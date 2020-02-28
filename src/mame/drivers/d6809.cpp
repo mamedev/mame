@@ -145,7 +145,7 @@ READ8_MEMBER( d6809_state::term_r )
 WRITE8_MEMBER( d6809_state::term_w )
 {
 	if ((data > 0) && (data < 0x80))
-		m_terminal->write(space, 0, data);
+		m_terminal->write(data);
 }
 
 void d6809_state::mem_map(address_map &map)
@@ -158,7 +158,7 @@ void d6809_state::mem_map(address_map &map)
 	//map(0x00f0, 0x00f0).r(m_fdc, FUNC(upd765a_device::msr_r));
 	map(0x00ff, 0x00ff).rw(FUNC(d6809_state::term_r), FUNC(d6809_state::term_w));
 	map(0x0200, 0x0201).mirror(0xfe).m(m_fdc, FUNC(upd765a_device::map));
-	map(0x0300, 0x0300).mirror(0xff).lw8("tc", [this](u8 data){ m_fdc->tc_w(1); m_fdc->tc_w(0); } );
+	map(0x0300, 0x0300).mirror(0xff).lw8(NAME([this] (u8 data){ m_fdc->tc_w(1); m_fdc->tc_w(0); }));
 	map(0x1000, 0xdfff).ram();
 	map(0xe000, 0xffff).rom().region("roms", 0);
 }

@@ -147,7 +147,7 @@ const tiny_rom_entry *mini_chief_device::device_rom_region() const
 void c1571_device::c1571_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x1800, 0x180f).mirror(0x03f0).rw(M6522_0_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x1800, 0x180f).mirror(0x03f0).m(M6522_0_TAG, FUNC(via6522_device::map));
 	map(0x1c00, 0x1c0f).mirror(0x03f0).rw(FUNC(c1571_device::via1_r), FUNC(c1571_device::via1_w));
 	map(0x2000, 0x2003).mirror(0x1ffc).rw(WD1770_TAG, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
 	map(0x4000, 0x400f).mirror(0x3ff0).rw(M6526_TAG, FUNC(mos6526_device::read), FUNC(mos6526_device::write));
@@ -162,7 +162,7 @@ void c1571_device::c1571_mem(address_map &map)
 void mini_chief_device::mini_chief_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x1800, 0x180f).mirror(0x03f0).rw(M6522_0_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x1800, 0x180f).mirror(0x03f0).m(M6522_0_TAG, FUNC(via6522_device::map));
 	map(0x1c00, 0x1c0f).mirror(0x03f0).rw(FUNC(mini_chief_device::via1_r), FUNC(mini_chief_device::via1_w));
 	map(0x2000, 0x2003).mirror(0x1ffc).rw(WD1770_TAG, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
 	map(0x4000, 0x400f).mirror(0xff0).rw(M6526_TAG, FUNC(mos6526_device::read), FUNC(mos6526_device::write));
@@ -598,7 +598,7 @@ void c1571_device::add_base_mconfig(machine_config &config)
 {
 	M6502(config, m_maincpu, 16_MHz_XTAL / 16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1571_device::c1571_mem);
-	config.m_perfect_cpu_quantum = subtag(M6502_TAG);
+	//config.set_perfect_quantum(m_maincpu); FIXME: not safe in a slot device - add barriers
 
 	VIA6522(config, m_via0, 16_MHz_XTAL / 16);
 	m_via0->readpa_handler().set(FUNC(c1571_device::via0_pa_r));

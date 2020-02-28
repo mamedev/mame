@@ -16,6 +16,10 @@
 
 class northbridge_device : public device_t
 {
+public:
+	template <typename T>
+	void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+
 protected:
 	// construction/destruction
 	northbridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -24,7 +28,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_cpu;
 	required_device<ram_device> m_ram;
 };
 

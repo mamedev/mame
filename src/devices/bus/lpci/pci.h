@@ -21,7 +21,7 @@ class pci_bus_device;
 
 // ======================> pci_device_interface
 
-class pci_device_interface :  public device_slot_card_interface
+class pci_device_interface :  public device_interface
 {
 public:
 	// construction/destruction
@@ -41,7 +41,7 @@ protected:
 };
 
 class pci_connector_device : public device_t,
-						public device_slot_interface
+						public device_single_card_slot_interface<pci_device_interface>
 {
 public:
 	template <typename T>
@@ -79,9 +79,9 @@ public:
 	DECLARE_WRITE64_MEMBER( write_64be );
 
 	void set_busnum(int busnum) { m_busnum = busnum; }
-	void set_father(const char *father) { m_father = father; }
-	void set_device(int num, const char *tag) {
-		m_devtag[num] = tag; }
+	template <typename T>
+	void set_father(T &&tag) { m_father.set_tag(std::forward<T>(tag)); }
+	void set_device(int num, const char *tag) { m_devtag[num] = tag; }
 
 	pci_bus_device *pci_search_bustree(int busnum, int devicenum, pci_bus_device *pcibus);
 	void add_sibling(pci_bus_device *sibling, int busnum);
@@ -100,7 +100,6 @@ private:
 	const char *        m_devtag[32];
 	pci_device_interface *m_device[32];
 
-	const char *        m_father;
 	pci_bus_device *    m_siblings[8];
 	uint8_t               m_siblings_busnum[8];
 	int                 m_siblings_count;
@@ -109,25 +108,11 @@ private:
 	int8_t                m_devicenum; // device number we are addressing
 	int8_t                m_busnumber; // pci bus number we are addressing
 	pci_bus_device *    m_busnumaddr; // pci bus we are addressing
+
+	optional_device<pci_bus_device> m_father;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(PCI_BUS, pci_bus_device)
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_PCI_BUS_ADD(_tag, _busnum) \
-	MCFG_DEVICE_ADD(_tag, PCI_BUS, 0) \
-	downcast<pci_bus_device *>(device)->set_busnum(_busnum);
-#define MCFG_PCI_BUS_DEVICE(_tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, PCI_CONNECTOR, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
-
-#define MCFG_PCI_BUS_SIBLING(_father_tag) \
-	downcast<pci_bus_device *>(device)->set_father(_father_tag);
-
 
 #endif // MAME_BUS_LPCI_PCI_H

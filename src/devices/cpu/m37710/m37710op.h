@@ -2486,61 +2486,6 @@ TABLE_OPCODES3 =
 };
 
 
-/* Assert or clear a line on the CPU */
-TABLE_FUNCTION(void, set_line, (int line, int state))
-{
-	switch(line)
-	{
-		// maskable interrupts
-		case M37710_LINE_ADC:
-		case M37710_LINE_UART1XMIT:
-		case M37710_LINE_UART1RECV:
-		case M37710_LINE_UART0XMIT:
-		case M37710_LINE_UART0RECV:
-		case M37710_LINE_TIMERB2:
-		case M37710_LINE_TIMERB1:
-		case M37710_LINE_TIMERB0:
-		case M37710_LINE_TIMERA4:
-		case M37710_LINE_TIMERA3:
-		case M37710_LINE_TIMERA2:
-		case M37710_LINE_TIMERA1:
-		case M37710_LINE_TIMERA0:
-		case M37710_LINE_IRQ2:
-		case M37710_LINE_IRQ1:
-		case M37710_LINE_IRQ0:
-		case M37710_LINE_DMA0:
-		case M37710_LINE_DMA1:
-		case M37710_LINE_DMA2:
-		case M37710_LINE_DMA3:
-			switch(state)
-			{
-				case CLEAR_LINE:
-					LINE_IRQ &= ~(1 << line);
-					if (m37710_irq_levels[line])
-					{
-						m_m37710_regs[m37710_irq_levels[line]] &= ~8;
-					}
-					break;
-
-				case ASSERT_LINE:
-				case HOLD_LINE:
-					LINE_IRQ |= (1 << line);
-					if (m37710_irq_levels[line])
-					{
-						m_m37710_regs[m37710_irq_levels[line]] |= 8;
-					}
-					break;
-
-				default: break;
-			}
-			break;
-
-		default: break;
-	}
-}
-
-
-
 /* Get a register from the CPU core */
 TABLE_FUNCTION(uint32_t, get_reg, (int regnum))
 {
@@ -2583,7 +2528,7 @@ TABLE_FUNCTION(void, set_reg, (int regnum, uint32_t val))
 		case M37710_X: REG_X = MAKE_UINT_16(val); break;
 		case M37710_Y: REG_Y = MAKE_UINT_16(val); break;
 #endif
-		case M37710_IRQ_STATE: (this->*FTABLE_SET_LINE)(M37710_LINE_IRQ0, val == 0 ? CLEAR_LINE : ASSERT_LINE); break;
+		case M37710_IRQ_STATE: m37710_set_irq_line(M37710_LINE_IRQ0, val == 0 ? CLEAR_LINE : ASSERT_LINE); break;
 	}
 }
 

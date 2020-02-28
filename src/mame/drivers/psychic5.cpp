@@ -370,10 +370,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(psychic5_state::scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* RST 10h - vblank */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* Z80 - RST 10h - vblank */
 
 	if(scanline == 0) // sprite buffer irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* Z80 - RST 08h */
 }
 
 
@@ -733,7 +733,7 @@ void psychic5_state::psychic5(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psychic5_state::psychic5_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psychic5_state::psychic5_soundport_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);      /* Allow time for 2nd cpu to interleave */
+	config.set_maximum_quantum(attotime::from_hz(600));      /* Allow time for 2nd cpu to interleave */
 
 	MCFG_MACHINE_START_OVERRIDE(psychic5_state,psychic5)
 
@@ -748,7 +748,6 @@ void psychic5_state::psychic5(machine_config &config)
 	JALECO_BLEND(config, m_blend, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(psychic5_state,psychic5)
-	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -782,7 +781,7 @@ void psychic5_state::bombsa(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psychic5_state::bombsa_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psychic5_state::bombsa_soundport_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_START_OVERRIDE(psychic5_state,bombsa)
 
@@ -795,7 +794,6 @@ void psychic5_state::bombsa(machine_config &config)
 	PALETTE(config, m_palette).set_entries(768);
 
 	MCFG_VIDEO_START_OVERRIDE(psychic5_state,bombsa)
-	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

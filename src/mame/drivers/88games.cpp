@@ -26,12 +26,6 @@
  *
  *************************************/
 
-WRITE_LINE_MEMBER(_88games_state::vblank_irq)
-{
-	if (state && m_k052109->is_irq_enabled())
-		m_maincpu->set_input_line(0, HOLD_LINE);
-}
-
 READ8_MEMBER(_88games_state::bankedram_r)
 {
 	if (m_videobank)
@@ -39,9 +33,9 @@ READ8_MEMBER(_88games_state::bankedram_r)
 	else
 	{
 		if (m_zoomreadroms)
-			return m_k051316->rom_r(space, offset);
+			return m_k051316->rom_r(offset);
 		else
-			return m_k051316->read(space, offset);
+			return m_k051316->read(offset);
 	}
 }
 
@@ -50,7 +44,7 @@ WRITE8_MEMBER(_88games_state::bankedram_w)
 	if (m_videobank)
 		m_ram[offset] = data;
 	else
-		m_k051316->write(space, offset, data);
+		m_k051316->write(offset, data);
 }
 
 WRITE8_MEMBER(_88games_state::k88games_5f84_w)
@@ -69,7 +63,7 @@ WRITE8_MEMBER(_88games_state::k88games_5f84_w)
 
 WRITE8_MEMBER(_88games_state::k88games_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 
@@ -92,24 +86,24 @@ READ8_MEMBER(_88games_state::k052109_051960_r)
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return m_k051960->k051937_r(space, offset - 0x3800);
+			return m_k051960->k051937_r(offset - 0x3800);
 		else if (offset < 0x3c00)
-			return m_k052109->read(space, offset);
+			return m_k052109->read(offset);
 		else
-			return m_k051960->k051960_r(space, offset - 0x3c00);
+			return m_k051960->k051960_r(offset - 0x3c00);
 	}
 	else
-		return m_k052109->read(space, offset);
+		return m_k052109->read(offset);
 }
 
 WRITE8_MEMBER(_88games_state::k052109_051960_w)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
-		m_k051960->k051937_w(space, offset - 0x3800, data);
+		m_k051960->k051937_w(offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		m_k052109->write(space, offset, data);
+		m_k052109->write(offset, data);
 	else
-		m_k051960->k051960_w(space, offset - 0x3c00, data);
+		m_k051960->k051960_w(offset - 0x3c00, data);
 }
 
 /*************************************
@@ -323,22 +317,23 @@ void _88games_state::_88games(machine_config &config)
 	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(_88games_state::screen_update_88games));
 	screen.set_palette("palette");
-	screen.screen_vblank().set(FUNC(_88games_state::vblank_irq));
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
-	m_k052109->set_tile_callback(FUNC(_88games_state::tile_callback), this);
+	m_k052109->set_screen("screen");
+	m_k052109->set_tile_callback(FUNC(_88games_state::tile_callback));
+	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette("palette");
-	m_k051960->set_screen_tag("screen");
-	m_k051960->set_sprite_callback(FUNC(_88games_state::sprite_callback), this);
+	m_k051960->set_screen("screen");
+	m_k051960->set_sprite_callback(FUNC(_88games_state::sprite_callback));
 
 	K051316(config, m_k051316, 0);
 	m_k051316->set_palette("palette");
-	m_k051316->set_zoom_callback(FUNC(_88games_state::zoom_callback), this);
+	m_k051316->set_zoom_callback(FUNC(_88games_state::zoom_callback));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

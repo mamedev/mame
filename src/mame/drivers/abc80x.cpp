@@ -153,6 +153,8 @@ Notes:
 
 #define LOG 0
 
+#define ABCBUS_TAG "bus"
+
 
 //**************************************************************************
 //  SOUND
@@ -988,7 +990,7 @@ void abc806_state::machine_reset()
 //  bac quickload
 //-------------------------------------------------
 
-QUICKLOAD_LOAD_MEMBER( abc800_state, bac )
+QUICKLOAD_LOAD_MEMBER(abc800_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -1049,10 +1051,11 @@ QUICKLOAD_LOAD_MEMBER( abc800_state, bac )
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( common )
+//  machine_config( common )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc800_state::common)
+void abc800_state::common(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, ABC800_X01/2/2);
 	m_maincpu->set_daisy_config(abc800_daisy_chain);
@@ -1083,8 +1086,13 @@ MACHINE_CONFIG_START(abc800_state::common)
 	m_dart->out_txdb_callback().set(ABC_KEYBOARD_PORT_TAG, FUNC(abc_keyboard_port_device::txd_w));
 	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, abc800_discrete).add_route(ALL_OUTPUTS, "mono", 0.80);
+
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, TIMER_CASSETTE_TAG).configure_periodic(FUNC(abc800_state::cassette_input_tick), attotime::from_hz(44100));
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
@@ -1104,24 +1112,21 @@ MACHINE_CONFIG_START(abc800_state::common)
 
 	ABCBUS_SLOT(config, ABCBUS_TAG, ABC800_X01/2/2, abcbus_cards, nullptr);
 
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, abc800_discrete).add_route(ALL_OUTPUTS, "mono", 0.80);
-
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("abc800");
 	SOFTWARE_LIST(config, "hdd_list").set_original("abc800_hdd");
 
 	// quickload
-	MCFG_QUICKLOAD_ADD("quickload", abc800_state, bac, "bac", 2)
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "bac", attotime::from_seconds(2)).set_load_callback(FUNC(abc800_state::quickload_cb));
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( abc800c )
+//  machine_config( abc800c )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc800c_state::abc800c)
+void abc800c_state::abc800c(machine_config &config)
+{
 	common(config);
 
 	// basic machine hardware
@@ -1132,23 +1137,23 @@ MACHINE_CONFIG_START(abc800c_state::abc800c)
 	abc800c_video(config);
 
 	// peripheral hardware
-	MCFG_DEVICE_MODIFY(ABC_KEYBOARD_PORT_TAG)
-	MCFG_SLOT_DEFAULT_OPTION("abc800")
-	MCFG_SLOT_FIXED(true)
+	abc_keyboard_port_device &kb(*subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG));
+	kb.set_default_option("abc800");
+	kb.set_fixed(true);
 
-	MCFG_DEVICE_MODIFY(ABCBUS_TAG)
-	MCFG_SLOT_DEFAULT_OPTION("abc830")
+	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc830");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( abc800m )
+//  machine_config( abc800m )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc800m_state::abc800m)
+void abc800m_state::abc800m(machine_config &config)
+{
 	common(config);
 
 	// basic machine hardware
@@ -1159,23 +1164,23 @@ MACHINE_CONFIG_START(abc800m_state::abc800m)
 	abc800m_video(config);
 
 	// peripheral hardware
-	MCFG_DEVICE_MODIFY(ABC_KEYBOARD_PORT_TAG)
-	MCFG_SLOT_DEFAULT_OPTION("abc800")
-	MCFG_SLOT_FIXED(true)
+	abc_keyboard_port_device &kb(*subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG));
+	kb.set_default_option("abc800");
+	kb.set_fixed(true);
 
-	MCFG_DEVICE_MODIFY(ABCBUS_TAG)
-	MCFG_SLOT_DEFAULT_OPTION("abc830")
+	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc830");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( abc802 )
+//  machine_config( abc802 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc802_state::abc802)
+void abc802_state::abc802(machine_config &config)
+{
 	common(config);
 
 	// basic machine hardware
@@ -1189,22 +1194,21 @@ MACHINE_CONFIG_START(abc802_state::abc802)
 	m_dart->out_dtrb_callback().set(FUNC(abc802_state::lrs_w));
 	m_dart->out_rtsb_callback().set(FUNC(abc802_state::mux80_40_w));
 
-	MCFG_DEVICE_MODIFY(ABC_KEYBOARD_PORT_TAG)
-	MCFG_SLOT_DEFAULT_OPTION("abc55")
+	subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG)->set_default_option("abc55");
 
-	MCFG_DEVICE_MODIFY(ABCBUS_TAG)
-	MCFG_SLOT_DEFAULT_OPTION("abc834")
+	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc834");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( abc806 )
+//  machine_config( abc806 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc806_state::abc806)
+void abc806_state::abc806(machine_config &config)
+{
 	common(config);
 
 	// basic machine hardware
@@ -1219,18 +1223,16 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 
 	m_dart->out_dtrb_callback().set(FUNC(abc806_state::keydtr_w));
 
-	MCFG_DEVICE_MODIFY(ABC_KEYBOARD_PORT_TAG)
-	MCFG_SLOT_DEFAULT_OPTION("abc77")
+	subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG)->set_default_option("abc77");
 
-	MCFG_DEVICE_MODIFY(ABCBUS_TAG)
-	MCFG_SLOT_DEFAULT_OPTION("abc832")
+	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc832");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("160K").set_extra_options("544K");
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list2").set_original("abc806");
-MACHINE_CONFIG_END
+}
 
 
 

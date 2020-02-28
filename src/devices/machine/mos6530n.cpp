@@ -127,10 +127,10 @@ mos6530_device_base::mos6530_device_base(const machine_config &mconfig, device_t
 	m_out8_pa_cb(*this),
 	m_in8_pb_cb(*this),
 	m_out8_pb_cb(*this),
-	m_in_pa_cb{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } },
-	m_out_pa_cb{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } },
-	m_in_pb_cb{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } },
-	m_out_pb_cb{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } },
+	m_in_pa_cb(*this),
+	m_out_pa_cb(*this),
+	m_in_pb_cb(*this),
+	m_out_pb_cb(*this),
 	m_pa_in(0xff),
 	m_pa_out(0),
 	m_pa_ddr(0),
@@ -178,14 +178,10 @@ void mos6530_device_base::device_start()
 	m_out8_pa_cb.resolve();
 	m_in8_pb_cb.resolve();
 	m_out8_pb_cb.resolve();
-	for (auto &cb : m_in_pa_cb)
-		cb.resolve();
-	for (auto &cb : m_out_pa_cb)
-		cb.resolve_safe();
-	for (auto &cb : m_in_pb_cb)
-		cb.resolve();
-	for (auto &cb : m_out_pb_cb)
-		cb.resolve_safe();
+	m_in_pa_cb.resolve_all();
+	m_out_pa_cb.resolve_all_safe();
+	m_in_pb_cb.resolve_all();
+	m_out_pb_cb.resolve_all_safe();
 
 	// allocate timer
 	t_gen = timer_alloc(0);
@@ -412,7 +408,7 @@ void mos6530_device_base::edge_detect()
 	uint8_t data = (m_pa_out & ddr_out) | (m_pa_in & ddr_in);
 	int state = BIT(data, 7);
 
-	if ((m_pa7 ^ state) && (m_pa7_dir ^ state) == 0)
+	if ((m_pa7 ^ state) && (m_pa7_dir ^ state) == 0 && !m_irq_edge)
 	{
 		LOG("%s %s edge-detect IRQ\n", machine().time().as_string(), name());
 

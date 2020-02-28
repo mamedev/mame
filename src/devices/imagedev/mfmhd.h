@@ -48,8 +48,7 @@ private:
 	running_machine &           m_machine;
 };
 
-class mfm_harddisk_device : public harddisk_image_device,
-							public device_slot_card_interface
+class mfm_harddisk_device : public harddisk_image_device
 {
 public:
 	~mfm_harddisk_device();

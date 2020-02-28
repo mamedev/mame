@@ -29,7 +29,7 @@
 		<!-- repaired copy protected by hand -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="331572">
-				<rom name="123_sys.mfm" size="2002793" crc="89e185f8" sha1="316ae07e5cbf02a4dcdbe322f9f0dced75b5f387" offset="0" status="baddump"/>
+				<rom name="123_sys.mfm" size="2002793" crc="89e185f8" sha1="316ae07e5cbf02a4dcdbe322f9f0dced75b5f387" status="baddump"/>
 			</dataarea>
 		</part>
 

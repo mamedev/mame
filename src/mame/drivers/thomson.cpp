@@ -300,7 +300,7 @@ T9000 (1980)
 Early TO7 prototype.
 The hardware seems to be the exactly same. Only the BIOS is different.
 It has some bug that were corrected later for the TO7.
-Actually, the two computers are undistinguishable, except for the different
+Actually, the two computers are indistinguishable, except for the different
 startup screen, and a couple BIOS addresses.
 They can run the same software and accept the same devices and extensions.
 
@@ -309,7 +309,7 @@ They can run the same software and accept the same devices and extensions.
 
 /* ------------ address maps ------------ */
 
-void thomson_state::to7(address_map &map)
+void thomson_state::to7_map(address_map &map)
 {
 
 	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(thomson_state::to7_cartridge_w)); /* 4 * 16 KB */
@@ -329,7 +329,7 @@ void thomson_state::to7(address_map &map)
 	map(0xe800, 0xffff).rom();       /* system bios  */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
-/* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
+/* 18 KB floppy / network ROM controllers */
 
 /* RAM mapping:
    0x0000 - 0x3fff: 16 KB video RAM (actually 8 K x 8 bits + 8 K x 6 bits)
@@ -344,65 +344,78 @@ void thomson_state::to7(address_map &map)
 /* ------------ ROMS ------------ */
 
 /* external floppy controllers */
-#define ROM_FLOPPY( base )                      \
+#define ROM_FLOPPY                              \
 		/* no controller */                     \
-	ROM_FILL( base, 0x800, 0x39 )                   \
+	ROM_REGION( 0x800, "floppy_none", 0 )           \
+	ROM_FILL( 0, 0x800, 0x39 )                      \
 		/* CD 90-015 (5"1/4) */                     \
-	ROM_LOAD ( "cd90-015.rom", base+0x800, 0x7c0,           \
+	ROM_REGION( 0x800, "floppy_cd90_015", 0 )           \
+	ROM_LOAD ( "cd90-015.rom", 0x000, 0x7c0,                \
 		CRC(821d34c1)                       \
 		SHA1(31a6bb81baaeec5fc8de457c97264f9dfa92c18b) )    \
 		/* CD 90-640 (5"1/4) */                     \
-	ROM_LOAD ( "cd90-640.rom", base+0x1000, 0x7c0,          \
+	ROM_REGION( 0x800, "floppy_cd90_640", 0 )           \
+	ROM_LOAD ( "cd90-640.rom", 0x000, 0x7c0,                \
 		CRC(5114c0a5)                       \
 		SHA1(5c72566c22d8160ef0c75959e1863a1309bbbe49) )    \
 		/* CD 90-351 (3"1/2) */                     \
-	ROM_LOAD ( "cd-351-0.rom", base+0x1800, 0x7c0,          \
+	ROM_REGION( 0x2000, "floppy_cd90_351", 0 )          \
+	ROM_LOAD ( "cd-351-0.rom", 0x0000, 0x7c0,               \
 		CRC(2c0159fd)                       \
 		SHA1(bab5395ed8bc7c06f9897897f836054e6546e8e8) )    \
-	ROM_LOAD ( "cd-351-1.rom", base+0x2000, 0x7c0,          \
+	ROM_LOAD ( "cd-351-1.rom", 0x0800, 0x7c0,               \
 		CRC(8e58d159)                       \
 		SHA1(dcf992c96e7556b2faee6bacd3f744e56998e6ea) )    \
-	ROM_LOAD ( "cd-351-2.rom", base+0x2800, 0x7c0,          \
+	ROM_LOAD ( "cd-351-2.rom", 0x1000, 0x7c0,               \
 		CRC(c9228b60)                       \
 		SHA1(179e10107d5be91e684069dee80f94847b83201f) )    \
-	ROM_LOAD ( "cd-351-3.rom", base+0x3000, 0x7c0,          \
+	ROM_LOAD ( "cd-351-3.rom", 0x1800, 0x7c0,               \
 		CRC(3ca8e5dc)                       \
 		SHA1(7118636fb5c597c78c2fce17b02aed5e4ba38635) )    \
 		/* CQ 90-028 (2"8, aka QDD) */                  \
-	ROM_LOAD ( "cq90-028.rom", base+0x3800, 0x7c0,          \
+	ROM_REGION( 0x800, "floppy_cq90_028", 0 )               \
+	ROM_LOAD ( "cq90-028.rom", 0x000, 0x7c0,                \
 		CRC(ca4dba3d)                       \
 		SHA1(949c1f777c892da62c242215d79757d61e71e62b) )
 
 /* external floppy / network controller: 9 banks */
-#define ROM_FLOPPY5( base )             \
-	ROM_FLOPPY( base )                  \
-	ROM_LOAD ( "nano5.rom", base+0x4000, 0x7c0, \
+#define ROM_FLOPPY5                     \
+	ROM_FLOPPY                          \
+	ROM_REGION( 0x800, "floppy_nano", 0 )       \
+	ROM_LOAD ( "nano5.rom", 0x000, 0x7c0,       \
 			CRC(2f756868)               \
 			SHA1(b5b7cb6d12493d849330b6b5628efd1a83a4bbf5) )
 
-#define ROM_FLOPPY7( base )             \
-	ROM_FLOPPY( base )                  \
-	ROM_LOAD ( "nano7.rom", base+0x4000, 0x7c0, \
+#define ROM_FLOPPY7                     \
+	ROM_FLOPPY                          \
+	ROM_REGION( 0x800, "floppy_nano", 0 )       \
+	ROM_LOAD ( "nano7.rom", 0x000, 0x7c0,       \
 			CRC(42a1d1a6)               \
 			SHA1(973209f4baa5e81bf7885c0602949e064bac7862) )
 
 
 ROM_START ( to7 )
-	ROM_REGION ( 0x24800, "maincpu", 0 )
+	ROM_REGION ( 0x10000, "maincpu", 0 )
 	ROM_LOAD ( "to7.rom", 0xe800, 0x1800,
 		CRC(0e7826da)
 		SHA1(23a2f84b03c01d385cc1923c8ece95c43756297a) )
-	ROM_FILL ( 0x10000, 0x10000, 0x39 )
-	ROM_FLOPPY7 ( 0x20000 )
+
+	ROM_REGION ( 0x10000, "cartridge", 0 )
+	ROM_FILL ( 0x00000, 0x10000, 0x39 )
+
+	ROM_FLOPPY7
 ROM_END
 
 ROM_START ( t9000 )
-	ROM_REGION ( 0x24800, "maincpu", 0 )
+	ROM_REGION ( 0x10000, "maincpu", 0 )
 	ROM_LOAD ( "t9000.rom", 0xe800, 0x1800,
 		CRC(daa8cfbf)
 		SHA1(a5735db1ad4e529804fc46603f838d3f4ccaf5cf) )
-	ROM_FILL ( 0x10000, 0x10000, 0x39 )
-	ROM_FLOPPY7 ( 0x20000 )
+
+	ROM_REGION ( 0x10000, "cartridge", 0 )
+	ROM_FILL ( 0x00000, 0x10000, 0x39 )
+
+	ROM_FLOPPY7
 ROM_END
 
 
@@ -619,43 +632,42 @@ static void cd90_640_floppies(device_slot_interface &device)
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::to7_base)
-
+void thomson_state::to7_base(machine_config &config)
+{
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to7 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to7 )
 
 /* cpu */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 16_MHz_XTAL / 16)
-	MCFG_DEVICE_PROGRAM_MAP(to7)
+	MC6809E(config, m_maincpu, 16_MHz_XTAL / 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::to7_map);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainfirq").output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
 /* video */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE ( /*50*/ 1./0.019968 )
-	MCFG_SCREEN_SIZE ( THOM_TOTAL_WIDTH * 2, THOM_TOTAL_HEIGHT )
-	MCFG_SCREEN_VISIBLE_AREA ( 0, THOM_TOTAL_WIDTH * 2 - 1,
-				0, THOM_TOTAL_HEIGHT - 1 )
-	MCFG_SCREEN_UPDATE_DRIVER( thomson_state, screen_update_thom )
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, thomson_state, thom_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(/*50*/ 1./0.019968);
+	m_screen->set_size(THOM_TOTAL_WIDTH * 2, THOM_TOTAL_HEIGHT);
+	m_screen->set_visarea(0, THOM_TOTAL_WIDTH * 2 - 1, 0, THOM_TOTAL_HEIGHT - 1);
+	m_screen->set_screen_update(FUNC(thomson_state::screen_update_thom));
+	m_screen->screen_vblank().set(FUNC(thomson_state::thom_vblank));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(thomson_state::thom_palette), 4097); // 12-bit color + transparency
 	MCFG_VIDEO_START_OVERRIDE( thomson_state, thom )
 
 /* sound */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("buzzer", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // 6-bit game extension R-2R DAC (R=10K)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "buzzer", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_1BIT(config, "buzzer", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	DAC_6BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // 6-bit game extension R-2R DAC (R=10K)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "buzzer", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 /* speech synthesis */
-	MCFG_DEVICE_ADD("mea8000", MEA8000, 3840000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	MEA8000(config, m_mea8000, 3840000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 /* cassette */
 	CASSETTE(config, m_cassette);
@@ -664,20 +676,22 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	m_cassette->set_interface("to_cass");
 
 /* floppy */
-	MCFG_DEVICE_ADD("mc6843", MC6843, 16_MHz_XTAL / 16 / 2)
+	CQ90_028(config, m_to7qdd, 0);
 
-	MCFG_DEVICE_ADD(m_floppy_image[0], LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_0_w))
-	MCFG_DEVICE_ADD(m_floppy_image[1], LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_1_w))
-	MCFG_DEVICE_ADD(m_floppy_image[2], LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_2_w))
-	MCFG_DEVICE_ADD(m_floppy_image[3], LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_3_w))
+	THMFC1(config, m_thmfc, 16_MHz_XTAL);
+	m_thmfc->floppy_active_cb().set(FUNC(thomson_state::thom_floppy_active));
+
+	MC6843(config, m_mc6843, 16_MHz_XTAL / 16 / 2);
+	m_mc6843->set_floppy_drives(m_floppy_image[0], m_floppy_image[1], m_floppy_image[2], m_floppy_image[3]);
+
+	LEGACY_FLOPPY(config, m_floppy_image[0], 0, &thomson_floppy_interface);
+	m_floppy_image[0]->out_idx_cb().set(FUNC(thomson_state::fdc_index_0_w));
+	LEGACY_FLOPPY(config, m_floppy_image[1], 0, &thomson_floppy_interface);
+	m_floppy_image[1]->out_idx_cb().set(FUNC(thomson_state::fdc_index_1_w));
+	LEGACY_FLOPPY(config, m_floppy_image[2], 0, &thomson_floppy_interface);
+	m_floppy_image[2]->out_idx_cb().set(FUNC(thomson_state::fdc_index_2_w));
+	LEGACY_FLOPPY(config, m_floppy_image[3], 0, &thomson_floppy_interface);
+	m_floppy_image[3]->out_idx_cb().set(FUNC(thomson_state::fdc_index_3_w));
 
 	WD2793(config, m_wd2793_fdc, 16_MHz_XTAL / 16);
 	FLOPPY_CONNECTOR(config, "wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats);
@@ -735,9 +749,7 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	acia_clock.signal_handler().set(FUNC(thomson_state::write_acia_clock));
 
 /* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "to_cart")
-	MCFG_GENERIC_EXTENSIONS("m7,rom")
-	MCFG_GENERIC_LOAD(thomson_state, to7_cartridge)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "to_cart", "m7,rom").set_device_load(FUNC(thomson_state::to7_cartridge));
 
 /* internal ram */
 	RAM(config, m_ram).set_default_size("40K").set_extra_options("24K,48K");
@@ -747,7 +759,7 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	SOFTWARE_LIST(config, "to7_cass_list").set_original("to7_cass");
 	SOFTWARE_LIST(config, "to_flop_list").set_original("to_flop");
 	SOFTWARE_LIST(config, "to7_qd_list").set_original("to7_qd");
-MACHINE_CONFIG_END
+}
 
 void thomson_state::to7(machine_config &config)
 {
@@ -822,7 +834,7 @@ In arabic mode, Ctrl+E / Ctrl+X to start / stop typing in-line latin.
 
 **********************************************************************/
 
-void thomson_state::to770(address_map &map)
+void thomson_state::to770_map(address_map &map)
 {
 
 	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(thomson_state::to7_cartridge_w)); /* 4 * 16 KB */
@@ -843,7 +855,7 @@ void thomson_state::to770(address_map &map)
 	map(0xe800, 0xffff).rom();       /* system bios  */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
-/* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
+/* 18 KB floppy / network ROM controllers */
 
 /* RAM mapping:
    0x00000 - 0x03fff: 16 KB video RAM
@@ -858,21 +870,27 @@ void thomson_state::to770(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( to770 )
-	ROM_REGION ( 0x24800, "maincpu", 0 )
+	ROM_REGION ( 0x10000, "maincpu", 0 )
 	ROM_LOAD ( "to770.rom", 0xe800, 0x1800, /* BIOS */
 		CRC(89518862)
 		SHA1(cd34474c0bcc758f6d71c90fbd40cef379d61374) )
-	ROM_FLOPPY7 ( 0x20000 )
-	ROM_FILL ( 0x10000, 0x10000, 0x39 )
+
+	ROM_REGION ( 0x10000, "cartridge", 0 )
+	ROM_FILL ( 0x00000, 0x10000, 0x39 )
+
+	ROM_FLOPPY7
 ROM_END
 
 ROM_START ( to770a )
-	ROM_REGION ( 0x24800, "maincpu", 0 )
+	ROM_REGION ( 0x10000, "maincpu", 0 )
 	ROM_LOAD ( "to770a.rom", 0xe800, 0x1800,
 		CRC(378ea808)
 		SHA1(f4575b537dfdb46ff2a0e7cbe8dfe4ba63161b8e) )
-	ROM_FLOPPY7 ( 0x20000 )
-	ROM_FILL ( 0x10000, 0x10000, 0x39 )
+
+	ROM_REGION ( 0x10000, "cartridge", 0 )
+	ROM_FILL ( 0x00000, 0x10000, 0x39 )
+
+	ROM_FLOPPY7
 ROM_END
 
 
@@ -927,13 +945,13 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::to770)
+void thomson_state::to770(machine_config &config)
+{
 	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to770 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to770 )
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP ( to770)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::to770_map);
 
 	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to770_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
@@ -947,7 +965,7 @@ MACHINE_CONFIG_START(thomson_state::to770)
 
 	SOFTWARE_LIST(config, "t770_cart_list").set_original("to770_cart");
 	SOFTWARE_LIST(config.replace(), "to7_cart_list").set_compatible("to7_cart");
-MACHINE_CONFIG_END
+}
 
 void thomson_state::to770a(machine_config &config)
 {
@@ -1020,7 +1038,7 @@ Differences include:
 
 **********************************************************************/
 
-void thomson_state::mo5(address_map &map)
+void thomson_state::mo5_map(address_map &map)
 {
 
 	map(0x0000, 0x1fff).bankr(THOM_VRAM_BANK).w(FUNC(thomson_state::to770_vram_w));
@@ -1039,7 +1057,7 @@ void thomson_state::mo5(address_map &map)
 	map(0xf000, 0xffff).rom();       /* system bios */
 
 /* 0x10000 - 0x1ffff: 16 KB integrated BASIC / 64 KB external cartridge */
-/* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
+/* 18 KB floppy / network ROM controllers */
 
 /* RAM mapping:
    0x00000 - 0x03fff: 16 KB video RAM
@@ -1054,25 +1072,33 @@ void thomson_state::mo5(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo5 )
-	ROM_REGION ( 0x24800, "maincpu", 0 )
+	ROM_REGION ( 0x14000, "maincpu", 0 )
 	ROM_LOAD ( "mo5.rom", 0xf000, 0x1000,
 		CRC(f0ea9140)
 		SHA1(36ce2d3df1866ec2fe368c1c28757e2f5401cf44) )
 	ROM_LOAD ( "basic5.rom", 0x11000, 0x3000,
 		CRC(c2c11b9d)
 		SHA1(512dd40fb45bc2b51a24c84b3723a32bc8e80c06) )
-	ROM_FLOPPY5 ( 0x20000 )
+
+	ROM_REGION ( 0x10000, "cartridge", 0 )
+	ROM_FILL( 0x00000, 0x10000, 0x39 )
+
+	ROM_FLOPPY5
 ROM_END
 
 ROM_START ( mo5e )
-	ROM_REGION ( 0x24800, "maincpu", 0 )
+	ROM_REGION ( 0x14000, "maincpu", 0 )
 	ROM_LOAD ( "mo5e.rom", 0xf000, 0x1000,
 		CRC(6520213a)
 		SHA1(f17a7a59baf2819ec80991b34b204795536a5e01) )
 	ROM_LOAD ( "basic5e.rom", 0x11000, 0x3000,
 		CRC(934a72b2)
 		SHA1(b37e2b1afbfba368c19be87b3bf61dfe6ad8b0bb) )
-	ROM_FLOPPY5 ( 0x20000 )
+
+	ROM_REGION ( 0x10000, "cartridge", 0 )
+	ROM_FILL( 0x00000, 0x10000, 0x39 )
+
+	ROM_FLOPPY5
 ROM_END
 
 
@@ -1116,13 +1142,13 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::mo5)
+void thomson_state::mo5(machine_config &config)
+{
 	to7_base(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5 )
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP ( mo5)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::mo5_map);
 
 	m_cassette->set_formats(mo5_cassette_formats);
 	m_cassette->set_interface("mo_cass");
@@ -1137,10 +1163,7 @@ MACHINE_CONFIG_START(thomson_state::mo5)
 	m_pia_sys->cb2_handler().set_nop();
 	m_pia_sys->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>)); // WARNING: differs from TO7 !
 
-	config.device_remove("cartslot");
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
-	MCFG_GENERIC_EXTENSIONS("m5,rom")
-	MCFG_GENERIC_LOAD(thomson_state, mo5_cartridge)
+	GENERIC_CARTSLOT(config.replace(), "cartslot", generic_plain_slot, "mo_cart", "m5,rom").set_device_load(FUNC(thomson_state::mo5_cartridge));
 
 	config.device_remove("to7_cart_list");
 	config.device_remove("to7_cass_list");
@@ -1154,11 +1177,12 @@ MACHINE_CONFIG_START(thomson_state::mo5)
 
 	/* internal ram */
 	m_ram->set_default_size("112K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(thomson_state::mo5e)
+void thomson_state::mo5e(machine_config &config)
+{
 	mo5(config);
-MACHINE_CONFIG_END
+}
 
 
 COMP( 1984, mo5, 0, 0, mo5, mo5, thomson_state, empty_init, "Thomson", "MO5", 0 )
@@ -1238,7 +1262,7 @@ It was replaced quickly with the improved TO9+.
 
 **********************************************************************/
 
-void thomson_state::to9(address_map &map)
+void thomson_state::to9_map(address_map &map)
 {
 
 	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(thomson_state::to9_cartridge_w));/* 4 * 16 KB */
@@ -1254,7 +1278,7 @@ void thomson_state::to9(address_map &map)
 	map(0xe7de, 0xe7df).rw(FUNC(thomson_state::to9_kbd_r), FUNC(thomson_state::to9_kbd_w));
 	map(0xe7e4, 0xe7e7).rw(FUNC(thomson_state::to9_gatearray_r), FUNC(thomson_state::to9_gatearray_w));
 	map(0xe7e8, 0xe7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-/*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w ) */
+/*  map(0xe7f0, 0xe7f7).rw(FUNC(thomson_state::to9_ieee_r), FUNC(thomson_state::to9_ieee_w )); */
 	map(0xe7f2, 0xe7f3).rw(FUNC(thomson_state::to7_midi_r), FUNC(thomson_state::to7_midi_w));
 	map(0xe7f8, 0xe7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7fe, 0xe7ff).rw(FUNC(thomson_state::to7_modem_mea8000_r), FUNC(thomson_state::to7_modem_mea8000_w));
@@ -1262,7 +1286,7 @@ void thomson_state::to9(address_map &map)
 
 /* 0x10000 - 0x1ffff:  64 KB external ROM cartridge */
 /* 0x20000 - 0x3ffff: 128 KB internal software ROM */
-/* 0x40000 - 0x447ff: 18  KB external floppy / network ROM controllers */
+/* 18 KB external floppy / network ROM controllers */
 
 /* RAM mapping:
    0x00000 - 0x03fff: 16 KB video RAM
@@ -1282,40 +1306,41 @@ void thomson_state::to9(address_map &map)
  */
 
 ROM_START ( to9 )
-	ROM_REGION ( 0x44800, "maincpu", 0 )
+	ROM_REGION ( 0x30000, "maincpu", 0 )
 	ROM_LOAD ( "to9.rom", 0xe000, 0x2000, /* BIOS & floppy controller */
 		CRC(f9278bf7)
 		SHA1(9e99e6ae0285950f007b19161de642a4031fe46e) )
 
 		/* BASIC & software */
-	ROM_LOAD ( "basic9-0.rom", 0x20000, 0x4000,
+	ROM_LOAD ( "basic9-0.rom", 0x10000, 0x4000,
 		CRC(c7bac620)
 		SHA1(4b2a8b30cf437858ce978ba7b0dfa2bbd57eb38a) )
-	ROM_LOAD ( "basic9-1.rom", 0x24000, 0x4000,
+	ROM_LOAD ( "basic9-1.rom", 0x14000, 0x4000,
 		CRC(ea5f3e43)
 		SHA1(5e58a29c2d117fcdb1f5e7ca31dbfffa0f9218f2) )
-	ROM_LOAD ( "basic9-2.rom", 0x28000, 0x4000,
+	ROM_LOAD ( "basic9-2.rom", 0x18000, 0x4000,
 		CRC(0f5581b3)
 		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
-	ROM_LOAD ( "basic9-3.rom", 0x2c000, 0x4000,
+	ROM_LOAD ( "basic9-3.rom", 0x1c000, 0x4000,
 		CRC(6b5b19e3)
 		SHA1(0e832670c185694d9abbcebcc3ad90e94eed585d) )
-	ROM_LOAD ( "soft9-0a.rom", 0x30000, 0x4000,
+	ROM_LOAD ( "soft9-0a.rom", 0x20000, 0x4000,
 		CRC(8cee157e)
 		SHA1(f32fc39b95890c00571e9f3fbcc2d8e0596fc4a1) )
-	ROM_LOAD ( "soft9-1a.rom", 0x34000, 0x4000,
+	ROM_LOAD ( "soft9-1a.rom", 0x24000, 0x4000,
 		CRC(cf39ac93)
 		SHA1(b97e6b7389398e5706624973c11ee7ddba323ce1) )
-	ROM_LOAD ( "soft9-0b.rom", 0x38000, 0x4000,
+	ROM_LOAD ( "soft9-0b.rom", 0x28000, 0x4000,
 		CRC(033aee3f)
 		SHA1(f3604e500329ec0489b05dbab05530322e9463c5) )
-	ROM_LOAD ( "soft9-1b.rom", 0x3c000, 0x4000,
+	ROM_LOAD ( "soft9-1b.rom", 0x2c000, 0x4000,
 		CRC(214fe527)
 		SHA1(0d8e3f1ca347026e906c3d00a0371e8238c44a60) )
 
-	ROM_FLOPPY7( 0x40000 )
+	ROM_REGION ( 0x10000, "cartridge", 0 )
+	ROM_FILL( 0x00000, 0x10000, 0x39 )
 
-	ROM_FILL( 0x10000, 0x10000, 0x39 )
+	ROM_FLOPPY7
 ROM_END
 
 
@@ -1473,14 +1498,14 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::to9)
+void thomson_state::to9(machine_config &config)
+{
 	to7(config);
 
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9 )
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP ( to9)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::to9_map);
 
 	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to9_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
@@ -1496,7 +1521,7 @@ MACHINE_CONFIG_START(thomson_state::to9)
 
 	/* internal ram */
 	m_ram->set_default_size("192K").set_extra_options("128K");
-MACHINE_CONFIG_END
+}
 
 
 COMP( 1985, to9, 0, 0, to9, to9, thomson_state, empty_init, "Thomson", "TO9", MACHINE_IMPERFECT_COLORS )
@@ -1565,7 +1590,7 @@ The TO8D is simply a TO8 with an integrated 3"1/2 floppy drive.
 **********************************************************************/
 
 
-void thomson_state::to8(address_map &map)
+void thomson_state::to8_map(address_map &map)
 {
 
 	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(thomson_state::to8_cartridge_w)); /* 4 * 16 KB */
@@ -1582,7 +1607,7 @@ void thomson_state::to8(address_map &map)
 	map(0xe7da, 0xe7dd).rw(FUNC(thomson_state::to8_vreg_r), FUNC(thomson_state::to8_vreg_w));
 	map(0xe7e4, 0xe7e7).rw(FUNC(thomson_state::to8_gatearray_r), FUNC(thomson_state::to8_gatearray_w));
 	map(0xe7e8, 0xe7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-/*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w ) */
+/*  map(0xe7f0, 0xe7f7).rw(FUNC(thomson_state::to9_ieee_r), FUNC(thomson_state::to9_ieee_w )); */
 	map(0xe7f2, 0xe7f3).rw(FUNC(thomson_state::to7_midi_r), FUNC(thomson_state::to7_midi_w));
 	map(0xe7f8, 0xe7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7fe, 0xe7ff).rw(FUNC(thomson_state::to7_modem_mea8000_r), FUNC(thomson_state::to7_modem_mea8000_w));
@@ -1591,7 +1616,7 @@ void thomson_state::to8(address_map &map)
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB internal software ROM */
 /* 0x30000 - 0x33fff: 16 KB BIOS ROM */
-/* 0x34000 - 0x387ff: 18 KB external floppy / network ROM controllers */
+/* 18 KB external floppy / network ROM controllers */
 
 /* RAM mapping: 512 KB flat (including video) */
 
@@ -1601,63 +1626,65 @@ void thomson_state::to8(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( to8 )
-	ROM_REGION ( 0x38800, "maincpu", 0 )
+	ROM_REGION ( 0x24000, "maincpu", 0 )
 
 		/* BIOS & floppy */
-	ROM_LOAD ( "to8-0.rom", 0x30000, 0x2000,
+	ROM_LOAD ( "to8-0.rom", 0x20000, 0x2000,
 		CRC(3c4a640a)
 		SHA1(0a4952f0ca002d82ac83755e1f694d56399413b2) )
-	ROM_LOAD ( "to8-1.rom", 0x32000, 0x2000,
+	ROM_LOAD ( "to8-1.rom", 0x22000, 0x2000,
 		CRC(cb9bae2d)
 		SHA1(a4a55a6e2c74bca15951158c5164970e922fc1c1) )
 
 		/* BASIC */
-	ROM_LOAD ( "basic8-0.rom", 0x20000, 0x4000,
+	ROM_LOAD ( "basic8-0.rom", 0x10000, 0x4000,
 		CRC(e5a00fb3)
 		SHA1(281e535ed9b0f76e620253e9103292b8ff623d02) )
-	ROM_LOAD ( "basic8-1.rom", 0x24000, 0x4000,
+	ROM_LOAD ( "basic8-1.rom", 0x14000, 0x4000,
 		CRC(4b241e63)
 		SHA1(ca8941a10db6cc069bf84c773f5e7d7d2c18449e) )
-	ROM_LOAD ( "basic8-2.rom", 0x28000, 0x4000,
+	ROM_LOAD ( "basic8-2.rom", 0x18000, 0x4000,
 		CRC(0f5581b3)
 		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
-	ROM_LOAD ( "basic8-3.rom", 0x2c000, 0x4000,
+	ROM_LOAD ( "basic8-3.rom", 0x1c000, 0x4000,
 		CRC(f552e7e3)
 		SHA1(3208e0d7d90241a327ed24e4921303f16e167bd5) )
 
-	ROM_FLOPPY7( 0x34000 )
+	ROM_REGION ( 0x10000, "cartridge", 0 )
+	ROM_FILL( 0x00000, 0x10000, 0x39 )
 
-	ROM_FILL( 0x10000, 0x10000, 0x39 )
+	ROM_FLOPPY7
 ROM_END
 
 ROM_START ( to8d )
-	ROM_REGION ( 0x38800, "maincpu", 0 )
+	ROM_REGION ( 0x24000, "maincpu", 0 )
 
 		/* BIOS & floppy */
-	ROM_LOAD ( "to8d-0.rom", 0x30000, 0x2000,
+	ROM_LOAD ( "to8d-0.rom", 0x20000, 0x2000,
 		CRC(30ea4950)
 		SHA1(6705100cd337fffb26ce999302b55fb71557b128) )
-	ROM_LOAD ( "to8d-1.rom", 0x32000, 0x2000,
+	ROM_LOAD ( "to8d-1.rom", 0x22000, 0x2000,
 		CRC(926cf0ca)
 		SHA1(8521613ac00e04dd94b69e771aeaefbf4fe97bf7) )
 
 		/* BASIC */
-	ROM_LOAD ( "basic8-0.rom", 0x20000, 0x4000,
+	ROM_LOAD ( "basic8-0.rom", 0x10000, 0x4000,
 		CRC(e5a00fb3)
 		SHA1(281e535ed9b0f76e620253e9103292b8ff623d02) )
-	ROM_LOAD ( "basic8-1.rom", 0x24000, 0x4000,
+	ROM_LOAD ( "basic8-1.rom", 0x14000, 0x4000,
 		CRC(4b241e63)
 		SHA1(ca8941a10db6cc069bf84c773f5e7d7d2c18449e) )
-	ROM_LOAD ( "basic8-2.rom", 0x28000, 0x4000,
+	ROM_LOAD ( "basic8-2.rom", 0x18000, 0x4000,
 		CRC(0f5581b3)
 		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
-	ROM_LOAD ( "basic8-3.rom", 0x2c000, 0x4000,
+	ROM_LOAD ( "basic8-3.rom", 0x1c000, 0x4000,
 		CRC(f552e7e3)
 		SHA1(3208e0d7d90241a327ed24e4921303f16e167bd5) )
 
-	ROM_FLOPPY7( 0x34000 )
+	ROM_REGION ( 0x10000, "cartridge", 0 )
+	ROM_FILL( 0x00000, 0x10000, 0x39 )
 
-	ROM_FILL( 0x10000, 0x10000, 0x39 )
+	ROM_FLOPPY7
 ROM_END
 
 
@@ -1694,15 +1721,15 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::to8)
+void thomson_state::to8(machine_config &config)
+{
 	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to8 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to8 )
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP ( to8)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::to8_map);
 
-	//MCFG_DEVICE_ADD("kbdmcu", MC6804, 11_MHz_XTAL)
+	//MC6804(config, "kbdmcu", 11_MHz_XTAL);
 
 	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to8_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
@@ -1725,7 +1752,7 @@ MACHINE_CONFIG_START(thomson_state::to8)
 	SOFTWARE_LIST(config, "to8_qd_list").set_original("to8_qd");
 	SOFTWARE_LIST(config.replace(), "to7_cass_list").set_compatible("to7_cass");
 	SOFTWARE_LIST(config.replace(), "to7_qd_list").set_compatible("to7_qd");
-MACHINE_CONFIG_END
+}
 
 void thomson_state::to8d(machine_config &config)
 {
@@ -1775,7 +1802,7 @@ The differences with the TO8 are:
 
 **********************************************************************/
 
-void thomson_state::to9p(address_map &map)
+void thomson_state::to9p_map(address_map &map)
 {
 
 	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(thomson_state::to8_cartridge_w)); /* 4 * 16 KB */
@@ -1793,7 +1820,7 @@ void thomson_state::to9p(address_map &map)
 	map(0xe7de, 0xe7df).rw(FUNC(thomson_state::to9_kbd_r), FUNC(thomson_state::to9_kbd_w));
 	map(0xe7e4, 0xe7e7).rw(FUNC(thomson_state::to8_gatearray_r), FUNC(thomson_state::to8_gatearray_w));
 	map(0xe7e8, 0xe7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-/*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w ) */
+/*  map(0xe7f0, 0xe7f7).rw(FUNC(thomson_state::to9_ieee_r), FUNC(thomson_state::to9_ieee_w )); */
 	map(0xe7f2, 0xe7f3).rw(FUNC(thomson_state::to7_midi_r), FUNC(thomson_state::to7_midi_w));
 	map(0xe7f8, 0xe7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7fe, 0xe7ff).rw(FUNC(thomson_state::to7_modem_mea8000_r), FUNC(thomson_state::to7_modem_mea8000_w));
@@ -1802,7 +1829,7 @@ void thomson_state::to9p(address_map &map)
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB internal software ROM */
 /* 0x30000 - 0x33fff: 16 KB BIOS ROM */
-/* 0x34000 - 0x387ff: 18 KB external floppy / network ROM controllers */
+/* 18 KB external floppy / network ROM controllers */
 
 /* RAM mapping: 512 KB flat (including video) */
 
@@ -1812,33 +1839,34 @@ void thomson_state::to9p(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( to9p )
-	ROM_REGION ( 0x38800, "maincpu", 0 )
+	ROM_REGION ( 0x24000, "maincpu", 0 )
 
 		/* BIOS & floppy */
-	ROM_LOAD ( "to9p-0.rom", 0x30000, 0x2000,
+	ROM_LOAD ( "to9p-0.rom", 0x20000, 0x2000,
 		CRC(a2731296)
 		SHA1(b30e06127d6e99d4ac5a5bb67881df27bbd9a7e5) )
-	ROM_LOAD ( "to9p-1.rom", 0x32000, 0x2000,
+	ROM_LOAD ( "to9p-1.rom", 0x22000, 0x2000,
 		CRC(c52ce315)
 		SHA1(7eacbd796e76bc72b872f9700c9b90414899ea0f) )
 
 		/* BASIC */
-	ROM_LOAD ( "basicp-0.rom", 0x20000, 0x4000,
+	ROM_LOAD ( "basicp-0.rom", 0x10000, 0x4000,
 		CRC(e5a00fb3)
 		SHA1(281e535ed9b0f76e620253e9103292b8ff623d02) )
-	ROM_LOAD ( "basicp-1.rom", 0x24000, 0x4000,
+	ROM_LOAD ( "basicp-1.rom", 0x14000, 0x4000,
 		CRC(4b241e63)
 		SHA1(ca8941a10db6cc069bf84c773f5e7d7d2c18449e) )
-	ROM_LOAD ( "basicp-2.rom", 0x28000, 0x4000,
+	ROM_LOAD ( "basicp-2.rom", 0x18000, 0x4000,
 		CRC(0f5581b3)
 		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
-	ROM_LOAD ( "basicp-3.rom", 0x2c000, 0x4000,
+	ROM_LOAD ( "basicp-3.rom", 0x1c000, 0x4000,
 		CRC(ebe9c8d9)
 		SHA1(b667ad09a1181f65059a2cbb4c95421bc544a334) )
 
-	ROM_FLOPPY7( 0x34000 )
+	ROM_REGION ( 0x10000, "cartridge", 0 )
+	ROM_FILL( 0x00000, 0x10000, 0x39 )
 
-	ROM_FILL( 0x10000, 0x10000, 0x39 )
+	ROM_FLOPPY7
 ROM_END
 
 
@@ -1856,13 +1884,13 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::to9p)
+void thomson_state::to9p(machine_config &config)
+{
 	to7(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9p )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9p )
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP ( to9p)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::to9p_map);
 
 	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to8_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
@@ -1886,7 +1914,7 @@ MACHINE_CONFIG_START(thomson_state::to9p)
 	SOFTWARE_LIST(config, "to8_qd_list").set_original("to8_qd");
 	SOFTWARE_LIST(config.replace(), "to7_cass_list").set_compatible("to7_cass");
 	SOFTWARE_LIST(config.replace(), "to7_qd_list").set_compatible("to7_qd");
-MACHINE_CONFIG_END
+}
 
 COMP( 1986, to9p, 0, 0, to9p, to9p, thomson_state, empty_init, "Thomson", "TO9+", 0 )
 
@@ -1950,7 +1978,7 @@ a PC XT.
 
 **********************************************************************/
 
-void thomson_state::mo6(address_map &map)
+void thomson_state::mo6_map(address_map &map)
 {
 
 	map(0x0000, 0x1fff).bankr(THOM_VRAM_BANK).w(FUNC(thomson_state::to770_vram_w));
@@ -1975,7 +2003,7 @@ void thomson_state::mo6(address_map &map)
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB BIOS ROM */
-/* 0x30000 - 0x347ff: 16 KB floppy / network ROM controllers */
+/* 16 KB floppy / network ROM controllers */
 
 /* RAM mapping: 128 KB flat (including video) */
 
@@ -1985,61 +2013,65 @@ void thomson_state::mo6(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo6 )
-	ROM_REGION ( 0x34800, "maincpu", 0 )
+	ROM_REGION ( 0x20000, "maincpu", 0 )
 
 		/* BIOS */
-	ROM_LOAD ( "mo6-0.rom", 0x23000, 0x1000,
+	ROM_LOAD ( "mo6-0.rom", 0x13000, 0x1000,
 		CRC(0446eef6)
 		SHA1(b57fcda69c95f0c97c5cb0605d17c49a0c630300) )
-	ROM_LOAD ( "mo6-1.rom", 0x27000, 0x1000,
+	ROM_LOAD ( "mo6-1.rom", 0x17000, 0x1000,
 		CRC(eb6df8d4)
 		SHA1(24e2232f582ce04f260acd8e9ec710468a81505c) )
 
 		/* BASIC */
-	ROM_LOAD ( "basic6-0.rom", 0x20000, 0x3000,
+	ROM_LOAD ( "basic6-0.rom", 0x10000, 0x3000,
 		CRC(18789833)
 		SHA1(fccbf69cbc6deba45a767a26cd6454cf0eedfc2b) )
-	ROM_LOAD ( "basic6-1.rom", 0x24000, 0x3000,
+	ROM_LOAD ( "basic6-1.rom", 0x14000, 0x3000,
 		CRC(c9b4d6f4)
 		SHA1(47487d2bc4c9a9c09c733bd89c49693c52e262de) )
-	ROM_LOAD ( "basic6-2.rom", 0x28000, 0x4000,
+	ROM_LOAD ( "basic6-2.rom", 0x18000, 0x4000,
 		CRC(08eac9bb)
 		SHA1(c0231fdb3bcccbbb10c1f93cc529fc3b96dd3f4d) )
-	ROM_LOAD ( "basic6-3.rom", 0x2c000, 0x4000,
+	ROM_LOAD ( "basic6-3.rom", 0x1c000, 0x4000,
 		CRC(19d66dc4)
 		SHA1(301b6366269181b74cb5d7ccdf5455b7290ae99b) )
 
-	ROM_FLOPPY5 ( 0x30000 )
-	ROM_FILL ( 0x10000, 0x10000, 0x39 )
+	ROM_REGION ( 0x10000, "cartridge", 0 )
+	ROM_FILL ( 0x00000, 0x10000, 0x39 )
+
+	ROM_FLOPPY5
 ROM_END
 
 ROM_START ( pro128 )
-	ROM_REGION ( 0x34800, "maincpu", 0 )
+	ROM_REGION ( 0x20000, "maincpu", 0 )
 
 		/* BIOS */
-	ROM_LOAD ( "pro128-0.rom", 0x23000, 0x1000,
+	ROM_LOAD ( "pro128-0.rom", 0x13000, 0x1000,
 		CRC(a8aef291)
 		SHA1(2685cca841f405a37ef48b0115f90c865ce79d0f) )
-	ROM_LOAD ( "pro128-1.rom", 0x27000, 0x1000,
+	ROM_LOAD ( "pro128-1.rom", 0x17000, 0x1000,
 		CRC(5b3340ec)
 		SHA1(269f2eb3e3452014b8d1f0f9e1c63fe56375a863) )
 
 		/* BASIC */
-	ROM_LOAD ( "basico-0.rom", 0x20000, 0x3000,
+	ROM_LOAD ( "basico-0.rom", 0x10000, 0x3000,
 		CRC(98b10d5e)
 		SHA1(d6b77e694fa85e1114293448e5a64f6e2cf46c22) )
-	ROM_LOAD ( "basico-1.rom", 0x24000, 0x3000,
+	ROM_LOAD ( "basico-1.rom", 0x14000, 0x3000,
 		CRC(721d2124)
 		SHA1(51db1cd03b3891e212a24aa6563b09968930d897) )
-	ROM_LOAD ( "basico-2.rom", 0x28000, 0x4000,
+	ROM_LOAD ( "basico-2.rom", 0x18000, 0x4000,
 		CRC(135438ab)
 		SHA1(617d4e4979842bea2c21ef7f8c50f3b08b15239a) )
-	ROM_LOAD ( "basico-3.rom", 0x2c000, 0x4000,
+	ROM_LOAD ( "basico-3.rom", 0x1c000, 0x4000,
 		CRC(2c2befa6)
 		SHA1(3e94e182bacbb55bb07be2af4c76c0b0df47b3bf) )
 
-	ROM_FLOPPY5 ( 0x30000 )
-	ROM_FILL ( 0x10000, 0x10000, 0x39 )
+	ROM_REGION ( 0x10000, "cartridge", 0 )
+	ROM_FILL ( 0x00000, 0x10000, 0x39 )
+
+	ROM_FLOPPY5
 ROM_END
 
 
@@ -2199,13 +2231,13 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::mo6)
+void thomson_state::mo6(machine_config &config)
+{
 	to7_base(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo6 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo6 )
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP ( mo6)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::mo6_map);
 
 	m_cassette->set_formats(mo5_cassette_formats);
 	m_cassette->set_interface("mo_cass");
@@ -2227,10 +2259,7 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
 
-	config.device_remove("cartslot");
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
-	MCFG_GENERIC_EXTENSIONS("m5,rom")
-	MCFG_GENERIC_LOAD(thomson_state, mo5_cartridge)
+	GENERIC_CARTSLOT(config.replace(), "cartslot", generic_plain_slot, "mo_cart", "m5,rom").set_device_load(FUNC(thomson_state::mo5_cartridge));
 
 	/* internal ram */
 	m_ram->set_default_size("128K");
@@ -2247,7 +2276,7 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 	SOFTWARE_LIST(config, "mo5_cass_list").set_compatible("mo5_cass");
 	SOFTWARE_LIST(config, "mo5_flop_list").set_compatible("mo5_flop");
 	SOFTWARE_LIST(config, "mo5_qd_list").set_compatible("mo5_qd");
-MACHINE_CONFIG_END
+}
 
 void thomson_state::pro128(machine_config &config)
 {
@@ -2300,7 +2329,7 @@ Here are the differences between the MO6 and MO5NR:
 
 **********************************************************************/
 
-void thomson_state::mo5nr(address_map &map)
+void thomson_state::mo5nr_map(address_map &map)
 {
 
 	map(0x0000, 0x1fff).bankr(THOM_VRAM_BANK).w(FUNC(thomson_state::to770_vram_w));
@@ -2329,7 +2358,7 @@ void thomson_state::mo5nr(address_map &map)
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB BIOS ROM */
-/* 0x30000 - 0x347ff: 16 KB floppy / network ROM controllers */
+/* 16 KB floppy / network ROM controllers */
 
 /* RAM mapping: 128 KB flat (including video) */
 
@@ -2339,32 +2368,34 @@ void thomson_state::mo5nr(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo5nr )
-	ROM_REGION ( 0x34800, "maincpu", 0 )
+	ROM_REGION ( 0x20000, "maincpu", 0 )
 
 		/* BIOS */
-	ROM_LOAD ( "mo5nr-0.rom", 0x23000, 0x1000,
+	ROM_LOAD ( "mo5nr-0.rom", 0x13000, 0x1000,
 		CRC(06e31115)
 		SHA1(7429cc0c15475398b5ab514cb3d3efdc71cf082f) )
-	ROM_LOAD ( "mo5nr-1.rom", 0x27000, 0x1000,
+	ROM_LOAD ( "mo5nr-1.rom", 0x17000, 0x1000,
 		CRC(7cda17c9)
 		SHA1(2ff6480ce9e30acc4c89b6113d7c8ea6095d90a5) )
 
 		/* BASIC */
-	ROM_LOAD ( "basicn-0.rom", 0x20000, 0x3000,
+	ROM_LOAD ( "basicn-0.rom", 0x10000, 0x3000,
 		CRC(fae9e691)
 		SHA1(62fbfd6d4ca837f6cb8ed37f828eca97f80e6200) )
-	ROM_LOAD ( "basicn-1.rom", 0x24000, 0x3000,
+	ROM_LOAD ( "basicn-1.rom", 0x14000, 0x3000,
 		CRC(cf134dd7)
 		SHA1(1bd961314e16e460d37a65f5e7f4acf5604fbb17) )
-	ROM_LOAD ( "basicn-2.rom", 0x28000, 0x4000,
+	ROM_LOAD ( "basicn-2.rom", 0x18000, 0x4000,
 		CRC(b69d2e0d)
 		SHA1(ea3220bbae991e08259d38a7ea24533b2bb86418) )
-	ROM_LOAD ( "basicn-3.rom", 0x2c000, 0x4000,
+	ROM_LOAD ( "basicn-3.rom", 0x1c000, 0x4000,
 		CRC(7785610f)
 		SHA1(c38b0be404d8af6f409a1b52cb79a4e10fc33177) )
 
-	ROM_FLOPPY5 ( 0x30000 )
-	ROM_FILL ( 0x10000, 0x10000, 0x39 ) /* TODO: network ROM */
+	ROM_REGION ( 0x10000, "cartridge", 0 )
+	ROM_FILL ( 0x00000, 0x10000, 0x39 ) /* TODO: network ROM */
+
+	ROM_FLOPPY5
 ROM_END
 
 
@@ -2465,13 +2496,13 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::mo5nr)
+void thomson_state::mo5nr(machine_config &config)
+{
 	to7_base(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5nr )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5nr )
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP ( mo5nr)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::mo5nr_map);
 
 	m_cassette->set_formats(mo5_cassette_formats);
 	m_cassette->set_interface("mo_cass");
@@ -2495,10 +2526,7 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
 
-	config.device_remove("cartslot");
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
-	MCFG_GENERIC_EXTENSIONS("m5,rom")
-	MCFG_GENERIC_LOAD(thomson_state, mo5_cartridge)
+	GENERIC_CARTSLOT(config.replace(), "cartslot", generic_plain_slot, "mo_cart", "m5,rom").set_device_load(FUNC(thomson_state::mo5_cartridge));
 
 	/* internal ram */
 	m_ram->set_default_size("128K");
@@ -2515,6 +2543,6 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	SOFTWARE_LIST(config, "mo5_cass_list").set_compatible("mo5_cass");
 	SOFTWARE_LIST(config, "mo5_flop_list").set_compatible("mo5_flop");
 	SOFTWARE_LIST(config, "mo5_qd_list").set_compatible("mo5_qd");
-MACHINE_CONFIG_END
+}
 
 COMP( 1986, mo5nr, 0, 0, mo5nr, mo5nr, thomson_state, empty_init, "Thomson", "MO5 NR", 0 )

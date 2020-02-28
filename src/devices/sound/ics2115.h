@@ -18,7 +18,6 @@ public:
 	// construction/destruction
 	ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
 	auto irq() { return m_irq_cb.bind(); }
 
 	u8 read(offs_t offset);
@@ -100,6 +99,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 
 	// internal callbacks
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;

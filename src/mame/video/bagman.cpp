@@ -64,18 +64,18 @@ void bagman_state::bagman_palette(palette_device &palette) const
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		int const r = combine_3_weights(weights_r, bit0, bit1, bit2);
+		int const r = combine_weights(weights_r, bit0, bit1, bit2);
 
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		int const g = combine_3_weights(weights_g, bit0, bit1, bit2);
+		int const g = combine_weights(weights_g, bit0, bit1, bit2);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		int const b = combine_2_weights(weights_b, bit0, bit1);
+		int const b = combine_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -107,21 +107,22 @@ TILE_GET_INFO_MEMBER(bagman_state::get_bg_tile_info)
 
 void bagman_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bagman_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bagman_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 }
 
 
 void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
+	// Spriteram is at the start of the colorram
+	for (int offs = 0x20 - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy;
 
-		sx = m_spriteram[offs + 3];
-		sy = 256 - m_spriteram[offs + 2] - 16;
-		flipx = m_spriteram[offs] & 0x40;
-		flipy = m_spriteram[offs] & 0x80;
+		sx = m_colorram[offs + 3];
+		sy = 256 - m_colorram[offs + 2] - 16;
+		flipx = m_colorram[offs] & 0x40;
+		flipy = m_colorram[offs] & 0x80;
 		if (flip_screen())
 		{
 			sx = 256 - sx - 15;
@@ -130,11 +131,11 @@ void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			flipy = !flipy;
 		}
 
-		if (m_spriteram[offs + 2] && m_spriteram[offs + 3])
+		if (m_colorram[offs + 2] && m_colorram[offs + 3])
 			m_gfxdecode->gfx(1)->transpen(bitmap,
 					cliprect,
-					(m_spriteram[offs] & 0x3f) + 2 * (m_spriteram[offs + 1] & 0x20),
-					m_spriteram[offs + 1] & 0x1f,
+					(m_colorram[offs] & 0x3f) + 2 * (m_colorram[offs + 1] & 0x20),
+					m_colorram[offs + 1] & 0x1f,
 					flipx,flipy,
 					sx,sy,0);
 	}

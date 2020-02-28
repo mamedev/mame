@@ -250,21 +250,21 @@ WRITE8_MEMBER(fireball_state::io_06_w)
 			//address_w
 			if (LOG_AY8912)
 				logerror("write to 0x06 bc1=1\n");
-			m_ay->address_w(space,0,to_ay_data );
+			m_ay->address_w(to_ay_data);
 			if (LOG_AY8912)
 				logerror("AY8912 address latch write=%02X\n",to_ay_data);
 		}else{
 			//data_w
 			if (LOG_AY8912)
 				logerror("write to 0x06 bc1=0\n");
-			m_ay->data_w(space,0,to_ay_data );
+			m_ay->data_w(to_ay_data);
 			if (LOG_AY8912)
 				logerror("AY8912 data write=%02X\n",to_ay_data);
 		}
 	}else{
 		if (LOG_AY8912)
 			logerror("write to 0x06 bdir=0\n");
-		ay_data=m_ay->data_r(space,0);
+		ay_data=m_ay->data_r();
 	}
 
 	m_p1_data=data;
@@ -492,7 +492,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( fireball_state::int_0 )
 *************************/
 
 
-MACHINE_CONFIG_START(fireball_state::fireball)
+void fireball_state::fireball(machine_config &config)
+{
 	/* basic machine hardware */
 	I8031(config, m_maincpu, CPU_CLK); //
 	m_maincpu->set_addrmap(AS_PROGRAM, &fireball_state::fireball_map);
@@ -503,7 +504,7 @@ MACHINE_CONFIG_START(fireball_state::fireball)
 	m_maincpu->port_out_cb<3>().set(FUNC(fireball_state::p3_w));
 
 	//9ms from scope reading 111Hz take care of this in the handler
-	TIMER(config, "int_0", 0).configure_periodic(timer_device::expired_delegate(FUNC(fireball_state::int_0), this), attotime::from_hz(555));
+	TIMER(config, "int_0", 0).configure_periodic(FUNC(fireball_state::int_0), attotime::from_hz(555));
 
 	EEPROM_X24C44_16BIT(config, "eeprom");
 
@@ -513,7 +514,7 @@ MACHINE_CONFIG_START(fireball_state::fireball)
 
 	/* Video */
 	config.set_default_layout(layout_fireball);
-MACHINE_CONFIG_END
+}
 
 
 /*************************

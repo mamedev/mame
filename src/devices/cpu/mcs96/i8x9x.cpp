@@ -14,7 +14,7 @@
 
 i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	mcs96_device(mconfig, type, tag, owner, clock, 8, address_map_constructor(FUNC(i8x9x_device::internal_regs), this)),
-	m_ach_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
+	m_ach_cb(*this),
 	m_hso_cb(*this),
 	m_serial_tx_cb(*this),
 	m_in_p0_cb(*this),
@@ -41,8 +41,7 @@ std::unique_ptr<util::disasm_interface> i8x9x_device::create_disassembler()
 
 void i8x9x_device::device_resolve_objects()
 {
-	for (auto &cb : m_ach_cb)
-		cb.resolve();
+	m_ach_cb.resolve_all();
 	m_hso_cb.resolve_safe();
 	m_serial_tx_cb.resolve_safe();
 	m_in_p0_cb.resolve_safe(0);
@@ -67,6 +66,7 @@ void i8x9x_device::device_start()
 	state_add(I8X9X_SBUF_TX,     "SBUF_TX",     serial_send_buf);
 	state_add(I8X9X_SP_CON,      "SP_CON",      sp_con).mask(0x1f);
 	state_add(I8X9X_SP_STAT,     "SP_STAT",     sp_stat).mask(0xe0);
+	state_add(I8X9X_BAUD_RATE,   "BAUD_RATE",   baud_reg);
 	state_add(I8X9X_IOC0,        "IOC0",        ioc0).mask(0xfd);
 	state_add(I8X9X_IOC1,        "IOC1",        ioc1);
 	state_add(I8X9X_IOS0,        "IOS0",        ios0);
@@ -99,6 +99,8 @@ void i8x9x_device::device_start()
 	save_item(NAME(sp_stat));
 	save_item(NAME(serial_send_buf));
 	save_item(NAME(serial_send_timer));
+	save_item(NAME(baud_reg));
+	save_item(NAME(brh));
 }
 
 void i8x9x_device::device_reset()
@@ -119,6 +121,7 @@ void i8x9x_device::device_reset()
 	sp_con &= 0x17;
 	sp_stat &= 0x80;
 	serial_send_timer = 0;
+	brh = false;
 	m_hso_cb(0);
 }
 
@@ -166,7 +169,7 @@ void i8x9x_device::serial_send_done()
 
 void i8x9x_device::internal_regs(address_map &map)
 {
-	map(0x00, 0x01).lr16("r0", []() -> u16 { return 0; }).nopw();
+	map(0x00, 0x01).lr16([] () -> u16 { return 0; }, "r0").nopw();
 	map(0x02, 0x03).r(FUNC(i8x9x_device::ad_result_r)); // 8-bit access
 	map(0x02, 0x02).w(FUNC(i8x9x_device::ad_command_w));
 	map(0x03, 0x03).w(FUNC(i8x9x_device::hsi_mode_w));
@@ -267,7 +270,12 @@ u16 i8x9x_device::timer2_r()
 
 void i8x9x_device::baud_rate_w(u8 data)
 {
-	logerror("baud rate %02x (%04x)\n", data, PPC);
+	if (brh)
+		baud_reg = (baud_reg & 0x00ff) | u16(data) << 8;
+	else
+		baud_reg = (baud_reg & 0xff00) | data;
+	if (!machine().side_effects_disabled())
+		brh = !brh;
 }
 
 u8 i8x9x_device::port0_r()

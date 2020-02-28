@@ -130,7 +130,7 @@ void nes_pxrom_device::ppu_latch(offs_t offset)
 	}
 }
 
-WRITE8_MEMBER( nes_pxrom_device::pxrom_write )
+void nes_pxrom_device::pxrom_write(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("pxrom write_h, offset: %04x, data: %02x\n", offset, data));
 	switch (offset & 0x7000)
@@ -182,7 +182,7 @@ WRITE8_MEMBER( nes_pxrom_device::pxrom_write )
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER( nes_fxrom_device::write_h )
+void nes_fxrom_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("fxrom write_h, offset: %04x, data: %02x\n", offset, data));
 	switch (offset & 0x7000)
@@ -191,7 +191,7 @@ WRITE8_MEMBER( nes_fxrom_device::write_h )
 			prg16_89ab(data);
 			break;
 		default:
-			pxrom_write(space, offset, data, mem_mask);
+			pxrom_write(offset, data);
 			break;
 	}
 }

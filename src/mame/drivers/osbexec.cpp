@@ -517,7 +517,7 @@ void osbexec_state::machine_reset()
 	m_video_timer->adjust( m_screen->time_until_pos( 0, 0 ) );
 
 	// D0 cleared on interrupt acknowledge cycle by TTL gates at UC21 and UA18
-	m_maincpu->set_input_line_vector(0, 0xfe);
+	m_maincpu->set_input_line_vector(0, 0xfe); // Z80
 }
 
 

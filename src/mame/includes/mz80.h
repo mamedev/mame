@@ -16,7 +16,6 @@
 #include "machine/timer.h"
 #include "imagedev/cassette.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 
 class mz80_state : public driver_device
 {

@@ -201,7 +201,7 @@ WRITE8_MEMBER(meadows_state::meadows_audio_w)
 
 INPUT_CHANGED_MEMBER(meadows_state::coin_inserted)
 {
-	m_maincpu->set_input_line_and_vector(0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82);
+	m_maincpu->set_input_line_and_vector(0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82); // S2650
 }
 
 
@@ -631,7 +631,7 @@ void meadows_state::meadows(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &meadows_state::audio_map);
 	m_audiocpu->set_periodic_int(FUNC(meadows_state::audio_interrupt), attotime::from_hz((double)5000000/131072));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -649,7 +649,6 @@ void meadows_state::meadows(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
@@ -692,7 +691,7 @@ void meadows_state::bowl3d(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &meadows_state::audio_map);
 	m_audiocpu->set_periodic_int(FUNC(meadows_state::audio_interrupt), attotime::from_hz((double)5000000/131072));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -710,7 +709,6 @@ void meadows_state::bowl3d(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
@@ -755,7 +753,7 @@ ROM_START( deadeye )
 	/* empty */
 
 	ROM_REGION( 0x08000, "audiocpu", 0 )
-	ROM_LOAD( "de_snd",       0x0000, 0x0400, CRC(c10a1b1a) SHA1(779ea261d23360634081295a164cacbd819d8719) )
+	ROM_LOAD( "de_sound_099c_m2-a1.0.4a", 0x0000, 0x0400, CRC(c10a1b1a) SHA1(779ea261d23360634081295a164cacbd819d8719) )
 ROM_END
 
 

@@ -75,7 +75,7 @@ PC88VA doujin games (mostly undumped)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">   <!-- Data CRC16: 2729 -->
-				<rom name="pc88-va demo.d88" size="1296112" crc="56097ca5" sha1="833ef5f645fbaf1683b53d423e506a2f72e1e83e" offset="0" />
+				<rom name="pc88-va demo.d88" size="1296112" crc="56097ca5" sha1="833ef5f645fbaf1683b53d423e506a2f72e1e83e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -90,7 +90,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="88VA1 店頭デモ" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
-				<rom name="88va1 tentou demo.d88" size="1331888" crc="a0d11833" sha1="0e99c7154c5e118e416daf7668db2a630634ab78" offset="0" />
+				<rom name="88va1 tentou demo.d88" size="1331888" crc="a0d11833" sha1="0e99c7154c5e118e416daf7668db2a630634ab78"/>
 			</dataarea>
 		</part>
 	</software>
@@ -101,7 +101,7 @@ PC88VA doujin games (mostly undumped)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
-				<rom name="nec pc-88va2 demo.d88" size="1331888" crc="ca33e185" sha1="7895ffebce522bacef50397b23414e09bce7e9d0" offset="0" />
+				<rom name="nec pc-88va2 demo.d88" size="1331888" crc="ca33e185" sha1="7895ffebce522bacef50397b23414e09bce7e9d0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -114,14 +114,14 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1338960">
-				<rom name="animeframer - prog disk.d88" size="1338960" crc="2eff589a" sha1="a385f97c7f38579af3320a8d0505f000134e7493" offset="0" />
+				<rom name="animeframer - prog disk.d88" size="1338960" crc="2eff589a" sha1="a385f97c7f38579af3320a8d0505f000134e7493"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="1338960">
-				<rom name="animeframer - data disk.d88" size="1338960" crc="9b5cd907" sha1="80f1558a3d5c6d21d1c42d8325ae55e320674ef7" offset="0" />
+				<rom name="animeframer - data disk.d88" size="1338960" crc="9b5cd907" sha1="80f1558a3d5c6d21d1c42d8325ae55e320674ef7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -134,14 +134,14 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1338960">
-				<rom name="paint - prog disk.d88" size="1331888" crc="08107401" sha1="aab13d4437358f0fac7adec31cf83d1a22608616" offset="0" />
+				<rom name="paint - prog disk.d88" size="1331888" crc="08107401" sha1="aab13d4437358f0fac7adec31cf83d1a22608616"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="1338960">
-				<rom name="paint - data disk.d88" size="1331888" crc="73739619" sha1="60f493e7ab24ad8fc57367224a994b0ecf0ad5e2" offset="0" />
+				<rom name="paint - data disk.d88" size="1331888" crc="73739619" sha1="60f493e7ab24ad8fc57367224a994b0ecf0ad5e2"/>
 			</dataarea>
 		</part>
 
@@ -153,7 +153,7 @@ PC88VA doujin games (mostly undumped)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
-				<rom name="micromusician va.d88" size="1331888" crc="f2ff8069" sha1="a201a60330c701f1f2021b73664582e535dc9b7e" offset="0" />
+				<rom name="micromusician va.d88" size="1331888" crc="f2ff8069" sha1="a201a60330c701f1f2021b73664582e535dc9b7e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -165,7 +165,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="PC-Engine(VA2添付版)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1338960">
-				<rom name="pc-engine (va2 tenpu-ban).d88" size="1338960" crc="3c2cf3c5" sha1="e92694e060f46037fd2cdf11ad1f2d75c5121de2" offset="0" />
+				<rom name="pc-engine (va2 tenpu-ban).d88" size="1338960" crc="3c2cf3c5" sha1="e92694e060f46037fd2cdf11ad1f2d75c5121de2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -176,7 +176,7 @@ PC88VA doujin games (mostly undumped)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
-				<rom name="pc-engine 1.1 os.d88" size="1331888" crc="17d2e121" sha1="b88095cae4238a68833435ac0e3414081cb5a13b" offset="0" />
+				<rom name="pc-engine 1.1 os.d88" size="1331888" crc="17d2e121" sha1="b88095cae4238a68833435ac0e3414081cb5a13b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -192,21 +192,21 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1281968">
-				<rom name="famista_1.d88" size="1281968" crc="3c78e2e7" sha1="1040b1d79052df93e4a1b3a6ed019098c8c2ad46" offset="0" />
+				<rom name="famista_1.d88" size="1281968" crc="3c78e2e7" sha1="1040b1d79052df93e4a1b3a6ed019098c8c2ad46"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1281968">
-				<rom name="famista_2.d88" size="1281968" crc="29cfa16a" sha1="2a343ef96852ae882730cfe340cb130d48f17bc5" offset="0" />
+				<rom name="famista_2.d88" size="1281968" crc="29cfa16a" sha1="2a343ef96852ae882730cfe340cb130d48f17bc5"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1331888">
-				<rom name="famista_u.d88" size="1331888" crc="d2623a5e" sha1="b57bb896488e62c6d1c5bd20acf97d4f9f805a0c" offset="0" />
+				<rom name="famista_u.d88" size="1331888" crc="d2623a5e" sha1="b57bb896488e62c6d1c5bd20acf97d4f9f805a0c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -217,19 +217,19 @@ PC88VA doujin games (mostly undumped)
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<info name="alt_title" value="ファミリースタジアム'89ペナントレース編" />
 		<!--combined image-->
-		<!--rom name="family stadium pennant race ban (va).d88" size="2563936" crc="91d95d8e" sha1="3d31ab00a0be2f792d2bcb031afd065d138c747a" offset="0" /-->
+		<!--rom name="family stadium pennant race ban (va).d88" size="2563936" crc="91d95d8e" sha1="3d31ab00a0be2f792d2bcb031afd065d138c747a"/-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1281968">
-				<rom name="family stadium pennant race ban (va) (disk 1).d88" size="1281968" crc="fd71b310" sha1="48e72d453a49cba1e6c31b7a1cdfe8ac2b0d01ad" offset="0" />
+				<rom name="family stadium pennant race ban (va) (disk 1).d88" size="1281968" crc="fd71b310" sha1="48e72d453a49cba1e6c31b7a1cdfe8ac2b0d01ad"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1281968">
-				<rom name="family stadium pennant race ban (va) (disk 2).d88" size="1281968" crc="d7f86e0f" sha1="d5ebf14ae42e39f964c6eb5c69db12d2d9d7a926" offset="0" />
+				<rom name="family stadium pennant race ban (va) (disk 2).d88" size="1281968" crc="d7f86e0f" sha1="d5ebf14ae42e39f964c6eb5c69db12d2d9d7a926"/>
 			</dataarea>
 		</part>
 	</software>
@@ -241,21 +241,21 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1298608">
-				<rom name="famista89_1.d88" size="1298608" crc="9c7766fe" sha1="00d3db6035ba07183066fe928dfd7a2753f76229" offset="0" />
+				<rom name="famista89_1.d88" size="1298608" crc="9c7766fe" sha1="00d3db6035ba07183066fe928dfd7a2753f76229"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1298608">
-				<rom name="famista89_2.d88" size="1298608" crc="4304ec90" sha1="a9b2632c3dacacdbec10277797a05d256d7befc2" offset="0" />
+				<rom name="famista89_2.d88" size="1298608" crc="4304ec90" sha1="a9b2632c3dacacdbec10277797a05d256d7befc2"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1331888">
-				<rom name="famista89_u.d88" size="1331888" crc="11ee32e8" sha1="959205c410d24db3cca3ceb147d57a8b94aa20bf" offset="0" />
+				<rom name="famista89_u.d88" size="1331888" crc="11ee32e8" sha1="959205c410d24db3cca3ceb147d57a8b94aa20bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -268,21 +268,21 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A - User" />
 			<dataarea name="flop" size="1094592">
-				<rom name="might &amp; magic(diska_userdisk) (star craft).d88" size="1094592" crc="de68bba5" sha1="d6be57c867a3cca8b694bc2b129705c653ae44da" offset="0" />
+				<rom name="might &amp; magic(diska_userdisk) (star craft).d88" size="1094592" crc="de68bba5" sha1="d6be57c867a3cca8b694bc2b129705c653ae44da"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B - Game" />
 			<dataarea name="flop" size="1100592">
-				<rom name="might &amp; magic(diskb_gamedisk) (star craft).d88" size="1100592" crc="7f4ea9d9" sha1="afe55877a8899fea022b5d3bd0a38adb4580fb0a" offset="0" />
+				<rom name="might &amp; magic(diskb_gamedisk) (star craft).d88" size="1100592" crc="7f4ea9d9" sha1="afe55877a8899fea022b5d3bd0a38adb4580fb0a"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C - Boot" />
 			<dataarea name="flop" size="1331888">
-				<rom name="might &amp; magic(diskc_bootdisk) (star craft).d88" size="1331888" crc="f3c56b5e" sha1="ab39d96aa7a5446a8cb8b929978f6211746d02bc" offset="0" />
+				<rom name="might &amp; magic(diskc_bootdisk) (star craft).d88" size="1331888" crc="f3c56b5e" sha1="ab39d96aa7a5446a8cb8b929978f6211746d02bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -295,28 +295,28 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1296112">
-				<rom name="might &amp; magic book2 (bootdisk) (star craft).d88" size="1296112" crc="0f851010" sha1="3cb58c9effa7bb75292905e81bc8cce5039ad6e7" offset="0" />
+				<rom name="might &amp; magic book2 (bootdisk) (star craft).d88" size="1296112" crc="0f851010" sha1="3cb58c9effa7bb75292905e81bc8cce5039ad6e7"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1094592">
-				<rom name="might &amp; magic book2 (programdisk) (star craft).d88" size="1094592" crc="53efd8fc" sha1="c16b11fc3e404e0fde29ec1dce0d81cd494c3317" offset="0" />
+				<rom name="might &amp; magic book2 (programdisk) (star craft).d88" size="1094592" crc="53efd8fc" sha1="c16b11fc3e404e0fde29ec1dce0d81cd494c3317"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Player Disk" />
 			<dataarea name="flop" size="1100592">
-				<rom name="might &amp; magic book2 (playerdisk) (star craft).d88" size="1100592" crc="ddc7d79b" sha1="b61870c6bb206e2fc25f182b576259e634017ca4" offset="0" />
+				<rom name="might &amp; magic book2 (playerdisk) (star craft).d88" size="1100592" crc="ddc7d79b" sha1="b61870c6bb206e2fc25f182b576259e634017ca4"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Utility Disk" />
 			<dataarea name="flop" size="1100592">
-				<rom name="might &amp; magic book2 (utilitydisk) (star craft).d88" size="1100592" crc="0cb2ccd5" sha1="ff409a7e280f16cd348f53924e993360eb9a93cb" offset="0" />
+				<rom name="might &amp; magic book2 (utilitydisk) (star craft).d88" size="1100592" crc="0cb2ccd5" sha1="ff409a7e280f16cd348f53924e993360eb9a93cb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -329,28 +329,28 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1281968">
-				<rom name="olteus(diska) (winky soft).d88" size="1281968" crc="76546093" sha1="5c4bf120c1822e76aaf5a2cf0afc8c62226f8d82" offset="0" />
+				<rom name="olteus(diska) (winky soft).d88" size="1281968" crc="76546093" sha1="5c4bf120c1822e76aaf5a2cf0afc8c62226f8d82"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1281968">
-				<rom name="olteus(diskb) (winky soft).d88" size="1281968" crc="45f32c19" sha1="1a91a7bf441917e361ab4b9d1f6609a1101be1fc" offset="0" />
+				<rom name="olteus(diskb) (winky soft).d88" size="1281968" crc="45f32c19" sha1="1a91a7bf441917e361ab4b9d1f6609a1101be1fc"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1281968">
-				<rom name="olteus(diskc) (winky soft).d88" size="1281968" crc="46eabfee" sha1="1f5ce27138186775d94f0aa980a53fb1a5f6ac07" offset="0" />
+				<rom name="olteus(diskc) (winky soft).d88" size="1281968" crc="46eabfee" sha1="1f5ce27138186775d94f0aa980a53fb1a5f6ac07"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1296112">
-				<rom name="olteus(diskd) (winky soft).d88" size="1296112" crc="246bae5b" sha1="b18eed01265eed7229788b7226130b5042c61c73" offset="0" />
+				<rom name="olteus(diskd) (winky soft).d88" size="1296112" crc="246bae5b" sha1="b18eed01265eed7229788b7226130b5042c61c73"/>
 			</dataarea>
 		</part>
 	</software>
@@ -364,28 +364,28 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1281968">
-				<rom name="olteus (1987)(winky)(disk 1 of 4)(disk a).d88" size="1281968" crc="76546093" sha1="5c4bf120c1822e76aaf5a2cf0afc8c62226f8d82" offset="0" />
+				<rom name="olteus (1987)(winky)(disk 1 of 4)(disk a).d88" size="1281968" crc="76546093" sha1="5c4bf120c1822e76aaf5a2cf0afc8c62226f8d82"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1281968">
-				<rom name="olteus (1987)(winky)(disk 2 of 4)(disk b).d88" size="1281968" crc="45f32c19" sha1="1a91a7bf441917e361ab4b9d1f6609a1101be1fc" offset="0" />
+				<rom name="olteus (1987)(winky)(disk 2 of 4)(disk b).d88" size="1281968" crc="45f32c19" sha1="1a91a7bf441917e361ab4b9d1f6609a1101be1fc"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1281968">
-				<rom name="olteus (1987)(winky)(disk 3 of 4)(disk c).d88" size="1281968" crc="46eabfee" sha1="1f5ce27138186775d94f0aa980a53fb1a5f6ac07" offset="0" />
+				<rom name="olteus (1987)(winky)(disk 3 of 4)(disk c).d88" size="1281968" crc="46eabfee" sha1="1f5ce27138186775d94f0aa980a53fb1a5f6ac07"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1296112">
-				<rom name="olteus (1987)(winky)(disk 4 of 4)(disk d).d88" size="1296112" crc="100cd5d1" sha1="749cd61ca25e084b40037835fbabdfada9ead884" offset="0" />
+				<rom name="olteus (1987)(winky)(disk 4 of 4)(disk d).d88" size="1296112" crc="100cd5d1" sha1="749cd61ca25e084b40037835fbabdfada9ead884"/>
 			</dataarea>
 		</part>
 	</software>
@@ -396,13 +396,13 @@ PC88VA doujin games (mostly undumped)
 		<publisher>NEC</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">
-				<rom name="r-type(disk1) (irem).d88" size="1296112" crc="5d24bb7f" sha1="2f8ee8495ebc68dae466e753c7e38c0df4c654b8" offset="0" />
+				<rom name="r-type(disk1) (irem).d88" size="1296112" crc="5d24bb7f" sha1="2f8ee8495ebc68dae466e753c7e38c0df4c654b8"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">
-				<rom name="r-type(disk2) (irem).d88" size="1296112" crc="041d6155" sha1="b72d4ed6a031bfa0e1900dd012effc811a8169c1" offset="0" />
+				<rom name="r-type(disk2) (irem).d88" size="1296112" crc="041d6155" sha1="b72d4ed6a031bfa0e1900dd012effc811a8169c1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -416,21 +416,21 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1331888">
-				<rom name="rogue alliance(bootdisk) (star craft).d88" size="1331888" crc="4f7b8123" sha1="e9143d1ba3c600d11ea8f6952ad0e68e8a769d03" offset="0" />
+				<rom name="rogue alliance(bootdisk) (star craft).d88" size="1331888" crc="4f7b8123" sha1="e9143d1ba3c600d11ea8f6952ad0e68e8a769d03"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1122880">
-				<rom name="rogue alliance(programdisk) (star craft).d88" size="1122880" crc="9dd5846b" sha1="86f494dda6d6498df3635cb028461c8ccc1069d7" offset="0" />
+				<rom name="rogue alliance(programdisk) (star craft).d88" size="1122880" crc="9dd5846b" sha1="86f494dda6d6498df3635cb028461c8ccc1069d7"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Play Disk" />
 			<dataarea name="flop" size="1128880">
-				<rom name="rogue alliance(playdisk) (star craft).d88" size="1128880" crc="eefc9724" sha1="350ec250eb63a080322e79f2509eae7efd6a109b" offset="0" />
+				<rom name="rogue alliance(playdisk) (star craft).d88" size="1128880" crc="eefc9724" sha1="350ec250eb63a080322e79f2509eae7efd6a109b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -442,7 +442,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="上海" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">
-				<rom name="shang-hai (system soft).d88" size="1296112" crc="b567190e" sha1="68ca3d14e0ea12637c5f7b1c2244f0370c3abc5e" offset="0" />
+				<rom name="shang-hai (system soft).d88" size="1296112" crc="b567190e" sha1="68ca3d14e0ea12637c5f7b1c2244f0370c3abc5e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -455,14 +455,14 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1331888">
-				<rom name="shinra bansho(diska) (nihon telenet).d88" size="1331888" crc="6983feed" sha1="0f834209d82ab13832f63f82aeafa9854b5621e6" offset="0" />
+				<rom name="shinra bansho(diska) (nihon telenet).d88" size="1331888" crc="6983feed" sha1="0f834209d82ab13832f63f82aeafa9854b5621e6"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1296112">
-				<rom name="shinra bansho(diskb) (nihon telenet).d88" size="1296112" crc="1ee8acdf" sha1="4e0cab59ec6707f848b28b056040be835e2357ed" offset="0" />
+				<rom name="shinra bansho(diskb) (nihon telenet).d88" size="1296112" crc="1ee8acdf" sha1="4e0cab59ec6707f848b28b056040be835e2357ed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -477,35 +477,35 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program" />
 			<dataarea name="flop" size="761008">
-				<rom name="sorcerian va (program)(nihon falcom).d88" size="761008" crc="b6184dce" sha1="1b465063194faffa634006aaaa76cdffa4d9529e" offset="0" />
+				<rom name="sorcerian va (program)(nihon falcom).d88" size="761008" crc="b6184dce" sha1="1b465063194faffa634006aaaa76cdffa4d9529e"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="User" />
 			<dataarea name="flop" size="761008">
-				<rom name="sorcerian va (user)(nihon falcom).d88" size="761008" crc="bf940215" sha1="41800b49186e3145c44b105d8c2a84c7c09c358e" offset="0" />
+				<rom name="sorcerian va (user)(nihon falcom).d88" size="761008" crc="bf940215" sha1="41800b49186e3145c44b105d8c2a84c7c09c358e"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 1" />
 			<dataarea name="flop" size="761008">
-				<rom name="sorcerian va (scenario#1)(nihon falcom).d88" size="761008" crc="ae710257" sha1="500c3800e89e62580a8e766e4ea7ed702673d505" offset="0" />
+				<rom name="sorcerian va (scenario#1)(nihon falcom).d88" size="761008" crc="ae710257" sha1="500c3800e89e62580a8e766e4ea7ed702673d505"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 2" />
 			<dataarea name="flop" size="761008">
-				<rom name="sorcerian va (scenario#2)(nihon falcom).d88" size="761008" crc="f41929f4" sha1="184d81ebf43627b0a3d4361477b757845b6e637e" offset="0" />
+				<rom name="sorcerian va (scenario#2)(nihon falcom).d88" size="761008" crc="f41929f4" sha1="184d81ebf43627b0a3d4361477b757845b6e637e"/>
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 3" />
 			<dataarea name="flop" size="761008">
-				<rom name="sorcerian va (scenario#3)(nihon falcom).d88" size="761008" crc="53f6e8fe" sha1="86f86a1fbc783634fbcae292fff53af1f49cff8c" offset="0" />
+				<rom name="sorcerian va (scenario#3)(nihon falcom).d88" size="761008" crc="53f6e8fe" sha1="86f86a1fbc783634fbcae292fff53af1f49cff8c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -518,7 +518,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="ソーサリアン ユーティリティディスク"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
-				<rom name="sorcerian va (utility)(nihon falcom).d88" size="761008" crc="a41c948c" sha1="86a8c260901e42f72d066f3d95a703dbcde23584" offset="0" />
+				<rom name="sorcerian va (utility)(nihon falcom).d88" size="761008" crc="a41c948c" sha1="86a8c260901e42f72d066f3d95a703dbcde23584"/>
 			</dataarea>
 		</part>
 	</software>
@@ -531,7 +531,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="ソーサリアン追加シナリオ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
-				<rom name="sorcerian va (tsuika1)(nihon falcom).d88" size="761008" crc="0080de65" sha1="e801ea413590ba409def2a947668bf64a81ed4c4" offset="0" />
+				<rom name="sorcerian va (tsuika1)(nihon falcom).d88" size="761008" crc="0080de65" sha1="e801ea413590ba409def2a947668bf64a81ed4c4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -544,7 +544,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="ソーサリアン追加シナリオ2 戦国ソーサリアン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
-				<rom name="sorcerian va (tsuika2)(nihon falcom).d88" size="761008" crc="93591936" sha1="af95aca8214ffaa81573914c9b1cc2c053b324c6" offset="0" />
+				<rom name="sorcerian va (tsuika2)(nihon falcom).d88" size="761008" crc="93591936" sha1="af95aca8214ffaa81573914c9b1cc2c053b324c6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -557,7 +557,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="ソーサリアン追加シナリオ3 ピラミッドソーサリアン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="760608">
-				<rom name="sorcerian va (tsuika3)(nihon falcom).d88" size="760608" crc="87323c96" sha1="87cef8d3c1aa600be5c327feb49b2140d53c6316" offset="0" />
+				<rom name="sorcerian va (tsuika3)(nihon falcom).d88" size="760608" crc="87323c96" sha1="87cef8d3c1aa600be5c327feb49b2140d53c6316"/>
 			</dataarea>
 		</part>
 	</software>
@@ -570,7 +570,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="ソーサリアン NEWシナリオ Vol.1 宇宙からの訪問者"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
-				<rom name="sorcerian va (uchu)(nihon falcom).d88" size="761008" crc="e75a4fd5" sha1="067c2811e59f5ce1d366826b8595409382133407" offset="0" />
+				<rom name="sorcerian va (uchu)(nihon falcom).d88" size="761008" crc="e75a4fd5" sha1="067c2811e59f5ce1d366826b8595409382133407"/>
 			</dataarea>
 		</part>
 	</software>
@@ -583,7 +583,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="ギルガメッシュソーサリアン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
-				<rom name="sorcerian va (gilgamesh)(nihon falcom).d88" size="761008" crc="e673cee3" sha1="626478f821cdf65173b05cb2c5843d4c926de47e" offset="0" />
+				<rom name="sorcerian va (gilgamesh)(nihon falcom).d88" size="761008" crc="e673cee3" sha1="626478f821cdf65173b05cb2c5843d4c926de47e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -596,7 +596,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="セレクテッドソーサリアン1"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
-				<rom name="sorcerian va (selected1)(takeru_brother).d88" size="761008" crc="b1e06658" sha1="c5ee1cc25b58943b0632e27db8885bf737a95dc4" offset="0" />
+				<rom name="sorcerian va (selected1)(takeru_brother).d88" size="761008" crc="b1e06658" sha1="c5ee1cc25b58943b0632e27db8885bf737a95dc4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -609,7 +609,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="セレクテッドソーサリアン2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
-				<rom name="sorcerian va (selected2)(takeru_brother).d88" size="761008" crc="5e80f8c8" sha1="4b1438280bdd9e71dfed1b9d7beed948a2c69816" offset="0" />
+				<rom name="sorcerian va (selected2)(takeru_brother).d88" size="761008" crc="5e80f8c8" sha1="4b1438280bdd9e71dfed1b9d7beed948a2c69816"/>
 			</dataarea>
 		</part>
 	</software>
@@ -622,7 +622,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="セレクテッドソーサリアン3"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
-				<rom name="sorcerian va (selected3)(takeru_brother).d88" size="761008" crc="d881c9cf" sha1="418297a8a79b7fd4808490c57820202d327bc217" offset="0" />
+				<rom name="sorcerian va (selected3)(takeru_brother).d88" size="761008" crc="d881c9cf" sha1="418297a8a79b7fd4808490c57820202d327bc217"/>
 			</dataarea>
 		</part>
 	</software>
@@ -635,7 +635,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="セレクテッドソーサリアン4"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
-				<rom name="sorcerian va (selected4)(takeru_brother).d88" size="761008" crc="f4bb4c53" sha1="5e34d329427b2d350e90f287e2d28fd7ef16fa05" offset="0" />
+				<rom name="sorcerian va (selected4)(takeru_brother).d88" size="761008" crc="f4bb4c53" sha1="5e34d329427b2d350e90f287e2d28fd7ef16fa05"/>
 			</dataarea>
 		</part>
 	</software>
@@ -648,7 +648,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="セレクテッドソーサリアン5"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
-				<rom name="sorcerian va (selected5)(takeru_brother).d88" size="761008" crc="cc7b491a" sha1="720774039653a48325d7cd5e32dbfe536ff44016" offset="0" />
+				<rom name="sorcerian va (selected5)(takeru_brother).d88" size="761008" crc="cc7b491a" sha1="720774039653a48325d7cd5e32dbfe536ff44016"/>
 			</dataarea>
 		</part>
 	</software>
@@ -661,7 +661,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="テトリス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="3481685">
-				<rom name="tetris.mfm" size="3481685" crc="2edafe52" sha1="1a93282d59f56517ac2d4a8aa3fa323611c8c67a" offset="0" />
+				<rom name="tetris.mfm" size="3481685" crc="2edafe52" sha1="1a93282d59f56517ac2d4a8aa3fa323611c8c67a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -677,50 +677,50 @@ PC88VA doujin games (mostly undumped)
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk 1.fdi" size="1265664" crc="6c28f456" sha1="b9595c3798b0faf5152df79f1ea1c74ce3a07672" offset="0" />
+				<rom name="disk 1.fdi" size="1265664" crc="6c28f456" sha1="b9595c3798b0faf5152df79f1ea1c74ce3a07672"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk 2.fdi" size="1265664" crc="408aba76" sha1="5770ff0dc637776d6cb5e30cd4a128fb783befa3" offset="0" />
+				<rom name="disk 2.fdi" size="1265664" crc="408aba76" sha1="5770ff0dc637776d6cb5e30cd4a128fb783befa3"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk 3.fdi" size="1265664" crc="da57a623" sha1="3fbd4cdeccf99e531b34dfe5a3fe890966307fa8" offset="0" />
+				<rom name="disk 3.fdi" size="1265664" crc="da57a623" sha1="3fbd4cdeccf99e531b34dfe5a3fe890966307fa8"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk 4.fdi" size="1265664" crc="cfb2c03b" sha1="b7397ef886811f71927d53c6d940167f01147b9d" offset="0" />
+				<rom name="disk 4.fdi" size="1265664" crc="cfb2c03b" sha1="b7397ef886811f71927d53c6d940167f01147b9d"/>
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk 5.fdi" size="1265664" crc="1187eea4" sha1="7ad2a757460adaff37d73c59287b941241d1e160" offset="0" />
+				<rom name="disk 5.fdi" size="1265664" crc="1187eea4" sha1="7ad2a757460adaff37d73c59287b941241d1e160"/>
 			</dataarea>
 		</part>
 
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk 6.fdi" size="1265664" crc="3256197f" sha1="26a46c2f6124c569b3586e6b9dd97e521460bc0e" offset="0" />
+				<rom name="disk 6.fdi" size="1265664" crc="3256197f" sha1="26a46c2f6124c569b3586e6b9dd97e521460bc0e"/>
 			</dataarea>
 		</part>
 
 		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="disk 7.fdi" size="1265664" crc="2b71cca8" sha1="60b32fe6816be8a9b0b35d9b779ab5baa2fac8af" offset="0" />
+				<rom name="disk 7.fdi" size="1265664" crc="2b71cca8" sha1="60b32fe6816be8a9b0b35d9b779ab5baa2fac8af"/>
 			</dataarea>
 		</part>
 
 		<part name="flop8" interface="floppy_5_25">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1265664">
-				<rom name="user disk.fdi" size="1265664" crc="c1c566df" sha1="0211d36ee53453122d6e2df604d5fdf6c9bfba3a" offset="0" />
+				<rom name="user disk.fdi" size="1265664" crc="c1c566df" sha1="0211d36ee53453122d6e2df604d5fdf6c9bfba3a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -731,21 +731,21 @@ PC88VA doujin games (mostly undumped)
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<info name="release" value="19901102"/>
 
-		<part name="flop1" interface="floppy_5_25" >
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
-				<rom name="xak 2 (disk 1).d88" size="1281968" crc="cd855b7a" sha1="508e25ca306631be64e69e476d49116e7ac04bce" offset="0" />
+				<rom name="xak 2 (disk 1).d88" size="1281968" crc="cd855b7a" sha1="508e25ca306631be64e69e476d49116e7ac04bce"/>
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_5_25" >
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
-				<rom name="xak 2 (disk 2).d88" size="1281968" crc="3927cdcf" sha1="555daba18a61ea2219b5685a850b512dea085cf2" offset="0" />
+				<rom name="xak 2 (disk 2).d88" size="1281968" crc="3927cdcf" sha1="555daba18a61ea2219b5685a850b512dea085cf2"/>
 			</dataarea>
 		</part>
 
-		<part name="flop3" interface="floppy_5_25" >
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
-				<rom name="xak 2 (disk 3).d88" size="1281968" crc="42e25779" sha1="897b62c7fdb604f5bb729e0aeb183566e08c4e33" offset="0" />
+				<rom name="xak 2 (disk 3).d88" size="1281968" crc="42e25779" sha1="897b62c7fdb604f5bb729e0aeb183566e08c4e33"/>
 			</dataarea>
 		</part>
 	</software>
@@ -757,27 +757,27 @@ PC88VA doujin games (mostly undumped)
 		<info name="release" value="19911220"/>
 		<info name="alt_title" value="フレイ"/>
 
-		<part name="flop1" interface="floppy_5_25" >
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="fray - in magical adventure (disk 1).fdi" size="1261568" crc="3a88990a" sha1="252e2589bb8c12800cdd678508b0abd868d0ab83" offset="0" />
+				<rom name="fray - in magical adventure (disk 1).fdi" size="1261568" crc="3a88990a" sha1="252e2589bb8c12800cdd678508b0abd868d0ab83"/>
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_5_25" >
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="fray - in magical adventure (disk 2).fdi" size="1261568" crc="9cbfb7b4" sha1="b040e4ed4e3e516effb1f6997b0f766f4b376ab4" offset="0" />
+				<rom name="fray - in magical adventure (disk 2).fdi" size="1261568" crc="9cbfb7b4" sha1="b040e4ed4e3e516effb1f6997b0f766f4b376ab4"/>
 			</dataarea>
 		</part>
 
-		<part name="flop3" interface="floppy_5_25" >
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="fray - in magical adventure (disk 3).fdi" size="1261568" crc="9f79f4bb" sha1="2d3ebbaa844bd451190d899a7f53829b07b830eb" offset="0" />
+				<rom name="fray - in magical adventure (disk 3).fdi" size="1261568" crc="9f79f4bb" sha1="2d3ebbaa844bd451190d899a7f53829b07b830eb"/>
 			</dataarea>
 		</part>
 
-		<part name="flop4" interface="floppy_5_25" >
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="fray - in magical adventure (disk 4).fdi" size="1261568" crc="c074800a" sha1="bf114221bdcc8e6545c4566ae58cea1af324aa9a" offset="0" />
+				<rom name="fray - in magical adventure (disk 4).fdi" size="1261568" crc="c074800a" sha1="bf114221bdcc8e6545c4566ae58cea1af324aa9a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -794,21 +794,21 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk a.xdf" size="1261568" crc="7614c8af" sha1="eeea190cf882eb91b55965553cf3bac64f09dee0" offset="0" />
+				<rom name="disk a.xdf" size="1261568" crc="7614c8af" sha1="eeea190cf882eb91b55965553cf3bac64f09dee0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk b.xdf" size="1261568" crc="9e83829f" sha1="e171236054d08b78b30657a3f7132e179de9a0cf" offset="0" />
+				<rom name="disk b.xdf" size="1261568" crc="9e83829f" sha1="e171236054d08b78b30657a3f7132e179de9a0cf"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk c.xdf" size="1261568" crc="9d536580" sha1="feb812332d2119196558cffde50a5ef1272a4c37" offset="0" />
+				<rom name="disk c.xdf" size="1261568" crc="9d536580" sha1="feb812332d2119196558cffde50a5ef1272a4c37"/>
 			</dataarea>
 		</part>
 	</software>
@@ -823,21 +823,21 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk a.xdf" size="1261568" crc="ccebcb01" sha1="fc6c8913c9e0fc70b0983d0d2dc8837e441ae567" offset="0" />
+				<rom name="disk a.xdf" size="1261568" crc="ccebcb01" sha1="fc6c8913c9e0fc70b0983d0d2dc8837e441ae567"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk b.xdf" size="1261568" crc="702de57e" sha1="1d7bfbcb3a2543abfadec1a5d999386994763384" offset="0" />
+				<rom name="disk b.xdf" size="1261568" crc="702de57e" sha1="1d7bfbcb3a2543abfadec1a5d999386994763384"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk c.xdf" size="1261568" crc="d1c56921" sha1="7a8d496fc94167b99cc8cc5b590e5dab8f453d05" offset="0" />
+				<rom name="disk c.xdf" size="1261568" crc="d1c56921" sha1="7a8d496fc94167b99cc8cc5b590e5dab8f453d05"/>
 			</dataarea>
 		</part>
 	</software>
@@ -852,14 +852,14 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk a.xdf" size="1261568" crc="f6078845" sha1="f1695e9b313daba8a93ee2d74aefe833262078f4" offset="0" />
+				<rom name="disk a.xdf" size="1261568" crc="f6078845" sha1="f1695e9b313daba8a93ee2d74aefe833262078f4"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk b.xdf" size="1261568" crc="224d3faf" sha1="300cf05020e91069c0fd54d2d992e5b7acccd1c9" offset="0" />
+				<rom name="disk b.xdf" size="1261568" crc="224d3faf" sha1="300cf05020e91069c0fd54d2d992e5b7acccd1c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -874,28 +874,28 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System" />
 			<dataarea name="flop" size="1261568">
-				<rom name="system.xdf" size="1261568" crc="94af1a60" sha1="b662d9024b23aef819eaf95826cd56cc9a517e70" offset="0" />
+				<rom name="system.xdf" size="1261568" crc="94af1a60" sha1="b662d9024b23aef819eaf95826cd56cc9a517e70"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 1" />
 			<dataarea name="flop" size="1261568">
-				<rom name="scenario 1.xdf" size="1261568" crc="a96f5768" sha1="3b84125f81d610ba218a2df9aab163d044ee84d4" offset="0" />
+				<rom name="scenario 1.xdf" size="1261568" crc="a96f5768" sha1="3b84125f81d610ba218a2df9aab163d044ee84d4"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 2" />
 			<dataarea name="flop" size="1261568">
-				<rom name="scenario 2.xdf" size="1261568" crc="030bbe44" sha1="7fe3bd38370c67fbd80c9b069299abcf914c45ab" offset="0" />
+				<rom name="scenario 2.xdf" size="1261568" crc="030bbe44" sha1="7fe3bd38370c67fbd80c9b069299abcf914c45ab"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 3 ~ Fahnen Fliegen" />
 			<dataarea name="flop" size="1261568">
-				<rom name="scenario 3.xdf" size="1261568" crc="ee47af10" sha1="3db3f994df5701ec2811c4f628ca7552845a07ab" offset="0" />
+				<rom name="scenario 3.xdf" size="1261568" crc="ee47af10" sha1="3db3f994df5701ec2811c4f628ca7552845a07ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -910,28 +910,28 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System" />
 			<dataarea name="flop" size="1261568">
-				<rom name="system.xdf" size="1261568" crc="509433e8" sha1="db9f073f6afb379c4b7d79f8b685048951421eb2" offset="0" />
+				<rom name="system.xdf" size="1261568" crc="509433e8" sha1="db9f073f6afb379c4b7d79f8b685048951421eb2"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 1" />
 			<dataarea name="flop" size="1261568">
-				<rom name="scenario 1.xdf" size="1261568" crc="d1bdb2bf" sha1="ea58a504414d0824ddd9adc23ca504a974573f26" offset="0" />
+				<rom name="scenario 1.xdf" size="1261568" crc="d1bdb2bf" sha1="ea58a504414d0824ddd9adc23ca504a974573f26"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 2" />
 			<dataarea name="flop" size="1261568">
-				<rom name="scenario 2.xdf" size="1261568" crc="10250dff" sha1="550696eb596e0c3ffbb670d2fd003faf664866d5" offset="0" />
+				<rom name="scenario 2.xdf" size="1261568" crc="10250dff" sha1="550696eb596e0c3ffbb670d2fd003faf664866d5"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 3 ~ Antique House" />
 			<dataarea name="flop" size="1261568">
-				<rom name="scenario 3.xdf" size="1261568" crc="b8d09260" sha1="d4067d8c87e3fe6f66396145edeb64fdcbe22842" offset="0" />
+				<rom name="scenario 3.xdf" size="1261568" crc="b8d09260" sha1="d4067d8c87e3fe6f66396145edeb64fdcbe22842"/>
 			</dataarea>
 		</part>
 	</software>
@@ -946,28 +946,28 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System" />
 			<dataarea name="flop" size="1261568">
-				<rom name="system.xdf" size="1261568" crc="509433e8" sha1="db9f073f6afb379c4b7d79f8b685048951421eb2" offset="0" />
+				<rom name="system.xdf" size="1261568" crc="509433e8" sha1="db9f073f6afb379c4b7d79f8b685048951421eb2"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 1" />
 			<dataarea name="flop" size="1261568">
-				<rom name="scenario 1.xdf" size="1261568" crc="03631feb" sha1="f13f294c47993cff8d8a87baa481170a697c9cd5" offset="0" />
+				<rom name="scenario 1.xdf" size="1261568" crc="03631feb" sha1="f13f294c47993cff8d8a87baa481170a697c9cd5"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 2" />
 			<dataarea name="flop" size="1261568">
-				<rom name="scenario 2.xdf" size="1261568" crc="0c58a147" sha1="2c009163532b104757e119a20d947b91469aaad6" offset="0" />
+				<rom name="scenario 2.xdf" size="1261568" crc="0c58a147" sha1="2c009163532b104757e119a20d947b91469aaad6"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 3 ~ Rabbit P4P" />
 			<dataarea name="flop" size="1261568">
-				<rom name="scenario 3.xdf" size="1261568" crc="4ebe2833" sha1="d29eaad46e44af04d140f4ee18262490e46f1b79" offset="0" />
+				<rom name="scenario 3.xdf" size="1261568" crc="4ebe2833" sha1="d29eaad46e44af04d140f4ee18262490e46f1b79"/>
 			</dataarea>
 		</part>
 	</software>
@@ -982,28 +982,28 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk a.xdf" size="1261568" crc="7512d4ff" sha1="a442213bf7330548ef012f3e0623b1df5fb2142e" offset="0" />
+				<rom name="disk a.xdf" size="1261568" crc="7512d4ff" sha1="a442213bf7330548ef012f3e0623b1df5fb2142e"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk b.xdf" size="1261568" crc="fa088a6f" sha1="7ddcace8d5e42a75b0ca30f262f71159844ee69d" offset="0" />
+				<rom name="disk b.xdf" size="1261568" crc="fa088a6f" sha1="7ddcace8d5e42a75b0ca30f262f71159844ee69d"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk c.xdf" size="1261568" crc="5e571192" sha1="cc6ecbb63be4c201e0634c85d0883173f983e879" offset="0" />
+				<rom name="disk c.xdf" size="1261568" crc="5e571192" sha1="cc6ecbb63be4c201e0634c85d0883173f983e879"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk d.xdf" size="1261568" crc="80c44e64" sha1="497bff6513c4fba5d193f06df95009dc2c154370" offset="0" />
+				<rom name="disk d.xdf" size="1261568" crc="80c44e64" sha1="497bff6513c4fba5d193f06df95009dc2c154370"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1017,42 +1017,42 @@ PC88VA doujin games (mostly undumped)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="adisk.xdf" size="1261568" crc="959d531e" sha1="8bfa67e8290f195f6325cc03ff667a7c935958ba" offset="0" />
+				<rom name="adisk.xdf" size="1261568" crc="959d531e" sha1="8bfa67e8290f195f6325cc03ff667a7c935958ba"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="bdisk.xdf" size="1261568" crc="c51e2d10" sha1="3e82f90249ec3545a67758970e018d297ffb8f23" offset="0" />
+				<rom name="bdisk.xdf" size="1261568" crc="c51e2d10" sha1="3e82f90249ec3545a67758970e018d297ffb8f23"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="cdisk.xdf" size="1261568" crc="473aaf1c" sha1="e3bc65950531df8dda0e5392323cebb6cb92c44f" offset="0" />
+				<rom name="cdisk.xdf" size="1261568" crc="473aaf1c" sha1="e3bc65950531df8dda0e5392323cebb6cb92c44f"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261568">
-				<rom name="ddisk.xdf" size="1261568" crc="b84fdce5" sha1="ba80bdd9d32cda0713abfc7259c841237463a512" offset="0" />
+				<rom name="ddisk.xdf" size="1261568" crc="b84fdce5" sha1="ba80bdd9d32cda0713abfc7259c841237463a512"/>
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
-				<rom name="edisk.xdf" size="1261568" crc="df3de612" sha1="0cec33872aa32c1451a0741064a1db86f92ebfd7" offset="0" />
+				<rom name="edisk.xdf" size="1261568" crc="df3de612" sha1="0cec33872aa32c1451a0741064a1db86f92ebfd7"/>
 			</dataarea>
 		</part>
 
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk F" />
 			<dataarea name="flop" size="1261568">
-				<rom name="fdisk.xdf" size="1261568" crc="0d9a2891" sha1="834cd1495d36217fb0e7d19814abd3ea387d4fc0" offset="0" />
+				<rom name="fdisk.xdf" size="1261568" crc="0d9a2891" sha1="834cd1495d36217fb0e7d19814abd3ea387d4fc0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1068,7 +1068,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="ばる〜んぶ れ〜か〜" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
-				<rom name="balloon breaker.d88" size="1331888" crc="352d976e" sha1="c56f916f84673539bf29d6fc564e69b4d4b82484" offset="0" />
+				<rom name="balloon breaker.d88" size="1331888" crc="352d976e" sha1="c56f916f84673539bf29d6fc564e69b4d4b82484"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1080,7 +1080,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="developer" value="Fredia" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
-				<rom name="boomering.d88" size="1331888" crc="11b2a411" sha1="299d971e36b03ce6fbd9ffa13d45019936461c4c" offset="0" />
+				<rom name="boomering.d88" size="1331888" crc="11b2a411" sha1="299d971e36b03ce6fbd9ffa13d45019936461c4c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1093,13 +1093,13 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="ハレ晴レユカイ" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
-				<rom name="harehare1.d88" size="1331888" crc="1488f784" sha1="96f93801318ed850f1074fb5f050420d098d85b5" offset="0" />
+				<rom name="harehare1.d88" size="1331888" crc="1488f784" sha1="96f93801318ed850f1074fb5f050420d098d85b5"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
-				<rom name="harehare2.d88" size="1331888" crc="61d820e5" sha1="ff667f767e9a27be286053bc198eb0855925e7e8" offset="0" />
+				<rom name="harehare2.d88" size="1331888" crc="61d820e5" sha1="ff667f767e9a27be286053bc198eb0855925e7e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1112,7 +1112,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="ハティの空で" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1298608">
-				<rom name="hati sora.d88" size="1298608" crc="bdee6770" sha1="445ba8da78cce7fd3c4d1bce263d8c8edd88849d" offset="0" />
+				<rom name="hati sora.d88" size="1298608" crc="bdee6770" sha1="445ba8da78cce7fd3c4d1bce263d8c8edd88849d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1125,7 +1125,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="alt_title" value="最終平気UPOプレリリース" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1289040">
-				<rom name="upo.d88" size="1289040" crc="cfbcfdda" sha1="0b57d9c9df6c4186339f484794905417ea0dccb4" offset="0" />
+				<rom name="upo.d88" size="1289040" crc="cfbcfdda" sha1="0b57d9c9df6c4186339f484794905417ea0dccb4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1138,7 +1138,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="developer" value="Shinra" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
-				<rom name="pacman.d88" size="1331888" crc="9198eae1" sha1="2abf462b72c29e2ff56ea7c1401836f01b97dfe1" offset="0" />
+				<rom name="pacman.d88" size="1331888" crc="9198eae1" sha1="2abf462b72c29e2ff56ea7c1401836f01b97dfe1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1151,7 +1151,7 @@ PC88VA doujin games (mostly undumped)
 		<info name="developer" value="Shinra" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
-				<rom name="pacmana.d88" size="1281968" crc="14ecc6d5" sha1="a0d4b7fa7c68323a8542d3739782d216ffab85a6" offset="0" />
+				<rom name="pacmana.d88" size="1281968" crc="14ecc6d5" sha1="a0d4b7fa7c68323a8542d3739782d216ffab85a6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1164,40 +1164,40 @@ PC88VA doujin games (mostly undumped)
 		<year>19??</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
 		<!--combined image-->
-		<!--rom name="mid garts patched va.d88" size="2079120" crc="1bc74ca4" sha1="74a436fc016407adc14051a4ecc7e8c410d850d0" offset="0" /-->
+		<!--rom name="mid garts patched va.d88" size="2079120" crc="1bc74ca4" sha1="74a436fc016407adc14051a4ecc7e8c410d850d0"/-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="415824">
-				<rom name="mid garts patched va (disk 1).d88" size="415824" crc="6cb7ccd5" sha1="9f67454ef4b87b09857db6bbd482600dbe074beb" offset="0" />
+				<rom name="mid garts patched va (disk 1).d88" size="415824" crc="6cb7ccd5" sha1="9f67454ef4b87b09857db6bbd482600dbe074beb"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="415824">
-				<rom name="mid garts patched va (disk 2).d88" size="415824" crc="ff34f309" sha1="9e9668e0f6c601aaa4d2544fed5255e5b1704e8c" offset="0" />
+				<rom name="mid garts patched va (disk 2).d88" size="415824" crc="ff34f309" sha1="9e9668e0f6c601aaa4d2544fed5255e5b1704e8c"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="415824">
-				<rom name="mid garts patched va (disk 3).d88" size="415824" crc="c486a06d" sha1="bac326f7d482609f7ce23f72063b59dbe7592673" offset="0" />
+				<rom name="mid garts patched va (disk 3).d88" size="415824" crc="c486a06d" sha1="bac326f7d482609f7ce23f72063b59dbe7592673"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="415824">
-				<rom name="mid garts patched va (disk 4).d88" size="415824" crc="b7266c42" sha1="00485820f0f68a3de794db07b643e49f453b5fff" offset="0" />
+				<rom name="mid garts patched va (disk 4).d88" size="415824" crc="b7266c42" sha1="00485820f0f68a3de794db07b643e49f453b5fff"/>
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size="415824">
-				<rom name="mid garts patched va (disk 5).d88" size="415824" crc="1019066c" sha1="daf53434cf0ffc6423262a343ed7df5c434dd921" offset="0" />
+				<rom name="mid garts patched va (disk 5).d88" size="415824" crc="1019066c" sha1="daf53434cf0ffc6423262a343ed7df5c434dd921"/>
 			</dataarea>
 		</part>
 	</software>

@@ -2,7 +2,7 @@
 // copyright-holders:Juergen Buchmueller
 /*****************************************************************************
  *
- *   z80.c
+ *   z80.cpp
  *   Portable Z80 emulator V3.9
  *
  *   TODO:
@@ -17,8 +17,9 @@
  *       - OUT (C),0 outputs 0 on NMOS Z80, $FF on CMOS Z80
  *       - SCF/CCF X/Y flags is ((flags | A) & 0x28) on SGS/SHARP/ZiLOG NMOS Z80,
  *         (flags & A & 0x28) on NEC NMOS Z80, other models unknown.
- *         However, people from the Speccy scene mention that SCF/CCF X/Y results
- *         are inconsistant and may be influenced by I and R registers.
+ *         However, recent findings say that SCF/CCF X/Y results depend on whether
+ *         or not the previous instruction touched the flag register. And the exact
+ *         behaviour on NEC Z80 is still unknown.
  *      This Z80 emulator assumes a ZiLOG NMOS model.
  *
  *   Changes in 3.9:

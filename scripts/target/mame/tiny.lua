@@ -93,7 +93,7 @@ function createProjects_mame_tiny(_target, _subtarget)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-mame-tiny"))
 	addprojectflags()
-	precompiledheaders()
+	precompiledheaders_novs()
 
 	includedirs {
 		MAME_DIR .. "src/osd",

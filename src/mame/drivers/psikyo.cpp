@@ -23,12 +23,24 @@ Name                    Year    Board          Notes
 Sengoku Ace         (J) 1993    SH201B
 Gun Bird            (J) 1994    KA302C
 Battle K-Road       (J) 1994    ""
-Strikers 1945       (J) 1995    SH403/SH404    SH403 is similiar to KA302C
+Strikers 1945       (J) 1995    SH403/SH404    SH403 is similar to KA302C
 Tengai              (J) 1996    SH404          SH404 has MCU, ymf278-b for sound and gfx banking
 ---------------------------------------------------------------------------
 
 To Do:
 
+- All games uses PORT_VBLANK and legacy screen parameters (which is already
+  bad per-se), with also naive and unlikely measurements (i.e. exactly 59.30
+  or 59.90 Hz).
+  The most blunt examples of something being wrong with timings are with
+  Gunbird and Tengai: they both have FOUR frames of input lag, the real thing
+  doesn't sport anything like that.
+  Given the above, all games are marked with MACHINE_IMPERFECT_TIMING until
+  somebody provides accurate H/Vsync signals for at least one game of this
+  driver.
+- tengai / tengaij: "For use in Japan" screen is supposed to output the
+  typical blue Psikyo backdrop gradient instead of being pure black as it is
+  now;
 - Flip Screen support
 
 NOTE: Despite being mentioned in the manual Strikers 1945 doesn't seem to
@@ -69,6 +81,7 @@ This was pointed out by Bart Puype
 #include "includes/psikyo.h"
 
 #include "cpu/z80/z80.h"
+#include "cpu/z80/lz8420m.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/2610intf.h"
@@ -81,7 +94,7 @@ This was pointed out by Bart Puype
                         Strikers 1945 / Tengai MCU
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(psikyo_state::mcu_status_r)
+READ_LINE_MEMBER(psikyo_state::mcu_status_r)
 {
 	int ret = 0x00;
 
@@ -125,100 +138,89 @@ static const u8 s1945j_table[256] = {
 	0x00, 0x00, 0x32, 0x90, 0x00, 0x00, 0xac, 0x64, 0x00, 0x00, 0x2b, 0xc0
 };
 
-WRITE32_MEMBER(psikyo_state::s1945_mcu_w)
+void psikyo_state::s1945_mcu_data_w(uint8_t data)
 {
-	// Accesses are always bytes, so resolve it
-	int suboff;
-
-	for (suboff = 0; suboff < 3; suboff++)
-		if ((0xff << (8 * suboff)) & mem_mask)
-			break;
-	data >>= 8 * suboff;
-	offset = offset * 4 + 4 + (3 - suboff);
-
-	switch (offset)
-	{
-	case 0x06:
-		m_s1945_mcu_inlatch = data;
-		break;
-	case 0x08:
-		m_s1945_mcu_control = data;
-		break;
-	case 0x09:
-		m_s1945_mcu_direction = data;
-		break;
-	case 0x07:
-		switch_bgbanks(1, (data >> 6) & 3);
-		switch_bgbanks(0, (data >> 4) & 3);
-		m_s1945_mcu_bctrl = data;
-		break;
-	case 0x0b:
-		switch (data | (m_s1945_mcu_direction ? 0x100 : 0))
-		{
-		case 0x11c:
-			m_s1945_mcu_latching = 5;
-			m_s1945_mcu_index = m_s1945_mcu_inlatch;
-			break;
-		case 0x013:
-//          logerror("MCU: Table read index %02x\n", m_s1945_mcu_index);
-			m_s1945_mcu_latching = 1;
-			m_s1945_mcu_latch1 = m_s1945_mcu_table[m_s1945_mcu_index];
-			break;
-		case 0x113:
-			m_s1945_mcu_mode = m_s1945_mcu_inlatch;
-			if (m_s1945_mcu_mode == 1)
-			{
-				m_s1945_mcu_latching &= ~1;
-				m_s1945_mcu_latch2 = 0x55;
-			}
-			else
-			{
-				// Go figure.
-				m_s1945_mcu_latching &= ~1;
-				m_s1945_mcu_latching |= 2;
-			}
-			m_s1945_mcu_latching &= ~4;
-			m_s1945_mcu_latch1 = m_s1945_mcu_inlatch;
-			break;
-		case 0x010:
-		case 0x110:
-			m_s1945_mcu_latching |= 4;
-			break;
-		default:
-//          logerror("MCU: function %02x, direction %02x, latch1 %02x, latch2 %02x (%x)\n", data, m_s1945_mcu_direction, m_s1945_mcu_latch1, m_s1945_mcu_latch2, m_maincpu->pc());
-			break;
-		}
-		break;
-	default:
-//      logerror("MCU.w %x, %02x (%x)\n", offset, data, m_maincpu->pc());
-		;
-	}
+	m_s1945_mcu_inlatch = data;
 }
 
-READ32_MEMBER(psikyo_state::s1945_mcu_r)
+void psikyo_state::s1945_mcu_control_w(uint8_t data)
 {
-	switch (offset)
+	m_s1945_mcu_control = data;
+}
+
+void psikyo_state::s1945_mcu_direction_w(uint8_t data)
+{
+	m_s1945_mcu_direction = data;
+}
+
+void psikyo_state::s1945_mcu_bctrl_w(uint8_t data)
+{
+	switch_bgbanks(1, (data >> 6) & 3);
+	switch_bgbanks(0, (data >> 4) & 3);
+	m_s1945_mcu_bctrl = data;
+}
+
+void psikyo_state::s1945_mcu_command_w(uint8_t data)
+{
+	switch (data | (m_s1945_mcu_direction ? 0x100 : 0))
 	{
-	case 0:
+	case 0x11c:
+		m_s1945_mcu_latching = 5;
+		m_s1945_mcu_index = m_s1945_mcu_inlatch;
+		break;
+	case 0x013:
+//          logerror("MCU: Table read index %02x\n", m_s1945_mcu_index);
+		m_s1945_mcu_latching = 1;
+		if (m_s1945_mcu_table != nullptr)
+			m_s1945_mcu_latch1 = m_s1945_mcu_table[m_s1945_mcu_index];
+		break;
+	case 0x113:
+		m_s1945_mcu_mode = m_s1945_mcu_inlatch;
+		if (m_s1945_mcu_mode == 1)
 		{
-		u32 res;
-		if (m_s1945_mcu_control & 16)
-		{
-			res = m_s1945_mcu_latching & 4 ? 0x0000ff00 : m_s1945_mcu_latch1 << 8;
-			m_s1945_mcu_latching |= 4;
+			m_s1945_mcu_latching &= ~1;
+			m_s1945_mcu_latch2 = 0x55;
 		}
 		else
 		{
-			res = m_s1945_mcu_latching & 1 ? 0x0000ff00 : m_s1945_mcu_latch2 << 8;
-			m_s1945_mcu_latching |= 1;
+			// Go figure.
+			m_s1945_mcu_latching &= ~1;
+			m_s1945_mcu_latching |= 2;
 		}
-		res |= m_s1945_mcu_bctrl & 0xf0;
-		return res;
+		m_s1945_mcu_latching &= ~4;
+		m_s1945_mcu_latch1 = m_s1945_mcu_inlatch;
+		break;
+	case 0x010:
+	case 0x110:
+		m_s1945_mcu_latching |= 4;
+		break;
+	default:
+//          logerror("MCU: function %02x, direction %02x, latch1 %02x, latch2 %02x (%x)\n", data, m_s1945_mcu_direction, m_s1945_mcu_latch1, m_s1945_mcu_latch2, m_maincpu->pc());
+		break;
 	}
-	case 1:
-		return (m_s1945_mcu_latching << 24) | 0x08000000;
+}
+
+// TODO: make this handler 8-bit
+uint32_t psikyo_state::s1945_mcu_data_r()
+{
+	u32 res;
+	if (m_s1945_mcu_control & 16)
+	{
+		res = m_s1945_mcu_latching & 4 ? 0x0000ff00 : m_s1945_mcu_latch1 << 8;
+		m_s1945_mcu_latching |= 4;
 	}
-	return 0;
+	else
+	{
+		res = m_s1945_mcu_latching & 1 ? 0x0000ff00 : m_s1945_mcu_latch2 << 8;
+		m_s1945_mcu_latching |= 1;
+	}
+	res |= m_s1945_mcu_bctrl & 0xf0;
+	return res;
+}
+
+uint8_t psikyo_state::s1945_mcu_control_r()
+{
+	return m_s1945_mcu_latching | 0x08;
 }
 
 template<int Layer>
@@ -394,8 +396,7 @@ READ32_MEMBER(psikyo_state::s1945_input_r)
 	switch (offset)
 	{
 		case 0x0:   return m_in_p1_p2->read();
-		case 0x1:   return (m_in_dsw->read() & 0xffff000f) | s1945_mcu_r(space, offset - 1, mem_mask);
-		case 0x2:   return s1945_mcu_r(space, offset - 1, mem_mask);
+		case 0x1:   return (m_in_dsw->read() & 0xffff000f) | s1945_mcu_data_r();
 		default:    logerror("PC %06X - Read input %02X !\n", m_maincpu->pc(), offset * 2);
 					return 0;
 	}
@@ -404,8 +405,12 @@ READ32_MEMBER(psikyo_state::s1945_input_r)
 void psikyo_state::s1945_map(address_map &map)
 {
 	psikyo_map(map);
-	map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::s1945_input_r)); // input ports
-	map(0xc00004, 0xc0000b).w(FUNC(psikyo_state::s1945_mcu_w)); // protection and tile bank switching
+	map(0xc00000, 0xc00007).r(FUNC(psikyo_state::s1945_input_r)); // input ports
+	map(0xc00006, 0xc00006).w(FUNC(psikyo_state::s1945_mcu_data_w));
+	map(0xc00007, 0xc00007).w(FUNC(psikyo_state::s1945_mcu_bctrl_w)); // tile bank switching
+	map(0xc00008, 0xc00008).rw(FUNC(psikyo_state::s1945_mcu_control_r), FUNC(psikyo_state::s1945_mcu_control_w));
+	map(0xc00009, 0xc00009).w(FUNC(psikyo_state::s1945_mcu_direction_w));
+	map(0xc0000b, 0xc0000b).w(FUNC(psikyo_state::s1945_mcu_command_w));
 	map(0xc00011, 0xc00011).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
@@ -427,7 +432,7 @@ void psikyo_state::s1945_sound_io_map(address_map &map)
 
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(psikyo_state::z80_nmi_r)
+READ_LINE_MEMBER(psikyo_state::z80_nmi_r)
 {
 	int ret = 0x00;
 
@@ -547,7 +552,7 @@ static INPUT_PORTS_START( samuraia )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, nullptr)   // From Sound CPU
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(psikyo_state, z80_nmi_r)   // From Sound CPU
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
 
 	PORT_MODIFY("DSW")      /* c00004 -> c00007 */
@@ -623,7 +628,7 @@ static INPUT_PORTS_START( btlkroad )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, nullptr)   // From Sound CPU
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(psikyo_state, z80_nmi_r)   // From Sound CPU
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
@@ -727,7 +732,7 @@ static INPUT_PORTS_START( gunbird )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, nullptr)   // From Sound CPU
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(psikyo_state, z80_nmi_r)   // From Sound CPU
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW")      /* c00004 -> c00007 */
@@ -788,12 +793,12 @@ static INPUT_PORTS_START( s1945 )
 	PORT_MODIFY("P1_P2")            /* c00000 -> c00003 */
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,mcu_status_r, nullptr)
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(psikyo_state, mcu_status_r)
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, nullptr)   // From Sound CPU
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(psikyo_state, z80_nmi_r)   // From Sound CPU
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW")      /* c00004 -> c00007 */
@@ -912,12 +917,12 @@ static INPUT_PORTS_START( tengai )
 	PORT_MODIFY("P1_P2")            /* c00000 -> c00003 */
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,mcu_status_r, nullptr)
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(psikyo_state, mcu_status_r)
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, nullptr)   // From Sound CPU
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(psikyo_state, z80_nmi_r)   // From Sound CPU
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW")      /* c00004 -> c00007 */
@@ -1041,8 +1046,9 @@ void psikyo_state::sngkace(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: accurate measurements
 	m_screen->set_refresh_hz(59.3);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */  // we're using PORT_VBLANK
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
@@ -1077,18 +1083,19 @@ void psikyo_state::sngkace(machine_config &config)
 void psikyo_state::gunbird(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, 16000000);
+	M68EC020(config, m_maincpu, 16_MHz_XTAL);  // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_map);
 	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);  /* ! LZ8420M (Z80 core) ! */
+	LZ8420M(config, m_audiocpu, 16_MHz_XTAL / 2);  // 8 MHz (16 / 2)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psikyo_state::gunbird_sound_io_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: accurate measurements
 	m_screen->set_refresh_hz(59.3);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */  // we're using PORT_VBLANK
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
@@ -1104,7 +1111,7 @@ void psikyo_state::gunbird(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono",  1.0);
 
@@ -1128,8 +1135,9 @@ void psikyo_state::s1945bl(machine_config &config) /* Bootleg hardware based on 
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: accurate measurements
 	m_screen->set_refresh_hz(59.3);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */  // we're using PORT_VBLANK
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update_bootleg));
@@ -1159,20 +1167,21 @@ void psikyo_state::s1945bl(machine_config &config) /* Bootleg hardware based on 
 void psikyo_state::s1945(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, 16000000);
+	M68EC020(config, m_maincpu, 16_MHz_XTAL);  // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::s1945_map);
 	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);  /* ! LZ8420M (Z80 core) ! */
+	LZ8420M(config, m_audiocpu, 16_MHz_XTAL / 2);  // 8 MHz (16 / 2)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psikyo_state::s1945_sound_io_map);
 
-	PIC16C57(config, "mcu", 4000000).set_disable();  /* 4 MHz? */ /* Internal ROM is't dumped */
+	PIC16C57(config, "mcu", 4_MHz_XTAL).set_disable();  // Internal ROM isn't dumped (there's one weirdly sized dump available from a Korean version, actually. TODO: verify it's good and hook it up)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(59.90);    /* verified on pcb */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */  // we're using PORT_VBLANK
+	// TODO: accurate measurements
+	m_screen->set_refresh_hz(59.9229);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
@@ -1188,8 +1197,8 @@ void psikyo_state::s1945(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ymf278b_device &ymf(YMF278B(config, "ymf", YMF278B_STD_CLOCK));
-	ymf.irq_handler().set_inputline("audiocpu", 0);
+	ymf278b_device &ymf(YMF278B(config, "ymf", 33.8688_MHz_XTAL));
+	ymf.irq_handler().set_inputline(m_audiocpu, 0);
 	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -1625,7 +1634,7 @@ OSC:    16.000MHz
         14.3181MHz
         33.8688MHz (YMF)
         4.000MHz (PIC)
-
+SYNCS:  HSync 15.2183kHz, VSync 59.9229Hz
 1-U59   security (PIC16C57; not dumped)
 
 ***************************************************************************/
@@ -1959,24 +1968,24 @@ void psikyo_state::init_s1945bl()
 
 ***************************************************************************/
 
-GAME( 1993, samuraia,  0,        sngkace,  samuraia,  psikyo_state, init_sngkace,  ROT270, "Psikyo",  "Samurai Aces (World)",       MACHINE_SUPPORTS_SAVE ) // Banpresto?
-GAME( 1993, sngkace,   samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo",  "Sengoku Ace (Japan, set 1)", MACHINE_SUPPORTS_SAVE ) // Banpresto?
-GAME( 1993, sngkacea,  samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo",  "Sengoku Ace (Japan, set 2)", MACHINE_SUPPORTS_SAVE ) // Banpresto?
+GAME( 1993, samuraia,  0,        sngkace,  samuraia,  psikyo_state, init_sngkace,  ROT270, "Psikyo",  "Samurai Aces (World)",       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // Banpresto?
+GAME( 1993, sngkace,   samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo",  "Sengoku Ace (Japan, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // Banpresto?
+GAME( 1993, sngkacea,  samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo",  "Sengoku Ace (Japan, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // Banpresto?
 
-GAME( 1994, gunbird,   0,        gunbird,  gunbird,   psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunbirdk,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunbirdj,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbird,   0,        gunbird,  gunbird,   psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1994, gunbirdk,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1994, gunbirdj,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
-GAME( 1994, btlkroad,  0,        gunbird,  btlkroad,  psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road",         MACHINE_SUPPORTS_SAVE )
-GAME( 1994, btlkroadk, btlkroad, gunbird,  btlkroadk, psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road (Korea)", MACHINE_SUPPORTS_SAVE ) // game code is still multi-region, but sound rom appears to be Korea specific at least
+GAME( 1994, btlkroad,  0,        gunbird,  btlkroad,  psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1994, btlkroadk, btlkroad, gunbird,  btlkroadk, psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // game code is still multi-region, but sound rom appears to be Korea specific at least
 
-GAME( 1995, s1945,     0,        s1945,    s1945,     psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (World)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1995, s1945a,    s1945,    s1945,    s1945a,    psikyo_state, init_s1945a,   ROT270, "Psikyo",  "Strikers 1945 (Japan / World)",      MACHINE_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World
-GAME( 1995, s1945j,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945j,   ROT270, "Psikyo",  "Strikers 1945 (Japan)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1995, s1945n,    s1945,    s1945n,   s1945,     psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (World, unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, s1945nj,   s1945,    s1945n,   s1945j,    psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (Japan, unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, s1945k,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (Korea)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1995, s1945bl,   s1945,    s1945bl,  s1945bl,   psikyo_state, init_s1945bl,  ROT270, "bootleg", "Strikers 1945 (Hong Kong, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945,     0,        s1945,    s1945,     psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (World)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1995, s1945a,    s1945,    s1945,    s1945a,    psikyo_state, init_s1945a,   ROT270, "Psikyo",  "Strikers 1945 (Japan / World)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // Region dip - 0x0f=Japan, anything else=World
+GAME( 1995, s1945j,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945j,   ROT270, "Psikyo",  "Strikers 1945 (Japan)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1995, s1945n,    s1945,    s1945n,   s1945,     psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (World, unprotected)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1995, s1945nj,   s1945,    s1945n,   s1945j,    psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (Japan, unprotected)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1995, s1945k,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (Korea)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1995, s1945bl,   s1945,    s1945bl,  s1945bl,   psikyo_state, init_s1945bl,  ROT270, "bootleg", "Strikers 1945 (Hong Kong, bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
-GAME( 1996, tengai,    0,        s1945,    tengai,    psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Tengai (World)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1996, tengaij,   tengai,   s1945,    tengaij,   psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Sengoku Blade: Sengoku Ace Episode II / Tengai", MACHINE_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World
+GAME( 1996, tengai,    0,        s1945,    tengai,    psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Tengai (World)",                                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1996, tengaij,   tengai,   s1945,    tengaij,   psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Sengoku Blade: Sengoku Ace Episode II / Tengai", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // Region dip - 0x0f=Japan, anything else=World

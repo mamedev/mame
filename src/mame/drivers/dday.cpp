@@ -35,15 +35,15 @@ read:
 write:
 
 4000 Search light image and flip
-6400 AY8910 #1 Control Port
-6401 AY8910 #1 Write Port
-6800 AY8910 #2 Control Port
-6801 AY8910 #2 Write Port
+6400 AY8912 #1 Control Port
+6401 AY8912 #1 Write Port
+6800 AY8912 #2 Control Port
+6801 AY8912 #2 Write Port
 7800 Bit 0 - Coin Counter 1
      Bit 1 - Coin Counter 2
      Bit 2 - ??? Pulsated when the player is hit
      Bit 3 - ??? Seems to be unused
-     Bit 4 - Tied to AY8910 RST. Used to turn off sound
+     Bit 4 - Tied to AY8912 RST. Used to turn off sound
      Bit 5 - ??? Seem to be always on
      Bit 6 - Search light enable
      Bit 7 - ???
@@ -67,8 +67,8 @@ void dday_state::dday_map(address_map &map)
 	map(0x5800, 0x5bff).ram().w(FUNC(dday_state::dday_bgvideoram_w)).share("bgvideoram");
 	map(0x5c00, 0x5fff).rw(FUNC(dday_state::dday_colorram_r), FUNC(dday_state::dday_colorram_w)).share("colorram");
 	map(0x6000, 0x63ff).ram();
-	map(0x6400, 0x6401).mirror(0x000e).w(m_ay1, FUNC(ay8910_device::address_data_w));
-	map(0x6800, 0x6801).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x6400, 0x6401).mirror(0x000e).w(m_ay1, FUNC(ay8912_device::address_data_w));
+	map(0x6800, 0x6801).w("ay2", FUNC(ay8912_device::address_data_w));
 	map(0x6c00, 0x6c00).portr("BUTTONS");
 	map(0x7000, 0x7000).portr("DSW0");
 	map(0x7400, 0x7400).portr("DSW1");
@@ -254,21 +254,21 @@ void dday_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(dday_state::dday)
-
+void dday_state::dday(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 2000000)     /* 2 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(dday_map)
+	Z80(config, m_maincpu, 2000000);     /* 2 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dday_state::dday_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dday_state, screen_update_dday)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(dday_state::screen_update_dday));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dday);
 	PALETTE(config, m_palette, FUNC(dday_state::dday_palette), 256).enable_shadows();
@@ -277,9 +277,9 @@ MACHINE_CONFIG_START(dday_state::dday)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_ay1, 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
-	AY8910(config, "ay2", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+	AY8912(config, m_ay1, 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8912(config, "ay2", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 

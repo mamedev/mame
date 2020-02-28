@@ -535,7 +535,7 @@ void microterm_f8_state::act5a(machine_config &config)
 	AY51013(config, m_uart);
 	m_uart->read_si_callback().set(m_io, FUNC(rs232_port_device::rxd_r));
 	m_uart->write_so_callback().set("txd", FUNC(input_merger_device::in_w<0>));
-	m_uart->write_dav_callback().set("smi", FUNC(f3853_device::ext_int_w)).invert();
+	m_uart->write_dav_callback().set("smi", FUNC(f3853_device::ext_int_w));
 	m_uart->set_auto_rdav(true);
 
 	RS232_PORT(config, m_io, default_rs232_devices, nullptr);

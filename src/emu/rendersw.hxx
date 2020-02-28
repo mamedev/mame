@@ -603,12 +603,8 @@ private:
 	//  rasterization of a 16bpp palettized texture
 	//-------------------------------------------------
 
-	static void draw_quad_palette16_none(const render_primitive &prim, _PixelType *dstdata, u32 pitch, quad_setup_data &setup)
+	static void draw_quad_palette16_none(const render_primitive &prim, _PixelType *dstdata, u32 pitch, const quad_setup_data &setup)
 	{
-		s32 dudx = setup.dudx;
-		s32 dvdx = setup.dvdx;
-		s32 endx = setup.endx;
-
 		// ensure all parameters are valid
 		assert(prim.texture.palette != nullptr);
 
@@ -623,12 +619,12 @@ private:
 				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// loop over cols
-				for (s32 x = setup.startx; x < endx; x++)
+				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					u32 pix = get_texel_palette16(prim.texture, curu, curv);
+					const u32 pix = get_texel_palette16(prim.texture, curu, curv);
 					*dest++ = source32_to_dest(pix);
-					curu += dudx;
-					curv += dvdx;
+					curu += setup.dudx;
+					curv += setup.dvdx;
 				}
 			}
 		}
@@ -653,16 +649,16 @@ private:
 				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// loop over cols
-				for (s32 x = setup.startx; x < endx; x++)
+				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					u32 pix = get_texel_palette16(prim.texture, curu, curv);
-					u32 r = (source32_r(pix) * sr) >> 8;
-					u32 g = (source32_g(pix) * sg) >> 8;
-					u32 b = (source32_b(pix) * sb) >> 8;
+					const u32 pix = get_texel_palette16(prim.texture, curu, curv);
+					const u32 r = (source32_r(pix) * sr) >> 8;
+					const u32 g = (source32_g(pix) * sg) >> 8;
+					const u32 b = (source32_b(pix) * sb) >> 8;
 
 					*dest++ = dest_assemble_rgb(r, g, b);
-					curu += dudx;
-					curv += dvdx;
+					curu += setup.dudx;
+					curv += setup.dvdx;
 				}
 			}
 		}
@@ -689,17 +685,17 @@ private:
 				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// loop over cols
-				for (s32 x = setup.startx; x < endx; x++)
+				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					u32 pix = get_texel_palette16(prim.texture, curu, curv);
-					u32 dpix = _NoDestRead ? 0 : *dest;
-					u32 r = (source32_r(pix) * sr + dest_r(dpix) * invsa) >> 8;
-					u32 g = (source32_g(pix) * sg + dest_g(dpix) * invsa) >> 8;
-					u32 b = (source32_b(pix) * sb + dest_b(dpix) * invsa) >> 8;
+					const u32 pix = get_texel_palette16(prim.texture, curu, curv);
+					const u32 dpix = _NoDestRead ? 0 : *dest;
+					const u32 r = (source32_r(pix) * sr + dest_r(dpix) * invsa) >> 8;
+					const u32 g = (source32_g(pix) * sg + dest_g(dpix) * invsa) >> 8;
+					const u32 b = (source32_b(pix) * sb + dest_b(dpix) * invsa) >> 8;
 
 					*dest++ = dest_assemble_rgb(r, g, b);
-					curu += dudx;
-					curv += dvdx;
+					curu += setup.dudx;
+					curv += setup.dvdx;
 				}
 			}
 		}
@@ -711,12 +707,8 @@ private:
 	//  rasterization of a 16bpp palettized texture
 	//-------------------------------------------------
 
-	static void draw_quad_palette16_add(const render_primitive &prim, _PixelType *dstdata, u32 pitch, quad_setup_data &setup)
+	static void draw_quad_palette16_add(const render_primitive &prim, _PixelType *dstdata, u32 pitch, const quad_setup_data&setup)
 	{
-		s32 dudx = setup.dudx;
-		s32 dvdx = setup.dvdx;
-		s32 endx = setup.endx;
-
 		// ensure all parameters are valid
 		assert(prim.texture.palette != nullptr);
 
@@ -731,12 +723,12 @@ private:
 				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// loop over cols
-				for (s32 x = setup.startx; x < endx; x++)
+				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					u32 pix = get_texel_palette16(prim.texture, curu, curv);
+					const u32 pix = get_texel_palette16(prim.texture, curu, curv);
 					if ((pix & 0xffffff) != 0)
 					{
-						u32 dpix = _NoDestRead ? 0 : *dest;
+						const u32 dpix = _NoDestRead ? 0 : *dest;
 						u32 r = source32_r(pix) + dest_r(dpix);
 						u32 g = source32_g(pix) + dest_g(dpix);
 						u32 b = source32_b(pix) + dest_b(dpix);
@@ -746,8 +738,8 @@ private:
 						*dest = dest_assemble_rgb(r, g, b);
 					}
 					dest++;
-					curu += dudx;
-					curv += dvdx;
+					curu += setup.dudx;
+					curv += setup.dvdx;
 				}
 			}
 		}
@@ -772,12 +764,12 @@ private:
 				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// loop over cols
-				for (s32 x = setup.startx; x < endx; x++)
+				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					u32 pix = get_texel_palette16(prim.texture, curu, curv);
+					const u32 pix = get_texel_palette16(prim.texture, curu, curv);
 					if ((pix & 0xffffff) != 0)
 					{
-						u32 dpix = _NoDestRead ? 0 : *dest;
+						const u32 dpix = _NoDestRead ? 0 : *dest;
 						u32 r = ((source32_r(pix) * sr) >> 8) + dest_r(dpix);
 						u32 g = ((source32_g(pix) * sg) >> 8) + dest_g(dpix);
 						u32 b = ((source32_b(pix) * sb) >> 8) + dest_b(dpix);
@@ -785,105 +777,9 @@ private:
 						g = (g | -(g >> (8 - _SrcShiftG))) & (0xff >> _SrcShiftG);
 						b = (b | -(b >> (8 - _SrcShiftB))) & (0xff >> _SrcShiftB);
 						*dest++ = dest_assemble_rgb(r, g, b);
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
-				}
-			}
-		}
-	}
-
-
-
-	//**************************************************************************
-	//  16-BIT ALPHA PALETTE RASTERIZERS
-	//**************************************************************************
-
-	//-------------------------------------------------
-	//  draw_quad_palettea16_alpha - perform
-	//  rasterization using standard alpha blending
-	//-------------------------------------------------
-
-	static void draw_quad_palettea16_alpha(const render_primitive &prim, _PixelType *dstdata, u32 pitch, quad_setup_data &setup)
-	{
-		s32 dudx = setup.dudx;
-		s32 dvdx = setup.dvdx;
-		s32 endx = setup.endx;
-
-		// ensure all parameters are valid
-		assert(prim.texture.palette != nullptr);
-
-		// fast case: no coloring, no alpha
-		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
-		{
-			// loop over rows
-			for (s32 y = setup.starty; y < setup.endy; y++)
-			{
-				_PixelType *dest = dstdata + y * pitch + setup.startx;
-				s32 curu = setup.startu + (y - setup.starty) * setup.dudy;
-				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
-
-				// loop over cols
-				for (s32 x = setup.startx; x < endx; x++)
-				{
-					u32 pix = get_texel_palette16a(prim.texture, curu, curv);
-					u32 ta = pix >> 24;
-					if (ta != 0)
-					{
-						u32 dpix = _NoDestRead ? 0 : *dest;
-						u32 invta = 0x100 - ta;
-						u32 r = (source32_r(pix) * ta + dest_r(dpix) * invta) >> 8;
-						u32 g = (source32_g(pix) * ta + dest_g(dpix) * invta) >> 8;
-						u32 b = (source32_b(pix) * ta + dest_b(dpix) * invta) >> 8;
-
-						*dest = dest_assemble_rgb(r, g, b);
-					}
-					dest++;
-					curu += dudx;
-					curv += dvdx;
-				}
-			}
-		}
-
-		// alpha and/or coloring case
-		else
-		{
-			u32 sr = u32(256.0f * prim.color.r);
-			u32 sg = u32(256.0f * prim.color.g);
-			u32 sb = u32(256.0f * prim.color.b);
-			u32 sa = u32(256.0f * prim.color.a);
-
-			// clamp R,G,B and inverse A to 0-256 range
-			if (sr > 0x100) { if (s32(sr) < 0) sr = 0; else sr = 0x100; }
-			if (sg > 0x100) { if (s32(sg) < 0) sg = 0; else sg = 0x100; }
-			if (sb > 0x100) { if (s32(sb) < 0) sb = 0; else sb = 0x100; }
-			if (sa > 0x100) { if (s32(sa) < 0) sa = 0; else sa = 0x100; }
-
-			// loop over rows
-			for (s32 y = setup.starty; y < setup.endy; y++)
-			{
-				_PixelType *dest = dstdata + y * pitch + setup.startx;
-				s32 curu = setup.startu + (y - setup.starty) * setup.dudy;
-				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
-
-				// loop over cols
-				for (s32 x = setup.startx; x < endx; x++)
-				{
-					u32 pix = get_texel_palette16a(prim.texture, curu, curv);
-					u32 ta = (pix >> 24) * sa;
-					if (ta != 0)
-					{
-						u32 dpix = _NoDestRead ? 0 : *dest;
-						u32 invsta = (0x10000 - ta) << 8;
-						u32 r = (source32_r(pix) * sr * ta + dest_r(dpix) * invsta) >> 24;
-						u32 g = (source32_g(pix) * sg * ta + dest_g(dpix) * invsta) >> 24;
-						u32 b = (source32_b(pix) * sb * ta + dest_b(dpix) * invsta) >> 24;
-
-						*dest = dest_assemble_rgb(r, g, b);
-					}
-					dest++;
-					curu += dudx;
-					curv += dvdx;
 				}
 			}
 		}
@@ -900,12 +796,8 @@ private:
 	//  rasterization of a 16bpp YUY image
 	//-------------------------------------------------
 
-	static void draw_quad_yuy16_none(const render_primitive &prim, _PixelType *dstdata, u32 pitch, quad_setup_data &setup)
+	static void draw_quad_yuy16_none(const render_primitive &prim, _PixelType *dstdata, u32 pitch, const quad_setup_data&setup)
 	{
-		s32 dudx = setup.dudx;
-		s32 dvdx = setup.dvdx;
-		s32 endx = setup.endx;
-
 		// fast case: no coloring, no alpha
 		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
 		{
@@ -917,12 +809,12 @@ private:
 				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// loop over cols
-				for (s32 x = setup.startx; x < endx; x++)
+				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					u32 pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
+					const u32 pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
 					*dest++ = source32_to_dest(pix);
-					curu += dudx;
-					curv += dvdx;
+					curu += setup.dudx;
+					curv += setup.dvdx;
 				}
 			}
 		}
@@ -947,16 +839,16 @@ private:
 				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// loop over cols
-				for (s32 x = setup.startx; x < endx; x++)
+				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					u32 pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
-					u32 r = (source32_r(pix) * sr) >> 8;
-					u32 g = (source32_g(pix) * sg) >> 8;
-					u32 b = (source32_b(pix) * sb) >> 8;
+					const u32 pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
+					const u32 r = (source32_r(pix) * sr) >> 8;
+					const u32 g = (source32_g(pix) * sg) >> 8;
+					const u32 b = (source32_b(pix) * sb) >> 8;
 
 					*dest++ = dest_assemble_rgb(r, g, b);
-					curu += dudx;
-					curv += dvdx;
+					curu += setup.dudx;
+					curv += setup.dvdx;
 				}
 			}
 		}
@@ -983,17 +875,17 @@ private:
 				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// loop over cols
-				for (s32 x = setup.startx; x < endx; x++)
+				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					u32 pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
-					u32 dpix = _NoDestRead ? 0 : *dest;
-					u32 r = (source32_r(pix) * sr + dest_r(dpix) * invsa) >> 8;
-					u32 g = (source32_g(pix) * sg + dest_g(dpix) * invsa) >> 8;
-					u32 b = (source32_b(pix) * sb + dest_b(dpix) * invsa) >> 8;
+					const u32 pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
+					const u32 dpix = _NoDestRead ? 0 : *dest;
+					const u32 r = (source32_r(pix) * sr + dest_r(dpix) * invsa) >> 8;
+					const u32 g = (source32_g(pix) * sg + dest_g(dpix) * invsa) >> 8;
+					const u32 b = (source32_b(pix) * sb + dest_b(dpix) * invsa) >> 8;
 
 					*dest++ = dest_assemble_rgb(r, g, b);
-					curu += dudx;
-					curv += dvdx;
+					curu += setup.dudx;
+					curv += setup.dvdx;
 				}
 			}
 		}
@@ -1006,12 +898,8 @@ private:
 	//  conversion
 	//-------------------------------------------------
 
-	static void draw_quad_yuy16_add(const render_primitive &prim, _PixelType *dstdata, u32 pitch, quad_setup_data &setup)
+	static void draw_quad_yuy16_add(const render_primitive &prim, _PixelType *dstdata, u32 pitch, const quad_setup_data&setup)
 	{
-		s32 dudx = setup.dudx;
-		s32 dvdx = setup.dvdx;
-		s32 endx = setup.endx;
-
 		// simply can't do this without reading from the dest
 		if (_NoDestRead)
 			return;
@@ -1027,10 +915,10 @@ private:
 				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// loop over cols
-				for (s32 x = setup.startx; x < endx; x++)
+				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					u32 pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
-					u32 dpix = _NoDestRead ? 0 : *dest;
+					const u32 pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
+					const u32 dpix = _NoDestRead ? 0 : *dest;
 					u32 r = source32_r(pix) + dest_r(dpix);
 					u32 g = source32_g(pix) + dest_g(dpix);
 					u32 b = source32_b(pix) + dest_b(dpix);
@@ -1038,8 +926,8 @@ private:
 					g = (g | -(g >> (8 - _SrcShiftG))) & (0xff >> _SrcShiftG);
 					b = (b | -(b >> (8 - _SrcShiftB))) & (0xff >> _SrcShiftB);
 					*dest++ = dest_assemble_rgb(r, g, b);
-					curu += dudx;
-					curv += dvdx;
+					curu += setup.dudx;
+					curv += setup.dvdx;
 				}
 			}
 		}
@@ -1066,10 +954,10 @@ private:
 				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// loop over cols
-				for (s32 x = setup.startx; x < endx; x++)
+				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					u32 pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
-					u32 dpix = _NoDestRead ? 0 : *dest;
+					const u32 pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
+					const u32 dpix = _NoDestRead ? 0 : *dest;
 					u32 r = ((source32_r(pix) * sr * sa) >> 16) + dest_r(dpix);
 					u32 g = ((source32_g(pix) * sg * sa) >> 16) + dest_g(dpix);
 					u32 b = ((source32_b(pix) * sb * sa) >> 16) + dest_b(dpix);
@@ -1077,8 +965,8 @@ private:
 					g = (g | -(g >> (8 - _SrcShiftG))) & (0xff >> _SrcShiftG);
 					b = (b | -(b >> (8 - _SrcShiftB))) & (0xff >> _SrcShiftB);
 					*dest++ = dest_assemble_rgb(r, g, b);
-					curu += dudx;
-					curv += dvdx;
+					curu += setup.dudx;
+					curv += setup.dvdx;
 				}
 			}
 		}
@@ -1094,12 +982,9 @@ private:
 	//  a 32bpp RGB texture
 	//-------------------------------------------------
 
-	static void draw_quad_rgb32(const render_primitive &prim, _PixelType *dstdata, u32 pitch, quad_setup_data &setup)
+	static void draw_quad_rgb32(const render_primitive &prim, _PixelType *dstdata, u32 pitch, const quad_setup_data&setup)
 	{
 		const rgb_t *palbase = prim.texture.palette;
-		s32 dudx = setup.dudx;
-		s32 dvdx = setup.dvdx;
-		s32 endx = setup.endx;
 
 		// fast case: no coloring, no alpha
 		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
@@ -1115,12 +1000,12 @@ private:
 				if (palbase == nullptr)
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_rgb32(prim.texture, curu, curv);
+						const u32 pix = get_texel_rgb32(prim.texture, curu, curv);
 						*dest++ = source32_to_dest(pix);
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 
@@ -1128,16 +1013,16 @@ private:
 				else
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_rgb32(prim.texture, curu, curv);
-						u32 r = palbase[(pix >> 16) & 0xff] >> _SrcShiftR;
-						u32 g = palbase[(pix >> 8) & 0xff] >> _SrcShiftG;
-						u32 b = palbase[(pix >> 0) & 0xff] >> _SrcShiftB;
+						const u32 pix = get_texel_rgb32(prim.texture, curu, curv);
+						const u32 r = palbase[(pix >> 16) & 0xff] >> _SrcShiftR;
+						const u32 g = palbase[(pix >> 8) & 0xff] >> _SrcShiftG;
+						const u32 b = palbase[(pix >> 0) & 0xff] >> _SrcShiftB;
 
 						*dest++ = dest_assemble_rgb(r, g, b);
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 			}
@@ -1166,16 +1051,16 @@ private:
 				if (palbase == nullptr)
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_rgb32(prim.texture, curu, curv);
-						u32 r = (source32_r(pix) * sr) >> 8;
-						u32 g = (source32_g(pix) * sg) >> 8;
-						u32 b = (source32_b(pix) * sb) >> 8;
+						const u32 pix = get_texel_rgb32(prim.texture, curu, curv);
+						const u32 r = (source32_r(pix) * sr) >> 8;
+						const u32 g = (source32_g(pix) * sg) >> 8;
+						const u32 b = (source32_b(pix) * sb) >> 8;
 
 						*dest++ = dest_assemble_rgb(r, g, b);
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 
@@ -1183,16 +1068,16 @@ private:
 				else
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_rgb32(prim.texture, curu, curv);
-						u32 r = (palbase[(pix >> 16) & 0xff] * sr) >> (8 + _SrcShiftR);
-						u32 g = (palbase[(pix >> 8) & 0xff] * sg) >> (8 + _SrcShiftG);
-						u32 b = (palbase[(pix >> 0) & 0xff] * sb) >> (8 + _SrcShiftB);
+						const u32 pix = get_texel_rgb32(prim.texture, curu, curv);
+						const u32 r = (palbase[(pix >> 16) & 0xff] * sr) >> (8 + _SrcShiftR);
+						const u32 g = (palbase[(pix >> 8) & 0xff] * sg) >> (8 + _SrcShiftG);
+						const u32 b = (palbase[(pix >> 0) & 0xff] * sb) >> (8 + _SrcShiftB);
 
 						*dest++ = dest_assemble_rgb(r, g, b);
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 			}
@@ -1223,17 +1108,17 @@ private:
 				if (palbase == nullptr)
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_rgb32(prim.texture, curu, curv);
-						u32 dpix = _NoDestRead ? 0 : *dest;
-						u32 r = (source32_r(pix) * sr + dest_r(dpix) * invsa) >> 8;
-						u32 g = (source32_g(pix) * sg + dest_g(dpix) * invsa) >> 8;
-						u32 b = (source32_b(pix) * sb + dest_b(dpix) * invsa) >> 8;
+						const u32 pix = get_texel_rgb32(prim.texture, curu, curv);
+						const u32 dpix = _NoDestRead ? 0 : *dest;
+						const u32 r = (source32_r(pix) * sr + dest_r(dpix) * invsa) >> 8;
+						const u32 g = (source32_g(pix) * sg + dest_g(dpix) * invsa) >> 8;
+						const u32 b = (source32_b(pix) * sb + dest_b(dpix) * invsa) >> 8;
 
 						*dest++ = dest_assemble_rgb(r, g, b);
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 
@@ -1241,17 +1126,17 @@ private:
 				else
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_rgb32(prim.texture, curu, curv);
-						u32 dpix = _NoDestRead ? 0 : *dest;
-						u32 r = ((palbase[(pix >> 16) & 0xff] >> _SrcShiftR) * sr + dest_r(dpix) * invsa) >> 8;
-						u32 g = ((palbase[(pix >> 8) & 0xff] >> _SrcShiftG) * sg + dest_g(dpix) * invsa) >> 8;
-						u32 b = ((palbase[(pix >> 0) & 0xff] >> _SrcShiftB) * sb + dest_b(dpix) * invsa) >> 8;
+						const u32 pix = get_texel_rgb32(prim.texture, curu, curv);
+						const u32 dpix = _NoDestRead ? 0 : *dest;
+						const u32 r = ((palbase[(pix >> 16) & 0xff] >> _SrcShiftR) * sr + dest_r(dpix) * invsa) >> 8;
+						const u32 g = ((palbase[(pix >> 8) & 0xff] >> _SrcShiftG) * sg + dest_g(dpix) * invsa) >> 8;
+						const u32 b = ((palbase[(pix >> 0) & 0xff] >> _SrcShiftB) * sb + dest_b(dpix) * invsa) >> 8;
 
 						*dest++ = dest_assemble_rgb(r, g, b);
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 			}
@@ -1264,12 +1149,9 @@ private:
 	//  rasterization by using RGB add
 	//-------------------------------------------------
 
-	static void draw_quad_rgb32_add(const render_primitive &prim, _PixelType *dstdata, u32 pitch, quad_setup_data &setup)
+	static void draw_quad_rgb32_add(const render_primitive &prim, _PixelType *dstdata, u32 pitch, const quad_setup_data&setup)
 	{
 		const rgb_t *palbase = prim.texture.palette;
-		s32 dudx = setup.dudx;
-		s32 dvdx = setup.dvdx;
-		s32 endx = setup.endx;
 
 		// simply can't do this without reading from the dest
 		if (_NoDestRead)
@@ -1289,10 +1171,10 @@ private:
 				if (palbase == nullptr)
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_argb32(prim.texture, curu, curv);
-						u32 dpix = _NoDestRead ? 0 : *dest;
+						const u32 pix = get_texel_argb32(prim.texture, curu, curv);
+						const u32 dpix = _NoDestRead ? 0 : *dest;
 						u32 r = source32_r(pix) + dest_r(dpix);
 						u32 g = source32_g(pix) + dest_g(dpix);
 						u32 b = source32_b(pix) + dest_b(dpix);
@@ -1300,8 +1182,8 @@ private:
 						g = (g | -(g >> (8 - _SrcShiftG))) & (0xff >> _SrcShiftG);
 						b = (b | -(b >> (8 - _SrcShiftB))) & (0xff >> _SrcShiftB);
 						*dest++ = dest_assemble_rgb(r, g, b);
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 
@@ -1309,10 +1191,10 @@ private:
 				else
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_argb32(prim.texture, curu, curv);
-						u32 dpix = _NoDestRead ? 0 : *dest;
+						const u32 pix = get_texel_argb32(prim.texture, curu, curv);
+						const u32 dpix = _NoDestRead ? 0 : *dest;
 						u32 r = (palbase[(pix >> 16) & 0xff] >> _SrcShiftR) + dest_r(dpix);
 						u32 g = (palbase[(pix >> 8) & 0xff] >> _SrcShiftG) + dest_g(dpix);
 						u32 b = (palbase[(pix >> 0) & 0xff] >> _SrcShiftB) + dest_b(dpix);
@@ -1320,8 +1202,8 @@ private:
 						g = (g | -(g >> (8 - _SrcShiftG))) & (0xff >> _SrcShiftG);
 						b = (b | -(b >> (8 - _SrcShiftB))) & (0xff >> _SrcShiftB);
 						*dest++ = dest_assemble_rgb(r, g, b);
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 			}
@@ -1352,10 +1234,10 @@ private:
 				if (palbase == nullptr)
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_argb32(prim.texture, curu, curv);
-						u32 dpix = _NoDestRead ? 0 : *dest;
+						const u32 pix = get_texel_argb32(prim.texture, curu, curv);
+						const u32 dpix = _NoDestRead ? 0 : *dest;
 						u32 r = ((source32_r(pix) * sr * sa) >> 16) + dest_r(dpix);
 						u32 g = ((source32_g(pix) * sg * sa) >> 16) + dest_g(dpix);
 						u32 b = ((source32_b(pix) * sb * sa) >> 16) + dest_b(dpix);
@@ -1363,8 +1245,8 @@ private:
 						g = (g | -(g >> (8 - _SrcShiftG))) & (0xff >> _SrcShiftG);
 						b = (b | -(b >> (8 - _SrcShiftB))) & (0xff >> _SrcShiftB);
 						*dest++ = dest_assemble_rgb(r, g, b);
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 
@@ -1372,10 +1254,10 @@ private:
 				else
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_argb32(prim.texture, curu, curv);
-						u32 dpix = _NoDestRead ? 0 : *dest;
+						const u32 pix = get_texel_argb32(prim.texture, curu, curv);
+						const u32 dpix = _NoDestRead ? 0 : *dest;
 						u32 r = ((palbase[(pix >> 16) & 0xff] * sr * sa) >> (16 + _SrcShiftR)) + dest_r(dpix);
 						u32 g = ((palbase[(pix >> 8) & 0xff] * sr * sa) >> (16 + _SrcShiftR)) + dest_g(dpix);
 						u32 b = ((palbase[(pix >> 0) & 0xff] * sr * sa) >> (16 + _SrcShiftR)) + dest_b(dpix);
@@ -1383,159 +1265,8 @@ private:
 						g = (g | -(g >> (8 - _SrcShiftG))) & (0xff >> _SrcShiftG);
 						b = (b | -(b >> (8 - _SrcShiftB))) & (0xff >> _SrcShiftB);
 						*dest++ = dest_assemble_rgb(r, g, b);
-						curu += dudx;
-						curv += dvdx;
-					}
-				}
-			}
-		}
-	}
-
-
-
-	//**************************************************************************
-	//  32-BIT ARGB QUAD RASTERIZERS
-	//**************************************************************************
-
-	//-------------------------------------------------
-	//  draw_quad_argb32_alpha - perform
-	//  rasterization using standard alpha blending
-	//-------------------------------------------------
-
-	static void draw_quad_argb32_alpha(const render_primitive &prim, _PixelType *dstdata, u32 pitch, quad_setup_data &setup)
-	{
-		const rgb_t *palbase = prim.texture.palette;
-		s32 dudx = setup.dudx;
-		s32 dvdx = setup.dvdx;
-		s32 endx = setup.endx;
-
-		// fast case: no coloring, no alpha
-		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
-		{
-			// loop over rows
-			for (s32 y = setup.starty; y < setup.endy; y++)
-			{
-				_PixelType *dest = dstdata + y * pitch + setup.startx;
-				s32 curu = setup.startu + (y - setup.starty) * setup.dudy;
-				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
-
-				// no lookup case
-				if (palbase == nullptr)
-				{
-					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
-					{
-						u32 pix = get_texel_argb32(prim.texture, curu, curv);
-						u32 ta = pix >> 24;
-						if (ta != 0)
-						{
-							u32 dpix = _NoDestRead ? 0 : *dest;
-							u32 invta = 0x100 - ta;
-							u32 r = (source32_r(pix) * ta + dest_r(dpix) * invta) >> 8;
-							u32 g = (source32_g(pix) * ta + dest_g(dpix) * invta) >> 8;
-							u32 b = (source32_b(pix) * ta + dest_b(dpix) * invta) >> 8;
-
-							*dest = dest_assemble_rgb(r, g, b);
-						}
-						dest++;
-						curu += dudx;
-						curv += dvdx;
-					}
-				}
-
-				// lookup case
-				else
-				{
-					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
-					{
-						u32 pix = get_texel_argb32(prim.texture, curu, curv);
-						u32 ta = pix >> 24;
-						if (ta != 0)
-						{
-							u32 dpix = _NoDestRead ? 0 : *dest;
-							u32 invta = 0x100 - ta;
-							u32 r = ((palbase[(pix >> 16) & 0xff] >> _SrcShiftR) * ta + dest_r(dpix) * invta) >> 8;
-							u32 g = ((palbase[(pix >> 8) & 0xff] >> _SrcShiftG) * ta + dest_g(dpix) * invta) >> 8;
-							u32 b = ((palbase[(pix >> 0) & 0xff] >> _SrcShiftB) * ta + dest_b(dpix) * invta) >> 8;
-
-							*dest = dest_assemble_rgb(r, g, b);
-						}
-						dest++;
-						curu += dudx;
-						curv += dvdx;
-					}
-				}
-			}
-		}
-
-		// alpha and/or coloring case
-		else
-		{
-			u32 sr = u32(256.0f * prim.color.r);
-			u32 sg = u32(256.0f * prim.color.g);
-			u32 sb = u32(256.0f * prim.color.b);
-			u32 sa = u32(256.0f * prim.color.a);
-
-			// clamp R,G,B and inverse A to 0-256 range
-			if (sr > 0x100) { if (s32(sr) < 0) sr = 0; else sr = 0x100; }
-			if (sg > 0x100) { if (s32(sg) < 0) sg = 0; else sg = 0x100; }
-			if (sb > 0x100) { if (s32(sb) < 0) sb = 0; else sb = 0x100; }
-			if (sa > 0x100) { if (s32(sa) < 0) sa = 0; else sa = 0x100; }
-
-			// loop over rows
-			for (s32 y = setup.starty; y < setup.endy; y++)
-			{
-				_PixelType *dest = dstdata + y * pitch + setup.startx;
-				s32 curu = setup.startu + (y - setup.starty) * setup.dudy;
-				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
-
-				// no lookup case
-				if (palbase == nullptr)
-				{
-					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
-					{
-						u32 pix = get_texel_argb32(prim.texture, curu, curv);
-						u32 ta = (pix >> 24) * sa;
-						if (ta != 0)
-						{
-							u32 dpix = _NoDestRead ? 0 : *dest;
-							u32 invsta = (0x10000 - ta) << 8;
-							u32 r = (source32_r(pix) * sr * ta + dest_r(dpix) * invsta) >> 24;
-							u32 g = (source32_g(pix) * sg * ta + dest_g(dpix) * invsta) >> 24;
-							u32 b = (source32_b(pix) * sb * ta + dest_b(dpix) * invsta) >> 24;
-
-							*dest = dest_assemble_rgb(r, g, b);
-						}
-						dest++;
-						curu += dudx;
-						curv += dvdx;
-					}
-				}
-
-
-				// lookup case
-				else
-				{
-					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
-					{
-						u32 pix = get_texel_argb32(prim.texture, curu, curv);
-						u32 ta = (pix >> 24) * sa;
-						if (ta != 0)
-						{
-							u32 dpix = _NoDestRead ? 0 : *dest;
-							u32 invsta = (0x10000 - ta) << 8;
-							u32 r = ((palbase[(pix >> 16) & 0xff] >> _SrcShiftR) * sr * ta + dest_r(dpix) * invsta) >> 24;
-							u32 g = ((palbase[(pix >> 8) & 0xff] >> _SrcShiftG) * sg * ta + dest_g(dpix) * invsta) >> 24;
-							u32 b = ((palbase[(pix >> 0) & 0xff] >> _SrcShiftB) * sb * ta + dest_b(dpix) * invsta) >> 24;
-
-							*dest = dest_assemble_rgb(r, g, b);
-						}
-						dest++;
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 			}
@@ -1544,16 +1275,13 @@ private:
 
 
 	//-------------------------------------------------
-	//  draw_quad_argb32_multiply - perform
+	//  draw_quad_rgb32_multiply - perform
 	//  rasterization using RGB multiply
 	//-------------------------------------------------
 
-	static void draw_quad_argb32_multiply(const render_primitive &prim, _PixelType *dstdata, u32 pitch, quad_setup_data &setup)
+	static void draw_quad_rgb32_multiply(const render_primitive &prim, _PixelType *dstdata, u32 pitch, const quad_setup_data&setup)
 	{
 		const rgb_t *palbase = prim.texture.palette;
-		s32 dudx = setup.dudx;
-		s32 dvdx = setup.dvdx;
-		s32 endx = setup.endx;
 
 		// simply can't do this without reading from the dest
 		if (_NoDestRead)
@@ -1573,33 +1301,33 @@ private:
 				if (palbase == nullptr)
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_argb32(prim.texture, curu, curv);
-						u32 dpix = _NoDestRead ? 0 : *dest;
-						u32 r = (source32_r(pix) * dest_r(dpix)) >> (8 - _SrcShiftR);
-						u32 g = (source32_g(pix) * dest_g(dpix)) >> (8 - _SrcShiftG);
-						u32 b = (source32_b(pix) * dest_b(dpix)) >> (8 - _SrcShiftB);
+						const u32 pix = get_texel_argb32(prim.texture, curu, curv);
+						const u32 dpix = _NoDestRead ? 0 : *dest;
+						const u32 r = (source32_r(pix) * dest_r(dpix)) >> (8 - _SrcShiftR);
+						const u32 g = (source32_g(pix) * dest_g(dpix)) >> (8 - _SrcShiftG);
+						const u32 b = (source32_b(pix) * dest_b(dpix)) >> (8 - _SrcShiftB);
 
 						*dest++ = dest_assemble_rgb(r, g, b);
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 				else
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_argb32(prim.texture, curu, curv);
-						u32 dpix = _NoDestRead ? 0 : *dest;
-						u32 r = (palbase[(pix >> 16) & 0xff] * dest_r(dpix)) >> 8;
-						u32 g = (palbase[(pix >> 8) & 0xff] * dest_g(dpix)) >> 8;
-						u32 b = (palbase[(pix >> 0) & 0xff] * dest_b(dpix)) >> 8;
+						const u32 pix = get_texel_argb32(prim.texture, curu, curv);
+						const u32 dpix = _NoDestRead ? 0 : *dest;
+						const u32 r = (palbase[(pix >> 16) & 0xff] * dest_r(dpix)) >> 8;
+						const u32 g = (palbase[(pix >> 8) & 0xff] * dest_g(dpix)) >> 8;
+						const u32 b = (palbase[(pix >> 0) & 0xff] * dest_b(dpix)) >> 8;
 
 						*dest++ = dest_assemble_rgb(r, g, b);
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 			}
@@ -1612,7 +1340,7 @@ private:
 			u32 sg = u32(256.0f * prim.color.g * prim.color.a);
 			u32 sb = u32(256.0f * prim.color.b * prim.color.a);
 
-			// clamp R,G,B and inverse A to 0-256 range
+			// clamp R,G,B to 0-256 range
 			if (sr > 0x100) { if (s32(sr) < 0) sr = 0; else sr = 0x100; }
 			if (sg > 0x100) { if (s32(sg) < 0) sg = 0; else sg = 0x100; }
 			if (sb > 0x100) { if (s32(sb) < 0) sb = 0; else sb = 0x100; }
@@ -1628,33 +1356,33 @@ private:
 				if (palbase == nullptr)
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_argb32(prim.texture, curu, curv);
-						u32 dpix = _NoDestRead ? 0 : *dest;
-						u32 r = (source32_r(pix) * sr * dest_r(dpix)) >> (16 - _SrcShiftR);
-						u32 g = (source32_g(pix) * sg * dest_g(dpix)) >> (16 - _SrcShiftG);
-						u32 b = (source32_b(pix) * sb * dest_b(dpix)) >> (16 - _SrcShiftB);
+						const u32 pix = get_texel_argb32(prim.texture, curu, curv);
+						const u32 dpix = _NoDestRead ? 0 : *dest;
+						const u32 r = (source32_r(pix) * sr * dest_r(dpix)) >> (16 - _SrcShiftR);
+						const u32 g = (source32_g(pix) * sg * dest_g(dpix)) >> (16 - _SrcShiftG);
+						const u32 b = (source32_b(pix) * sb * dest_b(dpix)) >> (16 - _SrcShiftB);
 
 						*dest++ = dest_assemble_rgb(r, g, b);
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 				else
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_argb32(prim.texture, curu, curv);
-						u32 dpix = _NoDestRead ? 0 : *dest;
-						u32 r = (palbase[(pix >> 16) & 0xff] * sr * dest_r(dpix)) >> 16;
-						u32 g = (palbase[(pix >> 8) & 0xff] * sg * dest_g(dpix)) >> 16;
-						u32 b = (palbase[(pix >> 0) & 0xff] * sb * dest_b(dpix)) >> 16;
+						const u32 pix = get_texel_argb32(prim.texture, curu, curv);
+						const u32 dpix = _NoDestRead ? 0 : *dest;
+						const u32 r = (palbase[(pix >> 16) & 0xff] * sr * dest_r(dpix)) >> 16;
+						const u32 g = (palbase[(pix >> 8) & 0xff] * sg * dest_g(dpix)) >> 16;
+						const u32 b = (palbase[(pix >> 0) & 0xff] * sb * dest_b(dpix)) >> 16;
 
 						*dest++ = dest_assemble_rgb(r, g, b);
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 			}
@@ -1662,21 +1390,18 @@ private:
 	}
 
 
+	//**************************************************************************
+	//  32-BIT ARGB QUAD RASTERIZERS
+	//**************************************************************************
+
 	//-------------------------------------------------
-	//  draw_quad_argb32_add - perform
-	//  rasterization by using RGB add
+	//  draw_quad_argb32_alpha - perform
+	//  rasterization using standard alpha blending
 	//-------------------------------------------------
 
-	static void draw_quad_argb32_add(const render_primitive &prim, _PixelType *dstdata, u32 pitch, quad_setup_data &setup)
+	static void draw_quad_argb32_alpha(const render_primitive &prim, _PixelType *dstdata, u32 pitch, const quad_setup_data&setup)
 	{
 		const rgb_t *palbase = prim.texture.palette;
-		s32 dudx = setup.dudx;
-		s32 dvdx = setup.dvdx;
-		s32 endx = setup.endx;
-
-		// simply can't do this without reading from the dest
-		if (_NoDestRead)
-			return;
 
 		// fast case: no coloring, no alpha
 		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
@@ -1692,24 +1417,23 @@ private:
 				if (palbase == nullptr)
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_argb32(prim.texture, curu, curv);
-						u32 ta = pix >> 24;
+						const u32 pix = get_texel_argb32(prim.texture, curu, curv);
+						const u32 ta = pix >> 24;
 						if (ta != 0)
 						{
-							u32 dpix = _NoDestRead ? 0 : *dest;
-							u32 r = ((source32_r(pix) * ta) >> 8) + dest_r(dpix);
-							u32 g = ((source32_g(pix) * ta) >> 8) + dest_g(dpix);
-							u32 b = ((source32_b(pix) * ta) >> 8) + dest_b(dpix);
-							r = (r | -(r >> (8 - _SrcShiftR))) & (0xff >> _SrcShiftR);
-							g = (g | -(g >> (8 - _SrcShiftG))) & (0xff >> _SrcShiftG);
-							b = (b | -(b >> (8 - _SrcShiftB))) & (0xff >> _SrcShiftB);
+							const u32 dpix = _NoDestRead ? 0 : *dest;
+							const u32 invta = 0x100 - ta;
+							const u32 r = (source32_r(pix) * ta + dest_r(dpix) * invta) >> 8;
+							const u32 g = (source32_g(pix) * ta + dest_g(dpix) * invta) >> 8;
+							const u32 b = (source32_b(pix) * ta + dest_b(dpix) * invta) >> 8;
+
 							*dest = dest_assemble_rgb(r, g, b);
 						}
 						dest++;
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 
@@ -1717,24 +1441,23 @@ private:
 				else
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_argb32(prim.texture, curu, curv);
-						u32 ta = pix >> 24;
+						const u32 pix = get_texel_argb32(prim.texture, curu, curv);
+						const u32 ta = pix >> 24;
 						if (ta != 0)
 						{
-							u32 dpix = _NoDestRead ? 0 : *dest;
-							u32 r = ((palbase[(pix >> 16) & 0xff] * ta) >> (8 + _SrcShiftR)) + dest_r(dpix);
-							u32 g = ((palbase[(pix >> 8) & 0xff] * ta) >> (8 + _SrcShiftG)) + dest_g(dpix);
-							u32 b = ((palbase[(pix >> 0) & 0xff] * ta) >> (8 + _SrcShiftB)) + dest_b(dpix);
-							r = (r | -(r >> (8 - _SrcShiftR))) & (0xff >> _SrcShiftR);
-							g = (g | -(g >> (8 - _SrcShiftG))) & (0xff >> _SrcShiftG);
-							b = (b | -(b >> (8 - _SrcShiftB))) & (0xff >> _SrcShiftB);
+							const u32 dpix = _NoDestRead ? 0 : *dest;
+							const u32 invta = 0x100 - ta;
+							const u32 r = ((palbase[(pix >> 16) & 0xff] >> _SrcShiftR) * ta + dest_r(dpix) * invta) >> 8;
+							const u32 g = ((palbase[(pix >> 8) & 0xff] >> _SrcShiftG) * ta + dest_g(dpix) * invta) >> 8;
+							const u32 b = ((palbase[(pix >> 0) & 0xff] >> _SrcShiftB) * ta + dest_b(dpix) * invta) >> 8;
+
 							*dest = dest_assemble_rgb(r, g, b);
 						}
 						dest++;
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 			}
@@ -1765,13 +1488,162 @@ private:
 				if (palbase == nullptr)
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_argb32(prim.texture, curu, curv);
-						u32 ta = (pix >> 24) * sa;
+						const u32 pix = get_texel_argb32(prim.texture, curu, curv);
+						const u32 ta = (pix >> 24) * sa;
 						if (ta != 0)
 						{
-							u32 dpix = _NoDestRead ? 0 : *dest;
+							const u32 dpix = _NoDestRead ? 0 : *dest;
+							const u32 invsta = (0x10000 - ta) << 8;
+							const u32 r = (source32_r(pix) * sr * ta + dest_r(dpix) * invsta) >> 24;
+							const u32 g = (source32_g(pix) * sg * ta + dest_g(dpix) * invsta) >> 24;
+							const u32 b = (source32_b(pix) * sb * ta + dest_b(dpix) * invsta) >> 24;
+
+							*dest = dest_assemble_rgb(r, g, b);
+						}
+						dest++;
+						curu += setup.dudx;
+						curv += setup.dvdx;
+					}
+				}
+
+
+				// lookup case
+				else
+				{
+					// loop over cols
+					for (s32 x = setup.startx; x < setup.endx; x++)
+					{
+						const u32 pix = get_texel_argb32(prim.texture, curu, curv);
+						const u32 ta = (pix >> 24) * sa;
+						if (ta != 0)
+						{
+							const u32 dpix = _NoDestRead ? 0 : *dest;
+							const u32 invsta = (0x10000 - ta) << 8;
+							const u32 r = ((palbase[(pix >> 16) & 0xff] >> _SrcShiftR) * sr * ta + dest_r(dpix) * invsta) >> 24;
+							const u32 g = ((palbase[(pix >> 8) & 0xff] >> _SrcShiftG) * sg * ta + dest_g(dpix) * invsta) >> 24;
+							const u32 b = ((palbase[(pix >> 0) & 0xff] >> _SrcShiftB) * sb * ta + dest_b(dpix) * invsta) >> 24;
+
+							*dest = dest_assemble_rgb(r, g, b);
+						}
+						dest++;
+						curu += setup.dudx;
+						curv += setup.dvdx;
+					}
+				}
+			}
+		}
+	}
+
+
+	//-------------------------------------------------
+	//  draw_quad_argb32_add - perform
+	//  rasterization by using RGB add
+	//-------------------------------------------------
+
+	static void draw_quad_argb32_add(const render_primitive &prim, _PixelType *dstdata, u32 pitch, const quad_setup_data&setup)
+	{
+		const rgb_t *palbase = prim.texture.palette;
+
+		// simply can't do this without reading from the dest
+		if (_NoDestRead)
+			return;
+
+		// fast case: no coloring, no alpha
+		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
+		{
+			// loop over rows
+			for (s32 y = setup.starty; y < setup.endy; y++)
+			{
+				_PixelType *dest = dstdata + y * pitch + setup.startx;
+				s32 curu = setup.startu + (y - setup.starty) * setup.dudy;
+				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
+
+				// no lookup case
+				if (palbase == nullptr)
+				{
+					// loop over cols
+					for (s32 x = setup.startx; x < setup.endx; x++)
+					{
+						const u32 pix = get_texel_argb32(prim.texture, curu, curv);
+						const u32 ta = pix >> 24;
+						if (ta != 0)
+						{
+							const u32 dpix = _NoDestRead ? 0 : *dest;
+							u32 r = ((source32_r(pix) * ta) >> 8) + dest_r(dpix);
+							u32 g = ((source32_g(pix) * ta) >> 8) + dest_g(dpix);
+							u32 b = ((source32_b(pix) * ta) >> 8) + dest_b(dpix);
+							r = (r | -(r >> (8 - _SrcShiftR))) & (0xff >> _SrcShiftR);
+							g = (g | -(g >> (8 - _SrcShiftG))) & (0xff >> _SrcShiftG);
+							b = (b | -(b >> (8 - _SrcShiftB))) & (0xff >> _SrcShiftB);
+							*dest = dest_assemble_rgb(r, g, b);
+						}
+						dest++;
+						curu += setup.dudx;
+						curv += setup.dvdx;
+					}
+				}
+
+				// lookup case
+				else
+				{
+					// loop over cols
+					for (s32 x = setup.startx; x < setup.endx; x++)
+					{
+						const u32 pix = get_texel_argb32(prim.texture, curu, curv);
+						const u32 ta = pix >> 24;
+						if (ta != 0)
+						{
+							const u32 dpix = _NoDestRead ? 0 : *dest;
+							u32 r = ((palbase[(pix >> 16) & 0xff] * ta) >> (8 + _SrcShiftR)) + dest_r(dpix);
+							u32 g = ((palbase[(pix >> 8) & 0xff] * ta) >> (8 + _SrcShiftG)) + dest_g(dpix);
+							u32 b = ((palbase[(pix >> 0) & 0xff] * ta) >> (8 + _SrcShiftB)) + dest_b(dpix);
+							r = (r | -(r >> (8 - _SrcShiftR))) & (0xff >> _SrcShiftR);
+							g = (g | -(g >> (8 - _SrcShiftG))) & (0xff >> _SrcShiftG);
+							b = (b | -(b >> (8 - _SrcShiftB))) & (0xff >> _SrcShiftB);
+							*dest = dest_assemble_rgb(r, g, b);
+						}
+						dest++;
+						curu += setup.dudx;
+						curv += setup.dvdx;
+					}
+				}
+			}
+		}
+
+		// alpha and/or coloring case
+		else
+		{
+			u32 sr = u32(256.0f * prim.color.r);
+			u32 sg = u32(256.0f * prim.color.g);
+			u32 sb = u32(256.0f * prim.color.b);
+			u32 sa = u32(256.0f * prim.color.a);
+
+			// clamp R,G,B and inverse A to 0-256 range
+			if (sr > 0x100) { if (s32(sr) < 0) sr = 0; else sr = 0x100; }
+			if (sg > 0x100) { if (s32(sg) < 0) sg = 0; else sg = 0x100; }
+			if (sb > 0x100) { if (s32(sb) < 0) sb = 0; else sb = 0x100; }
+			if (sa > 0x100) { if (s32(sa) < 0) sa = 0; else sa = 0x100; }
+
+			// loop over rows
+			for (s32 y = setup.starty; y < setup.endy; y++)
+			{
+				_PixelType *dest = dstdata + y * pitch + setup.startx;
+				s32 curu = setup.startu + (y - setup.starty) * setup.dudy;
+				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
+
+				// no lookup case
+				if (palbase == nullptr)
+				{
+					// loop over cols
+					for (s32 x = setup.startx; x < setup.endx; x++)
+					{
+						const u32 pix = get_texel_argb32(prim.texture, curu, curv);
+						const u32 ta = (pix >> 24) * sa;
+						if (ta != 0)
+						{
+							const u32 dpix = _NoDestRead ? 0 : *dest;
 							u32 r = ((source32_r(pix) * sr * ta) >> 24) + dest_r(dpix);
 							u32 g = ((source32_g(pix) * sg * ta) >> 24) + dest_g(dpix);
 							u32 b = ((source32_b(pix) * sb * ta) >> 24) + dest_b(dpix);
@@ -1781,8 +1653,8 @@ private:
 							*dest = dest_assemble_rgb(r, g, b);
 						}
 						dest++;
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 
@@ -1790,13 +1662,13 @@ private:
 				else
 				{
 					// loop over cols
-					for (s32 x = setup.startx; x < endx; x++)
+					for (s32 x = setup.startx; x < setup.endx; x++)
 					{
-						u32 pix = get_texel_argb32(prim.texture, curu, curv);
-						u32 ta = (pix >> 24) * sa;
+						const u32 pix = get_texel_argb32(prim.texture, curu, curv);
+						const u32 ta = (pix >> 24) * sa;
 						if (ta != 0)
 						{
-							u32 dpix = _NoDestRead ? 0 : *dest;
+							const u32 dpix = _NoDestRead ? 0 : *dest;
 							u32 r = ((palbase[(pix >> 16) & 0xff] * sr * ta) >> (24 + _SrcShiftR)) + dest_r(dpix);
 							u32 g = ((palbase[(pix >> 8) & 0xff] * sr * ta) >> (24 + _SrcShiftR)) + dest_g(dpix);
 							u32 b = ((palbase[(pix >> 0) & 0xff] * sr * ta) >> (24 + _SrcShiftR)) + dest_b(dpix);
@@ -1806,8 +1678,8 @@ private:
 							*dest = dest_assemble_rgb(r, g, b);
 						}
 						dest++;
-						curu += dudx;
-						curv += dvdx;
+						curu += setup.dudx;
+						curv += setup.dvdx;
 					}
 				}
 			}
@@ -1884,10 +1756,6 @@ private:
 				draw_quad_palette16_add(prim, dstdata, pitch, setup);
 				break;
 
-			case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTEA16) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA):
-				draw_quad_palettea16_alpha(prim, dstdata, pitch, setup);
-				break;
-
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16) | PRIMFLAG_BLENDMODE(BLENDMODE_NONE):
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA):
 				draw_quad_yuy16_none(prim, dstdata, pitch, setup);
@@ -1903,16 +1771,17 @@ private:
 				draw_quad_rgb32(prim, dstdata, pitch, setup);
 				break;
 
+			case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32) | PRIMFLAG_BLENDMODE(BLENDMODE_RGB_MULTIPLY):
+			case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32) | PRIMFLAG_BLENDMODE(BLENDMODE_RGB_MULTIPLY):
+				draw_quad_rgb32_multiply(prim, dstdata, pitch, setup);
+				break;
+
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD):
 				draw_quad_rgb32_add(prim, dstdata, pitch, setup);
 				break;
 
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA):
 				draw_quad_argb32_alpha(prim, dstdata, pitch, setup);
-				break;
-
-			case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32) | PRIMFLAG_BLENDMODE(BLENDMODE_RGB_MULTIPLY):
-				draw_quad_argb32_multiply(prim, dstdata, pitch, setup);
 				break;
 
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD):

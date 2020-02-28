@@ -1087,7 +1087,17 @@ Core Performance Options
 
     **-str** *<n>* **-video none -sound none -nothrottle**
 
+.. _mame-commandline-lowlatency:
 
+**-lowlatency**
+
+    This tells MAME to draw a new frame before throttling to reduce input
+    latency.  This is particularly effective with VRR (Variable Refresh Rate)
+    displays.
+
+    This may cause frame pacing issues in the form of jitter with some 
+    systems (especially newer 3D-based systems or systems that run software
+    akin to an operating system), so the default is off (**-nolowlatency**).
 
 Core Rotation Options
 ---------------------
@@ -1503,46 +1513,6 @@ Core Artwork Options
     via the Video Options menu in the user interface.
 
     The default is OFF **-noartwork_crop**.
-
-.. _mame-commandline-nousebackdrops:
-
-**-[no]use_backdrops** / **-[no]backdrop**
-
-    Enables/disables the display of backdrops.
-
-    The default is ON (**-use_backdrops**).
-
-.. _mame-commandline-nouseoverlays:
-
-**-[no]use_overlays** / **-[no]overlay**
-
-    Enables/disables the display of overlays.
-
-    The default is ON (**-use_overlays**).
-
-.. _mame-commandline-nousebezels:
-
-**-[no]use_bezels** / **-[no]bezels**
-
-    Enables/disables the display of bezels.
-
-    The default is ON (**-use_bezels**).
-
-.. _mame-commandline-nousecpanels:
-
-**-[no]use_cpanels** / **-[no]cpanels**
-
-    Enables/disables the display of control panels.
-
-    The default is ON (**-use_cpanels**).
-
-.. _mame-commandline-nousemarquees:
-
-**-[no]use_marquees** / **-[no]marquees**
-
-    Enables/disables the display of marquees.
-
-    The default is ON (**-use_marquees**).
 
 .. _mame-commandline-fallbackartwork:
 
@@ -2387,7 +2357,7 @@ Core Misc Options
 
 **\-confirm_quit**
 
-    Display a Confirm Quit dialong to screen on exit, requiring one extra step
+    Display a Confirm Quit dialog to screen on exit, requiring one extra step
     to exit MAME.
 
     The default is OFF (**-noconfirm_quit**).
@@ -2412,7 +2382,8 @@ Core Misc Options
 
     Save the NVRAM contents when exiting machine emulation. By turning this off,
     you can retain your previous NVRAM contents as any current changes made will
-    not be saved.
+    not be saved. Turning this option off will also unconditionally suppress the
+    saving of .nv files associated with some types of software cartridges.
 
     The default is ON (**-nvram_save**).
 

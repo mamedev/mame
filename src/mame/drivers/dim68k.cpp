@@ -149,18 +149,19 @@ WRITE16_MEMBER( dim68k_state::dim68k_video_control_w )
    D1 0 = Standard Chars & LoRes; 1 = Alternate Chars & HiRes [not emulated yet]
    D0 0 = Non-Mixed (all text or all Graphics); 1 = Mixed (Colour Graphics and Monochrome Text) [not emulated yet]
  */
-	m_crtc->set_hpixels_per_column((data & 0x40) ? 7 : 8);
+	unsigned dots = (data & 0x40) ? 7 : 8;
+	m_crtc->set_hpixels_per_column(dots);
 	m_video_control = data;
 
 	switch (data & 0x18)
 	{
-		case 0x00: m_crtc->set_clock(XTAL(14'000'000));
+		case 0x00: m_crtc->set_unscaled_clock(XTAL(14'000'000) / dots);
 					break;
-		case 0x08: m_crtc->set_clock(XTAL(3'579'545));
+		case 0x08: m_crtc->set_unscaled_clock(XTAL(3'579'545) / dots);
 					break;
-		case 0x10: m_crtc->set_clock(XTAL(14'000'000) / 2);
+		case 0x10: m_crtc->set_unscaled_clock(XTAL(14'000'000) / dots / 2);
 					break;
-		case 0x18: m_crtc->set_clock(XTAL(3'579'545) / 2);
+		case 0x18: m_crtc->set_unscaled_clock(XTAL(3'579'545) / dots / 2);
 					break;
 	}
 }
@@ -212,7 +213,7 @@ void dim68k_state::dim68k_mem(address_map &map)
 	map(0x00ffcc00, 0x00ffcc1f).rw(FUNC(dim68k_state::dim68k_game_switches_r), FUNC(dim68k_state::dim68k_reset_timers_w));
 	map(0x00ffd000, 0x00ffd003).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff); // NEC uPD765A
 	map(0x00ffd004, 0x00ffd005).rw(FUNC(dim68k_state::dim68k_fdc_r), FUNC(dim68k_state::dim68k_fdc_w));
-	//AM_RANGE(0x00ffd400, 0x00ffd403) emulation trap control
+	//map(0x00ffd400, 0x00ffd403) emulation trap control
 	map(0x00ffd800, 0x00ffd801).w(FUNC(dim68k_state::dim68k_printer_strobe_w));
 	map(0x00ffdc00, 0x00ffdc01).w(FUNC(dim68k_state::dim68k_banksw_w));
 }
@@ -224,11 +225,9 @@ INPUT_PORTS_END
 
 void dim68k_state::machine_reset()
 {
-	u8* ROM = memregion("bootrom")->base();
+	u16* ROM = &memregion("bootrom")->as_u16();
 
-	memcpy((u8*)m_ram.target(), ROM, 0x2000);
-
-	m_maincpu->reset();
+	memcpy((u16*)m_ram.target(), ROM, 0x2000);
 }
 
 // Text-only; graphics isn't emulated yet. Need to find out if hardware cursor is used.
@@ -311,25 +310,25 @@ void dim68k_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-MACHINE_CONFIG_START(dim68k_state::dim68k)
+void dim68k_state::dim68k(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(dim68k_mem)
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &dim68k_state::dim68k_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 250-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 250-1);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dim68k)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_dim68k);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	UPD765A(config, "fdc", 8'000'000, true, true); // these options unknown
@@ -340,14 +339,14 @@ MACHINE_CONFIG_START(dim68k_state::dim68k)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(dim68k_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(dim68k_state::crtc_update_row));
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(dim68k_state::kbd_put));
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("dim68k");
-MACHINE_CONFIG_END
+}
 
 /*
 68000
@@ -377,26 +376,26 @@ MC113   82S153  U16
 */
 /* ROM definition */
 ROM_START( dim68k )
-	ROM_REGION( 0x2000, "bootrom", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "mc103e.bin", 0x0000, 0x1000, CRC(4730c902) SHA1(5c4bb79ad22def721a22eb63dd05e0391c8082be))
-	ROM_LOAD16_BYTE( "mc104.bin",  0x0001, 0x1000, CRC(14b04575) SHA1(43e15d9ebe1c9c1bf1bcfc1be3899a49e6748200))
+	ROM_REGION16_BE( 0x2000, "bootrom", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "mc103e.bin", 0x0001, 0x1000, CRC(4730c902) SHA1(5c4bb79ad22def721a22eb63dd05e0391c8082be))
+	ROM_LOAD16_BYTE( "mc104.bin",  0x0000, 0x1000, CRC(14b04575) SHA1(43e15d9ebe1c9c1bf1bcfc1be3899a49e6748200))
 
 	ROM_REGION( 0x1000, "chargen", ROMREGION_ERASEFF )
 	ROM_LOAD( "mc105e.bin", 0x0000, 0x1000, CRC(7a09daa8) SHA1(844bfa579293d7c3442fcbfa21bda75fff930394))
 
 	// The remaining roms may not be in the correct positions or being loaded correctly
-	ROM_REGION( 0x1000, "cop6512", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "mc106.bin", 0x0000, 0x0100, CRC(11530d8a) SHA1(e3eae266535383bcaee2d84d7bed6052d40e4e4a))
-	ROM_LOAD16_WORD_SWAP( "mc107.bin", 0x0100, 0x0100, CRC(966db11b) SHA1(3c3105ac842602d8e01b0f924152fd672a85f00c))
-	ROM_LOAD16_WORD_SWAP( "mc108.bin", 0x0200, 0x0400, CRC(687f9b0a) SHA1(ed9f1265b25f89f6d3cf8cd0a7b0fb73cb129f9f))
-	ROM_LOAD16_WORD_SWAP( "mc109.bin", 0x0600, 0x0200, CRC(4a857f98) SHA1(9f2bbc2171fc49f65aa798c9cd7799a26afd2ddf))
-	ROM_LOAD16_WORD_SWAP( "mc110.bin", 0x0800, 0x0100, CRC(e207b457) SHA1(a8987ba3d1bbdb3d8b3b11cec90c532ff09e762e))
+	ROM_REGION16_BE( 0x1000, "cop6512", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD( "mc106.bin", 0x0000, 0x0100, CRC(11530d8a) SHA1(e3eae266535383bcaee2d84d7bed6052d40e4e4a))
+	ROM_LOAD16_WORD( "mc107.bin", 0x0100, 0x0100, CRC(966db11b) SHA1(3c3105ac842602d8e01b0f924152fd672a85f00c))
+	ROM_LOAD16_WORD( "mc108.bin", 0x0200, 0x0400, CRC(687f9b0a) SHA1(ed9f1265b25f89f6d3cf8cd0a7b0fb73cb129f9f))
+	ROM_LOAD16_WORD( "mc109.bin", 0x0600, 0x0200, CRC(4a857f98) SHA1(9f2bbc2171fc49f65aa798c9cd7799a26afd2ddf))
+	ROM_LOAD16_WORD( "mc110.bin", 0x0800, 0x0100, CRC(e207b457) SHA1(a8987ba3d1bbdb3d8b3b11cec90c532ff09e762e))
 
-	ROM_REGION( 0x1000, "copz80", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "mc111.bin", 0x0000, 0x0020, CRC(6a380057) SHA1(6522a7b3e0af9db14a6ed04d4eec3ee6e44c2dab))
+	ROM_REGION16_BE( 0x1000, "copz80", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD( "mc111.bin", 0x0000, 0x0020, CRC(6a380057) SHA1(6522a7b3e0af9db14a6ed04d4eec3ee6e44c2dab))
 
-	ROM_REGION( 0x1000, "cop8086", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "mc112.bin", 0x0000, 0x0100, CRC(dfd4cdbb) SHA1(a7831d415943fa86c417066807038bccbabb2573))
+	ROM_REGION16_BE( 0x1000, "cop8086", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD( "mc112.bin", 0x0000, 0x0100, CRC(dfd4cdbb) SHA1(a7831d415943fa86c417066807038bccbabb2573))
 	ROM_LOAD( "mc113.bin", 0x0100, 0x00ef, CRC(594bdf05) SHA1(36db911a27d930e023fa12683e86e9eecfffdba6))
 
 	ROM_REGION( 0x1000, "mb", ROMREGION_ERASEFF )   // mainboard unknown

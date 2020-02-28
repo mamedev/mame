@@ -80,12 +80,17 @@ public:
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:0"),
 		m_palette(*this, "palette"),
-		m_sound_buffer(0), m_sound_latch(false)
+		m_leds(*this, "led_%u", 0U),
+		m_sound_buffer(0),
+		m_sound_latch(false)
 	{ }
 
 	void guab(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	EF9369_COLOR_UPDATE(ef9369_color_update);
@@ -110,15 +115,14 @@ private:
 
 	void guab_map(address_map &map);
 
-	virtual void machine_start() override;
-
-
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34061_device> m_tms34061;
 	required_device<sn76489_device> m_sn;
 	required_device<wd1773_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<palette_device> m_palette;
+
+	output_finder<48> m_leds;
 
 	uint8_t m_sound_buffer;
 	bool m_sound_latch;
@@ -157,8 +161,8 @@ void guab_state::guab_map(address_map &map)
 
 static INPUT_PORTS_START( guab )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("50p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, (void *)50)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("100p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, (void *)100)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("50p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, 50)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("100p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, 100)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key switch") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
@@ -183,14 +187,14 @@ static INPUT_PORTS_START( guab )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("C")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("D")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("10p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, (void *)10)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("20p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, (void *)20)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("10p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, 10)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("20p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, 20)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tenup )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("50p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, (void *)50)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("100p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, (void *)100)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("50p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, 50)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("100p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, 100)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key switch") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
@@ -215,8 +219,8 @@ static INPUT_PORTS_START( tenup )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("C")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("10p")  PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, (void *)10)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("20p")  PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, (void *)20)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("10p")  PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, 10)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("20p")  PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, 20)
 INPUT_PORTS_END
 
 
@@ -241,10 +245,10 @@ WRITE16_MEMBER( guab_state::tms34061_w )
 		col = offset <<= 1;
 
 	if (ACCESSING_BITS_8_15)
-		m_tms34061->write(space, col, row, func, data >> 8);
+		m_tms34061->write(col, row, func, data >> 8);
 
 	if (ACCESSING_BITS_0_7)
-		m_tms34061->write(space, col | 1, row, func, data & 0xff);
+		m_tms34061->write(col | 1, row, func, data & 0xff);
 }
 
 READ16_MEMBER( guab_state::tms34061_r )
@@ -260,10 +264,10 @@ READ16_MEMBER( guab_state::tms34061_r )
 		col = offset <<= 1;
 
 	if (ACCESSING_BITS_8_15)
-		data |= m_tms34061->read(space, col, row, func) << 8;
+		data |= m_tms34061->read(col, row, func) << 8;
 
 	if (ACCESSING_BITS_0_7)
-		data |= m_tms34061->read(space, col | 1, row, func);
+		data |= m_tms34061->read(col | 1, row, func);
 
 	return data;
 }
@@ -304,6 +308,8 @@ uint32_t guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bit
 
 void guab_state::machine_start()
 {
+	m_leds.resolve();
+
 	m_fdc->set_floppy(m_floppy->get_device());
 }
 
@@ -352,81 +358,81 @@ INPUT_CHANGED_MEMBER( guab_state::coin_inserted )
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 
 		/* Get the current credit value and add the new coin value */
-		credit = space.read_dword(0x8002c) + (uint32_t)(uintptr_t)param;
+		credit = space.read_dword(0x8002c) + param;
 		space.write_dword(0x8002c, credit);
 	}
 }
 
 WRITE8_MEMBER( guab_state::output1_w )
 {
-	output().set_value("led_0", BIT(data, 0)); // cash in (ten up: cash in)
-	output().set_value("led_1", BIT(data, 1)); // cash out (ten up: cash out)
-	output().set_value("led_2", BIT(data, 2));
-	output().set_value("led_3", BIT(data, 3));
-	output().set_value("led_4", BIT(data, 4));
-	output().set_value("led_5", BIT(data, 5));
-	output().set_value("led_6", BIT(data, 6)); // (ten up: 10p/100p drive)
-	output().set_value("led_7", BIT(data, 7));
+	m_leds[0] = BIT(data, 0); // cash in (ten up: cash in)
+	m_leds[1] = BIT(data, 1); // cash out (ten up: cash out)
+	m_leds[2] = BIT(data, 2);
+	m_leds[3] = BIT(data, 3);
+	m_leds[4] = BIT(data, 4);
+	m_leds[5] = BIT(data, 5);
+	m_leds[6] = BIT(data, 6); // (ten up: 10p/100p drive)
+	m_leds[7] = BIT(data, 7);
 }
 
 WRITE8_MEMBER( guab_state::output2_w )
 {
-	output().set_value("led_8", BIT(data, 0));
-	output().set_value("led_9", BIT(data, 1));
-	output().set_value("led_10", BIT(data, 2)); // start (ten up: start)
-	output().set_value("led_11", BIT(data, 3)); // (ten up: feature 6)
-	output().set_value("led_12", BIT(data, 4)); // (ten up: feature 11)
-	output().set_value("led_13", BIT(data, 5)); // (ten up: feature 13)
-	output().set_value("led_14", BIT(data, 6)); // lamp a (ten up: feature 12)
-	output().set_value("led_15", BIT(data, 7)); // lamp b (ten up: pass)
+	m_leds[8] = BIT(data, 0);
+	m_leds[9] = BIT(data, 1);
+	m_leds[10] = BIT(data, 2); // start (ten up: start)
+	m_leds[11] = BIT(data, 3); // (ten up: feature 6)
+	m_leds[12] = BIT(data, 4); // (ten up: feature 11)
+	m_leds[13] = BIT(data, 5); // (ten up: feature 13)
+	m_leds[14] = BIT(data, 6); // lamp a (ten up: feature 12)
+	m_leds[15] = BIT(data, 7); // lamp b (ten up: pass)
 }
 
 WRITE8_MEMBER( guab_state::output3_w )
 {
-	output().set_value("led_16", BIT(data, 0)); // select (ten up: collect)
-	output().set_value("led_17", BIT(data, 1)); // (ten up: feature 14)
-	output().set_value("led_18", BIT(data, 2)); // (ten up: feature 9)
-	output().set_value("led_19", BIT(data, 3)); //   (ten up: lamp a)
-	output().set_value("led_20", BIT(data, 4)); // lamp c (ten up: lamp b)
-	output().set_value("led_21", BIT(data, 5)); // lamp d (ten up: lamp c)
-	output().set_value("led_22", BIT(data, 6));
-	output().set_value("led_23", BIT(data, 7));
+	m_leds[16] = BIT(data, 0); // select (ten up: collect)
+	m_leds[17] = BIT(data, 1); // (ten up: feature 14)
+	m_leds[18] = BIT(data, 2); // (ten up: feature 9)
+	m_leds[19] = BIT(data, 3); //   (ten up: lamp a)
+	m_leds[20] = BIT(data, 4); // lamp c (ten up: lamp b)
+	m_leds[21] = BIT(data, 5); // lamp d (ten up: lamp c)
+	m_leds[22] = BIT(data, 6);
+	m_leds[23] = BIT(data, 7);
 }
 
 WRITE8_MEMBER( guab_state::output4_w )
 {
-	output().set_value("led_24", BIT(data, 0)); // feature 1 (ten up: feature 1)
-	output().set_value("led_25", BIT(data, 1)); // feature 2 (ten up: feature 10)
-	output().set_value("led_26", BIT(data, 2)); // feature 3 (ten up: feature 7)
-	output().set_value("led_27", BIT(data, 3)); // feature 4 (ten up: feature 2)
-	output().set_value("led_28", BIT(data, 4)); // feature 5 (ten up: feature 8)
-	output().set_value("led_29", BIT(data, 5)); // feature 6 (ten up: feature 3)
-	output().set_value("led_30", BIT(data, 6)); // feature 7 (ten up: feature 4)
-	output().set_value("led_31", BIT(data, 7)); // feature 8 (ten up: feature 5)
+	m_leds[24] = BIT(data, 0); // feature 1 (ten up: feature 1)
+	m_leds[25] = BIT(data, 1); // feature 2 (ten up: feature 10)
+	m_leds[26] = BIT(data, 2); // feature 3 (ten up: feature 7)
+	m_leds[27] = BIT(data, 3); // feature 4 (ten up: feature 2)
+	m_leds[28] = BIT(data, 4); // feature 5 (ten up: feature 8)
+	m_leds[29] = BIT(data, 5); // feature 6 (ten up: feature 3)
+	m_leds[30] = BIT(data, 6); // feature 7 (ten up: feature 4)
+	m_leds[31] = BIT(data, 7); // feature 8 (ten up: feature 5)
 }
 
 WRITE8_MEMBER( guab_state::output5_w )
 {
-	output().set_value("led_32", BIT(data, 0));
-	output().set_value("led_33", BIT(data, 1));
-	output().set_value("led_34", BIT(data, 2));
-	output().set_value("led_35", BIT(data, 3));
-	output().set_value("led_36", BIT(data, 4));
-	output().set_value("led_37", BIT(data, 5));
-	output().set_value("led_38", BIT(data, 6));
-	output().set_value("led_39", BIT(data, 7)); // mech lamp (ten up: mech lamp)
+	m_leds[32] = BIT(data, 0);
+	m_leds[33] = BIT(data, 1);
+	m_leds[34] = BIT(data, 2);
+	m_leds[35] = BIT(data, 3);
+	m_leds[36] = BIT(data, 4);
+	m_leds[37] = BIT(data, 5);
+	m_leds[38] = BIT(data, 6);
+	m_leds[39] = BIT(data, 7); // mech lamp (ten up: mech lamp)
 }
 
 WRITE8_MEMBER( guab_state::output6_w )
 {
-	output().set_value("led_40", BIT(data, 0));
-	output().set_value("led_41", BIT(data, 1));
-	output().set_value("led_42", BIT(data, 2));
-	output().set_value("led_43", BIT(data, 3));
-	output().set_value("led_44", BIT(data, 4)); // 50p drive (ten up: 10p drive)
-	output().set_value("led_45", BIT(data, 5)); // 100p drive (ten up: 100p drive)
-	output().set_value("led_46", BIT(data, 6));
-	output().set_value("led_47", BIT(data, 7));
+	m_leds[40] = BIT(data, 0);
+	m_leds[41] = BIT(data, 1);
+	m_leds[42] = BIT(data, 2);
+	m_leds[43] = BIT(data, 3);
+	m_leds[44] = BIT(data, 4); // 50p drive (ten up: 10p drive)
+	m_leds[45] = BIT(data, 5); // 100p drive (ten up: 100p drive)
+	m_leds[46] = BIT(data, 6);
+	m_leds[47] = BIT(data, 7);
 }
 
 static DEVICE_INPUT_DEFAULTS_START( acia_1_rs232_defaults )

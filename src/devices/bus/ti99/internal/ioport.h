@@ -29,14 +29,15 @@ public:
 	{ }
 
 	// Methods called from the console / ioport
-	virtual DECLARE_READ8Z_MEMBER( readz ) { };
-	virtual DECLARE_WRITE8_MEMBER( write ) { };
-	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { };
-	virtual DECLARE_READ8Z_MEMBER( crureadz ) { };
-	virtual DECLARE_WRITE8_MEMBER( cruwrite ) { };
-	virtual DECLARE_WRITE_LINE_MEMBER( memen_in ) { };
-	virtual DECLARE_WRITE_LINE_MEMBER( msast_in ) { };
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_in ) { };
+	virtual DECLARE_READ8Z_MEMBER( readz ) { }
+	virtual void write(offs_t offset, uint8_t data) { }
+	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { }
+	virtual DECLARE_READ8Z_MEMBER( crureadz ) { }
+	virtual void cruwrite(offs_t offset, uint8_t data) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( memen_in ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( msast_in ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( clock_in ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( reset_in ) { }
 
 	void set_ioport(ioport_device* ioport) { m_ioport = ioport; }
 
@@ -71,13 +72,14 @@ public:
 
 	// Methods called from the console
 	DECLARE_READ8Z_MEMBER( readz );
-	DECLARE_WRITE8_MEMBER( write );
+	void write(offs_t offset, uint8_t data);
 	DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin );
 	DECLARE_READ8Z_MEMBER( crureadz );
-	DECLARE_WRITE8_MEMBER( cruwrite );
+	void cruwrite(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( memen_in );
 	DECLARE_WRITE_LINE_MEMBER( msast_in );
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
+	DECLARE_WRITE_LINE_MEMBER( reset_in );
 
 	// Callbacks
 	auto extint_cb() { return m_console_extint.bind(); }

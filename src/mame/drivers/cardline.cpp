@@ -91,12 +91,13 @@ void cardline_state::machine_start()
 	m_lamps.resolve();
 	m_video = 0;
 	m_hsync_q = 1;
+
 	for (int i = 0; i < 0x2000; i++)
 		m_maincpu.target()->space(AS_IO).write_byte(i, 0x73);
+
 	save_item(NAME(m_video));
 	save_item(NAME(m_hsync_q));
 }
-
 
 MC6845_BEGIN_UPDATE( cardline_state::crtc_begin_update )
 {
@@ -105,16 +106,14 @@ MC6845_BEGIN_UPDATE( cardline_state::crtc_begin_update )
 
 MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 {
-	uint8_t *gfx;
 	uint16_t x = 0;
-	int gfx_ofs;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
-	gfx_ofs = 0;
+	int gfx_ofs = 0;
 
 	// bits 0 and 1 seem to be chip select lines. None of those selected
 	// most likely would put the output lines into a floating (threestate)
-	// state. The next statement doesn't add functioality but documents
+	// state. The next statement doesn't add functionality but documents
 	// how this works.
 
 	if(m_video & 1)
@@ -123,7 +122,7 @@ MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 	if(m_video & 2)
 		gfx_ofs = 0x1000;
 
-	gfx = memregion("gfx1")->base();
+	uint8_t *gfx = memregion("gfx1")->base();
 
 	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
@@ -163,7 +162,7 @@ WRITE_LINE_MEMBER(cardline_state::vsync_changed)
 
 WRITE8_MEMBER(cardline_state::a3003_w)
 {
-	/* seems a generate a signal when address is written to */
+	/* seems to generate a signal when address is written to */
 }
 
 WRITE8_MEMBER(cardline_state::vram_w)
@@ -232,13 +231,13 @@ void cardline_state::mem_io(address_map &map)
 	map(0x2006, 0x2006).portr("DSW");
 	map(0x2007, 0x2007).w(FUNC(cardline_state::lamps_w));
 	map(0x2008, 0x2008).noprw(); // set to 1 during coin input
-	//AM_RANGE(0x2080, 0x213f) AM_NOP // ????
+	//map(0x2080, 0x213f).noprw(); // ????
 	map(0x2100, 0x213f).rw(FUNC(cardline_state::asic_r), FUNC(cardline_state::asic_w));
 	map(0x2400, 0x2400).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x2800, 0x2800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2801, 0x2801).w("crtc", FUNC(mc6845_device::register_w));
-	//AM_RANGE(0x2840, 0x2840) AM_NOP // ???
-	//AM_RANGE(0x2880, 0x2880) AM_NOP // ???
+	//map(0x2840, 0x2840).noprw(); // ???
+	//map(0x2880, 0x2880).noprw(); // ???
 	map(0x3003, 0x3003).w(FUNC(cardline_state::a3003_w));
 	map(0xc000, 0xdfff).w(FUNC(cardline_state::vram_w)).share("videoram");
 	map(0xe000, 0xffff).w(FUNC(cardline_state::attr_w)).share("colorram");
@@ -326,8 +325,8 @@ void cardline_state::cardline_palette(palette_device &palette) const
 	}
 }
 
-MACHINE_CONFIG_START(cardline_state::cardline)
-
+void cardline_state::cardline(machine_config &config)
+{
 	/* basic machine hardware */
 	I80C32(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_port_forced_input(1, 0x10);
@@ -338,14 +337,14 @@ MACHINE_CONFIG_START(cardline_state::cardline)
 	//m_maincpu->set_vblank_int("screen", FUNC(cardline_state::irq1_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 35*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	//MCFG_SCREEN_UPDATE_DRIVER(cardline_state, screen_update_cardline)
-	//MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 35*8);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
+	//screen.set_screen_update(FUNC(cardline_state::screen_update_cardline));
+	//screen.set_palette(m_palette);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cardline);
 	PALETTE(config, m_palette, FUNC(cardline_state::cardline_palette), 512);
@@ -354,8 +353,8 @@ MACHINE_CONFIG_START(cardline_state::cardline)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_begin_update_callback(FUNC(cardline_state::crtc_begin_update), this);
-	crtc.set_update_row_callback(FUNC(cardline_state::crtc_update_row), this);
+	crtc.set_begin_update_callback(FUNC(cardline_state::crtc_begin_update));
+	crtc.set_update_row_callback(FUNC(cardline_state::crtc_update_row));
 	crtc.out_hsync_callback().set(FUNC(cardline_state::hsync_changed));
 	crtc.out_vsync_callback().set(FUNC(cardline_state::vsync_changed));
 
@@ -365,11 +364,10 @@ MACHINE_CONFIG_START(cardline_state::cardline)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 /***************************************************************************
 

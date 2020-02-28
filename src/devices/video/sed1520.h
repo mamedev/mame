@@ -33,17 +33,7 @@ public:
 	sed1520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// sconfiguration helpers
-	void set_screen_update_cb(screen_update_delegate callback) { m_screen_update_cb = callback; }
-	template <class FunctionClass> void set_screen_update_cb(const char *devname,
-		uint32_t (FunctionClass::*callback)(bitmap_ind16 &, const rectangle &, uint8_t *, int, int), const char *name)
-	{
-		set_screen_update_cb(screen_update_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_screen_update_cb(
-		uint32_t (FunctionClass::*callback)(bitmap_ind16 &, const rectangle &, uint8_t *, int, int), const char *name)
-	{
-		set_screen_update_cb(screen_update_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_screen_update_cb(T &&... args) { m_screen_update_cb.set(std::forward<T>(args)...); }
 
 	// device interface
 	virtual DECLARE_WRITE8_MEMBER(write);

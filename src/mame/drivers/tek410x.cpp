@@ -97,23 +97,24 @@ void tek4107a_state::machine_start()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(tek4107a_state::tek4107a)
+void tek4107a_state::tek4107a(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(I80188_TAG, I80188, 21000000)
-	MCFG_DEVICE_PROGRAM_MAP(tek4107a_mem)
-	MCFG_DEVICE_IO_MAP(tek4107a_io)
+	i80188_cpu_device &maincpu(I80188(config, I80188_TAG, 21000000));
+	maincpu.set_addrmap(AS_PROGRAM, &tek4107a_state::tek4107a_mem);
+	maincpu.set_addrmap(AS_IO, &tek4107a_state::tek4107a_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(tek4107a_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(tek4107a_state::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
 
 	PALETTE(config, "palette").set_entries(64);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_tek4107a);
-MACHINE_CONFIG_END
+}
 
 void tek4107a_state::tek4109a(machine_config &config)
 {

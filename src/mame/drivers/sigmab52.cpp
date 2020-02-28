@@ -333,7 +333,7 @@ void sigmab52_state::jwildb52_map(address_map &map)
 
 	map(0xf760, 0xf760).r(FUNC(sigmab52_state::unk_f760_r));
 
-//  AM_RANGE(0xf770, 0xf77f)  Bill validator
+//  map(0xf770, 0xf77f)  Bill validator
 
 	map(0xf780, 0xf780).w(FUNC(sigmab52_state::audiocpu_cmd_irq_w));
 	map(0xf790, 0xf790).w("soundlatch", FUNC(generic_latch_8_device::write));
@@ -447,7 +447,7 @@ static INPUT_PORTS_START( jwildb52 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_7_PAD)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("V Door")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, sigmab52_state, coin_drop_start, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, sigmab52_state, coin_drop_start, 0)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "DSW1-1" )        PORT_DIPLOCATION("SW1:1")
@@ -575,14 +575,14 @@ void sigmab52_state::machine_reset()
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(sigmab52_state::jwildb52)
-
+void sigmab52_state::jwildb52(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(jwildb52_map)
+	MC6809(config, m_maincpu, XTAL(8'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab52_state::jwildb52_map);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809, XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(sound_prog_map)
+	MC6809(config, m_audiocpu, XTAL(8'000'000));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sigmab52_state::sound_prog_map);
 
 	ptm6840_device &ptm1(PTM6840(config, "6840ptm_1", XTAL(8'000'000) / 8));  // FIXME
 	ptm1.irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
@@ -592,27 +592,25 @@ MACHINE_CONFIG_START(sigmab52_state::jwildb52)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(1024, 1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 544-1, 0, 436-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(1024, 1024);
+	screen.set_visarea(0, 544-1, 0, 436-1);
+	screen.set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
+	screen.set_palette(m_palette);
 
 	HD63484(config, "hd63484", XTAL(8'000'000)).set_addrmap(0, &sigmab52_state::jwildb52_hd63484_map);
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, m_palette).set_entries(16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-MACHINE_CONFIG_END
+	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*************************

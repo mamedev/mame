@@ -51,7 +51,7 @@ private:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	required_device<fd1793_device> m_fdc;
+	required_device<wd2793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;

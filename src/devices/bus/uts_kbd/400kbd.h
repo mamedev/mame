@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_BUS_UTS_400KBD_H
-#define MAME_BUS_UTS_400KBD_H
+#ifndef MAME_BUS_UTS_KBD_400KBD_H
+#define MAME_BUS_UTS_KBD_400KBD_H
 
 #pragma once
 
@@ -41,4 +41,4 @@ private:
 
 DECLARE_DEVICE_TYPE(UTS_400_KEYBOARD, uts_400_keyboard_device)
 
-#endif // MAME_BUS_UTS_400KBD_H
+#endif // MAME_BUS_UTS_KBD_400KBD_H

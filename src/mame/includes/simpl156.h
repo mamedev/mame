@@ -46,26 +46,23 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<okim6295_device> m_okimusic;
 	/* memory pointers */
-	std::unique_ptr<uint16_t[]>  m_pf1_rowscroll;
-	std::unique_ptr<uint16_t[]>  m_pf2_rowscroll;
-	required_shared_ptr<uint32_t> m_mainram;
-	required_shared_ptr<uint32_t> m_systemram;
+	std::unique_ptr<u16[]>  m_rowscroll[2];
+	required_shared_ptr<u32> m_mainram;
+	required_shared_ptr<u32> m_systemram;
 	optional_device<decospr_device> m_sprgen;
 	required_device<palette_device> m_palette;
-	std::unique_ptr<uint16_t[]> m_spriteram;
+	std::unique_ptr<u16[]> m_spriteram;
 	size_t m_spriteram_size;
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
-	DECLARE_WRITE32_MEMBER(simpl156_eeprom_w);
-	DECLARE_READ32_MEMBER(simpl156_spriteram_r);
-	DECLARE_WRITE32_MEMBER(simpl156_spriteram_w);
-	DECLARE_READ32_MEMBER(simpl156_mainram_r);
-	DECLARE_WRITE32_MEMBER(simpl156_mainram_w);
-	DECLARE_READ32_MEMBER(simpl156_pf1_rowscroll_r);
-	DECLARE_WRITE32_MEMBER(simpl156_pf1_rowscroll_w);
-	DECLARE_READ32_MEMBER(simpl156_pf2_rowscroll_r);
-	DECLARE_WRITE32_MEMBER(simpl156_pf2_rowscroll_w);
+	void eeprom_w(u32 data);
+	u32 spriteram_r(offs_t offset);
+	void spriteram_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 mainram_r(offs_t offset);
+	void mainram_w(offs_t offset, u32 data, u32 mem_mask);
+	template<unsigned Layer> u32 rowscroll_r(offs_t offset);
+	template<unsigned Layer> void rowscroll_w(offs_t offset, u32 data, u32 mem_mask);
 	DECLARE_READ32_MEMBER(joemacr_speedup_r);
 	DECLARE_READ32_MEMBER(chainrec_speedup_r);
 	DECLARE_READ32_MEMBER(prtytime_speedup_r);
@@ -73,8 +70,8 @@ private:
 	DECLARE_READ32_MEMBER(osman_speedup_r);
 
 	virtual void video_start() override;
-	uint32_t screen_update_simpl156(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(simpl156_vbl_interrupt);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt);
 
 	void chainrec_map(address_map &map);
 	void joemacr_map(address_map &map);

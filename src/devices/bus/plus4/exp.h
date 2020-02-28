@@ -58,7 +58,7 @@
 class device_plus4_expansion_card_interface;
 
 class plus4_expansion_slot_device : public device_t,
-									public device_slot_interface,
+									public device_single_card_slot_interface<device_plus4_expansion_card_interface>,
 									public device_image_interface
 {
 public:
@@ -80,35 +80,33 @@ public:
 	auto aec_wr_callback() { return m_write_aec.bind(); }
 
 	// computer interface
-	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
-	void cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
+	uint8_t cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
+	void cd_w(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
 
 	// cartridge interface
-	DECLARE_READ8_MEMBER( dma_cd_r ) { return m_read_dma_cd(offset); }
-	DECLARE_WRITE8_MEMBER( dma_cd_w ) { m_write_dma_cd(offset, data); }
+	uint8_t dma_cd_r(offs_t offset) { return m_read_dma_cd(offset); }
+	void dma_cd_w(offs_t offset, uint8_t data) { m_write_dma_cd(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( aec_w ) { m_write_aec(state); }
 	int phi2() { return clock(); }
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "plus4_cart"; }
-	virtual const char *file_extensions() const override { return "rom,bin"; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "plus4_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "rom,bin"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
@@ -124,7 +122,7 @@ protected:
 
 // ======================> device_plus4_expansion_card_interface
 
-class device_plus4_expansion_card_interface : public device_slot_card_interface
+class device_plus4_expansion_card_interface : public device_interface
 {
 	friend class plus4_expansion_slot_device;
 
@@ -133,8 +131,8 @@ public:
 	virtual ~device_plus4_expansion_card_interface();
 
 	// runtime
-	virtual uint8_t plus4_cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { return data; }
-	virtual void plus4_cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { }
+	virtual uint8_t plus4_cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { return data; }
+	virtual void plus4_cd_w(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { }
 
 protected:
 	device_plus4_expansion_card_interface(const machine_config &mconfig, device_t &device);

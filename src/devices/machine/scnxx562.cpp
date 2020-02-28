@@ -732,7 +732,7 @@ void duscc_channel::device_timer(emu_timer &timer, device_timer_id id, int param
 			m_ictsr |= REG_ICTSR_ZERO_DET; // set zero detection bit
 
 			// Generate interrupt?
-			if ( ( (m_ctcr & REG_CTCR_ZERO_DET_INT) == 1 ) &&
+			if ( ( (m_ctcr & REG_CTCR_ZERO_DET_INT) == REG_CTCR_ZERO_DET_INT ) &&
 					( (m_uart->m_icr & (m_index == duscc_device::CHANNEL_A ? duscc_device::REG_ICR_CHA : duscc_device::REG_ICR_CHB) ) != 0) )
 			{
 				LOG("Zero Detect Interrupt pending\n");

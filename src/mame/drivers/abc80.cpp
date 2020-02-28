@@ -59,6 +59,11 @@ Notes:
     DIPSW1  -
     DIPSW2  -
 
+ROM checksum program:
+    10 FOR I%=0% TO 16383%
+    20 A%=A%+PEEK(I%)
+    30 NEXT I%
+    40 ;A%; I%
 */
 
 /*
@@ -71,6 +76,7 @@ Notes:
     - GeJo 80-column card
     - Mikrodatorn 64K expansion
     - Metric ABC CAD 1000
+    - ROMs with checksum 10042
 
 */
 
@@ -449,7 +455,7 @@ void abc80_state::machine_start()
 	save_item(NAME(m_tape_in_latch));
 }
 
-QUICKLOAD_LOAD_MEMBER( abc80_state, bac )
+QUICKLOAD_LOAD_MEMBER(abc80_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -482,10 +488,11 @@ QUICKLOAD_LOAD_MEMBER( abc80_state, bac )
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( abc80 )
+//  machine_config( abc80 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc80_state::abc80)
+void abc80_state::abc80(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(11'980'800)/2/2); // 2.9952 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc80_state::abc80_mem);
@@ -509,8 +516,6 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	m_csg->set_oneshot_params(CAP_U(0.1), RES_K(330));
 	m_csg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
-
 	// devices
 	Z80PIO(config, m_pio, XTAL(11'980'800)/2/2);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -520,18 +525,19 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("abc80_cass");
 
 	ABC80_KEYBOARD(config, m_kb, 0);
 	m_kb->keydown_wr_callback().set(FUNC(abc80_state::keydown_w));
 
-	ABCBUS_SLOT(config, ABCBUS_TAG, XTAL(11'980'800)/2/2, abc80_cards, "abcexp");
+	ABCBUS_SLOT(config, m_bus, XTAL(11'980'800)/2/2, abc80_cards, "abcexp");
 
 	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
 	keyboard.set_keyboard_callback(FUNC(abc80_state::kbd_w));
 
-	MCFG_QUICKLOAD_ADD("quickload", abc80_state, bac, "bac", 2)
+	QUICKLOAD(config, "quickload", "bac", attotime::from_seconds(2)).set_load_callback(FUNC(abc80_state::quickload_cb));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("16K");
@@ -539,7 +545,7 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	// software list
 	SOFTWARE_LIST(config, "cass_list").set_original("abc80_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("abc80_flop");
-MACHINE_CONFIG_END
+}
 
 
 
@@ -553,13 +559,13 @@ MACHINE_CONFIG_END
 
 ROM_START( abc80 )
 	ROM_REGION( 0x4000, Z80_TAG, 0 )
-	ROM_DEFAULT_BIOS("v2")
-	ROM_SYSTEM_BIOS( 0, "v1", "V1" )
+	ROM_DEFAULT_BIOS("9913")
+	ROM_SYSTEM_BIOS( 0, "11273", "Checksum 11273" )
 	ROMX_LOAD( "3506_3.a5", 0x0000, 0x1000, CRC(7c004fb6) SHA1(9aee1d085122f4537c3e6ecdab9d799bd429ef52), ROM_BIOS(0) )
 	ROMX_LOAD( "3507_3.a3", 0x1000, 0x1000, CRC(d1850a84) SHA1(f7719f3af9173601a2aa23ae38ae00de1a387ad8), ROM_BIOS(0) )
 	ROMX_LOAD( "3508_3.a4", 0x2000, 0x1000, CRC(b55528e9) SHA1(3e5017e8cacad1f13215242f1bbd89d1d3eee131), ROM_BIOS(0) )
 	ROMX_LOAD( "3509_3.a2", 0x3000, 0x1000, CRC(659cab1e) SHA1(181db748cef22cdcccd311a60aa6189c85343db7), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "v2", "V2" )
+	ROM_SYSTEM_BIOS( 1, "9913", "Checksum 9913" )
 	ROMX_LOAD( "3506_3_v2.a5", 0x0000, 0x1000, CRC(e2afbf48) SHA1(9883396edd334835a844dcaa792d29599a8c67b9), ROM_BIOS(1) )
 	ROMX_LOAD( "3507_3_v2.a3", 0x1000, 0x1000, CRC(d224412a) SHA1(30968054bba7c2aecb4d54864b75a446c1b8fdb1), ROM_BIOS(1) )
 	ROMX_LOAD( "3508_3_v2.a4", 0x2000, 0x1000, CRC(1502ba5b) SHA1(5df45909c2c4296e5701c6c99dfaa9b10b3a729b), ROM_BIOS(1) )

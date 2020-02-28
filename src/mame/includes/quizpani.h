@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/nmk112.h"
+#include "tilemap.h"
 
 class quizpani_state : public driver_device
 {

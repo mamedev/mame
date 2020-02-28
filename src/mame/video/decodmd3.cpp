@@ -74,7 +74,7 @@ WRITE16_MEMBER( decodmd_type3_device::crtc_address_w )
 {
 	if(ACCESSING_BITS_8_15)
 	{
-		m_mc6845->address_w(space,offset,data >> 8);
+		m_mc6845->address_w(data >> 8);
 		m_crtc_index = data >> 8;
 	}
 }
@@ -82,7 +82,7 @@ WRITE16_MEMBER( decodmd_type3_device::crtc_address_w )
 READ16_MEMBER( decodmd_type3_device::crtc_status_r )
 {
 	if(ACCESSING_BITS_8_15)
-		return m_mc6845->register_r(space,offset);
+		return m_mc6845->register_r();
 	else
 		return 0xff;
 }
@@ -93,7 +93,7 @@ WRITE16_MEMBER( decodmd_type3_device::crtc_register_w )
 	{
 		if(m_crtc_index == 9)  // hack!!
 			data -= 0x100;
-		m_mc6845->register_w(space,offset,data >> 8);
+		m_mc6845->register_w(data >> 8);
 		m_crtc_reg[m_crtc_index] = data >> 8;
 	}
 }
@@ -136,15 +136,15 @@ void decodmd_type3_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_cpu, XTAL(12'000'000));
 	m_cpu->set_addrmap(AS_PROGRAM, &decodmd_type3_device::decodmd3_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
-	TIMER(config, "irq_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(decodmd_type3_device::dmd_irq), this), attotime::from_hz(150));
+	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(decodmd_type3_device::dmd_irq), attotime::from_hz(150));
 
 	MC6845(config, m_mc6845, XTAL(12'000'000) / 4);  // TODO: confirm clock speed
 	m_mc6845->set_screen(nullptr);
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(16);
-	m_mc6845->set_update_row_callback(FUNC(decodmd_type3_device::crtc_update_row), this);
+	m_mc6845->set_update_row_callback(FUNC(decodmd_type3_device::crtc_update_row));
 
 	screen_device &screen(SCREEN(config, "dmd", SCREEN_TYPE_RASTER));
 	screen.set_native_aspect();

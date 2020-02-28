@@ -169,7 +169,7 @@ void abc99_device::device_add_mconfig(machine_config &config)
 	m_mousecpu->set_addrmap(AS_PROGRAM, &abc99_device::abc99_z5_mem);
 	//m_mousecpu->p1_in_cb().set(FUNC(abc99_device::z5_p1_r));
 	//m_mousecpu->p2_out_cb().set(FUNC(abc99_device::z5_p2_w));
-	//MCFG_MCS48_PORT_T0_CLK_CUSTOM() // Z2 CLK
+	//m_mousecpu->set_t0_clk_cb(); // Z2 CLK
 	//m_mousecpu->t1_in_cb().set(FUNC(abc99_device::z5_t1_r));
 	m_mousecpu->set_disable(); // HACK fix for broken serial I/O
 
@@ -383,7 +383,7 @@ INPUT_PORTS_START( abc99 )
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
 
 	PORT_START("J4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc99_device, keyboard_reset, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc99_device, keyboard_reset, 0)
 INPUT_PORTS_END
 
 

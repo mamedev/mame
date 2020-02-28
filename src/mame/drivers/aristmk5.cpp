@@ -34,8 +34,8 @@
        reelpwr, retrsama, retrsamb, rushrst, snowcat, swhr2a, thndh, thndha, thor, topbana,
        trpdlght, wamazona, wcougar, wildbill, wldangel
 
-    BIOS ROMs are actually nowhere to be found on a regular MK5 system, as the BIOS code is at the start of game ROMs U7 and U11.
-    Therefore, no BIOS system is required as it it built into each game, with the exception of casino software (see below).
+    BIOS ROMs are actually nowhere to be found on a regular MK5 system, as the BIOS code is at the start of game ROMs in U7 and U11.
+    Therefore, no BIOS system is required as it is built into each game, with the exception of casino software (see below).
     On most US machines, set chips are required to change the system configurations on a game by swapping them with the game ROMs in U7/U11.
 
     Casino versions actually do have a BIOS, otherwise known as a Base System, which is installed at U7/U11 at all times.
@@ -48,7 +48,7 @@
     The Brazilian casino BIOS does not use comms, therefore qnilebr is playable. By swapping u7/u11 with the other
     casino games (goldpyrb/jungjuic/penpir2), these games also become playable.
 
-    chickna5ql, bumblbugql and the 0700474V casino BIOS all use QCOM, blackpnt uses VLC (Video Lottery Consultants) comms instead.
+    Queensland games and the 0700474V casino BIOS all use QCOM, blackpnt uses VLC (Video Lottery Consultants) comms instead.
 
     Diamond Touch, Dream Weaver, Magic Touch and the New Zealand games have an autoplay option.
     The New Zealand games have this enabled by default in the options, whereas on the NSW games it is disabled by default.
@@ -100,8 +100,9 @@
     List of Hyperlink systems/themes on MK5 hardware:
     Cash Express - Train theme.
     Penguin Pucks - Arctic/Antarctic theme, based on Cash Express.
-    Maximillions - Game show style theme, stylized as Maximillion$. A similar game for the US market is Millioniser, stylized as Millioni$er.
+    Maximillions - Game show style theme, stylized as Maximillion$. A similar game for the US market is Millioniser, stylized as Millioni$er, however this may only be on later hardware.
     Scorchin' Fortune - Sports car/racing theme, based on Cash Express.
+    Fast Lane - Same theme as Scorchin' Fortune but the jackpot feature is slightly different.
     Born To Be Wild - Motorcycle theme, based on Cash Express, later recycled on MK6 hardware as Thunderheart (not to be confused with the game Thunder Heart).
 
     Note: The Hyperlink jackpot feature trigger is won at random and is predetermined the instant the player has started a game.
@@ -128,7 +129,7 @@
     Queen of the Nile does not use this early prerecorded music in any of its variants.
 
     List of clones (identical games with different names and/or graphics):
-    Queen of the Nile = Golden Pyramids = Dolphin Treasure = Adonis = Geisha (note that Adonis has a slightly different symbol layout for reel 1, but the symbol frequency is still identical)
+    Queen of the Nile = Golden Pyramids = Dolphin Treasure = Beyond the Reef (undumped) = Adonis = Geisha (note that Adonis has a slightly different symbol layout for reel 1, but the symbol frequency is still identical)
     Sweethearts II = Heart Throb = Desert Bloom = Tropical Delight = Coral Riches II
     Phantom Pays = Enchanted Forest = Magic Garden = Lucky Clover = The Gambler = Thunder Heart (9 line) = Mountain Money (9 line)
     Diamond Touch = Magic Mask = Party Gras = Diamond Destiny
@@ -167,10 +168,10 @@
 
     Standard NSW/ACT games and similar non-US games, including Holland and Venezuela:
 
-    Step 1: Audit key in (F2), open the main door (M) and press Reserve (A) and the fourth line button (G) together to clear the memory.
+    Step 1: Audit key in (F2), press Reserve (A) and the fourth line button (G) together to clear the memory. Some games may require the main door to be open (press M) prior to clearing.
     Note: On 3-payline games, press Reserve (A) and Bet 1 Credit (E) to clear the memory.
 
-    Optionally, the main door can be closed from this point on (press M again).
+    If open, the main door can be closed from this point on (press M again).
 
     Step 2: Enter Operator Setup -> Machine Options
 
@@ -194,7 +195,7 @@
     Note: To disable both the hopper and forced hand pay on cashout, change both the Collect Limit and Hopper Refill to $0.00.
     Disabling this setting will allow hand pays but still allow the player to continue if they inadvertently hit Collect.
     To perform a hand pay or jackpot reset (e.g. after a Hyperlink feature), press (V) to allow the game to enter play mode.
-    Note that in some games such as Treasure Trove (trstrove), the collect options are been moved to Operator Setup -> Set Collect Limit rather than in Machine Options.
+    Note that in some games such as Treasure Trove (trstrove), the collect options are moved to Operator Setup -> Set Collect Limit rather than in Machine Options.
 
 
     New Zealand non-casino games, and most NSW/ACT touchscreen games:
@@ -212,7 +213,8 @@
     and have smaller but more frequent payouts due to gambling laws which limit the maximum possible win per bought game to $500.00. CCCE comms is not used on New Zealand machines.
 
 
-    Queensland games:
+    Queensland games, older types:
+    bumblbugql, chickna5ql
 
     Audit key in, press Reserve (A) and the fourth line button (G) together to clear the memory.
     The game will automatically enter the Machine Options menu where you can change the QCOM poll address, serial number, denomination and bill acceptor settings.
@@ -223,8 +225,19 @@
     Note 2: As the QCOM protocol is not yet emulated, the games are not playable since they automatically disable themselves after timing out.
 
 
+    Queensland games, newer types:
+    dolphntrql, indrema5ql, qnilefl, qnileql, reelrockql
+
+    Audit key in, press Collect (Q) and the fourth line button (G) together to clear the memory.
+    The game will automatically enter the Machine Options menu where you can change the serial number (it cannot be zero) and enable/disable the bill acceptor.
+    Bill acceptor options should remain disabled until implemented in MAME, otherwise the machine will give a bill acceptor stacker error.
+    Press Collect (Q) to save changes, and key out (F2) to exit the menu.
+    Note 1: Once these settings have been saved, they cannot be changed unlike games from other regions as the Machine Options menu is hidden.
+    Note 2: As the QCOM protocol is not yet emulated, the games are not playable since they automatically disable themselves after timing out.
+
+
     Casino games using the New Zealand 0700474V base EPROMs:
-    Currently, this is limited to goldpyrb, jungjuic and penpir2. The games are universal (including qnilebr below, if you swap the base EPROMs), however the base is region coded.
+    Currently, this is limited to goldpyrb, jungjuic and penpir2 (and also qnilebr if you swap the base EPROMs). The games are universal (all regions), however the base is region coded.
 
     Step 1: Audit key in, press Service (A) and the fourth line button (G) together to clear the memory.
 
@@ -233,7 +246,7 @@
 
 
     Casino games using the Brazilian 0301718V base EPROMs:
-    Currently this is limited to qnilbr (and the above three casino games if you swap the base EPROMs).
+    Currently this is limited to qnilebr (and the above three casino games if you swap the base EPROMs).
 
     This is similar to the NSW/ACT games, however upon keying in (F2), it requires a four-digit setup code before it can be initialized.
     By default, this number is 4856. After the game has accepted this code, press Service (A) and Play 7 Lines (G) at the same time to clear the memory.
@@ -322,7 +335,7 @@
     Step 3: Now that we know the correct bet/line values and the set chip version it is time to swap the U7 and U11 game chips for the set chips.
 
     To do this in MAME, press Tab to open the menu and enter Machine Configuration and select an appropriate set chip with the left/right keys.
-    I use 4.04.09 for all games as it is the latest version supported in MAME; set chips are backward compatible with previous versions so they can also be used to set up older games (for example, cashchamu requires 4.00.xx).
+    It is best to use 4.04.09 for all games as it is the latest version supported in MAME; set chips are backward compatible with previous versions so they can also be used to set up older games (for example, cashchamu requires 4.00.xx).
     You should now be in the set chip menu (if not, hit F3).
 
     Press Service and Cashout together (Q+A) to reset the SRAM and enter the Version Menu.
@@ -339,7 +352,7 @@
 
     Jurisdiction: This option sets the various US regions or Bolivia, Peru/Sask, Puerto Rico or Uruguay.
     Each region has its own gambling laws and restrictions which is why there are so many options.
-    The set chip region with the least restrictions is actually Uruguay rather than a US state, as US slot machines are not allowed to store more than $1200.00 worth of credits and/or wins and wins in excess of the limit must be hand paid.
+    The set chip region with the least restrictions is actually Uruguay rather than a US state, as US slot machines are not allowed to store more than $1200.00 worth of credits and/or wins, and wins in excess of the limit must be hand paid.
 
     Cancel Residual Credit: Soft Lockup or Hard Lockup. Residual credits are credits below the minimum value which cannot be cashed out as coins or otherwise.
     A soft lockup allows the player to either call an attendant for a hand pay or continue playing, while a hard lockup requires a hand pay of the remaining credits.
@@ -347,7 +360,7 @@
     Gamble Feature: Toggle between Disabled or Enabled.
     The gamble feature is not available in the following regions: Arizona, California, Colorado, North Dakota, South Dakota, Wisconsin and Puerto Rico.
 
-    Bill Acceptor Protocol: (To be written later once emulated)
+    Bill Acceptor Protocol: (To be written once emulated)
     EFT/Bonus Transfer: Cashless/ticket acceptance options, not required in MAME.
 
     The following items are hard coded and cannot be changed:
@@ -577,11 +590,10 @@
 #include "machine/nvram.h"
 #include "machine/ins8250.h"
 #include "machine/ticket.h"
-#include "sound/volt_reg.h"
-#include "speaker.h"
 
 // Non-US button layouts    Bet buttons       Lines Gamble     Other
 #include "aristmk5.lh"   // 1, 2, 3, 5, 10    20    suits      Take Win/Start Feature
+#include "adonisce.lh"   // 1, 2, 3, 5, 10    20    suits      TW/SF, Cash Express buttons
 #include "baddog.lh"     // Video Poker
 #include "cashcatnz.lh"  // 1, 2, 3, 4, 5     9     suits      TW/SF, 7L or Autoplay
 #include "cashcham.lh"   // 1, 5, 10, 20, 25  20    suits
@@ -608,7 +620,7 @@
 #include "locoloota.lh"  // 1, 2, 5, 10, 20   9     suits
 #include "marmagic.lh"   // multiple configs  9/20  suits      TW/SF (different bets to dynajack/fortellr)
 #include "montree.lh"    // 1, 2, 3, 5, 12    20    suits      15L or Autoplay
-#include "mountmon.lh"   // 1, 5, 10, 25, 50  20    suits
+#include "mountmon.lh"   // 1, 5, 10, 25, 50  20    red/black
 #include "multidrw.lh"   // Video Poker (different to baddog)
 #include "mystgard.lh"   // 1, 2, 3, 4, 5     20    red/black
 #include "one4all.lh"    // 1, 2, 3, 5, 6     20    suits      TW/SF, 15L or Autoplay
@@ -625,22 +637,23 @@
 #include "qnilenl.lh"    // 1, 2, 3, 5, 10    9     red/black  TW/SF, Service
 #include "qtbird.lh"     // 1, 2, 3, 4, 5     9     red/black
 #include "reelrock.lh"   // 1, 2, 3, 5, 8     243   suits
+#include "retrsam.lh"    // 1, 2, 3           3     odds
 #include "retrsamb.lh"   // 1, 2, 3, 5, 10    9     odds
 #include "sbuk2.lh"      // 1, 2, 3, 4, 5     1     red/black  Single line game
 #include "sbuk3.lh"      // 1, 2, 3           3     odds       TW/SF
 #include "snowcat.lh"    // 1, 2, 3, 5, 10    9     suits
 #include "swhr2.lh"      // 1, 2, 3, 5, 10    9     red/black
-#include "tritreat.lh"   // multiple configs  9/20  suits      TW/SF (90 and 500 credit play)
-#include "trstrove.lh"   // 1, 2, 5, 10, 25   20    suits      Take Win/Start Feature
 #include "toutangonl.lh" // 1, 2, 3, 5, 10    9     red/black  Service
+#include "tritreat.lh"   // multiple configs  9/20  suits      TW/SF (90 and 500 credit play)
+#include "trstrove.lh"   // 1, 2, 5, 10, 25   20    suits      TW/SF
 #include "venicea5.lh"   // multiple configs  9/20  suits      TW/SF (different bets to dynajack/fortellr/marmagic)
 #include "wamazon.lh"    // 1, 2, 3           3     suits      Play Feature Game
 #include "wamazona.lh"   // 1, 2, 3, 5, 10    1     suits      Single line game
 #include "wcougar.lh"    // 1, 2, 5, 10, 20   9     red/black
 #include "wikwin.lh"     // 1, 2, 3, 4        243   suits      Max Bet button
 #include "wildbill.lh"   // 1, 2, 3           3     suits
-#include "wtiger.lh"     // 1, 2, 3, 5, 10    20    suits      Classic Buy Feature
 #include "wizways.lh"    // 1, 2, 5, 10, 20   243   suits
+#include "wtiger.lh"     // 1, 2, 3, 5, 10    20    suits      Classic Buy Feature
 #include "yukongl5.lh"   // multiple configs  20    suits      TW/SF
 
 // US button layouts             Lines  Bet buttons     Max bet(s)                    Other
@@ -652,8 +665,10 @@
 #include "cashchamu.lh"       // 20     multiple        60, 100, 200, 400, 500, 1000  Different layout on 3 credit setup
 #include "dolphntrceb.lh"     // 20     multiple        60, 100, 200, 400, 500, 1000  Different bets to bparty, cashchamu and pengpuck
 #include "magimaska.lh"       // 9      multiple        45, 90, 180
+#include "marmagicu.lh"       // 9      multiple        45, 90, 180                   Same bet buttons as magimaska but with Start Feature button
+#include "pengpayce.lh"       // 9      multiple        27, 45, 90, 180, 225, 450     Different layout to cuckoou
 #include "pengpuck.lh"        // 20     multiple        60, 100, 200, 400, 500, 1000  Slightly different layout to dolphntrceb
-#include "qnilecea.lh"        // 9      multiple        27, 45, 90, 180, 225, 450     Same bet buttons as dolphntrceb but with 9 lines
+#include "qnilecea.lh"        // 9      multiple        27, 45, 90, 180, 225, 450     Same bet buttons as pengpayce but with Start Feature button
 #include "swhr2u.lh"          // 5      1, 2, 3, 4, 5   25
 #include "wnpost.lh"          // 5      1, 2, 3, 5, 10  50
 
@@ -687,7 +702,7 @@ public:
 	INPUT_CHANGED_MEMBER(coin_start);
 	CUSTOM_INPUT_MEMBER(coin_r);
 	CUSTOM_INPUT_MEMBER(coin_usa_r);
-	CUSTOM_INPUT_MEMBER(hopper_r);
+	DECLARE_READ_LINE_MEMBER(hopper_r);
 
 private:
 	DECLARE_WRITE32_MEMBER(Ns5w48);
@@ -1138,7 +1153,7 @@ void aristmk5_state::aristmk5_map(address_map &map)
 
 	map(0x03320000, 0x0333ffff).rw(FUNC(aristmk5_state::sram_r), FUNC(aristmk5_state::sram_w)).umask32(0x000000ff);
 
-	map(0x03400000, 0x035fffff).w(FUNC(aristmk5_state::archimedes_vidc_w));
+	map(0x03400000, 0x035fffff).w(m_vidc, FUNC(acorn_vidc10_device::write));
 	map(0x03600000, 0x037fffff).w(FUNC(aristmk5_state::archimedes_memc_w));
 	map(0x03800000, 0x039fffff).w(FUNC(aristmk5_state::archimedes_memc_page_w));
 
@@ -1196,7 +1211,7 @@ void aristmk5_state::aristmk5_drame_map(address_map &map)
 }
 
 
-CUSTOM_INPUT_MEMBER(aristmk5_state::hopper_r)
+READ_LINE_MEMBER(aristmk5_state::hopper_r)
 {
 	return (m_hopper_test && m_hopper->line_r()) ? 0 : 1;
 }
@@ -1264,12 +1279,15 @@ INPUT_CHANGED_MEMBER(aristmk5_state::coin_start)
 static INPUT_PORTS_START( aristmk5_usa )
 	/* This simulates the ROM swap */
 	PORT_START("ROM_LOAD")
-	PORT_CONFNAME( 0x07, 0x04, "System Mode" )
+	PORT_CONFNAME( 0x07, 0x07, "System Mode" )
 	PORT_CONFSETTING(    0x00, "USA Set Chip v4.04.09 Mode" )
 	PORT_CONFSETTING(    0x01, "USA Set Chip v4.04.08 Mode" )
-	PORT_CONFSETTING(    0x02, "USA Set Chip v4.04.00 Mode" )
-	PORT_CONFSETTING(    0x03, "USA Set Chip v4.02.04 Mode" )
-	PORT_CONFSETTING(    0x04, "Game Mode" )
+	PORT_CONFSETTING(    0x02, "USA Set Chip v4.04.05 Mode" )
+	PORT_CONFSETTING(    0x03, "USA Set Chip v4.04.00 Mode" )
+	PORT_CONFSETTING(    0x04, "USA Set Chip v4.03.07 Mode" )
+	PORT_CONFSETTING(    0x05, "USA Set Chip v4.02.04 Mode" )
+	PORT_CONFSETTING(    0x06, "USA Set Chip v1.0 Mode" )
+	PORT_CONFSETTING(    0x07, "Game Mode" )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME(0x0f, 0x0f, "Bank 1 - Denomination Values: Coin Value")
@@ -1368,7 +1386,7 @@ static INPUT_PORTS_START( aristmk5_usa )
 	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR)  PORT_CODE(KEYCODE_C) PORT_TOGGLE PORT_NAME("Cashbox door")
 
 	PORT_START("P4")
-	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_usa_r, nullptr)
+	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(aristmk5_state, coin_usa_r)
 
 	PORT_START("P5")
 	PORT_BIT(0x00000008, IP_ACTIVE_LOW,  IPT_OTHER)   // Meters
@@ -1378,7 +1396,7 @@ static INPUT_PORTS_START( aristmk5_usa )
 
 	PORT_START("EXTRA")
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_TOGGLE PORT_CODE(KEYCODE_L)   PORT_NAME("Logic door")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, aristmk5_state, coin_start, nullptr)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, aristmk5_state, coin_start, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( aristmk5 )
@@ -1422,14 +1440,14 @@ static INPUT_PORTS_START( aristmk5 )
 	PORT_BIT(0x00c00000, IP_ACTIVE_HIGH, IPT_UNUSED)  // Unused mechanical security switch
 
 PORT_START("P3")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, hopper_r, nullptr)
-	PORT_BIT(0x000000f8, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_r, nullptr)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_READ_LINE_MEMBER(aristmk5_state, hopper_r)
+	PORT_BIT(0x000000f8, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(aristmk5_state, coin_r)
 
 	PORT_START("P6")
 	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_OTHER)    // Battery
 
 	PORT_START("EXTRA")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, aristmk5_state, coin_start, nullptr)
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, aristmk5_state, coin_start, 0)
 INPUT_PORTS_END
 
 /********** Game-specific button labels **********/
@@ -2240,7 +2258,7 @@ void aristmk5_state::machine_reset()
 
 		if (ioport("ROM_LOAD") != nullptr)
 		{
-			static const char *const rom_region[] = { "set_4.04.09", "set_4.04.08", "set_4.04.00", "set_4.02.04", "game_prg" };
+			static const char *const rom_region[] = { "set_4.04.09", "set_4.04.08", "set_4.04.05", "set_4.04.00", "set_4.03.07", "set_4.02.04", "set_1.0", "game_prg" };
 
 			uint8_t op_mode = ioport("ROM_LOAD")->read();
 
@@ -2274,14 +2292,12 @@ void aristmk5_state::aristmk5(machine_config &config)
 	/* TODO: this isn't supposed to access a keyboard ... */
 	AAKART(config, m_kart, 12000000/128); // TODO: frequency
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(640, 400);
-	m_screen->set_visarea(0, 640-1, 0, 400-1);
-	m_screen->set_screen_update(FUNC(archimedes_state::screen_update));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	PALETTE(config, m_palette).set_entries(0x200);
+	ACORN_VIDC10(config, m_vidc, MASTER_CLOCK/3);
+	m_vidc->set_screen("screen");
+	m_vidc->vblank().set(FUNC(aristmk5_state::vblank_irq));
+	m_vidc->sound_drq().set(FUNC(aristmk5_state::sound_drq));
 
 	EEPROM_93C56_16BIT(config, m_eeprom[0]);
 	EEPROM_93C56_16BIT(config, m_eeprom[1]);
@@ -2317,22 +2333,6 @@ void aristmk5_state::aristmk5(machine_config &config)
 	DS1302(config, m_rtc, 32.768_kHz_XTAL);
 
 	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
-
-	SPEAKER(config, "speaker").front_center();
-	for (int i = 0; i < 8; i++)
-	{
-		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(0, "speaker", 0.1); // unknown DAC
-	}
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
-	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac0", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac3", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac4", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac4", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac5", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac5", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac6", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac6", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac7", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac7", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -2364,15 +2364,24 @@ void aristmk5_state::aristmk5_usa_touch(machine_config &config)
 	ROM_REGION( 0x400000, "set_4.04.09", ROMREGION_ERASEFF ) /* setchip v4.04.09 4meg */ \
 	ROM_LOAD32_WORD( "setchip v4.04.09.u7",  0x000000, 0x80000, CRC(e8e8dc75) SHA1(201fe95256459ce34fdb6f7498135ab5016d07f3) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.09.u11", 0x000002, 0x80000, CRC(ff7a9035) SHA1(4352c4336e61947c555fdc80c61f944076f64b64) ) \
-	ROM_REGION( 0x400000, "set_4.04.08", ROMREGION_ERASEFF ) /* setchip v4.04.08 4meg */ \
+	ROM_REGION( 0x400000, "set_4.04.08", ROMREGION_ERASEFF ) /* setchip v4.04.08 4meg (27c4096) */ \
 	ROM_LOAD32_WORD( "setchip v4.04.08.u7",  0x000000, 0x80000, CRC(7c4b7fe4) SHA1(39dd39c794c0cb6abc1b7503650643a8131468d1) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.08.u11", 0x000002, 0x80000, CRC(d3234a28) SHA1(8ff112ee4aadf1d359ca8ffe0cfa9c7400aa0595) ) \
+	ROM_REGION( 0x400000, "set_4.04.05", ROMREGION_ERASEFF ) /* setchip v4.04.05 4meg */ \
+	ROM_LOAD32_WORD( "setchip v4.04.05.u7",  0x000000, 0x80000, CRC(e7b39a73) SHA1(e826d717a0871383394e15634896fcb2e2bdeb75) ) \
+	ROM_LOAD32_WORD( "setchip v4.04.05.u11", 0x000002, 0x80000, CRC(2fc9b2a0) SHA1(89191f02c4ec8089e26989430806650d14e13e5a) ) \
 	ROM_REGION( 0x400000, "set_4.04.00", ROMREGION_ERASEFF ) /* setchip v4.04.00 4meg 42pin */ \
 	ROM_LOAD32_WORD( "setchip v4.04.00.u7",  0x000000, 0x80000, CRC(2453137e) SHA1(b59998e75ae3924da16faf47b9cfe9afd60d810c) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.00.u11", 0x000002, 0x80000, CRC(82dfa12a) SHA1(86fd0f0ad8d5d1bc503392a40bbcdadb055b2765) ) \
+	ROM_REGION( 0x400000, "set_4.03.07", ROMREGION_ERASEFF ) /* setchip v4.03.07 4meg */ \
+	ROM_LOAD32_WORD( "setchip v4.03.07.u7",  0x000000, 0x80000, CRC(5cf56036) SHA1(ff11deb6f76627f4fb5a7ec789e4071887e3eae9) ) \
+	ROM_LOAD32_WORD( "setchip v4.03.07.u11", 0x000002, 0x80000, CRC(637de9b9) SHA1(4b5c974fd4c1d1a21f83bdc03d8bc5013d4a40ea) ) \
 	ROM_REGION( 0x400000, "set_4.02.04", ROMREGION_ERASEFF ) /* setchip v4.02.04 */ \
 	ROM_LOAD32_WORD( "setchip v4.02.04.u7",  0x000000, 0x80000, CRC(5a254b22) SHA1(8444f237b392df2a3cb42ea349e7af32f47dd544) ) \
-	ROM_LOAD32_WORD( "setchip v4.02.04.u11", 0x000002, 0x80000, CRC(def36617) SHA1(c7ba5b08e884a8fb36c9fb51c08e243e32c81f89) )
+	ROM_LOAD32_WORD( "setchip v4.02.04.u11", 0x000002, 0x80000, CRC(def36617) SHA1(c7ba5b08e884a8fb36c9fb51c08e243e32c81f89) ) \
+	ROM_REGION( 0x400000, "set_1.0",     ROMREGION_ERASEFF ) /* setchip v1.0 4meg */ \
+	ROM_LOAD32_WORD( "setchip v1.0.u7",      0x000000, 0x80000, CRC(16c2828d) SHA1(87218a76bb2791bce27b4b8ab341ba73cbbf6ffe) ) \
+	ROM_LOAD32_WORD( "setchip v1.0.u11",     0x000002, 0x80000, CRC(a969f12b) SHA1(fc6d234ce1f5c6b5aceb97b73aad60144352023b) )
 
 #define ARISTOCRAT_MK5_GALS \
 	ROM_REGION( 0x600, "gals", 0 ) \
@@ -2394,7 +2403,7 @@ ROM_START( aristmk5 )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
@@ -2420,7 +2429,7 @@ ROM_START( adonis )
 	ROM_LOAD32_WORD( "0200751v.u12", 0x100002, 0x80000, CRC(443a7b6d) SHA1(c19a1c50fb8774826a1e12adacba8bbfce320891) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2445,7 +2454,7 @@ ROM_START( adonisa )
 	ROM_LOAD32_WORD( "0100751v.u12", 0x100002, 0x80000, CRC(77090858) SHA1(76ebc15b26f378ac95276f0aa26d077e3646a6f1) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2472,7 +2481,7 @@ ROM_START( adonisu )
 	ROM_LOAD32_WORD( "bhg1508.u12", 0x100002, 0x80000, CRC(b8995b25) SHA1(ad39ad11dc02dbbe8be99d81c96e9fc3191726ad) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2500,7 +2509,7 @@ ROM_START( adonisce )
 	ROM_LOAD32_WORD( "0201005v.u13", 0x200002, 0x80000, CRC(e005a7e8) SHA1(cbb313f5d1d04c5a441b3f92b7a90a281ddb4885) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2530,7 +2539,7 @@ ROM_START( alchemst )
 	ROM_LOAD32_WORD( "01j02046.u13", 0x200002, 0x80000, CRC(6b791adf) SHA1(f00923101f926034603243a3c63e1010b044829e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2557,7 +2566,7 @@ ROM_START( baddog )
 	ROM_LOAD32_WORD( "0200428v.u13", 0x200002, 0x80000, CRC(883b2ec3) SHA1(5b431d8c9c8eabca65ab22dcf2bdb22d49445bb1) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2583,7 +2592,7 @@ ROM_START( blackpnt )
 	ROM_LOAD32_WORD( "0200818v.u12", 0x100002, 0x80000, BAD_DUMP CRC(bb2bf7bb) SHA1(f88208238a69fc79e33af17f39e25cd2857d7172) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2611,7 +2620,7 @@ ROM_START( bootsctn )
 	ROM_LOAD32_WORD( "0100812v.u14", 0x300002, 0x80000, CRC(75b9b89e) SHA1(08d487b3722f2ea5d2d18c78f571a44c78616dbe) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2644,7 +2653,7 @@ ROM_START( bootsctnu )
 	ROM_LOAD32_WORD( "ghg101202.u14", 0x300002, 0x80000, CRC(18934c51) SHA1(f7c9c95c687dbfe89747e7877157fde37bc1119e) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2673,7 +2682,7 @@ ROM_START( bootsctnua )
 	ROM_LOAD32_WORD( "ghg100803.u14", 0x300002, 0x80000, CRC(9759692e) SHA1(7666027e21af27329720127367a780776973c515) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2703,7 +2712,7 @@ ROM_START( bootsctnub )
 	ROM_LOAD32_WORD( "ahg1547.u14", 0x300002, 0x80000, CRC(de2888e2) SHA1(f614d68c0e09912e9126cb024f54ed32ee50b57e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2735,7 +2744,7 @@ ROM_START( bparty )
 	ROM_LOAD32_WORD( "bhg1248.u14", 0x300002, 0x80000, CRC(b276d61a) SHA1(8bee7fa551caec3da03afa061612c153f7b48cdb) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2759,7 +2768,7 @@ ROM_START( bpartya )
 	ROM_LOAD32_WORD( "bhg1579.u14", 0x300002, 0x7ff94, BAD_DUMP CRC(34ffe312) SHA1(34432e57e2e3dd90c15dd3ff7cb16d8381343be8) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2781,7 +2790,7 @@ ROM_START( bumblbug )
 	ROM_LOAD32_WORD( "0200510v.u11", 0x000002, 0x80000, CRC(5d888245) SHA1(bbbe61e09bebd5fcb79f060d5caee15100c9a685) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2806,7 +2815,7 @@ ROM_START( bumblbugql )
 	ROM_LOAD32_WORD( "0200456v.u12", 0x100002, 0x80000, CRC(9f0d7615) SHA1(1453b1476510e1dd68bc14feba72dc59b9dfe676) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2835,7 +2844,7 @@ ROM_START( bumblbugu )
 	ROM_LOAD32_WORD( "chg047903.u12", 0x100002, 0x80000, CRC(7dbb634b) SHA1(f7a752240989032af142f4cd6e4260a12a5b4c0a) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2865,7 +2874,7 @@ ROM_START( bumblbugua )
 	ROM_LOAD32_WORD( "chg047999.u12", 0x100002, 0x80000, CRC(7dbb634b) SHA1(f7a752240989032af142f4cd6e4260a12a5b4c0a) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2890,7 +2899,7 @@ ROM_START( buttdeli )
 	ROM_LOAD32_WORD( "0200143v.u12", 0x100002, 0x80000, CRC(0d58cf28) SHA1(aa65b7ee88b5bc872008a46e60bd49d9e5eda153) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2909,7 +2918,7 @@ ROM_START( canrose )
 	ROM_LOAD32_WORD( "ahg1463.u12", 0x100002, 0x7f4fc, CRC(5fe736c2) SHA1(d7c1a3f003085848e413aa499d9eaecca74773da) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2934,7 +2943,7 @@ ROM_START( cashcat )
 	ROM_LOAD32_WORD( "0100676v.u12", 0x100002, 0x80000, CRC(a7199f5f) SHA1(6a46935c095b1d89307921e3a53b48032e6f45fa) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2959,7 +2968,7 @@ ROM_START( cashcata )
 	ROM_LOAD32_WORD( "0100557v.u12", 0x100002, 0x80000, CRC(bdeeafd3) SHA1(a95a44ff8534bb030d696a37821f3e53072f2947) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2977,7 +2986,7 @@ ROM_START( cashcatnz )
 	ROM_LOAD32_WORD( "0300863v.u12", 0x100002, 0x80000, CRC(f930fc07) SHA1(cb3fdbd5b87af7b14067f7999740470d3cf434df) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3002,7 +3011,7 @@ ROM_START( cashcham )
 	ROM_LOAD32_WORD( "0100438v.u12", 0x100002, 0x80000, CRC(7ae3b5db) SHA1(238698b72f529ac4fb292d08267069d1da01b43b) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3027,7 +3036,7 @@ ROM_START( cashchama )
 	ROM_LOAD32_WORD( "0200437v.u12", 0x100002, 0x80000, CRC(571aab82) SHA1(03895d1a08d2dd868fd594db1aaeb29b295f0d98) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3045,7 +3054,7 @@ ROM_START( cashchamnz )
 	ROM_LOAD32_WORD( "0300781v.u12", 0x100002, 0x80000, CRC(2aeb0265) SHA1(50e526ecccfdd35f7e156e1873cf4c81fb117069) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3073,7 +3082,7 @@ ROM_START( cashchamu )
 	ROM_LOAD32_WORD( "dhg407899.u12", 0x100002, 0x80000, CRC(2fd087f8) SHA1(f16414abf58e1a7a8ca08380993bdeca6f9c7317) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3098,7 +3107,7 @@ ROM_START( cashcra5 )
 	ROM_LOAD32_WORD( "0300467v.u12", 0x100002, 0x80000, CRC(570c7f8a) SHA1(7c9527e0b37970b7960c723727c3c650a48e8125) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3116,7 +3125,7 @@ ROM_START( cashcra5a )
 	ROM_LOAD32_WORD( "0300447v.u12", 0x100002, 0x7fe36, BAD_DUMP CRC(ef641efa) SHA1(52e54ed933352cde0f280ba2b3e9bae01c4aae7e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3141,7 +3150,7 @@ ROM_START( chariotc )
 	ROM_LOAD32_WORD( "0100787v.u12", 0x100002, 0x80000, CRC(b44cf571) SHA1(04447820e015425493cade5611b3eb2f21e48c2e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3168,7 +3177,7 @@ ROM_START( chariotcv )
 	ROM_LOAD32_WORD( "04j00714.u12", 0x100002, 0x80000, CRC(b8d4a5ec) SHA1(097e44cdb30b9aafd7f5358c8f0cdd130ec0615e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3196,7 +3205,7 @@ ROM_START( checkma5 )
 	ROM_LOAD32_WORD( "01j00681.u13", 0x200002, 0x80000, CRC(ad12a718) SHA1(0c36729cb8da800668f533f65fcc870f5dfc0f6a) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3222,7 +3231,7 @@ ROM_START( chickna5 )
 	ROM_LOAD32_WORD( "0100351v.u13", 0x200002, 0x80000, CRC(88a1ccae) SHA1(e242f48f99044b4fdf1bf36d8e105df09f94aa50) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3251,7 +3260,7 @@ ROM_START( chickna5ql )
 	ROM_LOAD32_WORD( "0200530v.u14", 0x300002, 0x80000, CRC(e87cf6c9) SHA1(a330644658da6100d7231b1c47260dc7f2e88448) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3286,7 +3295,7 @@ ROM_START( chickna5u )
 	ROM_LOAD32_WORD( "rhg073003.u14", 0x300002, 0x80000, CRC(240f7759) SHA1(1fa5ba0185b027101dae207ec5d28b07d3d73fc2) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3319,7 +3328,7 @@ ROM_START( chickna5ua )
 	ROM_LOAD32_WORD( "rhg073099.u14", 0x300002, 0x80000, CRC(240f7759) SHA1(1fa5ba0185b027101dae207ec5d28b07d3d73fc2) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3348,7 +3357,7 @@ ROM_START( chickna5v )
 	ROM_LOAD32_WORD( "01j01886.u13", 0x200002, 0x80000, BAD_DUMP CRC(231ca698) SHA1(eb237652974228994e793f0dc87de93095db3c9c) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3373,7 +3382,7 @@ ROM_START( coralrc2 )
 	ROM_LOAD32_WORD( "0100919v.u12", 0x100002, 0x80000, CRC(9ea140b5) SHA1(11f6b9ab60117f236b464c9dbc939dfb8f240359) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3398,7 +3407,7 @@ ROM_START( cuckoo )
 	ROM_LOAD32_WORD( "0200753v.u12", 0x100002, 0x80000, CRC(cb706eb7) SHA1(cbd6235ca7a29c78ef2cb659d9c21466ed39b360) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3426,7 +3435,7 @@ ROM_START( cuckoou )
 	ROM_LOAD32_WORD( "chg1195.u12", 0x100002, 0x80000, CRC(00bb7597) SHA1(f4d6b21091e320a82d59477469340633b001ed0d) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 
 	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
@@ -3463,7 +3472,7 @@ ROM_START( dstbloom )
 	ROM_LOAD32_WORD( "0300111v.u12", 0x100002, 0x80000, CRC(10cf45b3) SHA1(3f47682ed95f65bdb267f911e113e329ad448167) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3489,7 +3498,7 @@ ROM_START( dstblooma )
 	ROM_LOAD32_WORD( "0200111v.u12", 0x100002, 0x80000, CRC(0ad41815) SHA1(131efc6ed45d8f44a667bd30380c9e37c64f2c42) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3510,7 +3519,7 @@ ROM_START( diamdest )
 	ROM_LOAD32_WORD( "ahg1533.u13", 0x200002, 0x7ffeb, BAD_DUMP CRC(612a6bf2) SHA1(01ee8854204da0610aa4ab3a36c3e517906d2ab4) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3538,7 +3547,7 @@ ROM_START( diamdove )
 	ROM_LOAD32_WORD( "0101018v.u13", 0x200002, 0x80000, CRC(952a850f) SHA1(66da391af532f9ef531d10995c96a90eb71cd09a) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3560,7 +3569,7 @@ ROM_START( dmdfever )
 	ROM_LOAD32_WORD( "0200302v.u11", 0x000002, 0x80000, CRC(29620f05) SHA1(172b6226c443931f0c4ddc44a63c8fc0e6be3824) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASEFF )
 ROM_END
 
@@ -3579,7 +3588,7 @@ ROM_START( dimtouch )
 	ROM_LOAD32_WORD( "0400433v.u12", 0x100002, 0x80000, CRC(9e0d08e2) SHA1(38b10f7c37f1cefe9271549073dc0a4fed409aec) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASEFF )
 ROM_END
 
@@ -3601,7 +3610,7 @@ ROM_START( dolphntr )
 	ROM_LOAD32_WORD( "0200424v.u11", 0x000002, 0x80000, CRC(bcb732ea) SHA1(838300914846c6e740780e5a24b9db7304a8a88d) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3627,7 +3636,7 @@ ROM_START( dolphntra )
 	ROM_LOAD32_WORD( "0100424v.u12", 0x100002, 0x80000, CRC(6abd9309) SHA1(c405a13f5bfe447c1ab20d92e140e4fb145920d4) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3652,7 +3661,7 @@ ROM_START( dolphntrb )
 	ROM_LOAD32_WORD( "0100388v.u12", 0x100002, 0x80000, CRC(1a1fbbcf) SHA1(6e3772dcccd9b5958bec3bfac9af22b2eabca32e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3684,7 +3693,7 @@ ROM_START( dolphntrce )
 	ROM_LOAD32_WORD( "ahg1607.u14", 0x300002, 0x80000, CRC(6f522ffb) SHA1(0fbba6b8df15631e4361daf505469f2214ad8695) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3716,7 +3725,7 @@ ROM_START( dolphntrcea )
 	ROM_LOAD32_WORD( "ahg1606.u14", 0x300002, 0x80000, CRC(c6c59ed6) SHA1(0ce8e5824c5937ffe2eeb34320db9dc568bca7cb) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3748,7 +3757,32 @@ ROM_START( dolphntrceb )
 	ROM_LOAD32_WORD( "ahg1519.u14", 0x300002, 0x80000, CRC(f2da081c) SHA1(5202741719d72a9290bda2c646d37e8c8ad41c04) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
+// 0101250V / 602/17 / 25 Credit Multiplier / 20 Line Multiline
+// Dolphin Treasure / QCOM / A - 20/01/00
+ROM_START( dolphntrql )
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
+	/*
+	    Checksum code found at 0x000ad0
+	    0x000000-0x0806ab is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xb0e71f34
+	        Calculated Checksum 0xb0e71f34  (OK)
+	    0x0806ac-0x1ad0c7 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0806ac-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "0101250v.u7",  0x000000, 0x80000, CRC(4d38af9a) SHA1(4f0bc990b33b8421bde4473d22ad8ca55fc407c9) )
+	ROM_LOAD32_WORD( "0101250v.u11", 0x000002, 0x80000, CRC(f9750215) SHA1(8e44be5c83a1f75a95c856729cfc84c270649caf) )
+	ROM_LOAD32_WORD( "0101250v.u8",  0x100000, 0x80000, CRC(7d82a406) SHA1(c3757597fe9c484de71d81cb02046f6cca27ff44) )
+	ROM_LOAD32_WORD( "0101250v.u12", 0x100002, 0x80000, CRC(35236e6f) SHA1(f196f12a1761a235ad66f4e181ca249b1df7e245) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3775,7 +3809,7 @@ ROM_START( dolphntru )
 	ROM_LOAD32_WORD( "fhg407702.u12", 0x100002, 0x80000, CRC(8ee1c2d3) SHA1(e6ecaaac0cb4518ecc0d36532ab532f46e3e628b) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 
 	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
@@ -3810,7 +3844,7 @@ ROM_START( drgneye )
 	ROM_LOAD32_WORD( "0100521v.u11", 0x000002, 0x80000, CRC(2bb47749) SHA1(796f610e5202b5eb26a6e901d43ee5d9e3f95332) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3829,7 +3863,7 @@ ROM_START( dreamwv )
 	ROM_LOAD32_WORD( "0200586v.u12", 0x100002, 0x80000, CRC(0b3e03d3) SHA1(966ec84aff686ad360d440995b81ae469539a5b5) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3856,7 +3890,7 @@ ROM_START( dynajack )
 	ROM_LOAD32_WORD( "01j00081.u13", 0x200002, 0x80000, CRC(d204ff9c) SHA1(8ac5533928fb3ca247dc85cea67da45a6743f732) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3877,7 +3911,7 @@ ROM_START( dynajacku )
 	ROM_LOAD32_WORD( "chg1562.u13", 0x200002, 0x80000, CRC(5a2220d7) SHA1(aca5fefb60af93ba776cc695e9a7ea406f527937) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3899,7 +3933,7 @@ ROM_START( eldorda5 )
 	ROM_LOAD32_WORD( "0100652v.u11", 0x000002, 0x80000, CRC(35233cf8) SHA1(e02477526f2f9e2663c1876f543d138b2caf28df) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3921,7 +3955,7 @@ ROM_START( eforsta5 )
 	ROM_LOAD32_WORD( "0400122v.u11", 0x000002, 0x80000, CRC(7a97adc8) SHA1(b52f7fdc7edf9ad92351154c01b8003c0576ed94) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3945,7 +3979,7 @@ ROM_START( eforsta5ce )
 	ROM_LOAD32_WORD( "chg1536.u14", 0x300002, 0x80000, CRC(113238a6) SHA1(145467e1f015543d23bb4a377d71949693f21c34) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3978,7 +4012,7 @@ ROM_START( eforsta5cea )
 	ROM_LOAD32_WORD( "ahg1615.u14", 0x300002, 0x80000, CRC(961fd1b3) SHA1(59c2280258b98bc0153b6dc08d1af026de5b3ed3) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4007,7 +4041,7 @@ ROM_START( eforsta5u )
 	ROM_LOAD32_WORD( "jhg041503.u12", 0x100002, 0x80000, CRC(c968471f) SHA1(9d54a5c396e6f83690db2fcb7ddcc8a47a7dd777) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4036,7 +4070,7 @@ ROM_START( eforsta5ua )
 	ROM_LOAD32_WORD( "jhg041599.u12", 0x100002, 0x80000, CRC(c968471f) SHA1(9d54a5c396e6f83690db2fcb7ddcc8a47a7dd777) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4061,7 +4095,7 @@ ROM_START( fastfort )
 	ROM_LOAD32_WORD( "0100651v.u12", 0x100002, 0x80000, CRC(d591dfb6) SHA1(9a1c1070b7e8774928d684c45481d72ce5108bf1) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4090,7 +4124,7 @@ ROM_START( fortellr )
 	ROM_LOAD32_WORD( "01j00131.u14", 0x300002, 0x80000, CRC(507bbe10) SHA1(01b1982c02a00b60aa39ee1b408d653365f728d4) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4113,7 +4147,7 @@ ROM_START( fortfvr )
 	ROM_LOAD32_WORD( "bhg1566.u14", 0x300002, 0x7ffff, BAD_DUMP CRC(4fba6570) SHA1(46bb22ba10dc69c70241dfbb00e86ffa5b28fd1c) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4142,7 +4176,7 @@ ROM_START( gambler )
 	ROM_LOAD32_WORD( "ehg091602.u12", 0x100002, 0x80000, CRC(ebe957f9) SHA1(539945ec9beafe2c83051208370588fce2334f16) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4163,7 +4197,7 @@ ROM_START( geisha )
 	ROM_LOAD32_WORD( "0101408v.u13", 0x200002, 0x80000, CRC(5ef6323e) SHA1(82a720d814ca06c6d286c59bbf325d9a1034375a) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4186,7 +4220,7 @@ ROM_START( genmagi )
 	ROM_LOAD32_WORD( "0200894v.u14", 0x300002, 0x80000, CRC(52092ffb) SHA1(6ed591a510e9186588470ec745caf8001712012e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4217,7 +4251,7 @@ ROM_START( glizrdce )
 	ROM_LOAD32_WORD( "ahg1623.u14", 0x300002, 0x80000, CRC(5ceb871c) SHA1(42b8a087fa39261818dd333ea3d8c1ef269671bf) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4242,7 +4276,7 @@ ROM_START( gnomeatw )
 	ROM_LOAD32_WORD( "0100767v.u12", 0x100002, 0x80000, CRC(49eb3869) SHA1(d98fe385c667872f26d656a3240f557a70ba924f) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4271,7 +4305,7 @@ ROM_START( goldpyr )
 	ROM_LOAD32_WORD( "ahg120503.u12", 0x100002, 0x80000, CRC(8bbf45d0) SHA1(f58f28e7cc4ac225197959566d81973b5aa0e836) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4300,7 +4334,7 @@ ROM_START( goldpyra )
 	ROM_LOAD32_WORD( "ahg120699.u12", 0x100002, 0x80000, CRC(13021157) SHA1(6beb8dea66659b5ec9cbb8dcd921c30a621049a9) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4332,7 +4366,7 @@ ROM_START( goldpyrb )
 	ROM_LOAD32_WORD( "0100878v.u13", 0x200002, 0x80000, CRC(0df660be) SHA1(73d370d90655dada34f2b5b2209652632c34a22e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4359,7 +4393,7 @@ ROM_START( goldenra )
 	ROM_LOAD32_WORD( "0101164v.u13", 0x200002, 0x80000, CRC(8f62ccc5) SHA1(5105313192ab8dfd522b921c70b8b03a8a61ac63) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4386,7 +4420,7 @@ ROM_START( honeypot )
 	ROM_LOAD32_WORD( "03j00241.u13", 0x200002, 0x80000, CRC(d98e20eb) SHA1(6274ceee7ad49a9052b354d9dfc7e3cfa4e61017) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4417,7 +4451,7 @@ ROM_START( hnktonku )
 	ROM_LOAD32_WORD( "bhg1455.u13", 0x200002, 0x80000, CRC(18dd37fe) SHA1(432a4959886fad4f4a55de31b7cc42c51d7f2792) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4443,7 +4477,7 @@ ROM_START( incasun )
 	ROM_LOAD32_WORD( "0100872v.u13", 0x200002, 0x80000, CRC(00407593) SHA1(4c759fe3267b1782ae84d8ed9134295dfaa0faaf) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4470,7 +4504,7 @@ ROM_START( incasunsp )
 	ROM_LOAD32_WORD( "sp__0100872v.u13", 0x200002, 0x80000, CRC(6d66c6b4) SHA1(2106f2ede58bd4d09334e32a1553f02a154bb767) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4490,7 +4524,7 @@ ROM_START( incasunnz )
 	ROM_LOAD32_WORD( "0101108v.u13", 0x200002, 0x80000, CRC(472f4097) SHA1(5ebe72b138cdc67989db17c82979eeddc60a081e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4517,7 +4551,7 @@ ROM_START( incasunu )
 	ROM_LOAD32_WORD( "chg1458.u13", 0x200002, 0x80000, CRC(2e573a8d) SHA1(aa8ac4f4a427829f0a5929273c618edb4ecf7b36) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 
 	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
@@ -4558,7 +4592,7 @@ ROM_START( incasunua )
 	ROM_LOAD32_WORD( "dhg1577.u13", 0x200002, 0x80000, CRC(f7c30ef9) SHA1(44d7213e1220d6b89715408d009ef1484de2696f) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4585,7 +4619,7 @@ ROM_START( incasunv )
 	ROM_LOAD32_WORD( "01j01946.u13", 0x200002, 0x80000, CRC(0efdd830) SHA1(de0be1cd3f691299f48d7a184df6bb59fef22de2) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4610,7 +4644,33 @@ ROM_START( indrema5 )
 	ROM_LOAD32_WORD( "0100845v.u12", 0x100002, 0x80000, CRC(4bbe67f6) SHA1(928f88387da66697f1de54f086531f600f80a15e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
+// 0101340V / 628/3 / 10 Credit Multiplier / 20 Line MultiLine
+// INDIAN DREAMING / QLD / A - 02/05/00
+ROM_START( indrema5ql )
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
+	/*
+	    Checksum code found at 0x000ad0
+	    0x000000-0x081823 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xa70d8e67
+	        Calculated Checksum 0xa70d8e67  (OK)
+	    0x081824-0x20612b is the non-Checksummed range (unusual endpoint)
+	*/
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "0101340v.u7",  0x000000, 0x80000, CRC(60b93091) SHA1(6d4953b8312866f952b9658a680e8827bf2b5e57) )
+	ROM_LOAD32_WORD( "0101340v.u11", 0x000002, 0x80000, CRC(34125c7d) SHA1(c6e57346f2c53a04e858b01132abcb4d91403822) )
+	ROM_LOAD32_WORD( "0101340v.u8",  0x100000, 0x80000, CRC(de715129) SHA1(30c15bdfc9ee5c45e04b9f9eb614be89a911260b) )
+	ROM_LOAD32_WORD( "0101340v.u12", 0x100002, 0x80000, CRC(48d7b043) SHA1(835d148db1e2ce7747a4410e3ceea4468355a164) )
+	ROM_LOAD32_WORD( "0101340v.u9",  0x200000, 0x80000, CRC(77c94665) SHA1(48d786a323603d1315f94fef97de6f9d1311c688) )
+	ROM_LOAD32_WORD( "0101340v.u13", 0x200002, 0x80000, CRC(7ec9557e) SHA1(8f143c1ee1c82d822ff66ec5b3dac03b0c911223) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4628,7 +4688,7 @@ ROM_START( jumpbean )
 	ROM_LOAD32_WORD( "0100161v.u12", 0x100002, 0x7fa54, BAD_DUMP CRC(d1d6cfba) SHA1(8c8ee5a97bc3c8cd21cd291701cebf214ca388f3) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4653,7 +4713,7 @@ ROM_START( jumpjoey )
 	ROM_LOAD32_WORD( "0100383v.u12", 0x100002, 0x80000, CRC(defce2e9) SHA1(95f88f8647c52f99dceb4920780696d7f7c1c24b) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4682,7 +4742,7 @@ ROM_START( jungjuic )
 	ROM_LOAD32_WORD( "0200240v.u12", 0x100002, 0x80000, CRC(ffa3d0ba) SHA1(e60e01d4d425aea483387fa2f9ae5bb69b80f829) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4708,7 +4768,7 @@ ROM_START( kgalah )
 	ROM_LOAD32_WORD( "0200536v.u12", 0x100002, 0x80000, CRC(15d5bfb4) SHA1(7c48dabfd83cc30fe2ffd0b4de63fbc9dc56ee2f) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4734,7 +4794,7 @@ ROM_START( kgalaha )
 	ROM_LOAD32_WORD( "0100536v.u12", 0x100002, 0x80000, CRC(ddde1739) SHA1(d2dec30baef8b43b2f3bc1d572353b5afe01be4b) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4766,7 +4826,7 @@ ROM_START( kgalahce )
 	ROM_LOAD32_WORD( "ahg1625.u14", 0x300002, 0x80000, CRC(499419db) SHA1(6df8c7a9a69d60e746eb266127647327d4b88919) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4791,7 +4851,7 @@ ROM_START( kgbirda5 )
 	ROM_LOAD32_WORD( "0200024v.u12", 0x100002, 0x80000, CRC(df176c5a) SHA1(dcaecdefb7c880b9425a6445dbed969968fe3d1c) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4821,7 +4881,7 @@ ROM_START( koalamnt )
 	ROM_LOAD32_WORD( "chg1573.u14", 0x300002, 0x80000, CRC(5e4776e9) SHA1(d44851cbfaa054cd5675a841a3089a8f4fdc8421) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4846,7 +4906,7 @@ ROM_START( kookabuk )
 	ROM_LOAD32_WORD( "0100677v.u12", 0x100002, 0x80000, CRC(b2f2fd15) SHA1(9614f3ae6e82a40ecf44090d0b8d7bd8b6b1f830) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4878,7 +4938,7 @@ ROM_START( kyhatonu )
 	ROM_LOAD32_WORD( "bhg1204.u14", 0x300002, 0x80000, CRC(490a9eb5) SHA1(30df13960614f82deac5426ff754885ffb429603) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4900,7 +4960,7 @@ ROM_START( locoloot )
 	ROM_LOAD32_WORD( "0100473v.u11", 0x000002, 0x80000, CRC(0c0c2697) SHA1(0fc1dec8fba488a4b59c81b5bab7a11d62be2599) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4922,7 +4982,7 @@ ROM_START( locoloota )
 	ROM_LOAD32_WORD( "0100472v.u11", 0x000002, 0x80000, CRC(21332a1a) SHA1(76a4c30d1c9624984175e9bd117c68c9204f01df) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4940,7 +5000,7 @@ ROM_START( locolootnz )
 	ROM_LOAD32_WORD( "0600725v.u12", 0x100002, 0x80000, CRC(29f03505) SHA1(c173167f43cc2eef0e063118e03bc37a87188391) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4967,7 +5027,7 @@ ROM_START( locolootu )
 	ROM_LOAD32_WORD( "ahg1513.u12", 0x100002, 0x80000, CRC(5bf7b4b1) SHA1(2282ec8d0ddd1aea715005fba2171468831513f4) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4989,7 +5049,7 @@ ROM_START( lonewolf )
 	ROM_LOAD32_WORD( "0100587v.u11", 0x000002, 0x80000, CRC(0ed6fb6b) SHA1(a2baa4154fe762e2c1b40a97b2d27265df8b5dab) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5011,7 +5071,7 @@ ROM_START( luckyclo )
 	ROM_LOAD32_WORD( "0300109v.u11", 0x000002, 0x80000, CRC(4be1cdef) SHA1(8633077a6ddde80b2e7a3c4439ccb5a3f2b83695) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5039,7 +5099,7 @@ ROM_START( mgarden )
 	ROM_LOAD32_WORD( "ahg121199.u12", 0x100002, 0x80000, CRC(4b252c2c) SHA1(8be41fb2b8f8d2829c18ea123a02f3e61c136206) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5067,7 +5127,7 @@ ROM_START( magimask )
 	ROM_LOAD32_WORD( "ahg1549.u12", 0x100002, 0x80000, CRC(d008deab) SHA1(fd544767356bfdf44ec4af7218c9f2990581e620) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5094,7 +5154,7 @@ ROM_START( magimaska )
 	ROM_LOAD32_WORD( "ahg1548.u12", 0x100002, 0x80000, CRC(cf4cd569) SHA1(408edcd746587d249c4286f7a99f33ad94214f7c) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 
 	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
@@ -5135,7 +5195,7 @@ ROM_START( magimaskb )
 	ROM_LOAD32_WORD( "dhg1309.u12", 0x100002, 0x80000, CRC(6829a7bf) SHA1(97eed83763d0ec5e753d6ad194e906b1307c4940) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 
 	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
@@ -5168,7 +5228,7 @@ ROM_START( magtcha5 )
 	ROM_LOAD32_WORD( "0300455v.u13", 0x200002, 0x80000, CRC(5e54ed88) SHA1(5fe9a74e210bc2c1b158e7a3bb01fdcc96ea0075) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5190,7 +5250,7 @@ ROM_START( magtcha5a )
 	ROM_LOAD32_WORD( "0200455v.u13", 0x200002, 0x80000, CRC(cfd2a86e) SHA1(66891a1b0e85ad7146b733f4b5d806db789d8821) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5215,7 +5275,7 @@ ROM_START( mammothm )
 	ROM_LOAD32_WORD( "0100425v.u12", 0x100002, 0x80000, CRC(58171e9b) SHA1(7f375aeb8cabe22fcc6f61cac5ef6f72f0c99899) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5242,7 +5302,7 @@ ROM_START( marmagic )
 	ROM_LOAD32_WORD( "01j00101.u13", 0x200002, 0x80000, CRC(3f702945) SHA1(a6c9a848d059c1e564fdc5a65bf8c9600853edfa) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5273,7 +5333,7 @@ ROM_START( marmagicu )
 	ROM_LOAD32_WORD( "ehg1558.u14", 0x300002, 0x80000, CRC(a2096cb3) SHA1(c2bba35396f9c83b17d692a384b6406f3441c8f5) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5305,7 +5365,7 @@ ROM_START( marmagicua )
 	ROM_LOAD32_WORD( "ehg1559.u14", 0x300002, 0x80000, CRC(bdfdc0e4) SHA1(0e56f08abc0cdd9dfa5d8e51bb6fe06fa356b3b3) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5330,7 +5390,7 @@ ROM_START( minemine )
 	ROM_LOAD32_WORD( "0400115v.u12", 0x100002, 0x80000, CRC(b0607ccf) SHA1(f7b35d02170620060c8cdf90b9cb6aac86e26a52) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5357,7 +5417,7 @@ ROM_START( minemineu )
 	ROM_LOAD32_WORD( "vhg041699.u12", 0x100002, 0x80000, CRC(26c01532) SHA1(ec68ad44b703609c7bc27275f8d9250a16d9067c) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 
 	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
@@ -5398,7 +5458,7 @@ ROM_START( minemineua )
 	ROM_LOAD32_WORD( "nhg0416.u12", 0x100002, 0x80000, CRC(fc3f18ff) SHA1(f2afc6bdd7a702e4ac4037749613ac4a40446511) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5423,7 +5483,7 @@ ROM_START( monmouse )
 	ROM_LOAD32_WORD( "0400469v.u12", 0x100002, 0x80000, CRC(72d992ed) SHA1(94560305dacbe776ddc95114ad5e5ffaa234937c) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5449,7 +5509,7 @@ ROM_START( monmousea )
 	ROM_LOAD32_WORD( "0300469v.u12", 0x100002, 0x80000, CRC(2be9bce0) SHA1(3768e616e4f03f253074e1f06aa628181db9dce8) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5469,7 +5529,7 @@ ROM_START( montree )
 	ROM_LOAD32_WORD( "0201397v.u13", 0x200002, 0x80000, CRC(e1f23c3f) SHA1(fe74c219c738625257fb62806e271a60075aaa07) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5491,7 +5551,7 @@ ROM_START( mountmon )
 	ROM_LOAD32_WORD( "0100294v.u11", 0x000002, 0x80000, CRC(4fb2a4dc) SHA1(23895b701387f7442a31969989d21cefe2a25efd) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5513,7 +5573,7 @@ ROM_START( mountmona )
 	ROM_LOAD32_WORD( "0100289v.u11", 0x000002, 0x80000, CRC(565b76ff) SHA1(559d4ec4f1a727cd293d842b7f777c99dcf488bc) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5537,7 +5597,7 @@ ROM_START( mountmonce )
 	ROM_LOAD32_WORD( "ahg1629.u14", 0x300002, 0x7ffff, BAD_DUMP CRC(57f31de5) SHA1(aceb1d700c3b41e29e0abd613d59008d7dc259c9) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5560,7 +5620,7 @@ ROM_START( mountmonu )
 	ROM_LOAD32_WORD( "bhg1465.u14", 0x300002, 0x80000, CRC(62f9b2af) SHA1(bddf24c7a412e911cf75316723f3139be99acbdd) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5591,7 +5651,7 @@ ROM_START( mountmonua )
 	ROM_LOAD32_WORD( "bhg1464.u14", 0x300002, 0x80000, CRC(5b1e5888) SHA1(4cfb0a7af2553037fed650085bbe11e3d043797b) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5618,7 +5678,7 @@ ROM_START( multidrw )
 	ROM_LOAD32_WORD( "0200956v.u13", 0x200002, 0x80000, CRC(0d6f7ec5) SHA1(0a80257eb464e50292554f45583f3d7b85de2bc3) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5640,7 +5700,7 @@ ROM_START( mystgard )
 	ROM_LOAD32_WORD( "0100275v.u11", 0x000002, 0x80000, CRC(6e618fc5) SHA1(a02e7ca2433cf8128d74792833d9708a3ba5df4b) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5660,7 +5720,7 @@ ROM_START( one4all )
 	ROM_LOAD32_WORD( "0101503v.u13", 0x200002, 0x80000, CRC(3b116e0d) SHA1(5df873c00c1103304c2cb77cedf05a5db83ece29) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5686,7 +5746,7 @@ ROM_START( orchidms )
 	ROM_LOAD32_WORD( "0200849v.u12", 0x100002, 0x80000, CRC(165a762d) SHA1(8487d2e32bd2fab5a9114380ba2be6d34b097b11) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5713,7 +5773,7 @@ ROM_START( orchidmsa )
 	ROM_LOAD32_WORD( "0100849v.u12", 0x100002, 0x80000, CRC(4b5baf9d) SHA1(2fd13cbb22aff14936cbe2da582a0aa3984ab4a2) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5731,7 +5791,7 @@ ROM_START( orchidmsnz )
 	ROM_LOAD32_WORD( "0101241v.u12", 0x100002, 0x80000, CRC(141e2b47) SHA1(e311693d730bfff99ad75995e47606e9822ba722) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5753,7 +5813,7 @@ ROM_START( oscara5 )
 	ROM_LOAD32_WORD( "0200348v.u11", 0x000002, 0x80000, CRC(11394e80) SHA1(1c6e7e954a6118e04da9d761fef8ec00c46d2af8) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5779,7 +5839,7 @@ ROM_START( oscara5a )
 	ROM_LOAD32_WORD( "0100348v.u12", 0x100002, 0x80000, CRC(fd1c5c7b) SHA1(61b29459e39912ea3c2bf290e1f3061ce13ea648) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5804,7 +5864,7 @@ ROM_START( pantmag )
 	ROM_LOAD32_WORD( "0101046v.u12", 0x100002, 0x80000, CRC(eae75fa9) SHA1(576c8cf98ad4032bbdde12162e2c1bdd10056762) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5829,7 +5889,7 @@ ROM_START( pantmaga )
 	ROM_LOAD32_WORD( "0100716v.u12", 0x100002, 0x80000, CRC(6adfd0ab) SHA1(3b6479bcd95812f5678a27adc7decbc881cd6caa) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5858,7 +5918,7 @@ ROM_START( partygrs )
 	ROM_LOAD32_WORD( "ahg1567.u12", 0x100002, 0x80000, CRC(00d1395c) SHA1(d9a66d6cdb5aa4f583d8c23306b1416646cbde93) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 
 	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
@@ -5898,7 +5958,7 @@ ROM_START( partygrsa )
 	ROM_LOAD32_WORD( "bhg1284.u12", 0x100002, 0x80000, CRC(090ce72f) SHA1(a4783ca84aabd365613357a53a19a3dd48f4df0c) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5918,7 +5978,7 @@ ROM_START( partygrsb )
 	ROM_LOAD32_WORD( "ahg1568.u12", 0x100002, 0x7f7da, BAD_DUMP CRC(43764888) SHA1(cfd59692f17e9ca70dc882423238f6de59dafbed) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5943,7 +6003,7 @@ ROM_START( peaflut )
 	ROM_LOAD32_WORD( "02j00011.u12", 0x100002, 0x80000, CRC(2d96c449) SHA1(af98a864b9ed3f95227fd0d6edc6a38c0544c93f) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5968,7 +6028,7 @@ ROM_START( pengpay )
 	ROM_LOAD32_WORD( "0200460v.u12", 0x100002, 0x80000, CRC(90864742) SHA1(f6491e4fbce5d642b9d0224118923b56625338b1) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -5993,7 +6053,7 @@ ROM_START( pengpaya )
 	ROM_LOAD32_WORD( "0200357v.u12", 0x100002, 0x80000, CRC(123cbe90) SHA1(b51b84f79e0822a1be71485bbad514ab9fa55622) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6019,7 +6079,7 @@ ROM_START( pengpayb )
 	ROM_LOAD32_WORD( "0200359v.u12", 0x100002, 0x80000, CRC(d2882682) SHA1(dd42edca8ef9d28dd5b16fe8132f8e0fb3c85979) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6044,7 +6104,7 @@ ROM_START( pengpayc )
 	ROM_LOAD32_WORD( "0200113v.u12", 0x100002, 0x80000, CRC(a1865467) SHA1(572558bab639145c8260884a95646fc424687b47) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6062,7 +6122,7 @@ ROM_START( pengpayd )
 	ROM_LOAD32_WORD( "0300113v.u12", 0x100002, 0x7fb27, BAD_DUMP CRC(7206dc37) SHA1(4d2f8551daeb4be13e73e3123e158dc1e1e4e067) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6090,7 +6150,7 @@ ROM_START( pengpayu )
 	ROM_LOAD32_WORD( "bhi041703.u12", 0x100002, 0x80000, CRC(d959a048) SHA1(92f69090d599f95b48e79213e5b7d486e083d8f4) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 
 	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
@@ -6130,7 +6190,7 @@ ROM_START( pengpayua )
 	ROM_LOAD32_WORD( "ohg041703.u12", 0x100002, 0x80000, CRC(9eae7f7b) SHA1(23bd952de1d6d5d69e5565cc2bc241c2cd775453) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6158,7 +6218,7 @@ ROM_START( pengpayub )
 	ROM_LOAD32_WORD( "ohg041702.u12", 0x100002, 0x80000, CRC(9eae7f7b) SHA1(23bd952de1d6d5d69e5565cc2bc241c2cd775453) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6191,7 +6251,7 @@ ROM_START( pengpayce )
 	ROM_LOAD32_WORD( "ahg1544.u14", 0x300002, 0x80000, CRC(4ef4f063) SHA1(d6e9928f80f19d3fdd0e7acb0bfb6f9b2ae5724b) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6222,7 +6282,7 @@ ROM_START( pengpuck )
 	ROM_LOAD32_WORD( "ehg1257.u14", 0x300002, 0x80000, CRC(b6cb5809) SHA1(84288a41d2a3980bf68e9a32b9402652ac6a16d6) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6247,7 +6307,7 @@ ROM_START( penpir )
 	ROM_LOAD32_WORD( "0100674v.u12", 0x100002, 0x80000, CRC(acdbbbe6) SHA1(5909135163af18c3ecd84934612e3751ca62ae74) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6272,7 +6332,7 @@ ROM_START( penpira )
 	ROM_LOAD32_WORD( "0200578v.u12", 0x100002, 0x80000, CRC(7ea30a52) SHA1(70d7640ea237197be4b2b8c64c2a97ad7b608cc0) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6305,7 +6365,7 @@ ROM_START( penpir2 )
 	ROM_LOAD32_WORD( "0100869v.u13", 0x200002, 0x80000, CRC(e1dbfd58) SHA1(687b7254279734e1835e1713d032b5aa2cf70812) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6330,7 +6390,7 @@ ROM_START( petshop )
 	ROM_LOAD32_WORD( "0100731v.u12", 0x100002, 0x80000, CRC(6e74cd57) SHA1(9092e656cbd8627b208b81ca0d737483a779bce1) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6347,7 +6407,7 @@ ROM_START( petshopa )
 	ROM_LOAD32_WORD( "0100679v.u12", 0x100002, 0x80000, BAD_DUMP CRC(2cd12986) SHA1(b6b0bd6dd8c964498edc3763cb5c450795042a8d) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6372,7 +6432,7 @@ ROM_START( phantpay )
 	ROM_LOAD32_WORD( "0500005v.u12", 0x100002, 0x80000, CRC(d43a092a) SHA1(5f851bd179b14ef3983b460ed932810f3713d3e5) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6399,7 +6459,7 @@ ROM_START( przfight )
 	ROM_LOAD32_WORD( "0100299v.u13", 0x200002, 0x80000, CRC(c16197d5) SHA1(716c4afdf2acde10ff09ad90b03bc5e689f0a737) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6424,7 +6484,7 @@ ROM_START( qcash )
 	ROM_LOAD32_WORD( "0100706v.u12", 0x100002, 0x80000, CRC(bfedb3fc) SHA1(e115db94b8ee7babb29e31e64b96d181f5c6491b) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6450,7 +6510,7 @@ ROM_START( qnile )
 	ROM_LOAD32_WORD( "0300439v.u12", 0x100002, 0x80000, CRC(eec01bb4) SHA1(146fdce6b32a21659dc775e4a5f3bb027bd09825) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6476,7 +6536,7 @@ ROM_START( qnilea )
 	ROM_LOAD32_WORD( "0200439v.u12", 0x100002, 0x80000, CRC(2a0f7feb) SHA1(27c89dadf759e6c892121650758c44ec50990cb6) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6502,7 +6562,7 @@ ROM_START( qnileb )
 	ROM_LOAD32_WORD( "0100439v.u12", 0x100002, 0x80000, CRC(bdcec4eb) SHA1(ef3658460263cd2e68e10015efdc016ad705213e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6536,7 +6596,7 @@ ROM_START( qnilebr )
 	ROM_LOAD32_WORD( "0101707v.u13", 0x200002, 0x80000, CRC(1b5da8ca) SHA1(9a6cfbadba24677a0d82a61ffdc25772ecbac287) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6561,7 +6621,7 @@ ROM_START( qnilec )
 	ROM_LOAD32_WORD( "0300440v.u12", 0x100002, 0x80000, CRC(52bd3694) SHA1(bcfa3054c7577f7a1653b756828d048a5f1776e7) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6592,7 +6652,7 @@ ROM_START( qnilece )
 	ROM_LOAD32_WORD( "ahg1609.u14", 0x300002, 0x80000, CRC(fe7817f3) SHA1(a3579ed7ce6d999b0f71482f2a2e3ade693668fb) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6624,7 +6684,7 @@ ROM_START( qnilecea )
 	ROM_LOAD32_WORD( "ahg1525.u14", 0x300002, 0x80000, CRC(520452d4) SHA1(6d501b82a7b35a6e53a0991cbc384b752a295edf) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6657,7 +6717,7 @@ ROM_START( qnileceb )
 	ROM_LOAD32_WORD( "ahg1608.u14", 0x300002, 0x80000, CRC(4d0f1d12) SHA1(980775e628e9508398cb5227af10ed9ff0555b8a) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6684,7 +6744,7 @@ ROM_START( qniled )
 	ROM_LOAD32_WORD( "0101139v.u13", 0x200002, 0x80000, CRC(160fbbb5) SHA1(fe2ce9b915b0dfcbc60deed30a95550a21a18127) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6711,7 +6771,7 @@ ROM_START( qnilefl )
 	ROM_LOAD32_WORD( "0101670v.u13", 0x200002, 0x80000, CRC(715e7789) SHA1(b734aa88e7e65fba988e7fffd711039c4f554b2c) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6740,7 +6800,7 @@ ROM_START( qnilemax )
 	ROM_LOAD32_WORD( "0401072v.u14", 0x300002, 0x80000, CRC(4fbccf72) SHA1(97d6bb400caf78cb673a324d48d2580f1bbb1acd) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6765,7 +6825,7 @@ ROM_START( qnilenl )
 	ROM_LOAD32_WORD( "0301059v.u12", 0x100002, 0x80000, CRC(e505912a) SHA1(ae71aa6d56d424383add3b9cbc17473ab0a13bdc) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6786,7 +6846,7 @@ ROM_START( qnilenz )
 	ROM_LOAD32_WORD( "0300785v.u13", 0x200002, 0x80000, CRC(b267d25a) SHA1(8065601190540e5f0b4a91fed1deffcdb2606f94) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6811,7 +6871,7 @@ ROM_START( qnileql )
 	ROM_LOAD32_WORD( "0201200v.u12", 0x100002, 0x80000, CRC(38332f4e) SHA1(53c90103df06e5a28bbaf32504a0984b7c65bec7) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6839,7 +6899,7 @@ ROM_START( qnileu )
 	ROM_LOAD32_WORD( "ghg409102.u12", 0x100002, 0x80000, CRC(7871a846) SHA1(ac1d741092afda842e1864f1a7a14137a9ee46d9) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 
 	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
@@ -6882,7 +6942,7 @@ ROM_START( qnileua )
 	ROM_LOAD32_WORD( "ghg4091.u12",   0x100002, 0x80000, CRC(7871a846) SHA1(ac1d741092afda842e1864f1a7a14137a9ee46d9) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6909,7 +6969,7 @@ ROM_START( qnilev )
 	ROM_LOAD32_WORD( "04j00784.u12", 0x100002, 0x80000, CRC(621adc77) SHA1(2fecef64139c502b0baee5c945fe5671532aacab) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6934,7 +6994,7 @@ ROM_START( qtbird )
 	ROM_LOAD32_WORD( "0500009v.u12", 0x100002, 0x80000, CRC(bb8344a9) SHA1(8b0e904b937c7f34470ad946076240b0c54bf434) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6964,7 +7024,7 @@ ROM_START( rainwrce )
 	ROM_LOAD32_WORD( "0101332v.u14", 0x300002, 0x80000, CRC(92274626) SHA1(fae8d89efba9bf3d171bfe484015d009786ce40d) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -6989,7 +7049,7 @@ ROM_START( reelpwr )
 	ROM_LOAD32_WORD( "0100400v.u12", 0x100002, 0x80000, CRC(e6033756) SHA1(82603f02fcec2b01f5a1cfc13d50129669e84dc7) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7015,7 +7075,7 @@ ROM_START( reelrock )
 	ROM_LOAD32_WORD( "0100779v.u12", 0x100002, 0x80000, CRC(4ac20679) SHA1(0ac732ffe6a33806e4a06e87ec875a3e1314e06b) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7042,7 +7102,7 @@ ROM_START( reelrockql )
 	ROM_LOAD32_WORD( "0101460v.u13", 0x200002, 0x80000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7067,7 +7127,7 @@ ROM_START( retrsam )
 	ROM_LOAD32_WORD( "0400549v.u12", 0x100002, 0x80000, CRC(fdf22d5b) SHA1(664fa003a350c0a3b515b7c384d32176158c2d3e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7090,7 +7150,7 @@ ROM_START( retrsama )
 	ROM_LOAD32_WORD( "0200549v.u11", 0x000002, 0x80000, CRC(99f61822) SHA1(88a726a5c9cae3a7d3120cb9013ca4d38ef8c560) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7112,7 +7172,7 @@ ROM_START( retrsamb )
 	ROM_LOAD32_WORD( "0200506v.u11", 0x000002, 0x80000, CRC(e662404b) SHA1(f0da3384c81d01ec17d24b2191d3a0b0eaf48d12) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7139,7 +7199,7 @@ ROM_START( rushrst )
 	ROM_LOAD32_WORD( "0200534v.u13", 0x200002, 0x80000, CRC(dfe02424) SHA1(798ce31ef23cf5bd7d5b04dc21ffd99b2f6243b3) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7165,7 +7225,7 @@ ROM_START( sbuk2 )
 	ROM_LOAD32_WORD( "0400501v.u12", 0x100002, 0x80000, CRC(f9b65d2b) SHA1(f519fc284aaa08d3619e4d88e92e690320cf5432) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7184,7 +7244,7 @@ ROM_START( sbuk2a )
 	ROM_LOAD32_WORD( "0300006v.u12", 0x100002, 0x80000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7209,7 +7269,7 @@ ROM_START( sbuk3 )
 	ROM_LOAD32_WORD( "0200711v.u12", 0x100002, 0x80000, CRC(a585172d) SHA1(3c74efb11285ff78ce76a7e8af2f936d3dc31290) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7235,7 +7295,7 @@ ROM_START( sbuk3a )
 	ROM_LOAD32_WORD( "0100711v.u12", 0x100002, 0x80000, CRC(0ce0ba8d) SHA1(7fc6ee6281bb3c474fa0cf4d879e735ae03bb1ed) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7265,7 +7325,7 @@ ROM_START( sldeluxe )
 	ROM_LOAD32_WORD( "ahg1575.u14", 0x300002, 0x80000, CRC(bd890100) SHA1(c82b2891287429a3e77ccaf9b66139f0548f1902) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7290,7 +7350,7 @@ ROM_START( slvrwolf )
 	ROM_LOAD32_WORD( "0100673v.u12", 0x100002, 0x80000, CRC(122816dd) SHA1(5c37b29179262a79d8c68c92035ff14fc2885150) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7312,7 +7372,7 @@ ROM_START( snowcat )
 	ROM_LOAD32_WORD( "0100405v.u11", 0x000002, 0x80000, CRC(9f9e2637) SHA1(3d4992cec760360931bc5de400c7a27329f8b953) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7337,7 +7397,7 @@ ROM_START( sumospin )
 	ROM_LOAD32_WORD( "0200606v.u12", 0x100002, 0x80000, CRC(ba3eede2) SHA1(708a25af0908a1aa874b3ca4897816c65b0c9178) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7359,7 +7419,7 @@ ROM_START( swhr2 )
 	ROM_LOAD32_WORD( "0200465v.u11", 0x000002, 0x80000, CRC(dcf51719) SHA1(1ea07091ce22245f77b6de5dcd994efb94c4ba58) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7382,7 +7442,7 @@ ROM_START( swhr2a )
 	ROM_LOAD32_WORD( "0200004v.u11", 0x000002, 0x80000, CRC(bde067d7) SHA1(cbf2cbd0644f1daeb5c3cd08d72f3d7aafe521ec) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7411,7 +7471,7 @@ ROM_START( swhr2u )
 	ROM_LOAD32_WORD( "phg074202.u12", 0x100002, 0x80000, CRC(885cde6c) SHA1(a6ccf94ecdae2092a703075c9917d0b4004efa52) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7434,7 +7494,7 @@ ROM_START( swhr2v )
 	ROM_LOAD32_WORD( "01j01986.u11", 0x000002, 0x80000, CRC(bd7ead91) SHA1(9f775428a4aa0b0a8ee17aed9be620edc2020c5e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7459,7 +7519,7 @@ ROM_START( thor )
 	ROM_LOAD32_WORD( "0200319v.u12", 0x100002, 0x80000, CRC(a4b27820) SHA1(75bb554300372c8bccea79ab55aa60688b7597fa) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7484,7 +7544,7 @@ ROM_START( thndh )
 	ROM_LOAD32_WORD( "0200333v.u12", 0x100002, 0x80000, CRC(522b0459) SHA1(d9f0e94223897ef8935558593b1d261ad953a3ec) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7509,7 +7569,7 @@ ROM_START( thndha )
 	ROM_LOAD32_WORD( "0200334v.u12", 0x100002, 0x80000, CRC(77c0d46d) SHA1(a183eca1ebdc305dce75caa311635ec98477909d) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7531,7 +7591,7 @@ ROM_START( topbana )
 	ROM_LOAD32_WORD( "0100550v.u11", 0x000002, 0x80000, CRC(1c64b3b6) SHA1(80bbc6e3f47ab932e9c07e0c6063197a2d8e81f7) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7560,7 +7620,7 @@ ROM_START( toutango )
 	ROM_LOAD32_WORD( "0100782v.u14", 0x300002, 0x80000, CRC(69f2acde) SHA1(cda52548e675a06677a2d9fee89b33f9abb96f64) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7588,7 +7648,7 @@ ROM_START( toutangonl )
 	ROM_LOAD32_WORD( "0301388v.u14", 0x300002, 0x80000, CRC(fbb37975) SHA1(648b56df5047b8ae60b41bdf29f35f8bf8fe2d29) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7613,7 +7673,7 @@ ROM_START( trstrove )
 	ROM_LOAD32_WORD( "01j00161.u12", 0x100002, 0x80000, CRC(715f53cb) SHA1(364c35fc2d36180c13127c8004a8729126f68db1) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7640,7 +7700,7 @@ ROM_START( tritreat )
 	ROM_LOAD32_WORD( "0201692v.u13", 0x200002, 0x80000, CRC(0a0b0ce1) SHA1(41a4d613cf1828df1832c087f0bc18d31076f056) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7667,7 +7727,7 @@ ROM_START( trojhors )
 	ROM_LOAD32_WORD( "01j00851.u13", 0x200002, 0x80000, CRC(b6d1ceb6) SHA1(b41200620aaa905697ac73b4c86496a53f070ed3) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7692,7 +7752,7 @@ ROM_START( trpdlght )
 	ROM_LOAD32_WORD( "0100269v.u12", 0x100002, 0x80000, CRC(88978d4e) SHA1(cd2b747fd858f7d84b889bf87865c4fbb349e1b7) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7721,7 +7781,7 @@ ROM_START( trpdlghtu )
 	ROM_LOAD32_WORD( "phg062502.u12", 0x100002, 0x80000, CRC(0190804b) SHA1(7acb29fb7f77e78bb2afeb74d341475cd089dafb) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7746,7 +7806,7 @@ ROM_START( unicornd )
 	ROM_LOAD32_WORD( "0100791v.u12", 0x100002, 0x80000, CRC(14afdeda) SHA1(1eb2a297e903dc1a0683425b37669e0af4ae4218) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7771,7 +7831,7 @@ ROM_START( unicornda )
 	ROM_LOAD32_WORD( "0100813v.u12", 0x100002, 0x80000, CRC(b712dcd1) SHA1(f4080185f909d385e93edc73954d05de1dc6aa65) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7789,7 +7849,7 @@ ROM_START( unicorndnz )
 	ROM_LOAD32_WORD( "0101228v.u12", 0x100002, 0x80000, CRC(00d4cd6e) SHA1(eb941164cf421f22bcc9864f198348c4f30d904c) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7816,7 +7876,7 @@ ROM_START( unicorndu )
 	ROM_LOAD32_WORD( "bhg1584.u12", 0x100002, 0x80000, CRC(c1e878b5) SHA1(4e4e9dee4d85fbb77dc6f7d39c2dc5b0bf438aef) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7843,7 +7903,7 @@ ROM_START( venicea5 )
 	ROM_LOAD32_WORD( "02j02056.u14", 0x300002, 0x80000, CRC(7b695bf3) SHA1(89ea3252c9915aab81a85c6c028b21911bf8b4c4) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7871,7 +7931,7 @@ ROM_START( wafricau )
 	ROM_LOAD32_WORD( "ahg1535.u12", 0x100002, 0x80000, CRC(f569843c) SHA1(ccf1b727ad1dc49bca609ee0887b36a29223cace) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7893,7 +7953,7 @@ ROM_START( wamazon )
 	ROM_LOAD32_WORD( "0200507v.u11", 0x000002, 0x80000, CRC(2e24756a) SHA1(247db8316e7815be7524aefc43a5756fad84779a) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7918,7 +7978,7 @@ ROM_START( wamazona )
 	ROM_LOAD32_WORD( "0200285v.u12", 0x100002, 0x80000, CRC(fdb10dd3) SHA1(cbf4fe97c75652f83b8ddb929b06941a70b36388) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7944,7 +8004,7 @@ ROM_START( wamazonv )
 	ROM_LOAD32_WORD( "01j01996.u12", 0x100002, 0x80000, CRC(945e0a05) SHA1(db7580b39c537a7b50898ee99cfceb5eb71be19a) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7969,7 +8029,7 @@ ROM_START( wikwin )
 	ROM_LOAD32_WORD( "0100553v.u12", 0x100002, 0x80000, CRC(06cf5d68) SHA1(5469e8087371f8b59fd9b2b413682efe2ea0f279) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7991,7 +8051,7 @@ ROM_START( wildbill )
 	ROM_LOAD32_WORD( "0100297v.u11", 0x000002, 0x80000, CRC(57b3c340) SHA1(4f95ed7fed697cf2bfbde8215f6e35768cf20334) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -8016,7 +8076,7 @@ ROM_START( wcougar )
 	ROM_LOAD32_WORD( "0100167v.u12", 0x100002, 0x80000, CRC(85bb41a7) SHA1(335f29f10f216e202b93b46a376958c3f5271461) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -8043,7 +8103,7 @@ ROM_START( wcougaru )
 	ROM_LOAD32_WORD( "nhg029604.u12", 0x100002, 0x80000, CRC(fe2bafdc) SHA1(e8b454db44a532d75b3aff323855340695688f0f) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 
 	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
@@ -8084,7 +8144,7 @@ ROM_START( wcougarua )
 	ROM_LOAD32_WORD( "nhg029607.u12", 0x100002, 0x80000, CRC(fe2bafdc) SHA1(e8b454db44a532d75b3aff323855340695688f0f) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -8112,7 +8172,7 @@ ROM_START( wcougarub )
 	ROM_LOAD32_WORD( "nhg029699.u12", 0x100002, 0x80000, CRC(fe2bafdc) SHA1(e8b454db44a532d75b3aff323855340695688f0f) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -8141,7 +8201,7 @@ ROM_START( wcougaruc )
 	ROM_LOAD32_WORD( "ahg1531.u12", 0x100002, 0x80000, CRC(5aac8336) SHA1(d1bfd21579bdcf5b46e0f4db1181d10159f0b643) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -8160,7 +8220,7 @@ ROM_START( wcoyote )
 	ROM_LOAD32_WORD( "ahg1515.u12", 0x100002, 0x7ff14, BAD_DUMP CRC(0068bce4) SHA1(37517f6bd53660deab471f41a4d63c4b03bf22b3) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -8186,7 +8246,7 @@ ROM_START( wizways )
 	ROM_LOAD32_WORD( "0200396v.u12", 0x100002, 0x80000, CRC(934d7286) SHA1(205f72b62d83667e9068141346bda3bcb9742a83) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -8211,7 +8271,7 @@ ROM_START( wldangel )
 	ROM_LOAD32_WORD( "0100337v.u12", 0x100002, 0x80000, CRC(81f0d1c8) SHA1(1e91c9457593f592c0ca4a186a49b00b2cfe256f) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -8238,7 +8298,7 @@ ROM_START( wnpost )
 	ROM_LOAD32_WORD( "rhg041804.u12", 0x100002, 0x80000, CRC(ff70b305) SHA1(3c832ed20b1d00318fd3d2428bb469735f68965b) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -8263,7 +8323,7 @@ ROM_START( wthing )
 	ROM_LOAD32_WORD( "0101158v.u12", 0x100002, 0x80000, CRC(450a4f4f) SHA1(e59fb3260755a125c47ff6c1a042a48b0eace72d) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -8283,7 +8343,7 @@ ROM_START( wthinga )
 	ROM_LOAD32_WORD( "0201176v.u13", 0x200002, 0x7ffdb, BAD_DUMP CRC(026317bc) SHA1(94a48b33ddc60d6271ac0a89fc86b9f1be68f9a6) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -8305,7 +8365,7 @@ ROM_START( wtiger )
 	ROM_LOAD32_WORD( "0200954v.u11", 0x000002, 0x80000, CRC(38e888b1) SHA1(acc857eb2be19140bbb58d70583e08f24807b9f2) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -8332,7 +8392,7 @@ ROM_START( yukongl5 )
 	ROM_LOAD32_WORD( "03j00191.u13", 0x200002, 0x80000, CRC(e514b87f) SHA1(5423215bc03ab8468d5ebec0dba6ba7820cdcd50) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -8347,7 +8407,7 @@ GAMEL( 1995, aristmk5,    0,        aristmk5_usa,       aristmk5_usa, aristmk5_s
 // Dates listed below are for the combination (reel layout), not release dates
 GAMEL( 1998, adonis,      aristmk5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Adonis (0200751V, NSW/ACT)",                           MACHINE_NOT_WORKING, layout_aristmk5 )        // 602/9, A - 25/05/98, Rev 10
 GAMEL( 1998, adonisa,     adonis,   aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Adonis (0100751V, NSW/ACT)",                           MACHINE_NOT_WORKING, layout_aristmk5 )        // 602/9, A - 25/05/98, Rev 9
-GAMEL( 1999, adonisce,    adonis,   aristmk5,           adonisce,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Adonis - Cash Express (0201005V, NSW/ACT)",            MACHINE_NOT_WORKING, layout_aristmk5 )        // 602/9, C - 06/07/99, Rev 12
+GAMEL( 1999, adonisce,    adonis,   aristmk5,           adonisce,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Adonis - Cash Express (0201005V, NSW/ACT)",            MACHINE_NOT_WORKING, layout_adonisce )        // 602/9, C - 06/07/99, Rev 12
 GAMEL( 2001, adonisu,     adonis,   aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Adonis (BHG1508, US)",                                 MACHINE_NOT_WORKING, layout_adonisu )         // MV4124/1, B - 31/07/01
 GAMEL( 2002, alchemst,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Alchemist (01J02046, Venezuela)",                      MACHINE_NOT_WORKING, layout_yukongl5 )        // JB013/1, A - 22/01/02, Rev 17
 GAMEL( 2000, bparty,      aristmk5, aristmk5_usa_touch, bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bachelorette Party (BHG1248, US)",                     MACHINE_NOT_WORKING, layout_bparty )          // MV4119/1, B - 25/08/2000
@@ -8357,7 +8417,6 @@ GAMEL( 1999, bootsctnu,   bootsctn, aristmk5_usa,       aristmk5_usa, aristmk5_s
 GAMEL( 1999, bootsctnua,  bootsctn, aristmk5_usa,       pengpuck,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Boot Scootin' (GHG1008-03, US)",                       MACHINE_NOT_WORKING, layout_aristmk5_us_200 ) // MV4098/1, A - 27/07/99
 GAMEL( 2001, bootsctnub,  bootsctn, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Boot Scootin' (AHG1547, US)",                          MACHINE_NOT_WORKING, layout_adonisu )         // MV4098/1, B - 22/03/01
 GAMEL( 1996, bumblbug,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200510V, NSW/ACT)",                      MACHINE_NOT_WORKING, layout_swhr2 )           // 593, D - 5/07/96, Rev 3
-GAMEL( 1996, bumblbugql,  bumblbug, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200456V, Queensland)",                   MACHINE_NOT_WORKING, layout_swhr2 )           // 593, D - 5/07/96, Rev 1.0
 GAMEL( 1997, bumblbugu,   bumblbug, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bumble Bugs (CHG0479-03, US)",                         MACHINE_NOT_WORKING, layout_aristmk5_us )     // 593, D - 05/07/97
 GAMEL( 1997, bumblbugua,  bumblbug, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bumble Bugs (CHG0479-99, US)",                         MACHINE_NOT_WORKING, layout_aristmk5_us )     // 593, D - 05/07/97
 GAMEL( 1995, buttdeli,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Butterfly Delight (0200143V, NSW/ACT)",                0,                   layout_swhr2 )           // 571/4, A - 19/12/95, Rev 1.8.1.0
@@ -8373,7 +8432,6 @@ GAMEL( 1998, chariotc,    aristmk5, aristmk5,           chariotc,     aristmk5_s
 GAMEL( 1998, chariotcv,   chariotc, aristmk5,           chariotcv,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "The Chariot Challenge (04J00714, Venezuela)",          MACHINE_NOT_WORKING, layout_snowcat )         // 630, A - 10/08/98, Rev 12
 GAMEL( 2001, checkma5,    aristmk5, aristmk5,           checkma5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Checkmate (01J00681, NSW/ACT)",                        MACHINE_NOT_WORKING, layout_checkma5 )        // JB011, B - 06/07/01, Rev 17
 GAMEL( 1996, chickna5,    aristmk5, aristmk5,           chickna5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (0100351V, NSW/ACT)",                          0,                   layout_snowcat )         // 596, A - 27/08/96, Rev 1.24
-GAMEL( 1998, chickna5ql,  chickna5, aristmk5,           chickna5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (0200530V, Queensland)",                       MACHINE_NOT_WORKING, layout_snowcat )         // 596, C - 23/02/98, Rev 1.0
 GAMEL( 1998, chickna5u,   chickna5, aristmk5_usa,       chickna5u,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (RHG0730-03, US)",                             MACHINE_NOT_WORKING, layout_aristmk5_us )     // 596, C - 23/02/98
 GAMEL( 1998, chickna5ua,  chickna5, aristmk5_usa,       chickna5u,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (RHG0730-99, US)",                             MACHINE_NOT_WORKING, layout_aristmk5_us )     // 596, C - 23/02/98
 GAMEL( 1998, coralrc2,    aristmk5, aristmk5,           coralrc2,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Coral Riches II (0100919V, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_coralrc2 )        // 577/7, A - 29/12/98, Rev 12
@@ -8389,7 +8447,7 @@ GAMEL( 1996, dolphntra,   dolphntr, aristmk5,           aristmk5,     aristmk5_s
 GAMEL( 1996, dolphntrb,   dolphntr, aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0100388V, NSW/ACT)",                 0,                   layout_dolphntrb )       // 602, B - 10/12/96, Rev 1.24.4.0
 GAMEL( 1996, dolphntru,   dolphntr, aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (FHG4077-02, US)",                    MACHINE_NOT_WORKING, layout_aristmk5_us )     // 602/1, B - 06/12/96
 GAMEL( 1999, dolphntrce,  dolphntr, aristmk5_usa,       dolphntrce,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure - Cash Express (AHG1607, US)",        MACHINE_NOT_WORKING, layout_adonisu )         // MV4090, D - 22/12/99
-GAMEL( 1999, dolphntrcea, dolphntr, aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure - Cash Express (AHG1606, US)",        MACHINE_NOT_WORKING, layout_magimaska )       // MV4090, D - 22/12/99
+GAMEL( 1999, dolphntrcea, dolphntr, aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure - Cash Express (AHG1606, US)",        MACHINE_NOT_WORKING, layout_marmagicu )       // MV4090, D - 22/12/99
 GAMEL( 1999, dolphntrceb, dolphntr, aristmk5_usa,       dolphntrce,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure - Cash Express (AHG1519, US)",        MACHINE_NOT_WORKING, layout_dolphntrceb )     // MV4090, D - 22/12/99
 GAMEL( 1997, drgneye,     aristmk5, aristmk5,           snowcat,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dragon's Eye (0100521V, NSW/ACT)",                     0,                   layout_snowcat )         // 610, A - 09/05/97, Rev 1.27
 GAMEL( 1997, dreamwv,     aristmk5, aristmk5_touch,     dreamwv,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dream Weaver (0200586V, NSW/ACT)",                     MACHINE_NOT_WORKING, layout_dreamwv )         // 606/2, A - 20/06/97, Rev 16
@@ -8408,7 +8466,6 @@ GAMEL( 2001, glizrdce,    aristmk5, aristmk5_usa,       bootsctnua,   aristmk5_s
 GAMEL( 1998, gnomeatw,    aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Gnome Around The World (0100767V, NSW/ACT)",           MACHINE_NOT_WORKING, layout_kgalah )          // 625, C - 18/12/98, Rev 16
 GAMEL( 1997, goldpyr,     aristmk5, aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1205-03, US)",                     MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4091, B - 13/05/97
 GAMEL( 1997, goldpyra,    goldpyr,  aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1206-99, US)",                     MACHINE_NOT_WORKING, layout_aristmk5_us_200 ) // 602/2, B - 13/05/97
-GAMEL( 1998, goldpyrb,    goldpyr,  aristmk5,           goldpyrb,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Golden Pyramids (0100878V, Victoria)",                 MACHINE_NOT_WORKING, layout_goldpyrb )        // 602/5, C - 19/06/98
 GAMEL( 2000, goldenra,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Golden Ra (0101164V, NSW/ACT)",                        MACHINE_NOT_WORKING, layout_goldenra )        // 661, A - 10/04/00, Rev 15
 GAMEL( 2001, hnktonku,    aristmk5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Honky Tonk (BHG1455, US)",                             MACHINE_NOT_WORKING, layout_magimaska )       // MV4122/3, A - 07/08/01
 GAMEL( 2000, honeypot,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Honey Pot (03J00241, NSW/ACT)",                        MACHINE_NOT_WORKING, layout_yukongl5 )        // JB008, A - 21/11/2000, Rev 17
@@ -8420,7 +8477,6 @@ GAMEL( 2000, incasunua,   incasun,  aristmk5_usa,       bootsctnua,   aristmk5_s
 GAMEL( 1999, incasunv,    incasun,  aristmk5,           incasun,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Inca Sun (01J01946, Venezuela)",                       MACHINE_NOT_WORKING, layout_incasun )         // 631/3 B, B- 03/05/99, Rev 15
 GAMEL( 1998, indrema5,    aristmk5, aristmk5,           indrema5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Indian Dreaming (0100845V, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_indrema5 )        // 628/1, B - 15/12/98, Rev 7
 GAMEL( 1996, jumpjoey,    aristmk5, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Jumpin' Joey (0100383V, NSW/ACT)",                     0,                   layout_cashcham )        // 586/6, C - 13/11/96
-GAMEL( 1996, jungjuic,    aristmk5, aristmk5,           jungjuic,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Jungle Juice (0200240V, New Zealand)",                 MACHINE_NOT_WORKING, layout_jungjuic )        // 566/3, F - 06/03/96
 GAMEL( 1995, kgalah,      aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "King Galah (0200536V, NSW/ACT)",                       MACHINE_NOT_WORKING, layout_kgalah )          // 613/6, A - 21/07/95
 GAMEL( 1995, kgalaha,     kgalah,   aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "King Galah (0100536V, NSW/ACT)",                       0,                   layout_kgalah )          // 613, A - 21/07/95
 GAMEL( 2001, kgalahce,    kgalah,   aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "King Galah - Cash Express (AHG1625, US)",              MACHINE_NOT_WORKING, layout_adonisu )         // MV4112/2, B - 07/02/01
@@ -8441,7 +8497,7 @@ GAMEL( 1997, magtcha5,    aristmk5, aristmk5_touch,     dimtouch,     aristmk5_s
 GAMEL( 1997, magtcha5a,   magtcha5, aristmk5_touch,     dimtouch,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Magic Touch (0200455V, NSW/ACT)",                      MACHINE_NOT_WORKING, layout_dimtouch )        // 606, A - 06/03/97, Rev 14
 GAMEL( 1997, mammothm,    aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mammoth Money (0100425V, NSW/ACT)",                    0,                   layout_kgalah )          // 595/5, D - 07/04/97, Rev 1.22.14.1
 GAMEL( 2000, marmagic,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Margarita Magic (01J00101, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_marmagic )        // JB005, A - 07/07/00, Rev 17
-GAMEL( 2000, marmagicu,   marmagic, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1558, US)",                        MACHINE_NOT_WORKING, layout_magimaska )       // US003, 07/07/2000
+GAMEL( 2000, marmagicu,   marmagic, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1558, US)",                        MACHINE_NOT_WORKING, layout_marmagicu )       // US003, 07/07/2000
 GAMEL( 2000, marmagicua,  marmagic, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1559, US)",                        MACHINE_NOT_WORKING, layout_adonisu )         // US003, A - 07/07/00
 GAMEL( 1997, mgarden,     aristmk5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Magic Garden (AHG1211-99, US)",                        MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4033, B - 10/02/97
 GAMEL( 1996, minemine,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (0400115V, NSW/ACT)",                 0,                   layout_swhr2 )           // 559/2, D - 16/01/96, Rev 1.18.3.0
@@ -8473,11 +8529,10 @@ GAMEL( 1995, pengpayc,    pengpay,  aristmk5,           wcougar,      aristmk5_s
 GAMEL( 1997, pengpayu,    pengpay,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (BHI0417-03, US)",                        MACHINE_NOT_WORKING, layout_aristmk5_us )     // 586/7(b), B - 14/07/97
 GAMEL( 1997, pengpayua,   pengpay,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (OHG0417-03, US)",                        MACHINE_NOT_WORKING, layout_aristmk5_us )     // 586/7(b), B - 14/07/97
 GAMEL( 1997, pengpayub,   pengpay,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (OHG0417-02, US)",                        MACHINE_NOT_WORKING, layout_aristmk5_us )     // 586/7(b), B - 14/07/97
-GAMEL( 2001, pengpayce,   pengpay,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays - Cash Express (AHG1544, US)",            MACHINE_NOT_WORKING, layout_qnilecea )        // MV4122,  C - 19/01/01
+GAMEL( 2001, pengpayce,   pengpay,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays - Cash Express (AHG1544, US)",            MACHINE_NOT_WORKING, layout_pengpayce )       // MV4122,  C - 19/01/01
 GAMEL( 2001, pengpuck,    pengpay,  aristmk5_usa,       pengpuck,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays - Penguin Pucks (EHG1257, US)",           MACHINE_NOT_WORKING, layout_pengpuck )        // MV4122/1, C - 19/01/01
 GAMEL( 1998, penpir,      aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pirate (0100674V, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_kgalah )          // 619/1, A - 31/03/98, Rev 10
 GAMEL( 1998, penpira,     penpir,   aristmk5,           snowcat,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pirate (0200578V, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_snowcat )         // 619, A - 27/02/98, Rev 8
-GAMEL( 1998, penpir2,     aristmk5, aristmk5,           penpir2,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pirate II (0100869V, Victoria)",               MACHINE_NOT_WORKING, layout_penpir2 )         // 619/3, A - 17/12/98
 GAMEL( 1998, petshop,     aristmk5, aristmk5,           petshop,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Pet Shop (0100731V, NSW/ACT)",                         MACHINE_NOT_WORKING, layout_petshop )         // 618/1, A - 17/04/98, Rev 13
 GAMEL( 1995, phantpay,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Phantom Pays (0500005V, NSW/ACT)",                     0,                   layout_swhr2 )           // 570/1, E - 12/09/95
 GAMEL( 1996, przfight,    aristmk5, aristmk5,           przfight,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Prize Fight (0100299V, NSW/ACT)",                      0,                   layout_przfight )        // 578/4, B - 08/08/96
@@ -8488,10 +8543,8 @@ GAMEL( 1997, qnileb,      qnile,    aristmk5,           qnile,        aristmk5_s
 GAMEL( 2002, qnilebr,     qnile,    aristmk5,           goldpyrb,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0101707V, Brazil)",                 0,                   layout_goldpyrb )        // MV4162, A - 21/08/02
 GAMEL( 1997, qnilec,      qnile,    aristmk5,           qnilec,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300440V, NSW/ACT)",                MACHINE_NOT_WORKING, layout_qnilec )          // 602/3, B - 13/05/97, Rev 5
 GAMEL( 1999, qniled,      qnile,    aristmk5,           checkma5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0101139V, NSW/ACT)",                MACHINE_NOT_WORKING, layout_qniled )          // 602/16, A - 11/10/99, Rev 14
-GAMEL( 2001, qnilefl,     qnile,    aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Fast Lane (0101670V, Queensland)", MACHINE_NOT_WORKING, layout_trstrove )        // 602/4, E - 17/08/01
 GAMEL( 2000, qnilenl,     qnile,    aristmk5,           qnilenl,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0301059V, Holland)",                0,                   layout_qnilenl )         // 602/5, G - 10/04/00
 GAMEL( 1998, qnilenz,     qnile,    aristmk5,           cashcatnz,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300785V, New Zealand)",            0,                   layout_cashcatnz )       // MV4068, A - 31/8/98, Rev 20
-GAMEL( 1999, qnileql,     qnile,    aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0201200V, Queensland)",             MACHINE_NOT_WORKING, layout_trstrove )        // 602/4, D - 18/06/99
 GAMEL( 1997, qnileu,      qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-02, US)",                   MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4091, B - 13/05/97
 GAMEL( 1997, qnileua,     qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-03, US)",                   MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4091, B - 13/05/97
 GAMEL( 1997, qnilev,      qnile,    aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (04J00784, Venezuela)",              MACHINE_NOT_WORKING, layout_dolphntrb )       // 602/3, B - 13/05/97, Rev 6
@@ -8500,12 +8553,11 @@ GAMEL( 2001, qnilecea,    qnile,    aristmk5_usa,       dolphntru,    aristmk5_s
 GAMEL( 2001, qnileceb,    qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Cash Express (AHG1608, US)",       MACHINE_NOT_WORKING, layout_magimaska )       // MV4091, F - 17/01/01
 GAMEL( 1999, qnilemax,    qnile,    aristmk5_touch,     trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Maximillions (0401072V, NSW/ACT)", MACHINE_NOT_WORKING, layout_trstrove )        // 602/4, D - 18/06/99, Rev 14
 GAMEL( 1994, qtbird,      aristmk5, aristmk5,           qtbird,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Q.T. Bird (0500009V, NSW/ACT)",                        0,                   layout_qtbird )          // 581, A - 27/10/94, Rev 1.1.1.0
-GAMEL( 2000, rainwrce,    aristmk5, aristmk5,           adonisce,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Rainbow Warriors - Cash Express (0101332V, NSW/ACT)",  MACHINE_NOT_WORKING, layout_aristmk5 )        // 655, B - 02/03/00, Rev 25
+GAMEL( 2000, rainwrce,    aristmk5, aristmk5,           adonisce,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Rainbow Warriors - Cash Express (0101332V, NSW/ACT)",  MACHINE_NOT_WORKING, layout_adonisce )        // 655, B - 02/03/00, Rev 25
 GAMEL( 1998, reelpwr,     aristmk5, aristmk5,           wizways,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Reel Power (0100400V, NSW/ACT)",                       0,                   layout_wizways )         // 598/2, A - 01/11/96, Rev 1.23.8.0
 GAMEL( 1998, reelrock,    aristmk5, aristmk5,           reelrock,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Reelin-n-Rockin (0100779V, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_reelrock )        // 628, A - 13/07/98, Rev 5
-GAMEL( 2000, reelrockql,  reelrock, aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Reelin-n-Rockin (0101460V, Queensland)",               MACHINE_NOT_WORKING, layout_trstrove )        // 628/2, E - 20/12/00
-GAMEL( 1997, retrsam,     aristmk5, aristmk5,           retrsam,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0400549V, NSW/ACT)",            MACHINE_NOT_WORKING, layout_sbuk3 )           // 608, A - 17/04/97, Rev 5
-GAMEL( 1997, retrsama,    retrsam,  aristmk5,           retrsam,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0200549V, NSW/ACT)",            0,                   layout_sbuk3 )           // 608, A - 17/04/97, Rev 1.26.25.3
+GAMEL( 1997, retrsam,     aristmk5, aristmk5,           retrsam,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0400549V, NSW/ACT)",            MACHINE_NOT_WORKING, layout_retrsam )         // 608, A - 17/04/97, Rev 5
+GAMEL( 1997, retrsama,    retrsam,  aristmk5,           retrsam,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0200549V, NSW/ACT)",            0,                   layout_retrsam )         // 608, A - 17/04/97, Rev 1.26.25.3
 GAMEL( 1997, retrsamb,    retrsam,  aristmk5,           retrsamb,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0200506V, NSW/ACT)",            0,                   layout_retrsamb )        // 608, A - 17/04/97, Rev 1.26.25.3
 GAMEL( 1997, rushrst,     aristmk5, aristmk5,           rushrst,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Rushin Rooster (0100534V, NSW/ACT)",                   0,                   layout_cashchama )       // 596/3, C - 25/06/97, Rev 1.27.2.3
 GAMEL( 2001, sldeluxe,    aristmk5, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Sweet Liberty Deluxe (AHG1575, US)",                   MACHINE_NOT_WORKING, layout_adonisu )         // MV4137, A - 11/02/01
@@ -8548,9 +8600,22 @@ GAMEL( 1997, wcougarub,   wcougar,  aristmk5_usa,       aristmk5_usa, aristmk5_s
 GAMEL( 1997, wcougaruc,   wcougar,  aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Cougar (AHG1531, US)",                            MACHINE_NOT_WORKING, layout_magimaska )       // MV4055, B - 13/05/97
 GAMEL( 1996, wizways,     aristmk5, aristmk5,           wizways,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wizard Ways (0200396V, NSW/ACT)",                      MACHINE_NOT_WORKING, layout_wizways )         // 598/3, A - 04/11/96, Rev 9
 GAMEL( 1997, wnpost,      aristmk5, aristmk5_usa,       wnpost,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Winning Post (RHG0418-04, US)",                        MACHINE_NOT_WORKING, layout_wnpost )          // 541/2, G - 11/02/97
-GAMEL( 1999, wthing,      aristmk5, aristmk5,           retrsam,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Thing (0101158V, NSW/ACT)",                       MACHINE_NOT_WORKING, layout_sbuk3 )           // 608/4, B - 14/12/99, Rev 8
+GAMEL( 1999, wthing,      aristmk5, aristmk5,           retrsam,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Thing (0101158V, NSW/ACT)",                       MACHINE_NOT_WORKING, layout_retrsam )         // 608/4, B - 14/12/99, Rev 8
 GAMEL( 1999, wtiger,      aristmk5, aristmk5,           wtiger,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "White Tiger Classic (0200954V, NSW/ACT)",              MACHINE_NOT_WORKING, layout_wtiger )          // 638/1, B - 08/07/99, Rev 13
 GAMEL( 2000, yukongl5,    aristmk5, aristmk5,           goldenra,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Yukon Gold (03J00191, NSW/ACT)",                       MACHINE_NOT_WORKING, layout_yukongl5 )        // JB005/1, A - 30/10/2000, Rev 17
+
+// the following parent sets boot but cannot be played due to unemulated comms
+GAMEL( 1996, jungjuic,    aristmk5, aristmk5,           jungjuic,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Jungle Juice (0200240V, New Zealand)",                 MACHINE_NOT_WORKING, layout_jungjuic )        // 566/3, F - 06/03/96
+GAMEL( 1998, penpir2,     aristmk5, aristmk5,           penpir2,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pirate II (0100869V, Victoria)",               MACHINE_NOT_WORKING, layout_penpir2 )         // 619/3, A - 17/12/98
+
+// the following clone sets boot but cannot be played due to unemulated comms
+GAMEL( 1996, bumblbugql,  bumblbug, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200456V, Queensland)",                   MACHINE_NOT_WORKING, layout_swhr2 )           // 593, D - 5/07/96, Rev 1.0
+GAMEL( 1998, chickna5ql,  chickna5, aristmk5,           chickna5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (0200530V, Queensland)",                       MACHINE_NOT_WORKING, layout_snowcat )         // 596, C - 23/02/98, Rev 1.0
+GAMEL( 2000, dolphntrql,  dolphntr, aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0101250V, Queensland)",              MACHINE_NOT_WORKING, layout_trstrove )        // 602/17, A - 20/01/00, Rev 1.0.1.0
+GAMEL( 1998, goldpyrb,    goldpyr,  aristmk5,           goldpyrb,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Golden Pyramids (0100878V, Victoria)",                 MACHINE_NOT_WORKING, layout_goldpyrb )        // 602/5, C - 19/06/98
+GAMEL( 2000, indrema5ql,  indrema5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Indian Dreaming (0101340V, Queensland)",               MACHINE_NOT_WORKING, layout_aristmk5 )        // 628/3, A - 02/05/00, Rev 1.0
+GAMEL( 1999, qnileql,     qnile,    aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0201200V, Queensland)",             MACHINE_NOT_WORKING, layout_trstrove )        // 602/4, D - 18/06/99
+GAMEL( 2001, qnilefl,     qnile,    aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Fast Lane (0101670V, Queensland)", MACHINE_NOT_WORKING, layout_trstrove )        // 602/4, E - 17/08/01
 
 // the following parent sets are known bad dumps, and do not boot (confirmed)
 GAMEL( 1996, blackpnt,    aristmk5, aristmk5,           wildbill,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Black Panther (0200818V, Victoria)",                   MACHINE_NOT_WORKING, layout_wildbill )        // 594/1, A - 30/07/96
@@ -8572,5 +8637,6 @@ GAMEL( 2001, mountmonu,   mountmon, aristmk5_usa,       aristmk5_usa, aristmk5_s
 GAMEL( 2001, partygrsb,   partygrs, aristmk5_usa_touch, bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Party Gras (AHG1568, US)",                             MACHINE_NOT_WORKING, layout_bparty )          // MV4115/6, A - 10/11/2001, 20 lines
 GAMEL( 1995, pengpayd,    pengpay,  aristmk5,           wcougar,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (0300113V, NSW/ACT)",                     MACHINE_NOT_WORKING, layout_wcougar )         // 586, A - 12/10/95, Rev 4
 GAMEL( 1998, petshopa,    petshop,  aristmk5,           snowcat,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Pet Shop (0100679V, NSW/ACT)",                         MACHINE_NOT_WORKING, layout_snowcat )         // 618, A - 09/03/98, Rev 10
+GAMEL( 2000, reelrockql,  reelrock, aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Reelin-n-Rockin (0101460V, Queensland)",               MACHINE_NOT_WORKING, layout_trstrove )        // 628/2, E - 20/12/00
 GAMEL( 1995, sbuk2a,      sbuk2,    aristmk5,           sbuk2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Super Bucks II (0300006V, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_sbuk2 )           // no data due to missing ROMs
 GAMEL( 2000, wthinga,     wthing,   aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Thing (0201176V, NSW/ACT)",                       MACHINE_NOT_WORKING, layout_aristmk5 )        // 608/5, B - 25/02/00, Rev 11

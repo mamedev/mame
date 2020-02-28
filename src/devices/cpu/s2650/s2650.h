@@ -32,9 +32,6 @@ public:
 	s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_sense_handler(Object &&cb) { return m_sense_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_flag_handler(Object &&cb) { return m_flag_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_intack_handler(Object &&cb) { return m_intack_handler.set_callback(std::forward<Object>(cb)); }
 	auto sense_handler() { return m_sense_handler.bind(); }
 	auto flag_handler() { return m_flag_handler.bind(); }
 	auto intack_handler() { return m_intack_handler.bind(); }
@@ -45,10 +42,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 5; }
-	virtual uint32_t execute_max_cycles() const override { return 13; }
-	virtual uint32_t execute_input_lines() const override { return 2; }
-	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 5; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 13; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -87,7 +84,7 @@ private:
 	uint8_t   m_irq_state;
 
 	int     m_icount;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 
 	// For debugger
 	uint16_t  m_debugger_temp;

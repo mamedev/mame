@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 #ifndef MAME_BUS_DMV_K806_H
 #define MAME_BUS_DMV_K806_H
 
@@ -35,8 +36,8 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data) override;
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, uint8_t data) override;
+	virtual void io_read(int ifsel, offs_t offset, uint8_t &data) override;
+	virtual void io_write(int ifsel, offs_t offset, uint8_t data) override;
 
 private:
 	DECLARE_READ_LINE_MEMBER(portt1_r);
@@ -50,7 +51,6 @@ private:
 	required_ioport m_mouse_buttons;
 	required_ioport m_mouse_x;
 	required_ioport m_mouse_y;
-	dmvcart_slot_device * m_bus;
 
 	struct
 	{

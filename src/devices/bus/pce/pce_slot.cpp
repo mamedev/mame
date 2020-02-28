@@ -29,10 +29,10 @@ DEFINE_DEVICE_TYPE(PCE_CART_SLOT, pce_cart_slot_device, "pce_cart_slot", "PCE/TG
 //  device_pce_cart_interface - constructor
 //-------------------------------------------------
 
-device_pce_cart_interface::device_pce_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0)
+device_pce_cart_interface::device_pce_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "pcecart"),
+	m_rom(nullptr),
+	m_rom_size(0)
 {
 }
 
@@ -138,7 +138,7 @@ void device_pce_cart_interface::rom_map_setup(uint32_t size)
 pce_cart_slot_device::pce_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PCE_CART_SLOT, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_pce_cart_interface>(mconfig, *this),
 	m_interface("pce_cart"),
 	m_type(PCE_STD), m_cart(nullptr)
 {
@@ -159,7 +159,7 @@ pce_cart_slot_device::~pce_cart_slot_device()
 
 void pce_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_pce_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 
@@ -181,6 +181,7 @@ static const pce_slot slot_list[] =
 	{ PCE_CDSYS3J, "cdsys3j" },
 	{ PCE_POPULOUS, "populous" },
 	{ PCE_SF2, "sf2" },
+	{ PCE_TENNOKOE, "tennokoe" },
 };
 
 static int pce_get_pcb_id(const char *slot)
@@ -306,6 +307,8 @@ int pce_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 		if (!memcmp(ROM + 0x29d1, "VER. 3.", 7))         { type = PCE_CDSYS3J; } // JP version
 		else if (!memcmp(ROM + 0x29c4, "VER. 3.", 7 ))   { type = PCE_CDSYS3U; } // US version
 	}
+
+	// TODO: type for TENNOKOE, "Kei's" string at bottom?
 
 	return type;
 }

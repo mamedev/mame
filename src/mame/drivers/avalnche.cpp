@@ -215,12 +215,12 @@ void avalnche_state::machine_start()
 	save_item(NAME(m_avalance_video_inverted));
 }
 
-MACHINE_CONFIG_START(avalnche_state::avalnche_base)
-
+void avalnche_state::avalnche_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 12.096_MHz_XTAL / 16)     /* clock input is the "2H" signal divided by two */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(avalnche_state, nmi_line_pulse, 8*60)
+	M6502(config, m_maincpu, 12.096_MHz_XTAL / 16);     /* clock input is the "2H" signal divided by two */
+	m_maincpu->set_addrmap(AS_PROGRAM, &avalnche_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(avalnche_state::nmi_line_pulse), attotime::from_hz(8*60));
 
 	F9334(config, m_latch); // F8
 	m_latch->q_out_cb<0>().set_output("led0"); // 1 CREDIT LAMP
@@ -232,27 +232,28 @@ MACHINE_CONFIG_START(avalnche_state::avalnche_base)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 16, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(avalnche_state, screen_update_avalnche)
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 16, 256);
+	screen.set_screen_update(FUNC(avalnche_state::screen_update_avalnche));
+}
 
-MACHINE_CONFIG_START(avalnche_state::avalnche)
+void avalnche_state::avalnche(machine_config &config)
+{
 	avalnche_base(config);
 	/* sound hardware */
 	avalnche_sound(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(avalnche_state::acatch)
+void avalnche_state::acatch(machine_config &config)
+{
 	avalnche_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(catch_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &avalnche_state::catch_map);
 
 	/* sound hardware... */
 	acatch_sound(config);
-MACHINE_CONFIG_END
+}
 
 
 /*************************************
@@ -263,12 +264,12 @@ MACHINE_CONFIG_END
 
 ROM_START( avalnche )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_NIB_HIGH(  "30612.d2",     0x6800, 0x0800, CRC(3f975171) SHA1(afe680865da97824f1ebade4c7a2ba5d7ee2cbab) )
-	ROM_LOAD_NIB_LOW (  "30615.d3",     0x6800, 0x0800, CRC(3e1a86b4) SHA1(3ff4cffea5b7a32231c0996473158f24c3bbe107) )
-	ROM_LOAD_NIB_HIGH(  "30613.e2",     0x7000, 0x0800, CRC(47a224d3) SHA1(9feb7444a2e5a3d90a4fe78ae5d23c3a5039bfaa) )
-	ROM_LOAD_NIB_LOW (  "30616.e3",     0x7000, 0x0800, CRC(f620f0f8) SHA1(7802b399b3469fc840796c3145b5f63781090956) )
-	ROM_LOAD_NIB_HIGH(  "30611.c2",     0x7800, 0x0800, CRC(0ad07f85) SHA1(5a1a873b14e63dbb69ee3686ba53f7ca831fe9d0) )
-	ROM_LOAD_NIB_LOW (  "30614.c3",     0x7800, 0x0800, CRC(a12d5d64) SHA1(1647d7416bf9266d07f066d3797bda943e004d24) )
+	ROM_LOAD_NIB_HIGH(  "30612-01.d2",     0x6800, 0x0800, CRC(3f975171) SHA1(afe680865da97824f1ebade4c7a2ba5d7ee2cbab) )
+	ROM_LOAD_NIB_LOW (  "30615-01.d3",     0x6800, 0x0800, CRC(3e1a86b4) SHA1(3ff4cffea5b7a32231c0996473158f24c3bbe107) )
+	ROM_LOAD_NIB_HIGH(  "30613-01.e2",     0x7000, 0x0800, CRC(47a224d3) SHA1(9feb7444a2e5a3d90a4fe78ae5d23c3a5039bfaa) )
+	ROM_LOAD_NIB_LOW (  "30616-01.e3",     0x7000, 0x0800, CRC(f620f0f8) SHA1(7802b399b3469fc840796c3145b5f63781090956) )
+	ROM_LOAD_NIB_HIGH(  "30611-01.c2",     0x7800, 0x0800, CRC(0ad07f85) SHA1(5a1a873b14e63dbb69ee3686ba53f7ca831fe9d0) )
+	ROM_LOAD_NIB_LOW (  "30614-01.c3",     0x7800, 0x0800, CRC(a12d5d64) SHA1(1647d7416bf9266d07f066d3797bda943e004d24) )
 ROM_END
 
 ROM_START( cascade )

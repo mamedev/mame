@@ -12,6 +12,7 @@
 
 #include "video/ladybug.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 class ladybug_base_state : public driver_device
@@ -53,8 +54,9 @@ protected:
 
 	void ladybug_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
+
+private:
 	required_device<ladybug_video_device> m_video;
 
 	required_ioport m_port_dsw0;

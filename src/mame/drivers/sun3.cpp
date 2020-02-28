@@ -189,8 +189,8 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 #include "machine/z80scc.h"
 #include "machine/am79c90.h"
 #include "machine/ncr5380n.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
@@ -319,7 +319,6 @@ void sun3_state::ncr5380(device_t *device)
 {
 	devcb_base *devcb;
 	(void)devcb;
-	downcast<ncr5380n_device &>(*device).set_clock(10000000);
 //  downcast<ncr5380n_device &>(*device).drq_handler().set(FUNC(sun3_state::drq_w));
 }
 
@@ -779,8 +778,8 @@ void sun3_state::vmetype0space_novram_map(address_map &map)
 // type 1 device space
 void sun3_state::vmetype1space_map(address_map &map)
 {
-	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
-	map(0x00020000, 0x0002000f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
+	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
+	map(0x00020000, 0x0002000f).rw(m_scc2, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
 	map(0x00040000, 0x000407ff).ram().share("nvram");   // type 2816 parallel EEPROM
 	map(0x00060000, 0x0006ffff).rw(FUNC(sun3_state::rtc7170_r), FUNC(sun3_state::rtc7170_w));
 	map(0x00080000, 0x0008000f).rw(FUNC(sun3_state::parity_r), FUNC(sun3_state::parity_w));
@@ -998,7 +997,6 @@ void sun3_state::machine_start()
 
 void sun3_state::machine_reset()
 {
-	m_maincpu->reset();
 	m_enable = 0;
 	m_buserr = 0;
 	m_diag = 1;
@@ -1008,16 +1006,17 @@ void sun3_state::machine_reset()
 }
 
 // The base Sun 3004 CPU board
-MACHINE_CONFIG_START(sun3_state::sun3)
+void sun3_state::sun3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68020, 16670000)
-	MCFG_DEVICE_PROGRAM_MAP(sun3_mem)
+	M68020(config, m_maincpu, 16670000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun3_state::sun3_mem);
 
-	MCFG_SCREEN_ADD("bwtwo", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(sun3_state, bw2_update)
-	MCFG_SCREEN_SIZE(1600,1100)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
+	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	bwtwo.set_screen_update(FUNC(sun3_state::bw2_update));
+	bwtwo.set_size(1600,1100);
+	bwtwo.set_visarea(0, 1152-1, 0, 900-1);
+	bwtwo.set_refresh_hz(72);
 
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("6M,8M,12M,16M,20M,24M,28M,32M").set_default_value(0x00);
 
@@ -1070,56 +1069,60 @@ MACHINE_CONFIG_START(sun3_state::sun3)
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this] (device_t *device) { ncr5380(device); });
-MACHINE_CONFIG_END
+}
 
 // Sun 3/60
-MACHINE_CONFIG_START(sun3_state::sun3_60)
+void sun3_state::sun3_60(machine_config &config)
+{
 	sun3(config);
-	MCFG_DEVICE_REPLACE("maincpu", M68020, 20000000)
-	MCFG_DEVICE_PROGRAM_MAP(sun3_mem)
+	M68020(config.replace(), m_maincpu, 20000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun3_state::sun3_mem);
 
-	MCFG_SCREEN_MODIFY("bwtwo")
-	MCFG_SCREEN_UPDATE_DRIVER(sun3_state, bw2_16x11_update)
-	MCFG_SCREEN_SIZE(1600,1100)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1600-1, 0, 1100-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
-MACHINE_CONFIG_END
+	screen_device &bwtwo(*subdevice<screen_device>("bwtwo"));
+	bwtwo.set_screen_update(FUNC(sun3_state::bw2_16x11_update));
+	bwtwo.set_size(1600,1100);
+	bwtwo.set_visarea(0, 1600-1, 0, 1100-1);
+	bwtwo.set_refresh_hz(72);
+}
 
 // Sun 3/E
-MACHINE_CONFIG_START(sun3_state::sun3e)
+void sun3_state::sun3e(machine_config &config)
+{
 	sun3(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", M68020, 20000000)
-	MCFG_DEVICE_PROGRAM_MAP(sun3_mem)
-MACHINE_CONFIG_END
+	M68020(config.replace(), m_maincpu, 20000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun3_state::sun3_mem);
+}
 
 // 3/260 and 3/280 (the Sun 3200 board)
-MACHINE_CONFIG_START(sun3_state::sun3200)
+void sun3_state::sun3200(machine_config &config)
+{
 	sun3(config);
-	MCFG_DEVICE_REPLACE("maincpu", M68020, 25000000)
-	MCFG_DEVICE_PROGRAM_MAP(sun3_mem)
+	M68020(config.replace(), m_maincpu, 25000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun3_state::sun3_mem);
 
-	MCFG_SCREEN_MODIFY("bwtwo")
-	MCFG_SCREEN_UPDATE_DRIVER(sun3_state, bw2_16x11_update)
-	MCFG_SCREEN_SIZE(1600,1100)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1600-1, 0, 1100-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
+	screen_device &bwtwo(*subdevice<screen_device>("bwtwo"));
+	bwtwo.set_screen_update(FUNC(sun3_state::bw2_16x11_update));
+	bwtwo.set_size(1600,1100);
+	bwtwo.set_visarea(0, 1600-1, 0, 1100-1);
+	bwtwo.set_refresh_hz(72);
 
 	m_ram->set_default_size("32M").set_extra_options("64M,96M,128M");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sun3_state::sun3_50)
+void sun3_state::sun3_50(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68020, 15700000)
-	MCFG_DEVICE_PROGRAM_MAP(sun3_mem)
+	M68020(config, m_maincpu, 15700000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun3_state::sun3_mem);
 
 	AM79C90(config, m_lance, 10'000'000); // clock is a guess
 
-	MCFG_SCREEN_ADD("bwtwo", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(sun3_state, bw2_350_update)
-	MCFG_SCREEN_SIZE(1600,1100)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
+	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	bwtwo.set_screen_update(FUNC(sun3_state::bw2_350_update));
+	bwtwo.set_size(1600,1100);
+	bwtwo.set_visarea(0, 1152-1, 0, 900-1);
+	bwtwo.set_refresh_hz(72);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1170,7 +1173,7 @@ MACHINE_CONFIG_START(sun3_state::sun3_50)
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this] (device_t *device) { ncr5380(device); });
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 

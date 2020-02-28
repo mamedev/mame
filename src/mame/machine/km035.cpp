@@ -11,16 +11,16 @@
 #include "km035.h"
 #include "speaker.h"
 
-#define VERBOSE_DBG 0       /* general debug messages */
 
-#define DBG_LOG(N,M,A) \
-	do { \
-	if(VERBOSE_DBG>=N) \
-		{ \
-			logerror("%11.6f at %s: ",machine().time().as_double(),machine().describe_context()); \
-			logerror A; \
-		} \
-	} while (0)
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_DEBUG     (1U <<  1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -292,7 +292,7 @@ void km035_device::device_reset()
 
 WRITE_LINE_MEMBER( km035_device::write_rxd )
 {
-	DBG_LOG(1,0,("write_rxd %d\n", state));
+	LOG("write_rxd %d\n", state);
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 	m_rx = state;
 }
@@ -317,20 +317,20 @@ WRITE8_MEMBER( km035_device::p1_w )
 	    6       Matrix row bit 2
 	    7       Matrix row bit 3
 	*/
-	DBG_LOG(2,0,( "p1_w %02x = row %d col %d tx %d\n", data, (data>>4)&15, data&7, !BIT(data, 3)));
+	LOGDBG("p1_w %02x = row %d col %d tx %d\n", data, (data>>4)&15, data&7, !BIT(data, 3));
 	m_p1 = data;
 
 	sense = m_kbd[(data>>4) & 15]->read();
 	m_keylatch = BIT(sense, (data & 7));
 	if (m_keylatch)
-		DBG_LOG(1,0,( "keypress at row %d col %d\n", (data>>4)&15, data&7));
+		LOG("keypress at row %d col %d\n", (data>>4)&15, data&7);
 
 	m_tx_handler(!BIT(data, 3));
 }
 
 WRITE8_MEMBER( km035_device::p2_w )
 {
-	DBG_LOG(2,0,( "p2_w %02x\n", data ));
+	LOGDBG("p2_w %02x\n", data);
 
 	m_p2 = data;
 }
@@ -351,7 +351,7 @@ READ8_MEMBER( km035_device::p2_r )
 
 WRITE8_MEMBER( km035_device::bus_w )
 {
-	DBG_LOG(2,0,( "bus_w %02x\n", data));
+	LOGDBG("bus_w %02x\n", data);
 }
 
 //-------------------------------------------------

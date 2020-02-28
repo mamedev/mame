@@ -333,18 +333,19 @@ static void trs80_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(trs80m3_state::model3)
+void trs80m3_state::model3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 20.2752_MHz_XTAL / 10) // FIXME: actual Model III XTAL is 10.1376 MHz
-	MCFG_DEVICE_PROGRAM_MAP(m3_mem)
-	MCFG_DEVICE_IO_MAP(m3_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(trs80m3_state, rtc_interrupt, 20.2752_MHz_XTAL / 10 / 67584)
+	Z80(config, m_maincpu, 20.2752_MHz_XTAL / 10); // FIXME: actual Model III XTAL is 10.1376 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &trs80m3_state::m3_mem);
+	m_maincpu->set_addrmap(AS_IO, &trs80m3_state::m3_io);
+	m_maincpu->set_periodic_int(FUNC(trs80m3_state::rtc_interrupt), attotime::from_hz(20.2752_MHz_XTAL / 10 / 67584));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(12.672_MHz_XTAL, 800, 0, 640, 264, 0, 240) // FIXME: these are Model 4 80-column parameters
-	MCFG_SCREEN_UPDATE_DRIVER(trs80m3_state, screen_update_trs80m3)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(12.672_MHz_XTAL, 800, 0, 640, 264, 0, 240); // FIXME: these are Model 4 80-column parameters
+	screen.set_screen_update(FUNC(trs80m3_state::screen_update_trs80m3));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_trs80m3);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -352,14 +353,14 @@ MACHINE_CONFIG_START(trs80m3_state::model3)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(trs80l2_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	MCFG_QUICKLOAD_ADD("quickload", trs80m3_state, trs80_cmd, "cmd", 1.0)
+	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(trs80m3_state::quickload_cb));
 
 	FD1793(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(trs80m3_state::intrq_w));
@@ -390,13 +391,13 @@ MACHINE_CONFIG_START(trs80m3_state::model3)
 	//MCFG_AY31015_WRITE_DAV_CB(WRITELINE( , , ))
 	m_uart->set_auto_rdav(true);
 	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(trs80m3_state::model4)
+void trs80m3_state::model4(machine_config &config)
+{
 	model3(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(m4_mem)
-	MCFG_DEVICE_IO_MAP(m4_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &trs80m3_state::m4_mem);
+	m_maincpu->set_addrmap(AS_IO, &trs80m3_state::m4_io);
 
 	RAM(config, m_mainram, 0);
 	m_mainram->set_default_size("64K");
@@ -408,13 +409,13 @@ MACHINE_CONFIG_START(trs80m3_state::model4)
 	m_m4_bank->set_data_width(8);
 	m_m4_bank->set_addr_width(18);
 	m_m4_bank->set_stride(0x10000);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(trs80m3_state::model4p)
+void trs80m3_state::model4p(machine_config &config)
+{
 	model3(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(m4p_mem)
-	MCFG_DEVICE_IO_MAP(m4p_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &trs80m3_state::m4p_mem);
+	m_maincpu->set_addrmap(AS_IO, &trs80m3_state::m4p_io);
 
 	RAM(config, m_mainram, 0);
 	m_mainram->set_default_size("64K");
@@ -428,13 +429,13 @@ MACHINE_CONFIG_START(trs80m3_state::model4p)
 	m_m4p_bank->set_stride(0x10000);
 
 	config.device_remove("quickload");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(trs80m3_state::cp500)
+void trs80m3_state::cp500(machine_config &config)
+{
 	model3(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(cp500_io)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &trs80m3_state::cp500_io);
+}
 
 /***************************************************************************
 

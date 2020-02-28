@@ -46,8 +46,6 @@ public:
 	void init_tokyogal();
 	void init_finalbny();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
-
 private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;

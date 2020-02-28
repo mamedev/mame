@@ -54,7 +54,6 @@ Ports:
 #include "sound/ay8910.h"
 #include "sound/sp0256.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -130,7 +129,7 @@ private:
 	DECLARE_WRITE8_MEMBER(pio_bc_w);
 	DECLARE_READ8_MEMBER(sby_r);
 	DECLARE_WRITE8_MEMBER(ald_w);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( ace );
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
 	void ace_io(address_map &map);
 	void ace_mem(address_map &map);
@@ -169,7 +168,7 @@ private:
  Snapshot Handling
 ******************************************************************************/
 
-SNAPSHOT_LOAD_MEMBER( ace_state, ace )
+SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 {
 	cpu_device *cpu = m_maincpu;
 	uint8_t *RAM = memregion(cpu->tag())->base();
@@ -751,32 +750,32 @@ void ace_state::machine_start()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ace )
+//  machine_config( ace )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ace_state::ace)
+void ace_state::ace(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(6'500'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(ace_mem)
-	MCFG_DEVICE_IO_MAP(ace_io)
-	config.m_minimum_quantum = attotime::from_hz(60);
+	Z80(config, m_maincpu, XTAL(6'500'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ace_state::ace_mem);
+	m_maincpu->set_addrmap(AS_IO, &ace_state::ace_io);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(ace_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(6'500'000), 416, 0, 336, 312, 0, 304)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(ace_state::screen_update));
+	screen.set_raw(XTAL(6'500'000), 416, 0, 336, 312, 0, 304);
+	screen.set_palette("palette");
 
 	TIMER(config, "set_irq").configure_scanline(FUNC(ace_state::set_irq), SCREEN_TAG, 31*8, 264);
 	TIMER(config, "clear_irq").configure_scanline(FUNC(ace_state::clear_irq), SCREEN_TAG, 32*8, 264);
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ace)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ace);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	AY8910(config, AY8910_TAG, XTAL(6'500'000) / 2).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -788,9 +787,14 @@ MACHINE_CONFIG_START(ace_state::ace)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(ace_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("jupace_cass");
 
-	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", 1)
+	// snapshot
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "ace"));
+	snapshot.set_delay(attotime::from_double(1.0));
+	snapshot.set_load_callback(FUNC(ace_state::snapshot_cb));
+	snapshot.set_interface("jupace_snap");
 
 	I8255A(config, m_ppi);
 	m_ppi->in_pb_callback().set(FUNC(ace_state::sby_r));
@@ -811,7 +815,8 @@ MACHINE_CONFIG_START(ace_state::ace)
 	RAM(config, RAM_TAG).set_default_size("1K").set_extra_options("16K,32K,48K");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("jupace_cass");
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "snap_list").set_original("jupace_snap");
+}
 
 
 

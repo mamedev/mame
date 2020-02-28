@@ -276,7 +276,7 @@ void x68k_keyboard_device::device_reset()
 	buffered_rs232_device::device_reset();
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(38'400); // TODO: Should be 2400 but MC68901 doesn't support divide by 16
+	set_rate(2400);
 	receive_register_reset();
 	transmit_register_reset();
 
@@ -312,7 +312,7 @@ void x68k_state::x68k_keyboard_push_scancode(unsigned char code)
 			//if(ioport("options")->read() & 0x01)
 			//{
 			//  m_current_vector[6] = 0x4c;
-			//  m_maincpu->set_input_line_and_vector(6,ASSERT_LINE,0x4c);
+			//  m_maincpu->set_input_line(6,ASSERT_LINE);
 			//  logerror("MFP: Receive buffer full IRQ sent\n");
 			//}
 		}

@@ -355,10 +355,11 @@ public:
 
 	//TIMER_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
-	IRQ_CALLBACK_MEMBER(cat_int_ack);
 
 	void cat(machine_config &config);
 	void cat_mem(address_map &map);
+	void cpu_space_map(address_map &map);
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -901,7 +902,7 @@ void cat_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		counter_6ms_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in cat_state::device_timer");
+		throw emu_fatalerror("Unknown id in cat_state::device_timer");
 	}
 }
 
@@ -915,10 +916,10 @@ TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
 	m_6ms_counter++;
 }
 
-IRQ_CALLBACK_MEMBER(cat_state::cat_int_ack)
+void cat_state::cpu_space_map(address_map &map)
 {
-	m_maincpu->set_input_line(M68K_IRQ_1,CLEAR_LINE);
-	return M68K_INT_ACK_AUTOVECTOR;
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff3, 0xfffff3).lr8(NAME([this]() { m_maincpu->set_input_line(1, CLEAR_LINE); return m68000_device::autovector(1); }));
 }
 
 MACHINE_START_MEMBER(cat_state,cat)
@@ -983,12 +984,10 @@ uint32_t cat_state::screen_update_cat(screen_device &screen, bitmap_rgb32 &bitma
  */
 WRITE_LINE_MEMBER(cat_state::cat_duart_irq_handler)
 {
-	int irqvector = m_duart->get_irq_vector();
-
 #ifdef DEBUG_DUART_IRQ_HANDLER
 	fprintf(stderr, "Duart IRQ handler called: state: %02X, vector: %06X\n", state, irqvector);
 #endif
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_1, state, irqvector);
+	m_maincpu->set_input_line(M68K_IRQ_1, state);
 }
 
 WRITE_LINE_MEMBER(cat_state::cat_duart_txa) // semit sends stuff here; connects to the serial port on the back
@@ -1054,23 +1053,23 @@ WRITE_LINE_MEMBER(cat_state::prn_ack_ff) // switch the flipflop state on the ris
 #endif
 }
 
-MACHINE_CONFIG_START(cat_state::cat)
-
+void cat_state::cat(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(19'968'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(cat_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cat_state,cat_int_ack)
+	M68000(config, m_maincpu, XTAL(19'968'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cat_state::cat_mem);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cat_state::cpu_space_map);
 
 	MCFG_MACHINE_START_OVERRIDE(cat_state,cat)
 	MCFG_MACHINE_RESET_OVERRIDE(cat_state,cat)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(672, 344)
-	MCFG_SCREEN_VISIBLE_AREA(0, 672-1, 0, 344-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cat_state, screen_update_cat)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(672, 344);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(cat_state::screen_update_cat));
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
@@ -1091,7 +1090,7 @@ MACHINE_CONFIG_START(cat_state::cat)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 ROM_START( cat )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
@@ -1135,7 +1134,7 @@ ROM_START( cat )
 	// According to Sandy Bumgarner, there should be a 2.42 version which fixes some bugs in the calc command vs 2.40
 	// According to the Cat Repair Manual page 4-20, there should be a version called B91U0x (maybe 1.91 or 0.91?) with sum16s of 9F1F, FF0A, 79BF and 03FF
 
-	ROM_REGION( 0x80000, "svrom", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x80000, "svrom", ROMREGION_ERASE00 )
 	// SPELLING VERIFICATION ROM (SVROM)
 	/* Romspace here is a little strange: there are 3 ROM sockets on the board:
 	 * svrom-0 maps to 200000-21ffff every ODD byte (d8-d0)
@@ -1156,7 +1155,7 @@ ROM_START( cat )
 	 * Each of these will also have its own code ROMset as well.
 	 */
 	// NH7-0684 (US, dumped):
-	ROMX_LOAD( "uv1__nh7-0684__hn62301apc11__7h1.ic6", 0x00000, 0x20000, CRC(229ca210) SHA1(564b57647a34acdd82159993a3990a412233da14), ROM_SKIP(1)) // this is a 28pin tc531000 mask ROM, 128KB long; "US" SVROM
+	ROMX_LOAD( "uv1__nh7-0684__hn62301apc11__7h1.ic6", 0x00001, 0x20000, CRC(229ca210) SHA1(564b57647a34acdd82159993a3990a412233da14), ROM_SKIP(1)) // this is a 28pin tc531000 mask ROM, 128KB long; "US" SVROM
 
 	/* There is an unpopulated PAL16L8 at IC9 whose original purpose (based
 	 * on the schematics) was probably to cause a 68k bus error when

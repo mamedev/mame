@@ -9,6 +9,7 @@ driver by Jarek Burczynski
 Todo:
  - analog sound
  - colors
+ - horizontal sprite positioning when screen is flipped
 
 ***********************************************************
 
@@ -48,6 +49,7 @@ PROMs : NEC B406 (1kx4) x2
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class sbowling_state : public driver_device
@@ -110,8 +112,8 @@ static void plot_pixel_sbw(bitmap_ind16 *tmpbitmap, int x, int y, int col, int f
 {
 	if (flip)
 	{
-		y = 255-y;
-		x = 247-x;
+		y = 255 - y;
+		x = 255 - x;
 	}
 
 	tmpbitmap->pix16(y, x) = col;
@@ -151,7 +153,7 @@ uint32_t sbowling_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 void sbowling_state::video_start()
 {
 	m_tmpbitmap = std::make_unique<bitmap_ind16>(32*8,32*8);
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sbowling_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sbowling_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	save_item(NAME(m_bgmap));
 	save_item(NAME(m_system));
@@ -198,10 +200,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(sbowling_state::interrupt)
 	int scanline = param;
 
 	if(scanline == 256)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* Z80 - RST 08h */
 
 	if(scanline == 128)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h */
 
 }
 
@@ -216,14 +218,11 @@ WRITE8_MEMBER(sbowling_state::system_w)
 	*/
 
 
-	flip_screen_set(data&1);
+	flip_screen_set(BIT(data, 3));
 
-	if ((m_system^data)&1)
-	{
-		int offs;
-		for (offs = 0;offs < 0x4000; offs++)
+	for (int offs = 0; offs < 0x4000; offs++)
 			videoram_w(space, offs, m_videoram[offs]);
-	}
+
 	m_system = data;
 }
 
@@ -292,7 +291,7 @@ static INPUT_PORTS_START( sbowling )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
@@ -412,21 +411,22 @@ void sbowling_state::sbowling_palette(palette_device &palette) const
 	}
 }
 
-MACHINE_CONFIG_START(sbowling_state::sbowling)
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(19'968'000)/10)   /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(port_map)
+void sbowling_state::sbowling(machine_config &config)
+{
+	I8080(config, m_maincpu, XTAL(19'968'000)/10);   /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sbowling_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &sbowling_state::port_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(sbowling_state::interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)     /* vert size taken from mw8080bw */
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sbowling_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 262);     /* vert size taken from mw8080bw */
+	screen.set_visarea(1*8, 31*8-1, 4*8, 32*8-1);
+	screen.set_screen_update(FUNC(sbowling_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_sbowling);
 
@@ -436,7 +436,7 @@ MACHINE_CONFIG_START(sbowling_state::sbowling)
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, "aysnd", XTAL(19'968'000)/16).add_route(ALL_OUTPUTS, "mono", 0.33);  /* ? */
-MACHINE_CONFIG_END
+}
 
 ROM_START( sbowling )
 	ROM_REGION( 0x10000, "maincpu", 0 )

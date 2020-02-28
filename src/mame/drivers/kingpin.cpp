@@ -69,7 +69,7 @@ private:
 
 WRITE8_MEMBER(kingpin_state::sound_nmi_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -91,21 +91,20 @@ void kingpin_state::kingpin_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x20, 0x20).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0x21, 0x21).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x20, 0x21).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 	map(0x60, 0x60).w(FUNC(kingpin_state::sound_nmi_w));
-	//AM_RANGE(0x30, 0x30) AM_WRITENOP // lamps?
-	//AM_RANGE(0x40, 0x40) AM_WRITENOP // lamps?
-	//AM_RANGE(0x50, 0x50) AM_WRITENOP // ?
-	//AM_RANGE(0x70, 0x70) AM_WRITENOP // ?
+	//map(0x30, 0x30).nopw(); // lamps?
+	//map(0x40, 0x40).nopw(); // lamps?
+	//map(0x50, 0x50).nopw(); // ?
+	//map(0x70, 0x70).nopw(); // ?
 }
 
 void kingpin_state::kingpin_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x8000, 0x8001).w("aysnd", FUNC(ay8910_device::address_data_w));
-	//AM_RANGE(0x8400, 0x8400) AM_READNOP // ?
-	//AM_RANGE(0x8401, 0x8401) AM_WRITENOP // ?
+	//map(0x8400, 0x8400).nopr(); // ?
+	//map(0x8401, 0x8401).nopw(); // ?
 	map(0x8800, 0x8fff).ram();
 	map(0x9000, 0x9000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }

@@ -216,8 +216,8 @@ private:
 
 	DECLARE_READ16_MEMBER(unk0_r) { return 0; }
 	DECLARE_READ16_MEMBER(unk_r) { return machine().rand(); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( iq128_cart );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( iq128_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(cart_unload);
 
 	void geniusiq_mem(address_map &map);
 
@@ -410,7 +410,7 @@ INPUT_CHANGED_MEMBER( geniusiq_state::send_mouse_input )
 
 INPUT_CHANGED_MEMBER( geniusiq_state::send_input )
 {
-	uint16_t data = (uint16_t)(uintptr_t)param;
+	uint16_t data = (uint16_t)param;
 
 	// set bit 7 if the key is released
 	if (!newval)
@@ -429,8 +429,8 @@ void geniusiq_state::geniusiq_mem(address_map &map)
 	map(0x310000, 0x31FFFF).ram();
 	map(0x400000, 0x41ffff).mirror(0x0e0000).rw("flash", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
 	map(0x600300, 0x600301).r(FUNC(geniusiq_state::input_r));
-	//AM_RANGE(0x600500, 0x60050f)                      // read during IRQ 5
-	//AM_RANGE(0x600600, 0x600605)                      // sound ??
+	//map(0x600500, 0x60050f)                      // read during IRQ 5
+	//map(0x600600, 0x600605)                      // sound ??
 	map(0x600606, 0x600609).w(FUNC(geniusiq_state::gfx_base_w));
 	map(0x60060a, 0x60060b).w(FUNC(geniusiq_state::gfx_idx_w));
 	map(0x600802, 0x600803).r(FUNC(geniusiq_state::cart_state_r));  // cartridge state
@@ -667,7 +667,7 @@ void geniusiq_state::machine_reset()
 	m_mouse_gfx_posy = 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state,iq128_cart)
+DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -692,26 +692,27 @@ DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state,iq128_cart)
 	return image_init_result::PASS;
 }
 
-DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state,iq128_cart)
+DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state::cart_unload)
 {
 	m_cart_state = IQ128_NO_CART;
 }
 
 
-MACHINE_CONFIG_START(geniusiq_state::iq128)
+void geniusiq_state::iq128(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // The main crystal is at 32MHz, not sure whats the CPU freq
-	MCFG_DEVICE_PROGRAM_MAP(geniusiq_mem)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(geniusiq_state, irq6_line_hold,  125)  // the internal clock is increased by 1 sec every 125 interrupts
+	M68000(config, m_maincpu, XTAL(32'000'000)/2); // The main crystal is at 32MHz, not sure whats the CPU freq
+	m_maincpu->set_addrmap(AS_PROGRAM, &geniusiq_state::geniusiq_mem);
+	m_maincpu->set_periodic_int(FUNC(geniusiq_state::irq6_line_hold), attotime::from_hz(125));  // the internal clock is increased by 1 sec every 125 interrupts
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER( geniusiq_state, screen_update )
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(512, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(geniusiq_state::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(geniusiq_state::geniusiq_palette), 16);
 
@@ -719,13 +720,13 @@ MACHINE_CONFIG_START(geniusiq_state::iq128)
 	AMD_29F010(config, "flash");
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "iq128_cart")
-	MCFG_GENERIC_LOAD(geniusiq_state, iq128_cart)
-	MCFG_GENERIC_UNLOAD(geniusiq_state, iq128_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "iq128_cart"));
+	cartslot.set_device_load(FUNC(geniusiq_state::cart_load));
+	cartslot.set_device_unload(FUNC(geniusiq_state::cart_unload));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("iq128");
-MACHINE_CONFIG_END
+}
 
 void geniusiq_state::iqtv512(machine_config &config)
 {

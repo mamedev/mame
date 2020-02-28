@@ -18,17 +18,18 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart) override;
-
-	DECLARE_WRITE8_MEMBER(banking);
+	virtual uint8_t read_cart(offs_t offset) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_post_load() override;
 
 	void restore_banks();
 
 private:
+	void banking(uint8_t data);
+
 	uint8_t m_selected_bank;
 	uint8_t *m_bank_base;
 };

@@ -23,6 +23,30 @@ void konami1_device::device_start()
 	m6809_base_device::device_start();
 }
 
+u32 konami1_device::disassembler::interface_flags() const
+{
+	return SPLIT_DECRYPTION;
+}
+
+u8 konami1_device::disassembler::decrypt8(u8 value, offs_t pc, bool opcode) const
+{
+	if (!opcode || pc < m_boundary)
+		return value;
+	switch (pc & 0xa) {
+	default:
+	case 0x0: return value ^ 0x22;
+	case 0x2: return value ^ 0x82;
+	case 0x8: return value ^ 0x28;
+	case 0xa: return value ^ 0x88;
+	}
+	return value;
+}
+
+std::unique_ptr<util::disasm_interface> konami1_device::create_disassembler()
+{
+	return std::make_unique<disassembler>(m_boundary);
+}
+
 void konami1_device::set_encryption_boundary(uint16_t adr)
 {
 	m_boundary = adr;

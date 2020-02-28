@@ -157,7 +157,7 @@ uint8_t a2bus_timemasterho_device::read_c0nx(uint8_t offset)
 {
 	if (offset <= 3)
 	{
-		return m_pia->reg_r(offset);
+		return m_pia->read(offset);
 	}
 
 	return 0xff;
@@ -172,7 +172,7 @@ void a2bus_timemasterho_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	if (offset <= 3)
 	{
-		m_pia->reg_w(offset, data);
+		m_pia->write(offset, data);
 	}
 }
 
@@ -225,7 +225,7 @@ WRITE8_MEMBER(a2bus_timemasterho_device::pia_out_b)
 	// if it's a read, poke it into the PIA
 	if ((data>>5) & 1)
 	{
-		m_pia->write_porta(m_msm5832->data_r(space, 0));
+		m_pia->write_porta(m_msm5832->data_r());
 	}
 }
 

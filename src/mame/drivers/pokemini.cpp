@@ -104,7 +104,7 @@ private:
 	DECLARE_WRITE8_MEMBER(hwreg_w);
 	DECLARE_READ8_MEMBER(hwreg_r);
 	DECLARE_READ8_MEMBER(rom_r);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void pokemini_mem_map(address_map &map);
 
@@ -126,7 +126,7 @@ private:
 READ8_MEMBER( pokemini_state::rom_r )
 {
 	offset += 0x2100;
-	return m_cart->read_rom(space, offset & 0x1fffff);
+	return m_cart->read_rom(offset & 0x1fffff);
 }
 
 void pokemini_state::pokemini_mem_map(address_map &map)
@@ -304,7 +304,7 @@ void pokemini_state::check_irqs()
 	{
 		//logerror("Triggering IRQ with vector %02x\n", vector );
 		/* Trigger interrupt and set vector */
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector );
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector ); // MINX
 	}
 	else
 	{
@@ -1509,7 +1509,7 @@ READ8_MEMBER(pokemini_state::hwreg_r)
 	return data;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( pokemini_state, pokemini_cart )
+DEVICE_IMAGE_LOAD_MEMBER( pokemini_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -1768,7 +1768,7 @@ void pokemini_state::pokemini(machine_config &config)
 	MINX(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pokemini_state::pokemini_mem_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	I2CMEM(config, m_i2cmem, 0).set_data_size(0x2000);
 
@@ -1789,8 +1789,7 @@ void pokemini_state::pokemini(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cartridge */
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "pokemini_cart", "bin,min"));
-	cartslot.set_device_load(device_image_load_delegate(&pokemini_state::device_image_load_pokemini_cart, this));
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "pokemini_cart", "bin,min").set_device_load(FUNC(pokemini_state::cart_load));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("pokemini");

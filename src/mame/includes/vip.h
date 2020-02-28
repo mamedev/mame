@@ -86,7 +86,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(exp_dma_out_w);
 	DECLARE_WRITE_LINE_MEMBER(exp_dma_in_w);
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( vip );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void vip_io(address_map &map);
 	void vip_mem(address_map &map);

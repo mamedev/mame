@@ -136,7 +136,7 @@ void spacefb_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		interrupt_callback(ptr, param);
 		break;
 	default:
-			assert_always(false, "Unknown id in spacefb_state::device_timer");
+		throw emu_fatalerror("Unknown id in spacefb_state::device_timer");
 	}
 }
 
@@ -147,7 +147,7 @@ TIMER_CALLBACK_MEMBER(spacefb_state::interrupt_callback)
 	/* compute vector and set the interrupt line */
 	int vpos = m_screen->vpos();
 	uint8_t vector = 0xc7 | ((vpos & 0x40) >> 2) | ((~vpos & 0x40) >> 3);
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, vector);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, vector); // Z80
 
 	/* set up for next interrupt */
 	if (vpos == SPACEFB_INT_TRIGGER_COUNT_1)
@@ -330,8 +330,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(spacefb_state::spacefb)
-
+void spacefb_state::spacefb(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, SPACEFB_MAIN_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spacefb_state::spacefb_main_map);
@@ -344,17 +344,16 @@ MACHINE_CONFIG_START(spacefb_state::spacefb)
 	m_audiocpu->t0_in_cb().set(FUNC(spacefb_state::audio_t0_r));
 	m_audiocpu->t1_in_cb().set(FUNC(spacefb_state::audio_t1_r));
 
-	config.m_minimum_quantum = attotime::from_hz(180);
+	config.set_maximum_quantum(attotime::from_hz(180));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(SPACEFB_PIXEL_CLOCK, SPACEFB_HTOTAL, SPACEFB_HBEND, SPACEFB_HBSTART, SPACEFB_VTOTAL, SPACEFB_VBEND, SPACEFB_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(spacefb_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(SPACEFB_PIXEL_CLOCK, SPACEFB_HTOTAL, SPACEFB_HBEND, SPACEFB_HBSTART, SPACEFB_VTOTAL, SPACEFB_VBEND, SPACEFB_VBSTART);
+	m_screen->set_screen_update(FUNC(spacefb_state::screen_update));
 
 	/* audio hardware */
 	spacefb_audio(config);
-
-MACHINE_CONFIG_END
+}
 
 
 

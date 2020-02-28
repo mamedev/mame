@@ -7,12 +7,13 @@
     Format code for Coleco Adam .ddp cassette files.
 
 *********************************************************************/
+#ifndef MAME_FORMATS_ADAM_CAS_H
+#define MAME_FORMATS_ADAM_CAS_H
 
-#ifndef __ADAM_CAS_H
-#define __ADAM_CAS_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(coleco_adam_cassette_formats);
 
-#endif
+#endif // MAME_FORMATS_ADAM_CAS_H

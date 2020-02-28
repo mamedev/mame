@@ -42,30 +42,27 @@ sbus_slot_device::sbus_slot_device(const machine_config &mconfig, const char *ta
 
 sbus_slot_device::sbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_sbus_card_interface>(mconfig, *this)
 	, m_sbus(*this, finder_base::DUMMY_TAG)
+	, m_slot(-1)
 {
 }
 
 void sbus_slot_device::device_validity_check(validity_checker &valid) const
 {
-	device_t *const card(get_card_device());
-	if (card && !dynamic_cast<device_sbus_card_interface *>(card))
-		osd_printf_error("Card device %s (%s) does not implement device_sbus_card_interface\n", card->tag(), card->name());
+	if (m_slot < 0 || m_slot > 2)
+		osd_printf_error("Slot %d out of range for Sun SBus\n", m_slot);
 }
 
 void sbus_slot_device::device_resolve_objects()
 {
-	device_sbus_card_interface *const sbus_card(dynamic_cast<device_sbus_card_interface *>(get_card_device()));
+	device_sbus_card_interface *const sbus_card(get_card_device());
 	if (sbus_card)
-		sbus_card->set_sbus(m_sbus, tag());
+		sbus_card->set_sbus(m_sbus, m_slot);
 }
 
 void sbus_slot_device::device_start()
 {
-	device_t *const card(get_card_device());
-	if (card && !dynamic_cast<device_sbus_card_interface *>(card))
-		throw emu_fatalerror("sbus_slot_device: card device %s (%s) does not implement device_sbus_card_interface\n", card->tag(), card->name());
 }
 
 
@@ -89,7 +86,7 @@ sbus_device::sbus_device(const machine_config &mconfig, device_type type, const 
 	, m_space_config("SBus Space", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor())
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_type1space(*this, finder_base::DUMMY_TAG)
-	, m_irq_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_irq_cb(*this)
 	, m_buserr(*this)
 {
 }
@@ -97,8 +94,7 @@ sbus_device::sbus_device(const machine_config &mconfig, device_type type, const 
 void sbus_device::device_resolve_objects()
 {
 	// resolve callbacks
-	for (int i = 0; i < 7; i++)
-		m_irq_cb[i].resolve_safe();
+	m_irq_cb.resolve_all_safe();
 	m_buserr.resolve_safe();
 }
 
@@ -107,9 +103,9 @@ void sbus_device::device_start()
 	std::fill(std::begin(m_device_list), std::end(m_device_list), nullptr);
 
 	m_space = &space(0);
-	m_space->install_readwrite_handler(0x00000000, 0x01ffffff, read32_delegate(FUNC(sbus_device::slot_timeout_r<0>), this), write32_delegate(FUNC(sbus_device::slot_timeout_w<0>), this));
-	m_space->install_readwrite_handler(0x02000000, 0x03ffffff, read32_delegate(FUNC(sbus_device::slot_timeout_r<1>), this), write32_delegate(FUNC(sbus_device::slot_timeout_w<1>), this));
-	m_space->install_readwrite_handler(0x04000000, 0x05ffffff, read32_delegate(FUNC(sbus_device::slot_timeout_r<2>), this), write32_delegate(FUNC(sbus_device::slot_timeout_w<2>), this));
+	m_space->install_readwrite_handler(0x00000000, 0x01ffffff, read32_delegate(*this, FUNC(sbus_device::slot_timeout_r<0>)), write32_delegate(*this, FUNC(sbus_device::slot_timeout_w<0>)));
+	m_space->install_readwrite_handler(0x02000000, 0x03ffffff, read32_delegate(*this, FUNC(sbus_device::slot_timeout_r<1>)), write32_delegate(*this, FUNC(sbus_device::slot_timeout_w<1>)));
+	m_space->install_readwrite_handler(0x04000000, 0x05ffffff, read32_delegate(*this, FUNC(sbus_device::slot_timeout_r<2>)), write32_delegate(*this, FUNC(sbus_device::slot_timeout_w<2>)));
 }
 
 template <unsigned Slot> READ32_MEMBER(sbus_device::slot_timeout_r)
@@ -166,10 +162,9 @@ void sbus_device::set_irq_line(int state, int line)
 
 
 device_sbus_card_interface::device_sbus_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "sbus")
 	, m_sbus_finder(device, finder_base::DUMMY_TAG)
 	, m_sbus(nullptr)
-	, m_sbus_slottag(nullptr)
 	, m_slot(-1)
 	, m_base(0)
 {
@@ -187,8 +182,6 @@ void device_sbus_card_interface::interface_validity_check(validity_checker &vali
 
 void device_sbus_card_interface::interface_pre_start()
 {
-	device_slot_card_interface::interface_pre_start();
-
 	if (!m_sbus)
 	{
 		m_sbus = m_sbus_finder;
@@ -196,25 +189,18 @@ void device_sbus_card_interface::interface_pre_start()
 			fatalerror("Can't find Sun SBus device %s\n", m_sbus_finder.finder_tag());
 	}
 
-	if (0 > m_slot)
-	{
-		if (!m_sbus->started())
-			throw device_missing_dependencies();
-
-		// extract the slot number from the last digit of the slot tag
-		size_t const tlen = strlen(m_sbus_slottag);
-
-		m_slot = (m_sbus_slottag[tlen - 1] - '1');
-		if (m_slot < 0 || m_slot > 2)
-			fatalerror("Slot %x out of range for Sun SBus\n", m_slot);
-
-		m_base = m_slot << 25;
-		m_sbus->add_sbus_card(m_slot, this);
-	}
+	if (!m_sbus->started())
+		throw device_missing_dependencies();
 }
 
-void device_sbus_card_interface::set_sbus(sbus_device *sbus, const char *slottag)
+void device_sbus_card_interface::interface_post_start()
+{
+	m_base = m_slot << 25;
+	m_sbus->add_sbus_card(m_slot, this);
+}
+
+void device_sbus_card_interface::set_sbus(sbus_device *sbus, int slot)
 {
 	m_sbus = sbus;
-	m_sbus_slottag = slottag;
+	m_slot = slot;
 }

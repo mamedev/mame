@@ -65,7 +65,7 @@ bsmt2000_device::bsmt2000_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, BSMT2000, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this, 32)
-	, m_ready_callback()
+	, m_ready_callback(*this)
 	, m_stream(nullptr)
 	, m_cpu(*this, "bsmt2000")
 	, m_register_select(0)
@@ -110,7 +110,7 @@ void bsmt2000_device::device_add_mconfig(machine_config &config)
 
 void bsmt2000_device::device_start()
 {
-	m_ready_callback.bind_relative_to(*owner());
+	m_ready_callback.resolve();
 
 	// create the stream; BSMT typically runs at 24MHz and writes to a DAC, so
 	// in theory we should generate a 24MHz stream, but that's certainly overkill
@@ -180,8 +180,8 @@ void bsmt2000_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	// just fill with current left/right values
 	for (int samp = 0; samp < samples; samp++)
 	{
-		outputs[0][samp] = m_left_data * 16;
-		outputs[1][samp] = m_right_data * 16;
+		outputs[0][samp] = m_left_data;
+		outputs[1][samp] = m_right_data;
 	}
 }
 
@@ -264,8 +264,8 @@ READ16_MEMBER( bsmt2000_device::tms_data_r )
 
 READ16_MEMBER( bsmt2000_device::tms_rom_r )
 {
-	// underlying logic assumes this is a sign-extended value
-	return (int8_t)read_byte((m_rom_bank << 16) + m_rom_address);
+	// DSP code expects a 16-bit value with the data in the high byte
+	return (int16_t)(read_byte((m_rom_bank << 16) + m_rom_address) << 8);
 }
 
 

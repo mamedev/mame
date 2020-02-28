@@ -34,42 +34,36 @@
 #include "video/mc6845.h"
 #include "video/mos6566.h"
 
-#define Z80A_TAG        "u10"
 #define M8502_TAG       "u6"
 #define MOS8563_TAG     "u22"
 #define MOS8564_TAG     "u21"
 #define MOS8566_TAG     "u21"
-#define MOS6581_TAG     "u5"
-#define MOS6526_1_TAG   "u1"
-#define MOS6526_2_TAG   "u4"
 #define MOS8721_TAG     "u11"
-#define MOS8722_TAG     "u7"
 #define SCREEN_VIC_TAG  "screen"
 #define SCREEN_VDC_TAG  "screen80"
 #define CONTROL1_TAG    "joy1"
 #define CONTROL2_TAG    "joy2"
-#define PET_USER_PORT_TAG     "user"
 
 class c128_state : public driver_device
 {
 public:
 	c128_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, Z80A_TAG),
+		m_maincpu(*this, "u10"),
 		m_subcpu(*this, M8502_TAG),
 		m_nmi(*this, "nmi"),
-		m_mmu(*this, MOS8722_TAG),
+		m_mmu(*this, "u7"),
 		m_pla(*this, MOS8721_TAG),
 		m_vdc(*this, MOS8563_TAG),
 		m_vic(*this, MOS8564_TAG),
-		m_sid(*this, MOS6581_TAG),
-		m_cia1(*this, MOS6526_1_TAG),
-		m_cia2(*this, MOS6526_2_TAG),
+		m_sid(*this, "u5"),
+		m_cia1(*this, "u1"),
+		m_cia2(*this, "u4"),
 		m_iec(*this, CBM_IEC_TAG),
 		m_joy1(*this, CONTROL1_TAG),
 		m_joy2(*this, CONTROL2_TAG),
 		m_exp(*this, "exp"),
-		m_user(*this, PET_USER_PORT_TAG),
+		m_user(*this, "user"),
 		m_ram(*this, RAM_TAG),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 		m_from(*this, "from"),
@@ -131,8 +125,8 @@ public:
 
 	inline void check_interrupts();
 	int read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0);
-	uint8_t read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io);
-	void write_memory(address_space &space, offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io);
+	uint8_t read_memory(offs_t offset, offs_t vma, int ba, int aec, int z80io);
+	void write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io);
 	inline void update_iec();
 
 	DECLARE_READ8_MEMBER( z80_r );
@@ -179,7 +173,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_restore );
 	DECLARE_INPUT_CHANGED_MEMBER( caps_lock );
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c64 );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_c128);
 
 	DECLARE_READ8_MEMBER( cia2_pb_r );
 	DECLARE_WRITE8_MEMBER( cia2_pb_w );
@@ -279,7 +273,7 @@ enum
 };
 
 
-QUICKLOAD_LOAD_MEMBER( c128_state, cbm_c64 )
+QUICKLOAD_LOAD_MEMBER(c128_state::quickload_c128)
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
@@ -319,8 +313,8 @@ int c128_state::read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, i
 	int vicfix = 1;
 	int sphi2 = m_vic->phi0_r();
 
-	m_game = m_exp->game_r(ca, sphi2, ba, rw, m_hiram);
-	m_exrom = m_exp->exrom_r(ca, sphi2, ba, rw, m_hiram);
+	m_game = m_exp->game_r(ca, sphi2, ba, rw, m_loram, m_hiram);
+	m_exrom = m_exp->exrom_r(ca, sphi2, ba, rw, m_loram, m_hiram);
 
 	uint32_t input = sphi2 << 26 | m_va14 << 25 | m_charen << 24 |
 		m_hiram << 23 | m_loram << 22 | ba << 21 | VMA5 << 20 | VMA4 << 19 | ms0 << 18 | ms1 << 17 | ms2 << 16 |
@@ -335,7 +329,7 @@ int c128_state::read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, i
 //  read_memory -
 //-------------------------------------------------
 
-uint8_t c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io)
+uint8_t c128_state::read_memory(offs_t offset, offs_t vma, int ba, int aec, int z80io)
 {
 	int rw = 1, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
 	int io1 = 1, io2 = 1;
@@ -406,37 +400,37 @@ uint8_t c128_state::read_memory(address_space &space, offs_t offset, offs_t vma,
 	}
 	if (!BIT(plaout, PLA_OUT_VIC))
 	{
-		data = m_vic->read(space, offset & 0x3f);
+		data = m_vic->read(offset & 0x3f);
 	}
 	if (!BIT(plaout, PLA_OUT_FROM1) && m_from->exists())
 	{
-		data = m_from->read_rom(space, offset & 0x7fff);
+		data = m_from->read_rom(offset & 0x7fff);
 	}
 	if (!BIT(plaout, PLA_OUT_IOCS) && BIT(offset, 10))
 	{
 		switch ((BIT(offset, 11) << 2) | ((offset >> 8) & 0x03))
 		{
 		case 0: // SID
-			data = m_sid->read(space, offset & 0x1f);
+			data = m_sid->read(offset & 0x1f);
 			break;
 
 		case 2: // CS8563
 			if (BIT(offset, 0))
 			{
-				data = m_vdc->register_r(space, 0);
+				data = m_vdc->register_r();
 			}
 			else
 			{
-				data = m_vdc->status_r(space, 0);
+				data = m_vdc->status_r();
 			}
 			break;
 
 		case 4: // CIA1
-			data = m_cia1->read(space, offset & 0x0f);
+			data = m_cia1->read(offset & 0x0f);
 			break;
 
 		case 5: // CIA2
-			data = m_cia2->read(space, offset & 0x0f);
+			data = m_cia2->read(offset & 0x0f);
 			break;
 
 		case 6: // I/O1
@@ -452,7 +446,7 @@ uint8_t c128_state::read_memory(address_space &space, offs_t offset, offs_t vma,
 	int roml = BIT(plaout, PLA_OUT_ROML);
 	int romh = BIT(plaout, PLA_OUT_ROMH);
 
-	data = m_exp->cd_r(space, ca, data, sphi2, ba, roml, romh, io1, io2);
+	data = m_exp->cd_r(ca, data, sphi2, ba, roml, romh, io1, io2);
 
 	return m_mmu->read(offset, data);
 }
@@ -462,7 +456,7 @@ uint8_t c128_state::read_memory(address_space &space, offs_t offset, offs_t vma,
 //  write_memory -
 //-------------------------------------------------
 
-void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io)
+void c128_state::write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io)
 {
 	int rw = 0, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
 	int io1 = 1, io2 = 1;
@@ -494,33 +488,33 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, u
 	}
 	if (!BIT(plaout, PLA_OUT_VIC))
 	{
-		m_vic->write(space, offset & 0x3f, data);
+		m_vic->write(offset & 0x3f, data);
 	}
 	if (!BIT(plaout, PLA_OUT_IOCS) && BIT(offset, 10))
 	{
 		switch ((BIT(offset, 11) << 2) | ((offset >> 8) & 0x03))
 		{
 		case 0: // SID
-			m_sid->write(space, offset & 0x1f, data);
+			m_sid->write(offset & 0x1f, data);
 			break;
 
 		case 2: // CS8563
 			if (BIT(offset, 0))
 			{
-				m_vdc->register_w(space, 0, data);
+				m_vdc->register_w(data);
 			}
 			else
 			{
-				m_vdc->address_w(space, 0, data);
+				m_vdc->address_w(data);
 			}
 			break;
 
 		case 4: // CIA1
-			m_cia1->write(space, offset & 0x0f, data);
+			m_cia1->write(offset & 0x0f, data);
 			break;
 
 		case 5: // CIA2
-			m_cia2->write(space, offset & 0x0f, data);
+			m_cia2->write(offset & 0x0f, data);
 			break;
 
 		case 6: // I/O1
@@ -536,9 +530,9 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, u
 	int roml = BIT(plaout, PLA_OUT_ROML);
 	int romh = BIT(plaout, PLA_OUT_ROMH);
 
-	m_exp->cd_w(space, ca, data, sphi2, ba, roml, romh, io1, io2);
+	m_exp->cd_w(ca, data, sphi2, ba, roml, romh, io1, io2);
 
-	m_mmu->write(space, offset, data);
+	m_mmu->write(offset, data);
 }
 
 
@@ -551,7 +545,7 @@ READ8_MEMBER( c128_state::z80_r )
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	return read_memory(space, offset, vma, ba, aec, z80io);
+	return read_memory(offset, vma, ba, aec, z80io);
 }
 
 
@@ -564,7 +558,7 @@ WRITE8_MEMBER( c128_state::z80_w )
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	write_memory(space, offset, vma, data, ba, aec, z80io);
+	write_memory(offset, vma, data, ba, aec, z80io);
 }
 
 
@@ -577,7 +571,7 @@ READ8_MEMBER( c128_state::z80_io_r )
 	int ba = 1, aec = 1, z80io = 0;
 	offs_t vma = 0;
 
-	return read_memory(space, offset, vma, ba, aec, z80io);
+	return read_memory(offset, vma, ba, aec, z80io);
 }
 
 
@@ -590,7 +584,7 @@ WRITE8_MEMBER( c128_state::z80_io_w )
 	int ba = 1, aec = 1, z80io = 0;
 	offs_t vma = 0;
 
-	write_memory(space, offset, vma, data, ba, aec, z80io);
+	write_memory(offset, vma, data, ba, aec, z80io);
 }
 
 
@@ -603,7 +597,7 @@ READ8_MEMBER( c128_state::read )
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	return read_memory(space, offset, vma, ba, aec, z80io);
+	return read_memory(offset, vma, ba, aec, z80io);
 }
 
 
@@ -616,7 +610,7 @@ WRITE8_MEMBER( c128_state::write )
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	write_memory(space, offset, vma, data, ba, aec, z80io);
+	write_memory(offset, vma, data, ba, aec, z80io);
 }
 
 
@@ -628,7 +622,7 @@ READ8_MEMBER( c128_state::vic_videoram_r )
 {
 	int ba = 0, aec = 0, z80io = 1;
 
-	return read_memory(space, 0, offset, ba, aec, z80io);
+	return read_memory(0, offset, ba, aec, z80io);
 }
 
 
@@ -1111,7 +1105,7 @@ READ8_MEMBER( c128_state::sid_potx_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia1->read_pa() >> 6)
+	switch (m_cia1->pa_r() >> 6)
 	{
 	case 1: data = m_joy1->read_pot_x(); break;
 	case 2: data = m_joy2->read_pot_x(); break;
@@ -1138,7 +1132,7 @@ READ8_MEMBER( c128_state::sid_poty_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia1->read_pa() >> 6)
+	switch (m_cia1->pa_r() >> 6)
 	{
 	case 1: data = m_joy1->read_pot_y(); break;
 	case 2: data = m_joy2->read_pot_y(); break;
@@ -1192,7 +1186,7 @@ READ8_MEMBER( c128_state::cia1_pa_r )
 	data &= ~(!BIT(joy_b, 5) << 4);
 
 	// keyboard
-	uint8_t cia1_pb = m_cia1->read_pb();
+	uint8_t cia1_pb = m_cia1->pb_r();
 	uint32_t row[8] = { m_row[0]->read(), m_row[1]->read() & m_lock->read(), m_row[2]->read(), m_row[3]->read(),
 						m_row[4]->read(), m_row[5]->read(), m_row[6]->read(), m_row[7]->read() };
 
@@ -1260,7 +1254,7 @@ READ8_MEMBER( c128_state::cia1_pb_r )
 	data &= ~(!BIT(joy_a, 5) << 4);
 
 	// keyboard
-	uint8_t cia1_pa = m_cia1->read_pa();
+	uint8_t cia1_pa = m_cia1->pa_r();
 
 	if (!BIT(cia1_pa, 7)) data &= m_row[7]->read();
 	if (!BIT(cia1_pa, 6)) data &= m_row[6]->read();
@@ -1512,7 +1506,7 @@ READ8_MEMBER( c128_state::exp_dma_cd_r )
 	int ba = 0, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	return read_memory(space, offset, vma, ba, aec, z80io);
+	return read_memory(offset, vma, ba, aec, z80io);
 }
 
 WRITE8_MEMBER( c128_state::exp_dma_cd_w )
@@ -1520,7 +1514,7 @@ WRITE8_MEMBER( c128_state::exp_dma_cd_w )
 	int ba = 0, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	return write_memory(space, offset, data, vma, ba, aec, z80io);
+	return write_memory(offset, data, vma, ba, aec, z80io);
 }
 
 WRITE_LINE_MEMBER( c128_state::exp_dma_w )
@@ -1629,7 +1623,7 @@ void c128_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ntsc )
+//  machine_config( ntsc )
 //-------------------------------------------------
 
 void c128_state::ntsc(machine_config &config)
@@ -1638,15 +1632,13 @@ void c128_state::ntsc(machine_config &config)
 	Z80(config, m_maincpu, XTAL(14'318'181)*2/3.5/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c128_state::z80_mem);
 	m_maincpu->set_addrmap(AS_IO, &c128_state::z80_io);
-	config.m_perfect_cpu_quantum = subtag(Z80A_TAG);
 
 	M8502(config, m_subcpu, XTAL(14'318'181)*2/3.5/8);
-	m_subcpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_subcpu->read_callback().set(FUNC(c128_state::cpu_r));
 	m_subcpu->write_callback().set(FUNC(c128_state::cpu_w));
 	m_subcpu->set_pulls(0x07, 0x20);
 	m_subcpu->set_addrmap(AS_PROGRAM, &c128_state::m8502_mem);
-	config.m_perfect_cpu_quantum = subtag(M8502_TAG);
+	config.set_perfect_quantum(m_subcpu);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -1755,24 +1747,16 @@ void c128_state::ntsc(machine_config &config)
 	m_user->pl_handler().set(FUNC(c128_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c128_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c128_state, cbm_c64), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c128_state::quickload_c128));
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
-	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart");
-	SOFTWARE_LIST(config, "cart_list").set_original("c128_cart");
-	SOFTWARE_LIST(config, "cass_list_c64").set_original("c64_cass");
-	SOFTWARE_LIST(config, "flop_list_c64").set_original("c64_flop");
-	SOFTWARE_LIST(config, "flop_list").set_original("c128_flop");
-	SOFTWARE_LIST(config, "from_list").set_original("c128_rom");
-	subdevice<software_list_device>("cart_list_vic10")->set_filter("NTSC");
-	subdevice<software_list_device>("cart_list_c64")->set_filter("NTSC");
-	subdevice<software_list_device>("cart_list")->set_filter("NTSC");
-	subdevice<software_list_device>("cass_list_c64")->set_filter("NTSC");
-	subdevice<software_list_device>("flop_list_c64")->set_filter("NTSC");
-	subdevice<software_list_device>("flop_list")->set_filter("NTSC");
-	subdevice<software_list_device>("from_list")->set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart").set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list").set_original("c128_cart").set_filter("NTSC");
+	SOFTWARE_LIST(config, "cass_list_c64").set_original("c64_cass").set_filter("NTSC");
+	SOFTWARE_LIST(config, "flop_list_c64").set_original("c64_flop").set_filter("NTSC");
+	SOFTWARE_LIST(config, "flop_list").set_original("c128_flop").set_filter("NTSC");
+	SOFTWARE_LIST(config, "from_list").set_original("c128_rom").set_filter("NTSC");
 
 	// function ROM
 	GENERIC_SOCKET(config, "from", generic_plain_slot, "c128_rom", "bin,rom");
@@ -1783,7 +1767,7 @@ void c128_state::ntsc(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( c128 )
+//  machine_config( c128 )
 //-------------------------------------------------
 
 void c128_state::c128(machine_config &config)
@@ -1796,7 +1780,7 @@ void c128_state::c128(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( c128dcr )
+//  machine_config( c128dcr )
 //-------------------------------------------------
 
 void c128_state::c128dcr(machine_config &config)
@@ -1809,7 +1793,7 @@ void c128_state::c128dcr(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( c128d81 )
+//  machine_config( c128d81 )
 //-------------------------------------------------
 
 void c128_state::c128d81(machine_config &config)
@@ -1819,12 +1803,12 @@ void c128_state::c128d81(machine_config &config)
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
 
-	CBM_IEC_SLOT(config.replace(), "iec8", c128d81_iec_devices, "c1563");
+	CBM_IEC_SLOT(config.replace(), "iec8", 8, c128d81_iec_devices, "c1563");
 }
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pal )
+//  machine_config( pal )
 //-------------------------------------------------
 
 void c128_state::pal(machine_config &config)
@@ -1833,15 +1817,13 @@ void c128_state::pal(machine_config &config)
 	Z80(config, m_maincpu, XTAL(17'734'472)*2/4.5/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c128_state::z80_mem);
 	m_maincpu->set_addrmap(AS_IO, &c128_state::z80_io);
-	config.m_perfect_cpu_quantum = subtag(Z80A_TAG);
 
 	M8502(config, m_subcpu, XTAL(17'734'472)*2/4.5/8);
-	m_subcpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_subcpu->read_callback().set(FUNC(c128_state::cpu_r));
 	m_subcpu->write_callback().set(FUNC(c128_state::cpu_w));
 	m_subcpu->set_pulls(0x07, 0x20);
 	m_subcpu->set_addrmap(AS_PROGRAM, &c128_state::m8502_mem);
-	config.m_perfect_cpu_quantum = subtag(M8502_TAG);
+	config.set_perfect_quantum(m_subcpu);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -1950,8 +1932,7 @@ void c128_state::pal(machine_config &config)
 	m_user->pl_handler().set(FUNC(c128_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c128_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c128_state, cbm_c64), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c128_state::quickload_c128));
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
@@ -1978,7 +1959,7 @@ void c128_state::pal(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( c128pal )
+//  machine_config( c128pal )
 //-------------------------------------------------
 
 void c128_state::c128pal(machine_config &config)
@@ -1991,7 +1972,7 @@ void c128_state::c128pal(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( c128dcrp )
+//  machine_config( c128dcrp )
 //-------------------------------------------------
 
 void c128_state::c128dcrp(machine_config &config)

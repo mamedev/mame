@@ -307,8 +307,8 @@ WRITE_LINE_MEMBER(dynduke_state::vblank_irq)
 {
 	if (state)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
-		m_slave->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
+		m_slave->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
 	}
 }
 
@@ -331,7 +331,7 @@ void dynduke_state::dynduke(machine_config &config)
 	sei80bu_device &sei80bu(SEI80BU(config, "sei80bu", 0));
 	sei80bu.set_addrmap(AS_PROGRAM, &dynduke_state::sei80bu_encrypted_full_map);
 
-	config.m_minimum_quantum = attotime::from_hz(3600);
+	config.set_maximum_quantum(attotime::from_hz(3600));
 
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);

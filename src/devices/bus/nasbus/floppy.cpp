@@ -89,9 +89,9 @@ void nascom_fdc_device::device_start()
 
 void nascom_fdc_device::device_reset()
 {
-	io_space().install_readwrite_handler(0xe0, 0xe3, read8sm_delegate(FUNC(fd1793_device::read), m_fdc.target()), write8sm_delegate(FUNC(fd1793_device::write), m_fdc.target()));
-	io_space().install_readwrite_handler(0xe4, 0xe4, read8_delegate(FUNC(nascom_fdc_device::select_r), this), write8_delegate(FUNC(nascom_fdc_device::select_w), this));
-	io_space().install_read_handler(0xe5, 0xe5, read8_delegate(FUNC(nascom_fdc_device::status_r), this));
+	io_space().install_readwrite_handler(0xe0, 0xe3, read8sm_delegate(*m_fdc, FUNC(fd1793_device::read)), write8sm_delegate(*m_fdc, FUNC(fd1793_device::write)));
+	io_space().install_readwrite_handler(0xe4, 0xe4, read8_delegate(*this, FUNC(nascom_fdc_device::select_r)), write8_delegate(*this, FUNC(nascom_fdc_device::select_w)));
+	io_space().install_read_handler(0xe5, 0xe5, read8_delegate(*this, FUNC(nascom_fdc_device::status_r)));
 }
 
 //-------------------------------------------------

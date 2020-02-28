@@ -58,7 +58,7 @@ public:
 	void init_micro3d();
 	void init_botss();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(botss_hwchk_r);
+	DECLARE_READ_LINE_MEMBER(botss_hwchk_r);
 
 protected:
 	enum
@@ -200,6 +200,7 @@ private:
 	int clip_triangle(micro3d_vtx *v, micro3d_vtx *vout, int num_vertices, enum planes plane);
 	void draw_triangles(uint32_t attr);
 
+	void cpu_space_map(address_map &map);
 	void drmath_data(address_map &map);
 	void drmath_prg(address_map &map);
 	void hostmem(address_map &map);

@@ -64,6 +64,7 @@ public:
 	void init_cninjabl2();
 	DECLARE_MACHINE_START(robocop2);
 	DECLARE_MACHINE_RESET(robocop2);
+	DECLARE_VIDEO_START(cninja);
 	DECLARE_VIDEO_START(stoneage);
 	DECLARE_VIDEO_START(mutantf);
 	uint32_t screen_update_cninja(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

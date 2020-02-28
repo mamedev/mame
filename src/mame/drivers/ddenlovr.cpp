@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Luca Elia
-/***************************************************************************
+/**********************************************************************************************************************
 
 Some Dynax/Nakanihon games using the third version of their blitter
 
@@ -103,6 +103,9 @@ TODO:
 
 - mjflove: Transparency problems in title screen, staff roll and gal display (the background is not visible)
 
+- mjflove: 1st level sports a slot-like gal rotation that is hidden in 2nd with a solid green color.
+  Most likely a bug, related to above?
+
 - implement palette RAM enable in most games. Done for seljan2 (in a convoluted way).
 
 Notes:
@@ -110,7 +113,7 @@ Notes:
 - daimyojn: In Test->Option, press "N Ron Ron N" to access more options
 - kotbinyo: To access service mode, during boot press start+button+right (start+d+e in keyboard mode)
 
-***************************************************************************/
+**********************************************************************************************************************/
 
 #include "emu.h"
 #include "includes/dynax.h"
@@ -118,6 +121,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/tmpz84c015.h"
+#include "cpu/z80/kl5c80a12.h"
 #include "sound/ay8910.h"
 #include "sound/ym2413.h"
 #include "machine/74259.h"
@@ -155,10 +159,13 @@ The drawing operation is verified (quiz365) to modify ddenlovr_blit_y.
 ***************************************************************************/
 
 enum { BLIT_NEXT = 0, BLIT_LINE, BLIT_COPY, BLIT_SKIP, BLIT_CHANGE_NUM, BLIT_CHANGE_PEN, BLIT_UNKNOWN, BLIT_STOP };
-//                                          0          1                2                   3               4               5                   6                   7
-static const int ddenlovr_commands[8]   = { BLIT_NEXT, BLIT_LINE,       BLIT_COPY,          BLIT_SKIP,      BLIT_UNKNOWN,   BLIT_CHANGE_NUM,    BLIT_CHANGE_PEN,    BLIT_STOP   };
-static const int hanakanz_commands[8]   = { BLIT_NEXT, BLIT_CHANGE_PEN, BLIT_CHANGE_NUM,    BLIT_UNKNOWN,   BLIT_SKIP,      BLIT_COPY,          BLIT_LINE,          BLIT_STOP   };
-static const int mjflove_commands[8]    = { BLIT_STOP, BLIT_CHANGE_PEN, BLIT_CHANGE_NUM,    BLIT_UNKNOWN,   BLIT_SKIP,      BLIT_COPY,          BLIT_LINE,          BLIT_NEXT   };
+
+static const int ddenlovr_commands[8]   = { BLIT_NEXT,    BLIT_LINE,       BLIT_COPY,       BLIT_SKIP,
+											BLIT_UNKNOWN, BLIT_CHANGE_NUM, BLIT_CHANGE_PEN, BLIT_STOP   };
+static const int hanakanz_commands[8]   = { BLIT_NEXT,    BLIT_CHANGE_PEN, BLIT_CHANGE_NUM, BLIT_UNKNOWN,
+											BLIT_SKIP,    BLIT_COPY,       BLIT_LINE,       BLIT_STOP   };
+static const int mjflove_commands[8]    = { BLIT_STOP,    BLIT_CHANGE_PEN, BLIT_CHANGE_NUM, BLIT_UNKNOWN,
+											BLIT_SKIP,    BLIT_COPY,       BLIT_LINE,       BLIT_NEXT   };
 
 class ddenlovr_state : public dynax_state
 {
@@ -211,7 +218,7 @@ public:
 	void init_rongrong();
 	void init_momotaro();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovr_blitter_irq_r);
+	DECLARE_READ_LINE_MEMBER(blitter_irq_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovj_blitter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(nettoqc_special_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mjflove_blitter_r);
@@ -240,8 +247,8 @@ private:
 	DECLARE_MACHINE_START(funkyfig);
 	DECLARE_MACHINE_START(mjmyster);
 	DECLARE_MACHINE_START(hparadis);
-	uint32_t screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ddenlovr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_htengoku(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(ddenlovr_irq);
 	DECLARE_WRITE_LINE_MEMBER(mmpanic_irq);
@@ -267,6 +274,7 @@ private:
 	DECLARE_READ16_MEMBER(ddenlovr_gfxrom_r);
 	DECLARE_WRITE_LINE_MEMBER(ddenlovr_coincounter_0_w);
 	DECLARE_WRITE_LINE_MEMBER(ddenlovr_coincounter_1_w);
+	DECLARE_WRITE8_MEMBER(rongrong_coincounter_w);
 	DECLARE_WRITE8_MEMBER(rongrong_palette_w);
 	DECLARE_WRITE8_MEMBER(ddenlovr_palette_base_w);
 	DECLARE_WRITE8_MEMBER(ddenlovr_palette_base2_w);
@@ -426,7 +434,7 @@ private:
 	inline void log_blit(int data );
 	void blitter_w(int blitter, offs_t offset, uint8_t data);
 	void blitter_w_funkyfig(int blitter, offs_t offset, uint8_t data);
-	void copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer );
+	void copylayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer);
 	void mmpanic_update_leds();
 	void mjchuuka_get_romdata();
 	uint8_t hgokou_player_r( int player );
@@ -538,6 +546,7 @@ private:
 	uint8_t m_mjflove_irq_cause;
 	uint8_t m_daimyojn_palette_sel;
 
+	bitmap_ind16 m_htengoku_layer;
 };
 
 VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
@@ -1607,7 +1616,7 @@ READ16_MEMBER(ddenlovr_state::ddenlovr_gfxrom_r)
 }
 
 
-void ddenlovr_state::copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
+void ddenlovr_state::copylayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer)
 {
 	int x,y;
 	int scrollx = m_ddenlovr_scroll[layer / 4 * 8 + (layer % 4) + 0];
@@ -1622,6 +1631,8 @@ void ddenlovr_state::copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	palbase  &= ~penmask;
 	transpen &= transmask;
 
+	const pen_t *pens = &m_palette->pen(palbase);
+
 	if (((m_ddenlovr_layer_enable2 << 4) | m_ddenlovr_layer_enable) & (1 << layer))
 	{
 		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
@@ -1632,15 +1643,14 @@ void ddenlovr_state::copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 				if ((pen & transmask) != transpen)
 				{
 					pen &= penmask;
-					pen |= palbase;
-					bitmap.pix16(y, x) = pen;
+					bitmap.pix32(y, x) = pens[pen];
 				}
 			}
 		}
 	}
 }
 
-uint32_t ddenlovr_state::screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ddenlovr_state::screen_update_ddenlovr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const int order[24][4] =
 	{
@@ -1678,7 +1688,7 @@ uint32_t ddenlovr_state::screen_update_ddenlovr(screen_device &screen, bitmap_in
 	if (machine().input().code_pressed_once(KEYCODE_F)) { base++; while ((gfx[base] & 0xf0) != 0x30) base++; }
 #endif
 
-	bitmap.fill(m_ddenlovr_bgcolor, cliprect);
+	bitmap.fill(m_palette->pen(m_ddenlovr_bgcolor), cliprect);
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed(KEYCODE_Z))
@@ -1745,7 +1755,7 @@ uint32_t ddenlovr_state::screen_update_ddenlovr(screen_device &screen, bitmap_in
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(ddenlovr_state::ddenlovr_blitter_irq_r)
+READ_LINE_MEMBER(ddenlovr_state::blitter_irq_r)
 {
 	return m_ddenlovr_blitter_irq_flag;
 }
@@ -1942,7 +1952,7 @@ void ddenlovr_state::quiz365_map(address_map &map)
 
 	map(0x200c02, 0x200c03).r(FUNC(ddenlovr_state::quiz365_protection_r));                          // Protection
 	map(0x200e0a, 0x200e0d).w(FUNC(ddenlovr_state::quiz365_protection_w));                         // Protection
-//  map(0x201000, 0x2017ff) AM_WRITEONLY                                      // ?
+//  map(0x201000, 0x2017ff).writeonly();                                      // ?
 
 	map(0x300201, 0x300201).w(FUNC(ddenlovr_state::ddenlovr_select2_w));
 	map(0x300203, 0x300203).w(FUNC(ddenlovr_state::quiz365_coincounter_w));                        // Coin Counters + more stuff written on startup
@@ -1996,7 +2006,7 @@ void ddenlovr_state::ddenlovj_map(address_map &map)
 	map(0x000000, 0x07ffff).rom(); // ROM
 
 	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::rongrong_palette_w)).umask16(0x00ff);
-//  map(0x201000, 0x2017ff) AM_WRITEONLY                                      // ? B0 on startup, then 00
+//  map(0x201000, 0x2017ff).writeonly();                                      // ? B0 on startup, then 00
 
 	map(0x300040, 0x300047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
 	map(0x300048, 0x30004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
@@ -2055,7 +2065,7 @@ void ddenlovr_state::ddenlovrk_map(address_map &map)
 	map(0x200000, 0x200001).rw(FUNC(ddenlovr_state::ddenlovrk_protection2_r), FUNC(ddenlovr_state::ddenlovrk_protection2_w)).share("protection2");
 
 	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::rongrong_palette_w)).umask16(0x00ff);
-//  map(0xd01000, 0xd017ff) AM_RAM                                                    // ? B0 on startup, then 00
+//  map(0xd01000, 0xd017ff).ram();                                                    // ? B0 on startup, then 00
 
 	map(0xe00040, 0xe00047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
 	map(0xe00048, 0xe0004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
@@ -2091,7 +2101,7 @@ void ddenlovr_state::ddenlovr_map(address_map &map)
 	map(0x300001, 0x300001).w(FUNC(ddenlovr_state::ddenlovr_oki_bank_w));
 
 	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::rongrong_palette_w)).umask16(0x00ff);
-//  map(0xd01000, 0xd017ff) AM_RAM                                                   // ? B0 on startup, then 00
+//  map(0xd01000, 0xd017ff).ram();                                                   // ? B0 on startup, then 00
 
 	map(0xe00040, 0xe00047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
 	map(0xe00048, 0xe0004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
@@ -2274,6 +2284,16 @@ WRITE8_MEMBER(ddenlovr_state::rongrong_select_w)
 	membank("bank2")->set_entry(((data & 0xe0) >> 5));
 }
 
+WRITE8_MEMBER(ddenlovr_state::rongrong_coincounter_w)
+{
+	// input_sel goes 0x03 -> 0x0c before writing here
+	if (m_input_sel == 0x0c)
+	{
+		machine().bookkeeping().coin_counter_w(0, (~data) & 0x01);
+		machine().bookkeeping().coin_counter_w(1, (~data) & 0x04);
+	}
+	// TODO: POST values
+}
 
 void ddenlovr_state::quizchq_map(address_map &map)
 {
@@ -2292,6 +2312,7 @@ void ddenlovr_state::quizchq_portmap(address_map &map)
 	map(0x03, 0x03).r(FUNC(ddenlovr_state::rongrong_gfxrom_r));
 
 	map(0x20, 0x20).w(FUNC(ddenlovr_state::ddenlovr_select2_w));
+	map(0x21, 0x21).w(FUNC(ddenlovr_state::rongrong_coincounter_w));
 	map(0x22, 0x23).r(FUNC(ddenlovr_state::rongrong_input2_r));
 
 	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -2343,6 +2364,7 @@ void ddenlovr_state::rongrong_portmap(address_map &map)
 	map(0x98, 0x98).r(FUNC(ddenlovr_state::unk_r));                                 // ? must be 78 on startup
 
 	map(0xa0, 0xa0).w(FUNC(ddenlovr_state::ddenlovr_select2_w));
+	map(0xa1, 0xa1).w(FUNC(ddenlovr_state::rongrong_coincounter_w));
 	map(0xa2, 0xa3).r(FUNC(ddenlovr_state::rongrong_input2_r));
 	map(0xc2, 0xc2).nopw();                                    // enables palette RAM at f000, and protection device at f705/f706/f601
 }
@@ -2378,7 +2400,7 @@ WRITE8_MEMBER(ddenlovr_state::mmpanic_blitter2_w)
 WRITE_LINE_MEMBER(ddenlovr_state::mmpanic_blitter_irq)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf);    // RST 18
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf);    // Z80 - RST 18
 }
 
 void ddenlovr_state::mmpanic_update_leds()
@@ -2524,7 +2546,7 @@ WRITE8_MEMBER(ddenlovr_state::funkyfig_blitter_w)
 WRITE_LINE_MEMBER(ddenlovr_state::funkyfig_blitter_irq)
 {
 	if (0) // this vector looks wrong
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0); // Z80
 }
 
 WRITE8_MEMBER(ddenlovr_state::funkyfig_rombank_w)
@@ -2821,14 +2843,14 @@ void ddenlovr_state::kotbinyo_portmap(address_map &map)
 	map(0x83, 0x84).r(FUNC(ddenlovr_state::hanakanz_gfxrom_r));
 	map(0xa0, 0xa1).w("ym2413", FUNC(ym2413_device::write));
 	map(0xb0, 0xb0).portr("SYSTEM");
-//  map(0xb1, 0xb2) AM_READ(hanakanz_keyb_r)
+//  map(0xb1, 0xb2).r(FUNC(ddenlovr_state::hanakanz_keyb_r));
 	map(0xb1, 0xb1).portr("KEYB0");
 	map(0xb2, 0xb2).portr("KEYB1");
 	map(0xb3, 0xb3).w(FUNC(ddenlovr_state::hanakanz_coincounter_w));
-//  map(0xb4, 0xb4) AM_WRITE(hanakanz_keyb_w)
+//  map(0xb4, 0xb4).w(FUNC(ddenlovr_state::hanakanz_keyb_w));
 	map(0xb6, 0xb6).r(FUNC(ddenlovr_state::hanakanz_rand_r));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-//  map(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+//  map(0xe0, 0xef).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 }
 
 
@@ -2846,14 +2868,14 @@ void ddenlovr_state::kotbinsp_portmap(address_map &map)
 	map(0x83, 0x84).r(FUNC(ddenlovr_state::hanakanz_gfxrom_r));
 	map(0xa0, 0xa1).w("ym2413", FUNC(ym2413_device::write));
 	map(0x90, 0x90).portr("SYSTEM");
-//  map(0x91, 0x91) AM_READ(hanakanz_keyb_r)
+//  map(0x91, 0x91).r(FUNC(ddenlovr_state::hanakanz_keyb_r));
 	map(0x91, 0x91).portr("KEYB0");
 	map(0x92, 0x92).portr("KEYB1");
 	map(0x93, 0x93).w(FUNC(ddenlovr_state::hanakanz_coincounter_w));
-//  map(0x94, 0x94) AM_WRITE(hanakanz_keyb_w)
+//  map(0x94, 0x94).w(FUNC(ddenlovr_state::hanakanz_keyb_w));
 	map(0x96, 0x96).r(FUNC(ddenlovr_state::hanakanz_rand_r));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-//  map(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+//  map(0xe0, 0xef).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 }
 
 
@@ -4170,9 +4192,11 @@ VIDEO_START_MEMBER(ddenlovr_state,htengoku)
 {
 	VIDEO_START_CALL_MEMBER(ddenlovr);
 	VIDEO_START_CALL_MEMBER(hnoridur);
+
+	m_screen->register_screen_bitmap(m_htengoku_layer);
 }
 
-uint32_t ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int layer, x, y;
 
@@ -4180,12 +4204,12 @@ uint32_t ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_in
 	// format and let screen_update_ddenlovr() do the final compositing (priorities + palettes)
 	for (layer = 0; layer < 4; layer++)
 	{
-		bitmap.fill(0, cliprect);
-		hanamai_copylayer(bitmap, cliprect, layer);
+		m_htengoku_layer.fill(0, cliprect);
+		hanamai_copylayer(m_htengoku_layer, cliprect, layer);
 
 		for (y = 0; y < 256; y++)
 			for (x = 0; x < 512; x++)
-				m_ddenlovr_pixmap[3 - layer][y * 512 + x] = (uint8_t)(bitmap.pix16(y, x));
+				m_ddenlovr_pixmap[3 - layer][y * 512 + x] = (uint8_t)(m_htengoku_layer.pix16(y, x));
 	}
 
 	return screen_update_ddenlovr(screen, bitmap, cliprect);
@@ -4331,8 +4355,8 @@ void dynax_state::htengoku_banked_map(address_map &map)
 	map(0x80000, 0x801ff).w(FUNC(dynax_state::tenkai_palette_w));
 }
 
-MACHINE_CONFIG_START(ddenlovr_state::htengoku)
-
+void ddenlovr_state::htengoku(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 20000000 / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::htengoku_mem_map);
@@ -4366,7 +4390,6 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 	m_screen->set_visarea(0, 336-1, 0+8, 256-1-8);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_htengoku));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::sprtmtch_vblank_w));
 
 	DYNAX_BLITTER_REV2(config, m_blitter, 0);
@@ -4392,7 +4415,7 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 	/* devices */
 	msm6242_device &rtc(MSM6242(config, "rtc", XTAL(32'768)));
 	rtc.out_int_handler().set("mainirq", FUNC(rst_pos_buffer_device::rst1_w));
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -4544,7 +4567,7 @@ static INPUT_PORTS_START( ddenlovj )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddenlovr_state,ddenlovj_blitter_r, nullptr) // blitter irq flag? (bit 5) & RTC (bit 6)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ddenlovr_state, ddenlovj_blitter_r) // blitter irq flag? (bit 5) & RTC (bit 6)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )
 
 	PORT_START("DSW1")
@@ -4650,7 +4673,7 @@ static INPUT_PORTS_START( ddenlovr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )    // ? quiz365
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddenlovr_state,ddenlovr_blitter_irq_r, nullptr) // blitter irq flag
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddenlovr_state, blitter_irq_r) // blitter irq flag
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
 	PORT_START("DSW")
@@ -4705,7 +4728,7 @@ static INPUT_PORTS_START( nettoqc )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddenlovr_state,nettoqc_special_r, nullptr)  // ? (bit 5) & blitter irq flag (bit 6)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ddenlovr_state, nettoqc_special_r)  // ? (bit 5) & blitter irq flag (bit 6)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )
 
 	PORT_START("DSW1")
@@ -4803,7 +4826,7 @@ static INPUT_PORTS_START( ultrchmp )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddenlovr_state,ddenlovr_blitter_irq_r, nullptr) // blitter irq flag
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddenlovr_state, blitter_irq_r) // blitter irq flag
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
 	PORT_START("DSW")
@@ -4823,7 +4846,7 @@ static INPUT_PORTS_START( htengoku )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE3 )   // data clear
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  // note
@@ -4859,7 +4882,7 @@ static INPUT_PORTS_START( htengoku )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")  /* IN12 - DSW2 */
-	PORT_DIPNAME( 0x07, 0x05, "Payout Rate" )
+	PORT_DIPNAME( 0x07, 0x07, "Payout Rate" )
 	PORT_DIPSETTING(    0x00, "Lowest" )
 	PORT_DIPSETTING(    0x01, "Lower" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Low ) )
@@ -4983,7 +5006,7 @@ static INPUT_PORTS_START( quiz365 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )    // ? quiz365
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddenlovr_state,ddenlovr_blitter_irq_r, nullptr) // blitter irq flag
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddenlovr_state, blitter_irq_r) // blitter irq flag
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
 	PORT_START("DSW1")
@@ -5118,7 +5141,7 @@ static INPUT_PORTS_START( rongrong )
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
-//  PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x00, "3 (duplicate)" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -8085,7 +8108,7 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddenlovr_state,mjflove_blitter_r, nullptr)  // RTC (bit 5) & blitter irq flag (bit 6)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ddenlovr_state, mjflove_blitter_r)  // RTC (bit 5) & blitter irq flag (bit 6)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
 	PORT_START("KEY0")
@@ -8208,14 +8231,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hparadis )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")    /* IN1 - Player 2 */
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -8232,85 +8255,95 @@ static INPUT_PORTS_START( hparadis )
 
 	/* keyb 1 */
 	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // I
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Kan
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1   )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // I
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // Kan
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // J
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Reach
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // BET
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // J
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // Reach
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // BET
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // K
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Chi
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Ron
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // K
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // Chi
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // Ron
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // L
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // PON
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // L
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // PON
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Flip Flop
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "b"
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "s"
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // "t"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // "w"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // Flip Flop
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // "b"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // "s"
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	/* keyb 2 */
 	PORT_START("KEY5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // I
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Kan
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2   )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // I
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // Kan
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // J
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Reach
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // BET
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // J
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // Reach
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // BET
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // K
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Chi
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Ron
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // K
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // Chi
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)  // Ron
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // L
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // PON
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // L
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // PON
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Flip Flop
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "b"
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "s"
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40) // "t"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40) // "w"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40) // Flip Flop
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40) // "b"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40) // "s"
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
@@ -8330,7 +8363,7 @@ static INPUT_PORTS_START( hparadis )
 	PORT_DIPSETTING(    0x60, "Hanafuda" )
 	PORT_DIPSETTING(    0x40, "Mahjong" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Joystick ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( Joystick ) )
+	PORT_DIPSETTING(    0x00, "Joystick (duplicate)" )
 	PORT_DIPNAME( 0x80, 0x80, "First Chance" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
@@ -9317,7 +9350,6 @@ static INPUT_PORTS_START( dtoyoken )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( daimyojn )
-
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -9609,6 +9641,8 @@ MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
 	m_romdata[1] = 0;
 
 	memset(m_palram, 0, ARRAY_LENGTH(m_palram));
+
+	m_blitter_irq_handler(1);
 }
 
 MACHINE_START_MEMBER(ddenlovr_state,rongrong)
@@ -9692,8 +9726,8 @@ WRITE_LINE_MEMBER(ddenlovr_state::ddenlovr_irq)
 		m_maincpu->set_input_line(M68K_IRQ_1, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(ddenlovr_state::ddenlovr)
-
+void ddenlovr_state::ddenlovr(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(24'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::ddenlovr_map);
@@ -9701,7 +9735,7 @@ MACHINE_CONFIG_START(ddenlovr_state::ddenlovr)
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<1>().set(FUNC(ddenlovr_state::ddenlovr_blitter_irq_ack_w));
 	m_mainlatch->q_out_cb<4>().set(FUNC(ddenlovr_state::ddenlovr_coincounter_0_w));
-	m_mainlatch->q_out_cb<5>().set(FUNC(ddenlovr_state::ddenlovr_coincounter_1_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(ddenlovr_state::ddenlovr_coincounter_1_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,ddenlovr)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -9714,7 +9748,6 @@ MACHINE_CONFIG_START(ddenlovr_state::ddenlovr)
 	m_screen->set_visarea(0, 336-1, 5, 256-16+5-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::ddenlovr_irq));
 
 	PALETTE(config, m_palette).set_entries(0x100);
@@ -9730,14 +9763,14 @@ MACHINE_CONFIG_START(ddenlovr_state::ddenlovr)
 
 	YMZ284(config, "aysnd", XTAL(28'636'363) / 16).add_route(ALL_OUTPUTS, "mono", 0.30);  // or /8 ?
 
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "mono", 0.80);
+	OKIM6295(config, m_oki, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */
 	RTC72421(config, "rtc", XTAL(32'768)); // internal oscillator
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ddenlovr_state::ddenlovj)
+void ddenlovr_state::ddenlovj(machine_config &config)
+{
 	ddenlovr(config);
 
 	/* basic machine hardware */
@@ -9748,7 +9781,7 @@ MACHINE_CONFIG_START(ddenlovr_state::ddenlovj)
 	m_mainlatch->q_out_cb<5>().set(FUNC(ddenlovr_state::ddenlovr_blitter_irq_ack_w));
 
 	RTC62421(config.replace(), "rtc", XTAL(32'768)); // internal oscillator
-MACHINE_CONFIG_END
+}
 
 void ddenlovr_state::ddenlovrk(machine_config &config)
 {
@@ -9826,7 +9859,6 @@ void ddenlovr_state::quizchq(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::quizchq_portmap);
 	maincpu.in_pa_callback().set(FUNC(ddenlovr_state::rongrong_input_r));
 	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::rongrong_select_w));
-	// bit 5 of 0x1b (SIO CTSB?) = blitter busy
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,rongrong)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -9839,13 +9871,13 @@ void ddenlovr_state::quizchq(machine_config &config)
 	m_screen->set_visarea(0, 336-1, 5, 256-16+5-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::strobe_a)).invert();
 
 	PALETTE(config, m_palette).set_entries(0x100);
 
 	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg0));
 	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg1));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::ctsb_w));
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
 
@@ -9896,15 +9928,15 @@ WRITE_LINE_MEMBER(ddenlovr_state::mmpanic_irq)
 	//if (downcast<cpu_device *>(m_maincpu)->input_state(0))
 	//  return;
 
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // RST 08, vblank
-	m_soundcpu->set_input_line(0, HOLD_LINE);   // NMI by main cpu
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08, vblank
+	m_soundcpu->set_input_line(0, HOLD_LINE);   // Z80 - NMI by main cpu
 }
 
 
 WRITE_LINE_MEMBER(ddenlovr_state::mmpanic_rtc_irq)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf); // RST 18, clock
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf); // Z80 - RST 18, clock
 }
 
 void ddenlovr_state::mmpanic(machine_config &config)
@@ -9929,7 +9961,6 @@ void ddenlovr_state::mmpanic(machine_config &config)
 	m_screen->set_visarea(0, 336-1, 5, 256-16+5-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::mmpanic_irq));
 
 	PALETTE(config, m_palette).set_entries(0x100);
@@ -9980,7 +10011,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::hanakanz_irq)
 	//if (downcast<cpu_device *>(m_maincpu)->input_state(0))
 	//  return;
 
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0); // Z80
 }
 
 WRITE_LINE_MEMBER(ddenlovr_state::hanakanz_rtc_irq)
@@ -9994,13 +10025,13 @@ WRITE_LINE_MEMBER(ddenlovr_state::hanakanz_rtc_irq)
 	//if (downcast<cpu_device *>(drvm_maincpu)->input_state(0))
 	//  return;
 
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe2);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe2); // Z80
 }
 
 void ddenlovr_state::hanakanz(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8000000); // KL5C80A12
+	KL5C80A12(config, m_maincpu, 8000000); // KL5C80A12
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
 	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::hanakanz_portmap);
 
@@ -10015,7 +10046,6 @@ void ddenlovr_state::hanakanz(machine_config &config)
 	m_screen->set_visarea(0, 336-1, 5, 256-11-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::hanakanz_irq));
 
 	PALETTE(config, m_palette).set_entries(0x200);
@@ -10046,7 +10076,7 @@ void ddenlovr_state::hkagerou(machine_config &config)
 void ddenlovr_state::kotbinyo(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(20'000'000) / 2); // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
+	KL5C80A12(config, m_maincpu, XTAL(20'000'000) / 2); // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
 	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::kotbinyo_portmap);
 
@@ -10061,7 +10091,6 @@ void ddenlovr_state::kotbinyo(machine_config &config)
 	m_screen->set_visarea(0, 336-1-1, 1+4, 256-15-1+4);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::hanakanz_irq));
 
 	PALETTE(config, m_palette).set_entries(0x200);
@@ -10179,7 +10208,6 @@ void ddenlovr_state::mjschuka(machine_config &config)
 	m_screen->set_visarea(0, 336-1, 5, 256-11-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set("maincpu", FUNC(tmpz84c015_device::trg0));
 
 	PALETTE(config, m_palette).set_entries(0x200);
@@ -10431,7 +10459,8 @@ void ddenlovr_state::mjflove(machine_config &config)
 	AY8910(config, "aysnd", 28636363/8).add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
-MACHINE_CONFIG_START(ddenlovr_state::hparadis)
+void ddenlovr_state::hparadis(machine_config &config)
+{
 	quizchq(config);
 
 	/* basic machine hardware */
@@ -10445,30 +10474,29 @@ MACHINE_CONFIG_START(ddenlovr_state::hparadis)
 	config.device_remove("rtc");
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hparadis)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ddenlovr_state::jongtei)
-
+void ddenlovr_state::jongtei(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(20'000'000) / 2) // KL5C80A12
-	MCFG_DEVICE_PROGRAM_MAP(hanakanz_map)
-	MCFG_DEVICE_IO_MAP(jongtei_portmap)
+	KL5C80A12(config, m_maincpu, XTAL(20'000'000) / 2); // KL5C80A12
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
+	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::jongtei_portmap);
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(336, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-11-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddenlovr_state, hanakanz_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(336, 256);
+	m_screen->set_visarea(0, 336-1, 5, 256-11-1);
+	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->screen_vblank().set(FUNC(ddenlovr_state::hanakanz_irq));
 
-	MCFG_PALETTE_ADD("palette", 0x200)
+	PALETTE(config, m_palette).set_entries(0x200);
 
 	blitter_irq().set(FUNC(ddenlovr_state::mjflove_blitter_irq));
 
@@ -10479,29 +10507,27 @@ MACHINE_CONFIG_START(ddenlovr_state::jongtei)
 
 	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	OKIM6295(config, m_oki, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */
 	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(FUNC(ddenlovr_state::hanakanz_rtc_irq));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ddenlovr_state::mjgnight)
+void ddenlovr_state::mjgnight(machine_config &config)
+{
 	jongtei(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(mjgnight_portmap)
+	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::mjgnight_portmap);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(336, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5-4, 256-11-1-4)
-MACHINE_CONFIG_END
+	m_screen->set_size(336, 256);
+	m_screen->set_visarea(0, 336-1, 5-4, 256-11-1-4);
+}
 
 /***************************************************************************
                             Mahjong Seiryu Densetsu
 ***************************************************************************/
 
-MACHINE_CONFIG_START(ddenlovr_state::sryudens)
-
+void ddenlovr_state::sryudens(machine_config &config)
+{
 	/* basic machine hardware */
 	tmpz84c015_device &maincpu(TMPZ84C015(config, m_maincpu, XTAL(16'000'000) / 2)); // ?
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::sryudens_map);
@@ -10513,17 +10539,16 @@ MACHINE_CONFIG_START(ddenlovr_state::sryudens)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.8532)   // VSync 60.8532Hz, HSync 15.2790kHz
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(336, 256+22)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 0+5, 256-12-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(336, 256+22);
+	m_screen->set_visarea(0, 336-1, 0+5, 256-12-1);
+	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	blitter_irq().set(FUNC(ddenlovr_state::mjflove_blitter_irq));
 
@@ -10536,20 +10561,19 @@ MACHINE_CONFIG_START(ddenlovr_state::sryudens)
 
 	YMZ284(config, "aysnd", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH) // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	OKIM6295(config, m_oki, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80); // ?
 
 	/* devices */
 	RTC62421(config, "rtc", XTAL(32'768)).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1)); // internal oscillator
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
                             Mahjong Janshin Plus
 ***************************************************************************/
 
 // PCB: NM7001004
-MACHINE_CONFIG_START(ddenlovr_state::janshinp)
-
+void ddenlovr_state::janshinp(machine_config &config)
+{
 	/* basic machine hardware */
 	tmpz84c015_device &maincpu(TMPZ84C015(config, m_maincpu, XTAL(16'000'000) / 2));
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::janshinp_map);
@@ -10561,17 +10585,16 @@ MACHINE_CONFIG_START(ddenlovr_state::janshinp)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.8532)   // VSync 60.8532Hz, HSync 15.2790kHz ?
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(336, 256+22)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 0+5, 256-12-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz ?
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(336, 256+22);
+	m_screen->set_visarea(0, 336-1, 0+5, 256-12-1);
+	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	blitter_irq().set(FUNC(ddenlovr_state::mjflove_blitter_irq));
 
@@ -10584,12 +10607,11 @@ MACHINE_CONFIG_START(ddenlovr_state::janshinp)
 
 	YMZ284(config, "aysnd", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH) // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	OKIM6295(config, m_oki, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80); // ?
 
 	/* devices */
 	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1));
-MACHINE_CONFIG_END
+}
 
 // Same PCB as janshinp
 void ddenlovr_state::dtoyoken(machine_config &config)
@@ -10618,8 +10640,8 @@ MACHINE_START_MEMBER(ddenlovr_state,seljan2)
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-MACHINE_CONFIG_START(ddenlovr_state::seljan2)
-
+void ddenlovr_state::seljan2(machine_config &config)
+{
 	/* basic machine hardware */
 	tmpz84c015_device &maincpu(TMPZ84C015(config, m_maincpu, XTAL(16'000'000) / 2));
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::seljan2_map);
@@ -10631,17 +10653,16 @@ MACHINE_CONFIG_START(ddenlovr_state::seljan2)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.8532)   // VSync 60.8532Hz, HSync 15.2790kHz ?
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(336, 256+22)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 0+5, 256-12-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz ?
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(336, 256+22);
+	m_screen->set_visarea(0, 336-1, 0+5, 256-12-1);
+	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::pa7_w)).invert(); // PA bit 7 = blitter busy
 
@@ -10657,12 +10678,11 @@ MACHINE_CONFIG_START(ddenlovr_state::seljan2)
 	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH) // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	OKIM6295(config, m_oki, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80); // ?
 
 	/* devices */
 	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1));
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -10670,43 +10690,40 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-MACHINE_CONFIG_START(ddenlovr_state::daimyojn)
-
+void ddenlovr_state::daimyojn(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(20'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(hanakanz_map)
-	MCFG_DEVICE_IO_MAP(daimyojn_portmap)
+	Z80(config, m_maincpu, XTAL(20'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
+	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::daimyojn_portmap);
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjflove)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.7922)   // HSync 15.4248kHz
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(336, 256+22)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1-1, 1, 256-15-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddenlovr_state, hanakanz_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.7922);   // HSync 15.4248kHz
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(336, 256+22);
+	m_screen->set_visarea(0, 336-1-1, 1, 256-15-1);
+	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->screen_vblank().set(FUNC(ddenlovr_state::hanakanz_irq));
 
-	MCFG_PALETTE_ADD("palette", 0x200)
+	PALETTE(config, m_palette).set_entries(0x200);
 
-	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz); // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	OKIM6295(config, m_oki, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */
 	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(FUNC(ddenlovr_state::hanakanz_rtc_irq));
-MACHINE_CONFIG_END
-
+}
 
 
 /***************************************************************************
@@ -12838,6 +12855,8 @@ ROM_START( momotaro )
 	ROM_RELOAD(             0x10000, 0x80000 )
 
 	ROM_REGION( 0x400000, "blitter", 0 )    /* blitter data */
+	// no table at top, half size or encrypted?
+	// should be similar to daimyojn format, the initial POST screen/test mode draws properly if using roms from that.
 	ROM_LOAD( "t0273.7b", 0x000000, 0x200000, BAD_DUMP CRC(5ae90ae2) SHA1(975bae930d848987405dc3dd59de138b1f98b358) )   // FIXED BITS (xxxxx1xxxxxxxxx1)
 	ROM_LOAD( "t0274.8b", 0x200000, 0x200000, BAD_DUMP CRC(78209778) SHA1(4054972e12115049322bb43381ff50a354c3cadf) )   // FIXED BITS (xxxxx1xxxxxxxxx1)
 
@@ -12931,7 +12950,7 @@ ROM_END
 
 void ddenlovr_state::init_momotaro()
 {
-	m_maincpu->space(AS_IO).install_read_handler(0xe0, 0xe0, read8_delegate(FUNC(ddenlovr_state::momotaro_protection_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0xe0, 0xe0, read8_delegate(*this, FUNC(ddenlovr_state::momotaro_protection_r)));
 }
 
 /***************************************************************************
@@ -13003,31 +13022,31 @@ ROM_START( htengoku )
 	ROM_LOAD( "6510.11b", 0x280000, 0x20000, CRC(0fdd6edf) SHA1(c6870ab538987110337e6e154cba98391c68fb98) )
 ROM_END
 
-GAME( 1992, htengoku,  0,        htengoku,  htengoku, ddenlovr_state, empty_init,    ROT180, "Dynax",                                     "Hanafuda Hana Tengoku (Japan)",                                   0)
+GAME( 1992, htengoku,  0,        htengoku,  htengoku, ddenlovr_state, empty_init,    ROT180, "Dynax",                                     "Hanafuda Hana Tengoku [BET] (Japan)",                                   0)
 GAME( 1992, mmpanic,   0,        mmpanic,   mmpanic,  ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Monkey Mole Panic (USA)",                                         MACHINE_NO_COCKTAIL  )
-GAME( 1993, mjmyorn2,  0,        mjmyornt,  mjmyorn2, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient Part 2 - Exotic Dream",             MACHINE_NO_COCKTAIL  )
-GAME( 1992, mjmyornt,  mjmyorn2, mjmyornt,  mjmyornt, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient",                                   MACHINE_NO_COCKTAIL  )
+GAME( 1993, mjmyorn2,  0,        mjmyornt,  mjmyorn2, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient Part 2 ~ Exotic Dream ~ [BET] (Japan, v1.00)",             MACHINE_NO_COCKTAIL  ) // no copyright warning, assume Japan from game strings
+GAME( 1992, mjmyornt,  mjmyorn2, mjmyornt,  mjmyornt, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient [BET] (Japan, v1.00)",                     MACHINE_NO_COCKTAIL  ) // no copyright warning, assume Japan from game strings
 GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (USA, Canada, Mexico / Japan, set 1)",    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // scrolling, priority?
 GAME( 1993, funkyfiga, funkyfig, funkyfig,  funkyfig, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (USA, Canada, Mexico / Japan, set 2)",    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // ""
-GAME( 1993, quizchq,   0,        quizchq,   quizchq,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Quiz Channel Question (Ver 1.00) (Japan)",                        MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1993, quizchql,  quizchq,  quizchq,   quizchq,  ddenlovr_state, empty_init,    ROT0, "Nakanihon (Laxan license)",                   "Quiz Channel Question (Ver 1.23) (Taiwan?)",                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1993, animaljr,  0,        mmpanic,   animaljr, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Exciting Animal Land Jr. (USA)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, quizchq,   0,        quizchq,   quizchq,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Quiz Channel Question (Japan, Ver 1.00)",                        MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, quizchql,  quizchq,  quizchq,   quizchq,  ddenlovr_state, empty_init,    ROT0, "Nakanihon (Laxan license)",                   "Quiz Channel Question (Taiwan?, Ver 1.23)",                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, animaljr,  0,        mmpanic,   animaljr, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Exciting Animal Land Jr. (USA, Canada, Mexico)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
 GAME( 1993, animaljrs, animaljr, mmpanic,   animaljr, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Animalandia Jr. (Spanish)",                                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
 GAME( 1993, animaljrj, animaljr, mmpanic,   animaljr, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Waiwai Animal Land Jr. (Japan)",                                  MACHINE_NO_COCKTAIL  )
-GAME( 1994, mjmyster,  0,        mjmyster,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 1)",                            MACHINE_NO_COCKTAIL  )
-GAME( 1994, mjmywrld,  mjmyster, mjmywrld,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 2)",                            MACHINE_NO_COCKTAIL  )
-GAME( 1994, hginga,    0,        hginga,    hginga,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Ginga",                                             MACHINE_NO_COCKTAIL  )
-GAME( 1994, mjmyuniv,  0,        mjmyuniv,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Universe (Japan, D85)",                    MACHINE_NO_COCKTAIL  )
+GAME( 1994, mjmyster,  0,        mjmyster,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World [BET] (Japan, set 1)",                            MACHINE_NO_COCKTAIL  )
+GAME( 1994, mjmywrld,  mjmyster, mjmywrld,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World [BET] (Japan, set 2)",                            MACHINE_NO_COCKTAIL  )
+GAME( 1994, hginga,    0,        hginga,    hginga,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Ginga [BET] (Japan)",                               MACHINE_NO_COCKTAIL  )
+GAME( 1994, mjmyuniv,  0,        mjmyuniv,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Universe [BET] (Japan, D85)",              MACHINE_NO_COCKTAIL  )
 GAME( 1994, quiz365,   0,        quiz365,   quiz365,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                                MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, quiz365t,  quiz365,  quiz365,   quiz365,  ddenlovr_state, empty_init,    ROT0, "Nakanihon / Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, rongrong,  0,        rongrong,  rongrong, ddenlovr_state, init_rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Europe)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
 GAME( 1994, rongrongj, rongrong, rongrong,  rongrong, ddenlovr_state, init_rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Japan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
 GAME( 1994, rongrongg, rongrong, rongrong,  rongrong, ddenlovr_state, init_rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Germany)",                                 MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
 GAME( 1994, hparadis,  0,        hparadis,  hparadis, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Super Hana Paradise (Japan)",                                     MACHINE_NO_COCKTAIL  )
-GAME( 1995, hgokou,    0,        hgokou,    hgokou,   ddenlovr_state, empty_init,    ROT0, "Dynax (Alba license)",                        "Hanafuda Hana Gokou (Japan)",                                     MACHINE_NO_COCKTAIL  )
-GAME( 1995, hgokbang,  hgokou,   hgokbang,  hgokou,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Gokou Bangaihen (Japan)",                           MACHINE_NO_COCKTAIL  )
-GAME( 1995, mjdchuka,  0,        mjchuuka,  mjchuuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken (China, D111)",                        MACHINE_NO_COCKTAIL  )
-GAME( 1995, mjschuka,  0,        mjschuka,  mjschuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Super Dai Chuuka Ken (Japan, D115)",                      MACHINE_NO_COCKTAIL  )
+GAME( 1995, hgokou,    0,        hgokou,    hgokou,   ddenlovr_state, empty_init,    ROT0, "Dynax (Alba license)",                        "Hanafuda Hana Gokou [BET] (Japan)",                                     MACHINE_NO_COCKTAIL  )
+GAME( 1995, hgokbang,  hgokou,   hgokbang,  hgokou,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Gokou Bangaihen [BET] (Japan)",                           MACHINE_NO_COCKTAIL  )
+GAME( 1995, mjdchuka,  0,        mjchuuka,  mjchuuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken [BET] (China, D111)",                        MACHINE_NO_COCKTAIL  )
+GAME( 1995, mjschuka,  0,        mjschuka,  mjschuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Super Dai Chuuka Ken [BET] (Japan, D115)",                      MACHINE_NO_COCKTAIL  )
 GAME( 1995, nettoqc,   0,        nettoqc,   nettoqc,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Nettoh Quiz Champion (Japan)",                                    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
 GAME( 1995, ultrchmp,  nettoqc,  ultrchmp,  ultrchmp, ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Se Gye Hweng Dan Ultra Champion (Korea)",                         MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
 GAME( 1995, ultrchmph, nettoqc,  ultrchmp,  ultrchmp, ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Cheng Ba Shi Jie - Chao Shi Kong Guan Jun (Taiwan)",              MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
@@ -13039,15 +13058,15 @@ GAME( 1996, hanakanz,  0,        hanakanz,  hanakanz, ddenlovr_state, empty_init
 GAME( 1997, kotbinyo,  hanakanz, kotbinyo,  kotbinyo, ddenlovr_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo (Korea)",                                             MACHINE_NO_COCKTAIL  )
 GAME( 1997, kotbinsp,  0,        kotbinsp,  kotbinsp, ddenlovr_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo Special (Korea)",                                     MACHINE_NO_COCKTAIL  )
 GAME( 1996, akamaru,   0,        akamaru,   akamaru,  ddenlovr_state, empty_init,    ROT0, "Dynax (Nakanihon license)",                   "Panel & Variety Akamaru Q Jousyou Dont-R",                        MACHINE_NO_COCKTAIL  )
-GAME( 1996, janshinp,  0,        janshinp,  janshinp, ddenlovr_state, empty_init,    ROT0, "Dynax / Sigma",                               "Mahjong Janshin Plus (Japan)",                                    MACHINE_NO_COCKTAIL  )
-GAME( 1996, dtoyoken,  0,        dtoyoken,  dtoyoken, ddenlovr_state, empty_init,    ROT0, "Dynax / Sigma",                               "Mahjong Dai Touyouken (Japan)",                                   MACHINE_NO_COCKTAIL  )
-GAME( 1996, sryudens,  0,        sryudens,  sryudens, ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Mahjong Seiryu Densetsu (Japan, NM502)",                          MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, seljan2,   0,        seljan2,   seljan2,  ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Return Of Sel Jan II (Japan, NM557)",                             MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, janshinp,  0,        janshinp,  janshinp, ddenlovr_state, empty_init,    ROT0, "Dynax / Sigma",                               "Mahjong Janshin Plus [BET] (Japan)",                                    MACHINE_NO_COCKTAIL  )
+GAME( 1996, dtoyoken,  0,        dtoyoken,  dtoyoken, ddenlovr_state, empty_init,    ROT0, "Dynax / Sigma",                               "Mahjong Dai Touyouken [BET] (Japan)",                                   MACHINE_NO_COCKTAIL  )
+GAME( 1996, sryudens,  0,        sryudens,  sryudens, ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Mahjong Seiryu Densetsu [BET] (Japan, NM502)",                          MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, seljan2,   0,        seljan2,   seljan2,  ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Return Of Sel Jan II [BET] (Japan, NM557)",                             MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, mjflove,   0,        mjflove,   mjflove,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Mahjong Fantasic Love (Japan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, hkagerou,  0,        hkagerou,  hkagerou, ddenlovr_state, empty_init,    ROT0, "Nakanihon / Dynax",                           "Hana Kagerou [BET] (Japan)",                                      MACHINE_NO_COCKTAIL  )
-GAME( 1998, mjchuuka,  0,        mjchuuka,  mjchuuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Chuukanejyo (China)",                                     MACHINE_NO_COCKTAIL  )
-GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, ddenlovr_state, empty_init,    ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan)",                                   MACHINE_NO_COCKTAIL  )
-GAME( 1999, jongtei,   0,        jongtei,   jongtei,  ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Jong-Tei (Japan, NM532-01)",                              MACHINE_NO_COCKTAIL  )
-GAME( 2000, mjgnight,  0,        mjgnight,  mjgnight, ddenlovr_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night (Japan, TSM003-01)",                       MACHINE_NO_COCKTAIL  )
-GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, ddenlovr_state, empty_init,    ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin (Japan, T017-PB-00)",                           MACHINE_NO_COCKTAIL  )
-GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, ddenlovr_state, init_momotaro, ROT0, "Techno-Top",                                  "Mahjong Momotarou (Japan)",                                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1998, mjchuuka,  0,        mjchuuka,  mjchuuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Chuukanejyo [BET] (China)",                                     MACHINE_NO_COCKTAIL  )
+GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, ddenlovr_state, empty_init,    ROT0, "Nihon System",                                "Mahjong Reach Ippatsu [BET] (Japan)",                                   MACHINE_NO_COCKTAIL  )
+GAME( 1999, jongtei,   0,        jongtei,   jongtei,  ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Jong-Tei [BET] (Japan, NM532-01)",                              MACHINE_NO_COCKTAIL  )
+GAME( 2000, mjgnight,  0,        mjgnight,  mjgnight, ddenlovr_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night [BET] (Japan, TSM003-01)",                       MACHINE_NO_COCKTAIL  )
+GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, ddenlovr_state, empty_init,    ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin [BET] (Japan, T017-PB-00)",                           MACHINE_NO_COCKTAIL  )
+GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, ddenlovr_state, init_momotaro, ROT0, "Techno-Top",                                  "Mahjong Momotarou [BET] (Japan, T027-RB-01)",                             MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

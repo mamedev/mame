@@ -123,15 +123,94 @@ READ32_MEMBER(sh2_device::sh2_internal_a5)
     sh2_internal_map - maps SH2 built-ins
 -------------------------------------------------*/
 
+
 void sh2_device::sh7604_map(address_map &map)
 {
 	map(0x40000000, 0xbfffffff).r(FUNC(sh2_device::sh2_internal_a5));
-/*!
-  @todo: cps3boot breaks with this enabled. Needs customization ...
-  */
-//  AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array
-//  AM_RANGE(0xffffff88, 0xffffff8b) AM_READWRITE(dma_dtcr0_r,dma_dtcr0_w)
-	map(0xe0000000, 0xe00001ff).mirror(0x1ffffe00).rw(FUNC(sh2_device::sh7604_r), FUNC(sh2_device::sh7604_w));
+
+//  TODO: cps3boot breaks with this enabled. Needs callback
+//  map(0xc0000000, 0xc0000fff).ram(); // cache data array
+
+//  map(0xe0000000, 0xe00001ff).mirror(0x1ffffe00).rw(FUNC(sh2_device::sh7604_r), FUNC(sh2_device::sh7604_w));
+	// TODO: internal map takes way too much resources if mirrored with 0x1ffffe00
+	//       we eventually internalize again via trampoline & sh7604_device
+	//       Also area 0xffff8000-0xffffbfff is for synchronous DRAM mode,
+	//       so this isn't actually a full mirror
+	// SCI
+	map(0xfffffe00, 0xfffffe00).rw(FUNC(sh2_device::smr_r), FUNC(sh2_device::smr_w));
+	map(0xfffffe01, 0xfffffe01).rw(FUNC(sh2_device::brr_r), FUNC(sh2_device::brr_w));
+	map(0xfffffe02, 0xfffffe02).rw(FUNC(sh2_device::scr_r), FUNC(sh2_device::scr_w));
+	map(0xfffffe03, 0xfffffe03).rw(FUNC(sh2_device::tdr_r), FUNC(sh2_device::tdr_w));
+	map(0xfffffe04, 0xfffffe04).rw(FUNC(sh2_device::ssr_r), FUNC(sh2_device::ssr_w));
+	map(0xfffffe05, 0xfffffe05).r(FUNC(sh2_device::rdr_r));
+
+	// FRC
+	map(0xfffffe10, 0xfffffe10).rw(FUNC(sh2_device::tier_r), FUNC(sh2_device::tier_w));
+	map(0xfffffe11, 0xfffffe11).rw(FUNC(sh2_device::ftcsr_r), FUNC(sh2_device::ftcsr_w));
+	map(0xfffffe12, 0xfffffe13).rw(FUNC(sh2_device::frc_r), FUNC(sh2_device::frc_w));
+	map(0xfffffe14, 0xfffffe15).rw(FUNC(sh2_device::ocra_b_r), FUNC(sh2_device::ocra_b_w));
+	map(0xfffffe16, 0xfffffe16).rw(FUNC(sh2_device::frc_tcr_r), FUNC(sh2_device::frc_tcr_w));
+	map(0xfffffe17, 0xfffffe17).rw(FUNC(sh2_device::tocr_r), FUNC(sh2_device::tocr_w));
+	map(0xfffffe18, 0xfffffe19).r(FUNC(sh2_device::frc_icr_r));
+
+	// INTC
+	map(0xfffffe60, 0xfffffe61).rw(FUNC(sh2_device::iprb_r), FUNC(sh2_device::iprb_w));
+	map(0xfffffe62, 0xfffffe63).rw(FUNC(sh2_device::vcra_r), FUNC(sh2_device::vcra_w));
+	map(0xfffffe64, 0xfffffe65).rw(FUNC(sh2_device::vcrb_r), FUNC(sh2_device::vcrb_w));
+	map(0xfffffe66, 0xfffffe67).rw(FUNC(sh2_device::vcrc_r), FUNC(sh2_device::vcrc_w));
+	map(0xfffffe68, 0xfffffe69).rw(FUNC(sh2_device::vcrd_r), FUNC(sh2_device::vcrd_w));
+
+	map(0xfffffe71, 0xfffffe71).rw(FUNC(sh2_device::drcr_r<0>), FUNC(sh2_device::drcr_w<0>));
+	map(0xfffffe72, 0xfffffe72).rw(FUNC(sh2_device::drcr_r<1>), FUNC(sh2_device::drcr_w<1>));
+
+	// WTC
+	map(0xfffffe80, 0xfffffe81).rw(FUNC(sh2_device::wtcnt_r), FUNC(sh2_device::wtcnt_w));
+	map(0xfffffe82, 0xfffffe83).rw(FUNC(sh2_device::rstcsr_r), FUNC(sh2_device::rstcsr_w));
+
+	// standby and cache control
+	map(0xfffffe90, 0xfffffe91).rw(FUNC(sh2_device::fmr_sbycr_r), FUNC(sh2_device::fmr_sbycr_w));
+	map(0xfffffe92, 0xfffffe92).rw(FUNC(sh2_device::ccr_r), FUNC(sh2_device::ccr_w));
+
+	// INTC second section
+	map(0xfffffee0, 0xfffffee1).rw(FUNC(sh2_device::intc_icr_r), FUNC(sh2_device::intc_icr_w));
+	map(0xfffffee2, 0xfffffee3).rw(FUNC(sh2_device::ipra_r), FUNC(sh2_device::ipra_w));
+	map(0xfffffee4, 0xfffffee5).rw(FUNC(sh2_device::vcrwdt_r), FUNC(sh2_device::vcrwdt_w));
+
+	// DIVU
+	map(0xffffff00, 0xffffff03).rw(FUNC(sh2_device::dvsr_r), FUNC(sh2_device::dvsr_w));
+	map(0xffffff04, 0xffffff07).rw(FUNC(sh2_device::dvdnt_r), FUNC(sh2_device::dvdnt_w));
+	map(0xffffff08, 0xffffff0b).rw(FUNC(sh2_device::dvcr_r), FUNC(sh2_device::dvcr_w));
+	// INTC third section
+	map(0xffffff0c, 0xffffff0f).rw(FUNC(sh2_device::vcrdiv_r), FUNC(sh2_device::vcrdiv_w));
+	// DIVU continued (64-bit plus mirrors)
+	map(0xffffff10, 0xffffff13).rw(FUNC(sh2_device::dvdnth_r), FUNC(sh2_device::dvdnth_w));
+	map(0xffffff14, 0xffffff17).rw(FUNC(sh2_device::dvdntl_r), FUNC(sh2_device::dvdntl_w));
+	map(0xffffff18, 0xffffff1b).r(FUNC(sh2_device::dvdnth_r));
+	map(0xffffff1c, 0xffffff1f).r(FUNC(sh2_device::dvdntl_r));
+
+	// DMAC
+	map(0xffffff80, 0xffffff83).rw(FUNC(sh2_device::sar_r<0>), FUNC(sh2_device::sar_w<0>));
+	map(0xffffff84, 0xffffff87).rw(FUNC(sh2_device::dar_r<0>), FUNC(sh2_device::dar_w<0>));
+	map(0xffffff88, 0xffffff8b).rw(FUNC(sh2_device::dmac_tcr_r<0>), FUNC(sh2_device::dmac_tcr_w<0>));
+	map(0xffffff8c, 0xffffff8f).rw(FUNC(sh2_device::chcr_r<0>), FUNC(sh2_device::chcr_w<0>));
+
+	map(0xffffff90, 0xffffff93).rw(FUNC(sh2_device::sar_r<1>), FUNC(sh2_device::sar_w<1>));
+	map(0xffffff94, 0xffffff97).rw(FUNC(sh2_device::dar_r<1>), FUNC(sh2_device::dar_w<1>));
+	map(0xffffff98, 0xffffff9b).rw(FUNC(sh2_device::dmac_tcr_r<1>), FUNC(sh2_device::dmac_tcr_w<1>));
+	map(0xffffff9c, 0xffffff9f).rw(FUNC(sh2_device::chcr_r<1>), FUNC(sh2_device::chcr_w<1>));
+
+	map(0xffffffa0, 0xffffffa3).rw(FUNC(sh2_device::vcrdma_r<0>), FUNC(sh2_device::vcrdma_w<0>));
+	map(0xffffffa8, 0xffffffab).rw(FUNC(sh2_device::vcrdma_r<1>), FUNC(sh2_device::vcrdma_w<1>));
+	map(0xffffffb0, 0xffffffb3).rw(FUNC(sh2_device::dmaor_r), FUNC(sh2_device::dmaor_w));
+
+	// BSC
+	map(0xffffffe0, 0xffffffe3).rw(FUNC(sh2_device::bcr1_r), FUNC(sh2_device::bcr1_w));
+	map(0xffffffe4, 0xffffffe7).rw(FUNC(sh2_device::bcr2_r), FUNC(sh2_device::bcr2_w));
+	map(0xffffffe8, 0xffffffeb).rw(FUNC(sh2_device::wcr_r), FUNC(sh2_device::wcr_w));
+	map(0xffffffec, 0xffffffef).rw(FUNC(sh2_device::mcr_r), FUNC(sh2_device::mcr_w));
+	map(0xfffffff0, 0xfffffff3).rw(FUNC(sh2_device::rtcsr_r), FUNC(sh2_device::rtcsr_w));
+	map(0xfffffff4, 0xfffffff7).rw(FUNC(sh2_device::rtcnt_r), FUNC(sh2_device::rtcnt_w));
+	map(0xfffffff8, 0xfffffffb).rw(FUNC(sh2_device::rtcor_r), FUNC(sh2_device::rtcor_w));
 }
 
 void sh2a_device::sh7021_map(address_map &map)
@@ -144,8 +223,8 @@ void sh2a_device::sh7021_map(address_map &map)
 	map(0x05ffff48, 0x05ffff49).rw(FUNC(sh2a_device::dmaor_r), FUNC(sh2a_device::dmaor_w));
 	map(0x05ffff4a, 0x05ffff4b).rw(FUNC(sh2a_device::dma_tcr0_r), FUNC(sh2a_device::dma_tcr0_w));
 	map(0x05ffff4e, 0x05ffff4f).rw(FUNC(sh2a_device::dma_chcr0_r), FUNC(sh2a_device::dma_chcr0_w));
-//  AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
-//  AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
+//  map(0x07000000, 0x070003ff).ram().share("oram"); // on-chip RAM, actually at 0xf000000 (1 kb)
+//  map(0x0f000000, 0x0f0003ff).ram().share("oram"); // on-chip RAM, actually at 0xf000000 (1 kb)
 }
 
 void sh1_device::sh7032_map(address_map &map)
@@ -176,6 +255,9 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 	, m_program_config("program", ENDIANNESS_BIG, 32, addrlines, 0, internal_map)
 	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, addrlines, 0)
 	, m_is_slave(0)
+	, m_dma_kludge_cb(*this)
+	, m_dma_fifo_data_available_cb(*this)
+	, m_ftcsr_read_cb(*this)
 	, m_drcfe(nullptr)
 	, m_debugger_temp(0)
 {
@@ -187,11 +269,13 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 sh2a_device::sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh2_device(mconfig, SH2A, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh2a_device::sh7021_map), this), 28)
 {
+	std::fill(std::begin(m_sh7021_regs), std::end(m_sh7021_regs), 0);
 }
 
 sh1_device::sh1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh2_device(mconfig, SH1, tag, owner, clock, CPU_TYPE_SH1, address_map_constructor(FUNC(sh1_device::sh7032_map), this), 28)
 {
+	std::fill(std::begin(m_sh7032_regs), std::end(m_sh7032_regs), 0);
 }
 
 device_memory_interface::space_config_vector sh2_device::memory_space_config() const
@@ -364,13 +448,11 @@ void sh2_device::device_reset()
 	m_sh2_state->pending_irq = m_test_irq = 0;
 	//memset(&m_irq_queue[0], 0, sizeof(m_irq_queue[0])*16);
 	memset(&m_irq_line_state[0], 0, sizeof(m_irq_line_state[0])*17);
-	m_frc = m_ocra = m_ocrb = m_icr = 0;
+	m_frc = m_ocra = m_ocrb = m_frc_icr = 0;
 	m_frc_base = 0;
 	m_frt_input = m_sh2_state->internal_irq_level = m_internal_irq_vector = 0;
 	m_dma_timer_active[0] = m_dma_timer_active[1] = 0;
 	m_dma_irq[0] = m_dma_irq[1] = 0;
-
-	memset(m_m, 0, 0x200);
 
 	m_sh2_state->pc = RL(0);
 	m_sh2_state->r[15] = RL(4);
@@ -435,6 +517,8 @@ void sh2_device::device_start()
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_timer_callback), this));
 	m_timer->adjust(attotime::never);
+	m_wdtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_wdtimer_callback), this));
+	m_wdtimer->adjust(attotime::never);
 
 	m_dma_current_active_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_dma_current_active_callback), this));
 	m_dma_current_active_timer[0]->adjust(attotime::never);
@@ -443,9 +527,9 @@ void sh2_device::device_start()
 	m_dma_current_active_timer[1]->adjust(attotime::never);
 
 	/* resolve callbacks */
-	m_dma_kludge_cb.bind_relative_to(*owner());
-	m_dma_fifo_data_available_cb.bind_relative_to(*owner());
-	m_ftcsr_read_cb.bind_relative_to(*owner());
+	m_dma_kludge_cb.resolve();
+	m_dma_fifo_data_available_cb.resolve();
+	m_ftcsr_read_cb.resolve();
 
 	m_decrypted_program = has_space(AS_OPCODES) ? &space(AS_OPCODES) : &space(AS_PROGRAM);
 	auto cache = m_decrypted_program->cache<2, 0, ENDIANNESS_BIG>();
@@ -467,12 +551,92 @@ void sh2_device::device_start()
 
 	m_internal = &space(AS_PROGRAM);
 
-	save_item(NAME(m_cpu_off));
-	//save_item(NAME(m_dvsr));
-	//save_item(NAME(m_dvdnth));
-	//save_item(NAME(m_dvdntl));
-	//save_item(NAME(m_dvcr));
-	save_item(NAME(m_test_irq));
+	// SCI
+	save_item(NAME(m_smr));
+	save_item(NAME(m_brr));
+	save_item(NAME(m_scr));
+	save_item(NAME(m_tdr));
+	save_item(NAME(m_ssr));
+
+	// FRT / FRC
+	save_item(NAME(m_tier));
+	save_item(NAME(m_ftcsr));
+	save_item(NAME(m_frc_tcr));
+	save_item(NAME(m_tocr));
+	save_item(NAME(m_frc));
+	save_item(NAME(m_ocra));
+	save_item(NAME(m_ocrb));
+	save_item(NAME(m_frc_icr));
+	save_item(NAME(m_frc_base));
+	save_item(NAME(m_frt_input));
+
+	// INTC
+	save_item(NAME(m_irq_level.frc));
+	save_item(NAME(m_irq_level.sci));
+	save_item(NAME(m_irq_level.divu));
+	save_item(NAME(m_irq_level.dmac));
+	save_item(NAME(m_irq_level.wdt));
+	save_item(NAME(m_irq_vector.fic));
+	save_item(NAME(m_irq_vector.foc));
+	save_item(NAME(m_irq_vector.fov));
+	save_item(NAME(m_irq_vector.divu));
+	save_item(NAME(m_irq_vector.dmac[0]));
+	save_item(NAME(m_irq_vector.dmac[1]));
+
+	save_item(NAME(m_ipra));
+	save_item(NAME(m_iprb));
+	save_item(NAME(m_vcra));
+	save_item(NAME(m_vcrb));
+	save_item(NAME(m_vcrc));
+	save_item(NAME(m_vcrd));
+	save_item(NAME(m_vcrwdt));
+	save_item(NAME(m_vcrdiv));
+	save_item(NAME(m_intc_icr));
+	save_item(NAME(m_vcrdma[0]));
+	save_item(NAME(m_vcrdma[1]));
+
+	save_item(NAME(m_vecmd));
+	save_item(NAME(m_nmie));
+
+	// DIVU
+	save_item(NAME(m_divu_ovf));
+	save_item(NAME(m_divu_ovfie));
+	save_item(NAME(m_dvsr));
+	save_item(NAME(m_dvdntl));
+	save_item(NAME(m_dvdnth));
+
+	// WTC
+	save_item(NAME(m_wtcnt));
+	save_item(NAME(m_wtcsr));
+	save_item(NAME(m_rstcsr));
+	save_item(NAME(m_wtcw[0]));
+	save_item(NAME(m_wtcw[1]));
+
+	// DMAC
+	save_item(NAME(m_dmaor));
+	save_item(NAME(m_dmac[0].drcr));
+	save_item(NAME(m_dmac[1].drcr));
+	save_item(NAME(m_dmac[0].sar));
+	save_item(NAME(m_dmac[1].sar));
+	save_item(NAME(m_dmac[0].dar));
+	save_item(NAME(m_dmac[1].dar));
+	save_item(NAME(m_dmac[0].tcr));
+	save_item(NAME(m_dmac[1].tcr));
+	save_item(NAME(m_dmac[0].chcr));
+	save_item(NAME(m_dmac[1].chcr));
+
+	// misc
+	save_item(NAME(m_sbycr));
+	save_item(NAME(m_ccr));
+
+	// BSC
+	save_item(NAME(m_bcr1));
+	save_item(NAME(m_bcr2));
+	save_item(NAME(m_wcr));
+	save_item(NAME(m_mcr));
+	save_item(NAME(m_rtcsr));
+	save_item(NAME(m_rtcor));
+	save_item(NAME(m_rtcnt));
 
 	/*
 	for (int i = 0; i < 16; ++i)
@@ -482,21 +646,14 @@ void sh2_device::device_start()
 	}
 	*/
 
-
+	// internals
+	save_item(NAME(m_cpu_off));
+	save_item(NAME(m_test_irq));
 	save_item(NAME(m_irq_line_state));
-	save_item(NAME(m_m));
 	save_item(NAME(m_nmi_line_state));
-	save_item(NAME(m_frc));
-	save_item(NAME(m_ocra));
-	save_item(NAME(m_ocrb));
-	save_item(NAME(m_icr));
-	save_item(NAME(m_frc_base));
-	save_item(NAME(m_frt_input));
 	save_item(NAME(m_internal_irq_vector));
 	save_item(NAME(m_dma_timer_active));
 	save_item(NAME(m_dma_irq));
-	save_item(NAME(m_wtcnt));
-	save_item(NAME(m_wtcsr));
 
 	state_add( STATE_GENPC, "PC", m_sh2_state->pc).mask(SH12_AM).callimport();
 	state_add( STATE_GENPCBASE, "CURPC", m_sh2_state->pc ).callimport().noshow();
@@ -509,14 +666,13 @@ void sh2_device::device_start()
 	//m_dvcr = 0;
 	m_test_irq = 0;
 
-
 	memset(m_irq_line_state, 0, sizeof(m_irq_line_state));
-	memset(m_m, 0, sizeof(m_m));
+
 	m_nmi_line_state = 0;
 	m_frc = 0;
 	m_ocra = 0;
 	m_ocrb = 0;
-	m_icr = 0;
+	m_frc_icr = 0;
 	m_frc_base = 0;
 	m_frt_input = 0;
 	m_internal_irq_vector = 0;
@@ -641,7 +797,7 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 		}
 		else
 		{
-			if(m_m[0x38] & 0x00010000)
+			if(m_vecmd == true)
 			{
 				vector = standard_irq_callback(irqline);
 				LOG("SH-2 exception #%d (external vector: $%x) after [%s]\n", irqline, vector, message);
@@ -909,61 +1065,64 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 
 	UML_LABEL(block, label++);              // label:
 
-	for (auto & elem : m_fastram)
+	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
 	{
-		if (elem.base != nullptr && (!iswrite || !elem.readonly))
+		for (auto & elem : m_fastram)
 		{
-			void *fastbase = (uint8_t *)elem.base - elem.start;
-			uint32_t skip = label++;
-			if (elem.end != 0xffffffff)
+			if (elem.base != nullptr && (!iswrite || !elem.readonly))
 			{
-				UML_CMP(block, I0, elem.end);   // cmp     i0,end
-				UML_JMPc(block, COND_A, skip);                                      // ja      skip
-			}
-			if (elem.start != 0x00000000)
-			{
-				UML_CMP(block, I0, elem.start);// cmp     i0,fastram_start
-				UML_JMPc(block, COND_B, skip);                                      // jb      skip
-			}
+				void *fastbase = (uint8_t *)elem.base - elem.start;
+				uint32_t skip = label++;
+				if (elem.end != 0xffffffff)
+				{
+					UML_CMP(block, I0, elem.end);   // cmp     i0,end
+					UML_JMPc(block, COND_A, skip);                                      // ja      skip
+				}
+				if (elem.start != 0x00000000)
+				{
+					UML_CMP(block, I0, elem.start);// cmp     i0,fastram_start
+					UML_JMPc(block, COND_B, skip);                                      // jb      skip
+				}
 
-			if (!iswrite)
-			{
-				if (size == 1)
+				if (!iswrite)
 				{
-					UML_XOR(block, I0, I0, BYTE4_XOR_BE(0));
-					UML_LOAD(block, I0, fastbase, I0, SIZE_BYTE, SCALE_x1);             // load    i0,fastbase,i0,byte
+					if (size == 1)
+					{
+						UML_XOR(block, I0, I0, BYTE4_XOR_BE(0));
+						UML_LOAD(block, I0, fastbase, I0, SIZE_BYTE, SCALE_x1);             // load    i0,fastbase,i0,byte
+					}
+					else if (size == 2)
+					{
+						UML_XOR(block, I0, I0, WORD_XOR_BE(0));
+						UML_LOAD(block, I0, fastbase, I0, SIZE_WORD, SCALE_x1);         // load    i0,fastbase,i0,word_x1
+					}
+					else if (size == 4)
+					{
+						UML_LOAD(block, I0, fastbase, I0, SIZE_DWORD, SCALE_x1);            // load    i0,fastbase,i0,dword_x1
+					}
+					UML_RET(block);                                                     // ret
 				}
-				else if (size == 2)
+				else
 				{
-					UML_XOR(block, I0, I0, WORD_XOR_BE(0));
-					UML_LOAD(block, I0, fastbase, I0, SIZE_WORD, SCALE_x1);         // load    i0,fastbase,i0,word_x1
+					if (size == 1)
+					{
+						UML_XOR(block, I0, I0, BYTE4_XOR_BE(0));
+						UML_STORE(block, fastbase, I0, I1, SIZE_BYTE, SCALE_x1);// store   fastbase,i0,i1,byte
+					}
+					else if (size == 2)
+					{
+						UML_XOR(block, I0, I0, WORD_XOR_BE(0));
+						UML_STORE(block, fastbase, I0, I1, SIZE_WORD, SCALE_x1);// store   fastbase,i0,i1,word_x1
+					}
+					else if (size == 4)
+					{
+						UML_STORE(block, fastbase, I0, I1, SIZE_DWORD, SCALE_x1);       // store   fastbase,i0,i1,dword_x1
+					}
+					UML_RET(block);                                                     // ret
 				}
-				else if (size == 4)
-				{
-					UML_LOAD(block, I0, fastbase, I0, SIZE_DWORD, SCALE_x1);            // load    i0,fastbase,i0,dword_x1
-				}
-				UML_RET(block);                                                     // ret
-			}
-			else
-			{
-				if (size == 1)
-				{
-					UML_XOR(block, I0, I0, BYTE4_XOR_BE(0));
-					UML_STORE(block, fastbase, I0, I1, SIZE_BYTE, SCALE_x1);// store   fastbase,i0,i1,byte
-				}
-				else if (size == 2)
-				{
-					UML_XOR(block, I0, I0, WORD_XOR_BE(0));
-					UML_STORE(block, fastbase, I0, I1, SIZE_WORD, SCALE_x1);// store   fastbase,i0,i1,word_x1
-				}
-				else if (size == 4)
-				{
-					UML_STORE(block, fastbase, I0, I1, SIZE_DWORD, SCALE_x1);       // store   fastbase,i0,i1,dword_x1
-				}
-				UML_RET(block);                                                     // ret
-			}
 
-			UML_LABEL(block, skip);                                             // skip:
+				UML_LABEL(block, skip);                                             // skip:
+			}
 		}
 	}
 

@@ -9,6 +9,10 @@
 class interpro_bus_device : public device_t
 {
 public:
+	// space configuration
+	template <typename T> void set_main_space(T &&tag, int spacenum) { m_main_space.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io_space.set_tag(std::forward<T>(tag), spacenum); }
+
 	// callback configuration
 	auto out_irq0_cb() { return m_out_irq0_cb.bind(); }
 	auto out_irq1_cb() { return m_out_irq1_cb.bind(); }
@@ -24,9 +28,8 @@ protected:
 	// construction/destruction
 	interpro_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, type, tag, owner, clock)
-		, m_maincpu(*this, finder_base::DUMMY_TAG)
-		, m_main_space(nullptr)
-		, m_io_space(nullptr)
+		, m_main_space(*this, finder_base::DUMMY_TAG, -1)
+		, m_io_space(*this, finder_base::DUMMY_TAG, -1)
 		, m_out_irq0_cb(*this)
 		, m_out_irq1_cb(*this)
 		, m_out_irq2_cb(*this)
@@ -38,9 +41,8 @@ protected:
 	virtual void device_resolve_objects() override;
 
 	// internal state
-	required_device<cpu_device> m_maincpu;
-	address_space *m_main_space;
-	address_space *m_io_space;
+	required_address_space m_main_space;
+	required_address_space m_io_space;
 
 private:
 	devcb_write_line m_out_irq0_cb;
@@ -55,12 +57,6 @@ class cbus_bus_device : public interpro_bus_device
 {
 public:
 	// construction/destruction
-	template <typename T>
-	cbus_bus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, T &&cpu_device)
-		: cbus_bus_device(mconfig, tag, owner, clock)
-	{
-		m_maincpu.set_tag(std::forward<T>(cpu_device));
-	}
 	cbus_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	static const u32 CBUS_BASE = 0x87000000;
@@ -79,7 +75,7 @@ public:
 		offs_t end = start + (CBUS_SIZE - 1);
 
 		// install the idprom region
-		read32_delegate idprom_r([idprom](address_space &space, offs_t offset, u32 mem_mask) { return idprom->as_u32(offset); }, idprom->name());
+		read32_delegate idprom_r(*this, [idprom] (address_space &space, offs_t offset, u32 mem_mask) { return idprom->as_u32(offset); }, idprom->name());
 		m_main_space->install_read_handler(start, start | 0x7f, idprom_r);
 		m_io_space->install_read_handler(start, start | 0x7f, idprom_r);
 
@@ -124,7 +120,7 @@ private:
 	required_device<cbus_bus_device> m_bus;
 };
 
-class device_cbus_card_interface : public device_slot_card_interface
+class device_cbus_card_interface : public device_interface
 {
 protected:
 	friend class cbus_slot_device;
@@ -137,7 +133,7 @@ public:
 
 protected:
 	device_cbus_card_interface(const machine_config &mconfig, device_t &device, const char *idprom_region = "idprom")
-		: device_slot_card_interface(mconfig, device)
+		: device_interface(device, "interprocbus")
 		, m_bus(nullptr)
 		, m_idprom_region(idprom_region)
 	{
@@ -158,12 +154,6 @@ class srx_bus_device : public interpro_bus_device
 {
 public:
 	// construction/destruction
-	template <typename T>
-	srx_bus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, T &&cpu_device)
-		: srx_bus_device(mconfig, tag, owner, clock)
-	{
-		m_maincpu.set_tag(std::forward<T>(cpu_device));
-	}
 	srx_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	static const u32 SRX_BASE = 0x8f000000;
@@ -181,7 +171,7 @@ public:
 		offs_t end = start + (SRX_SIZE - 1);
 
 		// install the idprom region
-		read32_delegate idprom_r([idprom](address_space &space, offs_t offset, u32 mem_mask) { return idprom->as_u32(offset); }, idprom->name());
+		read32_delegate idprom_r(*this, [idprom] (address_space &space, offs_t offset, u32 mem_mask) { return idprom->as_u32(offset); }, idprom->name());
 		m_main_space->install_read_handler(start | 0x7f80, start | 0x7fff, idprom_r);
 		m_io_space->install_read_handler(start | 0x7f80, start | 0x7fff, idprom_r);
 
@@ -242,7 +232,7 @@ private:
 	required_device<srx_bus_device> m_bus;
 };
 
-class device_srx_card_interface : public device_slot_card_interface
+class device_srx_card_interface : public device_interface
 {
 protected:
 	friend class srx_slot_device;
@@ -255,7 +245,7 @@ public:
 
 protected:
 	device_srx_card_interface(const machine_config &mconfig, device_t &device, const char *idprom_region = "idprom")
-		: device_slot_card_interface(mconfig, device)
+		: device_interface(device, "interprosrx")
 		, m_bus(nullptr)
 		, m_idprom_region(idprom_region)
 	{

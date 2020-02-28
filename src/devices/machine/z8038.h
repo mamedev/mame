@@ -187,7 +187,7 @@ private:
 		ISR_HMASK = 0xe0,
 	};
 
-	devcb_write_line m_out_int_cb[2];
+	devcb_write_line::array<2> m_out_int_cb;
 	devcb_write_line m_out_E_cb; // pin number 35
 	devcb_write_line m_out_F_cb; // pin number 34
 	devcb_write_line m_out_H_cb; // pin number 32

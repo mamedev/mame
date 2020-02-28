@@ -102,25 +102,27 @@ static DISCRETE_SOUND_START(avalnche_discrete)
 DISCRETE_SOUND_END
 
 
-MACHINE_CONFIG_START(avalnche_state::avalnche_sound)
+void avalnche_state::avalnche_sound(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, avalnche_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	DISCRETE(config, m_discrete, avalnche_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	m_latch->q_out_cb<1>().set("discrete", FUNC(discrete_device::write_line<AVALNCHE_ATTRACT_EN>));
-	m_latch->q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<AVALNCHE_AUD0_EN>));
-	m_latch->q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<AVALNCHE_AUD1_EN>));
-	m_latch->q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<AVALNCHE_AUD2_EN>));
-MACHINE_CONFIG_END
+	m_latch->q_out_cb<1>().set(m_discrete, FUNC(discrete_device::write_line<AVALNCHE_ATTRACT_EN>));
+	m_latch->q_out_cb<4>().set(m_discrete, FUNC(discrete_device::write_line<AVALNCHE_AUD0_EN>));
+	m_latch->q_out_cb<5>().set(m_discrete, FUNC(discrete_device::write_line<AVALNCHE_AUD1_EN>));
+	m_latch->q_out_cb<6>().set(m_discrete, FUNC(discrete_device::write_line<AVALNCHE_AUD2_EN>));
+}
 
 
-MACHINE_CONFIG_START(avalnche_state::acatch_sound) // just a stub here...
+void avalnche_state::acatch_sound(machine_config &config)
+{
+	// just a stub here...
 	m_latch->q_out_cb<1>().set_nop(); // It is attract_enable just like avalnche, but not hooked up yet.
 	m_latch->q_out_cb<4>().set(FUNC(avalnche_state::catch_aud0_w));
 	m_latch->q_out_cb<5>().set(FUNC(avalnche_state::catch_aud1_w));
 	m_latch->q_out_cb<6>().set(FUNC(avalnche_state::catch_aud2_w));
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

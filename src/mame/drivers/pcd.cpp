@@ -50,7 +50,6 @@ public:
 		, m_scsi_data_out(*this, "scsi_data_out")
 		, m_scsi_data_in(*this, "scsi_data_in")
 		, m_ram(*this, "ram")
-		, m_req_hack(nullptr)
 	{ }
 
 	void pcx(machine_config &config);
@@ -63,8 +62,6 @@ private:
 
 	DECLARE_READ8_MEMBER( nmi_io_r );
 	DECLARE_WRITE8_MEMBER( nmi_io_w );
-	DECLARE_READ8_MEMBER( rtc_r );
-	DECLARE_WRITE8_MEMBER( rtc_w );
 	DECLARE_READ8_MEMBER( stat_r );
 	DECLARE_WRITE8_MEMBER( stat_w );
 	DECLARE_READ8_MEMBER( led_r );
@@ -93,7 +90,6 @@ private:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic1;
@@ -108,7 +104,6 @@ private:
 	required_device<ram_device> m_ram;
 	uint8_t m_stat, m_led;
 	int m_msg, m_bsy, m_io, m_cd, m_req, m_rst;
-	emu_timer *m_req_hack;
 	uint16_t m_dskctl;
 	struct {
 		uint16_t ctl;
@@ -125,16 +120,8 @@ private:
 //  MACHINE EMULATION
 //**************************************************************************
 
-void pcd_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	// TODO: remove this hack
-	if(m_req)
-		m_maincpu->drq0_w(1);
-}
-
 void pcd_state::machine_start()
 {
-	m_req_hack = timer_alloc();
 	save_item(NAME(m_mmu.ctl));
 	save_item(NAME(m_mmu.regs));
 }
@@ -187,18 +174,6 @@ WRITE8_MEMBER( pcd_state::nmi_io_w )
 	logerror("%s: unmapped %s %04x\n", machine().describe_context(), space.name(), offset);
 	m_stat |= 0xfd;
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
-READ8_MEMBER( pcd_state::rtc_r )
-{
-	m_rtc->write(space, 0, offset);
-	return m_rtc->read(space, 1);
-}
-
-WRITE8_MEMBER( pcd_state::rtc_w )
-{
-	m_rtc->write(space, 0, offset);
-	m_rtc->write(space, 1, data);
 }
 
 READ8_MEMBER( pcd_state::stat_r )
@@ -377,7 +352,6 @@ WRITE_LINE_MEMBER(pcd_state::write_scsi_req)
 		if(!m_cd)
 		{
 			m_maincpu->drq0_w(1);
-			m_req_hack->adjust(attotime::from_msec(10)); // poke the dmac
 		}
 		else if(m_msg)
 		{
@@ -387,8 +361,6 @@ WRITE_LINE_MEMBER(pcd_state::write_scsi_req)
 	}
 	else
 	{
-		if(m_req_hack) // this might be called before machine_start
-			m_req_hack->adjust(attotime::never);
 		m_scsi->write_ack(0);
 	}
 	check_scsi_irq();
@@ -457,7 +429,7 @@ void pcd_state::pcd_io(address_map &map)
 	map(0xf820, 0xf821).rw(m_pic2, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf840, 0xf840).rw(FUNC(pcd_state::stat_r), FUNC(pcd_state::stat_w));
 	map(0xf841, 0xf841).rw(FUNC(pcd_state::led_r), FUNC(pcd_state::led_w));
-	map(0xf880, 0xf8bf).rw(FUNC(pcd_state::rtc_r), FUNC(pcd_state::rtc_w));
+	map(0xf880, 0xf8bf).rw(m_rtc, FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
 	map(0xf900, 0xf903).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 	map(0xf904, 0xf905).rw(FUNC(pcd_state::dskctl_r), FUNC(pcd_state::dskctl_w));
 	map(0xf940, 0xf943).rw(FUNC(pcd_state::scsi_r), FUNC(pcd_state::scsi_w));
@@ -465,7 +437,7 @@ void pcd_state::pcd_io(address_map &map)
 	map(0xf9c0, 0xf9c3).rw(m_usart[0], FUNC(mc2661_device::read), FUNC(mc2661_device::write));  // UARTs
 	map(0xf9d0, 0xf9d3).rw(m_usart[1], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 	map(0xf9e0, 0xf9e3).rw(m_usart[2], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
-//  AM_RANGE(0xfa00, 0xfa7f) // pcs4-n (peripheral chip select)
+//  map(0xfa00, 0xfa7f) // pcs4-n (peripheral chip select)
 	map(0xfb00, 0xfb00).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
 	map(0xfb02, 0xffff).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
 }
@@ -595,6 +567,8 @@ void pcd_state::pcx(machine_config &config)
 	subdevice<pcd_keyboard_device>("keyboard")->out_tx_handler().set("video", FUNC(pcx_video_device::rx_w));
 
 	m_usart[1]->txd_handler().set_nop();
+
+	SOFTWARE_LIST(config, "flop_ls").set_original("pcx_flop");
 }
 
 //**************************************************************************
@@ -602,7 +576,7 @@ void pcd_state::pcx(machine_config &config)
 //**************************************************************************
 
 ROM_START( pcd )
-	ROM_REGION(0x4000, "bios", 0)
+	ROM_REGION16_LE(0x4000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "v2", "V2 GS")  // from mainboard SYBAC S26361-D359 V2 GS
 	ROMX_LOAD("s26361-d359.d42", 0x0001, 0x2000, CRC(e20244dd) SHA1(0ebc5ddb93baacd9106f1917380de58aac64fe73), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("s26361-d359.d43", 0x0000, 0x2000, CRC(e03db2ec) SHA1(fcae8b0c9e7543706817b0a53872826633361fda), ROM_SKIP(1) | ROM_BIOS(0))
@@ -612,7 +586,7 @@ ROM_START( pcd )
 ROM_END
 
 ROM_START( pcx )
-	ROM_REGION(0x4000, "bios", 0)
+	ROM_REGION16_LE(0x4000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "v2", "V2 GS")  // from mainboard SYBAC S26361-D359 V2 GS
 	ROMX_LOAD("s26361-d359.d42", 0x0001, 0x2000, CRC(e20244dd) SHA1(0ebc5ddb93baacd9106f1917380de58aac64fe73), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("s26361-d359.d43", 0x0000, 0x2000, CRC(e03db2ec) SHA1(fcae8b0c9e7543706817b0a53872826633361fda), ROM_SKIP(1) | ROM_BIOS(0))

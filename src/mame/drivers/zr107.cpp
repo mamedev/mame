@@ -253,7 +253,6 @@ protected:
 	WRITE_LINE_MEMBER(k054539_irq_gen);
 	double adc0838_callback(uint8_t input);
 
-	void k054539_map(address_map &map);
 	void sharc_memmap(address_map &map);
 	void sound_memmap(address_map &map);
 
@@ -315,8 +314,6 @@ uint32_t jetwave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
-
-	m_dsp->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }
 
@@ -358,8 +355,6 @@ uint32_t midnrun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
-
-	m_dsp->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }
 
@@ -498,11 +493,11 @@ void zr107_state::machine_start()
 void midnrun_state::main_memmap(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram().share("workram"); /* Work RAM */
-	map(0x74000000, 0x74003fff).rw(m_k056832, FUNC(k056832_device::ram_long_r), FUNC(k056832_device::ram_long_w));
-	map(0x74020000, 0x7402003f).rw(m_k056832, FUNC(k056832_device::long_r), FUNC(k056832_device::long_w));
+	map(0x74000000, 0x74003fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0x74020000, 0x7402003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
 	map(0x74060000, 0x7406003f).rw(FUNC(midnrun_state::ccu_r), FUNC(midnrun_state::ccu_w));
 	map(0x74080000, 0x74081fff).ram().w(FUNC(midnrun_state::paletteram32_w)).share("paletteram");
-	map(0x740a0000, 0x740a3fff).r(m_k056832, FUNC(k056832_device::rom_long_r));
+	map(0x740a0000, 0x740a3fff).r(m_k056832, FUNC(k056832_device::rom_word_r));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));        /* 21N 21K 23N 23K */
 	map(0x78010000, 0x7801ffff).w(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x78040000, 0x7804000f).rw(m_k001006_1, FUNC(k001006_device::read), FUNC(k001006_device::write));
@@ -570,11 +565,6 @@ void zr107_state::sound_memmap(address_map &map)
 	map(0x580000, 0x580001).nopw(); // 'NRES' - D2: K056602 /RESET
 }
 
-void zr107_state::k054539_map(address_map &map)
-{
-	map(0x000000, 0x5fffff).rom().region("k054539", 0);
-}
-
 /*****************************************************************************/
 
 
@@ -601,10 +591,10 @@ void zr107_state::sharc_memmap(address_map &map)
 
 static INPUT_PORTS_START( zr107 )
 	PORT_START("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("View Button")       // View switch
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Shift Up")      // Shift up
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shift Down")        // Shift down
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("AT/MT Switch")  PORT_TOGGLE // AT/MT switch
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start/View")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Shift Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Down")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("AT/MT Switch") PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x0b, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -639,99 +629,65 @@ static INPUT_PORTS_START( midnrun )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // COIN2?
-	PORT_DIPNAME( 0x0c, 0x00, "Network ID" ) PORT_DIPLOCATION("SW:2,1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x0c, 0x0c, "Network ID" ) PORT_DIPLOCATION("SW:4,3")
 	PORT_DIPSETTING( 0x0c, "1" )
 	PORT_DIPSETTING( 0x08, "2" )
 	PORT_DIPSETTING( 0x04, "3" )
 	PORT_DIPSETTING( 0x00, "4" )
-	PORT_DIPNAME( 0x02, 0x02, "Transmission Type" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPNAME( 0x02, 0x02, "Transmission Type" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING( 0x02, "Button" )
-	PORT_DIPSETTING( 0x00, "'T'Gate" )
-	PORT_DIPNAME( 0x01, 0x01, "CG Board Type" ) PORT_DIPLOCATION("SW:4")
-	PORT_DIPSETTING( 0x01, DEF_STR( Single ) )
-	PORT_DIPSETTING( 0x00, "Twin" )
+	PORT_DIPSETTING( 0x00, "'T'Gate" ) //unused
+	PORT_DIPNAME( 0x01, 0x01, "CG Board Type" ) PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING( 0x01, "Single" )
+	PORT_DIPSETTING( 0x00, "Twin" ) //unused
 
-	PORT_START("ANALOG1")       // Steering wheel
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_START("ANALOG1")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
-	PORT_START("ANALOG2")       // Acceleration pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_START("ANALOG2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x00,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
-	PORT_START("ANALOG3")       // Brake pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( windheat )
-	PORT_INCLUDE( zr107 )
-
-	PORT_START("IN3")
-	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // COIN2?
-	PORT_DIPNAME( 0x0c, 0x00, "Network ID" ) PORT_DIPLOCATION("SW:2,1")
-	PORT_DIPSETTING( 0x0c, "1" )
-	PORT_DIPSETTING( 0x08, "2" )
-	PORT_DIPSETTING( 0x04, "3" )
-	PORT_DIPSETTING( 0x00, "4" )
-	PORT_DIPNAME( 0x02, 0x02, "Transmission Type" ) PORT_DIPLOCATION("SW:3")
-	PORT_DIPSETTING( 0x02, "Button" )
-	PORT_DIPSETTING( 0x00, "'T'Gate" )
-	PORT_DIPNAME( 0x01, 0x01, "CG Board Type" ) PORT_DIPLOCATION("SW:4")
-	PORT_DIPSETTING( 0x01, DEF_STR( Single ) )
-	PORT_DIPSETTING( 0x00, "Twin" )
-
-	PORT_START("ANALOG1")       // Steering wheel
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
-	PORT_START("ANALOG2")       // Acceleration pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
-	PORT_START("ANALOG3")       // Brake pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
+	PORT_START("ANALOG3")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jetwave )
 	PORT_INCLUDE( zr107 )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("View Shift")        // View Shift
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("T-Center")      // T-Center
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_BUTTON3 ) PORT_NAME("Angle")         // Angle
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left Turn")     // Left Turn
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Right Turn")        // Right Turn
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start/View")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("T-Center") //Non-analog acell
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Angle")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Left Turn") //Non-analog left
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Right Turn") //Non-analog right
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x08, 0x00, "DIP 1" ) PORT_DIPLOCATION("SW:1")
-	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIP 2" ) PORT_DIPLOCATION("SW:2")
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIP 3" ) PORT_DIPLOCATION("SW:3")
-	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x00, "DIP 4" ) PORT_DIPLOCATION("SW:4")
-	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x0c, 0x0c, "Network ID" ) PORT_DIPLOCATION("SW:4,3")
+	PORT_DIPSETTING( 0x0c, "1" )
+	PORT_DIPSETTING( 0x08, "2" )
+	PORT_DIPSETTING( 0x04, "3" )
+	PORT_DIPSETTING( 0x00, "4" )
+	PORT_DIPNAME( 0x02, 0x00, "Drive System" ) PORT_DIPLOCATION("SW:2") //Sensors for force feedback. Todo: "Disable" the sensors so this switch can be set to off without errors.
+	PORT_DIPSETTING( 0x02, "On" ) // Enables the sensors/normal use.
+	PORT_DIPSETTING( 0x00, "Off" ) //Disables and bypasses all sensor checks. This disables the force feedback on actual hardware.
+	PORT_DIPNAME( 0x01, 0x01, "Running Mode" ) PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING( 0x01, "Product" ) //Enables the analog inputs; normal usage
+	PORT_DIPSETTING( 0x00, "Check" ) //Disables them for use with a JAMMA interface; intended for development purposes.
 
-	PORT_START("ANALOG1")       // Steering wheel
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
+	PORT_START("ANALOG1")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering") PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("ANALOG2")       // Acceleration pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_START("ANALOG2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Accelerator") PORT_MINMAX(0x00,0x90) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
-	PORT_START("ANALOG3")       // Brake pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
+	PORT_START("ANALOG3") //actually required else MAME will crash if this port is removed.
+	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -779,7 +735,10 @@ WRITE_LINE_MEMBER(zr107_state::k054539_irq_gen)
 WRITE_LINE_MEMBER(zr107_state::vblank)
 {
 	if (state)
+	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_dsp->set_flag_input(1, ASSERT_LINE);
+	}
 }
 
 void zr107_state::machine_reset()
@@ -827,13 +786,13 @@ void zr107_state::zr107(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	k054539_device &k054539_1(K054539(config, "k054539_1", XTAL(18'432'000)));
-	k054539_1.set_addrmap(0, &zr107_state::k054539_map);
+	k054539_1.set_device_rom_tag("k054539");
 	k054539_1.timer_handler().set(FUNC(zr107_state::k054539_irq_gen));
 	k054539_1.add_route(0, "lspeaker", 0.75);
 	k054539_1.add_route(1, "rspeaker", 0.75);
 
 	k054539_device &k054539_2(K054539(config, "k054539_2", XTAL(18'432'000)));
-	k054539_2.set_addrmap(0, &zr107_state::k054539_map);
+	k054539_2.set_device_rom_tag("k054539");
 	k054539_2.add_route(0, "lspeaker", 0.75);
 	k054539_2.add_route(1, "rspeaker", 0.75);
 
@@ -850,14 +809,14 @@ void midnrun_state::midnrun(machine_config &config)
 	zr107(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midnrun_state::main_memmap);
 
-	config.m_minimum_quantum = attotime::from_hz(750000); // Very high sync needed to prevent lockups - why?
+	config.set_maximum_quantum(attotime::from_hz(750000)); // Very high sync needed to prevent lockups - why?
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(midnrun_state::screen_update));
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(midnrun_state::tile_callback), this);
-	m_k056832->set_config("gfx2", K056832_BPP_8, 1, 0);
+	m_k056832->set_tile_callback(FUNC(midnrun_state::tile_callback));
+	m_k056832->set_config(K056832_BPP_8, 1, 0);
 	m_k056832->set_palette(m_palette);
 }
 
@@ -866,7 +825,7 @@ void jetwave_state::jetwave(machine_config &config)
 	zr107(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jetwave_state::main_memmap);
 
-	config.m_minimum_quantum = attotime::from_hz(2000000); // Very high sync needed to prevent lockups - why?
+	config.set_maximum_quantum(attotime::from_hz(2000000)); // Very high sync needed to prevent lockups - why?
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(jetwave_state::screen_update));
@@ -910,7 +869,7 @@ ROM_START( midnrun )
 	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD16_WORD_SWAP( "477a07.19l", 0x000000, 0x20000, CRC(a82c0ba1) SHA1(dad69f2e5e75009d70cc2748477248ec47627c30) )
 
-	ROM_REGION(0x100000, "gfx2", 0) /* Tilemap */
+	ROM_REGION(0x100000, "k056832", 0) /* Tilemap */
 	ROM_LOAD16_BYTE( "477a11.35b", 0x000000, 0x80000, CRC(85eef04b) SHA1(02e26d2d4a8b29894370f28d2a49fdf5c7d23f95) )
 	ROM_LOAD16_BYTE( "477a12.35a", 0x000001, 0x80000, CRC(451d7777) SHA1(0bf280ca475100778bbfd3f023547bf0413fc8b7) )
 
@@ -936,7 +895,7 @@ ROM_START( midnrunj )
 	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD16_WORD_SWAP( "477a07.19l", 0x000000, 0x20000, CRC(a82c0ba1) SHA1(dad69f2e5e75009d70cc2748477248ec47627c30) )
 
-	ROM_REGION(0x100000, "gfx2", 0) /* Tilemap */
+	ROM_REGION(0x100000, "k056832", 0) /* Tilemap */
 	ROM_LOAD16_BYTE( "477a11.35b", 0x000000, 0x80000, CRC(85eef04b) SHA1(02e26d2d4a8b29894370f28d2a49fdf5c7d23f95) )
 	ROM_LOAD16_BYTE( "477a12.35a", 0x000001, 0x80000, CRC(451d7777) SHA1(0bf280ca475100778bbfd3f023547bf0413fc8b7) )
 
@@ -962,7 +921,7 @@ ROM_START( midnruna )
 	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD16_WORD_SWAP( "477a07.19l", 0x000000, 0x20000, CRC(a82c0ba1) SHA1(dad69f2e5e75009d70cc2748477248ec47627c30) )
 
-	ROM_REGION(0x100000, "gfx2", 0) /* Tilemap */
+	ROM_REGION(0x100000, "k056832", 0) /* Tilemap */
 	ROM_LOAD16_BYTE( "477a11.35b", 0x000000, 0x80000, CRC(85eef04b) SHA1(02e26d2d4a8b29894370f28d2a49fdf5c7d23f95) )
 	ROM_LOAD16_BYTE( "477a12.35a", 0x000001, 0x80000, CRC(451d7777) SHA1(0bf280ca475100778bbfd3f023547bf0413fc8b7) )
 
@@ -988,7 +947,7 @@ ROM_START( windheat )
 	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD16_WORD_SWAP( "677a07.19l", 0x000000, 0x020000, CRC(05b14f2d) SHA1(3753f71173594ee741980e08eed0f7c3fc3588c9) )
 
-	ROM_REGION(0x100000, "gfx2", 0) /* Tilemap */
+	ROM_REGION(0x100000, "k056832", 0) /* Tilemap */
 	ROM_LOAD16_BYTE( "677a11.35b", 0x000000, 0x080000, CRC(bf34f00f) SHA1(ca0d390c8b30d0cfdad4cfe5a601cc1f6e8c263d) )
 	ROM_LOAD16_BYTE( "677a12.35a", 0x000001, 0x080000, CRC(458f0b1d) SHA1(8e11023c75c80b496dfc62b6645cfedcf2a80db4) )
 
@@ -1014,7 +973,7 @@ ROM_START( windheatu )
 	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD16_WORD_SWAP( "677a07.19l", 0x000000, 0x020000, CRC(05b14f2d) SHA1(3753f71173594ee741980e08eed0f7c3fc3588c9) )
 
-	ROM_REGION(0x100000, "gfx2", 0) /* Tilemap */
+	ROM_REGION(0x100000, "k056832", 0) /* Tilemap */
 	ROM_LOAD16_BYTE( "677a11.35b", 0x000000, 0x080000, CRC(bf34f00f) SHA1(ca0d390c8b30d0cfdad4cfe5a601cc1f6e8c263d) )
 	ROM_LOAD16_BYTE( "677a12.35a", 0x000001, 0x080000, CRC(458f0b1d) SHA1(8e11023c75c80b496dfc62b6645cfedcf2a80db4) )
 
@@ -1040,7 +999,7 @@ ROM_START( windheatj )
 	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD16_WORD_SWAP( "677a07.19l", 0x000000, 0x020000, CRC(05b14f2d) SHA1(3753f71173594ee741980e08eed0f7c3fc3588c9) )
 
-	ROM_REGION(0x100000, "gfx2", 0) /* Tilemap */
+	ROM_REGION(0x100000, "k056832", 0) /* Tilemap */
 	ROM_LOAD16_BYTE( "677a11.35b", 0x000000, 0x080000, CRC(bf34f00f) SHA1(ca0d390c8b30d0cfdad4cfe5a601cc1f6e8c263d) )
 	ROM_LOAD16_BYTE( "677a12.35a", 0x000001, 0x080000, CRC(458f0b1d) SHA1(8e11023c75c80b496dfc62b6645cfedcf2a80db4) )
 
@@ -1066,7 +1025,7 @@ ROM_START( windheata )
 	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD16_WORD_SWAP( "677a07.19l", 0x000000, 0x020000, CRC(05b14f2d) SHA1(3753f71173594ee741980e08eed0f7c3fc3588c9) )
 
-	ROM_REGION(0x100000, "gfx2", 0) /* Tilemap */
+	ROM_REGION(0x100000, "k056832", 0) /* Tilemap */
 	ROM_LOAD16_BYTE( "677a11.35b", 0x000000, 0x080000, CRC(bf34f00f) SHA1(ca0d390c8b30d0cfdad4cfe5a601cc1f6e8c263d) )
 	ROM_LOAD16_BYTE( "677a12.35a", 0x000001, 0x080000, CRC(458f0b1d) SHA1(8e11023c75c80b496dfc62b6645cfedcf2a80db4) )
 
@@ -1162,13 +1121,13 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1995, midnrun,  0,        midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (EAA, Euro v1.11)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, midnrunj, midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (JAD, Japan v1.10)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, midnruna, midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (AAA, Asia v1.10)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, windheat, 0,        midnrun, windheat, midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, windheatu,windheat, midnrun, windheat, midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, windheatj,windheat, midnrun, windheat, midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, windheata,windheat, midnrun, windheat, midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, jetwave,  0,        jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, waveshrk, jetwave,  jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, jetwavej, jetwave,  jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, midnrun,  0,        midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (EAA, Euro v1.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1995, midnrunj, midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (JAD, Japan v1.10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1995, midnruna, midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (AAA, Asia v1.10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheat, 0,        midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheatu,windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheatj,windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheata,windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, jetwave,  0,        jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, waveshrk, jetwave,  jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, jetwavej, jetwave,  jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )

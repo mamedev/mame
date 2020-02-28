@@ -201,25 +201,24 @@ void bfm_swp_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(bfm_swp_state::bfm_swp)
-
+void bfm_swp_state::bfm_swp(machine_config &config)
+{
 	/* basic machine hardware */
 	M68340(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_swp_state::bfm_swp_map);
 
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(bfm_swp_state, screen_update)
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update(FUNC(bfm_swp_state::screen_update));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 10000000 )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YMZ280B(config, "ymz", 10000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 ROM_START( c3_rtime )
 	ROM_REGION( 0x100000, "maincpu", 0 )

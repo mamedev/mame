@@ -1,35 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Sylvain Glaize, Paul Priest, Olivier Galibert
+#ifndef MAME_INCLUDES_SUPRNOVA_H
+#define MAME_INCLUDES_SUPRNOVA_H
 
-#include "machine/timer.h"
+#pragma once
+
 #include "video/sknsspr.h"
 
 #include "cpu/sh/sh2.h"
+#include "machine/timer.h"
 
 #include "emupal.h"
-
-
-struct hit_t
-{
-	uint16_t x1p, y1p, z1p, x1s, y1s, z1s;
-	uint16_t x2p, y2p, z2p, x2s, y2s, z2s;
-	uint16_t org;
-
-	uint16_t x1_p1, x1_p2, y1_p1, y1_p2, z1_p1, z1_p2;
-	uint16_t x2_p1, x2_p2, y2_p1, y2_p2, z2_p1, z2_p2;
-	uint16_t x1tox2, y1toy2, z1toz2;
-	int16_t x_in, y_in, z_in;
-	uint16_t flag;
-
-	uint8_t disconnect;
-};
+#include "tilemap.h"
 
 
 class skns_state : public driver_device
 {
 public:
-	skns_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	skns_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_spritegen(*this, "spritegen"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -44,7 +33,9 @@ public:
 		m_palette_ram(*this, "palette_ram"),
 		m_v3t_ram(*this, "v3t_ram"),
 		m_main_ram(*this, "main_ram"),
-		m_cache_ram(*this, "cache_ram") { }
+		m_cache_ram(*this, "cache_ram"),
+		m_paddle(*this, "Paddle %c", 'A')
+	{ }
 
 	void sknsk(machine_config &config);
 	void sknsu(machine_config &config);
@@ -73,9 +64,24 @@ public:
 	void init_galpani4();
 	void init_ryouran();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(paddle_r);
+	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(paddle_r);
 
 private:
+	struct hit_t
+	{
+		uint16_t x1p, y1p, z1p, x1s, y1s, z1s;
+		uint16_t x2p, y2p, z2p, x2s, y2s, z2s;
+		uint16_t org;
+
+		uint16_t x1_p1, x1_p2, y1_p1, y1_p2, z1_p1, z1_p2;
+		uint16_t x2_p1, x2_p2, y2_p1, y2_p2, z2_p1, z2_p2;
+		uint16_t x1tox2, y1toy2, z1toz2;
+		int16_t x_in, y_in, z_in;
+		uint16_t flag;
+
+		uint8_t disconnect;
+	};
+
 	required_device<sh2_device> m_maincpu;
 	required_device<sknsspr_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -92,6 +98,8 @@ private:
 	required_shared_ptr<uint32_t> m_v3t_ram;
 	required_shared_ptr<uint32_t> m_main_ram;
 	required_shared_ptr<uint32_t> m_cache_ram;
+
+	optional_ioport_array<4> m_paddle;
 
 	hit_t m_hit;
 	bitmap_ind16 m_sprite_bitmap;
@@ -178,3 +186,5 @@ private:
 
 	void skns_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SUPRNOVA_H

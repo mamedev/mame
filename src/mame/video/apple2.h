@@ -15,7 +15,7 @@
 #define BORDER_RIGHT    (32)
 #define BORDER_TOP  (16)    // (plus bottom)
 
-class a2_video_device : public device_t, public device_palette_interface
+class a2_video_device : public device_t, public device_palette_interface, public device_video_interface
 {
 public:
 	// construction/destruction
@@ -43,9 +43,17 @@ public:
 
 	int m_sysconfig;
 
+	DECLARE_WRITE_LINE_MEMBER(txt_w);
+	DECLARE_WRITE_LINE_MEMBER(mix_w);
+	DECLARE_WRITE_LINE_MEMBER(scr_w);
+	DECLARE_WRITE_LINE_MEMBER(res_w);
+	DECLARE_WRITE_LINE_MEMBER(dhires_w);
+	DECLARE_WRITE_LINE_MEMBER(an2_w);
+
 	void text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void text_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void text_update_orig(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+	void text_update_dodo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void text_update_jplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void text_updateGS(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void lores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
@@ -69,6 +77,7 @@ private:
 	void plot_text_character_ultr(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg);
 	void plot_text_character_orig(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg);
 	void plot_text_character_jplus(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg);
+	void plot_text_character_dodo(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg);
 	void plot_text_characterGS(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg);
 };
 

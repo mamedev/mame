@@ -42,9 +42,6 @@
 
 #include "logmacro.h"
 
-// disable FCS insertion on transmit
-#define I82586_FCS 0
-
 ALLOW_SAVE_TYPE(i82586_base_device::cu_state);
 ALLOW_SAVE_TYPE(i82586_base_device::ru_state);
 
@@ -122,11 +119,11 @@ i82586_base_device::i82586_base_device(const machine_config &mconfig, device_typ
 	, m_cna(false)
 	, m_rnr(false)
 	, m_initialised(false)
+	, m_reset(false)
 	, m_irq_assert(1)
 	, m_cu_state(CU_IDLE)
 	, m_ru_state(RU_IDLE)
 	, m_scp_address(SCP_ADDRESS)
-	, m_lb_length(0)
 {
 }
 
@@ -169,14 +166,13 @@ void i82586_base_device::device_start()
 
 	m_cu_timer = timer_alloc(CU_TIMER);
 	m_cu_timer->enable(false);
-	m_ru_timer = timer_alloc(RU_TIMER);
-	m_ru_timer->enable(false);
 
 	save_item(NAME(m_cx));
 	save_item(NAME(m_fr));
 	save_item(NAME(m_cna));
 	save_item(NAME(m_rnr));
 	save_item(NAME(m_initialised));
+	save_item(NAME(m_reset));
 
 	save_item(NAME(m_cu_state));
 	save_item(NAME(m_ru_state));
@@ -189,15 +185,11 @@ void i82586_base_device::device_start()
 	save_item(NAME(m_rfd));
 
 	save_item(NAME(m_mac_multi));
-
-	save_item(NAME(m_lb_length));
-	save_item(NAME(m_lb_buf));
 }
 
 void i82586_base_device::device_reset()
 {
 	m_cu_timer->enable(false);
-	m_ru_timer->enable(false);
 
 	m_cx = false;
 	m_fr = false;
@@ -209,7 +201,6 @@ void i82586_base_device::device_reset()
 	m_ru_state = RU_IDLE;
 
 	m_scp_address = SCP_ADDRESS;
-	m_lb_length = 0;
 }
 
 void i82586_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -218,16 +209,6 @@ void i82586_base_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	{
 		case CU_TIMER:
 			cu_execute();
-			break;
-
-		case RU_TIMER:
-			if (m_lb_length)
-			{
-				LOG("device_timer injecting loopback frame length %d\n", m_lb_length);
-
-				recv_cb(m_lb_buf, m_lb_length);
-			}
-			m_lb_length = 0;
 			break;
 	}
 }
@@ -253,8 +234,23 @@ WRITE_LINE_MEMBER(i82586_base_device::ca)
 	}
 }
 
+WRITE_LINE_MEMBER(i82586_base_device::reset_w)
+{
+	LOG("reset %s (%s)\n", state ? "asserted" : "cleared", machine().describe_context());
+
+	// reset is active high
+	if (state && !m_reset)
+		device_reset();
+
+	m_reset = state;
+}
+
 int i82586_base_device::recv_start_cb(u8 *buf, int length)
 {
+	// discard external packets in loopback mode
+	if (cfg_loopback_mode())
+		return 0;
+
 	switch (m_ru_state)
 	{
 	case RU_IDLE:
@@ -263,19 +259,25 @@ int i82586_base_device::recv_start_cb(u8 *buf, int length)
 		break;
 
 	case RU_READY:
-		if (address_filter(buf))
-		{
-			LOG("recv_cb receiving frame length %d\n", length);
-			dump_bytes(buf, length);
-
-			return ru_execute(buf, length);
-		}
-		break;
+		return recv_start(buf, length);
 
 	default:
 		// no resources
 		// TODO: accumulate statistics
 		break;
+	}
+
+	return 0;
+}
+
+int i82586_base_device::recv_start(u8 *buf, int length)
+{
+	if (address_filter(buf))
+	{
+		LOG("recv_start receiving frame length %d\n", length);
+		dump_bytes(buf, length);
+
+		return ru_execute(buf, length);
 	}
 
 	return 0;
@@ -787,6 +789,12 @@ void i82586_device::device_reset()
 
 void i82586_device::initialise()
 {
+	if (m_reset)
+	{
+		LOG("initialise blocked by reset\n");
+		return;
+	}
+
 	// read iscp address from scp
 	u32 iscp_address = m_space->read_dword(m_scp_address + 8);
 	LOG("initialise iscp address 0x%08x\n", iscp_address);
@@ -977,9 +985,8 @@ bool i82586_device::cu_transmit(u32 command)
 		length += fetch_bytes(&buf[length], tb_address, tbd_count & TB_COUNT);
 	}
 
-#if I82586_FCS
 	// optionally compute/insert ethernet frame check sequence (4 bytes)
-	if (!cfg_no_crc_insertion())
+	if (!cfg_no_crc_insertion() && !cfg_loopback_mode())
 	{
 		LOG("cu_transmit inserting frame check sequence\n");
 
@@ -991,21 +998,16 @@ bool i82586_device::cu_transmit(u32 command)
 		buf[length++] = (crc >> 16) & 0xff;
 		buf[length++] = (crc >> 24) & 0xff;
 	}
-#endif
 
-	if (cfg_loopback_mode() != LOOPBACK_NONE)
+	if (cfg_loopback_mode())
 	{
 		LOG("cu_transmit loopback frame length %d\n", length);
 
-		if (m_lb_length == 0)
-		{
-			memcpy(m_lb_buf, buf, length);
-			m_lb_length = length;
+		int status = recv_start(buf, length);
+		if (status)
+			ru_complete(status);
 
-			m_ru_timer->adjust(attotime::zero);
-		}
-		else
-			LOG("cu_tranmit error: loopback buffer not empty\n");
+		cu_complete(CB_OK);
 
 		return true;
 	}
@@ -1089,7 +1091,7 @@ u16 i82586_device::ru_execute(u8 *buf, int length)
 		status |= RFD_S_SHORT;
 
 	// set crc status
-	if (~compute_crc(buf, length, cfg_crc16()) != FCS_RESIDUE)
+	if (!cfg_loopback_mode() && ~compute_crc(buf, length, cfg_crc16()) != FCS_RESIDUE)
 	{
 		LOGMASKED(LOG_FRAMES, "ru_execute crc error computed 0x%08x stored 0x%08x\n",
 			compute_crc(buf, length - 4, cfg_crc16()), *(u32 *)&buf[length - 4]);
@@ -1656,9 +1658,8 @@ bool i82596_device::cu_transmit(u32 command)
 		length += fetch_bytes(&buf[length], tb_address, tbd_count & TB_COUNT);
 	}
 
-#if I82586_FCS
 	// optionally compute/insert ethernet frame check sequence (4 bytes)
-	if (!cfg_no_crc_insertion() && !(command & CB_NC))
+	if (!cfg_no_crc_insertion() && !(command & CB_NC) && !cfg_loopback_mode())
 	{
 		LOG("cu_transmit inserting frame check sequence\n");
 
@@ -1670,23 +1671,16 @@ bool i82596_device::cu_transmit(u32 command)
 		buf[length++] = (crc >> 16) & 0xff;
 		buf[length++] = (crc >> 24) & 0xff;
 	}
-#endif
 
-	if (cfg_loopback_mode() != LOOPBACK_NONE)
+	if (cfg_loopback_mode())
 	{
 		LOG("cu_transmit loopback frame length %d\n", length);
 
-		if (m_lb_length == 0)
-		{
-			dump_bytes(buf, length);
+		int status = recv_start(buf, length);
+		if (status)
+			ru_complete(status);
 
-			memcpy(m_lb_buf, buf, length);
-			m_lb_length = length;
-
-			m_ru_timer->adjust(attotime::zero);
-		}
-		else
-			LOG("cu_tranmit error: loopback buffer not empty\n");
+		cu_complete(CB_OK);
 
 		return true;
 	}
@@ -1795,25 +1789,17 @@ u16 i82596_device::ru_execute(u8 *buf, int length)
 	// offset into rfd/rbd for linear mode
 	int linear_offset = mode() == MODE_LINEAR ? 4 : 0;
 
-	if (!cfg_crc_in_memory())
-	{
-		// compute and append fcs
-		u32 crc = compute_crc(buf, length, false);
-
-		// append the fcs
-		buf[length++] = (crc >> 0) & 0xff;
-		buf[length++] = (crc >> 8) & 0xff;
-		buf[length++] = (crc >> 16) & 0xff;
-		buf[length++] = (crc >> 24) & 0xff;
-	}
-
 	// current buffer position and bytes remaining
 	int position = 0, remaining = length;
+
+	if (cfg_crc_in_memory())
+		remaining -= 4;
 
 	// set busy status
 	m_space->write_dword(m_rfd, rfd_cs | RFD_B);
 
-	LOG("ru_execute receiving %d bytes using %s mode into rfd 0x%08x\n", length, (mode() == MODE_82586 ? "82586" : ((rfd_cs & RFD_SF) ? "flexible" : "simplified")), m_rfd);
+	LOG("ru_execute receiving %d bytes using %s mode into rfd 0x%08x\n",
+		remaining, (mode() == MODE_82586 ? "82586" : ((rfd_cs & RFD_SF) ? "flexible" : "simplified")), m_rfd);
 
 	// TODO: check length if configured, status bit 12
 
@@ -1830,7 +1816,7 @@ u16 i82596_device::ru_execute(u8 *buf, int length)
 	}
 
 	// set crc status
-	if (~compute_crc(buf, length, cfg_crc16()) != FCS_RESIDUE)
+	if (!cfg_loopback_mode() && ~compute_crc(buf, length, cfg_crc16()) != FCS_RESIDUE)
 	{
 		LOGMASKED(LOG_FRAMES, "ru_execute crc error computed 0x%08x stored 0x%08x\n",
 			compute_crc(buf, length - 4, cfg_crc16()), *(u32 *)&buf[length - 4]);
@@ -1861,30 +1847,31 @@ u16 i82596_device::ru_execute(u8 *buf, int length)
 		u16 rfd_size = m_space->read_word(m_rfd + 10 + linear_offset, RB_SIZE);
 
 		// increment "no resources" counter
-		if (rfd_size < length)
+		if (rfd_size < remaining)
 			m_space->write_dword(m_scb_address + 16 + linear_offset, m_space->read_dword(m_scb_address + 16 + linear_offset) + 1);
 
 		// truncate/capture the frame
-		if (length <= rfd_size || cfg_save_bad_frames())
+		if (remaining <= rfd_size || cfg_save_bad_frames())
 		{
 			// compute stored length
-			int actual = (rfd_size < length) ? rfd_size : length;
+			int actual = (rfd_size < remaining) ? rfd_size : remaining;
 
 			LOG("ru_execute storing %d bytes into rfd size %d\n", actual, rfd_size);
 
 			// store data in rfd
 			store_bytes(m_rfd + 12 + linear_offset, buf, actual);
-			position += actual;
-			remaining -= actual;
 
 			// store actual count, f and eof
 			m_space->write_word(m_rfd + 8 + linear_offset, actual | RB_F | RB_EOF);
 
 			// set frame received and truncated frame status
-			status |= RFD_C | (actual < length ? RFD_S_TRUNCATED : 0);
+			status |= RFD_C | (actual < remaining ? RFD_S_TRUNCATED : 0);
+
+			position += actual;
+			remaining -= actual;
 		}
 		else
-			LOG("ru_execute discarding %d byte frame exceeding rfd size %d\n", length, rfd_size);
+			LOG("ru_execute discarding %d byte frame exceeding rfd size %d\n", remaining, rfd_size);
 	}
 	else
 	{
@@ -1895,7 +1882,7 @@ u16 i82596_device::ru_execute(u8 *buf, int length)
 			u16 rfd_size = m_space->read_word(m_rfd + 10 + linear_offset, RB_SIZE);
 
 			// compute stored length (from rfd_size)
-			int actual = (rfd_size < length) ? rfd_size : length;
+			int actual = (rfd_size < remaining) ? rfd_size : remaining;
 
 			LOG("ru_execute storing %d bytes into rfd size %d\n", actual, rfd_size);
 

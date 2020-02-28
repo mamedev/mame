@@ -145,10 +145,10 @@ protected:
 	devcb_write8   m_out8_pa_cb;
 	devcb_read8    m_in8_pb_cb;
 	devcb_write8   m_out8_pb_cb;
-	devcb_read_line m_in_pa_cb[8];
-	devcb_write_line m_out_pa_cb[8];
-	devcb_read_line m_in_pb_cb[8];
-	devcb_write_line m_out_pb_cb[8];
+	devcb_read_line::array<8> m_in_pa_cb;
+	devcb_write_line::array<8> m_out_pa_cb;
+	devcb_read_line::array<8> m_in_pb_cb;
+	devcb_write_line::array<8> m_out_pb_cb;
 
 	uint8_t m_pa_in;
 	uint8_t m_pa_out;
@@ -224,7 +224,7 @@ public:
 	virtual void ram_map(address_map &map);
 	virtual void io_map(address_map &map);
 
-	// is there a better way to access the memory map when not using AM_DEVICE?
+	// is there a better way to access the memory map when not using m()?
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 

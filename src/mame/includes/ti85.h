@@ -62,10 +62,7 @@ public:
 		, m_link_port(*this, "linkport")
 		, m_nvram(*this, "nvram")
 		, m_flash(*this, "flash")
-		, m_membank1(*this, "membank1")
-		, m_membank2(*this, "membank2")
-		, m_membank3(*this, "membank3")
-		, m_membank4(*this, "membank4")
+		, m_membank(*this, "membank%u", 0U)
 	{
 	}
 
@@ -87,10 +84,7 @@ private:
 	optional_device<ti8x_link_port_device> m_link_port;
 	optional_shared_ptr<uint8_t> m_nvram;
 	optional_device<intelfsh8_device> m_flash;
-	optional_device<address_map_bank_device> m_membank1;
-	optional_device<address_map_bank_device> m_membank2;
-	optional_device<address_map_bank_device> m_membank3;
-	optional_device<address_map_bank_device> m_membank4;
+	optional_device_array<address_map_bank_device, 4> m_membank;
 
 	ti85_model m_model;
 
@@ -237,7 +231,7 @@ private:
 	void ti8x_snapshot_setup_registers(uint8_t *data);
 	void ti85_setup_snapshot(uint8_t *data);
 	void ti86_setup_snapshot(uint8_t *data);
-	DECLARE_SNAPSHOT_LOAD_MEMBER(ti8x);
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
 	ti83pse_timer m_ctimer[3];
 

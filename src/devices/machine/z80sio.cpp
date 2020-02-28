@@ -3,6 +3,8 @@
 /***************************************************************************
 
     Z80-SIO Serial Input/Output emulation
+    Intel 8274 Multi-Protocol Serial Controller emulation
+    NEC µPD7201 Multiprotocol Serial Communications Controller emulation
 
     The variants in the SIO family are only different in the packaging
     but has the same register features. However, since some signals are
@@ -11,7 +13,10 @@
     check that an operation is invalid because of package type but relies
     on the software to be adapated for the particular version.
 
-    Package:                DIP40  SIO/0, SIO/1, SIO/2, SIO/9
+    Package:                DIP40  SIO/0 (RxCB and TxCB share one pin)
+                            DIP40  SIO/1 (no DTRB pin)
+                            DIP40  SIO/2 (no SYNCB pin)
+                            DIP40  SIO/9 (channel B is nonfunctional)
                             QFP44  SIO/3
                             PLCC44 SIO/4
     -------------------------------------------------------------------
@@ -45,6 +50,15 @@
   * Transmitter FIFO         1
     -------------------------------------------------------------------------
     * = Features that has been implemented  n/a = features that will not
+
+    Mostek not only second-sourced the Z80 SIO but redesigned it for
+    68000 compatibility as the MK68564 SIO. This 48-pin device has a
+    revamped register interface with five address inputs to make every
+    register separately selectable, and most control registers may be read
+    back as written. The RxRDY and TxRDY pins are separate here, and many
+    control bits have been shifted around. The MK68564 also features a
+    built-in baud rate generator (not compatible with the Z8530 SCC's).
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -68,8 +82,10 @@
 #define LOG_DCD     (1U <<  8)
 #define LOG_SYNC    (1U <<  9)
 #define LOG_BIT     (1U <<  10)
+#define LOG_RTS     (1U <<  11)
+#define LOG_BRG     (1U <<  12)
 
-//#define VERBOSE  (LOG_INT | LOG_READ | LOG_SETUP | LOG_TX | LOG_CMD | LOG_CTS)
+//#define VERBOSE  (LOG_CMD | LOG_SETUP | LOG_SYNC | LOG_BIT | LOG_TX )
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -81,9 +97,11 @@
 #define LOGTX(...)    LOGMASKED(LOG_TX,      __VA_ARGS__)
 #define LOGRCV(...)   LOGMASKED(LOG_RCV,     __VA_ARGS__)
 #define LOGCTS(...)   LOGMASKED(LOG_CTS,     __VA_ARGS__)
+#define LOGRTS(...)   LOGMASKED(LOG_RTS,     __VA_ARGS__)
 #define LOGDCD(...)   LOGMASKED(LOG_DCD,     __VA_ARGS__)
 #define LOGSYNC(...)  LOGMASKED(LOG_SYNC,    __VA_ARGS__)
 #define LOGBIT(...)   LOGMASKED(LOG_BIT,     __VA_ARGS__)
+#define LOGBRG(...)   LOGMASKED(LOG_BRG,     __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -179,9 +197,9 @@ enum : uint8_t
 enum : uint8_t
 {
 	WR3_RX_ENABLE             = 0x01,
-	WR3_SYNC_CHAR_LOAD_INHIBIT= 0x02, // not supported
-	WR3_ADDRESS_SEARCH_MODE   = 0x04, // not supported
-	WR3_RX_CRC_ENABLE         = 0x08, // not supported
+	WR3_SYNC_CHAR_LOAD_INHIBIT= 0x02,
+	WR3_ADDRESS_SEARCH_MODE   = 0x04,
+	WR3_RX_CRC_ENABLE         = 0x08,
 	WR3_ENTER_HUNT_PHASE      = 0x10,
 	WR3_AUTO_ENABLES          = 0x20,
 	WR3_RX_WORD_LENGTH_MASK   = 0xc0,
@@ -196,14 +214,14 @@ enum : uint8_t
 	WR4_PARITY_ENABLE         = 0x01,
 	WR4_PARITY_EVEN           = 0x02,
 	WR4_STOP_BITS_MASK        = 0x0c,
-	WR4_STOP_BITS_SYNC        = 0x00, // partially supported
+	WR4_STOP_BITS_SYNC        = 0x00,
 	WR4_STOP_BITS_1           = 0x04,
 	WR4_STOP_BITS_1_5         = 0x08,
 	WR4_STOP_BITS_2           = 0x0c,
-	WR4_SYNC_MODE_MASK        = 0x30, // partially supported
-	WR4_SYNC_MODE_8_BIT       = 0x00, // partially supported
-	WR4_SYNC_MODE_16_BIT      = 0x10, // partially supported
-	WR4_SYNC_MODE_SDLC        = 0x20, // partially supported
+	WR4_SYNC_MODE_MASK        = 0x30,
+	WR4_SYNC_MODE_8_BIT       = 0x00,
+	WR4_SYNC_MODE_16_BIT      = 0x10,
+	WR4_SYNC_MODE_SDLC        = 0x20,
 	WR4_SYNC_MODE_EXT         = 0x30, // partially supported
 	WR4_CLOCK_RATE_MASK       = 0xc0,
 	WR4_CLOCK_RATE_X1         = 0x00,
@@ -227,17 +245,21 @@ enum : uint8_t
 	WR5_DTR                   = 0x80
 };
 
+constexpr uint32_t TX_SR_MASK   = 0xfffffU;
+constexpr uint16_t SDLC_RESIDUAL    = 0x1d0f;
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(Z80SIO_CHANNEL, z80sio_channel,     "z80sio_channel", "Z80 SIO channel")
-DEFINE_DEVICE_TYPE(I8274_CHANNEL,  i8274_channel,      "i8274_channel",  "Intel 8274 MPSC channel")
-DEFINE_DEVICE_TYPE(Z80SIO,         z80sio_device,      "z80sio",         "Z80 SIO")
-DEFINE_DEVICE_TYPE(I8274_NEW,      i8274_new_device,   "i8274_new",      "Intel 8274 MPSC (new)") // Remove trailing N when z80dart.cpp's 8274 implementation is fully replaced
-DEFINE_DEVICE_TYPE(UPD7201_NEW,    upd7201_new_device, "upd7201_new",    "NEC uPD7201 MPSC (new)") // Remove trailing N when z80dart.cpp's 7201 implementation is fully replaced
+DEFINE_DEVICE_TYPE(Z80SIO_CHANNEL,  z80sio_channel,     "z80sio_channel",  "Z80 SIO channel")
+DEFINE_DEVICE_TYPE(I8274_CHANNEL,   i8274_channel,      "i8274_channel",   "Intel 8274 MPSC channel")
+DEFINE_DEVICE_TYPE(MK68564_CHANNEL, mk68564_channel,    "mk68564_channel", "Mostek MK68564 SIO channel")
+DEFINE_DEVICE_TYPE(Z80SIO,          z80sio_device,      "z80sio",          "Z80 SIO")
+DEFINE_DEVICE_TYPE(I8274,           i8274_device,       "i8274",           "Intel 8274 MPSC")
+DEFINE_DEVICE_TYPE(UPD7201,         upd7201_device,     "upd7201",         "NEC uPD7201 MPSC")
+DEFINE_DEVICE_TYPE(MK68564,         mk68564_device,     "mk68564",         "Mostek MK68564 SIO")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -248,10 +270,16 @@ void z80sio_device::device_add_mconfig(machine_config &config)
 	Z80SIO_CHANNEL(config, CHANB_TAG, 0);
 }
 
-void i8274_new_device::device_add_mconfig(machine_config &config)
+void i8274_device::device_add_mconfig(machine_config &config)
 {
 	I8274_CHANNEL(config, CHANA_TAG, 0);
 	I8274_CHANNEL(config, CHANB_TAG, 0);
+}
+
+void mk68564_device::device_add_mconfig(machine_config &config)
+{
+	MK68564_CHANNEL(config, CHANA_TAG, 0);
+	MK68564_CHANNEL(config, CHANB_TAG, 0);
 }
 
 
@@ -286,16 +314,21 @@ inline bool z80sio_channel::receive_allowed() const
 	return (m_wr3 & WR3_RX_ENABLE) && (!(m_wr3 & WR3_AUTO_ENABLES) || !m_dcd);
 }
 
-inline bool z80sio_channel::transmit_allowed() const
+bool z80sio_channel::transmit_allowed() const
 {
 	return (m_wr5 & WR5_TX_ENABLE) && (!(m_wr3 & WR3_AUTO_ENABLES) || !m_cts);
+}
+
+bool mk68564_channel::transmit_allowed() const
+{
+	return (m_wr5 & WR5_TX_ENABLE) && (!m_tx_auto_enable || !m_cts);
 }
 
 inline void z80sio_channel::set_rts(int state)
 {
 	if (bool(m_rts) != bool(state))
 	{
-		LOG("%s(%d) \"%s\" Channel %c \n", FUNCNAME, state, owner()->tag(), 'A' + m_index);
+		LOGRTS("%s(%d) \"%s\" Channel %c \n", FUNCNAME, state, owner()->tag(), 'A' + m_index);
 		out_rts_cb(m_rts = state);
 	}
 }
@@ -309,21 +342,20 @@ inline void z80sio_channel::set_dtr(int state)
 	}
 }
 
-inline void z80sio_channel::tx_setup(uint16_t data, int bits, int parity, bool framing, bool special)
+inline void z80sio_channel::tx_setup(uint16_t data, int bits, bool framing, bool crc_tx, bool abort_tx)
 {
-	m_tx_bits = bits;
-	m_tx_parity = parity;
-	m_tx_sr = data | (~uint16_t(0) << bits);
-	if (parity)
-	{
-		if (m_wr4 & WR4_PARITY_EVEN)
-			m_tx_sr &= ~(uint16_t(1) << m_tx_bits);
-		++m_tx_bits;
-	}
+	m_rr1 |= RR1_ALL_SENT;
+	m_tx_parity = false;
+	m_tx_sr = data;
+	m_tx_sr &= ~(~uint32_t(0) << bits);
+	m_tx_sr |= ~uint32_t(0) << (bits + 3);
 	m_tx_flags =
 			((!framing && (m_wr5 & WR5_TX_CRC_ENABLE)) ? TX_FLAG_CRC : 0U) |
 			(framing ? TX_FLAG_FRAMING : 0U) |
-			(special ? TX_FLAG_SPECIAL : 0U);
+			(abort_tx ? TX_FLAG_ABORT_TX : 0U) |
+			(crc_tx ? TX_FLAG_CRC_TX : 0U) |
+			(!framing && !crc_tx && !abort_tx ? TX_FLAG_DATA_TX : 0U);
+	LOGBIT("%.6f TX_SR %05x data %04x flags %x\n" , machine().time().as_double() , m_tx_sr & TX_SR_MASK , data , m_tx_flags);
 }
 
 inline void z80sio_channel::tx_setup_idle()
@@ -331,23 +363,22 @@ inline void z80sio_channel::tx_setup_idle()
 	switch (m_wr4 & WR4_SYNC_MODE_MASK)
 	{
 	case WR4_SYNC_MODE_8_BIT:
-		tx_setup(m_wr6, 8, 0, true, false);
+	case WR4_SYNC_MODE_EXT:
+		// External sync mode sends a single sync byte
+		tx_setup(m_wr6, 8, true, false, false);
 		break;
 	case WR4_SYNC_MODE_16_BIT:
-		tx_setup(uint16_t(m_wr6) | (uint16_t(m_wr7) << 8), 16, 0, true, false);
+		tx_setup(uint16_t(m_wr6) | (uint16_t(m_wr7) << 8), 16, true, false, false);
 		break;
 	case WR4_SYNC_MODE_SDLC:
 		// SDLC transmit examples don't show flag being loaded, implying it's hard-coded on the transmit side
-		tx_setup(0x7e, 8, 0, true, false);
-		break;
-	case WR4_SYNC_MODE_EXT:
-		// TODO: what does a real chip do for sync idle in external sync mode?
-		// This is based on the assumption that bit 4 controls 8-/16-bit idle pattern (fits for monosync/bisync/SDLC).
-		tx_setup(uint16_t(m_wr6) | (uint16_t(m_wr7) << 8), 16, 0, true, false);
+		//tx_setup(0x7e, 8, true, false, false);
+		// Verified on a 8274, the 0x7e SYNC byte is required in CR7 to start transmitting, other values fails
+		tx_setup(m_wr7, 8, true, false, false);
 		break;
 	}
+	m_tx_in_pkt = false;
 }
-
 
 //-------------------------------------------------
 //  z80sio_device - constructor
@@ -358,14 +389,14 @@ z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, co
 	m_chanA(*this, CHANA_TAG),
 	m_chanB(*this, CHANB_TAG),
 	m_hostcpu(*this, finder_base::DUMMY_TAG),
-	m_out_txd_cb{ { *this }, { *this } },
-	m_out_dtr_cb{ { *this }, { *this } },
-	m_out_rts_cb{ { *this }, { *this } },
-	m_out_wrdy_cb{ { *this }, { *this } },
-	m_out_sync_cb{ { *this }, { *this } },
+	m_out_txd_cb(*this),
+	m_out_dtr_cb(*this),
+	m_out_rts_cb(*this),
+	m_out_wrdy_cb(*this),
+	m_out_sync_cb(*this),
 	m_out_int_cb(*this),
-	m_out_rxdrq_cb{ { *this }, { *this } },
-	m_out_txdrq_cb{ { *this }, { *this } }
+	m_out_rxdrq_cb(*this),
+	m_out_txdrq_cb(*this)
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
@@ -376,18 +407,23 @@ z80sio_device::z80sio_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-i8274_new_device::i8274_new_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+i8274_device::i8274_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	z80sio_device(mconfig, type, tag, owner, clock)
 {
 }
 
-i8274_new_device::i8274_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	i8274_new_device(mconfig, I8274_NEW, tag, owner, clock)
+i8274_device::i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i8274_device(mconfig, I8274, tag, owner, clock)
 {
 }
 
-upd7201_new_device::upd7201_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	i8274_new_device(mconfig, UPD7201_NEW, tag, owner, clock)
+upd7201_device::upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i8274_device(mconfig, UPD7201, tag, owner, clock)
+{
+}
+
+mk68564_device::mk68564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i8274_device(mconfig, MK68564, tag, owner, clock)
 {
 }
 
@@ -408,21 +444,14 @@ void z80sio_device::device_resolve_objects()
 	LOG("%s\n", FUNCNAME);
 
 	// resolve callbacks
-	m_out_txd_cb[CHANNEL_A].resolve_safe();
-	m_out_dtr_cb[CHANNEL_A].resolve_safe();
-	m_out_rts_cb[CHANNEL_A].resolve_safe();
-	m_out_wrdy_cb[CHANNEL_A].resolve_safe();
-	m_out_sync_cb[CHANNEL_A].resolve_safe();
-	m_out_txd_cb[CHANNEL_B].resolve_safe();
-	m_out_dtr_cb[CHANNEL_B].resolve_safe();
-	m_out_rts_cb[CHANNEL_B].resolve_safe();
-	m_out_wrdy_cb[CHANNEL_B].resolve_safe();
-	m_out_sync_cb[CHANNEL_B].resolve_safe();
+	m_out_txd_cb.resolve_all_safe();
+	m_out_dtr_cb.resolve_all_safe();
+	m_out_rts_cb.resolve_all_safe();
+	m_out_wrdy_cb.resolve_all_safe();
+	m_out_sync_cb.resolve_all_safe();
 	m_out_int_cb.resolve_safe();
-	m_out_rxdrq_cb[CHANNEL_A].resolve_safe();
-	m_out_txdrq_cb[CHANNEL_A].resolve_safe();
-	m_out_rxdrq_cb[CHANNEL_B].resolve_safe();
-	m_out_txdrq_cb[CHANNEL_B].resolve_safe();
+	m_out_rxdrq_cb.resolve_all_safe();
+	m_out_txdrq_cb.resolve_all_safe();
 }
 
 //-------------------------------------------------
@@ -510,7 +539,7 @@ int z80sio_device::z80daisy_irq_ack()
 	return -1;
 }
 
-int i8274_new_device::z80daisy_irq_ack()
+int i8274_device::z80daisy_irq_ack()
 {
 	// FIXME: we're not modelling the full behaviour of this chip
 	// The 8274 is designed to work with Intel processors with multiple interrupt acknowledge cycles
@@ -588,7 +617,7 @@ void z80sio_device::z80daisy_irq_reti()
 	return_from_interrupt();
 }
 
-void i8274_new_device::z80daisy_irq_reti()
+void i8274_device::z80daisy_irq_reti()
 {
 	LOGINT("%s - i8274/uPD7201 lacks RETI detection, no action taken\n", FUNCNAME);
 }
@@ -697,7 +726,6 @@ uint8_t z80sio_device::read_vector()
 	{
 		if (m_int_state[prio[i]] & Z80_DAISY_INT)
 		{
-			constexpr uint8_t RR1_SPECIAL(RR1_RX_OVERRUN_ERROR | RR1_CRC_FRAMING_ERROR | RR1_END_OF_FRAME);
 			switch (prio[i])
 			{
 			case 0 + z80sio_channel::INT_TRANSMIT:
@@ -705,9 +733,9 @@ uint8_t z80sio_device::read_vector()
 			case 0 + z80sio_channel::INT_EXTERNAL:
 				return vec | 0x0aU;
 			case 0 + z80sio_channel::INT_RECEIVE:
-				if (((m_chanA->m_wr1 & WR1_RX_INT_MODE_MASK) == WR1_RX_INT_ALL_PARITY) && (m_chanA->m_rr1 & (RR1_SPECIAL | RR1_PARITY_ERROR)))
+				if (((m_chanA->m_wr1 & WR1_RX_INT_MODE_MASK) == WR1_RX_INT_ALL_PARITY) && (m_chanA->m_rr1 & (m_chanA->get_special_rx_mask() | RR1_PARITY_ERROR)))
 					return vec | 0x0eU;
-				else if (((m_chanA->m_wr1 & WR1_RX_INT_MODE_MASK) == WR1_RX_INT_ALL) && (m_chanA->m_rr1 & RR1_SPECIAL))
+				else if (((m_chanA->m_wr1 & WR1_RX_INT_MODE_MASK) == WR1_RX_INT_ALL) && (m_chanA->m_rr1 & m_chanA->get_special_rx_mask()))
 					return vec | 0x0eU;
 				else
 					return vec | 0x0cU;
@@ -716,9 +744,9 @@ uint8_t z80sio_device::read_vector()
 			case 3 + z80sio_channel::INT_EXTERNAL:
 				return vec | 0x02U;
 			case 3 + z80sio_channel::INT_RECEIVE:
-				if (((m_chanB->m_wr1 & WR1_RX_INT_MODE_MASK) == WR1_RX_INT_ALL_PARITY) && (m_chanB->m_rr1 & (RR1_SPECIAL | RR1_PARITY_ERROR)))
+				if (((m_chanB->m_wr1 & WR1_RX_INT_MODE_MASK) == WR1_RX_INT_ALL_PARITY) && (m_chanB->m_rr1 & (m_chanB->get_special_rx_mask() | RR1_PARITY_ERROR)))
 					return vec | 0x06U;
-				else if (((m_chanB->m_wr1 & WR1_RX_INT_MODE_MASK) == WR1_RX_INT_ALL) && (m_chanB->m_rr1 & RR1_SPECIAL))
+				else if (((m_chanB->m_wr1 & WR1_RX_INT_MODE_MASK) == WR1_RX_INT_ALL) && (m_chanB->m_rr1 & m_chanB->get_special_rx_mask()))
 					return vec | 0x06U;
 				else
 					return vec | 0x04U;
@@ -737,7 +765,7 @@ uint8_t z80sio_device::read_vector()
    interrrupt is generated, otherwise it will indicate the previous state."
    8274: "If RR2 is specified but not read, no internal interrupts, regardless of priority, are accepted."
 */
-uint8_t i8274_new_device::read_vector()
+uint8_t i8274_device::read_vector()
 {
 	// 8086 and 8085 modes have different variable bits
 	bool const aff(m_chanB->m_wr1 & WR1_STATUS_VECTOR);
@@ -812,7 +840,7 @@ int const *z80sio_device::interrupt_priorities() const
 	return prio;
 }
 
-int const *i8274_new_device::interrupt_priorities() const
+int const *i8274_device::interrupt_priorities() const
 {
 	static constexpr EQUIVALENT_ARRAY(m_int_state, int) prio_a{
 			0 + z80sio_channel::INT_RECEIVE, 3 + z80sio_channel::INT_RECEIVE,
@@ -835,17 +863,11 @@ int z80sio_device::m1_r()
 	return z80daisy_irq_ack();
 }
 
-int i8274_new_device::m1_r()
-{
-	LOGINT("%s %s \n",FUNCNAME, tag());
-	return 0;
-}
-
 
 //-------------------------------------------------
 //  cd_ba_r -
 //-------------------------------------------------
-READ8_MEMBER( z80sio_device::cd_ba_r )
+uint8_t z80sio_device::cd_ba_r(offs_t offset)
 {
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
@@ -858,7 +880,7 @@ READ8_MEMBER( z80sio_device::cd_ba_r )
 //-------------------------------------------------
 //  cd_ba_w -
 //-------------------------------------------------
-WRITE8_MEMBER( z80sio_device::cd_ba_w )
+void z80sio_device::cd_ba_w(offs_t offset, uint8_t data)
 {
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
@@ -874,7 +896,7 @@ WRITE8_MEMBER( z80sio_device::cd_ba_w )
 //-------------------------------------------------
 //  ba_cd_r -
 //-------------------------------------------------
-READ8_MEMBER( z80sio_device::ba_cd_r )
+uint8_t z80sio_device::ba_cd_r(offs_t offset)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -887,7 +909,7 @@ READ8_MEMBER( z80sio_device::ba_cd_r )
 //-------------------------------------------------
 //  ba_cd_w -
 //-------------------------------------------------
-WRITE8_MEMBER( z80sio_device::ba_cd_w )
+void z80sio_device::ba_cd_w(offs_t offset, uint8_t data)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -922,10 +944,9 @@ z80sio_channel::z80sio_channel(
 	, m_rx_bit(0)
 	, m_rx_sr(0)
 	, m_rx_first(0)
-	, m_rx_break(0)
 	, m_rxd(1)
 	, m_tx_data(0)
-	, m_tx_clock(0), m_tx_count(0), m_tx_bits(0), m_tx_parity(0), m_tx_sr(0), m_tx_crc(0), m_tx_hist(0), m_tx_flags(0)
+	, m_tx_clock(0), m_tx_count(0), m_tx_parity(0), m_tx_sr(0), m_tx_crc(0), m_tx_hist(0), m_tx_flags(0)
 	, m_txd(1), m_dtr(0), m_rts(0)
 	, m_ext_latched(0), m_brk_latched(0), m_cts(0), m_dcd(0), m_sync(0)
 	, m_rr1_auto_reset(rr1_auto_reset)
@@ -938,12 +959,22 @@ z80sio_channel::z80sio_channel(
 }
 
 z80sio_channel::z80sio_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80sio_channel(mconfig, Z80SIO_CHANNEL, tag, owner, clock, RR1_CRC_FRAMING_ERROR)
+	: z80sio_channel(mconfig, Z80SIO_CHANNEL, tag, owner, clock, RR1_END_OF_FRAME | RR1_CRC_FRAMING_ERROR | RR1_RESIDUE_CODE_MASK)
 {
 }
 
 i8274_channel::i8274_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80sio_channel(mconfig, I8274_CHANNEL, tag, owner, clock, RR1_RX_OVERRUN_ERROR)
+{
+}
+
+mk68564_channel::mk68564_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z80sio_channel(mconfig, MK68564_CHANNEL, tag, owner, clock, RR1_END_OF_FRAME | RR1_CRC_FRAMING_ERROR | RR1_RESIDUE_CODE_MASK)
+	, m_tx_auto_enable(false)
+	, m_brg_tc(0)
+	, m_brg_control(0)
+	, m_brg_state(false)
+	, m_brg_timer(nullptr)
 {
 }
 
@@ -981,19 +1012,31 @@ void z80sio_channel::device_start()
 	save_item(NAME(m_rx_error_fifo));
 	save_item(NAME(m_rx_clock));
 	save_item(NAME(m_rx_count));
+	save_item(NAME(m_dlyd_rxd));
 	save_item(NAME(m_rx_bit));
+	save_item(NAME(m_rx_bit_limit));
+	save_item(NAME(m_rx_sync_fsm));
+	save_item(NAME(m_rx_one_cnt));
 	save_item(NAME(m_rx_sr));
+	save_item(NAME(m_rx_sync_sr));
+	save_item(NAME(m_rx_crc_delay));
+	save_item(NAME(m_rx_crc));
+	save_item(NAME(m_rx_crc_en));
+	save_item(NAME(m_rx_parity));
 	save_item(NAME(m_rx_first));
-	save_item(NAME(m_rx_break));
 	save_item(NAME(m_tx_data));
 	save_item(NAME(m_tx_clock));
 	save_item(NAME(m_tx_count));
-	save_item(NAME(m_tx_bits));
+	save_item(NAME(m_tx_phase));
 	save_item(NAME(m_tx_parity));
+	save_item(NAME(m_tx_in_pkt));
+	save_item(NAME(m_tx_forced_sync));
 	save_item(NAME(m_tx_sr));
 	save_item(NAME(m_tx_crc));
 	save_item(NAME(m_tx_hist));
 	save_item(NAME(m_tx_flags));
+	save_item(NAME(m_tx_delay));
+	save_item(NAME(m_all_sent_delay));
 	save_item(NAME(m_txd));
 	save_item(NAME(m_dtr));
 	save_item(NAME(m_rts));
@@ -1002,6 +1045,18 @@ void z80sio_channel::device_start()
 	save_item(NAME(m_dcd));
 	save_item(NAME(m_sync));
 	save_item(NAME(m_cts));
+}
+
+void mk68564_channel::device_start()
+{
+	z80sio_channel::device_start();
+
+	m_brg_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mk68564_channel::brg_timeout), this));
+
+	save_item(NAME(m_tx_auto_enable));
+	save_item(NAME(m_brg_tc));
+	save_item(NAME(m_brg_control));
+	save_item(NAME(m_brg_state));
 }
 
 
@@ -1016,9 +1071,11 @@ void z80sio_channel::device_reset()
 	m_rx_fifo_depth = 0;
 	m_rx_data_fifo = m_rx_error_fifo = 0U;
 	m_rx_bit = 0;
+	m_rx_one_cnt = 0;
+	m_rx_sync_fsm = SYNC_FSM_HUNT;
 	m_tx_count = 0;
-	m_tx_bits = 0;
 	m_rr0 &= ~RR0_RX_CHAR_AVAILABLE;
+	m_rr0 |= RR0_SYNC_HUNT;
 	m_rr1 &= ~(RR1_PARITY_ERROR | RR1_RX_OVERRUN_ERROR | RR1_CRC_FRAMING_ERROR);
 
 	// disable receiver
@@ -1029,6 +1086,13 @@ void z80sio_channel::device_reset()
 	m_rr0 |= RR0_TX_BUFFER_EMPTY | RR0_TX_UNDERRUN;
 	m_rr1 |= RR1_ALL_SENT;
 	m_tx_flags = 0U;
+	m_tx_delay = ~0;
+	m_all_sent_delay = 0;
+	m_tx_in_pkt = false;
+	m_tx_forced_sync = true;
+	m_txd = 1;
+	out_txd_cb(1);
+	m_tx_sr = ~0;
 
 	// TODO: what happens to WAIT/READY?
 
@@ -1045,6 +1109,21 @@ void z80sio_channel::device_reset()
 		m_uart->reset_interrupts();
 }
 
+void mk68564_channel::device_reset()
+{
+	z80sio_channel::device_reset();
+
+	m_tx_auto_enable = false;
+	m_brg_tc = 0;
+	m_brg_control = 0;
+	m_brg_state = false;
+	m_brg_timer->adjust(attotime::never);
+}
+
+bool z80sio_channel::is_tx_idle() const
+{
+	return (m_tx_sr & TX_SR_MASK) == TX_SR_MASK;
+}
 
 //-------------------------------------------------
 //  transmit_enable - start transmission if
@@ -1052,19 +1131,39 @@ void z80sio_channel::device_reset()
 //-------------------------------------------------
 void z80sio_channel::transmit_enable()
 {
-	if (!m_tx_bits && transmit_allowed())
+	LOGTX("%s\n", FUNCNAME);
+
+	if (transmit_allowed())
 	{
-		if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC)
+		if (is_tx_idle())
 		{
-			LOGTX("Channel %c synchronous transmit enabled - load sync pattern\n", 'A' + m_index);
-			tx_setup_idle();
-			if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
-				set_ready(true);
+			if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC)
+			{
+				LOGTX("Channel %c synchronous transmit enabled - load sync pattern\n", 'A' + m_index);
+				tx_setup_idle();
+				m_tx_forced_sync = false;
+				if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
+					set_ready(true);
+			}
+			else if (!(m_rr0 & RR0_TX_BUFFER_EMPTY))
+				async_tx_setup();
 		}
-		else if (!(m_rr0 & RR0_TX_BUFFER_EMPTY))
+	}
+	else
+	{
+		// Send at least 1 sync once tx is re-enabled
+		m_tx_forced_sync = true;
+		LOGBIT("tx forced set 1\n");
+
+		// If tx is disabled during CRC transmission, flag/sync is sent for the remaining bits
+		if (m_tx_flags & TX_FLAG_CRC_TX)
 		{
-			async_tx_setup();
+			m_tx_flags = TX_FLAG_FRAMING;
+			set_tx_empty(false , (m_rr0 & RR0_TX_BUFFER_EMPTY) != 0);
 		}
+		m_tx_in_pkt = false;
+		// Not sure if RR0_TX_UNDERRUN is set when tx is disabled. It certainly makes sense to be that way.
+		m_rr0 |= RR0_TX_UNDERRUN;
 	}
 }
 
@@ -1074,7 +1173,7 @@ void z80sio_channel::transmit_enable()
 //-------------------------------------------------
 void z80sio_channel::transmit_complete()
 {
-	LOG("%s %s\n",FUNCNAME, tag());
+	if (!m_rts) LOGTX("%s %s\n",FUNCNAME, tag());
 
 	if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC)
 		sync_tx_sr_empty();
@@ -1092,53 +1191,66 @@ void z80sio_channel::sync_tx_sr_empty()
 {
 	if (!transmit_allowed())
 	{
-		LOGTX("%s() Channel %c Transmitter Disabled m_wr5:%02x\n", FUNCNAME, 'A' + m_index, m_wr5);
+		if (!m_rts) LOGTX("%s() Channel %c Transmitter Disabled m_wr5:%02x\n", FUNCNAME, 'A' + m_index, m_wr5);
+		m_tx_flags = 0;
+	}
+	else if (m_tx_forced_sync ||
+			 ((m_rr0 & RR0_TX_BUFFER_EMPTY) && ((m_rr0 & RR0_TX_UNDERRUN) || !(m_wr5 & WR5_TX_CRC_ENABLE))))
+	{
+		LOGBIT("tx forced = %d\n" , m_tx_forced_sync);
+		m_tx_forced_sync = false;
 
-		// transmit disabled, set flag if nothing pending
-		m_tx_flags &= ~TX_FLAG_SPECIAL;
-		if (m_rr0 & RR0_TX_BUFFER_EMPTY)
-			m_rr1 |= RR1_ALL_SENT;
+		if (!(m_rr0 & RR0_TX_UNDERRUN))
+		{
+			m_rr0 |= RR0_TX_UNDERRUN;
+			trigger_ext_int();
+		}
+		// TODO: Check
+		// if ((m_tx_flags & (TX_FLAG_CRC_TX | TX_FLAG_DATA_TX)) && (m_wr1 & WR1_TX_INT_ENABLE))
+		//  // At the beginning of the sync/flag sequence that closes a frame, send tx interrupt
+		//  m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
+		if (m_tx_flags & TX_FLAG_CRC_TX)
+		{
+			// At the end of CRC transmission, set tx empty
+			m_tx_flags = 0;
+			set_tx_empty (false , (m_rr0 & RR0_TX_BUFFER_EMPTY) != 0);
+		}
+		tx_setup_idle();
 	}
 	else if (!(m_rr0 & RR0_TX_BUFFER_EMPTY))
 	{
 		LOGTX("%s() Channel %c Transmit Data Byte '%02x' m_wr5:%02x\n", FUNCNAME, 'A' + m_index, m_tx_data, m_wr5);
-		tx_setup(m_tx_data, get_tx_word_length(m_tx_data), (m_wr4 & WR4_PARITY_ENABLE) ? 1 : 0, false, false);
-
+		tx_setup(m_tx_data, get_tx_word_length(), false, false, false);
 		// empty transmit buffer
-		m_rr0 |= RR0_TX_BUFFER_EMPTY;
-		if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
-			set_ready(true);
-		if (m_wr1 & WR1_TX_INT_ENABLE)
-			m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
-	}
-	else if ((m_rr0 & RR0_TX_UNDERRUN) || ((m_wr4 & WR4_SYNC_MODE_MASK) == WR4_SYNC_MODE_8_BIT))
-	{
-		// uts20 always resets the underrun/end-of-message flag if it sees it set, but wants to see sync (not CRC) on the loopback.
-		// It seems odd that automatic CRC transmission would be disabled by certain modes, but this at least allows the test to pass.
-
-		LOGTX("%s() Channel %c Underrun - load sync pattern m_wr5:%02x\n", FUNCNAME, 'A' + m_index, m_wr5);
-		bool const first_idle((m_tx_flags & TX_FLAG_SPECIAL) || !(m_tx_flags & TX_FLAG_FRAMING));
-		tx_setup_idle();
-
-		if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
-			set_ready(true);
-		m_rr1 |= RR1_ALL_SENT;
-
-		// if this is the first sync pattern, generate an interrupt indicating that the next frame can be sent
-		// FIXME: uts20 definitely doesn't want a Tx interrupt here, but what does SDLC mode want?
-		// In that case, it would seem that the underrun flag would already be set when the CRC was loaded.
-		if (!(m_rr0 & RR0_TX_UNDERRUN))
-			trigger_ext_int();
-		else if (first_idle && (m_wr1 & WR1_TX_INT_ENABLE))
-			m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
+		set_tx_empty(false , true);
 	}
 	else
 	{
 		LOGTX("%s() Channel %c Transmit FCS '%04x' m_wr5:%02x\n", FUNCNAME, 'A' + m_index, m_tx_crc, m_wr5);
 
-		// just for fun, SDLC sends the FCS inverted in reverse bit order
-		uint16_t const fcs(bitswap<16>(m_tx_crc, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
-		tx_setup(((m_wr4 & WR4_SYNC_MODE_MASK) == WR4_SYNC_MODE_SDLC) ? ~fcs : fcs, 16, 0, false, true);
+		// Send CRC. 16 bits are counted by loading 2 flag/sync bytes into tx SR (these bits
+		// are actually sent out when tx is disabled during CRC transmission)
+		uint16_t flags = 0;
+		switch (m_wr4 & WR4_SYNC_MODE_MASK)
+		{
+		case WR4_SYNC_MODE_8_BIT:
+		case WR4_SYNC_MODE_EXT:
+			flags = (uint16_t(m_wr6) << 8) | m_wr6;
+			break;
+		case WR4_SYNC_MODE_16_BIT:
+			flags = uint16_t(m_wr6) | (uint16_t(m_wr7) << 8);
+			break;
+		case WR4_SYNC_MODE_SDLC:
+			flags = 0x7e7e;
+			// In SDLC mode, invert CRC before sending it out
+			m_tx_crc = ~m_tx_crc;
+			// In addition, ensure at least 1 flag is sent out before next frame
+			m_tx_forced_sync = true;
+			break;
+		}
+		tx_setup(flags, 16, false, true, false);
+		set_tx_empty(true , true);
+		LOGBIT("Send CRC=%04x\n" , m_tx_crc);
 
 		// set the underrun flag so it will send sync next time
 		m_rr0 |= RR0_TX_UNDERRUN;
@@ -1146,6 +1258,43 @@ void z80sio_channel::sync_tx_sr_empty()
 	}
 }
 
+bool z80sio_channel::get_tx_empty() const
+{
+	// During CRC transmission, tx buffer is shown as full
+	return (m_rr0 & RR0_TX_BUFFER_EMPTY) &&
+		(m_tx_flags & TX_FLAG_CRC_TX) == 0;
+}
+
+void z80sio_channel::set_tx_empty(bool prev_state, bool new_state)
+{
+	if (new_state)
+		m_rr0 |= RR0_TX_BUFFER_EMPTY;
+	else
+		m_rr0 &= ~RR0_TX_BUFFER_EMPTY;
+
+	bool curr_tx_empty = get_tx_empty();
+
+	if (!prev_state && curr_tx_empty)
+	{
+		if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
+			set_ready(true);
+		if (m_wr1 & WR1_TX_INT_ENABLE)
+			m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
+	}
+	else if (prev_state && !curr_tx_empty)
+	{
+		if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
+			set_ready(false);
+	}
+}
+
+void z80sio_channel::update_crc(uint16_t& crc , bool bit)
+{
+	if (BIT(crc , 15) ^ bit)
+		crc = (crc << 1) ^ ((m_wr5 & WR5_CRC16) ? 0x8005U : 0x1021U);
+	else
+		crc <<= 1;
+}
 
 //-------------------------------------------------
 //  async_tx_setup - set up for asynchronous
@@ -1155,15 +1304,27 @@ void z80sio_channel::async_tx_setup()
 {
 	LOGTX("%s() Channel %c Transmit Data Byte '%02x' m_wr5:%02x\n", FUNCNAME, 'A' + m_index, m_tx_data, m_wr5);
 
-	tx_setup(uint16_t(m_tx_data) << 1, get_tx_word_length(m_tx_data) + 1, (m_wr4 & WR4_PARITY_ENABLE) ? 2 : 0, false, false);
-	++m_tx_bits; // stop bit
+	// 5 bits: | 11x 1 | tx_data (8 bits) | 0 |
+	// 6 bits: | 10x 1 | 000 | tx_data (6 bits) | 0 |
+	// 7 bits: |  9x 1 | 000 | tx_data (7 bits) | 0 |
+	// 8 bits: |  8x 1 | 000 | tx_data (8 bits) | 0 |
+	// Add start bit on the right
+	m_tx_sr = uint32_t(m_tx_data) << 1;
+	auto wl = get_tx_word_length();
+	if (wl != 5)
+		// Filter out bits to be ignored in m_tx_data
+		m_tx_sr &= ~(~uint32_t(0) << (wl + 1));
+	// Add 1s on the left
+	m_tx_sr |= ~uint32_t(0) << (wl + 4);
+	LOGBIT("TX_SR %05x TX_D %02x\n" , m_tx_sr & TX_SR_MASK , m_tx_data);
+	m_tx_parity = false;
+
+	m_tx_flags = TX_FLAG_DATA_TX;
 
 	// empty transmit buffer
-	m_rr0 |= RR0_TX_BUFFER_EMPTY;
-	if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
-		set_ready(true);
-	if (m_wr1 & WR1_TX_INT_ENABLE)
-		m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
+	set_tx_empty(false , true);
+	m_rr1 &= ~RR1_ALL_SENT;
+	m_all_sent_delay = 0;
 }
 
 
@@ -1230,7 +1391,7 @@ void z80sio_channel::trigger_ext_int()
 //-------------------------------------------------
 //  get_clock_mode - get clock divisor
 //-------------------------------------------------
-int z80sio_channel::get_clock_mode()
+int z80sio_channel::get_clock_mode() const
 {
 	//LOG("%s %s\n",FUNCNAME, tag());
 	int clocks = 1;
@@ -1264,10 +1425,8 @@ void z80sio_channel::update_dtr_rts_break()
 	// RTS is affected by transmit queue state in asynchronous mode
 	if (m_wr5 & WR5_RTS)
 		set_rts(0); // when the RTS bit is set, the _RTS output goes low
-	else if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC)
+	else if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC || (m_rr1 & RR1_ALL_SENT))
 		set_rts(1); // in synchronous mode, there's no automatic RTS
-	else
-		set_rts(((m_rr0 & RR0_TX_BUFFER_EMPTY) && !m_tx_count) ? 1 : 0); // TODO: is this affected by transmit enable?
 
 	// break immediately forces spacing condition on TxD output
 	out_txd_cb((m_wr5 & WR5_SEND_BREAK) ? 0 : m_txd);
@@ -1280,7 +1439,7 @@ void z80sio_channel::update_dtr_rts_break()
 //-------------------------------------------------
 //  get_rx_word_length - get receive word length
 //-------------------------------------------------
-int z80sio_channel::get_rx_word_length()
+int z80sio_channel::get_rx_word_length() const
 {
 	LOG("%s %s\n",FUNCNAME, tag());
 	int bits = 5;
@@ -1315,31 +1474,17 @@ int z80sio_channel::get_tx_word_length() const
 	return 5;
 }
 
-int z80sio_channel::get_tx_word_length(uint8_t data) const
-{
-	LOG("%s(%02x)\n", FUNCNAME, data);
-
-	// deal with "five bits or less" mode (the actual chips probably detect a sentinel pattern in the transmit shift register)
-	int bits = get_tx_word_length();
-	if (5 == bits)
-	{
-		for (int b = 7; (b >= 4) && BIT(data, b); --b)
-			--bits;
-	}
-	return bits;
-}
-
 /*
  * This register contains the status of the receive and transmit buffers; the
  * DCD, CTS, and SYNC inputs; the Transmit Underrun/EOM latch; and the
  * Break/Abort latch. */
 uint8_t z80sio_channel::do_sioreg_rr0()
 {
-	LOGR("%s\n", FUNCNAME);
-	if (m_tx_flags & TX_FLAG_SPECIAL)
-		return m_rr0 & ~RR0_TX_BUFFER_EMPTY;
-	else
-		return m_rr0;
+	uint8_t tmp = m_rr0 & ~RR0_TX_BUFFER_EMPTY;
+	if (get_tx_empty())
+		tmp |= RR0_TX_BUFFER_EMPTY;
+	LOGR("%s: %02x\n", FUNCNAME, tmp);
+	return tmp;
 }
 
 /*
@@ -1422,7 +1567,9 @@ void z80sio_channel::do_sioreg_wr0_resets(uint8_t data)
 		LOGCMD("Z80SIO Channel %c : CRC_RESET_NULL\n", 'A' + m_index);
 		break;
 	case WR0_CRC_RESET_RX: /* In Synchronous mode: all Os (zeros) (CCITT-O CRC-16) */
-		LOGCMD("Z80SIO Channel %c : CRC_RESET_RX - not implemented\n", 'A' + m_index);
+		LOGCMD("Z80SIO Channel %c : CRC_RESET_RX\n", 'A' + m_index);
+		m_rx_crc = ((m_wr4 & WR4_SYNC_MODE_MASK) == WR4_SYNC_MODE_SDLC) ? ~uint16_t(0U) : uint16_t(0U);
+		m_rx_crc_en = false;
 		break;
 	case WR0_CRC_RESET_TX: /* In HDLC mode: all 1s (ones) (CCITT-1) */
 		LOGCMD("Z80SIO Channel %c : CRC_RESET_TX\n", 'A' + m_index);
@@ -1430,7 +1577,11 @@ void z80sio_channel::do_sioreg_wr0_resets(uint8_t data)
 		break;
 	case WR0_CRC_RESET_TX_UNDERRUN: /* Resets Tx underrun/EOM bit (D6 of the SRO register) */
 		LOGCMD("Z80SIO Channel %c : CRC_RESET_TX_UNDERRUN\n", 'A' + m_index);
-		m_rr0 &= ~RR0_TX_UNDERRUN;
+		// Command is accepted in active part of packet only
+		if (m_tx_in_pkt)
+			m_rr0 &= ~RR0_TX_UNDERRUN;
+		else
+			LOGCMD(" - not accepted as not in active part of packet\n");
 		break;
 	default: /* Will not happen unless someone messes with the mask */
 		logerror("Z80SIO Channel %c : %s Wrong CRC reset/init command:%02x\n", 'A' + m_index, FUNCNAME, data & WR0_CRC_RESET_CODE_MASK);
@@ -1442,7 +1593,7 @@ void z80sio_channel::do_sioreg_wr0(uint8_t data)
 	m_wr0 = data;
 
 	if ((data & WR0_COMMAND_MASK) != WR0_NULL)
-		LOGSETUP(" * %s %c Reg %02x <- %02x \n", owner()->tag(), 'A' + m_index, 0, data);
+		LOGSETUP("\n * %s %c Reg %02x <- %02x \n", owner()->tag(), 'A' + m_index, 0, data);
 	switch (data & WR0_COMMAND_MASK)
 	{
 	case WR0_NULL:
@@ -1457,13 +1608,9 @@ void z80sio_channel::do_sioreg_wr0(uint8_t data)
 		else
 		{
 			LOGCMD("%s Ch:%c : Send abort command\n", FUNCNAME, 'A' + m_index);
-			// FIXME: how does this interact with interrupts?
-			// For now assume it behaves like automatically sending CRC and generates a transmit interrupt when a new frame can be sent.
-			tx_setup(0xff, 8, 0, true, true);
-			m_rr0 |= RR0_TX_BUFFER_EMPTY;
-			m_rr1 &= ~RR1_ALL_SENT;
-			if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
-				set_ready(false);
+			bool prev_tx_empty = get_tx_empty();
+			tx_setup(0xff, 8, true, false, true);
+			set_tx_empty(prev_tx_empty , true);
 		}
 		break;
 	case WR0_RESET_EXT_STATUS:
@@ -1492,12 +1639,12 @@ void z80sio_channel::do_sioreg_wr0(uint8_t data)
 		{
 			// clearing framing and overrun errors advances the FIFO
 			// TODO: Intel 8274 manual doesn't mention this behaviour - is it specific to Z80 SIO?
-			m_rr1 &= ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR);
+			m_rr1 &= ~(RR1_END_OF_FRAME | RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR);
 			advance_rx_fifo();
 		}
 		else
 		{
-			m_rr1 &= ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR);
+			m_rr1 &= ~(RR1_END_OF_FRAME | RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR);
 		}
 		break;
 	case WR0_RETURN_FROM_INT:
@@ -1516,44 +1663,40 @@ void z80sio_channel::do_sioreg_wr1(uint8_t data)
 {
 /* TODO: implement vector modifications when WR1 bit D2 is changed */
 	m_wr1 = data;
-	LOG("Z80SIO \"%s\" Channel %c : External Interrupt Enable %u\n", owner()->tag(), 'A' + m_index, (data & WR1_EXT_INT_ENABLE) ? 1 : 0);
-	LOG("Z80SIO \"%s\" Channel %c : Transmit Interrupt Enable %u\n", owner()->tag(), 'A' + m_index, (data & WR1_TX_INT_ENABLE) ? 1 : 0);
-	LOG("Z80SIO \"%s\" Channel %c : Status Affects Vector %u\n", owner()->tag(), 'A' + m_index, (data & WR1_STATUS_VECTOR) ? 1 : 0);
-	LOG("Z80SIO \"%s\" Channel %c : Wait/Ready Enable %u\n", owner()->tag(), 'A' + m_index, (data & WR1_WRDY_ENABLE) ? 1 : 0);
-	LOG("Z80SIO \"%s\" Channel %c : Wait/Ready Function %s\n", owner()->tag(), 'A' + m_index, (data & WR1_WRDY_FUNCTION) ? "Ready" : "Wait");
-	LOG("Z80SIO \"%s\" Channel %c : Wait/Ready on %s\n", owner()->tag(), 'A' + m_index, (data & WR1_WRDY_ON_RX_TX) ? "Receive" : "Transmit");
-
-	switch (data & WR1_RX_INT_MODE_MASK)
-	{
-	case WR1_RX_INT_DISABLE:
-		LOG("Z80SIO \"%s\" Channel %c : Receiver Interrupt Disabled\n", owner()->tag(), 'A' + m_index);
-		break;
-
-	case WR1_RX_INT_FIRST:
-		LOG("Z80SIO \"%s\" Channel %c : Receiver Interrupt on First Character\n", owner()->tag(), 'A' + m_index);
-		break;
-
-	case WR1_RX_INT_ALL_PARITY:
-		LOG("Z80SIO \"%s\" Channel %c : Receiver Interrupt on All Characters, Parity Affects Vector\n", owner()->tag(), 'A' + m_index);
-		break;
-
-	case WR1_RX_INT_ALL:
-		LOG("Z80SIO \"%s\" Channel %c : Receiver Interrupt on All Characters\n", owner()->tag(), 'A' + m_index);
-		break;
-	}
+	LOGSETUP("Z80SIO \"%s\" Channel %c :\n", owner()->tag(), 'A' + m_index);
+	LOGSETUP(" - External Interrupt Enable %u\n", (data & WR1_EXT_INT_ENABLE) ? 1 : 0);
+	LOGSETUP(" - Transmit Interrupt Enable %u\n", (data & WR1_TX_INT_ENABLE) ? 1 : 0);
+	LOGSETUP(" - Status Affects Vector %u\n", (data & WR1_STATUS_VECTOR) ? 1 : 0);
+	LOGSETUP(" - Wait/Ready Enable %u\n",     (data & WR1_WRDY_ENABLE) ? 1 : 0);
+	LOGSETUP(" - Wait/Ready Function %s\n",   (data & WR1_WRDY_FUNCTION) ? "Ready" : "Wait");
+	LOGSETUP(" - Wait/Ready on %s\n",         (data & WR1_WRDY_ON_RX_TX) ? "Rx" : "Tx");
+	LOGSETUP(" - Receiver Interrupt %s\n",  std::array<char const *, 4>
+		 {{"Disabled", "on First Character", "on All Characters, Parity Affects Vector", "on All Characters"}}[(m_wr2 >> 3) & 0x03]);
 
 	if (!(data & WR1_WRDY_ENABLE))
 		set_ready(false);
 	else if (data & WR1_WRDY_ON_RX_TX)
 		set_ready(bool(m_rr0 & RR0_RX_CHAR_AVAILABLE));
 	else
-		set_ready((m_rr0 & RR0_TX_BUFFER_EMPTY) && !(m_tx_flags & TX_FLAG_SPECIAL));
+		set_ready(m_rr0 & RR0_TX_BUFFER_EMPTY);
 }
 
 void z80sio_channel::do_sioreg_wr2(uint8_t data)
 {
 	m_wr2 = data;
-	LOG("Z80SIO \"%s\" Channel %c : Interrupt Vector %02x\n", owner()->tag(), 'A' + m_index, data);
+	LOGSETUP("Z80SIO \"%s\" Channel %c : ", owner()->tag(), 'A' + m_index);
+	if (m_index == 0)
+	{
+		LOGSETUP(" - INT/DMA priority and mode: %02x\n", m_wr2 & 0x07);
+		LOGSETUP(" - Interrupt mode: %s\n", std::array<char const *, 4> {{"85-1", "85-2", "85-3", "86"}}[(m_wr2 >> 3) & 0x03]);
+		LOGSETUP(" - Vector mode: %s\n", (m_wr2 & 0x20) ? "Vectored" : "Non-vectored");
+		LOGSETUP(" - Rx INT mask: %d\n", (m_wr2 >> 6) & 0x01 );
+		LOGSETUP(" - Pin 10: %s\n",  (m_wr2 & 0x80) ? "SYNCB" : "RTSB");
+	}
+	else
+	{
+		LOGSETUP("Interrupt Vector %02x\n", m_wr2);
+	}
 }
 
 void z80sio_channel::do_sioreg_wr3(uint8_t data)
@@ -1562,12 +1705,13 @@ void z80sio_channel::do_sioreg_wr3(uint8_t data)
 	LOGSETUP("Z80SIO Channel %c : Sync Character Load Inhibit %u\n", 'A' + m_index, (data & WR3_SYNC_CHAR_LOAD_INHIBIT) ? 1 : 0);
 	LOGSETUP("Z80SIO Channel %c : Receive CRC Enable %u\n", 'A' + m_index, (data & WR3_RX_CRC_ENABLE) ? 1 : 0);
 	LOGSETUP("Z80SIO Channel %c : Auto Enables %u\n", 'A' + m_index, (data & WR3_AUTO_ENABLES) ? 1 : 0);
-	LOGSETUP("Z80SIO Channel %c : Receiver Bits/Character %u\n", 'A' + m_index, get_rx_word_length());
-	if (data & WR3_ENTER_HUNT_PHASE)
-		LOGCMD("Z80SIO Channel %c : Enter Hunt Phase\n", 'A' + m_index);
+	LOGSETUP("Z80SIO Channel %c : Enter Hunt Phase %u\n", 'A' + m_index, (data & WR3_ENTER_HUNT_PHASE) ? 1 : 0);
+		 //if (data & WR3_ENTER_HUNT_PHASE)
+		 //LOGCMD("Z80SIO Channel %c : Enter Hunt Phase\n", 'A' + m_index);
 
 	bool const was_allowed(receive_allowed());
 	m_wr3 = data;
+	LOG("Z80SIO Channel %c : Receiver Bits/Character %u\n", 'A' + m_index, get_rx_word_length()); // depends on m_wr3 being updated
 
 	if (!was_allowed && receive_allowed())
 	{
@@ -1576,41 +1720,34 @@ void z80sio_channel::do_sioreg_wr3(uint8_t data)
 	else if ((data & WR3_ENTER_HUNT_PHASE) && ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC))
 	{
 		// TODO: should this re-initialise hunt logic if already in hunt phase for 8-bit/16-bit/SDLC sync?
-		if ((m_wr4 & WR4_SYNC_MODE_MASK) == WR4_SYNC_MODE_EXT)
-		{
-			m_rx_bit = 0;
-		}
-		else if (!(m_rr0 & RR0_SYNC_HUNT))
-		{
-			m_rx_bit = 0;
-			m_rr0 |= RR0_SYNC_HUNT;
-			trigger_ext_int();
-		}
+		enter_hunt_mode();
 	}
 }
 
 void z80sio_channel::do_sioreg_wr4(uint8_t data)
 {
 	m_wr4 = data;
-	LOG("Z80SIO \"%s\" Channel %c : Parity Enable %u\n", owner()->tag(), 'A' + m_index, (data & WR4_PARITY_ENABLE) ? 1 : 0);
-	LOG("Z80SIO \"%s\" Channel %c : Parity %s\n", owner()->tag(), 'A' + m_index, (data & WR4_PARITY_EVEN) ? "Even" : "Odd");
+	LOGSETUP("Z80SIO \"%s\" Channel %c : Parity Enable %u\n", owner()->tag(), 'A' + m_index, (data & WR4_PARITY_ENABLE) ? 1 : 0);
+	LOGSETUP("Z80SIO \"%s\" Channel %c : Parity %s\n", owner()->tag(), 'A' + m_index, (data & WR4_PARITY_EVEN) ? "Even" : "Odd");
 	if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC)
-		LOG("Z80SIO \"%s\" Channel %c : Synchronous Mode\n", owner()->tag(), 'A' + m_index);
+		LOGSETUP("Z80SIO \"%s\" Channel %c : Synchronous Mode %s\n", owner()->tag(), 'A' + m_index,
+			std::array<char const *, 4> {{"Monosync", "Bisync", "HDLC/SDLC", "External"}}[(m_wr4 >> 4) & 0x03]);
 	else
-		LOG("Z80SIO \"%s\" Channel %c : Stop Bits %g\n", owner()->tag(), 'A' + m_index, (((m_wr4 & WR4_STOP_BITS_MASK) >> 2) + 1) / 2.);
-	LOG("Z80SIO \"%s\" Channel %c : Clock Mode %uX\n", owner()->tag(), 'A' + m_index, get_clock_mode());
+		LOGSETUP("Z80SIO \"%s\" Channel %c : Stop Bits %g\n", owner()->tag(), 'A' + m_index, (((m_wr4 & WR4_STOP_BITS_MASK) >> 2) + 1) / 2.);
+	LOGSETUP("Z80SIO \"%s\" Channel %c : Clock Mode %uX\n", owner()->tag(), 'A' + m_index, get_clock_mode());
 }
 
 void z80sio_channel::do_sioreg_wr5(uint8_t data)
 {
 	m_wr5 = data;
-	LOG("Z80SIO Channel %c : Transmitter Enable %u\n", 'A' + m_index, (data & WR5_TX_ENABLE) ? 1 : 0);
-	LOG("Z80SIO Channel %c : Transmitter Bits/Character %u\n", 'A' + m_index, get_tx_word_length());
-	LOG("Z80SIO Channel %c : Transmit CRC Enable %u\n", 'A' + m_index, (data & WR5_TX_CRC_ENABLE) ? 1 : 0);
-	LOG("Z80SIO Channel %c : %s Frame Check Polynomial\n", 'A' + m_index, (data & WR5_CRC16) ? "CRC-16" : "SDLC");
-	LOG("Z80SIO Channel %c : Send Break %u\n", 'A' + m_index, (data & WR5_SEND_BREAK) ? 1 : 0);
-	LOG("Z80SIO Channel %c : Request to Send %u\n", 'A' + m_index, (data & WR5_RTS) ? 1 : 0);
-	LOG("Z80SIO Channel %c : Data Terminal Ready %u\n", 'A' + m_index, (data & WR5_DTR) ? 1 : 0);
+	LOGSETUP("Z80SIO Channel %c\n", 'A' + m_index);
+	LOGSETUP(" - Transmitter Enable %u\n",         (data & WR5_TX_ENABLE) ? 1 : 0);
+	LOGSETUP(" - Transmitter Bits/Character %u\n", get_tx_word_length());
+	LOGSETUP(" - Transmit CRC Enable %u\n",        (data & WR5_TX_CRC_ENABLE) ? 1 : 0);
+	LOGSETUP(" - %s Frame Check Polynomial\n",     (data & WR5_CRC16) ? "CRC-16" : "SDLC");
+	LOGSETUP(" - Send Break %u\n",                 (data & WR5_SEND_BREAK) ? 1 : 0);
+	LOGSETUP(" - Request to Send %u\n",            (data & WR5_RTS) ? 1 : 0);
+	LOGSETUP(" - Data Terminal Ready %u\n",        (data & WR5_DTR) ? 1 : 0);
 
 	if (~data & WR5_TX_ENABLE)
 		m_uart->clear_interrupt(m_index, INT_TRANSMIT);
@@ -1618,13 +1755,13 @@ void z80sio_channel::do_sioreg_wr5(uint8_t data)
 
 void z80sio_channel::do_sioreg_wr6(uint8_t data)
 {
-	LOG("Z80SIO \"%s\" Channel %c : Transmit Sync/Sync 1/SDLC Address %02x\n", owner()->tag(), 'A' + m_index, data);
+	LOGSETUP("Z80SIO \"%s\" Channel %c : Transmit Sync/Sync 1/SDLC Address %02x\n", owner()->tag(), 'A' + m_index, data);
 	m_wr6 = data;
 }
 
 void z80sio_channel::do_sioreg_wr7(uint8_t data)
 {
-	LOG("Z80SIO \"%s\" Channel %c : Receive Sync/Sync 2/SDLC Flag %02x\n", owner()->tag(), 'A' + m_index, data);
+	LOGSETUP("Z80SIO \"%s\" Channel %c : Receive Sync/Sync 2/SDLC Flag %02x\n", owner()->tag(), 'A' + m_index, data);
 	m_wr7 = data;
 }
 
@@ -1638,7 +1775,7 @@ void z80sio_channel::control_write(uint8_t data)
 	if (reg != 0)
 	{
 		LOGSETUP(" * %s %c Reg %02x <- %02x - %s\n", tag(), 'A' + m_index, reg, data, std::array<char const *, 8>
-			 {{"WR0", "WR1", "WR2", "WR3 - Async Rx setup", "WR4 - Async Clock, Parity and stop bits", "WR5 - Async Tx setup", "WR6", "WR7"}}[reg]);
+			 {{"WR0", "WR1", "WR2", "WR3", "WR4", "WR5", "WR6", "WR7"}}[reg]);
 		// mask out register index
 		m_wr0 &= ~WR0_REGISTER_MASK;
 	}
@@ -1693,21 +1830,27 @@ void z80sio_channel::data_write(uint8_t data)
 
 	// fill transmit buffer
 	m_tx_data = data;
-	m_rr0 &= ~RR0_TX_BUFFER_EMPTY;
-	m_rr1 &= ~RR1_ALL_SENT;
-	if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
-		set_ready(false);
+	set_tx_empty(get_tx_empty() , false);
+	if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC)
+	{
+		LOGTX("Z80SIO: WR4_STOP_BITS_SYNC detected\n");
+		m_tx_in_pkt = true;
+	}
+	else
+	{
+		// ALL_SENT is only meaningful in async mode, in sync mode it's always 1
+		LOGTX("Z80SIO: WR4_STOP_BITS_SYNC *not* detected\n");
+		m_rr1 &= ~RR1_ALL_SENT;
+		m_all_sent_delay = 0;
+	}
 
-	// handle automatic RTS
 	bool const async((m_wr4 & WR4_STOP_BITS_MASK) != WR4_STOP_BITS_SYNC);
-	if (async && !(m_wr5 & WR5_RTS))
-		set_rts(0); // TODO: if transmission is disabled when the data buffer is full, is this still asserted?
 
 	// clear transmit interrupt
 	m_uart->clear_interrupt(m_index, INT_TRANSMIT);
 
 	// may be possible to transmit immediately (synchronous mode will load when sync pattern completes)
-	if (async && !m_tx_bits && transmit_allowed())
+	if (async && is_tx_idle() && transmit_allowed())
 		async_tx_setup();
 }
 
@@ -1750,6 +1893,13 @@ void z80sio_channel::advance_rx_fifo()
 	}
 }
 
+uint8_t z80sio_channel::get_special_rx_mask() const
+{
+	return ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC) ?
+		(RR1_RX_OVERRUN_ERROR | RR1_END_OF_FRAME) :
+		(RR1_RX_OVERRUN_ERROR | RR1_CRC_FRAMING_ERROR);
+}
+
 
 //-------------------------------------------------
 //  receive_enabled - conditions have changed
@@ -1761,73 +1911,282 @@ void z80sio_channel::receive_enabled()
 	bool const sync_mode((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC);
 	m_rx_count = sync_mode ? 0 : ((get_clock_mode() - 1) / 2);
 	m_rx_bit = 0;
-	if (sync_mode && ((m_wr4 & WR4_SYNC_MODE_MASK) != WR4_SYNC_MODE_EXT))
-		m_rr0 |= RR0_SYNC_HUNT;
+	if (sync_mode)
+		enter_hunt_mode();
 }
 
+void z80sio_channel::enter_hunt_mode()
+{
+	if (!(m_rr0 & RR0_SYNC_HUNT))
+	{
+		m_rx_sync_fsm = SYNC_FSM_HUNT;
+		m_rr0 |= RR0_SYNC_HUNT;
+		trigger_ext_int();
+	}
+}
 
 //-------------------------------------------------
 //  sync_receive - synchronous reception handler
 //-------------------------------------------------
-
 void z80sio_channel::sync_receive()
 {
-	// TODO: this is a fundamentally flawed approach - it's just the quickest way to get uts20 to pass some tests
-	// Sync acquisition works, but sync load suppression doesn't work right.
-	// Assembled data needs to be separated from the receive shift register for SDLC.
-	// Supporting receive checksum for modes other than SDLC is going to be very complicated due to all the bit delays involved.
+	LOGBIT("%.6f Channel %c Sync Received Bit %d, sync=%02x, sr=%03x, crc_dly=%02x, crc=%04x, FSM=%d, bit=%d, limit=%d\n" , machine().time().as_double(), 'A' + m_index, m_dlyd_rxd, m_rx_sync_sr, m_rx_sr, m_rx_crc_delay, m_rx_crc, m_rx_sync_fsm, m_rx_bit, m_rx_bit_limit);
 
-	bool const ext_sync((m_wr4 & WR4_SYNC_MODE_MASK) == WR4_SYNC_MODE_EXT);
-	bool const hunt_phase(ext_sync ? m_sync : (m_rr0 & RR0_SYNC_HUNT));
-	if (hunt_phase)
+	bool sync_sr_out = BIT(m_rx_sync_sr , 0);
+	m_rx_sync_sr = (m_rx_sync_sr >> 1) & 0x7f;
+	if (m_dlyd_rxd)
+		m_rx_sync_sr |= 0x80;
+
+	bool wr7_matched = m_rx_sync_sr == m_wr7;
+
+	switch (m_rx_sync_fsm)
 	{
-		// check for sync detection
-		bool acquired(false);
-		int limit(16);
+	case SYNC_FSM_HUNT:
+	{
+		bool got_sync = false;
 		switch (m_wr4 & WR4_SYNC_MODE_MASK)
 		{
 		case WR4_SYNC_MODE_8_BIT:
-		case WR4_SYNC_MODE_SDLC:
-			acquired = (m_rx_bit >= 8) && ((m_rx_sr & 0xff00U) == (uint16_t(m_wr7) << 8));
-			limit = 8;
+			if (wr7_matched)
+			{
+				LOGRCV("Channel %c 8-bit Sync Acquired\n", 'A' + m_index);
+				got_sync = true;
+			}
 			break;
+
 		case WR4_SYNC_MODE_16_BIT:
-			acquired = (m_rx_bit >= 16) && (m_rx_sr == ((uint16_t(m_wr7) << 8) | uint16_t(m_wr6)));
+		{
+			m_rx_sr = (m_rx_sr >> 1) & 0x7f;
+			if (sync_sr_out)
+				m_rx_sr |= 0x80;
+			if ((m_rx_sr & 0xff) == m_wr6 && wr7_matched)
+			{
+				LOGRCV("Channel %c 16-bit Sync Acquired\n", 'A' + m_index);
+				got_sync = true;
+			}
 			break;
 		}
-		if (acquired)
+
+		case WR4_SYNC_MODE_EXT:
+			// Not entirely correct: sync input is synchronized 2 bits off in the real hw
+			got_sync = m_sync;
+			break;
+
+		default:
+			break;
+		}
+		if (got_sync)
 		{
-			// TODO: make this do something sensible in SDLC mode
-			// FIXME: set sync output for one receive bit cycle
-			// FIXME: what if sync load isn't suppressed?
-			LOGRCV("%s() Channel %c Character Sync Acquired\n", FUNCNAME, 'A' + m_index);
-			m_rr0 &= ~RR0_SYNC_HUNT;
+			if (m_rr0 & RR0_SYNC_HUNT)
+			{
+				m_rr0 &= ~RR0_SYNC_HUNT;
+				trigger_ext_int();
+			}
+			m_rx_sync_fsm = SYNC_FSM_1ST_CHAR;
+			m_rx_crc_en = false;
 			m_rx_bit = 0;
-			trigger_ext_int();
+			m_rx_bit_limit = get_rx_word_length() + ((m_wr4 & WR4_PARITY_ENABLE) ? 1 : 0);
+			m_rx_parity = false;
 		}
-		else
+	}
+	break;
+
+	case SYNC_FSM_1ST_CHAR:
+	case SYNC_FSM_IN_FRAME:
+	{
+		bool rx_sr_out = BIT(m_rx_sr , 0);
+		bool rx_crc_delay_out = BIT(m_rx_crc_delay , 0);
+		m_rx_crc_delay = (m_rx_crc_delay >> 1);
+		if (rx_sr_out)
+			m_rx_crc_delay |= 0x80;
+		if (m_rx_crc_en)
+			update_crc(m_rx_crc , rx_crc_delay_out);
+		m_rx_sr = (m_rx_sr >> 1) & ((1U << (m_rx_bit_limit - 1)) - 1);
+		if (m_dlyd_rxd)
 		{
-			// track number of bits we have
-			m_rx_bit = (std::min)(m_rx_bit + 1, limit);
+			m_rx_sr |= (1U << (m_rx_bit_limit - 1));
+			m_rx_parity = !m_rx_parity;
 		}
+		if (++m_rx_bit == m_rx_bit_limit)
+		{
+			if (!(m_wr3 & WR3_SYNC_CHAR_LOAD_INHIBIT) ||
+				((m_rx_sr & 0xff) != m_wr6 && !wr7_matched))
+			{
+				uint8_t status_byte = 0;
+				if (m_rx_crc != 0)
+					status_byte |= RR1_CRC_FRAMING_ERROR;
+				if (m_wr4 & WR4_PARITY_EVEN)
+					m_rx_parity = !m_rx_parity;
+				if (!m_rx_parity && (m_wr4 & WR4_PARITY_ENABLE))
+					status_byte |= RR1_PARITY_ERROR;
+				uint8_t data = m_rx_sr & 0xff;
+				if (m_rx_bit_limit < 8)
+					// Fill the unused part of character with ones
+					data |= ~((1U << m_rx_bit_limit) - 1);
+				queue_received(data , status_byte);
+			}
+			m_rx_bit = 0;
+			m_rx_bit_limit = get_rx_word_length() + ((m_wr4 & WR4_PARITY_ENABLE) ? 1 : 0);
+			m_rx_parity = false;
+			m_rx_crc_en = (m_rx_sync_fsm == SYNC_FSM_IN_FRAME) && (m_wr3 & WR3_RX_CRC_ENABLE);
+			m_rx_sync_fsm = SYNC_FSM_IN_FRAME;
+		}
+		break;
+	}
+
+	default:
+		LOG("Invalid Sync FSM state (%d)\n" , m_rx_sync_fsm);
+		m_rx_sync_fsm = SYNC_FSM_HUNT;
+	}
+
+	m_dlyd_rxd = m_rxd;
+}
+
+//-------------------------------------------------
+//  sdlc_receive - SDLC reception handler
+//-------------------------------------------------
+void z80sio_channel::sdlc_receive()
+{
+	LOGBIT("Channel %c SDLC Received Bit %d, sync=%02x, sr=%03x, FSM=%d, bit=%d, limit=%d\n", 'A' + m_index, m_rxd, m_rx_sync_sr, m_rx_sr, m_rx_sync_fsm, m_rx_bit, m_rx_bit_limit);
+
+	// Check for flag
+	bool flag_matched = m_rx_sync_sr == m_wr7;
+
+	// Shift RxD into sync SR
+	bool sync_sr_out = BIT(m_rx_sync_sr , 0);
+	m_rx_sync_sr >>= 1;
+	if (m_rxd)
+		m_rx_sync_sr |= 0x80;
+
+	// Zero deletion & abort detection
+	bool zero_deleted = false;
+	if (sync_sr_out)
+	{
+		m_rx_sr = (m_rx_sr >> 1) | (1U << 10);
+		if (m_rx_one_cnt < 7 && ++m_rx_one_cnt == 7)
+		{
+			LOGRCV("SDLC Abort detected\n");
+			m_rr0 |= RR0_BREAK_ABORT;
+			if (!m_brk_latched) {
+				m_brk_latched = 1;
+				trigger_ext_int();
+			}
+			enter_hunt_mode();
+		}
+	}
+	else if (m_rx_one_cnt == 5)
+	{
+		m_rx_one_cnt = 0;
+		// Ignore the zero
+		zero_deleted = true;
 	}
 	else
 	{
-		// FIXME: SDLC needs to monitor for flag/abort
-		// FIXME: what if sync load is suppressed?
-		// FIXME: what about receive checksum and the nasty internal shift register delays?
-		int const word_length(get_rx_word_length() + ((m_wr4 & WR4_PARITY_ENABLE) ? 1 : 0));
-		if (++m_rx_bit == word_length)
+		m_rx_sr >>= 1;
+		m_rx_one_cnt = 0;
+		if (m_rr0 & RR0_BREAK_ABORT)
 		{
-			uint16_t const data((m_rx_sr >> (16 - word_length)) | (~uint16_t(0) << word_length));
-			m_rx_bit = 0;
-			LOGRCV("%s() Channel %c Received Data %02x\n", FUNCNAME, 'A' + m_index, data & 0xff);
-			queue_received(data, 0U);
+			m_rr0 &= ~RR0_BREAK_ABORT;
+			if (!m_brk_latched) {
+				m_brk_latched = 1;
+				trigger_ext_int();
+			}
 		}
 	}
 
-	LOGBIT("%s() Channel %c Read Bit %d\n", FUNCNAME, 'A' + m_index, m_rxd);
-	m_rx_sr = (m_rx_sr >> 1) | (m_rxd ? 0x8000U : 0x0000U);
+	switch (m_rx_sync_fsm)
+	{
+	case SYNC_FSM_HUNT:
+	case SYNC_FSM_EVICT:
+		if (flag_matched)
+		{
+			// Got sync
+			m_rx_sync_fsm = SYNC_FSM_EVICT;
+			m_rx_bit = 0;
+			m_rx_bit_limit = 7;
+			LOGRCV("Channel %c SDLC Sync Acquired\n", 'A' + m_index);
+			if (m_rr0 & RR0_SYNC_HUNT)
+			{
+				m_rr0 &= ~RR0_SYNC_HUNT;
+				trigger_ext_int();
+			}
+		}
+		else if (m_rx_sync_fsm == SYNC_FSM_EVICT && ++m_rx_bit == m_rx_bit_limit)
+		{
+			m_rx_sync_fsm = SYNC_FSM_1ST_CHAR;
+			m_rx_crc = ~0;
+			m_rx_bit = 0;
+			m_rx_bit_limit = 11;
+		}
+		break;
+
+	case SYNC_FSM_1ST_CHAR:
+	case SYNC_FSM_IN_FRAME:
+		if (zero_deleted)
+			break;
+		if (++m_rx_bit == m_rx_bit_limit)
+			m_rx_bit = 0;
+		if (flag_matched)
+		{
+			// Got closing flag
+			if (m_rx_sync_fsm != SYNC_FSM_1ST_CHAR)
+			{
+				// Frame ended
+				LOGRCV("SDLC frame ended, CRC=%04x, residual=%d\n" , m_rx_crc , m_rx_bit);
+				uint8_t status_byte = RR1_END_OF_FRAME;
+				if (m_rx_crc != SDLC_RESIDUAL)
+					status_byte |= RR1_CRC_FRAMING_ERROR;
+				// The residue code is nothing but the bit-reversed accumulated bit count
+				if (BIT(m_rx_bit , 0))
+					status_byte |= 0x08;
+				if (BIT(m_rx_bit , 1))
+					status_byte |= 0x04;
+				if (BIT(m_rx_bit , 2))
+					status_byte |= 0x02;
+				// Is the last character masked according to rx word length?
+				// We don't mask it here, after all it just holds a (useless) part of CRC
+				queue_received(m_rx_sr & 0xff , status_byte);
+			}
+			// else: frame ended before 11 bits are received, discard it
+			m_rx_sync_fsm = SYNC_FSM_EVICT;
+			m_rx_bit = 0;
+			m_rx_bit_limit = 7;
+		}
+		else
+		{
+			// Update rx CRC
+			update_crc(m_rx_crc , sync_sr_out);
+			LOGBIT("SDLC CRC=%04x/%d\n" , m_rx_crc , sync_sr_out);
+
+			if (m_rx_bit == 0)
+			{
+				// Check for address byte
+				if (m_rx_sync_fsm == SYNC_FSM_1ST_CHAR && (m_wr3 & WR3_ADDRESS_SEARCH_MODE) &&
+					(m_rx_sr & 0xff) != 0xff && (m_rx_sr & 0xff) != m_wr6)
+				{
+					LOGRCV("Channel %c SDLC Address %02x not matching %02x\n" , 'A' + m_index , m_rx_sr & 0xff , m_wr6);
+					// Address not matching, ignore this frame
+					m_rx_sync_fsm = SYNC_FSM_HUNT;
+				}
+				else
+				{
+					m_rx_bit_limit = get_rx_word_length();
+					uint8_t data = m_rx_sr & 0xff;
+					if (m_rx_bit_limit != 8)
+						// Fill the unused part of character with ones
+						data |= ~((1U << m_rx_bit_limit) - 1);
+					LOGRCV("SDLC rx data=%02x (%d bits)\n" , data , m_rx_bit_limit);
+					queue_received(data , 0);
+					m_rx_sync_fsm = SYNC_FSM_IN_FRAME;
+				}
+			}
+		}
+		break;
+
+	default:
+		LOG("Invalid SDLC FSM state (%d)\n" , m_rx_sync_fsm);
+		m_rx_sync_fsm = SYNC_FSM_HUNT;
+	}
 }
 
 //-------------------------------------------------
@@ -1844,20 +2203,6 @@ void z80sio_channel::receive_data()
 
 void z80sio_channel::queue_received(uint16_t data, uint32_t error)
 {
-	if (m_wr4 & WR4_PARITY_ENABLE)
-	{
-		int const word_length = get_rx_word_length();
-		uint16_t par(data);
-		for (int i = 1; word_length >= i; ++i)
-			par ^= BIT(par, i);
-
-		if (bool(BIT(par, 0)) == bool(m_wr4 & WR4_PARITY_EVEN))
-		{
-			LOGRCV("  Parity error detected\n");
-			error |= RR1_PARITY_ERROR;
-		}
-	}
-
 	if (3 == m_rx_fifo_depth)
 	{
 		LOG("  Receive FIFO overrun detected\n");
@@ -1875,7 +2220,7 @@ void z80sio_channel::queue_received(uint16_t data, uint32_t error)
 		m_rx_data_fifo |= uint32_t(data & 0x00ffU) << (8 * m_rx_fifo_depth);
 		m_rx_error_fifo |= error << (8 * m_rx_fifo_depth);
 		if (!m_rx_fifo_depth)
-			m_rr1 |= uint8_t(error);
+			m_rr1 = (m_rr1 & ~m_rr1_auto_reset) | uint8_t(error);
 		++m_rx_fifo_depth;
 	}
 
@@ -1887,7 +2232,7 @@ void z80sio_channel::queue_received(uint16_t data, uint32_t error)
 	switch (m_wr1 & WR1_RX_INT_MODE_MASK)
 	{
 	case WR1_RX_INT_FIRST:
-		if (m_rx_first || (error & (RR1_RX_OVERRUN_ERROR | RR1_CRC_FRAMING_ERROR)))
+		if (m_rx_first || (error & get_special_rx_mask()))
 			m_uart->trigger_interrupt(m_index, INT_RECEIVE);
 		m_rx_first = 0;
 		break;
@@ -1915,9 +2260,8 @@ WRITE_LINE_MEMBER( z80sio_channel::cts_w )
 		m_cts = state;
 		trigger_ext_int();
 
-		// this may enable transmission
-		if (!state)
-			transmit_enable();
+		// this may enable/disable transmission
+		transmit_enable();
 	}
 }
 
@@ -1929,7 +2273,7 @@ WRITE_LINE_MEMBER( z80sio_channel::dcd_w )
 {
 	if (bool(m_dcd) != bool(state))
 	{
-		LOG("Z80SIO Channel %c : DCD %u\n", 'A' + m_index, state);
+		LOGDCD("Z80SIO Channel %c : DCD %u\n", 'A' + m_index, state);
 
 		bool const was_allowed(receive_allowed());
 		m_dcd = state;
@@ -1949,7 +2293,7 @@ WRITE_LINE_MEMBER( z80sio_channel::sync_w )
 {
 	if (bool(m_sync) != bool(state))
 	{
-		LOG("Z80SIO Channel %c : Sync %u\n", 'A' + m_index, state);
+		LOGSYNC("Z80SIO Channel %c : Sync %u\n", 'A' + m_index, state);
 
 		m_sync = state;
 
@@ -1966,27 +2310,21 @@ WRITE_LINE_MEMBER( z80sio_channel::sync_w )
 WRITE_LINE_MEMBER( z80sio_channel::rxc_w )
 {
 	//LOG("Z80SIO \"%s\" Channel %c : Receiver Clock Pulse\n", owner()->tag(), m_index + 'A');
+	//if ((receive_allowed() || m_rx_bit != 0) && state && !m_rx_clock)
 	if (receive_allowed() && state && !m_rx_clock)
 	{
 		// RxD sampled on rising edge
 		int const clocks = get_clock_mode() - 1;
-
-		// break termination detection
-		// TODO: how does this interact with receiver being disable or synchronous modes?
-		if (m_rxd && !m_brk_latched && (m_rr0 & RR0_BREAK_ABORT))
-		{
-			LOGRCV("Break termination detected\n");
-			m_rr0 &= ~RR0_BREAK_ABORT;
-			m_brk_latched = 1;
-			trigger_ext_int();
-		}
 
 		if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC)
 		{
 			// synchronous receive is a different beast
 			if (!m_rx_count)
 			{
-				sync_receive();
+				if ((m_wr4 & WR4_SYNC_MODE_MASK) == WR4_SYNC_MODE_SDLC)
+					sdlc_receive();
+				else
+					sync_receive();
 				m_rx_count = clocks;
 			}
 			else
@@ -1994,69 +2332,97 @@ WRITE_LINE_MEMBER( z80sio_channel::rxc_w )
 				--m_rx_count;
 			}
 		}
-		else if (!m_rx_bit)
+		else if (!(m_rr0 & RR0_BREAK_ABORT) || m_rxd)
 		{
-			// look for start bit
-			if (m_rxd)
+			// break termination detection
+			if ((m_rr0 & RR0_BREAK_ABORT) && m_rxd)
 			{
-				// line idle
-				m_rx_count = (std::max)(m_rx_count, (clocks / 2) + 1) - 1;
-			}
-			else if (!m_rx_count)
-			{
-				// half a bit period expired, start shifting bits
-				m_rx_count = clocks;
-				++m_rx_bit;
-				m_rx_sr = ~uint16_t(0U);
-			}
-			else
-			{
-				// ensure start bit lasts long enough
-				--m_rx_count;
-			}
-		}
-		else if (!m_rx_count)
-		{
-			// sample a data/parity/stop bit
-			if (!m_rxd)
-				m_rx_sr &= ~uint16_t(1U << (m_rx_bit - 1));
-			int const word_length(get_rx_word_length() + ((m_wr4 & WR4_PARITY_ENABLE) ? 1 : 0));
-			bool const stop_reached((word_length + 1) == m_rx_bit);
-			LOGBIT("%s() Channel %c Received %s Bit %d\n", FUNCNAME, 'A' + m_index, stop_reached ? "Stop" : "Data", m_rxd);
-
-			if (stop_reached)
-			{
-				// this is the stop bit - framing error adds a half bit period
-				m_rx_count = m_rxd ? (clocks / 2) : clocks;
-				m_rx_bit = 0;
-
-				LOGRCV("%s() Channel %c Received Data %02x\n", FUNCNAME, 'A' + m_index, m_rx_sr & 0xff);
-
-				// check framing errors and break condition
-				uint16_t const stop_bit = uint16_t(1U) << word_length;
-				bool const brk(!(m_rx_sr & ((stop_bit << 1) - 1)));
-				queue_received(m_rx_sr | stop_bit, (m_rx_sr & stop_bit) ? 0U : RR1_CRC_FRAMING_ERROR);
-
-				// break interrupt
-				if (brk && !m_brk_latched && !(m_rr0 & RR0_BREAK_ABORT))
-				{
-					LOGRCV("Break detected\n");
-					m_rr0 |= RR0_BREAK_ABORT;
+				LOGRCV("Break termination detected\n");
+				m_rr0 &= ~RR0_BREAK_ABORT;
+				if (!m_brk_latched) {
 					m_brk_latched = 1;
 					trigger_ext_int();
 				}
 			}
+			if (!m_rx_bit)
+			{
+				// look for start bit
+				if (m_rxd)
+				{
+					// line idle
+					m_rx_count = (std::max)(m_rx_count, (clocks / 2) + 1) - 1;
+				}
+				else if (!m_rx_count)
+				{
+					// half a bit period expired, start shifting bits
+					m_rx_count = clocks;
+					++m_rx_bit;
+					m_rx_sr = ~uint16_t(0U);
+				}
+				else
+				{
+					// ensure start bit lasts long enough
+					--m_rx_count;
+				}
+			}
+			else if (!m_rx_count)
+			{
+				// sample a data/parity/stop bit
+				if (!m_rxd)
+					m_rx_sr &= ~uint16_t(1U << (m_rx_bit - 1));
+				int const word_length(get_rx_word_length() + ((m_wr4 & WR4_PARITY_ENABLE) ? 1 : 0));
+				bool const stop_reached((word_length + 1) == m_rx_bit);
+				LOGBIT("%s() Channel %c Received %s Bit %d\n", FUNCNAME, 'A' + m_index, stop_reached ? "Stop" : "Data", m_rxd);
+
+				if (stop_reached)
+				{
+					// this is the stop bit - framing error adds a half bit period
+					m_rx_count = m_rxd ? (clocks / 2) : clocks;
+					m_rx_bit = 0;
+
+					LOGRCV("%s() Channel %c Received Data %02x\n", FUNCNAME, 'A' + m_index, m_rx_sr & 0xff);
+
+					// check framing errors and break condition
+					uint16_t const stop_bit = uint16_t(1U) << word_length;
+					bool const brk(!(m_rx_sr & ((stop_bit << 1) - 1)));
+					uint8_t error = brk || (m_rx_sr & stop_bit) ? 0U : RR1_CRC_FRAMING_ERROR;
+					if (m_wr4 & WR4_PARITY_ENABLE)
+					{
+						int const word_length = get_rx_word_length();
+						uint16_t par(m_rx_sr);
+						for (int i = 1; word_length >= i; ++i)
+							par ^= BIT(par, i);
+
+						if (bool(BIT(par, 0)) == bool(m_wr4 & WR4_PARITY_EVEN))
+						{
+							LOGRCV("  Parity error detected\n");
+							error |= RR1_PARITY_ERROR;
+						}
+					}
+
+					queue_received(m_rx_sr | stop_bit, error);
+
+					// break interrupt
+					if (brk && !m_brk_latched && !(m_rr0 & RR0_BREAK_ABORT))
+					{
+						LOGRCV("Break detected\n");
+						m_rr0 |= RR0_BREAK_ABORT;
+						m_brk_latched = 1;
+						trigger_ext_int();
+					}
+				}
+				else
+				{
+					// wait a whole bit period for the next bit
+					m_rx_count = clocks;
+					++m_rx_bit;
+				}
+			}
 			else
 			{
-				// wait a whole bit period for the next bit
-				m_rx_count = clocks;
-				++m_rx_bit;
+				// bit period hasn't expired
+				--m_rx_count;
 			}
-		}
-		else
-		{
-			// bit period hasn't expired
-			--m_rx_count;
 		}
 	}
 	m_rx_clock = state;
@@ -2072,88 +2438,514 @@ WRITE_LINE_MEMBER( z80sio_channel::txc_w )
 	if (!state && m_tx_clock)
 	{
 		// falling edge active
-		if (m_tx_count)
+		if (m_tx_count == 0)
 		{
-			// divide transmit clock
-			--m_tx_count;
-		}
-		else if (!m_tx_bits)
-		{
-			// idle marking line
-			if (!m_txd)
-			{
-				m_txd = 1;
-				if (!(m_wr5 & WR5_SEND_BREAK))
-					out_txd_cb(1);
-			}
-
-			if (((m_wr4 & WR4_STOP_BITS_MASK) != WR4_STOP_BITS_SYNC) && (m_rr0 & RR0_TX_BUFFER_EMPTY))
-			{
-				// when the RTS bit is reset in asynchronous mode, the _RTS output goes high after the transmitter empties
-				if (!(m_wr5 & WR5_RTS) && !m_rts)
-					set_rts(1); // TODO: if transmission is disabled when the data buffer is full, is this still asserted?
-
-				// if transmit buffer is empty in asynchronous mode then all characters have been sent
-				m_rr1 |= RR1_ALL_SENT;
-			}
+			// x1 clock
+			m_tx_phase = true;
+			// Shift delay by a half bit and duplicate last input bit
+			m_tx_delay = (m_tx_delay << 1) | (m_tx_delay & 1);
 		}
 		else
+			m_tx_count--;
+		if (m_tx_count == 0)
 		{
-			bool const sdlc_mode((m_wr4 & (WR4_STOP_BITS_MASK | WR4_SYNC_MODE_MASK)) == (WR4_STOP_BITS_SYNC | WR4_SYNC_MODE_SDLC));
-			bool const framing(m_tx_flags & TX_FLAG_FRAMING);
-			bool const stuff_zero(sdlc_mode && !framing && ((m_tx_hist & 0x1fU) == 0x1fU));
-
-			// have bits, shift out
-			int const db(stuff_zero ? 0 : BIT(m_tx_sr, 0));
-			if (!stuff_zero)
+			m_tx_phase = !m_tx_phase;
+			// Load delay for half bit
+			m_tx_count = get_clock_mode() / 2;
+			// Send out a delayed half bit
+			bool new_txd = BIT(m_tx_delay , 3);
+			LOGBIT("%.6f TX %d DLY %x\n" , machine().time().as_double() , new_txd , m_tx_delay & 0xf);
+			if (new_txd != m_txd && !(m_wr5 & WR5_SEND_BREAK))
 			{
-				LOGBIT("%s() Channel %c transmit %s bit %d m_wr5:%02x\n", FUNCNAME, 'A' + m_index, framing ? "framing" : "data", db, m_wr5);
-				if (m_tx_parity >= m_tx_bits)
-					m_tx_parity = 0;
-				else if (m_tx_parity)
-					m_tx_sr ^= uint16_t(db) << (m_tx_bits - m_tx_parity);
-				m_tx_sr >>= 1;
-
-				if (m_tx_flags & TX_FLAG_CRC)
+				out_txd_cb(new_txd);
+			}
+			m_txd = new_txd;
+			// Check for ALL SENT condition
+			if (!(m_rr1 & RR1_ALL_SENT) && BIT(m_all_sent_delay , 3))
+			{
+				LOGBIT("%.6f ALL_SENT\n" , machine().time().as_double());
+				m_rr1 |= RR1_ALL_SENT;
+				if (!(m_wr5 & WR5_RTS))
+					set_rts(1);
+			}
+			// Shift delay by a half bit and duplicate last input bit
+			// When m_tx_phase is false, LSB is replaced by new bit (see below)
+			m_tx_delay = (m_tx_delay << 1) | (m_tx_delay & 1);
+			m_all_sent_delay <<= 1;
+			if (!m_tx_phase)
+			{
+				// Generate a new bit
+				bool new_bit = false;
+				if ((m_wr4 & (WR4_SYNC_MODE_MASK | WR4_STOP_BITS_MASK)) == (WR4_SYNC_MODE_SDLC | WR4_STOP_BITS_SYNC) &&
+					!(m_tx_flags & TX_FLAG_FRAMING) && (m_tx_hist & 0x1f) == 0x1f)
+					// SDLC, not sending framing & 5 ones in a row: do zero insertion
+					new_bit = false;
+				else
 				{
-					uint16_t const poly((m_wr5 & WR5_CRC16) ? 0x8005U : device_sdlc_consumer_interface::POLY_SDLC);
-					m_tx_crc = device_sdlc_consumer_interface::update_frame_check(poly, m_tx_crc, db);
+					bool get_out = false;
+					while (!get_out)
+					{
+						// Pattern for parity bit in SR?
+						// 17x 1 || 000
+						if ((m_tx_sr & TX_SR_MASK) == 0xffff8)
+						{
+							if ((m_wr4 & WR4_PARITY_ENABLE) != 0 &&
+								(m_tx_flags & TX_FLAG_DATA_TX))
+							{
+								new_bit = m_tx_parity;
+								if (!(m_wr4 & WR4_PARITY_EVEN))
+									new_bit = !new_bit;
+								get_out = true;
+							}
+						}
+						// Pattern for 1st stop bit?
+						// 18x 1 || 00
+						else if ((m_tx_sr & TX_SR_MASK) == 0xffffc)
+						{
+							if ((m_wr4 & WR4_STOP_BITS_MASK) != WR4_STOP_BITS_SYNC)
+							{
+								new_bit = true;
+								get_out = true;
+							}
+						}
+						// Pattern for 2nd stop bit?
+						// 19x 1 || 0
+						else if ((m_tx_sr & TX_SR_MASK) == 0xffffe)
+						{
+							if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_1_5 ||
+								(m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_2)
+							{
+								new_bit = true;
+								if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_1_5)
+									// Force current stop bit to last for 1/2 bit time
+									m_tx_phase = true;
+								get_out = true;
+							}
+						}
+						// Pattern for idle tx?
+						// 20x 1
+						else if (is_tx_idle())
+						{
+							transmit_complete();
+							if (is_tx_idle())
+							{
+								new_bit = true;
+								get_out = true;
+							}
+							else
+								continue;
+						}
+						else if (m_tx_flags & TX_FLAG_CRC_TX)
+						{
+							// CRC bits (from MSB to LSB)
+							new_bit = BIT(m_tx_crc , 15);
+							m_tx_crc <<= 1;
+							if ((m_wr4 & WR4_SYNC_MODE_MASK) == WR4_SYNC_MODE_SDLC)
+								m_tx_crc |= 1;
+							get_out = true;
+						}
+						else
+						{
+							// Start bit or data bits
+							new_bit = BIT(m_tx_sr , 0);
+							// Update parity
+							if (new_bit)
+								m_tx_parity = !m_tx_parity;
+							// Update CRC
+							if (m_tx_flags & TX_FLAG_CRC)
+							{
+								LOGBIT("CRC %04x/%d\n" , m_tx_crc , new_bit);
+								update_crc(m_tx_crc , new_bit);
+							}
+							get_out = true;
+						}
+						// Shift right 1 bit && insert 1 at MSB
+						m_tx_sr = (m_tx_sr >> 1) | 0x80000;
+					}
+					if ((m_wr4 & WR4_STOP_BITS_MASK) != WR4_STOP_BITS_SYNC && is_tx_idle() && (m_rr0 & RR0_TX_BUFFER_EMPTY))
+						m_all_sent_delay |= 1U;
+					else
+						m_all_sent_delay = 0;
 				}
+				if (m_tx_flags & TX_FLAG_FRAMING)
+					m_tx_hist = 0;
+				else
+					m_tx_hist = (m_tx_hist << 1) | new_bit;
+				// Insert new bit in delay register
+				m_tx_delay = (m_tx_delay & ~1U) | new_bit;
 			}
-			else
-			{
-				LOGBIT("%s() Channel %c stuff bit %d m_wr5:%02x\n", FUNCNAME, 'A' + m_index, db, m_wr5);
-			}
-			m_tx_hist = (m_tx_hist << 1) | db;
-
-			// update output line state
-			if (bool(m_txd) != bool(db))
-			{
-				m_txd = db;
-				if (!(m_wr5 & WR5_SEND_BREAK))
-					out_txd_cb(m_txd);
-			}
-
-			// calculate next bit time
-			m_tx_count = get_clock_mode();
-			if (!stuff_zero && !--m_tx_bits)
-			{
-				switch (m_wr4 & WR4_STOP_BITS_MASK)
-				{
-				case WR4_STOP_BITS_SYNC:
-				case WR4_STOP_BITS_1:
-					break;
-				case WR4_STOP_BITS_1_5:
-					m_tx_count = ((m_tx_count * 3) + 1) / 2; // TODO: what does 1.5 stop bits do in TxC/1 mode?  the +1 here rounds it up
-					break;
-				case WR4_STOP_BITS_2:
-					m_tx_count *= 2;
-					break;
-				}
-				transmit_complete();
-			}
-			--m_tx_count;
 		}
 	}
 	m_tx_clock = state;
+}
+
+//**************************************************************************
+//  MK68564 REGISTER INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  cmdreg_r - read from command register
+//-------------------------------------------------
+uint8_t mk68564_channel::cmdreg_r()
+{
+	return m_wr0;
+}
+
+
+//-------------------------------------------------
+//  cmdreg_w - write to command register
+//-------------------------------------------------
+void mk68564_channel::cmdreg_w(uint8_t data)
+{
+	// TODO: bit 0 sets loop mode (no register select)
+	// FIXME: no return from interrupt command
+	do_sioreg_wr0(data);
+}
+
+
+//-------------------------------------------------
+//  modectl_r - read from mode control register
+//-------------------------------------------------
+uint8_t mk68564_channel::modectl_r()
+{
+	return m_wr4;
+}
+
+
+//-------------------------------------------------
+//  modectl_w - write to mode control register
+//-------------------------------------------------
+void mk68564_channel::modectl_w(uint8_t data)
+{
+	do_sioreg_wr4(data);
+}
+
+
+//-------------------------------------------------
+//  intctl_r - read from interrupt control register
+//-------------------------------------------------
+uint8_t mk68564_channel::intctl_r()
+{
+	return m_wr1 | (m_wr5 & WR5_CRC16 ? 0x80 : 0);
+}
+
+
+//-------------------------------------------------
+//  intctl_w - write to interrupt control register
+//-------------------------------------------------
+void mk68564_channel::intctl_w(uint8_t data)
+{
+	if (BIT(data, 7))
+		m_wr5 |= WR5_CRC16;
+	else
+		m_wr5 &= ~WR5_CRC16;
+
+	// TODO: bits 5 and 6 are independent RxRDY and WxRDY enables
+	do_sioreg_wr1(data & 0x7f);
+}
+
+
+//-------------------------------------------------
+//  sync1_r - read from sync word register 1
+//-------------------------------------------------
+uint8_t mk68564_channel::sync1_r()
+{
+	return m_wr6;
+}
+
+
+//-------------------------------------------------
+//  sync1_w - write to sync word register 1
+//-------------------------------------------------
+void mk68564_channel::sync1_w(uint8_t data)
+{
+	do_sioreg_wr6(data);
+}
+
+
+//-------------------------------------------------
+//  sync2_r - read from sync word register 2
+//-------------------------------------------------
+uint8_t mk68564_channel::sync2_r()
+{
+	return m_wr7;
+}
+
+
+//-------------------------------------------------
+//  sync2_w - write to sync word register 2
+//-------------------------------------------------
+void mk68564_channel::sync2_w(uint8_t data)
+{
+	do_sioreg_wr7(data);
+}
+
+
+//-------------------------------------------------
+//  rcvctl_r - read from receiver control register
+//-------------------------------------------------
+uint8_t mk68564_channel::rcvctl_r()
+{
+	return bitswap<8>(m_wr3, 6, 7, 5, 4, 3, 2, 1, 0) & ~WR3_ENTER_HUNT_PHASE;
+}
+
+
+//-------------------------------------------------
+//  rcvctl_w - write to receiver control register
+//-------------------------------------------------
+void mk68564_channel::rcvctl_w(uint8_t data)
+{
+	do_sioreg_wr3(bitswap<8>(data, 6, 7, 5, 4, 3, 2, 1, 0));
+}
+
+
+//-------------------------------------------------
+//  xmtctl_r - read from transmitter control
+//  register
+//-------------------------------------------------
+uint8_t mk68564_channel::xmtctl_r()
+{
+	uint8_t xmtctl = 0;
+	if (m_wr5 & WR5_TX_ENABLE)
+		xmtctl |= 0x01;
+	if (m_wr5 & WR5_RTS)
+		xmtctl |= 0x02;
+	if (m_wr5 & WR5_DTR)
+		xmtctl |= 0x04;
+	if (m_wr5 & WR5_TX_CRC_ENABLE)
+		xmtctl |= 0x08;
+	if (m_wr5 & WR5_SEND_BREAK)
+		xmtctl |= 0x10;
+	if (m_tx_auto_enable)
+		xmtctl |= 0x20;
+	xmtctl |= (m_wr5 & 0x40) << 1;
+	xmtctl |= (m_wr5 & 0x80) >> 1;
+	return xmtctl;
+}
+
+
+//-------------------------------------------------
+//  xmtctl_w - write to transmitter control
+//  register
+//-------------------------------------------------
+void mk68564_channel::xmtctl_w(uint8_t data)
+{
+	uint8_t control =
+		(BIT(data, 0) ? WR5_TX_ENABLE : 0) |
+		(BIT(data, 1) ? WR5_RTS : 0) |
+		(BIT(data, 2) ? WR5_DTR : 0) |
+		(BIT(data, 3) ? WR5_TX_CRC_ENABLE : 0) |
+		(BIT(data, 4) ? WR5_SEND_BREAK : 0) |
+		(data & 0x40) << 1 |
+		(data & 0x80) >> 1 |
+		(m_wr5 & WR5_CRC16);
+	do_sioreg_wr5(control);
+
+	m_tx_auto_enable = BIT(data, 5);
+}
+
+
+//-------------------------------------------------
+//  tcreg_r - read from time constant register
+//-------------------------------------------------
+uint8_t mk68564_channel::tcreg_r()
+{
+	return m_brg_tc;
+}
+
+
+//-------------------------------------------------
+//  tcreg_w - write to time constant register
+//-------------------------------------------------
+void mk68564_channel::tcreg_w(uint8_t data)
+{
+	m_brg_tc = data;
+}
+
+
+//-------------------------------------------------
+//  brgctl_r - read from baud rate generator
+//  control register
+//-------------------------------------------------
+uint8_t mk68564_channel::brgctl_r()
+{
+	// unused bits are all zero
+	return m_brg_control & 0x0f;
+}
+
+
+//-------------------------------------------------
+//  brgctl_w - write to baud rate generator
+//  control register
+//-------------------------------------------------
+void mk68564_channel::brgctl_w(uint8_t data)
+{
+	if (BIT(data, 0))
+		LOGBRG("%s: BRG enabled, divide by %d, RxC %sternal, TxC %sternal (TC = %d, %.1f Hz)\n",
+			machine().describe_context(),
+			BIT(data, 1) ? 64 : 4,
+			BIT(data, 2) ? "in" : "ex",
+			BIT(data, 3) ? "in" : "ex",
+			m_brg_tc,
+			clocks_to_attotime((m_brg_tc ? m_brg_tc : 256) * (BIT(data, 1) ? 64 : 4)).as_hz());
+	else
+		LOGBRG("%s: BRG disabled\n", machine().describe_context());
+
+	m_brg_control = data & 0x0f;
+	m_brg_state = false;
+	brg_update();
+}
+
+
+//-------------------------------------------------
+//  vectrg_w - write to the interrupt vector
+//  register (only one exists)
+//-------------------------------------------------
+void mk68564_device::vectrg_w(uint8_t data)
+{
+	m_chanB->do_sioreg_wr2(data);
+}
+
+
+//-------------------------------------------------
+//  read - 68000 compatible bus read
+//-------------------------------------------------
+uint8_t mk68564_device::read(offs_t offset)
+{
+	mk68564_channel &channel = downcast<mk68564_channel &>(BIT(offset, 4) ? *m_chanB : *m_chanA);
+
+	switch (offset & 0x0f)
+	{
+	case 0x00:
+		return channel.cmdreg_r();
+
+	case 0x01:
+		return channel.modectl_r();
+
+	case 0x02:
+		return channel.intctl_r();
+
+	case 0x03:
+		return channel.sync1_r();
+
+	case 0x04:
+		return channel.sync2_r();
+
+	case 0x05:
+		return channel.rcvctl_r();
+
+	case 0x06:
+		return channel.xmtctl_r();
+
+	case 0x07:
+		return channel.do_sioreg_rr0();
+
+	case 0x08:
+		return channel.do_sioreg_rr1();
+
+	case 0x09:
+		return channel.data_read();
+
+	case 0x0a:
+		return channel.tcreg_r();
+
+	case 0x0b:
+		return channel.brgctl_r();
+
+	case 0x0c: // vector register is addressable through either channel
+		return read_vector();
+
+	default: // unused registers read as FF
+		return 0xff;
+	}
+}
+
+
+//-------------------------------------------------
+//  write - 68000 compatible bus write
+//-------------------------------------------------
+void mk68564_device::write(offs_t offset, uint8_t data)
+{
+	mk68564_channel &channel = downcast<mk68564_channel &>(BIT(offset, 4) ? *m_chanB : *m_chanA);
+
+	switch (offset & 0x0f)
+	{
+	case 0x00:
+		channel.cmdreg_w(data);
+		break;
+
+	case 0x01:
+		channel.modectl_w(data);
+		break;
+
+	case 0x02:
+		channel.intctl_w(data);
+		break;
+
+	case 0x03:
+		channel.sync1_w(data);
+		break;
+
+	case 0x04:
+		channel.sync2_w(data);
+		break;
+
+	case 0x05:
+		channel.rcvctl_w(data);
+		break;
+
+	case 0x06:
+		channel.xmtctl_w(data);
+		break;
+
+	case 0x09:
+		channel.data_write(data);
+		break;
+
+	case 0x0a:
+		channel.tcreg_w(data);
+		break;
+
+	case 0x0b:
+		channel.brgctl_w(data);
+		break;
+
+	case 0x0c: // vector register is addressable through either channel
+		vectrg_w(data);
+		break;
+
+	default:
+		logerror("Write %02X to unused/read-only register %02X\n", data, offset & 0x1f);
+		break;
+	}
+}
+
+//**************************************************************************
+//  MK68564 BAUD RATE GENERATOR
+//**************************************************************************
+
+void mk68564_device::set_xtal(uint32_t clock)
+{
+	assert(!configured());
+	subdevice<mk68564_channel>(CHANA_TAG)->set_clock(clock);
+	subdevice<mk68564_channel>(CHANB_TAG)->set_clock(clock);
+}
+
+void mk68564_channel::brg_update()
+{
+	if (BIT(m_brg_control, 2))
+		rxc_w(m_brg_state);
+	if (BIT(m_brg_control, 3))
+		txc_w(m_brg_state);
+
+	if (BIT(m_brg_control, 0))
+		m_brg_timer->adjust(clocks_to_attotime((m_brg_tc ? m_brg_tc : 256) * (BIT(m_brg_control, 1) ? 32 : 2)));
+	else
+		m_brg_timer->adjust(attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(mk68564_channel::brg_timeout)
+{
+	m_brg_state = !m_brg_state;
+	brg_update();
 }

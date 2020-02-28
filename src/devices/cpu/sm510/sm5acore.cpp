@@ -44,25 +44,21 @@ void sm5a_device::data_5x13x4(address_map &map)
 
 
 // device definitions
-sm5a_device::sm5a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm5a_device(mconfig, SM5A, tag, owner, clock, 1 /* stack levels */, 9 /* o group pins */, 11 /* prg width */, address_map_constructor(FUNC(sm5a_device::program_1_8k), this), 7 /* data width */, address_map_constructor(FUNC(sm5a_device::data_5x13x4), this))
-{
-}
+sm5a_device::sm5a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	sm5a_device(mconfig, SM5A, tag, owner, clock, 1 /* stack levels */, 9 /* o group pins */, 11 /* prg width */, address_map_constructor(FUNC(sm5a_device::program_1_8k), this), 7 /* data width */, address_map_constructor(FUNC(sm5a_device::data_5x13x4), this))
+{ }
 
-sm5a_device::sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
-	: sm500_device(mconfig, type, tag, owner, clock, stack_levels, o_pins, prgwidth, program, datawidth, data)
-{
-}
+sm5a_device::sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+	sm500_device(mconfig, type, tag, owner, clock, stack_levels, o_pins, prgwidth, program, datawidth, data)
+{ }
 
-sm5l_device::sm5l_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm5a_device(mconfig, SM5L, tag, owner, clock, 1, 9, 11, address_map_constructor(FUNC(sm5l_device::program_1_8k), this), 7, address_map_constructor(FUNC(sm5l_device::data_5x13x4), this))
-{
-}
+sm5l_device::sm5l_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	sm5a_device(mconfig, SM5L, tag, owner, clock, 1, 9, 11, address_map_constructor(FUNC(sm5l_device::program_1_8k), this), 7, address_map_constructor(FUNC(sm5l_device::data_5x13x4), this))
+{ }
 
-kb1013vk12_device::kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm5a_device(mconfig, KB1013VK12, tag, owner, clock, 1, 9, 11, address_map_constructor(FUNC(kb1013vk12_device::program_1_8k), this), 7, address_map_constructor(FUNC(kb1013vk12_device::data_5x13x4), this))
-{
-}
+kb1013vk12_device::kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	sm5a_device(mconfig, KB1013VK12, tag, owner, clock, 1, 9, 11, address_map_constructor(FUNC(kb1013vk12_device::program_1_8k), this), 7, address_map_constructor(FUNC(kb1013vk12_device::data_5x13x4), this))
+{ }
 
 
 // disasm

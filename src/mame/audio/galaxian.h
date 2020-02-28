@@ -7,9 +7,7 @@
 
 #include "sound/discrete.h"
 
-#define GAL_AUDIO   "discrete"
-
-class galaxian_sound_device : public device_t, public device_sound_interface
+class galaxian_sound_device : public device_t
 {
 public:
 	galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -23,21 +21,30 @@ public:
 	DECLARE_WRITE8_MEMBER( lfo_freq_w );
 
 protected:
+	galaxian_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	required_device<discrete_device> m_discrete;
 
 private:
 	// internal state
 	uint8_t m_lfo_val;
-	required_device<discrete_device> m_discrete;
 };
 
-DECLARE_DEVICE_TYPE(GALAXIAN, galaxian_sound_device)
+class mooncrst_sound_device : public galaxian_sound_device
+{
+public:
+	mooncrst_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-DISCRETE_SOUND_EXTERN(galaxian_discrete);
-DISCRETE_SOUND_EXTERN(mooncrst_discrete);
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
+DECLARE_DEVICE_TYPE(GALAXIAN_SOUND, galaxian_sound_device)
+DECLARE_DEVICE_TYPE(MOONCRST_SOUND, mooncrst_sound_device)
 
 #endif // MAME_AUDIO_GALAXIAN_H

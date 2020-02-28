@@ -18,13 +18,11 @@ public:
 	// channels must be a power of two
 	void set_channels(int channels) { output_channels = channels; }
 
-	template <class Object> devcb_base &set_irqf(Object &&cb) { return m_irq_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_adcf(Object &&cb) { return m_adc_func.set_callback(std::forward<Object>(cb)); }
 	auto irq_func() { return m_irq_func.bind(); }
 	auto adc_func() { return m_adc_func.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	uint8_t get_channel_strobe() { return m_channel_strobe; }
 

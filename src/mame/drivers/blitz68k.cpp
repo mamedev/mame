@@ -20,6 +20,7 @@ Year  Game                        Manufacturer
 1997  Deuces Wild 2               <unknown>
 1998  Funny Fruit                 Cadillac Jack
 1998  Triple Play                 Cadillac Jack
+1998  Texas Reels                 Cadillac Jack
 199?  Il Pagliaccio               <unknown>
 ----------------------------------------------------------------------
 
@@ -46,6 +47,7 @@ To Do:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m6805/m68hc05.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/saa1099.h"
@@ -63,6 +65,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_nvram(*this, "nvram")
 		, m_frame_buffer(*this, "frame_buffer")
+		, m_blit_rom(*this, "blitter")
 		, m_blit_romaddr(*this, "blit_romaddr")
 		, m_blit_attr1_ram(*this, "blit_attr1_ram")
 		, m_blit_dst_ram_loword(*this, "blitram_loword")
@@ -80,12 +83,14 @@ public:
 	{ }
 
 	void init_bankrob();
+	void init_bankroba();
+	void init_bankrobb();
 	void init_cjffruit();
 	void init_deucesw2();
 	void init_megadble();
-	void init_bankroba();
 	void init_maxidbl();
 	void init_cj3play();
+	void init_texasrls();
 	void init_megadblj();
 	void init_hermit();
 	void init_dualgame();
@@ -100,8 +105,12 @@ public:
 	void dualgame(machine_config &config);
 	void bankroba(machine_config &config);
 	void ramdac_config(machine_config &config);
-private:
+	void texasrls(machine_config &config);
 
+protected:
+	virtual void machine_start() override { m_leds.resolve(); }
+
+private:
 	DECLARE_WRITE16_MEMBER(blit_copy_w);
 	DECLARE_READ8_MEMBER(blit_status_r);
 	DECLARE_WRITE8_MEMBER(blit_x_w);
@@ -197,11 +206,10 @@ private:
 	void ramdac_map(address_map &map);
 	void steaser_map(address_map &map);
 
-	virtual void machine_start() override { m_leds.resolve(); }
-
 	optional_shared_ptr<uint16_t> m_nvram;
 	std::unique_ptr<uint8_t[]> m_blit_buffer;
 	optional_shared_ptr<uint16_t> m_frame_buffer;
+	optional_memory_region m_blit_rom;
 	optional_shared_ptr<uint16_t> m_blit_romaddr;
 	optional_shared_ptr<uint16_t> m_blit_attr1_ram;
 	optional_shared_ptr<uint16_t> m_blit_dst_ram_loword;
@@ -216,6 +224,21 @@ private:
 	required_device<palette_device> m_palette;
 	optional_device<mc6845_device> m_crtc;
 	output_finder<17> m_leds;
+
+	struct blit_t
+	{
+		uint8_t x, y;
+		uint8_t w, h;
+		uint8_t addr[3];
+		uint8_t pen[4];
+		uint8_t flag[8];
+		uint8_t flipx, flipy;
+		uint8_t solid;
+		uint8_t trans;
+		int addr_factor;
+	};
+
+	blit_t m_blit;
 };
 
 /*************************************************************************************************************
@@ -224,40 +247,38 @@ private:
 
 *************************************************************************************************************/
 
-struct blit_t
-{
-	uint8_t x, y;
-	uint8_t w, h;
-	uint8_t addr[3];
-	uint8_t pen[4];
-	uint8_t flag[8];
-	uint8_t flipx, flipy;
-	uint8_t solid;
-	uint8_t trans;
-	int addr_factor;
-} blit;
-
 VIDEO_START_MEMBER(blitz68k_state,blitz68k)
 {
 	m_blit_buffer = std::make_unique<uint8_t[]>(512*256);
-	blit.addr_factor = 2;
+	m_blit.addr_factor = 2;
+
+	save_pointer(NAME(m_blit_buffer), 512*256);
+	save_item(NAME(m_blit.x));
+	save_item(NAME(m_blit.y));
+	save_item(NAME(m_blit.w));
+	save_item(NAME(m_blit.h));
+	save_item(NAME(m_blit.addr));
+	save_item(NAME(m_blit.pen));
+	save_item(NAME(m_blit.flag));
+	save_item(NAME(m_blit.flipx));
+	save_item(NAME(m_blit.flipy));
+	save_item(NAME(m_blit.solid));
+	save_item(NAME(m_blit.trans));
 }
 
 VIDEO_START_MEMBER(blitz68k_state,blitz68k_addr_factor1)
 {
 	VIDEO_START_CALL_MEMBER(blitz68k);
-	blit.addr_factor = 1;
+	m_blit.addr_factor = 1;
 }
 
 uint32_t blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-
 	uint8_t *src = m_blit_buffer.get();
 
-	for(y = 0; y < 256; y++)
+	for(int y = 0; y < 256; y++)
 	{
-		for(x = 0; x < 512; x++)
+		for(int x = 0; x < 512; x++)
 		{
 			bitmap.pix32(y, x) = m_palette->pen(*src++);
 		}
@@ -271,13 +292,11 @@ uint32_t blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rg
 
 uint32_t blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-
 	uint16_t *src = m_frame_buffer;
 
-	for(y = 0; y < 256; y++)
+	for(int y = 0; y < 256; y++)
 	{
-		for(x = 0; x < 512; )
+		for(int x = 0; x < 512; )
 		{
 			uint16_t pen = *src++;
 			bitmap.pix32(y, x++) = m_palette->pen((pen >>  8) & 0xf);
@@ -297,7 +316,7 @@ uint32_t blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bi
     To do:
     - register names should be properly renamed
       "transpen" 8/2 is for layer clearance;
-      "transpen" 10/2 is the trasparency pen;
+      "transpen" 10/2 is the transparency pen;
       "vregs" are pen selects, they select the proper color to render, and are tied to the first three gfx offsets;
     - shrinking bit? (some pictures in steaser, "00" on top of ilpag)
     - draw direction (card choose in steaser, in service mode)
@@ -310,7 +329,7 @@ uint32_t blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bi
 
 WRITE16_MEMBER(blitz68k_state::blit_copy_w)
 {
-	uint8_t *blit_rom = memregion("blitter")->base();
+	uint8_t *blit_rom = m_blit_rom->base();
 	uint32_t blit_dst_xpos;
 	uint32_t blit_dst_ypos;
 	int x,y,x_size,y_size;
@@ -348,14 +367,14 @@ WRITE16_MEMBER(blitz68k_state::blit_copy_w)
 			{
 				uint8_t pen_helper;
 
-				pen_helper = blit_rom[src] & 0xff;
+				pen_helper = blit_rom[BYTE_XOR_BE(src)] & 0xff;
 				if(m_blit_transpen[0xa/2] & 0x100) //pen is opaque register
 				{
 					if(pen_helper)
-						m_blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 3) ? ((m_blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[src];
+						m_blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 3) ? ((m_blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[BYTE_XOR_BE(src)];
 				}
 				else
-					m_blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 3) ? ((m_blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[src];
+					m_blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 3) ? ((m_blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[BYTE_XOR_BE(src)];
 			}
 
 			src++;
@@ -377,11 +396,11 @@ READ8_MEMBER(blitz68k_state::blit_status_r)
 
 WRITE8_MEMBER(blitz68k_state::blit_x_w)
 {
-	blit.x = data;
+	m_blit.x = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_y_w)
 {
-	blit.y = data;
+	m_blit.y = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_xy_w)
 {
@@ -394,11 +413,11 @@ WRITE8_MEMBER(blitz68k_state::blit_xy_w)
 
 WRITE8_MEMBER(blitz68k_state::blit_w_w)
 {
-	blit.w = data;
+	m_blit.w = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_h_w)
 {
-	blit.h = data;
+	m_blit.h = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_wh_w)
 {
@@ -411,11 +430,11 @@ WRITE8_MEMBER(blitz68k_state::blit_wh_w)
 
 WRITE8_MEMBER(blitz68k_state::blit_addr0_w)
 {
-	blit.addr[0] = data;
+	m_blit.addr[0] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_addr1_w)
 {
-	blit.addr[1] = data;
+	m_blit.addr[1] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_addr01_w)
 {
@@ -426,63 +445,63 @@ WRITE8_MEMBER(blitz68k_state::blit_addr01_w)
 }
 WRITE8_MEMBER(blitz68k_state::blit_addr2_w)
 {
-	blit.addr[2] = data;
+	m_blit.addr[2] = data;
 }
 
 
 WRITE8_MEMBER(blitz68k_state::blit_pens_w)
 {
-	blit.pen[offset] = data;
+	m_blit.pen[offset] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_pen0_w)
 {
-	blit.pen[0] = data;
+	m_blit.pen[0] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_pen1_w)
 {
-	blit.pen[1] = data;
+	m_blit.pen[1] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_pen2_w)
 {
-	blit.pen[2] = data;
+	m_blit.pen[2] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_pen3_w)
 {
-	blit.pen[3] = data;
+	m_blit.pen[3] = data;
 }
 
 
 WRITE8_MEMBER(blitz68k_state::blit_flag0_w)
 {
-	blit.flag[0] = data;
+	m_blit.flag[0] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_flag1_w)
 {
-	blit.flag[1] = data;
+	m_blit.flag[1] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_flipx_w)
 {
-	blit.flipx = data;
+	m_blit.flipx = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_flipy_w)
 {
-	blit.flipy = data;
+	m_blit.flipy = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_solid_w)
 {
-	blit.solid = data;
+	m_blit.solid = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_trans_w)
 {
-	blit.trans = data;
+	m_blit.trans = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_flag6_w)
 {
-	blit.flag[6] = data;
+	m_blit.flag[6] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_flag7_w)
 {
-	blit.flag[7] = data;
+	m_blit.flag[7] = data;
 }
 
 WRITE8_MEMBER(blitz68k_state::blit_flags_w)
@@ -498,40 +517,40 @@ WRITE8_MEMBER(blitz68k_state::blit_flags_w)
 
 WRITE8_MEMBER(blitz68k_state::blit_draw_w)
 {
-	uint8_t *blit_rom  = memregion("blitter")->base();
-	int blit_romsize = memregion("blitter")->bytes();
+	uint8_t *blit_rom = m_blit_rom->base();
+	int blit_romsize = m_blit_rom->bytes();
 	uint32_t blit_dst_xpos;
 	uint32_t blit_dst_ypos;
 	int x, y, x_size, y_size;
 	uint32_t src;
 
 	logerror("%s: blit x=%02x y=%02x w=%02x h=%02x addr=%02x%02x%02x pens=%02x %02x %02x %02x flag=%02x %02x %02x %02x - %02x %02x %02x %02x\n", machine().describe_context(),
-				blit.x,  blit.y, blit.w, blit.h,
-				blit.addr[2], blit.addr[1], blit.addr[0],
-				blit.pen[0], blit.pen[1], blit.pen[2], blit.pen[3],
-				blit.flag[0], blit.flag[1], blit.flipx, blit.flipy,     blit.solid, blit.trans, blit.flag[6], blit.flag[7]
+				m_blit.x,  m_blit.y, m_blit.w, m_blit.h,
+				m_blit.addr[2], m_blit.addr[1], m_blit.addr[0],
+				m_blit.pen[0], m_blit.pen[1], m_blit.pen[2], m_blit.pen[3],
+				m_blit.flag[0], m_blit.flag[1], m_blit.flipx, m_blit.flipy,     m_blit.solid, m_blit.trans, m_blit.flag[6], m_blit.flag[7]
 	);
 
-	x_size = (blit.w + 1) * 2;
-	y_size = (blit.h + 1);
+	x_size = (m_blit.w + 1) * 2;
+	y_size = (m_blit.h + 1);
 
-	blit_dst_ypos = (blit.y);
-	blit_dst_xpos = (blit.x);
+	blit_dst_ypos = (m_blit.y);
+	blit_dst_xpos = (m_blit.x);
 
 	blit_dst_xpos *= 2;
 
-	src = (blit.addr[2] << 16) | (blit.addr[1] << 8) | blit.addr[0];
+	src = (m_blit.addr[2] << 16) | (m_blit.addr[1] << 8) | m_blit.addr[0];
 
 	uint8_t pen = 0;
-	if (blit.solid)
+	if (m_blit.solid)
 	{
 		pen = src & 0xff;
 	}
 
-	src *= blit.addr_factor;
+	src *= m_blit.addr_factor;
 
-	int flipx = (blit.flipx == 0);
-	int flipy = (blit.flipy == 0);
+	int flipx = (m_blit.flipx == 0);
+	int flipy = (m_blit.flipy == 0);
 
 	for (y = 0; y < y_size; y++)
 	{
@@ -540,17 +559,17 @@ WRITE8_MEMBER(blitz68k_state::blit_draw_w)
 			int drawx = (blit_dst_xpos + (flipx ? -x+1 : x)) & 0x1ff;
 			int drawy = (blit_dst_ypos + (flipy ? -y+1 : y)) & 0x0ff;
 
-			if (!blit.solid)
+			if (!m_blit.solid)
 			{
 				src %= blit_romsize;
-				pen = blit_rom[src];
+				pen = blit_rom[BYTE_XOR_BE(src)];
 				src++;
 			}
 
-			if (pen || !blit.trans)
+			if (pen || !m_blit.trans)
 			{
 				if (pen <= 3)
-					pen = blit.pen[pen] & 0xf;
+					pen = m_blit.pen[pen] & 0xf;
 
 				m_blit_buffer[drawy * 512 + drawx] = pen;
 			}
@@ -560,8 +579,8 @@ WRITE8_MEMBER(blitz68k_state::blit_draw_w)
 	// used by cjffruit in service mode (girl select screen)
 	blit_dst_xpos += (flipx ?        +1 :      0);
 	blit_dst_ypos += (flipy ? -y_size+1 : y_size);
-	blit.x = blit_dst_xpos / 2;
-	blit.y = blit_dst_ypos;
+	m_blit.x = blit_dst_xpos / 2;
+	m_blit.y = blit_dst_ypos;
 }
 
 WRITE8_MEMBER(blitz68k_state::blit_hwyxa_draw_w)
@@ -639,8 +658,8 @@ void blitz68k_state::ilpag_map(address_map &map)
 	map(0x100000, 0x1fffff).rom().region("blitter", 0);
 	map(0x200000, 0x20ffff).ram().share("nvram");
 
-//  AM_RANGE(0x800000, 0x800001) AM_READ(test_r)
-//  AM_RANGE(0x880000, 0x880001) AM_READ(test_r)
+//  map(0x800000, 0x800001).r(FUNC(blitz68k_state::test_r));
+//  map(0x880000, 0x880001).r(FUNC(blitz68k_state::test_r));
 
 	map(0x900000, 0x900000).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x900002, 0x900002).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -656,9 +675,9 @@ void blitz68k_state::ilpag_map(address_map &map)
 
 	map(0xc00000, 0xc00001).w(FUNC(blitz68k_state::lamps_w));
 	map(0xc00180, 0xc00181).portr("IN2");
-//  AM_RANGE(0xc00200, 0xc00201) AM_WRITE(sound_write_w)
+//  map(0xc00200, 0xc00201).w(FUNC(blitz68k_state::sound_write_w));
 	map(0xc00380, 0xc00381).portr("IN3");
-//  AM_RANGE(0xc00300, 0xc00301) AM_WRITE(irq_callback_w)
+//  map(0xc00300, 0xc00301).w(FUNC(blitz68k_state::irq_callback_w));
 }
 
 void blitz68k_state::steaser_map(address_map &map)
@@ -668,9 +687,9 @@ void blitz68k_state::steaser_map(address_map &map)
 	map(0x200000, 0x20ffff).ram().share("nvram");
 
 	map(0x800000, 0x800001).r(FUNC(blitz68k_state::test_r));
-//  AM_RANGE(0x840000, 0x840001) AM_WRITE(sound_write_w)
+//  map(0x840000, 0x840001).w(FUNC(blitz68k_state::sound_write_w));
 	map(0x880000, 0x880001).r(FUNC(blitz68k_state::test_r));
-//  AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE(sound_write_w)
+//  map(0x8c0000, 0x8c0001).w(FUNC(blitz68k_state::sound_write_w));
 
 	map(0x900000, 0x900000).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x900002, 0x900002).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -688,11 +707,11 @@ void blitz68k_state::steaser_map(address_map &map)
 	map(0x9e0000, 0x9e0001).r(FUNC(blitz68k_state::blitter_status_r));
 	map(0x9f0000, 0x9f0001).nopw(); //???
 
-//  AM_RANGE(0xc00000, 0xc00001) AM_WRITE(lamps_w)
+//  map(0xc00000, 0xc00001).w(FUNC(blitz68k_state::lamps_w));
 	map(0xbd0000, 0xbd0001).r(FUNC(blitz68k_state::test_r));
-//  AM_RANGE(0xc00200, 0xc00201) AM_WRITE(sound_write_w)
-//  AM_RANGE(0xc00380, 0xc00381) AM_READ_PORT("IN3")
-//  AM_RANGE(0xc00300, 0xc00301) AM_WRITE(irq_callback_w)
+//  map(0xc00200, 0xc00201).w(FUNC(blitz68k_state::sound_write_w));
+//  map(0xc00380, 0xc00381).portr("IN3");
+//  map(0xc00300, 0xc00301).w(FUNC(blitz68k_state::irq_callback_w));
 }
 
 /*************************************************************************************************************
@@ -833,7 +852,7 @@ void blitz68k_state::bankroba_map(address_map &map)
 	map(0x900002, 0x900002).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x900004, 0x900004).w("ramdac", FUNC(ramdac_device::mask_w));
 
-//  AM_RANGE(0x940000, 0x940001) AM_WRITE   // lev 6
+//  map(0x940000, 0x940001).w   // lev 6
 
 	map(0x980000, 0x980000).w(FUNC(blitz68k_state::blit_flag0_w));
 	map(0x980002, 0x980002).w(FUNC(blitz68k_state::blit_flag1_w));
@@ -925,17 +944,17 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
 READ8_MEMBER(blitz68k_state::crtc_r)
 {
 	if (offset)
-		return m_crtc->register_r(space, 0);
+		return m_crtc->register_r();
 	else
-		return m_crtc->status_r(space, 0);
+		return m_crtc->status_r();
 }
 
 WRITE8_MEMBER(blitz68k_state::crtc_w)
 {
 	if (offset)
-		m_crtc->register_w(space, 0, data);
+		m_crtc->register_w(data);
 	else
-		m_crtc->address_w(space, 0, data);
+		m_crtc->address_w(data);
 }
 
 WRITE16_MEMBER(blitz68k_state::crtc_lpen_w)
@@ -1720,24 +1739,25 @@ void blitz68k_state::ramdac_config(machine_config &config)
 	ramdac.set_addrmap(0, &blitz68k_state::ramdac_map);
 }
 
-MACHINE_CONFIG_START(blitz68k_state::ilpag)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, 11059200 )  // ?
-	MCFG_DEVICE_PROGRAM_MAP(ilpag_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state, irq4_line_hold) //3 & 6 used, mcu comms?
+void blitz68k_state::ilpag(machine_config &config)
+{
+	M68000(config, m_maincpu, 11059200 );  // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::ilpag_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq4_line_hold)); //3 & 6 used, mcu comms?
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-MACHINE_CONFIG_END
+}
 
 /*
 20089f = 1 -> menu
@@ -1777,47 +1797,56 @@ TIMER_DEVICE_CALLBACK_MEMBER(blitz68k_state::steaser_mcu_sim)
 }
 
 
-MACHINE_CONFIG_START(blitz68k_state::steaser)
+void blitz68k_state::steaser(machine_config &config)
+{
 	ilpag(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(steaser_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state, irq5_line_hold) //3, 4 & 6 used, mcu comms?
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::steaser_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq5_line_hold)); //3, 4 & 6 used, mcu comms?
 
 	TIMER(config, "coinsim").configure_periodic(FUNC(blitz68k_state::steaser_mcu_sim), attotime::from_hz(10000));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(blitz68k_state::cjffruit)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(22'118'400)/2)
-	MCFG_DEVICE_PROGRAM_MAP(cjffruit_map)
+void blitz68k_state::cjffruit(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(22'118'400)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::cjffruit_map);
 
 	// MC68HC705C8P (Sound MCU)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-8-1);
+	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
 	R6545_1(config, m_crtc, XTAL(22'118'400)/8);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
-	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr));
 	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq1));
 
 	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-MACHINE_CONFIG_END
+}
 
+void blitz68k_state::texasrls(machine_config &config)
+{
+	cjffruit(config);
 
-MACHINE_CONFIG_START(blitz68k_state::bankrob)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200))
-	MCFG_DEVICE_PROGRAM_MAP(bankrob_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
+	// not hooked up yet (some reads and writes in unimplemented features of the MCU core), but it's dumped
+	M68HC705C8A(config, "mcu", XTAL(4'000'000)); // clock and divider not verified, using the xtal found near the MCU
+}
+
+void blitz68k_state::bankrob(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(11'059'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::bankrob_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq3_line_hold));   // protection prevents correct irq frequency by crtc
 	// irq 2 reads from MCUs
 
 	// MC68HC705C8P (MCU1)
@@ -1826,89 +1855,92 @@ MACHINE_CONFIG_START(blitz68k_state::bankrob)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
-	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0+4, 256-1-4);
+	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
-	H46505(config, m_crtc, XTAL(11'059'200)/4);
+	HD6845S(config, m_crtc, XTAL(11'059'200)/4);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
-	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr));
 	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq3));
 
 	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(blitz68k_state::bankroba)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200) )
-	MCFG_DEVICE_PROGRAM_MAP(bankroba_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq5_line_hold)   // protection prevents correct irq frequency by crtc
+void blitz68k_state::bankroba(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(11'059'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::bankroba_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq5_line_hold));   // protection prevents correct irq frequency by crtc
 	// irq 3,4 read from MCUs
 
 	// MC68HC705C8P (MCU)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+7, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0+7, 256-1);
+	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
-	H46505(config, m_crtc, XTAL(11'059'200)/4);
+	HD6845S(config, m_crtc, XTAL(11'059'200)/4);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
-	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr));
 	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq5));
 
 	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k_addr_factor1)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(blitz68k_state::deucesw2)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(22'118'400) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(deucesw2_map)
+void blitz68k_state::deucesw2(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(22'118'400) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::deucesw2_map);
 	// irq 2 reads from MCUs
 
 	// MC68HC705C8P (MCU)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
 	R6545_1(config, m_crtc, XTAL(22'118'400)/8);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
-	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr));
 	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq3));
 
 	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(blitz68k_state::dualgame)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200) )
-	MCFG_DEVICE_PROGRAM_MAP(dualgame_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq2_line_hold) // lev 2 = MCUs, lev 3 = vblank
+void blitz68k_state::dualgame(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(11'059'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::dualgame_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq2_line_hold)); // lev 2 = MCUs, lev 3 = vblank
 
 	// MC68HC705C8P (MCU1)
 
@@ -1916,58 +1948,60 @@ MACHINE_CONFIG_START(blitz68k_state::dualgame)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
-	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0+4, 256-1-4);
+	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
-	H46505(config, m_crtc, XTAL(11'059'200)/4);
+	HD6845S(config, m_crtc, XTAL(11'059'200)/4);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
-	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr));
 	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq3));
 
 	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(blitz68k_state::hermit)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(22'118'400)/2 )
-	MCFG_DEVICE_PROGRAM_MAP(hermit_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq1_line_hold)   // protection prevents correct irq frequency by crtc
+void blitz68k_state::hermit(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(22'118'400)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::hermit_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq1_line_hold));   // protection prevents correct irq frequency by crtc
 
 	// MC68HC705C8P (MCU)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
-	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0+4, 256-1-4);
+	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
-	H46505(config, m_crtc, XTAL(22'118'400)/8);
+	HD6845S(config, m_crtc, XTAL(22'118'400)/8);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
-	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr));
 	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq1));
 
 	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(blitz68k_state::maxidbl)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200))
-	MCFG_DEVICE_PROGRAM_MAP(maxidbl_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
+void blitz68k_state::maxidbl(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(11'059'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::maxidbl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq3_line_hold));   // protection prevents correct irq frequency by crtc
 	// irq 2 reads from MCUs
 
 	// MC68HC705C8P (MCU1)
@@ -1978,18 +2012,18 @@ MACHINE_CONFIG_START(blitz68k_state::maxidbl)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k_noblit)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k_noblit));
 
-	H46505(config, m_crtc, XTAL(11'059'200)/4);
+	HD6845S(config, m_crtc, XTAL(11'059'200)/4);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
-	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr));
 	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq3));
 
 	ramdac_config(config);
@@ -2058,7 +2092,7 @@ ROM_START( bankrob )
 	ROM_REGION( 0x2000, "mcu2", 0 ) // 68HC705C8P code
 	ROM_LOAD( "xpi-2_2.6.u7", 0x0000, 0x2000, NO_DUMP ) // "for SPI & MPI 06/08/1995"
 
-	ROM_REGION( 0x100000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x100000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD16_BYTE( "unknown_label.u70", 0x00000, 0x80000, CRC(35225bf6) SHA1(cd3176ab43c0678c6b9a92b9fafea116babdd534) )
 	ROM_LOAD16_BYTE( "unknown_label.u54", 0x00001, 0x80000, CRC(c7c0c2d1) SHA1(3b3b6954fbded65418492374aaa94e3c60af69c5) )
 
@@ -2126,7 +2160,7 @@ ROM_START( bankroba )
 	ROM_REGION( 0x2000, "mcu2", 0 ) // 68HC705C8P code
 	ROM_LOAD( "bankroba_sub.mcu", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x100000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD( "dkbkus_2.31-c.u46", 0x00000, 0x80000, CRC(d94a3ead) SHA1(e599b8d110bae16f83b3969834aa9b01076e2310) )
 	ROM_LOAD( "dkbkus_2.31-d.u51", 0x80000, 0x80000, CRC(834b63bb) SHA1(da6b5e2fc1626044ecddf438c696e606a72d6164) )
 
@@ -2147,6 +2181,34 @@ ROM_START( bankroba )
 	ROM_LOAD( "palce16v8h.u69",   0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "palce16v8h.u71",   0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "palce16v8h.u72",   0x000, 0x117, NO_DUMP )
+ROM_END
+
+ROM_START( bankrobb ) // DK-B main PCB + 8L74 sub PCB
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "bank 1.23-b.u32", 0x00000, 0x20000, CRC(81f88277) SHA1(ad0127d0e4c79074d4695288f31211868c097e3a) )
+	ROM_LOAD16_BYTE( "bank 1.23-a.u31", 0x00001, 0x20000, CRC(dc72bad8) SHA1(a885279c3de0cbe55836023a87b44e9f577f19d8) )
+
+	ROM_REGION( 0x2000, "mcu1", 0 ) // 68HC705C8P code
+	ROM_LOAD( "c8-bank.u2", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x2000, "mcu2", 0 ) // on sub PCB, 68HC705C8P code
+	ROM_LOAD( "8l6_74_-4.01.u18", 0x0000, 0x2000, NO_DUMP ) // actual label 8l6(74)-4.01
+
+	ROM_REGION16_BE( 0x180000, "blitter", 0 ) // data for the blitter
+	ROM_LOAD( "bank-c.u46", 0x00000,  0x80000, CRC(f9f77d0f) SHA1(e56e78e7b6abff99fa228bcbe3eccf1eb40c1ee8) )
+	ROM_LOAD( "bank-d.u51", 0x80000,  0x80000, CRC(4145d57c) SHA1(bec349706d0d06ed52252835313616ae6e023b28) )
+	ROM_LOAD( "bank-e.u61", 0x100000, 0x80000, CRC(0d75efbb) SHA1(0d4dd5f3d1fdd31e0f99acdc23f05d8e67393a48) ) // u61 might be wrong, not readable on the pics
+
+	ROM_REGION( 0x80000, "samples", 0 ) // 8 bit unsigned
+	ROM_LOAD( "bank-g.u18", 0x00000, 0x80000, CRC(009a5fea) SHA1(bf76a8f5dcf88bb6f6f9f60b4423157a262a6f78) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "pal20x10a.u12",  0x000, 0x0cc, NO_DUMP )
+	ROM_LOAD( "pal20x10a.u40",  0x000, 0x0cc, NO_DUMP )
+	ROM_LOAD( "pal20x8a.u43",   0x000, 0x0cc, NO_DUMP )
+	ROM_LOAD( "pal20x8a.u48",   0x000, 0x0cc, NO_DUMP )
+	ROM_LOAD( "pal20x8a.u52",   0x000, 0x0cc, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u71", 0x000, 0x117, NO_DUMP )
 ROM_END
 
 /*************************************************************************************************************
@@ -2193,7 +2255,7 @@ ROM_START( cj3play )
 	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8A code
 	ROM_LOAD( "cj-tripleplay_2.4.c8", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x200000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD16_BYTE( "cjtripleply-cj_1.10-d.u68", 0x000000, 0x80000, CRC(8bbcf296) SHA1(e7e6e88f5f3065e7df7fff45429fdda1404418d6) )
 	ROM_LOAD16_BYTE( "cjtripleply-cj_1.10-c.u75", 0x000001, 0x80000, CRC(3dd101e0) SHA1(01241a880e72834282dd7447273ffc332a105ad1) )
 	ROM_LOAD16_BYTE( "cjtripleply-cj_1.10-f.u51", 0x100000, 0x80000, CRC(c8ccf1a7) SHA1(7a7b0f68d6ed5894fb4deb93fbf8053aff4fdb35) )
@@ -2242,7 +2304,7 @@ Other:
 
 Note:
   Game supports a Centronics iDP-3541 printer (4-pin connector) and a Deltronics DL-1275 ticket dispenser.
-  It is also available on board CJ-8L REV-B LEV-1, wih a R6545AP as CRT controller.
+  It is also available on board CJ-8L REV-B LEV-1, with a R6545AP as CRT controller.
 
 *************************************************************************************************************/
 
@@ -2253,7 +2315,7 @@ ROM_START( cjffruit )
 	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
 	ROM_LOAD( "cjfunfruit_2.3.c8", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x200000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD16_BYTE( "cjfunfruit-cj_1.13-d.u68", 0x000000, 0x80000, CRC(33ccdc3f) SHA1(8d81e25c5a38f280c6fe5710937c876dcb679e61) )
 	ROM_LOAD16_BYTE( "cjfunfruit-cj_1.13-c.u75", 0x000001, 0x80000, CRC(93854506) SHA1(09fd85d60ab723883d28a12f56dbb0cb2b03907f) )
 	ROM_LOAD16_BYTE( "cjfunfruit-cj_1.13-f.u51", 0x100000, 0x80000, CRC(f5de1072) SHA1(943a82899ca6a07991fa4031d2ff96f625c9d6f5) )
@@ -2261,6 +2323,30 @@ ROM_START( cjffruit )
 
 	ROM_REGION( 0x80000, "samples", 0 ) // 8 bit unsigned
 	ROM_LOAD( "cjfunfruit-cj_1.13-g.u50", 0x00000, 0x80000, CRC(5fb53d3e) SHA1(f4a37b00a9417440685d198f1375b615848e7fb6) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8d_vdp.u15", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_vdo.u53", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck2.u64", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck1.u69", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_dec.u70", 0x000, 0x117, NO_DUMP )
+ROM_END
+
+ROM_START( texasrls ) // CJ-8L REV-D, same PCB as cjffruit
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD( "cjtxsreels ii-cj 2.00-a 040 for cjab checksum 855c.u65", 0x00000, 0x80000, CRC(8d4bf476) SHA1(dc5d72f35d4dffb3726d37f2975ba5277c1dde36) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
+	ROM_LOAD( "cjtxsreels ii 5.2 for cj-8l.u30", 0x0000, 0x2000, CRC(1177ce65) SHA1(c0a8fba886e03c579c0f33b23020fbe0a511da36) )
+
+	ROM_REGION16_BE( 0x200000, "blitter", 0 ) // data for the blitter
+	ROM_LOAD16_BYTE( "cjtxsreels ii-cj 2.00-d 040 for cjab checksum b8d6.u68", 0x000000, 0x80000, CRC(e4f9e314) SHA1(a71e0a3b4ad528e9af36cf158866a76aea713d0d) )
+	ROM_LOAD16_BYTE( "cjtxsreels ii-cj 2.00-c 040 for cjab checksum 0e27.u75", 0x000001, 0x80000, CRC(2279ade0) SHA1(a219a143d113d433878033222da22880f813b14c) )
+	ROM_LOAD16_BYTE( "cjtxsreels ii-cj 2.00-f 020 for cjab checksum 3eee.u51", 0x100000, 0x80000, CRC(d1b5f9e3) SHA1(f7fd89d19828c4309cb17b699e506bd6fba1f16a) )
+	ROM_LOAD16_BYTE( "cjtxsreels ii-cj 2.00-e 020 for cjab checksum 9adf.u61", 0x100001, 0x80000, CRC(0c7d6175) SHA1(ba925faa80224f2c43dcb58b7c34a26114cd6494) )
+
+	ROM_REGION( 0x80000, "samples", 0 ) // 8 bit unsigned
+	ROM_LOAD( "cjtxreels ii-cj 2.00-g 040 for cjab checksum 011f.u50", 0x00000, 0x80000, CRC(5fb53d3e) SHA1(f4a37b00a9417440685d198f1375b615848e7fb6) )
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "gal16v8d_vdp.u15", 0x000, 0x117, NO_DUMP )
@@ -2318,7 +2404,7 @@ ROM_START( deucesw2 )
 	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
 	ROM_LOAD( "cbc-8l_2.0.u31", 0x0000, 0x2000, NO_DUMP )   // "for CBC-8L REV..." (label is only partially readable)
 
-	ROM_REGION( 0x80000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x80000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD16_BYTE( "cb2wild-ah-2.02f-d.u87", 0x00000, 0x40000, CRC(7ab3ea30) SHA1(5e435f2a6ea169b827ae0f3da6a8afda0b636d7e) ) // "for CBC ($AA97)"
 	ROM_LOAD16_BYTE( "cb2wild-ah-2.02f-c.u94", 0x00001, 0x40000, CRC(5b465430) SHA1(df428e3309732376d0999ad75567e264b7db9a1c) ) // "for CBC ($465A)"
 
@@ -2396,7 +2482,7 @@ ROM_START( dualgame )
 	ROM_REGION( 0x2000, "mcu2", 0 ) // 68HC705C8P code
 	ROM_LOAD( "dualgame.u9", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x100000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD16_BYTE( "mpduga_0.01-d.u69", 0x00000, 0x80000, CRC(2f65e87e) SHA1(ded9d75ebb46e061615dac408f86dad14df9d30b) )
 	ROM_LOAD16_BYTE( "mpduga_0.01-c.u68", 0x00001, 0x80000, CRC(bc5b4738) SHA1(69bcc15d3e7524ba26dad0e29919461fbd0a8736) )
 
@@ -2449,7 +2535,7 @@ ROM_START( hermit )
 	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
 	ROM_LOAD( "lc-hermit_1.00.u51", 0x0000, 0x2000, NO_DUMP )   // "for LC-8L 26/04/1995"
 
-	ROM_REGION( 0x100000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x100000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD16_BYTE( "unknown_label.u2", 0x00000, 0x80000, CRC(fc8b9ec6) SHA1(c7515cf78d68a1ae7f2e8e50fe3083db2547c314) )
 	ROM_LOAD16_BYTE( "unknown_label.u3", 0x00001, 0x80000, CRC(0a621d76) SHA1(66cabf4e233dc784851c9fb07f18658c10744cd7) )
 
@@ -2502,7 +2588,7 @@ ROM_START( ilpag )
 	ROM_REGION( 0x800, "mcu", 0 ) // 87C748 code
 	ROM_LOAD( "87c748.u132", 0x000, 0x800, NO_DUMP )
 
-	ROM_REGION( 0x100000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x100000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD( "graf1.u46",   0x00000, 0x80000, CRC(cf745964) SHA1(7af4a6c0b8d01c0d1b71bc5330a257d2fa712611) )
 	ROM_LOAD( "graf2.u51",   0x80000, 0x80000, CRC(2d64d3b5) SHA1(8fdb943d0aedf12706ce0a772c8f5155fa03e8c7) )
 ROM_END
@@ -2767,7 +2853,7 @@ ROM_START( steaser )
 	ROM_REGION( 0x1000, "mcu2", 0 ) // 68705
 	ROM_LOAD( "mc68hc705c8p_sub.mcu", 0x00000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x200000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD( "u46.2", 0x000000, 0x80000, CRC(c4a5e47b) SHA1(9f3d3124c76c0bdf8cdca849e1d921a335e433b6) )
 	ROM_LOAD( "u51.3", 0x080000, 0x80000, CRC(4dc57435) SHA1(7dfa6f9e35986dd48869786abbe70103f336bcb1) )
 	ROM_LOAD( "u61.4", 0x100000, 0x80000, CRC(d8d8dc6f) SHA1(5a76b1fd1a3a532e5ff2de127286ace7d3567c58) )
@@ -2812,6 +2898,16 @@ void blitz68k_state::init_bankroba()
 	ROM[0x178ec/2] = 0x4e71;
 }
 
+void blitz68k_state::init_bankrobb()
+{
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+
+	// loop
+	ROM[0x1dae/2] = 0x4e71;
+
+	ROM[0xf912/2] = 0x67ee;
+}
+
 void blitz68k_state::init_cj3play()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
@@ -2837,6 +2933,17 @@ void blitz68k_state::init_cjffruit()
 
 	// ERROR CHECKSUM ROM PROGRAM
 	ROM[0x1e7b8/2] = 0x6050;
+}
+
+void blitz68k_state::init_texasrls()
+{
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+
+	// WRONG C8 #1
+	ROM[0x11f3a/2] = 0x6028; // TODO: the dump is available, hook up the MCU properly (it would give sound to the driver, too).
+
+	// ERROR CHECKSUM ROM PROGRAM
+	ROM[0x211bc/2] = 0x6050;
 }
 
 void blitz68k_state::init_deucesw2()
@@ -2919,10 +3026,12 @@ GAME( 1990,  megadble, 0,       maxidbl,  maxidbl,  blitz68k_state, init_megadbl
 GAME( 1993,  steaser,  0,       steaser,  steaser,  blitz68k_state, empty_init,    ROT0, "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
 GAME( 1993,  bankrob,  0,       bankrob,  bankrob,  blitz68k_state, init_bankrob,  ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC APRIL 1995
 GAME( 1993,  bankroba, bankrob, bankroba, bankrob,  blitz68k_state, init_bankroba, ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC MAY 10TH, 1993
-GAME( 1993?, poker52,  0,       maxidbl,  maxidbl,  blitz68k_state, empty_init,    ROT0, "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                  // MARCH 10TH, 1994
+GAME( 1993,  bankrobb, bankrob, bankroba, bankrob,  blitz68k_state, init_bankrobb, ROT0, "Blitz Systems Inc.",             "Bank Robbery (Ver. 1.23)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // @ 1993 BLITZ SYSTEM INC
+GAME( 1993?, poker52,  0,       maxidbl,  maxidbl,  blitz68k_state, empty_init,    ROT0, "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // MARCH 10TH, 1994
 GAME( 1995,  dualgame, 0,       dualgame, dualgame, blitz68k_state, init_dualgame, ROT0, "Labtronix Technologies",         "Dual Games (prototype)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // SEPTEMBER 5TH, 1995
 GAME( 1995,  hermit,   0,       hermit,   hermit,   blitz68k_state, init_hermit,   ROT0, "Dugamex",                        "The Hermit (Ver. 1.14)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 1995
 GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, blitz68k_state, init_deucesw2, ROT0, "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 10TH, 1997
 GAME( 1998,  cj3play,  0,       cjffruit, cjffruit, blitz68k_state, init_cj3play,  ROT0, "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999
 GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, blitz68k_state, init_cjffruit, ROT0, "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 21ST, 1999
+GAME( 1998,  texasrls, 0,       texasrls, cjffruit, blitz68k_state, init_texasrls, ROT0, "Cadillac Jack",                  "Texas Reels (Ver. 2.00)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // OCTOBER 15TH, 2002
 GAME( 199?,  ilpag,    0,       ilpag,    ilpag,    blitz68k_state, empty_init,    ROT0, "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )

@@ -31,24 +31,16 @@ public:
 protected:
 	m6510_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	class mi_6510_normal : public memory_interface {
+	class mi_6510 : public memory_interface {
 	public:
 		m6510_device *base;
 
-		mi_6510_normal(m6510_device *base);
-		virtual ~mi_6510_normal() {}
+		mi_6510(m6510_device *base);
+		virtual ~mi_6510() {}
 		virtual uint8_t read(uint16_t adr) override;
 		virtual uint8_t read_sync(uint16_t adr) override;
 		virtual uint8_t read_arg(uint16_t adr) override;
 		virtual void write(uint16_t adr, uint8_t val) override;
-	};
-
-	class mi_6510_nd : public mi_6510_normal {
-	public:
-		mi_6510_nd(m6510_device *base);
-		virtual ~mi_6510_nd() {}
-		virtual uint8_t read_sync(uint16_t adr) override;
-		virtual uint8_t read_arg(uint16_t adr) override;
 	};
 
 	devcb_read8  read_port;
@@ -64,6 +56,7 @@ protected:
 	uint8_t port_r();
 	void port_w(uint8_t data);
 
+	void init_port();
 	void update_port();
 
 #define O(o) void o ## _full(); void o ## _partial()
@@ -80,11 +73,34 @@ protected:
 #undef O
 };
 
+class m6508_device : public m6510_device {
+public:
+	m6508_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+
+	class mi_6508 : public memory_interface {
+	public:
+		m6508_device *base;
+
+		mi_6508(m6508_device *base);
+		virtual ~mi_6508() {}
+		virtual uint8_t read(uint16_t adr) override;
+		virtual uint8_t read_sync(uint16_t adr) override;
+		virtual uint8_t read_arg(uint16_t adr) override;
+		virtual void write(uint16_t adr, uint8_t val) override;
+	};
+
+	std::unique_ptr<uint8_t[]> ram_page;
+};
+
 enum {
 	M6510_IRQ_LINE = m6502_device::IRQ_LINE,
 	M6510_NMI_LINE = m6502_device::NMI_LINE
 };
 
 DECLARE_DEVICE_TYPE(M6510, m6510_device)
+DECLARE_DEVICE_TYPE(M6508, m6508_device)
 
 #endif // MAME_CPU_M6502_M6510_H

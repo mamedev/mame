@@ -241,26 +241,26 @@ static GFXDECODE_START( gfx_pass )
 GFXDECODE_END
 
 /* todo : is this correct? */
-MACHINE_CONFIG_START(pass_state::pass)
-
+void pass_state::pass(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 14318180/2 )
-	MCFG_DEVICE_PROGRAM_MAP(pass_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pass_state,  irq1_line_hold) /* all the same */
+	M68000(config, m_maincpu, 14318180/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pass_state::pass_map);
+	m_maincpu->set_vblank_int("screen", FUNC(pass_state::irq1_line_hold)); /* all the same */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4 )
-	MCFG_DEVICE_PROGRAM_MAP(pass_sound_map)
-	MCFG_DEVICE_IO_MAP(pass_sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(pass_state, irq0_line_hold, 60) /* probably not accurate, unknown timing and generation (ym2203 sound chip?). */
+	z80_device &audiocpu(Z80(config, "audiocpu", 14318180/4));
+	audiocpu.set_addrmap(AS_PROGRAM, &pass_state::pass_sound_map);
+	audiocpu.set_addrmap(AS_IO, &pass_state::pass_sound_io_map);
+	audiocpu.set_periodic_int(FUNC(pass_state::irq0_line_hold), attotime::from_hz(60)); /* probably not accurate, unknown timing and generation (ym2203 sound chip?). */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pass_state, screen_update_pass)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(pass_state::screen_update_pass));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_pass);
@@ -271,12 +271,10 @@ MACHINE_CONFIG_START(pass_state::pass)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 14318180/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	YM2203(config, "ymsnd", 14318180/4).add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 792000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 792000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); // clock frequency & pin 7 not verified
+}
 
 
 ROM_START( pass )

@@ -448,7 +448,7 @@ uint8_t hp64k_state::hp64k_crtc_filter(uint8_t data)
 
 WRITE16_MEMBER(hp64k_state::hp64k_crtc_w)
 {
-		m_crtc->write(space , offset == 0 , hp64k_crtc_filter((uint8_t)data));
+		m_crtc->write(offset == 0 , hp64k_crtc_filter((uint8_t)data));
 }
 
 WRITE_LINE_MEMBER(hp64k_state::hp64k_crtc_drq_w)
@@ -465,7 +465,7 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_crtc_drq_w)
 
 				m_crtc_ptr++;
 
-				m_crtc->dack_w(prog_space , 0 , hp64k_crtc_filter(data));
+				m_crtc->dack_w(hp64k_crtc_filter(data));
 		}
 }
 
@@ -1372,15 +1372,16 @@ INPUT_PORTS_END
 
 static void hp64k_floppies(device_slot_interface &device)
 {
-	device.option_add("525dd" , FLOPPY_525_DD);
+	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-MACHINE_CONFIG_START(hp64k_state::hp64k)
-	HP_5061_3011(config , m_cpu , 6250000);
+void hp64k_state::hp64k(machine_config &config)
+{
+	HP_5061_3011(config, m_cpu, 6250000);
 	m_cpu->set_rw_cycles(6 , 6);
 	m_cpu->set_relative_mode(true);
-	m_cpu->set_addrmap(AS_PROGRAM , &hp64k_state::cpu_mem_map);
-	m_cpu->set_addrmap(AS_IO , &hp64k_state::cpu_io_map);
+	m_cpu->set_addrmap(AS_PROGRAM, &hp64k_state::cpu_mem_map);
+	m_cpu->set_addrmap(AS_IO, &hp64k_state::cpu_io_map);
 	m_cpu->set_irq_acknowledge_callback(FUNC(hp64k_state::hp64k_irq_callback));
 
 	// Actual keyboard refresh rate should be between 1 and 2 kHz
@@ -1393,15 +1394,16 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	I8275(config, m_crtc, 2729045);
 	m_crtc->set_screen("screen");
 	m_crtc->set_character_width(9);
-	m_crtc->set_display_callback(FUNC(hp64k_state::crtc_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(hp64k_state::crtc_display_pixels));
 	m_crtc->drq_wr_callback().set(FUNC(hp64k_state::hp64k_crtc_drq_w));
 	m_crtc->vrtc_wr_callback().set(FUNC(hp64k_state::hp64k_crtc_vrtc_w));
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(720, 390)
-	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 390-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
+	screen.set_refresh_hz(60);
+	screen.set_size(720, 390);
+	screen.set_visarea(0, 720-1, 0, 390-1);
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
@@ -1454,30 +1456,30 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	m_phi->sys_cntrl_read_cb().set(FUNC(hp64k_state::hp64k_phi_sys_ctrl_r));
 	m_phi->dio_read_cb().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_phi->dio_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_EOI>().set(IEEE488_TAG, FUNC(ieee488_device::host_eoi_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_DAV>().set(IEEE488_TAG, FUNC(ieee488_device::host_dav_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_NRFD>().set(IEEE488_TAG, FUNC(ieee488_device::host_nrfd_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_NDAC>().set(IEEE488_TAG, FUNC(ieee488_device::host_ndac_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_IFC>().set(IEEE488_TAG, FUNC(ieee488_device::host_ifc_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_SRQ>().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_ATN>().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_REN>().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
+	m_phi->eoi_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_eoi_w));
+	m_phi->dav_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dav_w));
+	m_phi->nrfd_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_nrfd_w));
+	m_phi->ndac_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ndac_w));
+	m_phi->ifc_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ifc_w));
+	m_phi->srq_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
+	m_phi->atn_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
+	m_phi->ren_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
 
-	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_EOI_CALLBACK(WRITELINE(m_phi, phi_device, eoi_w))
-	MCFG_IEEE488_DAV_CALLBACK(WRITELINE(m_phi, phi_device, dav_w))
-	MCFG_IEEE488_NRFD_CALLBACK(WRITELINE(m_phi, phi_device, nrfd_w))
-	MCFG_IEEE488_NDAC_CALLBACK(WRITELINE(m_phi, phi_device, ndac_w))
-	MCFG_IEEE488_IFC_CALLBACK(WRITELINE(m_phi, phi_device, ifc_w))
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(m_phi, phi_device, srq_w))
-	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(m_phi, phi_device, atn_w))
-	MCFG_IEEE488_REN_CALLBACK(WRITELINE(m_phi, phi_device, ren_w))
-	MCFG_IEEE488_DIO_CALLBACK(WRITE8(m_phi, phi_device , bus_dio_w))
-	MCFG_IEEE488_SLOT_ADD("ieee_rem" , 0 , remote488_devices , nullptr)
-MACHINE_CONFIG_END
+	ieee488_device &ieee(IEEE488(config, IEEE488_TAG));
+	ieee.eoi_callback().set(m_phi, FUNC(phi_device::eoi_w));
+	ieee.dav_callback().set(m_phi, FUNC(phi_device::dav_w));
+	ieee.nrfd_callback().set(m_phi, FUNC(phi_device::nrfd_w));
+	ieee.ndac_callback().set(m_phi, FUNC(phi_device::ndac_w));
+	ieee.ifc_callback().set(m_phi, FUNC(phi_device::ifc_w));
+	ieee.srq_callback().set(m_phi, FUNC(phi_device::srq_w));
+	ieee.atn_callback().set(m_phi, FUNC(phi_device::atn_w));
+	ieee.ren_callback().set(m_phi, FUNC(phi_device::ren_w));
+	ieee.dio_callback().set(m_phi, FUNC(phi_device::bus_dio_w));
+	IEEE488_SLOT(config, "ieee_rem", 0, remote488_devices, nullptr);
+}
 
 ROM_START(hp64k)
-	ROM_REGION(0x8000 , "cpu" , ROMREGION_16BIT | ROMREGION_BE | ROMREGION_INVERT)
+	ROM_REGION(0x8000, "cpu" , ROMREGION_16BIT | ROMREGION_BE | ROMREGION_INVERT)
 	ROM_LOAD16_BYTE("64100_80022.bin" , 0x0000 , 0x1000 , CRC(38b2aae5) SHA1(bfd0f126bfaf3724dc501979ad2d46afc41913aa))
 	ROM_LOAD16_BYTE("64100_80020.bin" , 0x0001 , 0x1000 , CRC(ac01b436) SHA1(be1e827ea1393a95abb02a52ab5cc35dc2cd96e4))
 	ROM_LOAD16_BYTE("64100_80023.bin" , 0x2000 , 0x1000 , CRC(6b4bc2ce) SHA1(00e6c58ccae9640dc81cb3e92db90a8c69b02a93))

@@ -17,8 +17,9 @@
 //**************************************************************************
 
 class a1bus_device;
+class device_a1bus_card_interface;
 
-class a1bus_slot_device : public device_t, public device_slot_interface
+class a1bus_slot_device : public device_t, public device_single_card_slot_interface<device_a1bus_card_interface>
 {
 public:
 	// construction/destruction
@@ -38,7 +39,6 @@ protected:
 	a1bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
@@ -50,7 +50,6 @@ protected:
 DECLARE_DEVICE_TYPE(A1BUS_SLOT, a1bus_slot_device)
 
 
-class device_a1bus_card_interface;
 // ======================> a1bus_device
 class a1bus_device : public device_t
 {
@@ -59,7 +58,7 @@ public:
 	a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	template <typename T> void set_cputag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
 	auto out_irq_callback() { return m_out_irq_cb.bind(); }
 	auto out_nmi_callback() { return m_out_nmi_cb.bind(); }
 
@@ -84,7 +83,7 @@ protected:
 	virtual void device_reset() override;
 
 	// internal state
-	required_device<cpu_device> m_maincpu;
+	required_address_space m_space;
 
 	devcb_write_line    m_out_irq_cb;
 	devcb_write_line    m_out_nmi_cb;
@@ -99,7 +98,7 @@ DECLARE_DEVICE_TYPE(A1BUS, a1bus_device)
 // ======================> device_a1bus_card_interface
 
 // class representing interface-specific live a1bus card
-class device_a1bus_card_interface : public device_slot_card_interface
+class device_a1bus_card_interface : public device_interface
 {
 	friend class a1bus_device;
 public:

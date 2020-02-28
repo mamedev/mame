@@ -63,7 +63,7 @@
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 
 #define I80186_TAG      "ic1"
 #define I80130_TAG      "ic15"
@@ -177,7 +177,7 @@ READ16_MEMBER( compis_state::pcs6_0_1_r )
 	}
 	else
 	{
-		return m_graphics->dma_ack_r(space, offset);
+		return m_graphics->dma_ack_r(offset);
 	}
 }
 
@@ -191,7 +191,7 @@ WRITE16_MEMBER( compis_state::pcs6_0_1_w )
 	}
 	else
 	{
-		m_graphics->dma_ack_w(space, offset, data);
+		m_graphics->dma_ack_w(offset, data);
 	}
 }
 
@@ -199,7 +199,7 @@ READ16_MEMBER( compis_state::pcs6_2_3_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return m_mpsc->inta_r(space, 0);
+		return m_mpsc->inta_r();
 	}
 	else
 	{
@@ -222,7 +222,7 @@ READ16_MEMBER( compis_state::pcs6_4_5_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return m_mpsc->cd_ba_r(space, offset & 0x03);
+		return m_mpsc->cd_ba_r(offset & 0x03);
 	}
 	else
 	{
@@ -237,7 +237,7 @@ WRITE16_MEMBER( compis_state::pcs6_4_5_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_mpsc->cd_ba_w(space, offset & 0x03, data);
+		m_mpsc->cd_ba_w(offset & 0x03, data);
 	}
 	else
 	{
@@ -250,7 +250,7 @@ READ16_MEMBER( compis_state::pcs6_6_7_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return m_graphics->pcs6_6_r(space, offset);
+		return m_graphics->pcs6_6_r(offset);
 	}
 	else
 	{
@@ -265,7 +265,7 @@ WRITE16_MEMBER( compis_state::pcs6_6_7_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_graphics->pcs6_6_w(space, offset, data);
+		m_graphics->pcs6_6_w(offset, data);
 	}
 	else
 	{
@@ -278,11 +278,11 @@ READ16_MEMBER( compis_state::pcs6_8_9_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return m_isbx0->mcs0_r(space, offset);
+		return m_isbx0->mcs0_r(offset);
 	}
 	else
 	{
-		return m_isbx0->mcs1_r(space, offset) << 8;
+		return m_isbx0->mcs1_r(offset) << 8;
 	}
 }
 
@@ -290,11 +290,11 @@ WRITE16_MEMBER( compis_state::pcs6_8_9_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_isbx0->mcs0_w(space, offset, data);
+		m_isbx0->mcs0_w(offset, data);
 	}
 	else
 	{
-		m_isbx0->mcs1_w(space, offset, data >> 8);
+		m_isbx0->mcs1_w(offset, data >> 8);
 	}
 }
 
@@ -302,11 +302,11 @@ READ16_MEMBER( compis_state::pcs6_10_11_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return m_isbx0->mcs1_r(space, offset);
+		return m_isbx0->mcs1_r(offset);
 	}
 	else
 	{
-		return m_isbx0->mdack_r(space, offset) << 8;
+		return m_isbx0->mdack_r(offset) << 8;
 	}
 }
 
@@ -314,11 +314,11 @@ WRITE16_MEMBER( compis_state::pcs6_10_11_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_isbx0->mcs1_w(space, offset, data);
+		m_isbx0->mcs1_w(offset, data);
 	}
 	else
 	{
-		m_isbx0->mdack_w(space, offset, data >> 8);
+		m_isbx0->mdack_w(offset, data >> 8);
 	}
 }
 
@@ -326,11 +326,11 @@ READ16_MEMBER( compis_state::pcs6_12_13_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return m_isbx1->mcs0_r(space, offset);
+		return m_isbx1->mcs0_r(offset);
 	}
 	else
 	{
-		return m_isbx1->mcs1_r(space, offset) << 8;
+		return m_isbx1->mcs1_r(offset) << 8;
 	}
 }
 
@@ -338,11 +338,11 @@ WRITE16_MEMBER( compis_state::pcs6_12_13_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_isbx1->mcs0_w(space, offset, data);
+		m_isbx1->mcs0_w(offset, data);
 	}
 	else
 	{
-		m_isbx1->mcs1_w(space, offset, data >> 8);
+		m_isbx1->mcs1_w(offset, data >> 8);
 	}
 }
 
@@ -350,11 +350,11 @@ READ16_MEMBER( compis_state::pcs6_14_15_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return m_isbx1->mcs1_r(space, offset);
+		return m_isbx1->mcs1_r(offset);
 	}
 	else
 	{
-		return m_isbx1->mdack_r(space, offset) << 8;
+		return m_isbx1->mdack_r(offset) << 8;
 	}
 }
 
@@ -362,11 +362,11 @@ WRITE16_MEMBER( compis_state::pcs6_14_15_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_isbx1->mcs1_w(space, offset, data);
+		m_isbx1->mcs1_w(offset, data);
 	}
 	else
 	{
-		m_isbx1->mdack_w(space, offset, data >> 8);
+		m_isbx1->mdack_w(offset, data >> 8);
 	}
 }
 
@@ -734,7 +734,7 @@ void compis_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( compis )
+//  machine_config( compis )
 //-------------------------------------------------
 
 void compis_state::compis(machine_config &config)
@@ -788,19 +788,19 @@ void compis_state::compis(machine_config &config)
 	m_rtc->set_day1(1);   // monday
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	TIMER(config, "tape").configure_periodic(FUNC(compis_state::tape_tick), attotime::from_hz(44100));
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
-	rs232a.rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
-	rs232a.dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcda_w));
-	rs232a.cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsa_w));
+	rs232a.rxd_handler().set(m_mpsc, FUNC(i8274_device::rxa_w));
+	rs232a.dcd_handler().set(m_mpsc, FUNC(i8274_device::dcda_w));
+	rs232a.cts_handler().set(m_mpsc, FUNC(i8274_device::ctsa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
-	rs232b.rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxb_w));
-	rs232b.dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcdb_w));
-	rs232b.cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
+	rs232b.rxd_handler().set(m_mpsc, FUNC(i8274_device::rxb_w));
+	rs232b.dcd_handler().set(m_mpsc, FUNC(i8274_device::dcdb_w));
+	rs232b.cts_handler().set(m_mpsc, FUNC(i8274_device::ctsb_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(compis_state::write_centronics_busy));
@@ -829,7 +829,7 @@ void compis_state::compis(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( compis2 )
+//  machine_config( compis2 )
 //-------------------------------------------------
 
 void compis_state::compis2(machine_config &config)

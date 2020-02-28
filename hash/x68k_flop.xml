@@ -3042,8 +3042,8 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	</software>
 
 	<!-- Offset front layer, but playable -->
-	<software name="cuberunr">
-		<description>Cube Runner</description>
+	<software name="cuebrunr">
+		<description>Cueb Runner</description>
 		<year>1990</year>
 		<publisher>SPS</publisher>
 		<info name="alt_title" value="キューブランナー" />

@@ -61,7 +61,6 @@ public:
 	void coco(machine_config &config);
 protected:
 	virtual void device_start() override;
-	virtual void update_cart_base(uint8_t *cart_base) override;
 
 	// PIA1
 	virtual void pia1_pb_changed(uint8_t data) override;

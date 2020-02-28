@@ -65,17 +65,20 @@
 #include "cpu/nec/nec.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 #include "screen.h"
 #include "emupal.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
 #define LOG_KEYBOARD  (1U <<  1)
 #define LOG_DEBUG     (1U <<  2)
 
-#define VERBOSE (LOG_DEBUG)
+//#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
@@ -103,6 +106,7 @@ public:
 		, m_isabus(*this, "isa")
 		, m_pic8259(*this, "pic8259")
 		, m_pit8254(*this, "pit8254")
+		, m_dac(*this, "dac")
 		, m_screen(*this, "screen")
 		, m_p_videoram(*this, "video")
 		, m_p_chargen(*this, "gfx1")
@@ -133,6 +137,7 @@ protected:
 	required_device<isa8_device> m_isabus;
 	required_device<pic8259_device> m_pic8259;
 	required_device<pit8254_device> m_pit8254;
+	required_device<dac_8bit_r2r_device> m_dac;
 	required_device<screen_device> m_screen;
 
 private:
@@ -287,6 +292,8 @@ void hp95lx_state::machine_reset()
 	m_kbit = 0;
 	m_scancode = 0;
 	m_kbdflag = 0;
+
+	m_dac->write(0x7f);
 }
 
 
@@ -356,6 +363,7 @@ WRITE8_MEMBER(hp95lx_state::e300_w)
 		break;
 
 	case 5: // DAC out (per snd.c)
+		m_dac->write(data);
 		break;
 
 	case 9: // b1 = 'a2d power' (per snd.c)
@@ -709,11 +717,12 @@ void hp95lx_state::hp95lx_io(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(hp95lx_state::hp95lx)
-	MCFG_DEVICE_ADD("maincpu", V20, XTAL(5'370'000))
-	MCFG_DEVICE_PROGRAM_MAP(hp95lx_map)
-	MCFG_DEVICE_IO_MAP(hp95lx_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+void hp95lx_state::hp95lx(machine_config &config)
+{
+	V20(config, m_maincpu, XTAL(5'370'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp95lx_state::hp95lx_map);
+	m_maincpu->set_addrmap(AS_IO, &hp95lx_state::hp95lx_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	ADDRESS_MAP_BANK(config, "bankdev_c000").set_map(&hp95lx_state::hp95lx_romdos).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
 	ADDRESS_MAP_BANK(config, "bankdev_d000").set_map(&hp95lx_state::hp95lx_romdos).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
@@ -735,31 +744,38 @@ MACHINE_CONFIG_START(hp95lx_state::hp95lx)
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 
-	MCFG_DEVICE_ADD("board0", ISA8_SLOT, 0, "isa", pc_isa8_cards, "com", true)
+	ISA8_SLOT(config, "board0", 0, "isa", pc_isa8_cards, "com", true);
 
-	MCFG_DEVICE_ADD(KBDC_TAG, PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, hp95lx_state, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(*this, hp95lx_state, keyboard_data_w))
-	MCFG_PC_KBDC_SLOT_ADD(KBDC_TAG, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, KBDC_TAG, 0));
+	pc_kbdc.out_clock_cb().set(FUNC(hp95lx_state::keyboard_clock_w));
+	pc_kbdc.out_data_cb().set(FUNC(hp95lx_state::keyboard_data_w));
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270).set_pc_kbdc_slot(&pc_kbdc);
 
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
 	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // card slot
 
+	SPEAKER(config, "speaker").front_center();
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
+
 	// XXX When the AC adapter is plugged in, the LCD refresh rate is 73.14 Hz.
 	// XXX When the AC adapter is not plugged in (ie, running off of batteries) the refresh rate is 56.8 Hz.
-	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::white())
-	MCFG_SCREEN_UPDATE_DRIVER(hp95lx_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(5'370'000) / 2, 300, 0, 240, 180, 0, 128)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD, rgb_t::white());
+	m_screen->set_screen_update(FUNC(hp95lx_state::screen_update));
+	m_screen->set_raw(XTAL(5'370'000) / 2, 300, 0, 240, 180, 0, 128);
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(hp95lx_state::hp95lx_palette), 2);
 
 	RAM(config, RAM_TAG).set_default_size("512K");
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( hp95lx )
-	ROM_REGION16_LE(0x100000, "romdos", 0)
+	ROM_REGION(0x100000, "romdos", 0)
 	// Version A ... ROM BIOS Ver 2.14 ... 04/02/91
 	ROM_LOAD("18-5301.abd.bin", 0, 0x100000, CRC(18121c48) SHA1(c3bfb45cbbf4f57ae67fb5659da40f371d8e5c54))
 

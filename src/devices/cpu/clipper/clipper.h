@@ -6,9 +6,7 @@
 
 #pragma once
 
-#include <limits.h>
-#include "softfloat/milieu.h"
-#include "softfloat/softfloat.h"
+#include "softfloat3/source/include/softfloat.h"
 
 #include "cpu/clipper/common.h"
 #include "machine/cammu.h"
@@ -142,11 +140,11 @@ public:
 	enum fp_exception_mask : u8
 	{
 		F_NONE  = (0),
-		F_I     = (float_flag_invalid),
-		F_X     = (float_flag_inexact),
-		F_IX    = (float_flag_invalid | float_flag_inexact),
-		F_IVUX  = (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact),
-		F_IVDUX = (float_flag_invalid | float_flag_overflow | float_flag_divbyzero | float_flag_underflow | float_flag_inexact)
+		F_I     = (softfloat_flag_invalid),
+		F_X     = (softfloat_flag_inexact),
+		F_IX    = (softfloat_flag_invalid | softfloat_flag_inexact),
+		F_IVUX  = (softfloat_flag_invalid | softfloat_flag_overflow | softfloat_flag_underflow | softfloat_flag_inexact),
+		F_IVDUX = (softfloat_flag_invalid | softfloat_flag_overflow | softfloat_flag_infinite | softfloat_flag_underflow | softfloat_flag_inexact)
 	};
 
 protected:
@@ -157,9 +155,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual u32 execute_min_cycles() const override { return 1; }
-	virtual u32 execute_max_cycles() const override { return 1; } // FIXME: don't know, especially macro instructions
-	virtual u32 execute_input_lines() const override { return 2; } // number of input/interrupt lines (irq/nmi)
+	virtual u32 execute_min_cycles() const noexcept override { return 1; }
+	virtual u32 execute_max_cycles() const noexcept override { return 1; } // FIXME: don't know, especially macro instructions
+	virtual u32 execute_input_lines() const noexcept override { return 2; } // number of input/interrupt lines (irq/nmi)
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -207,19 +205,19 @@ protected:
 	}
 
 	// floating point helpers
-	float32 get_fp32(const u8 reg) const { return m_f[reg & 0xf]; }
-	float64 get_fp64(const u8 reg) const { return m_f[reg & 0xf]; }
-	template <typename T> void set_fp(const u8 reg, const T data, const fp_exception_mask exception_mask)
+	float32_t get_fp32(u8 const reg) const { return float32_t{ u32(m_f[reg & 0xf]) }; }
+	float64_t get_fp64(u8 const reg) const { return float64_t{ m_f[reg & 0xf] }; }
+	template <typename T> void set_fp(u8 const reg, T const data, fp_exception_mask const exception_mask)
 	{
 		// suppress unexpected exceptions
-		float_exception_flags &= exception_mask;
+		softfloat_exceptionFlags &= exception_mask;
 
 		// save floating exception state
 		m_fp_pc = m_pc;
 		m_fp_dst = m_f[reg & 0xf];
 
 		// assign data
-		if (float_exception_flags & float_flag_overflow && PSW(EFV))
+		if (softfloat_exceptionFlags & softfloat_flag_overflow && PSW(EFV))
 		{
 			/*
 			 * If the EFV flag is set, the computed result is delivered to the
@@ -241,9 +239,9 @@ protected:
 			 * Standard wrapped exponent.
 			 */
 			// FIXME: implement non-IEEE behaviour described above
-			m_f[reg & 0xf] = data;
+			m_f[reg & 0xf] = data.v;
 		}
-		else if (float_exception_flags & float_flag_underflow && PSW(EFU))
+		else if (softfloat_exceptionFlags & softfloat_flag_underflow && PSW(EFU))
 		{
 			/*
 			 * If EFU is set, the floating underflow exception is signalled
@@ -260,10 +258,10 @@ protected:
 			 * is 0..-275; for double-precision the range is 0..-1125.
 			 */
 			// FIXME: implement non-IEEE behaviour described above
-			m_f[reg & 0xf] = data;
+			m_f[reg & 0xf] = data.v;
 		}
 		else
-			m_f[reg & 0xf] = data;
+			m_f[reg & 0xf] = data.v;
 
 		// set floating dirty flag
 		m_ssw |= SSW_FRD;

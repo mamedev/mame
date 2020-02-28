@@ -44,24 +44,24 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_plus4_expansion_card_interface overrides
-	virtual uint8_t plus4_cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
-	virtual void plus4_cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
+	virtual uint8_t plus4_cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
+	virtual void plus4_cd_w(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
 
 private:
-	DECLARE_READ8_MEMBER( port_r );
-	DECLARE_WRITE8_MEMBER( port_w );
+	uint8_t port_r();
+	void port_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( tcbm_data_r );
-	DECLARE_WRITE8_MEMBER( tcbm_data_w );
-	DECLARE_READ8_MEMBER( tpi0_pc_r );
-	DECLARE_WRITE8_MEMBER( tpi0_pc_w );
+	uint8_t tcbm_data_r();
+	void tcbm_data_w(uint8_t data);
+	uint8_t tpi0_pc_r();
+	void tpi0_pc_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( tpi1_pb_r );
-	DECLARE_READ8_MEMBER( tpi1_pc_r );
-	DECLARE_WRITE8_MEMBER( tpi1_pc_w );
+	uint8_t tpi1_pb_r();
+	uint8_t tpi1_pc_r();
+	void tpi1_pc_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( tpi0_r );
-	DECLARE_WRITE8_MEMBER( tpi0_w );
+	uint8_t tpi0_r(offs_t offset);
+	void tpi0_w(offs_t offset, uint8_t data);
 
 	void c1551_mem(address_map &map);
 

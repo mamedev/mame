@@ -128,7 +128,7 @@ public:
 			m_led(*this, "led1")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 	required_device<wd1772_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<mc68901_device> m_mfp;
@@ -238,9 +238,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( ikbd_tx_w );
 
-	DECLARE_READ8_MEMBER( mfp_gpio_r );
-	DECLARE_WRITE_LINE_MEMBER( mfp_tdo_w );
-
 	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
 
 	void toggle_dma_fifo();
@@ -326,7 +323,6 @@ public:
 	bitmap_rgb32 m_bitmap;
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
-	IRQ_CALLBACK_MEMBER(atarist_int_ack);
 
 	int m_monochrome;
 	required_device<palette_device> m_palette;
@@ -336,6 +332,7 @@ public:
 	void common(machine_config &config);
 	void st(machine_config &config);
 	void ikbd_map(address_map &map);
+	void cpu_space_map(address_map &map);
 	void st_map(address_map &map);
 protected:
 	void keyboard(machine_config &config);

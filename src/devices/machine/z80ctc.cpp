@@ -77,12 +77,12 @@ DEFINE_DEVICE_TYPE(Z80CTC_CHANNEL, z80ctc_channel_device, "z80ctc_channel", "Z80
 //-------------------------------------------------
 
 z80ctc_device::z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, Z80CTC, tag, owner, clock),
-		device_z80daisy_interface(mconfig, *this),
-		m_intr_cb(*this),
-		m_zc_cb{*this, *this, *this, *this},
-		m_vector(0),
-		m_channel(*this, "ch%u", 0U)
+	: device_t(mconfig, Z80CTC, tag, owner, clock)
+	, device_z80daisy_interface(mconfig, *this)
+	, m_intr_cb(*this)
+	, m_zc_cb(*this)
+	, m_vector(0)
+	, m_channel(*this, "ch%u", 0U)
 {
 }
 
@@ -91,7 +91,7 @@ z80ctc_device::z80ctc_device(const machine_config &mconfig, const char *tag, dev
 //  read - standard handler for reading
 //-------------------------------------------------
 
-READ8_MEMBER( z80ctc_device::read )
+uint8_t z80ctc_device::read(offs_t offset)
 {
 	return m_channel[offset & 3]->read();
 }
@@ -101,7 +101,7 @@ READ8_MEMBER( z80ctc_device::read )
 //  write - standard handler for writing
 //-------------------------------------------------
 
-WRITE8_MEMBER( z80ctc_device::write )
+void z80ctc_device::write(offs_t offset, uint8_t data)
 {
 	m_channel[offset & 3]->write(data);
 }
@@ -145,8 +145,7 @@ void z80ctc_device::device_resolve_objects()
 {
 	// resolve callbacks
 	m_intr_cb.resolve_safe();
-	for (auto &cb : m_zc_cb)
-		cb.resolve_safe();
+	m_zc_cb.resolve_all_safe();
 }
 
 
@@ -373,7 +372,10 @@ u8 z80ctc_channel_device::read()
 
 		LOG("CTC clock %f\n", period.as_hz());
 
-		return u8((m_timer->remaining().as_double() / period.as_double()) + 1.0);
+		if(!m_timer->remaining().is_never())
+			return u8((m_timer->remaining().as_double() / period.as_double()) + 1.0);
+		else
+			return 0;
 	}
 }
 

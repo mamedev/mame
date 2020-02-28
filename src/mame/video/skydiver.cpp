@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(skydiver_state::get_tile_info)
 
 void skydiver_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skydiver_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skydiver_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	save_item(NAME(m_nmion));
 	save_item(NAME(m_width));
@@ -144,8 +144,8 @@ WRITE_LINE_MEMBER(skydiver_state::lamp_r_w)
 
 WRITE8_MEMBER(skydiver_state::latch3_watchdog_w)
 {
-	m_watchdog->reset_w(space, 0, 0);
-	m_latch3->write_a0(space, offset, 0);
+	m_watchdog->watchdog_reset();
+	m_latch3->write_a0(offset);
 }
 
 

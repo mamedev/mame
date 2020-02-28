@@ -60,7 +60,8 @@ static void pf10_floppies(device_slot_interface &device)
 	device.option_add("smd165", EPSON_SMD_165);
 }
 
-MACHINE_CONFIG_START(epson_pf10_device::device_add_mconfig)
+void epson_pf10_device::device_add_mconfig(machine_config &config)
+{
 	HD6303Y(config, m_cpu, XTAL(4'915'200)); // HD63A03XF
 	m_cpu->set_addrmap(AS_PROGRAM, &epson_pf10_device::cpu_mem);
 	m_cpu->in_p1_cb().set(FUNC(epson_pf10_device::port1_r));
@@ -72,10 +73,10 @@ MACHINE_CONFIG_START(epson_pf10_device::device_add_mconfig)
 	UPD765A(config, m_fdc, 4'000'000, false, true);
 	FLOPPY_CONNECTOR(config, m_floppy, pf10_floppies, "smd165", floppy_image_device::default_floppy_formats);
 
-	MCFG_EPSON_SIO_ADD("sio", nullptr)
-	MCFG_EPSON_SIO_RX(WRITELINE(DEVICE_SELF, epson_pf10_device, rxc_w))
-	MCFG_EPSON_SIO_PIN(WRITELINE(DEVICE_SELF, epson_pf10_device, pinc_w))
-MACHINE_CONFIG_END
+	EPSON_SIO(config, m_sio_output, nullptr);
+	m_sio_output->rx_callback().set(DEVICE_SELF, FUNC(epson_pf10_device::rxc_w));
+	m_sio_output->pin_callback().set(DEVICE_SELF, FUNC(epson_pf10_device::pinc_w));
+}
 
 
 //**************************************************************************

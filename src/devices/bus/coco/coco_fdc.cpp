@@ -11,7 +11,7 @@
     which mostly uses the same command set with some subtle differences, most
     notably the 2797 handles disk side select internally. The Dragon Alpha also
     uses the WD2797, however as this is a built in interface and not an external
-    cartrige, it is dealt with in the main coco.cpp file.
+    cartridge, it is dealt with in the main coco.cpp file.
 
     The wd's variables are mapped to $FF48-$FF4B on the CoCo and on $FF40-$FF43
     on the Dragon.  In addition, there is another register
@@ -53,6 +53,7 @@
 #include "formats/jvc_dsk.h"
 #include "formats/vdk_dsk.h"
 #include "formats/sdf_dsk.h"
+#include "formats/os9_dsk.h"
 
 
 /***************************************************************************
@@ -88,6 +89,7 @@ protected:
 	};
 
 	// device-level overrides
+	virtual DECLARE_READ8_MEMBER(cts_read) override;
 	virtual DECLARE_READ8_MEMBER(scs_read) override;
 	virtual DECLARE_WRITE8_MEMBER(scs_write) override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -118,7 +120,8 @@ FLOPPY_FORMATS_MEMBER( coco_family_fdc_device_base::floppy_formats )
 	FLOPPY_DMK_FORMAT,
 	FLOPPY_JVC_FORMAT,
 	FLOPPY_VDK_FORMAT,
-	FLOPPY_SDF_FORMAT
+	FLOPPY_SDF_FORMAT,
+	FLOPPY_OS9_FORMAT
 FLOPPY_FORMATS_END
 
 static void coco_fdc_floppies(device_slot_interface &device)
@@ -310,6 +313,16 @@ void coco_fdc_device_base::dskreg_w(uint8_t data)
 
 
 //-------------------------------------------------
+//  cts_read
+//-------------------------------------------------
+
+READ8_MEMBER(coco_fdc_device_base::cts_read)
+{
+	return memregion("eprom")->base()[offset];
+}
+
+
+//-------------------------------------------------
 //  scs_read
 //-------------------------------------------------
 
@@ -343,17 +356,17 @@ READ8_MEMBER(coco_fdc_device_base::scs_read)
 
 	case 0x38:  /* FF78 */
 		if (real_time_clock() == rtc_type::CLOUD9)
-			m_ds1315->read_0(space, offset);
+			m_ds1315->read_0();
 		break;
 
 	case 0x39:  /* FF79 */
 		if (real_time_clock() == rtc_type::CLOUD9)
-			m_ds1315->read_1(space, offset);
+			m_ds1315->read_1();
 		break;
 
 	case 0x3C:  /* FF7C */
 		if (real_time_clock() == rtc_type::CLOUD9)
-			result = m_ds1315->read_data(space, offset);
+			result = m_ds1315->read_data();
 		break;
 	}
 	return result;

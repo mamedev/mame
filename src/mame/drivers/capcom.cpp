@@ -46,11 +46,12 @@ void capcom_state::init_capcom()
 {
 }
 
-MACHINE_CONFIG_START(capcom_state::capcom)
+void capcom_state::capcom(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16670000) // M68306
-	MCFG_DEVICE_PROGRAM_MAP(capcom_map)
-MACHINE_CONFIG_END
+	M68000(config, m_maincpu, 16670000); // M68306
+	m_maincpu->set_addrmap(AS_PROGRAM, &capcom_state::capcom_map);
+}
 
 /*-------------------------------------------------------------------
 / Airborne (03/96)

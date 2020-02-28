@@ -11,11 +11,12 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "machine/nvram.h"
+#include "tilemap.h"
 
 
 class mastboyo_state : public driver_device
@@ -73,7 +74,7 @@ TILE_GET_INFO_MEMBER(mastboyo_state::get_fg_tile_info)
 
 void mastboyo_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mastboyo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mastboyo_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t mastboyo_state::screen_update_mastboyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -196,26 +197,26 @@ void mastboyo_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(mastboyo_state::mastboyo)
-
+void mastboyo_state::mastboyo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 20_MHz_XTAL / 6)
-	MCFG_DEVICE_PROGRAM_MAP(mastboyo_map)
-	MCFG_DEVICE_IO_MAP(mastboyo_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mastboyo_state, irq0_line_hold, 256.244f)  // not sure, INT0 pin was measured at 256.244Hz
+	Z80(config, m_maincpu, 20_MHz_XTAL / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mastboyo_state::mastboyo_map);
+	m_maincpu->set_addrmap(AS_IO, &mastboyo_state::mastboyo_portmap);
+	m_maincpu->set_periodic_int(FUNC(mastboyo_state::irq0_line_hold), attotime::from_hz(256.244f));  // not sure, INT0 pin was measured at 256.244Hz
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 2*8, 256-2*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mastboyo_state, screen_update_mastboyo)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 2*8, 256-2*8-1);
+	screen.set_screen_update(FUNC(mastboyo_state::screen_update_mastboyo));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mastboyo)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mastboyo);
 
 	PALETTE(config, "palette", FUNC(mastboyo_state::mastboyo_palette), 256);
 
@@ -226,8 +227,7 @@ MACHINE_CONFIG_START(mastboyo_state::mastboyo)
 	aysnd.port_a_read_callback().set_ioport("DSW"); // DSW
 	aysnd.port_b_read_callback().set_ioport("IN0"); // player inputs
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-
-MACHINE_CONFIG_END
+}
 
 
 /*
@@ -300,6 +300,27 @@ ROM_START( mastboyoa )
 	ROM_LOAD( "masterboy-1987-82s129-l-ic40.bin", 0x000, 0x100, CRC(4d061216) SHA1(1abf9320da75a3fd23c6bdbcc4088d18e133c4e5) )  // Identical to the parent set.
 ROM_END
 
+ROM_START( mastboyob )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "mb_p1.ic14", 0x0000, 0x4000, CRC(9ff8d386) SHA1(4bf0df6d5cb605f2a4c9ef3cf0ece229ce8cbb40) ) // masterboy-1987-27128-ic14.bin       43.347168%
 
-GAME( 1987, mastboyo,  0,        mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)", "Master Boy (1987, Z80 hardware, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mastboyoa, mastboyo, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)", "Master Boy (1987, Z80 hardware, set 2)", MACHINE_SUPPORTS_SAVE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "fij.c36", 0x0000, 0x4000, CRC(bdd0f821) SHA1(63f607bccf1eded92531b2a10605d0578d371f77) ) // masterboy-1987-27128-mbfij-ic36.bin    97.308350%
+
+	ROM_REGION( 0x80000, "questions", ROMREGION_ERASEFF )
+	ROM_LOAD( "mb_3.ic9",  0x60000, 0x08000, CRC(b92ffd4f) SHA1(34431d6771e58f2ec083756f07e8b2a02bdb0e5a) ) // mastboy_27256.ic10    IDENTICAL
+	ROM_LOAD( "mb_4.ic8",  0x68000, 0x08000, CRC(c4844264) SHA1(e8a45b87878f95ad4590ad5e19c15339fde1a762) ) // mastboy_27256.ic9     99.996948%
+	ROM_LOAD( "mb_1.ic11", 0x70000, 0x08000, CRC(f5a9bf63) SHA1(53890e615cd73809c950a302bb423ec111ee493b) ) // mastboy_27256.ic12    99.996948%
+	ROM_LOAD( "mb_2.ic10", 0x78000, 0x08000, CRC(f2611186) SHA1(05860fecc23014c39cb28762763e94bc91412b34) ) // mastboy_27256.ic11    IDENTICAL
+
+	ROM_REGION( 0x100, "proms", 0 ) // timing or memory mapping?
+	ROM_LOAD( "d_82s129.ic23", 0x000, 0x100, CRC(d5fd2dfd) SHA1(66e3afa9e73507db0647d125c0be992b27d08adc) )
+
+	ROM_REGION( 0x200, "palette", 0 )
+	ROM_LOAD( "h_82s129.ic39", 0x100, 0x100, CRC(8e965fc3) SHA1(b52c8e505438937c7a5d3e1393d54f0ad0425e78) )
+	ROM_LOAD( "l_82s129.ic40", 0x000, 0x100, CRC(4d061216) SHA1(1abf9320da75a3fd23c6bdbcc4088d18e133c4e5) )
+ROM_END
+
+GAME( 1987, mastboyo,  0,        mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)",    "Master Boy (1987, Z80 hardware, Covielsa, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mastboyoa, mastboyo, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)",    "Master Boy (1987, Z80 hardware, Covielsa, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mastboyob, mastboyo, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Ichi-Funtel license)", "Master Boy (1987, Z80 hardware, Ichi-Funtel)", MACHINE_SUPPORTS_SAVE )

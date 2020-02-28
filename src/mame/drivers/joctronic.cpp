@@ -335,7 +335,8 @@ void joctronic_state::machine_reset()
 static INPUT_PORTS_START( joctronic )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(joctronic_state::joctronic)
+void joctronic_state::joctronic(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000)/4); // 3 MHz - uses WAIT
 	m_maincpu->set_addrmap(AS_PROGRAM, &joctronic_state::maincpu_map); // 139
@@ -355,7 +356,7 @@ MACHINE_CONFIG_START(joctronic_state::joctronic)
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(12'000'000)/4)); // 3 MHz
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	ctc.zc_callback<0>().set_inputline(m_soundcpu, INPUT_LINE_IRQ0); //SINT
+	ctc.zc_callback<0>().set_inputline(m_soundcpu, INPUT_LINE_IRQ0, ASSERT_LINE); //SINT
 
 	LS259(config, "drivers1", 0); // IC4
 	LS259(config, "drivers2", 0); // IC3
@@ -393,12 +394,12 @@ void joctronic_state::slalom03(machine_config &config)
 
 	LS259(config, m_mainlatch); // IC6 - exact type unknown
 	//m_mainlatch->q_out_cb<0>().set(FUNC(joctronic_state::cont_w));
-	//m_mainlatch->parallel_out_cb().set(FUNC(joctronic_state::ls145_w)).rshift(3).mask(0x38);
+	//m_mainlatch->parallel_out_cb().set(FUNC(joctronic_state::ls145_w)).rshift(3).mask(0x07);
 	//m_mainlatch->q_out_cb<7>().set(FUNC(joctronic_state::slalom03_reset_w));
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(12'000'000)/2)); // 6 MHz
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	//ctc.zc_callback<0>().set_inputline(m_soundcpu, INPUT_LINE_IRQ0); //SINT
+	//ctc.zc_callback<0>().set_inputline(m_soundcpu, INPUT_LINE_IRQ0, ASSERT_LINE); //SINT
 
 	HC259(config, "drivers1", 0); // IC1
 	HC259(config, "drivers2", 0); // IC2

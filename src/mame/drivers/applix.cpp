@@ -24,19 +24,19 @@
     TODO:
     - Cassette interface (coded but not working)
     - Use kbtro device (tried and failed)
-    - Optional serial device Z8530 Z80SCC
     - Optional SCSI controller NCR5380 and hard drive (max 40mb)
     - Joystick
     - Audio: it could be better
     - DAC output is used to compare against analog inputs; core doesn't permit
       audio outputs to be used for non-speaker purposes.
-    - Bios 5 crashes mess after scrolling about half a screen
+    - Bios 5 crashes MAME after scrolling about half a screen
 
 ****************************************************************************/
 
 #include "emu.h"
 
 #include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
@@ -45,9 +45,9 @@
 #include "machine/6522via.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
+#include "machine/z80scc.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "sound/wave.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
@@ -61,46 +61,46 @@
 class applix_state : public driver_device
 {
 public:
-	applix_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_base(*this, "base"),
-		m_maincpu(*this, "maincpu"),
-		m_crtc(*this, "crtc"),
-		m_via(*this, "via6522"),
-		m_centronics(*this, "centronics"),
-		m_cent_data_out(*this, "cent_data_out"),
-		m_fdc(*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_floppy1(*this, "fdc:1"),
-		m_ldac(*this, "ldac"),
-		m_rdac(*this, "rdac"),
-		m_cass(*this, "cassette"),
-		m_io_dsw(*this, "DSW"),
-		m_io_fdc(*this, "FDC"),
-		m_io_k0f(*this, "K0f"),
-		m_io_k300(*this, "K30_0"),
-		m_io_k301(*this, "K30_1"),
-		m_io_k310(*this, "K31_0"),
-		m_io_k311(*this, "K31_1"),
-		m_io_k320(*this, "K32_0"),
-		m_io_k321(*this, "K32_1"),
-		m_io_k330(*this, "K33_0"),
-		m_io_k331(*this, "K33_1"),
-		m_io_k340(*this, "K34_0"),
-		m_io_k341(*this, "K34_1"),
-		m_io_k350(*this, "K35_0"),
-		m_io_k351(*this, "K35_1"),
-		m_io_k360(*this, "K36_0"),
-		m_io_k361(*this, "K36_1"),
-		m_io_k370(*this, "K37_0"),
-		m_io_k371(*this, "K37_1"),
-		m_io_k380(*this, "K38_0"),
-		m_io_k390(*this, "K39_0"),
-		m_io_k3a0(*this, "K3a_0"),
-		m_io_k3b0(*this, "K3b_0"),
-		m_io_k0b(*this, "K0b"),
-		m_expansion(*this, "expansion"),
-		m_palette(*this, "palette")
+	applix_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_base(*this, "base")
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+		, m_via(*this, "via6522")
+		, m_centronics(*this, "centronics")
+		, m_cent_data_out(*this, "cent_data_out")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+		, m_ldac(*this, "ldac")
+		, m_rdac(*this, "rdac")
+		, m_cass(*this, "cassette")
+		, m_io_dsw(*this, "DSW")
+		, m_io_fdc(*this, "FDC")
+		, m_io_k0f(*this, "K0f")
+		, m_io_k300(*this, "K30_0")
+		, m_io_k301(*this, "K30_1")
+		, m_io_k310(*this, "K31_0")
+		, m_io_k311(*this, "K31_1")
+		, m_io_k320(*this, "K32_0")
+		, m_io_k321(*this, "K32_1")
+		, m_io_k330(*this, "K33_0")
+		, m_io_k331(*this, "K33_1")
+		, m_io_k340(*this, "K34_0")
+		, m_io_k341(*this, "K34_1")
+		, m_io_k350(*this, "K35_0")
+		, m_io_k351(*this, "K35_1")
+		, m_io_k360(*this, "K36_0")
+		, m_io_k361(*this, "K36_1")
+		, m_io_k370(*this, "K37_0")
+		, m_io_k371(*this, "K37_1")
+		, m_io_k380(*this, "K38_0")
+		, m_io_k390(*this, "K39_0")
+		, m_io_k3a0(*this, "K3a_0")
+		, m_io_k3b0(*this, "K3b_0")
+		, m_io_k0b(*this, "K0b")
+		, m_expansion(*this, "expansion")
+		, m_palette(*this, "palette")
 	{ }
 
 	void applix(machine_config &config);
@@ -148,6 +148,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
+	MC6845_BEGIN_UPDATE(crtc_update_border);
 	void applix_palette(palette_device &palette) const;
 
 	uint8_t m_video_latch;
@@ -466,13 +467,13 @@ void applix_state::applix_mem(address_map &map)
 	map(0x600080, 0x6000ff).w(FUNC(applix_state::dac_latch_w));
 	map(0x600100, 0x60017f).w(FUNC(applix_state::video_latch_w)); //video latch (=border colour, high nybble; video base, low nybble) (odd)
 	map(0x600180, 0x6001ff).w(FUNC(applix_state::analog_latch_w));
-	//AM_RANGE(0x700000, 0x700007) z80-scc (ch b control, ch b data, ch a control, ch a data) on even addresses
+	map(0x700000, 0x700007).mirror(0x78).rw("scc", FUNC(scc8530_device::ab_dc_r), FUNC(scc8530_device::ab_dc_w)).umask16(0xff00).cswidth(16);
 	map(0x700080, 0x7000ff).r(FUNC(applix_state::applix_inputs_r));
-	map(0x700100, 0x70011f).mirror(0x60).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0xff00);
-	map(0x700180, 0x700180).mirror(0x7c).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
-	map(0x700182, 0x700182).mirror(0x7c).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x700100, 0x70011f).mirror(0x60).m(m_via, FUNC(via6522_device::map)).umask16(0xff00).cswidth(16);
+	map(0x700180, 0x700180).mirror(0x7c).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w)).cswidth(16);
+	map(0x700182, 0x700182).mirror(0x7c).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w)).cswidth(16);
 	map(0xffffc0, 0xffffc1).rw(FUNC(applix_state::fdc_data_r), FUNC(applix_state::fdc_data_w));
-	//AM_RANGE(0xffffc2, 0xffffc3) AM_READWRITE(fdc_int_r,fdc_int_w) // optional
+	//map(0xffffc2, 0xffffc3).rw(FUNC(applix_state::fdc_int_r) , FUNC(applix_state::fdc_int_w)); // optional
 	map(0xffffc8, 0xffffcd).r(FUNC(applix_state::fdc_stat_r));
 	map(0xffffd0, 0xffffd1).w(FUNC(applix_state::fdc_cmd_w));
 	//600000, 6FFFFF  io ports and latches
@@ -792,15 +793,15 @@ void applix_state::video_start()
 MC6845_UPDATE_ROW( applix_state::crtc_update_row )
 {
 	// The display is bitmapped. 2 modes are supported here, 320x200x16 and 640x200x4.
-	// Need to display a border colour.
 	// There is a monochrome mode, but no info found as yet.
+	// The 6845 cursor signal is not used at all.
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	uint32_t const vidbase = (m_video_latch & 15) << 14;
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t const vidbase = (m_video_latch & 15) << 14 | (ra & 7) << 12;
+	uint32_t *p = &bitmap.pix32(y + vbp, hbp);
 
 	for (uint16_t x = 0; x < x_count; x++)
 	{
-		uint32_t const mem = vidbase + ma + x + (ra<<12);
+		uint32_t const mem = vidbase | ((ma + x) & 0xfff);
 		uint16_t chr = m_base[mem];
 
 		if (BIT(m_pa, 3))
@@ -825,6 +826,11 @@ MC6845_UPDATE_ROW( applix_state::crtc_update_row )
 	}
 }
 
+MC6845_BEGIN_UPDATE( applix_state::crtc_update_border )
+{
+	bitmap.fill(m_palette->pen(m_video_latch >> 4), cliprect);
+}
+
 WRITE_LINE_MEMBER( applix_state::vsync_w )
 {
 	m_via->write_ca2(state);
@@ -847,14 +853,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(applix_state::cass_timer)
 	}
 }
 
-MACHINE_CONFIG_START(applix_state::applix)
+void applix_state::applix(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 30_MHz_XTAL / 4) // MC68000-P10 @ 7.5 MHz
-	MCFG_DEVICE_PROGRAM_MAP(applix_mem)
+	M68000(config, m_maincpu, 30_MHz_XTAL / 4); // MC68000-P10 @ 7.5 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &applix_state::applix_mem);
 
-	MCFG_DEVICE_ADD("subcpu", Z80, 16_MHz_XTAL / 2) // Z80H
-	MCFG_DEVICE_PROGRAM_MAP(subcpu_mem)
-	MCFG_DEVICE_IO_MAP(subcpu_io)
+	z80_device &subcpu(Z80(config, "subcpu", 16_MHz_XTAL / 2)); // Z80H
+	subcpu.set_addrmap(AS_PROGRAM, &applix_state::subcpu_mem);
+	subcpu.set_addrmap(AS_IO, &applix_state::subcpu_io);
 
 	i8051_device &kbdcpu(I8051(config, "kbdcpu", 11060250));
 	kbdcpu.set_addrmap(AS_PROGRAM, &applix_state::keytronic_pc3270_program);
@@ -867,33 +874,31 @@ MACHINE_CONFIG_START(applix_state::applix)
 	kbdcpu.port_out_cb<3>().set(FUNC(applix_state::p3_write));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 200);
+	screen.set_visarea_full();
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette, FUNC(applix_state::applix_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ldac", DAC0800, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // 74ls374.u20 + dac0800.u21 + 4052.u23
-	MCFG_DEVICE_ADD("rdac", DAC0800, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // 74ls374.u20 + dac0800.u21 + 4052.u23
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	DAC0800(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // 74ls374.u20 + dac0800.u21 + 4052.u23
+	DAC0800(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // 74ls374.u20 + dac0800.u21 + 4052.u23
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT).add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT).add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* Devices */
 	MC6845(config, m_crtc, 30_MHz_XTAL / 16); // MC6545 @ 1.875 MHz
 	m_crtc->set_screen("screen");
-	m_crtc->set_show_border_area(false);
+	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(applix_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(applix_state::crtc_update_row));
+	m_crtc->set_begin_update_callback(FUNC(applix_state::crtc_update_border));
 	m_crtc->out_vsync_callback().set(FUNC(applix_state::vsync_w));
-
 
 	VIA6522(config, m_via, 30_MHz_XTAL / 4 / 10); // VIA uses 68000 E clock
 	m_via->readpb_handler().set(FUNC(applix_state::applix_pb_r));
@@ -912,13 +917,35 @@ MACHINE_CONFIG_START(applix_state::applix)
 	m_centronics->set_output_latch(*m_cent_data_out);
 
 	CASSETTE(config, m_cass);
-	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
 
 	WD1772(config, m_fdc, 16_MHz_XTAL / 2); //connected to Z80H clock pin
 	FLOPPY_CONNECTOR(config, "fdc:0", applix_floppies, "35dd", applix_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", applix_floppies, "35dd", applix_state::floppy_formats).enable_sound(true);
 	TIMER(config, "applix_c").configure_periodic(FUNC(applix_state::cass_timer), attotime::from_hz(100000));
-MACHINE_CONFIG_END
+
+	scc8530_device &scc(SCC8530N(config, "scc", 30_MHz_XTAL / 8));
+	scc.out_txda_callback().set("serial_a", FUNC(rs232_port_device::write_txd));
+	scc.out_rtsa_callback().set("serial_a", FUNC(rs232_port_device::write_rts));
+	scc.out_dtra_callback().set("serial_a", FUNC(rs232_port_device::write_dtr));
+	scc.out_txdb_callback().set("serial_b", FUNC(rs232_port_device::write_txd));
+	scc.out_rtsb_callback().set("serial_b", FUNC(rs232_port_device::write_rts));
+	scc.out_dtrb_callback().set("serial_b", FUNC(rs232_port_device::write_dtr));
+	scc.out_int_callback().set_inputline("maincpu", M68K_IRQ_3);
+
+	rs232_port_device &serial_a(RS232_PORT(config, "serial_a", default_rs232_devices, nullptr));
+	serial_a.rxd_handler().set("scc", FUNC(scc8530_device::rxa_w));
+	serial_a.cts_handler().set("scc", FUNC(scc8530_device::ctsa_w));
+	serial_a.cts_handler().set("scc", FUNC(scc8530_device::dcda_w));
+
+	rs232_port_device &serial_b(RS232_PORT(config, "serial_b", default_rs232_devices, nullptr));
+	serial_b.rxd_handler().set("scc", FUNC(scc8530_device::rxb_w));
+	serial_b.cts_handler().set("scc", FUNC(scc8530_device::ctsb_w));
+	serial_b.cts_handler().set("scc", FUNC(scc8530_device::dcdb_w));
+
+	SOFTWARE_LIST(config, "flop_list").set_original("applix_flop");
+}
 
 /* ROM definition */
 ROM_START( applix )

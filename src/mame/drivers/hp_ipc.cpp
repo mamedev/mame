@@ -10,23 +10,19 @@ Driver to-do list
 
 - softlist: merge dumps from coho.org and classiccmp.org
 - keyboard: NMI generation, autorepeat
-- HP-HIL mouse
-- RTC chip: proper month, day
-- switchable graphics resolution ("_desktop" mode uses 640x400)
-- HP-IB chip
-- CS/80, SS/80 storage protocol(s) and drives
+- RTC chip: proper month, day (possibly a different chip, 82167)
 - HP-IL printer
 - sound (needs dump of COP452)
 
 QA
-- diagnstc.td0: display test [cannot execute]
-- diagnstc.td0: complete keyboard test [keyboard stops responding]
++ diagnstc.td0: display test
+- diagnstc.td0: complete keyboard test [second connector not implemented]
 - diagnstc.td0: speaker test
 - diagnstc.td0: printer test
 + diagnstc.td0: auto: floppy disc test
 + diagnstc.td0: auto: ram test
 - diagnstc.td0: auto: rtc test [cannot execute]
-- diagnstc.td0: auto: short keyboard test [cannot execute + keyboard stops responding]
++ diagnstc.td0: auto: short keyboard test
 
 maybe
 - drive AP line of MLC from a timer
@@ -171,6 +167,7 @@ Notes:
          ROM - 16Kb (32Kx4) Some kind of very early DIP28 PROM/ROM? Same pinout as 1Kb RAM above. Holds the character font table for the printer
                Four versions of this ROM exist, one each for Japan/Arabic/Hebrew and one for all other regions
     NS58167A - National Semiconductor NS58167A Clock Controller RTC at U44. Clock input 32.768kHz (DIP24)
+               (Tony Duell's schematics show a 82167 instead)
        LM358 - National Semiconductor LM358 Operational Amplifier at U40 (DIP8)
        LM393 - Texas Instruments LM393 Dual Comparator at U34 (DIP8)
          BT1 - 3v lithium battery
@@ -499,7 +496,7 @@ void hp_ipc_state::hp_ipc_mem_inner_base(address_map &map)
 	map(0x0610000, 0x0610007).rw(FUNC(hp_ipc_state::floppy_id_r), FUNC(hp_ipc_state::floppy_id_w)).umask16(0x00ff);
 	map(0x0610008, 0x061000F).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
 	map(0x0620000, 0x0620007).rw(m_gpu, FUNC(hp1ll3_device::read), FUNC(hp1ll3_device::write)).umask16(0x00ff);
-	map(0x0630000, 0x063FFFF).mask(0xf).rw("hpib" , FUNC(tms9914_device::reg8_r) , FUNC(tms9914_device::reg8_w)).umask16(0x00ff);
+	map(0x0630000, 0x063FFFF).mask(0xf).rw("hpib" , FUNC(tms9914_device::read) , FUNC(tms9914_device::write)).umask16(0x00ff);
 	map(0x0640000, 0x064002F).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 	map(0x0660000, 0x06600FF).rw("mlc", FUNC(hp_hil_mlc_device::read), FUNC(hp_hil_mlc_device::write)).umask16(0x00ff);  // 'caravan', scrn/caravan.h
 	map(0x0670000, 0x067FFFF).noprw();       // Speaker (NatSemi COP 452)
@@ -667,37 +664,37 @@ void hp_ipc_state::floppy_id_w(uint8_t data)
 
 WRITE_LINE_MEMBER(hp_ipc_state::irq_1)
 {
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_1, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_1, state);
 }
 
 WRITE_LINE_MEMBER(hp_ipc_state::irq_2)
 {
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_2, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_2, state);
 }
 
 WRITE_LINE_MEMBER(hp_ipc_state::irq_3)
 {
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_3, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_3, state);
 }
 
 WRITE_LINE_MEMBER(hp_ipc_state::irq_4)
 {
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_4, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_4, state);
 }
 
 WRITE_LINE_MEMBER(hp_ipc_state::irq_5)
 {
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_5, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_5, state);
 }
 
 WRITE_LINE_MEMBER(hp_ipc_state::irq_6)
 {
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_6, state);
 }
 
 WRITE_LINE_MEMBER(hp_ipc_state::irq_7)
 {
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_7, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_7, state);
 }
 
 
@@ -737,9 +734,10 @@ static void hp_ipc_floppies(device_slot_interface &device)
  *  2   HP-HIL devices (keyboard, mouse)
  *  1   Real-time clock
  */
-MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
-	MCFG_DEVICE_ADD("maincpu", M68000, 15.92_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(hp_ipc_mem_outer)
+void hp_ipc_state::hp_ipc_base(machine_config &config)
+{
+	M68000(config, m_maincpu, 15.92_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp_ipc_state::hp_ipc_mem_outer);
 
 	HP1LL3(config , m_gpu , 24_MHz_XTAL / 8).set_screen("screen");
 
@@ -774,21 +772,23 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 	hpib.srq_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
 	hpib.atn_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
 	hpib.ren_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
-	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_EOI_CALLBACK(WRITELINE("hpib" , tms9914_device , eoi_w))
-	MCFG_IEEE488_DAV_CALLBACK(WRITELINE("hpib" , tms9914_device , dav_w))
-	MCFG_IEEE488_NRFD_CALLBACK(WRITELINE("hpib" , tms9914_device , nrfd_w))
-	MCFG_IEEE488_NDAC_CALLBACK(WRITELINE("hpib" , tms9914_device , ndac_w))
-	MCFG_IEEE488_IFC_CALLBACK(WRITELINE("hpib" , tms9914_device , ifc_w))
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE("hpib" , tms9914_device , srq_w))
-	MCFG_IEEE488_ATN_CALLBACK(WRITELINE("hpib" , tms9914_device , atn_w))
-	MCFG_IEEE488_REN_CALLBACK(WRITELINE("hpib" , tms9914_device , ren_w))
-	MCFG_IEEE488_SLOT_ADD("ieee_rem" , 0 , remote488_devices , nullptr)
+
+	ieee488_device &ieee(IEEE488(config, IEEE488_TAG));
+	ieee.eoi_callback().set("hpib" , FUNC(tms9914_device::eoi_w));
+	ieee.dav_callback().set("hpib" , FUNC(tms9914_device::dav_w));
+	ieee.nrfd_callback().set("hpib" , FUNC(tms9914_device::nrfd_w));
+	ieee.ndac_callback().set("hpib" , FUNC(tms9914_device::ndac_w));
+	ieee.ifc_callback().set("hpib" , FUNC(tms9914_device::ifc_w));
+	ieee.srq_callback().set("hpib" , FUNC(tms9914_device::srq_w));
+	ieee.atn_callback().set("hpib" , FUNC(tms9914_device::atn_w));
+	ieee.ren_callback().set("hpib" , FUNC(tms9914_device::ren_w));
+	IEEE488_SLOT(config , "ieee_rem" , 0 , remote488_devices , nullptr);
 
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("768K,1M,1576K,2M,3M,4M,5M,6M,7M,7680K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
+void hp_ipc_state::hp_ipc(machine_config &config)
+{
 	hp_ipc_base(config);
 
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&hp_ipc_state::hp_ipc_mem_inner_9807a).set_options(ENDIANNESS_BIG, 16, 25, 0x1000000);
@@ -807,9 +807,10 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hp_ipc_state::hp9808a)
+void hp_ipc_state::hp9808a(machine_config &config)
+{
 	hp_ipc_base(config);
 
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&hp_ipc_state::hp_ipc_mem_inner_9808a).set_options(ENDIANNESS_BIG, 16, 25, 0x1000000);
@@ -825,7 +826,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp9808a)
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(hp_ipc)
@@ -855,5 +856,5 @@ ROM_END
 #define rom_hp9808a rom_hp_ipc
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME                            FLAGS
-COMP( 1985, hp_ipc,  0,      0,      hp_ipc,  hp_ipc, hp_ipc_state, empty_init, "Hewlett-Packard", "Integral Personal Computer 9807A", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1985, hp_ipc,  0,      0,      hp_ipc,  hp_ipc, hp_ipc_state, empty_init, "Hewlett-Packard", "Integral Personal Computer 9807A", MACHINE_NO_SOUND)
 COMP( 1985, hp9808a, 0,      0,      hp9808a, hp_ipc, hp_ipc_state, empty_init, "Hewlett-Packard", "Integral Personal Computer 9808A", MACHINE_NOT_WORKING)

@@ -110,7 +110,7 @@ private:
 	virtual void video_start() override;
 	void progolf_palette(palette_device &palette) const;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void main_cpu(address_map &map);
 	void sound_cpu(address_map &map);
 };
@@ -136,7 +136,7 @@ void progolf_state::video_start()
 }
 
 
-uint32_t progolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t progolf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int count,color,x,y,xi,yi;
 
@@ -175,7 +175,7 @@ uint32_t progolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 						color = m_fg_fb[(xi+yi*8)+count*0x40];
 
 						if(color != 0 && cliprect.contains(x+yi, 256-y+xi))
-							bitmap.pix16(x+yi, 256-y+xi) = m_palette->pen((color & 0x7));
+							bitmap.pix32(x+yi, 256-y+xi) = m_palette->pen((color & 0x7));
 					}
 				}
 
@@ -278,7 +278,7 @@ void progolf_state::main_cpu(address_map &map)
 	map(0x9800, 0x9800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x9801, 0x9801).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x9a00, 0x9a00).portr("DSW2").w("soundlatch", FUNC(generic_latch_8_device::write));
-//  AM_RANGE(0x9e00, 0x9e00) AM_WRITENOP
+//  map(0x9e00, 0x9e00).nopw();
 	map(0xb000, 0xffff).rom();
 }
 
@@ -418,30 +418,30 @@ void progolf_state::progolf_palette(palette_device &palette) const
 	}
 }
 
-MACHINE_CONFIG_START(progolf_state::progolf)
+void progolf_state::progolf(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", DECO_222, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
-	MCFG_DEVICE_PROGRAM_MAP(main_cpu)
+	DECO_222(config, m_maincpu, 3000000/2); /* guess, 3 Mhz makes the game to behave worse? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &progolf_state::main_cpu);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, 500000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
+	M6502(config, m_audiocpu, 500000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &progolf_state::sound_cpu);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
 	soundlatch.data_pending_callback().set_inputline(m_audiocpu, 0);
 	soundlatch.set_separate_acknowledge(true);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(progolf_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3072));
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(progolf_state::screen_update));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_progolf)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_progolf);
 	PALETTE(config, m_palette, FUNC(progolf_state::progolf_palette), 32 * 3);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 3000000/4)); /* hand tuned to get ~57 fps */
@@ -455,14 +455,15 @@ MACHINE_CONFIG_START(progolf_state::progolf)
 	AY8910(config, "ay1", 12000000/8).add_route(ALL_OUTPUTS, "mono", 0.23);
 
 	AY8910(config, "ay2", 12000000/8).add_route(ALL_OUTPUTS, "mono", 0.23);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(progolf_state::progolfa)
+void progolf_state::progolfa(machine_config &config)
+{
 	progolf(config);
-	config.device_remove("maincpu"); /* different encrypted cpu to progolf */
-	MCFG_DEVICE_ADD("maincpu", DECO_CPU6, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
-	MCFG_DEVICE_PROGRAM_MAP(main_cpu)
-MACHINE_CONFIG_END
+	/* different encrypted cpu to progolf */
+	DECO_CPU6(config.replace(), m_maincpu, 3000000/2); /* guess, 3 Mhz makes the game to behave worse? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &progolf_state::main_cpu);
+}
 
 
 ROM_START( progolf )

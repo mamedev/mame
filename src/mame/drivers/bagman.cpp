@@ -133,14 +133,11 @@ void bagman_state::main_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram();
 	map(0x9000, 0x93ff).ram().w(FUNC(bagman_state::videoram_w)).share("videoram");
-	map(0x9800, 0x9bff).ram().w(FUNC(bagman_state::colorram_w)).share("colorram");
+	map(0x9800, 0x9bff).ram().w(FUNC(bagman_state::colorram_w)).share("colorram"); // Includes spriteram
 	map(0x9c00, 0x9fff).nopw();    /* written to, but unused */
 	map(0xa000, 0xa000).r(FUNC(bagman_state::pal16r6_r));
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xc000, 0xffff).rom(); /* Super Bagman only */
-	map(0x9800, 0x981f).writeonly().share("spriteram"); /* hidden portion of color RAM */
-									/* here only to initialize the pointer, */
-									/* writes are handled by colorram_w */
 	map(0xa800, 0xa807).w(FUNC(bagman_state::ls259_w)); /* TMS5110 driving state machine */
 	map(0xb000, 0xb000).portr("DSW");
 	map(0xb800, 0xb800).nopr();                             /* looks like watchdog from schematics */
@@ -158,10 +155,7 @@ void bagman_state::pickin_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x7000, 0x77ff).ram();
 	map(0x8800, 0x8bff).ram().w(FUNC(bagman_state::videoram_w)).share("videoram");
-	map(0x9800, 0x9bff).ram().w(FUNC(bagman_state::colorram_w)).share("colorram");
-	map(0x9800, 0x981f).writeonly().share("spriteram"); /* hidden portion of color RAM */
-									/* here only to initialize the pointer, */
-									/* writes are handled by colorram_w */
+	map(0x9800, 0x9bff).ram().w(FUNC(bagman_state::colorram_w)).share("colorram"); // Includes spriteram
 	map(0x9c00, 0x9fff).nopw();    /* written to, but unused */
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xa800, 0xa800).portr("DSW");
@@ -176,7 +170,7 @@ void bagman_state::main_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x08, 0x09).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x0c, 0x0c).r("aysnd", FUNC(ay8910_device::data_r));
-	//AM_RANGE(0x56, 0x56) AM_WRITENOP
+	//map(0x56, 0x56).nopw();
 }
 
 
@@ -249,11 +243,23 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( pickin )
 	PORT_INCLUDE( bagman )
 
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+
+	PORT_MODIFY ("P2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "2C/1C 1C/1C 1C/3C 1C/7C" )
 	PORT_DIPSETTING(    0x01, "1C/1C 1C/2C 1C/6C 1C/14C" )
-	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:2,3")
+	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x06, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -262,10 +268,16 @@ static INPUT_PORTS_START( pickin )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Language ) )         PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x20, "30000" )
+	PORT_DIPSETTING(    0x00, "40000" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Language ) )         PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x40, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( French ) )
+	PORT_CONFNAME(0x80, 0x80, DEF_STR( Cabinet ) ) // sense line on wiring harness
+	PORT_CONFSETTING(   0x80, DEF_STR( Upright ) )
+	PORT_CONFSETTING(   0x00, DEF_STR( Cocktail ) )
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( botanicf )
@@ -331,7 +343,7 @@ static INPUT_PORTS_START( squaitsa )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, squaitsa_state, dial_input_r<0>, nullptr)
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(squaitsa_state, dial_input_r<0>)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("P2")
@@ -340,7 +352,7 @@ static INPUT_PORTS_START( squaitsa )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, squaitsa_state, dial_input_r<1>, nullptr)
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(squaitsa_state, dial_input_r<1>)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("DSW")
@@ -752,9 +764,10 @@ ROM_START( bagmans )
 	ROM_LOAD( "a2_1c.bin",    0x0000, 0x1000, CRC(f3e11bd7) SHA1(43ee00ff777008c89f619eb183e7c5e63f6c7694) )
 	ROM_LOAD( "a2_1f.bin",    0x1000, 0x1000, CRC(d0f7105b) SHA1(fb382703850a4ded567706e02ebb7f3e22531b7c) )
 
+	// according to MT #02508 Stern/Seeburg logos should have different colors.
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "p3.bin",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
-	ROM_LOAD( "r3.bin",       0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
+	ROM_LOAD( "p3.bin",       0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
+	ROM_LOAD( "r3.bin",       0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
 	ROM_LOAD( "r6.bin",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
@@ -781,9 +794,10 @@ ROM_START( bagmans2 )
 	ROM_LOAD( "a2_1c.bin",    0x0000, 0x1000, CRC(f3e11bd7) SHA1(43ee00ff777008c89f619eb183e7c5e63f6c7694) )
 	ROM_LOAD( "a2_1f.bin",    0x1000, 0x1000, CRC(d0f7105b) SHA1(fb382703850a4ded567706e02ebb7f3e22531b7c) )
 
+	// according to MT #02508 Stern/Seeburg logos should have different colors.
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "p3.bin",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
-	ROM_LOAD( "r3.bin",       0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
+	ROM_LOAD( "p3.bin",       0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
+	ROM_LOAD( "r3.bin",       0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
 	ROM_LOAD( "r6.bin",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
@@ -811,11 +825,11 @@ ROM_START( bagmanj )
 	ROM_LOAD( "bf8_04-1.f1",  0x1000, 0x1000, CRC(3f5c991e) SHA1(853c629ba0b4739dcb1af669fd600a3d83fb2072) ) // 2732
 
 	ROM_REGION( 0x0040, "proms", 0 ) // not dumped for this set
-	ROM_LOAD( "p3.bin",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
-	ROM_LOAD( "r3.bin",       0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
+	ROM_LOAD( "p3.bin",       0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
+	ROM_LOAD( "r3.bin",       0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
 	ROM_REGION( 0x0020, "5110ctrl", 0) // not dumped for this set
-	ROM_LOAD( "r6.bin",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
+	ROM_LOAD( "r6.bin",       0x0000, 0x0020, BAD_DUMP CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) /* data for the TMS5110 speech chip */
 	ROM_LOAD( "bf8_12.r9",    0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) ) // 2732
@@ -855,6 +869,45 @@ ROM_START( botanic2 ) // PCB has Valadon logo with 'bajo licencia Itisa (Palamos
 ROM_END
 
 ROM_START( sbagman )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sb5v5.9e",     0x0000, 0x1000, CRC(b61029ea) SHA1(2166ca62eb1e237b56252b83d0199e58ec1c8dac) )
+	ROM_LOAD( "sb6v4.9f",     0x1000, 0x1000, CRC(bb6a6883) SHA1(a65ac9aeac9c6c85bd4e7eca385d875def92b954) )
+	ROM_LOAD( "sb7v4.9j",     0x2000, 0x1000, CRC(a62b6b77) SHA1(ae9cb9c148e293519e391cb88eed9d137d80ea57) )
+	ROM_LOAD( "sb8v3.9k",     0x3000, 0x1000, CRC(b94fbb73) SHA1(5d676c5d1d864d70d98f0137c4072062a781b3a0) )
+	ROM_LOAD( "sb9v3.9m",     0x4000, 0x1000, CRC(601f34ba) SHA1(1b7ee61a341b9a87abe4fe10b0c647a9b0b97d38) )
+	ROM_LOAD( "sb10v3.9n",    0x5000, 0x1000, CRC(5f750918) SHA1(3dc44f259e88999dbb95b4d4376281cc81c1ab87) )
+	ROM_LOAD( "sb13v5.8d",    0xc000, 0x0e00, CRC(e0e920f6) SHA1(fbdb36e2d3f4c8dd1f27b3f39a4c025fa47df234) )
+	ROM_CONTINUE(             0xfe00, 0x0200 )
+	ROM_LOAD( "sb14v3.8f",    0xd000, 0x0400, CRC(83b10139) SHA1(8a1880c6ab8a345676fe30465351d69cc1b416b2) )
+	ROM_CONTINUE(             0xe400, 0x0200 )
+	ROM_CONTINUE(             0xd600, 0x0a00 )
+	ROM_LOAD( "sb15v3.8j",    0xe000, 0x0400, CRC(fe924879) SHA1(b80cbf9cba91e553f7685aef348854c02f0619c7) )
+	ROM_CONTINUE(             0xd400, 0x0200 )
+	ROM_CONTINUE(             0xe600, 0x0a00 )
+	ROM_LOAD( "sb16v3.8k",    0xf000, 0x0e00, CRC(b77eb1f5) SHA1(ef94c1b449e3fa230491052fc3bd4db3f1239263) )
+	ROM_CONTINUE(             0xce00, 0x0200 )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "sb2v3.1e",     0x0000, 0x1000, CRC(f4d3d4e6) SHA1(167ad0259578966fe86384df844e69cf2cc77443) )
+	ROM_LOAD( "sb4v3.1j",     0x1000, 0x1000, CRC(2c6a510d) SHA1(304064f11e80f4ec471174823b8aaf59844061ac) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "sb1v3.1c",     0x0000, 0x1000, CRC(a046ff44) SHA1(af319cfb74e5efe435c26e971de13bd390f4b378) )
+	ROM_LOAD( "sb3v3.1f",     0x1000, 0x1000, CRC(a4422da4) SHA1(3aa55ca8c99566c1c9eb097b6d645c4216e09dfb) )
+
+	ROM_REGION( 0x0040, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "p3.bin",       0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
+	ROM_LOAD( "r3.bin",       0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
+
+	ROM_REGION( 0x0020, "5110ctrl", 0) // not dumped for this set
+	ROM_LOAD( "r6.bin",       0x0000, 0x0020, BAD_DUMP CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
+
+	ROM_REGION( 0x2000, "tmsprom", 0 ) /* data for the TMS5110 speech chip */
+	ROM_LOAD( "b11v3.9r",     0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) )
+	ROM_LOAD( "b12v3.9t",     0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) )
+ROM_END
+
+ROM_START( sbagman2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5.9e",         0x0000, 0x1000, CRC(1b1d6b0a) SHA1(549161f6adc88fa16339815e05af33ca57815660) )
 	ROM_LOAD( "6.9f",         0x1000, 0x1000, CRC(ac49cb82) SHA1(5affa0c03bedf2c9d5368c7f075818e1760c12ae) )
@@ -1107,7 +1160,8 @@ GAME( 1982, bagmans,   bagman,  bagman,   bagmans,   bagman_state,   empty_init,
 GAME( 1982, bagmans2,  bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bagmanj,   bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation (Taito license)", "Bagman (Taito)", MACHINE_SUPPORTS_SAVE ) // title screen actually doesn't mention Valadon, only Stern and Taito
 
-GAME( 1984, sbagman,   0,       sbagman,  sbagman,   bagman_state,   empty_init, ROT270, "Valadon Automation", "Super Bagman", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbagman,   0,       sbagman,  sbagman,   bagman_state,   empty_init, ROT270, "Valadon Automation", "Super Bagman (version 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbagman2,  sbagman, sbagman,  sbagman,   bagman_state,   empty_init, ROT270, "Valadon Automation", "Super Bagman (version 3?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, sbagmani,  sbagman, sbagmani, sbagman,   bagman_state,   empty_init, ROT90,  "Valadon Automation (Itisa license)", "Super Bagman (Itisa, Spain)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // different color PROMs, needs correct decoding
 GAME( 1984, sbagmans,  sbagman, sbagman,  sbagman,   bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
 

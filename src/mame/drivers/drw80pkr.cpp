@@ -27,6 +27,7 @@
     company in 1981 and changed its name to IGT.
 
 ***********************************************************************************/
+
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/nvram.h"
@@ -34,6 +35,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class drw80pkr_state : public driver_device
@@ -201,11 +203,11 @@ WRITE8_MEMBER(drw80pkr_state::io_w)
 
 		// ay8910 control port
 		if (m_p1 == 0xfc)
-			m_aysnd->address_w(space, 0, data);
+			m_aysnd->address_w(data);
 
 		// ay8910_write_port_0_w
 		if (m_p1 == 0xfe)
-			m_aysnd->data_w(space, 0, data);
+			m_aysnd->data_w(data);
 	}
 }
 
@@ -336,7 +338,7 @@ TILE_GET_INFO_MEMBER(drw80pkr_state::get_bg_tile_info)
 
 void drw80pkr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(drw80pkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 24, 27);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(drw80pkr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 24, 27);
 }
 
 uint32_t drw80pkr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -451,7 +453,8 @@ INPUT_PORTS_END
 *     Machine Driver     *
 *************************/
 
-MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
+void drw80pkr_state::drw80pkr(machine_config &config)
+{
 	// basic machine hardware
 	I8039(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &drw80pkr_state::map);
@@ -468,15 +471,15 @@ MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
 	m_maincpu->set_vblank_int("screen", FUNC(drw80pkr_state::irq0_line_hold));
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((31+1)*8, (31+1)*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*8-1, 0*8, 27*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(drw80pkr_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((31+1)*8, (31+1)*8);
+	screen.set_visarea(0*8, 24*8-1, 0*8, 27*8-1);
+	screen.set_screen_update(FUNC(drw80pkr_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_drw80pkr)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_drw80pkr);
 	PALETTE(config, "palette", FUNC(drw80pkr_state::drw80pkr_palette), 16 * 16);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -485,7 +488,7 @@ MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
 	SPEAKER(config, "mono").front_center();
 
 	AY8912(config, m_aysnd, 20000000/12).add_route(ALL_OUTPUTS, "mono", 0.75);
-MACHINE_CONFIG_END
+}
 
 /*************************
 *        Rom Load        *

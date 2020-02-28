@@ -238,7 +238,7 @@ private:
 
 void _4roses_state::_4roses_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram(); // AM_SHARE("nvram")
+	map(0x0000, 0x07ff).ram(); // .share("nvram");
 	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
 	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
@@ -290,7 +290,7 @@ void _4roses_state::_4roses_opcodes_map(address_map &map)
 
 void rugby_state::rugby_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram(); // AM_SHARE("nvram")
+	map(0x0000, 0x07ff).ram(); // .share("nvram");
 	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
 	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
@@ -454,25 +454,25 @@ GFXDECODE_END
 *     Machine Drivers     *
 **************************/
 
-MACHINE_CONFIG_START(_4roses_state::_4roses)
+void _4roses_state::_4roses(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M65C02, MASTER_CLOCK/8) /* 2MHz, guess */
-	MCFG_DEVICE_PROGRAM_MAP(_4roses_map)
-	MCFG_DEVICE_OPCODES_MAP(_4roses_opcodes_map)
+	M65C02(config, m_maincpu, MASTER_CLOCK/8); /* 2MHz, guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &_4roses_state::_4roses_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &_4roses_state::_4roses_opcodes_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((124+1)*4, (30+1)*8)               /* guess. taken from funworld games */
-	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)  /* guess. taken from funworld games */
-	MCFG_SCREEN_UPDATE_DRIVER(_4roses_state, screen_update_funworld)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((124+1)*4, (30+1)*8);               /* guess. taken from funworld games */
+	screen.set_visarea(0*4, 96*4-1, 0*8, 29*8-1);  /* guess. taken from funworld games */
+	screen.set_screen_update(FUNC(_4roses_state::screen_update_funworld));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_4roses)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_4roses);
 
 	PALETTE(config, "palette", FUNC(_4roses_state::funworld_palette), 0x1000);
 
@@ -486,14 +486,15 @@ MACHINE_CONFIG_START(_4roses_state::_4roses)
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, "ay8910", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 2.5);    /* 2MHz, guess */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(rugby_state::rugby)
+void rugby_state::rugby(machine_config &config)
+{
 	_4roses(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(rugby_map)
-	MCFG_DEVICE_OPCODES_MAP(rugby_opcodes_map)
-MACHINE_CONFIG_END
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &rugby_state::rugby_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &rugby_state::rugby_opcodes_map);
+}
 
 
 /*************************

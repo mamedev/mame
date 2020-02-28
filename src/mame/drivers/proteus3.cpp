@@ -34,7 +34,6 @@
     same company.
 
     To Do:
-    - Cassette (coded but too unreliable to be considered working)
     - Add support for k7 cassette files.
     - Need software
     - Need missing PROM, so that all the CRTC controls can be emulated
@@ -54,7 +53,6 @@
 #include "machine/clock.h"
 #include "machine/keyboard.h"
 #include "machine/timer.h"
-#include "sound/wave.h"
 
 #include "bus/rs232/rs232.h"
 
@@ -85,10 +83,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ca2_w);
 	DECLARE_WRITE8_MEMBER(video_w);
 	void kbd_put(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(acia1_txdata_w);
 	DECLARE_WRITE_LINE_MEMBER(acia1_clock_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	uint32_t screen_update_proteus3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// Clocks
@@ -115,9 +111,7 @@ private:
 	uint8_t m_flashcnt;
 	uint16_t m_curs_pos;
 	uint8_t m_cass_data[4];
-	bool m_cass_state;
-	bool m_cassold;
-	uint8_t m_clockcnt;
+	bool m_cassbit, m_cassold, m_cassinbit;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_videoram;
@@ -145,7 +139,7 @@ void proteus3_state::proteus3_mem(address_map &map)
 	map(0x0000, 0x7fff).ram();
 	map(0x8004, 0x8007).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8008, 0x8009).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // cassette
-	map(0x8010, 0x8011).rw(m_acia2, FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // serial keyboard (never writes data)
+	map(0x8010, 0x8011).rw(m_acia2, FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // serial keyboard 7E2 (never writes data)
 	map(0xc000, 0xffff).rom();
 }
 
@@ -157,22 +151,22 @@ void proteus3_state::proteus3_mem(address_map &map)
 static INPUT_PORTS_START(proteus3)
 	PORT_START("SERIAL")
 	PORT_CONFNAME(0x0F , 0x00 , "Serial Baud Rate") // F1-F16 pins on MC14411 in X16
-	PORT_CONFSETTING(mc14411_device::TIMER_F1,  "153600")
-	PORT_CONFSETTING(mc14411_device::TIMER_F2,  "115200")
-	PORT_CONFSETTING(mc14411_device::TIMER_F3,  "76800")
-	PORT_CONFSETTING(mc14411_device::TIMER_F4,  "57600")
-	PORT_CONFSETTING(mc14411_device::TIMER_F5,  "38400")
-	PORT_CONFSETTING(mc14411_device::TIMER_F6,  "28800")
-	PORT_CONFSETTING(mc14411_device::TIMER_F7,  "19200")
-	PORT_CONFSETTING(mc14411_device::TIMER_F8,  "9600")
-	PORT_CONFSETTING(mc14411_device::TIMER_F9,  "4800")
-	PORT_CONFSETTING(mc14411_device::TIMER_F10, "3200")
-	PORT_CONFSETTING(mc14411_device::TIMER_F11, "2400")
-	PORT_CONFSETTING(mc14411_device::TIMER_F12, "2153.3")
-	PORT_CONFSETTING(mc14411_device::TIMER_F13, "1758.8")
-	PORT_CONFSETTING(mc14411_device::TIMER_F14, "1200")
-	PORT_CONFSETTING(mc14411_device::TIMER_F15, "921.6")
-	PORT_CONFSETTING(mc14411_device::TIMER_F16, "1.8432")
+	PORT_CONFSETTING(mc14411_device::TIMER_F1,  "9600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F2,  "7200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F3,  "4800")
+	PORT_CONFSETTING(mc14411_device::TIMER_F4,  "3600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F5,  "2400")
+	PORT_CONFSETTING(mc14411_device::TIMER_F6,  "1800")
+	PORT_CONFSETTING(mc14411_device::TIMER_F7,  "1200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F8,  "600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F9,  "300")
+	PORT_CONFSETTING(mc14411_device::TIMER_F10, "200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F11, "150")
+	PORT_CONFSETTING(mc14411_device::TIMER_F12, "134.5")
+	PORT_CONFSETTING(mc14411_device::TIMER_F13, "110")
+	PORT_CONFSETTING(mc14411_device::TIMER_F14, "75")
+	PORT_CONFSETTING(mc14411_device::TIMER_F15, "57600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F16, "115200")
 INPUT_PORTS_END
 
 void proteus3_state::kbd_put(u8 data)
@@ -200,47 +194,54 @@ void proteus3_state::write_acia_clocks(int id, int state)
 /******************************************************************************
  Cassette
 ******************************************************************************/
-TIMER_DEVICE_CALLBACK_MEMBER( proteus3_state::timer_c )
-{
-	m_cass_data[3]++;
 
-	if (m_cass_state != m_cassold)
+TIMER_DEVICE_CALLBACK_MEMBER( proteus3_state::kansas_r )
+{
+	// no tape - set uart to idle
+	m_cass_data[1]++;
+	if (m_cass_data[1] > 32)
 	{
-		m_cass_data[3] = 0;
-		m_cassold = m_cass_state;
+		m_cass_data[1] = 32;
+		m_cassinbit = 1;
 	}
 
-	if (m_cass_state)
-		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
-	else
-		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER( proteus3_state::timer_p )
-{
 	/* cassette - turn 1200/2400Hz to a bit */
-	m_cass_data[1]++;
-	uint8_t cass_ws = (m_cass->input() > +0.01) ? 1 : 0;
+	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
 		m_cass_data[0] = cass_ws;
-		m_acia1->write_rxd((m_cass_data[1] < 12) ? 1 : 0);
+		m_cassinbit = (m_cass_data[1] < 12) ? 1 : 0;
 		m_cass_data[1] = 0;
 	}
 }
 
-WRITE_LINE_MEMBER( proteus3_state::acia1_txdata_w )
-{
-	m_cass_state = state;
-}
-
 WRITE_LINE_MEMBER( proteus3_state::acia1_clock_w )
 {
-	m_clockcnt++;
-	m_acia1->write_txc(BIT(m_clockcnt, 0));  // divide by 16 selected in the acia
-	if ((m_clockcnt & 0x0f) == 0x04)
-		m_acia1->write_rxc(BIT(m_clockcnt, 4));  // divide by 1 selected
+	// Save - 8N2 - /16 - 600baud
+	// Load - 8N2 - /1
+	u8 twobit = m_cass_data[3] & 15;
+	// incoming @9600Hz
+	if (state)
+	{
+		if (twobit == 0)
+		{
+			m_cassold = m_cassbit;
+			// synchronous rx
+			m_acia1->write_rxc(0);
+			m_acia1->write_rxd(m_cassinbit);
+			m_acia1->write_rxc(1);
+		}
+
+		if (m_cassold)
+			m_cass->output(BIT(m_cass_data[3], 1) ? +1.0 : -1.0); // 2400Hz
+		else
+			m_cass->output(BIT(m_cass_data[3], 2) ? +1.0 : -1.0); // 1200Hz
+
+		m_cass_data[3]++;
+	}
+
+	m_acia1->write_txc(state);
 }
 
 
@@ -361,7 +362,7 @@ void proteus3_state::machine_reset()
 {
 	m_curs_pos = 0;
 	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
-	m_cass_state = 1;
+	m_cassbit = 1;
 	m_cassold = 1;
 	m_acia1->write_rxd(1);
 
@@ -380,20 +381,21 @@ void proteus3_state::machine_reset()
  Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(proteus3_state::proteus3)
+void proteus3_state::proteus3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(3'579'545))  /* Divided by 4 internally */
-	MCFG_DEVICE_PROGRAM_MAP(proteus3_mem)
+	M6800(config, m_maincpu, XTAL(3'579'545));  /* Divided by 4 internally */
+	m_maincpu->set_addrmap(AS_PROGRAM, &proteus3_state::proteus3_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(200))
-	MCFG_SCREEN_SIZE(64*8, 16*12)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*12-1)
-	MCFG_SCREEN_UPDATE_DRIVER(proteus3_state, screen_update_proteus3)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_proteus3)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(200));
+	screen.set_size(64*8, 16*12);
+	screen.set_visarea(0, 64*8-1, 0, 16*12-1);
+	screen.set_screen_update(FUNC(proteus3_state::screen_update_proteus3));
+	screen.set_palette("palette");
+	GFXDECODE(config, "gfxdecode", "palette", gfx_proteus3);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Devices */
@@ -407,14 +409,14 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 
 	/* cassette */
 	ACIA6850(config, m_acia1, 0);
-	m_acia1->txd_handler().set(FUNC(proteus3_state::acia1_txdata_w));
+	m_acia1->txd_handler().set([this] (bool state) { m_cassbit = state; });
+
+	SPEAKER(config, "mono").front_center();
 
 	CASSETTE(config, m_cass);
-	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
-	TIMER(config, "timer_c").configure_periodic(FUNC(proteus3_state::timer_c), attotime::from_hz(4800));
-	TIMER(config, "timer_p").configure_periodic(FUNC(proteus3_state::timer_p), attotime::from_hz(40000));
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_r").configure_periodic(FUNC(proteus3_state::kansas_r), attotime::from_hz(40000));
 
 	// optional tty keyboard
 	ACIA6850(config, m_acia2, 0);
@@ -442,7 +444,7 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	m_brg->out_f<13>().set(FUNC(proteus3_state::write_f13_clock));
 	m_brg->out_f<14>().set(FUNC(proteus3_state::write_f14_clock));
 	m_brg->out_f<15>().set(FUNC(proteus3_state::write_f15_clock));
-MACHINE_CONFIG_END
+}
 
 
 

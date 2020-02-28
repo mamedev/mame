@@ -21,7 +21,7 @@
 		<info name="usage" value="Load with *RUN&quot;runme&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="chuckie.dsk" size="102400" crc="1241ac5d" sha1="4ef6e1a18af27c922003415abb69987d54efe391" offset="0" />
+				<rom name="chuckie.dsk" size="102400" crc="1241ac5d" sha1="4ef6e1a18af27c922003415abb69987d54efe391" />
 			</dataarea>
 		</part>
 	</software>
@@ -32,7 +32,7 @@
 		<publisher>Acorn</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="utilities_disc.dsk" size="102400" crc="f4541c02" sha1="51711a7cf705bb6757ee39d5b3ed225009774d9c" offset="0" />
+				<rom name="utilities_disc.dsk" size="102400" crc="f4541c02" sha1="51711a7cf705bb6757ee39d5b3ed225009774d9c" />
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +45,7 @@
 		<info name="usage" value="Load with *RUN&quot;EHRUN&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="egghead.dsk" size="102400" crc="a25a9305" sha1="68d53a0e9419c7dca4ba8b525595d12926ab1c85" offset="0" />
+				<rom name="egghead.dsk" size="102400" crc="a25a9305" sha1="68d53a0e9419c7dca4ba8b525595d12926ab1c85" />
 			</dataarea>
 		</part>
 	</software>
@@ -58,7 +58,7 @@
 		<info name="usage" value="Load with *RUN&quot;F14RUN&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="f14.dsk" size="102400" crc="b0b213c2" sha1="a4691fd7590884e0da96cf92f90c31786a74fd93" offset="0" />
+				<rom name="f14.dsk" size="102400" crc="b0b213c2" sha1="a4691fd7590884e0da96cf92f90c31786a74fd93" />
 			</dataarea>
 		</part>
 	</software>
@@ -71,7 +71,7 @@
 		<info name="usage" value="Load with *RUN&quot;runme&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="gala.dsk" size="102400" crc="db52a3ae" sha1="ffece5ae2295818f649735c5b7711e740dfe4731" offset="0" />
+				<rom name="gala.dsk" size="102400" crc="db52a3ae" sha1="ffece5ae2295818f649735c5b7711e740dfe4731" />
 			</dataarea>
 		</part>
 	</software>
@@ -83,7 +83,7 @@
 		<info name="usage" value="Load with *RUN&quot;GALAXI&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Galaxians(Aardvark).dsk" size="102400" crc="142fff89" sha1="5edca5333d5584ed64f980f15c67698873db93ff" offset="0" />
+				<rom name="Galaxians(Aardvark).dsk" size="102400" crc="142fff89" sha1="5edca5333d5584ed64f980f15c67698873db93ff" />
 			</dataarea>
 		</part>
 	</software>
@@ -96,7 +96,7 @@
 		<info name="usage" value="Load with *RUN&quot;LOADER&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="hardhatharry.dsk" size="102400" crc="654cadd3" sha1="fd2f6ff91bfb105b5eb866562d23f3a6edc91276" offset="0" />
+				<rom name="hardhatharry.dsk" size="102400" crc="654cadd3" sha1="fd2f6ff91bfb105b5eb866562d23f3a6edc91276" />
 			</dataarea>
 		</part>
 	</software>
@@ -109,7 +109,7 @@
 		<info name="usage" value="Load with *RUN&quot;LOADER&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="hyperviper.dsk" size="102400" crc="401dadb9" sha1="ece2cf9d7740c0266ebe5072dd298e9811dd0f47" offset="0" />
+				<rom name="hyperviper.dsk" size="102400" crc="401dadb9" sha1="ece2cf9d7740c0266ebe5072dd298e9811dd0f47" />
 			</dataarea>
 		</part>
 	</software>
@@ -122,7 +122,7 @@
 		<info name="usage" value="Load with *RUN&quot;LOADER&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="jetsetminer.dsk" size="102400" crc="de1a54f2" sha1="62d97d25fb748ee72ee972ad42c30f69d31ec5e0" offset="0" />
+				<rom name="jetsetminer.dsk" size="102400" crc="de1a54f2" sha1="62d97d25fb748ee72ee972ad42c30f69d31ec5e0" />
 			</dataarea>
 		</part>
 	</software>
@@ -135,7 +135,7 @@
 		<info name="usage" value="Load with *RUN&quot;JSWRUN&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="jsw.dsk" size="102400" crc="01625c6a" sha1="ee1f5cc7e21cbc7044d4b6741b144facf45130e7" offset="0" />
+				<rom name="jsw.dsk" size="102400" crc="01625c6a" sha1="ee1f5cc7e21cbc7044d4b6741b144facf45130e7" />
 			</dataarea>
 		</part>
 	</software>
@@ -148,7 +148,7 @@
 		<info name="usage" value="Load with *RUN&quot;JSW2RUN&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="jsw2.dsk" size="102400" crc="28566aed" sha1="394859c86d20d404a210e984b759c067aa2dc67d" offset="0" />
+				<rom name="jsw2.dsk" size="102400" crc="28566aed" sha1="394859c86d20d404a210e984b759c067aa2dc67d" />
 			</dataarea>
 		</part>
 	</software>
@@ -161,7 +161,7 @@
 		<info name="usage" value="Load with *RUN&quot;JOE&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="joeblade.dsk" size="102400" crc="6b5fc7a5" sha1="58c812c2bdecc358e0a127d470ee26aa0c190262" offset="0" />
+				<rom name="joeblade.dsk" size="102400" crc="6b5fc7a5" sha1="58c812c2bdecc358e0a127d470ee26aa0c190262" />
 			</dataarea>
 		</part>
 	</software>
@@ -174,7 +174,7 @@
 		<info name="usage" value="Load with *RUN&quot;runme&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="jungle.dsk" size="102400" crc="92c50fe2" sha1="a6ffbdbf0f2f7b5c4038d44632a14e1b89682db0" offset="0" />
+				<rom name="jungle.dsk" size="102400" crc="92c50fe2" sha1="a6ffbdbf0f2f7b5c4038d44632a14e1b89682db0" />
 			</dataarea>
 		</part>
 	</software>
@@ -187,7 +187,7 @@
 		<info name="usage" value="Load with *RUN&quot;MMRUN&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="mm.dsk" size="102400" crc="744d5ac9" sha1="7990c552cacf4af428251afc2fde452bdd2bb1af" offset="0" />
+				<rom name="mm.dsk" size="102400" crc="744d5ac9" sha1="7990c552cacf4af428251afc2fde452bdd2bb1af" />
 			</dataarea>
 		</part>
 	</software>
@@ -200,7 +200,7 @@
 		<info name="usage" value="Load with *RUN&quot;runme&quot;" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="repton.dsk" size="102400" crc="17cebe3d" sha1="0657e2bb63ba46e0de7e21abca5cab6dcdf666d1" offset="0" />
+				<rom name="repton.dsk" size="102400" crc="17cebe3d" sha1="0657e2bb63ba46e0de7e21abca5cab6dcdf666d1" />
 			</dataarea>
 		</part>
 	</software>

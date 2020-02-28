@@ -44,6 +44,7 @@ function maintargetosdoptions(_target,_subtarget)
 		"comdlg32",
 		"psapi",
 		"ole32",
+		"shlwapi",
 	}
 end
 

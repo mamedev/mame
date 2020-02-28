@@ -32,7 +32,7 @@ GFXDECODE_START( namcos2_roz_device::gfxinfo )
 	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout, 0, 16 )
 GFXDECODE_END
 
-DEFINE_DEVICE_TYPE(NAMCOS2_ROZ, namcos2_roz_device, "namcos2_roz", "Namco Sysem 2 ROZ (C102)")
+DEFINE_DEVICE_TYPE(NAMCOS2_ROZ, namcos2_roz_device, "namcos2_roz", "Namco System 2 ROZ (C102)")
 
 namcos2_roz_device::namcos2_roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCOS2_ROZ, tag, owner, clock),
@@ -44,7 +44,7 @@ namcos2_roz_device::namcos2_roz_device(const machine_config &mconfig, const char
 
 void namcos2_roz_device::device_start()
 {
-	m_tilemap_roz = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namcos2_roz_device::roz_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 256, 256);
+	m_tilemap_roz = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namcos2_roz_device::roz_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 256, 256);
 	m_tilemap_roz->set_transparent_pen(0xff);
 }
 

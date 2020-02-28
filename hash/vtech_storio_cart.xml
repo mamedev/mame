@@ -57,7 +57,7 @@
 
 	<software name="scoobysp" supported="no">
 		<description>Scooby-Doo!-Scooby-Doo y la momia (Spain)</description>
-		<year>20??</year>
+		<year>2012</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">

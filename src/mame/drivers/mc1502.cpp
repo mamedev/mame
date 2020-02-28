@@ -20,7 +20,6 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "machine/kb_7007_3.h"
-#include "sound/wave.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -210,6 +209,12 @@ MACHINE_RESET_MEMBER(mc1502_state, mc1502)
  * macros
  */
 
+void mc1502_state::fdc_config(device_t *device)
+{
+	mc1502_fdc_device &fdc = *downcast<mc1502_fdc_device*>(device);
+	fdc.set_cpu(m_maincpu);
+}
+
 void mc1502_state::mc1502_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -229,7 +234,8 @@ static INPUT_PORTS_START( mc1502 )
 	PORT_INCLUDE( mc7007_3_keyboard )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(mc1502_state::mc1502)
+void mc1502_state::mc1502(machine_config &config)
+{
 	I8088(config, m_maincpu, XTAL(16'000'000)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mc1502_state::mc1502_map);
 	m_maincpu->set_addrmap(AS_IO, &mc1502_state::mc1502_io);
@@ -284,13 +290,13 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	isa.irq5_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 	isa.irq6_callback().set(m_pic8259, FUNC(pic8259_device::ir6_w));
 	isa.irq7_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
+	isa.iochrdy_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
-	MCFG_DEVICE_ADD("board0", ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "cga_mc1502", true) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1",   ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "fdc", false)
-	MCFG_DEVICE_ADD("isa2",   ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "rom", false)
+	ISA8_SLOT(config, "board0", 0, "isa", mc1502_isa8_cards, "cga_mc1502", true); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa1", 0, "isa", mc1502_isa8_cards, "fdc", false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa2", 0, "isa", mc1502_isa8_cards, "rom", false).set_option_machine_config("fdc", [this](device_t* device) { fdc_config(device); });
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette); // FIXME: really no output routes for the cassette sound?
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -306,12 +312,13 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("mc1502_flop");
 //  SOFTWARE_LIST(config, "cass_list").set_original("mc1502_cass");
 
 	RAM(config, RAM_TAG).set_default_size("608K").set_extra_options("96K"); /* 96 base + 512 on expansion card */
-MACHINE_CONFIG_END
+}
 
 
 /*
@@ -324,7 +331,7 @@ MACHINE_CONFIG_END
         QWERTY).
 */
 ROM_START( mc1502 )
-	ROM_REGION16_LE(0x10000,"bios", 0)
+	ROM_REGION(0x10000,"bios", 0)
 
 	ROM_DEFAULT_BIOS("v52")
 	ROM_SYSTEM_BIOS(0, "v50", "v5.0 10/05/89")
@@ -374,7 +381,7 @@ ROM_END
         different video subsystem (not emulated).
 */
 ROM_START( pk88 )
-	ROM_REGION16_LE(0x10000,"bios", 0)
+	ROM_REGION(0x10000, "bios", 0)
 
 	// datecode 07.23.87
 	ROM_LOAD( "b0.064", 0x0000, 0x2000, CRC(80d3cf5d) SHA1(64769b7a8b60ffeefa04e4afbec778069a2840c9))

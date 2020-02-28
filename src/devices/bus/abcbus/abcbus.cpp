@@ -27,8 +27,8 @@ DEFINE_DEVICE_TYPE(ABCBUS_SLOT, abcbus_slot_device, "abcbus_slot", "ABCBUS slot"
 //  device_abcbus_card_interface - constructor
 //-------------------------------------------------
 
-device_abcbus_card_interface::device_abcbus_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+device_abcbus_card_interface::device_abcbus_card_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "abcbus")
 {
 	m_slot = dynamic_cast<abcbus_slot_device *>(device.owner());
 }
@@ -40,7 +40,7 @@ device_abcbus_card_interface::device_abcbus_card_interface(const machine_config 
 
 abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ABCBUS_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_abcbus_card_interface>(mconfig, *this),
 	m_write_irq(*this),
 	m_write_nmi(*this),
 	m_write_rdy(*this),
@@ -62,7 +62,7 @@ abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char
 
 void abcbus_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_abcbus_card_interface *>(get_card_device());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();
@@ -92,6 +92,7 @@ void abcbus_slot_device::device_start()
 #include "ram.h"
 #include "sio.h"
 #include "slutprov.h"
+#include "ssa.h"
 #include "uni800.h"
 #include "unidisk.h"
 
@@ -103,15 +104,16 @@ void abcbus_slot_device::device_start()
 
 void abc80_cards(device_slot_interface &device)
 {
+	device.option_add("16k", ABC80_16KB_RAM_CARD);
+	device.option_add("abc830", ABC830);
+	device.option_add("abcexp", ABC_EXPANSION_UNIT);
+	device.option_add("cadabc", ABC_CADMOUSE);
+	device.option_add("db411223", DATABOARD_4112_23);
 	device.option_add("fd2", ABC_FD2);
 	device.option_add("memcard", ABC_MEMORY_CARD);
-	device.option_add("abcexp", ABC_EXPANSION_UNIT);
-	device.option_add("16k", ABC80_16KB_RAM_CARD);
 	device.option_add("slow", LUXOR_55_10828);
-	device.option_add("abc830", ABC830);
-	device.option_add("db411223", DATABOARD_4112_23);
-	device.option_add("unidisk", UNIDISK);
-	device.option_add("cadabc", ABC_CADMOUSE);
+	device.option_add("ssa", ABC_SUPER_SMARTAID);
+	device.option_add("unidisk", ABC_UNIDISK);
 }
 
 
@@ -135,9 +137,9 @@ void abcbus_cards(device_slot_interface &device)
 	device.option_add("hdc", ABC_HDC);
 	device.option_add("sio", ABC_SIO);
 	device.option_add("slow", LUXOR_55_10828);
-	device.option_add("uni800", ABC_UNI800);
-	device.option_add("unidisk", UNIDISK);
 	device.option_add("slutprov", ABC_SLUTPROV);
+	device.option_add("uni800", ABC_UNI800);
+	device.option_add("unidisk", ABC_UNIDISK);
 	device.option_add("xebec", LUXOR_55_21056);
 }
 

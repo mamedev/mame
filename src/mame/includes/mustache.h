@@ -9,6 +9,7 @@
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class mustache_state : public driver_device
 {
@@ -53,7 +54,6 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void decrypted_opcodes_map(address_map &map);
 	void memmap(address_map &map);
 };

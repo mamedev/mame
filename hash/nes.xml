@@ -3478,6 +3478,7 @@
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
 			<feature name="batt" value="yes" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="3296ff7a" sha1="ebb64e13f8c244eaa8187624771c84b9f67f8ea7" offset="00000" />
 			</dataarea>
@@ -6335,7 +6336,7 @@
 		</part>
 	</software>
 
-	<software name="chevlzod">
+	<software name="chevlzod" cloneof="sseiya">
 		<description>Les Chevaliers Du Zodiaque - La Legende D'Or (Fra)</description>
 		<year>1992</year>
 		<publisher>Bandai</publisher>
@@ -8648,6 +8649,7 @@
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
 			<feature name="batt" value="yes" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="96533999" sha1="1fa339a59832562a3acd1b524f6e41ed125486bf" offset="00000" />
 			</dataarea>
@@ -9820,6 +9822,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<dataarea name="prg" size="131072">
 				<rom name="namcotdnpr" size="131072" crc="fba98643" sha1="6f79e0aae58654fe50ab5daf47a1c5f6f33c74ef" offset="00000" />
 			</dataarea>
@@ -10913,6 +10916,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 5" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="5f162195" sha1="f41389f92ad771633b1132558a31344a895f8c74" offset="00000" />
 			</dataarea>
@@ -12110,6 +12114,7 @@
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
 			<feature name="batt" value="yes" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<dataarea name="prg" size="131072">
 				<rom name="namcot f90 prg" size="131072" crc="429fd177" sha1="08f506bad1ffae78783ac35ffead1621df89c0ff" offset="00000" />
 			</dataarea>
@@ -12771,6 +12776,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 3" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="968dcf09" sha1="0dabc907e0608ac4d9dd38345a22a69c61484ac4" offset="00000" />
 			</dataarea>
@@ -15677,7 +15683,7 @@
 			<feature name="ic5" value="CIC" />
 			<feature name="ic6" value="3195 [unpopulated]" />
 			<feature name="ic7" value="3196 [unpopulated]" />
-			<feature name="ic7" value="319X [unpopulated]" />
+			<!-- feature name="ic7" value="319X [unpopulated]" / duplicate feature - what's this even supposed to be? -->
 			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="40e0f69e" sha1="8be9caaebd09e231cfa5f74ac86f2a35362d06fb" offset="00000" />
@@ -17113,6 +17119,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<feature name="batt" value="yes" />
 			<dataarea name="prg" size="262144">
 				<rom name="0.prg" size="262144" crc="dd454208" sha1="21cdda0eaa26c688b63010abb490b810e87cfc28" offset="00000" />
@@ -19108,6 +19115,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<dataarea name="prg" size="262144">
 				<rom name="0.prg" size="262144" crc="29c61b41" sha1="278003c283a43826f75fade6a41d9058cd99a3e0" offset="00000" />
 			</dataarea>
@@ -19260,6 +19268,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<feature name="batt" value="yes" />
 			<dataarea name="prg" size="131072">
 				<rom name="namcot km prg" size="131072" crc="b1b9e187" sha1="cc1db05ce226c70752545fd82033a294f63aaa69" offset="00000" />
@@ -19941,6 +19950,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 5" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="1dd6619b" sha1="eca545c2a383584283cea2e73d7bd1f58698a25e" offset="00000" />
 			</dataarea>
@@ -21904,7 +21914,7 @@
 		</part>
 	</software>
 
-	<software name="worldjen">
+	<software name="wordjen">
 		<description>Lost Word of Jenny - Ushinawareta Message (Jpn)</description>
 		<year>1987</year>
 		<publisher>Takara</publisher>
@@ -23019,6 +23029,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 5" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="598fb9f5" sha1="5fa67a84067febcc63006553c5d6d86df614f9b2" offset="00000" />
 			</dataarea>
@@ -23733,6 +23744,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 3" />
 			<dataarea name="prg" size="262144">
 				<rom name="0.prg" size="262144" crc="1294ab5a" sha1="ade6b8872a24fc2e91fc717f2eeb05c773c18fdf" offset="00000" />
 			</dataarea>
@@ -24296,7 +24308,6 @@
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="COBIC-7403-MM"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="mirroring" value="vertical" />
 			<feature name="slot" value="bf9093" />
 			<feature name="pcb" value="NR8NV1-1" />
 			<feature name="mirroring" value="vertical" />
@@ -24618,6 +24629,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<feature name="batt" value="yes" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="af15338f" sha1="0c792cff77e2bbfca9248cddaa073b69b191c821" offset="00000" />
@@ -25867,6 +25879,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<dataarea name="prg" size="262144">
 				<rom name="0.prg" size="262144" crc="2b825ce1" sha1="fa61d78845a7826768f07ba453eda15705223955" offset="00000" />
 			</dataarea>
@@ -25889,6 +25902,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 3" />
 			<dataarea name="prg" size="262144">
 				<rom name="0.prg" size="262144" crc="9a2b0641" sha1="781ee304241fdc19bbec4a66face364c64d904b8" offset="00000" />
 			</dataarea>
@@ -31223,6 +31237,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 4" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="3deac303" sha1="95ef5172c9634402d6fa9c638ce46fe70ed505b9" offset="00000" />
 			</dataarea>
@@ -32110,6 +32125,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 3" />
 			<dataarea name="prg" size="262144">
 				<rom name="0.prg" size="262144" crc="6901346e" sha1="4e17d6626bf5da9f40b93d9ad3aca16f869053c7" offset="00000" />
 			</dataarea>
@@ -32136,6 +32152,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 5" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="b78970d2" sha1="eb818027f68a436286b532cbdc14584921a8e685" offset="00000" />
 			</dataarea>
@@ -33598,6 +33615,41 @@
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcity">
+		<description>SimCity (USA, Prototype)</description>
+		<year>1991</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="exrom" />
+			<feature name="pcb" value="NES-ETEPROM" />
+			<feature name="pcb_model" value="NES-ETEPROM-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 MMC5" />
+			<feature name="u4" value="U4 W-RAM-0" />
+			<feature name="u5" value="U5 W-RAM-1" />
+			<feature name="u6" value="U6 CIC" />
+			<feature name="battery" value="+Batt CR2032" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="simcity prg.u1" size="131072" crc="ad8bfb35" sha1="88fef47ebeec6bad9b7aef07b40f4ecf00846ca0" offset="0"/>
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="simcity chr.u2" size="131072" crc="3fbc73b9" sha1="5697a2040fa80f9eb8052aabe507bd8451eefcc3" offset="0"/>
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+			<!-- 1k Internal RAM in the MMC5 chip (ExRAM) -->
+			<dataarea name="mapper_ram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -35237,6 +35289,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 2" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="8a2824bb" sha1="ce25e790bf205b37746cff327ca5c1a533919f86" offset="00000" />
 			</dataarea>
@@ -36051,8 +36104,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SFROM" />
-			<feature name="peripheral" value="zapper" />
-			<feature name="peripheral" value="powerpad" />
+			<feature name="peripheral" value="zapper,powerpad" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-wh-0 prg" size="131072" crc="6beb5c84" sha1="ad48815abdf6ae67eccd1d1cc15eaa709cd5e4cc" offset="00000" />
 			</dataarea>
@@ -36073,8 +36125,7 @@
 			<feature name="slot" value="sxrom_a" />
 			<feature name="pcb" value="NES-SFROM" />
 			<feature name="mmc1_type" value="MMC1A" />
-			<feature name="peripheral" value="zapper" />
-			<feature name="peripheral" value="powerpad" />
+			<feature name="peripheral" value="zapper,powerpad" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="d4f018f5" sha1="c673378f44042213c2e28da14de02009e4470011" offset="00000" />
 			</dataarea>
@@ -40749,7 +40800,7 @@
 		<publisher>Sigma Shouji</publisher>
 		<info name="serial" value="SEI-1B"/>
 		<info name="release" value="19891124"/>
-		<info name="alt_title" value="ベガスコネクション カジノより愛をこめて"/>
+		<info name="alt_title" value="ベガスコネクション カジノから愛をこめて"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
@@ -42824,6 +42875,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="namcot_163" />
 			<feature name="pcb" value="NAMCOT-163" />
+			<feature name="n163-vol" value="SUBMAPPER 5" />
 			<dataarea name="prg" size="131072">
 				<rom name="namcot yd prg" size="131072" crc="17421900" sha1="5fda17f7d44a1529924156c5a2983f9f7d6c765e" offset="00000" />
 			</dataarea>
@@ -47119,7 +47171,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="u2" value="U2 CHR" />
 			<feature name="u3" value="U3 PRG" />
 			<feature name="u4" value="U4 DIS23CO1" />
-			<feature name="u4" value="U5 PAL" />
+			<feature name="u5" value="U5 PAL" />
 			<!-- PRG chip on Frank Cifaldi's board says "9318" and CHR chip on the same one says "9317". -->
 			<!-- Likely a sort of production code? -->
 			<dataarea name="chr" size="131072">
@@ -48480,7 +48532,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- Glitched in NTSC -->
-	<software name="pirates" >
+	<software name="pirates">
 		<description>Pirates! (Euro)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
@@ -51027,6 +51079,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 
 <!-- Sachen / Thin Chen (and clones) -->
+
+	<software name="englpyrm">
+		<description>English Pyramid (Pirate)</description>
+		<year>1991</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="K-001"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ffe4" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="k-001 prg" size="32768" crc="7093ac82" sha1="7ec247a4fa445d8ee029ec5577767261e5685b8e" />
+			</dataarea>
+			<dataarea name="chr" size="16384">
+				<rom name="k-001 chr" size="16384" crc="45600bf5" sha1="6d37d046e45098a0e596994a6dc0ea88ae9d06cc" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="jovial">
 		<!-- Important: there is also an image with prg crc 55089f7e which according to my research
@@ -62536,10 +62605,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="jyc_a" />
 			<feature name="pcb" value="JYCOMPANY-A" />
 			<dataarea name="chr" size="262144">
-				<rom name="mickey mania 7 (pirate origianl).chr" size="262144" crc="ad8c83c3" sha1="5308a96d5c54fa63398f20c8c703225330cb423c" offset="00000" status="baddump" />
+				<rom name="mickey mania 7 (pirate original).chr" size="262144" crc="ad8c83c3" sha1="5308a96d5c54fa63398f20c8c703225330cb423c" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="mickey mania 7 (pirate origianl).prg" size="262144" crc="60fb492c" sha1="4826b32e22a60985020acaf3a06f2d32e4ca0c8d" offset="00000" status="baddump" />
+				<rom name="mickey mania 7 (pirate original).prg" size="262144" crc="60fb492c" sha1="4826b32e22a60985020acaf3a06f2d32e4ca0c8d" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -64421,7 +64490,7 @@ from the NEStopia source, hence they would require confirmation. -->
 		<description>Happy Biqi III - World Fighter (Chi, Decrypted WXN)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
-		<info name="alt_title" value=" 快乐比奇Ⅲ-地球战士"/>
+		<info name="alt_title" value="快乐比奇Ⅲ-地球战士"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" /> <!-- Header says mapper 4 but there are glitches -->
@@ -69497,7 +69566,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="edu18a">
+	<software name="edu18a" cloneof="edu18">
 		<description>Education Games 18 in 1 (Chi, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -69845,7 +69914,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="subor_keyboard" />
 			<dataarea name="prg" size="1048576">
-				<rom name="unknown_arabic_study_cartridge_contain_32_itmes_(unl).prg" size="1048576" crc="c0a76428" sha1="68a826b1f8589015cad42f22e6593a682e56ab25" offset="00000" status="baddump" />
+				<rom name="unknown_arabic_study_cartridge_contain_32_items_(unl).prg" size="1048576" crc="c0a76428" sha1="68a826b1f8589015cad42f22e6593a682e56ab25" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -81081,7 +81150,7 @@ that the real dumps might surface -->
 		<description>Family Computer Disk System (Jpn)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
-		<info name="usage" value="This only is only supported by Famicom"/>
+		<info name="usage" value="This is only supported by Famicom"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="disksys" />
 			<!-- This is a fake and unused PRG dataarea to avoid changing the loading routines for the moment-->

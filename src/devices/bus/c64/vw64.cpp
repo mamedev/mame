@@ -111,7 +111,7 @@ void c64_vizawrite_cartridge_device::device_timer(emu_timer &timer, device_timer
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_vizawrite_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_vizawrite_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{

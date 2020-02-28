@@ -287,7 +287,7 @@ image_verify_result lviv_state::verify_snapshot(uint8_t * data, uint32_t size)
 	return image_verify_result::PASS;
 }
 
-SNAPSHOT_LOAD_MEMBER(lviv_state, lviv)
+SNAPSHOT_LOAD_MEMBER(lviv_state::snapshot_cb)
 {
 	std::vector<uint8_t> snapshot_data(LVIV_SNAPSHOT_SIZE);
 

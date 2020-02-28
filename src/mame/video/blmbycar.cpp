@@ -77,8 +77,8 @@ TILE_GET_INFO_MEMBER(blmbycar_state::get_tile_info)
 
 void blmbycar_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blmbycar_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blmbycar_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
 	m_tilemap[1]->set_transparent_pen(0);
 }
 

@@ -26,7 +26,6 @@
 #include "machine/z80pio.h"
 
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 
 #include "video/mc6845.h"
 
@@ -43,7 +42,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_pio(*this, "z80pio")
 		, m_cassette(*this, "cassette")
-		, m_wave(*this, "wave")
 		, m_speaker(*this, "speaker")
 		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")
@@ -128,8 +126,8 @@ private:
 	DECLARE_MACHINE_RESET(mbeett);
 	uint32_t screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_newkb);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(mbee);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(mbee_z80bin);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_bee);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_bin);
 	WRITE_LINE_MEMBER(rtc_irq_w);
 	WRITE_LINE_MEMBER(fdc_intrq_w);
 	WRITE_LINE_MEMBER(fdc_drq_w);
@@ -185,7 +183,6 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<cassette_image_device> m_cassette;
-	required_device<wave_device> m_wave;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;

@@ -27,6 +27,7 @@ public:
 		, m_deco_tilegen(*this, "tilegen%u", 1U)
 		, m_spritegen(*this, "spritegen")
 		, m_spriteram(*this, "spriteram")
+		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "colors")
 		, m_soundlatch(*this, "soundlatch")
 		, m_paletteram(*this, "palette")
@@ -44,6 +45,7 @@ private:
 	required_device_array<deco16ic_device, 2> m_deco_tilegen;
 	required_device<deco_mxc06_device> m_spritegen;
 	required_device<buffered_spriteram16_device> m_spriteram;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
@@ -62,6 +64,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void vaportra_colpri_cb(u32 &colour, u32 &pri_mask);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_palette( int offset );
 

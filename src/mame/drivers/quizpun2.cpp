@@ -95,6 +95,7 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class quizpun2_state : public driver_device
@@ -215,8 +216,8 @@ WRITE8_MEMBER(quizpun2_state::scroll_w)
 
 void quizpun2_state::video_start()
 {
-	m_bg_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quizpun2_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,16,16,0x20,0x40);
-	m_fg_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quizpun2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,16,16,0x20,0x40);
+	m_bg_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(quizpun2_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,16,16,0x20,0x40);
+	m_fg_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(quizpun2_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,16,16,0x20,0x40);
 
 	m_bg_tmap->set_transparent_pen(0);
 	m_fg_tmap->set_transparent_pen(0);
@@ -326,7 +327,7 @@ WRITE8_MEMBER(quizpun2_state::irq_ack)
 
 WRITE8_MEMBER(quizpun2_state::soundlatch_w)
 {
-	m_soundlatch->write(space, 0, data ^ 0x80);
+	m_soundlatch->write(data ^ 0x80);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

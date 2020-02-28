@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="white"><rect><color red="0.85" green="0.85" blue="0.85" /></rect></element>
+
+	<element name="ladder">
+		<rect>
+			<bounds x="0" y="0" width="1" height="10" />
+			<color red="1" green="1" blue="1" />
+		</rect>
+		<rect>
+			<bounds x="5" y="0" width="1" height="10" />
+			<color red="1" green="1" blue="1" />
+		</rect>
+		<rect>
+			<bounds x="0.5" y="0.5" width="5" height="0.5" />
+			<color red="1" green="1" blue="1" />
+		</rect>
+		<rect>
+			<bounds x="0.5" y="4.75" width="5" height="0.5" />
+			<color red="1" green="1" blue="1" />
+		</rect>
+		<rect>
+			<bounds x="0.5" y="9" width="5" height="0.5" />
+			<color red="1" green="1" blue="1" />
+		</rect>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<screen index="0"><bounds left="0" top="0" right="479" bottom="1080" /></screen>
+
+		<bezel element="ladder"><bounds x="0" y="290" width="55" height="213" /><color alpha="0.85" /></bezel>
+		<bezel element="ladder"><bounds x="424" y="484" width="55" height="213" /><color alpha="0.85" /></bezel>
+		<bezel element="ladder"><bounds x="0" y="680" width="55" height="213" /><color alpha="0.85" /></bezel>
+		<bezel element="ladder"><bounds x="424" y="874" width="55" height="213" /><color alpha="0.85" /></bezel>
+
+	</view>
+</mamelayout>

@@ -194,14 +194,14 @@ void model1io2_device::device_add_mconfig(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(6*20+1, 19);
 	screen.set_visarea(0, 6*20, 0, 19-1);
-	screen.set_screen_update("lcd", FUNC(hd44780_device::screen_update));
+	screen.set_screen_update(m_lcd, FUNC(hd44780_device::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(model1io2_device::lcd_palette), 3);
 
 	HD44780(config, m_lcd, 0);
 	m_lcd->set_lcd_size(2, 20);
-	m_lcd->set_pixel_update_cb(FUNC(model1io2_device::lcd_pixel_update), this);
+	m_lcd->set_pixel_update_cb(FUNC(model1io2_device::lcd_pixel_update));
 }
 
 
@@ -221,9 +221,9 @@ model1io2_device::model1io2_device(const machine_config &mconfig, const char *ta
 	m_led_comm_err(*this, "led_comm_err"),
 	m_lightgun_ports(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG}),
 	m_read_cb(*this), m_write_cb(*this),
-	m_in_cb{ {*this}, {*this}, {*this} },
+	m_in_cb(*this),
 	m_drive_read_cb(*this), m_drive_write_cb(*this),
-	m_an_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
+	m_an_cb(*this),
 	m_output_cb(*this),
 	m_secondary_controls(false),
 	m_lcd_data(0),
@@ -242,16 +242,10 @@ void model1io2_device::device_start()
 
 	m_read_cb.resolve_safe(0xff);
 	m_write_cb.resolve_safe();
-
-	for (unsigned i = 0; i < 3; i++)
-		m_in_cb[i].resolve_safe(0xff);
-
+	m_in_cb.resolve_all_safe(0xff);
 	m_drive_read_cb.resolve_safe(0xff);
 	m_drive_write_cb.resolve_safe();
-
-	for (unsigned i = 0; i < 8; i++)
-		m_an_cb[i].resolve_safe(0xff);
-
+	m_an_cb.resolve_all_safe(0xff);
 	m_output_cb.resolve_safe();
 
 	// register for save states

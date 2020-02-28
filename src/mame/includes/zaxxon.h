@@ -14,6 +14,7 @@
 #include "machine/i8255.h"
 #include "sound/samples.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class zaxxon_state : public driver_device
 {
@@ -47,8 +48,8 @@ public:
 	void init_razmataz();
 	void init_zaxxonj();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(razmataz_dial_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(zaxxon_coin_r);
+	template <int Num> DECLARE_CUSTOM_INPUT_MEMBER(razmataz_dial_r);
+	template <int Num> DECLARE_READ_LINE_MEMBER(zaxxon_coin_r);
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 	DECLARE_INPUT_CHANGED_MEMBER(zaxxon_coin_inserted);
 
@@ -123,7 +124,7 @@ private:
 	DECLARE_WRITE8_MEMBER(zaxxon_sound_c_w);
 	DECLARE_WRITE8_MEMBER(congo_sound_b_w);
 	DECLARE_WRITE8_MEMBER(congo_sound_c_w);
-	void video_start_common(tilemap_get_info_delegate fg_tile_info);
+	void video_start_common(tilemap_get_info_delegate &&fg_tile_info);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int skew);
 	inline int find_minimum_y(uint8_t value, int flip);
 	inline int find_minimum_x(uint8_t value, int flip);

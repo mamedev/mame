@@ -36,16 +36,14 @@ void sm500_device::data_4x10x4(address_map &map)
 
 
 // device definitions
-sm500_device::sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm500_device(mconfig, SM500, tag, owner, clock, 1 /* stack levels */, 7 /* o group pins */, 11 /* prg width */, address_map_constructor(FUNC(sm500_device::program_1_2k), this), 6 /* data width */, address_map_constructor(FUNC(sm500_device::data_4x10x4), this))
-{
-}
+sm500_device::sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	sm500_device(mconfig, SM500, tag, owner, clock, 1 /* stack levels */, 7 /* o group pins */, 11 /* prg width */, address_map_constructor(FUNC(sm500_device::program_1_2k), this), 6 /* data width */, address_map_constructor(FUNC(sm500_device::data_4x10x4), this))
+{ }
 
-sm500_device::sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
-	: sm510_base_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data),
+sm500_device::sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+	sm510_base_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data),
 	m_o_pins(o_pins)
-{
-}
+{ }
 
 
 // disasm

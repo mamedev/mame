@@ -366,7 +366,7 @@ public:
 
 		// find the font
 		HR_RET0(find_font(
-			familyName.c_str(),
+			familyName,
 			bold ? DWRITE_FONT_WEIGHT_BOLD : DWRITE_FONT_WEIGHT_NORMAL,
 			DWRITE_FONT_STRETCH_NORMAL,
 			italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL,
@@ -624,7 +624,7 @@ private:
 		HR_RETHR(fonts->FindFamilyName(familyName.c_str(), &family_index, &exists));
 		if (!exists)
 		{
-			osd_printf_error("Font with family name %S does not exist.\n", familyName.c_str());
+			osd_printf_error("Font with family name %s does not exist.\n", osd::text::from_wstring(familyName));
 			return E_FAIL;
 		}
 

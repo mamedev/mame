@@ -51,10 +51,10 @@ INPUT_CHANGED_MEMBER(vsmileb_state::pad_button_changed)
 	}
 	else
 	{
-		value |= (uint16_t)(uintptr_t)param;
+		value |= (uint16_t)param;
 	}
-	m_spg->uart_rx((uint8_t)(value >> 8));
-	m_spg->uart_rx((uint8_t)value);
+	m_maincpu->uart_rx((uint8_t)(value >> 8));
+	m_maincpu->uart_rx((uint8_t)value);
 }
 
 template <uint16_t V> INPUT_CHANGED_MEMBER(vsmileb_state::sw_mode)
@@ -63,16 +63,16 @@ template <uint16_t V> INPUT_CHANGED_MEMBER(vsmileb_state::sw_mode)
 	{
 		m_mode = V;
 		const uint16_t value = m_mode | 0x0080;
-		m_spg->uart_rx((uint8_t)(value >> 8));
-		m_spg->uart_rx((uint8_t)value);
+		m_maincpu->uart_rx((uint8_t)(value >> 8));
+		m_maincpu->uart_rx((uint8_t)value);
 	}
 }
 
 void vsmileb_state::banked_map(address_map &map)
 {
-	map(0x0000000, 0x03fffff).rom().region("maincpu", 0);
-	map(0x0400000, 0x07fffff).rom().region("maincpu", 0);
-	map(0x0800000, 0x0bfffff).rom().region("maincpu", 0);
+	map(0x0000000, 0x03fffff).rom().region("sysrom", 0);
+	map(0x0400000, 0x07fffff).rom().region("sysrom", 0);
+	map(0x0800000, 0x0bfffff).rom().region("sysrom", 0);
 
 	map(0x1000000, 0x13fffff).rw(m_cart, FUNC(vsmile_cart_slot_device::bank0_r), FUNC(vsmile_cart_slot_device::bank0_w));
 
@@ -103,9 +103,9 @@ static INPUT_PORTS_START( vsmileb )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, pad_button_changed, vsmileb_state::BUTTON_EXIT)   PORT_NAME("Exit")
 
 	PORT_START("MODE")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Play Time")       PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0400>, nullptr) // three-position function switch
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Watch & Learn")   PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0800>, nullptr)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Learn & Explore") PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0c00>, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Play Time")       PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0400>, 0) // three-position function switch
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Watch & Learn")   PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0800>, 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Learn & Explore") PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0c00>, 0)
 
 	PORT_START("LOGO")
 	PORT_DIPNAME( 0x10, 0x10, "VTech Intro" )
@@ -122,16 +122,18 @@ INPUT_PORTS_END
 
 void vsmileb_state::vsmileb(machine_config &config)
 {
+	SPG28X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vsmileb_state::mem_map);
+	m_maincpu->set_force_no_drc(true);
+	m_maincpu->chip_select().set(FUNC(vsmileb_state::chip_sel_w));
+	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_maincpu->porta_in().set(FUNC(vsmileb_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(vsmileb_state::portb_r));
+
 	vsmile_base(config);
 
 	m_bankdev->set_addrmap(AS_PROGRAM, &vsmileb_state::banked_map);
-
-	SPG28X(config.replace(), m_spg, XTAL(27'000'000), m_maincpu, m_screen);
-	m_spg->chip_select().set(FUNC(vsmileb_state::chip_sel_w));
-	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-	m_spg->porta_in().set(FUNC(vsmileb_state::porta_r));
-	m_spg->portb_in().set(FUNC(vsmileb_state::portb_r));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("vsmileb_cart");
 }
@@ -139,7 +141,7 @@ void vsmileb_state::vsmileb(machine_config &config)
 void vsmileb_state::vsmilebp(machine_config &config)
 {
 	vsmileb(config);
-	m_spg->set_pal(true);
+	m_maincpu->set_pal(true);
 }
 
 /************************************
@@ -148,17 +150,23 @@ void vsmileb_state::vsmilebp(machine_config &config)
  *
  ************************************/
 
-// TODO: decide on a dump endian, these likely differ in endianess due to different dumping technqiues
 ROM_START( vsmileb )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "vbabybios.bin", 0x000000, 0x800000, CRC(ddc7f845) SHA1(2c17d0f54200070176d03d44a40c7923636e596a) )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "vsmilebabybios.bin", 0x000000, 0x800000, CRC(58d4caa0) SHA1(0b636ff80fd7fc429d753a8beab2957f1e59cbde) )
+ROM_END
+
+ROM_START( vsmilebs )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "vsmilebabybios_spain_pooh.bin", 0x000000, 0x800000, CRC(a1926654) SHA1(a8ccbe29235bb44faef77b1e7d73a20221b005c2) )
 ROM_END
 
 ROM_START( vsmilebsw )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "vsmileswedenbios.bin", 0x000000, 0x800000, CRC(8b464b19) SHA1(cea304ba886c39e86906aad3dce17d5fff7cfcbe) )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "vsmilebabyswedenbios.bin", 0x000000, 0x800000, CRC(8b464b19) SHA1(cea304ba886c39e86906aad3dce17d5fff7cfcbe) )
 ROM_END
 
 //    year, name,    parent, compat, machine, input,   class,         init,       company, fullname,            flags
 CONS( 2005, vsmileb,   0,       0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2005, vsmilebsw ,vsmileb, 0,      vsmilebp,vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Sweden)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// has the Winnie the Pooh game in the BIOS ROM.  This was supplied as a 'Romless cart' with the device, so probably triggers a switch, currently always banked in.
+CONS( 2005, vsmilebs,  vsmileb, 0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Spain, with Aventuras en el Bosque de los Cien Acres)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -128,7 +128,7 @@ WRITE8_MEMBER(starwars_state::esb_slapstic_w)
 
 void starwars_state::main_map(address_map &map)
 {
-	map(0x0000, 0x2fff).ram().share("vectorram").region("maincpu", 0);
+	map(0x0000, 0x2fff).ram().share("avg:vectorram").region("maincpu", 0);
 	map(0x3000, 0x3fff).rom();                             /* vector_rom */
 	map(0x4300, 0x431f).portr("IN0");
 	map(0x4320, 0x433f).portr("IN1");
@@ -213,9 +213,9 @@ static INPUT_PORTS_START( starwars )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	/* Bit 6 is VG_HALT */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_starwars_device, done_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_starwars_device, done_r)
 	/* Bit 7 is MATH_RUN - see machine/starwars.c */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, starwars_state,matrix_flag_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(starwars_state, matrix_flag_r)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x02, "Starting Shields" )  PORT_DIPLOCATION("10D:1,2")
@@ -298,17 +298,17 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(starwars_state::starwars)
-
+void starwars_state::starwars(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(starwars_state, irq0_line_assert, CLOCK_3KHZ / 12)
+	MC6809E(config, m_maincpu, MASTER_CLOCK / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &starwars_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(starwars_state::irq0_line_assert), attotime::from_hz(CLOCK_3KHZ / 12));
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_hz(CLOCK_3KHZ / 128));
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MC6809E(config, m_audiocpu, MASTER_CLOCK / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &starwars_state::sound_map);
 
 	adc0809_device &adc(ADC0809(config, "adc", MASTER_CLOCK / 16)); // designated as "137243-001" on parts list and "157249-120" on schematics
 	adc.in_callback<0>().set_ioport("STICKY"); // pitch
@@ -336,11 +336,11 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 
 	/* video hardware */
 	VECTOR(config, "vector", 0);
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ / 12 / 6)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 250, 0, 280)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
+	screen.set_refresh_hz(CLOCK_3KHZ / 12 / 6);
+	screen.set_size(400, 300);
+	screen.set_visarea(0, 250, 0, 280);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
 	avg_device &avg(AVG_STARWARS(config, "avg", 0));
 	avg.set_vector_tag("vector");
@@ -362,19 +362,19 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	GENERIC_LATCH_8(config, m_mainlatch);
 	m_mainlatch->data_pending_callback().set(m_riot, FUNC(riot6532_device::pa6_w));
 	m_mainlatch->data_pending_callback().append(FUNC(starwars_state::boost_interleave_hack));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(starwars_state::esb)
+void starwars_state::esb(machine_config &config)
+{
 	starwars(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(esb_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &starwars_state::esb_main_map);
 
 	SLAPSTIC(config, m_slapstic_device, 101, false);
 
 	subdevice<ls259_device>("outlatch")->q_out_cb<4>().append_membank("bank2");
-MACHINE_CONFIG_END
+}
 
 
 
@@ -402,7 +402,7 @@ ROM_START( starwars )
 	ROM_LOAD( "136021-208.1h", 0x6000, 0x2000, CRC(e38070a8) SHA1(c858ae1702efdd48615453ab46e488848891d139) ) /* Sound ROM 0 */
 	ROM_RELOAD(                0xe000, 0x2000 )
 
-	ROM_REGION( 0x100, "user1", 0)
+	ROM_REGION( 0x100, "avg:prom", 0)
 	ROM_LOAD( "136021-109.4b", 0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
@@ -430,7 +430,7 @@ ROM_START( starwars1 )
 	ROM_LOAD( "136021-208.1h", 0x6000, 0x2000, CRC(e38070a8) SHA1(c858ae1702efdd48615453ab46e488848891d139) ) /* Sound ROM 0 */
 	ROM_RELOAD(                0xe000, 0x2000 )
 
-	ROM_REGION( 0x100, "user1", 0)
+	ROM_REGION( 0x100, "avg:prom", 0)
 	ROM_LOAD( "136021-109.4b", 0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
@@ -458,7 +458,7 @@ ROM_START( starwarso )
 	ROM_LOAD( "136021-208.1h", 0x6000, 0x2000, CRC(e38070a8) SHA1(c858ae1702efdd48615453ab46e488848891d139) ) /* Sound ROM 0 */
 	ROM_RELOAD(                0xe000, 0x2000 )
 
-	ROM_REGION( 0x100, "user1", 0)
+	ROM_REGION( 0x100, "avg:prom", 0)
 	ROM_LOAD( "136021-109.4b", 0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
@@ -486,7 +486,7 @@ ROM_START( tomcatsw )
 	ROM_LOAD( "136021-208.1h", 0x6000, 0x2000, NO_DUMP ) /* Sound ROM 0 */
 	ROM_RELOAD(                0xe000, 0x2000 )
 
-	ROM_REGION( 0x100, "user1", 0)
+	ROM_REGION( 0x100, "avg:prom", 0)
 	ROM_LOAD( "136021-109.4b", 0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
@@ -521,7 +521,7 @@ ROM_START( esb )
 	ROM_LOAD( "136031-112.1h", 0x6000, 0x2000, CRC(ca72d341) SHA1(52de5b82bb85d7c9caad2047e540d0748aa93ba5) ) /* Sound ROM 1 */
 	ROM_CONTINUE(              0xe000, 0x2000 )
 
-	ROM_REGION( 0x100, "user1", 0)
+	ROM_REGION( 0x100, "avg:prom", 0)
 	ROM_LOAD( "136021-109.4b", 0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */

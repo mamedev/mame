@@ -10,13 +10,13 @@
 
 ***************************************************************************/
 
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <time.h>
-#include <stdarg.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cstdlib>
+#include <ctime>
+#include <cstdarg>
+#include <cassert>
 
 #include "corestr.h"
 
@@ -50,6 +50,17 @@
 #include "formats/applix_dsk.h"
 
 #include "formats/hpi_dsk.h"
+#include "formats/img_dsk.h"
+
+#include "formats/dvk_mx_dsk.h"
+#include "formats/aim_dsk.h"
+#include "formats/m20_dsk.h"
+
+#include "formats/os9_dsk.h"
+
+#include "formats/flex_dsk.h"
+#include "formats/uniflex_dsk.h"
+
 
 static floppy_format_type floppy_formats[] = {
 	FLOPPY_MFI_FORMAT,
@@ -89,7 +100,17 @@ static floppy_format_type floppy_formats[] = {
 
 	FLOPPY_APPLIX_FORMAT,
 
-	FLOPPY_HPI_FORMAT
+	FLOPPY_HPI_FORMAT,
+	FLOPPY_IMG_FORMAT,
+
+	FLOPPY_DVK_MX_FORMAT,
+	FLOPPY_AIM_FORMAT,
+	FLOPPY_M20_FORMAT,
+
+	FLOPPY_OS9_FORMAT,
+
+	FLOPPY_FLEX_FORMAT,
+	FLOPPY_UNIFLEX_FORMAT
 };
 
 void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)

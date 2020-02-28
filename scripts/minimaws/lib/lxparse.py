@@ -5,6 +5,8 @@
 
 from . import dbaccess
 
+import os
+import os.path
 import subprocess
 import xml.sax
 import xml.sax.saxutils
@@ -191,6 +193,9 @@ class MachineHandler(ElementHandler):
         self.romof = attrs.get('romof')
         self.dbcurs.add_sourcefile(self.sourcefile)
 
+    def endMainElement(self, name):
+        self.dbcurs.close()
+
     def startChildElement(self, name, attrs):
         if name in self.CHILD_HANDLERS:
             self.setChildHandler(name, attrs, self.CHILD_HANDLERS[name](self))
@@ -206,6 +211,24 @@ class MachineHandler(ElementHandler):
                 status = 0 if 'status' not in attrs else 2 if attrs['status'] == 'unemulated' else 1
                 overall = status if 'overall' not in attrs else 2 if attrs['overall'] == 'unemulated' else 1
                 self.dbcurs.add_feature(self.id, attrs['type'], status, overall)
+            elif name == 'softwarelist':
+                self.dbcurs.add_machinesoftwarelist(self.id, attrs['name'], attrs['tag'], attrs['status'])
+            elif name == 'rom':
+                crc = attrs.get('crc')
+                sha1 = attrs.get('sha1')
+                if (crc is not None) and (sha1 is not None):
+                    crc = int(crc, 16)
+                    sha1 = sha1.lower()
+                    self.dbcurs.add_rom(crc, sha1)
+                    status = attrs.get('status', 'good')
+                    self.dbcurs.add_romdump(self.id, attrs['name'], crc, sha1, status != 'good')
+            elif name == 'disk':
+                sha1 = attrs.get('sha1')
+                if sha1 is not None:
+                    sha1 = sha1.lower()
+                    self.dbcurs.add_disk(sha1)
+                    status = attrs.get('status', 'good')
+                    self.dbcurs.add_diskdump(self.id, attrs['name'], sha1, status != 'good')
             self.setChildHandler(name, attrs, self.IGNORE)
 
     def endChildHandler(self, name, handler):
@@ -221,9 +244,6 @@ class MachineHandler(ElementHandler):
         elif name == 'manufacturer':
             self.manufacturer = handler.text
             self.dbcurs.add_system(self.id, self.year, self.manufacturer)
-
-    def endMainElement(self, name):
-        self.dbcurs.close()
 
 
 class ListXmlHandler(ElementHandler):
@@ -243,12 +263,10 @@ class ListXmlHandler(ElementHandler):
                     msg=('Expected "mame" element but found "%s"' % (name, )),
                     exception=None,
                     locator=self.locator)
-        self.dbconn.prepare_for_load()
         self.machines = 0
 
     def endMainElement(self, name):
-        # TODO: build index by first letter or whatever
-        self.dbconn.finalise_load()
+        self.dbconn.commit()
 
     def startChildElement(self, name, attrs):
         if name != 'machine':
@@ -270,11 +288,172 @@ class ListXmlHandler(ElementHandler):
         pass
 
 
+class DataAreaHandler(ElementHandler):
+    def __init__(self, parent, **kwargs):
+        super(DataAreaHandler, self).__init__(parent=parent, **kwargs)
+        self.dbcurs = parent.dbcurs
+        self.part = parent.id
+
+    def startChildElement(self, name, attrs):
+        if name == 'rom':
+            crc = attrs.get('crc')
+            sha1 = attrs.get('sha1')
+            if ('name' in attrs) and (crc is not None) and (sha1 is not None):
+                crc = int(crc, 16)
+                sha1 = sha1.lower()
+                self.dbcurs.add_rom(crc, sha1)
+                status = attrs.get('status', 'good')
+                self.dbcurs.add_softwareromdump(self.part, attrs['name'], crc, sha1, status != 'good')
+        self.setChildHandler(name, attrs, self.IGNORE)
+
+
+class DiskAreaHandler(ElementHandler):
+    def __init__(self, parent, **kwargs):
+        super(DiskAreaHandler, self).__init__(parent=parent, **kwargs)
+        self.dbcurs = parent.dbcurs
+        self.part = parent.id
+
+    def startChildElement(self, name, attrs):
+        if name == 'disk':
+            sha1 = attrs.get('sha1')
+            if sha1 is not None:
+                sha1 = sha1.lower()
+                self.dbcurs.add_disk(sha1)
+                status = attrs.get('status', 'good')
+                self.dbcurs.add_softwarediskdump(self.part, attrs['name'], sha1, status != 'good')
+        self.setChildHandler(name, attrs, self.IGNORE)
+
+
+class SoftwarePartHandler(ElementHandler):
+    CHILD_HANDLERS = {
+            'dataarea':         DataAreaHandler,
+            'diskarea':         DiskAreaHandler }
+
+    def __init__(self, parent, **kwargs):
+        super(SoftwarePartHandler, self).__init__(parent=parent, **kwargs)
+        self.dbcurs = parent.dbcurs
+        self.software = parent.id
+
+    def startMainElement(self, name, attrs):
+        self.id = self.dbcurs.add_softwarepart(self.software, attrs['name'], attrs['interface'])
+
+    def startChildElement(self, name, attrs):
+        if name in self.CHILD_HANDLERS:
+            self.setChildHandler(name, attrs, self.CHILD_HANDLERS[name](self))
+        else:
+            if name == 'feature':
+                self.dbcurs.add_softwarepartfeaturetype(attrs['name'])
+                self.dbcurs.add_softwarepartfeature(self.id, attrs['name'], attrs['value'])
+            self.setChildHandler(name, attrs, self.IGNORE)
+
+
+class SoftwareHandler(ElementHandler):
+    CHILD_HANDLERS = {
+            'description':      TextAccumulator,
+            'year':             TextAccumulator,
+            'publisher':        TextAccumulator,
+            'part':             SoftwarePartHandler }
+
+    def __init__(self, parent, **kwargs):
+        super(SoftwareHandler, self).__init__(parent=parent, **kwargs)
+        self.dbcurs = self.dbconn.cursor()
+        self.softwarelist = parent.id
+
+    def startMainElement(self, name, attrs):
+        self.shortname = attrs['name']
+        self.cloneof = attrs.get('cloneof')
+        self.supported = 0 if (attrs.get('supported', 'yes') == 'yes') else 1 if (attrs.get('supported', 'yes') == 'partial') else 2
+
+    def endMainElement(self, name):
+        self.dbcurs.close()
+
+    def startChildElement(self, name, attrs):
+        if name in self.CHILD_HANDLERS:
+            self.setChildHandler(name, attrs, self.CHILD_HANDLERS[name](self))
+        else:
+            if name == 'info':
+                self.dbcurs.add_softwareinfotype(attrs['name'])
+                self.dbcurs.add_softwareinfo(self.id, attrs['name'], attrs['value'])
+            elif name == 'sharedfeat':
+                self.dbcurs.add_softwaresharedfeattype(attrs['name'])
+                self.dbcurs.add_softwaresharedfeat(self.id, attrs['name'], attrs['value'])
+            self.setChildHandler(name, attrs, self.IGNORE)
+
+    def endChildHandler(self, name, handler):
+        if name == 'description':
+            self.description = handler.text
+        elif name == 'year':
+            self.year = handler.text
+        elif name == 'publisher':
+            self.publisher = handler.text
+            self.id = self.dbcurs.add_software(self.softwarelist, self.shortname, self.supported, self.description, self.year, self.publisher)
+            if self.cloneof is not None:
+                self.dbcurs.add_softwarecloneof(self.id, self.cloneof)
+
+
+class SoftwareListHandler(ElementHandler):
+    def __init__(self, dbconn, **kwargs):
+        super(SoftwareListHandler, self).__init__(parent=None, **kwargs)
+        self.dbconn = dbconn
+
+    def startDocument(self):
+        pass
+
+    def endDocument(self):
+        pass
+
+    def startMainElement(self, name, attrs):
+        if name != 'softwarelist':
+            raise xml.sax.SAXParseException(
+                    msg=('Expected "softwarelist" element but found "%s"' % (name, )),
+                    exception=None,
+                    locator=self.locator)
+        self.shortname = attrs['name']
+        self.description = attrs['description']
+        self.entries = 0
+        dbcurs = self.dbconn.cursor()
+        self.id = dbcurs.add_softwarelist(self.shortname, self.description)
+        dbcurs.close()
+
+    def endMainElement(self, name):
+        self.dbconn.commit()
+
+    def startChildElement(self, name, attrs):
+        if name != 'software':
+            raise xml.sax.SAXParseException(
+                    msg=('Expected "software" element but found "%s"' % (name, )),
+                    exception=None,
+                    locator=self.locator)
+        self.setChildHandler(name, attrs, SoftwareHandler(self))
+
+    def endChildHandler(self, name, handler):
+        if name == 'software':
+            if self.entries >= 1023:
+                self.dbconn.commit()
+                self.entries = 0
+            else:
+                self.entries += 1
+
+    def processingInstruction(self, target, data):
+        pass
+
+
 def load_info(options):
+    dbconn = dbaccess.UpdateConnection(options.database)
+    dbconn.prepare_for_load()
     parser = xml.sax.make_parser()
-    parser.setContentHandler(ListXmlHandler(dbaccess.UpdateConnection(options.database)))
+
+    parser.setContentHandler(SoftwareListHandler(dbconn))
+    for path in options.softwarepath:
+        files = [os.path.join(path, f) for f in os.listdir(path) if f.endswith('.xml')]
+        for filename in files:
+            parser.parse(filename)
+
+    parser.setContentHandler(ListXmlHandler(dbconn))
     if options.executable is not None:
         task = subprocess.Popen([options.executable, '-listxml'], stdout=subprocess.PIPE)
         parser.parse(task.stdout)
     else:
         parser.parse(options.file)
+
+    dbconn.finalise_load()

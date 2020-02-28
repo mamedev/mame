@@ -36,13 +36,14 @@ bbc_ram_device::bbc_ram_device(const machine_config &mconfig, const char *tag, d
 
 void bbc_ram_device::device_start()
 {
+	ram_alloc(0x8000);
 }
 
 //-------------------------------------------------
 //  read
 //-------------------------------------------------
 
-READ8_MEMBER(bbc_ram_device::read)
+uint8_t bbc_ram_device::read(offs_t offset)
 {
 	return get_ram_base()[offset & (get_ram_size() - 1)];
 }
@@ -51,7 +52,7 @@ READ8_MEMBER(bbc_ram_device::read)
 //  write
 //-------------------------------------------------
 
-WRITE8_MEMBER(bbc_ram_device::write)
+void bbc_ram_device::write(offs_t offset, uint8_t data)
 {
 	get_ram_base()[offset & (get_ram_size() - 1)] = data;
 }

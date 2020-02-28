@@ -231,7 +231,7 @@ void pc6001_state::pc6001_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom().nopw();
-//  AM_RANGE(0x4000, 0x5fff) // mapped by the cartslot
+//  map(0x4000, 0x5fff) // mapped by the cartslot
 	map(0x6000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).ram().share("ram");
 }
@@ -718,8 +718,8 @@ void pc6001mk2_state::pc6001mk2_io(address_map &map)
 	map(0xf1, 0xf1).rw(FUNC(pc6001mk2_state::mk2_bank_r1_r), FUNC(pc6001mk2_state::mk2_bank_r1_w));
 	map(0xf2, 0xf2).rw(FUNC(pc6001mk2_state::mk2_bank_w0_r), FUNC(pc6001mk2_state::mk2_bank_w0_w));
 	map(0xf3, 0xf3).w(FUNC(pc6001mk2_state::mk2_0xf3_w));
-//  AM_RANGE(0xf4
-//  AM_RANGE(0xf5
+//  map(0xf4
+//  map(0xf5
 	map(0xf6, 0xf6).w(FUNC(pc6001mk2_state::mk2_timer_adj_w));
 	map(0xf7, 0xf7).w(FUNC(pc6001mk2_state::mk2_timer_irqv_w));
 }
@@ -748,9 +748,9 @@ void pc6601_state::pc6601_io(address_map &map)
 	pc6001mk2_io(map);
 
 	// these are disk related
-//  AM_RANGE(0xb1
-//  AM_RANGE(0xb2
-//  AM_RANGE(0xb3
+//  map(0xb1
+//  map(0xb2
+//  map(0xb3
 
 	map(0xd0, 0xdf).rw(FUNC(pc6601_state::fdc_r), FUNC(pc6601_state::fdc_w));
 }
@@ -942,14 +942,14 @@ void pc6001sr_state::pc6001sr_io(address_map &map)
 
 	map(0xb0, 0xb0).w(FUNC(pc6001sr_state::sr_system_latch_w));
 	/* these are disk related */
-//  AM_RANGE(0xb1
+//  map(0xb1
 	map(0xb2, 0xb2).r(FUNC(pc6001sr_state::hw_rev_r));
-//  AM_RANGE(0xb3
+//  map(0xb3
 
 	map(0xb8, 0xbf).ram().share("irq_vectors");
-//  AM_RANGE(0xc0, 0xc0) AM_WRITE(mk2_col_bank_w)
-//  AM_RANGE(0xc1, 0xc1) AM_WRITE(mk2_vram_bank_w)
-//  AM_RANGE(0xc2, 0xc2) AM_WRITE(opt_bank_w)
+//  map(0xc0, 0xc0).w(FUNC(pc6001sr_state::mk2_col_bank_w));
+//  map(0xc1, 0xc1).w(FUNC(pc6001sr_state::mk2_vram_bank_w));
+//  map(0xc2, 0xc2).w(FUNC(pc6001sr_state::opt_bank_w));
 
 	map(0xc8, 0xc8).w(FUNC(pc6001sr_state::sr_mode_w));
 	map(0xc9, 0xc9).w(FUNC(pc6001sr_state::sr_vram_bank_w));
@@ -960,12 +960,12 @@ void pc6001sr_state::pc6001sr_io(address_map &map)
 
 	map(0xe0, 0xe3).mirror(0x0c).rw("upd7752", FUNC(upd7752_device::read), FUNC(upd7752_device::write));
 
-//  AM_RANGE(0xf0, 0xf0) AM_READWRITE(mk2_bank_r0_r, mk2_bank_r0_w)
-//  AM_RANGE(0xf1, 0xf1) AM_READWRITE(mk2_bank_r1_r, mk2_bank_r1_w)
-//  AM_RANGE(0xf2, 0xf2) AM_READWRITE(mk2_bank_w0_r, mk2_bank_w0_w)
+//  map(0xf0, 0xf0).rw(FUNC(pc6001sr_state::mk2_bank_r0_r), FUNC(pc6001sr_state::mk2_bank_r0_w));
+//  map(0xf1, 0xf1).rw(FUNC(pc6001sr_state::mk2_bank_r1_r), FUNC(pc6001sr_state::mk2_bank_r1_w));
+//  map(0xf2, 0xf2).rw(FUNC(pc6001sr_state::mk2_bank_w0_r), FUNC(pc6001sr_state::mk2_bank_w0_w));
 	map(0xf3, 0xf3).w(FUNC(pc6001sr_state::mk2_0xf3_w));
-//  AM_RANGE(0xf4
-//  AM_RANGE(0xf5
+//  map(0xf4
+//  map(0xf5
 	map(0xf6, 0xf6).w(FUNC(pc6001sr_state::mk2_timer_adj_w));
 	map(0xf7, 0xf7).w(FUNC(pc6001sr_state::mk2_timer_irqv_w));
 }
@@ -1287,8 +1287,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
 			else
 				cas_data_i>>=1;
 		#else
-			address_space &space = m_maincpu->space(AS_PROGRAM);
-			m_cur_keycode = m_cas_hack->read_rom(space, m_cas_offset++);
+			m_cur_keycode = m_cas_hack->read_rom(m_cas_offset++);
 			popmessage("%04x %04x", m_cas_offset, m_cas_maxsize);
 			if(m_cas_offset > m_cas_maxsize)
 			{
@@ -1350,7 +1349,7 @@ void pc6001_state::machine_reset()
 	set_videoram_bank(0xc000);
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
@@ -1471,25 +1470,26 @@ GFXDECODE_END
 
 #define PC6001_MAIN_CLOCK 7987200
 
-MACHINE_CONFIG_START(pc6001_state::pc6001)
+void pc6001_state::pc6001(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, PC6001_MAIN_CLOCK / 2) // PD 780C-1, ~4 Mhz
-	MCFG_DEVICE_PROGRAM_MAP(pc6001_map)
-	MCFG_DEVICE_IO_MAP(pc6001_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc6001_state, vrtc_irq)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
+	Z80(config, m_maincpu, PC6001_MAIN_CLOCK / 2); // PD 780C-1, ~4 Mhz
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc6001_state::pc6001_map);
+	m_maincpu->set_addrmap(AS_IO, &pc6001_state::pc6001_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pc6001_state::vrtc_irq));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001_state::irq_callback));
 
-//  MCFG_DEVICE_ADD("subcpu", I8049, 7987200)
+//  I8049(config, "subcpu", 7987200);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc6001m2);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(pc6001_state, screen_update_pc6001)
-	MCFG_SCREEN_SIZE(320, 25+192+26)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_screen_update(FUNC(pc6001_state::screen_update_pc6001));
+	m_screen->set_size(320, 25+192+26);
+	m_screen->set_visarea(0, 319, 0, 239);
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(pc6001_state::pc6001_palette), 16+4);
 
@@ -1502,79 +1502,76 @@ MACHINE_CONFIG_START(pc6001_state::pc6001)
 	m_ppi->out_pc_callback().set(FUNC(pc6001_state::ppi_portc_w));
 
 	/* uart */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pc6001_cart")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pc6001_cart");
 
 //  CASSETTE(config, m_cassette);
 //  m_cassette->set_formats(pc6001_cassette_formats);
 //  m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
-	MCFG_GENERIC_CARTSLOT_ADD("cas_hack", generic_plain_slot, "pc6001_cass")
-	MCFG_GENERIC_EXTENSIONS("cas,p6")
+//  m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	GENERIC_CARTSLOT(config, m_cas_hack, generic_plain_slot, "pc6001_cass", "cas,p6");
 
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &ay8910(AY8910(config, "ay8910", PC6001_MAIN_CLOCK/4));
 	ay8910.port_a_read_callback().set_ioport("P1");
 	ay8910.port_b_read_callback().set_ioport("P2");
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);
-//  WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* TODO: accurate timing on this */
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(pc6001_state::keyboard_callback), attotime::from_hz(250));
 	TIMER(config, "cassette_timer").configure_periodic(FUNC(pc6001_state::cassette_callback), attotime::from_hz(1200/12));
-MACHINE_CONFIG_END
+}
 
 
 
-MACHINE_CONFIG_START(pc6001mk2_state::pc6001mk2)
+void pc6001mk2_state::pc6001mk2(machine_config &config)
+{
 	pc6001(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pc6001mk2_map)
-	MCFG_DEVICE_IO_MAP(pc6001mk2_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc6001mk2_state::pc6001mk2_map);
+	m_maincpu->set_addrmap(AS_IO, &pc6001mk2_state::pc6001mk2_io);
 
 //  MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2_state,pc6001mk2)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(pc6001mk2_state, screen_update_pc6001mk2)
+	m_screen->set_screen_update(FUNC(pc6001mk2_state::screen_update_pc6001mk2));
 
 	m_palette->set_entries(16+16);
 	m_palette->set_init(FUNC(pc6001mk2_state::pc6001mk2_palette));
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pc6001m2);
 
-	MCFG_DEVICE_ADD("upd7752", UPD7752, PC6001_MAIN_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	UPD7752(config, "upd7752", PC6001_MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(pc6601_state::pc6601)
+void pc6601_state::pc6601(machine_config &config)
+{
 	pc6001mk2(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", Z80, PC6001_MAIN_CLOCK / 2)
-	MCFG_DEVICE_PROGRAM_MAP(pc6001mk2_map)
-	MCFG_DEVICE_IO_MAP(pc6601_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc6001_state, vrtc_irq)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
-MACHINE_CONFIG_END
+	Z80(config.replace(), m_maincpu, PC6001_MAIN_CLOCK / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc6601_state::pc6001mk2_map);
+	m_maincpu->set_addrmap(AS_IO, &pc6601_state::pc6601_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pc6001_state::vrtc_irq));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001_state::irq_callback));
+}
 
-MACHINE_CONFIG_START(pc6001sr_state::pc6001sr)
+void pc6001sr_state::pc6001sr(machine_config &config)
+{
 	pc6001mk2(config);
 
 	/* basic machine hardware */
 	//*Yes*, PC-6001 SR Z80 CPU is actually slower than older models (better waitstates tho?)
-	MCFG_DEVICE_REPLACE("maincpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(pc6001sr_map)
-	MCFG_DEVICE_IO_MAP(pc6001sr_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc6001sr_state,  sr_vrtc_irq)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
+	Z80(config.replace(), m_maincpu, XTAL(3'579'545));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc6001sr_state::pc6001sr_map);
+	m_maincpu->set_addrmap(AS_IO, &pc6001sr_state::pc6001sr_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pc6001sr_state::sr_vrtc_irq));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pc6001_state::irq_callback));
 
 //  MCFG_MACHINE_RESET_OVERRIDE(pc6001sr_state,pc6001sr)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(pc6001sr_state, screen_update_pc6001sr)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(pc6001sr_state::screen_update_pc6001sr));
+}
 
 /* ROM definition */
 ROM_START( pc6001 )

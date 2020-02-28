@@ -222,7 +222,7 @@ std::unique_ptr<util::disasm_interface> i8008_device::create_disassembler()
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t i8008_device::execute_min_cycles() const
+uint32_t i8008_device::execute_min_cycles() const noexcept
 {
 	return 8;
 }
@@ -232,7 +232,7 @@ uint32_t i8008_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t i8008_device::execute_max_cycles() const
+uint32_t i8008_device::execute_max_cycles() const noexcept
 {
 	return 16;
 }

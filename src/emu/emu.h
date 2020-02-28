@@ -19,6 +19,7 @@
 #define __EMU_H__
 
 #include <list>
+#include <forward_list>
 #include <vector>
 #include <memory>
 #include <map>
@@ -94,7 +95,6 @@
 
 // video-related
 #include "drawgfx.h"
-#include "tilemap.h"
 #include "video.h"
 
 // sound-related

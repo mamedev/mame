@@ -129,7 +129,8 @@ DISCRETE_SOUND_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc77_device::device_add_mconfig)
+void abc77_device::device_add_mconfig(machine_config &config)
+{
 	// keyboard cpu
 	I8035(config, m_maincpu, XTAL(4'608'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc77_device::abc77_map);
@@ -144,9 +145,8 @@ MACHINE_CONFIG_START(abc77_device::device_add_mconfig)
 
 	// discrete sound
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, abc77_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, abc77_discrete).add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
 //-------------------------------------------------
@@ -305,7 +305,7 @@ INPUT_PORTS_START( abc55 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("SW1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc77_device, keyboard_reset, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc77_device, keyboard_reset, 0)
 INPUT_PORTS_END
 
 

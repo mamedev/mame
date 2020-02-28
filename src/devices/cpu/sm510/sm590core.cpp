@@ -35,25 +35,21 @@ void sm590_device::data_16x2x4(address_map &map)
 }
 
 // device definitions
-sm590_device::sm590_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm590_device(mconfig, SM590, tag, owner, clock, 4 /* stack levels */, 9 /* prg width */, address_map_constructor(FUNC(sm590_device::program_1x128x4), this), 5 /* data width */, address_map_constructor(FUNC(sm590_device::data_16x2x4), this))
-{
-}
+sm590_device::sm590_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	sm590_device(mconfig, SM590, tag, owner, clock, 4 /* stack levels */, 9 /* prg width */, address_map_constructor(FUNC(sm590_device::program_1x128x4), this), 5 /* data width */, address_map_constructor(FUNC(sm590_device::data_16x2x4), this))
+{ }
 
-//sm591_device::sm591_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-//  : sm510_base_device(mconfig, SM591, tag, owner, clock, 4 /* stack levels */, 10 /* prg width */, address_map_constructor(FUNC(sm591_device::program_2x128x4), this), 6 /* data width */, address_map_constructor(FUNC(sm591_device::data_16x3.5x4), this))
-//{
-//}
+//sm591_device::sm591_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+//  sm510_base_device(mconfig, SM591, tag, owner, clock, 4 /* stack levels */, 10 /* prg width */, address_map_constructor(FUNC(sm591_device::program_2x128x4), this), 6 /* data width */, address_map_constructor(FUNC(sm591_device::data_16x3.5x4), this))
+//{ }
 
-//sm595_device::sm595_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-//  : sm510_base_device(mconfig, SM595, tag, owner, clock, 4 /* stack levels */, 10 /* prg width */, address_map_constructor(FUNC(sm595_device::program_1x128x4_1x128x2), this), 5 /* data width */, address_map_constructor(FUNC(sm595_device::data_16x2x4), this))
-//{
-//}
+//sm595_device::sm595_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+//  sm510_base_device(mconfig, SM595, tag, owner, clock, 4 /* stack levels */, 10 /* prg width */, address_map_constructor(FUNC(sm595_device::program_1x128x4_1x128x2), this), 5 /* data width */, address_map_constructor(FUNC(sm595_device::data_16x2x4), this))
+//{ }
 
-sm590_device::sm590_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
-	: sm510_base_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data)
-{
-}
+sm590_device::sm590_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+	sm510_base_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data)
+{ }
 
 
 std::unique_ptr<util::disasm_interface> sm590_device::create_disassembler()

@@ -178,12 +178,12 @@ WRITE8_MEMBER(_4enraya_state::sound_control_w)
 	{
 		case 0: case 3:
 			// latch address
-			m_ay->address_w(space, 0, m_soundlatch);
+			m_ay->address_w(m_soundlatch);
 			break;
 
 		case 2:
 			// write to psg
-			m_ay->data_w(space, 0, m_soundlatch);
+			m_ay->data_w(m_soundlatch);
 			break;
 
 		default:
@@ -280,7 +280,7 @@ void unk_gambl_state::unkpacg_main_portmap(address_map &map)
 	map(0x00, 0x00).portr("DSW1");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2");
-//  AM_RANGE(0x03, 0x03) AM_WRITE("out_w")  // to investigate...
+//  map(0x03, 0x03).w(FUNC(unk_gambl_state::out_w));  // to investigate...
 	map(0x17, 0x17).w(m_ay, FUNC(ay8910_device::data_w));
 	map(0x27, 0x27).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x37, 0x37).w(m_ay, FUNC(ay8910_device::address_w));
@@ -470,48 +470,47 @@ void _4enraya_state::machine_reset()
 *         Machine Drivers          *
 ***********************************/
 
-MACHINE_CONFIG_START(_4enraya_state::_4enraya )
-
+void _4enraya_state::_4enraya(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(_4enraya_state, irq0_line_hold, 4*60) // unknown timing
+	Z80(config, m_maincpu, MAIN_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &_4enraya_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &_4enraya_state::main_portmap);
+	m_maincpu->set_periodic_int(FUNC(_4enraya_state::irq0_line_hold), attotime::from_hz(4*60)); // unknown timing
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(_4enraya_state, screen_update_4enraya)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(_4enraya_state::screen_update_4enraya));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_4enraya)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_4enraya);
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_ay, MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.3); /* guess */
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(unk_gambl_state::unkpacg)
+void unk_gambl_state::unkpacg(machine_config &config)
+{
 	_4enraya(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(unkpacg_main_map)
-	MCFG_DEVICE_IO_MAP(unkpacg_main_portmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &unk_gambl_state::unkpacg_main_map);
+	m_maincpu->set_addrmap(AS_IO, &unk_gambl_state::unkpacg_main_portmap);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
-//  SPEAKER(config, "mono").front_center();
 	AY8910(config.replace(), m_ay, MAIN_CLOCK/4); /* guess */
 	m_ay->port_a_read_callback().set_ioport("DSW2");
 	m_ay->add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 /***********************************

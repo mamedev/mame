@@ -81,7 +81,6 @@ void tvboy_state::tvboyii(machine_config &config)
 	/* basic machine hardware */
 	M6507(config, m_maincpu, MASTER_CLOCK_PAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tvboy_state::tvboy_mem);
-	m_maincpu->disable_cache();
 
 	/* video hardware */
 	TIA_PAL_VIDEO(config, m_tia, 0, "tia");
@@ -92,7 +91,6 @@ void tvboy_state::tvboyii(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31);
 	m_screen->set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
-	m_screen->set_palette("tia_video:palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

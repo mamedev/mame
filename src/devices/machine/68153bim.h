@@ -104,7 +104,7 @@ public:
 	// construction/destruction
 	bim68153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	IRQ_CALLBACK_MEMBER(iack);
+	u16 iack(int irqline);
 	int acknowledge();
 	int get_irq_level();
 

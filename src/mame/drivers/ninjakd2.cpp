@@ -881,51 +881,18 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout layout8x8 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,32) },
-	32*8
-};
-
-static const gfx_layout layout16x16 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(32*8,4) },
-	{ STEP8(0,32), STEP8(64*8,32) },
-	128*8
-};
-
-static const gfx_layout robokid_layout16x16 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(64*8,4) },
-	{ STEP16(0,32) },
-	128*8
-};
-
 static GFXDECODE_START( gfx_ninjakd2 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,    0x200, 16)    // fg
-	GFXDECODE_ENTRY( "gfx2", 0, layout16x16,  0x100, 16)    // sprites
-	GFXDECODE_ENTRY( "gfx3", 0, layout16x16,  0x000, 16)    // bg
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x200, 16)    // fg
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x100, 16)    // sprites
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 16)    // bg
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_robokid )
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,           0x300, 16) // fg
-	GFXDECODE_ENTRY( "gfx2", 0, robokid_layout16x16, 0x200, 16) // sprites
-	GFXDECODE_ENTRY( "gfx3", 0, robokid_layout16x16, 0x000, 16) // bg0
-	GFXDECODE_ENTRY( "gfx4", 0, robokid_layout16x16, 0x000, 16) // bg1
-	GFXDECODE_ENTRY( "gfx5", 0, robokid_layout16x16, 0x000, 16) // bg2
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x300, 16) // fg
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x200, 16) // sprites
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16) // bg0
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16) // bg1
+	GFXDECODE_ENTRY( "gfx5", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16) // bg2
 GFXDECODE_END
 
 
@@ -1098,183 +1065,174 @@ void omegaf_state::omegaf(machine_config &config)
 
 ROM_START( ninjakd2 )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "nk2_01.rom",   0x00000, 0x8000, CRC(3cdbb906) SHA1(f48f82528b5fc581ee3b1ccd0ef9cdecc7249bb3) )
-	ROM_LOAD( "nk2_02.rom",   0x10000, 0x8000, CRC(b5ce9a1a) SHA1(295a7e1d41e1a8ee45f1250086a0c9314837eded) )   // banked at 8000-bfff
-	ROM_LOAD( "nk2_03.rom",   0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )
-	ROM_LOAD( "nk2_04.rom",   0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )
-	ROM_LOAD( "nk2_05.rom",   0x28000, 0x8000, CRC(5dac9426) SHA1(0916cddbbe1e93c32b96fe28e145d34b2a892e80) )
+	ROM_LOAD( "1.3s", 0x00000, 0x8000, CRC(3cdbb906) SHA1(f48f82528b5fc581ee3b1ccd0ef9cdecc7249bb3) )
+	ROM_LOAD( "2.3q", 0x10000, 0x8000, CRC(b5ce9a1a) SHA1(295a7e1d41e1a8ee45f1250086a0c9314837eded) ) // banked at 8000-bfff
+	ROM_LOAD( "3.3r", 0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )
+	ROM_LOAD( "4.3p", 0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )
+	ROM_LOAD( "5.3m", 0x28000, 0x8000, CRC(5dac9426) SHA1(0916cddbbe1e93c32b96fe28e145d34b2a892e80) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "nk2_06.rom",   0x00000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) )  // encrypted
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // NEC MC-8123 custom CPU block
+	ROM_LOAD( "6.3h", 0x0000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) ) // encrypted
 
 	ROM_REGION( 0x2000, "soundcpu:key", 0 ) /* MC8123 key */
-	ROM_LOAD( "ninjakd2.key",  0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
+	ROM_LOAD( "ninjakd2.key", 0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
-	ROM_LOAD( "nk2_12.rom",   0x00000, 0x08000, CRC(db5657a9) SHA1(abbb033edb9a5a0c66ee5981d1e4df1ab334a82d) )
+	ROM_LOAD( "12.5n", 0x00000, 0x08000, CRC(db5657a9) SHA1(abbb033edb9a5a0c66ee5981d1e4df1ab334a82d) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )    // sprites (need lineswapping)
-	ROM_LOAD( "nk2_08.rom",   0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
-	ROM_LOAD( "nk2_07.rom",   0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
+	ROM_LOAD( "8.6l", 0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
+	ROM_LOAD( "7.6n", 0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )    // bg tiles (need lineswapping)
-	ROM_LOAD( "nk2_11.rom",   0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
-	ROM_LOAD( "nk2_10.rom",   0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
+	ROM_LOAD( "11.2n", 0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
+	ROM_LOAD( "10.2r", 0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
 
 	ROM_REGION( 0x10000, "pcm", 0 )
-	ROM_LOAD( "nk2_09.rom",   0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) )   // unsigned 8-bit pcm samples
+	ROM_LOAD( "9.6c", 0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) ) // unsigned 8-bit pcm samples
 ROM_END
 
 ROM_START( ninjakd2a )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "nk2_01.bin",   0x00000, 0x8000, CRC(e6adca65) SHA1(33d483dde0853f37455cde32b461f4e919601b4b) )
-	ROM_LOAD( "nk2_02.bin",   0x10000, 0x8000, CRC(d9284bd1) SHA1(e790fb1a718a1f7997931f2f390fe053655f231d) )   // banked at 8000-bfff
-	ROM_LOAD( "nk2_03.rom",   0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )
-	ROM_LOAD( "nk2_04.rom",   0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )
-	ROM_LOAD( "nk2_05.bin",   0x28000, 0x8000, CRC(960725fb) SHA1(160c8bfaf089cbeeef2023f12379793079bff93b) )
+	ROM_LOAD( "1.3s", 0x00000, 0x8000, CRC(e6adca65) SHA1(33d483dde0853f37455cde32b461f4e919601b4b) ) // sldh
+	ROM_LOAD( "2.3q", 0x10000, 0x8000, CRC(d9284bd1) SHA1(e790fb1a718a1f7997931f2f390fe053655f231d) ) // sldh - banked at 8000-bfff
+	ROM_LOAD( "3.3r", 0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )
+	ROM_LOAD( "4.3p", 0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )
+	ROM_LOAD( "5.3m", 0x28000, 0x8000, CRC(960725fb) SHA1(160c8bfaf089cbeeef2023f12379793079bff93b) ) // sldh
 
 	ROM_REGION( 2*0x10000, "soundcpu", 0 )
-	ROM_LOAD( "nk2_06.bin",   0x10000, 0x8000, CRC(7bfe6c9e) SHA1(aef8cbeb0024939bf65f77113a5cf777f6613722) )   // decrypted opcodes
-	ROM_CONTINUE(             0x00000, 0x8000 )                                                                 // decrypted data
+	ROM_LOAD( "nk2_06.bin", 0x10000, 0x8000, CRC(7bfe6c9e) SHA1(aef8cbeb0024939bf65f77113a5cf777f6613722) ) // decrypted opcodes
+	ROM_CONTINUE(           0x00000, 0x8000 )                                                               // decrypted data
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
-	ROM_LOAD( "nk2_12.rom",   0x00000, 0x08000, CRC(db5657a9) SHA1(abbb033edb9a5a0c66ee5981d1e4df1ab334a82d) )
+	ROM_LOAD( "12.5n", 0x00000, 0x08000, CRC(db5657a9) SHA1(abbb033edb9a5a0c66ee5981d1e4df1ab334a82d) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )    // sprites (need lineswapping)
-	ROM_LOAD( "nk2_08.rom",   0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
-	ROM_LOAD( "nk2_07.rom",   0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
+	ROM_LOAD( "8.6l", 0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
+	ROM_LOAD( "7.6n", 0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )    // bg tiles (need lineswapping)
-	ROM_LOAD( "nk2_11.rom",   0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
-	ROM_LOAD( "nk2_10.rom",   0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
+	ROM_LOAD( "11.2n", 0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
+	ROM_LOAD( "10.2r", 0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
 
 	ROM_REGION( 0x10000, "pcm", 0 )
-	ROM_LOAD( "nk2_09.rom",   0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) )   // unsigned 8-bit pcm samples
+	ROM_LOAD( "9.6c", 0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) ) // unsigned 8-bit pcm samples
 ROM_END
 
 ROM_START( ninjakd2b )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "1.3s",         0x00000, 0x8000, CRC(cb4f4624) SHA1(4fc66641adc0a2c0eca332f27c5777df62fa507b) )
-	ROM_LOAD( "2.3q",         0x10000, 0x8000, CRC(0ad0c100) SHA1(c5bbc107ba07bd6950bb4d7377e827c084b8229b) )   // banked at 8000-bfff
-	ROM_LOAD( "nk2_03.rom",   0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )   // 3.3p
-	ROM_LOAD( "nk2_04.rom",   0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )   // 4.3n
-	ROM_LOAD( "nk2_05.rom",   0x28000, 0x8000, CRC(5dac9426) SHA1(0916cddbbe1e93c32b96fe28e145d34b2a892e80) )   // 5.3l
+	ROM_LOAD( "1.3s", 0x00000, 0x8000, CRC(cb4f4624) SHA1(4fc66641adc0a2c0eca332f27c5777df62fa507b) ) // sldh
+	ROM_LOAD( "2.3q", 0x10000, 0x8000, CRC(0ad0c100) SHA1(c5bbc107ba07bd6950bb4d7377e827c084b8229b) ) // sldh - banked at 8000-bfff
+	ROM_LOAD( "3.3r", 0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )
+	ROM_LOAD( "4.3p", 0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )
+	ROM_LOAD( "5.3m", 0x28000, 0x8000, CRC(5dac9426) SHA1(0916cddbbe1e93c32b96fe28e145d34b2a892e80) )
 
 	ROM_REGION( 2*0x10000, "soundcpu", 0 )
-	ROM_LOAD( "nk2_06.bin",   0x10000, 0x8000, CRC(7bfe6c9e) SHA1(aef8cbeb0024939bf65f77113a5cf777f6613722) )   // 6.3g  decrypted opcodes
-	ROM_CONTINUE(             0x00000, 0x8000 )                                                                 // decrypted data
+	ROM_LOAD( "nk2_06.bin", 0x10000, 0x8000, CRC(7bfe6c9e) SHA1(aef8cbeb0024939bf65f77113a5cf777f6613722) ) // 6.3g  decrypted opcodes
+	ROM_CONTINUE(           0x00000, 0x8000 )                                                               // decrypted data
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
-	ROM_LOAD( "nk2_12.rom",   0x00000, 0x08000, CRC(db5657a9) SHA1(abbb033edb9a5a0c66ee5981d1e4df1ab334a82d) )  // 12.5m
+	ROM_LOAD( "12.5n", 0x00000, 0x08000, CRC(db5657a9) SHA1(abbb033edb9a5a0c66ee5981d1e4df1ab334a82d) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )    // sprites (need lineswapping)
-	ROM_LOAD( "nk2_08.rom",   0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )  // 8.6k
-	ROM_LOAD( "nk2_07.rom",   0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )  // 7.6m
+	ROM_LOAD( "8.6l", 0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
+	ROM_LOAD( "7.6n", 0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )    // bg tiles (need lineswapping)
-	ROM_LOAD( "nk2_11.rom",   0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )  // 11.2m
-	ROM_LOAD( "nk2_10.rom",   0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )  // 10.2p
+	ROM_LOAD( "11.2n", 0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
+	ROM_LOAD( "10.2r", 0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
 
 	ROM_REGION( 0x10000, "pcm", 0 )
-	ROM_LOAD( "nk2_09.rom",   0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) )   // 9.6d  unsigned 8-bit pcm samples
+	ROM_LOAD( "9.6c", 0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) ) // unsigned 8-bit pcm samples
 ROM_END
 
 ROM_START( ninjakd2c )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "1.3u",         0x00000, 0x8000, CRC(06096412) SHA1(4a84a9326248ff899a04f32950b4c4a5ff58cf75) ) // sldh w/rdaction
-	ROM_LOAD( "2.3t",         0x10000, 0x8000, CRC(9ed9a994) SHA1(ec95e09066ad51cf4514e269384b7609d6c345d9) )   // banked at 8000-bfff
-	ROM_LOAD( "nk2_03.rom",   0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )
-	ROM_LOAD( "nk2_04.rom",   0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )
-	ROM_LOAD( "5.3m",         0x28000, 0x8000, CRC(800d4951) SHA1(878516bd03a61ac970cd9e8c35116f8ec3020e79) )
+	ROM_LOAD( "1.3u", 0x00000, 0x8000, CRC(06096412) SHA1(4a84a9326248ff899a04f32950b4c4a5ff58cf75) ) // sldh
+	ROM_LOAD( "2.3t", 0x10000, 0x8000, CRC(9ed9a994) SHA1(ec95e09066ad51cf4514e269384b7609d6c345d9) ) // sldh - banked at 8000-bfff
+	ROM_LOAD( "3.3r", 0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )
+	ROM_LOAD( "4.3p", 0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )
+	ROM_LOAD( "5.3m", 0x28000, 0x8000, CRC(800d4951) SHA1(878516bd03a61ac970cd9e8c35116f8ec3020e79) ) // sldh
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "nk2_06.rom",   0x00000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) )  // encrypted
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // NEC MC-8123 custom CPU block
+	ROM_LOAD( "6.3h", 0x0000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) ) // encrypted
 
 	ROM_REGION( 0x2000, "soundcpu:key", 0 ) /* MC8123 key */
-	ROM_LOAD( "ninjakd2.key",  0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
+	ROM_LOAD( "ninjakd2.key", 0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
-	ROM_LOAD( "nk2_12.rom",   0x00000, 0x08000, CRC(db5657a9) SHA1(abbb033edb9a5a0c66ee5981d1e4df1ab334a82d) )
+	ROM_LOAD( "12.5n", 0x00000, 0x08000, CRC(db5657a9) SHA1(abbb033edb9a5a0c66ee5981d1e4df1ab334a82d) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )    // sprites (need lineswapping)
-	ROM_LOAD( "nk2_08.rom",   0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
-	ROM_LOAD( "nk2_07.rom",   0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
+	ROM_LOAD( "8.6l", 0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
+	ROM_LOAD( "7.6n", 0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )    // bg tiles (need lineswapping)
-	ROM_LOAD( "nk2_11.rom",   0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
-	ROM_LOAD( "nk2_10.rom",   0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
+	ROM_LOAD( "11.2n", 0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
+	ROM_LOAD( "10.2r", 0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
 
 	ROM_REGION( 0x10000, "pcm", 0 )
-	ROM_LOAD( "nk2_09.rom",   0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) )   // unsigned 8-bit pcm samples
+	ROM_LOAD( "9.6c", 0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) )   // unsigned 8-bit pcm samples
 ROM_END
 
 ROM_START( rdaction )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "1.3u",         0x00000, 0x8000, CRC(5c475611) SHA1(2da88a95b5d68b259c8ae48af1438a82a1d601c1) ) // sldh w/ninjajd2c
-	ROM_LOAD( "2.3s",         0x10000, 0x8000, CRC(a1e23bd2) SHA1(c3b6574dc9fa66b4f41c37754a0d20a865f8bc28) )   // banked at 8000-bfff
-	ROM_LOAD( "nk2_03.rom",   0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )   // 3.3r
-	ROM_LOAD( "nk2_04.rom",   0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )   // 4.3p
-	ROM_LOAD( "nk2_05.bin",   0x28000, 0x8000, CRC(960725fb) SHA1(160c8bfaf089cbeeef2023f12379793079bff93b) )   // 5.3m
+	ROM_LOAD( "1.3u", 0x00000, 0x8000, CRC(5c475611) SHA1(2da88a95b5d68b259c8ae48af1438a82a1d601c1) ) // sldh
+	ROM_LOAD( "2.3s", 0x10000, 0x8000, CRC(a1e23bd2) SHA1(c3b6574dc9fa66b4f41c37754a0d20a865f8bc28) ) // sldh - banked at 8000-bfff
+	ROM_LOAD( "3.3r", 0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )
+	ROM_LOAD( "4.3p", 0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )
+	ROM_LOAD( "5.3m", 0x28000, 0x8000, CRC(960725fb) SHA1(160c8bfaf089cbeeef2023f12379793079bff93b) ) // sldh - == 5.3m from ninjakd2a
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "nk2_06.rom",   0x0000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) )   // 6.3h  encrypted
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // NEC MC-8123 custom CPU block
+	ROM_LOAD( "6.3h", 0x0000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) ) // encrypted
 
 	ROM_REGION( 0x2000, "soundcpu:key", 0 ) /* MC8123 key */
-	ROM_LOAD( "ninjakd2.key",  0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
+	ROM_LOAD( "ninjakd2.key", 0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
-	ROM_LOAD( "12.5n",        0x00000, 0x08000, CRC(0936b365) SHA1(3705f42b76ab474357e77c1a9b8e3755c7ab2c0c) )  // 12.5n
+	ROM_LOAD( "12.5n", 0x00000, 0x08000, CRC(0936b365) SHA1(3705f42b76ab474357e77c1a9b8e3755c7ab2c0c) ) // sldh - this rom contains the new title / license
 
 	ROM_REGION( 0x20000, "gfx2", 0 )    // sprites (need lineswapping)
-	ROM_LOAD( "nk2_08.rom",   0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )  // 8.6l
-	ROM_LOAD( "nk2_07.rom",   0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )  // 7.6n
+	ROM_LOAD( "8.6l", 0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
+	ROM_LOAD( "7.6n", 0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )    // bg tiles (need lineswapping)
-	ROM_LOAD( "nk2_11.rom",   0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )  // 11.2n
-	ROM_LOAD( "nk2_10.rom",   0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )  // 10.2r
+	ROM_LOAD( "11.2n", 0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
+	ROM_LOAD( "10.2r", 0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
 
 	ROM_REGION( 0x10000, "pcm", 0 )
-	ROM_LOAD( "nk2_09.rom",   0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) )   // 9.6c  unsigned 8-bit pcm samples
+	ROM_LOAD( "9.6c", 0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) ) // unsigned 8-bit pcm samples
 ROM_END
 
-// Is this official? works with any program rom set, but nowhere in any program roms is the title JT-104 mentioned.
-// It was found on a board with RAD ACTION program roms.
-//
-// In addition to the title screen text change the new graphic ROM has 'UNITED AMUSEMENTS' license text replacing
-// the regular UPL copyright (used on the interludes) however because it is using the RAD ACTION program roms the
-// title screen still shows the 'World Games' license text.
-//
-// Did this board have incorrect program roms, or is this just how it was?
-
-
-ROM_START( jt104 ) // identical to radaction set with different gfx rom and decrypted sound rom
+// Found on an official UPL board with an original encrypted sound CPU block and official UPL serial number sticker
+// Other "JT 104" sets have been found with mismatched ROMs and the decrypted sound CPU + ROM hack
+ROM_START( jt104 )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "1.3u",         0x00000, 0x8000, CRC(5c475611) SHA1(2da88a95b5d68b259c8ae48af1438a82a1d601c1) )
-	ROM_LOAD( "2.3s",         0x10000, 0x8000, CRC(a1e23bd2) SHA1(c3b6574dc9fa66b4f41c37754a0d20a865f8bc28) )   // banked at 8000-bfff
-	ROM_LOAD( "nk2_03.rom",   0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )   // 3.3r
-	ROM_LOAD( "nk2_04.rom",   0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )   // 4.3p
-	ROM_LOAD( "nk2_05.bin",   0x28000, 0x8000, CRC(960725fb) SHA1(160c8bfaf089cbeeef2023f12379793079bff93b) )   // 5.3m
+	ROM_LOAD( "1.3u", 0x00000, 0x8000, CRC(5c475611) SHA1(2da88a95b5d68b259c8ae48af1438a82a1d601c1) ) // sldh - == 1.3u from rdaction
+	ROM_LOAD( "2.3s", 0x10000, 0x8000, CRC(87a91d11) SHA1(08bb9a0a691681c86ddd551af96d5742daa878c3) ) // sldh - banked at 8000-bfff
+	ROM_LOAD( "3.3r", 0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )
+	ROM_LOAD( "4.3p", 0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )
+	ROM_LOAD( "5.3m", 0x28000, 0x8000, CRC(960725fb) SHA1(160c8bfaf089cbeeef2023f12379793079bff93b) ) // sldh - == 5.3m from ninjakd2a
 
-	ROM_REGION( 2*0x10000, "soundcpu", 0 )
-	ROM_LOAD( "nk2_06.bin",   0x10000, 0x8000, CRC(7bfe6c9e) SHA1(aef8cbeb0024939bf65f77113a5cf777f6613722) )   // decrypted opcodes
-	ROM_CONTINUE(             0x00000, 0x8000 )                                                                 // decrypted data
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // NEC MC-8123 custom CPU block
+	ROM_LOAD( "6.3h", 0x0000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) ) // encrypted
 
 	ROM_REGION( 0x2000, "soundcpu:key", 0 ) /* MC8123 key */
-	ROM_LOAD( "ninjakd2.key",  0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
+	ROM_LOAD( "ninjakd2.key", 0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
-	ROM_LOAD( "jt_104_12.bin",        0x00000, 0x08000, CRC(c038fadb) SHA1(59e9b125ead3e9bdc9d66de75dffd58956eb922e) )  // this rom contains the new title / license
+	ROM_LOAD( "12.5n", 0x00000, 0x08000, CRC(c038fadb) SHA1(59e9b125ead3e9bdc9d66de75dffd58956eb922e) )  // sldh - this rom contains the new title / license
 
 	ROM_REGION( 0x20000, "gfx2", 0 )    // sprites (need lineswapping)
-	ROM_LOAD( "nk2_08.rom",   0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
-	ROM_LOAD( "nk2_07.rom",   0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
+	ROM_LOAD( "8.6l", 0x00000, 0x10000, CRC(1b79c50a) SHA1(8954bc51cb9fbbe16b09381f35c84ccc56a803f3) )
+	ROM_LOAD( "7.6n", 0x10000, 0x10000, CRC(0be5cd13) SHA1(8f94a8fef6668aaf13329715fee81302dbd6c685) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )    // bg tiles (need lineswapping)
-	ROM_LOAD( "nk2_11.rom",   0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
-	ROM_LOAD( "nk2_10.rom",   0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
+	ROM_LOAD( "11.2n", 0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
+	ROM_LOAD( "10.2r", 0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
 
 	ROM_REGION( 0x10000, "pcm", 0 )
-	ROM_LOAD( "nk2_09.rom",   0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) )   // unsigned 8-bit pcm samples
+	ROM_LOAD( "9.6c", 0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) ) // unsigned 8-bit pcm samples
 ROM_END
 
 
@@ -1705,7 +1663,7 @@ void robokid_state::motion_error_kludge(uint16_t offset)
 	ROM[2] = 0x18;
 	ROM[3] = 0xf6; // jr $-8
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(offset, offset, read8_delegate(FUNC(robokid_state::motion_error_verbose_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(offset, offset, read8_delegate(*this, FUNC(robokid_state::motion_error_verbose_r)));
 }
 
 void robokid_state::init_robokid()
@@ -1727,12 +1685,12 @@ void robokid_state::init_robokidj()
  *************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,   INPUT,    STATE,          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, ninjakd2,  0,        ninjakd2,  ninjakd2, ninjakd2_state, init_ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjakd2a, ninjakd2, ninjakd2b, ninjakd2, ninjakd2_state, init_bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjakd2b, ninjakd2, ninjakd2b, rdaction, ninjakd2_state, init_bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjakd2c, ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 4)", MACHINE_SUPPORTS_SAVE ) // close to set 3
+GAME( 1987, ninjakd2,  0,        ninjakd2,  ninjakd2, ninjakd2_state, init_ninjakd2, ROT0,   "UPL",                             "Ninja-Kid II / NinjaKun Ashura no Shou (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjakd2a, ninjakd2, ninjakd2b, ninjakd2, ninjakd2_state, init_bootleg,  ROT0,   "UPL",                             "Ninja-Kid II / NinjaKun Ashura no Shou (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjakd2b, ninjakd2, ninjakd2b, rdaction, ninjakd2_state, init_bootleg,  ROT0,   "UPL",                             "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjakd2c, ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL",                             "Ninja-Kid II / NinjaKun Ashura no Shou (set 4)", MACHINE_SUPPORTS_SAVE ) // close to set 3
 GAME( 1987, rdaction,  ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL (World Games license)",       "Rad Action / NinjaKun Ashura no Shou", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, jt104,     ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_bootleg,  ROT0,   "UPL (United Amusements license)", "JT-104 (title screen modification of Rad Action)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, jt104,     ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL (United Amusements license)", "JT 104 / NinjaKun Ashura no Shou", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, mnight,    0,        mnight,    mnight,   mnight_state,   init_mnight,   ROT0,   "UPL", "Mutant Night", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, mnightj,   mnight,   mnight,    mnight,   mnight_state,   init_mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night (Japan)", MACHINE_SUPPORTS_SAVE )

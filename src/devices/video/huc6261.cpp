@@ -108,8 +108,8 @@ void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			g_profiler.start( PROFILER_VIDEO );
 			/* Get next pixel information */
-			m_pixel_data_a = m_huc6270_a->next_pixel( machine().dummy_space(), 0, 0xffff );
-			m_pixel_data_b = m_huc6270_b->next_pixel( machine().dummy_space(), 0, 0xffff );
+			m_pixel_data_a = m_huc6270_a->next_pixel();
+			m_pixel_data_b = m_huc6270_b->next_pixel();
 			apply_pal_offs(&m_pixel_data_a);
 			apply_pal_offs(&m_pixel_data_b);
 

@@ -22,6 +22,7 @@
 #define VERBOSE     (0)
 #include "logmacro.h"
 
+
 /*************************************
  *
  *  CMOS reads/writes
@@ -62,15 +63,15 @@ WRITE16_MEMBER(midxunit_state::midxunit_io_w)
 			break;
 
 		default:
-			/* Gun Outputs for RevX */
-			/* Note: The Gun for the Coin slot you use is supposed to rumble when you insert coins, and it doesn't for P3. */
-			/* Perhaps an Input is hooked up wrong. */
-			output().set_value("Player1_Gun_Recoil", data & 0x1 );
-			output().set_value("Player2_Gun_Recoil", (data & 0x2) >> 1 );
-			output().set_value("Player3_Gun_Recoil", (data & 0x4) >> 2 );
-			output().set_value("Player1_Gun_LED", (~data & 0x10) >> 4 );
-			output().set_value("Player2_Gun_LED", (~data & 0x20) >> 5 );
-			output().set_value("Player3_Gun_LED", (~data & 0x40) >> 6 );
+			// Gun Outputs for RevX
+			// Note: The Gun for the Coin slot you use is supposed to rumble when you insert coins, and it doesn't for P3.
+			// Perhaps an Input is hooked up wrong.
+			m_gun_recoil[0] = BIT(data, 0);
+			m_gun_recoil[1] = BIT(data, 1);
+			m_gun_recoil[2] = BIT(data, 2);
+			m_gun_led[0] = BIT(~data, 4);
+			m_gun_led[1] = BIT(~data, 5);
+			m_gun_led[2] = BIT(~data, 6);
 
 			LOGMASKED(LOG_IO, "%s: I/O write to %d = %04X\n", machine().describe_context(), offset, data);
 			break;
@@ -107,7 +108,7 @@ WRITE_LINE_MEMBER(midxunit_state::adc_int_w)
 READ16_MEMBER(midxunit_state::midxunit_status_r)
 {
 	/* low bit indicates whether the ADC is done reading the current input */
-	return (m_midway_serial_pic->status_r(space,0) << 1) | (m_adc_int ? 1 : 0);
+	return (m_midway_serial_pic->status_r() << 1) | (m_adc_int ? 1 : 0);
 }
 
 
@@ -249,6 +250,9 @@ WRITE16_MEMBER(midxunit_state::midxunit_uart_w)
 
 void midxunit_state::machine_start()
 {
+	m_gun_recoil.resolve();
+	m_gun_led.resolve();
+
 	save_item(NAME(m_cmos_write_enable));
 	save_item(NAME(m_iodata));
 	save_item(NAME(m_ioshuffle));
@@ -267,7 +271,7 @@ void midxunit_state::machine_reset()
 	for (int i = 0; i < 16; i++)
 		m_ioshuffle[i] = i % 8;
 
-	m_dcs->set_io_callbacks(write_line_delegate(FUNC(midxunit_state::midxunit_dcs_output_full),this), write_line_delegate());
+	m_dcs->set_io_callbacks(write_line_delegate(*this, FUNC(midxunit_state::midxunit_dcs_output_full)), write_line_delegate(*this));
 }
 
 
@@ -280,7 +284,7 @@ void midxunit_state::machine_reset()
 
 READ16_MEMBER(midxunit_state::midxunit_security_r)
 {
-	return m_midway_serial_pic->read(space,0);
+	return m_midway_serial_pic->read();
 }
 
 WRITE16_MEMBER(midxunit_state::midxunit_security_w)
@@ -293,7 +297,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_security_w)
 WRITE16_MEMBER(midxunit_state::midxunit_security_clock_w)
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
-		m_midway_serial_pic->write(space, 0, ((~data & 2) << 3) | m_security_bits);
+		m_midway_serial_pic->write(((~data & 2) << 3) | m_security_bits);
 }
 
 

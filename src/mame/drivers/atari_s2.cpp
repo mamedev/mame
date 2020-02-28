@@ -479,10 +479,11 @@ void atari_s2_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(atari_s2_state::atari_s2)
+void atari_s2_state::atari_s2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(4'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(atari_s2_map)
+	M6800(config, m_maincpu, XTAL(4'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atari_s2_state::atari_s2_map);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -490,24 +491,24 @@ MACHINE_CONFIG_START(atari_s2_state::atari_s2)
 	genpin_audio(config);
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("dac", DAC_4BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // r23-r26 (68k,33k,18k,8.2k)
-	MCFG_DEVICE_ADD("dac1", DAC_3BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // r18-r20 (100k,47k,100k)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_4BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // r23-r26 (68k,33k,18k,8.2k)
+	DAC_3BIT_BINARY_WEIGHTED(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // r18-r20 (100k,47k,100k)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* Video */
 	config.set_default_layout(layout_atari_s2);
 
 	TIMER(config, "irq").configure_periodic(FUNC(atari_s2_state::irq), attotime::from_hz(XTAL(4'000'000) / 8192));
 	TIMER(config, "timer_s").configure_periodic(FUNC(atari_s2_state::timer_s), attotime::from_hz(150000));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(atari_s2_state::atari_s3)
+void atari_s2_state::atari_s3(machine_config &config)
+{
 	atari_s2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(atari_s3_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &atari_s2_state::atari_s3_map);
+}
 
 
 /*-------------------------------------------------------------------

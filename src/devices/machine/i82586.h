@@ -158,6 +158,7 @@ public:
 	auto out_irq_cb() { return m_out_irq.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(ca);
+	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
 protected:
 	i82586_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endian, u8 datawidth, u8 addrwidth);
@@ -190,6 +191,7 @@ protected:
 	virtual bool cu_dump() = 0;
 
 	// receive unit
+	int recv_start(u8 *buf, int length);
 	virtual bool address_filter(u8 *mac);
 	virtual u16 ru_execute(u8 *buf, int length) = 0;
 	virtual void ru_complete(const u16 status) = 0;
@@ -210,9 +212,7 @@ protected:
 
 	devcb_write_line m_out_irq;
 	static const device_timer_id CU_TIMER = 0;
-	static const device_timer_id RU_TIMER = 1;
 	emu_timer *m_cu_timer;
-	emu_timer *m_ru_timer;
 
 	// interrupt state
 	bool m_cx;          // command executed (with interrupt)
@@ -220,6 +220,7 @@ protected:
 	bool m_cna;         // command unit became inactive
 	bool m_rnr;         // receive unit became not ready
 	bool m_initialised;
+	bool m_reset;
 	int m_irq_assert;   // configurable interrupt polarity
 
 	// receive/command unit state
@@ -233,9 +234,6 @@ protected:
 	u32 m_rfd;           // current receive frame descriptor address
 
 	u64 m_mac_multi; // multicast address hash table
-
-	u8 m_lb_buf[MAX_FRAME_SIZE]; // storage for loopback frames
-	u16 m_lb_length;             // length of loopback frame (relies on wrapping to match 64k max buffer size)
 
 	// configure parameters
 	enum lb_mode

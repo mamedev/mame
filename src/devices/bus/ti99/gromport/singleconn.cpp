@@ -22,25 +22,25 @@ ti99_single_cart_conn_device::ti99_single_cart_conn_device(const machine_config 
 READ8Z_MEMBER(ti99_single_cart_conn_device::readz)
 {
 	// Pass through
-	m_cartridge->readz(space, offset, value);
+	m_cartridge->readz(offset, value);
 }
 
-WRITE8_MEMBER(ti99_single_cart_conn_device::write)
+void ti99_single_cart_conn_device::write(offs_t offset, uint8_t data)
 {
 	// Pass through
-	m_cartridge->write(space, offset, data);
+	m_cartridge->write(offset, data);
 }
 
 READ8Z_MEMBER(ti99_single_cart_conn_device::crureadz)
 {
 	// Pass through
-	m_cartridge->crureadz(space, offset, value);
+	m_cartridge->crureadz(offset, value);
 }
 
-WRITE8_MEMBER(ti99_single_cart_conn_device::cruwrite)
+void ti99_single_cart_conn_device::cruwrite(offs_t offset, uint8_t data)
 {
 	// Pass through
-	m_cartridge->cruwrite(space, offset, data);
+	m_cartridge->cruwrite(offset, data);
 }
 
 WRITE_LINE_MEMBER(ti99_single_cart_conn_device::romgq_line)

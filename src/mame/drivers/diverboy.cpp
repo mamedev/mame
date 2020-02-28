@@ -151,7 +151,7 @@ WRITE16_MEMBER(diverboy_state::soundcmd_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
@@ -175,12 +175,12 @@ void diverboy_state::diverboy_map(address_map &map)
 	map(0x180000, 0x180001).portr("P1_P2");
 	map(0x180002, 0x180003).portr("DSW");
 	map(0x180008, 0x180009).portr("COINS");
-//  AM_RANGE(0x18000a, 0x18000b) AM_READNOP
-//  AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
+//  map(0x18000a, 0x18000b).nopr();
+//  map(0x18000c, 0x18000d).nopw();
 	map(0x320000, 0x3207ff).writeonly(); /* ?? */
 	map(0x322000, 0x3227ff).writeonly(); /* ?? */
-//  AM_RANGE(0x340000, 0x340001) AM_WRITENOP
-//  AM_RANGE(0x340002, 0x340003) AM_WRITENOP
+//  map(0x340000, 0x340001).nopw();
+//  map(0x340002, 0x340003).nopw();
 }
 
 void diverboy_state::snd_map(address_map &map)
@@ -274,25 +274,25 @@ void diverboy_state::machine_start()
 {
 }
 
-MACHINE_CONFIG_START(diverboy_state::diverboy)
+void diverboy_state::diverboy(machine_config &config)
+{
+	M68000(config, m_maincpu, 12000000); /* guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &diverboy_state::diverboy_map);
+	m_maincpu->set_vblank_int("screen", FUNC(diverboy_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000) /* guess */
-	MCFG_DEVICE_PROGRAM_MAP(diverboy_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", diverboy_state,  irq6_line_hold)
-
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(snd_map)
+	Z80(config, m_audiocpu, 4000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &diverboy_state::snd_map);
 
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_diverboy)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_diverboy);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8+4, 40*8+1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(diverboy_state, screen_update_diverboy)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8+4, 40*8+1, 2*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(diverboy_state::screen_update_diverboy));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x400);
 
@@ -301,9 +301,8 @@ MACHINE_CONFIG_START(diverboy_state::diverboy)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1320000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
+}
 
 /*
 

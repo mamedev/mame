@@ -41,7 +41,7 @@
 
 class ql_rom_cartridge_slot_device;
 
-class device_ql_rom_cartridge_card_interface : public device_slot_card_interface
+class device_ql_rom_cartridge_card_interface : public device_interface
 {
 	friend class ql_rom_cartridge_slot_device;
 
@@ -50,8 +50,8 @@ public:
 	virtual ~device_ql_rom_cartridge_card_interface();
 
 	virtual void romoeh_w(int state) { m_romoeh = state; }
-	virtual uint8_t read(address_space &space, offs_t offset, uint8_t data) { return data; }
-	virtual void write(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t read(offs_t offset, uint8_t data) { return data; }
+	virtual void write(offs_t offset, uint8_t data) { }
 
 protected:
 	device_ql_rom_cartridge_card_interface(const machine_config &mconfig, device_t &device);
@@ -69,7 +69,7 @@ protected:
 // ======================> ql_rom_cartridge_slot_device
 
 class ql_rom_cartridge_slot_device : public device_t,
-								public device_slot_interface,
+								public device_single_card_slot_interface<device_ql_rom_cartridge_card_interface>,
 								public device_image_interface
 {
 public:
@@ -86,13 +86,12 @@ public:
 	ql_rom_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// computer interface
-	uint8_t read(address_space &space, offs_t offset, uint8_t data) { if (m_card) data = m_card->read(space, offset, data); return data; }
-	void write(address_space &space, offs_t offset, uint8_t data) { if (m_card) m_card->write(space, offset, data); }
+	uint8_t read(offs_t offset, uint8_t data) { if (m_card) data = m_card->read(offset, data); return data; }
+	void write(offs_t offset, uint8_t data) { if (m_card) m_card->write(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( romoeh_w ) { if (m_card) m_card->romoeh_w(state); }
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
@@ -100,15 +99,15 @@ protected:
 	virtual image_init_result call_load() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "ql_cart"; }
-	virtual const char *file_extensions() const override { return "rom,bin"; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "ql_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "rom,bin"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;

@@ -11,6 +11,7 @@
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class xain_state : public driver_device
 {
@@ -37,7 +38,7 @@ public:
 	void xsleena(machine_config &config);
 	void xsleenab(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(vblank_r);
+	DECLARE_READ_LINE_MEMBER(vblank_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
 
 protected:

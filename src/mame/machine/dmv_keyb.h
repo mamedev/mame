@@ -41,7 +41,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	required_device<i8741_device> m_maincpu;
+	required_device<i8741a_device> m_maincpu;
 	required_ioport_array<16> m_keyboard;
 
 	uint8_t   m_col;

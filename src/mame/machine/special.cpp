@@ -119,14 +119,12 @@ void special_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_bank1->set_entry(0);
 		break;
 	case TIMER_PIT8253_GATES:
-	{
 		m_pit->write_gate0(0);
 		m_pit->write_gate1(0);
 		m_pit->write_gate2(0);
 		break;
-	}
 	default:
-		assert_always(false, "Unknown id in special_state::device_timer");
+		throw emu_fatalerror("Unknown id in special_state::device_timer");
 	}
 }
 
@@ -169,7 +167,7 @@ void special_state::specimx_set_bank(offs_t i, uint8_t data)
 	{
 		case 0 :
 			space.install_write_bank(0x0000, 0x8fff, "bank1");
-			space.install_write_handler(0x9000, 0xbfff, write8_delegate(FUNC(special_state::video_memory_w), this));
+			space.install_write_handler(0x9000, 0xbfff, write8_delegate(*this, FUNC(special_state::video_memory_w)));
 
 			m_bank1->set_base(ram);
 			m_bank2->set_base(ram + 0x9000);
@@ -323,7 +321,7 @@ void special_state::erik_set_bank()
 			m_bank4->set_base(mem + 0x1c000);
 			space.unmap_write(0xf000, 0xf7ff);
 			space.nop_read(0xf000, 0xf7ff);
-			space.install_readwrite_handler(0xf800, 0xf803, 0, 0x7fc, 0, read8sm_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi), write8sm_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi));
+			space.install_readwrite_handler(0xf800, 0xf803, 0, 0x7fc, 0, read8sm_delegate(*m_ppi, FUNC(i8255_device::read)), write8sm_delegate(*m_ppi, FUNC(i8255_device::write)));
 			break;
 	}
 }

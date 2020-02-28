@@ -62,7 +62,7 @@
 
 class portfolio_expansion_slot_device;
 
-class device_portfolio_expansion_slot_interface : public device_slot_card_interface
+class device_portfolio_expansion_slot_interface : public device_interface
 {
 public:
 	virtual bool nmd1() { return 1; }
@@ -72,8 +72,8 @@ public:
 	virtual uint8_t iack_r() { return 0xff; }
 	virtual uint8_t eack_r() { return 0xff; }
 
-	virtual uint8_t nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { return data; }
-	virtual void nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { }
+	virtual uint8_t nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { return data; }
+	virtual void nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { }
 
 	virtual WRITE_LINE_MEMBER( iint_w ) { }
 
@@ -91,7 +91,7 @@ protected:
 
 // ======================> portfolio_expansion_slot_device
 
-class portfolio_expansion_slot_device : public device_t, public device_slot_interface
+class portfolio_expansion_slot_device : public device_t, public device_single_card_slot_interface<device_portfolio_expansion_slot_interface>
 {
 public:
 	// construction/destruction
@@ -119,8 +119,8 @@ public:
 	uint8_t iack_r() { return (m_card != nullptr) ? m_card->iack_r() : 0xff; };
 	uint8_t eack_r() { return (m_card != nullptr) ? m_card->eack_r() : 0xff; };
 
-	uint8_t nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { return (m_card != nullptr) ? m_card->nrdi_r(space, offset, data, iom, bcom, ncc1) : data; }
-	void nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { if (m_card != nullptr) m_card->nwri_w(space, offset, data, iom, bcom, ncc1); }
+	uint8_t nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { return (m_card != nullptr) ? m_card->nrdi_r(offset, data, iom, bcom, ncc1) : data; }
+	void nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { if (m_card != nullptr) m_card->nwri_w(offset, data, iom, bcom, ncc1); }
 
 	WRITE_LINE_MEMBER( iint_w ) { if (m_card != nullptr) m_card->iint_w(state); }
 

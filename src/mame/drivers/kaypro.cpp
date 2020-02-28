@@ -195,7 +195,8 @@ static void kaypro_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(kaypro_state::kayproii)
+void kaypro_state::kayproii(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 20_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kaypro_state::kaypro_map);
@@ -206,25 +207,25 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(80*7, 24*10)
-	MCFG_SCREEN_VISIBLE_AREA(0,80*7-1,0,24*10-1)
-	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
-	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kayproii)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(80*7, 24*10);
+	m_screen->set_visarea(0, 80*7-1, 0, 24*10-1);
+	m_screen->set_screen_update(FUNC(kaypro_state::screen_update_kayproii));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kayproii)
+	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_kayproii);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 950) /* piezo-device needs to be measured */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	BEEP(config, m_beep, 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* piezo-device needs to be measured */
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(kaypro_state::quickload_cb));
 
 	kaypro_10_keyboard_device &kbd(KAYPRO_10_KEYBOARD(config, "kbd"));
 	kbd.rxd_cb().set("sio", FUNC(z80sio_device::rxb_w));
@@ -270,7 +271,7 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config, "flop_list").set_original("kayproii");
-MACHINE_CONFIG_END
+}
 
 void kaypro_state::kayproiv(machine_config &config)
 {
@@ -283,7 +284,8 @@ void kaypro_state::kayproiv(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats);
 }
 
-MACHINE_CONFIG_START(kaypro_state::kaypro484)
+void kaypro_state::kaypro484(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kaypro_state::kaypro_map);
@@ -293,13 +295,14 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(80*8, 25*16)
-	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*16-1)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(80*8, 25*16);
+	m_screen->set_visarea(0,80*8-1,0,25*16-1);
+	m_screen->set_screen_update(FUNC(kaypro_state::screen_update_kaypro484));
+
 	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
-	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kaypro484)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_kaypro484);
 	PALETTE(config, m_palette, FUNC(kaypro_state::kaypro_palette), 3);
@@ -313,9 +316,9 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(7);
-	m_crtc->set_update_row_callback(FUNC(kaypro_state::kaypro484_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(kaypro_state::kaypro484_update_row));
 
-	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(kaypro_state::quickload_cb));
 
 	kaypro_10_keyboard_device &kbd(KAYPRO_10_KEYBOARD(config, "kbd"));
 	kbd.rxd_cb().set("sio_1", FUNC(z80sio_device::rxb_w));
@@ -363,7 +366,7 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	m_fdc->set_force_ready(true);
 	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-MACHINE_CONFIG_END
+}
 
 void kaypro_state::kaypro10(machine_config &config)
 {
@@ -387,11 +390,11 @@ void kaypro_state::kaypro284(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
 }
 
-MACHINE_CONFIG_START(kaypro_state::omni2)
+void kaypro_state::omni2(machine_config &config)
+{
 	kayproiv(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_omni2)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(kaypro_state::screen_update_omni2));
+}
 
 void kaypro_state::init_kaypro()
 {

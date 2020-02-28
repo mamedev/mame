@@ -10,7 +10,7 @@
 		<publisher>Samsung</publisher>
 		<part name="cass" interface="spc1500_cass">
 			<dataarea name="cass" size="930771">
-				<rom name="spc1500_demo.tap" size="930771" crc="0bc5637a" sha1="25b36e378c7ad827bf77b7afe8ba496246ef5859" offset="0" />
+				<rom name="spc1500_demo.tap" size="930771" crc="0bc5637a" sha1="25b36e378c7ad827bf77b7afe8ba496246ef5859"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 		<publisher>Samsung</publisher>
 		<part name="cass" interface="spc1500_cass">
 			<dataarea name="cass" size="596518">
-				<rom name="demo2.tap" size="596518" crc="d484a3b3" sha1="5e160709d8969478d1be007ae2f802cc6388b409" offset="0" />
+				<rom name="demo2.tap" size="596518" crc="d484a3b3" sha1="5e160709d8969478d1be007ae2f802cc6388b409"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32,7 +32,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1500_cass">
 			<dataarea name="cass" size="652672">
-				<rom name="galaga.tap" size="652672" crc="c72e4818" sha1="0820c632ab7330b96850f6938970ed584fbf4f28" offset="0" />
+				<rom name="galaga.tap" size="652672" crc="c72e4818" sha1="0820c632ab7330b96850f6938970ed584fbf4f28"/>
 			</dataarea>
 		</part>
 	</software>
@@ -43,7 +43,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1500_cass">
 			<dataarea name="cass" size="680349">
-				<rom name="loderunner.tap" size="680349" crc="18779608" sha1="9cc2975f28efe3d12996fac1ba2e3acd0d736fec" offset="0" />
+				<rom name="loderunner.tap" size="680349" crc="18779608" sha1="9cc2975f28efe3d12996fac1ba2e3acd0d736fec"/>
 			</dataarea>
 		</part>
 	</software>

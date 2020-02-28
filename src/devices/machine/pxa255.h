@@ -34,43 +34,43 @@ public:
 
 	pxa255_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto gpio0_set_cb() { return m_gpio0_set_func.bind(); }
-	auto gpio0_clear_cb() { return m_gpio0_clear_func.bind(); }
-	auto gpio0_in_cb() { return m_gpio0_in_func.bind(); }
+	auto gpio0_write() { return m_gpio0_w.bind(); }
+	auto gpio0_read() { return m_gpio0_r.bind(); }
 
-	DECLARE_READ32_MEMBER(pxa255_i2s_r);
-	DECLARE_WRITE32_MEMBER(pxa255_i2s_w);
-	DECLARE_READ32_MEMBER(pxa255_dma_r);
-	DECLARE_WRITE32_MEMBER(pxa255_dma_w);
-	DECLARE_READ32_MEMBER(pxa255_ostimer_r);
-	DECLARE_WRITE32_MEMBER(pxa255_ostimer_w);
-	DECLARE_READ32_MEMBER(pxa255_intc_r);
-	DECLARE_WRITE32_MEMBER(pxa255_intc_w);
-	DECLARE_READ32_MEMBER(pxa255_gpio_r);
-	DECLARE_WRITE32_MEMBER(pxa255_gpio_w);
-	DECLARE_READ32_MEMBER(pxa255_lcd_r);
-	DECLARE_WRITE32_MEMBER(pxa255_lcd_w);
+	DECLARE_READ32_MEMBER(i2s_r);
+	DECLARE_WRITE32_MEMBER(i2s_w);
+	DECLARE_READ32_MEMBER(dma_r);
+	DECLARE_WRITE32_MEMBER(dma_w);
+	DECLARE_READ32_MEMBER(ostimer_r);
+	DECLARE_WRITE32_MEMBER(ostimer_w);
+	DECLARE_READ32_MEMBER(intc_r);
+	DECLARE_WRITE32_MEMBER(intc_w);
+	DECLARE_READ32_MEMBER(gpio_r);
+	DECLARE_WRITE32_MEMBER(gpio_w);
+	DECLARE_READ32_MEMBER(lcd_r);
+	DECLARE_WRITE32_MEMBER(lcd_w);
+
+	void set_irq_line(uint32_t line, int state);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void pxa255_dma_irq_check();
-	void pxa255_dma_load_descriptor_and_start(int channel);
-	void pxa255_ostimer_irq_check();
-	void pxa255_update_interrupts();
-	void pxa255_set_irq_line(uint32_t line, int state);
-	void pxa255_lcd_load_dma_descriptor(address_space & space, uint32_t address, int channel);
-	void pxa255_lcd_irq_check();
-	void pxa255_lcd_dma_kickoff(int channel);
-	void pxa255_lcd_check_load_next_branch(int channel);
+	void dma_irq_check();
+	void dma_load_descriptor_and_start(int channel);
+	void ostimer_irq_check();
+	void update_interrupts();
+	void lcd_load_dma_descriptor(address_space & space, uint32_t address, int channel);
+	void lcd_irq_check();
+	void lcd_dma_kickoff(int channel);
+	void lcd_check_load_next_branch(int channel);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	TIMER_CALLBACK_MEMBER(pxa255_dma_dma_end);
-	TIMER_CALLBACK_MEMBER(pxa255_ostimer_match);
-	TIMER_CALLBACK_MEMBER(pxa255_lcd_dma_eof);
+	TIMER_CALLBACK_MEMBER(dma_dma_end);
+	TIMER_CALLBACK_MEMBER(ostimer_match);
+	TIMER_CALLBACK_MEMBER(lcd_dma_eof);
 
 	struct dma_regs_t
 	{
@@ -205,20 +205,21 @@ protected:
 	gpio_regs_t m_gpio_regs;
 	lcd_regs_t m_lcd_regs;
 
-	devcb_write32 m_gpio0_set_func;
-	devcb_write32 m_gpio0_clear_func;
-	devcb_read32 m_gpio0_in_func;
+	devcb_write32 m_gpio0_w;
+	devcb_write32 m_gpio1_w;
+	devcb_write32 m_gpio2_w;
+	devcb_read32 m_gpio0_r;
+	devcb_read32 m_gpio1_r;
+	devcb_read32 m_gpio2_r;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 	required_device<palette_device> m_palette;
 
-	std::unique_ptr<uint32_t[]> m_pxa255_lcd_palette; // 0x100
-	std::unique_ptr<uint8_t[]> m_pxa255_lcd_framebuffer; // 0x100000
+	std::unique_ptr<uint32_t[]> m_lcd_palette; // 0x100
+	std::unique_ptr<uint8_t[]> m_lcd_framebuffer; // 0x100000
 	std::unique_ptr<uint32_t[]> m_words; // 0x800
 	std::unique_ptr<int16_t[]> m_samples; // 0x1000
-
-	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 };
 
 DECLARE_DEVICE_TYPE(PXA255_PERIPHERALS, pxa255_periphs_device)

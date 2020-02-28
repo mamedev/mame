@@ -15,6 +15,7 @@
 #include "machine/mb8421.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 enum hng64trans_t
 {
@@ -151,7 +152,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	devcb_write8  m_lamps_out_cb[8];
+	devcb_write8::array<8> m_lamps_out_cb;
 };
 
 

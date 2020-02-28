@@ -12,7 +12,7 @@
 /* Missing:
    - linescroll in special modes (qgh title, mahmajn2/qrouka attract mode)
    - screen flipping (mix register 13 & 2)
-   - FRC timer IRQ is currently in a slight off-beat (timer should be resetted every time
+   - FRC timer IRQ is currently in a slight off-beat (timer should be reset every time
      that the mode changes, but current MAME framework doesn't seem to like it)
 */
 
@@ -143,7 +143,7 @@ Notes:
         the floppy disk format is custom. The floppy disk can be read with "Anadisk"
         depending on the PC being used and it's floppy controller. Most clone PC's can't read the
         System 24 floppies even with "Anadisk"[1]. But many brand-name PC's can. It's likely due to the
-        propietry nature of the components used in brand-name PC's. Generally the older and crappier
+        proprietary nature of the components used in brand-name PC's. Generally the older and crappier
         the PC is, the better chance you have of being able to read the floppy ;-)
 
         [1] Actually, most can _except_ for the Hotrod disks.  Those 8K sectors are deadly.
@@ -357,7 +357,7 @@ Notes:
 #define VIDEO_CLOCK         XTAL(32'000'000)
 #define TIMER_CLOCK         (VIDEO_CLOCK/4)
 #define HSYNC_CLOCK         (VIDEO_CLOCK/2/656.0)
-/* TODO: understand why divisors doesn't match at all with the reference */
+/* TODO: understand why divisors don't match at all with the reference */
 #define FRC_CLOCK_MODE0     (MASTER_CLOCK/2)/24 // /16 according to Charles
 #define FRC_CLOCK_MODE1     (MASTER_CLOCK/2)/1536 // /1024 according to Charles, but /1536 sounds better
 
@@ -1157,6 +1157,11 @@ void segas24_state::hotrod_cpu1_map(address_map &map)
 	hotrod_common_map(map);
 }
 
+void segas24_state::dcclubj_cpu1_map(address_map &map)
+{
+	rombd_cpu1_map(map);
+	roughrac_common_map(map);
+}
 
 /*************************************
  *
@@ -1186,6 +1191,12 @@ void segas24_state::hotrod_cpu2_map(address_map &map)
 {
 	cpu2_map(map);
 	hotrod_common_map(map);
+}
+
+void segas24_state::dcclubj_cpu2_map(address_map &map)
+{
+	rombd_cpu2_map(map);
+	roughrac_common_map(map);
 }
 
 void segas24_state::decrypted_opcodes_map(address_map &map)
@@ -1566,81 +1577,23 @@ static INPUT_PORTS_START( qsww )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( dcclub ) /* In the Japan set missing angle input */
-	PORT_INCLUDE( system24_generic )
-
-	PORT_MODIFY("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_DIPNAME( 0x0100, 0x0100, "DSWA" )
-	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-
-	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Start Credit" ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x01, "1" )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Timing Meter" ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPNAME( 0x10, 0x10, "Initial Balls" ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x10, "2" )
-	PORT_DIPNAME( 0x20, 0x20, "Balls Limit" ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x20, "4" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-
-	PORT_START("PADDLE")
-	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0x00,0xbf) PORT_SENSITIVITY(64) PORT_KEYDELTA(64) PORT_PLAYER(1)
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( sgmast )
 	PORT_INCLUDE( system24_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	/* For select the power shot rotate the stick from up-left (max power) to up (minimum power) and relese */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Angle Left")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Club")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Angle Right")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Stance")
+	/* For select the power shot rotate the stick from up-left (max power) to up (minimum power) and release */
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_CUSTOM )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("PADDLE")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xbf) PORT_SENSITIVITY(16) PORT_KEYDELTA(16) PORT_PLAYER(1) PORT_NAME("P1 Swing")
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Start Credit" ) PORT_DIPLOCATION("SW2:1")
@@ -1667,8 +1620,13 @@ static INPUT_PORTS_START( sgmast )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )                                  //       136%         100%       100%
 INPUT_PORTS_END
 
+// Japanese version has an analog "angle" device in place of the two dedicated buttons
 static INPUT_PORTS_START( sgmastj )
 	PORT_INCLUDE( sgmast )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DSW")
 	//"SW2:1" not divert from "sgmast"
@@ -1681,10 +1639,47 @@ static INPUT_PORTS_START( sgmastj )
 	//"SW2:8" not divert from "sgmast"
 
 	PORT_START("DIAL1")
-	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_RESET PORT_PLAYER(2)
+	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_RESET PORT_PLAYER(1) PORT_NAME("P1 Angle")
 
 	PORT_START("DIAL2")
 	PORT_BIT( 0xfff, 0x000, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dcclub_dips )
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "Start Credit" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Timing Meter" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPNAME( 0x10, 0x10, "Initial Balls" ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPNAME( 0x20, 0x20, "Balls Limit" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dcclub )
+	PORT_INCLUDE( sgmast )
+	PORT_INCLUDE( dcclub_dips )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dcclubj )
+	PORT_INCLUDE( sgmastj )
+	PORT_INCLUDE( dcclub_dips )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( quizmeku )
@@ -1926,7 +1921,7 @@ void segas24_state::system24(machine_config &config)
 	M68000(config, m_subcpu, MASTER_CLOCK/2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &segas24_state::cpu2_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	sega_315_5296_device &io(SEGA_315_5296(config, "io", VIDEO_CLOCK/2));
 	io.in_pa_callback().set_ioport("P1");
@@ -1942,7 +1937,7 @@ void segas24_state::system24(machine_config &config)
 
 	TIMER(config, "irq_timer").configure_generic(FUNC(segas24_state::irq_timer_cb));
 	TIMER(config, "irq_timer_clear").configure_generic(FUNC(segas24_state::irq_timer_clear_cb));
-	TIMER(config, "frc_timer").configure_generic(timer_device::expired_delegate());
+	TIMER(config, "frc_timer").configure_generic(nullptr);
 	TIMER(config, "irq_frc").configure_periodic(FUNC(segas24_state::irq_frc_cb), attotime::from_hz(FRC_CLOCK_MODE1));
 
 	S24TILE(config, m_vtile, 0, 0xfff).set_palette("palette");
@@ -1967,7 +1962,6 @@ void segas24_state::system24(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -2051,6 +2045,17 @@ void segas24_state::dcclub(machine_config &config)
 	io.in_pc_callback().set(FUNC(segas24_state::dcclub_p3_r));
 }
 
+void segas24_state::dcclubj(machine_config &config)
+{
+	dcclub(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas24_state::dcclubj_cpu1_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &segas24_state::dcclubj_cpu2_map);
+
+	upd4701_device &upd4701(UPD4701A(config, "upd4701"));
+	upd4701.set_portx_tag("DIAL1");
+	upd4701.set_porty_tag("DIAL2");
+}
+
 void segas24_state::system24_floppy_dcclub(machine_config &config)
 {
 	system24_floppy_fd1094(config);
@@ -2059,6 +2064,13 @@ void segas24_state::system24_floppy_dcclub(machine_config &config)
 	io.in_pc_callback().set(FUNC(segas24_state::dcclub_p3_r));
 }
 
+void segas24_state::sgmastj(machine_config &config)
+{
+	system24_floppy_fd_upd(config);
+	sega_315_5296_device &io(*subdevice<sega_315_5296_device>("io"));
+	io.in_pa_callback().set(FUNC(segas24_state::dcclub_p1_r));
+	io.in_pc_callback().set(FUNC(segas24_state::dcclub_p3_r));
+}
 
 /*************************************
  *
@@ -2066,6 +2078,11 @@ void segas24_state::system24_floppy_dcclub(machine_config &config)
  *
  *************************************/
 
+//*************************************************************************************************************************
+//  Hot Rod, Sega System 24
+//   Sega game ID: 833-6570-01 HOT ROD
+//     Main board: 837-6571
+// I/O Controller: 834-6510
 ROM_START( hotrod )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-11339.ic2", 0x000000, 0x20000, CRC(75130e73) SHA1(e079739f4a3da3807aac570442c5afef1a7d7b0e) )
@@ -2199,7 +2216,7 @@ ROM_START( quizmeku ) // Quiz Mekuromeku Story
 	ROM_LOAD16_BYTE( "epr15343.ic2", 0x000000, 0x20000, CRC(c72399a7) SHA1(bfbf0079ea63f89bca4ce9081aed5d5c1d9d169a) )
 	ROM_LOAD16_BYTE( "epr15342.ic1", 0x000001, 0x20000, CRC(0968ac84) SHA1(4e1170ac123adaec32819754b5075531ff1925fe) )
 
-	ROM_REGION16_BE( 0x400000, "romboard", 0)
+	ROM_REGION16_BE( 0x400000, "romboard", 0) // ROM board: 834-7492-12E
 	ROM_LOAD16_BYTE( "epr15345.ic5", 0x000000, 0x80000, CRC(88030b5d) SHA1(d2feeedb9a64c3dc8dd25716209f945d12fa9b53) )
 	ROM_LOAD16_BYTE( "epr15344.ic4", 0x000001, 0x80000, CRC(dd11b382) SHA1(2b0f49fb307a9aba0f295de64782ee095c557170) )
 	ROM_LOAD16_BYTE( "mpr15347.ic7", 0x100000, 0x80000, CRC(0472677b) SHA1(93ae57a2817b6b54c99814fca28ef51f7ff5e559) )
@@ -2359,6 +2376,10 @@ ROM_START( dcclub )
 	ROM_LOAD16_BYTE( "mpr-14096-t.3",0x100001, 0x80000, CRC(38d96502) SHA1(c68b3c5c83fd0839c3f6f81189c310ec19bdf1c4) )
 ROM_END
 
+//  Dynamic Country Club (Japan), Sega System 24
+//      ROM board: 834-7492-09E
+//     Main board: 837-6442-02
+// I/O Controller: 834-6510-01
 ROM_START( dcclubj )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr13948.bin", 0x000000, 0x20000, CRC(d6a031c8) SHA1(45b7e3cd2c7412e24f547cd4185166199d3938d5) )
@@ -2551,9 +2572,9 @@ void segas24_state::init_roughrac()
 /* 04 */GAME( 1989, crkdown,   0,        system24_floppy_fd1094, crkdown,  segas24_state, init_crkdown,  ROT0,   "Sega", "Crack Down (World, Floppy Based, FD1094 317-0058-04c)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
 /* 04 */GAME( 1989, crkdownu,  crkdown,  system24_floppy_fd1094, crkdown,  segas24_state, init_crkdown,  ROT0,   "Sega", "Crack Down (US, Floppy Based, FD1094 317-0058-04d)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
 /* 04 */GAME( 1989, crkdownj,  crkdown,  system24_floppy_fd1094, crkdown,  segas24_state, init_crkdown,  ROT0,   "Sega", "Crack Down (Japan, Floppy Based, FD1094 317-0058-04b Rev A)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
-/* 05 */GAME( 1989, sgmast,    0,        system24_floppy_fd1094, sgmast,   segas24_state, init_sgmast,   ROT0,   "Sega", "Super Masters Golf (World?, Floppy Based, FD1094 317-0058-05d?)", 0 )
-/* 05 */GAME( 1989, sgmastc,   sgmast,   system24_floppy_fd1094, sgmast,   segas24_state, init_sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (World, Floppy Based, FD1094 317-0058-05c)", MACHINE_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
-/* 05 */GAME( 1989, sgmastj,   sgmast,   system24_floppy_fd_upd, sgmastj,  segas24_state, init_sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (Japan, Floppy Based, FD1094 317-0058-05b)", MACHINE_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
+/* 05 */GAME( 1989, sgmast,    0,        system24_floppy_dcclub, sgmast,   segas24_state, init_sgmast,   ROT0,   "Sega", "Super Masters Golf (World?, Floppy Based, FD1094 317-0058-05d?)", 0 )
+/* 05 */GAME( 1989, sgmastc,   sgmast,   system24_floppy_dcclub, sgmast,   segas24_state, init_sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (World, Floppy Based, FD1094 317-0058-05c)", MACHINE_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
+/* 05 */GAME( 1989, sgmastj,   sgmast,   sgmastj,                sgmastj,  segas24_state, init_sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (Japan, Floppy Based, FD1094 317-0058-05b)", MACHINE_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
 /* 06 */GAME( 1990, roughrac,  0,        system24_floppy_fd_upd, roughrac, segas24_state, init_roughrac, ROT0,   "Sega", "Rough Racer (Japan, Floppy Based, FD1094 317-0058-06b)", 0 )
 /* 07 */GAME( 1990, bnzabros,  0,        system24_floppy_rom,    bnzabros, segas24_state, init_bnzabros, ROT0,   "Sega", "Bonanza Bros (US, Floppy DS3-5000-07d? Based)", 0 )
 /* 07 */GAME( 1990, bnzabrosj, bnzabros, system24_floppy_rom,    bnzabros, segas24_state, init_bnzabros, ROT0,   "Sega", "Bonanza Bros (Japan, Floppy DS3-5000-07b Based)", 0 )
@@ -2563,7 +2584,7 @@ void segas24_state::init_roughrac()
 //    YEAR  NAME      PARENT    MACHINE       INPUT     CLASS          INIT           MONITOR COMPANY FULLNAME FLAGS
 /* ROM Based */
 GAME( 1991, dcclub,   0,        dcclub,       dcclub,   segas24_state, init_dcclub,   ROT0,   "Sega", "Dynamic Country Club (World, ROM Based)", 0 )
-GAME( 1991, dcclubj,  dcclub,   dcclub,       dcclub,   segas24_state, init_dcclub,   ROT0,   "Sega", "Dynamic Country Club (Japan, ROM Based)", 0 )
+GAME( 1991, dcclubj,  dcclub,   dcclubj,      dcclubj,  segas24_state, init_dcclub,   ROT0,   "Sega", "Dynamic Country Club (Japan, ROM Based)", 0 )
 GAME( 1991, qrouka,   0,        system24_rom, qrouka,   segas24_state, init_qrouka,   ROT0,   "Sega", "Quiz Rouka Ni Tattenasai (Japan, ROM Based)", 0 )
 GAME( 1992, quizmeku, 0,        system24_rom, quizmeku, segas24_state, init_quizmeku, ROT0,   "Sega", "Quiz Mekurumeku Story (Japan, ROM Based)", 0 ) /* Released in 05.1993 */
 GAME( 1992, mahmajn,  0,        mahmajn,      mahmajn,  segas24_state, init_mahmajn,  ROT0,   "Sega", "Tokoro San no MahMahjan (Japan, ROM Based)", 0 )

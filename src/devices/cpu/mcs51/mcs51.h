@@ -78,11 +78,11 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 12 - 1) / 12; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 12); }
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 20; }
-	virtual uint32_t execute_input_lines() const override { return 6; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 12 - 1) / 12; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 12); }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 20; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -122,6 +122,10 @@ protected:
 
 	uint8_t   m_forced_inputs[4];   /* allow read even if configured as output */
 
+	// JB-related hacks
+	uint8_t m_last_op;
+	uint8_t m_last_bit;
+
 	int     m_icount;
 
 	struct mcs51_uart
@@ -149,8 +153,8 @@ protected:
 	address_space *m_data;
 	address_space *m_io;
 
-	devcb_read8 m_port_in_cb[4];
-	devcb_write8 m_port_out_cb[4];
+	devcb_read8::array<4> m_port_in_cb;
+	devcb_write8::array<4> m_port_out_cb;
 
 	/* Serial Port TX/RX Callbacks */
 	devcb_write8 m_serial_tx_cb;    //Call back function when sending data out of serial port
@@ -335,6 +339,7 @@ DECLARE_DEVICE_TYPE(I87C51, i87c51_device)
 DECLARE_DEVICE_TYPE(I80C32, i80c32_device)
 DECLARE_DEVICE_TYPE(I80C52, i80c52_device)
 DECLARE_DEVICE_TYPE(I87C52, i87c52_device)
+DECLARE_DEVICE_TYPE(I80C51GB, i80c51gb_device)
 DECLARE_DEVICE_TYPE(AT89C52, at89c52_device)
 DECLARE_DEVICE_TYPE(AT89S52, at89s52_device)
 /* 4k internal perom and 128 internal ram and 2 analog comparators */
@@ -461,6 +466,16 @@ class i87c52_device : public i80c52_device
 public:
 	// construction/destruction
 	i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class i80c51gb_device : public i80c52_device
+{
+public:
+	// construction/destruction
+	i80c51gb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 class at89c52_device : public i80c52_device

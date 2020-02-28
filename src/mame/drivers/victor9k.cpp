@@ -36,7 +36,7 @@
 #include "machine/ram.h"
 #include "machine/victor9k_kb.h"
 #include "machine/victor9k_fdc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "sound/hc55516.h"
 #include "video/mc6845.h"
 #include "emupal.h"
@@ -131,8 +131,6 @@ private:
 
 	DECLARE_WRITE8_MEMBER( via2_pa_w );
 	DECLARE_WRITE8_MEMBER( via2_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( write_ria );
-	DECLARE_WRITE_LINE_MEMBER( write_rib );
 	DECLARE_WRITE_LINE_MEMBER( via2_irq_w );
 
 	DECLARE_WRITE8_MEMBER( via3_pb_w );
@@ -202,10 +200,10 @@ void victor9k_state::victor9k_mem(address_map &map)
 	map(0xe0040, 0xe0043).mirror(0x7f00).rw(m_upd7201, FUNC(upd7201_device::cd_ba_r), FUNC(upd7201_device::cd_ba_w));
 	map(0xe8000, 0xe8000).mirror(0x7f00).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xe8001, 0xe8001).mirror(0x7f00).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0xe8020, 0xe802f).mirror(0x7f00).rw(m_via1, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0xe8040, 0xe804f).mirror(0x7f00).rw(m_via2, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xe8020, 0xe802f).mirror(0x7f00).m(m_via1, FUNC(via6522_device::map));
+	map(0xe8040, 0xe804f).mirror(0x7f00).m(m_via2, FUNC(via6522_device::map));
 	map(0xe8060, 0xe8061).mirror(0x7f00).rw(m_ssda, FUNC(mc6852_device::read), FUNC(mc6852_device::write));
-	map(0xe8080, 0xe808f).mirror(0x7f00).rw(m_via3, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xe8080, 0xe808f).mirror(0x7f00).m(m_via3, FUNC(via6522_device::map));
 	map(0xe80a0, 0xe80af).mirror(0x7f00).rw(m_fdc, FUNC(victor_9000_fdc_device::cs5_r), FUNC(victor_9000_fdc_device::cs5_w));
 	map(0xe80c0, 0xe80cf).mirror(0x7f00).rw(m_fdc, FUNC(victor_9000_fdc_device::cs6_r), FUNC(victor_9000_fdc_device::cs6_w));
 	map(0xe80e0, 0xe80ef).mirror(0x7f00).rw(m_fdc, FUNC(victor_9000_fdc_device::cs7_r), FUNC(victor_9000_fdc_device::cs7_w));
@@ -251,7 +249,7 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 	if (m_hires != hires)
 	{
 		m_hires = hires;
-		m_crtc->set_clock(XTAL(30'000'000) / width);
+		m_crtc->set_unscaled_clock(XTAL(30'000'000) / width);
 		m_crtc->set_hpixels_per_column(width);
 	}
 
@@ -518,20 +516,6 @@ WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
 }
 
 
-WRITE_LINE_MEMBER( victor9k_state::write_ria )
-{
-	m_upd7201->ria_w(state);
-	m_via2->write_pa2(state);
-}
-
-
-WRITE_LINE_MEMBER( victor9k_state::write_rib )
-{
-	m_upd7201->rib_w(state);
-	m_via2->write_pa4(state);
-}
-
-
 /*
     bit    description
 
@@ -676,7 +660,7 @@ void victor9k_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( victor9k )
+//  machine_config( victor9k )
 //-------------------------------------------------
 
 void victor9k_state::victor9k(machine_config &config)
@@ -691,17 +675,17 @@ void victor9k_state::victor9k(machine_config &config)
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_screen_update(HD46505S_TAG, FUNC(hd6845_device::screen_update));
+	screen.set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
 
 	PALETTE(config, m_palette, FUNC(victor9k_state::victor9k_palette), 16);
 
-	HD6845(config, m_crtc, XTAL(30'000'000)/10); // HD6845 == HD46505S
+	HD6845S(config, m_crtc, XTAL(30'000'000)/10); // HD6845 == HD46505S
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(10);
-	m_crtc->set_update_row_callback(FUNC(victor9k_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(victor9k_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(victor9k_state::vert_w));
 
 	// sound hardware
@@ -769,18 +753,18 @@ void victor9k_state::victor9k(machine_config &config)
 	m_centronics->select_handler().set(M6522_1_TAG, FUNC(via6522_device::write_pb7));
 
 	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
-	m_rs232a->rxd_handler().set(UPD7201_TAG, FUNC(z80dart_device::rxa_w));
-	m_rs232a->dcd_handler().set(UPD7201_TAG, FUNC(z80dart_device::dcda_w));
-	m_rs232a->ri_handler().set(FUNC(victor9k_state::write_ria));
-	m_rs232a->cts_handler().set(UPD7201_TAG, FUNC(z80dart_device::ctsa_w));
-	m_rs232a->dsr_handler().set(M6522_2_TAG, FUNC(via6522_device::write_pa3));
+	m_rs232a->rxd_handler().set(m_upd7201, FUNC(upd7201_device::rxa_w));
+	m_rs232a->dcd_handler().set(m_upd7201, FUNC(upd7201_device::dcda_w));
+	m_rs232a->ri_handler().set(m_via2, FUNC(via6522_device::write_pa2));
+	m_rs232a->cts_handler().set(m_upd7201, FUNC(upd7201_device::ctsa_w));
+	m_rs232a->dsr_handler().set(m_via2, FUNC(via6522_device::write_pa3));
 
 	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
-	m_rs232b->rxd_handler().set(UPD7201_TAG, FUNC(z80dart_device::rxb_w));
-	m_rs232b->dcd_handler().set(UPD7201_TAG, FUNC(z80dart_device::dcdb_w));
-	m_rs232b->ri_handler().set(FUNC(victor9k_state::write_ria));
-	m_rs232b->cts_handler().set(UPD7201_TAG, FUNC(z80dart_device::ctsb_w));
-	m_rs232b->dsr_handler().set(M6522_2_TAG, FUNC(via6522_device::write_pa5));
+	m_rs232b->rxd_handler().set(m_upd7201, FUNC(upd7201_device::rxb_w));
+	m_rs232b->dcd_handler().set(m_upd7201, FUNC(upd7201_device::dcdb_w));
+	m_rs232b->ri_handler().set(m_via2, FUNC(via6522_device::write_pa4));
+	m_rs232b->cts_handler().set(m_upd7201, FUNC(upd7201_device::ctsb_w));
+	m_rs232b->dsr_handler().set(m_via2, FUNC(via6522_device::write_pa5));
 
 	VICTOR9K_KEYBOARD(config, m_kb, 0);
 	m_kb->kbrdy_handler().set(FUNC(victor9k_state::kbrdy_w));
@@ -793,7 +777,7 @@ void victor9k_state::victor9k(machine_config &config)
 
 	RAM(config, m_ram).set_default_size("128K");
 
-	SOFTWARE_LIST(config, "flop_list").set_type("victor9k_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list").set_original("victor9k_flop");
 }
 
 

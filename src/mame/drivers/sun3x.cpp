@@ -239,8 +239,8 @@ void sun3x_state::sun3_80_mem(address_map &map)
 	map(0x61001000, 0x61001003).rw(FUNC(sun3x_state::memreg_r), FUNC(sun3x_state::memreg_w));
 	map(0x61001004, 0x61001007).rw(FUNC(sun3x_state::memrerraddr_r), FUNC(sun3x_state::memrerraddr_w));
 	map(0x61001400, 0x61001403).rw(FUNC(sun3x_state::irqctrl_r), FUNC(sun3x_state::irqctrl_w));
-	map(0x62000000, 0x6200000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
-	map(0x62002000, 0x6200200f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
+	map(0x62000000, 0x6200000f).rw(m_scc1, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
+	map(0x62002000, 0x6200200f).rw(m_scc2, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
 	map(0x63000000, 0x6301ffff).rom().region("user1", 0);
 	map(0x64000000, 0x640007ff).rw(TIMEKEEPER_TAG, FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 	map(0x66000000, 0x6600003f).rw(ESP_TAG, FUNC(ncr539x_device::read), FUNC(ncr539x_device::write)).umask32(0xff000000);
@@ -264,8 +264,8 @@ void sun3x_state::sun3_460_mem(address_map &map)
 	map(0x61001000, 0x61001003).rw(FUNC(sun3x_state::memreg_r), FUNC(sun3x_state::memreg_w));
 	map(0x61001004, 0x61001007).rw(FUNC(sun3x_state::memrerraddr_r), FUNC(sun3x_state::memrerraddr_w));
 	map(0x61001400, 0x61001403).rw(FUNC(sun3x_state::irqctrl_r), FUNC(sun3x_state::irqctrl_w));
-	map(0x62000000, 0x6200000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
-	map(0x62002000, 0x6200200f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
+	map(0x62000000, 0x6200000f).rw(m_scc1, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
+	map(0x62002000, 0x6200200f).rw(m_scc2, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
 	map(0x63000000, 0x6301ffff).rom().region("user1", 0);
 
 	map(0x6f00003c, 0x6f00003f).rw(FUNC(sun3x_state::printer_r), FUNC(sun3x_state::printer_w));
@@ -360,7 +360,8 @@ WRITE32_MEMBER(sun3x_state::ramwrite_w)
 		}
 
 		m_bInBusErr = true; // prevent recursion
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, 2);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
 
 	COMBINE_DATA(&pRAM[offset]);
@@ -568,8 +569,6 @@ void sun3x_state::machine_reset()
 
 	memcpy((uint8_t*)m_p_ram.target(),user1,0x10000);
 
-	m_maincpu->reset();
-
 	memset(m_iommu, 0, sizeof(m_iommu));
 
 	m_enable = 0;
@@ -591,12 +590,13 @@ static void sun_floppies(device_slot_interface &device)
 	device.option_add("35hd", FLOPPY_35_HD);
 }
 
-MACHINE_CONFIG_START(sun3x_state::sun3_80)
+void sun3x_state::sun3_80(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68030, 20000000)
-	MCFG_DEVICE_PROGRAM_MAP(sun3_80_mem)
+	M68030(config, m_maincpu, 20000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun3x_state::sun3_80_mem);
 
-	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, M48T02, 0)
+	M48T02(config, TIMEKEEPER_TAG, 0);
 
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
 	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
@@ -619,24 +619,24 @@ MACHINE_CONFIG_START(sun3x_state::sun3_80)
 	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
 
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
+	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
+	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
 
 	NCR539X(config, ESP_TAG, 20000000/2).set_scsi_port("scsi");
 
-	N82077AA(config, m_fdc, n82077aa_device::MODE_PS2);
+	N82077AA(config, m_fdc, n82077aa_device::mode_t::PS2);
 	FLOPPY_CONNECTOR(config, "fdc:0", sun_floppies, "35hd", sun3x_state::floppy_formats);
 
 	// the timekeeper has no interrupt output, so 3/80 includes a dedicated timer circuit
 	TIMER(config, "timer").configure_periodic(FUNC(sun3x_state::sun380_timer), attotime::from_hz(100));
 
-	MCFG_SCREEN_ADD("bwtwo", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(sun3x_state, bw2_update)
-	MCFG_SCREEN_SIZE(1152,900)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
-MACHINE_CONFIG_END
+	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	bwtwo.set_screen_update(FUNC(sun3x_state::bw2_update));
+	bwtwo.set_size(1152,900);
+	bwtwo.set_visarea(0, 1152-1, 0, 900-1);
+	bwtwo.set_refresh_hz(72);
+}
 
 void sun3x_state::sun3_460(machine_config &config)
 {

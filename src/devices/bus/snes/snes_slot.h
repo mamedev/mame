@@ -40,7 +40,8 @@ enum
 	SNES_OBC1,
 	SNES_SA1,
 	SNES_SDD1,
-	SNES_SFX,
+	SNES_GSU1,
+	SNES_GSU2,
 	SNES_SPC7110,
 	SNES_SPC7110_RTC,
 	SNES_SRTC,
@@ -88,7 +89,8 @@ enum
 	ADDON_OBC1,
 	ADDON_SA1,
 	ADDON_SDD1,
-	ADDON_SFX,
+	ADDON_GSU1,
+	ADDON_GSU2,
 	ADDON_SPC7110,
 	ADDON_SPC7110_RTC,
 	ADDON_ST010,
@@ -102,7 +104,7 @@ class base_sns_cart_slot_device;
 
 // ======================> device_sns_cart_interface
 
-class device_sns_cart_interface : public device_slot_card_interface
+class device_sns_cart_interface : public device_interface
 {
 	friend class base_sns_cart_slot_device;
 
@@ -111,14 +113,14 @@ public:
 	virtual ~device_sns_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) { return 0xff; }   // ROM access in range [00-7f]
-	virtual DECLARE_READ8_MEMBER(read_h) { return 0xff; }   // ROM access in range [80-ff]
-	virtual DECLARE_READ8_MEMBER(read_ram) { if (!m_nvram.empty()) return m_nvram[offset & (m_nvram.size()-1)]; else return 0xff; }   // NVRAM access
-	virtual DECLARE_WRITE8_MEMBER(write_l) { }   // used by carts with subslots
-	virtual DECLARE_WRITE8_MEMBER(write_h) { }   // used by carts with subslots
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { if (!m_nvram.empty()) m_nvram[offset & (m_nvram.size()-1)] = data; } // NVRAM access
-	virtual DECLARE_READ8_MEMBER(chip_read) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(chip_write) { }
+	virtual uint8_t read_l(offs_t offset) { return 0xff; }   // ROM access in range [00-7f]
+	virtual uint8_t read_h(offs_t offset) { return 0xff; }   // ROM access in range [80-ff]
+	virtual uint8_t read_ram(offs_t offset) { if (!m_nvram.empty()) return m_nvram[offset & (m_nvram.size()-1)]; else return 0xff; }   // NVRAM access
+	virtual void write_l(offs_t offset, uint8_t data) { }   // used by carts with subslots
+	virtual void write_h(offs_t offset, uint8_t data) { }   // used by carts with subslots
+	virtual void write_ram(offs_t offset, uint8_t data) { if (!m_nvram.empty()) m_nvram[offset & (m_nvram.size()-1)] = data; } // NVRAM access
+	virtual uint8_t chip_read(offs_t offset) { return 0xff; }
+	virtual void chip_write(offs_t offset, uint8_t data) { }
 	virtual void speedup_addon_bios_access() {}
 
 	void rom_alloc(uint32_t size, const char *tag);
@@ -142,6 +144,7 @@ protected:
 	device_sns_cart_interface(const machine_config &mconfig, device_t &device);
 
 	DECLARE_WRITE_LINE_MEMBER(write_irq);
+	uint8_t read_open_bus();
 
 	// internal state
 	uint8_t *m_rom;
@@ -168,14 +171,21 @@ public:
 
 	// configuration
 	auto irq_callback() { return m_irq_callback.bind(); }
-
-	// device-level overrides
-	virtual void device_start() override;
+	auto open_bus_callback() { return m_open_bus_callback.bind(); }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
+
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return true; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+
+	// slot interface overrides
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	void get_cart_type_addon(const uint8_t *ROM, uint32_t len, int &type, int &addon) const;
 	uint32_t snes_skip_header(const uint8_t *ROM, uint32_t snes_rom_size) const;
@@ -187,27 +197,18 @@ public:
 	void save_ram() { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram();
 					if (m_cart && m_cart->get_rtc_ram_size()) m_cart->save_rtc_ram(); }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 1; }
-	virtual bool is_reset_on_load() const override { return 1; }
-
-	// slot interface overrides
-	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
-
 	// reading and writing
-	DECLARE_READ8_MEMBER(read_l);
-	DECLARE_READ8_MEMBER(read_h);
-	DECLARE_READ8_MEMBER(read_ram);
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_WRITE8_MEMBER(write_h);
-	DECLARE_WRITE8_MEMBER(write_ram);
-	DECLARE_READ8_MEMBER(chip_read);
-	DECLARE_WRITE8_MEMBER(chip_write);
+	uint8_t read_l(offs_t offset);
+	uint8_t read_h(offs_t offset);
+	uint8_t read_ram(offs_t offset);
+	void write_l(offs_t offset, uint8_t data);
+	void write_h(offs_t offset, uint8_t data);
+	void write_ram(offs_t offset, uint8_t data);
+	uint8_t chip_read(offs_t offset);
+	void chip_write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(write_irq) { m_irq_callback(state); }
+	uint8_t read_open_bus() { return m_open_bus_callback(); }
 
 	// in order to support legacy dumps + add-on CPU dump appended at the end of the file, we
 	// check if the required data is present and update bank map accordingly
@@ -228,8 +229,15 @@ public:
 protected:
 	base_sns_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	// device-level overrides
+	virtual void device_start() override;
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
+
 private:
 	devcb_write_line m_irq_callback;
+	devcb_read8 m_open_bus_callback;
 };
 
 // ======================> sns_cart_slot_device
@@ -248,8 +256,8 @@ public:
 		set_fixed(false);
 	}
 	sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual const char *image_interface() const override { return "snes_cart"; }
-	virtual const char *file_extensions() const override { return "sfc"; }
+	virtual const char *image_interface() const noexcept override { return "snes_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "sfc"; }
 };
 
 // ======================> sns_sufami_cart_slot_device
@@ -268,9 +276,9 @@ public:
 		set_fixed(false);
 	}
 	sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual const char *image_interface() const override { return "st_cart"; }
-	virtual const char *file_extensions() const override { return "st"; }
-	virtual bool must_be_loaded() const override { return 0; }
+	virtual const char *image_interface() const noexcept override { return "st_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "st"; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
 };
 
 // ======================> sns_sufami_cart_slot_device
@@ -289,9 +297,9 @@ public:
 		set_fixed(false);
 	}
 	sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual const char *image_interface() const override { return "bspack"; }
-	virtual const char *file_extensions() const override { return "bs"; }
-	virtual bool must_be_loaded() const override { return 0; }
+	virtual const char *image_interface() const noexcept override { return "bspack"; }
+	virtual const char *file_extensions() const noexcept override { return "bs"; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
 };
 
 

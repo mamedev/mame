@@ -228,7 +228,7 @@ WRITE_LINE_MEMBER(es8712_device::msm_int)
 	}
 	else
 	{
-		m_adpcm_select->write_ab(read_byte(m_base_offset));
+		m_adpcm_select->ab_w(read_byte(m_base_offset));
 		m_adpcm_select->select_w(m_adpcm_trigger);
 		m_adpcm_trigger ^= 1;
 		if (m_adpcm_trigger == 0)

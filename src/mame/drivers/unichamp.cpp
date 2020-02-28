@@ -186,10 +186,10 @@ void unichamp_state::machine_start()
 			ptr[i+1] = TEMP;
 		}
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x17ff,
-					read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
+					read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
 	} else
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x17ff,
-					read16_delegate(FUNC(unichamp_state::read_ff), this));
+					read16_delegate(*this, FUNC(unichamp_state::read_ff)));
 }
 
 /* Set Reset and INTR/INTRM Vector */
@@ -207,9 +207,9 @@ void unichamp_state::machine_reset()
 	//The cart ROMS are self mapped to 0x1000
 	//upon boot the EXEC ROM puts 0x0800 on the bus for the CPU to use as first INT vector
 
-	m_maincpu->set_input_line_vector(CP1610_RESET,     0x0800);
-	m_maincpu->set_input_line_vector(CP1610_INT_INTRM, 0x0804);//not used anyway
-	m_maincpu->set_input_line_vector(CP1610_INT_INTR,  0x0804);//not used anyway
+	m_maincpu->set_input_line_vector(CP1610_RESET,     0x0800); // CP1610
+	m_maincpu->set_input_line_vector(CP1610_INT_INTRM, 0x0804); // CP1610 - not used anyway
+	m_maincpu->set_input_line_vector(CP1610_INT_INTR,  0x0804); // CP1610 - not used anyway
 
 	/* Set initial PC */
 	m_maincpu->set_state_int(cp1610_cpu_device::CP1610_R7, 0x0800);
@@ -248,14 +248,14 @@ void unichamp_state::unichamp(machine_config &config)
 	/* basic machine hardware */
 
 	//The CPU is really clocked this way:
-	//MCFG_DEVICE_ADD("maincpu", CP1610, XTAL(3'579'545)/4)
+	//CP1610(config, m_maincpu, XTAL(3'579'545)/4);
 	//But since it is only running 7752/29868 th's of the time...
 	//TODO find a more accurate method? (the emulation will be the same though)
 	CP1610(config, m_maincpu, (7752.0/29868.0)*XTAL(3'579'545)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &unichamp_state::unichamp_mem);
 	m_maincpu->bext().set(FUNC(unichamp_state::bext_r));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

@@ -1542,7 +1542,7 @@ void tnzs_base_state::tnzs_base(machine_config &config)
 
 	tnzs_mainbank(config);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	SETA001_SPRITE(config, m_seta001, 0);
@@ -1701,7 +1701,6 @@ void kabukiz_state::kabukiz(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -2077,7 +2076,7 @@ PCB:
 Seta: P0-025-A
 Taito: K1100241A J1100107A
 
-The drtoppelj PCB has a sticker label which says "K1100269A // DR. ドツペル タンケン" (DoTuPeRu TaNKeN)
+The drtoppelj PCB has a sticker label which says "K1100269A // DR. トッペル タンケン" (To'PeRu TaNKeN)
 */
 ROM_START( drtoppel )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */

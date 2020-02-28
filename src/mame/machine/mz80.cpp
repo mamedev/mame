@@ -41,7 +41,7 @@ READ8_MEMBER( mz80_state::mz80k_8255_portc_r )
 	uint8_t val = 0;
 	val |= m_mz80k_vertical ? 0x80 : 0x00;
 	val |= ((m_mz80k_cursor_cnt & 0x3f) > 31) ? 0x40 : 0x00;
-	val |= (m_cassette->get_state() & CASSETTE_MASK_UISTATE)== CASSETTE_PLAY ? 0x10 : 0x00;
+	val |= (m_cassette->get_state() & CASSETTE_MASK_UISTATE)!= CASSETTE_STOPPED ? 0x10 : 0x00;
 
 	if (m_cassette->input() > 0.00)
 		val |= 0x20;
@@ -57,6 +57,7 @@ WRITE8_MEMBER( mz80_state::mz80k_8255_porta_w )
 WRITE8_MEMBER( mz80_state::mz80k_8255_portc_w )
 {
 //  logerror("mz80k_8255_portc_w %02x\n",data);
+	m_cassette->output(BIT(data, 1) ? -1.0 : +1.0);
 }
 
 

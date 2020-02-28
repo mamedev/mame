@@ -88,7 +88,7 @@ void mz6500_state::mz6500_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x9ffff).ram();
-//  AM_RANGE(0xa0000,0xbffff) kanji/dictionary ROM
+//  map(0xa0000,0xbffff) kanji/dictionary ROM
 	map(0xc0000, 0xeffff).rw(FUNC(mz6500_state::mz6500_vram_r), FUNC(mz6500_state::mz6500_vram_w));
 	map(0xfc000, 0xfffff).rom().region("ipl", 0);
 }
@@ -96,27 +96,27 @@ void mz6500_state::mz6500_map(address_map &map)
 void mz6500_state::mz6500_io(address_map &map)
 {
 	map.unmap_value_high();
-//  AM_RANGE(0x0000, 0x000f) i8237 dma
-//  AM_RANGE(0x0010, 0x001f) i8255
+//  map(0x0000, 0x000f) i8237 dma
+//  map(0x0010, 0x001f) i8255
 	map(0x0020, 0x0021).mirror(0xe).m(m_fdc, FUNC(upd765a_device::map));
-//  AM_RANGE(0x0030, 0x003f) i8259 master
-//  AM_RANGE(0x0040, 0x004f) i8259 slave
-//  AM_RANGE(0x0050, 0x0050) segment byte for DMA
-//  AM_RANGE(0x0060, 0x0060) system port A
-//  AM_RANGE(0x0070, 0x0070) system port C
-//  AM_RANGE(0x00cd, 0x00cd) MZ-1R32
+//  map(0x0030, 0x003f) i8259 master
+//  map(0x0040, 0x004f) i8259 slave
+//  map(0x0050, 0x0050) segment byte for DMA
+//  map(0x0060, 0x0060) system port A
+//  map(0x0070, 0x0070) system port C
+//  map(0x00cd, 0x00cd) MZ-1R32
 	map(0x0100, 0x0103).mirror(0xc).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff);
-//  AM_RANGE(0x0110, 0x011f) video address / data registers (priority)
-//  AM_RANGE(0x0120, 0x012f) video registers
-//  AM_RANGE(0x0130, 0x013f) video register
-//  AM_RANGE(0x0140, 0x015f) palette pens
-//  AM_RANGE(0x0200, 0x020f) z80sio
-//  AM_RANGE(0x0210, 0x021f) z80ctc
-//  AM_RANGE(0x0220, 0x022f) rp5c01
-//  AM_RANGE(0x0230, 0x023f) ay-3-8912
-//  AM_RANGE(0x0240, 0x0240) z80ctc vector ack
-//  AM_RANGE(0x0250, 0x0250) z80sio vector ack
-//  AM_RANGE(0x0270, 0x0270) system port B
+//  map(0x0110, 0x011f) video address / data registers (priority)
+//  map(0x0120, 0x012f) video registers
+//  map(0x0130, 0x013f) video register
+//  map(0x0140, 0x015f) palette pens
+//  map(0x0200, 0x020f) z80sio
+//  map(0x0210, 0x021f) z80ctc
+//  map(0x0220, 0x022f) rp5c01
+//  map(0x0230, 0x023f) ay-3-8912
+//  map(0x0240, 0x0240) z80ctc vector ack
+//  map(0x0250, 0x0250) z80sio vector ack
+//  map(0x0270, 0x0270) system port B
 }
 
 /* Input ports */
@@ -149,41 +149,42 @@ void mz6500_state::upd7220_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(mz6500_state::mz6500)
+void mz6500_state::mz6500(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8086, 8000000) //unk clock
-	MCFG_DEVICE_PROGRAM_MAP(mz6500_map)
-	MCFG_DEVICE_IO_MAP(mz6500_io)
+	I8086(config, m_maincpu, 8000000); //unk clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &mz6500_state::mz6500_map);
+	m_maincpu->set_addrmap(AS_IO, &mz6500_state::mz6500_io);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_PALETTE_ADD("palette", 8)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("upd7220", FUNC(upd7220_device::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	PALETTE(config, "palette").set_entries(8);
 
 	/* Devices */
 	UPD7220(config, m_hgdc, 8000000/6); // unk clock
 	m_hgdc->set_addrmap(0, &mz6500_state::upd7220_map);
-	m_hgdc->set_display_pixels_callback(FUNC(mz6500_state::hgdc_display_pixels), this);
+	m_hgdc->set_display_pixels(FUNC(mz6500_state::hgdc_display_pixels));
 
 	UPD765A(config, m_fdc, 8000000, true, true);
 	FLOPPY_CONNECTOR(config, "upd765:0", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( mz6500 )
-	ROM_REGION( 0x4000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x4000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x4000,CRC(6c978ac4) SHA1(7872d7e6d9cda2ed9f47ed4833a5caa4dfe0e55c))
 
-	ROM_REGION( 0x40000, "dictionary", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x40000, "dictionary", ROMREGION_ERASEFF )
 	ROM_LOAD( "dict.rom", 0x0000, 0x40000, CRC(2df3cfd3) SHA1(d420ede09658c2626b0bb650a063d88b1783e554))
 
-	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x40000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "kanji.rom", 0x0000, 0x40000, CRC(b618e25d) SHA1(1da93337fecde6c0f8a5bd68f3f0b3222a38d63e))
 ROM_END
 

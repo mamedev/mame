@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "machine/segacrpt_device.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class cclimber_state : public driver_device
 {

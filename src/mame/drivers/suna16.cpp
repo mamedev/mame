@@ -49,7 +49,7 @@ WRITE16_MEMBER(suna16_state::soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_soundlatch->write(space, 0, data & 0xff );
+		m_soundlatch->write(data & 0xff);
 	}
 	if (data & ~0xff)   logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", m_maincpu->pc(), data);
 }
@@ -834,7 +834,7 @@ void suna16_state::bssoccer(machine_config &config)
 	m_pcm2->set_addrmap(AS_PROGRAM, &suna16_state::bssoccer_pcm_2_map);
 	m_pcm2->set_addrmap(AS_IO, &suna16_state::bssoccer_pcm_2_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_START_OVERRIDE(suna16_state,bssoccer)
 
@@ -867,7 +867,6 @@ void suna16_state::bssoccer(machine_config &config)
 	DAC_4BIT_R2R(config, "ldac2", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.2); // unknown DAC
 	DAC_4BIT_R2R(config, "rdac2", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.2); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
@@ -899,7 +898,7 @@ void suna16_state::uballoon(machine_config &config)
 
 	/* 2nd PCM Z80 missing */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_START_OVERRIDE(suna16_state,uballoon)
 	MCFG_MACHINE_RESET_OVERRIDE(suna16_state,uballoon)
@@ -930,7 +929,6 @@ void suna16_state::uballoon(machine_config &config)
 	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
 	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
@@ -958,7 +956,7 @@ void suna16_state::sunaq(machine_config &config)
 
 	/* 2nd PCM Z80 missing */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_START_OVERRIDE(suna16_state,uballoon)
 	MCFG_MACHINE_RESET_OVERRIDE(suna16_state,uballoon)
@@ -989,7 +987,6 @@ void suna16_state::sunaq(machine_config &config)
 	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
 	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
@@ -1022,7 +1019,7 @@ void suna16_state::bestbest(machine_config &config)
 
 	/* 2nd PCM Z80 missing */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_START_OVERRIDE(suna16_state, bestbest)
 
@@ -1060,7 +1057,6 @@ void suna16_state::bestbest(machine_config &config)
 	DAC_4BIT_R2R(config, "ldac2", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.2); // unknown DAC
 	DAC_4BIT_R2R(config, "rdac2", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.2); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);

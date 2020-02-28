@@ -5,7 +5,7 @@
     Tape support for Orao  TAP format
 
 */
-#include <assert.h>
+#include <cassert>
 
 #include "orao_cas.h"
 

@@ -4,20 +4,21 @@
 
     "HTI" format
 
-    Format of images of DC-100 tape cassettes as used in HP 9845
-    and HP 85 systems.
+    Format of images of DC-100 tape cassettes as used in HP 9825,
+    HP 9845 and HP 85 systems.
 
 *********************************************************************/
-
-#ifndef _HTI_TAPE_H_
-#define _HTI_TAPE_H_
+#ifndef MAME_FORMATS_HTI_TAPE_H
+#define MAME_FORMATS_HTI_TAPE_H
 
 #pragma once
 
-#include <map>
 #include "ioprocs.h"
 
-class hti_format_t {
+#include <map>
+
+class hti_format_t
+{
 public:
 	hti_format_t();
 
@@ -48,9 +49,15 @@ public:
 	// Iterator to access words on tape
 	typedef tape_track_t::iterator track_iterator_t;
 
+	// Set no. of bits per word (needed when loading old format)
+	void set_bits_per_word(unsigned bits) { m_bits_per_word = bits; }
+
 	bool load_tape(io_generic *io);
 	void save_tape(io_generic *io);
 	void clear_tape();
+
+	// Return physical length of a bit on tape
+	static constexpr tape_pos_t bit_length(bool bit) { return bit ? ONE_BIT_LEN : ZERO_BIT_LEN; }
 
 	// Return physical length of a 16-bit word on tape
 	static tape_pos_t word_length(tape_word_t w);
@@ -73,22 +80,32 @@ public:
 	// Return position of next data word in a given direction
 	bool next_data(unsigned track_no , tape_pos_t pos , bool forward , bool inclusive , track_iterator_t& it);
 
-	typedef enum {
+	enum adv_res_t
+	{
 		ADV_NO_MORE_DATA,
 		ADV_CONT_DATA,
 		ADV_DISCONT_DATA
-	} adv_res_t;
+	};
 
 	// Advance an iterator to next word of data
 	adv_res_t adv_it(unsigned track_no , bool forward , track_iterator_t& it);
 
+	// Sync with the preamble of a record
+	bool sync_with_record(unsigned track_no , track_iterator_t& it , unsigned& bit_idx);
+
+	// Get a data word from record, after syncing
+	adv_res_t next_word(unsigned track_no , track_iterator_t& it , unsigned& bit_idx , tape_word_t& word);
+
 	// Scan for beginning of next gap in a given direction
 	bool next_gap(unsigned track_no , tape_pos_t& pos , bool forward , tape_pos_t min_gap);
+
 private:
 	// Content of tape tracks
 	tape_track_t m_tracks[ 2 ];
+	// Bits per word in old format
+	unsigned m_bits_per_word;
 
-	static bool load_track(io_generic *io , uint64_t& offset , tape_track_t& track);
+	bool load_track(io_generic *io , uint64_t& offset , tape_track_t& track , bool old_format);
 	static void dump_sequence(io_generic *io , uint64_t& offset , tape_track_t::const_iterator it_start , unsigned n_words);
 
 	static tape_pos_t word_end_pos(const track_iterator_t& it);
@@ -96,4 +113,4 @@ private:
 	static void ensure_a_lt_b(tape_pos_t& a , tape_pos_t& b);
 };
 
-#endif /* _HTI_TAPE_H_ */
+#endif // MAME_FORMATS_HTI_TAPE_H

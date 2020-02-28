@@ -238,7 +238,7 @@ READ8_MEMBER(airbustr_state::devram_r)
 		   that would reset the main cpu. We avoid this and patch
 		   the rom instead (main cpu has to be reset once at startup) */
 		case 0xfe0:
-			return m_watchdog->reset_r(space, 0);
+			return m_watchdog->reset_r(space);
 
 		/* Reading a word at eff2 probably yelds the product
 		   of the words written to eff0 and eff2 */
@@ -481,39 +481,11 @@ static INPUT_PORTS_START( airbustrj )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 INPUT_PORTS_END
 
-/* Graphics Layout */
-
-static const gfx_layout tile_gfxlayout =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{  1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
-		1*4+32*8, 0*4+32*8, 3*4+32*8, 2*4+32*8, 5*4+32*8, 4*4+32*8, 7*4+32*8, 6*4+32*8 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		0*32+64*8, 1*32+64*8, 2*32+64*8, 3*32+64*8, 4*32+64*8, 5*32+64*8, 6*32+64*8, 7*32+64*8 },
-	16*16*4
-};
-
-static const gfx_layout sprite_gfxlayout =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-		0*4+32*8, 1*4+32*8, 2*4+32*8, 3*4+32*8, 4*4+32*8, 5*4+32*8, 6*4+32*8, 7*4+32*8 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		0*32+64*8, 1*32+64*8, 2*32+64*8, 3*32+64*8, 4*32+64*8, 5*32+64*8, 6*32+64*8, 7*32+64*8 },
-	16*16*4
-};
-
 /* Graphics Decode Information */
 
 static GFXDECODE_START( gfx_airbustr )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_gfxlayout,   0, 32 ) // tiles
-	GFXDECODE_ENTRY( "gfx2", 0, sprite_gfxlayout, 512, 16 ) // sprites
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_lsb,   0, 32 ) // tiles
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 512, 16 ) // sprites
 GFXDECODE_END
 
 
@@ -525,17 +497,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(airbustr_state::airbustr_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_master->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_master->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 
 	/* Pandora "sprite end dma" irq? TODO: timing is likely off */
 	if(scanline == 64)
-		m_master->set_input_line_and_vector(0, HOLD_LINE, 0xfd);
+		m_master->set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
 }
 
 /* Sub Z80 uses IM2 too, but 0xff irq routine just contains an irq ack in it */
 INTERRUPT_GEN_MEMBER(airbustr_state::slave_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
 }
 
 /* Machine Initialization */
@@ -562,38 +534,37 @@ void airbustr_state::machine_reset()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(airbustr_state::airbustr)
-
+void airbustr_state::airbustr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("master", Z80, XTAL(12'000'000)/2)   /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_DEVICE_IO_MAP(master_io_map)
+	Z80(config, m_master, XTAL(12'000'000)/2);   /* verified on pcb */
+	m_master->set_addrmap(AS_PROGRAM, &airbustr_state::master_map);
+	m_master->set_addrmap(AS_IO, &airbustr_state::master_io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(airbustr_state::airbustr_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave", Z80, XTAL(12'000'000)/2)    /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(slave_map)
-	MCFG_DEVICE_IO_MAP(slave_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", airbustr_state,  slave_interrupt) /* nmi signal from master cpu */
+	Z80(config, m_slave, XTAL(12'000'000)/2);    /* verified on pcb */
+	m_slave->set_addrmap(AS_PROGRAM, &airbustr_state::slave_map);
+	m_slave->set_addrmap(AS_IO, &airbustr_state::slave_io_map);
+	m_slave->set_vblank_int("screen", FUNC(airbustr_state::slave_interrupt)); /* nmi signal from master cpu */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", airbustr_state,  irq0_line_hold)       // nmi are caused by sub cpu writing a sound command
+	Z80(config, m_audiocpu, XTAL(12'000'000)/2); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &airbustr_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &airbustr_state::sound_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  // Palette RAM is filled by sub cpu with data supplied by main cpu
+	config.set_maximum_quantum(attotime::from_hz(6000));  // Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.4)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(airbustr_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, airbustr_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(57.4);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(airbustr_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(airbustr_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_airbustr);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 768);
@@ -613,14 +584,14 @@ MACHINE_CONFIG_START(airbustr_state::airbustr)
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4));   /* verified on pcb */
 	ymsnd.port_a_read_callback().set_ioport("DSW1");       // DSW-1 connected to port A
 	ymsnd.port_b_read_callback().set_ioport("DSW2");       // DSW-2 connected to port B
+	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 	ymsnd.add_route(0, "mono", 0.25);
 	ymsnd.add_route(1, "mono", 0.25);
 	ymsnd.add_route(2, "mono", 0.25);
 	ymsnd.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/4, okim6295_device::PIN7_LOW)   /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", XTAL(12'000'000)/4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.80);   /* verified on pcb */
+}
 
 void airbustr_state::airbustrb(machine_config &config)
 {
@@ -728,7 +699,7 @@ ROM_END
 
 void airbustr_state::init_airbustr()
 {
-	m_master->space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8_delegate(FUNC(airbustr_state::devram_r),this)); // protection device lives here
+	m_master->space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8_delegate(*this, FUNC(airbustr_state::devram_r))); // protection device lives here
 }
 
 

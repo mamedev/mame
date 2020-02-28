@@ -14,6 +14,7 @@
 #include "sound/flt_vol.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 /* Calculated from CRT controller writes */
 #define PIXEL_CLOCK            (XTAL(21'000'000) / 3)

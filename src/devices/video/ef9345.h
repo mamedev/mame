@@ -34,8 +34,8 @@ public:
 	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 
 	// device interface
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
+	uint8_t data_r(offs_t offset);
+	void data_w(offs_t offset, uint8_t data);
 	void update_scanline(uint16_t scanline);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -78,7 +78,7 @@ private:
 	uint16_t indexblock(uint16_t x, uint16_t y);
 	void bichrome40(uint8_t type, uint16_t address, uint8_t dial, uint16_t iblock, uint16_t x, uint16_t y, uint8_t c0, uint8_t c1, uint8_t insert, uint8_t flash, uint8_t hided, uint8_t negative, uint8_t underline);
 	void quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, uint16_t y);
-	void bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y);
+	void bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, uint8_t cursor);
 	void makechar(uint16_t x, uint16_t y);
 	void draw_border(uint16_t line);
 	void makechar_16x40(uint16_t x, uint16_t y);

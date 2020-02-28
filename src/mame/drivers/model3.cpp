@@ -742,6 +742,7 @@ JP4/5/6/7 - Jumpers to configure ROMs
 #include "machine/m3comm.h"
 #include "speaker.h"
 
+#include "segabill.lh"
 
 void model3_state::update_irq_state()
 {
@@ -1157,7 +1158,7 @@ READ64_MEMBER(model3_state::real3d_dma_r)
 			}
 			break;
 	}
-	osd_printf_debug("real3d_dma_r: %08X, %08X%08X\n", offset, (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
+	osd_printf_debug("real3d_dma_r: %08X, %016X\n", offset, mem_mask);
 	return 0;
 }
 
@@ -1367,7 +1368,6 @@ void model3_state::model3_init(int step)
 
 	// copy the 68k vector table into RAM
 	memcpy(m_soundram, memregion("audiocpu")->base(), 16);
-	m_audiocpu->reset();
 
 	m_scan_timer->adjust(m_screen->time_until_pos(m_screen->vpos() + 1), m_screen->vpos() + 1);
 
@@ -1409,175 +1409,70 @@ MACHINE_RESET_MEMBER(model3_state,model3_20){ model3_init(0x20); }
 MACHINE_RESET_MEMBER(model3_state,model3_21){ model3_init(0x21); }
 
 
-READ64_MEMBER(model3_state::model3_ctrl_r)
+//**************************************************************************
+//  INPUT HANDLING
+//**************************************************************************
+
+WRITE8_MEMBER( model3_state::eeprom_w )
 {
-	switch( offset )
-	{
-		case 0:
-			if (ACCESSING_BITS_56_63)
-			{
-				return (uint64_t)m_controls_bank << 56;
-			}
-			else if (ACCESSING_BITS_24_31)
-			{
-				if(m_controls_bank & 0x1)
-				{
-					return (ioport("IN1")->read()) << 24;
-				}
-				else
-				{
-					return (ioport("IN0")->read()) << 24;
-				}
-			}
-			break;
+	m_controls_bank = BIT(data, 0);
 
-		case 1:
-			if (ACCESSING_BITS_56_63)
-			{
-				return (uint64_t)ioport("IN2")->read() << 56;
-			}
-			else if (ACCESSING_BITS_24_31)
-			{
-				return ioport("IN3")->read() << 24;
-			}
-			break;
-
-		case 2:
-			return 0xffffffffffffffffU;
-
-		case 3:
-			return 0xffffffffffffffffU;     /* Dip switches */
-
-		case 4:
-			return 0xffffffffffffffffU;
-
-		case 5:
-			if (ACCESSING_BITS_24_31)                   /* Serial comm RX FIFO 1 */
-			{
-				return (uint64_t)m_serial_fifo1 << 24;
-			}
-			break;
-
-		case 6:
-			if (ACCESSING_BITS_56_63)       /* Serial comm RX FIFO 2 */
-			{
-				return (uint64_t)m_serial_fifo2 << 56;
-			}
-			else if (ACCESSING_BITS_24_31)              /* Serial comm full/empty flags */
-			{
-				return 0x0c << 24;
-			}
-			break;
-
-		case 7:
-			if (ACCESSING_BITS_24_31)       /* ADC Data read */
-			{
-				const uint8_t adc_data = m_adc_ports[m_adc_channel].read_safe(0);
-				m_adc_channel++;
-				m_adc_channel &= 0x7;
-				return (uint64_t)adc_data << 24;
-			}
-			break;
-	}
-
-	logerror("ctrl_r: %02X, %08X%08X", offset, (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
-	return 0;
+	m_eeprom->di_write(BIT(data, 5));
+	m_eeprom->clk_write(BIT(data, 7) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->cs_write(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE64_MEMBER(model3_state::model3_ctrl_w)
+READ8_MEMBER( model3_state::input_r )
 {
-	switch(offset)
+	if (m_controls_bank == 1)
+		return (ioport("IN1")->read());
+	else
+		return (ioport("IN0")->read());
+}
+
+WRITE8_MEMBER( model3_state::lostwsga_ser1_w )
+{
+	switch (data)
 	{
-		case 0:
-			if (ACCESSING_BITS_56_63)
+		case 0x00:
+			m_lightgun_reg_sel = m_serial_fifo2;
+			break;
+
+		case 0x87:
+			switch (m_lightgun_reg_sel)
 			{
-				int reg = (data >> 56) & 0xff;
-				m_eeprom->di_write((reg & 0x20) ? 1 : 0);
-				m_eeprom->clk_write((reg & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-				m_eeprom->cs_write((reg & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-				m_controls_bank = reg & 0xff;
-			}
-			return;
+				// lightgun position
+				case 0: m_serial_fifo2 = (ioport("LIGHT0_Y")->read() >> 0) & 0xff; break;
+				case 1: m_serial_fifo2 = (ioport("LIGHT0_Y")->read() >> 8) & 0x03; break;
+				case 2: m_serial_fifo2 = (ioport("LIGHT0_X")->read() >> 0) & 0xff; break;
+				case 3: m_serial_fifo2 = (ioport("LIGHT0_X")->read() >> 8) & 0x03; break;
+				case 4: m_serial_fifo2 = (ioport("LIGHT1_Y")->read() >> 0) & 0xff; break;
+				case 5: m_serial_fifo2 = (ioport("LIGHT1_Y")->read() >> 8) & 0x03; break;
+				case 6: m_serial_fifo2 = (ioport("LIGHT1_X")->read() >> 0) & 0xff; break;
+				case 7: m_serial_fifo2 = (ioport("LIGHT1_X")->read() >> 8) & 0x03; break;
 
-		case 2:
-			COMBINE_DATA(&m_controls_2);
-			return;
-
-		case 3:
-			COMBINE_DATA(&m_controls_3);
-			return;
-
-		case 4:
-			if (ACCESSING_BITS_56_63)   /* Port 4 direction */
-			{
-			}
-			if (ACCESSING_BITS_24_31)               /* Serial comm TX FIFO 1 */
-			{                                           /* Used for reading the light gun in Lost World */
-				switch(data >> 24)
-				{
-					case 0x00:
-						m_lightgun_reg_sel = m_serial_fifo2;
-						break;
-					case 0x87:
-						m_serial_fifo1 = 0;
-						switch(m_lightgun_reg_sel)      /* read lightrun register */
-						{
-							case 0:     /* player 1 gun X-position, lower 8-bits */
-								m_serial_fifo2 = ioport("LIGHT0_Y")->read() & 0xff;
-								break;
-							case 1:     /* player 1 gun X-position, upper 2-bits */
-								m_serial_fifo2 = (ioport("LIGHT0_Y")->read() >> 8) & 0x3;
-								break;
-							case 2:     /* player 1 gun Y-position, lower 8-bits */
-								m_serial_fifo2 = ioport("LIGHT0_X")->read() & 0xff;
-								break;
-							case 3:     /* player 1 gun Y-position, upper 2-bits */
-								m_serial_fifo2 = (ioport("LIGHT0_X")->read() >> 8) & 0x3;
-								break;
-							case 4:     /* player 2 gun X-position, lower 8-bits */
-								m_serial_fifo2 = ioport("LIGHT1_Y")->read() & 0xff;
-								break;
-							case 5:     /* player 2 gun X-position, upper 2-bits */
-								m_serial_fifo2 = (ioport("LIGHT1_Y")->read() >> 8) & 0x3;
-								break;
-							case 6:     /* player 2 gun Y-position, lower 8-bits */
-								m_serial_fifo2 = ioport("LIGHT1_X")->read() & 0xff;
-								break;
-							case 7:     /* player 2 gun Y-position, upper 2-bits */
-								m_serial_fifo2 = (ioport("LIGHT1_X")->read() >> 8) & 0x3;
-								break;
-							case 8:     /* gun offscreen (bit set = gun offscreen, bit clear = gun on screen) */
-								m_serial_fifo2 = 0; /* bit 0 = player 1, bit 1 = player 2 */
-								if(ioport("OFFSCREEN")->read() & 0x1) {
-									m_serial_fifo2 |= 0x01;
-								}
-								break;
-						}
-						break;
-					default:
-						//osd_printf_debug("%s Lightgun: Unknown command %02X\n", machine().describe_context().c_str(), (uint32_t)(data >> 24));
-						break;
-				}
-			}
-			return;
-
-		case 5:
-			if (ACCESSING_BITS_56_63)   /* Serial comm TX FIFO 2 */
-			{
-				m_serial_fifo2 = data >> 56;
-				return;
+				// off-screen detect
+				case 8:
+					m_serial_fifo2 = 0;
+					if(ioport("OFFSCREEN")->read() & 0x01)
+						m_serial_fifo2 |= 0x01;
+					break;
 			}
 			break;
 
-		case 7:
-			if (ACCESSING_BITS_24_31)   /* ADC Channel selection */
-			{
-				m_adc_channel = (data >> 24) & 0xf;
-			}
-			return;
+		default:
+			logerror("lostwsga_ser1_w: Unknown command %02x\n", data);
 	}
+}
 
-	logerror("ctrl_w: %02X, %08X%08X, %08X%08X", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
+READ8_MEMBER( model3_state::lostwsga_ser2_r )
+{
+	return m_serial_fifo2;
+}
+
+WRITE8_MEMBER( model3_state::lostwsga_ser2_w )
+{
+	m_serial_fifo2 = data;
 }
 
 READ64_MEMBER(model3_state::model3_sys_r)
@@ -1807,7 +1702,7 @@ void model3_state::model3_10_mem(address_map &map)
 	map(0x8e000000, 0x8e0fffff).w(FUNC(model3_state::real3d_display_list_w));
 	map(0x98000000, 0x980fffff).w(FUNC(model3_state::real3d_polygon_ram_w));
 
-	map(0xf0040000, 0xf004003f).mirror(0x0e000000).rw(FUNC(model3_state::model3_ctrl_r), FUNC(model3_state::model3_ctrl_w));
+	map(0xf0040000, 0xf004003f).mirror(0x0e000000).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask64(0xff000000ff000000);
 	map(0xf0080000, 0xf008ffff).mirror(0x0e000000).rw(FUNC(model3_state::model3_sound_r), FUNC(model3_state::model3_sound_w));
 	map(0xf00c0000, 0xf00dffff).mirror(0x0e000000).ram().share("backup");    /* backup SRAM */
 	map(0xf0100000, 0xf010003f).mirror(0x0e000000).rw(FUNC(model3_state::model3_sys_r), FUNC(model3_state::model3_sys_w));
@@ -1834,7 +1729,7 @@ void model3_state::model3_5881_mem(address_map &map)
 	map(0xf01a0000, 0xf01a003f).mirror(0x0e000000).m(m_cryptdevice, FUNC(sega_315_5881_crypt_device::iomap_64be));
 }
 
-static INPUT_PORTS_START( common )
+static INPUT_PORTS_START( model3 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1849,40 +1744,59 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( model3 )
-	PORT_INCLUDE( common )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )        PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )        PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY
 
 	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN5")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN6")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN7")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( von2 )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( model3 )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Lever Shot Trigger")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Left Lever Turbo Button")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1892,7 +1806,7 @@ static INPUT_PORTS_START( von2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Right Lever Shot Trigger")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Right Lever Turbo Button")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1901,24 +1815,17 @@ static INPUT_PORTS_START( von2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY
-
-	// TODO: not here
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lostwsga )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( model3 )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
 
 	PORT_START("LIGHT0_X")  // lightgun X-axis
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x00,0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -1937,9 +1844,9 @@ static INPUT_PORTS_START( lostwsga )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( scud )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( model3 )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* View Button 1 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* View Button 2 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )    /* View Button 3 */
@@ -1949,88 +1856,79 @@ static INPUT_PORTS_START( scud )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 )    /* Shift 3 */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 )    /* Shift 4 */
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
-
-	PORT_START("AN0")   // steering
+	PORT_MODIFY("AN0")   // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")   // accelerator
+	PORT_MODIFY("AN1")   // accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")   // brake
+	PORT_MODIFY("AN2")   // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bass )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( model3 )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)     /* Cast */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)     /* Select */
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
-
-	PORT_START("AN0")       /* Rod Y */
+	PORT_MODIFY("AN0")       /* Rod Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")       /* Rod X */
+	PORT_MODIFY("AN1")       /* Rod X */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")
+	PORT_MODIFY("AN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("AN3")       /* Reel */
+	PORT_MODIFY("AN3")       /* Reel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN4")       /* Stick Y */
+	PORT_MODIFY("AN4")       /* Stick Y */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE_V ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN5")       /* Stick X */
+	PORT_MODIFY("AN5")       /* Stick X */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( harley )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( model3 )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* View Button 1 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* View Button 2 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )    /* Shift down */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 )    /* Shift up */
 	PORT_BIT( 0xcc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
-
-	PORT_START("AN0")   // steering
+	PORT_MODIFY("AN0")   // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")   // accelerator
+	PORT_MODIFY("AN1")   // accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")   // front brake
+	PORT_MODIFY("AN2")   // front brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN3")   // back brake
+	PORT_MODIFY("AN3")   // back brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( daytona2 )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( model3 )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* View Button 1 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* View Button 2 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )    /* View Button 3 */
@@ -2040,71 +1938,63 @@ static INPUT_PORTS_START( daytona2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 )    /* Shift 3 */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 )    /* Shift 4 */
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
-
-	PORT_START("AN0")   // steering
+	PORT_MODIFY("AN0")   // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")   // accelerator
+	PORT_MODIFY("AN1")   // accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")   // brake
+	PORT_MODIFY("AN2")   // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( swtrilgy )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( model3 )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xde, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
-
-	PORT_START("AN0")       /* Analog Stick Y */
+	PORT_MODIFY("AN0")       /* Analog Stick Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
-	PORT_START("AN1")       /* Analog Stick X */
+	PORT_MODIFY("AN1")       /* Analog Stick X */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( eca )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( model3 )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* View Change */
 	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* Shift Up */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )    /* Shift Down */
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
-
-	PORT_START("AN0")   // steering
+	PORT_MODIFY("AN0")   // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")   // accelerator
+	PORT_MODIFY("AN1")   // accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")   // brake
+	PORT_MODIFY("AN2")   // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( skichamp )
-	PORT_START("IN0")
+	PORT_INCLUDE( model3 )
+
+	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW ) /* Test Button A */
@@ -2114,28 +2004,24 @@ static INPUT_PORTS_START( skichamp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )     /* Select 1 */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )     /* Select 2 */
 
-	PORT_START("IN1")
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* Pole Right */
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Foot sensor */
 
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
-
-	PORT_START("AN0")   // inclining
+	PORT_MODIFY("AN0")   // inclining
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")   // swing
+	PORT_MODIFY("AN1")   // swing
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
-
 INPUT_PORTS_END
 
 
@@ -3613,7 +3499,7 @@ ROM_START( vs2v991 )    /* Step 2.0 */
 	ROM_PARAMETER( ":315_5881:key", "29222ac8" )
 ROM_END
 
-ROM_START( vs299b ) /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-13689 VS2 VER99 STEP2 */
+ROM_START( vs299b ) /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-13689 VS2 VER99 STEP2, 837-13690-COM security board */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21550b.17",  0x400006, 0x100000, CRC(c508e488) SHA1(3134d418beaee9f824a0bd0e5441a997b5911d16) )
@@ -3685,7 +3571,7 @@ ROM_START( vs299b ) /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-1
 	ROM_PARAMETER( ":315_5881:key", "29222ac8" )
 ROM_END
 
-ROM_START( vs299a ) /* Step 2.0 */
+ROM_START( vs299a ) /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-13689 VS2 VER99 STEP2, 837-13690-COM security board */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21535a.17",  0x400006, 0x100000, CRC(8e4ec341) SHA1(973c71e7a48e728cbcb2465b56e90669fee0ec53) )
@@ -5026,7 +4912,7 @@ ROM_START( srally2pa ) // prototype 1997/12/08
 	ROM_LOAD( "epr-20512.bin", 0x000000, 0x010000, CRC(cf64350d) SHA1(f30c8c7b65fb38f7dd63845f12b81388ff3b946d) )
 ROM_END
 
-ROM_START( srally2x )   /* Step 2.0 */
+ROM_START( srally2x )   /* Step 2.0, Sega game ID# is 833-13371, ROM board ID# 834-13372 SRT DX */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20502.17",  0x000006, 0x200000, CRC(af16846d) SHA1(a0babc4dc3809ca1e71eaad4dc2f8c1597575e8b) )
@@ -5213,7 +5099,7 @@ ROM_START( harleya )    /* Step 2.0, Sega game ID# is 833-13325, ROM board ID# 8
 	ROM_FILL( 0x000000, 0x1000000, 0x0000 )
 ROM_END
 
-ROM_START( fvipers2 )   /* Step 2.0 */
+ROM_START( fvipers2 )   /* Step 2.0, Sega game ID# is 833-13407 FIGHTING VIPERS2, ROM board ID# 834-13408 FIGHTING VIPERS2, Security board ID# 837-13423-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20596a.17", 0x000006, 0x200000, CRC(969ab801) SHA1(a7a2aa71204d1c38a6a8c0605331fd859cb224f1) )
@@ -5704,9 +5590,9 @@ ROM_START( ecap )   /* Step 2.1 - Proto or Location test - No security dongle */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	// Hand written SEGA labels in this form:  TITLE: QQ  ROM NO: IC17  CHECK SUM: 551B  9/12-'99
-	ROM_LOAD64_WORD_SWAP( "qq.ic17", 0x000006, 0x200000, BAD_DUMP CRC(1db889e0) SHA1(b9a5f344685e1d8b5711d8ab426bb886c1008e48) ) /* Check sum: 551B, dated "9/12-'99" */
-	ROM_LOAD64_WORD_SWAP( "qq.ic18", 0x000004, 0x200000, BAD_DUMP CRC(e33da02f) SHA1(2adf9b65b2f56db7f050115d002f520159364983) ) /* Check sum: AC51, dated "9/12-'99" */
-	ROM_LOAD64_WORD_SWAP( "qq.ic19", 0x000002, 0x200000, BAD_DUMP CRC(ca02f571) SHA1(cd797d750d4ef3534225ceb83ad2840421efd192) ) /* Check sum: 9DB5, dated "9/12-'99" */
+	ROM_LOAD64_WORD_SWAP( "qq.ic17", 0x000006, 0x200000, CRC(420b5eb8) SHA1(377afd200be441ceafa078c5a98d751b993e03d8) ) /* Check sum: 551B, dated "9/12-'99" */
+	ROM_LOAD64_WORD_SWAP( "qq.ic18", 0x000004, 0x200000, CRC(17b0bb2c) SHA1(cde18b4d5438103b91806a3c5eaeb184e5c5311b) ) /* Check sum: AC51, dated "9/12-'99" */
+	ROM_LOAD64_WORD_SWAP( "qq.ic19", 0x000002, 0x200000, CRC(a646c7e5) SHA1(3a420c05fad23dd5db0a49586c876ecdaa689c09) ) /* Check sum: 9DB5, dated "9/12-'99" */
 	ROM_LOAD64_WORD_SWAP( "qq.ic20", 0x000000, 0x200000, CRC(b12fe61c) SHA1(da8bb643a2b08857265f01a909f46bef98dab9cb) ) /* Check sum: C247, dated "9/12-'99" */
 
 	// CROM0
@@ -5723,9 +5609,9 @@ ROM_START( ecap )   /* Step 2.1 - Proto or Location test - No security dongle */
 
 	// CROM3
 	// Hand written SEGA labels in this form:  TITLE: QQ  ROM NO: IC13  CHECK SUM: 6B84  9/12-'99
-	ROM_LOAD64_WORD_SWAP( "qq.ic13", 0x3800006, 0x400000, BAD_DUMP CRC(75413a76) SHA1(3c6d1c385938687f8c91c1f293e5e1e1874f5496) ) /* Check sum: 6B84, dated "9/12-'99" */
-	ROM_LOAD64_WORD_SWAP( "qq.ic14", 0x3800004, 0x400000, BAD_DUMP CRC(678b9c2c) SHA1(04168df377850fd496cbd5eb2a3effa05c7c2e7b) ) /* Check sum: 3DC1, dated "9/12-'99" */
-	ROM_LOAD64_WORD_SWAP( "qq.ic15", 0x3800002, 0x400000, BAD_DUMP CRC(6ee8af07) SHA1(1f7d01ad6094e9204d5e1e1674a0ea7b53832263) ) /* Check sum: 4988, dated "9/12-'99" */
+	ROM_LOAD64_WORD_SWAP( "qq.ic13", 0x3800006, 0x400000, CRC(bf3aca1b) SHA1(895473cfc59bcd3e0b2f377e6029348de92dc37f) ) /* Check sum: 6B84, dated "9/12-'99" */
+	ROM_LOAD64_WORD_SWAP( "qq.ic14", 0x3800004, 0x400000, CRC(b41db79b) SHA1(f3e50b5f85f7722188f21e2c71f5e827ad937ada) ) /* Check sum: 3DC1, dated "9/12-'99" */
+	ROM_LOAD64_WORD_SWAP( "qq.ic15", 0x3800002, 0x400000, CRC(91c5a2a1) SHA1(dafc89fc9ca70174651faaf34f528c90eaa24630) ) /* Check sum: 4988, dated "9/12-'99" */
 	ROM_LOAD64_WORD_SWAP( "qq.ic16", 0x3800000, 0x400000, CRC(3634f178) SHA1(ac32cfb47c8a33e5f62cc99a99d5c6bebbc6b601) ) /* Check sum: 0461, dated "9/12-'99" */
 
 	ROM_REGION( 0x2000000, "user3", 0 )  /* Video ROMs Part 1 */
@@ -5750,7 +5636,7 @@ ROM_START( ecap )   /* Step 2.1 - Proto or Location test - No security dongle */
 
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	// Hand written SEGA labels in this form:  TITLE: QQ  ROM NO: IC21  CHECK SUM: 0994  9/12-'99
-	ROM_LOAD16_WORD_SWAP( "qq.ic21", 0x000000, 0x080000, BAD_DUMP CRC(d8496bca) SHA1(3fa76e2210f04b75c048979f90055854311e306c) ) /* Check sum: 0994, dated "9/12-'99" */
+	ROM_LOAD16_WORD_SWAP( "qq.ic21", 0x000000, 0x080000, CRC(0c55ca5f) SHA1(74da1945714f8a512627124280d4302b1a7276cc) ) /* Check sum: 0994, dated "9/12-'99" */
 
 	ROM_REGION16_BE( 0x1000000, "samples", 0 )   /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-22887.22", 0x000000, 0x400000, CRC(7d04a867) SHA1(053de98105880188b4daff183710d7932617547f) )
@@ -6024,12 +5910,28 @@ void model3_state::add_cpu_166mhz(machine_config &config)
 
 void model3_state::add_base_devices(machine_config &config)
 {
-	M68000(config, m_audiocpu, 45158000/4); // SCSP Clock / 2
+	M68000(config, m_audiocpu, 45.1584_MHz_XTAL / 4); // SCSP Clock / 2
 	m_audiocpu->set_addrmap(AS_PROGRAM, &model3_state::model3_snd);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 	NVRAM(config, "backup", nvram_device::DEFAULT_ALL_1);
 	RTC72421(config, m_rtc, XTAL(32'768)); // internal oscillator
+
+	SEGA_315_5649(config, m_io, 0);
+	m_io->out_pa_callback().set(FUNC(model3_state::eeprom_w));
+	m_io->in_pb_callback().set(FUNC(model3_state::input_r));
+	m_io->in_pc_callback().set_ioport("IN2");
+	m_io->in_pd_callback().set_ioport("IN3");
+	m_io->out_pe_callback().set([this] (uint8_t data) { m_billboard->write(data); });
+	m_io->in_pg_callback().set_ioport("DSW");
+	m_io->an_port_callback<0>().set_ioport("AN0");
+	m_io->an_port_callback<1>().set_ioport("AN1");
+	m_io->an_port_callback<2>().set_ioport("AN2");
+	m_io->an_port_callback<3>().set_ioport("AN3");
+	m_io->an_port_callback<4>().set_ioport("AN4");
+	m_io->an_port_callback<5>().set_ioport("AN5");
+	m_io->an_port_callback<6>().set_ioport("AN6");
+	m_io->an_port_callback<7>().set_ioport("AN7");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -6044,16 +5946,20 @@ void model3_state::add_base_devices(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	SCSP(config, m_scsp1, 45158000/2); // 45.158 MHz XTAL
+	SCSP(config, m_scsp1, 45.1584_MHz_XTAL / 2); // 45.158 MHz XTAL
 	m_scsp1->set_addrmap(0, &model3_state::scsp1_map);
 	m_scsp1->irq_cb().set(FUNC(model3_state::scsp_irq));
 	m_scsp1->add_route(0, "lspeaker", 1.0);
 	m_scsp1->add_route(1, "rspeaker", 1.0);
 
-	scsp_device &scsp2(SCSP(config, "scsp2", 45158000/2));
+	scsp_device &scsp2(SCSP(config, "scsp2", 45.1584_MHz_XTAL / 2));
 	scsp2.set_addrmap(0, &model3_state::scsp2_map);
 	scsp2.add_route(0, "lspeaker", 1.0);
 	scsp2.add_route(1, "rspeaker", 1.0);
+
+	SEGA_BILLBOARD(config, m_billboard, 0);
+
+	config.set_default_layout(layout_segabill);
 }
 
 void model3_state::add_scsi_devices(machine_config &config)
@@ -6081,7 +5987,7 @@ void model3_state::model3_10(machine_config &config)
 	add_base_devices(config);
 	add_scsi_devices(config);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_10)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_10)
@@ -6115,6 +6021,16 @@ void model3_state::scud(machine_config &config)
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 }
 
+void model3_state::lostwsga(machine_config &config)
+{
+	model3_15(config);
+
+	// lightgun
+	m_io->serial_ch1_wr_callback().set(FUNC(model3_state::lostwsga_ser1_w));
+	m_io->serial_ch2_rd_callback().set(FUNC(model3_state::lostwsga_ser2_r));
+	m_io->serial_ch2_wr_callback().set(FUNC(model3_state::lostwsga_ser2_w));
+}
+
 void model3_state::model3_20(machine_config &config)
 {
 	add_cpu_166mhz(config);
@@ -6124,20 +6040,6 @@ void model3_state::model3_20(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state, model3_20)
 
 	M3COMM(config, "comm_board", 0);
-}
-
-uint16_t model3_state::crypt_read_callback(uint32_t addr)
-{
-	uint16_t dat = 0;
-	if (addr < 0x8000)
-	{
-		dat = m_maincpu->space().read_word((0xf0180000 + 4 * addr)); // every other word is unused in this RAM, probably 32-bit ram on 64-bit bus?
-	}
-
-//  dat = ((dat & 0xff00) >> 8) | ((dat & 0x00ff) << 8);
-//  printf("reading %04x\n", dat);
-
-	return dat;
 }
 
 void model3_state::model3_20_5881(machine_config &config)
@@ -6161,6 +6063,20 @@ void model3_state::model3_21_5881(machine_config &config)
 {
 	model3_21(config);
 	add_crypt_devices(config);
+}
+
+uint16_t model3_state::crypt_read_callback(uint32_t addr)
+{
+	uint16_t dat = 0;
+	if (addr < 0x8000)
+	{
+		dat = m_maincpu->space().read_word((0xf0180000 + 4 * addr)); // every other word is unused in this RAM, probably 32-bit ram on 64-bit bus?
+	}
+
+//  dat = ((dat & 0xff00) >> 8) | ((dat & 0x00ff) << 8);
+//  printf("reading %04x\n", dat);
+
+	return dat;
 }
 
 void model3_state::interleave_vroms()
@@ -6198,23 +6114,23 @@ void model3_state::init_model3_10()
 {
 	interleave_vroms();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
 
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc105_addr_r),this), write64_delegate(FUNC(model3_state::mpc105_addr_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc105_data_r),this), write64_delegate(FUNC(model3_state::mpc105_data_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc105_reg_r),this), write64_delegate(FUNC(model3_state::mpc105_reg_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(*this, FUNC(model3_state::mpc105_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc105_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(*this, FUNC(model3_state::mpc105_data_r)), write64_delegate(*this, FUNC(model3_state::mpc105_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(*this, FUNC(model3_state::mpc105_reg_r)), write64_delegate(*this, FUNC(model3_state::mpc105_reg_w)));
 }
 
 void model3_state::init_model3_15()
 {
 	interleave_vroms();
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1");
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc105_addr_r),this), write64_delegate(FUNC(model3_state::mpc105_addr_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc105_data_r),this), write64_delegate(FUNC(model3_state::mpc105_data_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc105_reg_r),this), write64_delegate(FUNC(model3_state::mpc105_reg_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(*this, FUNC(model3_state::mpc105_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc105_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(*this, FUNC(model3_state::mpc105_data_r)), write64_delegate(*this, FUNC(model3_state::mpc105_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(*this, FUNC(model3_state::mpc105_reg_r)), write64_delegate(*this, FUNC(model3_state::mpc105_reg_w)));
 }
 
 void model3_state::init_model3_20()
@@ -6222,11 +6138,11 @@ void model3_state::init_model3_20()
 	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc2000000, 0xc20000ff, read64_delegate(FUNC(model3_state::real3d_dma_r),this), write64_delegate(FUNC(model3_state::real3d_dma_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc2000000, 0xc20000ff, read64_delegate(*this, FUNC(model3_state::real3d_dma_r)), write64_delegate(*this, FUNC(model3_state::real3d_dma_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),this), write64_delegate(FUNC(model3_state::mpc106_reg_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64_delegate(*this, FUNC(model3_state::mpc106_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(*this, FUNC(model3_state::mpc106_reg_r)), write64_delegate(*this, FUNC(model3_state::mpc106_reg_w)));
 }
 
 void model3_state::init_lostwsga()
@@ -6234,7 +6150,7 @@ void model3_state::init_lostwsga()
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 
 	init_model3_15();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
 
 	rom[0x7374f0/4] = 0x38840004;       /* This seems to be an actual bug in the original code */
 }
@@ -6243,7 +6159,7 @@ void model3_state::init_scud()
 {
 	init_model3_15();
 	/* TODO: network device at 0xC0000000 - FF */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
 
 //  uint32_t *rom = (uint32_t*)memregion("user1")->base();
 //  rom[(0x799de8^4)/4] = 0x00050208;       // secret debug menu
@@ -6252,20 +6168,20 @@ void model3_state::init_scud()
 void model3_state::init_scudplus()
 {
 	init_model3_15();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
 }
 
 void model3_state::init_scudplusa()
 {
 	init_model3_15();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
 }
 
 void model3_state::init_lemans24()
 {
 	init_model3_15();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
 
 //  rom[(0x73fe38^4)/4] = 0x38840004;       /* This seems to be an actual bug in the original code */
 }
@@ -6291,13 +6207,13 @@ void model3_state::init_vs215()
 	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),this), write64_delegate(FUNC(model3_state::mpc106_reg_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64_delegate(*this, FUNC(model3_state::mpc106_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64_delegate(*this, FUNC(model3_state::mpc106_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(*this, FUNC(model3_state::mpc106_reg_r)), write64_delegate(*this, FUNC(model3_state::mpc106_reg_w)));
 }
 
 void model3_state::init_vs29815()
@@ -6312,13 +6228,13 @@ void model3_state::init_vs29815()
 	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),this), write64_delegate(FUNC(model3_state::mpc106_reg_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64_delegate(*this, FUNC(model3_state::mpc106_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64_delegate(*this, FUNC(model3_state::mpc106_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(*this, FUNC(model3_state::mpc106_reg_r)), write64_delegate(*this, FUNC(model3_state::mpc106_reg_w)));
 }
 
 void model3_state::init_bass()
@@ -6328,13 +6244,13 @@ void model3_state::init_bass()
 	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(FUNC(model3_state::mpc106_addr_r),this), write64_delegate(FUNC(model3_state::mpc106_addr_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(FUNC(model3_state::mpc106_data_r),this), write64_delegate(FUNC(model3_state::mpc106_data_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),this), write64_delegate(FUNC(model3_state::mpc106_reg_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64_delegate(*this, FUNC(model3_state::mpc106_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64_delegate(*this, FUNC(model3_state::mpc106_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(*this, FUNC(model3_state::mpc106_reg_r)), write64_delegate(*this, FUNC(model3_state::mpc106_reg_w)));
 }
 
 void model3_state::init_getbass()
@@ -6342,11 +6258,11 @@ void model3_state::init_getbass()
 	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(*this, FUNC(model3_state::scsi_r)), write64_delegate(*this, FUNC(model3_state::scsi_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc105_addr_r),this), write64_delegate(FUNC(model3_state::mpc105_addr_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(FUNC(model3_state::mpc105_data_r),this), write64_delegate(FUNC(model3_state::mpc105_data_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc105_reg_r),this), write64_delegate(FUNC(model3_state::mpc105_reg_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(*this, FUNC(model3_state::mpc105_addr_r)), write64_delegate(*this, FUNC(model3_state::mpc105_addr_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64_delegate(*this, FUNC(model3_state::mpc105_data_r)), write64_delegate(*this, FUNC(model3_state::mpc105_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(*this, FUNC(model3_state::mpc105_reg_r)), write64_delegate(*this, FUNC(model3_state::mpc105_reg_w)));
 }
 
 void model3_state::init_vs2()
@@ -6437,8 +6353,8 @@ void model3_state::init_daytona2()
 //  uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64_delegate(FUNC(model3_state::daytona2_rombank_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, "bank2" );
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64_delegate(*this, FUNC(model3_state::daytona2_rombank_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, "bank2");
 
 	//rom[(0x68468c^4)/4] = 0x60000000;
 	//rom[(0x6063c4^4)/4] = 0x60000000;
@@ -6451,8 +6367,8 @@ void model3_state::init_dayto2pe()
 //  uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64_delegate(FUNC(model3_state::daytona2_rombank_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, "bank2" );
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64_delegate(*this, FUNC(model3_state::daytona2_rombank_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, "bank2");
 
 //  rom[(0x606784^4)/4] = 0x60000000;
 //  rom[(0x69a3fc^4)/4] = 0x60000000;       // jump to encrypted code
@@ -6545,8 +6461,8 @@ GAME( 1996, scudj,       scud,      scud, scud,     model3_state,     init_scud,
 GAME( 1996, scuda,       scud,      scud, scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race Twin (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, scudplus,    scud,      scud, scud,     model3_state, init_scudplus, ROT0, "Sega", "Scud Race Plus (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, scudplusa,   scud,      scud, scud,     model3_state,init_scudplusa, ROT0, "Sega", "Scud Race Plus", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, lostwsga,       0, model3_15, lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, lostwsgp,lostwsga, model3_15, lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World (location test)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, lostwsga,       0,  lostwsga, lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, lostwsgp,lostwsga,  lostwsga, lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World (location test)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, vs215,        vs2, model3_15, model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Export, USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, vs215o,       vs2, model3_15, model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, lemans24,       0, model3_15, scud,     model3_state, init_lemans24, ROT0, "Sega", "Le Mans 24 (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

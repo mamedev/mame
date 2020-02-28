@@ -19,11 +19,6 @@ class tms0270_cpu_device : public tms0980_cpu_device
 public:
 	tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// TMS0270 was designed to interface with TMS5100, set it up at driver level
-	auto read_ctl() { return m_read_ctl.bind(); }
-	auto write_ctl() { return m_write_ctl.bind(); }
-	auto write_pdc() { return m_write_pdc.bind(); }
-
 protected:
 	// overrides
 	virtual void device_start() override;
@@ -50,10 +45,6 @@ private:
 	u8   m_o_latch_low;
 	u8   m_o_latch;
 	u8   m_o_latch_prev;
-
-	devcb_read8 m_read_ctl;
-	devcb_write8 m_write_ctl;
-	devcb_write_line m_write_pdc;
 };
 
 

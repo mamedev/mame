@@ -27,6 +27,8 @@ public:
 	uint8_t irq_vector() const { return m_ivr; }
 	uint8_t arbitrate(uint8_t level) const { return (irq_level() == level) ? (m_mcrl & REG_MCRL_ARBLV) : 0; }
 
+	void module_reset();
+
 protected:
 	m68340_cpu_device *m_cpu;
 

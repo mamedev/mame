@@ -19,6 +19,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class metro_state : public driver_device
 {
@@ -70,6 +71,7 @@ public:
 	void vmetal(machine_config &config);
 	void daitorid(machine_config &config);
 	void puzzli(machine_config &config);
+	void puzzlia(machine_config &config);
 	void pangpoms(machine_config &config);
 	void dokyusp(machine_config &config);
 	void dokyusei(machine_config &config);
@@ -95,7 +97,7 @@ public:
 	void init_metro();
 	void init_lastfortg();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(custom_soundstatus_r);
+	DECLARE_READ_LINE_MEMBER(custom_soundstatus_r);
 
 private:
 	enum
@@ -106,6 +108,7 @@ private:
 
 	u8 irq_cause_r(offs_t offset);
 	void irq_cause_w(offs_t offset, u8 data);
+	uint8_t irq_vector_r(offs_t offset);
 	DECLARE_WRITE16_MEMBER(mouja_irq_timer_ctrl_w);
 	DECLARE_WRITE8_MEMBER(soundlatch_w);
 	DECLARE_READ8_MEMBER(soundstatus_r);
@@ -143,13 +146,12 @@ private:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_gstrik2);
 	DECLARE_VIDEO_START(blzntrnd);
 	DECLARE_VIDEO_START(gstrik2);
-	uint32_t screen_update_psac_vdp2_mix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_psac_vdp2_mix(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(periodic_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(bangball_scanline);
 	DECLARE_WRITE_LINE_MEMBER(karatour_vblank_irq);
 	DECLARE_WRITE_LINE_MEMBER(puzzlet_vblank_irq);
-	IRQ_CALLBACK_MEMBER(irq_callback);
 	DECLARE_READ_LINE_MEMBER(rxd_r);
 
 	void balcube_map(address_map &map);
@@ -158,6 +160,7 @@ private:
 	void blzntrnd_map(address_map &map);
 	void blzntrnd_sound_io_map(address_map &map);
 	void blzntrnd_sound_map(address_map &map);
+	void cpu_space_map(address_map &map);
 	void daitoa_map(address_map &map);
 	void daitorid_map(address_map &map);
 	void dharma_map(address_map &map);
@@ -238,9 +241,6 @@ private:
 	void update_irq_state();
 	void metro_common();
 	void gakusai_oki_bank_set();
-
-	// blazing tornado
-	bitmap_ind16 m_vdp_bitmap;
 };
 
 #endif // MAME_INCLUDES_METRO_H

@@ -99,7 +99,7 @@ READ8_MEMBER( zexall_state::output_ack_r )
 	// spit out the byte in out_byte if out_req is not equal to out_req_last
 	if (m_out_req != m_out_req_last)
 	{
-		m_terminal->write(space, 0, m_out_data);
+		m_terminal->write(m_out_data);
 		m_out_req_last = m_out_req;
 		m_out_ack++;
 	}

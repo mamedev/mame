@@ -369,25 +369,25 @@ void vc4000_state::machine_start()
 		// extra handler
 		switch (m_cart->get_type())
 		{
-			case VC4000_STD:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x07ff, read8_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
-				break;
-			case VC4000_ROM4K:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
-				break;
-			case VC4000_RAM1K:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x15ff, read8_delegate(FUNC(vc4000_cart_slot_device::read_ram),(vc4000_cart_slot_device*)m_cart), write8_delegate(FUNC(vc4000_cart_slot_device::write_ram),(vc4000_cart_slot_device*)m_cart));
-				break;
-			case VC4000_CHESS2:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x15ff, read8_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1800, 0x1bff, read8_delegate(FUNC(vc4000_cart_slot_device::read_ram),(vc4000_cart_slot_device*)m_cart), write8_delegate(FUNC(vc4000_cart_slot_device::write_ram),(vc4000_cart_slot_device*)m_cart));
-				break;
-			// undumped Radofin Hobby Module
-//          case VC4000_HOBBY:
-//              m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x07ff, read8_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
-//              m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0800, 0x0fff, read8_delegate(FUNC(vc4000_cart_slot_device::read_ram),(vc4000_cart_slot_device*)m_cart), write8_delegate(FUNC(vc4000_cart_slot_device::write_ram),(vc4000_cart_slot_device*)m_cart));
-//              break;
+		case VC4000_STD:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x07ff, read8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::read_rom)));
+			break;
+		case VC4000_ROM4K:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::read_rom)));
+			break;
+		case VC4000_RAM1K:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::read_rom)));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x15ff, read8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::read_ram)), write8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::write_ram)));
+			break;
+		case VC4000_CHESS2:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x15ff, read8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::read_rom)));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1800, 0x1bff, read8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::read_ram)), write8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::write_ram)));
+			break;
+		// undumped Radofin Hobby Module
+//      case VC4000_HOBBY:
+//          m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x07ff, read8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::read_rom)));
+//          m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0800, 0x0fff, read8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::read_ram)), write8sm_delegate(*m_cart, FUNC(vc4000_cart_slot_device::write_ram)));
+//          break;
 		}
 
 		m_cart->save_ram();
@@ -395,7 +395,7 @@ void vc4000_state::machine_start()
 }
 
 
-QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
+QUICKLOAD_LOAD_MEMBER(vc4000_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
@@ -529,7 +529,7 @@ static void vc4000_cart(device_slot_interface &device)
 void vc4000_state::vc4000(machine_config &config)
 {
 	/* basic machine hardware */
-//  MCFG_DEVICE_ADD("maincpu", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
+//  S2650(config, m_maincpu, 865000);        /* 3550000/4, 3580000/3, 4430000/3 */
 	S2650(config, m_maincpu, 3546875/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vc4000_state::vc4000_mem);
 	m_maincpu->sense_handler().set(FUNC(vc4000_state::vc4000_vsync_r));
@@ -550,8 +550,7 @@ void vc4000_state::vc4000(machine_config &config)
 	VC4000_SND(config, m_custom, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(vc4000_state, vc4000), this), "pgm,tvc", 0);
+	QUICKLOAD(config, "quickload", "pgm,tvc").set_load_callback(FUNC(vc4000_state::quickload_cb));
 
 	/* cartridge */
 	VC4000_CART_SLOT(config, "cartslot", vc4000_cart, nullptr);
@@ -595,8 +594,8 @@ void vc4000_state::elektor(machine_config &config)
 {
 	vc4000(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vc4000_state::elektor_mem);
-	CASSETTE(config, "cassette");
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	CASSETTE(config, m_cassette);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 

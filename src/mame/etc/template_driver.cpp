@@ -1,15 +1,14 @@
-// license:BSD-3-Clause
+// license:<license>
 // copyright-holders:<author_name>
 /***************************************************************************
 
-Template for skeleton drivers
+<template_header>
 
 ***************************************************************************/
 
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-//#include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -22,6 +21,7 @@ public:
 	xxx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
 	{
 	}
 
@@ -37,13 +37,14 @@ protected:
 private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void xxx_palette(palette_device *palette) const;
+	void xxx_palette(palette_device &palette) const;
 
 	void xxx_io(address_map &map);
 	void xxx_map(address_map &map);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };
 
 void xxx_state::video_start()
@@ -159,22 +160,16 @@ void xxx_state::xxx(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_screen_update(FUNC(xxx_state::screen_update));
-//  screen.set_size(32*8, 32*8);
-//  screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 	screen.set_raw(MAIN_CLOCK/2, 442, 0, 320, 264, 0, 240);          /* generic NTSC video timing at 320x240 */
-//  screen.set_raw(XTAL(12'000'000)/2, 384, 0, 256, 264, 16, 240);  /* generic NTSC video timing at 256x224 */
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_xxx);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_xxx);
 
-	PALETTE(config, "palette", FUNC(xxx_state::xxx_palette), 8);
+	PALETTE(config, m_palette, FUNC(xxx_state::xxx_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-//  AY8910(config, "aysnd", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
 
@@ -184,10 +179,9 @@ void xxx_state::xxx(machine_config &config)
 
 ***************************************************************************/
 
-ROM_START( xxx )
+<rom_load>
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 )
-ROM_END
 
 // See src/emu/gamedrv.h for details
 // For a game:

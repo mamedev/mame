@@ -9,7 +9,7 @@
 		<publisher>Vine Micros</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="Addcomm-1.00.rom" size="8192" crc="10324741" sha1="e8d5007b5c0b03dba1f756f3f15c72e30ea39cd7" offset="0"/>
+				<rom name="Addcomm-1.00.rom" size="8192" crc="10324741" sha1="e8d5007b5c0b03dba1f756f3f15c72e30ea39cd7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20,7 +20,7 @@
 		<publisher>Vine Micros</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="Addcomm-1.10.rom" size="8192" crc="69ff0fdf" sha1="2f7c69aa532a76e6e7da150b2ad7dd0c588e1979" offset="0"/>
+				<rom name="Addcomm-1.10.rom" size="8192" crc="69ff0fdf" sha1="2f7c69aa532a76e6e7da150b2ad7dd0c588e1979"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31,7 +31,7 @@
 		<publisher>Vine Micros</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="Addcomm-1.20.rom" size="8192" crc="57567fa9" sha1="a6fc77008ba067f7749f8b90e40d9411a7f335ff" offset="0"/>
+				<rom name="Addcomm-1.20.rom" size="8192" crc="57567fa9" sha1="a6fc77008ba067f7749f8b90e40d9411a7f335ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@
 		<publisher>Vine Micros</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="Addcomm-1.30.rom" size="8192" crc="185c4a87" sha1="d04e8b6d15d188ea3136fa39fd4fde5e6eef3fb2" offset="0"/>
+				<rom name="Addcomm-1.30.rom" size="8192" crc="185c4a87" sha1="d04e8b6d15d188ea3136fa39fd4fde5e6eef3fb2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="32768">
-				<rom name="AdvancedBASICEditorPlus-1.00.rom" size="32768" crc="7e3a119a" sha1="27e299a9f265415f347c028d14d8fb434c636d03" offset="0"/>
+				<rom name="AdvancedBASICEditorPlus-1.00.rom" size="32768" crc="7e3a119a" sha1="27e299a9f265415f347c028d14d8fb434c636d03"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +64,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedControlPanel-1.00.rom" size="16384" crc="cb3ce1b2" sha1="994f723928935a4da2709bdc4634ef74dee4e66c" offset="0"/>
+				<rom name="AdvancedControlPanel-1.00.rom" size="16384" crc="cb3ce1b2" sha1="994f723928935a4da2709bdc4634ef74dee4e66c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -75,7 +75,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedControlPanel-1.02.rom" size="16384" crc="cba57ba9" sha1="bd57776cf15861849919abaf56be587e6e5f5979" offset="0"/>
+				<rom name="AdvancedControlPanel-1.02.rom" size="16384" crc="cba57ba9" sha1="bd57776cf15861849919abaf56be587e6e5f5979"/>
 			</dataarea>
 		</part>
 	</software>
@@ -86,7 +86,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedControlPanel-1.03.rom" size="16384" crc="61b95aaf" sha1="52840be22f3095a6acc1a70331b87569d39e18d3" offset="0"/>
+				<rom name="AdvancedControlPanel-1.03.rom" size="16384" crc="61b95aaf" sha1="52840be22f3095a6acc1a70331b87569d39e18d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -97,7 +97,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedControlPanel-1.04.rom" size="16384" crc="1ea4e844" sha1="a9c7c43119eae0d411af2823df005c3b149f1eab" offset="0"/>
+				<rom name="AdvancedControlPanel-1.04.rom" size="16384" crc="1ea4e844" sha1="a9c7c43119eae0d411af2823df005c3b149f1eab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -108,7 +108,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedControlPanel-3.01.rom" size="16384" crc="23ed10e2" sha1="0c627a19cfd6d693c6140b11ffc34c9e00d032a0" offset="0"/>
+				<rom name="AdvancedControlPanel-3.01.rom" size="16384" crc="23ed10e2" sha1="0c627a19cfd6d693c6140b11ffc34c9e00d032a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -119,7 +119,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscInvestigator-1.00.rom" size="16384" crc="acfe8428" sha1="2d32d9d972760dc3aaaf429917cecc9b8af24ca3" offset="0"/>
+				<rom name="AdvancedDiscInvestigator-1.00.rom" size="16384" crc="acfe8428" sha1="2d32d9d972760dc3aaaf429917cecc9b8af24ca3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -130,7 +130,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscInvestigator-1.00a.rom" size="16384" crc="87e7242f" sha1="7e18a6619fe8af2944659ce51bc4396aeaf9b46b" offset="0"/>
+				<rom name="AdvancedDiscInvestigator-1.00a.rom" size="16384" crc="87e7242f" sha1="7e18a6619fe8af2944659ce51bc4396aeaf9b46b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -141,7 +141,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscInvestigator-1.10.rom" size="16384" crc="9cad0cb1" sha1="78af376360616708149f64a4dff11207a2990b7f" offset="0"/>
+				<rom name="AdvancedDiscInvestigator-1.10.rom" size="16384" crc="9cad0cb1" sha1="78af376360616708149f64a4dff11207a2990b7f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -152,7 +152,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscInvestigator-1.20.rom" size="16384" crc="41ce3b44" sha1="748df4937683a361669fed3f528c467d27a8f111" offset="0"/>
+				<rom name="AdvancedDiscInvestigator-1.20.rom" size="16384" crc="41ce3b44" sha1="748df4937683a361669fed3f528c467d27a8f111"/>
 			</dataarea>
 		</part>
 	</software>
@@ -163,7 +163,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscInvestigator-1.20a.rom" size="16384" crc="cb41ec36" sha1="59f6a5e75b6684b14cee56c20452999bb8f1c9c7" offset="0"/>
+				<rom name="AdvancedDiscInvestigator-1.20a.rom" size="16384" crc="cb41ec36" sha1="59f6a5e75b6684b14cee56c20452999bb8f1c9c7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -174,7 +174,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscInvestigator-1.22.rom" size="16384" crc="68650e7b" sha1="b2fc4e8278997d8084282424b1c1e18d07a28c99" offset="0"/>
+				<rom name="AdvancedDiscInvestigator-1.22.rom" size="16384" crc="68650e7b" sha1="b2fc4e8278997d8084282424b1c1e18d07a28c99"/>
 			</dataarea>
 		</part>
 	</software>
@@ -185,7 +185,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscInvestigator-2.00.rom" size="16384" crc="78d06e56" sha1="a8dfa206abea36ce791c0d3dfa15beabfbbfb9e7" offset="0"/>
+				<rom name="AdvancedDiscInvestigator-2.00.rom" size="16384" crc="78d06e56" sha1="a8dfa206abea36ce791c0d3dfa15beabfbbfb9e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -196,7 +196,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscToolkit-1.20.rom" size="16384" crc="6b6361e0" sha1="88951446676d592517c9b515b76ace4126aff87a" offset="0"/>
+				<rom name="AdvancedDiscToolkit-1.20.rom" size="16384" crc="6b6361e0" sha1="88951446676d592517c9b515b76ace4126aff87a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -207,7 +207,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscToolkit-1.40.rom" size="16384" crc="9dcf9f63" sha1="1a91f1e82c836825ed4256db93930ce3d54c65d7" offset="0"/>
+				<rom name="AdvancedDiscToolkit-1.40.rom" size="16384" crc="9dcf9f63" sha1="1a91f1e82c836825ed4256db93930ce3d54c65d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -218,7 +218,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscToolkit-1.50.rom" size="16384" crc="974eeaaf" sha1="7ae1a6a933b6ba8ea5284fa358bba8913da99d4e" offset="0"/>
+				<rom name="AdvancedDiscToolkit-1.50.rom" size="16384" crc="974eeaaf" sha1="7ae1a6a933b6ba8ea5284fa358bba8913da99d4e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -229,7 +229,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscToolkit-1.60.rom" size="16384" crc="23f253b1" sha1="921be90ff06635744f9c0d717343b46977a4dff6" offset="0"/>
+				<rom name="AdvancedDiscToolkit-1.60.rom" size="16384" crc="23f253b1" sha1="921be90ff06635744f9c0d717343b46977a4dff6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -240,7 +240,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscToolkit-1.72.rom" size="16384" crc="6b2f5169" sha1="e3ea80f6ce3e8c1a79090634e5d6279343ffc7cb" offset="0"/>
+				<rom name="AdvancedDiscToolkit-1.72.rom" size="16384" crc="6b2f5169" sha1="e3ea80f6ce3e8c1a79090634e5d6279343ffc7cb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -251,7 +251,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16383">
-				<rom name="AdvancedDiscToolkit-1.73.rom" size="16383" crc="0b66d995" sha1="70080be496732a192ef59ae716fb14748645b7f7" offset="0"/>
+				<rom name="AdvancedDiscToolkit-1.73.rom" size="16383" crc="0b66d995" sha1="70080be496732a192ef59ae716fb14748645b7f7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -262,7 +262,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscToolkit-1.74.rom" size="16384" crc="8a410218" sha1="c7ec2ec4948bbd3207c2074789e50667ae13fba0" offset="0"/>
+				<rom name="AdvancedDiscToolkit-1.74.rom" size="16384" crc="8a410218" sha1="c7ec2ec4948bbd3207c2074789e50667ae13fba0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -273,7 +273,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscToolkit-1.75.rom" size="16384" crc="3a9ee778" sha1="e2467ce5e3a2af8bef9e1209efdce8ffa0a0e687" offset="0"/>
+				<rom name="AdvancedDiscToolkit-1.75.rom" size="16384" crc="3a9ee778" sha1="e2467ce5e3a2af8bef9e1209efdce8ffa0a0e687"/>
 			</dataarea>
 		</part>
 	</software>
@@ -284,7 +284,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscToolkit-1.76.rom" size="16384" crc="41f8cb65" sha1="1daf6c54ddee50a26bcfa9fbffc3b4623d790a93" offset="0"/>
+				<rom name="AdvancedDiscToolkit-1.76.rom" size="16384" crc="41f8cb65" sha1="1daf6c54ddee50a26bcfa9fbffc3b4623d790a93"/>
 			</dataarea>
 		</part>
 	</software>
@@ -295,7 +295,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscToolkit-1.77crack.rom" size="16384" crc="f26bbdc3" sha1="48079eb13fb10a035a6f97fb96195dd734a366e2" offset="0"/>
+				<rom name="AdvancedDiscToolkit-1.77crack.rom" size="16384" crc="f26bbdc3" sha1="48079eb13fb10a035a6f97fb96195dd734a366e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -306,7 +306,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscToolkit-1.78.rom" size="16384" crc="a75ac03f" sha1="9324408a9eaa09159c8f0d445af08d7a70099d4c" offset="0"/>
+				<rom name="AdvancedDiscToolkit-1.78.rom" size="16384" crc="a75ac03f" sha1="9324408a9eaa09159c8f0d445af08d7a70099d4c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -317,7 +317,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedDiscToolkit-2.00.rom" size="16384" crc="58280631" sha1="f0d4cf0978ae397106370c187002ab95e2a592fc" offset="0"/>
+				<rom name="AdvancedDiscToolkit-2.00.rom" size="16384" crc="58280631" sha1="f0d4cf0978ae397106370c187002ab95e2a592fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -328,7 +328,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedEPROMProgrammer-1.00.rom" size="16384" crc="953598f3" sha1="3217d8af2049c2e8160c82466ee02eaa238a2fba" offset="0"/>
+				<rom name="AdvancedEPROMProgrammer-1.00.rom" size="16384" crc="953598f3" sha1="3217d8af2049c2e8160c82466ee02eaa238a2fba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -339,7 +339,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedFileManager-1.06.rom" size="16384" crc="0ce0d962" sha1="1710865ed4b6d8bab9c8645082debf3a7bf21602" offset="0"/>
+				<rom name="AdvancedFileManager-1.06.rom" size="16384" crc="0ce0d962" sha1="1710865ed4b6d8bab9c8645082debf3a7bf21602"/>
 			</dataarea>
 		</part>
 	</software>
@@ -350,7 +350,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedFileManager-1.07.rom" size="16384" crc="802a05f3" sha1="5b897bea01eb8fc6b0d19b5f4f382627e3438097" offset="0"/>
+				<rom name="AdvancedFileManager-1.07.rom" size="16384" crc="802a05f3" sha1="5b897bea01eb8fc6b0d19b5f4f382627e3438097"/>
 			</dataarea>
 		</part>
 	</software>
@@ -361,7 +361,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedFileManager-1.09.rom" size="16384" crc="64d7ff45" sha1="5306205a719d95a4bbad6ddee4fdcf37014821a8" offset="0"/>
+				<rom name="AdvancedFileManager-1.09.rom" size="16384" crc="64d7ff45" sha1="5306205a719d95a4bbad6ddee4fdcf37014821a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -372,7 +372,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedROMManager-1.00.rom" size="16384" crc="e7e2a294" sha1="e101477ac60f626c195a6b6fc52cd56d9bb26a64" offset="0"/>
+				<rom name="AdvancedROMManager-1.00.rom" size="16384" crc="e7e2a294" sha1="e101477ac60f626c195a6b6fc52cd56d9bb26a64"/>
 			</dataarea>
 		</part>
 	</software>
@@ -383,7 +383,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedROMManager-1.10.rom" size="16384" crc="cece0758" sha1="02898c0bea973aa2d4af8f6fad8fef48a3ecb618" offset="0"/>
+				<rom name="AdvancedROMManager-1.10.rom" size="16384" crc="cece0758" sha1="02898c0bea973aa2d4af8f6fad8fef48a3ecb618"/>
 			</dataarea>
 		</part>
 	</software>
@@ -394,7 +394,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedROMManager-1.12.rom" size="16384" crc="de826749" sha1="e1b8847c4c1acfcef0b476cb78e9ee7cd2f74807" offset="0"/>
+				<rom name="AdvancedROMManager-1.12.rom" size="16384" crc="de826749" sha1="e1b8847c4c1acfcef0b476cb78e9ee7cd2f74807"/>
 			</dataarea>
 		</part>
 	</software>
@@ -405,7 +405,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="AdvancedROMManager-1.13.rom" size="8192" crc="71827a15" sha1="a16b1d18ae166b250e449dbc70b801ed471578c9" offset="0"/>
+				<rom name="AdvancedROMManager-1.13.rom" size="8192" crc="71827a15" sha1="a16b1d18ae166b250e449dbc70b801ed471578c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -416,7 +416,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="ArtROM-2.1.rom" size="16384" crc="02d28676" sha1="ef358b9d133f12036672f87e8a08ca285b68066e" offset="0"/>
+				<rom name="ArtROM-2.1.rom" size="16384" crc="02d28676" sha1="ef358b9d133f12036672f87e8a08ca285b68066e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -427,7 +427,7 @@
 		<publisher>Altra</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AltraBasicEdDEMO-1.60.rom" size="16384" crc="beff480a" sha1="17c6ba07510bd0fd58fdb9d4beb708e24da954c6" offset="0"/>
+				<rom name="AltraBasicEdDEMO-1.60.rom" size="16384" crc="beff480a" sha1="17c6ba07510bd0fd58fdb9d4beb708e24da954c6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -438,7 +438,7 @@
 		<publisher>Ian Copestake Software</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="32768">
-				<rom name="BASICEditorToolkit-1.00.rom" size="32768" crc="9dcf064e" sha1="80fb0c735a294b57e3fcc92614063a4ce319b41b" offset="0"/>
+				<rom name="BASICEditorToolkit-1.00.rom" size="32768" crc="9dcf064e" sha1="80fb0c735a294b57e3fcc92614063a4ce319b41b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -449,7 +449,7 @@
 		<publisher>PACE</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Commstar-E1.12.rom" size="16384" crc="61a1d49e" sha1="3776c972789cebacd1f92b6f3aa01c8b2c8bd505" offset="0"/>
+				<rom name="Commstar-E1.12.rom" size="16384" crc="61a1d49e" sha1="3776c972789cebacd1f92b6f3aa01c8b2c8bd505"/>
 			</dataarea>
 		</part>
 	</software>
@@ -462,7 +462,7 @@
 		<info name="usage" value="Requires E2P-6502" />
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="PMSE2P-2.4.rom" size="8192" crc="05332a50" sha1="35c7dbf6119ab9770df4765d08382e3af7345aa9" offset="0" />
+				<rom name="PMSE2P-2.4.rom" size="8192" crc="05332a50" sha1="35c7dbf6119ab9770df4765d08382e3af7345aa9" />
 			</dataarea>
 		</part>
 	</software>
@@ -473,7 +473,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="ElkMan-1.4.rom" size="16384" crc="762e4ee6" sha1="9bd1c016aa0473183b5a137d6564423f3e3ff0f9" offset="0"/>
+				<rom name="ElkMan-1.4.rom" size="16384" crc="762e4ee6" sha1="9bd1c016aa0473183b5a137d6564423f3e3ff0f9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -484,7 +484,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="ElkMan-1.5.rom" size="8192" crc="2dad12b0" sha1="c834a5abc94ce7f2b690496296cc5d13852797a4" offset="0"/>
+				<rom name="ElkMan-1.5.rom" size="8192" crc="2dad12b0" sha1="c834a5abc94ce7f2b690496296cc5d13852797a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -495,7 +495,7 @@
 		<publisher>Morley Electronics</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="ElectronEPROMProgrammer-1.01.rom" size="8192" crc="465f1899" sha1="f3aa79d423d924a7b7755b4dfb038ca9764353d8" offset="0"/>
+				<rom name="ElectronEPROMProgrammer-1.01.rom" size="8192" crc="465f1899" sha1="f3aa79d423d924a7b7755b4dfb038ca9764353d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -506,7 +506,7 @@
 		<publisher>Vine Micros</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="Matrix-1.01.rom" size="8192" crc="79beb2e0" sha1="3759f55e9f39b83eb96cb95ea4466ab72baca57f" offset="0"/>
+				<rom name="Matrix-1.01.rom" size="8192" crc="79beb2e0" sha1="3759f55e9f39b83eb96cb95ea4466ab72baca57f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -517,7 +517,7 @@
 		<publisher>JAFA Systems</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Mode7Simulator-1.1.rom" size="16384" crc="3d4bbd16" sha1="22755882e39a6b5f92b9e29fb29d87cf4053c8e8" offset="0"/>
+				<rom name="Mode7Simulator-1.1.rom" size="16384" crc="3d4bbd16" sha1="22755882e39a6b5f92b9e29fb29d87cf4053c8e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -529,7 +529,7 @@
 		<info name="usage" value="*FORTH-83" />
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Multi-Forth83.rom" size="16384" crc="c7de445f" sha1="9d26aecf96608504d091628ce1f15fb045e2874a" offset="0"/>
+				<rom name="Multi-Forth83.rom" size="16384" crc="c7de445f" sha1="9d26aecf96608504d091628ce1f15fb045e2874a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -540,7 +540,7 @@
 		<publisher>Project Expansions</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="PluscomPlus-2.00.rom" size="16384" crc="5cb19328" sha1="cf01c3da5e23b7d39dd2965eb08c51e203ff69f0" offset="0"/>
+				<rom name="PluscomPlus-2.00.rom" size="16384" crc="5cb19328" sha1="cf01c3da5e23b7d39dd2965eb08c51e203ff69f0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -551,7 +551,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="PrinterROM-1.00.rom" size="8192" crc="f9b5d906" sha1="a38e8874f6aba199d7ab36fd7ddb25f84f1a8f12" offset="0"/>
+				<rom name="PrinterROM-1.00.rom" size="8192" crc="f9b5d906" sha1="a38e8874f6aba199d7ab36fd7ddb25f84f1a8f12"/>
 			</dataarea>
 		</part>
 	</software>
@@ -562,7 +562,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="PrinterROM-1.00-ROMBOX.rom" size="8192" crc="a56a0d37" sha1="e4500a3dbf95972fce99c2f135852071ed363ef7" offset="0"/>
+				<rom name="PrinterROM-1.00-ROMBOX.rom" size="8192" crc="a56a0d37" sha1="e4500a3dbf95972fce99c2f135852071ed363ef7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -574,7 +574,7 @@
 		<info name="usage" value="*ROM then CHAIN&quot;&quot;" />
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="PDG.rom" size="16384" crc="6fc48a1a" sha1="a83a71f07620db8ba942d7fda8571f1b6d271d2b" offset="0"/>
+				<rom name="PDG.rom" size="16384" crc="6fc48a1a" sha1="a83a71f07620db8ba942d7fda8571f1b6d271d2b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -585,7 +585,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="ElkRAMTest.rom" size="8192" crc="5ce25db7" sha1="be519328af9d07708fbbddbdbd5741c416ce18ce" offset="0"/>
+				<rom name="ElkRAMTest.rom" size="8192" crc="5ce25db7" sha1="be519328af9d07708fbbddbdbd5741c416ce18ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -596,7 +596,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="Stargraph-2.01.rom" size="8192" crc="07c9169a" sha1="bd332cb921f5af6319a5a6ec65e001b86b67aa04" offset="0"/>
+				<rom name="Stargraph-2.01.rom" size="8192" crc="07c9169a" sha1="bd332cb921f5af6319a5a6ec65e001b86b67aa04"/>
 			</dataarea>
 		</part>
 	</software>
@@ -607,7 +607,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="Stargraph-3.01.rom" size="8192" crc="dffedeb1" sha1="5e8496212fb734b8e9989092e60eb37009e95ad8" offset="0"/>
+				<rom name="Stargraph-3.01.rom" size="8192" crc="dffedeb1" sha1="5e8496212fb734b8e9989092e60eb37009e95ad8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -618,7 +618,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="Starmon-E1.20b.rom" size="8192" crc="f8d60f5e" sha1="c5bdc3361cc7eaac208d26abdc9c7c76c9ce9dd8" offset="0"/>
+				<rom name="Starmon-E1.20b.rom" size="8192" crc="f8d60f5e" sha1="c5bdc3361cc7eaac208d26abdc9c7c76c9ce9dd8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -629,7 +629,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Starspell-1.00.rom" size="16384" crc="765a71f3" sha1="a02a8ac35aaafef27a1911161c3c06b509ad56a4" offset="0"/>
+				<rom name="Starspell-1.00.rom" size="16384" crc="765a71f3" sha1="a02a8ac35aaafef27a1911161c3c06b509ad56a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -640,7 +640,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="Starstore-1.00.rom" size="8192" crc="e3ab400b" sha1="f17b6dcef2482b1b94534fc38a031f982fa750eb" offset="0"/>
+				<rom name="Starstore-1.00.rom" size="8192" crc="e3ab400b" sha1="f17b6dcef2482b1b94534fc38a031f982fa750eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -651,7 +651,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="Starstore-1.00-alt.rom" size="8192" crc="a95470c4" sha1="69dc39ab1566506dbb2a26bc9161474fbc85f40a" offset="0"/>
+				<rom name="Starstore-1.00-alt.rom" size="8192" crc="a95470c4" sha1="69dc39ab1566506dbb2a26bc9161474fbc85f40a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -662,7 +662,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Starstore2-2.03.rom" size="16384" crc="c51c35db" sha1="c80d6ad824304790a33ace85aa91258646b30e60" offset="0"/>
+				<rom name="Starstore2-2.03.rom" size="16384" crc="c51c35db" sha1="c80d6ad824304790a33ace85aa91258646b30e60"/>
 			</dataarea>
 		</part>
 	</software>
@@ -673,7 +673,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Starstore2-2.04.rom" size="16384" crc="43314d69" sha1="b2098b0b74257fb53eea4e24b12b4011028801d0" offset="0"/>
+				<rom name="Starstore2-2.04.rom" size="16384" crc="43314d69" sha1="b2098b0b74257fb53eea4e24b12b4011028801d0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -684,7 +684,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Starword-1.01.rom" size="16384" crc="eee36568" sha1="ba9d6c11d3875a94ec76a529693ced34b283bd50" offset="0"/>
+				<rom name="Starword-1.01.rom" size="16384" crc="eee36568" sha1="ba9d6c11d3875a94ec76a529693ced34b283bd50"/>
 			</dataarea>
 		</part>
 	</software>
@@ -695,7 +695,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Starword-1.01-NoLF.rom" size="16384" crc="41c4983c" sha1="8c7c0ae29717709e796504a923a646e382afe792" offset="0"/>
+				<rom name="Starword-1.01-NoLF.rom" size="16384" crc="41c4983c" sha1="8c7c0ae29717709e796504a923a646e382afe792"/>
 			</dataarea>
 		</part>
 	</software>
@@ -706,7 +706,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Starword-1.01-Cumana.rom" size="16384" crc="8263bdb8" sha1="afde61e0555bda408f5192e41e51f5e5311d934e" offset="0"/>
+				<rom name="Starword-1.01-Cumana.rom" size="16384" crc="8263bdb8" sha1="afde61e0555bda408f5192e41e51f5e5311d934e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -717,7 +717,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="T2C3-1.00.rom" size="8192" crc="35250909" sha1="cd288ea49052d01d9ce3fedce0a475c39541ddc6" offset="0"/>
+				<rom name="T2C3-1.00.rom" size="8192" crc="35250909" sha1="cd288ea49052d01d9ce3fedce0a475c39541ddc6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -728,7 +728,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="T2CU-1.01.rom" size="8192" crc="b04ac95f" sha1="495301b5df7857b9a4850c5f88b3047c620ac763" offset="0"/>
+				<rom name="T2CU-1.01.rom" size="8192" crc="b04ac95f" sha1="495301b5df7857b9a4850c5f88b3047c620ac763"/>
 			</dataarea>
 		</part>
 	</software>
@@ -739,7 +739,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="T2CU-2.01.rom" size="8192" crc="c107e2c5" sha1="f840f0fbd41c9f91d6b8a830ff003989fb53f99d" offset="0"/>
+				<rom name="T2CU-2.01.rom" size="8192" crc="c107e2c5" sha1="f840f0fbd41c9f91d6b8a830ff003989fb53f99d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -750,7 +750,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="T2P3-1.00.rom" size="8192" crc="fa452f32" sha1="b1b05046a51560faf72dabe8bbf3ce0a66ddce8e" offset="0"/>
+				<rom name="T2P3-1.00.rom" size="8192" crc="fa452f32" sha1="b1b05046a51560faf72dabe8bbf3ce0a66ddce8e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -761,7 +761,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="T2P3-1.01.rom" size="8192" crc="dbea55d5" sha1="32af52713501b38a7da0927668a5e97869a729da" offset="0"/>
+				<rom name="T2P3-1.01.rom" size="8192" crc="dbea55d5" sha1="32af52713501b38a7da0927668a5e97869a729da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -772,7 +772,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="T2P3-2.00.rom" size="8192" crc="c63a14d6" sha1="23d009552c1d3a1661542804df3bba25b9556998" offset="0"/>
+				<rom name="T2P3-2.00.rom" size="8192" crc="c63a14d6" sha1="23d009552c1d3a1661542804df3bba25b9556998"/>
 			</dataarea>
 		</part>
 	</software>
@@ -783,7 +783,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="T2P3-2.01.rom" size="8192" crc="5bba1353" sha1="5f3c8c3c7903b081ea4b61c6cd8db9691c9fafb8" offset="0"/>
+				<rom name="T2P3-2.01.rom" size="8192" crc="5bba1353" sha1="5f3c8c3c7903b081ea4b61c6cd8db9691c9fafb8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -794,7 +794,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="T2P3-2.02.rom" size="8192" crc="bb9b4c02" sha1="36880310a252e1f642a08cbddb343b6bbd61cbd6" offset="0"/>
+				<rom name="T2P3-2.02.rom" size="8192" crc="bb9b4c02" sha1="36880310a252e1f642a08cbddb343b6bbd61cbd6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -805,7 +805,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="T2P4-2.00.rom" size="8192" crc="e27f6be3" sha1="68743ac847dc53f17d777f236c05e5c8934dab8e" offset="0"/>
+				<rom name="T2P4-2.00.rom" size="8192" crc="e27f6be3" sha1="68743ac847dc53f17d777f236c05e5c8934dab8e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -816,7 +816,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="T2P4-2.01.rom" size="8192" crc="d1c66a36" sha1="8e2f3c97d7083c886679a656fed699be21321c50" offset="0"/>
+				<rom name="T2P4-2.01.rom" size="8192" crc="d1c66a36" sha1="8e2f3c97d7083c886679a656fed699be21321c50"/>
 			</dataarea>
 		</part>
 	</software>
@@ -827,7 +827,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="T2P4-2.02.rom" size="8192" crc="6a2356c6" sha1="5cbcb8ebddfb6d9a88d0c3c8c1dcf500dbd6efe1" offset="0"/>
+				<rom name="T2P4-2.02.rom" size="8192" crc="6a2356c6" sha1="5cbcb8ebddfb6d9a88d0c3c8c1dcf500dbd6efe1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -838,7 +838,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="T2PEG400-2.02.rom" size="8192" crc="bf2f12ea" sha1="c01e6867365677f4e1b1ad405eafed9436355603" offset="0"/>
+				<rom name="T2PEG400-2.02.rom" size="8192" crc="bf2f12ea" sha1="c01e6867365677f4e1b1ad405eafed9436355603"/>
 			</dataarea>
 		</part>
 	</software>
@@ -849,7 +849,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="T2SD-2.01.rom" size="8192" crc="9df09236" sha1="58ce0fed6f3833464ae8e9cea74bfc5d841712e8" offset="0"/>
+				<rom name="T2SD-2.01.rom" size="8192" crc="9df09236" sha1="58ce0fed6f3833464ae8e9cea74bfc5d841712e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -860,7 +860,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="T2SEDFS-2.00.rom" size="8192" crc="e40ccbc9" sha1="507bd0a2e5bc0ae59c3378d2f212548877f307a7" offset="0"/>
+				<rom name="T2SEDFS-2.00.rom" size="8192" crc="e40ccbc9" sha1="507bd0a2e5bc0ae59c3378d2f212548877f307a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -871,7 +871,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="T2SEDFS-2.02.rom" size="8192" crc="81dc4492" sha1="0a24c092757306264856a2a0a108e894a6112cc7" offset="0"/>
+				<rom name="T2SEDFS-2.02.rom" size="8192" crc="81dc4492" sha1="0a24c092757306264856a2a0a108e894a6112cc7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -882,12 +882,12 @@
 		<publisher>Cheshire Micro Systems</publisher>
 		<part name="rom1" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Time1.rom" size="16384" crc="95aea1a3" sha1="ff90ce72badc5ffe10326cfb59cd199566f49a73" offset="0"/>
+				<rom name="Time1.rom" size="16384" crc="95aea1a3" sha1="ff90ce72badc5ffe10326cfb59cd199566f49a73"/>
 			</dataarea>
 		</part>
 		<part name="rom2" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Time2.rom" size="16384" crc="c07b15c7" sha1="2236ab7a029cb9f399ba4d57e93fcef703e5cb61" offset="0"/>
+				<rom name="Time2.rom" size="16384" crc="c07b15c7" sha1="2236ab7a029cb9f399ba4d57e93fcef703e5cb61"/>
 			</dataarea>
 		</part>
 	</software>
@@ -898,7 +898,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Startrek-1.06.rom" size="16384" crc="f8c4ff20" sha1="1d51d57cc7588e86c61199c9c1eb3dd1eea35b93" offset="0"/>
+				<rom name="Startrek-1.06.rom" size="16384" crc="f8c4ff20" sha1="1d51d57cc7588e86c61199c9c1eb3dd1eea35b93"/>
 			</dataarea>
 		</part>
 	</software>
@@ -909,7 +909,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Startrek-1.07.rom" size="16384" crc="deadec14" sha1="19eb03bdffa3d899e892d1d1f02a2ffb4d46fb88" offset="0"/>
+				<rom name="Startrek-1.07.rom" size="16384" crc="deadec14" sha1="19eb03bdffa3d899e892d1d1f02a2ffb4d46fb88"/>
 			</dataarea>
 		</part>
 	</software>
@@ -920,7 +920,7 @@
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Utility-1.4.rom" size="16384" crc="184eea9d" sha1="9734d883e43f98d714a8b4a9fc29e3777abfc58c" offset="0"/>
+				<rom name="Utility-1.4.rom" size="16384" crc="184eea9d" sha1="9734d883e43f98d714a8b4a9fc29e3777abfc58c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -931,7 +931,7 @@
 		<publisher>Ian Copestake</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="WordPower-0.4.rom" size="16384" crc="3480cd3c" sha1="3de1dad3b41b5b83afa19ad081c9c42442fe079c" offset="0"/>
+				<rom name="WordPower-0.4.rom" size="16384" crc="3480cd3c" sha1="3de1dad3b41b5b83afa19ad081c9c42442fe079c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -942,7 +942,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Xbasic.rom" size="16384" crc="b1eb3e33" sha1="25d80112b789d72f739dccb54a86e1969f2eda0f" offset="0"/>
+				<rom name="Xbasic.rom" size="16384" crc="b1eb3e33" sha1="25d80112b789d72f739dccb54a86e1969f2eda0f"/>
 			</dataarea>
 		</part>
 	</software>

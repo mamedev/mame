@@ -39,6 +39,7 @@ D.G.R.M. NO 1947
 Notes:
       68000 clock 9.000MHz [18/2]
       M6295 clocks 1.000MHz [8/8] pin 7 high
+      PIC16C57 clock 4.000MHz [8/2]
 
 
 2008-07
@@ -85,6 +86,7 @@ Bugs (all of these looks BTANBs):
 #include "video/snk68_spr.h"
 #include "emupal.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class blackt96_state : public driver_device
@@ -169,7 +171,7 @@ TILE_GET_INFO_MEMBER(blackt96_state::get_tx_tile_info)
 
 void blackt96_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blackt96_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blackt96_state::get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(0);
 }
@@ -477,48 +479,51 @@ void blackt96_state::tile_callback(int &tile, int& fx, int& fy, int& region)
 }
 
 
-MACHINE_CONFIG_START(blackt96_state::blackt96)
-	MCFG_DEVICE_ADD("maincpu", M68000, 18000000 /2)
-	MCFG_DEVICE_PROGRAM_MAP(blackt96_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blackt96_state,  irq1_line_hold)
+void blackt96_state::blackt96(machine_config &config)
+{
+	M68000(config, m_maincpu, 18_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &blackt96_state::blackt96_map);
+	m_maincpu->set_vblank_int("screen", FUNC(blackt96_state::irq1_line_hold));
 
-	pic16c57_device &audiocpu(PIC16C57(config, "audiocpu", 8000000)); /* ? */
+	pic16c57_device &audiocpu(PIC16C57(config, "audiocpu", 8_MHz_XTAL / 2));
 	audiocpu.write_a().set(FUNC(blackt96_state::blackt96_soundio_port_a_w));
 	audiocpu.read_b().set(FUNC(blackt96_state::blackt96_soundio_port_b_r));
 	audiocpu.write_b().set(FUNC(blackt96_state::blackt96_soundio_port_b_w));
 	audiocpu.read_c().set(FUNC(blackt96_state::blackt96_soundio_port_c_r));
 	audiocpu.write_c().set(FUNC(blackt96_state::blackt96_soundio_port_c_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blackt96)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blackt96);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 16*32-1, 0*8, 16*32-1)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 256-1, 2*8, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(blackt96_state, screen_update_blackt96)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+//  screen.set_visarea(0*8, 16*32-1, 0*8, 16*32-1);
+	screen.set_visarea(0*8, 256-1, 2*8, 240-1);
+	screen.set_screen_update(FUNC(blackt96_state::screen_update_blackt96));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
 
 	SNK68_SPR(config, m_sprites, 0);
 	m_sprites->set_gfxdecode_tag(m_gfxdecode);
-	m_sprites->set_tile_indirect_cb(FUNC(blackt96_state::tile_callback), this);
+	m_sprites->set_tile_indirect_cb(FUNC(blackt96_state::tile_callback));
 	m_sprites->set_no_partial();
+	m_sprites->set_xpos_shift(12);
+	m_sprites->set_color_entry_mask(0x7f);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH) // music
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
+	OKIM6295(config, m_oki[0], 8_MHz_XTAL / 8, okim6295_device::PIN7_HIGH); // music
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
+	m_oki[0]->set_addrmap(0, &blackt96_state::oki1_map);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH) // sfx
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 8_MHz_XTAL / 8, okim6295_device::PIN7_HIGH); // sfx
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
+}
 
 
 ROM_START( blackt96 )

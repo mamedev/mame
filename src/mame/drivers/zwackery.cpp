@@ -28,6 +28,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 //**************************************************************************
@@ -194,10 +195,10 @@ void zwackery_state::video_start()
 	gfx_element *gfx2 = m_gfxdecode->gfx(2);
 
 	// initialize the background tilemap
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(zwackery_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(zwackery_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,  16,16, 32,32);
 
 	// initialize the foreground tilemap
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(zwackery_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(zwackery_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,  16,16, 32,32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	// allocate memory for the assembled gfx data
@@ -441,10 +442,7 @@ WRITE_LINE_MEMBER(zwackery_state::pia0_irq_w)
 
 READ8_MEMBER( zwackery_state::pia1_porta_r )
 {
-	uint8_t data = ioport("IN1")->read();
-	m_pia1->set_port_a_z_mask(data);
-
-	return data;
+	return ioport("IN1")->read();
 }
 
 READ8_MEMBER( zwackery_state::pia1_portb_r )
@@ -457,10 +455,7 @@ READ8_MEMBER( zwackery_state::pia1_portb_r )
 
 READ8_MEMBER( zwackery_state::pia2_porta_r )
 {
-	uint8_t data = ioport("IN3")->read();
-	m_pia2->set_port_a_z_mask(data);
-
-	return data;
+	return ioport("IN3")->read();
 }
 
 
@@ -479,7 +474,7 @@ READ8_MEMBER( zwackery_state::pia2_porta_r )
 READ8_MEMBER( zwackery_state::ptm_r )
 {
 	m_maincpu->adjust_icount(-14);
-	return m_ptm->read(space, offset);
+	return m_ptm->read(offset);
 }
 
 void zwackery_state::machine_start()

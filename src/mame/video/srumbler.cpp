@@ -47,13 +47,13 @@ TILE_GET_INFO_MEMBER(srumbler_state::get_bg_tile_info)
 
 void srumbler_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(srumbler_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(srumbler_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,    16,16,64,64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(srumbler_state::get_fg_tile_info)), TILEMAP_SCAN_COLS,  8, 8, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(srumbler_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16,16, 64,64);
 
 	m_fg_tilemap->set_transparent_pen(3);
 
-	m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
-	m_bg_tilemap->set_transmask(1,0x07ff,0xf800); /* split type 1 has pens 0-10 transparent in front half */
+	m_bg_tilemap->set_transmask(0,0xffff,0x0000); // split type 0 is totally transparent in front half
+	m_bg_tilemap->set_transmask(1,0x07ff,0xf800); // split type 1 has pens 0-10 transparent in front half
 
 	save_item(NAME(m_scroll));
 }

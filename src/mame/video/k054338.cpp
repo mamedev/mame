@@ -54,22 +54,15 @@ void k054338_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-WRITE16_MEMBER( k054338_device::word_w )
+void k054338_device::word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(m_regs + offset);
 }
 
-WRITE32_MEMBER( k054338_device::long_w )
-{
-	offset <<= 1;
-	word_w(space, offset, data >> 16, mem_mask >> 16);
-	word_w(space, offset + 1, data, mem_mask);
-}
-
 // returns a 16-bit '338 register
-int  k054338_device::register_r( int reg )
+u16 k054338_device::register_r(offs_t offset)
 {
-	return m_regs[reg];
+	return m_regs[offset];
 }
 
 void k054338_device::update_all_shadows( int rushingheroes_hack, palette_device &palette )
@@ -206,10 +199,3 @@ void k054338_device::export_config( int **shd_rgb )
 {
 	*shd_rgb = m_shd_rgb;
 }
-
-// debug handler
-
-READ16_MEMBER( k054338_device::word_r )
-{
-	return(m_regs[offset]);
-}       // CLTC

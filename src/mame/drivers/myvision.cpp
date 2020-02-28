@@ -52,7 +52,7 @@ public:
 	void myvision(machine_config &config);
 
 private:
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	DECLARE_READ8_MEMBER( ay_port_a_r );
 	DECLARE_READ8_MEMBER( ay_port_b_r );
 	DECLARE_WRITE8_MEMBER( ay_port_a_w );
@@ -76,10 +76,10 @@ private:
 void myvision_state::myvision_mem(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x0000, 0x5fff)      // mapped by the cartslot
+	//map(0x0000, 0x5fff)      // mapped by the cartslot
 	map(0xa000, 0xa7ff).ram();
-	map(0xe000, 0xe000).rw("tms9918", FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
-	map(0xe002, 0xe002).rw("tms9918", FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0xe000, 0xe000).rw("tms9918", FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
+	map(0xe002, 0xe002).rw("tms9918", FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
 }
 
 
@@ -140,7 +140,7 @@ INPUT_PORTS_END
 void myvision_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x5fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
 	save_item(NAME(m_column));
 }
@@ -152,7 +152,7 @@ void myvision_state::machine_reset()
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( myvision_state, cart )
+DEVICE_IMAGE_LOAD_MEMBER( myvision_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -214,11 +214,12 @@ WRITE8_MEMBER( myvision_state::ay_port_b_w )
 	m_column = data;
 }
 
-MACHINE_CONFIG_START(myvision_state::myvision)
+void myvision_state::myvision(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(10'738'635)/3)  /* Not verified */
-	MCFG_DEVICE_PROGRAM_MAP(myvision_mem)
-	MCFG_DEVICE_IO_MAP(myvision_io)
+	Z80(config, m_maincpu, XTAL(10'738'635)/3);  /* Not verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &myvision_state::myvision_mem);
+	m_maincpu->set_addrmap(AS_IO, &myvision_state::myvision_io);
 
 	/* video hardware */
 	tms9918a_device &vdp(TMS9918A(config, "tms9918", XTAL(10'738'635)));  /* Exact model not verified */
@@ -237,13 +238,13 @@ MACHINE_CONFIG_START(myvision_state::myvision)
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "myvision_cart")
-	MCFG_GENERIC_LOAD(myvision_state, cart)
-	//MCFG_GENERIC_MANDATORY
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "myvision_cart"));
+	cartslot.set_device_load(FUNC(myvision_state::cart_load));
+	//cartslot.set_must_be_loaded(true);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("myvision");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( myvision )

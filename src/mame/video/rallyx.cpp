@@ -80,18 +80,18 @@ void rallyx_state::rallyx_palette(palette_device &palette) const
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		int const r = combine_3_weights(rweights, bit0, bit1, bit2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		int const g = combine_3_weights(gweights, bit0, bit1, bit2);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		int const b = combine_2_weights(bweights, bit0, bit1);
+		int const b = combine_weights(bweights, bit0, bit1);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -141,18 +141,18 @@ void rallyx_state::jungler_palette(palette_device &palette) const
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		int const r = combine_3_weights(rweights, bit0, bit1, bit2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		int const g = combine_3_weights(gweights, bit0, bit1, bit2);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		int const b = combine_2_weights(bweights, bit0, bit1);
+		int const b = combine_weights(bweights, bit0, bit1);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -165,17 +165,17 @@ void rallyx_state::jungler_palette(palette_device &palette) const
 		// red component
 		bit0 = BIT((i - 0x20), 0);
 		bit1 = BIT((i - 0x20), 1);
-		int const r = combine_2_weights(rweights_star, bit0, bit1);
+		int const r = combine_weights(rweights_star, bit0, bit1);
 
 		// green component
 		bit0 = BIT(i - 0x20, 2);
 		bit1 = BIT(i - 0x20, 3);
-		int const g = combine_2_weights(gweights_star, bit0, bit1);
+		int const g = combine_weights(gweights_star, bit0, bit1);
 
 		// blue component
 		bit0 = BIT(i - 0x20, 4);
 		bit1 = BIT(i - 0x20, 5);
-		int const b = combine_2_weights(bweights_star, bit0, bit1);
+		int const b = combine_weights(bweights_star, bit0, bit1);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -327,8 +327,8 @@ void rallyx_state::rallyx_video_start_common(  )
 
 VIDEO_START_MEMBER(rallyx_state,rallyx)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::rallyx_bg_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::rallyx_fg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(rallyx_state::fg_tilemap_scan)), 8, 8, 8, 32);
 
 	/* the scrolling tilemap is slightly misplaced in Rally X */
 	m_bg_tilemap->set_scrolldx(3, 3);
@@ -341,8 +341,8 @@ VIDEO_START_MEMBER(rallyx_state,rallyx)
 
 VIDEO_START_MEMBER(rallyx_state,jungler)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::rallyx_bg_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::rallyx_fg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(rallyx_state::fg_tilemap_scan)), 8, 8, 8, 32);
 
 	m_spriteram_base = 0x14;
 
@@ -353,8 +353,8 @@ VIDEO_START_MEMBER(rallyx_state,jungler)
 
 VIDEO_START_MEMBER(rallyx_state,locomotn)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::locomotn_bg_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::locomotn_fg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(rallyx_state::fg_tilemap_scan)), 8, 8, 8, 32);
 
 	m_spriteram_base = 0x14;
 
@@ -365,8 +365,8 @@ VIDEO_START_MEMBER(rallyx_state,locomotn)
 
 VIDEO_START_MEMBER(rallyx_state,commsega)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::locomotn_bg_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::locomotn_fg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(rallyx_state::fg_tilemap_scan)), 8, 8, 8, 32);
 
 	/* commsega has more sprites and bullets than the other games */
 	m_spriteram_base = 0x00;

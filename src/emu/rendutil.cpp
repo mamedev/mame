@@ -559,7 +559,7 @@ void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname
 	else
 		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
 
-	if (file.open(fname.c_str()) != osd_file::error::NONE)
+	if (file.open(fname) != osd_file::error::NONE)
 		return;
 
 	// define standard JPEG structures
@@ -605,7 +605,7 @@ void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname
 				bitmap.pix32(j, i) = rgb_t(0xFF, buffer[0][i * s], buffer[0][i * s + 1], buffer[0][i * s + 2]);
 		else
 		{
-			osd_printf_error("Cannot read JPEG data from %s file.\n", fname.c_str());
+			osd_printf_error("Cannot read JPEG data from %s file.\n", fname);
 			bitmap.reset();
 			break;
 		}
@@ -637,7 +637,7 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
 	else
 		fname.assign(filename);
-	osd_file::error const filerr = file.open(fname.c_str());
+	osd_file::error const filerr = file.open(fname);
 	if (filerr != osd_file::error::NONE)
 		return false;
 
@@ -810,7 +810,7 @@ ru_imgformat render_detect_image(emu_file &file, const char *dirname, const char
 		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
 	else
 		fname.assign(filename);
-	osd_file::error const filerr = file.open(fname.c_str());
+	osd_file::error const filerr = file.open(fname);
 	if (filerr != osd_file::error::NONE)
 		return RENDUTIL_IMGFORMAT_ERROR;
 

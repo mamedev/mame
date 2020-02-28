@@ -86,15 +86,15 @@ void instantm_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x8000, 0x8000); //AM_WRITE
-	map(0xc000, 0xc000); //AM_WRITE
-	map(0xc400, 0xc400); //AM_WRITE
-	map(0xc800, 0xc800); //AM_WRITE
-	map(0xcc00, 0xcc00); //AM_WRITE
-	map(0xec00, 0xec00); //AM_READ
-	map(0xf000, 0xf000); //AM_READ
-	map(0xf400, 0xf400); //AM_READ
-	map(0xfc00, 0xfc00); //AM_READ
+	map(0x8000, 0x8000); //.w(FUNC(instantm_state::));
+	map(0xc000, 0xc000); //.w(FUNC(instantm_state::));
+	map(0xc400, 0xc400); //.w(FUNC(instantm_state::));
+	map(0xc800, 0xc800); //.w(FUNC(instantm_state::));
+	map(0xcc00, 0xcc00); //.w(FUNC(instantm_state::));
+	map(0xec00, 0xec00); //.r(FUNC(instantm_state::));
+	map(0xf000, 0xf000); //.r(FUNC(instantm_state::));
+	map(0xf400, 0xf400); //.r(FUNC(instantm_state::));
+	map(0xfc00, 0xfc00); //.r(FUNC(instantm_state::));
 }
 
 // doesn't use ram
@@ -126,24 +126,26 @@ void instantm_state::machine_reset()
 
 // OSC1 = XTAL(3'579'545)
 
-MACHINE_CONFIG_START(instantm_state::instantm)
+void instantm_state::instantm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	Z80(config, m_maincpu, XTAL(3'579'545));
+	m_maincpu->set_addrmap(AS_PROGRAM, &instantm_state::main_map);
 
-	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
-	MCFG_DEVICE_IO_MAP(sub_io)
+	z80_device &subcpu(Z80(config, "subcpu", XTAL(3'579'545)));
+	subcpu.set_addrmap(AS_PROGRAM, &instantm_state::sub_map);
+	subcpu.set_addrmap(AS_IO, &instantm_state::sub_io);
 
 	// all guesswork
 	clock_device &voice_clock(CLOCK(config, "voice_clock", 24000));
 	voice_clock.signal_handler().set(FUNC(instantm_state::clock_w));
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 

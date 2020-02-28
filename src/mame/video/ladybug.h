@@ -6,6 +6,7 @@
 #pragma once
 
 #include "screen.h"
+#include "tilemap.h"
 
 
 // used by ladybug and sraider

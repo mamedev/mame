@@ -586,11 +586,11 @@ void dbox_state::dbox_map(address_map &map)
 // CS2 - CS demux
 // 0000009a Address mask CS2 00000050, 00007fff (ffffffff) - Mask: 00007f00 FCM:0f DD:3 PS: External DSACK response
 // 000000a2 Base address CS2 00000054, 00700003 (ffffffff) - Base: 00700000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
-	//AM_RANGE(0x700000, 0x77ffff)
+	//map(0x700000, 0x77ffff)
 // CS3 - 8 bit devices
 // 000000aa Address mask CS3 00000058, 000007f2 (ffffffff) - Mask: 00000700 FCM:0f DD:0 PS: 8-bit
 // 000000b2 Base address CS3 0000005c, 00780003 (ffffffff) - Base: 00780000 BFC:00 WP:0 FTE:0 NCS:1 Valid: Yes
-	// AM_RANGE(0x780000, 0x7807ff)
+	// map(0x780000, 0x7807ff)
 	map(0x780100, 0x7801ff).w(FUNC(dbox_state::sda5708_reset));
 	map(0x780600, 0x7806ff).w(FUNC(dbox_state::sda5708_clk));
 // CS1 - RAM area

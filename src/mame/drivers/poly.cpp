@@ -248,22 +248,23 @@ static void poly_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(poly_state::poly)
+void poly_state::poly(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, 12.0576_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(poly_mem)
+	MC6809(config, m_maincpu, 12.0576_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &poly_state::poly_mem);
 
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&poly_state::poly_bank).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(40 * 12, 24 * 20)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 12 - 1, 0, 24 * 20 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(poly_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(40 * 12, 24 * 20);
+	screen.set_visarea(0, 40 * 12 - 1, 0, 24 * 20 - 1);
+	screen.set_screen_update(FUNC(poly_state::screen_update));
 
 	SAA5050(config, m_trom[0], 12.0576_MHz_XTAL / 2);
 	m_trom[0]->d_cb().set(FUNC(poly_state::videoram_1_r));
@@ -275,8 +276,7 @@ MACHINE_CONFIG_START(poly_state::poly)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("128K").set_extra_options("64K");
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(poly_state::poly)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_list").set_original("poly_flop").set_filter("POLY1");
-MACHINE_CONFIG_END
+}
 
 
 void poly_state::poly2(machine_config &config)

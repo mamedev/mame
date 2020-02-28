@@ -71,7 +71,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ppu(*this, "ppu") { }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<n2a03_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 
 	std::unique_ptr<uint8_t[]> m_nt_ram;
@@ -281,7 +281,7 @@ void cham24_state::machine_reset()
 	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
 	/* and read/write handlers */
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff,read8_delegate(FUNC(cham24_state::nt_r), this), write8_delegate(FUNC(cham24_state::nt_w), this));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(*this, FUNC(cham24_state::nt_r)), write8_delegate(*this, FUNC(cham24_state::nt_w)));
 }
 
 void cham24_state::init_cham24()
@@ -307,6 +307,7 @@ void cham24_state::cham24(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 ROM_START( cham24 )

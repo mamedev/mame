@@ -7,6 +7,7 @@
 
 #include "audio/pleiads.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class phoenix_state : public driver_device
 {
@@ -28,7 +29,7 @@ public:
 	DECLARE_WRITE8_MEMBER(phoenix_scroll_w);
 	DECLARE_READ8_MEMBER(survival_input_port_0_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(player_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(pleiads_protection_r);
+	DECLARE_READ_LINE_MEMBER(pleiads_protection_r);
 	void init_oneprom();
 	void init_coindsw();
 	void init_oneprom_coindsw();

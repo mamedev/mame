@@ -20,6 +20,7 @@ DEFINE_DEVICE_TYPE(IREM_M52_LARGE_AUDIO,  m52_large_audio_device,  "m52_large_au
 
 irem_audio_device::irem_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, m_audio_SINH(*this, "snd_nl:sinh")
 	, m_cpu(*this, "iremsound")
 	, m_adpcm1(*this, "msm1")
 	, m_adpcm2(*this, "msm2")
@@ -56,8 +57,6 @@ m52_large_audio_device::m52_large_audio_device(const machine_config &mconfig, co
 
 void irem_audio_device::device_start()
 {
-	m_audio_SINH = subdevice<netlist_mame_logic_input_device>("snd_nl:sinh");
-
 	save_item(NAME(m_port1));
 	save_item(NAME(m_port2));
 	save_item(NAME(m_soundlatch));
@@ -123,17 +122,17 @@ WRITE8_MEMBER( irem_audio_device::m6803_port2_w )
 		{
 			/* PSG 0 or 1? */
 			if (m_port2 & 0x08)
-				m_ay_45M->address_w(space, 0, m_port1);
+				m_ay_45M->address_w(m_port1);
 			if (m_port2 & 0x10)
-				m_ay_45L->address_w(space, 0, m_port1);
+				m_ay_45L->address_w(m_port1);
 		}
 		else
 		{
 			/* PSG 0 or 1? */
 			if (m_port2 & 0x08)
-				m_ay_45M->data_w(space, 0, m_port1);
+				m_ay_45M->data_w(m_port1);
 			if (m_port2 & 0x10)
-				m_ay_45L->data_w(space, 0, m_port1);
+				m_ay_45L->data_w(m_port1);
 		}
 	}
 	m_port2 = data;
@@ -151,9 +150,9 @@ READ8_MEMBER( irem_audio_device::m6803_port1_r )
 {
 	/* PSG 0 or 1? */
 	if (m_port2 & 0x08)
-		return m_ay_45M->data_r(space, 0);
+		return m_ay_45M->data_r();
 	if (m_port2 & 0x10)
-		return m_ay_45L->data_r(space, 0);
+		return m_ay_45L->data_r();
 	return 0xff;
 }
 
@@ -440,9 +439,9 @@ void m62_audio_device::device_add_mconfig(machine_config &config)
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
-	netlist_mame_sound_device &snd_nl(NETLIST_SOUND(config, "snd_nl", 48000));
-	snd_nl.set_constructor(netlist_kidniki);
-	snd_nl.add_route(ALL_OUTPUTS, "mono", 1.0);
+	NETLIST_SOUND(config, "snd_nl", 48000)
+		.set_source(netlist_kidniki)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	NETLIST_LOGIC_INPUT(config, "snd_nl:ibd", "I_BD0.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "snd_nl:isd", "I_SD0.IN", 0);
@@ -458,12 +457,9 @@ void m62_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin4", 4, "R_AY45L_B.R");
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin5", 5, "R_AY45L_C.R");
 
-
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin6", 6, "I_MSM2K0.IN").set_mult_offset(5.0/65535.0, 2.5);
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin7", 7, "I_MSM3K0.IN").set_mult_offset(5.0/65535.0, 2.5);
 
-	//MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "RV1.1")
-	//MCFG_NETLIST_ANALOG_MULT_OFFSET(30000.0, -35000.0)
 	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "R26.1").set_mult_offset(30000.0 * 10.0, 0.0);
 }
 

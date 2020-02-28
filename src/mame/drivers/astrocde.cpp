@@ -136,6 +136,9 @@
  *
  *  Protected RAM
  *
+ *  If not specified in the memory map,
+ *  then it's at the start of the nvram
+ *
  *************************************/
 
 WRITE8_MEMBER(astrocde_state::protected_ram_enable_w)
@@ -147,14 +150,14 @@ WRITE8_MEMBER(astrocde_state::protected_ram_enable_w)
 READ8_MEMBER(astrocde_state::protected_ram_r)
 {
 	m_ram_write_enable = false;
-	return m_protected_ram[offset];
+	return m_protected_ram ? m_protected_ram[offset] : m_nvram[offset];
 }
 
 
 WRITE8_MEMBER(astrocde_state::protected_ram_w)
 {
 	if (m_ram_write_enable)
-		m_protected_ram[offset] = data;
+		(m_protected_ram ? m_protected_ram : m_nvram)[offset] = data;
 	m_ram_write_enable = false;
 }
 
@@ -394,14 +397,14 @@ WRITE8_MEMBER(tenpindx_state::lights_w)
 
 WRITE8_MEMBER(astrocde_state::votrax_speech_w)
 {
-	m_votrax->inflection_w(space, 0, data >> 6);
-	m_votrax->write(space, 0, data);
+	m_votrax->inflection_w(data >> 6);
+	m_votrax->write(data & 0x3f);
 
 	/* Note : We should really also use volume in this as well as frequency */
 }
 
 
-CUSTOM_INPUT_MEMBER( astrocde_state::votrax_speech_status_r )
+READ_LINE_MEMBER( astrocde_state::votrax_speech_status_r )
 {
 	return m_votrax->request();
 }
@@ -458,7 +461,7 @@ void astrocde_state::robby_map(address_map &map)
 	map(0x4000, 0x7fff).ram().share("videoram");
 	map(0x8000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).ram().share("nvram");
-	map(0xe000, 0xe1ff).rw(FUNC(astrocde_state::protected_ram_r), FUNC(astrocde_state::protected_ram_w)).share("protected_ram");
+	map(0xe000, 0xe1ff).rw(FUNC(astrocde_state::protected_ram_r), FUNC(astrocde_state::protected_ram_w));
 	map(0xe800, 0xffff).ram();
 }
 
@@ -478,7 +481,7 @@ void astrocde_state::demndrgn_map(address_map &map)
 void astrocde_state::profpac_map(address_map &map)
 {
 	demndrgn_map(map);
-	map(0xe000, 0xe1ff).rw(FUNC(astrocde_state::protected_ram_r), FUNC(astrocde_state::protected_ram_w)).share("protected_ram");
+	map(0xe000, 0xe1ff).rw(FUNC(astrocde_state::protected_ram_r), FUNC(astrocde_state::protected_ram_w));
 }
 
 
@@ -720,7 +723,7 @@ static INPUT_PORTS_START( ebases )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "S1:8" )
 
 	PORT_START("P4HANDLE")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ebases_state, trackball_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ebases_state, trackball_r)
 
 	PORT_START("TRACKX1")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET
@@ -835,7 +838,7 @@ static INPUT_PORTS_START( wow )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrocde_state, votrax_speech_status_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(astrocde_state, votrax_speech_status_r)
 
 	PORT_START("P4HANDLE")
 	/* "If S1:1,2,3 are all ON or all OFF, only coin meter number 1 will count." */
@@ -905,7 +908,7 @@ static INPUT_PORTS_START( gorf )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrocde_state, votrax_speech_status_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(astrocde_state, votrax_speech_status_r)
 
 	PORT_START("P4HANDLE")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("S1:1")
@@ -1052,7 +1055,7 @@ static INPUT_PORTS_START( demndrgn )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2HANDLE")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, demndrgn_state, joystick_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(demndrgn_state, joystick_r)
 
 	PORT_START("P3HANDLE")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1475,8 +1478,8 @@ void demndrgn_state::demndrgn(machine_config &config)
 	outlatch.bit_handler<4>().set(FUNC(demndrgn_state::input_select_w));
 
 	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::bus_w));
-	m_astrocade_sound1->set_pot_tag<0>("FIREX");
-	m_astrocade_sound1->set_pot_tag<1>("FIREY");
+	m_astrocade_sound1->pot_cb<0>().set_ioport("FIREX");
+	m_astrocade_sound1->pot_cb<1>().set_ioport("FIREY");
 }
 
 void tenpindx_state::tenpindx(machine_config &config)

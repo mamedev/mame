@@ -2,12 +2,17 @@
 // copyright-holders:Jonathan Gevaryahu
 /******************************************************************************
 *
-*  V-tech Socrates Driver
-*  Copyright (C) 2009-2013 Jonathan Gevaryahu AKA Lord Nightmare
+*  V-tech Socrates-series devices
+*  Copyright (C) 2009-2020 Jonathan Gevaryahu AKA Lord Nightmare
 *  with dumping help from Kevin 'kevtris' Horton
 *
+*  The devices in this driver all use a similar ASIC, presumably produced by
+*  Toshiba for Vtech/Yeno, in a QFP package with 100 pins (30+20+30+20)
+*  The asic variants seen in the wild are:
+*  27-0769 TC17G032AF-0248 (Socrates NTSC)
+*  27-0883 1732-8277 (Video Painter and Socrates PAL)
 *
-TODO:
+TODO (socrates):
     * The speech chip is a Toshiba tc8802AF (which is pin and speech
       compatible with the older Toshiba t6803, but adds vsm rom read mode and
       apparently does away with the melody mode); the chip is running at
@@ -112,11 +117,13 @@ public:
 		m_kbdrow(*this, "IN%u", 0)
 	{ }
 
-	void socrates_pal(machine_config &config);
 	void socrates(machine_config &config);
+	void socrates_pal(machine_config &config);
+	void vpainter_pal(machine_config &config);
 
 	void init_socrates();
 	void init_iqunlimz();
+	void init_vpainter();
 
 protected:
 	enum
@@ -129,7 +136,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
 	required_device<screen_device> m_screen;
-	required_device<generic_slot_device> m_cart;
+	optional_device<generic_slot_device> m_cart;
 	memory_region *m_cart_reg;
 	required_memory_region m_bios_reg;
 	required_memory_region m_vram_reg;
@@ -144,7 +151,7 @@ protected:
 	uint16_t m_scroll_offset;
 	uint16_t m_kb_spi_buffer;
 	bool m_kb_spi_request;
-	uint8_t m_kbmcu_type; // 0 for socrates, 1 for iqunlimz
+	uint8_t m_kbmcu_type; // 0 for socrates, 1 for iqunlimz, 2 for vpainter
 	uint16_t m_oldkeyvalue; // previous key pressed
 	uint16_t m_keyrepeat_holdoffcounter; // keyrepeat holdoff countdown
 	uint8_t m_io40_latch; // what was last written to speech reg (for open bus)?
@@ -176,7 +183,7 @@ protected:
 	DECLARE_READ8_MEMBER(socrates_cart_r);
 	DECLARE_READ8_MEMBER(read_f3);
 	DECLARE_WRITE8_MEMBER(kbmcu_reset);
-	DECLARE_READ8_MEMBER(status_and_speech);
+	DECLARE_READ8_MEMBER(socrates_status_r);
 	DECLARE_WRITE8_MEMBER(speech_command);
 	DECLARE_READ8_MEMBER(keyboard_buffer_read);
 	DECLARE_WRITE8_MEMBER(keyboard_buffer_update);
@@ -204,8 +211,8 @@ protected:
 
 	void socrates_rambank_map(address_map &map);
 	void socrates_rombank_map(address_map &map);
-	void z80_io(address_map &map);
-	void z80_mem(address_map &map);
+	void socrates_io(address_map &map);
+	void socrates_mem(address_map &map);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -365,7 +372,7 @@ void socrates_state::machine_start()
 
 void socrates_state::machine_reset()
 {
-	m_cart_reg = memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG).c_str());
+	m_cart_reg = m_cart ? memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG).c_str()) : nullptr;
 	kbmcu_sim_reset();
 	m_kb_spi_request = true;
 	m_oldkeyvalue = 0;
@@ -393,7 +400,7 @@ void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		clear_irq_cb(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in socrates_state::device_timer");
+		throw emu_fatalerror("Unknown id in socrates_state::device_timer");
 	}
 }
 
@@ -417,6 +424,17 @@ void socrates_state::init_iqunlimz()
 		gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 	//m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
 	m_kbmcu_type = 1;
+}
+
+void socrates_state::init_vpainter()
+{
+	uint8_t *gfx = memregion("vram")->base();
+
+	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
+	for (int i = 0; i < 0x10000; i++)
+		gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
+	m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
+	m_kbmcu_type = 2;
 }
 
 READ8_MEMBER(socrates_state::common_rom_bank_r)
@@ -453,8 +471,9 @@ READ8_MEMBER(socrates_state::socrates_cart_r)
 	offset = ((offset&0x3FFFF)|((offset&0xF80000)>>1));
 	if (m_cart_reg)
 	{
-		offset &= (m_cart->get_rom_size()-1);
-		return (*(m_cart_reg->base()+offset));
+		assert(m_cart);
+		offset &= m_cart->get_rom_size()-1;
+		return *(m_cart_reg->base()+offset);
 	}
 	else
 		return 0xF3;
@@ -471,7 +490,7 @@ WRITE8_MEMBER(socrates_state::kbmcu_reset) // reset the keyboard MCU, clear its 
 	kbmcu_sim_reset();
 }
 
-READ8_MEMBER(socrates_state::status_and_speech)// read 0x4x, some sort of status reg
+READ8_MEMBER(socrates_state::socrates_status_r)// read 0x4x, some sort of status reg
 {
 // bit 7 - speech status: high when speech is playing, low when it is not (or when speech cart is not present)
 // bit 6 - unknown, usually set, possibly mcu ready state?
@@ -639,7 +658,7 @@ READ8_MEMBER( socrates_state::keyboard_buffer_read )
 		if (offset == 1) return m_kb_spi_buffer&0xFF;
 		else return (m_kb_spi_buffer&0xFF00)>>8;
 	}
-	else // (m_kbmcu_type == 1) // iqunlimz hack, the system won't work without this?!?!
+	else // if ( (m_kbmcu_type == 1) || (m_kbmcu_type == 2) ) // iqunlimz hack, the system won't work without this?!?!
 	{
 		if (offset == 1) return (m_screen->vblank()?0x80:0)|(m_kbdrow[0]->read()&0xf);
 		else return (m_kb_spi_buffer&0xFF00)>>8;
@@ -968,7 +987,7 @@ WRITE8_MEMBER( iqunlimz_state::colors_w )
 
 INPUT_CHANGED_MEMBER( iqunlimz_state::send_input )
 {
-	uint8_t data = (uint8_t)(uintptr_t)param;
+	uint8_t data = (uint8_t)param;
 
 	if (newval)
 	{
@@ -980,7 +999,7 @@ INPUT_CHANGED_MEMBER( iqunlimz_state::send_input )
  Address Maps
 ******************************************************************************/
 
-void socrates_state::z80_mem(address_map &map)
+void socrates_state::socrates_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom(); /* system rom, bank 0 (fixed) */
@@ -1003,7 +1022,7 @@ void socrates_state::socrates_rambank_map(address_map &map)
 	map(0x0000, 0xffff).ram().region("vram", 0).mirror(0x30000);
 }
 
-void socrates_state::z80_io(address_map &map)
+void socrates_state::socrates_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -1023,7 +1042,7 @@ void socrates_state::z80_io(address_map &map)
 	*/
 	map(0x20, 0x21).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::socrates_scroll_w)).mirror(0xE);
 	map(0x30, 0x30).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::kbmcu_reset)).mirror(0xF); /* resets the keyboard IR decoder MCU */
-	map(0x40, 0x40).rw(FUNC(socrates_state::status_and_speech), FUNC(socrates_state::speech_command)).mirror(0xF); /* reads status register for vblank/hblank/speech, also reads and writes speech module */
+	map(0x40, 0x40).rw(FUNC(socrates_state::socrates_status_r), FUNC(socrates_state::speech_command)).mirror(0xF); /* reads status register for vblank/hblank/speech, also reads and writes speech module */
 	map(0x50, 0x51).rw(FUNC(socrates_state::keyboard_buffer_read), FUNC(socrates_state::keyboard_buffer_update)).mirror(0xE); /* Keyboard fifo read, pop fifo on write */
 	map(0x60, 0x60).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::reset_speech)).mirror(0xF); /* reset the speech module, or perhaps fire an NMI?  */
 	map(0x70, 0xFF).r(FUNC(socrates_state::read_f3)); // nothing mapped here afaik
@@ -1388,7 +1407,7 @@ TIMER_CALLBACK_MEMBER(socrates_state::kbmcu_sim_cb)
 	// timer rate is a massive guess; we're assuming the mcu runs at the same speed as the cpu does,
 	// and the refresh rate depends on instructions per loop of mcu, which we've randomly guessed is 60 cycles.
 	m_kbmcu_sim_timer->adjust(m_maincpu->cycles_to_attotime(3000));
-	/// TODO: dump the mcu and get rid of this...
+	/// TODO: dump the mcus and get rid of this...
 	if (m_kbmcu_type == 0)
 	{
 		// socrates keyboard MCU simulation: if a keyboard key is pressed, enqueue it into the fifo as needed
@@ -1447,7 +1466,7 @@ TIMER_CALLBACK_MEMBER(socrates_state::kbmcu_sim_cb)
 			m_oldkeyvalue = keyvalue; // set this new key to be the 'previous key'
 		}
 	}
-	//else // m_kbmcu_type = 1 // this is currently hacked around by the input system so no code here
+	//else if (m_kbmcu_type == 1) // this is currently hacked around by the input system so no code here
 	//{
 	//}
 
@@ -1465,66 +1484,72 @@ TIMER_CALLBACK_MEMBER(socrates_state::kbmcu_sim_cb)
 	}
 }
 
-MACHINE_CONFIG_START(socrates_state::socrates)
+void socrates_state::socrates(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
-	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
-	MCFG_DEVICE_IO_MAP(z80_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
-	config.m_minimum_quantum = attotime::from_hz(60);
+	Z80(config, m_maincpu, XTAL(21'477'272)/6);  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &socrates_state::socrates_mem);
+	m_maincpu->set_addrmap(AS_IO, &socrates_state::socrates_io);
+	m_maincpu->set_vblank_int("screen", FUNC(socrates_state::assert_irq));
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ADDRESS_MAP_BANK(config, "rombank1").set_map(&socrates_state::socrates_rombank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "rambank1").set_map(&socrates_state::socrates_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "rambank2").set_map(&socrates_state::socrates_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(264, 228) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
-	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 219) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
-	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(264, 228); // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
+	m_screen->set_visarea(0, 263, 0, 219); // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
+	m_screen->set_screen_update(FUNC(socrates_state::screen_update_socrates));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(socrates_state::socrates_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256)) // this is correct, as strange as it sounds.
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SOCRATES_SOUND(config, m_sound, XTAL(21'477'272)/(512+256)).add_route(ALL_OUTPUTS, "mono", 0.25); // this is correct, as strange as it sounds.
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "socrates_cart")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "socrates_cart");
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("socrates");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(socrates_state::socrates_pal)
+void socrates_state::socrates_pal(machine_config &config)
+{
 	socrates(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", Z80, XTAL(26'601'712)/8)
-	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
-	MCFG_DEVICE_IO_MAP(z80_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
-	config.m_minimum_quantum = attotime::from_hz(50);
+	m_maincpu->set_clock(XTAL(26'601'712)/8); // XTAL verified, divider NOT verified; this is a later ASIC so the divider may be different
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE(264, 238) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
-	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 229) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
-	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
+	config.set_maximum_quantum(attotime::from_hz(50));
 
-	MCFG_DEVICE_REPLACE("soc_snd", SOCRATES_SOUND, XTAL(26'601'712)/(512+256)) // this is correct, as strange as it sounds.
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	m_screen->set_size(264, 238); // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
+	m_screen->set_visarea(0, 263, 0, 229); // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
+	m_screen->set_screen_update(FUNC(socrates_state::screen_update_socrates));
 
-MACHINE_CONFIG_START(iqunlimz_state::iqunlimz)
+	m_sound->set_clock(XTAL(26'601'712)/(512+256)); // this is correct, as strange as it sounds.
+}
+
+void socrates_state::vpainter_pal(machine_config &config)
+{
+	socrates_pal(config);
+
+	config.device_remove("cartslot");
+	config.device_remove("cart_list");
+}
+
+void iqunlimz_state::iqunlimz(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000)) /* not accurate */
-	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_mem)
-	MCFG_DEVICE_IO_MAP(iqunlimz_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", iqunlimz_state,  assert_irq)
+	Z80(config, m_maincpu, XTAL(4'000'000)); /* not accurate */
+	m_maincpu->set_addrmap(AS_PROGRAM, &iqunlimz_state::iqunlimz_mem);
+	m_maincpu->set_addrmap(AS_IO, &iqunlimz_state::iqunlimz_io);
+	m_maincpu->set_vblank_int("screen", FUNC(iqunlimz_state::assert_irq));
 
 	ADDRESS_MAP_BANK(config, "rombank1").set_map(&iqunlimz_state::iqunlimz_rombank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "rombank2").set_map(&iqunlimz_state::iqunlimz_rombank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
@@ -1532,33 +1557,32 @@ MACHINE_CONFIG_START(iqunlimz_state::iqunlimz)
 	ADDRESS_MAP_BANK(config, "rambank2").set_map(&iqunlimz_state::iqunlimz_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(iqunlimz_state, screen_update)
-	MCFG_SCREEN_SIZE(256, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_screen_update(FUNC(iqunlimz_state::screen_update));
+	m_screen->set_size(256, 224);
+	m_screen->set_visarea(0, 256-1, 0, 224-1);
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(iqunlimz_state::socrates_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SOCRATES_SOUND(config, m_sound, XTAL(21'477'272)/(512+256)).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, nullptr);
+}
 
 /******************************************************************************
  ROM Definitions
 ******************************************************************************/
 
 ROM_START(socrates)
-	ROM_REGION(0x400000, "maincpu", ROMREGION_ERASEVAL(0xF3)) /* can technically address 4mb of rom via bankswitching; open bus area reads as 0xF3 */
-	/* Socrates US NTSC */
-	/* all cart roms are 28 pin 23c1000/tc531000 128Kx8 roms */
-	/* cart port pinout:
+	ROM_REGION(0x400000, "maincpu", ROMREGION_ERASEVAL(0xF3)) /* can technically address 4mb of rom via bankswitching; open bus area reads as 0xF3 on fluke */
+	/* Socrates English (same ROM for NTSC and PAL) */
+	/* All cart ROMs are 28 pin 23c1000/tc531000 128Kx8 ROMs */
+	/* Cart port pinout:
 	(looking into end of disk-shaped cartridge with label/top side pointing to the right)
 	A15 -> 19  18 -- VCC
 	A14 -> 20  17 <- A16
@@ -1581,9 +1605,9 @@ ROM_START(socrates)
 	Note that a17 goes to what would be pin 2 on a rom chip if a 32 pin rom were installed, which is not the case. (pins 1, 31 and 32 would be tied to vcc)
 	It is likely that at least one of the 6 unknown lines is R/W from the z80, and another may be phi1/m1/clock etc to allow for ram to live in cart space
 
-	Cartridge check procedure by socrates is, after screen init and check for speech synth,
+	Cartridge check procedure by Socrates is, after screen init and check for speech synth,
 	bankswitch to bank 0x10 (i.e. first 0x4000 of cart appears at 4000-7fff in z80 space),
-	do following tests; if any tests fail, jump to 0x0015 (socrates main menu)
+	do following tests; if any tests fail, jump to 0x0015 (Socrates main menu)
 	* read 0x7ff0(0x3ff0 in cart rom) and compare to 0xAA
 	* read 0x7ff1(0x3ff1 in cart rom) and compare to 0x55
 	* read 0x7ff2(0x3ff2 in cart rom) and compare to 0xE7
@@ -1634,7 +1658,7 @@ ROM_START(profweis)
 	ROM_SYSTEM_BIOS(0, "89", "1989")
 	ROMX_LOAD("lh53216d.u1", 0x00000, 0x40000, CRC(6e801762) SHA1(b80574a3abacf18133dacb9d3a8d9e2916730423), ROM_BIOS(0)) // Label: "(Vtech) LH53216D // (C)1989 VIDEO TECHNOLOGY // 9119 D"
 	ROM_SYSTEM_BIOS(1, "88", "1988")
-	ROMX_LOAD("27-00885-001-000.u1", 0x00000, 0x40000, CRC(fcaf8850) SHA1(a99011ee6a1ef63461c00d062278951252f117db), ROM_BIOS(1)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
+	ROMX_LOAD("27-00885-000-000.u1", 0x00000, 0x40000, CRC(fcaf8850) SHA1(a99011ee6a1ef63461c00d062278951252f117db), ROM_BIOS(1)) // Label: "(Vtech) 27-00885-000-000 // (C)1988 VIDEO TECHNOLOGY // 8844 D"
 
 	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
@@ -1653,19 +1677,38 @@ ROM_START( iqunlimz )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "vtech.bin", 0x000000, 0x080000, CRC(f100c8a7) SHA1(6ad2a8accae2dd5c5c46ae953eef33cdd1ea3cf9) )
 
+	ROM_REGION(0x1000, "kbmcu", ROMREGION_ERASEFF)
+	ROM_LOAD("kbmcu.bin", 0x0000, 0x1000, NO_DUMP) /* keyboard reader MCU */
+
 	ROM_REGION( 0x40000, "vram", ROMREGION_ERASE )
 ROM_END
 
+ROM_START( vpainter )
+	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEVAL(0xF3))
+	ROM_LOAD("lh531g02.u1", 0x00000, 0x20000, CRC(898defac) SHA1(8307e00b5ce3675ce71960e7cf2d1334197a1dce)) // Label: "(Vtech)LH531G02 // (C)1991 VIDEO TECHNOLOGY // 9211 D"
+
+	ROM_REGION(0x1000, "kbmcu", ROMREGION_ERASEFF)
+	ROM_LOAD("tmp47c241nj408.u6", 0x0000, 0x1000, NO_DUMP) /* key/touchpad reader MCU */
+
+	///TODO: get rid of these regions in the status_read function or make it socrates-specific
+	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // doesn't exist? on vpainter, presumably reads as all zeroes
+	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // doesn't exist? on vpainter, presumably reads as all zeroes
+
+	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE )
+ROM_END
 
 /******************************************************************************
  Drivers
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE       INPUT     STATE           INIT           COMPANY                    FULLNAME                             FLAGS
-COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // English NTSC, no title copyright
+COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // English, no title copyright, same ROM for NTSC and PAL
 COMP( 1988, socratfc, socrates, 0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates SAITOUT",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // French Canandian NTSC, 1988 title copyright
+// Yeno Professeur Saitout (French SECAM) matches the Socrates SAITOUT dump (same ROM 27-00884-001-000)
 COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, init_socrates, "Video Technology / Yeno", "Professor Weiss-Alles",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // German PAL, 1988 title copyright
-// Yeno Professeur Saitout goes here (french SECAM)
-// ? goes here (spanish PAL)
+// ? goes here (Spanish PAL)
 
 COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlimz_state, init_iqunlimz, "Video Technology",        "IQ Unlimited (Z80)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+COMP( 1991, vpainter, 0,        0,      vpainter_pal, socrates, socrates_state, init_vpainter, "Video Technology",        "Video Painter (PAL)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// Master Video Painter goes here

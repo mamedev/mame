@@ -85,6 +85,7 @@ CHIP #  POSITION   TYPE
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #define MASTER_CLOCK XTAL(18'432'000)
 
@@ -176,8 +177,8 @@ TILE_GET_INFO_MEMBER(flower_state::get_fg_tile_info)
 
 void flower_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flower_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flower_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(flower_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(flower_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 
 	m_screen->register_screen_bitmap(m_temp_bitmap);
 	m_fg_tilemap->set_transparent_pen(15);
@@ -316,7 +317,7 @@ WRITE8_MEMBER(flower_state::coin_counter_w)
 
 WRITE8_MEMBER(flower_state::sound_command_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	if(m_audio_nmi_enable == true)
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
@@ -494,36 +495,36 @@ INTERRUPT_GEN_MEMBER(flower_state::slave_vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(flower_state::flower)
-	MCFG_DEVICE_ADD("mastercpu",Z80,MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(shared_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flower_state, master_vblank_irq)
+void flower_state::flower(machine_config &config)
+{
+	Z80(config, m_mastercpu, MASTER_CLOCK/4);
+	m_mastercpu->set_addrmap(AS_PROGRAM, &flower_state::shared_map);
+	m_mastercpu->set_vblank_int("screen", FUNC(flower_state::master_vblank_irq));
 
-	MCFG_DEVICE_ADD("slavecpu",Z80,MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(shared_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flower_state, slave_vblank_irq)
+	Z80(config, m_slavecpu, MASTER_CLOCK/4);
+	m_slavecpu->set_addrmap(AS_PROGRAM, &flower_state::shared_map);
+	m_slavecpu->set_vblank_int("screen", FUNC(flower_state::slave_vblank_irq));
 
-	MCFG_DEVICE_ADD("audiocpu",Z80,MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(flower_state, irq0_line_hold, 90)
+	Z80(config, m_audiocpu, MASTER_CLOCK/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &flower_state::audio_map);
+	m_audiocpu->set_periodic_int(FUNC(flower_state::irq0_line_hold), attotime::from_hz(90));
 
-	config.m_perfect_cpu_quantum = subtag("mastercpu");
+	config.set_perfect_quantum(m_mastercpu);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(flower_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3,384,0,288,264,16,240) // derived from Galaxian HW, 60.606060
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(flower_state::screen_update));
+	m_screen->set_raw(MASTER_CLOCK/3,384,0,288,264,16,240); // derived from Galaxian HW, 60.606060
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flower)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_flower);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("flower", FLOWER_CUSTOM, 96000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	FLOWER_CUSTOM(config, "flower", 96000).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( flower ) /* Komax version */

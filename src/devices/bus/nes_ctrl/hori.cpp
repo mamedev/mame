@@ -61,16 +61,28 @@ static void hori_adapter(device_slot_interface &device)
 
 void nes_horitwin_device::device_add_mconfig(machine_config &config)
 {
-	NES_CONTROL_PORT(config, "port1", hori_adapter, "joypad");
-	NES_CONTROL_PORT(config, "port2", hori_adapter, "joypad");
+	NES_CONTROL_PORT(config, m_port1, hori_adapter, "joypad");
+	NES_CONTROL_PORT(config, m_port2, hori_adapter, "joypad");
+	if (m_port != nullptr)
+	{
+		m_port1->set_screen_tag(m_port->m_screen);
+		m_port2->set_screen_tag(m_port->m_screen);
+	}
 }
 
 void nes_hori4p_device::device_add_mconfig(machine_config &config)
 {
-	NES_CONTROL_PORT(config, "port1", hori_adapter, "joypad");
-	NES_CONTROL_PORT(config, "port2", hori_adapter, "joypad");
-	NES_CONTROL_PORT(config, "port3", hori_adapter, "joypad");
-	NES_CONTROL_PORT(config, "port4", hori_adapter, "joypad");
+	NES_CONTROL_PORT(config, m_port1, hori_adapter, "joypad");
+	NES_CONTROL_PORT(config, m_port2, hori_adapter, "joypad");
+	NES_CONTROL_PORT(config, m_port3, hori_adapter, "joypad");
+	NES_CONTROL_PORT(config, m_port4, hori_adapter, "joypad");
+	if (m_port != nullptr)
+	{
+		m_port1->set_screen_tag(m_port->m_screen);
+		m_port2->set_screen_tag(m_port->m_screen);
+		m_port3->set_screen_tag(m_port->m_screen);
+		m_port4->set_screen_tag(m_port->m_screen);
+	}
 }
 
 

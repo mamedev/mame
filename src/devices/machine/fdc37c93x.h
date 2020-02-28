@@ -50,9 +50,6 @@ public:
 
 	void remap(int space_id, offs_t start, offs_t end) override;
 
-	// to access io ports
-	DECLARE_READ8_MEMBER(read_fdc37c93x);
-	DECLARE_WRITE8_MEMBER(write_fdc37c93x);
 	// for the internal floppy controller
 	DECLARE_WRITE_LINE_MEMBER(irq_floppy_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_floppy_w);
@@ -93,6 +90,9 @@ public:
 	void map_keyboard(address_map &map);
 	void unmap_keyboard(address_map &map);
 
+	// to access io ports
+	DECLARE_READ8_MEMBER(read_fdc37c93x);
+	DECLARE_WRITE8_MEMBER(write_fdc37c93x);
 	DECLARE_READ8_MEMBER(disabled_read);
 	DECLARE_WRITE8_MEMBER(disabled_write);
 	DECLARE_READ8_MEMBER(lpt_read);

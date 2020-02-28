@@ -32,10 +32,10 @@ class ti_rs232_pio_device : public device_t, public device_ti99_peribox_card_int
 public:
 	ti_rs232_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(offs_t offset, uint8_t data) override;
 
 protected:
 	void device_start() override;
@@ -50,10 +50,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(int1_callback);
 	DECLARE_WRITE_LINE_MEMBER(rcv0_callback);
 	DECLARE_WRITE_LINE_MEMBER(rcv1_callback);
-	DECLARE_WRITE8_MEMBER(xmit0_callback);
-	DECLARE_WRITE8_MEMBER(xmit1_callback);
-	DECLARE_WRITE8_MEMBER(ctrl0_callback);
-	DECLARE_WRITE8_MEMBER(ctrl1_callback);
+	void xmit0_callback(uint8_t data);
+	void xmit1_callback(uint8_t data);
+	void ctrl0_callback(offs_t offset, uint8_t data);
+	void ctrl1_callback(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(selected_w);
 	DECLARE_WRITE_LINE_MEMBER(pio_direction_in_w);
@@ -133,14 +133,14 @@ class ti_rs232_attached_device : public device_t, public device_image_interface
 public:
 	ti_rs232_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	iodevice_t image_type() const override { return IO_SERIAL; }
-	bool is_readable()  const override           { return true; }
-	bool is_writeable() const override           { return true; }
-	bool is_creatable() const override           { return true; }
-	bool must_be_loaded() const override         { return false; }
-	bool is_reset_on_load() const override       { return false; }
-	const char *image_interface() const override { return ""; }
-	const char *file_extensions() const override { return ""; }
+	iodevice_t image_type() const noexcept override { return IO_SERIAL; }
+	bool is_readable()  const noexcept override           { return true; }
+	bool is_writeable() const noexcept override           { return true; }
+	bool is_creatable() const noexcept override           { return true; }
+	bool must_be_loaded() const noexcept override         { return false; }
+	bool is_reset_on_load() const noexcept override       { return false; }
+	const char *image_interface() const noexcept override { return ""; }
+	const char *file_extensions() const noexcept override { return ""; }
 	void connect(tms9902_device *dev) { m_uart = dev; }
 
 protected:
@@ -161,14 +161,14 @@ class ti_pio_attached_device : public device_t, public device_image_interface
 public:
 	ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	iodevice_t image_type() const override { return IO_PARALLEL; }
-	bool is_readable()  const override           { return true; }
-	bool is_writeable() const override           { return true; }
-	bool is_creatable() const override           { return true; }
-	bool must_be_loaded() const override         { return false; }
-	bool is_reset_on_load() const override       { return false; }
-	const char *image_interface() const override { return ""; }
-	const char *file_extensions() const override { return ""; }
+	iodevice_t image_type() const noexcept override { return IO_PARALLEL; }
+	bool is_readable()  const noexcept override           { return true; }
+	bool is_writeable() const noexcept override           { return true; }
+	bool is_creatable() const noexcept override           { return true; }
+	bool must_be_loaded() const noexcept override         { return false; }
+	bool is_reset_on_load() const noexcept override       { return false; }
+	const char *image_interface() const noexcept override { return ""; }
+	const char *file_extensions() const noexcept override { return ""; }
 
 protected:
 	void    device_start() override { };

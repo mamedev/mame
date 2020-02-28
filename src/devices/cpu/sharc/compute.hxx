@@ -2,7 +2,7 @@
 // copyright-holders:Ville Linde
 /* compute operations */
 
-#include <math.h>
+#include <cmath>
 
 #define CLEAR_ALU_FLAGS()       (m_core->astat &= ~(AZ|AN|AV|AC|AS|AI))
 
@@ -731,6 +731,24 @@ void adsp21062_device::compute_fmin(int rn, int rx, int ry)
 	// AI
 	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || IS_FLOAT_NAN(REG(ry))) ? AI : 0;
 	/* TODO: AV flag */
+
+	FREG(rn) = r_alu.f;
+	m_core->astat |= AF;
+}
+
+/* Fn = COPYSIGN(Fx, Fy) */
+void adsp21062_device::compute_fcopysign(int rn, int rx, int ry)
+{
+	SHARC_REG r_alu;
+
+	r_alu.r = (REG(rx) & 0x7fffffff) | (REG(ry) & 0x80000000); // TODO DENORM and NAN cases ?
+
+	CLEAR_ALU_FLAGS();
+	m_core->astat |= (r_alu.f < 0.0f) ? AN : 0;
+	// AZ
+	m_core->astat |= (IS_FLOAT_ZERO(r_alu.r)) ? AZ : 0;
+	// AI
+	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || IS_FLOAT_NAN(REG(ry))) ? AI : 0;
 
 	FREG(rn) = r_alu.f;
 	m_core->astat |= AF;

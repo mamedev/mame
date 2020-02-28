@@ -58,7 +58,7 @@ private:
 	DECLARE_WRITE32_MEMBER(hvysmsh_oki_0_bank_w);
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt);
 	void descramble_sound( const char *tag );
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
@@ -266,22 +266,9 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8    /* every char takes 8 consecutive bytes */
-};
-
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 16, 0, 24, 8 },
-	{ 64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+4, 64*8+5, 64*8+6, 64*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	128*8
 };
 
 static const gfx_layout tilelayout =
@@ -290,25 +277,23 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(8*2*16,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
 static GFXDECODE_START( gfx_hvysmsh )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 32 )    /* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 32 )    /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 32 )    /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )    /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0, 32 )    /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 512, 32 )    /* Sprites 16x16 */
 GFXDECODE_END
 
 
 /**********************************************************************************/
 
-INTERRUPT_GEN_MEMBER(deco156_state::deco32_vbl_interrupt)
+WRITE_LINE_MEMBER(deco156_state::vblank_interrupt)
 {
-	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
+	m_maincpu->set_input_line(ARM_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 DECO16IC_BANK_CB_MEMBER(deco156_state::bank_callback)
@@ -329,27 +314,26 @@ DECOSPR_PRIORITY_CB_MEMBER(deco156_state::pri_callback)
 	return 0;
 }
 
-MACHINE_CONFIG_START(deco156_state::hvysmsh)
-
+void deco156_state::hvysmsh(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
-	MCFG_DEVICE_PROGRAM_MAP(hvysmsh_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
+	ARM(config, m_maincpu, 28000000); /* Unconfirmed */
+	m_maincpu->set_addrmap(AS_PROGRAM, &deco156_state::hvysmsh_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(deco156_state::screen_update));
+	screen.screen_vblank().set(FUNC(deco156_state::vblank_interrupt));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hvysmsh)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_hvysmsh);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 1024);
 
 	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_split(0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_trans_mask(0x0f);
@@ -358,51 +342,50 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);
 	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback), this);
-	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback), this);
+	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback));
+	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback));
 	m_deco_tilegen->set_pf12_8x8_bank(0);
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback), this);
+	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback));
 	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 28000000/28, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki1, 28000000/28, okim6295_device::PIN7_HIGH);
+	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 28000000/14, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki2, 28000000/14, okim6295_device::PIN7_HIGH);
+	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+}
 
-MACHINE_CONFIG_START(deco156_state::wcvol95)
-
+void deco156_state::wcvol95(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
-	MCFG_DEVICE_PROGRAM_MAP(wcvol95_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
+	ARM(config, m_maincpu, 28000000); /* Unconfirmed */
+	m_maincpu->set_addrmap(AS_PROGRAM, &deco156_state::wcvol95_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(deco156_state::screen_update));
+	screen.screen_vblank().set(FUNC(deco156_state::vblank_interrupt));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hvysmsh)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_hvysmsh);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_split(0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_trans_mask(0x0f);
@@ -411,25 +394,25 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);
 	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback), this);
-	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback), this);
+	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback));
+	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback));
 	m_deco_tilegen->set_pf12_8x8_bank(0);
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback), this);
+	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback));
 	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 28000000 / 2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 28000000 / 2));
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
 
 
 /**********************************************************************************/
@@ -499,8 +482,8 @@ ROM_START( hvysmsh ) /* Europe -2  1993/06/30 */
 	ROM_CONTINUE( 0x180000, 0x080000)
 
 	ROM_REGION( 0x800000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "mbg-01.10a", 0x000000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
-	ROM_LOAD16_BYTE( "mbg-02.11a", 0x000001, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
+	ROM_LOAD( "mbg-01.10a", 0x400000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
+	ROM_LOAD( "mbg-02.11a", 0x000000, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "mbg-03.10k", 0x00000, 0x80000,  CRC(4b809420) SHA1(ad0278745002320804a31af0b772f9ab5f075027) )
@@ -524,8 +507,8 @@ ROM_START( hvysmshj ) /* Japan -2  1993/06/30 */
 	ROM_CONTINUE( 0x180000, 0x080000)
 
 	ROM_REGION( 0x800000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "mbg-01.10a", 0x000000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
-	ROM_LOAD16_BYTE( "mbg-02.11a", 0x000001, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
+	ROM_LOAD( "mbg-01.10a", 0x400000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
+	ROM_LOAD( "mbg-02.11a", 0x000000, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "mbg-03.10k", 0x00000, 0x80000,  CRC(4b809420) SHA1(ad0278745002320804a31af0b772f9ab5f075027) )
@@ -549,8 +532,8 @@ ROM_START( hvysmsha ) /* Asia -4  1993/09/06 */
 	ROM_CONTINUE( 0x180000, 0x080000)
 
 	ROM_REGION( 0x800000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "mbg-01.10a", 0x000000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
-	ROM_LOAD16_BYTE( "mbg-02.11a", 0x000001, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
+	ROM_LOAD( "mbg-01.10a", 0x400000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
+	ROM_LOAD( "mbg-02.11a", 0x000000, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "mbg-03.10k", 0x00000, 0x80000,  CRC(4b809420) SHA1(ad0278745002320804a31af0b772f9ab5f075027) )
@@ -610,8 +593,8 @@ ROM_START( wcvol95 )
 	ROM_LOAD( "mbx-00.9a",    0x000000, 0x080000, CRC(a0b24204) SHA1(cec8089c6c635f23b3a4aeeef2c43f519568ad70) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "mbx-01.12a",    0x000000, 0x100000, CRC(73deb3f1) SHA1(c0cabecfd88695afe0f27c5bb115b4973907207d) )
-	ROM_LOAD16_BYTE( "mbx-02.13a",    0x000001, 0x100000, CRC(3204d324) SHA1(44102f71bae44bf3a9bd2de7e5791d959a2c9bdd) )
+	ROM_LOAD( "mbx-01.12a",    0x100000, 0x100000, CRC(73deb3f1) SHA1(c0cabecfd88695afe0f27c5bb115b4973907207d) )
+	ROM_LOAD( "mbx-02.13a",    0x000000, 0x100000, CRC(3204d324) SHA1(44102f71bae44bf3a9bd2de7e5791d959a2c9bdd) )
 
 	ROM_REGION( 0x200000, "ymz", 0 ) /* YMZ280B-F samples */
 	ROM_LOAD( "mbx-03.13j",    0x00000, 0x200000,  CRC(061632bc) SHA1(7900ac56e59f4a4e5768ce72f4a4b7c5875f5ae8) )
@@ -634,8 +617,8 @@ ROM_START( wcvol95j )
 	ROM_LOAD( "mbx-00.9a",    0x000000, 0x080000, CRC(a0b24204) SHA1(cec8089c6c635f23b3a4aeeef2c43f519568ad70) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "mbx-01.12a",    0x000000, 0x100000, CRC(73deb3f1) SHA1(c0cabecfd88695afe0f27c5bb115b4973907207d) )
-	ROM_LOAD16_BYTE( "mbx-02.13a",    0x000001, 0x100000, CRC(3204d324) SHA1(44102f71bae44bf3a9bd2de7e5791d959a2c9bdd) )
+	ROM_LOAD( "mbx-01.12a",    0x100000, 0x100000, CRC(73deb3f1) SHA1(c0cabecfd88695afe0f27c5bb115b4973907207d) )
+	ROM_LOAD( "mbx-02.13a",    0x000000, 0x100000, CRC(3204d324) SHA1(44102f71bae44bf3a9bd2de7e5791d959a2c9bdd) )
 
 	ROM_REGION( 0x200000, "ymz", 0 ) /* YMZ280B-F samples */
 	ROM_LOAD( "mbx-03.13j",    0x00000, 0x200000,  CRC(061632bc) SHA1(7900ac56e59f4a4e5768ce72f4a4b7c5875f5ae8) )
@@ -659,8 +642,8 @@ ROM_START( wcvol95x )
 	ROM_LOAD( "mbx-00.9a",    0x000000, 0x080000, CRC(a0b24204) SHA1(cec8089c6c635f23b3a4aeeef2c43f519568ad70) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "mbx-01.12a",    0x000000, 0x100000, CRC(73deb3f1) SHA1(c0cabecfd88695afe0f27c5bb115b4973907207d) )
-	ROM_LOAD16_BYTE( "mbx-02.13a",    0x000001, 0x100000, CRC(3204d324) SHA1(44102f71bae44bf3a9bd2de7e5791d959a2c9bdd) )
+	ROM_LOAD( "mbx-01.12a",    0x100000, 0x100000, CRC(73deb3f1) SHA1(c0cabecfd88695afe0f27c5bb115b4973907207d) )
+	ROM_LOAD( "mbx-02.13a",    0x000000, 0x100000, CRC(3204d324) SHA1(44102f71bae44bf3a9bd2de7e5791d959a2c9bdd) )
 
 	ROM_REGION( 0x200000, "ymz", 0 ) /* YMZ280B-F samples */
 	ROM_LOAD( "mbx-03.13j",    0x00000, 0x200000,  CRC(061632bc) SHA1(7900ac56e59f4a4e5768ce72f4a4b7c5875f5ae8) )

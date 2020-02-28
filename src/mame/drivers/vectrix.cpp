@@ -50,13 +50,14 @@ void vectrix_state::io_map(address_map &map)
 static INPUT_PORTS_START( vectrix )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(vectrix_state::vectrix)
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181)/3)  // no idea of clock
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+void vectrix_state::vectrix(machine_config &config)
+{
+	i8088_cpu_device &maincpu(I8088(config, "maincpu", XTAL(14'318'181)/3));  // no idea of clock
+	maincpu.set_addrmap(AS_PROGRAM, &vectrix_state::mem_map);
+	maincpu.set_addrmap(AS_IO, &vectrix_state::io_map);
 
-	MCFG_DEVICE_ADD("uart1", I8251, 0)
-MACHINE_CONFIG_END
+	I8251(config, "uart1", 0);
+}
 
 ROM_START( vectrix )
 	ROM_REGION( 0x4000, "roms", 0 )

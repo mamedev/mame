@@ -200,17 +200,17 @@ WRITE8_MEMBER( micronic_state::port_2c_w )
 
 WRITE8_MEMBER( micronic_state::rtc_address_w )
 {
-	m_rtc->write(space, 0, data);
+	m_rtc->write(0, data);
 }
 
 READ8_MEMBER( micronic_state::rtc_data_r )
 {
-	return m_rtc->read(space, 1);
+	return m_rtc->read(1);
 }
 
 WRITE8_MEMBER( micronic_state::rtc_data_w )
 {
-	m_rtc->write(space, 1, data);
+	m_rtc->write(1, data);
 }
 
 /***************************************************************************
@@ -349,19 +349,20 @@ WRITE_LINE_MEMBER( micronic_state::mc146818_irq )
 }
 
 
-MACHINE_CONFIG_START(micronic_state::micronic)
+void micronic_state::micronic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 3.579545_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(micronic_mem)
-	MCFG_DEVICE_IO_MAP(micronic_io)
+	Z80(config, m_maincpu, 3.579545_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &micronic_state::micronic_mem);
+	m_maincpu->set_addrmap(AS_IO, &micronic_state::micronic_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
-	MCFG_SCREEN_REFRESH_RATE(80)
-	MCFG_SCREEN_UPDATE_DEVICE(HD61830_TAG, hd61830_device, screen_update)
-	MCFG_SCREEN_SIZE(120, 64)   //6x20, 8x8
-	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 64-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(80);
+	screen.set_screen_update(HD61830_TAG, FUNC(hd61830_device::screen_update));
+	screen.set_size(120, 64);   //6x20, 8x8
+	screen.set_visarea(0, 120-1, 0, 64-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(micronic_state::micronic_palette), 2);
 
@@ -379,7 +380,7 @@ MACHINE_CONFIG_START(micronic_state::micronic)
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(FUNC(micronic_state::mc146818_irq));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( micronic )

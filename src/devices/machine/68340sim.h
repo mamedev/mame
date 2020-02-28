@@ -35,6 +35,7 @@ public:
 	bool m_pit_irq;
 
 	void reset();
+	void module_reset();
 
 	enum {
 		REG_MCR          = 0x00,

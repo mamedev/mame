@@ -1,7 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:FelipeSanches, Sandro Ronco
 //
-// Wacky Gator
+// Namco Gator Panic (Wani Wani Panic)
+// USA version distributed by Data East and renamed "Wacky Gator"
 //
 // Driver by Sandro Ronco and
 //  Felipe Correa da Silva Sanches <juca@members.fsf.org>
@@ -213,13 +214,13 @@ void wackygtr_state::set_lamps(int p, uint8_t value)
 
 static INPUT_PORTS_START( wackygtr )
 	PORT_START("IN0")
-	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_CUSTOM)  PORT_CUSTOM_MEMBER(DEVICE_SELF, wackygtr_state, alligators_rear_sensors_r, nullptr)
+	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(wackygtr_state, alligators_rear_sensors_r)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SERVICE)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_COIN1)
 
 	PORT_START("IN1")
-	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_CUSTOM)   PORT_CUSTOM_MEMBER(DEVICE_SELF, wackygtr_state, alligators_front_sensors_r, nullptr)
+	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(wackygtr_state, alligators_front_sensors_r)
 	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_1C ) )
@@ -281,8 +282,8 @@ void wackygtr_state::program_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-MACHINE_CONFIG_START(wackygtr_state::wackygtr)
-
+void wackygtr_state::wackygtr(machine_config &config)
+{
 	MC6809(config, m_maincpu, XTAL(3'579'545)); // HD68B09P
 	m_maincpu->set_addrmap(AS_PROGRAM, &wackygtr_state::program_map);
 	m_maincpu->set_periodic_int(FUNC(wackygtr_state::irq0_line_assert), attotime::from_hz(50)); // FIXME
@@ -345,4 +346,4 @@ ROM_START( wackygtr )
 	ROM_LOAD("wp3-vo0.2h", 0x0000, 0x10000, CRC(91c7986f) SHA1(bc9fa0d41c1caa0f909a349f511d022b7e42c6cd))
 ROM_END
 
-GAME(1990, wackygtr,    0, wackygtr,  wackygtr, wackygtr_state, empty_init, ROT0, "Data East", "Wacky Gator", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_CLICKABLE_ARTWORK)
+GAME(1988, wackygtr,    0, wackygtr,  wackygtr, wackygtr_state, empty_init, ROT0, "Namco (Data East license)", "Wacky Gator (US)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_CLICKABLE_ARTWORK)

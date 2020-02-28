@@ -7,7 +7,7 @@
 
 #ifdef _MSC_VER
 /* logb prototype is different for MS Visual C */
-#include <float.h>
+#include <cfloat>
 #define logb _logb
 #endif
 
@@ -17,10 +17,16 @@ DEFINE_DEVICE_TYPE(I960, i960_cpu_device, "i960kb", "Intel i960KB")
 
 i960_cpu_device::i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, I960, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
+	, m_stalled(false), m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_rcache_pos(0), m_SAT(0), m_PRCB(0), m_PC(0), m_AC(0), m_IP(0), m_PIP(0), m_ICR(0), m_bursting(0), m_immediate_irq(0)
 	, m_immediate_vector(0), m_immediate_pri(0), m_program(nullptr), m_cache(nullptr), m_icount(0)
 {
+	std::fill(std::begin(m_r), std::end(m_r), 0);
+	std::fill(std::begin(m_rcache_frame_addr), std::end(m_rcache_frame_addr), 0);
+	std::fill(std::begin(m_fp), std::end(m_fp), 0);
+
+	for (int i = 0; i <I960_RCACHE_SIZE; i++)
+		std::fill(std::begin(m_rcache[i]), std::end(m_rcache[i]), 0);
 }
 
 
@@ -1530,6 +1536,12 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				set_rif(opcode, t2f*log(t1f+1.0)/log(2.0));
 				break;
 
+			case 0x2: // logr
+				m_icount -= 400; // checkme
+				t1f = get_1_rif(opcode);
+				set_rif(opcode, log(t1f));
+				break;
+
 			case 0x3: // remr
 				m_icount -= 67; // (67 to 75878 depending on opcodes!!!)
 				t1f = get_1_rif(opcode);
@@ -1548,6 +1560,12 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount -= 104;
 				t1f = get_1_rif(opcode);
 				set_rif(opcode, sqrt(t1f));
+				break;
+
+			case 0x9: // expr
+				m_icount -= 334; // checkme
+				t1f = get_1_rif(opcode);
+				set_rif(opcode, pow(2.0, t1f) - 1.0);
 				break;
 
 			case 0xa: // logbnr

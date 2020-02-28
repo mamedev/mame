@@ -44,11 +44,15 @@
    - accurate timing of envelopes
    - LFO (vibrato, tremolo)
    - integrate YMF262 mixing (used by Fuuki games, not used by Psikyo and Metro games)
+   - Envelope and LFO function is similar algorithm as multipcm.cpp (except Damp, Pseudo Reverb)
+     Can it be merged with/ported to this?
 */
 
 #include "emu.h"
 #include "ymf278b.h"
 #include "ymf262.h"
+
+#include <algorithm>
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
@@ -219,13 +223,17 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	int32_t *mixp;
 	int32_t vl, vr;
 
-	if (&stream == m_stream_ymf262)
+	ymf262_update_one(m_ymf262, outputs, samples);
+	vl = m_mix_level[m_fm_l];
+	vr = m_mix_level[m_fm_r];
+	for (i = 0; i < samples; i++)
 	{
-		ymf262_update_one(m_ymf262, outputs, samples);
-		return;
+		// DO2 mixing
+		outputs[0][i] = (outputs[0][i] * vl) >> 16;
+		outputs[1][i] = (outputs[1][i] * vr) >> 16;
 	}
 
-	memset(m_mix_buffer.get(), 0, sizeof(m_mix_buffer[0])*samples*2);
+	std::fill(m_mix_buffer.begin(), m_mix_buffer.end(), 0);
 
 	for (i = 0; i < 24; i++)
 	{
@@ -233,7 +241,7 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 		if (slot->active)
 		{
-			mixp = m_mix_buffer.get();
+			mixp = &m_mix_buffer[0];
 
 			for (j = 0; j < samples; j++)
 			{
@@ -274,8 +282,20 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 						break;
 				}
 
-				*mixp++ += (sample * m_volume[slot->TL+m_pan_left [slot->pan]+(slot->env_vol>>23)])>>17;
-				*mixp++ += (sample * m_volume[slot->TL+m_pan_right[slot->pan]+(slot->env_vol>>23)])>>17;
+				if (slot->CH) // DO1 out
+				{
+					mixp++;
+					mixp++;
+					*mixp++ += (sample * m_volume[slot->TL+m_pan_left [slot->pan]+(slot->env_vol>>23)])>>17;
+					*mixp++ += (sample * m_volume[slot->TL+m_pan_right[slot->pan]+(slot->env_vol>>23)])>>17;
+				}
+				else // DO2 out
+				{
+					*mixp++ += (sample * m_volume[slot->TL+m_pan_left [slot->pan]+(slot->env_vol>>23)])>>17;
+					*mixp++ += (sample * m_volume[slot->TL+m_pan_right[slot->pan]+(slot->env_vol>>23)])>>17;
+					mixp++;
+					mixp++;
+				}
 
 				// update frequency
 				slot->stepptr += slot->step;
@@ -293,13 +313,15 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		}
 	}
 
-	mixp = m_mix_buffer.get();
+	mixp = &m_mix_buffer[0];
 	vl = m_mix_level[m_pcm_l];
 	vr = m_mix_level[m_pcm_r];
 	for (i = 0; i < samples; i++)
 	{
-		outputs[0][i] = (*mixp++ * vl) >> 16;
-		outputs[1][i] = (*mixp++ * vr) >> 16;
+		outputs[0][i] += (*mixp++ * vl) >> 16;
+		outputs[1][i] += (*mixp++ * vr) >> 16;
+		outputs[4][i] = *mixp++;
+		outputs[5][i] = *mixp++;
 	}
 }
 
@@ -494,9 +516,7 @@ void ymf278b_device::C_w(uint8_t reg, uint8_t data)
 
 				// status register LD bit is on for approx 300us
 				m_status_ld = 1;
-				period = attotime::from_usec(300);
-				if (m_clock != YMF278B_STD_CLOCK)
-					period = (period * m_clock) / YMF278B_STD_CLOCK;
+				period = clocks_to_attotime(10);
 				m_timer_ld->adjust(period);
 
 				// retrigger if key is on
@@ -780,6 +800,7 @@ u8 ymf278b_device::read(offs_t offset)
 //-------------------------------------------------
 //  device_post_load - device-specific post load
 //-------------------------------------------------
+
 void ymf278b_device::device_post_load()
 {
 	ymf262_post_load(m_ymf262);
@@ -851,16 +872,21 @@ void ymf278b_device::device_stop()
 
 void ymf278b_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock()/768);
-
+	int old_rate = m_rate;
 	m_clock = clock();
+	m_rate = m_clock/768;
+
+	if (m_rate > old_rate)
+	{
+		m_mix_buffer.resize(m_rate*4,0);
+	}
+	m_stream->set_sample_rate(m_rate);
+
 	m_timer_base = m_clock ? attotime::from_hz(m_clock) * (19 * 36) : attotime::zero;
 
 	// YMF262 related
 
-	int ymf262_clock = clock() / (19/8.0);
-	ymf262_clock_changed(m_ymf262, ymf262_clock, ymf262_clock / 288);
-	m_stream_ymf262->set_sample_rate(ymf262_clock / 288);
+	ymf262_clock_changed(m_ymf262, clock(), m_rate);
 }
 
 void ymf278b_device::rom_bank_updated()
@@ -969,6 +995,7 @@ void ymf278b_device::device_start()
 	int i;
 
 	m_clock = clock();
+	m_rate = m_clock / 768;
 	m_irq_handler.resolve();
 
 	m_timer_base = m_clock ? attotime::from_hz(m_clock) * (19*36) : attotime::zero;
@@ -982,8 +1009,8 @@ void ymf278b_device::device_start()
 		m_slots[i].num = i;
 	}
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock()/768);
-	m_mix_buffer = std::make_unique<int32_t[]>(44100*2);
+	m_stream = machine().sound().stream_alloc(*this, 0, 6, m_rate);
+	m_mix_buffer.resize(m_rate*4,0);
 
 	// rate tables
 	precompute_rate_tables();
@@ -1012,11 +1039,9 @@ void ymf278b_device::device_start()
 	// YMF262 related
 
 	/* stream system initialize */
-	int ymf262_clock = clock() / (19/8.0);
-	m_ymf262 = ymf262_init(this, ymf262_clock, ymf262_clock / 288);
-	assert_always(m_ymf262 != nullptr, "Error creating YMF262 chip");
-
-	m_stream_ymf262 = machine().sound().stream_alloc(*this, 0, 4, ymf262_clock / 288);
+	m_ymf262 = ymf278b_init(this, clock(), m_rate);
+	if (!m_ymf262)
+		throw emu_fatalerror("ymf278b_device(%s): Error creating YMF262 chip", tag());
 
 	/* YMF262 setup */
 	ymf262_set_timer_handler (m_ymf262, ymf278b_device::static_timer_handler, this);

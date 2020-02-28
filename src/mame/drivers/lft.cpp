@@ -69,7 +69,7 @@ void lft_state::io_map(address_map &map)
 	//map(0x0080, 0x0087) // unknown device
 	//map(0x00a0, 0x00a?) // unknown device
 	//map(0x00c0, 0x00c7) // unknown device
-	map(0x0100, 0x0107).rw(m_scc, FUNC(z80scc_device::cd_ab_r), FUNC(z80scc_device::cd_ab_w)).umask16(0x00ff);
+	map(0x0100, 0x0107).rw(m_scc, FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0x0180, 0x01bf).rw(m_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 	//map(0x0200, 0x0207) // unknown device
 }
@@ -116,13 +116,13 @@ void lft_state::lft(machine_config &config)
 
 /* ROM definition */
 ROM_START( lft1230 )
-	ROM_REGION(0x4000, "roms", 0)
+	ROM_REGION16_LE(0x4000, "roms", 0)
 	ROM_LOAD16_BYTE( "1230lf29", 0x0000, 0x2000, CRC(11c87367) SHA1(0879650aa98e19a4e6ca7b6ee7874f81c9c8ccfa) )
 	ROM_LOAD16_BYTE( "1230lf42", 0x0001, 0x2000, CRC(ab82b620) SHA1(8c7d93950703f348e5ce0f9e376d157dd6098c6a) )
 ROM_END
 
 ROM_START( lft1510 )
-	ROM_REGION(0x4000, "roms", 0)
+	ROM_REGION16_LE(0x4000, "roms", 0)
 	ROM_LOAD16_BYTE( "1510lfev", 0x2000, 0x1000, CRC(47dbb290) SHA1(b557e9a54a30d9a16edfdef4a6b12a5393d30bf3) )
 	ROM_IGNORE(0x1000)
 	ROM_LOAD16_BYTE( "1510lfod", 0x2001, 0x1000, CRC(ba8c23fc) SHA1(d4b82f69fccd653b31e7bd05ee884b323ff0007b) )

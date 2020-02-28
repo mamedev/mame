@@ -81,8 +81,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual u64 execute_clocks_to_cycles(u64 clocks) const override;
-	virtual u64 execute_cycles_to_clocks(u64 cycles) const override;
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override;
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override;
 
 	virtual void state_import(device_state_entry const &entry) override;
 	virtual void state_export(device_state_entry const &entry) override;
@@ -113,9 +113,9 @@ protected:
 	void memory_map(address_map &map);
 
 private:
-	devcb_read8         m_port_in_cb[4];
-	devcb_write8        m_port_out_cb[4];
-	devcb_write_line    m_cntr_out_cb;
+	devcb_read8::array<4>   m_port_in_cb;
+	devcb_write8::array<4>  m_port_out_cb;
+	devcb_write_line        m_cntr_out_cb;
 
 	u8  m_cr;
 

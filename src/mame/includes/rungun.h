@@ -18,6 +18,7 @@
 #include "video/konami_helper.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class rungun_state : public driver_device
 {
@@ -120,7 +121,6 @@ private:
 
 	INTERRUPT_GEN_MEMBER(rng_interrupt);
 
-	void k054539_map(address_map &map);
 	void rungun_map(address_map &map);
 	void rungun_sound_map(address_map &map);
 };

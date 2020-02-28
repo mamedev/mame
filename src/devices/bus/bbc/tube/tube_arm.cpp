@@ -37,7 +37,7 @@ void bbc_tube_arm_device::tube_arm_mem(address_map &map)
 //-------------------------------------------------
 
 ROM_START( tube_arm )
-	ROM_REGION(0x4000, "bootstrap", 0)
+	ROM_REGION32_LE(0x4000, "bootstrap", 0)
 	ROM_DEFAULT_BIOS("101")
 	ROM_SYSTEM_BIOS(0, "101", "Executive v1.00 (14th August 1986)")
 	ROMX_LOAD("armeval_101.rom", 0x0000, 0x4000, CRC(cab85473) SHA1(f86bbc4894e62725b8ef22d44e7f44d37c98ac14), ROM_BIOS(0))
@@ -120,18 +120,18 @@ void bbc_tube_arm_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_tube_arm_device::host_r)
+uint8_t bbc_tube_arm_device::host_r(offs_t offset)
 {
-	return m_ula->host_r(space, offset);
+	return m_ula->host_r(offset);
 }
 
-WRITE8_MEMBER(bbc_tube_arm_device::host_w)
+void bbc_tube_arm_device::host_w(offs_t offset, uint8_t data)
 {
-	m_ula->host_w(space, offset, data);
+	m_ula->host_w(offset, data);
 }
 
 
-READ8_MEMBER(bbc_tube_arm_device::ram_r)
+uint8_t bbc_tube_arm_device::ram_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -143,7 +143,7 @@ READ8_MEMBER(bbc_tube_arm_device::ram_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_tube_arm_device::ram_w)
+void bbc_tube_arm_device::ram_w(offs_t offset, uint8_t data)
 {
 	/* clear ROM select on first write */
 	if (!machine().side_effects_disabled()) m_rom_select = false;

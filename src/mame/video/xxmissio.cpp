@@ -63,8 +63,8 @@ TILE_GET_INFO_MEMBER(xxmissio_state::get_fg_tile_info)
 
 void xxmissio_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(xxmissio_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(xxmissio_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xxmissio_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xxmissio_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_cols(1);
 	m_bg_tilemap->set_scroll_rows(1);

@@ -104,7 +104,7 @@ void menu_directory::populate(float &customtop, float &custombottom)
 		item_append(_(elem.name), "", 0, (void *)(uintptr_t)elem.action);
 
 	item_append(menu_item_type::SEPARATOR);
-	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 //-------------------------------------------------
@@ -116,9 +116,9 @@ void menu_directory::custom_render(void *selectedref, float top, float bottom, f
 	char const *const toptext[] = { _("Folders Setup") };
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
-			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
 /**************************************************
@@ -170,7 +170,7 @@ void menu_display_actual::populate(float &customtop, float &custombottom)
 	else
 		m_searchpath.assign(machine().options().value(s_folders[m_ref].option));
 
-	path_iterator path(m_searchpath.c_str());
+	path_iterator path(m_searchpath);
 	std::string curpath;
 	m_folders.clear();
 	while (path.next(curpath, nullptr))
@@ -182,7 +182,7 @@ void menu_display_actual::populate(float &customtop, float &custombottom)
 		item_append(_("Remove Folder"), "", 0, (void *)REMOVE);
 
 	item_append(menu_item_type::SEPARATOR);
-	customtop = (m_folders.size() + 1) * ui().get_line_height() + 6.0f * UI_BOX_TB_BORDER;
+	customtop = (m_folders.size() + 1) * ui().get_line_height() + 6.0f * ui().box_tb_border();
 }
 
 //-------------------------------------------------
@@ -194,14 +194,14 @@ void menu_display_actual::custom_render(void *selectedref, float top, float bott
 	float const lineheight(ui().get_line_height());
 	float const maxwidth(draw_text_box(
 			std::begin(m_folders), std::end(m_folders),
-			origx1, origx2, origy1 - (3.0f * UI_BOX_TB_BORDER) - (m_folders.size() * lineheight), origy1 - UI_BOX_TB_BORDER,
+			origx1, origx2, origy1 - (3.0f * ui().box_tb_border()) - (m_folders.size() * lineheight), origy1 - ui().box_tb_border(),
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_BACKGROUND_COLOR, 1.0f));
+			ui().colors().text_color(), ui().colors().background_color(), 1.0f));
 	draw_text_box(
 			std::begin(m_heading), std::end(m_heading),
-			0.5f * (1.0f - maxwidth), 0.5f * (1.0f + maxwidth), origy1 - top, origy1 - top + lineheight + (2.0f * UI_BOX_TB_BORDER),
+			0.5f * (1.0f - maxwidth), 0.5f * (1.0f + maxwidth), origy1 - top, origy1 - top + lineheight + (2.0f * ui().box_tb_border()),
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
 /**************************************************
@@ -226,7 +226,7 @@ menu_add_change_folder::menu_add_change_folder(mame_ui_manager &mui, render_cont
 	else
 		searchpath = mui.machine().options().value(s_folders[m_ref].option);
 
-	path_iterator path(searchpath.c_str());
+	path_iterator path(searchpath);
 	std::string curpath;
 	while (path.next(curpath, nullptr))
 		m_folders.push_back(curpath);
@@ -250,7 +250,7 @@ void menu_add_change_folder::handle()
 		if (menu_event->iptkey == IPT_UI_SELECT)
 		{
 			int index = (uintptr_t)menu_event->itemref - 1;
-			const menu_item &pitem = item[index];
+			const menu_item &pitem = item(index);
 
 			// go up to the parent path
 			if (!strcmp(pitem.text.c_str(), ".."))
@@ -289,10 +289,10 @@ void menu_add_change_folder::handle()
 				if (m_change)
 				{
 					if (ui().options().exists(s_folders[m_ref].option))
-						ui().options().set_value(s_folders[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE);
+						ui().options().set_value(s_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
 					else if (strcmp(machine().options().value(s_folders[m_ref].option), m_current_path.c_str()) != 0)
 					{
-						machine().options().set_value(s_folders[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE);
+						machine().options().set_value(s_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
 					}
 				}
 				else
@@ -307,10 +307,10 @@ void menu_add_change_folder::handle()
 					}
 
 					if (ui().options().exists(s_folders[m_ref].option))
-						ui().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE);
+						ui().options().set_value(s_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
 					else if (strcmp(machine().options().value(s_folders[m_ref].option), tmppath.c_str()) != 0)
 					{
-						machine().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE);
+						machine().options().set_value(s_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
 					}
 				}
 
@@ -330,39 +330,39 @@ void menu_add_change_folder::handle()
 				int entry, bestmatch = 0;
 
 				// from current item to the end
-				for (entry = cur_selected; entry < item.size(); entry++)
-					if (item[entry].ref != nullptr && !m_search.empty())
+				for (entry = cur_selected; entry < item_count(); entry++)
+					if (item(entry).ref != nullptr && !m_search.empty())
 					{
 						int match = 0;
 						for (int i = 0; i < m_search.size() + 1; i++)
 						{
-							if (core_strnicmp(item[entry].text.c_str(), m_search.data(), i) == 0)
+							if (core_strnicmp(item(entry).text.c_str(), m_search.data(), i) == 0)
 								match = i;
 						}
 
 						if (match > bestmatch)
 						{
 							bestmatch = match;
-							selected = entry;
+							set_selected_index(entry);
 						}
 					}
 
 				// and from the first item to current one
 				for (entry = 0; entry < cur_selected; entry++)
 				{
-					if (item[entry].ref != nullptr && !m_search.empty())
+					if (item(entry).ref != nullptr && !m_search.empty())
 					{
 						int match = 0;
 						for (int i = 0; i < m_search.size() + 1; i++)
 						{
-							if (core_strnicmp(item[entry].text.c_str(), m_search.data(), i) == 0)
+							if (core_strnicmp(item(entry).text.c_str(), m_search.data(), i) == 0)
 								match = i;
 						}
 
 						if (match > bestmatch)
 						{
 							bestmatch = match;
-							selected = entry;
+							set_selected_index(entry);
 						}
 					}
 				}
@@ -403,8 +403,8 @@ void menu_add_change_folder::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 
 	// configure the custom rendering
-	customtop = 2.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-	custombottom = 1.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = 2.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
+	custombottom = 1.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 //-------------------------------------------------
@@ -421,17 +421,17 @@ void menu_add_change_folder::custom_render(void *selectedref, float top, float b
 			m_current_path };
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
-			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
 			ui::text_layout::CENTER, ui::text_layout::NEVER, false,
-			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 
 	// bottom text
 	char const *const bottomtext[] = { _("Press TAB to set") };
 	draw_text_box(
 			std::begin(bottomtext), std::end(bottomtext),
-			origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
+			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_RED_COLOR, 1.0f);
+			ui().colors().text_color(), UI_RED_COLOR, 1.0f);
 }
 
 /**************************************************
@@ -449,7 +449,7 @@ menu_remove_folder::menu_remove_folder(mame_ui_manager &mui, render_container &c
 	else
 		m_searchpath.assign(mui.machine().options().value(s_folders[m_ref].option));
 
-	path_iterator path(m_searchpath.c_str());
+	path_iterator path(m_searchpath);
 	std::string curpath;
 	while (path.next(curpath, nullptr))
 		m_folders.push_back(curpath);
@@ -479,10 +479,10 @@ void menu_remove_folder::handle()
 		}
 
 		if (ui().options().exists(s_folders[m_ref].option))
-			ui().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE);
+			ui().options().set_value(s_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
 		else if (strcmp(machine().options().value(s_folders[m_ref].option),tmppath.c_str())!=0)
 		{
-			machine().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE);
+			machine().options().set_value(s_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
 		}
 
 		reset_parent(reset_options::REMEMBER_REF);
@@ -501,7 +501,7 @@ void menu_remove_folder::populate(float &customtop, float &custombottom)
 		item_append(elem, "", 0, (void *)(uintptr_t)++folders_count);
 
 	item_append(menu_item_type::SEPARATOR);
-	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 //-------------------------------------------------
@@ -513,9 +513,9 @@ void menu_remove_folder::custom_render(void *selectedref, float top, float botto
 	std::string const toptext[] = {string_format(_("Remove %1$s Folder"), _(s_folders[m_ref].name)) };
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
-			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
 } // namespace ui

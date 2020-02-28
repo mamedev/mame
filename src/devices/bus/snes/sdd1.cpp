@@ -435,11 +435,8 @@ void sns_rom_sdd1_device::device_start()
 	save_item(NAME(m_xfer_enable));
 	save_item(NAME(m_mmc));
 
-	for (int i = 0; i < 8; i++)
-	{
-		save_item(NAME(m_dma[i].addr), i);
-		save_item(NAME(m_dma[i].size), i);
-	}
+	save_item(STRUCT_MEMBER(m_dma, addr));
+	save_item(STRUCT_MEMBER(m_dma, size));
 
 	save_pointer(NAME(m_buffer.data), 0x10000);
 	save_item(NAME(m_buffer.offset));
@@ -470,7 +467,7 @@ void sns_rom_sdd1_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER( sns_rom_sdd1_device::chip_read )
+uint8_t sns_rom_sdd1_device::chip_read(offs_t offset)
 {
 	uint16_t addr = offset & 0xffff;
 
@@ -491,7 +488,7 @@ READ8_MEMBER( sns_rom_sdd1_device::chip_read )
 }
 
 
-WRITE8_MEMBER( sns_rom_sdd1_device::chip_write )
+void sns_rom_sdd1_device::chip_write(offs_t offset, uint8_t data)
 {
 	uint16_t addr = offset & 0xffff;
 
@@ -589,7 +586,7 @@ uint8_t sns_rom_sdd1_device::read_helper(uint32_t addr)
 	return m_rom[m_mmc[(addr >> 20) & 3] + (addr & 0x0fffff)];
 }
 
-READ8_MEMBER(sns_rom_sdd1_device::read_l)
+uint8_t sns_rom_sdd1_device::read_l(offs_t offset)
 {
 	if (offset < 0x400000)
 		return m_rom[rom_bank_map[offset / 0x10000] * 0x8000 + (offset & 0x7fff)];
@@ -597,21 +594,21 @@ READ8_MEMBER(sns_rom_sdd1_device::read_l)
 		return m_rom[rom_bank_map[(offset - 0x400000) / 0x8000] * 0x8000 + (offset & 0x7fff)];
 }
 
-READ8_MEMBER(sns_rom_sdd1_device::read_h)
+uint8_t sns_rom_sdd1_device::read_h(offs_t offset)
 {
 	if (offset >= 0x400000)
 		return read_helper(offset - 0x400000);
 	else
-		return read_l(space, offset);
+		return read_l(offset);
 }
 
 
-READ8_MEMBER( sns_rom_sdd1_device::read_ram )
+uint8_t sns_rom_sdd1_device::read_ram(offs_t offset)
 {
 	return m_nvram[offset & 0x1fff];
 }
 
-WRITE8_MEMBER( sns_rom_sdd1_device::write_ram )
+void sns_rom_sdd1_device::write_ram(offs_t offset, uint8_t data)
 {
 	m_nvram[offset & 0x1fff] = data;
 }

@@ -32,14 +32,9 @@
 
 static osd_file::error common_process_file(emu_options &options, const char *location, const char *ext, const rom_entry *romp, emu_file &image_file)
 {
-	osd_file::error filerr;
-
-	if (location != nullptr && strcmp(location, "") != 0)
-		filerr = image_file.open(location, PATH_SEPARATOR, ROM_GETNAME(romp), ext);
-	else
-		filerr = image_file.open(ROM_GETNAME(romp), ext);
-
-	return filerr;
+	return (location && *location)
+			? image_file.open(location, PATH_SEPARATOR, ROM_GETNAME(romp), ext)
+			: image_file.open(ROM_GETNAME(romp), ext);
 }
 
 std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, u32 crc, const rom_entry *romp, osd_file::error &filerr)
@@ -145,39 +140,6 @@ const rom_entry *rom_next_parameter(const rom_entry *romp)
 	while (!ROMENTRY_ISREGIONEND(romp) && !ROMENTRY_ISPARAMETER(romp))
 		romp++;
 	return ROMENTRY_ISEND(romp) ? nullptr : romp;
-}
-
-
-/*-------------------------------------------------
-    rom_region_name - return the appropriate name
-    for a rom region
--------------------------------------------------*/
-
-std::string rom_region_name(const device_t &device, const rom_entry *romp)
-{
-	return device.subtag(ROM_GETNAME(romp));
-}
-
-
-/*-------------------------------------------------
-    rom_parameter_name - return the appropriate name
-    for a per-game parameter
--------------------------------------------------*/
-
-std::string rom_parameter_name(const device_t &device, const rom_entry *romp)
-{
-	return device.subtag(romp->name().c_str());
-}
-
-
-/*-------------------------------------------------
-    rom_parameter_name - return the value for a
-    per-game parameter
--------------------------------------------------*/
-
-std::string rom_parameter_value(const rom_entry *romp)
-{
-	return romp->hashdata();
 }
 
 
@@ -452,7 +414,7 @@ void rom_load_manager::display_loading_rom_message(const char *name, bool from_l
 	char buffer[200];
 
 	if (name != nullptr)
-		sprintf(buffer, "%s (%d%%)", from_list ? "Loading Software" : "Loading Machine", u32(100 * u64(m_romsloadedsize) / u64(m_romstotalsize)));
+		sprintf(buffer, "%s (%d%%)", from_list ? "Loading Software" : "Loading Machine", u32(100 * m_romsloadedsize / m_romstotalsize));
 	else
 		sprintf(buffer, "Loading Complete");
 
@@ -475,15 +437,15 @@ void rom_load_manager::display_rom_load_results(bool from_list)
 	if (m_errors != 0)
 	{
 		/* create the error message and exit fatally */
-		osd_printf_error("%s", m_errorstring.c_str());
-		fatalerror_exitcode(machine(), EMU_ERR_MISSING_FILES, "Required files are missing, the machine cannot be run.");
+		osd_printf_error("%s", m_errorstring);
+		throw emu_fatalerror(EMU_ERR_MISSING_FILES, "Required files are missing, the machine cannot be run.");
 	}
 
 	/* if we had warnings, output them, but continue */
 	if ((m_warnings) || (m_knownbad))
 	{
 		m_errorstring.append("WARNING: the machine might not run correctly.");
-		osd_printf_warning("%s\n", m_errorstring.c_str());
+		osd_printf_warning("%s\n", m_errorstring);
 	}
 }
 
@@ -493,12 +455,8 @@ void rom_load_manager::display_rom_load_results(bool from_list)
     byte swapping and inverting data as necessary
 -------------------------------------------------*/
 
-void rom_load_manager::region_post_process(const char *rgntag, bool invert)
+void rom_load_manager::region_post_process(memory_region *region, bool invert)
 {
-	memory_region *region = machine().root_device().memregion(rgntag);
-	u8 *base;
-	int i, j;
-
 	// do nothing if no region
 	if (region == nullptr)
 		return;
@@ -510,7 +468,8 @@ void rom_load_manager::region_post_process(const char *rgntag, bool invert)
 	if (invert)
 	{
 		LOG("+ Inverting region\n");
-		for (i = 0, base = region->base(); i < region->bytes(); i++)
+		u8 *base = region->base();
+		for (int i = 0; i < region->bytes(); i++)
 			*base++ ^= 0xff;
 	}
 
@@ -519,11 +478,12 @@ void rom_load_manager::region_post_process(const char *rgntag, bool invert)
 	{
 		LOG("+ Byte swapping region\n");
 		int datawidth = region->bytewidth();
-		for (i = 0, base = region->base(); i < region->bytes(); i += datawidth)
+		u8 *base = region->base();
+		for (int i = 0; i < region->bytes(); i += datawidth)
 		{
 			u8 temp[8];
 			memcpy(temp, base, datawidth);
-			for (j = datawidth - 1; j >= 0; j--)
+			for (int j = datawidth - 1; j >= 0; j--)
 				*base++ = temp[j];
 		}
 	}
@@ -600,7 +560,7 @@ int rom_load_manager::open_rom_file(const char *regiontag, const rom_entry *romp
 		}
 
 		if (tag5.find_first_of('%') != -1)
-			fatalerror("We do not support clones of clones!\n");
+			throw emu_fatalerror("We do not support clones of clones!\n");
 
 		// try to load from the available location(s):
 		// - if we are not using lists, we have regiontag only;
@@ -693,11 +653,11 @@ int rom_load_manager::read_rom_data(const rom_entry *parent_region, const rom_en
 
 	/* make sure we only fill within the region space */
 	if (ROM_GETOFFSET(romp) + numgroups * groupsize + (numgroups - 1) * skip > m_region->bytes())
-		fatalerror("Error in RomModule definition: %s out of memory region space\n", ROM_GETNAME(romp));
+		throw emu_fatalerror("Error in RomModule definition: %s out of memory region space\n", ROM_GETNAME(romp));
 
 	/* make sure the length was valid */
 	if (numbytes == 0)
-		fatalerror("Error in RomModule definition: %s has an invalid length\n", ROM_GETNAME(romp));
+		throw emu_fatalerror("Error in RomModule definition: %s has an invalid length\n", ROM_GETNAME(romp));
 
 	/* special case for simple loads */
 	if (datamask == 0xff && (groupsize == 1 || !reversed) && skip == 0)
@@ -795,11 +755,11 @@ void rom_load_manager::fill_rom_data(const rom_entry *romp)
 
 	// make sure we fill within the region space
 	if (ROM_GETOFFSET(romp) + numbytes > m_region->bytes())
-		fatalerror("Error in RomModule definition: FILL out of memory region space\n");
+		throw emu_fatalerror("Error in RomModule definition: FILL out of memory region space\n");
 
 	// make sure the length was valid
 	if (numbytes == 0)
-		fatalerror("Error in RomModule definition: FILL has an invalid length\n");
+		throw emu_fatalerror("Error in RomModule definition: FILL has an invalid length\n");
 
 	// for fill bytes, the byte that gets filled is the first byte of the hashdata string
 	u8 fill_byte = u8(strtol(ROM_GETHASHDATA(romp), nullptr, 0));
@@ -828,20 +788,20 @@ void rom_load_manager::copy_rom_data(const rom_entry *romp)
 
 	/* make sure we copy within the region space */
 	if (ROM_GETOFFSET(romp) + numbytes > m_region->bytes())
-		fatalerror("Error in RomModule definition: COPY out of target memory region space\n");
+		throw emu_fatalerror("Error in RomModule definition: COPY out of target memory region space\n");
 
 	/* make sure the length was valid */
 	if (numbytes == 0)
-		fatalerror("Error in RomModule definition: COPY has an invalid length\n");
+		throw emu_fatalerror("Error in RomModule definition: COPY has an invalid length\n");
 
 	/* make sure the source was valid */
 	memory_region *region = machine().root_device().memregion(srcrgntag);
 	if (region == nullptr)
-		fatalerror("Error in RomModule definition: COPY from an invalid region\n");
+		throw emu_fatalerror("Error in RomModule definition: COPY from an invalid region\n");
 
 	/* make sure we find within the region space */
 	if (srcoffs + numbytes > region->bytes())
-		fatalerror("Error in RomModule definition: COPY out of source memory region space\n");
+		throw emu_fatalerror("Error in RomModule definition: COPY out of source memory region space\n");
 
 	/* fill the data */
 	memcpy(base, region->base() + srcoffs, numbytes);
@@ -860,29 +820,29 @@ void rom_load_manager::process_rom_entries(const char *regiontag, const rom_entr
 	/* loop until we hit the end of this region */
 	while (!ROMENTRY_ISREGIONEND(romp))
 	{
-		/* if this is a continue entry, it's invalid */
 		if (ROMENTRY_ISCONTINUE(romp))
-			fatalerror("Error in RomModule definition: ROM_CONTINUE not preceded by ROM_LOAD\n");
+			throw emu_fatalerror("Error in RomModule definition: ROM_CONTINUE not preceded by ROM_LOAD\n");
 
-		/* if this is an ignore entry, it's invalid */
 		if (ROMENTRY_ISIGNORE(romp))
-			fatalerror("Error in RomModule definition: ROM_IGNORE not preceded by ROM_LOAD\n");
+			throw emu_fatalerror("Error in RomModule definition: ROM_IGNORE not preceded by ROM_LOAD\n");
 
-		/* if this is a reload entry, it's invalid */
 		if (ROMENTRY_ISRELOAD(romp))
-			fatalerror("Error in RomModule definition: ROM_RELOAD not preceded by ROM_LOAD\n");
+			throw emu_fatalerror("Error in RomModule definition: ROM_RELOAD not preceded by ROM_LOAD\n");
 
-		/* handle fills */
 		if (ROMENTRY_ISFILL(romp))
-			fill_rom_data(romp++);
+		{
+			if (!ROM_GETBIOSFLAGS(romp) || ROM_GETBIOSFLAGS(romp) == device->system_bios())
+				fill_rom_data(romp);
 
-		/* handle copies */
+			romp++;
+		}
 		else if (ROMENTRY_ISCOPY(romp))
+		{
 			copy_rom_data(romp++);
-
-		/* handle files */
+		}
 		else if (ROMENTRY_ISFILE(romp))
 		{
+			/* handle files */
 			int irrelevantbios = (ROM_GETBIOSFLAGS(romp) != 0 && ROM_GETBIOSFLAGS(romp) != device->system_bios());
 			const rom_entry *baserom = romp;
 			int explength = 0;
@@ -941,7 +901,7 @@ void rom_load_manager::process_rom_entries(const char *regiontag, const rom_entr
 		}
 		else
 		{
-			romp++; /* something else; skip */
+			romp++; // something else - skip
 		}
 	}
 }
@@ -1010,7 +970,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 		}
 
 		if (tag5.find_first_of('%') != -1)
-			fatalerror("We do not support clones of clones!\n");
+			throw emu_fatalerror("We do not support clones of clones!\n");
 
 		// try to load from the available location(s):
 		// - if we are not using lists, we have locationtag only;
@@ -1133,7 +1093,7 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 	/* try to open the diff */
 	LOG("Opening differencing image file: %s\n", fname.c_str());
 	emu_file diff_file(options.diff_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE);
-	osd_file::error filerr = diff_file.open(fname.c_str());
+	osd_file::error filerr = diff_file.open(fname);
 	if (filerr == osd_file::error::NONE)
 	{
 		std::string fullpath(diff_file.fullpath());
@@ -1146,7 +1106,7 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 	/* didn't work; try creating it instead */
 	LOG("Creating differencing image: %s\n", fname.c_str());
 	diff_file.set_openflags(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	filerr = diff_file.open(fname.c_str());
+	filerr = diff_file.open(fname);
 	if (filerr == osd_file::error::NONE)
 	{
 		std::string fullpath(diff_file.fullpath());
@@ -1290,7 +1250,6 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 {
 	std::string locationtag(swlist.list_name()), breakstr("%");
 	const rom_entry *region;
-	std::string regiontag;
 
 	m_errorstring.clear();
 	m_softwarningstring.clear();
@@ -1323,7 +1282,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		while (swinfo != nullptr)
 		{
 			locationtag.append(swinfo->shortname()).append(breakstr);
-			swinfo = !swinfo->parentname().empty() ? swlist.find(swinfo->parentname().c_str()) : nullptr;
+			swinfo = !swinfo->parentname().empty() ? swlist.find(swinfo->parentname()) : nullptr;
 		}
 		// strip the final '%'
 		locationtag.erase(locationtag.length() - 1, 1);
@@ -1335,7 +1294,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 	{
 		u32 regionlength = ROMREGION_GETLENGTH(region);
 
-		regiontag = device.subtag(ROMREGION_GETTAG(region));
+		std::string regiontag = device.subtag(ROMREGION_GETTAG(region));
 		LOG("Processing region \"%s\" (length=%X)\n", regiontag.c_str(), regionlength);
 
 		/* the first entry must be a region */
@@ -1344,7 +1303,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		/* if this is a device region, override with the device width and endianness */
 		endianness_t endianness = ROMREGION_ISBIGENDIAN(region) ? ENDIANNESS_BIG : ENDIANNESS_LITTLE;
 		u8 width = ROMREGION_GETWIDTH(region) / 8;
-		memory_region *memregion = machine().root_device().memregion(regiontag.c_str());
+		memory_region *memregion = machine().root_device().memregion(regiontag);
 		if (memregion != nullptr)
 		{
 			normalize_flags_for_device(regiontag.c_str(), width, endianness);
@@ -1387,10 +1346,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 
 	/* now go back and post-process all the regions */
 	for (region = start_region; region != nullptr; region = rom_next_region(region))
-	{
-		regiontag = device.subtag(ROMREGION_GETTAG(region));
-		region_post_process(regiontag.c_str(), ROMREGION_ISINVERTED(region));
-	}
+		region_post_process(device.memregion(ROMREGION_GETTAG(region)), ROMREGION_ISINVERTED(region));
 
 	/* display the results and exit */
 	display_rom_load_results(true);
@@ -1403,8 +1359,6 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 
 void rom_load_manager::process_region_list()
 {
-	std::string regiontag;
-
 	/* loop until we hit the end */
 	device_iterator deviter(machine().root_device());
 	for (device_t &device : deviter)
@@ -1412,7 +1366,7 @@ void rom_load_manager::process_region_list()
 		{
 			u32 regionlength = ROMREGION_GETLENGTH(region);
 
-			regiontag = rom_region_name(device, region);
+			std::string regiontag = device.subtag(ROM_GETNAME(region));
 			LOG("Processing region \"%s\" (length=%X)\n", regiontag.c_str(), regionlength);
 
 			/* the first entry must be a region */
@@ -1453,17 +1407,14 @@ void rom_load_manager::process_region_list()
 	/* now go back and post-process all the regions */
 	for (device_t &device : deviter)
 		for (const rom_entry *region = rom_first_region(device); region != nullptr; region = rom_next_region(region))
-		{
-			regiontag = rom_region_name(device, region);
-			region_post_process(regiontag.c_str(), ROMREGION_ISINVERTED(region));
-		}
+			region_post_process(device.memregion(ROM_GETNAME(region)), ROMREGION_ISINVERTED(region));
 
 	/* and finally register all per-game parameters */
 	for (device_t &device : deviter)
 		for (const rom_entry *param = rom_first_parameter(device); param != nullptr; param = rom_next_parameter(param))
 		{
-			regiontag = rom_parameter_name(device, param);
-			machine().parameters().add(regiontag, rom_parameter_value(param));
+			std::string regiontag = device.subtag(param->name());
+			machine().parameters().add(regiontag, param->hashdata());
 		}
 }
 

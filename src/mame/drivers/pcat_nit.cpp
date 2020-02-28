@@ -231,12 +231,13 @@ void pcat_nit_state::machine_start()
 	membank("rombank")->set_entry(0);
 }
 
-MACHINE_CONFIG_START(pcat_nit_state::pcat_nit)
+void pcat_nit_state::pcat_nit(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
-	MCFG_DEVICE_PROGRAM_MAP(pcat_map)
-	MCFG_DEVICE_IO_MAP(pcat_nit_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	I386(config, m_maincpu, 14318180*2);   /* I386 ?? Mhz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcat_nit_state::pcat_map);
+	m_maincpu->set_addrmap(AS_IO, &pcat_nit_state::pcat_nit_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
 	pcvideo_vga(config);
@@ -250,14 +251,15 @@ MACHINE_CONFIG_START(pcat_nit_state::pcat_nit)
 	MICROTOUCH(config, m_microtouch, 9600).stx().set(uart, FUNC(ins8250_uart_device::rx_w)); // rate?
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pcat_nit_state::bonanza)
+void pcat_nit_state::bonanza(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
-	MCFG_DEVICE_PROGRAM_MAP(bonanza_map)
-	MCFG_DEVICE_IO_MAP(bonanza_io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	I386(config, m_maincpu, 14318180*2);   /* I386 ?? Mhz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcat_nit_state::bonanza_map);
+	m_maincpu->set_addrmap(AS_IO, &pcat_nit_state::bonanza_io_map);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
 	pcvideo_cirrus_gd5428(config);
@@ -270,7 +272,7 @@ MACHINE_CONFIG_START(pcat_nit_state::bonanza)
 	MICROTOUCH(config, m_microtouch, 9600).stx().set(uart, FUNC(ins8250_uart_device::rx_w)); // rate?
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 /***************************************
 *
@@ -282,7 +284,7 @@ ROM_START(streetg)
 	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("system-bios-10-0004-01.u6", 0x00000, 0x10000, CRC(e4d6511f) SHA1(d432743f549fa6ecc04bc5bf94999253f86af08c) )
 
-	ROM_REGION(0x08000, "video_bios", 0)
+	ROM_REGION32_LE(0x08000, "video_bios", 0)
 	ROM_LOAD16_BYTE("vga1-bios-ver-b-1.00-07.u8",     0x00000, 0x04000, CRC(a40551d6) SHA1(db38190f06e4af2c2d59ae310e65883bb16cd3d6))
 	ROM_CONTINUE(                                     0x00001, 0x04000 )
 
@@ -294,7 +296,7 @@ ROM_START(streetg)
 	ROM_LOAD("10-0003-04.u13", 0x080000,0x40000, CRC(8a609145) SHA1(18fcb58b461aa9149a163b85dd8267dec90da3cd) )
 	ROM_CONTINUE(0x280000, 0x40000)
 
-	ROM_REGION(0x08000, "disk_bios", 0)
+	ROM_REGION32_LE(0x08000, "disk_bios", 0)
 	ROM_LOAD("disk-bios-10-0001-04.u10",     0x00000, 0x08000, CRC(1b4ce068) SHA1(8570b36acf3eb29f1c59e56a4dad6d38c218748f) )
 
 	ROM_REGION(0x08000, "nvram_data", 0)
@@ -305,7 +307,7 @@ ROM_START(streetgr3)
 	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("system-bios-10-0004-01.u6", 0x00000, 0x10000, CRC(e4d6511f) SHA1(d432743f549fa6ecc04bc5bf94999253f86af08c) )
 
-	ROM_REGION(0x08000, "video_bios", 0)
+	ROM_REGION32_LE(0x08000, "video_bios", 0)
 	ROM_LOAD16_BYTE("vga1-bios-ver-b-1.00-07.u8",     0x00000, 0x04000, CRC(a40551d6) SHA1(db38190f06e4af2c2d59ae310e65883bb16cd3d6))
 	ROM_CONTINUE(                                     0x00001, 0x04000 )
 
@@ -317,7 +319,7 @@ ROM_START(streetgr3)
 	ROM_LOAD("10-00003-03.u13", 0x080000,0x40000, CRC(6a9d0771) SHA1(6cd9a56a2413416d0928e5cf9340c94bc0c87c46) )
 	ROM_CONTINUE(0x280000, 0x40000)
 
-	ROM_REGION(0x08000, "disk_bios", 0)
+	ROM_REGION32_LE(0x08000, "disk_bios", 0)
 	ROM_LOAD("disk-bios-10-0001-04.u10",     0x00000, 0x08000, CRC(1b4ce068) SHA1(8570b36acf3eb29f1c59e56a4dad6d38c218748f) )
 
 	ROM_REGION(0x08000, "nvram_data", 0)
@@ -328,7 +330,7 @@ ROM_START(bonanza)
 	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("system-bios-sx-10-0004-02.u6", 0x00000, 0x10000, CRC(fa545ba8) SHA1(db64548bd87262cd2e82175a1b66f168b5ae072d) )
 
-	ROM_REGION(0x08000, "video_bios", 0)
+	ROM_REGION32_LE(0x08000, "video_bios", 0)
 	ROM_LOAD16_BYTE("techyosd-isa-bios-v1.2.u8",     0x00000, 0x04000, CRC(6adf7e71) SHA1(2b07d964cc7c2c0aa560625b7c12f38d4537d652) )
 	ROM_CONTINUE(                                    0x00001, 0x04000 )
 
@@ -346,7 +348,7 @@ ROM_START(bonanza)
 	ROM_LOAD("10-0018-03-090894.u17", 0x180000,0x40000, CRC(b637eb58) SHA1(7c4615f58118d9b82575d816ef916fccbb1be0f9) )
 	ROM_CONTINUE(0x380000, 0x40000)
 
-	ROM_REGION(0x08000, "disk_bios", 0)
+	ROM_REGION32_LE(0x08000, "disk_bios", 0)
 	ROM_LOAD("disk-bios-10-0001-04.u10",     0x00000, 0x08000, CRC(1b4ce068) SHA1(8570b36acf3eb29f1c59e56a4dad6d38c218748f) )
 
 	ROM_REGION(0x08000, "nvram_data", 0)
@@ -357,7 +359,7 @@ ROM_START(bonanzar2)
 	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("system-bios-sx-10-0004-02.u6", 0x00000, 0x10000, CRC(fa545ba8) SHA1(db64548bd87262cd2e82175a1b66f168b5ae072d) )
 
-	ROM_REGION(0x08000, "video_bios", 0)
+	ROM_REGION32_LE(0x08000, "video_bios", 0)
 	ROM_LOAD16_BYTE("techyosd-isa-bios-v1.2.u8",     0x00000, 0x04000, CRC(6adf7e71) SHA1(2b07d964cc7c2c0aa560625b7c12f38d4537d652) )
 	ROM_CONTINUE(                                    0x00001, 0x04000 )
 
@@ -375,7 +377,7 @@ ROM_START(bonanzar2)
 	ROM_LOAD("10-0018-02-081794.u17", 0x180000,0x40000, CRC(066108fe) SHA1(ef837422a2a81f5ac3375b6ed68f20143ac6caec) )
 	ROM_CONTINUE(0x380000, 0x40000)
 
-	ROM_REGION(0x08000, "disk_bios", 0)
+	ROM_REGION32_LE(0x08000, "disk_bios", 0)
 	ROM_LOAD("disk-bios-10-0001-04.u10",     0x00000, 0x08000, CRC(1b4ce068) SHA1(8570b36acf3eb29f1c59e56a4dad6d38c218748f) )
 
 	ROM_REGION(0x08000, "nvram_data", 0)
@@ -386,7 +388,7 @@ ROM_START(streetg2)
 	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("10-0004-01_mb-bios.bin", 0x00000, 0x10000, CRC(e4d6511f) SHA1(d432743f549fa6ecc04bc5bf94999253f86af08c) )
 
-	ROM_REGION(0x08000, "video_bios", 0)
+	ROM_REGION32_LE(0x08000, "video_bios", 0)
 	ROM_LOAD16_BYTE("vga1-bios-ver-b-1.00-07.u8",     0x00000, 0x04000, CRC(a40551d6) SHA1(db38190f06e4af2c2d59ae310e65883bb16cd3d6))
 	ROM_CONTINUE(                                     0x00001, 0x04000 )
 
@@ -398,7 +400,7 @@ ROM_START(streetg2)
 	ROM_LOAD("10-0007-07c_083194_rom6.u13", 0x080000,0x40000, CRC(6264f65f) SHA1(919a8e5d9861dc642ac0f0885faed544bbafa321) )
 	ROM_CONTINUE(0x280000, 0x40000)
 
-	ROM_REGION(0x08000, "disk_bios", 0)
+	ROM_REGION32_LE(0x08000, "disk_bios", 0)
 	ROM_LOAD("10-0001-03_disk_bios.u10",     0x00000, 0x08000, CRC(d6ba8b37) SHA1(1d1d984bc15fd154fc07dcfa2132bd44636d7bf1))
 
 	ROM_REGION(0x02000, "nvram", 0)
@@ -409,7 +411,7 @@ ROM_START(streetg2r5)
 	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("10-0004-01_mb-bios.bin", 0x00000, 0x10000, CRC(e4d6511f) SHA1(d432743f549fa6ecc04bc5bf94999253f86af08c) )
 
-	ROM_REGION(0x08000, "video_bios", 0)
+	ROM_REGION32_LE(0x08000, "video_bios", 0)
 	ROM_LOAD16_BYTE("vga1-bios-ver-b-1.00-07.u8",     0x00000, 0x04000, CRC(a40551d6) SHA1(db38190f06e4af2c2d59ae310e65883bb16cd3d6))
 	ROM_CONTINUE(                                     0x00001, 0x04000 )
 
@@ -421,7 +423,7 @@ ROM_START(streetg2r5)
 	ROM_LOAD("10-00007-05-032194.u17", 0x080000,0x40000, CRC(f6c996b9) SHA1(871a8d093b856511a0e2b03334ef5c66a2482622) )
 	ROM_CONTINUE(0x280000, 0x40000)
 
-	ROM_REGION(0x08000, "disk_bios", 0)
+	ROM_REGION32_LE(0x08000, "disk_bios", 0)
 	ROM_LOAD("10-0001-03_disk_bios.u10",     0x00000, 0x08000, CRC(d6ba8b37) SHA1(1d1d984bc15fd154fc07dcfa2132bd44636d7bf1))
 
 	ROM_REGION(0x08000, "nvram_data", 0)

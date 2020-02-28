@@ -7,9 +7,10 @@
     Floppy format code for basic disks
 
 *********************************************************************/
+#ifndef MAME_FORMATS_BASICDSK_H
+#define MAME_FORMATS_BASICDSK_H
 
-#ifndef BASICDSK_H
-#define BASICDSK_H
+#pragma once
 
 #include "flopimg.h"
 
@@ -34,4 +35,4 @@ floperr_t basicdsk_construct(floppy_image_legacy *floppy, const struct basicdsk_
 FLOPPY_IDENTIFY(basicdsk_identify_default);
 FLOPPY_CONSTRUCT(basicdsk_construct_default);
 
-#endif /* BASICDSK_H */
+#endif // MAME_FORMATS_BASICDSK_H

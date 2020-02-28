@@ -8,7 +8,6 @@
  TODO:
  - colors (missing proms)
  - dips
- - controls (is there START button ?)
  - when a car sprite goes outside of the screen it gets stuck for a split frame on top of screen
 
 HW info :
@@ -92,12 +91,16 @@ static INPUT_PORTS_START( ssrj )
 	PORT_BIT( 0xff, 0x00, IPT_DIAL  ) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_REVERSE
 
 	PORT_START("IN2")
-	PORT_BIT( 0xf, IP_ACTIVE_LOW, IPT_BUTTON2  )  /* code @ $eef  , tested when controls = type4 */
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) ) /* ??? code @ $62c */
-	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Very_Difficult ) )
+	PORT_BIT( 0xf, IP_ACTIVE_LOW, IPT_UNUSED  ) PORT_CONDITION("IN3", 0x30, EQUALS, 0x00) /* code @ $eef, tested when controls != type1 */
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_START1 ) PORT_CONDITION("IN3", 0x30, NOTEQUALS, 0x00) PORT_NAME("Start (Easy)")
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_START2 ) PORT_CONDITION("IN3", 0x30, NOTEQUALS, 0x00) PORT_NAME("Start (Normal)")
+	PORT_BIT( 0x4, IP_ACTIVE_LOW, IPT_START3 ) PORT_CONDITION("IN3", 0x30, NOTEQUALS, 0x00) PORT_NAME("Start (Difficult)")
+	PORT_BIT( 0x8, IP_ACTIVE_LOW, IPT_START4 ) PORT_CONDITION("IN3", 0x30, NOTEQUALS, 0x00) PORT_NAME("Start (Very difficult)")
+	PORT_DIPNAME( 0x30, 0x20, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING( 0x30, DEF_STR( Easy ) )
+	PORT_DIPSETTING( 0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING( 0x10, DEF_STR( Difficult ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -117,7 +120,7 @@ static INPUT_PORTS_START( ssrj )
 	PORT_DIPNAME( 0x08, 0x08, "Freeze" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Controls ) ) /* 'press button to start' message, and wait for button2 */
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Controls ) ) /* Type 1 has no start button and uses difficulty DSW, type 2-4 have 4 start buttons that determine difficulty. MT07492 for more.  */
 	PORT_DIPSETTING(    0x00, "Type 1" )
 	PORT_DIPSETTING(    0x10, "Type 2" )
 	PORT_DIPSETTING(    0x20, "Type 3" )
@@ -140,22 +143,22 @@ static GFXDECODE_START( gfx_ssrj )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(ssrj_state::ssrj)
-
+void ssrj_state::ssrj(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,8000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(ssrj_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ssrj_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 8000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssrj_state::ssrj_map);
+	m_maincpu->set_vblank_int("screen", FUNC(ssrj_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 1*8, 31*8-1) // unknown res
-	MCFG_SCREEN_UPDATE_DRIVER(ssrj_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ssrj_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 34*8-1, 1*8, 31*8-1); // unknown res
+	screen.set_screen_update(FUNC(ssrj_state::screen_update));
+	screen.screen_vblank().set(FUNC(ssrj_state::screen_vblank));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ssrj);
 	PALETTE(config, m_palette, FUNC(ssrj_state::ssrj_palette), 128);
@@ -166,7 +169,7 @@ MACHINE_CONFIG_START(ssrj_state::ssrj)
 	ay8910_device &aysnd(AY8910(config, "aysnd", 8000000/5));
 	aysnd.port_b_read_callback().set_ioport("IN3");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

@@ -112,18 +112,18 @@ void warpwarp_state::warpwarp_palette(palette_device &palette) const
 		bit0 = BIT(i, 0);
 		bit1 = BIT(i, 1);
 		bit2 = BIT(i, 2);
-		int const r = combine_3_weights(weights_tiles_rg, bit0, bit1, bit2);
+		int const r = combine_weights(weights_tiles_rg, bit0, bit1, bit2);
 
 		// green component
 		bit0 = BIT(i, 3);
 		bit1 = BIT(i, 4);
 		bit2 = BIT(i, 5);
-		int const g = combine_3_weights(weights_tiles_rg, bit0, bit1, bit2);
+		int const g = combine_weights(weights_tiles_rg, bit0, bit1, bit2);
 
 		// blue component
 		bit0 = BIT(i, 6);
 		bit1 = BIT(i, 7);
-		int const b = combine_2_weights(weights_tiles_b, bit0, bit1);
+		int const b = combine_weights(weights_tiles_b, bit0, bit1);
 
 		palette.set_pen_color((i << 1) | 0, rgb_t::black());
 		palette.set_pen_color((i << 1) | 1, rgb_t(r, g, b));
@@ -193,17 +193,17 @@ TILE_GET_INFO_MEMBER(warpwarp_state::warpwarp_get_tile_info)
 
 VIDEO_START_MEMBER(warpwarp_state,geebee)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(warpwarp_state::geebee_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(warpwarp_state::geebee_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(warpwarp_state::tilemap_scan)), 8,8, 34,28);
 }
 
 VIDEO_START_MEMBER(warpwarp_state,navarone)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(warpwarp_state::navarone_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(warpwarp_state::navarone_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(warpwarp_state::tilemap_scan)), 8,8, 34,28);
 }
 
 VIDEO_START_MEMBER(warpwarp_state,warpwarp)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(warpwarp_state::warpwarp_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(warpwarp_state::warpwarp_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(warpwarp_state::tilemap_scan)), 8,8, 34,28);
 }
 
 

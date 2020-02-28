@@ -178,8 +178,8 @@ VIDEO_START_MEMBER(phoenix_state,phoenix)
 	m_palette_bank = 0;
 	m_cocktail_mode = 0;
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(phoenix_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(phoenix_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(phoenix_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(phoenix_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -302,7 +302,7 @@ CUSTOM_INPUT_MEMBER(phoenix_state::player_input_r)
 		return (ioport("CTRL")->read() & 0x0f) >> 0;
 }
 
-CUSTOM_INPUT_MEMBER(phoenix_state::pleiads_protection_r)
+READ_LINE_MEMBER(phoenix_state::pleiads_protection_r)
 {
 	/* handle Pleiads protection */
 	switch (m_pleiads_protection_question)

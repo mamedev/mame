@@ -291,9 +291,11 @@ void smc91c9x_device::dump_bytes(u8 *buf, int length)
 	if (VERBOSE & LOG_PACKETS)
 	{
 		std::stringstream ss_bytes;
+		ss_bytes << std::hex << std::setfill('0');
 		for (int i = 0; i < length; i++)
 		{
-			ss_bytes << std::hex << std::setw(2) << std::setfill('0') << (int) buf[i];
+			ss_bytes << std::setw(2) << (int) buf[i];
+			// Send newline every 16 bytes and at the end
 			if ((i & 0xf) == 0xf || i == length - 1)
 			{
 				LOGMASKED(LOG_PACKETS, "%s\n", ss_bytes.str());

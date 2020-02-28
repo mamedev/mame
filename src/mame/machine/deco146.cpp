@@ -1119,14 +1119,14 @@ static deco146port_xx const port_table[] = {
 /* 0x7fe */ { 0x04c,           {  NIB1__, NIB2__, NIB0__, NIB3__ },  0, 1 }
 };
 
-inline uint16_t reorder(uint16_t input, uint8_t const *weights)
+inline u16 reorder(u16 input, u8 const *weights)
 {
-	uint16_t temp = 0;
-	for(int i = 0; i < 16; i++)
+	u16 temp = 0;
+	for (int i = 0; i < 16; i++)
 	{
-		if(input & (1 << i)) // if input bit is set
+		if (input & (1 << i)) // if input bit is set
 		{
-			if(weights[i] != 0xFF) // and weight exists for output bit
+			if (weights[i] != 0xFF) // and weight exists for output bit
 			{
 				temp |= 1 << weights[i]; // set that bit
 			}
@@ -1136,13 +1136,12 @@ inline uint16_t reorder(uint16_t input, uint8_t const *weights)
 }
 
 
-
 /* there are probably less dumb ways of doing the CS logic, it could be hooked up
    more like the system16 mapper chips */
 
-void deco_146_base_device::write_data(address_space &space, uint16_t address, uint16_t data, uint16_t mem_mask, uint8_t &csflags)
+void deco_146_base_device::write_data(u16 address, u16 data, u16 mem_mask, u8 &csflags)
 {
-	address = bitswap<16>(address>>1, 15,14,13,12,11,10, m_external_addrswap[9],m_external_addrswap[8] ,m_external_addrswap[7],m_external_addrswap[6],m_external_addrswap[5],m_external_addrswap[4],m_external_addrswap[3],m_external_addrswap[2],m_external_addrswap[1],m_external_addrswap[0]) << 1;
+	address = bitswap<16>(address >> 1, 15,14,13,12,11,10, m_external_addrswap[9],m_external_addrswap[8] ,m_external_addrswap[7],m_external_addrswap[6],m_external_addrswap[5],m_external_addrswap[4],m_external_addrswap[3],m_external_addrswap[2],m_external_addrswap[1],m_external_addrswap[0]) << 1;
 
 	csflags = 0;
 	int upper_addr_bits = (address & 0x7800) >> 11;
@@ -1152,9 +1151,9 @@ void deco_146_base_device::write_data(address_space &space, uint16_t address, ui
 		int real_address = address & 0xf;
 		logerror("write to config regs %04x %04x %04x\n", real_address, data, mem_mask);
 
-		if ((real_address>=0x2) && (real_address<=0x0c))
+		if ((real_address >= 0x2) && (real_address <= 0x0c))
 		{
-			region_selects[(real_address-2)/2] = data &0xf;
+			region_selects[(real_address - 2) / 2] = data & 0xf;
 			return;
 		}
 		else
@@ -1165,19 +1164,19 @@ void deco_146_base_device::write_data(address_space &space, uint16_t address, ui
 		return; // or fall through?
 	}
 
-	for (int i=0;i<6;i++)
+	for (int i = 0; i < 6; i++)
 	{
 		int cs = region_selects[i];
 
-		if (cs==upper_addr_bits)
+		if (cs == upper_addr_bits)
 		{
 			int real_address = address & 0x7ff;
 			csflags |= (1 << i);
 
-			if (i==0) // the first cs is our internal protection area
+			if (i == 0) // the first cs is our internal protection area
 			{
 //              logerror("write matches cs table (protection) %01x %04x %04x %04x\n", i, real_address, data, mem_mask);
-				write_protport(space, real_address, data, mem_mask);
+				write_protport(real_address, data, mem_mask);
 			}
 			else
 			{
@@ -1186,21 +1185,17 @@ void deco_146_base_device::write_data(address_space &space, uint16_t address, ui
 		}
 	}
 
-	if (csflags==0)
+	if (csflags == 0)
 	{
 		logerror("write not in cs table\n");
 	}
 }
 
 
-
-
-
-
-uint16_t deco_146_base_device::read_protport(uint16_t address, uint16_t mem_mask)
+u16 deco_146_base_device::read_protport(u16 address)
 {
 	// if we read the last written address immediately after then ignore all other logic and just return what was written unmodified
-	if ((address==m_latchaddr) && (m_latchflag==1))
+	if (((address == m_latchaddr) && (m_latchflag == 1)) && (!machine().side_effects_disabled()))
 	{
 		logerror("returning latched data %04x\n", m_latchdata);
 		m_latchflag = 0;
@@ -1212,23 +1207,14 @@ uint16_t deco_146_base_device::read_protport(uint16_t address, uint16_t mem_mask
 	if (m_magic_read_address_xor_enabled) address ^= m_magic_read_address_xor;
 
 	int location = 0;
-	uint16_t realret = read_data_getloc(address, location);
+	u16 realret = read_data_getloc(address, location);
 
-
-
-
-
-
-	if (location == m_bankswitch_swap_read_address) // this has a special meaning
+	if ((location == m_bankswitch_swap_read_address) && (!machine().side_effects_disabled())) // this has a special meaning
 	{
-	//  logerror("(bankswitch) %04x %04x\n", address, mem_mask);
+	//  logerror("(bankswitch) %04x %04x\n", address);
 
-		if (m_current_rambank==0)
-			m_current_rambank = 1;
-		else
-			m_current_rambank = 0;
+		m_current_rambank ^= 1;
 	}
-
 
 	return realret;
 }
@@ -1239,76 +1225,73 @@ TIMER_CALLBACK_MEMBER(deco_146_base_device::write_soundlatch)
 	m_soundlatch_irq_cb(ASSERT_LINE);
 }
 
-void deco_146_base_device::write_protport(address_space &space, uint16_t address, uint16_t data, uint16_t mem_mask)
+void deco_146_base_device::write_protport(u16 address, u16 data, u16 mem_mask)
 {
 	m_latchaddr = address;
 	m_latchdata = data;
 	m_latchflag = 1;
 
-	if ((address&0xff) == m_xor_port)
+	if ((address & 0xff) == m_xor_port)
 	{
 		logerror("LOAD XOR REGISTER %04x %04x\n", data, mem_mask);
 		COMBINE_DATA(&m_xor);
 	}
-	else if ((address&0xff) == m_mask_port)
+	else if ((address & 0xff) == m_mask_port)
 	{
 //          logerror("LOAD NAND REGISTER %04x %04x\n", data, mem_mask);
 		COMBINE_DATA(&m_nand);
 	}
-	else if ((address&0xff) == m_soundlatch_port)
+	else if ((address & 0xff) == m_soundlatch_port)
 	{
 		logerror("LOAD SOUND LATCH: %04x\n", data);
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(deco_146_base_device::write_soundlatch), this), data & 0xff);
 	}
 
 	// always store
-	if (m_current_rambank==0)
-		COMBINE_DATA(&m_rambank0[(address&0xff)>>1]);
-	else
-		COMBINE_DATA(&m_rambank1[(address&0xff)>>1]);
-
+	COMBINE_DATA(&m_rambank[m_current_rambank][(address & 0xff) >> 1]);
 }
 
 
-
-uint16_t deco_146_base_device::read_data(uint16_t address, uint16_t mem_mask, uint8_t &csflags)
+u16 deco_146_base_device::read_data(u16 address, u8 &csflags)
 {
-	address = bitswap<16>(address>>1, 15,14,13,12,11,10, m_external_addrswap[9],m_external_addrswap[8] ,m_external_addrswap[7],m_external_addrswap[6],m_external_addrswap[5],m_external_addrswap[4],m_external_addrswap[3],m_external_addrswap[2],m_external_addrswap[1],m_external_addrswap[0]) << 1;
+	address = bitswap<16>(address >> 1, 15,14,13,12,11,10, m_external_addrswap[9],m_external_addrswap[8] ,m_external_addrswap[7],m_external_addrswap[6],m_external_addrswap[5],m_external_addrswap[4],m_external_addrswap[3],m_external_addrswap[2],m_external_addrswap[1],m_external_addrswap[0]) << 1;
 
-	uint16_t retdata = 0;
+	u16 retdata = 0;
 	csflags = 0;
 	int upper_addr_bits = (address & 0x7800) >> 11;
 
 	if (upper_addr_bits == 0x8) // configuration registers are hardcoded to this area
 	{
 		int real_address = address & 0xf;
-		logerror("read config regs? %04x %04x\n", real_address, mem_mask);
+		if (!machine().side_effects_disabled())
+			logerror("read config regs? %04x\n", real_address);
+
 		return 0x0000;
 	}
 
 	// what gets priority?
-	for (int i=0;i<6;i++)
+	for (int i = 0; i < 6; i++)
 	{
 		int cs = region_selects[i];
 
-		if (cs==upper_addr_bits)
+		if (cs == upper_addr_bits)
 		{
 			int real_address = address & 0x7ff;
 			csflags |= (1 << i);
 
-			if (i==0) // the first cs is our internal protection area
+			if (i == 0) // the first cs is our internal protection area
 			{
-				//logerror("read matches cs table (protection) %01x %04x %04x\n", i, real_address, mem_mask);
-				return read_protport( real_address, mem_mask);
+				//logerror("read matches cs table (protection) %01x %04x\n", i, real_address);
+				return read_protport(real_address);
 			}
-			else
+			else if (!machine().side_effects_disabled())
 			{
-				logerror("read matches cs table (external connection) %01x %04x %04x\n", i, real_address, mem_mask);
+				logerror("read matches cs table (external connection) %01x %04x\n", i, real_address);
 			}
 		}
 	}
 
-	if (csflags==0)
+	if ((csflags == 0) && (!machine().side_effects_disabled()))
 	{
 		logerror("read not in cs table\n");
 	}
@@ -1316,13 +1299,13 @@ uint16_t deco_146_base_device::read_data(uint16_t address, uint16_t mem_mask, ui
 	return retdata;
 }
 
-READ8_MEMBER( deco_146_base_device::soundlatch_r )
+u8 deco_146_base_device::soundlatch_r()
 {
 	m_soundlatch_irq_cb(CLEAR_LINE);
 	return m_soundlatch;
 }
 
-deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock),
 	m_port_a_r(*this),
 	m_port_b_r(*this),
@@ -1343,11 +1326,12 @@ deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device
 
 void deco_146_base_device::device_start()
 {
-	for (int i=0;i<0x80;i++)
+	for (int bank = 0; bank < 2; bank++)
 	{
+		m_rambank[bank] = std::make_unique<u16[]>(0x80);
 		// the mutant fighter old sim assumes 0x0000
-		m_rambank0[i] = 0xffff;
-		m_rambank1[i] = 0xffff;
+		std::fill_n(&m_rambank[bank][0], 0x80, 0xffff);
+		save_pointer(NAME(m_rambank[bank]), 0x80, bank);
 	}
 
 	// bind our handler
@@ -1359,8 +1343,6 @@ void deco_146_base_device::device_start()
 	save_item(NAME(m_xor));
 	save_item(NAME(m_nand));
 
-	save_item(NAME(m_rambank0));
-	save_item(NAME(m_rambank1));
 	save_item(NAME(m_current_rambank));
 
 	save_item(NAME(region_selects));
@@ -1395,11 +1377,11 @@ void deco_146_base_device::device_reset()
 }
 
 
-uint16_t deco_146_base_device::read_data_getloc(uint16_t address, int& location)
+u16 deco_146_base_device::read_data_getloc(u16 address, int& location)
 {
-	uint16_t retdata = 0;
+	u16 retdata = 0;
 
-	location = m_lookup_table[address>>1].write_offset;
+	location = m_lookup_table[address >> 1].write_offset;
 
 	if (location==INPUT_PORT_A)
 	{
@@ -1415,26 +1397,22 @@ uint16_t deco_146_base_device::read_data_getloc(uint16_t address, int& location)
 	}
 	else
 	{
-		if (m_current_rambank==0)
-			retdata = m_rambank0[location>>1];
-		else
-			retdata = m_rambank1[location>>1];
+		retdata = m_rambank[m_current_rambank][location >> 1];
 	}
 
-	uint16_t realret = reorder(retdata, &m_lookup_table[address>>1].mapping[0] );
+	u16 realret = reorder(retdata, &m_lookup_table[address >> 1].mapping[0] );
 
-	if (m_lookup_table[address>>1].use_xor) realret ^= m_xor;
-	if (m_lookup_table[address>>1].use_nand) realret = (realret & ~m_nand);
+	if (m_lookup_table[address >> 1].use_xor) realret ^= m_xor;
+	if (m_lookup_table[address >> 1].use_nand) realret = (realret & ~m_nand);
 
 	return realret;
 }
 
 
-
 DEFINE_DEVICE_TYPE(DECO146PROT, deco146_device, "deco146", "DECO 146 Protection")
 
 
-deco146_device::deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+deco146_device::deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: deco_146_base_device(mconfig, DECO146PROT, tag, owner, clock)
 {
 	m_bankswitch_swap_read_address = 0x78;

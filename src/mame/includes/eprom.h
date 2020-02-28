@@ -15,6 +15,7 @@
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class eprom_state : public atarigen_state
 {
@@ -25,6 +26,7 @@ public:
 		m_alpha_tilemap(*this, "alpha"),
 		m_mob(*this, "mob"),
 		m_jsa(*this, "jsa"),
+		m_share1(*this, "share1"),
 		m_adc(*this, "adc"),
 		m_extra(*this, "extra"),
 		m_palette(*this, "palette"),
@@ -40,10 +42,8 @@ protected:
 	virtual void machine_reset() override;
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
-	DECLARE_READ16_MEMBER(special_port1_r);
 	DECLARE_READ8_MEMBER(adc_r);
 	DECLARE_WRITE16_MEMBER(eprom_latch_w);
-	DECLARE_READ16_MEMBER(sync_r);
 	template<bool maincpu> DECLARE_WRITE16_MEMBER(sync_w);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
@@ -62,9 +62,9 @@ private:
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_motion_objects_device> m_mob;
 	required_device<atari_jsa_base_device> m_jsa;
+	required_shared_ptr<uint16_t> m_share1;
 	int             m_screen_intensity;
 	int             m_video_disable;
-	uint16_t          m_sync_data;
 	optional_device<adc0808_device> m_adc;
 	optional_device<cpu_device> m_extra;
 	required_device<palette_device> m_palette;

@@ -11,7 +11,7 @@
 		<publisher>Fidelity Electronics</publisher>
 		<part name="cart" interface="fidel_scc">
 			<dataarea name="rom" size="0x2000">
-				<rom name="cb9.bin" size="0x2000" crc="421147e8" sha1="ccf62f6f218e8992baf30973fe41b35e14a1cc1a" offset="0x0000" />
+				<rom name="cb9.bin" offset="0x0000" size="0x2000" crc="421147e8" sha1="ccf62f6f218e8992baf30973fe41b35e14a1cc1a" />
 			</dataarea>
 		</part>
 	</software>
@@ -22,8 +22,8 @@
 		<publisher>Fidelity Electronics</publisher>
 		<part name="cart" interface="fidel_scc">
 			<dataarea name="rom" size="0x4000">
-				<rom name="101-1042a01" size="0x2000" crc="591b3e4a" sha1="f75ae850f2f70808b5423f847ff12ee890752bf8" offset="0x0000" />
-				<rom name="101-1042a02" size="0x2000" crc="1bdf0a21" sha1="1c6f673c0bf846e705d15c802f433ac1dc9b153c" offset="0x2000" />
+				<rom name="101-1042a01" offset="0x0000" size="0x2000" crc="591b3e4a" sha1="f75ae850f2f70808b5423f847ff12ee890752bf8" />
+				<rom name="101-1042a02" offset="0x2000" size="0x2000" crc="1bdf0a21" sha1="1c6f673c0bf846e705d15c802f433ac1dc9b153c" />
 			</dataarea>
 		</part>
 	</software>

@@ -7,7 +7,7 @@
 		<description>MTX Node Ring</description>
 		<year>198?</year>
 		<publisher>Memotech</publisher>
-		<part name="rom" interface="mtx_cart">
+		<part name="cart" interface="mtx_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="node.rom" size="8192" crc="cb05a1b8" sha1="b040e5f062b460d4465050da31be66075dee2844" offset="0"/>
 			</dataarea>

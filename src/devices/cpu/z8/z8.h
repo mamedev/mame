@@ -34,7 +34,8 @@ protected:
 		Z8_P01M, Z8_P3M, Z8_P2M,
 		Z8_PRE0, Z8_T0, Z8_PRE1, Z8_T1, Z8_TMR, Z8_TOUT,
 
-		Z8_R0, Z8_R1, Z8_R2, Z8_R3, Z8_R4, Z8_R5, Z8_R6, Z8_R7, Z8_R8, Z8_R9, Z8_R10, Z8_R11, Z8_R12, Z8_R13, Z8_R14, Z8_R15
+		Z8_R0, Z8_R1, Z8_R2, Z8_R3, Z8_R4, Z8_R5, Z8_R6, Z8_R7, Z8_R8, Z8_R9, Z8_R10, Z8_R11, Z8_R12, Z8_R13, Z8_R14, Z8_R15,
+		Z8_RR0, Z8_RR2, Z8_RR4, Z8_RR6, Z8_RR8, Z8_RR10, Z8_RR12, Z8_RR14
 	};
 
 	// construction/destruction
@@ -45,12 +46,12 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 6; }
-	virtual uint32_t execute_max_cycles() const override { return 27; }
-	virtual uint32_t execute_input_lines() const override { return 4; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return true; }
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 2 - 1) / 2; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 2); }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 6; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 27; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 4; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return true; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -59,7 +60,6 @@ protected:
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
-	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
@@ -80,8 +80,8 @@ private:
 	address_space *m_regs;
 
 	// callbacks
-	devcb_read8 m_input_cb[4];
-	devcb_write8 m_output_cb[4];
+	devcb_read8::array<4> m_input_cb;
+	devcb_write8::array<4> m_output_cb;
 
 	uint32_t m_rom_size;
 
@@ -122,9 +122,6 @@ private:
 	uint8_t m_receive_count;    // counter for receiver timing
 	bool m_receive_parity;      // receiver parity calculation
 	bool m_receive_started;     // true if receiver has seen start bit
-
-	// fake registers
-	uint8_t m_fake_r[16];       // fake working registers
 
 	// interrupts
 	int m_irq_line[4];

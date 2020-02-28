@@ -1426,13 +1426,18 @@ void dkong_state::dkongjr_audio(machine_config &config)
 
 void dkong_state::dkong3_audio(machine_config &config)
 {
-	N2A03(config, "n2a03a", NTSC_APU_CLOCK).set_addrmap(AS_PROGRAM, &dkong_state::dkong3_sound1_map);
-	N2A03(config, "n2a03b", NTSC_APU_CLOCK).set_addrmap(AS_PROGRAM, &dkong_state::dkong3_sound2_map);
+	SPEAKER(config, "mono").front_center();
+
+	n2a03_device &n2a03a(N2A03(config, "n2a03a", NTSC_APU_CLOCK));
+	n2a03a.set_addrmap(AS_PROGRAM, &dkong_state::dkong3_sound1_map);
+	n2a03a.add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	n2a03_device &n2a03b(N2A03(config, "n2a03b", NTSC_APU_CLOCK));
+	n2a03b.set_addrmap(AS_PROGRAM, &dkong_state::dkong3_sound2_map);
+	n2a03b.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* sound latches */
 	LATCH8(config, "latch1");
 	LATCH8(config, "latch2");
 	LATCH8(config, "latch3");
-
-	SPEAKER(config, "mono").front_center();
 }

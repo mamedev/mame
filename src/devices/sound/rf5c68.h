@@ -28,21 +28,13 @@ public:
 
 	rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_end_callback(sample_end_cb_delegate callback) { m_sample_end_cb = callback; }
-	template <class FunctionClass> void set_end_callback(const char *devname, void (FunctionClass::*callback)(int), const char *name)
-	{
-		set_end_callback(sample_end_cb_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_end_callback(void (FunctionClass::*callback)(int), const char *name)
-	{
-		set_end_callback(sample_end_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_end_callback(T &&... args) { m_sample_end_cb.set(std::forward<T>(args)...); }
 
-	DECLARE_READ8_MEMBER( rf5c68_r );
-	DECLARE_WRITE8_MEMBER( rf5c68_w );
+	u8 rf5c68_r(offs_t offset);
+	void rf5c68_w(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER( rf5c68_mem_r );
-	DECLARE_WRITE8_MEMBER( rf5c68_mem_w );
+	u8 rf5c68_mem_r(offs_t offset);
+	void rf5c68_mem_w(offs_t offset, u8 data);
 
 protected:
 	rf5c68_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

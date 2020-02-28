@@ -57,7 +57,6 @@ private:
 	void decrease_counter_value(int64_t cycles);
 	void load_counter_value();
 	void set_output(int output);
-	void simulate2(int64_t elapsed_cycles);
 	void simulate(int64_t elapsed_cycles);
 	void update();
 	uint16_t masked_value() const;
@@ -145,7 +144,7 @@ protected:
 	virtual void readback_command(uint8_t data);
 
 	double m_clk[3];
-	devcb_write_line m_out_handler[3];
+	devcb_write_line::array<3> m_out_handler;
 
 	required_device_array<pit_counter_device, 3> m_counter;
 

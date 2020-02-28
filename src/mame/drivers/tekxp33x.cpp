@@ -97,25 +97,26 @@ void tekxp330_state::machine_start()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(tekxp330_state::tekxp330)
+void tekxp330_state::tekxp330(machine_config &config)
+{
 	/* basic machine hardware */
 	r3052e_device &maincpu(R3052E(config, "maincpu", XTAL(20'000'000))); /* IDT 79R3052E, clock unknown */
 	maincpu.set_endianness(ENDIANNESS_BIG);
 	maincpu.set_addrmap(AS_PROGRAM, &tekxp330_state::cpu_map);
 
-	MCFG_DEVICE_ADD("tms", TMS34010, XTAL(40'000'000)) /* clock unknown */
-	MCFG_DEVICE_PROGRAM_MAP(tms_map)
+	tms34010_device &tms(TMS34010(config, "tms", XTAL(40'000'000))); /* clock unknown */
+	tms.set_addrmap(AS_PROGRAM, &tekxp330_state::tms_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(tekxp330_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(tekxp330_state::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
 
-	MCFG_PALETTE_ADD("palette", 64)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(64);
+}
 
 /* ROMs */
 

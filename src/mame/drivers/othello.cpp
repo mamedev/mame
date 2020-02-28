@@ -234,8 +234,8 @@ void othello_state::main_portmap(address_map &map)
 
 READ8_MEMBER(othello_state::latch_r)
 {
-	int retval = m_soundlatch->read(space, 0);
-	m_soundlatch->clear_w(space, 0, 0);
+	int retval = m_soundlatch->read();
+	m_soundlatch->clear_w();
 	return retval;
 }
 
@@ -251,14 +251,14 @@ WRITE8_MEMBER(othello_state::ack_w)
 
 WRITE8_MEMBER(othello_state::ay_address_w)
 {
-	if (m_ay_select & 1) m_ay[0]->address_w(space, 0, data);
-	if (m_ay_select & 2) m_ay[1]->address_w(space, 0, data);
+	if (m_ay_select & 1) m_ay[0]->address_w(data);
+	if (m_ay_select & 2) m_ay[1]->address_w(data);
 }
 
 WRITE8_MEMBER(othello_state::ay_data_w)
 {
-	if (m_ay_select & 1) m_ay[0]->data_w(space, 0, data);
-	if (m_ay_select & 2) m_ay[1]->data_w(space, 0, data);
+	if (m_ay_select & 1) m_ay[0]->data_w(data);
+	if (m_ay_select & 2) m_ay[1]->data_w(data);
 }
 
 void othello_state::audio_map(address_map &map)
@@ -415,15 +415,15 @@ void othello_state::othello(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*6, 64*8);
 	screen.set_visarea(0*8, 64*6-1, 0*8, 64*8-1);
-	screen.set_screen_update("crtc", FUNC(h46505_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(othello_state::othello_palette), 0x10);
 
-	h46505_device &crtc(H46505(config, "crtc", 1000000 /* ? MHz */));   /* H46505 @ CPU clock */
+	hd6845s_device &crtc(HD6845S(config, "crtc", 1000000 /* ? MHz */));   /* HD46505SP @ CPU clock */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(TILE_WIDTH);
-	crtc.set_update_row_callback(FUNC(othello_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(othello_state::crtc_update_row));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -435,7 +435,6 @@ void othello_state::othello(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }

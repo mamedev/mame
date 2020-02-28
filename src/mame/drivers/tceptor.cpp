@@ -331,7 +331,7 @@ void tceptor_state::tceptor(machine_config &config)
 	HD63701(config, m_mcu, XTAL(49'152'000)/8); // or compatible 6808 with extra instructions
 	m_mcu->set_addrmap(AS_PROGRAM, &tceptor_state::mcu_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -374,7 +374,6 @@ void tceptor_state::tceptor(machine_config &config)
 	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.4);
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }

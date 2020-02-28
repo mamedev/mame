@@ -7,13 +7,15 @@
     NASLite 1.72MB with funky interleaving format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_NASLITE_DSK_H
+#define MAME_FORMATS_NASLITE_DSK_H
 
-#ifndef NASLITE_DSK_H_
-#define NASLITE_DSK_H_
+#pragma once
 
 #include "upd765_dsk.h"
 
-class naslite_format : public upd765_format {
+class naslite_format : public upd765_format
+{
 public:
 	naslite_format();
 
@@ -29,4 +31,4 @@ protected:
 
 extern const floppy_format_type FLOPPY_NASLITE_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_NASLITE_DSK_H

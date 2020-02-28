@@ -581,9 +581,9 @@ void gunpey_state::irq_check(uint8_t irq_type)
 	m_irq_cause |= irq_type;
 
 	if(m_irq_cause & m_irq_mask)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x200/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x200/4); // V30
 	else
-		m_maincpu->set_input_line_and_vector(0, CLEAR_LINE, 0x200/4);
+		m_maincpu->set_input_line_and_vector(0, CLEAR_LINE, 0x200/4); // V30
 }
 
 WRITE8_MEMBER(gunpey_state::status_w)
@@ -1087,8 +1087,8 @@ WRITE16_MEMBER(gunpey_state::vregs_addr_w)
 void gunpey_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram().share("wram");
-//  AM_RANGE(0x50000, 0x500ff) AM_RAM
-//  AM_RANGE(0x50100, 0x502ff) AM_NOP
+//  map(0x50000, 0x500ff).ram();
+//  map(0x50100, 0x502ff).noprw();
 	map(0x80000, 0xfffff).rom();
 }
 
@@ -1106,7 +1106,7 @@ void gunpey_state::io_map(address_map &map)
 	map(0x7fe0, 0x7fe5).w(FUNC(gunpey_state::blitter_upper_w));
 	map(0x7ff0, 0x7ff5).w(FUNC(gunpey_state::blitter_upper2_w));
 
-	//AM_RANGE(0x7FF0, 0x7FF1) AM_RAM
+	//map(0x7ff0, 0x7ff1).ram();
 	map(0x7fec, 0x7fed).w(FUNC(gunpey_state::vregs_addr_w));
 	map(0x7fee, 0x7fef).w(FUNC(gunpey_state::vram_bank_w));
 
@@ -1217,33 +1217,33 @@ TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::scanline)
 }
 
 /***************************************************************************************/
-MACHINE_CONFIG_START(gunpey_state::gunpey)
-
+void gunpey_state::gunpey(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30, 57242400 / 4)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	V30(config, m_maincpu, 57242400 / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gunpey_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &gunpey_state::io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(gunpey_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(57242400/8, 442, 0, 320, 264, 0, 240) /* just to get ~60 Hz */
-	MCFG_SCREEN_UPDATE_DRIVER(gunpey_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(57242400/8, 442, 0, 320, 264, 0, 240); /* just to get ~60 Hz */
+	screen.set_screen_update(FUNC(gunpey_state::screen_update));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::RGB_555);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'934'400) / 8, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
+	OKIM6295(config, m_oki, XTAL(16'934'400) / 8, okim6295_device::PIN7_LOW);
+	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
+	ymz.add_route(0, "lspeaker", 0.25);
+	ymz.add_route(1, "rspeaker", 0.25);
+}
 
 /***************************************************************************************/
 

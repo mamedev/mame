@@ -38,7 +38,7 @@
 
 class device_vtech_ioexp_interface;
 
-class vtech_ioexp_slot_device : public device_t, public device_slot_interface
+class vtech_ioexp_slot_device : public device_t, public device_single_card_slot_interface<device_vtech_ioexp_interface>
 {
 	friend class device_vtech_ioexp_interface;
 public:
@@ -54,20 +54,17 @@ public:
 	vtech_ioexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vtech_ioexp_slot_device();
 
-	void set_io_space(address_space *io);
+	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io.set_tag(std::forward<T>(tag), spacenum); }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
-	address_space *m_io;
-
-	device_vtech_ioexp_interface *m_cart;
+	required_address_space m_io;
 };
 
 // class representing interface-specific live ioexp device
-class device_vtech_ioexp_interface : public device_slot_card_interface
+class device_vtech_ioexp_interface : public device_interface
 {
 public:
 	// construction/destruction

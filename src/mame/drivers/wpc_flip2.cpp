@@ -430,6 +430,14 @@ ROM_START(ft_p4)
 	ROM_LOAD("ft_u18.l1", 0x100000, 0x80000, CRC(48d2760a) SHA1(701b0bbb68f99332493ee1276e5a1cef5c85d499))
 ROM_END
 
+ROM_START(ft_p2)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "code", 0)
+	ROM_LOAD("ft_p2.u6", 0x00000, 0x80000, CRC(e776ebb8) SHA1(9701291b991f62b705f6866f299429e668be0e33))
+	ROM_REGION(0x180000, "sound1", 0)
+	ROM_LOAD("ft_u18.l1", 0x100000, 0x80000, CRC(48d2760a) SHA1(701b0bbb68f99332493ee1276e5a1cef5c85d499))
+ROM_END
+
 /*-----------------
 /  The Addams Family Special Collectors Edition #50038
 /------------------*/
@@ -678,8 +686,11 @@ ROM_START(tz_p3)
 	ROM_REGION(0x80000, "code", 0)
 	ROM_LOAD("tz_p3.bin", 0x00000, 0x80000, CRC(f3b1fd9f) SHA1(aa551fc6638e79edf10fbe89127c55372cc3cb58))
 	ROM_REGION(0x180000, "sound1", 0)
-	ROM_LOAD("u14-sp1.040", 0x000000, 0x80000, CRC(ad7cb98b) SHA1(a84bf157cb535acaf811e93ad22a505e1dd08dad))
-	ROM_LOAD("u15-sp1.040", 0x080000, 0x80000, CRC(0f17c9e9) SHA1(fcaa6f87ebd03222e3a40be08eb5aa6a5e002a8b))
+	ROM_LOAD("tzu14_l2.rom", 0x000000, 0x20000, CRC(5a67bd56) SHA1(98669fbfdc5793bcf09fe72c231e2b4fa2524cc5))
+	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
+	ROM_RELOAD( 0x000000 + 0x40000, 0x20000)
+	ROM_RELOAD( 0x000000 + 0x60000, 0x20000)
+	ROM_LOAD("tzu15_l2.rom", 0x080000, 0x80000, CRC(389d2442) SHA1(58a4bc7cc7a28b47c75d5c9bbf14abf34bd7a9e3))
 	ROM_LOAD("tzu18_p3.rom", 0x100000, 0x80000, CRC(1f750672) SHA1(033c6e261201a17667110069b7570fe90490286b))
 ROM_END
 
@@ -688,8 +699,11 @@ ROM_START(tz_p4)
 	ROM_REGION(0x80000, "code", 0)
 	ROM_LOAD("tz_p4.rom", 0x00000, 0x80000, CRC(5a662df5) SHA1(0f609ff59549225d56b913c3bf928b58f7bf1ca5))
 	ROM_REGION(0x180000, "sound1", 0)
-	ROM_LOAD("u14-sp1.040", 0x000000, 0x80000, CRC(ad7cb98b) SHA1(a84bf157cb535acaf811e93ad22a505e1dd08dad))
-	ROM_LOAD("u15-sp1.040", 0x080000, 0x80000, CRC(0f17c9e9) SHA1(fcaa6f87ebd03222e3a40be08eb5aa6a5e002a8b))
+	ROM_LOAD("tzu14_l2.rom", 0x000000, 0x20000, CRC(5a67bd56) SHA1(98669fbfdc5793bcf09fe72c231e2b4fa2524cc5))
+	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
+	ROM_RELOAD( 0x000000 + 0x40000, 0x20000)
+	ROM_RELOAD( 0x000000 + 0x60000, 0x20000)
+	ROM_LOAD("tzu15_l2.rom", 0x080000, 0x80000, CRC(389d2442) SHA1(58a4bc7cc7a28b47c75d5c9bbf14abf34bd7a9e3))
 	ROM_LOAD("tzu18_p3.rom", 0x100000, 0x80000, CRC(1f750672) SHA1(033c6e261201a17667110069b7570fe90490286b))
 ROM_END
 
@@ -869,6 +883,7 @@ GAME(1992,  ft_l5,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init
 GAME(1992,  ft_l3,      ft_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Fish Tales (L-3)",                                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  ft_l4,      ft_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Fish Tales (L-4)",                                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  ft_p4,      ft_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Fish Tales (P-4)",                                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  ft_p2,      ft_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Fish Tales (P-2)",                                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1994,  tafg_lx3,   0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "The Addams Family Special Collectors Edition Gold (LX-3)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1994,  tafg_h3,    tafg_lx3,   wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "The Addams Family Special Collectors Edition (H-3)",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1994,  tafg_la2,   tafg_lx3,   wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "The Addams Family Special Collectors Edition (LA-2)",      MACHINE_IS_SKELETON_MECHANICAL)

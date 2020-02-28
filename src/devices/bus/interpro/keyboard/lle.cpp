@@ -465,7 +465,7 @@ void lle_device_base::device_start()
 
 void lle_device_base::device_reset()
 {
-	m_txd = 0;
+	m_txd = 1;
 }
 
 void lle_device_base::io_map(address_map &map)
@@ -480,16 +480,16 @@ void lle_device_base::ext_map(address_map &map)
 	// not clear what these addresses correspond to, possibly
 	// used in manufacturer testing?
 	if (VERBOSE & LOG_GENERAL)
-		map(0x7fe, 0x7ff).lw8("write",
-			[this](address_space &space, offs_t offset, u8 data, u8 mem_mask)
-			{
-				LOG("write offset 0x%03f data 0x%02x (%s)\n", offset, data, machine().describe_context());
-			});
+		map(0x7fe, 0x7ff).lw8(
+				[this] (offs_t offset, u8 data, u8 mem_mask)
+				{
+					LOG("write offset 0x%03f data 0x%02x (%s)\n", offset, data, machine().describe_context());
+				}, "write");
 }
 
 READ_LINE_MEMBER(lle_device_base::t0_r)
 {
-	if ((VERBOSE & LOG_RXTX) && (m_mcu->pc() == 0x8e) && m_txd == 0)
+	if ((VERBOSE & LOG_RXTX) && (m_mcu->pc() == 0x8e) && m_txd)
 	{
 		auto const suppressor(machine().disable_side_effects());
 
@@ -499,7 +499,7 @@ READ_LINE_MEMBER(lle_device_base::t0_r)
 		LOGMASKED(LOG_RXTX, "received byte 0x%02x\n", input);
 	}
 
-	return m_txd;
+	return !m_txd;
 }
 
 READ_LINE_MEMBER(lle_device_base::t1_r)
@@ -561,7 +561,7 @@ WRITE8_MEMBER(lle_device_base::p2_w)
 		m_count++;
 
 	// serial transmit
-	output_rxd(BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
+	output_rxd(!BIT(data, 5));
 
 	// BIT(data, 4)?
 	if (!BIT(m_p2, 4) && BIT(data, 4))

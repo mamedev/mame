@@ -5,7 +5,8 @@
     Battle Lane Vol. 5
     1986 Taito
 
-    2x6809
+    This is a Technos game, though it was distributed by Taito and uses
+    some DECO custom ICs.
 
     Driver provided by Paul Leaman (paul@vortexcomputing.demon.co.uk)
 
@@ -273,15 +274,15 @@ void battlane_state::machine_reset()
 
 void battlane_state::battlane(machine_config &config)
 {
-	/* basic machine hardware */
-	M6809(config, m_maincpu, 1500000);      /* 1.5 MHz ? */
+	// TODO: measure clocks and determine whether CPUs are MC6809 or MC6809E (both are surface-scratched)
+	MC6809E(config, m_maincpu, 1500000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &battlane_state::battlane_map);
 	m_maincpu->set_vblank_int("screen", FUNC(battlane_state::battlane_cpu1_interrupt));
 
-	M6809(config, m_subcpu, 1500000);       /* 1.5 MHz ? */
+	MC6809E(config, m_subcpu, 1500000);
 	m_subcpu->set_addrmap(AS_PROGRAM, &battlane_state::battlane_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

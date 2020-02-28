@@ -99,19 +99,19 @@ void ampoker2_state::ampoker2_palette(palette_device &palette) const
 		// blue component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
-		int const b = combine_2_weights(weights_b, bit0, bit1);
+		int const b = combine_weights(weights_b, bit0, bit1);
 
 		// green component
 		bit0 = BIT(color_prom[i], 2);
 		bit1 = BIT(color_prom[i], 3);
 		bit2 = BIT(color_prom[i], 4);
-		int const g = combine_3_weights(weights_g, bit0, bit1, bit2);
+		int const g = combine_weights(weights_g, bit0, bit1, bit2);
 
 		// red component
 		bit0 = BIT(color_prom[i], 5);
 		bit1 = BIT(color_prom[i], 6);
 		bit2 = BIT(color_prom[i], 7);
-		int const r = combine_3_weights(weights_r, bit0, bit1, bit2);
+		int const r = combine_weights(weights_r, bit0, bit1, bit2);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -149,13 +149,13 @@ TILE_GET_INFO_MEMBER(ampoker2_state::s2k_get_bg_tile_info)
 
 void ampoker2_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ampoker2_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ampoker2_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 64, 32);
 }
 
 VIDEO_START_MEMBER(ampoker2_state,sigma2k)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ampoker2_state::s2k_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ampoker2_state::s2k_get_bg_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 64, 32);
 }
 

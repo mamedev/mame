@@ -303,9 +303,11 @@ static void pce_cart(device_slot_interface &device)
 	device.option_add_internal("cdsys3j", PCE_ROM_CDSYS3);
 	device.option_add_internal("populous", PCE_ROM_POPULOUS);
 	device.option_add_internal("sf2", PCE_ROM_SF2);
+	device.option_add_internal("tennokoe", PCE_ROM_TENNOKOE);
 }
 
-MACHINE_CONFIG_START(pce_state::pce_common)
+void pce_state::pce_common(machine_config &config)
+{
 	/* basic machine hardware */
 	H6280(config, m_maincpu, MAIN_CLOCK/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pce_state::pce_mem);
@@ -315,16 +317,16 @@ MACHINE_CONFIG_START(pce_state::pce_common)
 	m_maincpu->add_route(0, "lspeaker", 1.00);
 	m_maincpu->add_route(1, "rspeaker", 1.00);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
 	MCFG_MACHINE_RESET_OVERRIDE(pce_state, mess_pce )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
-	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
+	screen.set_screen_update(FUNC(pce_state::screen_update));
+	screen.set_palette(m_huc6260);
 
 	HUC6260(config, m_huc6260, MAIN_CLOCK);
 	m_huc6260->next_pixel_data().set("huc6270", FUNC(huc6270_device::next_pixel));
@@ -342,24 +344,27 @@ MACHINE_CONFIG_START(pce_state::pce_common)
 	PCE_CD(config, m_cd, 0);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("pcecd");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(pce_state::pce)
+void pce_state::pce(machine_config &config)
+{
 	pce_common(config);
-	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
+	PCE_CART_SLOT(config, m_cartslot, pce_cart, nullptr, "pce_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("pce");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(pce_state::tg16)
+void pce_state::tg16(machine_config &config)
+{
 	pce_common(config);
-	MCFG_TG16_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
+	PCE_CART_SLOT(config, m_cartslot, pce_cart, nullptr, "tg16_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("tg16");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(pce_state::sgx)
+void pce_state::sgx(machine_config &config)
+{
 	/* basic machine hardware */
 	H6280(config, m_maincpu, MAIN_CLOCK/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pce_state::sgx_mem);
@@ -369,16 +374,16 @@ MACHINE_CONFIG_START(pce_state::sgx)
 	m_maincpu->add_route(0, "lspeaker", 1.00);
 	m_maincpu->add_route(1, "rspeaker", 1.00);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
 	MCFG_MACHINE_RESET_OVERRIDE(pce_state, mess_pce )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
-	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
+	screen.set_screen_update(FUNC(pce_state::screen_update));
+	screen.set_palette(m_huc6260);
 
 	HUC6260(config, m_huc6260, MAIN_CLOCK);
 	m_huc6260->next_pixel_data().set("huc6202", FUNC(huc6202_device::next_pixel));
@@ -411,14 +416,14 @@ MACHINE_CONFIG_START(pce_state::sgx)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
+	PCE_CART_SLOT(config, m_cartslot, pce_cart, nullptr, "pce_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("sgx");
 	SOFTWARE_LIST(config, "pce_list").set_compatible("pce");
 
 	PCE_CD(config, m_cd, 0);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("pcecd");
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

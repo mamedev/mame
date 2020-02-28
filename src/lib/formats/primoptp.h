@@ -7,12 +7,13 @@
     Format code for Primo cassette files
 
 *********************************************************************/
+#ifndef MAME_FORMATS_PRIMOPTP_H
+#define MAME_FORMATS_PRIMOPTP_H
 
-#ifndef PRIMOPTP_H
-#define PRIMOPTP_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN( primo_ptp_format );
 
-#endif /* PRIMOPTP_H */
+#endif // MAME_FORMATS_PRIMOPTP_H

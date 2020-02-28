@@ -50,7 +50,7 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 				osd::text::tstring tc_buf = osd::text::to_tstring(string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[no image]"));
 				AppendMenu(m_devices_menu, MF_ENABLED, 0, tc_buf.c_str());
 			}
-			AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)m_devices_menu, TEXT("Images"));
+			AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)m_devices_menu, TEXT("Media"));
 		}
 
 		// get the work bounds
@@ -94,6 +94,7 @@ cleanup:
 consolewin_info::~consolewin_info()
 {
 }
+
 
 void consolewin_info::set_cpu(device_t &device)
 {
@@ -192,17 +193,27 @@ void consolewin_info::update_menu()
 
 			if (img.is_creatable())
 				AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_CREATE, TEXT("Create..."));
-			AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CLOSE, TEXT("Unmount"));
 
-			if (img.device().type() == CASSETTE)
+			if (img.exists())
 			{
-				cassette_state const state = (cassette_state)(img.exists() ? (downcast<cassette_image_device *>(&img.device())->get_state() & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED);
-				AppendMenu(devicesubmenu, MF_SEPARATOR, 0, nullptr);
-				AppendMenu(devicesubmenu, flags_for_exists | ((state == CASSETTE_STOPPED) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_STOPPAUSE, TEXT("Pause/Stop"));
-				AppendMenu(devicesubmenu, flags_for_exists | ((state == CASSETTE_PLAY) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_PLAY, TEXT("Play"));
-				AppendMenu(devicesubmenu, flags_for_writing | ((state == CASSETTE_RECORD) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_RECORD, TEXT("Record"));
-				AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_REWIND, TEXT("Rewind"));
-				AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_FASTFORWARD, TEXT("Fast Forward"));
+				AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CLOSE, TEXT("Unmount"));
+
+				if (img.device().type() == CASSETTE)
+				{
+					cassette_state const state = downcast<cassette_image_device *>(&img.device())->get_state() & CASSETTE_MASK_UISTATE;
+					AppendMenu(devicesubmenu, MF_SEPARATOR, 0, nullptr);
+					AppendMenu(devicesubmenu, flags_for_exists | ((state == CASSETTE_STOPPED) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_STOPPAUSE, TEXT("Pause/Stop"));
+					AppendMenu(devicesubmenu, flags_for_exists | ((state == CASSETTE_PLAY) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_PLAY, TEXT("Play"));
+					AppendMenu(devicesubmenu, flags_for_writing | ((state == CASSETTE_RECORD) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_RECORD, TEXT("Record"));
+					AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_REWIND, TEXT("Rewind"));
+					AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_FASTFORWARD, TEXT("Fast Forward"));
+					AppendMenu(devicesubmenu, MF_SEPARATOR, 0, nullptr);
+					// Motor state can be overriden by the driver
+					cassette_state const motor_state = downcast<cassette_image_device *>(&img.device())->get_state() & CASSETTE_MASK_MOTOR;
+					AppendMenu(devicesubmenu, flags_for_exists | ((motor_state == CASSETTE_MOTOR_ENABLED) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_MOTOR, TEXT("Motor"));
+					cassette_state const speaker_state = downcast<cassette_image_device *>(&img.device())->get_state() & CASSETTE_MASK_SPEAKER;
+					AppendMenu(devicesubmenu, flags_for_exists | ((speaker_state == CASSETTE_SPEAKER_ENABLED) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_SOUND, TEXT("Audio while Loading"));
+				}
 			}
 
 			std::string filename;
@@ -271,7 +282,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						std::string as = slmap.find(opt_name)->second;
 
 						/* Make sure a folder was specified, and that it exists */
-						if ((!osd::directory::open(as.c_str())) || (as.find(':') == std::string::npos))
+						if ((!osd::directory::open(as)) || (as.find(':') == std::string::npos))
 						{
 							/* Default to emu directory */
 							osd_get_full_path(as, ".");
@@ -311,7 +322,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 							buf.erase(0, t1+1);
 
 							// load software
-							img->load_software( buf.c_str());
+							img->load_software(buf);
 						}
 					}
 				}
@@ -341,7 +352,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 							as = buf; // the only path
 
 						/* Make sure a folder was specified, and that it exists */
-						if ((!osd::directory::open(as.c_str())) || (as.find(':') == std::string::npos))
+						if ((!osd::directory::open(as)) || (as.find(':') == std::string::npos))
 						{
 							/* Default to emu directory */
 							osd_get_full_path(as, ".");
@@ -367,7 +378,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						if (GetOpenFileName(&ofn))
 						{
 							auto utf8_buf = osd::text::from_tstring(selectedFilename);
-							img->load(utf8_buf.c_str());
+							img->load(utf8_buf);
 						}
 					}
 				}
@@ -396,7 +407,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 							as = buf; // the only path
 
 						/* Make sure a folder was specified, and that it exists */
-						if ((!osd::directory::open(as.c_str())) || (as.find(':') == std::string::npos))
+						if ((!osd::directory::open(as)) || (as.find(':') == std::string::npos))
 						{
 							/* Default to emu directory */
 							osd_get_full_path(as, ".");
@@ -422,7 +433,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						if (GetSaveFileName(&ofn))
 						{
 							auto utf8_buf = osd::text::from_tstring(selectedFilename);
-							img->create(utf8_buf.c_str(), img->device_get_indexed_creatable_format(0), nullptr);
+							img->create(utf8_buf, img->device_get_indexed_creatable_format(0), nullptr);
 						}
 					}
 				}
@@ -433,7 +444,8 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 			}
 			if (img->device().type() == CASSETTE)
 			{
-				cassette_image_device *const cassette = downcast<cassette_image_device *>(&img->device());
+				auto *const cassette = downcast<cassette_image_device *>(&img->device());
+				bool s;
 				switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX)
 				{
 				case DEVOPTION_CASSETTE_STOPPAUSE:
@@ -446,11 +458,19 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					cassette->change_state(CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
 					return true;
 				case DEVOPTION_CASSETTE_REWIND:
-					cassette->seek(-60.0, SEEK_CUR);
+					cassette->seek(0.0, SEEK_SET);  // to start
 					return true;
 				case DEVOPTION_CASSETTE_FASTFORWARD:
-					cassette->seek(+60.0, SEEK_CUR);
-					return true;
+					cassette->seek(+300.0, SEEK_CUR); // 5 minutes forward or end, whichever comes first
+					break;
+				case DEVOPTION_CASSETTE_MOTOR:
+					s =((cassette->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED);
+					cassette->change_state(s ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+					break;
+				case DEVOPTION_CASSETTE_SOUND:
+					s =((cassette->get_state() & CASSETTE_MASK_SPEAKER) == CASSETTE_SPEAKER_MUTED);
+					cassette->change_state(s ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+					break;
 				}
 			}
 		}
@@ -579,7 +599,7 @@ bool consolewin_info::get_softlist_info(device_image_interface *img)
 		while (sl_root && !passes_tests)
 		{
 			std::string test_path = sl_root + sl_dir;
-			if (osd::directory::open(test_path.c_str()))
+			if (osd::directory::open(test_path))
 			{
 				passes_tests = true;
 				slmap[opt_name] = test_path;

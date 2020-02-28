@@ -26,8 +26,8 @@ DEFINE_DEVICE_TYPE(BBC_EXP_SLOT, bbc_exp_slot_device, "bbc_exp_slot", "BBC Maste
 //  device_bbc_exp_interface - constructor
 //-------------------------------------------------
 
-device_bbc_exp_interface::device_bbc_exp_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+device_bbc_exp_interface::device_bbc_exp_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "bbcexp")
 {
 	m_slot = dynamic_cast<bbc_exp_slot_device *>(device.owner());
 }
@@ -43,7 +43,7 @@ device_bbc_exp_interface::device_bbc_exp_interface(const machine_config &mconfig
 
 bbc_exp_slot_device::bbc_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BBC_EXP_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_bbc_exp_interface>(mconfig, *this),
 	m_card(nullptr),
 	m_irq_handler(*this),
 	m_nmi_handler(*this),
@@ -54,27 +54,12 @@ bbc_exp_slot_device::bbc_exp_slot_device(const machine_config &mconfig, const ch
 
 
 //-------------------------------------------------
-//  device_validity_check -
-//-------------------------------------------------
-
-void bbc_exp_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const carddev = get_card_device();
-	if (carddev && !dynamic_cast<device_bbc_exp_interface *>(carddev))
-		osd_printf_error("Card device %s (%s) does not implement device_bbc_exp_interface\n", carddev->tag(), carddev->name());
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void bbc_exp_slot_device::device_start()
 {
-	device_t *const carddev = get_card_device();
-	m_card = dynamic_cast<device_bbc_exp_interface *>(carddev);
-	if (carddev && !m_card)
-		fatalerror("Card device %s (%s) does not implement device_bbc_exp_interface\n", carddev->tag(), carddev->name());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_irq_handler.resolve_safe();
@@ -86,37 +71,29 @@ void bbc_exp_slot_device::device_start()
 
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_exp_slot_device::device_reset()
-{
-}
-
-//-------------------------------------------------
 //  read
 //-------------------------------------------------
 
-READ8_MEMBER(bbc_exp_slot_device::fred_r)
+uint8_t bbc_exp_slot_device::fred_r(offs_t offset)
 {
 	if (m_card)
-		return m_card->fred_r(space, offset);
+		return m_card->fred_r(offset);
 	else
 		return 0xff;
 }
 
-READ8_MEMBER(bbc_exp_slot_device::jim_r)
+uint8_t bbc_exp_slot_device::jim_r(offs_t offset)
 {
 	if (m_card)
-		return m_card->jim_r(space, offset);
+		return m_card->jim_r(offset);
 	else
 		return 0xff;
 }
 
-READ8_MEMBER(bbc_exp_slot_device::sheila_r)
+uint8_t bbc_exp_slot_device::sheila_r(offs_t offset)
 {
 	if (m_card)
-		return m_card->sheila_r(space, offset);
+		return m_card->sheila_r(offset);
 	else
 		return 0xfe;
 }
@@ -125,32 +102,32 @@ READ8_MEMBER(bbc_exp_slot_device::sheila_r)
 //  write
 //-------------------------------------------------
 
-WRITE8_MEMBER(bbc_exp_slot_device::fred_w)
+void bbc_exp_slot_device::fred_w(offs_t offset, uint8_t data)
 {
 	if (m_card)
-		m_card->fred_w(space, offset, data);
+		m_card->fred_w(offset, data);
 }
 
-WRITE8_MEMBER(bbc_exp_slot_device::jim_w)
+void bbc_exp_slot_device::jim_w(offs_t offset, uint8_t data)
 {
 	if (m_card)
-		m_card->jim_w(space, offset, data);
+		m_card->jim_w(offset, data);
 }
 
-WRITE8_MEMBER(bbc_exp_slot_device::sheila_w)
+void bbc_exp_slot_device::sheila_w(offs_t offset, uint8_t data)
 {
 	if (m_card)
-		m_card->sheila_w(space, offset, data);
+		m_card->sheila_w(offset, data);
 }
 
 //-------------------------------------------------
 //  pb_r
 //-------------------------------------------------
 
-READ8_MEMBER(bbc_exp_slot_device::pb_r)
+uint8_t bbc_exp_slot_device::pb_r()
 {
 	if (m_card)
-		return 0x1f | m_card->pb_r(space, 0);
+		return 0x1f | m_card->pb_r();
 	else
 		return 0xff;
 }
@@ -160,10 +137,10 @@ READ8_MEMBER(bbc_exp_slot_device::pb_r)
 //  pb_w
 //-------------------------------------------------
 
-WRITE8_MEMBER(bbc_exp_slot_device::pb_w)
+void bbc_exp_slot_device::pb_w(uint8_t data)
 {
 	if (m_card)
-		m_card->pb_w(space, 0, data);
+		m_card->pb_w(data);
 }
 
 //-------------------------------------------------
@@ -172,12 +149,12 @@ WRITE8_MEMBER(bbc_exp_slot_device::pb_w)
 
 
 // slot devices
-//#include "autocue.h"
+#include "autocue.h"
 #include "mertec.h"
 
 
 void bbc_exp_devices(device_slot_interface &device)
 {
-	//device.option_add("autocue", BBC_AUTOCUE);       /* Autocue RAM disk board */
-	device.option_add("mertec",  BBC_MERTEC);        /* Mertec Compact Companion */
+	device.option_add_internal("autocue", BBC_AUTOCUE); /* Autocue RAM disk board */
+	device.option_add("mertec",  BBC_MERTEC);           /* Mertec Compact Companion */
 }

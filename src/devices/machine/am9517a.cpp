@@ -429,9 +429,9 @@ am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, 
 		m_out_eop_cb(*this),
 		m_in_memr_cb(*this),
 		m_out_memw_cb(*this),
-		m_in_ior_cb{ { *this }, { *this }, { *this }, { *this } },
-		m_out_iow_cb{ { *this }, { *this }, { *this }, { *this } },
-		m_out_dack_cb{ { *this }, { *this }, { *this }, { *this } }
+		m_in_ior_cb(*this),
+		m_out_iow_cb(*this),
+		m_out_dack_cb(*this)
 {
 }
 
@@ -445,8 +445,8 @@ v5x_dmau_device::v5x_dmau_device(const machine_config &mconfig, const char *tag,
 	: am9517a_device(mconfig, V5X_DMAU, tag, owner, clock)
 	, m_in_mem16r_cb(*this)
 	, m_out_mem16w_cb(*this)
-	, m_in_io16r_cb{ { *this },{ *this },{ *this },{ *this } }
-	, m_out_io16w_cb{ { *this },{ *this },{ *this },{ *this } }
+	, m_in_io16r_cb(*this)
+	, m_out_io16w_cb(*this)
 
 {
 }
@@ -470,12 +470,9 @@ void am9517a_device::device_start()
 	m_out_eop_cb.resolve_safe();
 	m_in_memr_cb.resolve_safe(0);
 	m_out_memw_cb.resolve_safe();
-	for(auto &cb : m_in_ior_cb)
-		cb.resolve_safe(0);
-	for(auto &cb : m_out_iow_cb)
-		cb.resolve_safe();
-	for(auto &cb : m_out_dack_cb)
-		cb.resolve_safe();
+	m_in_ior_cb.resolve_all_safe(0);
+	m_out_iow_cb.resolve_all_safe();
+	m_out_dack_cb.resolve_all_safe();
 
 	for(auto &elem : m_channel)
 	{
@@ -501,14 +498,11 @@ void am9517a_device::device_start()
 	save_item(NAME(m_temp));
 	save_item(NAME(m_request));
 
-	for (int i = 0; i < 4; i++)
-	{
-		save_item(NAME(m_channel[i].m_address), i);
-		save_item(NAME(m_channel[i].m_count), i);
-		save_item(NAME(m_channel[i].m_base_address), i);
-		save_item(NAME(m_channel[i].m_base_count), i);
-		save_item(NAME(m_channel[i].m_mode), i);
-	}
+	save_item(STRUCT_MEMBER(m_channel, m_address));
+	save_item(STRUCT_MEMBER(m_channel, m_count));
+	save_item(STRUCT_MEMBER(m_channel, m_base_address));
+	save_item(STRUCT_MEMBER(m_channel, m_base_count));
+	save_item(STRUCT_MEMBER(m_channel, m_mode));
 
 	m_address_mask = 0xffff;
 
@@ -723,7 +717,7 @@ void am9517a_device::execute_run()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( am9517a_device::read )
+uint8_t am9517a_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -787,7 +781,7 @@ READ8_MEMBER( am9517a_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( am9517a_device::write )
+void am9517a_device::write(offs_t offset, uint8_t data)
 {
 	if (!BIT(offset, 3))
 	{
@@ -1003,10 +997,8 @@ void v5x_dmau_device::device_start()
 
 	m_in_mem16r_cb.resolve_safe(0);
 	m_out_mem16w_cb.resolve_safe();
-	for (auto &cb : m_in_io16r_cb)
-		cb.resolve_safe(0);
-	for (auto &cb : m_out_io16w_cb)
-		cb.resolve_safe();
+	m_in_io16r_cb.resolve_all_safe(0);
+	m_out_io16w_cb.resolve_all_safe();
 
 	m_selected_channel = 0;
 	m_base = 0;
@@ -1024,7 +1016,7 @@ void v5x_dmau_device::device_reset()
 }
 
 
-READ8_MEMBER(v5x_dmau_device::read)
+uint8_t v5x_dmau_device::read(offs_t offset)
 {
 	uint8_t ret = 0;
 	int channel = m_selected_channel;
@@ -1108,7 +1100,7 @@ READ8_MEMBER(v5x_dmau_device::read)
 	return ret;
 }
 
-WRITE8_MEMBER(v5x_dmau_device::write)
+void v5x_dmau_device::write(offs_t offset, uint8_t data)
 {
 	int channel = m_selected_channel;
 
@@ -1322,4 +1314,5 @@ void eisa_dma_device::device_start()
 	m_address_mask = 0xffffffffU;
 
 	save_item(NAME(m_stop));
+	save_item(NAME(m_ext_mode));
 }

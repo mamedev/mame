@@ -46,12 +46,9 @@
 #ifndef NLD_R2R_DAC_H_
 #define NLD_R2R_DAC_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define R2R_DAC(name, p_VIN, p_R, p_N)                                          \
-		NET_REGISTER_DEV(R2R_DAC, name)                                         \
-		NETDEV_PARAMI(name, VIN, p_VIN)                                         \
-		NETDEV_PARAMI(name, R,   p_R)                                           \
-		NETDEV_PARAMI(name, N,   p_N)
+		NET_REGISTER_DEVEXT(R2R_DAC, name, p_VIN, p_R, p_N)
 
 #endif /* NLD_R2R_DAC_H_ */

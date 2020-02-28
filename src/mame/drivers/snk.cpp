@@ -327,11 +327,6 @@ enum
 
 /*********************************************************************/
 
-CUSTOM_INPUT_MEMBER(snk_state::marvins_sound_busy)
-{
-	return m_soundlatch->pending_r() ? 1 : 0;
-}
-
 READ8_MEMBER(snk_state::marvins_sound_nmi_ack_r)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -363,14 +358,14 @@ TIMER_CALLBACK_MEMBER(snk_state::sgladiat_sndirq_update_callback)
 
 WRITE8_MEMBER(snk_state::sgladiat_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), CMDIRQ_BUSY_ASSERT);
 }
 
 READ8_MEMBER(snk_state::sgladiat_soundlatch_r)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), BUSY_CLEAR);
-	return m_soundlatch->read(space,0);
+	return m_soundlatch->read();
 }
 
 READ8_MEMBER(snk_state::sgladiat_sound_nmi_ack_r)
@@ -461,11 +456,11 @@ WRITE_LINE_MEMBER(snk_state::ymirq_callback_2)
 
 WRITE8_MEMBER(snk_state::snk_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_BUSY_ASSERT);
 }
 
-CUSTOM_INPUT_MEMBER(snk_state::snk_sound_busy)
+READ_LINE_MEMBER(snk_state::sound_busy_r)
 {
 	return (m_sound_status & 4) ? 1 : 0;
 }
@@ -507,7 +502,7 @@ READ8_MEMBER(snk_state::tnk3_ymirq_ack_r)
 READ8_MEMBER(snk_state::tnk3_busy_clear_r)
 {
 	// it's uncertain whether the latch should be cleared here or when it's read
-	m_soundlatch->clear_w(space, 0, 0);
+	m_soundlatch->clear_w();
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), BUSY_CLEAR);
 	return 0xff;
 }
@@ -700,27 +695,28 @@ hand, always returning 0xf inbetween valid values confuses the game.
 
 *****************************************************************************/
 
+template <int Which>
 CUSTOM_INPUT_MEMBER(snk_state::gwar_rotary)
 {
-	int which = (int)(uintptr_t)param;
-	int value = m_rot_io[which]->read();
+	int value = m_rot_io[Which]->read();
 
-	if ((m_last_value[which] == 0x5 && value == 0x6) || (m_last_value[which] == 0x6 && value == 0x5))
+	if ((m_last_value[Which] == 0x5 && value == 0x6) || (m_last_value[Which] == 0x6 && value == 0x5))
 	{
-		if (!m_cp_count[which])
+		if (!m_cp_count[Which])
 			value = 0xf;
-		m_cp_count[which] = (m_cp_count[which] + 1) & 0x07;
+		m_cp_count[Which] = (m_cp_count[Which] + 1) & 0x07;
 	}
-	m_last_value[which] = value;
+	m_last_value[Which] = value;
 
 	return value;
 }
 
+template <int Which>
 CUSTOM_INPUT_MEMBER(snk_state::gwarb_rotary)
 {
 	if (m_joymode_io->read() == 1)
 	{
-		return gwar_rotary(field, param);
+		return gwar_rotary<Which>();
 	}
 	else
 	{
@@ -776,24 +772,23 @@ CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_y)
 
 /************************************************************************/
 
+template <int Mask>
 CUSTOM_INPUT_MEMBER(snk_state::snk_bonus_r)
 {
-	int bit_mask = (uintptr_t)param;
-
-	switch (bit_mask)
+	switch (Mask)
 	{
 		case 0x01:  /* older games : "Occurrence" Dip Switch (DSW2:1) */
-			return ((m_bonus_io->read() & bit_mask) >> 0);
+			return ((m_bonus_io->read() & Mask) >> 0);
 		case 0xc0:  /* older games : "Bonus Life" Dip Switches (DSW1:7,8) */
-			return ((m_bonus_io->read() & bit_mask) >> 6);
+			return ((m_bonus_io->read() & Mask) >> 6);
 
 		case 0x04:  /* later games : "Occurrence" Dip Switch (DSW1:3) */
-			return ((m_bonus_io->read() & bit_mask) >> 2);
+			return ((m_bonus_io->read() & Mask) >> 2);
 		case 0x30:  /* later games : "Bonus Life" Dip Switches (DSW2:5,6) */
-			return ((m_bonus_io->read() & bit_mask) >> 4);
+			return ((m_bonus_io->read() & Mask) >> 4);
 
 		default:
-			logerror("snk_bonus_r : invalid %02X bit_mask\n",bit_mask);
+			logerror("snk_bonus_r : invalid %02X bit_mask\n",Mask);
 			return 0;
 	}
 }
@@ -1418,7 +1413,7 @@ void snk_state::hal21_sound_map(address_map &map)
 	map(0xa000, 0xa000).r(FUNC(snk_state::sgladiat_soundlatch_r));
 	map(0xc000, 0xc000).r(FUNC(snk_state::sgladiat_sound_nmi_ack_r));
 	map(0xe000, 0xe001).w("ay1", FUNC(ay8910_device::address_data_w));
-//  AM_RANGE(0xe002, 0xe002) AM_WRITENOP    // bitfielded(0-5) details unknown. Filter enable?
+//  map(0xe002, 0xe002).nopw();    // bitfielded(0-5) details unknown. Filter enable?
 	map(0xe008, 0xe009).w("ay2", FUNC(ay8910_device::address_data_w));
 }
 
@@ -1447,7 +1442,7 @@ void snk_state::aso_YM3526_sound_map(address_map &map)
 	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe000).r(FUNC(snk_state::tnk3_busy_clear_r));
 	map(0xf000, 0xf001).rw("ym1", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
-//  AM_RANGE(0xf002, 0xf002) AM_READNOP unknown
+//  map(0xf002, 0xf002).nopr(); unknown
 	map(0xf004, 0xf004).r(FUNC(snk_state::tnk3_cmdirq_ack_r));
 	map(0xf006, 0xf006).r(FUNC(snk_state::tnk3_ymirq_ack_r));
 }
@@ -1518,7 +1513,7 @@ static INPUT_PORTS_START( marvins )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, nullptr) /* sound CPU status */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // sound CPU status
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )   // service switch according to schematics, see code at 0x0453. Goes to garbage.
 
 	PORT_START("IN1")
@@ -1600,7 +1595,7 @@ static INPUT_PORTS_START( vangrd2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, nullptr) /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // sound CPU status
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -1684,8 +1679,8 @@ static INPUT_PORTS_START( madcrash )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, nullptr) /* sound CPU status */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, nullptr) /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // sound CPU status
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // sound CPU status
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SERVICE )
 
 	PORT_START("IN1")
@@ -1762,7 +1757,7 @@ static INPUT_PORTS_START( jcross )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -1805,10 +1800,10 @@ static INPUT_PORTS_START( jcross )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 //  PORT_DIPSETTING(    0x10, "INVALID !" )                 /* settings table at 0x0378 is only 5 bytes wide */
 //  PORT_DIPSETTING(    0x08, "INVALID !" )                 /* settings table at 0x0378 is only 5 bytes wide */
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0xc0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0xc0>)
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x01>)
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW2:2,3")
 	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
@@ -1847,7 +1842,7 @@ static INPUT_PORTS_START( sgladiat )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SERVICE )            /* code at 0x054e */
 
@@ -1888,10 +1883,10 @@ static INPUT_PORTS_START( sgladiat )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0xc0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0xc0>)
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x01>)
 	PORT_DIPNAME( 0x02, 0x02, "Time" )                      PORT_DIPLOCATION("DSW2:2")
 	PORT_DIPSETTING(    0x02, "More" )                      /* Hazard race 2:30 / Chariot race 3:30 */
 	PORT_DIPSETTING(    0x00, "Less" )                      /* Hazard race 2:00 / Chariot race 3:00 */
@@ -1931,7 +1926,7 @@ static INPUT_PORTS_START( hal21 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -1972,10 +1967,10 @@ static INPUT_PORTS_START( hal21 )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0xc0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0xc0>)
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x01>)
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW2:2,3")
 	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
@@ -2014,7 +2009,7 @@ static INPUT_PORTS_START( aso )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )           /* uses "Coinage" settings - code at 0x2e04 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -2057,10 +2052,10 @@ static INPUT_PORTS_START( aso )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0xc0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0xc0>)
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x01>)
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW2:2,3")
 	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
@@ -2100,7 +2095,7 @@ static INPUT_PORTS_START( alphamis )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )           /* uses "Coin A" settings - code at 0x2e17 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -2147,7 +2142,7 @@ static INPUT_PORTS_START( alphamis )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DSW1:8" )
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x01>)
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW2:2,3")
 	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
@@ -2182,7 +2177,7 @@ static INPUT_PORTS_START( tnk3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -2228,10 +2223,10 @@ static INPUT_PORTS_START( tnk3 )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0xc0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0xc0>)
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x01>)
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW2:2,3")
 	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
@@ -2265,7 +2260,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( athena )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )           /* uses "Coin A" settings - code at 0x09d4 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2302,7 +2297,7 @@ static INPUT_PORTS_START( athena )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )          /* Single Controls */
 	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x04)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x04>)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -2329,7 +2324,7 @@ static INPUT_PORTS_START( athena )
 	PORT_DIPNAME( 0x08, 0x08, "Freeze" )                    PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x30)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x30>)
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DSW2:7" )
 	PORT_DIPNAME( 0x80, 0x80, "Energy" )                    PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, "12" )
@@ -2350,7 +2345,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( fitegolf )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x045b */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )           /* same as the dip switch */
@@ -2446,7 +2441,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( countryc )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x0450 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )           /* same as the dip switch */
@@ -2456,10 +2451,10 @@ static INPUT_PORTS_START( countryc )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,countryc_trackball_x, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, countryc_trackball_x)
 
 	PORT_START("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,countryc_trackball_y, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, countryc_trackball_y)
 
 	PORT_START("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2528,7 +2523,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ikari )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* adds 1 credit - code at 0x0a15 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2568,7 +2563,7 @@ static INPUT_PORTS_START( ikari )
 	PORT_DIPNAME( 0x02, 0x02, "P1 & P2 Fire Buttons" )      PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, "Separate" )
 	PORT_DIPSETTING(    0x00, "Common" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x04)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x04>)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -2594,7 +2589,7 @@ static INPUT_PORTS_START( ikari )
 	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x04, "Freeze" )
 	PORT_DIPSETTING(    0x00, "Infinite Lives (Cheat)")
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x30)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x30>)
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DSW2:7" )           /* read at 0x07c4, but strange test at 0x07cc */
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
@@ -2623,7 +2618,7 @@ static INPUT_PORTS_START( ikaria )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* adds 1 credit - code at 0x0a00 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 INPUT_PORTS_END
@@ -2665,7 +2660,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( victroad )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* adds 1 credit - code at 0x0a19 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2705,7 +2700,7 @@ static INPUT_PORTS_START( victroad )
 	PORT_DIPNAME( 0x02, 0x02, "P1 & P2 Fire Buttons" )      PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, "Separate" )
 	PORT_DIPSETTING(    0x00, "Common" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x04)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x04>)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -2731,7 +2726,7 @@ static INPUT_PORTS_START( victroad )
 	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x30)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x30>)
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -2769,7 +2764,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( bermudat )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x0a0a */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2807,7 +2802,7 @@ static INPUT_PORTS_START( bermudat )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x04)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x04>)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -2833,7 +2828,7 @@ static INPUT_PORTS_START( bermudat )
 	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x30)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state,snk_bonus_r<0x30>)
 	PORT_DIPNAME( 0xc0, 0x80, "Game Style" )                PORT_DIPLOCATION("DSW2:7,8")
 	PORT_DIPSETTING(    0xc0, "Normal without continue" )
 	PORT_DIPSETTING(    0x80, "Normal with continue" )
@@ -2898,7 +2893,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( psychos )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2935,7 +2930,7 @@ static INPUT_PORTS_START( psychos )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x04)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x04>)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -2962,7 +2957,7 @@ static INPUT_PORTS_START( psychos )
 	PORT_DIPNAME( 0x08, 0x08, "Freeze" )                    PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x30)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x30>)
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -2983,7 +2978,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gwar )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x08c8 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )
@@ -2997,7 +2992,7 @@ static INPUT_PORTS_START( gwar )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,gwar_rotary, (void*)0)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, gwar_rotary<0>)
 
 	PORT_START("P1ROT")
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
@@ -3007,7 +3002,7 @@ static INPUT_PORTS_START( gwar )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,gwar_rotary, (void*)1)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, gwar_rotary<1>)
 
 	PORT_START("P2ROT")
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
@@ -3029,7 +3024,7 @@ static INPUT_PORTS_START( gwar )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x04)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x04>)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -3055,7 +3050,7 @@ static INPUT_PORTS_START( gwar )
 	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x30)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x30>)
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DSW2:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DSW2:8" )
 
@@ -3078,10 +3073,10 @@ static INPUT_PORTS_START( gwarb )
 	// connected. If rotary is not connected, player fires in the direction he's facing.
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,gwarb_rotary, (void*)0)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, gwarb_rotary<0>)
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,gwarb_rotary, (void*)1)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, gwarb_rotary<1>)
 
 	PORT_START("JOYSTICK_MODE")
 	PORT_CONFNAME( 0x01, 0x00, "Joystick mode" )
@@ -3092,7 +3087,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( chopper )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x0849 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )
@@ -3131,7 +3126,7 @@ static INPUT_PORTS_START( chopper )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )          /* Single Controls */
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x04)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x04>)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -3157,7 +3152,7 @@ static INPUT_PORTS_START( chopper )
 	PORT_DIPSETTING(    0x0c, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x30)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x30>)
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
@@ -3213,7 +3208,7 @@ static INPUT_PORTS_START( tdfever )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE )           /* also reset - code at 0x074a */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* adds 1 credit - code at 0x1065 */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START1 ) PORT_NAME("Start Game A")
@@ -3355,7 +3350,7 @@ static INPUT_PORTS_START( fsoccer )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE )           /* same as the dip switch / also reset - code at 0x00cc */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x677f */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START1 ) PORT_NAME("Start Game A")
@@ -3627,7 +3622,7 @@ void snk_state::marvins(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &snk_state::marvins_sound_portmap);
 	m_audiocpu->set_periodic_int(FUNC(snk_state::nmi_line_assert), attotime::from_hz(244));  // schematics show a separate 244Hz timer
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3689,7 +3684,7 @@ void snk_state::jcross(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &snk_state::jcross_sound_portmap);
 	m_audiocpu->set_periodic_int(FUNC(snk_state::irq0_line_assert), attotime::from_hz(244)); // Marvin's frequency, sounds ok
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3760,7 +3755,7 @@ void snk_state::tnk3(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::tnk3_YM3526_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3853,7 +3848,7 @@ void snk_state::ikari(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_YM3526_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3910,7 +3905,7 @@ void snk_state::bermudat(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_Y8950_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(24000);
+	config.set_maximum_quantum(attotime::from_hz(24000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3993,7 +3988,7 @@ void snk_state::tdfever(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_Y8950_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -4705,32 +4700,32 @@ ROM_END
 
 ROM_START( fitegolfu )  /*  Later US version containing enhancements to make the game a little easier */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "np45.4p",    0x00000, 0x04000, CRC(16e8e763) SHA1(0b5296f2a91a7f3176b7461ca4958865ce998241) )
-	ROM_LOAD( "mn45.4m",    0x04000, 0x08000, CRC(a4fa09d5) SHA1(ae7f0cb47de06006ae71252c4201a93a01a26887) )
+	ROM_LOAD( "gu2_ver2.4p", 0x00000, 0x04000, CRC(16e8e763) SHA1(0b5296f2a91a7f3176b7461ca4958865ce998241) )
+	ROM_LOAD( "gu1_ver2.4m", 0x04000, 0x08000, CRC(a4fa09d5) SHA1(ae7f0cb47de06006ae71252c4201a93a01a26887) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "gu6.8p",     0x00000, 0x04000, CRC(2b9978c5) SHA1(5490e9f796697318650fc5f70c0e64d6785ad7fc) ) // NP8.256
-	ROM_LOAD( "gu5.8m",     0x04000, 0x08000, CRC(ea3d138c) SHA1(af0a0bfe2d266179946948cf42fe697505798a4f) ) // MN8.256
+	ROM_LOAD( "gu6.8p", 0x00000, 0x04000, CRC(2b9978c5) SHA1(5490e9f796697318650fc5f70c0e64d6785ad7fc) )
+	ROM_LOAD( "gu5.8m", 0x04000, 0x08000, CRC(ea3d138c) SHA1(af0a0bfe2d266179946948cf42fe697505798a4f) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "gu3.6g",     0x00000, 0x04000, CRC(811b87d7) SHA1(fb387f42085d6e0e5a88729ca0e50656411ce037) ) // FG67.256
-	ROM_LOAD( "gu4.6k",     0x04000, 0x08000, CRC(2d998e2b) SHA1(a471cfbb4dabc90fcc29c562620b9965eaff6861) ) // K67.256
+	ROM_LOAD( "gu3.6g", 0x00000, 0x04000, CRC(811b87d7) SHA1(fb387f42085d6e0e5a88729ca0e50656411ce037) )
+	ROM_LOAD( "gu4.6k", 0x04000, 0x08000, CRC(2d998e2b) SHA1(a471cfbb4dabc90fcc29c562620b9965eaff6861) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )
-	ROM_LOAD( "3.2c",       0x00000, 0x00400, CRC(6e4c7836) SHA1(3ab3c498939fac992e2bf1c33983ee821a9b6a18) ) /* 82s137 */
-	ROM_LOAD( "1.1b",       0x00400, 0x00400, CRC(29e7986f) SHA1(85ba8d3443458c27728f633745857a1315dd183f) ) /* 82s137 */
-	ROM_LOAD( "2.1c",       0x00800, 0x00400, CRC(27ba9ff9) SHA1(f021d10460f40de4447560df5ac47fa53bb57ff9) ) /* 82s137 */
+	ROM_LOAD( "3.2c", 0x00000, 0x00400, CRC(6e4c7836) SHA1(3ab3c498939fac992e2bf1c33983ee821a9b6a18) ) /* 82s137 */
+	ROM_LOAD( "1.1b", 0x00400, 0x00400, CRC(29e7986f) SHA1(85ba8d3443458c27728f633745857a1315dd183f) ) /* 82s137 */
+	ROM_LOAD( "2.1c", 0x00800, 0x00400, CRC(27ba9ff9) SHA1(f021d10460f40de4447560df5ac47fa53bb57ff9) ) /* 82s137 */
 
 	ROM_REGION( 0x4000, "tx_tiles", 0 )
-	ROM_LOAD( "gu8.2d",     0x00000, 0x04000, CRC(f1628dcf) SHA1(efea343d3a9dd45ef74947c297e166e34afbb680) ) // D2.128
+	ROM_LOAD( "gu8.2d", 0x00000, 0x04000, CRC(f1628dcf) SHA1(efea343d3a9dd45ef74947c297e166e34afbb680) )
 
 	ROM_REGION( 0x8000, "bg_tiles", 0 )
-	ROM_LOAD( "gu7.2b",     0x00000, 0x08000, CRC(4655f94e) SHA1(08526206d8e929bb01d61fff8de2ee99fd287c17) ) // BC2.256
+	ROM_LOAD( "gu7.2b", 0x00000, 0x08000, CRC(4655f94e) SHA1(08526206d8e929bb01d61fff8de2ee99fd287c17) )
 
 	ROM_REGION( 0x18000, "sp16_tiles", 0 )
-	ROM_LOAD( "gu9.2p",     0x00000, 0x08000, CRC(d4957ec5) SHA1(8ead7866ba5ac66ead6b707aa868bcae30c486e1) ) // P2.256
-	ROM_LOAD( "gu10.2rs",   0x08000, 0x08000, CRC(b3acdac2) SHA1(7377480d5e1b5ab2c49f5fee2927623ce8240e19) ) // R2.256
-	ROM_LOAD( "gu11.2t",    0x10000, 0x08000, CRC(b99cf73b) SHA1(23989fc3914e77d364807a9eb96a4ddf75ad7cf1) ) // S2.256
+	ROM_LOAD( "gu9.2p",   0x00000, 0x08000, CRC(d4957ec5) SHA1(8ead7866ba5ac66ead6b707aa868bcae30c486e1) )
+	ROM_LOAD( "gu10.2rs", 0x08000, 0x08000, CRC(b3acdac2) SHA1(7377480d5e1b5ab2c49f5fee2927623ce8240e19) )
+	ROM_LOAD( "gu11.2t",  0x10000, 0x08000, CRC(b99cf73b) SHA1(23989fc3914e77d364807a9eb96a4ddf75ad7cf1) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "a6001-1.6c", 0x00000, 0x00104, CRC(de291f4e) SHA1(b50294d30cb8eacc7a9bb8b46695a7463ef45ff1) ) /* PAL16R6A */
@@ -4746,7 +4741,7 @@ CPU/Sound Board: ?
 Video Board:     ?
 */
 
-ROM_START( fitegolf2 )
+ROM_START( fitegolfua )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fg_ver2_6.4e", 0x0000, 0x4000, CRC(4cc9ef0c) SHA1(0ac6071725db3ec85659b170eecec91d22e76abd) )
 	ROM_LOAD( "fg_ver2_7.g4", 0x4000, 0x4000, CRC(144b0beb) SHA1(5b5e58ee93cabbdd560487b16d0cc7217d9cea7f) )
@@ -6374,8 +6369,8 @@ GAME( 1986, athena,    0,        athena,    athena,    snk_state, empty_init, RO
 GAME( 1986, athenab,   athena,   athena,    athena,    snk_state, empty_init, ROT0,   "SNK",     "Athena (bootleg)", 0 ) // is this really a bootleg?
 GAME( 1987, sathena,   athena,   athena,    athena,    snk_state, empty_init, ROT0,   "bootleg", "Super Athena (bootleg)", 0 )
 GAME( 1988, fitegolf,  0,        fitegolf,  fitegolf,  snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (World?)", 0 )
-GAME( 1988, fitegolfu, fitegolf, fitegolf,  fitegolfu, snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US)", 0 )
-GAME( 1988, fitegolf2, fitegolf, fitegolf2, fitegolfu, snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US, Ver 2)", 0 )
+GAME( 1988, fitegolfu, fitegolf, fitegolf,  fitegolfu, snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US, Ver 2, set 1)", 0 )
+GAME( 1988, fitegolfua,fitegolf, fitegolf2, fitegolfu, snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US, Ver 2, set 2)", 0 )
 GAME( 1988, countryc,  0,        countryc,  countryc,  snk_state, empty_init, ROT0,   "SNK",     "Country Club", 0 )
 
 GAME( 1986, ikari,     0,        ikari,     ikari,     snk_state, empty_init, ROT270, "SNK",     "Ikari Warriors (US JAMMA)", 0 ) // distributed by Tradewest(?)

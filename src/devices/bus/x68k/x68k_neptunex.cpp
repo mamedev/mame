@@ -39,17 +39,15 @@ x68k_neptune_device::x68k_neptune_device(const machine_config &mconfig, const ch
 
 void x68k_neptune_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
 	char mac[7];
 	uint32_t num = machine().rand();
-	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
 	memset(m_prom, 0x57, 16);
 	sprintf(mac+2, "\x1b%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
 	mac[0] = 0; mac[1] = 0;  // avoid gcc warning
 	memcpy(m_prom, mac, 6);
 	m_dp8390->set_mac(mac);
-	space.install_readwrite_handler(0xece000,0xece3ff,read16_delegate(FUNC(x68k_neptune_device::x68k_neptune_port_r),this),write16_delegate(FUNC(x68k_neptune_device::x68k_neptune_port_w),this),0xffffffff);
+	m_slot->space().install_readwrite_handler(0xece000,0xece3ff, read16_delegate(*this, FUNC(x68k_neptune_device::x68k_neptune_port_r)), write16_delegate(*this, FUNC(x68k_neptune_device::x68k_neptune_port_w)), 0xffffffff);
 }
 
 void x68k_neptune_device::device_reset() {
@@ -141,7 +139,11 @@ WRITE8_MEMBER(x68k_neptune_device::x68k_neptune_mem_write)
 
 WRITE_LINE_MEMBER(x68k_neptune_device::x68k_neptune_irq_w)
 {
-	machine().device("maincpu")->execute().set_input_line_vector(2, NEPTUNE_IRQ_VECTOR);
 	m_slot->irq2_w(state);
 	logerror("Neptune: IRQ2 set to %i\n",state);
+}
+
+uint8_t x68k_neptune_device::iack2()
+{
+	return NEPTUNE_IRQ_VECTOR;
 }

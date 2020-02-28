@@ -36,7 +36,7 @@ READ8_MEMBER(pc1401_state::in_a_r)
 	int data = m_outa;
 
 	for (int bit = 0; bit < 5; bit++)
-		if (BIT(m_outb, 0))
+		if (BIT(m_outb, bit))
 			data |= m_keys[bit]->read();
 
 	if (m_outb & 0x20)

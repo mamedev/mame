@@ -30,7 +30,7 @@ N          U12   U16    U20     U28     U34   |
 +---------------------------------------------+
 
 CPU board:
-  CPU: Z84000ABI Z80 cpu
+  CPU: Z84000AB1 Z80 cpu
 Sound: AY-3-8910
   RAM: AMD AM9128-15PC (2048x8 Static RAM)
   OSC: 10.000MHz
@@ -83,53 +83,68 @@ Technology = NMOS
  - fix palette
  - fix tilemap colors
  - remove hack for irq0 firing
- - add nvram
+ - nvram does not work
 
 */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "video/pwm.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+#include "trvmadns.lh"
 
 class trvmadns_state : public driver_device
 {
 public:
 	trvmadns_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_gfxram(*this, "gfxram"),
-		m_tileram(*this, "tileram"),
 		m_maincpu(*this, "maincpu"),
+		m_lamps(*this, "lamps"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_8(*this, "paletteram") { }
+		m_generic_paletteram_8(*this, "paletteram"),
+		m_gfxram(*this, "gfxram"),
+		m_tileram(*this, "tileram")
+	{ }
 
 	void trvmadns(machine_config &config);
 
-private:
-	tilemap_t *m_bg_tilemap;
-	required_shared_ptr<uint8_t> m_gfxram;
-	required_shared_ptr<uint8_t> m_tileram;
-	int m_old_data;
-	DECLARE_WRITE8_MEMBER(trvmadns_banking_w);
-	DECLARE_WRITE8_MEMBER(trvmadns_gfxram_w);
-	DECLARE_WRITE8_MEMBER(trvmadns_palette_w);
-	DECLARE_WRITE8_MEMBER(w2);
-	DECLARE_WRITE8_MEMBER(w3);
-	DECLARE_WRITE8_MEMBER(trvmadns_tileram_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_trvmadns(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
 	required_device<cpu_device> m_maincpu;
+	required_device<pwm_display_device> m_lamps;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
+	required_shared_ptr<uint8_t> m_gfxram;
+	required_shared_ptr<uint8_t> m_tileram;
+
 	void cpu_map(address_map &map);
 	void io_map(address_map &map);
+
+	tilemap_t *m_bg_tilemap;
+	int m_old_data;
+
+	DECLARE_WRITE8_MEMBER(trvmadns_banking_w);
+	DECLARE_WRITE8_MEMBER(trvmadns_gfxram_w);
+	DECLARE_WRITE8_MEMBER(trvmadns_palette_w);
+	DECLARE_WRITE8_MEMBER(unknown_w);
+	DECLARE_WRITE8_MEMBER(lamps_w);
+	DECLARE_WRITE8_MEMBER(trvmadns_tileram_w);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	uint32_t screen_update_trvmadns(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -225,20 +240,21 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_palette_w)
 }
 
 
-WRITE8_MEMBER(trvmadns_state::w2)
+WRITE8_MEMBER(trvmadns_state::unknown_w)
 {
 /*  static int old = -1;
     if(data!=old)
-        logerror("w2 = %02X\n",old=data);
+        logerror("unknown_w = %02X\n",old=data);
 */
 }
 
-WRITE8_MEMBER(trvmadns_state::w3)
+WRITE8_MEMBER(trvmadns_state::lamps_w)
 {
-/*  static int old = -1;
-    if(data!=old)
-        logerror("w3 = %02X\n",old=data);
-*/
+	// 7-------  not used
+	// -6------  start button led
+	// --5-----  not used
+	// ---43210  button lamps 5 to 1
+	m_lamps->matrix(1, data);
 }
 
 WRITE8_MEMBER(trvmadns_state::trvmadns_tileram_w)
@@ -265,31 +281,32 @@ void trvmadns_state::cpu_map(address_map &map)
 	map(0x6000, 0x6fff).bankr("bank1");
 	map(0x7000, 0x7fff).bankr("bank2");
 	map(0x6000, 0x7fff).w(FUNC(trvmadns_state::trvmadns_gfxram_w)).share("gfxram");
-	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xa7ff).ram().w(FUNC(trvmadns_state::trvmadns_tileram_w)).share("tileram");
+	map(0x8000, 0x87ff).ram().share("nvram"); // u3
+	map(0xa000, 0xa7ff).ram().w(FUNC(trvmadns_state::trvmadns_tileram_w)).share("tileram"); // u17
 	map(0xc000, 0xc01f).ram().w(FUNC(trvmadns_state::trvmadns_palette_w)).share("paletteram");
-	map(0xe000, 0xe000).w(FUNC(trvmadns_state::w2));//NOP
-	map(0xe004, 0xe004).w(FUNC(trvmadns_state::w3));//NOP
+	map(0xe000, 0xe000).w(FUNC(trvmadns_state::unknown_w));//NOP
+	map(0xe004, 0xe004).w(FUNC(trvmadns_state::lamps_w));
 }
 
 void trvmadns_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x02, 0x02).portr("IN0");
+	map(0x00, 0x00).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x01, 0x01).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x80, 0x80).w(FUNC(trvmadns_state::trvmadns_banking_w));
 }
 
 static INPUT_PORTS_START( trvmadns )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE)
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -329,7 +346,7 @@ TILE_GET_INFO_MEMBER(trvmadns_state::get_bg_tile_info)
 
 void trvmadns_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(trvmadns_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(trvmadns_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 //  fg_tilemap->set_transparent_pen(1);
 
@@ -382,36 +399,48 @@ uint32_t trvmadns_state::screen_update_trvmadns(screen_device &screen, bitmap_in
 	return 0;
 }
 
+void trvmadns_state::machine_start()
+{
+}
+
 void trvmadns_state::machine_reset()
 {
 	m_old_data = -1;
 }
 
-MACHINE_CONFIG_START(trvmadns_state::trvmadns)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/4) // Most likely 2.5MHz (less likely 5MHz (10MHz/2))
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+void trvmadns_state::trvmadns(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(10'000'000)/4); // Most likely 2.5MHz (less likely 5MHz (10MHz/2))
+	m_maincpu->set_addrmap(AS_PROGRAM, &trvmadns_state::cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &trvmadns_state::io_map);
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(trvmadns_state, screen_update_trvmadns)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 31*8-1, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(trvmadns_state::screen_update_trvmadns));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trvmadns)
-	MCFG_PALETTE_ADD("palette", 16)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_trvmadns);
+	PALETTE(config, m_palette).set_entries(16);
 
+	PWM_DISPLAY(config, m_lamps).set_size(1, 8);
+	m_lamps->set_bri_levels(0.9);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "aysnd", XTAL(10'000'000)/2/4).add_route(ALL_OUTPUTS, "mono", 1.0); //?
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(10'000'000)/2/4)); //?
+	aysnd.port_a_read_callback().set_ioport("IN0");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	config.set_default_layout(layout_trvmadns);
+}
 
 
 ROM_START( trvmadns )

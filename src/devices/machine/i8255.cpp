@@ -229,6 +229,7 @@ i8255_device::i8255_device(const machine_config &mconfig, device_type type, cons
 	, m_out_pc_cb(*this)
 	, m_tri_pa_cb(*this)
 	, m_tri_pb_cb(*this)
+	, m_tri_pc_cb(*this)
 	, m_control(0)
 	, m_intr{ 0, 0 }
 {
@@ -250,6 +251,7 @@ void i8255_device::device_resolve_objects()
 	m_out_pc_cb.resolve_safe();
 	m_tri_pa_cb.resolve_safe(0xff);
 	m_tri_pb_cb.resolve_safe(0xff);
+	m_tri_pc_cb.resolve_safe(0xff);
 }
 
 //-------------------------------------------------
@@ -522,8 +524,8 @@ void i8255_device::output_pc()
 		}
 		else
 		{
-			// TTL inputs float high
-			data |= 0xf0;
+			// TTL inputs floating
+			data |= m_tri_pc_cb(0) & 0xf0;
 		}
 		break;
 
@@ -560,8 +562,8 @@ void i8255_device::output_pc()
 		}
 		else
 		{
-			// TTL inputs float high
-			data |= b_mask;
+			// TTL inputs floating
+			data |= m_tri_pc_cb(0) & b_mask;
 		}
 		break;
 

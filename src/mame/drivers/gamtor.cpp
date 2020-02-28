@@ -67,14 +67,14 @@ void gaminator_state::gaminator_map(address_map &map)
 	map(0x20000000, 0x2003ffff).ram();
 
 	/* standard VGA */
-	//AM_RANGE(0x40000000, 0x40000fff) AM_RAM // regs
+	//map(0x40000000, 0x40000fff).ram(); // regs
 	map(0x400003b0, 0x400003bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
 	map(0x400003c0, 0x400003cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
 	map(0x400003d0, 0x400003df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
 
 	map(0x44000000, 0x4401ffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w)); // VRAM
-//  AM_RANGE(0x44000000, 0x44007fff) AM_RAM AM_SHARE("tmapram1") // puts strings here, looks almost like a tilemap, but where are the tiles?
-//  AM_RANGE(0x440a0000, 0x440a1fff) AM_RAM AM_SHARE("tmapram2") // beetlem (like above, mirror?)
+//  map(0x44000000, 0x44007fff).ram().share("tmapram1"); // puts strings here, looks almost like a tilemap, but where are the tiles?
+//  map(0x440a0000, 0x440a1fff).ram().share("tmapram2"); // beetlem (like above, mirror?)
 
 	map(0xe0000000, 0xe00001ff).ram(); // nvram?
 	map(0xf0000000, 0xf00003ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
@@ -85,23 +85,23 @@ INPUT_PORTS_END
 
 
 
-MACHINE_CONFIG_START(gaminator_state::gaminator)
-	MCFG_DEVICE_ADD("maincpu", MCF5206E, 40000000) /* definitely Coldfire, model / clock uncertain */
-	MCFG_DEVICE_PROGRAM_MAP(gaminator_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaminator_state,  irq6_line_hold) // irq6 seems to be needed to get past the ROM checking
+void gaminator_state::gaminator(machine_config &config)
+{
+	MCF5206E(config, m_maincpu, 40000000); /* definitely Coldfire, model / clock uncertain */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaminator_state::gaminator_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gaminator_state::irq6_line_hold)); // irq6 seems to be needed to get past the ROM checking
 	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", gamtor_vga_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
+	screen.set_screen_update("vga", FUNC(gamtor_vga_device::screen_update));
 
-	MCFG_DEVICE_ADD("vga", GAMTOR_VGA, 0)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	GAMTOR_VGA(config, "vga", 0).set_screen("screen");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound */
-MACHINE_CONFIG_END
+}
 
 
 

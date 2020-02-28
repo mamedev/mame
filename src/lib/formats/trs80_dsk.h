@@ -7,11 +7,10 @@
     JV1 disk image format
 
 ***************************************************************************/
+#ifndef MAME_FORMATS_TRS80_DSK_H
+#define MAME_FORMATS_TRS80_DSK_H
 
 #pragma once
-
-#ifndef __TRS80_DSK_H__
-#define __TRS80_DSK_H__
 
 #include "wd177x_dsk.h"
 
@@ -33,4 +32,4 @@ private:
 
 extern const floppy_format_type FLOPPY_TRS80_FORMAT;
 
-#endif // __TRS80_DSK_H__
+#endif // MAME_FORMATS_TRS80_DSK_H

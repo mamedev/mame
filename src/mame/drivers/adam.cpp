@@ -457,10 +457,10 @@ READ8_MEMBER( adam_state::mreq_r )
 		}
 	}
 
-	data = m_cart->bd_r(space, offset & 0x7fff, data, cs1, cs2, cs3, cs4);
-	data = m_slot1->bd_r(space, offset & 0xff, data, 1, biorq, 1, 1, 1);
-	data = m_slot2->bd_r(space, offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
-	data = m_slot3->bd_r(space, offset, data, 1, 1, 1, cas1, cas2);
+	data = m_cart->bd_r(offset & 0x7fff, data, cs1, cs2, cs3, cs4);
+	data = m_slot1->bd_r(offset & 0xff, data, 1, biorq, 1, 1, 1);
+	data = m_slot2->bd_r(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	data = m_slot3->bd_r(offset, data, 1, 1, 1, cas1, cas2);
 
 	return data;
 }
@@ -516,9 +516,9 @@ WRITE8_MEMBER( adam_state::mreq_w )
 		m_ram->pointer()[offset] = data;
 	}
 
-	m_slot1->bd_w(space, offset & 0xff, data, 1, biorq, 1, 1, 1);
-	m_slot2->bd_w(space, offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
-	m_slot3->bd_w(space, offset, data, 1, 1, 1, cas1, cas2);
+	m_slot1->bd_w(offset & 0xff, data, 1, biorq, 1, 1, 1);
+	m_slot2->bd_w(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	m_slot3->bd_w(offset, data, 1, 1, 1, cas1, cas2);
 }
 
 
@@ -557,9 +557,9 @@ READ8_MEMBER( adam_state::iorq_r )
 		break;
 	}
 
-	data = m_slot1->bd_r(space, offset & 0xff, data, 1, biorq, 1, 1, 1);
-	data = m_slot2->bd_r(space, offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
-	data = m_slot3->bd_r(space, offset, data, 1, 1, 1, cas1, cas2);
+	data = m_slot1->bd_r(offset & 0xff, data, 1, biorq, 1, 1, 1);
+	data = m_slot2->bd_r(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	data = m_slot3->bd_r(offset, data, 1, 1, 1, cas1, cas2);
 
 	return data;
 }
@@ -609,9 +609,9 @@ WRITE8_MEMBER( adam_state::iorq_w )
 		break;
 	}
 
-	m_slot1->bd_w(space, offset & 0xff, data, 1, biorq, 1, 1, 1);
-	m_slot2->bd_w(space, offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
-	m_slot3->bd_w(space, offset, data, 1, 1, 1, cas1, cas2);
+	m_slot1->bd_w(offset & 0xff, data, 1, biorq, 1, 1, 1);
+	m_slot2->bd_w(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	m_slot3->bd_w(offset, data, 1, 1, 1, cas1, cas2);
 }
 
 
@@ -1042,7 +1042,7 @@ void adam_state::adam(machine_config &config)
 	m_netcpu->out_p3_cb().set(FUNC(adam_state::m6801_p3_w));
 	m_netcpu->out_p4_cb().set(FUNC(adam_state::m6801_p4_w));
 	m_netcpu->out_sc2_cb().set(FUNC(adam_state::os3_w));
-	config.m_perfect_cpu_quantum = subtag(M6801_TAG);
+	config.set_perfect_quantum(m_netcpu);
 
 	// video hardware
 	TMS9928A(config, m_vdc, XTAL(10'738'635)).set_screen("screen");
@@ -1058,22 +1058,22 @@ void adam_state::adam(machine_config &config)
 	//m_psg->ready_cb().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT).invert();
 
 	// devices
-	ADAMNET(config, ADAMNET_TAG, 0);
-	ADAMNET_SLOT(config, "net1", adamnet_devices, "kb");
-	ADAMNET_SLOT(config, "net2", adamnet_devices, "prn");
-	ADAMNET_SLOT(config, "net3", adamnet_devices, "ddp");
-	ADAMNET_SLOT(config, "net4", adamnet_devices, "fdc");
-	ADAMNET_SLOT(config, "net5", adamnet_devices, "fdc").set_option_device_input_defaults("fdc", device_iptdef_drive2);
-	ADAMNET_SLOT(config, "net6", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net7", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net8", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net9", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net10", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net11", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net12", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net13", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net14", adamnet_devices, nullptr);
-	ADAMNET_SLOT(config, "net15", adamnet_devices, nullptr);
+	ADAMNET(config, m_adamnet, 0);
+	ADAMNET_SLOT(config, "net1", m_adamnet, adamnet_devices, "kb");
+	ADAMNET_SLOT(config, "net2", m_adamnet, adamnet_devices, "prn");
+	ADAMNET_SLOT(config, "net3", m_adamnet, adamnet_devices, "ddp");
+	ADAMNET_SLOT(config, "net4", m_adamnet, adamnet_devices, "fdc");
+	ADAMNET_SLOT(config, "net5", m_adamnet, adamnet_devices, "fdc").set_option_device_input_defaults("fdc", device_iptdef_drive2);
+	ADAMNET_SLOT(config, "net6", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net7", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net8", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net9", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net10", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net11", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net12", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net13", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net14", m_adamnet, adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net15", m_adamnet, adamnet_devices, nullptr);
 
 	COLECOVISION_CARTRIDGE_SLOT(config, m_cart, colecovision_cartridges, nullptr);
 	ADAM_EXPANSION_SLOT(config, m_slot1, XTAL(7'159'090)/2, adam_slot1_devices, "adamlink");

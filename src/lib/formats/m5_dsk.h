@@ -7,9 +7,10 @@
     sord m5 format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_M5_DSK_H
+#define MAME_FORMATS_M5_DSK_H
 
-#ifndef M5_DSK_H_
-#define M5_DSK_H_
+#pragma once
 
 #include "upd765_dsk.h"
 
@@ -27,4 +28,4 @@ private:
 
 extern const floppy_format_type FLOPPY_M5_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_M5_DSK_H

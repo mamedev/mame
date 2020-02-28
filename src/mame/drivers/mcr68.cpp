@@ -107,7 +107,7 @@ WRITE16_MEMBER(mcr68_state::blasted_control_w)
 READ16_MEMBER(mcr68_state::spyhunt2_port_0_r)
 {
 	int result = ioport("IN0")->read();
-	int analog = m_adc->read(space, 0);
+	int analog = m_adc->read();
 
 	return result | ((m_sounds_good->read(space, 0) & 1) << 5) | (analog << 8);
 }
@@ -130,7 +130,7 @@ WRITE16_MEMBER(mcr68_state::spyhunt2_control_w)
 	m_sounds_good->reset_write(~m_control_word & 0x2000);
 	m_sounds_good->write(space, offset, (m_control_word >> 8) & 0x001f);
 
-	m_adc->write(space, 0, (m_control_word >> 3) & 0x0f);
+	m_adc->write((m_control_word >> 3) & 0x0f);
 }
 
 
@@ -896,11 +896,11 @@ GFXDECODE_END
 
 =================================================================*/
 
-MACHINE_CONFIG_START(mcr68_state::mcr68)
-
+void mcr68_state::mcr68(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 7723800)
-	MCFG_DEVICE_PROGRAM_MAP(mcr68_map)
+	M68000(config, m_maincpu, 7723800);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr68_state::mcr68_map);
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 	MCFG_MACHINE_START_OVERRIDE(mcr68_state,mcr68)
@@ -910,13 +910,13 @@ MACHINE_CONFIG_START(mcr68_state::mcr68)
 	m_ptm->irq_callback().set_inputline("maincpu", 2);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*16, 30*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*16-1, 0, 30*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mcr68_state, screen_update_mcr68)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(30);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(32*16, 30*16);
+	m_screen->set_visarea(0, 32*16-1, 0, 30*16-1);
+	m_screen->set_screen_update(FUNC(mcr68_state::screen_update_mcr68));
+	m_screen->set_palette("palette");
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(mcr68_state::scanline_cb), "screen", 0, 1);
 
@@ -927,7 +927,7 @@ MACHINE_CONFIG_START(mcr68_state::mcr68)
 
 	/* sound hardware -- determined by specific machine */
 	SPEAKER(config, "speaker").front_center();
-MACHINE_CONFIG_END
+}
 
 
 void mcr68_state::xenophob(machine_config &config)
@@ -949,56 +949,53 @@ void mcr68_state::intlaser(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(mcr68_state::spyhunt2)
+void mcr68_state::spyhunt2(machine_config &config)
+{
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_sounds_good, MIDWAY_SOUNDS_GOOD)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	MIDWAY_SOUNDS_GOOD(config, m_sounds_good).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	MIDWAY_TURBO_CHEAP_SQUEAK(config, m_turbo_cheap_squeak).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	ADC0844(config, m_adc);
 	m_adc->ch1_callback().set_ioport("AN1");
 	m_adc->ch2_callback().set_ioport("AN2");
 	m_adc->ch3_callback().set_ioport("AN3");
 	m_adc->ch4_callback().set_ioport("AN4");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(mcr68_state::archrivl)
+void mcr68_state::archrivl(machine_config &config)
+{
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	WILLIAMS_CVSD_SOUND(config, m_cvsd_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
-MACHINE_CONFIG_START(mcr68_state::pigskin)
+void mcr68_state::pigskin(machine_config &config)
+{
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	WILLIAMS_CVSD_SOUND(config, m_cvsd_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pigskin_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr68_state::pigskin_map);
+}
 
 
-MACHINE_CONFIG_START(mcr68_state::trisport)
+void mcr68_state::trisport(machine_config &config)
+{
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	WILLIAMS_CVSD_SOUND(config, m_cvsd_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(trisport_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr68_state::trisport_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -1491,7 +1488,7 @@ void mcr68_state::init_xenophob()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* install control port handler */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::xenophobe_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::xenophobe_control_w)));
 }
 
 
@@ -1503,9 +1500,9 @@ void mcr68_state::init_spyhunt2()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* analog port handling is a bit tricky */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::spyhunt2_control_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0d0000, 0x0dffff, read16_delegate(FUNC(mcr68_state::spyhunt2_port_0_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::spyhunt2_port_1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::spyhunt2_control_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0d0000, 0x0dffff, read16_delegate(*this, FUNC(mcr68_state::spyhunt2_port_0_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(*this, FUNC(mcr68_state::spyhunt2_port_1_r)));
 }
 
 
@@ -1519,7 +1516,7 @@ void mcr68_state::init_blasted()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::blasted_control_w)));
 }
 
 void mcr68_state::init_intlaser()
@@ -1530,7 +1527,7 @@ void mcr68_state::init_intlaser()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::blasted_control_w)));
 
 }
 
@@ -1544,10 +1541,10 @@ void mcr68_state::init_archrivl()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::archrivl_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::archrivl_control_w)));
 
 	/* 49-way joystick handling is a bit tricky */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivl_port_1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(*this, FUNC(mcr68_state::archrivl_port_1_r)));
 }
 
 READ16_MEMBER(mcr68_state::archrivlb_port_1_r)
@@ -1563,10 +1560,10 @@ void mcr68_state::init_archrivlb()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::archrivl_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::archrivl_control_w)));
 
 	/* 49-way joystick replaced by standard 8way stick */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivlb_port_1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(*this, FUNC(mcr68_state::archrivlb_port_1_r)));
 }
 
 

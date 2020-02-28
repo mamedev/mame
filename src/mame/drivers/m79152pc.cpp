@@ -142,7 +142,7 @@ void m79152pc_state::mem_map(address_map &map)
 
 void m79152pc_state::io_map(address_map &map)
 {
-	//ADDRESS_MAP_UNMAP_HIGH
+	//map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x40, 0x43).rw(m_uart, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x44, 0x47).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -264,7 +264,8 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(m79152pc_state::m79152pc)
+void m79152pc_state::m79152pc(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4'000'000); // UA880D
 	m_maincpu->set_addrmap(AS_PROGRAM, &m79152pc_state::mem_map);
@@ -287,7 +288,7 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	m_screen->set_screen_update(FUNC(m79152pc_state::screen_update));
 	m_screen->set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m79152pc)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_m79152pc);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	pit8253_device &pit(PIT8253(config, "pit", 0)); // КР580ВИ53
@@ -342,7 +343,7 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 1000);
 	m_beep->add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( m79152pc )

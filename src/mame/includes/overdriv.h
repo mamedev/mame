@@ -46,7 +46,7 @@ private:
 	DECLARE_WRITE8_MEMBER(sound_ack_w);
 	DECLARE_WRITE16_MEMBER(slave_irq4_assert_w);
 	DECLARE_WRITE16_MEMBER(slave_irq5_assert_w);
-	DECLARE_WRITE16_MEMBER(objdma_w);
+	DECLARE_WRITE8_MEMBER(objdma_w);
 	TIMER_CALLBACK_MEMBER(objdma_end_cb);
 
 	uint32_t screen_update_overdriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -56,7 +56,6 @@ private:
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K053246_CB_MEMBER(sprite_callback);
-	void overdriv_k053260_map(address_map &map);
 	void overdriv_master_map(address_map &map);
 	void overdriv_slave_map(address_map &map);
 	void overdriv_sound_map(address_map &map);

@@ -45,7 +45,7 @@ public:
 	void init_spacfury();
 
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
-	DECLARE_CUSTOM_INPUT_MEMBER(elim4_joint_coin_r);
+	DECLARE_READ_LINE_MEMBER(elim4_joint_coin_r);
 
 private:
 	required_shared_ptr<uint8_t> m_mainram;

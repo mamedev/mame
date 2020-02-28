@@ -69,6 +69,10 @@ void ide_pci_device::device_start()
 {
 	pci_device::device_start();
 
+	// always keep this device memory ranges active
+	command |= 3;
+	command_mask &= ~3;
+
 	add_map(8,    M_IO,  FUNC(ide_pci_device::chan1_data_command_map));
 	add_map(4,    M_IO,  FUNC(ide_pci_device::chan1_control_map));
 	add_map(8,    M_IO,  FUNC(ide_pci_device::chan2_data_command_map));

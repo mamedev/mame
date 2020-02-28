@@ -20,12 +20,11 @@
 class pc_keyboard_device : public device_t
 {
 public:
-	pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE_LINE_MEMBER(enable);
 
-	template <class Object> devcb_base &set_keypress_callback(Object &&cb) { return m_out_keypress_func.set_callback(std::forward<Object>(cb)); }
 	auto keypress() { return m_out_keypress_func.bind(); }
 
 	enum class KEYBOARD_TYPE
@@ -77,7 +76,13 @@ private:
 class at_keyboard_device : public pc_keyboard_device
 {
 public:
-	at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, KEYBOARD_TYPE type, int default_set)
+		: at_keyboard_device(mconfig, tag, owner, 0)
+	{
+		set_type(type, default_set);
+	}
+
+	at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -113,19 +118,5 @@ INPUT_PORTS_EXTERN( at_keyboard );
 
 DECLARE_DEVICE_TYPE(PC_KEYB, pc_keyboard_device)
 DECLARE_DEVICE_TYPE(AT_KEYB, at_keyboard_device)
-
-#define MCFG_PC_KEYB_ADD(_tag, _cb) \
-	MCFG_DEVICE_ADD(_tag, PC_KEYB, 0) \
-	downcast<pc_keyboard_device &>(*device).set_keypress_callback(DEVCB_##_cb);
-
-#define MCFG_AT_KEYB_ADD(_tag, _def_set, _cb) \
-	MCFG_DEVICE_ADD(_tag, AT_KEYB, 0) \
-	downcast<at_keyboard_device &>(*device).set_type(pc_keyboard_device::KEYBOARD_TYPE::AT, _def_set); \
-	downcast<pc_keyboard_device &>(*device).set_keypress_callback(DEVCB_##_cb);
-
-#define MCFG_AT_MF2_KEYB_ADD(_tag, _def_set, _cb) \
-	MCFG_DEVICE_ADD(_tag, AT_KEYB, 0) \
-	downcast<at_keyboard_device &>(*device).set_type(pc_keyboard_device::KEYBOARD_TYPE_MF2, _def_set); \
-	downcast<pc_keyboard_device &>(*device).set_keypress_callback(DEVCB_##_cb);
 
 #endif // MAME_MACHINE_PCKEYBRD_H

@@ -265,6 +265,13 @@ void m6805_base_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 
+	// get the minimum not including the zero placeholders for illegal instructions
+	m_min_cycles = *std::min_element(
+			std::begin(m_params.m_cycles),
+			std::end(m_params.m_cycles),
+			[] (u8 x, u8 y) { return u8(x - 1) < u8(y - 1); });
+	m_max_cycles = *std::max_element(std::begin(m_params.m_cycles), std::end(m_params.m_cycles));
+
 	// set our instruction counter
 	set_icountptr(m_icount);
 
@@ -307,7 +314,7 @@ void m6805_base_device::device_reset()
 	/* IRQ disabled */
 	SEI;
 
-	rm16(0xfffe, m_pc);
+	rm16(0xfffe & m_params.m_vector_mask, m_pc);
 }
 
 
@@ -356,7 +363,7 @@ bool m6805_base_device::test_il()
 
 void m6805_base_device::interrupt_vector()
 {
-	rm16(0xfffa, m_pc);
+	rm16(0xfffa & m_params.m_vector_mask, m_pc);
 }
 
 /* Generate interrupts */
@@ -424,7 +431,7 @@ std::unique_ptr<util::disasm_interface> m6805_base_device::create_disassembler()
 //  clock into cycles per second
 //-------------------------------------------------
 
-uint64_t m6805_base_device::execute_clocks_to_cycles(uint64_t clocks) const
+uint64_t m6805_base_device::execute_clocks_to_cycles(uint64_t clocks) const noexcept
 {
 	return (clocks + 3) / 4;
 }
@@ -435,7 +442,7 @@ uint64_t m6805_base_device::execute_clocks_to_cycles(uint64_t clocks) const
 //  count back to raw clocks
 //-------------------------------------------------
 
-uint64_t m6805_base_device::execute_cycles_to_clocks(uint64_t cycles) const
+uint64_t m6805_base_device::execute_cycles_to_clocks(uint64_t cycles) const noexcept
 {
 	return cycles * 4;
 }
@@ -446,14 +453,9 @@ uint64_t m6805_base_device::execute_cycles_to_clocks(uint64_t cycles) const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t m6805_base_device::execute_min_cycles() const
+uint32_t m6805_base_device::execute_min_cycles() const noexcept
 {
-	// get the minimum not including the zero placeholders for illegal instructions
-	u32 const result(*std::min_element(
-			std::begin(m_params.m_cycles),
-			std::end(m_params.m_cycles),
-			[] (u8 x, u8 y) { return u8(x - 1) < u8(y - 1); }));
-	return result;
+	return m_min_cycles;
 }
 
 
@@ -462,10 +464,9 @@ uint32_t m6805_base_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t m6805_base_device::execute_max_cycles() const
+uint32_t m6805_base_device::execute_max_cycles() const noexcept
 {
-	u32 const result(*std::max_element(std::begin(m_params.m_cycles), std::end(m_params.m_cycles)));
-	return result;
+	return m_max_cycles;
 }
 
 
@@ -474,7 +475,7 @@ uint32_t m6805_base_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t m6805_base_device::execute_input_lines() const
+uint32_t m6805_base_device::execute_input_lines() const noexcept
 {
 	return 9;
 }
@@ -516,17 +517,6 @@ void m6805_base_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-
-m6805_device::m6805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6805_base_device(
-			mconfig,
-			tag,
-			owner,
-			clock,
-			M6805,
-			{ s_hmos_ops, s_hmos_cycles, 12, 0x007f, 0x0060, 0xfffc })
-{
-}
 
 /****************************************************************************
  * M68HC05EG section
@@ -667,6 +657,5 @@ void hd63705_device::interrupt_vector()
 }
 
 
-DEFINE_DEVICE_TYPE(M6805,     m6805_device,     "m6805",     "Motorola M6805")
 DEFINE_DEVICE_TYPE(M68HC05EG, m68hc05eg_device, "m68hc05eg", "Motorola MC68HC05EG")
 DEFINE_DEVICE_TYPE(HD63705,   hd63705_device,   "hd63705",   "Hitachi HD63705")

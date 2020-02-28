@@ -401,6 +401,25 @@ ROM_START(gi_l6)
 	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
 ROM_END
 
+ROM_START(gi_l8)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x40000, "code", 0)
+	ROM_LOAD("gilligans_l8.u6", 0x00000, 0x40000, CRC(d21d3bf8) SHA1(d41447a35b710297786d35aefe235ebd8b354b29))
+	ROM_REGION(0x180000, "sound1",0)
+	ROM_LOAD("gi_u14.l2", 0x000000, 0x20000, CRC(0e7a4140) SHA1(c6408794120b5e45a48b35c380333879e1f0be78))
+	ROM_RELOAD( 0x000000 + 0x20000, 0x20000)
+	ROM_RELOAD( 0x000000 + 0x40000, 0x20000)
+	ROM_RELOAD( 0x000000 + 0x60000, 0x20000)
+	ROM_LOAD("gi_u15.l2", 0x080000, 0x20000, CRC(f8241dc9) SHA1(118a65555b9fff6f94e5e8324ed97d6ddec3d82b))
+	ROM_RELOAD( 0x080000 + 0x20000, 0x20000)
+	ROM_RELOAD( 0x080000 + 0x40000, 0x20000)
+	ROM_RELOAD( 0x080000 + 0x60000, 0x20000)
+	ROM_LOAD("gi_u18.l2", 0x100000, 0x20000, CRC(ea53e196) SHA1(5dcf3f44d2d658f6a7b130fa9e48d3cd616b4300))
+	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
+	ROM_RELOAD( 0x100000 + 0x40000, 0x20000)
+	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
+ROM_END
+
 /*-----------------
 / Hot Shot #60017
 /------------------*/
@@ -665,6 +684,7 @@ GAME(1991,  gi_l9,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot
 GAME(1991,  gi_l3,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-3)",                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1991,  gi_l4,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-4)",                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1991,  gi_l6,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-6)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  gi_l8,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-8)",                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  hshot_p8,   0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Midway",       "Hot Shot Basketball (P-8)",                    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1991,  hurr_l2,    0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Hurricane (L-2)",                              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1991,  pz_f4,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (F-4)",                         MACHINE_IS_SKELETON_MECHANICAL)

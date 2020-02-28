@@ -268,7 +268,7 @@ void necdsp_device::state_string_export(const device_state_entry &entry, std::st
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t necdsp_device::execute_min_cycles() const
+uint32_t necdsp_device::execute_min_cycles() const noexcept
 {
 	return 4;
 }
@@ -279,7 +279,7 @@ uint32_t necdsp_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t necdsp_device::execute_max_cycles() const
+uint32_t necdsp_device::execute_max_cycles() const noexcept
 {
 	return 4;
 }
@@ -290,7 +290,7 @@ uint32_t necdsp_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t necdsp_device::execute_input_lines() const
+uint32_t necdsp_device::execute_input_lines() const noexcept
 {
 	return 3; // TODO: there should be 11: INT, SCK, /SIEN, /SOEN, SI, and /DACK, plus SO, /SORQ and DRQ; for now, just INT, P0, and P1 are enough.
 }

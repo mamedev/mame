@@ -27,7 +27,7 @@ public:
 private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_uknc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<k1801vm2_device> m_maincpu;
 
 	void uknc_mem(address_map &map);
@@ -62,7 +62,7 @@ void uknc_state::video_start()
 {
 }
 
-uint32_t uknc_state::screen_update_uknc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t uknc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -84,8 +84,7 @@ void uknc_state::uknc(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(uknc_state::screen_update_uknc));
-	screen.set_palette("palette");
+	screen.set_screen_update(FUNC(uknc_state::screen_update));
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 }

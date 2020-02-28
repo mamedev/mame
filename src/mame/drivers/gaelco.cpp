@@ -109,7 +109,7 @@ void gaelco_state::bigkarnk_map(address_map &map)
 	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_w)).share("videoram");               /* Video RAM */
 	map(0x102000, 0x103fff).ram();                                                         /* Screen RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
-//  AM_RANGE(0x10800c, 0x10800d) AM_DEVWRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
+//  map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w)); /* INT 6 ACK/Watchdog timer */
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    /* Palette */
 	map(0x440000, 0x440fff).ram().share("spriteram");                               /* Sprite RAM */
 	map(0x700000, 0x700001).portr("DSW1");
@@ -117,10 +117,7 @@ void gaelco_state::bigkarnk_map(address_map &map)
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
 	map(0x700008, 0x700009).portr("SERVICE");
-	map(0x70000b, 0x70000b).select(0x000070).lw8("outlatch_w",
-												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
-												 });
+	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0x70000f, 0x70000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));               /* Triggers a FIRQ on the sound CPU */
 	map(0xff8000, 0xffffff).ram();                                                         /* Work RAM */
 }
@@ -129,7 +126,7 @@ void gaelco_state::bigkarnk_snd_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();                                         /* RAM */
 	map(0x0800, 0x0801).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   /* OKI6295 */
-//  AM_RANGE(0x0900, 0x0900) AM_WRITENOP                                    /* enable sound output? */
+//  map(0x0900, 0x0900).nopw();                                    /* enable sound output? */
 	map(0x0a00, 0x0a01).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));        /* YM3812 */
 	map(0x0b00, 0x0b00).r(m_soundlatch, FUNC(generic_latch_8_device::read));      /* Sound latch */
 	map(0x0c00, 0xffff).rom();                                         /* ROM */
@@ -141,7 +138,7 @@ void gaelco_state::maniacsq_map(address_map &map)
 	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_w)).share("videoram");               /* Video RAM */
 	map(0x102000, 0x103fff).ram();                                                         /* Screen RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
-//  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
+//  map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));  /* INT 6 ACK/Watchdog timer */
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    /* Palette */
 	map(0x440000, 0x440fff).ram().share("spriteram");                               /* Sprite RAM */
 	map(0x700000, 0x700001).portr("DSW2");
@@ -159,17 +156,14 @@ void gaelco_state::squash_map(address_map &map)
 	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_encrypted_w)).share("videoram");         /* Video RAM */
 	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::encrypted_w)).share("screenram");                /* Screen RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
-//  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
+//  map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w)); /* INT 6 ACK/Watchdog timer */
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    /* Palette */
 	map(0x440000, 0x440fff).ram().share("spriteram");                               /* Sprite RAM */
 	map(0x700000, 0x700001).portr("DSW2");
 	map(0x700002, 0x700003).portr("DSW1");
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
-	map(0x70000b, 0x70000b).select(0x000070).lw8("outlatch_w",
-												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
-												 });
+	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::oki_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                      /* OKI6295 status register */
 	map(0xff0000, 0xffffff).ram();                                                         /* Work RAM */
@@ -181,17 +175,14 @@ void gaelco_state::thoop_map(address_map &map)
 	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::thoop_vram_encrypted_w)).share("videoram");          /* Video RAM */
 	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::thoop_encrypted_w)).share("screenram");             /* Screen RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
-//  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                     /* INT 6 ACK/Watchdog timer */
+//  map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));  /* INT 6 ACK/Watchdog timer */
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");        /* Palette */
 	map(0x440000, 0x440fff).ram().share("spriteram");                               /* Sprite RAM */
 	map(0x700000, 0x700001).portr("DSW2");
 	map(0x700002, 0x700003).portr("DSW1");
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
-	map(0x70000b, 0x70000b).select(0x000070).lw8("outlatch_w",
-												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
-												 });
+	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::oki_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                      /* OKI6295 status register */
 	map(0xff0000, 0xffffff).ram();                                                         /* Work RAM */
@@ -336,7 +327,7 @@ static INPUT_PORTS_START( biomtoy )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:4,3")
+	PORT_DIPNAME( 0x30, 0x30, "Lives in Reserve" ) PORT_DIPLOCATION("SW2:4,3") // Test mode doesn't show the value of the lives given, but of the ones after you die the first time
 	PORT_DIPSETTING(    0x20, "0" )
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x30, "2" )
@@ -644,17 +635,18 @@ void gaelco_state::machine_start()
 		m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-MACHINE_CONFIG_START(gaelco_state::bigkarnk)
-
+// TODO: verify all clocks (XTALs are 8.0MHz & 24.000 MHz) - One PCB reported to have 8867.23 kHz instead of 8MHz
+void gaelco_state::bigkarnk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* MC68000P10, 10 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bigkarnk_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);   /* MC68000P10, 12 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::bigkarnk_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, 8867000/4)  /* 68B09EP, 2.21675 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(bigkarnk_snd_map)
+	MC6809E(config, m_audiocpu, XTAL(8'000'000)/4);  /* 68B09EP, 2 MHz? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gaelco_state::bigkarnk_snd_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)).invert();
@@ -663,13 +655,13 @@ MACHINE_CONFIG_START(gaelco_state::bigkarnk)
 	m_outlatch->q_out_cb<3>().set(FUNC(gaelco_state::coin2_counter_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_bigkarnk)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*16, 32*16);
+	screen.set_visarea(0, 320-1, 16, 256-1);
+	screen.set_screen_update(FUNC(gaelco_state::screen_update_bigkarnk));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
@@ -682,28 +674,26 @@ MACHINE_CONFIG_START(gaelco_state::bigkarnk)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 3580000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM3812(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, "mono", 1.0); // 4 MHz matches PCB recording
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", XTAL(8'000'000)/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+}
 
-MACHINE_CONFIG_START(gaelco_state::maniacsq)
-
+void gaelco_state::maniacsq(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2 ) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(maniacsq_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::maniacsq_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_maniacsq)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*16, 32*16);
+	screen.set_visarea(0, 320-1, 16, 256-1);
+	screen.set_screen_update(FUNC(gaelco_state::screen_update_maniacsq));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
@@ -713,19 +703,19 @@ MACHINE_CONFIG_START(gaelco_state::maniacsq)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH)); // pin 7 not verified
+	oki.set_addrmap(0, &gaelco_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(gaelco_state::squash)
-
+void gaelco_state::squash(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2 ) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(squash_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(20'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::squash_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	LS259(config, m_outlatch); // B8
 	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)).invert();
@@ -735,13 +725,13 @@ MACHINE_CONFIG_START(gaelco_state::squash)
 	m_outlatch->q_out_cb<4>().set_nop(); // used
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_maniacsq)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*16, 32*16);
+	screen.set_visarea(0, 320-1, 16, 256-1);
+	screen.set_screen_update(FUNC(gaelco_state::screen_update_maniacsq));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
@@ -751,19 +741,19 @@ MACHINE_CONFIG_START(gaelco_state::squash)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) /* verified on pcb */
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH)); /* verified on pcb */
+	oki.set_addrmap(0, &gaelco_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(gaelco_state::thoop)
-
+void gaelco_state::thoop(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2 ) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(thoop_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::thoop_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	LS259(config, m_outlatch); // B8
 	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)); // not inverted
@@ -773,13 +763,13 @@ MACHINE_CONFIG_START(gaelco_state::thoop)
 	m_outlatch->q_out_cb<4>().set_nop(); // used
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_maniacsq)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*16, 32*16);
+	screen.set_visarea(0, 320-1, 16, 256-1);
+	screen.set_screen_update(FUNC(gaelco_state::screen_update_maniacsq));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
@@ -789,10 +779,10 @@ MACHINE_CONFIG_START(gaelco_state::thoop)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH)); // pin 7 not verified
+	oki.set_addrmap(0, &gaelco_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*************************************

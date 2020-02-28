@@ -58,7 +58,7 @@ void spectrum_intf2_device::device_add_mconfig(machine_config &config)
 {
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "spectrum_cart", "bin,rom");
-	m_cart->set_device_load(device_image_load_delegate(&spectrum_intf2_device::device_image_load_spectrum_cart, this));
+	m_cart->set_device_load(FUNC(spectrum_intf2_device::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("spectrum_cart");
 }
@@ -93,7 +93,7 @@ void spectrum_intf2_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-DEVICE_IMAGE_LOAD_MEMBER(spectrum_intf2_device, spectrum_cart)
+DEVICE_IMAGE_LOAD_MEMBER(spectrum_intf2_device::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -117,7 +117,7 @@ READ_LINE_MEMBER(spectrum_intf2_device::romcs)
 		return 0;
 }
 
-READ8_MEMBER(spectrum_intf2_device::mreq_r)
+uint8_t spectrum_intf2_device::mreq_r(offs_t offset)
 {
 	if (m_cart && m_cart->exists())
 		return m_cart->get_rom_base()[offset & 0x3fff];
@@ -125,17 +125,20 @@ READ8_MEMBER(spectrum_intf2_device::mreq_r)
 		return 0xff;
 }
 
-READ8_MEMBER(spectrum_intf2_device::port_fe_r)
+uint8_t spectrum_intf2_device::iorq_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	uint8_t lines = offset >> 8;
+	switch (offset & 0xff)
+	{
+	case 0xfe:
+		if (((offset >> 8) & 8) == 0)
+			data = m_exp_line3->read() | (0xff ^ 0x1f);
 
-	if ((lines & 8) == 0)
-		data = m_exp_line3->read() | (0xff ^ 0x1f);
-
-	if ((lines & 16) == 0)
-		data = m_exp_line4->read() | (0xff ^ 0x1f);
+		if (((offset >> 8) & 16) == 0)
+			data = m_exp_line4->read() | (0xff ^ 0x1f);
+		break;
+	}
 
 	return data;
 }

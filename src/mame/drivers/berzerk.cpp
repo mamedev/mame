@@ -25,8 +25,8 @@
 class berzerk_state : public driver_device
 {
 public:
-	berzerk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	berzerk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_s14001a(*this, "speech"),
 		m_ls181_10c(*this, "ls181_10c"),
@@ -235,7 +235,7 @@ TIMER_CALLBACK_MEMBER(berzerk_state::irq_callback)
 
 	/* set the IRQ line if enabled */
 	if (m_irq_enabled)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc); // Z80
 
 	/* set up for next interrupt */
 	next_irq_number = (irq_number + 1) % IRQS_PER_FRAME;
@@ -476,9 +476,9 @@ void berzerk_state::get_pens(rgb_t *pens)
 		uint8_t b_bit = (color >> 2) & 0x01;
 		uint8_t i_bit = (color >> 3) & 0x01;
 
-		uint8_t r = combine_2_weights(color_weights, r_bit & i_bit, r_bit);
-		uint8_t g = combine_2_weights(color_weights, g_bit & i_bit, g_bit);
-		uint8_t b = combine_2_weights(color_weights, b_bit & i_bit, b_bit);
+		uint8_t r = combine_weights(color_weights, r_bit & i_bit, r_bit);
+		uint8_t g = combine_weights(color_weights, g_bit & i_bit, g_bit);
+		uint8_t b = combine_weights(color_weights, b_bit & i_bit, b_bit);
 
 		pens[color] = rgb_t(r, g, b);
 	}
@@ -793,7 +793,7 @@ static INPUT_PORTS_START( berzerk )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
 
-// this set has French speech roms, so default the language to French
+// this set has French speech ROMs, so default the language to French
 static INPUT_PORTS_START( berzerkf )
 	PORT_INCLUDE( berzerk )
 
@@ -805,7 +805,7 @@ static INPUT_PORTS_START( berzerkf )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Spanish ) )
 INPUT_PORTS_END
 
-// this set has German speech roms, so default the language to German
+// this set has German speech ROMs, so default the language to German
 static INPUT_PORTS_START( berzerkg )
 	PORT_INCLUDE( berzerk )
 
@@ -817,7 +817,7 @@ static INPUT_PORTS_START( berzerkg )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Spanish ) )
 INPUT_PORTS_END
 
-// this set has a Spanish speech rom, so default the language to Spanish
+// this set has a Spanish speech ROM, so default the language to Spanish
 static INPUT_PORTS_START( berzerks )
 	PORT_INCLUDE( berzerk )
 
@@ -1120,39 +1120,38 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(berzerk_state::berzerk)
-
+void berzerk_state::berzerk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(berzerk_map)
-	MCFG_DEVICE_IO_MAP(berzerk_io_map)
+	Z80(config, m_maincpu, MAIN_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &berzerk_state::berzerk_map);
+	m_maincpu->set_addrmap(AS_IO, &berzerk_state::berzerk_io_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ls181_10c", TTL74181)
-	MCFG_DEVICE_ADD("ls181_12c", TTL74181)
+	TTL74181(config, m_ls181_10c);
+	TTL74181(config, m_ls181_12c);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(berzerk_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(berzerk_state::screen_update));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("speech", S14001A, S14001_CLOCK/16/8) /* placeholder - the clock is software controllable */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	S14001A(config, m_s14001a, S14001_CLOCK/16/8).add_route(ALL_OUTPUTS, "mono", 1.00); /* placeholder - the clock is software controllable */
 	EXIDY(config, m_custom, 0).add_route(ALL_OUTPUTS, "mono", 0.33);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(berzerk_state::frenzy)
+void berzerk_state::frenzy(machine_config &config)
+{
 	berzerk(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(frenzy_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &berzerk_state::frenzy_map);
+}
 
 
 
@@ -1166,7 +1165,7 @@ MACHINE_CONFIG_END
 
 Berzerk program labels follow this format:
 
-BERZERK (C)    <-- rom socket silkscreened ROM0
+BERZERK (C)    <-- ROM socket silkscreened ROM0
 RC31 1C
 1980 STERN
 
@@ -1182,7 +1181,7 @@ So PCB location and silkscreen are as follows as they appear on an actual PCB:
 
 NOTE: No known set uses ROM6
 
-Sound roms for Berzerk / Frenzy have been found labeled as:
+Sound ROMs for Berzerk / Frenzy have been found labeled as:
 
 BERZERK        BERZERK
 R VO 1C        R VO 2C
@@ -1194,13 +1193,26 @@ E169-1CVO      E169-2CVO
 RVO 1C (-9)    RVO 2C (-9)
 1982  STERN    1982  STERN
 
-Both sets of roms contain the same data.
-
-We need to have actual verfied rom labels for all the sets below (other then voice roms :-)
+Both sets of ROMs contain the same data.
 
 */
 
-ROM_START( berzerk )
+ROM_START( berzerk ) /* All ROMs except 5C were white labels and revision RC31, 5C had a yellow label and is revision RC31A */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "berzerk_rc31_1c.rom0.1c",  0x0000, 0x0800, CRC(ca566dbc) SHA1(fae2647f12f1cd82826db61b53b116a5e0c9f995) )
+	ROM_LOAD( "berzerk_rc31_1d.rom1.1d",  0x1000, 0x0800, CRC(7ba69fde) SHA1(69af170c4a39a3494dcd180737e5c87b455f9203) )
+	ROM_LOAD( "berzerk_rc31_3d.rom2.3d",  0x1800, 0x0800, CRC(a1d5248b) SHA1(a0b7842f6a5f86c16d80d78e7012c78b3ea11d1d) )
+	ROM_LOAD( "berzerk_rc31_5d.rom3.5d",  0x2000, 0x0800, CRC(fcaefa95) SHA1(07f849aa39f1e3db938187ffde4a46a588156ddc) )
+	ROM_LOAD( "berzerk_rc31_6d.rom4.6d",  0x2800, 0x0800, CRC(1e35b9a0) SHA1(5a5e549ec0e4803ab2d1eac6b3e7171aedf28244) )
+	ROM_LOAD( "berzerk_rc31a_5c.rom5.5c", 0x3000, 0x0800, CRC(e0fab8f5) SHA1(31acef9583546671debe768e3d5c695ba1b9f7e0) )
+	ROM_FILL(                             0x3800, 0x0800, 0xff ) /* ROM socket ROM6 at 3C is unpopulated */
+
+	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
+	ROM_LOAD( "berzerk_r_vo_1c.1c", 0x0000, 0x0800, CRC(2cfe825d) SHA1(f12fed8712f20fa8213f606c4049a8144bfea42e) )  /* VSU-1000 board */
+	ROM_LOAD( "berzerk_r_vo_2c.2c", 0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )  /* ditto */
+ROM_END
+
+ROM_START( berzerka )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "berzerk_rc31_1c.rom0.1c", 0x0000, 0x0800, CRC(ca566dbc) SHA1(fae2647f12f1cd82826db61b53b116a5e0c9f995) )
 	ROM_LOAD( "berzerk_rc31_1d.rom1.1d", 0x1000, 0x0800, CRC(7ba69fde) SHA1(69af170c4a39a3494dcd180737e5c87b455f9203) )
@@ -1208,14 +1220,14 @@ ROM_START( berzerk )
 	ROM_LOAD( "berzerk_rc31_5d.rom3.5d", 0x2000, 0x0800, CRC(fcaefa95) SHA1(07f849aa39f1e3db938187ffde4a46a588156ddc) )
 	ROM_LOAD( "berzerk_rc31_6d.rom4.6d", 0x2800, 0x0800, CRC(1e35b9a0) SHA1(5a5e549ec0e4803ab2d1eac6b3e7171aedf28244) )
 	ROM_LOAD( "berzerk_rc31_5c.rom5.5c", 0x3000, 0x0800, CRC(c8c665e5) SHA1(e9eca4b119549e0061384abf52327c14b0d56624) )
-	ROM_FILL(                            0x3800, 0x0800, 0xff ) /* rom socket ROM6 at 3C is unpopulated */
+	ROM_FILL(                            0x3800, 0x0800, 0xff ) /* ROM socket ROM6 at 3C is unpopulated */
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
 	ROM_LOAD( "berzerk_r_vo_1c.1c", 0x0000, 0x0800, CRC(2cfe825d) SHA1(f12fed8712f20fa8213f606c4049a8144bfea42e) )  /* VSU-1000 board */
 	ROM_LOAD( "berzerk_r_vo_2c.2c", 0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )  /* ditto */
 ROM_END
 
-ROM_START( berzerk1 )
+ROM_START( berzerkb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "berzerk_rc28_1c.rom0.1c", 0x0000, 0x0800, CRC(5b7eb77d) SHA1(8de488e279036fe40d6fb4c0dde16075309342fd) )
 	ROM_LOAD( "berzerk_rc28_1d.rom1.1d", 0x1000, 0x0800, CRC(e58c8678) SHA1(a11f08448b457d690b270512c9f02fcf1e41d9e0) )
@@ -1223,7 +1235,7 @@ ROM_START( berzerk1 )
 	ROM_LOAD( "berzerk_rc28_5d.rom3.5d", 0x2000, 0x0800, CRC(6a1936b4) SHA1(f1635e9d2f25514c35559d2a247c3bc4b4034c19) )
 	ROM_LOAD( "berzerk_rc28_6d.rom4.6d", 0x2800, 0x0800, CRC(fa5dce40) SHA1(b3a3ee52bf65bbb3a20f905d3e4ebdf6871dcb5d) )
 	ROM_LOAD( "berzerk_rc28_5c.rom5.5c", 0x3000, 0x0800, CRC(2579b9f4) SHA1(890f0237afbb194166eae88c98de81989f408548) )
-	ROM_FILL(            0x3800, 0x0800, 0xff ) /* rom socket ROM6 at 3C is unpopulated */
+	ROM_FILL(                            0x3800, 0x0800, 0xff ) /* ROM socket ROM6 at 3C is unpopulated */
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
 	ROM_LOAD( "berzerk_r_vo_1c.1c", 0x0000, 0x0800, CRC(2cfe825d) SHA1(f12fed8712f20fa8213f606c4049a8144bfea42e) )  /* VSU-1000 board */
@@ -1238,26 +1250,26 @@ ROM_START( berzerkf )
 	ROM_LOAD( "berzerk_rc31f_5d.rom3.5d", 0x2000, 0x0800, CRC(316192b5) SHA1(50f4ba2b59423a48c1d51fc6e4d9ea098d6f3743) )
 	ROM_LOAD( "berzerk_rc31f_6d.rom4.6d", 0x2800, 0x0800, CRC(cd51238c) SHA1(f0b65bdd1f225c151a93ea62812b4bb64969acac) )
 	ROM_LOAD( "berzerk_rc31f_5c.rom5.5c", 0x3000, 0x0800, CRC(563b13b6) SHA1(f8d137cd26535efe92780560d2f69f12d3f0fa42) )
-	ROM_FILL(                             0x3800, 0x0800, 0xff ) /* rom socket ROM6 at 3C is unpopulated */
+	ROM_FILL(                             0x3800, 0x0800, 0xff ) /* ROM socket ROM6 at 3C is unpopulated */
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
-	ROM_LOAD( "berzerk_rvof_1c.1c", 0x0000, 0x0800, CRC(d7bfaca2) SHA1(b8c22db0f6e86d90f3c2ac9ff9e9d0ccff314919) )    /* VSU-1000 board */
-	ROM_LOAD( "berzerk_rvof_2c.2c", 0x0800, 0x0800, CRC(7bdc3573) SHA1(f346f0ac9813812f2e3fe68ebbf79151975babcb) )    /* ditto */
+	ROM_LOAD( "berzerk_rvof_1c.1c", 0x0000, 0x0800, CRC(d7bfaca2) SHA1(b8c22db0f6e86d90f3c2ac9ff9e9d0ccff314919) ) /* VSU-1000 board */
+	ROM_LOAD( "berzerk_rvof_2c.2c", 0x0800, 0x0800, CRC(7bdc3573) SHA1(f346f0ac9813812f2e3fe68ebbf79151975babcb) ) /* ditto */
 ROM_END
 
 ROM_START( berzerkg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cpu rom 00.1c", 0x0000, 0x0800, CRC(77923a9e) SHA1(3760800b7aa1245f2141897b2406f0f5af5a8d71) )
-	ROM_LOAD( "cpu rom 01.1d", 0x1000, 0x0800, CRC(19bb3aac) SHA1(11341521fd880d55ea01bceb4a321ec571f0b759) )
-	ROM_LOAD( "cpu rom 02.3d", 0x1800, 0x0800, CRC(b0888ff7) SHA1(ac76400482fe37b6c8e309cd9b10855dac86ed24) )
-	ROM_LOAD( "cpu rom 03.5d", 0x2000, 0x0800, CRC(e23239a9) SHA1(a0505efdee4cb1962243638c641e94983673f70f) )
-	ROM_LOAD( "cpu rom 04.6d", 0x2800, 0x0800, CRC(651b31b7) SHA1(890f424a5a73a95af642435c1b0cca78a9413aae) )
-	ROM_LOAD( "cpu rom 05.5c", 0x3000, 0x0800, CRC(8a403bba) SHA1(686a9b58a245df6c947d14991a2e4cbaf511e2ca) )
-	ROM_FILL(                  0x3800, 0x0800, 0xff ) /* rom socket ROM6 at 3C is unpopulated */
+	ROM_LOAD( "berzerk_rc32_1c.rom0.1c",  0x0000, 0x0800, CRC(77923a9e) SHA1(3760800b7aa1245f2141897b2406f0f5af5a8d71) ) /* Need to verify all ROM labels for this set */
+	ROM_LOAD( "berzerk_rc32_1d.rom1.1d",  0x1000, 0x0800, CRC(19bb3aac) SHA1(11341521fd880d55ea01bceb4a321ec571f0b759) )
+	ROM_LOAD( "berzerk_rc32g_3d.rom2.3d", 0x1800, 0x0800, CRC(b0888ff7) SHA1(ac76400482fe37b6c8e309cd9b10855dac86ed24) )
+	ROM_LOAD( "berzerk_rc32_5d.rom3.5d",  0x2000, 0x0800, CRC(e23239a9) SHA1(a0505efdee4cb1962243638c641e94983673f70f) )
+	ROM_LOAD( "berzerk_rc32g_6d.rom4.6d", 0x2800, 0x0800, CRC(651b31b7) SHA1(890f424a5a73a95af642435c1b0cca78a9413aae) )
+	ROM_LOAD( "berzerk_rc32g_5c.rom5.5c", 0x3000, 0x0800, CRC(8a403bba) SHA1(686a9b58a245df6c947d14991a2e4cbaf511e2ca) )
+	ROM_FILL(                             0x3800, 0x0800, 0xff ) /* ROM socket ROM6 at 3C is unpopulated */
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
-	ROM_LOAD( "berzerk_rvog_1c.1c", 0x0000, 0x0800, CRC(fc1da15f) SHA1(f759a017d9e95acf0e1d35b16d8820acee7d7e3d) )    /* VSU-1000 board */
-	ROM_LOAD( "berzerk_rvog_2c.2c", 0x0800, 0x0800, CRC(7f6808fb) SHA1(8a9c43597f924221f68d1b31e033f1dc492cddc5) )    /* ditto */
+	ROM_LOAD( "berzerk_rvog_1c.1c", 0x0000, 0x0800, CRC(fc1da15f) SHA1(f759a017d9e95acf0e1d35b16d8820acee7d7e3d) ) /* VSU-1000 board */
+	ROM_LOAD( "berzerk_rvog_2c.2c", 0x0800, 0x0800, CRC(7f6808fb) SHA1(8a9c43597f924221f68d1b31e033f1dc492cddc5) ) /* ditto */
 ROM_END
 
 ROM_START( berzerks )
@@ -1268,63 +1280,107 @@ ROM_START( berzerks )
 	ROM_LOAD( "berzerk_rc32_5d.rom3.5d",  0x2000, 0x0800, CRC(e23239a9) SHA1(a0505efdee4cb1962243638c641e94983673f70f) ) /* Same as the German set */
 	ROM_LOAD( "berzerk_rc32_6d.rom4.6d",  0x2800, 0x0800, CRC(959efd86) SHA1(3401f86ed6202e8790cef00c73af29cc282d322e) )
 	ROM_LOAD( "berzerk_rc32s_5c.rom5.5c", 0x3000, 0x0800, CRC(9ad80e4e) SHA1(f79a86dd3dee5d53c2a60eda5b5181816bd73bc3) )
-	ROM_FILL(                             0x3800, 0x0800, 0xff ) /* rom socket ROM6 at 3C is unpopulated */
+	ROM_FILL(                             0x3800, 0x0800, 0xff ) /* ROM socket ROM6 at 3C is unpopulated */
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
-	ROM_LOAD( "berzerk_rvos_1c.1c", 0x0000, 0x0800, CRC(0b51409c) SHA1(75333853a82029f080e3db61441ba6091c1aab55) )    /* VSU-1000 board */
-	/* rom socket 2C is unpopulated */
-ROM_END
-
-
-ROM_START( frenzy )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1c-0",         0x0000, 0x1000, CRC(abdd25b8) SHA1(e6a3ab826b51b2c6ddd63d55681848fccad800dd) )
-	ROM_LOAD( "1d-1",         0x1000, 0x1000, CRC(536e4ae8) SHA1(913385c43b8902d3d3ad2194a3137e19e61c6573) )
-	ROM_LOAD( "3d-2",         0x2000, 0x1000, CRC(3eb9bc9b) SHA1(1e43e76ae0606a6d41d9006005d6001bdee48694) )
-	ROM_LOAD( "5d-3",         0x3000, 0x1000, CRC(e1d3133c) SHA1(2af4a9bc2b29735a548ae770f872127bc009cc42) )
-	ROM_LOAD( "6d-4",         0xc000, 0x1000, CRC(5581a7b1) SHA1(1f633c1c29d3b64f701c601feba26da66a6c6f23) )
-
-	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
-	ROM_LOAD( "e169-1cvo.1c", 0x0000, 0x0800, CRC(2cfe825d) SHA1(f12fed8712f20fa8213f606c4049a8144bfea42e) )    /* VSU-1000 board */
-	ROM_LOAD( "e169-2cvo.2c", 0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )    /* ditto */
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "prom.6e",      0x0000, 0x0020, CRC(4471ca5d) SHA1(ba8dca2ec076818f8ad8c17b15c77965e36fa05e) ) /* address decoder/rom select prom (N82S123N) */
+	ROM_LOAD( "berzerk_rvos_1c.1c", 0x0000, 0x0800, CRC(0b51409c) SHA1(75333853a82029f080e3db61441ba6091c1aab55) ) /* VSU-1000 board */
+	/* ROM socket 2C is unpopulated */
 ROM_END
 
 
 /*
-   The original / prototype version of moon war runs on Frenzy Hardware.
 
-   The more common version of Moon War runs on modified Super Cobra (scobra.c) hardware and is often called
-   'Moon War 2' because it is the second version, and many of the PCBs are labeled as such.
+Frenzy program labels follow this format:
 
-   So far only 2 original boards of this have been found, one with only the sound roms on it, and the other
-   with only the program roms on it.  This set is a combination of dumps from those two boards, so there
+FRENZY    (c)    <-- ROM socket silkscreened ROM5
+RA1 ROM5(10)
+1982 STERN
+
+So PCB location and silkscreen are as follows as they appear on an actual PCB:
+
+                  1D <--> ROM1
+
+3C <--> ROM6      3D <--> ROM2
+
+5C <--> ROM5      5D <--> ROM3
+
+                  6D <--> ROM4
+
+NOTE: No known set uses ROM6 & there is NO socket for a ROM0
+
+Sound ROMs for Berzerk / Frenzy have been found labeled as:
+
+BERZERK        BERZERK
+R VO 1C        R VO 2C
+1980  STERN    1980  STERN
+
+as well as
+
+E169-1CVO      E169-2CVO
+RVO 1C (-9)    RVO 2C (-9)
+1982  STERN    1982  STERN
+
+Both sets of ROMs contain the same data.
+
+*/
+ROM_START( frenzy )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "frenzy_ra1_rom1.1d", 0x0000, 0x1000, CRC(abdd25b8) SHA1(e6a3ab826b51b2c6ddd63d55681848fccad800dd) )
+	ROM_LOAD( "frenzy_ra1_rom2.3d", 0x1000, 0x1000, CRC(536e4ae8) SHA1(913385c43b8902d3d3ad2194a3137e19e61c6573) )
+	ROM_LOAD( "frenzy_ra1_rom3.5d", 0x2000, 0x1000, CRC(3eb9bc9b) SHA1(1e43e76ae0606a6d41d9006005d6001bdee48694) )
+	ROM_LOAD( "frenzy_ra1_rom4.6d", 0x3000, 0x1000, CRC(e1d3133c) SHA1(2af4a9bc2b29735a548ae770f872127bc009cc42) )
+	ROM_LOAD( "frenzy_ra1_rom5.5c", 0xc000, 0x1000, CRC(5581a7b1) SHA1(1f633c1c29d3b64f701c601feba26da66a6c6f23) )
+
+	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
+	ROM_LOAD( "e169-1cvo.1c", 0x0000, 0x0800, CRC(2cfe825d) SHA1(f12fed8712f20fa8213f606c4049a8144bfea42e) ) /* VSU-1000 board */
+	ROM_LOAD( "e169-2cvo.2c", 0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) ) /* ditto */
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "frenzy_decoder_6ea1.6e", 0x0000, 0x0020, CRC(4471ca5d) SHA1(ba8dca2ec076818f8ad8c17b15c77965e36fa05e) ) /* address decoder/ROM select PROM (N82S123N) */
+ROM_END
+
+
+/*
+   The original / prototype version of Moon War runs on Frenzy Hardware.
+
+   The more common version of Moon War runs on modified Super Cobra (galaxian.cpp) hardware and is often called
+   'Moon War II' because it is the second version, and the ROMs as well as many of the PCBs are labeled as such.
+
+   So far only 2 original boards of this have been found, one with only the sound ROMs on it, and the other
+   with only the program ROMs on it.  This set is a combination of dumps from those two boards, so there
    is a small chance they could be mismatched.
+
+Sound ROMs for Moon War:
+
+MOON WAR       MOON WAR
+RVO  1C        RVO  2C
+1981 STERN     1981 STERN
+
+NOTE: The BPROM from the sound board set is most likely correct.  The program ROM board reportedly had ORIGINAL program
+      ROMs transferred over to a standard Frenzy PCB due to damage of the original Moon War PCB.
 */
 ROM_START( moonwarp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1d.bin",      0x0000, 0x1000, CRC(75470634) SHA1(1a811fef39724fd227e06b694841d3dad5659622) )
-	ROM_LOAD( "3d.bin",      0x1000, 0x1000, CRC(a9d046dc) SHA1(88afccd09d2809cafd12dd40ab3be77e3707cfc5) )
-	ROM_LOAD( "5d.bin",      0x2000, 0x1000, CRC(bf671737) SHA1(cdfae1eb8995c2251813cc5633fc809aa9e6a36f) )
-	ROM_LOAD( "6d.bin",      0x3000, 0x1000, CRC(cef2d697) SHA1(5c31c6e7002f0d944b3028d1b804480acf3af042) )
-	ROM_LOAD( "5c.bin",      0xc000, 0x1000, CRC(a3d551ab) SHA1(a32352727b5475a6ec6c495c55f01ccd6e024f98) )
+	ROM_LOAD( "1d.bin", 0x0000, 0x1000, CRC(75470634) SHA1(1a811fef39724fd227e06b694841d3dad5659622) )
+	ROM_LOAD( "3d.bin", 0x1000, 0x1000, CRC(a9d046dc) SHA1(88afccd09d2809cafd12dd40ab3be77e3707cfc5) )
+	ROM_LOAD( "5d.bin", 0x2000, 0x1000, CRC(bf671737) SHA1(cdfae1eb8995c2251813cc5633fc809aa9e6a36f) )
+	ROM_LOAD( "6d.bin", 0x3000, 0x1000, CRC(cef2d697) SHA1(5c31c6e7002f0d944b3028d1b804480acf3af042) )
+	ROM_LOAD( "5c.bin", 0xc000, 0x1000, CRC(a3d551ab) SHA1(a32352727b5475a6ec6c495c55f01ccd6e024f98) )
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
-	ROM_LOAD( "moonwar.1c.bin",           0x0000, 0x0800, CRC(9e9a653f) SHA1(cf49a38ef343ace271ba1e5dde38bd8b9c0bd876) )    /* VSU-1000 board */
-	ROM_LOAD( "moonwar.2c.bin",           0x0800, 0x0800, CRC(73fd988d) SHA1(08a2aeb4d87eee58e38e4e3f749a95f2308aceb0) )    /* ditto */
+	ROM_LOAD( "moon_war_rv0_1c.1c", 0x0000, 0x0800, CRC(9e9a653f) SHA1(cf49a38ef343ace271ba1e5dde38bd8b9c0bd876) ) /* VSU-1000 board */
+	ROM_LOAD( "moon_war_rv0_2c.2c", 0x0800, 0x0800, CRC(73fd988d) SHA1(08a2aeb4d87eee58e38e4e3f749a95f2308aceb0) ) /* ditto */
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "n82s123 po. e6 select decoder",      0x0000, 0x0020, CRC(4471ca5d) SHA1(ba8dca2ec076818f8ad8c17b15c77965e36fa05e) ) /* address decoder/rom select prom - from board with prg roms, same as Frenzy*/
-	ROM_LOAD( "prom.6e",        0x0000, 0x0020, CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/rom select prom - from the sound rom only set, is it bad? */
+	ROM_LOAD( "n82s123.6e", 0x0000, 0x0020, CRC(4471ca5d) SHA1(ba8dca2ec076818f8ad8c17b15c77965e36fa05e) ) /* address decoder/ROM select PROM - from board with prg ROMs, same as Frenzy */
+	ROM_LOAD( "prom.6e",    0x0000, 0x0020, CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/ROM select PROM - from the sound ROM only set */
 ROM_END
 
 void berzerk_state::init_moonwarp()
 {
 	address_space &io = m_maincpu->space(AS_IO);
-	io.install_read_handler (0x48, 0x48, read8_delegate(FUNC(berzerk_state::moonwarp_p1_r), this));
-	io.install_read_handler (0x4a, 0x4a, read8_delegate(FUNC(berzerk_state::moonwarp_p2_r), this));
+	io.install_read_handler (0x48, 0x48, read8_delegate(*this, FUNC(berzerk_state::moonwarp_p1_r)));
+	io.install_read_handler (0x4a, 0x4a, read8_delegate(*this, FUNC(berzerk_state::moonwarp_p2_r)));
 
 	save_item(NAME(m_p1_counter_74ls161));
 	save_item(NAME(m_p1_direction));
@@ -1338,10 +1394,11 @@ void berzerk_state::init_moonwarp()
  *
  *************************************/
 
-GAME( 1980, berzerk,  0,       berzerk, berzerk,  berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, berzerk1, berzerk, berzerk, berzerk,  berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, berzerkf, berzerk, berzerk, berzerkf, berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (French Speech)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, berzerkg, berzerk, berzerk, berzerkg, berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (German Speech)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, berzerks, berzerk, berzerk, berzerks, berzerk_state, empty_init,    ROT0, "Stern Electronics (Sonic License)", "Berzerk (Spanish Speech)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, frenzy,   0,       frenzy,  frenzy,   berzerk_state, empty_init,    ROT0, "Stern Electronics", "Frenzy", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, berzerk,  0,       berzerk, berzerk,  berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (revision RC31A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, berzerka, berzerk, berzerk, berzerk,  berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (revision RC31)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1980, berzerkb, berzerk, berzerk, berzerk,  berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (revision RC28)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1980, berzerkf, berzerk, berzerk, berzerkf, berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (French Speech, revision RC31)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, berzerkg, berzerk, berzerk, berzerkg, berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (German Speech, revision RC32)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, berzerks, berzerk, berzerk, berzerks, berzerk_state, empty_init,    ROT0, "Stern Electronics (Sonic License)", "Berzerk (Spanish Speech, revision RC32)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, frenzy,   0,       frenzy,  frenzy,   berzerk_state, empty_init,    ROT0, "Stern Electronics", "Frenzy (revision RA1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, moonwarp, 0,       frenzy,  moonwarp, berzerk_state, init_moonwarp, ROT0, "Stern Electronics", "Moon War (prototype on Frenzy hardware)", MACHINE_SUPPORTS_SAVE )

@@ -13,11 +13,12 @@ NOTES:
 A couple of things unaccounted for:
 
 No backgrounds ROMs from the original board...
-- This may be related to the SubCPU. I don't think it's contributing
-  much right now, but I could be wrong. And it would explain that vast
-  expanse of bankswitch ROM on a slave CPU....
-- Just had a look at the sprites, and they seem like kosher sprites all
-  the way up.... So it must be hidden in the sub-cpu somewhere?
+- TOSHIBA TRJ-100 installed at the second board should contain the image
+  as U.S. Championship V'Ball has a TRJ-101 that contains it. It also contains
+  related logic to generate 16-bits address and to decode pixels at 6MHz pixel
+  clock, based on given attributes in multicycles, screen flip flag, and clocks.
+  It seems almost equivalent to Double Dragon's  IC38, 39, 40, 53, 54, and all
+  logic in the page 9 of the schematics for the second board.
 - Got two bootleg sets with background gfx roms. Using those on the
   original games for now.
 
@@ -67,6 +68,179 @@ Input is unique but has a few similarities to DD2 (the coin inputs)
 
 2008-07
 Dip locations and factory settings verified with China Gate US manual.
+
+
+PCB Layout
+----------
+
+TA-0023-P1-03 (Main Board)
+|-----------------------------------------------------|
+|        |      J1      |     |      J2      |        |
+|        ----------------     ----------------        |
+| X1                                                  |
+|                                                     |
+|                                                     |
+|    LH0080A                                          |
+|                                                     |
+|                                                     |
+|                HD68B09EP    HD68B09EP               |
+|     23J0-0      (main)        (sub)         23J6-0  |
+|                                                     |
+|  YM2151                              23J5-0         |
+|       23J1 23J2  23J3-0      23J4-0                 |
+|        -0   -0                                      |
+|                                                     |
+|                                                     |
+|   YM3012  M6295                                     |
+|                                                     |
+|                                                     |
+|            X2                                       |
+|                                                     |
+|                                             SW2 SW1 |
+|                                                     |
+|                                                     |
+|  VR1           |-------------------|                |
+|                |   ||  JAMMA       |                |
+|----------------|---||--------------|----------------|
+
+Clock
+    X1        - 3.579545MHz
+    X2        - 1.056MHz
+
+CPUs
+    HD68B09EP - HITACHI 6809E for main
+    HD68B09EP - HITACHI 6809E for sub
+    LH0080A   - SHARP Z80 for sound
+
+Sound
+    YM2151    - YAMAHA FM sound
+    YM3012    - YAMAHA DAC for YM2151
+    M6295     - OKI ADPCM
+
+PROM
+    23J5-0    - user1 (82S129)
+
+ROMs
+    23J0-0    - soundcpu EPROM
+    23J1-0    - oki mask ROM
+    23J2-0    - oki mask ROM
+    23J3-0    - maincpu EPROM
+    23J4-0    - sub EPROM
+    23J6-0    - gfx1 mask ROM
+
+SRAMs
+    not listed yet
+
+Others
+    VR1       - Speaker volume
+    SW1       - DIPSW1
+    SW2       - DIPSW2
+    JAMMA     - Standard JAMMA connector
+
+
+TA-0023-P2-03 (Video Board)
+|-----------------------------------------------------|
+|        |      J2      |     |      J1      |        |
+|        ----------------     ----------------        |
+|                                                     |
+|                                                     |
+|        23JB-0                   IC7                 |
+|                                                     |
+|                                                     |
+| X1                                                  |
+|                                                     |
+|                                                     |
+|                                           IC40      |
+|                                                     |
+|                                        |------------|
+|      IC70                              |1           |
+|                                        |            |
+|                                        |            |
+|                         IC78   IC75    |  TRJ-100   |
+|                                        |            |
+|                                        |            |
+|                                        |32          |
+|                                        |------------|
+|                                                     |
+|   IC106     23J7-0  23J8-0  23J9-0  23JA-0          |
+|                                                     |
+|                                                     |
+|                                                     |
+|-----------------------------------------------------|
+
+Clock
+    X1        - 12MHz
+
+PROM
+    23JB-0    - user1 (82S131)
+
+ROMs
+    23J7-0    - gfx2 mask ROM
+    23J8-0    - gfx2 mask ROM
+    23J9-0    - gfx2 mask ROM
+    23JA-0    - gfx2 mask ROM
+    TJR-100   - gfx3 custom ROM (undump)
+
+SRAMs (2KBx8bits) Motorola MCM2016HN55, SANYO LC3517?
+    IC7       - ?
+    IC40      - bgvideoram
+    IC70      - ?
+    IC75      - ?
+    IC78      - ?
+    IC106     - ?
+
+Connectors
+    J1, J2    - 50pins, almost same assignments with ones for Double Dragon.
+                At this moment, 17pin is known to be used for TRJ-100.
+
+
+TRJ-100 pin assigns
+-------------------
+Following assignments are estimated based on the circuit around the TRJ-100 in
+comparison with one for Double Dragon.
+/M2H2 clock is special for this PCB, and M2H is used in Double Dragon instead.
+This signal is created by NAND with M2H (1.5MHz) and MH (3MHz).
+
+Following pictures show each clock timing. '%' is the timing to latch AT[7:0]
+by these clocks.
+        _    ________
+/M2H2 - _\__/%  _____\  duty 1:3, 1.5MHz
+/M2H  -  \_____/%    \  duty 1:1, 1.5MHz, inverted
+          _____
+M2H   -  /%    \_____/  duty 1:1, 1.5MHz
+
+ 1 - VCC
+ 2 I /M2H  - inverted 1.5MHz, used to latch AT[7:0] for A[13:6]
+ 3 I AT0   - connected with bgvideoram d0, used as A6 and A14
+ 4 I AT1   - connected with bgvideoram d1, used as A7 and A15
+ 5 I AT2   - connected with bgvideoram d2, used as A8 and A16
+ 6 I AT3   - connected with bgvideoram d3, used as A9 and BPL0
+ 7 I AT4   - connected with bgvideoram d4, used as A10 and BPL1
+ 8 I AT5   - connected with bgvideoram d5, used as A11 and BPL2
+ 9 I AT6   - connected with bgvideoram d6, used as A12 and BINV
+10 I AT7   - connected with bgvideoram d7, used as A13 and BPA
+11 I /M2H2 - /(M2H & MH), used to latch AT[7:0] for A[16:14], BPL, BIN, and BPA
+12 O BPAL0 - connected with J2 26pin
+13 O BPAL1 - connected with J2 24pin
+14 O BPAL2 - connected with J2 22pin
+15 O BPRT  - connected with J2 20pin
+16 I /CE?  - connected with J1 17pin, always LOW as far as it's observed
+17 I BHP3  - back horizontal (y) position 0, used to select output
+18 I /1P   - screen flip
+19 I BHP0  - back horizontal (y) position 1, used to select output
+20 I BHP1  - back horizontal (y) position 2, used as A5
+21 I BHP2  - back horizontal (y) position 3, used as A6
+22 I /HCLK - inverted 6MHZ clock, used as a pixel clock to shift output
+23 I BVP0  - back vertical (x) position 0, used as A0
+24 I BVP1  - back vertical (x) position 1, used as A1
+25 I BVP2  - back vertical (x) position 2, used as A2
+26 I BVP3  - back vertical (x) position 3, used as A3
+27 O BCOL0 - connected with J2 34pin
+28 O BCOL1 - connected with J2 32pin
+29 O BCOL2 - connected with J2 30pin
+30 O BCOL3 - connected with J2 28pin
+31 GND
+32 GND
 */
 
 #include "emu.h"
@@ -135,8 +309,8 @@ void chinagat_state::video_start()
 {
 	ddragon_state::video_start();
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinagat_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(chinagat_state::background_scan),this), 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinagat_state::get_fg_16color_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chinagat_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(chinagat_state::background_scan)), 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chinagat_state::get_fg_16color_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scrolldy(-8, -8);
@@ -186,7 +360,7 @@ WRITE8_MEMBER(chinagat_state::interrupt_w)
 	switch (offset)
 	{
 		case 0: /* 3e00 - SND irq */
-			m_soundlatch->write(space, 0, data);
+			m_soundlatch->write(data);
 			break;
 
 		case 1: /* 3e01 - NMI ack */
@@ -371,8 +545,8 @@ void chinagat_state::sub_map(address_map &map)
 	map(0x0000, 0x1fff).ram().share("share1");
 	map(0x2000, 0x2000).w(FUNC(chinagat_state::sub_bankswitch_w));
 	map(0x2800, 0x2800).w(FUNC(chinagat_state::sub_irq_ack_w)); /* Called on CPU start and after return from jump table */
-//  AM_RANGE(0x2a2b, 0x2a2b) AM_READNOP /* What lives here? */
-//  AM_RANGE(0x2a30, 0x2a30) AM_READNOP /* What lives here? */
+//  map(0x2a2b, 0x2a2b).nopr(); /* What lives here? */
+//  map(0x2a30, 0x2a30).nopr(); /* What lives here? */
 	map(0x4000, 0x7fff).bankr("bank4");
 	map(0x8000, 0xffff).rom();
 }
@@ -394,14 +568,14 @@ void chinagat_state::ym2203c_sound_map(address_map &map)
 // but only on the title screen....
 
 	map(0x8800, 0x8801).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-//  AM_RANGE(0x8802, 0x8802) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-//  AM_RANGE(0x8803, 0x8803) AM_DEVWRITE("oki", okim6295_device, write)
+//  map(0x8802, 0x8802).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+//  map(0x8803, 0x8803).w("oki", FUNC(okim6295_device::write));
 	map(0x8804, 0x8805).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-//  AM_RANGE(0x8804, 0x8804) AM_WRITEONLY
-//  AM_RANGE(0x8805, 0x8805) AM_WRITEONLY
+//  map(0x8804, 0x8804).writeonly();
+//  map(0x8805, 0x8805).writeonly();
 
-//  AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-//  AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+//  map(0x8800, 0x8801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+//  map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xA000, 0xA000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
@@ -584,7 +758,7 @@ void chinagat_state::chinagat(machine_config &config)
 	Z80(config, m_soundcpu, XTAL(3'579'545));     /* 3.579545 MHz */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &chinagat_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* heavy interleaving to sync up sprite<->main cpu's */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -631,7 +805,7 @@ void chinagat_state::saiyugoub1(machine_config &config)
 	mcu.p1_out_cb().set(FUNC(chinagat_state::saiyugoub1_adpcm_rom_addr_w));
 	mcu.p2_out_cb().set(FUNC(chinagat_state::saiyugoub1_adpcm_control_w));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* heavy interleaving to sync up sprite<->main cpu's */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -672,7 +846,7 @@ void chinagat_state::saiyugoub2(machine_config &config)
 	Z80(config, m_soundcpu, XTAL(3'579'545));       /* 3.579545 MHz oscillator */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &chinagat_state::ym2203c_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* heavy interleaving to sync up sprite<->main cpu's */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -733,7 +907,7 @@ ROM_START( chinagat )
 
 	ROM_REGION(0x40000, "gfx3", 0 ) /* Background */
 	ROM_LOAD( "chinagat_a-13", 0x00000, 0x10000, BAD_DUMP CRC(b745cac4) SHA1(759767ca7c5123b03b9e1a42bb105d194cb76400) ) // not dumped yet, these were taken from the bootleg set instead
-	ROM_LOAD( "chinagat_a-12", 0x10000, 0x10000, BAD_DUMP CRC(3c864299) SHA1(cb12616e4d6c53a82beb4cd51510a632894b359c) ) // Where are these on the real board?
+	ROM_LOAD( "chinagat_a-12", 0x10000, 0x10000, BAD_DUMP CRC(3c864299) SHA1(cb12616e4d6c53a82beb4cd51510a632894b359c) ) // TRJ-100 should contain it, but not dumped yet.
 	ROM_LOAD( "chinagat_a-15", 0x20000, 0x10000, BAD_DUMP CRC(2f268f37) SHA1(f82cfe3b2001d5ed2a709ca9c51febcf624bb627) )
 	ROM_LOAD( "chinagat_a-14", 0x30000, 0x10000, BAD_DUMP CRC(aef814c8) SHA1(f6b9229ca7beb9a0e47d1f6a1083c6102fdd20c8) )
 
@@ -770,7 +944,7 @@ ROM_START( saiyugou )
 
 	ROM_REGION(0x40000, "gfx3", 0 ) /* Background */
 	ROM_LOAD( "saiyugou_a-13", 0x00000, 0x10000, BAD_DUMP CRC(b745cac4) SHA1(759767ca7c5123b03b9e1a42bb105d194cb76400) ) // not dumped yet, these were taken from the bootleg set instead
-	ROM_LOAD( "saiyugou_a-12", 0x10000, 0x10000, BAD_DUMP CRC(3c864299) SHA1(cb12616e4d6c53a82beb4cd51510a632894b359c) ) // Where are these on the real board?
+	ROM_LOAD( "saiyugou_a-12", 0x10000, 0x10000, BAD_DUMP CRC(3c864299) SHA1(cb12616e4d6c53a82beb4cd51510a632894b359c) ) // TRJ-100 should contain it, but not dumped yet.
 	ROM_LOAD( "saiyugou_a-15", 0x20000, 0x10000, BAD_DUMP CRC(2f268f37) SHA1(f82cfe3b2001d5ed2a709ca9c51febcf624bb627) )
 	ROM_LOAD( "saiyugou_a-14", 0x30000, 0x10000, BAD_DUMP CRC(aef814c8) SHA1(f6b9229ca7beb9a0e47d1f6a1083c6102fdd20c8) )
 

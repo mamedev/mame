@@ -25,21 +25,21 @@
 #define ACTIVELOW_PORT_BIT(P,A,D)   ((P & (~(1 << A))) | ((D ^ 1) << A))
 #define ACTIVEHIGH_PORT_BIT(P,A,D)   ((P & (~(1 << A))) | (D << A))
 
-#define I8035_T_R(M,N) ((m_soundlatch2->read(M,0) >> (N)) & 1)
-#define I8035_T_W_AH(M,N,D) do { m_portT = ACTIVEHIGH_PORT_BIT(m_portT,N,D); m_soundlatch2->write(M, 0, m_portT); } while (0)
+#define I8035_T_R(N) ((m_soundlatch2->read() >> (N)) & 1)
+#define I8035_T_W_AH(N,D) do { m_portT = ACTIVEHIGH_PORT_BIT(m_portT,N,D); m_soundlatch2->write(m_portT); } while (0)
 
-#define I8035_P1_R(M) (m_soundlatch3->read(M,0))
-#define I8035_P2_R(M) (m_soundlatch4->read(M,0))
-#define I8035_P1_W(M,D) m_soundlatch3->write(M,0,D)
+#define I8035_P1_R() (m_soundlatch3->read())
+#define I8035_P2_R() (m_soundlatch4->read())
+#define I8035_P1_W(D) m_soundlatch3->write(D)
 
 #if (USE_8039)
-#define I8035_P2_W(M,D) do { m_soundlatch4->write(M,0,D); } while (0)
+#define I8035_P2_W(D) do { m_soundlatch4->write(D); } while (0)
 #else
-#define I8035_P2_W(M,D) do { set_ea(((D) & 0x20) ? 0 : 1);  m_soundlatch4->write(M,0,D); } while (0)
+#define I8035_P2_W(D) do { set_ea(((D) & 0x20) ? 0 : 1);  m_soundlatch4->write(D); } while (0)
 #endif
 
-#define I8035_P1_W_AH(M,B,D) I8035_P1_W(M,ACTIVEHIGH_PORT_BIT(I8035_P1_R(M),B,(D)))
-#define I8035_P2_W_AH(M,B,D) I8035_P2_W(M,ACTIVEHIGH_PORT_BIT(I8035_P2_R(M),B,(D)))
+#define I8035_P1_W_AH(B,D) I8035_P1_W(ACTIVEHIGH_PORT_BIT(I8035_P1_R(),B,(D)))
+#define I8035_P2_W_AH(B,D) I8035_P2_W(ACTIVEHIGH_PORT_BIT(I8035_P2_R(),B,(D)))
 
 
 #if OLD_SOUND
@@ -446,19 +446,17 @@ void mario_state::sound_start()
 
 void mario_state::sound_reset()
 {
-	address_space &space = m_audiocpu->space(AS_PROGRAM);
-
 #if USE_8039
 	set_ea(1);
 #endif
 
 	/* FIXME: convert to latch8 */
-	m_soundlatch->clear_w(space, 0, 0);
-	if (m_soundlatch2) m_soundlatch2->clear_w(space, 0, 0);
-	if (m_soundlatch3) m_soundlatch3->clear_w(space, 0, 0);
-	if (m_soundlatch4) m_soundlatch4->clear_w(space, 0, 0);
-	if (m_soundlatch3) I8035_P1_W(space, 0x00); /* Input port */
-	if (m_soundlatch4) I8035_P2_W(space, 0xff); /* Port is in high impedance state after reset */
+	m_soundlatch->clear_w();
+	if (m_soundlatch2) m_soundlatch2->clear_w();
+	if (m_soundlatch3) m_soundlatch3->clear_w();
+	if (m_soundlatch4) m_soundlatch4->clear_w();
+	if (m_soundlatch3) I8035_P1_W(0x00); /* Input port */
+	if (m_soundlatch4) I8035_P2_W(0xff); /* Port is in high impedance state after reset */
 
 	m_last = 0;
 }
@@ -471,32 +469,32 @@ void mario_state::sound_reset()
 
 READ8_MEMBER(mario_state::mario_sh_p1_r)
 {
-	return I8035_P1_R(space);
+	return I8035_P1_R();
 }
 
 READ8_MEMBER(mario_state::mario_sh_p2_r)
 {
-	return I8035_P2_R(space) & 0xEF; /* Bit 4 connected to GND! */
+	return I8035_P2_R() & 0xEF; /* Bit 4 connected to GND! */
 }
 
 READ_LINE_MEMBER(mario_state::mario_sh_t0_r)
 {
-	return I8035_T_R(machine().dummy_space(), 0);
+	return I8035_T_R(0);
 }
 
 READ_LINE_MEMBER(mario_state::mario_sh_t1_r)
 {
-	return I8035_T_R(machine().dummy_space(), 1);
+	return I8035_T_R(1);
 }
 
 READ8_MEMBER(mario_state::mario_sh_tune_r)
 {
 	uint8_t *SND = memregion("audiocpu")->base();
 	uint16_t mask = memregion("audiocpu")->bytes()-1;
-	uint8_t p2 = I8035_P2_R(space);
+	uint8_t p2 = I8035_P2_R();
 
 	if ((p2 >> 7) & 1)
-		return m_soundlatch->read(space, offset);
+		return m_soundlatch->read();
 	else
 		return (SND[(0x1000 + (p2 & 0x0f) * 256 + offset) & mask]);
 }
@@ -512,12 +510,12 @@ WRITE8_MEMBER(mario_state::mario_sh_sound_w)
 
 WRITE8_MEMBER(mario_state::mario_sh_p1_w)
 {
-	I8035_P1_W(space, data);
+	I8035_P1_W(data);
 }
 
 WRITE8_MEMBER(mario_state::mario_sh_p2_w)
 {
-	I8035_P2_W(space, data);
+	I8035_P2_W(data);
 }
 
 /****************************************************************
@@ -531,7 +529,7 @@ WRITE8_MEMBER(mario_state::masao_sh_irqtrigger_w)
 	if (m_last == 1 && data == 0)
 	{
 		/* setting bit 0 high then low triggers IRQ on the sound CPU */
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 	}
 
 	m_last = data;
@@ -539,7 +537,7 @@ WRITE8_MEMBER(mario_state::masao_sh_irqtrigger_w)
 
 WRITE8_MEMBER(mario_state::mario_sh_tuneselect_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 }
 
 /* Sound 0 and 1 are pulsed !*/
@@ -576,22 +574,22 @@ WRITE8_MEMBER(mario_state::mario_sh3_w)
 				m_audiocpu->set_input_line(0,CLEAR_LINE);
 			break;
 		case 1: /* get coin */
-			I8035_T_W_AH(space, 0,data & 1);
+			I8035_T_W_AH(0,data & 1);
 			break;
 		case 2: /* ice */
-			I8035_T_W_AH(space, 1, data & 1);
+			I8035_T_W_AH(1, data & 1);
 			break;
 		case 3: /* crab */
-			I8035_P1_W_AH(space, 0, data & 1);
+			I8035_P1_W_AH(0, data & 1);
 			break;
 		case 4: /* turtle */
-			I8035_P1_W_AH(space, 1, data & 1);
+			I8035_P1_W_AH(1, data & 1);
 			break;
 		case 5: /* fly */
-			I8035_P1_W_AH(space, 2, data & 1);
+			I8035_P1_W_AH(2, data & 1);
 			break;
 		case 6: /* coin */
-			I8035_P1_W_AH(space, 3, data & 1);
+			I8035_P1_W_AH(3, data & 1);
 			break;
 		case 7: /* skid */
 #if OLD_SOUND
@@ -663,9 +661,9 @@ void mario_state::mario_audio(machine_config &config)
 	m_discrete->set_intf(mario_discrete);
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 1);
 #else
-	netlist_mame_sound_device &snd_nl(NETLIST_SOUND(config, "snd_nl", 48000));
-	snd_nl.set_constructor(netlist_mario);
-	snd_nl.add_route(ALL_OUTPUTS, "mono", 1.0);
+	NETLIST_SOUND(config, "snd_nl", 48000)
+		.set_source(netlist_mario)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	NETLIST_LOGIC_INPUT(config, m_audio_snd0, "SOUND0.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_audio_snd1, "SOUND1.IN", 0);

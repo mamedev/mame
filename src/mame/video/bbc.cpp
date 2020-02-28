@@ -150,7 +150,7 @@ WRITE8_MEMBER(bbc_state::video_ula_w)
 	else
 		m_screen->update_partial(vpos - 1);
 
-	logerror("setting videoULA %.4x to:%.4x   at :%d \n", data, offset, vpos);
+	//logerror("setting videoULA %.4x to:%.4x   at :%d \n", data, offset, vpos);
 
 	switch (offset & 0x01)
 	{
@@ -175,13 +175,13 @@ WRITE8_MEMBER(bbc_state::video_ula_w)
 
 		m_hd6845->set_hpixels_per_column(m_pixels_per_byte);
 		if (m_video_ula.clock_rate_6845)
-			m_hd6845->set_clock(16_MHz_XTAL / 8);
+			m_hd6845->set_unscaled_clock(16_MHz_XTAL / 8);
 		else
-			m_hd6845->set_clock(16_MHz_XTAL / 16);
+			m_hd6845->set_unscaled_clock(16_MHz_XTAL / 16);
 
 		// FIXME: double clock for MODE7 until interlace is implemented
 		if (m_video_ula.teletext_normal_select)
-			m_hd6845->set_clock(16_MHz_XTAL / 8);
+			m_hd6845->set_unscaled_clock(16_MHz_XTAL / 8);
 		break;
 	// Set a palette register in the Video ULA
 	case 1:
@@ -278,6 +278,14 @@ WRITE_LINE_MEMBER(bbc_state::bbc_de_changed)
 		m_teletext_latch |= 0x80;
 	else
 		m_teletext_latch &= ~0x80;
+}
+
+uint8_t bbc_state::bus_video_data()
+{
+	int hpos = m_screen->hpos();
+	int vpos = m_screen->vpos();
+
+	return m_video_ram[calculate_video_address(hpos, vpos)];
 }
 
 /**** BBC B+/Master Shadow Ram change ****/

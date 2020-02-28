@@ -94,13 +94,13 @@ void electron_romboxp_device::device_add_mconfig(machine_config &config)
 
 	/* rom sockets */
 	GENERIC_SOCKET(config, m_rom[0], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 4/12
-	m_rom[0]->set_device_load(device_image_load_delegate(&electron_romboxp_device::device_image_load_rom1_load, this));
+	m_rom[0]->set_device_load(FUNC(electron_romboxp_device::rom1_load));
 	GENERIC_SOCKET(config, m_rom[1], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 5/13
-	m_rom[1]->set_device_load(device_image_load_delegate(&electron_romboxp_device::device_image_load_rom2_load, this));
+	m_rom[1]->set_device_load(FUNC(electron_romboxp_device::rom2_load));
 	GENERIC_SOCKET(config, m_rom[2], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 6/14 also ROM/RAM
-	m_rom[2]->set_device_load(device_image_load_delegate(&electron_romboxp_device::device_image_load_rom3_load, this));
+	m_rom[2]->set_device_load(FUNC(electron_romboxp_device::rom3_load));
 	GENERIC_SOCKET(config, m_rom[3], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 7/15
-	m_rom[3]->set_device_load(device_image_load_delegate(&electron_romboxp_device::device_image_load_rom4_load, this));
+	m_rom[3]->set_device_load(FUNC(electron_romboxp_device::rom4_load));
 
 	/* cartridges */
 	ELECTRON_CARTSLOT(config, m_cart[0], DERIVED_CLOCK(1, 1), electron_cart, nullptr); // ROM SLOT 0/1
@@ -160,7 +160,7 @@ void electron_romboxp_device::device_reset()
 //  expbus_r - expansion data read
 //-------------------------------------------------
 
-uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset)
+uint8_t electron_romboxp_device::expbus_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -174,11 +174,11 @@ uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset)
 		{
 		case 0:
 		case 1:
-			data = m_cart[1]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 1, 0);
+			data = m_cart[1]->read(offset & 0x3fff, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
 		case 2:
 		case 3:
-			data = m_cart[0]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 1, 0);
+			data = m_cart[0]->read(offset & 0x3fff, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
 		case 4:
 		case 5:
@@ -186,20 +186,20 @@ uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset)
 		case 7:
 			if (m_rom_base == 4)
 			{
-				data = m_rom[m_romsel - 4]->read_rom(space, offset & 0x3fff);
+				data = m_rom[m_romsel - 4]->read_rom(offset & 0x3fff);
 			}
 			break;
 		case 12:
 			data = m_exp_rom->base()[offset & 0x1fff];
 			break;
 		case 13:
-			data &= m_cart[0]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
-			data &= m_cart[1]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
+			data &= m_cart[0]->read(offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
+			data &= m_cart[1]->read(offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
 		case 14:
 		case 15:
 			if (m_rom_base == 12)
 			{
-				data = m_rom[m_romsel - 12]->read_rom(space, offset & 0x3fff);
+				data = m_rom[m_romsel - 12]->read_rom(offset & 0x3fff);
 			}
 			break;
 		}
@@ -209,18 +209,18 @@ uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset)
 		switch (offset >> 8)
 		{
 		case 0xfc:
-			data &= m_cart[0]->read(space, offset & 0xff, 1, 0, m_romsel & 0x01, 0, 0);
-			data &= m_cart[1]->read(space, offset & 0xff, 1, 0, m_romsel & 0x01, 0, 0);
+			data &= m_cart[0]->read(offset & 0xff, 1, 0, m_romsel & 0x01, 0, 0);
+			data &= m_cart[1]->read(offset & 0xff, 1, 0, m_romsel & 0x01, 0, 0);
 
 			if (offset == 0xfc72)
 			{
-				data &= status_r(space, offset);
+				data &= status_r();
 			}
 			break;
 
 		case 0xfd:
-			data &= m_cart[0]->read(space, offset & 0xff, 0, 1, m_romsel & 0x01, 0, 0);
-			data &= m_cart[1]->read(space, offset & 0xff, 0, 1, m_romsel & 0x01, 0, 0);
+			data &= m_cart[0]->read(offset & 0xff, 0, 1, m_romsel & 0x01, 0, 0);
+			data &= m_cart[1]->read(offset & 0xff, 0, 1, m_romsel & 0x01, 0, 0);
 			break;
 		}
 	}
@@ -232,7 +232,7 @@ uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset)
 //  expbus_w - expansion data write
 //-------------------------------------------------
 
-void electron_romboxp_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+void electron_romboxp_device::expbus_w(offs_t offset, uint8_t data)
 {
 	switch (offset >> 12)
 	{
@@ -244,11 +244,11 @@ void electron_romboxp_device::expbus_w(address_space &space, offs_t offset, uint
 		{
 		case 0:
 		case 1:
-			m_cart[1]->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 1, 0);
+			m_cart[1]->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
 		case 2:
 		case 3:
-			m_cart[0]->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 1, 0);
+			m_cart[0]->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
 		}
 		break;
@@ -257,8 +257,8 @@ void electron_romboxp_device::expbus_w(address_space &space, offs_t offset, uint
 		switch (offset >> 8)
 		{
 		case 0xfc:
-			m_cart[0]->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01, 0, 0);
-			m_cart[1]->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01, 0, 0);
+			m_cart[0]->write(offset & 0xff, data, 1, 0, m_romsel & 0x01, 0, 0);
+			m_cart[1]->write(offset & 0xff, data, 1, 0, m_romsel & 0x01, 0, 0);
 
 			if (offset == 0xfc71)
 			{
@@ -267,8 +267,8 @@ void electron_romboxp_device::expbus_w(address_space &space, offs_t offset, uint
 			break;
 
 		case 0xfd:
-			m_cart[0]->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01, 0, 0);
-			m_cart[1]->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01, 0, 0);
+			m_cart[0]->write(offset & 0xff, data, 0, 1, m_romsel & 0x01, 0, 0);
+			m_cart[1]->write(offset & 0xff, data, 0, 1, m_romsel & 0x01, 0, 0);
 			break;
 
 		case 0xfe:
@@ -285,7 +285,7 @@ void electron_romboxp_device::expbus_w(address_space &space, offs_t offset, uint
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(electron_romboxp_device::status_r)
+uint8_t electron_romboxp_device::status_r()
 {
 	// Status: b7: printer Busy
 	return (m_centronics_busy << 7) | 0x7f;

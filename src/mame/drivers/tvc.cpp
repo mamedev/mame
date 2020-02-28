@@ -110,7 +110,7 @@ private:
 	DECLARE_READ8_MEMBER(exp_id_r);
 	DECLARE_WRITE8_MEMBER(expint_ack_w);
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( tvc64);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -218,7 +218,7 @@ void tvc_state::set_mem_page(uint8_t data)
 		case 0xc0 : // External ROM selected
 			TVC_INSTALL_ROM_BANK(3, "bank4", 0xc000, 0xffff);
 			membank("bank4")->set_base(m_ext->base());
-			space.install_readwrite_handler (0xc000, 0xdfff, read8_delegate(FUNC(tvc_state::expansion_r), this), write8_delegate(FUNC(tvc_state::expansion_w), this), 0);
+			space.install_readwrite_handler(0xc000, 0xdfff, read8_delegate(*this, FUNC(tvc_state::expansion_r)), write8_delegate(*this, FUNC(tvc_state::expansion_w)), 0);
 			m_bank_type[3] = -1;
 			break;
 	}
@@ -742,7 +742,7 @@ WRITE_LINE_MEMBER(tvc_state::centronics_ack)
 		m_centronics_ff = 1;
 }
 
-QUICKLOAD_LOAD_MEMBER( tvc_state, tvc64)
+QUICKLOAD_LOAD_MEMBER(tvc_state::quickload_cb)
 {
 	uint8_t first_byte;
 
@@ -766,19 +766,20 @@ void tvc_exp(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(tvc_state::tvc)
+void tvc_state::tvc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, 3125000)
-	MCFG_DEVICE_PROGRAM_MAP(tvc_mem)
-	MCFG_DEVICE_IO_MAP(tvc_io)
+	Z80(config, m_maincpu, 3125000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tvc_state::tvc_mem);
+	m_maincpu->set_addrmap(AS_IO, &tvc_state::tvc_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 240 - 1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(512, 240);
+	screen.set_visarea(0, 512 - 1, 0, 240 - 1);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(tvc_state::tvc_palette), 16);
 
@@ -786,7 +787,7 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8); /*?*/
-	crtc.set_update_row_callback(FUNC(tvc_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(tvc_state::crtc_update_row));
 	crtc.out_cur_callback().set(FUNC(tvc_state::int_ff_set));
 
 	/* internal ram */
@@ -805,8 +806,7 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	m_centronics->set_output_latch(cent_data_out);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "tvc_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom,crt")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "tvc_cart", "bin,rom,crt");
 
 	/* expansion interface */
 	TVCEXP_SLOT(config, m_expansions[0], tvc_exp , nullptr);
@@ -825,17 +825,18 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(tvc64_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("tvc_cass");
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", tvc_state, tvc64, "cas", 6)
+	QUICKLOAD(config, "quickload", "cas", attotime::from_seconds(6)).set_load_callback(FUNC(tvc_state::quickload_cb));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("tvc_cart");
 	SOFTWARE_LIST(config, "cass_list").set_original("tvc_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("tvc_flop");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( tvc64 )

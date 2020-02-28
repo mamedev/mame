@@ -626,7 +626,7 @@ void accomm_state::main_map(address_map &map)
 	map(0x200000, 0x3fffff).noprw();                                                                /* External expansion RAM */
 	map(0x400000, 0x400000).noprw();                                                                /* MODEM */
 	map(0x410000, 0x410000).ram();                                                                  /* Econet ID */
-	map(0x420000, 0x42000f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));     /* 6522 VIA (printer etc) */
+	map(0x420000, 0x42000f).m(m_via, FUNC(via6522_device::map));                                    /* 6522 VIA (printer etc) */
 	map(0x430000, 0x430001).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));  /* 2641 ACIA (RS423) */
 	map(0x440000, 0x44ffff).w(FUNC(accomm_state::ch00switch_w));                                    /* CH00SWITCH */
 	map(0x450000, 0x457fff).ram().share("vram");                                                    /* Video RAM */
@@ -875,9 +875,7 @@ void accomm_state::accomm(machine_config &config)
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
 
-	econet_slot_device &econet_slot(ECONET_SLOT(config, "econet254", 0));
-	econet_devices(econet_slot);
-	econet_slot.set_slot(254);
+	ECONET_SLOT(config, "econet254", "econet", econet_devices).set_slot(254);
 
 	/* printer */
 	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));

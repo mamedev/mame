@@ -22,94 +22,7 @@ Notes:
 #include "netlist/devices/net_lib.h"
 #include "screen.h"
 #include "speaker.h"
-
-/* This is the output stage of the audio circuit.
- * It is solely an impedance changer and could be left away
- */
-
-static NETLIST_START(nl_popeye_imp_changer)
-	RES(R62, 510000)
-	RES(R63, 100)
-	RES(R64, 510000)
-	RES(R65, 2100)
-	RES(R66, 330)
-	RES(R67, 51)
-
-	QBJT_EB(Q8, "2SC1815")
-	QBJT_EB(Q9, "2SA1015")
-
-	NET_C(V5, R62.1, Q8.C, R66.1)
-	NET_C(R62.2, R64.1, R63.1, C7.2)
-	NET_C(R63.2, Q8.B)
-	NET_C(Q8.E, R65.1, Q9.B)
-	NET_C(R66.2, Q9.E, R67.1)
-
-	NET_C(GND, Q9.C, R65.2, R64.2)
-NETLIST_END()
-
-static NETLIST_START(nl_popeye)
-
-	/* register hard coded netlists */
-
-	LOCAL_SOURCE(nl_popeye_imp_changer)
-
-	/* Standard stuff */
-
-	SOLVER(Solver, 48000)
-	PARAM(Solver.ACCURACY, 1e-5)
-	ANALOG_INPUT(V5, 5)
-
-	/* AY 8910 internal resistors */
-
-	RES(R_AY1_1, 1000);
-	RES(R_AY1_2, 1000);
-	RES(R_AY1_3, 1000);
-
-	RES(R52, 2000)
-	RES(R55, 2000)
-	RES(R58, 2000)
-	RES(R53, 2000)
-	RES(R56, 2000)
-	RES(R59, 2000)
-	RES(R51, 20000)
-	RES(R57, 30000)
-	RES(R60, 30000)
-
-	RES(R61, 120000)
-
-	RES(ROUT, 5000)
-
-	CAP(C4, 0.047e-6)
-	CAP(C5, 330e-12)
-	CAP(C6, 330e-12)
-	CAP(C7, 3.3e-6)
-	CAP(C40, 680e-12)
-
-	NET_C(V5, R_AY1_1.1, R_AY1_2.1, R_AY1_3.1)
-
-	NET_C(R_AY1_1.2, R52.1, R53.1)
-	NET_C(R_AY1_2.2, R55.1, R56.1)
-	NET_C(R_AY1_3.2, R58.1, R59.1)
-
-	NET_C(R53.2, R51.1, C4.1)
-	NET_C(R56.2, R57.1, C5.1)
-	NET_C(R59.2, R60.1, C6.1)
-
-	NET_C(R51.2, R57.2, R60.2, R61.1, C40.1, C7.1)
-
-	NET_C(GND, R52.2, R55.2, R58.2, C4.2, C5.2, C6.2, R61.2, C40.2)
-
-	INCLUDE(nl_popeye_imp_changer)
-
-	/* output resistor (actually located in TV */
-
-	NET_C(R67.2, ROUT.1)
-
-	NET_C(GND, ROUT.2)
-
-NETLIST_END()
-
-
+#include "audio/nl_popeye.h"
 
 void tnx1_state::driver_start()
 {
@@ -151,6 +64,12 @@ void tnx1_state::decrypt_rom()
 
 void popeyebl_state::decrypt_rom()
 {
+	uint8_t* rom = memregion("blprot")->base();
+	for (int i = 0; i < 0x80; i++)
+	{
+		rom[i + 0x00] ^= 0xf; // opcodes
+		rom[i + 0x80] ^= 0x3; // data
+	}
 }
 
 void tpp2_state::decrypt_rom()
@@ -254,11 +173,11 @@ WRITE8_MEMBER(tnx1_state::protection_w)
 
 void tnx1_state::maincpu_program_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram();
+	map(0x0000, 0x7fff).rom().region("maincpu",0);
+	map(0x8000, 0x87ff).ram().share("ramlow");
 	map(0x8800, 0x8bff).nopw(); // Attempts to initialize this area with 00 on boot
 	map(0x8c00, 0x8e7f).ram().share("dmasource");
-	map(0x8e80, 0x8fff).ram();
+	map(0x8e80, 0x8fff).ram().share("ramhigh");
 	map(0xa000, 0xa3ff).w(FUNC(tnx1_state::popeye_videoram_w)).share("videoram");
 	map(0xa400, 0xa7ff).w(FUNC(tnx1_state::popeye_colorram_w)).share("colorram");
 	map(0xc000, 0xcfff).w(FUNC(tnx1_state::background_w));
@@ -269,7 +188,7 @@ void tpp2_state::maincpu_program_map(address_map &map)
 {
 	tpp1_state::maincpu_program_map(map);
 	map(0x8000, 0x87ff).unmaprw(); // 7f (unpopulated)
-	map(0x8800, 0x8bff).ram(); // 7h
+	map(0x8800, 0x8bff).ram().share("ramlow"); // 7h
 	map(0xc000, 0xdfff).w(FUNC(tpp2_state::background_w));
 }
 
@@ -280,6 +199,12 @@ void tpp2_noalu_state::maincpu_program_map(address_map &map)
 }
 
 void popeyebl_state::maincpu_program_map(address_map &map)
+{
+	tnx1_state::maincpu_program_map(map);
+	map(0xe000, 0xe01f).rom().region("blprot", 0x80);
+}
+
+void popeyebl_state::decrypted_opcodes_map(address_map& map)
 {
 	tnx1_state::maincpu_program_map(map);
 	map(0xe000, 0xe01f).rom().region("blprot", 0);
@@ -306,6 +231,7 @@ public:
 	{
 	}
 
+	virtual ~brazehs() override = default;
 	virtual void config(machine_config &config) override
 	{
 		T::config(config);
@@ -350,9 +276,9 @@ protected:
 };
 
 
-CUSTOM_INPUT_MEMBER(tnx1_state::dsw1_read)
+READ_LINE_MEMBER(tnx1_state::dsw1_read)
 {
-	return ioport("DSW1")->read() >> m_dswbit;
+	return m_io_dsw1->read() >> m_dswbit;
 }
 
 
@@ -406,7 +332,7 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_DIPSETTING(    0x08, "A 1/6 B 1/1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tnx1_state, dsw1_read, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(tnx1_state, dsw1_read)
 
 	PORT_START("DSW1")  /* DSW1 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
@@ -430,9 +356,15 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+
+	PORT_START("MCONF")
+	PORT_CONFNAME( 0x03, 0x00, "Interlace mode" )
+	PORT_CONFSETTING(    0x00, "False Progressive" )
+	PORT_CONFSETTING(    0x01, "Interlaced (scanline skip)" )
+	PORT_CONFSETTING(    0x02, "Interlaced (bitmap)" )
 INPUT_PORTS_END
 
-CUSTOM_INPUT_MEMBER( tnx1_state::pop_field_r )
+READ_LINE_MEMBER( tnx1_state::pop_field_r )
 {
 	return m_field ^ 1;
 }
@@ -463,7 +395,7 @@ static INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tnx1_state,pop_field_r, nullptr) /* inverted init e/o signal (even odd) */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(tnx1_state, pop_field_r) // inverted init e/o signal (even odd)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -485,7 +417,7 @@ static INPUT_PORTS_START( popeye )
 	PORT_CONFSETTING(    0x20, "Nintendo Co.,Ltd" )
 	PORT_CONFSETTING(    0x60, "Nintendo of America" )
 //  PORT_CONFSETTING(    0x00, "Nintendo of America" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tnx1_state, dsw1_read, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(tnx1_state, dsw1_read)
 
 	PORT_START("DSW1")  /* DSW1 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )       PORT_DIPLOCATION("SW2:1,2")
@@ -509,6 +441,13 @@ static INPUT_PORTS_START( popeye )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )     PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+
+	PORT_START("MCONF")
+	PORT_CONFNAME( 0x03, 0x00, "Interlace mode" )
+	PORT_CONFSETTING(    0x00, "False Progressive" )
+	PORT_CONFSETTING(    0x01, "Interlaced (scanline skip)" )
+	PORT_CONFSETTING(    0x02, "Interlaced (bitmap)" )
+
 INPUT_PORTS_END
 
 
@@ -594,13 +533,14 @@ void tnx1_state::config(machine_config &config)
 	m_maincpu->refresh_cb().set(FUNC(tnx1_state::refresh_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*16, 32*16);
-	screen.set_visarea(0*16, 32*16-1, 2*16, 30*16-1);
-	screen.set_screen_update(FUNC(tnx1_state::screen_update));
-	screen.set_palette(m_palette);
+	// FIXME: 59.94 screen refresch is the NTSC standard
+	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.94)
+		.set_vblank_time(ATTOSECONDS_IN_USEC(0))
+		.set_size(32*16, 32*16)
+		.set_visarea(0*16, 32*16-1, 2*16, 30*16-1)
+		.set_palette(m_palette)
+		.set_screen_update(FUNC(tnx1_state::screen_update));
 	screen.screen_vblank().set(FUNC(tnx1_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_popeye);
@@ -628,15 +568,22 @@ void tpp2_state::config(machine_config &config)
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
-	netlist_mame_sound_device &snd_nl(NETLIST_SOUND(config, "snd_nl", 48000));
-	snd_nl.set_constructor(netlist_nl_popeye);
-	snd_nl.add_route(ALL_OUTPUTS, "mono", 1.0);
+	NETLIST_SOUND(config, "snd_nl", 48000)
+		.set_source(NETLIST_NAME(popeye))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin0", 0, "R_AY1_1.R");
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin1", 1, "R_AY1_2.R");
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin2", 2, "R_AY1_3.R");
 
 	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "ROUT.1").set_mult_offset(30000.0, -65000.0);
+}
+
+void popeyebl_state::config(machine_config& config)
+{
+	tpp1_state::config(config);
+
+	m_maincpu->set_addrmap(AS_OPCODES, &popeyebl_state::decrypted_opcodes_map);
 }
 
 
@@ -799,8 +746,8 @@ ROM_START( popeyebl )
 	ROM_LOAD_NIB_HIGH( "4.2s.24s10", 0x0000, 0x0100, CRC(cab9bc53) SHA1(e63ba8856190187996e405f6fcee254c8ca6e81f) ) /* sprite palette - high 4 bits */
 
 	ROM_REGION( 0x0100, "blprot", 0 )
-	ROM_LOAD_NIB_LOW(  "1.1d.24s10", 0x0000, 0x0100, BAD_DUMP CRC(bb63b2a6) SHA1(0201cf37161b9b0cbf48f1d1248afee91276eb2a) )
-	ROM_LOAD_NIB_HIGH( "2.1e.24s10", 0x0000, 0x0100, BAD_DUMP CRC(29d7bd87) SHA1(0f139a7c1c747cc0bd99792851c5c46c01142e62) )
+	ROM_LOAD_NIB_LOW(  "1.1d.24s10", 0x0000, 0x0100, CRC(2e1b143a) SHA1(7e0fd19328ccd6f2b2148739ef64703ade585060) )
+	ROM_LOAD_NIB_HIGH( "2.1e.24s10", 0x0000, 0x0100, CRC(978b1c63) SHA1(ae67a4ac554e84c970c0acc82f4bc6a490f9d6ef) )
 
 	ROM_REGION(0x0100, "timing", 0)
 	ROM_LOAD( "7.11s.24s10",  0x0000, 0x0100, CRC(1c5c8dea) SHA1(5738303b2a9c79b7d06bcf20fdb4d9b29f6e2d96) ) /* video timing prom */
@@ -832,8 +779,8 @@ ROM_START( popeyeb2 )
 	ROM_LOAD_NIB_HIGH( "popeye.pr4", 0x0000, 0x0100, CRC(cab9bc53) SHA1(e63ba8856190187996e405f6fcee254c8ca6e81f) ) /* sprite palette - high 4 bits */
 
 	ROM_REGION( 0x0100, "blprot", 0 )
-	ROM_LOAD_NIB_LOW(  "popeye.d1",  0x0000, 0x0100, BAD_DUMP CRC(bb63b2a6) SHA1(0201cf37161b9b0cbf48f1d1248afee91276eb2a) )
-	ROM_LOAD_NIB_HIGH( "popeye.e1",  0x0000, 0x0100, BAD_DUMP CRC(29d7bd87) SHA1(0f139a7c1c747cc0bd99792851c5c46c01142e62) )
+	ROM_LOAD_NIB_LOW(  "popeye.d1",  0x0000, 0x0100, CRC(2e1b143a) SHA1(7e0fd19328ccd6f2b2148739ef64703ade585060) )
+	ROM_LOAD_NIB_HIGH( "popeye.e1",  0x0000, 0x0100, CRC(978b1c63) SHA1(ae67a4ac554e84c970c0acc82f4bc6a490f9d6ef) )
 ROM_END
 
 ROM_START( popeyeb3 )

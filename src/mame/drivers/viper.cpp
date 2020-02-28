@@ -350,8 +350,8 @@ some other components. It will be documented at a later date.
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
-#include "machine/ataintf.h"
-#include "machine/idehd.h"
+#include "bus/ata/ataintf.h"
+#include "bus/ata/idehd.h"
 #include "machine/lpci.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
@@ -382,7 +382,7 @@ public:
 		m_ds2430_bit_timer(*this, "ds2430_timer2"),
 		m_workram(*this, "workram"),
 		m_ds2430_rom(*this, "ds2430"),
-		m_io_ports(*this, {"IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7"})
+		m_io_ports(*this, "IN%u", 0U)
 	{
 	}
 
@@ -392,7 +392,7 @@ public:
 	void init_vipercf();
 	void init_viperhd();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ds2430_unk_r);
+	DECLARE_READ_LINE_MEMBER(ds2430_unk_r);
 
 private:
 	DECLARE_READ32_MEMBER(epic_r);
@@ -577,46 +577,68 @@ uint32_t viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &b
 }
 
 #ifdef UNUSED_FUNCTION
-static inline uint64_t read64le_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, uint64_t mem_mask)
+static inline uint64_t read64le_with_32smle_device_handler(read32sm_delegate handler, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t result = 0;
 	if (ACCESSING_BITS_0_31)
-		result |= (uint64_t)(handler)(space, offset * 2 + 0, mem_mask >> 0) << 0;
+		result |= (uint64_t)(handler)(offset * 2 + 0) << 0;
 	if (ACCESSING_BITS_32_63)
-		result |= (uint64_t)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
+		result |= (uint64_t)(handler)(offset * 2 + 1) << 32;
 	return result;
 }
 
 
-static inline void write64le_with_32le_device_handler(write32_delegate handler, address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
+static inline uint64_t read64le_with_32sle_device_handler(read32s_delegate handler, offs_t offset, uint64_t mem_mask)
+{
+	uint64_t result = 0;
+	if (ACCESSING_BITS_0_31)
+		result |= (uint64_t)(handler)(offset * 2 + 0, mem_mask >> 0) << 0;
+	if (ACCESSING_BITS_32_63)
+		result |= (uint64_t)(handler)(offset * 2 + 1, mem_mask >> 32) << 32;
+	return result;
+}
+
+
+static inline void write64le_with_32sle_device_handler(write32s_delegate handler, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_0_31)
-		handler(space, offset * 2 + 0, data >> 0, mem_mask >> 0);
+		handler(offset * 2 + 0, data >> 0, mem_mask >> 0);
 	if (ACCESSING_BITS_32_63)
-		handler(space, offset * 2 + 1, data >> 32, mem_mask >> 32);
+		handler(offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 #endif
 
-static inline uint64_t read64be_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, uint64_t mem_mask)
+static inline uint64_t read64be_with_32smle_device_handler(read32sm_delegate handler, offs_t offset, uint64_t mem_mask)
 {
 	mem_mask = swapendian_int64(mem_mask);
 	uint64_t result = 0;
 	if (ACCESSING_BITS_0_31)
-		result = (uint64_t)(handler)(space, offset * 2, mem_mask & 0xffffffff);
+		result = (uint64_t)(handler)(offset * 2);
 	if (ACCESSING_BITS_32_63)
-		result |= (uint64_t)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
+		result |= (uint64_t)(handler)(offset * 2 + 1) << 32;
+	return swapendian_int64(result);
+}
+
+static inline uint64_t read64be_with_32sle_device_handler(read32s_delegate handler, offs_t offset, uint64_t mem_mask)
+{
+	mem_mask = swapendian_int64(mem_mask);
+	uint64_t result = 0;
+	if (ACCESSING_BITS_0_31)
+		result = (uint64_t)(handler)(offset * 2, mem_mask & 0xffffffff);
+	if (ACCESSING_BITS_32_63)
+		result |= (uint64_t)(handler)(offset * 2 + 1, mem_mask >> 32) << 32;
 	return swapendian_int64(result);
 }
 
 
-static inline void write64be_with_32le_device_handler(write32_delegate handler,  address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
+static inline void write64be_with_32sle_device_handler(write32s_delegate handler, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	data = swapendian_int64(data);
 	mem_mask = swapendian_int64(mem_mask);
 	if (ACCESSING_BITS_0_31)
-		handler(space, offset * 2, data & 0xffffffff, mem_mask & 0xffffffff);
+		handler(offset * 2, data & 0xffffffff, mem_mask & 0xffffffff);
 	if (ACCESSING_BITS_32_63)
-		handler(space, offset * 2 + 1, data >> 32, mem_mask >> 32);
+		handler(offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 
 /*****************************************************************************/
@@ -1723,35 +1745,35 @@ void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t m
 
 READ64_MEMBER(viper_state::voodoo3_io_r)
 {
-	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_3_device::banshee_io_r), &(*m_voodoo)), space, offset, mem_mask);
+	return read64be_with_32sle_device_handler(read32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_io_r)), offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_io_w)
 {
 //  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
-	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_io_w), &(*m_voodoo)), space, offset, data, mem_mask);
+	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_io_w)), offset, data, mem_mask);
 }
 
 READ64_MEMBER(viper_state::voodoo3_r)
 {
-	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_3_device::banshee_r), &(*m_voodoo)), space, offset, mem_mask);
+	return read64be_with_32sle_device_handler(read32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_r)), offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_w)
 {
 //  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
-	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_w), &(*m_voodoo)), space, offset, data, mem_mask);
+	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_w)), offset, data, mem_mask);
 }
 
 READ64_MEMBER(viper_state::voodoo3_lfb_r)
 {
-	return read64be_with_32le_device_handler(read32_delegate(FUNC(voodoo_3_device::banshee_fb_r), &(*m_voodoo)), space, offset, mem_mask);
+	return read64be_with_32smle_device_handler(read32sm_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_fb_r)), offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_lfb_w)
 {
 //  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
-	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_fb_w), &(*m_voodoo)), space, offset, data, mem_mask);
+	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_fb_w)), offset, data, mem_mask);
 }
 
 
@@ -2079,7 +2101,7 @@ WRITE64_MEMBER(viper_state::unk_serial_w)
 
 void viper_state::viper_map(address_map &map)
 {
-//  ADDRESS_MAP_UNMAP_HIGH
+//  map.unmap_value_high();
 	map(0x00000000, 0x00ffffff).mirror(0x1000000).ram().share("workram");
 	map(0x80000000, 0x800fffff).rw(FUNC(viper_state::epic_r), FUNC(viper_state::epic_w));
 	map(0x82000000, 0x83ffffff).rw(FUNC(viper_state::voodoo3_r), FUNC(viper_state::voodoo3_w));
@@ -2090,7 +2112,7 @@ void viper_state::viper_map(address_map &map)
 	// 0xff000000, 0xff000fff - cf_card_data_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff200000, 0xff200fff - cf_card_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff300000, 0xff300fff - ata_r/w (installed in DRIVER_INIT(viperhd))
-//  AM_RANGE(0xff400xxx, 0xff400xxx) ppp2nd sense device
+//  map(0xff400xxx, 0xff400xxx) ppp2nd sense device
 	map(0xffe00000, 0xffe00007).r(FUNC(viper_state::e00000_r));
 	map(0xffe00008, 0xffe0000f).rw(FUNC(viper_state::e00008_r), FUNC(viper_state::e00008_w));
 	map(0xffe08000, 0xffe08007).noprw();
@@ -2110,7 +2132,7 @@ void viper_state::viper_map(address_map &map)
 
 /*****************************************************************************/
 
-CUSTOM_INPUT_MEMBER(viper_state::ds2430_unk_r)
+READ_LINE_MEMBER(viper_state::ds2430_unk_r)
 {
 	return m_ds2430_unk_status;
 }
@@ -2137,7 +2159,7 @@ static INPUT_PORTS_START( viper )
 	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, viper_state, ds2430_unk_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(viper_state, ds2430_unk_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // if this bit is 0, loads a disk copier instead
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -2393,17 +2415,17 @@ void viper_state::machine_reset()
 	m_ds2430_unk_status = 1;
 }
 
-MACHINE_CONFIG_START(viper_state::viper)
-
+void viper_state::viper(machine_config &config)
+{
 	/* basic machine hardware */
 	MPC8240(config, m_maincpu, 166666666); // Unknown
 	m_maincpu->set_bus_frequency(100000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &viper_state::viper_map);
 	m_maincpu->set_vblank_int("screen", FUNC(viper_state::viper_vblank));
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, viper_state, mpc8240_pci_r, mpc8240_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(12, DEVICE_SELF, viper_state, voodoo3_pci_r, voodoo3_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device( 0, FUNC(viper_state::mpc8240_pci_r), FUNC(viper_state::mpc8240_pci_w));
+	pcibus.set_device(12, FUNC(viper_state::voodoo3_pci_r), FUNC(viper_state::voodoo3_pci_w));
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
@@ -2432,7 +2454,7 @@ MACHINE_CONFIG_START(viper_state::viper)
 	SPEAKER(config, "rspeaker").front_right();
 
 	M48T58(config, "m48t58", 0);
-MACHINE_CONFIG_END
+}
 
 /*****************************************************************************/
 
@@ -2445,17 +2467,17 @@ void viper_state::init_viperhd()
 {
 	init_viper();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff300000, 0xff300fff, read64_delegate(FUNC(viper_state::ata_r), this), write64_delegate(FUNC(viper_state::ata_w), this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff300000, 0xff300fff, read64_delegate(*this, FUNC(viper_state::ata_r)), write64_delegate(*this, FUNC(viper_state::ata_w)));
 }
 
 void viper_state::init_vipercf()
 {
 	init_viper();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff000000, 0xff000fff, read64_delegate(FUNC(viper_state::cf_card_data_r), this), write64_delegate(FUNC(viper_state::cf_card_data_w), this) );
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff200000, 0xff200fff, read64_delegate(FUNC(viper_state::cf_card_r), this), write64_delegate(FUNC(viper_state::cf_card_w), this) );
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff000000, 0xff000fff, read64_delegate(*this, FUNC(viper_state::cf_card_data_r)), write64_delegate(*this, FUNC(viper_state::cf_card_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff200000, 0xff200fff, read64_delegate(*this, FUNC(viper_state::cf_card_r)), write64_delegate(*this, FUNC(viper_state::cf_card_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff300000, 0xff300fff, read64_delegate(FUNC(viper_state::unk_serial_r), this), write64_delegate(FUNC(viper_state::unk_serial_w), this) );
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff300000, 0xff300fff, read64_delegate(*this, FUNC(viper_state::unk_serial_r)), write64_delegate(*this, FUNC(viper_state::unk_serial_w)));
 }
 
 

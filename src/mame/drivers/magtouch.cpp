@@ -189,20 +189,20 @@ DEVICE_INPUT_DEFAULTS_END
 
 void magtouch_state::magtouch_sb_conf(device_t *device)
 {
-	device = device->subdevice("pc_joy");
-	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
+	device->subdevice<pc_joy_device>("pc_joy")->set_default_option(nullptr); // remove joystick
 }
 
-MACHINE_CONFIG_START(magtouch_state::magtouch)
+void magtouch_state::magtouch(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
-	MCFG_DEVICE_PROGRAM_MAP(magtouch_map)
-	MCFG_DEVICE_IO_MAP(magtouch_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	I386(config, m_maincpu, 14318180*2);   /* I386 ?? Mhz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &magtouch_state::magtouch_map);
+	m_maincpu->set_addrmap(AS_IO, &magtouch_state::magtouch_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
 	pcvideo_trident_vga(config);
-	MCFG_DEVICE_REPLACE("vga", TVGA9000_VGA, 0)
+	TVGA9000_VGA(config.replace(), "vga", 0);
 
 	pcat_common(config);
 
@@ -230,17 +230,17 @@ MACHINE_CONFIG_START(magtouch_state::magtouch)
 	m_isabus->drq3_callback().set("dma8237_1", FUNC(am9517a_device::dreq3_w));
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", magtouch_isa8_cards, "sb15", true)
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("sb15", magtouch_sb_def)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("sb15", magtouch_sb_conf)
-MACHINE_CONFIG_END
+	isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", 0, m_isabus, magtouch_isa8_cards, "sb15", true));
+	isa1.set_option_device_input_defaults("sb15", DEVICE_INPUT_DEFAULTS_NAME(magtouch_sb_def));
+	isa1.set_option_machine_config("sb15", magtouch_sb_conf);
+}
 
 
 ROM_START(magtouch)
 	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("mtouch.u13", 0x00000, 0x10000, CRC(e74fb144) SHA1(abc99e84832c30606374da542fd94f0fbc8cbaa6) )
 
-	ROM_REGION(0x08000, "video_bios", 0)
+	ROM_REGION32_LE(0x08000, "video_bios", 0)
 	//this is a phoenix standard vga only bios from 1991 despite the notes above saying the machine has a trident svga adapter
 	//ROM_LOAD16_BYTE("vga1-bios-ver-b-1.00-07.u8",     0x00000, 0x04000, CRC(a40551d6) SHA1(db38190f06e4af2c2d59ae310e65883bb16cd3d6))
 	//ROM_CONTINUE(                                     0x00001, 0x04000 )

@@ -304,11 +304,12 @@ GND  8A 8B GND
 #include "includes/segaipt.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/adc0804.h"
 #include "machine/i8255.h"
 #include "machine/mc8123.h"
+#include "machine/rescap.h"
 #include "machine/segacrp2_device.h"
 #include "machine/upd4701.h"
-#include "sound/sn76496.h"
 #include "video/315_5124.h"
 #include "speaker.h"
 
@@ -327,6 +328,7 @@ public:
 		m_bank1(*this, "bank1"),
 		m_bank0d(*this, "bank0d"),
 		m_bank1d(*this, "bank1d"),
+		m_analog_ports(*this, "IN%u", 2U),
 		m_lamp(*this, "lamp0")
 	{ }
 
@@ -341,11 +343,11 @@ public:
 	void init_fantzn2();
 
 private:
-	DECLARE_WRITE8_MEMBER(bank_write);
-	DECLARE_WRITE8_MEMBER(coin_counters_write);
+	void bank_write(uint8_t data);
+	void coin_counters_write(uint8_t data);
 
-	DECLARE_READ8_MEMBER( hangonjr_port_f8_read );
-	DECLARE_WRITE8_MEMBER( hangonjr_port_fa_write );
+	uint8_t hangonjr_analog_read();
+	void hangonjr_analog_select(uint8_t data);
 
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -370,6 +372,7 @@ private:
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;
+	optional_ioport_array<2> m_analog_ports;
 	output_finder<> m_lamp;
 
 	// Analog input related
@@ -411,8 +414,9 @@ void systeme_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x7b, 0x7b).w("sn1", FUNC(segapsg_device::write));
-	map(0x7e, 0x7f).w("sn2", FUNC(segapsg_device::write));
+	/* TODO : PSG connection correct? */
+	map(0x7b, 0x7b).w(m_vdp1, FUNC(sega315_5124_device::psg_w));
+	map(0x7e, 0x7f).w(m_vdp2, FUNC(sega315_5124_device::psg_w));
 	map(0x7e, 0x7e).r(m_vdp1, FUNC(sega315_5124_device::vcount_read));
 	map(0xba, 0xba).rw(m_vdp1, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
 	map(0xbb, 0xbb).rw(m_vdp1, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
@@ -440,7 +444,7 @@ void systeme_state::vdp2_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(systeme_state::bank_write)
+void systeme_state::bank_write(uint8_t data)
 {
 	membank("vdp1_bank")->set_entry((data >> 7) & 1);
 	membank("vdp2_bank")->set_entry((data >> 6) & 1);
@@ -450,7 +454,7 @@ WRITE8_MEMBER(systeme_state::bank_write)
 		m_bank1d->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER(systeme_state::coin_counters_write)
+void systeme_state::coin_counters_write(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // only one counter used in most games?
@@ -487,25 +491,14 @@ void systeme_state::machine_start()
 
 
 /*- Hang On Jr. Specific -*/
-READ8_MEMBER( systeme_state::hangonjr_port_f8_read )
+uint8_t systeme_state::hangonjr_analog_read()
 {
-	uint8_t temp;
-
-	temp = 0;
-
-	if (m_port_select == 0x08)  /* 0000 1000 */ /* Angle */
-		temp = ioport("IN2")->read();
-
-	if (m_port_select == 0x09)  /* 0000 1001 */ /* Accel */
-		temp = ioport("IN3")->read();
-
-	return temp;
+	return m_analog_ports[m_port_select & 0x01]->read();
 }
 
-WRITE8_MEMBER( systeme_state::hangonjr_port_fa_write)
+void systeme_state::hangonjr_analog_select(uint8_t data)
 {
-	/* Seems to write the same pattern again and again bits ---- xx-x used */
-	m_port_select = data & 0x0f;
+	m_port_select = data;
 }
 
 
@@ -654,10 +647,10 @@ static INPUT_PORTS_START( segae_hangonjr_generic )
 	//PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
 	//PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 
-	PORT_START("IN2")   /* Read from Port 0xf8 */
+	PORT_START("IN2")   /* Angle - Read from Port 0xf8 */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START("IN3")  /* Read from Port 0xf8 */
+	PORT_START("IN3")  /* Accel - Read from Port 0xf8 */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
@@ -886,46 +879,49 @@ uint32_t systeme_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-MACHINE_CONFIG_START(systeme_state::systeme)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'738'635)/2) /* Z80B @ 5.3693Mhz */
-	MCFG_DEVICE_PROGRAM_MAP(systeme_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+void systeme_state::systeme(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(10'738'635)/2); /* Z80B @ 5.3693Mhz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &systeme_state::systeme_map);
+	m_maincpu->set_addrmap(AS_IO, &systeme_state::io_map);
 
 	I8255(config, m_ppi);
 	m_ppi->out_pb_callback().set(FUNC(systeme_state::coin_counters_write));
 	m_ppi->tri_pb_callback().set_constant(0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
-			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
-			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 192)
-	MCFG_SCREEN_UPDATE_DRIVER(systeme_state, screen_update)
-
-	SEGA315_5124(config, m_vdp1, 0);
-	m_vdp1->set_is_pal(false);
-	m_vdp1->set_addrmap(0, &systeme_state::vdp1_map);
-
-	SEGA315_5124(config, m_vdp2, 0);
-	m_vdp2->set_is_pal(false);
-	m_vdp2->irq().set_inputline(m_maincpu, 0);
-	m_vdp2->set_addrmap(0, &systeme_state::vdp2_map);
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(10'738'635)/2,
+			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256,
+			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 192);
+	screen.set_screen_update(FUNC(systeme_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SEGAPSG, XTAL(10'738'635)/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SEGA315_5124(config, m_vdp1, XTAL(10'738'635));
+	m_vdp1->set_is_pal(false);
+	m_vdp1->set_addrmap(0, &systeme_state::vdp1_map);
+	m_vdp1->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("sn2", SEGAPSG, XTAL(10'738'635)/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SEGA315_5124(config, m_vdp2, XTAL(10'738'635));
+	m_vdp2->set_is_pal(false);
+	m_vdp2->n_int().set_inputline(m_maincpu, 0);
+	m_vdp2->set_addrmap(0, &systeme_state::vdp2_map);
+	m_vdp2->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 void systeme_state::hangonjr(machine_config &config)
 {
 	systeme(config);
-	m_ppi->in_pa_callback().set(FUNC(systeme_state::hangonjr_port_f8_read));
-	m_ppi->in_pc_callback().set_constant(0); // bit 4 must be the ADC0804 /INTR signal
-	m_ppi->out_pc_callback().set(FUNC(systeme_state::hangonjr_port_fa_write)); // CD4051 selector input
+	m_ppi->in_pa_callback().set("adc", FUNC(adc0804_device::read));
+	m_ppi->in_pc_callback().set("adc", FUNC(adc0804_device::intr_r)).lshift(4);
+	m_ppi->out_pc_callback().set(FUNC(systeme_state::hangonjr_analog_select)); // CD4051 selector input
+	m_ppi->out_pc_callback().append("adc", FUNC(adc0804_device::rd_w)).bit(2);
+	m_ppi->out_pc_callback().append("adc", FUNC(adc0804_device::wr_w)).bit(3);
+
+	adc0804_device &adc(ADC0804(config, "adc", RES_K(10), CAP_P(82))); // R1=10K/C11=82pF circuit on 834-5805 card
+	adc.vin_callback().set(FUNC(systeme_state::hangonjr_analog_read));
+	adc.set_rd_mode(adc0804_device::RD_BITBANGED);
 }
 
 void systeme_state::ridleofp(machine_config &config)
@@ -944,13 +940,14 @@ void systeme_state::ridleofp(machine_config &config)
 	ppi.out_pc_callback().append("upd4701", FUNC(upd4701_device::resety_w)).bit(0); // or possibly bit 1
 }
 
-MACHINE_CONFIG_START(systeme_state::systemex)
+void systeme_state::systemex(machine_config &config)
+{
 	systeme(config);
-	MCFG_DEVICE_REPLACE("maincpu", MC8123, XTAL(10'738'635)/2) /* Z80B @ 5.3693Mhz */
-	MCFG_DEVICE_PROGRAM_MAP(systeme_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	mc8123_device &maincpu(MC8123(config.replace(), m_maincpu, XTAL(10'738'635)/2)); /* Z80B @ 5.3693Mhz */
+	maincpu.set_addrmap(AS_PROGRAM, &systeme_state::systeme_map);
+	maincpu.set_addrmap(AS_IO, &systeme_state::io_map);
+	maincpu.set_addrmap(AS_OPCODES, &systeme_state::decrypted_opcodes_map);
+}
 
 void systeme_state::systemex_315_5177(machine_config &config)
 {
@@ -962,13 +959,14 @@ void systeme_state::systemex_315_5177(machine_config &config)
 	maincpu.set_decrypted_tag(m_decrypted_opcodes);
 }
 
-MACHINE_CONFIG_START(systeme_state::systemeb)
+void systeme_state::systemeb(machine_config &config)
+{
 	systeme(config);
-	MCFG_DEVICE_REPLACE("maincpu", MC8123, XTAL(10'738'635)/2) /* Z80B @ 5.3693Mhz */
-	MCFG_DEVICE_PROGRAM_MAP(systeme_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_OPCODES_MAP(banked_decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	mc8123_device &maincpu(MC8123(config.replace(), m_maincpu, XTAL(10'738'635)/2)); /* Z80B @ 5.3693Mhz */
+	maincpu.set_addrmap(AS_PROGRAM, &systeme_state::systeme_map);
+	maincpu.set_addrmap(AS_IO, &systeme_state::io_map);
+	maincpu.set_addrmap(AS_OPCODES, &systeme_state::banked_decrypted_opcodes_map);
+}
 
 
 void systeme_state::init_opaopa()
@@ -1057,6 +1055,8 @@ ROM_END
 
 //*************************************************************************************************************************
 //  Riddle of Pythagoras (Japan), Sega System E
+//   Game ID# 833-6200 ピタゴラス ノ ナゾ
+//   I/O board 834-6193 © SEGA 1986
 //
 ROM_START( ridleofp )
 	ROM_REGION( 0x30000, "maincpu", 0 )

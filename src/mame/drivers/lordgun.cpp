@@ -272,8 +272,8 @@ READ16_MEMBER(lordgun_state::lordgun_gun_1_y_r)
 
 WRITE16_MEMBER(lordgun_state::soundlatch_w)
 {
-	if (ACCESSING_BITS_0_7)     m_soundlatch->write(space, 0, (data >> 0) & 0xff);
-	if (ACCESSING_BITS_8_15)    m_soundlatch2->write(space, 0, (data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7)     m_soundlatch->write((data >> 0) & 0xff);
+	if (ACCESSING_BITS_8_15)    m_soundlatch2->write((data >> 8) & 0xff);
 
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }

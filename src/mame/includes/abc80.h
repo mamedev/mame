@@ -22,7 +22,6 @@
 #include "machine/ram.h"
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
-#include "sound/wave.h"
 #include "emupal.h"
 
 #define ABC80_HTOTAL    384
@@ -72,7 +71,7 @@ public:
 		m_pio(*this, Z80PIO_TAG),
 		m_csg(*this, SN76477_TAG),
 		m_cassette(*this, "cassette"),
-		m_bus(*this, ABCBUS_TAG),
+		m_bus(*this, "bus"),
 		m_kb(*this, ABC80_KEYBOARD_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rs232(*this, RS232_TAG),
@@ -151,7 +150,7 @@ public:
 	void kbd_w(u8 data);
 	DECLARE_WRITE8_MEMBER( csg_w );
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( bac );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	enum
 	{

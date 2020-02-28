@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SS50_INTERFACE_H
+#define MAME_BUS_SS50_INTERFACE_H
 
-#ifndef MAME_DEVICES_BUS_SS50_INTERFACE_H
-#define MAME_DEVICES_BUS_SS50_INTERFACE_H
+#pragma once
 
 
 //**************************************************************************
@@ -21,7 +21,7 @@ class ss50_card_interface;
 
 // ======================> ss50_interface_port_device
 
-class ss50_interface_port_device : public device_t, public device_slot_interface
+class ss50_interface_port_device : public device_t, public device_single_card_slot_interface<ss50_card_interface>
 {
 	friend class ss50_card_interface;
 
@@ -44,8 +44,8 @@ public:
 	auto firq_cb() { return m_firq_cb.bind(); }
 
 	// memory accesses
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	// baud rates
 	DECLARE_WRITE_LINE_MEMBER(f110_w);
@@ -70,7 +70,7 @@ private:
 
 // ======================> ss50_card_interface
 
-class ss50_card_interface : public device_slot_card_interface
+class ss50_card_interface : public device_interface
 {
 	friend class ss50_interface_port_device;
 
@@ -79,8 +79,8 @@ protected:
 	ss50_card_interface(const machine_config &mconfig, device_t &device);
 
 	// required overrides
-	virtual DECLARE_READ8_MEMBER(register_read) = 0;
-	virtual DECLARE_WRITE8_MEMBER(register_write) = 0;
+	virtual u8 register_read(offs_t offset) = 0;
+	virtual void register_write(offs_t offset, u8 data) = 0;
 
 	// optional overrides
 	virtual DECLARE_WRITE_LINE_MEMBER(f110_w) { }
@@ -94,6 +94,8 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(write_firq) { m_slot->m_firq_cb(state); }
 
 private:
+	virtual void interface_pre_start() override;
+
 	ss50_interface_port_device *m_slot;
 };
 
@@ -104,4 +106,4 @@ DECLARE_DEVICE_TYPE(SS50_INTERFACE, ss50_interface_port_device)
 void ss50_default_2rs_devices(device_slot_interface &device);
 //void ss50_default_4rs_devices(device_slot_interface &device);
 
-#endif
+#endif // MAME_BUS_SS50_INTERFACE_H

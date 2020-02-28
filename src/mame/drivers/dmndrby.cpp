@@ -60,6 +60,7 @@ DD10 DD14  DD18     H5            DD21
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class dmndrby_state : public driver_device
@@ -115,7 +116,7 @@ private:
 
 WRITE8_MEMBER(dmndrby_state::dderby_sound_w)
 {
-	m_soundlatch->write(space,0,data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -373,7 +374,7 @@ void dmndrby_state::video_start()
 	m_bg = 0;
 
 	m_racetrack_tilemap_rom = memregion("user1")->base();
-	m_racetrack_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dmndrby_state::get_dmndrby_tile_info),this),TILEMAP_SCAN_ROWS,16,16, 16, 512);
+	m_racetrack_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dmndrby_state::get_dmndrby_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 16, 512);
 	m_racetrack_tilemap->mark_all_dirty();
 
 }
@@ -497,18 +498,18 @@ void dmndrby_state::dmndrby_palette(palette_device &palette) const
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		int const r = combine_3_weights(rweights, bit0, bit1, bit2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		int const g = combine_3_weights(gweights, bit0, bit1, bit2);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		int const b = combine_2_weights(bweights, bit0, bit1);
+		int const b = combine_weights(bweights, bit0, bit1);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -527,35 +528,36 @@ void dmndrby_state::dmndrby_palette(palette_device &palette) const
 /*Main Z80 is IM 0,HW-latched irqs. */
 INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_irq)
 {
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h */
 }
 
 INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_timer_irq)
 {
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* RST 08h */
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* Z80 - RST 08h */
 }
 
-MACHINE_CONFIG_START(dmndrby_state::dderby)
+void dmndrby_state::dderby(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(memmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dmndrby_state,  dderby_irq)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(dmndrby_state, dderby_timer_irq,  244/2)
+	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dmndrby_state::memmap);
+	m_maincpu->set_vblank_int("screen", FUNC(dmndrby_state::dderby_irq));
+	m_maincpu->set_periodic_int(FUNC(dmndrby_state::dderby_timer_irq), attotime::from_hz(244/2));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* verified on schematics */
-	MCFG_DEVICE_PROGRAM_MAP(dderby_sound_map)
+	Z80(config, m_audiocpu, 4000000);  /* verified on schematics */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dmndrby_state::dderby_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dmndrby_state, screen_update_dderby)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(dmndrby_state::screen_update_dderby));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dmndrby);
 	PALETTE(config, m_palette, FUNC(dmndrby_state::dmndrby_palette), 0x300, 0x20);
@@ -565,7 +567,7 @@ MACHINE_CONFIG_START(dmndrby_state::dderby)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8910(config, "ay1", 1789750).add_route(ALL_OUTPUTS, "mono", 0.35); // frequency guessed
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( dmndrby )

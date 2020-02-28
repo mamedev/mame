@@ -10,6 +10,7 @@
 #include "video/c45.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class tceptor_state : public driver_device
 {

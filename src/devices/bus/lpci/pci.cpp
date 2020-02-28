@@ -91,7 +91,8 @@ DEFINE_DEVICE_TYPE(PCI_BUS, pci_bus_device, "pci_bus", "PCI Bus")
 //-------------------------------------------------
 pci_bus_device::pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PCI_BUS, tag, owner, clock), m_busnum(0),
-	m_father(nullptr), m_address(0), m_devicenum(0), m_busnumber(0), m_busnumaddr(nullptr)
+	m_address(0), m_devicenum(0), m_busnumber(0), m_busnumaddr(nullptr),
+	m_father(*this, finder_base::DUMMY_TAG)
 {
 	for (auto & elem : m_devtag) {
 		elem= nullptr;
@@ -284,11 +285,8 @@ void pci_bus_device::device_start()
 			m_device[i] = nullptr;
 	}
 
-	if (m_father != nullptr) {
-		pci_bus_device *father = machine().device<pci_bus_device>(m_father);
-		if (father)
-			father->add_sibling(this, m_busnum);
-	}
+	if (m_father.found())
+		m_father->add_sibling(this, m_busnum);
 
 	/* register pci states */
 	save_item(NAME(m_address));
@@ -312,8 +310,8 @@ void pci_bus_device::device_reset()
 //  pci_device_interface - constructor
 //-------------------------------------------------
 
-pci_device_interface::pci_device_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
+pci_device_interface::pci_device_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "lpci"),
 	m_pci_bus(nullptr)
 {
 }
@@ -332,7 +330,7 @@ DEFINE_DEVICE_TYPE(PCI_CONNECTOR, pci_connector_device, "pci_connector", "PCI de
 
 pci_connector_device::pci_connector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PCI_CONNECTOR, tag, owner, clock),
-	device_slot_interface(mconfig, *this)
+	device_single_card_slot_interface<pci_device_interface>(mconfig, *this)
 {
 }
 
@@ -346,5 +344,5 @@ void pci_connector_device::device_start()
 
 pci_device_interface *pci_connector_device::get_device()
 {
-	return dynamic_cast<pci_device_interface *>(get_card_device());
+	return get_card_device();
 }

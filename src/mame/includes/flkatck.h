@@ -14,6 +14,7 @@
 #include "machine/watchdog.h"
 #include "sound/k007232.h"
 #include "video/k007121.h"
+#include "tilemap.h"
 
 class flkatck_state : public driver_device
 {

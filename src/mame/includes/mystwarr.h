@@ -10,6 +10,7 @@
 #include "video/k054000.h"
 #include "machine/k054321.h"
 #include "machine/timer.h"
+#include "tilemap.h"
 
 class mystwarr_state : public konamigx_state
 {
@@ -110,7 +111,6 @@ private:
 	void martchmp_map(address_map &map);
 	void martchmp_sound_map(address_map &map);
 	void metamrph_map(address_map &map);
-	void mystwarr_k054539_map(address_map &map);
 	void mystwarr_map(address_map &map);
 	void mystwarr_sound_map(address_map &map);
 	void viostorm_map(address_map &map);

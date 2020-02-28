@@ -709,19 +709,16 @@ READ8_MEMBER( fd800_legacy_device::cru_r )
 {
 	int reply = 0;
 
-	switch (offset)
+	offset &= 31;
+	if (offset < 16)
 	{
-	case 0:
-	case 1:
 		// receive buffer
-		reply = m_recv_buf >> (offset*8);
-		break;
-
-	case 2:
-	case 3:
+		reply = BIT(m_recv_buf, offset);
+	}
+	else
+	{
 		// status register
-		reply = m_stat_reg >> ((offset-2)*8);
-		break;
+		reply = BIT(m_stat_reg, offset - 16);
 	}
 
 	return reply;

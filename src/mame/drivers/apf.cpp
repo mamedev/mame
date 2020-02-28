@@ -78,7 +78,6 @@ ToDo:
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "video/mc6847.h"
 
 #include "bus/apf/slot.h"
@@ -253,11 +252,11 @@ void apf_state::machine_start()
 		switch (m_cart->get_type())
 		{
 			case APF_BASIC:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x6800, 0x7fff, read8_delegate(FUNC(apf_cart_slot_device::extra_rom),(apf_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x6800, 0x7fff, read8_delegate(*m_cart, FUNC(apf_cart_slot_device::extra_rom)));
 				break;
 			case APF_SPACEDST:
 				m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x9800, 0x9fff);
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9800, 0x9bff, read8_delegate(FUNC(apf_cart_slot_device::read_ram),(apf_cart_slot_device*)m_cart), write8_delegate(FUNC(apf_cart_slot_device::write_ram),(apf_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9800, 0x9bff, read8_delegate(*m_cart, FUNC(apf_cart_slot_device::read_ram)), write8_delegate(*m_cart, FUNC(apf_cart_slot_device::write_ram)));
 				m_has_cart_ram = true;
 				break;
 		}
@@ -563,8 +562,6 @@ void apf_state::apfimag(machine_config &config)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("16K");
 
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.15);
-
 	PIA6821(config, m_pia1, 0);
 	m_pia1->readpa_handler().set(FUNC(apf_state::pia1_porta_r));
 	m_pia1->readpb_handler().set(FUNC(apf_state::pia1_portb_r));
@@ -573,6 +570,7 @@ void apf_state::apfimag(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(apf_cassette_formats);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.15);
 	m_cass->set_interface("apf_cass");
 
 	FD1771(config, m_fdc, 1000000); // guess

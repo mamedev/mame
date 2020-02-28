@@ -74,10 +74,10 @@ void tail2nos_state::sound_port_map(address_map &map)
 #endif
 }
 
+template <int N>
 CUSTOM_INPUT_MEMBER(tail2nos_state::analog_in_r)
 {
-	int num = (uintptr_t)param;
-	int delta = ioport(num ? "AN1" : "AN0")->read();
+	int delta = m_analog[N]->read();
 
 	return delta >> 5;
 }
@@ -91,7 +91,7 @@ static INPUT_PORTS_START( tail2nos )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000) PORT_NAME("Brake (standard BD)")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000) PORT_NAME("Accelerate (standard BD)")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000)
-	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tail2nos_state,analog_in_r, (void *)0) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
+	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tail2nos_state, analog_in_r<0>) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -103,7 +103,7 @@ static INPUT_PORTS_START( tail2nos )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tail2nos_state,analog_in_r, (void *)1) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
+	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tail2nos_state, analog_in_r<1>) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
 	PORT_BIT( 0x0070, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000)
 	PORT_BIT( 0xff8f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -232,16 +232,16 @@ void tail2nos_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(tail2nos_state::tail2nos)
-
+void tail2nos_state::tail2nos(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(20'000'000)/2)    /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tail2nos_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(20'000'000)/2);    /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tail2nos_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tail2nos_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(20'000'000)/4)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_port_map)
+	Z80(config, m_audiocpu, XTAL(20'000'000)/4);  /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tail2nos_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &tail2nos_state::sound_port_map);
 								/* IRQs are triggered by the YM2608 */
 
 	ACIA6850(config, m_acia, 0);
@@ -250,13 +250,13 @@ MACHINE_CONFIG_START(tail2nos_state::tail2nos)
 	//m_acia->rts_handler().set("link", FUNC(rs232_port_device::write_rts));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tail2nos_state, screen_update_tail2nos)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(tail2nos_state::screen_update_tail2nos));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tail2nos);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
@@ -266,7 +266,7 @@ MACHINE_CONFIG_START(tail2nos_state::tail2nos)
 	m_k051316->set_bpp(-4);
 	m_k051316->set_offsets(-89, -14);
 	m_k051316->set_wrap(1);
-	m_k051316->set_zoom_callback(FUNC(tail2nos_state::zoom_callback), this);
+	m_k051316->set_zoom_callback(FUNC(tail2nos_state::zoom_callback));
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(tail2nos_state::tail2nos)
 	ymsnd.add_route(0, "rspeaker", 0.25);
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

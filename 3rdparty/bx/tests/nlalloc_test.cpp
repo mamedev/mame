@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -34,7 +34,7 @@ namespace bx
 {
 	struct Blk
 	{
-		static const uint64_t kInvalid = UINT64_MAX;
+		static constexpr uint64_t kInvalid = UINT64_MAX;
 
 		Blk()
 			: ptr(kInvalid)
@@ -66,6 +66,8 @@ namespace bx
 	class NonLocalAllocator
 	{
 	public:
+		static constexpr uint32_t kMinBlockSize = 16u;
+
 		NonLocalAllocator()
 		{
 			reset();
@@ -102,13 +104,13 @@ namespace bx
 
 		Blk alloc(uint32_t _size)
 		{
-			_size = max(_size, 16u);
+			_size = max(_size, kMinBlockSize);
 
 			for (FreeList::iterator it = m_free.begin(), itEnd = m_free.end(); it != itEnd; ++it)
 			{
 				if (it->size >= _size)
 				{
-					uint64_t ptr = it->ptr;
+					const uint64_t ptr = it->ptr;
 
 					if (it->size != _size)
 					{
@@ -121,6 +123,7 @@ namespace bx
 					}
 
 					m_used += _size;
+
 					return Blk{ ptr, _size };
 				}
 			}
@@ -131,38 +134,32 @@ namespace bx
 
 		void free(const Blk& _blk)
 		{
+			BX_CHECK(isValid(_blk), "Freeing invalid block!");
+
 			m_used -= _blk.size;
-			m_free.push_back(_blk);
-			compact();
-		}
 
-		bool compact()
-		{
-			bx::quickSort(
-				  m_free.begin()
-				, uint32_t(m_free.end() - m_free.begin() )
-				, sizeof(Blk)
-				, [](const void* _a, const void* _b) -> int32_t {
-					const Blk& lhs = *(const Blk*)(_a);
-					const Blk& rhs = *(const Blk*)(_b);
-					return lhs < rhs ? -1 : 1;
-				});
-
-			for (FreeList::iterator it = m_free.begin(), next = it, itEnd = m_free.end(); next != itEnd;)
+			FreeList::iterator it    = m_free.begin();
+			FreeList::iterator itEnd = m_free.end();
+			for (; it != itEnd; ++it)
 			{
-				if ( (it->ptr + it->size) == next->ptr)
+				if ( (_blk.ptr + _blk.size) == it->ptr)
 				{
-					it->size += next->size;
-					next = m_free.erase(next);
+					it->ptr   = _blk.ptr;
+					it->size += _blk.size;
+					break;
 				}
-				else
+
+				if (_blk.ptr > it->ptr)
 				{
-					it = next;
-					++next;
+					m_free.insert(it, _blk);
+					break;
 				}
 			}
 
-			return 0 == m_used;
+			if (it == itEnd)
+			{
+				m_free.push_back(_blk);
+			}
 		}
 
 		uint32_t getUsed() const
@@ -175,6 +172,9 @@ namespace bx
 		FreeList m_free;
 		uint32_t m_used;
 	};
+
+	constexpr uint32_t NonLocalAllocator::kMinBlockSize;
+
 } // namespace bx
 
 TEST_CASE("nlalloc")
@@ -185,11 +185,45 @@ TEST_CASE("nlalloc")
 
 	blk = nla.alloc(100);
 	REQUIRE(!isValid(blk) );
-	nla.add(bx::Blk{0x1000, 100});
+	nla.add(bx::Blk{0x1000, 1024});
 
-	blk = nla.alloc(100);
+	blk = nla.alloc(1024);
 	REQUIRE(isValid(blk) );
 
+	bx::Blk blk2 = nla.alloc(1);
+	REQUIRE(!isValid(blk2) );
+
 	nla.free(blk);
+	REQUIRE(0 == nla.getUsed() );
+
+	{
+		bx::Blk blk3 = nla.alloc(123);
+		REQUIRE(isValid(blk3) );
+
+		bx::Blk blk4 = nla.alloc(134);
+		REQUIRE(isValid(blk4) );
+
+		bx::Blk blk5 = nla.alloc(145);
+		REQUIRE(isValid(blk5) );
+
+		bx::Blk blk6 = nla.alloc(156);
+		REQUIRE(isValid(blk6) );
+
+		bx::Blk blk7 = nla.alloc(167);
+		REQUIRE(isValid(blk7) );
+
+		nla.free(blk3);
+		nla.free(blk5);
+		nla.free(blk7);
+		nla.free(blk4);
+		nla.free(blk6);
+		REQUIRE(0 == nla.getUsed() );
+	}
+
+	blk2 = nla.alloc(1);
+	REQUIRE(isValid(blk2) );
+	REQUIRE(bx::NonLocalAllocator::kMinBlockSize == nla.getUsed() );
+
+	nla.free(blk2);
 	REQUIRE(0 == nla.getUsed() );
 }

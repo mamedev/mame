@@ -1971,22 +1971,24 @@ static INPUT_PORTS_START( tfs )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(wpc_s_state::wpc_s)
+void wpc_s_state::wpc_s(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(8'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(wpc_s_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(wpc_s_state, irq0_line_assert, XTAL(8'000'000)/8192.0)
+	MC6809E(config, maincpu, XTAL(8'000'000)/4);
+	maincpu->set_addrmap(AS_PROGRAM, &wpc_s_state::wpc_s_map);
+	maincpu->set_periodic_int(FUNC(wpc_s_state::irq0_line_assert), attotime::from_hz(XTAL(8'000'000)/8192.0));
+
 	TIMER(config, "zero_crossing").configure_periodic(FUNC(wpc_s_state::zc_timer), attotime::from_hz(120)); // Mains power zero crossing
 
-	MCFG_DEVICE_ADD("shift", WPC_SHIFT, 0)
-	MCFG_DEVICE_ADD("pic", WPC_PIC, 0)
-	MCFG_DEVICE_ADD("lamp", WPC_LAMP, 0)
-	MCFG_DEVICE_ADD("out", WPC_OUT, 0, 5)
+	WPC_SHIFT(config, "shift", 0);
+	WPC_PIC(config, pic, 0);
+	WPC_LAMP(config, lamp, 0);
+	WPC_OUT(config, out, 0, 5);
 	WPC_DMD(config, "dmd", 0).scanline_callback().set(FUNC(wpc_s_state::scanline_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	DCS_AUDIO_8K(config, dcs, 0);
-MACHINE_CONFIG_END
+}
 
 /*-----------------
 /  Corvette #50036
@@ -2031,12 +2033,24 @@ ROM_START(corv_px4)
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("u6-px4.rom", 0x00000, 0x80000, CRC(a5f22149) SHA1(e0b0bce31b1e66e6b74930c3184f87ebec400f80))
 	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
-	ROM_LOAD16_BYTE("corvsnd2", 0x000000, 0x080000, CRC(630d20a3) SHA1(c7b6cbc7f23c1f9c149a3ef32e84ca8797ff8026))
-	ROM_LOAD16_BYTE("corvsnd3", 0x200000, 0x080000, CRC(6ace0353) SHA1(dec5b6f129ee6b7c0d03c1677d6b71672dd25a5a))
-	ROM_LOAD16_BYTE("corvsnd4", 0x400000, 0x080000, CRC(87807278) SHA1(ba01b44c0ad6d10163a8aed2211539d541e69449))
-	ROM_LOAD16_BYTE("corvsnd5", 0x600000, 0x080000, CRC(35f82c21) SHA1(ee14489e5629e9cd5622a56849fab65b94ff9b59))
-	ROM_LOAD16_BYTE("corvsnd6", 0x800000, 0x080000, CRC(61e56d90) SHA1(41388523fca4839132d3f7e117bdac9ea9f4020c))
-	ROM_LOAD16_BYTE("corvsnd7", 0xa00000, 0x080000, CRC(1417b547) SHA1(851acf77159a1ef99fc2934353eb887065568004))
+	ROM_LOAD16_BYTE("su2-sl1.rom", 0x000000, 0x080000, CRC(141d280e) SHA1(ab1e8e38b9fa0e693837c93616f0821e25b31588))
+	ROM_LOAD16_BYTE("corvsnd3",    0x200000, 0x080000, CRC(6ace0353) SHA1(dec5b6f129ee6b7c0d03c1677d6b71672dd25a5a))
+	ROM_LOAD16_BYTE("corvsnd4",    0x400000, 0x080000, CRC(87807278) SHA1(ba01b44c0ad6d10163a8aed2211539d541e69449))
+	ROM_LOAD16_BYTE("corvsnd5",    0x600000, 0x080000, CRC(35f82c21) SHA1(ee14489e5629e9cd5622a56849fab65b94ff9b59))
+	ROM_LOAD16_BYTE("corvsnd6",    0x800000, 0x080000, CRC(61e56d90) SHA1(41388523fca4839132d3f7e117bdac9ea9f4020c))
+	ROM_LOAD16_BYTE("corvsnd7",    0xa00000, 0x080000, CRC(1417b547) SHA1(851acf77159a1ef99fc2934353eb887065568004))
+ROM_END
+
+ROM_START(corv_px3)
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("u6-px3.rom", 0x00000, 0x80000, CRC(5a363db8) SHA1(19eea89bf1ab3cc84c5b67eac00d8be4e65249f6))
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("su2-sp2.rom", 0x000000, 0x080000, CRC(9ae4bf31) SHA1(a33978d9ac8ffdc7b8719c803edd3e804f0dd886))
+	ROM_LOAD16_BYTE("corvsnd3",    0x200000, 0x080000, CRC(6ace0353) SHA1(dec5b6f129ee6b7c0d03c1677d6b71672dd25a5a))
+	ROM_LOAD16_BYTE("corvsnd4",    0x400000, 0x080000, CRC(87807278) SHA1(ba01b44c0ad6d10163a8aed2211539d541e69449))
+	ROM_LOAD16_BYTE("corvsnd5",    0x600000, 0x080000, CRC(35f82c21) SHA1(ee14489e5629e9cd5622a56849fab65b94ff9b59))
+	ROM_LOAD16_BYTE("corvsnd6",    0x800000, 0x080000, CRC(61e56d90) SHA1(41388523fca4839132d3f7e117bdac9ea9f4020c))
+	ROM_LOAD16_BYTE("corvsnd7",    0xa00000, 0x080000, CRC(1417b547) SHA1(851acf77159a1ef99fc2934353eb887065568004))
 ROM_END
 
 ROM_START(corv_la1)
@@ -2421,6 +2435,20 @@ ROM_START(fs_lx4)
 	ROM_LOAD16_BYTE("fs_u9_s.l1", 0xe00000, 0x080000, CRC(0a6664fb) SHA1(751a726e3ea6a808bb137f3563d54acd1580836d))
 ROM_END
 
+ROM_START(fs_lx3)
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("flin_lx3.rom", 0x00000, 0x80000, CRC(2298c267) SHA1(6536213d758d05d0c85bf39e9ccc34cac1d849d4))
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("fs_u2_s.l1", 0x000000, 0x080000, CRC(aa3da768) SHA1(b9ab9d716f03c3fa4dc7352993477c021a07138a))
+	ROM_LOAD16_BYTE("fs_u3_s.l1", 0x200000, 0x080000, CRC(e8a0b2d1) SHA1(5fd7ff4a194f845db53573a1a44efbfffed292f9))
+	ROM_LOAD16_BYTE("fs_u4_s.l1", 0x400000, 0x080000, CRC(a5de69f4) SHA1(a7e7f35964ec8b40a971920c2c6cf2ecb730bc60))
+	ROM_LOAD16_BYTE("fs_u5_s.l1", 0x600000, 0x080000, CRC(74b4d495) SHA1(98a145c07694db7b56f5c6ba84bc631fb5c18bae))
+	ROM_LOAD16_BYTE("fs_u6_s.l1", 0x800000, 0x080000, CRC(3c7f7a04) SHA1(45e017dc36922ad2ff420724f912e109a75a15a3))
+	ROM_LOAD16_BYTE("fs_u7_s.l1", 0xa00000, 0x080000, CRC(f32b9271) SHA1(19308cb54ae6fc6343ab7411546b251ba66b0905))
+	ROM_LOAD16_BYTE("fs_u8_s.l1", 0xc00000, 0x080000, CRC(a7aafa3e) SHA1(54dca32dc2bec5432cd3664bb5aa45d367560b96))
+	ROM_LOAD16_BYTE("fs_u9_s.l1", 0xe00000, 0x080000, CRC(0a6664fb) SHA1(751a726e3ea6a808bb137f3563d54acd1580836d))
+ROM_END
+
 /*-------------
 / The Pinball Circus #60020
 /--------------*/
@@ -2752,7 +2780,8 @@ ROM_START(tfs_12)
 ROM_END
 
 GAME(1994,  corv_21,    0,          wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (2.1)",                    MACHINE_MECHANICAL)
-GAME(1994,  corv_px4,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (PX4)",                    MACHINE_MECHANICAL)
+GAME(1994,  corv_px4,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (PX4 Prototype)",          MACHINE_MECHANICAL)
+GAME(1994,  corv_px3,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (PX3 Prototype)",          MACHINE_MECHANICAL)
 GAME(1994,  corv_lx1,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (LX1)",                    MACHINE_MECHANICAL)
 GAME(1994,  corv_lx2,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (LX2)",                    MACHINE_MECHANICAL)
 GAME(1994,  corv_la1,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (LA1)",                    MACHINE_MECHANICAL)
@@ -2783,6 +2812,7 @@ GAME(1994,  rs_lx2,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0
 GAME(1994,  fs_lx5,     0,          wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-5)",            MACHINE_MECHANICAL)
 GAME(1994,  fs_lx2,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-2)",            MACHINE_MECHANICAL)
 GAME(1994,  fs_sp2,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (SP-2)",            MACHINE_MECHANICAL)
+GAME(1994,  fs_lx3,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-3)",            MACHINE_MECHANICAL)
 GAME(1994,  fs_lx4,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-4)",            MACHINE_MECHANICAL)
 GAME(1995,  ts_lx5,     0,          wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LX-5)",                 MACHINE_MECHANICAL)
 GAME(1995,  ts_lh6,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LH-6)",                 MACHINE_MECHANICAL)

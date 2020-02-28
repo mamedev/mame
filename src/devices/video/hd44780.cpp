@@ -6,7 +6,8 @@
 
         TODO:
         - dump internal CGROM
-        - emulate osc pin, determine video timings and busy flag duration from it
+        - emulate osc pin, determine video timings and busy flag duration from it,
+          and if possible, remove m_busy_factor
 
 ***************************************************************************/
 
@@ -55,8 +56,14 @@ hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, d
 
 hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, m_pixel_update_cb(*this)
+	, m_busy_factor(1.0)
 	, m_cgrom(nullptr)
 	, m_cgrom_region(*this, DEVICE_SELF)
+	, m_rs_input(0)
+	, m_rw_input(0)
+	, m_db_input(0)
+	, m_enabled(false)
 {
 }
 
@@ -90,13 +97,14 @@ void hd44780_device::device_start()
 {
 	m_cgrom = m_cgrom_region.found() ? m_cgrom_region : memregion("cgrom")->base();
 
-	m_pixel_update_cb.bind_relative_to(*owner());
+	m_pixel_update_cb.resolve();
 
 	m_busy_timer = timer_alloc(TIMER_BUSY);
 	m_blink_timer = timer_alloc(TIMER_BLINKING);
 	m_blink_timer->adjust(attotime::from_msec(409), 0, attotime::from_msec(409));
 
 	// state saving
+	save_item(NAME(m_busy_factor));
 	save_item(NAME(m_busy_flag));
 	save_item(NAME(m_ac));
 	save_item(NAME(m_dr));
@@ -115,6 +123,10 @@ void hd44780_device::device_start()
 	save_item(NAME(m_ddram));
 	save_item(NAME(m_cgram));
 	save_item(NAME(m_nibble));
+	save_item(NAME(m_rs_input));
+	save_item(NAME(m_rw_input));
+	save_item(NAME(m_db_input));
+	save_item(NAME(m_enabled));
 	save_item(NAME(m_rs_state));
 	save_item(NAME(m_rw_state));
 }
@@ -182,7 +194,9 @@ void hd44780_device::set_charset_type(int type)
 void hd44780_device::set_busy_flag(uint16_t usec)
 {
 	m_busy_flag = true;
-	m_busy_timer->adjust( attotime::from_usec( usec ) );
+
+	usec = float(usec) * m_busy_factor + 0.5;
+	m_busy_timer->adjust(attotime::from_usec(usec));
 }
 
 void hd44780_device::correct_ac()
@@ -234,7 +248,7 @@ void hd44780_device::update_nibble(int rs, int rw)
 	m_nibble = !m_nibble;
 }
 
-inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, uint8_t line, uint8_t pos, uint8_t y, uint8_t x, int state)
+inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, u8 line, u8 pos, u8 y, u8 x, int state)
 {
 	if (!m_pixel_update_cb.isnull())
 	{
@@ -242,7 +256,7 @@ inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, uint8_t line, uin
 	}
 	else
 	{
-		uint8_t line_height = (m_char_size == 8) ? m_char_size : m_char_size + 1;
+		u8 line_height = (m_char_size == 8) ? m_char_size : m_char_size + 1;
 
 		if (m_lines <= 2)
 		{
@@ -275,13 +289,13 @@ inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, uint8_t line, uin
 //  device interface
 //**************************************************************************
 
-const uint8_t *hd44780_device::render()
+const u8 *hd44780_device::render()
 {
 	memset(m_render_buf, 0, sizeof(m_render_buf));
 
 	if (m_display_on)
 	{
-		uint8_t line_size = 80 / m_num_line;
+		u8 line_size = 80 / m_num_line;
 
 		for (int line = 0; line < m_num_line; line++)
 		{
@@ -304,8 +318,8 @@ const uint8_t *hd44780_device::render()
 					char_base = m_ddram[char_pos] * 0x10;
 				}
 
-				const uint8_t * charset = (m_ddram[char_pos] < 0x10) ? m_cgram : m_cgrom;
-				uint8_t *dest = m_render_buf + 16 * (line * line_size + pos);
+				const u8 *charset = (m_ddram[char_pos] < 0x10) ? m_cgram : m_cgrom;
+				u8 *dest = m_render_buf + 16 * (line * line_size + pos);
 				memcpy (dest, charset + char_base, m_char_size);
 
 				if (char_pos == m_ac)
@@ -327,15 +341,15 @@ const uint8_t *hd44780_device::render()
 uint32_t hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	const uint8_t *img = render();
+	const u8 *img = render();
 
-	uint8_t line_size = 80 / m_num_line;
+	u8 line_size = 80 / m_num_line;
 
 	for (int line = 0; line < m_num_line; line++)
 	{
 		for (int pos = 0; pos < line_size; pos++)
 		{
-			const uint8_t *src = img + 16 * (line * line_size + pos);
+			const u8 *src = img + 16 * (line * line_size + pos);
 			for (int y = 0; y < m_char_size; y++)
 				for (int x = 0; x < 5; x++)
 					pixel_update(bitmap, line, pos, y, x, BIT(src[y], 4 - x));
@@ -347,6 +361,9 @@ uint32_t hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 u8 hd44780_device::read(offs_t offset)
 {
+	if (m_data_len == 4 && !machine().side_effects_disabled())
+		update_nibble(offset & 0x01, 1);
+
 	switch (offset & 0x01)
 	{
 		case 0: return control_read();
@@ -358,6 +375,9 @@ u8 hd44780_device::read(offs_t offset)
 
 void hd44780_device::write(offs_t offset, u8 data)
 {
+	if (m_data_len == 4 && !machine().side_effects_disabled())
+		update_nibble(offset & 0x01, 0);
+
 	switch (offset & 0x01)
 	{
 		case 0: control_write(data);  break;
@@ -365,12 +385,56 @@ void hd44780_device::write(offs_t offset, u8 data)
 	}
 }
 
+u8 hd44780_device::db_r()
+{
+	if (m_enabled && m_rw_input == 1)
+	{
+		switch (m_rs_input)
+		{
+			case 0: return control_read();
+			case 1: return data_read();
+		}
+	}
+
+	return 0xff;
+}
+
+void hd44780_device::db_w(u8 data)
+{
+	m_db_input = data;
+}
+
+WRITE_LINE_MEMBER(hd44780_device::rs_w)
+{
+	m_rs_input = state;
+}
+
+WRITE_LINE_MEMBER(hd44780_device::rw_w)
+{
+	m_rw_input = state;
+}
+
+WRITE_LINE_MEMBER(hd44780_device::e_w)
+{
+	if (m_data_len == 4 && state && !m_enabled && !machine().side_effects_disabled())
+		update_nibble(m_rs_input, m_rw_input);
+
+	if (!state && m_enabled && m_rw_input == 0)
+	{
+		switch (m_rs_input)
+		{
+			case 0: control_write(m_db_input);  break;
+			case 1: data_write(m_db_input);     break;
+		}
+	}
+
+	m_enabled = state;
+}
+
 void hd44780_device::control_write(u8 data)
 {
 	if (m_data_len == 4)
 	{
-		update_nibble(0, 0);
-
 		if (m_nibble)
 		{
 			m_ir = data & 0xf0;
@@ -412,7 +476,7 @@ void hd44780_device::control_write(u8 data)
 		// function set
 		if (!m_first_cmd && m_data_len == (BIT(m_ir, 4) ? 8 : 4) && (m_char_size != (BIT(m_ir, 2) ? 10 : 8) || m_num_line != (BIT(m_ir, 3) + 1)))
 		{
-			logerror("HD44780 '%s': function set cannot be executed after other instructions unless the interface data length is changed\n", tag());
+			logerror("HD44780: function set cannot be executed after other instructions unless the interface data length is changed\n");
 			return;
 		}
 
@@ -480,6 +544,9 @@ void hd44780_device::control_write(u8 data)
 		m_disp_shift = 0;
 		memset(m_ddram, 0x20, sizeof(m_ddram));
 		set_busy_flag(1520);
+
+		// Some machines do a "clear display" first, even though the datasheet insists "function set" must come before all else
+		return;
 	}
 
 	m_first_cmd = false;
@@ -489,9 +556,6 @@ u8 hd44780_device::control_read()
 {
 	if (m_data_len == 4)
 	{
-		if (!machine().side_effects_disabled())
-			update_nibble(0, 1);
-
 		if (m_nibble)
 			return (m_busy_flag ? 0x80 : 0) | (m_ac & 0x70);
 		else
@@ -513,8 +577,6 @@ void hd44780_device::data_write(u8 data)
 
 	if (m_data_len == 4)
 	{
-		update_nibble(1, 0);
-
 		if (m_nibble)
 		{
 			m_dr = data & 0xf0;
@@ -545,15 +607,12 @@ void hd44780_device::data_write(u8 data)
 
 u8 hd44780_device::data_read()
 {
-	uint8_t data = (m_active_ram == DDRAM) ? m_ddram[m_ac] : m_cgram[m_ac];
+	u8 data = (m_active_ram == DDRAM) ? m_ddram[m_ac] : m_cgram[m_ac];
 
 	LOG("HD44780: %sRAM read %x %c\n", m_active_ram == DDRAM ? "DD" : "CG", m_ac, data);
 
 	if (m_data_len == 4)
 	{
-		if (!machine().side_effects_disabled())
-			update_nibble(1, 1);
-
 		if (m_nibble)
 			return data & 0xf0;
 		else

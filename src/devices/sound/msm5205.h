@@ -28,8 +28,6 @@ public:
 		m_s2 = BIT(select, 0);
 		m_bitwidth = (select & 4) ? 4 : 3;
 	}
-	template <class Object> devcb_base &set_vck_callback(Object &&cb) { return m_vck_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vck_legacy_callback(Object &&cb) { return m_vck_legacy_cb.set_callback(std::forward<Object>(cb)); }
 	auto vck_callback() { return m_vck_cb.bind(); }
 	auto vck_legacy_callback() { return m_vck_legacy_cb.bind(); }
 
@@ -57,7 +55,7 @@ protected:
 		TIMER_ADPCM_CAPTURE
 	};
 
-	msm5205_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	msm5205_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 dac_bits);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -85,6 +83,7 @@ protected:
 	u8 m_bitwidth;              // bit width selector -3B/4B
 	s32 m_signal;               // current ADPCM signal
 	s32 m_step;                 // current ADPCM step
+	u8 m_dac_bits;              // DAC output bits (10 for MSM5205, 12 for MSM6585)
 	int m_diff_lookup[49*16];
 
 	devcb_write_line m_vck_cb;

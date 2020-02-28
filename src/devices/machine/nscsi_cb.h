@@ -8,7 +8,7 @@
 #include "machine/nscsi_bus.h"
 
 
-class nscsi_callback_device : public nscsi_device
+class nscsi_callback_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
 	nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

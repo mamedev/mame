@@ -8,19 +8,42 @@ Compiling MAME
 All Platforms
 -------------
 
-* Whenever you are changing build parameters, (such as switching between a SDL-based build and a native Windows renderer one, or adding tools to the compile list) you need to run a **make REGENIE=1** to allow the settings to be regenerated. Failure to do this will cause you very difficult to troubleshoot problems.
+* To compile MAME, you need a C++14 compiler and runtime library.  We
+  support building with GCC version 7.2 or later and clang version 5 or
+  later.  MAME should run with GNU libstdc++ version 5.1 or later.
 
-* If you want to add various additional tools to the compile, such as *CHDMAN*, add a **TOOLS=1** to your make statement, like **make REGENIE=1 TOOLS=1**
+* Whenever you are changing build parameters, (such as switching between
+  a SDL-based build and a native Windows renderer one, or adding tools
+  to the compile list) you need to run a **make REGENIE=1** to allow the
+  settings to be regenerated.  Failure to do this will cause you very
+  difficult to troubleshoot problems.
 
-* You can do driver specific builds by using *SOURCES=<driver>* in your make statement. For instance, building Pac-Man by itself would be **make SOURCES=src/mame/drivers/pacman.cpp REGENIE=1** including the necessary *REGENIE* for rebuilding the settings.
+* If you want to add various additional tools to the compile, such as
+  *CHDMAN*, add a **TOOLS=1** to your make statement, like
+  **make REGENIE=1 TOOLS=1**
 
-* Speeding up the compilation can be done by using more cores from your CPU. This is done with the **-j** parameter. *Note: the maximum number you should use is the number of cores your CPU has, plus one. No higher than that will speed up the compilation, and may in fact slow it down.* For instance, **make -j5** on a quad-core CPU will provide optimal speed.
+* You can do driver specific builds by using *SOURCES=<driver>* in your
+  make statement.  For instance, building Pac-Man by itself would be
+  **make SOURCES=src/mame/drivers/pacman.cpp REGENIE=1** including the
+  necessary *REGENIE* for rebuilding the settings.
 
-* Debugging information can be added to a compile using *SYMBOLS=1* though most users will not want or need to use this.
+* Speeding up the compilation can be done by using more cores from your
+  CPU.  This is done with the **-j** parameter.  *Note: a good number to
+  start with is the total number of CPU cores in your system plus one.
+  An excessive number of concurrent jobs may increase compilation time.
+  The optimal number depends on many factors, including number of CPU
+  cores, available RAM, disk and filesystem performance, and memory
+  bandwidh.* For instance, **make -j5** is a good starting point on a
+  system with a quad-core CPU.
+
+* Debugging information can be added to a compile using *SYMBOLS=1*
+  though most users will not want or need to use this.  This increases
+  compile time and disk space used.
 
 Putting all of these together, we get a couple of examples:
 
-Rebuilding MAME for just the Pac-Man driver, with tools, on a quad-core (e.g. i5 or i7) machine:
+Rebuilding MAME for just the Pac-Man driver, with tools, on a quad-core
+(e.g. i5 or i7) machine:
 
 | **make SOURCES=src/mame/drivers/pacman.cpp TOOLS=1 REGENIE=1 -j5**
 |
@@ -118,7 +141,7 @@ Fedora Linux
 
 You'll need a few prerequisites from your distro. Make sure you get SDL2 2.0.3 or 2.0.4 as earlier versions are buggy.
 
-**sudo dnf install gcc gcc-c++ SDL2-devel SDL2_ttf-devel libXinerama-devel qt5-qtbase-devel qt5-qttools expat-devel fontconfig-devel alsa-lib-devel**
+**sudo dnf install gcc gcc-c++ SDL2-devel SDL2_ttf-devel libXi-devel libXinerama-devel qt5-qtbase-devel qt5-qttools expat-devel fontconfig-devel alsa-lib-devel**
 
 Compilation is exactly as described above in All Platforms.
 
@@ -130,7 +153,7 @@ Debian and Ubuntu (including Raspberry Pi and ODROID devices)
 
 You'll need a few prerequisites from your distro. Make sure you get SDL2 2.0.3 or 2.0.4 as earlier versions are buggy.
 
-**sudo apt-get install git build-essential libsdl2-dev libsdl2-ttf-dev libfontconfig-dev qt5-default**
+**sudo apt-get install git build-essential python libsdl2-dev libsdl2-ttf-dev libfontconfig-dev qt5-default**
 
 Compilation is exactly as described above in All Platforms.
 
@@ -218,6 +241,27 @@ You need to use a web server instead of opening the local files directly due to 
 
 If the result fails to run, you can open the Web Console in your browser to see any error output which may have been produced (e.g. missing or incorrect ROM files). A "ReferenceError: foo is not defined" error most likely indicates that a needed source file was omitted from the SOURCES list.
 
+.. _compiling-docs:
+
+Compiling the Documentation
+---------------------------
+
+Compiling the documentation will require you to install several packages depending on your operating system.
+
+On Debian/Ubuntu flavors of Linux, you'll need python3-sphinx/python-sphinx and the python3-pip/python-pip packages.
+
+**sudo apt-get install python3-sphinx python3-pip** or **sudo apt-get install python-sphinx python-pip** depending on whether you're using Python 3 or Python 2.
+
+You'll then need to install the SVG handler.
+
+**pip3 install sphinxcontrib-svg2pdfconverter** or **pip install sphinxcontrib-svg2pdfconverter** depending on whether you're using Python 3 or Python 2.
+
+If you intend on making a PDF via LaTeX, you'll need to install a LaTeX distribution such as TeX Live.
+
+**sudo apt-get install latexmk texlive texlive-science texlive-formats-extra**
+
+From this point you can do **make html** or **make latexpdf** from the docs folder to generate the output of your choice. Typing **make** by itself will tell you all available formats. The output will be in the docs/build folder in a subfolder based on the type chosen (e.g. **make html** will create *docs/build/html* with the output.)
+
 
 .. _compiling-options:
 
@@ -252,15 +296,27 @@ IGNORE_GIT
    revision description in the version string.
 
 Tool locations
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 OVERRIDE_CC
-   Set the C/Objective-C compiler command.
+   Set the C/Objective-C compiler command.  (This sets the target C compiler
+   command when cross-compiling.)
 OVERRIDE_CXX
-   Set the C++/Objective-C++ compiler command.
+   Set the C++/Objective-C++ compiler command.  (This sets the target C++
+   compiler command when cross-compiling.)
+OVERRIDE_LD
+   Set the linker command.  This is often not necessary or useful because the C
+   or C++ compiler command is used to invoke the linker.  (This sets the target
+   linker command when cross-compiling.)
 PYTHON_EXECUTABLE
    Set the Python interpreter command.  You need Python 2.7 or Python 3 to build
    MAME.
+CROSS_BUILD
+   Set to **1** to use separate host and target compilers and linkers, as
+   required for cross-compilation.  In this case, **OVERRIDE_CC**,
+   **OVERRIDE_CXX** and **OVERRIDE_LD** set the target C compiler, C++ compiler
+   and linker commands, while **CC**, **CXX** and **LD** set the host C
+   compiler, C++ compiler and linker commands.
 
 Optional features
 ~~~~~~~~~~~~~~~~~
@@ -388,10 +444,7 @@ Known Issues
 Issues with specific compiler versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* GCC 5 for Linux reports spurious errors on encountering deprecation warnings.
-  Adding **DEPRECATED=0** to your build options works around this by disabling
-  deprecation warnings.
-* MinGW GCC 7 for Windows i386 produces spurious out-of-bounds access warnings.
+* GCC 7 for 32-bit x86 targets produces spurious out-of-bounds access warnings.
   Adding **NOWERROR=1** to your build options works around this by not treating
   warnings as errors.
 * Initial versions of GNU libstdc++ 6 have a broken ``std::unique_ptr``
@@ -426,7 +479,7 @@ a **CFLAGS** or **CXXFLAGS** environment variable).  You can check to see
 whether the ``_FORTIFY_SOURCE`` macro is a built-in macro with your version of
 GCC with a command like this:
 
-**gcc -dM -E - | grep _FORTIFY_SOURCE**
+**gcc -dM -E - < /dev/null | grep _FORTIFY_SOURCE**
 
 If ``_FORTIFY_SOURCE`` is defined to a non-zero value by default, you can work
 around it by adding **-U_FORTIFY_SOURCE** to the compiler flags (e.g. by using
@@ -438,6 +491,23 @@ variables.
 
 Unusual Build Configurations
 ----------------------------
+
+Cross-compiling MAME
+~~~~~~~~~~~~~~~~~~~~
+
+MAME's build system has basic support for cross-compilation.  Set
+**CROSS_BUILD=1** to enable separate host and target compilers, set
+**OVERRIDE_CC** and **OVERRIDE_CXX** to the target C/C++ compiler commands, and
+if necessary set **CC** and **CXX** to the host C/C++ compiler commands.  If the
+target OS is different to the host OS, set it with **TARGETOS**.  For example it
+may be possible to build a MinGW32 x64 build on a Linux host using a command
+like this:
+
+**make TARGETOS=windows PTR64=1 OVERRIDE_CC=x86_64-w64-mingw32-gcc OVERRIDE_CXX=x86_64-w64-mingw32-g++ OVERRIDE_LD=x86_64-w64-mingw32-ld MINGW64=/usr**
+
+(The additional packages required for producing a standard MinGW32 x64 build on
+a Fedora Linux host are ``mingw64-gcc-c++``, ``mingw64-winpthreads-static`` and
+their dependencies.  Non-standard builds may require additional packages.)
 
 Using libc++ on Linux
 ~~~~~~~~~~~~~~~~~~~~~
@@ -464,9 +534,9 @@ want to build MAME on a Linux distribution that still uses a version of GNU
 libstdC++ that predates C++14 support.  To use an alternate GCC installation to,
 build MAME, set the C and C++ compilers to the full paths to the **gcc** and
 **g++** commands, and add the library path to the run-time search path.  If you
-installed GCC in /opt/local/gcc63, you might use a command like this:
+installed GCC in /opt/local/gcc72, you might use a command like this:
 
-**make OVERRIDE_CC=/opt/local/gcc63/bin/gcc OVERRIDE_CXX=/opt/local/gcc63/bin/g++ ARCHOPTS=-Wl,-R,/opt/local/gcc63/lib64**
+**make OVERRIDE_CC=/opt/local/gcc72/bin/gcc OVERRIDE_CXX=/opt/local/gcc72/bin/g++ ARCHOPTS=-Wl,-R,/opt/local/gcc72/lib64**
 
 You can add these options to a prefix makefile if you plan to use this
 configuration regularly.

@@ -61,23 +61,23 @@ WRITE8_MEMBER(speedatk_state::m6845_w)
 	if(offset == 0)
 	{
 		m_crtc_index = data;
-		m_crtc->address_w(space,0,data);
+		m_crtc->address_w(data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		m_crtc->register_w(space,0,data);
+		m_crtc->register_w(data);
 	}
 }
 
-uint32_t speedatk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t speedatk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int count;
 	uint16_t tile;
 	uint8_t color, region;
 
-	bitmap.fill(0, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	count = (m_crtc_vreg[0x0c]<<8)|(m_crtc_vreg[0x0d] & 0xff);
 
@@ -87,9 +87,9 @@ uint32_t speedatk_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{
 		for(x=0;x<m_crtc_vreg[1];x++)
 		{
-			tile = m_videoram[count] + ((m_colorram[count] & 0xe0) << 3);
+			tile = m_videoram[count] + ((m_colorram[count] & 0x60) << 3);
 			color = m_colorram[count] & 0x1f;
-			region = (m_colorram[count] & 0x10) >> 4;
+			region = (m_colorram[count] & 0x80) >> 7;
 
 			m_gfxdecode->gfx(region)->opaque(bitmap,cliprect,tile,color,m_flip_scr,m_flip_scr,x*8,y*8);
 

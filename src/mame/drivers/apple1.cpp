@@ -141,7 +141,7 @@ private:
 	DECLARE_READ8_MEMBER(pia_keyboard_r);
 	DECLARE_WRITE8_MEMBER(pia_display_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_display_gate_w);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( apple1 );
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	TIMER_CALLBACK_MEMBER(ready_start_cb);
 	TIMER_CALLBACK_MEMBER(ready_end_cb);
 	TIMER_CALLBACK_MEMBER(keyboard_strobe_cb);
@@ -172,7 +172,7 @@ static const uint8_t apple1_keymap[] =
 };
 
 // header is "LOAD:abcdDATA:" where abcd is the starting address
-SNAPSHOT_LOAD_MEMBER( apple1_state, apple1 )
+SNAPSHOT_LOAD_MEMBER(apple1_state::snapshot_cb)
 {
 	uint64_t snapsize;
 	uint8_t *data;
@@ -594,15 +594,16 @@ static void apple1_cards(device_slot_interface &device)
 	device.option_add("cffa", A1BUS_CFFA);
 }
 
-MACHINE_CONFIG_START(apple1_state::apple1)
-	MCFG_DEVICE_ADD(m_maincpu, M6502, 960000)        // effective CPU speed
-	MCFG_DEVICE_PROGRAM_MAP(apple1_map)
+void apple1_state::apple1(machine_config &config)
+{
+	M6502(config, m_maincpu, 960000);        // effective CPU speed
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple1_state::apple1_map);
 
 	// video timings are identical to the Apple II, unsurprisingly
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181), (65*7)*2, 0, (40*7)*2, 262, 0, 192)
-	MCFG_SCREEN_UPDATE_DRIVER(apple1_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(14'318'181), (65*7)*2, 0, (40*7)*2, 262, 0, 192);
+	m_screen->set_screen_update(FUNC(apple1_state::screen_update));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -611,15 +612,15 @@ MACHINE_CONFIG_START(apple1_state::apple1)
 	m_pia->writepb_handler().set(FUNC(apple1_state::pia_display_w));
 	m_pia->cb2_handler().set(FUNC(apple1_state::pia_display_gate_w));
 
-	A1BUS(config, A1_BUS_TAG, 0).set_cputag(m_maincpu);
+	A1BUS(config, A1_BUS_TAG, 0).set_space(m_maincpu, AS_PROGRAM);
 	A1BUS_SLOT(config, "exp", 0, A1_BUS_TAG, apple1_cards, "cassette");
 
-	MCFG_SNAPSHOT_ADD("snapshot", apple1_state, apple1, "snp", 0)
+	SNAPSHOT(config, "snapshot", "snp").set_load_callback(FUNC(apple1_state::snapshot_cb));
 
 	SOFTWARE_LIST(config, "cass_list").set_original("apple1");
 
 	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("4K,8K,12K,16K,20K,24K,28K,32K,36K,40K,44K");
-MACHINE_CONFIG_END
+}
 
 ROM_START(apple1)
 	ROM_REGION(0x100, A1_CPU_TAG, 0)

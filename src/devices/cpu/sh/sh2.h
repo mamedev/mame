@@ -60,30 +60,146 @@ public:
 
 	void set_is_slave(int slave) { m_is_slave = slave; }
 
-	template <typename Object> void set_dma_kludge_callback(Object &&cb) { m_dma_kludge_cb = std::forward<Object>(cb); }
-	template <class FunctionClass> void set_dma_kludge_callback(
-		int (FunctionClass::*callback)(uint32_t, uint32_t, uint32_t, int), const char *name)
-	{
-		set_dma_kludge_callback(dma_kludge_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_dma_kludge_callback(T &&... args) { m_dma_kludge_cb.set(std::forward<T>(args)...); }
 
-	template <typename Object> void set_dma_fifo_data_available_callback(Object &&cb) { m_dma_fifo_data_available_cb = std::forward<Object>(cb); }
-	template <class FunctionClass> void set_dma_fifo_data_available_callback(
-		int (FunctionClass::*callback)(uint32_t, uint32_t, uint32_t, int), const char *name)
-	{
-		set_dma_fifo_data_available_callback(dma_fifo_data_available_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_dma_fifo_data_available_callback(T &&... args) { m_dma_fifo_data_available_cb.set(std::forward<T>(args)...); }
 
-	template <typename Object> void set_ftcsr_read_callback(Object &&cb) { m_ftcsr_read_cb = std::forward<Object>(cb); }
-	template <class FunctionClass> void set_ftcsr_read_callback(void (FunctionClass::*callback)(uint32_t), const char *name)
-	{
-		set_ftcsr_read_callback(ftcsr_read_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_ftcsr_read_callback(T &&... args) { m_ftcsr_read_cb.set(std::forward<T>(args)...); }
 
-
-	DECLARE_WRITE32_MEMBER( sh7604_w );
-	DECLARE_READ32_MEMBER( sh7604_r );
 	DECLARE_READ32_MEMBER(sh2_internal_a5);
+
+	// SCI
+	DECLARE_READ8_MEMBER( smr_r );
+	DECLARE_WRITE8_MEMBER( smr_w );
+	DECLARE_READ8_MEMBER( brr_r );
+	DECLARE_WRITE8_MEMBER( brr_w );
+	DECLARE_READ8_MEMBER( scr_r );
+	DECLARE_WRITE8_MEMBER( scr_w );
+	DECLARE_READ8_MEMBER( tdr_r );
+	DECLARE_WRITE8_MEMBER( tdr_w );
+	DECLARE_READ8_MEMBER( ssr_r );
+	DECLARE_WRITE8_MEMBER( ssr_w );
+	DECLARE_READ8_MEMBER( rdr_r );
+
+	// FRT / FRC
+	DECLARE_READ8_MEMBER( tier_r );
+	DECLARE_WRITE8_MEMBER( tier_w );
+	DECLARE_READ16_MEMBER( frc_r );
+	DECLARE_WRITE16_MEMBER( frc_w );
+	DECLARE_READ8_MEMBER( ftcsr_r );
+	DECLARE_WRITE8_MEMBER( ftcsr_w );
+	DECLARE_READ16_MEMBER( ocra_b_r );
+	DECLARE_WRITE16_MEMBER( ocra_b_w );
+	DECLARE_READ8_MEMBER( frc_tcr_r );
+	DECLARE_WRITE8_MEMBER( frc_tcr_w );
+	DECLARE_READ8_MEMBER( tocr_r );
+	DECLARE_WRITE8_MEMBER( tocr_w );
+	DECLARE_READ16_MEMBER( frc_icr_r );
+
+	// INTC
+	DECLARE_READ16_MEMBER( ipra_r );
+	DECLARE_WRITE16_MEMBER( ipra_w );
+	DECLARE_READ16_MEMBER( iprb_r );
+	DECLARE_WRITE16_MEMBER( iprb_w );
+	DECLARE_READ16_MEMBER( vcra_r );
+	DECLARE_WRITE16_MEMBER( vcra_w );
+	DECLARE_READ16_MEMBER( vcrb_r );
+	DECLARE_WRITE16_MEMBER( vcrb_w );
+	DECLARE_READ16_MEMBER( vcrc_r );
+	DECLARE_WRITE16_MEMBER( vcrc_w );
+	DECLARE_READ16_MEMBER( vcrd_r );
+	DECLARE_WRITE16_MEMBER( vcrd_w );
+	DECLARE_READ16_MEMBER( vcrwdt_r );
+	DECLARE_WRITE16_MEMBER( vcrwdt_w );
+	DECLARE_READ32_MEMBER( vcrdiv_r );
+	DECLARE_WRITE32_MEMBER( vcrdiv_w );
+	DECLARE_READ16_MEMBER( intc_icr_r );
+	DECLARE_WRITE16_MEMBER( intc_icr_w );
+
+	// DIVU
+	DECLARE_READ32_MEMBER( dvsr_r );
+	DECLARE_WRITE32_MEMBER( dvsr_w );
+	DECLARE_READ32_MEMBER( dvdnt_r );
+	DECLARE_WRITE32_MEMBER( dvdnt_w );
+	DECLARE_READ32_MEMBER( dvdnth_r );
+	DECLARE_WRITE32_MEMBER( dvdnth_w );
+	DECLARE_READ32_MEMBER( dvdntl_r );
+	DECLARE_WRITE32_MEMBER( dvdntl_w );
+
+	DECLARE_READ32_MEMBER( dvcr_r );
+	DECLARE_WRITE32_MEMBER( dvcr_w );
+
+	// DMAC
+	template <int Channel> READ32_MEMBER(vcrdma_r)
+	{
+		return m_vcrdma[Channel] & 0x7f;
+	}
+
+	template <int Channel> WRITE32_MEMBER(vcrdma_w)
+	{
+		COMBINE_DATA(&m_vcrdma[Channel]);
+		m_irq_vector.dmac[Channel] = m_vcrdma[Channel] & 0x7f;
+		sh2_recalc_irq();
+	}
+
+	template <int Channel> READ8_MEMBER(drcr_r) { return m_dmac[Channel].drcr & 3; }
+	template <int Channel> WRITE8_MEMBER(drcr_w) { m_dmac[Channel].drcr = data & 3; sh2_recalc_irq(); }
+	template <int Channel> READ32_MEMBER(sar_r) { return m_dmac[Channel].sar; }
+	template <int Channel> WRITE32_MEMBER(sar_w) { COMBINE_DATA(&m_dmac[Channel].sar); }
+	template <int Channel> READ32_MEMBER(dar_r) { return m_dmac[Channel].dar; }
+	template <int Channel> WRITE32_MEMBER(dar_w) { COMBINE_DATA(&m_dmac[Channel].dar); }
+	template <int Channel> READ32_MEMBER(dmac_tcr_r) { return m_dmac[Channel].tcr; }
+	template <int Channel> WRITE32_MEMBER(dmac_tcr_w) { COMBINE_DATA(&m_dmac[Channel].tcr); m_dmac[Channel].tcr &= 0xffffff; }
+	template <int Channel> READ32_MEMBER(chcr_r) { return m_dmac[Channel].chcr; }
+	template <int Channel> WRITE32_MEMBER(chcr_w)
+	{
+		uint32_t old;
+		old = m_dmac[Channel].chcr;
+		COMBINE_DATA(&m_dmac[Channel].chcr);
+		m_dmac[Channel].chcr = (data & ~2) | (old & m_dmac[Channel].chcr & 2);
+		sh2_dmac_check(Channel);
+	}
+	READ32_MEMBER( dmaor_r ) { return m_dmaor & 0xf; }
+	WRITE32_MEMBER( dmaor_w )
+	{
+		if(ACCESSING_BITS_0_7)
+		{
+			uint8_t old;
+			old = m_dmaor & 0xf;
+			m_dmaor = (data & ~6) | (old & m_dmaor & 6);
+			sh2_dmac_check(0);
+			sh2_dmac_check(1);
+		}
+	}
+
+	// WTC
+	DECLARE_READ16_MEMBER( wtcnt_r );
+	DECLARE_WRITE16_MEMBER( wtcnt_w );
+	DECLARE_READ16_MEMBER( rstcsr_r );
+	DECLARE_WRITE16_MEMBER( rstcsr_w );
+
+	// misc
+	DECLARE_READ16_MEMBER( fmr_sbycr_r );
+	DECLARE_WRITE16_MEMBER( fmr_sbycr_w );
+	DECLARE_READ8_MEMBER( ccr_r );
+	DECLARE_WRITE8_MEMBER( ccr_w );
+
+	// BSC
+	DECLARE_READ32_MEMBER( bcr1_r );
+	DECLARE_WRITE32_MEMBER( bcr1_w );
+	DECLARE_READ32_MEMBER( bcr2_r );
+	DECLARE_WRITE32_MEMBER( bcr2_w );
+	DECLARE_READ32_MEMBER( wcr_r );
+	DECLARE_WRITE32_MEMBER( wcr_w );
+	DECLARE_READ32_MEMBER( mcr_r );
+	DECLARE_WRITE32_MEMBER( mcr_w );
+	DECLARE_READ32_MEMBER( rtcsr_r );
+	DECLARE_WRITE32_MEMBER( rtcsr_w );
+	DECLARE_READ32_MEMBER( rtcor_r );
+	DECLARE_WRITE32_MEMBER( rtcor_w );
+	DECLARE_READ32_MEMBER( rtcnt_r );
+	DECLARE_WRITE32_MEMBER( rtcnt_w );
+
 
 	virtual void set_frt_input(int state) override;
 	void sh2_notify_dma_data_available();
@@ -99,11 +215,11 @@ protected:
 	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 4; }
-	virtual uint32_t execute_input_lines() const override { return 16; }
-	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 4; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 16; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -122,45 +238,91 @@ protected:
 private:
 	address_space_config m_program_config, m_decrypted_program_config;
 
-	uint32_t  m_cpu_off;
-	uint32_t  m_test_irq;
+	uint32_t  m_cpu_off = 0;
+	uint32_t  m_test_irq = 0;
 
 	int8_t    m_irq_line_state[17];
 
 	address_space *m_internal;
-	uint32_t m_m[0x200/4];
-	int8_t  m_nmi_line_state;
+	// SCI
+	uint8_t m_smr = 0, m_brr = 0, m_scr = 0, m_tdr = 0, m_ssr = 0;
+	// FRT / FRC
+	uint8_t m_tier = 0, m_ftcsr = 0, m_frc_tcr = 0, m_tocr = 0;
+	uint16_t m_frc = 0;
+	uint16_t m_ocra = 0, m_ocrb = 0, m_frc_icr = 0;
+	// INTC
+	struct {
+		uint8_t frc = 0;
+		uint8_t sci = 0;
+		uint8_t divu = 0;
+		uint8_t dmac = 0;
+		uint8_t wdt = 0;
+	} m_irq_level;
+	struct {
+		uint8_t fic = 0;
+		uint8_t foc = 0;
+		uint8_t fov = 0;
+		uint8_t divu = 0;
+		uint8_t dmac[2] = { 0, 0 };
+	} m_irq_vector;
+	uint16_t m_ipra = 0, m_iprb = 0;
+	uint16_t m_vcra = 0, m_vcrb = 0, m_vcrc = 0, m_vcrd = 0, m_vcrwdt = 0, m_vcrdiv = 0, m_intc_icr = 0, m_vcrdma[2] = { 0, 0, };
+	bool m_vecmd = false, m_nmie = false;
 
-	uint16_t  m_frc;
-	uint16_t  m_ocra, m_ocrb, m_icr;
-	uint64_t  m_frc_base;
+	// DIVU
+	bool m_divu_ovf = false, m_divu_ovfie = false;
+	uint32_t m_dvsr = 0, m_dvdntl = 0, m_dvdnth = 0;
 
-	int     m_frt_input;
-	int     m_internal_irq_vector;
+	// WTC
+	uint8_t m_wtcnt = 0, m_wtcsr = 0;
+	uint8_t m_rstcsr = 0;
+	uint16_t m_wtcw[2] = { 0, 0 };
 
-	emu_timer *m_timer;
-	emu_timer *m_dma_current_active_timer[2];
-	int     m_dma_timer_active[2];
-	uint8_t  m_dma_irq[2];
+	// DMAC
+	struct {
+		uint8_t drcr = 0;
+		uint32_t sar = 0;
+		uint32_t dar = 0;
+		uint32_t tcr = 0;
+		uint32_t chcr = 0;
+	} m_dmac[2];
+	uint8_t m_dmaor = 0;
 
-	int m_active_dma_incs[2];
-	int m_active_dma_incd[2];
-	int m_active_dma_size[2];
-	int m_active_dma_steal[2];
-	uint32_t m_active_dma_src[2];
-	uint32_t m_active_dma_dst[2];
-	uint32_t m_active_dma_count[2];
-	uint16_t m_wtcnt;
-	uint8_t m_wtcsr;
+	// misc
+	uint8_t m_sbycr = 0, m_ccr = 0;
 
-	int     m_is_slave;
+	// BSC
+	uint32_t m_bcr1 = 0, m_bcr2 = 0, m_wcr = 0, m_mcr = 0, m_rtcsr = 0, m_rtcor = 0, m_rtcnt = 0;
+
+	int8_t  m_nmi_line_state = 0;
+
+	uint64_t  m_frc_base = 0;
+
+	int     m_frt_input = 0;
+	int     m_internal_irq_vector = 0;
+
+	emu_timer *m_timer = nullptr;
+	emu_timer *m_wdtimer = nullptr;
+	emu_timer *m_dma_current_active_timer[2] { nullptr, nullptr };
+	int     m_dma_timer_active[2] = { 0, 0 };
+	uint8_t  m_dma_irq[2] = { 0, 0 };
+
+	int m_active_dma_incs[2] = { 0, 0 };
+	int m_active_dma_incd[2] = { 0, 0 };
+	int m_active_dma_size[2] = { 0, 0 };
+	int m_active_dma_steal[2] = { 0, 0 };
+	uint32_t m_active_dma_src[2] = { 0, 0 };
+	uint32_t m_active_dma_dst[2] = { 0, 0 };
+	uint32_t m_active_dma_count[2] = { 0, 0 };
+
+	int     m_is_slave = 0;
 	dma_kludge_delegate              m_dma_kludge_cb;
 	dma_fifo_data_available_delegate m_dma_fifo_data_available_cb;
 	ftcsr_read_delegate              m_ftcsr_read_cb;
 
 	std::unique_ptr<sh2_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
 
-	uint32_t m_debugger_temp;
+	uint32_t m_debugger_temp = 0;
 
 	virtual uint8_t RB(offs_t A) override;
 	virtual uint16_t RW(offs_t A) override;
@@ -178,10 +340,13 @@ private:
 	virtual void execute_one_f000(uint16_t opcode) override;
 
 	TIMER_CALLBACK_MEMBER( sh2_timer_callback );
+	TIMER_CALLBACK_MEMBER( sh2_wdtimer_callback );
 	TIMER_CALLBACK_MEMBER( sh2_dma_current_active_callback );
 	void sh2_timer_resync();
 	void sh2_timer_activate();
-	void sh2_do_dma(int dma);
+	void sh2_wtcnt_recalc();
+	void sh2_wdt_activate();
+	void sh2_do_dma(int dmach);
 	virtual void sh2_exception(const char *message, int irqline) override;
 	void sh2_dmac_check(int dma);
 	void sh2_recalc_irq();
@@ -220,12 +385,12 @@ private:
 	uint16_t m_sh7021_regs[0x200];
 	struct
 	{
-		uint32_t              sar;    /**< Source Address Register */
-		uint32_t              dar;    /**< Destination Address Register */
-		uint16_t              tcr;    /**< Transfer Count Register */
-		uint16_t              chcr;   /**< Channel Control Register */
+		uint32_t              sar = 0;    /**< Source Address Register */
+		uint32_t              dar = 0;    /**< Destination Address Register */
+		uint16_t              tcr = 0;    /**< Transfer Count Register */
+		uint16_t              chcr = 0;   /**< Channel Control Register */
 	} m_dma[4];
-	uint16_t m_dmaor;                 /**< DMA Operation Register (status flags) */
+	uint16_t m_dmaor = 0;                 /**< DMA Operation Register (status flags) */
 
 };
 

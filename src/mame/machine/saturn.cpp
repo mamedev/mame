@@ -256,9 +256,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_slave_scanline )
 	y_step = get_ystep_count();
 
 	if(scanline == vblank_line*y_step)
-		m_slave->set_input_line_and_vector(0x6, HOLD_LINE, 0x43);
+		m_slave->set_input_line_and_vector(0x6, HOLD_LINE, 0x43); // SH2
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
-		m_slave->set_input_line_and_vector(0x2, HOLD_LINE, 0x41);
+		m_slave->set_input_line_and_vector(0x2, HOLD_LINE, 0x41); // SH2
 }
 
 static const gfx_layout tiles8x8x4_layout =

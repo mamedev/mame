@@ -9,12 +9,13 @@
 
     TODO:
     - discrete sound
-    - imperfect colors: unused bit 2 of color prom, guesswokred sea gradient, mg16 entirely unused.
+    - imperfect colors: unused bit 2 of color prom, guessworked sea gradient, mg16 entirely unused.
       also unused colors 0x10-0x1f (might be a flashing bank)
     - collision detection isn't perfect, sometimes octopus gets stuck and dies even if moves are still available.
       HW collision detection isn't perfect even from the reference, presumably needs a trojan run on the real HW.
     - ROM writes (irq mask?)
     - Merge devices with crbaloon/bking/grchamp drivers (PC3259).
+    - Currently defaults to cocktail instead of upright. When upright chosen, screen is upside down. (MT 07311)
 
 *****************************************************************************************************************
 
@@ -105,6 +106,7 @@ Lower PCB is plugged in with components facing up.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #define MAIN_CLOCK XTAL(9'987'000)
 
@@ -211,7 +213,7 @@ void marinedt_state::init_seabitmap()
 
 void marinedt_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(marinedt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(marinedt_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_tilemap->set_transparent_pen(0);
 
@@ -626,19 +628,19 @@ void marinedt_state::marinedt_palette(palette_device &palette) const
 	}
 }
 
-MACHINE_CONFIG_START(marinedt_state::marinedt)
-
+void marinedt_state::marinedt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,MAIN_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(marinedt_map)
-	MCFG_DEVICE_IO_MAP(marinedt_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", marinedt_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MAIN_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &marinedt_state::marinedt_map);
+	m_maincpu->set_addrmap(AS_IO, &marinedt_state::marinedt_io);
+	m_maincpu->set_vblank_int("screen", FUNC(marinedt_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(marinedt_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 328, 0, 256, 263, 32, 256) // template to get ~60 fps
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(marinedt_state::screen_update));
+	m_screen->set_raw(MAIN_CLOCK/2, 328, 0, 256, 263, 32, 256); // template to get ~60 fps
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_marinedt);
 
@@ -647,7 +649,7 @@ MACHINE_CONFIG_START(marinedt_state::marinedt)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	//AY8910(config, "aysnd", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

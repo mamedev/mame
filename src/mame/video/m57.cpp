@@ -138,7 +138,7 @@ WRITE8_MEMBER(m57_state::m57_videoram_w)
 
 void m57_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m57_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m57_state::get_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_rows(256);
 
 	save_item(NAME(m_flipscreen));

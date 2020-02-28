@@ -96,11 +96,13 @@
         skullfng - slowdowns not verified from real PCB, Random hangs sometimes
 
     Graphic TODO:
-        blending, raster effect features isn't fully emulated currently
-        Not verified : Can sprites effect 8bpp and alpha blending simultaneously?
+        blending, raster effect features isn't fully emulated, verified currently
+        Not verified : Can sprites effect 8bpp and shadowing simultaneously?
         Not verified what palette highest bits actually doing
 
     Driver by Bryan McPhail, bmcphail@tendril.co.uk, thank you to Avedis and The Guru.
+
+    Note: MLC stands for MotherLess Cassette
 
 ***************************************************************************/
 
@@ -141,7 +143,8 @@ WRITE32_MEMBER(deco_mlc_state::mlc_44001c_w)
 
 READ32_MEMBER(deco_mlc_state::mlc_200070_r)
 {
-	m_vbl_i ^=0xffffffff;
+	if (!machine().side_effects_disabled())
+		m_vbl_i ^= 0xffffffff;
 //logerror("vbl r %08x\n", m_maincpu->pc());
 	// Todo: Vblank probably in $10
 	return m_vbl_i;
@@ -171,15 +174,18 @@ READ32_MEMBER(deco_mlc_state::mlc_scanline_r)
 
 WRITE32_MEMBER(deco_mlc_state::eeprom_w)
 {
-	if (ACCESSING_BITS_8_15) {
-		uint8_t ebyte=(data>>8)&0xff;
-//      if (ebyte&0x80) {
+	if (ACCESSING_BITS_8_15)
+	{
+		const u8 ebyte = (data >> 8) & 0xff;
+//      if (ebyte & 0x80)
+//      {
 			m_eeprom->clk_write((ebyte & 0x2) ? ASSERT_LINE : CLEAR_LINE);
 			m_eeprom->di_write(ebyte & 0x1);
 			m_eeprom->cs_write((ebyte & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 //      }
 	}
-	else if (ACCESSING_BITS_0_7) {
+	else if (ACCESSING_BITS_0_7)
+	{
 		/* Master volume control (TODO: probably logaritmic) */
 		m_ymz->set_output_gain(0, (255.0 - data) / 255.0);
 		m_ymz->set_output_gain(1, (255.0 - data) / 255.0);
@@ -222,30 +228,30 @@ WRITE32_MEMBER(deco_mlc_state::irq_ram_w)
 	Word 3 : Unknown(Always 0)
 	*/
 
-	switch (offset*4)
+	switch (offset * 4)
 	{
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
 		m_maincpu->set_input_line(m_irqLevel, CLEAR_LINE);
 		return;
 	case 0x14: /* Prepare scanline interrupt */
-		if(m_irq_ram[0x14/4] == -1) // TODO: likely to be anything that doesn't fit into the screen v-pos range.
+		if(m_irq_ram[0x14 / 4] == -1) // TODO: likely to be anything that doesn't fit into the screen v-pos range.
 			m_raster_irq_timer->adjust(attotime::never);
 		else
-			m_raster_irq_timer->adjust(m_screen->time_until_pos(m_irq_ram[0x14/4]));
-		//logerror("prepare scanline to fire at %d (currently on %d)\n", m_irq_ram[0x14/4], m_screen->vpos());
+			m_raster_irq_timer->adjust(m_screen->time_until_pos(m_irq_ram[0x14 / 4]));
+		//logerror("prepare scanline to fire at %d (currently on %d)\n", m_irq_ram[0x14 / 4], m_screen->vpos());
 		return;
 
 	default:
 		break;
 	};
 
-//  logerror("irqw %04x %04x (%d)\n", offset * 4, data&0xffff, scanline);
+//  logerror("irqw %04x %04x (%d)\n", offset * 4, data & 0xffff, scanline);
 }
 
 
 READ32_MEMBER( deco_mlc_state::spriteram_r )
 {
-	uint32_t retdata = 0;
+	u32 retdata = 0;
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -278,8 +284,8 @@ READ16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
-	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	u8 cs = 0;
+	u16 data = m_deco146->read_data( deco146_addr, cs );
 	return data;
 }
 
@@ -287,8 +293,8 @@ WRITE16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
-	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
+	u8 cs = 0;
+	m_deco146->write_data( deco146_addr, data, mem_mask, cs );
 }
 
 
@@ -507,24 +513,24 @@ void deco_mlc_state::machine_reset()
 	m_vbl_i = 0xffffffff;
 }
 
-MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
-
+void deco_mlc_state::avengrgs(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, SH2, 42000000/2) /* 21 MHz clock confirmed on real board */
-	MCFG_DEVICE_PROGRAM_MAP(avengrgs_map)
+	SH2(config, m_maincpu, 42000000/2); /* 21 MHz clock confirmed on real board */
+	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::avengrgs_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom); /* Actually 93c45 */
 
 	TIMER(config, m_raster_irq_timer).configure_generic(FUNC(deco_mlc_state::interrupt_gen));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, deco_mlc_state, screen_vblank_mlc))
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58);
+	m_screen->set_size(40*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(deco_mlc_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(deco_mlc_state::screen_vblank_mlc));
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_deco_mlc);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
@@ -534,29 +540,29 @@ MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD(m_ymz, YMZ280B, 42000000 / 3)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	YMZ280B(config, m_ymz, 42000000 / 3);
+	m_ymz->add_route(0, "lspeaker", 1.0);
+	m_ymz->add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(deco_mlc_state::mlc)
-
+void deco_mlc_state::mlc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
-	MCFG_DEVICE_PROGRAM_MAP(decomlc_map)
+	ARM(config, m_maincpu, 42000000/6); /* 42 MHz -> 7MHz clock confirmed on real board */
+	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom); /* Actually 93c45 */
 
 	TIMER(config, m_raster_irq_timer).configure_generic(FUNC(deco_mlc_state::interrupt_gen));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, deco_mlc_state, screen_vblank_mlc))
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58);
+	m_screen->set_size(40*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(deco_mlc_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(deco_mlc_state::screen_vblank_mlc));
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_deco_mlc);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
@@ -569,10 +575,10 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD(m_ymz, YMZ280B, 42000000 / 3)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	YMZ280B(config, m_ymz, 42000000 / 3);
+	m_ymz->add_route(0, "lspeaker", 1.0);
+	m_ymz->add_route(1, "rspeaker", 1.0);
+}
 
 void deco_mlc_state::mlc_6bpp(machine_config &config)
 {
@@ -581,16 +587,16 @@ void deco_mlc_state::mlc_6bpp(machine_config &config)
 	m_gfxdecode->set_info(gfx_6bpp);
 }
 
-MACHINE_CONFIG_START(deco_mlc_state::mlc_5bpp)
+void deco_mlc_state::mlc_5bpp(machine_config &config)
+{
 	mlc(config);
 
 	m_gfxdecode->set_info(gfx_5bpp);
 
 	// TODO: mono? ch.0 doesn't output any sound in-game
-	MCFG_DEVICE_MODIFY("ymz")
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	m_ymz->add_route(1, "lspeaker", 1.0);
+	m_ymz->add_route(0, "rspeaker", 1.0);
+}
 
 /***************************************************************************/
 
@@ -912,35 +918,32 @@ ROM_END
 void deco_mlc_state::descramble_sound(  )
 {
 	/* the same as simpl156 / heavy smash? */
-	uint8_t *rom = memregion("ymz")->base();
+	u8 *rom = memregion("ymz")->base();
 	int length = memregion("ymz")->bytes();
-	std::vector<uint8_t> buf(length);
+	std::vector<u8> buf(length);
 
-	uint32_t x;
-
-	for (x=0;x<length;x++)
+	for (u32 x = 0; x < length; x++)
 	{
-		uint32_t addr;
-
-		addr = bitswap<24> (x,23,22,21,0, 20,
-							19,18,17,16,
-							15,14,13,12,
-							11,10,9, 8,
-							7, 6, 5, 4,
-							3, 2, 1 );
+		const u32 addr = bitswap<24>(x,
+				23,22,21, 0,20,
+				19,18,17,16,
+				15,14,13,12,
+				11,10, 9, 8,
+				 7, 6, 5, 4,
+				 3, 2, 1);
 
 		buf[addr] = rom[x];
 	}
 
-	std::copy(buf.begin(),buf.end(),&rom[0]);
+	std::copy(buf.begin(), buf.end(), &rom[0]);
 }
 
 READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
 {
-	uint32_t a=m_mainram[0x89a0/4];
-	uint32_t p=m_maincpu->pc();
+	const u32 a = m_mainram[0x89a0 / 4];
+	const u32 p = m_maincpu->pc();
 
-	if ((p==0x3234 || p==0x32dc) && (a&1)) m_maincpu->spin_until_interrupt();
+	if ((p == 0x3234 || p == 0x32dc) && (a & 1)) m_maincpu->spin_until_interrupt();
 
 	return a;
 }
@@ -955,12 +958,12 @@ void deco_mlc_state::init_avengrgs()
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_pcflush(0x32dc);
 
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0100000, 0x01088ff, 0, &m_mainram[0]);
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0108a00, 0x011ffff, 0, &m_mainram[0x8a00/4]);
+	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0108a00, 0x011ffff, 0, &m_mainram[0x8a00 / 4]);
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0200080, 0x02000ff, 0, &m_clip_ram[0]);
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0280000, 0x029ffff, 0, &m_vram[0]);
 
 	m_irqLevel = 1;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32_delegate(FUNC(deco_mlc_state::avengrgs_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32_delegate(*this, FUNC(deco_mlc_state::avengrgs_speedup_r)));
 	descramble_sound();
 }
 

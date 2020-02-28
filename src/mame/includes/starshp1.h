@@ -33,6 +33,7 @@
 #include "sound/discrete.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 #define STARSHP1_MASTER_CLOCK       (12096000)

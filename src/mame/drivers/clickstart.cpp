@@ -4,8 +4,9 @@
 
     Leapfrog Clickstart Emulation
 
-        die markings show
-        "SunPlus QL8041C" ( known as Sunplus SPG2?? )
+        Die markings show "SunPlus QL8041C" ( known as Sunplus SPG2?? )
+    The keyboard has a "SunPlus PU6583" MCU under a glob, and the
+     mouse optical sensor is a N2163, probably from Agilent.
 
     Status:
 
@@ -42,14 +43,15 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_spg(*this, "spg")
 		, m_cart(*this, "cartslot")
 		, m_system_region(*this, "maincpu")
 		, m_io_mouse_x(*this, "MOUSEX")
 		, m_io_mouse_y(*this, "MOUSEY")
+		, m_keys(*this, "KEYS%u", 0U)
 		, m_cart_region(nullptr)
 		, m_mouse_x(0)
 		, m_mouse_y(0)
+		, m_mouse_button(0)
 		, m_mouse_dx(0)
 		, m_mouse_dy(0)
 		, m_uart_tx_fifo_start(0)
@@ -74,7 +76,7 @@ private:
 
 	void mem_map(address_map &map);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	DECLARE_READ16_MEMBER(rom_r);
 
@@ -92,21 +94,22 @@ private:
 
 	void update_mouse_buffer();
 
-	required_device<cpu_device> m_maincpu;
+	required_device<spg2xx_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<spg2xx_device> m_spg;
 	required_device<generic_slot_device> m_cart;
 	required_memory_region m_system_region;
 	required_ioport m_io_mouse_x;
 	required_ioport m_io_mouse_y;
+	required_ioport_array<3> m_keys;
 	memory_region *m_cart_region;
 
 	uint16_t m_mouse_x;
 	uint16_t m_mouse_y;
+	uint8_t m_mouse_button;
 	int16_t m_mouse_dx;
 	int16_t m_mouse_dy;
 
-	uint8_t m_uart_tx_fifo[32]; // arbitrary size
+	uint8_t m_uart_tx_fifo[1024]; // arbitrary size
 	uint8_t m_uart_tx_fifo_start;
 	uint8_t m_uart_tx_fifo_end;
 	uint8_t m_uart_tx_fifo_count;
@@ -126,6 +129,7 @@ void clickstart_state::machine_start()
 
 	save_item(NAME(m_mouse_x));
 	save_item(NAME(m_mouse_y));
+	save_item(NAME(m_mouse_button));
 	save_item(NAME(m_mouse_dx));
 	save_item(NAME(m_mouse_dy));
 
@@ -142,8 +146,9 @@ void clickstart_state::machine_start()
 
 void clickstart_state::machine_reset()
 {
-	m_mouse_x = 0xffff;
-	m_mouse_y = 0xffff;
+	m_mouse_x = m_io_mouse_x->read();
+	m_mouse_y = m_io_mouse_y->read();
+	m_mouse_button = 0;
 	m_mouse_dx = 0;
 	m_mouse_dy = 0;
 
@@ -156,7 +161,7 @@ void clickstart_state::machine_reset()
 	m_unk_portc_toggle = 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(clickstart_state, cart)
+DEVICE_IMAGE_LOAD_MEMBER(clickstart_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -179,7 +184,7 @@ void clickstart_state::handle_uart_tx()
 	if (m_uart_tx_fifo_count == 0)
 		return;
 
-	m_spg->uart_rx(m_uart_tx_fifo[m_uart_tx_fifo_start]);
+	m_maincpu->uart_rx(m_uart_tx_fifo[m_uart_tx_fifo_start]);
 	m_uart_tx_fifo_start = (m_uart_tx_fifo_start + 1) % ARRAY_LENGTH(m_uart_tx_fifo);
 	m_uart_tx_fifo_count--;
 }
@@ -198,19 +203,21 @@ void clickstart_state::uart_tx_fifo_push(uint8_t value)
 
 INPUT_CHANGED_MEMBER(clickstart_state::key_update)
 {
-	const size_t keycode = reinterpret_cast<size_t>(param);
+	const size_t keycode = static_cast<size_t>(param);
+
 	printf("keycode:%02x, oldval:%02x, newval:%02x\n", (uint8_t)keycode, oldval, newval);
 
-	uint8_t buffer[5] = {};
-	buffer[0] = 0x01;
-	buffer[1] = newval ? keycode : 0x3f;
-	buffer[2] = 0x3f;
-	buffer[3] = 0x01;
+	uint8_t buffer[6] = {};
+	buffer[0] = 0x00;
+	buffer[1] = 0x01;
+	buffer[2] = newval ? keycode : 0x3f;
+	buffer[3] = 0x2f;
 	buffer[4] = 0x01;
+	buffer[5] = 0x01;
 
 	printf("Keyboard queueing: ");
 	uint16_t sum = 0;
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 6; i++)
 	{
 		uart_tx_fifo_push(buffer[i] ^ 0xff);
 		sum += buffer[i];
@@ -223,32 +230,38 @@ INPUT_CHANGED_MEMBER(clickstart_state::key_update)
 
 INPUT_CHANGED_MEMBER(clickstart_state::mouse_update)
 {
-	uint16_t x = m_io_mouse_x->read();
-	uint16_t y = m_io_mouse_y->read();
-	uint16_t old_mouse_x = m_mouse_x;
-	uint16_t old_mouse_y = m_mouse_y;
+	m_mouse_button = newval ? (uint8_t)static_cast<size_t>(param) : 0;
 
-	if (m_mouse_x == 0xffff)
-	{
-		old_mouse_x = x;
-		old_mouse_y = y;
-	}
+	const uint16_t x_val(m_io_mouse_x->read());
+	const uint16_t y_val(m_io_mouse_y->read());
+	int16_t x_delta(x_val - m_mouse_x);
+	int16_t y_delta(y_val - m_mouse_y);
 
-	m_mouse_x = x;
-	m_mouse_y = y;
+	// deal with wraparound
+	if (0x0200 <= x_delta)
+		x_delta -= 0x400;
+	else if (-0x0200 >= x_delta)
+		x_delta += 0x400;
+	if (0x100 <= y_delta)
+		y_delta -= 0x200;
+	else if (-0x100 >= y_delta)
+		x_delta += 0x200;
 
-	m_mouse_dx += (m_mouse_x - old_mouse_x);
-	m_mouse_dy += (m_mouse_y - old_mouse_y);
+	m_mouse_x = x_val;
+	m_mouse_y = y_val;
 
-	if (m_mouse_dx < -63)
-		m_mouse_dx = -63;
-	else if (m_mouse_dx > 62)
-		m_mouse_dx = 62;
+	m_mouse_dx = x_delta;
+	m_mouse_dy = -y_delta;
 
-	if (m_mouse_dy < -63)
-		m_mouse_dy = -63;
-	else if (m_mouse_dy > 62)
-		m_mouse_dy = 62;
+	if (m_mouse_dx < -255)
+		m_mouse_dx = -255;
+	else if (m_mouse_dx > 255)
+		m_mouse_dx = 255;
+
+	if (m_mouse_dy < -255)
+		m_mouse_dy = -255;
+	else if (m_mouse_dy > 255)
+		m_mouse_dy = 255;
 
 	update_mouse_buffer();
 
@@ -258,27 +271,22 @@ INPUT_CHANGED_MEMBER(clickstart_state::mouse_update)
 
 void clickstart_state::update_mouse_buffer()
 {
-	if (m_mouse_dx == 0 && m_mouse_dy == 0)
-		return;
+	uint8_t buffer[6] = {};
+	buffer[0] = 0x00;
+	buffer[1] = 0x01 | m_mouse_button;
+	buffer[2] = 0x3e | ((m_mouse_dx >> 1) & 0x80);
+	buffer[3] = 0x3f | ((m_mouse_dy >> 1) & 0x80);
+	buffer[4] = (m_mouse_dx & 0xfe) + 1;
+	buffer[5] = (m_mouse_dy & 0xfe) + 1;
 
-	uint8_t buffer[5] = {};
-	buffer[0] = 0x01;
-	buffer[1] = 0x3f;
-	buffer[2] = 0x3f;
-	buffer[3] = (m_mouse_dx + 1) & 0x3f;
-	buffer[4] = (m_mouse_dy + 1) & 0x3f;
-
-	printf("Mouse queueing: ");
 	uint16_t sum = 0;
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 6; i++)
 	{
 		uart_tx_fifo_push(buffer[i] ^ 0xff);
 		sum += buffer[i];
-		printf("%02x/%02x ", buffer[i], buffer[i] ^ 0xff);
 	}
 	sum = (sum & 0xff) ^ 0xff;
 	uart_tx_fifo_push((uint8_t)sum);
-	printf("%02x\n", (uint8_t)sum);
 }
 
 READ16_MEMBER(clickstart_state::rom_r)
@@ -303,24 +311,26 @@ WRITE16_MEMBER(clickstart_state::porta_w)
 
 WRITE16_MEMBER(clickstart_state::portb_w)
 {
-	logerror("%s: portb_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
+	//logerror("%s: portb_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 }
 
 WRITE16_MEMBER(clickstart_state::portc_w)
 {
+	// Bit 12: SCK from SPG SIO
+	// Bit 11: SDA from SPG SIO
 	//logerror("%s: portc_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 }
 
 READ16_MEMBER(clickstart_state::porta_r)
 {
 	uint16_t data = 0x4000;
-	//logerror("%s: porta_r: %04x & %04x\n", machine().describe_context(), data, mem_mask);
+	logerror("%s: porta_r: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
 
 READ16_MEMBER(clickstart_state::portb_r)
 {
-	logerror("%s: portb_r: %04x\n", machine().describe_context(), mem_mask);
+	//logerror("%s: portb_r: %04x\n", machine().describe_context(), mem_mask);
 	return 0;
 }
 
@@ -340,15 +350,18 @@ WRITE8_MEMBER(clickstart_state::chip_sel_w)
 void clickstart_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).r(FUNC(clickstart_state::rom_r));
-	map(0x000000, 0x003fff).m(m_spg, FUNC(spg2xx_device::map));
 }
 
 static INPUT_PORTS_START( clickstart )
 	PORT_START("MOUSEX")
-	PORT_BIT(0x3e, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, mouse_update, 0)
+	PORT_BIT(0x3ff, 0x00, IPT_MOUSE_X) PORT_MINMAX(0x0000,0x03ff) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, mouse_update, 0)
 
 	PORT_START("MOUSEY")
-	PORT_BIT(0x3e, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, mouse_update, 0)
+	PORT_BIT(0x1ff, 0x00, IPT_MOUSE_Y) PORT_MINMAX(0x0000,0x01ff) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, mouse_update, 0)
+
+	PORT_START("MOUSEBTN")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, mouse_update, 0x10)
+	PORT_BIT(0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("KEYS0")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x01) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
@@ -379,55 +392,55 @@ static INPUT_PORTS_START( clickstart )
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x18) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('x')
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x19) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('y')
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x1a) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('z')
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x1b) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x1c) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x1d) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x1e) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x1f) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x20) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x25) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x26) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x28) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x29) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x2a) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x2b) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
 
 	PORT_START("KEYS2")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x21) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x22) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x23) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x2d) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x2e) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x2f) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x24) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x27) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0xa9) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("Shift")
-	PORT_BIT(0xffc0, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x2c) PORT_CODE(KEYCODE_LALT) PORT_NAME("Music")
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0xa9) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("Shift") PORT_TOGGLE
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x2f) PORT_CODE(KEYCODE_TILDE) PORT_NAME("Pause") PORT_TOGGLE
+	PORT_BIT(0xff00, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-// There is a SEEPROM on the motherboard (type?)
+// There is a 24C08AN SEEPROM on the motherboard
 
 void clickstart_state::clickstart(machine_config &config)
 {
-	UNSP(config, m_maincpu, XTAL(27'000'000));
+	SPG28X(config, m_maincpu, XTAL(27'000'000), m_screen);
 	m_maincpu->set_addrmap(AS_PROGRAM, &clickstart_state::mem_map);
+	m_maincpu->porta_out().set(FUNC(clickstart_state::porta_w));
+	m_maincpu->portb_out().set(FUNC(clickstart_state::portb_w));
+	m_maincpu->portc_out().set(FUNC(clickstart_state::portc_w));
+	m_maincpu->porta_in().set(FUNC(clickstart_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(clickstart_state::portb_r));
+	m_maincpu->portc_in().set(FUNC(clickstart_state::portc_r));
+	m_maincpu->adc_in<0>().set_constant(0x0fff);
+	m_maincpu->chip_select().set(FUNC(clickstart_state::chip_sel_w));
+	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
-	m_screen->set_screen_update("spg", FUNC(spg2xx_device::screen_update));
-	m_screen->screen_vblank().set(m_spg, FUNC(spg2xx_device::vblank));
+	m_screen->set_screen_update("maincpu", FUNC(spg2xx_device::screen_update));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(spg2xx_device::vblank));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	SPG28X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
-	m_spg->porta_out().set(FUNC(clickstart_state::porta_w));
-	m_spg->portb_out().set(FUNC(clickstart_state::portb_w));
-	m_spg->portc_out().set(FUNC(clickstart_state::portc_w));
-	m_spg->porta_in().set(FUNC(clickstart_state::porta_r));
-	m_spg->portb_in().set(FUNC(clickstart_state::portb_r));
-	m_spg->portc_in().set(FUNC(clickstart_state::portc_r));
-	m_spg->adc_in<0>().set_constant(0x0fff);
-	m_spg->chip_select().set(FUNC(clickstart_state::chip_sel_w));
-	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "clickstart_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&clickstart_state::device_image_load_cart, this));
+	m_cart->set_device_load(FUNC(clickstart_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("clickstart_cart");
 }

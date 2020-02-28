@@ -43,7 +43,7 @@ void hyhoo_state::hyhoo_map(address_map &map)
 void hyhoo_state::hyhoo_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
+//  map(0x00, 0x00).w(m_nb1413m3, FUNC(nb1413m3_device::nmi_clock_w));
 	map(0x00, 0x7f).r(m_nb1413m3, FUNC(nb1413m3_device::sndrom_r));
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
@@ -56,13 +56,8 @@ void hyhoo_state::hyhoo_io_map(address_map &map)
 	map(0xe0, 0xe0).w(FUNC(hyhoo_state::hyhoo_romsel_w));
 	map(0xe0, 0xe1).r(m_nb1413m3, FUNC(nb1413m3_device::gfxrom_r));
 	map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
-//  AM_RANGE(0xf0, 0xf0) AM_WRITENOP
+//  map(0xf0, 0xf0).nopw();
 	map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
-}
-
-CUSTOM_INPUT_MEMBER( hyhoo_state::nb1413m3_busyflag_r )
-{
-	return m_nb1413m3->m_busyflag & 0x01;
 }
 
 static INPUT_PORTS_START( hyhoo )
@@ -111,7 +106,7 @@ static INPUT_PORTS_START( hyhoo )
 	PORT_DIPSETTING(    0x00, "95%" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hyhoo_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         // NOT USED
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
@@ -186,7 +181,7 @@ static INPUT_PORTS_START( hyhoo2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hyhoo_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         // NOT USED
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
@@ -226,23 +221,23 @@ static INPUT_PORTS_START( hyhoo2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(hyhoo_state::hyhoo)
-
+void hyhoo_state::hyhoo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)   /* 5.00 MHz ?? */
-	MCFG_DEVICE_PROGRAM_MAP(hyhoo_map)
-	MCFG_DEVICE_IO_MAP(hyhoo_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", hyhoo_state, irq0_line_hold)
+	Z80(config, m_maincpu, 5000000);   /* 5.00 MHz ?? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &hyhoo_state::hyhoo_map);
+	m_maincpu->set_addrmap(AS_IO, &hyhoo_state::hyhoo_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(hyhoo_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hyhoo_state, screen_update_hyhoo)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 16, 240-1);
+	m_screen->set_screen_update(FUNC(hyhoo_state::screen_update_hyhoo));
 
 	NB1413M3(config, m_nb1413m3, 0, NB1413M3_HYHOO);
 
@@ -254,10 +249,11 @@ MACHINE_CONFIG_START(hyhoo_state::hyhoo)
 	aysnd.port_b_read_callback().set_ioport("DSWB");
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 void hyhoo_state::hyhoo2(machine_config &config)

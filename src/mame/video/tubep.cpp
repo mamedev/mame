@@ -158,16 +158,16 @@ void tubep_state::tubep_palette(palette_device &palette)
 			bit0 = BIT(*color_prom, 0);
 			bit1 = BIT(*color_prom, 1);
 			bit2 = BIT(*color_prom, 2);
-			int const r = combine_3_weights(weights_txt_rg, bit0, bit1, bit2);
+			int const r = combine_weights(weights_txt_rg, bit0, bit1, bit2);
 			// green component
 			bit0 = BIT(*color_prom, 3);
 			bit1 = BIT(*color_prom, 4);
 			bit2 = BIT(*color_prom, 5);
-			int const g = combine_3_weights(weights_txt_rg, bit0, bit1, bit2);
+			int const g = combine_weights(weights_txt_rg, bit0, bit1, bit2);
 			// blue component
 			bit0 = BIT(*color_prom, 6);
 			bit1 = BIT(*color_prom, 7);
-			int const b = combine_2_weights(weights_txt_b, bit0, bit1);
+			int const b = combine_weights(weights_txt_b, bit0, bit1);
 
 			palette.set_pen_color(i, rgb_t(r, g, b));
 
@@ -692,16 +692,16 @@ void tubep_state::rjammer_palette(palette_device &palette) const
 		bit0 = BIT(*color_prom, 0);
 		bit1 = BIT(*color_prom, 1);
 		bit2 = BIT(*color_prom, 2);
-		int const r = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		int const r = combine_weights(weights_rg, bit0, bit1, bit2);
 		// green component
 		bit0 = BIT(*color_prom, 3);
 		bit1 = BIT(*color_prom, 4);
 		bit2 = BIT(*color_prom, 5);
-		int const g = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		int const g = combine_weights(weights_rg, bit0, bit1, bit2);
 		// blue component
 		bit0 = BIT(*color_prom, 6);
 		bit1 = BIT(*color_prom, 7);
-		int const b = combine_2_weights(weights_b, bit0, bit1);
+		int const b = combine_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r,g,b));
 

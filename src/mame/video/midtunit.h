@@ -165,6 +165,18 @@ protected:
 	int32_t m_debug_dma_mode;
 	int32_t m_debug_dma_command;
 #endif
+
+	char m_log_path[2048];
+	bool m_log_png;
+	bool m_log_json;
+	std::unique_ptr<uint64_t[]> m_logged_rom;
+	bitmap_argb32 m_log_bitmap;
+
+	void debug_init();
+	void debug_commands(int ref, const std::vector<std::string> &params);
+	void debug_help_command(int ref, const std::vector<std::string> &params);
+	void debug_png_dma_command(int ref, const std::vector<std::string> &params);
+	void log_bitmap(int command, int bpp, bool skip);
 };
 
 class midwunit_video_device : public midtunit_video_device

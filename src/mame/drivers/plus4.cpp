@@ -34,7 +34,6 @@
 #include "sound/mos7360.h"
 #include "sound/t6721a.h"
 
-#define MOS7501_TAG         "u2"
 #define MOS7360_TAG         "u1"
 #define MOS6551_TAG         "u3"
 #define MOS6529_USER_TAG    "u5"
@@ -52,7 +51,7 @@ class plus4_state : public driver_device
 public:
 	plus4_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, MOS7501_TAG),
+		m_maincpu(*this, "u2"),
 		m_pla(*this, PLA_TAG),
 		m_ted(*this, MOS7360_TAG),
 		m_acia(*this, MOS6551_TAG),
@@ -122,7 +121,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( write_kb6 ) { if (state) m_kb |= 64; else m_kb &= ~64; }
 	DECLARE_WRITE_LINE_MEMBER( write_kb7 ) { if (state) m_kb |= 128; else m_kb &= ~128; }
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c16 );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_c16);
 
 	enum
 	{
@@ -190,7 +189,7 @@ private:
 
 
 
-QUICKLOAD_LOAD_MEMBER( plus4_state, cbm_c16 )
+QUICKLOAD_LOAD_MEMBER(plus4_state::quickload_c16)
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
@@ -295,7 +294,7 @@ uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, in
 	}
 	else if (!_6551 && m_acia)
 	{
-		data = m_acia->read(space, offset & 0x03);
+		data = m_acia->read(offset & 0x03);
 	}
 	else if (!keyport)
 	{
@@ -371,7 +370,7 @@ uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, in
 		data = m_ram->pointer()[offset & m_ram->mask()];
 	}
 
-	return m_exp->cd_r(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+	return m_exp->cd_r(offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 }
 
 
@@ -416,7 +415,7 @@ WRITE8_MEMBER( plus4_state::write )
 	}
 	else if (!_6551 && m_acia)
 	{
-		m_acia->write(space, offset & 0x03, data);
+		m_acia->write(offset & 0x03, data);
 	}
 	else if (!addr_clk)
 	{
@@ -431,7 +430,7 @@ WRITE8_MEMBER( plus4_state::write )
 		m_ram->pointer()[offset & m_ram->mask()] = data;
 	}
 
-	m_exp->cd_w(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+	m_exp->cd_w(offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 }
 
 
@@ -837,7 +836,7 @@ void plus4_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( plus4 )
+//  machine_config( plus4 )
 //-------------------------------------------------
 
 void plus4_state::plus4(machine_config &config)
@@ -845,11 +844,10 @@ void plus4_state::plus4(machine_config &config)
 	// basic machine hardware
 	M7501(config, m_maincpu, 0);
 	m_maincpu->set_addrmap(AS_PROGRAM, &plus4_state::plus4_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->read_callback().set(FUNC(plus4_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(plus4_state::cpu_w));
 	m_maincpu->set_pulls(0x00, 0xc0);
-	config.m_perfect_cpu_quantum = subtag(MOS7501_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m7501_device::IRQ_LINE);
 
@@ -928,10 +926,9 @@ void plus4_state::plus4(machine_config &config)
 	m_exp->irq_wr_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_exp->cd_rd_callback().set(FUNC(plus4_state::read));
 	m_exp->cd_wr_callback().set(FUNC(plus4_state::write));
-	m_exp->aec_wr_callback().set_inputline(MOS7501_TAG, INPUT_LINE_HALT);
+	m_exp->aec_wr_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(plus4_state, cbm_c16), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(plus4_state::quickload_c16));
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("64K");
@@ -939,7 +936,7 @@ void plus4_state::plus4(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( plus4p )
+//  machine_config( plus4p )
 //-------------------------------------------------
 
 void c16_state::plus4p(machine_config &config)
@@ -958,7 +955,7 @@ void c16_state::plus4p(machine_config &config)
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( plus4n )
+//  machine_config( plus4n )
 //-------------------------------------------------
 
 void c16_state::plus4n(machine_config &config)
@@ -978,7 +975,7 @@ void c16_state::plus4n(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( c16n )
+//  machine_config( c16n )
 //-------------------------------------------------
 
 void c16_state::c16n(machine_config &config)
@@ -999,7 +996,7 @@ void c16_state::c16n(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( c16p )
+//  machine_config( c16p )
 //-------------------------------------------------
 
 void c16_state::c16p(machine_config &config)
@@ -1027,7 +1024,7 @@ void c16_state::c232(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( v364 )
+//  machine_config( v364 )
 //-------------------------------------------------
 
 void c16_state::v364(machine_config &config)

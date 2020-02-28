@@ -105,8 +105,8 @@
 
 		<bezel element="text_check"><bounds x="1" y="8.2" width="8" height="2" /></bezel>
 		<bezel element="text_lose"><bounds x="10.5" y="8.2" width="8" height="2" /></bezel>
-		<bezel name="1.7" element="led"><bounds x="0" y="8.5" width="1.5" height="1.5" /></bezel>
-		<bezel name="0.7" element="led"><bounds x="9.5" y="8.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="4.a" element="led"><bounds x="0" y="8.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="5.a" element="led"><bounds x="9.5" y="8.5" width="1.5" height="1.5" /></bezel>
 
 		<bezel element="text_from"><bounds x="0" y="17.2" width="8" height="2" /></bezel>
 		<bezel element="text_to"><bounds x="9.5" y="17.2" width="8" height="2" /></bezel>

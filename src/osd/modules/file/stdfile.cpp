@@ -14,7 +14,7 @@
 #include <cstdlib>
 #include <string>
 
-#include <stdio.h>  // for fileno
+#include <cstdio>  // for fileno
 #include <unistd.h> // for ftruncate
 
 

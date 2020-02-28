@@ -21,10 +21,10 @@ public:
 	void set_vram_size(uint32_t vram_size) { m_vram_size = vram_size; }
 	auto irq() { return m_irq_changed_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ16_MEMBER( next_pixel );
-	inline DECLARE_READ16_MEMBER( time_until_next_event )
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+	u16 next_pixel();
+	inline u16 time_until_next_event()
 	{
 		return m_horz_to_go * 8 + m_horz_steps;
 	}

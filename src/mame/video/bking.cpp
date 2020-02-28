@@ -62,18 +62,18 @@ void bking_state::bking_palette(palette_device &palette) const
 		bit0 = (color_prom[pen] >> 0) & 0x01;
 		bit1 = (color_prom[pen] >> 1) & 0x01;
 		bit2 = (color_prom[pen] >> 2) & 0x01;
-		int const r = combine_3_weights(rweights, bit0, bit1, bit2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
 		// green component
 		bit0 = (color_prom[pen] >> 3) & 0x01;
 		bit1 = (color_prom[pen] >> 4) & 0x01;
 		bit2 = (color_prom[pen] >> 5) & 0x01;
-		int const g = combine_3_weights(gweights, bit0, bit1, bit2);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
 
 		// blue component
 		bit0 = (color_prom[pen] >> 6) & 0x01;
 		bit1 = (color_prom[pen] >> 7) & 0x01;
-		int const b = combine_2_weights(gweights, bit0, bit1);
+		int const b = combine_weights(gweights, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -215,7 +215,7 @@ TILE_GET_INFO_MEMBER(bking_state::get_tile_info)
 
 void bking_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bking_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bking_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_screen->register_screen_bitmap(m_colmap_bg);
 	m_screen->register_screen_bitmap(m_colmap_ball);
 }

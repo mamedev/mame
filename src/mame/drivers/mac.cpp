@@ -166,7 +166,7 @@ WRITE32_MEMBER( mac_state::ariel_ramdac_w ) // this is for the "Ariel" style RAM
 	}
 	else if (mem_mask == 0x00ff0000)
 	{
-		m_rbv_colors[m_rbv_count++] = data>>16;
+		m_rbv_colors[m_rbv_count++] = (data>>16) & 0xff;
 
 		if (m_rbv_count == 3)
 		{
@@ -546,11 +546,11 @@ READ8_MEMBER(mac_state::mac_5396_r)
 {
 	if (offset < 0x100)
 	{
-		return m_539x_1->read(space, offset>>4);
+		return m_539x_1->read(offset>>4);
 	}
 	else    // pseudo-DMA: read from the FIFO
 	{
-		return m_539x_1->read(space, 2);
+		return m_539x_1->read(2);
 	}
 
 	// never executed
@@ -561,11 +561,11 @@ WRITE8_MEMBER(mac_state::mac_5396_w)
 {
 	if (offset < 0x100)
 	{
-		m_539x_1->write(space, offset>>4, data);
+		m_539x_1->write(offset>>4, data);
 	}
 	else    // pseudo-DMA: write to the FIFO
 	{
-		m_539x_1->write(space, 2, data);
+		m_539x_1->write(2, data);
 	}
 }
 
@@ -950,7 +950,7 @@ void mac_state::add_scsi(machine_config &config, bool cdrom)
 	m_ncr5380->set_scsi_port("scsi");
 	m_ncr5380->irq_callback().set(FUNC(mac_state::mac_scsi_irq));
 
-	SOFTWARE_LIST(config, "hdd_list").set_type("mac_hdd", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 }
 
 void mac_state::add_via1_adb(machine_config &config, bool macii)
@@ -984,7 +984,7 @@ void mac_state::add_egret(machine_config &config, int type)
 	m_egret->linechange_callback().set(FUNC(mac_state::adb_linechange_w));
 	m_egret->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_egret->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 }
 
 void mac_state::add_cuda(machine_config &config, int type)
@@ -1040,7 +1040,7 @@ void mac_state::mac512ke_base(machine_config &config)
 	M68000(config, m_maincpu, C7M);       /* 7.8336 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::mac512ke_map);
 	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(C7M*2, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
@@ -1055,7 +1055,6 @@ void mac_state::mac512ke_base(machine_config &config)
 	DAC_8BIT_PWM(config, m_dac, 0);
 	m_dac->add_route(ALL_OUTPUTS, "speaker", 0.25); // 2 x ls161
 	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref", 0));
-	vreg.set_output(5.0);
 	vreg.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
@@ -1090,13 +1089,13 @@ void mac_state::add_macplus_additions(machine_config &config)
 	m_ram->set_extra_options("1M,2M,2560K,4M");
 
 	// software list
-	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 }
 
 void mac_state::add_nubus(machine_config &config, bool bank1, bool bank2)
 {
 	nubus_device &nubus(NUBUS(config, "nubus", 0));
-	nubus.set_cputag("maincpu");
+	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irq9_callback().set(FUNC(mac_state::nubus_irq_9_w));
 	nubus.out_irqa_callback().set(FUNC(mac_state::nubus_irq_a_w));
 	nubus.out_irqb_callback().set(FUNC(mac_state::nubus_irq_b_w));
@@ -1120,7 +1119,7 @@ void mac_state::add_nubus(machine_config &config, bool bank1, bool bank2)
 template <typename T> void mac_state::add_nubus_pds(machine_config &config, const char *slot_tag, T &&opts)
 {
 	nubus_device &nubus(NUBUS(config, "pds", 0));
-	nubus.set_cputag("maincpu");
+	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irq9_callback().set(FUNC(mac_state::nubus_irq_9_w));
 	nubus.out_irqa_callback().set(FUNC(mac_state::nubus_irq_a_w));
 	nubus.out_irqb_callback().set(FUNC(mac_state::nubus_irq_b_w));
@@ -1175,7 +1174,7 @@ void mac_state::macprtb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macprtb_map);
 	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	add_pb1xx_screen(config);
 	m_screen->set_screen_update(FUNC(mac_state::screen_update_macprtb));
@@ -1226,7 +1225,7 @@ void mac_state::macii(machine_config &config, bool cpu, asc_device::asc_type asc
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("8M,32M,64M,96M,128M");
 
-	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 }
 
 void mac_state::maciihmu(machine_config &config)
@@ -1261,7 +1260,7 @@ void mac_state::maciifx(machine_config &config)
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("8M,16M,32M,64M,96M,128M");
 
-	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 
 	add_nubus(config);
 }
@@ -1422,7 +1421,7 @@ void mac_state::macse30(machine_config &config)
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("8M,16M,32M,48M,64M,96M,128M");
 
-	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 }
 
 void mac_state::macpb140(machine_config &config)
@@ -1447,7 +1446,7 @@ void mac_state::macpb140(machine_config &config)
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("4M,6M,8M");
 
-	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 }
 
 // PowerBook 145 = 140 @ 25 MHz (still 2MB RAM - the 145B upped that to 4MB)
@@ -1492,7 +1491,7 @@ void mac_state::macpb160(machine_config &config)
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("8M,12M,16M");
 
-	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 }
 
 void mac_state::macpb180(machine_config &config)
@@ -1510,7 +1509,7 @@ void mac_state::macpb180c(machine_config &config)
 	m_screen->set_size(800, 525);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
 	m_screen->set_screen_update(FUNC(mac_state::screen_update_macpbwd));
-	m_screen->set_palette(finder_base::DUMMY_TAG);
+	m_screen->set_no_palette();
 }
 
 void mac_state::macpd210(machine_config &config)
@@ -1679,7 +1678,7 @@ void mac_state::macqd700(machine_config &config)
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("8M,16M,32M,64M,68M,72M,80M,96M,128M");
 
-	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 }
 
 static INPUT_PORTS_START( macadb )
@@ -1757,10 +1756,10 @@ static INPUT_PORTS_START( macadb )
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)    /* keyboard Enter : */
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")     PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Command / Open Apple") PORT_CODE(KEYCODE_LALT)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Command / Open Apple") PORT_CODE(KEYCODE_RALT)
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Option / Solid Apple") PORT_CODE(KEYCODE_RALT)
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Option / Solid Apple") PORT_CODE(KEYCODE_LALT)
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Arrow") PORT_CODE(KEYCODE_LEFT)      PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Arrow") PORT_CODE(KEYCODE_RIGHT)    PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down Arrow") PORT_CODE(KEYCODE_DOWN)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))
@@ -2034,26 +2033,26 @@ ROM_END
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS      INIT                COMPANY           FULLNAME */
 //COMP( 1983, mactw,     0,        0,      mac128k,  macplus, mac_state, init_mac128k512k,   "Apple Computer", "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
-COMP( 1987, macse,     0,        0,      macse,    macadb,  mac_state, init_macse,         "Apple Computer", "Macintosh SE",  0 )
-COMP( 1987, macsefd,   0,        0,      macse,    macadb,  mac_state, init_macse,         "Apple Computer", "Macintosh SE (FDHD)",  0 )
-COMP( 1987, macii,     0,        0,      macii,    macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II",  0 )
-COMP( 1987, maciihmu,  macii,    0,      maciihmu, macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II (w/o 68851 MMU)", 0 )
-COMP( 1988, mac2fdhd,  0,        0,      macii,    macadb,  mac_state, init_maciifdhd,     "Apple Computer", "Macintosh II (FDHD)",  0 )
-COMP( 1988, maciix,    mac2fdhd, 0,      maciix,   macadb,  mac_state, init_maciix,        "Apple Computer", "Macintosh IIx",  0 )
+COMP( 1987, macse,     0,        0,      macse,    macadb,  mac_state, init_macse,         "Apple Computer", "Macintosh SE",  MACHINE_NOT_WORKING )
+COMP( 1987, macsefd,   0,        0,      macse,    macadb,  mac_state, init_macse,         "Apple Computer", "Macintosh SE (FDHD)",  MACHINE_NOT_WORKING )
+COMP( 1987, macii,     0,        0,      macii,    macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II",  MACHINE_NOT_WORKING )
+COMP( 1987, maciihmu,  macii,    0,      maciihmu, macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II (w/o 68851 MMU)", MACHINE_NOT_WORKING )
+COMP( 1988, mac2fdhd,  0,        0,      macii,    macadb,  mac_state, init_maciifdhd,     "Apple Computer", "Macintosh II (FDHD)",  MACHINE_NOT_WORKING )
+COMP( 1988, maciix,    mac2fdhd, 0,      maciix,   macadb,  mac_state, init_maciix,        "Apple Computer", "Macintosh IIx",  MACHINE_NOT_WORKING )
 COMP( 1989, macprtb,   0,        0,      macprtb,  macadb,  mac_state, init_macprtb,       "Apple Computer", "Macintosh Portable", MACHINE_NOT_WORKING )
-COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macadb,  mac_state, init_macse30,       "Apple Computer", "Macintosh SE/30",  0 )
-COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macadb,  mac_state, init_maciicx,       "Apple Computer", "Macintosh IIcx",  0 )
-COMP( 1989, maciici,   0,        0,      maciici,  maciici, mac_state, init_maciici,       "Apple Computer", "Macintosh IIci", 0 )
+COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macadb,  mac_state, init_macse30,       "Apple Computer", "Macintosh SE/30",  MACHINE_NOT_WORKING )
+COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macadb,  mac_state, init_maciicx,       "Apple Computer", "Macintosh IIcx",  MACHINE_NOT_WORKING )
+COMP( 1989, maciici,   0,        0,      maciici,  maciici, mac_state, init_maciici,       "Apple Computer", "Macintosh IIci", MACHINE_NOT_WORKING )
 COMP( 1990, maciifx,   0,        0,      maciifx,  macadb,  mac_state, init_maciifx,       "Apple Computer", "Macintosh IIfx",  MACHINE_NOT_WORKING )
-COMP( 1990, macclasc,  0,        0,      macclasc, macadb,  mac_state, init_macclassic,    "Apple Computer", "Macintosh Classic",  0 )
+COMP( 1990, macclasc,  0,        0,      macclasc, macadb,  mac_state, init_macclassic,    "Apple Computer", "Macintosh Classic",  MACHINE_NOT_WORKING )
 COMP( 1990, maclc,     0,        0,      maclc,    maciici, mac_state, init_maclc,         "Apple Computer", "Macintosh LC", MACHINE_IMPERFECT_SOUND )
-COMP( 1990, maciisi,   0,        0,      maciisi,  maciici, mac_state, init_maciisi,       "Apple Computer", "Macintosh IIsi", 0 )
+COMP( 1990, maciisi,   0,        0,      maciisi,  maciici, mac_state, init_maciisi,       "Apple Computer", "Macintosh IIsi", MACHINE_NOT_WORKING )
 COMP( 1991, macpb100,  0,        0,      macprtb,  macadb,  mac_state, init_macprtb,       "Apple Computer", "Macintosh PowerBook 100", MACHINE_NOT_WORKING )
 COMP( 1991, macpb140,  0,        0,      macpb140, macadb,  mac_state, init_macpb140,      "Apple Computer", "Macintosh PowerBook 140", MACHINE_NOT_WORKING )
 COMP( 1991, macpb170,  macpb140, 0,      macpb170, macadb,  mac_state, init_macpb140,      "Apple Computer", "Macintosh PowerBook 170", MACHINE_NOT_WORKING )
 COMP( 1991, macqd700,  macpb140, 0,      macqd700, macadb,  mac_state, init_macquadra700,  "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING )
-COMP( 1991, macclas2,  0,        0,      macclas2, macadb,  mac_state, init_macclassic2,   "Apple Computer", "Macintosh Classic II", MACHINE_IMPERFECT_SOUND )
-COMP( 1991, maclc2,    0,        0,      maclc2,   maciici, mac_state, init_maclc2,        "Apple Computer", "Macintosh LC II",  MACHINE_IMPERFECT_SOUND )
+COMP( 1991, macclas2,  0,        0,      macclas2, macadb,  mac_state, init_macclassic2,   "Apple Computer", "Macintosh Classic II", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
+COMP( 1991, maclc2,    0,        0,      maclc2,   maciici, mac_state, init_maclc2,        "Apple Computer", "Macintosh LC II",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
 COMP( 1992, macpb145,  macpb140, 0,      macpb145, macadb,  mac_state, init_macpb140,      "Apple Computer", "Macintosh PowerBook 145", MACHINE_NOT_WORKING )
 COMP( 1992, macpb160,  0,        0,      macpb160, macadb,  mac_state, init_macpb160,      "Apple Computer", "Macintosh PowerBook 160", MACHINE_NOT_WORKING )
 COMP( 1992, macpb180,  macpb160, 0,      macpb180, macadb,  mac_state, init_macpb160,      "Apple Computer", "Macintosh PowerBook 180", MACHINE_NOT_WORKING )
@@ -2061,8 +2060,8 @@ COMP( 1992, macpb180c, macpb160, 0,      macpb180c,macadb,  mac_state, init_macp
 COMP( 1992, macpd210,  0,        0,      macpd210, macadb,  mac_state, init_macpd210,      "Apple Computer", "Macintosh PowerBook Duo 210", MACHINE_NOT_WORKING )
 COMP( 1993, maccclas,  0,        0,      maccclas, macadb,  mac_state, init_maclrcclassic, "Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING )
 COMP( 1992, macpb145b, macpb140, 0,      macpb170, macadb,  mac_state, init_macpb140,      "Apple Computer", "Macintosh PowerBook 145B", MACHINE_NOT_WORKING )
-COMP( 1993, maclc3,    0,        0,      maclc3,   maciici, mac_state, init_maclc3,        "Apple Computer", "Macintosh LC III",  MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maciivx,   0,        0,      maciivx,  maciici, mac_state, init_maciivx,       "Apple Computer", "Macintosh IIvx", MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maciivi,   maciivx,  0,      maciivi,  maciici, mac_state, init_maciivx,       "Apple Computer", "Macintosh IIvi", MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maclc3,    0,        0,      maclc3,   maciici, mac_state, init_maclc3,        "Apple Computer", "Macintosh LC III",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maciivx,   0,        0,      maciivx,  maciici, mac_state, init_maciivx,       "Apple Computer", "Macintosh IIvx", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maciivi,   maciivx,  0,      maciivi,  maciici, mac_state, init_maciivx,       "Apple Computer", "Macintosh IIvi", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
 COMP( 1993, maclc520,  0,        0,      maclc520, maciici, mac_state, init_maclc520,      "Apple Computer", "Macintosh LC 520",  MACHINE_NOT_WORKING )
 COMP( 1994, pmac6100,  0,        0,      pwrmac,   macadb,  mac_state, init_macpm6100,     "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

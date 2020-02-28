@@ -58,7 +58,6 @@ public:
 
 	auto wdm_handler() { return m_wdm_w.bind(); }
 
-protected:
 	/* Registers - used by g65816_set_reg() and g65816_get_reg() */
 	enum
 	{
@@ -68,6 +67,7 @@ protected:
 		_5A22_FASTROM
 	};
 
+protected:
 	g65816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal);
 
 	// device-level overrides
@@ -75,9 +75,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 20; }
-	virtual uint32_t execute_input_lines() const override { return 5; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 20; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 5; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -142,8 +142,10 @@ protected:
 	void g65816_set_pc(unsigned val);
 	unsigned g65816_get_sp();
 	void g65816_set_sp(unsigned val);
+public:
 	unsigned g65816_get_reg(int regnum);
 	void g65816_set_reg(int regnum, unsigned value);
+protected:
 	void g65816_restore_state();
 	unsigned g65816i_read_8_normal(unsigned address);
 	unsigned g65816i_read_8_immediate(unsigned address);
@@ -244,7 +246,7 @@ protected:
 	unsigned m_destination;
 	int m_ICount;
 	int m_cpu_type;
-	uint8_t m_rw8_cycles, m_rw16_cycles, m_rw24_cycles;
+	uint8_t m_divider;
 	uint32_t m_debugger_temp;
 
 	/* 5A22 specific registers */

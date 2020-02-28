@@ -18,7 +18,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
-				<rom name="us-m001.u1" size="0x080000" crc="8c12c0c2" sha1="8cc1b098894af25a4bfccada884125b66f5fe8b2" offset="0" />
+				<rom name="us-m001.u1" size="0x080000" crc="8c12c0c2" sha1="8cc1b098894af25a4bfccada884125b66f5fe8b2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -41,7 +41,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="us-e001.u1" size="0x100000" crc="29df4aea" sha1="b95835aaf8630b61b47e5da0968cd4a1dd3bc517" offset="0" />
+				<rom name="us-e001.u1" size="0x100000" crc="29df4aea" sha1="b95835aaf8630b61b47e5da0968cd4a1dd3bc517"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +64,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="us-e002.u1" size="0x100000" crc="6c66772e" sha1="e1e719df1e51caaafd9b3af187059334f7abbba3" offset="0" />
+				<rom name="us-e002.u1" size="0x100000" crc="6c66772e" sha1="e1e719df1e51caaafd9b3af187059334f7abbba3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -87,7 +87,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="us-e003.u1" size="0x100000" crc="d90a7e58" sha1="37b899676935fb3dda266dc5614ef53cb2c33980" offset="0" />
+				<rom name="us-e003.u1" size="0x100000" crc="d90a7e58" sha1="37b899676935fb3dda266dc5614ef53cb2c33980"/>
 			</dataarea>
 		</part>
 	</software>
@@ -110,7 +110,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="us-e004.u1" size="0x100000" crc="790822e9" sha1="cc5806fdc79f777a42980d6825c92837b07fd80d" offset="0" />
+				<rom name="us-e004.u1" size="0x100000" crc="790822e9" sha1="cc5806fdc79f777a42980d6825c92837b07fd80d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -133,7 +133,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="us-e005.u1" size="0x100000" crc="edf1e4ce" sha1="7e5e3116f62897ae023c84842036f24b19c926cc" offset="0" />
+				<rom name="us-e005.u1" size="0x100000" crc="edf1e4ce" sha1="7e5e3116f62897ae023c84842036f24b19c926cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -156,7 +156,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="us-e006.u1" size="0x100000" crc="e9aaca2f" sha1="983086f068ee38b970c01d2304e757148474aee3" offset="0" />
+				<rom name="us-e006.u1" size="0x100000" crc="e9aaca2f" sha1="983086f068ee38b970c01d2304e757148474aee3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -179,7 +179,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="us-e007.u1" size="0x100000" crc="b7f5ca53" sha1="84af6d96512de96dbab03c236b3416b2e604f753" offset="0" />
+				<rom name="us-e007.u1" size="0x100000" crc="b7f5ca53" sha1="84af6d96512de96dbab03c236b3416b2e604f753"/>
 			</dataarea>
 		</part>
 	</software>
@@ -202,7 +202,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="us-e008.u1" size="0x100000" crc="5cddaf1f" sha1="345ae679974ae5ae9b506b32323ada234c01f984" offset="0" />
+				<rom name="us-e008.u1" size="0x100000" crc="5cddaf1f" sha1="345ae679974ae5ae9b506b32323ada234c01f984"/>
 			</dataarea>
 		</part>
 	</software>
@@ -225,7 +225,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="us-e009.u1" size="0x100000" crc="0d9c402b" sha1="95652eb71dab74fbf05f8450f2a9b664b455deeb" offset="0" />
+				<rom name="us-e009.u1" size="0x100000" crc="0d9c402b" sha1="95652eb71dab74fbf05f8450f2a9b664b455deeb"/>
 			</dataarea>
 		</part>
 	</software>

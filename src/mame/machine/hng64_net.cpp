@@ -116,20 +116,20 @@ void hng64_state::hng_comm_io_map(address_map &map)
 	map.global_mask(0xff);
 	/* Reserved for the KL5C80 internal hardware */
 	map(0x00, 0x07).rw(FUNC(hng64_state::hng64_comm_mmu_r), FUNC(hng64_state::hng64_comm_mmu_w));
-//  AM_RANGE(0x08,0x1f) AM_NOP              /* Reserved */
-//  AM_RANGE(0x20,0x25) AM_READWRITE        /* Timer/Counter B */           /* hng64 writes here */
-//  AM_RANGE(0x27,0x27) AM_NOP              /* Reserved */
-//  AM_RANGE(0x28,0x2b) AM_READWRITE        /* Timer/Counter A */           /* hng64 writes here */
-//  AM_RANGE(0x2c,0x2f) AM_READWRITE        /* Parallel port A */
-//  AM_RANGE(0x30,0x33) AM_READWRITE        /* Parallel port B */
-//  AM_RANGE(0x34,0x37) AM_READWRITE        /* Interrupt controller */      /* hng64 writes here */
-//  AM_RANGE(0x38,0x39) AM_READWRITE        /* Serial port */               /* hng64 writes here */
-//  AM_RANGE(0x3a,0x3b) AM_READWRITE        /* System control register */   /* hng64 writes here */
-//  AM_RANGE(0x3c,0x3f) AM_NOP              /* Reserved */
+//  map(0x08, 0x1f).noprw();              /* Reserved */
+//  map(0x20, 0x25).rw(hng64_state::));   /* Timer/Counter B */           /* hng64 writes here */
+//  map(0x27, 0x27).noprw();              /* Reserved */
+//  map(0x28, 0x2b).rw(hng64_state::)); /* Timer/Counter A */           /* hng64 writes here */
+//  map(0x2c, 0x2f).rw(hng64_state::)); /* Parallel port A */
+//  map(0x30, 0x33).rw(hng64_state::)); /* Parallel port B */
+//  map(0x34, 0x37).rw(hng64_state::)); /* Interrupt controller */      /* hng64 writes here */
+//  map(0x38, 0x39).rw(hng64_state::)); /* Serial port */               /* hng64 writes here */
+//  map(0x3a, 0x3b).rw(hng64_state::)); /* System control register */   /* hng64 writes here */
+//  map(0x3c, 0x3f).noprw();              /* Reserved */
 
 	/* General IO */
 	map(0x50, 0x57).rw(FUNC(hng64_state::hng64_com_share_r), FUNC(hng64_state::hng64_com_share_w));
-//  AM_RANGE(0x72,0x72) AM_WRITE            /* dunno yet */
+//  map(0x72, 0x72).w(hng64_state::));            /* dunno yet */
 }
 
 
@@ -142,8 +142,9 @@ void hng64_state::reset_net()
 	m_mmub[5] = 0; // rolls back to 0xffff
 }
 
-MACHINE_CONFIG_START(hng64_state::hng64_network)
-	MCFG_DEVICE_ADD("network", KL5C80A12, HNG64_MASTER_CLOCK / 4)        /* KL5C80A12CFP - binary compatible with Z80. */
-	MCFG_DEVICE_PROGRAM_MAP(hng_comm_map)
-	MCFG_DEVICE_IO_MAP(hng_comm_io_map)
-MACHINE_CONFIG_END
+void hng64_state::hng64_network(machine_config &config)
+{
+	KL5C80A12(config, m_comm, HNG64_MASTER_CLOCK / 4);        /* KL5C80A12CFP - binary compatible with Z80. */
+	m_comm->set_addrmap(AS_PROGRAM, &hng64_state::hng_comm_map);
+	m_comm->set_addrmap(AS_IO, &hng64_state::hng_comm_io_map);
+}

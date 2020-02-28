@@ -67,7 +67,7 @@ void bbc_tube_z80_device::device_add_mconfig(machine_config &config)
 	m_z80->set_addrmap(AS_PROGRAM, &bbc_tube_z80_device::tube_z80_mem);
 	m_z80->set_addrmap(AS_OPCODES, &bbc_tube_z80_device::tube_z80_fetch);
 	m_z80->set_addrmap(AS_IO, &bbc_tube_z80_device::tube_z80_io);
-	m_z80->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(bbc_tube_z80_device::irq_callback), this));
+	m_z80->set_irq_acknowledge_callback(FUNC(bbc_tube_z80_device::irq_callback));
 
 	TUBE(config, m_ula);
 	m_ula->hirq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_tube_slot_device::irq_w));
@@ -134,18 +134,18 @@ void bbc_tube_z80_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_tube_z80_device::host_r)
+uint8_t bbc_tube_z80_device::host_r(offs_t offset)
 {
-	return m_ula->host_r(space, offset);
+	return m_ula->host_r(offset);
 }
 
-WRITE8_MEMBER(bbc_tube_z80_device::host_w)
+void bbc_tube_z80_device::host_w(offs_t offset, uint8_t data)
 {
-	m_ula->host_w(space, offset, data);
+	m_ula->host_w(offset, data);
 }
 
 
-READ8_MEMBER(bbc_tube_z80_device::opcode_r)
+uint8_t bbc_tube_z80_device::opcode_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -158,7 +158,7 @@ READ8_MEMBER(bbc_tube_z80_device::opcode_r)
 }
 
 
-READ8_MEMBER(bbc_tube_z80_device::mem_r)
+uint8_t bbc_tube_z80_device::mem_r(offs_t offset)
 {
 	uint8_t data;
 
@@ -170,7 +170,7 @@ READ8_MEMBER(bbc_tube_z80_device::mem_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_tube_z80_device::mem_w)
+void bbc_tube_z80_device::mem_w(offs_t offset, uint8_t data)
 {
 	m_ram->pointer()[offset] = data;
 }

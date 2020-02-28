@@ -25,35 +25,29 @@
 #include "speaker.h"
 
 
-WRITE_LINE_MEMBER(bottom9_state::vblank_irq)
-{
-	if (state && m_k052109->is_irq_enabled())
-		m_maincpu->set_input_line(0, HOLD_LINE);
-}
-
 READ8_MEMBER(bottom9_state::k052109_051960_r)
 {
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return m_k051960->k051937_r(space, offset - 0x3800);
+			return m_k051960->k051937_r(offset - 0x3800);
 		else if (offset < 0x3c00)
-			return m_k052109->read(space, offset);
+			return m_k052109->read(offset);
 		else
-			return m_k051960->k051960_r(space, offset - 0x3c00);
+			return m_k051960->k051960_r(offset - 0x3c00);
 	}
 	else
-		return m_k052109->read(space, offset);
+		return m_k052109->read(offset);
 }
 
 WRITE8_MEMBER(bottom9_state::k052109_051960_w)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
-		m_k051960->k051937_w(space, offset - 0x3800, data);
+		m_k051960->k051937_w(offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		m_k052109->write(space, offset, data);
+		m_k052109->write(offset, data);
 	else
-		m_k051960->k051960_w(space, offset - 0x3c00, data);
+		m_k051960->k051960_w(offset - 0x3c00, data);
 }
 
 READ8_MEMBER(bottom9_state::bottom9_bankedram1_r)
@@ -63,9 +57,9 @@ READ8_MEMBER(bottom9_state::bottom9_bankedram1_r)
 	else
 	{
 		if (m_zoomreadroms)
-			return m_k051316->rom_r(space, offset);
+			return m_k051316->rom_r(offset);
 		else
-			return m_k051316->read(space, offset);
+			return m_k051316->read(offset);
 	}
 }
 
@@ -74,7 +68,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_bankedram1_w)
 	if (m_k052109_selected)
 		k052109_051960_w(space, offset, data);
 	else
-		m_k051316->write(space, offset, data);
+		m_k051316->write(offset, data);
 }
 
 READ8_MEMBER(bottom9_state::bottom9_bankedram2_r)
@@ -90,7 +84,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_bankedram2_w)
 	if (m_k052109_selected)
 		k052109_051960_w(space, offset + 0x2000, data);
 	else
-		m_palette->write8(space, offset, data);
+		m_palette->write8(offset, data);
 }
 
 WRITE8_MEMBER(bottom9_state::bankswitch_w)
@@ -131,7 +125,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_1f90_w)
 
 WRITE8_MEMBER(bottom9_state::bottom9_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 INTERRUPT_GEN_MEMBER(bottom9_state::bottom9_sound_interrupt)
@@ -319,7 +313,6 @@ void bottom9_state::bottom9(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(bottom9_state::screen_update_bottom9));
-	screen.screen_vblank().set(FUNC(bottom9_state::vblank_irq));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
@@ -327,16 +320,18 @@ void bottom9_state::bottom9(machine_config &config)
 
 	K052109(config, m_k052109, 0); // 051961 on schematics
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(bottom9_state::tile_callback), this);
+	m_k052109->set_screen("screen");
+	m_k052109->set_tile_callback(FUNC(bottom9_state::tile_callback));
+	m_k052109->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
-	m_k051960->set_sprite_callback(FUNC(bottom9_state::sprite_callback), this);
+	m_k051960->set_screen("screen");
+	m_k051960->set_sprite_callback(FUNC(bottom9_state::sprite_callback));
 
 	K051316(config, m_k051316, 0);
 	m_k051316->set_palette(m_palette);
-	m_k051316->set_zoom_callback(FUNC(bottom9_state::zoom_callback), this);
+	m_k051316->set_zoom_callback(FUNC(bottom9_state::zoom_callback));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

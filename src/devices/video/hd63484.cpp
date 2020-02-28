@@ -24,10 +24,11 @@
 //  hd63484_device - constructor
 //-------------------------------------------------
 
-hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HD63484, tag, owner, clock),
+hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, HD63484, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
+	m_display_cb(*this),
 	m_auto_configure_screen(true),
 	m_external_skew(0),
 	m_ar(0),
@@ -2003,7 +2004,7 @@ WRITE8_MEMBER( hd63484_device::data8_w )
 
 void hd63484_device::device_start()
 {
-	m_display_cb.bind_relative_to(*owner());
+	m_display_cb.resolve();
 
 	register_save_state();
 }

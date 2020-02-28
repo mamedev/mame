@@ -666,23 +666,23 @@ void tmmjprd_state::main_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();
 	map(0x200010, 0x200013).r(FUNC(tmmjprd_state::randomtmmjprds)); // gfx chip status?
 	/* check these are used .. */
-//  AM_RANGE(0x200010, 0x200013) AM_WRITEONLY AM_SHARE("viewregs0")
+//  map(0x200010, 0x200013).writeonly().share("viewregs0");
 	map(0x200100, 0x200117).writeonly().share(m_tilemap_regs[0]); // tilemap regs1
 	map(0x200120, 0x200137).writeonly().share(m_tilemap_regs[1]); // tilemap regs2
 	map(0x200140, 0x200157).writeonly().share(m_tilemap_regs[2]); // tilemap regs3
 	map(0x200160, 0x200177).writeonly().share(m_tilemap_regs[3]); // tilemap regs4
 	map(0x200200, 0x20021b).writeonly().share(m_spriteregs); // sprregs?
-//  AM_RANGE(0x200300, 0x200303) AM_WRITE(rombank_w) // used during rom testing, rombank/area select + something else?
+//  map(0x200300, 0x200303).w(FUNC(tmmjprd_state::rombank_w)); // used during rom testing, rombank/area select + something else?
 	map(0x20040c, 0x20040f).w(FUNC(tmmjprd_state::brt_w<0>));
 	map(0x200410, 0x200413).w(FUNC(tmmjprd_state::brt_w<1>));
-//  AM_RANGE(0x200500, 0x200503) AM_WRITEONLY AM_SHARE("viewregs7")
+//  map(0x200500, 0x200503).writeonly().share("viewregs7");
 #if EMULATE_BLITTER
 	map(0x200700, 0x20070f).w(FUNC(tmmjprd_state::blitter_w)).share(m_blitterregs);
 #endif
-//  AM_RANGE(0x200800, 0x20080f) AM_WRITEONLY AM_SHARE("viewregs9") // never changes?
+//  map(0x200800, 0x20080f).writeonly().share("viewregs9"); // never changes?
 	map(0x200900, 0x2009ff).rw("i5000snd", FUNC(i5000snd_device::read), FUNC(i5000snd_device::write));
 	/* hmm */
-//  AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("viewregs10")
+//  map(0x279700, 0x279713).writeonly().share("viewregs10");
 	/* tilemaps */
 	map(0x280000, 0x283fff).rw(FUNC(tmmjprd_state::tilemap_r<0>), FUNC(tmmjprd_state::tilemap_w<0>));
 	map(0x284000, 0x287fff).rw(FUNC(tmmjprd_state::tilemap_r<1>), FUNC(tmmjprd_state::tilemap_w<1>));

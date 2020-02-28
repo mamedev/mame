@@ -105,9 +105,13 @@ Notes:
 - similarly, splndrbt hardware only appears to be capable of displaying 24 sprites.
   This time, they are consecutive in RAM.
 
-- gekisou doesn't have dip switches, but battery backed RAM. To enter the Settings
-  menu, press F1. The settings menu is VERY spartan, with no indication of what the
-  settings do.
+- gekisou doesn't have dip-switches but battery backed RAM.
+  By pressing service button (F2) at any time after POST operator can access to
+  a simple config menu with no setting OSD indication about what they do but just a
+  laconic number for each, basically mimicking an actual dip bank.
+  END arrows indicates where to exit and return back to title screen, basically
+  giving the operator to either read or rewrite all the settings.
+  Defaults are all ON.
 
   Settings:                1   2   3   4   5   6   7   8
   COIN 1  1 Coin / 1 Play  ON  ON
@@ -151,6 +155,8 @@ TODO:
 - gekisou: there is a small glitch during the text intro at the beginning of player
   2 game in cocktail mode: a white line spills out from the text box as characters
   in the last line are written. This might well be a bug in the original.
+  Update: background is actually misaligned one line, cfr. the blue buildings
+  that are near the status bar (missing on the other side).
 
 - splndrbt, hvoltage: the interpretation of the scaling PROMs might be wrong.
   The sprite x scaling is not used at all because I couldn't figure it out.
@@ -444,7 +450,7 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 
 		case 7: // c0ff: sound command latch clear
 			// Note: solder pad CP1 on the pcb would allow to disable this
-			m_soundlatch->clear_w(space, 0, 0);
+			m_soundlatch->clear_w();
 			break;
 	}
 }
@@ -583,7 +589,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_state::splndrbt_scanline)
 /******************************************************************************/
 // CPU Handlers
 
-CUSTOM_INPUT_MEMBER(gekisou_state::gekisou_unknown_bit_r)
+READ_LINE_MEMBER(gekisou_state::gekisou_unknown_bit_r)
 {
 	return m_gekisou_unknown_bit;
 }
@@ -638,11 +644,10 @@ WRITE_LINE_MEMBER(equites_state::mcu_switch_w)
 /******************************************************************************/
 // CPU Memory Maps
 
-void equites_state::equites_map(address_map &map)
+void equites_state::equites_common_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x00ffff).rom(); // ROM area is written several times (dev system?)
-	map(0x040000, 0x040fff).ram();
 	map(0x080000, 0x080fff).rw(FUNC(equites_state::equites_fg_videoram_r), FUNC(equites_state::equites_fg_videoram_w)).umask16(0x00ff);
 	map(0x0c0000, 0x0c01ff).ram().w(FUNC(equites_state::equites_bg_videoram_w)).share("bg_videoram");
 	map(0x0c0200, 0x0c0fff).ram();
@@ -650,19 +655,22 @@ void equites_state::equites_map(address_map &map)
 	map(0x100000, 0x100001).r(FUNC(equites_state::equites_spriteram_kludge_r));
 	map(0x140000, 0x1407ff).rw(FUNC(equites_state::mcu_ram_r), FUNC(equites_state::mcu_ram_w)).umask16(0x00ff);
 	map(0x180000, 0x180001).portr("IN1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x180000, 0x180000).select(0x03c000).lw8("mainlatch_w",
-												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_mainlatch->write_a3(space, offset >> 13, data, mem_mask);
-												 });
+	map(0x180000, 0x180000).select(0x03c000).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_a3(offset >> 14); }));
 	map(0x180001, 0x180001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1c0000, 0x1c0001).portr("IN0").w(FUNC(equites_state::equites_scrollreg_w));
 	map(0x380000, 0x380000).w(FUNC(equites_state::equites_bgcolor_w));
 	map(0x780000, 0x780001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 }
 
+void equites_state::equites_map(address_map &map)
+{
+	equites_common_map(map);
+	map(0x040000, 0x040fff).ram();
+}
+
 void gekisou_state::gekisou_map(address_map &map)
 {
-	equites_map(map);
+	equites_common_map(map);
 	map(0x040000, 0x040fff).ram().share("nvram"); // mainram is battery-backed
 	map(0x580000, 0x580001).select(0x020000).w(FUNC(gekisou_state::gekisou_unknown_bit_w));
 }
@@ -676,10 +684,7 @@ void splndrbt_state::splndrbt_map(address_map &map)
 	map(0x080000, 0x080001).portr("IN0");
 	map(0x0c0000, 0x0c0001).portr("IN1");
 	map(0x0c0000, 0x0c0000).select(0x020000).w(FUNC(splndrbt_state::equites_bgcolor_w));
-	map(0x0c0001, 0x0c0001).select(0x03c000).lw8("mainlatch_w",
-												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_mainlatch->write_a3(space, offset >> 13, data, mem_mask);
-												 });
+	map(0x0c0001, 0x0c0001).select(0x03c000).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_a3(offset >> 14); }));
 	map(0x100000, 0x100001).w(FUNC(splndrbt_state::splndrbt_bg_scrollx_w));
 	map(0x140001, 0x140001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x1c0000, 0x1c0001).w(FUNC(splndrbt_state::splndrbt_bg_scrolly_w));
@@ -792,7 +797,7 @@ static INPUT_PORTS_START( gekisou )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gekisou_state, gekisou_unknown_bit_r, nullptr)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(gekisou_state, gekisou_unknown_bit_r)
 
 	/* this is actually a variable resistor */
 	PORT_START(FRQ_ADJUSTER_TAG)
@@ -1037,13 +1042,13 @@ static const char *const alphamc07_sample_names[] =
 
 #define MSM5232_BASE_VOLUME 1.0
 
-// the sound board is the same in all games
+// the sound board is the same in all games but bngotime
 void equites_state::common_sound(machine_config &config)
 {
 	I8085A(config, m_audiocpu, 6.144_MHz_XTAL); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &equites_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &equites_state::sound_portmap);
-	m_audiocpu->set_clk_out("audio8155", FUNC(i8155_device::set_unscaled_clock));
+	m_audiocpu->set_clk_out(m_audio8155, FUNC(i8155_device::set_unscaled_clock_int));
 
 	I8155(config, m_audio8155, 0);
 	m_audio8155->out_pa_callback().set(FUNC(equites_state::equites_8155_porta_w));
@@ -1079,7 +1084,6 @@ void equites_state::common_sound(machine_config &config)
 	DAC_6BIT_R2R(config, m_dac_1, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	DAC_6BIT_R2R(config, m_dac_2, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
@@ -1170,8 +1174,7 @@ void equites_state::equites(machine_config &config)
 	common_sound(config);
 
 	ALPHA_8201(config, m_alpha_8201, 4000000/8); // 8303 or 8304 (same device!)
-
-	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
+	config.set_perfect_quantum("alpha_8201:mcu");
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -1203,6 +1206,14 @@ void gekisou_state::gekisou(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
+void gekisou_state::bngotime(machine_config &config)
+{
+	gekisou(config);
+
+	// TODO: emulate different sound board with Z80 + AY8910
+	m_audiocpu->set_disable();
+}
+
 void splndrbt_state::splndrbt(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1219,7 +1230,7 @@ void splndrbt_state::splndrbt(machine_config &config)
 	common_sound(config);
 
 	ALPHA_8201(config, m_alpha_8201, 4000000/8); // 8303 or 8304 (same device!)
-	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
+	config.set_perfect_quantum("alpha_8201:mcu");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1942,7 +1953,60 @@ ROM_START( hvoltage )
 	ROM_LOAD( "3.8l",   0x0100, 0x0100, CRC(1314b0b5) SHA1(31ef4b916110581390afc1ba90c5dca7c08c619f) ) // y
 ROM_END
 
+/*
+Unknown bingo game
+(c)1986 CLS?
 
+68K55-2
+CPU:MC68000P8
+OSC:12.000MHz
+
+SOUND BOARD NO.60 MC 01
+CPU  :Z80A
+Sound:AY-3-8910A (unpopulated: another 8910 and a YM2203)
+OSC  :6.000MHz
+*/
+
+ROM_START( bngotime )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // 68000 ROMs
+	ROM_LOAD16_BYTE( "1.b15", 0x00001, 0x4000, CRC(34a27f5c) SHA1(d30ac37d8665ccc92f6a10f6b0f55783096df687) )
+	ROM_LOAD16_BYTE( "0.d15", 0x00000, 0x4000, CRC(21c738ee) SHA1(8c14265fe1ea44945555b37cb13ff6b72c747053) )
+	ROM_LOAD16_BYTE( "3.b14", 0x08001, 0x4000, CRC(e22555ab) SHA1(5c533b0b99ef600e2bc42c21b79a1a6914b1fc1e) )
+	ROM_LOAD16_BYTE( "2.d14", 0x08000, 0x4000, CRC(0f328bde) SHA1(30a98924600fc2beec8227100adfa6dfbbce5d67) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "11.sub", 0x00000, 0x2000, CRC(9b063c07) SHA1(c9fe7fe10bd204cb82066db7b576072df7787046) )
+
+	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
+	ROM_LOAD( "alpha-8505_44801c57.bin", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
+	ROM_LOAD( "9.d5",  0x00000, 0x1000, CRC(3c356e82) SHA1(55a58f1335206a0996caf8967b4ee962d2373db4) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 ) // tiles
+	ROM_LOAD( "6.r18",   0x00000, 0x2000, CRC(e85790f2) SHA1(473d5074e506cfe9ccc8d2a86ee64328b6cefa5f) )
+	// empty space to unpack previous ROM
+	ROM_CONTINUE(        0x04000, 0x2000)
+	// empty space to unpack previous ROM
+	ROM_LOAD( "4.r16",   0x08000, 0x2000, CRC(58479aaf) SHA1(916f6b193da7ed223831ca30d3ec8c57f5f1fa7f) )
+	ROM_CONTINUE(        0x0c000, 0x2000)
+	ROM_LOAD( "5.r15",   0x0a000, 0x2000, CRC(561dbbf6) SHA1(7a294b744ed96962e2d69bfd5d92b690c16b6371) )
+	ROM_CONTINUE(        0x0e000, 0x2000)
+
+	ROM_REGION( 0x10000, "gfx3", 0 ) // sprites
+	ROM_LOAD( "8.r9",   0x00000, 0x2000, CRC(067fd3a1) SHA1(8aeeb5c9a79db4e624de6203ce3810d715cbb35c) )
+	// empty space to unpack previous ROM
+	ROM_LOAD( "7.r8",    0x08000, 0x2000, CRC(4f50006a) SHA1(2e501181678b904577f457129e6c5e00542e3996) )
+
+	ROM_REGION( 0x0700, "proms", 0 )
+	ROM_LOAD( "82s129_br.b1",  0x0000, 0x100, CRC(fd98b98a) SHA1(754797272338adf36c951fa4cfc40dbcd3429c18) ) // R
+	ROM_LOAD( "82s129_bg.b4",  0x0100, 0x100, CRC(68d61fca) SHA1(4143587c3e68157e488093efabb7d182cdece111) ) // G
+	ROM_LOAD( "82s129_bb.b2",  0x0200, 0x100, CRC(839bc7a3) SHA1(54289fb75676a30640babf831edf659d84d1616d) ) // B
+	ROM_LOAD( "82s129_bs.n2",  0x0300, 0x100, CRC(1ecbeb37) SHA1(c4a139bc81f31b668c80c2cf150ce44b9b181e8a) ) // CLUT(same PROM x 4)
+	ROM_LOAD( "82s129_bs.n3",  0x0400, 0x100, CRC(1ecbeb37) SHA1(c4a139bc81f31b668c80c2cf150ce44b9b181e8a) )
+	ROM_LOAD( "82s129_bs.n4",  0x0500, 0x100, CRC(1ecbeb37) SHA1(c4a139bc81f31b668c80c2cf150ce44b9b181e8a) )
+	ROM_LOAD( "82s129_bs.n5",  0x0600, 0x100, CRC(1ecbeb37) SHA1(c4a139bc81f31b668c80c2cf150ce44b9b181e8a) )
+ROM_END
 
 /******************************************************************************/
 // Initializations
@@ -1989,6 +2053,7 @@ GAME( 1984, bullfgtr,  0,        equites,  bullfgtr, equites_state,  init_equite
 GAME( 1984, bullfgtrs, bullfgtr, equites,  bullfgtr, equites_state,  init_equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, kouyakyu,  0,        equites,  kouyakyu, equites_state,  init_equites,  ROT0,  "Alpha Denshi Co.", "The Koukou Yakyuu", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gekisou,   0,        gekisou,  gekisou,  gekisou_state,  init_equites,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bngotime,  0,        bngotime, gekisou,  gekisou_state,  init_equites,  ROT90, "CLS", "Bingo Time", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 8505 MCU isn't dumped
 
 // Splendor Blast Hardware
 GAME( 1985, splndrbt,  0,        splndrbt, splndrbt, splndrbt_state, init_splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

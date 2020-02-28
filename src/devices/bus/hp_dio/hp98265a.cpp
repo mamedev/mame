@@ -10,8 +10,7 @@
 #include "hp98265a.h"
 
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/devices.h"
 #include "machine/mb87030.h"
 
 #define VERBOSE 0
@@ -21,12 +20,6 @@
 DEFINE_DEVICE_TYPE_NS(HPDIO_98265A, bus::hp_dio, dio16_98265a_device, "hp98265a", "HP98265A SCSI S16 Interface")
 
 namespace bus { namespace hp_dio {
-
-static void scsi_devices(device_slot_interface &device)
-{
-	device.option_add("cdrom", NSCSI_CDROM);
-	device.option_add("harddisk", NSCSI_HARDDISK);
-}
 
 void dio16_98265a_device::mb87030_scsi_adapter(device_t *device)
 {
@@ -41,19 +34,19 @@ void dio16_98265a_device::device_add_mconfig(machine_config &config)
 {
 	NSCSI_BUS(config, m_scsibus, 0);
 	nscsi_connector &scsicon0(NSCSI_CONNECTOR(config, "scsibus:0", 0));
-	scsi_devices(scsicon0);
+	default_scsi_devices(scsicon0);
 	scsicon0.set_default_option("harddisk");
 
-	scsi_devices(NSCSI_CONNECTOR(config, "scsibus:1", 0));
-	scsi_devices(NSCSI_CONNECTOR(config, "scsibus:2", 0));
-	scsi_devices(NSCSI_CONNECTOR(config, "scsibus:3", 0));
-	scsi_devices(NSCSI_CONNECTOR(config, "scsibus:4", 0));
+	default_scsi_devices(NSCSI_CONNECTOR(config, "scsibus:1", 0));
+	default_scsi_devices(NSCSI_CONNECTOR(config, "scsibus:2", 0));
+	default_scsi_devices(NSCSI_CONNECTOR(config, "scsibus:3", 0));
+	default_scsi_devices(NSCSI_CONNECTOR(config, "scsibus:4", 0));
 
-	nscsi_connector &scsicon6(NSCSI_CONNECTOR(config, "scsibus:5", 0));
-	scsi_devices(scsicon6);
-	scsicon6.set_default_option("cdrom");
+	nscsi_connector &scsicon5(NSCSI_CONNECTOR(config, "scsibus:5", 0));
+	default_scsi_devices(scsicon5);
+	scsicon5.set_default_option("cdrom");
 
-	scsi_devices(NSCSI_CONNECTOR(config, "scsibus:6", 0));
+	default_scsi_devices(NSCSI_CONNECTOR(config, "scsibus:6", 0));
 	nscsi_connector &scsicon7(NSCSI_CONNECTOR(config, "scsibus:7", 0));
 	scsicon7.option_add_internal("mb87030", MB87030);
 	scsicon7.set_default_option("mb87030");
@@ -168,12 +161,12 @@ void dio16_98265a_device::device_reset()
 	code &= REG_SW1_SELECT_CODE_MASK;
 
 	if (!m_installed_io) {
-		program_space()->install_readwrite_handler(
+		program_space().install_readwrite_handler(
 				0x600000 + (code * 0x10000),
 				0x6007ff + (code * 0x10000),
-				read16_delegate(FUNC(dio16_98265a_device::io_r), this),
-				write16_delegate(FUNC(dio16_98265a_device::io_w), this));
-		program_space()->install_device(0x6e0020, 0x6e003f, *m_spc, &mb87030_device::map, 0x00ff00ff);
+				read16_delegate(*this, FUNC(dio16_98265a_device::io_r)),
+				write16_delegate(*this, FUNC(dio16_98265a_device::io_w)));
+		program_space().install_device(0x600020 + (code * 0x10000), 0x60003f + (code * 0x10000), *m_spc, &mb87030_device::map, 0x00ff00ff);
 		m_installed_io = true;
 	}
 	m_control = 0;

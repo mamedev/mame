@@ -191,7 +191,7 @@ void taito_zoom_device::device_add_mconfig(machine_config &config)
 	m_soundcpu->write_port<1>().set(FUNC(taito_zoom_device::tms_ctrl_w));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &taito_zoom_device::taitozoom_mn_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60000);
+	config.set_maximum_quantum(attotime::from_hz(60000));
 
 	TMS57002(config, m_tms57002, XTAL(25'000'000)/2);
 	//m_tms57002->empty_callback().set_inputline(m_soundcpu, MN10200_IRQ1, m_tms57002->empty_r()); /*.invert();*/

@@ -34,7 +34,7 @@ protected:
 	virtual void device_reset() override;
 
 	// bus-level overrides;
-	virtual void s100_sout_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void s100_sout_w(offs_t offset, uint8_t data) override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;

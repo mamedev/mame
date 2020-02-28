@@ -58,7 +58,7 @@
 class device_bw2_expansion_slot_interface;
 
 class bw2_expansion_slot_device : public device_t,
-									public device_slot_interface
+									public device_single_card_slot_interface<device_bw2_expansion_slot_interface>
 {
 public:
 	// construction/destruction
@@ -76,14 +76,14 @@ public:
 	virtual ~bw2_expansion_slot_device();
 
 	// computer interface
-	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6);
-	void cd_w(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6);
+	uint8_t cd_r(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6);
+	void cd_w(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6);
 
-	DECLARE_READ8_MEMBER( slot_r );
-	DECLARE_WRITE8_MEMBER( slot_w );
+	uint8_t slot_r(offs_t offset);
+	void slot_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( modsel_r );
-	DECLARE_WRITE8_MEMBER( modsel_w );
+	uint8_t modsel_r(offs_t offset);
+	void modsel_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -97,20 +97,20 @@ protected:
 // ======================> device_bw2_expansion_slot_interface
 
 // class representing interface-specific live bw2_expansion card
-class device_bw2_expansion_slot_interface : public device_slot_card_interface
+class device_bw2_expansion_slot_interface : public device_interface
 {
 public:
 	// construction/destruction
 	virtual ~device_bw2_expansion_slot_interface();
 
-	virtual uint8_t bw2_cd_r(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) { return data; };
-	virtual void bw2_cd_w(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) { };
+	virtual uint8_t bw2_cd_r(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) { return data; }
+	virtual void bw2_cd_w(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) { }
 
-	virtual uint8_t bw2_slot_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void bw2_slot_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t bw2_slot_r(offs_t offset) { return 0xff; }
+	virtual void bw2_slot_w(offs_t offset, uint8_t data) { }
 
-	virtual uint8_t bw2_modsel_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void bw2_modsel_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t bw2_modsel_r(offs_t offset) { return 0xff; }
+	virtual void bw2_modsel_w(offs_t offset, uint8_t data) { }
 
 protected:
 	device_bw2_expansion_slot_interface(const machine_config &mconfig, device_t &device);

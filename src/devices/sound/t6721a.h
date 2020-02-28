@@ -53,8 +53,8 @@ public:
 	auto dtrd_handler() { return m_write_dtrd.bind(); }
 	auto apd_handler() { return m_write_apd.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read();
+	void write(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( di_w );
 

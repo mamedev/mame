@@ -45,7 +45,6 @@ a2eaux_ramworks3_device::a2eaux_ramworks3_device(const machine_config &mconfig, 
 
 void a2eaux_ramworks3_device::device_start()
 {
-	set_a2eauxslot_device();
 	save_item(NAME(m_ram));
 	save_item(NAME(m_bank));
 }
@@ -88,7 +87,7 @@ uint8_t *a2eaux_ramworks3_device::get_auxbank_ptr()
     However, the software will recognize and correctly use a configuration in which
     all of banks 00-7F are populated for a total of 8 megabytes.  So that's what we do.
 */
-void a2eaux_ramworks3_device::write_c07x(address_space &space, uint8_t offset, uint8_t data)
+void a2eaux_ramworks3_device::write_c07x(uint8_t offset, uint8_t data)
 {
 	// write to C073?
 	if (offset == 3)

@@ -31,20 +31,6 @@ constexpr int AUTO_ALLOC_INPUT  = 65535;
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SOUND_ROUTE(_output, _target, ...) \
-	dynamic_cast<device_sound_interface &>(*device).add_route(_output, _target, __VA_ARGS__);
-
-#define MCFG_SOUND_ROUTES_RESET() \
-	dynamic_cast<device_sound_interface &>(*device).reset_routes();
-
-#define MCFG_MIXER_ROUTE(_output, _target, _gain, _mixoutput) \
-	dynamic_cast<device_sound_interface &>(*device).add_route(_output, _target, _gain, AUTO_ALLOC_INPUT, _mixoutput);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

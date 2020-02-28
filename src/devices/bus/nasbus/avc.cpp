@@ -22,10 +22,11 @@ DEFINE_DEVICE_TYPE(NASCOM_AVC, nascom_avc_device, "nascom_avc", "Nascom Advanced
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nascom_avc_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16250000, 1024, 0, 768, 320, 0, 256)
-	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update)
+void nascom_avc_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(16250000, 1024, 0, 768, 320, 0, 256);
+	screen.set_screen_update("mc6845", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
@@ -33,8 +34,8 @@ MACHINE_CONFIG_START(nascom_avc_device::device_add_mconfig)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(6);
-	m_crtc->set_update_row_callback(FUNC(nascom_avc_device::crtc_update_row), this);
-MACHINE_CONFIG_END
+	m_crtc->set_update_row_callback(FUNC(nascom_avc_device::crtc_update_row));
+}
 
 
 //**************************************************************************
@@ -77,9 +78,9 @@ void nascom_avc_device::device_start()
 
 void nascom_avc_device::device_reset()
 {
-	io_space().install_write_handler(0xb0, 0xb0, write8_delegate(FUNC(mc6845_device::address_w), m_crtc.target()));
-	io_space().install_readwrite_handler(0xb1, 0xb1, read8_delegate(FUNC(mc6845_device::register_r), m_crtc.target()), write8_delegate(FUNC(mc6845_device::register_w), m_crtc.target()));
-	io_space().install_write_handler(0xb2, 0xb2, write8_delegate(FUNC(nascom_avc_device::control_w), this));
+	io_space().install_write_handler(0xb0, 0xb0, write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
+	io_space().install_readwrite_handler(0xb1, 0xb1, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
+	io_space().install_write_handler(0xb2, 0xb2, write8_delegate(*this, FUNC(nascom_avc_device::control_w)));
 }
 
 
@@ -130,13 +131,13 @@ WRITE8_MEMBER( nascom_avc_device::control_w )
 	// page video ram in?
 	if (((m_control & 0x07) == 0) && (data & 0x07))
 	{
-		m_nasbus->ram_disable_w(0);
-		program_space().install_readwrite_handler(0x8000, 0xbfff, read8_delegate(FUNC(nascom_avc_device::vram_r), this), write8_delegate(FUNC(nascom_avc_device::vram_w), this));
+		ram_disable_w(0);
+		program_space().install_readwrite_handler(0x8000, 0xbfff, read8_delegate(*this, FUNC(nascom_avc_device::vram_r)), write8_delegate(*this, FUNC(nascom_avc_device::vram_w)));
 	}
 	else if ((data & 0x07) == 0)
 	{
 		program_space().unmap_readwrite(0x8000, 0xbfff);
-		m_nasbus->ram_disable_w(1);
+		ram_disable_w(1);
 	}
 
 	m_control = data;

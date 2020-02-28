@@ -3,28 +3,30 @@
 /******************************************************************************
 
     basic information
-	https://gbatemp.net/threads/the-c2-color-game-console-an-obscure-chinese-handheld.509320/
+    https://gbatemp.net/threads/the-c2-color-game-console-an-obscure-chinese-handheld.509320/
 
-	"The C2 is a glorious console with a D-Pad, Local 2.4GHz WiFi, Cartridge slot, A, B, and C buttons,
- 	 and has micro usb power! Don't be fooled though, there is no lithium battery, so you have to put in
-	 3 AA batteries if you don't want to play with it tethered to a charger. 
+    "The C2 is a glorious console with a D-Pad, Local 2.4GHz WiFi, Cartridge slot, A, B, and C buttons,
+     and has micro usb power! Don't be fooled though, there is no lithium battery, so you have to put in
+     3 AA batteries if you don't want to play with it tethered to a charger.
 
      It comes with a built in game based on the roco kingdom characters.
 
      In addition, there is a slot on the side of the console allowing cards to be swiped through. Those
-	 cards can add characters to the game. The console scans the barcode and a new character or item appears in the game for you to use.
+     cards can add characters to the game. The console scans the barcode and a new character or item appears in the game for you to use.
 
      The C2 comes with 9 holographic game cards that will melt your eyes."
 
-	also includes a link to the following video
-	https://www.youtube.com/watch?v=D3XO4aTZEko
+    also includes a link to the following video
+    https://www.youtube.com/watch?v=D3XO4aTZEko
 
-	TODO:
-	identify CPU type, and if the system ROM is needed to run carts or not
+    TODO:
+    identify CPU type, and if the system ROM is needed to run carts or not
 
 *******************************************************************************/
 
 #include "emu.h"
+
+#include "cpu/mcs51/mcs51.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -39,6 +41,7 @@ class c2_color_state : public driver_device
 public:
 	c2_color_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_cart(*this, "cartslot")
 		, m_cart_region(nullptr)
 		, m_palette(*this, "palette")
@@ -46,7 +49,6 @@ public:
 	{ }
 
 	void c2_color(machine_config &config);
-	void leapfrog_mfleappad(machine_config &config);
 
 private:
 	virtual void machine_start() override;
@@ -54,8 +56,14 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
+	u8 cart_r(offs_t offset);
+
+	void prog_map(address_map &map);
+	void ext_map(address_map &map);
+
+	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_region;
 	required_device<palette_device> m_palette;
@@ -84,7 +92,7 @@ void c2_color_state::machine_reset()
 {
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(c2_color_state, cart)
+DEVICE_IMAGE_LOAD_MEMBER(c2_color_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -94,12 +102,30 @@ DEVICE_IMAGE_LOAD_MEMBER(c2_color_state, cart)
 	return image_init_result::PASS;
 }
 
+u8 c2_color_state::cart_r(offs_t offset)
+{
+	// skip past 32-byte header
+	return m_cart->read_rom(offset + 32);
+}
+
+void c2_color_state::prog_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(c2_color_state::cart_r));
+}
+
+void c2_color_state::ext_map(address_map &map)
+{
+	map(0x2400, 0x2400).nopr();
+}
+
 static INPUT_PORTS_START( c2_color )
 INPUT_PORTS_END
 
 void c2_color_state::c2_color(machine_config &config)
 {
-	// unknown CPU
+	I8032(config, m_maincpu, 12'000'000); // exact type and clock unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &c2_color_state::prog_map);
+	m_maincpu->set_addrmap(AS_IO, &c2_color_state::ext_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -113,7 +139,7 @@ void c2_color_state::c2_color(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "c2color_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&c2_color_state::device_image_load_cart, this));
+	m_cart->set_device_load(FUNC(c2_color_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("c2color_cart");
 }
@@ -124,4 +150,4 @@ ROM_START( c2color )
 ROM_END
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
-CONS( 201?, c2color,      0,       0,      c2_color,   c2_color, c2_color_state, empty_init, "<unknown>", "C2 Color", MACHINE_IS_SKELETON )
+CONS( 201?, c2color,      0,       0,      c2_color,   c2_color, c2_color_state, empty_init, "Baiyi Animation", "C2 Color (China)", MACHINE_IS_SKELETON )

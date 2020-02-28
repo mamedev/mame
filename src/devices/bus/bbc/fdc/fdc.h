@@ -21,7 +21,7 @@
 
 class device_bbc_fdc_interface;
 
-class bbc_fdc_slot_device : public device_t, public device_slot_interface
+class bbc_fdc_slot_device : public device_t, public device_single_card_slot_interface<device_bbc_fdc_interface>
 {
 public:
 	// construction/destruction
@@ -41,17 +41,15 @@ public:
 	auto intrq_wr_callback() { return m_intrq_cb.bind(); }
 	auto drq_wr_callback() { return m_drq_cb.bind(); }
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( intrq_w ) { m_intrq_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER( drq_w) { m_drq_cb(state); }
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	device_bbc_fdc_interface *m_card;
 
@@ -63,11 +61,11 @@ private:
 
 // ======================> device_bbc_fdc_interface
 
-class device_bbc_fdc_interface : public device_slot_card_interface
+class device_bbc_fdc_interface : public device_interface
 {
 public:
-	virtual DECLARE_READ8_MEMBER(read) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write) { }
+	virtual uint8_t read(offs_t offset) { return 0xff; }
+	virtual void write(offs_t offset, uint8_t data) { }
 
 protected:
 	device_bbc_fdc_interface(const machine_config &mconfig, device_t &device);

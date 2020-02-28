@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(SVI_EXPANDER, svi_expander_device, "svi_expander", "SVI 318/3
 
 svi_expander_device::svi_expander_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SVI_EXPANDER, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_svi_expander_interface>(mconfig, *this),
 	m_module(nullptr),
 	m_int_handler(*this),
 	m_romdis_handler(*this),
@@ -56,7 +56,7 @@ svi_expander_device::~svi_expander_device()
 void svi_expander_device::device_start()
 {
 	// get inserted module
-	m_module = dynamic_cast<device_svi_expander_interface *>(get_card_device());
+	m_module = get_card_device();
 
 	// resolve callbacks
 	m_int_handler.resolve_safe();
@@ -69,49 +69,41 @@ void svi_expander_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void svi_expander_device::device_reset()
-{
-}
-
-//-------------------------------------------------
 //  host to module interface
 //-------------------------------------------------
 
-READ8_MEMBER( svi_expander_device::mreq_r )
+uint8_t svi_expander_device::mreq_r(offs_t offset)
 {
 	romdis_w(1);
 	ramdis_w(1);
 
 	if (m_module)
-		return m_module->mreq_r(space, offset);
+		return m_module->mreq_r(offset);
 
 	return 0xff;
 }
 
-WRITE8_MEMBER( svi_expander_device::mreq_w )
+void svi_expander_device::mreq_w(offs_t offset, uint8_t data)
 {
 	romdis_w(1);
 	ramdis_w(1);
 
 	if (m_module)
-		m_module->mreq_w(space, offset, data);
+		m_module->mreq_w(offset, data);
 }
 
-READ8_MEMBER( svi_expander_device::iorq_r )
+uint8_t svi_expander_device::iorq_r(offs_t offset)
 {
 	if (m_module)
-		return m_module->iorq_r(space, offset);
+		return m_module->iorq_r(offset);
 
 	return 0xff;
 }
 
-WRITE8_MEMBER( svi_expander_device::iorq_w )
+void svi_expander_device::iorq_w(offs_t offset, uint8_t data)
 {
 	if (m_module)
-		m_module->iorq_w(space, offset, data);
+		m_module->iorq_w(offset, data);
 }
 
 WRITE_LINE_MEMBER( svi_expander_device::bk21_w )
@@ -148,7 +140,7 @@ WRITE_LINE_MEMBER( svi_expander_device::bk32_w )
 //-------------------------------------------------
 
 device_svi_expander_interface::device_svi_expander_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "svi3x8exp")
 {
 	m_expander = dynamic_cast<svi_expander_device *>(device.owner());
 }

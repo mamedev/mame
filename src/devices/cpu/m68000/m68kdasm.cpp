@@ -1897,9 +1897,9 @@ std::string m68k_disassembler::d68010_movec()
 	}
 
 	if(BIT(m_cpu_ir, 0))
-		return util::string_format("movec %c%d, %s; (%s)", BIT(extension, 15) ? 'A' : 'D', (extension>>12)&7, reg_name, processor);
+		return util::string_format("movec   %c%d, %s; (%s)", BIT(extension, 15) ? 'A' : 'D', (extension>>12)&7, reg_name, processor);
 	else
-		return util::string_format("movec %s, %c%d; (%s)", reg_name, BIT(extension, 15) ? 'A' : 'D', (extension>>12)&7, processor);
+		return util::string_format("movec   %s, %c%d; (%s)", reg_name, BIT(extension, 15) ? 'A' : 'D', (extension>>12)&7, processor);
 }
 
 std::string m68k_disassembler::d68000_movem_pd_16()
@@ -2901,9 +2901,9 @@ std::string m68k_disassembler::d68020_unpk_mm()
 	return util::string_format("unpk    -(A%d), -(A%d), %s; (2+)", m_cpu_ir&7, (m_cpu_ir>>9)&7, get_imm_str_u16());
 }
 
-std::string m68k_disassembler::fc_to_string(uint16_t modes)
+std::string m68k_disassembler::fc_to_string(u16 modes)
 {
-	uint16_t fc = modes & 0x1f;
+	u16 fc = modes & 0x1f;
 
 	if (fc == 0)
 	{
@@ -3077,7 +3077,7 @@ std::string m68k_disassembler::d68851_pbcc32()
 std::string m68k_disassembler::d68851_pdbcc()
 {
 	u32 temp_pc = m_cpu_pc;
-	uint16_t modes = read_imm_16();
+	u16 modes = read_imm_16();
 
 	return util::string_format("pb%s %x", m_mmucond[modes&0xf], temp_pc + make_int_16(read_imm_16()));
 }
@@ -3095,7 +3095,7 @@ std::string m68k_disassembler::d68040_fbcc_16()
 	if(limit.first)
 		return limit.second;
 	u32 temp_pc = m_cpu_pc;
-	int16_t disp = make_int_16(read_imm_16());
+	s16 disp = make_int_16(read_imm_16());
 	return util::string_format("fb%-s   $%x", m_cpcc[m_cpu_ir & 0x3f], temp_pc + disp);
 }
 

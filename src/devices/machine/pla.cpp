@@ -11,6 +11,10 @@
 #include "jedparse.h"
 #include "plaparse.h"
 
+#define LOG_TERMS (1 << 0U)
+//#define VERBOSE (LOG_TERMS)
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(PLA, pla_device, "pla", "PLA")
 DEFINE_DEVICE_TYPE(PLS100, pls100_device, "pls100", "82S100-series PLA")
@@ -147,6 +151,16 @@ void pla_device::parse_fusemap()
 		}
 
 		term->or_mask <<= 32;
+
+		LOGMASKED(LOG_TERMS, "F |= %0*X if (I & %0*X) == zeroes and (I & %0*X) == ones [term %d%s]\n",
+			(m_outputs + 3) / 4,
+			term->or_mask >> 32,
+			(m_inputs + 3) / 4,
+			(term->and_mask ^ m_input_mask) >> 32,
+			(m_inputs + 3) / 4,
+			uint32_t(term->and_mask ^ m_input_mask),
+			p,
+			(~term->and_mask & (~term->and_mask >> 32) & m_input_mask) == 0 ? "" : ", ignored");
 	}
 
 	// XOR mask
@@ -158,6 +172,8 @@ void pla_device::parse_fusemap()
 	}
 
 	m_xor <<= 32;
+
+	LOGMASKED(LOG_TERMS, "F ^= %0*X\n", (m_outputs + 3) / 4, m_xor >> 32);
 }
 
 

@@ -74,43 +74,43 @@ void lynx_state::sound_cb()
 	lynx_timer_count_down(1);
 }
 
-MACHINE_CONFIG_START(lynx_state::lynx)
+void lynx_state::lynx(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
-	MCFG_DEVICE_PROGRAM_MAP(lynx_mem)
-	config.m_minimum_quantum = attotime::from_hz(60);
+	M65SC02(config, m_maincpu, 4000000);        /* vti core, integrated in vlsi, stz, but not bbr bbs */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lynx_state::lynx_mem);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ADDRESS_MAP_BANK(config, "bank_fc00").set_map(&lynx_state::lynx_fc00_mem).set_options(ENDIANNESS_LITTLE, 8, 9, 0x100);
 	ADDRESS_MAP_BANK(config, "bank_fd00").set_map(&lynx_state::lynx_fd00_mem).set_options(ENDIANNESS_LITTLE, 8, 9, 0x100);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(lynx_state, screen_update)
-	MCFG_SCREEN_SIZE(160, 102)
-	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 102-1)
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(30);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_screen_update(FUNC(lynx_state::screen_update));
+	m_screen->set_size(160, 102);
+	m_screen->set_visarea(0, 160-1, 0, 102-1);
 	config.set_default_layout(layout_lynx);
 
-	MCFG_PALETTE_ADD("palette", 0x10)
+	PALETTE(config, m_palette).set_entries(0x10);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	LYNX_SND(config, m_sound, 0);
-	m_sound->set_timer_delegate(FUNC(lynx_state::sound_cb), this);
+	m_sound->set_timer_delegate(FUNC(lynx_state::sound_cb));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", lynx_state, lynx, "o", 0)
+	QUICKLOAD(config, "quickload", "o").set_load_callback(FUNC(lynx_state::quickload_cb));
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "lynx_cart")
-	MCFG_GENERIC_EXTENSIONS("lnx,lyx")
-	MCFG_GENERIC_MANDATORY
-	MCFG_GENERIC_LOAD(lynx_state, lynx_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "lynx_cart", "lnx,lyx"));
+	cartslot.set_must_be_loaded(true);
+	cartslot.set_device_load(FUNC(lynx_state::cart_load));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("lynx");
-MACHINE_CONFIG_END
+}
 
 #if 0
 void lynx_state::lynx2(machine_config &config)
@@ -123,7 +123,7 @@ void lynx_state::lynx2(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	config.device_remove("lynx");
 	LYNX2_SND(config.replace(), m_sound, 0);
-	m_sound->set_timer_delegate(FUNC(lynx_state::sound_cb), this);
+	m_sound->set_timer_delegate(FUNC(lynx_state::sound_cb));
 	m_sound->add_route(0, "lspeaker", 0.50);
 	m_sound->add_route(1, "rspeaker", 0.50);
 }
@@ -155,7 +155,7 @@ ROM_END
 #endif
 
 
-QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
+QUICKLOAD_LOAD_MEMBER(lynx_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	std::vector<uint8_t> data;

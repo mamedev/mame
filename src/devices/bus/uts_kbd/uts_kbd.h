@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_UTS_KBD_H
-#define MAME_BUS_UTS_KBD_H 1
+#ifndef MAME_BUS_UTS_KBD_UTS_KBD_H
+#define MAME_BUS_UTS_KBD_UTS_KBD_H
 
 #pragma once
 
@@ -21,7 +21,7 @@ class device_uts_keyboard_interface;
 
 // ======================> uts_keyboard_port_device
 
-class uts_keyboard_port_device : public device_t, public device_slot_interface
+class uts_keyboard_port_device : public device_t, public device_single_card_slot_interface<device_uts_keyboard_interface>
 {
 	friend class device_uts_keyboard_interface;
 
@@ -63,7 +63,7 @@ private:
 
 // ======================> device_uts_keyboard_interface
 
-class device_uts_keyboard_interface : public device_slot_card_interface
+class device_uts_keyboard_interface : public device_interface
 {
 	friend class uts_keyboard_port_device;
 
@@ -98,4 +98,4 @@ WRITE_LINE_MEMBER(uts_keyboard_port_device::ready_w)
 		m_kbd->ready_w(state);
 }
 
-#endif // MAME_BUS_UTS_KBD_H
+#endif // MAME_BUS_UTS_KBD_UTS_KBD_H

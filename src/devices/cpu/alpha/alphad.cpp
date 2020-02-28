@@ -6,21 +6,14 @@
  *   - enforce "should be zero" fields
  *   - enforce "Ra must be R31"
  *   - assembly and register naming preferences
- *   - operating environment dependent PALcode
+ *   - implementation-dependent instructions for EV5 and EV6
  */
 
 #include "emu.h"
 #include "alphad.h"
+#include "common.h"
 
-// instruction field extraction
-#define Ra(x) ((x >> 21) & 31)
-#define Rb(x) ((x >> 16) & 31)
-#define Rc(x) (x & 31)
-#define Im(x) u8(x >> 13)
-#define Disp_M(x) s16(x)
-#define Disp_B(x) (s32(x << 11) >> 9)
-
-// instruction formats
+ // instruction formats
 #define OPERATE_RRR(opcode, ra, rb, rc)  util::stream_format(stream, "%-10s %s, %s, %s",   opcode, R[ra], R[rb], R[rc])
 #define OPERATE_FFF(opcode, ra, rb, rc)  util::stream_format(stream, "%-10s %s, %s, %s",   opcode, F[ra], F[rb], F[rc])
 #define OPERATE_RIR(opcode, ra, im, rc)  util::stream_format(stream, "%-10s %s, #%d, %s",  opcode, R[ra], im, R[rc])
@@ -30,20 +23,30 @@
 #define OPERATE_FR(opcode, ra, rc)       util::stream_format(stream, "%-10s %s, %s",       opcode, F[ra], R[rc])
 #define OPERATE_IR(opcode, im, rc)       util::stream_format(stream, "%-10s #%d, %s",      opcode, im, R[rc])
 #define OPERATE_R(opcode, rc)            util::stream_format(stream, "%-10s %s",           opcode, R[rc])
+#define OPERATE_F(opcode, rc)            util::stream_format(stream, "%-10s %s",           opcode, F[rc])
+
+// TODO: verify syntax for multiple register formats
+#define OPERATE_RI(opcode, rb, rc)       util::stream_format(stream, "%-10s %s, %s",       opcode, R[rb], IBX[rc])
+#define OPERATE_RA(opcode, rb, rc)       util::stream_format(stream, "%-10s %s, %s",       opcode, R[rb], ABX[rc])
+#define OPERATE_RAI(opcode, rb, rc)      util::stream_format(stream, "%-10s %s, %s:%s",    opcode, R[rb], ABX[rc], IBX[rc])
+#define OPERATE_RP(opcode, rb, rc)       util::stream_format(stream, "%-10s %s, %s",       opcode, R[rb], PT[rc])
+#define OPERATE_RPI(opcode, rb, rc)      util::stream_format(stream, "%-10s %s, %s:%s",    opcode, R[rb], PT[rc], IBX[rc])
+#define OPERATE_RPA(opcode, rb, rc)      util::stream_format(stream, "%-10s %s, %s:%s",    opcode, R[rb], PT[rc], ABX[rc])
+#define OPERATE_RPAI(opcode, rb, rc)     util::stream_format(stream, "%-10s %s, %s:%s:%s", opcode, R[rb], PT[rc], ABX[rc], IBX[rc])
 
 #define MEMORY_R(opcode, ra, disp, rb)   util::stream_format(stream, "%-10s %s, %d(%s)",   opcode, R[ra], disp, R[rb])
 #define MEMORY_F(opcode, ra, disp, rb)   util::stream_format(stream, "%-10s %s, %d(%s)",   opcode, F[ra], disp, R[rb])
 #define BRANCH_R(opcode, ra, offset)     util::stream_format(stream, "%-10s %s, 0x%x",     opcode, R[ra], pc + 4 + offset)
 #define BRANCH_F(opcode, ra, offset)     util::stream_format(stream, "%-10s %s, 0x%x",     opcode, F[ra], pc + 4 + offset)
+#define BRANCH(opcode, offset)           util::stream_format(stream, "%-10s 0x%x",         opcode, pc + 4 + offset)
 
 #define JUMP(opcode, ra, rb)             util::stream_format(stream, "%-10s %s, (%s)",     opcode, R[ra], R[rb])
 
-#define MISC_0(opcode)                   util::stream_format(stream, "%-10s",              opcode)
+#define MISC(opcode)                     util::stream_format(stream, "%-10s",              opcode)
 #define MISC_R(opcode, ra)               util::stream_format(stream, "%-10s %s",           opcode, R[ra])
 #define MISC_M(opcode, rb)               util::stream_format(stream, "%-10s (%s)",         opcode, R[rb])
 
-#define PAL(opcode, fnc)                 util::stream_format(stream, "%-10s #0x%x",        opcode, fnc)
-#define PAL_0(opcode)                    util::stream_format(stream, "%-10s",              opcode)
+#define CALL_PAL(fnc)                    util::stream_format(stream, "%-10s %s",           "call_pal", fnc)
 
 #define RESERVED(opcode)                 util::stream_format(stream, "%-10s",              opcode)
 #define UNKNOWN(type)                    util::stream_format(stream, "unknown %s",         type)
@@ -65,6 +68,31 @@ const char *const alpha_disassembler::F[] =
 	"f24", "f25", "f26", "f27", "f28", "f29", "f30", "f31"
 };
 
+const char *const alpha_disassembler::PT[] =
+{
+	 "pt0",  "pt1",  "pt2",  "pt3",  "pt4",  "pt5",  "pt6",  "pt7",
+	 "pt8",  "pt9", "pt10", "pt11", "pt12", "pt13", "pt14", "pt15",
+	"pt16", "pt17", "pt18", "pt19", "pt20", "pt21", "pt22", "pt23",
+	"pt24", "pt25", "pt26", "pt27", "pt28", "pt29", "pt30", "pt31"
+};
+
+// NOTE: ABXn and IBXn are placeholders for undefined/unused registers
+const char *const alpha_disassembler::ABX[] =
+{
+	"TB_CTL", "ABX1", "DTB_PTE", "DTB_PTE_TEMP", "MM_CSR", "VA", "DTBZAP", "DTBASM",
+	"DTBIS", "BIU_ADDR", "BIU_STAT", "ABX12", "DC_STAT", "FILL_ADDR", "ABOX_CTL", "ALT_MODE",
+	"CC", "CC_CTL", "BIU_CTL", "FILL_SYNDROME", "BC_TAG", "FLUSH_IC", "ABX22", "FLUSH_IC_ASM",
+	"ABX24", "ABX25", "ABX26", "ABX27", "ABX28", "ABX29", "ABX30", "ABX31"
+};
+
+const char *const alpha_disassembler::IBX[] =
+{
+	"TB_TAG", "ITB_PTE", "ICCSR", "ITB_PTE_TEMP", "EXC_ADDR", "SL_RCV", "ITBZAP", "ITBASM",
+	"ITBIS", "PS", "EXC_SUM", "PAL_BASE", "HIRR", "SIRR", "ASTRR", "IBX15",
+	"HIERR", "SIER", "ASTER", "SL_CLR", "IBX20", "IBX21", "SL_XMIT", "IBX23",
+	"IBX24", "IBX25", "IBX26", "IBX27", "IBX28", "IBX29", "IBX30", "IBX31"
+};
+
 offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	offs_t const bytes = 4;
@@ -76,13 +104,211 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 	{
 		// pal format
 		case 0x00:
-			switch (instruction & 0x03ffffff)
+			switch (m_dasm_type)
 			{
-				case 0x0000: PAL_0("halt"); break;
-				case 0x0002: PAL_0("draina"); break;
-				case 0x0086: PAL_0("imb"); break;
+			case TYPE_UNKNOWN:
+				switch (instruction & 0x03ffffff)
+				{
+				case 0x0000: CALL_PAL("halt"); break;
+				case 0x0002: CALL_PAL("draina"); break;
+				case 0x0086: CALL_PAL("imb"); break;
 
-				default: PAL("call_pal", instruction & 0x03ffffff); break; // CALL_PAL
+				default: UNKNOWN("call_pal"); break;
+				}
+				break;
+
+			case TYPE_NT:
+				switch (instruction & 0x03ffffff)
+				{
+					// Windows NT unprivileged PALcode
+				case 0x0080: CALL_PAL("bpt");        break; // breakpoint trap
+				case 0x0083: CALL_PAL("callsys");    break; // call system service
+				case 0x0086: CALL_PAL("imb");        break; // instruction memory barrier
+				case 0x00aa: CALL_PAL("gentrap");    break; // generate trap
+				case 0x00ab: CALL_PAL("rdteb");      break; // read TEB internal processor register
+				case 0x00ac: CALL_PAL("kbpt");       break; // kernel breakpoint trap
+				case 0x00ad: CALL_PAL("callkd");     break; // call kernel debugger
+
+					// Windows NT privileged PALcode
+				case 0x0000: CALL_PAL("halt");       break; // trap to illegal instruction
+				case 0x0001: CALL_PAL("restart");    break; // restart the processor
+				case 0x0002: CALL_PAL("draina");     break; // drain aborts
+				case 0x0003: CALL_PAL("reboot");     break; // transfer to console firmware
+				case 0x0004: CALL_PAL("initpal");    break; // initialize the PALcode
+				case 0x0005: CALL_PAL("wrentry");    break; // write system entry
+				case 0x0006: CALL_PAL("swpirql");    break; // swap IRQL
+				case 0x0007: CALL_PAL("rdirql");     break; // read current IRQL
+				case 0x0008: CALL_PAL("di");         break; // disable interrupts
+				case 0x0009: CALL_PAL("ei");         break; // enable interrupts
+				case 0x000a: CALL_PAL("swppal");     break; // swap PALcode
+				case 0x000c: CALL_PAL("ssir");       break; // set software interrupt request
+				case 0x000d: CALL_PAL("csir");       break; // clear software interrupt request
+				case 0x000e: CALL_PAL("rfe");        break; // return from exception
+				case 0x000f: CALL_PAL("retsys");     break; // return from system service call
+				case 0x0010: CALL_PAL("swpctx");     break; // swap privileged thread context
+				case 0x0011: CALL_PAL("swpprocess"); break; // swap privileged process context
+				case 0x0012: CALL_PAL("rdmces");     break; // read machine check error summary
+				case 0x0013: CALL_PAL("wrmces");     break; // write machine check error summary
+				case 0x0014: CALL_PAL("tbia");       break; // translation buffer invalidate all
+				case 0x0015: CALL_PAL("tbis");       break; // translation buffer invalidate single
+				case 0x0016: CALL_PAL("dtbis");      break; // data translation buffer invalidate single
+				case 0x0017: CALL_PAL("tbisasn");    break; // translation buffer invalidate single ASN
+				case 0x0018: CALL_PAL("rdksp");      break; // read initial kernel stack
+				case 0x0019: CALL_PAL("swpksp");     break; // swap initial kernel stack
+				case 0x001a: CALL_PAL("rdpsr");      break; // read processor status register
+				case 0x001c: CALL_PAL("rdpcr");      break; // read PCR (processor control registers)
+				case 0x001e: CALL_PAL("rdthread");   break; // read the current thread value
+				case 0x0020: CALL_PAL("wrperfmon");  break; // write performance monitoring values
+				case 0x0030: CALL_PAL("rdcounters"); break; // read PALcode event counters
+				case 0x0031: CALL_PAL("rdstate");    break; // read internal processor state
+
+				default: UNKNOWN("call_pal"); break;
+				}
+				break;
+
+			case TYPE_UNIX:
+				switch (instruction & 0x03ffffff)
+				{
+					// Digital UNIX unprivileged PALcode
+				case 0x0080: CALL_PAL("bpt");        break; // breakpoint trap
+				case 0x0081: CALL_PAL("bugchk");     break; // bugcheck
+				case 0x0083: CALL_PAL("callsys");    break; // system call
+				case 0x0086: CALL_PAL("imb");        break; // i-stream memory barrier
+				case 0x0092: CALL_PAL("urti");       break; // return from user mode trap
+				case 0x009e: CALL_PAL("rdunique");   break; // read unique value
+				case 0x009f: CALL_PAL("wrunique");   break; // write unique value
+				case 0x00aa: CALL_PAL("gentrap");    break; // generate software trap
+				case 0x00ae: CALL_PAL("clrfen");     break; // clear floating-point enable
+
+					// Digital UNIX privileged PALcode
+				case 0x0000: CALL_PAL("halt");       break; // halt the processor
+				case 0x0001: CALL_PAL("cflush");     break; // cache flush
+				case 0x0002: CALL_PAL("draina");     break; // drain aborts
+				case 0x0009: CALL_PAL("cserve");     break; // console service
+				case 0x000a: CALL_PAL("swppal");     break; // swap PALcode image
+				case 0x000d: CALL_PAL("wripir");     break; // write interprocessor interrupt request
+				case 0x0010: CALL_PAL("rdmces");     break; // read machine check error summary register
+				case 0x0011: CALL_PAL("wrmces");     break; // write machine check error summary register
+				case 0x002b: CALL_PAL("wrfen");      break; // write floating-point enable
+				case 0x002d: CALL_PAL("wrvptptr");   break; // write virtual page table pointer
+				case 0x0030: CALL_PAL("swpctx");     break; // swap privileged context
+				case 0x0031: CALL_PAL("wrval");      break; // write system value
+				case 0x0032: CALL_PAL("rdval");      break; // read system value
+				case 0x0033: CALL_PAL("tbi");        break; // translation buffer invalidate
+				case 0x0034: CALL_PAL("wrent");      break; // write system entry address
+				case 0x0035: CALL_PAL("swpipl");     break; // swap interrupt priority level
+				case 0x0036: CALL_PAL("rdps");       break; // read processor status
+				case 0x0037: CALL_PAL("wrkgp");      break; // write kernel global pointer
+				case 0x0038: CALL_PAL("wrusp");      break; // write user stack pointer
+				case 0x0039: CALL_PAL("wrperfmon");  break; // performance monitoring function
+				case 0x003a: CALL_PAL("rdusp");      break; // read user stack pointer
+				case 0x003c: CALL_PAL("whami");      break; // who am I
+				case 0x003d: CALL_PAL("retsys");     break; // return from system call
+				case 0x003e: CALL_PAL("wtint");      break; // wait for interrupt
+				case 0x003f: CALL_PAL("rti");        break; // return from trap or interrupt
+
+				default: UNKNOWN("call_pal"); break;
+				}
+				break;
+
+			case TYPE_VMS:
+				switch (instruction & 0x03ffffff)
+				{
+					// OpenVMS unprivileged PALcode
+				case 0x0080: CALL_PAL("bpt");          break; // breakpoint
+				case 0x0081: CALL_PAL("bugchk");       break; // bugcheck
+				case 0x0082: CALL_PAL("chme");         break; // change mode to executive
+				case 0x0083: CALL_PAL("chmk");         break; // change mode to kernel
+				case 0x0084: CALL_PAL("chms");         break; // change mode to supervisor
+				case 0x0085: CALL_PAL("chmu");         break; // change mode to user
+				case 0x0086: CALL_PAL("imb");          break; // i-stream memory barrier
+				case 0x0087: CALL_PAL("insqhil");      break; // insert into longword queue at head interlocked
+				case 0x0088: CALL_PAL("insqtil");      break; // insert into longword queue at tail interlocked
+				case 0x0089: CALL_PAL("insqhiq");      break; // insert into quadword queue at head interlocked
+				case 0x008a: CALL_PAL("insqtiq");      break; // insert into quadword queue at tail interlocked
+				case 0x008b: CALL_PAL("insquel");      break; // insert entry into longword queue
+				case 0x008c: CALL_PAL("insqueq");      break; // insert entry into quadword queue
+				case 0x008d: CALL_PAL("insquel/d");    break; // insert entry into longword queue deferred
+				case 0x008e: CALL_PAL("insqueq/d");    break; // insert entry into quadword queue deferred
+				case 0x008f: CALL_PAL("prober");       break; // probe for read access
+				case 0x0090: CALL_PAL("probew");       break; // probe for write access
+				case 0x0091: CALL_PAL("rd_ps");        break; // move processor status
+				case 0x0092: CALL_PAL("rei");          break; // return from exception or interrupt
+				case 0x0093: CALL_PAL("remqhil");      break; // remove from longword queue at head interlocked
+				case 0x0094: CALL_PAL("remqtil");      break; // remove from longword queue at tail interlocked
+				case 0x0095: CALL_PAL("remqhiq");      break; // remove from quadword queue at head interlocked
+				case 0x0096: CALL_PAL("remqtiq");      break; // remove from quadword queue at tail interlocked
+				case 0x0097: CALL_PAL("remquel");      break; // remove entry from longword queue
+				case 0x0098: CALL_PAL("remqueq");      break; // remove entry from quadword queue
+				case 0x0099: CALL_PAL("remquel/d");    break; // remove entry from longword queue deferred
+				case 0x009a: CALL_PAL("remqueq/d");    break; // remove entry from quadword queue deferred
+				case 0x009b: CALL_PAL("swasten");      break; // swap AST enable for current mode
+				case 0x009c: CALL_PAL("wr_ps_sw");     break; // write processor status software field
+				case 0x009d: CALL_PAL("rscc");         break; // read system cycle counter
+				case 0x009e: CALL_PAL("read_unq");     break; // read unique context
+				case 0x009f: CALL_PAL("write_unq");    break; // write unique context
+				case 0x00a0: CALL_PAL("amovrr");       break; // atomic move from register to register
+				case 0x00a1: CALL_PAL("amovrm");       break; // atomic move from register to memory
+				case 0x00a2: CALL_PAL("insqhilr");     break; // insert into longword queue at head interlocked resident
+				case 0x00a3: CALL_PAL("insqtilr");     break; // insert into longword queue at tail interlocked resident
+				case 0x00a4: CALL_PAL("insqhiqr");     break; // insert into quadword queue at head interlocked resident
+				case 0x00a5: CALL_PAL("insqtiqr");     break; // insert into quadword queue at tail interlocked resident
+				case 0x00a6: CALL_PAL("remqhilr");     break; // remove from longword queue at head interlocked resident
+				case 0x00a7: CALL_PAL("remqtilr");     break; // remove from longword queue at tail interlocked resident
+				case 0x00a8: CALL_PAL("remqhiqr");     break; // remove from quadword queue at head interlocked resident
+				case 0x00a9: CALL_PAL("remqtiqr");     break; // remove from quadword queue at tail interlocked resident
+				case 0x00aa: CALL_PAL("gentrap");      break; // generate software trap
+				case 0x00ae: CALL_PAL("clrfen");       break; // clear floating-point enable
+
+					// OpenVMS privileged PALcode
+				case 0x0000: CALL_PAL("halt");         break; // halt processor
+				case 0x0001: CALL_PAL("cflush");       break; // cache flush
+				case 0x0002: CALL_PAL("draina");       break; // drain aborts
+				case 0x0003: CALL_PAL("ldqp");         break; // load quadword physical
+				case 0x0004: CALL_PAL("stqp");         break; // store quadword physical
+				case 0x0005: CALL_PAL("swpctx");       break; // swap privileged context
+				case 0x0006: CALL_PAL("mfpr_asn");     break; // move from processor register ASN
+				case 0x0009: CALL_PAL("cserve");       break; // console service
+				case 0x000a: CALL_PAL("swppal");       break; // swap PALcode image
+				case 0x000b: CALL_PAL("mfpr_fen");     break; // move from processor register FEN
+				case 0x000c: CALL_PAL("mtpr_fen");     break; // move to processor register FEN
+				case 0x000d: CALL_PAL("mtpr_ipir");    break; // move to processor register IPRI
+				case 0x000e: CALL_PAL("mfpr_ipl");     break; // move from processor register IPL
+				case 0x000f: CALL_PAL("mtpr_ipl");     break; // move to processor register IPL
+				case 0x0010: CALL_PAL("mfpr_mces");    break; // move from processor register MCES
+				case 0x0011: CALL_PAL("mtpr_mces");    break; // move to processor register MCES
+				case 0x0012: CALL_PAL("mfpr_pcbb");    break; // move from processor register PCBB
+				case 0x0013: CALL_PAL("mfpr_prbr");    break; // move from processor register PRBR
+				case 0x0014: CALL_PAL("mtpr_prbr");    break; // move to processor register PRBR
+				case 0x0015: CALL_PAL("mfpr_ptbr");    break; // move from processor register PTBR
+				case 0x0016: CALL_PAL("mfpr_scbb");    break; // move from processor register SCBB
+				case 0x0017: CALL_PAL("mtpr_scbb");    break; // move to processor register SCBB
+				case 0x0018: CALL_PAL("mtpr_sirr");    break; // move to processor register SIRR
+				case 0x0019: CALL_PAL("mfpr_sisr");    break; // move from processor register SISR
+				case 0x001a: CALL_PAL("mfpr_tbchk");   break; // move from processor register TBCHK
+				case 0x001b: CALL_PAL("mtpr_tbia");    break; // move to processor register TBIA
+				case 0x001c: CALL_PAL("mtpr_tbiap");   break; // move to processor register TBIAP
+				case 0x001d: CALL_PAL("mtpr_tbis");    break; // move to processor register TBIS
+				case 0x001e: CALL_PAL("mfpr_esp");     break; // move from processor register ESP
+				case 0x001f: CALL_PAL("mtpr_esp");     break; // move to processor register ESP
+				case 0x0020: CALL_PAL("mfpr_ssp");     break; // move from processor register SSP
+				case 0x0021: CALL_PAL("mtpr_ssp");     break; // move to processor register SSP
+				case 0x0022: CALL_PAL("mfpr_usp");     break; // move from processor register USP
+				case 0x0023: CALL_PAL("mtpr_usp");     break; // move to processor register USP
+				case 0x0024: CALL_PAL("mtpr_tbisd");   break; // move to processor register TBISD
+				case 0x0025: CALL_PAL("mtpr_tbisi");   break; // move to processor register TBISI
+				case 0x0026: CALL_PAL("mtpr_asten");   break; // move to processor register ASTEN
+				case 0x0027: CALL_PAL("mtpr_astsr");   break; // move to processor register ASTSR
+				case 0x0029: CALL_PAL("mfpr_vptb");    break; // move from processor register VPTB
+				case 0x002a: CALL_PAL("mtpr_vptb");    break; // move to processor register VPTB
+				case 0x002b: CALL_PAL("mtpr_perfmon"); break; // move to processor register PERFMON
+				case 0x002e: CALL_PAL("mtpr_datfx");   break; // move to processor register DATFX
+				case 0x003e: CALL_PAL("wtint");        break; // wait for interrupt
+				case 0x003f: CALL_PAL("mfpr_whami");   break; // move from processor register WHAMI
+
+				default: UNKNOWN("call_pal"); break;
+				}
+				break;
 			}
 			break;
 
@@ -96,10 +322,20 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0x07: RESERVED("opc07"); break; // OPC07
 
 		// memory format
-		case 0x08: MEMORY_R("lda",   Ra(instruction), Disp_M(instruction), Rb(instruction)); break; // LDA
+		case 0x08:
+			if (Rb(instruction) == 31)
+				OPERATE_IR("mov", Disp_M(instruction), Ra(instruction));
+			else
+				MEMORY_R("lda",   Ra(instruction), Disp_M(instruction), Rb(instruction)); // LDA
+			break;
 		case 0x09: MEMORY_R("ldah",  Ra(instruction), Disp_M(instruction), Rb(instruction)); break; // LDAH
 		case 0x0a: MEMORY_R("ldbu",  Ra(instruction), Disp_M(instruction), Rb(instruction)); break; // LDBU (BWX)
-		case 0x0b: MEMORY_R("ldq_u", Ra(instruction), Disp_M(instruction), Rb(instruction)); break; // LDQ_U
+		case 0x0b:
+			if (Ra(instruction) == 31 && Disp_M(instruction) == 0)
+				MISC("unop");
+			else
+				MEMORY_R("ldq_u", Ra(instruction), Disp_M(instruction), Rb(instruction)); // LDQ_U
+			break;
 		case 0x0c: MEMORY_R("ldwu",  Ra(instruction), Disp_M(instruction), Rb(instruction)); break; // LDWU (BWX)
 		case 0x0d: MEMORY_R("stw",   Ra(instruction), Disp_M(instruction), Rb(instruction)); break; // STW (BWX)
 		case 0x0e: MEMORY_R("stb",   Ra(instruction), Disp_M(instruction), Rb(instruction)); break; // STB (BWX)
@@ -110,9 +346,19 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			switch ((instruction >> 5) & 0xff)
 			{
 				// register variants
-				case 0x00: OPERATE_RRR("addl",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // ADDL
+				case 0x00:
+					if (Ra(instruction) == 31)
+						OPERATE_RR("sextl", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_RRR("addl", Ra(instruction), Rb(instruction), Rc(instruction)); // ADDL
+					break;
 				case 0x02: OPERATE_RRR("s4addl", Ra(instruction), Rb(instruction), Rc(instruction)); break; // S4ADDL
-				case 0x09: OPERATE_RRR("subl",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // SUBL
+				case 0x09:
+					if (Ra(instruction) == 31)
+						OPERATE_RR("negl", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_RRR("subl", Ra(instruction), Rb(instruction), Rc(instruction)); // SUBL
+					break;
 				case 0x0b: OPERATE_RRR("s4subl", Ra(instruction), Rb(instruction), Rc(instruction)); break; // S4SUBL
 				case 0x0f: OPERATE_RRR("cmpbge", Ra(instruction), Rb(instruction), Rc(instruction)); break; // CMPBGE
 				case 0x12: OPERATE_RRR("s8addl", Ra(instruction), Rb(instruction), Rc(instruction)); break; // S8ADDL
@@ -120,23 +366,48 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 				case 0x1d: OPERATE_RRR("cmpult", Ra(instruction), Rb(instruction), Rc(instruction)); break; // CMPULT
 				case 0x20: OPERATE_RRR("addq",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // ADDQ
 				case 0x22: OPERATE_RRR("s4addq", Ra(instruction), Rb(instruction), Rc(instruction)); break; // S4ADDQ
-				case 0x29: OPERATE_RRR("subq",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // SUBQ
+				case 0x29:
+					if (Ra(instruction) == 31)
+						OPERATE_RR("negq", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_RRR("subq", Ra(instruction), Rb(instruction), Rc(instruction)); // SUBQ
+					break;
 				case 0x2b: OPERATE_RRR("s4subq", Ra(instruction), Rb(instruction), Rc(instruction)); break; // S4SUBQ
 				case 0x2d: OPERATE_RRR("cmpeq",  Ra(instruction), Rb(instruction), Rc(instruction)); break; // CMPEQ
 				case 0x32: OPERATE_RRR("s8addq", Ra(instruction), Rb(instruction), Rc(instruction)); break; // S8ADDQ
 				case 0x3b: OPERATE_RRR("s8subq", Ra(instruction), Rb(instruction), Rc(instruction)); break; // S8SUBQ
 				case 0x3d: OPERATE_RRR("cmpule", Ra(instruction), Rb(instruction), Rc(instruction)); break; // CMPULE
 				case 0x40: OPERATE_RRR("addl/v", Ra(instruction), Rb(instruction), Rc(instruction)); break; // ADDL/V
-				case 0x49: OPERATE_RRR("subl/v", Ra(instruction), Rb(instruction), Rc(instruction)); break; // SUBL/V
+				case 0x49:
+					if (Ra(instruction) == 31)
+						OPERATE_RR("negl/v", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_RRR("subl/v", Ra(instruction), Rb(instruction), Rc(instruction)); // SUBL/V
+					break;
 				case 0x4d: OPERATE_RRR("cmplt",  Ra(instruction), Rb(instruction), Rc(instruction)); break; // CMPLT
 				case 0x60: OPERATE_RRR("addq/v", Ra(instruction), Rb(instruction), Rc(instruction)); break; // ADDQ/V
-				case 0x69: OPERATE_RRR("subq/v", Ra(instruction), Rb(instruction), Rc(instruction)); break; // SUBQ/V
+				case 0x69:
+					if (Ra(instruction) == 31)
+						OPERATE_RR("negq/v", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_RRR("subq/v", Ra(instruction), Rb(instruction), Rc(instruction)); // SUBQ/V
+					break;
 				case 0x6d: OPERATE_RRR("cmple",  Ra(instruction), Rb(instruction), Rc(instruction)); break; // CMPLE
 
 				// immediate variants
-				case 0x80: OPERATE_RIR("addl",   Ra(instruction), Im(instruction), Rc(instruction)); break; // ADDL
+				case 0x80:
+					if (Ra(instruction) == 31)
+						OPERATE_IR("sextl", Im(instruction), Rc(instruction));
+					else
+						OPERATE_RIR("addl", Ra(instruction), Im(instruction), Rc(instruction)); // ADDL
+					break;
 				case 0x82: OPERATE_RIR("s4addl", Ra(instruction), Im(instruction), Rc(instruction)); break; // S4ADDL
-				case 0x89: OPERATE_RIR("subl",   Ra(instruction), Im(instruction), Rc(instruction)); break; // SUBL
+				case 0x89:
+					if (Ra(instruction) == 31)
+						OPERATE_IR("negl", Im(instruction), Rc(instruction));
+					else
+						OPERATE_RIR("subl", Ra(instruction), Im(instruction), Rc(instruction)); // SUBL
+					break;
 				case 0x8b: OPERATE_RIR("s4subl", Ra(instruction), Im(instruction), Rc(instruction)); break; // S4SUBL
 				case 0x8f: OPERATE_RIR("cmpbge", Ra(instruction), Im(instruction), Rc(instruction)); break; // CMPBGE
 				case 0x92: OPERATE_RIR("s8addl", Ra(instruction), Im(instruction), Rc(instruction)); break; // S8ADDL
@@ -144,17 +415,32 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 				case 0x9d: OPERATE_RIR("cmpult", Ra(instruction), Im(instruction), Rc(instruction)); break; // CMPULT
 				case 0xa0: OPERATE_RIR("addq",   Ra(instruction), Im(instruction), Rc(instruction)); break; // ADDQ
 				case 0xa2: OPERATE_RIR("s4addq", Ra(instruction), Im(instruction), Rc(instruction)); break; // S4ADDQ
-				case 0xa9: OPERATE_RIR("subq",   Ra(instruction), Im(instruction), Rc(instruction)); break; // SUBQ
+				case 0xa9:
+					if (Ra(instruction) == 31)
+						OPERATE_IR("negq", Im(instruction), Rc(instruction));
+					else
+						OPERATE_RIR("subq", Ra(instruction), Im(instruction), Rc(instruction)); // SUBQ
+					break;
 				case 0xab: OPERATE_RIR("s4subq", Ra(instruction), Im(instruction), Rc(instruction)); break; // S4SUBQ
 				case 0xad: OPERATE_RIR("cmpeq",  Ra(instruction), Im(instruction), Rc(instruction)); break; // CMPEQ
 				case 0xb2: OPERATE_RIR("s8addq", Ra(instruction), Im(instruction), Rc(instruction)); break; // S8ADDQ
 				case 0xbb: OPERATE_RIR("s8subq", Ra(instruction), Im(instruction), Rc(instruction)); break; // S8SUBQ
 				case 0xbd: OPERATE_RIR("cmpule", Ra(instruction), Im(instruction), Rc(instruction)); break; // CMPULE
 				case 0xc0: OPERATE_RIR("addl/v", Ra(instruction), Im(instruction), Rc(instruction)); break; // ADDL/V
-				case 0xc9: OPERATE_RIR("subl/v", Ra(instruction), Im(instruction), Rc(instruction)); break; // SUBL/V
+				case 0xc9:
+					if (Ra(instruction) == 31)
+						OPERATE_IR("negl/v", Im(instruction), Rc(instruction));
+					else
+						OPERATE_RIR("subl/v", Ra(instruction), Im(instruction), Rc(instruction)); // SUBL/V
+					break;
 				case 0xcd: OPERATE_RIR("cmplt",  Ra(instruction), Im(instruction), Rc(instruction)); break; // CMPLT
 				case 0xe0: OPERATE_RIR("addq/v", Ra(instruction), Im(instruction), Rc(instruction)); break; // ADDQ/V
-				case 0xe9: OPERATE_RIR("subq/v", Ra(instruction), Im(instruction), Rc(instruction)); break; // SUBQ/V
+				case 0xe9:
+					if (Ra(instruction) == 31)
+						OPERATE_IR("negq/v", Im(instruction), Rc(instruction));
+					else
+						OPERATE_RIR("subq/v", Ra(instruction), Im(instruction), Rc(instruction)); // SUBQ/V
+					break;
 				case 0xed: OPERATE_RIR("cmple",  Ra(instruction), Im(instruction), Rc(instruction)); break; // CMPLE
 
 				default: UNKNOWN("inta*"); break;
@@ -168,10 +454,24 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 				case 0x08: OPERATE_RRR("bic",     Ra(instruction), Rb(instruction), Rc(instruction)); break; // BIC
 				case 0x14: OPERATE_RRR("cmovlbs", Ra(instruction), Rb(instruction), Rc(instruction)); break; // CMOVLBS
 				case 0x16: OPERATE_RRR("cmovlbc", Ra(instruction), Rb(instruction), Rc(instruction)); break; // CMOVLBC
-				case 0x20: OPERATE_RRR("bis",     Ra(instruction), Rb(instruction), Rc(instruction)); break; // BIS
+				case 0x20:
+					if (Ra(instruction) == 31 && Rb(instruction) == 31 && Rc(instruction) == 31)
+						MISC("nop");
+					else if (Ra(instruction) == 31 && Rb(instruction) == 31)
+						OPERATE_R("clr", Rc(instruction));
+					else if (Ra(instruction) == Rb(instruction))
+						OPERATE_RR("mov", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_RRR("bis", Ra(instruction), Rb(instruction), Rc(instruction)); // BIS
+					break;
 				case 0x24: OPERATE_RRR("cmoveq",  Ra(instruction), Rb(instruction), Rc(instruction)); break; // CMOVEQ
 				case 0x26: OPERATE_RRR("cmovne",  Ra(instruction), Rb(instruction), Rc(instruction)); break; // CMOVNE
-				case 0x28: OPERATE_RRR("ornot",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // ORNOT
+				case 0x28:
+					if (Ra(instruction) == 31)
+						OPERATE_RR("not", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_RRR("ornot", Ra(instruction), Rb(instruction), Rc(instruction)); // ORNOT
+					break;
 				case 0x40: OPERATE_RRR("xor",     Ra(instruction), Rb(instruction), Rc(instruction)); break; // XOR
 				case 0x44: OPERATE_RRR("cmovlt",  Ra(instruction), Rb(instruction), Rc(instruction)); break; // CMOVLT
 				case 0x46: OPERATE_RRR("cmovge",  Ra(instruction), Rb(instruction), Rc(instruction)); break; // CMOVGE
@@ -185,10 +485,20 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 				case 0x88: OPERATE_RIR("bic",     Ra(instruction), Im(instruction), Rc(instruction)); break; // BIC
 				case 0x94: OPERATE_RIR("cmovlbs", Ra(instruction), Im(instruction), Rc(instruction)); break; // CMOVLBS
 				case 0x96: OPERATE_RIR("cmovlbc", Ra(instruction), Im(instruction), Rc(instruction)); break; // CMOVLBC
-				case 0xa0: OPERATE_RIR("bis",     Ra(instruction), Im(instruction), Rc(instruction)); break; // BIS
+				case 0xa0:
+					if (Ra(instruction) == 31)
+						OPERATE_IR("mov", Im(instruction), Rc(instruction));
+					else
+						OPERATE_RIR("bis", Ra(instruction), Im(instruction), Rc(instruction)); // BIS
+					break;
 				case 0xa4: OPERATE_RIR("cmoveq",  Ra(instruction), Im(instruction), Rc(instruction)); break; // CMOVEQ
 				case 0xa6: OPERATE_RIR("cmovne",  Ra(instruction), Im(instruction), Rc(instruction)); break; // CMOVNE
-				case 0xa8: OPERATE_RIR("ornot",   Ra(instruction), Im(instruction), Rc(instruction)); break; // ORNOT
+				case 0xa8:
+					if (Ra(instruction) == 31)
+						OPERATE_IR("not", Im(instruction), Rc(instruction));
+					else
+						OPERATE_RIR("ornot", Ra(instruction), Im(instruction), Rc(instruction)); // ORNOT
+					break;
 				case 0xc0: OPERATE_RIR("xor",     Ra(instruction), Im(instruction), Rc(instruction)); break; // XOR
 				case 0xc4: OPERATE_RIR("cmovlt",  Ra(instruction), Im(instruction), Rc(instruction)); break; // CMOVLT
 				case 0xc6: OPERATE_RIR("cmovge",  Ra(instruction), Im(instruction), Rc(instruction)); break; // CMOVGE
@@ -359,12 +669,22 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 				case 0x03c: OPERATE_FF("cvtqf/c",   Rb(instruction), Rc(instruction)); break; // CVTQF/C
 				case 0x03e: OPERATE_FF("cvtqg/c",   Rb(instruction), Rc(instruction)); break; // CVTQG/C
 				case 0x080: OPERATE_FFF("addf",     Ra(instruction), Rb(instruction), Rc(instruction)); break; // ADDF
-				case 0x081: OPERATE_FFF("subf",     Ra(instruction), Rb(instruction), Rc(instruction)); break; // SUBF
+				case 0x081:
+					if (Ra(instruction) == 31)
+						OPERATE_FF("negf", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_FFF("subf", Ra(instruction), Rb(instruction), Rc(instruction)); // SUBF
+					break;
 				case 0x082: OPERATE_FFF("mulf",     Ra(instruction), Rb(instruction), Rc(instruction)); break; // MULF
 				case 0x083: OPERATE_FFF("divf",     Ra(instruction), Rb(instruction), Rc(instruction)); break; // DIVF
 				case 0x09e: OPERATE_FF("cvtdg",     Rb(instruction), Rc(instruction)); break; // CVTDG
 				case 0x0a0: OPERATE_FFF("addg",     Ra(instruction), Rb(instruction), Rc(instruction)); break; // ADDG
-				case 0x0a1: OPERATE_FFF("subg",     Ra(instruction), Rb(instruction), Rc(instruction)); break; // SUBG
+				case 0x0a1:
+					if (Ra(instruction) == 31)
+						OPERATE_FF("negg", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_FFF("subg", Ra(instruction), Rb(instruction), Rc(instruction)); // SUBG
+					break;
 				case 0x0a2: OPERATE_FFF("mulg",     Ra(instruction), Rb(instruction), Rc(instruction)); break; // MULG
 				case 0x0a3: OPERATE_FFF("divg",     Ra(instruction), Rb(instruction), Rc(instruction)); break; // DIVG
 				case 0x0a5: OPERATE_FFF("cmpgeq",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // CMPGEQ
@@ -412,12 +732,22 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 				case 0x42d: OPERATE_FF("cvtgd/sc",  Rb(instruction), Rc(instruction)); break; // CVTGD/SC
 				case 0x42f: OPERATE_FF("cvtgq/sc",  Rb(instruction), Rc(instruction)); break; // CVTGQ/SC
 				case 0x480: OPERATE_FFF("addf/s",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // ADDF/S
-				case 0x481: OPERATE_FFF("subf/s",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // SUBF/S
+				case 0x481:
+					if (Ra(instruction) == 31)
+						OPERATE_FF("negf/s", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_FFF("subf/s", Ra(instruction), Rb(instruction), Rc(instruction)); // SUBF/S
+					break;
 				case 0x482: OPERATE_FFF("mulf/s",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // MULF/S
 				case 0x483: OPERATE_FFF("divf/s",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // DIVF/S
 				case 0x49e: OPERATE_FF("cvtdg/s",   Rb(instruction), Rc(instruction)); break; // CVTDG/S
 				case 0x4a0: OPERATE_FFF("addg/s",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // ADDG/S
-				case 0x4a1: OPERATE_FFF("subg/s",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // SUBG/S
+				case 0x4a1:
+					if (Ra(instruction) == 31)
+						OPERATE_FF("negg/s", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_FFF("subg/s", Ra(instruction), Rb(instruction), Rc(instruction)); // SUBG/S
+					break;
 				case 0x4a2: OPERATE_FFF("mulg/s",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // MULG/S
 				case 0x4a3: OPERATE_FFF("divg/s",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // DIVG/S
 				case 0x4a5: OPERATE_FFF("cmpgeq/s", Ra(instruction), Rb(instruction), Rc(instruction)); break; // CMPGEQ/S
@@ -482,11 +812,21 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 				case 0x07c: OPERATE_FF("cvtqs/m",     Rb(instruction), Rc(instruction)); break; // CVTQS/M
 				case 0x07e: OPERATE_FF("cvtqt/m",     Rb(instruction), Rc(instruction)); break; // CVTQT/M
 				case 0x080: OPERATE_FFF("adds",       Ra(instruction), Rb(instruction), Rc(instruction)); break; // ADDS
-				case 0x081: OPERATE_FFF("subs",       Ra(instruction), Rb(instruction), Rc(instruction)); break; // SUBS
+				case 0x081:
+					if (Ra(instruction) == 31)
+						OPERATE_FF("negs", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_FFF("subs", Ra(instruction), Rb(instruction), Rc(instruction)); // SUBS
+					break;
 				case 0x082: OPERATE_FFF("muls",       Ra(instruction), Rb(instruction), Rc(instruction)); break; // MULS
 				case 0x083: OPERATE_FFF("divs",       Ra(instruction), Rb(instruction), Rc(instruction)); break; // DIVS
 				case 0x0a0: OPERATE_FFF("addt",       Ra(instruction), Rb(instruction), Rc(instruction)); break; // ADDT
-				case 0x0a1: OPERATE_FFF("subt",       Ra(instruction), Rb(instruction), Rc(instruction)); break; // SUBT
+				case 0x0a1:
+					if (Ra(instruction) == 31)
+						OPERATE_FF("negt", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_FFF("subt", Ra(instruction), Rb(instruction), Rc(instruction)); // SUBT
+					break;
 				case 0x0a2: OPERATE_FFF("mult",       Ra(instruction), Rb(instruction), Rc(instruction)); break; // MULT
 				case 0x0a3: OPERATE_FFF("divt",       Ra(instruction), Rb(instruction), Rc(instruction)); break; // DIVT
 				case 0x0a4: OPERATE_FFF("cmptun",     Ra(instruction), Rb(instruction), Rc(instruction)); break; // CMPTUN
@@ -571,11 +911,21 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 				case 0x56c: OPERATE_FF("cvttts/sum",  Rb(instruction), Rc(instruction)); break; // CVTTS/SUM
 				case 0x56f: OPERATE_FF("cvttq/svm",   Rb(instruction), Rc(instruction)); break; // CVTTQ/SVM
 				case 0x580: OPERATE_FFF("adds/su",    Ra(instruction), Rb(instruction), Rc(instruction)); break; // ADDS/SU
-				case 0x581: OPERATE_FFF("subs/su",    Ra(instruction), Rb(instruction), Rc(instruction)); break; // SUBS/SU
+				case 0x581:
+					if (Ra(instruction) == 31)
+						OPERATE_FF("negs/su", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_FFF("subs/su", Ra(instruction), Rb(instruction), Rc(instruction)); // SUBS/SU
+					break;
 				case 0x582: OPERATE_FFF("muls/su",    Ra(instruction), Rb(instruction), Rc(instruction)); break; // MULS/SU
 				case 0x583: OPERATE_FFF("divs/su",    Ra(instruction), Rb(instruction), Rc(instruction)); break; // DIVS/SU
 				case 0x5a0: OPERATE_FFF("addt/su",    Ra(instruction), Rb(instruction), Rc(instruction)); break; // ADDT/SU
-				case 0x5a1: OPERATE_FFF("subt/su",    Ra(instruction), Rb(instruction), Rc(instruction)); break; // SUBT/SU
+				case 0x5a1:
+					if (Ra(instruction) == 31)
+						OPERATE_FF("negt/su", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_FFF("subt/su", Ra(instruction), Rb(instruction), Rc(instruction)); // SUBT/SU
+					break;
 				case 0x5a2: OPERATE_FFF("mult/su",    Ra(instruction), Rb(instruction), Rc(instruction)); break; // MULT/SU
 				case 0x5a3: OPERATE_FFF("divt/su",    Ra(instruction), Rb(instruction), Rc(instruction)); break; // DIVT/SU
 				case 0x5a4: OPERATE_FFF("cmptun/su",  Ra(instruction), Rb(instruction), Rc(instruction)); break; // CMPTUN/SU
@@ -620,11 +970,21 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 				case 0x77c: OPERATE_FF("cvtqs/suim",  Rb(instruction), Rc(instruction)); break; // CVTQS/SUIM
 				case 0x77e: OPERATE_FF("cvtqt/suim",  Rb(instruction), Rc(instruction)); break; // CVTQT/SUIM
 				case 0x780: OPERATE_FFF("adds/sui",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // ADDS/SUI
-				case 0x781: OPERATE_FFF("subs/sui",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // SUBS/SUI
+				case 0x781:
+					if (Ra(instruction) == 31)
+						OPERATE_FF("negs/sui", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_FFF("subs/sui", Ra(instruction), Rb(instruction), Rc(instruction)); // SUBS/SUI
+					break;
 				case 0x782: OPERATE_FFF("muls/sui",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // MULS/SUI
 				case 0x783: OPERATE_FFF("divs/sui",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // DIVS/SUI
 				case 0x7a0: OPERATE_FFF("addt/sui",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // ADDT/SUI
-				case 0x7a1: OPERATE_FFF("subt/sui",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // SUBT/SUI
+				case 0x7a1:
+					if (Ra(instruction) == 31)
+						OPERATE_FF("negt/sui", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_FFF("subt/sui", Ra(instruction), Rb(instruction), Rc(instruction)); // SUBT/SUI
+					break;
 				case 0x7a2: OPERATE_FFF("mult/sui",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // MULT/SUI
 				case 0x7a3: OPERATE_FFF("divt/sui",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // DIVT/SUI
 				case 0x7ac: OPERATE_FF("cvttts/sui",  Rb(instruction), Rc(instruction)); break; // CVTTS/SUI
@@ -651,11 +1011,37 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			switch ((instruction >> 5) & 0x7ff)
 			{
 				case 0x010: OPERATE_FF("cvtlq",    Rb(instruction), Rc(instruction)); break; // CVTLQ
-				case 0x020: OPERATE_FFF("cpys",    Ra(instruction), Rb(instruction), Rc(instruction)); break; // CPYS
-				case 0x021: OPERATE_FFF("cpysn",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // CPYSN
+				case 0x020:
+					if (Ra(instruction) == 31 && Rb(instruction) == 31 && Rc(instruction) == 31)
+						MISC("fnop");
+					else if (Ra(instruction) == 31 && Rb(instruction) == 31)
+						OPERATE_F("fclr", Rc(instruction));
+					else if (Ra(instruction) == 31)
+						OPERATE_FF("fabs", Rb(instruction), Rc(instruction));
+					else if (Ra(instruction) == Rb(instruction))
+						OPERATE_FF("fmov", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_FFF("cpys", Ra(instruction), Rb(instruction), Rc(instruction)); // CPYS
+					break;
+				case 0x021:
+					if (Ra(instruction) == Rb(instruction))
+						OPERATE_FF("fneg", Rb(instruction), Rc(instruction));
+					else
+						OPERATE_FFF("cpysn", Ra(instruction), Rb(instruction), Rc(instruction)); // CPYSN
+					break;
 				case 0x022: OPERATE_FFF("cpyse",   Ra(instruction), Rb(instruction), Rc(instruction)); break; // CPYSE
-				case 0x024: OPERATE_FFF("mt_fpcr", Ra(instruction), Rb(instruction), Rc(instruction)); break; // MT_FPCR
-				case 0x025: OPERATE_FFF("mf_fpcr", Ra(instruction), Rb(instruction), Rc(instruction)); break; // MF_FPCR
+				case 0x024:
+					if (Ra(instruction) == Rb(instruction) && Rb(instruction) == Rc(instruction))
+						OPERATE_F("mt_fpcr", Rc(instruction));
+					else
+						OPERATE_FFF("mt_fpcr", Ra(instruction), Rb(instruction), Rc(instruction)); // MT_FPCR
+					break;
+				case 0x025:
+					if (Ra(instruction) == Rb(instruction) && Rb(instruction) == Rc(instruction))
+						OPERATE_F("mf_fpcr", Rc(instruction));
+					else
+						OPERATE_FFF("mf_fpcr", Ra(instruction), Rb(instruction), Rc(instruction)); // MF_FPCR
+					break;
 				case 0x02a: OPERATE_FFF("fcmoveq", Ra(instruction), Rb(instruction), Rc(instruction)); break; // FCMOVEQ
 				case 0x02b: OPERATE_FFF("fcmovne", Ra(instruction), Rb(instruction), Rc(instruction)); break; // FCMOVNE
 				case 0x02c: OPERATE_FFF("fcmovlt", Ra(instruction), Rb(instruction), Rc(instruction)); break; // FCMOVLT
@@ -672,10 +1058,10 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0x18: // MISC* (miscellaneous)
 			switch (u16(instruction))
 			{
-				case 0x0000: MISC_0("trapb"); break; // TRAPB
-				case 0x0400: MISC_0("excb"); break; // EXCB
-				case 0x4000: MISC_0("mb"); break; // MB
-				case 0x4400: MISC_0("wmb"); break; // WMB
+				case 0x0000: MISC("trapb");    break; // TRAPB
+				case 0x0400: MISC("excb");     break; // EXCB
+				case 0x4000: MISC("mb");       break; // MB
+				case 0x4400: MISC("wmb");      break; // WMB
 				case 0x8000: MISC_M("fetch",   Rb(instruction)); break; // FETCH
 				case 0xa000: MISC_M("fetch_m", Rb(instruction)); break; // FETCH_M
 				case 0xc000: MISC_R("rpcc",    Ra(instruction)); break; // RPCC
@@ -687,7 +1073,20 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 				default: UNKNOWN("misc*"); break;
 			}
 			break;
-		case 0x19: PAL_0("pal19"); break; // PAL19
+		case 0x19: // PAL19
+			switch ((instruction >> 5) & 0x7)
+			{
+			case 0x0: MISC("nop"); break;
+			case 0x1: OPERATE_RI("hw_mfpr/i",     Rb(instruction), Rc(instruction)); break;
+			case 0x2: OPERATE_RA("hw_mfpr/a",     Rb(instruction), Rc(instruction)); break;
+			case 0x3: OPERATE_RAI("hw_mfpr/ai",   Rb(instruction), Rc(instruction)); break;
+			case 0x4: OPERATE_RP("hw_mfpr/p",     Rb(instruction), Rc(instruction)); break;
+			case 0x5: OPERATE_RPI("hw_mfpr/pi",   Rb(instruction), Rc(instruction)); break;
+			case 0x6: OPERATE_RPA("hw_mfpr/pa",   Rb(instruction), Rc(instruction)); break;
+			case 0x7: OPERATE_RPAI("hw_mfpr/pai", Rb(instruction), Rc(instruction)); break;
+			}
+			break;
+
 		case 0x1a: // JSR* (jump)
 			switch ((instruction >> 14) & 3)
 			{
@@ -697,7 +1096,27 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 				case 3: JUMP("jsr_c", Ra(instruction), Rb(instruction)); break; // JSR_COROUTINE
 			}
 			break;
-		case 0x1b: PAL_0("pal1b"); break; // PAL1B
+		case 0x1b: // PAL1B
+			switch ((instruction >> 12) & 0xf)
+			{
+			case 0x0: MEMORY_R("hw_ldl",     Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x1: MEMORY_R("hw_ldq",     Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x2: MEMORY_R("hw_ldl/r",   Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x3: MEMORY_R("hw_ldq/r",   Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x4: MEMORY_R("hw_ldl/a",   Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x5: MEMORY_R("hw_ldq/a",   Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x6: MEMORY_R("hw_ldl/ar",  Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x7: MEMORY_R("hw_ldq/ar",  Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x8: MEMORY_R("hw_ldl/p",   Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x9: MEMORY_R("hw_ldq/p",   Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0xa: MEMORY_R("hw_ldl/pr",  Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0xb: MEMORY_R("hw_ldq/pr",  Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0xc: MEMORY_R("hw_ldl/pa",  Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0xd: MEMORY_R("hw_ldq/pa",  Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0xe: MEMORY_R("hw_ldl/par", Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0xf: MEMORY_R("hw_ldq/par", Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			}
+			break;
 		case 0x1c: // FPTI* (floating to integer)
 			switch ((instruction >> 5) & 0xff)
 			{
@@ -738,10 +1157,48 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 				default: UNKNOWN("fpti*"); break;
 			}
 			break;
-		case 0x1d: PAL_0("pal1d"); break; // PAL1D
-		case 0x1e: PAL_0("pal1e"); break; // PAL1E
-		case 0x1f: PAL_0("pal1f"); break; // PAL1F
+		case 0x1d: // PAL1D
+			switch ((instruction >> 5) & 0x7)
+			{
+			case 0x0: MISC("nop"); break;
+			case 0x1: OPERATE_RI("hw_mtpr/i",     Rb(instruction), Rc(instruction)); break;
+			case 0x2: OPERATE_RA("hw_mtpr/a",     Rb(instruction), Rc(instruction)); break;
+			case 0x3: OPERATE_RAI("hw_mtpr/ai",   Rb(instruction), Rc(instruction)); break;
+			case 0x4: OPERATE_RP("hw_mtpr/p",     Rb(instruction), Rc(instruction)); break;
+			case 0x5: OPERATE_RPI("hw_mtpr/pi",   Rb(instruction), Rc(instruction)); break;
+			case 0x6: OPERATE_RPA("hw_mtpr/pa",   Rb(instruction), Rc(instruction)); break;
+			case 0x7: OPERATE_RPAI("hw_mtpr/pai", Rb(instruction), Rc(instruction)); break;
+			}
+			break;
+		case 0x1e: // PAL1E
+			switch (instruction & 0x03ffffff)
+			{
+			case 0x03ff8000: MISC("hw_rei"); break;
 
+			default: UNKNOWN("pal1e"); break;
+			}
+			break;
+		case 0x1f: // PAL1F
+			switch ((instruction >> 12) & 0xf)
+			{
+			case 0x0: MEMORY_R("hw_stl",     Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x1: MEMORY_R("hw_stq",     Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x2: MEMORY_R("hw_stl/r",   Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x3: MEMORY_R("hw_stq/r",   Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x4: MEMORY_R("hw_stl/a",   Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x5: MEMORY_R("hw_stq/a",   Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x6: MEMORY_R("hw_stl/ar",  Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x7: MEMORY_R("hw_stq/ar",  Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x8: MEMORY_R("hw_stl/p",   Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0x9: MEMORY_R("hw_stq/p",   Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0xa: MEMORY_R("hw_stl/pr",  Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0xb: MEMORY_R("hw_stq/pr",  Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0xc: MEMORY_R("hw_stl/pa",  Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0xd: MEMORY_R("hw_stq/pa",  Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0xe: MEMORY_R("hw_stl/par", Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			case 0xf: MEMORY_R("hw_stq/par", Ra(instruction), Disp_P(instruction), Rb(instruction)); break;
+			}
+			break;
 			// memory format
 		case 0x20: MEMORY_F("ldf",   Ra(instruction), Disp_M(instruction), Rb(instruction)); break; // LDF
 		case 0x21: MEMORY_F("ldg",   Ra(instruction), Disp_M(instruction), Rb(instruction)); break; // LDG
@@ -761,7 +1218,12 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		case 0x2f: MEMORY_R("stq_c", Ra(instruction), Disp_M(instruction), Rb(instruction)); break; // STQ_C
 
 			// branch format
-		case 0x30: BRANCH_R("br",   Ra(instruction), Disp_B(instruction)); break; // BR
+		case 0x30:
+			if (Ra(instruction) == 31)
+				BRANCH("br", Disp_B(instruction));
+			else
+				BRANCH_R("br", Ra(instruction), Disp_B(instruction)); // BR
+			break;
 		case 0x31: BRANCH_F("fbeq", Ra(instruction), Disp_B(instruction)); break; // FBEQ
 		case 0x32: BRANCH_F("fblt", Ra(instruction), Disp_B(instruction)); break; // FBLT
 		case 0x33: BRANCH_F("fble", Ra(instruction), Disp_B(instruction)); break; // FBLE

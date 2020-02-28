@@ -87,17 +87,12 @@
 #ifndef MAME_MACHINE_MC68328_H
 #define MAME_MACHINE_MC68328_H
 
+#include "cpu/m68000/m68000.h"
 
-class mc68328_device : public device_t
+
+class mc68328_device : public m68000_device
 {
 public:
-	template <typename T>
-	mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: mc68328_device(mconfig, tag, owner, clock)
-	{
-		m_cpu.set_tag(std::forward<T>(cpu_tag));
-	}
-
 	mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto out_port_a() { return m_out_port_a_cb.bind(); }
@@ -125,9 +120,6 @@ public:
 	auto in_spim() { return m_in_spim_cb.bind(); }
 	auto spim_xch_trigger() { return m_spim_xch_trigger_cb.bind(); }
 
-
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE_LINE_MEMBER(set_penirq_line);
 	void set_port_d_lines(uint8_t state, int bit);
 
@@ -135,6 +127,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -332,9 +325,13 @@ private:
 		uint8_t   unused42[1260];
 	};
 
+	void internal_map(address_map &map);
+
 	// internal state
 	void set_interrupt_line(uint32_t line, uint32_t active);
 	void poll_port_d_interrupts();
+	void cpu_space_map(address_map &map);
+	uint8_t irq_callback(offs_t offset);
 	uint32_t get_timer_frequency(uint32_t index);
 	void maybe_start_timer(uint32_t index, uint32_t new_enable);
 	void timer_compare_event(uint32_t index);
@@ -345,6 +342,9 @@ private:
 	TIMER_CALLBACK_MEMBER(timer2_hit);
 	TIMER_CALLBACK_MEMBER(pwm_transition);
 	TIMER_CALLBACK_MEMBER(rtc_tick);
+
+	void internal_write(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t internal_read(offs_t offset, uint16_t mem_mask = 0xffff);
 
 	mc68328_regs_t m_regs;
 
@@ -380,8 +380,6 @@ private:
 	devcb_read16  m_in_spim_cb;       /* 16-bit input */
 
 	devcb_write_line m_spim_xch_trigger_cb;    /* SPIM exchange trigger */ /*todo: not really a write line, fix*/
-
-	required_device<cpu_device> m_cpu;
 };
 
 

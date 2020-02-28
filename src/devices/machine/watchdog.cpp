@@ -180,21 +180,21 @@ void watchdog_timer_device::watchdog_vblank(screen_device &screen, bool vblank_s
 //  8-bit reset read/write handlers
 //-------------------------------------------------
 
-WRITE8_MEMBER( watchdog_timer_device::reset_w ) { watchdog_reset(); }
-READ8_MEMBER( watchdog_timer_device::reset_r ) { watchdog_reset(); return space.unmap(); }
+void watchdog_timer_device::reset_w(u8 data) { watchdog_reset(); }
+u8 watchdog_timer_device::reset_r(address_space &space) { watchdog_reset(); return space.unmap(); }
 
 
 //-------------------------------------------------
 //  16-bit reset read/write handlers
 //-------------------------------------------------
 
-WRITE16_MEMBER( watchdog_timer_device::reset16_w ) { watchdog_reset(); }
-READ16_MEMBER( watchdog_timer_device::reset16_r ) { watchdog_reset(); return space.unmap(); }
+void watchdog_timer_device::reset16_w(u16 data) { watchdog_reset(); }
+u16 watchdog_timer_device::reset16_r(address_space &space) { watchdog_reset(); return space.unmap(); }
 
 
 //-------------------------------------------------
 //  32-bit reset read/write handlers
 //-------------------------------------------------
 
-WRITE32_MEMBER( watchdog_timer_device::reset32_w ) { watchdog_reset(); }
-READ32_MEMBER( watchdog_timer_device::reset32_r ) { watchdog_reset(); return space.unmap(); }
+void watchdog_timer_device::reset32_w(u32 data) { watchdog_reset(); }
+u32 watchdog_timer_device::reset32_r(address_space &space) { watchdog_reset(); return space.unmap(); }

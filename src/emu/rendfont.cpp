@@ -374,7 +374,7 @@ private:
 
 void convert_command_glyph(std::string &str)
 {
-	str.c_str(); // force NUL-termination - we depend on it later
+	(void)str.c_str(); // force NUL-termination - we depend on it later
 	std::size_t const len(str.length());
 	std::vector<char> buf(2 * (len + 1));
 	std::size_t j(0);
@@ -958,7 +958,7 @@ bool render_font::load_cached_bdf(const char *filename)
 	// attempt to open the cached version of the font
 	{
 		emu_file cachefile(m_manager.machine().options().font_path(), OPEN_FLAG_READ);
-		filerr = cachefile.open(cachedname.c_str());
+		filerr = cachefile.open(cachedname);
 		if (filerr == osd_file::error::NONE)
 		{
 			// if we have a cached version, load it

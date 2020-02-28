@@ -10,14 +10,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 of 2"/>
 			<dataarea name="flop" size="256891">
-				<rom name="prof80_3.td0" size="256891" crc="4108cb30" sha1="7d73c08a098bcb3a289d25a6300d35d1547b1ea0" offset="0"/>
+				<rom name="prof80_3.td0" size="256891" crc="4108cb30" sha1="7d73c08a098bcb3a289d25a6300d35d1547b1ea0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Backup Masterdisk"/>
 			<dataarea name="flop" size="536773">
-				<rom name="cpm-a.td0" size="536773" crc="27a3018a" sha1="baec93eee25bbd341ed3ffd76c8dbf5e0d14f3b8" offset="0"/>
+				<rom name="cpm-a.td0" size="536773" crc="27a3018a" sha1="baec93eee25bbd341ed3ffd76c8dbf5e0d14f3b8"/>
 			</dataarea>
 		</part>
 	</software>

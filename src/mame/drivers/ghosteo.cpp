@@ -185,7 +185,7 @@ WRITE8_MEMBER( ghosteo_state::qs1000_p3_w )
 	membank("qs1000:bank")->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
-		m_soundlatch->acknowledge_w(space, 0, !BIT(data, 5));
+		m_soundlatch->acknowledge_w();
 }
 
 
@@ -600,7 +600,7 @@ void ghosteo_state::machine_start()
 
 void ghosteo_state::machine_reset()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013,read32_delegate(FUNC(ghosteo_state::bballoon_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013,read32_delegate(*this, FUNC(ghosteo_state::bballoon_speedup_r)));
 }
 
 void ghosteo_state::ghosteo(machine_config &config)

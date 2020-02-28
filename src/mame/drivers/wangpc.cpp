@@ -70,7 +70,7 @@ public:
 		m_centronics(*this, CENTRONICS_TAG),
 		m_cent_data_in(*this, "cent_data_in"),
 		m_cent_data_out(*this, "cent_data_out"),
-		m_bus(*this, WANGPC_BUS_TAG),
+		m_bus(*this, "wangpcbus"),
 		m_sw(*this, "SW"),
 		m_led_diagnostic(*this, LED_DIAGNOSTIC),
 		m_timer2_irq(1),
@@ -761,7 +761,7 @@ void wangpc_state::wangpc_io(address_map &map)
 	map(0x1018, 0x1018).mirror(0x0002).rw(FUNC(wangpc_state::fdc_reset_r), FUNC(wangpc_state::fdc_reset_w));
 	map(0x101c, 0x101c).mirror(0x0002).rw(FUNC(wangpc_state::fdc_tc_r), FUNC(wangpc_state::fdc_tc_w));
 	map(0x1020, 0x1027).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x1028, 0x1029); //AM_WRITE(?)
+	map(0x1028, 0x1029); //.w(FUNC(wangpc_state::)); (?)
 	map(0x1040, 0x1047).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x1060, 0x1063).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x1080, 0x1087).r(m_epci, FUNC(mc2661_device::read)).umask16(0x00ff);
@@ -876,7 +876,7 @@ WRITE8_MEMBER( wangpc_state::memw_w )
 READ8_MEMBER( wangpc_state::ior2_r )
 {
 	if (m_disable_dreq2)
-		return m_bus->dack_r(space, 2);
+		return m_bus->dack_r(2);
 	else
 		return m_fdc->dma_r();
 }
@@ -884,7 +884,7 @@ READ8_MEMBER( wangpc_state::ior2_r )
 WRITE8_MEMBER( wangpc_state::iow2_w )
 {
 	if (m_disable_dreq2)
-		m_bus->dack_w(space, 2, data);
+		m_bus->dack_w(2, data);
 	else
 		m_fdc->dma_w(data);
 }
@@ -1272,7 +1272,7 @@ void wangpc_state::on_disk1_unload(floppy_image_device *image)
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( wangpc )
+//  machine_config( wangpc )
 //-------------------------------------------------
 
 void wangpc_state::wangpc(machine_config &config)
@@ -1363,11 +1363,11 @@ void wangpc_state::wangpc(machine_config &config)
 	m_bus->drq2_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq2_w));
 	m_bus->drq3_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
 	m_bus->ioerror_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	WANGPC_BUS_SLOT(config, "slot1", wangpc_cards, nullptr, 1);
-	WANGPC_BUS_SLOT(config, "slot2", wangpc_cards, "mvc", 2);
-	WANGPC_BUS_SLOT(config, "slot3", wangpc_cards, nullptr, 3);
-	WANGPC_BUS_SLOT(config, "slot4", wangpc_cards, nullptr, 4);
-	WANGPC_BUS_SLOT(config, "slot5", wangpc_cards, nullptr, 5);
+	WANGPC_BUS_SLOT(config, "slot1", m_bus, wangpc_cards, nullptr, 1);
+	WANGPC_BUS_SLOT(config, "slot2", m_bus, wangpc_cards, "mvc", 2);
+	WANGPC_BUS_SLOT(config, "slot3", m_bus, wangpc_cards, nullptr, 3);
+	WANGPC_BUS_SLOT(config, "slot4", m_bus, wangpc_cards, nullptr, 4);
+	WANGPC_BUS_SLOT(config, "slot5", m_bus, wangpc_cards, nullptr, 5);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K");

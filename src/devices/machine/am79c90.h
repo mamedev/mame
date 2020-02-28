@@ -18,6 +18,8 @@ public:
 	DECLARE_READ16_MEMBER(regs_r);
 	DECLARE_WRITE16_MEMBER(regs_w);
 
+	void reset_w(int state) { if (!state) device_reset(); }
+
 protected:
 	am7990_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 

@@ -300,7 +300,7 @@ public:
 		int keynum;
 
 		// allocate and link in a new device
-		devinfo = m_dinput_helper->create_device<dinput_keyboard_device>(machine, *this, instance, &c_dfDIKeyboard, nullptr, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+		devinfo = m_dinput_helper->create_device<dinput_keyboard_device>(machine, *this, instance, &c_dfDIKeyboard, nullptr, dinput_cooperative_level::FOREGROUND);
 		if (devinfo == nullptr)
 			goto exit;
 
@@ -372,7 +372,7 @@ public:
 		HRESULT result;
 
 		// allocate and link in a new device
-		devinfo = m_dinput_helper->create_device<dinput_mouse_device>(machine, *this, instance, &c_dfDIMouse2, &c_dfDIMouse, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+		devinfo = m_dinput_helper->create_device<dinput_mouse_device>(machine, *this, instance, &c_dfDIMouse2, &c_dfDIMouse, dinput_cooperative_level::FOREGROUND);
 		if (devinfo == nullptr)
 			goto exit;
 
@@ -403,7 +403,7 @@ public:
 		// populate the buttons
 		for (butnum = 0; butnum < devinfo->dinput.caps.dwButtons; butnum++)
 		{
-			uintptr_t offset = reinterpret_cast<uintptr_t>(&static_cast<DIMOUSESTATE *>(nullptr)->rgbButtons[butnum]);
+			auto offset = reinterpret_cast<uintptr_t>(&static_cast<DIMOUSESTATE *>(nullptr)->rgbButtons[butnum]);
 
 			// add to the mouse device
 			std::string name = device_item_name(devinfo, offset, default_button_name(butnum), nullptr);
@@ -535,7 +535,7 @@ int dinput_joystick_device::configure()
 	// populate the buttons
 	for (uint32_t butnum = 0; butnum < dinput.caps.dwButtons; butnum++)
 	{
-		uintptr_t offset = reinterpret_cast<uintptr_t>(&static_cast<DIJOYSTATE2 *>(nullptr)->rgbButtons[butnum]);
+		auto offset = reinterpret_cast<uintptr_t>(&static_cast<DIJOYSTATE2 *>(nullptr)->rgbButtons[butnum]);
 		std::string name = dinput_module::device_item_name(this, offset, default_button_name(butnum), nullptr);
 
 		input_item_id itemid;
@@ -572,13 +572,13 @@ public:
 
 	BOOL device_enum_callback(LPCDIDEVICEINSTANCE instance, LPVOID ref) override
 	{
-		DWORD cooperative_level = DISCL_FOREGROUND | DISCL_NONEXCLUSIVE;
+		dinput_cooperative_level cooperative_level = dinput_cooperative_level::FOREGROUND;
 		running_machine &machine = *static_cast<running_machine *>(ref);
 		dinput_joystick_device *devinfo;
 		int result = 0;
 
 		if (!osd_common_t::s_window_list.empty() && osd_common_t::s_window_list.front()->win_has_menu())
-			cooperative_level = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
+			cooperative_level = dinput_cooperative_level::BACKGROUND;
 
 		// allocate and link in a new device
 		devinfo = m_dinput_helper->create_device<dinput_joystick_device>(machine, *this, instance, &c_dfDIJoystick, nullptr, cooperative_level);
@@ -602,7 +602,7 @@ public:
 
 static int32_t dinput_joystick_pov_get_state(void *device_internal, void *item_internal)
 {
-	dinput_joystick_device *devinfo = static_cast<dinput_joystick_device *>(device_internal);
+	auto *devinfo = static_cast<dinput_joystick_device *>(device_internal);
 	int povnum = reinterpret_cast<uintptr_t>(item_internal) / 4;
 	int povdir = reinterpret_cast<uintptr_t>(item_internal) % 4;
 	int32_t result = 0;

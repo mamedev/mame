@@ -1,9 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef IPF_DSK_H_
-#define IPF_DSK_H_
+#ifndef MAME_FORMATS_IPF_DSK_H
+#define MAME_FORMATS_IPF_DSK_H
+
+#pragma once
 
 #include "flopimg.h"
+
+#include <vector>
 
 class ipf_format : public floppy_image_format_t
 {
@@ -86,4 +90,4 @@ private:
 
 extern const floppy_format_type FLOPPY_IPF_FORMAT;
 
-#endif /*IPF_DSK_H_*/
+#endif // MAME_FORMATS_IPF_DSK_H

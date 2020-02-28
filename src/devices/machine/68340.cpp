@@ -67,16 +67,22 @@ void m68340_cpu_device::update_ipl()
 	}
 }
 
-IRQ_CALLBACK_MEMBER(m68340_cpu_device::int_ack)
+void m68340_cpu_device::internal_vectors_r(address_map &map)
 {
-	uint8_t pit_iarb = pit_arbitrate(irqline);
-	uint8_t scu_iarb = m_serial->arbitrate(irqline);
-	uint8_t t1_iarb = m_timer[0]->arbitrate(irqline);
-	uint8_t t2_iarb = m_timer[1]->arbitrate(irqline);
+	map(0xfffffff0, 0xffffffff).r(FUNC(m68340_cpu_device::int_ack)).umask16(0x00ff);
+}
+
+
+uint8_t m68340_cpu_device::int_ack(offs_t offset)
+{
+	uint8_t pit_iarb = pit_arbitrate(offset);
+	uint8_t scu_iarb = m_serial->arbitrate(offset);
+	uint8_t t1_iarb = m_timer[0]->arbitrate(offset);
+	uint8_t t2_iarb = m_timer[1]->arbitrate(offset);
 	uint8_t iarb = std::max({pit_iarb, scu_iarb, t1_iarb, t2_iarb});
-	LOGMASKED(LOG_IPL, "Level %d interrupt arbitration: PIT = %X, SCU = %X, T1 = %X, T2 = %X\n", irqline, pit_iarb, scu_iarb, t1_iarb, t2_iarb);
+	LOGMASKED(LOG_IPL, "Level %d interrupt arbitration: PIT = %X, SCU = %X, T1 = %X, T2 = %X\n", offset, pit_iarb, scu_iarb, t1_iarb, t2_iarb);
 	int response = 0;
-	uint32_t vector = standard_irq_callback(irqline);
+	uint8_t vector = 0x18; // Spurious interrupt
 
 	// Valid IARB levels are F (high) to 1 (low) and should be unique among modules using the same interrupt level
 	if (iarb != 0)
@@ -111,9 +117,9 @@ IRQ_CALLBACK_MEMBER(m68340_cpu_device::int_ack)
 	}
 
 	if (response == 0)
-		logerror("Spurious interrupt (level %d)\n", irqline);
+		logerror("Spurious interrupt (level %d)\n", offset);
 	else if (response > 1)
-		logerror("%d modules responded to interrupt (level %d, IARB = %X)\n", response, irqline, iarb);
+		logerror("%d modules responded to interrupt (level %d, IARB = %X)\n", response, offset, iarb);
 
 	return vector;
 }
@@ -151,42 +157,37 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %08x (%08x) (m_m68340_base write)\n", pc(), offset*4,data,mem_mask);
 
 		// map new modules
-		if (m_m68340_base&1)
+		if (m_m68340_base & 1)
 		{
 			int base = m_m68340_base & 0xfffff000;
 
 			m_internal->install_readwrite_handler(base + 0x000, base + 0x03f,
-								read16_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_r),this),
-								write16_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_w),this),0xffffffff);
+					read16_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_r)),
+					write16_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_w)),0xffffffff);
 			m_internal->install_readwrite_handler(base + 0x010, base + 0x01f, // Intentionally punches a hole in previous address mapping
-								read8_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_ports_r),this),
-								write8_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_ports_w),this),0xffffffff);
+					read8_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_ports_r)),
+					write8_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_ports_w)),0xffffffff);
 			m_internal->install_readwrite_handler(base + 0x040, base + 0x05f,
-								read32_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_cs_r),this),
-								write32_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_cs_w),this));
+					read32_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_cs_r)),
+					write32_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_cs_w)));
 			m_internal->install_readwrite_handler(base + 0x600, base + 0x63f,
-								READ16_DEVICE_DELEGATE(m_timer[0], mc68340_timer_module_device, read),
-								WRITE16_DEVICE_DELEGATE(m_timer[0], mc68340_timer_module_device, write),0xffffffff);
+					read16_delegate(*m_timer[0], FUNC(mc68340_timer_module_device::read)),
+					write16_delegate(*m_timer[0], FUNC(mc68340_timer_module_device::write)),0xffffffff);
 			m_internal->install_readwrite_handler(base + 0x640, base + 0x67f,
-								READ16_DEVICE_DELEGATE(m_timer[1], mc68340_timer_module_device, read),
-								WRITE16_DEVICE_DELEGATE(m_timer[1], mc68340_timer_module_device, write),0xffffffff);
+					read16_delegate(*m_timer[1], FUNC(mc68340_timer_module_device::read)),
+					write16_delegate(*m_timer[1], FUNC(mc68340_timer_module_device::write)),0xffffffff);
 			m_internal->install_readwrite_handler(base + 0x700, base + 0x723,
-								read8sm_delegate(FUNC(mc68340_serial_module_device::read), &*m_serial),
-								write8sm_delegate(FUNC(mc68340_serial_module_device::write), &*m_serial),0xffffffff);
+					read8sm_delegate(*m_serial, FUNC(mc68340_serial_module_device::read)),
+					write8sm_delegate(*m_serial, FUNC(mc68340_serial_module_device::write)),0xffffffff);
 			m_internal->install_readwrite_handler(base + 0x780, base + 0x7bf,
-								read32_delegate(FUNC(m68340_cpu_device::m68340_internal_dma_r),this),
-								write32_delegate(FUNC(m68340_cpu_device::m68340_internal_dma_w),this));
-
+					read32_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_dma_r)),
+					write32_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_dma_w)));
 		}
-
 	}
 	else
 	{
 		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %04x (%04x) (should fall through?)\n", pc(), offset*4,data,mem_mask);
 	}
-
-
-
 }
 
 void m68340_cpu_device::m68340_internal_map(address_map &map)
@@ -228,6 +229,7 @@ m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *
 	m_m68340DMA = nullptr;
 	m_m68340_base = 0;
 	m_ipl = 0;
+	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(m68340_cpu_device::internal_vectors_r), this);
 }
 
 void m68340_cpu_device::device_reset()
@@ -259,6 +261,13 @@ void m68340_cpu_device::device_start()
 	m_m68340_base = 0x00000000;
 
 	m_internal = &space(AS_PROGRAM);
+}
 
-	m_int_ack_callback = device_irq_acknowledge_delegate(FUNC(m68340_cpu_device::int_ack), this);
+void m68340_cpu_device::m68k_reset_peripherals()
+{
+	m_m68340SIM->module_reset();
+	m_m68340DMA->module_reset();
+	m_serial->module_reset();
+	m_timer[0]->module_reset();
+	m_timer[1]->module_reset();
 }

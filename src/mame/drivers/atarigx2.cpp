@@ -15,7 +15,8 @@
         * Road Riot's Revenge Rally (1993)
 
     Known bugs:
-        * Unemulated protection for Road Riot's Revenge
+        * Protection for Road Riot's Revenge
+        * Missing DSPCOM board (Moto Frenzy SD) and Clarn board (Road Riot's Revenge, Space Lords and Moto Frenzy mini dx), both ADSP2105 based.
 
 ****************************************************************************
 
@@ -77,9 +78,9 @@ READ32_MEMBER(atarigx2_state::special_port3_r)
 
 READ8_MEMBER(atarigx2_state::a2d_data_r)
 {
-	uint8_t result = m_adc->data_r(space, 0);
+	uint8_t result = m_adc->data_r();
 	if (!machine().side_effects_disabled())
-		m_adc->address_offset_start_w(space, offset, 0);
+		m_adc->address_offset_start_w(offset, 0);
 	return result;
 }
 
@@ -103,7 +104,7 @@ WRITE32_MEMBER(atarigx2_state::latch_w)
 	if (ACCESSING_BITS_24_31)
 	{
 		/* bits 13-11 are the MO control bits */
-		m_rle->control_write(space, offset, (data >> 27) & 7);
+		m_rle->control_write((data >> 27) & 7);
 	}
 
 	/* lower byte */
@@ -116,7 +117,7 @@ WRITE32_MEMBER(atarigx2_state::mo_command_w)
 {
 	COMBINE_DATA(m_mo_command);
 	if (ACCESSING_BITS_0_15)
-		m_rle->command_write(space, offset, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+		m_rle->command_write(((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
 
@@ -1194,11 +1195,14 @@ void atarigx2_state::main_map(address_map &map)
 	map(0xd00000, 0xd0000f).r(FUNC(atarigx2_state::a2d_data_r)).umask32(0xff00ff00);
 	map(0xd20000, 0xd20fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0xd40000, 0xd40fff).ram().w("palette", FUNC(palette_device::write32)).share("palette");
-	map(0xd70000, 0xd7ffff).ram();
-	map(0xd72000, 0xd75fff).w(m_playfield_tilemap, FUNC(tilemap_device::write32)).share("playfield");
-	map(0xd76000, 0xd76fff).w(m_alpha_tilemap, FUNC(tilemap_device::write32)).share("alpha");
+	map(0xd70000, 0xd71fff).ram();
+	map(0xd72000, 0xd75fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write32)).share("playfield");
+	map(0xd76000, 0xd76fff).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write32)).share("alpha");
+	map(0xd77000, 0xd77fff).ram();
 	map(0xd78000, 0xd78fff).ram().share("rle");
-	map(0xd7a200, 0xd7a203).w(FUNC(atarigx2_state::mo_command_w)).share("mo_command");
+	map(0xd79000, 0xd7a1ff).ram();
+	map(0xd7a200, 0xd7a203).ram().w(FUNC(atarigx2_state::mo_command_w)).share("mo_command");
+	map(0xd7a204, 0xd7ffff).ram();
 	map(0xd80000, 0xd9ffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write32));
 	map(0xe06000, 0xe06000).w(m_jsa, FUNC(atari_jsa_iiis_device::main_command_w));
 	map(0xe08000, 0xe08003).w(FUNC(atarigx2_state::latch_w));
@@ -1485,11 +1489,11 @@ static const atari_rle_objects_config modesc_0x400 =
  *
  *************************************/
 
-MACHINE_CONFIG_START(atarigx2_state::atarigx2)
-
+void atarigx2_state::atarigx2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68EC020(config, m_maincpu, ATARI_CLOCK_14MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarigx2_state::main_map);
 
 	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
 	m_adc->in_callback<0>().set_ioport("A2D0");
@@ -1504,20 +1508,22 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigx2)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_atarigx2);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
-	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigx2_state, get_playfield_tile_info, 8,8, atarigx2_playfield_scan, 128,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, atarigx2_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8);
+	m_playfield_tilemap->set_layout(FUNC(atarigx2_state::atarigx2_playfield_scan), 128,64);
+	m_playfield_tilemap->set_info_callback(FUNC(atarigx2_state::get_playfield_tile_info));
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32, 0).set_info_callback(FUNC(atarigx2_state::get_alpha_tile_info));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a pair of GALs to determine H and V parameters */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(atarigx2_state, screen_update_atarigx2)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarigx2_state, video_int_write_line))
+	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(atarigx2_state::screen_update_atarigx2));
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(atarigx2_state::video_int_write_line));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1528,8 +1534,7 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	m_jsa->test_read_cb().set_ioport("SERVICE").bit(6);
 	m_jsa->add_route(0, "lspeaker", 1.0);
 	m_jsa->add_route(1, "rspeaker", 1.0);
-MACHINE_CONFIG_END
-
+}
 
 void atarigx2_state::atarigx2_0x200(machine_config &config)
 {
@@ -1735,10 +1740,10 @@ ROM_END
 
 ROM_START( motofren )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
-	ROM_LOAD32_BYTE( "136094-moto0.23e", 0x000000, 0x020000, CRC(2c6ec446) SHA1(d83fee26b384e6fd783104746e6560504ae43ca6) )
-	ROM_LOAD32_BYTE( "136094-moto1.23j", 0x000001, 0x020000, CRC(e7163e7b) SHA1(7ea8a7a63bd1befee4cf9e708949fca7f06572c1) )
-	ROM_LOAD32_BYTE( "136094-moto2.37e", 0x000002, 0x020000, CRC(6b1c7626) SHA1(b318a5856bcbd6a8fc7eb92e4b9a576b8c16cbf3) )
-	ROM_LOAD32_BYTE( "136094-moto3.37j", 0x000003, 0x020000, CRC(44c3cd2a) SHA1(a16046586cbaa000e056115c92b5f22bf49869ad) )
+	ROM_LOAD32_BYTE( "136094-0021i.23e", 0x000000, 0x020000, CRC(2c6ec446) SHA1(d83fee26b384e6fd783104746e6560504ae43ca6) )
+	ROM_LOAD32_BYTE( "136094-0022i.23j", 0x000001, 0x020000, CRC(e7163e7b) SHA1(7ea8a7a63bd1befee4cf9e708949fca7f06572c1) )
+	ROM_LOAD32_BYTE( "136094-0023i.37e", 0x000002, 0x020000, CRC(6b1c7626) SHA1(b318a5856bcbd6a8fc7eb92e4b9a576b8c16cbf3) )
+	ROM_LOAD32_BYTE( "136094-0024i.37j", 0x000003, 0x020000, CRC(44c3cd2a) SHA1(a16046586cbaa000e056115c92b5f22bf49869ad) )
 
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136094-0080a.12c", 0x00000, 0x10000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
@@ -2104,15 +2109,15 @@ ROM_START( rrreveng )
 	ROM_LOAD( "136094-0019b.3n",  0x0000, 0x0157, CRC(598d5009) SHA1(9804f05fbf1b9324f8c3937e0953da02870d988b) ) /* GAL20V8A */
 	ROM_LOAD( "136094-0010a.5n",  0x0000, 0x0117, CRC(87ff6393) SHA1(df1f0a5450485598c0ef7fa4981cc0e40a6a5073) ) /* GAL16V8A */
 	ROM_LOAD( "136094-0011b.5r",  0x0000, 0x0117, CRC(832671eb) SHA1(85232128a4b03c4e3dffb4f2e6381a89f4f9aac5) ) /* GAL16V8A */
-	ROM_LOAD( "136094-0009a.7n",  0x0000, 0x0117, CRC(87d3a1d6) SHA1(33437f6b39b263a3064b34da41a7eed922036a56) ) /* GAL16V8A */
-	ROM_LOAD( "136094-0012a.7r",  0x0000, 0x0117, CRC(87d3a1d6) SHA1(33437f6b39b263a3064b34da41a7eed922036a56) ) /* GAL16V8A */
-	ROM_LOAD( "136094-0007a.12l", 0x0000, 0x0117, CRC(145b1474) SHA1(f1983732c36a444d38aeba94adaffa305d4c0398) ) /* GAL16V8A */
+	ROM_LOAD( "136094-0009a.7n",  0x0000, 0x0117, NO_DUMP ) /* GAL16V8A */
+	ROM_LOAD( "136094-0012a.7r",  0x0000, 0x0117, NO_DUMP ) /* GAL16V8A */
+	ROM_LOAD( "136094-0007a.12l", 0x0000, 0x0117, NO_DUMP ) /* GAL16V8A */
 	ROM_LOAD( "136094-0006a.13r", 0x0000, 0x0117, CRC(d5c84926) SHA1(22d2821ed77ad070163e3d188b1412f8d8d52977) ) /* GAL16V8A */
 	ROM_LOAD( "136094-0008a.17l", 0x0000, 0x0117, CRC(b85ab18d) SHA1(eabcc2e54c2b6bc393603a31d22418edf60593ad) ) /* GAL16V8A, hand written "ROAD 2" over label */
 	ROM_LOAD( "136094-0014a.22r", 0x0000, 0x0117, CRC(9dc3831d) SHA1(553c289801eb1e15118bc045ddca226343e6a623) ) /* GAL16V8A */
-	ROM_LOAD( "136094-0016a.23r", 0x0000, 0x0117, CRC(87d3a1d6) SHA1(33437f6b39b263a3064b34da41a7eed922036a56) ) /* GAL16V8A */
+	ROM_LOAD( "136094-0016a.23r", 0x0000, 0x0117, NO_DUMP ) /* GAL16V8A */
 	ROM_LOAD( "136094-0015a.23s", 0x0000, 0x0117, CRC(9404e122) SHA1(fb1db0fdb10ddeb7247dd254b3e725b9ef85097b) ) /* GAL16V8A */
-	ROM_LOAD( "136094-0013a.24c", 0x0000, 0x0117, CRC(11934654) SHA1(a230c4e9abc190a62872961d60f9f96dedb273cd) ) /* GAL16V8A */
+	ROM_LOAD( "136094-0013a.24c", 0x0000, 0x0117, NO_DUMP ) /* GAL16V8A */
 	ROM_LOAD( "136094-0018a.24j", 0x0000, 0x0117, CRC(9def4158) SHA1(11c168e2c16046e1213786c065906455fdb5a63c) ) /* GAL16V8A */
 	ROM_LOAD( "136094-0017a.25c", 0x0000, 0x0117, CRC(76d8fa5b) SHA1(5fcb7b75f37f918331d99422ea3f0ea202665d5e) ) /* GAL16V8A */
 
@@ -2174,15 +2179,15 @@ ROM_START( rrrevenga ) /* Same program roms as the set below, but shares more ro
 	ROM_LOAD( "136094-0019b.3n",  0x0000, 0x0157, CRC(598d5009) SHA1(9804f05fbf1b9324f8c3937e0953da02870d988b) ) /* GAL20V8A */
 	ROM_LOAD( "136094-0010a.5n",  0x0000, 0x0117, CRC(87ff6393) SHA1(df1f0a5450485598c0ef7fa4981cc0e40a6a5073) ) /* GAL16V8A */
 	ROM_LOAD( "136094-0011b.5r",  0x0000, 0x0117, CRC(832671eb) SHA1(85232128a4b03c4e3dffb4f2e6381a89f4f9aac5) ) /* GAL16V8A */
-	ROM_LOAD( "136094-0009a.7n",  0x0000, 0x0117, CRC(87d3a1d6) SHA1(33437f6b39b263a3064b34da41a7eed922036a56) ) /* GAL16V8A */
-	ROM_LOAD( "136094-0012a.7r",  0x0000, 0x0117, CRC(87d3a1d6) SHA1(33437f6b39b263a3064b34da41a7eed922036a56) ) /* GAL16V8A */
-	ROM_LOAD( "136094-0007a.12l", 0x0000, 0x0117, CRC(145b1474) SHA1(f1983732c36a444d38aeba94adaffa305d4c0398) ) /* GAL16V8A */
+	ROM_LOAD( "136094-0009a.7n",  0x0000, 0x0117, NO_DUMP ) /* GAL16V8A */
+	ROM_LOAD( "136094-0012a.7r",  0x0000, 0x0117, NO_DUMP ) /* GAL16V8A */
+	ROM_LOAD( "136094-0007a.12l", 0x0000, 0x0117, NO_DUMP ) /* GAL16V8A */
 	ROM_LOAD( "136094-0006a.13r", 0x0000, 0x0117, CRC(d5c84926) SHA1(22d2821ed77ad070163e3d188b1412f8d8d52977) ) /* GAL16V8A */
 	ROM_LOAD( "136094-0008a.17l", 0x0000, 0x0117, CRC(b85ab18d) SHA1(eabcc2e54c2b6bc393603a31d22418edf60593ad) ) /* GAL16V8A, hand written "ROAD 2" over label */
 	ROM_LOAD( "136094-0014a.22r", 0x0000, 0x0117, CRC(9dc3831d) SHA1(553c289801eb1e15118bc045ddca226343e6a623) ) /* GAL16V8A */
-	ROM_LOAD( "136094-0016a.23r", 0x0000, 0x0117, CRC(87d3a1d6) SHA1(33437f6b39b263a3064b34da41a7eed922036a56) ) /* GAL16V8A */
+	ROM_LOAD( "136094-0016a.23r", 0x0000, 0x0117, NO_DUMP ) /* GAL16V8A */
 	ROM_LOAD( "136094-0015a.23s", 0x0000, 0x0117, CRC(9404e122) SHA1(fb1db0fdb10ddeb7247dd254b3e725b9ef85097b) ) /* GAL16V8A */
-	ROM_LOAD( "136094-0013a.24c", 0x0000, 0x0117, CRC(11934654) SHA1(a230c4e9abc190a62872961d60f9f96dedb273cd) ) /* GAL16V8A */
+	ROM_LOAD( "136094-0013a.24c", 0x0000, 0x0117, NO_DUMP ) /* GAL16V8A */
 	ROM_LOAD( "136094-0018a.24j", 0x0000, 0x0117, CRC(9def4158) SHA1(11c168e2c16046e1213786c065906455fdb5a63c) ) /* GAL16V8A */
 	ROM_LOAD( "136094-0017a.25c", 0x0000, 0x0117, CRC(76d8fa5b) SHA1(5fcb7b75f37f918331d99422ea3f0ea202665d5e) ) /* GAL16V8A */
 ROM_END
@@ -2233,15 +2238,15 @@ ROM_START( rrrevengb )
 	ROM_LOAD( "136094-0019b.3n",  0x0000, 0x0157, CRC(598d5009) SHA1(9804f05fbf1b9324f8c3937e0953da02870d988b) ) /* GAL20V8A */
 	ROM_LOAD( "136094-0010a.5n",  0x0000, 0x0117, CRC(87ff6393) SHA1(df1f0a5450485598c0ef7fa4981cc0e40a6a5073) ) /* GAL16V8A */
 	ROM_LOAD( "136094-0011b.5r",  0x0000, 0x0117, CRC(832671eb) SHA1(85232128a4b03c4e3dffb4f2e6381a89f4f9aac5) ) /* GAL16V8A */
-	ROM_LOAD( "136094-0009a.7n",  0x0000, 0x0117, CRC(87d3a1d6) SHA1(33437f6b39b263a3064b34da41a7eed922036a56) ) /* GAL16V8A */
-	ROM_LOAD( "136094-0012a.7r",  0x0000, 0x0117, CRC(87d3a1d6) SHA1(33437f6b39b263a3064b34da41a7eed922036a56) ) /* GAL16V8A */
-	ROM_LOAD( "136094-0007a.12l", 0x0000, 0x0117, CRC(145b1474) SHA1(f1983732c36a444d38aeba94adaffa305d4c0398) ) /* GAL16V8A */
+	ROM_LOAD( "136094-0009a.7n",  0x0000, 0x0117, NO_DUMP ) /* GAL16V8A */
+	ROM_LOAD( "136094-0012a.7r",  0x0000, 0x0117, NO_DUMP ) /* GAL16V8A */
+	ROM_LOAD( "136094-0007a.12l", 0x0000, 0x0117, NO_DUMP ) /* GAL16V8A */
 	ROM_LOAD( "136094-0006a.13r", 0x0000, 0x0117, CRC(d5c84926) SHA1(22d2821ed77ad070163e3d188b1412f8d8d52977) ) /* GAL16V8A */
 	ROM_LOAD( "136094-0008a.17l", 0x0000, 0x0117, CRC(b85ab18d) SHA1(eabcc2e54c2b6bc393603a31d22418edf60593ad) ) /* GAL16V8A, hand written "ROAD 2" over label */
 	ROM_LOAD( "136094-0014a.22r", 0x0000, 0x0117, CRC(9dc3831d) SHA1(553c289801eb1e15118bc045ddca226343e6a623) ) /* GAL16V8A */
-	ROM_LOAD( "136094-0016a.23r", 0x0000, 0x0117, CRC(87d3a1d6) SHA1(33437f6b39b263a3064b34da41a7eed922036a56) ) /* GAL16V8A */
+	ROM_LOAD( "136094-0016a.23r", 0x0000, 0x0117, NO_DUMP ) /* GAL16V8A */
 	ROM_LOAD( "136094-0015a.23s", 0x0000, 0x0117, CRC(9404e122) SHA1(fb1db0fdb10ddeb7247dd254b3e725b9ef85097b) ) /* GAL16V8A */
-	ROM_LOAD( "136094-0013a.24c", 0x0000, 0x0117, CRC(11934654) SHA1(a230c4e9abc190a62872961d60f9f96dedb273cd) ) /* GAL16V8A */
+	ROM_LOAD( "136094-0013a.24c", 0x0000, 0x0117, NO_DUMP ) /* GAL16V8A */
 	ROM_LOAD( "136094-0018a.24j", 0x0000, 0x0117, CRC(9def4158) SHA1(11c168e2c16046e1213786c065906455fdb5a63c) ) /* GAL16V8A */
 	ROM_LOAD( "136094-0017a.25c", 0x0000, 0x0117, CRC(76d8fa5b) SHA1(5fcb7b75f37f918331d99422ea3f0ea202665d5e) ) /* GAL16V8A */
 ROM_END
@@ -2258,8 +2263,8 @@ void atarigx2_state::init_spclords()
 {
 	m_playfield_base = 0x000;
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc80f00, 0xc80fff, read32_delegate(FUNC(atari_136095_0072_device::polylsb_read),(atari_136095_0072_device*)&(*m_xga)), write32_delegate(FUNC(atari_136095_0072_device::polylsb_write),(atari_136095_0072_device*)&(*m_xga)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atari_xga_device::read),&(*m_xga)), write32_delegate(FUNC(atari_xga_device::write),&(*m_xga)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc80f00, 0xc80fff, read32_delegate(downcast<atari_136095_0072_device &>(*m_xga), FUNC(atari_136095_0072_device::polylsb_read)), write32_delegate(downcast<atari_136095_0072_device &>(*m_xga), FUNC(atari_136095_0072_device::polylsb_write)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(*m_xga, FUNC(atari_xga_device::read)), write32_delegate(*m_xga, FUNC(atari_xga_device::write)));
 }
 
 
@@ -2288,15 +2293,15 @@ XMEM=68.A23*E.A22*!E.A21*68.A20                                 = 1101 xxxx = d0
     +68.A23*E.A22*!E.A21*!68.A20*68.A19                         = 1100 1xxx = c80000-cfffff
     +!68.A23*!E.A22*!E.A21                                      = 000x xxxx = 000000-1fffff
 */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atari_xga_device::read),&(*m_xga)), write32_delegate(FUNC(atari_xga_device::write),&(*m_xga)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(*m_xga, FUNC(atari_xga_device::read)), write32_delegate(*m_xga, FUNC(atari_xga_device::write)));
 }
 
 void atarigx2_state::init_rrreveng()
 {
 	m_playfield_base = 0x000;
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atarigx2_state::atarigx2_protection_r),this), write32_delegate(FUNC(atarigx2_state::atarigx2_protection_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xca0fc0, 0xca0fc3, read32_delegate(FUNC(atarigx2_state::rrreveng_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(*this, FUNC(atarigx2_state::atarigx2_protection_r)), write32_delegate(*this, FUNC(atarigx2_state::atarigx2_protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xca0fc0, 0xca0fc3, read32_delegate(*this, FUNC(atarigx2_state::rrreveng_prot_r)));
 }
 
 
@@ -2306,16 +2311,16 @@ void atarigx2_state::init_rrreveng()
  *
  *************************************/
 
-GAME( 1992, spclords,  0,         atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev C)", 0 )
-GAME( 1992, spclordsb, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev B)", 0 )
-GAME( 1992, spclordsg, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A, German)", 0 )
-GAME( 1992, spclordsa, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A)", 0 )
+GAME( 1992, spclords,  0,         atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev C)", MACHINE_NODEVICE_LAN )
+GAME( 1992, spclordsb, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev B)", MACHINE_NODEVICE_LAN )
+GAME( 1992, spclordsg, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A, German)", MACHINE_NODEVICE_LAN )
+GAME( 1992, spclordsa, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A)", MACHINE_NODEVICE_LAN )
 
-GAME( 1992, motofren,   0,        atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy", 0 )
-GAME( 1992, motofrenmd, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", 0 )
-GAME( 1992, motofrenft, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", 0 )
-GAME( 1992, motofrenmf, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", 0 )
+GAME( 1992, motofren,   0,        atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy", MACHINE_NODEVICE_LAN )
+GAME( 1992, motofrenmd, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", MACHINE_NODEVICE_LAN )
+GAME( 1992, motofrenft, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", MACHINE_NODEVICE_LAN )
+GAME( 1992, motofrenmf, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", MACHINE_NODEVICE_LAN )
 
-GAME( 1993, rrreveng,   0,        atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, rrrevenga,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, rrrevengb,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, rrreveng,   0,        atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1993, rrrevenga,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1993, rrrevengb,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )

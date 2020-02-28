@@ -68,12 +68,13 @@ void apricot_keyboard_device::apricot_keyboard_io(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(apricot_keyboard_device::device_add_mconfig)
+void apricot_keyboard_device::device_add_mconfig(machine_config &config)
+{
 #ifdef UPD7507_EMULATED
-	MCFG_DEVICE_ADD(UPD7507C_TAG, UPD7507, XTAL(32'768))
-	MCFG_DEVICE_IO_MAP(apricot_keyboard_io)
+	upd7507_device &upd(UPD7507(config, UPD7507C_TAG, XTAL(32'768)));
+	upd.set_addrmap(AS_IO, &apricot_keyboard_device::apricot_keyboard_io);
 #endif
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------

@@ -42,7 +42,7 @@ ALLOW_SAVE_TYPE(adc0808_device::state);
 adc0808_device::adc0808_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_eoc_cb(*this), m_eoc_ff_cb(*this),
-	m_in_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
+	m_in_cb(*this),
 	m_state(STATE_IDLE),
 	m_cycle_timer(nullptr),
 	m_start(0), m_address(0), m_sar(0xff), m_eoc(1)
@@ -81,9 +81,7 @@ void adc0808_device::device_start()
 	// resolve callbacks
 	m_eoc_cb.resolve_safe();
 	m_eoc_ff_cb.resolve_safe();
-
-	for (int i = 0; i < 8; i++)
-		m_in_cb[i].resolve_safe(0xff);
+	m_in_cb.resolve_all_safe(0xff);
 
 	// allocate timers
 	m_cycle_timer = timer_alloc();
@@ -156,7 +154,7 @@ void adc0808_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  INTERFACE
 //**************************************************************************
 
-READ8_MEMBER( adc0808_device::data_r )
+u8 adc0808_device::data_r()
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -170,7 +168,7 @@ READ8_MEMBER( adc0808_device::data_r )
 	return m_sar;
 }
 
-WRITE8_MEMBER( adc0808_device::address_w )
+void adc0808_device::address_w(u8 data)
 {
 	m_address = data & 7;
 }
@@ -198,22 +196,22 @@ READ_LINE_MEMBER( adc0808_device::eoc_r )
 	return m_eoc;
 }
 
-WRITE8_MEMBER( adc0808_device::address_offset_start_w )
+void adc0808_device::address_offset_start_w(offs_t offset, u8 data)
 {
 	if (VERBOSE)
 		logerror("address_offset_start_w %02x %02x\n", offset, data);
 
 	start_w(1);
-	address_w(space, 0, offset);
+	address_w(offset);
 	start_w(0);
 }
 
-WRITE8_MEMBER( adc0808_device::address_data_start_w )
+void adc0808_device::address_data_start_w(u8 data)
 {
 	if (VERBOSE)
-		logerror("address_data_start_w %02x %02x\n", offset, data);
+		logerror("address_data_start_w %02x\n", data);
 
 	start_w(1);
-	address_w(space, 0, data);
+	address_w(data);
 	start_w(0);
 }

@@ -31,12 +31,6 @@
 #include "speaker.h"
 
 
-INTERRUPT_GEN_MEMBER(spy_state::spy_interrupt)
-{
-	if (m_k052109->is_irq_enabled())
-		device.execute().set_input_line(0, HOLD_LINE);
-}
-
 READ8_MEMBER(spy_state::spy_bankedram1_r)
 {
 	if (m_rambank & 1)
@@ -64,7 +58,7 @@ WRITE8_MEMBER(spy_state::spy_bankedram1_w)
 {
 	if (m_rambank & 1)
 	{
-		m_palette->write8(space,offset,data);
+		m_palette->write8(offset,data);
 	}
 	else if (m_rambank & 2)
 	{
@@ -332,7 +326,7 @@ WRITE8_MEMBER(spy_state::spy_3f90_w)
 
 WRITE8_MEMBER(spy_state::spy_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE8_MEMBER(spy_state::sound_bank_w)
@@ -354,24 +348,24 @@ READ8_MEMBER(spy_state::k052109_051960_r)
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return m_k051960->k051937_r(space, offset - 0x3800);
+			return m_k051960->k051937_r(offset - 0x3800);
 		else if (offset < 0x3c00)
-			return m_k052109->read(space, offset);
+			return m_k052109->read(offset);
 		else
-			return m_k051960->k051960_r(space, offset - 0x3c00);
+			return m_k051960->k051960_r(offset - 0x3c00);
 	}
 	else
-		return m_k052109->read(space, offset);
+		return m_k052109->read(offset);
 }
 
 WRITE8_MEMBER(spy_state::k052109_051960_w)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
-		m_k051960->k051937_w(space, offset - 0x3800, data);
+		m_k051960->k051937_w(offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		m_k052109->write(space, offset, data);
+		m_k052109->write(offset, data);
 	else
-		m_k051960->k051960_w(space, offset - 0x3c00, data);
+		m_k051960->k051960_w(offset - 0x3c00, data);
 }
 
 void spy_state::spy_map(address_map &map)
@@ -499,7 +493,6 @@ void spy_state::spy(machine_config &config)
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, XTAL(24'000'000) / 8); // 3 MHz? (divided by 051961)
 	m_maincpu->set_addrmap(AS_PROGRAM, &spy_state::spy_map);
-	m_maincpu->set_vblank_int("screen", FUNC(spy_state::spy_interrupt));
 
 	Z80(config, m_audiocpu, XTAL(3'579'545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spy_state::spy_sound_map); /* nmi by the sound chip */
@@ -518,14 +511,16 @@ void spy_state::spy(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 0); // 051961 on schematics
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(spy_state::tile_callback), this);
+	m_k052109->set_screen("screen");
+	m_k052109->set_tile_callback(FUNC(spy_state::tile_callback));
+	m_k052109->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
-	m_k051960->set_sprite_callback(FUNC(spy_state::sprite_callback), this);
+	m_k051960->set_screen("screen");
+	m_k051960->set_sprite_callback(FUNC(spy_state::sprite_callback));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -205,19 +205,18 @@ TODO:
 #include "crmaze4p.lh"
 
 
-struct bt471_t
-{
-	uint8_t address;
-	uint8_t addr_cnt;
-	uint8_t pixmask;
-	uint8_t command;
-	rgb_t color;
-};
-
-
 class mpu4vid_state : public mpu4_state
 {
 public:
+	struct bt471_t
+	{
+		uint8_t address;
+		uint8_t addr_cnt;
+		uint8_t pixmask;
+		uint8_t command;
+		rgb_t color;
+	};
+
 	mpu4vid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mpu4_state(mconfig, type, tag),
 		m_videocpu(*this, "video"),
@@ -281,9 +280,9 @@ private:
 	int m_gfx_index;
 	int8_t m_cur[2];
 
-	DECLARE_MACHINE_START(mpu4_vid);
-	DECLARE_MACHINE_RESET(mpu4_vid);
-	DECLARE_VIDEO_START(mpu4_vid);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_WRITE_LINE_MEMBER(m6809_acia_irq);
 	DECLARE_WRITE_LINE_MEMBER(m68k_acia_irq);
@@ -438,7 +437,7 @@ WRITE16_MEMBER(mpu4vid_state::mpu4_vid_vidram_w )
 }
 
 
-VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
+void mpu4vid_state::video_start()
 {
 	m_vid_vidram.allocate(0x20000/2);
 
@@ -1152,19 +1151,16 @@ WRITE_LINE_MEMBER(mpu4vid_state::mpu_video_reset)
 }
 
 /* machine start (called only once) */
-MACHINE_START_MEMBER(mpu4vid_state,mpu4_vid)
+void mpu4vid_state::machine_start()
 {
 	mpu4_config_common();
 
 	m_mod_number=4; //No AY chip
 	/* setup communications */
 	m_link7a_connected = 1;
-
-	/* Hook the reset line */
-	m_videocpu->set_reset_callback(write_line_delegate(FUNC(mpu4vid_state::mpu_video_reset),this));
 }
 
-MACHINE_RESET_MEMBER(mpu4vid_state,mpu4_vid)
+void mpu4vid_state::machine_reset()
 {
 	m_vfd->reset(); //for debug ports only
 
@@ -1188,11 +1184,11 @@ void mpu4vid_state::mpu4_68k_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rom();
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
-//  map(0x810000, 0x81ffff) AM_RAM /* ? */
+//  map(0x810000, 0x81ffff).ram(); /* ? */
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
 	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
-/*  map(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+//  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xff8000, 0xff8003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
@@ -1202,9 +1198,9 @@ void mpu4vid_state::mpu4_68k_map(address_map &map)
 
 void mpu4vid_state::mpu4oki_68k_map(address_map &map)
 {
-	map(0x000000, 0x5fffff).rom(); //AM_WRITENOP
+	map(0x000000, 0x5fffff).rom(); //.nopw();
 	map(0x600000, 0x63ffff).ram(); /* The Mating Game has an extra 256kB RAM on the program card */
-//  map(0x640000, 0x7fffff) AM_NOP /* Possible bug, reads and writes here */
+//  map(0x640000, 0x7fffff).noprw(); /* Possible bug, reads and writes here */
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
@@ -1217,7 +1213,7 @@ void mpu4vid_state::mpu4oki_68k_map(address_map &map)
 	map(0xffa040, 0xffa04f).w(FUNC(mpu4vid_state::ic3ss_w)).umask16(0x00ff);  // 6840PTM on sampled sound board
 	map(0xffa060, 0xffa067).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);    // PIA6821 on sampled sound board
 	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
-//  map(0xfff000, 0xffffff) AM_NOP /* Possible bug, reads and writes here */
+//  map(0xfff000, 0xffffff).noprw(); /* Possible bug, reads and writes here */
 }
 
 void mpu4vid_state::bwbvid_68k_map(address_map &map)
@@ -1228,13 +1224,13 @@ void mpu4vid_state::bwbvid_68k_map(address_map &map)
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
 	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
-//  map(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
-/*  map(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+//  map(0xa00000, 0xa0000f).rw(FUNC(mpu4vid_state::bt471_r), FUNC(mpu4vid_state::bt471_w)); //Some games use this
+//  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xe00000, 0xe00003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0xe01000, 0xe0100f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
-	//map(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
+	//map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::bwb_characteriser16_r), FUNC(mpu4vid_state::bwb_characteriser16_w)); //.rw(FUNC(mpu4vid_state::adpcm_r), FUNC(mpu4vid_state::adpcm_w));  CHR ?
 }
 
 void mpu4vid_state::bwbvid5_68k_map(address_map &map)
@@ -1245,8 +1241,8 @@ void mpu4vid_state::bwbvid5_68k_map(address_map &map)
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
 	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
-	//map(0xa00000, 0xa00003) AM_READWRITE8(bt471_r,bt471_w,0x00ff) Some games use this
-/*  map(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+//  map(0xa00000, 0xa00003).rw(FUNC(mpu4vid_state::bt471_r), FUNC(mpu4vid_state::bt471_w)).umask16(0x00ff); Some games use this
+//  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xe00000, 0xe00003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
@@ -1254,7 +1250,7 @@ void mpu4vid_state::bwbvid5_68k_map(address_map &map)
 	map(0xe02000, 0xe02007).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0xff00); //Seems odd...
 	map(0xe03000, 0xe0300f).r("ptm_ic3ss", FUNC(ptm6840_device::read)).umask16(0xff00);  // 6840PTM on sampled sound board
 	map(0xe03000, 0xe0300f).w(FUNC(mpu4vid_state::ic3ss_w)).umask16(0xff00);  // 6840PTM on sampled sound board
-	map(0xe04000, 0xe0400f).rw(FUNC(mpu4vid_state::bwb_characteriser_r), FUNC(mpu4vid_state::bwb_characteriser_w)).umask16(0x00ff);//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
+	map(0xe04000, 0xe0400f).rw(FUNC(mpu4vid_state::bwb_characteriser_r), FUNC(mpu4vid_state::bwb_characteriser_w)).umask16(0x00ff); //.rw(FUNC(mpu4vid_state::adpcm_r), FUNC(mpu4vid_state::adpcm_w));  CHR ?
 }
 
 /* TODO: Fix up MPU4 map*/
@@ -1302,12 +1298,9 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 
 	M68000(config, m_videocpu, VIDEO_MASTER_CLOCK);
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map);
+	m_videocpu->set_reset_callback(FUNC(mpu4vid_state::mpu_video_reset));
 
-//  config.m_minimum_quantum = attotime::from_hz(960);
-
-	MCFG_MACHINE_START_OVERRIDE(mpu4vid_state,mpu4_vid)
-	MCFG_MACHINE_RESET_OVERRIDE(mpu4vid_state,mpu4_vid)
-	MCFG_VIDEO_START_OVERRIDE (mpu4vid_state,mpu4_vid)
+//  config.set_maximum_quantum(attotime::from_hz(960));
 
 	PALETTE(config, m_palette).set_entries(ef9369_device::NUMCOLORS);
 

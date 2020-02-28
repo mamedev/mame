@@ -13,7 +13,11 @@
  *   http://www.sensi.org/~alec/mips/mips-history.html
  *
  * TODO
- *   - everything (skeleton only)
+ *   - big-endian support for RISC/os
+ *   - EISA bus and slots
+ *   - slotify and improve graphics board
+ *   - other models/variants
+ *   - sound and other loose ends
  *
  * Unconfirmed parts lists from ARCSystem reference design (which appears to
  * be very similar or identical to the Jazz system) taken from:
@@ -56,48 +60,105 @@
 
 #include "debugger.h"
 
+#include "jazz.lh"
+
 #define VERBOSE 0
 #include "logmacro.h"
 
 void jazz_state::machine_start()
 {
+	m_led.resolve();
 }
 
 void jazz_state::machine_reset()
 {
+	// HACK: make sure the RTC is running
+	m_rtc->write_direct(0x0a, 0x20);
 }
 
 void jazz_state::init_common()
 {
-	// map the configured ram
-	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->mask(), m_ram->pointer());
+	// map the configured ram and vram
+	m_mct_adr->space(0).install_ram(0x00000000, 0x00000000 | m_ram->mask(), m_ram->pointer());
+	m_mct_adr->space(0).install_ram(0x40000000, 0x40000000 | m_vram->mask(), m_vram->pointer());
 }
 
-void jazz_state::jazz_common_map(address_map &map)
+void jazz_state::cpu_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(m_mct_adr, FUNC(mct_adr_device::r4k_r), FUNC(mct_adr_device::r4k_w));
+}
+
+void jazz_state::mct_map(address_map &map)
 {
 	map(0x1fc00000, 0x1fc3ffff).r(m_flash, FUNC(amd_28f020_device::read));
 
-	// FIXME: lots of guesswork and assumptions here for now
-	map(0x80000000, 0x80000fff).m(m_mct_adr, FUNC(jazz_mct_adr_device::map));
-	map(0x80001000, 0x80001fff).m(m_network, FUNC(dp83932c_device::map));
-	//map(0x80002000, 0x80002fff).m(m_scsi, FUNC(ncr5390_device::map)).umask32(0x000000ff);
-	map(0x80003000, 0x80003fff).m(m_fdc, FUNC(n82077aa_device::map));
-	//map(0x80004000, 0x80004fff).rw(m_rtc, FUNC(mc146818_device::read), FUNC(mc146818_device::write));
-	//map(0x80005000, 0x80005fff).m() // keyboard/mouse
-	//map(0x80006000, 0x80006fff).m() // serial1
-	//map(0x80007000, 0x80007fff).m() // serial2
-	//map(0x80008000, 0x80008fff).m() // parallel
-	map(0x80009000, 0x80009fff).ram().share("nvram"); // unprotected?
-	map(0x8000a000, 0x8000afff).ram().share("nvram"); // protected?
-	map(0x8000b000, 0x8000bfff).ram().share("nvram"); // read-only?  also sonic IO access?
+	// VDR1
+	//map(0x60000000, 0x60001fff).m(m_cvc, FUNC(g364_device::map));
+	//map(0x60010000, 0x60010000); // id (r/w)
+	//map(0x60020000, 0x60020000); // reset
+
+	// VDR1F "Fission"
+	map(0x60000000, 0x6007ffff).rom().region("graphics", 0);
+	map(0x60080000, 0x60081fff).m(m_cvc, FUNC(g364_device::map));
+	map(0x60100000, 0x60100000).lw8([this] (u8 data) { m_cvc->set_swapped(ENDIANNESS_NATIVE == ENDIANNESS_BIG); }, "little_endian");
+	map(0x60102000, 0x60102000).lw8([this] (u8 data) { m_cvc->set_swapped(ENDIANNESS_NATIVE == ENDIANNESS_LITTLE); }, "big_endian");
+	map(0x60180000, 0x60180000).lw8([this] (u8 data) { m_cvc->reset(); }, "g364_reset");
+	//map(0x60182000, 0x60182000); // TODO: monitor
+
+	// VDR2
+	//map(0x60000000, 0x60000fff).m(m_cvc, FUNC(g300_device::map));
+	//map(0x60008000, 0x60008fff).m(m_cursor, FUNC(bt431_device::map)).umask32(0x000000ff);
+
+	map(0x80000000, 0x80000fff).m(m_mct_adr, FUNC(mct_adr_device::map));
+
+	map(0x80001000, 0x800010ff).m(m_net, FUNC(dp83932c_device::map)).umask32(0x0000ffff);
+	map(0x80002000, 0x8000200f).m(m_scsi, FUNC(ncr53c94_device::map));
+	map(0x80003000, 0x8000300f).m(m_fdc, FUNC(n82077aa_device::map));
+
+	// LE: only reads 4000
+	// BE: read 400d, write 400d, write 400c
+	map(0x80004000, 0x8000400f).lrw8(
+			NAME([this] (offs_t offset) { return m_rtc->read(1); }),
+			NAME([this] (offs_t offset, u8 data) { m_rtc->write(1, data); }));
+	map(0x80005000, 0x80005000).rw(m_kbdc, FUNC(ps2_keyboard_controller_device::data_r), FUNC(ps2_keyboard_controller_device::data_w));
+	map(0x80005001, 0x80005001).rw(m_kbdc, FUNC(ps2_keyboard_controller_device::status_r), FUNC(ps2_keyboard_controller_device::command_w));
+	map(0x80006000, 0x80006007).rw(m_ace[0], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+	map(0x80007000, 0x80007007).rw(m_ace[1], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+	map(0x80008000, 0x80008003).rw(m_lpt, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write));
+	map(0x80009000, 0x8000afff).ram().share("nvram");
+	map(0x8000b000, 0x8000b007).lr8(
+			[] (offs_t offset)
+			{
+				// mac address and checksum
+				static u8 const mac[] = { 0x00, 0x00, 0x6b, 0x12, 0x34, 0x56, 0x00, 0xf7 };
+
+				return mac[offset];
+			},
+			"mac");
+
 	//map(0x8000c000, 0x8000cfff) // sound
-	map(0x8000d000, 0x8000dfff).noprw(); // dummy dma device?
+	//map(0x8000d000, 0x8000dfff).noprw(); // dummy dma device?
+	map(0x8000d600, 0x8000d607).nopw();
 
-	map(0x8000f000, 0x8000f001).rw(FUNC(jazz_state::led_r), FUNC(jazz_state::led_w));
+	map(0x8000f000, 0x8000f000).w(FUNC(jazz_state::led_w));
 
-	//map(0x800e0000, 0x800e0000).rw(FUNC(jazz_state::dram_config_r), FUNC(jazz_state::dram_config_w));
+	// lots of byte data written to 800
+	//map(0x800e0000, 0x800fffff).m() // dram config
 
-	map(0xe0800000, 0xe0bfffff).ram().share("vram"); // framebuffer?
+	map(0x90000000, 0x90ffffff).m(m_isp, FUNC(i82357_device::map));
+
+	// HACK: empty eisa slots
+	map(0x90001c80, 0x90001c87).ram();
+	map(0x90002c80, 0x90002c87).ram();
+	map(0x90003c80, 0x90003c87).ram();
+	map(0x90004c80, 0x90004c87).ram();
+
+	//map(0x91000000, 0x91ffffff).m();
+	//map(0x92000000, 0x92ffffff).m(); // EISA I/O ports?
+	//map(0x93000000, 0x93ffffff).m(); // EISA memory
+
+	map(0xf0000000, 0xf0000001).r(m_mct_adr, FUNC(mct_adr_device::isr_r));
+	map(0xf0000002, 0xf0000003).rw(m_mct_adr, FUNC(mct_adr_device::imr_r), FUNC(mct_adr_device::imr_w));
 
 	map(0xfff00000, 0xfff3ffff).r(m_flash, FUNC(amd_28f020_device::read)); // mirror?
 }
@@ -108,108 +169,232 @@ static void jazz_scsi_devices(device_slot_interface &device)
 	device.option_add("cdrom", NSCSI_CDROM);
 }
 
+FLOPPY_FORMATS_MEMBER(jazz_state::floppy_formats)
+	FLOPPY_PC_FORMAT
+FLOPPY_FORMATS_END
+
 void jazz_state::jazz(machine_config &config)
 {
-	m_maincpu->set_addrmap(AS_PROGRAM, &jazz_state::jazz_common_map);
+	// FIXME: slow the cpu clock to get past session manager bugcheck
+	R4000(config, m_cpu, 50_MHz_XTAL / 5);
+	m_cpu->set_addrmap(0, &jazz_state::cpu_map);
 
-	RAM(config, m_ram, 0);
-	m_ram->set_default_size("8M");
-	m_ram->set_extra_options("16M,32M,64M,128M,256M");
+	RAM(config, m_ram);
+	m_ram->set_default_size("16M");
+	m_ram->set_extra_options("32M,64M,128M,256M");
 	m_ram->set_default_value(0);
 
 	RAM(config, m_vram);
 	m_vram->set_default_size("2M");
 	m_vram->set_default_value(0);
 
-	// FIXME: may require big and little endian variants
-	JAZZ_MCT_ADR(config, m_mct_adr, 0);
+	// local bus dma, timer and interrupt controller
+	MCT_ADR(config, m_mct_adr, 0);
+	m_mct_adr->set_addrmap(0, &jazz_state::mct_map);
+	m_mct_adr->out_int_dma_cb().set_inputline(m_cpu, INPUT_LINE_IRQ0);
+	m_mct_adr->out_int_device_cb().set_inputline(m_cpu, INPUT_LINE_IRQ1);
+	m_mct_adr->out_int_timer_cb().set_inputline(m_cpu, INPUT_LINE_IRQ4);
+	m_mct_adr->eisa_iack_cb().set(m_isp, FUNC(i82357_device::eisa_irq_ack));
 
 	// scsi bus and devices
-	NSCSI_BUS(config, m_scsibus, 0);
-
-	nscsi_connector &harddisk(NSCSI_CONNECTOR(config, "scsi:0", 0));
-	jazz_scsi_devices(harddisk);
-	harddisk.set_default_option("harddisk");
-
-	nscsi_connector &cdrom(NSCSI_CONNECTOR(config, "scsi:6", 0));
-	jazz_scsi_devices(cdrom);
-	cdrom.set_default_option("cdrom");
-
-	jazz_scsi_devices(NSCSI_CONNECTOR(config, "scsi:1", 0));
-	jazz_scsi_devices(NSCSI_CONNECTOR(config, "scsi:2", 0));
-	jazz_scsi_devices(NSCSI_CONNECTOR(config, "scsi:3", 0));
-	jazz_scsi_devices(NSCSI_CONNECTOR(config, "scsi:4", 0));
-	jazz_scsi_devices(NSCSI_CONNECTOR(config, "scsi:5", 0));
+	NSCSI_BUS(config, m_scsibus);
+	NSCSI_CONNECTOR(config, "scsi:0", jazz_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:1", jazz_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", jazz_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", jazz_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", jazz_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", jazz_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", jazz_scsi_devices, "cdrom");
 
 	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
-	adapter.option_add_internal("host", NCR53C90A);
-	adapter.set_default_option("host");
-	adapter.set_fixed(true);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c94", NCR53C94).clock(24_MHz_XTAL).machine_config(
+		[this] (device_t *device)
+		{
+			ncr53c94_device &adapter = downcast<ncr53c94_device &>(*device);
 
+			adapter.irq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::irq<5>));
+			adapter.drq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::drq<0>));
+
+			subdevice<mct_adr_device>(":mct_adr")->dma_r_cb<0>().set(adapter, FUNC(ncr53c94_device::dma_r));
+			subdevice<mct_adr_device>(":mct_adr")->dma_w_cb<0>().set(adapter, FUNC(ncr53c94_device::dma_w));
+		});
+
+	// floppy controller and drive
 	N82077AA(config, m_fdc, 24_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set(m_mct_adr, FUNC(mct_adr_device::irq<1>));
+	m_fdc->drq_wr_callback().set(m_mct_adr, FUNC(mct_adr_device::drq<1>));
+	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, jazz_state::floppy_formats).enable_sound(false);
+	m_mct_adr->dma_r_cb<1>().set(m_fdc, FUNC(n82077aa_device::dma_r));
+	m_mct_adr->dma_w_cb<1>().set(m_fdc, FUNC(n82077aa_device::dma_w));
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->set_epoch(1980);
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
 	AMD_28F020(config, m_flash);
 
-	// pc keyboard controller?
-	pc_kbdc_device &kbdc(PC_KBDC(config, "pc_kbdc", 0));
-	kbdc.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
-	kbdc.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
+	// pc keyboard connector
+	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd_con", 0));
+	kbd_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
+	kbd_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
 
 	// keyboard port
-	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", 0));
-	pc_at_keyboards(kbd);
-	kbd.set_default_option(STR_KBD_IBM_PC_AT_84);
-	kbd.set_pc_kbdc_slot(&kbdc);
+	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
+	kbd.set_pc_kbdc_slot(&kbd_con);
 
-	// at keyboard controller
-	AT_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
-	m_kbdc->hot_res().set_inputline(m_maincpu, INPUT_LINE_RESET);
-	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+	// auxiliary connector
+	pc_kbdc_device &aux_con(PC_KBDC(config, "aux_con", 0));
+	aux_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
+	aux_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_data_w));
+
+	// auxiliary port
+	pc_kbdc_slot_device &aux(PC_KBDC_SLOT(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
+	aux.set_pc_kbdc_slot(&aux_con);
+
+	// keyboard controller
+	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
+	// FIXME: reset is probably routed through the MCT-ADR
+	m_kbdc->hot_res().set([this] (int state) { machine().schedule_soft_reset(); });
+	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->kbd_irq().set(m_mct_adr, FUNC(mct_adr_device::irq<6>));
+	m_kbdc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->aux_irq().set(m_mct_adr, FUNC(mct_adr_device::irq<7>));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(78643200, 1280, 0, 1280, 1024, 0, 1024);
-	m_screen->set_screen_update("g364", FUNC(g364_device::screen_update));
+	m_screen->set_screen_update(m_cvc, FUNC(g364_device::screen_update));
+	m_screen->screen_vblank().set(m_mct_adr, FUNC(mct_adr_device::irq<3>)); // maybe?
 
-	G364(config, m_ramdac, 5_MHz_XTAL); // FIXME: guessed clock
-	m_ramdac->set_screen(m_screen);
-	m_ramdac->set_vram(m_vram);
+	G364(config, m_cvc, 5_MHz_XTAL); // FIXME: guessed clock
+	m_cvc->set_screen(m_screen);
+	m_cvc->set_vram(m_vram);
 
-	DP83932C(config, m_network, 20_MHz_XTAL);
-	m_network->set_ram(RAM_TAG);
+	// WD16C552 (two 16550 + pc_lpt)
+	NS16550(config, m_ace[0], 4233600);
+	rs232_port_device &serial0(RS232_PORT(config, "serial0", default_rs232_devices, nullptr));
+
+	m_ace[0]->out_dtr_callback().set(serial0, FUNC(rs232_port_device::write_dtr));
+	m_ace[0]->out_rts_callback().set(serial0, FUNC(rs232_port_device::write_rts));
+	m_ace[0]->out_tx_callback().set(serial0, FUNC(rs232_port_device::write_txd));
+	m_ace[0]->out_int_callback().set(m_mct_adr, FUNC(mct_adr_device::irq<8>));
+
+	serial0.cts_handler().set(m_ace[0], FUNC(ns16550_device::cts_w));
+	serial0.dcd_handler().set(m_ace[0], FUNC(ns16550_device::dcd_w));
+	serial0.dsr_handler().set(m_ace[0], FUNC(ns16550_device::dsr_w));
+	serial0.ri_handler().set(m_ace[0], FUNC(ns16550_device::ri_w));
+	serial0.rxd_handler().set(m_ace[0], FUNC(ns16550_device::rx_w));
+
+	NS16550(config, m_ace[1], 8_MHz_XTAL);
+	rs232_port_device &serial1(RS232_PORT(config, "serial1", default_rs232_devices, nullptr));
+
+	m_ace[1]->out_dtr_callback().set(serial1, FUNC(rs232_port_device::write_dtr));
+	m_ace[1]->out_rts_callback().set(serial1, FUNC(rs232_port_device::write_rts));
+	m_ace[1]->out_tx_callback().set(serial1, FUNC(rs232_port_device::write_txd));
+	m_ace[1]->out_int_callback().set(m_mct_adr, FUNC(mct_adr_device::irq<9>));
+
+	serial1.cts_handler().set(m_ace[1], FUNC(ns16550_device::cts_w));
+	serial1.dcd_handler().set(m_ace[1], FUNC(ns16550_device::dcd_w));
+	serial1.dsr_handler().set(m_ace[1], FUNC(ns16550_device::dsr_w));
+	serial1.ri_handler().set(m_ace[1], FUNC(ns16550_device::ri_w));
+	serial1.rxd_handler().set(m_ace[1], FUNC(ns16550_device::rx_w));
+
+	PC_LPT(config, m_lpt, 0);
+	m_lpt->irq_handler().set(m_mct_adr, FUNC(mct_adr_device::irq<0>));
+
+	// TODO: sound, interrupt 2, drq 2(l) & 3(r)
+
+	// buzzer
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_buzzer);
+	m_buzzer->add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	DP83932C(config, m_net, 20_MHz_XTAL);
+	m_net->out_int_cb().set(m_mct_adr, FUNC(mct_adr_device::irq<4>));
+	m_net->set_bus(m_mct_adr, 1);
+
+	I82357(config, m_isp, 14.318181_MHz_XTAL);
+	m_isp->out_rtc_cb().set(m_rtc, FUNC(mc146818_device::write));
+	m_isp->out_int_cb().set_inputline(m_cpu, INPUT_LINE_IRQ2);
+	m_isp->out_nmi_cb().set_inputline(m_cpu, INPUT_LINE_IRQ3);
+	m_isp->out_spkr_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
+
+	// TODO: 4 EISA slots
+
+	config.set_default_layout(layout_jazz);
+
+	// software list
+	SOFTWARE_LIST(config, m_softlist).set_original("jazz");
+}
+
+void jazz_state::led_w(u8 data)
+{
+	// 7-segment diagnostic led
+	static u8 const patterns[16] =
+	{
+			  // test      output
+		0x3f, // mct-adr     0
+		0x06, // network     1
+		0x5b, // scsi        2
+		0x4f, // floppy      3
+		0x66, // isp/rtc     4
+		0x6d, // keyboard    5
+		0x7d, // serial      6
+		0x07, // nvram       7
+		0x7f, //             8?
+		0x6f, // video       9
+		0x77, // memory      A
+		0x40, //             -
+		0x39, // flash       C
+		0x00, //           (blank)
+		0x79, // cpu         E
+		0x71, //             F?
+	};
+
+	m_led = patterns[data & 0xf] | (BIT(data, 4) ? 0x80 : 0);
 }
 
 void jazz_state::mmr4000be(machine_config &config)
 {
-	R4000BE(config, m_maincpu, 50_MHz_XTAL);
-
 	jazz(config);
+
+	m_cpu->set_config(r4000_device::CONFIG_BE, r4000_device::CONFIG_BE);
 }
 
 void jazz_state::mmr4000le(machine_config &config)
 {
-	R4000LE(config, m_maincpu, 50_MHz_XTAL);
-
 	jazz(config);
+
+	m_cpu->set_config(0, r4000_device::CONFIG_BE);
 }
 
 ROM_START(mmr4000be)
-	ROM_REGION32_BE(0x40000, "flash", 0)
+	ROM_REGION32_LE(0x40000, "flash", 0)
 	ROM_SYSTEM_BIOS(0, "riscos", "R4000 RISC/os PROM")
 	ROMX_LOAD("riscos.bin", 0x00000, 0x40000, CRC(cea6bc8f) SHA1(3e47b4ad5d1a0c7aac649e6aef3df1bf86fc938b), ROM_BIOS(0))
+
+	ROM_REGION32_LE(0x800000, "graphics", 0)
+	ROM_LOAD64_BYTE("mips_g364.bin", 0x000000, 0x020000, CRC(be6a726e) SHA1(225c198f6a7f8445dac3de052ecceecbb5be6bc7) BAD_DUMP)
 ROM_END
 
 ROM_START(mmr4000le)
 	ROM_REGION32_LE(0x40000, "flash", 0)
 	ROM_SYSTEM_BIOS(0, "ntprom", "R4000 Windows NT PROM")
 	ROMX_LOAD("ntprom.bin", 0x00000, 0x40000, CRC(d91018d7) SHA1(316de17820192c89b8ee6d9936ab8364a739ca53), ROM_BIOS(0))
+
+	ROM_REGION32_LE(0x800000, "graphics", 0)
+	// Jazz G300 (8.125MHz video clock, Bt431)
+	//ROM_LOAD64_BYTE("jazz_g300.bin", 0x00, 0x40, CRC(258eb00a) SHA1(6e3fd0272957524de82e7042d6e36aca492c4d26) BAD_DUMP)
+	// Jazz G364 (8.125MHz video clock)
+	//ROM_LOAD64_BYTE("jazz_g364.bin", 0x000000, 0x020000, CRC(495fb417) SHA1(c341f3d498822ec1ee07a70076d7bbbf7aa60cb5) BAD_DUMP)
+	// Jazz VXL (aka Jaguar, part number 09-00184, Bt484 or Bt485)
+	//ROM_LOAD64_BYTE("jazz_vxl.bin", 0x000000, 0x010000, CRC(8edf1a62) SHA1(7750833eac0708ee79f01f36523554d29a094692) BAD_DUMP)
+	// MIPS G364 (5MHz video clock, part number 09-00176)
+	ROM_LOAD64_BYTE("mips_g364.bin", 0x000000, 0x020000, CRC(be6a726e) SHA1(225c198f6a7f8445dac3de052ecceecbb5be6bc7) BAD_DUMP)
 ROM_END
 
-/*    YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT         COMPANY  FULLNAME                 FLAGS */
-COMP( 1992,  mmr4000be, 0,      0,      mmr4000be, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (big)",    MACHINE_IS_SKELETON)
-COMP( 1992,  mmr4000le, 0,      0,      mmr4000le, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (little)", MACHINE_IS_SKELETON)
+/*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT         COMPANY  FULLNAME             FLAGS */
+COMP(1992,  mmr4000be, 0,      0,      mmr4000be, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (be)", MACHINE_NO_SOUND)
+COMP(1992,  mmr4000le, 0,      0,      mmr4000le, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (le)", MACHINE_NO_SOUND)

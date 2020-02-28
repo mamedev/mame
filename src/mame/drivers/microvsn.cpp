@@ -59,7 +59,7 @@ private:
 	void microvision_palette(palette_device &palette) const;
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( microvsn_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	// i8021 interface
 	DECLARE_WRITE8_MEMBER(i8021_p0_write);
@@ -505,7 +505,7 @@ static const u16 microvision_output_pla_1[0x20] =
 };
 
 
-DEVICE_IMAGE_LOAD_MEMBER(microvision_state, microvsn_cart)
+DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 {
 	uint8_t *rom1 = memregion("maincpu1")->base();
 	uint8_t *rom2 = memregion("maincpu2")->base();
@@ -633,7 +633,8 @@ static INPUT_PORTS_START( microvision )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(microvision_state::microvision)
+void microvision_state::microvision(machine_config &config)
+{
 	I8021(config, m_i8021, 2000000);    // approximately
 	m_i8021->bus_out_cb().set(FUNC(microvision_state::i8021_p0_write));
 	m_i8021->p1_out_cb().set(FUNC(microvision_state::i8021_p1_write));
@@ -647,32 +648,33 @@ MACHINE_CONFIG_START(microvision_state::microvision)
 	m_tms1100->o().set(FUNC(microvision_state::tms1100_write_o));
 	m_tms1100->r().set(FUNC(microvision_state::tms1100_write_r));
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(0)
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
-	MCFG_SCREEN_UPDATE_DRIVER(microvision_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, microvision_state, screen_vblank))
-	MCFG_SCREEN_SIZE(16, 16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 15, 0, 15)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(0);
+	screen.set_screen_update(FUNC(microvision_state::screen_update));
+	screen.screen_vblank().set(FUNC(microvision_state::screen_vblank));
+	screen.set_size(16, 16);
+	screen.set_visarea(0, 15, 0, 15);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(microvision_state::microvision_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "microvision_cart")
-	MCFG_GENERIC_MANDATORY
-	MCFG_GENERIC_LOAD(microvision_state, microvsn_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "microvision_cart"));
+	cartslot.set_must_be_loaded(true);
+	cartslot.set_device_load(FUNC(microvision_state::cart_load));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("microvision");
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( microvsn )

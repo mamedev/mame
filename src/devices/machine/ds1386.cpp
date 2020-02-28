@@ -27,12 +27,14 @@
 #define HOURS_12_24     (0x40)
 #define HOURS_AM_PM     (0x20)
 
-DEFINE_DEVICE_TYPE(DS1386_8K,  ds1386_8k_device,  "ds1386_8k",  "DS1386 RAMified Watchdog Timekeeper (8K)")
-DEFINE_DEVICE_TYPE(DS1386_32K, ds1386_32k_device, "ds1386_32k", "DS1386 RAMified Watchdog Timekeeper (32K)")
+DEFINE_DEVICE_TYPE(DS1286,     ds1286_device,     "ds1286",     "DS1286 Watchdog Timekeeper")
+DEFINE_DEVICE_TYPE(DS1386_8K,  ds1386_8k_device,  "ds1386_8k",  "DS1386-8K RAMified Watchdog Timekeeper")
+DEFINE_DEVICE_TYPE(DS1386_32K, ds1386_32k_device, "ds1386_32k", "DS1386-32K RAMified Watchdog Timekeeper")
 
 ds1386_device::ds1386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, size_t size)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
+	, device_rtc_interface(mconfig, *this)
 	, m_tod_alarm(0)
 	, m_watchdog_alarm(0)
 	, m_square(1)
@@ -57,6 +59,11 @@ ds1386_device::ds1386_device(const machine_config &mconfig, device_type type, co
 	, m_months_enables(0)
 	, m_years(0)
 	, m_ram_size(size)
+{
+}
+
+ds1286_device::ds1286_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ds1386_device(mconfig, DS1286, tag, owner, clock, 64)
 {
 }
 
@@ -114,48 +121,36 @@ void ds1386_device::device_start()
 	m_intb_timer= timer_alloc(INTB_TIMER);
 	m_intb_timer->adjust(attotime::never);
 
-	set_current_time();
-
 	// state saving
 	save_item(NAME(m_tod_alarm));
 	save_item(NAME(m_watchdog_alarm));
 	save_item(NAME(m_square));
 
 	m_ram = std::make_unique<uint8_t[]>(m_ram_size);
-	memset(&m_ram[0], 0, m_ram_size);
-}
-
-void ds1386_device::device_reset()
-{
-	m_tod_alarm = 0;
-	m_watchdog_alarm = 0;
-	m_square = 1;
-
-	safe_inta_cb(0);
-	safe_intb_cb(0);
-	safe_sqw_cb(1);
-
-	m_clock_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
-	m_square_timer->adjust(attotime::never);
-	m_watchdog_timer->adjust(attotime::never);
-
-	set_current_time();
+	save_pointer(NAME(m_ram), m_ram_size);
 }
 
 
-void ds1386_device::set_current_time()
+void ds1386_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	system_time systime;
-	machine().base_datetime(systime);
-
 	m_hundredths = 0;
-	m_seconds = time_helper::make_bcd(systime.local_time.second);
-	m_minutes = time_helper::make_bcd(systime.local_time.minute);
-	m_hours = time_helper::make_bcd(systime.local_time.hour);
-	m_days = time_helper::make_bcd(systime.local_time.weekday + 1);
-	m_date = time_helper::make_bcd(systime.local_time.mday);
-	m_months_enables = time_helper::make_bcd(systime.local_time.month + 1);
-	m_years = time_helper::make_bcd(systime.local_time.year % 100);
+	m_seconds = time_helper::make_bcd(second);
+	m_minutes = time_helper::make_bcd(minute);
+	if (m_hours & HOURS_12_24)
+	{
+		if (hour >= 12)
+			m_hours = time_helper::make_bcd(hour == 12 ? 12 : hour - 12) | HOURS_12_24 | HOURS_AM_PM;
+		else
+			m_hours = time_helper::make_bcd(hour == 0 ? 12 : hour) | HOURS_12_24;
+	}
+	else
+		m_hours = time_helper::make_bcd(hour);
+	m_days = time_helper::make_bcd(day_of_week);
+	m_date = time_helper::make_bcd(second);
+	m_months_enables = (time_helper::make_bcd(month) & 0x1f) | (m_months_enables & 0xc0);
+	m_years = time_helper::make_bcd(year);
+
+	copy_registers_to_ram();
 }
 
 void ds1386_device::time_of_day_alarm()
@@ -413,7 +408,8 @@ void ds1386_device::check_tod_alarm()
 
 void ds1386_device::nvram_default()
 {
-	memset(&m_ram[0], 0, m_ram_size);
+	std::fill_n(&m_ram[0], m_ram_size, 0);
+	m_ram[REGISTER_COMMAND] = COMMAND_TE | COMMAND_WAM | COMMAND_TDM;
 }
 
 void ds1386_device::nvram_read(emu_file &file)

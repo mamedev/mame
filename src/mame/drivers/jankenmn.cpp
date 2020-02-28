@@ -169,7 +169,7 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_status_r);
+	DECLARE_READ_LINE_MEMBER(hopper_status_r);
 
 	void jankenmn(machine_config &config);
 
@@ -251,7 +251,7 @@ WRITE8_MEMBER(jankenmn_state::lamps3_w)
 		logerror("payout: %02X\n", (data & 0x04));
 }
 
-CUSTOM_INPUT_MEMBER(jankenmn_state::hopper_status_r)
+READ_LINE_MEMBER(jankenmn_state::hopper_status_r)
 {
 	// temp workaround, needs hopper
 	return machine().rand();
@@ -336,7 +336,7 @@ static INPUT_PORTS_START( jankenmn )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Paa (Paper)")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 ) // 100 yen coin
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jankenmn_state, hopper_status_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jankenmn_state, hopper_status_r)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // 10 yen coin
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // 10 yen coin
 
@@ -383,7 +383,8 @@ static const z80_daisy_config daisy_chain[] =
 *               Machine Config               *
 *********************************************/
 
-MACHINE_CONFIG_START(jankenmn_state::jankenmn)
+void jankenmn_state::jankenmn(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK);  /* 2.5 MHz */
 	m_maincpu->set_daisy_config(daisy_chain);
@@ -410,10 +411,11 @@ MACHINE_CONFIG_START(jankenmn_state::jankenmn)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("dac", AD7523, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	AD7523(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 /*********************************************

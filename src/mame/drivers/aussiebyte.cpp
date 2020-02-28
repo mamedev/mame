@@ -238,7 +238,7 @@ READ8_MEMBER( aussiebyte_state::rtc_r )
 {
 	m_rtc->read_w(1);
 	m_rtc->address_w(offset);
-	uint8_t data = m_rtc->data_r(space,0);
+	uint8_t data = m_rtc->data_r();
 	m_rtc->read_w(0);
 	return data;
 }
@@ -246,7 +246,7 @@ READ8_MEMBER( aussiebyte_state::rtc_r )
 WRITE8_MEMBER( aussiebyte_state::rtc_w )
 {
 	m_rtc->address_w(offset);
-	m_rtc->data_w(space,0,data);
+	m_rtc->data_w(data);
 	m_rtc->write_w(1);
 	m_rtc->write_w(0);
 }
@@ -436,7 +436,7 @@ static void aussiebyte_floppies(device_slot_interface &device)
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( aussiebyte_state, aussiebyte )
+QUICKLOAD_LOAD_MEMBER(aussiebyte_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
@@ -495,7 +495,8 @@ void aussiebyte_state::machine_reset()
 	m_maincpu->reset();
 }
 
-MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
+void aussiebyte_state::aussiebyte(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &aussiebyte_state::aussiebyte_map);
@@ -584,15 +585,16 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(aussiebyte_state::crtc_update_row), this);
-	m_crtc->set_on_update_addr_change_callback(FUNC(aussiebyte_state::crtc_update_addr), this);
+	m_crtc->set_update_row_callback(FUNC(aussiebyte_state::crtc_update_row));
+	m_crtc->set_on_update_addr_change_callback(FUNC(aussiebyte_state::crtc_update_addr));
 
 	MSM5832(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", aussiebyte_state, aussiebyte, "com,cpm", 3)
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(aussiebyte_state::quickload_cb));
 
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("aussiebyte");
+}
 
 
 void aussiebyte_state::machine_start()

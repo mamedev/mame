@@ -11,32 +11,7 @@ No information has been found. All code is guesswork.
 2011-12-29 Skeleton driver.
 2016-07-15 Added terminal and uart.
 
-'maincpu' (0384): unmapped i/o memory write to 00F8 = 56 & FF
-'maincpu' (0388): unmapped i/o memory write to 00F8 = B6 & FF
-'maincpu' (038C): unmapped i/o memory write to 0024 = 00 & FF
-'maincpu' (0A0B): unmapped i/o memory write to 0080 = BE & FF
-'maincpu' (0A0F): unmapped i/o memory write to 0080 = 08 & FF
-'maincpu' (0A13): unmapped i/o memory write to 0080 = 0C & FF
-'maincpu' (0A15): unmapped i/o memory read from 0082 & FF
-'maincpu' (0A19): unmapped i/o memory write to 0080 = 05 & FF
-'maincpu' (04DE): unmapped i/o memory write to 00F6 = 27 & FF
-'maincpu' (04E2): unmapped i/o memory write to 00F6 = 40 & FF
-'maincpu' (04E6): unmapped i/o memory write to 00F6 = CE & FF
-'maincpu' (04EA): unmapped i/o memory write to 00F6 = 27 & FF
-'maincpu' (043B): unmapped i/o memory write to 00F8 = B6 & FF
-'maincpu' (043F): unmapped i/o memory write to 00F6 = 27 & FF
-'maincpu' (2AA3): unmapped i/o memory write to 00F8 = 14 & FF
-'maincpu' (2AA7): unmapped i/o memory write to 00FB = C0 & FF
-'maincpu' (2AC2): unmapped i/o memory write to 00F8 = 56 & FF
-'maincpu' (2AC6): unmapped i/o memory write to 00FA = 03 & FF
-'maincpu' (0082): unmapped i/o memory write to 0024 = 06 & FF
-
-Debug stuff:
-- Start it up
-- Write FF to 7D57 to see some messages
-- Write 00 to 7D57 to silence it
-
-Even though it gives an input prompt, there's no code to accept anything
+Press E to see some messages.
 
 Terminal settings: 8 data bits, 2 stop bits, no parity @ 9600
 
@@ -80,12 +55,12 @@ private:
 
 WRITE8_MEMBER(konin_state::picu_b_w)
 {
-	m_picu->b_w(data ^ 7);
+	m_picu->b_w(data);
 }
 
 WRITE_LINE_MEMBER(konin_state::picu_r3_w)
 {
-	m_picu->r_w(3, !state);
+	m_picu->r_w(4, !state);
 }
 
 void konin_state::konin_mem(address_map &map)
@@ -105,14 +80,14 @@ void konin_state::konin_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x24, 0x24).w(FUNC(konin_state::picu_b_w));
-	map(0x80, 0x83).lrw8("ioppi_rw",
-		[this](offs_t offset) { return m_ioppi->read(offset^3); },
-		[this](offs_t offset, u8 data) { m_ioppi->write(offset^3, data); });
+	map(0x80, 0x83).lrw8(
+		NAME([this](offs_t offset) { return m_ioppi->read(offset^3); }),
+		NAME([this](offs_t offset, u8 data) { m_ioppi->write(offset^3, data); }));
 	map(0xf6, 0xf6).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xf7, 0xf7).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf8, 0xfb).lrw8("iopit_rw",
-		[this](offs_t offset) { return m_iopit->read(offset^3); },
-		[this](offs_t offset, u8 data) { m_iopit->write(offset^3, data); });
+	map(0xf8, 0xfb).lrw8(
+		NAME([this](offs_t offset) { return m_iopit->read(offset^3); }),
+		NAME([this](offs_t offset, u8 data) { m_iopit->write(offset^3, data); }));
 }
 
 /* Input ports */
@@ -131,7 +106,7 @@ void konin_state::konin(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &konin_state::konin_mem);
 	maincpu.set_addrmap(AS_IO, &konin_state::konin_io);
 	maincpu.out_inte_func().set(m_picu, FUNC(i8214_device::inte_w));
-	maincpu.set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i8212_device::inta_cb), "intlatch", (i8212_device*)nullptr));
+	maincpu.set_irq_acknowledge_callback("intlatch", FUNC(i8212_device::inta_cb));
 
 	i8212_device &intlatch(I8212(config, "intlatch", 0));
 	intlatch.md_rd_callback().set_constant(0);

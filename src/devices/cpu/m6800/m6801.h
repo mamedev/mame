@@ -12,10 +12,7 @@
 enum
 {
 	M6801_IRQ_LINE = M6800_IRQ_LINE,
-	M6801_TIN_LINE,                 /* P20/Tin Input Capture line (eddge sense)     */
-									/* Active eddge is selecrable by internal reg.  */
-									/* raise eddge : CLEAR_LINE  -> ASSERT_LINE     */
-									/* fall  eddge : ASSERT_LINE -> CLEAR_LINE      */
+	M6801_TIN_LINE, // P20/Tin Input Capture line (edge sense). Active edge is selectable by internal reg.
 	M6801_SC1_LINE
 };
 
@@ -72,8 +69,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_disasm_interface overrides
@@ -81,8 +78,8 @@ protected:
 
 	void m6803_mem(address_map &map);
 
-	devcb_read8 m_in_port_func[4];
-	devcb_write8 m_out_port_func[4];
+	devcb_read8::array<4> m_in_port_func;
+	devcb_write8::array<4> m_out_port_func;
 
 	devcb_write_line m_out_sc2_func;
 	devcb_write_line m_out_sertx_func;

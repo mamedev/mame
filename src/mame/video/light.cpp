@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, Tyson Smith
 /*
-		Silicon Graphics LG1 "Light" graphics board used as
-		entry level graphics in the Indigo and IRIS Crimson.
+        Silicon Graphics LG1 "Light" graphics board used as
+        entry level graphics in the Indigo and IRIS Crimson.
 */
 
 #include "emu.h"
 #include "video/light.h"
 #include "screen.h"
 
-#define LOG_REX	(1 << 0)
-#define LOG_ALL	(LOG_REX)
+#define LOG_REX (1 << 0)
+#define LOG_ALL (LOG_REX)
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -213,7 +213,7 @@ WRITE32_MEMBER(light_video_device::entry_w)
 	case (REX15_PAGE0_SET+REX15_P0REG_COLORBACK)/4:
 	case (REX15_PAGE0_GO+REX15_P0REG_COLORBACK)/4:
 		m_lg1.m_color_back = data;
-		LOGMASKED(LOG_REX, "%s: LG1 REX1.5 ColorBlueI Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
+		LOGMASKED(LOG_REX, "%s: LG1 REX1.5 ColorBackI Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
 		break;
 	case (REX15_PAGE0_SET+REX15_P0REG_ZPATTERN)/4:
 	case (REX15_PAGE0_GO+REX15_P0REG_ZPATTERN)/4:

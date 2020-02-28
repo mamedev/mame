@@ -6,8 +6,6 @@
 #pragma once
 
 
-#define YMF278B_STD_CLOCK (33868800)            /* standard clock for OPL4 */
-
 class ymf278b_device : public device_t, public device_sound_interface, public device_rom_interface
 {
 public:
@@ -90,7 +88,7 @@ private:
 	void precompute_rate_tables();
 	void register_save_state();
 
-	void update_request() { m_stream_ymf262->update(); }
+	void update_request() { m_stream->update(); }
 
 	static void static_irq_handler(device_t *param, int irq) { }
 	static void static_timer_handler(device_t *param, int c, const attotime &period) { }
@@ -127,15 +125,15 @@ private:
 
 	emu_timer *m_timer_a, *m_timer_b;
 	int m_clock;
+	int m_rate;
 
 	sound_stream * m_stream;
-	std::unique_ptr<int32_t[]> m_mix_buffer;
+	std::vector<int32_t> m_mix_buffer;
 	devcb_write_line m_irq_handler;
 	uint8_t m_last_fm_data;
 
 	// ymf262
 	void *m_ymf262;
-	sound_stream * m_stream_ymf262;
 };
 
 DECLARE_DEVICE_TYPE(YMF278B, ymf278b_device)

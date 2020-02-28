@@ -907,8 +907,8 @@ void hp48_state::init_hp48()
 	for (int i = 0; i < 6; i++)
 	{
 		m_modules[i].off_mask = 0x00fff;  /* 2 KB */
-		m_modules[i].read     = read8_delegate();
-		m_modules[i].write    = write8_delegate();
+		m_modules[i].read     = read8_delegate(*this);
+		m_modules[i].write    = write8_delegate(*this);
 		m_modules[i].data     = nullptr;
 		m_modules[i].isnop    = 0;
 	}
@@ -957,8 +957,8 @@ void hp48_state::base_machine_start(hp48_models model)
 
 	/* I/O RAM */
 	m_modules[HP48_HDW].off_mask = 0x0003f;  /* 32 B */
-	m_modules[HP48_HDW].read     = read8_delegate(FUNC(hp48_state::io_r),this);
-	m_modules[HP48_HDW].write    = write8_delegate(FUNC(hp48_state::io_w),this);
+	m_modules[HP48_HDW].read     = read8_delegate(*this, FUNC(hp48_state::io_r));
+	m_modules[HP48_HDW].write    = write8_delegate(*this, FUNC(hp48_state::io_w));
 
 	/* internal RAM */
 	if (HP49_G_MODEL)
@@ -980,8 +980,8 @@ void hp48_state::base_machine_start(hp48_models model)
 	if (HP48_G_SERIES)
 	{
 		m_modules[HP48_CE1].off_mask = 0x00fff;  /* 2 KB */
-		m_modules[HP48_CE1].read     = read8_delegate(FUNC(hp48_state::bank_r),this);
-		m_modules[HP48_CE1].write    = HP49_G_MODEL ? write8_delegate(FUNC(hp48_state::hp49_bank_w),this) : write8_delegate();
+		m_modules[HP48_CE1].read     = read8_delegate(*this, FUNC(hp48_state::bank_r));
+		m_modules[HP48_CE1].write    = HP49_G_MODEL ? write8_delegate(*this, FUNC(hp48_state::hp49_bank_w)) : write8_delegate(*this);
 	}
 
 	/* timers */
@@ -996,13 +996,13 @@ void hp48_state::base_machine_start(hp48_models model)
 	m_kbd_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 
 	/* save state */
-	save_item(NAME(m_out) );
-	save_item(NAME(m_kdn) );
-	save_item(NAME(m_io_addr) );
-	save_item(NAME(m_crc) );
-	save_item(NAME(m_timer1) );
-	save_item(NAME(m_timer2) );
-	save_item(NAME(m_bank_switch) );
+	save_item(NAME(m_out));
+	save_item(NAME(m_kdn));
+	save_item(NAME(m_io_addr));
+	save_item(NAME(m_crc));
+	save_item(NAME(m_timer1));
+	save_item(NAME(m_timer2));
+	save_item(NAME(m_bank_switch));
 	for (int i = 0; i < 6; i++)
 	{
 		save_item(m_modules[i].state, "globals/m_modules[i].state", i);

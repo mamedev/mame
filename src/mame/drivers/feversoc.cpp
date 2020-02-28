@@ -201,7 +201,7 @@ void feversoc_state::feversoc_map(address_map &map)
 {
 	map(0x00000000, 0x0003ffff).rom();
 	map(0x02000000, 0x0202ffff).ram().share("workram1"); //work ram
-	map(0x02030000, 0x0203ffff).ram().share("nvram");
+	map(0x02030000, 0x02033fff).ram().share("nvram");
 	map(0x02034000, 0x0203dfff).ram().share("workram2"); //work ram
 	map(0x0203e000, 0x0203ffff).ram().share("spriteram");
 	map(0x06000000, 0x06000001).w(FUNC(feversoc_state::output_w));
@@ -209,7 +209,7 @@ void feversoc_state::feversoc_map(address_map &map)
 	map(0x06000006, 0x06000007).w(FUNC(feversoc_state::feversoc_irq_ack));
 	map(0x06000008, 0x0600000b).r(FUNC(feversoc_state::in_r));
 	map(0x0600000d, 0x0600000d).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	//AM_RANGE(0x06010000, 0x0601007f) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write) AM_RAM
+	//map(0x06010000, 0x0601007f).rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
 	map(0x06010060, 0x06010063).nopw(); // sprite buffering
 	map(0x06018000, 0x06019fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 }
@@ -286,29 +286,28 @@ void feversoc_state::machine_start()
 	m_lamps.resolve();
 }
 
-MACHINE_CONFIG_START(feversoc_state::feversoc)
-
+void feversoc_state::feversoc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",SH2,MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(feversoc_map)
+	SH2(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &feversoc_state::feversoc_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1) //dynamic resolution?
-	MCFG_SCREEN_UPDATE_DRIVER(feversoc_state, screen_update_feversoc)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, feversoc_state, feversoc_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 30*8-1); //dynamic resolution?
+	screen.set_screen_update(FUNC(feversoc_state::screen_update_feversoc));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(feversoc_state::feversoc_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_feversoc);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
+	OKIM6295(config, m_oki, MASTER_CLOCK/16, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.6); //pin 7 & frequency not verified (clock should be 28,6363 / n)
 
 	EEPROM_93C56_16BIT(config, "eeprom");
 
@@ -317,7 +316,7 @@ MACHINE_CONFIG_START(feversoc_state::feversoc)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(60), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

@@ -115,12 +115,13 @@ void a2bus_pcxporter_device::pc_io(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_pcxporter_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(m_v30, V30, A2BUS_7M_CLOCK)    // 7.16 MHz as per manual
-	MCFG_DEVICE_PROGRAM_MAP(pc_map)
-	MCFG_DEVICE_IO_MAP(pc_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
-	MCFG_DEVICE_DISABLE()
+void a2bus_pcxporter_device::device_add_mconfig(machine_config &config)
+{
+	V30(config, m_v30, A2BUS_7M_CLOCK);    // 7.16 MHz as per manual
+	m_v30->set_addrmap(AS_PROGRAM, &a2bus_pcxporter_device::pc_map);
+	m_v30->set_addrmap(AS_IO, &a2bus_pcxporter_device::pc_io);
+	m_v30->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_v30->set_disable();
 
 	PIT8253(config, m_pit8253);
 	m_pit8253->set_clk<0>(A2BUS_7M_CLOCK / 6.0); // heartbeat IRQ
@@ -163,18 +164,18 @@ MACHINE_CONFIG_START(a2bus_pcxporter_device::device_add_mconfig)
 	m_isabus->drq2_callback().set(m_dma8237, FUNC(am9517a_device::dreq2_w));
 	m_isabus->drq3_callback().set(m_dma8237, FUNC(am9517a_device::dreq3_w));
 
-	MCFG_DEVICE_ADD(m_pc_kbdc, PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, a2bus_pcxporter_device, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(*this, a2bus_pcxporter_device, keyboard_data_w))
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
+	PC_KBDC(config, m_pc_kbdc, 0);
+	m_pc_kbdc->out_clock_cb().set(FUNC(a2bus_pcxporter_device::keyboard_clock_w));
+	m_pc_kbdc->out_data_cb().set(FUNC(a2bus_pcxporter_device::keyboard_data_w));
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270).set_pc_kbdc_slot(m_pc_kbdc);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, m_isabus, pc_isa8_cards, "cga", true) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, m_isabus, pc_isa8_cards, "fdc_xt", true)
-MACHINE_CONFIG_END
+	ISA8_SLOT(config, "isa1", 0, m_isabus, pc_isa8_cards, "cga", true); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, m_isabus, pc_isa8_cards, "fdc_xt", true);
+}
 
 //**************************************************************************
 //  LIVE DEVICE

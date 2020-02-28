@@ -250,7 +250,7 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 			int vpos = m_rasterposition;
 
 			// in the vblank it specifies line 0, the first raster interrupt then specifies line 0 again before the subsequent ones use the real line numbers?
-			// It seems more likely the the raster IRQ stays asserted for the entire line, thus triggering a second interrupt unless the line number is changed?
+			// It seems more likely that the raster IRQ stays asserted for the entire line, thus triggering a second interrupt unless the line number is changed?
 			if (m_rasterposition == m_screen->vpos()) hpos = m_screen->hpos() + 0x100;
 			//logerror("setting raster to %d %d\n", vpos, hpos);
 			m_raster_timer->adjust(m_screen->time_until_pos(vpos, hpos), 0);
@@ -621,11 +621,12 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 TIMER_CALLBACK_MEMBER(seta2_state::raster_timer_done)
 {
-	if (m_tmp68301)
+	auto *tmp68301 = dynamic_cast<tmp68301_device *>(m_maincpu.target());
+	if (tmp68301)
 	{
 		if (m_rasterenabled & 1)
 		{
-			m_tmp68301->external_interrupt_1();
+			tmp68301->external_interrupt_1();
 			logerror("external int (vpos is %d)\n", m_screen->vpos());
 			m_screen->update_partial(m_screen->vpos() - 1);
 		}

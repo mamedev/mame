@@ -115,7 +115,7 @@ void tk80bs_state::tk80bs_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).rom();
-//  AM_RANGE(0x0c00, 0x7bff) AM_ROM // ext
+//  map(0x0c00, 0x7bff).rom(); // ext
 	map(0x7df8, 0x7df9).noprw(); // i8251 sio
 	map(0x7dfc, 0x7dff).rw(FUNC(tk80bs_state::ppi_custom_r), FUNC(tk80bs_state::ppi_custom_w));
 	map(0x7e00, 0x7fff).ram().share("videoram"); // video ram
@@ -172,22 +172,23 @@ static GFXDECODE_START( gfx_tk80bs )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(tk80bs_state::tk80bs)
+void tk80bs_state::tk80bs(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(1'000'000)) //unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(tk80bs_mem)
+	I8080(config, m_maincpu, XTAL(1'000'000)); //unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &tk80bs_state::tk80bs_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256, 128)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 128-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tk80bs_state, screen_update_tk80bs)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 128);
+	screen.set_visarea(0, 256-1, 0, 128-1);
+	screen.set_screen_update(FUNC(tk80bs_state::screen_update_tk80bs));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tk80bs)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tk80bs);
 
 	/* Devices */
 	I8255(config, m_ppi);
@@ -196,7 +197,7 @@ MACHINE_CONFIG_START(tk80bs_state::tk80bs)
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(tk80bs_state::kbd_put));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( tk80bs )

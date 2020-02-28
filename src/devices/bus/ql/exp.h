@@ -56,14 +56,14 @@
 
 class ql_expansion_slot_device;
 
-class device_ql_expansion_card_interface : public device_slot_card_interface
+class device_ql_expansion_card_interface : public device_interface
 {
 	friend class ql_expansion_slot_device;
 
 public:
 	virtual void romoeh_w(int state) { m_romoeh = state; }
-	virtual uint8_t read(address_space &space, offs_t offset, uint8_t data) { return data; }
-	virtual void write(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t read(offs_t offset, uint8_t data) { return data; }
+	virtual void write(offs_t offset, uint8_t data) { }
 
 protected:
 	// construction/destruction
@@ -79,7 +79,7 @@ protected:
 
 // ======================> ql_expansion_slot_device
 
-class ql_expansion_slot_device : public device_t, public device_slot_interface
+class ql_expansion_slot_device : public device_t, public device_single_card_slot_interface<device_ql_expansion_card_interface>
 {
 public:
 	// construction/destruction
@@ -100,8 +100,8 @@ public:
 	auto extintl_wr_callback() { return m_write_extintl.bind(); }
 
 	// computer interface
-	uint8_t read(address_space &space, offs_t offset, uint8_t data) { if (m_card) data = m_card->read(space, offset, data); return data; }
-	void write(address_space &space, offs_t offset, uint8_t data) { if (m_card) m_card->write(space, offset, data); }
+	uint8_t read(offs_t offset, uint8_t data) { if (m_card) data = m_card->read(offset, data); return data; }
+	void write(offs_t offset, uint8_t data) { if (m_card) m_card->write(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( romoeh_w ) { if (m_card) m_card->romoeh_w(state); }
 
 	// card interface
@@ -112,7 +112,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 

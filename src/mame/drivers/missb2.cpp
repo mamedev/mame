@@ -231,7 +231,7 @@ void missb2_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x9000).rw(FUNC(missb2_state::missb2_oki_r), FUNC(missb2_state::missb2_oki_w)); //AM_MIRROR(0x0fff) ???
+	map(0x9000, 0x9000).rw(FUNC(missb2_state::missb2_oki_r), FUNC(missb2_state::missb2_oki_w)); //.mirror(0x0fff); ???
 	map(0xa000, 0xa001).mirror(0x0ffe).rw("ym3526", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
 	map(0xb000, 0xb000).mirror(0x0ffc).r(m_main_to_sound, FUNC(generic_latch_8_device::read)).w(m_sound_to_main, FUNC(generic_latch_8_device::write));
 	map(0xb001, 0xb001).mirror(0x0ffc).r(FUNC(missb2_state::common_sound_semaphores_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
@@ -481,7 +481,7 @@ void missb2_state::missb2(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &missb2_state::sound_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(missb2_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000); // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	config.set_maximum_quantum(attotime::from_hz(6000)); // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128);
 

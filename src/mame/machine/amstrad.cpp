@@ -235,7 +235,7 @@ void amstrad_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		cb_set_resolution(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in amstrad_state::device_timer");
+		throw emu_fatalerror("Unknown id in amstrad_state::device_timer");
 	}
 }
 
@@ -505,9 +505,9 @@ void amstrad_state::amstrad_plus_dma_parse(int channel)
 	{
 	case 0x0000:  // Load PSG register
 		{
-			m_ay->address_w(generic_space(), 0, (command & 0x0f00) >> 8);
-			m_ay->data_w(generic_space(), 0, command & 0x00ff);
-			m_ay->address_w(generic_space(), 0, m_prev_reg);
+			m_ay->address_w((command & 0x0f00) >> 8);
+			m_ay->data_w(command & 0x00ff);
+			m_ay->address_w(m_prev_reg);
 		}
 		logerror("DMA %i: LOAD %i, %i\n",channel,(command & 0x0f00) >> 8, command & 0x00ff);
 		break;
@@ -1160,10 +1160,10 @@ void amstrad_state::amstrad_setLowerRom()
 
 /*      if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
         {
-            space.install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_r),this));
-            space.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_r),this));
-            space.install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_w),this));
-            space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_w),this));
+            space.install_read_handler(0x4000, 0x5fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_r)));
+            space.install_read_handler(0x6000, 0x7fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_r)));
+            space.install_write_handler(0x4000, 0x5fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_w)));
+            space.install_write_handler(0x6000, 0x7fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_w)));
         }
         else
         {
@@ -1425,7 +1425,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_6000_w)
 			if ( m_asic.enabled )
 			{
 				vector = (data & 0xf8) + (m_plus_irq_cause);
-				m_maincpu->set_input_line_vector(0, vector);
+				m_maincpu->set_input_line_vector(0, vector); // Z80
 				logerror("ASIC: IM 2 vector write %02x, data = &%02x\n",vector,data);
 			}
 			m_asic.dma_clear = data & 0x01;
@@ -1646,8 +1646,8 @@ Mode changing is synchronised with HSYNC. If the mode is changed, it will take e
 
 Rom configuration selection :
 -----------------------------
-Bit 2 is used to enable or disable the lower rom area. The lower rom area occupies memory addressess &0000-&3fff and is used to access the operating system rom. When the lower rom area is is enabled, reading from &0000-&3FFF will return data in the rom. When a value is written to &0000-&3FFF, it will be written to the ram underneath the rom. When it is disabled, data read from &0000-&3FFF will return the data in the ram.
-Similarly, bit 3 controls enabling or disabling of the upper rom area. The upper rom area occupies memory addressess &C000-&FFFF and is BASIC or any expansion roms which may be plugged into a rom board/box. See the document on upper rom selection for more details. When the upper rom area enabled, reading from &c000-&ffff, will return data in the rom. When data is written to &c000-&FFFF, it will be written to the ram at the same address as the rom. When the upper rom area is disabled, and data is read from &c000-&ffff the data returned will be the data in the ram.
+Bit 2 is used to enable or disable the lower rom area. The lower rom area occupies memory addressess &0000-&3fff and is used to access the operating system rom. When the lower rom area is enabled, reading from &0000-&3FFF will return data in the rom. When a value is written to &0000-&3FFF, it will be written to the ram underneath the rom. When it is disabled, data read from &0000-&3FFF will return the data in the ram.
+Similarly, bit 3 controls enabling or disabling of the upper rom area. The upper rom area occupies memory addressess &C000-&FFFF and is BASIC or any expansion roms which may be plugged into a rom board/box. See the document on upper rom selection for more details. When the upper rom area is enabled, reading from &c000-&ffff will return data in the rom. When data is written to &c000-&FFFF, it will be written to the ram at the same address as the rom. When the upper rom area is disabled, and data is read from &c000-&ffff, the data returned will be the data in the ram.
 
 Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 	case 0x02:
@@ -1867,9 +1867,9 @@ READ8_MEMBER(amstrad_state::amstrad_cpc_io_r)
 		{
 		case 0x02:
 			// CRTC Type 1 (UM6845R) only!!
-			//data = m_crtc->status_r( space, 0 );
+			//data = m_crtc->status_r();
 			if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )  // All Plus systems are Type 3 (AMS40489)
-				data = m_crtc->register_r( space, 0 );
+				data = m_crtc->register_r();
 			else
 				data = 0xff;  // Type 0 (HD6845S/UM6845) and Type 2 (MC6845) return 0xff
 #if 0
@@ -1890,7 +1890,7 @@ READ8_MEMBER(amstrad_state::amstrad_cpc_io_r)
 			break;
 		case 0x03:
 			/* All CRTC type : Read from selected internal 6845 register Read only */
-			data = m_crtc->register_r( space, 0 );
+			data = m_crtc->register_r();
 			break;
 		}
 	}
@@ -1939,10 +1939,10 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 			switch (b8b0)
 			{
 			case 0x02:
-				data = m_fdc->msr_r(space, 0);
+				data = m_fdc->msr_r();
 				break;
 			case 0x03:
-				data = m_fdc->fifo_r(space, 0);
+				data = m_fdc->fifo_r();
 				break;
 			default:
 				break;
@@ -2043,7 +2043,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 		switch ((offset & 0x0300) >> 8) // r1r0
 		{
 		case 0x00:      /* Select internal 6845 register Write Only */
-			m_crtc->address_w( space, 0, data );
+			m_crtc->address_w(data);
 			if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )
 				amstrad_plus_seqcheck(data);
 
@@ -2058,7 +2058,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 				timer_set(attotime::from_usec(0), TIMER_VIDEO_UPDATE, 1);
 			else
 				timer_set(attotime::from_usec(0), TIMER_VIDEO_UPDATE, 0);
-			m_crtc->register_w( space, 0, data );
+			m_crtc->register_w(data);
 
 			/* printer port bit 8 */
 			if (m_printer_bit8_selected && m_system_type == SYSTEM_PLUS)
@@ -2158,7 +2158,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 					break;
 
 				case 0x03: /* Write Data register of FDC */
-					m_fdc->fifo_w(space, 0,data);
+					m_fdc->fifo_w(data);
 					break;
 
 				default:
@@ -2179,7 +2179,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 	{
 		m_aleste_mode = data;
 		logerror("EXTEND: Port &FABF write 0x%02x\n",data);
-		m_crtc->set_clock( ( m_aleste_mode & 0x02 ) ? ( XTAL(16'000'000) / 8 ) : ( XTAL(16'000'000) / 16 ) );
+		m_crtc->set_unscaled_clock( ( m_aleste_mode & 0x02 ) ? ( XTAL(16'000'000) / 8 ) : ( XTAL(16'000'000) / 16 ) );
 	}
 
 	mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(machine(),"multiface2"));
@@ -2196,7 +2196,6 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 /* load CPCEMU style snapshots */
 void amstrad_state::amstrad_handle_snapshot(unsigned char *pSnapshot)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int RegData;
 	int i;
 
@@ -2284,11 +2283,11 @@ void amstrad_state::amstrad_handle_snapshot(unsigned char *pSnapshot)
 	/* init CRTC */
 	for (i=0; i<18; i++)
 	{
-		m_crtc->address_w( space, 0, i );
-		m_crtc->register_w( space, 0, pSnapshot[0x043+i] & 0xff );
+		m_crtc->address_w(i);
+		m_crtc->register_w(pSnapshot[0x043+i] & 0xff);
 	}
 
-	m_crtc->address_w( space, 0, i );
+	m_crtc->address_w(i);
 
 	/* upper rom selection */
 	m_gate_array.upper_bank = pSnapshot[0x055];
@@ -2303,11 +2302,11 @@ void amstrad_state::amstrad_handle_snapshot(unsigned char *pSnapshot)
 	/* PSG */
 	for (i=0; i<16; i++)
 	{
-		m_ay->address_w(space, 0, i);
-		m_ay->data_w(space, 0, pSnapshot[0x05b + i] & 0x0ff);
+		m_ay->address_w(i);
+		m_ay->data_w(pSnapshot[0x05b + i] & 0x0ff);
 	}
 
-	m_ay->address_w(space, 0, pSnapshot[0x05a]);
+	m_ay->address_w(pSnapshot[0x05a]);
 
 	{
 		int MemSize;
@@ -2486,20 +2485,18 @@ BDIR BC1       |
 /* PSG function selected */
 void amstrad_state::update_psg()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	if(m_aleste_mode & 0x20)  // RTC selected
 	{
 		switch(m_aleste_rtc_function)
 		{
 		case 0x02:  // AS
-			m_rtc->write(space, 0,m_ppi_port_outputs[amstrad_ppi_PortA]);
+			m_rtc->write(0, m_ppi_port_outputs[amstrad_ppi_PortA]);
 			break;
 		case 0x04:  // DS write
-			m_rtc->write(space, 1,m_ppi_port_outputs[amstrad_ppi_PortA]);
+			m_rtc->write(1, m_ppi_port_outputs[amstrad_ppi_PortA]);
 			break;
 		case 0x05:  // DS read
-			m_ppi_port_inputs[amstrad_ppi_PortA] = m_rtc->read(space, 1);
+			m_ppi_port_inputs[amstrad_ppi_PortA] = m_rtc->read(1);
 			break;
 		}
 		return;
@@ -2511,12 +2508,12 @@ void amstrad_state::update_psg()
 		} break;
 	case 1:
 		{/* b6 = 1 ? : Read from selected PSG register and make the register data available to PPI Port A */
-			m_ppi_port_inputs[amstrad_ppi_PortA] = m_ay->data_r(space, 0);
+			m_ppi_port_inputs[amstrad_ppi_PortA] = m_ay->data_r();
 		}
 		break;
 	case 2:
 		{/* b7 = 1 ? : Write to selected PSG register and write data to PPI Port A */
-			m_ay->data_w(space, 0, m_ppi_port_outputs[amstrad_ppi_PortA]);
+			m_ay->data_w(m_ppi_port_outputs[amstrad_ppi_PortA]);
 		}
 		break;
 	case 3:
@@ -2524,7 +2521,7 @@ void amstrad_state::update_psg()
 			/* ignore if an invalid PSG register is selected, usually when the PPI port directions are changed after selecting the PSG register */
 			if(m_ppi_port_outputs[amstrad_ppi_PortA] <= 15)
 			{
-				m_ay->address_w(space, 0, m_ppi_port_outputs[amstrad_ppi_PortA]);
+				m_ay->address_w(m_ppi_port_outputs[amstrad_ppi_PortA]);
 				m_prev_reg = m_ppi_port_outputs[amstrad_ppi_PortA];
 			}
 		}
@@ -3039,9 +3036,9 @@ void amstrad_state::amstrad_common_init()
 
 	m_maincpu->reset();
 	if ( m_system_type == SYSTEM_CPC || m_system_type == SYSTEM_ALESTE )
-		m_maincpu->set_input_line_vector(0, 0xff);
+		m_maincpu->set_input_line_vector(0, 0xff); // Z80
 	else
-		m_maincpu->set_input_line_vector(0, 0x00);
+		m_maincpu->set_input_line_vector(0, 0x00); // Z80
 
 	/* The opcode timing in the Amstrad is different to the opcode
 	timing in the core for the Z80 CPU.
@@ -3147,10 +3144,10 @@ MACHINE_RESET_MEMBER(amstrad_state,plus)
 	AmstradCPC_GA_SetRamConfiguration();
 	amstrad_GateArray_write(0x081); // Epyx World of Sports requires upper ROM to be enabled by default
 
-	space.install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_r),this));
-	space.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_r),this));
-	space.install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_w),this));
-	space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_w),this));
+	space.install_read_handler(0x4000, 0x5fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_r)));
+	space.install_read_handler(0x6000, 0x7fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_r)));
+	space.install_write_handler(0x4000, 0x5fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_w)));
+	space.install_write_handler(0x6000, 0x7fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_w)));
 
 	//  multiface_init();
 	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
@@ -3190,10 +3187,10 @@ MACHINE_RESET_MEMBER(amstrad_state,gx4000)
 	AmstradCPC_GA_SetRamConfiguration();
 	amstrad_GateArray_write(0x081); // Epyx World of Sports requires upper ROM to be enabled by default
 	//  multiface_init();
-	space.install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_r),this));
-	space.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_r),this));
-	space.install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_w),this));
-	space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_w),this));
+	space.install_read_handler(0x4000, 0x5fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_r)));
+	space.install_read_handler(0x6000, 0x7fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_r)));
+	space.install_write_handler(0x4000, 0x5fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_w)));
+	space.install_write_handler(0x6000, 0x7fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_w)));
 
 	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
 }
@@ -3243,7 +3240,7 @@ MACHINE_RESET_MEMBER(amstrad_state,aleste)
 
 
 /* load snapshot */
-SNAPSHOT_LOAD_MEMBER( amstrad_state,amstrad)
+SNAPSHOT_LOAD_MEMBER(amstrad_state::snapshot_cb)
 {
 	std::vector<uint8_t> snapshot;
 
@@ -3266,7 +3263,7 @@ SNAPSHOT_LOAD_MEMBER( amstrad_state,amstrad)
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(amstrad_state::amstrad_plus_cartridge)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 	unsigned char header[12];

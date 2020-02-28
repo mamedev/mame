@@ -36,13 +36,14 @@ DEFINE_DEVICE_TYPE(NUBUS_M2HIRES, nubus_m2hires_device, "nb_m2hr", "Macintosh II
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nubus_m2hires_device::device_add_mconfig)
-	MCFG_SCREEN_ADD( M2HIRES_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_m2hires_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(1024,768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-MACHINE_CONFIG_END
+void nubus_m2hires_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, M2HIRES_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(nubus_m2hires_device::screen_update));
+	screen.set_raw(25175000, 800, 0, 640, 525, 0, 480);
+	screen.set_size(1024, 768);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -92,9 +93,9 @@ void nubus_m2hires_device::device_start()
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
 
-	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_m2hires_device::vram_r), this), write32_delegate(FUNC(nubus_m2hires_device::vram_w), this));
-	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(FUNC(nubus_m2hires_device::vram_r), this), write32_delegate(FUNC(nubus_m2hires_device::vram_w), this));
-	nubus().install_device(slotspace+0x80000, slotspace+0xeffff, read32_delegate(FUNC(nubus_m2hires_device::m2hires_r), this), write32_delegate(FUNC(nubus_m2hires_device::m2hires_w), this));
+	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(*this, FUNC(nubus_m2hires_device::vram_r)), write32_delegate(*this, FUNC(nubus_m2hires_device::vram_w)));
+	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(*this, FUNC(nubus_m2hires_device::vram_r)), write32_delegate(*this, FUNC(nubus_m2hires_device::vram_w)));
+	nubus().install_device(slotspace+0x80000, slotspace+0xeffff, read32_delegate(*this, FUNC(nubus_m2hires_device::m2hires_r)), write32_delegate(*this, FUNC(nubus_m2hires_device::m2hires_w)));
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(screen().time_until_pos(479, 0), 0);

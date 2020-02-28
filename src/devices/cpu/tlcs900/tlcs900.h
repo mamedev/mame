@@ -58,10 +58,10 @@ protected:
 	virtual void device_start() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; } /* FIXME */
-	virtual uint32_t execute_max_cycles() const override { return 1; } /* FIXME */
-	virtual uint32_t execute_input_lines() const override { return 6; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; } /* FIXME */
+	virtual uint32_t execute_max_cycles() const noexcept override { return 1; } /* FIXME */
+	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -788,7 +788,7 @@ private:
 	devcb_write8   m_porte_write;
 
 	// analogue inputs, sampled at 10 bits
-	devcb_read16   m_an_read[8];
+	devcb_read16::array<8> m_an_read;
 };
 
 #endif // MAME_CPU_TLCS900_TLCS900_H

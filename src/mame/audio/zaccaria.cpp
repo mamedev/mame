@@ -31,7 +31,6 @@ DEFINE_DEVICE_TYPE(ZACCARIA_1B11142, zac1b11142_audio_device, "zac1b11142", "Zac
 void zac1b111xx_melody_base::zac1b111xx_melody_base_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x007f).ram(); // 6802 internal RAM
 	map(0x400c, 0x400f).mirror(0x1ff0).rw("melodypia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 }
 
@@ -132,7 +131,6 @@ void zac1b11142_audio_device::zac1b11142_melody_map(address_map &map)
 void zac1b11142_audio_device::zac1b11142_audio_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x007f).ram(); // 6802 internal RAM
 	map(0x0090, 0x0093).mirror(0x8f6c).rw("pia_1i", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0x1000).mirror(0x83ff).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x1400, 0x1400).mirror(0xc3ff).w(FUNC(zac1b11142_audio_device::melody_command_w));
@@ -159,6 +157,14 @@ INPUT_PORTS_START(zac1b11142_ioports)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("P1") PORT_CHANGED_MEMBER(DEVICE_SELF, zac1b11142_audio_device, p1_changed, 0) // test button?  generates NMI on master CPU
+
+	PORT_START("VP1")
+	PORT_ADJUSTER( 50, "VP1 - Music volume" )   NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot1")
+	PORT_START("VP2")
+	PORT_ADJUSTER( 50, "VP2 - Speech volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot2")
+	PORT_START("VP3")
+	PORT_ADJUSTER( 50, "VP3 - DAC volume" )     NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot3")
+
 INPUT_PORTS_END
 
 
@@ -189,10 +195,10 @@ READ8_MEMBER(zac1b111xx_melody_base::melodypia_porta_r)
 	u8 data = 0xff;
 
 	if (0x01 == (control & 0x03))
-		data &= m_melodypsg1->data_r(space, 0);
+		data &= m_melodypsg1->data_r();
 
 	if (0x04 == (control & 0x0c))
-		data &= m_melodypsg2->data_r(space, 0);
+		data &= m_melodypsg2->data_r();
 
 	return data;
 }
@@ -202,19 +208,19 @@ WRITE8_MEMBER(zac1b111xx_melody_base::melodypia_porta_w)
 	u8 const control = m_melodypia->b_output();
 
 	if (control & 0x02)
-		m_melodypsg1->data_address_w(space, (control >> 0) & 0x01, data);
+		m_melodypsg1->data_address_w((control >> 0) & 0x01, data);
 
 	if (control & 0x08)
-		m_melodypsg2->data_address_w(space, (control >> 2) & 0x01, data);
+		m_melodypsg2->data_address_w((control >> 2) & 0x01, data);
 }
 
 WRITE8_MEMBER(zac1b111xx_melody_base::melodypia_portb_w)
 {
 	if (data & 0x02)
-		m_melodypsg1->data_address_w(space, (data >> 0) & 0x01, m_melodypia->a_output());
+		m_melodypsg1->data_address_w((data >> 0) & 0x01, m_melodypia->a_output());
 
 	if (data & 0x08)
-		m_melodypsg2->data_address_w(space, (data >> 2) & 0x01, m_melodypia->a_output());
+		m_melodypsg2->data_address_w((data >> 2) & 0x01, m_melodypia->a_output());
 }
 
 READ8_MEMBER(zac1b111xx_melody_base::melodypsg1_portb_r)
@@ -413,12 +419,14 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	m_melodypsg1->add_route(0, "sound_nl", 1.0, 0);
 	m_melodypsg1->add_route(1, "sound_nl", 1.0, 1);
 	m_melodypsg1->add_route(2, "sound_nl", 1.0, 2);
+	m_melodypsg1->set_flags(AY8910_RESISTOR_OUTPUT);
 
 	m_melodypsg2->port_a_write_callback().set(FUNC(zac1b11142_audio_device::ay_4h_porta_w));
 	m_melodypsg2->port_b_write_callback().set(FUNC(zac1b11142_audio_device::ay_4h_portb_w));
 	m_melodypsg2->add_route(0, "sound_nl", 1.0, 3);
 	m_melodypsg2->add_route(1, "sound_nl", 1.0, 4);
 	m_melodypsg2->add_route(2, "sound_nl", 1.0, 5);
+	m_melodypsg2->set_flags(AY8910_RESISTOR_OUTPUT);
 
 	M6802(config, m_audiocpu, XTAL(3'579'545)); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &zac1b11142_audio_device::zac1b11142_audio_map);
@@ -428,9 +436,9 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	m_pia_1i->writepa_handler().set(m_speech, FUNC(tms5220_device::data_w));
 	m_pia_1i->writepb_handler().set(FUNC(zac1b11142_audio_device::pia_1i_portb_w));
 
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.40, AUTO_ALLOC_INPUT, 0); // mc1408.1f
+	//MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.30, AUTO_ALLOC_INPUT, 0); // mc1408.1f
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "sound_nl", 1.0, 7); // mc1408.1f
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
@@ -439,11 +447,11 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	TMS5200(config, m_speech, 649200); // ROMCLK pin measured at 162.3Khz, OSC is exactly *4 of that)
 	m_speech->irq_cb().set(m_pia_1i, FUNC(pia6821_device::cb1_w));
 	m_speech->ready_cb().set(m_pia_1i, FUNC(pia6821_device::ca2_w));
-	m_speech->add_route(ALL_OUTPUTS, *this, 0.80, AUTO_ALLOC_INPUT, 0);
+	m_speech->add_route(0, "sound_nl", 1.0, 6);
 
-	netlist_mame_sound_device &sound_nl(NETLIST_SOUND(config, "sound_nl", 48000));
-	sound_nl.set_constructor(netlist_zac1b11142);
-	sound_nl.add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(netlist_zac1b11142)
+		.add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 
 	NETLIST_LOGIC_INPUT(config, "sound_nl:ioa0",   "I_IOA0.IN",   0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:ioa1",   "I_IOA1.IN",   0);
@@ -460,8 +468,24 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_STREAM_INPUT(config, "sound_nl:cin3", 3, "R_AY4H_A.R");
 	NETLIST_STREAM_INPUT(config, "sound_nl:cin4", 4, "R_AY4H_B.R");
 	NETLIST_STREAM_INPUT(config, "sound_nl:cin5", 5, "R_AY4H_C.R");
+	/* Speech
+	 * The 5200 output is a current source providing between 0 and 1.5mA.
+	 * This is explained in detail in the datasheet.
+	 */
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin6", 6, "I_SP.I").set_mult_offset(750e-6 / 16384.0, 750e-6);
+	/* DAC
+	 * The 1408 output is a current sink providing between 0 and 2.0mA.
+	 * This is explained in detail in the datasheet.
+	 */
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin7", 7, "I_DAC.I").set_mult_offset(1e-3 / 32768.0, 1e-3);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "P1.2").set_mult_offset(3000.0 * 10.0, 0.0); // FIXME: no clue what numbers to use here
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "C7.2").set_mult_offset(3000.0 * 10.0, 0.0); // FIXME: no clue what numbers to use here
+
+	// Potentiometers
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot1", "P1.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot2", "P2.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot3", "P3.DIAL");
+
 }
 
 ioport_constructor zac1b11142_audio_device::device_input_ports() const

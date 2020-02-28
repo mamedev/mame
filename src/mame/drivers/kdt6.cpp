@@ -187,7 +187,7 @@ void kdt6_state::psi98_io(address_map &map)
 	map(0x19, 0x19).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x1c, 0x1c).w(FUNC(kdt6_state::status0_w));
 	map(0x1d, 0x1d).r(m_keyboard, FUNC(psi_keyboard_bus_device::key_data_r));
-	map(0x1e, 0x1e).rw(m_fdc, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
+	map(0x1e, 0x1e).rw(m_fdc, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
 	map(0x1f, 0x1f).w(FUNC(kdt6_state::fdc_tc_w));
 	map(0x20, 0x2f).rw(FUNC(kdt6_state::mapper_r), FUNC(kdt6_state::mapper_w));
 	map(0x30, 0x30).rw(FUNC(kdt6_state::video_data_r), FUNC(kdt6_state::video_data_w));
@@ -574,8 +574,8 @@ void kdt6_state::machine_start()
 	m_dummy_w = std::make_unique<uint8_t[]>(0x1000);
 
 	// override the region 0x0000 to 0x1fff here to enable prom reading
-	m_cpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(FUNC(kdt6_state::page0_r), this));
-	m_cpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(kdt6_state::page1_r), this));
+	m_cpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(*this, FUNC(kdt6_state::page0_r)));
+	m_cpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(*this, FUNC(kdt6_state::page1_r)));
 
 	m_fdc->set_rate(250000);
 
@@ -617,16 +617,18 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(kdt6_state::psi98)
+void kdt6_state::psi98(machine_config &config)
+{
 	Z80(config, m_cpu, XTAL(16'000'000) / 4);
 	m_cpu->set_addrmap(AS_PROGRAM, &kdt6_state::psi98_mem);
 	m_cpu->set_addrmap(AS_IO, &kdt6_state::psi98_io);
 	m_cpu->set_daisy_config(daisy_chain_intf);
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL(13'516'800), 824, 48, 688, 274, 0, 250)
-	MCFG_SCREEN_UPDATE_DRIVER(kdt6_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_raw(XTAL(13'516'800), 824, 48, 688, 274, 0, 250);
+	screen.set_screen_update(FUNC(kdt6_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	config.set_default_layout(layout_kdt6);
@@ -635,7 +637,7 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(kdt6_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(kdt6_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set("ctc2", FUNC(z80ctc_device::trg2));
 
 	// sound hardware
@@ -718,12 +720,12 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 
 	SOFTWARE_LIST(config, "floppy_list").set_original("psi98");
 
-	MCFG_PSI_KEYBOARD_INTERFACE_ADD("kbd", "hle")
-	MCFG_PSI_KEYBOARD_RX_HANDLER(WRITELINE(*this, kdt6_state, keyboard_rx_w))
-	MCFG_PSI_KEYBOARD_KEY_STROBE_HANDLER(WRITELINE("ctc2", z80ctc_device, trg1))
+	PSI_KEYBOARD_INTERFACE(config, m_keyboard, "hle");
+	m_keyboard->rx().set(FUNC(kdt6_state::keyboard_rx_w));
+	m_keyboard->key_strobe().set("ctc2", FUNC(z80ctc_device::trg1));
 
 	// 6 ECB slots
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

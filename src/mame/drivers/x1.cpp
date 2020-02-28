@@ -8,27 +8,26 @@
     special thanks to Dirk Best for various wd17xx fixes
 
     TODO:
+    - clean-ups, split components into devices if necessary and maybe separate turbo/turboz features into specific file(s);
+    - refactor base video into a true scanline renderer, expect it to break 6845 drawing delegation support badly;
+    - support extended x1turboz video features (need more test cases?);
     - Rewrite keyboard input hook-up and decap/dump the keyboard MCU if possible;
     - Fix the 0xe80/0xe83 kanji ROM readback;
     - x1turbo keyboard inputs are currently broken, use x1turbo40 for now;
     - Hook-up remaining .tap image formats;
     - Implement APSS tape commands;
-    - Sort out / redump the BIOS gfx roms;
+    - Sort out / redump the BIOS gfx roms, and understand if TurboZ really have same BIOS as
+      vanilla Turbo like Jp emulators seems to suggest;
     - X1Turbo: Implement SIO.
     - Implement true 400 lines mode (i.e. Chatnoir no Mahjong v2.1, Casablanca)
     - Implement SASI HDD interface;
-    - clean-ups!
-    - There are various unclear video things, these are:
-        - Implement the remaining scrn regs;
-        - Implement the new features of the x1turboz, namely the 4096 color feature amongst other things
-        - (anything else?)
     - Driver Configuration switches:
         - OPN for X1
         - EMM, and hook-up for X1 too
         - RAM size for EMM
         - specific x1turboz features?
 
-    per-game/program specific TODO:
+    per-game/program specific TODO (to be moved to hash file):
     - CZ8FB02 / CZ8FB03: doesn't load at all, they are 2hd floppies apparently;
     - Chack'n Pop: game is too fast, presumably missing wait states;
     - Dragon Buster: it crashed to me once with a obj flag hang;
@@ -700,7 +699,7 @@ READ8_MEMBER( x1_state::x1_rom_r )
 {
 //  logerror("%06x\n",m_rom_index[0]<<16|m_rom_index[1]<<8|m_rom_index[2]<<0);
 	if (m_cart->exists())
-		return m_cart->read_rom(space, (m_rom_index[0] << 16) | (m_rom_index[1] << 8) | (m_rom_index[2] << 0));
+		return m_cart->read_rom((m_rom_index[0] << 16) | (m_rom_index[1] << 8) | (m_rom_index[2] << 0));
 	else
 		return 0;
 }
@@ -976,7 +975,21 @@ WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
 	{
 		if (m_turbo_reg.gfx_pal & 0x80) // APEN bit
 		{
-			uint32_t const pal_entry = ((offset & 0xff) << 4) | ((data & 0xf0) >> 4);
+			if (m_turbo_reg.gfx_pal & 0x08) // APRD bit
+			{
+				// TODO: writing here on APRD condition just fetch offset index that reads back on this I/O
+				popmessage("APRD enabled, contact MAMEdev");
+				return;
+			}
+			// TODO: unlike normal operation this cannot do mid-frame scanline update
+			// (-> bus request signal when accessing this on non-vblank time)
+			uint32_t pal_entry = ((offset & 0xff) << 4) | ((data & 0xf0) >> 4);
+			// TODO: more complex condition
+			if ((m_turbo_reg.pal & 0x10) == 0) // C64 bit
+			{
+				pal_entry &= 0xccc;
+				pal_entry |= pal_entry >> 2;
+			}
 
 			m_pal_4096[pal_entry+((offset & 0x300)<<4)] = data & 0xf;
 
@@ -984,7 +997,7 @@ WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
 			uint8_t const g = m_pal_4096[pal_entry+(2<<12)];
 			uint8_t const b = m_pal_4096[pal_entry+(0<<12)];
 
-			m_palette->set_pen_color(pal_entry+16, pal3bit(r), pal3bit(g), pal3bit(b));
+			m_palette->set_pen_color(pal_entry+16, pal4bit(r), pal4bit(g), pal4bit(b));
 		}
 	}
 	else //compatible mode
@@ -1069,12 +1082,12 @@ WRITE8_MEMBER( x1_state::x1_6845_w )
 	if(offset == 0)
 	{
 		m_crtc_index = data & 31;
-		m_crtc->address_w(space, offset, data);
+		m_crtc->address_w(data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		m_crtc->register_w(space, offset, data);
+		m_crtc->register_w(data);
 	}
 }
 
@@ -1355,7 +1368,7 @@ void x1_state::x1_io_banks(address_map &map)
 {
 	x1_io_banks_common(map);
 
-//  AM_RANGE(0x0700, 0x0701) TODO: user could install ym2151 on plain X1 too
+//  map(0x0700, 0x0701) TODO: user could install ym2151 on plain X1 too
 
 	map(0x1000, 0x1000).mirror(0x00ff).w(FUNC(x1_state::x1_pal_b_w));
 	map(0x1100, 0x1100).mirror(0x00ff).w(FUNC(x1_state::x1_pal_r_w));
@@ -1391,7 +1404,7 @@ void x1_state::x1turbo_io_banks(address_map &map)
 	map(0x1000, 0x12ff).w(FUNC(x1_state::x1turboz_4096_palette_w));
 
 	map(0x1f80, 0x1f80).mirror(0x000f).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
-	map(0x1f90, 0x1f93).rw("sio", FUNC(z80sio0_device::ba_cd_r), FUNC(z80sio0_device::ba_cd_w));
+	map(0x1f90, 0x1f93).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x1f98, 0x1f9f).rw(FUNC(x1_state::ext_sio_ctc_r), FUNC(x1_state::ext_sio_ctc_w));
 	map(0x1fb0, 0x1fb0).rw(FUNC(x1_state::x1turbo_pal_r), FUNC(x1_state::x1turbo_pal_w));       // Z only!
 	map(0x1fb8, 0x1fbf).rw(FUNC(x1_state::x1turbo_txpal_r), FUNC(x1_state::x1turbo_txpal_w));   // Z only!
@@ -1401,7 +1414,7 @@ void x1_state::x1turbo_io_banks(address_map &map)
 	map(0x1fc3, 0x1fc3).w(FUNC(x1_state::z_chroma_key_w));                         // Z only!
 	map(0x1fc4, 0x1fc4).w(FUNC(x1_state::z_extra_scroll_w));                       // Z only!
 	map(0x1fc5, 0x1fc5).rw(FUNC(x1_state::x1turbo_gfxpal_r), FUNC(x1_state::x1turbo_gfxpal_w)); // Z only!
-//  AM_RANGE(0x1fd0, 0x1fdf)                   AM_READ(x1_scrn_r)                               // Z only!
+//  map(0x1fd0, 0x1fdf).r(FUNC(x1_state::x1_scrn_r));                               // Z only!
 	map(0x1fd0, 0x1fd0).mirror(0x000f).w(FUNC(x1_state::x1_scrn_w));
 	map(0x1fe0, 0x1fe0).rw(FUNC(x1_state::x1turboz_blackclip_r), FUNC(x1_state::x1turbo_blackclip_w));
 	map(0x1ff0, 0x1ff0).portr("X1TURBO_DSW");
@@ -1510,7 +1523,7 @@ WRITE8_MEMBER( x1_state::x1_portc_w )
 	m_hres_320 = data & 0x40;
 
 	/* set up the pixel clock according to the above divider */
-	m_crtc->set_clock(VDP_CLOCK/((m_hres_320) ? 48 : 24));
+	m_crtc->set_unscaled_clock(VDP_CLOCK/((m_hres_320) ? 48 : 24));
 
 	if(!BIT(data, 5) && BIT(m_io_switch, 5))
 		m_iobank->set_bank(1);
@@ -1672,7 +1685,7 @@ INPUT_CHANGED_MEMBER(x1_state::ipl_reset)
 	//anything else?
 }
 
-/* Apparently most games doesn't support this (not even the Konami ones!), one that does is...177 :o */
+// on 177 this makes the game to reset, on other games sending a NMI signal just causes a jump to la-la-land (including the Konami ones)
 INPUT_CHANGED_MEMBER(x1_state::nmi_reset)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
@@ -1683,12 +1696,14 @@ INPUT_PORTS_START( x1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, x1_state, ipl_reset,0) PORT_NAME("IPL reset")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, x1_state, nmi_reset,0) PORT_NAME("NMI reset")
 
-	PORT_START("SOUND_SW") //FIXME: this is X1Turbo specific
+	PORT_START("SOUND_SW")
+	// TODO: this is X1Turbo specific and likely OPN busy flag instead
 	PORT_DIPNAME( 0x80, 0x80, "OPM Sound Setting?" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IOSYS") //TODO: implement front-panel DIP-SW here
+	PORT_START("IOSYS")
+	// TODO: route front-panel DIP-SW here
 	PORT_DIPNAME( 0x01, 0x01, "IOSYS" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2153,7 +2168,7 @@ static const gfx_layout x1_pcg_8x8 =
 	8*8
 };
 
-MACHINE_START_MEMBER(x1_state,x1)
+void x1_state::machine_start()
 {
 	/* set up RTC */
 	{
@@ -2191,14 +2206,15 @@ static void x1_floppies(device_slot_interface &device)
 	device.option_add("dd", FLOPPY_525_DD);
 }
 
-MACHINE_CONFIG_START(x1_state::x1)
+void x1_state::x1(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MAIN_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &x1_state::x1_mem);
 	m_maincpu->set_addrmap(AS_IO, &x1_state::x1_io);
 	m_maincpu->set_daisy_config(x1_daisy);
 
-	ADDRESS_MAP_BANK(config, "iobank").set_map(&x1_state::x1_io_banks).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
+	ADDRESS_MAP_BANK(config, m_iobank).set_map(&x1_state::x1_io_banks).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", MAIN_CLOCK/4));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -2206,7 +2222,7 @@ MACHINE_CONFIG_START(x1_state::x1)
 	ctc.zc_callback<1>().set("ctc", FUNC(z80ctc_device::trg1));
 	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg2));
 
-	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
+	X1_KEYBOARD(config, "x1kb", 0);
 
 	i8255_device &ppi(I8255A(config, "ppi8255_0"));
 	ppi.in_pa_callback().set(FUNC(x1_state::x1_porta_r));
@@ -2216,18 +2232,17 @@ MACHINE_CONFIG_START(x1_state::x1)
 	ppi.out_pb_callback().set(FUNC(x1_state::x1_portb_w));
 	ppi.out_pc_callback().set(FUNC(x1_state::x1_portc_w));
 
-	MCFG_MACHINE_START_OVERRIDE(x1_state,x1)
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(x1_state, screen_update_x1)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640-1, 0, 480-1);
+	m_screen->set_screen_update(FUNC(x1_state::screen_update_x1));
 
-	H46505(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
+	HD6845S(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
@@ -2235,8 +2250,6 @@ MACHINE_CONFIG_START(x1_state::x1)
 	PALETTE(config, m_palette, palette_device::BLACK, 0x10+0x1000);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x1);
-
-	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 
 	MB8877(config, m_fdc, MAIN_CLOCK / 16);
 	// TODO: guesswork, try to implicitly start the motor
@@ -2249,8 +2262,7 @@ MACHINE_CONFIG_START(x1_state::x1)
 
 	SOFTWARE_LIST(config, "flop_list").set_original("x1_flop");
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "x1_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "x1_cart", "bin,rom");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -2263,20 +2275,21 @@ MACHINE_CONFIG_START(x1_state::x1)
 	ay.add_route(0, "rspeaker", 0.25);
 	ay.add_route(1, "lspeaker", 0.5);
 	ay.add_route(2, "rspeaker", 0.5);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(x1_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 	m_cassette->set_interface("x1_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");
 
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1_state::x1_keyboard_callback), attotime::from_hz(250));
 	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1_state::x1_cmt_wind_timer), attotime::from_hz(16));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(x1_state::x1turbo)
+void x1_state::x1turbo(machine_config &config)
+{
 	x1(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &x1_state::x1turbo_mem);
@@ -2284,10 +2297,9 @@ MACHINE_CONFIG_START(x1_state::x1turbo)
 
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1turbo)
 
-	MCFG_DEVICE_MODIFY("iobank")
-	MCFG_DEVICE_PROGRAM_MAP(x1turbo_io_banks)
+	m_iobank->set_map(&x1_state::x1turbo_io_banks);
 
-	z80sio0_device& sio(Z80SIO0(config, "sio", MAIN_CLOCK/4));
+	z80sio_device& sio(Z80SIO(config, "sio", MAIN_CLOCK/4));
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80DMA(config, m_dma, MAIN_CLOCK/4);
@@ -2303,7 +2315,7 @@ MACHINE_CONFIG_START(x1_state::x1turbo)
 	YM2151(config, m_ym, MAIN_CLOCK/8); //option board
 	m_ym->add_route(0, "lspeaker", 0.50);
 	m_ym->add_route(1, "rspeaker", 0.50);
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *

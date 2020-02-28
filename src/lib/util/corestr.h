@@ -18,7 +18,7 @@
 
 #include <string>
 
-#include <string.h>
+#include <cstring>
 
 
 /***************************************************************************
@@ -53,8 +53,6 @@ int core_strnicmp(const char *s1, const char *s2, size_t n);
 int core_strwildcmp(const char *sp1, const char *sp2);
 bool core_iswildstr(const char *sp);
 
-
-int strcatvprintf(std::string &str, const char *format, va_list args);
 
 void strdelchr(std::string& str, char chr);
 void strreplacechr(std::string& str, char ch, char newch);

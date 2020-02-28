@@ -910,26 +910,26 @@ MACHINE_RESET_MEMBER(jack_state,joinem)
 
 /***************************************************************/
 
-MACHINE_CONFIG_START(jack_state::jack)
-
+void jack_state::jack(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'000'000)/6)
-	MCFG_DEVICE_PROGRAM_MAP(jack_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jack_state, irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(18'000'000)/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jack_state::jack_map);
+	m_maincpu->set_vblank_int("screen", FUNC(jack_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'000'000)/6)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(jack_state, jack_sh_irq_ack)
+	Z80(config, m_audiocpu, XTAL(18'000'000)/6);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &jack_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &jack_state::sound_io_map);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(jack_state::jack_sh_irq_ack));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_jack)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(jack_state::screen_update_jack));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jack);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 32);
@@ -944,29 +944,28 @@ MACHINE_CONFIG_START(jack_state::jack)
 	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	aysnd.port_b_read_callback().set(FUNC(jack_state::timer_r));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(jack_state::treahunt)
+void jack_state::treahunt(machine_config &config)
+{
 	jack(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_OPCODES, &jack_state::decrypted_opcodes_map);
+}
 
 
-MACHINE_CONFIG_START(jack_state::striv)
+void jack_state::striv(machine_config &config)
+{
 	jack(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(striv_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &jack_state::striv_map);
 
 	MCFG_MACHINE_START_OVERRIDE(jack_state,striv)
 	MCFG_MACHINE_RESET_OVERRIDE(jack_state,striv)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_striv)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(jack_state::screen_update_striv));
+}
 
 
 /***************************************************************/
@@ -977,43 +976,41 @@ INTERRUPT_GEN_MEMBER(jack_state::joinem_vblank_irq)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(jack_state::joinem)
+void jack_state::joinem(machine_config &config)
+{
 	jack(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(joinem_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jack_state, joinem_vblank_irq)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(jack_state, irq0_line_hold, 250) // ??? controls game speed
+	m_maincpu->set_addrmap(AS_PROGRAM, &jack_state::joinem_map);
+	m_maincpu->set_vblank_int("screen", FUNC(jack_state::joinem_vblank_irq));
+	m_maincpu->set_periodic_int(FUNC(jack_state::irq0_line_hold), attotime::from_hz(250)); // ??? controls game speed
 
 	MCFG_MACHINE_START_OVERRIDE(jack_state,joinem)
 	MCFG_MACHINE_RESET_OVERRIDE(jack_state,joinem)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_joinem)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(jack_state::screen_update_joinem));
 
 	m_gfxdecode->set_info(gfx_joinem);
 
 	PALETTE(config.replace(), m_palette, FUNC(jack_state::joinem_palette), 64);
 
 	MCFG_VIDEO_START_OVERRIDE(jack_state,joinem)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(jack_state::unclepoo)
+void jack_state::unclepoo(machine_config &config)
+{
 	joinem(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(unclepoo_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &jack_state::unclepoo_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	subdevice<screen_device>("screen")->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 
 	m_palette->set_entries(256);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -1348,11 +1345,11 @@ ROM_START( striv )
 	ROM_LOAD( "s.triv_p1.2f",       0x0000, 0x1000, CRC(dcf5da6e) SHA1(e88c8226ae4d4a0af717f0760e551e0ce4c79c5e) )
 	ROM_LOAD( "s.triv_p2.3f",       0x1000, 0x1000, CRC(921610ba) SHA1(7dea7a57543dd79325da34cebd7b9dd8a767bb2a) )
 	ROM_LOAD( "pr3.5f",             0x2000, 0x1000, BAD_DUMP CRC(c36f0e21) SHA1(d036a56798bbb42bee269450524172ec071dcf03) ) // wasn't in the romset, but the other 3 ROMs match the ones from strivf
-	ROM_LOAD( "s.triv_cp4.f6",      0x3000, 0x1000, CRC(0dc98a97) SHA1(36c1c61d3330e2c00d9aa94ae80bcb1b9c5aea21) )
+	ROM_LOAD( "s.triv_cp4.6f",      0x3000, 0x1000, CRC(0dc98a97) SHA1(36c1c61d3330e2c00d9aa94ae80bcb1b9c5aea21) )
 	/* 0xc000 - 0xcfff questions rom space */
-	ROM_LOAD( "s.triv_c1.5e",       0xd000, 0x1000, CRC(2c2c7282) SHA1(91b983e8cd86579f6ebbe72ebaaa98814da27f9b) ) // FIXED BITS (x0xxxxxx)
-	ROM_LOAD( "s.triv_c2.e6",       0xe000, 0x1000, CRC(e21bd3ab) SHA1(a34056df2df3e5fcdfee78b65caff0eb82733d42) ) // FIXED BITS (x0xxxxxx)
-	ROM_LOAD( "s.triv_c3.e7",       0xf000, 0x1000, CRC(2f4b0570) SHA1(32f9fed9898de9059e39bc80700f65c2690383b6) )
+	ROM_LOAD( "s.triv_c3.7e",       0xd000, 0x1000, CRC(2f4b0570) SHA1(32f9fed9898de9059e39bc80700f65c2690383b6) )
+	ROM_LOAD( "s.triv_c2.6e",       0xe000, 0x1000, CRC(e21bd3ab) SHA1(a34056df2df3e5fcdfee78b65caff0eb82733d42) ) // FIXED BITS (x0xxxxxx)
+	ROM_LOAD( "s.triv_c1.5e",       0xf000, 0x1000, CRC(2c2c7282) SHA1(91b983e8cd86579f6ebbe72ebaaa98814da27f9b) ) // FIXED BITS (x0xxxxxx)
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "s.triv_sound.5a",       0x0000, 0x1000, CRC(b7ddf84f) SHA1(fa4cc0b2e5a88c82c62492c03e97ac6aa8a905b1) )
@@ -1629,7 +1626,7 @@ GAME( 1984, freeze,    0,        jack,     freeze,   jack_state, init_jack,     
 GAME( 1981, tripool,   0,        jack,     tripool,  jack_state, init_jack,     ROT90,  "Noma (Casino Tech license)", "Tri-Pool (Casino Tech)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, tripoola,  tripool,  jack,     tripool,  jack_state, init_jack,     ROT90,  "Noma (Costal Games license)", "Tri-Pool (Costal Games)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, sucasino,  0,        jack,     sucasino, jack_state, init_jack,     ROT90,  "Data Amusement", "Super Casino", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, striv,     0,        striv,    striv,    jack_state, init_striv,    ROT270, "Nova du Canada", "Super Triv (English questions)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // resets after displaying the first question
+GAME( 1985, striv,     0,        striv,    striv,    jack_state, init_striv,    ROT270, "Nova du Canada", "Super Triv (English questions)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, strivf,    striv,    striv,    striv,    jack_state, init_striv,    ROT270, "Nova du Canada", "Super Triv (French questions)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Hara Industries PCB
 GAME( 1983, joinem,    0,        joinem,   joinem,   jack_state, init_zzyzzyxx, ROT90,  "Global Corporation", "Joinem", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, unclepoo,  0,        unclepoo, unclepoo, jack_state, init_zzyzzyxx, ROT90,  "Diatec", "Uncle Poo", MACHINE_SUPPORTS_SAVE ) // based on Joinem?

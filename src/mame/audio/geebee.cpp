@@ -2,7 +2,7 @@
 // copyright-holders:Juergen Buchmueller
 /****************************************************************************
  *
- * geebee.c
+ * geebee.cpp
  *
  * sound driver
  * juergen buchmueller <pullmoll@t-online.de>, jan 2000
@@ -58,17 +58,17 @@ void geebee_sound_device::device_timer(emu_timer &timer, device_timer_id id, int
 {
 	switch (id)
 	{
-		case TIMER_VOLUME_DECAY:
-			if (--m_volume < 0)
-				m_volume = 0;
-			break;
+	case TIMER_VOLUME_DECAY:
+		if (--m_volume < 0)
+			m_volume = 0;
+		break;
 
-		default:
-			assert_always(false, "Unknown id in geebee_device::device_timer");
+	default:
+		throw emu_fatalerror("Unknown id in geebee_device::device_timer");
 	}
 }
 
-WRITE8_MEMBER( geebee_sound_device::sound_w )
+void geebee_sound_device::sound_w(u8 data)
 {
 	m_channel->update();
 	m_sound_latch = data;

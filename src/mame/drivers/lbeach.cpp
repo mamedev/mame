@@ -28,6 +28,7 @@ TODO:
 #include "machine/nvram.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #include "lbeach.lh"
 
@@ -141,9 +142,9 @@ TILE_GET_INFO_MEMBER(lbeach_state::get_fg_tile_info)
 
 void lbeach_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lbeach_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lbeach_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lbeach_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lbeach_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_screen->register_screen_bitmap(m_colmap_car);
@@ -233,12 +234,12 @@ void lbeach_state::lbeach_map(address_map &map)
 	map(0x8000, 0x8000).writeonly().share("scroll_y");
 	map(0x8001, 0x8001).writeonly().share("sprite_x");
 	map(0x8002, 0x8002).writeonly().share("sprite_code");
-//  AM_RANGE(0x8003, 0x8003) AM_WRITENOP // ?
-//  AM_RANGE(0x8004, 0x8004) AM_WRITENOP // ?
-//  AM_RANGE(0x8005, 0x8005) AM_WRITENOP // ?
+//  map(0x8003, 0x8003).nopw(); // ?
+//  map(0x8004, 0x8004).nopw(); // ?
+//  map(0x8005, 0x8005).nopw(); // ?
 	map(0x8007, 0x8007).nopw(); // probably watchdog
 	map(0xa000, 0xa000).portr("IN0");
-//  AM_RANGE(0xa003, 0xa003) AM_READNOP // ? tests d7 at game over
+//  map(0xa003, 0xa003).nopr(); // ? tests d7 at game over
 	map(0xc000, 0xcfff).rom();
 	map(0xf000, 0xffff).rom();
 }
@@ -333,29 +334,29 @@ void lbeach_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(lbeach_state::lbeach)
-
+void lbeach_state::lbeach(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(16'000'000) / 32) // Motorola MC6800P, 500kHz
-	MCFG_DEVICE_PROGRAM_MAP(lbeach_map)
+	M6800(config, m_maincpu, XTAL(16'000'000) / 32); // Motorola MC6800P, 500kHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &lbeach_state::lbeach_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60) // ~60Hz
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511-32, 0, 255-24)
-	MCFG_SCREEN_UPDATE_DRIVER(lbeach_state, screen_update_lbeach)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE) // needed for collision detection
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60); // ~60Hz
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 511-32, 0, 255-24);
+	m_screen->set_screen_update(FUNC(lbeach_state::screen_update_lbeach));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // needed for collision detection
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lbeach);
 	PALETTE(config, m_palette, FUNC(lbeach_state::lbeach_palette), 2 + 8 + 2);
 	/* sound hardware */
 	// ...
-MACHINE_CONFIG_END
+}
 
 
 

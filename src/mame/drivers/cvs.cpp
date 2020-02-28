@@ -234,7 +234,7 @@ INTERRUPT_GEN_MEMBER(cvs_state::cvs_main_cpu_interrupt)
 
 WRITE_LINE_MEMBER(cvs_state::cvs_slave_cpu_interrupt)
 {
-	m_audiocpu->set_input_line_vector(0, 0x03);
+	m_audiocpu->set_input_line_vector(0, 0x03); // S2650
 	//m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 	m_audiocpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
@@ -376,7 +376,7 @@ READ8_MEMBER(cvs_state::cvs_speech_command_r)
 {
 	/* FIXME: this was by observation on board ???
 	 *          -bit 7 is TMS status (active LO) */
-	return ((m_tms5110->ctl_r(space, 0) ^ 1) << 7) | (m_soundlatch->read(space, 0) & 0x7f);
+	return ((m_tms5110->ctl_r(space, 0) ^ 1) << 7) | (m_soundlatch->read() & 0x7f);
 }
 
 
@@ -432,7 +432,7 @@ WRITE8_MEMBER(cvs_state::audio_command_w)
 {
 	LOG(("data %02x\n", data));
 	/* cause interrupt on audio CPU if bit 7 set */
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	cvs_slave_cpu_interrupt(data & 0x80 ? 1 : 0);
 }
 
@@ -1019,7 +1019,6 @@ void cvs_state::cvs(machine_config &config)
 	DAC_4BIT_R2R(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
@@ -1562,7 +1561,7 @@ READ8_MEMBER(cvs_state::huncholy_prot_r)
 
 void cvs_state::init_huncholy()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6ff1, 0x6ff2, read8_delegate(FUNC(cvs_state::huncholy_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6ff1, 0x6ff2, read8_delegate(*this, FUNC(cvs_state::huncholy_prot_r)));
 
 	save_item(NAME(m_protection_counter));
 }
@@ -1587,7 +1586,7 @@ READ8_MEMBER(cvs_state::superbik_prot_r)
 void cvs_state::init_superbik()
 {
 	m_protection_counter = 0;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f1, 0x73f2, read8_delegate(FUNC(cvs_state::superbik_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f1, 0x73f2, read8_delegate(*this, FUNC(cvs_state::superbik_prot_r)));
 
 	save_item(NAME(m_protection_counter));
 }
@@ -1620,7 +1619,7 @@ READ8_MEMBER(cvs_state::hero_prot_r)
 
 void cvs_state::init_hero()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f0, 0x73ff, read8_delegate(FUNC(cvs_state::hero_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f0, 0x73ff, read8_delegate(*this, FUNC(cvs_state::hero_prot_r)));
 }
 
 

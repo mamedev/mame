@@ -635,7 +635,7 @@ uint64_t gameboy_sound_device::noise_period_cycles()
 }
 
 
-READ8_MEMBER( dmg_apu_device::wave_r )
+u8 dmg_apu_device::wave_r(offs_t offset)
 {
 	m_channel->update();
 	update_state();
@@ -649,7 +649,7 @@ READ8_MEMBER( dmg_apu_device::wave_r )
 }
 
 
-READ8_MEMBER( cgb04_apu_device::wave_r )
+u8 cgb04_apu_device::wave_r(offs_t offset)
 {
 	m_channel->update();
 	update_state();
@@ -663,7 +663,7 @@ READ8_MEMBER( cgb04_apu_device::wave_r )
 }
 
 
-READ8_MEMBER( gameboy_sound_device::sound_r )
+u8 gameboy_sound_device::sound_r(offs_t offset)
 {
 	static const uint8_t read_mask[0x40] =
 	{
@@ -692,7 +692,7 @@ READ8_MEMBER( gameboy_sound_device::sound_r )
 }
 
 
-WRITE8_MEMBER(dmg_apu_device::wave_w)
+void dmg_apu_device::wave_w(offs_t offset, u8 data)
 {
 	m_channel->update();
 	update_state();
@@ -711,7 +711,7 @@ WRITE8_MEMBER(dmg_apu_device::wave_w)
 }
 
 
-WRITE8_MEMBER(cgb04_apu_device::wave_w)
+void cgb04_apu_device::wave_w(offs_t offset, u8 data)
 {
 	m_channel->update();
 	update_state();
@@ -727,7 +727,7 @@ WRITE8_MEMBER(cgb04_apu_device::wave_w)
 }
 
 
-WRITE8_MEMBER( dmg_apu_device::sound_w )
+void dmg_apu_device::sound_w(offs_t offset, u8 data)
 {
 	/* change in registers so update first */
 	m_channel->update();
@@ -741,7 +741,7 @@ WRITE8_MEMBER( dmg_apu_device::sound_w )
 }
 
 
-WRITE8_MEMBER( cgb04_apu_device::sound_w )
+void cgb04_apu_device::sound_w(offs_t offset, u8 data)
 {
 	/* change in registers so update first */
 	m_channel->update();

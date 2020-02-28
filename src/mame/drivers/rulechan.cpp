@@ -135,7 +135,7 @@
   Dev notes:
 
   Again, this driver was written based on a couple of ROM dumps and a
-  lot of reverse engineering, with no harware available, but guessing
+  lot of reverse engineering, with no hardware available, but guessing
   that this firmware and hardware are similar to others well known
   roulettes like Lucky Ball, Lucky Roulette, Corona, Re900, etc...
 
@@ -163,22 +163,26 @@
 
 *********************************************************************/
 
-
-#define CPU_CLOCK       XTAL(8'000'000)     // guess
-#define VID_CLOCK       XTAL(21'477'272)    // guess
-#define TMS_CLOCK       (CPU_CLOCK / 4)      // guess
-#define VDP_MEM         0x20000  // 4x 4464 (64K x 4 DRAM)
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/eepromser.h"
 #include "machine/timer.h"
+#include "machine/i8255.h"
 #include "video/v9938.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
+
 #include "rulechan.lh"
+
+#define CPU_CLOCK       XTAL(8'000'000)     // guess
+#define VID_CLOCK       XTAL(21'477'272)    // guess
+#define TMS_CLOCK       (CPU_CLOCK / 4)      // guess
+#define VDP_MEM         0x20000  // 4x 4464 (64K x 4 DRAM)
 
 #define BIT2    BIT(m_p30,2)
 #define BIT3    BIT(m_p30,3)
@@ -189,7 +193,7 @@
 #define RAM_PSW 0xf078
 
 #define BALLIN  (m_ballin >= 2)
-#define MOTORON (m_p32 != 0xf0)
+#define MOTORON ((m_p32 & 0x0f) != 0x00)
 #define LEDNOTNUM (m_led != m_num)
 
 
@@ -211,14 +215,13 @@ public:
 	void rulechan(machine_config &config);
 	void rulechan_init();
 
-private:
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); m_digits.resolve(); }
 
-	DECLARE_READ8_MEMBER(port0_r);
+private:
 	DECLARE_WRITE8_MEMBER(port0_w);
 	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_READ8_MEMBER(port3_r);
 	DECLARE_READ8_MEMBER(port30_r);
-	DECLARE_READ8_MEMBER(port31_r);
 	DECLARE_WRITE8_MEMBER(port31_w);
 	DECLARE_WRITE8_MEMBER(port32_w);
 	DECLARE_READ8_MEMBER(psg_portA_r);
@@ -242,7 +245,7 @@ private:
 	uint8_t m_ballin;
 	uint8_t m_led;
 	uint8_t m_pass[6];
-	uint8_t m_sndsrt[10]= { 0x0a, 0x0e, 0x06, 0x0a, 0x0b, 0x48, 0x0c, 0x00, 0x0d, 0x01 };
+	static constexpr uint8_t s_sndsrt[10] = { 0x0a, 0x0e, 0x06, 0x0a, 0x0b, 0x48, 0x0c, 0x00, 0x0d, 0x01 };
 
 	required_device<v9938_device> m_v9938;
 	required_device<cpu_device> m_maincpu;
@@ -256,10 +259,11 @@ private:
 	void sound_sort();
 	void sound_off();
 
-	virtual void machine_start() override { m_lamps.resolve(); m_digits.resolve(); }
 	output_finder<63> m_lamps;
 	output_finder<6> m_digits;
 };
+
+constexpr uint8_t rulechan_state::s_sndsrt[10];
 
 
 /* BCD to Seven Segment Decoder */
@@ -300,17 +304,12 @@ void rulechan_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x00, 0x00).rw(FUNC(rulechan_state::port0_r),FUNC(rulechan_state::port0_w));   // Matrix scan line selector - Must be 0xf0 at power-up.
-	map(0x01, 0x01).portw("EEPROMOUT");                                                // EEPROM ok.
-	map(0x02, 0x02).r(FUNC(rulechan_state::port2_r));                                  // Matrix button read.
-	map(0x03, 0x03).r(FUNC(rulechan_state::port3_r));
+	map(0x00, 0x03).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x11).w("ay8910", FUNC(ay8910_device::address_data_w));                  // sound ok.
 	map(0x12, 0x12).r("ay8910", FUNC(ay8910_device::data_r));                          // ports ok.
 	map(0x20, 0x23).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));  // video ok.
-	map(0x30, 0x30).r(FUNC(rulechan_state::port30_r));                                 // wheel control.
-	map(0x31, 0x31).rw(FUNC(rulechan_state::port31_r),FUNC(rulechan_state::port31_w)); // wheel control - read: Must be 0x00 at power-up.
-	map(0x32, 0x32).w(FUNC(rulechan_state::port32_w));                                 // wheel control.
-	map(0x40, 0x43).nopr().nopw();
+	map(0x30, 0x33).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));   // wheel control.
+	map(0x40, 0x43).nopr().nopw();                                                     // serial communications?
 	map(0x60, 0x60).nopw();                                                            // Watchdog.
 }
 
@@ -319,19 +318,9 @@ void rulechan_state::main_io(address_map &map)
 *      Read Handlers      *
 **************************/
 
-READ8_MEMBER(rulechan_state::port0_r)
-{
-	return 0xf0;
-}
-
 READ8_MEMBER(rulechan_state::port2_r)
 {
 	return m_keymx[m_sline]->read();
-}
-
-READ8_MEMBER(rulechan_state::port3_r)
-{
-	return 0xff;
 }
 
 /******************************
@@ -345,11 +334,6 @@ READ8_MEMBER(rulechan_state::port3_r)
 READ8_MEMBER(rulechan_state::port30_r)
 {
 	return m_p30;
-}
-
-READ8_MEMBER(rulechan_state::port31_r)
-{
-	return 0x00;
 }
 
 READ8_MEMBER(rulechan_state::psg_portA_r)
@@ -374,9 +358,7 @@ WRITE8_MEMBER(rulechan_state::port0_w)
 	m_sline = data & 0x07;                 // Matrix scan line selector.
 
 	if (m_sline > 5)
-	{
 		m_sline = 0;
-	}
 }
 
 /****************************************
@@ -390,18 +372,18 @@ WRITE8_MEMBER(rulechan_state::port31_w)
 {
 	m_p31 = data;
 
-	if(BIT(m_p31, 4))
+	if (BIT(m_p31, 4))
 	{
 		m_p30 |= 0x20;
 		m_ballin = 0;      // Drop ball....ball in shooter.
 	}
 
-	if(BIT(m_p31, 7))                      // Shoot ball.
+	if (BIT(m_p31, 7))                      // Shoot ball.
 	{
 		m_p30 &= 0xdf;                     // ball out....
 		m_num = machine().rand() % 37;     // sort winning number.
 
-		//logerror("shooting ball 2d\n", m_num);
+		LOG("shooting ball 2d\n", m_num);
 	}
 }
 
@@ -424,17 +406,17 @@ WRITE8_MEMBER(rulechan_state::port32_w)
 
 void rulechan_state::sound_off()
 {
-		m_maincpu->space(AS_IO).write_byte(0x10, 0x07);
-		m_maincpu->space(AS_IO).write_byte(0x11, m_maincpu->space(AS_PROGRAM).read_byte(SND_FLG) | 0x20);
-		m_maincpu->space(AS_IO).write_byte(0x10, 0x0e);
+	m_maincpu->space(AS_IO).write_byte(0x10, 0x07);
+	m_maincpu->space(AS_IO).write_byte(0x11, m_maincpu->space(AS_PROGRAM).read_byte(SND_FLG) | 0x20);
+	m_maincpu->space(AS_IO).write_byte(0x10, 0x0e);
 }
 
 void rulechan_state::sound_sort()
 {
 	for (int i = 0; i < 5; i++)
 	{
-		m_maincpu->space(AS_IO).write_byte(0x10, m_sndsrt[(2 * i)]);
-		m_maincpu->space(AS_IO).write_byte(0x11, m_sndsrt[(2 * i) + 1]);
+		m_maincpu->space(AS_IO).write_byte(0x10, s_sndsrt[(2 * i)]);
+		m_maincpu->space(AS_IO).write_byte(0x11, s_sndsrt[(2 * i) + 1]);
 	}
 	m_maincpu->space(AS_IO).write_byte(0x10, 0x07);
 	m_maincpu->space(AS_IO).write_byte(0x11, m_maincpu->space(AS_PROGRAM).read_byte(SND_FLG) & 0xdf);
@@ -448,58 +430,58 @@ void rulechan_state::sound_sort()
 
 TIMER_DEVICE_CALLBACK_MEMBER(rulechan_state::wheel_speed)
 {
-	if(m_step == 0)
+	if (m_step == 0)
 	{
-		if((BIT4) & (m_updn4 == 0))
+		if ((BIT4) && (m_updn4 == 0))
 		{
 			m_p30 &= 0xef;
 			m_updn4 = 1;
 
-			//logerror("1:port_p30:- Reset bit 4 pulse start -%2x cont_pasos:%2d\n",m_p30, m_step);
+			LOG("1:port_p30:- Reset bit 4 pulse start -%2x cont_pasos:%2d\n", m_p30, m_step);
 			return;
 		}
 
-		if((!BIT4) & (m_updn4 == 1))
+		if ((!BIT4) && (m_updn4 == 1))
 		{
 			m_p30 |= 0x10;
 
-			//logerror("2:port_p30:- Set bit 4 -%2x cont_pasos:%2d\n",m_p30, m_step);
+			LOG("2:port_p30:- Set bit 4 -%2x cont_pasos:%2d\n", m_p30, m_step);
 			return;
 		}
 
-		if((BIT4) & (m_updn4 == 1))
+		if ((BIT4) && (m_updn4 == 1))
 		{
 			m_updn4 = 0;
 			m_step++;
 
-			//logerror("3:port_p30:-end mark for reset bit 4 -%2x cont_pasos:%2d\n",m_p30, m_step);
+			LOG("3:port_p30:-end mark for reset bit 4 -%2x cont_pasos:%2d\n", m_p30, m_step);
 			return;
 		}
 	}
 	else
 	{
-		if(BIT3 & (m_updn3 == 0))
+		if (BIT3 && (m_updn3 == 0))
 		{
 			m_p30 &= 0xf7;
 
-			//logerror("4:port_p30:-reset bit 3 -%2x cont_pasos:%2d\n",m_p30, m_step);
+			LOG("4:port_p30:-reset bit 3 -%2x cont_pasos:%2d\n", m_p30, m_step);
 			return;
 		}
 
-		if(!BIT3 & (m_updn3 == 0))
+		if (!BIT3 && (m_updn3 == 0))
 		{
-			if(!BIT2)
+			if (!BIT2)
 			{
 				m_p30 |= 0x04;
 
-				//logerror("5:port_p30:-set bit 2 -%2x cont_pasos:%2d\n",m_p30, m_step);
+				LOG("5:port_p30:-set bit 2 -%2x cont_pasos:%2d\n", m_p30, m_step);
 				return;
 			}
 			else
 			{
-				if((m_step - 1 == m_num) & (m_updn2 == 0))
+				if ((m_step - 1 == m_num) && (m_updn2 == 0))
 				{
-					if(!BIT5)   // ball in pocket?...
+					if (!BIT5)   // ball in pocket?...
 					{
 						m_p30 &= 0xfb;
 						m_updn2 = 1;
@@ -514,7 +496,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rulechan_state::wheel_speed)
 			m_updn3 = 1;
 		}
 
-		if(!BIT3 & (m_updn3 == 1))
+		if (!BIT3 && (m_updn3 == 1))
 		{
 			m_p30 |= 0x08;
 			m_updn3 = 0;
@@ -526,7 +508,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rulechan_state::wheel_speed)
 				m_p30 |= 0x1c;
 			}
 
-			//logerror("6:port_p30:-set bit 3 -%2x cont_pasos:%2d \n",m_p30, m_step);
+			LOG("6:port_p30:-set bit 3 -%2x cont_pasos:%2d \n", m_p30, m_step);
 			return;
 		}
 	}
@@ -539,38 +521,34 @@ TIMER_DEVICE_CALLBACK_MEMBER(rulechan_state::wheel_speed)
 
 TIMER_DEVICE_CALLBACK_MEMBER(rulechan_state::ball_speed)
 {
-	if(MOTORON)
+	if (MOTORON)
 	{
-		if(d_spin == 0)
+		if (d_spin == 0)
 		{
 			m_tspin++;
 			d_spin = m_spin;
 
-			if(BALLIN)
+			if (BALLIN)
 			{
 				m_tspin = 37;   // breaking ball once per number step.
 			}
 
-			if(m_tspin == 37)
+			if (m_tspin == 37)
 			{
 				m_tspin = 0;
 				m_spin++;
 				d_spin = m_spin;   // breaking ball once per round.
 			}
 
-			if((!BALLIN) | (LEDNOTNUM & BALLIN ))
+			if (!BALLIN || LEDNOTNUM)
 			{
 				m_led++;
 
-				if(m_led == 37)
-				{
+				if (m_led == 37)
 					m_led = 0;
-				}
 
 				for (int i = 0; i < 37; i++)
-				{
 					m_lamps[i + 20] = (m_led == i) ? 1 : 0;   // update roulette led lamps.
-				}
 
 				sound_sort();
 			}
@@ -584,32 +562,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(rulechan_state::ball_speed)
 	else
 	{
 		for (int i = 0; i < 37; i++)
-		{
 			m_lamps[i + 20] = (m_num == i) ? 1 : 0;
-		}
 
-		m_spin=d_spin=m_tspin=m_ballin=0;
+		m_spin = d_spin = m_tspin = m_ballin = 0;
 	}
 
 	/* END of Ball simulation */
 
-/* if needed, get pass and shows it on layout*/
+	/* if needed, get pass and shows it on layout*/
 	m_pass[0] = m_maincpu->space(AS_PROGRAM).read_byte(RAM_PSW);
 
-	if((m_pass[0] <= 0x39) & (m_pass[0] >= 0x30))
+	if ((m_pass[0] <= 0x39) && (m_pass[0] >= 0x30))
 	{
-		for(int i = 0; i < 6; i++)
+		for (int i = 0; i < 6; i++)
 		{
-			m_pass[i]= m_maincpu->space(AS_PROGRAM).read_byte(RAM_PSW + i);
+			m_pass[i] = m_maincpu->space(AS_PROGRAM).read_byte(RAM_PSW + i);
 			m_lamps[10 + i] = dec_7seg(m_pass[i] - 0x30);
 		}
 	}
 	else
 	{
-		for(int i = 0; i < 6; i++)
-		{
+		for (int i = 0; i < 6; i++)
 			m_lamps[10 + i] = dec_7seg(0xff);
-		}
 	}
 }
 
@@ -744,6 +718,17 @@ void rulechan_state::rulechan(machine_config &config)
 	TIMER(config, "ball_speed").configure_periodic(FUNC(rulechan_state::ball_speed), attotime::from_hz(60));
 	TIMER(config, "wheel_speed").configure_periodic(FUNC(rulechan_state::wheel_speed), attotime::from_hz(60));
 
+	i8255_device &ppi0(I8255(config, "ppi0"));
+	ppi0.out_pa_callback().set(FUNC(rulechan_state::port0_w));   // Matrix scan line selector - Must read back as 0xf0 at power-up.
+	ppi0.out_pb_callback().set_ioport("EEPROMOUT");              // EEPROM ok.
+	ppi0.in_pc_callback().set(FUNC(rulechan_state::port2_r));    // Matrix button read.
+
+	i8255_device &ppi1(I8255(config, "ppi1"));
+	ppi1.in_pa_callback().set(FUNC(rulechan_state::port30_r));
+	ppi1.out_pb_callback().set(FUNC(rulechan_state::port31_w));  // Must read back as 0x00 at power-up.
+	ppi1.out_pc_callback().set(FUNC(rulechan_state::port32_w));
+	ppi1.tri_pc_callback().set_constant(0xf0);                   // Motor off at startup
+
 	/* video hardware */
 	v9938_device &v9938(V9938(config, "v9938", VID_CLOCK));
 	v9938.set_screen_ntsc("screen");
@@ -788,7 +773,6 @@ ROM_END
 void rulechan_state::rulechan_init()
 {
 	m_p30 = 0x3c;
-	m_p32 = 0xf0;  // Motor off at startup
 	m_step = 0;
 	m_updn2 = 0;
 	m_updn3 = 0;

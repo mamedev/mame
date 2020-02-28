@@ -15,13 +15,12 @@
 #include "machine/am9519.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
-#include "machine/timer.h"
 #include "machine/trs80m2kb.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 
@@ -87,7 +86,6 @@ public:
 
 	MC6845_UPDATE_ROW( crtc_update_row );
 
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 

@@ -7,7 +7,7 @@
 
 class device_interpro_keyboard_port_interface;
 
-class interpro_keyboard_port_device : public device_t, public device_slot_interface
+class interpro_keyboard_port_device : public device_t, public device_single_card_slot_interface<device_interpro_keyboard_port_interface>
 {
 	friend class device_interpro_keyboard_port_interface;
 
@@ -40,13 +40,13 @@ private:
 	device_interpro_keyboard_port_interface *m_dev;
 };
 
-class device_interpro_keyboard_port_interface : public device_slot_card_interface
+class device_interpro_keyboard_port_interface : public device_interface
 {
 	friend class interpro_keyboard_port_device;
 
 public:
 	// input lines
-	virtual DECLARE_WRITE_LINE_MEMBER(input_txd) { }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_txd) = 0;
 	DECLARE_WRITE_LINE_MEMBER(output_rxd) { m_port->m_rxd_handler(state); }
 
 protected:

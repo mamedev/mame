@@ -42,7 +42,7 @@
     report can be identified by a fixed pattern in the five most
     significant bits.
 
-    Reports are five bytes long.  The first byte contains the the button
+    Reports are five bytes long.  The first byte contains the button
     state; the second and fourth bytes contain X delta; the third and
     fifth bytes contain Y delta.  The two delta values for each axis
     should be summed.  Delta values range from -120 to 127 to prevent
@@ -88,16 +88,16 @@ namespace {
 INPUT_PORTS_START(msft)
 	PORT_START("BTN")
 	PORT_BIT( 0xfffc, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msmouse_device_base, input_changed, nullptr)
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msmouse_device_base, input_changed, nullptr)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msmouse_device_base, input_changed, 0)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msmouse_device_base, input_changed, 0)
 
 	PORT_START("X")
 	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0fff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msmouse_device_base, input_changed, nullptr)
+	PORT_BIT( 0x0fff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msmouse_device_base, input_changed, 0)
 
 	PORT_START("Y")
 	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0fff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msmouse_device_base, input_changed, nullptr)
+	PORT_BIT( 0x0fff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msmouse_device_base, input_changed, 0)
 INPUT_PORTS_END
 
 
@@ -105,8 +105,8 @@ INPUT_PORTS_START(logitech)
 	PORT_INCLUDE(msft)
 
 	PORT_MODIFY("BTN")
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msmouse_device_base, input_changed, nullptr)
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msmouse_device_base, input_changed, nullptr)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msmouse_device_base, input_changed, 0)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msmouse_device_base, input_changed, 0)
 INPUT_PORTS_END
 
 
@@ -115,24 +115,24 @@ INPUT_PORTS_START(wheel)
 
 	PORT_START("WHEEL")
 	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0fff, 0x00, IPT_DIAL_V ) PORT_SENSITIVITY(10) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msmouse_device_base, input_changed, nullptr)
+	PORT_BIT( 0x0fff, 0x00, IPT_DIAL_V ) PORT_SENSITIVITY(10) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msmouse_device_base, input_changed, 0)
 INPUT_PORTS_END
 
 
 INPUT_PORTS_START(msystems)
 	PORT_START("BTN")
 	PORT_BIT( 0xfff8, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msystems_device_base, input_changed, nullptr)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msystems_device_base, input_changed, nullptr)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msystems_device_base, input_changed, nullptr)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msystems_device_base, input_changed, 0)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msystems_device_base, input_changed, 0)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msystems_device_base, input_changed, 0)
 
 	PORT_START("X")
 	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0fff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msystems_device_base, input_changed, nullptr)
+	PORT_BIT( 0x0fff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msystems_device_base, input_changed, 0)
 
 	PORT_START("Y")
 	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0fff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msystems_device_base, input_changed, nullptr)
+	PORT_BIT( 0x0fff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msystems_device_base, input_changed, 0)
 INPUT_PORTS_END
 
 
@@ -141,7 +141,7 @@ INPUT_PORTS_START(rotatable)
 
 	PORT_START("ROT")
 	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0fff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(10) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msystems_device_base, input_changed, nullptr)
+	PORT_BIT( 0x0fff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(10) PORT_CHANGED_MEMBER(DEVICE_SELF, hle_msystems_device_base, input_changed, 0)
 INPUT_PORTS_END
 
 

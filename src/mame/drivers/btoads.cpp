@@ -73,13 +73,13 @@ READ16_MEMBER( btoads_state::main_sound_r )
 }
 
 
-CUSTOM_INPUT_MEMBER( btoads_state::main_to_sound_r )
+READ_LINE_MEMBER( btoads_state::main_to_sound_r )
 {
 	return m_main_to_sound_ready;
 }
 
 
-CUSTOM_INPUT_MEMBER( btoads_state::sound_to_main_r )
+READ_LINE_MEMBER( btoads_state::sound_to_main_r )
 {
 	return m_sound_to_main_ready;
 }
@@ -191,7 +191,6 @@ void btoads_state::main_map(address_map &map)
 	map(0xa8800000, 0xa8ffffff).nopw();
 	map(0xb0000000, 0xb03fffff).rw(FUNC(btoads_state::vram_bg0_r), FUNC(btoads_state::vram_bg0_w)).share("vram_bg0");
 	map(0xb4000000, 0xb43fffff).rw(FUNC(btoads_state::vram_bg1_r), FUNC(btoads_state::vram_bg1_w)).share("vram_bg1");
-	map(0xc0000000, 0xc00003ff).rw(m_maincpu, FUNC(tms34020_device::io_register_r), FUNC(tms34020_device::io_register_w));
 	map(0xfc000000, 0xffffffff).rom().region("user1", 0);
 }
 
@@ -265,9 +264,9 @@ static INPUT_PORTS_START( btoads )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, btoads_state, sound_to_main_r, nullptr)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(btoads_state, sound_to_main_r)
 	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, btoads_state, main_to_sound_r, nullptr)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(btoads_state, main_to_sound_r)
 	PORT_BIT( 0xff7c, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SW1")
@@ -317,7 +316,7 @@ void btoads_state::btoads(machine_config &config)
 	Z80(config, m_audiocpu, SOUND_CLOCK/4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &btoads_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &btoads_state::sound_io_map);
-	m_audiocpu->set_periodic_int(FUNC(btoads_state::irq0_line_assert), attotime::from_ticks(32768, SOUND_CLOCK/4));
+	m_audiocpu->set_periodic_int(FUNC(btoads_state::irq0_line_assert), attotime::from_hz(SOUND_CLOCK/4/32768));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

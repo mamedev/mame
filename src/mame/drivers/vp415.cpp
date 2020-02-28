@@ -496,7 +496,7 @@ void vp415_state::vp415(machine_config &config)
 	m_datacpu->set_addrmap(AS_PROGRAM, &vp415_state::z80_program_map);
 	m_datacpu->set_addrmap(AS_IO, &vp415_state::z80_io_map);
 
-	I8041(config, m_datamcu, XTAL(4'000'000)); // Verified on schematic
+	I8041A(config, m_datamcu, XTAL(4'000'000)); // Verified on schematic
 	m_datamcu->p1_in_cb().set(FUNC(vp415_state::data_mcu_port1_r));
 	m_datamcu->p1_out_cb().set(FUNC(vp415_state::data_mcu_port1_w));
 	m_datamcu->p2_in_cb().set(FUNC(vp415_state::data_mcu_port2_r));
@@ -515,7 +515,7 @@ void vp415_state::vp415(machine_config &config)
 	m_ctrlcpu->set_addrmap(AS_PROGRAM, &vp415_state::ctrl_program_map);
 	m_ctrlcpu->set_addrmap(AS_IO, &vp415_state::ctrl_io_map);
 
-	I8041(config, m_ctrlmcu, XTAL(4'000'000)); // Verified on schematic
+	I8041A(config, m_ctrlmcu, XTAL(4'000'000)); // Verified on schematic
 	m_ctrlmcu->p1_in_cb().set(FUNC(vp415_state::ctrl_mcu_port1_r));
 	m_ctrlmcu->p1_out_cb().set(FUNC(vp415_state::ctrl_mcu_port1_w));
 	m_ctrlmcu->p2_in_cb().set(FUNC(vp415_state::ctrl_mcu_port2_r));

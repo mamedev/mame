@@ -180,442 +180,63 @@ Protection Notes:
 #include "machine/r2crypt.h"
 
 #include "debugger.h"
-#include "screen.h"
 #include "speaker.h"
 
 
+void raiden2_state::common_save_state()
+{
+	save_item(NAME(m_bg_bank));
+	save_item(NAME(m_fg_bank));
+	save_item(NAME(m_mid_bank));
+	save_item(NAME(m_tx_bank));
+	save_item(NAME(m_tilemap_enable));
+	save_item(NAME(m_prg_bank));
+	save_item(NAME(m_cop_bank));
+
+	save_item(NAME(m_sprite_prot_x));
+	save_item(NAME(m_sprite_prot_y));
+	save_item(NAME(m_dst1));
+	save_item(NAME(m_cop_spr_maxx));
+	save_item(NAME(m_cop_spr_off));
+
+	save_item(NAME(m_scrollvals));
+
+	save_item(NAME(m_sprite_prot_src_addr));
+}
+
 void raiden2_state::machine_start()
 {
-	save_item(NAME(bg_bank));
-	save_item(NAME(fg_bank));
-	save_item(NAME(mid_bank));
-	save_item(NAME(tx_bank));
-	save_item(NAME(raiden2_tilemap_enable));
-	save_item(NAME(prg_bank));
-	save_item(NAME(cop_bank));
+	common_save_state();
 
-	save_item(NAME(sprite_prot_x));
-	save_item(NAME(sprite_prot_y));
-	save_item(NAME(dst1));
-	save_item(NAME(cop_spr_maxx));
-	save_item(NAME(cop_spr_off));
-
-
-	save_item(NAME(scrollvals));
-
-	save_item(NAME(sprite_prot_src_addr));
-
+	save_item(NAME(m_sprcpt_adr));
+	save_item(NAME(m_sprcpt_idx));
+	save_item(NAME(m_sprcpt_val));
+	save_item(NAME(m_sprcpt_flags1));
+	save_item(NAME(m_sprcpt_flags2));
+	save_item(NAME(m_sprcpt_data_1));
+	save_item(NAME(m_sprcpt_data_2));
+	save_item(NAME(m_sprcpt_data_3));
+	save_item(NAME(m_sprcpt_data_4));
 }
 
 /*
-uint16_t raiden2_state::rps()
+u16 raiden2_state::rps()
 {
     return m_maincpu->state_int(NEC_CS);
 }
 
-uint16_t raiden2_state::rpc()
+u16 raiden2_state::rpc()
 {
     return m_maincpu->state_int(NEC_IP);
 }
 */
 
-int cnt=0, ccol = -1;
 
-
-WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
+void raiden2_state::combine32(u32 *val, offs_t offset, u16 data, u16 mem_mask)
 {
-	//  map(0x0d000, 0x0d7ff).ram().w(FUNC(raiden2_state::raiden2_background_w)).share("back_data");
-	//  map(0x0d800, 0x0dfff).ram().w(FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
-	//  map(0x0e000, 0x0e7ff).ram().w(FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
-	//  map(0x0e800, 0x0f7ff).ram().w(FUNC(raiden2_state::raiden2_text_w).share("text_data");
-
-	if (offset < 0x800 / 2)
-	{
-		raiden2_background_w(space, offset, data, 0xffff);
-	}
-	else if (offset < 0x1000 /2)
-	{
-		offset -= 0x800 / 2;
-		raiden2_foreground_w(space, offset, data, 0xffff);
-	}
-	else if (offset < 0x1800/2)
-	{
-		offset -= 0x1000 / 2;
-		raiden2_midground_w(space, offset, data, 0xffff);
-	}
-	else if (offset < 0x2800/2)
-	{
-		offset -= 0x1800 / 2;
-		raiden2_text_w(space, offset, data, 0xffff);
-	}
-}
-
-
-
-void raiden2_state::combine32(uint32_t *val, int offset, uint16_t data, uint16_t mem_mask)
-{
-	uint16_t *dest = (uint16_t *)val + BYTE_XOR_LE(offset);
+	u16 *dest = (u16 *)val + BYTE_XOR_LE(offset);
 	COMBINE_DATA(dest);
 }
-
-
-
-/* SPRITE DRAWING (move to video file) */
-
-void raiden2_state::draw_sprites(const rectangle &cliprect)
-{
-	uint16_t *source = sprites + (0x1000/2)-4;
-	sprite_buffer.fill(0xf, cliprect);
-
-	gfx_element *gfx = m_gfxdecode->gfx(2);
-
-	/*
-	  00 fhhh Fwww ppcc cccc   h = height f=flipy w = width F = flipx p = priority c = color
-	  02 nnnn nnnn nnnn nnnn   n = tileno
-	  04 xxxx xxxx xxxx xxxx   x = xpos
-	  06 yyyy yyyy yyyy yyyy   y = ypos
-	 */
-
-	while( source >= sprites ){
-		int tile_number = source[1];
-		int sx = source[2];
-		int sy = source[3];
-		int colr;
-		int xtiles, ytiles;
-		int ytlim, xtlim;
-		int xflip, yflip;
-		int xstep, ystep;
-		int pri;
-
-		ytlim = (source[0] >> 12) & 0x7;
-		xtlim = (source[0] >> 8 ) & 0x7;
-
-		xflip = (source[0] >> 15) & 0x1;
-		yflip = (source[0] >> 11) & 0x1;
-
-		colr = source[0] & 0x3f;
-
-		pri = (source[0] >> 6) & 3;
-
-		colr |= pri << (14-4);
-
-		ytlim += 1;
-		xtlim += 1;
-
-		xstep = 16;
-		ystep = 16;
-
-		if (xflip)
-		{
-			ystep = -16;
-			sy += ytlim*16-16;
-		}
-
-		if (yflip)
-		{
-			xstep = -16;
-			sx += xtlim*16-16;
-		}
-
-		for (xtiles = 0; xtiles < xtlim; xtiles++)
-		{
-			for (ytiles = 0; ytiles < ytlim; ytiles++)
-			{
-				/* note this wraparound handling could be wrong if some of the COP maths is wrong */
-
-#define ZEROTEAM_MASK_X (0x1ff) // causes a blank square in the corner of zero team, but otherwise the thrusters of the ship in the r2 intro are clipped, using 0x8000 as a sign bit instead of this logic works for r2, but not zero team
-#define ZEROTEAM_MASK_Y (0x1ff)
-
-
-
-						gfx->transpen(
-						sprite_buffer,
-						cliprect,
-						tile_number,
-						colr,
-						yflip,xflip,
-						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y, 15);
-
-
-						gfx->transpen(
-						sprite_buffer,
-						cliprect,
-						tile_number,
-						colr,
-						yflip,xflip,
-						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y, 15);
-
-
-						gfx->transpen(
-						sprite_buffer,
-						cliprect,
-						tile_number,
-						colr,
-						yflip,xflip,
-						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200, 15);
-
-
-						gfx->transpen(
-						sprite_buffer,
-						cliprect,
-						tile_number,
-						colr,
-						yflip,xflip,
-						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200, 15);
-
-
-				tile_number++;
-			}
-		}
-
-		source -= 4;
-	}
-
-}
-
-/* VIDEO RELATED WRITE HANDLERS (move to video file) */
-
-WRITE16_MEMBER(raiden2_state::raiden2_background_w)
-{
-	COMBINE_DATA(&m_back_data[offset]);
-	background_layer->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(raiden2_state::raiden2_midground_w)
-{
-	COMBINE_DATA(&m_mid_data[offset]);
-	midground_layer->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(raiden2_state::raiden2_foreground_w)
-{
-	COMBINE_DATA(&m_fore_data[offset]);
-	foreground_layer->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(raiden2_state::raiden2_text_w)
-{
-	COMBINE_DATA(&m_text_data[offset]);
-	text_layer->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(raiden2_state::tilemap_enable_w)
-{
-	COMBINE_DATA(&raiden2_tilemap_enable);
-}
-
-WRITE16_MEMBER(raiden2_state::tile_scroll_w)
-{
-	tilemap_t *tm = nullptr;
-	switch(offset/2) {
-	case 0: tm = background_layer; break;
-	case 1: tm = midground_layer; break;
-	case 2: tm = foreground_layer; break;
-	default: assert(0); break;
-	}
-
-	COMBINE_DATA(scrollvals + offset);
-	data = scrollvals[offset];
-
-	if(offset & 1)
-		tm->set_scrolly(0, data);
-	else
-		tm->set_scrollx(0, data);
-}
-
-WRITE16_MEMBER(raiden2_state::tile_bank_01_w)
-{
-	if(ACCESSING_BITS_0_7) {
-		int new_bank;
-		new_bank = 0 | ((data & 1)<<1);
-		if(new_bank != bg_bank) {
-			bg_bank = new_bank;
-			background_layer->mark_all_dirty();
-		}
-
-		new_bank = 1 | (data & 2);
-		if(new_bank != mid_bank) {
-			mid_bank = new_bank;
-			midground_layer->mark_all_dirty();
-		}
-	}
-}
-
-READ16_MEMBER(raiden2_state::cop_tile_bank_2_r)
-{
-	return cop_bank;
-}
-
-WRITE16_MEMBER(raiden2_state::cop_tile_bank_2_w)
-{
-	COMBINE_DATA(&cop_bank);
-
-	if(ACCESSING_BITS_8_15) {
-		int new_bank = 4 | (data >> 14);
-		if(new_bank != fg_bank) {
-			fg_bank = new_bank;
-			foreground_layer->mark_all_dirty();
-		}
-	}
-}
-
-WRITE16_MEMBER(raiden2_state::raidendx_cop_bank_2_w)
-{
-	COMBINE_DATA(&cop_bank);
-
-	int new_bank = 4 | ((cop_bank >> 4) & 3);
-	if(new_bank != fg_bank) {
-		fg_bank = new_bank;
-		foreground_layer->mark_all_dirty();
-	}
-
-	/* mainbank2 coming from 6c9 ? */
-	int bb = cop_bank >> 12;
-	membank("mainbank1")->set_entry(bb + 16);
-	membank("mainbank2")->set_entry(3);
-}
-
-
-
-/* TILEMAP RELATED (move to video file) */
-
-TILE_GET_INFO_MEMBER(raiden2_state::get_back_tile_info)
-{
-	int tile = m_back_data[tile_index];
-	int color = (tile >> 12) | (0 << 4);
-
-	tile = (tile & 0xfff) | (bg_bank << 12);
-
-	SET_TILE_INFO_MEMBER(1,tile+0x0000,color,0);
-}
-
-TILE_GET_INFO_MEMBER(raiden2_state::get_mid_tile_info)
-{
-	int tile = m_mid_data[tile_index];
-	int color = (tile >> 12) | (2 << 4);
-
-	tile = (tile & 0xfff) | (mid_bank << 12);
-
-	SET_TILE_INFO_MEMBER(1,tile,color,0);
-}
-
-TILE_GET_INFO_MEMBER(raiden2_state::get_fore_tile_info)
-{
-	int tile = m_fore_data[tile_index];
-	int color = (tile >> 12) | (1 << 4);
-
-	tile = (tile & 0xfff) | (fg_bank << 12);
-
-	SET_TILE_INFO_MEMBER(1,tile,color,0);
-}
-
-TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
-{
-	int tile = m_text_data[tile_index];
-	int color = (tile>>12)&0xf;
-
-	tile &= 0xfff;
-
-	SET_TILE_INFO_MEMBER(0,tile + tx_bank * 0x1000,color,0);
-}
-
-/* VIDEO START (move to video file) */
-
-
-VIDEO_START_MEMBER(raiden2_state,raiden2)
-{
-	m_back_data = make_unique_clear<uint16_t[]>(0x800/2);
-	m_fore_data = make_unique_clear<uint16_t[]>(0x800/2);
-	m_mid_data = make_unique_clear<uint16_t[]>(0x800/2);
-	m_text_data = make_unique_clear<uint16_t[]>(0x1000/2);
-	m_palette_data = make_unique_clear<uint16_t[]>(0x1000/2);
-	m_palette->basemem().set(m_palette_data.get(), 0x1000/2 * sizeof(uint16_t), 16, ENDIANNESS_LITTLE, 2);
-
-	save_pointer(NAME(m_back_data), 0x800/2);
-	save_pointer(NAME(m_fore_data), 0x800/2);
-	save_pointer(NAME(m_mid_data), 0x800/2);
-	save_pointer(NAME(m_text_data), 0x1000/2);
-	save_pointer(NAME(m_palette_data), 0x1000/2);
-
-	text_layer       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
-	background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
-	midground_layer  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_mid_tile_info),this),  TILEMAP_SCAN_ROWS, 16,16, 32,32 );
-	foreground_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_fore_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
-}
-
-/* screen_update_raiden2 (move to video file) */
-
-void raiden2_state::blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind16 &source, int layer)
-{
-	if(layer == -1)
-		return;
-
-	const pen_t *pens = &m_palette->pen(0);
-	layer <<= 14;
-	for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
-		const uint16_t *src = &source.pix16(y, cliprect.min_x);
-		uint32_t *dst = &bitmap.pix32(y, cliprect.min_x);
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
-			uint16_t val = *src++;
-			if((val & 0xc000) == layer && (val & 0x000f) != 0x000f) {
-				val &= 0x07ff;
-
-				if(blend_active[val])
-					*dst = alpha_blend_r32(*dst, pens[val], 0x7f);
-				else
-					*dst = pens[val];
-			}
-			dst++;
-		}
-	}
-}
-
-void raiden2_state::tilemap_draw_and_blend(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tilemap)
-{
-	tilemap->draw(screen, tile_buffer, cliprect, 0, 0);
-	blend_layer(bitmap, cliprect, tile_buffer, 0);
-}
-
-uint32_t raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(m_palette->black_pen(), cliprect);
-	if (!(raiden2_tilemap_enable & 16)) {
-		draw_sprites(cliprect);
-
-		blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[0]);
-	}
-
-	if (!(raiden2_tilemap_enable & 1))
-		tilemap_draw_and_blend(screen, bitmap, cliprect, background_layer);
-
-	if (!(raiden2_tilemap_enable & 16))
-		blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[1]);
-
-	if (!(raiden2_tilemap_enable & 2))
-		tilemap_draw_and_blend(screen, bitmap, cliprect, midground_layer);
-
-	if (!(raiden2_tilemap_enable & 16))
-		blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[2]);
-
-	if (!(raiden2_tilemap_enable & 4))
-		tilemap_draw_and_blend(screen, bitmap, cliprect, foreground_layer);
-
-	if (!(raiden2_tilemap_enable & 16))
-		blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[3]);
-
-	if (!(raiden2_tilemap_enable & 8))
-		tilemap_draw_and_blend(screen, bitmap, cliprect, text_layer);
-
-	if (!(raiden2_tilemap_enable & 16))
-		blend_layer(bitmap, cliprect, sprite_buffer, cur_spri[4]);
-
-	if (machine().input().code_pressed_once(KEYCODE_Z))
-		if (m_raiden2cop) m_raiden2cop->dump_table();
-
-	return 0;
-}
-
-
 
 
 /*************************************
@@ -624,101 +245,100 @@ uint32_t raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_rgb3
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(raiden2_state::raiden2_interrupt)
+INTERRUPT_GEN_MEMBER(raiden2_state::interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0/4);   /* VBL */
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0/4);   /* V30 - VBL */
 }
-
-
 
 
 // Sprite encryption key upload
 
-static uint32_t sprcpt_adr, sprcpt_idx;
-
-static uint16_t sprcpt_flags2;
-static uint32_t sprcpt_val[2], sprcpt_flags1;
-static uint32_t sprcpt_data_1[0x100], sprcpt_data_2[0x40], sprcpt_data_3[6], sprcpt_data_4[4];
-
-void raiden2_state::sprcpt_init(void)
+void raiden2_state::sprcpt_init()
 {
-	memset(sprcpt_data_1, 0, sizeof(sprcpt_data_1));
-	memset(sprcpt_data_2, 0, sizeof(sprcpt_data_2));
-	memset(sprcpt_data_3, 0, sizeof(sprcpt_data_3));
-	memset(sprcpt_data_4, 0, sizeof(sprcpt_data_4));
+	std::fill(std::begin(m_sprcpt_data_1), std::end(m_sprcpt_data_1), 0);
+	std::fill(std::begin(m_sprcpt_data_2), std::end(m_sprcpt_data_2), 0);
+	std::fill(std::begin(m_sprcpt_data_3), std::end(m_sprcpt_data_3), 0);
+	std::fill(std::begin(m_sprcpt_data_4), std::end(m_sprcpt_data_4), 0);
 
-	sprcpt_adr = 0;
-	sprcpt_idx = 0;
+	m_sprcpt_adr = 0;
+	m_sprcpt_idx = 0;
 }
 
 
-WRITE16_MEMBER(raiden2_state::sprcpt_adr_w)
+void raiden2_state::sprcpt_adr_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	combine32(&sprcpt_adr, offset, data, mem_mask);
+	combine32(&m_sprcpt_adr, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_data_1_w)
+void raiden2_state::sprcpt_data_1_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	combine32(sprcpt_data_1+sprcpt_adr, offset, data, mem_mask);
+	combine32(m_sprcpt_data_1+m_sprcpt_adr, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_data_2_w)
+void raiden2_state::sprcpt_data_2_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	combine32(sprcpt_data_2+sprcpt_adr, offset, data, mem_mask);
+	combine32(m_sprcpt_data_2+m_sprcpt_adr, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_data_3_w)
+void raiden2_state::sprcpt_data_3_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	combine32(sprcpt_data_3+sprcpt_idx, offset, data, mem_mask);
-	if(offset == 1) {
-		sprcpt_idx ++;
-		if(sprcpt_idx == 6)
-			sprcpt_idx = 0;
+	combine32(m_sprcpt_data_3+m_sprcpt_idx, offset, data, mem_mask);
+	if (offset == 1)
+	{
+		m_sprcpt_idx ++;
+		if (m_sprcpt_idx == 6)
+			m_sprcpt_idx = 0;
 	}
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_data_4_w)
+void raiden2_state::sprcpt_data_4_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	combine32(sprcpt_data_4+sprcpt_idx, offset, data, mem_mask);
-	if(offset == 1) {
-		sprcpt_idx ++;
-		if(sprcpt_idx == 4)
-			sprcpt_idx = 0;
+	combine32(m_sprcpt_data_4+m_sprcpt_idx, offset, data, mem_mask);
+	if (offset == 1)
+	{
+		m_sprcpt_idx ++;
+		if (m_sprcpt_idx == 4)
+			m_sprcpt_idx = 0;
 	}
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_val_1_w)
+void raiden2_state::sprcpt_val_1_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	combine32(sprcpt_val+0, offset, data, mem_mask);
+	combine32(m_sprcpt_val+0, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_val_2_w)
+void raiden2_state::sprcpt_val_2_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	combine32(sprcpt_val+1, offset, data, mem_mask);
+	combine32(m_sprcpt_val+1, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_flags_1_w)
+void raiden2_state::sprcpt_flags_1_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	combine32(&sprcpt_flags1, offset, data, mem_mask);
-	if(offset == 1) {
+	combine32(&m_sprcpt_flags1, offset, data, mem_mask);
+	if (offset == 1)
+	{
 		// bit 31: 1 = allow write on sprcpt data
 
-		if(!(sprcpt_flags1 & 0x80000000U)) {
+		if (!(m_sprcpt_flags1 & 0x80000000U))
+		{
 			// Upload finished
-			if(1) {
+			if (1)
+			{
 				int i;
-				logerror("sprcpt_val 1: %08x\n", sprcpt_val[0]);
-				logerror("sprcpt_val 2: %08x\n", sprcpt_val[1]);
+				logerror("sprcpt_val 1: %08x\n", m_sprcpt_val[0]);
+				logerror("sprcpt_val 2: %08x\n", m_sprcpt_val[1]);
 				logerror("sprcpt_data 1:\n");
-				for(i=0; i<0x100; i++) {
-					logerror(" %08x", sprcpt_data_1[i]);
-					if(!((i+1) & 7))
+				for (i=0; i<0x100; i++)
+				{
+					logerror(" %08x", m_sprcpt_data_1[i]);
+					if (!((i+1) & 7))
 						logerror("\n");
 				}
 				logerror("sprcpt_data 2:\n");
-				for(i=0; i<0x40; i++) {
-					logerror(" %08x", sprcpt_data_2[i]);
-					if(!((i+1) & 7))
+				for (i=0; i<0x40; i++)
+				{
+					logerror(" %08x", m_sprcpt_data_2[i]);
+					if (!((i+1) & 7))
 						logerror("\n");
 				}
 			}
@@ -726,169 +346,162 @@ WRITE16_MEMBER(raiden2_state::sprcpt_flags_1_w)
 	}
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_flags_2_w)
+void raiden2_state::sprcpt_flags_2_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&sprcpt_flags2);
-	if(offset == 0) {
-		if(sprcpt_flags2 & 0x8000) {
+	COMBINE_DATA(&m_sprcpt_flags2);
+	if (offset == 0)
+	{
+		if (m_sprcpt_flags2 & 0x8000)
+		{
 			// Reset decryption -> redo it
 		}
 	}
 }
 
 
-
-void raiden2_state::common_reset()
+void raiden2_state::bank_reset(int bgbank, int fgbank, int midbank, int txbank)
 {
-	bg_bank=0;
-	fg_bank=6;
-	mid_bank=1;
-	tx_bank = 0;
+	m_bg_bank  = bgbank;
+	m_fg_bank  = fgbank;
+	m_mid_bank = midbank;
+	m_tx_bank  = txbank;
 }
 
 MACHINE_RESET_MEMBER(raiden2_state,raiden2)
 {
-	common_reset();
+	bank_reset(0,6,1,0);
 	sprcpt_init();
 
-	membank("mainbank1")->set_entry(2);
-	membank("mainbank2")->set_entry(3);
+	m_mainbank[0]->set_entry(2);
+	m_mainbank[1]->set_entry(3);
 
-	prg_bank = 0;
+	m_prg_bank = 0;
 	//cop_init();
 }
 
 MACHINE_RESET_MEMBER(raiden2_state,raidendx)
 {
-	common_reset();
+	bank_reset(0,6,1,0);
 	sprcpt_init();
 
-	membank("mainbank1")->set_entry(16);
-	membank("mainbank2")->set_entry(3);
+	m_mainbank[0]->set_entry(16);
+	m_mainbank[1]->set_entry(3);
 
-	prg_bank = 0x08;
+	m_prg_bank = 0x08;
 
 	//cop_init();
 }
 
 MACHINE_RESET_MEMBER(raiden2_state,zeroteam)
 {
-	bg_bank = 0;
-	fg_bank = 2;
-	mid_bank = 1;
-	tx_bank = 0;
+	bank_reset(0,2,1,0);
 	sprcpt_init();
 
-	membank("mainbank1")->set_entry(2);
-	membank("mainbank2")->set_entry(3);
+	m_mainbank[0]->set_entry(2);
+	m_mainbank[1]->set_entry(3);
 
-	prg_bank = 0;
+	m_prg_bank = 0;
 	//cop_init();
 }
 
 MACHINE_RESET_MEMBER(raiden2_state,xsedae)
 {
-	bg_bank = 0;
-	fg_bank = 2;
-	mid_bank = 1;
-	tx_bank = 0;
+	bank_reset(0,2,1,0);
 	sprcpt_init();
 }
 
-WRITE16_MEMBER(raiden2_state::raiden2_bank_w)
+void raiden2_state::raiden2_bank_w(u8 data)
 {
-	if(ACCESSING_BITS_8_15) {
-		int bb = (~data >> 15) & 1;
-		logerror("select bank %d %04x\n", (data >> 15) & 1, data);
-		membank("mainbank1")->set_entry(bb*2);
-		membank("mainbank2")->set_entry(bb*2+1);
-		prg_bank = ((data >> 15) & 1);
-	}
+	int bb = (~data >> 7) & 1;
+	logerror("select bank %d %04x\n", (data >> 7) & 1, data);
+	m_mainbank[0]->set_entry(bb*2);
+	m_mainbank[1]->set_entry(bb*2+1);
+	m_prg_bank = ((data >> 7) & 1);
 }
 
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_x_w)
+void raiden2_state::sprite_prot_x_w(u16 data)
 {
-	sprite_prot_x = data;
-	//popmessage("%04x %04x",sprite_prot_x,sprite_prot_y);
+	m_sprite_prot_x = data;
+	//popmessage("%04x %04x",m_sprite_prot_x,m_sprite_prot_y);
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_y_w)
+void raiden2_state::sprite_prot_y_w(u16 data)
 {
-	sprite_prot_y = data;
-	//popmessage("%04x %04x",sprite_prot_x,sprite_prot_y);
+	m_sprite_prot_y = data;
+	//popmessage("%04x %04x",m_sprite_prot_x,m_sprite_prot_y);
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_src_seg_w)
+void raiden2_state::sprite_prot_src_seg_w(u16 data)
 {
-	sprite_prot_src_addr[0] = data;
+	m_sprite_prot_src_addr[0] = data;
 }
 
-READ16_MEMBER(raiden2_state::sprite_prot_src_seg_r)
+u16 raiden2_state::sprite_prot_src_seg_r()
 {
-	return sprite_prot_src_addr[0];
+	return m_sprite_prot_src_addr[0];
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
+void raiden2_state::sprite_prot_src_w(address_space &space, u16 data)
 {
-	sprite_prot_src_addr[1] = data;
-	uint32_t src = (sprite_prot_src_addr[0]<<4)+sprite_prot_src_addr[1];
+	m_sprite_prot_src_addr[1] = data;
+	u32 src = (m_sprite_prot_src_addr[0]<<4)+m_sprite_prot_src_addr[1];
 
-	int x = int16_t((space.read_dword(src+0x08) >> 16) - (sprite_prot_x));
-	int y = int16_t((space.read_dword(src+0x04) >> 16) - (sprite_prot_y));
+	int x = int16_t((space.read_dword(src+0x08) >> 16) - (m_sprite_prot_x));
+	int y = int16_t((space.read_dword(src+0x04) >> 16) - (m_sprite_prot_y));
 
-	uint16_t head1 = space.read_word(src+cop_spr_off);
-	uint16_t head2 = space.read_word(src+cop_spr_off+2);
+	u16 head1 = space.read_word(src+m_cop_spr_off);
+	u16 head2 = space.read_word(src+m_cop_spr_off+2);
 
 	int w = (((head1 >> 8 ) & 7) + 1) << 4;
 	int h = (((head1 >> 12) & 7) + 1) << 4;
 
-	uint16_t flag = x-w/2 > -w && x-w/2 < cop_spr_maxx+w && y-h/2 > -h && y-h/2 < 256+h ? 1 : 0;
+	u16 flag = x-w/2 > -w && x-w/2 < m_cop_spr_maxx+w && y-h/2 > -h && y-h/2 < 256+h ? 1 : 0;
 
 	flag = (space.read_word(src) & 0xfffe) | flag;
 	space.write_word(src, flag);
 
-	if(flag & 1)
+	if (flag & 1)
 	{
-		space.write_word(dst1,   head1);
-		space.write_word(dst1+2, head2);
-		space.write_word(dst1+4, x-w/2);
-		space.write_word(dst1+6, y-h/2);
+		space.write_word(m_dst1,   head1);
+		space.write_word(m_dst1+2, head2);
+		space.write_word(m_dst1+4, x-w/2);
+		space.write_word(m_dst1+6, y-h/2);
 
-		dst1 += 8;
+		m_dst1 += 8;
 	}
-	//printf("[%08x] %08x %08x %04x %04x\n",src,dx,dy,dst1,dst2);
+	//printf("[%08x] %08x %08x %04x %04x\n",src,dx,dy,m_dst1,dst2);
 	//machine().debug_break();
 }
 
-READ16_MEMBER(raiden2_state::sprite_prot_dst1_r)
+u16 raiden2_state::sprite_prot_dst1_r()
 {
-	return dst1;
+	return m_dst1;
 }
 
-READ16_MEMBER(raiden2_state::sprite_prot_maxx_r)
+u16 raiden2_state::sprite_prot_maxx_r()
 {
-	return cop_spr_maxx;
+	return m_cop_spr_maxx;
 }
 
-READ16_MEMBER(raiden2_state::sprite_prot_off_r)
+u16 raiden2_state::sprite_prot_off_r()
 {
-	return cop_spr_off;
+	return m_cop_spr_off;
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_dst1_w)
+void raiden2_state::sprite_prot_dst1_w(u16 data)
 {
-	dst1 = data;
+	m_dst1 = data;
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_maxx_w)
+void raiden2_state::sprite_prot_maxx_w(u16 data)
 {
-	cop_spr_maxx = data;
+	m_cop_spr_maxx = data;
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_off_w)
+void raiden2_state::sprite_prot_off_w(u16 data)
 {
-	cop_spr_off = data;
+	m_cop_spr_off = data;
 }
 
 /* MEMORY MAPS */
@@ -949,8 +562,8 @@ void raiden2_state::raiden2_cop_mem(address_map &map)
 	map(0x006c2, 0x006c3).rw(FUNC(raiden2_state::sprite_prot_src_seg_r), FUNC(raiden2_state::sprite_prot_src_seg_w));
 	map(0x006c4, 0x006c5).nopw(); // constant value written along with 0x6c0
 	map(0x006c6, 0x006c7).w(FUNC(raiden2_state::sprite_prot_dst1_w));
-	map(0x006ca, 0x006cb).w(FUNC(raiden2_state::raiden2_bank_w));
-	map(0x006cc, 0x006cd).w(FUNC(raiden2_state::tile_bank_01_w));
+	map(0x006cb, 0x006cb).w(FUNC(raiden2_state::raiden2_bank_w));
+	map(0x006cc, 0x006cc).w(FUNC(raiden2_state::tile_bank_01_w));
 	map(0x006ce, 0x006cf).w(FUNC(raiden2_state::sprcpt_flags_2_w));
 	map(0x006d8, 0x006d9).w(FUNC(raiden2_state::sprite_prot_x_w));
 	map(0x006da, 0x006db).w(FUNC(raiden2_state::sprite_prot_y_w));
@@ -970,11 +583,11 @@ void raiden2_state::raiden2_mem(address_map &map)
 
 	raiden2_cop_mem(map);
 
-	map(0x0068e, 0x0068f).nopw(); //irq ack / sprite buffering?
+	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 
-	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
-							   [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-							   [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x00700, 0x0071f).lrw8(
+							   NAME([this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+							   NAME([this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 
 	map(0x00740, 0x00741).portr("DSW");
 	map(0x00744, 0x00745).portr("P1_P2");
@@ -982,11 +595,11 @@ void raiden2_state::raiden2_mem(address_map &map)
 
 	map(0x00800, 0x0bfff).ram();
 
-	map(0x0c000, 0x0cfff).ram().share("sprites");
-	map(0x0d000, 0x0d7ff).ram(); // .w(FUNC(raiden2_state::raiden2_background_w)).share("back_data");
-	map(0x0d800, 0x0dfff).ram(); // .w(FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
-	map(0x0e000, 0x0e7ff).ram(); // .w(FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
-	map(0x0e800, 0x0f7ff).ram(); // .w(FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	map(0x0c000, 0x0cfff).ram().share("spriteram");
+	map(0x0d000, 0x0d7ff).ram(); // .w(FUNC(raiden2_state::background_w)).share("back_data");
+	map(0x0d800, 0x0dfff).ram(); // .w(FUNC(raiden2_state::foreground_w).share("fore_data");
+	map(0x0e000, 0x0e7ff).ram(); // .w(FUNC(raiden2_state::midground_w).share("mid_data");
+	map(0x0e800, 0x0f7ff).ram(); // .w(FUNC(raiden2_state::text_w).share("text_data");
 	map(0x0f800, 0x0ffff).ram(); /* Stack area */
 
 	map(0x10000, 0x1efff).ram();
@@ -1015,11 +628,11 @@ void raiden2_state::zeroteam_mem(address_map &map)
 	map(0x00470, 0x00471).nopw();
 	map(0x006cc, 0x006cd).nopw();
 
-	map(0x0068e, 0x0068f).nopw(); // irq ack / sprite buffering?
+	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 
-	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
-							   [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-							   [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x00700, 0x0071f).lrw8(
+							   NAME([this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+							   NAME([this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 
 	map(0x00740, 0x00741).portr("DSW");
 	map(0x00744, 0x00745).portr("P1_P2");
@@ -1027,12 +640,12 @@ void raiden2_state::zeroteam_mem(address_map &map)
 	map(0x0074c, 0x0074d).portr("SYSTEM");
 
 	map(0x00800, 0x0b7ff).ram();
-	map(0x0b800, 0x0bfff).ram(); // .w(FUNC(raiden2_state::raiden2_background_w)).share("back_data");
-	map(0x0c000, 0x0c7ff).ram(); // .w(FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
-	map(0x0c800, 0x0cfff).ram(); // .w(FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
-	map(0x0d000, 0x0dfff).ram(); // .w(FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	map(0x0b800, 0x0bfff).ram(); // .w(FUNC(raiden2_state::background_w)).share("back_data");
+	map(0x0c000, 0x0c7ff).ram(); // .w(FUNC(raiden2_state::foreground_w).share("fore_data");
+	map(0x0c800, 0x0cfff).ram(); // .w(FUNC(raiden2_state::midground_w).share("mid_data");
+	map(0x0d000, 0x0dfff).ram(); // .w(FUNC(raiden2_state::text_w).share("text_data");
 	map(0x0e000, 0x0efff).ram(); // .w("palette", palette_device, write).share("palette");
-	map(0x0f000, 0x0ffff).ram().share("sprites");
+	map(0x0f000, 0x0ffff).ram().share("spriteram");
 	map(0x10000, 0x1ffff).ram();
 
 	map(0x20000, 0x2ffff).bankr("mainbank1");
@@ -1049,11 +662,11 @@ void raiden2_state::xsedae_mem(address_map &map)
 	map(0x00470, 0x00471).nopw();
 	map(0x006cc, 0x006cd).nopw();
 
-	map(0x0068e, 0x0068f).nopw(); //irq ack / sprite buffering?
+	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 
-	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
-							   [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-							   [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x00700, 0x0071f).lrw8(
+							   NAME([this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+							   NAME([this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 
 	map(0x00740, 0x00741).portr("DSW");
 	map(0x00744, 0x00745).portr("P1_P2");
@@ -1061,12 +674,12 @@ void raiden2_state::xsedae_mem(address_map &map)
 	map(0x0074c, 0x0074d).portr("SYSTEM");
 
 	map(0x00800, 0x0b7ff).ram();
-	map(0x0b800, 0x0bfff).ram(); // .w(FUNC(raiden2_state::raiden2_background_w)).share("back_data");
-	map(0x0c000, 0x0c7ff).ram(); // .w(FUNC(raiden2_state::raiden2_foreground_w).share("fore_data");
-	map(0x0c800, 0x0cfff).ram(); // .w(FUNC(raiden2_state::raiden2_midground_w).share("mid_data");
-	map(0x0d000, 0x0dfff).ram(); // .w(FUNC(raiden2_state::raiden2_text_w).share("text_data");
+	map(0x0b800, 0x0bfff).ram(); // .w(FUNC(raiden2_state::background_w)).share("back_data");
+	map(0x0c000, 0x0c7ff).ram(); // .w(FUNC(raiden2_state::foreground_w).share("fore_data");
+	map(0x0c800, 0x0cfff).ram(); // .w(FUNC(raiden2_state::midground_w).share("mid_data");
+	map(0x0d000, 0x0dfff).ram(); // .w(FUNC(raiden2_state::text_w).share("text_data");
 	map(0x0e000, 0x0efff).ram(); // .w("palette", palette_device, write).share("palette");
-	map(0x0f000, 0x0ffff).ram().share("sprites");
+	map(0x0f000, 0x0ffff).ram().share("spriteram");
 
 	map(0x10000, 0x1ffff).ram();
 
@@ -1373,10 +986,10 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout raiden2_charlayout =
+static const gfx_layout charlayout =
 {
 	8,8,
-	4096,
+	RGN_FRAC(1,1),
 	4,
 	{ 8,12,0,4 },
 	{ 3,2,1,0,19,18,17,16 },
@@ -1385,10 +998,10 @@ static const gfx_layout raiden2_charlayout =
 };
 
 
-static const gfx_layout raiden2_tilelayout =
+static const gfx_layout tilelayout =
 {
 	16,16,
-	0x8000,
+	RGN_FRAC(1,1),
 	4,
 	{ 8,12,0,4 },
 	{
@@ -1401,10 +1014,10 @@ static const gfx_layout raiden2_tilelayout =
 	128*8
 };
 
-static const gfx_layout raiden2_spritelayout =
+static const gfx_layout spritelayout =
 {
 	16, 16,
-	0x10000,
+	RGN_FRAC(1,1),
 	4,
 	{ STEP4(0,1) },
 	{ 4, 0, 12, 8, 20, 16, 28, 24, 36, 32, 44, 40, 52, 48, 60, 56 },
@@ -1412,10 +1025,10 @@ static const gfx_layout raiden2_spritelayout =
 	16*16*4
 };
 
-static GFXDECODE_START( gfx_raiden2 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, raiden2_charlayout,   0x700, 128 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, raiden2_tilelayout,   0x400, 128 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, raiden2_spritelayout, 0x000, 4096 ) // really 128, but using the top bits for priority
+GFXDECODE_START( raiden2_state::gfx_raiden2 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0x700, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,   0x400, 0x30 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout, 0x000, 0x40 ) // really 128, but using the top bits for priority
 GFXDECODE_END
 
 
@@ -1426,7 +1039,7 @@ void raiden2_state::raiden2(machine_config &config)
 	/* basic machine hardware */
 	V30(config, m_maincpu, XTAL(32'000'000)/2); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden2_state::raiden2_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(raiden2_state::raiden2_interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(raiden2_state::interrupt));
 
 	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,raiden2)
 
@@ -1438,21 +1051,21 @@ void raiden2_state::raiden2(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_raw(XTAL(32'000'000)/4, 512, 0, 40*8, 282, 0, 30*8); /* hand-tuned to match ~55.47 */
-	screen.set_screen_update(FUNC(raiden2_state::screen_update_raiden2));
+	screen.set_screen_update(FUNC(raiden2_state::screen_update));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_raiden2);
+	GFXDECODE(config, m_gfxdecode, m_palette, raiden2_state::gfx_raiden2);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
 	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
 
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	RAIDEN2COP(config, m_raiden2cop, 0);
 	m_raiden2cop->videoramout_cb().set(FUNC(raiden2_state::m_videoram_private_w));
 	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
-
-	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1476,17 +1089,6 @@ void raiden2_state::raiden2(machine_config &config)
 	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 }
 
-void raiden2_state::xsedae(machine_config &config)
-{
-	raiden2(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &raiden2_state::xsedae_mem);
-
-	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,xsedae)
-
-	subdevice<screen_device>("screen")->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	subdevice<screen_device>("screen")->set_visarea(0*8, 40*8-1, 0, 32*8-1);
-}
-
 void raiden2_state::raidendx(machine_config &config)
 {
 	raiden2(config);
@@ -1500,7 +1102,7 @@ void raiden2_state::zeroteam(machine_config &config)
 	/* basic machine hardware */
 	V30(config, m_maincpu, XTAL(32'000'000)/2); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden2_state::zeroteam_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(raiden2_state::raiden2_interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(raiden2_state::interrupt));
 
 	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,zeroteam)
 
@@ -1513,21 +1115,21 @@ void raiden2_state::zeroteam(machine_config &config)
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 //  screen.set_refresh_hz(55.47);    /* verified on pcb */
 	screen.set_raw(XTAL(32'000'000)/4, 512, 0, 40*8, 282, 0, 32*8); /* hand-tuned to match ~55.47 */
-	screen.set_screen_update(FUNC(raiden2_state::screen_update_raiden2));
+	screen.set_screen_update(FUNC(raiden2_state::screen_update));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_raiden2);
+	GFXDECODE(config, m_gfxdecode, m_palette, raiden2_state::gfx_raiden2);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
 	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
 
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	RAIDEN2COP(config, m_raiden2cop, 0);
 	m_raiden2cop->videoramout_cb().set(FUNC(raiden2_state::m_videoram_private_w));
 	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
-
-	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1545,6 +1147,24 @@ void raiden2_state::zeroteam(machine_config &config)
 	m_seibu_sound->set_rombank_tag("seibu_bank1");
 	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
+}
+
+void raiden2_state::xsedae(machine_config &config)
+{
+	zeroteam(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &raiden2_state::xsedae_mem);
+
+	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,xsedae)
+
+	subdevice<screen_device>("screen")->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+
+	ym2151_device &ymsnd(YM2151(config.replace(), "ymsnd", XTAL(28'636'363)/8));
+	ymsnd.irq_handler().set(m_seibu_sound, FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
+
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 }
 
 /* ROM LOADING */
@@ -1673,9 +1293,6 @@ ROM_START( raiden2 )
 	ROM_LOAD16_BYTE("prg1.u0212",   0x000001, 0x80000, CRC(4609b5f2) SHA1(272d2aa75b8ea4d133daddf42c4fc9089093df2e) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "snd.u1110",  0x000000, 0x08000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -1684,25 +1301,30 @@ ROM_START( raiden2 )
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu7.u0724", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
-	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered mask ROM */
-	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered mask ROM */
-
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu6.u1017", 0x00000, 0x40000, CRC(fb0fca23) SHA1(4b2217b121a66c5ab6015537609cf908ffedaf86) ) /* PCB silkscreened VOICE1 */
 
-	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
-	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered mask ROM */
-
+	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 ROM_START( raiden2g )
@@ -1712,9 +1334,6 @@ ROM_START( raiden2g )
 	ROM_LOAD16_BYTE("prg1g.u0212",   0x000001, 0x80000, CRC(41001d2e) SHA1(06bece44c081ecbb3b8dac5c515e30c5a5ffc1bf) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "snd.u1110",  0x000000, 0x08000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -1723,25 +1342,30 @@ ROM_START( raiden2g )
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu7.u0724", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 - sldh w/raiden2u */
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
-	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered mask ROM */
-	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered mask ROM */
-
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu6.u1017", 0x00000, 0x40000, CRC(fb0fca23) SHA1(4b2217b121a66c5ab6015537609cf908ffedaf86) ) /* PCB silkscreened VOICE1 */
 
-	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
-	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered mask ROM */
-
+	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 /*
@@ -1769,8 +1393,6 @@ ROM_START( raiden2hk )
 	ROM_LOAD16_BYTE("rom2e.u0212",  0x000001, 0x80000, CRC(458d619c) SHA1(842bf0eeb5d192a6b188f4560793db8dad697683) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered mask ROM */
 
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu5.u1110",  0x000000, 0x08000, CRC(8f130589) SHA1(e58c8beaf9f27f063ffbcb0ab4600123c25ce6f3) ) // sldh w/raiden2u
@@ -1780,25 +1402,30 @@ ROM_START( raiden2hk )
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu7.u0724", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
-	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered mask ROM */
-	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered mask ROM */
-
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu6.u1017", 0x00000, 0x40000, CRC(fb0fca23) SHA1(4b2217b121a66c5ab6015537609cf908ffedaf86) ) /* PCB silkscreened VOICE1 */
 
-	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
-	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered mask ROM */
-
+	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 /*
@@ -1843,9 +1470,6 @@ ROM_START( raiden2j )
 	ROM_LOAD16_BYTE("rom2j.u0212",  0x000001, 0x80000, CRC(e4e4fb4c) SHA1(7ccf33fe9a1cddf0c7e80d7ed66d615a828b3bb9) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu5.u1110",  0x000000, 0x08000, CRC(8f130589) SHA1(e58c8beaf9f27f063ffbcb0ab4600123c25ce6f3) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -1854,25 +1478,30 @@ ROM_START( raiden2j )
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu7.u0724", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
-	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered mask ROM */
-	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered mask ROM */
-
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu6.u1017", 0x00000, 0x40000, CRC(fb0fca23) SHA1(4b2217b121a66c5ab6015537609cf908ffedaf86) ) /* PCB silkscreened VOICE1 - sldh w/raiden2u */
 
-	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
-	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered mask ROM */
-
+	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 ROM_START( raiden2sw ) // original board with serial # 0008307
@@ -1882,9 +1511,6 @@ ROM_START( raiden2sw ) // original board with serial # 0008307
 	ROM_LOAD16_BYTE("seibu_2.u0212",   0x000001, 0x80000, CRC(59abc2ec) SHA1(45f2dbd2dd46f5da07dae0dc486772f8e61f4c43) ) // sldh w/raiden2eu
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu_5.u1110",  0x000000, 0x08000, CRC(c2028ba2) SHA1(f6a9322b669ff82dea6ecf52ad3bd5d0901cce1b) ) // 99.993896% match
 	ROM_CONTINUE(0x10000,0x8000)
@@ -1893,25 +1519,30 @@ ROM_START( raiden2sw ) // original board with serial # 0008307
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu_7.u0724", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
-	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered mask ROM */
-	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered mask ROM */
-
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(fb0fca23) SHA1(4b2217b121a66c5ab6015537609cf908ffedaf86) ) /* PCB silkscreened VOICE1 */
 
-	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
-	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered mask ROM */
-
+	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 ROM_START( raiden2f ) // original board with serial # 12476 that matches raiden2nl set except the region and Audio CPU
@@ -1921,9 +1552,6 @@ ROM_START( raiden2f ) // original board with serial # 12476 that matches raiden2
 	ROM_LOAD16_BYTE("seibu2_u0212.bin",  0x000001, 0x80000, CRC(8dcd8a8d) SHA1(be0681d5867d8b4f5fb78946a896d89827a71e8e) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu5_u1110.bin",  0x000000, 0x08000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )   // == raiden2
 	ROM_CONTINUE(0x10000,0x8000)
@@ -1932,25 +1560,30 @@ ROM_START( raiden2f ) // original board with serial # 12476 that matches raiden2
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "7_u0724.bin", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
-	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered mask ROM */
-	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered mask ROM */
-
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "6_u1017.bin", 0x00000, 0x40000, CRC(fb0fca23) SHA1(4b2217b121a66c5ab6015537609cf908ffedaf86) ) /* PCB silkscreened VOICE1 */
 
-	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
-	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered mask ROM */
-
+	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 ROM_START( raiden2nl )
@@ -1960,9 +1593,6 @@ ROM_START( raiden2nl )
 	ROM_LOAD16_BYTE("2_u0212.bin",  0x000001, 0x80000, CRC(88829c08) SHA1(ecdfbafeeffcd009bbc4cf5bf797bcd4b5bfcf50) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5_u1110.bin",  0x000000, 0x08000, CRC(8f130589) SHA1(e58c8beaf9f27f063ffbcb0ab4600123c25ce6f3) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -1971,25 +1601,30 @@ ROM_START( raiden2nl )
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "7_u0724.bin", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
-	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered mask ROM */
-	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered mask ROM */
-
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "6_u1017.bin", 0x00000, 0x40000, CRC(fb0fca23) SHA1(4b2217b121a66c5ab6015537609cf908ffedaf86) ) /* PCB silkscreened VOICE1 */
 
-	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
-	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered mask ROM */
-
+	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 ROM_START( raiden2u )
@@ -1999,9 +1634,6 @@ ROM_START( raiden2u )
 	ROM_LOAD16_BYTE("2.u0212",  0x000001, 0x80000, CRC(2a14b112) SHA1(84cd9891b5be0b71b2bae3487ad38bed3045305e) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu5.u1110", 0x000000, 0x08000, CRC(6d362472) SHA1(a362e500bb9492affde1f7a4da7e08dd16e755df) ) // sldh w/raiden2hk
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2010,25 +1642,30 @@ ROM_START( raiden2u )
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu7.u0724", 0x000000, 0x020000, CRC(c7aa4d00) SHA1(9ad99d3891598c1ea3f12318400ee67666da56dd) ) // sldh w/raiden2g
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
-	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered mask ROM */
-	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered mask ROM */
-
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu6.u1017", 0x00000, 0x40000, CRC(fab9f8e4) SHA1(b1eff154c4f766b2d272ac6a57f8d54c9e39e3bb) ) // sldh w/raiden2j
 
-	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
-	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered mask ROM */
-
+	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 ROM_START( raiden2i )
@@ -2038,9 +1675,6 @@ ROM_START( raiden2i )
 	ROM_LOAD16_BYTE("seibu2.u0212",   0x000001, 0x80000, CRC(28d5365f) SHA1(21efe29c2d373229c2ff302d86e59c2c94fa6d03) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu5.c.u1110",  0x000000, 0x08000, CRC(5db9f922) SHA1(8257aab98657fe44df19d2a48d85fcf65b3d98c6) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2049,25 +1683,30 @@ ROM_START( raiden2i )
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu7.u0724", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
-	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered mask ROM */
-	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered mask ROM */
-
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu6.u1017", 0x00000, 0x40000, CRC(fb0fca23) SHA1(4b2217b121a66c5ab6015537609cf908ffedaf86) ) /* PCB silkscreened VOICE1 */
 
-	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
-	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered mask ROM */
-
+	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 
@@ -2078,9 +1717,6 @@ ROM_START( raiden2k )
 	ROM_LOAD16_BYTE("k2.u0212",   0x000001, 0x80000, CRC(59a744ca) SHA1(5fdd7dd4049f944df23371e2e2d3133b10c66ab8) ) // hand-written
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "snd.u1110",  0x000000, 0x08000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2089,25 +1725,30 @@ ROM_START( raiden2k )
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu7.u0724", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
-	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered mask ROM */
-	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered mask ROM */
-
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu6.u1017", 0x00000, 0x40000, CRC(fb0fca23) SHA1(4b2217b121a66c5ab6015537609cf908ffedaf86) ) /* PCB silkscreened VOICE1 */
 
-	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
-	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered mask ROM */
-
+	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 /*
@@ -2134,9 +1775,6 @@ ROM_START( raiden2e )
 	ROM_LOAD16_BYTE("r2_prg_1.u0212",   0x000001, 0x80000, CRC(509ade43) SHA1(7cdee7bb00a6a1c7899d10b96385d54c261f6f5a) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "r2_snd.u1110", 0x000000, 0x08000, CRC(6bad0a3e) SHA1(eb7ae42353e1984cd60b569c26cdbc3b025a7da6) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2145,25 +1783,30 @@ ROM_START( raiden2e )
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "r2_fx0.u0724",   0x000000, 0x020000, CRC(c709bdf6) SHA1(0468d90412b7590d67eaadc0a5e3537cd5e73943) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
-	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered mask ROM */
-	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered mask ROM */
-
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "r2_voi1.u1017", 0x00000, 0x40000, CRC(488d050f) SHA1(fde2fd64fea6bc39e1a42885d21d362bc6be2ac2) )
 
-	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
-	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered mask ROM */
-
+	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 ROM_START( raiden2ea )
@@ -2173,9 +1816,6 @@ ROM_START( raiden2ea )
 	ROM_LOAD16_BYTE("r2.2.u0212",  0x000001, 0x80000, CRC(bf7577ec) SHA1(98576af78760b8aef1ef3efe1ba963977c89d225) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "r2.5.u1110", 0x000000, 0x08000, CRC(f5f835af) SHA1(5be82ebc582d0da919e9ae1b9e64528bb295efc7) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2184,25 +1824,30 @@ ROM_START( raiden2ea )
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "r2.7.u0724", 0x000000, 0x020000, CRC(c7aa4d00) SHA1(9ad99d3891598c1ea3f12318400ee67666da56dd) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
-	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered mask ROM */
-	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered mask ROM */
-
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "r2.6.u1017", 0x00000, 0x40000, CRC(fab9f8e4) SHA1(b1eff154c4f766b2d272ac6a57f8d54c9e39e3bb) )
 
-	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
-	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered mask ROM */
-
+	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 ROM_START( raiden2eu ) // same as raiden2ea, different region
@@ -2212,9 +1857,6 @@ ROM_START( raiden2eu ) // same as raiden2ea, different region
 	ROM_LOAD16_BYTE("seibu_2.u0212",  0x000001, 0x80000, CRC(beb71ddb) SHA1(471399ead1cdc27ac2a1139f9616f828efd14626) ) // sldh w/raiden2sw
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "r2.5.u1110", 0x000000, 0x08000, CRC(f5f835af) SHA1(5be82ebc582d0da919e9ae1b9e64528bb295efc7) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2223,25 +1865,30 @@ ROM_START( raiden2eu ) // same as raiden2ea, different region
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "r2.7.u0724", 0x000000, 0x020000, CRC(c7aa4d00) SHA1(9ad99d3891598c1ea3f12318400ee67666da56dd) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
-	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered mask ROM */
-	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered mask ROM */
-
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "r2.6.u1017", 0x00000, 0x40000, CRC(fab9f8e4) SHA1(b1eff154c4f766b2d272ac6a57f8d54c9e39e3bb) )
 
-	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
-	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered mask ROM */
-
+	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 ROM_START( raiden2eua ) // sort of a mixture of raiden2e easy set with voice ROM of raiden2ea and 2f and a unique sound ROM
@@ -2250,13 +1897,10 @@ ROM_START( raiden2eua ) // sort of a mixture of raiden2e easy set with voice ROM
 	ROM_RELOAD(0x100000, 0x40000)
 	ROM_LOAD32_BYTE("seibu__2.27c2001.u1211",   0x000001, 0x40000, CRC(bb6ecf2a) SHA1(d4f628e9d0ed2897654f05a8a2541e1ed3faf8dd) )
 	ROM_RELOAD(0x100001, 0x40000)
-	ROM_LOAD32_BYTE("seibu__3.27c2001.u129",   0x000002, 0x40000, CRC(6a01d52c) SHA1(983b914592ab9d9c058bebb5bccf5c882e2b82de) )
+	ROM_LOAD32_BYTE("seibu__3.27c2001.u129",    0x000002, 0x40000, CRC(6a01d52c) SHA1(983b914592ab9d9c058bebb5bccf5c882e2b82de) )
 	ROM_RELOAD(0x100002, 0x40000)
 	ROM_LOAD32_BYTE("seibu__4.27c2001.u1212",   0x000003, 0x40000, CRC(e54bfa37) SHA1(4fabb23503fd9245a10cded15a6880415ca5ffd7) )
 	ROM_RELOAD(0x100003, 0x40000)
-
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered mask ROM */
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu__5.27c512.u1110", 0x000000, 0x08000, CRC(6d362472) SHA1(a362e500bb9492affde1f7a4da7e08dd16e755df) )
@@ -2266,40 +1910,42 @@ ROM_START( raiden2eua ) // sort of a mixture of raiden2e easy set with voice ROM
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu__7.fx0.27c210.u0724", 0x000000, 0x020000, CRC(c7aa4d00) SHA1(9ad99d3891598c1ea3f12318400ee67666da56dd) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
-	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered mask ROM */
-	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered mask ROM */
-
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu__6.voice1.23c020.u1017", 0x00000, 0x40000, CRC(fab9f8e4) SHA1(b1eff154c4f766b2d272ac6a57f8d54c9e39e3bb) )
 
-	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
-	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered mask ROM */
-
+	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 ROM_START( raiden2eg ) // this is the same code revision as raiden2eua but a german region
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v30 main cpu */
-	ROM_LOAD32_BYTE("raiden_2_1.bin",   0x000000, 0x40000, CRC(ed1514e3) SHA1(296125bfe3c4f3033f7aa319dd8554bc978c4a00) )
+	ROM_LOAD32_BYTE("raiden_2_1.u1210",   0x000000, 0x40000, CRC(ed1514e3) SHA1(296125bfe3c4f3033f7aa319dd8554bc978c4a00) )
 	ROM_RELOAD(0x100000, 0x40000)
-	ROM_LOAD32_BYTE("raiden_2_2.bin",   0x000001, 0x40000, CRC(bb6ecf2a) SHA1(d4f628e9d0ed2897654f05a8a2541e1ed3faf8dd) )
+	ROM_LOAD32_BYTE("raiden_2_2.u1211",   0x000001, 0x40000, CRC(bb6ecf2a) SHA1(d4f628e9d0ed2897654f05a8a2541e1ed3faf8dd) )
 	ROM_RELOAD(0x100001, 0x40000)
-	ROM_LOAD32_BYTE("raiden_2_3.bin",   0x000002, 0x40000, CRC(6a01d52c) SHA1(983b914592ab9d9c058bebb5bccf5c882e2b82de) )
+	ROM_LOAD32_BYTE("raiden_2_3.u129",    0x000002, 0x40000, CRC(6a01d52c) SHA1(983b914592ab9d9c058bebb5bccf5c882e2b82de) )
 	ROM_RELOAD(0x100002, 0x40000)
-	ROM_LOAD32_BYTE("raiden_2_4.bin",   0x000003, 0x40000, CRC(81273f33) SHA1(074cedf44cc5286649cc101bce0b48d40234e472) )
+	ROM_LOAD32_BYTE("raiden_2_4.u1212",   0x000003, 0x40000, CRC(81273f33) SHA1(074cedf44cc5286649cc101bce0b48d40234e472) )
 	ROM_RELOAD(0x100003, 0x40000)
-
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered mask ROM */
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "raiden_2_5.bin", 0x000000, 0x08000, CRC(6d362472) SHA1(a362e500bb9492affde1f7a4da7e08dd16e755df) )
@@ -2309,36 +1955,83 @@ ROM_START( raiden2eg ) // this is the same code revision as raiden2eua but a ger
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "raiden_2_7.bin", 0x000000, 0x020000, CRC(c7aa4d00) SHA1(9ad99d3891598c1ea3f12318400ee67666da56dd) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
-	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered mask ROM */
-	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered mask ROM */
-
-	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered mask ROM */
-	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered mask ROM */
-
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "raiden_2_6.bin", 0x00000, 0x40000, CRC(fab9f8e4) SHA1(b1eff154c4f766b2d272ac6a57f8d54c9e39e3bb) )
 
-	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
-	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered mask ROM */
-
+	// Common Raiden II PALs below
 	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
+ROM_END
+
+ROM_START( raiden2eup )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* v30 main cpu */
+	ROM_LOAD32_BYTE("prg0 11-16.u1210",   0x000000, 0x40000, CRC(0a68a400) SHA1(7b3baae086ea9604af29eabde358da358d43591f) )
+	ROM_RELOAD(0x100000, 0x40000)
+	ROM_LOAD32_BYTE("prg1 11-16.u1211",   0x000001, 0x40000, CRC(45a01ebe) SHA1(8b114198130ead8a70cc64b195fba5a3507ff6cb) )
+	ROM_RELOAD(0x100001, 0x40000)
+	ROM_LOAD32_BYTE("prg2 11-16.u129",    0x000002, 0x40000, CRC(9a6e33d7) SHA1(fadaec486cd4163d4b8f41aac171baaac3505e30) )
+	ROM_RELOAD(0x100002, 0x40000)
+	ROM_LOAD32_BYTE("prg3a 11-16.u1212",  0x000003, 0x40000, CRC(42ce511b) SHA1(59f199cb52cb315ddea0373b978541b8efeb57a3) )
+	ROM_RELOAD(0x100003, 0x40000)
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_LOAD( "sound 11-12.bin", 0x000000, 0x08000, CRC(4fac206c) SHA1(47b78b2efe88729df07033a8674ba203cdf2e44c) )
+	ROM_CONTINUE(0x10000,0x8000)
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
+	ROM_LOAD( "fix.bin", 0x000000, 0x020000, CRC(6a6fa0de) SHA1(4e2ba9e84f5f5684b480e6d7f86bfc08ac9f5337) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "pcm 11-11.bin", 0x00000, 0x40000, CRC(c541c729) SHA1(23f0b454d8d813bfcdb831ee5a8547178892231f) )
+
+	// Common Raiden II PALs below
+	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
+
+	// Common Raiden II soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) )
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) )
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) )
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 ROM_END
 
 ROM_START( raiden2dx ) // this set is very weird, it's Raiden II on a Raiden DX board, I'm assuming for now that it uses Raiden DX graphics, but could be wrong.
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v30 main cpu */
-	ROM_LOAD32_BYTE("u1210.bin", 0x000000, 0x80000, CRC(413241e0) SHA1(50fa501db91412baea474a8faf8ad483f3a119c7) )
+	ROM_LOAD32_BYTE("u1210.bin",      0x000000, 0x80000, CRC(413241e0) SHA1(50fa501db91412baea474a8faf8ad483f3a119c7) )
 	ROM_LOAD32_BYTE("prg1_u1211.bin", 0x000001, 0x80000, CRC(93491f56) SHA1(2239980fb7267906e4c3985703c2dc2932b23705) )
-	ROM_LOAD32_BYTE("u129.bin",  0x000002, 0x80000, CRC(e0932b6c) SHA1(04f1ca885d220e802023042438f63e40e4106696) )
-	ROM_LOAD32_BYTE("u1212.bin", 0x000003, 0x80000, CRC(505423f4) SHA1(d8e65580deec05dd84c4cf3074cb690e3764c625) )
-
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.6s",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
+	ROM_LOAD32_BYTE("u129.bin",       0x000002, 0x80000, CRC(e0932b6c) SHA1(04f1ca885d220e802023042438f63e40e4106696) )
+	ROM_LOAD32_BYTE("u1212.bin",      0x000003, 0x80000, CRC(505423f4) SHA1(d8e65580deec05dd84c4cf3074cb690e3764c625) )
 
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "u1110.bin",  0x000000, 0x08000,  CRC(b8ad8fe7) SHA1(290896f811f717ef6e3ec2152d4db98a9fe9b310) )
@@ -2349,6 +2042,13 @@ ROM_START( raiden2dx ) // this set is very weird, it's Raiden II on a Raiden DX 
 	//ROM_LOAD( "fx0_u0724.bin",    0x000000,   0x020000,   CRC(ded3c718) SHA1(c722ec45cd1b2dab23aac14e9113e0e9697830d3) ) // bad dump
 	ROM_LOAD( "7_u0724.bin", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
 
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "dx_6.3b",   0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
+
+	// Common Raiden DX(!) soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.6s",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
+
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "dx_back1.1s",   0x000000, 0x200000, CRC(90970355) SHA1(d71d57cd550a800f583550365102adb7b1b779fc) )
 	ROM_LOAD( "dx_back2.2s",   0x200000, 0x200000, CRC(5799af3e) SHA1(85d6532abd769da77bcba70bd2e77915af40f987) )
@@ -2358,9 +2058,6 @@ ROM_START( raiden2dx ) // this set is very weird, it's Raiden II on a Raiden DX 
 	ROM_LOAD32_WORD( "obj2",        0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
 	ROM_LOAD32_WORD( "dx_obj3.4k",  0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
 	ROM_LOAD32_WORD( "dx_obj4.6k",  0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
-
-	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
-	ROM_LOAD( "dx_6.3b",   0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
 	ROM_LOAD( "dx_pcm.3a", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Shared with original Raiden 2 */
@@ -2375,9 +2072,6 @@ ROM_START( raidendx )
 	ROM_LOAD32_BYTE("3d.6n",   0x000002, 0x80000, CRC(f0a47e67) SHA1(8cbd21993077b2e01295db6e343cae9e0e4bfefe) )
 	ROM_LOAD32_BYTE("4d.6p",   0x000003, 0x80000, CRC(2a2003e8) SHA1(f239b351759babe4683d16e745a5ac2f3c2ab06b) )
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu_5.u1110",  0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2385,6 +2079,13 @@ ROM_START( raidendx )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu_7.u0724",    0x000000,   0x020000,   CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
+
+	// Common Raiden DX soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "dx_back-1.u075",  0x000000, 0x200000, CRC(90970355) SHA1(d71d57cd550a800f583550365102adb7b1b779fc) )
@@ -2395,9 +2096,6 @@ ROM_START( raidendx )
 	ROM_LOAD32_WORD( "raiden_2_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
 	ROM_LOAD32_WORD( "dx_obj-3.u0837",       0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
 	ROM_LOAD32_WORD( "dx_obj-4.u0836",       0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
-
-	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
-	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
 	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Mask ROM - Shared with original Raiden 2 */
@@ -2410,9 +2108,6 @@ ROM_START( raidendxg )
 	ROM_LOAD32_BYTE("3d.u129",  0x000002, 0x80000, CRC(f0a47e67) SHA1(8cbd21993077b2e01295db6e343cae9e0e4bfefe) )
 	ROM_LOAD32_BYTE("4d.u1212", 0x000003, 0x80000, CRC(6bde6edc) SHA1(c3565a55b858c10659fd9b93b1cd92bc39e6446d) )
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu_5.u1110",  0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2420,6 +2115,13 @@ ROM_START( raidendxg )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu_7.u0724",    0x000000,   0x020000,   CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
+
+	// Common Raiden DX soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "dx_back-1.u075",  0x000000, 0x200000, CRC(90970355) SHA1(d71d57cd550a800f583550365102adb7b1b779fc) )
@@ -2430,9 +2132,6 @@ ROM_START( raidendxg )
 	ROM_LOAD32_WORD( "raiden_2_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
 	ROM_LOAD32_WORD( "dx_obj-3.u0837",       0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
 	ROM_LOAD32_WORD( "dx_obj-4.u0836",       0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
-
-	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
-	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
 	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Mask ROM - Shared with original Raiden 2 */
@@ -2445,9 +2144,6 @@ ROM_START( raidendxpt )
 	ROM_LOAD32_BYTE("seibu_3d.u129",  0x000002, 0x80000, CRC(f0a47e67) SHA1(8cbd21993077b2e01295db6e343cae9e0e4bfefe) )
 	ROM_LOAD32_BYTE("seibu_4d.u1212", 0x000003, 0x80000, CRC(e4fa53ac) SHA1(640257420beba6acaeaf687fde34dd20aef7c41a) )
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu_5.u1110",  0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2455,6 +2151,13 @@ ROM_START( raidendxpt )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu_7.u0724",    0x000000,   0x020000,   CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
+
+	// Common Raiden DX soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "dx_back-1.u075",  0x000000, 0x200000, CRC(90970355) SHA1(d71d57cd550a800f583550365102adb7b1b779fc) )
@@ -2465,9 +2168,6 @@ ROM_START( raidendxpt )
 	ROM_LOAD32_WORD( "raiden_2_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
 	ROM_LOAD32_WORD( "dx_obj-3.u0837",       0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
 	ROM_LOAD32_WORD( "dx_obj-4.u0836",       0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
-
-	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
-	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
 	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Mask ROM - Shared with original Raiden 2 */
@@ -2480,9 +2180,6 @@ ROM_START( raidendxa1 )
 	ROM_LOAD32_BYTE("dx_3h.6n",   0x000002, 0x80000, CRC(6c495bcf) SHA1(fb6153ecc443dabc829dda6f8d11234ad48de88a) )
 	ROM_LOAD32_BYTE("dx_4h.6k",   0x000003, 0x80000, CRC(9ed6335f) SHA1(66975204b120915f23258a431e19dbc017afd912) )
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu_5.u1110",  0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2490,6 +2187,13 @@ ROM_START( raidendxa1 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu_7.u0724",    0x000000,   0x020000,   CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
+
+	// Common Raiden DX soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "dx_back-1.u075",  0x000000, 0x200000, CRC(90970355) SHA1(d71d57cd550a800f583550365102adb7b1b779fc) )
@@ -2500,9 +2204,6 @@ ROM_START( raidendxa1 )
 	ROM_LOAD32_WORD( "raiden_2_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
 	ROM_LOAD32_WORD( "dx_obj-3.u0837",       0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
 	ROM_LOAD32_WORD( "dx_obj-4.u0836",       0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
-
-	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
-	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
 	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Mask ROM - Shared with original Raiden 2 */
@@ -2515,9 +2216,6 @@ ROM_START( raidendxa2 )
 	ROM_LOAD32_BYTE("3d.bin",   0x000002, 0x80000, CRC(b4785576) SHA1(aa5eee7b0c635c6d18a7fc1e037bf570a677dd90) )
 	ROM_LOAD32_BYTE("4d.bin",   0x000003, 0x80000, CRC(5a77f7b4) SHA1(aa757e6308893ca63963170c5b1743de7c7ab034) )
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu_5.u1110",  0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2525,6 +2223,13 @@ ROM_START( raidendxa2 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu_7.u0724",    0x000000,   0x020000,   CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
+
+	// Common Raiden DX soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "dx_back-1.u075",  0x000000, 0x200000, CRC(90970355) SHA1(d71d57cd550a800f583550365102adb7b1b779fc) )
@@ -2535,9 +2240,6 @@ ROM_START( raidendxa2 )
 	ROM_LOAD32_WORD( "raiden_2_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
 	ROM_LOAD32_WORD( "dx_obj-3.u0837",       0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
 	ROM_LOAD32_WORD( "dx_obj-4.u0836",       0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
-
-	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
-	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
 	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Mask ROM - Shared with original Raiden 2 */
@@ -2550,9 +2252,6 @@ ROM_START( raidendxk )
 	ROM_LOAD32_BYTE("rdxj_3.bin",   0x000002, 0x80000, CRC(55ec0e1d) SHA1(6be7f268df51311a817c1c329a578b38abb659ae) )
 	ROM_LOAD32_BYTE("rdxj_4.bin",   0x000003, 0x80000, CRC(f8fb31b4) SHA1(b72fd7cbbebcf3d1b2253c309fcfa60674776467) )
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu_5.u1110",  0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2560,6 +2259,13 @@ ROM_START( raidendxk )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu_7.u0724",    0x000000,   0x020000,   CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
+
+	// Common Raiden DX soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "dx_back-1.u075",  0x000000, 0x200000, CRC(90970355) SHA1(d71d57cd550a800f583550365102adb7b1b779fc) )
@@ -2570,9 +2276,6 @@ ROM_START( raidendxk )
 	ROM_LOAD32_WORD( "raiden_2_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
 	ROM_LOAD32_WORD( "dx_obj-3.u0837",       0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
 	ROM_LOAD32_WORD( "dx_obj-4.u0836",       0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
-
-	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
-	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
 	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Mask ROM - Shared with original Raiden 2 */
@@ -2585,9 +2288,6 @@ ROM_START( raidendxu )
 	ROM_LOAD32_BYTE("3a.u129",  0x000002, 0x80000, CRC(7dbfd73d) SHA1(43cb1dbc3ccbded64fc300c262d1fd528e0391a2) )
 	ROM_LOAD32_BYTE("4a.u1212", 0x000003, 0x80000, CRC(cb41a459) SHA1(532f0ed00a5b50a7537e5f48884d632aa5b92fb0) )
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu_5.u1110",  0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2595,6 +2295,13 @@ ROM_START( raidendxu )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu_7.u0724",    0x000000,   0x020000,   CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
+
+	// Common Raiden DX soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "dx_back-1.u075",  0x000000, 0x200000, CRC(90970355) SHA1(d71d57cd550a800f583550365102adb7b1b779fc) )
@@ -2605,9 +2312,6 @@ ROM_START( raidendxu )
 	ROM_LOAD32_WORD( "raiden_2_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
 	ROM_LOAD32_WORD( "dx_obj-3.u0837",       0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
 	ROM_LOAD32_WORD( "dx_obj-4.u0836",       0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
-
-	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
-	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
 	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Mask ROM - Shared with original Raiden 2 */
@@ -2620,9 +2324,6 @@ ROM_START( raidendxnl )
 	ROM_LOAD32_BYTE("u129_6n.bin",  0x000002, 0x80000, CRC(60f04634) SHA1(50f1b721a017d879838d920cf5d5355aa024e09b) )
 	ROM_LOAD32_BYTE("u1212_6p.bin", 0x000003, 0x80000, CRC(21ec37cc) SHA1(6da629e2bb5bd4c2192156af017148e99e274544) )
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu_5.u1110",  0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2630,6 +2331,13 @@ ROM_START( raidendxnl )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu_7.u0724",    0x000000,   0x020000,   CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
+
+	// Common Raiden DX soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "dx_back-1.u075",  0x000000, 0x200000, CRC(90970355) SHA1(d71d57cd550a800f583550365102adb7b1b779fc) )
@@ -2640,9 +2348,6 @@ ROM_START( raidendxnl )
 	ROM_LOAD32_WORD( "raiden_2_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
 	ROM_LOAD32_WORD( "dx_obj-3.u0837",       0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
 	ROM_LOAD32_WORD( "dx_obj-4.u0836",       0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
-
-	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
-	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
 	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Mask ROM - Shared with original Raiden 2 */
@@ -2655,9 +2360,6 @@ ROM_START( raidendxj )
 	ROM_LOAD32_BYTE("rdxj_3.u129",  0x000002, 0x80000, CRC(e7f08013) SHA1(1f99672d8fdbda847c6552da210c417b21ca78ac) )
 	ROM_LOAD32_BYTE("rdxj_4.u1212", 0x000003, 0x80000, CRC(78037e1f) SHA1(8d9c4188ca808e670e330e70e906bb1d27e36492) )
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu_5.u1110",  0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2665,6 +2367,13 @@ ROM_START( raidendxj )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "rdxj_7.u0724", 0x000000, 0x020000, CRC(ec31fa10) SHA1(e39c9d95699dbeb21e3661d863eee503c9011bbc) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
+
+	// Common Raiden DX soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "dx_back-1.u075",  0x000000, 0x200000, CRC(90970355) SHA1(d71d57cd550a800f583550365102adb7b1b779fc) )
@@ -2675,9 +2384,6 @@ ROM_START( raidendxj )
 	ROM_LOAD32_WORD( "raiden_2_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
 	ROM_LOAD32_WORD( "dx_obj-3.u0837",       0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
 	ROM_LOAD32_WORD( "dx_obj-4.u0836",       0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
-
-	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
-	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
 	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Mask ROM - Shared with original Raiden 2 */
@@ -2690,9 +2396,6 @@ ROM_START( raidendxja )
 	ROM_LOAD32_BYTE("3.bin", 0x000002, 0x80000, CRC(fbab727f) SHA1(5415ff87dd967e52b5cf7d754c046223cfa1147b) )
 	ROM_LOAD32_BYTE("4.bin", 0x000003, 0x80000, CRC(a08d5838) SHA1(ec07770503eefa5f22d30f40e3df2a02813908e4) )
 
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu_5.u1110",  0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2700,6 +2403,13 @@ ROM_START( raidendxja )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "rdxj_7.u0724", 0x000000, 0x020000, CRC(ec31fa10) SHA1(e39c9d95699dbeb21e3661d863eee503c9011bbc) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
+
+	// Common Raiden DX soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "dx_back-1.u075",  0x000000, 0x200000, CRC(90970355) SHA1(d71d57cd550a800f583550365102adb7b1b779fc) )
@@ -2710,9 +2420,6 @@ ROM_START( raidendxja )
 	ROM_LOAD32_WORD( "raiden_2_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
 	ROM_LOAD32_WORD( "dx_obj-3.u0837",       0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
 	ROM_LOAD32_WORD( "dx_obj-4.u0836",       0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
-
-	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
-	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
 	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Mask ROM - Shared with original Raiden 2 */
@@ -2726,9 +2433,6 @@ ROM_START( raidendxch )
 	ROM_LOAD32_BYTE("rdxc_4.u1212", 0x000003, 0x80000, CRC(00071e70) SHA1(8a03ea0e650936e48cdd21ff84132742649920fe) )
 
 	// no other ROMs present with this set, so the ones below could be wrong
-	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
-	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
-
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu_5.u1110",  0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
@@ -2736,6 +2440,13 @@ ROM_START( raidendxch )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu_7.u0724",    0x000000,   0x020000,   CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
+
+	// Common Raiden DX soldered mask ROMs below
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "dx_back-1.u075",  0x000000, 0x200000, CRC(90970355) SHA1(d71d57cd550a800f583550365102adb7b1b779fc) )
@@ -2746,9 +2457,6 @@ ROM_START( raidendxch )
 	ROM_LOAD32_WORD( "raiden_2_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
 	ROM_LOAD32_WORD( "dx_obj-3.u0837",       0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
 	ROM_LOAD32_WORD( "dx_obj-4.u0836",       0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
-
-	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
-	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
 	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Mask ROM - Shared with original Raiden 2 */
@@ -3193,13 +2901,11 @@ ROM_START( xsedae )
 	ROM_LOAD32_WORD( "obj-1.u0811",  0x000000, 0x200000, CRC(6ae993eb) SHA1(d9713c79eacb4b3ce5e82dd3ce39003e3a433d8f) )
 	ROM_LOAD32_WORD( "obj-2.u082",   0x000002, 0x200000, CRC(26c806ee) SHA1(899a76a1b3f933c6f5cb6b5dcdf5b58e1b7e49c6) )
 
-	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x100000, "oki", 0 )   /* ADPCM samples */
 	ROM_LOAD( "9.u105.4a", 0x00000, 0x40000, CRC(a7a0c5f9) SHA1(7882681ac152642aa4f859071f195842068b214b) )
-
-	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASEFF )   /* ADPCM samples */
 ROM_END
 
-const uint16_t raiden2_state::raiden_blended_colors[] = {
+const u16 raiden2_state::raiden_blended_colors[] = {
 	// bridge tunnel entrance shadow
 	0x380,
 
@@ -3247,21 +2953,21 @@ const uint16_t raiden2_state::raiden_blended_colors[] = {
 	0xffff,
 };
 
-void raiden2_state::init_blending(const uint16_t *table)
+void raiden2_state::init_blending(const u16 *table)
 {
-	for(auto & elem : blend_active)
+	for (auto & elem : m_blend_active)
 		elem = false;
-	while(*table != 0xffff)
-		blend_active[*table++] = true;
+	while (*table != 0xffff)
+		m_blend_active[*table++] = true;
 }
 
 void raiden2_state::init_raiden2()
 {
 	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
-	cur_spri = spri;
-	membank("mainbank1")->configure_entries(0, 4, memregion("maincpu")->base(), 0x10000);
-	membank("mainbank2")->configure_entries(0, 4, memregion("maincpu")->base(), 0x10000);
+	m_cur_spri = spri;
+	m_mainbank[0]->configure_entries(0, 4, memregion("maincpu")->base(), 0x10000);
+	m_mainbank[1]->configure_entries(0, 4, memregion("maincpu")->base(), 0x10000);
 	raiden2_decrypt_sprites(machine());
 }
 
@@ -3269,13 +2975,13 @@ void raiden2_state::init_raidendx()
 {
 	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
-	cur_spri = spri;
-	membank("mainbank1")->configure_entries(0, 0x20, memregion("maincpu")->base(), 0x10000);
-	membank("mainbank2")->configure_entries(0, 0x20, memregion("maincpu")->base(), 0x10000);
+	m_cur_spri = spri;
+	m_mainbank[0]->configure_entries(0, 0x20, memregion("maincpu")->base(), 0x10000);
+	m_mainbank[1]->configure_entries(0, 0x20, memregion("maincpu")->base(), 0x10000);
 	raiden2_decrypt_sprites(machine());
 }
 
-const uint16_t raiden2_state::xsedae_blended_colors[] = {
+const u16 raiden2_state::xsedae_blended_colors[] = {
 	0xffff,
 };
 
@@ -3283,11 +2989,11 @@ void raiden2_state::init_xsedae()
 {
 	init_blending(xsedae_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
-	cur_spri = spri;
+	m_cur_spri = spri;
 	/* doesn't have banking */
 }
 
-const uint16_t raiden2_state::zeroteam_blended_colors[] = {
+const u16 raiden2_state::zeroteam_blended_colors[] = {
 	// Player selection
 	0x37e,
 	// Boss spear shadow
@@ -3305,9 +3011,9 @@ void raiden2_state::init_zeroteam()
 {
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
-	cur_spri = spri;
-	membank("mainbank1")->configure_entries(0, 4, memregion("maincpu")->base(), 0x10000);
-	membank("mainbank2")->configure_entries(0, 4, memregion("maincpu")->base(), 0x10000);
+	m_cur_spri = spri;
+	m_mainbank[0]->configure_entries(0, 4, memregion("maincpu")->base(), 0x10000);
+	m_mainbank[1]->configure_entries(0, 4, memregion("maincpu")->base(), 0x10000);
 	zeroteam_decrypt_sprites(machine());
 }
 
@@ -3344,6 +3050,10 @@ GAME( 1993, raiden2e,   raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden
 // code rev with first ROM having checksum ed1514e3 (using 4x program ROM configuration, not 2) would have crc 2abc848c in 2 ROM config, so same rev as above
 GAME( 1993, raiden2eua, raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (easier, US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, raiden2eg,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden II (easier, Germany)", MACHINE_SUPPORTS_SAVE )
+
+// unique revision (4x program ROM configuration)
+GAME( 1993, raiden2eup, raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (easier, US, prototype? 11-16)", MACHINE_SUPPORTS_SAVE ) // program ROMs had 11-16 date
+
 // code rev with first ROM having checksum d7041be4
 GAME( 1993, raiden2ea,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (easier, Japan)", MACHINE_SUPPORTS_SAVE ) // (Region 0x00) - Japan, but the easy sets have no 'FOR USE IN JAPAN ONLY' display even when region is 00
 GAME( 1993, raiden2eu,  raiden2,  raiden2,  raiden2,  raiden2_state, init_raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden II (easier, US set 2)", MACHINE_SUPPORTS_SAVE ) //  ^

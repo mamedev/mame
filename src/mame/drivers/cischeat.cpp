@@ -182,10 +182,11 @@ Cisco Heat.
 #include "includes/cischeat.h"
 
 #include "cpu/m68000/m68000.h"
-#include "sound/ym2151.h"
-#include "sound/okim6295.h"
+#include "machine/adc0804.h"
 #include "machine/jalcrpt.h"
 #include "machine/nvram.h"
+#include "sound/okim6295.h"
+#include "sound/ym2151.h"
 #include "speaker.h"
 
 #include "cischeat.lh"
@@ -524,7 +525,7 @@ WRITE16_MEMBER(cischeat_state::scudhamm_motor_command_w)
 }
 
 
-READ16_MEMBER(cischeat_state::scudhamm_analog_r)
+uint8_t cischeat_state::scudhamm_analog_r()
 {
 	int i=ioport("IN1")->read(),j;
 
@@ -601,7 +602,7 @@ void cischeat_state::scudhamm_map(address_map &map)
 	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));             // Sound
 	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));             //
 	map(0x10001c, 0x10001d).w(FUNC(cischeat_state::scudhamm_enable_w));                                            // ?
-	map(0x100040, 0x100041).r(FUNC(cischeat_state::scudhamm_analog_r)).nopw();                         // A / D
+	map(0x100041, 0x100041).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));                    // A / D
 	map(0x100044, 0x100045).r(FUNC(cischeat_state::scudhamm_motor_pos_r));                                  // Motor Position
 	map(0x100050, 0x100051).r(FUNC(cischeat_state::scudhamm_motor_status_r)).w(FUNC(cischeat_state::scudhamm_motor_command_w));        // Motor Limit Switches
 	map(0x10005c, 0x10005d).portr("IN2");                                                    // 2 x DSW
@@ -622,7 +623,7 @@ WRITE16_MEMBER(cischeat_state::armchmp2_motor_command_w)
 	COMBINE_DATA( &m_scudhamm_motor_command );
 }
 
-READ16_MEMBER(cischeat_state::armchmp2_analog_r)
+uint8_t cischeat_state::armchmp2_analog_r()
 {
 	int armdelta;
 
@@ -684,7 +685,7 @@ void cischeat_state::armchmp2_map(address_map &map)
 	map(0x100000, 0x100001).portr("IN2").w(FUNC(cischeat_state::scudhamm_oki_bank_w));                      // DSW + Sound
 	map(0x100004, 0x100005).portr("IN3");                                                    // DSW
 	map(0x100008, 0x100009).rw(FUNC(cischeat_state::armchmp2_buttons_r), FUNC(cischeat_state::armchmp2_leds_w));                      // Leds + Coin Counters + Buttons + Sensors
-	map(0x10000c, 0x10000d).r(FUNC(cischeat_state::armchmp2_analog_r)).nopw();                         // A / D
+	map(0x10000d, 0x10000d).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));              // A / D
 	map(0x100010, 0x100011).rw(FUNC(cischeat_state::armchmp2_motor_status_r), FUNC(cischeat_state::armchmp2_motor_command_w));        // Motor Limit Switches?
 	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));           // Sound
 	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));           //
@@ -698,7 +699,7 @@ void cischeat_state::armchmp2_map(address_map &map)
 #define RIGHT 0
 #define LEFT  1
 
-WRITE16_MEMBER(cischeat_state::captflag_leds_w)
+WRITE16_MEMBER(captflag_state::leds_w)
 {
 	COMBINE_DATA( &m_captflag_leds );
 	if (ACCESSING_BITS_8_15)
@@ -709,13 +710,13 @@ WRITE16_MEMBER(cischeat_state::captflag_leds_w)
 		m_leds[1] = BIT(data, 13);    // select
 
 		int power = (data & 0x1000);
-		m_captflag_hopper->motor_w(power ? 1 : 0);    // prize motor
+		m_hopper->motor_w(power ? 1 : 0);    // prize motor
 		if (!power)
-			m_captflag_hopper->reset();
+			m_hopper->reset();
 	}
 }
 
-WRITE16_MEMBER(cischeat_state::captflag_oki_bank_w)
+WRITE16_MEMBER(captflag_state::oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -726,32 +727,32 @@ WRITE16_MEMBER(cischeat_state::captflag_oki_bank_w)
 
 // Motors
 
-WRITE16_MEMBER(cischeat_state::captflag_motor_command_right_w)
+WRITE16_MEMBER(captflag_state::motor_command_right_w)
 {
 	// Output check:
 	// e09a up
 	// 80b9 - (when not busy)
 	// 0088 - (when busy)
 	// e0ba down
-	data = COMBINE_DATA( &m_captflag_motor_command[RIGHT] );
-	captflag_motor_move(RIGHT, data);
+	data = COMBINE_DATA( &m_motor_command[RIGHT] );
+	motor_move(RIGHT, data);
 }
-WRITE16_MEMBER(cischeat_state::captflag_motor_command_left_w)
+WRITE16_MEMBER(captflag_state::motor_command_left_w)
 {
 	// Output check:
 	// e0ba up
 	// 8099 - (when not busy)
 	// 0088 - (when busy)
 	// e09a down
-	data = COMBINE_DATA( &m_captflag_motor_command[LEFT] );
-	captflag_motor_move(LEFT, data);
+	data = COMBINE_DATA( &m_motor_command[LEFT] );
+	motor_move(LEFT, data);
 }
 
-void cischeat_state::captflag_motor_move(int side, uint16_t data)
+void captflag_state::motor_move(int side, uint16_t data)
 {
-	uint16_t & pos  = m_captflag_motor_pos[side];
+	uint16_t & pos  = m_motor_pos[side];
 
-	timer_device &dev((side == RIGHT) ? *m_captflag_motor_right : *m_captflag_motor_left);
+	timer_device &dev((side == RIGHT) ? *m_motor_right : *m_motor_left);
 
 //  bool busy = !(dev.time_left() == attotime::never);
 	bool busy = false;
@@ -802,20 +803,22 @@ void cischeat_state::captflag_motor_move(int side, uint16_t data)
 	output().set_value((side == RIGHT) ? "right" : "left", pos);
 }
 
-CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_pos_r)
+template <int N>
+CUSTOM_INPUT_MEMBER(captflag_state::motor_pos_r)
 {
 	const uint8_t pos[4] = {1,0,2,3}; // -> 2,3,1,0 offsets -> 0123
-	return ~pos[m_captflag_motor_pos[(uintptr_t)param]];
+	return ~pos[m_motor_pos[N]];
 }
 
-CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_busy_r)
+template <int N>
+READ_LINE_MEMBER(captflag_state::motor_busy_r)
 {
-//  timer_device & dev = ((side == RIGHT) ? m_captflag_motor_right : m_captflag_motor_left);
+//  timer_device & dev = ((side == RIGHT) ? m_motor_right : m_motor_left);
 //  return (dev.time_left() == attotime::never) ? 0 : 1;
 	return 0;
 }
 
-void cischeat_state::captflag_map(address_map &map)
+void captflag_state::captflag_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                                 // ROM
 	map(0x082000, 0x082005).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
@@ -827,24 +830,24 @@ void cischeat_state::captflag_map(address_map &map)
 	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2"); // Scroll RAM 2
 	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
 	map(0x0f0000, 0x0fffff).ram().share("ram");                                                 // Work RAM + Spriteram
-	map(0x100000, 0x100001).portr("SW1_2").w(FUNC(cischeat_state::captflag_oki_bank_w));                    // 2 x DSW + Sound
-	map(0x100008, 0x100009).portr("Buttons").w(FUNC(cischeat_state::captflag_leds_w));                      // Buttons + Leds
+	map(0x100000, 0x100001).portr("SW1_2").w(FUNC(captflag_state::oki_bank_w));                    // 2 x DSW + Sound
+	map(0x100008, 0x100009).portr("Buttons").w(FUNC(captflag_state::leds_w));                      // Buttons + Leds
 	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));         // Sound
 	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));         //
-	map(0x10001c, 0x10001d).w(FUNC(cischeat_state::scudhamm_enable_w));                                            // ?
+	map(0x10001c, 0x10001d).w(FUNC(captflag_state::scudhamm_enable_w));                                            // ?
 	map(0x100040, 0x100041).portr("SW01");                                                   // DSW + Motor
-	map(0x100044, 0x100045).w(FUNC(cischeat_state::captflag_motor_command_left_w));                                // Motor Command (Left)
-	map(0x100048, 0x100049).w(FUNC(cischeat_state::captflag_motor_command_right_w));                               // Motor Command (Right)
+	map(0x100044, 0x100045).w(FUNC(captflag_state::motor_command_left_w));                                 // Motor Command (Left)
+	map(0x100048, 0x100049).w(FUNC(captflag_state::motor_command_right_w));                                // Motor Command (Right)
 	map(0x100060, 0x10007f).ram().share("nvram");      // NVRAM (even bytes only)
 }
 
-void cischeat_state::captflag_oki1_map(address_map &map)
+void captflag_state::oki1_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
 	map(0x20000, 0x3ffff).bankr("oki1_bank");
 }
 
-void cischeat_state::captflag_oki2_map(address_map &map)
+void captflag_state::oki2_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
 	map(0x20000, 0x3ffff).bankr("oki2_bank");
@@ -1641,7 +1644,7 @@ static INPUT_PORTS_START( armchmp2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 ) // elbow (it always complains though)
 
 	PORT_START("IN1")   // A/D
-	PORT_BIT( 0x00ff, 0x0000, IPT_DIAL ) PORT_MINMAX(0x0000,0x00ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
 	PORT_START("IN2")   // DSW
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
@@ -1752,11 +1755,11 @@ static INPUT_PORTS_START( captflag )
 	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW2:8" )
 
 	PORT_START("SW01")
-	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_pos_r,  (void *)LEFT)
-	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_pos_r,  (void *)RIGHT)
+	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(captflag_state, motor_pos_r<LEFT>)
+	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(captflag_state, motor_pos_r<RIGHT>)
 
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_busy_r, (void *)LEFT)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_busy_r, (void *)RIGHT)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(captflag_state, motor_busy_r<LEFT>)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(captflag_state, motor_busy_r<RIGHT>)
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW01:1,2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
@@ -1792,44 +1795,6 @@ INPUT_PORTS_END
 
 **************************************************************************/
 
-#ifdef UNUSED_VARIABLE
-/* 8x8x4, straightforward layout */
-static const gfx_layout tiles_8x8 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	8*8*4
-};
-#endif
-
-/* 16x16x4, straightforward layout */
-static const gfx_layout tiles_16x16 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP16(0,4) },
-	{ STEP16(0,4*16) },
-	16*16*4
-};
-
-/* 16x16x4, made of four 8x8 tiles */
-static const gfx_layout tiles_16x16_quad =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(8*8*4*0,4), STEP8(8*8*4*2,4) },
-	{ STEP16(0,4*8) },
-	16*16*4
-};
-
 static const uint32_t road_layout_xoffset[64] =
 {
 	STEP16(16*4*0,4),STEP16(16*4*1,4),
@@ -1855,10 +1820,10 @@ static const gfx_layout road_layout =
 **************************************************************************/
 
 static GFXDECODE_START( gfx_bigrun )
-	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x0e00/2 , 16 ) // Scroll 0
-	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x1600/2 , 16 ) // Scroll 1
-	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x3600/2 , 16 ) // Scroll 2
-	GFXDECODE_ENTRY( "sprites", 0, tiles_16x16,0x2800/2 , 64 ) // [0] Sprites
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,   0x0e00/2 , 16 ) // Scroll 0
+	//GFXDECODE_ENTRY( "scroll1", 0, gfx_8x8x4_packed_msb,   0x1600/2 , 16 ) // Scroll 1
+	//GFXDECODE_ENTRY( "scroll2", 0, gfx_8x8x4_packed_msb,   0x3600/2 , 16 ) // Scroll 2
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_msb, 0x2800/2 , 64 ) // [0] Sprites
 	GFXDECODE_ENTRY( "road0", 0, road_layout,0x2000/2 , 64 ) // [1] Road 0
 	GFXDECODE_ENTRY( "road1", 0, road_layout,0x1800/2 , 64 ) // [2] Road 1
 GFXDECODE_END
@@ -1868,10 +1833,10 @@ GFXDECODE_END
 **************************************************************************/
 
 static GFXDECODE_START( gfx_cischeat )
-	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x1c00/2, 32  ) // Scroll 0
-	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x2c00/2, 32  ) // Scroll 1
-	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x6c00/2, 32  ) // Scroll 2
-	GFXDECODE_ENTRY( "sprites", 0, tiles_16x16,0x5000/2, 128 ) // [0] Sprites
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,   0x1c00/2, 32  ) // Scroll 0
+	//GFXDECODE_ENTRY( "scroll1", 0, gfx_8x8x4_packed_msb,   0x2c00/2, 32  ) // Scroll 1
+	//GFXDECODE_ENTRY( "scroll2", 0, gfx_8x8x4_packed_msb,   0x6c00/2, 32  ) // Scroll 2
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_msb, 0x5000/2, 128 ) // [0] Sprites
 	GFXDECODE_ENTRY( "road0", 0, road_layout,0x3800/2, 64  ) // [1] Road 0
 	GFXDECODE_ENTRY( "road1", 0, road_layout,0x4800/2, 64  ) // [2] Road 1
 GFXDECODE_END
@@ -1881,10 +1846,10 @@ GFXDECODE_END
 **************************************************************************/
 
 static GFXDECODE_START( gfx_f1gpstar )
-	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x1e00/2, 16  ) // Scroll 0
-	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x2e00/2, 16  ) // Scroll 1
-	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x6e00/2, 16  ) // Scroll 2
-	GFXDECODE_ENTRY( "sprites", 0, tiles_16x16,0x5000/2, 128 ) // [0] Sprites
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,   0x1e00/2, 16  ) // Scroll 0
+	//GFXDECODE_ENTRY( "scroll1", 0, gfx_8x8x4_packed_msb,   0x2e00/2, 16  ) // Scroll 1
+	//GFXDECODE_ENTRY( "scroll2", 0, gfx_8x8x4_packed_msb,   0x6e00/2, 16  ) // Scroll 2
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_msb, 0x5000/2, 128 ) // [0] Sprites
 	GFXDECODE_ENTRY( "road0", 0, road_layout,0x3800/2, 64  ) // [1] Road 0
 	GFXDECODE_ENTRY( "road1", 0, road_layout,0x4800/2, 64  ) // [2] Road 1
 GFXDECODE_END
@@ -1894,10 +1859,10 @@ GFXDECODE_END
 **************************************************************************/
 
 static GFXDECODE_START( gfx_scudhamm )
-	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,          0x1e00/2, 16  )   // Scroll 0
-	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,          0x0000/2, 16  )   // UNUSED
-	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,          0x4e00/2, 16  )   // Scroll 2
-	GFXDECODE_ENTRY( "sprites", 0, tiles_16x16_quad,   0x3000/2, 128 )   // [0] sprites
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,               0x1e00/2, 16  )   // Scroll 0
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,               0x0000/2, 16  )   // UNUSED
+	//GFXDECODE_ENTRY( "scroll2", 0, gfx_8x8x4_packed_msb,               0x4e00/2, 16  )   // Scroll 2
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x3000/2, 128 )   // [0] sprites
 	// No Road Layers
 GFXDECODE_END
 
@@ -1949,37 +1914,37 @@ WRITE_LINE_MEMBER(cischeat_state::sound_irq)
 
 
 
-MACHINE_CONFIG_START(cischeat_state::bigrun)
-
+void cischeat_state::bigrun(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("cpu1", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(bigrun_map)
+	M68000(config, m_cpu1, 10000000);
+	m_cpu1->set_addrmap(AS_PROGRAM, &cischeat_state::bigrun_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::bigrun_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("cpu2", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(bigrun_map2)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
+	M68000(config, m_cpu2, 10000000);
+	m_cpu2->set_addrmap(AS_PROGRAM, &cischeat_state::bigrun_map2);
+	m_cpu2->set_vblank_int("screen", FUNC(cischeat_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("cpu3", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(bigrun_map3)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
+	M68000(config, m_cpu3, 10000000);
+	m_cpu3->set_addrmap(AS_PROGRAM, &cischeat_state::bigrun_map3);
+	m_cpu3->set_vblank_int("screen", FUNC(cischeat_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", M68000, 6000000)
-	MCFG_DEVICE_PROGRAM_MAP(bigrun_sound_map)
+	M68000(config, m_soundcpu, 6000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &cischeat_state::bigrun_sound_map);
 	// timing set by the YM irqhandler
-//  MCFG_DEVICE_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
+//  m_soundcpu->set_periodic_int(FUNC(cischeat_state::irq4_line_hold), attotime::from_hz(16*30));
 
-	config.m_minimum_quantum = attotime::from_hz(1200);
+	config.set_maximum_quantum(attotime::from_hz(1200));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_bigrun)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1,  0+16, 256-16-1);
+	m_screen->set_screen_update(FUNC(cischeat_state::screen_update_bigrun));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bigrun);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x4000/2);
@@ -2002,36 +1967,32 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	ymsnd.add_route(0, "lspeaker", 0.50);
 	ymsnd.add_route(1, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
+	OKIM6295(config, m_oki1, 4000000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki2, 4000000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+}
 
 
-MACHINE_CONFIG_START(cischeat_state::cischeat)
+void cischeat_state::cischeat(machine_config &config)
+{
 	bigrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(cischeat_map)
+	m_cpu1->set_addrmap(AS_PROGRAM, &cischeat_state::cischeat_map);
 
-	MCFG_DEVICE_MODIFY("cpu2")
-	MCFG_DEVICE_PROGRAM_MAP(cischeat_map2)
+	m_cpu2->set_addrmap(AS_PROGRAM, &cischeat_state::cischeat_map2);
 
-	MCFG_DEVICE_MODIFY("cpu3")
-	MCFG_DEVICE_PROGRAM_MAP(cischeat_map3)
+	m_cpu3->set_addrmap(AS_PROGRAM, &cischeat_state::cischeat_map3);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(cischeat_sound_map)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &cischeat_state::cischeat_sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_cischeat)
+	m_screen->set_visarea(0, 256-1,  0+16, 256-16-8-1);
+	m_screen->set_screen_update(FUNC(cischeat_state::screen_update_cischeat));
 
 	m_gfxdecode->set_info(gfx_cischeat);
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
@@ -2044,27 +2005,24 @@ MACHINE_CONFIG_START(cischeat_state::cischeat)
 
 	m_tmap[2]->set_colorbase(0x6c00/2);
 	m_tmap[2]->set_bits_per_color_code(5);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(cischeat_state::f1gpstar)
+void cischeat_state::f1gpstar(machine_config &config)
+{
 	bigrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_CLOCK(12000000)
-	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map)
+	m_cpu1->set_clock(12000000);
+	m_cpu1->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstar_map);
 
-	MCFG_DEVICE_MODIFY("cpu2")
-	MCFG_DEVICE_CLOCK(12000000)
-	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map2)
+	m_cpu2->set_clock(12000000);
+	m_cpu2->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstar_map2);
 
-	MCFG_DEVICE_MODIFY("cpu3")
-	MCFG_DEVICE_CLOCK(12000000)
-	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map3)
+	m_cpu3->set_clock(12000000);
+	m_cpu3->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstar_map3);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_sound_map)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstar_sound_map);
 
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_f1gpstar);
@@ -2076,34 +2034,32 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstar)
 
 	m_tmap[2]->set_colorbase(0x6e00/2);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_f1gpstar)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(cischeat_state::screen_update_f1gpstar));
+}
 
 
-MACHINE_CONFIG_START(cischeat_state::f1gpstr2)
+void cischeat_state::f1gpstr2(machine_config &config)
+{
 	f1gpstar(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_map)
+	m_cpu1->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstr2_map);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_sound_map)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstr2_sound_map);
 
-	MCFG_DEVICE_ADD("cpu5", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_io_map)
+	M68000(config, m_cpu5, 10000000);
+	m_cpu5->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstr2_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
-MACHINE_CONFIG_END
+	config.set_maximum_quantum(attotime::from_hz(12000));
+}
 
 
-MACHINE_CONFIG_START(wildplt_state::wildplt)
+void wildplt_state::wildplt(machine_config &config)
+{
 	f1gpstr2(config);
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(wildplt_map)
-MACHINE_CONFIG_END
+	m_cpu1->set_addrmap(AS_PROGRAM, &wildplt_state::wildplt_map);
+}
 
 
 /**************************************************************************
@@ -2128,24 +2084,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(cischeat_state::scudhamm)
-
+void cischeat_state::scudhamm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(scudhamm_map)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cischeat_state::scudhamm_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::scudhamm_scanline), "screen", 0, 1);
+
+	adc0804_device &adc(ADC0804(config, "adc", 640000)); // unknown clock
+	adc.vin_callback().set(FUNC(cischeat_state::scudhamm_analog_r));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(30) //TODO: wrong!
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0 +16, 256-1 -16)
-	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz(30); //TODO: wrong!
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0 +16, 256-1 -16);
+	m_screen->set_screen_update(FUNC(cischeat_state::screen_update_scudhamm));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scudhamm);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
@@ -2158,14 +2117,14 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+	OKIM6295(config, m_oki1, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki2, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+}
 
 
 /**************************************************************************
@@ -2183,14 +2142,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::armchamp2_scanline)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(cischeat_state::armchmp2)
+void cischeat_state::armchmp2(machine_config &config)
+{
 	scudhamm(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(armchmp2_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cischeat_state::armchmp2_map);
 	subdevice<timer_device>("scantimer")->set_callback(FUNC(cischeat_state::armchamp2_scanline));
-MACHINE_CONFIG_END
+	subdevice<adc0804_device>("adc")->vin_callback().set(FUNC(cischeat_state::armchmp2_analog_r));
+}
 
 
 /**************************************************************************
@@ -2204,7 +2164,7 @@ MACHINE_CONFIG_END
     4-7]        rte
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(captflag_state::captflag_scanline)
 {
 	int scanline = param;
 
@@ -2215,27 +2175,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(cischeat_state::captflag)
-
+void captflag_state::captflag(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(24'000'000) / 2)  // TMP68000P-12
-	MCFG_DEVICE_PROGRAM_MAP(captflag_map)
-	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::captflag_scanline), "screen", 0, 1);
+	M68000(config, m_maincpu, XTAL(24'000'000) / 2);  // TMP68000P-12
+	m_maincpu->set_addrmap(AS_PROGRAM, &captflag_state::captflag_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(captflag_state::captflag_scanline), "screen", 0, 1);
 
-	TICKET_DISPENSER(config, m_captflag_hopper, attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
 
 	WATCHDOG_TIMER(config, m_watchdog);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(30) //TODO: wrong!
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0 +16, 256-1 -16)
-	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz(30); //TODO: wrong!
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0 +16, 256-1 -16);
+	m_screen->set_screen_update(FUNC(captflag_state::screen_update_scudhamm));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scudhamm);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
@@ -2245,8 +2205,8 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x4e00/2);
 
 	// Motors
-	TIMER(config, m_captflag_motor_left).configure_generic(timer_device::expired_delegate());
-	TIMER(config, m_captflag_motor_right).configure_generic(timer_device::expired_delegate());
+	TIMER(config, m_motor_left).configure_generic(nullptr);
+	TIMER(config, m_motor_right).configure_generic(nullptr);
 
 	// Layout
 	config.set_default_layout(layout_captflag);
@@ -2255,16 +2215,16 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, captflag_oki1_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+	OKIM6295(config, m_oki1, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki1->set_addrmap(0, &captflag_state::oki1_map);
+	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, captflag_oki2_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki2, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki2->set_addrmap(0, &captflag_state::oki2_map);
+	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+}
 
 
 /***************************************************************************
@@ -3758,7 +3718,7 @@ ROM_START( captflag )
 	ROM_LOAD( "mr92027-09_w26.ic18", 0x000000, 0x100000, CRC(3aaa332a) SHA1(6c19364069e0b077a07ac4f9c4b0cf0c0985a42a) ) // 1 on the PCB
 ROM_END
 
-void cischeat_state::init_captflag()
+void captflag_state::init_captflag()
 {
 	m_oki1_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki1")->base(), 0x20000);
 	m_oki2_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki2")->base(), 0x20000);
@@ -3783,5 +3743,5 @@ GAME(  1992, armchmp2o2,armchmp2, armchmp2, armchmp2, cischeat_state, empty_init
 GAME(  1992, armchmp2o, armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 1.7)",       MACHINE_IMPERFECT_GRAPHICS )
 GAME(  1992, wildplt,   0,        wildplt,  wildplt,  wildplt_state,  init_f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
 GAMEL( 1993, f1gpstr2,  0,        f1gpstr2, f1gpstr2, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAME(  1993, captflag,  0,        captflag, captflag, cischeat_state, init_captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1993, captflag,  0,        captflag, captflag, captflag_state, init_captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )
 GAME(  1994, scudhamm,  0,        scudhamm, scudhamm, cischeat_state, empty_init,    ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )

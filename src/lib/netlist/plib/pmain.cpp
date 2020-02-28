@@ -1,15 +1,11 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pmain.cpp
- *
- */
 
 #include "pmain.h"
 
 #ifdef _WIN32
 #include <windows.h>
-#include <string.h>
+#include <cstring>
 #include <tchar.h>
 #endif
 
@@ -29,26 +25,14 @@ namespace plib {
 	}
 	#endif
 
-/***************************************************************************
-    Application
-***************************************************************************/
-
 	app::app()
-	: options()
-	, pout_strm()
-	, perr_strm()
-	, pout(&pout_strm)
-	, perr(&perr_strm)
+	: pout(&std::cout)
+	, perr(&std::cerr)
 	{
 
 	}
 
-	app::~app()
-	{
-
-	}
-
-	int app::main_utfX(int argc, char *argv[])
+	int app::main_utfX(int argc, char **argv)
 	{
 		auto r = this->parse(argc, argv);
 		int ret = 0;

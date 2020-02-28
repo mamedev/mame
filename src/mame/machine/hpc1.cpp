@@ -11,8 +11,8 @@
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/hlemouse.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 #include "bus/sgikbd/sgikbd.h"
 #include "machine/hpc1.h"
 #include "speaker.h"
@@ -123,7 +123,7 @@ void hpc1_device::indigo_mice(device_slot_interface &device)
 
 void hpc1_device::scsi_devices(device_slot_interface &device)
 {
-	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("cdrom", NSCSI_CDROM_SGI);
 	device.option_add("harddisk", NSCSI_HARDDISK);
 }
 
@@ -204,7 +204,7 @@ void hpc1_device::device_add_mconfig(machine_config &config)
 READ32_MEMBER(hpc1_device::read)
 {
 	if (offset >= 0x0e00/4 && offset <= 0x0e7c/4)
-		return m_rtc->read(space, offset - 0xe00/4);
+		return m_rtc->read(offset - 0xe00/4);
 
 	switch (offset)
 	{
@@ -289,7 +289,7 @@ READ32_MEMBER(hpc1_device::read)
 	case 0x0d20/4:
 	{
 		const uint32_t index = (offset >> 2) & 3;
-		uint32_t ret = m_scc[index]->ba_cd_r(space, 3);
+		uint32_t ret = m_scc[index]->ab_dc_r(0);
 		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel B Control Read: %08x & %08x\n", machine().describe_context(), index, ret, mem_mask);
 		return ret;
 	}
@@ -298,7 +298,7 @@ READ32_MEMBER(hpc1_device::read)
 	case 0x0d24/4:
 	{
 		const uint32_t index = (offset >> 2) & 3;
-		const uint32_t ret = m_scc[index]->ba_cd_r(space, 2);
+		const uint32_t ret = m_scc[index]->ab_dc_r(1);
 		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel B Data Read: %08x & %08x\n", machine().describe_context(), index, ret, mem_mask);
 		return ret;
 	}
@@ -307,7 +307,7 @@ READ32_MEMBER(hpc1_device::read)
 	case 0x0d28/4:
 	{
 		const uint32_t index = (offset >> 2) & 3;
-		const uint32_t ret = m_scc[index]->ba_cd_r(space, 1);
+		const uint32_t ret = m_scc[index]->ab_dc_r(2);
 		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel A Control Read: %08x & %08x\n", machine().describe_context(), index, ret, mem_mask);
 		return ret;
 	}
@@ -316,7 +316,7 @@ READ32_MEMBER(hpc1_device::read)
 	case 0x0d2c/4:
 	{
 		const uint32_t index = (offset >> 2) & 3;
-		const uint32_t ret = m_scc[index]->ba_cd_r(space, 0);
+		const uint32_t ret = m_scc[index]->ab_dc_r(3);
 		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel A Data Read: %08x & %08x\n", machine().describe_context(), index, ret, mem_mask);
 		return ret;
 	}
@@ -331,7 +331,7 @@ WRITE32_MEMBER(hpc1_device::write)
 {
 	if (offset >= 0x0e00/4 && offset <= 0x0e7c/4)
 	{
-		m_rtc->write(space, offset - 0xe00/4, (uint8_t)data);
+		m_rtc->write(offset - 0xe00/4, (uint8_t)data);
 		return;
 	}
 
@@ -461,7 +461,7 @@ WRITE32_MEMBER(hpc1_device::write)
 	case 0x0d20/4:
 	{
 		const uint32_t index = (offset >> 2) & 3;
-		m_scc[index]->ba_cd_w(space, 3, (uint8_t)data);
+		m_scc[index]->ab_dc_w(0, (uint8_t)data);
 		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel B Control Write: %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
 		break;
 	}
@@ -470,7 +470,7 @@ WRITE32_MEMBER(hpc1_device::write)
 	case 0x0d24/4:
 	{
 		const uint32_t index = (offset >> 2) & 3;
-		m_scc[index]->ba_cd_w(space, 2, (uint8_t)data);
+		m_scc[index]->ab_dc_w(1, (uint8_t)data);
 		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel B Data Write: %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
 		break;
 	}
@@ -479,7 +479,7 @@ WRITE32_MEMBER(hpc1_device::write)
 	case 0x0d28/4:
 	{
 		const uint32_t index = (offset >> 2) & 3;
-		m_scc[index]->ba_cd_w(space, 1, (uint8_t)data);
+		m_scc[index]->ab_dc_w(2, (uint8_t)data);
 		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel A Control Write: %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
 		break;
 	}
@@ -488,7 +488,7 @@ WRITE32_MEMBER(hpc1_device::write)
 	case 0x0d2c/4:
 	{
 		const uint32_t index = (offset >> 2) & 3;
-		m_scc[index]->ba_cd_w(space, 0, (uint8_t)data);
+		m_scc[index]->ab_dc_w(3, (uint8_t)data);
 		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel A Data Write: %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
 		break;
 	}
@@ -523,7 +523,7 @@ void hpc1_device::fetch_chain()
 	m_scsi_dma.m_ctrl = m_cpu_space->read_dword(m_scsi_dma.m_desc);
 	m_scsi_dma.m_addr = m_cpu_space->read_dword(m_scsi_dma.m_desc+4);
 	m_scsi_dma.m_next = m_cpu_space->read_dword(m_scsi_dma.m_desc+8);
-	m_scsi_dma.m_length = m_scsi_dma.m_ctrl & 0x3fff;
+	m_scsi_dma.m_length = m_scsi_dma.m_ctrl & 0x1fff;
 
 	LOGMASKED(LOG_CHAIN, "Fetching chain from %08x:\n", m_scsi_dma.m_desc);
 	LOGMASKED(LOG_CHAIN, "    Addr: %08x\n", m_scsi_dma.m_addr);

@@ -51,11 +51,13 @@ Thanks to HIGHWAYMAN for providing info on how to get to these epoxies
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/adc0804.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class wallc_state : public driver_device
@@ -157,18 +159,18 @@ void wallc_state::wallc_palette(palette_device &palette) const
 		// red component
 		bit0 = BIT(color_prom[i], 5);
 		bit1 = BIT(color_prom[i], 6);
-		int const r = combine_2_weights(weights_r, bit1, bit0);
+		int const r = combine_weights(weights_r, bit1, bit0);
 
 		// green component
 		bit0 = BIT(color_prom[i], 2);
 		bit1 = BIT(color_prom[i], 3);
-		int const g = combine_2_weights(weights_g, bit1, bit0);
+		int const g = combine_weights(weights_g, bit1, bit0);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit7 = BIT(color_prom[i], 7);
-		int const b = combine_3_weights(weights_b, bit7, bit1, bit0);
+		int const b = combine_weights(weights_b, bit7, bit1, bit0);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -195,18 +197,18 @@ void wallc_state::unkitpkr_palette(palette_device &palette) const
 		// red component
 		bit0 = BIT(color_prom[i], 5);
 		bit1 = BIT(color_prom[i], 6);
-		int const r = combine_2_weights(weights_r, bit1, bit0);
+		int const r = combine_weights(weights_r, bit1, bit0);
 
 		// green component
 		bit0 = BIT(color_prom[i], 2);
 		bit1 = BIT(color_prom[i], 3);
-		int const g = combine_2_weights(weights_g, bit1, bit0);
+		int const g = combine_weights(weights_g, bit1, bit0);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit7 = BIT(color_prom[i], 7);
-		int const b = combine_3_weights(weights_b, bit7, bit1, bit0);
+		int const b = combine_weights(weights_b, bit7, bit1, bit0);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -241,17 +243,17 @@ TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_sidampkr)
 
 void wallc_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info), this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wallc_state::get_bg_tile_info)), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
 }
 
 VIDEO_START_MEMBER(wallc_state, unkitpkr)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info_unkitpkr), this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wallc_state::get_bg_tile_info_unkitpkr)), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
 }
 
 VIDEO_START_MEMBER(wallc_state, sidampkr)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info_sidampkr), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wallc_state::get_bg_tile_info_sidampkr)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t wallc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -293,14 +295,13 @@ void wallc_state::wallc_map(address_map &map)
 
 	map(0xb000, 0xb000).portr("DSW1");
 	map(0xb200, 0xb200).portr("SYSTEM");
-	map(0xb400, 0xb400).portr("DIAL");
-	map(0xb600, 0xb600).portr("DSW2");
+	map(0xb400, 0xb400).r("adc", FUNC(adc0804_device::read_and_write));
 
 	map(0xb000, 0xb000).nopw();
 	map(0xb100, 0xb100).w(FUNC(wallc_state::wallc_coin_counter_w));
 	map(0xb200, 0xb200).nopw();
 	map(0xb500, 0xb500).w("aysnd", FUNC(ay8912_device::address_w));
-	map(0xb600, 0xb600).w("aysnd", FUNC(ay8912_device::data_w));
+	map(0xb600, 0xb600).rw("aysnd", FUNC(ay8912_device::data_r), FUNC(ay8912_device::data_w));
 }
 
 void wallc_state::unkitpkr_map(address_map &map)
@@ -514,55 +515,60 @@ void wallc_state::init_wallca()
 }
 
 
-MACHINE_CONFIG_START(wallc_state::wallc)
+void wallc_state::wallc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 12.288_MHz_XTAL / 4)  /* 3.072 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(wallc_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wallc_state, irq0_line_hold)
+	Z80(config, m_maincpu, 12.288_MHz_XTAL / 4);  /* 3.072 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wallc_state::wallc_map);
+	m_maincpu->set_vblank_int("screen", FUNC(wallc_state::irq0_line_hold));
+
+	ADC0804(config, "adc", 640000).vin_callback().set_ioport("DIAL"); // clock not verified
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wallc_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(wallc_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_wallc);
 	PALETTE(config, "palette", FUNC(wallc_state::wallc_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	AY8912(config, "aysnd", 12288000 / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
-MACHINE_CONFIG_END
+	ay8912_device &aysnd(AY8912(config, "aysnd", 12288000 / 8));
+	aysnd.port_a_read_callback().set_ioport("DSW2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
-MACHINE_CONFIG_START(wallc_state::wallca)
+void wallc_state::wallca(machine_config &config)
+{
 	wallc(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(12_MHz_XTAL / 4)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(12_MHz_XTAL / 4);
+}
 
-MACHINE_CONFIG_START(wallc_state::unkitpkr)
+void wallc_state::unkitpkr(machine_config &config)
+{
 	wallc(config);
+	config.device_remove("adc");
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(unkitpkr_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &wallc_state::unkitpkr_map);
 
 	MCFG_VIDEO_START_OVERRIDE(wallc_state, unkitpkr)
 	subdevice<palette_device>("palette")->set_init(FUNC(wallc_state::unkitpkr_palette));
 
 	/* sound hardware */
-	subdevice<ay8912_device>("aysnd")->port_a_read_callback().set_ioport("DSW2");
-	subdevice<ay8912_device>("aysnd")->reset_routes();
-	subdevice<ay8912_device>("aysnd")->add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+	subdevice<ay8912_device>("aysnd")->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(wallc_state::sidampkr)
+void wallc_state::sidampkr(machine_config &config)
+{
 	unkitpkr(config);
 
 	MCFG_VIDEO_START_OVERRIDE(wallc_state, sidampkr)
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

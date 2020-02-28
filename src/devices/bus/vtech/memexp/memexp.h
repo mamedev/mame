@@ -45,7 +45,7 @@
 
 class device_vtech_memexp_interface;
 
-class vtech_memexp_slot_device : public device_t, public device_slot_interface
+class vtech_memexp_slot_device : public device_t, public device_single_card_slot_interface<device_vtech_memexp_interface>
 {
 	friend class device_vtech_memexp_interface;
 public:
@@ -61,8 +61,8 @@ public:
 	vtech_memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vtech_memexp_slot_device();
 
-	void set_program_space(address_space *program);
-	void set_io_space(address_space *io);
+	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io.set_tag(std::forward<T>(tag), spacenum); }
 
 	// callbacks
 	auto int_handler() { return m_int_handler.bind(); }
@@ -76,13 +76,11 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
-	address_space *m_program;
-	address_space *m_io;
-
-	device_vtech_memexp_interface *m_cart;
+	required_address_space m_program;
+	required_address_space m_io;
 
 private:
 	devcb_write_line m_int_handler;
@@ -91,7 +89,7 @@ private:
 };
 
 // class representing interface-specific live memexp device
-class device_vtech_memexp_interface : public device_slot_card_interface
+class device_vtech_memexp_interface : public device_interface
 {
 public:
 	// construction/destruction

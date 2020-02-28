@@ -201,6 +201,7 @@ enum {
 	MIPS3_PAGEMASK,
 	MIPS3_WIRED,
 	MIPS3_BADVADDR,
+	MIPS3_LLADDR,
 	MIPS3_R0H,
 	MIPS3_R1H,
 	MIPS3_R2H,
@@ -237,6 +238,9 @@ enum {
 
 #define MIPS3_MAX_FASTRAM       3
 #define MIPS3_MAX_HOTSPOTS      16
+
+/* COP1 CCR register */
+#define COP1_FCR31              (m_core->ccr[1][31])
 
 /***************************************************************************
 INTERRUPT CONSTANTS
@@ -315,9 +319,9 @@ protected:
 	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 40; }
-	virtual uint32_t execute_input_lines() const override { return 6; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 40; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual void execute_burn(int32_t cycles) override { m_totalcycles += cycles; }
@@ -328,6 +332,7 @@ protected:
 
 	// device_state_interface overrides
 	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
@@ -428,6 +433,7 @@ protected:
 	uint32_t        c_system_clock;
 	uint32_t        m_cpu_clock;
 	emu_timer *     m_compare_int_timer;
+	uint32_t        m_tlb_seed;
 
 	/* derived info based on flavor */
 	uint32_t        m_pfnmask;
@@ -507,7 +513,6 @@ protected:
 	}               m_hotspot[MIPS3_MAX_HOTSPOTS];
 	bool            m_isdrc;
 
-
 	void generate_exception(int exception, int backup);
 	void generate_tlb_exception(int exception, offs_t address);
 	virtual void check_irqs();
@@ -525,6 +530,7 @@ private:
 	uint32_t compute_config_register();
 	uint32_t compute_prid_register();
 
+	uint32_t generate_tlb_index();
 	void tlb_map_entry(int tlbindex);
 	void tlb_write_common(int tlbindex);
 
@@ -591,6 +597,7 @@ public:
 	void func_printf_exception();
 	void func_printf_debug();
 	void func_printf_probe();
+	void func_debug_break();
 	void func_unimplemented();
 private:
 	/* internal compiler state */

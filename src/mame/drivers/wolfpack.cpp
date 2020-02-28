@@ -22,7 +22,7 @@ void wolfpack_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		periodic_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in wolfpack_state::device_timer");
+		throw emu_fatalerror("Unknown id in wolfpack_state::device_timer");
 	}
 }
 
@@ -53,10 +53,10 @@ void wolfpack_state::machine_reset()
 }
 
 
-CUSTOM_INPUT_MEMBER(wolfpack_state::dial_r)
+template <int Bit>
+READ_LINE_MEMBER(wolfpack_state::dial_r)
 {
-	int bit = (uintptr_t)param;
-	return ((ioport("DIAL")->read() + bit) / 2) & 0x01;
+	return ((ioport("DIAL")->read() + Bit) / 2) & 0x01;
 }
 
 
@@ -171,8 +171,8 @@ void wolfpack_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( wolfpack )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state, dial_r, (void *)0)    /* dial connects here */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state, dial_r, (void *)1)    /* dial connects here */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(wolfpack_state, dial_r<0>)    // dial connects here
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(wolfpack_state, dial_r<1>)    // dial connects here
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
@@ -306,31 +306,31 @@ static GFXDECODE_START( gfx_wolfpack )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(wolfpack_state::wolfpack)
-
+void wolfpack_state::wolfpack(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 16)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M6502(config, m_maincpu, 12096000 / 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wolfpack_state::main_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(wolfpack_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wolfpack_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(512, 262);
+	m_screen->set_visarea(0, 511, 16, 239);
+	m_screen->set_screen_update(FUNC(wolfpack_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(wolfpack_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_wolfpack)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wolfpack);
 	PALETTE(config, m_palette, FUNC(wolfpack_state::wolfpack_palette), 12, 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speech", S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	S14001A(config, m_s14001a, 20000); /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
+	m_s14001a->add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 ROM_START( wolfpack )

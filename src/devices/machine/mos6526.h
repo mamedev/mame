@@ -85,13 +85,11 @@ public:
 	auto pb_wr_callback() { return m_write_pb.bind(); }
 	auto pc_wr_callback() { return m_write_pc.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	uint8_t read_pa() { return m_pa; }
-	DECLARE_READ8_MEMBER( pa_r ) { return m_pa; }
-	uint8_t read_pb() { return m_pb; }
-	DECLARE_READ8_MEMBER( pb_r ) { return m_pb; }
+	uint8_t pa_r() { return m_pa; }
+	uint8_t pb_r() { return m_pb; }
 
 	DECLARE_READ_LINE_MEMBER( sp_r ) { return m_sp; }
 	DECLARE_WRITE_LINE_MEMBER( sp_w );
@@ -230,8 +228,8 @@ class mos8520_device : public mos6526_device
 public:
 	mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	virtual inline void clock_tod() override;
@@ -245,8 +243,8 @@ class mos5710_device : public mos6526_device
 public:
 	mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	//DECLARE_READ8_MEMBER( read );
-	//DECLARE_WRITE8_MEMBER( write );
+	//uint8_t read(offs_t offset);
+	//void write(offs_t offset, uint8_t data);
 };
 
 

@@ -9,33 +9,33 @@
 struct AICADSP
 {
 	void init();
-	void setsample(int32_t sample, int32_t SEL, int32_t MXL);
+	void setsample(s32 sample, u8 SEL, s32 MXL);
 	void step();
 	void start();
 
 //Config
-	uint16_t *AICARAM;
-	uint32_t AICARAM_LENGTH;
-	uint32_t RBP; //Ring buf pointer
-	uint32_t RBL; //Delay ram (Ring buffer) size in words
+	address_space *space;
+	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *cache;
+	u32 RBP; //Ring buf pointer
+	u32 RBL; //Delay ram (Ring buffer) size in words
 
 //context
 
-	int16_t COEF[128*2];      //16 bit signed
-	uint16_t MADRS[64*2]; //offsets (in words), 16 bit
-	uint16_t MPRO[128*4*2*2]; //128 steps 64 bit
-	int32_t TEMP[128];    //TEMP regs,24 bit signed
-	int32_t MEMS[32]; //MEMS regs,24 bit signed
-	uint32_t DEC;
+	s16 COEF[128 * 2];      //16 bit signed
+	u16 MADRS[64 * 2]; //offsets (in words), 16 bit
+	u16 MPRO[128 * 4 * 2 * 2]; //128 steps 64 bit
+	s32 TEMP[128];    //TEMP regs,24 bit signed
+	s32 MEMS[32]; //MEMS regs,24 bit signed
+	u32 DEC;
 
 //input
-	int32_t MIXS[16]; //MIXS, 24 bit signed
-	int16_t EXTS[2];  //External inputs (CDDA)    16 bit signed
+	s32 MIXS[16]; //MIXS, 24 bit signed
+	s16 EXTS[2];  //External inputs (CDDA)    16 bit signed
 
 //output
-	int16_t EFREG[16];    //EFREG, 16 bit signed
+	s16 EFREG[16];    //EFREG, 16 bit signed
 
-	int Stopped;
+	bool Stopped;
 	int LastStep;
 };
 

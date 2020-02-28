@@ -551,9 +551,9 @@ READ8_MEMBER(wicat_state::video_r)
 	switch(offset)
 	{
 	case 0x00:
-		return m_crtc->read(space,0);
+		return m_crtc->read(0);
 	case 0x02:
-		return m_crtc->read(space,1);
+		return m_crtc->read(1);
 	default:
 		return 0xff;
 	}
@@ -564,10 +564,10 @@ WRITE8_MEMBER(wicat_state::video_w)
 	switch(offset)
 	{
 	case 0x00:
-		m_crtc->write(space,0,data);
+		m_crtc->write(0,data);
 		break;
 	case 0x02:
-		m_crtc->write(space,1,data);
+		m_crtc->write(1,data);
 		break;
 	}
 }
@@ -584,13 +584,13 @@ WRITE8_MEMBER( wicat_state::vram_w )
 
 READ8_MEMBER(wicat_state::video_dma_r)
 {
-	return m_videodma->read(space,offset/2);
+	return m_videodma->read(offset/2);
 }
 
 WRITE8_MEMBER(wicat_state::video_dma_w)
 {
 	if(!(offset & 0x01))
-		m_videodma->write(space,offset/2,data);
+		m_videodma->write(offset/2,data);
 }
 
 READ8_MEMBER(wicat_state::video_uart0_r)
@@ -784,7 +784,7 @@ void wicat_state::wicat(machine_config &config)
 	m_videocpu->set_addrmap(AS_PROGRAM, &wicat_state::video_mem);
 	m_videocpu->set_addrmap(AS_IO, &wicat_state::video_io);
 
-	INPUT_MERGER_ANY_HIGH(config, m_videoirq).output_handler().set_inputline(m_videocpu, INPUT_LINE_IRQ0);
+	INPUT_MERGER_ANY_HIGH(config, m_videoirq).output_handler().set_inputline(m_videocpu, z8002_device::NVI_LINE);
 
 	LS259(config, m_videoctrl);
 	m_videoctrl->q_out_cb<0>().set(FUNC(wicat_state::crtc_irq_clear_w));
@@ -799,7 +799,7 @@ void wicat_state::wicat(machine_config &config)
 	m_videodma->out_memw_callback().set(FUNC(wicat_state::vram_w));
 	m_videodma->out_iow_callback<0>().set(m_crtc, FUNC(i8275_device::dack_w));
 
-	INPUT_MERGER_ALL_HIGH(config, "dmairq").output_handler().set_inputline(m_videocpu, INPUT_LINE_NMI);
+	INPUT_MERGER_ALL_HIGH(config, "dmairq").output_handler().set_inputline(m_videocpu, z8002_device::NMI_LINE);
 
 	IM6402(config, m_videouart, 0);
 	m_videouart->set_rrc(0);
@@ -832,7 +832,7 @@ void wicat_state::wicat(machine_config &config)
 
 	I8275(config, m_crtc, 19.6608_MHz_XTAL/10);
 	m_crtc->set_character_width(10);
-	m_crtc->set_display_callback(FUNC(wicat_state::wicat_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(wicat_state::wicat_display_pixels));
 	m_crtc->drq_wr_callback().set(m_videodma, FUNC(am9517a_device::dreq0_w));
 	m_crtc->vrtc_wr_callback().set(FUNC(wicat_state::crtc_irq_w));
 	m_crtc->set_screen("screen");
@@ -850,7 +850,7 @@ void wicat_state::wicat(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:2", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	SOFTWARE_LIST(config, "flop_list").set_type("wicat", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list").set_original("wicat");
 }
 
 /* ROM definition */

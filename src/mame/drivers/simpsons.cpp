@@ -178,7 +178,7 @@ void simpsons_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in simpsons_state::device_timer");
+		throw emu_fatalerror("Unknown id in simpsons_state::device_timer");
 	}
 }
 
@@ -316,9 +316,6 @@ INTERRUPT_GEN_MEMBER(simpsons_state::simpsons_irq)
 		// 32+256us delay at 8MHz dotclock; artificially shortened since actual V-blank length is unknown
 		timer_set(attotime::from_usec(30), TIMER_DMAEND);
 	}
-
-	if (m_k052109->is_irq_enabled())
-		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 void simpsons_state::simpsons(machine_config &config)
@@ -352,11 +349,13 @@ void simpsons_state::simpsons(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
-	m_k052109->set_tile_callback(FUNC(simpsons_state::tile_callback), this);
+	m_k052109->set_screen("screen");
+	m_k052109->set_tile_callback(FUNC(simpsons_state::tile_callback));
+	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(simpsons_state::sprite_callback), this);
-	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, 53, 23);
+	m_k053246->set_sprite_callback(FUNC(simpsons_state::sprite_callback));
+	m_k053246->set_config(NORMAL_PLANE_ORDER, 53, 23);
 	m_k053246->set_palette("palette");
 
 	K053251(config, m_k053251, 0);
@@ -398,7 +397,7 @@ ROM_START( simpsons ) /* World 4 Player */
 	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
 	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */
+	ROM_REGION( 0x400000, "k053246", 0 ) /* graphics */
 	ROM_LOAD64_WORD( "072-b08.3n",  0x000000, 0x100000, CRC(7de500ad) SHA1(61b76b8f402e3bde1509679aaaa28ef08cafb0ab) ) /* sprites */
 	ROM_LOAD64_WORD( "072-b09.8n",  0x000002, 0x100000, CRC(aa085093) SHA1(925239d79bf607021d371263352618876f59c1f8) )
 	ROM_LOAD64_WORD( "072-b10.12n", 0x000004, 0x100000, CRC(577dbd53) SHA1(e603e03e3dcba766074561faa92afafa5761953d) )
@@ -427,7 +426,7 @@ ROM_START( simpsons4pe ) /* World 4 Player, later? (by use of later leters) */
 	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
 	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */
+	ROM_REGION( 0x400000, "k053246", 0 ) /* graphics */
 	ROM_LOAD64_WORD( "072-b08.3n",  0x000000, 0x100000, CRC(7de500ad) SHA1(61b76b8f402e3bde1509679aaaa28ef08cafb0ab) ) /* sprites */
 	ROM_LOAD64_WORD( "072-b09.8n",  0x000002, 0x100000, CRC(aa085093) SHA1(925239d79bf607021d371263352618876f59c1f8) )
 	ROM_LOAD64_WORD( "072-b10.12n", 0x000004, 0x100000, CRC(577dbd53) SHA1(e603e03e3dcba766074561faa92afafa5761953d) )
@@ -456,7 +455,7 @@ ROM_START( simpsons4pa ) /* Asia 4 Player */
 	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
 	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */
+	ROM_REGION( 0x400000, "k053246", 0 ) /* graphics */
 	ROM_LOAD64_WORD( "072-b08.3n",  0x000000, 0x100000, CRC(7de500ad) SHA1(61b76b8f402e3bde1509679aaaa28ef08cafb0ab) ) /* sprites */
 	ROM_LOAD64_WORD( "072-b09.8n",  0x000002, 0x100000, CRC(aa085093) SHA1(925239d79bf607021d371263352618876f59c1f8) )
 	ROM_LOAD64_WORD( "072-b10.12n", 0x000004, 0x100000, CRC(577dbd53) SHA1(e603e03e3dcba766074561faa92afafa5761953d) )
@@ -486,7 +485,7 @@ ROM_START( simpsons2p ) /* World 2 Player */
 	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
 	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */
+	ROM_REGION( 0x400000, "k053246", 0 ) /* graphics */
 	ROM_LOAD64_WORD( "072-b08.3n",  0x000000, 0x100000, CRC(7de500ad) SHA1(61b76b8f402e3bde1509679aaaa28ef08cafb0ab) ) /* sprites */
 	ROM_LOAD64_WORD( "072-b09.8n",  0x000002, 0x100000, CRC(aa085093) SHA1(925239d79bf607021d371263352618876f59c1f8) )
 	ROM_LOAD64_WORD( "072-b10.12n", 0x000004, 0x100000, CRC(577dbd53) SHA1(e603e03e3dcba766074561faa92afafa5761953d) )
@@ -515,7 +514,7 @@ ROM_START( simpsons2p2 ) /* World 2 Player, alt */
 	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
 	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */
+	ROM_REGION( 0x400000, "k053246", 0 ) /* graphics */
 	ROM_LOAD64_WORD( "072-b08.3n",  0x000000, 0x100000, CRC(7de500ad) SHA1(61b76b8f402e3bde1509679aaaa28ef08cafb0ab) ) /* sprites */
 	ROM_LOAD64_WORD( "072-b09.8n",  0x000002, 0x100000, CRC(aa085093) SHA1(925239d79bf607021d371263352618876f59c1f8) )
 	ROM_LOAD64_WORD( "072-b10.12n", 0x000004, 0x100000, CRC(577dbd53) SHA1(e603e03e3dcba766074561faa92afafa5761953d) )
@@ -544,7 +543,7 @@ ROM_START( simpsons2p3 ) // no rom labels
 	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
 	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */
+	ROM_REGION( 0x400000, "k053246", 0 ) /* graphics */
 	ROM_LOAD64_WORD( "072-b08.3n",  0x000000, 0x100000, CRC(7de500ad) SHA1(61b76b8f402e3bde1509679aaaa28ef08cafb0ab) ) /* sprites */
 	ROM_LOAD64_WORD( "072-b09.8n",  0x000002, 0x100000, CRC(aa085093) SHA1(925239d79bf607021d371263352618876f59c1f8) )
 	ROM_LOAD64_WORD( "072-b10.12n", 0x000004, 0x100000, CRC(577dbd53) SHA1(e603e03e3dcba766074561faa92afafa5761953d) )
@@ -573,7 +572,7 @@ ROM_START( simpsons2pa ) /* Asia 2 Player */
 	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
 	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */
+	ROM_REGION( 0x400000, "k053246", 0 ) /* graphics */
 	ROM_LOAD64_WORD( "072-b08.3n",  0x000000, 0x100000, CRC(7de500ad) SHA1(61b76b8f402e3bde1509679aaaa28ef08cafb0ab) ) /* sprites */
 	ROM_LOAD64_WORD( "072-b09.8n",  0x000002, 0x100000, CRC(aa085093) SHA1(925239d79bf607021d371263352618876f59c1f8) )
 	ROM_LOAD64_WORD( "072-b10.12n", 0x000004, 0x100000, CRC(577dbd53) SHA1(e603e03e3dcba766074561faa92afafa5761953d) )
@@ -602,7 +601,7 @@ ROM_START( simpsons2pj ) /* Japan 2 Player */
 	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
 	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */
+	ROM_REGION( 0x400000, "k053246", 0 ) /* graphics */
 	ROM_LOAD64_WORD( "072-b08.3n",  0x000000, 0x100000, CRC(7de500ad) SHA1(61b76b8f402e3bde1509679aaaa28ef08cafb0ab) ) /* sprites */
 	ROM_LOAD64_WORD( "072-b09.8n",  0x000002, 0x100000, CRC(aa085093) SHA1(925239d79bf607021d371263352618876f59c1f8) )
 	ROM_LOAD64_WORD( "072-b10.12n", 0x000004, 0x100000, CRC(577dbd53) SHA1(e603e03e3dcba766074561faa92afafa5761953d) )

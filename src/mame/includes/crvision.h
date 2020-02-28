@@ -13,7 +13,6 @@
 #include "bus/crvision/rom.h"
 #include "machine/ram.h"
 #include "sound/sn76496.h"
-#include "sound/wave.h"
 #include "video/tms9928a.h"
 
 #define SCREEN_TAG      "screen"

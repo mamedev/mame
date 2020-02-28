@@ -12,7 +12,7 @@
 #pragma once
 
 #include "cpcexp.h"
-#include "machine/ataintf.h"
+#include "bus/ata/ataintf.h"
 #include "machine/ds128x.h"
 #include "machine/nvram.h"
 

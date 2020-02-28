@@ -18,6 +18,7 @@
 #include "video/k053936.h"
 #include "video/k053251.h"
 #include "video/konami_helper.h"
+#include "tilemap.h"
 
 class dbz_state : public driver_device
 {

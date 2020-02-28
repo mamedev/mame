@@ -53,7 +53,7 @@ private:
 void spirit76_state::maincpu_map(address_map &map)
 {
 	map.unmap_value_high();
-//  ADDRESS_MAP_GLOBAL_MASK(0xfff) // this could most likely go in once the memory map is sorted
+//  map.global_mask(0xfff); // this could most likely go in once the memory map is sorted
 	map(0x0000, 0x00ff).ram(); // 2x 2112
 	map(0x2200, 0x2203).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // 6820
 	map(0x2400, 0x2400).r(FUNC(spirit76_state::unk_r));
@@ -121,14 +121,16 @@ void spirit76_state::machine_reset()
 	m_t_c = 0;
 }
 
-MACHINE_CONFIG_START(spirit76_state::spirit76)
+void spirit76_state::spirit76(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 500000)
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	M6800(config, m_maincpu, 500000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spirit76_state::maincpu_map);
+
 	TIMER(config, "irq").configure_periodic(FUNC(spirit76_state::irq), attotime::from_hz(120));
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT()
+	//config.set_default_layout();
 
 	//6821pia
 	pia6821_device &pia(PIA6821(config, "pia", 0));
@@ -143,7 +145,7 @@ MACHINE_CONFIG_START(spirit76_state::spirit76)
 
 	/* sound hardware */
 	genpin_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(spirit76)

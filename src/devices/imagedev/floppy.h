@@ -54,8 +54,7 @@ class floppy_sound_device;
 ***************************************************************************/
 
 class floppy_image_device : public device_t,
-							public device_image_interface,
-							public device_slot_card_interface
+							public device_image_interface
 {
 public:
 	typedef delegate<image_init_result (floppy_image_device *)> load_cb;
@@ -80,16 +79,15 @@ public:
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
-	virtual const char *image_interface() const override = 0;
-	virtual iodevice_t image_type() const override { return IO_FLOPPY; }
+	virtual const char *image_interface() const noexcept override = 0;
+	virtual iodevice_t image_type() const noexcept override { return IO_FLOPPY; }
 
-	virtual bool is_readable()  const override { return true; }
-	virtual bool is_writeable() const override { return true; }
-	virtual bool is_creatable() const override { return true; }
-	virtual bool must_be_loaded() const override { return false; }
-	virtual bool is_reset_on_load() const override { return false; }
-	virtual const char *file_extensions() const override { return extension_list; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return extension_list; }
 	void setup_write(floppy_image_format_t *output_format);
 
 	void setup_load_cb(load_cb cb);
@@ -147,6 +145,9 @@ protected:
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
+
 	virtual void setup_characteristics() = 0;
 
 	void init_floppy_load(bool write_supported);
@@ -191,6 +192,12 @@ protected:
 	uint32_t revolution_count;
 	int cyl, subcyl;
 
+	/* Current floppy zone cache */
+	attotime cache_start_time, cache_end_time, cache_weak_start;
+	int cache_index;
+	u32 cache_entry;
+	bool cache_weak;
+
 	bool image_dirty;
 	int ready_counter;
 
@@ -203,10 +210,19 @@ protected:
 
 	void check_led();
 	uint32_t find_position(attotime &base, const attotime &when);
-	int find_index(uint32_t position, const std::vector<uint32_t> &buf);
+	int find_index(uint32_t position, const std::vector<uint32_t> &buf) const;
+	bool test_track_last_entry_warps(const std::vector<uint32_t> &buf) const;
+	attotime position_to_time(const attotime &base, int position) const;
+
 	void write_zone(uint32_t *buf, int &cells, int &index, uint32_t spos, uint32_t epos, uint32_t mg);
 	void commit_image();
-	attotime get_next_index_time(std::vector<uint32_t> &buf, int index, int delta, attotime base);
+
+	u32 hash32(u32 val) const;
+
+	void cache_clear();
+	void cache_fill_index(const std::vector<uint32_t> &buf, int &index, attotime &base);
+	void cache_fill(const attotime &when);
+	void cache_weakness_setup();
 
 	// Sound
 	bool    m_make_sound;
@@ -219,7 +235,7 @@ protected:
 		Name(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); \
 		virtual ~Name(); \
 		virtual void handled_variants(uint32_t *variants, int &var_count) const override; \
-		virtual const char *image_interface() const override { return Interface; } \
+		virtual const char *image_interface() const noexcept override { return Interface; } \
 	protected: \
 		virtual void setup_characteristics() override; \
 	}; \

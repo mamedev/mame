@@ -302,10 +302,10 @@ void nc_state::nc_refresh_memory_bank_config(int bank)
 	uint8_t *ptr;
 	int mem_type;
 	int mem_bank;
-	char bank1[10];
-	char bank5[10];
-	sprintf(bank1,"bank%d",bank+1);
-	sprintf(bank5,"bank%d",bank+5);
+	char bank1[20];
+	char bank5[20];
+	snprintf(bank1,ARRAY_LENGTH(bank1),"bank%d",bank+1);
+	snprintf(bank5,ARRAY_LENGTH(bank5),"bank%d",bank+5);
 
 	mem_type = (m_memory_config[bank]>>6) & 0x03;
 	mem_bank = m_memory_config[bank] & 0x03f;
@@ -1376,26 +1376,25 @@ INPUT_PORTS_END
 
 /**********************************************************************************************************/
 
-MACHINE_CONFIG_START(nc_state::nc_base)
+void nc_state::nc_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
-	MCFG_DEVICE_PROGRAM_MAP(nc_map)
-	config.m_minimum_quantum = attotime::from_hz(60);
+	Z80(config, m_maincpu, /*6000000*/ 4606000);        /* Russell Marks says this is more accurate */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nc_state::nc_map);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(nc_state::nc_colours), NC_NUM_COLOURS);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beep.1", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_DEVICE_ADD("beep.2", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	BEEP(config, m_beeper1, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beeper2, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* printer */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -1411,9 +1410,9 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	uart_clock.signal_handler().set(FUNC(nc_state::write_uart_clock));
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_plain_slot, nullptr)
-	MCFG_GENERIC_LOAD(nc_state, nc_pcmcia_card)
-	MCFG_GENERIC_UNLOAD(nc_state, nc_pcmcia_card)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cardslot", generic_plain_slot, nullptr));
+	cartslot.set_device_load(FUNC(nc_state::load_pcmcia_card));
+	cartslot.set_device_unload(FUNC(nc_state::unload_pcmcia_card));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");
@@ -1421,19 +1420,19 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 
 	/* dummy timer */
 	TIMER(config, "dummy_timer").configure_periodic(FUNC(nc_state::dummy_timer_callback), attotime::from_hz(50));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nc100_state::nc100)
+void nc100_state::nc100(machine_config &config)
+{
 	nc_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(nc100_io)
+	m_maincpu->set_addrmap(AS_IO, &nc100_state::nc100_io);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(480, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 64-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nc100_state, screen_update_nc100)
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_size(480, 64);
+	screen.set_visarea(0, 480-1, 0, 64-1);
+	screen.set_screen_update(FUNC(nc100_state::screen_update_nc100));
 
 	/* printer */
 	m_centronics->ack_handler().set(FUNC(nc100_state::write_nc100_centronics_ack));
@@ -1445,7 +1444,7 @@ MACHINE_CONFIG_START(nc100_state::nc100)
 	/* rtc */
 	tc8521_device &rtc(TC8521(config, "rtc", XTAL(32'768)));
 	rtc.out_alarm_callback().set(FUNC(nc100_state::nc100_tc8521_alarm_callback));
-MACHINE_CONFIG_END
+}
 
 static const floppy_format_type ibmpc_floppy_formats[] = {
 	FLOPPY_PC_FORMAT,
@@ -1458,17 +1457,17 @@ static void ibmpc_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-MACHINE_CONFIG_START(nc200_state::nc200)
+void nc200_state::nc200(machine_config &config)
+{
 	nc_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(nc200_io)
+	m_maincpu->set_addrmap(AS_IO, &nc200_state::nc200_io);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(NC200_SCREEN_WIDTH, NC200_SCREEN_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0, NC200_SCREEN_WIDTH-1, 0, NC200_SCREEN_HEIGHT-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nc200_state, screen_update_nc200)
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_size(NC200_SCREEN_WIDTH, NC200_SCREEN_HEIGHT);
+	screen.set_visarea(0, NC200_SCREEN_WIDTH-1, 0, NC200_SCREEN_HEIGHT-1);
+	screen.set_screen_update(FUNC(nc200_state::screen_update_nc200));
 
 	palette_device &palette(*subdevice<palette_device>("palette"));
 	palette.set_entries(NC200_NUM_COLOURS);
@@ -1490,7 +1489,7 @@ MACHINE_CONFIG_START(nc200_state::nc200)
 
 	/* internal ram */
 	m_ram->set_default_size("128K");
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

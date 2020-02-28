@@ -70,7 +70,7 @@ private:
 void fb01_state::fb01_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).ram().share("nvram");  // 2 * 8KB S-RAM
+	map(0x8000, 0xbfff).mirror(0x4000).ram().share("nvram"); // 2 * 8KB S-RAM
 }
 
 
@@ -89,8 +89,7 @@ void fb01_state::fb01_io(address_map &map)
 	map(0x20, 0x20).portr("PANEL");
 
 	// 30-31  HD44780A
-	map(0x30, 0x30).rw("hd44780", FUNC(hd44780_device::control_read), FUNC(hd44780_device::control_write));
-	map(0x31, 0x31).rw("hd44780", FUNC(hd44780_device::data_read), FUNC(hd44780_device::data_write));
+	map(0x30, 0x31).rw("hd44780", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 }
 
 
@@ -179,20 +178,21 @@ void fb01_state::fb01_palette(palette_device &palette) const
 }
 
 
-MACHINE_CONFIG_START(fb01_state::fb01)
+void fb01_state::fb01(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(fb01_mem)
-	MCFG_DEVICE_IO_MAP(fb01_io)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fb01_state::fb01_mem);
+	m_maincpu->set_addrmap(AS_IO, &fb01_state::fb01_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(6*16, 9)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(6*16, 9);
+	screen.set_visarea_full();
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_palette("palette");
 
 	config.set_default_layout(layout_fb01);
 
@@ -200,7 +200,7 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 
 	hd44780_device &hd44780(HD44780(config, "hd44780", 0));
 	hd44780.set_lcd_size(2, 8);   // 2x8 displayed as 1x16
-	hd44780.set_pixel_update_cb(FUNC(fb01_state::fb01_pixel_update), this);
+	hd44780.set_pixel_update_cb(FUNC(fb01_state::fb01_pixel_update));
 
 	I8251(config, m_upd71051, XTAL(4'000'000));
 	m_upd71051->rxrdy_handler().set(FUNC(fb01_state::upd71051_rxrdy_w));
@@ -224,7 +224,7 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 	ym2164.add_route(1, "rspeaker", 1.00);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

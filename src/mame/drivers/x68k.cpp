@@ -166,9 +166,6 @@ void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	case TIMER_X68K_BUS_ERROR:
 		bus_error(ptr, param);
 		break;
-	case TIMER_X68K_NET_IRQ:
-		net_irq(ptr, param);
-		break;
 	case TIMER_X68K_FDC_TC:
 		m_upd72065->tc_w(ASSERT_LINE);
 		m_upd72065->tc_w(CLEAR_LINE);
@@ -178,7 +175,7 @@ void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		m_hd63450->drq3_w(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in x68k_state::device_timer");
+		throw emu_fatalerror("Unknown id in x68k_state::device_timer");
 	}
 }
 
@@ -311,10 +308,9 @@ TIMER_CALLBACK_MEMBER(x68k_state::scc_ack)
 		{
 			if(m_scc->get_reg_b(5) & 0x02)  // RTS signal
 			{
-				m_mouse.irqactive = 1;
-				m_current_vector[5] = 0x54;
-				m_current_irq_line = 5;
-				m_maincpu->set_input_line_and_vector(5,ASSERT_LINE,0x54);
+				m_mouse.irqactive = true;
+				m_mouse.irqvector = 0x54;
+				update_ipl();
 			}
 		}
 	}
@@ -678,14 +674,15 @@ WRITE_LINE_MEMBER( x68k_state::fdc_irq )
 {
 	if((m_ioc.irqstatus & 0x04) && state)
 	{
-		m_current_vector[1] = m_ioc.fdcvector;
 		m_ioc.irqstatus |= 0x80;
-		m_current_irq_line = 1;
 		LOGMASKED(LOG_FDC, "FDC: IRQ triggered\n");
-		m_maincpu->set_input_line_and_vector(1, ASSERT_LINE, m_current_vector[1]);
+		update_ipl();
 	}
 	else
-		m_maincpu->set_input_line(1, CLEAR_LINE);
+	{
+		m_ioc.irqstatus &= 0x7f;
+		update_ipl();
+	}
 }
 
 WRITE8_MEMBER(x68k_state::ct_w)
@@ -998,34 +995,17 @@ WRITE16_MEMBER(x68k_state::exp_w)
 		set_bus_error((offset << 1) + 0xeafa00, 1, mem_mask);
 }
 
-void x68k_state::dma_irq(int channel)
+WRITE_LINE_MEMBER(x68k_state::dma_irq)
 {
-	m_current_vector[3] = m_hd63450->get_vector(channel);
-	m_current_irq_line = 3;
-	LOGMASKED(LOG_SYS, "DMA#%i: DMA End (vector 0x%02x)\n",channel,m_current_vector[3]);
-	m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,m_current_vector[3]);
+	m_dmac_int = state != CLEAR_LINE;
+	update_ipl();
 }
 
 WRITE8_MEMBER(x68k_state::dma_end)
 {
-	if(data != 0)
-	{
-		dma_irq(offset);
-	}
 	if(offset == 0)
 	{
 		m_fdc_tc->adjust(attotime::from_usec(1), 0, attotime::never);
-	}
-}
-
-WRITE8_MEMBER(x68k_state::dma_error)
-{
-	if(data != 0)
-	{
-		m_current_vector[3] = m_hd63450->get_error_vector(offset);
-		m_current_irq_line = 3;
-		LOGMASKED(LOG_SYS, "DMA#%i: DMA Error (vector 0x%02x)\n",offset,m_current_vector[3]);
-		m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,m_current_vector[3]);
 	}
 }
 
@@ -1056,51 +1036,163 @@ WRITE8_MEMBER(x68k_state::adpcm_w)
 
 WRITE_LINE_MEMBER(x68k_state::mfp_irq_callback)
 {
-	if(m_mfp_prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
-		return;
-	if(state != CLEAR_LINE)
-		state = HOLD_LINE;  // to get around erroneous spurious interrupt
-//  if((m_ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
-//      return;
-	m_maincpu->set_input_line(6, state);
-	m_current_vector[6] = 0;
-	m_mfp_prev = state;
+	m_mfp_int = state;
+	update_ipl();
 }
 
-IRQ_CALLBACK_MEMBER(x68k_state::int_ack)
+void x68k_state::update_ipl()
 {
-	if(irqline == 6)  // MFP
+	uint8_t new_ipl = 0;
+	if (m_exp_nmi[0] || m_exp_nmi[1])
+		new_ipl = 7;
+	else if (m_mfp_int)
+		new_ipl = 6;
+	else if (m_mouse.irqactive)
+		new_ipl = 5;
+	else if (m_exp_irq4[0] || m_exp_irq4[1])
+		new_ipl = 4;
+	else if (m_dmac_int)
+		new_ipl = 3;
+	else if (m_exp_irq2[0] || m_exp_irq2[1])
+		new_ipl = 2;
+	else if ((m_ioc.irqstatus & 0xf0) != 0)
+		new_ipl = 1;
+
+	if (m_current_ipl != new_ipl)
 	{
-		if(m_current_vector[6] != 0x4b && m_current_vector[6] != 0x4c)
-			m_current_vector[6] = m_mfpdev->get_vector();
-		else
-			m_maincpu->set_input_line_and_vector(irqline,CLEAR_LINE,m_current_vector[irqline]);
-		LOGMASKED(LOG_IRQ, "SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[6],irqline);
-		return m_current_vector[6];
+		if (m_current_ipl != 0)
+			m_maincpu->set_input_line(m_current_ipl, CLEAR_LINE);
+		LOGMASKED(LOG_IRQ, "Changing interrupt level from %d to %d\n", m_current_ipl, new_ipl);
+		m_current_ipl = new_ipl;
+		if (m_current_ipl != 0)
+			m_maincpu->set_input_line(m_current_ipl, ASSERT_LINE);
+	}
+}
+
+uint8_t x68k_state::iack1()
+{
+	uint8_t vector = 0x18;
+	if (BIT(m_ioc.irqstatus, 7))
+	{
+		vector = m_ioc.fdcvector;
+		if (!machine().side_effects_disabled())
+		{
+			m_ioc.irqstatus &= 0x7f;
+			update_ipl();
+		}
+	}
+	else if (BIT(m_ioc.irqstatus, 6))
+	{
+		vector = 0x61 /*m_ioc.fddvector*/;
+		if (!machine().side_effects_disabled())
+		{
+			m_ioc.irqstatus &= 0xbf;
+			update_ipl();
+		}
+	}
+	else if (BIT(m_ioc.irqstatus, 5))
+	{
+		vector = m_ioc.prnvector;
+		if (!machine().side_effects_disabled())
+		{
+			m_ioc.irqstatus &= 0xdf;
+			update_ipl();
+		}
+	}
+	else if (BIT(m_ioc.irqstatus, 4))
+	{
+		vector = 0x6c /*m_ioc.hdcvector*/;
+		if (!machine().side_effects_disabled())
+		{
+			m_ioc.irqstatus &= 0xef;
+			update_ipl();
+		}
 	}
 
-	m_maincpu->set_input_line_and_vector(irqline,CLEAR_LINE,m_current_vector[irqline]);
-	if(irqline == 1)  // IOSC
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_IRQ, "IOC: IRQ1 acknowledged with vector = %02X\n", vector);
+	return vector;
+}
+
+template <int N>
+WRITE_LINE_MEMBER(x68k_state::irq2_line)
+{
+	m_exp_irq2[N] = (state != CLEAR_LINE);
+	LOGMASKED(LOG_IRQ, "IRQ2-%d %s\n", N + 1, m_exp_irq2[N] ? "asserted" : "cleared");
+	update_ipl();
+}
+
+template <int N>
+WRITE_LINE_MEMBER(x68k_state::irq4_line)
+{
+	m_exp_irq4[N] = (state != CLEAR_LINE);
+	LOGMASKED(LOG_IRQ, "IRQ4-%d %s\n", N + 1, m_exp_irq4[N] ? "asserted" : "cleared");
+	update_ipl();
+}
+
+template <int N>
+WRITE_LINE_MEMBER(x68k_state::nmi_line)
+{
+	m_exp_nmi[N] = (state != CLEAR_LINE);
+	LOGMASKED(LOG_IRQ, "EXNMI %s on expansion %d\n", m_exp_nmi[N] ? "asserted" : "cleared", N + 1);
+	update_ipl();
+}
+
+uint8_t x68k_state::iack2()
+{
+	// Relative priority of IACK2-1 and IACK2-2 is unknown
+	if (m_exp_irq2[0])
+		return m_expansion[0]->iack2();
+	else if (m_exp_irq2[1])
+		return m_expansion[1]->iack2();
+	else
+		return 0x18; // spurious interrupt
+}
+
+uint8_t x68k_state::iack4()
+{
+	// Relative priority of IACK4-1 and IACK4-2 is unknown
+	if (m_exp_irq4[0])
+		return m_expansion[0]->iack4();
+	else if (m_exp_irq4[1])
+		return m_expansion[1]->iack4();
+	else
+		return 0x18; // spurious interrupt
+}
+
+uint8_t x68k_state::iack5()
+{
+	if (!machine().side_effects_disabled())
 	{
-		m_ioc.irqstatus &= ~0xf0;
-	}
-	if(irqline == 5)  // SCC
-	{
-		m_mouse.irqactive = 0;
+		m_mouse.irqactive = false;
+		update_ipl();
 	}
 
-	LOGMASKED(LOG_IRQ, "SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[irqline],irqline);
-	return m_current_vector[irqline];
+	// TODO: use vector from SCC
+	return m_mouse.irqvector;
+}
+
+void x68k_state::cpu_space_map(address_map &map)
+{
+	map.global_mask(0xffffff);
+	map(0xfffff3, 0xfffff3).r(FUNC(x68k_state::iack1));
+	map(0xfffff5, 0xfffff5).r(FUNC(x68k_state::iack2));
+	map(0xfffff7, 0xfffff7).r(m_hd63450, FUNC(hd63450_device::iack));
+	map(0xfffff9, 0xfffff9).r(FUNC(x68k_state::iack4));
+	map(0xfffffb, 0xfffffb).r(FUNC(x68k_state::iack5));
+	map(0xfffffd, 0xfffffd).r(m_mfpdev, FUNC(mc68901_device::get_vector));
+	map(0xffffff, 0xffffff).lr8(NAME([] () { return m68000_base_device::autovector(7); }));
 }
 
 WRITE_LINE_MEMBER(x68ksupr_state::scsi_irq)
 {
+	LOGMASKED(LOG_IRQ, "SCSI IRQ %s\n", state ? "asserted" : "cleared");
+
 	// TODO : Internal SCSI IRQ vector 0x6c, External SCSI IRQ vector 0xf6, IRQs go through the IOSC (IRQ line 1)
 	if(state != 0)
 	{
-		m_current_vector[1] = 0x6c;
-		m_current_irq_line = 1;
-		m_maincpu->set_input_line_and_vector(1,ASSERT_LINE,m_current_vector[1]);
+		m_ioc.irqstatus |= 0x10;
+		update_ipl();
 	}
 }
 
@@ -1121,7 +1213,7 @@ void x68k_state::x68k_base_map(address_map &map)
 	map(0xe86000, 0xe87fff).rw(FUNC(x68k_state::areaset_r), FUNC(x68k_state::areaset_w));
 	map(0xe88000, 0xe89fff).rw(m_mfpdev, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
 	map(0xe8a000, 0xe8bfff).rw(m_rtc, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write)).umask16(0x00ff);
-//  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
+//  map(0xe8c000, 0xe8dfff).rw(FUNC(x68k_state::x68k_printer_r), FUNC(x68k_state::x68k_printer_w));
 	map(0xe8e000, 0xe8ffff).rw(FUNC(x68k_state::sysport_r), FUNC(x68k_state::sysport_w));
 	map(0xe90000, 0xe91fff).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
 	map(0xe94000, 0xe94003).m(m_upd72065, FUNC(upd72065_device::map)).umask16(0x00ff);
@@ -1172,11 +1264,11 @@ void x68030_state::x68030_map(address_map &map)
 	x68k_base_map(map);
 	map(0xe82000, 0xe821ff).rw(m_gfxpalette, FUNC(palette_device::read32), FUNC(palette_device::write32)).share("gfxpalette");
 	map(0xe82200, 0xe823ff).rw(m_pcgpalette, FUNC(palette_device::read32), FUNC(palette_device::write32)).share("pcgpalette");
-//  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
+//  map(0xe8c000, 0xe8dfff).rw(FUNC(x68k_state::x68k_printer_r), FUNC(x68k_state::x68k_printer_w));
 	map(0xe92000, 0xe92003).r(m_okim6258, FUNC(okim6258_device::status_r)).umask32(0x00ff00ff).w(FUNC(x68030_state::adpcm_w)).umask32(0x00ff00ff);
 
 	map(0xe96020, 0xe9603f).rw(m_scsictrl, FUNC(mb89352_device::mb89352_r), FUNC(mb89352_device::mb89352_w)).umask32(0x00ff00ff);
-	map(0xea0000, 0xea1fff).noprw();//AM_READWRITE16(exp_r, exp_w,0xffffffff)  // external SCSI ROM and controller
+	map(0xea0000, 0xea1fff).noprw();//.rw(FUNC(x68030_state::exp_r), FUNC(x68030_state::exp_w));  // external SCSI ROM and controller
 	map(0xeafa80, 0xeafa8b).rw(FUNC(x68030_state::areaset_r), FUNC(x68030_state::enh_areaset_w));
 	map(0xfc0000, 0xfdffff).rom();  // internal SCSI ROM
 }
@@ -1363,11 +1455,9 @@ void x68k_state::floppy_load_unload(bool load, floppy_image_device *dev)
 	dev->mon_w(!(m_fdc.motor && load));
 	if(m_ioc.irqstatus & 0x02)
 	{
-		m_current_vector[1] = 0x61;
-		m_ioc.irqstatus |= 0x40;
-		m_current_irq_line = 1;
-		m_maincpu->set_input_line_and_vector(1,ASSERT_LINE,m_current_vector[1]);  // Disk insert/eject interrupt
+		m_ioc.irqstatus |= 0x40;  // Disk insert/eject interrupt
 		LOGMASKED(LOG_FDC, "IOC: Disk image inserted\n");
+		update_ipl();
 	}
 }
 
@@ -1380,32 +1470,6 @@ image_init_result x68k_state::floppy_load(floppy_image_device *dev)
 void x68k_state::floppy_unload(floppy_image_device *dev)
 {
 	floppy_load_unload(false, dev);
-}
-
-TIMER_CALLBACK_MEMBER(x68k_state::net_irq)
-{
-	m_current_vector[2] = 0xf9;
-	m_current_irq_line = 2;
-	m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
-}
-
-WRITE_LINE_MEMBER(x68k_state::irq2_line)
-{
-	if(state==ASSERT_LINE)
-	{
-		m_net_timer->adjust(attotime::from_usec(16));
-	}
-	else
-		m_maincpu->set_input_line_and_vector(2,CLEAR_LINE,m_current_vector[2]);
-	LOGMASKED(LOG_IRQ, "EXP: IRQ2 set to %i\n",state);
-
-}
-
-WRITE_LINE_MEMBER(x68k_state::irq4_line)
-{
-	m_current_vector[4] = m_expansion->vector();
-	m_maincpu->set_input_line_and_vector(4,state,m_current_vector[4]);
-	LOGMASKED(LOG_IRQ, "EXP: IRQ4 set to %i (vector %02x)\n",state,m_current_vector[4]);
 }
 
 static void x68000_exp_cards(device_slot_interface &device)
@@ -1449,8 +1513,8 @@ void x68k_state::machine_reset()
 	std::fill(std::begin(m_access_drv_out), std::end(m_access_drv_out), 1);
 	m_fdc.select_drive = 0;
 
-	// reset CPU
-	m_maincpu->reset();
+	m_ioc.irqstatus &= 0x0f;
+	update_ipl();
 }
 
 void x68k_state::machine_start()
@@ -1485,6 +1549,15 @@ void x68k_state::machine_start()
 		}
 	}
 	m_fdc.motor = 0;
+
+	m_dmac_int = false;
+	m_mfp_int = false;
+	m_exp_irq2[0] = m_exp_irq2[1] = false;
+	m_exp_irq4[0] = m_exp_irq4[1] = false;
+	m_exp_nmi[0] = m_exp_nmi[1] = false;
+	m_ioc.irqstatus = 0;
+	m_mouse.irqactive = false;
+	m_current_ipl = 0;
 }
 
 void x68k_state::driver_init()
@@ -1506,7 +1579,6 @@ void x68k_state::driver_init()
 
 	m_mouse_timer = timer_alloc(TIMER_X68K_SCC_ACK);
 	m_led_timer = timer_alloc(TIMER_X68K_LED);
-	m_net_timer = timer_alloc(TIMER_X68K_NET_IRQ);
 	m_fdc_tc = timer_alloc(TIMER_X68K_FDC_TC);
 	m_adpcm_timer = timer_alloc(TIMER_X68K_ADPCM);
 	m_bus_error_timer = timer_alloc(TIMER_X68K_BUS_ERROR);
@@ -1553,19 +1625,18 @@ static void keyboard_devices(device_slot_interface &device)
 
 void x68k_state::x68000_base(machine_config &config)
 {
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* device hardware */
 	MC68901(config, m_mfpdev, 16_MHz_XTAL / 4);
 	m_mfpdev->set_timer_clock(16_MHz_XTAL / 4);
-	m_mfpdev->set_rx_clock(0);
-	m_mfpdev->set_tx_clock(0);
 	m_mfpdev->out_irq_cb().set(FUNC(x68k_state::mfp_irq_callback));
-	m_mfpdev->out_tbo_cb().set(m_mfpdev, FUNC(mc68901_device::clock_w));
+	m_mfpdev->out_tbo_cb().set(m_mfpdev, FUNC(mc68901_device::tc_w));
+	m_mfpdev->out_tbo_cb().append(m_mfpdev, FUNC(mc68901_device::rc_w));
 	m_mfpdev->out_so_cb().set("keyboard", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &keyboard(RS232_PORT(config, "keyboard", keyboard_devices, "x68k"));
-	keyboard.rxd_handler().set(m_mfpdev, FUNC(mc68901_device::write_rx));
+	keyboard.rxd_handler().set(m_mfpdev, FUNC(mc68901_device::si_w));
 
 	I8255A(config, m_ppi, 0);
 	m_ppi->in_pa_callback().set(FUNC(x68k_state::ppi_port_a_r));
@@ -1576,10 +1647,10 @@ void x68k_state::x68000_base(machine_config &config)
 	HD63450(config, m_hd63450, 40_MHz_XTAL / 4, "maincpu");
 	m_hd63450->set_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
 	m_hd63450->set_burst_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
+	m_hd63450->irq_callback().set(FUNC(x68k_state::dma_irq));
 	m_hd63450->dma_end().set(FUNC(x68k_state::dma_end));
-	m_hd63450->dma_error().set(FUNC(x68k_state::dma_error));
-	m_hd63450->dma_read<0>().set("upd72065", FUNC(upd72065_device::mdma_r));
-	m_hd63450->dma_write<0>().set("upd72065", FUNC(upd72065_device::mdma_w));
+	m_hd63450->dma_read<0>().set("upd72065", FUNC(upd72065_device::dma_r));
+	m_hd63450->dma_write<0>().set("upd72065", FUNC(upd72065_device::dma_w));
 
 	SCC8530(config, m_scc, 40_MHz_XTAL / 8);
 
@@ -1627,10 +1698,17 @@ void x68k_state::x68000_base(machine_config &config)
 
 	SOFTWARE_LIST(config, "flop_list").set_original("x68k_flop");
 
-	X68K_EXPANSION_SLOT(config, m_expansion, x68000_exp_cards, nullptr);
-	m_expansion->out_irq2_callback().set(FUNC(x68k_state::irq2_line));
-	m_expansion->out_irq4_callback().set(FUNC(x68k_state::irq4_line));
-	m_expansion->out_nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
+	X68K_EXPANSION_SLOT(config, m_expansion[0], x68000_exp_cards, nullptr);
+	m_expansion[0]->set_space(m_maincpu, AS_PROGRAM);
+	m_expansion[0]->out_irq2_callback().set(FUNC(x68k_state::irq2_line<0>));
+	m_expansion[0]->out_irq4_callback().set(FUNC(x68k_state::irq4_line<0>));
+	m_expansion[0]->out_nmi_callback().set(FUNC(x68k_state::nmi_line<0>));
+
+	X68K_EXPANSION_SLOT(config, m_expansion[1], x68000_exp_cards, nullptr);
+	m_expansion[1]->set_space(m_maincpu, AS_PROGRAM);
+	m_expansion[1]->out_irq2_callback().set(FUNC(x68k_state::irq2_line<1>));
+	m_expansion[1]->out_irq4_callback().set(FUNC(x68k_state::irq4_line<1>));
+	m_expansion[1]->out_nmi_callback().set(FUNC(x68k_state::nmi_line<1>));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,3M,5M,6M,7M,8M,9M,10M,11M,12M");
@@ -1644,6 +1722,7 @@ void x68k_state::x68000(machine_config &config)
 	x68000_base(config);
 
 	VINAS(config, m_crtc, 38.86363_MHz_XTAL);
+	m_crtc->set_clock_69m(69.55199_MHz_XTAL);
 	m_crtc->set_screen("screen");
 	m_crtc->vdisp_cb().set(m_mfpdev, FUNC(mc68901_device::i4_w));
 	m_crtc->vdisp_cb().append(m_mfpdev, FUNC(mc68901_device::tai_w));
@@ -1676,6 +1755,7 @@ void x68ksupr_state::x68ksupr_base(machine_config &config)
 	m_scsictrl->drq_cb().set(FUNC(x68ksupr_state::scsi_drq));
 
 	VICON(config, m_crtc, 38.86363_MHz_XTAL);
+	m_crtc->set_clock_69m(69.55199_MHz_XTAL);
 	m_crtc->set_screen("screen");
 	m_crtc->vdisp_cb().set(m_mfpdev, FUNC(mc68901_device::i4_w));
 	m_crtc->vdisp_cb().append(m_mfpdev, FUNC(mc68901_device::tai_w));
@@ -1695,7 +1775,7 @@ void x68ksupr_state::x68ksupr(machine_config &config)
 
 void x68ksupr_state::x68kxvi(machine_config &config)
 {
-	add_cpu(config, M68000, &x68ksupr_state::x68kxvi_map, 33.333_MHz_XTAL / 2); /* 16 MHz (nominally) */
+	add_cpu(config, M68000, &x68ksupr_state::x68kxvi_map, 33.33_MHz_XTAL / 2); /* 16 MHz (nominally) */
 	x68ksupr_base(config);
 }
 
@@ -1707,6 +1787,8 @@ void x68030_state::x68030(machine_config &config)
 	m_hd63450->set_clock(50_MHz_XTAL / 4);
 	m_scc->set_clock(20_MHz_XTAL / 4);
 	m_scsictrl->set_clock(20_MHz_XTAL / 4);
+
+	m_crtc->set_clock_50m(50.35_MHz_XTAL);
 }
 
 ROM_START( x68000 )

@@ -10,6 +10,7 @@
 #include "sound/sn76496.h"
 #include "sound/2203intf.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class homedata_state : public driver_device
 {
@@ -29,7 +30,8 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_mainlatch(*this, "mainlatch"),
 		m_sn(*this, "snsnd"),
-		m_mrokumei_soundbank(*this, "mrokumei_soundbank")
+		m_mrokumei_soundbank(*this, "mrokumei_soundbank"),
+		m_keys(*this, "KEY%u", 0U)
 	{
 	}
 
@@ -84,6 +86,8 @@ private:
 	optional_device<generic_latch_8_device> m_mainlatch; // pteacher
 	optional_device<sn76489a_device> m_sn; // mrokumei and pteacher
 	optional_device<address_map_bank_device> m_mrokumei_soundbank; // mrokumei
+
+	optional_ioport_array<12> m_keys;
 
 	uint8_t m_prot_data;
 	DECLARE_READ8_MEMBER(mrokumei_keyboard_r);

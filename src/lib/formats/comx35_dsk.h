@@ -7,13 +7,15 @@
     COMX-35 disk image format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_COMX35_DSK_H
+#define MAME_FORMATS_COMX35_DSK_H
 
-#ifndef COMX35_DSK_H_
-#define COMX35_DSK_H_
+#pragma once
 
 #include "wd177x_dsk.h"
 
-class comx35_format : public wd177x_format {
+class comx35_format : public wd177x_format
+{
 public:
 	comx35_format();
 
@@ -27,4 +29,4 @@ private:
 
 extern const floppy_format_type FLOPPY_COMX35_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_COMX35_DSK_H

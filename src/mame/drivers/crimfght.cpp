@@ -34,30 +34,30 @@ READ8_MEMBER(crimfght_state::k052109_051960_r)
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return m_k051960->k051937_r(space, offset - 0x3800);
+			return m_k051960->k051937_r(offset - 0x3800);
 		else if (offset < 0x3c00)
-			return m_k052109->read(space, offset);
+			return m_k052109->read(offset);
 		else
-			return m_k051960->k051960_r(space, offset - 0x3c00);
+			return m_k051960->k051960_r(offset - 0x3c00);
 	}
 	else
-		return m_k052109->read(space, offset);
+		return m_k052109->read(offset);
 }
 
 WRITE8_MEMBER(crimfght_state::k052109_051960_w)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
-		m_k051960->k051937_w(space, offset - 0x3800, data);
+		m_k051960->k051937_w(offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		m_k052109->write(space, offset, data);
+		m_k052109->write(offset, data);
 	else
-		m_k051960->k051960_w(space, offset - 0x3c00, data);
+		m_k051960->k051960_w(offset - 0x3c00, data);
 }
 
 WRITE8_MEMBER(crimfght_state::sound_w)
 {
 	// writing the latch asserts the irq line
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
@@ -183,7 +183,7 @@ static INPUT_PORTS_START( crimfght )
 	PORT_DIPUNUSED_DIPLOC(0x02, IP_ACTIVE_LOW, "SW3:2")
 	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW3:3")
 	PORT_DIPUNUSED_DIPLOC(0x08, IP_ACTIVE_LOW, "SW3:4")
-	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, crimfght_state, system_r, nullptr)
+	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(crimfght_state, system_r)
 
 	PORT_START("P1")
 	KONAMI8_B123_START(1)
@@ -327,12 +327,13 @@ void crimfght_state::crimfght(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(crimfght_state::tile_callback), this);
+	m_k052109->set_screen(nullptr);
+	m_k052109->set_tile_callback(FUNC(crimfght_state::tile_callback));
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
-	m_k051960->set_sprite_callback(FUNC(crimfght_state::sprite_callback), this);
+	m_k051960->set_screen("screen");
+	m_k051960->set_sprite_callback(FUNC(crimfght_state::sprite_callback));
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	/* sound hardware */

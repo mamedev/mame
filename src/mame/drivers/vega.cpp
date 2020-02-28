@@ -139,7 +139,6 @@ private:
 	int m_tmp;
 	int m_t1;
 
-	uint8_t m_ins8154_ram[0x80];
 	uint8_t m_txt_ram[0x400];
 
 	vega_obj    m_obj[NUM_OBJ];
@@ -194,7 +193,7 @@ WRITE8_MEMBER(vega_state::extern_w)
 		case 1: /* 04-07 */
 		{
 			/* AY 3-8910 */
-			m_ay8910->address_w(space, 0, offset);
+			m_ay8910->address_w(offset);
 		}
 		break;
 
@@ -204,12 +203,12 @@ WRITE8_MEMBER(vega_state::extern_w)
 
 			if(m_p2_data&0x40) /* P26 connected to M/IO pin */
 			{
-					m_ins8154_ram[offset&0x7f]=data;
+				m_ins8154->write_ram(offset, data);
 			}
 			else
 			{
 				//register w ?
-				m_ins8154->ins8154_w(space,offset&0x7f,data);
+				m_ins8154->write_io(offset & 0x7f, data);
 			}
 		}
 		break;
@@ -322,7 +321,7 @@ READ8_MEMBER(vega_state::extern_r)
 		case 1: /* 04-07 */
 		{
 			/* AY 3-8910 */
-			m_ay8910->data_w(space, 0, offset);
+			m_ay8910->data_w(offset);
 			return 0xff;//mame_rand(machine);
 		}
 
@@ -332,12 +331,12 @@ READ8_MEMBER(vega_state::extern_r)
 
 			if(m_p2_data&0x40) /* P26 connected to M/IO pin */
 			{
-				return m_ins8154_ram[offset&0x7f];
+				return m_ins8154->read_ram(offset);
 			}
 			else
 			{
 				//register r ?
-				return m_ins8154->ins8154_r(space,offset&0x7f);
+				return m_ins8154->read_io(offset & 0x7f);
 			}
 		}
 #if 0

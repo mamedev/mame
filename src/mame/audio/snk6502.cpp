@@ -319,9 +319,9 @@ void snk6502_sound_device::set_music_clock(double clock_time)
 	m_tone_clock = 0;
 }
 
-CUSTOM_INPUT_MEMBER(snk6502_sound_device::music0_playing)
+READ_LINE_MEMBER(snk6502_sound_device::music0_playing)
 {
-	return m_tone_channels[0].mute ? 0x01 : 0x00;
+	return m_tone_channels[0].mute ? 1 : 0;
 }
 
 void snk6502_sound_device::set_channel_base(int channel, int base, int mask)
@@ -338,8 +338,9 @@ void snk6502_sound_device::mute_channel(int channel)
 
 void snk6502_sound_device::unmute_channel(int channel)
 {
+	if (m_tone_channels[channel].mute)
+		m_tone_channels[channel].offset = 0;
 	m_tone_channels[channel].mute = 0;
-	m_tone_channels[channel].offset = 0;
 }
 
 
@@ -996,7 +997,10 @@ WRITE8_MEMBER(sasuke_sound_device::sound_w)
 			m_samples->start(3, 3);
 
 		if (BIT(data & ~m_last_port1, 7))
+		{
+			m_custom->reset_offset(0); // TODO: why is this the only game that needs this when unmuting?
 			m_custom->unmute_channel(0);
+		}
 		else if (BIT(~data & m_last_port1, 7))
 			m_custom->mute_channel(0);
 

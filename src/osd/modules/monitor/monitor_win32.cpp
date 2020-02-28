@@ -94,9 +94,9 @@ protected:
 
 		// if we're verbose, print the list of monitors
 		{
-			for (auto monitor : list())
+			for (const auto &monitor : list())
 			{
-				osd_printf_verbose("Video: Monitor %I64u = \"%s\" %s\n", monitor->oshandle(), monitor->devicename().c_str(), monitor->is_primary() ? "(primary)" : "");
+				osd_printf_verbose("Video: Monitor %I64u = \"%s\" %s\n", monitor->oshandle(), monitor->devicename(), monitor->is_primary() ? "(primary)" : "");
 			}
 		}
 
@@ -106,7 +106,7 @@ protected:
 private:
 	static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data)
 	{
-		win32_monitor_module* self = reinterpret_cast<win32_monitor_module*>(data);
+		auto* self = reinterpret_cast<win32_monitor_module*>(data);
 		MONITORINFOEX info;
 		BOOL result;
 

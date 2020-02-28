@@ -126,11 +126,12 @@ void abc80_keyboard_device::abc80_keyboard_io(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc80_keyboard_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(I8048_TAG, I8048, 4000000)
-	MCFG_DEVICE_IO_MAP(abc80_keyboard_io)
-	MCFG_DEVICE_DISABLE()
-MACHINE_CONFIG_END
+void abc80_keyboard_device::device_add_mconfig(machine_config &config)
+{
+	I8048(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_IO, &abc80_keyboard_device::abc80_keyboard_io);
+	m_maincpu->set_disable();
+}
 
 
 //-------------------------------------------------

@@ -27,20 +27,22 @@ Tetris with naughty bits
 there are a variety of test modes which can be obtained
 by resetting while holding down player 2 buttons
 
-eeprom / backup data not hooked up ( 24c04a on port4 )
-
 most sources say this is a game by Nics but I believe Nics
 to be a company from Korea, this game is quite clearly a
 Spanish game, we know for a fact that NIX are from Spain
 so it could be by them instead
 
+For some reason the game isn't saving scores to the EEPROM. Settings and
+statistics are saved however. The option "AUTO SAVE SCORES" doesn't seem
+to be honored - the game writes the value to RAM but never reads it.
 
 
 */
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-//#include "machine/i2cmem.h"
+#include "machine/bankdev.h"
+#include "machine/i2cmem.h"
 #include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"
@@ -53,8 +55,10 @@ public:
 	hotblock_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")/*,
-		m_i2cmem(*this, "i2cmem")*/
+		m_palette(*this, "palette"),
+		m_video_bank(*this, "video_bank"),
+		m_i2cmem(*this, "i2cmem"),
+		m_vram(*this, "vram")
 	{ }
 
 	void hotblock(machine_config &config);
@@ -63,104 +67,70 @@ private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-//  required_device<i2cmem_device> m_i2cmem;
+	required_device<address_map_bank_device> m_video_bank;
+	required_device<i2cmem_device> m_i2cmem;
 
 	/* misc */
 	int      m_port0;
-	int      m_port4;
 
 	/* memory */
-	std::unique_ptr<uint8_t[]> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 
-	DECLARE_READ8_MEMBER(video_read);
-	DECLARE_READ8_MEMBER(port4_r);
-	DECLARE_WRITE8_MEMBER(port4_w);
-	DECLARE_WRITE8_MEMBER(port0_w);
-	DECLARE_WRITE8_MEMBER(video_write);
+	u8 eeprom_r();
+	void eeprom_w(u8 data);
+	void port0_w(u8 data);
 
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void banked_video_map(address_map &map);
 	void hotblock_io(address_map &map);
 	void hotblock_map(address_map &map);
 };
 
-
-READ8_MEMBER(hotblock_state::video_read)
+u8 hotblock_state::eeprom_r()
 {
-	/* right?, anything else?? */
-	if (m_port0 & 0x20) // port 0 = a8 e8 -- palette
-	{
-		if (offset < 0x200)
-			return m_palette->read8(space, offset);
-
-		return 0;
-	}
-	else // port 0 = 88 c8
-	{
-		return m_vram[offset];
-	}
+	return m_i2cmem->read_sda();
 }
 
-/* port 4 is some kind of eeprom / storage .. used to store the scores */
-READ8_MEMBER(hotblock_state::port4_r)
+void hotblock_state::eeprom_w(u8 data)
 {
-//  osd_printf_debug("port4_r\n");
-	//logerror("trying to read port 4 at maincpu pc %08x\n", m_maincpu->pc());
-	//return (m_i2cmem->read_sda() & 1);
-	return 0x00;
+	m_i2cmem->write_scl(BIT(data, 1));
+	m_i2cmem->write_sda(BIT(data, 0));
 }
 
-
-WRITE8_MEMBER(hotblock_state::port4_w)
-{
-	//logerror("trying to write port 4 in %02x at maincpu pc %08x\n", data, m_maincpu->pc());
-	m_port4 = data;
-}
-
-
-WRITE8_MEMBER(hotblock_state::port0_w)
+void hotblock_state::port0_w(u8 data)
 {
 	m_port0 = data;
-}
-
-WRITE8_MEMBER(hotblock_state::video_write)
-{
-	/* right?, anything else?? */
-	if (m_port0 & 0x20) // port 0 = a8 e8 -- palette
-	{
-		if (offset < 0x200)
-			m_palette->write8(space, offset, data);
-	}
-	else // port 0 = 88 c8
-	{
-		m_vram[offset] = data;
-	}
+	m_video_bank->set_bank(m_port0 & ~0x40);
 }
 
 void hotblock_state::hotblock_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram();
-	map(0x10000, 0x1ffff).rw(FUNC(hotblock_state::video_read), FUNC(hotblock_state::video_write)).share("palette");
+	map(0x10000, 0x1ffff).m(m_video_bank, FUNC(address_map_bank_device::amap8));
 	map(0x20000, 0xfffff).rom();
 }
 
 void hotblock_state::hotblock_io(address_map &map)
 {
 	map(0x0000, 0x0000).w(FUNC(hotblock_state::port0_w));
-	map(0x0004, 0x0004).rw(FUNC(hotblock_state::port4_r), FUNC(hotblock_state::port4_w));
+	map(0x0004, 0x0004).rw(FUNC(hotblock_state::eeprom_r), FUNC(hotblock_state::eeprom_w));
 	map(0x8000, 0x8001).w("aysnd", FUNC(ym2149_device::address_data_w));
 	map(0x8001, 0x8001).r("aysnd", FUNC(ym2149_device::data_r));
 }
 
+/* right?, anything else?? */
+void hotblock_state::banked_video_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).mirror(0x9f0000).ram().share("vram"); // port 0 = 88 c8
+	map(0x200000, 0x2001ff).mirror(0x9f0000).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // port 0 = a8 e8 -- palette
+}
 
 
 void hotblock_state::video_start()
 {
-	m_vram = make_unique_clear<uint8_t[]>(0x10000);
-	save_pointer(NAME(m_vram), 0x10000);
 	save_item(NAME(m_port0));
-	save_item(NAME(m_port4)); //stored but not read for now
 }
 
 uint32_t hotblock_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -207,21 +177,23 @@ static INPUT_PORTS_START( hotblock )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(hotblock_state::hotblock)
-
+void hotblock_state::hotblock(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, 24_MHz_XTAL / 3) // Unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(hotblock_map)
-	MCFG_DEVICE_IO_MAP(hotblock_io)
+	I8088(config, m_maincpu, 24_MHz_XTAL / 3); // Unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &hotblock_state::hotblock_map);
+	m_maincpu->set_addrmap(AS_IO, &hotblock_state::hotblock_io);
 
-//  I2CMEM(config, m_i2cmem, 0).set_page_size(16).set_data_size(0x200); // 24C04
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // 24C04A
+
+	ADDRESS_MAP_BANK(config, m_video_bank).set_map(&hotblock_state::banked_video_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x10000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(24_MHz_XTAL / 3, 512, 0, 320, 312, 0, 200) // 15.625 kHz horizontal???
-	MCFG_SCREEN_UPDATE_DRIVER(hotblock_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // right?
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(24_MHz_XTAL / 3, 512, 0, 320, 312, 0, 200); // 15.625 kHz horizontal???
+	screen.set_screen_update(FUNC(hotblock_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI); // right?
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x200/2);
 
@@ -232,7 +204,7 @@ MACHINE_CONFIG_START(hotblock_state::hotblock)
 	aysnd.port_a_read_callback().set_ioport("P1");
 	aysnd.port_b_read_callback().set_ioport("P2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 ROM_START( hotblock )
 	ROM_REGION( 0x100000, "maincpu", 0 )

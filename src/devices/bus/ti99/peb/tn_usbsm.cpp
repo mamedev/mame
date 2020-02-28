@@ -93,9 +93,8 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::crureadz)
 	if ((offset & 0xff00)==m_cru_base)
 	{
 		uint8_t reply = 0;
-		offset &= 3;
 
-		if (offset == 0)
+		if ((offset & 0x0030) == 0)
 		{
 			// bit
 			// 0   >1x00   0: USB Host controller requests interrupt.
@@ -117,14 +116,14 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::crureadz)
 			else if (!m_smartmedia->is_protected())
 				reply |= 0x80;
 		}
-		*value = reply;
+		*value = BIT(reply, (offset >> 1) & 7);
 	}
 }
 
 /*
     CRU write
 */
-WRITE8_MEMBER(nouspikel_usb_smartmedia_device::cruwrite)
+void nouspikel_usb_smartmedia_device::cruwrite(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -193,7 +192,7 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
 {
 	if (machine().side_effects_disabled()) return;
 
-	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	if (in_dsr_space(offset, true) && m_selected)
 	{
 		if (m_tms9995_mode ? (!(offset & 1)) : (offset & 1))
 		{
@@ -212,7 +211,7 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
 				{
 					// FEEPROM
 					if (!m_write_flash)
-						m_input_latch = m_flash->read16(space, (offset>>1)&0xffff);
+						m_input_latch = m_flash->read16((offset>>1)&0xffff);
 				}
 			}
 			else
@@ -240,11 +239,11 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
 /*
     Memory write. The controller is 16 bit, so we need to demultiplex again.
 */
-WRITE8_MEMBER(nouspikel_usb_smartmedia_device::write)
+void nouspikel_usb_smartmedia_device::write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled()) return;
 
-	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	if (in_dsr_space(offset, true) && m_selected)
 	{
 		/* latch write */
 		if (offset & 1)
@@ -280,7 +279,7 @@ WRITE8_MEMBER(nouspikel_usb_smartmedia_device::write)
 				else
 				{   // FEEPROM
 					if (m_write_flash)
-						m_flash->write16(space, (offset>>1)&0xffff, m_output_latch);
+						m_flash->write16((offset>>1)&0xffff, m_output_latch);
 				}
 			}
 			else
@@ -326,16 +325,6 @@ void nouspikel_usb_smartmedia_device::device_reset()
 	m_enable_sm = false;
 	m_write_flash = false;
 
-	if (m_genmod)
-	{
-		m_select_mask = 0x1fe000;
-		m_select_value = 0x174000;
-	}
-	else
-	{
-		m_select_mask = 0x7e000;
-		m_select_value = 0x74000;
-	}
 	m_selected = false;
 
 	m_cru_base = ioport("CRUUSBSM")->read();
@@ -366,12 +355,13 @@ INPUT_PORTS_START( tn_usbsm )
 		PORT_DIPSETTING( 0x01, "Geneve mode")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(nouspikel_usb_smartmedia_device::device_add_mconfig)
+void nouspikel_usb_smartmedia_device::device_add_mconfig(machine_config &config)
+{
 	SMARTMEDIA(config, "smartmedia", 0);
 	STRATAFLASH(config, STRATA_TAG, 0);
 	RAM(config, RAM1_TAG).set_default_size("512K").set_default_value(0);
 	RAM(config, RAM2_TAG).set_default_size("512K").set_default_value(0);
-MACHINE_CONFIG_END
+}
 
 ioport_constructor nouspikel_usb_smartmedia_device::device_input_ports() const
 {

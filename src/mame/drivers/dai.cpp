@@ -80,7 +80,7 @@ void dai_state::dai_mem(address_map &map)
 	map(0xf000, 0xf7ff).w(FUNC(dai_state::dai_stack_interrupt_circuit_w));
 	map(0xf800, 0xf8ff).ram();
 	map(0xfb00, 0xfbff).rw(FUNC(dai_state::dai_amd9511_r), FUNC(dai_state::dai_amd9511_w));
-	map(0xfc00, 0xfcff).rw(FUNC(dai_state::dai_pit_r), FUNC(dai_state::dai_pit_w)); // AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+	map(0xfc00, 0xfcff).rw(FUNC(dai_state::dai_pit_r), FUNC(dai_state::dai_pit_w)); // .rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xfd00, 0xfdff).rw(FUNC(dai_state::dai_io_discrete_devices_r), FUNC(dai_state::dai_io_discrete_devices_w));
 	map(0xfe00, 0xfeff).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xff00, 0xff0f).mirror(0xf0).m(m_tms5501, FUNC(tms5501_device::io_map));
@@ -187,13 +187,14 @@ static GFXDECODE_START( gfx_dai )
 GFXDECODE_END
 
 /* machine definition */
-MACHINE_CONFIG_START(dai_state::dai)
+void dai_state::dai(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(dai_mem)
-	MCFG_DEVICE_IO_MAP(dai_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(dai_state,int_ack)
-	config.m_minimum_quantum = attotime::from_hz(60);
+	I8080(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dai_state::dai_mem);
+	m_maincpu->set_addrmap(AS_IO, &dai_state::dai_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(dai_state::int_ack));
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(2000000);
@@ -206,21 +207,20 @@ MACHINE_CONFIG_START(dai_state::dai)
 	I8255(config, "ppi8255");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1056, 542)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1056-1, 0, 302-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dai_state, screen_update_dai)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(1056, 542);
+	screen.set_visarea(0, 1056-1, 0, 302-1);
+	screen.set_screen_update(FUNC(dai_state::screen_update_dai));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_dai)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_dai);
 	PALETTE(config, m_palette, FUNC(dai_state::dai_palette), ARRAY_LENGTH(s_palette));
 
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	DAI_SOUND(config, m_sound).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50);
@@ -228,6 +228,7 @@ MACHINE_CONFIG_START(dai_state::dai)
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("dai_cass");
 
 	/* tms5501 */
@@ -241,7 +242,7 @@ MACHINE_CONFIG_START(dai_state::dai)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("dai_cass");
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(dai)

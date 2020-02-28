@@ -98,22 +98,19 @@ exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, cons
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(exidy440_sound_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("audiocpu", MC6809, EXIDY440_AUDIO_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(exidy440_audio_map)
+void exidy440_sound_device::device_add_mconfig(machine_config &config)
+{
+	MC6809(config, m_audiocpu, EXIDY440_AUDIO_CLOCK);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &exidy440_sound_device::exidy440_audio_map);
 
-//  MCFG_DEVICE_ADD("cvsd1", MC3418, EXIDY440_MC3418_CLOCK)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+//  MC3418(config, "cvsd1", EXIDY440_MC3418_CLOCK).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
-//  MCFG_DEVICE_ADD("cvsd2", MC3418, EXIDY440_MC3418_CLOCK)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+//  MC3418(config, "cvsd2", EXIDY440_MC3418_CLOCK).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-//  MCFG_DEVICE_ADD("cvsd3", MC3417, EXIDY440_MC3417_CLOCK)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+//  MC3417(config, "cvsd3", EXIDY440_MC3417_CLOCK).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
-//  MCFG_DEVICE_ADD("cvsd4", MC3417, EXIDY440_MC3417_CLOCK)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+//  MC3417(config, "cvsd4", EXIDY440_MC3417_CLOCK).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

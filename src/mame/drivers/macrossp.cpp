@@ -310,7 +310,7 @@ WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
 	if (ACCESSING_BITS_16_31)
 	{
 		//logerror("%08x write soundcmd %08x (%08x)\n",m_maincpu->pc(),data,mem_mask);
-		m_soundlatch->write(space, 0, data >> 16, 0xffff);
+		m_soundlatch->write(data >> 16);
 		m_sndpending = 1;
 		m_audiocpu->set_input_line(2, HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
@@ -322,7 +322,7 @@ READ16_MEMBER(macrossp_state::macrossp_soundcmd_r)
 {
 	//  logerror("%06x read soundcmd\n",m_audiocpu->pc());
 	m_sndpending = 0;
-	return m_soundlatch->read(space, offset, mem_mask);
+	return m_soundlatch->read();
 }
 
 WRITE16_MEMBER(macrossp_state::palette_fade_w)
@@ -544,11 +544,11 @@ void macrossp_state::machine_reset()
 void macrossp_state::macrossp(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, 50000000/2);   /* 25 MHz */
+	M68EC020(config, m_maincpu, 50_MHz_XTAL/2);   /* 25 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &macrossp_state::macrossp_map);
 	m_maincpu->set_vblank_int("screen", FUNC(macrossp_state::irq3_line_hold)); // there are others ...
 
-	M68000(config, m_audiocpu, 32000000/2);    /* 16 MHz */
+	M68000(config, m_audiocpu, 32_MHz_XTAL/2);    /* 16 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &macrossp_state::macrossp_sound_map);
 
 	/* video hardware */
@@ -569,7 +569,7 @@ void macrossp_state::macrossp(machine_config &config)
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 
-	es5506_device &ensoniq(ES5506(config, "ensoniq", 16000000));
+	es5506_device &ensoniq(ES5506(config, "ensoniq", 32_MHz_XTAL/2));    /* 16 MHz */
 	ensoniq.set_region0("ensoniq.0");
 	ensoniq.set_region1("ensoniq.1");
 	ensoniq.set_region2("ensoniq.2");
@@ -712,13 +712,13 @@ WRITE32_MEMBER(macrossp_state::quizmoon_speedup_w)
 
 void macrossp_state::init_macrossp()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf10158, 0xf1015b, write32_delegate(FUNC(macrossp_state::macrossp_speedup_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf10158, 0xf1015b, write32_delegate(*this, FUNC(macrossp_state::macrossp_speedup_w)));
 }
 
 void macrossp_state::init_quizmoon()
 {
 #ifdef UNUSED_FUNCTION
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf00020, 0xf00023, write32_delegate(FUNC(macrossp_state::quizmoon_speedup_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf00020, 0xf00023, write32_delegate(*this, FUNC(macrossp_state::quizmoon_speedup_w)));
 #endif
 }
 

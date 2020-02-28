@@ -43,7 +43,6 @@ a2eaux_std80col_device::a2eaux_std80col_device(const machine_config &mconfig, de
 
 void a2eaux_std80col_device::device_start()
 {
-	set_a2eauxslot_device();
 	save_item(NAME(m_ram));
 }
 

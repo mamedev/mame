@@ -70,7 +70,7 @@ Associating maps to spaces is done at the machine config level, after the device
 | **MCFG_DEVICE_PROGRAM_MAP**\ (_map)
 | **MCFG_DEVICE_DATA_MAP**\ (_map)
 | **MCFG_DEVICE_IO_MAP**\ (_map)
-| **MCFG_DEVICE_DECRYPTED_OPCODES_MAP**\ (_map)
+| **MCFG_DEVICE_OPCODES_MAP**\ (_map)
 
 The generic macro and the four specific ones associate a map to a
 given space. Address maps associated to non-existing spaces are

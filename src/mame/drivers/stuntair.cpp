@@ -89,6 +89,7 @@ Bprom dump by f205v
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class stuntair_state : public driver_device
@@ -206,10 +207,10 @@ TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
 
 void stuntair_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(stuntair_state::get_stuntair_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(stuntair_state::get_stuntair_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -320,7 +321,7 @@ WRITE8_MEMBER(stuntair_state::stuntair_sound_w)
 {
 	// each command is written three times: with bit 7 set, then with bit 7 clear, then with bit 7 set again
 	// the 3 highest bits are ignored by the sound program
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -518,16 +519,16 @@ void stuntair_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(stuntair_state::stuntair)
-
+void stuntair_state::stuntair(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,  XTAL(18'432'000)/6)         /* 3 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(stuntair_map)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);         /* 3 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &stuntair_state::stuntair_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,  XTAL(18'432'000)/6)         /* 3 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(stuntair_sound_map)
-	MCFG_DEVICE_IO_MAP(stuntair_sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(stuntair_state, irq0_line_hold, 420) // drives music tempo, timing is approximate based on PCB audio recording.. and where is irq ack?
+	Z80(config, m_audiocpu, XTAL(18'432'000)/6);         /* 3 MHz? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &stuntair_state::stuntair_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &stuntair_state::stuntair_sound_portmap);
+	m_audiocpu->set_periodic_int(FUNC(stuntair_state::irq0_line_hold), attotime::from_hz(420)); // drives music tempo, timing is approximate based on PCB audio recording.. and where is irq ack?
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // type and location not verified
 	mainlatch.q_out_cb<0>().set_nop(); // set but never cleared
@@ -544,14 +545,14 @@ MACHINE_CONFIG_START(stuntair_state::stuntair)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60) // ?
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stuntair_state, screen_update_stuntair)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, stuntair_state, stuntair_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60); // ?
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(stuntair_state::screen_update_stuntair));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(stuntair_state::stuntair_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stuntair);
 	PALETTE(config, m_palette, FUNC(stuntair_state::stuntair_palette), 0x100 + 2);
@@ -567,7 +568,7 @@ MACHINE_CONFIG_START(stuntair_state::stuntair)
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	AY8910(config, "ay2", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 

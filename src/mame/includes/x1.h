@@ -22,10 +22,9 @@
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
 #include "machine/z80dma.h"
+#include "machine/z80sio.h"
 #include "sound/ay8910.h"
-#include "sound/wave.h"
 #include "sound/ym2151.h"
 #include "video/mc6845.h"
 
@@ -135,9 +134,9 @@ public:
 	DECLARE_WRITE8_MEMBER(x1_portb_w);
 	DECLARE_WRITE8_MEMBER(x1_portc_w);
 	void init_x1_kanji();
-	DECLARE_MACHINE_START(x1);
+	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(x1);
-	DECLARE_VIDEO_START(x1);
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(x1turbo);
 	uint32_t screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);

@@ -88,11 +88,10 @@ void fungames_state::video_start()
 {
 }
 
-MACHINE_CONFIG_START(fungames_state::fungames)
-
+void fungames_state::fungames(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(fungames)
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_fungames);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -102,7 +101,7 @@ MACHINE_CONFIG_START(fungames_state::fungames)
 	m_video->set_vert_params(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL);
 	m_video->set_fieldcount(1);
 	m_video->set_threshold(0.30);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

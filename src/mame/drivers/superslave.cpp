@@ -358,7 +358,7 @@ void superslave_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( superslave )
+//  machine_config( superslave )
 //-------------------------------------------------
 
 void superslave_state::superslave(machine_config &config)

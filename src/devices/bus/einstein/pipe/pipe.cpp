@@ -32,9 +32,9 @@ DEFINE_DEVICE_TYPE(TATUNG_PIPE, tatung_pipe_device, "tatung_pipe", "Tatung Pipe 
 
 tatung_pipe_device::tatung_pipe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TATUNG_PIPE, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
-	m_program(nullptr),
-	m_io(nullptr),
+	device_single_card_slot_interface<device_tatung_pipe_interface>(mconfig, *this),
+	m_program(*this, finder_base::DUMMY_TAG, -1),
+	m_io(*this, finder_base::DUMMY_TAG, -1),
 	m_card(nullptr),
 	m_int_handler(*this),
 	m_nmi_handler(*this),
@@ -51,26 +51,40 @@ tatung_pipe_device::~tatung_pipe_device()
 }
 
 //-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tatung_pipe_device::device_config_complete()
+{
+	// for passthrough connectors, use the parent slot's spaces
+	if (dynamic_cast<device_tatung_pipe_interface *>(owner()) != nullptr)
+	{
+		auto parent = dynamic_cast<tatung_pipe_device *>(owner()->owner());
+		if (parent != nullptr)
+		{
+			if (m_program.finder_tag() == finder_base::DUMMY_TAG)
+				m_program.set_tag(parent->m_program, parent->m_program.spacenum());
+			if (m_io.finder_tag() == finder_base::DUMMY_TAG)
+				m_io.set_tag(parent->m_io, parent->m_io.spacenum());
+		}
+	}
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void tatung_pipe_device::device_start()
 {
 	// get inserted module
-	m_card = dynamic_cast<device_tatung_pipe_interface *>(get_card_device());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_int_handler.resolve_safe();
 	m_nmi_handler.resolve_safe();
 	m_reset_handler.resolve_safe();
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void tatung_pipe_device::device_reset()
-{
 }
 
 //-------------------------------------------------
@@ -83,24 +97,6 @@ WRITE_LINE_MEMBER( tatung_pipe_device::host_int_w )
 		m_card->int_w(state);
 }
 
-//-------------------------------------------------
-//  set_program_space - set address space we are attached to
-//-------------------------------------------------
-
-void tatung_pipe_device::set_program_space(address_space *program)
-{
-	m_program = program;
-}
-
-//-------------------------------------------------
-//  set_io_space - set address space we are attached to
-//-------------------------------------------------
-
-void tatung_pipe_device::set_io_space(address_space *io)
-{
-	m_io = io;
-}
-
 
 //**************************************************************************
 //  CARD INTERFACE
@@ -111,7 +107,7 @@ void tatung_pipe_device::set_io_space(address_space *io)
 //-------------------------------------------------
 
 device_tatung_pipe_interface::device_tatung_pipe_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "tatungpipe")
 {
 	m_slot = dynamic_cast<tatung_pipe_device *>(device.owner());
 }

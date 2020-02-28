@@ -14,7 +14,6 @@
 #pragma once
 
 
-#include "machine/apollo_dbg.h"
 #include "machine/apollo_kbd.h"
 
 #include "cpu/m68000/m68000.h"
@@ -89,11 +88,6 @@ uint8_t apollo_get_ram_config_byte(void);
 
 //apollo_get_node_id - get the node id
 uint32_t apollo_get_node_id(void);
-
-#if 0
-	// should be called by the CPU core before executing each instruction
-int apollo_instruction_hook(m68000_base_device *device, offs_t curpc);
-#endif
 
 void apollo_set_cache_status_register(device_t *device,uint8_t mask, uint8_t data);
 
@@ -221,8 +215,9 @@ public:
 	DECLARE_MACHINE_RESET(apollo);
 	DECLARE_MACHINE_START(apollo);
 
-	IRQ_CALLBACK_MEMBER(apollo_irq_acknowledge);
-	IRQ_CALLBACK_MEMBER(apollo_pic_acknowledge);
+	void cpu_space_map(address_map &map);
+	u16 apollo_irq_acknowledge(offs_t offset);
+	u16 apollo_pic_get_vector();
 	void apollo_bus_error();
 	DECLARE_READ_LINE_MEMBER( apollo_kbd_is_german );
 	DECLARE_WRITE_LINE_MEMBER( apollo_dma8237_out_eop );
@@ -265,7 +260,6 @@ public:
 	void select_dma_channel(int channel, bool state);
 
 	DECLARE_WRITE_LINE_MEMBER(apollo_reset_instr_callback);
-	DECLARE_READ32_MEMBER(apollo_instruction_hook);
 
 	void common(machine_config &config);
 	void apollo(machine_config &config);
@@ -373,25 +367,25 @@ public:
 	apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~apollo_ni();
 
-	virtual iodevice_t image_type() const override { return IO_ROM; }
-
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual bool support_command_line_image_creation() const override { return 1; }
-	virtual const char *file_extensions() const override { return "ani,bin"; }
-
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_READ16_MEMBER(read);
-
 	// image-level overrides
+	virtual iodevice_t image_type() const noexcept override { return IO_ROM; }
+
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual bool support_command_line_image_creation() const noexcept override { return true; }
+	virtual const char *file_extensions() const noexcept override { return "ani,bin"; }
+
 	virtual image_init_result call_load() override;
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
-	virtual const char *custom_instance_name() const override { return "node_id"; }
-	virtual const char *custom_brief_instance_name() const override { return "ni"; }
+	virtual const char *custom_instance_name() const noexcept override { return "node_id"; }
+	virtual const char *custom_brief_instance_name() const noexcept override { return "ni"; }
+
+	DECLARE_WRITE16_MEMBER(write);
+	DECLARE_READ16_MEMBER(read);
 
 	void set_node_id_from_disk();
 
@@ -687,14 +681,14 @@ public:
 
 private:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// serial overrides
-	virtual void rcv_complete(); // Rx completed receiving byte
-	virtual void tra_complete(); // Tx completed sending byte
-	virtual void tra_callback(); // Tx send bit
+	virtual void rcv_complete() override; // Rx completed receiving byte
+	virtual void tra_complete() override; // Tx completed sending byte
+	virtual void tra_callback() override; // Tx send bit
 
 	TIMER_CALLBACK_MEMBER( poll_timer );
 	void xmit_char(uint8_t data);

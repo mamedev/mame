@@ -231,6 +231,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class nmg5_state : public driver_device
@@ -335,7 +336,7 @@ WRITE16_MEMBER(nmg5_state::vram_w)
 
 WRITE8_MEMBER(nmg5_state::soundlatch_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -860,8 +861,8 @@ TILE_GET_INFO_MEMBER(nmg5_state::get_tile_info){ SET_TILE_INFO_MEMBER(0, m_vram[
 
 void nmg5_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmg5_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmg5_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[1]->set_transparent_pen(0);
 
 	m_pixmap = std::make_unique<bitmap_ind16>(512, 256);
@@ -978,8 +979,8 @@ void nmg5_state::machine_reset()
 	m_input_data = 0;
 }
 
-MACHINE_CONFIG_START(nmg5_state::nmg5)
-
+void nmg5_state::nmg5(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16000000);    /* 16 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmg5_state::nmg5_map);

@@ -97,9 +97,14 @@ protected:
 class bt45x_mono_device_base : public bt45x_device_base
 {
 public:
-	// helpers instead of a device_palette_interface
-	u8 palette_lookup(u8 index) const { return m_color_ram[index & m_read_mask]; }
-	u8 overlay_lookup(u8 index) const { return m_color_ram[m_palette_colors + index]; }
+	// helper instead of device_palette_interface
+	u8 lookup(u8 pixel, u8 overlay = 0) const
+	{
+		if (overlay & 3)
+			return m_color_ram[m_palette_colors + (overlay & (m_command & (CR1|CR0)))];
+		else
+			return (m_command & CR6) ? m_color_ram[pixel & m_read_mask] : m_color_ram[m_palette_colors + 0];
+	}
 
 protected:
 	bt45x_mono_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors);

@@ -53,7 +53,6 @@ Grndtour:
 #include "includes/iqblock.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "sound/ym2413.h"
 #include "emupal.h"
@@ -340,12 +339,12 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(iqblock_state::iqblock)
-
+void iqblock_state::iqblock(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2) /* 6 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
+	Z80(config, m_maincpu, 12000000/2); /* 6 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &iqblock_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &iqblock_state::main_portmap);
 	TIMER(config, "scantimer").configure_scanline(FUNC(iqblock_state::irq), "screen", 0, 1);
 
 	i8255_device &ppi(I8255A(config, "ppi8255"));
@@ -355,22 +354,22 @@ MACHINE_CONFIG_START(iqblock_state::iqblock)
 	ppi.out_pc_callback().set(FUNC(iqblock_state::port_C_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(iqblock_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(iqblock_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_iqblock)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_iqblock);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ymsnd", 3'579'545).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -488,7 +487,7 @@ void iqblock_state::init_iqblock()
 		if ((i & 0x0090) == 0x0010) rom[i] ^= 0x20;
 	}
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe26, 0xfe26, write8_delegate(FUNC(iqblock_state::iqblock_prot_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe26, 0xfe26, write8_delegate(*this, FUNC(iqblock_state::iqblock_prot_w)));
 	m_video_type=1;
 }
 
@@ -503,7 +502,7 @@ void iqblock_state::init_grndtour()
 		if ((i & 0x0060) == 0x0040) rom[i] ^= 0x20;
 	}
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe39, 0xfe39, write8_delegate(FUNC(iqblock_state::grndtour_prot_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe39, 0xfe39, write8_delegate(*this, FUNC(iqblock_state::grndtour_prot_w)));
 	m_video_type=0;
 }
 

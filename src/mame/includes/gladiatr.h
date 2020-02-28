@@ -7,6 +7,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 class gladiatr_state_base : public driver_device

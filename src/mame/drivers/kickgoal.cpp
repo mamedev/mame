@@ -9,12 +9,43 @@ driver by David Haywood
 
 
 todo:
-
-PIC from Action Hollywood still needs deprotecting + dumping
-
-Both games have problems with the Eeprom (settings are not saved)
+  PIC from Action Hollywood still needs deprotecting + dumping
+  Both games have problems with the Eeprom (settings are not saved)
 
 
+Main board: PRO-3/B
++-------------------------------------------+
+|       IC13   PIC16C57                16MHz|
+|VOL    M6295                   +----+ 65764|
+|                               |1020|      |
+|                               +----+ 65764|
+|J    65764 65764                           |
+|A    65764 65764               +----+ IC36 |
+|M                              |1020| IC35 |
+|M                              +----+ IC34 |
+|A    62256 62256               +----+ IC33 |
+|  SW   IC5 IC6                 |1020| IC32 |
+|12MHz MC68000P12               +----+ IC31 |
+|MACH1111                62256         IC30 |
+|     93C46N             62256         IC29 |
++-------------------------------------------+
+
+   CPU: MC68000P12
+        PIC16C57-XT/P
+ Sound: OKI M6295 (rebadged as U6295)
+   OSC: 16.000MHz, 12.000MHz
+   RAM: UM62256D-70LL - 32Kx8 SRAM (x4)
+        HM3-65764E-5 - 8Kx8 SRAM (x6)
+EEPROM: 93C46N
+ Other: TI TPC1020BFN-084C (x3)
+        AMD MACH111-15CJ
+        VOL - volume pot
+        SW - push button service switch
+
+Measured clocks:
+    68000 - 12MHz
+ PIC16C57 - 4MHz
+    M6295 - 1MHz
 */
 
 /* Notes
@@ -42,7 +73,7 @@ lev 7 : 0x7c : 0000 0000 - x
 /*
 
 ****************************************************************
-Hollywood Action
+Action Hollywood
 
 01-19 Samples
 21-26 Melodies Bank 0
@@ -139,9 +170,7 @@ WRITE16_MEMBER(kickgoal_state::actionhw_snd_w)
 }
 
 
-
-
-static const uint16_t kickgoal_default_eeprom_type1[64] = {
+static const u16 kickgoal_default_eeprom_type1[64] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -153,40 +182,9 @@ static const uint16_t kickgoal_default_eeprom_type1[64] = {
 };
 
 
-
-READ16_MEMBER(kickgoal_state::kickgoal_eeprom_r)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		return m_eeprom->do_read();
-	}
-	return 0;
-}
-
-
-WRITE16_MEMBER(kickgoal_state::kickgoal_eeprom_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		switch (offset)
-		{
-			case 0:
-				m_eeprom->cs_write((data & 0x0001) ? ASSERT_LINE : CLEAR_LINE);
-				break;
-			case 1:
-				m_eeprom->clk_write((data & 0x0001) ? ASSERT_LINE : CLEAR_LINE);
-				break;
-			case 2:
-				m_eeprom->di_write(data & 0x0001);
-				break;
-		}
-	}
-}
-
-
 /* Memory Maps *****************************************************************/
 
-void kickgoal_state::kickgoal_program_map(address_map &map)
+void kickgoal_state::program_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 
@@ -199,12 +197,14 @@ void kickgoal_state::kickgoal_program_map(address_map &map)
 	map(0x880000, 0x89ffff).nopw(); // during startup
 
 	map(0x900000, 0x90ffff).nopw(); // during startup
-	map(0x900000, 0x900005).w(FUNC(kickgoal_state::kickgoal_eeprom_w));
-	map(0x900006, 0x900007).r(FUNC(kickgoal_state::kickgoal_eeprom_r));
+	map(0x900001, 0x900001).lw8(NAME([this] (u8 data) { m_eeprom->cs_write(BIT(data, 0)); }));
+	map(0x900003, 0x900003).lw8(NAME([this] (u8 data) { m_eeprom->clk_write(BIT(data, 0)); }));
+	map(0x900005, 0x900005).lw8(NAME([this] (u8 data) { m_eeprom->di_write(BIT(data, 0)); }));
+	map(0x900007, 0x900007).lr8(NAME([this] () { return m_eeprom->do_read(); }));
 
-	map(0xa00000, 0xa03fff).ram().w(FUNC(kickgoal_state::kickgoal_fgram_w)).share("fgram"); /* FG Layer */
-	map(0xa04000, 0xa07fff).ram().w(FUNC(kickgoal_state::kickgoal_bgram_w)).share("bgram"); /* Higher BG Layer */
-	map(0xa08000, 0xa0bfff).ram().w(FUNC(kickgoal_state::kickgoal_bg2ram_w)).share("bg2ram"); /* Lower BG Layer */
+	map(0xa00000, 0xa03fff).ram().w(FUNC(kickgoal_state::fgram_w)).share("fgram"); /* FG Layer */
+	map(0xa04000, 0xa07fff).ram().w(FUNC(kickgoal_state::bgram_w)).share("bgram"); /* Higher BG Layer */
+	map(0xa08000, 0xa0bfff).ram().w(FUNC(kickgoal_state::bg2ram_w)).share("bg2ram"); /* Lower BG Layer */
 	map(0xa0c000, 0xa0ffff).ram(); // more tilemap?
 	map(0xa10000, 0xa1000f).writeonly().share("scrram"); /* Scroll Registers */
 	map(0xb00000, 0xb007ff).writeonly().share("spriteram"); /* Sprites */
@@ -257,64 +257,63 @@ INPUT_PORTS_END
 
 /* GFX Decodes ***************************************************************/
 
-static const gfx_layout fg88_charlayout =
+static const gfx_layout layout_8x8 =
 {
 	8,8,
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 2*8, 4*8, 6*8, 8*8, 10*8, 12*8, 14*8  },  // note 1*3, 3*8, 5*8 etc. not used, the pixel data is the same, CPS1-like
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8
 };
 
-static const gfx_layout fg88_alt_charlayout =
+
+static const gfx_layout layout_8x8_alt =
 {
 	8,8,
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8,  2*8,  3*8,  4*8, 5*8, 6*8,  7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8
 };
 
 
-static const gfx_layout bg1616_charlayout =
+static const gfx_layout layout_16x16 =
 {
 	16,16,
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+	{ STEP16(0,1) },
 	{ STEP16(0,16) },
 	16*16
 };
 
 
-static const gfx_layout bg3232_charlayout =
+static const gfx_layout layout_32x32 =
 {
 	32,32,
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{
-		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-		16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
-	},
+	{ STEP32(0,1) },
 	{ STEP32(0,32) },
 	32*32,
 };
 
 static GFXDECODE_START( gfx_kickgoal )
-	GFXDECODE_ENTRY( "gfx1", 0, fg88_charlayout,    0x000, 0x40 )
-	GFXDECODE_ENTRY( "gfx1", 0, bg1616_charlayout,  0x000, 0x40 )
-	GFXDECODE_ENTRY( "gfx1", 0, bg3232_charlayout,  0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8,    0x000, 0x40 ) // FG GFX for even column like CPS1
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16,  0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout_32x32,  0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 1, layout_8x8,    0x000, 0x40 ) // FG GFX for odd column like CPS1
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_actionhw )
-	GFXDECODE_ENTRY( "gfx1", 0, fg88_alt_charlayout,    0x000, 0x40 )
-	GFXDECODE_ENTRY( "gfx1", 0, bg1616_charlayout,      0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8_alt, 0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16,   0x000, 0x40 )
 GFXDECODE_END
 
 /* MACHINE drivers ***********************************************************/
@@ -385,7 +384,7 @@ WRITE8_MEMBER(kickgoal_state::soundio_port_c_w)
 	{
 		if (!(data & 0x10))
 		{
-			m_pic_portb = m_soundlatch->read(space, 0);
+			m_pic_portb = m_soundlatch->read();
 			m_sound_command_sent = 0x00;
 		}
 	}
@@ -412,38 +411,37 @@ WRITE8_MEMBER(kickgoal_state::soundio_port_c_w)
 
 WRITE16_MEMBER(kickgoal_state::to_pic_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_sound_command_sent = 0x20;
 }
 
 
-
-MACHINE_CONFIG_START(kickgoal_state::kickgoal)
-
+void kickgoal_state::kickgoal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(kickgoal_program_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(12'000'000));   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kickgoal_state::program_map);
+	m_maincpu->set_vblank_int("screen", FUNC(kickgoal_state::irq6_line_hold));
 
-	PIC16C57(config, m_audiocpu, XTAL(12'000'000)/3);  /* 4MHz ? */
+	PIC16C57(config, m_audiocpu, XTAL(12'000'000)/3);  /* 4MHz */
 	m_audiocpu->write_a().set(FUNC(kickgoal_state::soundio_port_a_w));
 	m_audiocpu->read_b().set(FUNC(kickgoal_state::soundio_port_b_r));
 	m_audiocpu->write_b().set(FUNC(kickgoal_state::soundio_port_b_w));
 	m_audiocpu->read_c().set(FUNC(kickgoal_state::soundio_port_c_r));
 	m_audiocpu->write_c().set(FUNC(kickgoal_state::soundio_port_c_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_data(kickgoal_default_eeprom_type1, 128);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(9*8, 55*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(9*8, 55*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(kickgoal_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kickgoal);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
@@ -455,32 +453,32 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_LOW)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(12'000'000)/12, okim6295_device::PIN7_LOW);  /* 1MHz */
+	m_oki->set_addrmap(0, &kickgoal_state::oki_map);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-MACHINE_CONFIG_START(kickgoal_state::actionhw)
-
+void kickgoal_state::actionhw(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(kickgoal_program_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(12'000'000)); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kickgoal_state::program_map);
+	m_maincpu->set_vblank_int("screen", FUNC(kickgoal_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(12'000'000)/3)    /* verified on pcb */
-	MCFG_DEVICE_DISABLE() /* Disabled since the internal rom isn't dumped */
+	PIC16C57(config, m_audiocpu, XTAL(12'000'000)/3);    /* verified on pcb */
+	m_audiocpu->set_disable(); /* Disabled since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_data(kickgoal_default_eeprom_type1, 128);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(10*8+2, 54*8-1+2, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(10*8+2, 54*8-1+2, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(kickgoal_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_actionhw);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
@@ -492,11 +490,10 @@ MACHINE_CONFIG_START(kickgoal_state::actionhw)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) /* verified on pcb */
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
-
+	OKIM6295(config, m_oki, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH); /* verified on pcb */
+	m_oki->set_addrmap(0, &kickgoal_state::oki_map);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
 /* Rom Loading ***************************************************************/
@@ -550,7 +547,7 @@ ROM_START( actionhw ) /* PRO-3/B pcb */
 	ROM_LOAD16_BYTE( "1.ic5",  0x000001, 0x80000, CRC(136b9711) SHA1(553f9fdd99bb9ce2e1492d0755633075e59ba587) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 ) /* sound? (missing) */
-	/* Remove the CPU_DISABLED flag in MACHINE_DRIVER when the rom is dumped */
+	/* Remove the m_audiocpu->set_disable(); flag in MACHINE_DRIVER when the rom is dumped */
 	ROM_LOAD( "pic16c57",     0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
@@ -572,7 +569,7 @@ ROM_END
 void kickgoal_state::init_kickgoal()
 {
 #if 0 /* we should find a real fix instead  */
-	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+	u16 *rom = (u16 *)memregion("maincpu")->base();
 
 	/* fix "bug" that prevents game from writing to EEPROM */
 	rom[0x12b0/2] = 0x0001;
@@ -581,11 +578,10 @@ void kickgoal_state::init_kickgoal()
 
 void kickgoal_state::init_actionhw()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800004, 0x800005, write16_delegate(FUNC(kickgoal_state::actionhw_snd_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800004, 0x800005, write16_delegate(*this, FUNC(kickgoal_state::actionhw_snd_w)));
 }
 
 GAME( 1995, kickgoal,  0,        kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 1)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1995, kickgoala, kickgoal, kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 2)",        MACHINE_SUPPORTS_SAVE )
 
 GAME( 1995, actionhw,  0,        actionhw, kickgoal, kickgoal_state, init_actionhw, ROT0, "TCH", "Action Hollywood", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-

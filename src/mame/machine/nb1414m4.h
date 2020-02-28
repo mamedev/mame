@@ -5,12 +5,15 @@
 
 #pragma once
 
+#include "tilemap.h"
+
 class nb1414m4_device : public device_t, public device_video_interface
 {
 public:
 	nb1414m4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void exec(uint16_t mcu_cmd, uint8_t *vram, uint16_t &scrollx, uint16_t &scrolly, tilemap_t *tilemap);
+	void vblank_trigger();
 
 protected:
 	// device-level overrides
@@ -28,7 +31,9 @@ private:
 	void _0e00(uint16_t mcu_cmd, uint8_t *vram);
 
 	required_region_ptr<uint8_t> m_data;
-
+	uint16_t m_previous_0200_command;
+	uint64_t m_previous_0200_command_frame;
+	bool m_in_game;
 };
 
 DECLARE_DEVICE_TYPE(NB1414M4, nb1414m4_device)

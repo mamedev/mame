@@ -54,7 +54,7 @@ ROM_END
 
 void a2bus_corvfdc02_device::device_add_mconfig(machine_config &config)
 {
-	UPD765A(config, m_fdc, 8'000'000, true, false);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, true, false); // clocked through FDC9229BT
 	m_fdc->intrq_wr_callback().set(FUNC(a2bus_corvfdc02_device::intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(a2bus_corvfdc02_device::drq_w));
 	FLOPPY_CONNECTOR(config, m_con1, corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats);
@@ -132,10 +132,10 @@ uint8_t a2bus_corvfdc02_device::read_c0nx(uint8_t offset)
 	switch (offset)
 	{
 		case 0: // 765 FIFO
-			return m_fdc->read_fifo();
+			return m_fdc->fifo_r();
 
 		case 1: // 765 MSR
-			return m_fdc->read_msr();
+			return m_fdc->msr_r();
 
 		case 2: // buffer address
 			return (m_bufptr>>1) & 0xff;
@@ -170,7 +170,7 @@ void a2bus_corvfdc02_device::write_c0nx(uint8_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0:    // FDC FIFO write
-			m_fdc->write_fifo(data);
+			m_fdc->fifo_w(data);
 			break;
 
 		case 1:    // FDC ???

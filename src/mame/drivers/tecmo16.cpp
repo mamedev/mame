@@ -321,32 +321,10 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,1),   /* 4096 characters */
-	4,  /* 4 bits per pixel */
-	{ STEP4(0,1) }, /* the bitplanes are packed in one nibble */
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	4*8*8    /* every char takes 32 consecutive bytes */
-};
-
-static const gfx_layout tilelayout =
-{
-	16,16,  /* 16*16 tiles */
-	RGN_FRAC(1,1),   /* 8192 tiles */
-	4,  /* 4 bits per pixel */
-	{ STEP4(0,1) }, /* the bitplanes are packed in one nibble */
-	{ STEP8(0,4), STEP8(4*8*8,4) },
-	{ STEP8(0,4*8), STEP8(4*8*8*2,4*8) },
-	4*8*8*2*2   /* every tile takes 128 consecutive bytes */
-};
-
 static GFXDECODE_START( gfx_tecmo16 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 1*16*16,    16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,       0, 0x100 )
-	GFXDECODE_ENTRY( "gfx3", 0, charlayout,       0, 0x100 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,         1*16*16,    16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 0x100 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_msb,               0, 0x100 )
 GFXDECODE_END
 
 /******************************************************************************/
@@ -354,34 +332,33 @@ GFXDECODE_END
 #define MASTER_CLOCK XTAL(24'000'000)
 #define OKI_CLOCK XTAL(8'000'000)
 
-MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
-
+void tecmo16_state::fstarfrc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,MASTER_CLOCK/2)          /* 12MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fstarfrc_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tecmo16_state,  irq5_line_hold)
+	M68000(config, m_maincpu, MASTER_CLOCK/2);          /* 12MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo16_state::fstarfrc_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tecmo16_state::irq5_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,MASTER_CLOCK/6)         /* 4MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, MASTER_CLOCK/6);         /* 4MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tecmo16_state::sound_map);
 								/* NMIs are triggered by the main CPU */
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tecmo16_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(tecmo16_state::screen_update));
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tecmo16);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_444, 4096);
 
 	TECMO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
 
 	TECMO_MIXER(config, m_mixer, 0);
 	m_mixer->set_mixer_shifts(10,9,4);
@@ -402,26 +379,27 @@ MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
 	ymsnd.add_route(0, "lspeaker", 0.60);
 	ymsnd.add_route(1, "rspeaker", 0.60);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK/8, okim6295_device::PIN7_HIGH) // sample rate 1 MHz / 132
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", OKI_CLOCK/8, okim6295_device::PIN7_HIGH)); // sample rate 1 MHz / 132
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+}
 
-MACHINE_CONFIG_START(tecmo16_state::ginkun)
+void tecmo16_state::ginkun(machine_config &config)
+{
 	fstarfrc(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ginkun_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo16_state::ginkun_map);
 
 	MCFG_VIDEO_START_OVERRIDE(tecmo16_state,ginkun)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tecmo16_state::riot)
+void tecmo16_state::riot(machine_config &config)
+{
 	ginkun(config);
 
 	/* basic machine hardware */
 	MCFG_VIDEO_START_OVERRIDE(tecmo16_state,riot)
-MACHINE_CONFIG_END
+}
 
 /******************************************************************************/
 
@@ -452,6 +430,29 @@ ROM_START( fstarfrcj )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1.bin", 0x00000, 0x40000, CRC(1905d85d) SHA1(83d244f13064b826ccf86b5a8158478452efbf7f) )
 	ROM_LOAD16_BYTE( "2.bin", 0x00001, 0x40000, CRC(de9cfc39) SHA1(bd7943f366a3161222848c5f9b687a6ba8c1d43a) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "fstarf07.rom", 0x00000, 0x10000, CRC(e0ad5de1) SHA1(677237341e837061b6cc02200c0752964caed907) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "fstarf03.rom", 0x00000, 0x20000, CRC(54375335) SHA1(d1af56a7c7fff877066dad3144d0b5147da28c6a) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fstarf05.rom", 0x00000, 0x80000, CRC(77a281e7) SHA1(a87a90c2c856d45785cb56185b1a7dff3404b5cb) )
+	ROM_LOAD16_BYTE( "fstarf04.rom", 0x00001, 0x80000, CRC(398a920d) SHA1(eecc167803f48517348d68ce70f15e87eac204bb) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_LOAD16_BYTE( "fstarf09.rom", 0x00000, 0x80000, CRC(d51341d2) SHA1(e46c319158046d407d4387cb2d8f0b6cfd7be576) )
+	ROM_LOAD16_BYTE( "fstarf06.rom", 0x00001, 0x80000, CRC(07e40e87) SHA1(22867e52a8267ae8ae0ff0dba6bb846cb3e1b63d) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "fstarf08.rom", 0x00000, 0x20000, CRC(f0ad5693) SHA1(a0202801bb9f9c86175ca7989fbc9efa47183188) )
+ROM_END
+
+ROM_START( fstarfrcw )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1.bin", 0x00000, 0x40000, CRC(5bc0a9d2) SHA1(bd8ceded1b4bcaffbe220f33b22cdf434ef4cc6c) )
+	ROM_LOAD16_BYTE( "2.bin", 0x00001, 0x40000, CRC(8ec787cb) SHA1(dd7976a334bdbc5a9264e866d4faf49fa72db3a3) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "fstarf07.rom", 0x00000, 0x10000, CRC(e0ad5de1) SHA1(677237341e837061b6cc02200c0752964caed907) )
@@ -626,7 +627,8 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1992, fstarfrc,  0,        fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (US)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fstarfrcj, fstarfrc, fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, riot,      0,        riot,     riot,     tecmo16_state, empty_init, ROT0,  "NMK",   "Riot",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ginkun,    0,        ginkun,   ginkun,   tecmo16_state, empty_init, ROT0,  "Tecmo", "Ganbare Ginkun",           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fstarfrc,  0,        fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (US)",     MACHINE_SUPPORTS_SAVE ) // Has 'Recycle it, don't trash it"  and 'Winners don't use drugs' screens after first attract cycle
+GAME( 1992, fstarfrcj, fstarfrc, fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fstarfrcw, fstarfrc, fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (World?)", MACHINE_SUPPORTS_SAVE ) // more similar the to the Japanese version than to the US one, not the parent because not sure it's the world version
+GAME( 1992, riot,      0,        riot,     riot,     tecmo16_state, empty_init, ROT0,  "NMK",   "Riot",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ginkun,    0,        ginkun,   ginkun,   tecmo16_state, empty_init, ROT0,  "Tecmo", "Ganbare Ginkun",            MACHINE_SUPPORTS_SAVE )

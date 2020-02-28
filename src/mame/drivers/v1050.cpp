@@ -160,6 +160,7 @@ Notes:
 
 void v1050_state::set_interrupt(int line, int state)
 {
+	line ^= 7;
 	if (state)
 	{
 		m_int_state |= (1 << line);
@@ -1022,18 +1023,17 @@ void v1050_state::machine_reset()
 
 // Machine Driver
 
-MACHINE_CONFIG_START(v1050_state::v1050)
+void v1050_state::v1050(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL/4)
-	MCFG_DEVICE_PROGRAM_MAP(v1050_mem)
-	MCFG_DEVICE_IO_MAP(v1050_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(v1050_state,v1050_int_ack)
+	Z80(config, m_maincpu, 16_MHz_XTAL/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &v1050_state::v1050_mem);
+	m_maincpu->set_addrmap(AS_IO, &v1050_state::v1050_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(v1050_state::v1050_int_ack));
 
-	config.m_perfect_cpu_quantum = subtag(Z80_TAG);
-
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, 15.36_MHz_XTAL/16)
-	MCFG_DEVICE_PROGRAM_MAP(v1050_crt_mem)
-	config.m_perfect_cpu_quantum = subtag(M6502_TAG);
+	M6502(config, m_subcpu, 15.36_MHz_XTAL/16);
+	m_subcpu->set_addrmap(AS_PROGRAM, &v1050_state::v1050_crt_mem);
+	config.set_perfect_quantum(m_subcpu);
 
 	// keyboard HACK
 	TIMER(config, "keyboard").configure_periodic(FUNC(v1050_state::v1050_keyboard_tick), attotime::from_hz(60));
@@ -1114,7 +1114,7 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	m_sasibus->msg_handler().set(m_sasi_ctrl_in, FUNC(input_buffer_device::write_bit2));
 	m_sasibus->cd_handler().set(m_sasi_ctrl_in, FUNC(input_buffer_device::write_bit3));
 	m_sasibus->io_handler().set(FUNC(v1050_state::write_sasi_io)).exor(1); // bit4
-	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", S1410, SCSI_ID_0)
+	m_sasibus->set_slot_device(1, "harddisk", S1410, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 
 	OUTPUT_LATCH(config, m_sasi_data_out);
 	m_sasibus->set_output_latch(*m_sasi_data_out);
@@ -1138,7 +1138,7 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K");
-MACHINE_CONFIG_END
+}
 
 // ROMs
 

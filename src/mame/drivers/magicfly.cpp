@@ -449,6 +449,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 #define MASTER_CLOCK    XTAL(10'000'000)
@@ -491,7 +492,7 @@ private:
 	void magicfly_palette(palette_device &palette) const;
 	void bchance_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(7mezzo);
-	uint32_t screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_magicfly(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void magicfly_map(address_map &map);
 };
 
@@ -541,7 +542,7 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_magicfly_tile_info)
 
 void magicfly_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magicfly_state::get_magicfly_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(magicfly_state::get_magicfly_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
 }
 
 
@@ -572,11 +573,11 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_7mezzo_tile_info)
 
 VIDEO_START_MEMBER(magicfly_state, 7mezzo)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magicfly_state::get_7mezzo_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(magicfly_state::get_7mezzo_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
 }
 
 
-uint32_t magicfly_state::screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t magicfly_state::screen_update_magicfly(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -940,22 +941,21 @@ GFXDECODE_END
 *              Machine Drivers               *
 *********************************************/
 
-MACHINE_CONFIG_START(magicfly_state::magicfly)
-
+void magicfly_state::magicfly(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
-	MCFG_DEVICE_PROGRAM_MAP(magicfly_map)
+	M6502(config, m_maincpu, MASTER_CLOCK / 16); /* guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &magicfly_state::magicfly_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)                /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1). */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)  /* Taken from MC6845 init, registers 01 & 06. */
-	MCFG_SCREEN_UPDATE_DRIVER(magicfly_state, screen_update_magicfly)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((39+1)*8, (31+1)*8);                /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1). */
+	screen.set_visarea(0*8, 32*8-1, 0*8, 29*8-1);  /* Taken from MC6845 init, registers 01 & 06. */
+	screen.set_screen_update(FUNC(magicfly_state::screen_update_magicfly));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_magicfly);
 	PALETTE(config, "palette", FUNC(magicfly_state::magicfly_palette), 32);
@@ -968,19 +968,19 @@ MACHINE_CONFIG_START(magicfly_state::magicfly)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
 
 
-MACHINE_CONFIG_START(magicfly_state::_7mezzo)
+void magicfly_state::_7mezzo(machine_config &config)
+{
 	magicfly(config);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(magicfly_state, 7mezzo)
-
-MACHINE_CONFIG_END
+}
 
 
 void magicfly_state::bchance(machine_config &config)

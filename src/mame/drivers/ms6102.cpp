@@ -86,7 +86,7 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { m_pic->r_w(N, state?0:1); }
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { m_pic->r_w(N, state ? 0 : 1); }
 
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(display_attr);
@@ -201,14 +201,14 @@ I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_attr) // TODO: attributes
 
 READ8_MEMBER(ms6102_state::crtc_r)
 {
-	m_crtc2->read(space, offset);
-	return m_crtc1->read(space, offset); // cs is same for both crtcs so they should return the same thing
+	m_crtc2->read(offset);
+	return m_crtc1->read(offset); // cs is same for both crtcs so they should return the same thing
 }
 
 WRITE8_MEMBER(ms6102_state::crtc_w)
 {
-	m_crtc1->write(space, offset, data);
-	m_crtc2->write(space, offset, data);
+	m_crtc1->write(offset, data);
+	m_crtc2->write(offset, data);
 }
 
 READ8_MEMBER(ms6102_state::misc_status_r)
@@ -233,22 +233,21 @@ WRITE8_MEMBER(ms6102_state::kbd_uart_clock_w)
 
 WRITE8_MEMBER(ms6102_state::pic_w)
 {
-	m_pic->b_w((data & 7) ^ 7);
-	m_pic->sgs_w(BIT(data, 3) ^ 1);
+	m_pic->b_sgs_w(~data);
 }
 
 WRITE8_MEMBER(ms6102_state::vdack_w)
 {
 	if(m_dmaaddr & 1)
-		m_crtc1->dack_w(space, offset, data);
+		m_crtc1->dack_w(data);
 	else
-		m_crtc2->dack_w(space, offset, data | 0x80);
+		m_crtc2->dack_w(data | 0x80);
 }
 
 IRQ_CALLBACK_MEMBER(ms6102_state::ms6102_int_ack)
 {
 	m_maincpu->set_input_line(I8085_INTR_LINE, CLEAR_LINE);
-	return 0xc7 | (m_pic->a_r() << 3);
+	return 0xc7 | ((m_pic->a_r() ^ 7) << 3);
 }
 
 

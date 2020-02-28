@@ -445,14 +445,15 @@ void _20pacgal_state::video_start()
  *
  *************************************/
 
-MACHINE_CONFIG_START(_20pacgal_state::_20pacgal_video)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(SCREEN_WIDTH, SCREEN_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(_20pacgal_state, screen_update_20pacgal)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, _20pacgal_state, vblank_irq))
+void _20pacgal_state::_20pacgal_video(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(SCREEN_WIDTH, SCREEN_HEIGHT);
+	screen.set_visarea(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1);
+	screen.set_screen_update(FUNC(_20pacgal_state::screen_update_20pacgal));
+	screen.screen_vblank().set(FUNC(_20pacgal_state::vblank_irq));
 
 	PALETTE(config, m_palette, FUNC(_20pacgal_state::starpal_init), NUM_PENS + NUM_PENS);
-MACHINE_CONFIG_END
+}

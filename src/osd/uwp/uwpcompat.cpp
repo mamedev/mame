@@ -9,7 +9,7 @@
 #include "uwpcompat.h"
 
 #include <windows.h>
-#include <errno.h>
+#include <cerrno>
 
 #undef interface
 

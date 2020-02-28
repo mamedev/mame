@@ -113,11 +113,11 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + m_clk_div - 1) / m_clk_div; } // default 2 cycles per machine cycle
-	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return (cycles * m_clk_div); } // "
-	virtual u32 execute_min_cycles() const override { return 1; }
-	virtual u32 execute_max_cycles() const override { return 2; }
-	virtual u32 execute_input_lines() const override { return 1; }
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + m_clk_div - 1) / m_clk_div; } // default 2 cycles per machine cycle
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * m_clk_div); } // "
+	virtual u32 execute_min_cycles() const noexcept override { return 1; }
+	virtual u32 execute_max_cycles() const noexcept override { return 2; }
+	virtual u32 execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
 	virtual void execute_one() { } // -> child class
@@ -149,6 +149,7 @@ protected:
 	u8 m_bl;
 	u8 m_bm;
 	bool m_sbm;
+	bool m_sbl;
 	u8 m_c;
 	bool m_skip;
 	u8 m_w;
@@ -164,7 +165,7 @@ protected:
 	emu_timer *m_lcd_timer;
 	u8 m_l, m_x;
 	u8 m_y;
-	bool m_bp;
+	u8 m_bp;
 	bool m_bc;
 
 	u16 get_lcd_row(int column, u8* ram);
@@ -214,6 +215,7 @@ protected:
 	// opcode handlers
 	virtual void op_lb();
 	virtual void op_lbl();
+	virtual void op_sbl();
 	virtual void op_sbm();
 	virtual void op_exbla();
 	virtual void op_incb();

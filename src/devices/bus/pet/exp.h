@@ -32,7 +32,7 @@
 class device_pet_expansion_card_interface;
 
 class pet_expansion_slot_device : public device_t,
-									public device_slot_interface
+									public device_single_card_slot_interface<device_pet_expansion_card_interface>
 {
 public:
 	template <typename T>
@@ -52,9 +52,9 @@ public:
 	auto dma_write_callback() { return m_write_dma.bind(); }
 
 	// computer interface
-	int norom_r(address_space &space, offs_t offset, int sel);
-	uint8_t read(address_space &space, offs_t offset, uint8_t data, int &sel);
-	void write(address_space &space, offs_t offset, uint8_t data, int &sel);
+	int norom_r(offs_t offset, int sel);
+	uint8_t read(offs_t offset, uint8_t data, int &sel);
+	void write(offs_t offset, uint8_t data, int &sel);
 	DECLARE_READ_LINE_MEMBER( diag_r );
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 
@@ -86,9 +86,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	device_pet_expansion_card_interface *m_card;
 
@@ -99,7 +97,7 @@ protected:
 
 // ======================> device_pet_expansion_card_interface
 
-class device_pet_expansion_card_interface : public device_slot_card_interface
+class device_pet_expansion_card_interface : public device_interface
 {
 	friend class pet_expansion_slot_device;
 
@@ -111,9 +109,9 @@ protected:
 	device_pet_expansion_card_interface(const machine_config &mconfig, device_t &device);
 
 	// runtime
-	virtual int pet_norom_r(address_space &space, offs_t offset, int sel) { return 1; }
-	virtual uint8_t pet_bd_r(address_space &space, offs_t offset, uint8_t data, int &sel) { return data; };
-	virtual void pet_bd_w(address_space &space, offs_t offset, uint8_t data, int &sel) { };
+	virtual int pet_norom_r(offs_t offset, int sel) { return 1; }
+	virtual uint8_t pet_bd_r(offs_t offset, uint8_t data, int &sel) { return data; };
+	virtual void pet_bd_w(offs_t offset, uint8_t data, int &sel) { };
 	virtual int pet_diag_r() { return 1; }
 	virtual void pet_irq_w(int state) { }
 

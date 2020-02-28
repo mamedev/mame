@@ -14,6 +14,7 @@
 #include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class cheekyms_state : public driver_device
 {

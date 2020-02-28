@@ -51,7 +51,7 @@ WRITE16_MEMBER(bbusters_state_base::video_w)
 
 void bbusters_state_base::video_start()
 {
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state_base::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bbusters_state_base::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fix_tilemap->set_transparent_pen(15);
 
 	save_item(NAME(m_scale_line_count));
@@ -61,8 +61,8 @@ void bbusters_state::video_start()
 {
 	bbusters_state_base::video_start();
 
-	m_pf_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&bbusters_state::get_pf_tile_info<0,3>, "layer0_gfx3", this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
-	m_pf_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&bbusters_state::get_pf_tile_info<1,4>, "layer1_gfx4", this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
+	m_pf_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&bbusters_state::get_pf_tile_info<0,3>))), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
+	m_pf_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&bbusters_state::get_pf_tile_info<1,4>))), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
 
 	m_pf_tilemap[0]->set_transparent_pen(15);
 }
@@ -71,8 +71,8 @@ void mechatt_state::video_start()
 {
 	bbusters_state_base::video_start();
 
-	m_pf_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&mechatt_state::get_pf_tile_info<0,2>, "layer0_gfx2", this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
-	m_pf_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&mechatt_state::get_pf_tile_info<1,3>, "layer1_gfx3", this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
+	m_pf_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&mechatt_state::get_pf_tile_info<0,2>))), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
+	m_pf_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&mechatt_state::get_pf_tile_info<1,3>))), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
 
 	m_pf_tilemap[0]->set_transparent_pen(15);
 }

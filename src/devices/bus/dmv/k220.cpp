@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 /***************************************************************************
 
     NCR DMV K220 Diagnostic module
@@ -137,11 +138,15 @@ dmv_k220_device::dmv_k220_device(const machine_config &mconfig, const char *tag,
 
 void dmv_k220_device::device_start()
 {
-	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
-	space.install_readwrite_handler(0x08, 0x0b, read8sm_delegate(FUNC(pit8253_device::read), &(*m_pit)), write8sm_delegate(FUNC(pit8253_device::write), &(*m_pit)), 0);
-	space.install_readwrite_handler(0x0c, 0x0f, read8sm_delegate(FUNC(i8255_device::read), &(*m_ppi)), write8sm_delegate(FUNC(i8255_device::write), &(*m_ppi)), 0);
+	address_space &space = iospace();
+	space.install_readwrite_handler(0x08, 0x0b, read8sm_delegate(*m_pit, FUNC(pit8253_device::read)), write8sm_delegate(*m_pit, FUNC(pit8253_device::write)), 0);
+	space.install_readwrite_handler(0x0c, 0x0f, read8sm_delegate(*m_ppi, FUNC(i8255_device::read)), write8sm_delegate(*m_ppi, FUNC(i8255_device::write)), 0);
 
 	m_digits.resolve();
+
+	// register for state saving
+	save_item(NAME(m_portc));
+	save_pointer(NAME(m_ram->base()), m_ram->bytes());
 }
 
 //-------------------------------------------------
@@ -151,6 +156,8 @@ void dmv_k220_device::device_start()
 void dmv_k220_device::device_reset()
 {
 	// active the correct layout
+	// FIXME: this is a very bad idea - you have no idea what view the user has loaded externally or from other devices,
+	// and it won't allow selected view to be saved/restored correctly
 	machine().render().first_target()->set_view(1);
 }
 

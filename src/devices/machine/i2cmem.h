@@ -55,7 +55,7 @@ public:
 
 protected:
 	// construction/destruction
-	i2cmem_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, int page_size, int data_size);
+	i2cmem_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int page_size, int data_size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -92,6 +92,8 @@ protected:
 	int m_byteaddr;
 	std::vector<uint8_t> m_page;
 	int m_page_offset;
+	int m_page_written_size;
+	bool m_in_write;
 };
 
 #define DECLARE_I2C_DEVICE(name) \
@@ -104,6 +106,7 @@ protected:
 DECLARE_I2C_DEVICE(x2404p)
 DECLARE_I2C_DEVICE(24c01)
 DECLARE_I2C_DEVICE(24c02)
+DECLARE_I2C_DEVICE(24c04)
 DECLARE_I2C_DEVICE(24c08)
 DECLARE_I2C_DEVICE(24c16);
 DECLARE_I2C_DEVICE(24c16a);
@@ -114,6 +117,7 @@ DECLARE_DEVICE_TYPE(I2CMEM,     i2cmem_device)
 DECLARE_DEVICE_TYPE(I2C_X2404P, i2c_x2404p_device)
 DECLARE_DEVICE_TYPE(I2C_24C01,  i2c_24c01_device)
 DECLARE_DEVICE_TYPE(I2C_24C02,  i2c_24c02_device)
+DECLARE_DEVICE_TYPE(I2C_24C04,  i2c_24c04_device)
 DECLARE_DEVICE_TYPE(I2C_24C08,  i2c_24c08_device)
 DECLARE_DEVICE_TYPE(I2C_24C16,  i2c_24c16_device)
 DECLARE_DEVICE_TYPE(I2C_24C16A, i2c_24c16a_device)

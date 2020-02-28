@@ -14,7 +14,6 @@
 #include "sound/ay8910.h"
 #include "sound/upd7752.h"
 //#include "sound/2203intf.h"
-#include "sound/wave.h"
 #include "video/mc6847.h"
 
 #include "bus/generic/slot.h"

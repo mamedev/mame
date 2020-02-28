@@ -65,21 +65,21 @@ void tp84_state::tp84_palette(palette_device &palette) const
 		bit1 = BIT(color_prom[i | 0x000], 1);
 		bit2 = BIT(color_prom[i | 0x000], 2);
 		bit3 = BIT(color_prom[i | 0x000], 3);
-		int const r = combine_4_weights(weights, bit0, bit1, bit2, bit3);
+		int const r = combine_weights(weights, bit0, bit1, bit2, bit3);
 
 		// green component
 		bit0 = BIT(color_prom[i | 0x100], 0);
 		bit1 = BIT(color_prom[i | 0x100], 1);
 		bit2 = BIT(color_prom[i | 0x100], 2);
 		bit3 = BIT(color_prom[i | 0x100], 3);
-		int const g = combine_4_weights(weights, bit0, bit1, bit2, bit3);
+		int const g = combine_weights(weights, bit0, bit1, bit2, bit3);
 
 		// blue component
 		bit0 = BIT(color_prom[i | 0x200], 0);
 		bit1 = BIT(color_prom[i | 0x200], 1);
 		bit2 = BIT(color_prom[i | 0x200], 2);
 		bit3 = BIT(color_prom[i | 0x200], 3);
-		int const b = combine_4_weights(weights, bit0, bit1, bit2, bit3);
+		int const b = combine_weights(weights, bit0, bit1, bit2, bit3);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -140,8 +140,8 @@ TILE_GET_INFO_MEMBER(tp84_state::get_fg_tile_info)
 
 void tp84_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tp84_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tp84_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tp84_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tp84_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

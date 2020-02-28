@@ -47,7 +47,8 @@ ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config 
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_vsp(*this, "vsp"),
 	m_reading(false),
-	m_sbe(false)
+	m_sbe(false),
+	m_dec_high(false)
 {
 }
 
@@ -67,14 +68,14 @@ READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 		// lines by setting the address bus to a different value, but the
 		// Geneve may behave differently. This may not 100% reflect the real
 		// situation, but it ensures a safe processing.
-		m_vsp->combined_rsq_wsq_w(space, 0, ~0);
+		m_vsp->combined_rsq_wsq_w(~0);
 	}
 }
 
 /*
     Memory write
 */
-WRITE8_MEMBER( ti_speech_synthesizer_device::write )
+void ti_speech_synthesizer_device::write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled()) return;
 
@@ -92,11 +93,14 @@ SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
 	// 1001 00xx xxxx xxx0   DBIN=1
 	// 1001 01xx xxxx xxx0   DBIN=0
 	// 1111 1000 0000 0001    mask
-	m_space = &space;
 	m_reading = (state==ASSERT_LINE);
 
 	bool valid = (((offset & 0x0400)==0) == m_reading);
-	m_sbe = ((offset & m_select_mask)==m_select_value) && valid;
+
+	if (m_dec_high)
+		m_sbe = ((offset & 0x7f801)==0x79000) && valid;
+	else
+		m_sbe = ((offset & 0x0f801)==0x09000) && valid;
 
 	if (m_sbe)
 	{
@@ -107,11 +111,11 @@ SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
 		// both RS* and WS* are active, which is illegal.
 		// Alternatively, we'll use the combined settings method
 
-		m_vsp->combined_rsq_wsq_w(space, 0, m_reading ? ~tms5220_device::RS : ~tms5220_device::WS);
+		m_vsp->combined_rsq_wsq_w(m_reading ? ~tms5220_device::RS : ~tms5220_device::WS);
 	}
 	else
 		// If other address, turn off RS* and WS* (negative logic!)
-		m_vsp->combined_rsq_wsq_w(space, 0, ~0);
+		m_vsp->combined_rsq_wsq_w(~0);
 }
 
 /****************************************************************************/
@@ -126,32 +130,20 @@ WRITE_LINE_MEMBER( ti_speech_synthesizer_device::speech_ready )
 
 	if ((state==0) && !m_reading)
 		// Clear the lines only when we are done with writing.
-		m_vsp->combined_rsq_wsq_w(*m_space, 0, ~0);
+		m_vsp->combined_rsq_wsq_w(~0);
 }
 
 void ti_speech_synthesizer_device::device_start()
 {
-	// We don't need to save m_space because the calling method
-	// combined_rsq_wsq_w only needs the address space formally.
 	save_item(NAME(m_reading));
 	save_item(NAME(m_sbe));
 }
 
 void ti_speech_synthesizer_device::device_reset()
 {
-	if (m_genmod)
-	{
-		m_select_mask = 0x1ff801;
-		m_select_value = 0x179000;
-	}
-	else
-	{
-		m_select_mask = 0x7f801;
-		m_select_value = 0x79000;
-	}
-
 	m_reading = false;
 	m_sbe = false;
+	m_dec_high = (ioport("AMADECODE")->read()!=0);
 }
 
 ROM_START( ti99_speech )
@@ -178,6 +170,18 @@ void ti_speech_synthesizer_device::device_add_mconfig(machine_config& config)
     m_vsp->data_cb().set("vsm", FUNC(tms6100_device::data_line_r));
     m_vsp->romclk_cb().set("vsm", FUNC(tms6100_device::clk_w));
 */
+}
+
+INPUT_PORTS_START( ti99_speech )
+	PORT_START( "AMADECODE" )
+	PORT_CONFNAME( 0x01, 0x01, "Decode AMA/AMB/AMC lines" )
+		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
+		PORT_CONFSETTING( 0x01, DEF_STR( On ))
+INPUT_PORTS_END
+
+ioport_constructor ti_speech_synthesizer_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(ti99_speech);
 }
 
 const tiny_rom_entry *ti_speech_synthesizer_device::device_rom_region() const

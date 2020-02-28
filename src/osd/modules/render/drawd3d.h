@@ -18,7 +18,7 @@
 #include <mmsystem.h>
 #include <d3d9.h>
 #include <d3dx9.h>
-#include <math.h>
+#include <cmath>
 #undef interface
 
 #include "d3d/d3dcomm.h"
@@ -48,7 +48,7 @@ struct d3d_base
 class shaders;
 struct hlsl_options;
 
-/* renderer is the information about Direct3D for the current screen */
+/* renderer_d3d9 is the information about Direct3D for the current screen */
 class renderer_d3d9 : public osd_renderer, public slider_dirty_notifier
 {
 public:

@@ -27,7 +27,6 @@ TODO:
 #include "includes/vector06.h"
 
 #include "formats/vector06_dsk.h"
-#include "sound/wave.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -45,9 +44,9 @@ void vector06_state::vector06_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 
-	map(0x00, 0x03).lrw8("ppi8255_rw", [this](offs_t offset) -> u8 { return m_ppi8255->read(offset^3); }, [this](offs_t offset, u8 data) { m_ppi8255->write(offset^3, data); });
-	map(0x04, 0x07).lrw8("ppi8255_2_rw", [this](offs_t offset) -> u8 { return m_ppi8255_2->read(offset^3); }, [this](offs_t offset, u8 data) { m_ppi8255_2->write(offset^3, data); });
-	map(0x08, 0x0b).lrw8("pit8253_rw", [this](offs_t offset) -> u8 { return m_pit8253->read(offset^3); }, [this](offs_t offset, u8 data) { m_pit8253->write(offset^3, data); });
+	map(0x00, 0x03).lrw8(NAME([this] (offs_t offset) -> u8 { return m_ppi8255->read(offset^3); }), NAME([this] (offs_t offset, u8 data) { m_ppi8255->write(offset^3, data); }));
+	map(0x04, 0x07).lrw8(NAME([this] (offs_t offset) -> u8 { return m_ppi8255_2->read(offset^3); }), NAME([this] (offs_t offset, u8 data) { m_ppi8255_2->write(offset^3, data); }));
+	map(0x08, 0x0b).lrw8(NAME([this] (offs_t offset) -> u8 { return m_pit8253->read(offset^3); }), NAME([this] (offs_t offset, u8 data) { m_pit8253->write(offset^3, data); }));
 	map(0x0c, 0x0c).w(FUNC(vector06_state::vector06_color_set));
 	map(0x10, 0x10).w(FUNC(vector06_state::vector06_ramdisk_w));
 	map(0x14, 0x15).rw(m_ay, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_address_w));
@@ -181,7 +180,6 @@ void vector06_state::vector06(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BLACK, 16);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	I8255(config, m_ppi8255);
@@ -197,7 +195,8 @@ void vector06_state::vector06(machine_config &config)
 	m_ppi8255_2->out_pc_callback().set(FUNC(vector06_state::vector06_romdisk_portc_w));
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	KR1818VG93(config, m_fdc, 1_MHz_XTAL);
 

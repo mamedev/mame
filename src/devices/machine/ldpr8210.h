@@ -18,16 +18,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_LASERDISC_PR8210_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PIONEER_PR8210, 0)
-#define MCFG_LASERDISC_SIMUTREK_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SIMUTREK_SPECIAL, 0)
-
-
-//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
@@ -48,7 +38,7 @@ class pioneer_pr8210_device : public laserdisc_device
 {
 public:
 	// construction/destruction
-	pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// input and output
 	void control_w(uint8_t data);
@@ -113,10 +103,22 @@ protected:
 	void overlay_erase(bitmap_yuy16 &bitmap, float xstart, float xend);
 	void overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch, float xstart);
 
+	// LED outputs
+	output_finder<>     m_audio1;
+	output_finder<>     m_audio2;
+	output_finder<>     m_clv;
+	output_finder<>     m_cav;
+	output_finder<>     m_srev;
+	output_finder<>     m_sfwd;
+	output_finder<>     m_play;
+	output_finder<>     m_step;
+	output_finder<>     m_pause;
+	output_finder<>     m_standby;
+
 	// internal state
-	uint8_t               m_control;              // control line state
-	uint8_t               m_lastcommand;          // last command seen
-	uint16_t              m_accumulator;          // bit accumulator
+	uint8_t             m_control;              // control line state
+	uint8_t             m_lastcommand;          // last command seen
+	uint16_t            m_accumulator;          // bit accumulator
 	attotime            m_lastcommandtime;      // time of the last command
 	attotime            m_lastbittime;          // time of last bit received
 	attotime            m_firstbittime;         // time of first bit in command
@@ -126,8 +128,8 @@ protected:
 	attotime            m_slowtrg;              // time of the last SLOW TRG
 	pioneer_pia         m_pia;                  // PIA state
 	bool                m_vsync;                // live VSYNC state
-	uint8_t               m_i8049_port1;          // 8049 port 1 state
-	uint8_t               m_i8049_port2;          // 8049 port 2 state
+	uint8_t             m_i8049_port1;          // 8049 port 1 state
+	uint8_t             m_i8049_port2;          // 8049 port 2 state
 
 private:
 	void pr8210_portmap(address_map &map);

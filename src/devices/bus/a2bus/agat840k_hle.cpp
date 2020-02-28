@@ -51,13 +51,12 @@ static const floppy_interface agat840k_hle_floppy_interface =
 	"floppy_5_25"
 };
 
-MACHINE_CONFIG_START(a2bus_agat840k_hle_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(agat840k_hle_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, a2bus_agat840k_hle_device, index_0_w))
-	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(agat840k_hle_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, a2bus_agat840k_hle_device, index_1_w))
+void a2bus_agat840k_hle_device::device_add_mconfig(machine_config &config)
+{
+	legacy_floppy_image_device &floppy0(LEGACY_FLOPPY(config, m_floppy_image[0], 0, &agat840k_hle_floppy_interface));
+	floppy0.out_idx_cb().set(FUNC(a2bus_agat840k_hle_device::index_0_w));
+	legacy_floppy_image_device &floppy1(LEGACY_FLOPPY(config, m_floppy_image[1], 0, &agat840k_hle_floppy_interface));
+	floppy1.out_idx_cb().set(FUNC(a2bus_agat840k_hle_device::index_1_w));
 
 	I8255(config, m_d14);
 	// PA not connected
@@ -69,7 +68,7 @@ MACHINE_CONFIG_START(a2bus_agat840k_hle_device::device_add_mconfig)
 //  m_d15->out_pb_callback().set(FUNC(a2bus_agat840k_hle_device::d15_o_b)); // write data
 	m_d15->in_pc_callback().set(FUNC(a2bus_agat840k_hle_device::d15_i_c));
 	m_d15->out_pc_callback().set(FUNC(a2bus_agat840k_hle_device::d15_o_c));
-MACHINE_CONFIG_END
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -87,6 +86,7 @@ const tiny_rom_entry *a2bus_agat840k_hle_device::device_rom_region() const
 a2bus_agat840k_hle_device::a2bus_agat840k_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a2bus_card_interface(mconfig, *this)
+	, m_floppy_image(*this, "floppy%u", 0U)
 	, m_d14(*this, "d14")
 	, m_d15(*this, "d15")
 	, m_rom(nullptr)
@@ -148,17 +148,16 @@ void a2bus_agat840k_hle_device::device_reset()
 {
 	u8 buf[256];
 
-	for (int i = 0; i < 2; i++)
+	for (auto &img : m_floppy_image)
 	{
-		legacy_floppy_image_device *img = floppy_image(i);
-		if (img)
+		if (img.found())
 		{
 			img->floppy_drive_set_ready_state(FLOPPY_DRIVE_READY, 0);
 			img->floppy_drive_set_rpm(300.);
 			img->floppy_drive_seek(-img->floppy_drive_get_current_track());
 		}
 	}
-	m_floppy = floppy_image(0);
+	m_floppy = m_floppy_image[0].target();
 
 	// generate track images in memory, using default volume ID and gap padding bytes
 	int t = 0;
@@ -325,26 +324,21 @@ uint8_t a2bus_agat840k_hle_device::read_cnxx(uint8_t offset)
 	return m_rom[offset];
 }
 
-legacy_floppy_image_device *a2bus_agat840k_hle_device::floppy_image(int drive)
-{
-	const char *floppy_name = nullptr;
-
-	switch (drive)
-	{
-	case 0:
-		floppy_name = FLOPPY_0;
-		break;
-	case 1:
-		floppy_name = FLOPPY_1;
-		break;
-	}
-	return subdevice<legacy_floppy_image_device>(floppy_name);
-}
-
-// all signals active low.  write support not implemented; WPT is always active.
+/*
+ * all signals active low.  write support not implemented; WPT is always active.
+ *
+ * b0-b1    type of drive 2: 00 - ES 5323.01 "1000 KB", 01 - "500 KB", 10 - "250 KB", 11 - not present
+ * b2-b3    type of drive 1: -""-
+ * b4       INDEX/SECTOR
+ * b5       WRITE PROTECT
+ * b6       TRACK 0
+ * b7       READY
+ *
+ * C0x1
+ */
 READ8_MEMBER(a2bus_agat840k_hle_device::d14_i_b)
 {
-	u8 data = 0x03; // one drive present, because drive select is broken
+	u8 data = 0x3;
 
 	m_floppy->floppy_drive_set_ready_state(FLOPPY_DRIVE_READY, 1);
 
@@ -374,13 +368,12 @@ READ8_MEMBER(a2bus_agat840k_hle_device::d14_i_b)
  */
 WRITE8_MEMBER(a2bus_agat840k_hle_device::d14_o_c)
 {
-	// drive select is broken in legacy flopdrv.cpp -- floppy_get_drive
 	m_unit = BIT(data, 3);
-	m_floppy = floppy_image(m_unit);
+	m_floppy = m_floppy_image[m_unit].target();
 	if (m_unit)
-		m_floppy->floppy_ds1_w(m_unit != 1);
+		m_floppy->floppy_ds_w(m_unit != 1);
 	else
-		m_floppy->floppy_ds0_w(m_unit != 0);
+		m_floppy->floppy_ds_w(m_unit != 0);
 
 	m_floppy->floppy_drtn_w(!BIT(data, 2));
 	m_side = BIT(data, 4);
@@ -403,6 +396,8 @@ WRITE8_MEMBER(a2bus_agat840k_hle_device::d14_o_c)
 		data, m_unit, m_side, !BIT(data, 2), !BIT(data, 6), !BIT(data, 7));
 }
 
+// C0x4
+//
 // data are latched in by write to PC4
 READ8_MEMBER(a2bus_agat840k_hle_device::d15_i_a)
 {

@@ -168,9 +168,10 @@ WRITE8_MEMBER(gamate_rom_4in1_device::write_rom)
 	}
 }
 
-MACHINE_CONFIG_START(gamate_rom_plain_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("protection", GAMATE_PROT, 0)
-MACHINE_CONFIG_END
+void gamate_rom_plain_device::device_add_mconfig(machine_config &config)
+{
+	GAMATE_PROT(config, m_protection, 0);
+}
 
 
 /*-------------------------------------------------

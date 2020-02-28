@@ -493,6 +493,12 @@ void m68340_sim::reset()
 	m_pit_irq = false;
 }
 
+void m68340_sim::module_reset()
+{
+	// SYS set in RSR, nothing else happens
+	m_avr_rsr = (m_avr_rsr & 0xff00) | 0x02;
+}
+
 /* do_tick_pit works on whole clock cycles, no flank support */
 void m68340_cpu_device::do_tick_pit()
 {

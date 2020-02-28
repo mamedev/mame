@@ -79,6 +79,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class pipeline_state : public driver_device
@@ -160,8 +161,8 @@ TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info2)
 void pipeline_state::video_start()
 {
 	m_palram=std::make_unique<u8[]>(0x1000);
-	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
-	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
+	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pipeline_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pipeline_state::get_tile_info2)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
 	m_tilemap2->set_transparent_pen(0);
 
 	save_item(NAME(m_vidctrl));

@@ -43,10 +43,10 @@ ToDo:
 - Need software that does more than plain text (such as games)
 - Add masking feature (only used for the UARTs)
 - Connect devices to the above hardware
-- Fix the display
 - Dump Telcon and Gemini BIOSes
 - Emulate the Co-Power-88 expansion (allows PC-DOS, CP/M-86, etc. to be used)
 - Probably lots of other things
+- Press F3 and screen turns into garbage. This breakage started in the 0.198 to 0.199 cycle.
 
 
 *************************************************************************************************************/
@@ -166,20 +166,20 @@ void zorba_state::zorba(machine_config &config)
 	m_dma->in_iorq_callback().set(FUNC(zorba_state::io_read_byte));
 	m_dma->out_iorq_callback().set(FUNC(zorba_state::io_write_byte));
 
-	I8251(config, m_uart0, 0); // U32 COM port J2
+	I8251(config, m_uart0, 24_MHz_XTAL / 12); // U32 COM port J2
 	m_uart0->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd)); // TODO: this line has a LED attached
 	m_uart0->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_uart0->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_uart0->rxrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<1>));
 	m_uart0->txrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<0>));
 
-	I8251(config, m_uart1, 0); // U31 printer port J3
+	I8251(config, m_uart1, 24_MHz_XTAL / 12); // U31 printer port J3
 	m_uart1->txd_handler().set("serprn", FUNC(rs232_port_device::write_txd));
 	m_uart1->rts_handler().set("serprn", FUNC(rs232_port_device::write_rts));
 	m_uart1->rxrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<3>));
 	m_uart1->txrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<2>));
 
-	I8251(config, m_uart2, 0); // U30 serial keyboard J6
+	I8251(config, m_uart2, 24_MHz_XTAL / 12); // U30 serial keyboard J6
 	m_uart2->txd_handler().set("keyboard", FUNC(zorba_keyboard_device::txd_w));
 	m_uart2->rxrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<5>));
 	m_uart2->txrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<4>));
@@ -214,9 +214,10 @@ void zorba_state::zorba(machine_config &config)
 	pit.out_handler<2>().append(m_uart2, FUNC(i8251_device::write_rxc));
 
 	// CRTC
-	I8275(config, m_crtc, 14.318'181_MHz_XTAL / 7);
+	I8275(config, m_crtc, 14.318'181_MHz_XTAL / 8); // TODO: character clock divider is 9 during HRTC
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(zorba_state::zorba_update_chr), this);
+	m_crtc->set_refresh_hack(true);
+	m_crtc->set_display_callback(FUNC(zorba_state::zorba_update_chr));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
 	m_crtc->irq_wr_callback().set("irq0", FUNC(input_merger_device::in_w<1>));
 	m_crtc->set_screen("screen");
@@ -372,10 +373,7 @@ template <unsigned N> WRITE_LINE_MEMBER( zorba_state::irq_w )
 	else if (BIT(m_irq, 3)) vector = 0x88;
 	else                    vector = 0x84; // very wrong, need test cases for other things
 
-	m_maincpu->set_input_line_and_vector(
-			INPUT_LINE_IRQ0,
-			m_irq ? ASSERT_LINE : CLEAR_LINE,
-			vector);
+	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, m_irq ? ASSERT_LINE : CLEAR_LINE, vector); // Z80
 }
 
 
@@ -411,7 +409,7 @@ WRITE8_MEMBER(zorba_state::io_write_byte)
 	address_space& prog_space = m_maincpu->space(AS_IO);
 
 	if (offset == 0x10)
-		m_crtc->dack_w(space, 0, data);
+		m_crtc->dack_w(data);
 	else
 		prog_space.write_byte(offset, data);
 }
@@ -503,14 +501,15 @@ I8275_DRAW_CHARACTER_MEMBER( zorba_state::zorba_update_chr )
 
 	uint8_t gfx = m_p_chargen[(linecount & 15) + (charcode << 4) + ((gpa & 1) << 11)];
 
+	if (rvv)
+		gfx ^= 0xff;
+
+	// VSP actually overrides reverse video here
 	if (vsp)
 		gfx = 0;
 
 	if (lten)
 		gfx = 0xff;
-
-	if (rvv)
-		gfx ^= 0xff;
 
 	for(i=0;i<8;i++)
 		bitmap.pix32(y, x + 7 - i) = palette[BIT(gfx, i) ? (hlgt ? 2 : 1) : 0];

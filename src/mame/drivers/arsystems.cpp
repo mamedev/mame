@@ -89,7 +89,7 @@ public:
 	void init_argh();
 
 	DECLARE_WRITE16_MEMBER(arcadia_multibios_change_game);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
+	template <int Coin> DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
 	DECLARE_WRITE8_MEMBER(arcadia_cia_0_portb_w);
 
@@ -162,18 +162,17 @@ WRITE8_MEMBER(arcadia_amiga_state::arcadia_cia_0_portb_w)
  *
  *************************************/
 
+template <int Coin>
 CUSTOM_INPUT_MEMBER(arcadia_amiga_state::coin_counter_r)
 {
-	int coin = (uintptr_t)param;
-
 	/* return coin counter values */
-	return m_coin_counter[coin] & 3;
+	return m_coin_counter[Coin] & 3;
 }
 
 
 INPUT_CHANGED_MEMBER(arcadia_amiga_state::coin_changed_callback)
 {
-	int coin = (uintptr_t)param;
+	int coin = param;
 
 	/* check for a 0 -> 1 transition */
 	if (!oldval && newval && m_coin_counter[coin] < 3)
@@ -233,7 +232,7 @@ void arcadia_amiga_state::argh_map(address_map &map)
 {
 	a500_mem(map);
 	map(0x800000, 0x97ffff).bankr("bank2").region("user3", 0);
-//  AM_RANGE(0x980000, 0x9fefff) AM_ROM AM_REGION("user3", 0)
+//  map(0x980000, 0x9fefff).rom().region("user3", 0);
 	map(0x9ff000, 0x9fffff).ram().share("nvram");
 	map(0xf00000, 0xf7ffff).rom().region("user3", 0);
 }
@@ -257,15 +256,15 @@ static INPUT_PORTS_START( arcadia )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_counter_r, (void *)0)
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_counter_r, (void *)1)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arcadia_amiga_state, coin_counter_r<0>)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arcadia_amiga_state, coin_counter_r<1>)
 
 	PORT_START("joy_0_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,amiga_joystick_convert, (void *)0)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arcadia_amiga_state, amiga_joystick_convert<0>)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("joy_1_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,amiga_joystick_convert, (void *)1)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arcadia_amiga_state, amiga_joystick_convert<1>)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("potgo")
@@ -300,11 +299,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(arcadia_amiga_state::arcadia)
-
+void arcadia_amiga_state::arcadia(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
-	MCFG_DEVICE_PROGRAM_MAP(arcadia_map)
+	M68000(config, m_maincpu, amiga_state::CLK_7M_NTSC);
+	m_maincpu->set_addrmap(AS_PROGRAM, &arcadia_amiga_state::arcadia_map);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
@@ -321,13 +320,13 @@ MACHINE_CONFIG_START(arcadia_amiga_state::arcadia)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	paula_8364_device &paula(PAULA_8364(config, "amiga", amiga_state::CLK_C1_NTSC));
-	paula.add_route(0, "lspeaker", 0.50);
-	paula.add_route(1, "rspeaker", 0.50);
-	paula.add_route(2, "rspeaker", 0.50);
-	paula.add_route(3, "lspeaker", 0.50);
-	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
-	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
+	PAULA_8364(config, m_paula, amiga_state::CLK_C1_NTSC);
+	m_paula->add_route(0, "lspeaker", 0.50);
+	m_paula->add_route(1, "rspeaker", 0.50);
+	m_paula->add_route(2, "rspeaker", 0.50);
+	m_paula->add_route(3, "lspeaker", 0.50);
+	m_paula->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_paula->int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	/* cia */
 	MOS8520(config, m_cia_0, amiga_state::CLK_E_NTSC);
@@ -347,15 +346,15 @@ MACHINE_CONFIG_START(arcadia_amiga_state::arcadia)
 	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
 	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
 	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(arcadia_amiga_state::argh)
+void arcadia_amiga_state::argh(machine_config &config)
+{
 	arcadia(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(argh_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &arcadia_amiga_state::argh_map);
+}
 
 
 /*************************************

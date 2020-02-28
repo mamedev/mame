@@ -37,7 +37,7 @@ texture_manager::~texture_manager()
 
 void texture_manager::add_provider(std::string name, bgfx_texture_handle_provider* provider)
 {
-	std::map<std::string, bgfx_texture_handle_provider*>::iterator iter = m_textures.find(name);
+	auto iter = m_textures.find(name);
 	if (iter != m_textures.end())
 	{
 		iter->second = provider;
@@ -50,7 +50,7 @@ void texture_manager::add_provider(std::string name, bgfx_texture_handle_provide
 
 bgfx_texture* texture_manager::create_texture(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, void* data, uint32_t flags)
 {
-	bgfx_texture* texture = new bgfx_texture(name, format, width, height, flags, data);
+	auto* texture = new bgfx_texture(name, format, width, height, flags, data);
 	m_textures[name] = texture;
 	return texture;
 }
@@ -67,13 +67,13 @@ bgfx_texture* texture_manager::create_png_texture(std::string path, std::string 
 		return nullptr;
 	}
 
-	uint8_t *data = new uint8_t[bitmap.width() * bitmap.height() * 4];
-	uint32_t *data32 = reinterpret_cast<uint32_t *>(data);
+	auto *data = new uint8_t[bitmap.width() * bitmap.height() * 4];
+	auto *data32 = reinterpret_cast<uint32_t *>(data);
 
 	const uint32_t width = bitmap.width();
 	const uint32_t height = bitmap.height();
 	const uint32_t rowpixels = bitmap.rowpixels();
-	uint32_t* base = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(0));
+	auto* base = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(0));
 	for (int y = 0; y < height; y++)
 	{
 		copy_util::copyline_argb32(data32 + y * width, base + y * rowpixels, width, nullptr);
@@ -96,7 +96,7 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 	bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
 	if (old_key != ~0ULL)
 	{
-		std::map<uint64_t, sequenced_handle>::iterator iter = m_mame_textures.find(old_key);
+		auto iter = m_mame_textures.find(old_key);
 		if (iter != m_mame_textures.end())
 		{
 			handle = iter->second.handle;
@@ -116,8 +116,10 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 				}
 				else
 				{
-					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(format, width, height, rowpixels, palette, base);
-					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)width, (uint16_t)height, mem);
+					bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::BGRA8;
+					uint16_t pitch = width;
+					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, width, height, rowpixels, palette, base, &pitch);
+					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)width, (uint16_t)height, mem, pitch);
 					return handle;
 				}
 			}
@@ -127,7 +129,7 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 	}
 	else
 	{
-		std::map<uint64_t, sequenced_handle>::iterator iter = m_mame_textures.find(key);
+		auto iter = m_mame_textures.find(key);
 		if (iter != m_mame_textures.end())
 		{
 			handle = iter->second.handle;
@@ -142,8 +144,10 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 				}
 				else
 				{
-					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(format, width, height, rowpixels, palette, base);
-					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)width, (uint16_t)height, mem);
+					bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::BGRA8;
+					uint16_t pitch = width;
+					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, width, height, rowpixels, palette, base, &pitch);
+					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)width, (uint16_t)height, mem, pitch);
 					return handle;
 				}
 			}
@@ -151,9 +155,11 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 		}
 	}
 
-	const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(format, width, height, rowpixels, palette, base);
-	handle = bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::RGBA8, flags, nullptr);
-	bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)width, (uint16_t)height, mem);
+	bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::BGRA8;
+	uint16_t pitch = width;
+	const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, width, height, rowpixels, palette, base, &pitch);
+	handle = bgfx::createTexture2D(width, height, false, 1, dst_format, flags, nullptr);
+	bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)width, (uint16_t)height, mem, pitch);
 
 	m_mame_textures[key] = { handle, seqid, width, height };
 	return handle;
@@ -162,7 +168,7 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 bgfx::TextureHandle texture_manager::handle(std::string name)
 {
 	bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
-	std::map<std::string, bgfx_texture_handle_provider*>::iterator iter = m_textures.find(name);
+	auto iter = m_textures.find(name);
 	if (iter != m_textures.end())
 	{
 		handle = (iter->second)->texture();
@@ -174,7 +180,7 @@ bgfx::TextureHandle texture_manager::handle(std::string name)
 
 bgfx_texture_handle_provider* texture_manager::provider(std::string name)
 {
-	std::map<std::string, bgfx_texture_handle_provider*>::iterator iter = m_textures.find(name);
+	auto iter = m_textures.find(name);
 	if (iter != m_textures.end())
 	{
 		return iter->second;

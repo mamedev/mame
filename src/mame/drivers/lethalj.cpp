@@ -150,7 +150,7 @@ Pin #11(+) | | R               |
 #define MASTER_CLOCK            XTAL(40'000'000)
 #define SOUND_CLOCK             XTAL(2'000'000)
 
-#define VIDEO_CLOCK             XTAL(11'289'000)
+#define VIDEO_CLOCK             XTAL(11'289'600)
 #define VIDEO_CLOCK_LETHALJ     XTAL(11'059'200)
 
 
@@ -216,14 +216,13 @@ void lethalj_state::lethalj_map(address_map &map)
 	map(0x04000000, 0x0400000f).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x04000010, 0x0400001f).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x04100000, 0x0410000f).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-//  AM_RANGE(0x04100010, 0x0410001f) AM_READNOP     /* read but never examined */
+//  map(0x04100010, 0x0410001f).nopr();     /* read but never examined */
 	map(0x04200000, 0x0420001f).nopw();    /* clocks bits through here */
 	map(0x04300000, 0x0430007f).r(FUNC(lethalj_state::lethalj_gun_r));
 	map(0x04400000, 0x0440000f).nopw();    /* clocks bits through here */
 	map(0x04500010, 0x0450001f).portr("IN0");
 	map(0x04600000, 0x0460000f).portr("IN1");
 	map(0x04700000, 0x0470007f).w(FUNC(lethalj_state::blitter_w));
-	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xc0000240, 0xc000025f).nopw();    /* seems to be a bug in their code, one of many. */
 	map(0xff800000, 0xffffffff).rom().region("maincpu", 0);
 }
@@ -368,7 +367,7 @@ static INPUT_PORTS_START( eggvntdx )
 	PORT_INCLUDE(eggventr)
 
 	PORT_MODIFY("IN0")
-	PORT_DIPUNUSED_DIPLOC( 0x1000, IP_ACTIVE_LOW, "SW3:4" ) // Was "Slot Machine" - The slot machince is present in the code as a 'bonus stage'
+	PORT_DIPUNUSED_DIPLOC( 0x1000, IP_ACTIVE_LOW, "SW3:4" ) // Was "Slot Machine" - The slot machine is present in the code as a 'bonus stage'
 								//  (when the egg reaches Vegas?), but not actually called (EC).
 INPUT_PORTS_END
 
@@ -515,7 +514,7 @@ static INPUT_PORTS_START( cclownz )
 	PORT_DIPSETTING(      0x0000, "3000" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lethalj_state,cclownz_paddle, nullptr)
+	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(lethalj_state, cclownz_paddle)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0060, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
@@ -631,8 +630,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(lethalj_state::gameroom)
-
+void lethalj_state::gameroom(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS34010(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lethalj_state::lethalj_map);
@@ -644,35 +643,32 @@ MACHINE_CONFIG_START(lethalj_state::gameroom)
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 701, 0, 512, 263, 0, 236)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(VIDEO_CLOCK, 701, 0, 512, 263, 0, 236);
+	m_screen->set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_ind16));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, SOUND_CLOCK, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	OKIM6295(config, "oki1", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, SOUND_CLOCK, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	OKIM6295(config, "oki2", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_DEVICE_ADD("oki3", OKIM6295, SOUND_CLOCK, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki3", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.8);
+}
 
 
-MACHINE_CONFIG_START(lethalj_state::lethalj)
+void lethalj_state::lethalj(machine_config &config)
+{
 	gameroom(config);
 
 	m_maincpu->set_pixel_clock(VIDEO_CLOCK_LETHALJ);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK_LETHALJ, 689, 0, 512, 259, 0, 236)
-MACHINE_CONFIG_END
+	m_screen->set_raw(VIDEO_CLOCK_LETHALJ, 689, 0, 512, 259, 0, 236);
+}
 
 
 
@@ -1019,19 +1015,19 @@ ROM_END
 
 void lethalj_state::init_ripribit()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::ripribit_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(*this, FUNC(lethalj_state::ripribit_control_w)));
 }
 
 
 void lethalj_state::init_cfarm()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cfarm_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(*this, FUNC(lethalj_state::cfarm_control_w)));
 }
 
 
 void lethalj_state::init_cclownz()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cclownz_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(*this, FUNC(lethalj_state::cclownz_control_w)));
 }
 
 

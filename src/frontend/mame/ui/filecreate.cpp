@@ -182,7 +182,7 @@ void menu_file_create::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Create"), "", 0, ITEMREF_CREATE);
 
-	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 
@@ -205,7 +205,7 @@ void menu_file_create::handle()
 			if ((event->itemref == ITEMREF_CREATE) || (event->itemref == ITEMREF_NEW_IMAGE_NAME))
 			{
 				std::string tmp_file(m_filename);
-				if (tmp_file.find(".") != -1 && tmp_file.find(".") < tmp_file.length() - 1)
+				if (tmp_file.find('.') != -1 && tmp_file.find('.') < tmp_file.length() - 1)
 				{
 					m_current_file = m_filename;
 					stack_pop();

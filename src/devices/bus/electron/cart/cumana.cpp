@@ -87,7 +87,7 @@ void electron_cumana_device::device_start()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t electron_cumana_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
+uint8_t electron_cumana_device::read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
 {
 	uint8_t data = 0xff;
 
@@ -103,7 +103,7 @@ uint8_t electron_cumana_device::read(address_space &space, offs_t offset, int in
 			break;
 		case 0x98:
 		case 0x9c:
-			data = m_rtc->read(space, BIT(offset, 2));
+			data = m_rtc->read(BIT(offset, 2));
 			break;
 		}
 	}
@@ -134,7 +134,7 @@ uint8_t electron_cumana_device::read(address_space &space, offs_t offset, int in
 //  write - cartridge data write
 //-------------------------------------------------
 
-void electron_cumana_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
+void electron_cumana_device::write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
 {
 	if (infc)
 	{
@@ -147,12 +147,11 @@ void electron_cumana_device::write(address_space &space, offs_t offset, uint8_t 
 			m_fdc->write(offset & 0x03, data);
 			break;
 		case 0x94:
-			wd1793_control_w(space, 0, data);
+			wd1793_control_w(data);
 			break;
 		case 0x98:
 		case 0x9c:
-			m_rtc->write(space, BIT(offset, 2), data);
-			break;
+			m_rtc->write(BIT(offset, 2), data);
 			break;
 		}
 	}
@@ -170,7 +169,7 @@ void electron_cumana_device::write(address_space &space, offs_t offset, uint8_t 
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE8_MEMBER(electron_cumana_device::wd1793_control_w)
+void electron_cumana_device::wd1793_control_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 

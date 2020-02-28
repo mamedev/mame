@@ -75,7 +75,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ir7_w) { set_int_line(IRQ_7, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir8_w) { set_int_line(IRQ_CBUS3, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir9_w) { set_int_line(IRQ_RTC, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir10_w) { set_int_line(IRQ_60HZ, state); }
+	//DECLARE_WRITE_LINE_MEMBER(ir10_w) { set_int_line(IRQ_60HZ, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir11_w) { set_int_line(IRQ_SERIAL, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir12_w) { set_int_line(IRQ_ETHERNET, state); }
 
@@ -260,7 +260,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(serial_dma);
 	TIMER_CALLBACK_MEMBER(timer0);
 	TIMER_CALLBACK_MEMBER(timer1);
-	TIMER_CALLBACK_MEMBER(timer_60hz);
+	virtual TIMER_CALLBACK_MEMBER(timer_60hz);
 
 	virtual TIMER_CALLBACK_MEMBER(eth_reset) = 0;
 
@@ -464,6 +464,8 @@ public:
 	sapphire_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
+
+	virtual TIMER_CALLBACK_MEMBER(timer_60hz) override;
 
 	DECLARE_WRITE16_MEMBER(eth_w);
 	DECLARE_READ16_MEMBER(eth_r);

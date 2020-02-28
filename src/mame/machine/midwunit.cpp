@@ -118,7 +118,7 @@ READ16_MEMBER(midwunit_state::midwunit_io_r)
 		case 4:
 		{
 			int picret = 0;
-			if (m_midway_serial_pic) picret = m_midway_serial_pic->status_r(space, 0);
+			if (m_midway_serial_pic) picret = m_midway_serial_pic->status_r();
 
 			return (picret << 12) | midwunit_sound_state_r(space, 0, 0xffff);
 		}
@@ -209,14 +209,14 @@ void midwunit_state::init_mk3r10()
 void midwunit_state::init_umk3()
 {
 	init_mk3_common();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16_delegate(FUNC(midwunit_state::umk3_palette_hack_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16_delegate(*this, FUNC(midwunit_state::umk3_palette_hack_w)));
 	m_umk3_palette = m_mainram + (0x6a060>>4);
 }
 
 void midwunit_state::init_umk3r11()
 {
 	init_mk3_common();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f,write16_delegate(FUNC(midwunit_state::umk3_palette_hack_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16_delegate(*this, FUNC(midwunit_state::umk3_palette_hack_w)));
 	m_umk3_palette = m_mainram + (0x6a060>>4);
 }
 
@@ -291,7 +291,7 @@ WRITE16_MEMBER(midwunit_state::wwfmania_io_0_w)
 void midwunit_state::init_wwfmania()
 {
 	/* enable I/O shuffling */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01800000, 0x0180000f, write16_delegate(FUNC(midwunit_state::wwfmania_io_0_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01800000, 0x0180000f, write16_delegate(*this, FUNC(midwunit_state::wwfmania_io_0_w)));
 
 	/* serial prefixes 430, 528 */
 	//midway_serial_pic_init(machine(), 528);
@@ -335,7 +335,7 @@ void midwunit_state::machine_reset()
 READ16_MEMBER(midwunit_state::midwunit_security_r)
 {
 	uint16_t picret = 0;
-	if (m_midway_serial_pic) picret = m_midway_serial_pic->read(space, 0);
+	if (m_midway_serial_pic) picret = m_midway_serial_pic->read();
 	return picret;
 }
 
@@ -344,7 +344,7 @@ WRITE16_MEMBER(midwunit_state::midwunit_security_w)
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
 	{
-		if (m_midway_serial_pic) m_midway_serial_pic->write(space, 0, data);
+		if (m_midway_serial_pic) m_midway_serial_pic->write(data);
 	}
 }
 

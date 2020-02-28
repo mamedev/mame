@@ -203,7 +203,7 @@ void menu_slot_devices::populate(float &customtop, float &custombottom)
 	item_append(_("Reset"), "", 0, ITEMREF_RESET);
 
 	// leave space for the name of the current option at the bottom
-	custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 
@@ -220,9 +220,9 @@ void menu_slot_devices::custom_render(void *selectedref, float top, float bottom
 		char const *const text[] = { option ? option->devtype().fullname() : _("[empty slot]") };
 		draw_text_box(
 				std::begin(text), std::end(text),
-				origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
+				origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
 				ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-				UI_TEXT_COLOR, UI_BACKGROUND_COLOR, 1.0f);
+				ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 	}
 }
 

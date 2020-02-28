@@ -267,7 +267,7 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
 			m_VIC3_ControlB = data;
 			break;
 		default:
-			printf("%02x %02x\n",offset,data);
+			printf("%02x %02x\n", offset, data);
 			break;
 	}
 
@@ -402,9 +402,9 @@ READ8_MEMBER(c65_state::CIASelect_r)
 		switch((offset & 0x700) | 0x800)
 		{
 			case 0xc00:
-				return m_cia0->read(space,offset);
+				return m_cia0->read(offset);
 			case 0xd00:
-				return m_cia1->read(space,offset);
+				return m_cia1->read(offset);
 			default:
 				printf("Unknown I/O access read to offset %04x\n",offset);
 				break;
@@ -425,14 +425,14 @@ WRITE8_MEMBER(c65_state::CIASelect_w)
 		switch((offset & 0x700) | 0x800)
 		{
 			case 0xc00:
-				m_cia0->write(space,offset,data);
+				m_cia0->write(offset, data);
 				break;
 
 			case 0xd00:
-				m_cia1->write(space,offset,data);
+				m_cia1->write(offset, data);
 				break;
 			default:
-				printf("Unknown I/O access write to offset %04x data = %02x\n",offset,data);
+				printf("Unknown I/O access write to offset %04x data = %02x\n", offset, data);
 				break;
 		}
 	}
@@ -499,7 +499,7 @@ void c65_state::c65_map(address_map &map)
 	// 0x0d440, 0x0d4*f Left  SID
 	map(0x0d600, 0x0d6ff).rw(FUNC(c65_state::uart_r), FUNC(c65_state::uart_w));
 	map(0x0d700, 0x0d702).w(FUNC(c65_state::DMAgic_w)).share("dmalist"); // 0x0d700, 0x0d7** DMAgic
-	//AM_RANGE(0x0d703, 0x0d703) AM_READ(DMAgic_r)
+	//map(0x0d703, 0x0d703).r(FUNC(c65_state::DMAgic_r));
 	// 0x0d800, 0x0d8** Color matrix
 	map(0x0d800, 0x0dfff).rw(FUNC(c65_state::CIASelect_r), FUNC(c65_state::CIASelect_w)).share("cram");
 	// 0x0dc00, 0x0dc** CIA-1
@@ -684,12 +684,12 @@ WRITE_LINE_MEMBER(c65_state::cia0_irq)
 //  c65_irq(state || m_vicirq);
 }
 
-MACHINE_CONFIG_START(c65_state::c65)
-
+void c65_state::c65(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M4510, MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(c65_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", c65_state, vic3_vblank_irq)
+	M4510(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c65_state::c65_map);
+	m_maincpu->set_vblank_int("screen", FUNC(c65_state::vic3_vblank_irq));
 
 	MOS6526(config, m_cia0, MAIN_CLOCK);
 	m_cia0->set_tod_clock(60);
@@ -707,16 +707,16 @@ MACHINE_CONFIG_START(c65_state::c65)
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(c65_state, screen_update)
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK*4, 910, 0, 640, 262, 0, 200) // mods needed
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_refresh_hz(60);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_screen_update(FUNC(c65_state::screen_update));
+//  m_screen->set_size(32*8, 32*8);
+//  m_screen->set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	m_screen->set_raw(MAIN_CLOCK*4, 910, 0, 640, 262, 0, 200); // mods needed
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_c65)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_c65);
 
 	PALETTE(config, m_palette, FUNC(c65_state::c65_palette), 0x100);
 
@@ -727,7 +727,7 @@ MACHINE_CONFIG_START(c65_state::c65)
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("c65_flop");
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

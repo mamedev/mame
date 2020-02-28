@@ -1,90 +1,149 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nl_string.c
- *
- */
 
 #include "pfmtlog.h"
 #include "palloc.h"
+#include "pstonum.h"
+#include "pstrutil.h"
 
-#include <cstring>
-#include <cstdlib>
-#include <cstdarg>
 #include <algorithm>
-#include <locale>
+#include <array>
+#include <iomanip>
 #include <iostream>
 
 namespace plib {
 
-pfmt &pfmt::format_element(const char *l, const unsigned cfmt_spec,  ...)
+#if 0
+struct ptemporary_locale
 {
-	va_list ap;
-	va_start(ap, cfmt_spec);
-	pstring fmt("%");
-	char buf[2048]; // FIXME
-	std::size_t sl;
+	ptemporary_locale(std::locale tlocale)
+	: new_locale(tlocale), old_clocale(std::setlocale(LC_ALL, nullptr))
+	{
+		if (old_locale != tlocale)
+			std::locale::global(tlocale);
+		if (old_clocale != tlocale.name().c_str())
+			std::setlocale(LC_ALL, tlocale.name().c_str());
+	}
 
-	m_arg++;
+	~ptemporary_locale()
+	{
+		if (old_clocale != new_locale.name().c_str())
+			std::setlocale(LC_ALL, old_clocale.c_str());
+		if (old_locale != new_locale)
+			std::locale::global(old_locale);
+	}
+private:
+	std::locale new_locale;
+	std::locale old_locale;
+	pstring old_clocale;
+};
+#endif
 
+pfmt::rtype pfmt::setfmt(std::stringstream &strm, char32_t cfmt_spec)
+{
+	pstring fmt;
 	pstring search("{");
 	search += plib::to_string(m_arg);
-	sl = search.size();
 
-	auto p = m_str.find(search + ":");
-	sl++; // ":"
-	if (p == pstring::npos) // no further specifiers
+	rtype r;
+
+	r.sl = search.size();
+	r.p = m_str.find(search + ':');
+	r.sl++; // ":"
+	if (r.p == pstring::npos) // no further specifiers
 	{
-		p = m_str.find(search + "}");
-		if (p == pstring::npos) // not found try default
+		r.p = m_str.find(search + '}');
+		if (r.p == pstring::npos) // not found try default
 		{
-			sl = 2;
-			p = m_str.find("{}");
+			r.sl = 2;
+			r.p = m_str.find("{}");
 		}
-		if (p == pstring::npos)
+		else
+			// found absolute positional place holder
+			r.ret = 1;
+		if (r.p == pstring::npos)
 		{
-			sl=1;
-			p = m_str.find("{");
-			if (p != pstring:: npos)
+			r.sl=2;
+			r.p = m_str.find("{:");
+			if (r.p != pstring:: npos)
 			{
-				auto p1 = m_str.find("}", p);
+				auto p1 = m_str.find('}', r.p);
 				if (p1 != pstring::npos)
 				{
-					sl = p1 - p + 1;
-					fmt += m_str.substr(p+1, p1 - p - 1);
+					r.sl = p1 - r.p + 1;
+					fmt += m_str.substr(r.p+2, p1 - r.p - 2);
 				}
 			}
 		}
 	}
 	else
 	{
-		auto p1 = m_str.find("}", p);
+		// found absolute positional place holder
+		auto p1 = m_str.find('}', r.p);
 		if (p1 != pstring::npos)
 		{
-			sl = p1 - p + 1;
-			fmt += ((m_arg>=10) ? m_str.substr(p+4, p1 - p - 4) : m_str.substr(p+3, p1 - p - 3));
+			r.sl = p1 - r.p + 1;
+			fmt += ((m_arg>=10) ? m_str.substr(r.p+4, p1 - r.p - 4) : m_str.substr(r.p+3, p1 - r.p - 3));
+			r.ret = 1;
 		}
 	}
-	pstring::value_type pend = fmt.at(fmt.size() - 1);
-	if (pstring("duxo").find(cfmt_spec) != pstring::npos)
+	if (r.p != pstring::npos)
 	{
-		if (pstring("duxo").find(pend) == pstring::npos)
-			fmt += (pstring(l) + static_cast<pstring::value_type>(cfmt_spec));
+		// a.b format here ...
+		char32_t pend(0);
+		int width(0);
+		if (fmt != "" && pstring("duxofge").find(static_cast<pstring::value_type>(cfmt_spec)) != pstring::npos)
+		{
+			pend = static_cast<char32_t>(fmt.at(fmt.size() - 1));
+			if (pstring("duxofge").find(static_cast<pstring::value_type>(pend)) == pstring::npos)
+				pend = cfmt_spec;
+			else
+				fmt = plib::left(fmt, fmt.size() - 1);
+		}
 		else
-			fmt = plib::left(fmt, fmt.size() - 1) + pstring(l) + plib::right(fmt, 1);
-	}
-	else if (pstring("fge").find(cfmt_spec) != pstring::npos)
-	{
-		if (pstring("fge").find(pend) == pstring::npos)
-			fmt += cfmt_spec;
+			// FIXME: Error
+			pend = cfmt_spec;
+
+		auto pdot(fmt.find('.'));
+
+		if (pdot==0)
+			strm << std::setprecision(pstonum_ne_def<int>(fmt.substr(1), 6));
+		else if (pdot != pstring::npos)
+		{
+			strm << std::setprecision(pstonum_ne_def<int>(fmt.substr(pdot + 1), 6));
+			width = pstonum_ne_def<int>(left(fmt,pdot), 0);
+		}
+		else if (fmt != "")
+			width = pstonum_ne_def<int>(fmt, 0);
+
+		auto aw(plib::abs(width));
+
+		strm << std::setw(aw);
+		if (width < 0)
+			strm << std::left;
+
+		switch (pend)
+		{
+			case 'x':
+				strm << std::hex;
+				break;
+			case 'o':
+				strm << std::oct;
+				break;
+			case 'f':
+				strm << std::fixed;
+				break;
+			case 'e':
+				strm << std::scientific;
+				break;
+			default:
+				break;
+		}
 	}
 	else
-		fmt += cfmt_spec;
-	vsprintf(buf, fmt.c_str(), ap);
-	if (p != pstring::npos)
-		m_str = m_str.substr(0, p) + pstring(buf) + m_str.substr(p + sl);
-	va_end(ap);
-	return *this;
-}
+		r.ret = -1;
+	return r;
 
 }
+
+} // namespace plib

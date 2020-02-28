@@ -8,6 +8,7 @@
 #include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define PIXMAP_COLOR_BASE  (16 + 32)
 #define BITMAPRAM_SIZE      0x6000

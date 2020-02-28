@@ -17,6 +17,7 @@
 #include "video/bufsprite.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 class ddragon3_state : public driver_device
@@ -117,7 +118,8 @@ public:
 	wwfwfest_state(const machine_config &mconfig, device_type type, const char *tag) :
 		ddragon3_state(mconfig, type, tag),
 		m_fg0_videoram(*this, "fg0_videoram"),
-		m_paletteram(*this, "palette")
+		m_paletteram(*this, "palette"),
+		m_dsw(*this, "DSW%u", 1U)
 	{
 		vblank_level = 3;
 		raster_level = 2;
@@ -126,13 +128,14 @@ public:
 	void wwfwfest(machine_config &config);
 	void wwfwfstb(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dsw_3f_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(dsw_c0_r);
+	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(dsw_3f_r);
+	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(dsw_c0_r);
 
 private:
 	/* wwfwfest has an extra layer */
 	required_shared_ptr<uint16_t> m_fg0_videoram;
 	required_shared_ptr<uint16_t> m_paletteram;
+	required_ioport_array<2> m_dsw;
 	tilemap_t *m_fg0_tilemap;
 	DECLARE_WRITE16_MEMBER(wwfwfest_fg0_videoram_w);
 

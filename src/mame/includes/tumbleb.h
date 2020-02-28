@@ -10,6 +10,7 @@
 #include "video/decospr.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class tumbleb_state : public driver_device
 {
@@ -43,11 +44,11 @@ public:
 	void magipur(machine_config &config);
 	void suprtrio(machine_config &config);
 	void htchctch(machine_config &config);
+	void htchctch_mcu(machine_config &config);
 	void sdfight(machine_config &config);
 	void chokchok(machine_config &config);
 	void cookbib_mcu(machine_config &config);
 	void jumpkids(machine_config &config);
-	void funkyjetb(machine_config &config);
 
 	void init_dquizgo();
 	void init_jumpkids();
@@ -64,7 +65,7 @@ public:
 	void init_magipur();
 	void init_carket();
 
-private:
+protected:
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_mainram;
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -177,7 +178,33 @@ private:
 	void suprtrio_sound_map(address_map &map);
 	void tumblepopb_main_map(address_map &map);
 	void tumblepopba_main_map(address_map &map);
+};
+
+class tumbleb_pic_state : public tumbleb_state
+{
+public:
+	tumbleb_pic_state(const machine_config &mconfig, device_type type, const char *tag) :
+		tumbleb_state(mconfig, type, tag),
+		m_okibank(*this, "okibank")
+	{ }
+
+	void funkyjetb(machine_config &config);
+
+protected:
+	virtual void driver_start() override;
+
+private:
+	void oki_bank_w(uint8_t data);
+	uint8_t pic_data_r();
+	void pic_data_w(uint8_t data);
+	void pic_ctrl_w(uint8_t data);
+
 	void funkyjetb_map(address_map &map);
+	void funkyjetb_oki_map(address_map &map);
+
+	required_memory_bank m_okibank;
+
+	uint8_t m_pic_data;
 };
 
 #endif // MAME_INCLUDES_TUMBLEB_H

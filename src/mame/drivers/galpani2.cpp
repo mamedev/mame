@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-	/***************************************************************************
+/***************************************************************************
 
-	                        -= Gals Panic II =-
+                            -= Gals Panic II =-
 
-	                driver by   Luca Elia (l.elia@tin.it)
+                    driver by   Luca Elia (l.elia@tin.it)
 
 CPU     :   2 x 68000  +  MCU
 SOUND   :   2 x OKIM6295
@@ -14,8 +14,8 @@ CUSTOM  :   ?
 To Do:
 
 - Simulation of the MCU: it sits between the 2 68000's and passes
-	messages along. It is currently incomplete, thus no backgrounds
-	and the game is unplayable
+    messages along. It is currently incomplete, thus no backgrounds
+    and the game is unplayable
 
 - The layers are offset
 
@@ -63,18 +63,18 @@ Z04G2-004
 |          6116 6116    G003K5.U63         |------|                  |
 |--------------------------------------------------------------------|
 Notes:
-	       * - These ROMs not populated. Korean-specific ROMs have a K as part of the label text
-	   68000 - Clock 13.500MHz [27/2]
-	   M6295 - Clock 2.000MHz [16/8]. Pin 7 HIGH
-	  V-080D - Custom Kaneko RGB DAC
-	 MC-1091 - Custom Kaneko I/O module
-	  LFP-6K - Custom Kaneko sound filter/DAC
-	  PX4460 - Custom Kaneko sound filter/DAC
-	  PISCES - NEC uPD78324 series MCU with 32k internal rom. Clock 13.500MHz [27/2] on pins 51 & 52
-	   VSync - 59.1856Hz
-	   HSync - 15.625kHz
+           * - These ROMs not populated. Korean-specific ROMs have a K as part of the label text
+       68000 - Clock 13.500MHz [27/2]
+       M6295 - Clock 2.000MHz [16/8]. Pin 7 HIGH
+      V-080D - Custom Kaneko RGB DAC
+     MC-1091 - Custom Kaneko I/O module
+      LFP-6K - Custom Kaneko sound filter/DAC
+      PX4460 - Custom Kaneko sound filter/DAC
+      PISCES - NEC uPD78324 series MCU with 32k internal rom. Clock 13.500MHz [27/2] on pins 51 & 52
+       VSync - 59.1856Hz
+       HSync - 15.625kHz
 
-	   (TODO: VTOTAL = 264, HTOTAL = 432, pixel clock 27 MHz / 4)
+       (TODO: VTOTAL = 264, HTOTAL = 432, pixel clock 27 MHz / 4)
 
 ***************************************************************************/
 
@@ -354,7 +354,7 @@ void galpani2_state::galpani2_mem1(address_map &map)
 	map(0x110000, 0x11000f).ram();                                  // ? corrupted? stack dumper on POST failure, pc+sr on gp2se
 	map(0x300000, 0x301fff).ram();                                  // ?
 	map(0x302000, 0x303fff).ram().share("spriteram");               // Sprites
-	map(0x304000, 0x30401f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
+	map(0x304000, 0x30401f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::regs_r), FUNC(kaneko16_sprite_device::regs_w));
 //  map(0x308000, 0x308001).nopw();                                 // ? 0 at startup
 	map(0x30c000, 0x30c001).nopw();                                 // ? hblank effect ?
 	map(0x310000, 0x3101ff).ram().w(m_bg8palette, FUNC(palette_device::write16)).share("bg8palette");    // ?
@@ -555,33 +555,6 @@ INPUT_PORTS_END
 /***************************************************************************
 
 
-                                Graphics Layouts
-
-
-***************************************************************************/
-
-/*
-    16x16x8 made of four 8x8x8 tiles arranged like: 01
-                                                    23
-*/
-static const gfx_layout layout_16x16x8 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP8(0,8),   STEP8(8*8*8*1,8)   },
-	{ STEP8(0,8*8), STEP8(8*8*8*2,8*8) },
-	16*16*8
-};
-
-static GFXDECODE_START( gfx_galpani2 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0,  0x40    ) // [0] Sprites
-GFXDECODE_END
-
-/***************************************************************************
-
-
                                 Machine Drivers
 
 
@@ -622,47 +595,45 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt2)
 		m_subcpu->set_input_line(3, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(galpani2_state::galpani2)
-
+void galpani2_state::galpani2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(27'000'000)/2)       /* Confirmed on galpani2i PCB */
-	MCFG_DEVICE_PROGRAM_MAP(galpani2_mem1)
+	M68000(config, m_maincpu, XTAL(27'000'000)/2);       /* Confirmed on galpani2i PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &galpani2_state::galpani2_mem1);
 	TIMER(config, "m_scantimer").configure_scanline(FUNC(galpani2_state::galpani2_interrupt1), "screen", 0, 1);
 	//config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_DEVICE_ADD("sub", M68000, XTAL(27'000'000)/2)           /* Confirmed on galpani2i PCB */
-	MCFG_DEVICE_PROGRAM_MAP(galpani2_mem2)
+	M68000(config, m_subcpu, XTAL(27'000'000)/2);           /* Confirmed on galpani2i PCB */
+	m_subcpu->set_addrmap(AS_PROGRAM, &galpani2_state::galpani2_mem2);
 	TIMER(config, "s_scantimer").configure_scanline(FUNC(galpani2_state::galpani2_interrupt2), "screen", 0, 1);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(galpani2_state, screen_update_galpani2)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(320, 256);
+	screen.set_visarea(0, 320-1, 0, 256-1-16);
+	screen.set_screen_update(FUNC(galpani2_state::screen_update_galpani2));
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_galpani2);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x4000); // sprites
 	PALETTE(config, m_bg8palette).set_format(palette_device::xGRB_555, 0x200 / 2); // bg8
 	PALETTE(config, m_bg15palette, palette_device::GRB_555); // 32768 static colors for the bg
 
 	KANEKO_KC002_SPRITE(config, m_kaneko_spr);
 	m_kaneko_spr->set_offsets(0x10000 - 0x16c0 + 0xc00, 0);
-	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
+	m_kaneko_spr->set_palette(m_palette);
+	m_kaneko_spr->set_color_base(0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(20'000'000)/10, okim6295_device::PIN7_HIGH)    /* Confirmed on galpani2i PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	OKIM6295(config, "oki1", XTAL(20'000'000)/10, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "lspeaker", 1.0);    /* Confirmed on galpani2i PCB */
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(20'000'000)/10, okim6295_device::PIN7_HIGH)    /* Confirmed on galpani2i PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki2, XTAL(20'000'000)/10, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "rspeaker", 1.0);    /* Confirmed on galpani2i PCB */
+}
 
 
 /***************************************************************************
@@ -762,7 +733,7 @@ ROM_START( galpani2 )
 	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
 	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
 	ROM_CONTINUE(            0x000000, 0x080000             )
 	ROM_LOAD( "gp2-201.047", 0x180000, 0x080000, CRC(2f6392b4) SHA1(67446974c00481a7a806f4bc5b10eb6e442a1186) )
@@ -808,7 +779,7 @@ ROM_START( galpani2e )
 	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
 	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
 	ROM_CONTINUE(            0x000000, 0x080000             )
 	ROM_LOAD( "gp2-201.047", 0x180000, 0x080000, CRC(2f6392b4) SHA1(67446974c00481a7a806f4bc5b10eb6e442a1186) )
@@ -855,7 +826,7 @@ ROM_START( galpani2i )
 	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
 	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
 	ROM_CONTINUE(            0x000000, 0x080000             )
 	ROM_LOAD( "gp2-201.047", 0x180000, 0x080000, CRC(2f6392b4) SHA1(67446974c00481a7a806f4bc5b10eb6e442a1186) )
@@ -904,7 +875,7 @@ ROM_START( galpani2gs ) // basically the same as the Italy set but with differen
 	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
 	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
 	ROM_CONTINUE(            0x000000, 0x080000             )
 	ROM_LOAD( "gp2-201.047", 0x180000, 0x080000, CRC(2f6392b4) SHA1(67446974c00481a7a806f4bc5b10eb6e442a1186) )
@@ -954,7 +925,7 @@ ROM_START( galpani2g )
 	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
 	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
 	ROM_CONTINUE(            0x000000, 0x080000             )
 	ROM_LOAD( "gp2-201.047", 0x180000, 0x080000, CRC(2f6392b4) SHA1(67446974c00481a7a806f4bc5b10eb6e442a1186) )
@@ -1006,7 +977,7 @@ ROM_START( galpani2e2 )
 	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
 	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
 	ROM_CONTINUE(            0x000000, 0x080000             )
 	ROM_LOAD( "gp2-201.047", 0x180000, 0x080000, CRC(2f6392b4) SHA1(67446974c00481a7a806f4bc5b10eb6e442a1186) )
@@ -1056,7 +1027,7 @@ ROM_START( galpani2t )
 	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
 	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
 	ROM_CONTINUE(            0x000000, 0x080000             )
 	ROM_LOAD( "gp2-201.047", 0x180000, 0x080000, CRC(2f6392b4) SHA1(67446974c00481a7a806f4bc5b10eb6e442a1186) )
@@ -1114,7 +1085,7 @@ ROM_START( galpani2j )
 	ROM_LOAD16_BYTE( "gp2-303a.179", 0x600000, 0x100000, CRC(162d83b7) SHA1(16daf2ba09e63eaca5e50c944472773b1774c946) )
 	ROM_LOAD16_BYTE( "gp2-303b.180", 0x600001, 0x100000, CRC(458a1fbc) SHA1(971548ec8cce592773e762a0c972264013b7cb8d) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200j.189", 0x000000, 0x200000, CRC(2f81e519) SHA1(c07f4dad15b6f7f1fb867f773c0ada309d172326) )
 	ROM_LOAD( "gp2-201j.171", 0x200000, 0x200000, CRC(bbe404e0) SHA1(198db9a6c6ec97ed8fd32d946051ba4d6e4bd354) )
 	ROM_LOAD16_BYTE( "g204j0.169", 0x400000, 0x040000, CRC(212d8aab) SHA1(459f556978ef9a103279cf633fcc1cacb367ea61) )
@@ -1149,7 +1120,7 @@ ROM_START( gp2se )
 	ROM_LOAD16_BYTE( "g305aj4.u160", 0x900000, 0x080000, CRC(2d4a8fbb) SHA1(8a00e6ba4e061678da4c41446df7278c9b4f26c2) )
 	ROM_LOAD16_BYTE( "g305bj4.u161", 0x900001, 0x080000, CRC(53d13974) SHA1(29ca4d36f2a8153228c2eec8e9ef6a6bf712cb59) )
 
-	ROM_REGION( 0x500000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x500000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200-j-0073.u189", 0x000000, 0x200000, CRC(2f81e519) SHA1(c07f4dad15b6f7f1fb867f773c0ada309d172326) )
 	ROM_LOAD( "gp2-201-j-0074.u171", 0x200000, 0x200000, CRC(bbe404e0) SHA1(198db9a6c6ec97ed8fd32d946051ba4d6e4bd354) )
 	ROM_LOAD16_BYTE( "g204aj4.u169", 0x400000, 0x080000, CRC(e5e32820) SHA1(9bdc0717feb8983c0d6d5edaa08bcebad4baace0) )
@@ -1182,7 +1153,7 @@ ROM_START( gp2quiz )
 	ROM_LOAD16_BYTE( "gp2-303a-0063.u179", 0x600000, 0x100000, CRC(162d83b7) SHA1(16daf2ba09e63eaca5e50c944472773b1774c946) )
 	ROM_LOAD16_BYTE( "gp2-303b-0064.u180", 0x600001, 0x100000, CRC(458a1fbc) SHA1(971548ec8cce592773e762a0c972264013b7cb8d) )
 
-	ROM_REGION( 0x500000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x500000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200-j-0073.u189", 0x000000, 0x200000, CRC(2f81e519) SHA1(c07f4dad15b6f7f1fb867f773c0ada309d172326) )
 	ROM_LOAD( "gp2-201-j-0074.u171", 0x200000, 0x200000, CRC(bbe404e0) SHA1(198db9a6c6ec97ed8fd32d946051ba4d6e4bd354) )
 	ROM_LOAD16_BYTE( "g204a3.u169-3", 0x400000, 0x080000, CRC(92a837b7) SHA1(f581e1f7754f1fb20255c6c55ffc4e486d867111) )

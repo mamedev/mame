@@ -23,8 +23,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs48/mcs48.h"
 #include "bus/uts_kbd/400kbd.h"
+
+#include "cpu/mcs48/mcs48.h"
+
 
 DEFINE_DEVICE_TYPE(UTS_400_KEYBOARD, uts_400_keyboard_device, "uts_400kbd", "UTS 400-Format Keyboard (F3621-04-000)")
 

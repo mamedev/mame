@@ -563,32 +563,32 @@ INPUT_CHANGED_MEMBER( avigo_state::power_down_irq )
 
 static INPUT_PORTS_START(avigo)
 	PORT_START("LINE0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PAGE UP")      PORT_CODE(KEYCODE_PGUP) PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, nullptr )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PAGE DOWN")    PORT_CODE(KEYCODE_PGDN) PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, nullptr )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("LIGHT")        PORT_CODE(KEYCODE_L)    PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, nullptr )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PAGE UP")      PORT_CODE(KEYCODE_PGUP) PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, 0 )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PAGE DOWN")    PORT_CODE(KEYCODE_PGDN) PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, 0 )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("LIGHT")        PORT_CODE(KEYCODE_L)    PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, 0 )
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("LINE1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("TO DO")        PORT_CODE(KEYCODE_T)    PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, nullptr )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("ADDRESS")      PORT_CODE(KEYCODE_A)    PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, nullptr )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("SCHEDULE")     PORT_CODE(KEYCODE_S)    PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, nullptr )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("TO DO")        PORT_CODE(KEYCODE_T)    PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, 0 )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("ADDRESS")      PORT_CODE(KEYCODE_A)    PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, 0 )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("SCHEDULE")     PORT_CODE(KEYCODE_S)    PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, 0 )
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("LINE2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("MEMO")         PORT_CODE(KEYCODE_M)    PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, nullptr )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("MEMO")         PORT_CODE(KEYCODE_M)    PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, 0 )
 	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("LINE3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Pen/Stylus pressed") PORT_CODE(KEYCODE_ENTER) PORT_CODE(MOUSECODE_BUTTON1)  PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, pen_irq, nullptr )
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Pen/Stylus pressed") PORT_CODE(KEYCODE_ENTER) PORT_CODE(MOUSECODE_BUTTON1)  PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, pen_irq, 0 )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("?? Causes a NMI") PORT_CODE(KEYCODE_W) PORT_CODE(JOYCODE_BUTTON2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Power Down")       PORT_CODE(KEYCODE_Q) PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, power_down_irq, nullptr )
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Power Down")       PORT_CODE(KEYCODE_Q) PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, power_down_irq, 0 )
 
 	/* these two ports are used to emulate the position of the pen/stylus on the screen */
 	PORT_START("POSX") /* Mouse - X AXIS */
-	PORT_BIT(0x3ff, 0x060, IPT_LIGHTGUN_X) PORT_SENSITIVITY(100) PORT_CROSSHAIR(X, 1, 0, 0) PORT_MINMAX(0x060, 0x3a0) PORT_KEYDELTA(10) PORT_PLAYER(1)              PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, pen_move_irq, nullptr )
+	PORT_BIT(0x3ff, 0x060, IPT_LIGHTGUN_X) PORT_SENSITIVITY(100) PORT_CROSSHAIR(X, 1, 0, 0) PORT_MINMAX(0x060, 0x3a0) PORT_KEYDELTA(10) PORT_PLAYER(1)              PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, pen_move_irq, 0 )
 
 	PORT_START("POSY") /* Mouse - Y AXIS */
-	PORT_BIT(0x3ff, 0x044, IPT_LIGHTGUN_Y) PORT_SENSITIVITY(100) PORT_CROSSHAIR(Y, 1, 0, 0) PORT_MINMAX(0x044, 0x3a6) PORT_INVERT PORT_KEYDELTA(10) PORT_PLAYER(1)  PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, pen_move_irq, nullptr )
+	PORT_BIT(0x3ff, 0x044, IPT_LIGHTGUN_Y) PORT_SENSITIVITY(100) PORT_CROSSHAIR(Y, 1, 0, 0) PORT_MINMAX(0x044, 0x3a6) PORT_INVERT PORT_KEYDELTA(10) PORT_PLAYER(1)  PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, pen_move_irq, 0 )
 INPUT_PORTS_END
 
 /* F4 Character Displayer */
@@ -694,7 +694,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(avigo_state::avigo_1hz_timer)
 	refresh_ints();
 }
 
-QUICKLOAD_LOAD_MEMBER( avigo_state,avigo)
+QUICKLOAD_LOAD_MEMBER(avigo_state::quickload_cb)
 {
 	const char *systemname = machine().system().name;
 	uint32_t first_app_page = (0x50000>>14);
@@ -749,12 +749,13 @@ void avigo_state::nvram_init(nvram_device &nvram, void *base, size_t size)
 	memset(base, 0x00, size);
 }
 
-MACHINE_CONFIG_START(avigo_state::avigo)
+void avigo_state::avigo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(avigo_mem)
-	MCFG_DEVICE_IO_MAP(avigo_io)
-	config.m_minimum_quantum = attotime::from_hz(60);
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &avigo_state::avigo_mem);
+	m_maincpu->set_addrmap(AS_IO, &avigo_state::avigo_io);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	NS16550(config, m_uart, XTAL(1'843'200));
 	m_uart->out_tx_callback().set(m_serport, FUNC(rs232_port_device::write_txd));
@@ -770,13 +771,13 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	m_serport->cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(avigo_state, screen_update)
-	MCFG_SCREEN_SIZE(AVIGO_SCREEN_WIDTH, AVIGO_SCREEN_HEIGHT + AVIGO_PANEL_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0, AVIGO_SCREEN_WIDTH-1, 0, AVIGO_SCREEN_HEIGHT + AVIGO_PANEL_HEIGHT -1)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(avigo_state::screen_update));
+	screen.set_size(AVIGO_SCREEN_WIDTH, AVIGO_SCREEN_HEIGHT + AVIGO_PANEL_HEIGHT);
+	screen.set_visarea_full();
+	screen.set_palette(m_palette);
 
 	config.set_default_layout(layout_avigo);
 
@@ -811,8 +812,8 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	TIMER(config, "1hz_timer").configure_periodic(FUNC(avigo_state::avigo_1hz_timer), attotime::from_hz(1));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", avigo_state, avigo, "app", 0)
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "app").set_load_callback(FUNC(avigo_state::quickload_cb));
+}
 
 
 /***************************************************************************

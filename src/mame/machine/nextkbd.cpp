@@ -248,7 +248,7 @@ WRITE32_MEMBER( nextkbd_device::kmdata_w )
 
 INPUT_CHANGED_MEMBER( nextkbd_device::update )
 {
-	int bank = (int)(uintptr_t)param;
+	int bank = param;
 	switch(bank) {
 	case 0: case 1: case 2: {
 		int index;

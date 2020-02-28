@@ -42,16 +42,11 @@ public:
 	auto out_callback() { return m_out_cb.bind(); }
 
 	// data writes
-	DECLARE_WRITE8_MEMBER(a_w) { write_a(data); }
-	void write_a(u8 data);
-	DECLARE_WRITE8_MEMBER(b_w) { write_b(data); }
-	void write_b(u8 data);
-	DECLARE_WRITE8_MEMBER(ab_w) { write_ab(data); }
-	void write_ab(u8 data);
-	DECLARE_WRITE8_MEMBER(ba_w) { write_ba(data); }
-	void write_ba(u8 data);
-	DECLARE_WRITE8_MEMBER(interleave_w) { write_interleave(data); }
-	void write_interleave(u8 data);
+	void a_w(u8 data);
+	void b_w(u8 data);
+	void ab_w(u8 data);
+	void ba_w(u8 data);
+	void interleave_w(u8 data);
 
 	// data line writes
 	DECLARE_WRITE_LINE_MEMBER(a0_w);
@@ -68,7 +63,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(strobe_w);
 
 	// output read
-	DECLARE_READ8_MEMBER(output_r);
+	u8 output_r();
 
 protected:
 	ls157_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 mask);

@@ -73,6 +73,8 @@ public:
 	void toggle_record_mng() { toggle_record_movie(MF_MNG); }
 	void toggle_record_avi() { toggle_record_movie(MF_AVI); }
 	osd_file::error open_next(emu_file &file, const char *extension, uint32_t index = 0);
+	void compute_snapshot_size(s32 &width, s32 &height);
+	void pixels(u32 *buffer);
 
 	// render a frame
 	void frame_update(bool from_debugger = false);
@@ -80,6 +82,7 @@ public:
 	// current speed helpers
 	std::string speed_text();
 	double speed_percent() const { return m_speed_percent; }
+	int effective_frameskip() const;
 
 	// snapshots
 	void save_snapshot(screen_device *screen, emu_file &file);
@@ -114,7 +117,6 @@ private:
 
 	// effective value helpers
 	bool effective_autoframeskip() const;
-	int effective_frameskip() const;
 	bool effective_throttle() const;
 
 	// speed and throttling helpers
@@ -161,6 +163,7 @@ private:
 	u32                 m_seconds_to_run;           // number of seconds to run before quitting
 	bool                m_auto_frameskip;           // flag: true if we're automatically frameskipping
 	u32                 m_speed;                    // overall speed (*1000)
+	bool                m_low_latency;              // flag: true if we are throttling after blitting
 
 	// frameskipping
 	u8                  m_empty_skip_count;         // number of empty frames we have skipped

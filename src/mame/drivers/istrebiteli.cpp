@@ -27,6 +27,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #define I8080_TAG   "maincpu"
 
@@ -143,7 +144,7 @@ public:
 	void istreb(machine_config &config);
 	void motogonki(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(collision_r);
+	template <int ID> DECLARE_READ_LINE_MEMBER(collision_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inc);
@@ -271,14 +272,14 @@ void istrebiteli_state::init_moto()
 
 void istrebiteli_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(istrebiteli_state::get_tile_info), this), TILEMAP_SCAN_ROWS,
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(istrebiteli_state::get_tile_info)), TILEMAP_SCAN_ROWS,
 		8, 16, 16, 1);
 	m_tilemap->set_scrolldx(96, 96);
 }
 
 VIDEO_START_MEMBER(istrebiteli_state, moto)
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(istrebiteli_state::get_tile_info), this), TILEMAP_SCAN_ROWS,
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(istrebiteli_state::get_tile_info)), TILEMAP_SCAN_ROWS,
 		8, 16, 16, 1);
 	m_tilemap->set_scrolldx(96, 96);
 	m_tilemap->set_scrolldy(8, 8);
@@ -448,23 +449,23 @@ void istrebiteli_state::moto_io_map(address_map &map)
 	map(0x40, 0x4f).w(FUNC(istrebiteli_state::moto_tileram_w));
 }
 
-CUSTOM_INPUT_MEMBER(istrebiteli_state::collision_r)
+template <int ID>
+READ_LINE_MEMBER(istrebiteli_state::collision_r)
 {
 	// piece of HACK
 	// real hardware does per-pixel sprite collision detection
-	int id = *(int*)&param;
 
-	if ((m_spr_ctrl[id] & 0x80) == 0)
+	if ((m_spr_ctrl[ID] & 0x80) == 0)
 	{
-		int sx = m_spr_xy[0 + id * 2];
-		int sy = m_spr_xy[1 + id * 2];
-		int px = m_spr_xy[6 - id * 2] + 3;
-		int py = m_spr_xy[7 - id * 2] + 3;
+		int sx = m_spr_xy[0 + ID * 2];
+		int sy = m_spr_xy[1 + ID * 2];
+		int px = m_spr_xy[6 - ID * 2] + 3;
+		int py = m_spr_xy[7 - ID * 2] + 3;
 
 		if (sx > 56 && px >= sx && px < (sx + 8) && py >= sy && py < (sy + 8))
-			m_spr_collision[id] |= 1;
+			m_spr_collision[ID] |= 1;
 	}
-	return m_spr_collision[id];
+	return m_spr_collision[ID];
 }
 
 CUSTOM_INPUT_MEMBER(istrebiteli_state::coin_r)
@@ -485,7 +486,7 @@ static INPUT_PORTS_START( istreb )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(istrebiteli_state, collision_r<1>)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -495,19 +496,19 @@ static INPUT_PORTS_START( istreb )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(istrebiteli_state, collision_r<0>)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2)
-	PORT_BIT(0x3c, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, coin_r, nullptr)
+	PORT_BIT(0x3c, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(istrebiteli_state, coin_r)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_HBLANK("screen")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, istrebiteli_state,coin_inc, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, istrebiteli_state,coin_inc, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( moto )
@@ -584,11 +585,12 @@ static GFXDECODE_START( gfx_motogonki )
 	GFXDECODE_ENTRY( "sprite", 0x0000, moto_sprite_layout, 2, 2 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(istrebiteli_state::istreb)
+void istrebiteli_state::istreb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8080, XTAL(8'000'000) / 4)       // KR580VM80A
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	I8080(config, m_maincpu, XTAL(8'000'000) / 4);       // KR580VM80A
+	m_maincpu->set_addrmap(AS_PROGRAM, &istrebiteli_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &istrebiteli_state::io_map);
 
 	i8255_device &ppi0(I8255A(config, "ppi0"));
 	ppi0.in_pa_callback().set_ioport("IN1");
@@ -601,10 +603,10 @@ MACHINE_CONFIG_START(istrebiteli_state::istreb)
 	ppi1.in_pc_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(8'000'000) / 2, 256, 64, 256, 312, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(istrebiteli_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(8'000'000) / 2, 256, 64, 256, 312, 0, 256);
+	screen.set_screen_update(FUNC(istrebiteli_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_istrebiteli);
 	PALETTE(config, "palette", FUNC(istrebiteli_state::istrebiteli_palette), 4);
@@ -612,13 +614,14 @@ MACHINE_CONFIG_START(istrebiteli_state::istreb)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	ISTREBITELI_SOUND(config, m_sound_dev, XTAL(8'000'000) / 2 / 256).add_route(ALL_OUTPUTS, "mono", 1.00);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(istrebiteli_state::motogonki)
+void istrebiteli_state::motogonki(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8080, XTAL(15'700'000) / 9)       // KR580VM80A
-	MCFG_DEVICE_PROGRAM_MAP(moto_mem_map)
-	MCFG_DEVICE_IO_MAP(moto_io_map)
+	I8080(config, m_maincpu, XTAL(15'700'000) / 9);       // KR580VM80A
+	m_maincpu->set_addrmap(AS_PROGRAM, &istrebiteli_state::moto_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &istrebiteli_state::moto_io_map);
 
 	i8255_device &ppi0(I8255A(config, "ppi0"));
 	ppi0.out_pa_callback().set(FUNC(istrebiteli_state::spr0_ctrl_w));
@@ -630,10 +633,10 @@ MACHINE_CONFIG_START(istrebiteli_state::motogonki)
 	ppi1.in_pc_callback().set_ioport("IN1");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(8'000'000) / 2, 256, 64, 256, 312, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(istrebiteli_state, moto_screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(8'000'000) / 2, 256, 64, 256, 312, 0, 256);
+	screen.set_screen_update(FUNC(istrebiteli_state::moto_screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_motogonki);
 	PALETTE(config, "palette", FUNC(istrebiteli_state::motogonki_palette), 4);
@@ -642,7 +645,7 @@ MACHINE_CONFIG_START(istrebiteli_state::motogonki)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	ISTREBITELI_SOUND(config, m_sound_dev, XTAL(8'000'000) / 2 / 256).add_route(ALL_OUTPUTS, "mono", 1.00);
-MACHINE_CONFIG_END
+}
 
 ROM_START( istreb )
 	ROM_REGION( 0x1000, I8080_TAG, ROMREGION_ERASEFF )

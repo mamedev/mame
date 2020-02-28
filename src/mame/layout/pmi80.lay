@@ -22,7 +22,7 @@
 
 		<!-- Background -->
 		<backdrop element="background">
-			<bounds left="0" top="0" right="450" bottom="69" />
+			<bounds left="0" top="0" right="406" bottom="69" />
 		</backdrop>
 
 		<!-- LEDs -->
@@ -53,10 +53,6 @@
 		<bezel name="digit8" element="digit">
 			<bounds left="362" top="10" right="396" bottom="59" />
 		</bezel>
-		<bezel name="digitx" element="digit">
-			<bounds left="406" top="10" right="440" bottom="59" />
-		</bezel><!-- This digit shows something but it does not exist on real unit.
-		                Change to 'digit9' to see it in action. -->
 
 	</view>
 

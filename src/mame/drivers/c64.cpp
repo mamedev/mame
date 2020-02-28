@@ -34,7 +34,6 @@
 #include "sound/mos6581.h"
 #include "video/mos6566.h"
 
-#define M6510_TAG       "u7"
 #define MOS6567_TAG     "u19"
 #define MOS6569_TAG     "u19"
 #define MOS6581_TAG     "u18"
@@ -51,7 +50,7 @@ class c64_state : public driver_device
 public:
 	c64_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, M6510_TAG),
+		m_maincpu(*this, "u7"),
 		m_nmi(*this, "nmi"),
 		m_pla(*this, PLA_TAG),
 		m_vic(*this, MOS6569_TAG),
@@ -130,7 +129,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( exp_dma_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c64 );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_c64);
 
 	DECLARE_READ8_MEMBER( cia2_pb_r );
 	DECLARE_WRITE8_MEMBER( cia2_pb_w );
@@ -165,6 +164,11 @@ public:
 	void c64_mem(address_map &map);
 	void vic_colorram_map(address_map &map);
 	void vic_videoram_map(address_map &map);
+
+	offs_t dasm_zeropage(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);
+	offs_t dasm_vector(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);
+	offs_t dasm_zeropage_vector(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);
+	offs_t dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
 
 
@@ -209,6 +213,175 @@ public:
 	void pal_gs(machine_config &config);
 };
 
+struct dasm_zeropage_data
+{
+	u8 addr;
+	const char *name;
+};
+
+struct dasm_vector_data
+{
+	u16 addr;
+	const char *name;
+};
+
+static const struct dasm_zeropage_data c64_zeropage_locations[] =
+{
+	{ 0x00, "D6510" }, { 0x01, "R6510" }, { 0x03, "ADRAY1" }, { 0x05, "ADRAY2" }, { 0x07, "CHARAC" }, { 0x08, "ENDCHR" }, { 0x09, "TRMPOS" }, { 0x0a, "VERCK" },
+	{ 0x0b, "COUNT" }, { 0x0c, "DIMFLG" }, { 0x0d, "VALTYP" }, { 0x0e, "INTFLG" }, { 0x0f, "GARBFL" }, { 0x10, "SUBFLG" }, { 0x11, "INPFLG" }, { 0x12, "TANSGN" },
+	{ 0x14, "LINNUM" }, { 0x16, "TEMPPT" }, { 0x17, "LASTPT" }, { 0x19, "TEMPST" }, { 0x22, "INDEX" }, { 0x26, "RESHO" }, { 0x2b, "TXTTAB" }, { 0x2d, "VARTAB" },
+	{ 0x2f, "ARYTAB" }, { 0x31, "STREND" }, { 0x33, "FRETOP" }, { 0x35, "FRESPC" }, { 0x37, "MEMSIZ" }, { 0x39, "CURLIN" }, { 0x3b, "OLDLIN" }, { 0x3d, "OLDTXT" },
+	{ 0x3f, "DATLIN" }, { 0x41, "DATPTR" }, { 0x43, "INPPTR" }, { 0x45, "VARNAM" }, { 0x47, "VARPNT" }, { 0x49, "FORPNT" }, { 0x61, "FACEXP" }, { 0x62, "FACHO" },
+	{ 0x66, "FACSGN" }, { 0x67, "SGNFLG" }, { 0x68, "BITS" }, { 0x69, "ARGEXP" }, { 0x6a, "ARGHO" }, { 0x6e, "ARGSGN" }, { 0x6f, "ARISGN" }, { 0x70, "FACOV" },
+	{ 0x71, "FBUFPT" }, { 0x73, "CHRGET" }, { 0x79, "CHRGOT" }, { 0x7a, "TXTPTR" }, { 0x8b, "RNDX" }, { 0x90, "STATUS" }, { 0x91, "STKEY" }, { 0x92, "SVXT" },
+	{ 0x93, "VERCK" }, { 0x94, "C3PO" }, { 0x95, "BSOUR" }, { 0x96, "SYNO" }, { 0x98, "LDTND" }, { 0x99, "DFLTN" }, { 0x9a, "DFLTO" }, { 0x9b, "PRTY" },
+	{ 0x9c, "DPSW" }, { 0x9d, "MSGFLG" }, { 0x9e, "PTR1" }, { 0x9f, "PTR2" }, { 0xa0, "TIME" }, { 0xa5, "CNTDN" }, { 0xa6, "BUFPNT" }, { 0xa7, "INBIT" },
+	{ 0xa8, "BITCI" }, { 0xa9, "RINONE" }, { 0xaa, "RIDATA" }, { 0xab, "RIPRTY" }, { 0xac, "SAL" }, { 0xae, "EAL" }, { 0xb0, "CMPO" }, { 0xb2, "TAPE1" },
+	{ 0xb4, "BITTS" }, { 0xb5, "NXTBIT" }, { 0xb6, "RODATA" }, { 0xb7, "FNLEN" }, { 0xb8, "LA" }, { 0xb9, "SA" }, { 0xba, "FA" }, { 0xbb, "FNADR" },
+	{ 0xbc, "ROPRTY" }, { 0xbe, "FSBLK" }, { 0xbf, "MYCH" }, { 0xc0, "CAS1" }, { 0xc1, "STAL" }, { 0xc3, "MEMUSS" }, { 0xc5, "LSTX" }, { 0xc6, "NDX" },
+	{ 0xc7, "RVS" }, { 0xc8, "INDX" }, { 0xc9, "LXSP" }, { 0xcb, "SFDX" }, { 0xcc, "BLNSW" }, { 0xcd, "BLNCT" }, { 0xce, "GDBLN" }, { 0xcf, "BLNON" },
+	{ 0xd0, "CRSW" }, { 0xd1, "PNT" }, { 0xd3, "PNTR" }, { 0xd4, "QTSW" }, { 0xd5, "LNMX" }, { 0xd6, "TBLX" }, { 0xd8, "INSRT" }, { 0xd9, "LDTB1" },
+	{ 0xf3, "USER" }, { 0xf5, "KEYTAB" }, { 0xf7, "RIBUF" }, { 0xf9, "ROBUF" }, { 0xfb, "FREKZB" }, { 0xff, "BASZPT" }
+};
+
+static const struct dasm_vector_data cbm_kernal_vectors[] =
+{
+	{ 0xff81, "CINT" }, { 0xff84, "IOINT" }, { 0xff87, "RAMTAS" }, { 0xff8a, "RESTOR" }, { 0xff8d, "VECTOR" }, { 0xff90, "SETMSG" }, { 0xff93, "SECOND" }, { 0xff96, "TKSA" },
+	{ 0xff99, "MEMTOP" }, { 0xff9c, "MEMBOT" }, { 0xff9f, "SCNKEY" }, { 0xffa2, "SETTMO" }, { 0xffa5, "ACPTR" }, { 0xffa8, "CIOUT" }, { 0xffab, "UNTALK" }, { 0xffae, "UNLSN" },
+	{ 0xffb1, "LISTEN" }, { 0xffb4, "TALK" }, { 0xffb7, "READST" }, { 0xffba, "SETLFS" }, { 0xffbd, "SETNAM" }, { 0xffc3, "CLOSE" }, { 0xffc6, "CHKIN" }, { 0xffc9, "CHKOUT" },
+	{ 0xffcc, "CLRCHN" }, { 0xffcf, "CHRIN" }, { 0xffd2, "CHROUT" }, { 0xffd5, "LOAD" }, { 0xffd8, "SAVE" }, { 0xffdb, "SETTIM" }, { 0xffde, "RDTIM" }, { 0xffe1, "STOP" },
+	{ 0xffe4, "GETIN" }, { 0xffe7, "CLALL" }, { 0xffea, "UDTIM" }, { 0xffed, "SCREEN" }, { 0xfff0, "PLOT" }, { 0xfff3, "IOBASE" }
+};
+
+offs_t c64_state::dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
+{
+	switch (opcodes.r8(pc))
+	{
+	case 0x20: return dasm_vector(stream, pc, opcodes, "jsr %s");
+	case 0x4c: return dasm_vector(stream, pc, opcodes, "jmp %s");
+	case 0x6c: return dasm_zeropage_vector(stream, pc, opcodes, "jmp (%s)");
+	case 0x65: return dasm_zeropage(stream, pc, opcodes, "adc %s");
+	case 0x75: return dasm_zeropage(stream, pc, opcodes, "adc %s, x");
+	case 0x61: return dasm_zeropage(stream, pc, opcodes, "adc (%s, x)");
+	case 0x71: return dasm_zeropage(stream, pc, opcodes, "adc (%s), y");
+	case 0x25: return dasm_zeropage(stream, pc, opcodes, "and %s");
+	case 0x35: return dasm_zeropage(stream, pc, opcodes, "and %s, x");
+	case 0x21: return dasm_zeropage(stream, pc, opcodes, "and (%s, x)");
+	case 0x31: return dasm_zeropage(stream, pc, opcodes, "and (%s), y");
+	case 0x06: return dasm_zeropage(stream, pc, opcodes, "asl %s");
+	case 0x16: return dasm_zeropage(stream, pc, opcodes, "asl %s, x");
+	case 0x24: return dasm_zeropage(stream, pc, opcodes, "bit %s");
+	case 0xc5: return dasm_zeropage(stream, pc, opcodes, "cmp %s");
+	case 0xd5: return dasm_zeropage(stream, pc, opcodes, "cmp %s, x");
+	case 0xc1: return dasm_zeropage(stream, pc, opcodes, "cmp (%s, x)");
+	case 0xd1: return dasm_zeropage(stream, pc, opcodes, "cmp (%s), y");
+	case 0xe4: return dasm_zeropage(stream, pc, opcodes, "cpx %s");
+	case 0xc4: return dasm_zeropage(stream, pc, opcodes, "cpy %s");
+	case 0xc6: return dasm_zeropage(stream, pc, opcodes, "dec %s");
+	case 0xd6: return dasm_zeropage(stream, pc, opcodes, "dec %s, x");
+	case 0x45: return dasm_zeropage(stream, pc, opcodes, "eor %s");
+	case 0x55: return dasm_zeropage(stream, pc, opcodes, "eor %s, x");
+	case 0x41: return dasm_zeropage(stream, pc, opcodes, "eor (%s, x)");
+	case 0x51: return dasm_zeropage(stream, pc, opcodes, "eor (%s), y");
+	case 0xe6: return dasm_zeropage(stream, pc, opcodes, "inc %s");
+	case 0xf6: return dasm_zeropage(stream, pc, opcodes, "inc %s, x");
+	case 0xa5: return dasm_zeropage(stream, pc, opcodes, "lda %s");
+	case 0xb5: return dasm_zeropage(stream, pc, opcodes, "lda %s, x");
+	case 0xa1: return dasm_zeropage(stream, pc, opcodes, "lda (%s, x)");
+	case 0xb1: return dasm_zeropage(stream, pc, opcodes, "lda (%s), y");
+	case 0xa6: return dasm_zeropage(stream, pc, opcodes, "ldx %s");
+	case 0xb6: return dasm_zeropage(stream, pc, opcodes, "ldx %s, y");
+	case 0xa4: return dasm_zeropage(stream, pc, opcodes, "ldy %s");
+	case 0xb4: return dasm_zeropage(stream, pc, opcodes, "ldy %s, x");
+	case 0x46: return dasm_zeropage(stream, pc, opcodes, "lsr %s");
+	case 0x56: return dasm_zeropage(stream, pc, opcodes, "lsr %s, x");
+	case 0x05: return dasm_zeropage(stream, pc, opcodes, "ora %s");
+	case 0x15: return dasm_zeropage(stream, pc, opcodes, "ora %s, x");
+	case 0x01: return dasm_zeropage(stream, pc, opcodes, "ora (%s, x)");
+	case 0x11: return dasm_zeropage(stream, pc, opcodes, "ora (%s), y");
+	case 0x26: return dasm_zeropage(stream, pc, opcodes, "rol %s");
+	case 0x36: return dasm_zeropage(stream, pc, opcodes, "rol %s, x");
+	case 0x66: return dasm_zeropage(stream, pc, opcodes, "ror %s");
+	case 0x76: return dasm_zeropage(stream, pc, opcodes, "ror %s, x");
+	case 0xe5: return dasm_zeropage(stream, pc, opcodes, "sbc %s");
+	case 0xf5: return dasm_zeropage(stream, pc, opcodes, "sbc %s, x");
+	case 0xe1: return dasm_zeropage(stream, pc, opcodes, "sbc (%s, x)");
+	case 0xf1: return dasm_zeropage(stream, pc, opcodes, "sbc (%s), y");
+	case 0x85: return dasm_zeropage(stream, pc, opcodes, "sta %s");
+	case 0x95: return dasm_zeropage(stream, pc, opcodes, "sta %s, x");
+	case 0x81: return dasm_zeropage(stream, pc, opcodes, "sta (%s, x)");
+	case 0x91: return dasm_zeropage(stream, pc, opcodes, "sta (%s), y");
+	case 0x86: return dasm_zeropage(stream, pc, opcodes, "stx %s");
+	case 0x96: return dasm_zeropage(stream, pc, opcodes, "stx (%s), y");
+	case 0x84: return dasm_zeropage(stream, pc, opcodes, "sty %s");
+	case 0x94: return dasm_zeropage(stream, pc, opcodes, "sty %s, x");
+	}
+
+	return 0;
+}
+
+offs_t c64_state::dasm_zeropage(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname)
+{
+	int item = 0;
+	u8 operand = opcodes.r8(pc+1);
+
+	while (c64_zeropage_locations[item].addr != 0xff)
+	{
+		if (c64_zeropage_locations[item].addr == operand)
+		{
+			std::ostringstream buffer;
+			util::stream_format(buffer, opname, c64_zeropage_locations[item].name);
+			stream << buffer.str();
+			return 2 | util::disasm_interface::SUPPORTED;
+		}
+		item++;
+	}
+
+	return 0;
+}
+
+offs_t c64_state::dasm_vector(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname)
+{
+	int item = 0;
+	u16 operand = opcodes.r16(pc+1);
+
+	while (cbm_kernal_vectors[item].addr != 0xfff3)
+	{
+		if (cbm_kernal_vectors[item].addr == operand)
+		{
+			std::ostringstream buffer;
+			util::stream_format(buffer, opname, cbm_kernal_vectors[item].name);
+			stream << buffer.str();
+			return 3 | util::disasm_interface::SUPPORTED;
+		}
+		item++;
+	}
+
+	return 0;
+}
+
+offs_t c64_state::dasm_zeropage_vector(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname)
+{
+	int item = 0;
+	u16 operand = opcodes.r16(pc+1);
+
+	if (operand < 0x100)
+	{
+		while (c64_zeropage_locations[item].addr != 0xff)
+		{
+			if (c64_zeropage_locations[item].addr == operand)
+			{
+				std::ostringstream buffer;
+				util::stream_format(buffer, opname, c64_zeropage_locations[item].name);
+				stream << buffer.str();
+				return 3 | util::disasm_interface::SUPPORTED;
+			}
+			item++;
+		}
+	}
+
+	return 0;
+}
 
 
 //**************************************************************************
@@ -235,7 +408,7 @@ enum
 };
 
 
-QUICKLOAD_LOAD_MEMBER( c64_state, cbm_c64 )
+QUICKLOAD_LOAD_MEMBER(c64_state::quickload_c64)
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
@@ -271,8 +444,8 @@ int c64_state::read_pla(offs_t offset, offs_t va, int rw, int aec, int ba)
 	//int ba = m_vic->ba_r();
 	//int aec = !m_vic->aec_r();
 	int sphi2 = m_vic->phi0_r();
-	int game = m_exp->game_r(offset, sphi2, ba, rw, m_hiram);
-	int exrom = m_exp->exrom_r(offset, sphi2, ba, rw, m_hiram);
+	int game = m_exp->game_r(offset, sphi2, ba, rw, m_loram, m_hiram);
+	int exrom = m_exp->exrom_r(offset, sphi2, ba, rw, m_loram, m_hiram);
 	int cas = 0;
 
 	uint32_t input = VA12 << 15 | VA13 << 14 | game << 13 | exrom << 12 | rw << 11 | aec << 10 | ba << 9 | A12 << 8 |
@@ -332,14 +505,14 @@ uint8_t c64_state::read_memory(address_space &space, offs_t offset, offs_t va, i
 		case 1:
 		case 2:
 		case 3: // VIC
-			data = m_vic->read(space, offset & 0x3f);
+			data = m_vic->read(offset & 0x3f);
 			break;
 
 		case 4:
 		case 5:
 		case 6:
 		case 7: // SID
-			data = m_sid->read(space, offset & 0x1f);
+			data = m_sid->read(offset & 0x1f);
 			break;
 
 		case 0x8:
@@ -350,11 +523,11 @@ uint8_t c64_state::read_memory(address_space &space, offs_t offset, offs_t va, i
 			break;
 
 		case 0xc: // CIA1
-			data = m_cia1->read(space, offset & 0x0f);
+			data = m_cia1->read(offset & 0x0f);
 			break;
 
 		case 0xd: // CIA2
-			data = m_cia2->read(space, offset & 0x0f);
+			data = m_cia2->read(offset & 0x0f);
 			break;
 
 		case 0xe: // I/O1
@@ -369,7 +542,7 @@ uint8_t c64_state::read_memory(address_space &space, offs_t offset, offs_t va, i
 
 	int roml = BIT(plaout, PLA_OUT_ROML);
 	int romh = BIT(plaout, PLA_OUT_ROMH);
-	return m_exp->cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+	return m_exp->cd_r(offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
@@ -404,14 +577,14 @@ void c64_state::write_memory(address_space &space, offs_t offset, uint8_t data, 
 		case 1:
 		case 2:
 		case 3: // VIC
-			m_vic->write(space, offset & 0x3f, data);
+			m_vic->write(offset & 0x3f, data);
 			break;
 
 		case 4:
 		case 5:
 		case 6:
 		case 7: // SID
-			m_sid->write(space, offset & 0x1f, data);
+			m_sid->write(offset & 0x1f, data);
 			break;
 
 		case 0x8:
@@ -422,11 +595,11 @@ void c64_state::write_memory(address_space &space, offs_t offset, uint8_t data, 
 			break;
 
 		case 0xc: // CIA1
-			m_cia1->write(space, offset & 0x0f, data);
+			m_cia1->write(offset & 0x0f, data);
 			break;
 
 		case 0xd: // CIA2
-			m_cia2->write(space, offset & 0x0f, data);
+			m_cia2->write(offset & 0x0f, data);
 			break;
 
 		case 0xe: // I/O1
@@ -441,7 +614,7 @@ void c64_state::write_memory(address_space &space, offs_t offset, uint8_t data, 
 
 	int roml = BIT(plaout, PLA_OUT_ROML);
 	int romh = BIT(plaout, PLA_OUT_ROMH);
-	m_exp->cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+	m_exp->cd_w(offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
@@ -692,7 +865,7 @@ READ8_MEMBER( c64_state::sid_potx_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia1->read_pa() >> 6)
+	switch (m_cia1->pa_r() >> 6)
 	{
 	case 1: data = m_joy1->read_pot_x(); break;
 	case 2: data = m_joy2->read_pot_x(); break;
@@ -719,7 +892,7 @@ READ8_MEMBER( c64_state::sid_poty_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia1->read_pa() >> 6)
+	switch (m_cia1->pa_r() >> 6)
 	{
 	case 1: data = m_joy1->read_pot_y(); break;
 	case 2: data = m_joy2->read_pot_y(); break;
@@ -773,7 +946,7 @@ READ8_MEMBER( c64_state::cia1_pa_r )
 	data &= ~(!BIT(joy_b, 5) << 4);
 
 	// keyboard
-	uint8_t cia1_pb = m_cia1->read_pb();
+	uint8_t cia1_pb = m_cia1->pb_r();
 	uint32_t row[8] = { m_row[0]->read(), m_row[1]->read() & m_lock->read(), m_row[2]->read(), m_row[3]->read(),
 						m_row[4]->read(), m_row[5]->read(), m_row[6]->read(), m_row[7]->read() };
 
@@ -841,7 +1014,7 @@ READ8_MEMBER( c64_state::cia1_pb_r )
 	data &= ~(!BIT(joy_a, 5) << 4);
 
 	// keyboard
-	uint8_t cia1_pa = m_cia1->read_pa();
+	uint8_t cia1_pa = m_cia1->pa_r();
 
 	if (!BIT(cia1_pa, 7)) data &= m_row[7]->read();
 	if (!BIT(cia1_pa, 6)) data &= m_row[6]->read();
@@ -1260,7 +1433,7 @@ void c64_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ntsc )
+//  machine_config( ntsc )
 //-------------------------------------------------
 
 void c64_state::ntsc(machine_config &config)
@@ -1268,11 +1441,11 @@ void c64_state::ntsc(machine_config &config)
 	// basic hardware
 	M6510(config, m_maincpu, XTAL(14'318'181)/14);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64_state::c64_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->read_callback().set(FUNC(c64_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
 	m_maincpu->set_pulls(0x17, 0xc8);
-	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
+	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
+	config.set_perfect_quantum(m_maincpu);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
@@ -1282,7 +1455,7 @@ void c64_state::ntsc(machine_config &config)
 
 	// video hardware
 	mos6567_device &mos6567(MOS6567(config, MOS6567_TAG, XTAL(14'318'181)/14));
-	mos6567.set_cpu(M6510_TAG);
+	mos6567.set_cpu(m_maincpu);
 	mos6567.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 	mos6567.set_screen(SCREEN_TAG);
 	mos6567.set_addrmap(0, &c64_state::vic_videoram_map);
@@ -1361,18 +1534,16 @@ void c64_state::ntsc(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c64_state, cbm_c64), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS);
+	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64));
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
-	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart");
-	SOFTWARE_LIST(config, "cass_list").set_original("c64_cass");
-	SOFTWARE_LIST(config, "flop_list").set_original("c64_flop");
-	subdevice<software_list_device>("cart_list_vic10")->set_filter("NTSC");
-	subdevice<software_list_device>("cart_list_c64")->set_filter("NTSC");
-	subdevice<software_list_device>("cass_list")->set_filter("NTSC");
-	subdevice<software_list_device>("flop_list")->set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart").set_filter("NTSC");
+	SOFTWARE_LIST(config, "cass_list").set_original("c64_cass").set_filter("NTSC");
+	// disk softlist split into originals, cleanly cracked, and misc (homebrew and defaced cracks)
+	SOFTWARE_LIST(config, "flop525_orig").set_original("c64_flop_orig").set_filter("NTSC");
+	SOFTWARE_LIST(config, "flop525_clean").set_compatible("c64_flop_clcracked").set_filter("NTSC");
+	SOFTWARE_LIST(config, "flop525_misc").set_compatible("c64_flop_misc").set_filter("NTSC");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -1380,7 +1551,7 @@ void c64_state::ntsc(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pet64 )
+//  machine_config( pet64 )
 //-------------------------------------------------
 
 void c64_state::pet64(machine_config &config)
@@ -1391,7 +1562,7 @@ void c64_state::pet64(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ntsc_sx )
+//  machine_config( ntsc_sx )
 //-------------------------------------------------
 
 void sx64_state::ntsc_sx(machine_config &config)
@@ -1404,12 +1575,12 @@ void sx64_state::ntsc_sx(machine_config &config)
 	m_maincpu->set_pulls(0x07, 0xc0);
 
 	// devices
-	CBM_IEC_SLOT(config.replace(), "iec8", sx1541_iec_devices, "sx1541");
+	CBM_IEC_SLOT(config.replace(), "iec8", 8, sx1541_iec_devices, "sx1541");
 }
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ntsc_dx )
+//  machine_config( ntsc_dx )
 //-------------------------------------------------
 
 void sx64_state::ntsc_dx(machine_config &config)
@@ -1417,12 +1588,12 @@ void sx64_state::ntsc_dx(machine_config &config)
 	ntsc_sx(config);
 
 	// devices
-	CBM_IEC_SLOT(config.replace(), "iec9", sx1541_iec_devices, "sx1541");
+	CBM_IEC_SLOT(config.replace(), "iec9", 9, sx1541_iec_devices, "sx1541");
 }
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ntsc_c )
+//  machine_config( ntsc_c )
 //-------------------------------------------------
 
 void c64c_state::ntsc_c(machine_config &config)
@@ -1436,7 +1607,7 @@ void c64c_state::ntsc_c(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pal )
+//  machine_config( pal )
 //-------------------------------------------------
 
 void c64_state::pal(machine_config &config)
@@ -1444,11 +1615,11 @@ void c64_state::pal(machine_config &config)
 	// basic hardware
 	M6510(config, m_maincpu, XTAL(17'734'472)/18);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64_state::c64_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->read_callback().set(FUNC(c64_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
 	m_maincpu->set_pulls(0x17, 0xc8);
-	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
+	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
+	config.set_perfect_quantum(m_maincpu);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
@@ -1458,7 +1629,7 @@ void c64_state::pal(machine_config &config)
 
 	// video hardware
 	mos6569_device &mos6569(MOS6569(config, MOS6569_TAG, XTAL(17'734'472)/18));
-	mos6569.set_cpu(M6510_TAG);
+	mos6569.set_cpu(m_maincpu);
 	mos6569.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 	mos6569.set_screen(SCREEN_TAG);
 	mos6569.set_addrmap(0, &c64_state::vic_videoram_map);
@@ -1537,18 +1708,16 @@ void c64_state::pal(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c64_state, cbm_c64), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS);
+	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64));
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
-	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart");
-	SOFTWARE_LIST(config, "cass_list").set_original("c64_cass");
-	SOFTWARE_LIST(config, "flop_list").set_original("c64_flop");
-	subdevice<software_list_device>("cart_list_vic10")->set_filter("PAL");
-	subdevice<software_list_device>("cart_list_c64")->set_filter("PAL");
-	subdevice<software_list_device>("cass_list")->set_filter("PAL");
-	subdevice<software_list_device>("flop_list")->set_filter("PAL");
+	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("PAL");
+	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart").set_filter("PAL");
+	SOFTWARE_LIST(config, "cass_list").set_original("c64_cass").set_filter("PAL");
+	// disk softlist split into originals, cleanly cracked, and misc (homebrew and defaced cracks)
+	SOFTWARE_LIST(config, "flop525_orig").set_original("c64_flop_orig").set_filter("PAL");
+	SOFTWARE_LIST(config, "flop525_clean").set_compatible("c64_flop_clcracked").set_filter("PAL");
+	SOFTWARE_LIST(config, "flop525_misc").set_compatible("c64_flop_misc").set_filter("PAL");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -1556,7 +1725,7 @@ void c64_state::pal(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pal_sx )
+//  machine_config( pal_sx )
 //-------------------------------------------------
 
 void sx64_state::pal_sx(machine_config &config)
@@ -1569,12 +1738,12 @@ void sx64_state::pal_sx(machine_config &config)
 	m_maincpu->set_pulls(0x07, 0xc0);
 
 	// devices
-	CBM_IEC_SLOT(config.replace(), "iec8", sx1541_iec_devices, "sx1541");
+	CBM_IEC_SLOT(config.replace(), "iec8", 8, sx1541_iec_devices, "sx1541");
 }
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pal_c )
+//  machine_config( pal_c )
 //-------------------------------------------------
 
 void c64c_state::pal_c(machine_config &config)
@@ -1588,7 +1757,7 @@ void c64c_state::pal_c(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pal_gs )
+//  machine_config( pal_gs )
 //-------------------------------------------------
 
 void c64gs_state::pal_gs(machine_config &config)
@@ -1596,11 +1765,11 @@ void c64gs_state::pal_gs(machine_config &config)
 	// basic hardware
 	M6510(config, m_maincpu, XTAL(17'734'472)/18);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64gs_state::c64_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->read_callback().set(FUNC(c64gs_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64gs_state::cpu_w));
 	m_maincpu->set_pulls(0x07, 0xc0);
-	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
+	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
+	config.set_perfect_quantum(m_maincpu);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
@@ -1610,7 +1779,7 @@ void c64gs_state::pal_gs(machine_config &config)
 
 	// video hardware
 	mos8565_device &mos8565(MOS8565(config, MOS6569_TAG, XTAL(17'734'472)/18));
-	mos8565.set_cpu(M6510_TAG);
+	mos8565.set_cpu(m_maincpu);
 	mos8565.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 	mos8565.set_screen(SCREEN_TAG);
 	mos8565.set_addrmap(0, &c64_state::vic_videoram_map);
@@ -1687,14 +1856,11 @@ void c64gs_state::pal_gs(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c64_state, cbm_c64), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS);
+	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64));
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
-	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart");
-	subdevice<software_list_device>("cart_list_vic10")->set_filter("PAL");
-	subdevice<software_list_device>("cart_list_c64")->set_filter("PAL");
+	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("PAL");
+	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart").set_filter("PAL");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");

@@ -29,10 +29,9 @@ DEFINE_DEVICE_TYPE(VTECH_MEMEXP_SLOT, vtech_memexp_slot_device, "vtech_memexp_sl
 
 vtech_memexp_slot_device::vtech_memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VTECH_MEMEXP_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
-	m_program(nullptr),
-	m_io(nullptr),
-	m_cart(nullptr),
+	device_single_card_slot_interface<device_vtech_memexp_interface>(mconfig, *this),
+	m_program(*this, finder_base::DUMMY_TAG, -1),
+	m_io(*this, finder_base::DUMMY_TAG, -1),
 	m_int_handler(*this),
 	m_nmi_handler(*this),
 	m_reset_handler(*this)
@@ -48,6 +47,28 @@ vtech_memexp_slot_device::~vtech_memexp_slot_device()
 }
 
 //-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void vtech_memexp_slot_device::device_config_complete()
+{
+	// for passthrough connectors, use the parent slot's spaces
+	if (dynamic_cast<device_vtech_memexp_interface *>(owner()) != nullptr)
+	{
+		auto parent = dynamic_cast<vtech_memexp_slot_device *>(owner()->owner());
+		if (parent != nullptr)
+		{
+			if (m_program.finder_tag() == finder_base::DUMMY_TAG)
+				m_program.set_tag(parent->m_program, parent->m_program.spacenum());
+			if (m_io.finder_tag() == finder_base::DUMMY_TAG)
+				m_io.set_tag(parent->m_io, parent->m_io.spacenum());
+		}
+	}
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -57,32 +78,6 @@ void vtech_memexp_slot_device::device_start()
 	m_int_handler.resolve_safe();
 	m_nmi_handler.resolve_safe();
 	m_reset_handler.resolve_safe();
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void vtech_memexp_slot_device::device_reset()
-{
-}
-
-//-------------------------------------------------
-//  set_program_space - set address space we are attached to
-//-------------------------------------------------
-
-void vtech_memexp_slot_device::set_program_space(address_space *program)
-{
-	m_program = program;
-}
-
-//-------------------------------------------------
-//  set_io_space - set address space we are attached to
-//-------------------------------------------------
-
-void vtech_memexp_slot_device::set_io_space(address_space *io)
-{
-	m_io = io;
 }
 
 
@@ -95,7 +90,7 @@ void vtech_memexp_slot_device::set_io_space(address_space *io)
 //-------------------------------------------------
 
 device_vtech_memexp_interface::device_vtech_memexp_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "vtechmemexp")
 {
 	m_slot = dynamic_cast<vtech_memexp_slot_device *>(device.owner());
 }

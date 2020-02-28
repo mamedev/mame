@@ -149,7 +149,7 @@ void sandy_super_disk_device::device_reset()
 //  read -
 //-------------------------------------------------
 
-uint8_t sandy_super_disk_device::read(address_space &space, offs_t offset, uint8_t data)
+uint8_t sandy_super_disk_device::read(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xf0000) == 0xc0000)
 	{
@@ -195,7 +195,7 @@ uint8_t sandy_super_disk_device::read(address_space &space, offs_t offset, uint8
 //  write -
 //-------------------------------------------------
 
-void sandy_super_disk_device::write(address_space &space, offs_t offset, uint8_t data)
+void sandy_super_disk_device::write(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xf0000) == 0xc0000)
 	{

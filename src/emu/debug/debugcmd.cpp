@@ -20,7 +20,8 @@
 #include "debugvw.h"
 #include "natkeyboard.h"
 #include "render.h"
-#include <ctype.h>
+#include <cctype>
+#include <algorithm>
 #include <fstream>
 
 
@@ -113,16 +114,16 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	/* add all single-entry save state globals */
 	for (int itemnum = 0; itemnum < MAX_GLOBALS; itemnum++)
 	{
-		u32 valsize, valcount;
 		void *base;
+		u32 valsize, valcount, blockcount, stride;
 
 		/* stop when we run out of items */
-		const char* name = m_machine.save().indexed_item(itemnum, base, valsize, valcount);
-		if (name == nullptr)
+		const char* name = m_machine.save().indexed_item(itemnum, base, valsize, valcount, blockcount, stride);
+		if (!name)
 			break;
 
 		/* if this is a single-entry global, add it */
-		if (valcount == 1 && strstr(name, "/globals/"))
+		if ((valcount == 1) && (blockcount == 1) && strstr(name, "/globals/"))
 		{
 			char symname[100];
 			sprintf(symname, ".%s", strrchr(name, '/') + 1);
@@ -168,6 +169,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("observe",   CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_observe, this, _1, _2));
 	m_console.register_command("suspend",   CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_suspend, this, _1, _2));
 	m_console.register_command("resume",    CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_resume, this, _1, _2));
+	m_console.register_command("cpulist",   CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_cpulist, this, _1, _2));
 
 	m_console.register_command("comadd",    CMDFLAG_NONE, 0, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1, _2));
 	m_console.register_command("//",        CMDFLAG_NONE, 0, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1, _2));
@@ -460,12 +462,17 @@ bool debugger_commands::validate_cpu_parameter(const char *param, device_t *&res
 		return false;
 	}
 
-	/* if we got a valid one, return */
-	device_execute_interface *exec = execute_interface_iterator(m_machine.root_device()).byindex(cpunum);
-	if (exec != nullptr)
+	// attempt to find by numerical index
+	int index = 0;
+	for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
 	{
-		result = &exec->device();
-		return true;
+		// real CPUs should have pcbase
+		const device_state_interface *state;
+		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE) != nullptr && index++ == cpunum)
+		{
+			result = &exec.device();
+			return true;
+		}
 	}
 
 	/* if out of range, complain */
@@ -1172,6 +1179,21 @@ void debugger_commands::execute_resume(int ref, const std::vector<std::string> &
 	}
 }
 
+//-------------------------------------------------
+//  execute_cpulist - list all CPUs
+//-------------------------------------------------
+
+void debugger_commands::execute_cpulist(int ref, const std::vector<std::string> &params)
+{
+	int index = 0;
+	for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+	{
+		device_state_interface *state;
+		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE) != nullptr)
+			m_console.printf("[%s%d] %s\n", &exec.device() == m_cpu.get_visible_cpu() ? "*" : "", index++, exec.device().tag());
+	}
+}
+
 /*-------------------------------------------------
     execute_comment - add a comment to a line
 -------------------------------------------------*/
@@ -1394,18 +1416,18 @@ void debugger_commands::execute_bplist(int ref, const std::vector<std::string> &
 
 	/* loop over all CPUs */
 	for (device_t &device : device_iterator(m_machine.root_device()))
-		if (device.debug()->breakpoint_first() != nullptr)
+		if (!device.debug()->breakpoint_list().empty())
 		{
 			m_console.printf("Device '%s' breakpoints:\n", device.tag());
 
 			/* loop over the breakpoints */
-			for (device_debug::breakpoint *bp = device.debug()->breakpoint_first(); bp != nullptr; bp = bp->next())
+			for (const device_debug::breakpoint &bp : device.debug()->breakpoint_list())
 			{
-				buffer = string_format("%c%4X @ %0*X", bp->enabled() ? ' ' : 'D', bp->index(), device.debug()->logaddrchars(), bp->address());
-				if (std::string(bp->condition()).compare("1") != 0)
-					buffer.append(string_format(" if %s", bp->condition()));
-				if (std::string(bp->action()).compare("") != 0)
-					buffer.append(string_format(" do %s", bp->action()));
+				buffer = string_format("%c%4X @ %0*X", bp.enabled() ? ' ' : 'D', bp.index(), device.debug()->logaddrchars(), bp.address());
+				if (std::string(bp.condition()).compare("1") != 0)
+					buffer.append(string_format(" if %s", bp.condition()));
+				if (std::string(bp.action()).compare("") != 0)
+					buffer.append(string_format(" do %s", bp.action()));
 				m_console.printf("%s\n", buffer.c_str());
 				printed++;
 			}
@@ -1694,16 +1716,16 @@ void debugger_commands::execute_rplist(int ref, const std::vector<std::string> &
 
 	/* loop over all CPUs */
 	for (device_t &device : device_iterator(m_machine.root_device()))
-		if (device.debug()->registerpoint_first() != nullptr)
+		if (!device.debug()->registerpoint_list().empty())
 		{
 			m_console.printf("Device '%s' registerpoints:\n", device.tag());
 
 			/* loop over the breakpoints */
-			for (device_debug::registerpoint *rp = device.debug()->registerpoint_first(); rp != nullptr; rp = rp->next())
+			for (const device_debug::registerpoint &rp : device.debug()->registerpoint_list())
 			{
-				buffer = string_format("%c%4X if %s", rp->enabled() ? ' ' : 'D', rp->index(), rp->condition());
-				if (rp->action() != nullptr)
-					buffer.append(string_format(" do %s", rp->action()));
+				buffer = string_format("%c%4X if %s", rp.enabled() ? ' ' : 'D', rp.index(), rp.condition());
+				if (rp.action() != nullptr)
+					buffer.append(string_format(" do %s", rp.action()));
 				m_console.printf("%s\n", buffer.c_str());
 				printed++;
 			}
@@ -1843,7 +1865,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	switch (space->addr_shift())
 	{
 	case -3:
-		for (offs_t i = offset; i != endoffset; i++)
+		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
 			u64 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
@@ -1852,7 +1874,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 		}
 		break;
 	case -2:
-		for (offs_t i = offset; i != endoffset; i++)
+		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
 			u32 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
@@ -1861,7 +1883,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 		}
 		break;
 	case -1:
-		for (offs_t i = offset; i != endoffset; i++)
+		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
 			u16 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
@@ -1870,7 +1892,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 		}
 		break;
 	case  0:
-		for (offs_t i = offset; i != endoffset; i++)
+		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
 			u8 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
@@ -1881,9 +1903,9 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	case  3:
 		offset &= ~15;
 		endoffset &= ~15;
-		for (offs_t i = offset; i != endoffset; i+=16)
+		for (u64 i = offset; i != endoffset; i+=16)
 		{
-			offs_t curaddr = i >> 4;
+			offs_t curaddr = i;
 			u16 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
 				space->read_word(curaddr) : space->unmap();
 			fwrite(&data, 2, 1, f);
@@ -1938,7 +1960,7 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 	// determine the addresses to read
 	endoffset = (offset + length - 1) & space->addrmask();
 	offset = offset & space->addrmask();
-	offs_t i = 0;
+	u64 i = 0;
 	// now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1)
 	switch (space->addr_shift())
 	{
@@ -1987,7 +2009,7 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 		endoffset &= ~15;
 		for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 16); i+=16)
 		{
-			offs_t curaddr = i >> 4;
+			offs_t curaddr = i;
 			u16 data;
 			f.read((char *)&data, 2);
 			if (f && space->device().memory().translate(space->spacenum(), TRANSLATE_WRITE_DEBUG, curaddr))
@@ -2028,12 +2050,12 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	if (params.size() > 4 && !validate_number_parameter(params[4], ascii))
 		return;
 
-	u64 rowsize = 16;
-	if (params.size() > 5 && !validate_number_parameter(params[5], rowsize))
-		return;
-
 	address_space *space;
 	if (!validate_cpu_space_parameter((params.size() > 6) ? params[6].c_str() : nullptr, ref, space))
+		return;
+
+	u64 rowsize = space->byte_to_address(16);
+	if (params.size() > 5 && !validate_number_parameter(params[5], rowsize))
 		return;
 
 	int shift = space->addr_shift();
@@ -2054,9 +2076,9 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		m_console.printf("Invalid width! (must be at least %d)\n", granularity);
 		return;
 	}
-	if (rowsize == 0 || (rowsize % width) != 0)
+	if (rowsize == 0 || (rowsize % space->byte_to_address(width)) != 0)
 	{
-		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", width);
+		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", space->byte_to_address(width));
 		return;
 	}
 
@@ -2075,15 +2097,12 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	util::ovectorstream output;
 	output.reserve(200);
 
-	if (shift > 0)
-		width <<= shift;
-	else if(shift < 0)
-		width >>= -shift;
+	const unsigned delta = (shift >= 0) ? (width << shift) : (width >> -shift);
 
 	auto dis = space->device().machine().disable_side_effects();
 	bool be = space->endianness() == ENDIANNESS_BIG;
 
-	for (offs_t i = offset; i <= endoffset; i += rowsize)
+	for (u64 i = offset; i <= endoffset; i += rowsize)
 	{
 		output.clear();
 		output.rdbuf()->clear();
@@ -2092,7 +2111,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		util::stream_format(output, "%0*X: ", space->logaddrchars(), i);
 
 		/* print the bytes */
-		for (u64 j = 0; j < rowsize; j += width)
+		for (u64 j = 0; j < rowsize; j += delta)
 		{
 			if (i + j <= endoffset)
 			{
@@ -2128,7 +2147,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		if (ascii)
 		{
 			util::stream_format(output, "  ");
-			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j += width)
+			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j += delta)
 			{
 				offs_t curaddr = i + j;
 				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
@@ -3100,7 +3119,7 @@ void debugger_commands::execute_snap(int ref, const std::vector<std::string> &pa
 		if (fname.find(".png") == -1)
 			fname.append(".png");
 		emu_file file(m_machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		osd_file::error filerr = file.open(fname.c_str());
+		osd_file::error filerr = file.open(fname);
 
 		if (filerr != osd_file::error::NONE)
 		{
@@ -3215,13 +3234,6 @@ void debugger_commands::execute_memdump(int ref, const std::vector<std::string> 
     execute_symlist - execute the symlist command
 -------------------------------------------------*/
 
-static int CLIB_DECL symbol_sort_compare(const void *item1, const void *item2)
-{
-	const char *str1 = *(const char **)item1;
-	const char *str2 = *(const char **)item2;
-	return strcmp(str1, str2);
-}
-
 void debugger_commands::execute_symlist(int ref, const std::vector<std::string> &params)
 {
 	device_t *cpu = nullptr;
@@ -3257,7 +3269,9 @@ void debugger_commands::execute_symlist(int ref, const std::vector<std::string> 
 
 	/* sort the symbols */
 	if (count > 1)
-		qsort((void *)namelist, count, sizeof(namelist[0]), symbol_sort_compare);
+		std::sort(&namelist[0], &namelist[count], [](const char *item1, const char *item2) {
+			return strcmp(item1, item2) < 0;
+		});
 
 	/* iterate over symbols and print out relevant ones */
 	for (symnum = 0; symnum < count; symnum++)

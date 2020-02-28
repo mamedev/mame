@@ -124,7 +124,7 @@ PORT_START("LINE0")         /* IN0 keys row 0 */
 	PORT_START("LINE3")         /* IN3 STEP and RESET keys, MODE switch */
 	PORT_BIT( 0x80, 0x00, IPT_UNUSED )
 	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("sw1: ST") PORT_CODE(KEYCODE_F7)
-	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RST") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, junior_state, junior_reset, nullptr)
+	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RST") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, junior_state, junior_reset, 0)
 	PORT_DIPNAME(0x10, 0x10, "sw3: SS (NumLock)") PORT_CODE(KEYCODE_NUMLOCK) PORT_TOGGLE
 	PORT_DIPSETTING( 0x00, "single step")
 	PORT_DIPSETTING( 0x10, "run")
@@ -230,7 +230,7 @@ void junior_state::junior(machine_config &config)
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 1_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &junior_state::junior_mem);
-	config.m_minimum_quantum = attotime::from_hz(50);
+	config.set_maximum_quantum(attotime::from_hz(50));
 
 	/* video hardware */
 	config.set_default_layout(layout_junior);

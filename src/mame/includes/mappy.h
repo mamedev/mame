@@ -10,6 +10,7 @@
 #include "sound/namco.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class mappy_state : public driver_device
 {

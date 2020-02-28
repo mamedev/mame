@@ -45,6 +45,7 @@ public:
 	sdk86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_kbdrow(*this, "X%X", 0U)
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
@@ -61,6 +62,7 @@ private:
 	uint8_t m_digit;
 	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
+	required_ioport_array<3> m_kbdrow;
 	output_finder<8> m_digits;
 };
 
@@ -127,12 +129,9 @@ READ8_MEMBER( sdk86_state::kbd_r )
 {
 	uint8_t data = 0xff;
 
-	if (m_digit < 3)
-	{
-		char kbdrow[6];
-		sprintf(kbdrow,"X%X",m_digit);
-		data = ioport(kbdrow)->read();
-	}
+	if ((m_digit & 7) < 3)
+		data = m_kbdrow[m_digit & 7]->read();
+
 	return data;
 }
 

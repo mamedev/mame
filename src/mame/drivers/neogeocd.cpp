@@ -6,8 +6,7 @@
     Neo-Geo CD hardware
 
     Thanks to:
-        * The FBA team (Barry Harris) for much of the CDC / CDD code and system details.
-          ( http://www.barryharris.me.uk/ )
+        * Jan Klaassen (of the former FBA team) for much of the CDC / CDD code and system details.
         * Mirko Buffoni for a commented disassembly of the NeoCD bios rom.
 
     Current status:
@@ -122,7 +121,7 @@ public:
 	void init_neocdz();
 	void init_neocdzj();
 
-	IRQ_CALLBACK_MEMBER(int_callback);
+	uint8_t cdc_irq_ack();
 
 	std::unique_ptr<uint8_t[]> m_meminternal_data;
 	std::unique_ptr<uint8_t[]> m_sprite_ram;
@@ -132,6 +131,7 @@ public:
 	void neocd_audio_io_map(address_map &map);
 	void neocd_audio_map(address_map &map);
 	void neocd_main_map(address_map &map);
+	void neocd_vector_map(address_map &map);
 	void neocd_ym_map(address_map &map);
 
 protected:
@@ -541,7 +541,7 @@ int32_t ngcd_state::SekIdle(int32_t nCycles)
  *  DMA
 
     FF0061  Write 0x40 means start DMA transfer
-    FF0064  Source address (in copy mode), Target address (in filll mode)
+    FF0064  Source address (in copy mode), Target address (in fill mode)
     FF0068  Target address (in copy mode)
     FF006C  Fill word
     FF0070  Words count
@@ -585,7 +585,7 @@ void ngcd_state::do_dma(address_space& curr_space)
 {
 	// The LC8953 chip has a programmable DMA controller, which is not properly emulated.
 	// Since the software only uses it in a limited way, we can apply a simple heuristic
-	// to determnine the requested operation.
+	// to determine the requested operation.
 
 	// Additionally, we don't know how many cycles DMA operations take.
 	// Here, only bus access is used to get a rough approximation --
@@ -899,6 +899,12 @@ void ngcd_state::neocd_main_map(address_map &map)
 	map(0xff0200, 0xffffff).r(FUNC(ngcd_state::unmapped_r));
 }
 
+void ngcd_state::neocd_vector_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff9, 0xfffff9).r(FUNC(ngcd_state::cdc_irq_ack));
+}
+
 
 /*************************************
  *
@@ -919,7 +925,7 @@ void ngcd_state::neocd_audio_io_map(address_map &map)
 	map(0x04, 0x07).mirror(0xff00).rw(m_ym, FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0x08, 0x08).mirror(0xff00).select(0x0010).w(FUNC(ngcd_state::audio_cpu_enable_nmi_w));
 	// banking reads are actually NOP on NeoCD? but some games still access them
-//  AM_RANGE(0x08, 0x0b) AM_MIRROR(0x00f0) AM_SELECT(0xff00) AM_READ(audio_cpu_bank_select_r)
+//  map(0x08, 0x0b).mirror(0x00f0).select(0xff00).r(FUNC(ngcd_state::audio_cpu_bank_select_r));
 	map(0x0c, 0x0c).mirror(0xff00).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
 
 	// ??
@@ -958,17 +964,14 @@ INPUT_PORTS_END
 
 /* NeoCD uses custom vectors on IRQ4 to handle various events from the CDC */
 
-IRQ_CALLBACK_MEMBER(ngcd_state::int_callback)
+uint8_t ngcd_state::cdc_irq_ack()
 {
-	if (irqline==4)
-	{
-		if (get_irq_vector_ack()) {
-			set_irq_vector_ack(0);
-			return get_irq_vector();
-		}
+	if (get_irq_vector_ack()) {
+		set_irq_vector_ack(0);
+		return get_irq_vector();
 	}
 
-	return (0x60+irqline*4)/4;
+	return (0x60+4*4)/4;
 }
 
 void ngcd_state::interrupt_callback_type1(void)
@@ -1039,7 +1042,7 @@ void ngcd_state::neocd(machine_config &config)
 	neogeo_stereo(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &ngcd_state::neocd_main_map);
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(ngcd_state::int_callback), this));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &ngcd_state::neocd_vector_map);
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ngcd_state::neocd_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &ngcd_state::neocd_audio_io_map);
@@ -1050,10 +1053,11 @@ void ngcd_state::neocd(machine_config &config)
 
 	// temporary until things are cleaned up
 	LC89510_TEMP(config, m_tempcdc, 0); // cd controller
+	m_tempcdc->set_cdrom_tag("cdrom");
 	m_tempcdc->set_is_neoCD(true);
-	m_tempcdc->set_type1_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type1), this);
-	m_tempcdc->set_type2_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type2), this);
-	m_tempcdc->set_type3_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type3), this);
+	m_tempcdc->set_type1_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type1));
+	m_tempcdc->set_type2_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type2));
+	m_tempcdc->set_type3_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type3));
 
 	NVRAM(config, "saveram", nvram_device::DEFAULT_ALL_0);
 
@@ -1061,7 +1065,7 @@ void ngcd_state::neocd(machine_config &config)
 	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_controls, "joy", false);
 
 	CDROM(config, "cdrom").set_interface("neocd_cdrom");
-	SOFTWARE_LIST(config, "cd_list").set_type("neocd", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cd_list").set_original("neocd");
 
 	m_ym->set_addrmap(0, &ngcd_state::neocd_ym_map);
 }

@@ -102,7 +102,7 @@ private:
 	DECLARE_WRITE8_MEMBER(vsync_irq_enable_w);
 	void smc777_palette(palette_device &palette) const;
 	uint32_t screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vsync_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 
 	DECLARE_READ8_MEMBER(fdc_r);
@@ -112,7 +112,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER(smc777);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void smc777_io(address_map &map);
 	void smc777_mem(address_map &map);
@@ -310,12 +310,12 @@ WRITE8_MEMBER(smc777_state::mc6845_w)
 	if(offset == 0)
 	{
 		m_crtc_addr = data;
-		m_crtc->address_w(space, 0,data);
+		m_crtc->address_w(data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_addr] = data;
-		m_crtc->register_w(space, 0,data);
+		m_crtc->register_w(data);
 	}
 }
 
@@ -413,7 +413,7 @@ WRITE8_MEMBER(smc777_state::fbuf_w)
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( smc777_state, smc777 )
+QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
@@ -1092,11 +1092,11 @@ void smc777_state::smc777_palette(palette_device &palette) const
 }
 
 
-INTERRUPT_GEN_MEMBER(smc777_state::vblank_irq)
+WRITE_LINE_MEMBER(smc777_state::vsync_w)
 {
-	if(m_vsync_ief)
+	if (state && m_vsync_ief)
 	{
-		device.execute().set_input_line(0,HOLD_LINE);
+		m_maincpu->set_input_line(0,HOLD_LINE);
 		m_vsync_idf = true;
 	}
 }
@@ -1108,30 +1108,31 @@ static void smc777_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(smc777_state::smc777)
+void smc777_state::smc777(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(smc777_mem)
-	MCFG_DEVICE_IO_MAP(smc777_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", smc777_state, vblank_irq)
+	Z80(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &smc777_state::smc777_mem);
+	m_maincpu->set_addrmap(AS_IO, &smc777_state::smc777_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(0x400, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
-	MCFG_SCREEN_UPDATE_DRIVER(smc777_state, screen_update_smc777)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(0x400, 400);
+	m_screen->set_visarea(0, 660-1, 0, 220-1); //normal 640 x 200 + 20 pixels for border color
+	m_screen->set_screen_update(FUNC(smc777_state::screen_update_smc777));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(smc777_state::smc777_palette), 0x20); // 16 + 8 colors (SMC-777 + SMC-70) + 8 empty entries (SMC-70)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	H46505(config, m_crtc, MASTER_CLOCK/2);    /* unknown clock, hand tuned to get ~60 fps */
+	HD6845S(config, m_crtc, MASTER_CLOCK/2);    /* HD68A45SP; unknown clock, hand tuned to get ~60 fps */
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
+	m_crtc->out_vsync_callback().set(FUNC(smc777_state::vsync_w));
 
 	// floppy controller
 	MB8876(config, m_fdc, 1_MHz_XTAL);
@@ -1143,19 +1144,18 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 	FLOPPY_CONNECTOR(config, "fdc:1", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("smc777");
-	MCFG_QUICKLOAD_ADD("quickload", smc777_state, smc777, "com,cpm", 3)
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(smc777_state::quickload_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76489A(config, "sn1", MASTER_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider
 
 	BEEP(config, m_beeper, 300); // TODO: correct frequency
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(smc777_state::keyboard_callback), attotime::from_hz(240/32));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( smc777 )
@@ -1166,8 +1166,8 @@ ROM_START( smc777 )
 	ROM_SYSTEM_BIOS(1, "2nd", "2nd rev.")
 	ROMX_LOAD( "smcrom.v2",  0x0000, 0x4000, CRC(c1494b8f) SHA1(a7396f5c292f11639ffbf0b909e8473c5aa63518), ROM_BIOS(1))
 
-	ROM_REGION( 0x800, "mcu", ROMREGION_ERASEFF )
-	ROM_LOAD( "i80xx", 0x000, 0x800, NO_DUMP ) // keyboard mcu, needs decapping
+	ROM_REGION( 0x400, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "m5l8041a-077p.bin", 0x000, 0x400, NO_DUMP ) // 8041 keyboard mcu, needs decapping
 ROM_END
 
 /* Driver */

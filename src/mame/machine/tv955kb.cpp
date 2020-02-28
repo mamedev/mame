@@ -43,6 +43,11 @@ void tv955kb_device::device_start()
 	m_bell_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tv955kb_device::bell_q8), this));
 
 	save_item(NAME(m_bell_on));
+
+	// Hack to avoid starting up in wrong state
+	auto &resetctl = *subdevice<input_merger_device>("resetctl");
+	resetctl.in_w<0>(1);
+	resetctl.in_w<1>(1);
 }
 
 void tv955kb_device::device_reset()

@@ -39,6 +39,7 @@ offs_t mcs48_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 	switch (opcodes.r8(cpc++))
 	{
 		case 0x00:      util::stream_format(stream, "nop");                                                 break;
+		case 0x01:      util::stream_format(stream, "idl");                                                 break; // CMOS only; called "HALT" by NEC and Toshiba
 		case 0x02:  if (m_i802x)
 						util::stream_format(stream, "illegal");
 					else if (!m_upi41)

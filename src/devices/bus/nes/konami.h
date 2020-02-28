@@ -18,7 +18,7 @@ public:
 	// construction/destruction
 	nes_konami_vrc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -39,9 +39,9 @@ public:
 	// construction/destruction
 	nes_konami_vrc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -63,7 +63,7 @@ public:
 	// construction/destruction
 	nes_konami_vrc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -91,7 +91,7 @@ public:
 	// construction/destruction
 	nes_konami_vrc4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -126,7 +126,7 @@ public:
 	// construction/destruction
 	nes_konami_vrc6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -146,7 +146,7 @@ public:
 	// construction/destruction
 	nes_konami_vrc7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -157,7 +157,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	required_device<ym2413_device> m_ym2413;
+	required_device<vrc7snd_device> m_vrc7snd;
 };
 
 

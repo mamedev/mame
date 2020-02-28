@@ -663,7 +663,7 @@ INPUT_PORTS_END
 void ecoinf3_state::ecoinf3_pyramid(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, 8000000); // certainly not a plain z80 at least, invalid opcodes for that
+	Z80180(config, m_maincpu, 8000000); // certainly not a plain z80 at least, invalid opcodes for that
 	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinf3_state::pyramid_memmap);
 	m_maincpu->set_addrmap(AS_IO, &ecoinf3_state::pyramid_portmap);
 

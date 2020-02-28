@@ -98,7 +98,7 @@ void cfa3000_opt_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(cfa3000_opt_device::fred_r)
+uint8_t cfa3000_opt_device::fred_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 

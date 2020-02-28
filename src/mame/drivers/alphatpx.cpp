@@ -36,7 +36,7 @@
 
     P2U
     ===
-    For paging via port 0x78A, a 16K RAM card with RAM at 0x0000 and 0x3fff and the banking logic (see above) is added to the the standard 48K memory card.
+    For paging via port 0x78A, a 16K RAM card with RAM at 0x0000 and 0x3fff and the banking logic (see above) is added to the standard 48K memory card.
     P2S, P2U: 2x 320K, double sided, 40 tracks, 16 sectors/track, 256 bytes/sector floppy disk drives
 
     P3, P4
@@ -135,7 +135,7 @@ private:
 	void alphatp2_mem(address_map &map);
 
 	required_device<address_map_bank_device> m_bankdev;
-	required_device<i8041_device> m_kbdmcu;
+	required_device<i8041a_device> m_kbdmcu;
 	required_device<crt5027_device> m_crtc;
 	required_device<fd1791_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
@@ -221,7 +221,7 @@ private:
 	void alphatp3_mem(address_map &map);
 
 	required_device<address_map_bank_device> m_bankdev;
-	required_device<i8041_device> m_kbdmcu;
+	required_device<i8041a_device> m_kbdmcu;
 	required_device<crt5037_device> m_crtc;
 	required_device<fd1791_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
@@ -271,7 +271,7 @@ void alphatp_12_state::alphatp2_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x04, 0x05).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041a_device::upi41_master_r), FUNC(i8041a_device::upi41_master_w));
 	map(0x12, 0x12).w(FUNC(alphatp_12_state::beep_w));
 	map(0x50, 0x53).rw(FUNC(alphatp_12_state::fdc_r), FUNC(alphatp_12_state::fdc_w));
 	map(0x54, 0x54).rw(FUNC(alphatp_12_state::fdc_stat_r), FUNC(alphatp_12_state::fdc_cmd_w));
@@ -308,13 +308,13 @@ void alphatp_34_state::alphatp3_map(address_map &map)
 void alphatp_34_state::alphatp3_io(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x00, 0x00) AM_READ // unknown
+	//map(0x00, 0x00).r(FUNC(alphatp_34_state::)); // unknown
 	map(0x04, 0x05).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x08, 0x09).rw(FUNC(alphatp_34_state::comm88_r), FUNC(alphatp_34_state::comm88_w));
-	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041a_device::upi41_master_r), FUNC(i8041a_device::upi41_master_w));
 	map(0x12, 0x12).w(FUNC(alphatp_34_state::beep_w));
 	map(0x40, 0x41).r(FUNC(alphatp_34_state::start88_r));
-	//AM_RANGE(0x42, 0x42) AM_WRITE // unknown
+	//map(0x42, 0x42).w(FUNC(alphatp_34_state::)); // unknown
 	map(0x50, 0x53).rw(FUNC(alphatp_34_state::fdc_r), FUNC(alphatp_34_state::fdc_w));
 	map(0x54, 0x54).rw(FUNC(alphatp_34_state::fdc_stat_r), FUNC(alphatp_34_state::fdc_cmd_w));
 	map(0x78, 0x78).w(FUNC(alphatp_34_state::bank_w));
@@ -329,11 +329,11 @@ void alphatp_34_state::alphatp30_8088_map(address_map &map)
 
 void alphatp_34_state::alphatp30_8088_io(address_map &map)
 {
-	//AM_RANGE(0x008a, 0x008a) AM_READ // unknown
+	//map(0x008a, 0x008a).r(FUNC(alphatp_34_state::)); // unknown
 	map(0xf800, 0xf800).w(FUNC(alphatp_34_state::gfxext1_w));
 	map(0xf900, 0xf900).w(FUNC(alphatp_34_state::gfxext2_w));
 	map(0xfa00, 0xfa01).w(FUNC(alphatp_34_state::gfxext3_w));
-	//AM_RANGE(0xfb00, 0xfb0f) AM_WRITE // unknown possibly gfx ext
+	//map(0xfb00, 0xfb0f).w(FUNC(alphatp_34_state::)); // unknown possibly gfx ext
 	map(0xffe0, 0xffe1).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xffe4, 0xffe7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xffe9, 0xffea).rw(FUNC(alphatp_34_state::comm85_r), FUNC(alphatp_34_state::comm85_w));
@@ -1204,14 +1204,15 @@ void alphatp_12_state::machine_reset()
 	m_curfloppy = nullptr;
 }
 
-MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
-	MCFG_DEVICE_ADD("maincpu", I8085A, 6_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(alphatp2_mem)
-	MCFG_DEVICE_IO_MAP(alphatp2_io)
+void alphatp_12_state::alphatp2(machine_config &config)
+{
+	i8085a_cpu_device &maincpu(I8085A(config, "maincpu", 6_MHz_XTAL));
+	maincpu.set_addrmap(AS_PROGRAM, &alphatp_12_state::alphatp2_mem);
+	maincpu.set_addrmap(AS_IO, &alphatp_12_state::alphatp2_io);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum("maincpu");
 
-	I8041(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
+	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
 	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_12_state::kbd_matrix_r));
 	m_kbdmcu->p1_out_cb().set(FUNC(alphatp_12_state::kbd_matrix_w));
 	m_kbdmcu->p2_in_cb().set(FUNC(alphatp_12_state::kbd_port2_r));
@@ -1220,9 +1221,9 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&alphatp_12_state::alphatp2_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(12.8544_MHz_XTAL, 824, 0, 640, 312, 0, 288)
-	MCFG_SCREEN_UPDATE_DRIVER(alphatp_12_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_raw(12.8544_MHz_XTAL, 824, 0, 640, 312, 0, 288);
+	screen.set_screen_update(FUNC(alphatp_12_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -1232,14 +1233,13 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 	m_crtc->vsyn_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
 	m_crtc->set_screen("screen");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatp3)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_alphatp3);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 1060 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	BEEP(config, m_beep, 1060).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 	// 4.9152_MHz_XTAL serial clock
 
 	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
@@ -1248,7 +1248,7 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 	m_fdc->hld_wr_callback().set(FUNC(alphatp_12_state::fdchld_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
-MACHINE_CONFIG_END
+}
 
 void alphatp_12_state::alphatp2u(machine_config &config)
 {
@@ -1282,14 +1282,15 @@ void alphatp_34_state::machine_reset()
 	m_curfloppy = nullptr;
 	m_88_da = m_85_da = m_88_started = false;
 }
-MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
-	MCFG_DEVICE_ADD("maincpu", I8085A, 6_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(alphatp3_mem)
-	MCFG_DEVICE_IO_MAP(alphatp3_io)
+void alphatp_34_state::alphatp3(machine_config &config)
+{
+	i8085a_cpu_device &maincpu(I8085A(config, "maincpu", 6_MHz_XTAL));
+	maincpu.set_addrmap(AS_PROGRAM, &alphatp_34_state::alphatp3_mem);
+	maincpu.set_addrmap(AS_IO, &alphatp_34_state::alphatp3_io);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum("maincpu");
 
-	I8041(config, m_kbdmcu, 12.8544_MHz_XTAL /2);
+	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
 	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_34_state::kbd_matrix_r));
 	m_kbdmcu->p1_out_cb().set(FUNC(alphatp_34_state::kbd_matrix_w));
 	m_kbdmcu->p2_in_cb().set(FUNC(alphatp_34_state::kbd_port2_r));
@@ -1298,9 +1299,9 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&alphatp_34_state::alphatp3_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(12.8544_MHz_XTAL, 824, 0, 640, 312, 0, 288)
-	MCFG_SCREEN_UPDATE_DRIVER(alphatp_34_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_raw(12.8544_MHz_XTAL, 824, 0, 640, 312, 0, 288);
+	screen.set_screen_update(FUNC(alphatp_34_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -1309,14 +1310,13 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	m_crtc->vsyn_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
 	m_crtc->set_screen("screen");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatp3)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_alphatp3);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 1060 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	BEEP(config, m_beep, 1060).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 	// 4.9152_MHz_XTAL serial clock
 
 	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
@@ -1325,7 +1325,7 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	m_fdc->hld_wr_callback().set(FUNC(alphatp_34_state::fdchld_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats);
-MACHINE_CONFIG_END
+}
 
 void alphatp_34_state::alphatp30(machine_config &config)
 {

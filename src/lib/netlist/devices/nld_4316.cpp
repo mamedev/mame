@@ -6,9 +6,9 @@
  */
 
 #include "nld_4316.h"
-#include "nlid_cmos.h"
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/solver/nld_solver.h"
+#include "nlid_system.h"
 
 namespace netlist { namespace devices {
 
@@ -16,11 +16,11 @@ namespace netlist { namespace devices {
 	{
 		NETLIB_CONSTRUCTOR(CD4316_GATE)
 		NETLIB_FAMILY("CD4XXX")
-		, m_supply(*this, "PS")
+		, m_supply(*this, "VDD", "VSS")
 		, m_R(*this, "_R")
 		, m_S(*this, "S")
 		, m_E(*this, "E")
-		, m_base_r(*this, "BASER", 45.0)
+		, m_base_r(*this, "BASER", nlconst::magic(45.0))
 		{
 		}
 
@@ -28,17 +28,17 @@ namespace netlist { namespace devices {
 		NETLIB_UPDATEI();
 
 	public:
-		NETLIB_SUB(vdd_vss)        m_supply;
+		nld_power_pins             m_supply;
 		analog::NETLIB_SUB(R_base) m_R;
 
 		logic_input_t              m_S;
 		logic_input_t              m_E;
-		param_double_t             m_base_r;
+		param_fp_t             m_base_r;
 	};
 
 	NETLIB_RESET(CD4316_GATE)
 	{
-		m_R.set_R(NL_FCONST(1.0) / exec().gmin());
+		m_R.set_R(plib::reciprocal(exec().gmin()));
 	}
 
 	NETLIB_UPDATE(CD4316_GATE)
@@ -47,10 +47,11 @@ namespace netlist { namespace devices {
 		if (m_S() && !m_E())
 			m_R.set_R(m_base_r());
 		else
-			m_R.set_R(NL_FCONST(1.0) / exec().gmin());
-		m_R.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
+			m_R.set_R(plib::reciprocal(exec().gmin()));
+		m_R.solve_later(NLTIME_FROM_NS(1));
 	}
 
 	NETLIB_DEVICE_IMPL(CD4316_GATE, "CD4316_GATE", "")
 
-} } // namesapce netlist::devices
+} // namespace devices
+ } // namespace netlist

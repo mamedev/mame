@@ -24,7 +24,6 @@ To Do:
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "imagedev/snapquik.h"
 #include "emupal.h"
 #include "screen.h"
@@ -56,7 +55,7 @@ public:
 	DECLARE_READ8_MEMBER( p3_r );
 	DECLARE_WRITE8_MEMBER( p3_w );
 	void es40_palette(palette_device &palette) const;
-	DECLARE_QUICKLOAD_LOAD_MEMBER( jtc );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
@@ -590,7 +589,7 @@ static INPUT_PORTS_START( jtces40 )
 	PORT_START("Y15")
 INPUT_PORTS_END
 
-QUICKLOAD_LOAD_MEMBER( jtc_state, jtc )
+QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	u16 i, quick_addr, quick_length;
@@ -809,7 +808,8 @@ static GFXDECODE_START( gfx_jtces40 )
 	GFXDECODE_ENTRY( UB8830D_TAG, 0x1000, jtces40_charlayout, 0, 8 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(jtc_state::basic)
+void jtc_state::basic(machine_config &config)
+{
 	/* basic machine hardware */
 	UB8830D(config, m_maincpu, XTAL(8'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &jtc_state::jtc_mem);
@@ -817,88 +817,92 @@ MACHINE_CONFIG_START(jtc_state::basic)
 	m_maincpu->p3_in_cb().set(FUNC(jtc_state::p3_r));
 	m_maincpu->p3_out_cb().set(FUNC(jtc_state::p3_w));
 
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* printer */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(jtc_state::write_centronics_busy));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", jtc_state, jtc, "jtc,bin", 2)
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "jtc,bin", attotime::from_seconds(2)).set_load_callback(FUNC(jtc_state::quickload_cb));
+}
 
-MACHINE_CONFIG_START(jtc_state::jtc)
+void jtc_state::jtc(machine_config &config)
+{
 	basic(config);
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(jtc_state, screen_update)
-	MCFG_SCREEN_SIZE(64, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64-1, 0, 64-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(jtc_state::screen_update));
+	screen.set_size(64, 64);
+	screen.set_visarea(0, 64-1, 0, 64-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("2K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(jtces88_state::jtces88)
+void jtces88_state::jtces88(machine_config &config)
+{
 	jtc(config);
 
 	/* internal ram */
 	m_ram->set_default_size("4K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(jtces23_state::jtces23)
+void jtces23_state::jtces23(machine_config &config)
+{
 	basic(config);
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &jtces23_state::jtc_es23_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(jtces23_state, screen_update)
-	MCFG_SCREEN_SIZE(128, 128)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(jtces23_state::screen_update));
+	screen.set_size(128, 128);
+	screen.set_visarea(0, 128-1, 0, 128-1);
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jtces23)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_jtces23);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("4K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(jtces40_state::jtces40)
+void jtces40_state::jtces40(machine_config &config)
+{
 	basic(config);
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &jtces40_state::jtc_es40_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(jtces40_state, screen_update)
-	MCFG_SCREEN_SIZE(320, 192)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(jtces40_state::screen_update));
+	screen.set_size(320, 192);
+	screen.set_visarea(0, 320-1, 0, 192-1);
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jtces40)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_jtces40);
 	PALETTE(config, "palette", FUNC(jtc_state::es40_palette), 16);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("16K,32K");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

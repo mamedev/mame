@@ -260,14 +260,14 @@ void gotcha_state::machine_reset()
 	m_banksel = 0;
 }
 
-MACHINE_CONFIG_START(gotcha_state::gotcha)
-
+void gotcha_state::gotcha(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 14.318181_MHz_XTAL)    /* 14.31818 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(gotcha_map)
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL);    /* 14.31818 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gotcha_state::gotcha_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 6_MHz_XTAL)   /* 6 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 6_MHz_XTAL);   /* 6 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gotcha_state::sound_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -299,9 +299,8 @@ MACHINE_CONFIG_START(gotcha_state::gotcha)
 	ymsnd.add_route(0, "mono", 0.80);
 	ymsnd.add_route(1, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1_MHz_XTAL, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60);
+}
 
 
 

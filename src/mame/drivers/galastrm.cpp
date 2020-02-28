@@ -61,7 +61,7 @@ INTERRUPT_GEN_MEMBER(galastrm_state::interrupt)
 }
 
 template<int Chip>
-WRITE16_MEMBER(galastrm_state::tc0610_w)
+void galastrm_state::tc0610_w(offs_t offset, u16 data)
 {
 	if (offset == 0)
 		m_tc0610_addr[Chip] = data;
@@ -70,12 +70,12 @@ WRITE16_MEMBER(galastrm_state::tc0610_w)
 }
 
 
-CUSTOM_INPUT_MEMBER(galastrm_state::frame_counter_r)
+READ_LINE_MEMBER(galastrm_state::frame_counter_r)
 {
 	return m_frame_counter;
 }
 
-WRITE8_MEMBER(galastrm_state::coin_word_w)
+void galastrm_state::coin_word_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -97,13 +97,13 @@ void galastrm_state::main_map(address_map &map)
 	map(0x40fff0, 0x40fff3).nopw();
 	map(0x500000, 0x500007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask32(0xffffffff);
 	map(0x600000, 0x6007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)); /* Sound shared ram */
-	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));        /* tilemaps */
-	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
+	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));        /* tilemaps */
+	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x900000, 0x900003).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));                               /* TC0110PCR */
 	map(0xb00000, 0xb00003).w(FUNC(galastrm_state::tc0610_w<0>));                              /* TC0610 */
 	map(0xc00000, 0xc00003).w(FUNC(galastrm_state::tc0610_w<1>));
-	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::long_r), FUNC(tc0100scn_device::long_w));        /* piv tilemaps */
-	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_long_r), FUNC(tc0100scn_device::ctrl_long_w));
+	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));        /* piv tilemaps */
+	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 }
 
 /***********************************************************
@@ -113,7 +113,7 @@ void galastrm_state::main_map(address_map &map)
 static INPUT_PORTS_START( galastrm )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galastrm_state, frame_counter_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galastrm_state, frame_counter_r)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -158,27 +158,14 @@ static const gfx_layout tile16x16_layout =
 	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
-	{ 0, 8, 16, 24 },
-	{ 32, 33, 34, 35, 36, 37, 38, 39, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*64, 1*64,  2*64,  3*64,  4*64,  5*64,  6*64,  7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	{ STEP4(0,16) },
+	{ STEP16(0,1) },
+	{ STEP16(0,16*4) },
 	64*16   /* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_layout charlayout =
-{
-	16,16,    /* 16*16 characters */
-	RGN_FRAC(1,1),
-	4,        /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 3*4, 2*4, 7*4, 6*4, 1*4, 0*4, 5*4, 4*4, 11*4, 10*4, 15*4, 14*4, 9*4, 8*4, 13*4, 12*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8     /* every sprite takes 128 consecutive bytes */
-};
-
 static GFXDECODE_START( gfx_galastrm )
-	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout, 0, 4096 )
-	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,       0, 4096 )
+	GFXDECODE_ENTRY( "sprites", 0x0, tile16x16_layout, 0, 4096/16 )
 GFXDECODE_END
 
 
@@ -218,25 +205,19 @@ void galastrm_state::galastrm(machine_config &config)
 	m_screen->set_size(64*8, 50*8);
 	m_screen->set_visarea(0+96, 40*8-1+96, 3*8+60, 32*8-1+60);
 	m_screen->set_screen_update(FUNC(galastrm_state::screen_update));
-	m_screen->set_palette(m_palette);
+	m_screen->set_palette(m_tc0110pcr);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galastrm);
-	PALETTE(config, m_palette).set_entries(4096);
+	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_galastrm);
 
 	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(0);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(-48, -56);
-	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0480SCP(config, m_tc0480scp, 0);
-	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(3);
+	m_tc0480scp->set_palette(m_tc0110pcr);
 	m_tc0480scp->set_offsets(-40, -3);
-	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
-	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
 	TAITO_EN(config, "taito_en", 0);
@@ -255,15 +236,17 @@ ROM_START( galastrm )
 	ROM_LOAD16_BYTE( "c99_23.ic8",  0x100000, 0x20000,  CRC(5718ee92) SHA1(33cfa60c5bceb1525498f27b598067d2dc620431) )
 	ROM_LOAD16_BYTE( "c99_22.ic7",  0x100001, 0x20000,  CRC(b90f7c42) SHA1(e2fa9ee10ad61ae1a672c3357c0072b79ec7fbcb) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "c99-06.ic2",  0x000000, 0x100000, CRC(812ed3ae) SHA1(775904dd42643d0e3a30890590d5f8eac1fe78db) )  /* SCR 16x16 tiles */
-	ROM_LOAD16_BYTE( "c99-05.ic1",  0x000001, 0x100000, CRC(a91ffba4) SHA1(467af9646ddad5fbb520b6bc13517ed4deacf479) )
+	ROM_REGION( 0x100, "tc0100scn", ROMREGION_ERASE00 ) // no roms for tc0100scn, dummy
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "c99-02.ic50", 0x000000, 0x100000, CRC(81e9fc6f) SHA1(4495a7d130b755b5a48eaa814d884d6bb8243bcb) )  /* OBJ 16x16 tiles */
-	ROM_LOAD32_BYTE( "c99-01.ic51", 0x000001, 0x100000, CRC(9dda1267) SHA1(c639ba064496dcadf5f1e55332a12bb442e9dc86) )
-	ROM_LOAD32_BYTE( "c99-04.ic66", 0x000002, 0x100000, CRC(a681760f) SHA1(23d4fc7eb778c8a25c4bc7cee1d0c8cdd828a996) )
-	ROM_LOAD32_BYTE( "c99-03.ic67", 0x000003, 0x100000, CRC(a2807a27) SHA1(977e395ea2ab2fb82807d3cf5fe5f1dbbde99da0) )
+	ROM_REGION( 0x200000, "tc0480scp", 0 )
+	ROM_LOAD32_WORD( "c99-05.ic1",  0x000000, 0x100000, CRC(a91ffba4) SHA1(467af9646ddad5fbb520b6bc13517ed4deacf479) )  /* SCR 16x16 tiles */
+	ROM_LOAD32_WORD( "c99-06.ic2",  0x000002, 0x100000, CRC(812ed3ae) SHA1(775904dd42643d0e3a30890590d5f8eac1fe78db) )
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "c99-02.ic50", 0x000000, 0x100000, CRC(81e9fc6f) SHA1(4495a7d130b755b5a48eaa814d884d6bb8243bcb) )  /* OBJ 16x16 tiles */
+	ROM_LOAD64_WORD_SWAP( "c99-01.ic51", 0x000002, 0x100000, CRC(9dda1267) SHA1(c639ba064496dcadf5f1e55332a12bb442e9dc86) )
+	ROM_LOAD64_WORD_SWAP( "c99-04.ic66", 0x000004, 0x100000, CRC(a681760f) SHA1(23d4fc7eb778c8a25c4bc7cee1d0c8cdd828a996) )
+	ROM_LOAD64_WORD_SWAP( "c99-03.ic67", 0x000006, 0x100000, CRC(a2807a27) SHA1(977e395ea2ab2fb82807d3cf5fe5f1dbbde99da0) )
 
 	ROM_REGION16_LE( 0x80000, "sprmaprom", 0 )
 	ROM_LOAD16_WORD( "c99-11.ic90",  0x00000,  0x80000, CRC(26a6926c) SHA1(918860e2829131e9ecfe983b2ae3e49e1c9ecd72) )  /* STY, spritemap */

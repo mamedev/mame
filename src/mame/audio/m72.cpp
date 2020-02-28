@@ -51,11 +51,9 @@ DEFINE_DEVICE_TYPE(IREM_M72_AUDIO, m72_audio_device, "m72_audio", "Irem M72 Audi
 
 m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IREM_M72_AUDIO, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 32) // unknown address bits
 	, m_sample_addr(0)
-	, m_samples(*this, "^samples")
-	, m_samples_size(0)
-	, m_dac(*this, "^dac")
+	, m_dac(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -65,19 +63,23 @@ m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *ta
 
 void m72_audio_device::device_start()
 {
-	m_samples_size = m_samples.bytes();
-
 	save_item(NAME(m_sample_addr));
 }
 
+//-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
 
+void m72_audio_device::rom_bank_updated()
+{
+}
 
 void m72_audio_device::set_sample_start(int start)
 {
 	m_sample_addr = start;
 }
 
-WRITE8_MEMBER( m72_audio_device::vigilant_sample_addr_w )
+void m72_audio_device::vigilant_sample_addr_w(offs_t offset, u8 data)
 {
 	if (offset == 1)
 		m_sample_addr = (m_sample_addr & 0x00ff) | ((data << 8) & 0xff00);
@@ -85,7 +87,7 @@ WRITE8_MEMBER( m72_audio_device::vigilant_sample_addr_w )
 		m_sample_addr = (m_sample_addr & 0xff00) | ((data << 0) & 0x00ff);
 }
 
-WRITE8_MEMBER( m72_audio_device::shisen_sample_addr_w )
+void m72_audio_device::shisen_sample_addr_w(offs_t offset, u8 data)
 {
 	m_sample_addr >>= 2;
 
@@ -97,7 +99,7 @@ WRITE8_MEMBER( m72_audio_device::shisen_sample_addr_w )
 	m_sample_addr <<= 2;
 }
 
-WRITE8_MEMBER( m72_audio_device::rtype2_sample_addr_w )
+void m72_audio_device::rtype2_sample_addr_w(offs_t offset, u8 data)
 {
 	m_sample_addr >>= 5;
 
@@ -109,7 +111,7 @@ WRITE8_MEMBER( m72_audio_device::rtype2_sample_addr_w )
 	m_sample_addr <<= 5;
 }
 
-WRITE8_MEMBER( m72_audio_device::poundfor_sample_addr_w )
+void m72_audio_device::poundfor_sample_addr_w(offs_t offset, u8 data)
 {
 	/* poundfor writes both sample start and sample END - a first for Irem...
 	   we don't handle the end written here, 00 marks the sample end as usual. */
@@ -125,22 +127,13 @@ WRITE8_MEMBER( m72_audio_device::poundfor_sample_addr_w )
 	m_sample_addr <<= 4;
 }
 
-READ8_MEMBER( m72_audio_device::sample_r )
+u8 m72_audio_device::sample_r()
 {
-	return m_samples[m_sample_addr];
+	return read_byte(m_sample_addr);
 }
 
-WRITE8_MEMBER( m72_audio_device::sample_w )
+void m72_audio_device::sample_w(u8 data)
 {
 	m_dac->write(data);
-	m_sample_addr = (m_sample_addr + 1) & (m_samples_size - 1);
-}
-
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void m72_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
+	m_sample_addr++;
 }

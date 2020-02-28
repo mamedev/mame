@@ -45,18 +45,22 @@ enum
 /* extended error information from parsing */
 struct parse_error
 {
-	const char *            error_message;
-	int                     error_line;
-	int                     error_column;
+	parse_error() = default;
+
+	const char *            error_message = nullptr;
+	int                     error_line = 0;
+	int                     error_column = 0;
 };
 
 
 // parsing options
 struct parse_options
 {
-	parse_error *       error;
-	void                (*init_parser)(XML_ParserStruct *parser);
-	uint32_t            flags;
+	parse_options() = default;
+
+	parse_error *       error = nullptr;
+	void                (*init_parser)(XML_ParserStruct *parser) = nullptr;
+	uint32_t            flags = 0;
 };
 
 
@@ -211,7 +215,7 @@ public:
 	using ptr = std::unique_ptr<file>;
 
 
-	~file();
+	~file() = default;
 
 	// create a new, empty XML file
 	static ptr create();
@@ -227,7 +231,7 @@ public:
 
 
 private:
-	file();
+	file() = default;
 };
 
 

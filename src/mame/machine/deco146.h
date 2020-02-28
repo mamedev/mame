@@ -38,11 +38,10 @@
 struct deco146port_xx
 {
 	int write_offset;
-	uint8_t mapping[16];
+	u8 mapping[16];
 	int use_xor;
 	int use_nand;
 };
-
 
 
 /* Data East 146 protection chip */
@@ -50,15 +49,15 @@ struct deco146port_xx
 class deco_146_base_device : public device_t
 {
 public:
-	void write_data(address_space &space, uint16_t address, uint16_t data, uint16_t mem_mask, uint8_t &csflags);
-	uint16_t read_data(uint16_t address, uint16_t mem_mask, uint8_t &csflags);
+	void write_data(u16 address, u16 data, u16 mem_mask, u8 &csflags);
+	u16 read_data(u16 address, u8 &csflags);
 
 	auto port_a_cb() { return m_port_a_r.bind(); }
 	auto port_b_cb() { return m_port_b_r.bind(); }
 	auto port_c_cb() { return m_port_c_r.bind(); }
 
 	// there are some standard ways the chip gets hooked up, so have them here ready to use
-	void set_interface_scramble(uint8_t a9, uint8_t a8, uint8_t a7, uint8_t a6, uint8_t a5, uint8_t a4, uint8_t a3,uint8_t a2,uint8_t a1,uint8_t a0)
+	void set_interface_scramble(u8 a9, u8 a8, u8 a7, u8 a6, u8 a5, u8 a4, u8 a3,u8 a2,u8 a1,u8 a0)
 	{
 		m_external_addrswap[9] = a9;
 		m_external_addrswap[8] = a8;
@@ -77,60 +76,59 @@ public:
 
 	auto soundlatch_irq_cb() { return m_soundlatch_irq_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( soundlatch_r );
+	u8 soundlatch_r();
 
 	devcb_read16 m_port_a_r;
 	devcb_read16 m_port_b_r;
 	devcb_read16 m_port_c_r;
 
-	uint8_t m_bankswitch_swap_read_address;
-	uint16_t m_magic_read_address_xor;
+	u8 m_bankswitch_swap_read_address;
+	u16 m_magic_read_address_xor;
 	bool m_magic_read_address_xor_enabled;
-	uint8_t m_xor_port;
-	uint8_t m_mask_port;
-	uint8_t m_soundlatch_port;
+	u8 m_xor_port;
+	u8 m_mask_port;
+	u8 m_soundlatch_port;
 
-	uint8_t m_external_addrswap[10];
+	u8 m_external_addrswap[10];
 
 	deco146port_xx const *m_lookup_table;
 
 protected:
-	deco_146_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	deco_146_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	uint16_t read_protport(uint16_t address, uint16_t mem_mask);
-	virtual void write_protport(address_space &space, uint16_t address, uint16_t data, uint16_t mem_mask);
-	virtual uint16_t read_data_getloc(uint16_t address, int& location);
+	u16 read_protport(u16 address);
+	virtual void write_protport(u16 address, u16 data, u16 mem_mask);
+	virtual u16 read_data_getloc(u16 address, int& location);
 
-	uint16_t m_rambank0[0x80];
-	uint16_t m_rambank1[0x80];
+	std::unique_ptr<u16[]> m_rambank[2];
 
 	int m_current_rambank;
 
-	uint16_t m_nand;
-	uint16_t m_xor;
+	u16 m_nand;
+	u16 m_xor;
 
-	uint16_t m_latchaddr;
-	uint16_t m_latchdata;
+	u16 m_latchaddr;
+	u16 m_latchdata;
 
-	uint8_t m_configregion; // which value of upper 4 address lines accesses the config region
+	u8 m_configregion; // which value of upper 4 address lines accesses the config region
 	int m_latchflag;
 
 private:
 	TIMER_CALLBACK_MEMBER(write_soundlatch);
 
-	uint8_t region_selects[6];
+	u8 region_selects[6];
 
-	uint8_t m_soundlatch;
+	u8 m_soundlatch;
 	devcb_write_line m_soundlatch_irq_cb;
 };
 
 class deco146_device : public deco_146_base_device
 {
 public:
-	deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 DECLARE_DEVICE_TYPE(DECO146PROT, deco146_device)

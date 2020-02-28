@@ -294,11 +294,11 @@ WRITE16_MEMBER(taitob_state::player_34_coin_ctrl_w)
 WRITE16_MEMBER(taitob_state::spacedxo_tc0220ioc_w)
 {
 	if (ACCESSING_BITS_0_7)
-		m_tc0220ioc->write(space, offset, data & 0xff);
+		m_tc0220ioc->write(offset, data & 0xff);
 	else
 	{
 		/* spacedxo also writes here - bug? */
-		m_tc0220ioc->write(space, offset, (data >> 8) & 0xff);
+		m_tc0220ioc->write(offset, (data >> 8) & 0xff);
 	}
 }
 
@@ -363,7 +363,7 @@ void taitob_state::tetrista_map(address_map &map)
 }
 
 
-void taitob_state::hitice_map(address_map &map)
+void hitice_state::hitice_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x400000, 0x47ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
@@ -374,8 +374,8 @@ void taitob_state::hitice_map(address_map &map)
 	map(0x700002, 0x700002).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
 	map(0x800000, 0x803fff).ram(); /* Main RAM */
 	map(0xa00000, 0xa01fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xb00000, 0xb7ffff).ram().w(FUNC(taitob_state::hitice_pixelram_w)).share("pixelram");
-	map(0xbffff0, 0xbffff5).w(FUNC(taitob_state::hitice_pixel_scroll_w));
+	map(0xb00000, 0xb7ffff).ram().w(FUNC(hitice_state::pixelram_w)).share("pixelram");
+	map(0xbffff0, 0xbffff5).w(FUNC(hitice_state::pixel_scroll_w));
 //  { 0xbffffa, 0xbffffb, ???
 }
 
@@ -1738,7 +1738,7 @@ void taitob_state::rastsag2(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -1758,8 +1758,6 @@ void taitob_state::rastsag2(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x40);
@@ -1794,7 +1792,7 @@ void taitob_state::masterw(machine_config &config)
 	Z80(config, m_audiocpu, 24_MHz_XTAL / 4);  /* 6 MHz Z80B */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::masterw_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
@@ -1814,8 +1812,6 @@ void taitob_state::masterw(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x10);
@@ -1867,7 +1863,7 @@ void taitob_state::ashura(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -1887,8 +1883,6 @@ void taitob_state::ashura(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x40);
@@ -1923,7 +1917,7 @@ void taitob_state::crimec(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -1943,8 +1937,6 @@ void taitob_state::crimec(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x80);
@@ -1970,23 +1962,23 @@ void taitob_state::crimec(machine_config &config)
 }
 
 
-void taitob_state::hitice(machine_config &config)
+void hitice_state::hitice(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::hitice_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hitice_state::hitice_map);
 
 	Z80(config, m_audiocpu, 24_MHz_XTAL / 4);  /* 6 MHz Z80B */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::viofight_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &hitice_state::viofight_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
 	m_tc0220ioc->read_3_callback().set_ioport("IN1");
-	m_tc0220ioc->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
+	m_tc0220ioc->write_4_callback().set(FUNC(hitice_state::player_12_coin_ctrl_w));
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
@@ -1995,13 +1987,10 @@ void taitob_state::hitice(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_screen_update(FUNC(hitice_state::screen_update_taitob));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,hitice)
-	MCFG_VIDEO_RESET_OVERRIDE(taitob_state,hitice)
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4); // nominally "6.6 MHZ"
 	m_tc0180vcu->set_fb_colorbase(0x40);
@@ -2041,7 +2030,7 @@ void taitob_state::rambo3p(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2061,8 +2050,6 @@ void taitob_state::rambo3p(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x40);
@@ -2097,7 +2084,7 @@ void taitob_state::rambo3(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); /* 4MHz verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2117,8 +2104,6 @@ void taitob_state::rambo3(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x10);
@@ -2153,7 +2138,7 @@ void taitob_state::pbobble(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 2);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -2178,8 +2163,6 @@ void taitob_state::pbobble(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x80);
@@ -2214,7 +2197,7 @@ void taitob_state::spacedx(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -2239,8 +2222,6 @@ void taitob_state::spacedx(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x80);
@@ -2275,7 +2256,7 @@ void taitob_state::spacedxo(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2295,8 +2276,6 @@ void taitob_state::spacedxo(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x10);
@@ -2331,7 +2310,7 @@ void taitob_state::qzshowby(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -2356,8 +2335,6 @@ void taitob_state::qzshowby(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x80);
@@ -2392,7 +2369,7 @@ void taitob_state::viofight(machine_config &config)
 	Z80(config, m_audiocpu, 24_MHz_XTAL / 4);  /* 6 MHz verified */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::viofight_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2412,8 +2389,6 @@ void taitob_state::viofight(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x10);
@@ -2453,7 +2428,7 @@ void taitob_state::silentd(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2473,8 +2448,6 @@ void taitob_state::silentd(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x10);
@@ -2509,7 +2482,7 @@ void taitob_state::selfeena(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2529,8 +2502,6 @@ void taitob_state::selfeena(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x10);
@@ -2574,7 +2545,7 @@ void taitob_state::ryujin(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2594,8 +2565,6 @@ void taitob_state::ryujin(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x10);
@@ -2637,7 +2606,7 @@ void taitob_state::sbm(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0510NIO(config, m_tc0510nio, 0);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
@@ -2657,8 +2626,6 @@ void taitob_state::sbm(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x40);
@@ -2693,7 +2660,7 @@ void taitob_c_state::realpunc(machine_config &config)
 	Z80(config, m_audiocpu, 6000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_c_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0510NIO(config, m_tc0510nio, 0);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
@@ -2713,8 +2680,6 @@ void taitob_c_state::realpunc(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(taitob_c_state,realpunc)
 
 	hd63484_device &hd63484(HD63484(config, "hd63484", 0));
 	hd63484.set_addrmap(0, &taitob_c_state::realpunc_hd63484_map);
@@ -3599,9 +3564,9 @@ GAME( 1990, ashura,   0,       ashura,   ashura,    taitob_state, init_taito_b, 
 GAME( 1990, ashuraj,  ashura,  ashura,   ashuraj,   taitob_state, init_taito_b, ROT270, "Taito Corporation",         "Ashura Blaster (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ashurau,  ashura,  ashura,   ashurau,   taitob_state, init_taito_b, ROT270, "Taito America Corporation", "Ashura Blaster (US)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, hitice,   0,       hitice,   hitice,    taitob_state, init_taito_b, ROT0,   "Taito Corporation (Williams license)",     "Hit the Ice (US)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hiticerb, hitice,  hitice,   hitice,    taitob_state, init_taito_b, ROT0,   "Taito Corporation (Williams license)",     "Hit the Ice (US, with riser board)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hiticej,  hitice,  hitice,   hiticej,   taitob_state, init_taito_b, ROT0,   "Taito Corporation (licensed from Midway)", "Hit the Ice (Japan)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hitice,   0,       hitice,   hitice,    hitice_state, init_taito_b, ROT0,   "Taito Corporation (Williams license)",     "Hit the Ice (US)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiticerb, hitice,  hitice,   hitice,    hitice_state, init_taito_b, ROT0,   "Taito Corporation (Williams license)",     "Hit the Ice (US, with riser board)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiticej,  hitice,  hitice,   hiticej,   hitice_state, init_taito_b, ROT0,   "Taito Corporation (licensed from Midway)", "Hit the Ice (Japan)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, selfeena, 0,       selfeena, selfeena,  taitob_state, init_taito_b, ROT0,   "East Technology", "Sel Feena", MACHINE_SUPPORTS_SAVE )
 

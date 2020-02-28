@@ -9,6 +9,7 @@
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class wwfsstar_state : public driver_device
 {
@@ -28,7 +29,7 @@ public:
 
 	void wwfsstar(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(vblank_r);
+	DECLARE_READ_LINE_MEMBER(vblank_r);
 
 protected:
 	virtual void video_start() override;

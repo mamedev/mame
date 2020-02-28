@@ -7,6 +7,7 @@
 
 #include "machine/74259.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class thepit_state : public driver_device
 {
@@ -25,6 +26,7 @@ public:
 
 	void suprmous(machine_config &config);
 	void desertdn(machine_config &config);
+	void dockmanb(machine_config &config);
 	void intrepid(machine_config &config);
 	void thepit(machine_config &config);
 	void fitter(machine_config &config);
@@ -87,6 +89,7 @@ private:
 	void audio_io_map(address_map &map);
 	void audio_map(address_map &map);
 	void desertdan_main_map(address_map &map);
+	void dockmanb_main_map(address_map &map);
 	void intrepid_main_map(address_map &map);
 	void thepit_main_map(address_map &map);
 };

@@ -353,10 +353,8 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_spriteram_w )
 
 TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3off_callback)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	/* clear the state */
-	scanline_int_ack_w(space, 0, 0);
+	scanline_int_ack_w();
 }
 
 
@@ -397,6 +395,10 @@ READ16_MEMBER( atarisy1_state::atarisy1_int3state_r )
  *************************************/
 
 void atarisy1_state::update_timers(int scanline)
+{
+}
+
+void atarisy1r_state::update_timers(int scanline)
 {
 	int offset = m_mob->bank() * 64 * 4;
 	int link = 0, best = scanline, found = 0;

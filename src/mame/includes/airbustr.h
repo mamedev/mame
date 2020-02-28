@@ -16,6 +16,7 @@
 #include "video/kan_pand.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class airbustr_state : public driver_device
 {

@@ -113,7 +113,6 @@ void vectrex_base_state::vectrex_base(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // mc1408.ic301 (also used for vector generation)
 	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref", 0));
-	vreg.set_output(5.0);
 	vreg.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
@@ -143,7 +142,7 @@ void vectrex_state::vectrex(machine_config &config)
 	vectrex_cart(slot);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cart_list").set_type("vectrex", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cart_list").set_original("vectrex");
 }
 
 ROM_START(vectrex)

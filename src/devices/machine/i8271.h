@@ -24,10 +24,10 @@ public:
 	auto hdl_wr_callback() { return hdl_cb.bind(); }
 	auto opt_wr_callback() { return opt_cb.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER (data_r);
-	DECLARE_WRITE8_MEMBER(data_w);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t data_r();
+	void data_w(uint8_t data);
 
 	void ready_w(bool val);
 
@@ -228,11 +228,11 @@ private:
 		C_INCOMPLETE
 	};
 
-	DECLARE_READ8_MEMBER (sr_r);
-	DECLARE_READ8_MEMBER (rr_r);
-	DECLARE_WRITE8_MEMBER(reset_w) { if(data == 1) soft_reset(); }
-	DECLARE_WRITE8_MEMBER(cmd_w);
-	DECLARE_WRITE8_MEMBER(param_w);
+	uint8_t sr_r();
+	uint8_t rr_r();
+	void reset_w(uint8_t data) { if(data == 1) soft_reset(); }
+	void cmd_w(uint8_t data);
+	void param_w(uint8_t data);
 
 	void delay_cycles(emu_timer *tm, int cycles);
 	void set_drq(bool state);

@@ -128,7 +128,7 @@ void pcvideo_t1000_device::device_add_mconfig(machine_config &config)
 	m_mc6845->set_screen(T1000_SCREEN_NAME);
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(8);
-	m_mc6845->set_update_row_callback(FUNC(pc_t1t_device::crtc_update_row), this);
+	m_mc6845->set_update_row_callback(FUNC(pc_t1t_device::crtc_update_row));
 	m_mc6845->out_de_callback().set(FUNC(pc_t1t_device::t1000_de_changed));
 	m_mc6845->out_vsync_callback().set(FUNC(pcvideo_t1000_device::t1000_vsync_changed));
 
@@ -148,7 +148,7 @@ void pcvideo_pcjr_device::device_add_mconfig(machine_config &config)
 	m_mc6845->set_screen(T1000_SCREEN_NAME);
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(8);
-	m_mc6845->set_update_row_callback(FUNC(pcvideo_pcjr_device::crtc_update_row), this);
+	m_mc6845->set_update_row_callback(FUNC(pcvideo_pcjr_device::crtc_update_row));
 	m_mc6845->out_de_callback().set(FUNC(pc_t1t_device::t1000_de_changed));
 	m_mc6845->out_vsync_callback().set(FUNC(pcvideo_pcjr_device::pcjr_vsync_changed));
 
@@ -607,11 +607,11 @@ void pcvideo_pcjr_device::pc_pcjr_mode_switch()
 	/* Determine mc6845 input clock */
 	if ( m_reg.data[0] & 0x01 )
 	{
-		m_mc6845->set_clock( XTAL(14'318'181)/8 );
+		m_mc6845->set_unscaled_clock( XTAL(14'318'181)/8 );
 	}
 	else
 	{
-		m_mc6845->set_clock( XTAL(14'318'181)/16 );
+		m_mc6845->set_unscaled_clock( XTAL(14'318'181)/16 );
 	}
 
 	/* color or b/w? */
@@ -875,10 +875,10 @@ WRITE8_MEMBER( pcvideo_t1000_device::write )
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
-			m_mc6845->address_w( space, offset, data );
+			m_mc6845->address_w(data);
 			break;
 		case 1: case 3: case 5: case 7:
-			m_mc6845->register_w( space, offset, data );
+			m_mc6845->register_w(data);
 			break;
 		case 8:
 			mode_control_w(data);
@@ -913,10 +913,10 @@ WRITE8_MEMBER( pcvideo_pcjr_device::write )
 	switch( offset )
 	{
 		case 0: case 4:
-			m_mc6845->address_w( space, offset, data );
+			m_mc6845->address_w(data);
 			break;
 		case 1: case 5:
-			m_mc6845->register_w( space, offset, data );
+			m_mc6845->register_w(data);
 			break;
 		case 10:
 			if ( m_address_data_ff & 0x01 )
@@ -958,7 +958,7 @@ READ8_MEMBER( pc_t1t_device::read )
 			break;
 
 		case 1: case 3: case 5: case 7:
-			data = m_mc6845->register_r( space, offset );
+			data = m_mc6845->register_r();
 			break;
 
 		case 8:

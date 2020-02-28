@@ -317,13 +317,114 @@ void ygv608_device::port_map(address_map &map)
 
 ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t(mconfig, YGV608, tag, owner, clock),
-	  device_gfx_interface(mconfig, *this, gfx_ygv608),
+	  device_gfx_interface(mconfig, *this, gfx_ygv608, DEVICE_SELF),
 	  device_memory_interface(mconfig, *this),
+	  device_palette_interface(mconfig, *this),
 	  device_video_interface(mconfig, *this),
 	  m_io_space_config("io", ENDIANNESS_BIG, 8, 6, 0, address_map_constructor(FUNC(ygv608_device::regs_map), this)),
+	  m_namcond1_gfxbank(0),
+	  m_tilemap_A(nullptr),
+	  m_tilemap_B(nullptr),
+	  m_work_bitmap(0),
+	  m_bits16(0),
+	  m_page_x(0),
+	  m_page_y(0),
+	  m_pny_shift(0),
+	  m_na8_mask(0),
+	  m_col_shift(0),
+	  m_base_y_shift(0),
+	  m_screen_resize(false),
+	  m_tilemap_resize(false),
+	  m_color_state_r(0),
+	  m_color_state_w(0),
+	  m_p0_state(0),
+	  m_pattern_name_base_r(0),
+	  m_pattern_name_base_w(0),
+	  m_screen_status(0),
+	  m_dma_status(0),
+	  m_register_address(0),
+	  m_register_autoinc_r(false),
+	  m_register_autoinc_w(false),
+	  m_raster_irq_mask(false),
+	  m_vblank_irq_mask(false),
+	  m_raster_irq_hpos(0),
+	  m_raster_irq_vpos(0),
+	  m_raster_irq_mode(false),
+	  m_scroll_address(0),
+	  m_palette_address(0),
+	  m_sprite_address(0),
+	  m_sprite_bank(0),
+	  m_xtile_ptr(0),
+	  m_ytile_ptr(0),
+	  m_xtile_autoinc(false),
+	  m_ytile_autoinc(false),
+	  m_plane_select_access(false),
+	  m_mosaic_aplane(0),
+	  m_mosaic_bplane(0),
+	  m_sprite_disable(0),
+	  m_sprite_aux_mode(0),
+	  m_sprite_aux_reg(0),
+	  m_border_color(0),
+	  m_saar(false),
+	  m_saaw(false),
+	  m_scar(false),
+	  m_scaw(false),
+	  m_cpar(false),
+	  m_cpaw(false),
+	  m_ba_plane_scroll_select(false),
+	  m_dspe(false),
+	  m_md(0),
+	  m_zron(false),
+	  m_flip(false),
+	  m_dckm(false),
+	  m_page_size(false),
+	  m_h_display_size(0),
+	  m_v_display_size(0),
+	  m_roz_wrap_disable(false),
+	  m_scroll_wrap_disable(false),
+	  m_pattern_size(0),
+	  m_h_div_size(0),
+	  m_v_div_size(0),
+	  m_planeA_trans_enable(false),
+	  m_planeB_trans_enable(false),
+	  m_priority_mode(0),
+	  m_cbdr(false),
+	  m_yse(false),
+	  m_scm(0),
+	  m_planeA_color_fetch(0),
+	  m_planeB_color_fetch(0),
+	  m_sprite_color_fetch(0),
 	  m_vblank_handler(*this),
-	  m_raster_handler(*this)
+	  m_raster_handler(*this),
+	  m_vblank_timer(nullptr),
+	  m_raster_timer(nullptr),
+	  m_ax(0),
+	  m_dx(0),
+	  m_dxy(0),
+	  m_ay(0),
+	  m_dy(0),
+	  m_dyx(0),
+	  m_raw_ax(0),
+	  m_raw_dx(0),
+	  m_raw_dxy(0),
+	  m_raw_ay(0),
+	  m_raw_dy(0),
+	  m_raw_dyx(0)
 {
+	std::fill(std::begin(m_pattern_name_table), std::end(m_pattern_name_table), 0);
+	std::fill(std::begin(m_tilemap_A_cache_8), std::end(m_tilemap_A_cache_8), nullptr);
+	std::fill(std::begin(m_tilemap_A_cache_16), std::end(m_tilemap_A_cache_16), nullptr);
+	std::fill(std::begin(m_tilemap_B_cache_8), std::end(m_tilemap_B_cache_8), nullptr);
+	std::fill(std::begin(m_tilemap_B_cache_16), std::end(m_tilemap_B_cache_16), nullptr);
+
+	for (int i = 0; i < 2; i++)
+	{
+		std::fill(std::begin(m_scroll_data_table[i]), std::end(m_scroll_data_table[i]), 0);
+		std::fill(std::begin(m_base_addr[i]), std::end(m_base_addr[i]), 0);
+	}
+
+	for (int i = 0; i < 256; i++)
+		std::fill(std::begin(m_colour_palette[i]), std::end(m_colour_palette[i]), 0);
 }
 
 //-------------------------------------------------
@@ -358,21 +459,21 @@ void ygv608_device::device_start()
 	save_item(NAME(m_namcond1_gfxbank));
 
 	/* create tilemaps of all sizes and combinations */
-	m_tilemap_A_cache_8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,32);
-	m_tilemap_A_cache_8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 64,32);
-	m_tilemap_A_cache_8[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,64);
+	m_tilemap_A_cache_8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_A_8)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  8,8, 32,32);
+	m_tilemap_A_cache_8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_A_8)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  8,8, 64,32);
+	m_tilemap_A_cache_8[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_A_8)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  8,8, 32,64);
 
-	m_tilemap_A_cache_16[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,32);
-	m_tilemap_A_cache_16[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 64,32);
-	m_tilemap_A_cache_16[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,64);
+	m_tilemap_A_cache_16[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_A_16)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  16,16, 32,32);
+	m_tilemap_A_cache_16[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_A_16)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  16,16, 64,32);
+	m_tilemap_A_cache_16[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_A_16)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  16,16, 32,64);
 
-	m_tilemap_B_cache_8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,32);
-	m_tilemap_B_cache_8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 64,32);
-	m_tilemap_B_cache_8[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,64);
+	m_tilemap_B_cache_8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_B_8)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  8,8, 32,32);
+	m_tilemap_B_cache_8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_B_8)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  8,8, 64,32);
+	m_tilemap_B_cache_8[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_B_8)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  8,8, 32,64);
 
-	m_tilemap_B_cache_16[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,32);
-	m_tilemap_B_cache_16[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 64,32);
-	m_tilemap_B_cache_16[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,64);
+	m_tilemap_B_cache_16[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_B_16)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  16,16, 32,32);
+	m_tilemap_B_cache_16[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_B_16)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  16,16, 64,32);
+	m_tilemap_B_cache_16[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_B_16)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  16,16, 32,64);
 
 	m_tilemap_A = nullptr;
 	m_tilemap_B = nullptr;
@@ -1601,7 +1702,7 @@ WRITE8_MEMBER( ygv608_device::palette_data_w )
 		m_color_state_w = 0;
 //      if(m_colour_palette[m_palette_address][0] & 0x80) // Transparency designation, none of the Namco games enables it?
 
-		palette().set_pen_color(m_palette_address,
+		set_pen_color(m_palette_address,
 			pal6bit( m_colour_palette[m_palette_address][0] ),
 			pal6bit( m_colour_palette[m_palette_address][1] ),
 			pal6bit( m_colour_palette[m_palette_address][2] ));

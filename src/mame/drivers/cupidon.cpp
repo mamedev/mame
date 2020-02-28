@@ -88,14 +88,13 @@ void cupidon_state::cupidon_map(address_map &map)
 	map(0x1800000, 0x1800003).r(FUNC(cupidon_state::cupidon_return_ffffffff));
 	map(0x2000074, 0x2000077).ram(); // port
 
-//  AM_RANGE(0x2000040, 0x200004f) AM_RAM
-
+//  map(0x2000040, 0x200004f).ram();
 
 // might just be 4mb of VRAM
 	map(0x3000000, 0x33bffff).ram();
 	map(0x33c0000, 0x33fffff).ram().share("gfxram"); // seems to upload graphics to here, tiles etc. if you skip the loop after the romtest in funnyfm
-//  AM_RANGE(0x3400000, 0x3400fff) AM_RAM
-//  AM_RANGE(0x3F80000, 0x3F80003) AM_RAM
+//  map(0x3400000, 0x3400fff).ram();
+//  map(0x3F80000, 0x3F80003).ram();
 	map(0x3FF0400, 0x3FF0403).ram(); // register? gangrose likes to read this?
 }
 
@@ -103,24 +102,25 @@ static INPUT_PORTS_START(  cupidon )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(cupidon_state::cupidon)
+void cupidon_state::cupidon(machine_config &config)
+{
 	M68340(config, m_maincpu, 16000000);    // The access to 3FF00 at the start would suggest this is a 68340 so probably 16 or 25 mhz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &cupidon_state::cupidon_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cupidon_state, screen_update_cupidon)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(cupidon_state::screen_update_cupidon));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 0x10000)
+	PALETTE(config, "palette").set_entries(0x10000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound, probably DAC driven using 68340 DMA */
-MACHINE_CONFIG_END
+}
 
 
 

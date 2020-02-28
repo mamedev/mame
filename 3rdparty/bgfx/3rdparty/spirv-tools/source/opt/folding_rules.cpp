@@ -18,6 +18,7 @@
 #include <memory>
 #include <utility>
 
+#include "ir_builder.h"
 #include "source/latest_version_glsl_std_450_header.h"
 #include "source/opt/ir_context.h"
 
@@ -1239,6 +1240,117 @@ FoldingRule MergeSubSubArithmetic() {
   };
 }
 
+// Helper function for MergeGenericAddSubArithmetic. If |addend| and
+// subtrahend of |sub| is the same, merge to copy of minuend of |sub|.
+bool MergeGenericAddendSub(uint32_t addend, uint32_t sub, Instruction* inst) {
+  IRContext* context = inst->context();
+  analysis::DefUseManager* def_use_mgr = context->get_def_use_mgr();
+  Instruction* sub_inst = def_use_mgr->GetDef(sub);
+  if (sub_inst->opcode() != SpvOpFSub && sub_inst->opcode() != SpvOpISub)
+    return false;
+  if (sub_inst->opcode() == SpvOpFSub &&
+      !sub_inst->IsFloatingPointFoldingAllowed())
+    return false;
+  if (addend != sub_inst->GetSingleWordInOperand(1)) return false;
+  inst->SetOpcode(SpvOpCopyObject);
+  inst->SetInOperands(
+      {{SPV_OPERAND_TYPE_ID, {sub_inst->GetSingleWordInOperand(0)}}});
+  context->UpdateDefUse(inst);
+  return true;
+}
+
+// Folds addition of a subtraction where the subtrahend is equal to the
+// other addend. Return a copy of the minuend. Accepts generic (const and
+// non-const) operands.
+// Cases:
+// (a - b) + b = a
+// b + (a - b) = a
+FoldingRule MergeGenericAddSubArithmetic() {
+  return [](IRContext* context, Instruction* inst,
+            const std::vector<const analysis::Constant*>&) {
+    assert(inst->opcode() == SpvOpFAdd || inst->opcode() == SpvOpIAdd);
+    const analysis::Type* type =
+        context->get_type_mgr()->GetType(inst->type_id());
+    bool uses_float = HasFloatingPoint(type);
+    if (uses_float && !inst->IsFloatingPointFoldingAllowed()) return false;
+
+    uint32_t width = ElementWidth(type);
+    if (width != 32 && width != 64) return false;
+
+    uint32_t add_op0 = inst->GetSingleWordInOperand(0);
+    uint32_t add_op1 = inst->GetSingleWordInOperand(1);
+    if (MergeGenericAddendSub(add_op0, add_op1, inst)) return true;
+    return MergeGenericAddendSub(add_op1, add_op0, inst);
+  };
+}
+
+// Helper function for FactorAddMuls. If |factor0_0| is the same as |factor1_0|,
+// generate |factor0_0| * (|factor0_1| + |factor1_1|).
+bool FactorAddMulsOpnds(uint32_t factor0_0, uint32_t factor0_1,
+                        uint32_t factor1_0, uint32_t factor1_1,
+                        Instruction* inst) {
+  IRContext* context = inst->context();
+  if (factor0_0 != factor1_0) return false;
+  InstructionBuilder ir_builder(
+      context, inst,
+      IRContext::kAnalysisDefUse | IRContext::kAnalysisInstrToBlockMapping);
+  Instruction* new_add_inst = ir_builder.AddBinaryOp(
+      inst->type_id(), inst->opcode(), factor0_1, factor1_1);
+  inst->SetOpcode(inst->opcode() == SpvOpFAdd ? SpvOpFMul : SpvOpIMul);
+  inst->SetInOperands({{SPV_OPERAND_TYPE_ID, {factor0_0}},
+                       {SPV_OPERAND_TYPE_ID, {new_add_inst->result_id()}}});
+  context->UpdateDefUse(inst);
+  return true;
+}
+
+// Perform the following factoring identity, handling all operand order
+// combinations: (a * b) + (a * c) = a * (b + c)
+FoldingRule FactorAddMuls() {
+  return [](IRContext* context, Instruction* inst,
+            const std::vector<const analysis::Constant*>&) {
+    assert(inst->opcode() == SpvOpFAdd || inst->opcode() == SpvOpIAdd);
+    const analysis::Type* type =
+        context->get_type_mgr()->GetType(inst->type_id());
+    bool uses_float = HasFloatingPoint(type);
+    if (uses_float && !inst->IsFloatingPointFoldingAllowed()) return false;
+
+    analysis::DefUseManager* def_use_mgr = context->get_def_use_mgr();
+    uint32_t add_op0 = inst->GetSingleWordInOperand(0);
+    Instruction* add_op0_inst = def_use_mgr->GetDef(add_op0);
+    if (add_op0_inst->opcode() != SpvOpFMul &&
+        add_op0_inst->opcode() != SpvOpIMul)
+      return false;
+    uint32_t add_op1 = inst->GetSingleWordInOperand(1);
+    Instruction* add_op1_inst = def_use_mgr->GetDef(add_op1);
+    if (add_op1_inst->opcode() != SpvOpFMul &&
+        add_op1_inst->opcode() != SpvOpIMul)
+      return false;
+
+    // Only perform this optimization if both of the muls only have one use.
+    // Otherwise this is a deoptimization in size and performance.
+    if (def_use_mgr->NumUses(add_op0_inst) > 1) return false;
+    if (def_use_mgr->NumUses(add_op1_inst) > 1) return false;
+
+    if (add_op0_inst->opcode() == SpvOpFMul &&
+        (!add_op0_inst->IsFloatingPointFoldingAllowed() ||
+         !add_op1_inst->IsFloatingPointFoldingAllowed()))
+      return false;
+
+    for (int i = 0; i < 2; i++) {
+      for (int j = 0; j < 2; j++) {
+        // Check if operand i in add_op0_inst matches operand j in add_op1_inst.
+        if (FactorAddMulsOpnds(add_op0_inst->GetSingleWordInOperand(i),
+                               add_op0_inst->GetSingleWordInOperand(1 - i),
+                               add_op1_inst->GetSingleWordInOperand(j),
+                               add_op1_inst->GetSingleWordInOperand(1 - j),
+                               inst))
+          return true;
+      }
+    }
+    return false;
+  };
+}
+
 FoldingRule IntMultipleBy1() {
   return [](IRContext*, Instruction* inst,
             const std::vector<const analysis::Constant*>& constants) {
@@ -1274,6 +1386,12 @@ FoldingRule CompositeConstructFeedingExtract() {
            "Wrong opcode.  Should be OpCompositeExtract.");
     analysis::DefUseManager* def_use_mgr = context->get_def_use_mgr();
     analysis::TypeManager* type_mgr = context->get_type_mgr();
+
+    // If there are no index operands, then this rule cannot do anything.
+    if (inst->NumInOperands() <= 1) {
+      return false;
+    }
+
     uint32_t cid = inst->GetSingleWordInOperand(kExtractCompositeIdInIdx);
     Instruction* cinst = def_use_mgr->GetDef(cid);
 
@@ -2025,7 +2143,7 @@ FoldingRule StoringUndef() {
 
     // If this is a volatile store, the store cannot be removed.
     if (inst->NumInOperands() == 3) {
-      if (inst->GetSingleWordInOperand(3) & SpvMemoryAccessVolatileMask) {
+      if (inst->GetSingleWordInOperand(2) & SpvMemoryAccessVolatileMask) {
         return false;
       }
     }
@@ -2167,9 +2285,40 @@ FoldingRule VectorShuffleFeedingShuffle() {
   };
 }
 
+// Removes duplicate ids from the interface list of an OpEntryPoint
+// instruction.
+FoldingRule RemoveRedundantOperands() {
+  return [](IRContext*, Instruction* inst,
+            const std::vector<const analysis::Constant*>&) {
+    assert(inst->opcode() == SpvOpEntryPoint &&
+           "Wrong opcode.  Should be OpEntryPoint.");
+    bool has_redundant_operand = false;
+    std::unordered_set<uint32_t> seen_operands;
+    std::vector<Operand> new_operands;
+
+    new_operands.emplace_back(inst->GetOperand(0));
+    new_operands.emplace_back(inst->GetOperand(1));
+    new_operands.emplace_back(inst->GetOperand(2));
+    for (uint32_t i = 3; i < inst->NumOperands(); ++i) {
+      if (seen_operands.insert(inst->GetSingleWordOperand(i)).second) {
+        new_operands.emplace_back(inst->GetOperand(i));
+      } else {
+        has_redundant_operand = true;
+      }
+    }
+
+    if (!has_redundant_operand) {
+      return false;
+    }
+
+    inst->SetInOperands(std::move(new_operands));
+    return true;
+  };
+}
+
 }  // namespace
 
-FoldingRules::FoldingRules() {
+void FoldingRules::AddFoldingRules() {
   // Add all folding rules to the list for the opcodes to which they apply.
   // Note that the order in which rules are added to the list matters. If a rule
   // applies to the instruction, the rest of the rules will not be attempted.
@@ -2183,12 +2332,14 @@ FoldingRules::FoldingRules() {
 
   rules_[SpvOpDot].push_back(DotProductDoingExtract());
 
-  rules_[SpvOpExtInst].push_back(RedundantFMix());
+  rules_[SpvOpEntryPoint].push_back(RemoveRedundantOperands());
 
   rules_[SpvOpFAdd].push_back(RedundantFAdd());
   rules_[SpvOpFAdd].push_back(MergeAddNegateArithmetic());
   rules_[SpvOpFAdd].push_back(MergeAddAddArithmetic());
   rules_[SpvOpFAdd].push_back(MergeAddSubArithmetic());
+  rules_[SpvOpFAdd].push_back(MergeGenericAddSubArithmetic());
+  rules_[SpvOpFAdd].push_back(FactorAddMuls());
 
   rules_[SpvOpFDiv].push_back(RedundantFDiv());
   rules_[SpvOpFDiv].push_back(ReciprocalFDiv());
@@ -2214,6 +2365,8 @@ FoldingRules::FoldingRules() {
   rules_[SpvOpIAdd].push_back(MergeAddNegateArithmetic());
   rules_[SpvOpIAdd].push_back(MergeAddAddArithmetic());
   rules_[SpvOpIAdd].push_back(MergeAddSubArithmetic());
+  rules_[SpvOpIAdd].push_back(MergeGenericAddSubArithmetic());
+  rules_[SpvOpIAdd].push_back(FactorAddMuls());
 
   rules_[SpvOpIMul].push_back(IntMultipleBy1());
   rules_[SpvOpIMul].push_back(MergeMulMulArithmetic());
@@ -2238,6 +2391,15 @@ FoldingRules::FoldingRules() {
   rules_[SpvOpUDiv].push_back(MergeDivNegateArithmetic());
 
   rules_[SpvOpVectorShuffle].push_back(VectorShuffleFeedingShuffle());
+
+  FeatureManager* feature_manager = context_->get_feature_mgr();
+  // Add rules for GLSLstd450
+  uint32_t ext_inst_glslstd450_id =
+      feature_manager->GetExtInstImportId_GLSLstd450();
+  if (ext_inst_glslstd450_id != 0) {
+    ext_rules_[{ext_inst_glslstd450_id, GLSLstd450FMix}].push_back(
+        RedundantFMix());
+  }
 }
 }  // namespace opt
 }  // namespace spvtools

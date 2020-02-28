@@ -170,6 +170,9 @@ void namco_52xx_device::device_start()
 		m_extclock_pulse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namco_52xx_device::external_clock_pulse), this));
 		m_extclock_pulse_timer->adjust(attotime(0, m_extclock), 0, attotime(0, m_extclock));
 	}
+
+	save_item(NAME(m_latched_cmd));
+	save_item(NAME(m_address));
 }
 
 //-------------------------------------------------

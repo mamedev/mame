@@ -7,7 +7,7 @@
 
 class device_interpro_mouse_port_interface;
 
-class interpro_mouse_port_device : public device_t, public device_slot_interface
+class interpro_mouse_port_device : public device_t, public device_single_card_slot_interface<device_interpro_mouse_port_interface>
 {
 	friend class device_interpro_mouse_port_interface;
 
@@ -29,7 +29,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 
@@ -39,15 +38,14 @@ private:
 	device_interpro_mouse_port_interface *m_device;
 };
 
-class device_interpro_mouse_port_interface : public device_slot_card_interface
+class device_interpro_mouse_port_interface : public device_interface
 {
 	friend class interpro_mouse_port_device;
 
-public:
-	DECLARE_WRITE32_MEMBER(state_w) { m_port->m_state_func(space, offset, data, mem_mask); }
-
 protected:
 	device_interpro_mouse_port_interface(machine_config const &mconfig, device_t &device);
+
+	void state_w(u32 data, u32 mem_mask) { m_port->m_state_func(offs_t(0), data, mem_mask); }
 
 private:
 	interpro_mouse_port_device *m_port;

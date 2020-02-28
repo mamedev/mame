@@ -1267,8 +1267,9 @@ Notes:
 #include "video/poly.h"
 #include "emupal.h"
 #include "speaker.h"
+#include "tilemap.h"
 
-#include <float.h>
+#include <cfloat>
 
 
 #define JVSCLOCK    (XTAL(14'745'600))
@@ -2413,7 +2414,7 @@ WRITE32_MEMBER(namcos23_state::textchar_w)
 VIDEO_START_MEMBER(namcos23_state,s23)
 {
 	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_charram.target()));
-	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(namcos23_state::TextTilemapGetInfo)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_bgtilemap->set_transparent_pen(0xf);
 	m_bgtilemap->set_scrolldx(860, 860);
 	m_render.polymgr = std::make_unique<namcos23_renderer>(*this);
@@ -3011,7 +3012,7 @@ void namcos23_state::gmen_sh2_map(address_map &map)
 	map(0x00000000, 0x0000ffff).ram().share("gmen_sh2_shared");
 	map(0x00800000, 0x008fffff).rom().region("data", 0xc00000); //c00000 "data" for final furlong 2. 0x1b6bc0 "user1" for gunmen wars
 	map(0x01800000, 0x0183ffff).ram(); // ???
-	//AM_RANGE(0x02800000, 0x02800003) AM_RAM // probably transfer status related, reads/writes after each end of flash transfer, TBD
+	//map(0x02800000, 0x02800003).ram(); // probably transfer status related, reads/writes after each end of flash transfer, TBD
 	map(0x04000000, 0x043fffff).ram(); // SH-2 main work RAM (SDRAM)
 	map(0x06000000, 0x06000003).noprw(); // serial port for camera?
 }
@@ -3203,7 +3204,7 @@ void namcos23_state::s23iobrdmap(address_map &map)
 	map(0x6002, 0x6003).portr("IN23");
 	map(0x6004, 0x6005).nopw();
 	map(0x6006, 0x6007).noprw();
-	map(0xc000, 0xffff).ram();
+	map(0xc000, 0xfb7f).ram();
 }
 
 void namcos23_state::s23iobrdiomap(address_map &map)
@@ -3617,7 +3618,7 @@ void namcos23_state::gorgon(machine_config &config)
 	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
 	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 
-	config.m_minimum_quantum = attotime::from_hz(2*115200);
+	config.set_maximum_quantum(attotime::from_hz(2*115200));
 
 	NAMCO_SETTINGS(config, m_settings, 0);
 
@@ -3682,7 +3683,7 @@ void namcos23_state::s23(machine_config &config)
 	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
 	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 
-	config.m_minimum_quantum = attotime::from_hz(2*115200);
+	config.set_maximum_quantum(attotime::from_hz(2*115200));
 
 	NAMCO_SETTINGS(config, m_settings, 0);
 
@@ -3761,7 +3762,7 @@ void namcos23_state::ss23(machine_config &config)
 	// Timer at 115200*16 for the jvs serial clock
 	m_subcpu->subdevice<h8_sci_device>("sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
 
-	config.m_minimum_quantum = attotime::from_hz(2*115200);
+	config.set_maximum_quantum(attotime::from_hz(2*115200));
 
 	NAMCO_SETTINGS(config, m_settings, 0);
 
@@ -5315,27 +5316,27 @@ ROM_END
 GAME( 1997, rapidrvr,    0,        gorgon,      rapidrvr,  namcos23_state, init_s23, ROT0, "Namco", "Rapid River (US, RD3 Ver. C)",     GAME_FLAGS ) // 97/11/27, USA
 GAME( 1997, rapidrvrv2c, rapidrvr, gorgon,      rapidrvr,  namcos23_state, init_s23, ROT0, "Namco", "Rapid River (World, RD2 Ver. C)",     GAME_FLAGS ) // 97/11/27, Europe
 GAME( 1997, rapidrvrp,   rapidrvr, gorgon,      rapidrvrp, namcos23_state, init_s23, ROT0, "Namco", "Rapid River (prototype)",      GAME_FLAGS ) // 97/11/10, USA
-GAME( 1997, finfurl,     0,        gorgon,      finfurl,   namcos23_state, init_s23, ROT0, "Namco", "Final Furlong (World, FF2 Ver. A)",   GAME_FLAGS )
-GAME( 1997, downhill,    0,        s23,         downhill,  namcos23_state, init_s23, ROT0, "Namco", "Downhill Bikers (US, DH3 Ver. A)", GAME_FLAGS )
-GAME( 1997, motoxgo,     0,        s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (US, MG3 Ver. A)",   GAME_FLAGS )
-GAME( 1997, motoxgov2a,  motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 1)",   GAME_FLAGS )
-GAME( 1997, motoxgov2a2, motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 2)",   GAME_FLAGS )
-GAME( 1997, motoxgov1a,  motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 1)", GAME_FLAGS )
-GAME( 1997, motoxgov1a2, motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 2)", GAME_FLAGS )
-GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (US, TSS3 Ver. B)", GAME_FLAGS )
-GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (World, TSS2 Ver. B)", GAME_FLAGS )
-GAME( 1997, timecrs2v1b, timecrs2, timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (Japan, TSS1 Ver. B)", GAME_FLAGS )
-GAME( 1997, timecrs2v4a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (World, TSS4 Ver. A)", GAME_FLAGS )
-GAME( 1997, timecrs2v5a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (US, TSS5 Ver. A)", GAME_FLAGS )
+GAME( 1997, finfurl,     0,        gorgon,      finfurl,   namcos23_state, init_s23, ROT0, "Namco", "Final Furlong (World, FF2 Ver. A)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, downhill,    0,        s23,         downhill,  namcos23_state, init_s23, ROT0, "Namco", "Downhill Bikers (US, DH3 Ver. A)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgo,     0,        s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (US, MG3 Ver. A)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgov2a,  motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 1)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgov2a2, motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 2)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgov1a,  motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 1)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgov1a2, motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 2)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (US, TSS3 Ver. B)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (World, TSS2 Ver. B)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, timecrs2v1b, timecrs2, timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (Japan, TSS1 Ver. B)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, timecrs2v4a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (World, TSS4 Ver. A)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, timecrs2v5a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (US, TSS5 Ver. A)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, panicprk,    0,        s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (World, PNP2 Ver. A)",     GAME_FLAGS )
 GAME( 1997, panicprkj,   panicprk, s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B)",     GAME_FLAGS )
-GAME( 1998, gunwars,     0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. B)",     GAME_FLAGS )
-GAME( 1998, gunwarsa,    gunwars,  gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. A)",     GAME_FLAGS )
-GAME( 1998, raceon,      0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Race On! (World, RO2 Ver. A)",        GAME_FLAGS )
-GAME( 1998, 500gp,       0,        ss23,        s23,       namcos23_state, init_s23, ROT0, "Namco", "500 GP (US, 5GP3 Ver. C)",         GAME_FLAGS )
+GAME( 1998, gunwars,     0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. B)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1998, gunwarsa,    gunwars,  gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1998, raceon,      0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Race On! (World, RO2 Ver. A)",        GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1998, 500gp,       0,        ss23,        s23,       namcos23_state, init_s23, ROT0, "Namco", "500 GP (US, 5GP3 Ver. C)",         GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, aking,       0,        ss23,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Angler King (Japan, AG1 Ver. A)",     GAME_FLAGS )
-GAME( 1998, finfurl2,    0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (World)",      GAME_FLAGS )
-GAME( 1998, finfurl2j,   finfurl2, gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (Japan)",      GAME_FLAGS )
+GAME( 1998, finfurl2,    0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (World)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1998, finfurl2j,   finfurl2, gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (Japan)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1999, crszone,     0,        ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. B)",   GAME_FLAGS )
 GAME( 1999, crszonev4a,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. A)",   GAME_FLAGS )
 GAME( 1999, crszonev3b,  crszone,  ss23e2,      s23,       namcos23_state, init_s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 1)", GAME_FLAGS )

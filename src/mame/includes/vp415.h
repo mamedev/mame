@@ -233,11 +233,11 @@ private:
 	void drive_io_map(address_map &map);
 
 	required_device<z80_device> m_datacpu;
-	required_device<i8041_device> m_datamcu;
+	required_device<i8041a_device> m_datamcu;
 	required_device<ncr5385_device> m_scsi;
 	required_device<i8031_device> m_drivecpu;
 	required_device<i8031_device> m_ctrlcpu;
-	required_device<i8041_device> m_ctrlmcu;
+	required_device<i8041a_device> m_ctrlmcu;
 	required_device<mb88303_device> m_chargen;
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_ctrlram;

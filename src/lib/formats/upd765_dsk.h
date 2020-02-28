@@ -7,9 +7,10 @@
     helper for simple upd765-formatted disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_UPD765_DSK_H
+#define MAME_FORMATS_UPD765_DSK_H
 
-#ifndef UPD765_DSK_H
-#define UPD765_DSK_H
+#pragma once
 
 #include "flopimg.h"
 
@@ -59,4 +60,4 @@ private:
 	format const *const formats;
 };
 
-#endif /* UPD765_DSK_H */
+#endif // MAME_FORMATS_UPD765_DSK_H

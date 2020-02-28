@@ -173,7 +173,7 @@ READ8_MEMBER(ccs_state::io_read)
 {
 	// A7-A3 are compared against jumper settings
 	if (m_ser_en->read() && (offset & 0x00f8) == m_ser_addr_sel->read())
-		return m_ins8250->ins8250_r(space, offset & 7);
+		return m_ins8250->ins8250_r(offset & 7);
 
 	return 0xff;
 }
@@ -182,7 +182,7 @@ WRITE8_MEMBER(ccs_state::io_write)
 {
 	// A7-A3 are compared against jumper settings
 	if (m_ser_en->read() && (offset & 0x00f8) == m_ser_addr_sel->read())
-		m_ins8250->ins8250_w(space, offset & 7, data);
+		m_ins8250->ins8250_w(offset & 7, data);
 }
 
 void ccs_state::ccs2810_mem(address_map &map)

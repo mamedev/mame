@@ -12,6 +12,8 @@
 #ifndef MAME_BUS_SMS_CTRL_SMSCTRL_H
 #define MAME_BUS_SMS_CTRL_SMSCTRL_H
 
+#include "screen.h"
+
 #pragma once
 
 
@@ -44,8 +46,6 @@ public:
 	// static configuration helpers
 	auto th_input_handler() { return m_th_pin_handler.bind(); }
 
-	auto pixel_handler() { return m_pixel_handler.bind(); }
-
 	// Physical DE-9 connector interface
 
 	// Data returned by the port_r methods:
@@ -63,7 +63,11 @@ public:
 	void port_w( uint8_t data );
 
 	void th_pin_w(int state);
-	uint32_t pixel_r();
+
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+
+	// for peripherals that interact with the machine's screen
+	required_device<screen_device> m_screen;
 
 protected:
 	// device-level overrides
@@ -73,14 +77,13 @@ protected:
 
 private:
 	devcb_write_line m_th_pin_handler;
-	devcb_read32 m_pixel_handler;
 };
 
 
 // ======================> device_sms_control_port_interface
 
 // class representing interface-specific live sms_expansion card
-class device_sms_control_port_interface : public device_slot_card_interface
+class device_sms_control_port_interface : public device_interface
 {
 public:
 	// construction/destruction

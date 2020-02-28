@@ -17,12 +17,10 @@ S - Alter memory
 
 
 The photos show 3 boards:
-- A scsi board (all 74-series TTL)
+- A "SASI Interface" board (all 74-series TTL)
 - CPU board (64k dynamic RAM, Z80A CPU, 2x Z80CTC, 2x Z80SIO/0, MB8877A, Z80DMA, 4x MC1488,
   4x MC1489, XTALS 1.8432MHz and 24MHz)
-- ADES board (Adaptec Inc AIC-100, AIC-250, AIC-300, Intel D8086AH, unknown crystal)
-
-Both roms contain Z80 code.
+- ADES board (Adaptec Inc AIC-100, AIC-250, AIC-300, Intel D8085AH, unknown crystal)
 
 
 ********************************************************************************************************************/
@@ -71,11 +69,11 @@ void dsb46_state::dsb46_io(address_map &map)
 	map(0x00, 0x03).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x08, 0x0b).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x1a, 0x1a).w(FUNC(dsb46_state::port1a_w));
-	//AM_RANGE(0x10, 0x10) disk related
-	//AM_RANGE(0x14, 0x14) ?? (read after CTC1 TRG3)
-	//AM_RANGE(0x18, 0x18) ??
-	//AM_RANGE(0x1c, 0x1c) disk data
-	//AM_RANGE(0x1d, 0x1d) disk status (FF = no fdc)
+	//map(0x10, 0x10) disk related
+	//map(0x14, 0x14) ?? (read after CTC1 TRG3)
+	//map(0x18, 0x18) ??
+	//map(0x1c, 0x1c) disk data
+	//map(0x1d, 0x1d) disk status (FF = no fdc)
 }
 
 static INPUT_PORTS_START( dsb46 )

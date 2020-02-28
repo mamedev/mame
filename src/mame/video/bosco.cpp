@@ -13,9 +13,8 @@
 #include "includes/bosco.h"
 
 
-#define MAX_STARS 252
-#define STARS_COLOR_BASE (64*4+64*4+4)
 #define VIDEO_RAM_SIZE 0x400
+
 
 void bosco_state::bosco_palette(palette_device &palette) const
 {
@@ -118,8 +117,8 @@ TILE_GET_INFO_MEMBER(bosco_state::fg_get_tile_info )
 
 VIDEO_START_MEMBER(bosco_state,bosco)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bosco_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bosco_state::fg_get_tile_info),this),tilemap_mapper_delegate(FUNC(bosco_state::fg_tilemap_scan),this),  8,8, 8,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bosco_state::bg_get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bosco_state::fg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(bosco_state::fg_tilemap_scan)), 8,8, 8,32);
 
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x1f);
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x1f);
@@ -132,8 +131,9 @@ VIDEO_START_MEMBER(bosco_state,bosco)
 	m_bosco_radarx = m_videoram + 0x03f0;
 	m_bosco_radary = m_bosco_radarx + 0x0800;
 
-	save_item(NAME(m_stars_scrollx));
-	save_item(NAME(m_stars_scrolly));
+	m_bosco_starclr = 1;
+
+	save_item(NAME(m_bosco_starclr));
 }
 
 
@@ -165,6 +165,8 @@ WRITE8_MEMBER( bosco_state::bosco_scrolly_w )
 
 WRITE8_MEMBER( bosco_state::bosco_starclr_w )
 {
+	// On any write to $9840, turn on starfield
+	m_bosco_starclr = 0;
 }
 
 
@@ -225,39 +227,6 @@ void bosco_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 }
 
 
-void bosco_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip)
-{
-	if (1)
-	{
-		int star_cntr;
-		int set_a, set_b;
-
-		/* two sets of stars controlled by these bits */
-		set_a = m_videolatch->q4_r();
-		set_b = m_videolatch->q5_r() | 2;
-
-		for (star_cntr = 0;star_cntr < MAX_STARS;star_cntr++)
-		{
-			int x,y;
-
-			if ((set_a == s_star_seed_tab[star_cntr].set) || (set_b == s_star_seed_tab[star_cntr].set))
-			{
-				x = (s_star_seed_tab[star_cntr].x + m_stars_scrollx) % 256;
-				y = (s_star_seed_tab[star_cntr].y + m_stars_scrolly) % 256;
-
-				/* don't draw the stars that are off the screen */
-				if (x < 224)
-				{
-					if (flip) x += 64;
-
-					if (cliprect.contains(x, y))
-						bitmap.pix16(y, x) = STARS_COLOR_BASE + s_star_seed_tab[star_cntr].col;
-				}
-			}
-		}
-	}
-}
-
 
 uint32_t bosco_state::screen_update_bosco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -278,7 +247,7 @@ uint32_t bosco_state::screen_update_bosco(screen_device &screen, bitmap_ind16 &b
 	}
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	draw_stars(bitmap,cliprect,flip);
+	m_starfield->draw_starfield(bitmap,cliprect,flip);
 
 	m_bg_tilemap->draw(screen, bitmap, bg_clip, 0,0);
 	m_fg_tilemap->draw(screen, bitmap, fg_clip, 0,0);
@@ -300,10 +269,14 @@ WRITE_LINE_MEMBER(bosco_state::screen_vblank_bosco)
 	// falling edge
 	if (!state)
 	{
-		static const int speedsx[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };
-		static const int speedsy[8] = { 0, -1, -2, -3, 0, 3, 2, 1 };
+		// Bosconian scrolls in X and Y directions
+		const uint8_t speed_index_X = m_bosco_starcontrol[0] & 0x07;
+		const uint8_t speed_index_Y = (m_bosco_starcontrol[0] & 0x38) >> 3;
+		m_starfield->set_scroll_speed(speed_index_X,speed_index_Y);
 
-		m_stars_scrollx += speedsx[m_bosco_starcontrol[0] & 0x07];
-		m_stars_scrolly += speedsy[(m_bosco_starcontrol[0] & 0x38) >> 3];
+		m_starfield->set_active_starfield_sets(m_videolatch->q4_r(), m_videolatch->q5_r() | 2);
+
+		// _STARCLR signal enables/disables starfield
+		m_starfield->enable_starfield(!m_bosco_starclr);
 	}
 }

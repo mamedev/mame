@@ -239,7 +239,7 @@ private:
 void tutor_state::machine_start()
 {
 	std::string region_tag;
-	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG));
 
 	m_tape_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tutor_state::tape_interrupt_handler),this));
 
@@ -296,17 +296,17 @@ READ8_MEMBER( tutor_state::key_r )
 	char port[12];
 	uint8_t value;
 
-	snprintf(port, ARRAY_LENGTH(port), "LINE%d", offset);
+	snprintf(port, ARRAY_LENGTH(port), "LINE%d", (offset & 0x007e) >> 3);
 	value = ioport(port)->read();
 
 	/* hack for ports overlapping with joystick */
-	if (offset == 4 || offset == 5)
+	if (offset >= 32 && offset < 48)
 	{
-		snprintf(port, ARRAY_LENGTH(port), "LINE%d_alt", offset);
+		snprintf(port, ARRAY_LENGTH(port), "LINE%d_alt", (offset & 0x007e) >> 3);
 		value |= ioport(port)->read();
 	}
 
-	return value;
+	return BIT(value, offset & 7);
 }
 
 
@@ -559,8 +559,8 @@ void tutor_state::tutor_memmap(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank2").nopw();
 	map(0xc000, 0xdfff).noprw(); /*free for expansion, or cartridge ROM?*/
 
-	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));    /*VDP data*/
-	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));/*VDP status*/
+	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));    /*VDP data*/
+	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));/*VDP status*/
 	map(0xe100, 0xe1ff).rw(FUNC(tutor_state::tutor_mapper_r), FUNC(tutor_state::tutor_mapper_w));   /*cartridge mapper*/
 	map(0xe200, 0xe200).w("sn76489a", FUNC(sn76489a_device::write));    /*sound chip*/
 	map(0xe800, 0xe8ff).rw(FUNC(tutor_state::tutor_printer_r), FUNC(tutor_state::tutor_printer_w)); /*printer*/
@@ -576,8 +576,8 @@ void tutor_state::pyuutajr_mem(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank2").nopw();
 	map(0xc000, 0xdfff).noprw(); /*free for expansion, or cartridge ROM?*/
 
-	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));    /*VDP data*/
-	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));/*VDP status*/
+	map(0xe000, 0xe000).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));    /*VDP data*/
+	map(0xe002, 0xe002).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));/*VDP status*/
 	map(0xe100, 0xe1ff).rw(FUNC(tutor_state::tutor_mapper_r), FUNC(tutor_state::tutor_mapper_w));   /*cartridge mapper*/
 	map(0xe200, 0xe200).w("sn76489a", FUNC(sn76489a_device::write));    /*sound chip*/
 	map(0xe800, 0xe800).portr("LINE0");
@@ -600,8 +600,8 @@ void tutor_state::pyuutajr_mem(address_map &map)
 
 void tutor_state::tutor_io(address_map &map)
 {
-	map(0xec0, 0xec7).r(FUNC(tutor_state::key_r));               /*keyboard interface*/
-	map(0xed0, 0xed0).r(FUNC(tutor_state::tutor_cassette_r));        /*cassette interface*/
+	map(0xec00, 0xec7f).r(FUNC(tutor_state::key_r));               /*keyboard interface*/
+	map(0xed00, 0xed01).r(FUNC(tutor_state::tutor_cassette_r));        /*cassette interface*/
 }
 
 /* tutor keyboard: 56 keys
@@ -775,7 +775,7 @@ void tutor_state::tutor(machine_config &config)
 	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "tutor_cart", "bin");
 
 	// software lists
-	SOFTWARE_LIST(config, "cart_list").set_type("tutor", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cart_list").set_original("tutor");
 
 }
 

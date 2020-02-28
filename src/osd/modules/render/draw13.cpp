@@ -11,8 +11,8 @@
 //============================================================
 
 // standard C headers
-#include <math.h>
-#include <stdio.h>
+#include <cmath>
+#include <cstdio>
 
 // MAME headers
 #include "emu.h"
@@ -704,9 +704,6 @@ texture_info::texture_info(renderer_sdl2 *renderer, const render_texinfo &texsou
 			break;
 		case TEXFORMAT_PALETTE16:
 			m_format = SDL_TEXFORMAT_PALETTE16;
-			break;
-		case TEXFORMAT_PALETTEA16:
-			m_format = SDL_TEXFORMAT_PALETTE16A;
 			break;
 		case TEXFORMAT_YUY16:
 			m_format = texsource.palette ? SDL_TEXFORMAT_YUY16_PALETTED : SDL_TEXFORMAT_YUY16;

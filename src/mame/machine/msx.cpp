@@ -168,7 +168,7 @@ static const uint8_t cc_ex[0x100] = {
 
 void msx_state::driver_start()
 {
-	m_maincpu->set_input_line_vector(0, 0xff);
+	m_maincpu->set_input_line_vector(0, 0xff); // Z80
 
 	msx_memory_init();
 
@@ -362,13 +362,11 @@ READ8_MEMBER( msx_state::msx_ppi_port_b_r )
  *
  ***********************************************************************/
 
-void msx_state::install_slot_pages(uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, device_t *device)
+void msx_state::install_slot_pages(uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, msx_internal_slot_interface &device)
 {
-	msx_internal_slot_interface *internal_slot = dynamic_cast<msx_internal_slot_interface *>(device);
-
 	for ( int i = page; i < std::min(page + numpages, 4); i++ )
 	{
-		m_all_slots[prim][sec][i] = internal_slot;
+		m_all_slots[prim][sec][i] = &device;
 	}
 	if ( sec )
 	{
@@ -430,12 +428,12 @@ void msx_state::msx_memory_map_all ()
 
 READ8_MEMBER( msx_state::msx_mem_read )
 {
-	return m_current_page[offset >> 14]->read(space, offset);
+	return m_current_page[offset >> 14]->read(offset);
 }
 
 WRITE8_MEMBER( msx_state::msx_mem_write )
 {
-	m_current_page[offset >> 14]->write(space, offset, data);
+	m_current_page[offset >> 14]->write(offset, data);
 }
 
 WRITE8_MEMBER( msx_state::msx_sec_slot_w )
@@ -450,7 +448,7 @@ WRITE8_MEMBER( msx_state::msx_sec_slot_w )
 		msx_memory_map_all ();
 	}
 	else
-		m_current_page[3]->write(space, 0xffff, data);
+		m_current_page[3]->write(0xffff, data);
 }
 
 READ8_MEMBER( msx_state::msx_sec_slot_r )
@@ -463,7 +461,7 @@ READ8_MEMBER( msx_state::msx_sec_slot_r )
 	}
 	else
 	{
-		return m_current_page[3]->read(space, 0xffff);
+		return m_current_page[3]->read(0xffff);
 	}
 }
 

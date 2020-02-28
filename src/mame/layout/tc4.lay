@@ -16,6 +16,10 @@
 			<bounds x="0.25" y="0.25" width="0.5" height="0.5" />
 		</disk>
 		<disk state="1">
+			<color red="0.5" green="0.125" blue="0.14" />
+			<bounds x="0.25" y="0.25" width="0.5" height="0.5" />
+		</disk>
+		<disk state="2">
 			<color red="1.0" green="0.25" blue="0.28" />
 			<bounds x="0.25" y="0.25" width="0.5" height="0.5" />
 		</disk>

@@ -69,11 +69,11 @@ void cpc_playcity_device::device_start()
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 	address_space &space = m_slot->cpu().space(AS_IO);
 
-	space.install_readwrite_handler(0xf880,0xf883,read8_delegate(FUNC(cpc_playcity_device::ctc_r),this),write8_delegate(FUNC(cpc_playcity_device::ctc_w),this));
-	space.install_readwrite_handler(0xf884,0xf884,read8_delegate(FUNC(cpc_playcity_device::ymz1_data_r),this),write8_delegate(FUNC(cpc_playcity_device::ymz1_data_w),this));
-	space.install_readwrite_handler(0xf888,0xf888,read8_delegate(FUNC(cpc_playcity_device::ymz2_data_r),this),write8_delegate(FUNC(cpc_playcity_device::ymz2_data_w),this));
-	space.install_write_handler(0xf984,0xf984,write8_delegate(FUNC(cpc_playcity_device::ymz1_address_w),this));
-	space.install_write_handler(0xf988,0xf988,write8_delegate(FUNC(cpc_playcity_device::ymz2_address_w),this));
+	space.install_readwrite_handler(0xf880,0xf883, read8_delegate(*this, FUNC(cpc_playcity_device::ctc_r)), write8_delegate(*this, FUNC(cpc_playcity_device::ctc_w)));
+	space.install_readwrite_handler(0xf884,0xf884, read8_delegate(*this, FUNC(cpc_playcity_device::ymz1_data_r)), write8_delegate(*this, FUNC(cpc_playcity_device::ymz1_data_w)));
+	space.install_readwrite_handler(0xf888,0xf888, read8_delegate(*this, FUNC(cpc_playcity_device::ymz2_data_r)), write8_delegate(*this, FUNC(cpc_playcity_device::ymz2_data_w)));
+	space.install_write_handler(0xf984,0xf984, write8_delegate(*this, FUNC(cpc_playcity_device::ymz1_address_w)));
+	space.install_write_handler(0xf988,0xf988, write8_delegate(*this, FUNC(cpc_playcity_device::ymz2_address_w)));
 }
 
 //-------------------------------------------------
@@ -87,44 +87,44 @@ void cpc_playcity_device::device_reset()
 
 READ8_MEMBER(cpc_playcity_device::ctc_r)
 {
-	return m_ctc->read(space,offset);
+	return m_ctc->read(offset);
 }
 
 WRITE8_MEMBER(cpc_playcity_device::ctc_w)
 {
-	m_ctc->write(space,offset,data);
+	m_ctc->write(offset,data);
 	if(offset == 0)
 		update_ymz_clock();
 }
 
 WRITE8_MEMBER(cpc_playcity_device::ymz1_address_w)
 {
-	m_ymz1->address_w(space,offset,data);
+	m_ymz1->address_w(data);
 }
 
 WRITE8_MEMBER(cpc_playcity_device::ymz2_address_w)
 {
-	m_ymz2->address_w(space,offset,data);
+	m_ymz2->address_w(data);
 }
 
 WRITE8_MEMBER(cpc_playcity_device::ymz1_data_w)
 {
-	m_ymz1->data_w(space,offset,data);
+	m_ymz1->data_w(data);
 }
 
 WRITE8_MEMBER(cpc_playcity_device::ymz2_data_w)
 {
-	m_ymz2->data_w(space,offset,data);
+	m_ymz2->data_w(data);
 }
 
 READ8_MEMBER(cpc_playcity_device::ymz1_data_r)
 {
-	return m_ymz1->data_r(space,offset);
+	return m_ymz1->data_r();
 }
 
 READ8_MEMBER(cpc_playcity_device::ymz2_data_r)
 {
-	return m_ymz2->data_r(space,offset);
+	return m_ymz2->data_r();
 }
 
 void cpc_playcity_device::update_ymz_clock()

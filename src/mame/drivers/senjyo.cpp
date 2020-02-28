@@ -93,7 +93,6 @@ void senjyo_state::machine_start()
 	save_item(NAME(m_sound_cmd));
 	save_item(NAME(m_single_volume));
 	save_item(NAME(m_sound_state));
-	save_item(NAME(m_bgstripes));
 }
 
 void senjyo_state::machine_reset()
@@ -101,7 +100,6 @@ void senjyo_state::machine_reset()
 	m_sound_cmd = 0;
 	m_single_volume = 0;
 	m_sound_state = 0;
-	m_bgstripes = 0;
 }
 
 WRITE8_MEMBER(senjyo_state::irq_ctrl_w)
@@ -131,20 +129,25 @@ void senjyo_state::senjyo_map(address_map &map)
 	map(0x9400, 0x97ff).ram().w(FUNC(senjyo_state::fgcolorram_w)).share("fgcolorram");
 	map(0x9800, 0x987f).ram().share("spriteram");
 	map(0x9c00, 0x9dff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x9e00, 0x9e3f).ram();
 	map(0x9e00, 0x9e1f).ram().share("fgscroll");
 	map(0x9e20, 0x9e21).ram().share("scrolly3");
-/*  AM_RANGE(0x9e22, 0x9e23) height of the layer (Senjyo only, fixed at 0x380) */
+/*  map(0x9e22, 0x9e23) height of the layer (Senjyo only, fixed at 0x380) */
+	map(0x9e22, 0x9e24).ram();
 	map(0x9e25, 0x9e25).ram().share("scrollx3");
+	map(0x9e26, 0x9e26).ram();
 	map(0x9e27, 0x9e27).ram().share("bgstripesram");  /* controls width of background stripes */
 	map(0x9e28, 0x9e29).ram().share("scrolly2");
-/*  AM_RANGE(0x9e2a, 0x9e2b) height of the layer (Senjyo only, fixed at 0x200) */
+/*  map(0x9e2a, 0x9e2b) height of the layer (Senjyo only, fixed at 0x200) */
+	map(0x9e2a, 0x9e2c).ram();
 	map(0x9e2d, 0x9e2d).ram().share("scrollx2");
+	map(0x9e2e, 0x9e2f).ram();
 	map(0x9e30, 0x9e31).ram().share("scrolly1");
-/*  AM_RANGE(0x9e32, 0x9e33) height of the layer (Senjyo only, fixed at 0x100) */
+/*  map(0x9e32, 0x9e33) height of the layer (Senjyo only, fixed at 0x100) */
+	map(0x9e32, 0x9e34).ram();
 	map(0x9e35, 0x9e35).ram().share("scrollx1");
-/*  AM_RANGE(0x9e38, 0x9e38) probably radar y position (Senjyo only, fixed at 0x61) */
-/*  AM_RANGE(0x9e3d, 0x9e3d) probably radar x position (Senjyo only, 0x00/0xc0 depending on screen flip) */
+/*  map(0x9e38, 0x9e38) probably radar y position (Senjyo only, fixed at 0x61) */
+/*  map(0x9e3d, 0x9e3d) probably radar x position (Senjyo only, 0x00/0xc0 depending on screen flip) */
+	map(0x9e36, 0x9e3f).ram();
 	map(0xa000, 0xa7ff).ram().w(FUNC(senjyo_state::bg3videoram_w)).share("bg3videoram");
 	map(0xa800, 0xafff).ram().w(FUNC(senjyo_state::bg2videoram_w)).share("bg2videoram");
 	map(0xb000, 0xb7ff).ram().w(FUNC(senjyo_state::bg1videoram_w)).share("bg1videoram");
@@ -548,12 +551,12 @@ static GFXDECODE_START( gfx_senjyo )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(senjyo_state::senjyo)
-
+void senjyo_state::senjyo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(senjyo_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
+	Z80(config, m_maincpu, 4000000);   /* 4 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_map);
+	m_maincpu->set_vblank_int("screen", FUNC(senjyo_state::irq0_line_assert));
 
 	z80_device& sub(Z80(config, "sub", 2000000));   /* 2 MHz? */
 	sub.set_daisy_config(senjyo_daisy_chain);
@@ -570,12 +573,12 @@ MACHINE_CONFIG_START(senjyo_state::senjyo)
 	ctc.zc_callback<2>().set(FUNC(senjyo_state::sound_line_clock));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(senjyo_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(senjyo_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_senjyo);
 
@@ -585,19 +588,17 @@ MACHINE_CONFIG_START(senjyo_state::senjyo)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76496, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	SN76496(config, "sn1", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("sn2", SN76496, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	SN76496(config, "sn2", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("sn3", SN76496, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	SN76496(config, "sn3", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 
@@ -622,16 +623,15 @@ void senjyo_state::senjyox_a(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(senjyo_state::starforb)
+void senjyo_state::starforb(machine_config &config)
+{
 	senjyox_e(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(starforb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &senjyo_state::starforb_map);
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(starforb_sound_map)
-MACHINE_CONFIG_END
+	subdevice<z80_device>("sub")->set_addrmap(AS_PROGRAM, &senjyo_state::starforb_sound_map);
+}
 
 
 /***************************************************************************

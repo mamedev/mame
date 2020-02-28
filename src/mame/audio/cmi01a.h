@@ -18,12 +18,18 @@
 
 class cmi01a_device : public device_t, public device_sound_interface {
 public:
+	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t channel)
+		: cmi01a_device(mconfig, tag, owner, clock)
+	{
+		m_channel = channel;
+	}
+
 	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto irq_callback() { return m_irq_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
@@ -50,9 +56,10 @@ private:
 	void run_voice();
 	void update_wave_addr(int inc);
 
+	uint32_t    m_channel;
 	emu_timer * m_zx_timer;
-	uint8_t       m_zx_flag;
-	uint8_t       m_zx_ff;
+	uint8_t     m_zx_flag;
+	uint8_t     m_zx_ff;
 
 	std::unique_ptr<uint8_t[]>    m_wave_ram;
 	uint16_t  m_segment_cnt;
@@ -71,16 +78,16 @@ private:
 
 	devcb_write_line m_irq_cb;
 
-	DECLARE_WRITE8_MEMBER( rp_w );
-	DECLARE_WRITE8_MEMBER( ws_dir_w );
+	void rp_w(uint8_t data);
+	void ws_dir_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( tri_r );
 	DECLARE_WRITE_LINE_MEMBER( pia_0_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia_0_cb2_w );
 
 	DECLARE_READ_LINE_MEMBER( eosi_r );
 	DECLARE_READ_LINE_MEMBER( zx_r );
-	DECLARE_WRITE8_MEMBER( pia_1_a_w );
-	DECLARE_WRITE8_MEMBER( pia_1_b_w );
+	void pia_1_a_w(uint8_t data);
+	void pia_1_b_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( ptm_o1 );
 };

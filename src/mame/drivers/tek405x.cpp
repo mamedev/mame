@@ -149,11 +149,11 @@ void tek4051_state::tek4051_mem(address_map &map)
 	map(0x87a8, 0x87ab).rw(MC6820_KB_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x87b0, 0x87b3).rw(m_gpib_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x87c0, 0x87c0).mirror(0x03).w(FUNC(tek4051_state::lbs_w));
-//  AM_RANGE(0x87c0, 0x87c3) AM_DEVREADWRITE(MC6820_COM_TAG, pia6821_device, read, write)
-//  AM_RANGE(0x87c4, 0x87c5) AM_MIRROR(0x02) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, read, write)
-//  AM_RANGE(0x87c8, 0x87cb) XPC2
-//  AM_RANGE(0x87cc, 0x87cf) XPC3
-//  AM_RANGE(0x87d0, 0x87d3) XPC4
+//  map(0x87c0, 0x87c3).rw(MC6820_COM_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+//  map(0x87c4, 0x87c5).mirror(0x02).rw(MC6850_TAG, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+//  map(0x87c8, 0x87cb) XPC2
+//  map(0x87cc, 0x87cf) XPC3
+//  map(0x87d0, 0x87d3) XPC4
 	map(0x8800, 0xa7ff).rom().region(MC6800_TAG, 0x800);
 	map(0xa800, 0xffff).rom().region(MC6800_TAG, 0x2800);
 }

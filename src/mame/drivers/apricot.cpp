@@ -59,6 +59,7 @@ public:
 		m_floppy0(*this, "ic68:0"),
 		m_floppy1(*this, "ic68:1"),
 		m_palette(*this, "palette"),
+		m_exp(*this, "exp"),
 		m_screen_buffer(*this, "screen_buffer"),
 		m_video_mode(0),
 		m_display_on(1),
@@ -102,7 +103,7 @@ private:
 	required_device<i8086_cpu_device> m_cpu;
 	required_device<i8089_device> m_iop;
 	required_device<ram_device> m_ram;
-	required_device<hd6845_device> m_crtc;
+	required_device<hd6845s_device> m_crtc;
 	required_device<i8255_device> m_ppi;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8253_device> m_pit;
@@ -113,6 +114,7 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<palette_device> m_palette;
+	required_device<apricot_expansion_bus_device> m_exp;
 	required_shared_ptr<uint16_t> m_screen_buffer;
 
 	bool m_video_mode;
@@ -192,7 +194,7 @@ WRITE8_MEMBER( apricot_state::i8255_portb_w )
 		floppy->mon_w(0);
 
 	// switch video modes
-	m_crtc->set_clock(15_MHz_XTAL / (m_video_mode ? 10 : 16));
+	m_crtc->set_unscaled_clock(15_MHz_XTAL / (m_video_mode ? 10 : 16));
 	m_crtc->set_hpixels_per_column(m_video_mode ? 10 : 16);
 
 	// PB7 Centronics transceiver direction. 0 = output, 1 = input
@@ -210,7 +212,7 @@ READ8_MEMBER( apricot_state::sio_da_r )
 	if (m_bus_locked)
 		return m_sio->m1_r();
 
-	return m_sio->da_r(space, offset);
+	return m_sio->da_r();
 }
 
 READ8_MEMBER( apricot_state::sio_ca_r )
@@ -218,7 +220,7 @@ READ8_MEMBER( apricot_state::sio_ca_r )
 	if (m_bus_locked)
 		return m_sio->m1_r();
 
-	return m_sio->ca_r(space, offset);
+	return m_sio->ca_r();
 }
 
 READ8_MEMBER( apricot_state::sio_cb_r )
@@ -226,7 +228,7 @@ READ8_MEMBER( apricot_state::sio_cb_r )
 	if (m_bus_locked)
 		return m_sio->m1_r();
 
-	return m_sio->cb_r(space, offset);
+	return m_sio->cb_r();
 }
 
 READ8_MEMBER( apricot_state::sio_db_r )
@@ -234,7 +236,7 @@ READ8_MEMBER( apricot_state::sio_db_r )
 	if (m_bus_locked)
 		return m_sio->m1_r();
 
-	return m_sio->db_r(space, offset);
+	return m_sio->db_r();
 }
 
 
@@ -345,8 +347,8 @@ void apricot_state::apricot_io(address_map &map)
 	map(0x62, 0x62).r(FUNC(apricot_state::sio_ca_r)).w(m_sio, FUNC(z80sio_device::ca_w)).umask16(0x00ff);
 	map(0x64, 0x64).r(FUNC(apricot_state::sio_db_r)).w(m_sio, FUNC(z80sio_device::db_w)).umask16(0x00ff);
 	map(0x66, 0x66).r(FUNC(apricot_state::sio_cb_r)).w(m_sio, FUNC(z80sio_device::cb_w)).umask16(0x00ff);
-	map(0x68, 0x68).mirror(0x04).w(m_crtc, FUNC(hd6845_device::address_w));
-	map(0x6a, 0x6a).mirror(0x04).rw(m_crtc, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
+	map(0x68, 0x68).mirror(0x04).w(m_crtc, FUNC(hd6845s_device::address_w));
+	map(0x6a, 0x6a).mirror(0x04).rw(m_crtc, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 	map(0x70, 0x70).mirror(0x04).w(FUNC(apricot_state::i8089_ca1_w));
 	map(0x72, 0x72).mirror(0x04).w(FUNC(apricot_state::i8089_ca2_w));
 	map(0x78, 0x7f).noprw(); // unavailable
@@ -387,11 +389,11 @@ void apricot_state::apricot(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
-	HD6845(config, m_crtc, 15_MHz_XTAL / 10);
+	HD6845S(config, m_crtc, 15_MHz_XTAL / 10);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(10);
-	m_crtc->set_update_row_callback(FUNC(apricot_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(apricot_state::crtc_update_row));
 	m_crtc->out_de_callback().set(FUNC(apricot_state::apricot_hd6845_de));
 
 	// sound hardware
@@ -471,7 +473,13 @@ void apricot_state::apricot(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("apricot_flop");
 
 	// expansion bus
-	APRICOT_EXPANSION_BUS(config, "exp", m_cpu, m_iop);
+	APRICOT_EXPANSION_BUS(config, m_exp, 0);
+	m_exp->set_program_space(m_cpu, AS_PROGRAM);
+	m_exp->set_io_space(m_cpu, AS_IO);
+	m_exp->set_program_iop_space(m_iop, AS_PROGRAM);
+	m_exp->set_io_iop_space(m_iop, AS_IO);
+	m_exp->int2().set(m_pic, FUNC(pic8259_device::ir2_w));
+	m_exp->int3().set(m_pic, FUNC(pic8259_device::ir3_w));
 	APRICOT_EXPANSION_SLOT(config, "exp:1", apricot_expansion_cards, nullptr);
 	APRICOT_EXPANSION_SLOT(config, "exp:2", apricot_expansion_cards, nullptr);
 }
@@ -487,13 +495,13 @@ void apricot_state::apricotxi(machine_config &config)
 //**************************************************************************
 
 ROM_START( apricot )
-	ROM_REGION(0x4000, "bootstrap", 0)
+	ROM_REGION16_LE(0x4000, "bootstrap", 0)
 	ROM_LOAD16_BYTE("pc_bios_lo_001.bin", 0x0000, 0x2000, CRC(0c217cc2) SHA1(0d7a2b61e17966462b555115f962a175fadcf72a))
 	ROM_LOAD16_BYTE("pc_bios_hi_001.bin", 0x0001, 0x2000, CRC(7c27f36c) SHA1(c801bbf904815f76ec6463e948f57e0118a26292))
 ROM_END
 
 ROM_START( apricotxi )
-	ROM_REGION(0x4000, "bootstrap", 0)
+	ROM_REGION16_LE(0x4000, "bootstrap", 0)
 	ROM_LOAD16_BYTE("lo_ve007.u11", 0x0000, 0x2000, CRC(e74e14d1) SHA1(569133b0266ce3563b21ae36fa5727308797deee)) // LO Ve007 03.04.84
 	ROM_LOAD16_BYTE("hi_ve007.u9",  0x0001, 0x2000, CRC(b04fb83e) SHA1(cc2b2392f1b4c04bb6ec8ee26f8122242c02e572)) // HI Ve007 03.04.84
 ROM_END

@@ -18,10 +18,10 @@ DEFINE_DEVICE_TYPE(EKARA_CART_SLOT, ekara_cart_slot_device, "ekara_cart_slot", "
 //  device_ekara_cart_interface - constructor
 //-------------------------------------------------
 
-device_ekara_cart_interface::device_ekara_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0)
+device_ekara_cart_interface::device_ekara_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "ekaracart"),
+	m_rom(nullptr),
+	m_rom_size(0)
 {
 }
 
@@ -57,7 +57,7 @@ void device_ekara_cart_interface::rom_alloc(uint32_t size, const char *tag)
 ekara_cart_slot_device::ekara_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, EKARA_CART_SLOT, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_ekara_cart_interface>(mconfig, *this),
 	m_type(EKARA_PLAIN),
 	m_cart(nullptr)
 {
@@ -77,7 +77,7 @@ ekara_cart_slot_device::~ekara_cart_slot_device()
 
 void ekara_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_ekara_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 //-------------------------------------------------
@@ -95,6 +95,7 @@ static const ekara_slot slot_list[] =
 {
 	{ EKARA_PLAIN,       "plain" },
 	{ EKARA_I2C_BASE,    "i2c_base" },
+	{ EKARA_I2C_24C08,   "rom_24c08" },
 	{ EKARA_I2C_24LC04,  "rom_24lc04" },
 	{ EKARA_I2C_24LC02,  "rom_24lc02" },
 };
@@ -237,3 +238,40 @@ WRITE8_MEMBER(ekara_cart_slot_device::write_extra)
 	m_cart->write_extra(space, offset, data);
 }
 
+/*-------------------------------------------------
+ write control
+ -------------------------------------------------*/
+
+WRITE8_MEMBER(ekara_cart_slot_device::write_bus_control)
+{
+	m_cart->write_bus_control(space, offset, data);
+}
+
+bool ekara_cart_slot_device::is_read_access_not_rom(void)
+{
+	return m_cart->is_read_access_not_rom();
+}
+
+bool ekara_cart_slot_device::is_write_access_not_rom(void)
+{
+	return m_cart->is_write_access_not_rom();
+}
+
+/*-------------------------------------------------
+ direct seeprom access (popira2, gc0010)
+ -------------------------------------------------*/
+
+WRITE_LINE_MEMBER(ekara_cart_slot_device::write_sda)
+{
+	m_cart->write_sda(state);
+}
+
+WRITE_LINE_MEMBER(ekara_cart_slot_device::write_scl)
+{
+	m_cart->write_scl(state);
+}
+
+READ_LINE_MEMBER(ekara_cart_slot_device::read_sda )
+{
+	return  m_cart->read_sda();
+}

@@ -4,25 +4,18 @@
 
 Samsung SPC-1000 driver by Miodrag Milanovic
 
-    2009-05-10 Preliminary driver.
-    2014-02-16 Added cassette, many games are playable
+2009-05-10 Preliminary driver.
+2014-02-16 Added cassette, many games are playable
 
 ToDo:
 - Find out if any of the unconnected parts of 6000,4000,4001 are used
 
 
-NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
-                  disk. Since it is not to our coding standards, it is
-                  commented out with #if 0/#endif and 3 slashes (///).
-                  It is planned to be converted when time permits. The
-                  author is Miso Kim.
+Hardware details of the fdc: Intelligent device, Z80 CPU,
+XTAL(8'000'000), PPI 8255, FDC uPD765C, 2 RAM chips, 28 other
+small ics.
 
-                  Hardware details of the fdc: Intelligent device, Z80 CPU,
-                  XTAL(8'000'000), PPI 8255, FDC uPD765C, 2 RAM chips, 28 other
-                  small ics. And of course, no schematic.
-
-
-2014-10-11: Replaced above code with MESS-compliant code [Meeso Kim]
+2014-10-11: Added code for the floppy disk [Meeso Kim]
 
 2015-06-19: Added code for the centronics printer port
 
@@ -134,7 +127,6 @@ NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/ay8910.h"
-#include "sound/wave.h"
 #include "video/mc6847.h"
 
 #include "bus/centronics/ctronics.h"
@@ -229,10 +221,14 @@ WRITE8_MEMBER( spc1000_state::cass_w )
 {
 	attotime time = machine().scheduler().time();
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
-	if (BIT(data, 1) && (time - m_time).as_attoseconds()/ATTOSECONDS_PER_MICROSECOND > 100) {
-		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	if (BIT(data, 1) || (((time - m_time).as_attoseconds()/ATTOSECONDS_PER_MILLISECOND) < 1000))
+	{
+		m_cass->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		m_time = time;
 	}
+	else
+		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+
 	m_centronics->write_strobe(BIT(data, 2) ? true : false);
 }
 
@@ -410,7 +406,7 @@ void spc1000_state::machine_start()
 	membank("bank2")->set_base(ram);
 	membank("bank4")->set_base(ram + 0x8000);
 
-		m_time = machine().scheduler().time();
+	m_time = machine().scheduler().time();
 }
 
 void spc1000_state::machine_reset()
@@ -466,11 +462,12 @@ void spc1000_exp(device_slot_interface &device)
 	device.option_add("vdp", SPC1000_VDP_EXP);
 }
 
-MACHINE_CONFIG_START(spc1000_state::spc1000)
+void spc1000_state::spc1000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(spc1000_mem)
-	MCFG_DEVICE_IO_MAP(spc1000_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &spc1000_state::spc1000_mem);
+	m_maincpu->set_addrmap(AS_IO, &spc1000_state::spc1000_io);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -489,10 +486,8 @@ MACHINE_CONFIG_START(spc1000_state::spc1000)
 	ay8910.port_a_read_callback().set(FUNC(spc1000_state::porta_r));
 	ay8910.port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	MCFG_DEVICE_ADD("ext1", SPC1000_EXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(spc1000_exp, nullptr, false)
+	SPC1000_EXP_SLOT(config, "ext1", spc1000_exp);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(spc1000_state::centronics_busy_w));
@@ -505,13 +500,14 @@ MACHINE_CONFIG_START(spc1000_state::spc1000)
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(spc1000_cassette_formats);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cass->set_interface("spc1000_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("spc1000_cass");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( spc1000 )

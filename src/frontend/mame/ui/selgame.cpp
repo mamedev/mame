@@ -20,17 +20,17 @@
 #include "ui/selsoft.h"
 #include "ui/ui.h"
 
-#include "../info.h"
+#include "infoxml.h"
+#include "luaengine.h"
+#include "mame.h"
 
 #include "audit.h"
 #include "drivenum.h"
 #include "emuopts.h"
-#include "mame.h"
 #include "rendutil.h"
 #include "romload.h"
 #include "softlist_dev.h"
 #include "uiinput.h"
-#include "luaengine.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -251,7 +251,7 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 		ui_globals::rpanel = std::min<int>(std::max<int>(moptions.last_right_panel(), RP_FIRST), RP_LAST);
 
 		std::string tmp(moptions.last_used_filter());
-		std::size_t const found = tmp.find_first_of(",");
+		std::size_t const found = tmp.find_first_of(',');
 		std::string fake_ini;
 		if (found == std::string::npos)
 		{
@@ -306,8 +306,8 @@ menu_select_game::~menu_select_game()
 
 	ui_options &mopt = ui().options();
 	mopt.set_value(OPTION_LAST_RIGHT_PANEL, ui_globals::rpanel, OPTION_PRIORITY_CMDLINE);
-	mopt.set_value(OPTION_LAST_USED_FILTER, filter.c_str(), OPTION_PRIORITY_CMDLINE);
-	mopt.set_value(OPTION_LAST_USED_MACHINE, last_driver.c_str(), OPTION_PRIORITY_CMDLINE);
+	mopt.set_value(OPTION_LAST_USED_FILTER, filter, OPTION_PRIORITY_CMDLINE);
+	mopt.set_value(OPTION_LAST_USED_MACHINE, last_driver, OPTION_PRIORITY_CMDLINE);
 	mopt.set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE);
 	ui().save_ui_options();
 }
@@ -319,7 +319,7 @@ menu_select_game::~menu_select_game()
 void menu_select_game::handle()
 {
 	if (!m_prev_selected)
-		m_prev_selected = item[0].ref;
+		m_prev_selected = item(0).ref;
 
 	// if I have to load datfile, perform a hard reset
 	if (ui_globals::reset)
@@ -371,10 +371,6 @@ void menu_select_game::handle()
 		case IPT_UI_END:
 			if (get_focus() == focused_menu::LEFT)
 				m_filter_highlight = machine_filter::LAST;
-			break;
-
-		case IPT_UI_CONFIGURE:
-			inkey_navigation();
 			break;
 
 		case IPT_UI_EXPORT:
@@ -616,17 +612,17 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		skip_main_items = 0;
 
 	// configure the custom rendering
-	customtop = 3.0f * ui().get_line_height() + 5.0f * UI_BOX_TB_BORDER;
-	custombottom = 5.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = 3.0f * ui().get_line_height() + 5.0f * ui().box_tb_border();
+	custombottom = 5.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
 
 	// reselect prior game launched, if any
 	if (old_item_selected != -1)
 	{
-		selected = old_item_selected;
+		set_selected_index(old_item_selected);
 		if (ui_globals::visible_main_lines == 0)
-			top_line = (selected != 0) ? selected - 1 : 0;
+			top_line = (selected_index() != 0) ? selected_index() - 1 : 0;
 		else
-			top_line = selected - (ui_globals::visible_main_lines / 2);
+			top_line = selected_index() - (ui_globals::visible_main_lines / 2);
 
 		if (reselect_last::software().empty())
 			reselect_last::reset();
@@ -898,8 +894,8 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		driver_enumerator drv(machine().options(), *ui_swinfo->driver);
 		media_auditor auditor(drv);
 		drv.next();
-		software_list_device *swlist = software_list_device::find_by_name(*drv.config(), ui_swinfo->listname.c_str());
-		const software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
+		software_list_device *swlist = software_list_device::find_by_name(*drv.config(), ui_swinfo->listname);
+		const software_info *swinfo = swlist->find(ui_swinfo->shortname);
 
 		media_auditor::summary const summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);
 
@@ -1075,6 +1071,21 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	else
 		str << _("Sound\tOK\n");
 
+	if (flags.unemulated_features() & device_t::feature::CAPTURE)
+		str << _("Capture\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::CAPTURE)
+		str << _("Capture\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::CAMERA)
+		str << _("Camera\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::CAMERA)
+		str << _("Camera\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::MICROPHONE)
+		str << _("Microphone\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::MICROPHONE)
+		str << _("Microphone\tImperfect\n");
+
 	if (flags.unemulated_features() & device_t::feature::CONTROLS)
 		str << _("Controls\tUnimplemented\n");
 	else if (flags.imperfect_features() & device_t::feature::CONTROLS)
@@ -1090,15 +1101,10 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	else if (flags.imperfect_features() & device_t::feature::MOUSE)
 		str << _("Mouse\tImperfect\n");
 
-	if (flags.unemulated_features() & device_t::feature::MICROPHONE)
-		str << _("Microphone\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::MICROPHONE)
-		str << _("Microphone\tImperfect\n");
-
-	if (flags.unemulated_features() & device_t::feature::CAMERA)
-		str << _("Camera\tUnimplemented\n");
-	else if (flags.imperfect_features() & device_t::feature::CAMERA)
-		str << _("Camera\tImperfect\n");
+	if (flags.unemulated_features() & device_t::feature::MEDIA)
+		str << _("Media\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::MEDIA)
+		str << _("Media\tImperfect\n");
 
 	if (flags.unemulated_features() & device_t::feature::DISK)
 		str << _("Disk\tUnimplemented\n");
@@ -1109,6 +1115,31 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 		str << _("Printer\tUnimplemented\n");
 	else if (flags.imperfect_features() & device_t::feature::PRINTER)
 		str << _("Printer\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::TAPE)
+		str << _("Mag. Tape\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::TAPE)
+		str << _("Mag. Tape\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::PUNCH)
+		str << _("Punch Tape\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::PUNCH)
+		str << _("Punch Tape\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::DRUM)
+		str << _("Mag. Drum\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::DRUM)
+		str << _("Mag. Drum\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::ROM)
+		str << _("(EP)ROM\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::ROM)
+		str << _("(EP)ROM\tImperfect\n");
+
+	if (flags.unemulated_features() & device_t::feature::COMMS)
+		str << _("Communications\tUnimplemented\n");
+	else if (flags.imperfect_features() & device_t::feature::COMMS)
+		str << _("Communications\tImperfect\n");
 
 	if (flags.unemulated_features() & device_t::feature::LAN)
 		str << _("LAN\tUnimplemented\n");
@@ -1361,7 +1392,7 @@ void menu_select_game::make_topbox_text(std::string &line0, std::string &line1, 
 	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"),
 			emulator_info::get_appname(),
 			bare_build_version,
-			visible_items,
+			m_available_items,
 			(driver_list::total() - 1),
 			m_persistent_data.bios_count());
 

@@ -151,7 +151,7 @@ void atari_cage_device::device_start()
 	m_cpu_h1_clock_period = cage_cpu_clock_period * 2;
 
 	if (m_speedup) {
-		m_cpu->space(AS_PROGRAM).install_write_handler(m_speedup, m_speedup, write32_delegate(FUNC(atari_cage_device::speedup_w),this));
+		m_cpu->space(AS_PROGRAM).install_write_handler(m_speedup, m_speedup, write32_delegate(*this, FUNC(atari_cage_device::speedup_w)));
 		m_speedup_ram = m_cageram + m_speedup;
 	}
 
@@ -469,7 +469,7 @@ WRITE32_MEMBER( atari_cage_device::cage_to_main_w )
 {
 	if (LOG_COMM)
 		logerror("%s Data from CAGE = %04X\n", machine().describe_context(), data);
-	m_soundlatch->write(space, 0, data, mem_mask);
+	m_soundlatch->write(data);
 	m_cage_to_cpu_ready = 1;
 	update_control_lines();
 }
@@ -489,10 +489,10 @@ READ32_MEMBER( atari_cage_device::cage_io_status_r )
 uint16_t atari_cage_device::main_r()
 {
 	if (LOG_COMM)
-		logerror("%s:main read data = %04X\n", machine().describe_context(), m_soundlatch->read(machine().dummy_space(), 0, 0));
+		logerror("%s:main read data = %04X\n", machine().describe_context(), m_soundlatch->read());
 	m_cage_to_cpu_ready = 0;
 	update_control_lines();
-	return m_soundlatch->read(machine().dummy_space(), 0, 0xffff);
+	return m_soundlatch->read();
 }
 
 
@@ -588,7 +588,6 @@ void atari_cage_device::cage_map(address_map &map)
 	map(0x200000, 0x200000).nopw();
 	map(0x400000, 0x47ffff).bankr("bootbank");
 	map(0x808000, 0x8080ff).rw(FUNC(atari_cage_device::tms32031_io_r), FUNC(atari_cage_device::tms32031_io_w));
-	map(0x809800, 0x809fff).ram();
 	map(0xa00000, 0xa00000).rw(FUNC(atari_cage_device::cage_from_main_r), FUNC(atari_cage_device::cage_to_main_w));
 	map(0xc00000, 0xffffff).bankr("mainbank");
 }
@@ -600,7 +599,6 @@ void atari_cage_seattle_device::cage_map_seattle(address_map &map)
 	map(0x200000, 0x200000).nopw();
 	map(0x400000, 0x47ffff).bankr("bootbank");
 	map(0x808000, 0x8080ff).rw(FUNC(atari_cage_seattle_device::tms32031_io_r), FUNC(atari_cage_seattle_device::tms32031_io_w));
-	map(0x809800, 0x809fff).ram();
 	map(0xa00000, 0xa00000).rw(FUNC(atari_cage_seattle_device::cage_from_main_r), FUNC(atari_cage_seattle_device::cage_from_main_ack_w));
 	map(0xa00001, 0xa00001).w(FUNC(atari_cage_seattle_device::cage_to_main_w));
 	map(0xa00003, 0xa00003).r(FUNC(atari_cage_seattle_device::cage_io_status_r));

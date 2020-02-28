@@ -158,10 +158,10 @@ void duet16_state::duet16_mem(address_map &map)
 	map(0xf8020, 0xf8023).rw(FUNC(duet16_state::pic_r), FUNC(duet16_state::pic_w)).umask16(0x00ff);
 	map(0xf8040, 0xf804f).rw("itm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 	map(0xf8060, 0xf8067).rw("bgpit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0xf8080, 0xf8087).rw("sio", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w)).umask16(0x00ff);
+	map(0xf8080, 0xf8087).rw("sio", FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w)).umask16(0x00ff);
 	map(0xf80a0, 0xf80a3).rw("kbusart", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
-	map(0xf80c0, 0xf80c0).rw("crtc", FUNC(h46505_device::status_r), FUNC(h46505_device::address_w));
-	map(0xf80c2, 0xf80c2).rw("crtc", FUNC(h46505_device::register_r), FUNC(h46505_device::register_w));
+	map(0xf80c0, 0xf80c0).rw("crtc", FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));
+	map(0xf80c2, 0xf80c2).rw("crtc", FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 	map(0xf80e0, 0xf80e3).rw("i8741", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
 	map(0xf8100, 0xf8103).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0xf8120, 0xf8120).rw(FUNC(duet16_state::rtc_r), FUNC(duet16_state::rtc_w));
@@ -353,7 +353,8 @@ static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(duet16_state::duet16)
+void duet16_state::duet16(machine_config &config)
+{
 	I8086(config, m_maincpu, 24_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &duet16_state::duet16_mem);
 	m_maincpu->set_addrmap(AS_IO, &duet16_state::duet16_io);
@@ -366,7 +367,7 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	i8087.irq().set(m_pic, FUNC(pic8259_device::ir2_w)); // INT87
 	i8087.busy().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
-	I8741(config, "i8741", 20_MHz_XTAL / 4);
+	I8741A(config, "i8741", 20_MHz_XTAL / 4);
 
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
@@ -375,18 +376,18 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	m_dmac->out_hreq_callback().set(FUNC(duet16_state::hrq_w));
 	m_dmac->in_memr_callback().set(FUNC(duet16_state::dma_mem_r));
 	m_dmac->out_memw_callback().set(FUNC(duet16_state::dma_mem_w));
-	m_dmac->in_ior_callback<0>().set(m_fdc, FUNC(upd765a_device::mdma_r));
-	m_dmac->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::mdma_w));
+	m_dmac->in_ior_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dmac->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dmac->out_eop_callback().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
 	pit8253_device &bgpit(PIT8253(config, "bgpit", 0));
 	bgpit.set_clk<0>(8_MHz_XTAL / 13);
 	bgpit.set_clk<1>(8_MHz_XTAL / 13);
 	bgpit.set_clk<2>(8_MHz_XTAL / 13);
-	bgpit.out_handler<0>().set("sio", FUNC(upd7201_new_device::txca_w)); // TODO: selected through LS153
-	bgpit.out_handler<0>().append("sio", FUNC(upd7201_new_device::rxca_w));
-	bgpit.out_handler<1>().set("sio", FUNC(upd7201_new_device::txcb_w));
-	bgpit.out_handler<1>().append("sio", FUNC(upd7201_new_device::rxcb_w));
+	bgpit.out_handler<0>().set("sio", FUNC(upd7201_device::txca_w)); // TODO: selected through LS153
+	bgpit.out_handler<0>().append("sio", FUNC(upd7201_device::rxca_w));
+	bgpit.out_handler<1>().set("sio", FUNC(upd7201_device::txcb_w));
+	bgpit.out_handler<1>().append("sio", FUNC(upd7201_device::rxcb_w));
 	bgpit.out_handler<2>().set("kbusart", FUNC(i8251_device::write_txc));
 	bgpit.out_handler<2>().append("kbusart", FUNC(i8251_device::write_rxc));
 
@@ -396,7 +397,7 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	itm.o3_callback().append("itm", FUNC(ptm6840_device::set_c2));
 	itm.irq_callback().set(m_tmint, FUNC(input_merger_device::in_w<0>));
 
-	upd7201_new_device& sio(UPD7201_NEW(config, "sio", 8_MHz_XTAL / 2));
+	upd7201_device& sio(UPD7201(config, "sio", 8_MHz_XTAL / 2));
 	sio.out_int_callback().set("pic", FUNC(pic8259_device::ir1_w)); // INT5
 
 	i8251_device &kbusart(I8251(config, "kbusart", 8_MHz_XTAL / 4));
@@ -419,20 +420,20 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	FLOPPY_CONNECTOR(config, "fdc:0", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats, true);
 	FLOPPY_CONNECTOR(config, "fdc:1", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats, true);
 
-	h46505_device &crtc(H46505(config, "crtc", 2000000));
+	hd6845s_device &crtc(HD6845S(config, "crtc", 2000000)); // "46505S" on schematics
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(duet16_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(duet16_state::crtc_update_row));
 
-	MCFG_PALETTE_ADD("palette", 8)
+	PALETTE(config, m_pal).set_entries(8);
 	PALETTE(config, m_chrpal, palette_device::BRG_3BIT);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "chrpal", gfx_duet16)
+	GFXDECODE(config, "gfxdecode", m_chrpal, gfx_duet16);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
 	MSM58321(config, m_rtc, 32768_Hz_XTAL);
 	m_rtc->d0_handler().set(FUNC(duet16_state::rtc_d0_w));
@@ -442,10 +443,10 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	m_rtc->busy_handler().set(FUNC(duet16_state::rtc_busy_w));
 	m_rtc->set_year0(1980);
 	m_rtc->set_default_24h(true);
-MACHINE_CONFIG_END
+}
 
 ROM_START(duet16)
-	ROM_REGION(0x2000, "rom", 0)
+	ROM_REGION16_LE(0x2000, "rom", 0)
 	ROM_LOAD16_BYTE("duet16_h516a_3.bin", 0x0001, 0x1000, CRC(936706aa) SHA1(412ff9c7bf4443d2ed29a8d792fc3c849c9393cc))
 	ROM_LOAD16_BYTE("duet16_h517a_z.bin", 0x0000, 0x1000, CRC(1633cce8) SHA1(5145d04a48921cacfed17a94873e8988772fc8d4))
 

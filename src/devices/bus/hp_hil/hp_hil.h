@@ -79,10 +79,11 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class device_hp_hil_interface;
 class hp_hil_mlc_device;
 
 
-class hp_hil_slot_device : public device_t, public device_slot_interface
+class hp_hil_slot_device : public device_t, public device_single_card_slot_interface<device_hp_hil_interface>
 {
 public:
 	// construction/destruction
@@ -111,9 +112,7 @@ protected:
 DECLARE_DEVICE_TYPE(HP_HIL_SLOT, hp_hil_slot_device)
 
 
-class device_hp_hil_interface;
-
-class hp_hil_mlc_device :  public device_t
+class hp_hil_mlc_device : public device_t
 {
 public:
 	// construction/destruction
@@ -153,7 +152,7 @@ DECLARE_DEVICE_TYPE(HP_HIL_MLC, hp_hil_mlc_device)
 
 // ======================> device_hp_hil_interface
 
-class device_hp_hil_interface : public device_slot_card_interface
+class device_hp_hil_interface : public device_interface
 {
 	friend class hp_hil_mlc_device;
 	template <class ElementType> friend class simple_list;

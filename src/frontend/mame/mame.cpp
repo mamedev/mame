@@ -17,7 +17,7 @@
 #include "validity.h"
 #include "clifront.h"
 #include "luaengine.h"
-#include <time.h>
+#include <ctime>
 #include "ui/ui.h"
 #include "ui/selgame.h"
 #include "ui/simpleselgame.h"
@@ -88,6 +88,11 @@ void mame_machine_manager::schedule_new_driver(const game_driver &driver)
 /***************************************************************************
     CORE IMPLEMENTATION
 ***************************************************************************/
+
+//-------------------------------------------------
+//  update_machine
+//-------------------------------------------------
+
 void mame_machine_manager::update_machine()
 {
 	m_lua->set_machine(m_machine);
@@ -95,7 +100,11 @@ void mame_machine_manager::update_machine()
 }
 
 
-std::vector<std::string> split(const std::string &text, char sep)
+//-------------------------------------------------
+//  split
+//-------------------------------------------------
+
+static std::vector<std::string> split(const std::string &text, char sep)
 {
 	std::vector<std::string> tokens;
 	std::size_t start = 0, end = 0;
@@ -110,18 +119,27 @@ std::vector<std::string> split(const std::string &text, char sep)
 	return tokens;
 }
 
+
+//-------------------------------------------------
+//  start_luaengine
+//-------------------------------------------------
+
 void mame_machine_manager::start_luaengine()
 {
 	if (options().plugins())
 	{
+		// scan all plugin directories
 		path_iterator iter(options().plugins_path());
 		std::string pluginpath;
 		while (iter.next(pluginpath))
 		{
-			m_plugins->parse_json(pluginpath);
+			// user may specify environment variables; subsitute them
+			osd_subst_env(pluginpath, pluginpath);
+
+			// and then scan the directory recursively
+			m_plugins->scan_directory(pluginpath, true);
 		}
-		std::vector<std::string> include = split(options().plugin(), ',');
-		std::vector<std::string> exclude = split(options().no_plugin(), ',');
+
 		{
 			// parse the file
 			// attempt to open the output file
@@ -130,7 +148,7 @@ void mame_machine_manager::start_luaengine()
 			{
 				try
 				{
-					m_plugins->parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, false);
+					m_plugins->parse_ini_file((util::core_file&)file);
 				}
 				catch (options_exception &)
 				{
@@ -138,31 +156,34 @@ void mame_machine_manager::start_luaengine()
 				}
 			}
 		}
-		for (auto &curentry : m_plugins->entries())
+
+		// process includes
+		for (const std::string &incl : split(options().plugin(), ','))
 		{
-			if (curentry->type() != core_options::option_type::HEADER)
-			{
-				if (std::find(include.begin(), include.end(), curentry->name()) != include.end())
-				{
-					m_plugins->set_value(curentry->name(), "1", OPTION_PRIORITY_CMDLINE);
-				}
-				if (std::find(exclude.begin(), exclude.end(), curentry->name()) != exclude.end())
-				{
-					m_plugins->set_value(curentry->name(), "0", OPTION_PRIORITY_CMDLINE);
-				}
-			}
+			plugin *p = m_plugins->find(incl);
+			if (!p)
+				fatalerror("Fatal error: Could not load plugin: %s\n", incl.c_str());
+			p->m_start = true;
+		}
+
+		// process excludes
+		for (const std::string &excl : split(options().no_plugin(), ','))
+		{
+			plugin *p = m_plugins->find(excl);
+			if (!p)
+				fatalerror("Fatal error: Unknown plugin: %s\n", excl.c_str());
+			p->m_start = false;
 		}
 	}
+
+	// we have a special way to open the console plugin
 	if (options().console())
 	{
-		if (m_plugins->exists(OPTION_CONSOLE))
-		{
-			m_plugins->set_value(OPTION_CONSOLE, "1", OPTION_PRIORITY_CMDLINE);
-		}
-		else
-		{
-			fatalerror("Console plugin not found.\n");
-		}
+		plugin *p = m_plugins->find(OPTION_CONSOLE);
+		if (!p)
+			fatalerror("Fatal error: Console plugin not found.\n");
+
+		p->m_start = true;
 	}
 
 	m_lua->initialize();
@@ -179,9 +200,10 @@ void mame_machine_manager::start_luaengine()
 	}
 }
 
-/*-------------------------------------------------
-    execute - run the core emulation
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  execute - run the core emulation
+//-------------------------------------------------
 
 int mame_machine_manager::execute()
 {
@@ -301,6 +323,11 @@ void mame_machine_manager::ui_initialize(running_machine& machine)
 	m_ui->display_startup_screens(m_firstrun);
 }
 
+void mame_machine_manager::before_load_settings(running_machine& machine)
+{
+	m_lua->on_machine_before_load_settings();
+}
+
 void mame_machine_manager::create_custom(running_machine& machine)
 {
 	// start the inifile manager
@@ -317,6 +344,32 @@ void mame_machine_manager::load_cheatfiles(running_machine& machine)
 {
 	// set up the cheat engine
 	m_cheat = std::make_unique<cheat_manager>(machine);
+}
+
+//-------------------------------------------------
+//  missing_mandatory_images - search for devices
+//  which need an image to be loaded
+//-------------------------------------------------
+
+std::vector<std::reference_wrapper<const std::string>> mame_machine_manager::missing_mandatory_images()
+{
+	std::vector<std::reference_wrapper<const std::string>> results;
+	assert(m_machine);
+
+	// make sure that any required image has a mounted file
+	for (device_image_interface &image : image_interface_iterator(m_machine->root_device()))
+	{
+		if (image.must_be_loaded())
+		{
+			if (m_machine->options().image_option(image.instance_name()).value().empty())
+			{
+				// this is a missing image; give LUA plugins a chance to handle it
+				if (!lua()->on_missing_mandatory_image(image.instance_name()))
+					results.push_back(std::reference_wrapper<const std::string>(image.instance_name()));
+			}
+		}
+	}
+	return results;
 }
 
 const char * emulator_info::get_bare_build_version() { return bare_build_version; }
@@ -358,6 +411,11 @@ void emulator_info::periodic_check()
 bool emulator_info::frame_hook()
 {
 	return mame_machine_manager::instance()->lua()->frame_hook();
+}
+
+void emulator_info::sound_hook()
+{
+	return mame_machine_manager::instance()->lua()->on_sound_update();
 }
 
 void emulator_info::layout_file_cb(util::xml::data_node const &layout)

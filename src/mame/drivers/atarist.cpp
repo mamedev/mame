@@ -69,7 +69,7 @@ void st_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 		blitter_tick();
 		break;
 	default:
-		assert_always(false, "Unknown id in st_state::device_timer");
+		throw emu_fatalerror("Unknown id in st_state::device_timer");
 	}
 }
 
@@ -1213,6 +1213,16 @@ void st_state::ikbd_map(address_map &map)
 
 
 //-------------------------------------------------
+//  ADDRESS_MAP( cpu_space_map )
+//-------------------------------------------------
+
+void st_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffffd, 0xfffffd).r(m_mfp, FUNC(mc68901_device::get_vector));
+}
+
+//-------------------------------------------------
 //  ADDRESS_MAP( st_map )
 //-------------------------------------------------
 
@@ -1223,7 +1233,7 @@ void st_state::st_map(address_map &map)
 	map(0x000008, 0x1fffff).ram();
 	map(0x200000, 0x3fffff).ram();
 	map(0x400000, 0xf9ffff).rw(FUNC(st_state::berr_r), FUNC(st_state::berr_w));
-	//AM_RANGE(0xfa0000, 0xfbffff)      // mapped by the cartslot
+	//map(0xfa0000, 0xfbffff)      // mapped by the cartslot
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0).w(FUNC(st_state::berr_w));
 	map(0xff8001, 0xff8001).rw(FUNC(st_state::mmu_r), FUNC(st_state::mmu_w));
 	map(0xff8200, 0xff8203).rw(FUNC(st_state::shifter_base_r), FUNC(st_state::shifter_base_w)).umask16(0x00ff);
@@ -1325,7 +1335,7 @@ void ste_state::ste_map(address_map &map)
 void megaste_state::megaste_map(address_map &map)
 {
 	st_map(map);
-	map(0xff8c80, 0xff8c87).rw(Z8530_TAG, FUNC(scc8530_t::reg_r), FUNC(scc8530_t::reg_w)).umask16(0x00ff);
+	map(0xff8c80, 0xff8c87).rw(Z8530_TAG, FUNC(scc8530_legacy_device::reg_r), FUNC(scc8530_legacy_device::reg_w)).umask16(0x00ff);
 	map(0xfffc20, 0xfffc3f).rw(RP5C15_TAG, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write)).umask16(0x00ff);
 }
 
@@ -1338,47 +1348,47 @@ void stbook_state::stbook_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).ram();
 	map(0x200000, 0x3fffff).ram();
-//  AM_RANGE(0xd40000, 0xd7ffff) AM_ROM
+//  map(0xd40000, 0xd7ffff).rom();
 	map(0xe00000, 0xe3ffff).rom().region(M68000_TAG, 0);
-//  AM_RANGE(0xe80000, 0xebffff) AM_ROM
-//  AM_RANGE(0xfa0000, 0xfbffff) AM_ROM // cartridge
+//  map(0xe80000, 0xebffff).rom();
+//  map(0xfa0000, 0xfbffff).rom(); // cartridge
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
-/*  AM_RANGE(0xf00000, 0xf1ffff) AM_READWRITE(stbook_ide_r, stbook_ide_w)
-    AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(stbook_mmu_r, stbook_mmu_w)
-    AM_RANGE(0xff8200, 0xff8203) AM_READWRITE(stbook_shifter_base_r, stbook_shifter_base_w)
-    AM_RANGE(0xff8204, 0xff8209) AM_READWRITE(stbook_shifter_counter_r, stbook_shifter_counter_w)
-    AM_RANGE(0xff820a, 0xff820b) AM_READWRITE8(stbook_shifter_sync_r, stbook_shifter_sync_w, 0xff00)
-    AM_RANGE(0xff820c, 0xff820d) AM_READWRITE(stbook_shifter_base_low_r, stbook_shifter_base_low_w)
-    AM_RANGE(0xff820e, 0xff820f) AM_READWRITE(stbook_shifter_lineofs_r, stbook_shifter_lineofs_w)
-    AM_RANGE(0xff8240, 0xff8241) AM_READWRITE(stbook_shifter_palette_r, stbook_shifter_palette_w)
-    AM_RANGE(0xff8260, 0xff8261) AM_READWRITE8(stbook_shifter_mode_r, stbook_shifter_mode_w, 0xff00)
-    AM_RANGE(0xff8264, 0xff8265) AM_READWRITE(stbook_shifter_pixelofs_r, stbook_shifter_pixelofs_w)
-    AM_RANGE(0xff827e, 0xff827f) AM_WRITE(lcd_control_w)*/
+/*  map(0xf00000, 0xf1ffff).rw(FUNC(stbook_state::stbook_ide_r), FUNC(stbook_state::stbook_ide_w));
+    map(0xff8000, 0xff8001).rw(FUNC(stbook_state::stbook_mmu_r), FUNC(stbook_state::stbook_mmu_w));
+    map(0xff8200, 0xff8203).rw(FUNC(stbook_state::stbook_shifter_base_r), FUNC(stbook_state::stbook_shifter_base_w));
+    map(0xff8204, 0xff8209).rw(FUNC(stbook_state::stbook_shifter_counter_r), FUNC(stbook_state::stbook_shifter_counter_w));
+    map(0xff820a, 0xff820a).rw(FUNC(stbook_state::stbook_shifter_sync_r), FUNC(stbook_state::stbook_shifter_sync_w));
+    map(0xff820c, 0xff820d).rw(FUNC(stbook_state::stbook_shifter_base_low_r), FUNC(stbook_state::stbook_shifter_base_low_w));
+    map(0xff820e, 0xff820f).rw(FUNC(stbook_state::stbook_shifter_lineofs_r), FUNC(stbook_state::stbook_shifter_lineofs_w));
+    map(0xff8240, 0xff8241).rw(FUNC(stbook_state::stbook_shifter_palette_r), FUNC(stbook_state::stbook_shifter_palette_w));
+    map(0xff8260, 0xff8260).rw(FUNC(stbook_state::stbook_shifter_mode_r), FUNC(stbook_state::stbook_shifter_mode_w));
+    map(0xff8264, 0xff8265).rw(FUNC(stbook_state::stbook_shifter_pixelofs_r), FUNC(stbook_state::stbook_shifter_pixelofs_w));
+    map(0xff827e, 0xff827f).w(FUNC(stbook_state::lcd_control_w));*/
 	map(0xff8800, 0xff8800).rw(YM3439_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0xff8802, 0xff8802).w(YM3439_TAG, FUNC(ay8910_device::data_w));
-/*  AM_RANGE(0xff8900, 0xff8901) AM_READWRITE8(sound_dma_control_r, sound_dma_control_w, 0x00ff)
-    AM_RANGE(0xff8902, 0xff8907) AM_READWRITE8(sound_dma_base_r, sound_dma_base_w, 0x00ff)
-    AM_RANGE(0xff8908, 0xff890d) AM_READ8(sound_dma_counter_r, 0x00ff)
-    AM_RANGE(0xff890e, 0xff8913) AM_READWRITE8(sound_dma_end_r, sound_dma_end_w, 0x00ff)
-    AM_RANGE(0xff8920, 0xff8921) AM_READWRITE8(sound_mode_r, sound_mode_w, 0x00ff)
-    AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(microwire_data_r, microwire_data_w)
-    AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(microwire_mask_r, microwire_mask_w)
-    AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(blitter_halftone_r, blitter_halftone_w)
-    AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(blitter_src_inc_x_r, blitter_src_inc_x_w)
-    AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(blitter_src_inc_y_r, blitter_src_inc_y_w)
-    AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE(blitter_src_r, blitter_src_w)
-    AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE(blitter_end_mask_r, blitter_end_mask_w)
-    AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE(blitter_dst_inc_x_r, blitter_dst_inc_x_w)
-    AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w)
-    AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE(blitter_dst_r, blitter_dst_w)
-    AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE(blitter_count_x_r, blitter_count_x_w)
-    AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(blitter_count_y_r, blitter_count_y_w)
-    AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(blitter_op_r, blitter_op_w)
-    AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)
-    AM_RANGE(0xff9200, 0xff9201) AM_READ(config_r)
-    AM_RANGE(0xff9202, 0xff9203) AM_READWRITE(lcd_contrast_r, lcd_contrast_w)
-    AM_RANGE(0xff9210, 0xff9211) AM_READWRITE(power_r, power_w)
-    AM_RANGE(0xff9214, 0xff9215) AM_READWRITE(reference_r, reference_w)*/
+/*  map(0xff8901, 0xff8901).rw(FUNC(stbook_state::sound_dma_control_r), FUNC(stbook_state::sound_dma_control_w));
+    map(0xff8902, 0xff8907).rw(FUNC(stbook_state::sound_dma_base_r), FUNC(stbook_state::sound_dma_base_w)).umask16(0x00ff);
+    map(0xff8908, 0xff890d).r(FUNC(stbook_state::sound_dma_counter_r)).umask16(0x00ff);
+    map(0xff890e, 0xff8913).rw(FUNC(stbook_state::sound_dma_end_r), FUNC(stbook_state::sound_dma_end_w)).umask16(0x00ff);
+    map(0xff8921, 0xff8921).rw(FUNC(stbook_state::sound_mode_r), FUNC(stbook_state::sound_mode_w));
+    map(0xff8922, 0xff8923).rw(FUNC(stbook_state::microwire_data_r), FUNC(stbook_state::microwire_data_w));
+    map(0xff8924, 0xff8925).rw(FUNC(stbook_state::microwire_mask_r), FUNC(stbook_state::microwire_mask_w));
+    map(0xff8a00, 0xff8a1f).rw(FUNC(stbook_state::blitter_halftone_r), FUNC(stbook_state::blitter_halftone_w));
+    map(0xff8a20, 0xff8a21).rw(FUNC(stbook_state::blitter_src_inc_x_r), FUNC(stbook_state::blitter_src_inc_x_w));
+    map(0xff8a22, 0xff8a23).rw(FUNC(stbook_state::blitter_src_inc_y_r), FUNC(stbook_state::blitter_src_inc_y_w));
+    map(0xff8a24, 0xff8a27).rw(FUNC(stbook_state::blitter_src_r), FUNC(stbook_state::blitter_src_w));
+    map(0xff8a28, 0xff8a2d).rw(FUNC(stbook_state::blitter_end_mask_r), FUNC(stbook_state::blitter_end_mask_w));
+    map(0xff8a2e, 0xff8a2f).rw(FUNC(stbook_state::blitter_dst_inc_x_r), FUNC(stbook_state::blitter_dst_inc_x_w));
+    map(0xff8a30, 0xff8a31).rw(FUNC(stbook_state::blitter_dst_inc_y_r), FUNC(stbook_state::blitter_dst_inc_y_w));
+    map(0xff8a32, 0xff8a35).rw(FUNC(stbook_state::blitter_dst_r), FUNC(stbook_state::blitter_dst_w));
+    map(0xff8a36, 0xff8a37).rw(FUNC(stbook_state::blitter_count_x_r), FUNC(stbook_state::blitter_count_x_w));
+    map(0xff8a38, 0xff8a39).rw(FUNC(stbook_state::blitter_count_y_r), FUNC(stbook_state::blitter_count_y_w));
+    map(0xff8a3a, 0xff8a3b).rw(FUNC(stbook_state::blitter_op_r), FUNC(stbook_state::blitter_op_w));
+    map(0xff8a3c, 0xff8a3d).rw(FUNC(stbook_state::blitter_ctrl_r), FUNC(stbook_state::blitter_ctrl_w));
+    map(0xff9200, 0xff9201).r(FUNC(stbook_state::config_r));
+    map(0xff9202, 0xff9203).rw(FUNC(stbook_state::lcd_contrast_r), FUNC(stbook_state::lcd_contrast_w));
+    map(0xff9210, 0xff9211).rw(FUNC(stbook_state::power_r), FUNC(stbook_state::power_w));
+    map(0xff9214, 0xff9215).rw(FUNC(stbook_state::reference_r), FUNC(stbook_state::reference_w));*/
 }
 #endif
 
@@ -1770,11 +1780,6 @@ WRITE_LINE_MEMBER(st_state::write_acia_clock)
 }
 
 
-WRITE_LINE_MEMBER( st_state::mfp_tdo_w )
-{
-	m_mfp->clock_w(state);
-}
-
 WRITE_LINE_MEMBER( st_state::fdc_drq_w )
 {
 	if (state && (!(m_fdc_mode & DMA_MODE_ENABLED)) && (m_fdc_mode & DMA_MODE_FDC_HDC_ACK))
@@ -1785,21 +1790,6 @@ WRITE_LINE_MEMBER( st_state::fdc_drq_w )
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
-
-//-------------------------------------------------
-//  IRQ_CALLBACK_MEMBER( atarist_int_ack )
-//-------------------------------------------------
-
-IRQ_CALLBACK_MEMBER(st_state::atarist_int_ack)
-{
-	if (irqline == M68K_IRQ_6)
-	{
-		return m_mfp->get_vector();
-	}
-
-	return M68K_INT_ACK_AUTOVECTOR;
-}
-
 
 //-------------------------------------------------
 //  configure_memory -
@@ -1867,7 +1857,7 @@ void st_state::machine_start()
 	configure_memory();
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
 
 	// allocate timers
 	if (m_mousex.found())
@@ -1922,7 +1912,7 @@ void ste_state::machine_start()
 	configure_memory();
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
 
 	/* allocate timers */
 	m_dmasound_timer = timer_alloc(TIMER_DMASOUND_TICK);
@@ -1969,7 +1959,7 @@ void stbook_state::machine_start()
 	}
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
 
 	/* register for state saving */
 	ste_state::state_save();
@@ -1998,7 +1988,7 @@ void st_state::common(machine_config &config)
 {
 	// basic machine hardware
 	M68000(config, m_maincpu, Y2/4);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(st_state::atarist_int_ack));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &st_state::cpu_space_map);
 
 	keyboard(config);
 
@@ -2024,14 +2014,13 @@ void st_state::common(machine_config &config)
 
 	MC68901(config, m_mfp, Y2/8);
 	m_mfp->set_timer_clock(Y1);
-	m_mfp->set_rx_clock(0);
-	m_mfp->set_tx_clock(0);
 	m_mfp->out_irq_cb().set_inputline(m_maincpu, M68K_IRQ_6);
-	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
+	m_mfp->out_tdo_cb().set(m_mfp, FUNC(mc68901_device::tc_w));
+	m_mfp->out_tdo_cb().append(m_mfp, FUNC(mc68901_device::rc_w));
 	m_mfp->out_so_cb().set(m_rs232, FUNC(rs232_port_device::write_txd));
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->rxd_handler().set(m_mfp, FUNC(mc68901_device::write_rx));
+	m_rs232->rxd_handler().set(m_mfp, FUNC(mc68901_device::si_w));
 	m_rs232->dcd_handler().set(m_mfp, FUNC(mc68901_device::i1_w));
 	m_rs232->cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
 	m_rs232->ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));
@@ -2074,7 +2063,7 @@ void st_state::keyboard(machine_config &config)
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( st )
+//  machine_config( st )
 //-------------------------------------------------
 
 void st_state::st(machine_config &config)
@@ -2106,7 +2095,7 @@ void st_state::st(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( megast )
+//  machine_config( megast )
 //-------------------------------------------------
 
 void megast_state::megast(machine_config &config)
@@ -2141,7 +2130,7 @@ void megast_state::megast(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ste )
+//  machine_config( ste )
 //-------------------------------------------------
 
 void ste_state::ste(machine_config &config)
@@ -2164,9 +2153,9 @@ void ste_state::ste(machine_config &config)
 	m_ymsnd->add_route(0, "lspeaker", 0.50);
 	m_ymsnd->add_route(0, "rspeaker", 0.50);
 /*
-    MCFG_DEVICE_ADD("custom", CUSTOM, 0) // DAC
-    MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
-    MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
+    custom_device &custom_dac(CUSTOM(config, "custom", 0)); // DAC
+    custom_dac.add_route(0, "rspeaker", 0.50);
+    custom_dac.add_route(1, "lspeaker", 0.50);
 */
 	LMC1992(config, LMC1992_TAG);
 
@@ -2181,7 +2170,7 @@ void ste_state::ste(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( megaste )
+//  machine_config( megaste )
 //-------------------------------------------------
 
 void megaste_state::megaste(machine_config &config)
@@ -2198,7 +2187,7 @@ void megaste_state::megaste(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( stbook )
+//  machine_config( stbook )
 //-------------------------------------------------
 #if 0
 void stbook_state::stbook(machine_config &config)
@@ -2206,9 +2195,8 @@ void stbook_state::stbook(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, U517/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stbook_state::stbook_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(st_state::atarist_int_ack));
 
-	//MCFG_DEVICE_ADD(COP888_TAG, COP888, Y700)
+	//COP888(config, COP888_TAG, Y700);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
@@ -2230,10 +2218,9 @@ void stbook_state::stbook(machine_config &config)
 
 	MC68901(config, m_mfp, U517/8);
 	m_mfp->set_timer_clock(Y1);
-	m_mfp->set_rx_clock(0);
-	m_mfp->set_tx_clock(0);
 	m_mfp->out_irq_cb().set_inputline(M68000_TAG, M68K_IRQ_6);
-	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
+	m_mfp->out_tdo_cb().set(m_mfp, FUNC(mc68901_device::tc_w));
+	m_mfp->out_tdo_cb().append(m_mfp, FUNC(mc68901_device::rc_w));
 	m_mfp->out_so_cb().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	WD1772(config, m_fdc, U517/2);
@@ -2249,7 +2236,7 @@ void stbook_state::stbook(machine_config &config)
 	m_centronics->set_output_latch(cent_data_out);
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->rxd_handler().set(m_mfp, FUNC(mc68901_device::write_rx));
+	m_rs232->rxd_handler().set(m_mfp, FUNC(mc68901_device::si_w));
 	m_rs232->dcd_handler().set(m_mfp, FUNC(mc68901_device::i1_w));
 	m_rs232->cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
 	m_rs232->ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));
@@ -2282,7 +2269,7 @@ void stbook_state::stbook(machine_config &config)
 #endif
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( tt030 )
+//  machine_config( tt030 )
 //-------------------------------------------------
 
 void ste_state::tt030(machine_config &config)
@@ -2292,7 +2279,7 @@ void ste_state::tt030(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( falcon )
+//  machine_config( falcon )
 //-------------------------------------------------
 
 void ste_state::falcon(machine_config &config)
@@ -2302,7 +2289,7 @@ void ste_state::falcon(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( falcon40 )
+//  machine_config( falcon40 )
 //-------------------------------------------------
 
 void ste_state::falcon40(machine_config &config)

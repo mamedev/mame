@@ -47,8 +47,9 @@ DEFINE_DEVICE_TYPE(HP98032_GPIO_LOOPBACK , hp98032_gpio_loopback_device , "hp980
 // +----------------------+
 
 hp98032_io_card_device::hp98032_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hp9845_io_card_device(mconfig , HP98032_IO_CARD , tag , owner , clock)
-	, m_gpio(*this , "gpio")
+	: device_t(mconfig, HP98032_IO_CARD, tag, owner, clock)
+	, device_hp9845_io_interface(mconfig, *this)
+	, m_gpio(*this, "gpio")
 {
 }
 
@@ -56,15 +57,16 @@ hp98032_io_card_device::~hp98032_io_card_device()
 {
 }
 
-MACHINE_CONFIG_START(hp98032_io_card_device::device_add_mconfig)
+void hp98032_io_card_device::device_add_mconfig(machine_config &config)
+{
 	HP98032_GPIO_SLOT(config , m_gpio , 0);
 	m_gpio->pflg_cb().set(FUNC(hp98032_io_card_device::pflg_w));
 	m_gpio->psts_cb().set(FUNC(hp98032_io_card_device::psts_w));
 	m_gpio->eir_cb().set(FUNC(hp98032_io_card_device::eir_w));
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START(hp98032_port)
-	MCFG_HP9845_IO_SC(2)
+	PORT_HP9845_IO_SC(2)
 INPUT_PORTS_END
 
 ioport_constructor hp98032_io_card_device::device_input_ports() const
@@ -347,7 +349,7 @@ void hp98032_io_card_device::latch_input_LSB()
 
 hp98032_gpio_slot_device::hp98032_gpio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig , HP98032_GPIO_SLOT , tag , owner , clock)
-	, device_slot_interface(mconfig , *this)
+	, device_single_card_slot_interface<device_hp98032_gpio_interface>(mconfig , *this)
 	, m_pflg_handler(*this)
 	, m_psts_handler(*this)
 	, m_eir_handler(*this)
@@ -365,7 +367,7 @@ hp98032_gpio_slot_device::~hp98032_gpio_slot_device()
 
 uint16_t hp98032_gpio_slot_device::get_jumpers() const
 {
-	hp98032_gpio_card_device *card = downcast<hp98032_gpio_card_device*>(get_card_device());
+	device_hp98032_gpio_interface *card = get_card_device();
 	if (card != nullptr) {
 		return card->get_jumpers();
 	} else {
@@ -375,7 +377,7 @@ uint16_t hp98032_gpio_slot_device::get_jumpers() const
 
 uint16_t hp98032_gpio_slot_device::input_r() const
 {
-	hp98032_gpio_card_device *card = downcast<hp98032_gpio_card_device*>(get_card_device());
+	device_hp98032_gpio_interface *card = get_card_device();
 	if (card != nullptr) {
 		return card->input_r();
 	} else {
@@ -385,7 +387,7 @@ uint16_t hp98032_gpio_slot_device::input_r() const
 
 uint8_t hp98032_gpio_slot_device::ext_status_r() const
 {
-	hp98032_gpio_card_device *card = downcast<hp98032_gpio_card_device*>(get_card_device());
+	device_hp98032_gpio_interface *card = get_card_device();
 	if (card != nullptr) {
 		return card->ext_status_r();
 	} else {
@@ -395,7 +397,7 @@ uint8_t hp98032_gpio_slot_device::ext_status_r() const
 
 void hp98032_gpio_slot_device::output_w(uint16_t data)
 {
-	hp98032_gpio_card_device *card = downcast<hp98032_gpio_card_device*>(get_card_device());
+	device_hp98032_gpio_interface *card = get_card_device();
 	if (card != nullptr) {
 		card->output_w(data);
 	}
@@ -403,7 +405,7 @@ void hp98032_gpio_slot_device::output_w(uint16_t data)
 
 void hp98032_gpio_slot_device::ext_control_w(uint8_t data)
 {
-	hp98032_gpio_card_device *card = downcast<hp98032_gpio_card_device*>(get_card_device());
+	device_hp98032_gpio_interface *card = get_card_device();
 	if (card != nullptr) {
 		card->ext_control_w(data);
 	}
@@ -426,7 +428,7 @@ WRITE_LINE_MEMBER(hp98032_gpio_slot_device::eir_w)
 
 WRITE_LINE_MEMBER(hp98032_gpio_slot_device::pctl_w)
 {
-	hp98032_gpio_card_device *card = downcast<hp98032_gpio_card_device*>(get_card_device());
+	device_hp98032_gpio_interface *card = get_card_device();
 	if (card != nullptr) {
 		card->pctl_w(state);
 	}
@@ -434,7 +436,7 @@ WRITE_LINE_MEMBER(hp98032_gpio_slot_device::pctl_w)
 
 WRITE_LINE_MEMBER(hp98032_gpio_slot_device::io_w)
 {
-	hp98032_gpio_card_device *card = downcast<hp98032_gpio_card_device*>(get_card_device());
+	device_hp98032_gpio_interface *card = get_card_device();
 	if (card != nullptr) {
 		card->io_w(state);
 	}
@@ -442,7 +444,7 @@ WRITE_LINE_MEMBER(hp98032_gpio_slot_device::io_w)
 
 WRITE_LINE_MEMBER(hp98032_gpio_slot_device::preset_w)
 {
-	hp98032_gpio_card_device *card = downcast<hp98032_gpio_card_device*>(get_card_device());
+	device_hp98032_gpio_interface *card = get_card_device();
 	if (card != nullptr) {
 		card->preset_w(state);
 	}
@@ -465,35 +467,34 @@ void hp98032_gpio_slot_device::device_reset()
 	}
 }
 
-// +------------------------+
-// |hp98032_gpio_card_device|
-// +------------------------+
+// +-----------------------------+
+// |device_hp98032_gpio_interface|
+// +-----------------------------+
 
-hp98032_gpio_card_device::hp98032_gpio_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig , type , tag , owner , clock)
-	, device_slot_card_interface(mconfig , *this)
+device_hp98032_gpio_interface::device_hp98032_gpio_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "hp98032gpio")
 {
 }
 
-hp98032_gpio_card_device::~hp98032_gpio_card_device()
+device_hp98032_gpio_interface::~device_hp98032_gpio_interface()
 {
 }
 
-WRITE_LINE_MEMBER(hp98032_gpio_card_device::pflg_w)
+WRITE_LINE_MEMBER(device_hp98032_gpio_interface::pflg_w)
 {
-	hp98032_gpio_slot_device *slot = downcast<hp98032_gpio_slot_device*>(owner());
+	hp98032_gpio_slot_device *slot = downcast<hp98032_gpio_slot_device*>(device().owner());
 	slot->pflg_w(state);
 }
 
-WRITE_LINE_MEMBER(hp98032_gpio_card_device::psts_w)
+WRITE_LINE_MEMBER(device_hp98032_gpio_interface::psts_w)
 {
-	hp98032_gpio_slot_device *slot = downcast<hp98032_gpio_slot_device*>(owner());
+	hp98032_gpio_slot_device *slot = downcast<hp98032_gpio_slot_device*>(device().owner());
 	slot->psts_w(state);
 }
 
-WRITE_LINE_MEMBER(hp98032_gpio_card_device::eir_w)
+WRITE_LINE_MEMBER(device_hp98032_gpio_interface::eir_w)
 {
-	hp98032_gpio_slot_device *slot = downcast<hp98032_gpio_slot_device*>(owner());
+	hp98032_gpio_slot_device *slot = downcast<hp98032_gpio_slot_device*>(device().owner());
 	slot->eir_w(state);
 }
 
@@ -502,7 +503,8 @@ WRITE_LINE_MEMBER(hp98032_gpio_card_device::eir_w)
 // +----------------------------+
 
 hp98032_gpio_loopback_device::hp98032_gpio_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hp98032_gpio_card_device(mconfig, HP98032_GPIO_LOOPBACK, tag, owner, clock)
+	: device_t(mconfig, HP98032_GPIO_LOOPBACK, tag, owner, clock)
+	, device_hp98032_gpio_interface(mconfig, *this)
 {
 }
 

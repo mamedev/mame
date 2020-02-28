@@ -24,10 +24,6 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define COP421_TAG      "u9f"
-#define KB_COP421_TAG   "kbcop"
-#define SCREEN_TAG      "screen"
-
 /* lisa MMU segment regs */
 struct real_mmu_entry
 {
@@ -129,7 +125,7 @@ public:
 		m_io_mouse_x(*this, "MOUSE_X"),
 		m_io_mouse_y(*this, "MOUSE_Y"),
 		m_palette(*this, "palette"),
-		m_screen(*this, SCREEN_TAG)
+		m_screen(*this, "screen")
 	{ }
 
 	void lisa(machine_config &config);
@@ -145,7 +141,7 @@ private:
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	optional_device<applefdc_base_device> m_fdc;
-	required_device<scc8530_t> m_scc;
+	required_device<scc8530_legacy_device> m_scc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<nvram_device> m_nvram;
 	required_device<ls259_device> m_latch;

@@ -54,6 +54,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 #define MASTER_CLOCK    XTAL(12'000'000)
@@ -86,7 +87,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	void nibble_palette(palette_device &palette) const;
-	uint32_t screen_update_nibble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nibble(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nibble_interrupt);
 
 	void nibble_map(address_map &map);
@@ -122,10 +123,10 @@ TILE_GET_INFO_MEMBER(nibble_state::get_bg_tile_info)
 
 void nibble_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nibble_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nibble_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-uint32_t nibble_state::screen_update_nibble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nibble_state::screen_update_nibble(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -333,20 +334,19 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(nibble_state::nibble)
-
+void nibble_state::nibble(machine_config &config)
+{
 	UPD7811(config, m_maincpu, MASTER_CLOCK / 3); // type guessed; clock not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &nibble_state::nibble_map);
 	//m_maincpu->set_vblank_int("screen", FUNC(nibble_state::nibble_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nibble_state, screen_update_nibble)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(nibble_state::screen_update_nibble));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_nibble);
 
@@ -367,7 +367,7 @@ MACHINE_CONFIG_START(nibble_state::nibble)
 
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, "aysnd", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 /*************************

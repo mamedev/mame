@@ -69,7 +69,7 @@ WRITE_LINE_MEMBER( vertigo_state::adc_eoc_w )
 
 READ16_MEMBER(vertigo_state::vertigo_io_convert)
 {
-	m_adc->address_offset_start_w(space, offset, 0);
+	m_adc->address_offset_start_w(offset, 0);
 	return 0;
 }
 

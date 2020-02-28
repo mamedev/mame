@@ -34,6 +34,7 @@
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 #include "video/cgapal.h"
+#include "bus/isa/p1_fdc.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -41,25 +42,26 @@
 #include "speaker.h"
 
 
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_KEYBOARD  (1U <<  1)
+#define LOG_DEBUG     (1U <<  2)
+
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+
+
 #define CGA_PALETTE_SETS 83
 /* one for colour, one for mono, 81 for colour composite */
 
 #define BG_COLOR(x) (((x)&7) | (((x)&0x10) >> 1))
 
-#define VERBOSE_DBG 0
-
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-10s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
-
 #define POISK1_UPDATE_ROW(name) \
 	void name(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *videoram, uint16_t ma, uint8_t ra, uint8_t stride)
+
 
 class p1_state : public driver_device
 {
@@ -83,6 +85,8 @@ public:
 	void poisk1(machine_config &config);
 
 	void init_poisk1();
+
+	void fdc_config(device_t *device);
 
 protected:
 	virtual void machine_start() override;
@@ -167,21 +171,21 @@ private:
 READ8_MEMBER(p1_state::p1_trap_r)
 {
 	uint8_t data = m_video.trap[offset];
-	DBG_LOG(1, "trap", ("R %.2x $%02x\n", 0x28 + offset, data));
+	LOG("trap R %.2x $%02x\n", 0x28 + offset, data);
 	if (offset == 0) m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return data;
 }
 
 WRITE8_MEMBER(p1_state::p1_trap_w)
 {
-	DBG_LOG(1, "trap", ("W %.2x $%02x\n", 0x28 + offset, data));
+	LOG("trap W %.2x $%02x\n", 0x28 + offset, data);
 }
 
 READ8_MEMBER(p1_state::p1_cga_r)
 {
 	uint16_t port = offset + 0x3d0;
 
-	DBG_LOG(1, "cga", ("R %.4x\n", port));
+	LOG("cga R %.4x\n", port);
 	m_video.trap[1] = 0x40 | ((port >> 8) & 0x3f);
 	m_video.trap[0] = port & 255;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -192,7 +196,7 @@ WRITE8_MEMBER(p1_state::p1_cga_w)
 {
 	uint16_t port = offset + 0x3d0;
 
-	DBG_LOG(1, "cga", ("W %.4x $%02x\n", port, data));
+	LOG("cga W %.4x $%02x\n", port, data);
 	m_video.trap[2] = data;
 	m_video.trap[1] = 0xC0 | ((port >> 8) & 0x3f);
 	m_video.trap[0] = port & 255;
@@ -201,7 +205,7 @@ WRITE8_MEMBER(p1_state::p1_cga_w)
 
 WRITE8_MEMBER(p1_state::p1_vram_w)
 {
-	DBG_LOG(1, "vram", ("W %.4x $%02x\n", offset, data));
+	LOG("vram W %.4x $%02x\n", offset, data);
 	if (m_video.videoram_base) m_video.videoram_base[offset] = data;
 	m_video.trap[2] = data;
 	m_video.trap[1] = 0x80 | ((offset >> 8) & 0x3f);
@@ -223,7 +227,7 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	DBG_LOG(1, "color_select_68", ("W $%02x\n", data));
+	LOG("color_select_68 W $%02x\n", data);
 
 	// NMI DISABLE
 	if (BIT((data ^ m_video.color_select_68), 3))
@@ -236,7 +240,7 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 		else
 		{
 			program.install_read_bank(0xb8000, 0xbbfff, "bank11");
-			program.install_write_handler(0xb8000, 0xbbfff, WRITE8_DELEGATE(p1_state, p1_vram_w));
+			program.install_write_handler(0xb8000, 0xbbfff, write8_delegate(*this, FUNC(p1_state::p1_vram_w)));
 		}
 	}
 	// DISPLAY BANK
@@ -266,7 +270,7 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 
 WRITE8_MEMBER(p1_state::p1_ppi_portc_w)
 {
-	DBG_LOG(1, "mode_control_6a", ("W $%02x\n", data));
+	LOG("mode_control_6a W $%02x\n", data);
 
 	m_video.mode_control_6a = data;
 	set_palette_luts();
@@ -324,7 +328,7 @@ POISK1_UPDATE_ROW(p1_state::cga_gfx_2bpp_update_row)
 	uint16_t odd, offset;
 	int i;
 
-	if (ra == 0) DBG_LOG(1, "cga_gfx_2bpp_update_row", ("\n"));
+	if (ra == 0) LOG("cga_gfx_2bpp_update_row\n");
 	odd = (ra & 1) << 13;
 	offset = (ma & 0x1fff) | odd;
 	for (i = 0; i < stride; i++)
@@ -352,7 +356,7 @@ POISK1_UPDATE_ROW(p1_state::cga_gfx_1bpp_update_row)
 	uint16_t odd, offset;
 	int i;
 
-	if (ra == 0) DBG_LOG(1, "cga_gfx_1bpp_update_row", ("bg %d\n", bg));
+	if (ra == 0) LOG("cga_gfx_1bpp_update_row bg %d\n", bg);
 	odd = (ra & 1) << 13;
 	offset = (ma & 0x1fff) | odd;
 	for (i = 0; i < stride; i++)
@@ -384,7 +388,7 @@ POISK1_UPDATE_ROW(p1_state::poisk1_gfx_1bpp_update_row)
 	uint16_t odd, offset;
 	int i;
 
-	if (ra == 0) DBG_LOG(1, "poisk1_gfx_1bpp_update_row", ("bg %d\n", bg));
+	if (ra == 0) LOG("poisk1_gfx_1bpp_update_row bg %d\n", bg);
 	odd = (ra & 1) << 13;
 	offset = (ma & 0x1fff) | odd;
 	for (i = 0; i < stride; i++)
@@ -406,8 +410,6 @@ POISK1_UPDATE_ROW(p1_state::poisk1_gfx_1bpp_update_row)
 // Initialise the cga palette
 void p1_state::p1_palette(palette_device &palette) const
 {
-	DBG_LOG(0, "init", ("palette_init()\n"));
-
 	for (int i = 0; i < CGA_PALETTE_SETS * 16; i++)
 		palette.set_pen_color(i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2]);
 }
@@ -415,8 +417,6 @@ void p1_state::p1_palette(palette_device &palette) const
 void p1_state::video_start()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	DBG_LOG(0, "init", ("video_start()\n"));
 
 	memset(&m_video, 0, sizeof(m_video));
 	m_video.videoram_base = std::make_unique<uint8_t[]>(0x8000);
@@ -478,7 +478,7 @@ WRITE_LINE_MEMBER(p1_state::p1_pit8253_out2_changed)
 WRITE8_MEMBER(p1_state::p1_ppi_porta_w)
 {
 	m_kbpoll_mask = data;
-	DBG_LOG(2, "p1_ppi_porta_w", ("( %02X -> %02X )\n", data, m_kbpoll_mask));
+	LOGDBG("p1_ppi_porta_w %02X <- %02X\n", m_kbpoll_mask, data);
 }
 
 READ8_MEMBER(p1_state::p1_ppi_porta_r)
@@ -486,7 +486,7 @@ READ8_MEMBER(p1_state::p1_ppi_porta_r)
 	uint8_t ret;
 
 	ret = m_kbpoll_mask;
-	DBG_LOG(1, "p1_ppi_porta_r", ("= %02X\n", ret));
+	LOG("p1_ppi_porta_r = %02X\n", ret);
 	return ret;
 }
 
@@ -504,7 +504,7 @@ READ8_MEMBER(p1_state::p1_ppi_portb_r)
 	}
 
 	ret = key & 0xff;
-//  DBG_LOG(1,"p1_ppi_portb_r",("= %02X\n", ret));
+//  LOG("p1_ppi_portb_r = %02X\n", ret);
 	return ret;
 }
 
@@ -522,7 +522,7 @@ READ8_MEMBER(p1_state::p1_ppi_portc_r)
 	}
 
 	ret = (key >> 8) & 0xff;
-	DBG_LOG(2,"p1_ppi_portc_r",("= %02X\n", ret));
+	LOGDBG("p1_ppi_portc_r = %02X\n", ret);
 	return ret;
 }
 
@@ -535,7 +535,7 @@ READ8_MEMBER(p1_state::p1_ppi2_portc_r)
 
 	data = (data & ~0x10) | (tap_val < 0 ? 0x10 : 0x00);
 
-	DBG_LOG(2, "p1_ppi_portc_r", ("= %02X (tap_val %f) at %s\n", data, tap_val, machine().describe_context()));
+	LOGDBG("p1_ppi_portc_r = %02X (tap_val %f) at %s\n", data, tap_val, machine().describe_context());
 	return data;
 }
 
@@ -562,7 +562,7 @@ READ8_MEMBER(p1_state::p1_ppi_r)
 	case 3:
 		return m_ppi8255n2->read(offset);
 	default:
-		DBG_LOG(1, "p1ppi", ("R %.2x (unimp)\n", 0x60 + offset));
+		LOG("p1ppi R %.2x (unimp)\n", 0x60 + offset);
 		return 0xff;
 	}
 }
@@ -584,7 +584,7 @@ WRITE8_MEMBER(p1_state::p1_ppi_w)
 	case 3:
 		return m_ppi8255n2->write(offset, data);
 	default:
-		DBG_LOG(1, "p1ppi", ("W %.2x $%02x (unimp)\n", 0x60 + offset, data));
+		LOG("p1ppi W %.2x $%02x (unimp)\n", 0x60 + offset, data);
 		return;
 	}
 }
@@ -599,27 +599,28 @@ void p1_state::init_poisk1()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	DBG_LOG(0, "init", ("driver_init()\n"));
-
 	program.install_readwrite_bank(0, m_ram->size() - 1, "bank10");
 	membank("bank10")->set_base(m_ram->pointer());
 }
 
 void p1_state::machine_start()
 {
-	DBG_LOG(0, "init", ("machine_start()\n"));
 }
 
 void p1_state::machine_reset()
 {
-	DBG_LOG(0, "init", ("machine_reset()\n"));
-
 	m_kbpoll_mask = 0;
 }
 
 /*
  * macros
  */
+
+void p1_state::fdc_config(device_t *device)
+{
+	p1_fdc_device &fdc = *downcast<p1_fdc_device*>(device);
+	fdc.set_cpu(m_maincpu);
+}
 
 void p1_state::poisk1_map(address_map &map)
 {
@@ -632,7 +633,7 @@ void p1_state::poisk1_io(address_map &map)
 	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0028, 0x002B).rw(FUNC(p1_state::p1_trap_r), FUNC(p1_state::p1_trap_w));
 	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	// can't use regular AM_DEVREADWRITE, because THIS IS SPARTA!
+	// can't use regular rw(), because THIS IS SPARTA!
 	// 1st PPI occupies ports 60, 69, 6A and 6B; 2nd PPI -- 68, 61, 62 and 63.
 	map(0x0060, 0x006F).rw(FUNC(p1_state::p1_ppi_r), FUNC(p1_state::p1_ppi_w));
 	map(0x03D0, 0x03DF).rw(FUNC(p1_state::p1_cga_r), FUNC(p1_state::p1_cga_w));
@@ -642,7 +643,8 @@ static INPUT_PORTS_START( poisk1 )
 	PORT_INCLUDE( poisk1_keyboard_v91 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(p1_state::poisk1)
+void p1_state::poisk1(machine_config &config)
+{
 	/* basic machine hardware */
 	I8088(config, m_maincpu, 5000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &p1_state::poisk1_map);
@@ -680,35 +682,37 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	m_isabus->irq4_callback().set(m_pic8259, FUNC(pic8259_device::ir4_w));
 	m_isabus->irq5_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 	m_isabus->irq7_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
+	m_isabus->iochrdy_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", p1_isa8_cards, "fdc", false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
-
-	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-
-	SOFTWARE_LIST(config, "flop_list").set_original("poisk1_flop");
-//  SOFTWARE_LIST(config, "cass_list").set_original("poisk1_cass");
+	// FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa1", 0, m_isabus, p1_isa8_cards, "fdc", false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa2", 0, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa3", 0, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa4", 0, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "speaker", SPEAKER_SOUND )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS( XTAL(15'000'000), 912,0,640, 262,0,200 )
-	MCFG_SCREEN_UPDATE_DRIVER( p1_state, screen_update )
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(15'000'000), 912,0,640, 262,0,200);
+	m_screen->set_screen_update(FUNC(p1_state::screen_update));
 
 	/* XXX verify palette */
 	PALETTE(config, m_palette, FUNC(p1_state::p1_palette), CGA_PALETTE_SETS * 16);
 
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("poisk1_flop");
+//  SOFTWARE_LIST(config, "cass_list").set_original("poisk1_cass");
+
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("512K");
-MACHINE_CONFIG_END
+}
 
 ROM_START( poisk1 )
-	ROM_REGION16_LE(0x10000,"bios", 0)
+	ROM_REGION(0x10000, "bios", 0)
 
 	ROM_DEFAULT_BIOS("v91")
 	ROM_SYSTEM_BIOS(0, "v89r0", "1989r0")

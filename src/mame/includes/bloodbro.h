@@ -9,6 +9,7 @@
 #include "sound/3812intf.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class bloodbro_state : public driver_device, public seibu_sound_common
 {
@@ -28,6 +29,16 @@ public:
 		m_txvideoram(*this, "txvideoram")
 	{ }
 
+	void init_weststry();
+
+	void bloodbro(machine_config &config);
+	void skysmash(machine_config &config);
+	void weststry(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -67,18 +78,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
-	virtual void video_start() override;
-
 	uint32_t screen_update_bloodbro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_weststry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_skysmash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void bloodbro_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void weststry_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void init_weststry();
-	void bloodbro(machine_config &config);
-	void skysmash(machine_config &config);
-	void weststry(machine_config &config);
 	void bloodbro_map(address_map &map);
 	void common_map(address_map &map);
 	void skysmash_map(address_map &map);

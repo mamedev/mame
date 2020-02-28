@@ -47,7 +47,6 @@
 #include "cpu/s2650/s2650.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "instruct.lh"
@@ -80,7 +79,7 @@ private:
 	DECLARE_WRITE8_MEMBER(portf8_w);
 	DECLARE_WRITE8_MEMBER(portf9_w);
 	DECLARE_WRITE8_MEMBER(portfa_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(instruct);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	INTERRUPT_GEN_MEMBER(t2l_int);
 	void data_map(address_map &map);
 	void io_map(address_map &map);
@@ -214,12 +213,12 @@ INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
 
 		// Check INT sw & key
 		if (BIT(switches, 1))
-			device.execute().set_input_line_and_vector(0, BIT(hwkeys, 1) ? ASSERT_LINE : CLEAR_LINE, vector);
+			device.execute().set_input_line_and_vector(0, BIT(hwkeys, 1) ? ASSERT_LINE : CLEAR_LINE, vector); // S2650
 		else
 		// process ac input
 		{
 			m_irqstate ^= 1;
-			device.execute().set_input_line_and_vector(0, m_irqstate ? ASSERT_LINE : CLEAR_LINE, vector);
+			device.execute().set_input_line_and_vector(0, m_irqstate ? ASSERT_LINE : CLEAR_LINE, vector); // S2650
 		}
 	}
 }
@@ -340,7 +339,7 @@ void instruct_state::machine_reset()
 	m_maincpu->set_state_int(S2650_PC, 0x1800);
 }
 
-QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
+QUICKLOAD_LOAD_MEMBER(instruct_state::quickload_cb)
 {
 	uint16_t i, exec_addr, quick_length, read_;
 	image_init_result result = image_init_result::FAIL;
@@ -436,13 +435,14 @@ void instruct_state::instruct(machine_config &config)
 	config.set_default_layout(layout_instruct);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(instruct_state, instruct), this), "pgm", 1);
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(instruct_state::quickload_cb));
+
+	SPEAKER(config, "mono").front_center();
 
 	/* cassette */
 	CASSETTE(config, m_cass);
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 /* ROM definition */

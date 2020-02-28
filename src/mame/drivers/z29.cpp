@@ -36,8 +36,8 @@ protected:
 private:
 	void p3_w(u8 data);
 	DECLARE_READ8_MEMBER(bs_24k_r);
-	DECLARE_WRITE8_MEMBER(crtc_w);
-	DECLARE_WRITE8_MEMBER(latch_12k_w);
+	void crtc_w(offs_t offset, u8 data);
+	void latch_12k_w(u8 data);
 
 	void prg_map(address_map &map);
 	void ext_map(address_map &map);
@@ -72,8 +72,8 @@ READ8_MEMBER(z29_state::bs_24k_r)
 			u8 chardata = m_charmem[offset];
 			u8 attrdata = m_attrmem[offset] & 0xf;
 
-			m_crtc[0]->dack_w(space, 0, chardata & 0x7f);
-			m_crtc[1]->dack_w(space, 0, (chardata & 0x60) | (BIT(chardata, 7) ? 0x10 : 0) | attrdata);
+			m_crtc[0]->dack_w(chardata & 0x7f);
+			m_crtc[1]->dack_w((chardata & 0x60) | (BIT(chardata, 7) ? 0x10 : 0) | attrdata);
 		}
 		else
 		{
@@ -85,13 +85,13 @@ READ8_MEMBER(z29_state::bs_24k_r)
 	return m_dmatype ? 0x24 : 0x20;
 }
 
-WRITE8_MEMBER(z29_state::crtc_w)
+void z29_state::crtc_w(offs_t offset, u8 data)
 {
-	m_crtc[0]->write(space, offset, data);
-	m_crtc[1]->write(space, offset, data);
+	m_crtc[0]->write(offset, data);
+	m_crtc[1]->write(offset, data);
 }
 
-WRITE8_MEMBER(z29_state::latch_12k_w)
+void z29_state::latch_12k_w(u8 data)
 {
 	m_nvram->store(!BIT(data, 0));
 	m_nvram->recall(!BIT(data, 3));

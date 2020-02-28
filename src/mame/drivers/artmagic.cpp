@@ -128,7 +128,7 @@ void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		update_irq_state();
 		break;
 	default:
-		assert_always(false, "Unknown id in artmagic_state::device_timer");
+		throw emu_fatalerror("Unknown id in artmagic_state::device_timer");
 	}
 }
 
@@ -371,7 +371,7 @@ void artmagic_state::stonebal_protection()
 }
 
 
-CUSTOM_INPUT_MEMBER(artmagic_state::prot_r)
+READ_LINE_MEMBER(artmagic_state::prot_r)
 {
 	return m_prot_output_bit;
 }
@@ -452,7 +452,7 @@ void artmagic_state::shtstar_map(address_map &map)
 	map(0x200000, 0x27ffff).ram();
 	map(0x280000, 0x280fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 
-	map(0x300000, 0x300001).nopr(); //AM_READ_PORT("300000")
+	map(0x300000, 0x300001).nopr(); //.portr("300000");
 	map(0x300000, 0x300003).w(FUNC(artmagic_state::control_w)).share("control");
 	map(0x300004, 0x300007).w(FUNC(artmagic_state::protection_bit_w));
 	map(0x340001, 0x340001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -473,7 +473,6 @@ void artmagic_state::tms_map(address_map &map)
 	map(0x00400000, 0x005fffff).ram().share("vram1");
 	map(0x00800000, 0x0080007f).rw(FUNC(artmagic_state::blitter_r), FUNC(artmagic_state::blitter_w));
 	map(0x00c00000, 0x00c000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
-	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffe00000, 0xffffffff).ram();
 }
 
@@ -484,7 +483,6 @@ void artmagic_state::stonebal_tms_map(address_map &map)
 	map(0x00400000, 0x005fffff).ram().share("vram1");
 	map(0x00800000, 0x0080007f).rw(FUNC(artmagic_state::blitter_r), FUNC(artmagic_state::blitter_w));
 	map(0x00c00000, 0x00c000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
-	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffc00000, 0xffffffff).ram();
 }
 
@@ -601,8 +599,8 @@ static INPUT_PORTS_START( cheesech )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("30000a")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, artmagic_state,prot_r, nullptr)    /* protection data */
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_CUSTOM )     /* protection ready */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(artmagic_state, prot_r)    // protection data
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_CUSTOM )     // protection ready
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -793,8 +791,8 @@ static INPUT_PORTS_START( shtstar )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("3c000a")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, artmagic_state,prot_r, nullptr)    /* protection data */
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_CUSTOM )     /* protection ready */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(artmagic_state, prot_r)    // protection data
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_CUSTOM )     // protection ready
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -806,8 +804,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(artmagic_state::artmagic)
-
+void artmagic_state::artmagic(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, MASTER_CLOCK_25MHz/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &artmagic_state::main_map);
@@ -822,47 +820,44 @@ MACHINE_CONFIG_START(artmagic_state::artmagic)
 	m_tms->set_shiftreg_in_callback(FUNC(artmagic_state::to_shiftreg));
 	m_tms->set_shiftreg_out_callback(FUNC(artmagic_state::from_shiftreg));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	EEPROM_2816(config, "eeprom").write_time(attotime::from_usec(1)); // FIXME: false-readback polling should make this unnecessary
 
 	/* video hardware */
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_40MHz/6, 428, 0, 320, 313, 0, 256)
-	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK_40MHz/6, 428, 0, 320, 313, 0, 256);
+	screen.set_screen_update("tms", FUNC(tms34010_device::tms340x0_rgb32));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK_40MHz/3/10, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, MASTER_CLOCK_40MHz/3/10, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.65);
+}
 
 
-MACHINE_CONFIG_START(artmagic_state::cheesech)
+void artmagic_state::cheesech(machine_config &config)
+{
 	artmagic(config);
 
-	MCFG_DEVICE_MODIFY("oki")
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	m_oki->reset_routes();
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(artmagic_state::stonebal)
+void artmagic_state::stonebal(machine_config &config)
+{
 	artmagic(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(stonebal_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &artmagic_state::stonebal_map);
 
-	MCFG_DEVICE_MODIFY("tms")
-	MCFG_DEVICE_PROGRAM_MAP(stonebal_tms_map)
+	m_tms->set_addrmap(AS_PROGRAM, &artmagic_state::stonebal_tms_map);
 
-	MCFG_DEVICE_MODIFY("oki")
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_CONFIG_END
+	m_oki->reset_routes();
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.45);
+}
 
 void artmagic_state::shtstar(machine_config &config)
 {
@@ -1162,7 +1157,7 @@ void artmagic_state::init_ultennis()
 	m_protection_handler = &artmagic_state::ultennis_protection;
 
 	/* additional (protection?) hack */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(FUNC(artmagic_state::ultennis_hack_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(*this, FUNC(artmagic_state::ultennis_hack_r)));
 }
 
 

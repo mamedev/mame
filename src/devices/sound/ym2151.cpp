@@ -935,6 +935,8 @@ void ym2151_device::device_start()
 	eg_timer_add  = 1 << EG_SH;
 	eg_timer_overflow = 3 * eg_timer_add;
 
+	irqlinestate = 0;
+
 	/* save all 32 operators */
 	for (int j=0; j<32; j++)
 	{
@@ -1802,6 +1804,7 @@ void ym2151_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	if (m_reset_active)
 	{
 		std::fill(&outputs[0][0], &outputs[0][samples], 0);
+		std::fill(&outputs[1][0], &outputs[1][samples], 0);
 		return;
 	}
 

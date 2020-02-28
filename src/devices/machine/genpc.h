@@ -38,6 +38,9 @@ public:
 		subdevice<isa8_device>("isa")->set_iospace(std::forward<T>(tag), AS_IO);
 	}
 
+	auto int_callback() { return m_int_callback.bind(); }
+	auto nmi_callback() { return m_nmi_callback.bind(); }
+
 	void map(address_map &map);
 
 	uint8_t m_pit_out2;
@@ -56,6 +59,7 @@ protected:
 	ibm5160_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	// optional information overrides
@@ -74,6 +78,9 @@ protected:
 	required_device<isa8_device>            m_isabus;
 	optional_device<pc_kbdc_device>         m_pc_kbdc;
 	required_device<ram_device>             m_ram;
+
+	devcb_write_line m_int_callback;
+	devcb_write_line m_nmi_callback;
 
 	/* U73 is an LS74 - dual flip flop */
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
@@ -158,6 +165,7 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(IBM5150_MOTHERBOARD, ibm5150_mb_device)
 
+
 class ec1841_mb_device : public ibm5160_mb_device
 {
 public:
@@ -165,6 +173,8 @@ public:
 	ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	ec1841_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -178,6 +188,26 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device)
+
+
+class ec1840_mb_device : public ec1841_mb_device
+{
+public:
+	// construction/destruction
+	ec1840_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+
+private:
+	DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
+	DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
+};
+
+DECLARE_DEVICE_TYPE(EC1840_MOTHERBOARD, ec1840_mb_device)
 
 
 class pc_noppi_mb_device : public ibm5160_mb_device

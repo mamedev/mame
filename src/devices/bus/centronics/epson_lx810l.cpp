@@ -142,7 +142,6 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* gate array */
@@ -173,7 +172,7 @@ static INPUT_PORTS_START( epson_lx810l )
 
 	/* Buttons on printer */
 	PORT_START("ONLINE")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_O) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_device, online_sw, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_O) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_device, online_sw, 0)
 	PORT_START("FORMFEED")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Form Feed") PORT_CODE(KEYCODE_F) PORT_TOGGLE
 	PORT_START("LINEFEED")
@@ -280,6 +279,7 @@ epson_lx810l_device::epson_lx810l_device(const machine_config &mconfig, device_t
 	m_eeprom(*this, "eeprom"),
 	m_e05a30(*this, "e05a30"),
 	m_screen(*this, "screen"),
+	m_online_led(*this, "online_led"),
 	m_93c06_clk(0),
 	m_93c06_cs(0),
 	m_printhead(0),
@@ -300,11 +300,10 @@ epson_ap2000_device::epson_ap2000_device(const machine_config &mconfig, const ch
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-
-
-
 void epson_lx810l_device::device_start()
 {
+	m_online_led.resolve();
+
 	m_cr_timer = timer_alloc(TIMER_CR);
 
 	m_screen->register_screen_bitmap(m_bitmap);
@@ -467,7 +466,7 @@ WRITE8_MEMBER( epson_lx810l_device::portc_w )
 	m_eeprom->clk_write(m_93c06_clk ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->cs_write (m_93c06_cs  ? ASSERT_LINE : CLEAR_LINE);
 
-	machine().output().set_value("online_led", !BIT(data, 2));
+	m_online_led = !BIT(data, 2);
 }
 
 

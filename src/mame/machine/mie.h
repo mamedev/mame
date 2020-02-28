@@ -32,6 +32,12 @@ public:
 
 	template <uint8_t Which, typename T>
 	void set_gpio_name(T &&gpio_port_tag) { gpio_port[Which].set_tag(std::forward<T>(gpio_port_tag)); }
+	template <uint8_t First = 0U, typename T, typename... U>
+	void set_gpio_names(T &&first_tag, U &&... other_tags)
+	{
+		set_gpio_name<First>(std::forward<T>(first_tag));
+		set_gpio_names<First + 1>(std::forward<U>(other_tags)...);
+	}
 
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -70,7 +76,10 @@ public:
 
 	void mie_map(address_map &map);
 	void mie_port(address_map &map);
+
 protected:
+	template <uint8_t First> void set_gpio_names() { }
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;

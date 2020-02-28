@@ -60,7 +60,6 @@
 #include "imagedev/printer.h"
 #include "machine/upd765.h" /* for floppy disc controller */
 #include "sound/discrete.h"  /* for 1 Bit sound*/
-#include "sound/wave.h"      /* for K7 sound*/
 #include "screen.h"
 #include "softlist.h"
 
@@ -90,10 +89,10 @@ void interact_state::interact_mem(address_map &map)
 	map.unmap_value_high();
 	/* Main ROM page*/
 	map(0x0000, 0x3fff).rom();  /*BANK(2)*/
-	/*   AM_RANGE(0x1000,0x3fff) AM_RAM*/
+//  map(0x1000,0x3fff).ram();
 
 	/* Hardware address mapping*/
-/*  AM_RANGE(0x0800,0x0808) AM_WRITE(switch_bank_w)// Bank management not udsed in BR machine*/
+//  map(0x0800,0x0808).w(FUNC(interact_state::switch_bank_w)); // Bank management not udsed in BR machine*/
 	map(0x1000, 0x1000).w(FUNC(interact_state::color_a_w));  /* Color c0/c1*/
 	map(0x1800, 0x1800).w(FUNC(interact_state::color_b_w));  /* Color c2/c3*/
 	map(0x2000, 0x2003).w(FUNC(interact_state::sn_2000_w));  /* Sound*/
@@ -127,26 +126,26 @@ uint32_t interact_state::screen_update_interact(screen_device &screen, bitmap_in
 	return 0;
 }
 
-MACHINE_CONFIG_START(interact_state::interact)
-
+void interact_state::interact(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(2'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(interact_mem)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
+	I8080(config, m_maincpu, XTAL(2'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &interact_state::interact_mem);
+	m_maincpu->set_periodic_int(FUNC(interact_state::irq0_line_hold), attotime::from_hz(50)); /*  put on the I8080 irq in Hz*/
 
 	MCFG_MACHINE_RESET_OVERRIDE(interact_state,interact)
 	MCFG_MACHINE_START_OVERRIDE(interact_state,interact)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256, 79)
-	MCFG_SCREEN_VISIBLE_AREA(0, 112, 0, 77)
-	MCFG_SCREEN_UPDATE_DRIVER(interact_state, screen_update_interact)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 79);
+	screen.set_visarea(0, 112, 0, 77);
+	screen.set_screen_update(FUNC(interact_state::screen_update_interact));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 16)             /* 8 colours, but only 4 at a time*/
+	PALETTE(config, m_palette).set_entries(16);             /* 8 colours, but only 4 at a time*/
 
 	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
 
@@ -154,36 +153,35 @@ MACHINE_CONFIG_START(interact_state::interact)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(hector_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("interact_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("interact");
 
 	/* printer */
 	PRINTER(config, m_printer, 0);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(interact_state::hector1)
-
+void interact_state::hector1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(1'750'000))
-	MCFG_DEVICE_PROGRAM_MAP(interact_mem)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
+	Z80(config, m_maincpu, XTAL(1'750'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &interact_state::interact_mem);
+	m_maincpu->set_periodic_int(FUNC(interact_state::irq0_line_hold), attotime::from_hz(50)); /*  put on the I8080 irq in Hz*/
 
 	MCFG_MACHINE_RESET_OVERRIDE(interact_state,interact)
 	MCFG_MACHINE_START_OVERRIDE(interact_state,interact)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256, 79)
-	MCFG_SCREEN_VISIBLE_AREA(0, 112, 0, 77)
-	MCFG_SCREEN_UPDATE_DRIVER(interact_state, screen_update_interact)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 79);
+	screen.set_visarea(0, 112, 0, 77);
+	screen.set_screen_update(FUNC(interact_state::screen_update_interact));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 16)             /* 8 colours, but only 4 at a time*/
+	PALETTE(config, m_palette).set_entries(16);             /* 8 colours, but only 4 at a time*/
 
 	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
 
@@ -191,13 +189,12 @@ MACHINE_CONFIG_START(interact_state::hector1)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(hector_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("interact_cass");
 
 	/* printer */
 	PRINTER(config, m_printer, 0);
-
-MACHINE_CONFIG_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( interact )

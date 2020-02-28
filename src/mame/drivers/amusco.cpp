@@ -83,6 +83,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "amusco.lh"
 
@@ -190,7 +191,7 @@ TILE_GET_INFO_MEMBER(amusco_state::get_bg_tile_info)
 
 void amusco_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(amusco_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 10, 74, 24);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(amusco_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 10, 74, 24);
 	m_blink_state = false;
 
 	m_videoram = std::make_unique<uint8_t []>(videoram_size);
@@ -218,16 +219,16 @@ void amusco_state::mem_map(address_map &map)
 READ8_MEMBER( amusco_state::mc6845_r)
 {
 	if(offset & 1)
-		return m_crtc->register_r(space, 0);
+		return m_crtc->register_r();
 
-	return m_crtc->status_r(space,0); // not a plain 6845, requests update bit here ...
+	return m_crtc->status_r(); // not a plain 6845, requests update bit here ...
 }
 
 WRITE8_MEMBER( amusco_state::mc6845_w)
 {
 	if(offset & 1)
 	{
-		m_crtc->register_w(space, 0,data);
+		m_crtc->register_w(data);
 		if(m_mc6845_address == 0x12)
 			m_video_update_address = ((data & 0xff) << 8) | (m_video_update_address & 0x00ff);
 		if(m_mc6845_address == 0x13)
@@ -235,7 +236,7 @@ WRITE8_MEMBER( amusco_state::mc6845_w)
 	}
 	else
 	{
-		m_crtc->address_w(space,0,data);
+		m_crtc->address_w(data);
 		m_mc6845_address = data;
 	}
 }
@@ -532,8 +533,8 @@ void amusco_state::amusco_palette(palette_device &palette) const
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(amusco_state::amusco)
-
+void amusco_state::amusco(machine_config &config)
+{
 	/* basic machine hardware */
 	I8088(config, m_maincpu, CPU_CLOCK);        // 5 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &amusco_state::mem_map);
@@ -574,12 +575,12 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(30), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(88*8, 27*10)                           // screen size: 88*8 27*10
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 74*8-1, 0*10, 24*10-1)    // visible scr: 74*8 24*10
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(88*8, 27*10);                           // screen size: 88*8 27*10
+	m_screen->set_visarea(0*8, 74*8-1, 0*10, 24*10-1);    // visible scr: 74*8 24*10
+	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_amusco);
 	PALETTE(config, "palette", FUNC(amusco_state::amusco_palette), 8*8);
@@ -588,21 +589,19 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_on_update_addr_change_callback(FUNC(amusco_state::crtc_addr), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(amusco_state::crtc_addr));
 	m_crtc->out_de_callback().set(m_pic, FUNC(pic8259_device::ir1_w)); // IRQ1 sets 0x918 bit 3
-	m_crtc->set_update_row_callback(FUNC(amusco_state::update_row), this);
-
+	m_crtc->set_update_row_callback(FUNC(amusco_state::update_row));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("sn", SN76489A, SND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	SN76489A(config, "sn", SND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 void amusco_state::draw88pkr(machine_config &config)
 {
 	amusco(config);
-	//MCFG_DEVICE_MODIFY("ppi_outputs") // Some bits are definitely different
+	// TODO: Some bits of ppi_outputs are definitely different
 }
 
 /*************************

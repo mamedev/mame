@@ -73,72 +73,18 @@
 ******************************************************************************************/
 #include "emu.h"
 #include "includes/maygay1b.h"
+
 #include "machine/74259.h"
 #include "speaker.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 #include "maygay1b.lh"
 
-#include "m1albsqp.lh"
-#include "m1apollo2.lh"
-#include "m1bargnc.lh"
-#include "m1bghou.lh"
-#include "m1bigdel.lh"
-#include "m1calypsa.lh"
-#include "m1casclb.lh"
-#include "m1casroy1.lh"
-#include "m1chain.lh"
-#include "m1cik51o.lh"
-#include "m1clbfvr.lh"
-#include "m1cluecb1.lh"
-#include "m1cluedo4.lh"
-#include "m1cluessf.lh"
-#include "m1coro21n.lh"
-#include "m1cororrk.lh"
-#include "m1dkong91n.lh"
-#include "m1dxmono51o.lh"
-#include "m1eastndl.lh"
-#include "m1eastqv3.lh"
-#include "m1fantfbb.lh"
-#include "m1fightb.lh"
-#include "m1frexplc.lh"
-#include "m1gladg.lh"
-#include "m1grescb.lh"
-#include "m1guvnor.lh"
-#include "m1hotpoth.lh"
-#include "m1htclb.lh"
-#include "m1imclb.lh"
-#include "m1infern.lh"
-#include "m1inwinc.lh"
-#include "m1itjobc.lh"
-#include "m1itskob.lh"
-#include "m1jpmult.lh"
-#include "m1lucknon.lh"
-#include "m1luxorb.lh"
-#include "m1manhat.lh"
-#include "m1monclb.lh"
-#include "m1mongam.lh"
-#include "m1monmon.lh"
-#include "m1monou.lh"
-#include "m1nhp.lh"
-#include "m1nudbnke.lh"
-#include "m1omega.lh"
-#include "m1onbusa.lh"
-#include "m1pinkpc.lh"
-#include "m1przeeb.lh"
-#include "m1retpp.lh"
-#include "m1search.lh"
-#include "m1sptlgtc.lh"
-#include "m1startr.lh"
-#include "m1sudnima.lh"
-#include "m1taknot.lh"
-#include "m1thatlfc.lh"
-#include "m1topstr.lh"
-#include "m1triviax.lh"
-#include "m1trtr.lh"
-#include "m1ttcash.lh"
-#include "m1wldzner.lh"
-#include "m1wotwa.lh"
 
+#define M1_MASTER_CLOCK (XTAL(8'000'000))
+#define M1_DUART_CLOCK  (XTAL(3'686'400))
 
 // not yet working
 //#define USE_MCU
@@ -494,7 +440,7 @@ void maygay1b_state::m1_memmap(address_map &map)
 #else
 	//8051
 	map(0x2040, 0x2041).rw("i8279_2", FUNC(i8279_device::read), FUNC(i8279_device::write));
-//  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
+//  map(0x2050, 0x2050)// SCAN on M1B
 #endif
 
 	map(0x2070, 0x207f).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
@@ -580,7 +526,7 @@ void maygay1b_state::m1_nec_memmap(address_map &map)
 #else
 	//8051
 	map(0x2040, 0x2041).rw("i8279_2", FUNC(i8279_device::read), FUNC(i8279_device::write));
-//  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
+//  map(0x2050, 0x2050)// SCAN on M1B
 #endif
 
 	map(0x2070, 0x207f).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
@@ -751,7 +697,7 @@ READ8_MEMBER(maygay1b_state::mcu_port2_r)
 {
 	// this is read in BOTH the external interrupts
 	// it seems that both the writes from the main cpu go here
-	// and the MCU knows which is is based on the interrupt level
+	// and the MCU knows which it is based on the interrupt level
 	uint8_t ret = m_main_to_mcu;
 #ifdef USE_MCU
 	logerror("%s: mcu_port2_r returning %02x\n", machine().describe_context(), ret);
@@ -762,10 +708,10 @@ READ8_MEMBER(maygay1b_state::mcu_port2_r)
 
 // machine driver for maygay m1 board /////////////////////////////////
 
-MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
-
-	MCFG_DEVICE_ADD("maincpu", MC6809, M1_MASTER_CLOCK/2) // claimed to be 4 MHz
-	MCFG_DEVICE_PROGRAM_MAP(m1_memmap)
+void maygay1b_state::maygay_m1(machine_config &config)
+{
+	MC6809(config, m_maincpu, M1_MASTER_CLOCK/2); // claimed to be 4 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &maygay1b_state::m1_memmap);
 
 	I80C51(config, m_mcu, 2000000); //  EP840034.A-P-80C51AVW
 	m_mcu->port_in_cb<0>().set(FUNC(maygay1b_state::mcu_port0_r));
@@ -801,13 +747,13 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	m_ay->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_ay->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, M1_MASTER_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", M1_MASTER_CLOCK/4));
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("msm6376", OKIM6376, 102400) //? Seems to work well with samples, but unconfirmed
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6376(config, m_msm6376, 102400); //? Seems to work well with samples, but unconfirmed
+	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	TIMER(config, "nmitimer").configure_periodic(FUNC(maygay1b_state::maygay1b_nmitimer_callback), attotime::from_hz(75)); // freq?
 
@@ -841,7 +787,7 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	config.set_default_layout(layout_maygay1b);
-MACHINE_CONFIG_END
+}
 
 void maygay1b_state::maygay_m1_no_oki(machine_config &config)
 {
@@ -849,17 +795,17 @@ void maygay1b_state::maygay_m1_no_oki(machine_config &config)
 	config.device_remove("msm6376");
 }
 
-MACHINE_CONFIG_START(maygay1b_state::maygay_m1_nec)
+void maygay1b_state::maygay_m1_nec(machine_config &config)
+{
 	maygay_m1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(m1_nec_memmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &maygay1b_state::m1_nec_memmap);
 
 	config.device_remove("msm6376");
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 WRITE8_MEMBER(maygay1b_state::m1ab_no_oki_w)
 {
@@ -910,12 +856,10 @@ void maygay1b_state::init_m1()
 {
 	init_m1common();
 
-	//AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
+	//map(0x2420, 0x2421).w(FUNC(maygay1b_state::latch_ch2_w)); // oki
 	// if there is no OKI region disable writes here, the rom might be missing, so alert user
 
 	if (m_oki_region == nullptr) {
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x2420, 0x2421, write8_delegate(FUNC(maygay1b_state::m1ab_no_oki_w), this));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x2420, 0x2421, write8_delegate(*this, FUNC(maygay1b_state::m1ab_no_oki_w)));
 	}
 }
-
-#include "maygay1b.hxx"

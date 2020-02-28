@@ -301,13 +301,13 @@ const lh5801_disassembler::Entry lh5801_disassembler::table[0x100]={
 	{ TIN, Imp },
 	{ VEJ, Vej },
 	{ CIN, Imp },
-	{ ILL },
+	{ VEJ, Vej },
 	{ REC, Imp },
-	{ ILL },
+	{ VEJ, Vej },
 	{ SEC, Imp },
-	{ ILL },
+	{ VEJ, Vej },
 	{ PREFD },
-	{ ILL },
+	{ VEJ, Vej },
 	{ ILL }
 };
 

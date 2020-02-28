@@ -56,25 +56,25 @@ class upd7220_device :  public device_t,
 						public device_video_interface
 {
 public:
-	typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int x, uint32_t address)> display_pixels_delegate;
-	typedef device_delegate<void (bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr)> draw_text_delegate;
+	using display_pixels_delegate = device_delegate<void (bitmap_rgb32 &bitmap, int y, int x, uint32_t address)>;
+	using draw_text_delegate = device_delegate<void (bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr)>;
 
 	// construction/destruction
 	upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename... T> void set_display_pixels_callback(T &&... args) { m_display_cb = display_pixels_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_draw_text_callback(T &&... args) { m_draw_text_cb = draw_text_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_display_pixels(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_draw_text(T &&... args) { m_draw_text_cb.set(std::forward<T>(args)...); }
 
 	auto drq_wr_callback() { return m_write_drq.bind(); }
 	auto hsync_wr_callback() { return m_write_hsync.bind(); }
 	auto vsync_wr_callback() { return m_write_vsync.bind(); }
 	auto blank_wr_callback() { return m_write_blank.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( dack_r );
-	DECLARE_WRITE8_MEMBER( dack_w );
+	uint8_t dack_r();
+	void dack_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( ext_sync_w );
 	DECLARE_WRITE_LINE_MEMBER( lpen_w );

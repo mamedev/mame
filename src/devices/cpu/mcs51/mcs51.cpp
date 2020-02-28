@@ -10,6 +10,8 @@
  *   8052 Product Line (8032,8052,8752)
  *   8054 Product Line (8054)
  *   8058 Product Line (8058)
+ *   80552 Product Line (80552, 83552, 87552)
+ *   80562 Product Line (80562, 83562, 87562)
  *
  *   Copyright Steve Ellenoff, all rights reserved.
  *
@@ -87,7 +89,7 @@
  *
  *****************************************************************************/
 
-/* TODO: Varios
+/* TODO: Various
  *  - EA pin - defined by architecture, must implement:
  *    1 means external access, bypassing internal ROM
  *  - T0 output clock ?
@@ -100,6 +102,7 @@
  *      actually use 80CXX, i.e. CMOS versions.
  *      "Normal" 805X will return a 0 if reading from a output port which has
  *      a 0 written to it's latch. At least cardline expects a 1 here.
+ * - ADC support for 80552/80562 (controls analog inputs for Arctic Thunder)
  *
  * Done: (Couriersud)
  * - Merged DS5002FP
@@ -222,19 +225,20 @@ enum
 };
 
 
-DEFINE_DEVICE_TYPE(I8031, i8031_device, "i8031", "Intel I8031")
-DEFINE_DEVICE_TYPE(I8032, i8032_device, "i8032", "Intel I8032")
-DEFINE_DEVICE_TYPE(I8051, i8051_device, "i8051", "Intel I8051")
-DEFINE_DEVICE_TYPE(I8751, i8751_device, "i8751", "Intel I8751")
+DEFINE_DEVICE_TYPE(I8031, i8031_device, "i8031", "Intel 8031")
+DEFINE_DEVICE_TYPE(I8032, i8032_device, "i8032", "Intel 8032")
+DEFINE_DEVICE_TYPE(I8051, i8051_device, "i8051", "Intel 8051")
+DEFINE_DEVICE_TYPE(I8751, i8751_device, "i8751", "Intel 8751")
 DEFINE_DEVICE_TYPE(AM8753, am8753_device, "am8753", "AMD Am8753")
-DEFINE_DEVICE_TYPE(I8052, i8052_device, "i8052", "Intel I8052")
-DEFINE_DEVICE_TYPE(I8752, i8752_device, "i8752", "Intel I8752")
-DEFINE_DEVICE_TYPE(I80C31, i80c31_device, "i80c31", "Intel I80C31")
-DEFINE_DEVICE_TYPE(I80C51, i80c51_device, "i80c51", "Intel I80C51")
-DEFINE_DEVICE_TYPE(I87C51, i87c51_device, "i87c51", "Intel I87C51")
-DEFINE_DEVICE_TYPE(I80C32, i80c32_device, "i80c32", "Intel I80C32")
-DEFINE_DEVICE_TYPE(I80C52, i80c52_device, "i80c52", "Intel I80C52")
-DEFINE_DEVICE_TYPE(I87C52, i87c52_device, "i87c52", "Intel I87C52")
+DEFINE_DEVICE_TYPE(I8052, i8052_device, "i8052", "Intel 8052")
+DEFINE_DEVICE_TYPE(I8752, i8752_device, "i8752", "Intel 8752")
+DEFINE_DEVICE_TYPE(I80C31, i80c31_device, "i80c31", "Intel 80C31")
+DEFINE_DEVICE_TYPE(I80C51, i80c51_device, "i80c51", "Intel 80C51")
+DEFINE_DEVICE_TYPE(I87C51, i87c51_device, "i87c51", "Intel 87C51")
+DEFINE_DEVICE_TYPE(I80C32, i80c32_device, "i80c32", "Intel 80C32")
+DEFINE_DEVICE_TYPE(I80C52, i80c52_device, "i80c52", "Intel 80C52")
+DEFINE_DEVICE_TYPE(I87C52, i87c52_device, "i87c52", "Intel 87C52")
+DEFINE_DEVICE_TYPE(I80C51GB, i80c51gb_device, "i80c51gb", "Intel 80C51GB")
 DEFINE_DEVICE_TYPE(AT89C52, at89c52_device, "at89c52", "Atmel AT89C52")
 DEFINE_DEVICE_TYPE(AT89S52, at89s52_device, "at89s52", "Atmel AT89S52")
 DEFINE_DEVICE_TYPE(AT89C4051, at89c4051_device, "at89c4051", "Atmel AT89C4051")
@@ -271,8 +275,8 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	, m_num_interrupts(5)
 	, m_sfr_ram(*this, "sfr_ram")
 	, m_scratchpad(*this, "scratchpad")
-	, m_port_in_cb{{*this}, {*this}, {*this}, {*this}}
-	, m_port_out_cb{{*this}, {*this}, {*this}, {*this}}
+	, m_port_in_cb(*this)
+	, m_port_out_cb(*this)
 	, m_serial_tx_cb(*this)
 	, m_serial_rx_cb(*this)
 	, m_rtemp(0)
@@ -368,6 +372,11 @@ i80c32_device::i80c32_device(const machine_config &mconfig, const char *tag, dev
 
 i87c52_device::i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80c52_device(mconfig, I87C52, tag, owner, clock, 13, 8)
+{
+}
+
+i80c51gb_device::i80c51gb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80c52_device(mconfig, I80C51GB, tag, owner, clock, 0, 8)
 {
 }
 
@@ -770,7 +779,7 @@ uint8_t mcs51_cpu_device::r_psw() { return SFR_A(ADDR_PSW); }
   assume that most hardware will use port 2 for 8bit access as well.
 
   On configurations where 8 bit access in conjunction with other ports is used,
-  it is up to the driver to use AM_MIRROR to mask out the high level address and
+  it is up to the driver to use mirror() to mask out the high level address and
   provide it's own mapping.
 */
 
@@ -873,6 +882,8 @@ uint8_t mcs51_cpu_device::bit_address_r(uint8_t offset)
 	int bit_pos;
 	int distance;   /* distance between bit addressable words */
 					/* 1 for normal bits, 8 for sfr bit addresses */
+
+	m_last_bit = offset;
 
 	//User defined bit addresses 0x20-0x2f (values are 0x0-0x7f)
 	if (offset < 0x80) {
@@ -1358,6 +1369,8 @@ void mcs51_cpu_device::execute_op(uint8_t op)
 		m_recalc_parity = 0;
 	}
 
+	m_last_op = op;
+
 	switch( op )
 	{
 		case 0x00:  nop(op);                           break;  //NOP
@@ -1777,6 +1790,10 @@ void mcs51_cpu_device::check_irqs()
 		return;
 	}
 
+	// Hack to work around polling latency issue with JB INT0/INT1
+	if (m_last_op == 0x20 && ((int_vec == V_IE0 && m_last_bit == 0xb2) || (int_vec == V_IE1 && m_last_bit == 0xb3)))
+		PC = PPC + 3;
+
 	//Save current pc to stack, set pc to new interrupt vector
 	push_pc();
 	PC = int_vec;
@@ -2114,11 +2131,8 @@ void mcs51_cpu_device::device_start()
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
-	for (auto &cb : m_port_in_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_port_out_cb)
-		cb.resolve_safe();
-
+	m_port_in_cb.resolve_all_safe(0xff);
+	m_port_out_cb.resolve_all_safe();
 	m_serial_rx_cb.resolve_safe(0);
 	m_serial_tx_cb.resolve_safe();
 
@@ -2126,6 +2140,8 @@ void mcs51_cpu_device::device_start()
 
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_pc));
+	save_item(NAME(m_last_op));
+	save_item(NAME(m_last_bit));
 	save_item(NAME(m_rwm) );
 	save_item(NAME(m_cur_irq_prio) );
 	save_item(NAME(m_last_line_state) );
@@ -2213,6 +2229,8 @@ void mcs51_cpu_device::device_reset()
 	/* Flag as NO IRQ in Progress */
 	m_irq_active = 0;
 	m_cur_irq_prio = -1;
+	m_last_op = 0;
+	m_last_bit = 0;
 
 	/* these are all defined reset states */
 	PC = 0;
@@ -2507,6 +2525,11 @@ std::unique_ptr<util::disasm_interface> i80c51_device::create_disassembler()
 std::unique_ptr<util::disasm_interface> i80c52_device::create_disassembler()
 {
 	return std::make_unique<i80c52_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> i80c51gb_device::create_disassembler()
+{
+	return std::make_unique<i8xc51gb_disassembler>();
 }
 
 std::unique_ptr<util::disasm_interface> ds5002fp_device::create_disassembler()

@@ -247,7 +247,7 @@ WRITE8_MEMBER( super6_state::fdc_w )
 	m_fdc->dden_w(!BIT(data, 3));
 
 	// disk size
-	m_fdc->set_unscaled_clock (BIT(data, 4) ? 1'000'000 : 2'000'000);  // division occurs inside fdc depending on ENMF
+	m_fdc->enmf_w(!BIT(data, 4));
 }
 
 
@@ -283,8 +283,8 @@ void super6_state::super6_io(address_map &map)
 	map(0x16, 0x16).w(FUNC(super6_state::bank0_w));
 	map(0x17, 0x17).w(FUNC(super6_state::bank1_w));
 	map(0x18, 0x18).mirror(0x03).w(BR1945_TAG, FUNC(com8116_device::stt_str_w));
-//  AM_RANGE(0x40, 0x40) ?
-//  AM_RANGE(0xe0, 0xe7) HDC?
+//  map(0x40, 0x40) ?
+//  map(0xe0, 0xe7) HDC?
 }
 
 
@@ -440,7 +440,7 @@ void super6_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( super6 )
+//  machine_config( super6 )
 //-------------------------------------------------
 
 void super6_state::super6(machine_config &config)

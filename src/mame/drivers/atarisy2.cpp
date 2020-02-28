@@ -663,7 +663,7 @@ READ16_MEMBER(atarisy2_state::sound_r)
 	update_interrupts();
 
 	/* handle it normally otherwise */
-	return m_soundcomm->main_response_r(space,offset) | 0xff00;
+	return m_soundcomm->main_response_r() | 0xff00;
 }
 
 
@@ -674,7 +674,7 @@ WRITE8_MEMBER(atarisy2_state::sound_6502_w)
 	update_interrupts();
 
 	/* handle it normally otherwise */
-	m_soundcomm->sound_response_w(space, offset, data);
+	m_soundcomm->sound_response_w(data);
 }
 
 
@@ -685,7 +685,7 @@ READ8_MEMBER(atarisy2_state::sound_6502_r)
 	update_interrupts();
 
 	/* handle it normally otherwise */
-	return m_soundcomm->sound_command_r(space, offset);
+	return m_soundcomm->sound_command_r();
 }
 
 

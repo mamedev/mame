@@ -2,10 +2,7 @@
 // copyright-holders:Curt Coder
 /***************************************************************************
 
-    Intel 8274 Multi-Protocol Serial Controller emulation
-    NEC µPD7201 Multiprotocol Serial Communications Controller emulation
     Z80-DART Dual Asynchronous Receiver/Transmitter emulation
-    Z80-SIO/0/1/2/3/4 Serial Input/Output Controller emulation
 
     The z80dart/z80sio itself is based on an older intel serial chip, the i8274 MPSC
     (see http://doc.chipfind.ru/pdf/intel/8274.pdf), which also has almost identical
@@ -24,8 +21,6 @@
     - wr0 reset tx interrupt pending
     - wait/ready
     - 1.5 stop bits
-    - synchronous mode (Z80-SIO/1,2)
-    - SDLC mode (Z80-SIO/1,2)
 
 */
 
@@ -46,13 +41,6 @@
 // device type definition
 DEFINE_DEVICE_TYPE(Z80DART,         z80dart_device,  "z80dart",         "Z80 DART")
 DEFINE_DEVICE_TYPE(Z80DART_CHANNEL, z80dart_channel, "z80dart_channel", "Z80 DART channel")
-DEFINE_DEVICE_TYPE(Z80SIO0,         z80sio0_device,  "z80sio0",         "Z80 SIO/0")
-DEFINE_DEVICE_TYPE(Z80SIO1,         z80sio1_device,  "z80sio1",         "Z80 SIO/1")
-DEFINE_DEVICE_TYPE(Z80SIO2,         z80sio2_device,  "z80sio2",         "Z80 SIO/2")
-DEFINE_DEVICE_TYPE(Z80SIO3,         z80sio3_device,  "z80sio3",         "Z80 SIO/3")
-DEFINE_DEVICE_TYPE(Z80SIO4,         z80sio4_device,  "z80sio4",         "Z80 SIO/4")
-DEFINE_DEVICE_TYPE(I8274,           i8274_device,    "i8274",           "Intel 8274 MPSC")
-DEFINE_DEVICE_TYPE(UPD7201,         upd7201_device,  "upd7201",         "NEC uPD7201 MPSC")
 
 
 //-------------------------------------------------
@@ -106,41 +94,6 @@ z80dart_device::z80dart_device(const machine_config &mconfig, device_type type, 
 
 z80dart_device::z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80dart_device(mconfig, Z80DART, tag, owner, clock, TYPE_DART)
-{
-}
-
-z80sio0_device::z80sio0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80dart_device(mconfig, Z80SIO0, tag, owner, clock, TYPE_SIO0)
-{
-}
-
-z80sio1_device::z80sio1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80dart_device(mconfig, Z80SIO1, tag, owner, clock, TYPE_SIO1)
-{
-}
-
-z80sio2_device::z80sio2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80dart_device(mconfig, Z80SIO2, tag, owner, clock, TYPE_SIO2)
-{
-}
-
-z80sio3_device::z80sio3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80dart_device(mconfig, Z80SIO3, tag, owner, clock, TYPE_SIO3)
-{
-}
-
-z80sio4_device::z80sio4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80dart_device(mconfig, Z80SIO4, tag, owner, clock, TYPE_SIO4)
-{
-}
-
-i8274_device::i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80dart_device(mconfig, I8274, tag, owner, clock, TYPE_I8274)
-{
-}
-
-upd7201_device::upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80dart_device(mconfig, UPD7201, tag, owner, clock, TYPE_UPD7201)
 {
 }
 
@@ -392,7 +345,7 @@ int z80dart_device::m1_r()
 //  cd_ba_r -
 //-------------------------------------------------
 
-READ8_MEMBER( z80dart_device::cd_ba_r )
+uint8_t z80dart_device::cd_ba_r(offs_t offset)
 {
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
@@ -406,7 +359,7 @@ READ8_MEMBER( z80dart_device::cd_ba_r )
 //  cd_ba_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( z80dart_device::cd_ba_w )
+void z80dart_device::cd_ba_w(offs_t offset, uint8_t data)
 {
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
@@ -423,7 +376,7 @@ WRITE8_MEMBER( z80dart_device::cd_ba_w )
 //  ba_cd_r -
 //-------------------------------------------------
 
-READ8_MEMBER( z80dart_device::ba_cd_r )
+uint8_t z80dart_device::ba_cd_r(offs_t offset)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -437,7 +390,7 @@ READ8_MEMBER( z80dart_device::ba_cd_r )
 //  ba_cd_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( z80dart_device::ba_cd_w )
+void z80dart_device::ba_cd_w(offs_t offset, uint8_t data)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);

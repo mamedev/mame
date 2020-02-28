@@ -22,6 +22,8 @@ x68k_crtc_device::x68k_crtc_device(const machine_config &mconfig, device_type ty
 	, m_gvram_read_callback(*this)
 	, m_tvram_write_callback(*this)
 	, m_gvram_write_callback(*this)
+	, m_clock_69m(0)
+	, m_clock_50m(0)
 	, m_operation(0)
 	, m_vblank(false)
 	, m_hblank(false)
@@ -134,7 +136,7 @@ void x68k_crtc_device::text_copy(unsigned src, unsigned dest, u8 planes)
 	// update RAM in each plane
 	for (int words = 256; words > 0; words--, src_ram++, dest_ram++)
 	{
-		for (u8 plane = 0; plane < 3; plane++)
+		for (u8 plane = 0; plane <= 3; plane++)
 			if (BIT(planes, plane))
 				m_tvram_write_callback(dest_ram + 0x10000 * plane, m_tvram_read_callback(src_ram + 0x10000 * plane, 0xffff), 0xffff);
 	}
@@ -203,7 +205,7 @@ void x68k_crtc_device::refresh_mode()
 		div = BIT(m_reg[20], 0) ? 3 : 6;
 	if ((m_reg[20] & 0x0c) == 0)
 		div *= 2;
-	attotime refresh = attotime::from_hz((BIT(m_reg[20], 4) ? 69.55199_MHz_XTAL : 38.86363_MHz_XTAL) / div) * (scr.max_x * scr.max_y);
+	attotime refresh = attotime::from_hz((BIT(m_reg[20], 4) ? clock_69m() : clock_39m()) / div) * (scr.max_x * scr.max_y);
 	LOG("screen().configure(%i,%i,[%i,%i,%i,%i],%f)\n", scr.max_x, scr.max_y, visiblescr.min_x, visiblescr.min_y, visiblescr.max_x, visiblescr.max_y, refresh.as_hz());
 	screen().configure(scr.max_x, scr.max_y, visiblescr, refresh.as_attoseconds());
 }

@@ -327,11 +327,12 @@ static GFXDECODE_START( gfx_kot )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(tiamc1_state::tiamc1)
+void tiamc1_state::tiamc1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(tiamc1_map)
-	MCFG_DEVICE_IO_MAP(tiamc1_io_map)
+	I8080(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tiamc1_state::tiamc1_map);
+	m_maincpu->set_addrmap(AS_IO, &tiamc1_state::tiamc1_io_map);
 
 	i8255_device &ppi(I8255A(config, "kr580vv55a"));  /* soviet clone of i8255 */
 	ppi.in_pa_callback().set_ioport("IN0");
@@ -340,10 +341,10 @@ MACHINE_CONFIG_START(tiamc1_state::tiamc1)
 	ppi.out_pc_callback().set(FUNC(tiamc1_state::tiamc1_control_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 312, 0, 256)       // pixel clock and htotal comes from docs/schematics, the rest is guess (determined by undumped PROM)
-	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_tiamc1)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, 336, 0, 256, 312, 0, 256);       // pixel clock and htotal comes from docs/schematics, the rest is guess (determined by undumped PROM)
+	screen.set_screen_update(FUNC(tiamc1_state::screen_update_tiamc1));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tiamc1);
 	PALETTE(config, m_palette, FUNC(tiamc1_state::tiamc1_palette), 32);
@@ -351,20 +352,18 @@ MACHINE_CONFIG_START(tiamc1_state::tiamc1)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("2x8253", TIAMC1, SND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	TIAMC1(config, "2x8253", SND_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(tiamc1_state::kot)
+void tiamc1_state::kot(machine_config &config)
+{
 	tiamc1(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(kotrybolov_map)
-	MCFG_DEVICE_IO_MAP(kotrybolov_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &tiamc1_state::kotrybolov_map);
+	m_maincpu->set_addrmap(AS_IO, &tiamc1_state::kotrybolov_io_map);
 
-	MCFG_SCREEN_MODIFY("screen")
 	MCFG_VIDEO_START_OVERRIDE(tiamc1_state, kot)
-	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_kot)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(tiamc1_state::screen_update_kot));
 
 	m_gfxdecode->set_info(gfx_kot);
 
@@ -375,7 +374,7 @@ MACHINE_CONFIG_START(tiamc1_state::kot)
 	pit8253.set_clk<0>(PIXEL_CLOCK / 4);
 	pit8253.set_clk<2>(SND_CLOCK);                // guess
 	pit8253.out_handler<2>().set(FUNC(tiamc1_state::pit8253_2_w));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( konek )

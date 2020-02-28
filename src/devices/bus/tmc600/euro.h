@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Telercas Telmac TMC-600 euro bus emulation
+    Telercas Telmac TMC-600 Eurobus emulation
 
 **********************************************************************
 
@@ -50,44 +50,34 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define TMC600_EURO_BUS_TAG     "bus"
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> device_tmc600_euro_bus_card_interface
+// ======================> device_tmc600_eurobus_card_interface
 
-class tmc600_euro_bus_slot_t;
+class tmc600_eurobus_slot_device;
 
-class device_tmc600_euro_bus_card_interface : public device_slot_card_interface
+class device_tmc600_eurobus_card_interface : public device_interface
 {
-public:
-
 protected:
 	// construction/destruction
-	device_tmc600_euro_bus_card_interface(const machine_config &mconfig, device_t &device);
+	device_tmc600_eurobus_card_interface(const machine_config &mconfig, device_t &device);
 
-	tmc600_euro_bus_slot_t  *m_slot;
+	tmc600_eurobus_slot_device  *m_slot;
 
-	friend class tmc600_euro_bus_slot_t;
+	friend class tmc600_eurobus_slot_device;
 };
 
 
-// ======================> tmc600_euro_bus_slot_t
+// ======================> tmc600_eurobus_slot_device
 
-class tmc600_euro_bus_slot_t : public device_t,
-							   public device_slot_interface
+class tmc600_eurobus_slot_device : public device_t, public device_single_card_slot_interface<device_tmc600_eurobus_card_interface>
 {
 public:
 	// construction/destruction
 	template <typename T>
-	tmc600_euro_bus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: tmc600_euro_bus_slot_t(mconfig, tag, owner, 0)
+	tmc600_eurobus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: tmc600_eurobus_slot_device(mconfig, tag, owner, 0)
 	{
 		option_reset();
 		opts(*this);
@@ -95,25 +85,24 @@ public:
 		set_fixed(false);
 	}
 
-	tmc600_euro_bus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	tmc600_eurobus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override { if (m_card) get_card_device()->reset(); }
 
-	device_tmc600_euro_bus_card_interface *m_card;
+	device_tmc600_eurobus_card_interface *m_card;
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(TMC600_EURO_BUS_SLOT, tmc600_euro_bus_slot_t)
+DECLARE_DEVICE_TYPE(TMC600_EUROBUS_SLOT, tmc600_eurobus_slot_device)
 
 
-void tmc600_euro_bus_cards(device_slot_interface &device);
+void tmc600_eurobus_cards(device_slot_interface &device);
 
 
-typedef device_type_iterator<tmc600_euro_bus_slot_t> tmc600_euro_bus_slot_t_iterator;
+typedef device_type_iterator<tmc600_eurobus_slot_device> tmc600_eurobus_slot_iterator;
 
 
 #endif // MAME_DEVICES_TMC600_EURO_H

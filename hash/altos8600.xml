@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="altos8600" description="Altos 8600 floppies">
+
+	<software name="diag">
+		<description>Altos Diagnostic Executive</description>
+		<year>1982</year>
+		<publisher>Altos Computer Systems</publisher>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="272766">
+				<rom name="cdc114dg.imd" size="272766" crc="665efeeb" sha1="a9184447c46dfa11b961928f55c92f7ea1559b41"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -20,6 +20,14 @@ Notes:
 - Increased "gfx3" to address 0x400 sprites, to avoid Ghosts'n Goblins
   from drawing a bad sprite. (18/08/2005 Pierpaolo Prazzoli)
 
+ Notes by Jose Tejada (jotego)
+
+There is no watchdog in GnG, as previously stated in the MAME driver.
+Instead, there is a DMA circuit that copies object data from the CPU RAM to a buffer
+this also slows down the CPU as it is halted during that time.
+The DMA is triggered when a certain memory location is addressed. That location was
+thought to be a watchdog before.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -71,7 +79,7 @@ void gng_state::gng_map(address_map &map)
 	map(0x3a00, 0x3a00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x3b08, 0x3b09).w(FUNC(gng_state::gng_bgscrollx_w));
 	map(0x3b0a, 0x3b0b).w(FUNC(gng_state::gng_bgscrolly_w));
-	map(0x3c00, 0x3c00).noprw(); /* watchdog? */
+	// 0x3c00 is the DMA trigger. Not emulated.
 	map(0x3d00, 0x3d07).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x3e00, 0x3e00).w(FUNC(gng_state::gng_bankswitch_w));
 	map(0x4000, 0x5fff).bankr("bank1");
@@ -378,16 +386,16 @@ void gng_state::machine_reset()
 	}
 }
 
-MACHINE_CONFIG_START(gng_state::gng)
-
+void gng_state::gng(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(12'000'000)/2)        /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(gng_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gng_state,  irq0_line_hold)
+	MC6809(config, m_maincpu, XTAL(12'000'000)/2);        /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gng_state::gng_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gng_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/4)     /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(gng_state, irq0_line_hold, 4*60)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(12'000'000)/4));     /* verified on pcb */
+	audiocpu.set_addrmap(AS_PROGRAM, &gng_state::sound_map);
+	audiocpu.set_periodic_int(FUNC(gng_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 9B on A board
 	mainlatch.q_out_cb<0>().set(FUNC(gng_state::flipscreen_w));
@@ -397,18 +405,18 @@ MACHINE_CONFIG_START(gng_state::gng)
 	mainlatch.q_out_cb<3>().set([this] (int state) { machine().bookkeeping().coin_counter_w(1, state); });
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.59)    /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gng_state, screen_update_gng)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.59);    /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(gng_state::screen_update_gng));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gng)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gng);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256);
 
@@ -417,26 +425,26 @@ MACHINE_CONFIG_START(gng_state::gng)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8)     /* verified on pcb */
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-	MCFG_SOUND_ROUTE(2, "mono", 0.40)
-	MCFG_SOUND_ROUTE(3, "mono", 0.20)
+	YM2203(config, m_ym[0], XTAL(12'000'000)/8);     /* verified on pcb */
+	m_ym[0]->add_route(0, "mono", 0.40);
+	m_ym[0]->add_route(1, "mono", 0.40);
+	m_ym[0]->add_route(2, "mono", 0.40);
+	m_ym[0]->add_route(3, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(12'000'000)/8)     /* verified on pcb */
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-	MCFG_SOUND_ROUTE(2, "mono", 0.40)
-	MCFG_SOUND_ROUTE(3, "mono", 0.20)
-MACHINE_CONFIG_END
+	YM2203(config, m_ym[1], XTAL(12'000'000)/8);     /* verified on pcb */
+	m_ym[1]->add_route(0, "mono", 0.40);
+	m_ym[1]->add_route(1, "mono", 0.40);
+	m_ym[1]->add_route(2, "mono", 0.40);
+	m_ym[1]->add_route(3, "mono", 0.20);
+}
 
-MACHINE_CONFIG_START(gng_state::diamond)
+void gng_state::diamond(machine_config &config)
+{
 	gng(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(diamond_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &gng_state::diamond_map);
 
 	config.device_remove("mainlatch");
-MACHINE_CONFIG_END
+}
 
 
 

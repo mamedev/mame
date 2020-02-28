@@ -211,7 +211,7 @@ Port(hex)  Role       Comment
 ToDo:
 - Fix Paste: Shift operates randomly (only super80m is suitable, the others drop characters because
        of the horrible inline editor they use)
-- Get disk system to work (no disk images available) only connected to super80r atm
+- Disk system works, only connected to super80r atm - is it needed for super80v?
 
 
 ***********************************************************************************************************/
@@ -692,7 +692,7 @@ void super80_state::machine_start()
 
 static void super80_floppies(device_slot_interface &device)
 {
-	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("s80flop", FLOPPY_525_QD);
 }
 
 
@@ -734,7 +734,6 @@ void super80_state::super80(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1);
@@ -751,15 +750,15 @@ void super80_state::super80(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in", 0);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(super80_state, super80), this), "bin", 3);
+	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(super80_state::quickload_cb));
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("super80_cass");
 
-	TIMER(config, "timer_p").configure_periodic(FUNC(super80_state::timer_p), attotime::from_hz(40000)); // cass read
+	TIMER(config, "kansas_r").configure_periodic(FUNC(super80_state::kansas_r), attotime::from_hz(40000)); // cass read
 	TIMER(config, "timer_k").configure_periodic(FUNC(super80_state::timer_k), attotime::from_hz(300)); // keyb scan
 	TIMER(config, "timer_h").configure_periodic(FUNC(super80_state::timer_h), attotime::from_hz(100)); // half-speed
 
@@ -772,6 +771,10 @@ void super80_state::super80d(machine_config &config)
 	super80(config);
 	m_gfxdecode->set_info(gfx_super80d);
 	m_screen->set_screen_update(FUNC(super80_state::screen_update_super80d));
+
+	// software list
+	config.device_remove("cass_list");
+	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("D");
 }
 
 void super80_state::super80e(machine_config &config)
@@ -780,6 +783,10 @@ void super80_state::super80e(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &super80_state::super80e_io);
 	m_gfxdecode->set_info(gfx_super80e);
 	m_screen->set_screen_update(FUNC(super80_state::screen_update_super80e));
+
+	// software list
+	config.device_remove("cass_list");
+	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("E");
 }
 
 void super80_state::super80m(machine_config &config)
@@ -791,6 +798,10 @@ void super80_state::super80m(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(super80_state::screen_update_super80m));
 	m_screen->screen_vblank().set(FUNC(super80_state::screen_vblank_super80m));
+
+	// software list
+	config.device_remove("cass_list");
+	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("M");
 }
 
 void super80_state::super80v(machine_config &config)
@@ -822,13 +833,12 @@ void super80_state::super80v(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(SUPER80V_DOTS);
-	m_crtc->set_update_row_callback(FUNC(super80_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(super80_state::crtc_update_row));
 
 	config.set_default_layout(layout_super80);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1);
@@ -845,15 +855,15 @@ void super80_state::super80v(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in", 0);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(super80_state, super80), this), "bin", 3);
+	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(super80_state::quickload_cb));
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("super80_cass");
 
-	TIMER(config, "timer_p").configure_periodic(FUNC(super80_state::timer_p), attotime::from_hz(40000)); // cass read
+	TIMER(config, "kansas_r").configure_periodic(FUNC(super80_state::kansas_r), attotime::from_hz(40000)); // cass read
 	TIMER(config, "timer_k").configure_periodic(FUNC(super80_state::timer_k), attotime::from_hz(300)); // keyb scan
 
 	// software list
@@ -876,8 +886,12 @@ void super80_state::super80r(machine_config &config)
 
 	WD2793(config, m_fdc, 2_MHz_XTAL);
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", super80_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", super80_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", super80_floppies, "s80flop", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", super80_floppies, "s80flop", floppy_image_device::default_floppy_formats).enable_sound(true);
+
+	// software list
+	config.device_remove("cass_list");
+	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("R");
 }
 
 /**************************** ROMS *****************************************************************/

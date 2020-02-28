@@ -118,7 +118,7 @@ ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const 
 SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
 {
 	m_address = offset;
-	m_inDsrArea = ((m_address & m_select_mask)==m_select_value);
+	m_inDsrArea = in_dsr_space(offset, true);
 
 	line_state a14 = ((m_address & 2)!=0)? ASSERT_LINE : CLEAR_LINE;
 
@@ -142,10 +142,10 @@ SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
 	}
 }
 
-void ti_pcode_card_device::debugger_read(address_space& space, uint16_t offset, uint8_t& value)
+void ti_pcode_card_device::debugger_read(uint16_t offset, uint8_t& value)
 {
 	// The debuger does not call setaddress
-	if (m_active && ((offset & m_select_mask)==m_select_value))
+	if (m_active && in_dsr_space(offset, true))
 	{
 		bool isrom0 = ((offset & 0xf000)==0x4000);
 		bool isrom12 = ((offset & 0xf000)==0x5000);
@@ -160,7 +160,7 @@ READ8Z_MEMBER( ti_pcode_card_device::readz )
 	// Care for debugger
 	if (machine().side_effects_disabled())
 	{
-		debugger_read(space, offset, *value);
+		debugger_read(offset, *value);
 	}
 
 	if (m_active && m_inDsrArea && m_selected)
@@ -200,7 +200,7 @@ READ8Z_MEMBER( ti_pcode_card_device::readz )
     Write a byte in P-Code ROM space. This is only used for setting the
     GROM address.
 */
-WRITE8_MEMBER( ti_pcode_card_device::write )
+void ti_pcode_card_device::write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled()) return;
 	if (m_active && m_isgrom && m_selected)
@@ -253,7 +253,7 @@ READ8Z_MEMBER(ti_pcode_card_device::crureadz)
     A8, A13, and A14 so bit 0 is at 0x1f00, but bit 4 is at 0x1f80. Accordingly,
     bit 7 would be 0x1f86 but it is not used.
 */
-WRITE8_MEMBER(ti_pcode_card_device::cruwrite)
+void ti_pcode_card_device::cruwrite(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff00)==CRU_BASE)
 		m_crulatch->write_bit((offset & 0x80) >> 5 | (offset & 0x06) >> 1, data);
@@ -287,16 +287,6 @@ void ti_pcode_card_device::device_start()
 
 void ti_pcode_card_device::device_reset()
 {
-	if (m_genmod)
-	{
-		m_select_mask = 0x1fe000;
-		m_select_value = 0x174000;
-	}
-	else
-	{
-		m_select_mask = 0x7e000;
-		m_select_value = 0x74000;
-	}
 	m_bank_select = 1;
 	m_selected = false;
 	m_clock_count = 0;
@@ -323,7 +313,7 @@ INPUT_CHANGED_MEMBER( ti_pcode_card_device::switch_changed )
 
 INPUT_PORTS_START( ti99_pcode )
 	PORT_START( ACTIVE_TAG )
-	PORT_DIPNAME( 0x01, 0x00, "P-Code activation switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti_pcode_card_device, switch_changed, nullptr)
+	PORT_DIPNAME( 0x01, 0x00, "P-Code activation switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti_pcode_card_device, switch_changed, 0)
 		PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING( 0x01, DEF_STR( On ) )
 INPUT_PORTS_END

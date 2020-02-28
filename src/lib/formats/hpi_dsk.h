@@ -7,13 +7,15 @@
     "HPI" disk format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_HPI_DSK_H
+#define MAME_FORMATS_HPI_DSK_H
 
 #pragma once
 
-#ifndef _HPI_DSK_H_
-#define _HPI_DSK_H_
-
 #include "flopimg.h"
+
+#include <array>
+#include <vector>
 
 // Geometry constants
 constexpr unsigned HPI_TRACKS = 77;
@@ -53,4 +55,4 @@ private:
 
 extern const floppy_format_type FLOPPY_HPI_FORMAT;
 
-#endif /* _HPI_DSK_H_ */
+#endif // MAME_FORMATS_HPI_DSK_H

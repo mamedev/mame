@@ -386,21 +386,21 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(divebomb_state::divebomb)
+void divebomb_state::divebomb(machine_config &config)
+{
+	Z80(config, m_fgcpu, XTAL1/4); // ?
+	m_fgcpu->set_addrmap(AS_PROGRAM, &divebomb_state::divebomb_fgcpu_map);
+	m_fgcpu->set_addrmap(AS_IO, &divebomb_state::divebomb_fgcpu_iomap);
 
-	MCFG_DEVICE_ADD("fgcpu", Z80,XTAL1/4) // ?
-	MCFG_DEVICE_PROGRAM_MAP(divebomb_fgcpu_map)
-	MCFG_DEVICE_IO_MAP(divebomb_fgcpu_iomap)
+	Z80(config, m_spritecpu, XTAL1/4); // ?
+	m_spritecpu->set_addrmap(AS_PROGRAM, &divebomb_state::divebomb_spritecpu_map);
+	m_spritecpu->set_addrmap(AS_IO, &divebomb_state::divebomb_spritecpu_iomap);
 
-	MCFG_DEVICE_ADD("spritecpu", Z80,XTAL1/4) // ?
-	MCFG_DEVICE_PROGRAM_MAP(divebomb_spritecpu_map)
-	MCFG_DEVICE_IO_MAP(divebomb_spritecpu_iomap)
+	Z80(config, m_rozcpu, XTAL1/4); // ?
+	m_rozcpu->set_addrmap(AS_PROGRAM, &divebomb_state::divebomb_rozcpu_map);
+	m_rozcpu->set_addrmap(AS_IO, &divebomb_state::divebomb_rozcpu_iomap);
 
-	MCFG_DEVICE_ADD("rozcpu", Z80,XTAL1/4) // ?
-	MCFG_DEVICE_PROGRAM_MAP(divebomb_rozcpu_map)
-	MCFG_DEVICE_IO_MAP(divebomb_rozcpu_iomap)
-
-	config.m_perfect_cpu_quantum = subtag("fgcpu");
+	config.set_perfect_quantum(m_fgcpu);
 
 	INPUT_MERGER_ANY_HIGH(config, m_fgcpu_irq).output_handler().set_inputline(m_fgcpu, INPUT_LINE_IRQ0);
 
@@ -419,14 +419,14 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	m_k051316[0]->set_bpp(8);
 	m_k051316[0]->set_wrap(0);
 	m_k051316[0]->set_offsets(-88, -16);
-	m_k051316[0]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_1), this);
+	m_k051316[0]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_1));
 
 	K051316(config, m_k051316[1], 0);
 	m_k051316[1]->set_palette(m_palette);
 	m_k051316[1]->set_bpp(8);
 	m_k051316[1]->set_wrap(0);
 	m_k051316[1]->set_offsets(-88, -16);
-	m_k051316[1]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_2), this);
+	m_k051316[1]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_2));
 
 	MCFG_MACHINE_START_OVERRIDE(divebomb_state, divebomb)
 	MCFG_MACHINE_RESET_OVERRIDE(divebomb_state, divebomb)
@@ -452,19 +452,13 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	SPEAKER(config, "mono").front_center();
 
 	// All frequencies unverified
-	MCFG_DEVICE_ADD("sn0", SN76489, XTAL1/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_DEVICE_ADD("sn1", SN76489, XTAL1/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_DEVICE_ADD("sn2", SN76489, XTAL1/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_DEVICE_ADD("sn3", SN76489, XTAL1/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_DEVICE_ADD("sn4", SN76489, XTAL1/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_DEVICE_ADD("sn5", SN76489, XTAL1/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-MACHINE_CONFIG_END
+	SN76489(config, "sn0", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn1", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn2", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn3", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn4", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn5", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
+}
 
 
 

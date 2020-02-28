@@ -156,7 +156,6 @@ WRITE_LINE_MEMBER(qix_state::qix_pia_sint)
 
 void qix_state::audio_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x2000, 0x2003).mirror(0x5ffc).rw(m_sndpia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x4000, 0x4003).mirror(0x3ffc).rw(m_sndpia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xd000, 0xffff).rom();

@@ -16,7 +16,7 @@
 
 *********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "formats/kaypro_dsk.h"
 

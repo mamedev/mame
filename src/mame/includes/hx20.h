@@ -49,8 +49,9 @@ public:
 		, m_kbrequest(1)
 	{ }
 
-	void cm6000(machine_config &config);
 	void hx20(machine_config &config);
+	void cm6032(machine_config &config);
+	void cm6127(machine_config &config);
 
 private:
 	required_device<hd63701_cpu_device> m_maincpu;
@@ -116,9 +117,11 @@ private:
 	// sio state
 	int m_sio_rx;
 	int m_sio_pin;
-	void cm6000_mem(address_map &map);
+
 	void hx20_mem(address_map &map);
 	void hx20_sub_mem(address_map &map);
+	void cm6032_mem(address_map &map);
+	void cm6127_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_HX20_H

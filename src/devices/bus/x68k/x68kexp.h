@@ -68,20 +68,13 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define X68K_EXP_SLOT_TAG       "x68kexp"
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> device_x68k_expansion_card_interface
 
 // class representing interface-specific live x68k_expansion card
-class device_x68k_expansion_card_interface : public device_slot_card_interface
+class device_x68k_expansion_card_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -90,20 +83,17 @@ public:
 	// reset
 	virtual void x68k_reset_w() { }
 
-	void set_vector(uint8_t vector) { m_vector = vector; }
-	uint8_t vector() { return m_vector; }
+	virtual uint8_t iack2();
+	virtual uint8_t iack4();
 
 protected:
 	device_x68k_expansion_card_interface(const machine_config &mconfig, device_t &device);
-
-private:
-	uint8_t m_vector;
 };
 
 
 // ======================> x68k_expansion_slot_device
 
-class x68k_expansion_slot_device : public device_t, public device_slot_interface
+class x68k_expansion_slot_device : public device_t, public device_single_card_slot_interface<device_x68k_expansion_card_interface>
 {
 public:
 	// construction/destruction
@@ -119,23 +109,28 @@ public:
 	x68k_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~x68k_expansion_slot_device();
 
+	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
+
 	auto out_irq2_callback() { return m_out_irq2_cb.bind(); }
 	auto out_irq4_callback() { return m_out_irq4_cb.bind(); }
 	auto out_nmi_callback() { return m_out_nmi_cb.bind(); }
 	auto out_reset_callback() { return m_out_reset_cb.bind(); }
 
+	address_space &space() { return *m_space; }
 
 	DECLARE_WRITE_LINE_MEMBER( irq2_w );
 	DECLARE_WRITE_LINE_MEMBER( irq4_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 
-	uint8_t vector() { return m_card->vector(); }
+	uint8_t iack2() { return (m_card != nullptr) ? m_card->iack2() : 0x18; }
+	uint8_t iack4() { return (m_card != nullptr) ? m_card->iack4() : 0x18; }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
+
+	required_address_space m_space;
 
 	devcb_write_line    m_out_irq2_cb;
 	devcb_write_line    m_out_irq4_cb;

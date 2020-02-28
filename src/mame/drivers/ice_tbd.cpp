@@ -66,18 +66,18 @@ void ice_tbd_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(ice_tbd_state::ice_tbd)
-
+void ice_tbd_state::ice_tbd(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,8000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ice_tbd_map)
-	MCFG_DEVICE_IO_MAP(ice_tbd_io_map)
+	Z80(config, m_maincpu, 8000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ice_tbd_state::ice_tbd_map);
+	m_maincpu->set_addrmap(AS_IO, &ice_tbd_state::ice_tbd_io_map);
 
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.out_pa_callback().set_nop(); // ?
 	ppi.out_pb_callback().set_nop(); // ?
 	ppi.in_pc_callback().set_constant(0); // ?
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( ice_tbd )

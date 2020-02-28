@@ -14,6 +14,7 @@
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class mitchell_state : public driver_device
 {
@@ -154,6 +155,7 @@ private:
 	void mstworld_io_map(address_map &map);
 	void mstworld_sound_map(address_map &map);
 	void pangba_sound_map(address_map &map);
+	void pkladiesbl_io_map(address_map &map);
 	void spangbl_io_map(address_map &map);
 	void spangbl_map(address_map &map);
 	void spangbl_sound_map(address_map &map);

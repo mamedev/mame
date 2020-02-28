@@ -35,7 +35,8 @@ DEFINE_DEVICE_TYPE(TS9347, ts9347_device, "ts9347", "TS9347")
 // default address map
 void ef9345_device::ef9345(address_map &map)
 {
-	map(0x0000, 0x3fff).ram();
+	if (!has_configured_map(0))
+		map(0x0000, 0x3fff).ram();
 }
 
 //-------------------------------------------------
@@ -113,7 +114,7 @@ ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, co
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(ef9345_device::ef9345), this)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(ef9345_device::ef9345), this)),
 	m_charset(*this, DEVICE_SELF),
 	m_variant(variant),
 	m_palette(*this, finder_base::DUMMY_TAG)
@@ -381,6 +382,7 @@ uint16_t ef9345_device::indexblock(uint16_t x, uint16_t y)
 {
 	uint16_t i = x, j;
 	j = (y == 0) ? ((m_tgs & 0x20) >> 5) : ((m_ror & 0x1f) + y - 1);
+	j = (j > 31) ? (j - 24) : j;
 
 	//right side of a double width character
 	if ((m_tgs & 0x80) == 0 && x > 0)
@@ -533,7 +535,7 @@ void ef9345_device::quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, 
 }
 
 // draw bichrome character (80 columns)
-void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y)
+void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, uint8_t cursor)
 {
 	uint8_t c0, c1, pix[60];
 	uint16_t i, j, d;
@@ -559,6 +561,13 @@ void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y)
 			c0 = i;
 		}
 
+		if ((cursor == 0x40) || ((cursor == 0x60) && m_blink))
+		{
+			i = c1;
+			c1 = c0;
+			c0 = i;
+		}
+
 		d = ((c & 0x7f) >> 2) * 0x40 + (c & 0x03);  //char position
 
 		for(i=0, j=0; i < 10; i++)
@@ -569,7 +578,7 @@ void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y)
 		}
 
 		//draw the underline
-		if (a & 2)
+		if ((a & 2) || (cursor == 0x50) || ((cursor == 0x70) && m_blink))
 			memset(&pix[54], c1, 6);
 
 		break;
@@ -691,8 +700,19 @@ void ef9345_device::makechar_24x40(uint16_t x, uint16_t y)
 void ef9345_device::makechar_12x80(uint16_t x, uint16_t y)
 {
 	uint16_t iblock = indexblock(x, y);
-	bichrome80(m_videoram->read_byte(m_block + iblock), (m_videoram->read_byte(m_block + iblock + 0x1000) >> 4) & 0x0f, 2 * x + 1, y + 1);
-	bichrome80(m_videoram->read_byte(m_block + iblock + 0x0800), m_videoram->read_byte(m_block + iblock + 0x1000) & 0x0f, 2 * x + 2, y + 1);
+	//draw the cursor
+	uint8_t cursor = 0;
+	uint8_t b = BIT(m_registers[7], 7);
+
+	uint8_t i = (m_registers[6] & 0x1f);
+	if (i < 8)
+		i &= 1;
+
+	if (iblock == 0x40 * i + (m_registers[7] & 0x3f))   //cursor position
+		cursor = m_mat & 0x70;
+
+	bichrome80(m_videoram->read_byte(m_block + iblock), (m_videoram->read_byte(m_block + iblock + 0x1000) >> 4) & 0x0f, 2 * x + 1, y + 1, b ? 0 : cursor);
+	bichrome80(m_videoram->read_byte(m_block + iblock + 0x0800), m_videoram->read_byte(m_block + iblock + 0x1000) & 0x0f, 2 * x + 2, y + 1, b ? cursor : 0);
 }
 
 void ef9345_device::draw_border(uint16_t line)
@@ -844,7 +864,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			if (cmd&1)
 			{
 				if ((m_registers[7] & 0x80) == 0x00) { m_registers[7] |= 0x80; return; }
-				m_registers[7] &= 0x80;
+				m_registers[7] &= ~0x80;
 				inc_x(7);
 			}
 			break;
@@ -1047,7 +1067,7 @@ void ef9345_device::update_scanline(uint16_t scanline)
 	}
 }
 
-READ8_MEMBER( ef9345_device::data_r )
+uint8_t ef9345_device::data_r(offs_t offset)
 {
 	if (offset & 7)
 		return m_registers[offset & 7];
@@ -1060,7 +1080,7 @@ READ8_MEMBER( ef9345_device::data_r )
 	return m_state;
 }
 
-WRITE8_MEMBER( ef9345_device::data_w )
+void ef9345_device::data_w(offs_t offset, uint8_t data)
 {
 	m_registers[offset & 7] = data;
 

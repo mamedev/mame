@@ -1005,11 +1005,11 @@ void fanucspmg_state::fanucspmg(machine_config &config)
 	screen.set_raw(XTAL(15'000'000), 640, 0, 512, 390, 0, 384);
 	screen.set_screen_update(CRTC_TAG, FUNC(mc6845_device::screen_update));
 
-	HD6845(config, m_crtc, XTAL(8'000'000)/2);
+	HD6845S(config, m_crtc, XTAL(8'000'000)/2);
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(fanucspmg_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(fanucspmg_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(fanucspmg_state::vsync_w));
 }
 
@@ -1017,7 +1017,7 @@ void fanucspmg_state::fanucspmgm(machine_config &config)
 {
 	fanucspmg(config);
 
-	m_crtc->set_update_row_callback(FUNC(fanucspmg_state::crtc_update_row_mono), this);
+	m_crtc->set_update_row_callback(FUNC(fanucspmg_state::crtc_update_row_mono));
 }
 
 /* ROM definition */

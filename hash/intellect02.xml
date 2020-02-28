@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="intellect02" description="Intellect-02 Cartridges">
+
+<!-- Intellect-02 Cartridges -->
+
+	<software name="chess">
+		<description>Chess (3 levels)</description>
+		<year>1986</year>
+		<publisher>BREA Research Institute</publisher>
+		<part name="cart" interface="intellect02">
+			<dataarea name="rom" size="0x2000">
+				<rom name="chess.bin" size="0x2000" crc="81691aac" sha1="2f358fd8f1f1b0d886a728155a01ce61f0d6c39b" /> <!-- КР568РЕ20003, 8612 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess2">
+		<description>Chess (4 levels)</description>
+		<year>1989</year>
+		<publisher>BREA Research Institute</publisher>
+		<part name="cart" interface="intellect02">
+			<dataarea name="rom" size="0x2000">
+				<rom name="chess2.bin" size="0x2000" crc="7058e18f" sha1="f1e61eeb752aafbd3c9f4d288ee3e73cc9a74496" /> <!-- КР568РЕ2-0004, 8907 -->
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

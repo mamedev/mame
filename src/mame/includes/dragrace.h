@@ -15,6 +15,7 @@
 #include "sound/discrete.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 /* Discrete Sound Input Nodes */
 #define DRAGRACE_SCREECH1_EN    NODE_01
@@ -77,7 +78,7 @@ private:
 	int       m_gear[2];
 
 	/* devices */
-	required_device<discrete_device> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;

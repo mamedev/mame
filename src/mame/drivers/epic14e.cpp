@@ -84,7 +84,7 @@ void epic14e_state::cpu_map(address_map &map)
 	map(0x6000, 0x6007).rw("pvtc", FUNC(scn2672_device::read), FUNC(scn2672_device::write));
 	map(0x8000, 0x8003).rw("acia1", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x9000, 0x9003).rw("acia2", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xa010, 0xa01f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xa010, 0xa01f).m(m_via, FUNC(via6522_device::map));
 	map(0xe000, 0xffff).rom().region("program", 0);
 }
 

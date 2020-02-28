@@ -89,8 +89,7 @@ void icatel_state::i80c31_io(address_map &map)
 {
 	map(0x0000, 0x3FFF).ram();
 	map(0x8000, 0x8002).ram(); /* HACK! */
-	map(0x8040, 0x8040).mirror(0x3F1E).w(m_lcdc, FUNC(hd44780_device::control_write)); // not sure yet. CI12 (73LS273)
-	map(0x8041, 0x8041).mirror(0x3F1E).w(m_lcdc, FUNC(hd44780_device::data_write)); // not sure yet.  CI12
+	map(0x8040, 0x8041).mirror(0x3F1E).w(m_lcdc, FUNC(hd44780_device::write)); // not sure yet. CI12 (73LS273)
 	map(0x8060, 0x8060).mirror(0x3F1F).rw(FUNC(icatel_state::ci8_r), FUNC(icatel_state::ci8_w));
 	map(0x8080, 0x8080).mirror(0x3F1F).rw(FUNC(icatel_state::ci16_r), FUNC(icatel_state::ci16_w)); // card reader (?)
 	map(0x80C0, 0x80C0).mirror(0x3F1F).rw(FUNC(icatel_state::ci15_r), FUNC(icatel_state::ci15_w)); // 74LS244 (tristate buffer)
@@ -100,7 +99,7 @@ void icatel_state::i80c31_io(address_map &map)
 
 void icatel_state::i80c31_data(address_map &map)
 {
-//  AM_RANGE(0x0056,0x005A) AM_READ(magic_string) /* This is a hack! */
+//  map(0x0056,0x005A).r(FUNC(icatel_state::magic_string)); /* This is a hack! */
 }
 
 void icatel_state::init_icatel()
@@ -254,7 +253,8 @@ HD44780_PIXEL_UPDATE(icatel_state::icatel_pixel_update)
 	}
 }
 
-MACHINE_CONFIG_START(icatel_state::icatel)
+void icatel_state::icatel(machine_config &config)
+{
 	/* basic machine hardware */
 	I80C31(config, m_maincpu, XTAL(2'097'152));
 	m_maincpu->set_addrmap(AS_PROGRAM, &icatel_state::i80c31_prg);
@@ -266,21 +266,21 @@ MACHINE_CONFIG_START(icatel_state::icatel)
 	m_maincpu->port_out_cb<3>().set(FUNC(icatel_state::i80c31_p3_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_SIZE(6*16, 9*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_size(6*16, 9*2);
+	screen.set_visarea(0, 6*16-1, 0, 9*2-1);
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(icatel_state::icatel_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_icatel);
 
 	HD44780(config, m_lcdc, 0);
 	m_lcdc->set_lcd_size(2, 16);
-	m_lcdc->set_pixel_update_cb(FUNC(icatel_state::icatel_pixel_update), this);
-MACHINE_CONFIG_END
+	m_lcdc->set_pixel_update_cb(FUNC(icatel_state::icatel_pixel_update));
+}
 
 ROM_START( icatel )
 	ROM_REGION( 0x8000, "maincpu", 0 )

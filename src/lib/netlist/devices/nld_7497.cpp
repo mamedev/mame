@@ -10,15 +10,16 @@
  */
 
 #include "nld_7497.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
 	namespace devices
 	{
 
-	static constexpr netlist_time out_delay_CLK_Y[2] = { NLTIME_FROM_NS(20), NLTIME_FROM_NS(26) }; // tPHL, tPLH
-	static constexpr netlist_time out_delay_CLK_Z[2] = { NLTIME_FROM_NS(17), NLTIME_FROM_NS(12) };
+	static constexpr const std::array<netlist_time, 2> out_delay_CLK_Y = { NLTIME_FROM_NS(20), NLTIME_FROM_NS(26) }; // tPHL, tPLH
+	static constexpr const std::array<netlist_time, 2> out_delay_CLK_Z = { NLTIME_FROM_NS(17), NLTIME_FROM_NS(12) };
 
 	NETLIB_OBJECT(7497)
 	{
@@ -36,6 +37,7 @@ namespace netlist
 		, m_rate(*this, "_m_rate", 0)
 		, m_state(*this, "_m_state", 0)
 		, m_lastclock(*this, "_m_lastclock", 0)
+		, m_power_pins(*this)
 		{
 		}
 
@@ -64,6 +66,7 @@ namespace netlist
 		state_var_u8 m_rate;
 		state_var_sig m_state;
 		state_var_sig m_lastclock;
+		nld_power_pins m_power_pins;
 
 		void newstate(const netlist_sig_t state)
 		{
@@ -155,6 +158,7 @@ namespace netlist
 			register_subalias("5", m_ZQ);
 			register_subalias("6", m_Y);
 			register_subalias("7", m_ENOUTQ);
+			register_subalias("8", "GND");
 
 			register_subalias("9", m_CLK);
 			register_subalias("10", m_STRBQ);
@@ -163,11 +167,12 @@ namespace netlist
 			register_subalias("13", m_CLR);
 			register_subalias("14", m_B[3]); // B2
 			register_subalias("15", m_B[2]); // B3
+			register_subalias("16", "VCC");
 		}
 	};
 
 
-	NETLIB_DEVICE_IMPL(7497,        "TTL_7497",     "+CLK,+STRBQ,+ENQ,+UNITYQ,+CLR,+B0,+B1,+B2,+B3,+B4,+B5")
+	NETLIB_DEVICE_IMPL(7497,      "TTL_7497", "+CLK,+STRBQ,+ENQ,+UNITYQ,+CLR,+B0,+B1,+B2,+B3,+B4,+B5,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(7497_dip,  "TTL_7497_DIP", "")
 
 	} //namespace devices

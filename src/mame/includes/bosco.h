@@ -6,6 +6,7 @@
 #pragma once
 
 #include "galaga.h"
+#include "tilemap.h"
 
 class bosco_state : public galaga_state
 {
@@ -23,6 +24,8 @@ public:
 
 	uint8_t *m_bosco_radarx;
 	uint8_t *m_bosco_radary;
+
+	uint8_t m_bosco_starclr;
 
 	uint8_t *m_spriteram;
 	uint8_t *m_spriteram2;

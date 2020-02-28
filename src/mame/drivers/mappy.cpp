@@ -1334,7 +1334,7 @@ void mappy_state::superpac_common(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);    // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	config.set_maximum_quantum(attotime::from_hz(6000));    // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	ls157_device &dipmux(LS157(config, "dipmux"));
 	dipmux.a_in_callback().set_ioport("DSW2");
@@ -1417,7 +1417,6 @@ void mappy_state::grobda(machine_config &config)
 	/* sound hardware */
 	DAC_4BIT_BINARY_WEIGHTED(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.275); // alternate route to 15XX-related DAC?
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -1446,7 +1445,7 @@ void mappy_state::phozon(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);    // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	config.set_maximum_quantum(attotime::from_hz(6000));    // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	NAMCO_58XX(config, m_namcoio[0], 0);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
@@ -1505,7 +1504,7 @@ void mappy_state::mappy_common(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);    // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	config.set_maximum_quantum(attotime::from_hz(6000));    // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	ls157_device &dipmux(LS157(config, "dipmux"));
 	dipmux.a_in_callback().set_ioport("DSW2");
@@ -2065,7 +2064,9 @@ void mappy_state::init_grobda()
 	   However, removing the 15XX from the board causes sound to disappear completely, so
 	   the 15XX may still play some part in conveying speech to the DAC.
 	  */
-	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::data_w), (dac_byte_interface *)m_dac));
+	write8_delegate dac_w(*this);
+	dac_w.set(*m_dac, FUNC(dac_byte_interface::data_w));
+	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, dac_w);
 }
 
 

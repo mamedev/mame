@@ -137,7 +137,12 @@ void nbmj8688_state::ojousan_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
+void nbmj8688_state::bikkuri_map(address_map &map)
+{
+	secolove_map(map);
 
+	map(0xf800, 0xffff).rom();
+}
 
 READ8_MEMBER(nbmj8688_state::ff_r)
 {
@@ -161,21 +166,38 @@ void nbmj8688_state::secolove_io_map(address_map &map)
 	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
 	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::secolove_romsel_w));
-//  AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
-//  AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
+//  map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
+//  map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 	map(0xf0, 0xf0).w(FUNC(nbmj8688_state::scrolly_w));
+}
+
+void nbmj8688_state::bikkuri_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(m_nb1413m3, FUNC(nb1413m3_device::nmi_clock_w));
+	map(0x81, 0x81).r("psg", FUNC(ay8910_device::data_r));
+	map(0x82, 0x83).w("psg", FUNC(ay8910_device::data_address_w));
+	map(0x90, 0x90).r(m_nb1413m3, FUNC(nb1413m3_device::inputport0_r));
+	map(0x90, 0x97).w(FUNC(nbmj8688_state::blitter_w));
+	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
+	map(0xb0, 0xb0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r), FUNC(nb1413m3_device::sndrombank1_alt_w));
+	map(0xc0, 0xcf).w(FUNC(nbmj8688_state::clut_w));
+	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
+	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::secolove_romsel_w));
 }
 
 WRITE8_MEMBER(nbmj8688_state::barline_output_w)
 {
-	machine().bookkeeping().coin_lockout_w(0,~data & 0x80);
-	machine().bookkeeping().coin_counter_w(0,data & 0x02);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x80);
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(1, data & 0x01);
 }
 
 void nbmj8688_state::barline_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-//  AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
+//  map(0x00, 0x7f).r(m_nb1413m3, FUNC(nb1413m3_device::sndrom_r));
 	map(0x00, 0x00).w(m_nb1413m3, FUNC(nb1413m3_device::sndrombank1_w));
 	map(0x70, 0x70).w(m_nb1413m3, FUNC(nb1413m3_device::nmi_clock_w));
 	map(0x80, 0x81).rw("psg", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
@@ -185,7 +207,7 @@ void nbmj8688_state::barline_io_map(address_map &map)
 	map(0xb0, 0xb0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r)).w(FUNC(nbmj8688_state::barline_output_w));
 	map(0xc0, 0xcf).w(FUNC(nbmj8688_state::clut_w));
 	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
-//  AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_byte_interface, data_w) //not used
+//  map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w)); //not used
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::secolove_romsel_w));
 	map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r)).w(FUNC(nbmj8688_state::scrolly_w));
 	map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
@@ -206,9 +228,9 @@ void nbmj8688_state::crystalg_io_map(address_map &map)
 	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
 	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::crystalg_romsel_w));
-//  AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
-//  AM_RANGE(0xf0, 0xf0) AM_WRITENOP
-//  AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
+//  map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
+//  map(0xf0, 0xf0).nopw();
+//  map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 }
 
 
@@ -270,8 +292,8 @@ void nbmj8688_state::iemoto_io_map(address_map &map)
 	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
 	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::mjsikaku_gfxflag2_w));
-//  AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
-//  AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
+//  map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
+//  map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 	map(0xf0, 0xf0).w(FUNC(nbmj8688_state::scrolly_w));
 }
 
@@ -293,8 +315,8 @@ void nbmj8688_state::seiha_io_map(address_map &map)
 	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
 	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::mjsikaku_gfxflag2_w));
-//  AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
-//  AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
+//  map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
+//  map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 	map(0xf0, 0xf0).w(FUNC(nbmj8688_state::scrolly_w));
 }
 
@@ -314,8 +336,8 @@ void nbmj8688_state::mjgaiden_io_map(address_map &map)
 	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
 	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::mjsikaku_gfxflag2_w));
-//  AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
-//  AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
+//  map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
+//  map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 	map(0xf0, 0xf0).w(FUNC(nbmj8688_state::scrolly_w));
 }
 
@@ -340,8 +362,8 @@ void nbmj8688_state::p16bit_LCD_io_map(address_map &map)
 	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
 	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::secolove_romsel_w));
-//  AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
-//  AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
+//  map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
+//  map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 	map(0xf0, 0xf0).w(FUNC(nbmj8688_state::scrolly_w));
 }
 
@@ -385,14 +407,9 @@ void nbmj8688_state::mmsikaku_io_map(address_map &map)
 	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
 	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::mjsikaku_gfxflag2_w));
-//  AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
-//  AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
+//  map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
+//  map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 	map(0xf0, 0xf0).w(FUNC(nbmj8688_state::scrolly_w));
-}
-
-CUSTOM_INPUT_MEMBER( nbmj8688_state::nb1413m3_busyflag_r )
-{
-	return m_nb1413m3->m_busyflag & 0x01;
 }
 
 static INPUT_PORTS_START( mjsikaku )
@@ -427,7 +444,7 @@ static INPUT_PORTS_START( mjsikaku )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -483,7 +500,7 @@ static INPUT_PORTS_START( mmsikaku )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSWB:8" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -531,7 +548,7 @@ static INPUT_PORTS_START( otonano )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -574,7 +591,7 @@ static INPUT_PORTS_START( mjcamera )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -641,7 +658,7 @@ static INPUT_PORTS_START( kaguya )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -706,7 +723,7 @@ static INPUT_PORTS_START( kanatuen )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -770,7 +787,7 @@ static INPUT_PORTS_START( kyuhito )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -835,7 +852,7 @@ static INPUT_PORTS_START( idhimitu )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -900,7 +917,7 @@ static INPUT_PORTS_START( secolove )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -965,7 +982,7 @@ static INPUT_PORTS_START( barline )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1075,7 +1092,7 @@ static INPUT_PORTS_START( citylove )
 	PORT_DIPSETTING(    0x00, "HAIPAI" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1137,7 +1154,7 @@ static INPUT_PORTS_START( mcitylov )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1187,7 +1204,7 @@ static INPUT_PORTS_START( seiha )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSWB:8" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1251,7 +1268,7 @@ static INPUT_PORTS_START( seiham )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1301,7 +1318,7 @@ static INPUT_PORTS_START( iemoto )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSWB:8" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1365,7 +1382,7 @@ static INPUT_PORTS_START( iemotom )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1430,7 +1447,7 @@ static INPUT_PORTS_START( ryuuha )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1495,7 +1512,7 @@ static INPUT_PORTS_START( bijokkoy )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1571,7 +1588,7 @@ static INPUT_PORTS_START( bijokkog )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1647,7 +1664,7 @@ static INPUT_PORTS_START( housemnq )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1722,7 +1739,7 @@ static INPUT_PORTS_START( housemn2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1784,7 +1801,7 @@ static INPUT_PORTS_START( orangec )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSWB:8" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1849,7 +1866,7 @@ static INPUT_PORTS_START( orangeci )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1914,7 +1931,7 @@ static INPUT_PORTS_START( vipclub )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1977,7 +1994,7 @@ static INPUT_PORTS_START( livegal )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -2026,7 +2043,7 @@ static INPUT_PORTS_START( ojousan )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -2090,7 +2107,7 @@ static INPUT_PORTS_START( ojousanm )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -2140,7 +2157,7 @@ static INPUT_PORTS_START( korinai )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSWB:8" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -2204,7 +2221,7 @@ static INPUT_PORTS_START( korinaim )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -2252,7 +2269,7 @@ static INPUT_PORTS_START( crystalg )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSWB:8" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -2314,7 +2331,7 @@ static INPUT_PORTS_START( crystal2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -2376,7 +2393,7 @@ static INPUT_PORTS_START( apparel )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -2430,7 +2447,7 @@ static INPUT_PORTS_START( nightlov )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSWB:8" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8688_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -2442,6 +2459,94 @@ static INPUT_PORTS_START( nightlov )
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( bikkuri )
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x07, 0x07, "Game Out Rate" ) PORT_DIPLOCATION("DSWA:1,2,3")
+	PORT_DIPSETTING(    0x07, "95%" )
+	PORT_DIPSETTING(    0x06, "90%" )
+	PORT_DIPSETTING(    0x05, "85%" )
+	PORT_DIPSETTING(    0x04, "80%" )
+	PORT_DIPSETTING(    0x03, "75%" )
+	PORT_DIPSETTING(    0x02, "70%" )
+	PORT_DIPSETTING(    0x01, "65%" )
+	PORT_DIPSETTING(    0x00, "60%" )
+	// coinage
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWA:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWA:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWA:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWA:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWA:8")
+
+	PORT_START("DSWB")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWB:1")
+	PORT_SERVICE_DIPLOC( 0x02, IP_ACTIVE_LOW, "DSWB:2" )
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWB:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWB:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWB:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWB:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWB:7")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSWB:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Medal In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Mode SW")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("100 Yen In")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Solenoid SW") PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("10 Yen In")
+
+	PORT_START("KEY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Drop Kick")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Neck Hang")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Lariat")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Medal Out") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("P1 Bet")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY1")
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY4")
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY5")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY6")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY7")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY8")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY9")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 READ8_MEMBER(nbmj8688_state::dipsw1_r)
 {
@@ -2453,23 +2558,23 @@ READ8_MEMBER(nbmj8688_state::dipsw2_r)
 	return m_nb1413m3->dipsw2_r(space,offset);
 }
 
-MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_4096)
-
+void nbmj8688_state::NBMJDRV_4096(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)   /* 5.00 MHz */
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nbmj8688_state, irq0_line_hold)
+	Z80(config, m_maincpu, 5000000);   /* 5.00 MHz */
+	m_maincpu->set_vblank_int("screen", FUNC(nbmj8688_state::irq0_line_hold));
 
 	NB1413M3(config, m_nb1413m3, 0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nbmj8688_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 16, 240-1);
+	screen.set_screen_update(FUNC(nbmj8688_state::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(nbmj8688_state::mbmj8688_12bit), 4096);
 
@@ -2483,12 +2588,14 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_4096)
 	psg.port_b_read_callback().set(FUNC(nbmj8688_state::dipsw2_r));     // DIPSW-B read
 	psg.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_256)
+void nbmj8688_state::NBMJDRV_256(machine_config &config)
+{
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
@@ -2497,9 +2604,10 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_256)
 	subdevice<palette_device>("palette")->set_entries(256).set_init(FUNC(nbmj8688_state::mbmj8688_8bit));
 
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_8bit)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_65536)
+void nbmj8688_state::NBMJDRV_65536(machine_config &config)
+{
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
@@ -2508,20 +2616,20 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_65536)
 	subdevice<palette_device>("palette")->set_entries(65536).set_init(FUNC(nbmj8688_state::mbmj8688_16bit));
 
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_hybrid_16bit)
-MACHINE_CONFIG_END
+}
 
 // --------------------------------------------------------------------------------
 
-MACHINE_CONFIG_START(nbmj8688_state::crystalg)
+void nbmj8688_state::crystalg(machine_config &config)
+{
 	NBMJDRV_256(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(crystalg_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::crystalg_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_CRYSTALG);
-MACHINE_CONFIG_END
+}
 
 void nbmj8688_state::crystal2(machine_config &config)
 {
@@ -2537,28 +2645,28 @@ void nbmj8688_state::nightlov(machine_config &config)
 	m_nb1413m3->set_type(NB1413M3_NIGHTLOV);
 }
 
-MACHINE_CONFIG_START(nbmj8688_state::apparel)
+void nbmj8688_state::apparel(machine_config &config)
+{
 	NBMJDRV_256(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(secolove_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::secolove_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_APPAREL);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::mbmj_h12bit)
+void nbmj8688_state::mbmj_h12bit(machine_config &config)
+{
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(secolove_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::secolove_io_map);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_hybrid_12bit)
-MACHINE_CONFIG_END
+}
 
 void nbmj8688_state::citylove(machine_config &config)
 {
@@ -2582,42 +2690,40 @@ void nbmj8688_state::secolove(machine_config &config)
 }
 
 /*Same as h12bit HW with different sound HW + NMI enable bit*/
-MACHINE_CONFIG_START(nbmj8688_state::barline)
+void nbmj8688_state::barline(machine_config &config)
+{
 	mbmj_h12bit(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(barline_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::barline_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_BARLINE);
 
-	MCFG_DEVICE_REPLACE("psg", YM3812, 20000000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
+	YM3812(config.replace(), "psg", 20000000/8).add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	config.device_remove("dac");
 	config.device_remove("vref");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit)
+void nbmj8688_state::mbmj_p16bit(machine_config &config)
+{
 	NBMJDRV_65536(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(secolove_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::secolove_io_map);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_pure_16bit)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
-
+void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)   /* 5.00 MHz */
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nbmj8688_state, irq0_line_hold)
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(secolove_io_map)
-	MCFG_DEVICE_IO_MAP(p16bit_LCD_io_map)
+	Z80(config, m_maincpu, 5000000);   /* 5.00 MHz */
+	m_maincpu->set_vblank_int("screen", FUNC(nbmj8688_state::irq0_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::p16bit_LCD_io_map);
 
 	NB1413M3(config, m_nb1413m3, 0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -2626,13 +2732,13 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	PALETTE(config, "palette", FUNC(nbmj8688_state::mbmj8688_16bit), 65536);
 	config.set_default_layout(layout_nbmj8688);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nbmj8688_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 16, 240-1);
+	screen.set_screen_update(FUNC(nbmj8688_state::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette_lcd", FUNC(nbmj8688_state::mbmj8688_lcd), 2);
 
@@ -2670,10 +2776,11 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	psg.port_b_read_callback().set(FUNC(nbmj8688_state::dipsw2_r));     // DIPSW-B read
 	psg.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 void nbmj8688_state::bijokkoy(machine_config &config)
 {
@@ -2731,16 +2838,16 @@ void nbmj8688_state::vipclub(machine_config &config)
 	m_nb1413m3->set_type(NB1413M3_VIPCLUB);
 }
 
-MACHINE_CONFIG_START(nbmj8688_state::seiha)
+void nbmj8688_state::seiha(machine_config &config)
+{
 	NBMJDRV_65536(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(seiha_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::seiha_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_SEIHA);
-MACHINE_CONFIG_END
+}
 
 void nbmj8688_state::seiham(machine_config &config)
 {
@@ -2749,39 +2856,39 @@ void nbmj8688_state::seiham(machine_config &config)
 	m_nb1413m3->set_type(NB1413M3_SEIHAM);
 }
 
-MACHINE_CONFIG_START(nbmj8688_state::mjgaiden)
+void nbmj8688_state::mjgaiden(machine_config &config)
+{
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ojousan_map)
-	MCFG_DEVICE_IO_MAP(mjgaiden_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::ojousan_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::mjgaiden_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_OJOUSAN);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::iemoto)
+void nbmj8688_state::iemoto(machine_config &config)
+{
 	NBMJDRV_65536(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(iemoto_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::iemoto_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_IEMOTO);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::ojousan)
+void nbmj8688_state::ojousan(machine_config &config)
+{
 	NBMJDRV_65536(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ojousan_map)
-	MCFG_DEVICE_IO_MAP(iemoto_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::ojousan_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::iemoto_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_OJOUSAN);
-MACHINE_CONFIG_END
+}
 
 void nbmj8688_state::ojousanm(machine_config &config)
 {
@@ -2790,13 +2897,24 @@ void nbmj8688_state::ojousanm(machine_config &config)
 	m_nb1413m3->set_type(NB1413M3_OJOUSANM);
 }
 
-MACHINE_CONFIG_START(nbmj8688_state::swinggal)
+void nbmj8688_state::bikkuri(machine_config &config)
+{
+	NBMJDRV_256(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::bikkuri_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::bikkuri_io_map);
+
+	// m_nb1413m3->set_type(NB1413M3_TAIWANMB); // what's the correct type here?
+}
+
+void nbmj8688_state::swinggal(machine_config &config)
+{
 	ojousan(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(iemoto_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::iemoto_io_map);
+}
 
 void nbmj8688_state::iemotom(machine_config &config)
 {
@@ -2826,14 +2944,14 @@ void nbmj8688_state::korinaim(machine_config &config)
 	m_nb1413m3->set_type(NB1413M3_KORINAIM);
 }
 
-MACHINE_CONFIG_START(nbmj8688_state::mbmj_p12bit)
+void nbmj8688_state::mbmj_p12bit(machine_config &config)
+{
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mjsikaku_map)
-	MCFG_DEVICE_IO_MAP(kaguya_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::mjsikaku_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::kaguya_io_map);
+}
 
 void nbmj8688_state::kaguya(machine_config &config)
 {
@@ -2870,41 +2988,40 @@ void nbmj8688_state::idhimitu(machine_config &config)
 	m_nb1413m3->set_type(NB1413M3_IDHIMITU);
 }
 
-MACHINE_CONFIG_START(nbmj8688_state::mjsikaku)
+void nbmj8688_state::mjsikaku(machine_config &config)
+{
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mjsikaku_map)
-	MCFG_DEVICE_IO_MAP(mjsikaku_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::mjsikaku_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::mjsikaku_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_MJSIKAKU);
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("psg", YM3812, 20000000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
-MACHINE_CONFIG_END
+	YM3812(config.replace(), "psg", 20000000/8).add_route(ALL_OUTPUTS, "speaker", 0.7);
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::mmsikaku)
+void nbmj8688_state::mmsikaku(machine_config &config)
+{
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
-	MCFG_DEVICE_IO_MAP(mmsikaku_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::mmsikaku_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_MMSIKAKU);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nbmj8688_state::otonano)
+void nbmj8688_state::otonano(machine_config &config)
+{
 	mjsikaku(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(otonano_io_map)
+	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::otonano_io_map);
 
 	m_nb1413m3->set_type(NB1413M3_OTONANO);
-MACHINE_CONFIG_END
+}
 
 void nbmj8688_state::mjcamera(machine_config &config)
 {
@@ -3813,12 +3930,33 @@ ROM_START( barline )
 	ROM_LOAD( "16061.k7", 0x000, 0x104, CRC(d25ccac8) SHA1(cfad5a4cd9609ac2461314d77a5e0cecd326c63b) )
 ROM_END
 
+ROM_START( bikkuri )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "12.2c.27512", 0x00000, 0x10000, CRC(b5caab77) SHA1(e42657a17e0e4644524d116950b152c7dd23528f) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "13.9e.27512", 0x00000, 0x10000, CRC(d264f352) SHA1(dd75ed368f6afa6b42a6ae720077f18b839e2674) )
+	ROM_LOAD( "14.9f.27512", 0x10000, 0x10000, CRC(40e15d4b) SHA1(5a055cdff4841d1dec3578fc886f53cc8eb1328c) )
+	ROM_LOAD( "15.9g.27512", 0x20000, 0x10000, CRC(cf8a3bb6) SHA1(0e25d0440d1479a30010850329c519249f5a65ed) )
+	ROM_LOAD( "19.9h.27512", 0x30000, 0x10000, CRC(a0735d2d) SHA1(30bb62dab6057f6fb7c60ffc514ca81b027ef8b8) )
+	ROM_LOAD( "20.9i.27512", 0x40000, 0x10000, CRC(abe6c935) SHA1(846b93e5028319d2ec8e2bcfde52af7110d6d3be) )
+	ROM_LOAD( "21.9j.27512", 0x50000, 0x10000, CRC(b4c708da) SHA1(f474c5a24c9b72c2c38272915c45ea7dcebcde18) )
+	ROM_LOAD( "22.9k.27512", 0x60000, 0x10000, CRC(dc79f73b) SHA1(eb47e7a218610d53ba78a2cb344d8fc491ab7fbd) )
+	ROM_LOAD( "23.9l.27512", 0x70000, 0x10000, CRC(f18bbe10) SHA1(ce7862b9a812523ddadfc7137a47da197d9a2df0) )
+
+	ROM_REGION( 0x500, "pals", ROMREGION_ERASE00 ) // no dump attempt made, there might be more
+	ROM_LOAD( "pal10l8nc.8a",  0x000, 0x02c, NO_DUMP )
+	ROM_LOAD( "pal16l8acn.3g", 0x100, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8acn.8k", 0x300, 0x104, NO_DUMP )
+ROM_END
+
 
 /* 8-bit palette */
 GAME( 1986, crystalg, 0,        crystalg,        crystalg, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Crystal Gal (Japan 860512)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, crystal2, 0,        crystal2,        crystal2, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Crystal Gal 2 (Japan 860620)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, nightlov, 0,        nightlov,        nightlov, nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Night Love (Japan 860705)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, apparel,  0,        apparel,         apparel,  nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Apparel Night (Japan 860929)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bikkuri,  0,        bikkuri,         bikkuri,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Bikkuri Pro Wrestling (Japan 881221, Ver 1.05)", MACHINE_SUPPORTS_SAVE )
 
 /* hybrid 12-bit palette */
 GAME( 1986, citylove, 0,        citylove,        citylove, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "City Love (Japan 860908)", MACHINE_SUPPORTS_SAVE )

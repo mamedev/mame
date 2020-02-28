@@ -127,6 +127,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include <algorithm>
 
@@ -198,7 +199,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_3_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_4_tile_info);
-	uint32_t screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_skylncr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(skylncr_vblank_interrupt);
 	void bdream97_opcode_map(address_map &map);
 	void io_map_mbutrfly(address_map &map);
@@ -294,12 +295,12 @@ TILE_GET_INFO_MEMBER(skylncr_state::get_reel_4_tile_info)
 
 void skylncr_state::video_start()
 {
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skylncr_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20    );
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skylncr_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20    );
 
-	m_reel_1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
-	m_reel_2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
-	m_reel_3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_3_tile_info),this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
-	m_reel_4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_4_tile_info),this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	m_reel_1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skylncr_state::get_reel_1_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	m_reel_2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skylncr_state::get_reel_2_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	m_reel_3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skylncr_state::get_reel_3_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	m_reel_4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skylncr_state::get_reel_4_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
 
 	m_reel_2_tilemap->set_scroll_cols(0x40);
 	m_reel_3_tilemap->set_scroll_cols(0x40);
@@ -314,11 +315,11 @@ void skylncr_state::video_start()
 }
 
 
-uint32_t skylncr_state::screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t skylncr_state::screen_update_skylncr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
-	bitmap.fill(0, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 	m_reel_1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// are these hardcoded, or registers?
@@ -1645,13 +1646,13 @@ INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
 *           Machine Driver           *
 *************************************/
 
-MACHINE_CONFIG_START(skylncr_state::skylncr)
-
+void skylncr_state::skylncr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map_skylncr)
-	MCFG_DEVICE_IO_MAP(io_map_skylncr)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skylncr_state,  skylncr_vblank_interrupt)
+	Z80(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &skylncr_state::mem_map_skylncr);
+	m_maincpu->set_addrmap(AS_IO, &skylncr_state::io_map_skylncr);
+	m_maincpu->set_vblank_int("screen", FUNC(skylncr_state::skylncr_vblank_interrupt));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1669,13 +1670,12 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(skylncr_state, screen_update_skylncr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(skylncr_state::screen_update_skylncr));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skylncr);
 	PALETTE(config, m_palette).set_entries(0x200);
@@ -1694,15 +1694,15 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 	aysnd.port_a_read_callback().set_ioport("DSW3");
 	aysnd.port_b_read_callback().set_ioport("DSW4");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(skylncr_state::mbutrfly)
+void skylncr_state::mbutrfly(machine_config &config)
+{
 	skylncr(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(io_map_mbutrfly)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &skylncr_state::io_map_mbutrfly);
+}
 
 
 void skylncr_state::neraidou(machine_config &config)
@@ -1721,15 +1721,15 @@ void skylncr_state::sstar97(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(skylncr_state::bdream97)
+void skylncr_state::bdream97(machine_config &config)
+{
 	skylncr(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_OPCODES_MAP(bdream97_opcode_map)
+	m_maincpu->set_addrmap(AS_OPCODES, &skylncr_state::bdream97_opcode_map);
 
 	m_gfxdecode->set_info(gfx_bdream97);
-MACHINE_CONFIG_END
+}
 
 
 /**********************************

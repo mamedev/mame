@@ -9,7 +9,7 @@
 #include "machine/z80ctc.h"
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"
-#include "machine/ataintf.h"
+#include "bus/ata/ataintf.h"
 #include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
 

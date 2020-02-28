@@ -19,6 +19,8 @@
     called the Super AMS. Any documentation and software containing a reference
     to the AEMS are applicable to either AMS or SAMS.
 
+    The SAMS does not decode AMA/AMB/AMC.
+
     Michael Zapf
 
 *****************************************************************************/
@@ -50,7 +52,7 @@ READ8Z_MEMBER(sams_memory_expansion_device::readz)
 {
 	int base;
 
-	if (m_access_mapper && ((offset & 0xe000)==0x4000))
+	if (m_access_mapper && in_dsr_space(offset, false))
 	{
 		*value = m_mapper[(offset>>1)&0x000f];
 	}
@@ -70,11 +72,11 @@ READ8Z_MEMBER(sams_memory_expansion_device::readz)
 	}
 }
 
-WRITE8_MEMBER(sams_memory_expansion_device::write)
+void sams_memory_expansion_device::write(offs_t offset, uint8_t data)
 {
 	int base;
 
-	if (m_access_mapper && ((offset & 0xe000)==0x4000))
+	if (m_access_mapper && in_dsr_space(offset, false))
 	{
 		m_mapper[(offset>>1)&0x000f] = data;
 	}
@@ -104,7 +106,7 @@ READ8Z_MEMBER(sams_memory_expansion_device::crureadz)
 /*
     CRU write. Turns on the mapper and allows to change it.
 */
-WRITE8_MEMBER(sams_memory_expansion_device::cruwrite)
+void sams_memory_expansion_device::cruwrite(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff00)==SAMS_CRU_BASE)
 		m_crulatch->write_bit((offset & 0x000e) >> 1, data);

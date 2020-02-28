@@ -117,7 +117,7 @@ void tv950_state::tv950_mem(address_map &map)
 	map(0x9300, 0x9303).rw(m_uart[0], FUNC(mos6551_device::read), FUNC(mos6551_device::write)); // CS0 = AB9
 	map(0x9500, 0x9503).rw(m_uart[2], FUNC(mos6551_device::read), FUNC(mos6551_device::write)); // CS0 = AB10
 	map(0x9900, 0x9903).rw(m_uart[1], FUNC(mos6551_device::read), FUNC(mos6551_device::write)); // CS0 = AB11
-	map(0xb100, 0xb10f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xb100, 0xb10f).m(m_via, FUNC(via6522_device::map));
 	map(0xe000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -298,8 +298,8 @@ void tv950_state::tv950(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(14);
-	m_crtc->set_update_row_callback(FUNC(tv950_state::crtc_update_row), this);
-	m_crtc->set_on_update_addr_change_callback(FUNC(tv950_state::crtc_update_addr), this);
+	m_crtc->set_update_row_callback(FUNC(tv950_state::crtc_update_row));
+	m_crtc->set_on_update_addr_change_callback(FUNC(tv950_state::crtc_update_addr));
 	m_crtc->out_hsync_callback().set(m_via, FUNC(via6522_device::write_pb6)).invert();
 	m_crtc->out_vsync_callback().set(FUNC(tv950_state::crtc_vs_w));
 	m_crtc->set_screen(nullptr);

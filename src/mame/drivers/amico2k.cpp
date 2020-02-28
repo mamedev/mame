@@ -71,7 +71,7 @@ void amico2k_state::amico2k_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
-//  AM_RANGE(0x0400, 0x07ff) AM_RAM // optional expansion RAM
+//  map(0x0400, 0x07ff).ram(); // optional expansion RAM
 	map(0xfb00, 0xfcff).rom();
 	map(0xfd00, 0xfd03).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfe00, 0xffff).rom();
@@ -215,10 +215,11 @@ void amico2k_state::machine_start()
 	save_item(NAME(m_segment));
 }
 
-MACHINE_CONFIG_START(amico2k_state::amico2k)
+void amico2k_state::amico2k(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 1000000) /* 1MHz */
-	MCFG_DEVICE_PROGRAM_MAP(amico2k_mem)
+	M6502(config, m_maincpu, 1000000); /* 1MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &amico2k_state::amico2k_mem);
 
 	/* video hardware */
 	config.set_default_layout(layout_amico2k);
@@ -228,7 +229,7 @@ MACHINE_CONFIG_START(amico2k_state::amico2k)
 	ppi.out_pa_callback().set(FUNC(amico2k_state::ppi_pa_w));
 	ppi.in_pb_callback().set(FUNC(amico2k_state::ppi_pb_r));
 	ppi.out_pb_callback().set(FUNC(amico2k_state::ppi_pb_w));
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

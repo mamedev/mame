@@ -57,6 +57,7 @@ public:
 	// output state when pins are in tri-state, default 0xff
 	auto tri_pa_callback() { return m_tri_pa_cb.bind(); }
 	auto tri_pb_callback() { return m_tri_pb_cb.bind(); }
+	auto tri_pc_callback() { return m_tri_pc_cb.bind(); }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data );
@@ -117,6 +118,7 @@ private:
 
 	devcb_read8        m_tri_pa_cb;
 	devcb_read8        m_tri_pb_cb;
+	devcb_read8        m_tri_pc_cb;
 
 	uint8_t m_control;            // mode control word
 	uint8_t m_output[3];          // output latch

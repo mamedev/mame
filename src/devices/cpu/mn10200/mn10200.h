@@ -58,11 +58,11 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 2 - 1) / 2; } // internal /2 divider
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 2); } // internal /2 divider
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 13+7; } // max opcode cycles + interrupt duration
-	virtual uint32_t execute_input_lines() const override { return 4; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; } // internal /2 divider
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); } // internal /2 divider
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 13+7; } // max opcode cycles + interrupt duration
+	virtual uint32_t execute_input_lines() const noexcept override { return 4; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -80,8 +80,8 @@ private:
 	address_space *m_program;
 
 	// i/o handlers
-	devcb_read8 m_read_port[5];
-	devcb_write8 m_write_port[5];
+	devcb_read8::array<5> m_read_port;
+	devcb_write8::array<5> m_write_port;
 
 	int m_cycles;
 

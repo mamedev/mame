@@ -162,7 +162,7 @@ static INPUT_PORTS_START( mjkjidai )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEYBOARD")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, mjkjidai_state, keyboard_r, nullptr)
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(mjkjidai_state, keyboard_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // reinitialize NVRAM and reset the game
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
@@ -296,8 +296,8 @@ void mjkjidai_state::machine_reset()
 	m_adpcm_pos = m_adpcm_end = 0;
 }
 
-MACHINE_CONFIG_START(mjkjidai_state::mjkjidai)
-
+void mjkjidai_state::mjkjidai(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 10000000/2); /* 5 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mjkjidai_state::mjkjidai_map);

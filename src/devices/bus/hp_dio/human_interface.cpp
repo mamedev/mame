@@ -26,7 +26,7 @@ namespace bus {
 
 void human_interface_device::device_add_mconfig(machine_config &config)
 {
-	i8042_device &iocpu(I8042(config, "iocpu", XTAL(5'000'000)));
+	i8042ah_device &iocpu(I8042AH(config, "iocpu", XTAL(5'000'000)));
 	iocpu.set_addrmap(AS_PROGRAM, &human_interface_device::iocpu_map);
 	iocpu.p1_out_cb().set(FUNC(human_interface_device::iocpu_port1_w));
 	iocpu.p2_out_cb().set(FUNC(human_interface_device::iocpu_port2_w));
@@ -114,13 +114,13 @@ human_interface_device::human_interface_device(const machine_config &mconfig, de
 
 void human_interface_device::device_start()
 {
-	program_space()->install_readwrite_handler(0x420000, 0x420003, 0x0003, 0xfffc, 0,
-		read8_delegate(FUNC(upi41_cpu_device::upi41_master_r), &(*m_iocpu)),
-		write8_delegate(FUNC(upi41_cpu_device::upi41_master_w), &(*m_iocpu)), 0x00ff00ff);
+	program_space().install_readwrite_handler(0x420000, 0x420003, 0x0003, 0xfffc, 0,
+			read8_delegate(*m_iocpu, FUNC(upi41_cpu_device::upi41_master_r)),
+			write8_delegate(*m_iocpu, FUNC(upi41_cpu_device::upi41_master_w)), 0x00ff00ff);
 
-	program_space()->install_readwrite_handler(0x470000, 0x47001f, 0x1f, 0xffe0, 0,
-		read8_delegate(FUNC(human_interface_device::gpib_r), this),
-		write8_delegate(FUNC(human_interface_device::gpib_w), this), 0x00ff00ff);
+	program_space().install_readwrite_handler(0x470000, 0x47001f, 0x1f, 0xffe0, 0,
+			read8_delegate(*this, FUNC(human_interface_device::gpib_r)),
+			write8_delegate(*this, FUNC(human_interface_device::gpib_w)), 0x00ff00ff);
 
 	save_item(NAME(m_hil_read));
 	save_item(NAME(m_kbd_nmi));
@@ -194,7 +194,7 @@ WRITE8_MEMBER(human_interface_device::ieee488_dio_w)
 WRITE8_MEMBER(human_interface_device::gpib_w)
 {
 	if (offset & 0x08) {
-		m_tms9914->reg8_w(space, offset & 0x07, data);
+		m_tms9914->write(offset & 0x07, data);
 		return;
 	}
 
@@ -234,7 +234,7 @@ READ8_MEMBER(human_interface_device::gpib_r)
 	uint8_t data = 0xff;
 
 	if (offset & 0x8) {
-		data = m_tms9914->reg8_r(space, offset & 0x07);
+		data = m_tms9914->read(offset & 0x07);
 		return data;
 	}
 
@@ -360,14 +360,14 @@ void human_interface_device::dmack_w_in(int channel, uint8_t data)
 {
 	if (channel)
 		return;
-	m_tms9914->reg8_w(*program_space(), 7, data);
+	m_tms9914->write(7, data);
 }
 
 uint8_t human_interface_device::dmack_r_in(int channel)
 {
 	if (channel || !m_gpib_dma_enable)
 		return 0xff;
-	return m_tms9914->reg8_r(machine().dummy_space(), 7);
+	return m_tms9914->read(7);
 }
 
 } // namespace bus::hp_dio

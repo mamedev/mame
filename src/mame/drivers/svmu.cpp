@@ -53,7 +53,7 @@ private:
 	DECLARE_READ8_MEMBER(p1_r);
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_READ8_MEMBER(p7_r);
-	DECLARE_QUICKLOAD_LOAD_MEMBER( svmu );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void svmu_io_mem(address_map &map);
 	void svmu_mem(address_map &map);
@@ -209,7 +209,7 @@ inline void vmufat_write_word(uint8_t* flash, uint8_t block, offs_t offset, uint
 	flash[(block * 512) + offset + 1] = (data>>8) & 0xff;
 }
 
-QUICKLOAD_LOAD_MEMBER( svmu_state, svmu )
+QUICKLOAD_LOAD_MEMBER(svmu_state::quickload_cb)
 {
 	uint32_t size = image.length();
 	uint8_t *flash = m_flash->base();
@@ -341,8 +341,8 @@ void svmu_state::svmu(machine_config &config)
 	/* devices */
 	ATMEL_29C010(config, m_flash);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(svmu_state, svmu), this), "vms,bin", 0);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "vms,bin"));
+	quickload.set_load_callback(FUNC(svmu_state::quickload_cb));
 	quickload.set_interface("svmu_quik");
 
 	/* Software lists */
@@ -381,9 +381,9 @@ ROM_START( svmu )
 	ROM_SYSTEM_BIOS(5, "jp1005a", "VMS Japanese BIOS (1.005 1998/12/09)")
 	ROMX_LOAD("jp1005-19981209-315-6124-05.bin", 0x0000, 0x10000, CRC(47623324) SHA1(fca1aceff8a2f8c6826f3a865f4d5ef88dfd9ed1), ROM_BIOS(5))
 
-	// Version 1.005,1999/10/26,315-6028-04,SEGA Visual Memory System BIOS Produced by Sue
+	// Version 1.005,1999/10/26,315-6208-04,SEGA Visual Memory System BIOS Produced by Sue
 	ROM_SYSTEM_BIOS(6, "jp1005b", "VMS Japanese BIOS (1.005 1999/10/26)")
-	ROMX_LOAD("jp1005-19991026-315-6028-04.bin", 0x0000, 0x10000, CRC(6cab02c2) SHA1(6cc2fbf4a67770988922117c300d006aa20899ac), ROM_BIOS(6)) // extracted with trojan
+	ROMX_LOAD("jp1005-19991026-315-6208-04.bin", 0x0000, 0x10000, CRC(6cab02c2) SHA1(6cc2fbf4a67770988922117c300d006aa20899ac), ROM_BIOS(6)) // extracted with trojan
 
 	// Version 1.004,1998/09/30,315-6208-01,SEGA Visual Memory System BIOS Produced by Sue
 	ROM_SYSTEM_BIOS(7, "dev1004", "VMS Japanese Development BIOS (1.004 1998/09/30)") // automatically boot the first game found in the flash

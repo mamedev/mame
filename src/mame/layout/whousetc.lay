@@ -813,16 +813,16 @@ Westinghouse Test Console Serial #5 layout
 
 	<view name="Default Layout">
 
-		<bezel element="backdrop">
+		<element ref="backdrop">
 			<bounds left="0" top="0" right="960" bottom="520" />
-		</bezel>
+		</element>
 
 		<repeat count="16">
 			<param name="digitno" start="15" increment="-1" />
 			<param name="x" start="10" increment="60" />
-			<bezel name="digit~digitno~" element="char">
+			<element name="digit~digitno~" ref="char">
 				<bounds x="~x~" y="10" width="40" height="60" />
-			</bezel>
+			</element>
 		</repeat>
 
 		<repeat count="2">
@@ -836,9 +836,9 @@ Westinghouse Test Console Serial #5 layout
 					<param name="col" start="~group~" increment="1" />
 					<param name="btnx" start="~padx~" increment="110" />
 					<param name="mask" start="~mask~" lshift="1" />
-					<bezel element="btn~row~~col~" inputtag="row~row~" inputmask="~mask~">
+					<element ref="btn~row~~col~" inputtag="row~row~" inputmask="~mask~">
 						<bounds x="~btnx~" y="~y~" width="80" height="80" />
-					</bezel>
+					</element>
 				</repeat>
 			</repeat>
 		</repeat>

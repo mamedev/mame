@@ -29,10 +29,10 @@ DEFINE_DEVICE_TYPE(VCS_CART_SLOT, vcs_cart_slot_device, "vcs_cart_slot", "Atari 
 //  device_vcs_cart_interface - constructor
 //-------------------------------------------------
 
-device_vcs_cart_interface::device_vcs_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0)
+device_vcs_cart_interface::device_vcs_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "vcscart"),
+	m_rom(nullptr),
+	m_rom_size(0)
 {
 }
 
@@ -80,7 +80,8 @@ void device_vcs_cart_interface::ram_alloc(uint32_t size)
 vcs_cart_slot_device::vcs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VCS_CART_SLOT, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this), m_cart(nullptr), m_type(0)
+	device_single_card_slot_interface<device_vcs_cart_interface>(mconfig, *this),
+	m_cart(nullptr), m_type(0)
 {
 }
 
@@ -99,7 +100,7 @@ vcs_cart_slot_device::~vcs_cart_slot_device()
 
 void vcs_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_vcs_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 

@@ -156,7 +156,7 @@ static INPUT_PORTS_START( icecold )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP)
-	PORT_BIT(0x55, IP_ACTIVE_LOW, IPT_CUSTOM)          PORT_CUSTOM_MEMBER(DEVICE_SELF, icecold_state, motors_limit_r, nullptr)
+	PORT_BIT(0x55, IP_ACTIVE_LOW, IPT_CUSTOM)          PORT_CUSTOM_MEMBER(icecold_state, motors_limit_r)
 
 	PORT_START("X0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1)
@@ -265,9 +265,9 @@ READ8_MEMBER( icecold_state::kbd_r )
 WRITE8_MEMBER( icecold_state::snd_ctrl_w )
 {
 	if (m_ay_ctrl & ~data & 0x04)
-		m_ay8910[0]->data_address_w(space, m_ay_ctrl & 0x01, m_sound_latch);
+		m_ay8910[0]->data_address_w(m_ay_ctrl & 0x01, m_sound_latch);
 	if (m_ay_ctrl & ~data & 0x20)
-		m_ay8910[1]->data_address_w(space, (m_ay_ctrl>>3) & 0x01, m_sound_latch);
+		m_ay8910[1]->data_address_w((m_ay_ctrl>>3) & 0x01, m_sound_latch);
 
 	m_ay_ctrl = data;
 }
@@ -280,9 +280,9 @@ WRITE8_MEMBER( icecold_state::ay_w )
 READ8_MEMBER( icecold_state::ay_r )
 {
 	if (m_ay_ctrl & 0x02)
-		return m_ay8910[0]->data_r(space, 0);
+		return m_ay8910[0]->data_r();
 	if (m_ay_ctrl & 0x10)
-		return m_ay8910[1]->data_r(space, 0);
+		return m_ay8910[1]->data_r();
 
 	return 0;
 }
@@ -392,10 +392,10 @@ void icecold_state::icecold(machine_config &config)
 	kbdc.in_rl_callback().set(FUNC(icecold_state::kbd_r));              // kbd RL lines
 
 	// 30Hz signal from CH-C of ay0
-	TIMER(config, "sint_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(icecold_state::icecold_sint_timer), this), attotime::from_hz(30));
+	TIMER(config, "sint_timer", 0).configure_periodic(FUNC(icecold_state::icecold_sint_timer), attotime::from_hz(30));
 
 	// for update motors position
-	TIMER(config, "motors_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(icecold_state::icecold_motors_timer), this), attotime::from_msec(50));
+	TIMER(config, "motors_timer", 0).configure_periodic(FUNC(icecold_state::icecold_motors_timer), attotime::from_msec(50));
 
 	// video hardware
 	config.set_default_layout(layout_icecold);

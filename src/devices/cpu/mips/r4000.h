@@ -42,8 +42,10 @@ public:
 			COMBINE_DATA(&m_cp0[CP0_Config]);
 	}
 
+	void bus_error() { m_bus_error = true; }
+
 protected:
-	enum cache_size_t
+	enum cache_size
 	{
 		CACHE_4K   = 0,
 		CACHE_8K   = 1,
@@ -54,7 +56,7 @@ protected:
 		CACHE_256K = 6,
 		CACHE_512K = 7,
 	};
-	r4000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 prid, cache_size_t icache_size, cache_size_t dcache_size);
+	r4000_base_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size icache_size, cache_size dcache_size);
 
 	enum cp0_reg : int
 	{
@@ -169,6 +171,8 @@ protected:
 		EH_VPN2_32 = 0x0000'0000'ffff'e000, // virtual page number (32-bit mode)
 		EH_VPN2_64 = 0x0000'00ff'ffff'e000, // virtual page number (64-bit mode)
 		EH_R       = 0xc000'0000'0000'0000, // region (64-bit mode)
+
+		EH_WM      = 0xc000'00ff'ffff'e0ff, // write mask
 	};
 	enum cp0_tlb_el : u64
 	{
@@ -177,6 +181,8 @@ protected:
 		EL_D   = 0x0000'0000'0000'0004, // dirty
 		EL_C   = 0x0000'0000'0000'0038, // coherency
 		EL_PFN = 0x0000'0000'3fff'ffc0, // page frame number
+
+		EL_WM  = 0x0000'0000'3fff'fffe, // write mask
 	};
 	enum cp0_tlb_el_c : u64
 	{
@@ -275,6 +281,7 @@ protected:
 		MIPS3_PC  = 96,
 		MIPS3_HI,
 		MIPS3_LO,
+		MIPS3_FCR30,
 		MIPS3_FCR31,
 	};
 
@@ -312,9 +319,9 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_execute_interface overrides
-	virtual u32 execute_min_cycles() const override { return 1; }
-	virtual u32 execute_max_cycles() const override { return 40; }
-	virtual u32 execute_input_lines() const override { return 6; }
+	virtual u32 execute_min_cycles() const noexcept override { return 1; }
+	virtual u32 execute_max_cycles() const noexcept override { return 40; }
+	virtual u32 execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -342,23 +349,25 @@ protected:
 	// cp0 helpers
 	TIMER_CALLBACK_MEMBER(cp0_timer_callback);
 	void cp0_update_timer(bool start = false);
-	void cp0_mode_check();
+	bool cp0_64() const;
 
 	// cp1 implementation
+	void cp1_unimplemented();
+	template <typename T> bool cp1_op(T op);
 	void cp1_execute(u32 const op);
-	void cp1_set(unsigned const reg, u64 const data);
+	template <typename T> void cp1_set(unsigned const reg, T const data);
 
 	// cp2 implementation
 	void cp2_execute(u32 const op);
 
 	// address and memory handling
-	enum translate_t { ERROR, MISS, UNCACHED, CACHED };
-	translate_t translate(int intention, u64 &address);
+	enum translate_result { ERROR, MISS, UNCACHED, CACHED };
+	translate_result translate(int intention, u64 &address);
 	void address_error(int intention, u64 const address);
 
-	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, bool> load(u64 program_address, U &&apply);
+	template <typename T, bool Aligned = true, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, bool> load(u64 program_address, U &&apply);
 	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(u64, T)>>::value, bool> load_linked(u64 program_address, U &&apply);
-	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::value, bool> store(u64 program_address, U data, T mem_mask = ~T(0));
+	template <typename T, bool Aligned = true, typename U> std::enable_if_t<std::is_convertible<U, T>::value, bool> store(u64 program_address, U data, T mem_mask = ~T(0));
 	bool fetch(u64 address, std::function<void(u32)> &&apply);
 
 	// debugging helpers
@@ -378,7 +387,7 @@ protected:
 	u64 m_r[32];
 	u64 m_hi;
 	u64 m_lo;
-	enum branch_state_t : unsigned
+	enum branch_state : unsigned
 	{
 		NONE      = 0,
 		DELAY     = 1, // delay slot instruction active
@@ -393,22 +402,24 @@ protected:
 	u64 m_cp0[32];
 	u64 m_cp0_timer_zero;
 	emu_timer *m_cp0_timer;
-	memory_passthrough_handler *m_ll_watch;
-	struct tlb_entry_t
+	bool m_hard_reset;
+	bool m_ll_active;
+	bool m_bus_error;
+	struct tlb_entry
 	{
 		u64 mask;
 		u64 vpn;
 		u64 pfn[2];
 
-		u8 low_bit;
+		unsigned low_bit;
 	}
 	m_tlb[48];
-	unsigned m_last[3];
-	bool m_64;
+	unsigned m_tlb_mru[3][48];
 
 	// cp1 state
 	u64 m_f[32]; // floating point registers
 	u32 m_fcr0;  // implementation and revision register
+	u32 m_fcr30; // unknown
 	u32 m_fcr31; // control/status register
 
 	// experimental icache state
@@ -419,9 +430,11 @@ protected:
 	std::unique_ptr<u32[]> m_icache_tag;
 	std::unique_ptr<u32[]> m_icache_data;
 
-	// experimental icache statistics
-	u64 m_icache_hit;
-	u64 m_icache_miss;
+	// statistics
+	u64 m_tlb_scans;
+	u64 m_tlb_loops;
+	u64 m_icache_hits;
+	u64 m_icache_misses;
 };
 
 class r4000_device : public r4000_base_device
@@ -429,7 +442,7 @@ class r4000_device : public r4000_base_device
 public:
 	// NOTE: R4000 chips prior to 3.0 have an xtlb bug
 	r4000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R4000, tag, owner, clock, 0x0430, CACHE_8K, CACHE_8K)
+		: r4000_base_device(mconfig, R4000, tag, owner, clock, 0x0430, 0x0500, CACHE_8K, CACHE_8K)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;
@@ -440,7 +453,7 @@ class r4400_device : public r4000_base_device
 {
 public:
 	r4400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R4400, tag, owner, clock, 0x0440, CACHE_16K, CACHE_16K)
+		: r4000_base_device(mconfig, R4400, tag, owner, clock, 0x0440, 0x0500, CACHE_16K, CACHE_16K)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;
@@ -451,7 +464,7 @@ class r4600_device : public r4000_base_device
 {
 public:
 	r4600_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R4600, tag, owner, clock, 0x2000, CACHE_16K, CACHE_16K)
+		: r4000_base_device(mconfig, R4600, tag, owner, clock, 0x2020, 0x2020, CACHE_16K, CACHE_16K)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;

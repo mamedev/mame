@@ -9,12 +9,15 @@
     Michael Zapf, Sept 2014
 
 *********************************************************************/
+#ifndef MAME_FORMATS_TI99_DSK_H
+#define MAME_FORMATS_TI99_DSK_H
 
-#ifndef TI99_DSK_H
-#define TI99_DSK_H
+#pragma once
 
 #include "flopimg.h"
-#include <sstream>
+
+#include <string>
+
 
 class ti99_floppy_format : public floppy_image_format_t
 {
@@ -107,4 +110,4 @@ private:
 
 extern const floppy_format_type FLOPPY_TI99_TDF_FORMAT;
 
-#endif /* TI99_DSK_H */
+#endif // MAME_FORMATS_TI99_DSK_H

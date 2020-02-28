@@ -343,7 +343,7 @@ void p8k_state::p8k_16_datamap(address_map &map)
 
 void p8k_state::p8k_16_iomap(address_map &map)
 {
-//  AM_RANGE(0x0fef0, 0x0feff) // clock
+//  map(0x0fef0, 0x0feff) // clock
 	map(0x0ff80, 0x0ff87).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)).umask16(0x00ff);
 	map(0x0ff88, 0x0ff8f).rw("sio1", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)).umask16(0x00ff);
 	map(0x0ff90, 0x0ff97).rw("pio0", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)).umask16(0x00ff);
@@ -351,13 +351,13 @@ void p8k_state::p8k_16_iomap(address_map &map)
 	map(0x0ffa0, 0x0ffa7).rw(m_pio2, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)).umask16(0x00ff);
 	map(0x0ffa8, 0x0ffaf).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
 	map(0x0ffb0, 0x0ffb7).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
-//  AM_RANGE(0x0ffc0, 0x0ffc1) // SCR
-//  AM_RANGE(0x0ffc8, 0x0ffc9) // SBR
-//  AM_RANGE(0x0ffd0, 0x0ffd1) // NBR
-//  AM_RANGE(0x0ffd8, 0x0ffd9) // SNVR
+//  map(0x0ffc0, 0x0ffc1) // SCR
+//  map(0x0ffc8, 0x0ffc9) // SBR
+//  map(0x0ffd0, 0x0ffd1) // NBR
+//  map(0x0ffd8, 0x0ffd9) // SNVR
 	map(0x0ffe1, 0x0ffe1).w(m_daisy, FUNC(p8k_16_daisy_device::reti_w));
-//  AM_RANGE(0x0fff0, 0x0fff1) // TRPL
-//  AM_RANGE(0x0fff8, 0x0fff9) // IF1L
+//  map(0x0fff0, 0x0fff1) // TRPL
+//  map(0x0fff8, 0x0fff9) // IF1L
 }
 
 
@@ -369,7 +369,7 @@ void p8k_state::p8k_16_iomap(address_map &map)
 
 WRITE_LINE_MEMBER( p8k_state::p8k_16_daisy_interrupt )
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(z8001_device::VI_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -416,7 +416,8 @@ GFXDECODE_END
 
 ****************************************************************************/
 
-MACHINE_CONFIG_START(p8k_state::p8k)
+void p8k_state::p8k(machine_config &config)
+{
 	/* basic machine hardware */
 	z80_device& maincpu(Z80(config, "maincpu", 16_MHz_XTAL / 4));
 	maincpu.set_daisy_config(p8k_daisy_chain);
@@ -481,17 +482,17 @@ MACHINE_CONFIG_START(p8k_state::p8k)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	BEEP(config, "beeper", 3250).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
-MACHINE_CONFIG_START(p8k_state::p8k_16)
+void p8k_state::p8k_16(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z8001, XTAL(4'000'000) )
-	MCFG_DEVICE_PROGRAM_MAP(p8k_16_memmap)
-	MCFG_DEVICE_DATA_MAP(p8k_16_datamap)
-	MCFG_DEVICE_IO_MAP(p8k_16_iomap)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("p8k_16_daisy", p8k_16_daisy_device, irq_callback)
+	Z8001(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &p8k_state::p8k_16_memmap);
+	m_maincpu->set_addrmap(AS_DATA, &p8k_state::p8k_16_datamap);
+	m_maincpu->set_addrmap(AS_IO, &p8k_state::p8k_16_iomap);
+	m_maincpu->set_irq_acknowledge_callback("p8k_16_daisy", FUNC(p8k_16_daisy_device::irq_callback));
 
 	P8K_16_DAISY(config, m_daisy, 0);
 	m_daisy->set_daisy_config(p8k_16_daisy_chain);
@@ -531,9 +532,8 @@ MACHINE_CONFIG_START(p8k_state::p8k_16)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	BEEP(config, "beeper", 3250).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 /* ROM definition */
 ROM_START( p8000 )

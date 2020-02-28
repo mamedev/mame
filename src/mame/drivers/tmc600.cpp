@@ -134,7 +134,7 @@ void tmc600_state::tmc600_io_map(address_map &map)
 	map(0x03, 0x03).w(m_bwio, FUNC(cdp1852_device::write));
 	map(0x04, 0x04).w(CDP1852_TMC700_TAG, FUNC(cdp1852_device::write));
 	map(0x05, 0x05).rw(FUNC(tmc600_state::rtc_r), FUNC(tmc600_state::vismac_data_w));
-//  AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
+//  map(0x06, 0x06).w(FUNC(tmc600_state::floppy_w);
 	map(0x07, 0x07).w(FUNC(tmc600_state::vismac_register_w));
 }
 
@@ -234,9 +234,7 @@ READ_LINE_MEMBER( tmc600_state::ef2_r )
 
 READ_LINE_MEMBER( tmc600_state::ef3_r )
 {
-	uint8_t keylatch = m_bwio->do_r();
-
-	return !BIT(m_key_row[(keylatch >> 3) & 0x07]->read(), keylatch & 0x07);
+	return !BIT(m_key_row[(m_out3 >> 3) & 0x07]->read(), m_out3 & 0x07);
 }
 
 WRITE_LINE_MEMBER( tmc600_state::q_w )
@@ -249,6 +247,11 @@ WRITE8_MEMBER( tmc600_state::sc_w )
 	if (data == COSMAC_STATE_CODE_S3_INTERRUPT) {
 		m_maincpu->int_w(CLEAR_LINE);
 	}
+}
+
+WRITE8_MEMBER( tmc600_state::out3_w )
+{
+	m_out3 = data;
 }
 
 /* Machine Drivers */
@@ -273,6 +276,7 @@ void tmc600_state::tmc600(machine_config &config)
 	// keyboard output latch
 	CDP1852(config, m_bwio); // clock is CDP1802 TPB
 	m_bwio->mode_cb().set_constant(1);
+	m_bwio->do_cb().set(FUNC(tmc600_state::out3_w));
 
 #if 0
 	// address bus demux for expansion bus
@@ -291,10 +295,10 @@ void tmc600_state::tmc600(machine_config &config)
 
 	// cassette
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	// expansion bus connector
-	TMC600_EURO_BUS_SLOT(config, m_bus, tmc600_euro_bus_cards, nullptr);
+	TMC600_EUROBUS_SLOT(config, m_bus, tmc600_eurobus_cards, nullptr);
 
 	// internal RAM
 	RAM(config, RAM_TAG).set_default_size("8K");

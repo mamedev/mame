@@ -55,15 +55,15 @@ public:
 	auto out_pc_callback() { return m_out_pc_cb.bind(); }
 	auto out_to_callback() { return m_out_to_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( memory_r );
-	DECLARE_WRITE8_MEMBER( memory_w );
+	uint8_t memory_r(offs_t offset);
+	void memory_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( ale_w );
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	void ale_w(offs_t offset, uint8_t data);
+	uint8_t data_r();
+	void data_w(uint8_t data);
 
 protected:
 	i8155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -71,7 +71,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	devcb_read8        m_in_pa_cb;
@@ -100,24 +99,29 @@ private:
 	// counter
 	uint16_t m_count_length;    // count length register (assigned)
 	uint16_t m_count_loaded;    // count length register (loaded)
-	uint16_t m_counter;         // counter register
-	bool m_count_extra;         // extra cycle when count is odd
 	int m_to;                   // timer output
+	bool m_count_even_phase;
 
 	// timers
 	emu_timer *m_timer;         // counter timer
+	emu_timer *m_timer_tc;      // counter timer (for TC)
 
 	const address_space_config      m_space_config;
 
-	inline uint8_t get_timer_mode();
+	inline uint8_t get_timer_mode() const;
+	inline uint16_t get_timer_count() const;
 	inline void timer_output(int to);
 	inline void timer_stop_count();
 	inline void timer_reload_count();
 	inline int get_port_mode(int port);
 	inline uint8_t read_port(int port);
 	inline void write_port(int port, uint8_t data);
+	void write_command(uint8_t data);
 
 	void register_w(int offset, uint8_t data);
+
+	TIMER_CALLBACK_MEMBER(timer_half_counted);
+	TIMER_CALLBACK_MEMBER(timer_tc);
 };
 
 

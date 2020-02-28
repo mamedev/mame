@@ -166,7 +166,7 @@ void z80_daisy_chain_interface::daisy_init(const z80_daisy_config *daisy)
 		tailptr = &(*tailptr)->m_daisy_next;
 	}
 
-	osd_printf_verbose("Daisy chain = %s\n", daisy_show_chain().c_str());
+	osd_printf_verbose("Daisy chain = %s\n", daisy_show_chain());
 }
 
 

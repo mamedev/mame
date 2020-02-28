@@ -46,6 +46,7 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #define MAIN_CLOCK XTAL(10'000'000)
 
@@ -178,9 +179,9 @@ WRITE16_MEMBER(_3x3puzzle_state::tilemap1_scrolly_w)
 
 void _3x3puzzle_state::video_start()
 {
-	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile1_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile2_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_tilemap3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile3_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_3x3puzzle_state::get_tile1_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_3x3puzzle_state::get_tile2_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_3x3puzzle_state::get_tile3_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap2->set_transparent_pen(0);
 	m_tilemap3->set_transparent_pen(0);
 }
@@ -388,20 +389,20 @@ void _3x3puzzle_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(_3x3puzzle_state::_3x3puzzle)
-
+void _3x3puzzle_state::_3x3puzzle(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000,MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(_3x3puzzle_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _3x3puzzle_state,  irq4_line_hold)
+	M68000(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &_3x3puzzle_state::_3x3puzzle_map);
+	m_maincpu->set_vblank_int("screen", FUNC(_3x3puzzle_state::irq4_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(_3x3puzzle_state, screen_update)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_screen_update(FUNC(_3x3puzzle_state::screen_update));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_3x3puzzle);
 
@@ -409,9 +410,8 @@ MACHINE_CONFIG_START(_3x3puzzle_state::_3x3puzzle)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************

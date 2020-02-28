@@ -210,9 +210,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 8; }
-	virtual uint32_t execute_max_cycles() const override { return 8; }
-	virtual uint32_t execute_input_lines() const override { return 32; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 8; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 8; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 32; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -566,6 +566,7 @@ private:
 	inline void compute_fabs_plus(int rn, int rx, int ry);
 	inline void compute_fmax(int rn, int rx, int ry);
 	inline void compute_fmin(int rn, int rx, int ry);
+	inline void compute_fcopysign(int rn, int rx, int ry);
 	inline void compute_fclip(int rn, int rx, int ry);
 	inline void compute_recips(int rn, int rx);
 	inline void compute_rsqrts(int rn, int rx);

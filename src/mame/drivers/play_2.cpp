@@ -324,15 +324,15 @@ WRITE8_MEMBER( play_2_state::sound_g_w )
 	switch (data)
 	{
 	case 0x01:
-		m_aysnd1->data_w(space, 0, m_psg_latch);
+		m_aysnd1->data_w(m_psg_latch);
 		break;
 
 	case 0x02:
-		m_psg_latch = m_aysnd1->data_r(space, 0);
+		m_psg_latch = m_aysnd1->data_r();
 		break;
 
 	case 0x03:
-		m_aysnd1->address_w(space, 0, m_psg_latch);
+		m_aysnd1->address_w(m_psg_latch);
 		break;
 	}
 }

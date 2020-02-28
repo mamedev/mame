@@ -120,9 +120,9 @@ WRITE8_MEMBER(a78_megacart_device::write_40xx)
 
 // VersaBoard + POKEY @ 0x0450
 
-MACHINE_CONFIG_START(a78_rom_p450_vb_device::device_add_mconfig)
+void a78_rom_p450_vb_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("pokey450", POKEY, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
-MACHINE_CONFIG_END
+	POKEY(config, m_pokey450, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "addon", 1.00);
+}

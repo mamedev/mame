@@ -13,6 +13,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "sound/ay8910.h"
+#include "tilemap.h"
 
 
 class dday_state : public driver_device
@@ -62,7 +63,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<ay8910_device> m_ay1;
+	required_device<ay8912_device> m_ay1;
 
 	DECLARE_READ8_MEMBER(dday_countdown_timer_r);
 	DECLARE_WRITE8_MEMBER(dday_bgvideoram_w);

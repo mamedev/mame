@@ -72,17 +72,20 @@ void spectrum_protek_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(spectrum_protek_device::port_fe_r)
+uint8_t spectrum_protek_device::iorq_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	uint8_t lines = offset >> 8;
+	switch (offset & 0xff)
+	{
+	case 0xfe:
+		if (((offset >> 8) & 8) == 0)
+			data = m_exp_line3->read() | (0xff ^ 0x10);
 
-	if ((lines & 8) == 0)
-		data = m_exp_line3->read() | (0xff ^ 0x10);
-
-	if ((lines & 16) == 0)
-		data = m_exp_line4->read() | (0xff ^ 0x1d);
+		if (((offset >> 8) & 16) == 0)
+			data = m_exp_line4->read() | (0xff ^ 0x1d);
+		break;
+	}
 
 	return data;
 }

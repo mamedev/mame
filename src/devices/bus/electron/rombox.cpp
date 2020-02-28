@@ -55,21 +55,21 @@ void electron_rombox_device::device_add_mconfig(machine_config &config)
 {
 	/* rom sockets */
 	GENERIC_SOCKET(config, m_rom[0], generic_plain_slot, "electron_rom", "bin,rom");
-	m_rom[0]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom1_load, this));
+	m_rom[0]->set_device_load(FUNC(electron_rombox_device::rom1_load));
 	GENERIC_SOCKET(config, m_rom[1], generic_plain_slot, "electron_rom", "bin,rom");
-	m_rom[1]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom2_load, this));
+	m_rom[1]->set_device_load(FUNC(electron_rombox_device::rom2_load));
 	GENERIC_SOCKET(config, m_rom[2], generic_plain_slot, "electron_rom", "bin,rom");
-	m_rom[2]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom3_load, this));
+	m_rom[2]->set_device_load(FUNC(electron_rombox_device::rom3_load));
 	GENERIC_SOCKET(config, m_rom[3], generic_plain_slot, "electron_rom", "bin,rom");
-	m_rom[3]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom4_load, this));
+	m_rom[3]->set_device_load(FUNC(electron_rombox_device::rom4_load));
 	GENERIC_SOCKET(config, m_rom[4], generic_plain_slot, "electron_rom", "bin,rom");
-	m_rom[4]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom5_load, this));
+	m_rom[4]->set_device_load(FUNC(electron_rombox_device::rom5_load));
 	GENERIC_SOCKET(config, m_rom[5], generic_plain_slot, "electron_rom", "bin,rom");
-	m_rom[5]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom6_load, this));
+	m_rom[5]->set_device_load(FUNC(electron_rombox_device::rom6_load));
 	GENERIC_SOCKET(config, m_rom[6], generic_plain_slot, "electron_rom", "bin,rom");
-	m_rom[6]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom7_load, this));
+	m_rom[6]->set_device_load(FUNC(electron_rombox_device::rom7_load));
 	GENERIC_SOCKET(config, m_rom[7], generic_plain_slot, "electron_rom", "bin,rom");
-	m_rom[7]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom8_load, this));
+	m_rom[7]->set_device_load(FUNC(electron_rombox_device::rom8_load));
 
 	/* pass-through */
 	ELECTRON_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), electron_expansion_devices, nullptr);
@@ -117,7 +117,7 @@ void electron_rombox_device::device_reset()
 //  expbus_r - expansion data read
 //-------------------------------------------------
 
-uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset)
+uint8_t electron_rombox_device::expbus_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -131,7 +131,7 @@ uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset)
 		case 3:
 			if (m_rom_base == 0 && m_rom[m_romsel + 4]->exists())
 			{
-				data = m_rom[m_romsel + 4]->read_rom(space, offset & 0x3fff);
+				data = m_rom[m_romsel + 4]->read_rom(offset & 0x3fff);
 			}
 			break;
 		case 4:
@@ -140,7 +140,7 @@ uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset)
 		case 7:
 			if (m_rom[m_romsel - 4]->exists())
 			{
-				data = m_rom[m_romsel - 4]->read_rom(space, offset & 0x3fff);
+				data = m_rom[m_romsel - 4]->read_rom(offset & 0x3fff);
 			}
 			break;
 		case 12:
@@ -149,13 +149,13 @@ uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset)
 		case 15:
 			if (m_rom_base == 12 && m_rom[m_romsel - 8]->exists())
 			{
-				data = m_rom[m_romsel - 8]->read_rom(space, offset & 0x3fff);
+				data = m_rom[m_romsel - 8]->read_rom(offset & 0x3fff);
 			}
 			break;
 		}
 	}
 
-	data &= m_exp->expbus_r(space, offset);
+	data &= m_exp->expbus_r(offset);
 
 	return data;
 }
@@ -164,9 +164,9 @@ uint8_t electron_rombox_device::expbus_r(address_space &space, offs_t offset)
 //  expbus_w - expansion data write
 //-------------------------------------------------
 
-void electron_rombox_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+void electron_rombox_device::expbus_w(offs_t offset, uint8_t data)
 {
-	m_exp->expbus_w(space, offset, data);
+	m_exp->expbus_w(offset, data);
 
 	if (offset == 0xfe05)
 	{

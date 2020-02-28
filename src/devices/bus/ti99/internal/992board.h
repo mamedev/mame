@@ -33,10 +33,6 @@ public:
 	static constexpr unsigned TOTAL_HORZ                 = 342;
 	static constexpr unsigned TOTAL_VERT_NTSC            = 262;
 
-	template <class Object> devcb_base &set_readmem_callback(Object &&cb) { return m_mem_read_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_hold_callback(Object &&cb) { return m_hold_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_int_cb.set_callback(std::forward<Object>(cb)); }
-
 	// Delay(2) + ColorBurst(14) + Delay(8) + LeftBorder(13)
 	static constexpr unsigned HORZ_DISPLAY_START         = 2 + 14 + 8 + 13;
 	// RightBorder(15) + Delay(8) + HorizSync(26)
@@ -107,8 +103,8 @@ class io992_device : public bus::hexbus::hexbus_chained_device
 public:
 	io992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( cruread );
-	DECLARE_WRITE8_MEMBER( cruwrite );
+	uint8_t cruread(offs_t offset);
+	void cruwrite(offs_t offset, uint8_t data);
 	void device_start() override;
 	ioport_constructor device_input_ports() const override;
 	auto rombank_cb() { return m_set_rom_bank.bind(); }
@@ -120,8 +116,6 @@ protected:
 	void hexbus_value_changed(uint8_t data) override;
 
 private:
-	const uint8_t m_hexbval[6] = { 0x01, 0x02, 0x40, 0x80, 0x10, 0x04 };
-
 	required_device<hexbus::hexbus_device> m_hexbus;
 	required_device<cassette_image_device> m_cassette;
 	required_device<video992_device> m_videoctrl;
@@ -133,18 +127,8 @@ private:
 	// Keyboard row
 	int m_key_row;
 
-	// Hexbus outgoing signal latch. Should be set to D7 when idle.
-	// (see hexbus.cpp)
-	uint8_t m_latch_out;
-
-	// Hexbus incoming signal latch. Should be set to D7 when idle.
-	uint8_t m_latch_in;
-
-	// Hexbus inhibit. This prevents the incoming latches to store the data.
-	bool m_communication_disable;
-
-	// Bit 6. It is not documented, but likely to indicate the response phase.
-	bool m_response_phase;
+	// HSK* released flag. This is queried as CRU bit 6 (with the current HSK* level).
+	bool m_hsk_released;
 };
 
 

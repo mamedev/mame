@@ -361,7 +361,7 @@ void intv_state::intvecs_mem(address_map &map)
 {
 	map(0x0000, 0x003f).rw(FUNC(intv_state::intv_stic_r), FUNC(intv_state::intv_stic_w));
 	map(0x0080, 0x0081).rw("speech", FUNC(sp0256_device::spb640_r), FUNC(sp0256_device::spb640_w)); /* Intellivoice */
-	// AM_RANGE(0x00E0, 0x00E3) AM_READWRITE( intv_ecs_uart_r, intv_ecs_uart_w )
+	// map(0x00e0, 0x00e3).rw(FUNC(intv_state::intv_ecs_uart_r), FUNC(intv_state::intv_ecs_uart_w));
 	map(0x00f0, 0x00ff).rw("ecs", FUNC(intv_ecs_device::read_ay), FUNC(intv_ecs_device::write_ay)); /* ecs psg */
 	map(0x0100, 0x01ef).rw(FUNC(intv_state::intv_ram8_r), FUNC(intv_state::intv_ram8_w));
 	map(0x01f0, 0x01ff).rw(m_sound, FUNC(ay8914_device::read), FUNC(ay8914_device::write)).umask16(0x00ff);
@@ -438,7 +438,7 @@ void intv_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		intv_btb_fill(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in intv_state::device_timer");
+		throw emu_fatalerror("Unknown id in intv_state::device_timer");
 	}
 }
 
@@ -457,24 +457,25 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
 	timer_set(m_keyboard->cycles_to_attotime(100), TIMER_INTV_INTERRUPT2_COMPLETE);
 }
 
-MACHINE_CONFIG_START(intv_state::intv)
+void intv_state::intv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", CP1610, XTAL(3'579'545)/4)        /* Colorburst/4 */
-	MCFG_DEVICE_PROGRAM_MAP(intv_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt)
-	config.m_minimum_quantum = attotime::from_hz(60);
+	CP1610(config, m_maincpu, XTAL(3'579'545)/4);        /* Colorburst/4 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intv_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(intv_state::intv_interrupt));
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("stic", STIC, XTAL(3'579'545))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	STIC(config, m_stic, XTAL(3'579'545));
+	m_stic->set_screen("screen");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.92)
-	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2400)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(intv_state, screen_update_intv)
-	MCFG_SCREEN_SIZE(stic_device::SCREEN_WIDTH*INTV_X_SCALE, stic_device::SCREEN_HEIGHT*INTV_Y_SCALE)
-	MCFG_SCREEN_VISIBLE_AREA(0, stic_device::SCREEN_WIDTH*INTV_X_SCALE-1, 0, stic_device::SCREEN_HEIGHT*INTV_Y_SCALE-1)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.92);
+	//screen.set_vblank_time(ATTOSECONDS_IN_USEC(2400)); /* not accurate */
+	screen.set_screen_update(FUNC(intv_state::screen_update_intv));
+	screen.set_size(stic_device::SCREEN_WIDTH*INTV_X_SCALE, stic_device::SCREEN_HEIGHT*INTV_Y_SCALE);
+	screen.set_visarea(0, stic_device::SCREEN_WIDTH*INTV_X_SCALE-1, 0, stic_device::SCREEN_HEIGHT*INTV_Y_SCALE-1);
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(intv_state::intv_palette), 0x400, 32);
 
@@ -494,30 +495,30 @@ MACHINE_CONFIG_START(intv_state::intv)
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("intv");
 	SOFTWARE_LIST(config, "ecs_list").set_compatible("intvecs");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(intv_state::intv2)
+void intv_state::intv2(machine_config &config)
+{
 	intv(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(intv2_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intv2_mem);
+}
 
-MACHINE_CONFIG_START(intv_state::intvoice)
+void intv_state::intvoice(machine_config &config)
+{
 	intv(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(intvoice_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intvoice_mem);
 
 	config.device_remove("cartslot");
-	MCFG_DEVICE_ADD("voice", INTV_ROM_VOICE, 0)
-MACHINE_CONFIG_END
+	INTV_ROM_VOICE(config, "voice", 0);
+}
 
-MACHINE_CONFIG_START(intv_state::intvecs)
+void intv_state::intvecs(machine_config &config)
+{
 	intv(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(intvecs_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intvecs_mem);
 
 	config.device_remove("cartslot");
-	MCFG_DEVICE_ADD("ecs", INTV_ROM_ECS, 0)
+	INTV_ROM_ECS(config, "ecs", 0);
 
 	sp0256_device &speech(SP0256(config, "speech", 3120000));
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */
@@ -530,21 +531,21 @@ MACHINE_CONFIG_START(intv_state::intvecs)
 	config.device_remove("ecs_list");
 	SOFTWARE_LIST(config.replace(), "cart_list").set_original("intvecs");
 	SOFTWARE_LIST(config, "intv_list").set_compatible("intv");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(intv_state::intvkbd)
+void intv_state::intvkbd(machine_config &config)
+{
 	intv(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(intvkbd_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intvkbd_mem);
 
-	MCFG_DEVICE_ADD("keyboard", M6502, XTAL(7'159'090)/8)
-	MCFG_DEVICE_PROGRAM_MAP(intvkbd2_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt2)
+	M6502(config, m_keyboard, XTAL(7'159'090)/8);
+	m_keyboard->set_addrmap(AS_PROGRAM, &intv_state::intvkbd2_mem);
+	m_keyboard->set_vblank_int("screen", FUNC(intv_state::intv_interrupt2));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_intvkbd)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_intvkbd);
 
 	/* crt controller */
 	TMS9927(config, m_crtc, XTAL(7'159'090)/8);
@@ -555,13 +556,12 @@ MACHINE_CONFIG_START(intv_state::intvkbd)
 		stic_device::OVERSCAN_TOP_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE,
 		stic_device::OVERSCAN_BOTTOM_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(intv_state, screen_update_intvkbd)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(intv_state::screen_update_intvkbd));
 
 	/* I/O cartslots for BASIC */
-	MCFG_GENERIC_CARTSLOT_ADD("ioslot1", generic_plain_slot, "intbasic_cart")
-	MCFG_GENERIC_CARTSLOT_ADD("ioslot2", generic_plain_slot, "intbasic_cart")
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, m_iocart1, generic_plain_slot, "intbasic_cart");
+	GENERIC_CARTSLOT(config, m_iocart2, generic_plain_slot, "intbasic_cart");
+}
 
 ROM_START(intv) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 and RO-3-9504-021.U6
 	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)

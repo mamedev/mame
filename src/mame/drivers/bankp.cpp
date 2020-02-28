@@ -293,20 +293,20 @@ INTERRUPT_GEN_MEMBER(bankp_state::vblank_irq)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(bankp_state::bankp)
-
+void bankp_state::bankp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)
-	MCFG_DEVICE_PROGRAM_MAP(bankp_map)
-	MCFG_DEVICE_IO_MAP(bankp_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bankp_state,  vblank_irq)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bankp_state::bankp_map);
+	m_maincpu->set_addrmap(AS_IO, &bankp_state::bankp_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(bankp_state::vblank_irq));
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(bankp_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_screen_update(FUNC(bankp_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bankp);
 	PALETTE(config, m_palette, FUNC(bankp_state::bankp_palette), 32*4+16*8, 32);
@@ -314,15 +314,12 @@ MACHINE_CONFIG_START(bankp_state::bankp)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489, MASTER_CLOCK/6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76489(config, "sn1", MASTER_CLOCK/6).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("sn2", SN76489, MASTER_CLOCK/6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76489(config, "sn2", MASTER_CLOCK/6).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("sn3", SN76489, MASTER_CLOCK/6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SN76489(config, "sn3", MASTER_CLOCK/6).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

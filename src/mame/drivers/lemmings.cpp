@@ -48,7 +48,7 @@ READ16_MEMBER( lemmings_state::lem_protection_region_0_146_r )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	uint16_t data = m_deco146->read_data( deco146_addr, cs );
 	return data;
 }
 
@@ -57,7 +57,7 @@ WRITE16_MEMBER( lemmings_state::lem_protection_region_0_146_w )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
+	m_deco146->write_data( deco146_addr, data, mem_mask, cs );
 }
 
 
@@ -213,29 +213,29 @@ void lemmings_state::machine_start()
 {
 }
 
-MACHINE_CONFIG_START(lemmings_state::lemmings)
-
+void lemmings_state::lemmings(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 14000000)
-	MCFG_DEVICE_PROGRAM_MAP(lemmings_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lemmings_state,  irq6_line_hold)
+	M68000(config, m_maincpu, 28_MHz_XTAL / 2); // Data East 59
+	m_maincpu->set_addrmap(AS_PROGRAM, &lemmings_state::lemmings_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lemmings_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", M6809,32220000/8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MC6809E(config, m_audiocpu, 32.22_MHz_XTAL / 24); // MC68B09EP; clock not verified
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lemmings_state::sound_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
-	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
+	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lemmings_state, screen_update_lemmings)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lemmings_state, screen_vblank_lemmings))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(lemmings_state::screen_update_lemmings));
+	screen.screen_vblank().set(FUNC(lemmings_state::screen_vblank_lemmings));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lemmings)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lemmings);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 1024);
 
 	DECO_SPRITE(config, m_sprgen[0], 0);
@@ -251,7 +251,7 @@ MACHINE_CONFIG_START(lemmings_state::lemmings)
 	m_deco146->port_b_cb().set_ioport("SYSTEM");
 	m_deco146->port_c_cb().set_ioport("DSW");
 	m_deco146->set_use_magic_read_address_xor(true);
-	m_deco146->soundlatch_irq_cb().set_inputline(m_audiocpu, 1);
+	m_deco146->soundlatch_irq_cb().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -259,15 +259,15 @@ MACHINE_CONFIG_START(lemmings_state::lemmings)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32.22_MHz_XTAL / 9)); // clock likely wrong
+	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 	ymsnd.add_route(0, "lspeaker", 0.45);
 	ymsnd.add_route(1, "rspeaker", 0.45);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1023924, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1023924, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+}
 
 /******************************************************************************/
 

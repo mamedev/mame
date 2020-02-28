@@ -348,7 +348,7 @@ void bigbord2_state::bigbord2_io(address_map &map)
 	map(0xcc, 0xcf).w(FUNC(bigbord2_state::syslatch2_w));
 	map(0xd0, 0xd3).r(FUNC(bigbord2_state::kbd_r)); // u1
 	map(0xd4, 0xd7).rw(m_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write)); // u10
-	//AM_RANGE(0xd8, 0xdb) AM_READWRITE(portd8_r, portd8_w) // various external data ports; DB = centronics printer
+	//map(0xd8, 0xdb).rw(FUNC(bigbord2_state::portd8_r), FUNC(bigbord2_state::portd8_w)); // various external data ports; DB = centronics printer
 	map(0xd9, 0xd9).w("outlatch1", FUNC(ls259_device::write_nibble_d3)); // u96
 	map(0xdc, 0xdc).mirror(2).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w)); // u30
 	map(0xdd, 0xdd).mirror(2).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -548,7 +548,8 @@ MC6845_UPDATE_ROW( bigbord2_state::crtc_update_row )
 
 #define MAIN_CLOCK 8_MHz_XTAL / 2
 
-MACHINE_CONFIG_START(bigbord2_state::bigbord2)
+void bigbord2_state::bigbord2(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bigbord2_state::bigbord2_mem);
@@ -556,10 +557,10 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crt8002)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_crt8002);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	CLOCK(config, "ctc_clock", MAIN_CLOCK).signal_handler().set(FUNC(bigbord2_state::clock_w));
@@ -597,7 +598,7 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(bigbord2_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(bigbord2_state::crtc_update_row));
 	crtc.out_vsync_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
 
 	ls259_device &proglatch(LS259(config, "proglatch")); // U41
@@ -615,7 +616,7 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	m_syslatch1->q_out_cb<6>().set(FUNC(bigbord2_state::disk_motor_w)); // MOTOR
 	m_syslatch1->q_out_cb<7>().set("beeper", FUNC(beep_device::set_state)); // BELL
 
-	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // U96
+	LS259(config, "outlatch1", 0); // U96
 
 	/* keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
@@ -623,9 +624,8 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 950) // actual frequency is unknown
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	BEEP(config, "beeper", 950).add_route(ALL_OUTPUTS, "mono", 0.50); // actual frequency is unknown
+}
 
 
 /* ROMs */

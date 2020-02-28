@@ -59,29 +59,27 @@ public:
 	void init_proconn();
 
 private:
-	template <unsigned N> DECLARE_WRITE8_MEMBER( ay_w ) { m_ay->address_data_w(space, N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( ay_w ) { m_ay->address_data_w(N, data); }
 
-	template <unsigned N> DECLARE_WRITE8_MEMBER( ctc_w ) { m_z80ctc->write(space, N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( ctc_w ) { m_z80ctc->write(N, data); }
 
-	template <unsigned N> DECLARE_WRITE8_MEMBER( sio_w ) { m_z80sio->cd_ba_w(space, N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( sio_w ) { m_z80sio->cd_ba_w(N, data); }
 
-	template <unsigned N> DECLARE_WRITE8_MEMBER( pio1_w ) { m_z80pio[0]->write(space, N, data); }
-	template <unsigned N> DECLARE_WRITE8_MEMBER( pio2_w ) { m_z80pio[1]->write(space, N, data); }
-	template <unsigned N> DECLARE_WRITE8_MEMBER( pio3_w ) { m_z80pio[2]->write(space, N, data); }
-	template <unsigned N> DECLARE_WRITE8_MEMBER( pio4_w ) { m_z80pio[3]->write(space, N, data); }
-	template <unsigned N> DECLARE_WRITE8_MEMBER( pio5_w ) { m_z80pio[4]->write(space, N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( pio1_w ) { m_z80pio[0]->write(N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( pio2_w ) { m_z80pio[1]->write(N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( pio3_w ) { m_z80pio[2]->write(N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( pio4_w ) { m_z80pio[3]->write(N, data); }
+	template <unsigned N> DECLARE_WRITE8_MEMBER( pio5_w ) { m_z80pio[4]->write(N, data); }
 
-	template <unsigned N> DECLARE_READ8_MEMBER( ay_r ) { return m_ay->data_r(space, N); }
+	template <unsigned N> DECLARE_READ8_MEMBER( ctc_r ) { return m_z80ctc->read(N); }
 
-	template <unsigned N> DECLARE_READ8_MEMBER( ctc_r ) { return m_z80ctc->read(space, N); }
+	template <unsigned N> DECLARE_READ8_MEMBER( sio_r ) { return m_z80sio->cd_ba_r(N); }
 
-	template <unsigned N> DECLARE_READ8_MEMBER( sio_r ) { return m_z80sio->cd_ba_r(space, N); }
-
-	template <unsigned N> DECLARE_READ8_MEMBER( pio1_r ) { return m_z80pio[0]->read(space, N); }
-	template <unsigned N> DECLARE_READ8_MEMBER( pio2_r ) { return m_z80pio[1]->read(space, N); }
-	template <unsigned N> DECLARE_READ8_MEMBER( pio3_r ) { return m_z80pio[2]->read(space, N); }
-	template <unsigned N> DECLARE_READ8_MEMBER( pio4_r ) { return m_z80pio[3]->read(space, N); }
-	template <unsigned N> DECLARE_READ8_MEMBER( pio5_r ) { return m_z80pio[4]->read(space, N); }
+	template <unsigned N> DECLARE_READ8_MEMBER( pio1_r ) { return m_z80pio[0]->read(N); }
+	template <unsigned N> DECLARE_READ8_MEMBER( pio2_r ) { return m_z80pio[1]->read(N); }
+	template <unsigned N> DECLARE_READ8_MEMBER( pio3_r ) { return m_z80pio[2]->read(N); }
+	template <unsigned N> DECLARE_READ8_MEMBER( pio4_r ) { return m_z80pio[3]->read(N); }
+	template <unsigned N> DECLARE_READ8_MEMBER( pio5_r ) { return m_z80pio[4]->read(N); }
 
 	/* PIO 1 */
 
@@ -161,7 +159,7 @@ void proconn_state::proconn_map(address_map &map)
 // r0/r1/r2/r3 and w0/w1/w2/w3 might still be in the wrong order at the moment.
 void proconn_state::proconn_portmap(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0x3ff)
+//  map.global_mask(0x3ff);
 
 	// sio (vfd should be connected to it?)
 	map(0x00ff, 0x00ff).rw(FUNC(proconn_state::sio_r<0>), FUNC(proconn_state::sio_w<0>));
@@ -176,7 +174,7 @@ void proconn_state::proconn_portmap(address_map &map)
 	map(0x03fe, 0x03fe).rw(FUNC(proconn_state::ctc_r<3>), FUNC(proconn_state::ctc_w<3>));
 
 	// ay (meters connected to it?)
-	map(0x00fd, 0x00fd).rw(FUNC(proconn_state::ay_r<0>), FUNC(proconn_state::ay_w<0>));
+	map(0x00fd, 0x00fd).r(m_ay, FUNC(ay8910_device::data_r)).w(FUNC(proconn_state::ay_w<0>));
 	map(0x00fc, 0x00fc).w(FUNC(proconn_state::ay_w<1>));
 
 	// ??

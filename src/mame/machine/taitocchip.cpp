@@ -207,7 +207,7 @@ void taito_cchip_device::mem68_w(offs_t offset, u8 data)
 
 void taito_cchip_device::cchip_map(address_map &map)
 {
-	//AM_RANGE(0x0000, 0x0fff) AM_ROM // internal ROM of uPD7811
+	//map(0x0000, 0x0fff).rom(); // internal ROM of uPD7811
 	map(0x1000, 0x13ff).m(m_upd4464_bank, FUNC(address_map_bank_device::amap8));
 	map(0x1400, 0x17ff).rw(FUNC(taito_cchip_device::asic_r), FUNC(taito_cchip_device::asic_w));
 	map(0x2000, 0x3fff).rom().region("cchip_eprom", 0);

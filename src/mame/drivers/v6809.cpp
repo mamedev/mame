@@ -86,6 +86,8 @@ public:
 	void v6809(machine_config &config);
 
 private:
+	virtual void machine_reset() override;
+
 	DECLARE_WRITE_LINE_MEMBER(speaker_en_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_READ8_MEMBER(pb_r);
@@ -94,7 +96,6 @@ private:
 	DECLARE_WRITE8_MEMBER(v6809_address_w);
 	DECLARE_WRITE8_MEMBER(v6809_register_w);
 	void kbd_put(u8 data);
-	DECLARE_MACHINE_RESET(v6809);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
@@ -139,7 +140,7 @@ void v6809_state::v6809_mem(address_map &map)
 static INPUT_PORTS_START( v6809 )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( v6809_state, v6809)
+void v6809_state::machine_reset()
 {
 	m_term_data = 0;
 	m_pia0->cb1_w(1);
@@ -203,7 +204,7 @@ WRITE8_MEMBER( v6809_state::videoram_w )
 
 WRITE8_MEMBER( v6809_state::v6809_address_w )
 {
-	m_crtc->address_w( space, 0, data );
+	m_crtc->address_w(data);
 
 	m_video_index = data & 0x1f;
 
@@ -215,7 +216,7 @@ WRITE8_MEMBER( v6809_state::v6809_register_w )
 {
 	uint16_t temp = m_video_address;
 
-	m_crtc->register_w( space, 0, data );
+	m_crtc->register_w(data);
 
 	// Get transparent address
 	if (m_video_index == 18)
@@ -282,34 +283,33 @@ static void v6809_floppies(device_slot_interface &device)
 
 // *** Machine ****
 
-MACHINE_CONFIG_START(v6809_state::v6809)
+void v6809_state::v6809(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, 16_MHz_XTAL / 4) // divided by 4 again internally
-	MCFG_DEVICE_PROGRAM_MAP(v6809_mem)
-	MCFG_MACHINE_RESET_OVERRIDE(v6809_state, v6809)
+	MC6809(config, m_maincpu, 16_MHz_XTAL / 4); // divided by 4 again internally
+	m_maincpu->set_addrmap(AS_PROGRAM, &v6809_state::v6809_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update("crtc", FUNC(sy6545_1_device::screen_update));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_v6809)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_v6809);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
 	SY6545_1(config, m_crtc, 16_MHz_XTAL / 8);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(v6809_state::crtc_update_row), this);
-	m_crtc->set_on_update_addr_change_callback(FUNC(v6809_state::crtc_update_addr), this);
+	m_crtc->set_update_row_callback(FUNC(v6809_state::crtc_update_row));
+	m_crtc->set_on_update_addr_change_callback(FUNC(v6809_state::crtc_update_addr));
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(v6809_state::kbd_put));
@@ -350,7 +350,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 
 	MB8876(config, m_fdc, 16_MHz_XTAL / 16);
 	FLOPPY_CONNECTOR(config, "fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( v6809 )

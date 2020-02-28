@@ -18,7 +18,7 @@ public:
 	: osd_module(OSD_SOUND_PROVIDER, "none"), sound_module()
 	{
 	}
-	virtual ~sound_none() { }
+	virtual ~sound_none() = default;
 
 	virtual int init(const osd_options &options) override { return 0; }
 	virtual void exit() override { }

@@ -285,7 +285,7 @@ void edge1_device_base::map(address_map &map)
 	 */
 	map(0x000, 0x003).rw(FUNC(edge1_device_base::reg0_r), FUNC(edge1_device_base::reg0_w));
 
-	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::cd_ab_r), FUNC(z80scc_device::cd_ab_w)).umask32(0x000000ff);
+	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w)).umask32(0x000000ff);
 
 	map(0x100, 0x103).rw(FUNC(edge1_device_base::control_r), FUNC(edge1_device_base::control_w));
 	map(0x104, 0x107).rw(FUNC(edge1_device_base::status_r), FUNC(edge1_device_base::status_w));
@@ -301,14 +301,14 @@ void edge1_device_base::map(address_map &map)
 void edge1_device_base::map_dynamic(address_map &map)
 {
 	// TODO: map using lambdas until mixed-size submaps work
-	map(0x00000000, 0x0001ffff).lrw8("sram",
-		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram->read(offset); },
-		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sram->write(offset, data); });
+	map(0x00000000, 0x0001ffff).lrw8(
+			NAME([this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram->read(offset); }),
+			NAME([this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sram->write(offset, data); }));
 
 
-	map(0x01000000, 0x013fffff).lrw8("vram",
-		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_vram->read((offset >> 2) | (offset & 0x3)); },
-		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_vram->write((offset >> 2) | (offset & 0x3), data); });
+	map(0x01000000, 0x013fffff).lrw8(
+			NAME([this](address_space &space, offs_t offset, u8 mem_mask) { return m_vram->read((offset >> 2) | (offset & 0x3)); }),
+			NAME([this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_vram->write((offset >> 2) | (offset & 0x3), data); }));
 
 	//map(0x02028200, 0x0202827f).lr32("idprom",
 	//  [this](address_space &space, offs_t offset, u8 mem_mask) { return memregion("idprom")->as_u32(offset); });
@@ -350,10 +350,10 @@ void edge2plus_processor_device_base::map(address_map &map)
 {
 	map(0x000, 0x003).rw(FUNC(edge2plus_processor_device_base::reg0_r), FUNC(edge2plus_processor_device_base::reg0_w));
 
-	map(0x008, 0x008).lr8("mouse_x", []() { return 0; });
-	map(0x00c, 0x00c).lr8("mouse_y", []() { return 0; });
+	map(0x008, 0x008).lr8([]() { return 0; }, "mouse_x");
+	map(0x00c, 0x00c).lr8([]() { return 0; }, "mouse_y");
 
-	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::cd_ab_r), FUNC(z80scc_device::cd_ab_w)).umask32(0x000000ff);
+	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w)).umask32(0x000000ff);
 
 	map(0x100, 0x103).rw(FUNC(edge2plus_processor_device_base::control_r), FUNC(edge2plus_processor_device_base::control_w));
 	map(0x104, 0x107).rw(FUNC(edge2plus_processor_device_base::status_r), FUNC(edge2plus_processor_device_base::status_w));
@@ -377,18 +377,18 @@ void edge2plus_framebuffer_device_base::map_dynamic(address_map &map)
 {
 	// TODO: map using lambdas until mixed-size submaps work
 
-	map(0x00000000, 0x0003ffff).lrw8("sram",
-	[this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram->read(offset); },
-		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sram->write(offset, data); });
+	map(0x00000000, 0x0003ffff).lrw8(
+			NAME([this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram->read(offset); }),
+			NAME([this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sram->write(offset, data); }));
 
-	map(0x01000000, 0x01ffffff).lrw8("vram",
-		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_vram->read(offset); },
-		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_vram->write(offset, data); });
+	map(0x01000000, 0x01ffffff).lrw8(
+			NAME([this](address_space &space, offs_t offset, u8 mem_mask) { return m_vram->read(offset); }),
+			NAME([this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_vram->write(offset, data); }));
 
 	map(0x02028088, 0x0202808b).w(FUNC(edge2plus_framebuffer_device_base::select_w));
 
-	map(0x02028200, 0x0202827f).lr32("idprom",
-		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_select == 0 ? memregion("idprom")->as_u32(offset) : space.unmap(); });
+	map(0x02028200, 0x0202827f).lr32(
+			NAME([this](address_space &space, offs_t offset, u8 mem_mask) { return m_select == 0 ? memregion("idprom")->as_u32(offset) : space.unmap(); }));
 
 	map(0x02028290, 0x02028293).w(FUNC(edge2plus_framebuffer_device_base::lut_select_w));
 	map(0x02028300, 0x02028303).w(FUNC(edge2plus_framebuffer_device_base::unk_300_w));
@@ -475,7 +475,7 @@ void mpcb828_device::device_add_mconfig(machine_config &config)
 	TMS32030(config, m_dsp, 30_MHz_XTAL);
 	m_dsp->holda().set(FUNC(mpcb828_device::holda));
 	m_dsp->set_disable();
-	//MCFG_DEVICE_ADDRESS_MAP(0, map_dynamic<2>)
+	//m_dsp->set_addrmap(0, map_dynamic<2>);
 
 	BT458(config, "ramdac", 83'020'800);
 
@@ -484,7 +484,7 @@ void mpcb828_device::device_add_mconfig(machine_config &config)
 	m_scc->out_txda_callback().set("kbd", FUNC(interpro_keyboard_port_device::write_txd));
 
 	INTERPRO_KEYBOARD_PORT(config, "kbd", interpro_keyboard_devices, "hle_en_us").rxd_handler_cb().set(m_scc, FUNC(z80scc_device::rxa_w));
-MACHINE_CONFIG_END
+}
 
 /*
  * MPCB849: EDGE-1 graphics, 2 megapixels, single screen, 60Hz refresh.
@@ -755,9 +755,9 @@ u32 edge2plus_framebuffer_device_base::screen_update(screen_device &screen, bitm
 			const u8 index = *pixel_data++;
 
 			bitmap.pix(y, x) = rgb_t(
-				m_ramdac[0]->palette_lookup(index),
-				m_ramdac[1]->palette_lookup(index),
-				m_ramdac[2]->palette_lookup(index));
+				m_ramdac[0]->lookup(index),
+				m_ramdac[1]->lookup(index),
+				m_ramdac[2]->lookup(index));
 		}
 
 	return 0;
@@ -832,12 +832,12 @@ WRITE_LINE_MEMBER(edge2plus_processor_device_base::holda)
 
 void edge2plus_processor_device_base::dsp1_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).lrw8("sram",
-		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram->read(offset); },
-		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sram->write(offset, data); });
+	map(0x00000, 0x3ffff).lrw8(
+			NAME([this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram->read(offset); }),
+			NAME([this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sram->write(offset, data); }));
 
-	map(0x40000, 0x7ffff).lr32("prg1",
-		[this](address_space &space, offs_t offset, u32 mem_mask) { return memregion("prg1")->as_u32(offset); });
+	map(0x40000, 0x7ffff).lr32(
+			NAME([this](address_space &space, offs_t offset, u32 mem_mask) { return memregion("prg1")->as_u32(offset); }));
 }
 
 

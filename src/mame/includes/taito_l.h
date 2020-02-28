@@ -12,6 +12,7 @@
 #include "sound/msm5205.h"
 #include "sound/2203intf.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 class taitol_state : public driver_device

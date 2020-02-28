@@ -225,7 +225,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_inttimer)
 	if (m_t_c > 0x40)
 	{
 		uint8_t vector = (ioport("TEST")->read() ) ? 0x10 : 0x18;
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, vector);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, vector); // S2650
 	}
 	else
 		m_t_c++;

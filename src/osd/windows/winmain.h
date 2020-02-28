@@ -24,6 +24,7 @@
 
 // video options
 #define WINOPTION_MENU                  "menu"
+#define WINOPTION_ATTACH_WINDOW         "attach_window"
 
 // core post-processing options
 #define WINOPTION_HLSLPATH                  "hlslpath"
@@ -135,6 +136,7 @@ public:
 
 	// video options
 	bool menu() const { return bool_value(WINOPTION_MENU); }
+	const char *attach_window() const { return value(WINOPTION_ATTACH_WINDOW); }
 
 	// core post-processing options
 	const char *screen_post_fx_dir() const { return value(WINOPTION_HLSLPATH); }
@@ -278,9 +280,10 @@ public:
 	// general overridables
 	virtual void init(running_machine &machine) override;
 	virtual void update(bool skip_redraw) override;
+	virtual void input_update() override;
 
 	// input overrideables
-	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
+	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) override;
 
 	// video overridables
 	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) override;

@@ -57,21 +57,21 @@ void finalizr_state::finalizr_palette(palette_device &palette) const
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
 		bit3 = BIT(color_prom[i], 3);
-		int const r = combine_4_weights(rweights, bit0, bit1, bit2, bit3);
+		int const r = combine_weights(rweights, bit0, bit1, bit2, bit3);
 
 		// green component
 		bit0 = BIT(color_prom[i], 4);
 		bit1 = BIT(color_prom[i], 5);
 		bit2 = BIT(color_prom[i], 6);
 		bit3 = BIT(color_prom[i], 7);
-		int const g = combine_4_weights(gweights, bit0, bit1, bit2, bit3);
+		int const g = combine_weights(gweights, bit0, bit1, bit2, bit3);
 
 		// blue component
 		bit0 = BIT(color_prom[i + 0x20], 0);
 		bit1 = BIT(color_prom[i + 0x20], 1);
 		bit2 = BIT(color_prom[i + 0x20], 2);
 		bit3 = BIT(color_prom[i + 0x20], 3);
-		int const b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
+		int const b = combine_weights(bweights, bit0, bit1, bit2, bit3);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -114,8 +114,8 @@ TILE_GET_INFO_MEMBER(finalizr_state::get_fg_tile_info)
 
 void finalizr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(finalizr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(finalizr_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(finalizr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(finalizr_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

@@ -13,9 +13,9 @@
 #pragma once
 
 #include "z80.h"
-#include "machine/z80dart.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
+#include "machine/z80sio.h"
 
 
 /***************************************************************************
@@ -66,8 +66,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ctsb_w ) { m_sio->ctsb_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( dcda_w ) { m_sio->dcda_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( dcdb_w ) { m_sio->dcdb_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ria_w ) { m_sio->ria_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rib_w ) { m_sio->rib_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( rxca_w ) { m_sio->rxca_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( rxcb_w ) { m_sio->rxcb_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( txca_w ) { m_sio->txca_w(state); }
@@ -87,10 +85,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( strobe_a ) { m_pio->strobe_a(state); }
 	DECLARE_WRITE_LINE_MEMBER( strobe_b ) { m_pio->strobe_b(state); }
 
-	DECLARE_WRITE8_MEMBER( pa_w ) { m_pio->pa_w(space, offset, data, mem_mask); }
-	DECLARE_READ8_MEMBER( pa_r ) { return m_pio->pa_r(space, offset, mem_mask); }
-	DECLARE_WRITE8_MEMBER( pb_w ) { m_pio->pb_w(space, offset, data, mem_mask); }
-	DECLARE_READ8_MEMBER( pb_r ) { return m_pio->pb_r(space, offset, mem_mask); }
+	DECLARE_WRITE8_MEMBER( pa_w ) { m_pio->port_a_write(data); }
+	DECLARE_READ8_MEMBER( pa_r ) { return m_pio->port_a_read(); }
+	DECLARE_WRITE8_MEMBER( pb_w ) { m_pio->port_b_write(data); }
+	DECLARE_READ8_MEMBER( pb_r ) { return m_pio->port_b_read(); }
 	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { m_pio->pa0_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { m_pio->pa1_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( pa2_w ) { m_pio->pa2_w(state); }
@@ -127,7 +125,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<z80ctc_device> m_ctc;
-	required_device<z80dart_device> m_sio;
+	required_device<z80sio_device> m_sio;
 	required_device<z80pio_device> m_pio;
 
 	// internal state
@@ -151,7 +149,7 @@ private:
 	devcb_write_line m_out_rxdrqb_cb;
 	devcb_write_line m_out_txdrqb_cb;
 
-	devcb_write_line m_zc_cb[4];
+	devcb_write_line::array<4> m_zc_cb;
 
 	devcb_read8 m_in_pa_cb;
 	devcb_write8 m_out_pa_cb;

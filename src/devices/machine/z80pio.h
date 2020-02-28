@@ -97,10 +97,6 @@ public:
 	uint8_t port_b_read() { return port_read(PORT_B); }
 	void port_a_write(uint8_t data) { port_write(PORT_A, data); }
 	void port_b_write(uint8_t data) { port_write(PORT_B, data); }
-	DECLARE_WRITE8_MEMBER( pa_w ) { port_a_write(data); }
-	DECLARE_READ8_MEMBER( pa_r ) { return port_a_read(); }
-	DECLARE_WRITE8_MEMBER( pb_w ) { port_b_write(data); }
-	DECLARE_READ8_MEMBER( pb_r ) { return port_b_read(); }
 	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { port_write(PORT_A, 0, state); }
 	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { port_write(PORT_A, 1, state); }
 	DECLARE_WRITE_LINE_MEMBER( pa2_w ) { port_write(PORT_A, 2, state); }
@@ -119,12 +115,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pb7_w ) { port_write(PORT_B, 7, state); }
 
 	// standard read/write, with C/D in bit 1, B/A in bit 0
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	// alternate read/write, with C/D in bit 0, B/A in bit 1
-	DECLARE_READ8_MEMBER( read_alt );
-	DECLARE_WRITE8_MEMBER( write_alt );
+	u8 read_alt(offs_t offset);
+	void write_alt(offs_t offset, u8 data);
 
 private:
 	enum

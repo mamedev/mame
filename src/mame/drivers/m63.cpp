@@ -127,6 +127,7 @@ Dip locations verified for:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class m63_state : public driver_device
 {
@@ -334,8 +335,8 @@ TILE_GET_INFO_MEMBER(m63_state::get_fg_tile_info)
 
 VIDEO_START_MEMBER(m63_state,m63)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m63_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m63_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m63_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m63_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_cols(32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -413,13 +414,13 @@ WRITE8_MEMBER(m63_state::snd_irq_w)
 WRITE8_MEMBER(m63_state::snddata_w)
 {
 	if ((m_p2 & 0xf0) == 0xe0)
-		m_ay1->address_w(space, 0, offset);
+		m_ay1->address_w(offset);
 	else if ((m_p2 & 0xf0) == 0xa0)
-		m_ay1->data_w(space, 0, offset);
+		m_ay1->data_w(offset);
 	else if (m_ay2 != nullptr && (m_p1 & 0xe0) == 0x60)
-		m_ay2->address_w(space, 0, offset);
+		m_ay2->address_w(offset);
 	else if (m_ay2 != nullptr && (m_p1 & 0xe0) == 0x40)
-			m_ay2->data_w(space, 0, offset);
+			m_ay2->data_w(offset);
 	else if ((m_p2 & 0xf0) == 0x70 )
 		m_sound_status = offset;
 }
@@ -457,7 +458,7 @@ READ8_MEMBER(m63_state::snddata_r)
 {
 	switch (m_p2 & 0xf0)
 	{
-		case 0x60:  return m_soundlatch->read(space, 0); ;
+		case 0x60:  return m_soundlatch->read();
 		case 0x70:  return memregion("user1")->base()[((m_p1 & 0x1f) << 8) | offset];
 	}
 	return 0xff;
@@ -755,8 +756,8 @@ INTERRUPT_GEN_MEMBER(m63_state::vblank_irq)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(m63_state::m63)
-
+void m63_state::m63(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000)/4); /* 3 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &m63_state::m63_map);

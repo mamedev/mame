@@ -13,7 +13,9 @@
 
 #include <bgfx/bgfx.h>
 #include <bx/math.h>
+#include <cmath>
 
+#include "chainmanager.h"
 #include "chainentry.h"
 
 #include "effect.h"
@@ -28,7 +30,7 @@
 #include "render.h"
 
 
-bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, clear_state* clear, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair*> inputs, std::vector<bgfx_entry_uniform*> uniforms, target_manager& targets, std::string output)
+bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, clear_state* clear, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair*> inputs, std::vector<bgfx_entry_uniform*> uniforms, target_manager& targets, std::string output, bool apply_tint)
 	: m_name(name)
 	, m_effect(effect)
 	, m_clear(clear)
@@ -37,6 +39,7 @@ bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, clear_
 	, m_uniforms(uniforms)
 	, m_targets(targets)
 	, m_output(output)
+	, m_apply_tint(apply_tint)
 {
 }
 
@@ -55,7 +58,7 @@ bgfx_chain_entry::~bgfx_chain_entry()
 	delete m_clear;
 }
 
-void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen)
+void bgfx_chain_entry::submit(int view, chain_manager::screen_prim &prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen)
 {
 	if (!setup_view(view, screen_width, screen_height, screen))
 	{
@@ -67,9 +70,19 @@ void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager&
 		input->bind(m_effect, screen);
 	}
 
+	uint32_t tint = 0xffffffff;
+	if (m_apply_tint)
+	{
+		const auto a = (uint8_t)std::round(prim.m_prim->color.a * 255);
+		const auto r = (uint8_t)std::round(prim.m_prim->color.r * 255);
+		const auto g = (uint8_t)std::round(prim.m_prim->color.g * 255);
+		const auto b = (uint8_t)std::round(prim.m_prim->color.b * 255);
+		tint = (a << 24) | (b << 16) | (g << 8) | r;
+	}
+
 	bgfx::TransientVertexBuffer buffer;
-	put_screen_buffer(prim, &buffer);
-	bgfx::setVertexBuffer(0,&buffer);
+	put_screen_buffer(prim.m_screen_width, prim.m_screen_height, tint, &buffer);
+	bgfx::setVertexBuffer(0, &buffer);
 
 	setup_auto_uniforms(prim, textures, screen_count, screen_width, screen_height, screen_scale_x, screen_scale_y, screen_offset_x, screen_offset_y, rotation_type, swap_xy, screen);
 
@@ -145,13 +158,12 @@ void bgfx_chain_entry::setup_screencount_uniforms(uint16_t screen_count)
 	}
 }
 
-void bgfx_chain_entry::setup_sourcesize_uniform(render_primitive* prim) const
+void bgfx_chain_entry::setup_sourcesize_uniform(chain_manager::screen_prim &prim) const
 {
 	bgfx_uniform* source_dims = m_effect->uniform("u_source_dims");
 	if (source_dims != nullptr)
 	{
-		float values[2] = { float(prim->texture.width), float(prim->texture.height) };
-		source_dims->set(values, sizeof(float) * 2);
+		source_dims->set(&prim.m_tex_width, sizeof(float) * 2);
 	}
 }
 
@@ -203,12 +215,12 @@ void bgfx_chain_entry::setup_swapxy_uniform(bool swap_xy) const
 	}
 }
 
-void bgfx_chain_entry::setup_quaddims_uniform(render_primitive* prim) const
+void bgfx_chain_entry::setup_quaddims_uniform(chain_manager::screen_prim &prim) const
 {
 	bgfx_uniform* quad_dims_uniform = m_effect->uniform("u_quad_dims");
 	if (quad_dims_uniform != nullptr)
 	{
-		float values[2] = { float(floor((prim->bounds.x1 - prim->bounds.x0) + 0.5f)), float(floor((prim->bounds.y1 - prim->bounds.y0) + 0.5f)) };
+		float values[2] = { float(prim.m_quad_width), float(prim.m_quad_height) };
 		quad_dims_uniform->set(values, sizeof(float) * 2);
 	}
 }
@@ -223,7 +235,7 @@ void bgfx_chain_entry::setup_screenindex_uniform(int32_t screen) const
 	}
 }
 
-void bgfx_chain_entry::setup_auto_uniforms(render_primitive* prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, int32_t screen)
+void bgfx_chain_entry::setup_auto_uniforms(chain_manager::screen_prim &prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, int32_t screen)
 {
 	setup_screensize_uniforms(textures, screen_width, screen_height, screen);
 	setup_screenscale_uniforms(screen_scale_x, screen_scale_y);
@@ -268,7 +280,7 @@ bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
 	return true;
 }
 
-void bgfx_chain_entry::put_screen_buffer(render_primitive* prim, bgfx::TransientVertexBuffer* buffer) const
+void bgfx_chain_entry::put_screen_buffer(uint16_t screen_width, uint16_t screen_height, uint32_t screen_tint, bgfx::TransientVertexBuffer* buffer) const
 {
 	if (6 == bgfx::getAvailTransientVertexBuffer(6, ScreenVertex::ms_decl))
 	{
@@ -279,7 +291,7 @@ void bgfx_chain_entry::put_screen_buffer(render_primitive* prim, bgfx::Transient
 		return;
 	}
 
-	ScreenVertex* vertex = reinterpret_cast<ScreenVertex*>(buffer->data);
+	auto* vertex = reinterpret_cast<ScreenVertex*>(buffer->data);
 
 	float x[4] = { 0, 1, 0, 1 };
 	float y[4] = { 0, 0, 1, 1 };
@@ -292,46 +304,54 @@ void bgfx_chain_entry::put_screen_buffer(render_primitive* prim, bgfx::Transient
 		v[0] = v[1] = 1;
 		v[2] = v[3] = 0;
 	}
+	else if (renderer_type == bgfx::RendererType::Direct3D9)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			u[i] += 0.5f / screen_width;
+			v[i] += 0.5f / screen_height;
+		}
+	}
 
 	vertex[0].m_x = x[0];
 	vertex[0].m_y = y[0];
 	vertex[0].m_z = 0;
-	vertex[0].m_rgba = 0xffffffff;
+	vertex[0].m_rgba = screen_tint;
 	vertex[0].m_u = u[0];
 	vertex[0].m_v = v[0];
 
 	vertex[1].m_x = x[1];
 	vertex[1].m_y = y[1];
 	vertex[1].m_z = 0;
-	vertex[1].m_rgba = 0xffffffff;
+	vertex[1].m_rgba = screen_tint;
 	vertex[1].m_u = u[1];
 	vertex[1].m_v = v[1];
 
 	vertex[2].m_x = x[3];
 	vertex[2].m_y = y[3];
 	vertex[2].m_z = 0;
-	vertex[2].m_rgba = 0xffffffff;
+	vertex[2].m_rgba = screen_tint;
 	vertex[2].m_u = u[3];
 	vertex[2].m_v = v[3];
 
 	vertex[3].m_x = x[3];
 	vertex[3].m_y = y[3];
 	vertex[3].m_z = 0;
-	vertex[3].m_rgba = 0xffffffff;
+	vertex[3].m_rgba = screen_tint;
 	vertex[3].m_u = u[3];
 	vertex[3].m_v = v[3];
 
 	vertex[4].m_x = x[2];
 	vertex[4].m_y = y[2];
 	vertex[4].m_z = 0;
-	vertex[4].m_rgba = 0xffffffff;
+	vertex[4].m_rgba = screen_tint;
 	vertex[4].m_u = u[2];
 	vertex[4].m_v = v[2];
 
 	vertex[5].m_x = x[0];
 	vertex[5].m_y = y[0];
 	vertex[5].m_z = 0;
-	vertex[5].m_rgba = 0xffffffff;
+	vertex[5].m_rgba = screen_tint;
 	vertex[5].m_u = u[0];
 	vertex[5].m_v = v[0];
 }

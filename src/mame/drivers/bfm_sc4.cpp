@@ -343,14 +343,14 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 			end2 = base2 + 0x10000 / 2;
 
 
-			if ((offset>=base) && (offset<end))
+			if ((offset >= base) && (offset < end))
 			{
-				offset-=base;
-				return(m_mainram[offset]);
+				offset -= base;
+				return m_mainram[offset];
 			}
-			else if ((offset>=base2) && (offset<end2))
+			else if ((offset >= base2) && (offset < end2))
 			{
-				offset-=base2;
+				offset -= base2;
 				logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d\n", pc, offset*2, mem_mask, cs);
 				int addr = (offset<<1);
 
@@ -375,10 +375,10 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 						case 0x0240:
 							retvalue = 0x00ff;
 
-							if (mem_mask&0xff00)
+							if (ACCESSING_BITS_8_15)
 							{
-								retvalue |= (sec.read_data_line() << (6+8));
-								retvalue |= ioport("IN-COIN")->read() << 8; // coin?
+								retvalue |= (m_sec->data_r() << 14);
+								retvalue |= m_in_coin->read() << 8; // coin?
 								//printf("%08x maincpu read access offset %08x mem_mask %04x cs %d (LAMPS etc.)\n", pc, offset*2, mem_mask, cs);
 							}
 							return retvalue;
@@ -387,19 +387,19 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 							return 0x0080; // status of something?
 
 						case 0x1000:
-							return ioport("IN-16")->read();
+							return m_in[16]->read();
 
 						case 0x1010:
-							return ioport("IN-17")->read();
+							return m_in[17]->read();
 
 						case 0x1020:
-							return ioport("IN-18")->read();
+							return m_in[18]->read();
 
 						case 0x1030:
-							return ioport("IN-19")->read();
+							return m_in[19]->read();
 
 						case 0x1040: // door switch, test switch etc.
-							return ioport("IN-20")->read();
+							return m_in[20]->read();
 
 						case 0x1244:
 							return m_ymz->read(0);
@@ -559,7 +559,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 						case 0x0330:
 							logerror("%08x meter write %04x\n",pc, data);
 							//m_meterstatus = (m_meterstatus&0xc0) | (data & 0x3f);
-							sec.write_clock_line(~data&0x20);
+							m_sec->clk_w(~data&0x20);
 							break;
 
 						case 0x1248:
@@ -573,7 +573,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 						case 0x1330:
 							bfm_sc4_reel4_w(space,0,data&0xf);
 							//m_meterstatus = (m_meterstatus&0x3f) | ((data & 0x30) << 2);
-							sec.write_data_line(~data&0x10);
+							m_sec->data_w(~data&0x10);
 							break;
 
 						default:
@@ -811,8 +811,6 @@ void sc4_state::machine_reset()
 	bfm_sc45_state::machine_reset();
 
 	m_dochk41 = true;
-
-	sec.reset();
 }
 
 
@@ -823,10 +821,10 @@ void sc4_state::machine_start()
 	m_nvram->set_base(m_mainram, sizeof(m_mainram));
 
 	m_maincpu->set_port_callbacks(
-			m68307_cpu_device::porta_read_delegate(FUNC(sc4_state::bfm_sc4_68307_porta_r), this),
-			m68307_cpu_device::porta_write_delegate(FUNC(sc4_state::bfm_sc4_68307_porta_w), this),
-			m68307_cpu_device::portb_read_delegate(FUNC(sc4_state::bfm_sc4_68307_portb_r), this),
-			m68307_cpu_device::portb_write_delegate(FUNC(sc4_state::bfm_sc4_68307_portb_w), this));
+			m68307_cpu_device::porta_read_delegate(*this, FUNC(sc4_state::bfm_sc4_68307_porta_r)),
+			m68307_cpu_device::porta_write_delegate(*this, FUNC(sc4_state::bfm_sc4_68307_porta_w)),
+			m68307_cpu_device::portb_read_delegate(*this, FUNC(sc4_state::bfm_sc4_68307_portb_r)),
+			m68307_cpu_device::portb_write_delegate(*this, FUNC(sc4_state::bfm_sc4_68307_portb_w)));
 }
 
 
@@ -921,6 +919,8 @@ void sc4_state::sc4_common(machine_config &config)
 
 	YMZ280B(config, m_ymz, 16000000); // ?? Mhz
 	m_ymz->add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	SEC(config, m_sec);
 }
 
 //Standard 6 reels all connected
@@ -25094,9 +25094,15 @@ ROM_END
 
 ROM_START( sc4boomb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_BYTE( "95426488.lo", 0x00001, 0x080000, CRC(b5ddf816) SHA1(3817eedab684ae06f3b079993d800c4000cf46dd) )
-	ROM_LOAD16_BYTE( "95426489.hi", 0x00000, 0x080000, CRC(c84a8b41) SHA1(86f2f14f9a66aa616f579c835d8111751f36a84e) )
-	sc_mobob_others
+	ROM_LOAD16_BYTE( "mbob-low-95264882.bin",  0x00001, 0x080000, CRC(b5ddf816) SHA1(3817eedab684ae06f3b079993d800c4000cf46dd) )
+	ROM_LOAD16_BYTE( "mbob-high-95426489.bin", 0x00000, 0x080000, CRC(c84a8b41) SHA1(86f2f14f9a66aa616f579c835d8111751f36a84e) )
+
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+	ROM_LOAD( "mbob-sound1-95008842-bfg.ic1", 0x000000, 0x100000, CRC(3205f4c9) SHA1(a8b92e1558911e02281b1c38c64c5e04836794b0) )
+	ROM_LOAD( "mbob-sound2-95008843-bfg.ic2", 0x100000, 0x100000, CRC(95057e16) SHA1(6c26451dd336f908ce0fcea0c56176b589111868) )
+
+	ROM_REGION( 0x4310, "pics", ROMREGION_ERASE00 )
+	ROM_LOAD( "95-891-307.ic14", 0x0000, 0x4310, NO_DUMP ) // protected
 ROM_END
 
 
@@ -33886,15 +33892,15 @@ INPUT_PORTS_END
 
 // PR3039 AWP ANT N DECS JIGGY BANK S4         PR3009 JIGGY BANK SOUNDS11        JIGGY BANK  S.SITE
 GAMEL( 200?, sc4adjb,  0,       sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjba, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjbb, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjbc, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjbd, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjbe, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjbf, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjbg, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjbh, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjbi, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjba, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjbb, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjbc, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjbd, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjbe, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjbf, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjbg, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjbh, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjbi, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
 void sc4_state::init_sc4adwta()

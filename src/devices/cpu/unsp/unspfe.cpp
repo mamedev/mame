@@ -67,6 +67,8 @@ bool unsp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			case 9: // JA
 			case 10: // JLE
 			case 11: // JG
+			case 12: // JVC
+			case 13: // JVS
 				desc.regin[0] |= 1 << unsp_device::REG_SR;
 				desc.regout[0] |= 1 << unsp_device::REG_SR;
 				desc.regout[0] |= 1 << unsp_device::REG_PC;
@@ -124,6 +126,9 @@ bool unsp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			{
 				r1++;
 				desc.regout[0] |= 1 << r1;
+				if (r1 == unsp_device::REG_PC) {
+					desc.flags |= OPFLAG_END_SEQUENCE | OPFLAG_IS_UNCONDITIONAL_BRANCH;
+				}
 			}
 			return true;
 		}
@@ -183,6 +188,8 @@ bool unsp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					case 1:
 					case 2:
 					case 3:
+					case 4:
+					case 5:
 					case 8:
 					case 9:
 					case 12:
@@ -191,6 +198,17 @@ bool unsp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 						return true;
 				}
 				return false;
+
+			case 0x06:
+			case 0x07: // MULS
+				desc.regin[0] |= 1 << opa;
+				desc.regin[0] |= 1 << opb;
+				desc.regout[0] |= 1 << opa;
+				desc.regout[0] |= 1 << opb;
+				desc.regout[0] |= 1 << unsp_device::REG_R3;
+				desc.regout[0] |= 1 << unsp_device::REG_R4;
+				desc.flags = OPFLAG_READS_MEMORY | OPFLAG_WRITES_MEMORY;
+				return true;
 
 			default:
 				return false;

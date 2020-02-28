@@ -298,8 +298,8 @@ static const gfx_layout tile_8x8_layout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+0,RGN_FRAC(0,2)+8,RGN_FRAC(0,2)+0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	8*16
 };
 
@@ -309,27 +309,15 @@ static const gfx_layout tile_16x16_layout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+0,RGN_FRAC(0,2)+8,RGN_FRAC(0,2)+0 },
-	{ 256,257,258,259,260,261,262,263,0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
+	{ STEP8(8*2*16,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	32*16
-};
-
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 24,8,16,0 },
-	{ 512,513,514,515,516,517,518,519, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
-	32*32
 };
 
 static GFXDECODE_START( gfx_supbtime )
 	GFXDECODE_ENTRY( "tiles",   0, tile_8x8_layout,   256, 32 ) // 8x8
 	GFXDECODE_ENTRY( "tiles",   0, tile_16x16_layout, 256, 32 ) // 16x16
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout,        0, 16 ) // 16x16
+	GFXDECODE_ENTRY( "sprites", 0, tile_16x16_layout,   0, 16 ) // 16x16
 GFXDECODE_END
 
 
@@ -337,26 +325,26 @@ GFXDECODE_END
 //  MACHINE DEFINITIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(supbtime_state::supbtime)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(supbtime_map)
+void supbtime_state::supbtime(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(21'477'272) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &supbtime_state::supbtime_map);
 
-	H6280(config, m_audiocpu, XTAL(32'220'000) / 8);
+	H6280(config, m_audiocpu, XTAL(32'220'000) / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &supbtime_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, supbtime_state, vblank_w))
-	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_supbtime)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);
+	screen.screen_vblank().set(FUNC(supbtime_state::vblank_w));
+	screen.set_screen_update(FUNC(supbtime_state::screen_update_supbtime));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supbtime)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_supbtime);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
 	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_split(0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_trans_mask(0x0f);
@@ -383,27 +371,24 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	ymsnd.add_route(0, "mono", 0.45);
 	ymsnd.add_route(1, "mono", 0.45);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(21'477'272) / 20, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", XTAL(21'477'272) / 20, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
+}
 
-MACHINE_CONFIG_START(supbtime_state::chinatwn)
+void supbtime_state::chinatwn(machine_config &config)
+{
 	supbtime(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(chinatwn_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &supbtime_state::chinatwn_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_chinatwn)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(supbtime_state::screen_update_chinatwn));
+}
 
-MACHINE_CONFIG_START(supbtime_state::tumblep)
+void supbtime_state::tumblep(machine_config &config)
+{
 	supbtime(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tumblep_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &supbtime_state::tumblep_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_tumblep)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(supbtime_state::screen_update_tumblep));
+}
 
 
 //**************************************************************************
@@ -422,8 +407,8 @@ ROM_START( supbtime )
 	ROM_LOAD("mae02.bin", 0x00000, 0x80000, CRC(a715cca0) SHA1(0539bba39c60324d85599ac69ff78bb215deb511))
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD16_BYTE("mae00.bin", 0x00001, 0x80000, CRC(30043094) SHA1(5302cfd9bdaf90c4901fda75407379c4ce1cbdec))
-	ROM_LOAD16_BYTE("mae01.bin", 0x00000, 0x80000, CRC(434af3fb) SHA1(1cfd30d14f03554e826576d6d32ce424f0df3748))
+	ROM_LOAD("mae00.bin", 0x80000, 0x80000, CRC(30043094) SHA1(5302cfd9bdaf90c4901fda75407379c4ce1cbdec))
+	ROM_LOAD("mae01.bin", 0x00000, 0x80000, CRC(434af3fb) SHA1(1cfd30d14f03554e826576d6d32ce424f0df3748))
 
 	ROM_REGION( 0x20000, "oki", 0 )
 	ROM_LOAD("gc05.bin", 0x00000, 0x20000, CRC(2f2246ff) SHA1(3fcceb6f5aa5f33187bcf4c59d88327f396fa80d))
@@ -449,8 +434,8 @@ ROM_START( supbtimea ) // this set has no backgrounds ingame for most stages, bu
 	ROM_LOAD("mae02.bin", 0x00000, 0x80000, CRC(a715cca0) SHA1(0539bba39c60324d85599ac69ff78bb215deb511))
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD16_BYTE("mae00.bin", 0x00001, 0x80000, CRC(30043094) SHA1(5302cfd9bdaf90c4901fda75407379c4ce1cbdec))
-	ROM_LOAD16_BYTE("mae01.bin", 0x00000, 0x80000, CRC(434af3fb) SHA1(1cfd30d14f03554e826576d6d32ce424f0df3748))
+	ROM_LOAD("mae00.bin", 0x80000, 0x80000, CRC(30043094) SHA1(5302cfd9bdaf90c4901fda75407379c4ce1cbdec))
+	ROM_LOAD("mae01.bin", 0x00000, 0x80000, CRC(434af3fb) SHA1(1cfd30d14f03554e826576d6d32ce424f0df3748))
 
 	ROM_REGION( 0x20000, "oki", 0 )
 	ROM_LOAD("gc05.bin", 0x00000, 0x20000, CRC(2f2246ff) SHA1(3fcceb6f5aa5f33187bcf4c59d88327f396fa80d))
@@ -468,8 +453,8 @@ ROM_START( supbtimej )
 	ROM_LOAD("mae02.bin", 0x000000, 0x80000, CRC(a715cca0) SHA1(0539bba39c60324d85599ac69ff78bb215deb511))
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD16_BYTE("mae00.bin", 0x00001, 0x80000, CRC(30043094) SHA1(5302cfd9bdaf90c4901fda75407379c4ce1cbdec))
-	ROM_LOAD16_BYTE("mae01.bin", 0x00000, 0x80000, CRC(434af3fb) SHA1(1cfd30d14f03554e826576d6d32ce424f0df3748))
+	ROM_LOAD("mae00.bin", 0x80000, 0x80000, CRC(30043094) SHA1(5302cfd9bdaf90c4901fda75407379c4ce1cbdec))
+	ROM_LOAD("mae01.bin", 0x00000, 0x80000, CRC(434af3fb) SHA1(1cfd30d14f03554e826576d6d32ce424f0df3748))
 
 	ROM_REGION( 0x20000, "oki", 0 )
 	ROM_LOAD("gc05.bin",    0x00000, 0x20000, CRC(2f2246ff) SHA1(3fcceb6f5aa5f33187bcf4c59d88327f396fa80d))
@@ -487,8 +472,8 @@ ROM_START( chinatwn )
 	ROM_LOAD("mak-02.h2", 0x00000, 0x80000, CRC(745b2c50) SHA1(557ac71da170a04caaab393dc43e46858ef8dd70))
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD16_BYTE("mak-00.a2", 0x000001, 0x80000, CRC(18e8cc1b) SHA1(afa79557222a94de7d9fde526ca45796f74fb3b2))
-	ROM_LOAD16_BYTE("mak-01.a4", 0x000000, 0x80000, CRC(d88ebda8) SHA1(ec6eab95f3ca8ee946151c46c6570b0b0c508ffc))
+	ROM_LOAD("mak-00.a2", 0x080000, 0x80000, CRC(18e8cc1b) SHA1(afa79557222a94de7d9fde526ca45796f74fb3b2))
+	ROM_LOAD("mak-01.a4", 0x000000, 0x80000, CRC(d88ebda8) SHA1(ec6eab95f3ca8ee946151c46c6570b0b0c508ffc))
 
 	ROM_REGION( 0x20000, "oki", 0 )
 	ROM_LOAD("gv_03-.j14", 0x00000, 0x20000, CRC(948faf92) SHA1(2538c7d4fa7fe0bfdd5dccece8ee82e911cee63f))
@@ -506,8 +491,8 @@ ROM_START( tumblep )
 	ROM_LOAD("map-02.rom", 0x00000, 0x80000, CRC(dfceaa26) SHA1(83e391ff39efda71e5fa368ac68ba7d6134bac21))  // encrypted
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD16_BYTE("map-01.rom", 0x00000, 0x80000, CRC(e81ffa09) SHA1(01ada9557ead91eb76cf00db118d6c432104a398))
-	ROM_LOAD16_BYTE("map-00.rom", 0x00001, 0x80000, CRC(8c879cfe) SHA1(a53ef7811f14a8b105749b1cf29fe8a3a33bab5e))
+	ROM_LOAD("map-01.rom", 0x00000, 0x80000, CRC(e81ffa09) SHA1(01ada9557ead91eb76cf00db118d6c432104a398))
+	ROM_LOAD("map-00.rom", 0x80000, 0x80000, CRC(8c879cfe) SHA1(a53ef7811f14a8b105749b1cf29fe8a3a33bab5e))
 
 	ROM_REGION( 0x20000, "oki", 0 )
 	ROM_LOAD("hl03-.j15", 0x00000, 0x20000, CRC(01b81da0) SHA1(914802f3206dc59a720af9d57eb2285bc8ba822b))
@@ -525,8 +510,8 @@ ROM_START( tumblepj )
 	ROM_LOAD("map-02.rom", 0x00000, 0x80000, CRC(dfceaa26) SHA1(83e391ff39efda71e5fa368ac68ba7d6134bac21))  // encrypted
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD16_BYTE("map-01.rom", 0x00000, 0x80000, CRC(e81ffa09) SHA1(01ada9557ead91eb76cf00db118d6c432104a398))
-	ROM_LOAD16_BYTE("map-00.rom", 0x00001, 0x80000, CRC(8c879cfe) SHA1(a53ef7811f14a8b105749b1cf29fe8a3a33bab5e))
+	ROM_LOAD("map-01.rom", 0x00000, 0x80000, CRC(e81ffa09) SHA1(01ada9557ead91eb76cf00db118d6c432104a398))
+	ROM_LOAD("map-00.rom", 0x80000, 0x80000, CRC(8c879cfe) SHA1(a53ef7811f14a8b105749b1cf29fe8a3a33bab5e))
 
 	ROM_REGION( 0x20000, "oki", 0 )
 	ROM_LOAD("hl03-.j15", 0x00000, 0x20000, CRC(01b81da0) SHA1(914802f3206dc59a720af9d57eb2285bc8ba822b))

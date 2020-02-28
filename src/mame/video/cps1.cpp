@@ -113,6 +113,7 @@ Street Fighter II: The World Warrior (USA 910522, Rev. G)          90629B-3   ST
 Street Fighter II: The World Warrior (USA 910522, Rev. H)          90629B-3   STF29            IOB1  90632C-1     CPS-B-13  DL-0411-10008  C632
 Street Fighter II: The World Warrior (USA 910522, Rev. I)          90629B-3   STF29            IOB1  90632C-1     CPS-B-14  DL-0411-10009  C632
 Street Fighter II: The World Warrior (USA 911101)                  90629B-3   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
+Street Fighter II: The World Warrior (USA 920312)                  90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (Japan 910214)                90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (Japan 910306)                90629B-3   STF29            IOB1  90632C-1     CPS-B-12  DL-0411-10007  C632
 Street Fighter II: The World Warrior (Japan 910411)                90629B-3   STF29            IOB1  90632C-1     CPS-B-15  DL-0411-10010  C632
@@ -134,10 +135,10 @@ The King of Dragons* (Japan 910805, B-Board 89625B-1)              89625B-1   KD
 The King of Dragons* (Japan 910805, B-Board 90629B-3)              90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 
 Captain Commando* (World 911014)                             1991  91635B-2   CC63B    CCPRG   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
-Captain Commando* (World 911202)                                   91635B-2   CC63B    CCPRG1  IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632B   IOC1
+Captain Commando* (World 911202)                                   91635B-2   CC63B    CCPRG1  IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632^   IOC1
 Captain Commando* (USA 910928)                                     91635B-2   CC63B    CCPRG1  IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 Captain Commando* (Japan 910928)                                   91634B-2   CC63B    CCPRG   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
-Captain Commando* (Japan 911202)                                   91634B-2   CC63B    CCPRG1  IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632B   IOC1
+Captain Commando* (Japan 911202)                                   91634B-2   CC63B    CCPRG1  IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632^   IOC1
 
 Knights of the Round* (World 911127)                         1991  91635B-2   KR63B    BPRG1   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 Knights of the Round* (USA 911127)                                 91635B-2   KR63B    BPRG1   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
@@ -213,8 +214,9 @@ Ganbare! Marine Kun (Japan 2K0411)                           2000  91634B-2   GB
 
 @the original number (CPS-B-01) was scratched out and "04" stamped over it.
 *denotes Suicide Battery
+^c632b chips seen, but all variants of the game read the same c board io ports so the fusemap must be the same, perhaps incorrectly marked?
 
-The C628/C632 PALs on some C-boards probably handle the extra inputs (6 buttons/third player).
+The C628/C632 PALs on some C-boards handle the io for games with more than 3 buttons or more than 2 players.
 
 You can set the suicide CPS-B-21 chips to their default layer register and priority bit values
 if you pull pins 45 and 46 high (floating the pins seems to work, too). The default is the same
@@ -1405,6 +1407,7 @@ static const struct gfx_range mapper_pokonyan_table[] =
 	{ 0 }
 };
 
+// a game without an entry here defaults to cps2 mapper (eg. some games in fcrash.cpp)
 static const struct CPS1config cps1_config_table[]=
 {
 	/* name         CPSB          gfx mapper   in2  in3  out2   kludge */
@@ -1495,6 +1498,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2uh",       CPS_B_13,     mapper_STF29,  0x36 },
 	{"sf2ui",       CPS_B_14,     mapper_STF29,  0x36 },
 	{"sf2uk",       CPS_B_17,     mapper_STF29,  0x36 },
+	{"sf2um",       CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2j",        CPS_B_13,     mapper_STF29,  0x36 },
 	{"sf2j17",      CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2ja",       CPS_B_17,     mapper_STF29,  0x36 },
@@ -1528,12 +1532,14 @@ static const struct CPS1config cps1_config_table[]=
 	{"captcommj",   CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"captcommjr1", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"captcommb",   CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34, 3 },
+	{"captcommb2",  CPS_B_21_BT4, mapper_CC63B },  // junk around health bar with default cps2 mapper, uses BT4(knights) config
 	{"knights",     CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsu",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsj",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsja",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },   // wrong, this set uses KR22B, still not dumped
 	{"knightsb2",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },   // wrong, knightsb bootleg doesn't use the KR63B PAL
 	//{"knightsb",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },   // wrong, knightsb bootleg doesn't use the KR63B PAL
+	{"knightsb3",   CPS_B_21_BT4, mapper_KR63B },
 	{"pokonyan",    CPS_B_21_DEF, mapper_pokonyan, 0x36 },
 	{"sf2ce",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2ceea",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
@@ -1558,6 +1564,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2accp2",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2amf",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 }, // probably wrong but this set is not completely dumped anyway
 	{"sf2amf2",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
+	{"sf2amf3",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2dkot2",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2level",    HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2m1",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
@@ -1580,10 +1587,12 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2b",        CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1 },
 	{"sf2b2",       CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1 },
 	{"sf2ceupl",    HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 1 },
-	{"sf2rules",    HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
+	{"sf2rules",    HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 2 },
+	{"sf2ceds6",    HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2cems6a",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2cems6b",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2cems6c",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
+	{"sf2re",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"varth",       CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */  // wrong, this set uses VA24B, dumped but equations still not added
 	{"varthb",      CPS_B_04,     mapper_VA63B, 0, 0, 0, 0x0F },
 	{"varthr1",     CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */  // wrong, this set uses VA24B, dumped but equations still not added
@@ -1617,6 +1626,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"slammast",    CPS_B_21_QS4, mapper_MB63B },
 	{"slammastu",   CPS_B_21_QS4, mapper_MB63B },
 	{"slampic",     CPS_B_21_QS4, mapper_MB63B },
+	{"slampic2",    CPS_B_21_QS4, mapper_sfzch },  // default cps2 mapper breaks scroll layers
 	{"mbomberj",    CPS_B_21_QS4, mapper_MB63B },
 	{"mbombrd",     CPS_B_21_QS5, mapper_MB63B },
 	{"mbombrdj",    CPS_B_21_QS5, mapper_MB63B },
@@ -1810,10 +1820,12 @@ READ16_MEMBER(cps_state::cps1_cps_b_r)
 		return (m_cps_b_regs[m_game_config->mult_factor1 / 2] *
 				m_cps_b_regs[m_game_config->mult_factor2 / 2]) >> 16;
 
-	if (offset == m_game_config->in2_addr / 2)  /* Extra input ports (on C-board) */
+	/* Extra input ports (on C-board) */
+	if (m_game_config->in2_addr != 0 && offset == m_game_config->in2_addr / 2)
 		return ioport("IN2")->read();
 
-	if (offset == m_game_config->in3_addr / 2)  /* Player 4 controls (on C-board) ("Captain Commando") */
+	/* Player 4 controls (on C-board) ("Captain Commando") */
+	if (m_game_config->in3_addr != 0 && offset == m_game_config->in3_addr / 2)
 		return ioport("IN3")->read();
 
 	if (m_cps_version == 2)
@@ -1859,7 +1871,7 @@ WRITE16_MEMBER(cps_state::cps1_cps_b_w)
 
 
 	// additional outputs on C-board
-	if (offset == m_game_config->out2_addr / 2)
+	if (m_game_config->out2_addr != 0 && offset == m_game_config->out2_addr / 2)
 	{
 		if (ACCESSING_BITS_0_7)
 		{
@@ -2254,8 +2266,6 @@ void cps_state::cps1_update_transmasks()
 
 void cps_state::video_start()
 {
-	int i;
-
 	MACHINE_RESET_CALL_MEMBER(cps);
 
 	/* Put in some const */
@@ -2267,18 +2277,15 @@ void cps_state::video_start()
 	m_stars_rom_size = 0x2000;  /* first 0x4000 of gfx ROM are used, but 0x0000-0x1fff is == 0x2000-0x3fff */
 
 	/* create tilemaps */
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cps_state::get_tile0_info),this), tilemap_mapper_delegate(FUNC(cps_state::tilemap0_scan),this),  8,  8, 64, 64);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cps_state::get_tile1_info),this), tilemap_mapper_delegate(FUNC(cps_state::tilemap1_scan),this), 16, 16, 64, 64);
-	m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cps_state::get_tile2_info),this), tilemap_mapper_delegate(FUNC(cps_state::tilemap2_scan),this), 32, 32, 64, 64);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cps_state::get_tile0_info)), tilemap_mapper_delegate(*this, FUNC(cps_state::tilemap0_scan)),  8,  8, 64, 64);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cps_state::get_tile1_info)), tilemap_mapper_delegate(*this, FUNC(cps_state::tilemap1_scan)), 16, 16, 64, 64);
+	m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cps_state::get_tile2_info)), tilemap_mapper_delegate(*this, FUNC(cps_state::tilemap2_scan)), 32, 32, 64, 64);
 
 	/* create empty tiles */
 	memset(m_empty_tile, 0x0f, sizeof(m_empty_tile));
 
 	/* front masks will change at runtime to handle sprite occluding */
 	cps1_update_transmasks();
-
-	for (i = 0; i < cps1_palette_entries * 16; i++)
-		m_palette->set_pen_color(i, rgb_t(0,0,0));
 
 	m_buffered_obj = make_unique_clear<uint16_t[]>(m_obj_size / 2);
 
@@ -2295,7 +2302,8 @@ void cps_state::video_start()
 	m_cps_a_regs[CPS1_OTHER_BASE]   = 0x9100;
 
 	/* This should never be hit, since game_config is set in machine_reset */
-	assert_always(m_game_config, "state_game_config hasn't been set up yet");
+	if (!m_game_config)
+		throw emu_fatalerror("cps_state::video_start: m_game_config hasn't been set up yet");
 
 
 	/* Set up old base */
@@ -2306,6 +2314,8 @@ void cps_state::video_start()
 	m_other = nullptr;
 	cps1_get_video_base();   /* Calculate base pointers */
 	cps1_get_video_base();   /* Calculate old base pointers */
+
+	m_screen->register_screen_bitmap(m_dummy_bitmap);
 
 	/* state save register */
 	save_item(NAME(m_scanline1));
@@ -2385,7 +2395,7 @@ void cps_state::cps1_build_palette( const uint16_t* const palette_base )
 				g = ((palette >> 4) & 0x0f) * 0x11 * bright / 0x2d;
 				b = ((palette >> 0) & 0x0f) * 0x11 * bright / 0x2d;
 
-				m_palette->set_pen_color (0x200 * page + offset, rgb_t(r, g, b));
+				m_palette->set_pen_color(0x200 * page + offset, rgb_t(r, g, b));
 			}
 		}
 		else
@@ -2931,7 +2941,6 @@ void cps_state::cps1_render_layer( screen_device &screen, bitmap_ind16 &bitmap, 
 
 void cps_state::cps1_render_high_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
 {
-	bitmap_ind16 dummy_bitmap;
 	switch (layer)
 	{
 		case 0:
@@ -2940,7 +2949,7 @@ void cps_state::cps1_render_high_layer( screen_device &screen, bitmap_ind16 &bit
 		case 1:
 		case 2:
 		case 3:
-			m_bg_tilemap[layer - 1]->draw(screen, dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+			m_bg_tilemap[layer - 1]->draw(screen, m_dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 			break;
 	}
 }

@@ -7,13 +7,16 @@ Protec Pro-80
 2009-12-09 Skeleton driver.
 
 TODO:
-- Cassette load
+- Cassette load (last byte is bad)
 - Use messram for optional ram
-- Fix Step command (don't works due of missing interrupt emulation)
+- Fix Step command (doesn't work due to missing interrupt emulation)
 
 The cassette uses 2 bits for input, plus a D flipflop and a 74LS221 oneshot, with the pulse width set
   by 0.02uf and 24k (= 336 usec). The pulse is started by a H->L transistion of the input. At the end
   of the pulse, the current input is passed through the flipflop.
+
+Cassette start address is always 1000. The end address must be entered into 13DC/DD (little-endian).
+Then press W to save. To load, press L. If it says r at the end, it indicates a bad checksum.
 
 ******************************************************************************************************/
 
@@ -24,7 +27,6 @@ The cassette uses 2 bits for input, plus a D flipflop and a 74LS221 oneshot, wit
 #include "machine/timer.h"
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 
 #include "speaker.h"
 
@@ -38,6 +40,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
+		, m_io_keyboard(*this, "LINE%u", 0)
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
@@ -47,7 +50,7 @@ private:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(segment_w);
 	DECLARE_READ8_MEMBER(kp_r);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
 	void pro80_io(address_map &map);
 	void pro80_mem(address_map &map);
@@ -59,24 +62,22 @@ private:
 	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
+	required_ioport_array<6> m_io_keyboard;
 	output_finder<6> m_digits;
 };
 
-// This can read the first few bytes correctly, but after that bit slippage occurs.
-// Needs to be reworked
-TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::timer_p )
+TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::kansas_r )
 {
 	m_cass_data[1]++;
-	uint8_t cass_ws = ((m_cass)->input() > +0.03) ? 1 : 0;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
 		m_cass_data[0] = cass_ws;
-		m_cass_in = ((m_cass_data[1] < 0x0d) ? 0x10 : 0); // data bit
+		m_cass_in = ((m_cass_data[1] < 12) ? 0x10 : 0); // get data bit
 		m_cass_data[1] = 0;
+		if (!cass_ws) m_cass_in |= 0x20;  // set sync bit
 	}
-	if (m_cass_data[1] < 5)
-		m_cass_in |= 0x20; // sync bit
 }
 
 WRITE8_MEMBER( pro80_state::digit_w )
@@ -92,12 +93,9 @@ WRITE8_MEMBER( pro80_state::segment_w )
 {
 	if (m_digit_sel)
 	{
-		if (!BIT(m_digit_sel, 0)) m_digits[0] = data;
-		if (!BIT(m_digit_sel, 1)) m_digits[1] = data;
-		if (!BIT(m_digit_sel, 2)) m_digits[2] = data;
-		if (!BIT(m_digit_sel, 3)) m_digits[3] = data;
-		if (!BIT(m_digit_sel, 4)) m_digits[4] = data;
-		if (!BIT(m_digit_sel, 5)) m_digits[5] = data;
+		for (u8 i = 0; i < 6; i++)
+			if (!BIT(m_digit_sel, i))
+				m_digits[i] = data;
 
 		m_digit_sel = 0;
 	}
@@ -107,14 +105,14 @@ READ8_MEMBER( pro80_state::kp_r )
 {
 	uint8_t data = 0x0f;
 
-	if (!BIT(m_digit_sel, 0)) data &= ioport("LINE0")->read();
-	if (!BIT(m_digit_sel, 1)) data &= ioport("LINE1")->read();
-	if (!BIT(m_digit_sel, 2)) data &= ioport("LINE2")->read();
-	if (!BIT(m_digit_sel, 3)) data &= ioport("LINE3")->read();
-	if (!BIT(m_digit_sel, 4)) data &= ioport("LINE4")->read();
-	if (!BIT(m_digit_sel, 5)) data &= ioport("LINE5")->read();
+	for (u8 i = 0; i < 6; i++)
+		if (!BIT(m_digit_sel, i))
+			data &= m_io_keyboard[i]->read();
 
-	return data | m_cass_in | 0xc0;
+	data |= m_cass_in;
+	data |= 0xc0;
+	m_cass_in = 0;
+	return data;
 }
 
 void pro80_state::pro80_mem(address_map &map)
@@ -144,7 +142,7 @@ static INPUT_PORTS_START( pro80 )
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Res") PORT_CODE(KEYCODE_EQUALS)
 	PORT_START("LINE1")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("EXE") PORT_CODE(KEYCODE_ENTER)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("NEx") PORT_CODE(KEYCODE_N)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("NEx") PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_UP)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("REx") PORT_CODE(KEYCODE_R)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("MEx") PORT_CODE(KEYCODE_M)
 	PORT_START("LINE2")
@@ -185,14 +183,15 @@ void pro80_state::pro80(machine_config &config)
 	/* video hardware */
 	config.set_default_layout(layout_pro80);
 
+	Z80PIO(config, "pio", XTAL(4'000'000) / 2);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	/* Devices */
+	// Cassette
 	CASSETTE(config, m_cass);
-	Z80PIO(config, "pio", XTAL(4'000'000) / 2);
-	TIMER(config, "timer_p").configure_periodic(FUNC(pro80_state::timer_p), attotime::from_hz(40000)); // cass read
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_r").configure_periodic(FUNC(pro80_state::kansas_r), attotime::from_hz(40000)); // cass read
 }
 
 /* ROM definition */

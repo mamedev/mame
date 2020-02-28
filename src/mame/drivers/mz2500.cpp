@@ -1232,17 +1232,17 @@ WRITE8_MEMBER(mz2500_state::mz2500_emm_data_w)
 void mz2500_state::mz2500_io(address_map &map)
 {
 	map.global_mask(0xff);
-//  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
-//  AM_RANGE(0x63, 0x63) AM_READ(w3100a_r)
-//  AM_RANGE(0x98, 0x99) ADPCM, unknown type, custom?
+//  map(0x60, 0x63).w(FUNC(mz2500_state::w3100a_w));
+//  map(0x63, 0x63).r(FUNC(mz2500_state::w3100a_r));
+//  map(0x98, 0x99) ADPCM, unknown type, custom?
 	map(0xa0, 0xa3).rw("z80sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
-//  AM_RANGE(0xa4, 0xa5) AM_READWRITE(sasi_r, sasi_w)
+//  map(0xa4, 0xa5).rw(FUNC(mz2500_state::sasi_r), FUNC(mz2500_state::sasi_w));
 	map(0xa8, 0xa8).w(FUNC(mz2500_state::mz2500_rom_w));
 	map(0xa9, 0xa9).r(FUNC(mz2500_state::mz2500_rom_r));
 	map(0xac, 0xac).w(FUNC(mz2500_state::mz2500_emm_addr_w));
 	map(0xad, 0xad).r(FUNC(mz2500_state::mz2500_emm_data_r)).w(FUNC(mz2500_state::mz2500_emm_data_w));
 	map(0xae, 0xae).w(FUNC(mz2500_state::palette4096_io_w));
-//  AM_RANGE(0xb0, 0xb3) AM_READWRITE(sio_r,sio_w)
+//  map(0xb0, 0xb3).rw(FUNC(mz2500_state::sio_r), FUNC(mz2500_state::sio_w));
 	map(0xb4, 0xb4).rw(FUNC(mz2500_state::mz2500_bank_addr_r), FUNC(mz2500_state::mz2500_bank_addr_w));
 	map(0xb5, 0xb5).rw(FUNC(mz2500_state::mz2500_bank_data_r), FUNC(mz2500_state::mz2500_bank_data_w));
 	map(0xb7, 0xb7).nopw();
@@ -1254,7 +1254,7 @@ void mz2500_state::mz2500_io(address_map &map)
 	map(0xc6, 0xc6).w(FUNC(mz2500_state::mz2500_irq_sel_w));
 	map(0xc7, 0xc7).w(FUNC(mz2500_state::mz2500_irq_data_w));
 	map(0xc8, 0xc9).rw("ym", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-//  AM_RANGE(0xca, 0xca) AM_READWRITE(voice_r,voice_w)
+//  map(0xca, 0xca).rw(FUNC(mz2500_state::voice_r), FUNC(mz2500_state::voice_w));
 	map(0xcc, 0xcc).rw(FUNC(mz2500_state::rp5c15_8_r), FUNC(mz2500_state::rp5c15_8_w));
 	map(0xce, 0xce).w(FUNC(mz2500_state::mz2500_dictionary_bank_w));
 	map(0xcf, 0xcf).w(FUNC(mz2500_state::mz2500_kanji_bank_w));
@@ -1268,7 +1268,7 @@ void mz2500_state::mz2500_io(address_map &map)
 	map(0xef, 0xef).rw(FUNC(mz2500_state::mz2500_joystick_r), FUNC(mz2500_state::mz2500_joystick_w));
 	map(0xf0, 0xf3).w(FUNC(mz2500_state::timer_w));
 	map(0xf4, 0xf7).r(FUNC(mz2500_state::mz2500_crtc_hvblank_r)).w(FUNC(mz2500_state::mz2500_tv_crtc_w));
-//  AM_RANGE(0xf8, 0xf9) AM_READWRITE(extrom_r,extrom_w)
+//  map(0xf8, 0xf9).rw(FUNC(mz2500_state::extrom_r), FUNC(mz2500_state::extrom_w));
 }
 
 /* Input ports */
@@ -1778,7 +1778,7 @@ WRITE_LINE_MEMBER(mz2500_state::mz2500_rtc_alarm_irq)
 {
 	/* TODO: doesn't work yet */
 //  if(m_irq_mask[3] && state & 1)
-//      m_maincpu->set_input_line_and_vector(0, HOLD_LINE,drvm_irq_vector[3]);
+//      m_maincpu->set_input_line_and_vector(0, HOLD_LINE,drvm_irq_vector[3]); // Z80
 }
 
 
@@ -1787,13 +1787,14 @@ static void mz2500_floppies(device_slot_interface &device)
 	device.option_add("dd", FLOPPY_35_DD);
 }
 
-MACHINE_CONFIG_START(mz2500_state::mz2500)
+void mz2500_state::mz2500(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 6000000)
-	MCFG_DEVICE_PROGRAM_MAP(mz2500_map)
-	MCFG_DEVICE_IO_MAP(mz2500_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mz2500_state,  mz2500_vbl)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mz2500_state,mz2500_irq_ack)
+	Z80(config, m_maincpu, 6000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mz2500_state::mz2500_map);
+	m_maincpu->set_addrmap(AS_IO, &mz2500_state::mz2500_io);
+	m_maincpu->set_vblank_int("screen", FUNC(mz2500_state::mz2500_vbl));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(mz2500_state::mz2500_irq_ack));
 
 	for (int bank = 0; bank < 8; bank++)
 	{
@@ -1836,10 +1837,10 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 	SOFTWARE_LIST(config, "flop_list").set_original("mz2500");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(21'477'272, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
-	MCFG_SCREEN_UPDATE_DRIVER(mz2500_state, screen_update_mz2500)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(21'477'272, 640+108, 0, 640, 480, 0, 200); //unknown clock / divider
+	m_screen->set_screen_update(FUNC(mz2500_state::screen_update_mz2500));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(mz2500_state::mz2500_palette), 0x200);
 
@@ -1857,9 +1858,8 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 	ym.add_route(2, "mono", 0.50);
 	ym.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("beeper", BEEP, 4096)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-MACHINE_CONFIG_END
+	BEEP(config, m_beeper, 4096).add_route(ALL_OUTPUTS,"mono",0.50);
+}
 
 
 

@@ -38,12 +38,9 @@ public:
 	// configuration
 	void set_alpha_invert(int alpha_inv) { m_alpha_inv = alpha_inv; }
 
-	DECLARE_WRITE16_MEMBER( word_w ); // "CLCT" registers
-	DECLARE_WRITE32_MEMBER( long_w );
+	void word_w(offs_t offset, u16 data, u16 mem_mask = ~0); // "CLCT" registers
 
-	DECLARE_READ16_MEMBER( word_r );        // CLTC
-
-	int register_r(int reg);
+	u16 register_r(offs_t offset);
 	void update_all_shadows(int rushingheroes_hack, palette_device &palette);          // called at the beginning of SCREEN_UPDATE()
 	void fill_solid_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect);             // solid backcolor fill
 	void fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &cliprect, const pen_t *pal_ptr, int mode);  // solid or gradient fill using k055555

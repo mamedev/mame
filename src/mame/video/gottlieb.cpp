@@ -25,12 +25,12 @@ void gottlieb_state::palette_w(offs_t offset, u8 data)
 
 	/* blue & green are encoded in the even bytes */
 	val = m_paletteram[offset & ~1];
-	int const g = combine_4_weights(m_weights, BIT(val, 4), BIT(val, 5), BIT(val, 6), BIT(val, 7));
-	int const b = combine_4_weights(m_weights, BIT(val, 0), BIT(val, 1), BIT(val, 2), BIT(val, 3));
+	int const g = combine_weights(m_weights, BIT(val, 4), BIT(val, 5), BIT(val, 6), BIT(val, 7));
+	int const b = combine_weights(m_weights, BIT(val, 0), BIT(val, 1), BIT(val, 2), BIT(val, 3));
 
 	/* red is encoded in the odd bytes */
 	val = m_paletteram[offset | 1];
-	int const r = combine_4_weights(m_weights, BIT(val, 0), BIT(val, 1), BIT(val, 2), BIT(val, 3));
+	int const r = combine_weights(m_weights, BIT(val, 0), BIT(val, 1), BIT(val, 2), BIT(val, 3));
 
 	/* alpha is set to 0 if laserdisc video is enabled */
 	int const a = (m_transparent0 && offset / 2 == 0) ? 0 : 255;
@@ -140,7 +140,7 @@ void gottlieb_state::video_start()
 	m_transparent0 = false;
 
 	/* configure the background tilemap */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gottlieb_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gottlieb_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 
 	/* save some state */
@@ -163,7 +163,7 @@ VIDEO_START_MEMBER(gottlieb_state,screwloo)
 	m_transparent0 = false;
 
 	/* configure the background tilemap */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gottlieb_state::get_screwloo_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gottlieb_state::get_screwloo_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 
 	/* save some state */

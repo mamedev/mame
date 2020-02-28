@@ -239,7 +239,7 @@ READ16_MEMBER( hp9k_state::hp9k_videoram_r )
 	if (offset==0x0001)
 	{
 		//printf("m6845 read at [%x] mem_mask [%x]\n",offset,mem_mask);
-		return m_6845->register_r(space,0);
+		return m_6845->register_r();
 	}
 	else
 	{
@@ -262,13 +262,13 @@ WRITE16_MEMBER( hp9k_state::hp9k_videoram_w )
 	{
 		//printf("6845 address write [%x] at [%x] mask [%x]\n",data,offset,mem_mask);
 		data&=0x1f;
-		m_6845->address_w( space, 0, data );
+		m_6845->address_w(data);
 		crtc_curreg=data;
 	}
 	else if (offset==0x0001)
 	{
 		//printf("6845 register write [%x] at [%x] mask [%x]\n",data,offset,mem_mask);
-		m_6845->register_w( space, 0, data );
+		m_6845->register_w(data);
 		if (crtc_curreg==0x0c) crtc_addrStartHi=data;
 		if (crtc_curreg==0x0d) crtc_addrStartLow=data;
 	}
@@ -319,7 +319,7 @@ void hp9k_state::hp9k_mem(address_map &map)
 	map(0x530000, 0x53ffff).ram(); // graphic memory
 	map(0x540000, 0x5effff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
 	map(0x5f0000, 0x5f3fff).rw(FUNC(hp9k_state::hp9k_prom_r), FUNC(hp9k_state::hp9k_prom_w));
-	//AM_RANGE(0x5f0000, 0x5f3fff) AM_READWRITE(buserror_r,buserror_w)
+	//map(0x5f0000, 0x5f3fff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
 	map(0x5f4000, 0xfbffff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
 	map(0xFC0000, 0xffffff).ram(); // system ram
 }
@@ -394,29 +394,30 @@ WRITE8_MEMBER( hp9k_state::kbd_put )
 }
 
 
-MACHINE_CONFIG_START(hp9k_state::hp9k)
+void hp9k_state::hp9k(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(hp9k_mem)
+	M68000(config, m_maincpu, XTAL(8'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp9k_state::hp9k_mem);
 
 	/* video hardware */
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(HP9816_ROWX*HP9816_CHDIMX, HP9816_ROWY*HP9816_CHDIMY)
-	MCFG_SCREEN_VISIBLE_AREA(0, (HP9816_ROWX*HP9816_CHDIMX)-1, 0, (HP9816_ROWY*HP9816_CHDIMY)-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hp9k_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(HP9816_ROWX*HP9816_CHDIMX, HP9816_ROWY*HP9816_CHDIMY);
+	screen.set_visarea(0, (HP9816_ROWX*HP9816_CHDIMX)-1, 0, (HP9816_ROWY*HP9816_CHDIMY)-1);
+	screen.set_screen_update(FUNC(hp9k_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hp9k)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_hp9k);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	MC6845(config, m_6845, XTAL(16'000'000) / 16);
 	m_6845->set_screen("screen");
 	m_6845->set_show_border_area(false);
 	m_6845->set_char_width(8);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( hp9816 )

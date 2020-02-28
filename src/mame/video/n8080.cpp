@@ -10,7 +10,7 @@
 #include "includes/n8080.h"
 
 
-WRITE8_MEMBER(n8080_state::n8080_video_control_w)
+void n8080_state::n8080_video_control_w(uint8_t data)
 {
 	m_sheriff_color_mode = (data >> 3) & 3;
 	m_sheriff_color_data = (data >> 0) & 7;
@@ -25,7 +25,7 @@ void n8080_state::n8080_palette(palette_device &palette) const
 }
 
 
-void n8080_state::helifire_palette(palette_device &palette) const
+void helifire_state::helifire_palette(palette_device &palette) const
 {
 	n8080_palette(palette);
 
@@ -42,55 +42,55 @@ void n8080_state::helifire_palette(palette_device &palette) const
 }
 
 
-void n8080_state::spacefev_start_red_cannon()
+void spacefev_state::start_red_cannon()
 {
-	m_spacefev_red_cannon = 1;
+	m_red_cannon = 1;
 	m_cannon_timer->adjust(attotime::from_usec(550 * 68 * 10));
 }
 
 
-TIMER_CALLBACK_MEMBER(n8080_state::spacefev_stop_red_cannon)
+TIMER_CALLBACK_MEMBER(spacefev_state::stop_red_cannon)
 {
-	m_spacefev_red_cannon = 0;
+	m_red_cannon = 0;
 	m_cannon_timer->adjust(attotime::never);
 }
 
 
-void n8080_state::helifire_next_line(  )
+void helifire_state::next_line()
 {
-	m_helifire_mv++;
+	m_mv++;
 
-	if (m_helifire_sc % 4 == 2)
+	if (m_sc % 4 == 2)
 	{
-		m_helifire_mv %= 256;
+		m_mv %= 256;
 	}
 	else
 	{
 		if (flip_screen())
-			m_helifire_mv %= 255;
+			m_mv %= 255;
 		else
-			m_helifire_mv %= 257;
+			m_mv %= 257;
 	}
 
-	if (m_helifire_mv == 128)
+	if (m_mv == 128)
 	{
-		m_helifire_sc++;
+		m_sc++;
 	}
 }
 
 
-VIDEO_START_MEMBER(n8080_state,spacefev)
+void spacefev_state::video_start()
 {
-	m_cannon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::spacefev_stop_red_cannon),this));
+	m_cannon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spacefev_state::stop_red_cannon),this));
 
 	flip_screen_set(0);
 
-	save_item(NAME(m_spacefev_red_screen));
-	save_item(NAME(m_spacefev_red_cannon));
+	save_item(NAME(m_red_screen));
+	save_item(NAME(m_red_cannon));
 }
 
 
-VIDEO_START_MEMBER(n8080_state,sheriff)
+void sheriff_state::video_start()
 {
 	flip_screen_set(0);
 
@@ -99,15 +99,15 @@ VIDEO_START_MEMBER(n8080_state,sheriff)
 }
 
 
-VIDEO_START_MEMBER(n8080_state,helifire)
+void helifire_state::video_start()
 {
 	uint8_t data = 0;
 	int i;
 
-	save_item(NAME(m_helifire_mv));
-	save_item(NAME(m_helifire_sc));
-	save_item(NAME(m_helifire_flash));
-	save_item(NAME(m_helifire_LSFR));
+	save_item(NAME(m_mv));
+	save_item(NAME(m_sc));
+	save_item(NAME(m_flash));
+	save_item(NAME(m_LSFR));
 
 	for (i = 0; i < 63; i++)
 	{
@@ -117,14 +117,14 @@ VIDEO_START_MEMBER(n8080_state,helifire)
 
 		data = (data << 1) | (bit & 1);
 
-		m_helifire_LSFR[i] = data;
+		m_LSFR[i] = data;
 	}
 
 	flip_screen_set(0);
 }
 
 
-uint32_t n8080_state::screen_update_spacefev(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spacefev_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t mask = flip_screen() ? 0xff : 0x00;
 
@@ -144,7 +144,7 @@ uint32_t n8080_state::screen_update_spacefev(screen_device &screen, bitmap_ind16
 
 			uint8_t color = 0;
 
-			if (m_spacefev_red_screen)
+			if (m_red_screen)
 				color = 1;
 			else
 			{
@@ -152,7 +152,7 @@ uint32_t n8080_state::screen_update_spacefev(screen_device &screen, bitmap_ind16
 
 				if ((x >> 3) == 0x06)
 				{
-					color = m_spacefev_red_cannon ? 1 : 7;
+					color = m_red_cannon ? 1 : 7;
 				}
 
 				if ((x >> 3) == 0x1b)
@@ -193,7 +193,7 @@ uint32_t n8080_state::screen_update_spacefev(screen_device &screen, bitmap_ind16
 }
 
 
-uint32_t n8080_state::screen_update_sheriff(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sheriff_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t mask = flip_screen() ? 0xff : 0x00;
 
@@ -235,15 +235,15 @@ uint32_t n8080_state::screen_update_sheriff(screen_device &screen, bitmap_ind16 
 }
 
 
-uint32_t n8080_state::screen_update_helifire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t helifire_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int SUN_BRIGHTNESS = ioport("POT0")->read();
 	int SEA_BRIGHTNESS = ioport("POT1")->read();
 
 	static const int wave[8] = { 0, 1, 2, 2, 2, 1, 0, 0 };
 
-	unsigned saved_mv = m_helifire_mv;
-	unsigned saved_sc = m_helifire_sc;
+	unsigned saved_mv = m_mv;
+	unsigned saved_sc = m_sc;
 
 	int x;
 	int y;
@@ -252,7 +252,7 @@ uint32_t n8080_state::screen_update_helifire(screen_device &screen, bitmap_ind16
 	{
 		uint16_t* pLine = &bitmap.pix16(y);
 
-		int level = 120 + wave[m_helifire_mv & 7];
+		int level = 120 + wave[m_mv & 7];
 
 		/* draw sky */
 
@@ -263,28 +263,28 @@ uint32_t n8080_state::screen_update_helifire(screen_device &screen, bitmap_ind16
 
 		/* draw stars */
 
-		if (m_helifire_mv % 8 == 4) /* upper half */
+		if (m_mv % 8 == 4) /* upper half */
 		{
-			int step = (320 * (m_helifire_mv - 0)) % sizeof m_helifire_LSFR;
+			int step = (320 * (m_mv - 0)) % sizeof m_LSFR;
 
 			int data =
-				((m_helifire_LSFR[step] & 1) << 6) |
-				((m_helifire_LSFR[step] & 2) << 4) |
-				((m_helifire_LSFR[step] & 4) << 2) |
-				((m_helifire_LSFR[step] & 8) << 0);
+				((m_LSFR[step] & 1) << 6) |
+				((m_LSFR[step] & 2) << 4) |
+				((m_LSFR[step] & 4) << 2) |
+				((m_LSFR[step] & 8) << 0);
 
 			pLine[0x80 + data] |= 0x100;
 		}
 
-		if (m_helifire_mv % 8 == 5) /* lower half */
+		if (m_mv % 8 == 5) /* lower half */
 		{
-			int step = (320 * (m_helifire_mv - 1)) % sizeof m_helifire_LSFR;
+			int step = (320 * (m_mv - 1)) % sizeof m_LSFR;
 
 			int data =
-				((m_helifire_LSFR[step] & 1) << 6) |
-				((m_helifire_LSFR[step] & 2) << 4) |
-				((m_helifire_LSFR[step] & 4) << 2) |
-				((m_helifire_LSFR[step] & 8) << 0);
+				((m_LSFR[step] & 1) << 6) |
+				((m_LSFR[step] & 2) << 4) |
+				((m_LSFR[step] & 4) << 2) |
+				((m_LSFR[step] & 8) << 0);
 
 			pLine[0x00 + data] |= 0x100;
 		}
@@ -325,21 +325,21 @@ uint32_t n8080_state::screen_update_helifire(screen_device &screen, bitmap_ind16
 
 		/* next line */
 
-		helifire_next_line();
+		next_line();
 	}
 
-	m_helifire_mv = saved_mv;
-	m_helifire_sc = saved_sc;
+	m_mv = saved_mv;
+	m_sc = saved_sc;
 	return 0;
 }
 
 
-WRITE_LINE_MEMBER(n8080_state::screen_vblank_helifire)
+WRITE_LINE_MEMBER(helifire_state::screen_vblank)
 {
 	// falling edge
 	if (!state)
 	{
-		int n = (m_screen->frame_number() >> 1) % sizeof m_helifire_LSFR;
+		int n = (m_screen->frame_number() >> 1) % sizeof m_LSFR;
 
 		int i;
 
@@ -349,9 +349,9 @@ WRITE_LINE_MEMBER(n8080_state::screen_vblank_helifire)
 			int G = (i & 2);
 			int B = (i & 4);
 
-			if (m_helifire_flash)
+			if (m_flash)
 			{
-				if (m_helifire_LSFR[n] & 0x20)
+				if (m_LSFR[n] & 0x20)
 				{
 					G |= B;
 				}
@@ -370,7 +370,7 @@ WRITE_LINE_MEMBER(n8080_state::screen_vblank_helifire)
 
 		for (i = 0; i < 256; i++)
 		{
-			helifire_next_line();
+			next_line();
 		}
 	}
 }

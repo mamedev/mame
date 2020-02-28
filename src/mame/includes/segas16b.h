@@ -13,6 +13,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/315_5195.h"
 #include "machine/cxd1095.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
@@ -21,8 +22,11 @@
 #include "sound/ym2151.h"
 #include "sound/ym2413.h"
 #include "sound/upd7759.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
+#include "screen.h"
 
 
 // ======================> segas16b_state
@@ -44,14 +48,17 @@ public:
 		, m_cmptimer_1(*this, "cmptimer_1")
 		, m_cmptimer_2(*this, "cmptimer_2")
 		, m_nvram(*this, "nvram")
+		, m_screen(*this, "screen")
 		, m_sprites(*this, "sprites")
 		, m_segaic16vid(*this, "segaic16vid")
 		, m_soundlatch(*this, "soundlatch")
 		, m_cxdio(*this, "cxdio")
-		, m_upd4701a(*this, {"upd4701a1", "upd4701a2"})
+		, m_upd4701a(*this, "upd4701a%u", 1U)
 		, m_workram(*this, "workram")
 		, m_romboard(ROM_BOARD_INVALID)
 		, m_tilemap_type(segaic16_video_device::TILEMAP_16B)
+		, m_custom_io_r(*this)
+		, m_custom_io_w(*this)
 		, m_disable_screen_blanking(false)
 		, m_i8751_initial_config(nullptr)
 		, m_atomicp_sound_divisor(0)
@@ -60,9 +67,11 @@ public:
 		, m_hwc_monitor(*this, "MONITOR")
 		, m_hwc_left(*this, "LEFT")
 		, m_hwc_right(*this, "RIGHT")
+		, m_hwc_left_limit(*this, "LEFT_LIMIT")
+		, m_hwc_right_limit(*this, "RIGHT_LIMIT")
 		, m_mj_input_num(0)
 		, m_mj_last_val(0)
-		, m_mj_inputs(*this, {"MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5"})
+		, m_mj_inputs(*this, "MJ%u", 0U)
 		, m_spritepalbase(0x400)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes")
@@ -104,11 +113,9 @@ public:
 	void init_tturf_5704();
 	void init_wb3_5704();
 	void init_hwchamp_5521();
-	void init_altbeas5_5521();
 	void init_sdi_5358_small();
 	void init_fpointbla();
 	void init_altbeasj_5521();
-	void init_ddux_5704();
 	void init_snapper();
 	void init_shinobi4_5521();
 	void init_defense_5358_small();
@@ -214,8 +221,6 @@ protected:
 	// i8751 simulations
 	void altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoffs, int alt_bank);
 	void altbeasj_i8751_sim();
-	void altbeas5_i8751_sim();
-	void ddux_i8751_sim();
 	void tturf_i8751_sim();
 	void wb3_i8751_sim();
 
@@ -242,6 +247,7 @@ protected:
 	optional_device<sega_315_5250_compare_timer_device> m_cmptimer_1;
 	optional_device<sega_315_5250_compare_timer_device> m_cmptimer_2;
 	required_device<nvram_device> m_nvram;
+	required_device<screen_device> m_screen;
 	optional_device<sega_sys16b_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	optional_device<generic_latch_8_device> m_soundlatch; // not for atomicp
@@ -267,6 +273,8 @@ protected:
 	optional_ioport     m_hwc_monitor;
 	optional_ioport     m_hwc_left;
 	optional_ioport     m_hwc_right;
+	optional_ioport     m_hwc_left_limit;
+	optional_ioport     m_hwc_right_limit;
 	uint8_t               m_mj_input_num;
 	uint8_t               m_mj_last_val;
 	optional_ioport_array<6> m_mj_inputs;
@@ -280,14 +288,43 @@ protected:
 	output_finder<2> m_lamps;
 };
 
+class dfjail_state : public segas16b_state
+{
+public:
+	// construction/destruction
+	dfjail_state(const machine_config &mconfig, device_type type, const char *tag)
+		: segas16b_state(mconfig, type, tag)
+		, m_nmi_enable(false)
+		, m_dac_data(0)
+		, m_dac(*this, "dac")
+	{ }
+
+	void dfjail(machine_config &config);
+
+protected:
+	DECLARE_WRITE8_MEMBER( sound_control_w );
+	DECLARE_WRITE8_MEMBER( dac_data_w );
+	INTERRUPT_GEN_MEMBER( soundirq_cb );
+	bool m_nmi_enable;
+	uint16_t m_dac_data;
+
+	void dfjail_map(address_map &map);
+	void dfjail_sound_iomap(address_map &map);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<dac_word_interface> m_dac;
+};
+
 class afighter_16b_analog_state : public segas16b_state
 {
 public:
 	// construction/destruction
 	afighter_16b_analog_state(const machine_config &mconfig, device_type type, const char *tag)
-		: segas16b_state(mconfig, type, tag),
-			m_accel(*this, "ACCEL"),
-			m_steer(*this, "STEER")
+		: segas16b_state(mconfig, type, tag)
+		, m_accel(*this, "ACCEL")
+		, m_steer(*this, "STEER")
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(afighter_accel_r);
@@ -307,20 +344,20 @@ class isgsm_state : public segas16b_state
 public:
 	// construction/destruction
 	isgsm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: segas16b_state(mconfig, type, tag),
-			m_read_xor(0),
-			m_cart_addrlatch(0),
-			m_cart_addr(0),
-			m_data_type(0),
-			m_data_addr(0),
-			m_data_mode(0),
-			m_addr_latch(0),
-			m_security_value(0),
-			m_security_latch(0),
-			m_rle_control_position(8),
-			m_rle_control_byte(0),
-			m_rle_latched(false),
-			m_rle_byte(0)
+		: segas16b_state(mconfig, type, tag)
+		, m_read_xor(0)
+		, m_cart_addrlatch(0)
+		, m_cart_addr(0)
+		, m_data_type(0)
+		, m_data_addr(0)
+		, m_data_mode(0)
+		, m_addr_latch(0)
+		, m_security_value(0)
+		, m_security_latch(0)
+		, m_rle_control_position(8)
+		, m_rle_control_byte(0)
+		, m_rle_latched(false)
+		, m_rle_byte(0)
 	{ }
 
 	void isgsm(machine_config &config);
@@ -351,6 +388,7 @@ private:
 	uint32_t tetrbx_security(uint32_t input);
 
 	// driver overrides
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	// configuration

@@ -109,9 +109,20 @@ enum
 //  INLINE HELPERS
 //**************************************************************************
 
-inline uint8_t i8155_device::get_timer_mode()
+inline uint8_t i8155_device::get_timer_mode() const
 {
 	return (m_count_loaded >> 8) & TIMER_MODE_MASK;
+}
+
+inline uint16_t i8155_device::get_timer_count() const
+{
+	if (m_timer->enabled())
+	{
+		// timer counts down by twos
+		return std::min((uint16_t(attotime_to_clocks(m_timer->remaining())) + 1) << 1, m_count_loaded & 0x3ffe) | (m_count_even_phase ? 0 : 1);
+	}
+	else
+		return m_count_length;
 }
 
 inline void i8155_device::timer_output(int to)
@@ -128,7 +139,12 @@ inline void i8155_device::timer_output(int to)
 inline void i8155_device::timer_stop_count()
 {
 	// stop counting
-	m_timer->enable(0);
+	if (m_timer->enabled())
+	{
+		m_count_loaded = (m_count_loaded & (TIMER_MODE_MASK << 8)) | get_timer_count();
+		m_timer->enable(false);
+	}
+	m_timer_tc->enable(false);
 
 	// clear timer output
 	timer_output(1);
@@ -146,11 +162,10 @@ inline void i8155_device::timer_reload_count()
 	}
 
 	// begin the odd half of the count, with one extra cycle if count is odd
-	m_counter = (m_count_loaded & 0x3ffe) | 1;
-	m_count_extra = BIT(m_count_loaded, 0);
+	m_count_even_phase = false;
 
 	// set up our timer
-	m_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
+	m_timer->adjust(clocks_to_attotime(((m_count_length & 0x3ffe) >> 1) + (m_count_length & 1)));
 	timer_output(1);
 
 	switch (get_timer_mode())
@@ -271,9 +286,8 @@ i8155_device::i8155_device(const machine_config &mconfig, device_type type, cons
 		m_status(0),
 		m_count_length(0),
 		m_count_loaded(0),
-		m_counter(0),
-		m_count_extra(false),
-		m_to(0)
+		m_to(0),
+		m_count_even_phase(false)
 {
 }
 
@@ -307,7 +321,8 @@ void i8155_device::device_start()
 	m_ram = make_unique_clear<uint8_t[]>(256);
 
 	// allocate timers
-	m_timer = timer_alloc();
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i8155_device::timer_half_counted), this));
+	m_timer_tc = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i8155_device::timer_tc), this));
 
 	// register for state saving
 	save_item(NAME(m_io_m));
@@ -318,8 +333,6 @@ void i8155_device::device_start()
 	save_pointer(NAME(m_ram), 256);
 	save_item(NAME(m_count_length));
 	save_item(NAME(m_count_loaded));
-	save_item(NAME(m_count_extra));
-	save_item(NAME(m_counter));
 	save_item(NAME(m_to));
 }
 
@@ -347,45 +360,15 @@ void i8155_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer_half_counted - handler timer events
 //-------------------------------------------------
 
-void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(i8155_device::timer_half_counted)
 {
-	if (m_count_extra)
-	{
-		m_count_extra = false;
-		return;
-	}
-
-	// count down by twos
-	m_counter -= 2;
-
-	if (m_counter == 1)
-	{
-		LOGMASKED(LOG_TIMER, "Timer count half finished\n");
-
-		// reload the even half of the count
-		m_counter = m_count_loaded & 0x3ffe;
-
-		// square wave modes produce a low output in the second half of the counting period
-		if ((get_timer_mode() & TIMER_MODE_TC_PULSE) == 0)
-			timer_output(0);
-	}
-	else if (m_counter == 2)
-	{
-		if ((get_timer_mode() & TIMER_MODE_TC_PULSE) != 0)
-		{
-			// pulse low on TC being reached
-			timer_output(0);
-		}
-
-		// set timer flag
-		m_status |= STATUS_TIMER;
-	}
-	else if (m_counter == 0)
+	if (m_count_even_phase)
 	{
 		timer_output(1);
+		m_count_even_phase = false;
 
 		if ((get_timer_mode() & TIMER_MODE_AUTO_RELOAD) == 0 || (m_command & COMMAND_TM_MASK) == COMMAND_TM_STOP_AFTER_TC)
 		{
@@ -399,6 +382,37 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			timer_reload_count();
 		}
 	}
+	else
+	{
+		LOGMASKED(LOG_TIMER, "Timer count half finished\n");
+
+		// reload the even half of the count
+		m_timer->adjust(clocks_to_attotime((m_count_loaded & 0x3ffe) >> 1));
+		m_count_even_phase = true;
+
+		// square wave modes produce a low output in the second half of the counting period
+		if ((get_timer_mode() & TIMER_MODE_TC_PULSE) == 0)
+			timer_output(0);
+		else
+			m_timer_tc->adjust(clocks_to_attotime((std::max(m_count_loaded & 0x3ffe, 2) - 2) >> 1));
+	}
+}
+
+
+//-------------------------------------------------
+//  timer_tc - generate TC low pulse
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(i8155_device::timer_tc)
+{
+	if ((get_timer_mode() & TIMER_MODE_TC_PULSE) != 0)
+	{
+		// pulse low on TC being reached
+		timer_output(0);
+	}
+
+	// set timer flag
+	m_status |= STATUS_TIMER;
 }
 
 
@@ -406,7 +420,7 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 //  io_r - register read
 //-------------------------------------------------
 
-READ8_MEMBER( i8155_device::io_r )
+uint8_t i8155_device::io_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -416,7 +430,8 @@ READ8_MEMBER( i8155_device::io_r )
 		data = m_status;
 
 		// clear timer flag
-		m_status &= ~STATUS_TIMER;
+		if (!machine().side_effects_disabled())
+			m_status &= ~STATUS_TIMER;
 		break;
 
 	case REGISTER_PORT_A:
@@ -432,15 +447,89 @@ READ8_MEMBER( i8155_device::io_r )
 		break;
 
 	case REGISTER_TIMER_LOW:
-		data = m_counter & 0xff;
+		data = get_timer_count() & 0xff;
 		break;
 
 	case REGISTER_TIMER_HIGH:
-		data = (m_counter >> 8 & 0x3f) | get_timer_mode();
+		data = (get_timer_count() >> 8 & 0x3f) | get_timer_mode();
 		break;
 	}
 
 	return data;
+}
+
+//-------------------------------------------------
+//  write_command - set port modes and start/stop
+//  timer
+//-------------------------------------------------
+
+void i8155_device::write_command(uint8_t data)
+{
+	uint8_t old_command = std::exchange(m_command, data);
+
+	LOGMASKED(LOG_PORT, "Port A Mode: %s\n", (data & COMMAND_PA) ? "output" : "input");
+	LOGMASKED(LOG_PORT, "Port B Mode: %s\n", (data & COMMAND_PB) ? "output" : "input");
+
+	LOGMASKED(LOG_PORT, "Port A Interrupt: %s\n", (data & COMMAND_IEA) ? "enabled" : "disabled");
+	LOGMASKED(LOG_PORT, "Port B Interrupt: %s\n", (data & COMMAND_IEB) ? "enabled" : "disabled");
+
+	if ((data & COMMAND_PA) && (~old_command & COMMAND_PA))
+		m_out_pa_cb((offs_t)0, m_output[PORT_A]);
+	if ((data & COMMAND_PB) && (~old_command & COMMAND_PB))
+		m_out_pb_cb((offs_t)0, m_output[PORT_B]);
+
+	switch (data & COMMAND_PC_MASK)
+	{
+	case COMMAND_PC_ALT_1:
+		LOGMASKED(LOG_PORT, "Port C Mode: Alt 1 (PC0-PC5 input)\n");
+		break;
+
+	case COMMAND_PC_ALT_2:
+		LOGMASKED(LOG_PORT, "Port C Mode: Alt 2 (PC0-PC5 output)\n");
+		if ((old_command & COMMAND_PC_MASK) != COMMAND_PC_ALT_2)
+			m_out_pc_cb((offs_t)0, m_output[PORT_C]);
+		break;
+
+	case COMMAND_PC_ALT_3:
+		LOGMASKED(LOG_PORT, "Port C Mode: Alt 3 (PC0-PC2 A handshake, PC3-PC5 output)\n");
+		break;
+
+	case COMMAND_PC_ALT_4:
+		LOGMASKED(LOG_PORT, "Port C Mode: Alt 4 (PC0-PC2 A handshake, PC3-PC5 B handshake)\n");
+		break;
+	}
+
+	switch (data & COMMAND_TM_MASK)
+	{
+	case COMMAND_TM_NOP:
+		// do not affect counter operation
+		break;
+
+	case COMMAND_TM_STOP:
+		// NOP if timer has not started, stop counting if the timer is running
+		LOGMASKED(LOG_PORT, "Timer Command: Stop\n");
+		timer_stop_count();
+		break;
+
+	case COMMAND_TM_STOP_AFTER_TC:
+		// stop immediately after present TC is reached (NOP if timer has not started)
+		LOGMASKED(LOG_PORT, "Timer Command: Stop after TC\n");
+		break;
+
+	case COMMAND_TM_START:
+		LOGMASKED(LOG_PORT, "Timer Command: Start\n");
+
+		if (m_timer->enabled())
+		{
+			// if timer is running, start the new mode and CNT length immediately after present TC is reached
+		}
+		else
+		{
+			// load mode and CNT length and start immediately after loading (if timer is not running)
+			timer_reload_count();
+		}
+		break;
+	}
 }
 
 
@@ -453,64 +542,7 @@ void i8155_device::register_w(int offset, uint8_t data)
 	switch (offset & 0x07)
 	{
 	case REGISTER_COMMAND:
-		m_command = data;
-
-		LOGMASKED(LOG_PORT, "Port A Mode: %s\n", (data & COMMAND_PA) ? "output" : "input");
-		LOGMASKED(LOG_PORT, "Port B Mode: %s\n", (data & COMMAND_PB) ? "output" : "input");
-
-		LOGMASKED(LOG_PORT, "Port A Interrupt: %s\n", (data & COMMAND_IEA) ? "enabled" : "disabled");
-		LOGMASKED(LOG_PORT, "Port B Interrupt: %s\n", (data & COMMAND_IEB) ? "enabled" : "disabled");
-
-		switch (data & COMMAND_PC_MASK)
-		{
-		case COMMAND_PC_ALT_1:
-			LOGMASKED(LOG_PORT, "Port C Mode: Alt 1\n");
-			break;
-
-		case COMMAND_PC_ALT_2:
-			LOGMASKED(LOG_PORT, "Port C Mode: Alt 2\n");
-			break;
-
-		case COMMAND_PC_ALT_3:
-			LOGMASKED(LOG_PORT, "Port C Mode: Alt 3\n");
-			break;
-
-		case COMMAND_PC_ALT_4:
-			LOGMASKED(LOG_PORT, "Port C Mode: Alt 4\n");
-			break;
-		}
-
-		switch (data & COMMAND_TM_MASK)
-		{
-		case COMMAND_TM_NOP:
-			// do not affect counter operation
-			break;
-
-		case COMMAND_TM_STOP:
-			// NOP if timer has not started, stop counting if the timer is running
-			LOGMASKED(LOG_PORT, "Timer Command: Stop\n");
-			timer_stop_count();
-			break;
-
-		case COMMAND_TM_STOP_AFTER_TC:
-			// stop immediately after present TC is reached (NOP if timer has not started)
-			LOGMASKED(LOG_PORT, "Timer Command: Stop after TC\n");
-			break;
-
-		case COMMAND_TM_START:
-			LOGMASKED(LOG_PORT, "Timer Command: Start\n");
-
-			if (m_timer->enabled())
-			{
-				// if timer is running, start the new mode and CNT length immediately after present TC is reached
-			}
-			else
-			{
-				// load mode and CNT length and start immediately after loading (if timer is not running)
-				timer_reload_count();
-			}
-			break;
-		}
+		write_command(data);
 		break;
 
 	case REGISTER_PORT_A:
@@ -539,7 +571,7 @@ void i8155_device::register_w(int offset, uint8_t data)
 //  io_w - register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8155_device::io_w )
+void i8155_device::io_w(offs_t offset, uint8_t data)
 {
 	register_w(offset, data);
 }
@@ -549,7 +581,7 @@ WRITE8_MEMBER( i8155_device::io_w )
 //  memory_r - internal RAM read
 //-------------------------------------------------
 
-READ8_MEMBER( i8155_device::memory_r )
+uint8_t i8155_device::memory_r(offs_t offset)
 {
 	return m_ram[offset & 0xff];
 }
@@ -559,7 +591,7 @@ READ8_MEMBER( i8155_device::memory_r )
 //  memory_w - internal RAM write
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8155_device::memory_w )
+void i8155_device::memory_w(offs_t offset, uint8_t data)
 {
 	m_ram[offset & 0xff] = data;
 }
@@ -569,7 +601,7 @@ WRITE8_MEMBER( i8155_device::memory_w )
 //  ale_w - address latch write
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8155_device::ale_w )
+void i8155_device::ale_w(offs_t offset, uint8_t data)
 {
 	// I/O / memory select
 	m_io_m = BIT(offset, 0);
@@ -580,21 +612,21 @@ WRITE8_MEMBER( i8155_device::ale_w )
 
 
 //-------------------------------------------------
-//  read - memory or I/O read
+//  data_r - memory or I/O read
 //-------------------------------------------------
 
-READ8_MEMBER( i8155_device::read )
+uint8_t i8155_device::data_r()
 {
 	uint8_t data = 0;
 
 	switch (m_io_m)
 	{
 	case MEMORY:
-		data = memory_r(space, m_ad);
+		data = memory_r(m_ad);
 		break;
 
 	case IO:
-		data = io_r(space, m_ad);
+		data = io_r(m_ad);
 		break;
 	}
 
@@ -603,19 +635,19 @@ READ8_MEMBER( i8155_device::read )
 
 
 //-------------------------------------------------
-//  write - memory or I/O write
+//  data_w - memory or I/O write
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8155_device::write )
+void i8155_device::data_w(uint8_t data)
 {
 	switch (m_io_m)
 	{
 	case MEMORY:
-		memory_w(space, m_ad, data);
+		memory_w(m_ad, data);
 		break;
 
 	case IO:
-		io_w(space, m_ad, data);
+		io_w(m_ad, data);
 		break;
 	}
 }

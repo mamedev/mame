@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_CASPER, bbc_tube_casper_device, "bbc_tube_casper", "
 void bbc_tube_casper_device::tube_casper_mem(address_map &map)
 {
 	map(0x00000, 0x03fff).rom().region("casper_rom", 0);
-	map(0x10000, 0x1001f).rw("via6522_1", FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0x00ff);
+	map(0x10000, 0x1001f).m("via6522_1", FUNC(via6522_device::map)).umask16(0x00ff);
 	map(0x20000, 0x3ffff).ram();
 }
 
@@ -35,9 +35,9 @@ void bbc_tube_casper_device::tube_casper_mem(address_map &map)
 //-------------------------------------------------
 
 ROM_START( tube_casper )
-	ROM_REGION(0x4000, "casper_rom", 0)
-	ROM_LOAD16_BYTE("casper.ic9",  0x0000, 0x2000, CRC(4105cbf4) SHA1(a3efeb6fb144da55b47c718239967ed0af4fff72))
-	ROM_LOAD16_BYTE("casper.ic10", 0x0001, 0x2000, CRC(f25bc320) SHA1(297db56283bb3164c31c21331837213cea426837))
+	ROM_REGION16_BE(0x4000, "casper_rom", 0)
+	ROM_LOAD16_BYTE("casper.ic9",  0x0001, 0x2000, CRC(4105cbf4) SHA1(a3efeb6fb144da55b47c718239967ed0af4fff72))
+	ROM_LOAD16_BYTE("casper.ic10", 0x0000, 0x2000, CRC(f25bc320) SHA1(297db56283bb3164c31c21331837213cea426837))
 
 	ROM_REGION(0x8000, "exp_rom", 0)
 	ROM_LOAD("rom1.rom", 0x0000, 0x4000, CRC(602b6a36) SHA1(7b24746dbcacb8772468532e92832d5c7f6648fd))
@@ -109,12 +109,12 @@ void bbc_tube_casper_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_tube_casper_device::host_r)
+uint8_t bbc_tube_casper_device::host_r(offs_t offset)
 {
 	return m_via6522_0->read(offset & 0xf);
 }
 
-WRITE8_MEMBER(bbc_tube_casper_device::host_w)
+void bbc_tube_casper_device::host_w(offs_t offset, uint8_t data)
 {
 	m_via6522_0->write(offset & 0xf, data);
 }

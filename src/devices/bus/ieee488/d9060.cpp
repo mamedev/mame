@@ -123,7 +123,7 @@ void d9060_device_base::hdc_mem(address_map &map)
 {
 	map.global_mask(0x1fff);
 	map(0x0000, 0x007f).mirror(0x300).ram();
-	map(0x0080, 0x008f).mirror(0x370).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0080, 0x008f).mirror(0x370).m(m_via, FUNC(via6522_device::map));
 	map(0x0400, 0x07ff).ram().share("share1");
 	map(0x0800, 0x0bff).ram().share("share2");
 	map(0x0c00, 0x0fff).ram().share("share3");

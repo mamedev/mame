@@ -165,7 +165,6 @@
 #include "machine/wd_fdc.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "sound/wave.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 
@@ -526,10 +525,10 @@ void camplynx_state::lynx128k_io(address_map &map)
 	map(0x0050, 0x0053).mirror(0xff80).r("fdc", FUNC(fd1793_device::read));
 	map(0x0054, 0x0057).mirror(0xff80).w("fdc", FUNC(fd1793_device::write));
 	map(0x0058, 0x0058).mirror(0xff80).w(FUNC(camplynx_state::port58_w));
-//  AM_RANGE(0x007a,0x007b) AM_MIRROR(0xff80) AM_READ(lynx128k_joysticks_r)
-//  AM_RANGE(0x007c,0x007c) AM_MIRROR(0xff80) AM_READ(lynx128k_printer_r)
-//  AM_RANGE(0x007d,0x007d) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_init_w) // this is rw
-//  AM_RANGE(0x007e,0x007e) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_w)
+//  map(0x007a, 0x007b).mirror(0xff80).r(FUNC(camplynx_state::lynx128k_joysticks_r));
+//  map(0x007c, 0x007c).mirror(0xff80).r(FUNC(camplynx_state::lynx128k_printer_r));
+//  map(0x007d, 0x007d).mirror(0xff80).w(FUNC(camplynx_state::lynx128k_printer_init_w)); // this is rw
+//  map(0x007e, 0x007e).mirror(0xff80).w(FUNC(camplynx_state::lynx128k_printer_w));
 	map(0x0080, 0x0080).mirror(0xff00).w(FUNC(camplynx_state::port80_w));
 	map(0x0080, 0x0080).mirror(0xf000).portr("LINE0");
 	map(0x0180, 0x0180).mirror(0xf000).portr("LINE1");
@@ -856,9 +855,7 @@ void camplynx_state::lynx_common(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_6BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.375); // unknown DAC
-	VOLTAGE_REGULATOR(config, "vref").set_output(5.0)
-			.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT).add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.02);
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT).add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void camplynx_state::lynx_disk(machine_config &config)
@@ -868,7 +865,8 @@ void camplynx_state::lynx_disk(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy1, camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats).enable_sound(true);
 }
 
-MACHINE_CONFIG_START(camplynx_state::lynx48k)
+void camplynx_state::lynx48k(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &camplynx_state::lynx48k_mem);
@@ -877,18 +875,19 @@ MACHINE_CONFIG_START(camplynx_state::lynx48k)
 	MCFG_MACHINE_RESET_OVERRIDE(camplynx_state, lynx48k)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(512, 480);
+	screen.set_visarea_full();
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	lynx_common(config);
 
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(lynx48k_cassette_formats);
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cass->set_interface("camplynx_cass");
 
 	/* devices */
@@ -896,12 +895,12 @@ MACHINE_CONFIG_START(camplynx_state::lynx48k)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(camplynx_state::lynx48k_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(camplynx_state::lynx48k_update_row));
 	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("camplynx_cass");
-MACHINE_CONFIG_END
+}
 
 void camplynx_state::lynx96k(machine_config &config)
 {
@@ -915,7 +914,8 @@ void camplynx_state::lynx96k(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("camplynx_flop").set_filter("96K");
 }
 
-MACHINE_CONFIG_START(camplynx_state::lynx128k)
+void camplynx_state::lynx128k(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 24_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &camplynx_state::lynx128k_mem);
@@ -924,18 +924,19 @@ MACHINE_CONFIG_START(camplynx_state::lynx128k)
 	MCFG_MACHINE_RESET_OVERRIDE(camplynx_state, lynx128k)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(512, 480);
+	screen.set_visarea_full();
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	lynx_common(config);
 
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(lynx128k_cassette_formats);
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cass->set_interface("camplynx_cass");
 
 	/* devices */
@@ -943,7 +944,7 @@ MACHINE_CONFIG_START(camplynx_state::lynx128k)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(camplynx_state::lynx128k_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(camplynx_state::lynx128k_update_row));
 	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	lynx_disk(config);
@@ -951,7 +952,7 @@ MACHINE_CONFIG_START(camplynx_state::lynx128k)
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("camplynx_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("camplynx_flop").set_filter("128K");
-MACHINE_CONFIG_END
+}
 
 void camplynx_state::init_lynx48k()
 {

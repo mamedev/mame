@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class terracre_state : public driver_device
 {
@@ -31,8 +32,9 @@ public:
 protected:
 	void amazon_base_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
+
+private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram16_device> m_spriteram;

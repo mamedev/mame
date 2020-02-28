@@ -97,6 +97,7 @@ void tmc600_state::video_start()
 	save_item(NAME(m_vismac_color_latch));
 	save_item(NAME(m_frame));
 	save_item(NAME(m_blink));
+	save_item(NAME(m_out3));
 }
 
 static const gfx_layout tmc600_charlayout =

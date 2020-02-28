@@ -44,15 +44,15 @@ void sv806_device::device_add_mconfig(machine_config &config)
 	screen_device &screen(SCREEN(config, "80col", SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::green());
 	screen.set_raw((XTAL(12'000'000) / 6) * 8, 864, 0, 640, 317, 0, 192);
-	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	HD6845(config, m_crtc, XTAL(12'000'000) / 6);
+	HD6845S(config, m_crtc, XTAL(12'000'000) / 6); // HD6845 (variant not verified)
 	m_crtc->set_screen("80col");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(sv806_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(sv806_device::crtc_update_row));
 }
 
 
@@ -114,7 +114,7 @@ MC6845_UPDATE_ROW( sv806_device::crtc_update_row )
 	}
 }
 
-READ8_MEMBER( sv806_device::mreq_r )
+uint8_t sv806_device::mreq_r(offs_t offset)
 {
 	if (offset >= 0xf000 && m_ram_enabled)
 	{
@@ -125,7 +125,7 @@ READ8_MEMBER( sv806_device::mreq_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( sv806_device::mreq_w )
+void sv806_device::mreq_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xf000 && m_ram_enabled)
 	{
@@ -134,20 +134,20 @@ WRITE8_MEMBER( sv806_device::mreq_w )
 	}
 }
 
-READ8_MEMBER( sv806_device::iorq_r )
+uint8_t sv806_device::iorq_r(offs_t offset)
 {
 	if (offset == 0x51)
-		return m_crtc->register_r(space, 0);
+		return m_crtc->register_r();
 
 	return 0xff;
 }
 
-WRITE8_MEMBER( sv806_device::iorq_w )
+void sv806_device::iorq_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-	case 0x50: m_crtc->address_w(space, 0, data); break;
-	case 0x51: m_crtc->register_w(space, 0, data); break;
+	case 0x50: m_crtc->address_w(data); break;
+	case 0x51: m_crtc->register_w(data); break;
 	case 0x58: m_ram_enabled = data; break;
 	}
 }

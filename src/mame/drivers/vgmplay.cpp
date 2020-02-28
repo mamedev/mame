@@ -223,9 +223,9 @@ public:
 
 	vgmplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -620,17 +620,17 @@ void vgmplay_device::play()
 		device_reset();
 }
 
-uint32_t vgmplay_device::execute_min_cycles() const
+uint32_t vgmplay_device::execute_min_cycles() const noexcept
 {
 	return 0;
 }
 
-uint32_t vgmplay_device::execute_max_cycles() const
+uint32_t vgmplay_device::execute_max_cycles() const noexcept
 {
 	return 65536;
 }
 
-uint32_t vgmplay_device::execute_input_lines() const
+uint32_t vgmplay_device::execute_input_lines() const noexcept
 {
 	return 0;
 }
@@ -2639,7 +2639,7 @@ static const c140_device::C140_TYPE c140_bank_type(uint8_t vgm_type)
 	}
 }
 
-QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
+QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 {
 	m_vgmplay->stop();
 
@@ -2705,6 +2705,16 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		logerror("File version %x.%02x\n", version >> 8, version & 0xff);
 
 		uint32_t data_start = version >= 0x150 ? r32(0x34) + 0x34 : 0x40;
+		int volbyte = version >= 0x160 && data_start >= 0x7d ? r8(0x7c) : 0;
+		logerror("Volume %02x\n", volbyte);
+
+		if (volbyte == 0xc1) // 0x00~0xc0 0~192, 0xc1 -64, 0xc2~0xff -62~-1
+			volbyte = -0x40;
+		else if (volbyte > 0xc1)
+			volbyte -= 0x100;
+
+		float volume = version >= 0x160 && data_start >= 0x7d ? powf(2.0f, float(volbyte) / float(0x20)) : 1.0f;
+
 		uint32_t extra_header_start = version >= 0x170 && data_start >= 0xc0 && r32(0xbc) ? r32(0xbc) + 0xbc : 0;
 		uint32_t header_size = extra_header_start ? extra_header_start : data_start;
 
@@ -2718,10 +2728,13 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 		const auto&& setup_device([&](device_t &device, int chip_num, vgm_chip chip_type, uint32_t offset, uint32_t min_version = 0)
 		{
 			uint32_t c = 0;
+			float chip_volume = volume;
+			bool has_2chip = false;
 
 			if (min_version <= version && offset + 4 <= header_size && (chip_num == 0 || (r32(offset) & 0x40000000) != 0))
 			{
 				c =  r32(offset);
+				has_2chip = (c & 0x40000000) != 0;
 
 				if (chip_clock_start && chip_num != 0)
 					for (auto i(0); i < r8(chip_clock_start); i++)
@@ -2734,7 +2747,13 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
 					}
 			}
 
+			if (has_2chip)
+			{
+				chip_volume /= 2.0f;
+			}
 			device.set_unscaled_clock(c & ~0xc0000000);
+			if (device.unscaled_clock() != 0)
+				dynamic_cast<device_sound_interface *>(&device)->set_output_gain(ALL_OUTPUTS, chip_volume);
 
 			return (c & 0x80000000) != 0;
 		});
@@ -3087,22 +3106,22 @@ WRITE8_MEMBER(vgmplay_state::scc_w)
 		switch (offset >> 1)
 		{
 		case 0x00:
-			m_k051649[Index]->k051649_waveform_w(space, m_scc_reg[Index], data);
+			m_k051649[Index]->k051649_waveform_w(m_scc_reg[Index], data);
 			break;
 		case 0x01:
-			m_k051649[Index]->k051649_frequency_w(space, m_scc_reg[Index], data);
+			m_k051649[Index]->k051649_frequency_w(m_scc_reg[Index], data);
 			break;
 		case 0x02:
-			m_k051649[Index]->k051649_volume_w(space, m_scc_reg[Index], data);
+			m_k051649[Index]->k051649_volume_w(m_scc_reg[Index], data);
 			break;
 		case 0x03:
-			m_k051649[Index]->k051649_keyonoff_w(space, m_scc_reg[Index], data);
+			m_k051649[Index]->k051649_keyonoff_w(data);
 			break;
 		case 0x04:
-			m_k051649[Index]->k052539_waveform_w(space, m_scc_reg[Index], data);
+			m_k051649[Index]->k052539_waveform_w(m_scc_reg[Index], data);
 			break;
 		case 0x05:
-			m_k051649[Index]->k051649_test_w(space, m_scc_reg[Index], data);
+			m_k051649[Index]->k051649_test_w(data);
 			break;
 		}
 		break;
@@ -3114,7 +3133,7 @@ INPUT_CHANGED_MEMBER(vgmplay_state::key_pressed)
 	if (!newval)
 		return;
 
-	int val = (uint8_t)(uintptr_t)param;
+	int val = (uint8_t)param;
 	switch (val)
 	{
 	case VGMPLAY_STOP:
@@ -3178,8 +3197,8 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_YM3526_1, vgmplay_device::A_YM3526_1 + 1).w(m_ym3526[1], FUNC(ym3526_device::write));
 	map(vgmplay_device::A_Y8950_0, vgmplay_device::A_Y8950_0 + 1).w(m_y8950[0], FUNC(y8950_device::write));
 	map(vgmplay_device::A_Y8950_1, vgmplay_device::A_Y8950_1 + 1).w(m_y8950[1], FUNC(y8950_device::write));
-	map(vgmplay_device::A_YMF262_0, vgmplay_device::A_YMF262_0 + 1).w(m_ymf262[0], FUNC(ymf262_device::write));
-	map(vgmplay_device::A_YMF262_1, vgmplay_device::A_YMF262_1 + 1).w(m_ymf262[1], FUNC(ymf262_device::write));
+	map(vgmplay_device::A_YMF262_0, vgmplay_device::A_YMF262_0 + 3).w(m_ymf262[0], FUNC(ymf262_device::write));
+	map(vgmplay_device::A_YMF262_1, vgmplay_device::A_YMF262_1 + 3).w(m_ymf262[1], FUNC(ymf262_device::write));
 	map(vgmplay_device::A_YMF278B_0, vgmplay_device::A_YMF278B_0 + 0xf).w(m_ymf278b[0], FUNC(ymf278b_device::write));
 	map(vgmplay_device::A_YMF278B_1, vgmplay_device::A_YMF278B_1 + 0xf).w(m_ymf278b[1], FUNC(ymf278b_device::write));
 	map(vgmplay_device::A_YMF271_0, vgmplay_device::A_YMF271_0 + 0xf).w(m_ymf271[0], FUNC(ymf271_device::write));
@@ -3207,11 +3226,11 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_MULTIPCM_1 + 4, vgmplay_device::A_MULTIPCM_1 + 7).w("vgmplay", FUNC(vgmplay_device::multipcm_bank_hi_w<1>));
 	map(vgmplay_device::A_MULTIPCM_1 + 8, vgmplay_device::A_MULTIPCM_1 + 11).w("vgmplay", FUNC(vgmplay_device::multipcm_bank_lo_w<1>));
 	map(vgmplay_device::A_UPD7759_0 + 0, vgmplay_device::A_UPD7759_0 + 0).w(FUNC(vgmplay_state::upd7759_reset_w<0>));
-	map(vgmplay_device::A_UPD7759_0 + 1, vgmplay_device::A_UPD7759_0 + 1).lw8("upd7759.0.start", [this](uint8_t data) {m_upd7759[0]->start_w(data != 0); });
+	map(vgmplay_device::A_UPD7759_0 + 1, vgmplay_device::A_UPD7759_0 + 1).lw8(NAME([this](uint8_t data) {m_upd7759[0]->start_w(data != 0); }));
 	map(vgmplay_device::A_UPD7759_0 + 2, vgmplay_device::A_UPD7759_0 + 2).w(FUNC(vgmplay_state::upd7759_data_w<0>));
 	map(vgmplay_device::A_UPD7759_0 + 3, vgmplay_device::A_UPD7759_0 + 3).w("vgmplay", FUNC(vgmplay_device::upd7759_bank_w<0>));
 	map(vgmplay_device::A_UPD7759_1 + 0, vgmplay_device::A_UPD7759_1 + 0).w(FUNC(vgmplay_state::upd7759_reset_w<1>));
-	map(vgmplay_device::A_UPD7759_1 + 1, vgmplay_device::A_UPD7759_1 + 1).lw8("upd7759.1.start", [this](uint8_t data) {m_upd7759[1]->start_w(data != 0); });
+	map(vgmplay_device::A_UPD7759_1 + 1, vgmplay_device::A_UPD7759_1 + 1).lw8(NAME([this](uint8_t data) {m_upd7759[1]->start_w(data != 0); }));
 	map(vgmplay_device::A_UPD7759_1 + 2, vgmplay_device::A_UPD7759_1 + 2).w(FUNC(vgmplay_state::upd7759_data_w<1>));
 	map(vgmplay_device::A_UPD7759_1 + 3, vgmplay_device::A_UPD7759_1 + 3).w("vgmplay", FUNC(vgmplay_device::upd7759_bank_w<1>));
 	map(vgmplay_device::A_OKIM6258_0 + 0x0, vgmplay_device::A_OKIM6258_0 + 0x0).w(m_okim6258[0], FUNC(okim6258_device::ctrl_w));
@@ -3270,7 +3289,7 @@ void vgmplay_state::soundchips_map(address_map &map)
 
 void vgmplay_state::soundchips16_map(address_map &map)
 {
-	map(vgmplay_device::A_32X_PWM, vgmplay_device::A_32X_PWM + 0xf).w(m_sega32x, FUNC(sega_32x_device::_32x_pwm_w));
+	map(vgmplay_device::A_32X_PWM, vgmplay_device::A_32X_PWM + 0xf).w(m_sega32x, FUNC(sega_32x_device::pwm_w));
 	map(vgmplay_device::A_SCSP_0, vgmplay_device::A_SCSP_0 + 0xfff).w(m_scsp[0], FUNC(scsp_device::write));
 	map(vgmplay_device::A_SCSP_1, vgmplay_device::A_SCSP_1 + 0xfff).w(m_scsp[1], FUNC(scsp_device::write));
 	map(vgmplay_device::A_SCSP_RAM_0, vgmplay_device::A_SCSP_RAM_0 + 0xfffff).ram().share("scsp_ram.0");
@@ -3429,14 +3448,16 @@ void vgmplay_state::rf5c164_map(address_map &map)
 	map(0, 0xffff).ram().share("rf5c164_ram");
 }
 
-MACHINE_CONFIG_START(vgmplay_state::vgmplay)
+void vgmplay_state::vgmplay(machine_config &config)
+{
 	VGMPLAY(config, m_vgmplay, 44100);
 	m_vgmplay->set_addrmap(AS_PROGRAM, &vgmplay_state::file_map);
 	m_vgmplay->set_addrmap(AS_IO, &vgmplay_state::soundchips_map);
 	m_vgmplay->set_addrmap(AS_IO16, &vgmplay_state::soundchips16_map);
 
-	MCFG_QUICKLOAD_ADD("quickload", vgmplay_state, load_file, "vgm,vgz", 0)
-	MCFG_QUICKLOAD_INTERFACE("vgm_quik")
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "vgm,vgz"));
+	quickload.set_load_callback(FUNC(vgmplay_state::load_file));
+	quickload.set_interface("vgm_quik");
 
 	SOFTWARE_LIST(config, "vgm_list").set_original("vgmplay");
 
@@ -3455,8 +3476,8 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_ym2413[0]->add_route(ALL_OUTPUTS, "rspeaker", 1);
 
 	YM2413(config, m_ym2413[1], 0);
-	m_ym2413[1]->add_route(0, "lspeaker", 1);
-	m_ym2413[1]->add_route(1, "rspeaker", 1);
+	m_ym2413[1]->add_route(ALL_OUTPUTS, "lspeaker", 1);
+	m_ym2413[1]->add_route(ALL_OUTPUTS, "rspeaker", 1);
 
 	YM2612(config, m_ym2612[0], 0);
 	m_ym2612[0]->add_route(0, "lspeaker", 1);
@@ -3501,13 +3522,17 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	// TODO: prevent error.log spew
 	YM2608(config, m_ym2608[0], 0);
 	m_ym2608[0]->set_addrmap(0, &vgmplay_state::ym2608_map<0>);
-	m_ym2608[0]->add_route(ALL_OUTPUTS, "lspeaker", 1);
-	m_ym2608[0]->add_route(ALL_OUTPUTS, "rspeaker", 1);
+	m_ym2608[0]->add_route(0, "lspeaker", 0.25);
+	m_ym2608[0]->add_route(0, "rspeaker", 0.25);
+	m_ym2608[0]->add_route(1, "lspeaker", 1.00);
+	m_ym2608[0]->add_route(2, "rspeaker", 1.00);
 
 	YM2608(config, m_ym2608[1], 0);
 	m_ym2608[1]->set_addrmap(0, &vgmplay_state::ym2608_map<1>);
-	m_ym2608[1]->add_route(ALL_OUTPUTS, "lspeaker", 1);
-	m_ym2608[1]->add_route(ALL_OUTPUTS, "rspeaker", 1);
+	m_ym2608[1]->add_route(0, "lspeaker", 0.25);
+	m_ym2608[1]->add_route(0, "rspeaker", 0.25);
+	m_ym2608[1]->add_route(1, "lspeaker", 1.00);
+	m_ym2608[1]->add_route(2, "rspeaker", 1.00);
 
 	// TODO: prevent error.log spew
 	YM2610(config, m_ym2610[0], 0);
@@ -3553,44 +3578,60 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_y8950[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.40);
 
 	YMF262(config, m_ymf262[0], 0);
-	m_ymf262[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
-	m_ymf262[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
+	m_ymf262[0]->add_route(0, "lspeaker", 1.00);
+	m_ymf262[0]->add_route(1, "rspeaker", 1.00);
+	m_ymf262[0]->add_route(2, "lspeaker", 1.00);
+	m_ymf262[0]->add_route(3, "rspeaker", 1.00);
 
 	YMF262(config, m_ymf262[1], 0);
-	m_ymf262[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
-	m_ymf262[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
+	m_ymf262[1]->add_route(0, "lspeaker", 1.00);
+	m_ymf262[1]->add_route(1, "rspeaker", 1.00);
+	m_ymf262[1]->add_route(2, "lspeaker", 1.00);
+	m_ymf262[1]->add_route(3, "rspeaker", 1.00);
 
 	// TODO: prevent error.log spew
 	YMF278B(config, m_ymf278b[0], 0);
 	m_ymf278b[0]->set_addrmap(0, &vgmplay_state::ymf278b_map<0>);
-	m_ymf278b[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_ymf278b[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_ymf278b[0]->add_route(0, "lspeaker", 1.00);
+	m_ymf278b[0]->add_route(1, "rspeaker", 1.00);
+	m_ymf278b[0]->add_route(2, "lspeaker", 1.00);
+	m_ymf278b[0]->add_route(3, "rspeaker", 1.00);
+	m_ymf278b[0]->add_route(4, "lspeaker", 1.00);
+	m_ymf278b[0]->add_route(5, "rspeaker", 1.00);
 
 	YMF278B(config, m_ymf278b[1], 0);
 	m_ymf278b[1]->set_addrmap(0, &vgmplay_state::ymf278b_map<1>);
-	m_ymf278b[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_ymf278b[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_ymf278b[1]->add_route(0, "lspeaker", 1.00);
+	m_ymf278b[1]->add_route(1, "rspeaker", 1.00);
+	m_ymf278b[1]->add_route(2, "lspeaker", 1.00);
+	m_ymf278b[1]->add_route(3, "rspeaker", 1.00);
+	m_ymf278b[1]->add_route(4, "lspeaker", 1.00);
+	m_ymf278b[1]->add_route(5, "rspeaker", 1.00);
 
 	YMF271(config, m_ymf271[0], 0);
 	m_ymf271[0]->set_addrmap(0, &vgmplay_state::ymf271_map<0>);
-	m_ymf271[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_ymf271[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_ymf271[0]->add_route(0, "lspeaker", 0.25);
+	m_ymf271[0]->add_route(1, "rspeaker", 0.25);
+	m_ymf271[0]->add_route(2, "lspeaker", 0.25);
+	m_ymf271[0]->add_route(3, "rspeaker", 0.25);
 
 	YMF271(config, m_ymf271[1], 0);
 	m_ymf271[1]->set_addrmap(0, &vgmplay_state::ymf271_map<0>);
-	m_ymf271[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_ymf271[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_ymf271[1]->add_route(0, "lspeaker", 0.25);
+	m_ymf271[1]->add_route(1, "rspeaker", 0.25);
+	m_ymf271[1]->add_route(2, "lspeaker", 0.25);
+	m_ymf271[1]->add_route(3, "rspeaker", 0.25);
 
 	// TODO: prevent error.log spew
 	YMZ280B(config, m_ymz280b[0], 0);
 	m_ymz280b[0]->set_addrmap(0, &vgmplay_state::ymz280b_map<0>);
-	m_ymz280b[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_ymz280b[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_ymz280b[0]->add_route(0, "lspeaker", 0.25);
+	m_ymz280b[0]->add_route(1, "rspeaker", 0.25);
 
 	YMZ280B(config, m_ymz280b[1], 0);
 	m_ymz280b[1]->set_addrmap(0, &vgmplay_state::ymz280b_map<1>);
-	m_ymz280b[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_ymz280b[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_ymz280b[1]->add_route(0, "lspeaker", 0.25);
+	m_ymz280b[1]->add_route(1, "rspeaker", 0.25);
 
 	RF5C164(config, m_rf5c164, 0);
 	m_rf5c164->set_addrmap(0, &vgmplay_state::rf5c164_map<0>);
@@ -3599,14 +3640,13 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 
 	/// TODO: rewrite to generate audio without using DAC devices
 	SEGA_32X_NTSC(config, m_sega32x, 0, "sega32x_maincpu", "sega32x_scanline_timer");
-	m_sega32x->set_palette_tag("sega32x_palette");
+	m_sega32x->add_route(0, "lspeaker", 1.00);
+	m_sega32x->add_route(1, "rspeaker", 1.00);
 
 	auto& sega32x_maincpu(M68000(config, "sega32x_maincpu", 0));
 	sega32x_maincpu.set_disable();
 
 	TIMER(config, "sega32x_scanline_timer", 0);
-
-	PALETTE(config, "sega32x_palette").set_entries(0xc0 * 2);
 
 	m_sega32x->subdevice<cpu_device>("32x_master_sh2")->set_disable();
 	m_sega32x->subdevice<cpu_device>("32x_slave_sh2")->set_disable();
@@ -3631,20 +3671,14 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	N2A03(config, m_nescpu[0], 0);
 	m_nescpu[0]->set_addrmap(AS_PROGRAM, &vgmplay_state::nescpu_map<0>);
 	m_nescpu[0]->set_disable();
-
-	auto *nesapu_0(dynamic_cast<device_sound_interface *>(config.device_find(m_nescpu[0], "nesapu")));
-	nesapu_0->reset_routes();
-	nesapu_0->add_route(ALL_OUTPUTS, ":lspeaker", 0.50);
-	nesapu_0->add_route(ALL_OUTPUTS, ":rspeaker", 0.50);
+	m_nescpu[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_nescpu[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	N2A03(config, m_nescpu[1], 0);
 	m_nescpu[1]->set_addrmap(AS_PROGRAM, &vgmplay_state::nescpu_map<1>);
 	m_nescpu[1]->set_disable();
-
-	auto *nesapu_1(dynamic_cast<device_sound_interface *>(config.device_find(m_nescpu[1], "nesapu")));
-	nesapu_1->reset_routes();
-	nesapu_1->add_route(ALL_OUTPUTS, ":lspeaker", 0.50);
-	nesapu_1->add_route(ALL_OUTPUTS, ":rspeaker", 0.50);
+	m_nescpu[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_nescpu[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	MULTIPCM(config, m_multipcm[0], 0);
 	m_multipcm[0]->set_addrmap(0, &vgmplay_state::multipcm_map<0>);
@@ -3798,13 +3832,15 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 
 	ES5505(config, m_es5505[0], 0);
 	// TODO m_es5505[0]->set_addrmap(0, &vgmplay_state::es5505_map<0>);
-	m_es5505[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_es5505[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_es5505[0]->set_channels(1);
+	m_es5505[0]->add_route(0, "lspeaker", 0.5);
+	m_es5505[0]->add_route(1, "rspeaker", 0.5);
 
 	ES5505(config, m_es5505[1], 0);
 	// TODO m_es5505[1]->set_addrmap(0, &vgmplay_state::es5505_map<1>);
-	m_es5505[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_es5505[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_es5505[1]->set_channels(1);
+	m_es5505[1]->add_route(0, "lspeaker", 0.5);
+	m_es5505[1]->add_route(1, "rspeaker", 0.5);
 
 	X1_010(config, m_x1_010[0], 0);
 	m_x1_010[0]->set_addrmap(0, &vgmplay_state::x1_010_map<0>);
@@ -3820,11 +3856,15 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_c352[0]->set_addrmap(0, &vgmplay_state::c352_map<0>);
 	m_c352[0]->add_route(0, "lspeaker", 1);
 	m_c352[0]->add_route(1, "rspeaker", 1);
+	m_c352[0]->add_route(2, "lspeaker", 1);
+	m_c352[0]->add_route(3, "rspeaker", 1);
 
 	C352(config, m_c352[1], 0, 1);
 	m_c352[1]->set_addrmap(0, &vgmplay_state::c352_map<1>);
 	m_c352[1]->add_route(0, "lspeaker", 1);
 	m_c352[1]->add_route(1, "rspeaker", 1);
+	m_c352[1]->add_route(2, "lspeaker", 1);
+	m_c352[1]->add_route(3, "rspeaker", 1);
 
 	IREMGA20(config, m_ga20[0], 0);
 	m_ga20[0]->set_addrmap(0, &vgmplay_state::ga20_map<0>);
@@ -3838,14 +3878,14 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 
 	SPEAKER(config, m_lspeaker).front_left();
 	SPEAKER(config, m_rspeaker).front_right();
-MACHINE_CONFIG_END
+}
 
 ROM_START( vgmplay )
 	// TODO: split up 32x to remove dependencies
 	ROM_REGION( 0x4000, "master", ROMREGION_ERASE00 )
 	ROM_REGION( 0x4000, "slave", ROMREGION_ERASE00 )
 	ROM_REGION( 0x400000, "gamecart", ROMREGION_ERASE00 )
-	ROM_REGION( 0x400000, "gamecart_sh2", ROMREGION_ERASE00 )
+	ROM_REGION32_BE( 0x400000, "gamecart_sh2", ROMREGION_ERASE00 )
 ROM_END
 
 CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, empty_init, "MAME", "VGM player", MACHINE_CLICKABLE_ARTWORK )

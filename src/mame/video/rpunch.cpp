@@ -71,8 +71,8 @@ VIDEO_START_MEMBER(rpunch_state,rpunch)
 	m_sprite_xoffs = 0;
 
 	/* allocate tilemaps for the backgrounds */
-	m_background[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rpunch_state::get_bg0_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,64);
-	m_background[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rpunch_state::get_bg1_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,64);
+	m_background[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rpunch_state::get_bg0_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 64);
+	m_background[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rpunch_state::get_bg1_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 64);
 
 	/* configure the tilemaps */
 	m_background[1]->set_transparent_pen(15);
@@ -154,7 +154,7 @@ WRITE16_MEMBER(rpunch_state::rpunch_scrollreg_w)
 
 WRITE8_MEMBER(rpunch_state::rpunch_gga_w)
 {
-	m_gga->write(space, offset >> 4, data & 0xff);
+	m_gga->write(space, offset >> 5, data & 0xff);
 }
 
 

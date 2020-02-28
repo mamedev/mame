@@ -146,12 +146,12 @@ WRITE8_MEMBER(cmmb_state::cmmb_charram_w)
 
 READ8_MEMBER(cmmb_state::flash_r)
 {
-	return m_flash->read(space, offset + 0x2000);
+	return m_flash->read(offset + 0x2000);
 }
 
 WRITE8_MEMBER(cmmb_state::flash_w)
 {
-	m_flash->write(space, offset + 0x2000, data);
+	m_flash->write(offset + 0x2000, data);
 }
 
 READ8_MEMBER(cmmb_state::cmmb_input_r)
@@ -212,7 +212,7 @@ WRITE8_MEMBER(cmmb_state::cmmb_output_w)
 void cmmb_state::cmmb_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram(); /* zero page address */
-//  AM_RANGE(0x13c0, 0x13ff) AM_RAM //spriteram
+//  map(0x13c0, 0x13ff).ram(); //spriteram
 	map(0x1000, 0x1fff).ram().share("videoram");
 	map(0x2000, 0x9fff).m(m_bnk2000, FUNC(address_map_bank_device::amap8));
 	map(0xa000, 0xafff).ram();
@@ -416,31 +416,31 @@ void cmmb_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(cmmb_state::cmmb)
-
+void cmmb_state::cmmb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M65SC02, MAIN_CLOCK/5) // Unknown clock, but chip rated for 14MHz
-	MCFG_DEVICE_PROGRAM_MAP(cmmb_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cmmb_state, vblank_irq)
+	M65SC02(config, m_maincpu, MAIN_CLOCK/5); // Unknown clock, but chip rated for 14MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmmb_state::cmmb_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cmmb_state::vblank_irq));
 
 	AT29C020(config, "at29c020");
 
 	ADDRESS_MAP_BANK(config, "bnk2000").set_map(&cmmb_state::bnk2000_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x8000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/12, 384, 0, 256, 264, 0, 240) // TBD, not real measurements
-	MCFG_SCREEN_UPDATE_DRIVER(cmmb_state, screen_update_cmmb)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MAIN_CLOCK/12, 384, 0, 256, 264, 0, 240); // TBD, not real measurements
+	screen.set_screen_update(FUNC(cmmb_state::screen_update_cmmb));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cmmb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cmmb);
 
 	PALETTE(config, m_palette).set_format(palette_device::RGB_332_inverted, 512);
 
 	/* sound hardware */
 //  SPEAKER(config, "mono").front_center();
 //  AY8910(config, "aysnd", 8000000/4).add_route(ALL_OUTPUTS, "mono", 0.30);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -458,4 +458,14 @@ ROM_START( cmmb162 )
 	ROM_REGION( 0x1000, "gfx", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( cmmb103 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_LOAD( "cmm103.u2",    0x10000, 0x40000, CRC(5e925b6b) SHA1(ac675d65bf5cdbd8b0456bb23e46bb00dcae916a) )
+	ROM_COPY( "maincpu",      0x18000, 0x08000, 0x08000 )
+	//ROM_FILL( 0x1c124, 2, 0xea ) // temporary patch to avoid waiting on IRQs
+
+	ROM_REGION( 0x1000, "gfx", ROMREGION_ERASE00 )
+ROM_END
+
+GAME( 2001, cmmb103, 0, cmmb, cmmb, cmmb_state, empty_init, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command (rev 1.03)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 GAME( 2002, cmmb162, 0, cmmb, cmmb, cmmb_state, empty_init, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command / Let's Go Bowling (rev 1.62)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

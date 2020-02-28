@@ -30,7 +30,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_mainram(*this, "mainram"),
-		m_otherram(*this, "otherram")
+		m_otherram(*this, "otherram"),
+		m_bootcopy(0)
 	{ }
 
 	void monon_color(machine_config &config);
@@ -51,9 +52,10 @@ private:
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_otherram;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(monon_color_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void monon_color_map(address_map &map);
+	int m_bootcopy;
 };
 
 void monon_color_state::machine_start()
@@ -63,31 +65,7 @@ void monon_color_state::machine_start()
 
 	memcpy(maincpu, flash+0x200, 0x1e00); // 0x4000-0x5dff fixed code?
 
-	// there are a whole bunch of blocks that map at 0x5e00 (boot code jumps straight to 0x5e00)
 
-	memcpy(maincpu+0x1e00, flash+0x2000, 0x1000); // clears RAM, sets up stack etc. but then jumps to 0x9xxx where we have nothing (probably the correct initial block tho)
-//  memcpy(maincpu+0x1e00, flash+0x4200, 0x1000); // just set register + a jump (to function that writes to UART)
-//  memcpy(maincpu+0x1e00, flash+0x4c00, 0x1000);
-//  memcpy(maincpu+0x1e00, flash+0x5600, 0x1000);
-//  memcpy(maincpu+0x1e00, flash+0x6000, 0x1000); // ends up reting with nothing on the stack
-//  memcpy(maincpu+0x1e00, flash+0x6a00, 0x1000);
-//  memcpy(maincpu+0x1e00, flash+0x7e00, 0x1000);
-//  memcpy(maincpu+0x1e00, flash+0x8800, 0x1000);
-//  memcpy(maincpu+0x1e00, flash+0x9200, 0x1000);
-
-	/*  block starting at e000 in flash is not code? (or encrypted?)
-	    no code to map at 0x9000 in address space (possible BIOS?)
-	    no code in flash ROM past the first 64kb(?) which is basically the same on all games, must be some kind of script interpreter? J2ME maybe?
-
-	    there are 4 different 'versions' of the code in the dumped ROMs, where the code is the same the roms match up until 0x50000 after which the game specific data starts
-
-	    by game number:
-
-	    101,102,103,104,105          (1st revision)
-	    106,107                      (2nd revision)
-	    201                          (3rd revision)
-	    202,203,204,205,301,303,304  (4th revision)
-	*/
 }
 
 
@@ -95,6 +73,44 @@ void monon_color_state::machine_start()
 void monon_color_state::machine_reset()
 {
 	m_maincpu->set_state_int(MCS51_PC, 0x4000);
+
+	uint8_t* flash = memregion("flash")->base();
+	uint8_t* maincpu = &m_mainram[0];
+
+	memset(maincpu + 0x1e00, 0x00, 0x1000);
+
+	switch (m_bootcopy)
+	{
+	// there are a whole bunch of blocks that map at 0x5e00 (boot code jumps straight to 0x5e00)
+	case 0x0: memcpy(maincpu + 0x1e00, flash + 0x2000, 0x1000); break; // BANK0 - clears RAM, sets up stack etc. but then jumps to 0x9xxx where we have nothing (probably the correct initial block tho)
+	case 0x1: memcpy(maincpu + 0x1e00, flash + 0x4200, 0x0a00); break; // BANK1 - just set register + a jump (to function that writes to UART)
+	case 0x2: memcpy(maincpu + 0x1e00, flash + 0x4c00, 0x0a00); break; // BANK2
+	case 0x3: memcpy(maincpu + 0x1e00, flash + 0x5600, 0x0a00); break; // BANK3
+	case 0x4: memcpy(maincpu + 0x1e00, flash + 0x6000, 0x0a00); break; // BANK4 - ends up reting with nothing on the stack
+	case 0x5: memcpy(maincpu + 0x1e00, flash + 0x6a00, 0x0a00); break; // BANK5
+	case 0x6: memcpy(maincpu + 0x1e00, flash + 0x7400, 0x0a00); break; // BANK6
+	case 0x7: memcpy(maincpu + 0x1e00, flash + 0x7e00, 0x0a00); break; // BANK7
+	case 0x8: memcpy(maincpu + 0x1e00, flash + 0x8800, 0x0a00); break; // BANK8
+	case 0x9: memcpy(maincpu + 0x1e00, flash + 0x9200, 0x0a00); break; // BANK9
+	}
+
+	m_bootcopy++;
+	if (m_bootcopy == 0xa) m_bootcopy = 0x0;
+
+	/*  block starting at e000 in flash is not code? (or encrypted?)
+	    no code to map at 0x9000 in address space (possible BIOS?)
+	    no code in flash ROM past the first 64kb(?) which is basically the same on all games, must be some kind of script interpreter? J2ME maybe?
+
+	    there are 5 different 'versions' of the code in the dumped ROMs, where the code is the same the roms match up until 0x50000 after which the game specific data starts
+
+	    by game number:
+
+	    103alt                           (earliest? doesn't have bank9)
+	    101,102,103,104,105              (1st revision)
+	    106,107                          (2nd revision)
+	    201                              (3rd revision)
+	    202,203,204,205,301,302,303,304  (4th revision)
+	*/
 }
 
 void monon_color_state::video_start()
@@ -116,37 +132,36 @@ void monon_color_state::monon_color_map(address_map &map)
 	map(0x9000, 0x9fff).ram().share("otherram"); // lots of jumps to here, is there some kind of BIOS? none of the code appears to map here?
 }
 
-MACHINE_CONFIG_START(monon_color_state::monon_color)
-
+void monon_color_state::monon_color(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", AX208, 96000000) // (8051 / MCS51 derived) incomplete core!
-	MCFG_DEVICE_PROGRAM_MAP(monon_color_map)
+	AX208(config, m_maincpu, 96000000); // (8051 / MCS51 derived) incomplete core!
+	m_maincpu->set_addrmap(AS_PROGRAM, &monon_color_state::monon_color_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(monon_color_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_screen_update(FUNC(monon_color_state::screen_update));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "monon_color_cart")
-	MCFG_GENERIC_EXTENSIONS("bin")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM8_WIDTH)
-	MCFG_GENERIC_LOAD(monon_color_state, monon_color_cart)
-	MCFG_GENERIC_MANDATORY
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "monon_color_cart", "bin"));
+	cartslot.set_width(GENERIC_ROM8_WIDTH);
+	cartslot.set_device_load(FUNC(monon_color_state::cart_load));
+	cartslot.set_must_be_loaded(true);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("monon_color");
-MACHINE_CONFIG_END
+}
 
-DEVICE_IMAGE_LOAD_MEMBER( monon_color_state, monon_color_cart )
+DEVICE_IMAGE_LOAD_MEMBER( monon_color_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 	std::vector<uint8_t> temp;

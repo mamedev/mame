@@ -1,26 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde, Barry Rodewald, Carl, Philip Bennett
-#define OP_I386         0x1
-#define OP_FPU          0x2
-#define OP_I486         0x4
-#define OP_PENTIUM      0x8
-#define OP_MMX          0x10
-#define OP_PPRO         0x20
-#define OP_SSE          0x40
-#define OP_SSE2         0x80
-#define OP_SSE3         0x100
-#define OP_CYRIX        0x8000
-#define OP_2BYTE        0x80000000
-#define OP_3BYTE66      0x40000000
-#define OP_3BYTEF2      0x20000000
-#define OP_3BYTEF3      0x10000000
-#define OP_3BYTE38      0x08000000
-#define OP_3BYTE3A      0x04000000
-#define OP_4BYTE3866    0x02000000
-#define OP_4BYTE3A66    0x01000000
-#define OP_4BYTE38F2    0x00800000
-#define OP_4BYTE3AF2    0x00400000
-#define OP_4BYTE38F3    0x00200000
 
 const i386_device::X86_OPCODE i386_device::s_x86_opcode_table[] =
 {
@@ -181,6 +160,7 @@ const i386_device::X86_OPCODE i386_device::s_x86_opcode_table[] =
 	{ 0x99,     OP_I386,                    &i386_device::i386_cwd,                    &i386_device::i386_cdq,                false},
 	{ 0x9A,     OP_I386,                    &i386_device::i386_call_abs16,             &i386_device::i386_call_abs32,         false},
 	{ 0x9B,     OP_I386,                    &i386_device::i386_wait,                   &i386_device::i386_wait,               false},
+	{ 0x9B,     OP_I486,                    &i386_device::i486_wait,                   &i386_device::i486_wait,               false},
 	{ 0x9C,     OP_I386,                    &i386_device::i386_pushf,                  &i386_device::i386_pushfd,             false},
 	{ 0x9D,     OP_I386,                    &i386_device::i386_popf,                   &i386_device::i386_popfd,              false},
 	{ 0x9E,     OP_I386,                    &i386_device::i386_sahf,                   &i386_device::i386_sahf,               false},
@@ -450,13 +430,13 @@ const i386_device::X86_OPCODE i386_device::s_x86_opcode_table[] =
 	{ 0xB4,     OP_2BYTE|OP_I386,           &i386_device::i386_lfs16,                  &i386_device::i386_lfs32,              false},
 	{ 0xB5,     OP_2BYTE|OP_I386,           &i386_device::i386_lgs16,                  &i386_device::i386_lgs32,              false},
 	{ 0xB6,     OP_2BYTE|OP_I386,           &i386_device::i386_movzx_r16_rm8,          &i386_device::i386_movzx_r32_rm8,      false},
-	{ 0xB7,     OP_2BYTE|OP_I386,           &i386_device::i386_invalid,                &i386_device::i386_movzx_r32_rm16,     false},
+	{ 0xB7,     OP_2BYTE|OP_I386,           &i386_device::i386_mov_r16_rm16,           &i386_device::i386_movzx_r32_rm16,     false},
 	{ 0xBA,     OP_2BYTE|OP_I386,           &i386_device::i386_group0FBA_16,           &i386_device::i386_group0FBA_32,       true },
 	{ 0xBB,     OP_2BYTE|OP_I386,           &i386_device::i386_btc_rm16_r16,           &i386_device::i386_btc_rm32_r32,       true },
 	{ 0xBC,     OP_2BYTE|OP_I386,           &i386_device::i386_bsf_r16_rm16,           &i386_device::i386_bsf_r32_rm32,       false},
 	{ 0xBD,     OP_2BYTE|OP_I386,           &i386_device::i386_bsr_r16_rm16,           &i386_device::i386_bsr_r32_rm32,       false},
 	{ 0xBE,     OP_2BYTE|OP_I386,           &i386_device::i386_movsx_r16_rm8,          &i386_device::i386_movsx_r32_rm8,      false},
-	{ 0xBF,     OP_2BYTE|OP_I386,           &i386_device::i386_invalid,                &i386_device::i386_movsx_r32_rm16,     false},
+	{ 0xBF,     OP_2BYTE|OP_I386,           &i386_device::i386_mov_r16_rm16,           &i386_device::i386_movsx_r32_rm16,     false},
 	{ 0xC0,     OP_2BYTE|OP_I486,           &i386_device::i486_xadd_rm8_r8,            &i386_device::i486_xadd_rm8_r8,        true },
 	{ 0xC1,     OP_2BYTE|OP_I486,           &i386_device::i486_xadd_rm16_r16,          &i386_device::i486_xadd_rm32_r32,      true },
 	{ 0xC2,     OP_2BYTE|OP_SSE,            &i386_device::sse_cmpps_r128_rm128_i8,     &i386_device::sse_cmpps_r128_rm128_i8, false},

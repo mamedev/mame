@@ -18,7 +18,6 @@
 #include "cpu/m6800/m6800.h"
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -174,9 +173,9 @@ void bmjr_state::bmjr_mem(address_map &map)
 	map(0x0000, 0xafff).ram().share("wram");
 	map(0xb000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).rom();
-//  AM_RANGE(0xe890, 0xe890) W MP-1710 tile color
-//  AM_RANGE(0xe891, 0xe891) W MP-1710 background color
-//  AM_RANGE(0xe892, 0xe892) W MP-1710 monochrome / color setting
+//  map(0xe890, 0xe890) W MP-1710 tile color
+//  map(0xe891, 0xe891) W MP-1710 background color
+//  map(0xe892, 0xe892) W MP-1710 monochrome / color setting
 	map(0xee00, 0xee00).r(FUNC(bmjr_state::tape_stop_r)); //R stop tape
 	map(0xee20, 0xee20).r(FUNC(bmjr_state::tape_start_r)); //R start tape
 	map(0xee40, 0xee40).w(FUNC(bmjr_state::xor_display_w)); //W Picture reverse
@@ -185,7 +184,7 @@ void bmjr_state::bmjr_mem(address_map &map)
 	map(0xef00, 0xef00).r(FUNC(bmjr_state::ff_r)); //R timer
 	map(0xef40, 0xef40).r(FUNC(bmjr_state::ff_r)); //R unknown
 	map(0xef80, 0xef80).r(FUNC(bmjr_state::unk_r)); //R unknown
-//  AM_RANGE(0xefe0, 0xefe0) W screen mode
+//  map(0xefe0, 0xefe0) W screen mode
 	map(0xf000, 0xffff).rom();
 }
 
@@ -337,33 +336,34 @@ void bmjr_state::machine_reset()
 	m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
-MACHINE_CONFIG_START(bmjr_state::bmjr)
+void bmjr_state::bmjr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6800, XTAL(4'000'000)/4) //unknown clock / divider
-	MCFG_DEVICE_PROGRAM_MAP(bmjr_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bmjr_state,  irq0_line_hold)
+	M6800(config, m_maincpu, XTAL(4'000'000)/4); //unknown clock / divider
+	m_maincpu->set_addrmap(AS_PROGRAM, &bmjr_state::bmjr_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(bmjr_state::irq0_line_hold));
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256, 192)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bmjr_state, screen_update_bmjr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 192);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(bmjr_state::screen_update_bmjr));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::BRG_3BIT);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bmjr)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_bmjr);
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50); // guesswork
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	CASSETTE(config, m_cass);
-MACHINE_CONFIG_END
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+}
 
 /* ROM definition */
 ROM_START( bmjr )

@@ -166,6 +166,7 @@ Given CS numbers this is released after the other GunChamp
 #include "cpu/scmp/scmp.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #include "gunchamps.lh"
 
@@ -211,7 +212,7 @@ TILE_GET_INFO_MEMBER(supershot_state::get_supershot_text_tile_info)
 
 void supershot_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supershot_state::get_supershot_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supershot_state::get_supershot_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t supershot_state::screen_update_supershot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -344,27 +345,27 @@ static GFXDECODE_START( gfx_supershot )
 	GFXDECODE_ENTRY( "gfx", 0, supershot_charlayout,   0, 1  )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(supershot_state::supershot)
-
+void supershot_state::supershot(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SCMP, XTAL(11'289'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(supershot_map)
+	SCMP(config, m_maincpu, XTAL(11'289'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &supershot_state::supershot_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE((32)*8, (32)*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(supershot_state, screen_update_supershot)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size((32)*8, (32)*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(supershot_state::screen_update_supershot));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supershot)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_supershot);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	//...
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( sshot )

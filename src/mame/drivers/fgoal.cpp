@@ -72,7 +72,7 @@ void fgoal_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		interrupt_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in fgoal_state::device_timer");
+		throw emu_fatalerror("Unknown id in fgoal_state::device_timer");
 	}
 }
 
@@ -110,7 +110,7 @@ READ8_MEMBER(fgoal_state::analog_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(fgoal_state::_80_r)
+READ_LINE_MEMBER(fgoal_state::_80_r)
 {
 	uint8_t ret = (m_screen->vpos() & 0x80) ? 1 : 0;
 
@@ -142,13 +142,13 @@ READ8_MEMBER(fgoal_state::row_r)
 WRITE8_MEMBER(fgoal_state::row_w)
 {
 	m_row = data;
-	m_mb14241->shift_data_w(space, 0, 0);
+	m_mb14241->shift_data_w(0);
 }
 
 WRITE8_MEMBER(fgoal_state::col_w)
 {
 	m_col = data;
-	m_mb14241->shift_count_w(space, 0, data);
+	m_mb14241->shift_count_w(data);
 }
 
 READ8_MEMBER(fgoal_state::address_hi_r)
@@ -163,14 +163,14 @@ READ8_MEMBER(fgoal_state::address_lo_r)
 
 READ8_MEMBER(fgoal_state::shifter_r)
 {
-	uint8_t v = m_mb14241->shift_result_r(space, 0);
+	uint8_t v = m_mb14241->shift_result_r();
 
 	return bitswap<8>(v, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
 READ8_MEMBER(fgoal_state::shifter_reverse_r)
 {
-	uint8_t v = m_mb14241->shift_result_r(space, 0);
+	uint8_t v = m_mb14241->shift_result_r();
 
 	return bitswap<8>(v, 0, 1, 2, 3, 4, 5, 6, 7);
 }
@@ -263,7 +263,7 @@ static INPUT_PORTS_START( fgoal )
 	/* extra credit score changes depending on player's performance */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fgoal_state, _80_r, nullptr) /* 128V */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(fgoal_state, _80_r) /* 128V */
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ))
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ))
@@ -359,28 +359,28 @@ void fgoal_state::machine_reset()
 	m_prev_coin = 0;
 }
 
-MACHINE_CONFIG_START(fgoal_state::fgoal)
-
+void fgoal_state::fgoal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 10065000 / 10) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	M6800(config, m_maincpu, 10065000 / 10); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fgoal_state::cpu_map);
 
 	/* add shifter */
 	MB14241(config, "mb14241");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 263)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(fgoal_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 263);
+	m_screen->set_visarea(0, 255, 16, 255);
+	m_screen->set_screen_update(FUNC(fgoal_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fgoal);
 	PALETTE(config, m_palette, FUNC(fgoal_state::fgoal_palette), 128 + 16 + 1);
 
 	/* sound hardware */
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( fgoal )

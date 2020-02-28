@@ -29,8 +29,8 @@ const tiny_rom_entry *cpc_transtape_device::device_rom_region() const
 
 static INPUT_PORTS_START(cpc_transtape)
 	PORT_START("transtape")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Red Button") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_transtape_device,button_red_w,nullptr)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Black Button") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_transtape_device,button_black_w,nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Red Button") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_transtape_device,button_red_w,0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Black Button") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_transtape_device,button_black_w,0)
 INPUT_PORTS_END
 
 ioport_constructor cpc_transtape_device::device_input_ports() const
@@ -63,8 +63,8 @@ void cpc_transtape_device::device_start()
 
 	m_ram = make_unique_clear<uint8_t[]>(0x2000);
 
-	m_space->install_write_handler(0xfbf0,0xfbf0,write8_delegate(FUNC(cpc_transtape_device::output_w),this));
-	m_space->install_read_handler(0xfbff,0xfbff,read8_delegate(FUNC(cpc_transtape_device::input_r),this));
+	m_space->install_write_handler(0xfbf0,0xfbf0, write8_delegate(*this, FUNC(cpc_transtape_device::output_w)));
+	m_space->install_read_handler(0xfbff,0xfbff, read8_delegate(*this, FUNC(cpc_transtape_device::input_r)));
 }
 
 //-------------------------------------------------

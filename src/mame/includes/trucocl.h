@@ -7,6 +7,7 @@
 
 #include "sound/dac.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class trucocl_state : public driver_device
 {

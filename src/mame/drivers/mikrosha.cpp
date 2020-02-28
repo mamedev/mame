@@ -15,7 +15,6 @@
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "sound/wave.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -34,18 +33,21 @@ public:
 	void mikrosha(machine_config &config);
 
 private:
+	void mikrosha_8255_font_page_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	virtual void machine_reset() override;
 
 	void mikrosha_io(address_map &map);
 	void mikrosha_mem(address_map &map);
+
+	uint8_t m_mikrosha_font_page;
 };
 
 void mikrosha_state::machine_reset()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x8000+m_cart->get_rom_size()-1, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x8000 + m_cart->get_rom_size() - 1, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 	radio86_state::machine_reset();
 }
 
@@ -162,6 +164,11 @@ static INPUT_PORTS_START( mikrosha )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 INPUT_PORTS_END
 
+void mikrosha_state::mikrosha_8255_font_page_w(uint8_t data)
+{
+	m_mikrosha_font_page = (data >> 7) & 1;
+}
+
 WRITE_LINE_MEMBER(mikrosha_state::mikrosha_pit_out2)
 {
 }
@@ -203,11 +210,12 @@ static GFXDECODE_START( gfx_mikrosha )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikrosha_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(mikrosha_state::mikrosha)
+void mikrosha_state::mikrosha(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
-	MCFG_DEVICE_PROGRAM_MAP(mikrosha_mem)
-	MCFG_DEVICE_IO_MAP(mikrosha_io)
+	I8080(config, m_maincpu, XTAL(16'000'000) / 9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mikrosha_state::mikrosha_mem);
+	m_maincpu->set_addrmap(AS_IO, &mikrosha_state::mikrosha_io);
 
 	I8255(config, m_ppi8255_1);
 	m_ppi8255_1->in_pa_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
@@ -216,11 +224,12 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	m_ppi8255_1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 
 	I8255(config, m_ppi8255_2);
-	m_ppi8255_2->out_pb_callback().set(FUNC(radio86_state::mikrosha_8255_font_page_w));
+	m_ppi8255_2->out_pb_callback().set(FUNC(mikrosha_state::mikrosha_8255_font_page_w));
+	m_ppi8255_2->tri_pb_callback().set_constant(0);
 
 	i8275_device &i8275(I8275(config, "i8275", XTAL(16'000'000) / 12));
 	i8275.set_character_width(6);
-	i8275.set_display_callback(FUNC(mikrosha_state::display_pixels), this);
+	i8275.set_display_callback(FUNC(mikrosha_state::display_pixels));
 	i8275.drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
 
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
@@ -230,17 +239,16 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	pit8253.out_handler<2>().set(FUNC(mikrosha_state::mikrosha_pit_out2));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(78*6, 30*10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update("i8275", FUNC(i8275_device::screen_update));
+	screen.set_refresh_hz(50);
+	screen.set_size(78*6, 30*10);
+	screen.set_visarea(0, 78*6-1, 0, 30*10-1);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mikrosha);
 	PALETTE(config, m_palette, FUNC(mikrosha_state::radio86_palette), 3);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	I8257(config, m_dma8257, XTAL(16'000'000) / 9);
 	m_dma8257->out_hrq_cb().set(FUNC(radio86_state::hrq_w));
@@ -252,14 +260,14 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(rkm_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mikrosha_cass");
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mikrosha_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "mikrosha_cart", "bin,rom");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mikrosha_cass");
 	SOFTWARE_LIST(config, "cart_list").set_original("mikrosha_cart");
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

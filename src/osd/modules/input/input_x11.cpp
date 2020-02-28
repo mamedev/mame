@@ -20,8 +20,8 @@
 
 // standard sdl header
 #include <SDL2/SDL.h>
-#include <ctype.h>
-#include <stddef.h>
+#include <cctype>
+#include <cstddef>
 #include <mutex>
 #include <memory>
 #include <queue>
@@ -312,6 +312,9 @@ public:
 		std::lock_guard<std::mutex> scope_lock(m_lock);
 		XEvent xevent;
 
+		// If X11 has become invalid for some reason, XPending will crash. Assert instead.
+		assert(m_display != nullptr);
+
 		//Get XInput events
 		while (XPending(m_display) != 0)
 		{
@@ -401,7 +404,23 @@ public:
 		else if (xevent.type == button_press_type || xevent.type == button_release_type)
 		{
 			XDeviceButtonEvent *button = reinterpret_cast<XDeviceButtonEvent *>(&xevent);
-			lightgun.buttons[button->button] = (xevent.type == button_press_type) ? 0x80 : 0;
+
+			/*
+			 * SDL/X11 Number the buttons 1,2,3, while windows and other parts of MAME
+			 * like offscreen_reload expect 0,2,1. Transpose buttons 2 and 3, and then
+			 * -1 the button number to align the numbering schemes.
+			*/
+			int button_number = button->button;
+			switch (button_number)
+			{
+				case 2:
+					button_number = 3;
+					break;
+				case 3:
+					button_number = 2;
+					break;
+			}
+			lightgun.buttons[button_number - 1] = (xevent.type == button_press_type) ? 0x80 : 0;
 		}
 	}
 
@@ -427,6 +446,17 @@ public:
 	{
 	}
 
+	virtual bool probe() override
+	{
+		// If there is no X server, X11 lightguns cannot be supported
+		if (XOpenDisplay(nullptr) == nullptr)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	void input_init(running_machine &machine) override
 	{
 		int index;
@@ -437,6 +467,9 @@ public:
 
 		x11_event_manager::instance().initialize();
 		m_display = x11_event_manager::instance().display();
+
+		// If the X server has become invalid, a crash can occur
+		assert(m_display != nullptr);
 
 		// Loop through all 8 possible devices
 		for (index = 0; index < 8; index++)
@@ -453,7 +486,7 @@ public:
 
 			// Register and add the device
 			devinfo = create_lightgun_device(machine, index);
-			osd_printf_verbose("%i: %s\n", index, name.c_str());
+			osd_printf_verbose("%i: %s\n", index, name);
 
 			// Find the device info associated with the name
 			info = find_device_info(m_display, name.c_str(), 0);
@@ -461,7 +494,7 @@ public:
 			// If we couldn't find the device, skip
 			if (info == nullptr)
 			{
-				osd_printf_verbose("Can't find device %s!\n", name.c_str());
+				osd_printf_verbose("Can't find device %s!\n", name);
 				continue;
 			}
 
@@ -517,10 +550,34 @@ public:
 
 	void handle_event(XEvent &xevent) override
 	{
-		devicelist()->for_each_device([&xevent](auto device)
+		XID deviceid;
+		if (xevent.type == motion_type)
 		{
-			downcast<x11_input_device*>(device)->queue_events(&xevent, 1);
+			XDeviceMotionEvent *motion = reinterpret_cast<XDeviceMotionEvent *>(&xevent);
+			deviceid = motion->deviceid;
+		}
+		else if (xevent.type == button_press_type || xevent.type == button_release_type)
+		{
+			XDeviceButtonEvent *button = reinterpret_cast<XDeviceButtonEvent *>(&xevent);
+			deviceid = button->deviceid;
+		}
+		else
+		{
+			return;
+		}
+
+		// Figure out which lightgun this event id destined for
+		auto target_device = std::find_if(devicelist()->begin(), devicelist()->end(), [deviceid](auto &device)
+		{
+			std::unique_ptr<device_info> &ptr = device;
+			return downcast<x11_input_device*>(ptr.get())->x11_state.deviceid == deviceid;
 		});
+
+		// If we find a matching lightgun, dispatch the event to the lightgun
+		if (target_device != devicelist()->end())
+		{
+			downcast<x11_input_device*>((*target_device).get())->queue_events(&xevent, 1);
+		}
 	}
 
 private:
@@ -533,10 +590,9 @@ private:
 			if (m_lightgun_map.initialized)
 			{
 				snprintf(tempname, ARRAY_LENGTH(tempname), "NC%d", index);
-				devicelist()->create_device<x11_lightgun_device>(machine, tempname, tempname, *this);
-			}
-
-			return nullptr;
+				return devicelist()->create_device<x11_lightgun_device>(machine, tempname, tempname, *this);
+			} else
+				return nullptr;
 		}
 
 		return devicelist()->create_device<x11_lightgun_device>(machine, m_lightgun_map.map[index].name.c_str(), m_lightgun_map.map[index].name.c_str(), *this);

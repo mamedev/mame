@@ -345,11 +345,9 @@ void sbrain_state::ppi_pc_w(u8 data)
 		m_keydown &= 2; // ack DR
 
 	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
+	m_fdc->mr_w(!BIT(data, 3));
 	if (BIT(data, 3))
-	{
-		m_fdc->soft_reset();
 		disk_select_w(0);
-	}
 	m_subcpu->set_input_line(Z80_INPUT_LINE_BUSRQ, BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE); // ignored in z80.cpp
 	m_busak = BIT(data, 5);
 }
@@ -741,7 +739,9 @@ void sbrain_state::sbrain(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:2", sbrain_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", sbrain_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	TIMER(config, "timer_a", 0).configure_periodic(timer_device::expired_delegate(FUNC(sbrain_state::kbd_scan), this), attotime::from_hz(15));
+	TIMER(config, "timer_a", 0).configure_periodic(FUNC(sbrain_state::kbd_scan), attotime::from_hz(15));
+
+	SOFTWARE_LIST(config, "flop_list").set_original("sbrain");
 }
 
 ROM_START( sbrain )
@@ -754,6 +754,8 @@ ROM_START( sbrain )
 	ROMX_LOAD("3_1.z69", 0x0000, 0x0800, CRC(b6a2e6a5) SHA1(a646faaecb9ac45ee1a42764628e8971524d5c13), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "3_05", "3.05" )
 	ROMX_LOAD("qd_3_05.z69", 0x0000, 0x0800, CRC(aedbe777) SHA1(9ee9ca3f05e11ceb80896f06c3a3ae352db214dc), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS( 4, "4_2_50", "4.2 (50Hz hack)")
+	ROMX_LOAD("sbii_sb4_2_50hz.z69", 0x0000, 0x0800, CRC(285a894b) SHA1(694fef446fe19c0962f79951aa4d464489a9d161), ROM_BIOS(4))
 	// Using the chargen from 'c10' for now.
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD("c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))

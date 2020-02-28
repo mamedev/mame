@@ -448,22 +448,22 @@ static GFXDECODE_START( gfx_pingpong )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(pingpong_state::pingpong)
-
+void pingpong_state::pingpong(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,18432000/6)      /* 3.072 MHz (probably) */
-	MCFG_DEVICE_PROGRAM_MAP(pingpong_map)
+	Z80(config, m_maincpu,18432000/6);      /* 3.072 MHz (probably) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pingpong_state::pingpong_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(pingpong_state::pingpong_interrupt), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(456, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pingpong_state, screen_update_pingpong)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(456, 262);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(pingpong_state::screen_update_pingpong));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pingpong);
 	PALETTE(config, m_palette, FUNC(pingpong_state::pingpong_palette), 64*4+64*4, 32);
@@ -471,19 +471,18 @@ MACHINE_CONFIG_START(pingpong_state::pingpong)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("snsnd", SN76496, 18432000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SN76496(config, "snsnd", 18432000/8).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /* too fast! */
-MACHINE_CONFIG_START(pingpong_state::merlinmm)
+void pingpong_state::merlinmm(machine_config &config)
+{
 	pingpong(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(merlinmm_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pingpong_state::merlinmm_map);
 	subdevice<timer_device>("scantimer")->set_callback(FUNC(pingpong_state::merlinmm_interrupt));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -492,21 +491,21 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-ROM_START( pingpong )
+ROM_START( pingpong ) /* GX555 - PWB200222A */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pp_e04.rom",   0x0000, 0x4000, CRC(18552f8f) SHA1(cb03659b5e8a68003e72182a20979384d829280f) )
-	ROM_LOAD( "pp_e03.rom",   0x4000, 0x4000, CRC(ae5f01e8) SHA1(f0d6a2c64822f2662fed3f601e279db18246f894) )
+	ROM_LOAD( "555_e04.7a",   0x0000, 0x4000, CRC(18552f8f) SHA1(cb03659b5e8a68003e72182a20979384d829280f) )
+	ROM_LOAD( "555_e03.6a",   0x4000, 0x4000, CRC(ae5f01e8) SHA1(f0d6a2c64822f2662fed3f601e279db18246f894) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "pp_e01.rom",   0x0000, 0x2000, CRC(d1d6f090) SHA1(7b7d7cb90bed746dda871227463145263e4b0c5a) )
+	ROM_LOAD( "555_e01.7h",   0x0000, 0x2000, CRC(d1d6f090) SHA1(7b7d7cb90bed746dda871227463145263e4b0c5a) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "pp_e02.rom",   0x0000, 0x2000, CRC(33c687e0) SHA1(7c90de4d163d2ffad00c8cb6a194fa6125a4f4c1) )
+	ROM_LOAD( "555_e02.12c",   0x0000, 0x2000, CRC(33c687e0) SHA1(7c90de4d163d2ffad00c8cb6a194fa6125a4f4c1) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "pingpong.3j",  0x0000, 0x0020, CRC(3e04f06e) SHA1(a642c350f148e062d56eb2a2fc53c470603000e3) ) /* palette (this might be bad) */
-	ROM_LOAD( "pingpong.5h",  0x0020, 0x0100, CRC(8456046a) SHA1(8226f1325c14eb8aed5cd3c3d6bad9f9fd88c5fa) ) /* characters */
-	ROM_LOAD( "pingpong.11j", 0x0120, 0x0100, CRC(09d96b08) SHA1(81405e33eacc47f91ea4c7221d122f7e6f5b1e5d) ) /* sprites */
+	ROM_LOAD( "555e06.3j",  0x0000, 0x0020, CRC(3e04f06e) SHA1(a642c350f148e062d56eb2a2fc53c470603000e3) ) /* palette (this might be bad) */
+	ROM_LOAD( "555e05.5h",  0x0020, 0x0100, CRC(8456046a) SHA1(8226f1325c14eb8aed5cd3c3d6bad9f9fd88c5fa) ) /* characters */
+	ROM_LOAD( "555e07.11j", 0x0120, 0x0100, CRC(09d96b08) SHA1(81405e33eacc47f91ea4c7221d122f7e6f5b1e5d) ) /* sprites */
 ROM_END
 
 ROM_START( merlinmm )
@@ -583,8 +582,8 @@ void pingpong_state::init_cashquiz()
 		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* questions banking handlers */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_high_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4001, 0x4001, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_low_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4000, 0x4000, write8_delegate(*this, FUNC(pingpong_state::cashquiz_question_bank_high_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4001, 0x4001, write8_delegate(*this, FUNC(pingpong_state::cashquiz_question_bank_low_w)));
 
 	// 8 independents banks for questions
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5000, 0x50ff, "bank1");

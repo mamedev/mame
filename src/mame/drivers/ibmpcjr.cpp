@@ -79,8 +79,8 @@ private:
 	void pcjx_set_bank(int unk1, int unk2, int unk3);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pcjr_cart1) { return load_cart(image, m_cart1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pcjr_cart2) { return load_cart(image, m_cart2); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart1_load) { return load_cart(image, m_cart1); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart2_load) { return load_cart(image, m_cart2); }
 	void pc_speaker_set_spkrdata(uint8_t data);
 
 	uint8_t m_pc_spkrdata;
@@ -597,7 +597,8 @@ void pcjr_state::ibmpcjx_io(address_map &map)
 	map(0x01ff, 0x01ff).rw(FUNC(pcjr_state::pcjx_port_1ff_r), FUNC(pcjr_state::pcjx_port_1ff_w));
 }
 
-MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
+void pcjr_state::ibmpcjr(machine_config &config)
+{
 	/* basic machine hardware */
 	I8088(config, m_maincpu, 4900000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcjr_state::ibmpcjr_map);
@@ -638,17 +639,14 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	serport.cts_handler().set("ins8250", FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("pcvideo_pcjr", PCVIDEO_PCJR, 0)
-	MCFG_VIDEO_SET_SCREEN("pcvideo_pcjr:screen")
+	PCVIDEO_PCJR(config, "pcvideo_pcjr", 0).set_screen("pcvideo_pcjr:screen");
 
 	GFXDECODE(config, "gfxdecode", "pcvideo_pcjr:palette", gfx_pcjr);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-	MCFG_DEVICE_ADD("sn76496", SN76496, XTAL(14'318'181)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.80);
+	SN76496(config, "sn76496", XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* printer */
 	pc_lpt_device &lpt0(PC_LPT(config, "lpt_0"));
@@ -664,16 +662,12 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 
 	FLOPPY_CONNECTOR(config, "fdc:0", pcjr_floppies, "525dd", isa8_fdc_device::floppy_formats, true);
 
-	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(*this, pcjr_state, keyb_interrupt))
+	PC_KEYB(config, m_keyboard);
+	m_keyboard->keypress().set(FUNC(pcjr_state::keyb_interrupt));
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, "ibmpcjr_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,jrc")
-	MCFG_GENERIC_LOAD(pcjr_state, pcjr_cart1)
-
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", generic_plain_slot, "ibmpcjr_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,jrc")
-	MCFG_GENERIC_LOAD(pcjr_state, pcjr_cart2)
+	GENERIC_CARTSLOT(config, "cartslot1", generic_plain_slot, "ibmpcjr_cart", "bin,jrc").set_device_load(FUNC(pcjr_state::cart1_load));
+	GENERIC_CARTSLOT(config, "cartslot2", generic_plain_slot, "ibmpcjr_cart", "bin,jrc").set_device_load(FUNC(pcjr_state::cart2_load));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K, 256K, 512K");
@@ -682,7 +676,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	SOFTWARE_LIST(config, "cart_list").set_original("ibmpcjr_cart");
 	SOFTWARE_LIST(config, "flop_list").set_original("ibmpcjr_flop");
 	SOFTWARE_LIST(config, "pc_list").set_compatible("ibm5150");
-MACHINE_CONFIG_END
+}
 
 static GFXDECODE_START( gfx_ibmpcjx )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_8_charlayout, 3, 1 )

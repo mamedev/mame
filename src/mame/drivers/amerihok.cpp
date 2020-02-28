@@ -22,6 +22,7 @@ Processor is a ROMless MCU from the Z8 family.
 #include "cpu/z8/z8.h"
 #include "sound/okim6376.h"
 #include "speaker.h"
+#include "amerihok.lh"
 
 
 class amerihok_state : public driver_device
@@ -31,6 +32,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_oki(*this, "oki")
+		, m_digits(*this, "digit%u", 0U)
+		, m_lamp(*this, "lamp")
 	{ }
 
 	void amerihok(machine_config &config);
@@ -39,18 +42,59 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(control_w);
+	void control_w(u8 data);
+	void p2_w(u8 data);
+	u8 p3_r();
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z8_device> m_maincpu;
 	required_device<okim6376_device> m_oki;
 	void amerihok_data_map(address_map &map);
 	void amerihok_map(address_map &map);
+
+	u32 m_outputs[2];
+	u8 m_old_p2;
+
+	output_finder<6> m_digits;
+	output_finder<> m_lamp;
 };
 
-WRITE8_MEMBER(amerihok_state::control_w)
+void amerihok_state::control_w(u8 data)
 {
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	m_lamp = !BIT(data, 0);
+
 	m_oki->st_w(!BIT(data, 4));
 	m_oki->ch2_w(!BIT(data, 7));
+	if (BIT(data, 5))
+		m_oki->reset();
+}
+
+void amerihok_state::p2_w(u8 data)
+{
+	if (BIT(data, 5) && !BIT(m_old_p2, 5))
+	{
+		m_outputs[1] = (m_outputs[1] << 1) | BIT(m_outputs[0], 31);
+		m_outputs[0] = (m_outputs[0] << 1) | BIT(data, 6);
+	}
+
+	if (BIT(data, 7))
+	{
+		m_digits[0] = bitswap<7>(m_outputs[0], 3, 4, 2, 1, 0, 6, 5);
+		m_digits[1] = bitswap<7>(m_outputs[0], 27, 30, 31, 26, 25, 28, 29);
+		m_digits[2] = bitswap<7>(m_outputs[0], 20, 23, 22, 18, 19, 21, 24);
+		m_digits[3] = bitswap<7>(m_outputs[0], 8, 11, 12, 13, 9, 7, 10);
+		m_digits[4] = bitswap<7>(m_outputs[1], 5, 1, 2, 7, 6, 3, 0);
+		m_digits[5] = bitswap<7>(m_outputs[1], 28, 27, 23, 22, 21, 24, 26);
+
+		// These outputs are inactive during gameplay
+		//m_dots[0] = BIT(m_outputs[0], 16);
+		//m_dots[1] = BIT(m_outputs[0], 17);
+
+		//logerror("Outputs = %08X%08X\n", m_outputs[1], m_outputs[0]);
+	}
+
+	m_old_p2 = data;
 }
 
 void amerihok_state::amerihok_map(address_map &map)
@@ -60,17 +104,52 @@ void amerihok_state::amerihok_map(address_map &map)
 
 void amerihok_state::amerihok_data_map(address_map &map)
 {
+	map(0x1000, 0x1000).portr("1000");
 	map(0x2000, 0x2000).w(FUNC(amerihok_state::control_w));
+	map(0x3000, 0x3000).portr("3000");
 	map(0x4000, 0x4000).w(m_oki, FUNC(okim6376_device::write));
 }
 
 static INPUT_PORTS_START( amerihok )
+	PORT_START("1000")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON7) PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON8) PORT_CODE(KEYCODE_COMMA)
+
+	PORT_START("3000")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_A) PORT_NAME("Score Visitor")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_S) PORT_NAME("Score Home")
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("P2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON9) PORT_CODE(KEYCODE_STOP)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON10) PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT(0xee, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("P3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("oki", okim6376_device, nar_r)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN2)
 INPUT_PORTS_END
 
 
 
 void amerihok_state::machine_start()
 {
+	m_digits.resolve();
+	m_lamp.resolve();
+
+	std::fill(std::begin(m_outputs), std::end(m_outputs), 0);
+	m_old_p2 = 0xff;
+
+	save_item(NAME(m_outputs));
+	save_item(NAME(m_old_p2));
 }
 
 void amerihok_state::machine_reset()
@@ -83,6 +162,9 @@ void amerihok_state::amerihok(machine_config &config)
 	Z8681(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &amerihok_state::amerihok_map);
 	m_maincpu->set_addrmap(AS_DATA, &amerihok_state::amerihok_data_map);
+	m_maincpu->p2_in_cb().set_ioport("P2");
+	m_maincpu->p2_out_cb().set(FUNC(amerihok_state::p2_w));
+	m_maincpu->p3_in_cb().set_ioport("P3");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -103,4 +185,4 @@ ROM_START( amerihok )
 	ROM_LOAD( "airh-u10", 0x80000, 0x40000, CRC(71ee6421) SHA1(10131fc7c009158308c4a8bb2b037101622c07a1) )
 ROM_END
 
-GAME( 199?, amerihok, 0, amerihok, amerihok, amerihok_state, empty_init, ROT0, "Ameri", "Ameri-Hockey", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAMEL( 199?, amerihok, 0, amerihok, amerihok, amerihok_state, empty_init, ROT0, "Ameri", "Ameri-Hockey", MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_amerihok )

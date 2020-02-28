@@ -638,7 +638,7 @@ static INPUT_PORTS_START( teetert )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy_state,teetert_input_r, nullptr)
+	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(exidy_state, teetert_input_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -838,78 +838,77 @@ MACHINE_START_MEMBER(exidy_state,teetert)
  *
  *************************************/
 
-MACHINE_CONFIG_START(exidy_state::base)
-
+void exidy_state::base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, EXIDY_CPU_CLOCK)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exidy_state,  exidy_vblank_interrupt)
+	M6502(config, m_maincpu, EXIDY_CPU_CLOCK);
+	m_maincpu->set_vblank_int("screen", FUNC(exidy_state::exidy_vblank_interrupt));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exidy)
-	MCFG_PALETTE_ADD("palette", 8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exidy);
+	PALETTE(config, m_palette).set_entries(8);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_RAW_PARAMS(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(exidy_state, screen_update_exidy)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_raw(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART);
+	m_screen->set_screen_update(FUNC(exidy_state::screen_update_exidy));
+	m_screen->set_palette(m_palette);
+}
 
-MACHINE_CONFIG_END
 
-
-MACHINE_CONFIG_START(exidy_state::sidetrac)
+void exidy_state::sidetrac(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sidetrac_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::sidetrac_map);
 
 	/* audio hardware */
 	spectar_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(exidy_state::targ)
+void exidy_state::targ(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(targ_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::targ_map);
 
 	/* audio hardware */
 	targ_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(exidy_state::spectar)
+void exidy_state::spectar(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(spectar_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::spectar_map);
 
 	/* audio hardware */
 	spectar_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(exidy_state::rallys)
+void exidy_state::rallys(machine_config &config)
+{
 	spectar(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(rallys_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::rallys_map);
+}
 
 
-MACHINE_CONFIG_START(exidy_state::venture)
+void exidy_state::venture(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(venture_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::venture_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* audio hardware */
 	pia6821_device &pia(PIA6821(config, "pia", 0));
@@ -923,29 +922,28 @@ MACHINE_CONFIG_START(exidy_state::venture)
 	soundbd.pb_callback().set("pia", FUNC(pia6821_device::porta_w));
 	soundbd.ca2_callback().set("pia", FUNC(pia6821_device::cb1_w));
 	soundbd.cb2_callback().set("pia", FUNC(pia6821_device::ca1_w));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(exidy_state::teetert)
+void exidy_state::teetert(machine_config &config)
+{
 	venture(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(exidy_state, nmi_line_pulse, 10*60)
+	m_maincpu->set_periodic_int(FUNC(exidy_state::nmi_line_pulse), attotime::from_hz(10*60));
 
 	MCFG_MACHINE_START_OVERRIDE(exidy_state, teetert )
+}
 
-MACHINE_CONFIG_END
 
-
-MACHINE_CONFIG_START(exidy_state::mtrap)
+void exidy_state::mtrap(machine_config &config)
+{
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mtrap_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::mtrap_map);
 
-	config.m_minimum_quantum = attotime::from_hz(1920);
+	config.set_maximum_quantum(attotime::from_hz(1920));
 
 	/* audio hardware */
 	pia6821_device &pia(PIA6821(config, "pia", 0));
@@ -959,25 +957,25 @@ MACHINE_CONFIG_START(exidy_state::mtrap)
 	soundbd.pb_callback().set("pia", FUNC(pia6821_device::porta_w));
 	soundbd.ca2_callback().set("pia", FUNC(pia6821_device::cb1_w));
 	soundbd.cb2_callback().set("pia", FUNC(pia6821_device::ca1_w));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(exidy_state::pepper2)
+void exidy_state::pepper2(machine_config &config)
+{
 	venture(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pepper2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::pepper2_map);
+}
 
 
-MACHINE_CONFIG_START(exidy_state::fax)
+void exidy_state::fax(machine_config &config)
+{
 	pepper2(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(fax_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::fax_map);
+}
 
 
 
@@ -1451,6 +1449,30 @@ ROM_START( venture4 )
 ROM_END
 
 
+ROM_START( venture2b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "d2732.2s", 0x8000, 0x1000, CRC(87d69fe9) SHA1(d5ccf71af478873f32e23530a62515327f39f672) ) // only unique program ROM
+	ROM_LOAD( "d2732.2r", 0x9000, 0x1000, CRC(8163cefc) SHA1(7061819dd1105e8368c045dad2effae62d124539) )
+	ROM_LOAD( "d2732.2n", 0xa000, 0x1000, CRC(324a5054) SHA1(f845ff2f717ea627891e0dc9d6e66f690c0843d8) )
+	ROM_LOAD( "d2732.2m", 0xb000, 0x1000, CRC(24358203) SHA1(10c3ea83a892d6fd2751e590afe45bffa65bd6e0) )
+	ROM_LOAD( "d2732.2l", 0xc000, 0x1000, CRC(04428165) SHA1(6d8d860ce1f805ba2eb315f47c8660799256e921) )
+	ROM_LOAD( "d2732.2k", 0xd000, 0x1000, CRC(4c1a702a) SHA1(7f6a68d3cfdd885108eebb7ea76b3c2ce6070b18) )
+	ROM_LOAD( "d2732.2h", 0xe000, 0x1000, CRC(1aab27c2) SHA1(66c7274dbb8bda3c78cc61d96a6cb1a9b29939b5) )
+	ROM_LOAD( "d2732.2f", 0xf000, 0x1000, CRC(767bdd71) SHA1(334a903e05fc86186f90aa2d9ce3b0d367d7e516) )
+
+	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
+	ROM_LOAD( "tms2516.10f",  0x5800, 0x0800, CRC(4ea1c3d9) SHA1(d0c99c9d5b887d717c68e8745906ae4e65aec6ad) )
+	ROM_LOAD( "tms2564.10j",  0x6000, 0x2000, CRC(da9d8588) SHA1(b2e6509748059fc317af56d66396427c5ca78748) ) // bigger ROM, but contents identical to venture2
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "tms2516.6j",      0x0000, 0x0800, CRC(ea6fd981) SHA1(46b1658e1607423d5a073f14097c2a48d59057c0) ) // GFX ROM matches venture4, instead
+
+	ROM_REGION( 0x140, "proms", 0 ) // only 2 PROMs
+	ROM_LOAD( "sn74s288n.6c", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "sn74s288n.3d", 0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
+ROM_END
+
+
 ROM_START( pepper2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "main_12a", 0x9000, 0x1000, CRC(33db4737) SHA1(d8f7a5d340ddbc4d06d403c3bff0102ce637d24e) )
@@ -1773,6 +1795,7 @@ GAME( 1981, mtrapb2,   mtrap,   mtrap,    mtrap,     exidy_state, init_mtrap,   
 GAME( 1981, venture,   0,       venture,  venture,   exidy_state, init_venture,  ROT0, "Exidy",   "Venture (version 5 set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, venture2,  venture, venture,  venture,   exidy_state, init_venture,  ROT0, "Exidy",   "Venture (version 5 set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, venture4,  venture, venture,  venture,   exidy_state, init_venture,  ROT0, "Exidy",   "Venture (version 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, venture2b, venture, venture,  venture,   exidy_state, init_venture,  ROT0, "bootleg", "Venture (version 5 set 2, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, teetert,   0,       teetert,  teetert,   exidy_state, init_teetert,  ROT0, "Exidy",   "Teeter Torture (prototype)", MACHINE_SUPPORTS_SAVE )
 

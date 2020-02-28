@@ -98,47 +98,40 @@ void ymz770_device::device_start()
 	save_item(NAME(m_bsl));
 	save_item(NAME(m_cpl));
 
-	for (int ch = 0; ch < 16; ch++) // TODO array size
-	{
-		save_item(NAME(m_channels[ch].phrase), ch);
-		save_item(NAME(m_channels[ch].pan), ch);
-		save_item(NAME(m_channels[ch].pan_delay), ch);
-		save_item(NAME(m_channels[ch].pan1), ch);
-		save_item(NAME(m_channels[ch].pan1_delay), ch);
-		save_item(NAME(m_channels[ch].volume), ch);
-		save_item(NAME(m_channels[ch].volume_target), ch);
-		save_item(NAME(m_channels[ch].volume_delay), ch);
-		save_item(NAME(m_channels[ch].volume2), ch);
-		save_item(NAME(m_channels[ch].loop), ch);
-		save_item(NAME(m_channels[ch].is_playing), ch);
-		save_item(NAME(m_channels[ch].last_block), ch);
-		save_item(NAME(m_channels[ch].is_paused), ch);
-		save_item(NAME(m_channels[ch].output_remaining), ch);
-		save_item(NAME(m_channels[ch].output_ptr), ch);
-		save_item(NAME(m_channels[ch].atbl), ch);
-		save_item(NAME(m_channels[ch].pptr), ch);
-		save_item(NAME(m_channels[ch].output_data), ch);
-	}
-	for (int ch = 0; ch < 8; ch++)
-	{
-		save_item(NAME(m_sequences[ch].delay), ch);
-		save_item(NAME(m_sequences[ch].sequence), ch);
-		save_item(NAME(m_sequences[ch].timer), ch);
-		save_item(NAME(m_sequences[ch].stopchan), ch);
-		save_item(NAME(m_sequences[ch].loop), ch);
-		save_item(NAME(m_sequences[ch].bank), ch);
-		save_item(NAME(m_sequences[ch].is_playing), ch);
-		save_item(NAME(m_sequences[ch].is_paused), ch);
-		save_item(NAME(m_sequences[ch].offset), ch);
-	}
-	for (int ch = 0; ch < 8; ch++)
-	{
-		save_item(NAME(m_sqcs[ch].sqc), ch);
-		save_item(NAME(m_sqcs[ch].loop), ch);
-		save_item(NAME(m_sqcs[ch].is_playing), ch);
-		save_item(NAME(m_sqcs[ch].is_waiting), ch);
-		save_item(NAME(m_sqcs[ch].offset), ch);
-	}
+	save_item(STRUCT_MEMBER(m_channels, phrase));
+	save_item(STRUCT_MEMBER(m_channels, pan));
+	save_item(STRUCT_MEMBER(m_channels, pan_delay));
+	save_item(STRUCT_MEMBER(m_channels, pan1));
+	save_item(STRUCT_MEMBER(m_channels, pan1_delay));
+	save_item(STRUCT_MEMBER(m_channels, volume));
+	save_item(STRUCT_MEMBER(m_channels, volume_target));
+	save_item(STRUCT_MEMBER(m_channels, volume_delay));
+	save_item(STRUCT_MEMBER(m_channels, volume2));
+	save_item(STRUCT_MEMBER(m_channels, loop));
+	save_item(STRUCT_MEMBER(m_channels, is_playing));
+	save_item(STRUCT_MEMBER(m_channels, last_block));
+	save_item(STRUCT_MEMBER(m_channels, is_paused));
+	save_item(STRUCT_MEMBER(m_channels, output_remaining));
+	save_item(STRUCT_MEMBER(m_channels, output_ptr));
+	save_item(STRUCT_MEMBER(m_channels, atbl));
+	save_item(STRUCT_MEMBER(m_channels, pptr));
+	save_item(STRUCT_MEMBER(m_channels, output_data));
+
+	save_item(STRUCT_MEMBER(m_sequences, delay));
+	save_item(STRUCT_MEMBER(m_sequences, sequence));
+	save_item(STRUCT_MEMBER(m_sequences, timer));
+	save_item(STRUCT_MEMBER(m_sequences, stopchan));
+	save_item(STRUCT_MEMBER(m_sequences, loop));
+	save_item(STRUCT_MEMBER(m_sequences, bank));
+	save_item(STRUCT_MEMBER(m_sequences, is_playing));
+	save_item(STRUCT_MEMBER(m_sequences, is_paused));
+	save_item(STRUCT_MEMBER(m_sequences, offset));
+
+	save_item(STRUCT_MEMBER(m_sqcs, sqc));
+	save_item(STRUCT_MEMBER(m_sqcs, loop));
+	save_item(STRUCT_MEMBER(m_sqcs, is_playing));
+	save_item(STRUCT_MEMBER(m_sqcs, is_waiting));
+	save_item(STRUCT_MEMBER(m_sqcs, offset));
 }
 
 
@@ -468,19 +461,15 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 ymz774_device::ymz774_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ymz770_device(mconfig, YMZ774, tag, owner, clock, 44100)
 {
+	// calculate volume increments, fixed point values, fractions of 0x20000
+	for (u32 i = 0; i < 256; i++)
+	{
+		if (i < 0x20)
+			volinc[i] = i;
+		else
+			volinc[i] = (0x20 | (i & 0x1f)) << ((i >> 5) - 1);
+	}
 }
-
-// volume increments, fractions of 0x20000, likely typical for Yamaha log-linear
-static const uint32_t volinc[256] = {
-	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
-	32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,
-	64,66,68,70,72,74,76,78,80,82,84,86,88,90,92,94,96,98,100,102,104,106,108,110,112,114,116,118,120,122,124,126,
-	128,132,136,140,144,148,152,156,160,164,168,172,176,180,184,188,192,196,200,204,208,212,216,220,224,228,232,236,240,244,248,252,
-	256,264,272,280,288,296,304,312,320,328,336,344,351,360,368,376,384,392,400,408,416,424,432,440,448,456,464,471,480,488,495,504,
-	511,528,543,559,576,592,608,624,639,656,671,688,703,719,736,752,767,783,799,815,831,847,863,879,895,910,928,942,958,975,991,1006,
-	1023,1054,1087,1119,1149,1181,1215,1247,1277,1312,1340,1373,1404,1436,1469,1504,1534,1566,1598,1626,1661,1691,1721,1753,1786,1820,1856,1883,1912,1951,1981,2013,
-	2045,2102,2174,2238,2292,2363,2423,2487,2553,2624,2679,2737,2797,2860,2926,2996,3068,3118,3197,3252,3308,3367,3427,3490,3555,3623,3694,3767,3804,3882,3963,4005
-};
 
 READ8_MEMBER(ymz774_device::read)
 {

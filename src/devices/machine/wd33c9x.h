@@ -11,7 +11,7 @@
 
 #include "machine/nscsi_bus.h"
 
-class wd33c9x_base_device : public nscsi_device
+class wd33c9x_base_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
 	auto irq_cb() { return m_irq_cb.bind(); }

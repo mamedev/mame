@@ -130,7 +130,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="telebunny.cas" size="32768" crc="6585f71f" sha1="eb25060c4e056513f7ebe2d221df15078c1af0ac" offset="0" />
+				<rom name="telebunny.cas" size="32768" crc="6585f71f" sha1="eb25060c4e056513f7ebe2d221df15078c1af0ac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -143,7 +143,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="sasa.cas" size="32768" crc="5a5be05a" sha1="2e8360134107a479a20e04ec87d46f88687a5097" offset="0" />
+				<rom name="sasa.cas" size="32768" crc="5a5be05a" sha1="2e8360134107a479a20e04ec87d46f88687a5097"/>
 			</dataarea>
 		</part>
 	</software>
@@ -156,7 +156,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="kung fu master.cas" size="32768" crc="5a3d35b3" sha1="d5f803c537174c3b30ce50a7571f3c382e44115a" offset="0" />
+				<rom name="kung fu master.cas" size="32768" crc="5a3d35b3" sha1="d5f803c537174c3b30ce50a7571f3c382e44115a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -169,7 +169,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="tetra horror.cas" size="32768" crc="3a05e2c8" sha1="ea548508c668f8c8713e179e00b2b80cbdc6c80b" offset="0" />
+				<rom name="tetra horror.cas" size="32768" crc="3a05e2c8" sha1="ea548508c668f8c8713e179e00b2b80cbdc6c80b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -182,7 +182,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="old mac farmer.cas" size="32768" crc="7e78bd5c" sha1="d1f995f61833aa6964015b513b8730aec9c509cd" offset="0" />
+				<rom name="old mac farmer.cas" size="32768" crc="7e78bd5c" sha1="d1f995f61833aa6964015b513b8730aec9c509cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -195,7 +195,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="turboat.cas" size="32768" crc="a5b0364a" sha1="37047b2f8cc34d366988ab1ef118e4112656d71a" offset="0" />
+				<rom name="turboat.cas" size="32768" crc="a5b0364a" sha1="37047b2f8cc34d366988ab1ef118e4112656d71a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -208,7 +208,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="16384">
-				<rom name="spectron.cas" size="16384" crc="922c81b8" sha1="4270972f2f0f147bde2a270a4989b2ad8c9aa7f5" offset="0" />
+				<rom name="spectron.cas" size="16384" crc="922c81b8" sha1="4270972f2f0f147bde2a270a4989b2ad8c9aa7f5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -221,7 +221,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="16384">
-				<rom name="armoured assualt.cas" size="16384" crc="a741a408" sha1="a4ad2ceb493ac811fc12972fadcf0474e4ddf163" offset="0" />
+				<rom name="armoured assualt.cas" size="16384" crc="a741a408" sha1="a4ad2ceb493ac811fc12972fadcf0474e4ddf163"/>
 			</dataarea>
 		</part>
 	</software>
@@ -234,7 +234,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="8042">
-				<rom name="new york bomb blitz.cas" size="8042" crc="4e79dc11" sha1="f4c7dd3c8336bc89cbd6d7e16a8f89f212199443" offset="0" />
+				<rom name="new york bomb blitz.cas" size="8042" crc="4e79dc11" sha1="f4c7dd3c8336bc89cbd6d7e16a8f89f212199443"/>
 			</dataarea>
 		</part>
 	</software>
@@ -247,7 +247,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="7303">
-				<rom name="rescue.cas" size="7303" crc="13c7106c" sha1="1c5287d7cf9af4dbe3106457a7d04e9688092d26" offset="0" />
+				<rom name="rescue.cas" size="7303" crc="13c7106c" sha1="1c5287d7cf9af4dbe3106457a7d04e9688092d26"/>
 			</dataarea>
 		</part>
 	</software>
@@ -260,7 +260,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="8126">
-				<rom name="minigolf.cas" size="8126" crc="214a28c5" sha1="e8525e49b1b8a00993210c4d0811473a57ab917c" offset="0" />
+				<rom name="minigolf.cas" size="8126" crc="214a28c5" sha1="e8525e49b1b8a00993210c4d0811473a57ab917c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -273,7 +273,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="7992">
-				<rom name="junolander.cas" size="7992" crc="024bd117" sha1="88a371381300807af90b4b94e74a8cb5d4222f4a" offset="0" />
+				<rom name="junolander.cas" size="7992" crc="024bd117" sha1="88a371381300807af90b4b94e74a8cb5d4222f4a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -286,7 +286,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="8554">
-				<rom name="diary.cas" size="8554" crc="4d869288" sha1="afdc389327f25af266e94ebf26b05693f49bd1f5" offset="0" />
+				<rom name="diary.cas" size="8554" crc="4d869288" sha1="afdc389327f25af266e94ebf26b05693f49bd1f5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -299,7 +299,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="10467">
-				<rom name="home economist.cas" size="10467" crc="71171e2e" sha1="1a77191d439ff594659373ab555cb604f4e38e37" offset="0" />
+				<rom name="home economist.cas" size="10467" crc="71171e2e" sha1="1a77191d439ff594659373ab555cb604f4e38e37"/>
 			</dataarea>
 		</part>
 	</software>
@@ -312,7 +312,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="7903">
-				<rom name="srecipe manager.cas" size="7903" crc="3649c94d" sha1="9ac9950809d789548fc0b0899b4543c282e6f363" offset="0" />
+				<rom name="srecipe manager.cas" size="7903" crc="3649c94d" sha1="9ac9950809d789548fc0b0899b4543c282e6f363"/>
 			</dataarea>
 		</part>
 	</software>
@@ -325,7 +325,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="11944">
-				<rom name="filecab.cas" size="11944" crc="d7c3928f" sha1="f5fd759cfe028660f19c96fdd3b34f5f1d360cad" offset="0" />
+				<rom name="filecab.cas" size="11944" crc="d7c3928f" sha1="f5fd759cfe028660f19c96fdd3b34f5f1d360cad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -338,7 +338,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="justwrit.cas" size="32768" crc="1db067a3" sha1="00bc3f0365e789c0853a81ebca06c625a35cdd22" offset="0" />
+				<rom name="justwrit.cas" size="32768" crc="1db067a3" sha1="00bc3f0365e789c0853a81ebca06c625a35cdd22"/>
 			</dataarea>
 		</part>
 	</software>
@@ -351,7 +351,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="7170">
-				<rom name="compatability.cas" size="7170" crc="1ebede6d" sha1="81fca66fede44597f842ffeee3dda102c6e1f9c1" offset="0" />
+				<rom name="compatibility.cas" size="7170" crc="1ebede6d" sha1="81fca66fede44597f842ffeee3dda102c6e1f9c1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -364,7 +364,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="8845">
-				<rom name="biorythm.cas" size="8845" crc="fe6eaa6c" sha1="b84b42075ec92ae97f2d5372233fdb1b1d28c707" offset="0" />
+				<rom name="biorythm.cas" size="8845" crc="fe6eaa6c" sha1="b84b42075ec92ae97f2d5372233fdb1b1d28c707"/>
 			</dataarea>
 		</part>
 	</software>
@@ -377,7 +377,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="11919">
-				<rom name="swingman.cas" size="11919" crc="9c3fe115" sha1="bb827437a3c59fcfa977b31f93928ada2afd70fc" offset="0" />
+				<rom name="swingman.cas" size="11919" crc="9c3fe115" sha1="bb827437a3c59fcfa977b31f93928ada2afd70fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -390,7 +390,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="music mentor.cas" size="32768" crc="126b5eec" sha1="ba232a55d0746c0671d1adee08463f93595659c9" offset="0" />
+				<rom name="music mentor.cas" size="32768" crc="126b5eec" sha1="ba232a55d0746c0671d1adee08463f93595659c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -403,7 +403,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="15975">
-				<rom name="starwords.cas" size="15975" crc="95c901db" sha1="966aaf13dab2c306b80a7afd5afb9339f4789bc1" offset="0" />
+				<rom name="starwords.cas" size="15975" crc="95c901db" sha1="966aaf13dab2c306b80a7afd5afb9339f4789bc1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -416,7 +416,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="10151">
-				<rom name="nomis.cas" size="10151" crc="fb527eda" sha1="a75cfb45b8b99da7ac5571f137c3cfbbf7749434" offset="0" />
+				<rom name="nomis.cas" size="10151" crc="fb527eda" sha1="a75cfb45b8b99da7ac5571f137c3cfbbf7749434"/>
 			</dataarea>
 		</part>
 	</software>
@@ -429,7 +429,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="19433">
-				<rom name="firstep.cas" size="19433" crc="54a94a93" sha1="971c6fd6add7e1b494e43da63aefedf8104385e7" offset="0" />
+				<rom name="firstep.cas" size="19433" crc="54a94a93" sha1="971c6fd6add7e1b494e43da63aefedf8104385e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -442,7 +442,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="11547">
-				<rom name="findit.cas" size="11547" crc="d2c16fea" sha1="54219f1ffcae67ef45c47d1d9721813968f85468" offset="0" />
+				<rom name="findit.cas" size="11547" crc="d2c16fea" sha1="54219f1ffcae67ef45c47d1d9721813968f85468"/>
 			</dataarea>
 		</part>
 	</software>
@@ -455,7 +455,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="9399">
-				<rom name="munchmath.cas" size="9399" crc="ba202393" sha1="144c8a56d9d8cf6dd1989d9b30e1df6f70d4c600" offset="0" />
+				<rom name="munchmath.cas" size="9399" crc="ba202393" sha1="144c8a56d9d8cf6dd1989d9b30e1df6f70d4c600"/>
 			</dataarea>
 		</part>
 	</software>
@@ -468,7 +468,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="7631">
-				<rom name="sfonteditor.cas" size="7631" crc="dfc73d5f" sha1="19001edfc4c53f31687e9ac4101288b8219ee2d2" offset="0" />
+				<rom name="sfonteditor.cas" size="7631" crc="dfc73d5f" sha1="19001edfc4c53f31687e9ac4101288b8219ee2d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -481,7 +481,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="6877">
-				<rom name="crunch.cas" size="6877" crc="2913bce3" sha1="caac1d3fc15a4c8317117555a1db70ec46b20583" offset="0" />
+				<rom name="crunch.cas" size="6877" crc="2913bce3" sha1="caac1d3fc15a4c8317117555a1db70ec46b20583"/>
 			</dataarea>
 		</part>
 	</software>
@@ -494,7 +494,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="2764">
-				<rom name="emergency landing.cas" size="2764" crc="f61981c4" sha1="2555f8482f93d3faca650cb02ca7b1c826aeae29" offset="0" />
+				<rom name="emergency landing.cas" size="2764" crc="f61981c4" sha1="2555f8482f93d3faca650cb02ca7b1c826aeae29"/>
 			</dataarea>
 		</part>
 	</software>
@@ -507,7 +507,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="8857">
-				<rom name="ghostrap.cas" size="8857" crc="31ba05de" sha1="670989d09c1a7abf1d4e0f61d4ef833677ae58a7" offset="0" />
+				<rom name="ghostrap.cas" size="8857" crc="31ba05de" sha1="670989d09c1a7abf1d4e0f61d4ef833677ae58a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -520,7 +520,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="11049">
-				<rom name="graph master.cas" size="11049" crc="b6748d7a" sha1="9fb8fea026f85de36beae026aa5f0f937301bcb0" offset="0" />
+				<rom name="graph master.cas" size="11049" crc="b6748d7a" sha1="9fb8fea026f85de36beae026aa5f0f937301bcb0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -533,7 +533,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="6658">
-				<rom name="grave digger.cas" size="6658" crc="e5d5fd0a" sha1="60ace059212e5da759c895268c88263f42b8bc09" offset="0" />
+				<rom name="grave digger.cas" size="6658" crc="e5d5fd0a" sha1="60ace059212e5da759c895268c88263f42b8bc09"/>
 			</dataarea>
 		</part>
 	</software>
@@ -546,7 +546,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="6417">
-				<rom name="horse race.cas" size="6417" crc="0bf03495" sha1="e1a0f33ae7b3801ad53019e0267d3fe2223b42f3" offset="0" />
+				<rom name="horse race.cas" size="6417" crc="0bf03495" sha1="e1a0f33ae7b3801ad53019e0267d3fe2223b42f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -559,7 +559,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="9228">
-				<rom name="jumping jack.cas" size="9228" crc="9e64abe3" sha1="89539ca4024aa1d48e1051b1abdd0d2a5021fa1b" offset="0" />
+				<rom name="jumping jack.cas" size="9228" crc="9e64abe3" sha1="89539ca4024aa1d48e1051b1abdd0d2a5021fa1b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -572,7 +572,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="23763">
-				<rom name="jungle jim.cas" size="23763" crc="f05fb9fc" sha1="b5dd3e4cfde938fdc0993146ec66a70eeb2b1963" offset="0" />
+				<rom name="jungle jim.cas" size="23763" crc="f05fb9fc" sha1="b5dd3e4cfde938fdc0993146ec66a70eeb2b1963"/>
 			</dataarea>
 		</part>
 	</software>
@@ -585,7 +585,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="9709">
-				<rom name="killer car.cas" size="9709" crc="cf81898b" sha1="b1d6f4f8c68527ab91bcc051b583a33db8ac674a" offset="0" />
+				<rom name="killer car.cas" size="9709" crc="cf81898b" sha1="b1d6f4f8c68527ab91bcc051b583a33db8ac674a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -598,7 +598,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="10756">
-				<rom name="kiwi country.cas" size="10756" crc="7bd249ea" sha1="5cccd7e4d399866cac5de0c8f6f071a898575f08" offset="0" />
+				<rom name="kiwi country.cas" size="10756" crc="7bd249ea" sha1="5cccd7e4d399866cac5de0c8f6f071a898575f08"/>
 			</dataarea>
 		</part>
 	</software>
@@ -611,7 +611,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="7332">
-				<rom name="logit.cas" size="7332" crc="baca0c5b" sha1="0c1c601cad87f608eefda02f59fd4d13cc8bfb0a" offset="0" />
+				<rom name="logit.cas" size="7332" crc="baca0c5b" sha1="0c1c601cad87f608eefda02f59fd4d13cc8bfb0a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -624,7 +624,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="1946">
-				<rom name="memory trainer.cas" size="1946" crc="c41818af" sha1="59b1d52a0e4c43de22d486c7c9867c5d14274144" offset="0" />
+				<rom name="memory trainer.cas" size="1946" crc="c41818af" sha1="59b1d52a0e4c43de22d486c7c9867c5d14274144"/>
 			</dataarea>
 		</part>
 	</software>
@@ -637,7 +637,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="4576">
-				<rom name="moon lander.cas" size="4576" crc="a92094e7" sha1="27fdb86a1fd636b4db9b592778285e71b7d362aa" offset="0" />
+				<rom name="moon lander.cas" size="4576" crc="a92094e7" sha1="27fdb86a1fd636b4db9b592778285e71b7d362aa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -650,7 +650,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="1902">
-				<rom name="music composer.cas" size="1902" crc="13f99f21" sha1="415108b5073bf26952d7e6a0f7cb259fb7461b27" offset="0" />
+				<rom name="music composer.cas" size="1902" crc="13f99f21" sha1="415108b5073bf26952d7e6a0f7cb259fb7461b27"/>
 			</dataarea>
 		</part>
 	</software>
@@ -663,7 +663,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="candoo ninja (1984)(spectravideo)[bload'cas-',r].cas" size="32768" crc="78260340" sha1="1ce55b8245f85858dc6b4e1445330c7971365f87" offset="0" />
+				<rom name="candoo ninja (1984)(spectravideo)[bload'cas-',r].cas" size="32768" crc="78260340" sha1="1ce55b8245f85858dc6b4e1445330c7971365f87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -676,7 +676,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="6016">
-				<rom name="para-jump.cas" size="6016" crc="eadc1154" sha1="75d47d3b728b42862ca4e922aadead9337c72901" offset="0" />
+				<rom name="para-jump.cas" size="6016" crc="eadc1154" sha1="75d47d3b728b42862ca4e922aadead9337c72901"/>
 			</dataarea>
 		</part>
 	</software>
@@ -689,7 +689,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="17124">
-				<rom name="planet patrol.cas" size="17124" crc="09447a47" sha1="7d25e7b65c1c4bcc1c8788787448015916ec3b1d" offset="0" />
+				<rom name="planet patrol.cas" size="17124" crc="09447a47" sha1="7d25e7b65c1c4bcc1c8788787448015916ec3b1d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -702,7 +702,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="17124">
-				<rom name="planet patrol (1983)(spectravideo)[a][bload'cas-',r].cas" size="32768" crc="6adb5186" sha1="c26700c5159c9349d9be6cc4631067e43a2319fc" offset="0" />
+				<rom name="planet patrol (1983)(spectravideo)[a][bload'cas-',r].cas" size="32768" crc="6adb5186" sha1="c26700c5159c9349d9be6cc4631067e43a2319fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -715,7 +715,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="20450">
-				<rom name="roulette.cas" size="20450" crc="4e2ab765" sha1="c483d0a10878aedf444c46beeefb96400457935b" offset="0" />
+				<rom name="roulette.cas" size="20450" crc="4e2ab765" sha1="c483d0a10878aedf444c46beeefb96400457935b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -728,7 +728,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="6266">
-				<rom name="spectra break.cas" size="6266" crc="ab295b73" sha1="d363e24c12b072d2cb8c349efdb19fbc852a1e66" offset="0" />
+				<rom name="spectra break.cas" size="6266" crc="ab295b73" sha1="d363e24c12b072d2cb8c349efdb19fbc852a1e66"/>
 			</dataarea>
 		</part>
 	</software>
@@ -741,7 +741,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="6823">
-				<rom name="cryptic cube.cas" size="6823" crc="409d2f40" sha1="c589baeae3a19e5f668c88261be47703c8815560" offset="0" />
+				<rom name="cryptic cube.cas" size="6823" crc="409d2f40" sha1="c589baeae3a19e5f668c88261be47703c8815560"/>
 			</dataarea>
 		</part>
 	</software>
@@ -754,7 +754,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="10420">
-				<rom name="trader.cas" size="10420" crc="d9f4646d" sha1="839f3314787f3005c60345fa7bc2bff2811a85c0" offset="0" />
+				<rom name="trader.cas" size="10420" crc="d9f4646d" sha1="839f3314787f3005c60345fa7bc2bff2811a85c0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -767,7 +767,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="3027">
-				<rom name="spectramind.cas" size="3027" crc="06fb22a3" sha1="313385b027f00e916da7ae7ffbb627c349fc8226" offset="0" />
+				<rom name="spectramind.cas" size="3027" crc="06fb22a3" sha1="313385b027f00e916da7ae7ffbb627c349fc8226"/>
 			</dataarea>
 		</part>
 	</software>
@@ -780,7 +780,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="10828">
-				<rom name="address book.cas" size="10828" crc="7c226ab8" sha1="4b475ce52e5d137b8b28a1db411563a329124296" offset="0" />
+				<rom name="address book.cas" size="10828" crc="7c226ab8" sha1="4b475ce52e5d137b8b28a1db411563a329124296"/>
 			</dataarea>
 		</part>
 	</software>
@@ -793,7 +793,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="2860">
-				<rom name="treasure chess.cas" size="2860" crc="efd7e88d" sha1="3806aeec055267e693cac0b6b9508ff308ffd68a" offset="0" />
+				<rom name="treasure chess.cas" size="2860" crc="efd7e88d" sha1="3806aeec055267e693cac0b6b9508ff308ffd68a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -806,7 +806,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="4164">
-				<rom name="treasure chess.cas" size="4164" crc="50e415be" sha1="f8023c62912d0431c52272aaa70107b1cffe6407" offset="0" />
+				<rom name="treasure chess.cas" size="4164" crc="50e415be" sha1="f8023c62912d0431c52272aaa70107b1cffe6407"/>
 			</dataarea>
 		</part>
 	</software>
@@ -821,7 +821,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="flipper slipper.cas" size="32768" crc="adeec6e7" sha1="5e02eb18da7bab84a09b17a5d7645fbaea23a946" offset="0" />
+				<rom name="flipper slipper.cas" size="32768" crc="adeec6e7" sha1="5e02eb18da7bab84a09b17a5d7645fbaea23a946"/>
 			</dataarea>
 		</part>
 	</software>
@@ -834,7 +834,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="16700">
-				<rom name="frantic freddy.cas" size="16700" crc="7aab6fae" sha1="31ae26ceab46efd9abc718e7a5446b38a6160414" offset="0" />
+				<rom name="frantic freddy.cas" size="16700" crc="7aab6fae" sha1="31ae26ceab46efd9abc718e7a5446b38a6160414"/>
 			</dataarea>
 		</part>
 	</software>
@@ -847,7 +847,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="16700">
-				<rom name="frantic freddy (1983)(spectravideo)[a][bload'cas-',r].cas" size="32768" crc="5bd12860" sha1="255d8a90d26eb9c1ecdda16ae4da68d44198b47f" offset="0" />
+				<rom name="frantic freddy (1983)(spectravideo)[a][bload'cas-',r].cas" size="32768" crc="5bd12860" sha1="255d8a90d26eb9c1ecdda16ae4da68d44198b47f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -860,7 +860,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="sector alpha.cas" size="32768" crc="1ba3279a" sha1="0c8a12003ef8255290d045b3465b300dfdfe2c44" offset="0" />
+				<rom name="sector alpha.cas" size="32768" crc="1ba3279a" sha1="0c8a12003ef8255290d045b3465b300dfdfe2c44"/>
 			</dataarea>
 		</part>
 	</software>
@@ -873,7 +873,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="sector alpha.cas" size="32768" crc="669ad58c" sha1="eec894d6c64f05a82c22fc28b93bba70952afb40" offset="0" />
+				<rom name="sector alpha.cas" size="32768" crc="669ad58c" sha1="eec894d6c64f05a82c22fc28b93bba70952afb40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -890,7 +890,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="21671">
-				<rom name="assiduity (1984)(lars lewejohann)(de)[cload + run].cas" size="21671" crc="f503d28b" sha1="746be3516cf66cfd0151c2bef033509302eb9af8" offset="0" />
+				<rom name="assiduity (1984)(lars lewejohann)(de)[cload + run].cas" size="21671" crc="f503d28b" sha1="746be3516cf66cfd0151c2bef033509302eb9af8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -902,7 +902,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="12288">
-				<rom name="basic tutorial (1983)(spectravideo)[position tape + cload + run].cas" size="12288" crc="4395d38c" sha1="71645841fd789830472bab9d431d13c6b628e29f" offset="0" />
+				<rom name="basic tutorial (1983)(spectravideo)[position tape + cload + run].cas" size="12288" crc="4395d38c" sha1="71645841fd789830472bab9d431d13c6b628e29f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -914,7 +914,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="16384">
-				<rom name="crazy teeth (1984)(dan haggren)[cload + run].cas" size="16384" crc="eec68527" sha1="089f4109c5259bd007a83a35e50910cef5ad5897" offset="0" />
+				<rom name="crazy teeth (1984)(dan haggren)[cload + run].cas" size="16384" crc="eec68527" sha1="089f4109c5259bd007a83a35e50910cef5ad5897"/>
 			</dataarea>
 		</part>
 	</software>
@@ -926,7 +926,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="51369">
-				<rom name="deklarations-program (1985)(gite sundberg)(sv)[cload + run].cas" size="51369" crc="2794d9f7" sha1="5594bc4ff76255efec93c870e9206c01d83d0b0e" offset="0" />
+				<rom name="deklarations-program (1985)(gite sundberg)(sv)[cload + run].cas" size="51369" crc="2794d9f7" sha1="5594bc4ff76255efec93c870e9206c01d83d0b0e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -938,7 +938,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
-				<rom name="demo 5 v3.1 (1983)(spectravideo)[cload + run].cas" size="36864" crc="3f4c0ab1" sha1="5966572573f5c63d3c83a27eea49fb022e31a92e" offset="0" />
+				<rom name="demo 5 v3.1 (1983)(spectravideo)[cload + run].cas" size="36864" crc="3f4c0ab1" sha1="5966572573f5c63d3c83a27eea49fb022e31a92e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -950,7 +950,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="26014">
-				<rom name="diamond luis i (1986)(ikesoft)[cr morgoth][cload + run].cas" size="26014" crc="a8d8ee21" sha1="7ced3833411e27bdeb958a474e74104fa92576f8" offset="0" status="baddump" />
+				<rom name="diamond luis i (1986)(ikesoft)[cr morgoth][cload + run].cas" size="26014" crc="a8d8ee21" sha1="7ced3833411e27bdeb958a474e74104fa92576f8" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -962,7 +962,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33546">
-				<rom name="diamond luis editor.cas" size="33546" crc="1ca9289b" sha1="4697eef9a63c5f41cb684bd55e8018b3d6a1facf" offset="0" />
+				<rom name="diamond luis editor.cas" size="33546" crc="1ca9289b" sha1="4697eef9a63c5f41cb684bd55e8018b3d6a1facf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -974,7 +974,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="24552">
-				<rom name="explorer3.cas" size="24552" crc="4bc7fef2" sha1="ee54bfb4cf0d4f23012858ab1a04660ba775f6c2" offset="0" />
+				<rom name="explorer3.cas" size="24552" crc="4bc7fef2" sha1="ee54bfb4cf0d4f23012858ab1a04660ba775f6c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -986,7 +986,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="4336">
-				<rom name="flipper man (1984)(computerworld - mikrodata)(no)[cload + run].cas" size="4336" crc="4f45ffe3" sha1="fdb820185a1579a88be2f0a51c2be81213ce2281" offset="0" />
+				<rom name="flipper man (1984)(computerworld - mikrodata)(no)[cload + run].cas" size="4336" crc="4f45ffe3" sha1="fdb820185a1579a88be2f0a51c2be81213ce2281"/>
 			</dataarea>
 		</part>
 	</software>
@@ -998,7 +998,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="57344">
-				<rom name="fluffy (1987)(jtm software)[bload'cas-',r].cas" size="57344" crc="77c994d1" sha1="feb8891b0a4cc19c4c4dd5cb81412d64fdfdc051" offset="0" />
+				<rom name="fluffy (1987)(jtm software)[bload'cas-',r].cas" size="57344" crc="77c994d1" sha1="feb8891b0a4cc19c4c4dd5cb81412d64fdfdc051"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1010,7 +1010,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="57344">
-				<rom name="graphic chess (1986)(jtm software)[bload'cas-',r].cas" size="57344" crc="3b677ae4" sha1="01aab650078fdb3db9947f048b7939c7dece6aed" offset="0" />
+				<rom name="graphic chess (1986)(jtm software)[bload'cas-',r].cas" size="57344" crc="3b677ae4" sha1="01aab650078fdb3db9947f048b7939c7dece6aed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1022,7 +1022,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="9642">
-				<rom name="hollow (1984)(lars lewejohann)(de)[cload + run].cas" size="9642" crc="9176a093" sha1="b98338440ef7c68299bd94c589cd7f0555b30b35" offset="0" />
+				<rom name="hollow (1984)(lars lewejohann)(de)[cload + run].cas" size="9642" crc="9176a093" sha1="b98338440ef7c68299bd94c589cd7f0555b30b35"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1034,7 +1034,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="jet alf (1984)(els)[cload + run].cas" size="32768" crc="45dd260b" sha1="651eb63084cd967bdbf12e5ca7366fa46d7f6043" offset="0" />
+				<rom name="jet alf (1984)(els)[cload + run].cas" size="32768" crc="45dd260b" sha1="651eb63084cd967bdbf12e5ca7366fa46d7f6043"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1046,7 +1046,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="28672">
-				<rom name="jet alf and the manic masters revenge (1984)(els)[cload + run].cas" size="28672" crc="d063c059" sha1="94ef92d523cb93ffa63daa01dfe6313447b586c9" offset="0" />
+				<rom name="jet alf and the manic masters revenge (1984)(els)[cload + run].cas" size="28672" crc="d063c059" sha1="94ef92d523cb93ffa63daa01dfe6313447b586c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1058,7 +1058,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="9935">
-				<rom name="labyx (1985)(hjemmedata magazine)(no)[cload + run].cas" size="9935" crc="e6c2f0e1" sha1="d220ab1e466e02edc0e95b2b97104b151b4fc2a3" offset="0" />
+				<rom name="labyx (1985)(hjemmedata magazine)(no)[cload + run].cas" size="9935" crc="e6c2f0e1" sha1="d220ab1e466e02edc0e95b2b97104b151b4fc2a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1070,7 +1070,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="58425">
-				<rom name="megalone.cas" size="58425" crc="6609db48" sha1="5ed4c04fd38f362fda500c087811b66ac0e86097" offset="0" />
+				<rom name="megalone.cas" size="58425" crc="6609db48" sha1="5ed4c04fd38f362fda500c087811b66ac0e86097"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1082,7 +1082,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="65636">
-				<rom name="megalone (1986)(j&amp;d team)[a][cload + run].cas" size="65636" crc="40ee709e" sha1="3d5bc3230c4ee7a81b5da0c183f5c3079a9edb26" offset="0" />
+				<rom name="megalone (1986)(j&amp;d team)[a][cload + run].cas" size="65636" crc="40ee709e" sha1="3d5bc3230c4ee7a81b5da0c183f5c3079a9edb26"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1094,7 +1094,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="58425">
-				<rom name="msx emulator.cas" size="36864" crc="581497af" sha1="a4cd90130da7058f710c1d283c64978620904c88" offset="0" />
+				<rom name="msx emulator.cas" size="36864" crc="581497af" sha1="a4cd90130da7058f710c1d283c64978620904c88"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1106,7 +1106,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="28672">
-				<rom name="music demo 1 (1986)(bach tp)[position tape + cload + run].cas" size="28672" crc="294ffa38" sha1="61336ba0fd5e8fc6d18e3eabcc0d85952b58caf9" offset="0" />
+				<rom name="music demo 1 (1986)(bach tp)[position tape + cload + run].cas" size="28672" crc="294ffa38" sha1="61336ba0fd5e8fc6d18e3eabcc0d85952b58caf9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1118,7 +1118,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="20480">
-				<rom name="music demo 2 (1987)(bach tp)[position tape + cload + run].cas" size="20480" crc="d0d2e4bb" sha1="9a2cc9e24912b54c0187de7c8bd0a37cf645c3ab" offset="0" />
+				<rom name="music demo 2 (1987)(bach tp)[position tape + cload + run].cas" size="20480" crc="d0d2e4bb" sha1="9a2cc9e24912b54c0187de7c8bd0a37cf645c3ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1130,7 +1130,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="20480">
-				<rom name="music demo 3 (1988)(bach tp)[position tape + cload + run].cas" size="20480" crc="c261f678" sha1="875e74492942ea1e759f04e2226512f6812ee46f" offset="0" />
+				<rom name="music demo 3 (1988)(bach tp)[position tape + cload + run].cas" size="20480" crc="c261f678" sha1="875e74492942ea1e759f04e2226512f6812ee46f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1142,7 +1142,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="music mentor (1983)(spectravideo)[cr hacke][bload'cas-',r].cas" size="32768" crc="e6623f31" sha1="49febbbaa4ae8e2971e0d783397fa74c5c5e2444" offset="0" status="baddump" />
+				<rom name="music mentor (1983)(spectravideo)[cr hacke][bload'cas-',r].cas" size="32768" crc="e6623f31" sha1="49febbbaa4ae8e2971e0d783397fa74c5c5e2444" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1154,7 +1154,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="16384">
-				<rom name="pengwyn.cas" size="16384" crc="44838eee" sha1="24b0e47f05d998c0e5d15a72d8f6431eef19169a" offset="0" />
+				<rom name="pengwyn.cas" size="16384" crc="44838eee" sha1="24b0e47f05d998c0e5d15a72d8f6431eef19169a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1166,7 +1166,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="17268">
-				<rom name="perilous journey (1984)(pm programs)[cload + run].cas" size="17268" crc="ecd9c203" sha1="61b422dc0dfd7a8e36c6e73626c3bb83d0cc5b9d" offset="0" />
+				<rom name="perilous journey (1984)(pm programs)[cload + run].cas" size="17268" crc="ecd9c203" sha1="61b422dc0dfd7a8e36c6e73626c3bb83d0cc5b9d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1178,7 +1178,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="12307">
-				<rom name="pogo stick (1985)(choice software)(de)[cload + run].cas" size="12307" crc="3aab48ce" sha1="1c3a18d187307e734b4741dd0127f11e5913ab56" offset="0" />
+				<rom name="pogo stick (1985)(choice software)(de)[cload + run].cas" size="12307" crc="3aab48ce" sha1="1c3a18d187307e734b4741dd0127f11e5913ab56"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1190,7 +1190,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="robotball.cas" size="32768" crc="83c3ac0a" sha1="85ddd2545afcad313bb31c2e92da9b9e3eefb1c5" offset="0" />
+				<rom name="robotball.cas" size="32768" crc="83c3ac0a" sha1="85ddd2545afcad313bb31c2e92da9b9e3eefb1c5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1202,7 +1202,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="40960">
-				<rom name="stockholm adventure.cas" size="40960" crc="735d1bdd" sha1="db50d0beaa7974675a9afdd57f8dde4e654bc577" offset="0" />
+				<rom name="stockholm adventure.cas" size="40960" crc="735d1bdd" sha1="db50d0beaa7974675a9afdd57f8dde4e654bc577"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1214,7 +1214,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="19310">
-				<rom name="struggle for livelihood (1985)(choice software)(de)[cload + run].cas" size="19310" crc="992cfee7" sha1="f1af7726fed020d9f410ba515e2d98230e98f972" offset="0" />
+				<rom name="struggle for livelihood (1985)(choice software)(de)[cload + run].cas" size="19310" crc="992cfee7" sha1="f1af7726fed020d9f410ba515e2d98230e98f972"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1226,7 +1226,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="2232">
-				<rom name="three wall smash (1984)(ian mclachlan)[cload + run].cas" size="2232" crc="deb48e14" sha1="bc6ebf49e7c7ac351d96e4adab04e4d867d2a4c9" offset="0" />
+				<rom name="three wall smash (1984)(ian mclachlan)[cload + run].cas" size="2232" crc="deb48e14" sha1="bc6ebf49e7c7ac351d96e4adab04e4d867d2a4c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1238,7 +1238,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="6938">
-				<rom name="typing tutor v1.1 (1983)(s.g. bright)[cload + run].cas" size="6938" crc="b2f00f4d" sha1="baee71b3fc17dcb719bfad032a53e5b53c86ed4a" offset="0" />
+				<rom name="typing tutor v1.1 (1983)(s.g. bright)[cload + run].cas" size="6938" crc="b2f00f4d" sha1="baee71b3fc17dcb719bfad032a53e5b53c86ed4a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1255,7 +1255,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
-				<rom name="alien 8 (1985)(ultimate play the game)[cload + run].cas" size="36864" crc="c6c787de" sha1="d96fefd464ead4621cf588b4e5053b43c92e4c9a" offset="0" />
+				<rom name="alien 8 (1985)(ultimate play the game)[cload + run].cas" size="36864" crc="c6c787de" sha1="d96fefd464ead4621cf588b4e5053b43c92e4c9a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1267,7 +1267,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="53248">
-				<rom name="arkanoid.cas" size="53248" crc="117969bf" sha1="bf298529f40919db9d415805a3a7d3d0a42044f0" offset="0" />
+				<rom name="arkanoid.cas" size="53248" crc="117969bf" sha1="bf298529f40919db9d415805a3a7d3d0a42044f0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1280,7 +1280,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33158">
-				<rom name="cpk.cas" size="33158" crc="0d644ed0" sha1="451be018d149d8a3c48bb68a10e9beb912cd8b01" offset="0" />
+				<rom name="cpk.cas" size="33158" crc="0d644ed0" sha1="451be018d149d8a3c48bb68a10e9beb912cd8b01"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1293,7 +1293,7 @@ Ballonies (198x)
 
 		<part name="cass" interface="svi318_cass">
 			<dataarea name="cass" size="33156">
-				<rom name="circus charlie.cas" size="33156" crc="8a0baf6f" sha1="37bdd31d3b6d1673a3f289930107f5c45f48f39c" offset="0" />
+				<rom name="circus charlie.cas" size="33156" crc="8a0baf6f" sha1="37bdd31d3b6d1673a3f289930107f5c45f48f39c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1306,7 +1306,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
-				<rom name="comic bakery.cas" size="36864" crc="73565e52" sha1="32223043e42397686bcf3b6f2cb7bcc936eae165" offset="0" />
+				<rom name="comic bakery.cas" size="36864" crc="73565e52" sha1="32223043e42397686bcf3b6f2cb7bcc936eae165"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1319,7 +1319,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="53248">
-				<rom name="goonies, the (1986)(konami)[h lord wezzex][cload + run].cas" size="53248" crc="33f59944" sha1="5869404cfb8038706b887b2fb51f3c1427a9f848" offset="0" />
+				<rom name="goonies, the (1986)(konami)[h lord wezzex][cload + run].cas" size="53248" crc="33f59944" sha1="5869404cfb8038706b887b2fb51f3c1427a9f848"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1332,7 +1332,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="53248">
-				<rom name="goonies, the (1986)(konami)[h lord wezzex][a][cload + run].cas" size="53248" crc="2a2f5665" sha1="60d81d0d91d5b6acaf17d44b668f121675fd94a8" offset="0" />
+				<rom name="goonies, the (1986)(konami)[h lord wezzex][a][cload + run].cas" size="53248" crc="2a2f5665" sha1="60d81d0d91d5b6acaf17d44b668f121675fd94a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1344,7 +1344,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="57344">
-				<rom name="gunfright.cas" size="57344" crc="a886be3d" sha1="23673101167c3a18700b1c9d8cd6e79abbb3a3a3" offset="0" />
+				<rom name="gunfright.cas" size="57344" crc="a886be3d" sha1="23673101167c3a18700b1c9d8cd6e79abbb3a3a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1356,7 +1356,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="hero.cas" size="32768" crc="aa8e08f8" sha1="3116dfaff94072111d0bbeaae82e1becd3de075a" offset="0" />
+				<rom name="hero.cas" size="32768" crc="aa8e08f8" sha1="3116dfaff94072111d0bbeaae82e1becd3de075a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1368,7 +1368,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="81920">
-				<rom name="hobbit.cas" size="81920" crc="a8bb9f09" sha1="382254588f178ade8dcfe959014c61155a917d6c" offset="0" />
+				<rom name="hobbit.cas" size="81920" crc="a8bb9f09" sha1="382254588f178ade8dcfe959014c61155a917d6c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1381,7 +1381,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
-				<rom name="hyper olympic 1.cas" size="36864" crc="88233a1b" sha1="e28d30191adaa2c408ba6ee52811ab8a6bbc79ea" offset="0" />
+				<rom name="hyper olympic 1.cas" size="36864" crc="88233a1b" sha1="e28d30191adaa2c408ba6ee52811ab8a6bbc79ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1394,7 +1394,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33157">
-				<rom name="hyper olympic 2.cas" size="33157" crc="79120f6a" sha1="edc8cfa9227fa9e00027525a3973b470af3f855f" offset="0" />
+				<rom name="hyper olympic 2.cas" size="33157" crc="79120f6a" sha1="edc8cfa9227fa9e00027525a3973b470af3f855f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1407,7 +1407,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
-				<rom name="hyper rally.cas" size="36864" crc="600d9f1a" sha1="e84de1a3ca4a974bd1a8ac6ca1d1d7796c30af81" offset="0" />
+				<rom name="hyper rally.cas" size="36864" crc="600d9f1a" sha1="e84de1a3ca4a974bd1a8ac6ca1d1d7796c30af81"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1420,7 +1420,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33156">
-				<rom name="hyper sport 1.cas" size="33156" crc="9cce9640" sha1="bd758a2fa4a3d05563f0690977011a576f6bda92" offset="0" />
+				<rom name="hyper sport 1.cas" size="33156" crc="9cce9640" sha1="bd758a2fa4a3d05563f0690977011a576f6bda92"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1433,7 +1433,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33156">
-				<rom name="hyper sport 2.cas" size="33156" crc="24ee0086" sha1="4e66e286a0c9fa204d05096ff795023c33870bad" offset="0" />
+				<rom name="hyper sport 2.cas" size="33156" crc="24ee0086" sha1="4e66e286a0c9fa204d05096ff795023c33870bad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1445,7 +1445,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="69632">
-				<rom name="international karate (1986)(endurance games)[cr darksloke][cload + run].cas" size="69632" crc="ddc92a32" sha1="70cf020da2fd8f46ce1b67725834d9acbe2d9650" offset="0" />
+				<rom name="international karate (1986)(endurance games)[cr darksloke][cload + run].cas" size="69632" crc="ddc92a32" sha1="70cf020da2fd8f46ce1b67725834d9acbe2d9650"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1457,7 +1457,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="77824">
-				<rom name="jack the nipper ii - in coconut capers (1987)(gremlin graphics software)[t][cload + run].cas" size="77824" crc="2531bbd9" sha1="d6eeb92cb8a8d73f83ae9c55b4451ef1c4bae3a9" offset="0" />
+				<rom name="jack the nipper ii - in coconut capers (1987)(gremlin graphics software)[t][cload + run].cas" size="77824" crc="2531bbd9" sha1="d6eeb92cb8a8d73f83ae9c55b4451ef1c4bae3a9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1470,7 +1470,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="53248">
-				<rom name="knightmare.cas" size="53248" crc="23f20c14" sha1="a22140c8ef217dc3a67961ec9819830e661ed897" offset="0" />
+				<rom name="knightmare.cas" size="53248" crc="23f20c14" sha1="a22140c8ef217dc3a67961ec9819830e661ed897"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1483,7 +1483,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
-				<rom name="baseball.cas" size="36864" crc="7e9afcb7" sha1="a27aa792d29f1f035d08049c19c3c453f0992afe" offset="0" />
+				<rom name="baseball.cas" size="36864" crc="7e9afcb7" sha1="a27aa792d29f1f035d08049c19c3c453f0992afe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1496,7 +1496,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="53248">
-				<rom name="boxing.cas" size="53248" crc="408f42c4" sha1="ccb078b11db22428d87ab02449fc2d19f78bd8fc" offset="0" />
+				<rom name="boxing.cas" size="53248" crc="408f42c4" sha1="ccb078b11db22428d87ab02449fc2d19f78bd8fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1509,7 +1509,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
-				<rom name="pingpong.cas" size="36864" crc="59d39bff" sha1="19e4552930e22dbc6ba95ed663f890411f320dfb" offset="0" />
+				<rom name="pingpong.cas" size="36864" crc="59d39bff" sha1="19e4552930e22dbc6ba95ed663f890411f320dfb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1522,7 +1522,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="53248">
-				<rom name="soccer.cas" size="53248" crc="5c976cf3" sha1="80486b1f2ee2fffcda785830d753919c6ba54df4" offset="0" />
+				<rom name="soccer.cas" size="53248" crc="5c976cf3" sha1="80486b1f2ee2fffcda785830d753919c6ba54df4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1535,7 +1535,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
-				<rom name="tennis.cas" size="36864" crc="073d2f2e" sha1="8f715d285826bce2ceeae8fb1ea5ceeee58b07de" offset="0" />
+				<rom name="tennis.cas" size="36864" crc="073d2f2e" sha1="8f715d285826bce2ceeae8fb1ea5ceeee58b07de"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1548,7 +1548,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33154">
-				<rom name="magical tree.cas" size="33154" crc="600d34b6" sha1="5a3bccb22e6f586976853776587dd65bb69342a0" offset="0" />
+				<rom name="magical tree.cas" size="33154" crc="600d34b6" sha1="5a3bccb22e6f586976853776587dd65bb69342a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1561,7 +1561,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
-				<rom name="mopi ranger.cas" size="36864" crc="89890f20" sha1="603ba50f53fbb178c28c0b73e34d2a1346b35f69" offset="0" />
+				<rom name="mopi ranger.cas" size="36864" crc="89890f20" sha1="603ba50f53fbb178c28c0b73e34d2a1346b35f69"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1573,7 +1573,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="50277">
-				<rom name="mrdo.cas" size="50277" crc="1635c81a" sha1="ddcb6eb21dbedc20ba4d592ce3eee4fdb547238f" offset="0" />
+				<rom name="mrdo.cas" size="50277" crc="1635c81a" sha1="ddcb6eb21dbedc20ba4d592ce3eee4fdb547238f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1585,7 +1585,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
-				<rom name="punchy.cas" size="32768" crc="b7203e47" sha1="858dd939a6c7d3e09b8c451035251c045fb02caf" offset="0" />
+				<rom name="punchy.cas" size="32768" crc="b7203e47" sha1="858dd939a6c7d3e09b8c451035251c045fb02caf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1597,7 +1597,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="245741">
-				<rom name="rambo iii intro (19xx)(mr. haward)[run'cas-'].cas" size="245741" crc="44b44122" sha1="6a365dbb83c0383569e2827f0e6f88faae7081a0" offset="0" />
+				<rom name="rambo iii intro (19xx)(mr. haward)[run'cas-'].cas" size="245741" crc="44b44122" sha1="6a365dbb83c0383569e2827f0e6f88faae7081a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1609,7 +1609,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="205177">
-				<rom name="rambo iii intro (19xx)(mr. haward)[a][run'cas-'].cas" size="205177" crc="8143b755" sha1="758679ebe1448edcaa530f9d21429601720a1f78" offset="0" />
+				<rom name="rambo iii intro (19xx)(mr. haward)[a][run'cas-'].cas" size="205177" crc="8143b755" sha1="758679ebe1448edcaa530f9d21429601720a1f78"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1622,7 +1622,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
-				<rom name="road fighter.cas" size="36864" crc="e3fa4805" sha1="183b9f46c7946a6e12fb588568ab841026de8623" offset="0" />
+				<rom name="road fighter.cas" size="36864" crc="e3fa4805" sha1="183b9f46c7946a6e12fb588568ab841026de8623"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1634,7 +1634,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="249946">
-				<rom name="robocop (1988)(ocean software)[cr mr. haward][run'cas-'].cas" size="249946" crc="52673b68" sha1="eab3786e4d4654ebd02a9ec1d4a970f51a0d5258" offset="0" />
+				<rom name="robocop (1988)(ocean software)[cr mr. haward][run'cas-'].cas" size="249946" crc="52673b68" sha1="eab3786e4d4654ebd02a9ec1d4a970f51a0d5258"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1647,7 +1647,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33150">
-				<rom name="sky jaguar.cas" size="33150" crc="b8225999" sha1="9af503c206eb05e90f9606bf14a119f1608e3182" offset="0" />
+				<rom name="sky jaguar.cas" size="33150" crc="b8225999" sha1="9af503c206eb05e90f9606bf14a119f1608e3182"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1659,7 +1659,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="64522">
-				<rom name="time trax.cas" size="64522" crc="490ea429" sha1="4cd83b80b47e6fc1d7e4e5ad5954d1c45d5af4c3" offset="0" />
+				<rom name="time trax.cas" size="64522" crc="490ea429" sha1="4cd83b80b47e6fc1d7e4e5ad5954d1c45d5af4c3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1672,7 +1672,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33161">
-				<rom name="track and field 1.cas" size="33161" crc="da238538" sha1="8d6e20ab0263840cbfb4d87e5dcaf3905aaa03b2" offset="0" />
+				<rom name="track and field 1.cas" size="33161" crc="da238538" sha1="8d6e20ab0263840cbfb4d87e5dcaf3905aaa03b2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1685,7 +1685,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
-				<rom name="yie ar kung fu.cas" size="36864" crc="b1a02c2c" sha1="001a547f74e230a53f14ee41a40a0701e5e16c1d" offset="0" />
+				<rom name="yie ar kung fu.cas" size="36864" crc="b1a02c2c" sha1="001a547f74e230a53f14ee41a40a0701e5e16c1d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1698,7 +1698,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="53248">
-				<rom name="yie ar kung fu ii.cas" size="53248" crc="19118024" sha1="b8cd0bd7d92a11dc53379642ba5718cbc6bea75f" offset="0" />
+				<rom name="yie ar kung fu ii.cas" size="53248" crc="19118024" sha1="b8cd0bd7d92a11dc53379642ba5718cbc6bea75f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1710,7 +1710,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="63082">
-				<rom name="zakil wood.cas" size="63082" crc="705882f2" sha1="e9a29319e0a66a4e05abce0b1d402e5d7cb14437" offset="0" />
+				<rom name="zakil wood.cas" size="63082" crc="705882f2" sha1="e9a29319e0a66a4e05abce0b1d402e5d7cb14437"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1726,7 +1726,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="50277">
-				<rom name="cosmic avenger (1983)(universal)[h buggy software][cload + run].cas" size="50277" crc="6fd31fc3" sha1="de4a15e04a1109171cb61161949e953d430b9496" offset="0" />
+				<rom name="cosmic avenger (1983)(universal)[h buggy software][cload + run].cas" size="50277" crc="6fd31fc3" sha1="de4a15e04a1109171cb61161949e953d430b9496"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1738,7 +1738,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="53248">
-				<rom name="cabbage patch kids (1984)(konami)[h buggy software][cload + run].cas" size="53248" crc="b081916f" sha1="5ffe30bb2e090f8a7821ac688d47f64a3f8ed25f" offset="0" />
+				<rom name="cabbage patch kids (1984)(konami)[h buggy software][cload + run].cas" size="53248" crc="b081916f" sha1="5ffe30bb2e090f8a7821ac688d47f64a3f8ed25f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1750,7 +1750,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="50277">
-				<rom name="decathlon (1984)(activision)[h buggy software][cload + run].cas" size="50277" crc="fecfd38b" sha1="7d7912ea25ad5e3f37ae6dc184cc73b6a5ee1c95" offset="0" />
+				<rom name="decathlon (1984)(activision)[h buggy software][cload + run].cas" size="50277" crc="fecfd38b" sha1="7d7912ea25ad5e3f37ae6dc184cc73b6a5ee1c95"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1762,7 +1762,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="50277">
-				<rom name="donkey kong (1986)(ocean software)[h buggy software][cload + run].cas" size="50277" crc="411dc327" sha1="ff655700060b36ba2dfd0baedf09a3ff5d676cbe" offset="0" />
+				<rom name="donkey kong (1986)(ocean software)[h buggy software][cload + run].cas" size="50277" crc="411dc327" sha1="ff655700060b36ba2dfd0baedf09a3ff5d676cbe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1774,7 +1774,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="50278">
-				<rom name="gateway to apshai (1983)(us gold)[h buggy software][cload + run].cas" size="50278" crc="16336e30" sha1="192794740bd5f07f2d73f60b94bda53da8b266bd" offset="0" />
+				<rom name="gateway to apshai (1983)(us gold)[h buggy software][cload + run].cas" size="50278" crc="16336e30" sha1="192794740bd5f07f2d73f60b94bda53da8b266bd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1786,7 +1786,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="50277">
-				<rom name="looping (1983)(venture line)[h buggy software][cload + run].cas" size="50277" crc="6e18978e" sha1="260779f2a39f157450a8cc1dfe3afe800261a7df" offset="0" />
+				<rom name="looping (1983)(venture line)[h buggy software][cload + run].cas" size="50277" crc="6e18978e" sha1="260779f2a39f157450a8cc1dfe3afe800261a7df"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1798,7 +1798,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="50277">
-				<rom name="mouse trap (1983)(exidy)[h buggy software][cload + run].cas" size="50277" crc="06a0ca29" sha1="5b2342b3686c88d3e4a10b002066cc08b956068e" offset="0" />
+				<rom name="mouse trap (1983)(exidy)[h buggy software][cload + run].cas" size="50277" crc="06a0ca29" sha1="5b2342b3686c88d3e4a10b002066cc08b956068e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1810,7 +1810,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="50277">
-				<rom name="pepper 2 (1983)(coleco)[h buggy software][cload + run].cas" size="50277" crc="a638f9b5" sha1="28b0b450f6c3338b6221c2b6a7178cc182e0a077" offset="0" />
+				<rom name="pepper 2 (1983)(coleco)[h buggy software][cload + run].cas" size="50277" crc="a638f9b5" sha1="28b0b450f6c3338b6221c2b6a7178cc182e0a077"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1822,7 +1822,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="50277">
-				<rom name="smurf rescue in gargamel's castle (1983)(coleco)[h buggy software][cload + run].cas" size="50277" crc="c32de9d6" sha1="11dd05cd7770da3fa2b16c5b03da5d74290c754d" offset="0" />
+				<rom name="smurf rescue in gargamel's castle (1983)(coleco)[h buggy software][cload + run].cas" size="50277" crc="c32de9d6" sha1="11dd05cd7770da3fa2b16c5b03da5d74290c754d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1834,7 +1834,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="50277">
-				<rom name="war games (1984)(coleco)[h buggy software][cload + run].cas" size="50277" crc="0be201a7" sha1="695c513acaaea491a03acf2e52f2f9934bfbed5a" offset="0" />
+				<rom name="war games (1984)(coleco)[h buggy software][cload + run].cas" size="50277" crc="0be201a7" sha1="695c513acaaea491a03acf2e52f2f9934bfbed5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1846,7 +1846,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="50277">
-				<rom name="zaxxon (1982)(coleco)[h buggy software][cload + run].cas" size="50277" crc="40e277a5" sha1="c5ef2c763fbb60133d287341fd671e6fc558b074" offset="0" />
+				<rom name="zaxxon (1982)(coleco)[h buggy software][cload + run].cas" size="50277" crc="40e277a5" sha1="c5ef2c763fbb60133d287341fd671e6fc558b074"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1866,7 +1866,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="133428">
-				<rom name="burken soft game pac 01 (19xx)(-)[cload + run].cas" size="133428" crc="74e29dc3" sha1="1454c6f08fc015eb151d1a3044c74ab2b5b6346e" offset="0" />
+				<rom name="burken soft game pac 01 (19xx)(-)[cload + run].cas" size="133428" crc="74e29dc3" sha1="1454c6f08fc015eb151d1a3044c74ab2b5b6346e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1878,7 +1878,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="187832">
-				<rom name="burken soft game pac 02 (19xx)(-)[cload + run].cas" size="187832" crc="ffc0e62b" sha1="0ac2a3097a14d543e7e5401ffb344887dd1dc51a" offset="0" />
+				<rom name="burken soft game pac 02 (19xx)(-)[cload + run].cas" size="187832" crc="ffc0e62b" sha1="0ac2a3097a14d543e7e5401ffb344887dd1dc51a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1890,7 +1890,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="148558">
-				<rom name="burken soft game pac 03 (19xx)(-)[cload + run].cas" size="148558" crc="65844248" sha1="e837f041ccfc78179efd2f9424a260481e184f26" offset="0" />
+				<rom name="burken soft game pac 03 (19xx)(-)[cload + run].cas" size="148558" crc="65844248" sha1="e837f041ccfc78179efd2f9424a260481e184f26"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1902,7 +1902,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="172739">
-				<rom name="burken soft game pac 04 (19xx)(-)[cload + run].cas" size="172739" crc="3d623f84" sha1="f0e4c7f9811ef26e9a4f962cdc76ae4536717a71" offset="0" />
+				<rom name="burken soft game pac 04 (19xx)(-)[cload + run].cas" size="172739" crc="3d623f84" sha1="f0e4c7f9811ef26e9a4f962cdc76ae4536717a71"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1914,7 +1914,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="121583">
-				<rom name="burken soft game pac 05 (19xx)(-)[cload + run].cas" size="121583" crc="e192a52e" sha1="6551238697e670a0472eddf701e4cd6304fc61d4" offset="0" />
+				<rom name="burken soft game pac 05 (19xx)(-)[cload + run].cas" size="121583" crc="e192a52e" sha1="6551238697e670a0472eddf701e4cd6304fc61d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1926,7 +1926,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="77414">
-				<rom name="burken soft game pac 06 (19xx)(-)[cload + run].cas" size="77414" crc="0b69eb3b" sha1="2cee813cdf6d8c8637391ed5a1f3d48516e8fddd" offset="0" />
+				<rom name="burken soft game pac 06 (19xx)(-)[cload + run].cas" size="77414" crc="0b69eb3b" sha1="2cee813cdf6d8c8637391ed5a1f3d48516e8fddd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1938,7 +1938,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="104300">
-				<rom name="burken soft game pac 07 (19xx)(-)[cload + run].cas" size="104300" crc="464eb2f1" sha1="3215c415c9936372b6e997a887db91939e649ae2" offset="0" />
+				<rom name="burken soft game pac 07 (19xx)(-)[cload + run].cas" size="104300" crc="464eb2f1" sha1="3215c415c9936372b6e997a887db91939e649ae2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1950,7 +1950,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="104753">
-				<rom name="burken soft game pac 08 (19xx)(-)[cload + run].cas" size="104753" crc="9eb45201" sha1="498de28cb1dccad650365d0573f0f245825fe054" offset="0" />
+				<rom name="burken soft game pac 08 (19xx)(-)[cload + run].cas" size="104753" crc="9eb45201" sha1="498de28cb1dccad650365d0573f0f245825fe054"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1962,7 +1962,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="128399">
-				<rom name="burken soft game pac 09 (19xx)(-)[cload + run].cas" size="128399" crc="9f129bc5" sha1="833bfe32c139cfacfc1991123f7008ebb3655a07" offset="0" />
+				<rom name="burken soft game pac 09 (19xx)(-)[cload + run].cas" size="128399" crc="9f129bc5" sha1="833bfe32c139cfacfc1991123f7008ebb3655a07"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1974,7 +1974,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="84964">
-				<rom name="burken soft game pac 10 (19xx)(-)[cload + run].cas" size="84964" crc="fda49c5d" sha1="bab02aa71e78bce446aaffc50128ac37188eaa51" offset="0" />
+				<rom name="burken soft game pac 10 (19xx)(-)[cload + run].cas" size="84964" crc="fda49c5d" sha1="bab02aa71e78bce446aaffc50128ac37188eaa51"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1986,7 +1986,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="115783">
-				<rom name="burken soft game pac 11 (19xx)(-)[cload + run].cas" size="115783" crc="5e045561" sha1="72470cf84f5d0ea0df6d067a2d396d0d5545a857" offset="0" />
+				<rom name="burken soft game pac 11 (19xx)(-)[cload + run].cas" size="115783" crc="5e045561" sha1="72470cf84f5d0ea0df6d067a2d396d0d5545a857"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1998,7 +1998,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="112709">
-				<rom name="burken soft game pac 12 (19xx)(-)[cload + run].cas" size="112709" crc="d7302b43" sha1="518648fb3e18bef9f47f6bb0b9934498aa099c8b" offset="0" />
+				<rom name="burken soft game pac 12 (19xx)(-)[cload + run].cas" size="112709" crc="d7302b43" sha1="518648fb3e18bef9f47f6bb0b9934498aa099c8b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2010,7 +2010,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="104794">
-				<rom name="burken soft game pac 13 (19xx)(-)[cload + run].cas" size="104794" crc="202e7ae5" sha1="c36f21b19b4274dab4bf530701247a5e3b02564a" offset="0" />
+				<rom name="burken soft game pac 13 (19xx)(-)[cload + run].cas" size="104794" crc="202e7ae5" sha1="c36f21b19b4274dab4bf530701247a5e3b02564a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2022,7 +2022,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="110783">
-				<rom name="burken soft game pac 14 (19xx)(-)[cload + run].cas" size="110783" crc="1748aed7" sha1="49c5429d1734fd8855d6f357026af05b578eabe0" offset="0" />
+				<rom name="burken soft game pac 14 (19xx)(-)[cload + run].cas" size="110783" crc="1748aed7" sha1="49c5429d1734fd8855d6f357026af05b578eabe0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2034,7 +2034,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="133155">
-				<rom name="burken soft game pac 15 (19xx)(-)[cload + run].cas" size="133155" crc="db50d005" sha1="d117806714ea235041be454723d9c1c42bcae218" offset="0" />
+				<rom name="burken soft game pac 15 (19xx)(-)[cload + run].cas" size="133155" crc="db50d005" sha1="d117806714ea235041be454723d9c1c42bcae218"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2046,7 +2046,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="113781">
-				<rom name="burken soft game pac 16 (19xx)(-)[cload + run].cas" size="113781" crc="2c9c479c" sha1="84fde4bf4e90a2048589f7f4f03391ad25c38dce" offset="0" />
+				<rom name="burken soft game pac 16 (19xx)(-)[cload + run].cas" size="113781" crc="2c9c479c" sha1="84fde4bf4e90a2048589f7f4f03391ad25c38dce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2058,7 +2058,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="87955">
-				<rom name="burken soft game pac 17 (19xx)(-)[cload + run].cas" size="87955" crc="67175a5d" sha1="5cfab80bca3226678faccd23e30fbd9d2d9dd25a" offset="0" />
+				<rom name="burken soft game pac 17 (19xx)(-)[cload + run].cas" size="87955" crc="67175a5d" sha1="5cfab80bca3226678faccd23e30fbd9d2d9dd25a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2070,7 +2070,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="132352">
-				<rom name="burken soft game pac 18 (19xx)(-)[cload + run].cas" size="132352" crc="db1927fa" sha1="7c18c1ff4e4317cf97ad7e304d81b42765a41edd" offset="0" />
+				<rom name="burken soft game pac 18 (19xx)(-)[cload + run].cas" size="132352" crc="db1927fa" sha1="7c18c1ff4e4317cf97ad7e304d81b42765a41edd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2082,7 +2082,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="93389">
-				<rom name="burken soft game pac 19 (19xx)(-)[cload + run].cas" size="93389" crc="9f2a1df7" sha1="9614b20c5aaf996f6f4db376e55421db3c84d8ed" offset="0" />
+				<rom name="burken soft game pac 19 (19xx)(-)[cload + run].cas" size="93389" crc="9f2a1df7" sha1="9614b20c5aaf996f6f4db376e55421db3c84d8ed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2094,7 +2094,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32120">
-				<rom name="burken soft game pac 20 (19xx)(-)[cload + run][code-103423].cas" size="32120" crc="680293af" sha1="f1a0e3a41a047f142f743db54ee40255311b33a0" offset="0" />
+				<rom name="burken soft game pac 20 (19xx)(-)[cload + run][code-103423].cas" size="32120" crc="680293af" sha1="f1a0e3a41a047f142f743db54ee40255311b33a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2106,7 +2106,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="102798">
-				<rom name="burken soft game pac 21 (19xx)(-)[cload + run].cas" size="102798" crc="4e564909" sha1="8d8974ed28b92028a00a5d358b674738f00648cf" offset="0" />
+				<rom name="burken soft game pac 21 (19xx)(-)[cload + run].cas" size="102798" crc="4e564909" sha1="8d8974ed28b92028a00a5d358b674738f00648cf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2118,7 +2118,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="196649">
-				<rom name="burken soft game pac 22 (19xx)(-)[cload + run].cas" size="196649" crc="443eaea9" sha1="a390a885335cfee045069563b1cc8ae53ac255e0" offset="0" />
+				<rom name="burken soft game pac 22 (19xx)(-)[cload + run].cas" size="196649" crc="443eaea9" sha1="a390a885335cfee045069563b1cc8ae53ac255e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2130,7 +2130,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="131712">
-				<rom name="burken soft game pac 23 (19xx)(-)[cload + run].cas" size="131712" crc="6c65e500" sha1="e6736990aba510215e96ea0ee5b534502244e74a" offset="0" />
+				<rom name="burken soft game pac 23 (19xx)(-)[cload + run].cas" size="131712" crc="6c65e500" sha1="e6736990aba510215e96ea0ee5b534502244e74a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2142,7 +2142,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="120207">
-				<rom name="burken soft game pac 24 (19xx)(-)[cload + run].cas" size="120207" crc="4de515fe" sha1="e6fad3a07d8e2ba17e08c622a2b5f7100718cda4" offset="0" />
+				<rom name="burken soft game pac 24 (19xx)(-)[cload + run].cas" size="120207" crc="4de515fe" sha1="e6fad3a07d8e2ba17e08c622a2b5f7100718cda4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2154,7 +2154,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="143760">
-				<rom name="burken soft game pac 25 (19xx)(-)[cload + run].cas" size="143760" crc="4f34aca5" sha1="3d9c4d0da9e3a5e2649ac954349a8f7716a0fc9e" offset="0" />
+				<rom name="burken soft game pac 25 (19xx)(-)[cload + run].cas" size="143760" crc="4f34aca5" sha1="3d9c4d0da9e3a5e2649ac954349a8f7716a0fc9e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2166,7 +2166,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="86332">
-				<rom name="burken soft game pac 26 (19xx)(-)[cload + run].cas" size="86332" crc="a4514c93" sha1="7ff5be662ef935a8a0d71962f3181874676d4f52" offset="0" />
+				<rom name="burken soft game pac 26 (19xx)(-)[cload + run].cas" size="86332" crc="a4514c93" sha1="7ff5be662ef935a8a0d71962f3181874676d4f52"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2178,7 +2178,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="118644">
-				<rom name="burken soft game pac 27 (19xx)(-)[cload + run].cas" size="118644" crc="8eb80983" sha1="6fbf38608ad2e423b1084477532ebbd187bb0610" offset="0" />
+				<rom name="burken soft game pac 27 (19xx)(-)[cload + run].cas" size="118644" crc="8eb80983" sha1="6fbf38608ad2e423b1084477532ebbd187bb0610"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2190,7 +2190,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="123478">
-				<rom name="burken soft game pac 28 (19xx)(-)[cload + run].cas" size="123478" crc="03321219" sha1="1b6592e89f4da53adf6eea094283e86621075ad6" offset="0" />
+				<rom name="burken soft game pac 28 (19xx)(-)[cload + run].cas" size="123478" crc="03321219" sha1="1b6592e89f4da53adf6eea094283e86621075ad6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2202,7 +2202,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="119281">
-				<rom name="burken soft game pac 29 (19xx)(-)[cload + run].cas" size="119281" crc="236ac892" sha1="4021930ba9d37b9c8a46dfcfcdd05e888e3b0ad5" offset="0" />
+				<rom name="burken soft game pac 29 (19xx)(-)[cload + run].cas" size="119281" crc="236ac892" sha1="4021930ba9d37b9c8a46dfcfcdd05e888e3b0ad5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2216,7 +2216,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="54061">
-				<rom name="joystick 01 (1985)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="54061" crc="7b84ddb1" sha1="ae48f10f6a8c3e93568e015946db78e961937b40" offset="0" />
+				<rom name="joystick 01 (1985)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="54061" crc="7b84ddb1" sha1="ae48f10f6a8c3e93568e015946db78e961937b40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2228,7 +2228,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="53966">
-				<rom name="joystick 02 (1985)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="53966" crc="c220d3bd" sha1="f704527c2c15183e5da8af463029b1d3fb66a3b8" offset="0" />
+				<rom name="joystick 02 (1985)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="53966" crc="c220d3bd" sha1="f704527c2c15183e5da8af463029b1d3fb66a3b8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2240,7 +2240,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="61624">
-				<rom name="joystick 03 (1985)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="61624" crc="8eb3baae" sha1="cb806119a8c3a4931f26a6a4b422e2b76035007c" offset="0" />
+				<rom name="joystick 03 (1985)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="61624" crc="8eb3baae" sha1="cb806119a8c3a4931f26a6a4b422e2b76035007c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2252,7 +2252,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="101310">
-				<rom name="joystick 04 (1985)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="101310" crc="ae8d8e4b" sha1="a1684e24250eba7282853f3d6b7b5bb8c8ff51df" offset="0" />
+				<rom name="joystick 04 (1985)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="101310" crc="ae8d8e4b" sha1="a1684e24250eba7282853f3d6b7b5bb8c8ff51df"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2264,7 +2264,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="93553">
-				<rom name="joystick 05 (1986)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="93553" crc="23d02569" sha1="f9a6eff21ebe5f44de8f5d56584ccc234143177a" offset="0" status="baddump" />
+				<rom name="joystick 05 (1986)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="93553" crc="23d02569" sha1="f9a6eff21ebe5f44de8f5d56584ccc234143177a" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2276,7 +2276,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="96205">
-				<rom name="joystick 06 (1986)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="96205" crc="325aade5" sha1="105aa347f033a5815f1041cddf5bd9ca8193a6ad" offset="0" />
+				<rom name="joystick 06 (1986)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="96205" crc="325aade5" sha1="105aa347f033a5815f1041cddf5bd9ca8193a6ad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2288,7 +2288,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="116787">
-				<rom name="joystick 07 (1986)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="116787" crc="53627b03" sha1="dd871817eb854e71a7a7e496d9fb9641afb4f0ee" offset="0" />
+				<rom name="joystick 07 (1986)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="116787" crc="53627b03" sha1="dd871817eb854e71a7a7e496d9fb9641afb4f0ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2300,7 +2300,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="76865">
-				<rom name="joystick 08 (1986)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="76865" crc="c0a94bd1" sha1="54680a63ac48e99acda354853d4e990d67e58982" offset="0" status="baddump" />
+				<rom name="joystick 08 (1986)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="76865" crc="c0a94bd1" sha1="54680a63ac48e99acda354853d4e990d67e58982" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2312,7 +2312,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="92282">
-				<rom name="joystick 09 (1986)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="92282" crc="f6c90712" sha1="b56284036332de5a1eca89c5e9d26bc4b0c45b2c" offset="0" status="baddump" />
+				<rom name="joystick 09 (1986)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="92282" crc="f6c90712" sha1="b56284036332de5a1eca89c5e9d26bc4b0c45b2c" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2324,7 +2324,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="66292">
-				<rom name="joystick 11 (1986)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="66292" crc="dfe57e44" sha1="8b633314d3832cffa67401649efea03f48264e9a" offset="0" status="baddump" />
+				<rom name="joystick 11 (1986)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="66292" crc="dfe57e44" sha1="8b633314d3832cffa67401649efea03f48264e9a" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2336,7 +2336,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="48120">
-				<rom name="joystick 15 (1987)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="48120" crc="9eec4622" sha1="c8bc52b348867003faeda82442dd4630511631e8" offset="0" />
+				<rom name="joystick 15 (1987)(saga &amp; joystick)(sv)[position tape + cload + run].cas" size="48120" crc="9eec4622" sha1="c8bc52b348867003faeda82442dd4630511631e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2350,7 +2350,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="275740">
-				<rom name="mkod collection 01 (19xx)(-)[position tape + cload + run].cas" size="275740" crc="7ee3f346" sha1="4cd887a765ad760218eeb23a4ed7ff42cfd1fc5b" offset="0" />
+				<rom name="mkod collection 01 (19xx)(-)[position tape + cload + run].cas" size="275740" crc="7ee3f346" sha1="4cd887a765ad760218eeb23a4ed7ff42cfd1fc5b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2362,7 +2362,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="274085">
-				<rom name="mkod collection 02 (19xx)(-)[position tape + cload + run].cas" size="274085" crc="e712815c" sha1="425e39f2bd1150818d70ea92d266357489016767" offset="0" />
+				<rom name="mkod collection 02 (19xx)(-)[position tape + cload + run].cas" size="274085" crc="e712815c" sha1="425e39f2bd1150818d70ea92d266357489016767"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2374,7 +2374,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="410724">
-				<rom name="mkod collection 03 (19xx)(-)[position tape + cload + run].cas" size="410724" crc="9481191f" sha1="7940b0464a91ea5a14bde1366b88b1d874c26e5c" offset="0" />
+				<rom name="mkod collection 03 (19xx)(-)[position tape + cload + run].cas" size="410724" crc="9481191f" sha1="7940b0464a91ea5a14bde1366b88b1d874c26e5c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2386,7 +2386,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="410236">
-				<rom name="mkod collection 04 (19xx)(-)[position tape + cload + run].cas" size="410236" crc="62932ab3" sha1="e86f69da0ff953629a102fc4f3b42177f58a6972" offset="0" />
+				<rom name="mkod collection 04 (19xx)(-)[position tape + cload + run].cas" size="410236" crc="62932ab3" sha1="e86f69da0ff953629a102fc4f3b42177f58a6972"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2398,7 +2398,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="204827">
-				<rom name="mkod collection 05 (19xx)(-)[position tape + cload + run].cas" size="204827" crc="5189a564" sha1="b76eef23b5ccde916b9afad9abc3b32d0c3199bf" offset="0" />
+				<rom name="mkod collection 05 (19xx)(-)[position tape + cload + run].cas" size="204827" crc="5189a564" sha1="b76eef23b5ccde916b9afad9abc3b32d0c3199bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2410,7 +2410,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="258348">
-				<rom name="mkod collection 06 (19xx)(-)[position tape + cload + run].cas" size="258348" crc="e8565d26" sha1="8276c63f05466224c71361550f3dd2a5c6016e14" offset="0" />
+				<rom name="mkod collection 06 (19xx)(-)[position tape + cload + run].cas" size="258348" crc="e8565d26" sha1="8276c63f05466224c71361550f3dd2a5c6016e14"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2422,7 +2422,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="400275">
-				<rom name="mkod collection 07 (19xx)(-)[position tape + cload + run].cas" size="400275" crc="982b1bf8" sha1="94909493d8acf65a459a788c3912d6e72fc0a9bc" offset="0" />
+				<rom name="mkod collection 07 (19xx)(-)[position tape + cload + run].cas" size="400275" crc="982b1bf8" sha1="94909493d8acf65a459a788c3912d6e72fc0a9bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2434,7 +2434,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="394343">
-				<rom name="mkod collection 08 (19xx)(-)[position tape + cload + run].cas" size="394343" crc="81a6781d" sha1="a5e1aa0645dc4903536417eb42a1ba9fede2c9c1" offset="0" />
+				<rom name="mkod collection 08 (19xx)(-)[position tape + cload + run].cas" size="394343" crc="81a6781d" sha1="a5e1aa0645dc4903536417eb42a1ba9fede2c9c1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2446,7 +2446,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="201374">
-				<rom name="mkod collection 09 (19xx)(-)[position tape + cload + run].cas" size="201374" crc="e254b91a" sha1="38171c04ec2fd24f3273d276bd25f946b59fcecb" offset="0" />
+				<rom name="mkod collection 09 (19xx)(-)[position tape + cload + run].cas" size="201374" crc="e254b91a" sha1="38171c04ec2fd24f3273d276bd25f946b59fcecb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2458,7 +2458,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="360864">
-				<rom name="mkod collection 10 (19xx)(-)[position tape + cload + run].cas" size="360864" crc="53ed0e11" sha1="90fd3cb3fe66da98e9b5791a86ecc0c2abb6993b" offset="0" />
+				<rom name="mkod collection 10 (19xx)(-)[position tape + cload + run].cas" size="360864" crc="53ed0e11" sha1="90fd3cb3fe66da98e9b5791a86ecc0c2abb6993b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2470,7 +2470,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="393752">
-				<rom name="mkod collection 11 (19xx)(-)[position tape + cload + run].cas" size="393752" crc="dbc9deb2" sha1="581dcc712382d51bc739f52fd131f64727b481a8" offset="0" />
+				<rom name="mkod collection 11 (19xx)(-)[position tape + cload + run].cas" size="393752" crc="dbc9deb2" sha1="581dcc712382d51bc739f52fd131f64727b481a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2482,7 +2482,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="302039">
-				<rom name="mkod collection 12 (19xx)(-)[position tape + cload + run].cas" size="302039" crc="9b0c7c31" sha1="1d49579ab106e7869df2689fab764562871a885a" offset="0" />
+				<rom name="mkod collection 12 (19xx)(-)[position tape + cload + run].cas" size="302039" crc="9b0c7c31" sha1="1d49579ab106e7869df2689fab764562871a885a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2494,7 +2494,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="251726">
-				<rom name="mkod collection 13 (19xx)(-)[position tape + cload + run].cas" size="251726" crc="e064a7d8" sha1="902a0787fc213fe6e201227e360807b8b49d27ae" offset="0" />
+				<rom name="mkod collection 13 (19xx)(-)[position tape + cload + run].cas" size="251726" crc="e064a7d8" sha1="902a0787fc213fe6e201227e360807b8b49d27ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2506,7 +2506,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="216234">
-				<rom name="mkod collection 14 (19xx)(-)[position tape + cload + run].cas" size="216234" crc="1b836189" sha1="9805fd3c41acaab838e7fefaeade4818567b6306" offset="0" />
+				<rom name="mkod collection 14 (19xx)(-)[position tape + cload + run].cas" size="216234" crc="1b836189" sha1="9805fd3c41acaab838e7fefaeade4818567b6306"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2518,7 +2518,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="94478">
-				<rom name="mkod collection 15 (19xx)(-)[position tape + bload'cas-',r].cas" size="94478" crc="130c2615" sha1="69e3ecdb2c4b5e4a02a4cc0fcf76b9388fb30c1a" offset="0" />
+				<rom name="mkod collection 15 (19xx)(-)[position tape + bload'cas-',r].cas" size="94478" crc="130c2615" sha1="69e3ecdb2c4b5e4a02a4cc0fcf76b9388fb30c1a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2530,7 +2530,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="98664">
-				<rom name="mkod collection 16 (19xx)(-)[position tape + bload'cas-',r].cas" size="98664" crc="e2fc5ef9" sha1="2eed91c818524ff732d98bf97f7ebf8e0d63157f" offset="0" />
+				<rom name="mkod collection 16 (19xx)(-)[position tape + bload'cas-',r].cas" size="98664" crc="e2fc5ef9" sha1="2eed91c818524ff732d98bf97f7ebf8e0d63157f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2542,7 +2542,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="407796">
-				<rom name="mkod collection 17 (19xx)(-)[position tape + cload + run].cas" size="407796" crc="5806ec44" sha1="ad515dce0ecbd8120ed5447c915e0a50ffc2b6fe" offset="0" />
+				<rom name="mkod collection 17 (19xx)(-)[position tape + cload + run].cas" size="407796" crc="5806ec44" sha1="ad515dce0ecbd8120ed5447c915e0a50ffc2b6fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2554,7 +2554,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="376850">
-				<rom name="mkod collection 18 (19xx)(-)[position tape + cload + run].cas" size="376850" crc="164ad74f" sha1="11a9b02eb4b1a9486bc3d62f86b33c246d838a75" offset="0" />
+				<rom name="mkod collection 18 (19xx)(-)[position tape + cload + run].cas" size="376850" crc="164ad74f" sha1="11a9b02eb4b1a9486bc3d62f86b33c246d838a75"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2566,7 +2566,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="82220">
-				<rom name="mkod collection 19 (19xx)(-)[position tape + bload'cas-',r].cas" size="82220" crc="107983e9" sha1="39de63c813c69562024ea385633c6c975cbc4790" offset="0" />
+				<rom name="mkod collection 19 (19xx)(-)[position tape + bload'cas-',r].cas" size="82220" crc="107983e9" sha1="39de63c813c69562024ea385633c6c975cbc4790"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2580,7 +2580,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="83556">
-				<rom name="basic collection 01 (1985)(-)(sv)[position tape + cload + run].cas" size="83556" crc="e9e2f4ee" sha1="074b8dc7066420b121dbf9812e59eed4fffd3d2c" offset="0" />
+				<rom name="basic collection 01 (1985)(-)(sv)[position tape + cload + run].cas" size="83556" crc="e9e2f4ee" sha1="074b8dc7066420b121dbf9812e59eed4fffd3d2c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2592,7 +2592,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="70792">
-				<rom name="basic collection 02 (1985)(-)(sv)[position tape + cload + run].cas" size="70792" crc="918df490" sha1="577abd66afa14f43c6243709b3c3de917067b844" offset="0" />
+				<rom name="basic collection 02 (1985)(-)(sv)[position tape + cload + run].cas" size="70792" crc="918df490" sha1="577abd66afa14f43c6243709b3c3de917067b844"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2604,7 +2604,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="154453">
-				<rom name="basic collection 03 (1985)(-)(sv)[position tape + cload + run].cas" size="154453" crc="489edfff" sha1="8124badb6f7cd0f58c8f9c1155415f82e25b69eb" offset="0" />
+				<rom name="basic collection 03 (1985)(-)(sv)[position tape + cload + run].cas" size="154453" crc="489edfff" sha1="8124badb6f7cd0f58c8f9c1155415f82e25b69eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2616,7 +2616,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="173268">
-				<rom name="basic collection 04 (1985)(-)(sv)[position tape + cload + run].cas" size="173268" crc="6a6b4f28" sha1="e15df3b249b2ff300222935bca741a94dff76c4f" offset="0" />
+				<rom name="basic collection 04 (1985)(-)(sv)[position tape + cload + run].cas" size="173268" crc="6a6b4f28" sha1="e15df3b249b2ff300222935bca741a94dff76c4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2628,7 +2628,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="55633">
-				<rom name="basic collection 05 (1985)(-)(sv)[position tape + cload + run].cas" size="55633" crc="950205ca" sha1="00e7ca0e2629de3c6181d6c80515fe34d3ff02e9" offset="0" />
+				<rom name="basic collection 05 (1985)(-)(sv)[position tape + cload + run].cas" size="55633" crc="950205ca" sha1="00e7ca0e2629de3c6181d6c80515fe34d3ff02e9"/>
 			</dataarea>
 		</part>
 	</software>

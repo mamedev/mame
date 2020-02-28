@@ -34,8 +34,7 @@
 
 #pragma once
 
-class i8257_device :  public device_t,
-						public device_execute_interface
+class i8257_device : public device_t, public device_execute_interface
 {
 public:
 	// construction/destruction
@@ -60,7 +59,7 @@ public:
 	template <unsigned Ch> auto out_iow_cb() { return m_out_iow_cb[Ch].bind(); }
 	template <unsigned Ch> auto out_dack_cb() { return m_out_dack_cb[Ch].bind(); }
 
-	// HACK: the radio86 and alikes require this, is it a bug in the soviet clone or is there something else happening?
+	// This should be set for systems that map the DMAC registers into the memory space rather than as I/O ports (e.g. radio86)
 	void set_reverse_rw_mode(bool flag) { m_reverse_rw = flag; }
 
 protected:
@@ -99,14 +98,14 @@ private:
 	devcb_write_line   m_out_hrq_cb;
 	devcb_write_line   m_out_tc_cb;
 
-	/* accessors to main memory */
+	// accessors to main memory
 	devcb_read8        m_in_memr_cb;
 	devcb_write8       m_out_memw_cb;
 
-	/* channel accessors */
-	devcb_read8        m_in_ior_cb[4];
-	devcb_write8       m_out_iow_cb[4];
-	devcb_write_line   m_out_dack_cb[4];
+	// channel accessors
+	devcb_read8::array<4> m_in_ior_cb;
+	devcb_write8::array<4> m_out_iow_cb;
+	devcb_write_line::array<4> m_out_dack_cb;
 
 	struct
 	{

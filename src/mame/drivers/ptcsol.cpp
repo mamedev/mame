@@ -121,9 +121,9 @@
 //#include "bus/s100/s100.h"
 #include "imagedev/cassette.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "machine/keyboard.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -157,6 +157,8 @@ public:
 		, m_cass2(*this, "cassette2")
 		, m_uart(*this, "uart")
 		, m_uart_s(*this, "uart_s")
+		, m_uart_clock(*this, "uart_clock")
+		, m_uart_s_clock(*this, "uart_s_clock")
 		, m_rs232(*this, "rs232")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
@@ -211,6 +213,8 @@ private:
 	required_device<cassette_image_device> m_cass2;
 	required_device<ay31015_device> m_uart;
 	required_device<ay31015_device> m_uart_s;
+	required_device<clock_device> m_uart_clock;
+	required_device<clock_device> m_uart_s_clock;
 	required_device<rs232_port_device> m_rs232;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
@@ -246,7 +250,7 @@ void sol20_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		sol20_boot(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in sol20_state::device_timer");
+		throw emu_fatalerror("Unknown id in sol20_state::device_timer");
 	}
 }
 
@@ -420,8 +424,7 @@ WRITE8_MEMBER( sol20_state::sol20_fa_w )
 		m_cassette_timer->adjust(attotime::zero);
 
 	// bit 5 baud rate */
-	m_uart->set_receiver_clock((BIT(data, 5)) ? 4800.0 : 19200.0);
-	m_uart->set_transmitter_clock((BIT(data, 5)) ? 4800.0 : 19200.0);
+	m_uart_clock->set_unscaled_clock(BIT(data, 5) ? 4800 : 19200);
 }
 
 WRITE8_MEMBER( sol20_state::sol20_fd_w )
@@ -613,8 +616,7 @@ void sol20_state::machine_reset()
 		s_clock = s_bauds[s_count] << 4;
 
 	// these lines could be commented out for now if you want better performance
-	m_uart_s->set_receiver_clock(s_clock);
-	m_uart_s->set_transmitter_clock(s_clock);
+	m_uart_s_clock->set_unscaled_clock(s_clock);
 
 	// boot-bank
 	membank("boot")->set_entry(1);
@@ -756,31 +758,35 @@ void sol20_state::sol20(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 2.00); // music board
-	WAVE(config, "wave", m_cass1).add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
-	WAVE(config, "wave2", m_cass2).add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
 	// devices
 	CASSETTE(config, m_cass1).set_formats(sol20_cassette_formats);
-	m_cass1->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cass1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass1->add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
 	m_cass1->set_interface("sol20_cass");
 
 	CASSETTE(config, m_cass2).set_formats(sol20_cassette_formats);
-	m_cass2->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cass2->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass2->add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 	m_cass2->set_interface("sol20_cass");
 
 	AY51013(config, m_uart); // TMS6011NC
-	m_uart->set_tx_clock(4800.0);
-	m_uart->set_rx_clock(4800.0);
 	m_uart->set_auto_rdav(true); // ROD (pin 4) tied to RDD (pin 18)
+
+	CLOCK(config, m_uart_clock, 4800);
+	m_uart_clock->signal_handler().set(m_uart, FUNC(ay51013_device::write_rcp));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay51013_device::write_tcp));
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	AY51013(config, m_uart_s); // TMS6011NC
 	m_uart_s->read_si_callback().set(m_rs232, FUNC(rs232_port_device::rxd_r));
 	m_uart_s->write_so_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
-	m_uart_s->set_tx_clock(4800.0);
-	m_uart_s->set_rx_clock(4800.0);
 	m_uart_s->set_auto_rdav(true); // ROD (pin 4) tied to RDD (pin 18)
+
+	CLOCK(config, m_uart_s_clock, 4800);
+	m_uart_s_clock->signal_handler().set(m_uart_s, FUNC(ay51013_device::write_rcp));
+	m_uart_s_clock->signal_handler().append(m_uart_s, FUNC(ay51013_device::write_tcp));
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(sol20_state::kbd_put));
@@ -808,6 +814,9 @@ ROM_START( sol20 )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "6574.bin", 0x0000, 0x0800, BAD_DUMP CRC(fd75df4f) SHA1(4d09aae2f933478532b7d3d1a2dee7123d9828ca) )
 	ROM_LOAD( "6575.bin", 0x0800, 0x0800, BAD_DUMP CRC(cfdb76c2) SHA1(ab00798161d13f07bee3cf0e0070a2f0a805591f) )
+
+	ROM_REGION( 0x100, "keyboard", 0 )
+	ROM_LOAD( "8574.u18", 0x000, 0x100, NO_DUMP ) // 256x4 bipolar PROM or mask ROM; second half unused
 ROM_END
 
 /* Driver */

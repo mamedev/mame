@@ -43,17 +43,47 @@ to correct the music playback sequencing and also allow sound effect samples to
 play on any of the three available sample channels. The fourth channel is reserved
 for music playback.
 
-HotMind and presumably Lucky Boom have a Jamma expansion board that plugs onto the
-main boards Jamma connector and provides extra I/O using the generic Player-2 pins.
+There is another World Beach Volley with a (undumped) S87C751 for sound instead of a
+PIC (also with an OKI M6295) which fully matches "World Beach Volley (set 1)" for the
+other ROMS. It's an original PCB from Playmark Italy.
+
+HotMind, World Beach Volley and presumably Lucky Boom have a JAMMA expansion board
+that plugs onto the main boards Jamma connector and provides extra I/O using the
+generic Player-2 pins.
 The expansion boards provides I/O for the Token and Ticket dispensers, drive circuit
 for Coin-In Counter and Credit-Out Counter. In the case of HotMind, a 93C46 EEPROM
 for storing game config/stats. The Expansion board then has a male Jamma connector
 that you plug into your Jamma harness.
 
+The World Beach Volley JAMMA expansion board for the 87C751 version follows this layout:
+
+  PLAYMARK ITALY 1995
+  LINK2
+  ____________________________
+  |___    ___________        |
+     |   | TDA1510AQ|        |
+  ___|   |__________|        |
+  |__                        |
+J |__                        |
+A  __|                       |
+M |__                        |
+M |__      ___________       |
+A |__     |_MCT1413P_|       |
+  |__                        |
+  |__                       _|___
+  |__     ____________      |DB9|
+  |__    |SN74LS245N_|      |   | To main PCB
+  |__     ____________      |___|
+  |__    |S87C751-4N24       |
+  |__       ______           |
+  ___|      |XTAL|<-12.000   |
+  |         |____|           |
+  |__________________________|
+
 
 TODO:
-- World Beach Volley and Hard Times sound is controlled by a PIC16C57 whose internal
-  ROM is currently missing.
+- Hard Times sound is controlled by a PIC16C57 whose internal ROM is currently missing.
+- Dump the World Beach Volley sound S87C751 internal ROM.
 - Lucky Boom has some minor colour issue with the background - see the title screen. The
   game selects the wrong colour for some tiles. The tiles should be colour 0x01 not 0x02.
   Affects the backgrounds in game however it's barely noticeable.
@@ -281,7 +311,7 @@ void playmark_state::bigtwin_main_map(address_map &map)
 	map(0x70001c, 0x70001d).portr("DSW1");
 	map(0x70001e, 0x70001f).w(FUNC(playmark_state::playmark_snd_command_w));
 	map(0x780000, 0x7807ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
-//  AM_RANGE(0xe00000, 0xe00001) ?? written on startup
+//  map(0xe00000, 0xe00001) ?? written on startup
 	map(0xff0000, 0xffffff).ram();
 }
 
@@ -314,14 +344,14 @@ void playmark_state::wbeachvl_main_map(address_map &map)
 	map(0x50f000, 0x50ffff).ram().share("rowscroll");
 	map(0x510000, 0x51000b).w(FUNC(playmark_state::wbeachvl_scroll_w));
 	map(0x51000c, 0x51000d).nopw();    /* 2 and 3 */
-//  AM_RANGE(0x700000, 0x700001) ?? written on startup
+//  map(0x700000, 0x700001) ?? written on startup
 	map(0x710010, 0x710011).portr("SYSTEM");
 	map(0x710012, 0x710013).portr("P1");
 	map(0x710014, 0x710015).portr("P2");
 	map(0x710016, 0x710017).w(FUNC(playmark_state::wbeachvl_coin_eeprom_w));
 	map(0x710018, 0x710019).portr("P3");
 	map(0x71001a, 0x71001b).portr("P4");
-//  AM_RANGE(0x71001c, 0x71001d) AM_READ(playmark_snd_status???)
+//  map(0x71001c, 0x71001d).r(FUNC(playmark_state::playmark_snd_status???));
 	map(0x71001e, 0x71001f).w(FUNC(playmark_state::playmark_snd_command_w));
 	map(0x780000, 0x780fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xff0000, 0xffffff).ram();
@@ -370,7 +400,7 @@ void playmark_state::hrdtimes_main_map(address_map &map)
 	map(0x300016, 0x300017).w(FUNC(playmark_state::hrdtimes_coin_w));
 	map(0x30001a, 0x30001b).portr("DSW2");
 	map(0x30001c, 0x30001d).portr("DSW1");
-//  AM_RANGE(0x30001e, 0x30001f) AM_WRITE(playmark_snd_command_w)
+//  map(0x30001e, 0x30001f).w(FUNC(playmark_state::playmark_snd_command_w));
 	map(0x304000, 0x304001).nopw();        /* watchdog? irq ack? */
 }
 
@@ -1041,12 +1071,12 @@ MACHINE_RESET_MEMBER(playmark_state,playmark)
 	m_dispenser_latch = 0;
 }
 
-MACHINE_CONFIG_START(playmark_state::bigtwin)
-
+void playmark_state::bigtwin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bigtwin_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
+	M68000(config, m_maincpu, 12000000);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::bigtwin_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq2_line_hold));
 
 	PIC16C57(config, m_audiocpu, 12000000);
 	m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
@@ -1059,13 +1089,13 @@ MACHINE_CONFIG_START(playmark_state::bigtwin)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_bigtwin)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(playmark_state::screen_update_bigtwin));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bigtwin);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
@@ -1075,17 +1105,17 @@ MACHINE_CONFIG_START(playmark_state::bigtwin)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki->set_addrmap(0, &playmark_state::oki_map);
+}
 
-MACHINE_CONFIG_START(playmark_state::bigtwinb)
-
+void playmark_state::bigtwinb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(bigtwinb_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::bigtwinb_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq2_line_hold));
 
 	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);
 	m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
@@ -1098,13 +1128,13 @@ MACHINE_CONFIG_START(playmark_state::bigtwinb)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_bigtwinb)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(playmark_state::screen_update_bigtwinb));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bigtwinb);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
@@ -1114,17 +1144,17 @@ MACHINE_CONFIG_START(playmark_state::bigtwinb)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki->set_addrmap(0, &playmark_state::oki_map);
+}
 
-MACHINE_CONFIG_START(playmark_state::wbeachvl)
-
+void playmark_state::wbeachvl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wbeachvl_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
+	M68000(config, m_maincpu, 12000000);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::wbeachvl_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq2_line_hold));
 
 	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    /* 12MHz with internal 4x divisor */
 	m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // wrong?
@@ -1140,13 +1170,13 @@ MACHINE_CONFIG_START(playmark_state::wbeachvl)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_wbeachvl)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(playmark_state::screen_update_wbeachvl));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wbeachvl);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 2048);
@@ -1156,17 +1186,17 @@ MACHINE_CONFIG_START(playmark_state::wbeachvl)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki->set_addrmap(0, &playmark_state::oki_map);
+}
 
-MACHINE_CONFIG_START(playmark_state::excelsr)
-
+void playmark_state::excelsr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(excelsr_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::excelsr_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq2_line_hold));
 
 	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    /* 12MHz with internal 4x divisor */
 	m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
@@ -1179,13 +1209,13 @@ MACHINE_CONFIG_START(playmark_state::excelsr)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_excelsr)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(playmark_state::screen_update_excelsr));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_excelsr);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
@@ -1195,17 +1225,17 @@ MACHINE_CONFIG_START(playmark_state::excelsr)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) /* 1MHz resonator */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(1'000'000), okim6295_device::PIN7_HIGH); /* 1MHz resonator */
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki->set_addrmap(0, &playmark_state::oki_map);
+}
 
-MACHINE_CONFIG_START(playmark_state::hrdtimes)
-
+void playmark_state::hrdtimes(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(hrdtimes_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);   /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::hrdtimes_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq6_line_hold));
 
 	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    /* verified on pcb */
 //  m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
@@ -1219,13 +1249,13 @@ MACHINE_CONFIG_START(playmark_state::hrdtimes)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_hrdtimes)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(playmark_state::screen_update_hrdtimes));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hrdtimes);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
@@ -1235,17 +1265,17 @@ MACHINE_CONFIG_START(playmark_state::hrdtimes)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(1'000'000), okim6295_device::PIN7_HIGH); /* verified on pcb */
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki->set_addrmap(0, &playmark_state::oki_map);
+}
 
-MACHINE_CONFIG_START(playmark_state::hotmind)
-
+void playmark_state::hotmind(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(hotmind_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold) // irq 2 and 6 point to the same location on hotmind
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);   /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::hotmind_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq6_line_hold)); // irq 2 and 6 point to the same location on hotmind
 
 	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    /* verified on pcb */
 //  m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
@@ -1260,13 +1290,13 @@ MACHINE_CONFIG_START(playmark_state::hotmind)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_hrdtimes)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(playmark_state::screen_update_hrdtimes));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hotmind);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
@@ -1279,17 +1309,17 @@ MACHINE_CONFIG_START(playmark_state::hotmind)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(1'000'000), okim6295_device::PIN7_HIGH);  /* verified on pcb */
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki->set_addrmap(0, &playmark_state::oki_map);
+}
 
-MACHINE_CONFIG_START(playmark_state::luckboomh)
-
+void playmark_state::luckboomh(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(luckboomh_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);   /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::luckboomh_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq6_line_hold));
 
 	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    /* verified on pcb */
 //  m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
@@ -1304,13 +1334,13 @@ MACHINE_CONFIG_START(playmark_state::luckboomh)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_hrdtimes)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(playmark_state::screen_update_hrdtimes));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_luckboomh);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
@@ -1323,10 +1353,10 @@ MACHINE_CONFIG_START(playmark_state::luckboomh)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(1'000'000), okim6295_device::PIN7_HIGH);  /* verified on pcb */
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki->set_addrmap(0, &playmark_state::oki_map);
+}
 
 
 /***************************************************************************

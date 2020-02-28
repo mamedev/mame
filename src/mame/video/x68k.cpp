@@ -277,7 +277,10 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 						if(((m_video.reg[2] & 0x1800) == 0x1000) && (colour & 1))
 							m_special.pix16(scanline, pixel) = colour;
 						else
+						{
 							bitmap.pix16(scanline, pixel) = colour;
+							m_special.pix16(scanline, pixel) = 0;
+						}
 					}
 					loc++;
 					loc &= 0x3ff;
@@ -322,7 +325,15 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 							else if(((m_video.reg[2] & 0x1800) == 0x1000) && (colour & 1))
 								m_special.pix16(scanline, pixel) = colour;
 							else
+							{
+								m_special.pix16(scanline, pixel) = 0;
 								bitmap.pix16(scanline, pixel) = colour;
+							}
+						}
+						else if(((m_video.reg[2] & 0x1800) == 0x1000) && m_special.pix16(scanline, pixel))
+						{
+							bitmap.pix16(scanline, pixel) = m_special.pix16(scanline, pixel);
+							m_special.pix16(scanline, pixel) = 0;
 						}
 						loc++;
 						loc &= 0x1ff;
@@ -360,7 +371,15 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 								else if(((m_video.reg[2] & 0x1800) == 0x1000) && (colour & 1))
 									m_special.pix16(scanline, pixel) = colour;
 								else
+								{
 									bitmap.pix16(scanline, pixel) = colour;
+									m_special.pix16(scanline, pixel) = 0;
+								}
+							}
+							else if(((m_video.reg[2] & 0x1800) == 0x1000) && m_special.pix16(scanline, pixel))
+							{
+								bitmap.pix16(scanline, pixel) = m_special.pix16(scanline, pixel);
+								m_special.pix16(scanline, pixel) = 0;
 							}
 							loc++;
 							loc &= 0x1ff;
@@ -592,10 +611,10 @@ void x68k_state::video_start()
 	m_gfxdecode->gfx(gfx_index)->set_colors(32);
 
 	/* Tilemaps */
-	m_bg0_8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(x68k_state::get_bg0_tile),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg1_8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(x68k_state::get_bg1_tile),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg0_16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(x68k_state::get_bg0_tile_16),this),TILEMAP_SCAN_ROWS,16,16,64,64);
-	m_bg1_16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(x68k_state::get_bg1_tile_16),this),TILEMAP_SCAN_ROWS,16,16,64,64);
+	m_bg0_8 =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(x68k_state::get_bg0_tile)),    TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
+	m_bg1_8 =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(x68k_state::get_bg1_tile)),    TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
+	m_bg0_16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(x68k_state::get_bg0_tile_16)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_bg1_16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(x68k_state::get_bg1_tile_16)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	m_bg0_8->set_transparent_pen(0);
 	m_bg1_8->set_transparent_pen(0);

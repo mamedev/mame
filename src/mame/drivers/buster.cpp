@@ -34,7 +34,7 @@ public:
 	{ }
 
 	DECLARE_WRITE8_MEMBER(coin_output_w);
-	uint32_t screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_buster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void buster(machine_config &config);
 	void mainmap(address_map &map);
 protected:
@@ -51,7 +51,7 @@ void buster_state::video_start()
 {
 }
 
-uint32_t buster_state::screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t buster_state::screen_update_buster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0x0000;
@@ -83,7 +83,7 @@ WRITE8_MEMBER(buster_state::coin_output_w)
 
 void buster_state::mainmap(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();// AM_SHARE("rom")
+	map(0x0000, 0x3fff).rom();// .share("rom");
 	map(0x4000, 0x47ff).ram().share("wram");
 	map(0x5000, 0x5fff).ram().share("vram");
 	map(0x6000, 0x6000).w("crtc", FUNC(mc6845_device::address_w));
@@ -322,34 +322,34 @@ static GFXDECODE_START( gfx_buster )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(buster_state::buster)
+void buster_state::buster(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(3'579'545))        /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mainmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", buster_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(3'579'545));        /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &buster_state::mainmap);
+	m_maincpu->set_vblank_int("screen", FUNC(buster_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(buster_state, screen_update_buster)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(buster_state::screen_update_buster));
 
 	mc6845_device &crtc(MC6845(config, "crtc", XTAL(3'579'545)/4)); //unknown clock / type
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_buster)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_buster);
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, "aysnd", 1500000/2).add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( buster )

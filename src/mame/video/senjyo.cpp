@@ -84,19 +84,19 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_bg3_tile_info)
 
 void senjyo_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(senjyo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(senjyo_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	if (m_is_senjyo)
 	{
-		m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(senjyo_state::senjyo_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
-		m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(senjyo_state::get_bg2_tile_info),this),    TILEMAP_SCAN_ROWS, 16, 16, 16, 48);   /* only 16x32 used by Star Force */
-		m_bg3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(senjyo_state::get_bg3_tile_info),this),    TILEMAP_SCAN_ROWS, 16, 16, 16, 56);   /* only 16x32 used by Star Force */
+		m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(senjyo_state::senjyo_bg1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
+		m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(senjyo_state::get_bg2_tile_info)),    TILEMAP_SCAN_ROWS, 16, 16, 16, 48);   // only 16x32 used by Star Force
+		m_bg3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(senjyo_state::get_bg3_tile_info)),    TILEMAP_SCAN_ROWS, 16, 16, 16, 56);   // only 16x32 used by Star Force
 	}
 	else
 	{
-		m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(senjyo_state::starforc_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
-		m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(senjyo_state::get_bg2_tile_info),this),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32); /* only 16x32 used by Star Force */
-		m_bg3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(senjyo_state::get_bg3_tile_info),this),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32); /* only 16x32 used by Star Force */
+		m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(senjyo_state::starforc_bg1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
+		m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(senjyo_state::get_bg2_tile_info)),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32); // only 16x32 used by Star Force
+		m_bg3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(senjyo_state::get_bg3_tile_info)),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32); // only 16x32 used by Star Force
 	}
 
 	m_fg_tilemap->set_transparent_pen(0);
@@ -164,7 +164,9 @@ WRITE8_MEMBER(senjyo_state::bg3videoram_w)
 
 void senjyo_state::draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_bgstripes == 0xff) /* off */
+	// assume +1 from disabling layer being 0xff
+	uint8_t stripe_width = m_bgstripesram[0]+1;
+	if (stripe_width == 0)
 		bitmap.fill(m_palette->pen_color(0), cliprect);
 	else
 	{
@@ -172,7 +174,7 @@ void senjyo_state::draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 		int pen = 0;
 		int count = 0;
-		int strwid = m_bgstripes;
+		int strwid = stripe_width;
 		if (strwid == 0) strwid = 0x100;
 		if (flip) strwid ^= 0xff;
 

@@ -7,6 +7,7 @@
 
 
 class nscsi_device;
+class nscsi_slot_card_interface;
 
 class nscsi_bus_device : public device_t
 {
@@ -23,7 +24,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_config_complete() override;
+	virtual void device_resolve_objects() override;
 
 private:
 	struct dev_t {
@@ -42,7 +43,7 @@ private:
 };
 
 class nscsi_connector: public device_t,
-					   public device_slot_interface
+					   public device_single_card_slot_interface<nscsi_slot_card_interface>
 {
 public:
 	template <typename T>
@@ -63,7 +64,18 @@ protected:
 	virtual void device_start() override;
 };
 
-class nscsi_device : public device_t, public device_slot_card_interface
+class nscsi_slot_card_interface : public device_interface
+{
+	friend class nscsi_connector;
+
+public:
+	nscsi_slot_card_interface(const machine_config &mconfig, device_t &device, const char *nscsi_tag);
+
+private:
+	required_device<nscsi_device> m_nscsi;
+};
+
+class nscsi_device : public device_t
 {
 public:
 	// Here because the biggest users are the devices, not the bus
@@ -128,7 +140,7 @@ protected:
 	nscsi_bus_device *scsi_bus;
 };
 
-class nscsi_full_device : public nscsi_device
+class nscsi_full_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
 	virtual void scsi_ctrl_changed() override;
@@ -300,7 +312,7 @@ protected:
 		SBUF_SENSE
 	};
 
-	using nscsi_device::nscsi_device;
+	nscsi_full_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -308,6 +320,7 @@ protected:
 
 	virtual void scsi_message();
 	virtual void scsi_command();
+	virtual bool scsi_command_done(uint8_t command, uint8_t length);
 
 	void scsi_unknown_command();
 	void scsi_status_complete(uint8_t st);
@@ -448,7 +461,6 @@ private:
 	void target_recv_byte();
 	void target_send_byte(uint8_t val);
 	void target_send_buffer_byte();
-	bool command_done();
 };
 
 

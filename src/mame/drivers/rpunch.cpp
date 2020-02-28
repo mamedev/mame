@@ -138,8 +138,11 @@ void rpunch_state::machine_start()
 
 void rpunch_state::machine_reset()
 {
-	uint8_t *snd = memregion("upd")->base();
-	memcpy(snd, snd + 0x20000, 0x20000);
+	if (memregion("upd"))
+	{
+		uint8_t *snd = memregion("upd")->base();
+		memcpy(snd, snd + 0x20000, 0x20000);
+	}
 }
 
 
@@ -213,7 +216,7 @@ void rpunch_state::main_map(address_map &map)
 	map(0x0c0000, 0x0c0007).w(FUNC(rpunch_state::rpunch_scrollreg_w));
 	map(0x0c0009, 0x0c0009).select(0x20).w(FUNC(rpunch_state::rpunch_gga_w));
 	map(0x0c000c, 0x0c000d).w(FUNC(rpunch_state::rpunch_videoreg_w));
-	map(0x0c000f, 0x0c000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x0c000f, 0x0c000f).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0x0c0010, 0x0c0013).w(FUNC(rpunch_state::rpunch_ins_w));
 	map(0x0c0018, 0x0c0019).portr("P1");
 	map(0x0c001a, 0x0c001b).portr("P2");
@@ -222,7 +225,16 @@ void rpunch_state::main_map(address_map &map)
 	map(0x0fc000, 0x0fffff).ram();
 }
 
+void rpunch_state::svolleybl_main_map(address_map &map)
+{
+	main_map(map);
 
+	// TODO: sound latch hook up is incomplete
+	map(0x090000, 0x090fff).ram(); // ?
+	map(0x0c000e, 0x0c000f).unmapw();
+	map(0x0c001e, 0x0c001f).unmapr();
+	map(0x0b0001, 0x0b0001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+}
 
 /*************************************
  *
@@ -240,7 +252,15 @@ void rpunch_state::sound_map(address_map &map)
 	map(0xf800, 0xffff).ram();
 }
 
-
+void rpunch_state::svolleybl_sound_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xe800, 0xe800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	//map(0xf000, 0xf000) // OKI M5205?
+	//map(0xf400, 0xf400) // OKI M5205?
+	map(0xf800, 0xffff).ram();
+}
 
 /*************************************
  *
@@ -257,7 +277,7 @@ static INPUT_PORTS_START( rpunch )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rpunch_state,hi_bits_r, nullptr)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(rpunch_state, hi_bits_r)
 
 	PORT_START("P2")    /* c001a lower 8 bits */
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -267,7 +287,7 @@ static INPUT_PORTS_START( rpunch )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rpunch_state,hi_bits_r, nullptr)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(rpunch_state, hi_bits_r)
 
 	PORT_START("SERVICE")   /* c0018/c001a upper 8 bits */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -457,14 +477,14 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(rpunch_state::rpunch)
-
+void rpunch_state::rpunch(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rpunch_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, MASTER_CLOCK/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rpunch_state::sound_map);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set("soundirq", FUNC(input_merger_device::in_w<0>));
@@ -472,12 +492,12 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(304, 224)
-	MCFG_SCREEN_VISIBLE_AREA(8, 303-8, 0, 223-8)
-	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(304, 224);
+	m_screen->set_visarea(8, 303-8, 0, 223-8);
+	m_screen->set_screen_update(FUNC(rpunch_state::screen_update_rpunch));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rpunch);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
@@ -495,38 +515,36 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(rpunch_state::svolley)
+void rpunch_state::svolley(machine_config &config)
+{
 	rpunch(config);
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,svolley)
-MACHINE_CONFIG_END
+}
 
 
 // c+p of above for now, bootleg hw, things need verifying
-MACHINE_CONFIG_START(rpunch_state::svolleybl)
-
+void rpunch_state::svolleybl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rpunch_state::svolleybl_main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, MASTER_CLOCK/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rpunch_state::svolleybl_sound_map);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set("soundirq", FUNC(input_merger_device::in_w<0>));
-
-	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(304, 224)
-	MCFG_SCREEN_VISIBLE_AREA(8, 303-8, 0, 223-8)
-	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(304, 224);
+	m_screen->set_visarea(8, 303-8, 0, 223-8);
+	m_screen->set_screen_update(FUNC(rpunch_state::screen_update_rpunch));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_svolleybl);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
@@ -541,13 +559,10 @@ MACHINE_CONFIG_START(rpunch_state::svolleybl)
 	SPEAKER(config, "mono").front_center();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", MASTER_CLOCK/4));
-	ymsnd.irq_handler().set("soundirq", FUNC(input_merger_device::in_w<1>));
-	ymsnd.add_route(0, "mono", 0.50);
-	ymsnd.add_route(1, "mono", 0.50);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	// TODO: OKI M5205
+}
 
 
 
@@ -776,10 +791,8 @@ ROM_START( svolleybl )
 
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 Sound CPU */
-	ROM_LOAD( "2-snd.bin", 0x00000, 0x10000, CRC(e3065b1d) SHA1(c4a3a95ba7f43cdf1b0c574f41de06d007ad2bd8) ) // matches 1.ic140 from pspikes91
-	ROM_LOAD( "1-snd.bin", 0x10000, 0x08000, CRC(009d7157) SHA1(2cdda7094c7476289d75a78ee25b34fa3b3225c0) )
-
-	ROM_REGION( 0x60000, "upd", ROMREGION_ERASEFF )
+	ROM_LOAD( "2-snd.bin", 0x00000, 0x10000, CRC(e3065b1d) SHA1(c4a3a95ba7f43cdf1b0c574f41de06d007ad2bd8) ) // matches 1.ic140 from spikes91
+	ROM_LOAD( "1-snd.bin", 0x10000, 0x08000, CRC(009d7157) SHA1(2cdda7094c7476289d75a78ee25b34fa3b3225c0) ) // matches 2.ic141 from spikes91, when halved
 ROM_END
 
 

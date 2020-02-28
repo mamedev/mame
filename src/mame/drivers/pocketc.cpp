@@ -4,6 +4,10 @@
     Sharp pocket computers
     PC1401/PC1403
     PeT mess@utanet.at May 2000
+
+    pc1403 and pc1403h can be convinced to work if you hit Enter once or twice
+    as soon as it is started.
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -717,7 +721,7 @@ GFXDECODE_END
 
 void pocketc_state::pocketc_base(machine_config &config)
 {
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	NVRAM(config, "cpu_nvram", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "ram_nvram", nvram_device::DEFAULT_ALL_0);

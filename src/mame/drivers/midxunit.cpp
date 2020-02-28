@@ -77,12 +77,42 @@ Notes:                                                         |                
       P10      - 10 pin connector
       P12      - 4 pin connector
 
-There's a separate sound board also, but it wasn't available so is not documented here.
+There's a separate sound board also.
+
+SOUND BOARD - 5766-13959-01 - Williams Electronic Games Inc.
+________________________________________________________________
+|                   __________   __________  ________________   |
+|                   PC74HCT541P  |74HC541N_| |U9 M27C4001    |  |
+|                    __________  __________  |_______________|  |
+|                  CY7C128A-35PC |74HC541N_|   ________________ |
+|                                             |U8 M27C4001     ||
+|                    __________  __________   |________________||
+|                  CY7C128A-35PC SN74HC245N    ________________ |
+|                    __________  __________   |U7 M27C4001     ||
+|                  CY7C128A-35PC |74LS174N_|  |________________||
+|                                              ________________ |
+|                                __________   |U6 M27C4001     ||
+|                                |74HC174N_|  |________________||
+|                   __________                 ________________ |
+|                   |ADSP-2105|  __________   |U5 M27C4001     ||
+|             ____  |         |  M74HC138B1   |________________||
+|             XTAL  |         |  __________    ________________ |
+|        10.0000MHz |_________|  |_74F00PC_|  |U4 M27C4001     ||
+|                   __________   __________   |________________||
+|   __________ U17->|GAL16V8A_|  |_M7406N__|   ________________ |
+|SCC2691AC1N24 _________                      |U3 27C040-10    ||
+|    ________  |AD1851N_|                     |________________||
+|    M74HC14B1                                 ________________ |
+|    ________  _________                      |U2 M27C4001     ||
+|   AM26LS31CN |TL084CN_|                     |________________||
+|    ________  AUX-IN AUX-OUT                          FUSE     |
+|   AM26LS31CN                    _________                     |
+| :::::::::: <-SERIAL  PWR/PPKR-> ···· ····              ·· ··  |
+|_______________________________________________________________|
 
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/midtunit.h"
 #include "includes/midxunit.h"
 #include "audio/dcs.h"
 
@@ -122,7 +152,6 @@ void midxunit_state::main_map(address_map &map)
 	map(0x80c00000, 0x80c000ff).rw(FUNC(midxunit_state::midxunit_uart_r), FUNC(midxunit_state::midxunit_uart_w));
 	map(0xa0440000, 0xa047ffff).rw(FUNC(midxunit_state::midxunit_cmos_r), FUNC(midxunit_state::midxunit_cmos_w)).share("nvram");
 	map(0xa0800000, 0xa08fffff).rw(m_video, FUNC(midxunit_video_device::midxunit_paletteram_r), FUNC(midxunit_video_device::midxunit_paletteram_w)).share("palette");
-	map(0xc0000000, 0xc00003ff).rw("maincpu", FUNC(tms34020_device::io_register_r), FUNC(tms34020_device::io_register_w));
 	map(0xc0800000, 0xc08000ff).mirror(0x00400000).rw(m_video, FUNC(midxunit_video_device::midtunit_dma_r), FUNC(midxunit_video_device::midtunit_dma_w));
 	map(0xf8000000, 0xfeffffff).r(m_video, FUNC(midxunit_video_device::midwunit_gfxrom_r));
 	map(0xff000000, 0xffffffff).rom().region("maincpu", 0);
@@ -352,9 +381,10 @@ ROM_START( revx )
 	ROM_LOAD32_BYTE( "revx.53",  0x0e00002, 0x80000, CRC(a045b265) SHA1(b294d3a56e41f5ec4ab9bbcc0088833b1cab1879) )
 	ROM_LOAD32_BYTE( "revx.54",  0x0e00003, 0x80000, CRC(24471269) SHA1(262345bd147402100785459af422dafd1c562787) )
 
-	ROM_REGION( 0x400, "plds", 0 )
+	ROM_REGION( 0x600, "plds", 0 )
 	ROM_LOAD( "a-17722.u1",   0x000, 0x117, CRC(054de7a3) SHA1(bb7abaec50ed704c03b44d5d54296898f7c80d38) )
 	ROM_LOAD( "a-17721.u955", 0x200, 0x117, CRC(033fe902) SHA1(6efb4e519ed3c9d49fff046a679762b506b3a75b) )
+	ROM_LOAD( "snd-gal16v8a.u17", 0x400, 0x117, NO_DUMP ) // Protected
 ROM_END
 
 ROM_START( revxp5 )
@@ -418,11 +448,11 @@ ROM_START( revxp5 )
 	ROM_LOAD32_BYTE( "revx_p5.53",  0xe00002, 0x80000, CRC(fcfcf72a) SHA1(b471afb416e3d348b046b0b40f497d27b0afa470) )
 	ROM_LOAD32_BYTE( "revx_p5.54",  0xe00003, 0x80000, CRC(fd684c31) SHA1(db3453792e4d9fc375297d030f0b3f9cc3cad925) )
 
-	ROM_REGION( 0x400, "plds", 0 )
-	ROM_LOAD( "a-17722.u1",   0x000, 0x117, CRC(054de7a3) SHA1(bb7abaec50ed704c03b44d5d54296898f7c80d38) )
-	ROM_LOAD( "a-17721.u955", 0x200, 0x117, CRC(033fe902) SHA1(6efb4e519ed3c9d49fff046a679762b506b3a75b) )
+	ROM_REGION( 0x600, "plds", 0 )
+	ROM_LOAD( "a-17722.u1",       0x000, 0x117, CRC(054de7a3) SHA1(bb7abaec50ed704c03b44d5d54296898f7c80d38) )
+	ROM_LOAD( "a-17721.u955",     0x200, 0x117, CRC(033fe902) SHA1(6efb4e519ed3c9d49fff046a679762b506b3a75b) )
+	ROM_LOAD( "snd-gal16v8a.u17", 0x400, 0x117, NO_DUMP ) // Protected
 ROM_END
-
 
 
 /*************************************

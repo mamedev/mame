@@ -78,7 +78,7 @@ cedar_magnet_sound_device::cedar_magnet_sound_device(const machine_config &mconf
 
 WRITE8_MEMBER(efo_zsu_device::sound_command_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 }
 
 

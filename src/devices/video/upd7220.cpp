@@ -151,7 +151,8 @@ DEFINE_DEVICE_TYPE(UPD7220, upd7220_device, "upd7220", "NEC uPD7220")
 // default address map
 void upd7220_device::upd7220_vram(address_map &map)
 {
-	map(0x00000, 0x3ffff).ram();
+	if (!has_configured_map(0))
+		map(0x00000, 0x3ffff).ram();
 }
 
 
@@ -614,6 +615,8 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	device_t(mconfig, UPD7220, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
+	m_display_cb(*this),
+	m_draw_text_cb(*this),
 	m_write_drq(*this),
 	m_write_hsync(*this),
 	m_write_vsync(*this),
@@ -649,7 +652,7 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	m_disp(0),
 	m_gchr(0),
 	m_bitmap_mod(0),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, 0, address_map_constructor(), address_map_constructor(FUNC(upd7220_device::upd7220_vram), this))
+	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, 0, address_map_constructor(FUNC(upd7220_device::upd7220_vram), this))
 {
 	for (int i = 0; i < 16; i++)
 	{
@@ -675,8 +678,8 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 void upd7220_device::device_start()
 {
 	// resolve callbacks
-	m_display_cb.bind_relative_to(*owner());
-	m_draw_text_cb.bind_relative_to(*owner());
+	m_display_cb.resolve();
+	m_draw_text_cb.resolve();
 
 	m_write_drq.resolve_safe();
 	m_write_hsync.resolve_safe();
@@ -715,6 +718,23 @@ void upd7220_device::device_start()
 	save_item(NAME(m_gchr));
 	save_item(NAME(m_mask));
 	save_item(NAME(m_pitch));
+	save_item(NAME(m_ra_addr));
+	save_item(NAME(m_cr));
+	save_item(NAME(m_pr));
+	save_item(NAME(m_param_ptr));
+	save_item(NAME(m_fifo));
+	save_item(NAME(m_fifo_flag));
+	save_item(NAME(m_fifo_ptr));
+	save_item(NAME(m_fifo_dir));
+	save_item(NAME(m_bitmap_mod));
+	save_item(NAME(m_figs.m_dir));
+	save_item(NAME(m_figs.m_figure_type));
+	save_item(NAME(m_figs.m_dc));
+	save_item(NAME(m_figs.m_gd));
+	save_item(NAME(m_figs.m_d));
+	save_item(NAME(m_figs.m_d1));
+	save_item(NAME(m_figs.m_d2));
+	save_item(NAME(m_figs.m_dm));
 }
 
 
@@ -1091,21 +1111,27 @@ void upd7220_device::process_fifo()
 	uint8_t data;
 	int flag;
 	uint16_t eff_pitch = m_pitch >> m_figs.m_gd;
+	int cr;
 
 	dequeue(&data, &flag);
 
 	if (flag == FIFO_COMMAND)
 	{
-		m_cr = data;
-		m_param_ptr = 1;
+		cr = translate_command(data);
+		if (cr != COMMAND_BCTRL) // workaround for Rainbow 100 Windows 1.03, needs verification
+		{
+			m_cr = data;
+			m_param_ptr = 1;
+		}
 	}
 	else
 	{
+		cr = translate_command(m_cr);
 		m_pr[m_param_ptr] = data;
 		m_param_ptr++;
 	}
 
-	switch (translate_command(m_cr))
+	switch (cr)
 	{
 	case COMMAND_INVALID:
 		logerror("uPD7220 Invalid Command Byte %02x\n", m_cr);
@@ -1238,7 +1264,7 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_BCTRL: /* display blanking control */
-		m_de = m_cr & 0x01;
+		m_de = data & 0x01;
 
 		//LOG("uPD7220 DE: %u\n", m_de);
 		break;
@@ -1447,7 +1473,7 @@ void upd7220_device::continue_command()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( upd7220_device::read )
+uint8_t upd7220_device::read(offs_t offset)
 {
 	uint8_t data;
 
@@ -1478,7 +1504,7 @@ READ8_MEMBER( upd7220_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( upd7220_device::write )
+void upd7220_device::write(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 	{
@@ -1501,7 +1527,7 @@ WRITE8_MEMBER( upd7220_device::write )
 //  dack_r -
 //-------------------------------------------------
 
-READ8_MEMBER( upd7220_device::dack_r )
+uint8_t upd7220_device::dack_r()
 {
 	return 0;
 }
@@ -1511,7 +1537,7 @@ READ8_MEMBER( upd7220_device::dack_r )
 //  dack_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( upd7220_device::dack_w )
+void upd7220_device::dack_w(uint8_t data)
 {
 }
 

@@ -17,7 +17,6 @@
  - SIO interface for Game Gear (needs netplay, I guess)
  - Support for other DE-9 compatible controllers, like the Mega Drive 6-Button
    that has homebrew software support
- - Link between two Mark III's through keyboard, supported by F-16 Fighting Falcon
  - On sms1kr (without FM), verify if Rapid uses C-Sync and PSG can be muted like on smsj
  - Accurate GG vertical scaling in SMS mode (h-scaling seems right for subpixel rendering)
  - Software compatibility flags, by region and/or BIOS
@@ -264,15 +263,15 @@ DC00      - Selection buttons #2, 9-16 (R)
 #define MASTER_CLOCK_PAL    53203425.0  /* 12 * subcarrier freq. (4.43361875MHz) */
 
 
-void sms_state::sms1_mem(address_map &map)
+void sms1_state::sms1_mem(address_map &map)
 {
-	map(0x0000, 0xbfff).w(FUNC(sms_state::write_cart));
-	map(0x0000, 0x3fff).r(FUNC(sms_state::read_0000));
-	map(0x4000, 0x7fff).r(FUNC(sms_state::read_4000));
-	map(0x8000, 0xbfff).r(FUNC(sms_state::read_8000));
-	map(0xc000, 0xfff7).rw(FUNC(sms_state::read_ram), FUNC(sms_state::write_ram));
-	map(0xfff8, 0xfffb).rw(FUNC(sms_state::sms_sscope_r), FUNC(sms_state::sms_sscope_w));       /* 3-D glasses */
-	map(0xfffc, 0xffff).rw(FUNC(sms_state::sms_mapper_r), FUNC(sms_state::sms_mapper_w));       /* Bankswitch control */
+	map(0x0000, 0xbfff).w(FUNC(sms1_state::write_cart));
+	map(0x0000, 0x3fff).r(FUNC(sms1_state::read_0000));
+	map(0x4000, 0x7fff).r(FUNC(sms1_state::read_4000));
+	map(0x8000, 0xbfff).r(FUNC(sms1_state::read_8000));
+	map(0xc000, 0xfff7).rw(FUNC(sms1_state::read_ram), FUNC(sms1_state::write_ram));
+	map(0xfff8, 0xfffb).rw(FUNC(sms1_state::sscope_r), FUNC(sms1_state::sscope_w));             /* 3-D glasses */
+	map(0xfffc, 0xffff).rw(FUNC(sms1_state::sms_mapper_r), FUNC(sms1_state::sms_mapper_w));     /* Bankswitch control */
 }
 
 void sms_state::sms_mem(address_map &map)
@@ -301,7 +300,7 @@ void sms_state::sg1000m3_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
+	map(0x40, 0x7f).r(FUNC(sms_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 	map(0xc0, 0xc7).mirror(0x38).rw(FUNC(sms_state::sg1000m3_peripheral_r), FUNC(sms_state::sg1000m3_peripheral_w));
@@ -313,7 +312,7 @@ void sms_state::sms_io(address_map &map)
 	map.unmap_value_high();
 	map(0x00, 0x00).mirror(0x3e).w(FUNC(sms_state::sms_mem_control_w));
 	map(0x01, 0x01).mirror(0x3e).w(FUNC(sms_state::sms_io_control_w));
-	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
+	map(0x40, 0x7f).r(FUNC(sms_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 	map(0xc0, 0xc0).mirror(0x3e).r(FUNC(sms_state::sms_input_port_dc_r));
@@ -331,7 +330,7 @@ void sms_state::smskr_io(address_map &map)
 	map.unmap_value_high();
 	map(0x3e, 0x3e).w(FUNC(sms_state::sms_mem_control_w));
 	map(0x3f, 0x3f).w(FUNC(sms_state::sms_io_control_w));
-	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
+	map(0x40, 0x7f).r(FUNC(sms_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 	map(0xc0, 0xc0).mirror(0x3e).r(FUNC(sms_state::sms_input_port_dc_r));
@@ -347,7 +346,7 @@ void sms_state::smsj_io(address_map &map)
 	map.unmap_value_high();
 	map(0x3e, 0x3e).w(FUNC(sms_state::sms_mem_control_w));
 	map(0x3f, 0x3f).w(FUNC(sms_state::sms_io_control_w));
-	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
+	map(0x40, 0x7f).r(FUNC(sms_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 	map(0xc0, 0xc0).r(FUNC(sms_state::sms_input_port_dc_r));
@@ -362,29 +361,29 @@ void sms_state::smsj_io(address_map &map)
 
 // It seems the mirrors for I/O ports $3E/$3F also don't seem to exist on the
 // Game Gear. Leaving the mirrors breaks 'gloc' (it freezes after 1st stage).
-void sms_state::gg_io(address_map &map)
+void gamegear_state::gg_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x00, 0x00).r(FUNC(sms_state::gg_input_port_00_r));
-	map(0x01, 0x05).rw(FUNC(sms_state::gg_sio_r), FUNC(sms_state::gg_sio_w));
-	map(0x06, 0x06).w(FUNC(sms_state::gg_psg_stereo_w));
-	map(0x3e, 0x3e).w(FUNC(sms_state::sms_mem_control_w));
-	map(0x3f, 0x3f).w(FUNC(sms_state::sms_io_control_w));
-	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::gg_psg_w));
+	map(0x00, 0x00).r(FUNC(gamegear_state::gg_input_port_00_r));
+	map(0x01, 0x05).rw(FUNC(gamegear_state::gg_sio_r), FUNC(gamegear_state::gg_sio_w));
+	map(0x06, 0x06).w(FUNC(gamegear_state::gg_psg_stereo_w));
+	map(0x3e, 0x3e).w(FUNC(gamegear_state::sms_mem_control_w));
+	map(0x3f, 0x3f).w(FUNC(gamegear_state::sms_io_control_w));
+	map(0x40, 0x7f).r(FUNC(gamegear_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
 	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
-	map(0xc0, 0xc0).r(FUNC(sms_state::sms_input_port_dc_r));
-	map(0xc1, 0xc1).r(FUNC(sms_state::sms_input_port_dd_r));
-	map(0xdc, 0xdc).r(FUNC(sms_state::sms_input_port_dc_r));
-	map(0xdd, 0xdd).r(FUNC(sms_state::sms_input_port_dd_r));
+	map(0xc0, 0xc0).r(FUNC(gamegear_state::sms_input_port_dc_r));
+	map(0xc1, 0xc1).r(FUNC(gamegear_state::sms_input_port_dd_r));
+	map(0xdc, 0xdc).r(FUNC(gamegear_state::sms_input_port_dc_r));
+	map(0xdd, 0xdd).r(FUNC(gamegear_state::sms_input_port_dd_r));
 }
 
 
 static INPUT_PORTS_START( sms )
 	PORT_START("PAUSE")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1) PORT_WRITE_LINE_DEVICE_MEMBER("sms_vdp", sega315_5124_device, n_nmi_in_write)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sg1000m3 )
@@ -493,39 +492,37 @@ static INPUT_PORTS_START( gg )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(sms_state::sms_base)
+void sms_state::sms_base(machine_config &config)
+{
 	/* basic machine hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_SMS_CARTRIDGE_ADD("slot", sms_cart, nullptr)
+	SMS_CART_SLOT(config, "slot", sms_cart, nullptr);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("sms");
 
 	SMS_CONTROL_PORT(config, m_port_ctrl1, sms_control_port_devices, "joypad");
+	m_port_ctrl1->set_screen_tag(m_main_scr);
 	m_port_ctrl1->th_input_handler().set(FUNC(sms_state::sms_ctrl1_th_input));
-	m_port_ctrl1->pixel_handler().set(FUNC(sms_state::sms_pixel_color));
 
 	SMS_CONTROL_PORT(config, m_port_ctrl2, sms_control_port_devices, "joypad");
+	m_port_ctrl2->set_screen_tag(m_main_scr);
 	m_port_ctrl2->th_input_handler().set(FUNC(sms_state::sms_ctrl2_th_input));
-	m_port_ctrl2->pixel_handler().set(FUNC(sms_state::sms_pixel_color));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::sms_ntsc_base)
+void sms_state::sms_ntsc_base(machine_config &config)
+{
 	sms_base(config);
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'738'635)/3)
-	MCFG_DEVICE_PROGRAM_MAP(sms_mem)
-	MCFG_DEVICE_IO_MAP(sms_io)
+	Z80(config, m_maincpu, XTAL(10'738'635)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sms_state::sms_mem);
+	m_maincpu->set_addrmap(AS_IO, &sms_state::sms_io);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
-
-	/* actually, PSG is embedded in the VDP chip */
-	MCFG_DEVICE_ADD("segapsg", SEGAPSG, XTAL(10'738'635)/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	config.set_maximum_quantum(attotime::from_hz(60));
+}
 
 /*
     For SMS drivers, the ratio between CPU and pixel clocks, set through dividers, is 2/3. The
-    division that sets the pixel clock, in MCFG_SCREEN_RAW_PARAMS(), results in a remainder
+    division that sets the pixel clock, in screen.set_raw(), results in a remainder
     that is discarded internally. Due to this rounding, the cycle time and the screen pixel
     time, derived from their clocks, do not longer match (inversely) the exact original ratio
     of these clocks. The SMS VDP emulation controls some properties (counters/flags) through
@@ -536,429 +533,405 @@ MACHINE_CONFIG_END
     elapsed time by the pixel time, the obtained pixel count may be less than expected. Flubba's
     VDPTest ROM relies on exact results. A workaround is to use an additional macro, for each
     driver, that resets the refresh rate, and by consequence the pixel time, without discarding
-    the remainder of the division. If the core is fixed in the future, the MCFG_SCREEN_REFRESH_RATE
-    lines after each MCFG_SCREEN_RAW_PARAMS call below can be removed.
+    the remainder of the division. If the core is fixed in the future, the screen.set_refresh_hz
+    lines after each screen.set_raw call below can be removed.
 */
 
-#define MCFG_SCREEN_SMS_PAL_RAW_PARAMS(_pixelclock) \
-	MCFG_SCREEN_RAW_PARAMS(_pixelclock, \
-		sega315_5124_device::WIDTH, \
-		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, \
-		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10, \
-		sega315_5124_device::HEIGHT_PAL, \
-		sega315_5124_device::TBORDER_START + sega315_5124_device::PAL_240_TBORDER_HEIGHT, \
-		sega315_5124_device::TBORDER_START + sega315_5124_device::PAL_240_TBORDER_HEIGHT + 240) \
-	MCFG_SCREEN_REFRESH_RATE(_pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_PAL))
+template <typename X>
+void sms_state::screen_sms_pal_raw_params(screen_device &screen, X &&pixelclock)
+{
+	screen.set_raw(std::forward<X>(pixelclock),
+		sega315_5124_device::WIDTH,
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2,
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10,
+		sega315_5124_device::HEIGHT_PAL,
+		sega315_5124_device::TBORDER_START + sega315_5124_device::PAL_240_TBORDER_HEIGHT,
+		sega315_5124_device::TBORDER_START + sega315_5124_device::PAL_240_TBORDER_HEIGHT + 240);
+	screen.set_refresh_hz(pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_PAL));
+}
 
-#define MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(_pixelclock) \
-	MCFG_SCREEN_RAW_PARAMS(_pixelclock, \
-		sega315_5124_device::WIDTH, \
-		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, \
-		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10, \
-		sega315_5124_device::HEIGHT_NTSC, \
-		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, \
-		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224) \
-	MCFG_SCREEN_REFRESH_RATE(_pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
+template <typename X>
+void sms_state::screen_sms_ntsc_raw_params(screen_device &screen, X &&pixelclock)
+{
+	screen.set_raw(std::forward<X>(pixelclock),
+		sega315_5124_device::WIDTH,
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2,
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10,
+		sega315_5124_device::HEIGHT_NTSC,
+		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT,
+		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
+	screen.set_refresh_hz(pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC));
+}
 
-#define MCFG_SCREEN_GG_RAW_PARAMS(_pixelclock) \
-	MCFG_SCREEN_RAW_PARAMS(_pixelclock, \
-		sega315_5124_device::WIDTH, \
-		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 6*8, \
-		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 26*8, \
-		sega315_5124_device::HEIGHT_NTSC, \
-		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 3*8, \
-		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 21*8 ) \
-	MCFG_SCREEN_REFRESH_RATE(_pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
+template <typename X>
+void gamegear_state::screen_gg_raw_params(screen_device &screen, X &&pixelclock)
+{
+	screen.set_raw(std::forward<X>(pixelclock),
+		sega315_5124_device::WIDTH,
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 6*8,
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 26*8,
+		sega315_5124_device::HEIGHT_NTSC,
+		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 3*8,
+		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 21*8 );
+	screen.set_refresh_hz(pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC));
+}
 
 
-MACHINE_CONFIG_START(sms_state::sms2_ntsc)
+void sms_state::sms2_ntsc(machine_config &config)
+{
 	sms_ntsc_base(config);
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	screen_sms_ntsc_raw_params(*m_main_scr, XTAL(10'738'635)/2);
+	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
-	SEGA315_5246(config, m_vdp, 0);
+	SEGA315_5246(config, m_vdp, XTAL(10'738'635));
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(false);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	m_has_bios_full = true;
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(sms_state::sms1_ntsc)
+void sms1_state::sms1_ntsc(machine_config &config)
+{
 	sms_ntsc_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sms1_mem)  // This adds the SegaScope handlers for 3-D glasses
+	m_maincpu->set_addrmap(AS_PROGRAM, &sms1_state::sms1_mem);  // This adds the SegaScope handlers for 3-D glasses
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	screen_sms_ntsc_raw_params(*m_main_scr, XTAL(10'738'635)/2);
+	m_main_scr->set_screen_update(FUNC(sms1_state::screen_update_sms));
 
-	MCFG_SCREEN_ADD("left_lcd", LCD)    // This is needed for SegaScope Left LCD
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1_left)
+	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
+	screen_sms_ntsc_raw_params(*m_left_lcd, XTAL(10'738'635)/2);
+	m_left_lcd->set_screen_update(FUNC(sms1_state::screen_update_left));
 
-	MCFG_SCREEN_ADD("right_lcd", LCD)   // This is needed for SegaScope Right LCD
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1_right)
+	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
+	screen_sms_ntsc_raw_params(*m_right_lcd, XTAL(10'738'635)/2);
+	m_right_lcd->set_screen_update(FUNC(sms1_state::screen_update_right));
 
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
+	m_main_scr->screen_vblank().set(FUNC(sms1_state::sscope_vblank));
 
 	config.set_default_layout(layout_sms1);
 
-	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
-	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
-
-	SEGA315_5124(config, m_vdp, 0);
+	SEGA315_5124(config, m_vdp, XTAL(10'738'635));
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(false);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// card and expansion slots, not present in Master System II
-	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
+	SMS_CARD_SLOT(config, "mycard", sms_cart, nullptr);
 	SMS_EXPANSION_SLOT(config, "smsexp", sms_expansion_devices, nullptr);
 
 	m_has_bios_full = true;
 	m_has_pwr_led = true;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(smssdisp_state::sms_sdisp)
+void smssdisp_state::sms_sdisp(machine_config &config)
+{
 	sms1_ntsc(config);
 
-	m_vdp->irq().set(FUNC(smssdisp_state::sms_store_int_callback));
+	m_vdp->n_int().set(FUNC(smssdisp_state::sms_store_int_callback));
 
-	MCFG_DEVICE_ADD("control", Z80, XTAL(10'738'635)/3)
-	MCFG_DEVICE_PROGRAM_MAP(sms_store_mem)
+	Z80(config, m_control_cpu, XTAL(10'738'635)/3);
+	m_control_cpu->set_addrmap(AS_PROGRAM, &smssdisp_state::sms_store_mem);
 	/* Both CPUs seem to communicate with the VDP etc? */
-	MCFG_DEVICE_IO_MAP(sms_io)
+	m_control_cpu->set_addrmap(AS_IO, &smssdisp_state::sms_io);
 
 	config.device_remove("mycard");
 	config.device_remove("smsexp");
 
-	MCFG_SMS_CARTRIDGE_ADD("slot2", sms_cart, nullptr)
-	MCFG_SMS_CARTRIDGE_ADD("slot3", sms_cart, nullptr)
-	MCFG_SMS_CARTRIDGE_ADD("slot4", sms_cart, nullptr)
-	MCFG_SMS_CARTRIDGE_ADD("slot5", sms_cart, nullptr)
-	MCFG_SMS_CARTRIDGE_ADD("slot6", sms_cart, nullptr)
-	MCFG_SMS_CARTRIDGE_ADD("slot7", sms_cart, nullptr)
-	MCFG_SMS_CARTRIDGE_ADD("slot8", sms_cart, nullptr)
-	MCFG_SMS_CARTRIDGE_ADD("slot9", sms_cart, nullptr)
-	MCFG_SMS_CARTRIDGE_ADD("slot10", sms_cart, nullptr)
-	MCFG_SMS_CARTRIDGE_ADD("slot11", sms_cart, nullptr)
-	MCFG_SMS_CARTRIDGE_ADD("slot12", sms_cart, nullptr)
-	MCFG_SMS_CARTRIDGE_ADD("slot13", sms_cart, nullptr)
-	MCFG_SMS_CARTRIDGE_ADD("slot14", sms_cart, nullptr)
-	MCFG_SMS_CARTRIDGE_ADD("slot15", sms_cart, nullptr)
-	MCFG_SMS_CARTRIDGE_ADD("slot16", sms_cart, nullptr)
-
-	MCFG_SMS_CARD_ADD("slot17", sms_cart, nullptr)
-	MCFG_SMS_CARD_ADD("slot18", sms_cart, nullptr)
-	MCFG_SMS_CARD_ADD("slot19", sms_cart, nullptr)
-	MCFG_SMS_CARD_ADD("slot20", sms_cart, nullptr)
-	MCFG_SMS_CARD_ADD("slot21", sms_cart, nullptr)
-	MCFG_SMS_CARD_ADD("slot22", sms_cart, nullptr)
-	MCFG_SMS_CARD_ADD("slot23", sms_cart, nullptr)
-	MCFG_SMS_CARD_ADD("slot24", sms_cart, nullptr)
-	MCFG_SMS_CARD_ADD("slot25", sms_cart, nullptr)
-	MCFG_SMS_CARD_ADD("slot26", sms_cart, nullptr)
-	MCFG_SMS_CARD_ADD("slot27", sms_cart, nullptr)
-	MCFG_SMS_CARD_ADD("slot28", sms_cart, nullptr)
-	MCFG_SMS_CARD_ADD("slot29", sms_cart, nullptr)
-	MCFG_SMS_CARD_ADD("slot30", sms_cart, nullptr)
-	MCFG_SMS_CARD_ADD("slot31", sms_cart, nullptr)
-	MCFG_SMS_CARD_ADD("slot32", sms_cart, nullptr)
+	for (int i = 1; i < 16; i++)
+		SMS_CART_SLOT(config, m_slots[i], sms_cart, nullptr);
+	for (int i = 0; i < 16; i++)
+		SMS_CARD_SLOT(config, m_cards[i], sms_cart, nullptr);
 
 	m_has_bios_full = false;
-	m_is_sdisp = true;
 	m_has_pwr_led = false;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::sms_pal_base)
+void sms_state::sms_pal_base(machine_config &config)
+{
 	sms_base(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK_PAL/15)
-	MCFG_DEVICE_PROGRAM_MAP(sms_mem)
-	MCFG_DEVICE_IO_MAP(sms_io)
+	Z80(config, m_maincpu, MASTER_CLOCK_PAL/15);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sms_state::sms_mem);
+	m_maincpu->set_addrmap(AS_IO, &sms_state::sms_io);
 
-	config.m_minimum_quantum = attotime::from_hz(50);
+	config.set_maximum_quantum(attotime::from_hz(50));
+}
 
-	/* actually, PSG is embedded in the VDP chip */
-	MCFG_DEVICE_ADD("segapsg", SEGAPSG, MASTER_CLOCK_PAL/15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(sms_state::sms2_pal)
+void sms_state::sms2_pal(machine_config &config)
+{
 	sms_pal_base(config);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PAL/10)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PAL/10);
+	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
-	SEGA315_5246(config, m_vdp, 0);
+	SEGA315_5246(config, m_vdp, MASTER_CLOCK_PAL/5);
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(true);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	m_has_bios_full = true;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::sms1_pal)
+void sms1_state::sms1_pal(machine_config &config)
+{
 	sms_pal_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sms1_mem)  // This adds the SegaScope handlers for 3-D glasses
+	m_maincpu->set_addrmap(AS_PROGRAM, &sms1_state::sms1_mem);  // This adds the SegaScope handlers for 3-D glasses
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PAL/10)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PAL/10);
+	m_main_scr->set_screen_update(FUNC(sms1_state::screen_update_sms));
 
-	MCFG_SCREEN_ADD("left_lcd", LCD)    // This is needed for SegaScope Left LCD
-	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PAL/10)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
+	screen_sms_pal_raw_params(*m_left_lcd, MASTER_CLOCK_PAL/10);
+	m_left_lcd->set_screen_update(FUNC(sms1_state::screen_update_left));
 
-	MCFG_SCREEN_ADD("right_lcd", LCD)   // This is needed for SegaScope Right LCD
-	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PAL/10)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
+	screen_sms_pal_raw_params(*m_right_lcd, MASTER_CLOCK_PAL/10);
+	m_right_lcd->set_screen_update(FUNC(sms1_state::screen_update_right));
 
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
+	m_main_scr->screen_vblank().set(FUNC(sms1_state::sscope_vblank));
 
 	config.set_default_layout(layout_sms1);
 
-	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
-	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
-
-	SEGA315_5124(config, m_vdp, 0);
+	SEGA315_5124(config, m_vdp, MASTER_CLOCK_PAL/5);
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(true);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// card and expansion slots, not present in Master System II
-	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
+	SMS_CARD_SLOT(config, "mycard", sms_cart, nullptr);
 	SMS_EXPANSION_SLOT(config, "smsexp", sms_expansion_devices, nullptr);
 
 	m_has_bios_full = true;
 	m_has_pwr_led = true;
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(sms_state::sms_paln_base)
+void sms_state::sms_paln_base(machine_config &config)
+{
 	sms_base(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK_PALN/3)
-	MCFG_DEVICE_PROGRAM_MAP(sms_mem)
-	MCFG_DEVICE_IO_MAP(sms_io)
+	Z80(config, m_maincpu, MASTER_CLOCK_PALN/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sms_state::sms_mem);
+	m_maincpu->set_addrmap(AS_IO, &sms_state::sms_io);
 
-	config.m_minimum_quantum = attotime::from_hz(50);
+	config.set_maximum_quantum(attotime::from_hz(50));
+}
 
-	/* actually, PSG is embedded in the VDP chip */
-	MCFG_DEVICE_ADD("segapsg", SEGAPSG, MASTER_CLOCK_PALN/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(sms_state::sms3_paln)
+void sms_state::sms3_paln(machine_config &config)
+{
 	sms_paln_base(config);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PALN/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PALN/2);
+	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
-	SEGA315_5246(config, m_vdp, 0);
+	SEGA315_5246(config, m_vdp, MASTER_CLOCK_PALN);
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(true);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	m_has_bios_full = true;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::sms1_paln)
+void sms1_state::sms1_paln(machine_config &config)
+{
 	sms_paln_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sms1_mem)  // This adds the SegaScope handlers for 3-D glasses
+	m_maincpu->set_addrmap(AS_PROGRAM, &sms1_state::sms1_mem);  // This adds the SegaScope handlers for 3-D glasses
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PALN/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PALN/2);
+	m_main_scr->set_screen_update(FUNC(sms1_state::screen_update_sms));
 
-	MCFG_SCREEN_ADD("left_lcd", LCD)    // This is needed for SegaScope Left LCD
-	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PALN/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
+	screen_sms_pal_raw_params(*m_left_lcd, MASTER_CLOCK_PALN/2);
+	m_left_lcd->set_screen_update(FUNC(sms1_state::screen_update_left));
 
-	MCFG_SCREEN_ADD("right_lcd", LCD)   // This is needed for SegaScope Right LCD
-	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PALN/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
+	screen_sms_pal_raw_params(*m_right_lcd, MASTER_CLOCK_PALN/2);
+	m_right_lcd->set_screen_update(FUNC(sms1_state::screen_update_right));
 
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
+	m_main_scr->screen_vblank().set(FUNC(sms1_state::sscope_vblank));
 
 	config.set_default_layout(layout_sms1);
 
-	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
-	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
-
-	SEGA315_5124(config, m_vdp, 0);
+	SEGA315_5124(config, m_vdp, MASTER_CLOCK_PALN);
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(true);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// card and expansion slots, not present in Tec Toy Master System III
-	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
+	SMS_CARD_SLOT(config, "mycard", sms_cart, nullptr);
 	SMS_EXPANSION_SLOT(config, "smsexp", sms_expansion_devices, nullptr);
 
 	m_has_bios_full = true;
 	m_has_pwr_led = true;
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(sms_state::sms_br_base)
+void sms_state::sms_br_base(machine_config &config)
+{
 	sms_base(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK_PALM/3)
-	MCFG_DEVICE_PROGRAM_MAP(sms_mem)
-	MCFG_DEVICE_IO_MAP(sms_io)
+	Z80(config, m_maincpu, MASTER_CLOCK_PALM/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sms_state::sms_mem);
+	m_maincpu->set_addrmap(AS_IO, &sms_state::sms_io);
 
 	// PAL-M has near the same frequency of NTSC
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
+}
 
-	/* actually, PSG is embedded in the VDP chip */
-	MCFG_DEVICE_ADD("segapsg", SEGAPSG, MASTER_CLOCK_PALM/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(sms_state::sms3_br)
+void sms_state::sms3_br(machine_config &config)
+{
 	sms_br_base(config);
 	/* video hardware */
 	// PAL-M height/width parameters are the same of NTSC screens.
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(MASTER_CLOCK_PALM/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	screen_sms_ntsc_raw_params(*m_main_scr, MASTER_CLOCK_PALM/2);
+	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
-	SEGA315_5246(config, m_vdp, 0);
+	SEGA315_5246(config, m_vdp, MASTER_CLOCK_PALM);
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(false); // PAL-M has same line count of NTSC
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	m_has_bios_full = true;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::sms1_br)
+void sms1_state::sms1_br(machine_config &config)
+{
 	sms_br_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sms1_mem)  // This adds the SegaScope handlers for 3-D glasses
+	m_maincpu->set_addrmap(AS_PROGRAM, &sms1_state::sms1_mem);  // This adds the SegaScope handlers for 3-D glasses
 
 	/* video hardware */
 	// PAL-M height/width parameters are the same of NTSC screens.
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(MASTER_CLOCK_PALM/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	screen_sms_ntsc_raw_params(*m_main_scr, MASTER_CLOCK_PALM/2);
+	m_main_scr->set_screen_update(FUNC(sms1_state::screen_update_sms));
 
-	MCFG_SCREEN_ADD("left_lcd", LCD)    // This is needed for SegaScope Left LCD
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(MASTER_CLOCK_PALM/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
+	screen_sms_ntsc_raw_params(*m_left_lcd, MASTER_CLOCK_PALM/2);
+	m_left_lcd->set_screen_update(FUNC(sms1_state::screen_update_left));
 
-	MCFG_SCREEN_ADD("right_lcd", LCD)   // This is needed for SegaScope Right LCD
-	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(MASTER_CLOCK_PALM/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
+	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
+	screen_sms_ntsc_raw_params(*m_right_lcd, MASTER_CLOCK_PALM/2);
+	m_right_lcd->set_screen_update(FUNC(sms1_state::screen_update_right));
 
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
+	m_main_scr->screen_vblank().set(FUNC(sms1_state::sscope_vblank));
 
 	config.set_default_layout(layout_sms1);
 
-	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
-	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
-
-	SEGA315_5124(config, m_vdp, 0);
+	SEGA315_5124(config, m_vdp, MASTER_CLOCK_PALM);
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(false); // PAL-M has same line count of NTSC
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// card and expansion slots, not present in Tec Toy Master System III
-	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
+	SMS_CARD_SLOT(config, "mycard", sms_cart, nullptr);
 	SMS_EXPANSION_SLOT(config, "smsexp", sms_expansion_devices, nullptr);
 
 	m_has_bios_full = true;
 	m_has_pwr_led = true;
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(sms_state::sms2_kr)
+void sms_state::sms2_kr(machine_config &config)
+{
 	sms2_ntsc(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(smskr_io)
+
+	m_maincpu->set_addrmap(AS_IO, &sms_state::smskr_io);
 
 	config.device_remove("slot");
-	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
+	SG1000MK3_CART_SLOT(config, "slot", sg1000mk3_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list2").set_original("sg1000");
 
 	// Despite having a Japanese cartridge slot, this version is detected as Export region.
 	m_has_jpn_sms_cart_slot = true;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::sms1_kr)
+void sms1_state::sms1_kr(machine_config &config)
+{
 	sms1_ntsc(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(smskr_io)
+
+	m_maincpu->set_addrmap(AS_IO, &sms1_state::smskr_io);
 
 	// need to replace the cartridge slot with the Japanese version, so to
 	// keep the usual media order, remove and reinsert all of them.
 	config.device_remove("slot");
 	config.device_remove("mycard");
 	config.device_remove("smsexp");
-	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
-	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
+	SG1000MK3_CART_SLOT(config, "slot", sg1000mk3_cart, nullptr);
+	SMS_CARD_SLOT(config, "mycard", sms_cart, nullptr);
 	SMS_EXPANSION_SLOT(config, "smsexp", sms_expansion_devices, nullptr);
 
 	SOFTWARE_LIST(config, "cart_list2").set_original("sg1000");
 
-	m_vdp->csync().set(FUNC(sms_state::sms_csync_callback));
+	m_vdp->n_csync().set(FUNC(sms1_state::rapid_n_csync_callback));
 
 	m_has_bios_full = false;
 	m_has_bios_2000 = true;
 	m_ioctrl_region_is_japan = true;
 	m_has_jpn_sms_cart_slot = true;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::smsj)
+void sms1_state::smsj(machine_config &config)
+{
 	sms1_kr(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(smsj_io)
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(10'738'635)/3)
+	m_maincpu->set_addrmap(AS_IO, &sms1_state::smsj_io);
+
+	YM2413(config, m_ym, XTAL(10'738'635)/3);
 	// if this output gain is changed, the gain set when unmute the output need
 	// to be changed too, probably along the gain set for the Mark III FM Unit.
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	m_ym->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	m_is_smsj = true;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::sg1000m3)
+void sms1_state::sg1000m3(machine_config &config)
+{
 	sms1_ntsc(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(sg1000m3_io)
+
+	m_maincpu->set_addrmap(AS_IO, &sms1_state::sg1000m3_io);
 
 	// Remove and reinsert all media slots, as done with the sms1_kr config,
 	// and also replace the expansion slot with the SG-1000 version.
 	config.device_remove("slot");
 	config.device_remove("mycard");
 	config.device_remove("smsexp");
-	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
-	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
+	SG1000MK3_CART_SLOT(config, "slot", sg1000mk3_cart, nullptr);
+	SMS_CARD_SLOT(config, "mycard", sms_cart, nullptr);
 	SG1000_EXPANSION_SLOT(config, "sgexp", sg1000_expansion_devices, nullptr, false);
 
 	SOFTWARE_LIST(config, "cart_list2").set_original("sg1000");
@@ -970,59 +943,54 @@ MACHINE_CONFIG_START(sms_state::sg1000m3)
 	m_has_bios_full = false;
 	m_is_mark_iii = true;
 	m_has_jpn_sms_cart_slot = true;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::gamegear)
+void gamegear_state::gamegear(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK_GG/9)
-	MCFG_DEVICE_PROGRAM_MAP(sms_mem)
-	MCFG_DEVICE_IO_MAP(gg_io)
+	Z80(config, m_maincpu, MASTER_CLOCK_GG/9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gamegear_state::sms_mem);
+	m_maincpu->set_addrmap(AS_IO, &gamegear_state::gg_io);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_GG_RAW_PARAMS(MASTER_CLOCK_GG/6)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_gamegear)
-
-	MCFG_VIDEO_START_OVERRIDE(sms_state,gamegear)
-	MCFG_VIDEO_RESET_OVERRIDE(sms_state,gamegear)
-
-	/* VDP chip of the Gamegear 2 ASIC version */
-	SEGA315_5377(config, m_vdp, 0);
-	m_vdp->set_screen(m_main_scr);
-	m_vdp->set_is_pal(false);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	SCREEN(config, m_main_scr, SCREEN_TYPE_LCD);
+	screen_gg_raw_params(*m_main_scr, MASTER_CLOCK_GG/6);
+	m_main_scr->set_screen_update(FUNC(gamegear_state::screen_update_gamegear));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	/* actually, PSG is embedded in the VDP chip */
-	MCFG_DEVICE_ADD("gamegear", GAMEGEAR, MASTER_CLOCK_GG/9)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	/* VDP chip of the Gamegear 2 ASIC version */
+	SEGA315_5377(config, m_vdp, MASTER_CLOCK_GG/3);
+	m_vdp->set_screen(m_main_scr);
+	m_vdp->set_is_pal(false);
+	m_vdp->n_int().set_inputline(m_maincpu, 0);
+	m_vdp->vblank().set(FUNC(gamegear_state::gg_pause_callback));
+	m_vdp->add_route(0, "lspeaker", 1.00);
+	m_vdp->add_route(1, "rspeaker", 1.00);
 
 	/* cartridge */
-	MCFG_GG_CARTRIDGE_ADD("slot", gg_cart, nullptr)
+	GAMEGEAR_CART_SLOT(config, "slot", gg_cart, nullptr);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gamegear");
 
 	GG_EXT_PORT(config, m_port_gg_ext, gg_ext_port_devices, nullptr);
-	m_port_gg_ext->th_input_handler().set(FUNC(sms_state::gg_ext_th_input));
-	// only for GG-TV mod (may be simulated with a driver modified with SMS screen settings)
-	//m_port_gg_ext->pixel_handler().set(FUNC(sms_state::sms_pixel_color));
+	m_port_gg_ext->set_screen_tag(m_main_scr);
+	m_port_gg_ext->th_input_handler().set(FUNC(gamegear_state::gg_ext_th_input));
 
 	m_is_gamegear = true;
 	m_has_bios_0400 = true;
 	m_has_pwr_led = true;
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sms_state::gamegeaj)
+void gamegear_state::gamegeaj(machine_config &config)
+{
 	gamegear(config);
 	m_ioctrl_region_is_japan = true;
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(sms1)
@@ -1272,22 +1240,22 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT           COMPANY    FULLNAME                              FLAGS */
-CONS( 1985, sg1000m3, sms,      0,      sg1000m3,  sg1000m3, sms_state,      empty_init,    "Sega",    "Mark III",                           MACHINE_SUPPORTS_SAVE )
-CONS( 1986, sms1,     sms,      0,      sms1_ntsc, sms1,     sms_state,      empty_init,    "Sega",    "Master System I",                    MACHINE_SUPPORTS_SAVE )
-CONS( 1986, sms1pal,  sms,      0,      sms1_pal,  sms1,     sms_state,      empty_init,    "Sega",    "Master System I (PAL)" ,             MACHINE_SUPPORTS_SAVE )
+CONS( 1985, sg1000m3, sms,      0,      sg1000m3,  sg1000m3, sms1_state,     empty_init,    "Sega",    "Mark III",                           MACHINE_SUPPORTS_SAVE )
+CONS( 1986, sms1,     sms,      0,      sms1_ntsc, sms1,     sms1_state,     empty_init,    "Sega",    "Master System I",                    MACHINE_SUPPORTS_SAVE )
+CONS( 1986, sms1pal,  sms,      0,      sms1_pal,  sms1,     sms1_state,     empty_init,    "Sega",    "Master System I (PAL)" ,             MACHINE_SUPPORTS_SAVE )
 CONS( 1986, smssdisp, sms,      0,      sms_sdisp, smssdisp, smssdisp_state, empty_init,    "Sega",    "Master System Store Display Unit",   MACHINE_SUPPORTS_SAVE )
-CONS( 1987, smsj,     sms,      0,      smsj,      smsj,     sms_state,      empty_init,    "Sega",    "Master System (Japan)",              MACHINE_SUPPORTS_SAVE )
+CONS( 1987, smsj,     sms,      0,      smsj,      smsj,     sms1_state,     empty_init,    "Sega",    "Master System (Japan)",              MACHINE_SUPPORTS_SAVE )
 CONS( 1990, sms,      0,        0,      sms2_ntsc, sms,      sms_state,      empty_init,    "Sega",    "Master System II",                   MACHINE_SUPPORTS_SAVE )
 CONS( 1990, smspal,   sms,      0,      sms2_pal,  sms,      sms_state,      empty_init,    "Sega",    "Master System II (PAL)",             MACHINE_SUPPORTS_SAVE )
-CONS( 1989, sms1krfm, sms,      0,      smsj,      smsj,     sms_state,      empty_init,    "Samsung", "Gam*Boy I (Korea) (FM)",             MACHINE_SUPPORTS_SAVE )
-CONS( 19??, sms1kr,   sms,      0,      sms1_kr,   smsj,     sms_state,      empty_init,    "Samsung", "Gam*Boy I (Korea)",                  MACHINE_SUPPORTS_SAVE )
+CONS( 1989, sms1krfm, sms,      0,      smsj,      smsj,     sms1_state,     empty_init,    "Samsung", "Gam*Boy I (Korea) (FM)",             MACHINE_SUPPORTS_SAVE )
+CONS( 19??, sms1kr,   sms,      0,      sms1_kr,   smsj,     sms1_state,     empty_init,    "Samsung", "Gam*Boy I (Korea)",                  MACHINE_SUPPORTS_SAVE )
 CONS( 1991, smskr,    sms,      0,      sms2_kr,   sms,      sms_state,      empty_init,    "Samsung", "Gam*Boy II (Korea)",                 MACHINE_SUPPORTS_SAVE )
-CONS( 1989, sms1br,   sms,      0,      sms1_br,   sms1,     sms_state,      empty_init,    "Tec Toy", "Master System I (Brazil)",           MACHINE_SUPPORTS_SAVE )
-CONS( 1991, sms2br,   sms,      0,      sms1_br,   sms1,     sms_state,      empty_init,    "Tec Toy", "Master System II (Brazil)",          MACHINE_SUPPORTS_SAVE )
+CONS( 1989, sms1br,   sms,      0,      sms1_br,   sms1,     sms1_state,     empty_init,    "Tec Toy", "Master System I (Brazil)",           MACHINE_SUPPORTS_SAVE )
+CONS( 1991, sms2br,   sms,      0,      sms1_br,   sms1,     sms1_state,     empty_init,    "Tec Toy", "Master System II (Brazil)",          MACHINE_SUPPORTS_SAVE )
 CONS( 1992, smsbr,    sms,      0,      sms3_br,   sms,      sms_state,      empty_init,    "Tec Toy", "Master System III Compact (Brazil)", MACHINE_SUPPORTS_SAVE )
-CONS( 19??, sms1paln, sms,      0,      sms1_paln, sms1,     sms_state,      empty_init,    "Tec Toy", "Master System I (PAL-N)",            MACHINE_SUPPORTS_SAVE )
-CONS( 19??, sms2paln, sms,      0,      sms1_paln, sms1,     sms_state,      empty_init,    "Tec Toy", "Master System II (PAL-N)",           MACHINE_SUPPORTS_SAVE )
+CONS( 19??, sms1paln, sms,      0,      sms1_paln, sms1,     sms1_state,     empty_init,    "Tec Toy", "Master System I (PAL-N)",            MACHINE_SUPPORTS_SAVE )
+CONS( 19??, sms2paln, sms,      0,      sms1_paln, sms1,     sms1_state,     empty_init,    "Tec Toy", "Master System II (PAL-N)",           MACHINE_SUPPORTS_SAVE )
 CONS( 19??, smspaln,  sms,      0,      sms3_paln, sms,      sms_state,      empty_init,    "Tec Toy", "Master System III Compact (PAL-N)",  MACHINE_SUPPORTS_SAVE )
 
-CONS( 1991, gamegear, 0,        sms,    gamegear,  gg,       sms_state,      empty_init,    "Sega",    "Game Gear (Europe/America)",         MACHINE_SUPPORTS_SAVE )
-CONS( 1990, gamegeaj, gamegear, 0,      gamegeaj,  gg,       sms_state,      empty_init,    "Sega",    "Game Gear (Japan)",                  MACHINE_SUPPORTS_SAVE )
+CONS( 1991, gamegear, 0,        sms,    gamegear,  gg,       gamegear_state, empty_init,    "Sega",    "Game Gear (Europe/America)",         MACHINE_SUPPORTS_SAVE )
+CONS( 1990, gamegeaj, gamegear, 0,      gamegeaj,  gg,       gamegear_state, empty_init,    "Sega",    "Game Gear (Japan)",                  MACHINE_SUPPORTS_SAVE )

@@ -31,8 +31,7 @@ enum bitmap_format
 	BITMAP_FORMAT_IND64,            // 64bpp indexed
 	BITMAP_FORMAT_RGB32,            // 32bpp 8-8-8 RGB
 	BITMAP_FORMAT_ARGB32,           // 32bpp 8-8-8-8 ARGB
-	BITMAP_FORMAT_YUY16,            // 16bpp 8-8 Y/Cb, Y/Cr in sequence
-	BITMAP_FORMAT_LAST
+	BITMAP_FORMAT_YUY16             // 16bpp 8-8 Y/Cb, Y/Cr in sequence
 };
 
 
@@ -161,8 +160,8 @@ public:
 	}
 
 	// pixel access
-	template<typename _PixelType>
-	_PixelType &pixt(int32_t y, int32_t x = 0) const { return *(reinterpret_cast<_PixelType *>(m_base) + y * m_rowpixels + x); }
+	template<typename PixelType>
+	PixelType &pixt(int32_t y, int32_t x = 0) const { return *(reinterpret_cast<PixelType *>(m_base) + y * m_rowpixels + x); }
 	void *raw_pixptr(int32_t y, int32_t x = 0) const { return reinterpret_cast<uint8_t *>(m_base) + (y * m_rowpixels + x) * m_bpp / 8; }
 
 protected:
@@ -174,6 +173,7 @@ private:
 	// internal helpers
 	int32_t compute_rowpixels(int width, int xslop);
 	void compute_base(int xslop, int yslop);
+	bool valid_format() const;
 
 	// internal state
 	std::unique_ptr<uint8_t []> m_alloc;        // pointer to allocated pixel memory
@@ -189,111 +189,47 @@ private:
 };
 
 
-// ======================> bitmap8_t, bitmap16_t, bitmap32_t, bitmap64_t
+// ======================> bitmap_specific, bitmap8_t, bitmap16_t, bitmap32_t, bitmap64_t
+
+template<typename PixelType>
+class bitmap_specific : public bitmap_t
+{
+	static constexpr int PixelBits = 8 * sizeof(PixelType);
+
+protected:
+	// construction/destruction -- subclasses only
+	bitmap_specific(bitmap_specific<PixelType> &&) = default;
+	bitmap_specific(bitmap_format format, int width = 0, int height = 0, int xslop = 0, int yslop = 0) : bitmap_t(format, PixelBits, width, height, xslop, yslop) { }
+	bitmap_specific(bitmap_format format, PixelType *base, int width, int height, int rowpixels) : bitmap_t(format, PixelBits, base, width, height, rowpixels) { }
+	bitmap_specific(bitmap_format format, bitmap_specific<PixelType> &source, const rectangle &subrect) : bitmap_t(format, PixelBits, source, subrect) { }
+
+	bitmap_specific<PixelType> &operator=(bitmap_specific<PixelType> &&) = default;
+
+public:
+	using pixel_t = PixelType;
+
+	// getters
+	uint8_t bpp() const { return PixelBits; }
+
+	// pixel accessors
+	PixelType &pix(int32_t y, int32_t x = 0) const { return pixt<PixelType>(y, x); }
+	PixelType &pix8(int32_t y, int32_t x = 0) const { static_assert(PixelBits == 8, "must be 8bpp"); return pixt<PixelType>(y, x); }
+	PixelType &pix16(int32_t y, int32_t x = 0) const { static_assert(PixelBits == 16, "must be 16bpp"); return pixt<PixelType>(y, x); }
+	PixelType &pix32(int32_t y, int32_t x = 0) const { static_assert(PixelBits == 32, "must be 32bpp"); return pixt<PixelType>(y, x); }
+	PixelType &pix64(int32_t y, int32_t x = 0) const { static_assert(PixelBits == 64, "must be 64bpp"); return pixt<PixelType>(y, x); }
+};
 
 // 8bpp bitmaps
-class bitmap8_t : public bitmap_t
-{
-private:
-	// private helpers
-	bool valid_format(bitmap_format format) const { return (format == BITMAP_FORMAT_IND8); }
-
-protected:
-	// construction/destruction -- subclasses only
-	bitmap8_t(bitmap8_t &&) = default;
-	bitmap8_t(bitmap_format format, int width = 0, int height = 0, int xslop = 0, int yslop = 0) : bitmap_t(format, 8, width, height, xslop, yslop) { }
-	bitmap8_t(bitmap_format format, uint8_t *base, int width, int height, int rowpixels) : bitmap_t(format, 8, base, width, height, rowpixels) { assert(valid_format(format)); }
-	bitmap8_t(bitmap_format format, bitmap8_t &source, const rectangle &subrect) : bitmap_t(format, 8, source, subrect) { }
-
-	bitmap8_t &operator=(bitmap8_t &&) = default;
-
-public:
-	// getters
-	uint8_t bpp() const { return 8; }
-
-	// pixel accessors
-	typedef uint8_t pixel_t;
-	pixel_t &pix(int32_t y, int32_t x = 0) const { return pixt<pixel_t>(y, x); }
-	pixel_t &pix8(int32_t y, int32_t x = 0) const { return pixt<pixel_t>(y, x); }
-};
+using bitmap8_t = bitmap_specific<uint8_t>;
 
 // 16bpp bitmaps
-class bitmap16_t : public bitmap_t
-{
-private:
-	// private helpers
-	bool valid_format(bitmap_format format) const { return (format == BITMAP_FORMAT_IND16 || format == BITMAP_FORMAT_YUY16); }
-
-protected:
-	// construction/destruction -- subclasses only
-	bitmap16_t(bitmap16_t &&) = default;
-	bitmap16_t(bitmap_format format, int width = 0, int height = 0, int xslop = 0, int yslop = 0) : bitmap_t(format, 16, width, height, xslop, yslop) { assert(valid_format(format)); }
-	bitmap16_t(bitmap_format format, uint16_t *base, int width, int height, int rowpixels) : bitmap_t(format, 16, base, width, height, rowpixels) { assert(valid_format(format)); }
-	bitmap16_t(bitmap_format format, bitmap16_t &source, const rectangle &subrect) : bitmap_t(format, 16, source, subrect) { }
-
-	bitmap16_t &operator=(bitmap16_t &&) = default;
-
-public:
-	// getters
-	uint8_t bpp() const { return 16; }
-
-	// pixel accessors
-	typedef uint16_t pixel_t;
-	pixel_t &pix(int32_t y, int32_t x = 0) const { return pixt<pixel_t>(y, x); }
-	pixel_t &pix16(int32_t y, int32_t x = 0) const { return pixt<pixel_t>(y, x); }
-};
+using bitmap16_t = bitmap_specific<uint16_t>;
 
 // 32bpp bitmaps
-class bitmap32_t : public bitmap_t
-{
-private:
-	// private helpers
-	bool valid_format(bitmap_format format) const { return (format == BITMAP_FORMAT_IND32 || format == BITMAP_FORMAT_RGB32 || format == BITMAP_FORMAT_ARGB32); }
-
-protected:
-	// construction/destruction -- subclasses only
-	bitmap32_t(bitmap32_t &&) = default;
-	bitmap32_t(bitmap_format format, int width = 0, int height = 0, int xslop = 0, int yslop = 0) : bitmap_t(format, 32, width, height, xslop, yslop) { assert(valid_format(format)); }
-	bitmap32_t(bitmap_format format, uint32_t *base, int width, int height, int rowpixels) : bitmap_t(format, 32, base, width, height, rowpixels) { assert(valid_format(format)); }
-	bitmap32_t(bitmap_format format, bitmap32_t &source, const rectangle &subrect) : bitmap_t(format, 32, source, subrect) { }
-
-	bitmap32_t &operator=(bitmap32_t &&) = default;
-
-public:
-	// getters
-	uint8_t bpp() const { return 32; }
-
-	// pixel accessors
-	typedef uint32_t pixel_t;
-	pixel_t &pix(int32_t y, int32_t x = 0) const { return pixt<pixel_t>(y, x); }
-	pixel_t &pix32(int32_t y, int32_t x = 0) const { return pixt<pixel_t>(y, x); }
-};
+using bitmap32_t = bitmap_specific<uint32_t>;
 
 // 64bpp bitmaps
-class bitmap64_t : public bitmap_t
-{
-private:
-	// private helpers
-	bool valid_format(bitmap_format format) const { return (format == BITMAP_FORMAT_IND64); }
-
-protected:
-	// construction/destruction -- subclasses only
-	bitmap64_t(bitmap64_t &&) = default;
-	bitmap64_t(bitmap_format format, int width = 0, int height = 0, int xslop = 0, int yslop = 0) : bitmap_t(format, 64, width, height, xslop, yslop) { assert(valid_format(format)); }
-	bitmap64_t(bitmap_format format, uint64_t *base, int width, int height, int rowpixels) : bitmap_t(format, 64, base, width, height, rowpixels) { assert(valid_format(format)); }
-	bitmap64_t(bitmap_format format, bitmap64_t &source, const rectangle &subrect) : bitmap_t(format, 64, source, subrect) { }
-
-	bitmap64_t &operator=(bitmap64_t &&) = default;
-
-public:
-	// getters
-	uint8_t bpp() const { return 64; }
-
-	// pixel accessors
-	typedef uint64_t pixel_t;
-	pixel_t &pix(int32_t y, int32_t x = 0) const { return pixt<pixel_t>(y, x); }
-	pixel_t &pix64(int32_t y, int32_t x = 0) const { return pixt<pixel_t>(y, x); }
-};
+using bitmap64_t = bitmap_specific<uint64_t>;
 
 
 // ======================> bitmap_ind8, bitmap_ind16, bitmap_ind32, bitmap_ind64

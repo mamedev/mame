@@ -27,6 +27,8 @@ class qs1000_device :   public device_t,
 						public device_rom_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 	// construction/destruction
 	qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

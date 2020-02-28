@@ -141,7 +141,7 @@ private:
 	DECLARE_WRITE8_MEMBER(outport_w);
 	void murogem_palette(palette_device &palette) const;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void murogem_map(address_map &map);
 };
 
@@ -161,7 +161,6 @@ WRITE8_MEMBER(murogem_state::outport_w)
 
 void murogem_state::murogem_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x4000, 0x4000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x4001, 0x4001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x5000, 0x5000).portr("IN0");
@@ -227,7 +226,7 @@ void murogem_state::murogem_palette(palette_device &palette) const
 {
 }
 
-uint32_t murogem_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t murogem_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -249,20 +248,20 @@ uint32_t murogem_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-MACHINE_CONFIG_START(murogem_state::murogem)
+void murogem_state::murogem(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6802, 8000000)      /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(murogem_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", murogem_state,  irq0_line_hold)
+	M6802(config, m_maincpu, 8000000);      /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &murogem_state::murogem_map);
+	m_maincpu->set_vblank_int("screen", FUNC(murogem_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((39+1)*8, (38+1)*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(murogem_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((39+1)*8, (38+1)*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(murogem_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_murogem);
 	PALETTE(config, m_palette, FUNC(murogem_state::murogem_palette), 0x100);
@@ -274,10 +273,10 @@ MACHINE_CONFIG_START(murogem_state::murogem)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.375);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
 
 
 ROM_START( murogem )

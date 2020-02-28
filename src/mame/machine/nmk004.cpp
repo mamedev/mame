@@ -65,7 +65,7 @@ void nmk004_device::ym2203_irq_handler(int irq)
 
 void nmk004_device::nmk004_sound_mem_map(address_map &map)
 {
-	//AM_RANGE(0x0000, 0x1fff) AM_ROM /* 0x0000 - 0x1fff = internal ROM */
+	//map(0x0000, 0x1fff).rom(); /* 0x0000 - 0x1fff = internal ROM */
 	map(0x2000, 0xefff).rom().region(":audiocpu", 0x2000);
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf801).rw(":ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));

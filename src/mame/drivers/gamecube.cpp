@@ -142,10 +142,11 @@ void gamecube_state::machine_reset()
 //  MACHINE DEFINITIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(gamecube_state::gc)
-	MCFG_DEVICE_ADD("maincpu", PPC603, 485000000 / 100) // 485 MHz IBM "Gekko" (750CXe/750FX based)
-	MCFG_DEVICE_PROGRAM_MAP(ppc_mem)
-MACHINE_CONFIG_END
+void gamecube_state::gc(machine_config &config)
+{
+	PPC603(config, m_cpu, 485000000 / 100); // 485 MHz IBM "Gekko" (750CXe/750FX based)
+	m_cpu->set_addrmap(AS_PROGRAM, &gamecube_state::ppc_mem);
+}
 
 
 //**************************************************************************

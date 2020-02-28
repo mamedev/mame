@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C64_IEEE488, c64_ieee488_device, "c64_ieee488_device", "C64 IEEE-488 cartridge")
+DEFINE_DEVICE_TYPE(C64_IEEE488, c64_ieee488_device, "c64_ieee488", "C64 IEEE-488 cartridge")
 
 
 //-------------------------------------------------
@@ -106,7 +106,7 @@ READ8_MEMBER( c64_ieee488_device::tpi_pc_r )
 	data |= m_bus->ifc_r();
 	data |= m_bus->srq_r() << 1;
 
-	data |= m_exp->exrom_r(offset, 1, 1, 1, 0) << 7;
+	data |= m_exp->exrom_r(offset, 1, 1, 1, 0, 0) << 7;
 
 	return data;
 }
@@ -202,9 +202,9 @@ void c64_ieee488_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_ieee488_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_ieee488_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	data = m_exp->cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+	data = m_exp->cd_r(offset, data, sphi2, ba, roml, romh, io1, io2);
 
 	if (!roml && m_roml_sel)
 	{
@@ -212,7 +212,7 @@ uint8_t c64_ieee488_device::c64_cd_r(address_space &space, offs_t offset, uint8_
 	}
 	else if (!io2)
 	{
-		data = m_tpi->read(space, offset & 0x07);
+		data = m_tpi->read(offset & 0x07);
 	}
 
 	return data;
@@ -223,14 +223,14 @@ uint8_t c64_ieee488_device::c64_cd_r(address_space &space, offs_t offset, uint8_
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_ieee488_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_ieee488_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io2)
 	{
-		m_tpi->write(space, offset & 0x07, data);
+		m_tpi->write(offset & 0x07, data);
 	}
 
-	m_exp->cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+	m_exp->cd_w(offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
@@ -240,5 +240,5 @@ void c64_ieee488_device::c64_cd_w(address_space &space, offs_t offset, uint8_t d
 
 int c64_ieee488_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 {
-	return m_exp->game_r(offset, sphi2, ba, rw, m_slot->hiram());
+	return m_exp->game_r(offset, sphi2, ba, rw, m_slot->loram(), m_slot->hiram());
 }

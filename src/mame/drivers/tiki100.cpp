@@ -36,7 +36,7 @@ READ8_MEMBER( tiki100_state::mrq_r )
 {
 	bool mdis = 1;
 
-	uint8_t data = m_exp->mrq_r(space, offset, 0xff, mdis);
+	uint8_t data = m_exp->mrq_r(offset, 0xff, mdis);
 
 	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
 	uint8_t prom = m_prom->base()[prom_addr] ^ 0xff;
@@ -84,12 +84,12 @@ WRITE8_MEMBER( tiki100_state::mrq_w )
 		m_ram->pointer()[offset] = data;
 	}
 
-	m_exp->mrq_w(space, offset, data);
+	m_exp->mrq_w(offset, data);
 }
 
 READ8_MEMBER( tiki100_state::iorq_r )
 {
-	uint8_t data = m_exp->iorq_r(space, offset, 0xff);
+	uint8_t data = m_exp->iorq_r(offset, 0xff);
 
 	switch ((offset & 0xff) >> 2)
 	{
@@ -98,11 +98,11 @@ READ8_MEMBER( tiki100_state::iorq_r )
 		break;
 
 	case 0x01: // SERS
-		data = m_dart->cd_ba_r(space, offset & 0x03);
+		data = m_dart->cd_ba_r(offset & 0x03);
 		break;
 
 	case 0x02: // PARS
-		data = m_pio->read(space, offset & 0x03);
+		data = m_pio->read(offset & 0x03);
 		break;
 
 	case 0x04: // FLOP
@@ -113,13 +113,13 @@ READ8_MEMBER( tiki100_state::iorq_r )
 		switch (offset & 0x03)
 		{
 		case 3:
-			data = m_psg->data_r(space, 0);
+			data = m_psg->data_r();
 			break;
 		}
 		break;
 
 	case 0x06: // TIMS
-		data = m_ctc->read(space, offset & 0x03);
+		data = m_ctc->read(offset & 0x03);
 		break;
 	}
 
@@ -128,7 +128,7 @@ READ8_MEMBER( tiki100_state::iorq_r )
 
 WRITE8_MEMBER( tiki100_state::iorq_w )
 {
-	m_exp->iorq_w(space, offset, data);
+	m_exp->iorq_w(offset, data);
 
 	switch ((offset & 0xff) >> 2)
 	{
@@ -137,11 +137,11 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		break;
 
 	case 0x01: // SERS
-		m_dart->cd_ba_w(space, offset & 0x03, data);
+		m_dart->cd_ba_w(offset & 0x03, data);
 		break;
 
 	case 0x02: // PARS
-		m_pio->write(space, offset & 0x03, data);
+		m_pio->write(offset & 0x03, data);
 		break;
 
 	case 0x03: // VIPB
@@ -160,17 +160,17 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 			break;
 
 		case 2:
-			m_psg->address_w(space, 0, data);
+			m_psg->address_w(data);
 			break;
 
 		case 3:
-			m_psg->data_w(space, 0, data);
+			m_psg->data_w(data);
 			break;
 		}
 		break;
 
 	case 0x06: // TIMS
-		m_ctc->write(space, offset & 0x03, data);
+		m_ctc->write(offset & 0x03, data);
 		break;
 
 	case 0x07: // SYL
@@ -720,9 +720,9 @@ void tiki100_state::tiki100(machine_config &config)
 	m_exp->busrq_wr_callback().set(FUNC(tiki100_state::busrq_w));
 	m_exp->mrq_rd_callback().set(FUNC(tiki100_state::mrq_r));
 	m_exp->mrq_wr_callback().set(FUNC(tiki100_state::mrq_w));
-	TIKI100_BUS_SLOT(config, "slot1", tiki100_cards, "8088");
-	TIKI100_BUS_SLOT(config, "slot2", tiki100_cards, "hdc");
-	TIKI100_BUS_SLOT(config, "slot3", tiki100_cards, nullptr);
+	TIKI100_BUS_SLOT(config, "slot1", m_exp, tiki100_cards, "8088");
+	TIKI100_BUS_SLOT(config, "slot2", m_exp, tiki100_cards, "hdc");
+	TIKI100_BUS_SLOT(config, "slot3", m_exp, tiki100_cards, nullptr);
 
 	/* devices */
 	Z80DART(config, m_dart, 8_MHz_XTAL / 4);
@@ -770,17 +770,18 @@ void tiki100_state::tiki100(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
-
-	TIMER(config, "tape").configure_periodic(FUNC(tiki100_state::tape_tick), attotime::from_hz(44100));
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_psg, 8_MHz_XTAL / 4);
 	m_psg->set_flags(AY8910_SINGLE_OUTPUT);
 	m_psg->port_a_write_callback().set(FUNC(tiki100_state::video_scroll_w));
 	m_psg->add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	TIMER(config, "tape").configure_periodic(FUNC(tiki100_state::tape_tick), attotime::from_hz(44100));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

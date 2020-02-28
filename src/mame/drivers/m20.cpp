@@ -236,7 +236,7 @@ WRITE_LINE_MEMBER( m20_state::timer_tick_w )
 	 */
 	if(m_apb)
 		m_apb->nvi_w(state);
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? HOLD_LINE /*ASSERT_LINE*/ : CLEAR_LINE);
+	m_maincpu->set_input_line(z8001_device::NVI_LINE, state ? HOLD_LINE /*ASSERT_LINE*/ : CLEAR_LINE);
 }
 
 
@@ -744,7 +744,7 @@ WRITE_LINE_MEMBER(m20_state::int_w)
 {
 	if(m_apb && !m_apb->halted())
 		m_apb->vi_w(state);
-	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(z8001_device::VI_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void m20_state::machine_start()
@@ -768,7 +768,7 @@ void m20_state::machine_reset()
 	m_fd1797->reset();
 
 	memcpy(RAM, ROM, 8);  // we need only the reset vector
-	m_maincpu->reset();     // reset the CPU to ensure it picks up the new vector
+	m_maincpu->reset();   // FIXME: rewrite Z8000 core to not read the vector at this time
 	m_kbdi8251->write_cts(0);
 	if (m_apb)
 		m_apb->halt();
@@ -790,23 +790,24 @@ static void keyboard(device_slot_interface &device)
 	device.option_add("m20", M20_KEYBOARD);
 }
 
-MACHINE_CONFIG_START(m20_state::m20)
+void m20_state::m20(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z8001, MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(m20_program_mem)
-	MCFG_DEVICE_DATA_MAP(m20_data_mem)
-	MCFG_DEVICE_IO_MAP(m20_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(m20_state,m20_irq_callback)
+	Z8001(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m20_state::m20_program_mem);
+	m_maincpu->set_addrmap(AS_DATA, &m20_state::m20_data_mem);
+	m_maincpu->set_addrmap(AS_IO, &m20_state::m20_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(m20_state::m20_irq_callback));
 
 	RAM(config, RAM_TAG).set_default_size("160K").set_default_value(0).set_extra_options("128K,192K,224K,256K,384K,512K");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* Devices */
@@ -819,7 +820,7 @@ MACHINE_CONFIG_START(m20_state::m20)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(16);
-	crtc.set_update_row_callback(FUNC(m20_state::update_row), this);
+	crtc.set_update_row_callback(FUNC(m20_state::update_row));
 
 	I8255A(config, m_i8255, 0);
 
@@ -849,10 +850,10 @@ MACHINE_CONFIG_START(m20_state::m20)
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_ttyi8251, FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD("apb", M20_8086, "maincpu", m_i8259, RAM_TAG)
+	M20_8086(config, m_apb, m_maincpu, m_i8259, RAM_TAG);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("m20");
-MACHINE_CONFIG_END
+}
 
 ROM_START(m20)
 	ROM_REGION(0x2000,"maincpu", 0)

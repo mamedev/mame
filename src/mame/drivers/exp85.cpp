@@ -54,7 +54,7 @@ void exp85_state::exp85_io(address_map &map)
 	map.global_mask(0xff);
 	map(0xf0, 0xf3).rw(I8355_TAG, FUNC(i8355_device::io_r), FUNC(i8355_device::io_w));
 	map(0xf8, 0xfd).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-//  AM_RANGE(0xfe, 0xff) AM_DEVREADWRITE(I8279_TAG, i8279_r, i8279_w)
+//  map(0xfe, 0xff).rw(I8279_TAG, FUNC(i8279_device::read), FUNC(i8279_device::write));
 }
 
 /* Input Ports */
@@ -200,7 +200,8 @@ void exp85_state::exp85(machine_config &config)
 	i8355.out_pa().set(FUNC(exp85_state::i8355_a_w));
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	RS232_PORT(config, "rs232", default_rs232_devices, "terminal").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 

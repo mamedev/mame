@@ -292,7 +292,7 @@ void pntnpuzl_state::pntnpuzl_map(address_map &map)
 	map(0x100000, 0x100001).r(FUNC(pntnpuzl_state::irq2_ack_r));
 	map(0x180000, 0x180001).r(FUNC(pntnpuzl_state::irq4_ack_r));
 	map(0x200000, 0x200001).w(FUNC(pntnpuzl_state::pntnpuzl_200000_w));
-	map(0x280000, 0x28001f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0xff00);
+	map(0x280000, 0x28001f).m(m_via, FUNC(via6522_device::map)).umask16(0xff00);
 	map(0x280014, 0x280015).r(FUNC(pntnpuzl_state::pntnpuzl_280014_r));
 	map(0x280018, 0x280019).w(FUNC(pntnpuzl_state::pntnpuzl_280018_w));
 	map(0x28001a, 0x28001b).r(FUNC(pntnpuzl_state::pntnpuzl_28001a_r));
@@ -316,7 +316,7 @@ INPUT_CHANGED_MEMBER(pntnpuzl_state::coin_inserted)
 {
 	/* TODO: change this! */
 	if(newval)
-		m_maincpu->pulse_input_line((uint8_t)(uintptr_t)param, m_maincpu->minimum_quantum_time());
+		m_maincpu->pulse_input_line((uint8_t)param, m_maincpu->minimum_quantum_time());
 }
 
 static INPUT_PORTS_START( pntnpuzl )
@@ -353,9 +353,10 @@ static INPUT_PORTS_START( pntnpuzl )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(pntnpuzl_state::pntnpuzl)
-	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(pntnpuzl_map)
+void pntnpuzl_state::pntnpuzl(machine_config &config)
+{
+	M68000(config, m_maincpu, 12_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pntnpuzl_state::pntnpuzl_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -373,13 +374,12 @@ MACHINE_CONFIG_START(pntnpuzl_state::pntnpuzl)
 	mcu.ach7_cb().set_constant(0x180); // ?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
+	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
 
-	MCFG_DEVICE_ADD("vga", VGA, 0)
-	MCFG_VIDEO_SET_SCREEN("screen")
-MACHINE_CONFIG_END
+	VGA(config, "vga", 0).set_screen("screen");
+}
 
 ROM_START( pntnpuzl )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */

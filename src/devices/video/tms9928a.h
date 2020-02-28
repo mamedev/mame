@@ -73,13 +73,8 @@ public:
 	auto int_callback() { return m_out_int_line_cb.bind(); }
 	auto gromclk_callback() { return m_out_gromclk_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-
-	DECLARE_READ8_MEMBER( vram_r ) { return vram_read(); }
-	DECLARE_WRITE8_MEMBER( vram_w ) { vram_write(data); }
-	DECLARE_READ8_MEMBER( register_r ) { return register_read(); }
-	DECLARE_WRITE8_MEMBER( register_w ) { register_write(data); }
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	u8 vram_read();
 	void vram_write(u8 data);
@@ -87,14 +82,14 @@ public:
 	void register_write(u8 data);
 
 	/* update the screen */
-	uint32_t screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	bitmap_rgb32 &get_bitmap() { return m_tmpbmp; }
 
 	/* RESET pin */
 	void reset_line(int state) { if (state==ASSERT_LINE) device_reset(); }
 
 protected:
-	tms9928a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_50hz, bool is_reva, bool is_99);
+	tms9928a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t horz_total, bool is_50hz, bool is_reva, bool is_99);
 
 	// device-level overrides
 	virtual void device_config_complete() override;
@@ -139,6 +134,7 @@ private:
 	uint16_t  m_spritepattern;
 	int     m_colourmask;
 	int     m_patternmask;
+	const uint16_t m_total_horz;
 	const bool    m_50hz;
 	const bool    m_reva;
 	const bool    m_99;

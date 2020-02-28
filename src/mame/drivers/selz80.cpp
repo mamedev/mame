@@ -86,7 +86,7 @@ void selz80_state::selz80_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x27ff).ram(); // all 3 RAM sockets filled
-	// AM_RANGE(0x3000, 0x37ff) AM_ROM  // empty socket for ROM
+	// map(0x3000, 0x37ff).rom();  // empty socket for ROM
 	map(0xa000, 0xffff).rom();
 }
 
@@ -216,11 +216,12 @@ void selz80_state::machine_start()
 	m_digits.resolve();
 }
 
-MACHINE_CONFIG_START(selz80_state::selz80)
+void selz80_state::selz80(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000)) // it's actually a 5MHz XTAL with a NEC uPD780C-1 cpu
-	MCFG_DEVICE_PROGRAM_MAP(selz80_mem)
-	MCFG_DEVICE_IO_MAP(selz80_io)
+	Z80(config, m_maincpu, XTAL(4'000'000)); // it's actually a 5MHz XTAL with a NEC uPD780C-1 cpu
+	m_maincpu->set_addrmap(AS_PROGRAM, &selz80_state::selz80_mem);
+	m_maincpu->set_addrmap(AS_IO, &selz80_state::selz80_io);
 	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, selz80 )
 
 	/* video hardware */
@@ -247,14 +248,14 @@ MACHINE_CONFIG_START(selz80_state::selz80)
 	kbdc.in_rl_callback().set(FUNC(selz80_state::kbd_r));           // kbd RL lines
 	kbdc.in_shift_callback().set_constant(1);                       // Shift key
 	kbdc.in_ctrl_callback().set_constant(1);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(selz80_state::dagz80)
+void selz80_state::dagz80(machine_config &config)
+{
 	selz80(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(dagz80_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &selz80_state::dagz80_mem);
 	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, dagz80 )
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

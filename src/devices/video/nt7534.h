@@ -29,7 +29,7 @@ public:
 	// construction/destruction
 	nt7534_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb = pixel_update_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb.set(std::forward<T>(args)...); }
 
 	// device interface
 	virtual DECLARE_WRITE8_MEMBER(write);

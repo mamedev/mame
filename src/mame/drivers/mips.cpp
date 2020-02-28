@@ -42,10 +42,6 @@
  *   http://www.prumpleffer.de/~miod/machineroom/machines/mips/magnum/index.html
  *   https://web.archive.org/web/20140518203135/http://no-l.org/pages/riscos.html
  *
- * TODO (rx2030)
- *   - keyboard controller and keyboard
- *   - buzzer
- *
  * TODO (rx3230)
  *   - verify/complete address maps
  *   - keyboard controller and interrupts
@@ -133,7 +129,7 @@
 /*
  * Rx2030 WIP
  *
- *   status: boots RISC/os, requires unimplemented MIPS keyboard
+ *   - keyboard reset failure
  *
  * V50 internal peripherals:
  * base = 0xfe00
@@ -183,6 +179,23 @@
  *
  * Keyboard controller output port
  *  4: select 1M/4M SIMMs?
+ *
+ * PON failures
+ *   kseg0/kseg1 cache
+ *   instruction cache functionality (skipped)
+ *   instruction cache mats+ (skipped)
+ *   data cache block refill
+ *   instruction cache block refill (skipped)
+ *   scc - requires z80scc zero count interrupt
+ *   tod - loop <1 second real time?
+ *   color frame buffer (skipped)
+ *   dma controller chip
+ *   scsi controller chip
+ *   tlb (skipped) - all pass except tlb_n (requires cpu data cache)
+ *   exception (skipped)
+ *   parity
+ *   dma parity (skipped)
+ *   at serial board (skipped)
  */
 
 #include "emu.h"
@@ -231,6 +244,28 @@ void rx2030_state::rx2030_init()
 
 	if (!m_vram)
 		m_iop_interface |= VID_ABSENT;
+
+	/*
+	 * HACK: the prom bfs code broadcasts to the network address (i.e. the
+	 * host portion is "all zeroes"), instead of to the standard "all ones".
+	 * This makes it very difficult to receive the bfs request in a modern host
+	 * OS; the patch changes the code to broadcast to the standard broadcast
+	 * address instead.
+	 *
+	 * Technique is identical to that described for the rx3230 below.
+	 */
+	switch (system_bios())
+	{
+	case 1:
+		m_rom[0x1ab68 >> 1] = 0x0624;
+		m_rom[0x1ab6a >> 1] = 0xffff;
+		break;
+
+	case 2:
+		m_rom[0x1a7f8 >> 1] = 0x0624;
+		m_rom[0x1a7fa >> 1] = 0xffff;
+		break;
+	}
 }
 
 u16 rx2030_state::mmu_r(offs_t offset, u16 mem_mask)
@@ -249,8 +284,8 @@ void rx2030_state::mmu_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	offs_t const address = (m_mmu[(offset >> 11) & 0x1f] << 12) | ((offset << 1) & 0xfff);
 
-	LOGMASKED(LOG_MMU, "mmu_w offset 0x%06x reg %d page 0x%04x mapped 0x%06x data 0x%04x\n",
-		(offset << 1), (offset >> 11) & 0x1f, m_mmu[(offset >> 11) & 0x1f], address, data);
+	LOGMASKED(LOG_MMU, "mmu_w offset 0x%06x reg %d page 0x%04x mapped 0x%06x data 0x%04x (%s)\n",
+		(offset << 1), (offset >> 11) & 0x1f, m_mmu[(offset >> 11) & 0x1f], address, data, machine().describe_context());
 
 	if (ACCESSING_BITS_0_7)
 		m_ram->write(BYTE4_XOR_BE(address + 0), data);
@@ -268,20 +303,14 @@ void rx2030_state::iop_program_map(address_map &map)
 	map(0x00000, 0x1ffff).ram();
 	map(0x20000, 0x3ffff).rw(FUNC(rx2030_state::mmu_r), FUNC(rx2030_state::mmu_w));
 
-	map(0x80000, 0xbffff).rom().region("v50_ipl", 0).mirror(0x40000);
+	map(0x80000, 0xbffff).rom().region("rx2030", 0).mirror(0x40000);
 }
 
 void rx2030_state::iop_io_map(address_map &map)
 {
-	map(0x0000, 0x003f).lrw16("mmu",
-		[this](offs_t offset, u16 mem_mask)
-		{
-			return m_mmu[offset];
-		},
-		[this](offs_t offset, u16 data, u16 mem_mask)
-		{
-			m_mmu[offset] = data;
-		});
+	map(0x0000, 0x003f).lrw16(
+		NAME([this] (offs_t offset, u16 mem_mask) { return m_mmu[offset]; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { m_mmu[offset] = data; }));
 
 	map(0x0040, 0x0043).m(m_fdc, FUNC(wd37c65c_device::map)).umask16(0xff);
 	map(0x0044, 0x0045).w(m_fdc, FUNC(wd37c65c_device::dor_w)).umask16(0xff);
@@ -290,33 +319,41 @@ void rx2030_state::iop_io_map(address_map &map)
 
 	map(0x0080, 0x0083).rw(m_scsi, FUNC(aic6250_device::read), FUNC(aic6250_device::write)).umask16(0xff);
 
-	map(0x00c0, 0x00c1).rw(m_kbdc, FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w)).umask16(0xff);
+	/*
+	 * HACK: Substitute the keyboard "set defaults" command for the "reset"
+	 * command to avoid an issue where the keyboard is still busy performing
+	 * the reset and does not accept commands being sent to it to change the
+	 * scan code set. Possibly caused by imperfect V50 timing and/or memory
+	 * wait states that make the IOP code execute more slowly than emulated.
+	 */
+	map(0x00c0, 0x00c1).lrw8(NAME([this] () { return m_kbdc->data_r(); }), NAME([this] (u8 data) { m_kbdc->data_w(data == 0xff ? 0xf6 : data); })).umask16(0xff);
 	map(0x00c4, 0x00c5).rw(m_kbdc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w)).umask16(0xff);
 
-	map(0x0100, 0x0107).rw(m_scc, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask16(0xff);
+	map(0x0100, 0x0107).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0xff);
 
 	map(0x0140, 0x0143).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w));
 
-	map(0x0180, 0x018b).lr8("mac", [](offs_t offset)
-	{
-		// Ethernet MAC address (LSB first)
-		static u8 const mac[] = { 0x00, 0x00, 0x6b, 0x12, 0x34, 0x56 };
+	map(0x0180, 0x018b).lr8(
+			[] (offs_t offset)
+			{
+				// Ethernet MAC address (LSB first)
+				static u8 const mac[] = { 0x00, 0x00, 0x6b, 0x12, 0x34, 0x56 };
 
-		return mac[offset];
-	}).umask16(0xff);
+				return mac[offset];
+			}, "mac_r").umask16(0xff);
 
 	// iop tests bits 0x04, 0x10 and 0x20
-	map(0x01c0, 0x01c1).lr8("?", [this]() { return m_iop_interface; }); // maybe?
+	map(0x01c0, 0x01c1).lr8(NAME([this] () { return m_iop_interface; })); // maybe?
 
 	map(0x0200, 0x0201).rw(m_fio, FUNC(z8038_device::fifo_r<1>), FUNC(z8038_device::fifo_w<1>)).umask16(0xff);
 	map(0x0202, 0x0203).rw(m_fio, FUNC(z8038_device::reg_r<1>), FUNC(z8038_device::reg_w<1>)).umask16(0xff);
 
-	map(0x0240, 0x0241).lw8("rtc", [this](address_space &space, offs_t offset, u8 data) { m_rtc->write(space, 0, data); }).umask16(0xff00);
-	map(0x0280, 0x0281).lrw8("rtc",
-		[this](address_space &space, offs_t offset) { return m_rtc->read(space, 1); },
-		[this](address_space &space, offs_t offset, u8 data) { m_rtc->write(space, 1, data); }).umask16(0xff00);
+	map(0x0240, 0x0241).lw8(NAME([this] (u8 data) { m_rtc->write(0, data); })).umask16(0xff00);
+	map(0x0280, 0x0281).lrw8(
+			NAME([this] () { return m_rtc->read(1); }),
+			NAME([this] (u8 data) { m_rtc->write(1, data); })).umask16(0xff00);
 
-	map(0x02c0, 0x2c1).lw8("cpu_interface", [this](u8 data)
+	map(0x02c0, 0x2c1).lw8([this](u8 data)
 	{
 		switch (data)
 		{
@@ -334,7 +371,7 @@ void rx2030_state::iop_io_map(address_map &map)
 			else
 				m_iop->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
 			m_iop_interface |= IOP_IACK;
-			m_iop_interface &= ~IOP_IRQ; // maybe?
+			m_iop_interface &= ~IOP_IRQ;
 			break;
 
 		default:
@@ -347,15 +384,15 @@ void rx2030_state::iop_io_map(address_map &map)
 			// something to do with shared memory access?
 			//break;
 		}
-	}).umask16(0xff);
+	}, "cpu_interface_w").umask16(0xff);
 
-	map(0x0380, 0x0381).lw8("led", [this](u8 data) { logerror("led_w 0x%02x\n", data); }).umask16(0xff00);
+	map(0x0380, 0x0381).lw8(NAME([this](u8 data) { logerror("led_w 0x%02x\n", data); })).umask16(0xff00);
 }
 
 void rx2030_state::rx2030_map(address_map &map)
 {
-	map(0x02000000, 0x02000003).lrw8("iop_interface",
-		[this]() { return m_iop_interface; },
+	map(0x02000000, 0x02000003).lrw8(
+		NAME([this]() { return m_iop_interface; }),
 		[this](u8 data)
 		{
 			switch (data)
@@ -426,7 +463,7 @@ void rx2030_state::rx2030_map(address_map &map)
 
 				// interrupt the iop
 				m_iop_interface &= ~IOP_IACK;
-				m_iop_interface |= IOP_IRQ; // maybe?
+				m_iop_interface |= IOP_IRQ;
 				m_iop->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 				break;
 
@@ -437,7 +474,7 @@ void rx2030_state::rx2030_map(address_map &map)
 				LOG("iop interface command 0x%02x (%s)\n", data, machine().describe_context());
 				break;
 			}
-		}
+		}, "iop_interface_w"
 	).umask32(0xff);
 }
 
@@ -448,6 +485,9 @@ void rx2030_state::rs2030_map(address_map &map)
 	// video hardware
 	map(0x01000000, 0x011fffff).ram().share("vram");
 	map(0x01ffff00, 0x01ffffff).m(m_ramdac, FUNC(bt458_device::map)).umask32(0xff);
+
+	//map(0x01ff1000, 0x01ff1001).w() // graphics register?
+	//map(0x01ff0080, 0x01ff0081).w() // graphics register?
 }
 
 u16 rx2030_state::lance_r(offs_t offset, u16 mem_mask)
@@ -477,13 +517,13 @@ static void mips_scsi_devices(device_slot_interface &device)
 void rx2030_state::rx2030(machine_config &config)
 {
 	R2000A(config, m_cpu, 33.333_MHz_XTAL / 2, 32768, 32768);
-	// TODO: FPU disabled until properly emulated
-	//m_cpu->set_fpurev(mips1_device_base::MIPS_R2010A);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R2010A);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
-	V50(config, m_iop, 20_MHz_XTAL / 2);
+	V50(config, m_iop, 20_MHz_XTAL);
 	m_iop->set_addrmap(AS_PROGRAM, &rx2030_state::iop_program_map);
 	m_iop->set_addrmap(AS_IO, &rx2030_state::iop_io_map);
+	m_iop->out_handler<2>().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 
 	// general dma configuration
 	m_iop->out_hreq_cb().set(m_iop, FUNC(v50_device::hack_w));
@@ -507,19 +547,21 @@ void rx2030_state::rx2030(machine_config &config)
 	Z8038(config, m_fio, 0);
 	m_fio->out_int_cb<1>().set_inputline(m_iop, INPUT_LINE_IRQ4);
 
-	// keyboard
-	pc_kbdc_device &kbdc(PC_KBDC(config, "pc_kbdc", 0));
-	kbdc.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
-	kbdc.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
+	// keyboard connector
+	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd_con", 0));
+	kbd_con.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
+	kbd_con.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
 
-	PC_KBDC_SLOT(config, m_kbd, 0);
-	pc_at_keyboards(*m_kbd);
-	m_kbd->set_pc_kbdc_slot(&kbdc);
+	// keyboard port
+	PC_KBDC_SLOT(config, m_kbd, pc_at_keyboards, nullptr);
+	m_kbd->set_pc_kbdc_slot(&kbd_con);
 
+	// keyboard controller
 	AT_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
 	//m_kbdc->hot_res().set_inputline(m_maincpu, INPUT_LINE_RESET);
-	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->set_default_bios_tag("award15");
 
 	SCC85C30(config, m_scc, 1.8432_MHz_XTAL);
 	m_scc->configure_channels(m_scc->clock(), m_scc->clock(), m_scc->clock(), m_scc->clock());
@@ -585,9 +627,6 @@ void rx2030_state::rc2030(machine_config &config)
 
 	m_cpu->set_addrmap(AS_PROGRAM, &rx2030_state::rx2030_map);
 
-	// no keyboard
-	m_kbd->set_default_option(nullptr);
-
 	m_tty[1]->set_default_option("terminal");
 }
 
@@ -643,14 +682,17 @@ void rx3230_state::rx3230_map(address_map &map)
 {
 	map(0x00000000, 0x07ffffff).noprw(); // silence ram
 
+	//map(0x10000000, 0x13ffffff); // restricted AT I/O space
+	//map(0x14000000, 0x17ffffff); // restricted AT memory space
+
 	map(0x16080004, 0x16080007).nopr(); // silence graphics register
 
 	map(0x18000000, 0x1800003f).m(m_scsi, FUNC(ncr53c94_device::map)).umask32(0xff);
 	map(0x19000000, 0x19000003).rw(m_kbdc, FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w)).umask32(0xff);
 	map(0x19000004, 0x19000007).rw(m_kbdc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w)).umask32(0xff);
-	map(0x19800000, 0x19800003).lr8("int_reg", [this]() { return m_int_reg; }).umask32(0xff);
+	map(0x19800000, 0x19800003).lr8(NAME([this]() { return m_int_reg; })).umask32(0xff);
 	map(0x1a000000, 0x1a000007).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w)).umask32(0xffff);
-	map(0x1b000000, 0x1b00001f).rw(m_scc, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff); // TODO: order?
+	map(0x1b000000, 0x1b00001f).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff); // TODO: order?
 
 	map(0x1c000000, 0x1c000fff).m(m_rambo, FUNC(mips_rambo_device::map));
 
@@ -659,17 +701,15 @@ void rx3230_state::rx3230_map(address_map &map)
 	//map(0x1e800000, 0x1e800003).umask32(0xff); // fdc tc
 
 	map(0x1fc00000, 0x1fc3ffff).rom().region("rx3230", 0);
-
-	map(0x1ff00000, 0x1ff00003).lr8("boardtype", []() { return 0xa; }).umask32(0xff); // r? idprom boardtype?
-	//map(0x1ff00018, 0x1ff0001b).umask32(0x0000ff00); // r? idprom?
+	map(0x1ff00000, 0x1ff3ffff).rom().region("rx3230", 0); // mirror
 }
 
 void rx3230_state::rs3230_map(address_map &map)
 {
 	rx3230_map(map);
 
-	map(0x10000000, 0x12ffffff).lrw32("vram",
-		[this](offs_t offset)
+	map(0x10000000, 0x12ffffff).lrw32(
+		NAME([this](offs_t offset)
 		{
 			u32 const ram_offset = ((offset >> 13) * 0x500) + ((offset & 0x1ff) << 2);
 
@@ -680,8 +720,8 @@ void rx3230_state::rs3230_map(address_map &map)
 				u32(m_vram->read(ram_offset | 3)) << 0;
 
 			return data;
-		},
-		[this](offs_t offset, u32 data)
+		}),
+		NAME([this](offs_t offset, u32 data)
 		{
 			u32 const ram_offset = ((offset >> 13) * 0x500) + ((offset & 0x1ff) << 2);
 
@@ -689,19 +729,19 @@ void rx3230_state::rs3230_map(address_map &map)
 			m_vram->write(ram_offset | 1, data >> 16);
 			m_vram->write(ram_offset | 2, data >> 8);
 			m_vram->write(ram_offset | 3, data >> 0);
-		});
+		}));
 
 	map(0x14000000, 0x14000003).rw(m_ramdac, FUNC(bt459_device::address_lo_r), FUNC(bt459_device::address_lo_w)).umask32(0xff);
 	map(0x14080000, 0x14080003).rw(m_ramdac, FUNC(bt459_device::address_hi_r), FUNC(bt459_device::address_hi_w)).umask32(0xff);
 	map(0x14100000, 0x14100003).rw(m_ramdac, FUNC(bt459_device::register_r), FUNC(bt459_device::register_w)).umask32(0xff);
 	map(0x14180000, 0x14180003).rw(m_ramdac, FUNC(bt459_device::palette_r), FUNC(bt459_device::palette_w)).umask32(0xff);
 
-	map(0x16080004, 0x16080007).lr8("gfx_reg", [this]()
+	map(0x16080004, 0x16080007).lr8(NAME([this] ()
 	{
 		u8 const data = (m_screen->vblank() ? GFX_V_BLANK : 0) | (m_screen->hblank() ? GFX_H_BLANK : 0);
 
 		return data;
-	}).umask32(0xff); // also write 0
+	})).umask32(0xff); // also write 0
 
 	//map(0x16000004, 0x16000007).w(); // write 0x00000001
 	//map(0x16100000, 0x16100003).w(); // write 0xffffffff
@@ -748,7 +788,7 @@ void rx3230_state::rx3230(machine_config &config)
 {
 	R3000A(config, m_cpu, 50_MHz_XTAL / 2, 32768, 32768);
 	m_cpu->set_addrmap(AS_PROGRAM, &rx3230_state::rx3230_map);
-	m_cpu->set_fpurev(mips1_device_base::MIPS_R3010A);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010A);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
 	// 32 SIMM slots, 8-128MB memory, banks of 8 1MB or 4MB SIMMs
@@ -820,18 +860,19 @@ void rx3230_state::rx3230(machine_config &config)
 	//m_fdc->drq_wr_callback().set();
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, mips_floppy_formats).enable_sound(false);
 
-	// keyboard
-	pc_kbdc_device &kbdc(PC_KBDC(config, "pc_kbdc", 0));
-	kbdc.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
-	kbdc.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
+	// keyboard connector
+	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd_con", 0));
+	kbd_con.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
+	kbd_con.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
 
-	PC_KBDC_SLOT(config, m_kbd, 0);
-	pc_at_keyboards(*m_kbd);
-	m_kbd->set_pc_kbdc_slot(&kbdc);
+	// keyboard port
+	PC_KBDC_SLOT(config, m_kbd, pc_at_keyboards, nullptr);
+	m_kbd->set_pc_kbdc_slot(&kbd_con);
 
+	// keyboard controller
 	AT_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL); // TODO: confirm
-	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
 	//m_kbdc->kbd_irq().set(FUNC(rx3230_state::irq_w<INT_KBD>));
 
 	// buzzer
@@ -943,7 +984,7 @@ void rx3230_state::lance_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 ROM_START(rx2030)
-	ROM_REGION16_LE(0x40000, "v50_ipl", 0)
+	ROM_REGION16_LE(0x40000, "rx2030", 0)
 	ROM_SYSTEM_BIOS(0, "v4.32", "Rx2030 v4.32, Jan 1991")
 	ROMX_LOAD("50-00121__005.u139", 0x00000, 0x10000, CRC(b2f42665) SHA1(81c83aa6b8865338fda5c03733ede91749997648), ROM_BIOS(0) | ROM_SKIP(1))
 	ROMX_LOAD("50-00120__005.u140", 0x00001, 0x10000, CRC(0ffa485e) SHA1(7cdfb81d1a547c5ccc88e1e0ef73d447cd03e9e2), ROM_BIOS(0) | ROM_SKIP(1))
@@ -955,9 +996,6 @@ ROM_START(rx2030)
 	ROMX_LOAD("50-00120__003.u140", 0x00001, 0x10000, CRC(e1991721) SHA1(028d33be271c95f198473b650f7800f9ca4a60b2), ROM_BIOS(1) | ROM_SKIP(1))
 	ROMX_LOAD("50-00119__003.u141", 0x20001, 0x10000, CRC(c8469906) SHA1(69bbf4b5c415b2e2156a4467bf9cb30e79f586ef), ROM_BIOS(1) | ROM_SKIP(1))
 	ROMX_LOAD("50-00118__003.u142", 0x20000, 0x10000, CRC(18cc001a) SHA1(198023e92e1e3ba2fc8637f5dd6f370e7e023fdd), ROM_BIOS(1) | ROM_SKIP(1))
-
-	ROM_REGION(0x800, "i8742_eprom", 0)
-	ROM_LOAD("keyboard_1.5.bin", 0x000, 0x800, CRC(f86ba0f7) SHA1(1ad475451db35a76d929824c035d582279fbe3a3))
 
 	/*
 	 * The following isn't a real dump, but a hand-made nvram image that allows
@@ -1006,7 +1044,7 @@ ROM_END
 #define rom_rs3230 rom_rx3230
 
 /*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS         INIT         COMPANY  FULLNAME       FLAGS */
-COMP(1989,  rc2030,    0,      0,      rc2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RC2030",      MACHINE_NOT_WORKING)
-COMP(1989,  rs2030,    0,      0,      rs2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RS2030",      MACHINE_NOT_WORKING)
+COMP(1989,  rc2030,    0,      0,      rc2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RC2030",      0)
+COMP(1989,  rs2030,    0,      0,      rs2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RS2030",      0)
 COMP(1990,  rc3230,    0,      0,      rc3230,    0,     rx3230_state, rx3230_init, "MIPS",  "RC3230",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP(1990,  rs3230,    0,      0,      rs3230,    0,     rx3230_state, rx3230_init, "MIPS",  "Magnum 3000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

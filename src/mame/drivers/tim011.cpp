@@ -66,9 +66,9 @@ void tim011_state::tim011_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x007f).ram(); /* Z180 internal registers */
 	map(0x0080, 0x009f).m(m_fdc, FUNC(upd765a_device::map));
-	//AM_RANGE(0x00a0, 0x00a0) AM_MIRROR(0x001f)  AM_WRITE(fdc_dma_w)
-	//AM_RANGE(0x00c0, 0x00c1) AM_MIRROR(0x000e)  AM_READWRITE(print_r,print_w)
-	//AM_RANGE(0x00d0, 0x00d0) AM_MIRROR(0x000f)  AM_READWRITE(scroll_r,scroll_w)
+	//map(0x00a0, 0x00a0).mirror(0x001f).w(FUNC(tim011_state::fdc_dma_w));
+	//map(0x00c0, 0x00c1).mirror(0x000e).rw(FUNC(tim011_state::print_r), FUNC(tim011_state::print_w));
+	//map(0x00d0, 0x00d0).mirror(0x000f).rw(FUNC(tim011_state::scroll_r), FUNC(tim011_state::scroll_w));
 	map(0x8000, 0xffff).ram(); // Video RAM 43256 SRAM  (32KB)
 }
 
@@ -132,14 +132,15 @@ static const floppy_format_type tim011_floppy_formats[] = {
 	nullptr
 };
 
-MACHINE_CONFIG_START(tim011_state::tim011)
+void tim011_state::tim011(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z180, XTAL(12'288'000) / 2) // location U17 HD64180
-	MCFG_DEVICE_PROGRAM_MAP(tim011_mem)
-	MCFG_DEVICE_IO_MAP(tim011_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tim011_state, irq0_line_hold)
+	HD64180RP(config, m_maincpu, XTAL(12'288'000)); // location U17 HD64180
+	m_maincpu->set_addrmap(AS_PROGRAM, &tim011_state::tim011_mem);
+	m_maincpu->set_addrmap(AS_IO, &tim011_state::tim011_io);
+	m_maincpu->set_vblank_int("screen", FUNC(tim011_state::irq0_line_hold));
 
-//  MCFG_DEVICE_ADD("keyboard",CDP1802, XTAL(1'750'000)) // CDP1802, unknown clock
+//  CDP1802(config, "keyboard", XTAL(1'750'000)); // CDP1802, unknown clock
 
 	// FDC9266 location U43
 	UPD765A(config, m_fdc, XTAL(8'000'000), true, true);
@@ -152,16 +153,16 @@ MACHINE_CONFIG_START(tim011_state::tim011)
 	FLOPPY_CONNECTOR(config, FDC9266_TAG ":3", tim011_floppies, "35dd", tim011_floppy_formats);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tim011_state, screen_update_tim011)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(tim011_state::screen_update_tim011));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( tim011 )

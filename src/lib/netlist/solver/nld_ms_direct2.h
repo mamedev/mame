@@ -1,60 +1,62 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_ms_direct1.h
- *
- */
 
 #ifndef NLD_MS_DIRECT2_H_
 #define NLD_MS_DIRECT2_H_
+
+///
+/// \file nld_ms_direct2.h
+///
 
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
 
 namespace netlist
 {
-namespace devices
+namespace solver
 {
-
-	template <typename FT>
-	class matrix_solver_direct2_t: public matrix_solver_direct_t<FT, 2>
-	{
-	public:
-
-		typedef FT float_type;
-
-		matrix_solver_direct2_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params)
-			: matrix_solver_direct_t<double, 2>(anetlist, name, params, 2)
-			{}
-		virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
-
-	};
 
 	// ----------------------------------------------------------------------------------------
 	// matrix_solver - Direct2
 	// ----------------------------------------------------------------------------------------
 
 	template <typename FT>
-	inline unsigned matrix_solver_direct2_t<FT>::vsolve_non_dynamic(const bool newton_raphson)
+	class matrix_solver_direct2_t: public matrix_solver_direct_t<FT, 2>
 	{
-		this->build_LE_A(*this);
-		this->build_LE_RHS(*this);
+	public:
 
-		const float_type a = this->A(0,0);
-		const float_type b = this->A(0,1);
-		const float_type c = this->A(1,0);
-		const float_type d = this->A(1,1);
+		using float_type = FT;
 
-		float_type new_V[2];
-		new_V[1] = (a * this->RHS(1) - c * this->RHS(0)) / (a * d - b * c);
-		new_V[0] = (this->RHS(0) - b * new_V[1]) / a;
+		matrix_solver_direct2_t(netlist_state_t &anetlist, const pstring &name,
+			const analog_net_t::list_t &nets,
+			const solver_parameters_t *params)
+		: matrix_solver_direct_t<FT, 2>(anetlist, name, nets, params, 2)
+		{}
+		unsigned vsolve_non_dynamic(bool newton_raphson) override
+		{
+			this->clear_square_mat(this->m_A);
+			this->fill_matrix_and_rhs();
 
-		const float_type err = (newton_raphson ? this->delta(new_V) : 0.0);
-		this->store(new_V);
-		return (err > this->m_params.m_accuracy) ? 2 : 1;
-	}
+			const float_type a = this->m_A[0][0];
+			const float_type b = this->m_A[0][1];
+			const float_type c = this->m_A[1][0];
+			const float_type d = this->m_A[1][1];
 
-} //namespace devices
+			const float_type v1 = (a * this->m_RHS[1] - c * this->m_RHS[0]) / (a * d - b * c);
+			const float_type v0 = (this->m_RHS[0] - b * v1) / a;
+			this->m_new_V[0] = v0;
+			this->m_new_V[1] = v1;
+
+			bool err(false);
+			if (newton_raphson)
+				err = this->check_err();
+			this->store();
+			return (err) ? 2 : 1;
+		}
+
+	};
+
+} // namespace solver
 } // namespace netlist
 
-#endif /* NLD_MS_DIRECT2_H_ */
+#endif // NLD_MS_DIRECT2_H_

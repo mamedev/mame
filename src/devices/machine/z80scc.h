@@ -353,14 +353,10 @@ public:
 		m_txcb = txb;
 	}
 
-	DECLARE_READ8_MEMBER( cd_ab_r );
-	DECLARE_WRITE8_MEMBER( cd_ab_w );
-	DECLARE_READ8_MEMBER( cd_ba_r );
-	DECLARE_WRITE8_MEMBER( cd_ba_w );
-	DECLARE_READ8_MEMBER( ba_cd_r );
-	DECLARE_WRITE8_MEMBER( ba_cd_w );
-	DECLARE_READ8_MEMBER( ba_cd_inv_r );
-	DECLARE_WRITE8_MEMBER( ba_cd_inv_w );
+	uint8_t dc_ab_r(offs_t offset);
+	void dc_ab_w(offs_t offset, uint8_t data);
+	uint8_t ab_dc_r(offs_t offset);
+	void ab_dc_w(offs_t offset, uint8_t data);
 
 	/* Definitions moved to z80scc.c for enhancements */
 	uint8_t da_r(offs_t offset);
@@ -457,13 +453,13 @@ protected:
 	int m_txcb;
 
 	// internal state
-	devcb_write_line    m_out_txd_cb[2];
-	devcb_write_line    m_out_dtr_cb[2];
-	devcb_write_line    m_out_rts_cb[2];
-	devcb_write_line    m_out_wreq_cb[2];
-	devcb_write_line    m_out_sync_cb[2];
-	devcb_write_line    m_out_rxdrq_cb[2];
-	devcb_write_line    m_out_txdrq_cb[2];
+	devcb_write_line::array<2> m_out_txd_cb;
+	devcb_write_line::array<2> m_out_dtr_cb;
+	devcb_write_line::array<2> m_out_rts_cb;
+	devcb_write_line::array<2> m_out_wreq_cb;
+	devcb_write_line::array<2> m_out_sync_cb;
+	devcb_write_line::array<2> m_out_rxdrq_cb;
+	devcb_write_line::array<2> m_out_txdrq_cb;
 
 	devcb_write_line    m_out_int_cb;
 

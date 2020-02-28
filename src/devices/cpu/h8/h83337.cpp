@@ -9,7 +9,7 @@ DEFINE_DEVICE_TYPE(H83337, h83337_device, "h83337", "Hitachi H8/3337")
 
 
 h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
-	h8_device(mconfig, type, tag, owner, clock, true, address_map_constructor(FUNC(h83337_device::map), this)),
+	h8_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h83337_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
 	port1(*this, "port1"),
@@ -61,9 +61,9 @@ void h83337_device::map(address_map &map)
 	map(0xff90, 0xff90).rw("timer16:0", FUNC(h8_timer16_channel_device::tier_r), FUNC(h8_timer16_channel_device::tier_w));
 	map(0xff91, 0xff91).rw("timer16:0", FUNC(h8_timer16_channel_device::tsr_r), FUNC(h8_timer16_channel_device::tsr_w));
 	map(0xff92, 0xff93).rw("timer16:0", FUNC(h8_timer16_channel_device::tcnt_r), FUNC(h8_timer16_channel_device::tcnt_w));
-//  AM_RANGE(0xff94, 0xff95) AM_DEVREADWRITE( "timer16:0", h8_timer16_channel_device, ocr_r,   ocr_w          )
+//  map(0xff94, 0xff95).rw("timer16:0", FUNC(h8_timer16_channel_device::ocr_r, FUNC(h8_timer16_channel_device:ocr_w));
 	map(0xff96, 0xff96).rw("timer16:0", FUNC(h8_timer16_channel_device::tcr_r), FUNC(h8_timer16_channel_device::tcr_w));
-//  AM_RANGE(0xff96, 0xff97) AM_DEVREADWRITE8("timer16:0", h8_timer16_channel_device, tocr_r,  tocr_w,  0x00ff)
+//  map(0xff97, 0xff97).rw("timer16:0", FUNC(h8_timer16_channel_device::tocr_r, FUNC(h8_timer16_channel_device:tocr_w));
 	map(0xff98, 0xff9f).r("timer16:0", FUNC(h8_timer16_channel_device::tgr_r));
 
 	map(0xffa8, 0xffa9).rw("watchdog", FUNC(h8_watchdog_device::wd_r), FUNC(h8_watchdog_device::wd_w));

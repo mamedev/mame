@@ -80,7 +80,7 @@ private:
 	uint32_t screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tvlink(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(frame_int_w);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svision_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void svision_palette(palette_device &palette) const;
 	void svisionp_palette(palette_device &palette) const;

@@ -30,9 +30,11 @@ READ8_MEMBER(pc1251_state::in_a_r)
 			data |= 0x02;       // problem with the deg lcd
 	}
 
-	for (int bit = 0, key = 1; bit < 3; bit++, key++)
-		if (BIT(m_outb, bit))
-			data |= m_keys[key]->read();
+	if (BIT(m_outb, 1))
+		data |= m_keys[1]->read();
+
+	if (BIT(m_outb, 2))
+		data |= m_keys[2]->read();
 
 	for (int bit = 0, key = 3; bit < 7; bit++, key++)
 		if (BIT(m_outa, bit))

@@ -11,7 +11,7 @@
 
 #include "machine/3dom2.h"
 
-#include <math.h>
+#include <cmath>
 
 /*
     TODO:
@@ -555,22 +555,16 @@ static void write_te_reg(uint32_t &reg, uint32_t data, m2_te_device::te_reg_wmod
 	switch (mode)
 	{
 		case m2_te_device::REG_WRITE:
-		{
 			reg = data;
 			break;
-		}
 		case m2_te_device::REG_SET:
-		{
 			reg |= data;
 			break;
-		}
 		case m2_te_device::REG_CLEAR:
-		{
 			reg &= ~data;
 			break;
-		}
 		default:
-			assert_always(false, "Bad register write mode");
+			throw emu_fatalerror("write_te_reg: Bad register write mode");
 	}
 }
 
@@ -726,10 +720,10 @@ void m2_te_device::device_start()
 	m_winclip_int_handler.resolve_safe();
 
 	// Allocate texture RAM
-	m_tram = auto_alloc_array(machine(), uint32_t, TEXTURE_RAM_WORDS);
+	m_tram = std::make_unique<uint32_t[]>(TEXTURE_RAM_WORDS);
 
 	// Allocate PIP RAM
-	m_pipram = auto_alloc_array(machine(), uint32_t, PIP_RAM_WORDS);
+	m_pipram = std::make_unique<uint32_t[]>(PIP_RAM_WORDS);
 
 	// TODO
 	memset(&m_gc, 0, sizeof(m_gc));
@@ -1230,9 +1224,9 @@ void m2_te_device::setup_triangle(uint32_t flags)
 	if ((vb.y - vc.y) < 0.0f) a |= 2;
 	if ((vc.y - va.y) < 0.0f) a |= 1;
 
-	const se_vtx *v1 = NULL;
-	const se_vtx *v2 = NULL;
-	const se_vtx *v3 = NULL;
+	const se_vtx *v1 = nullptr;
+	const se_vtx *v2 = nullptr;
+	const se_vtx *v3 = nullptr;
 
 	switch (a)
 	{
@@ -1569,7 +1563,7 @@ void m2_te_device::walk_edges(uint32_t wrange)
 		if (scan_lr ^ (m_es.x1 < m_es.x2))
 		{
 			 // TODO: Is this possible?
-			assert_always(false, "SPECIAL CASE: WHAT DO?");
+			throw emu_fatalerror("m2_te_device::walk_edges: SPECIAL CASE: WHAT DO?");
 			r = m_es.r1; // Where do the colors come from?
 			g = m_es.g1;
 			b = m_es.b1;
@@ -3010,10 +3004,8 @@ uint8_t m2_te_device::color_blend(uint8_t ct, uint8_t cti, uint8_t cs, uint8_t c
 
 uint8_t m2_te_device::alu_calc(uint16_t a, uint16_t b)
 {
-	uint16_t cinv;
-	uint16_t c = 0;
+	int32_t result = 0;
 	uint32_t blendout;
-	uint32_t result;
 	uint32_t carry = 0;
 	uint32_t borrow = 0;
 	uint32_t cntl = (m_db.alu_ctrl & DBALUCNTL_ALUOP_MASK) >> DBALUCNTL_ALUOP_SHIFT;
@@ -3021,7 +3013,7 @@ uint8_t m2_te_device::alu_calc(uint16_t a, uint16_t b)
 	// p271
 
 	/* ALU */
-	if ((cntl & 8)  == 0)
+	if ((cntl & 8) == 0)
 	{
 		if (!(cntl & 4))
 		{
@@ -3043,36 +3035,18 @@ uint8_t m2_te_device::alu_calc(uint16_t a, uint16_t b)
 	/* Boolean */
 	else
 	{
-		cinv = 0;
 		int i, j;
 
 		for (i = 0; i < 8; ++i)
 		{
 			j = (a & 1) *2 + (b & 1);
 
-			switch (j)
-			{
-				case 0: cinv |= (cntl & 1);         break;
-				case 1: cinv |= ((cntl & 2) != 0);  break;
-				case 2: cinv |= ((cntl & 4) != 0);  break;
-				case 3: cinv |= ((cntl & 8) != 0);  break;
-			}
+			result >>= 1;
+			result |= (cntl >> j & 1) ? 0x80 : 0;
 
-			cinv <<= 1;
 			a >>= 1;
 			b >>= 1;
 		}
-		cinv >>= 1;
-
-		for (i = 0; i < 8; ++i)
-		{
-			c |= cinv & 1;
-			c <<= 1;
-			cinv >>= 1;
-		}
-
-		c >>= 1;
-		result = (int)c;
 	}
 
 	result &= 0x1ff;
@@ -3102,7 +3076,7 @@ uint8_t m2_te_device::alu_calc(uint16_t a, uint16_t b)
 		alugel = 4;
 #endif
 
-	if ((cntl & 8)  == 0)
+	if ((cntl & 8) == 0)
 	{
 		/* Clamp? */
 		if (!(cntl & 1))

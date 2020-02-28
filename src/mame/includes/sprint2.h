@@ -15,6 +15,7 @@
 #include "sound/discrete.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 /* Discrete Sound Input Nodes */
 #define SPRINT2_SKIDSND1_EN        NODE_01
@@ -87,7 +88,7 @@ private:
 	void sprint2_palette(palette_device &palette) const;
 	uint32_t screen_update_sprint2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sprint2);
-	INTERRUPT_GEN_MEMBER(sprint2);
+	INTERRUPT_GEN_MEMBER(sprint2_irq);
 	uint8_t collision_check(rectangle& rect);
 	inline int get_sprite_code(uint8_t *video_ram, int n);
 	inline int get_sprite_x(uint8_t *video_ram, int n);
@@ -96,7 +97,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<f9334_device> m_outlatch;
-	required_device<discrete_device> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

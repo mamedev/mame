@@ -47,11 +47,13 @@ public:
 	auto out_b() { return m_out_b_cb.bind(); }
 	auto out_irq() { return m_out_irq_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( ins8154_r );
-	DECLARE_WRITE8_MEMBER( ins8154_w );
+	uint8_t read_io(offs_t offset);
+	void write_io(offs_t offset, uint8_t data);
+	uint8_t read_ram(offs_t offset);
+	void write_ram(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( ins8154_porta_w );
-	DECLARE_WRITE8_MEMBER( ins8154_portb_w );
+	void porta_w(uint8_t data);
+	void portb_w(uint8_t data);
 
 protected:
 	// device-level overrides
@@ -77,6 +79,9 @@ private:
 	uint8_t m_mdr;   /* Mode Definition Register */
 	uint8_t m_odra;  /* Output Definition Register Port A */
 	uint8_t m_odrb;  /* Output Definition Register Port B */
+
+	/* on-board RAM */
+	uint8_t m_ram[0x80];
 };
 
 

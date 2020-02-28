@@ -68,15 +68,15 @@
 
 class portfolio_memory_card_slot_device;
 
-class device_portfolio_memory_card_slot_interface : public device_slot_card_interface
+class device_portfolio_memory_card_slot_interface : public device_interface
 {
 	friend class portfolio_memory_card_slot_device;
 
 public:
 	virtual bool cdet() { return 1; }
 
-	virtual uint8_t nrdi_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void nwri_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t nrdi_r(offs_t offset) { return 0xff; }
+	virtual void nwri_w(offs_t offset, uint8_t data) { }
 
 protected:
 	// construction/destruction
@@ -92,7 +92,7 @@ protected:
 // ======================> portfolio_memory_card_slot_device
 
 class portfolio_memory_card_slot_device : public device_t,
-									 public device_slot_interface,
+									 public device_single_card_slot_interface<device_portfolio_memory_card_slot_interface>,
 									 public device_image_interface
 {
 public:
@@ -112,8 +112,8 @@ public:
 	// computer interface
 	bool cdet_r() { return (m_card != nullptr) ? m_card->cdet() : 1; }
 
-	DECLARE_READ8_MEMBER( nrdi_r ) { return (m_card != nullptr) ? m_card->nrdi_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( nwri_w ) { if (m_card != nullptr) m_card->nwri_w(space, offset, data); }
+	uint8_t nrdi_r(offs_t offset) { return (m_card != nullptr) ? m_card->nrdi_r(offset) : 0xff; }
+	void nwri_w(offs_t offset, uint8_t data) { if (m_card != nullptr) m_card->nwri_w(offset, data); }
 
 protected:
 	// device-level overrides
@@ -123,15 +123,15 @@ protected:
 	virtual image_init_result call_load() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "pofo_card"; }
-	virtual const char *file_extensions() const override { return "rom,bin"; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "pofo_card"; }
+	virtual const char *file_extensions() const noexcept override { return "rom,bin"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;

@@ -28,7 +28,6 @@
 #include "machine/wd_fdc.h"
 #include "machine/z80pio.h"
 #include "sound/beep.h"
-#include "sound/wave.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -425,7 +424,7 @@ void mz2000_state::mz80b_io(address_map &map)
 	map(0xe4, 0xe7).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xe8, 0xeb).rw("z80pio_1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0xf0, 0xf3).w(FUNC(mz2000_state::timer_w));
-//  AM_RANGE(0xf4, 0xf4) AM_WRITE(vram_bank_w)
+//  map(0xf4, 0xf4).w(FUNC(mz2000_state::vram_bank_w));
 }
 
 void mz2000_state::mz2000_io(address_map &map)
@@ -876,11 +875,12 @@ static void mz2000_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(mz2000_state::mz2000)
+void mz2000_state::mz2000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(mz2000_map)
-	MCFG_DEVICE_IO_MAP(mz2000_io)
+	Z80(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mz2000_state::mz2000_map);
+	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz2000_io);
 
 	i8255_device &ppi(I8255(config, "i8255_0"));
 	ppi.in_pa_callback().set(FUNC(mz2000_state::mz2000_porta_r));
@@ -901,6 +901,9 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 	m_pit8253->set_clk<1>(31250); /* needed by "Art Magic" to boot */
 	m_pit8253->set_clk<2>(31250);
 
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 4096).add_route(ALL_OUTPUTS,"mono",0.15);
+
 	MB8877(config, m_mb8877a, 1_MHz_XTAL);
 
 	FLOPPY_CONNECTOR(config, "mb8877a:0", mz2000_floppies, "dd", mz2000_state::floppy_formats);
@@ -913,34 +916,29 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(mz700_cassette_formats);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cass->set_interface("mz_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mz2000_cass");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mz2000_state, screen_update_mz2000)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640-1, 0, 400-1);
+	m_screen->set_screen_update(FUNC(mz2000_state::screen_update_mz2000));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz2000)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mz2000);
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
+}
 
-	SPEAKER(config, "mono").front_center();
-
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	BEEP(config, "beeper", 4096).add_route(ALL_OUTPUTS,"mono",0.15);
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mz2000_state::mz80b)
+void mz2000_state::mz80b(machine_config &config)
+{
 	mz2000(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(mz80b_io)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz80b_io);
+}
 
 
 

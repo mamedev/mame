@@ -13,15 +13,20 @@ public:
 	{
 	}
 
-	required_shared_ptr<uint16_t> m_sharedprotram;
+	void init_olds();
+
+	void pgm_028_025_ol(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	required_shared_ptr<u16> m_sharedprotram;
 	required_device<igs025_device> m_igs025;
 	required_device<igs028_device> m_igs028;
 
 	void igs025_to_igs028_callback( void );
 
-	void init_olds();
-	DECLARE_MACHINE_RESET(olds);
-	void pgm_028_025_ol(machine_config &config);
 	void olds_mem(address_map &map);
 };
 

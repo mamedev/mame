@@ -8,10 +8,10 @@
 
 ****************************************************************************/
 
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
+#include <cctype>
+#include <cstdlib>
+#include <cstring>
+#include <cassert>
 
 #include "pool.h"
 #include "corestr.h"
@@ -59,15 +59,6 @@ option_resolution::option_resolution(const option_guide &guide)
 			entry.set_enum_value_range(enum_value_begin, enum_value_end);
 		}
 	}
-}
-
-
-// -------------------------------------------------
-//  dtor
-// -------------------------------------------------
-
-option_resolution::~option_resolution()
-{
 }
 
 

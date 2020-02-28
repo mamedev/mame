@@ -167,7 +167,7 @@ READ32_MEMBER( cxhumax_state::cx_scratch_r )
 		int i = 0;
 		while ((temp=program.read_byte(m_maincpu->state_int(ARM7_R0)+i))) {
 			buf[i++]=temp;
-			//m_terminal->write(space, 0, temp);
+			//m_terminal->write(temp);
 		}
 		osd_printf_debug("%s", buf);
 		verboselog(*this, 9, "(DEBUG) %s", buf);
@@ -412,7 +412,7 @@ WRITE32_MEMBER( cxhumax_state::cx_uart2_w )
 		case UART_FIFO_REG:
 			if(!(m_uart2_regs[UART_FRMC_REG]&UART_FRMC_BDS_BIT)) {
 				/* Sending byte... add logging */
-				m_terminal->write(space, 0, data);
+				m_terminal->write(data);
 
 				/* Transmitter Idle Interrupt Enable */
 				if(m_uart2_regs[UART_IRQE_REG]&UART_IRQE_TIDE_BIT) {
@@ -1055,26 +1055,27 @@ void cxhumax_state::machine_reset()
 	memset(m_gxa_cmd_regs,0,sizeof(m_gxa_cmd_regs));
 }
 
-MACHINE_CONFIG_START(cxhumax_state::cxhumax)
-	MCFG_DEVICE_ADD("maincpu", ARM920T, 180000000) // CX24175 (RevC up?)
-	MCFG_DEVICE_PROGRAM_MAP(cxhumax_map)
+void cxhumax_state::cxhumax(machine_config &config)
+{
+	ARM920T(config, m_maincpu, 180000000); // CX24175 (RevC up?)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cxhumax_state::cxhumax_map);
 
 
 	INTEL_28F320J3D(config, "flash");
 	I2CMEM(config, "eeprom", 0).set_data_size(0x2000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1920, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 1080-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cxhumax_state, screen_update_cxhumax)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(1920, 1080);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(cxhumax_state::screen_update_cxhumax));
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	GENERIC_TERMINAL(config, m_terminal, 0);
-MACHINE_CONFIG_END
+}
 
 ROM_START( hxhdci2k )
 	ROM_REGION( 0x400000, "flash", 0 )

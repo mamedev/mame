@@ -132,6 +132,7 @@ public:
 		, m_sio(*this, "sio")
 		, m_alarm(*this, "alarm")
 		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
 		, m_keyboard(*this, "keyboard")
 		, m_printer(*this, "printer")
 		, m_p_chargen(*this, "chargen")
@@ -180,7 +181,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(loopback_rxcb_w);
 	DECLARE_WRITE_LINE_MEMBER(porte6_w);
 
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -195,6 +196,7 @@ private:
 	required_device<z80sio_device>  m_sio;
 	required_device<speaker_sound_device> m_alarm;
 	required_device<screen_device>  m_screen;
+	required_device<palette_device> m_palette;
 
 	required_device<uts_keyboard_port_device> m_keyboard;
 	required_device<rs232_port_device> m_printer;
@@ -481,7 +483,7 @@ void univac_state::machine_start()
 	save_item(NAME(m_sio_wrdyb));
 }
 
-uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t univac_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (!m_display_enable)
 	{
@@ -489,29 +491,29 @@ uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		return 0;
 	}
 
-	u8 y,ra,chr;
-	uint16_t sy=0,x,ma=0,gfx;
+	const pen_t *pen = m_palette->pens();
+
+	uint16_t sy=0,ma=0;
 
 	m_framecnt++;
 
-	for (y = 0; y < 25; y++)
+	for (u8 y = 0; y < 25; y++)
 	{
-		for (ra = 0; ra < 14; ra++)
+		for (u8 ra = 0; ra < 14; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint32_t *p = &bitmap.pix32(sy++);
 
-			for (x = ma; x < ma + 80; x++)
+			for (uint16_t x = ma; x < ma + 80; x++)
 			{
-				chr = ram_r(x ^ m_disp_mask);    // bit 7 = rv attribute (or dim, depending on control-page setting)
+				u8 chr = ram_r(x ^ m_disp_mask);    // bit 7 = rv attribute (or dim, depending on control-page setting)
 
-				gfx = m_p_chargen[((chr & 0x7f)<<4) | ra];
+				uint16_t gfx = m_p_chargen[((chr & 0x7f)<<4) | ra];
 
 				// chars 1C, 1D, 1F need special handling
 				if ((chr >= 0x1c) && (chr <= 0x1f) && BIT(gfx, 7))
 				{
 					gfx &= 0x7f;
-				// They also blink
-					if (m_framecnt & 16)
+					if (m_framecnt & 16) // They also blink
 						gfx = 0;
 				}
 
@@ -520,18 +522,13 @@ uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 					gfx = ~gfx;
 
 				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 8);
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
+				for (int bit = 8; bit >= 0; bit--)
+				{
+					*p++ = pen[BIT(gfx, bit)];
+				}
 			}
 		}
-		ma+=80;
+		ma += 80;
 	}
 	return 0;
 }
@@ -562,7 +559,8 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 // All frequencies confirmed
-MACHINE_CONFIG_START(univac_state::uts20)
+void univac_state::uts20(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // 3.072 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &univac_state::mem_map);
@@ -585,11 +583,10 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	latch_e0.q_out_cb<6>().set(FUNC(univac_state::porte6_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DRIVER(univac_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	PALETTE(config, "palette", palette_device::MONOCHROME);
-	GFXDECODE(config, "gfxdecode", "palette", gfx_uts);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	m_screen->set_screen_update(FUNC(univac_state::screen_update));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_uts);
 
 	dp835x_device &crtc(DP835X_A(config, "crtc", 19'980'000));
 	crtc.set_screen("screen");
@@ -627,13 +624,13 @@ MACHINE_CONFIG_START(univac_state::uts20)
 
 	RS232_PORT(config, m_printer, default_rs232_devices, nullptr);
 	m_printer->dcd_handler().set(FUNC(univac_state::aux_dsr_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(univac_state::uts10)
+void univac_state::uts10(machine_config &config)
+{
 	uts20(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(uts10_map)
-	MCFG_DEVICE_IO_MAP(uts10_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &univac_state::uts10_map);
+	m_maincpu->set_addrmap(AS_IO, &univac_state::uts10_io_map);
 
 	config.device_remove("keybclk");
 	m_ctc->zc_callback<2>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
@@ -644,7 +641,7 @@ MACHINE_CONFIG_START(univac_state::uts10)
 
 	UTS_KEYBOARD(config.replace(), m_keyboard, uts10_keyboards, "extw");
 	m_keyboard->rxd_callback().set(FUNC(univac_state::aux_rxd_w));
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

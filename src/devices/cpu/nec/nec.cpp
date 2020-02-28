@@ -371,32 +371,48 @@ void nec_common_device::external_int()
 
 /*****************************************************************************/
 
+void nec_common_device::set_int_line(int state)
+{
+	m_irq_state = state;
+	if (state == CLEAR_LINE)
+		m_pending_irq &= ~INT_IRQ;
+	else
+	{
+		m_pending_irq |= INT_IRQ;
+		m_halted = 0;
+	}
+}
+
+void nec_common_device::set_nmi_line(int state)
+{
+	if (m_nmi_state == state)
+		return;
+	m_nmi_state = state;
+	if (state != CLEAR_LINE)
+	{
+		m_pending_irq |= NMI_IRQ;
+		m_halted = 0;
+	}
+}
+
+void nec_common_device::set_poll_line(int state)
+{
+	m_poll_state = state;
+}
+
 void nec_common_device::execute_set_input(int irqline, int state)
 {
 	switch (irqline)
 	{
-		case 0:
-			m_irq_state = state;
-			if (state == CLEAR_LINE)
-				m_pending_irq &= ~INT_IRQ;
-			else
-			{
-				m_pending_irq |= INT_IRQ;
-				m_halted = 0;
-			}
-			break;
-		case INPUT_LINE_NMI:
-			if (m_nmi_state == state) return;
-			m_nmi_state = state;
-			if (state != CLEAR_LINE)
-			{
-				m_pending_irq |= NMI_IRQ;
-				m_halted = 0;
-			}
-			break;
-		case NEC_INPUT_LINE_POLL:
-			m_poll_state = state;
-			break;
+	case 0:
+		set_int_line(state);
+		break;
+	case INPUT_LINE_NMI:
+		set_nmi_line(state);
+		break;
+	case NEC_INPUT_LINE_POLL:
+		set_poll_line(state);
+		break;
 	}
 }
 

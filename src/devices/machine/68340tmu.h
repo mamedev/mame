@@ -14,9 +14,6 @@ class mc68340_timer_module_device : public device_t
 public:
 	mc68340_timer_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	READ16_MEMBER( read );
 	WRITE16_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( tin_w );
@@ -26,7 +23,13 @@ public:
 	uint8_t irq_vector() const { return m_ir & REG_IR_INTVEC; }
 	uint8_t arbitrate(uint8_t level) const { return (irq_level() == level) ? (m_mcr & REG_MCR_ARBLV) : 0; }
 
- protected:
+	void module_reset();
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 	m68340_cpu_device *m_cpu;
 
 	uint16_t m_mcr;
@@ -41,7 +44,6 @@ public:
 	uint16_t m_timer_counter;
 	uint32_t m_tin;
 	uint32_t m_tgate;
-	uint32_t m_tout;
 	emu_timer *m_timer;
 
 	devcb_write_line    m_tout_out_cb;
@@ -49,6 +51,8 @@ public:
 	devcb_write_line    m_tgate_in_cb;
 	void do_timer_irq();
 	void do_timer_tick();
+	void tout_set();
+	void tout_clear();
 
 	TIMER_CALLBACK_MEMBER(timer_callback);
 

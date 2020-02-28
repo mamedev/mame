@@ -45,14 +45,16 @@ void spectrum_intf1_device::device_add_mconfig(machine_config &config)
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	/* microdrive */
-	MICRODRIVE(config, m_mdv1, 0);
+	MICRODRIVE(config, m_mdv1);
 	m_mdv1->comms_out_wr_callback().set(m_mdv2, FUNC(microdrive_image_device::comms_in_w));
-	MICRODRIVE(config, m_mdv2, 0);
+	MICRODRIVE(config, m_mdv2);
 
 	/* passthru */
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
 	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
 	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
+
+	SOFTWARE_LIST(config, "microdrive_list").set_original("spectrum_microdrive");
 }
 
 const tiny_rom_entry *spectrum_intf1_device::device_rom_region() const
@@ -85,6 +87,7 @@ spectrum_intf1_device::spectrum_intf1_device(const machine_config &mconfig, cons
 
 void spectrum_intf1_device::device_start()
 {
+	save_item(NAME(m_romcs));
 }
 
 //-------------------------------------------------
@@ -93,8 +96,6 @@ void spectrum_intf1_device::device_start()
 
 void spectrum_intf1_device::device_reset()
 {
-	m_exp->set_io_space(&io_space());
-
 	m_romcs = 0;
 }
 
@@ -107,45 +108,101 @@ READ_LINE_MEMBER(spectrum_intf1_device::romcs)
 	return m_romcs | m_exp->romcs();
 }
 
-READ8_MEMBER(spectrum_intf1_device::mreq_r)
+// the Interface 1 looks for specific bus conditions to enable / disable the expansion overlay ROM
+
+// the enable must occur BEFORE the opcode is fetched, as the opcode must be fetched from the expansion ROM
+void spectrum_intf1_device::pre_opcode_fetch(offs_t offset)
 {
-	uint8_t temp;
-	uint8_t data = 0xff;
+	m_exp->pre_opcode_fetch(offset);
 
 	if (!machine().side_effects_disabled())
 	{
-		if (offset == 0x0008 || offset == 0x1708)
+		switch (offset)
+		{
+		case 0x0008: case 0x1708:
 			m_romcs = 1;
+			break;
+		}
 	}
+}
 
-	temp = m_exp->mreq_r(space, offset);
-	if (m_exp->romcs())
-		data &= temp;
+// the disable must occur AFTER the opcode fetch, or the incorrect opcode is fetched for 0x0700
+void spectrum_intf1_device::post_opcode_fetch(offs_t offset)
+{
+	m_exp->post_opcode_fetch(offset);
+
+	if (!machine().side_effects_disabled())
+	{
+		switch (offset)
+		{
+		case 0x0700:
+			m_romcs = 0;
+			break;
+		}
+	}
+}
+
+
+uint8_t spectrum_intf1_device::mreq_r(offs_t offset)
+{
+	uint8_t data = 0xff;
 
 	if (m_romcs)
 		data &= m_rom->base()[offset & 0x1fff];
 
-	if (!machine().side_effects_disabled())
-	{
-		if (offset == 0x0700)
-			m_romcs = 0;
-	}
+	if (m_exp->romcs())
+		data &= m_exp->mreq_r(offset);
 
 	return data;
 }
 
-WRITE8_MEMBER(spectrum_intf1_device::mreq_w)
+void spectrum_intf1_device::mreq_w(offs_t offset, uint8_t data)
 {
 	if (m_exp->romcs())
-		m_exp->mreq_w(space, offset, data);
+		m_exp->mreq_w(offset, data);
 }
 
-READ8_MEMBER(spectrum_intf1_device::port_fe_r)
+uint8_t spectrum_intf1_device::iorq_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	if (m_exp->romcs())
-		data &= m_exp->port_fe_r(space, offset);
+	if ((offset & 0x18) != 0x18)
+	{
+		switch (offset & 0x18)
+		{
+		case 0x00:
+			logerror("%s: iorq_r (microdrive) %04x\n", machine().describe_context(), offset);
+			break;
+		case 0x08:
+			logerror("%s: iorq_r (control) %04x\n", machine().describe_context(), offset);
+			break;
+		case 0x10:
+			logerror("%s: iorq_r (network) %04x\n", machine().describe_context(), offset);
+			break;
+		}
+	}
 
+	data &= m_exp->iorq_r(offset);
 	return data;
+}
+
+void spectrum_intf1_device::iorq_w(offs_t offset, uint8_t data)
+{
+	if ((offset & 0x18) != 0x18)
+	{
+		switch (offset & 0x18)
+		{
+		case 0x00:
+			logerror("%s: iorq_w (microdrive) %04x: %02x\n", machine().describe_context(), offset, data);
+			break;
+		case 0x08:
+			logerror("%s: iorq_w (control) %04x: %02x\n", machine().describe_context(), offset, data);
+			break;
+		case 0x10:
+			logerror("%s: iorq_w (network) %04x: %02x\n", machine().describe_context(), offset, data);
+			break;
+		}
+	}
+
+	m_exp->iorq_w(offset, data);
 }

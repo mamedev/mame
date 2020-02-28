@@ -46,7 +46,6 @@
 
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
-#include "sound/wave.h"
 #include "sound/beep.h"
 
 #include "bus/centronics/dsjoy.h"
@@ -211,7 +210,7 @@ void fm7_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		fm77av_vsync(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in fm7_state::device_timer");
+		throw emu_fatalerror("Unknown id in fm7_state::device_timer");
 	}
 }
 
@@ -851,8 +850,6 @@ READ8_MEMBER(fm7_state::fm77av_boot_mode_r)
  */
 void fm7_state::fm7_update_psg()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	if(m_type == SYS_FM7)
 	{
 		switch(m_psg_regsel)
@@ -862,15 +859,15 @@ void fm7_state::fm7_update_psg()
 				break;
 			case 0x01:
 				// Data read
-				m_psg_data = m_psg->data_r(space, 0);
+				m_psg_data = m_psg->data_r();
 				break;
 			case 0x02:
 				// Data write
-				m_psg->data_w(space, 0,m_psg_data);
+				m_psg->data_w(m_psg_data);
 				break;
 			case 0x03:
 				// Address latch
-				m_psg->address_w(space, 0,m_psg_data);
+				m_psg->address_w(m_psg_data);
 				break;
 		}
 	}
@@ -1029,40 +1026,40 @@ void fm7_state::fm7_update_bank(address_space & space, int bank, uint8_t physica
         switch(physical)
         {
             case 0x10:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram0_r),this),write8_delegate(FUNC(fm7_state::fm7_vram0_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram0_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram0_w)));
                 break;
             case 0x11:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram1_r),this),write8_delegate(FUNC(fm7_state::fm7_vram1_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram1_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram1_w)));
                 break;
             case 0x12:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram2_r),this),write8_delegate(FUNC(fm7_state::fm7_vram2_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram2_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram2_w)));
                 break;
             case 0x13:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram3_r),this),write8_delegate(FUNC(fm7_state::fm7_vram3_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram3_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram3_w)));
                 break;
             case 0x14:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram4_r),this),write8_delegate(FUNC(fm7_state::fm7_vram4_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram4_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram4_w)));
                 break;
             case 0x15:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram5_r),this),write8_delegate(FUNC(fm7_state::fm7_vram5_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram5_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram5_w)));
                 break;
             case 0x16:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram6_r),this),write8_delegate(FUNC(fm7_state::fm7_vram6_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram6_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram6_w)));
                 break;
             case 0x17:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram7_r),this),write8_delegate(FUNC(fm7_state::fm7_vram7_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram7_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram7_w)));
                 break;
             case 0x18:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram8_r),this),write8_delegate(FUNC(fm7_state::fm7_vram8_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram8_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram8_w)));
                 break;
             case 0x19:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram9_r),this),write8_delegate(FUNC(fm7_state::fm7_vram9_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram9_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram9_w)));
                 break;
             case 0x1a:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vramA_r),this),write8_delegate(FUNC(fm7_state::fm7_vramA_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vramA_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vramA_w)));
                 break;
             case 0x1b:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vramB_r),this),write8_delegate(FUNC(fm7_state::fm7_vramB_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vramB_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vramB_w)));
                 break;
         }
 //      membank(bank+1)->set_base(RAM+(physical<<12)-0x10000);
@@ -1070,12 +1067,12 @@ void fm7_state::fm7_update_bank(address_space & space, int bank, uint8_t physica
     }
     if(physical == 0x1c)
     {
-        space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_console_ram_banked_r),this),write8_delegate(FUNC(fm7_state::fm7_console_ram_banked_w),this));
+        space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_console_ram_banked_r)),write8_delegate(*this, FUNC(fm7_state::fm7_console_ram_banked_w)));
         return;
     }
     if(physical == 0x1d)
     {
-        space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_sub_ram_ports_banked_r),this),write8_delegate(FUNC(fm7_state::fm7_sub_ram_ports_banked_w),this));
+        space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_sub_ram_ports_banked_r)),write8_delegate(*this, FUNC(fm7_state::fm7_sub_ram_ports_banked_w)));
         return;
     }
     if(physical == 0x35)
@@ -1148,7 +1145,7 @@ void fm7_state::fm7_mmr_refresh(address_space& space)
 	}
 	else
 	{
-		space.install_readwrite_handler(0x7000,0x7fff,read8sm_delegate(FUNC(address_map_bank_device::read8),(address_map_bank_device*)m_avbank[7]),write8sm_delegate(FUNC(address_map_bank_device::write8),(address_map_bank_device*)m_avbank[7]));
+		space.install_readwrite_handler(0x7000,0x7fff,read8sm_delegate(*m_avbank[7], FUNC(address_map_bank_device::read8)),write8sm_delegate(*m_avbank[7], FUNC(address_map_bank_device::write8)));
 	}
 	if(m_init_rom_en)
 	{
@@ -1558,7 +1555,7 @@ void fm7_state::fm11_sub_mem(address_map &map)
 	map(0x9000, 0x9f7f).ram(); // Work RAM(?)
 	map(0x9f80, 0x9fff).ram().share("shared_ram");
 	map(0xafe0, 0xafe3).ram();
-//  AM_RANGE(0xafe4,0xafe4) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
+//  map(0xafe4, 0xafe4).rw(FUNC(fm7_state::fm7_sub_busyflag_r), FUNC(fm7_state::fm7_sub_busyflag_w));
 	map(0xafe6, 0xafe6).rw(FUNC(fm7_state::fm77av_video_flags_r), FUNC(fm7_state::fm77av_video_flags_w));
 	map(0xaff0, 0xaff0).rw(FUNC(fm7_state::fm7_sub_busyflag_r), FUNC(fm7_state::fm7_sub_busyflag_w));
 	map(0xc000, 0xffff).rom(); // sybsystem ROM
@@ -1602,15 +1599,15 @@ void fm7_state::fm16_io(address_map &map)
 	map(0xfd03, 0xfd03).rw(FUNC(fm7_state::fm7_irq_cause_r), FUNC(fm7_state::fm7_beeper_w));  // IRQ flags
 	map(0xfd04, 0xfd04).r(FUNC(fm7_state::fm7_fd04_r));
 	map(0xfd05, 0xfd05).rw(FUNC(fm7_state::fm7_subintf_r), FUNC(fm7_state::fm7_subintf_w));
-//  AM_RANGE(0xfd06,0xfd0c) AM_READ8(fm7_unknown_r,0xffff)
+//  map(0xfd06, 0xfd0c).r(FUNC(fm7_state::fm7_unknown_r));
 	map(0xfd0f, 0xfd0f).rw(FUNC(fm7_state::fm7_rom_en_r), FUNC(fm7_state::fm7_rom_en_w));
-//  AM_RANGE(0xfd10,0xfd17) AM_READ8(fm7_unknown_r,0xffff)
+//  map(0xfd10, 0xfd17).r(FUNC(fm7_state::fm7_unknown_r));
 	map(0xfd18, 0xfd1f).rw(FUNC(fm7_state::fm7_fdc_r), FUNC(fm7_state::fm7_fdc_w));
 	map(0xfd20, 0xfd23).rw(FUNC(fm7_state::fm7_kanji_r), FUNC(fm7_state::fm7_kanji_w));
-//  AM_RANGE(0xfd24,0xfd36) AM_READ8(fm7_unknown_r,0xffff)
+//  map(0xfd24, 0xfd36).r(FUNC(fm7_state::fm7_unknown_r));
 	map(0xfd37, 0xfd37).w(FUNC(fm7_state::fm7_multipage_w));
 	map(0xfd38, 0xfd3f).rw(FUNC(fm7_state::fm7_palette_r), FUNC(fm7_state::fm7_palette_w));
-//  AM_RANGE(0xfd40,0xfdff) AM_READ8(fm7_unknown_r,0xffff)
+//  map(0xfd40, 0xfdff).r(FUNC(fm7_state::fm7_unknown_r));
 }
 
 void fm7_state::fm16_sub_mem(address_map &map)
@@ -2033,35 +2030,35 @@ static void fm7_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(fm7_state::fm7)
+void fm7_state::fm7(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, 16.128_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(fm7_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	MC6809(config, m_maincpu, 16.128_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fm7_state::fm7_mem);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_irq_ack));
 
-	MCFG_DEVICE_ADD("sub", MC6809, 16.128_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(fm7_sub_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
-	config.m_perfect_cpu_quantum = subtag("sub");
+	MC6809(config, m_sub, 16.128_MHz_XTAL / 2);
+	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm7_sub_mem);
+	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_sub_irq_ack));
+	config.set_perfect_quantum(m_sub);
 
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_psg, 4.9152_MHz_XTAL / 4).add_route(ALL_OUTPUTS,"mono", 1.00);
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200) // H = 15.75 KHz, V = 60.1145 Hz
-	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200); // H = 15.75 KHz, V = 60.1145 Hz
+	m_screen->set_screen_update(FUNC(fm7_state::screen_update_fm7));
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(fm7_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("fm7_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("fm7_cass");
@@ -2084,36 +2081,36 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(fm7_state::fm8)
+void fm7_state::fm8(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, 4.9152_MHz_XTAL)  // 1.2MHz 68A09
-	MCFG_DEVICE_PROGRAM_MAP(fm8_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	MC6809(config, m_maincpu, 4.9152_MHz_XTAL);  // 1.2MHz 68A09
+	m_maincpu->set_addrmap(AS_PROGRAM, &fm7_state::fm8_mem);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_irq_ack));
 
-	MCFG_DEVICE_ADD("sub", MC6809, 16.128_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(fm7_sub_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
-	config.m_perfect_cpu_quantum = subtag("sub");
+	MC6809(config, m_sub, 16.128_MHz_XTAL / 2);
+	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm7_sub_mem);
+	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_sub_irq_ack));
+	config.set_perfect_quantum(m_sub);
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200)
-	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200);
+	m_screen->set_screen_update(FUNC(fm7_state::screen_update_fm7));
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(fm7_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("fm7_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
@@ -2131,19 +2128,19 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(fm7_state::fm77av)
+void fm7_state::fm77av(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 16.128_MHz_XTAL / 8)
-	MCFG_DEVICE_PROGRAM_MAP(fm77av_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	MC6809E(config, m_maincpu, 16.128_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fm7_state::fm77av_mem);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_irq_ack));
 
-	MCFG_DEVICE_ADD("sub", MC6809E, 16.128_MHz_XTAL / 8)
-	MCFG_DEVICE_PROGRAM_MAP(fm77av_sub_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
-	config.m_perfect_cpu_quantum = subtag("sub");
+	MC6809E(config, m_sub, 16.128_MHz_XTAL / 8);
+	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm77av_sub_mem);
+	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_sub_irq_ack));
+	config.set_perfect_quantum(m_sub);
 
 	SPEAKER(config, "mono").front_center();
 	YM2203(config, m_ym, 4.9152_MHz_XTAL / 4);
@@ -2152,7 +2149,6 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	m_ym->port_b_read_callback().set(FUNC(fm7_state::fm77av_joy_2_r));
 	m_ym->add_route(ALL_OUTPUTS,"mono", 1.00);
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm77av)
 
@@ -2162,16 +2158,17 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	}
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200)
-	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200);
+	m_screen->set_screen_update(FUNC(fm7_state::screen_update_fm7));
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
-	MCFG_PALETTE_ADD("av_palette", 4096)
+	PALETTE(config, m_av_palette).set_entries(4096);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(fm7_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("fm7_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_compatible("fm7_cass");
@@ -2194,27 +2191,26 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(fm7_state::fm11)
+void fm7_state::fm11(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)  // 2MHz 68B09E
-	MCFG_DEVICE_PROGRAM_MAP(fm11_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	MC6809E(config, m_maincpu, 2000000);  // 2MHz 68B09E
+	m_maincpu->set_addrmap(AS_PROGRAM, &fm7_state::fm11_mem);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_irq_ack));
 
-	MCFG_DEVICE_ADD("sub", MC6809, 8000000)  // 2MHz 68B09
-	MCFG_DEVICE_PROGRAM_MAP(fm11_sub_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
-	config.m_perfect_cpu_quantum = subtag("sub");
+	MC6809(config, m_sub, 8000000);  // 2MHz 68B09
+	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm11_sub_mem);
+	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_sub_irq_ack));
+	config.set_perfect_quantum(m_sub);
 
-	MCFG_DEVICE_ADD("x86", I8088, 8000000)  // 8MHz i8088
-	MCFG_DEVICE_PROGRAM_MAP(fm11_x86_mem)
-	MCFG_DEVICE_IO_MAP(fm11_x86_io)
+	I8088(config, m_x86, 8000000);  // 8MHz i8088
+	m_x86->set_addrmap(AS_PROGRAM, &fm7_state::fm11_x86_mem);
+	m_x86->set_addrmap(AS_IO, &fm7_state::fm11_x86_io);
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm11)
 
@@ -2224,15 +2220,16 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 	}
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16128000, 1024, 0, 640, 262, 0, 200)
-	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16128000, 1024, 0, 640, 262, 0, 200);
+	m_screen->set_screen_update(FUNC(fm7_state::screen_update_fm7));
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(fm7_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("fm7_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
@@ -2250,36 +2247,36 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(fm7_state::fm16beta)
+void fm7_state::fm16beta(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8086, 8000000)  // 8MHz i8086
-	MCFG_DEVICE_PROGRAM_MAP(fm16_mem)
-	MCFG_DEVICE_IO_MAP(fm16_io)
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	I8086(config, m_maincpu, 8000000);  // 8MHz i8086
+	m_maincpu->set_addrmap(AS_PROGRAM, &fm7_state::fm16_mem);
+	m_maincpu->set_addrmap(AS_IO, &fm7_state::fm16_io);
 
-	MCFG_DEVICE_ADD("sub", MC6809, 8000000)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
-	MCFG_DEVICE_PROGRAM_MAP(fm16_sub_mem)
-	config.m_perfect_cpu_quantum = subtag("sub");
+	MC6809(config, m_sub, 8000000);
+	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_sub_irq_ack));
+	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm16_sub_mem);
+	config.set_perfect_quantum(m_sub);
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm16)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16128000, 1024, 0, 640, 262, 0, 200)
-	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16128000, 1024, 0, 640, 262, 0, 200);
+	m_screen->set_screen_update(FUNC(fm7_state::screen_update_fm7));
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(fm7_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("fm7_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
@@ -2297,7 +2294,7 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( fm8 )

@@ -153,24 +153,24 @@ READ8_MEMBER( blockhl_state::k052109_051960_r )
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return m_k051960->k051937_r(space, offset - 0x3800);
+			return m_k051960->k051937_r(offset - 0x3800);
 		else if (offset < 0x3c00)
-			return m_k052109->read(space, offset);
+			return m_k052109->read(offset);
 		else
-			return m_k051960->k051960_r(space, offset - 0x3c00);
+			return m_k051960->k051960_r(offset - 0x3c00);
 	}
 	else
-		return m_k052109->read(space, offset);
+		return m_k052109->read(offset);
 }
 
 WRITE8_MEMBER( blockhl_state::k052109_051960_w )
 {
 	if (offset >= 0x3800 && offset < 0x3808)
-		m_k051960->k051937_w(space, offset - 0x3800, data);
+		m_k051960->k051937_w(offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		m_k052109->write(space, offset, data);
+		m_k052109->write(offset, data);
 	else
-		m_k051960->k051960_w(space, offset - 0x3c00, data);
+		m_k051960->k051960_w(offset - 0x3c00, data);
 }
 
 
@@ -305,14 +305,14 @@ void blockhl_state::blockhl(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
-	m_k052109->set_screen_tag("screen");
-	m_k052109->set_tile_callback(FUNC(blockhl_state::tile_callback), this);
+	m_k052109->set_screen("screen");
+	m_k052109->set_tile_callback(FUNC(blockhl_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette("palette");
-	m_k051960->set_screen_tag("screen");
-	m_k051960->set_sprite_callback(FUNC(blockhl_state::sprite_callback), this);
+	m_k051960->set_screen("screen");
+	m_k051960->set_sprite_callback(FUNC(blockhl_state::sprite_callback));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

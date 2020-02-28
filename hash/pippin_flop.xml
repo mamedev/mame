@@ -5,7 +5,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 -->
 <softwarelist name="pippin_flop" description="Pippin disk images">
 
-<!-- The Apple/Bandai Pippin Atmark/@world didn't ship with a floopy drive, it was sold as an add-on -->
+<!-- The Apple/Bandai Pippin Atmark/@world didn't ship with a floppy drive, it was sold as an add-on -->
 
 	<software name="adaptera">
 		<description>Atmark Adapter-A (Jpn)</description>
@@ -13,7 +13,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>Apple</publisher>
 		<part name="flop1" interface="pippin_flop">
 			<dataarea name="flop" size="351232">
-				<rom name="adaptera.img" size="351232" crc="95bdbe7b" sha1="a32f3b81828ba8dec4251a2ca07629b07d3e9b70" offset="0" />
+				<rom name="adaptera.img" size="351232" crc="95bdbe7b" sha1="a32f3b81828ba8dec4251a2ca07629b07d3e9b70"/>
 			</dataarea>
 		</part>
 	</software>

@@ -67,7 +67,7 @@ public:
 
 	void aussiebyte(machine_config &config);
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER(aussiebyte);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 protected:
 	DECLARE_READ8_MEMBER(memory_read_byte);

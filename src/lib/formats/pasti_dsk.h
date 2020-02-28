@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef PASTI_DSK_H_
-#define PASTI_DSK_H_
+#ifndef MAME_FORMATS_PASTI_DSK_H
+#define MAME_FORMATS_PASTI_DSK_H
+
+#pragma once
 
 #include "flopimg.h"
 
@@ -61,4 +63,4 @@ private:
 
 extern const floppy_format_type FLOPPY_PASTI_FORMAT;
 
-#endif /*PASTI_DSK_H_*/
+#endif // MAME_FORMATS_PASTI_DSK_H

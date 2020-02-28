@@ -67,9 +67,9 @@ public:
 	void init_ecoinfr();
 	void init_ecoinfrmab();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel1_opto_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel2_opto_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel3_opto_r);
+	DECLARE_READ_LINE_MEMBER(reel1_opto_r);
+	DECLARE_READ_LINE_MEMBER(reel2_opto_r);
+	DECLARE_READ_LINE_MEMBER(reel3_opto_r);
 
 private:
 	int irq_toggle;
@@ -149,11 +149,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_state::ecoinfr_irq_timer)
 
 	if (irq_toggle==0)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe4); // Z80
 	}
 	else
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0); // Z80
 	}
 
 
@@ -502,7 +502,7 @@ void ecoinfr_state::portmap(address_map &map)
 	map(0x0b, 0x0b).w(FUNC(ecoinfr_state::ec_port0b_out_w)); // 11 (Sound 2)
 	map(0x0c, 0x0c).w(FUNC(ecoinfr_state::ec_port0c_out_cred_strobe_w));
 	map(0x0d, 0x0d).w(FUNC(ecoinfr_state::ec_port0d_out_cred_data_w));
-//  AM_RANGE(0x0e, 0x0e) AM_WRITE(ec_port0e_out_w)
+//  map(0x0e, 0x0e).w(FUNC(ecoinfr_state::ec_port0e_out_w));
 	map(0x0f, 0x0f).w(FUNC(ecoinfr_state::ec_port0f_out_bank_segdata_w));
 	map(0x10, 0x10).w(FUNC(ecoinfr_state::ec_port10_out_w)); // 16 (Meter)
 	map(0x11, 0x11).w(FUNC(ecoinfr_state::ec_port11_out_w)); // SEC
@@ -515,19 +515,19 @@ void ecoinfr_state::portmap(address_map &map)
 	map(0x18, 0x18).w(FUNC(ecoinfr_state::ec_port18_out_w)); // 24 (Watchdog)
 }
 
-CUSTOM_INPUT_MEMBER(ecoinfr_state::ecoinfr_reel1_opto_r)
+READ_LINE_MEMBER(ecoinfr_state::reel1_opto_r)
 {
 	if (m_optic_pattern & 0x1) return 1;
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(ecoinfr_state::ecoinfr_reel2_opto_r)
+READ_LINE_MEMBER(ecoinfr_state::reel2_opto_r)
 {
 	if (m_optic_pattern & 0x2) return 1;
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(ecoinfr_state::ecoinfr_reel3_opto_r)
+READ_LINE_MEMBER(ecoinfr_state::reel3_opto_r)
 {
 	if (m_optic_pattern & 0x4) return 1;
 	return 0;
@@ -561,12 +561,12 @@ static INPUT_PORTS_START( ecoinfr_barx )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ecoinfr_state,ecoinfr_reel1_opto_r, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ecoinfr_state, reel1_opto_r)
 	PORT_DIPNAME( 0x02, 0x02, "IN1:02" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ecoinfr_state,ecoinfr_reel3_opto_r, nullptr)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ecoinfr_state,ecoinfr_reel2_opto_r, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ecoinfr_state, reel3_opto_r)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ecoinfr_state, reel2_opto_r)
 	PORT_DIPNAME( 0x10, 0x10, "IN1:10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
@@ -778,10 +778,9 @@ void ecoinfr_state::ecoinfr(machine_config &config)
 	Z80(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinfr_state::memmap);
 	m_maincpu->set_addrmap(AS_IO, &ecoinfr_state::portmap);
-	TIMER(config , "ectimer" , 0).configure_periodic(timer_device::expired_delegate(FUNC(ecoinfr_state::ecoinfr_irq_timer) , this) , attotime::from_hz(250));
+	TIMER(config , "ectimer" , 0).configure_periodic(FUNC(ecoinfr_state::ecoinfr_irq_timer), attotime::from_hz(250));
 
 	config.set_default_layout(layout_ecoinfr);
-
 
 	I8251(config, UPD8251_TAG, 0);
 

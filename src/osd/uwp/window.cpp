@@ -319,10 +319,10 @@ void winwindow_process_events_periodic(running_machine &machine)
 //  (main or window thread)
 //============================================================
 
-BOOL winwindow_has_focus(void)
+bool winwindow_has_focus(void)
 {
 	// For now always act like we have focus
-	return TRUE;
+	return true;
 }
 
 //============================================================
@@ -525,7 +525,7 @@ void uwp_window_info::update()
 
 			// Actually perform the redraw
 			m_primlist = primlist;
-			draw_video_contents(FALSE);
+			draw_video_contents(false);
 		}
 	}
 }
@@ -535,7 +535,7 @@ void uwp_window_info::update()
 //  (window thread)
 //============================================================
 
-void uwp_window_info::draw_video_contents(int update)
+void uwp_window_info::draw_video_contents(bool update)
 {
 	assert(GetCurrentThreadId() == window_threadid);
 

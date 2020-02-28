@@ -174,7 +174,7 @@ INPUT_CHANGED_MEMBER(vsmile_pad_device::pad_joy_changed)
 		if (!is_tx_empty())
 		{
 			LOG("joy changed while transmission in progress, marking stale\n");
-			m_stale |= stale_inputs(uintptr_t(param));
+			m_stale |= stale_inputs(param);
 		}
 		else
 		{
@@ -226,7 +226,7 @@ INPUT_CHANGED_MEMBER(vsmile_pad_device::pad_button_changed)
 		if (!is_tx_empty())
 		{
 			LOG("buttons changed while transmission in progress, marking stale\n");
-			m_stale |= stale_inputs(uintptr_t(param));
+			m_stale |= stale_inputs(param);
 		}
 		else
 		{

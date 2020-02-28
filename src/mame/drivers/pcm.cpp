@@ -61,7 +61,6 @@
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -180,9 +179,9 @@ void pcm_state::pcm_io(address_map &map)
 	map(0x88, 0x8B).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)); // SIO
 	map(0x8C, 0x8F).rw(m_ctc_u, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // user CTC
 	map(0x90, 0x93).rw(m_pio_u, FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // user PIO
-	//AM_RANGE(0x94, 0x97) // bank select
-	//AM_RANGE(0x98, 0x9B) // NMI generator
-	//AM_RANGE(0x9C, 0x9F) // io ports available to the user
+	//map(0x94, 0x97) // bank select
+	//map(0x98, 0x9B) // NMI generator
+	//map(0x9C, 0x9F) // io ports available to the user
 	// disk controller?
 }
 
@@ -256,7 +255,8 @@ static GFXDECODE_START( gfx_pcm )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pcm_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(pcm_state::pcm)
+void pcm_state::pcm(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(10'000'000) /4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcm_state::pcm_mem);
@@ -264,25 +264,25 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 	m_maincpu->set_daisy_config(pcm_daisy_chain);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(pcm_state, screen_update)
-	MCFG_SCREEN_SIZE(64*8, 16*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(pcm_state::screen_update));
+	screen.set_size(64*8, 16*8);
+	screen.set_visarea(0, 64*8-1, 0, 16*8-1);
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pcm)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_pcm);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG, 0);
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	Z80PIO(config, m_pio_u, XTAL(10'000'000)/4);
 	m_pio_u->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -304,7 +304,7 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 	m_ctc_s->zc_callback<0>().append("sio", FUNC(z80sio_device::txca_w));
 	m_ctc_s->zc_callback<1>().set("sio", FUNC(z80sio_device::rxtxcb_w));
 	m_ctc_s->zc_callback<2>().set(FUNC(pcm_state::pcm_82_w));  // speaker
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( pcm )

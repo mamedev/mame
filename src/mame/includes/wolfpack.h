@@ -30,7 +30,7 @@ public:
 
 	void wolfpack(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
+	template <int Bit> DECLARE_READ_LINE_MEMBER(dial_r);
 
 private:
 	enum

@@ -46,17 +46,7 @@ public:
 	ef9369_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
-	template <typename Object> void set_color_update_callback(Object &&cb) { m_color_update_cb = std::forward<Object>(cb); }
-	void set_color_update_callback(color_update_delegate callback) { m_color_update_cb = callback; }
-	template <class FunctionClass> void set_color_update_callback(const char *devname,
-		void (FunctionClass::*callback)(int, bool, uint8_t, uint8_t, uint8_t), const char *name)
-	{
-		set_color_update_callback(color_update_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_color_update_callback(void (FunctionClass::*callback)(int, bool, uint8_t, uint8_t, uint8_t), const char *name)
-	{
-		set_color_update_callback(color_update_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_color_update_callback(T &&... args) { m_color_update_cb.set(std::forward<T>(args)...); }
 
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);

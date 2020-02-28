@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "image.h"
 #include "drivenum.h"
+#include "tilemap.h"
 
 
 //**************************************************************************
@@ -70,7 +71,7 @@ void driver_device::set_game_driver(const game_driver &game)
 
 void driver_device::static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback)
 {
-	downcast<driver_device &>(device).m_callbacks[type] = callback;
+	downcast<driver_device &>(device).m_callbacks[type] = std::move(callback);
 }
 
 
@@ -235,10 +236,7 @@ void driver_device::device_start()
 	else
 		machine_start();
 
-	if (!m_callbacks[CB_SOUND_START].isnull())
-		m_callbacks[CB_SOUND_START]();
-	else
-		sound_start();
+	sound_start();
 
 	if (!m_callbacks[CB_VIDEO_START].isnull())
 		m_callbacks[CB_VIDEO_START]();
@@ -267,10 +265,7 @@ void driver_device::device_reset_after_children()
 	else
 		machine_reset();
 
-	if (!m_callbacks[CB_SOUND_RESET].isnull())
-		m_callbacks[CB_SOUND_RESET]();
-	else
-		sound_reset();
+	sound_reset();
 
 	if (!m_callbacks[CB_VIDEO_RESET].isnull())
 		m_callbacks[CB_VIDEO_RESET]();

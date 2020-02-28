@@ -159,7 +159,7 @@ WRITE8_MEMBER( pulsar_state::ppi_pb_w )
 // d0..d3 Data lines to rtc
 WRITE8_MEMBER( pulsar_state::ppi_pc_w )
 {
-	m_rtc->data_w(space, 0, data & 15);
+	m_rtc->data_w(data & 15);
 }
 
 // d7     /2 SIDES
@@ -168,7 +168,7 @@ READ8_MEMBER( pulsar_state::ppi_pc_r )
 	uint8_t data = 0;
 	if (m_floppy)
 		data = m_floppy->twosid_r() << 7;
-	return m_rtc->data_r(space, 0) | data;
+	return m_rtc->data_r() | data;
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )

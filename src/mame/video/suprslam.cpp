@@ -57,8 +57,8 @@ uint32_t suprslam_state::suprslam_tile_callback( uint32_t code )
 
 void suprslam_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_screen_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprslam_state::get_suprslam_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_screen_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprslam_state::get_suprslam_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_spr_ctrl = 0;
 	m_screen_tilemap->set_transparent_pen(15);

@@ -278,7 +278,7 @@ void f1_state::act_f1_io(address_map &map)
 	map(0x0020, 0x0027).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
 	map(0x0030, 0x0030).w(FUNC(f1_state::m1_w));
 	map(0x0040, 0x0047).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
-//  AM_RANGE(0x01e0, 0x01ff) winchester
+//  map(0x01e0, 0x01ff) winchester
 }
 
 
@@ -342,28 +342,29 @@ void apricotf_floppies(device_slot_interface &device)
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( act_f1 )
+//  machine_config( act_f1 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(f1_state::act_f1)
+void f1_state::act_f1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(I8086_TAG, I8086, 14_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(act_f1_mem)
-	MCFG_DEVICE_IO_MAP(act_f1_io)
+	I8086(config, m_maincpu, 14_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &f1_state::act_f1_mem);
+	m_maincpu->set_addrmap(AS_IO, &f1_state::act_f1_io);
 
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(f1_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(f1_state::screen_update));
+	screen.set_size(640, 256);
+	screen.set_visarea_full();
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_act_f1)
+	PALETTE(config, m_palette).set_entries(16);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_act_f1);
 
 	/* Devices */
 	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG, 0);
@@ -389,7 +390,7 @@ MACHINE_CONFIG_START(f1_state::act_f1)
 
 	FLOPPY_CONNECTOR(config, WD2797_TAG ":0", apricotf_floppies, "d32w", f1_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, WD2797_TAG ":1", apricotf_floppies, "d32w", f1_state::floppy_formats);
-MACHINE_CONFIG_END
+}
 
 
 

@@ -73,7 +73,7 @@ void esprit_state::mem3_map(address_map &map)
 	map(0x93c0, 0x93c1).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x95c0, 0x95c3).rw("acia1", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x99c0, 0x99c3).rw("acia2", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xb1c0, 0xb1cf).rw("via", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xb1c0, 0xb1cf).m("via", FUNC(via6522_device::map));
 	map(0xe000, 0xffff).rom().region("roms", 0);
 }
 
@@ -160,7 +160,7 @@ void esprit_state::esprit(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(9);
-	crtc.set_update_row_callback(FUNC(esprit_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(esprit_state::crtc_update_row));
 }
 
 void esprit_state::esprit3(machine_config &config)
@@ -199,8 +199,8 @@ void esprit_state::esprit3(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(9);
-	crtc.set_update_row_callback(FUNC(esprit_state::crtc_update_row), this);
-	crtc.set_on_update_addr_change_callback(FUNC(esprit_state::crtc_update_addr), this);
+	crtc.set_update_row_callback(FUNC(esprit_state::crtc_update_row));
+	crtc.set_on_update_addr_change_callback(FUNC(esprit_state::crtc_update_addr));
 	crtc.out_hsync_callback().set("via", FUNC(via6522_device::write_pb6)).invert();
 }
 

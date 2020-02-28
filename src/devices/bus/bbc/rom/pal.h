@@ -46,7 +46,7 @@ public:
 
 protected:
 	// device_bbc_rom_interface overrides
-	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual uint8_t read(offs_t offset) override;
 };
 
 // ======================> bbc_ccibase_device
@@ -59,7 +59,7 @@ public:
 
 protected:
 	// device_bbc_rom_interface overrides
-	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual uint8_t read(offs_t offset) override;
 };
 
 // ======================> bbc_ccispell_device
@@ -72,7 +72,7 @@ public:
 
 protected:
 	// device_bbc_rom_interface overrides
-	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual uint8_t read(offs_t offset) override;
 };
 
 // ======================> bbc_palqst_device
@@ -84,7 +84,7 @@ public:
 
 protected:
 	// device_bbc_rom_interface overrides
-	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual uint8_t read(offs_t offset) override;
 };
 
 // ======================> bbc_palwap_device
@@ -96,7 +96,7 @@ public:
 
 protected:
 	// device_bbc_rom_interface overrides
-	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual uint8_t read(offs_t offset) override;
 };
 
 // ======================> bbc_palted_device
@@ -109,7 +109,7 @@ public:
 
 protected:
 	// device_bbc_rom_interface overrides
-	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual uint8_t read(offs_t offset) override;
 };
 
 // ======================> bbc_palabep_device
@@ -122,7 +122,7 @@ public:
 
 protected:
 	// device_bbc_rom_interface overrides
-	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual uint8_t read(offs_t offset) override;
 };
 
 // ======================> bbc_palabe_device
@@ -135,7 +135,7 @@ public:
 
 protected:
 	// device_bbc_rom_interface overrides
-	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual uint8_t read(offs_t offset) override;
 };
 
 // ======================> bbc_palmo2_device
@@ -148,7 +148,7 @@ public:
 
 protected:
 	// device_bbc_rom_interface overrides
-	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual uint8_t read(offs_t offset) override;
 };
 
 

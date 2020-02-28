@@ -38,6 +38,7 @@ TODO:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 #define MASTER_CLOCK XTAL(18'432'000)
@@ -101,7 +102,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void superwng_palette(palette_device &palette) const;
 	uint32_t screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(superwng_nmi_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(main_nmi_interrupt);
 	INTERRUPT_GEN_MEMBER(superwng_sound_nmi_assert);
 
 	void superwng_map(address_map &map);
@@ -149,8 +150,8 @@ TILE_GET_INFO_MEMBER(superwng_state::get_fg_tile_info)
 
 void superwng_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(superwng_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(superwng_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(superwng_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(superwng_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scrollx(0, 64);
 }
@@ -241,10 +242,10 @@ WRITE8_MEMBER(superwng_state::superwng_nmi_enable_w)
 	m_nmi_enable = data;
 }
 
-INTERRUPT_GEN_MEMBER(superwng_state::superwng_nmi_interrupt)
+WRITE_LINE_MEMBER(superwng_state::main_nmi_interrupt)
 {
-	if (BIT(m_nmi_enable, 0))
-		nmi_line_pulse(device);
+	if (state && BIT(m_nmi_enable, 0))
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_sound_interrupt_w)
@@ -477,26 +478,25 @@ void superwng_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-MACHINE_CONFIG_START(superwng_state::superwng)
-
+void superwng_state::superwng(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(superwng_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superwng_state,  superwng_nmi_interrupt)
+	Z80(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &superwng_state::superwng_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(superwng_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(superwng_state, superwng_sound_nmi_assert,  4*60)
-
+	Z80(config, m_audiocpu, MASTER_CLOCK/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &superwng_state::superwng_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(superwng_state::superwng_sound_nmi_assert), attotime::from_hz(4*60));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(superwng_state, screen_update_superwng)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(superwng_state::screen_update_superwng));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(superwng_state::main_nmi_interrupt));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_superwng);
 
@@ -509,7 +509,7 @@ MACHINE_CONFIG_START(superwng_state::superwng)
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	AY8910(config, "ay2", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 ROM_START( superwng )
 	ROM_REGION( 0x20000, "maincpu", 0 )

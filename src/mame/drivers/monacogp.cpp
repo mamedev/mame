@@ -183,11 +183,10 @@ void monacogp_state::video_start()
 {
 }
 
-MACHINE_CONFIG_START(monacogp_state::monacogp)
-
+void monacogp_state::monacogp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(monacogp)
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_monacogp);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -197,7 +196,7 @@ MACHINE_CONFIG_START(monacogp_state::monacogp)
 	m_video->set_vert_params(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL);
 	m_video->set_fieldcount(1);
 	m_video->set_threshold(0.30);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -268,5 +267,5 @@ ROM_END
 
 
 
-GAME( 1980, monacogp,  0,         monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (Set 1) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1980, monacogpa, monacogp,  monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (Set 2) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1980, monacogp,  0,         monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (set 1) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1980, monacogpa, monacogp,  monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (set 2) [TTL]", MACHINE_IS_SKELETON )

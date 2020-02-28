@@ -31,7 +31,7 @@ public:
 		m_videolatch(*this, "videolatch")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
+	DECLARE_READ_LINE_MEMBER(vblank_r);
 	void cloud9(machine_config &config);
 
 protected:

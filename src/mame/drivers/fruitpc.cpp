@@ -111,15 +111,15 @@ DEVICE_INPUT_DEFAULTS_END
 
 void fruitpc_state::fruitpc_sb_conf(device_t *device)
 {
-	device = device->subdevice("pc_joy");
-	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
+	device->subdevice<pc_joy_device>("pc_joy")->set_default_option(nullptr); // remove joystick
 }
 
-MACHINE_CONFIG_START(fruitpc_state::fruitpc)
-	MCFG_DEVICE_ADD("maincpu", I486, 66000000) // ST STPCD0166BTC3 66 MHz 486 CPU
-	MCFG_DEVICE_PROGRAM_MAP(fruitpc_map)
-	MCFG_DEVICE_IO_MAP(fruitpc_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+void fruitpc_state::fruitpc(machine_config &config)
+{
+	I486(config, m_maincpu, 66000000); // ST STPCD0166BTC3 66 MHz 486 CPU
+	m_maincpu->set_addrmap(AS_PROGRAM, &fruitpc_state::fruitpc_map);
+	m_maincpu->set_addrmap(AS_IO, &fruitpc_state::fruitpc_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
@@ -145,13 +145,13 @@ MACHINE_CONFIG_START(fruitpc_state::fruitpc)
 	m_isabus->drq3_callback().set("dma8237_1", FUNC(am9517a_device::dreq3_w));
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", fruitpc_isa8_cards, "sb15", true)
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("sb15", fruitpc_sb_def)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("sb15", fruitpc_sb_conf)
-MACHINE_CONFIG_END
+	isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", 0, "isa", fruitpc_isa8_cards, "sb15", true));
+	isa1.set_option_device_input_defaults("sb15", DEVICE_INPUT_DEFAULTS_NAME(fruitpc_sb_def));
+	isa1.set_option_machine_config("sb15", fruitpc_sb_conf);
+}
 
 ROM_START( fruitpc )
-	ROM_REGION( 0x20000, "bios", 0 )
+	ROM_REGION32_LE( 0x20000, "bios", 0 )
 	ROM_LOAD( "at-gs001.bin", 0x000000, 0x020000, CRC(7dec34d0) SHA1(81d194d67fef9f6531bd3cd1ee0baacb5c2558bf) )
 
 	DISK_REGION( "ide:0:hdd:image" )    // 8 MB Compact Flash card
@@ -163,7 +163,7 @@ GAME( 2006, fruitpc, 0, fruitpc, fruitpc, fruitpc_state, empty_init, ROT0, "<unk
 // this doesn't really belong here, but is some kind of x86 pc-like hardware, exact CPU type etc. unknown
 // hardware ia by Paokai, motherboard has logos, large chip with logo too, http://www.paokai.com.tw/
 ROM_START( gogostrk )
-	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "39sf020a.rom1", 0x000000, 0x040000, CRC(236d4d95) SHA1(50579acddc93c05d5f8e17ad3669a29d2dc49965) )
 
 	DISK_REGION( "ide:0:hdd:image" )    // 128 MB CF Card

@@ -102,6 +102,8 @@ c0   8 data bits, Rx disabled
 #include "softlist.h"
 #include "speaker.h"
 
+#include "bus/macpds/hyperdrive.h"
+
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "539x_1"
 #define MAC_539X_2_TAG "539x_2"
@@ -302,7 +304,6 @@ void mac128_state::machine_reset()
 	m_via_cycles = -10;
 	m_last_taken_interrupt = -1;
 	m_overlay = 1;
-	m_maincpu->reset();
 	m_screen_buffer = 1;
 #ifndef MAC_USE_EMULATED_KBD
 	m_keyboard_reply = 0;
@@ -714,10 +715,7 @@ WRITE16_MEMBER ( mac128_state::mac_via_w )
 	if (LOG_VIA)
 		logerror("mac_via_w: offset=0x%02x data=0x%08x\n", offset, data);
 
-	if (ACCESSING_BITS_0_7)
-		m_via->write(offset, data & 0xff);
-	if (ACCESSING_BITS_8_15)
-		m_via->write(offset, (data >> 8) & 0xff);
+	m_via->write(offset, (data >> 8) & 0xff);
 
 	m_maincpu->adjust_icount(m_via_cycles);
 }
@@ -1297,8 +1295,8 @@ void mac128_state::mac512ke_map(address_map &map)
 	map(0x000000, 0x3fffff).rw(FUNC(mac128_state::ram_r), FUNC(mac128_state::ram_w));
 	map(0x400000, 0x4fffff).rom().region("bootrom", 0).mirror(0x100000);
 	map(0x600000, 0x6fffff).rw(FUNC(mac128_state::ram_600000_r), FUNC(mac128_state::ram_600000_w));
-	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::cd_ab_r)).umask16(0xff00);
-	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::cd_ab_w)).umask16(0x00ff);
+	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
+	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xc00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
 	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
 	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
@@ -1309,8 +1307,8 @@ void mac128_state::macplus_map(address_map &map)
 	map(0x000000, 0x3fffff).rw(FUNC(mac128_state::ram_r), FUNC(mac128_state::ram_w));
 	map(0x400000, 0x4fffff).rom().region("bootrom", 0);
 	map(0x580000, 0x5fffff).rw(FUNC(mac128_state::macplus_scsi_r), FUNC(mac128_state::macplus_scsi_w));
-	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::cd_ab_r)).umask16(0xff00);
-	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::cd_ab_w)).umask16(0x00ff);
+	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
+	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xc00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
 	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
 	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
@@ -1341,12 +1339,17 @@ static const floppy_interface mac_floppy_interface =
 	"floppy_3_5"
 };
 
+static void mac_pds_cards(device_slot_interface &device)
+{
+	device.option_add("hyperdrive", PDS_HYPERDRIVE);  // GCC HyperDrive ST-506 interface
+}
+
 void mac128_state::mac512ke(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, C7M);        /* 7.8336 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::mac512ke_map);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1362,7 +1365,6 @@ void mac128_state::mac512ke(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_PWM(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 2 x ls161
 	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref"));
-	vreg.set_output(5.0);
 	vreg.add_route(0, DAC_TAG, 1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, DAC_TAG, -1.0, DAC_VREF_NEG_INPUT);
 
@@ -1395,9 +1397,12 @@ void mac128_state::mac512ke(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("512K");
 
+	MACPDS(config, "macpds", "maincpu");
+	MACPDS_SLOT(config, "pds", "macpds", mac_pds_cards, nullptr);
+
 	// software list
-	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
-	SOFTWARE_LIST(config, "hdd_list").set_type("mac_hdd", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 }
 
 void mac128_state::mac128k(machine_config &config)
@@ -1503,7 +1508,7 @@ static INPUT_PORTS_START( macplus )
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)    /* keyboard Enter : */
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_UNUSED)    /* escape: */
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_UNUSED)    /* ??? */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Command") PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Command") PORT_CODE(KEYCODE_RALT)
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Option") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_SHIFT_2)
@@ -1725,7 +1730,7 @@ ROM_END
 //COMP( 1983, mactw,    0,       0,      mac128k,  macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
 COMP( 1984, mac128k,  0,       0,      mac128k,  macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh 128k",  MACHINE_NOT_WORKING )
 COMP( 1984, mac512k,  mac128k, 0,      mac512ke, macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh 512k",  MACHINE_NOT_WORKING )
-COMP( 1986, mac512ke, macplus, 0,      mac512ke, macplus, mac128_state, init_mac512ke,    "Apple Computer",    "Macintosh 512ke", 0 )
+COMP( 1986, mac512ke, macplus, 0,      mac512ke, macplus, mac128_state, init_mac512ke,    "Apple Computer",    "Macintosh 512ke", MACHINE_NOT_WORKING )
 COMP( 1985, unitron,  macplus, 0,      mac512ke, macplus, mac128_state, init_mac512ke,    "bootleg (Unitron)", "Mac 512",  MACHINE_NOT_WORKING )
-COMP( 1986, macplus,  0,       0,      macplus,  macplus, mac128_state, init_macplus,     "Apple Computer",    "Macintosh Plus",  0 )
-COMP( 1985, utrn1024, macplus, 0,      macplus,  macplus, mac128_state, init_macplus,     "bootleg (Unitron)", "Unitron 1024",  0 )
+COMP( 1986, macplus,  0,       0,      macplus,  macplus, mac128_state, init_macplus,     "Apple Computer",    "Macintosh Plus",  MACHINE_NOT_WORKING )
+COMP( 1985, utrn1024, macplus, 0,      macplus,  macplus, mac128_state, init_macplus,     "bootleg (Unitron)", "Unitron 1024",  MACHINE_NOT_WORKING )

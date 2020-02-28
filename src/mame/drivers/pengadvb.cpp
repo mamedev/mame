@@ -126,8 +126,7 @@ void pengadvb_state::io_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x98, 0x98).rw("tms9128", FUNC(tms9128_device::vram_r), FUNC(tms9128_device::vram_w));
-	map(0x99, 0x99).rw("tms9128", FUNC(tms9128_device::register_r), FUNC(tms9128_device::register_w));
+	map(0x98, 0x99).rw("tms9128", FUNC(tms9128_device::read), FUNC(tms9128_device::write));
 	map(0xa0, 0xa1).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xa2, 0xa2).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));

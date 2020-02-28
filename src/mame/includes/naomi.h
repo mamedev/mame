@@ -27,6 +27,7 @@ naomi.h -> NAOMI includes
 #include "machine/jvsdev.h"
 #include "machine/jvs13551.h"
 #include "machine/m3comm.h"
+#include "machine/gunsense.h"
 #include "dc.h"
 
 enum {
@@ -43,12 +44,14 @@ class naomi_state : public dc_state
 		naomi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dc_state(mconfig, type, tag),
 		m_eeprom(*this, "main_eeprom"),
-		m_rombase(*this, "rombase")
+		m_rombase(*this, "rombase"),
+		m_mp(*this, "KEY%u", 1U)
 		{ }
 
 	void naomi_base(machine_config &config);
 	void naomim2(machine_config &config);
 	void naomim2_kb(machine_config &config);
+	void naomim2_gun(machine_config &config);
 	void naomi(machine_config &config);
 	void naomim1(machine_config &config);
 	void naomigd(machine_config &config);
@@ -66,6 +69,7 @@ class naomi_state : public dc_state
 	void init_naomi_mp();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(naomi_mp_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(suchie3_mp_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(naomi_kb_r);
 	DECLARE_INPUT_CHANGED_MEMBER(naomi_mp_w);
 
@@ -74,8 +78,10 @@ class naomi_state : public dc_state
 protected:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_shared_ptr<uint64_t> m_rombase;
+	optional_ioport_array<5> m_mp;
 
 	DECLARE_MACHINE_RESET(naomi);
+	DECLARE_WRITE_LINE_MEMBER(external_reset);
 
 	DECLARE_READ16_MEMBER( naomi_g2bus_r );
 	DECLARE_READ64_MEMBER( eeprom_93c46a_r );

@@ -1577,14 +1577,14 @@ void pc8801_state::pc8801_io(address_map &map)
 	map(0x71, 0x71).rw(FUNC(pc8801_state::pc8801_ext_rom_bank_r), FUNC(pc8801_state::pc8801_ext_rom_bank_w));
 	map(0x78, 0x78).w(FUNC(pc8801_state::pc8801_window_bank_inc_w));
 	map(0x90, 0x9f).rw(FUNC(pc8801_state::pc8801_cdrom_r), FUNC(pc8801_state::pc8801_cdrom_w));
-//  AM_RANGE(0xa0, 0xa3) AM_NOP                                     /* music & network */
+//  map(0xa0, 0xa3).noprw();                                     /* music & network */
 	map(0xa8, 0xad).rw(FUNC(pc8801_state::pc8801_opna_r), FUNC(pc8801_state::pc8801_opna_w));  /* second sound board */
-//  AM_RANGE(0xb4, 0xb5) AM_NOP                                     /* Video art board */
-//  AM_RANGE(0xc1, 0xc1) AM_NOP                                     /* (unknown) */
-//  AM_RANGE(0xc2, 0xcf) AM_NOP                                     /* music */
-//  AM_RANGE(0xd0, 0xd7) AM_NOP                                     /* music & GP-IB */
-//  AM_RANGE(0xd8, 0xd8) AM_NOP                                     /* GP-IB */
-//  AM_RANGE(0xdc, 0xdf) AM_NOP                                     /* MODEM */
+//  map(0xb4, 0xb5).noprw();                                     /* Video art board */
+//  map(0xc1, 0xc1).noprw();                                     /* (unknown) */
+//  map(0xc2, 0xcf).noprw();                                     /* music */
+//  map(0xd0, 0xd7).noprw();                                     /* music & GP-IB */
+//  map(0xd8, 0xd8).noprw();                                     /* GP-IB */
+//  map(0xdc, 0xdf).noprw();                                     /* MODEM */
 	map(0xe2, 0xe2).rw(FUNC(pc8801_state::pc8801_extram_mode_r), FUNC(pc8801_state::pc8801_extram_mode_w));            /* expand RAM mode */
 	map(0xe3, 0xe3).rw(FUNC(pc8801_state::pc8801_extram_bank_r), FUNC(pc8801_state::pc8801_extram_bank_w));            /* expand RAM bank */
 #if USE_PROPER_I8214
@@ -1594,14 +1594,14 @@ void pc8801_state::pc8801_io(address_map &map)
 	map(0xe4, 0xe4).w(FUNC(pc8801_state::pc8801_irq_level_w));
 	map(0xe6, 0xe6).w(FUNC(pc8801_state::pc8801_irq_mask_w));
 #endif
-//  AM_RANGE(0xe7, 0xe7) AM_NOP                                     /* Arcus writes here, almost likely to be a mirror of above */
+//  map(0xe7, 0xe7).noprw();                                     /* Arcus writes here, almost likely to be a mirror of above */
 	map(0xe8, 0xeb).rw(FUNC(pc8801_state::pc8801_kanji_r), FUNC(pc8801_state::pc8801_kanji_w));
 	map(0xec, 0xef).rw(FUNC(pc8801_state::pc8801_kanji_lv2_r), FUNC(pc8801_state::pc8801_kanji_lv2_w));
 	map(0xf0, 0xf0).w(FUNC(pc8801_state::pc8801_dic_bank_w));
 	map(0xf1, 0xf1).w(FUNC(pc8801_state::pc8801_dic_ctrl_w));
-//  AM_RANGE(0xf3, 0xf3) AM_NOP                                     /* DMA floppy (unknown) */
-//  AM_RANGE(0xf4, 0xf7) AM_NOP                                     /* DMA 5'floppy (may be not released) */
-//  AM_RANGE(0xf8, 0xfb) AM_NOP                                     /* DMA 8'floppy (unknown) */
+//  map(0xf3, 0xf3).noprw();                                     /* DMA floppy (unknown) */
+//  map(0xf4, 0xf7).noprw();                                     /* DMA 5'floppy (may be not released) */
+//  map(0xf8, 0xfb).noprw();                                     /* DMA 8'floppy (unknown) */
 	map(0xfc, 0xff).rw("d8255_master", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
@@ -2020,7 +2020,7 @@ static const cassette_interface pc88_cassette_interface =
 {
 	cassette_default_formats,   // we need T88 format support!
 	nullptr,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED,
 	"pc8801_cass"
 };
 #endif
@@ -2207,7 +2207,7 @@ void pc8801_state::machine_reset()
 	m_fdc_irq_opcode = 0; //TODO: copied from PC-88VA, could be wrong here ... should be 0x7f ld a,a in the latter case
 	m_mouse.phase = 0;
 
-	m_fdccpu->set_input_line_vector(0, 0);
+	m_fdccpu->set_input_line_vector(0, 0); // Z80
 
 	{
 		m_txt_color = 2;
@@ -2340,21 +2340,22 @@ WRITE_LINE_MEMBER( pc8801_state::rxrdy_w )
 	// ...
 }
 
-MACHINE_CONFIG_START(pc8801_state::pc8801)
+void pc8801_state::pc8801(machine_config &config)
+{
 	/* main CPU */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)        /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(pc8801_mem)
-	MCFG_DEVICE_IO_MAP(pc8801_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc8801_state,  pc8801_vrtc_irq)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc8801_state,pc8801_irq_callback)
+	Z80(config, m_maincpu, MASTER_CLOCK);        /* 4 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8801_state::pc8801_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc8801_state::pc8801_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pc8801_state::pc8801_vrtc_irq));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8801_state::pc8801_irq_callback));
 
 	/* sub CPU(5 inch floppy drive) */
-	MCFG_DEVICE_ADD(m_fdccpu, Z80, MASTER_CLOCK)       /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(pc8801fdc_mem)
-	MCFG_DEVICE_IO_MAP(pc8801fdc_io)
+	Z80(config, m_fdccpu, MASTER_CLOCK);       /* 4 MHz */
+	m_fdccpu->set_addrmap(AS_PROGRAM, &pc8801_state::pc8801fdc_mem);
+	m_fdccpu->set_addrmap(AS_IO, &pc8801_state::pc8801fdc_io);
 
-	//config.m_minimum_quantum = attotime::from_hz(300000);
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	//config.set_maximum_quantum(attotime::from_hz(300000));
+	config.set_perfect_quantum(m_maincpu);
 
 	i8255_device &d8255_master(I8255(config, "d8255_master"));
 	d8255_master.in_pa_callback().set("d8255_slave", FUNC(i8255_device::pb_r));
@@ -2377,7 +2378,7 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	UPD1990A(config, m_rtc);
 	//CENTRONICS(config, "centronics", centronics_devices, "printer");
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	SOFTWARE_LIST(config, "tape_list").set_original("pc8801_cass");
 
@@ -2390,10 +2391,10 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	SOFTWARE_LIST(config, "disk_list").set_original("pc8801_flop");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK_24KHz,848,0,640,448,0,400)
-	MCFG_SCREEN_UPDATE_DRIVER(pc8801_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK_24KHz,848,0,640,448,0,400);
+	m_screen->set_screen_update(FUNC(pc8801_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc8801);
 	PALETTE(config, m_palette, FUNC(pc8801_state::pc8801_palette), 0x10);
@@ -2414,26 +2415,28 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	m_opna->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
 	m_opna->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::pc8801_rtc_irq), attotime::from_hz(600));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pc8801_state::pc8801fh)
+void pc8801_state::pc8801fh(machine_config &config)
+{
 	pc8801(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_clock_speed )
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pc8801_state::pc8801ma)
+void pc8801_state::pc8801ma(machine_config &config)
+{
 	pc8801(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_dic )
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pc8801_state::pc8801mc)
+void pc8801_state::pc8801mc(machine_config &config)
+{
 	pc8801(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_cdrom )
-MACHINE_CONFIG_END
+}
 
 
 /* TODO: clean this up */

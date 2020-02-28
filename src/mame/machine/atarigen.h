@@ -49,12 +49,12 @@ public:
 	// construction/destruction
 	template <typename T>
 	atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cputag)
-		: atari_sound_comm_device(mconfig, tag, owner, (uint32_t)0)
+		: atari_sound_comm_device(mconfig, tag, owner, (u32)0)
 	{
 		m_sound_cpu.set_tag(std::forward<T>(cputag));
 	}
 
-	atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
 	auto int_callback() { return m_main_int_cb.bind(); }
@@ -64,16 +64,16 @@ public:
 	DECLARE_READ_LINE_MEMBER(sound_to_main_ready) { return m_sound_to_main_ready ? ASSERT_LINE : CLEAR_LINE; }
 
 	// main cpu accessors (forward internally to the atari_sound_comm_device)
-	DECLARE_WRITE8_MEMBER(main_command_w);
-	DECLARE_READ8_MEMBER(main_response_r);
-	DECLARE_WRITE16_MEMBER(sound_reset_w);
+	void main_command_w(u8 data);
+	u8 main_response_r();
+	void sound_reset_w(u16 data = 0);
 
 	// sound cpu accessors
 	void sound_cpu_reset() { synchronize(TID_SOUND_RESET, 1); }
-	DECLARE_WRITE8_MEMBER(sound_response_w);
-	DECLARE_READ8_MEMBER(sound_command_r);
-	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
-	DECLARE_READ8_MEMBER(sound_irq_ack_r);
+	void sound_response_w(u8 data);
+	u8 sound_command_r();
+	void sound_irq_ack_w(u8 data = 0);
+	u8 sound_irq_ack_r();
 	INTERRUPT_GEN_MEMBER(sound_irq_gen);
 	void sound_irq();
 
@@ -106,12 +106,12 @@ private:
 
 	// internal state
 	required_device<m6502_device> m_sound_cpu;
-	bool                m_main_to_sound_ready;
-	bool                m_sound_to_main_ready;
-	uint8_t               m_main_to_sound_data;
-	uint8_t               m_sound_to_main_data;
-	uint8_t               m_timed_int;
-	uint8_t               m_ym2151_int;
+	bool             m_main_to_sound_ready;
+	bool             m_sound_to_main_ready;
+	u8               m_main_to_sound_data;
+	u8               m_sound_to_main_data;
+	u8               m_timed_int;
+	u8               m_ym2151_int;
 };
 
 
@@ -147,13 +147,13 @@ protected:
 	// interrupt handling
 	void scanline_int_set(screen_device &screen, int scanline);
 	DECLARE_WRITE_LINE_MEMBER(scanline_int_write_line);
-	DECLARE_WRITE16_MEMBER(scanline_int_ack_w);
+	void scanline_int_ack_w(u16 data = 0);
 
 	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
-	DECLARE_WRITE16_MEMBER(video_int_ack_w);
+	void video_int_ack_w(u16 data = 0);
 
 	// slapstic helpers
-	void slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, uint8_t *mem);
+	void slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, u8 *mem);
 	void slapstic_update_bank(int bank);
 	DECLARE_WRITE16_MEMBER(slapstic_w);
 	DECLARE_READ16_MEMBER(slapstic_r);
@@ -178,23 +178,23 @@ protected:
 		TID_ATARIGEN_LAST
 	};
 
-	uint8_t               m_scanline_int_state;
-	uint8_t               m_video_int_state;
+	u8               m_scanline_int_state;
+	u8               m_video_int_state;
 
-	optional_shared_ptr<uint16_t> m_xscroll;
-	optional_shared_ptr<uint16_t> m_yscroll;
+	optional_shared_ptr<u16> m_xscroll;
+	optional_shared_ptr<u16> m_yscroll;
 
 	/* internal state */
-	uint8_t                 m_slapstic_num;
-	uint16_t *              m_slapstic;
-	uint8_t                 m_slapstic_bank;
-	std::vector<uint8_t>    m_slapstic_bank0;
-	offs_t                  m_slapstic_last_pc;
-	offs_t                  m_slapstic_last_address;
-	offs_t                  m_slapstic_base;
-	offs_t                  m_slapstic_mirror;
+	u8               m_slapstic_num;
+	u16 *            m_slapstic;
+	u8               m_slapstic_bank;
+	std::vector<u8>  m_slapstic_bank0;
+	offs_t           m_slapstic_last_pc;
+	offs_t           m_slapstic_last_address;
+	offs_t           m_slapstic_base;
+	offs_t           m_slapstic_mirror;
 
-	uint32_t                m_scanlines_per_callback;
+	u32              m_scanlines_per_callback;
 
 
 	atarigen_screen_timer   m_screen_timer[2];
@@ -216,31 +216,31 @@ private:
 
     Atari 68000 list:
 
-    Driver      Pr? Up? VC? PF? P2? MO? AL? BM? PH?
-    ----------  --- --- --- --- --- --- --- --- ---
-    arcadecl.c       *               *       *
-    atarig1.c        *       *      rle  *
-    atarig42.c       *       *      rle  *
-    atarigt.c                *      rle  *
-    atarigx2.c               *      rle  *
-    atarisy1.c   *   *       *       *   *              270->260
-    atarisy2.c   *   *       *       *   *              150->120
-    badlands.c       *       *       *                  250->260
-    batman.c     *   *   *   *   *   *   *       *      200->160 ?
-    blstroid.c       *       *       *                  240->230
-    cyberbal.c       *       *       *   *              125->105 ?
-    eprom.c          *       *       *   *              170->170
-    gauntlet.c   *   *       *       *   *       *      220->250
-    klax.c       *   *       *       *                  480->440 ?
-    offtwall.c       *   *   *       *                  260->260
-    rampart.c        *               *       *          280->280
-    relief.c     *   *   *   *   *   *                  240->240
-    shuuz.c          *   *   *       *                  410->290 fix!
-    skullxbo.c       *       *       *   *              150->145
-    thunderj.c       *   *   *   *   *   *       *      180->180
-    toobin.c         *       *       *   *              140->115 fix!
-    vindictr.c   *   *       *       *   *       *      200->210
-    xybots.c     *   *       *       *   *              235->238
+    Driver        Pr? Up? VC? PF? P2? MO? AL? BM? PH?
+    ----------    --- --- --- --- --- --- --- --- ---
+    arcadecl.cpp       *               *       *
+    atarig1.cpp        *       *      rle  *
+    atarig42.cpp       *       *      rle  *
+    atarigt.cpp                *      rle  *
+    atarigx2.cpp               *      rle  *
+    atarisy1.cpp   *   *       *       *   *              270->260
+    atarisy2.cpp   *   *       *       *   *              150->120
+    badlands.cpp       *       *       *                  250->260
+    batman.cpp     *   *   *   *   *   *   *       *      200->160 ?
+    blstroid.cpp       *       *       *                  240->230
+    cyberbal.cpp       *       *       *   *              125->105 ?
+    eprom.cpp          *       *       *   *              170->170
+    gauntlet.cpp   *   *       *       *   *       *      220->250
+    klax.cpp       *   *       *       *                  480->440 ?
+    offtwall.cpp       *   *   *       *                  260->260
+    rampart.cpp        *               *       *          280->280
+    relief.cpp     *   *   *   *   *   *                  240->240
+    shuuz.cpp          *   *   *       *                  410->290 fix!
+    skullxbo.cpp       *       *       *   *              150->145
+    thunderj.cpp       *   *   *   *   *   *       *      180->180
+    toobin.cpp         *       *       *   *              140->115 fix!
+    vindictr.cpp   *   *       *       *   *       *      200->210
+    xybots.cpp     *   *       *       *   *              235->238
     ----------  --- --- --- --- --- --- --- --- ---
 
     Pr? - do we have verifiable proof on priorities?

@@ -2499,11 +2499,12 @@ struct ym2610_state
 
 				ch->adpcm_acc += jedi_table[ch->adpcm_step + data];
 
+				/* the 12-bit accumulator wraps on the ym2610 and ym2608 (like the msm5205), it does not saturate (like the msm5218) */
+				ch->adpcm_acc &= 0xfff;
+
 				/* extend 12-bit signed int */
-				if (ch->adpcm_acc & ~0x7ff)
+				if (ch->adpcm_acc & 0x800)
 					ch->adpcm_acc |= ~0xfff;
-				else
-					ch->adpcm_acc &= 0xfff;
 
 				ch->adpcm_step += step_inc[data & 7];
 				Limit( ch->adpcm_step, 48*16, 0*16 );

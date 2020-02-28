@@ -227,18 +227,18 @@ READ8Z_MEMBER(ti99_gkracker_device::readz)
 		uint8_t val1 = *value;
 
 		// Read from the guest cartridge.
-		m_cartridge->readz(space, offset, value, mem_mask);
+		m_cartridge->readz(offset, value);
 		if (val1 != *value)
 			LOGMASKED(LOG_GKRACKER, "Read (from guest) %04x -> %02x\n", offset, *value);
 	}
 }
 
-WRITE8_MEMBER(ti99_gkracker_device::write)
+void ti99_gkracker_device::write(offs_t offset, uint8_t data)
 {
 	// write to the guest cartridge if present
 	if (m_cartridge != nullptr)
 	{
-		m_cartridge->write(space, offset, data, mem_mask);
+		m_cartridge->write(offset, data);
 	}
 
 	if (m_grom_selected)
@@ -307,18 +307,18 @@ WRITE8_MEMBER(ti99_gkracker_device::write)
 
 READ8Z_MEMBER( ti99_gkracker_device::crureadz )
 {
-	if (m_cartridge != nullptr) m_cartridge->crureadz(space, offset, value);
+	if (m_cartridge != nullptr) m_cartridge->crureadz(offset, value);
 }
 
-WRITE8_MEMBER( ti99_gkracker_device::cruwrite )
+void ti99_gkracker_device::cruwrite(offs_t offset, uint8_t data)
 {
-	if (m_cartridge != nullptr) m_cartridge->cruwrite(space, offset, data);
+	if (m_cartridge != nullptr) m_cartridge->cruwrite(offset, data);
 }
 
 INPUT_CHANGED_MEMBER( ti99_gkracker_device::gk_changed )
 {
-	LOGMASKED(LOG_GKRACKER, "Input changed %d - %d\n", (int)((uint64_t)param & 0x07), newval);
-	m_gk_switch[(uint64_t)param & 0x07] = newval;
+	LOGMASKED(LOG_GKRACKER, "Input changed %d - %d\n", int(param & 0x07), newval);
+	m_gk_switch[param & 0x07] = newval;
 }
 
 void ti99_gkracker_device::insert(int index, ti99_cartridge_device* cart)

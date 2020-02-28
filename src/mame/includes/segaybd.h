@@ -13,9 +13,9 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/mb3773.h"
-#include "machine/segaic16.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
+#include "screen.h"
 
 
 // ======================> segaybd_state
@@ -32,6 +32,7 @@ public:
 		, m_soundcpu(*this, "soundcpu")
 		, m_linkcpu(*this, "linkcpu")
 		, m_watchdog(*this, "watchdog")
+		, m_screen(*this, "screen")
 		, m_bsprites(*this, "bsprites")
 		, m_ysprites(*this, "ysprites")
 		, m_segaic16vid(*this, "segaic16vid")
@@ -42,7 +43,6 @@ public:
 		, m_timer_irq_state(0)
 		, m_vblank_irq_state(0)
 		, m_misc_io_data(0)
-		, m_tmp_bitmap(512, 512)
 	{
 	}
 
@@ -122,6 +122,7 @@ private:
 	required_device<z80_device> m_soundcpu;
 	optional_device<z80_device> m_linkcpu;
 	required_device<mb3773_device> m_watchdog;
+	required_device<screen_device> m_screen;
 	required_device<sega_sys16b_sprite_device> m_bsprites;
 	required_device<sega_yboard_sprite_device> m_ysprites;
 	required_device<segaic16_video_device> m_segaic16vid;
@@ -140,7 +141,6 @@ private:
 	uint8_t           m_timer_irq_state;
 	uint8_t           m_vblank_irq_state;
 	uint8_t           m_misc_io_data;
-	bitmap_ind16    m_tmp_bitmap;
 };
 
 #endif // MAME_INCLUDES_SEGAYBD_H

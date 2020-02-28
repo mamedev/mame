@@ -2,7 +2,7 @@
 // copyright-holders:Tim Schuerewegen
 /**************************************************************************
  *
- * gp32.c - Game Park GP32
+ * gp32.cpp - Game Park GP32
  * Driver by Tim Schuerewegen
  *
  * CPU: Samsung S3C2400X01 SoC
@@ -13,6 +13,21 @@
  *    Interrupt controller
  *    USB controller
  *    and more.
+ *
+ * TODO:
+ * - device-ify s3c240x;
+ * - console screen is horizontal, but here screen is setted up with
+ *   Height < Width and ROT270, in a double negation fashion. Simplify and
+ *   eventually update video fns;
+ * - Normalize palette to actual TFT color space;
+ * - Several games have dubious sound clipping and mixing;
+ * - RF and internet comms & netplay (rallypop has both);
+ * - Games from SW list doesn't reload after save, is it even supported?
+ * - Add slot for USB PC-Link application, add a host machine connection
+ *   somehow;
+ * - Verify MP3 support, which in turn needs checking out how the filesystem
+ *   works here (and eventually a tool for direct injecting);
+ * - Verify gp32linux distro;
  *
  **************************************************************************/
 
@@ -1609,7 +1624,7 @@ void gp32_state::s3c240x_machine_start()
 	m_s3c240x_iic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iic_timer_exp),this), (void *)(uintptr_t)0);
 	m_s3c240x_iis_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iis_timer_exp),this), (void *)(uintptr_t)0);
 	m_s3c240x_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_lcd_timer_exp),this), (void *)(uintptr_t)0);
-	m_eeprom_data = std::make_unique<uint8_t[]>(0x2000);
+	m_eeprom_data = std::make_unique<uint8_t[]>(0x2000); // a dump of the EEPROM (S524AB0X91) resulted to be 0x1000
 	m_nvram->set_base(m_eeprom_data.get(), 0x2000);
 	smc_init();
 	i2s_init();
@@ -1673,33 +1688,36 @@ void gp32_state::machine_reset()
 	s3c240x_machine_reset();
 }
 
-MACHINE_CONFIG_START(gp32_state::gp32)
-	MCFG_DEVICE_ADD("maincpu", ARM9, 40000000)
-	MCFG_DEVICE_PROGRAM_MAP(gp32_map)
+void gp32_state::gp32(machine_config &config)
+{
+	ARM9(config, m_maincpu, 40000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gp32_state::gp32_map);
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, m_palette).set_entries(32768);
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(240, 320)
-	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
-	MCFG_SCREEN_UPDATE_DRIVER(gp32_state, screen_update_gp32)
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	// TODO: bad setup that theoretically should fail a validation check plus console doesn't have vertical screen anyway
+	// TODO: retrieve actual defaults from BIOS
+	m_screen->set_size(240, 320);
+	m_screen->set_visarea(0, 239, 0, 319);
+	m_screen->set_screen_update(FUNC(gp32_state::screen_update_gp32));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	SMARTMEDIA(config, m_smartmedia, 0);
 
 	SOFTWARE_LIST(config, "memc_list").set_original("gp32");
-MACHINE_CONFIG_END
+}
 
 ROM_START( gp32 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1713,10 +1731,9 @@ ROM_START( gp32 )
 	ROMX_LOAD( "gp32166m.bin", 0x000000, 0x080000, CRC(4548a840) SHA1(1ad0cab0af28fb45c182e5e8c87ead2aaa4fffe1), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "mfv2", "Mr. Spiv Multi Firmware V2" )
 	ROMX_LOAD( "gp32mfv2.bin", 0x000000, 0x080000, CRC(7ddaaaeb) SHA1(5a85278f721beb3b00125db5c912d1dc552c5897), ROM_BIOS(4) )
-#if 0
-	ROM_SYSTEM_BIOS( 5, "test", "test" )
-	ROMX_LOAD( "test.bin", 0x000000, 0x080000, CRC(00000000) SHA1(0000000000000000000000000000000000000000), ROM_BIOS(5) )
-#endif
+
+	ROM_REGION( 0x4000, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "x2c32.jed", 0, 0x3bbb, CRC(eeec10d8) SHA1(34c4b1b865511517a5de1fa352228d95cda387c5) ) // JEDEC format for the time being. X2C32: 32 Macrocell CoolRunner-II CPLD
 ROM_END
 
-CONS(2001, gp32, 0, 0, gp32, gp32, gp32_state, empty_init, "Game Park Holdings", "GP32", ROT270|MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+CONS(2001, gp32, 0, 0, gp32, gp32, gp32_state, empty_init, "Game Park Holdings", "GP32", ROT270 | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )

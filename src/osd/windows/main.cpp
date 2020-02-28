@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  main.c - Win32 main program
+//  main.cpp - Win32 main program
 //
 //============================================================
 
@@ -12,7 +12,7 @@
 #endif
 #include <windows.h>
 #include <tchar.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <vector>
 #include <string>
 

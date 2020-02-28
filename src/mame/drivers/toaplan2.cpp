@@ -392,7 +392,7 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 
 #include "cpu/nec/v25.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z180/z180.h"
+#include "cpu/z180/hd647180x.h"
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "sound/ym2151.h"
@@ -433,7 +433,7 @@ MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
 	// All games execute a RESET instruction on init, presumably to reset the sound CPU.
 	// This is important for games with common RAM; the RAM test will fail
 	// when leaving service mode if the sound CPU is not reset.
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(toaplan2_state::toaplan2_reset),this));
+	m_maincpu->set_reset_callback(*this, FUNC(toaplan2_state::toaplan2_reset));
 }
 
 
@@ -445,21 +445,35 @@ MACHINE_RESET_MEMBER(toaplan2_state,ghox)
 }
 
 
+MACHINE_RESET_MEMBER(toaplan2_state,bgaregga)
+{
+	MACHINE_RESET_CALL_MEMBER(toaplan2);
+	for (int chip = 0; chip < 2; chip++)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			if (m_raizing_okibank[chip][i] != nullptr)
+				m_raizing_okibank[chip][i]->set_entry(0);
+		}
+	}
+}
+
+
 void toaplan2_state::init_dogyuun()
 {
-	m_v25_reset_line = 0x20;
+	m_sound_reset_bit = 0x20;
 }
 
 
 void toaplan2_state::init_fixeight()
 {
-	m_v25_reset_line = 0x08;
+	m_sound_reset_bit = 0x08;
 }
 
 
 void toaplan2_state::init_fixeightbl()
 {
-	uint8_t *ROM = memregion("oki1")->base();
+	u8 *ROM = memregion("oki1")->base();
 
 	m_okibank->configure_entries(0, 5, &ROM[0x30000], 0x10000);
 }
@@ -467,13 +481,13 @@ void toaplan2_state::init_fixeightbl()
 
 void toaplan2_state::init_vfive()
 {
-	m_v25_reset_line = 0x10;
+	m_sound_reset_bit = 0x10;
 }
 
 
 void toaplan2_state::init_pipibibsbl()
 {
-	uint16_t *ROM = (uint16_t *)(memregion("maincpu")->base());
+	u16 *ROM = (u16 *)(memregion("maincpu")->base());
 
 	for (int i = 0; i < (0x040000/2); i += 4)
 	{
@@ -484,21 +498,38 @@ void toaplan2_state::init_pipibibsbl()
 	}
 }
 
+void toaplan2_state::install_raizing_okibank(int chip)
+{
+	assert(m_oki_rom[chip] && m_raizing_okibank[chip][0]);
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_raizing_okibank[chip][i]->configure_entries(0, 16, &m_oki_rom[chip][(i * 0x100)], 0x10000);
+	}
+	m_raizing_okibank[chip][4]->configure_entries(0, 16, &m_oki_rom[chip][0x400], 0x10000);
+	for (int i = 5; i < 8; i++)
+	{
+		m_raizing_okibank[chip][i]->configure_entries(0, 16, &m_oki_rom[chip][0], 0x10000);
+	}
+}
 
 void toaplan2_state::init_bgaregga()
 {
-	uint8_t *Z80 = memregion("audiocpu")->base();
+	u8 *Z80 = memregion("audiocpu")->base();
 
 	m_audiobank->configure_entries(0, 8, Z80, 0x4000); // Test mode only, Mirror of First 128KB Areas?
 	m_audiobank->configure_entries(8, 8, Z80, 0x4000);
+	install_raizing_okibank(0);
 }
 
 
 void toaplan2_state::init_batrider()
 {
-	uint8_t *Z80 = memregion("audiocpu")->base();
+	u8 *Z80 = memregion("audiocpu")->base();
 
 	m_audiobank->configure_entries(0, 16, Z80, 0x4000);
+	install_raizing_okibank(0);
+	install_raizing_okibank(1);
 	m_sndirq_line = 4;
 }
 
@@ -510,32 +541,31 @@ void toaplan2_state::init_bbakraid()
 
 void toaplan2_state::init_enmadaio()
 {
-	uint8_t *ROM = memregion("oki1")->base();
+	u8 *ROM = memregion("oki1")->base();
 
 	m_okibank->configure_entries(0, 0x60, ROM, 0x40000);
 	m_okibank->set_entry(0);
 }
 
 
-
 /***************************************************************************
   Toaplan games
 ***************************************************************************/
 
-IRQ_CALLBACK_MEMBER(toaplan2_state::fixeightbl_irq_ack)
+void toaplan2_state::cpu_space_fixeightbl_map(address_map &map)
 {
-	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-	return M68K_INT_ACK_AUTOVECTOR;
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff5, 0xfffff5).lr8(NAME([this] () { m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE); return m68000_device::autovector(2); }));
 }
 
-IRQ_CALLBACK_MEMBER(toaplan2_state::pipibibsbl_irq_ack)
+void toaplan2_state::cpu_space_pipibibsbl_map(address_map &map)
 {
-	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
-	return M68K_INT_ACK_AUTOVECTOR;
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff9, 0xfffff9).lr8(NAME([this] () { m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE); return m68000_device::autovector(4); }));
 }
 
 
-READ16_MEMBER(toaplan2_state::video_count_r)
+u16 toaplan2_state::video_count_r()
 {
 	/* +---------+---------+--------+---------------------------+ */
 	/* | /H-Sync | /V-Sync | /Blank |       Scanline Count      | */
@@ -545,7 +575,7 @@ READ16_MEMBER(toaplan2_state::video_count_r)
 
 	int vpos = m_screen->vpos();
 
-	int video_status = 0xff00;    // Set signals inactive
+	u16 video_status = 0xff00;    // Set signals inactive
 
 	vpos = (vpos + 15) % 262;
 
@@ -566,7 +596,7 @@ READ16_MEMBER(toaplan2_state::video_count_r)
 }
 
 
-WRITE8_MEMBER(toaplan2_state::toaplan2_coin_w)
+void toaplan2_state::coin_w(u8 data)
 {
 	/* +----------------+------ Bits 7-5 not used ------+--------------+ */
 	/* | Coin Lockout 2 | Coin Lockout 1 | Coin Count 2 | Coin Count 1 | */
@@ -574,97 +604,66 @@ WRITE8_MEMBER(toaplan2_state::toaplan2_coin_w)
 
 	if (data & 0x0f)
 	{
-		machine().bookkeeping().coin_lockout_w(0, ((data & 4) ? 0 : 1) );
-		machine().bookkeeping().coin_lockout_w(1, ((data & 8) ? 0 : 1) );
-		machine().bookkeeping().coin_counter_w(0, (data & 1) );
-		machine().bookkeeping().coin_counter_w(1, (data & 2) );
+		machine().bookkeeping().coin_lockout_w(0, BIT(~data, 2));
+		machine().bookkeeping().coin_lockout_w(1, BIT(~data, 3));
+		machine().bookkeeping().coin_counter_w(0, BIT( data, 0));
+		machine().bookkeeping().coin_counter_w(1, BIT( data, 1));
 	}
 	else
 	{
 		machine().bookkeeping().coin_lockout_global_w(1);    // Lock all coin slots
 	}
-	if (data & 0xe0)
+	if (data & 0xf0)
 	{
 		logerror("Writing unknown upper bits (%02x) to coin control\n",data);
 	}
 }
 
-WRITE8_MEMBER(toaplan2_state::pwrkick_coin_w)
+void toaplan2_state::pwrkick_coin_w(u8 data)
 {
-	machine().bookkeeping().coin_counter_w(0, (data & 2) >> 1 ); // medal
-	machine().bookkeeping().coin_counter_w(1, (data & 8) >> 3 ); // 10 yen
-	machine().bookkeeping().coin_counter_w(2, (data & 1) ); // 100 yen
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 1)); // medal
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 3)); // 10 yen
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 0)); // 100 yen
 	m_hopper->motor_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER(toaplan2_state::pwrkick_coin_lockout_w)
+void toaplan2_state::pwrkick_coin_lockout_w(u8 data)
 {
-	machine().bookkeeping().coin_lockout_w(0, (data & 4) ? 0 : 1);
-	machine().bookkeeping().coin_lockout_w(1, (data & 4) ? 0 : 1);
-	machine().bookkeeping().coin_lockout_w(2, (data & 2) ? 0 : 1);
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 2));
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 2));
+	machine().bookkeeping().coin_lockout_w(2, BIT(~data, 1));
 }
 
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_coin_word_w)
+void toaplan2_state::coin_sound_reset_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		toaplan2_coin_w(space, offset, data & 0xff);
-	}
-	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
-	{
-		logerror("Writing unknown upper MSB command (%04x) to coin control\n",data & 0xff00);
-	}
+	logerror("coin_sound_reset_w %02x\n",data);
+
+	coin_w(data & ~m_sound_reset_bit);
+	sound_reset_w(data & m_sound_reset_bit);
 }
 
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_v25_coin_word_w)
+void toaplan2_state::shippumd_coin_w(u8 data)
 {
-	logerror("toaplan2_v25_coin_word_w %04x\n",data);
-
-	if (ACCESSING_BITS_0_7)
-	{
-		toaplan2_coin_w(space, offset, data & 0x0f);
-
-		m_audiocpu->set_input_line(INPUT_LINE_RESET,  (data & m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
-	}
-	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
-	{
-		logerror("Writing unknown upper MSB command (%04x) to coin control\n",data & 0xff00);
-	}
+	coin_w(data & ~0x10);
+	m_oki[0]->set_rom_bank(BIT(data, 4));
 }
 
 
-WRITE16_MEMBER(toaplan2_state::shippumd_coin_word_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		toaplan2_coin_w(space, offset, data & 0xff);
-		m_oki[0]->set_rom_bank((data & 0x10) >> 4);
-	}
-	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
-	{
-		logerror("Writing unknown upper MSB command (%04x) to coin control\n",data & 0xff00);
-	}
-}
-
-
-READ16_MEMBER(toaplan2_state::shared_ram_r)
+u8 toaplan2_state::shared_ram_r(offs_t offset)
 {
 	return m_shared_ram[offset];
 }
 
 
-WRITE16_MEMBER(toaplan2_state::shared_ram_w)
+void toaplan2_state::shared_ram_w(offs_t offset, u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_shared_ram[offset] = data;
-	}
+	m_shared_ram[offset] = data;
 }
 
 
-CUSTOM_INPUT_MEMBER(toaplan2_state::c2map_r)
+READ_LINE_MEMBER(toaplan2_state::c2map_r)
 {
 	// For Teki Paki hardware
 	// bit 4 high signifies secondary CPU is ready
@@ -674,41 +673,39 @@ CUSTOM_INPUT_MEMBER(toaplan2_state::c2map_r)
 }
 
 
-READ16_MEMBER(toaplan2_state::ghox_p1_h_analog_r)
+u16 toaplan2_state::ghox_p1_h_analog_r()
 {
-	int8_t value, new_value;
-
-	new_value = ioport("PAD1")->read();
+	const s8 new_value = m_io_pad[0]->read();
 	if (new_value == m_old_p1_paddle_h) return 0;
-	value = new_value - m_old_p1_paddle_h;
-	m_old_p1_paddle_h = new_value;
+	const s8 value = new_value - m_old_p1_paddle_h;
+	if (!machine().side_effects_disabled())
+		m_old_p1_paddle_h = new_value;
 	return value;
 }
 
 
-READ16_MEMBER(toaplan2_state::ghox_p2_h_analog_r)
+u16 toaplan2_state::ghox_p2_h_analog_r()
 {
-	int8_t value, new_value;
-
-	new_value = ioport("PAD2")->read();
+	const s8 new_value = m_io_pad[1]->read();
 	if (new_value == m_old_p2_paddle_h) return 0;
-	value = new_value - m_old_p2_paddle_h;
-	m_old_p2_paddle_h = new_value;
+	const s8 value = new_value - m_old_p2_paddle_h;
+	if (!machine().side_effects_disabled())
+		m_old_p2_paddle_h = new_value;
 	return value;
 }
 
-WRITE16_MEMBER(toaplan2_state::fixeight_subcpu_ctrl_w)
+void toaplan2_state::sound_reset_w(u8 data)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & m_sound_reset_bit) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 template<int Chip>
-WRITE8_MEMBER(toaplan2_state::oki_bankswitch_w)
+void toaplan2_state::oki_bankswitch_w(u8 data)
 {
 	m_oki[Chip]->set_rom_bank(data & 1);
 }
 
-WRITE8_MEMBER(toaplan2_state::fixeightbl_oki_bankswitch_w)
+void toaplan2_state::fixeightbl_oki_bankswitch_w(u8 data)
 {
 	data &= 7;
 	if (data <= 4) m_okibank->set_entry(data);
@@ -720,7 +717,7 @@ WRITE8_MEMBER(toaplan2_state::fixeightbl_oki_bankswitch_w)
 ***************************************************************************/
 
 
-WRITE8_MEMBER(toaplan2_state::raizing_z80_bankswitch_w)
+void toaplan2_state::raizing_z80_bankswitch_w(u8 data)
 {
 	m_audiobank->set_entry(data & 0x0f);
 }
@@ -731,14 +728,18 @@ WRITE8_MEMBER(toaplan2_state::raizing_z80_bankswitch_w)
 // it may not be a coincidence that the composer and sound designer for
 // these two games, Manabu "Santaruru" Namiki, came to Raizing from NMK...
 
-WRITE8_MEMBER(toaplan2_state::raizing_oki_bankswitch_w)
+void toaplan2_state::raizing_oki_bankswitch_w(offs_t offset, u8 data)
 {
-	m_nmk112->okibank_w(offset, data & 0x0f);
-	m_nmk112->okibank_w(offset + 1, (data >> 4) & 0x0f);
+	m_raizing_okibank[(offset & 4) >> 2][offset & 3]->set_entry(data & 0xf);
+	m_raizing_okibank[(offset & 4) >> 2][4 + (offset & 3)]->set_entry(data & 0xf);
+	offset++;
+	data >>= 4;
+	m_raizing_okibank[(offset & 4) >> 2][offset & 3]->set_entry(data & 0xf);
+	m_raizing_okibank[(offset & 4) >> 2][4 + (offset & 3)]->set_entry(data & 0xf);
 }
 
 
-READ8_MEMBER(toaplan2_state::bgaregga_E01D_r)
+u8 toaplan2_state::bgaregga_E01D_r()
 {
 	// the Z80 reads this address during its IRQ routine,
 	// and reads the soundlatch only if the lowest bit is clear.
@@ -746,50 +747,49 @@ READ8_MEMBER(toaplan2_state::bgaregga_E01D_r)
 }
 
 
-READ16_MEMBER(toaplan2_state::batrider_z80_busack_r)
+u16 toaplan2_state::batrider_z80_busack_r()
 {
 	// Bit 0x01 returns the status of BUSAK from the Z80.
 	// These accesses are made when the 68K wants to read the Z80
 	// ROM code. Failure to return the correct status incurrs a Sound Error.
 
-
 	return m_z80_busreq;    // Loop BUSRQ to BUSAK
 }
 
 
-WRITE8_MEMBER(toaplan2_state::batrider_z80_busreq_w)
+void toaplan2_state::batrider_z80_busreq_w(u8 data)
 {
 	m_z80_busreq = (data & 0x01);   // see batrider_z80_busack_r above
 }
 
 
-READ16_MEMBER(toaplan2_state::batrider_z80rom_r)
+u16 toaplan2_state::batrider_z80rom_r(offs_t offset)
 {
 	return m_z80_rom[offset];
 }
 
 // these two latches are always written together, via a single move.l instruction
-WRITE8_MEMBER(toaplan2_state::batrider_soundlatch_w)
+void toaplan2_state::batrider_soundlatch_w(u8 data)
 {
-	m_soundlatch->write(space, offset, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
-WRITE8_MEMBER(toaplan2_state::batrider_soundlatch2_w)
+void toaplan2_state::batrider_soundlatch2_w(u8 data)
 {
-	m_soundlatch2->write(space, offset, data & 0xff);
+	m_soundlatch2->write(data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE16_MEMBER(toaplan2_state::batrider_unknown_sound_w)
+void toaplan2_state::batrider_unknown_sound_w(u16 data)
 {
 	// the 68K writes here when it wants a sound acknowledge IRQ from the Z80
 	// for bbakraid this is on every sound command; for batrider, only on certain commands
 }
 
 
-WRITE16_MEMBER(toaplan2_state::batrider_clear_sndirq_w)
+void toaplan2_state::batrider_clear_sndirq_w(u16 data)
 {
 	// not sure whether this is correct
 	// the 68K writes here during the sound IRQ handler, and nowhere else...
@@ -797,27 +797,27 @@ WRITE16_MEMBER(toaplan2_state::batrider_clear_sndirq_w)
 }
 
 
-WRITE8_MEMBER(toaplan2_state::batrider_sndirq_w)
+void toaplan2_state::batrider_sndirq_w(u8 data)
 {
 	// if batrider_clear_sndirq_w() is correct, should this be ASSERT_LINE?
 	m_maincpu->set_input_line(m_sndirq_line, HOLD_LINE);
 }
 
 
-WRITE8_MEMBER(toaplan2_state::batrider_clear_nmi_w)
+void toaplan2_state::batrider_clear_nmi_w(u8 data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
-READ16_MEMBER(toaplan2_state::bbakraid_eeprom_r)
+u16 toaplan2_state::bbakraid_eeprom_r()
 {
 	// Bit 0x01 returns the status of BUSAK from the Z80.
 	// BUSRQ is activated via bit 0x10 on the EEPROM write port.
 	// These accesses are made when the 68K wants to read the Z80
 	// ROM code. Failure to return the correct status incurrs a Sound Error.
 
-	int data;
+	u8 data;
 	data  = ((m_eeprom->do_read() & 0x01) << 4);
 	data |= ((m_z80_busreq >> 4) & 0x01);   // Loop BUSRQ to BUSAK
 
@@ -825,13 +825,12 @@ READ16_MEMBER(toaplan2_state::bbakraid_eeprom_r)
 }
 
 
-WRITE16_MEMBER(toaplan2_state::bbakraid_eeprom_w)
+void toaplan2_state::bbakraid_eeprom_w(u8 data)
 {
-	if (data & ~0x001f)
-		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",m_maincpu->pc(),data);
+	if (data & ~0x1f)
+		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %02X\n",m_maincpu->pc(),data);
 
-	if ( ACCESSING_BITS_0_7 )
-		ioport("EEPROMOUT")->write(data, 0xff);
+	m_eepromout->write(data, 0xff);
 
 	m_z80_busreq = data & 0x10; // see bbakraid_eeprom_r above
 }
@@ -841,7 +840,6 @@ INTERRUPT_GEN_MEMBER(toaplan2_state::bbakraid_snd_interrupt)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }
-
 
 
 void toaplan2_state::tekipaki_68k_mem(address_map &map)
@@ -855,12 +853,11 @@ void toaplan2_state::tekipaki_68k_mem(address_map &map)
 	map(0x180010, 0x180011).portr("DSWB");
 	map(0x180020, 0x180021).portr("SYS");
 	map(0x180030, 0x180031).portr("JMPR");           // CPU 2 busy and Region Jumper block
-	map(0x180040, 0x180041).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x180041, 0x180041).w(FUNC(toaplan2_state::coin_w));
 	map(0x180050, 0x180051).portr("IN1");
 	map(0x180060, 0x180061).portr("IN2");
 	map(0x180071, 0x180071).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
-
 
 
 void toaplan2_state::ghox_68k_mem(address_map &map)
@@ -871,8 +868,8 @@ void toaplan2_state::ghox_68k_mem(address_map &map)
 	map(0x0c0000, 0x0c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x100000, 0x100001).r(FUNC(toaplan2_state::ghox_p1_h_analog_r));
 	map(0x140000, 0x14000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
-	map(0x180000, 0x180fff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
-	map(0x181000, 0x181001).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x180000, 0x180fff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff);
+	map(0x181001, 0x181001).w(FUNC(toaplan2_state::coin_w));
 	map(0x18100c, 0x18100d).portr("JMPR");
 }
 
@@ -884,8 +881,8 @@ void toaplan2_state::dogyuun_68k_mem(address_map &map)
 	map(0x200010, 0x200011).portr("IN1");
 	map(0x200014, 0x200015).portr("IN2");
 	map(0x200018, 0x200019).portr("SYS");
-	map(0x20001c, 0x20001d).w(FUNC(toaplan2_state::toaplan2_v25_coin_word_w)); // Coin count/lock + v25 reset line
-	map(0x210000, 0x21ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
+	map(0x20001d, 0x20001d).w(FUNC(toaplan2_state::coin_sound_reset_w)); // Coin count/lock + v25 reset line
+	map(0x210000, 0x21ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff);
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500000, 0x50000d).rw(m_vdp[1], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
@@ -897,11 +894,11 @@ void toaplan2_state::kbash_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram();
-	map(0x200000, 0x200fff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
+	map(0x200000, 0x200fff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff);
 	map(0x208010, 0x208011).portr("IN1");
 	map(0x208014, 0x208015).portr("IN2");
 	map(0x208018, 0x208019).portr("SYS");
-	map(0x20801c, 0x20801d).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x20801d, 0x20801d).w(FUNC(toaplan2_state::coin_w));
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));         // test bit 8
@@ -921,7 +918,7 @@ void toaplan2_state::kbash2_68k_mem(address_map &map)
 	map(0x200010, 0x200011).portr("IN1");
 	map(0x200014, 0x200015).portr("IN2");
 	map(0x200018, 0x200019).portr("SYS");
-	map(0x200021, 0x200021).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x200021, 0x200021).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x200025, 0x200025).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x200029, 0x200029).w(FUNC(toaplan2_state::oki_bankswitch_w<0>));
 	map(0x20002c, 0x20002d).r(FUNC(toaplan2_state::video_count_r));
@@ -950,7 +947,7 @@ void toaplan2_state::truxton2_68k_mem(address_map &map)
 	map(0x70000a, 0x70000b).portr("SYS");
 	map(0x700011, 0x700011).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700014, 0x700017).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0x70001e, 0x70001f).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x70001f, 0x70001f).w(FUNC(toaplan2_state::coin_w));
 }
 
 
@@ -960,8 +957,8 @@ void toaplan2_state::pipibibs_68k_mem(address_map &map)
 	map(0x080000, 0x082fff).ram();
 	map(0x0c0000, 0x0c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x140000, 0x14000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
-	map(0x190000, 0x190fff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
-	map(0x19c01c, 0x19c01d).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x190000, 0x190fff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff);
+	map(0x19c01d, 0x19c01d).w(FUNC(toaplan2_state::coin_w));
 	map(0x19c020, 0x19c021).portr("DSWA");
 	map(0x19c024, 0x19c025).portr("DSWB");
 	map(0x19c028, 0x19c029).portr("JMPR");
@@ -979,12 +976,12 @@ void toaplan2_state::pipibibi_bootleg_68k_mem(address_map &map)
 	map(0x083800, 0x087fff).ram();             // SpriteRAM (unused)
 	map(0x0c0000, 0x0c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x120000, 0x120fff).ram();             // Copy of SpriteRAM ?
-//  AM_RANGE(0x13f000, 0x13f001) AM_WRITENOP        // ???
+//  map(0x13f000, 0x13f001).nopw();        // ???
 	map(0x180000, 0x182fff).rw(m_vdp[0], FUNC(gp9001vdp_device::pipibibi_bootleg_videoram16_r), FUNC(gp9001vdp_device::pipibibi_bootleg_videoram16_w)); // TileRAM
 	map(0x188000, 0x18800f).w(m_vdp[0], FUNC(gp9001vdp_device::pipibibi_bootleg_scroll_w));
-	map(0x190002, 0x190003).r(FUNC(toaplan2_state::shared_ram_r));  // Z80 ready ?
-	map(0x190010, 0x190011).w(FUNC(toaplan2_state::shared_ram_w)); // Z80 task to perform
-	map(0x19c01c, 0x19c01d).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x190003, 0x190003).r(FUNC(toaplan2_state::shared_ram_r));  // Z80 ready ?
+	map(0x190011, 0x190011).w(FUNC(toaplan2_state::shared_ram_w)); // Z80 task to perform
+	map(0x19c01d, 0x19c01d).w(FUNC(toaplan2_state::coin_w));
 	map(0x19c020, 0x19c021).portr("DSWA");
 	map(0x19c024, 0x19c025).portr("DSWB");
 	map(0x19c028, 0x19c029).portr("JMPR");
@@ -1002,15 +999,15 @@ void toaplan2_state::fixeight_68k_mem(address_map &map)
 	map(0x200004, 0x200005).portr("IN2");
 	map(0x200008, 0x200009).portr("IN3");
 	map(0x200010, 0x200011).portr("SYS");
-	map(0x20001c, 0x20001d).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
-	map(0x280000, 0x28ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
+	map(0x20001d, 0x20001d).w(FUNC(toaplan2_state::coin_w));
+	map(0x280000, 0x28ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff);
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::tx_videoram_w)).share("tx_videoram");
 	map(0x502000, 0x5021ff).ram().share("tx_lineselect");
 	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::tx_linescroll_w)).share("tx_linescroll");
 	map(0x600000, 0x60ffff).ram().w(FUNC(toaplan2_state::tx_gfxram_w)).share("tx_gfxram");
-	map(0x700000, 0x700001).w(FUNC(toaplan2_state::fixeight_subcpu_ctrl_w));
+	map(0x700000, 0x700001).w(FUNC(toaplan2_state::sound_reset_w)).umask16(0x00ff).cswidth(16);
 	map(0x800000, 0x800001).r(FUNC(toaplan2_state::video_count_r));
 }
 
@@ -1039,12 +1036,12 @@ void toaplan2_state::vfive_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram();
-//  AM_RANGE(0x200000, 0x20ffff) AM_NOP // Read at startup by broken ROM checksum code - see notes
+//  map(0x200000, 0x20ffff).noprw(); // Read at startup by broken ROM checksum code - see notes
 	map(0x200010, 0x200011).portr("IN1");
 	map(0x200014, 0x200015).portr("IN2");
 	map(0x200018, 0x200019).portr("SYS");
-	map(0x20001c, 0x20001d).w(FUNC(toaplan2_state::toaplan2_v25_coin_word_w)); // Coin count/lock + v25 reset line
-	map(0x210000, 0x21ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
+	map(0x20001d, 0x20001d).w(FUNC(toaplan2_state::coin_sound_reset_w)); // Coin count/lock + v25 reset line
+	map(0x210000, 0x21ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff);
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));
@@ -1058,8 +1055,8 @@ void toaplan2_state::batsugun_68k_mem(address_map &map)
 	map(0x200010, 0x200011).portr("IN1");
 	map(0x200014, 0x200015).portr("IN2");
 	map(0x200018, 0x200019).portr("SYS");
-	map(0x20001c, 0x20001d).w(FUNC(toaplan2_state::toaplan2_v25_coin_word_w)); // Coin count/lock + v25 reset line
-	map(0x210000, 0x21ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
+	map(0x20001d, 0x20001d).w(FUNC(toaplan2_state::coin_sound_reset_w)); // Coin count/lock + v25 reset line
+	map(0x210000, 0x21ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff);
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500000, 0x50000d).rw(m_vdp[1], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
@@ -1107,11 +1104,11 @@ void toaplan2_state::othldrby_68k_mem(address_map &map)
 	map(0x700010, 0x700011).portr("IN2");
 	map(0x70001c, 0x70001d).portr("SYS");
 	map(0x700031, 0x700031).w(FUNC(toaplan2_state::oki_bankswitch_w<0>));
-	map(0x700034, 0x700035).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x700035, 0x700035).w(FUNC(toaplan2_state::coin_w));
 }
 
 
-WRITE16_MEMBER(toaplan2_state::enmadaio_oki_bank_w)
+void toaplan2_state::enmadaio_oki_bank_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	data &= mem_mask;
 
@@ -1128,7 +1125,7 @@ WRITE16_MEMBER(toaplan2_state::enmadaio_oki_bank_w)
 void toaplan2_state::enmadaio_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x103fff).ram(); // AM_SHARE("nvram")
+	map(0x100000, 0x103fff).ram(); //.share("nvram");
 	map(0x104000, 0x10ffff).ram();
 
 	map(0x200000, 0x20000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
@@ -1143,7 +1140,7 @@ void toaplan2_state::enmadaio_68k_mem(address_map &map)
 	map(0x700010, 0x700011).portr("MISC3");
 	map(0x700014, 0x700015).portr("MISC4");
 	map(0x700018, 0x700019).portr("SYS");
-	map(0x70001c, 0x70001d).portr("UNK"); //AM_READ_PORT("SYS")
+	map(0x70001c, 0x70001d).portr("UNK"); //.portr("SYS");
 
 	map(0x700020, 0x700021).w(FUNC(toaplan2_state::enmadaio_oki_bank_w)); // oki bank
 
@@ -1169,7 +1166,7 @@ void toaplan2_state::snowbro2_68k_mem(address_map &map)
 	map(0x700018, 0x700019).portr("IN4");
 	map(0x70001c, 0x70001d).portr("SYS");
 	map(0x700031, 0x700031).w(FUNC(toaplan2_state::oki_bankswitch_w<0>));
-	map(0x700034, 0x700035).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x700035, 0x700035).w(FUNC(toaplan2_state::coin_w));
 }
 
 
@@ -1177,8 +1174,8 @@ void toaplan2_state::mahoudai_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x218000, 0x21bfff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
-	map(0x21c01c, 0x21c01d).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x218000, 0x21bfff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff);
+	map(0x21c01d, 0x21c01d).w(FUNC(toaplan2_state::coin_w));
 	map(0x21c020, 0x21c021).portr("IN1");
 	map(0x21c024, 0x21c025).portr("IN2");
 	map(0x21c028, 0x21c029).portr("SYS");
@@ -1200,9 +1197,9 @@ void toaplan2_state::shippumd_68k_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x218000, 0x21bfff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
-//  AM_RANGE(0x21c008, 0x21c009) AM_WRITENOP                    // ???
-	map(0x21c01c, 0x21c01d).w(FUNC(toaplan2_state::shippumd_coin_word_w)); // Coin count/lock + oki bankswitch
+	map(0x218000, 0x21bfff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff);
+//  map(0x21c008, 0x21c009).nopw();                    // ???
+	map(0x21c01d, 0x21c01d).w(FUNC(toaplan2_state::shippumd_coin_w)); // Coin count/lock + oki bankswitch
 	map(0x21c020, 0x21c021).portr("IN1");
 	map(0x21c024, 0x21c025).portr("IN2");
 	map(0x21c028, 0x21c029).portr("SYS");
@@ -1224,8 +1221,8 @@ void toaplan2_state::bgaregga_68k_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x218000, 0x21bfff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
-	map(0x21c01c, 0x21c01d).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x218000, 0x21bfff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff);
+	map(0x21c01d, 0x21c01d).w(FUNC(toaplan2_state::coin_w));
 	map(0x21c020, 0x21c021).portr("IN1");
 	map(0x21c024, 0x21c025).portr("IN2");
 	map(0x21c028, 0x21c029).portr("SYS");
@@ -1261,9 +1258,9 @@ void toaplan2_state::batrider_68k_mem(address_map &map)
 	map(0x200000, 0x207fff).ram().share("mainram");
 	map(0x208000, 0x20ffff).ram();
 	map(0x300000, 0x37ffff).r(FUNC(toaplan2_state::batrider_z80rom_r));
-	map(0x400000, 0x40000d).lrw16("gp9001_invert_rw",
-							[this](offs_t offset, u16 mem_mask) { return m_vdp[0]->read(offset ^ (0xc/2), mem_mask); },
-							[this](offs_t offset, u16 data, u16 mem_mask) { m_vdp[0]->write(offset ^ (0xc/2), data, mem_mask); });
+	map(0x400000, 0x40000d).lrw16(
+							NAME([this](offs_t offset, u16 mem_mask) { return m_vdp[0]->read(offset ^ (0xc/2), mem_mask); }),
+							NAME([this](offs_t offset, u16 data, u16 mem_mask) { m_vdp[0]->write(offset ^ (0xc/2), data, mem_mask); }));
 	map(0x500000, 0x500001).portr("IN");
 	map(0x500002, 0x500003).portr("SYS-DSW");
 	map(0x500004, 0x500005).portr("DSW");
@@ -1271,7 +1268,7 @@ void toaplan2_state::batrider_68k_mem(address_map &map)
 	map(0x500009, 0x500009).r("soundlatch3", FUNC(generic_latch_8_device::read));
 	map(0x50000b, 0x50000b).r("soundlatch4", FUNC(generic_latch_8_device::read));
 	map(0x50000c, 0x50000d).r(FUNC(toaplan2_state::batrider_z80_busack_r));
-	map(0x500010, 0x500011).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x500011, 0x500011).w(FUNC(toaplan2_state::coin_w));
 	map(0x500021, 0x500021).w(FUNC(toaplan2_state::batrider_soundlatch_w));
 	map(0x500023, 0x500023).w(FUNC(toaplan2_state::batrider_soundlatch2_w));
 	map(0x500024, 0x500025).w(FUNC(toaplan2_state::batrider_unknown_sound_w));
@@ -1290,14 +1287,14 @@ void toaplan2_state::bbakraid_68k_mem(address_map &map)
 	map(0x200000, 0x207fff).ram().share("mainram");
 	map(0x208000, 0x20ffff).ram();
 	map(0x300000, 0x33ffff).r(FUNC(toaplan2_state::batrider_z80rom_r));
-	map(0x400000, 0x40000d).lrw16("gp9001_invert_rw",
-							[this](offs_t offset, u16 mem_mask) { return m_vdp[0]->read(offset ^ (0xc/2), mem_mask); },
-							[this](offs_t offset, u16 data, u16 mem_mask) { m_vdp[0]->write(offset ^ (0xc/2), data, mem_mask); });
+	map(0x400000, 0x40000d).lrw16(
+							NAME([this](offs_t offset, u16 mem_mask) { return m_vdp[0]->read(offset ^ (0xc/2), mem_mask); }),
+							NAME([this](offs_t offset, u16 data, u16 mem_mask) { m_vdp[0]->write(offset ^ (0xc/2), data, mem_mask); }));
 	map(0x500000, 0x500001).portr("IN");
 	map(0x500002, 0x500003).portr("SYS-DSW");
 	map(0x500004, 0x500005).portr("DSW");
 	map(0x500006, 0x500007).r(FUNC(toaplan2_state::video_count_r));
-	map(0x500008, 0x500009).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
+	map(0x500009, 0x500009).w(FUNC(toaplan2_state::coin_w));
 	map(0x500011, 0x500011).r("soundlatch3", FUNC(generic_latch_8_device::read));
 	map(0x500013, 0x500013).r("soundlatch4", FUNC(generic_latch_8_device::read));
 	map(0x500015, 0x500015).w(FUNC(toaplan2_state::batrider_soundlatch_w));
@@ -1305,13 +1302,11 @@ void toaplan2_state::bbakraid_68k_mem(address_map &map)
 	map(0x500018, 0x500019).r(FUNC(toaplan2_state::bbakraid_eeprom_r));
 	map(0x50001a, 0x50001b).w(FUNC(toaplan2_state::batrider_unknown_sound_w));
 	map(0x50001c, 0x50001d).w(FUNC(toaplan2_state::batrider_clear_sndirq_w));
-	map(0x50001e, 0x50001f).w(FUNC(toaplan2_state::bbakraid_eeprom_w));
+	map(0x50001f, 0x50001f).w(FUNC(toaplan2_state::bbakraid_eeprom_w));
 	map(0x500080, 0x500081).w(FUNC(toaplan2_state::batrider_textdata_dma_w));
 	map(0x500082, 0x500083).w(FUNC(toaplan2_state::batrider_pal_text_dma_w));
 	map(0x5000c0, 0x5000cf).w(FUNC(toaplan2_state::batrider_objectbank_w)).umask16(0x00ff);
 }
-
-
 
 void toaplan2_state::pipibibs_sound_z80_mem(address_map &map)
 {
@@ -1327,7 +1322,7 @@ void toaplan2_state::raizing_sound_z80_mem(address_map &map)
 	map(0xc000, 0xdfff).ram().share("shared_ram");
 	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xe004, 0xe004).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe00e, 0xe00e).w(FUNC(toaplan2_state::toaplan2_coin_w));
+	map(0xe00e, 0xe00e).w(FUNC(toaplan2_state::coin_w));
 }
 
 
@@ -1365,7 +1360,7 @@ void toaplan2_state::batrider_sound_z80_port(address_map &map)
 	map(0x4a, 0x4a).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0x80, 0x81).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x82, 0x82).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x84, 0x84).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x84, 0x84).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x88, 0x88).w(FUNC(toaplan2_state::raizing_z80_bankswitch_w));
 	map(0xc0, 0xc6).w(FUNC(toaplan2_state::raizing_oki_bankswitch_w));
 }
@@ -1437,25 +1432,33 @@ void toaplan2_state::enmadaio_oki(address_map &map)
 	map(0x00000, 0x3ffff).bankr("okibank");
 }
 
+// similar as NMK112, but GAL-driven; NOT actual NMK112 is present
+template<unsigned Chip>
+void toaplan2_state::raizing_oki(address_map &map)
+{
+	map(0x00000, 0x000ff).bankr(m_raizing_okibank[Chip][0]);
+	map(0x00100, 0x001ff).bankr(m_raizing_okibank[Chip][1]);
+	map(0x00200, 0x002ff).bankr(m_raizing_okibank[Chip][2]);
+	map(0x00300, 0x003ff).bankr(m_raizing_okibank[Chip][3]);
+	map(0x00400, 0x0ffff).bankr(m_raizing_okibank[Chip][4]);
+	map(0x10000, 0x1ffff).bankr(m_raizing_okibank[Chip][5]);
+	map(0x20000, 0x2ffff).bankr(m_raizing_okibank[Chip][6]);
+	map(0x30000, 0x3ffff).bankr(m_raizing_okibank[Chip][7]);
+}
 
 
-READ8_MEMBER(toaplan2_state::tekipaki_cmdavailable_r)
+u8 toaplan2_state::tekipaki_cmdavailable_r()
 {
 	if (m_soundlatch->pending_r()) return 0xff;
 	else return 0x00;
 };
 
-void toaplan2_state::hd647180_mem_map(address_map &map)
-{
-	map(0x00000, 0x03fff).rom();   /* Internal 16k byte ROM */
-	map(0x0fe00, 0x0ffff).ram();   /* Internal 512 byte RAM */
-}
-
 void toaplan2_state::hd647180_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x60, 0x60).r(FUNC(toaplan2_state::tekipaki_cmdavailable_r));
+	map(0x60, 0x60).nopr();
+	map(0x70, 0x75).nopw(); // DDRs are written with the wrong upper addresses!
 	map(0x84, 0x84).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 
 	map(0x82, 0x82).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
@@ -1465,10 +1468,6 @@ void toaplan2_state::hd647180_io_map(address_map &map)
 
 void toaplan2_state::ghox_hd647180_mem_map(address_map &map)
 {
-	map(0x00000, 0x03fff).rom();   // Internal 16k byte ROM
-	map(0x0fe00, 0x0ffff).ram();   // Internal 512 byte RAM
-	map(0x3fe00, 0x3ffff).ram();   // Relocated internal RAM (RMCR = 30)
-
 	map(0x40000, 0x407ff).ram().share("shared_ram");
 
 	map(0x80002, 0x80002).portr("DSWA");
@@ -1536,7 +1535,6 @@ void toaplan2_state::ghox_hd647180_mem_map(address_map &map)
 *****************************************************************************/
 
 
-
 static INPUT_PORTS_START( toaplan2_2b )
 	PORT_START("IN1")
 	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )
@@ -1575,7 +1573,6 @@ static INPUT_PORTS_START( toaplan2_3b )
 	PORT_MODIFY("IN2")
 	TOAPLAN_JOY_UDLR_3_BUTTONS( 2 )
 INPUT_PORTS_END
-
 
 
 static INPUT_PORTS_START( tekipaki )
@@ -1626,7 +1623,7 @@ static INPUT_PORTS_START( tekipaki )
 //  PORT_CONFSETTING(        0x000d, DEF_STR( Japan ) )
 //  PORT_CONFSETTING(        0x000e, DEF_STR( Japan ) )
 	PORT_CONFSETTING(       0x000f, "Japan (Distributed by Tecmo)" )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, toaplan2_state,c2map_r, nullptr)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(toaplan2_state, c2map_r)
 INPUT_PORTS_END
 
 
@@ -2039,7 +2036,7 @@ static INPUT_PORTS_START( whoopee )
 	PORT_INCLUDE( pipibibs )
 
 	PORT_MODIFY("JMPR")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, toaplan2_state,c2map_r, nullptr)   // bit 0x10 sound ready
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(toaplan2_state, c2map_r)   // bit 0x10 sound ready
 INPUT_PORTS_END
 
 
@@ -2276,7 +2273,6 @@ static INPUT_PORTS_START( vfive )
 INPUT_PORTS_END
 
 
-
 static INPUT_PORTS_START( batsugun )
 	PORT_INCLUDE( toaplan2_3b )
 
@@ -2389,15 +2385,15 @@ static INPUT_PORTS_START( pwrkick )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Button")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Center Button")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Right Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SLOT_STOP1 ) PORT_NAME("Left")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SLOT_STOP2 ) PORT_NAME("Center")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SLOT_STOP3 ) PORT_NAME("Right")
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Coin 2 (" UNICODE_YEN "10)")
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Down Button")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SLOT_STOP4 ) PORT_NAME("Down") // does this button really exist?
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MEMORY_RESET )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -3205,17 +3201,18 @@ static GFXDECODE_START( gfx_batrider )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(toaplan2_state::tekipaki)
-
+void toaplan2_state::tekipaki(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);         // 10MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::tekipaki_68k_mem);
 
-	Z180(config, m_audiocpu, 10_MHz_XTAL);          // HD647180 CPU actually
-	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::hd647180_mem_map);
-	m_audiocpu->set_addrmap(AS_IO, &toaplan2_state::hd647180_io_map);
+	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, 10_MHz_XTAL));
+	// 16k byte ROM and 512 byte RAM are internal
+	audiocpu.set_addrmap(AS_IO, &toaplan2_state::hd647180_io_map);
+	audiocpu.in_pa_callback().set(FUNC(toaplan2_state::tekipaki_cmdavailable_r));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3246,18 +3243,18 @@ MACHINE_CONFIG_START(toaplan2_state::tekipaki)
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", 27_MHz_XTAL/8));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(toaplan2_state::ghox)
-
+void toaplan2_state::ghox(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);         /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::ghox_68k_mem);
 
-	Z180(config, m_audiocpu, 10_MHz_XTAL);          /* HD647180 CPU actually */
+	HD647180X(config, m_audiocpu, 10_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::ghox_hd647180_mem_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,ghox)
 
@@ -3284,13 +3281,13 @@ MACHINE_CONFIG_START(toaplan2_state::ghox)
 	SPEAKER(config, "mono").front_center();
 
 	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 1.0); // verified on pcb
-MACHINE_CONFIG_END
+}
 
 /* probably dogyuun, vfive and kbash use the same decryption table;
 those 3 games have been seen with the NITRO905 chip, other alias are
 ts002mach for dogyuun, ts004dash for kbash and ts007spy for vfive */
 
-static const uint8_t nitro_decryption_table[256] = {
+static const u8 nitro_decryption_table[256] = {
 	0x1b,0x56,0x75,0x88,0x8c,0x06,0x58,0x72, 0x83,0x86,0x36,0x1a,0x5f,0xd3,0x8c,0xe9, /* 00 */
 	/* *//* *//* *//* *//* *//* *//* *//* */ /* *//* *//* *//* *//* *//* *//* *//* */
 	0x22,0x0f,0x03,0x2a,0xeb,0x2a,0xf9,0x0f, 0xa4,0xbd,0x75,0xf3,0x4f,0x53,0x8e,0xfe, /* 10 */
@@ -3336,8 +3333,8 @@ a4849 cd
 
 */
 
-MACHINE_CONFIG_START(toaplan2_state::dogyuun)
-
+void toaplan2_state::dogyuun(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 25_MHz_XTAL/2);           /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::dogyuun_68k_mem);
@@ -3376,11 +3373,11 @@ MACHINE_CONFIG_START(toaplan2_state::dogyuun)
 
 	OKIM6295(config, m_oki[0], 25_MHz_XTAL/24, okim6295_device::PIN7_HIGH); // verified on PCB
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::kbash)
-
+void toaplan2_state::kbash(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);         /* 16MHz Oscillator */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::kbash_68k_mem);
@@ -3420,11 +3417,11 @@ MACHINE_CONFIG_START(toaplan2_state::kbash)
 
 	OKIM6295(config, m_oki[0], 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::kbash2)
-
+void toaplan2_state::kbash2(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);         /* 16MHz Oscillator */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::kbash2_68k_mem);
@@ -3456,11 +3453,11 @@ MACHINE_CONFIG_START(toaplan2_state::kbash2)
 
 	OKIM6295(config, m_oki[1], 16_MHz_XTAL/16, okim6295_device::PIN7_HIGH);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::truxton2)
-
+void toaplan2_state::truxton2(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);         /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::truxton2_68k_mem);
@@ -3500,11 +3497,11 @@ MACHINE_CONFIG_START(toaplan2_state::truxton2)
 	OKIM6295(config, m_oki[0], 16_MHz_XTAL/4, okim6295_device::PIN7_LOW); // verified on PCB
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 #endif
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::pipibibs)
-
+void toaplan2_state::pipibibs(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);         // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibs_68k_mem);
@@ -3512,7 +3509,7 @@ MACHINE_CONFIG_START(toaplan2_state::pipibibs)
 	Z80(config, m_audiocpu, 27_MHz_XTAL/8);         // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibs_sound_z80_mem);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3541,20 +3538,20 @@ MACHINE_CONFIG_START(toaplan2_state::pipibibs)
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", 27_MHz_XTAL/8)); // verified on PCB
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::pipibibsbl)
-
+void toaplan2_state::pipibibsbl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL) // ??? (position labeled "68000-12" but 10 MHz-rated parts used)
-	MCFG_DEVICE_PROGRAM_MAP(pipibibi_bootleg_68k_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(toaplan2_state, pipibibsbl_irq_ack)
+	M68000(config, m_maincpu, 12_MHz_XTAL); // ??? (position labeled "68000-12" but 10 MHz-rated parts used)
+	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibi_bootleg_68k_mem);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &toaplan2_state::cpu_space_pipibibsbl_map);
 
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 2); // GoldStar Z8400B; clock source and divider unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibs_sound_z80_mem);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3580,12 +3577,12 @@ MACHINE_CONFIG_START(toaplan2_state::pipibibsbl)
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", 28.322_MHz_XTAL / 8)); // ???
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 /* x = modified to match batsugun 'unencrypted' code - '?' likewise, but not so sure about them */
 /* e = opcodes used in the EEPROM service routine */
 /* this one seems more different to the other tables */
-static const uint8_t ts001turbo_decryption_table[256] = {
+static const u8 ts001turbo_decryption_table[256] = {
 	0x90,0x05,0x57,0x5f,0xfe,0x4f,0xbd,0x36, 0x80,0x8b,0x8a,0x0a,0x89,0x90,0x47,0x80, /* 00 */
 			/*r*//*r*//*r*//*r*//*r*//*r*//*r*/ /*r*//*r*//*r*//*r*//*r*/     /*r*//*r*/
 	0x22,0x90,0x90,0x5d,0x81,0x3c,0xb5,0x83, 0x68,0xff,0x75,0x75,0x8d,0x5b,0x8a,0x38, /* 10 */
@@ -3621,8 +3618,8 @@ static const uint8_t ts001turbo_decryption_table[256] = {
 };
 
 
-MACHINE_CONFIG_START(toaplan2_state::fixeight)
-
+void toaplan2_state::fixeight(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);         // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::fixeight_68k_mem);
@@ -3659,15 +3656,15 @@ MACHINE_CONFIG_START(toaplan2_state::fixeight)
 
 	OKIM6295(config, m_oki[0], 16_MHz_XTAL/16, okim6295_device::PIN7_HIGH); /* verified on pcb */
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::fixeightbl)
-
+void toaplan2_state::fixeightbl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))         /* 10MHz Oscillator */
-	MCFG_DEVICE_PROGRAM_MAP(fixeightbl_68k_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(toaplan2_state, fixeightbl_irq_ack)
+	M68000(config, m_maincpu, XTAL(10'000'000));         /* 10MHz Oscillator */
+	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::fixeightbl_68k_mem);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &toaplan2_state::cpu_space_fixeightbl_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3695,11 +3692,11 @@ MACHINE_CONFIG_START(toaplan2_state::fixeightbl)
 	OKIM6295(config, m_oki[0], 14_MHz_XTAL/16, okim6295_device::PIN7_LOW);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_oki[0]->set_addrmap(0, &toaplan2_state::fixeightbl_oki);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::vfive)
-
+void toaplan2_state::vfive(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 20_MHz_XTAL/2);   // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::vfive_68k_mem);
@@ -3732,11 +3729,11 @@ MACHINE_CONFIG_START(toaplan2_state::vfive)
 	SPEAKER(config, "mono").front_center();
 
 	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 1.0); // verified on PCB
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::batsugun)
-
+void toaplan2_state::batsugun(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);           // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::batsugun_68k_mem);
@@ -3777,10 +3774,10 @@ MACHINE_CONFIG_START(toaplan2_state::batsugun)
 
 	OKIM6295(config, m_oki[0], 32_MHz_XTAL/8, okim6295_device::PIN7_LOW);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(toaplan2_state::pwrkick)
-
+void toaplan2_state::pwrkick(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pwrkick_68k_mem);
@@ -3812,9 +3809,10 @@ MACHINE_CONFIG_START(toaplan2_state::pwrkick)
 	// empty YM2151 socket
 	OKIM6295(config, m_oki[0], 27_MHz_XTAL/8, okim6295_device::PIN7_HIGH); // not confirmed
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(toaplan2_state::othldrby)
+void toaplan2_state::othldrby(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::othldrby_68k_mem);
@@ -3844,10 +3842,11 @@ MACHINE_CONFIG_START(toaplan2_state::othldrby)
 
 	OKIM6295(config, m_oki[0], 27_MHz_XTAL/8, okim6295_device::PIN7_HIGH); // not confirmed
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::enmadaio)
+void toaplan2_state::enmadaio(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 20_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::enmadaio_68k_mem);
@@ -3876,10 +3875,10 @@ MACHINE_CONFIG_START(toaplan2_state::enmadaio)
 	OKIM6295(config, m_oki[0], 16_MHz_XTAL/4, okim6295_device::PIN7_LOW); // pin7 not confirmed
 	m_oki[0]->set_addrmap(0, &toaplan2_state::enmadaio_oki);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(toaplan2_state::snowbro2)
-
+void toaplan2_state::snowbro2(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::snowbro2_68k_mem);
@@ -3910,11 +3909,11 @@ MACHINE_CONFIG_START(toaplan2_state::snowbro2)
 
 	OKIM6295(config, m_oki[0], 27_MHz_XTAL/10, okim6295_device::PIN7_HIGH);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::mahoudai)
-
+void toaplan2_state::mahoudai(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::mahoudai_68k_mem);
@@ -3922,7 +3921,7 @@ MACHINE_CONFIG_START(toaplan2_state::mahoudai)
 	Z80(config, m_audiocpu, 32_MHz_XTAL/8);     // 4MHz, 32MHz Oscillator
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::raizing_sound_z80_mem);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3949,57 +3948,22 @@ MACHINE_CONFIG_START(toaplan2_state::mahoudai)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.68);
 
 	OKIM6295(config, m_oki[0], 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::shippumd)
-
+void toaplan2_state::shippumd(machine_config &config)
+{
+	mahoudai(config);
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::shippumd_68k_mem);
+}
 
-	Z80(config, m_audiocpu, 32_MHz_XTAL/8);     // 4MHz, 32MHz Oscillator
-	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::raizing_sound_z80_mem);
-
-	config.m_minimum_quantum = attotime::from_hz(600);
-
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	//m_screen->set_refresh_hz(60);
-	//m_screen->set_size(432, 262);
-	//m_screen->set_visarea(0, 319, 0, 239);
-	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_truxton2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
-	m_screen->set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_textrom);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
-
-	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
-	m_vdp[0]->set_palette(m_palette);
-	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_4);
-
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgaregga)
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	OKIM6295(config, m_oki[0], 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(toaplan2_state::bgaregga)
-
+void toaplan2_state::bgaregga(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bgaregga_68k_mem);
@@ -4007,9 +3971,9 @@ MACHINE_CONFIG_START(toaplan2_state::bgaregga)
 	Z80(config, m_audiocpu, 32_MHz_XTAL/8);     // 4MHz, 32MHz Oscillator
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bgaregga_sound_z80_mem);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,bgaregga)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -4038,25 +4002,24 @@ MACHINE_CONFIG_START(toaplan2_state::bgaregga)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	YM2151(config, "ymsnd", 32_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM2151(config, "ymsnd", 32_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.68);
 
 	OKIM6295(config, m_oki[0], 32_MHz_XTAL/16, okim6295_device::PIN7_HIGH);
+	m_oki[0]->set_addrmap(0, &toaplan2_state::raizing_oki<0>);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	NMK112(config, m_nmk112, 0);
-	m_nmk112->set_rom0_tag("oki1");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::bgareggabl)
+void toaplan2_state::bgareggabl(machine_config &config)
+{
 	bgaregga(config);
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgareggabl)
 
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_bootleg));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(toaplan2_state::batrider)
-
+void toaplan2_state::batrider(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator (verified)
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::batrider_68k_mem);
@@ -4065,9 +4028,9 @@ MACHINE_CONFIG_START(toaplan2_state::batrider)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::batrider_sound_z80_mem);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan2_state::batrider_sound_z80_port);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,bgaregga)
 
 	ADDRESS_MAP_BANK(config, m_dma_space, 0);
 	m_dma_space->set_addrmap(0, &toaplan2_state::batrider_dma_mem);
@@ -4092,6 +4055,7 @@ MACHINE_CONFIG_START(toaplan2_state::batrider)
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
+	m_vdp[0]->set_tile_callback(FUNC(toaplan2_state::batrider_bank_cb));
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,batrider)
@@ -4105,32 +4069,30 @@ MACHINE_CONFIG_START(toaplan2_state::batrider)
 	GENERIC_LATCH_8(config, "soundlatch3");
 	GENERIC_LATCH_8(config, "soundlatch4");
 
-	YM2151(config, "ymsnd", 32_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 1.0); // 4MHz, 32MHz Oscillator (verified)
+	YM2151(config, "ymsnd", 32_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.68); // 4MHz, 32MHz Oscillator (verified)
 
 	OKIM6295(config, m_oki[0], 32_MHz_XTAL/10, okim6295_device::PIN7_HIGH);
+	m_oki[0]->set_addrmap(0, &toaplan2_state::raizing_oki<0>);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	OKIM6295(config, m_oki[1], 32_MHz_XTAL/10, okim6295_device::PIN7_LOW);
+	m_oki[1]->set_addrmap(0, &toaplan2_state::raizing_oki<1>);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	NMK112(config, m_nmk112, 0);
-	m_nmk112->set_rom0_tag("oki1");
-	m_nmk112->set_rom1_tag("oki2");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(toaplan2_state::bbakraid)
-
+void toaplan2_state::bbakraid(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bbakraid_68k_mem);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/6)     /* 5.3333MHz , 32MHz Oscillator */
-	MCFG_DEVICE_PROGRAM_MAP(bbakraid_sound_z80_mem)
-	MCFG_DEVICE_IO_MAP(bbakraid_sound_z80_port)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(toaplan2_state, bbakraid_snd_interrupt,  448)
+	Z80(config, m_audiocpu, XTAL(32'000'000)/6);     /* 5.3333MHz , 32MHz Oscillator */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bbakraid_sound_z80_mem);
+	m_audiocpu->set_addrmap(AS_IO, &toaplan2_state::bbakraid_sound_z80_port);
+	m_audiocpu->set_periodic_int(FUNC(toaplan2_state::bbakraid_snd_interrupt), attotime::from_hz(448));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -4159,6 +4121,7 @@ MACHINE_CONFIG_START(toaplan2_state::bbakraid)
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
+	m_vdp[0]->set_tile_callback(FUNC(toaplan2_state::batrider_bank_cb));
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_1);
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,batrider)
@@ -4174,7 +4137,7 @@ MACHINE_CONFIG_START(toaplan2_state::bbakraid)
 
 	YMZ280B(config, "ymz", 16.9344_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
 	// IRQ not used ???  Connected to a test pin (TP082)
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -4484,13 +4447,14 @@ ROM_START( pipibibsp )
 ROM_END
 
 
+// TODO: this runs on oneshot.cpp hardware. Move to that driver and remove the hacks in video/gp9001.cpp needed to run it in this driver
 ROM_START( pipibibsbl ) /* Based off the proto code. */
 	ROM_REGION( 0x040000, "maincpu", 0 )            /* Main 68K code */
 	ROM_LOAD16_BYTE( "ppbb06.bin", 0x000000, 0x020000, CRC(14c92515) SHA1(2d7f7c89272bb2a8115f163ad651bef3bca5107e) )
 	ROM_LOAD16_BYTE( "ppbb05.bin", 0x000001, 0x020000, CRC(3d51133c) SHA1(d7bd94ad11e9aeb5a5165c5ac6f71950849bcd2f) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )            /* Sound Z80 code */
-	ROM_LOAD( "ppbb08.bin", 0x0000, 0x8000, CRC(101c0358) SHA1(162e02d00b7bdcdd3b48a0cd0527b7428435ec50) )
+	ROM_LOAD( "ppbb08.bin", 0x0000, 0x8000, CRC(101c0358) SHA1(162e02d00b7bdcdd3b48a0cd0527b7428435ec50) ) // same data as komocomo in oneshot.cpp
 
 	ROM_REGION( 0x200000, "gp9001_0", 0 )
 	/* GFX data differs slightly from Toaplan boards ??? */
@@ -4500,9 +4464,28 @@ ROM_START( pipibibsbl ) /* Based off the proto code. */
 	ROM_LOAD16_BYTE( "ppbb04.bin", 0x100001, 0x080000, CRC(70faa734) SHA1(4448f4dbded56c142e57293d371e0a422c3a667e) )
 
 	ROM_REGION( 0x8000, "user1", 0 )            /* ??? Some sort of table */
-	ROM_LOAD( "ppbb07.bin", 0x0000, 0x8000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) )
+	ROM_LOAD( "ppbb07.bin", 0x0000, 0x8000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) ) // 1xxxxxxxxxxxxxx = 0xFF, same data as komocomo in oneshot.cpp
 ROM_END
 
+
+// TODO: determine if this is the correct driver or if this needs to be moved somewhere else, too
+ROM_START( pipibibsbl2 ) // PIPI001 PCB
+	ROM_REGION( 0x040000, "maincpu", 0 )            /* Main 68K code */
+	ROM_LOAD16_BYTE( "06.bin", 0x000000, 0x020000, CRC(25f49c2f) SHA1(a61246ec8a07ba14ee0a01c3458c59840b435c0b) )
+	ROM_LOAD16_BYTE( "07.bin", 0x000001, 0x020000, CRC(15250177) SHA1(a5ee5ccc219f300d7387b45dc8f8b72fd0f37d7e) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )            /* Sound Z80 code */
+	ROM_LOAD( "08.bin", 0x00000, 0x10000, CRC(f2080071) SHA1(68cbae9559879b2dc19c41a7efbd13ab4a569d3f) ) //  // 1ST AND 2ND HALF IDENTICAL, same as komocomo in oneshot.cpp
+
+	ROM_REGION( 0x200000, "gp9001_0", 0 )
+	ROM_LOAD16_BYTE( "01.bin", 0x000000, 0x80000, CRC(505e9e9f) SHA1(998995d94585d785263cc926f68632065aa6c366) )
+	ROM_LOAD16_BYTE( "02.bin", 0x000001, 0x80000, CRC(860018f5) SHA1(7f42dffb27940629447d688e1771b4ecf04f3b43) )
+	ROM_LOAD16_BYTE( "03.bin", 0x100000, 0x80000, CRC(ece1bc0f) SHA1(d29f1520f1a3a9d276d36af650bc0d70bcb5b8da) )
+	ROM_LOAD16_BYTE( "04.bin", 0x100001, 0x80000, CRC(f328d7a3) SHA1(2c4fb5d6202f847aaf7c7be719c0c92b8bb5946b) )
+
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD( "5.bin", 0x00000, 0x20000, CRC(8107c4bd) SHA1(64e2fafa808c16c722454b611a8492a4620a925c) ) // motherboard ROM, unknown purpose
+ROM_END
 
 #define ROMS_FIXEIGHT \
 	ROM_REGION( 0x080000, "maincpu", 0 ) \
@@ -4897,6 +4880,25 @@ ROM_START( snowbro2b2 ) // seems to mostly be the same data, but with copyright 
 	ROM_LOAD( "rom09.bin", 0x00000, 0x80000, CRC(638f341e) SHA1(aa3fca25f099339ece1878ea730c5e9f18ec4823) )
 ROM_END
 
+ROM_START( snowbro2ny ) // Nyanko
+	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
+	ROM_LOAD16_WORD_SWAP( "rom1_c8.u61", 0x000000, 0x080000, CRC(9e6eb76b) SHA1(9e8b356dabedeb4ae9e08d60fbf6ed4a09edc0bd) )
+
+	ROM_REGION( 0x300000, "gp9001_0", 0 )
+	ROM_LOAD( "rom2-l_tp-033.u13", 0x000000, 0x100000, CRC(e9d366a9) SHA1(e87e3966fce3395324b90db6c134b3345104c04b) )
+	ROM_LOAD( "rom2-h_c10.u26",    0x100000, 0x080000, CRC(9aab7a62) SHA1(611f6a15fdbac5d3063426a365538c1482e996bf) )
+	ROM_LOAD( "rom3-l_tp-033.u12", 0x180000, 0x100000, CRC(eb06e332) SHA1(7cd597bfffc153d178530c0f0903bebd751c9dd1) )
+	ROM_LOAD( "rom3-h_c9.u27",     0x280000, 0x080000, CRC(6de2b059) SHA1(695e789849c34de5d83e40b0e834b2106fcd78db) )
+
+	ROM_REGION( 0x80000, "oki1", 0 )         /* ADPCM Samples */
+	ROM_LOAD( "rom4-tp-033.u33", 0x00000, 0x80000, CRC(638f341e) SHA1(aa3fca25f099339ece1878ea730c5e9f18ec4823) )
+
+	ROM_REGION( 0x345, "plds", 0 )
+	ROM_LOAD( "13_gal16v8-25lnc.u91", 0x000, 0x117, NO_DUMP ) // Protected
+	ROM_LOAD( "14_gal16v8-25lnc.u92", 0x117, 0x117, NO_DUMP ) // Protected
+	ROM_LOAD( "15_gal16v8-25lnc.u93", 0x22e, 0x117, NO_DUMP ) // Protected
+ROM_END
+
 /* -------------------------- Raizing games ------------------------- */
 
 
@@ -5038,8 +5040,8 @@ ROM_START( bgaregga )
 	ROM_REGION( 0x008000, "text", 0 )
 	ROM_LOAD( "text.u81", 0x00000, 0x08000, CRC(e67fd534) SHA1(987d0edffc2c243a13d4567319ea3d185eaadbf8) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )        /* ADPCM Samples */
-	ROM_LOAD( "rom5.bin", 0x040000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+	ROM_REGION( 0x100000, "oki1", 0 )        /* ADPCM Samples */
+	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
 ROM_END
 
 
@@ -5060,8 +5062,8 @@ ROM_START( bgareggahk )
 	ROM_REGION( 0x008000, "text", 0 )
 	ROM_LOAD( "text.u81", 0x00000, 0x08000, CRC(e67fd534) SHA1(987d0edffc2c243a13d4567319ea3d185eaadbf8) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )        /* ADPCM Samples */
-	ROM_LOAD( "rom5.bin", 0x040000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+	ROM_REGION( 0x100000, "oki1", 0 )        /* ADPCM Samples */
+	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
 ROM_END
 
 
@@ -5082,8 +5084,8 @@ ROM_START( bgareggatw )
 	ROM_REGION( 0x008000, "text", 0 )
 	ROM_LOAD( "text.u81", 0x00000, 0x08000, CRC(e67fd534) SHA1(987d0edffc2c243a13d4567319ea3d185eaadbf8) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )        /* ADPCM Samples */
-	ROM_LOAD( "rom5.bin", 0x040000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+	ROM_REGION( 0x100000, "oki1", 0 )        /* ADPCM Samples */
+	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
 ROM_END
 
 
@@ -5104,8 +5106,8 @@ ROM_START( bgaregganv )
 	ROM_REGION( 0x008000, "text", 0 )
 	ROM_LOAD( "text.u81", 0x00000, 0x08000, CRC(e67fd534) SHA1(987d0edffc2c243a13d4567319ea3d185eaadbf8) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )        /* ADPCM Samples */
-	ROM_LOAD( "rom5.bin", 0x040000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+	ROM_REGION( 0x100000, "oki1", 0 )        /* ADPCM Samples */
+	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
 ROM_END
 
 
@@ -5126,8 +5128,8 @@ ROM_START( bgareggat2 )
 	ROM_REGION( 0x008000, "text", 0 )
 	ROM_LOAD( "text.u81", 0x00000, 0x08000, CRC(e67fd534) SHA1(987d0edffc2c243a13d4567319ea3d185eaadbf8) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )        /* ADPCM Samples */
-	ROM_LOAD( "rom5.bin", 0x040000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+	ROM_REGION( 0x100000, "oki1", 0 )        /* ADPCM Samples */
+	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
 ROM_END
 
 
@@ -5148,8 +5150,8 @@ ROM_START( bgareggacn )
 	ROM_REGION( 0x008000, "text", 0 )
 	ROM_LOAD( "text.u81", 0x00000, 0x08000, CRC(e67fd534) SHA1(987d0edffc2c243a13d4567319ea3d185eaadbf8) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )        /* ADPCM Samples */
-	ROM_LOAD( "rom5.bin", 0x040000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+	ROM_REGION( 0x100000, "oki1", 0 )        /* ADPCM Samples */
+	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
 ROM_END
 
 
@@ -5170,8 +5172,8 @@ ROM_START( bgareggabl )
 	ROM_REGION( 0x010000, "user1", 0 ) // not graphics
 	ROM_LOAD( "2@-256", 0x00000, 0x08000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )        /* ADPCM Samples */
-	ROM_LOAD( "rom5.bin", 0x040000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+	ROM_REGION( 0x100000, "oki1", 0 )        /* ADPCM Samples */
+	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
 ROM_END
 
 ROM_START( bgareggabla )
@@ -5193,8 +5195,8 @@ ROM_START( bgareggabla )
 	ROM_REGION( 0x010000, "user1", 0 ) // not graphics
 	ROM_LOAD( "base.bin", 0x00000, 0x08000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )        /* ADPCM Samples */
-	ROM_LOAD( "rom5.bin", 0x040000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+	ROM_REGION( 0x100000, "oki1", 0 )        /* ADPCM Samples */
+	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
 ROM_END
 
 /*
@@ -5281,11 +5283,11 @@ ROM_START( batrider )
 	ROM_LOAD( "rom-2.bin", 0x800000, 0x400000, CRC(1bfea593) SHA1(ce06dc3097ae56b0df56d104bbf7efc9b5d968d4) )
 	ROM_LOAD( "rom-4.bin", 0xc00000, 0x400000, CRC(bee03c94) SHA1(5bc1e6769c42857c03456426b502fcb86a114f19) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )       /* ADPCM Samples 1 */
-	ROM_LOAD( "rom-5.bin", 0x040000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
+	ROM_REGION( 0x100000, "oki1", 0 )       /* ADPCM Samples 1 */
+	ROM_LOAD( "rom-5.bin", 0x000000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
 
-	ROM_REGION( 0x140000, "oki2", 0 )       /* ADPCM Samples 2 */
-	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
+	ROM_REGION( 0x100000, "oki2", 0 )       /* ADPCM Samples 2 */
+	ROM_LOAD( "rom-6.bin", 0x000000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
 
@@ -5305,11 +5307,11 @@ ROM_START( batrideru )
 	ROM_LOAD( "rom-2.bin", 0x800000, 0x400000, CRC(1bfea593) SHA1(ce06dc3097ae56b0df56d104bbf7efc9b5d968d4) )
 	ROM_LOAD( "rom-4.bin", 0xc00000, 0x400000, CRC(bee03c94) SHA1(5bc1e6769c42857c03456426b502fcb86a114f19) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )       /* ADPCM Samples 1 */
-	ROM_LOAD( "rom-5.bin", 0x040000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
+	ROM_REGION( 0x100000, "oki1", 0 )       /* ADPCM Samples 1 */
+	ROM_LOAD( "rom-5.bin", 0x000000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
 
-	ROM_REGION( 0x140000, "oki2", 0 )       /* ADPCM Samples 2 */
-	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
+	ROM_REGION( 0x100000, "oki2", 0 )       /* ADPCM Samples 2 */
+	ROM_LOAD( "rom-6.bin", 0x000000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
 
@@ -5329,11 +5331,11 @@ ROM_START( batriderc )
 	ROM_LOAD( "rom-2.bin", 0x800000, 0x400000, CRC(1bfea593) SHA1(ce06dc3097ae56b0df56d104bbf7efc9b5d968d4) )
 	ROM_LOAD( "rom-4.bin", 0xc00000, 0x400000, CRC(bee03c94) SHA1(5bc1e6769c42857c03456426b502fcb86a114f19) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )       /* ADPCM Samples 1 */
-	ROM_LOAD( "rom-5.bin", 0x040000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
+	ROM_REGION( 0x100000, "oki1", 0 )       /* ADPCM Samples 1 */
+	ROM_LOAD( "rom-5.bin", 0x000000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
 
-	ROM_REGION( 0x140000, "oki2", 0 )       /* ADPCM Samples 2 */
-	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
+	ROM_REGION( 0x100000, "oki2", 0 )       /* ADPCM Samples 2 */
+	ROM_LOAD( "rom-6.bin", 0x000000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
 
@@ -5353,11 +5355,11 @@ ROM_START( batriderj )
 	ROM_LOAD( "rom-2.bin", 0x800000, 0x400000, CRC(1bfea593) SHA1(ce06dc3097ae56b0df56d104bbf7efc9b5d968d4) )
 	ROM_LOAD( "rom-4.bin", 0xc00000, 0x400000, CRC(bee03c94) SHA1(5bc1e6769c42857c03456426b502fcb86a114f19) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )       /* ADPCM Samples 1 */
-	ROM_LOAD( "rom-5.bin", 0x040000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
+	ROM_REGION( 0x100000, "oki1", 0 )       /* ADPCM Samples 1 */
+	ROM_LOAD( "rom-5.bin", 0x000000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
 
-	ROM_REGION( 0x140000, "oki2", 0 )       /* ADPCM Samples 2 */
-	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
+	ROM_REGION( 0x100000, "oki2", 0 )       /* ADPCM Samples 2 */
+	ROM_LOAD( "rom-6.bin", 0x000000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
 
@@ -5377,11 +5379,11 @@ ROM_START( batriderk )
 	ROM_LOAD( "rom-2.bin", 0x800000, 0x400000, CRC(1bfea593) SHA1(ce06dc3097ae56b0df56d104bbf7efc9b5d968d4) )
 	ROM_LOAD( "rom-4.bin", 0xc00000, 0x400000, CRC(bee03c94) SHA1(5bc1e6769c42857c03456426b502fcb86a114f19) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )       /* ADPCM Samples 1 */
-	ROM_LOAD( "rom-5.bin", 0x040000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
+	ROM_REGION( 0x100000, "oki1", 0 )       /* ADPCM Samples 1 */
+	ROM_LOAD( "rom-5.bin", 0x000000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
 
-	ROM_REGION( 0x140000, "oki2", 0 )       /* ADPCM Samples 2 */
-	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
+	ROM_REGION( 0x100000, "oki2", 0 )       /* ADPCM Samples 2 */
+	ROM_LOAD( "rom-6.bin", 0x000000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
 /* older version, might have only been released in Japan, Hong Kong and Taiwan? */
@@ -5401,11 +5403,11 @@ ROM_START( batriderja )
 	ROM_LOAD( "rom-2.bin", 0x800000, 0x400000, CRC(1bfea593) SHA1(ce06dc3097ae56b0df56d104bbf7efc9b5d968d4) )
 	ROM_LOAD( "rom-4.bin", 0xc00000, 0x400000, CRC(bee03c94) SHA1(5bc1e6769c42857c03456426b502fcb86a114f19) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )       /* ADPCM Samples 1 */
-	ROM_LOAD( "rom-5.bin", 0x040000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
+	ROM_REGION( 0x100000, "oki1", 0 )       /* ADPCM Samples 1 */
+	ROM_LOAD( "rom-5.bin", 0x000000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
 
-	ROM_REGION( 0x140000, "oki2", 0 )       /* ADPCM Samples 2 */
-	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
+	ROM_REGION( 0x100000, "oki2", 0 )       /* ADPCM Samples 2 */
+	ROM_LOAD( "rom-6.bin", 0x000000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
 
@@ -5425,11 +5427,11 @@ ROM_START( batriderhk )
 	ROM_LOAD( "rom-2.bin", 0x800000, 0x400000, CRC(1bfea593) SHA1(ce06dc3097ae56b0df56d104bbf7efc9b5d968d4) )
 	ROM_LOAD( "rom-4.bin", 0xc00000, 0x400000, CRC(bee03c94) SHA1(5bc1e6769c42857c03456426b502fcb86a114f19) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )       /* ADPCM Samples 1 */
-	ROM_LOAD( "rom-5.bin", 0x040000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
+	ROM_REGION( 0x100000, "oki1", 0 )       /* ADPCM Samples 1 */
+	ROM_LOAD( "rom-5.bin", 0x000000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
 
-	ROM_REGION( 0x140000, "oki2", 0 )       /* ADPCM Samples 2 */
-	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
+	ROM_REGION( 0x100000, "oki2", 0 )       /* ADPCM Samples 2 */
+	ROM_LOAD( "rom-6.bin", 0x000000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
 
@@ -5449,11 +5451,11 @@ ROM_START( batridert )
 	ROM_LOAD( "rom-2.bin", 0x800000, 0x400000, CRC(1bfea593) SHA1(ce06dc3097ae56b0df56d104bbf7efc9b5d968d4) )
 	ROM_LOAD( "rom-4.bin", 0xc00000, 0x400000, CRC(bee03c94) SHA1(5bc1e6769c42857c03456426b502fcb86a114f19) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )       /* ADPCM Samples 1 */
-	ROM_LOAD( "rom-5.bin", 0x040000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
+	ROM_REGION( 0x100000, "oki1", 0 )       /* ADPCM Samples 1 */
+	ROM_LOAD( "rom-5.bin", 0x000000, 0x100000, CRC(4274daf6) SHA1(85557b4707d529e5914f03c7a856864f5c24950e) )
 
-	ROM_REGION( 0x140000, "oki2", 0 )       /* ADPCM Samples 2 */
-	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
+	ROM_REGION( 0x100000, "oki2", 0 )       /* ADPCM Samples 2 */
+	ROM_LOAD( "rom-6.bin", 0x000000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
 
@@ -5639,7 +5641,8 @@ GAME( 1991, pipibibsa,   pipibibs, pipibibs,     pipibibs,   toaplan2_state, emp
 GAME( 1991, pipibibsp,   pipibibs, pipibibs,     pipibibsp,  toaplan2_state, empty_init,    ROT0,   "Toaplan",         "Pipi & Bibis / Whoopee!! (prototype)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1991, whoopee,     pipibibs, tekipaki,     whoopee,    toaplan2_state, empty_init,    ROT0,   "Toaplan",         "Pipi & Bibis / Whoopee!! (Teki Paki hardware)",   MACHINE_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead of Z80
 
-GAME( 1991, pipibibsbl,  pipibibs, pipibibsbl,   pipibibsbl, toaplan2_state, init_pipibibsbl, ROT0,   "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pipibibsbl,  pipibibs, pipibibsbl,   pipibibsbl, toaplan2_state, init_pipibibsbl, ROT0, "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pipibibsbl2, pipibibs, pipibibsbl,   pipibibsbl, toaplan2_state, empty_init,    ROT0,   "bootleg",                 "Pipi & Bibis / Whoopee!! (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different memory map, not scrambled
 
 GAME( 1993, enmadaio,    0,        enmadaio,     enmadaio,   toaplan2_state, init_enmadaio, ROT0,   "Toaplan / Taito",  "Enma Daio (Japan)", 0 ) // TP-031
 
@@ -5673,9 +5676,10 @@ GAME( 1993, batsugunsp,  batsugun, batsugun,   batsugun,   toaplan2_state, init_
 GAME( 1994, pwrkick,     0,        pwrkick,    pwrkick,    toaplan2_state, empty_init,      ROT0,   "Sunwise",  "Power Kick (Japan)",    0 )
 GAME( 1995, othldrby,    0,        othldrby,   othldrby,   toaplan2_state, empty_init,      ROT0,   "Sunwise",  "Othello Derby (Japan)", 0 )
 
-GAME( 1994, snowbro2,    0,        snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "Hanafram",           "Snow Bros. 2 - With New Elves / Otenki Paradise",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1998, snowbro2b,   snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "bootleg",            "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, snowbro2b2,  snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "bootleg (Q Elec)",   "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg, set 2)", MACHINE_SUPPORTS_SAVE ) // possibly not a bootleg, has some original parts
+GAME( 1994, snowbro2,    0,        snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "Hanafram",         "Snow Bros. 2 - With New Elves / Otenki Paradise (Hanafram)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, snowbro2ny,  snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "Nyanko",           "Snow Bros. 2 - With New Elves / Otenki Paradise (Nyanko)",         MACHINE_SUPPORTS_SAVE ) // not a bootleg, has original parts (the "GP9001 L7A0498 TOA PLAN" IC and the three mask ROMs)
+GAME( 1998, snowbro2b,   snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "bootleg",          "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, snowbro2b2,  snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "bootleg (Q Elec)", "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg, set 2)", MACHINE_SUPPORTS_SAVE ) // possibly not a bootleg, has some original parts
 
 GAME( 1993, sstriker,    0,        mahoudai,   sstriker,   toaplan2_state, empty_init,      ROT270, "Raizing",                         "Sorcer Striker",           MACHINE_SUPPORTS_SAVE ) // verified on two different PCBs
 GAME( 1993, sstrikerk,   sstriker, mahoudai,   sstrikerk,  toaplan2_state, empty_init,      ROT270, "Raizing (Unite Trading license)", "Sorcer Striker (Korea)" ,  MACHINE_SUPPORTS_SAVE ) // Although the region jumper is functional, it's a Korean board / version

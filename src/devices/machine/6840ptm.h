@@ -39,18 +39,18 @@ public:
 	void set_ext_clock(int counter, double clock);  // set clock frequency
 	int ext_clock(int counter) const { return m_external_clock[counter]; }  // get clock frequency
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
 
 	void set_gate(int idx, int state);
-	DECLARE_WRITE_LINE_MEMBER( set_g1 );
-	DECLARE_WRITE_LINE_MEMBER( set_g2 );
-	DECLARE_WRITE_LINE_MEMBER( set_g3 );
+	DECLARE_WRITE_LINE_MEMBER( set_g1 ) { set_gate(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( set_g2 ) { set_gate(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( set_g3 ) { set_gate(2, state); }
 
 	void set_clock(int idx, int state);
-	DECLARE_WRITE_LINE_MEMBER( set_c1 );
-	DECLARE_WRITE_LINE_MEMBER( set_c2 );
-	DECLARE_WRITE_LINE_MEMBER( set_c3 );
+	DECLARE_WRITE_LINE_MEMBER( set_c1 ) { set_clock(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( set_c2 ) { set_clock(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( set_c3 ) { set_clock(2, state); }
 
 	void update_interrupts();
 
@@ -102,7 +102,7 @@ private:
 
 	double m_external_clock[3];
 
-	devcb_write_line m_out_cb[3];
+	devcb_write_line::array<3> m_out_cb;
 	devcb_write_line m_irq_cb;
 
 	uint8_t m_control_reg[3];

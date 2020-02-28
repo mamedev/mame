@@ -132,12 +132,12 @@
 #define LOG_WARN        (1U<<1)   // Warnings
 #define LOG_ILLWRITE    (1U<<2)
 #define LOG_READY       (1U<<3)
-#define LOG_INT         (1U<<4)
+#define LOG_INTERRUPTS  (1U<<4)
 #define LOG_ADDRESS     (1U<<5)
 #define LOG_MEM         (1U<<6)
 #define LOG_MUX         (1U<<7)
 
-#define VERBOSE ( LOG_WARN )
+#define VERBOSE ( LOG_GENERAL | LOG_WARN )
 
 #include "logmacro.h"
 
@@ -165,40 +165,39 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( ready_line );
 	DECLARE_WRITE_LINE_MEMBER( extint );
 	DECLARE_WRITE_LINE_MEMBER( notconnected );
-	DECLARE_READ8_MEMBER( interrupt_level );
+	uint8_t interrupt_level();
 
-	DECLARE_READ8_MEMBER( setoffset );
-	DECLARE_READ16_MEMBER( memread );
-	DECLARE_WRITE16_MEMBER( memwrite );
-	DECLARE_WRITE_LINE_MEMBER( dbin_in );
+	void setaddress(offs_t mode, uint16_t address);
+	uint16_t memread(offs_t offset);
+	void memwrite(offs_t offset, uint16_t data);
 
-	DECLARE_READ16_MEMBER( samsmem_read );
-	DECLARE_WRITE16_MEMBER( samsmem_write );
-
-	DECLARE_WRITE8_MEMBER(external_operation);
+	void external_operation(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
-	DECLARE_WRITE_LINE_MEMBER( dbin_line );
 
 	// CRU (Communication Register Unit) handling
-	DECLARE_READ8_MEMBER( cruread );
-	DECLARE_WRITE8_MEMBER( cruwrite );
-	DECLARE_READ8_MEMBER( read_by_9901 );
+	uint8_t cruread(offs_t offset);
+	void cruwrite(offs_t offset, uint8_t data);
+	uint8_t psi_input(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(keyC0);
 	DECLARE_WRITE_LINE_MEMBER(keyC1);
 	DECLARE_WRITE_LINE_MEMBER(keyC2);
 	DECLARE_WRITE_LINE_MEMBER(cs_motor);
 	DECLARE_WRITE_LINE_MEMBER(audio_gate);
 	DECLARE_WRITE_LINE_MEMBER(cassette_output);
-	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
+	void tms9901_interrupt(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(alphaW);
 
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt_in);
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
-	void memmap_setoffset(address_map &map);
+	void memmap_setaddress(address_map &map);
 
 	void    datamux_clock_in(int clock);
+
+	// Latch for 9901 INT1 and INT2 lines
+	int  m_int1;
+	int  m_int2;
 
 	// Devices
 	required_device<tms9900_device>        m_cpu;
@@ -213,8 +212,8 @@ private:
 	required_ioport m_alpha;
 
 	int decode_address(int address);
-	DECLARE_READ16_MEMBER( debugger_read );
-	DECLARE_WRITE16_MEMBER( debugger_write );
+	uint16_t debugger_read(offs_t offset);
+	void debugger_write(offs_t offset, uint16_t data);
 	void ready_join();
 	void set_keyboard_column(int number, int data);
 
@@ -222,7 +221,7 @@ private:
 	uint16_t *m_rom;
 
 	// First joystick. 6 for TI-99/4A
-	int     m_firstjoy;
+	static constexpr int FIRSTJOY=6;
 
 	int     m_keyboard_column;
 	int     m_check_alphalock;
@@ -257,9 +256,6 @@ private:
 	// Incoming Ready level
 	int m_sysready;
 
-	// Saves a pointer to the address space
-	address_space* m_spacep;
-
 	// Internal DSR mapped in
 	bool m_internal_dsr_active;
 
@@ -282,10 +278,6 @@ private:
 	// Mapper registers
 	uint8_t m_mapper[16];
 
-	// Latch for 9901 INT2, INT1 lines
-	int     m_9901_int;
-	void    set_9901_int(int line, line_state state);
-
 	int     m_ready_prev;       // for debugging purposes only
 };
 
@@ -302,18 +294,15 @@ void ti99_4p_state::memmap(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(ti99_4p_state::memread), FUNC(ti99_4p_state::memwrite));
 }
 
-void ti99_4p_state::memmap_setoffset(address_map &map)
+void ti99_4p_state::memmap_setaddress(address_map &map)
 {
-	map(0x0000, 0xffff).r(FUNC(ti99_4p_state::setoffset));
+	map(0x0000, 0xffff).w(FUNC(ti99_4p_state::setaddress));
 }
 
 void ti99_4p_state::crumap(address_map &map)
 {
-	map(0x0000, 0x01ff).r(FUNC(ti99_4p_state::cruread));
-	map(0x0000, 0x003f).r(m_tms9901, FUNC(tms9901_device::read));
-
-	map(0x0000, 0x0fff).w(FUNC(ti99_4p_state::cruwrite));
-	map(0x0000, 0x01ff).w(m_tms9901, FUNC(tms9901_device::write));
+	map(0x0000, 0x1fff).rw(FUNC(ti99_4p_state::cruread), FUNC(ti99_4p_state::cruwrite));
+	map(0x0000, 0x03ff).rw(m_tms9901, FUNC(tms9901_device::read), FUNC(tms9901_device::write));
 }
 
 /*
@@ -388,7 +377,7 @@ static INPUT_PORTS_START(ti99_4p)
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('-')
 
 	PORT_START("ALPHA") /* one more port for Alpha line */
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Alpha Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Alpha Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 
 
 INPUT_PORTS_END
@@ -440,16 +429,16 @@ int ti99_4p_state::decode_address(int address)
     Called when the memory access starts by setting the address bus. From that
     point on, we suspend the CPU until all operations are done.
 */
-READ8_MEMBER( ti99_4p_state::setoffset )
+void ti99_4p_state::setaddress(offs_t address, uint16_t busctrl)
 {
-	m_addr_buf = offset;
+	m_addr_buf = address << 1;
 	m_waitcount = 0;
+	m_dbin = ((busctrl & TMS99xx_BUS_DBIN)!=0);
 
 	LOGMASKED(LOG_ADDRESS, "set address %04x\n", m_addr_buf);
 
 	m_decode = SGCPU_NONE;
 	m_muxready = true;
-	m_spacep = &space;
 
 	m_decode = decode_address(m_addr_buf);
 
@@ -462,15 +451,13 @@ READ8_MEMBER( ti99_4p_state::setoffset )
 		m_waitcount = 5;
 		m_muxready = false;
 		m_peribox->memen_in(ASSERT_LINE);
-		m_peribox->setaddress_dbin(space, m_addr_buf+1, m_dbin);
+		m_peribox->setaddress_dbin(m_addr_buf+1, m_dbin);
 	}
 
 	ready_join();
-
-	return 0;
 }
 
-READ16_MEMBER( ti99_4p_state::memread )
+uint16_t ti99_4p_state::memread(offs_t offset)
 {
 	int address = 0;
 	uint8_t hbyte = 0;
@@ -523,10 +510,10 @@ READ16_MEMBER( ti99_4p_state::memread )
 		break;
 
 	case SGCPU_PEB:
-		if (machine().side_effects_disabled()) return debugger_read(space, offset);
+		if (machine().side_effects_disabled()) return debugger_read(offset);
 		// The byte from the odd address has already been read into the latch
 		// Reading the even address now
-		m_peribox->readz(space, m_addr_buf, &hbyte);
+		m_peribox->readz(m_addr_buf, &hbyte);
 		m_peribox->memen_in(CLEAR_LINE);
 		LOGMASKED(LOG_MEM, "Read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
 		value = (hbyte<<8) | m_latch;
@@ -536,7 +523,7 @@ READ16_MEMBER( ti99_4p_state::memread )
 }
 
 
-WRITE16_MEMBER( ti99_4p_state::memwrite )
+void ti99_4p_state::memwrite(offs_t offset, uint16_t data)
 {
 	int address = 0;
 
@@ -585,7 +572,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 		break;
 
 	case SGCPU_PEB:
-		if (machine().side_effects_disabled()) { debugger_write(space, offset, data); return; }
+		if (machine().side_effects_disabled()) { debugger_write(offset, data); return; }
 
 		// Writing the even address now (addr)
 		// The databus multiplexer puts the even value into the latch and outputs the odd value now.
@@ -593,7 +580,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 
 		// write odd byte
 		LOGMASKED(LOG_MEM, "datamux: write odd byte to address %04x <- %02x\n",  m_addr_buf+1, data & 0xff);
-		m_peribox->write(space, m_addr_buf+1, data & 0xff);
+		m_peribox->write(m_addr_buf+1, data & 0xff);
 		m_peribox->memen_in(CLEAR_LINE);
 	}
 }
@@ -601,14 +588,14 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 /*
     Used when the debugger is reading values from PEB cards.
 */
-READ16_MEMBER( ti99_4p_state::debugger_read )
+uint16_t ti99_4p_state::debugger_read(offs_t offset)
 {
 	uint8_t lval = 0;
 	uint8_t hval = 0;
 	uint16_t addrb = offset << 1;
 	m_peribox->memen_in(ASSERT_LINE);
-	m_peribox->readz(space, addrb+1, &lval);
-	m_peribox->readz(space, addrb, &hval);
+	m_peribox->readz(addrb+1, &lval);
+	m_peribox->readz(addrb, &hval);
 	m_peribox->memen_in(CLEAR_LINE);
 	return ((hval << 8)&0xff00) | (lval & 0xff);
 }
@@ -616,21 +603,13 @@ READ16_MEMBER( ti99_4p_state::debugger_read )
 /*
     Used when the debugger is writing values to PEB cards.
 */
-WRITE16_MEMBER( ti99_4p_state::debugger_write )
+void ti99_4p_state::debugger_write(offs_t offset, uint16_t data)
 {
 	int addrb = offset << 1;
 	m_peribox->memen_in(ASSERT_LINE);
-	m_peribox->write(space, addrb+1, data & 0xff);
-	m_peribox->write(space, addrb,  (data>>8) & 0xff);
+	m_peribox->write(addrb+1, data & 0xff);
+	m_peribox->write(addrb,  (data>>8) & 0xff);
 	m_peribox->memen_in(CLEAR_LINE);
-}
-
-/*
-   Data bus in (DBIN) line from the CPU.
-*/
-WRITE_LINE_MEMBER( ti99_4p_state::dbin_line )
-{
-	m_dbin = (line_state)state;
 }
 
 /*
@@ -662,14 +641,14 @@ WRITE_LINE_MEMBER( ti99_4p_state::datamux_clock_in )
 				if (m_waitcount==2)
 				{
 					// read odd byte
-					m_peribox->readz(*m_spacep, m_addr_buf+1, &m_latch);
+					m_peribox->readz(m_addr_buf+1, &m_latch);
 					m_peribox->memen_in(CLEAR_LINE);
 
 					LOGMASKED(LOG_MEM, "datamux: read odd byte from address %04x -> %02x\n",  m_addr_buf+1, m_latch);
 
 					// do the setaddress for the even address
 					m_peribox->memen_in(ASSERT_LINE);
-					m_peribox->setaddress_dbin(*m_spacep, m_addr_buf, m_dbin);
+					m_peribox->setaddress_dbin(m_addr_buf, m_dbin);
 				}
 			}
 		}
@@ -689,11 +668,11 @@ WRITE_LINE_MEMBER( ti99_4p_state::datamux_clock_in )
 				{
 					// do the setaddress for the even address
 					m_peribox->memen_in(ASSERT_LINE);
-					m_peribox->setaddress_dbin(*m_spacep, m_addr_buf, m_dbin);
+					m_peribox->setaddress_dbin(m_addr_buf, m_dbin);
 
 					// write even byte
 					LOGMASKED(LOG_MEM, "datamux: write even byte to address %04x <- %02x\n",  m_addr_buf, m_latch);
-					m_peribox->write(*m_spacep,  m_addr_buf, m_latch);
+					m_peribox->write(m_addr_buf, m_latch);
 					m_peribox->memen_in(CLEAR_LINE);
 				}
 			}
@@ -711,7 +690,7 @@ WRITE_LINE_MEMBER( ti99_4p_state::datamux_clock_in )
 /*
     CRU write
 */
-WRITE8_MEMBER( ti99_4p_state::cruwrite )
+void ti99_4p_state::cruwrite(offs_t offset, uint8_t data)
 {
 	int addroff = offset<<1;
 
@@ -732,13 +711,13 @@ WRITE8_MEMBER( ti99_4p_state::cruwrite )
 	}
 
 	// No match - pass to peribox
-	m_peribox->cruwrite(space, addroff, data);
+	m_peribox->cruwrite(addroff, data);
 }
 
-READ8_MEMBER( ti99_4p_state::cruread )
+uint8_t ti99_4p_state::cruread(offs_t offset)
 {
 	uint8_t value = 0;
-	m_peribox->crureadz(space, offset<<4, &value);
+	m_peribox->crureadz(offset<<1, &value);
 	return value;
 }
 
@@ -746,60 +725,102 @@ READ8_MEMBER( ti99_4p_state::cruread )
     Keyboard/tape control
 ****************************************************************************/
 
-READ8_MEMBER( ti99_4p_state::read_by_9901 )
+uint8_t ti99_4p_state::psi_input(offs_t offset)
 {
-	int answer=0;
-
-	switch (offset & 0x03)
+	switch (offset)
 	{
-	case tms9901_device::CB_INT7:
-		// Read pins INT3*-INT7* of TI99's 9901.
-		// bit 1: INT1 status
-		// bit 2: INT2 status
-		// bit 3-7: keyboard status bits 0 to 4
-		//
-		// |K|K|K|K|K|I2|I1|C|
-		//
-		if (m_keyboard_column >= m_firstjoy) // joy 1 and 2
-		{
-			answer = m_joyport->read_port();
-		}
+	case tms9901_device::INT1:
+		return (m_int1==CLEAR_LINE)? 1 : 0;
+	case tms9901_device::INT2:
+		return (m_int2==CLEAR_LINE)? 1 : 0;
+	case tms9901_device::INT3:
+	case tms9901_device::INT4:
+	case tms9901_device::INT5:
+	case tms9901_device::INT6:
+		// Keyboard ACTIVE_LOW (s.o.)
+		// Joysticks ACTIVE_LOW (handset.cpp)
+		if (m_keyboard_column >= 6)
+			return BIT(m_joyport->read_port(), offset-tms9901_device::INT3);
+		else
+			return BIT(m_keyboard[m_keyboard_column]->read(), offset-tms9901_device::INT3);
+
+	case tms9901_device::INT7_P15:
+		if (m_keyboard_column >= 6) // Joysticks
+			return BIT(m_joyport->read_port(), offset-tms9901_device::INT3);
 		else
 		{
-			answer = m_keyboard[m_keyboard_column]->read();
+			if (m_check_alphalock)
+			{
+				return BIT(m_alpha->read(), offset-tms9901_device::INT3);
+			}
+			else
+				return BIT(m_keyboard[m_keyboard_column]->read(), offset-tms9901_device::INT3);
 		}
-		if (m_check_alphalock)
-		{
-			answer &= ~(m_alpha->read());
-		}
-		answer = (answer << 3) | m_9901_int;
-		break;
 
-	case tms9901_device::INT8_INT15:
-		// Read pins int8_t*-INT15* of TI99's 9901.
-		// bit 0-2: keyboard status bits 5 to 7
-		// bit 3: tape input mirror
-		// bit 5-7: weird, not emulated
-
-		// |1|1|1|1|0|K|K|K|
-		if (m_keyboard_column >= m_firstjoy) answer = 0x07;
-		else answer = ((m_keyboard[m_keyboard_column]->read())>>5) & 0x07;
-		answer |= 0xf0;
-		break;
-
-	case tms9901_device::P0_P7:
-		break;
-
-	case tms9901_device::P8_P15:
-		// Read pins P8-P15 of TI99's 9901.
-		// bit 26: high
-		// bit 27: tape input
-		answer = 4;
-		if (m_cassette->input() > 0) answer |= 8;
-		break;
+	case tms9901_device::INT8_P14:
+	case tms9901_device::INT9_P13:
+	case tms9901_device::INT10_P12:
+		if (m_keyboard_column >= FIRSTJOY)  // no joystick lines after /INT7
+			return 1;
+		else
+			return BIT(m_keyboard[m_keyboard_column]->read(), offset-tms9901_device::INT3);
+	case tms9901_device::INT11_P11:
+		// CS2 is write-only
+		return (m_cassette->input() > 0);
+	default:
+		return 1;
 	}
-	return answer;
 }
+
+/*  switch (offset & 0x03)
+    {
+    case tms9901_device::CB_INT7:
+        // Read pins INT3*-INT7* of TI99's 9901.
+        // bit 1: INT1 status
+        // bit 2: INT2 status
+        // bit 3-7: keyboard status bits 0 to 4
+        //
+        // |K|K|K|K|K|I2|I1|C|
+        //
+        if (m_keyboard_column >= FIRSTJOY) // joy 1 and 2
+        {
+            answer = m_joyport->read_port();
+        }
+        else
+        {
+            answer = m_keyboard[m_keyboard_column]->read();
+        }
+        if (m_check_alphalock)
+        {
+            answer &= ~(m_alpha->read());
+        }
+        answer = (answer << 3) | m_9901_int;
+        break;
+
+    case tms9901_device::INT8_INT15:
+        // Read pins int8_t*-INT15* of TI99's 9901.
+        // bit 0-2: keyboard status bits 5 to 7
+        // bit 3: tape input mirror
+        // bit 5-7: weird, not emulated
+
+        // |1|1|1|1|0|K|K|K|
+        if (m_keyboard_column >= FIRSTJOY) answer = 0x07;
+        else answer = ((m_keyboard[m_keyboard_column]->read())>>5) & 0x07;
+        answer |= 0xf0;
+        break;
+
+    case tms9901_device::P0_P7:
+        break;
+
+    case tms9901_device::P8_P15:
+        // Read pins P8-P15 of TI99's 9901.
+        // bit 26: high
+        // bit 27: tape input
+        answer = 4;
+        if (m_cassette->input() > 0) answer |= 8;
+        break;
+    }
+    */
 
 /*
     WRITE key column select (P2-P4)
@@ -809,9 +830,9 @@ void ti99_4p_state::set_keyboard_column(int number, int data)
 	if (data!=0)    m_keyboard_column |= 1 << number;
 	else            m_keyboard_column &= ~(1 << number);
 
-	if (m_keyboard_column >= m_firstjoy)
+	if (m_keyboard_column >= FIRSTJOY)
 	{
-		m_joyport->write_port(m_keyboard_column - m_firstjoy + 1);
+		m_joyport->write_port(m_keyboard_column - FIRSTJOY + 1);
 	}
 }
 
@@ -895,23 +916,16 @@ WRITE_LINE_MEMBER( ti99_4p_state::ready_line )
 	ready_join();
 }
 
-void ti99_4p_state::set_9901_int( int line, line_state state)
-{
-	m_tms9901->set_single_int(line, state);
-	// We latch the value for the read operation. Mind the negative logic.
-	if (state==CLEAR_LINE) m_9901_int |= (1<<line);
-	else m_9901_int &= ~(1<<line);
-}
-
 WRITE_LINE_MEMBER( ti99_4p_state::extint )
 {
-	LOGMASKED(LOG_INT, "EXTINT level = %02x\n", state);
-	set_9901_int(1, (line_state)state);
+	LOGMASKED(LOG_INTERRUPTS, "EXTINT level = %02x\n", state);
+	m_int1 = (line_state)state;
+	m_tms9901->set_int_line(1, state);
 }
 
 WRITE_LINE_MEMBER( ti99_4p_state::notconnected )
 {
-	LOGMASKED(LOG_INT, "Setting a not connected line ... ignored\n");
+	LOGMASKED(LOG_INTERRUPTS, "Setting a not connected line ... ignored\n");
 }
 
 /*
@@ -919,11 +933,12 @@ WRITE_LINE_MEMBER( ti99_4p_state::notconnected )
 */
 WRITE_LINE_MEMBER( ti99_4p_state::clock_out )
 {
+	m_tms9901->phi_line(state);
 	datamux_clock_in(state);
 	m_peribox->clock_in(state);
 }
 
-WRITE8_MEMBER( ti99_4p_state::tms9901_interrupt )
+void ti99_4p_state::tms9901_interrupt(offs_t offset, uint8_t data)
 {
 	// offset contains the interrupt level (0-15)
 	// However, the TI board just ignores that level and hardwires it to 1
@@ -931,14 +946,14 @@ WRITE8_MEMBER( ti99_4p_state::tms9901_interrupt )
 	m_cpu->set_input_line(INT_9900_INTREQ, data);
 }
 
-READ8_MEMBER( ti99_4p_state::interrupt_level )
+uint8_t ti99_4p_state::interrupt_level()
 {
 	// On the TI-99 systems these IC lines are not used; the input lines
 	// at the CPU are hardwired to level 1.
 	return 1;
 }
 
-WRITE8_MEMBER( ti99_4p_state::external_operation )
+void ti99_4p_state::external_operation(offs_t offset, uint8_t data)
 {
 	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset != IDLE_OP) logerror("External operation %s not implemented on the SGCPU board\n", extop[offset]);
@@ -951,14 +966,13 @@ void ti99_4p_state::driver_start()
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
 
-	m_firstjoy = 6;
-
 	m_sysready = ASSERT_LINE;
 	m_muxready = true;
 
 	m_rom = (uint16_t*)(memregion("maincpu")->base());
 
-	save_item(NAME(m_firstjoy));
+	save_item(NAME(m_int1));
+	save_item(NAME(m_int2));
 	save_item(NAME(m_keyboard_column));
 	save_item(NAME(m_check_alphalock));
 	save_item(NAME(m_internal_dsr));
@@ -980,7 +994,6 @@ void ti99_4p_state::driver_start()
 	save_item(NAME(m_highbyte));
 	save_item(NAME(m_latch));
 	save_pointer(NAME(m_mapper),16);
-	save_item(NAME(m_9901_int));
 }
 
 /*
@@ -988,7 +1001,9 @@ void ti99_4p_state::driver_start()
 */
 WRITE_LINE_MEMBER(ti99_4p_state::video_interrupt_in)
 {
-	set_9901_int(2, (line_state)state);
+	LOGMASKED(LOG_INTERRUPTS, "VDP INT2 from EVPC on tms9901, level=%d\n", state);
+	m_int2 = (line_state)state;
+	m_tms9901->set_int_line(2, state);
 }
 
 /*
@@ -996,11 +1011,11 @@ WRITE_LINE_MEMBER(ti99_4p_state::video_interrupt_in)
 */
 void ti99_4p_state::driver_reset()
 {
-	set_9901_int(12, CLEAR_LINE);
-
 	m_cpu->set_ready(ASSERT_LINE);
 	m_cpu->set_hold(CLEAR_LINE);
-	m_9901_int = 0x03; // INT2* and INT1* set to 1, i.e. inactive
+	m_int1 = m_int2 = CLEAR_LINE;
+	m_peribox->reset_in(ASSERT_LINE);
+	m_peribox->reset_in(CLEAR_LINE);
 }
 
 /*
@@ -1013,15 +1028,14 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 	TMS9900(config, m_cpu, 3000000);
 	m_cpu->set_addrmap(AS_PROGRAM, &ti99_4p_state::memmap);
 	m_cpu->set_addrmap(AS_IO, &ti99_4p_state::crumap);
-	m_cpu->set_addrmap(tms99xx_device::AS_SETOFFSET, &ti99_4p_state::memmap_setoffset);
+	m_cpu->set_addrmap(tms99xx_device::AS_SETADDRESS, &ti99_4p_state::memmap_setaddress);
 	m_cpu->extop_cb().set(FUNC(ti99_4p_state::external_operation));
 	m_cpu->intlevel_cb().set(FUNC(ti99_4p_state::interrupt_level));
 	m_cpu->clkout_cb().set(FUNC(ti99_4p_state::clock_out));
-	m_cpu->dbin_cb().set(FUNC(ti99_4p_state::dbin_line));
 
 	// tms9901
-	TMS9901(config, m_tms9901, 3000000);
-	m_tms9901->read_cb().set(FUNC(ti99_4p_state::read_by_9901));
+	TMS9901(config, m_tms9901, 0);
+	m_tms9901->read_cb().set(FUNC(ti99_4p_state::psi_input));
 	m_tms9901->p_out_cb(2).set(FUNC(ti99_4p_state::keyC0));
 	m_tms9901->p_out_cb(3).set(FUNC(ti99_4p_state::keyC1));
 	m_tms9901->p_out_cb(4).set(FUNC(ti99_4p_state::keyC2));
@@ -1029,7 +1043,7 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 	m_tms9901->p_out_cb(6).set(FUNC(ti99_4p_state::cs_motor));
 	m_tms9901->p_out_cb(8).set(FUNC(ti99_4p_state::audio_gate));
 	m_tms9901->p_out_cb(9).set(FUNC(ti99_4p_state::cassette_output));
-	m_tms9901->intlevel_cb().set(FUNC(ti99_4p_state::tms9901_interrupt));
+	m_tms9901->intreq_cb().set(FUNC(ti99_4p_state::tms9901_interrupt));
 
 	// Peripheral expansion box (SGCPU composition)
 	TI99_PERIBOX_SG(config, m_peribox, 0);

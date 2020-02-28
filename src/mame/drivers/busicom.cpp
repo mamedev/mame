@@ -224,7 +224,8 @@ void busicom_state::machine_reset()
 
 //static const char layout_busicom [] = "busicom";
 
-MACHINE_CONFIG_START(busicom_state::busicom)
+void busicom_state::busicom(machine_config &config)
+{
 	/* basic machine hardware */
 	I4004(config, m_maincpu, 750000);
 	m_maincpu->set_rom_map(&busicom_state::busicom_rom);
@@ -234,18 +235,18 @@ MACHINE_CONFIG_START(busicom_state::busicom)
 	m_maincpu->set_ram_ports_map(&busicom_state::busicom_mp);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(40*17, 44*11)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*17-1, 0, 44*11-1)
-	MCFG_SCREEN_UPDATE_DRIVER(busicom_state, screen_update_busicom)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(40*17, 44*11);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(busicom_state::screen_update_busicom));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(busicom_state::busicom_palette), 16);
 
 	TIMER(config, "busicom_timer").configure_periodic(FUNC(busicom_state::timer_callback), attotime::from_msec(28*2));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( busicom )

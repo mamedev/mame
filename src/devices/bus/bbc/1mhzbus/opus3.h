@@ -39,10 +39,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	virtual DECLARE_READ8_MEMBER(fred_r) override;
-	virtual DECLARE_WRITE8_MEMBER(fred_w) override;
-	virtual DECLARE_READ8_MEMBER(jim_r) override;
-	virtual DECLARE_WRITE8_MEMBER(jim_w) override;
+	virtual uint8_t fred_r(offs_t offset) override;
+	virtual void fred_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t jim_r(offs_t offset) override;
+	virtual void jim_w(offs_t offset, uint8_t data) override;
 
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);

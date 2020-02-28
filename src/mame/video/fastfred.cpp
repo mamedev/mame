@@ -47,21 +47,21 @@ void fastfred_state::fastfred_palette(palette_device &palette) const
 		bit1 = BIT(color_prom[i | 0x000], 1);
 		bit2 = BIT(color_prom[i | 0x000], 2);
 		bit3 = BIT(color_prom[i | 0x000], 3);
-		int const r = combine_4_weights(rweights, bit0, bit1, bit2, bit3);
+		int const r = combine_weights(rweights, bit0, bit1, bit2, bit3);
 
 		// green component
 		bit0 = BIT(color_prom[i | 0x100], 0);
 		bit1 = BIT(color_prom[i | 0x100], 1);
 		bit2 = BIT(color_prom[i | 0x100], 2);
 		bit3 = BIT(color_prom[i | 0x100], 3);
-		int const g = combine_4_weights(gweights, bit0, bit1, bit2, bit3);
+		int const g = combine_weights(gweights, bit0, bit1, bit2, bit3);
 
 		// blue component
 		bit0 = BIT(color_prom[i | 0x200], 0);
 		bit1 = BIT(color_prom[i | 0x200], 1);
 		bit2 = BIT(color_prom[i | 0x200], 2);
 		bit3 = BIT(color_prom[i | 0x200], 3);
-		int const b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
+		int const b = combine_weights(bweights, bit0, bit1, bit2, bit3);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(fastfred_state::get_tile_info)
 
 VIDEO_START_MEMBER(fastfred_state,fastfred)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fastfred_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fastfred_state::get_tile_info)), TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(32);
@@ -325,9 +325,9 @@ WRITE_LINE_MEMBER(fastfred_state::imago_charbank_w)
 
 VIDEO_START_MEMBER(fastfred_state,imago)
 {
-	m_web_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fastfred_state::imago_get_tile_info_web),this),TILEMAP_SCAN_ROWS,8,8,32,32);
-	m_bg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fastfred_state::imago_get_tile_info_bg),this), TILEMAP_SCAN_ROWS,8,8,32,32);
-	m_fg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fastfred_state::imago_get_tile_info_fg),this), TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_web_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fastfred_state::imago_get_tile_info_web)),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fastfred_state::imago_get_tile_info_bg)), TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_fg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fastfred_state::imago_get_tile_info_fg)), TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);

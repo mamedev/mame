@@ -26,6 +26,7 @@ public:
 		m_overscan_top = top;
 		m_overscan_bottom = bottom;
 	}
+	void set_visarea(s16 minx, s16 maxx, s16 miny, s16 maxy) { m_custom_visarea.set(minx, maxx, miny, maxy); }
 
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(read);
@@ -80,6 +81,7 @@ private:
 	bool      m_valid_config;
 	uint16_t  m_total_hpix, m_total_vpix;
 	uint16_t  m_visible_hpix, m_visible_vpix;
+	rectangle m_custom_visarea;
 	uint16_t  m_vsyn_start, m_vsyn_end;
 	uint16_t  m_hsyn_start, m_hsyn_end;
 

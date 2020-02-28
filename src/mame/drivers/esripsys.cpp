@@ -670,7 +670,7 @@ void esripsys_state::esripsys(machine_config &config)
 	m_gamecpu->set_addrmap(AS_PROGRAM, &esripsys_state::game_cpu_map);
 	m_gamecpu->set_vblank_int("screen", FUNC(esripsys_state::esripsys_vblank_irq));
 
-	config.m_perfect_cpu_quantum = subtag("game_cpu");
+	config.set_perfect_quantum(m_gamecpu);
 
 	MC6809E(config, m_framecpu, XTAL(8'000'000) / 4);
 	m_framecpu->set_addrmap(AS_PROGRAM, &esripsys_state::frame_cpu_map);
@@ -704,7 +704,6 @@ void esripsys_state::esripsys(machine_config &config)
 	dacvol.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	dacvol.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
 
 	TMS5220(config, m_tms, 640000).add_route(ALL_OUTPUTS, "speaker", 1.0);

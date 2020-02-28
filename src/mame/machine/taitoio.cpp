@@ -56,6 +56,7 @@ Newer version of the I/O chip ?
 #include "emu.h"
 #include "machine/taitoio.h"
 
+#include <algorithm>
 
 /***************************************************************************/
 /*                                                                         */
@@ -67,7 +68,6 @@ DEFINE_DEVICE_TYPE(TC0040IOC, tc0040ioc_device, "tc0040ioc", "Taito TC0040IOC")
 
 tc0040ioc_device::tc0040ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TC0040IOC, tag, owner, clock),
-	m_regs{ 0, 0, 0, 0, 0, 0, 0, 0 },
 	m_port(0),
 	m_watchdog(*this, "watchdog"),
 	m_read_0_cb(*this),
@@ -77,6 +77,7 @@ tc0040ioc_device::tc0040ioc_device(const machine_config &mconfig, const char *ta
 	m_write_4_cb(*this),
 	m_read_7_cb(*this)
 {
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
 
 //-------------------------------------------------
@@ -104,8 +105,7 @@ void tc0040ioc_device::device_reset()
 {
 	m_port = 0;
 
-	for (auto & elem : m_regs)
-		elem = 0;
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
 
 //-------------------------------------------------
@@ -121,40 +121,41 @@ void tc0040ioc_device::device_add_mconfig(machine_config &config)
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ8_MEMBER( tc0040ioc_device::read )
+u8 tc0040ioc_device::read(offs_t offset)
 {
 	if (offset & 1)
-		return watchdog_r(space, 0);
+		return watchdog_r();
 	else
-		return portreg_r(space, 0);
+		return portreg_r();
 }
 
-WRITE8_MEMBER( tc0040ioc_device::write )
+void tc0040ioc_device::write(offs_t offset, u8 data)
 {
 	if (offset & 1)
-		port_w(space, 0, data);
+		port_w(data);
 	else
-		portreg_w(space, 0, data);
+		portreg_w(data);
 }
 
-READ8_MEMBER( tc0040ioc_device::watchdog_r )
+u8 tc0040ioc_device::watchdog_r()
 {
-	m_watchdog->watchdog_reset();
+	if (!machine().side_effects_disabled())
+		m_watchdog->watchdog_reset();
 	return 0;
 }
 
 // only used now for "input bypass" hacks
-READ8_MEMBER( tc0040ioc_device::port_r )
+u8 tc0040ioc_device::port_r()
 {
 	return m_port;
 }
 
-WRITE8_MEMBER( tc0040ioc_device::port_w )
+void tc0040ioc_device::port_w(u8 data)
 {
 	m_port = data;
 }
 
-READ8_MEMBER( tc0040ioc_device::portreg_r )
+u8 tc0040ioc_device::portreg_r()
 {
 	switch (m_port)
 	{
@@ -182,7 +183,7 @@ READ8_MEMBER( tc0040ioc_device::portreg_r )
 	}
 }
 
-WRITE8_MEMBER( tc0040ioc_device::portreg_w )
+void tc0040ioc_device::portreg_w(u8 data)
 {
 	if (m_port < ARRAY_LENGTH(m_regs))
 		m_regs[m_port] = data;
@@ -213,7 +214,6 @@ DEFINE_DEVICE_TYPE(TC0220IOC, tc0220ioc_device, "tc0220ioc", "Taito TC0220IOC")
 
 tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TC0220IOC, tag, owner, clock),
-	m_regs{ 0, 0, 0, 0, 0, 0, 0, 0 },
 	m_watchdog(*this, "watchdog"),
 	m_read_0_cb(*this),
 	m_read_1_cb(*this),
@@ -223,6 +223,7 @@ tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, const char *ta
 	m_write_4_cb(*this),
 	m_read_7_cb(*this)
 {
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
 
 //-------------------------------------------------
@@ -248,8 +249,7 @@ void tc0220ioc_device::device_start()
 
 void tc0220ioc_device::device_reset()
 {
-	for (auto & elem : m_regs)
-		elem = 0;
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
 
 //-------------------------------------------------
@@ -266,7 +266,7 @@ void tc0220ioc_device::device_add_mconfig(machine_config &config)
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ8_MEMBER( tc0220ioc_device::read )
+u8 tc0220ioc_device::read(offs_t offset)
 {
 	switch (offset)
 	{
@@ -294,7 +294,7 @@ READ8_MEMBER( tc0220ioc_device::read )
 	}
 }
 
-WRITE8_MEMBER( tc0220ioc_device::write )
+void tc0220ioc_device::write(offs_t offset, u8 data)
 {
 	m_regs[offset] = data;
 	switch (offset)
@@ -341,6 +341,7 @@ tc0510nio_device::tc0510nio_device(const machine_config &mconfig, const char *ta
 	m_write_4_cb(*this),
 	m_read_7_cb(*this)
 {
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
 
 //-------------------------------------------------
@@ -366,8 +367,7 @@ void tc0510nio_device::device_start()
 
 void tc0510nio_device::device_reset()
 {
-	for (auto & elem : m_regs)
-		elem = 0;
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
 
 //-------------------------------------------------
@@ -383,7 +383,7 @@ void tc0510nio_device::device_add_mconfig(machine_config &config)
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ8_MEMBER( tc0510nio_device::read )
+u8 tc0510nio_device::read(offs_t offset)
 {
 	switch (offset)
 	{
@@ -411,7 +411,7 @@ READ8_MEMBER( tc0510nio_device::read )
 	}
 }
 
-WRITE8_MEMBER( tc0510nio_device::write )
+void tc0510nio_device::write(offs_t offset, u8 data)
 {
 	m_regs[offset] = data;
 
@@ -435,31 +435,31 @@ WRITE8_MEMBER( tc0510nio_device::write )
 	}
 }
 
-READ16_MEMBER( tc0510nio_device::halfword_r )
+u16 tc0510nio_device::halfword_r(offs_t offset)
 {
-	return read(space, offset);
+	return read(offset);
 }
 
-WRITE16_MEMBER( tc0510nio_device::halfword_w )
+void tc0510nio_device::halfword_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		write(space, offset, data & 0xff);
+		write(offset, data & 0xff);
 	else
 	{
 		/* driftout writes the coin counters here - bug? */
 //logerror("CPU #0 %s: warning - write to MSB of TC0510NIO address %02x\n",m_maincpu->pc(),offset);
-		write(space, offset, (data >> 8) & 0xff);
+		write(offset, (data >> 8) & 0xff);
 	}
 }
 
-READ16_MEMBER( tc0510nio_device::halfword_wordswap_r )
+u16 tc0510nio_device::halfword_wordswap_r(offs_t offset)
 {
-	return halfword_r(space, offset ^ 1, mem_mask);
+	return halfword_r(offset ^ 1);
 }
 
-WRITE16_MEMBER( tc0510nio_device::halfword_wordswap_w )
+void tc0510nio_device::halfword_wordswap_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	halfword_w(space, offset ^ 1,data, mem_mask);
+	halfword_w(offset ^ 1,data, mem_mask);
 }
 
 
@@ -482,6 +482,7 @@ tc0640fio_device::tc0640fio_device(const machine_config &mconfig, const char *ta
 	m_write_4_cb(*this),
 	m_read_7_cb(*this)
 {
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
 
 //-------------------------------------------------
@@ -506,8 +507,7 @@ void tc0640fio_device::device_start()
 
 void tc0640fio_device::device_reset()
 {
-	for (auto & elem : m_regs)
-		elem = 0;
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
 
 //-------------------------------------------------
@@ -524,7 +524,7 @@ void tc0640fio_device::device_add_mconfig(machine_config &config)
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ8_MEMBER( tc0640fio_device::read )
+u8 tc0640fio_device::read(offs_t offset)
 {
 	switch (offset)
 	{
@@ -552,7 +552,7 @@ READ8_MEMBER( tc0640fio_device::read )
 	}
 }
 
-WRITE8_MEMBER( tc0640fio_device::write )
+void tc0640fio_device::write(offs_t offset, u8 data)
 {
 	m_regs[offset] = data;
 	switch (offset)
@@ -571,34 +571,34 @@ WRITE8_MEMBER( tc0640fio_device::write )
 	}
 }
 
-READ16_MEMBER( tc0640fio_device::halfword_r )
+u16 tc0640fio_device::halfword_r(offs_t offset)
 {
-	return read(space, offset);
+	return read(offset);
 }
 
-WRITE16_MEMBER( tc0640fio_device::halfword_w )
+void tc0640fio_device::halfword_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		write(space, offset, data & 0xff);
+		write(offset, data & 0xff);
 	else
 	{
-		write(space, offset, (data >> 8) & 0xff);
+		write(offset, (data >> 8) & 0xff);
 //logerror("CPU #0 %s: warning - write to MSB of TC0640FIO address %02x\n",m_maincpu->pc(),offset);
 	}
 }
 
-READ16_MEMBER( tc0640fio_device::halfword_byteswap_r )
+u16 tc0640fio_device::halfword_byteswap_r(offs_t offset)
 {
-	return halfword_r(space, offset, mem_mask) << 8;
+	return halfword_r(offset) << 8;
 }
 
-WRITE16_MEMBER( tc0640fio_device::halfword_byteswap_w )
+void tc0640fio_device::halfword_byteswap_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
-		write(space, offset, (data >> 8) & 0xff);
+		write(offset, (data >> 8) & 0xff);
 	else
 	{
-		write(space, offset, data & 0xff);
+		write(offset, data & 0xff);
 //logerror("CPU #0 %s: warning - write to LSB of TC0640FIO address %02x\n",m_maincpu->pc(),offset);
 	}
 }

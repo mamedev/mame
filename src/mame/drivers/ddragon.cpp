@@ -260,7 +260,7 @@ WRITE8_MEMBER(darktowr_state::darktowr_bankswitch_w)
  *
  *************************************/
 
-void ddragon_state::ddragon_interrupt_ack(address_space &space, offs_t offset, uint8_t data)
+void ddragon_state::ddragon_interrupt_ack(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -277,7 +277,7 @@ void ddragon_state::ddragon_interrupt_ack(address_space &space, offs_t offset, u
 			break;
 
 		case 3: /* 380e - SND IRQ and latch */
-			m_soundlatch->write(space, 0, data);
+			m_soundlatch->write(data);
 			break;
 
 		case 4: /* 380f - MCU IRQ */
@@ -290,14 +290,14 @@ void ddragon_state::ddragon_interrupt_ack(address_space &space, offs_t offset, u
 
 READ8_MEMBER(ddragon_state::ddragon_interrupt_r)
 {
-	ddragon_interrupt_ack(space, offset, 0xff);
+	ddragon_interrupt_ack(offset, 0xff);
 	return 0xff;
 }
 
 
 WRITE8_MEMBER(ddragon_state::ddragon_interrupt_w)
 {
-	ddragon_interrupt_ack(space, offset, data);
+	ddragon_interrupt_ack(offset, data);
 }
 
 
@@ -332,7 +332,7 @@ WRITE8_MEMBER(ddragon_state::ddragonba_port_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(ddragon_state::subcpu_bus_free)
+READ_LINE_MEMBER(ddragon_state::subcpu_bus_free_r)
 {
 	// Corresponds to BA (Bus Available) on the HD63701
 	if (m_subcpu)
@@ -561,7 +561,7 @@ void ddragon_state::sub_map(address_map &map)
 
 void ddragon_state::ddragonba_sub_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram();
+	map(0x0100, 0x0fff).ram();
 	map(0x8000, 0x81ff).ram().share("comram");
 	map(0xc000, 0xffff).rom();
 }
@@ -680,7 +680,7 @@ static INPUT_PORTS_START( ddragon )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddragon_state, subcpu_bus_free, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddragon_state, subcpu_bus_free_r)
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -954,7 +954,7 @@ void ddragon_state::ddragon(machine_config &config)
 	MC6809(config, m_soundcpu, MAIN_CLOCK / 2); /* HD68A09P, 6 MHz / 4 internally */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &ddragon_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60000); /* heavy interleaving to sync up sprite<->main CPUs */
+	config.set_maximum_quantum(attotime::from_hz(60000)); /* heavy interleaving to sync up sprite<->main CPUs */
 
 	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
@@ -1025,7 +1025,7 @@ void ddragon_state::ddragon6809(machine_config &config)
 	MC6809E(config, m_soundcpu, MAIN_CLOCK / 8);    /* 1.5 MHz */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &ddragon_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60000); /* heavy interleaving to sync up sprite<->main CPUs */
+	config.set_maximum_quantum(attotime::from_hz(60000)); /* heavy interleaving to sync up sprite<->main CPUs */
 
 	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
@@ -1076,7 +1076,7 @@ void ddragon_state::ddragon2(machine_config &config)
 	Z80(config, m_soundcpu, 3579545);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &ddragon_state::dd2_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60000); /* heavy interleaving to sync up sprite<->main CPUs */
+	config.set_maximum_quantum(attotime::from_hz(60000)); /* heavy interleaving to sync up sprite<->main CPUs */
 
 	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
@@ -1103,7 +1103,7 @@ void ddragon_state::ddragon2(machine_config &config)
 	fmsnd.add_route(0, "mono", 0.60);
 	fmsnd.add_route(1, "mono", 0.60);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 verified on bootleg PCB by Jose Tejada
 	oki.add_route(ALL_OUTPUTS, "mono", 0.20);
 }
 
@@ -1179,8 +1179,8 @@ ROM_START( ddragon )
 	ROM_LOAD( "21j-7",        0x00000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* Layer priority */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* Layer priority */
+	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
 ROM_END
 
 ROM_START( ddragonw )
@@ -1703,7 +1703,8 @@ ROM_START( ddragon2 )
 	ROM_LOAD( "26j7-0.bin",   0x20000, 0x20000, CRC(bc6a48d5) SHA1(04c434f8cd42a8f82a263548183569396f9b684d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon) */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* Layer priority (same as ddragon) */
+	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon)  */
 ROM_END
 
 

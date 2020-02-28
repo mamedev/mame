@@ -101,6 +101,7 @@ public:
 	{
 	public:
 		typedef std::shared_ptr<entry> shared_ptr;
+		typedef std::shared_ptr<const entry> shared_const_ptr;
 		typedef std::weak_ptr<entry> weak_ptr;
 
 		// constructor/destructor
@@ -113,17 +114,17 @@ public:
 		virtual ~entry();
 
 		// accessors
-		const std::vector<std::string> &names() const { return m_names; }
-		const std::string &name() const { return m_names[0]; }
-		virtual const char *value() const;
-		int priority() const { return m_priority;  }
-		void set_priority(int priority) { m_priority = priority; }
-		option_type type() const { return m_type; }
-		const char *description() const { return m_description; }
-		virtual const std::string &default_value() const;
-		virtual const char *minimum() const;
-		virtual const char *maximum() const;
-		bool has_range() const;
+		const std::vector<std::string> &names() const noexcept { return m_names; }
+		const std::string &name() const noexcept { return m_names[0]; }
+		virtual const char *value() const noexcept;
+		int priority() const noexcept { return m_priority; }
+		void set_priority(int priority) noexcept { m_priority = priority; }
+		option_type type() const noexcept { return m_type; }
+		const char *description() const noexcept { return m_description; }
+		virtual const std::string &default_value() const noexcept;
+		virtual const char *minimum() const noexcept;
+		virtual const char *maximum() const noexcept;
+		bool has_range() const noexcept;
 
 		// mutators
 		void set_value(std::string &&newvalue, int priority, bool always_override = false);
@@ -146,21 +147,21 @@ public:
 	};
 
 	// construction/destruction
-	core_options();
+	core_options() = default;
 	core_options(const core_options &) = delete;
-	core_options(core_options &&) = delete;
+	core_options(core_options &&) = default;
 	core_options& operator=(const core_options &) = delete;
-	core_options& operator=(core_options &&) = delete;
+	core_options& operator=(core_options &&) = default;
 	virtual ~core_options();
 
 	// getters
-	const std::string &command() const { return m_command; }
-	const std::vector<std::string> &command_arguments() const { assert(!m_command.empty()); return m_command_arguments; }
-	const entry::shared_ptr get_entry(const std::string &name) const;
-	entry::shared_ptr get_entry(const std::string &name);
-	const std::vector<entry::shared_ptr> &entries() const { return m_entries; }
-	bool exists(const std::string &name) const { return get_entry(name) != nullptr; }
-	bool header_exists(const char *description) const;
+	const std::string &command() const noexcept { return m_command; }
+	const std::vector<std::string> &command_arguments() const noexcept { assert(!m_command.empty()); return m_command_arguments; }
+	entry::shared_const_ptr get_entry(const std::string &name) const noexcept;
+	entry::shared_ptr get_entry(const std::string &name) noexcept;
+	const std::vector<entry::shared_ptr> &entries() const noexcept { return m_entries; }
+	bool exists(const std::string &name) const noexcept { return get_entry(name) != nullptr; }
+	bool header_exists(const char *description) const noexcept;
 
 	// configuration
 	void add_entry(entry::shared_ptr &&entry, const char *after_header = nullptr);
@@ -184,11 +185,11 @@ public:
 	std::string output_help() const;
 
 	// reading
-	const char *value(const char *option) const;
-	const char *description(const char *option) const;
+	const char *value(const char *option) const noexcept;
+	const char *description(const char *option) const noexcept;
 	bool bool_value(const char *option) const { return int_value(option) != 0; }
-	int int_value(const char *option) const { return atoi(value(option)); }
-	float float_value(const char *option) const { return atof(value(option)); }
+	int int_value(const char *option) const;
+	float float_value(const char *option) const;
 
 	// setting
 	void set_value(const std::string &name, const std::string &value, int priority);
@@ -197,7 +198,7 @@ public:
 	void set_value(const std::string &name, float value, int priority);
 
 	// misc
-	static const char *unadorned(int x = 0) { return s_option_unadorned[std::min(x, MAX_UNADORNED_OPTIONS - 1)]; }
+	static const char *unadorned(int x = 0) noexcept { return s_option_unadorned[std::min(x, MAX_UNADORNED_OPTIONS - 1)]; }
 
 protected:
 	virtual void command_argument_processed() { }
@@ -212,13 +213,13 @@ private:
 		simple_entry(simple_entry &&) = delete;
 		simple_entry& operator=(const simple_entry &) = delete;
 		simple_entry& operator=(simple_entry &&) = delete;
-		~simple_entry();
+		virtual ~simple_entry();
 
 		// getters
-		virtual const char *value() const override;
-		virtual const char *minimum() const override;
-		virtual const char *maximum() const override;
-		virtual const std::string &default_value() const override;
+		virtual const char *value() const noexcept override;
+		virtual const char *minimum() const noexcept override;
+		virtual const char *maximum() const noexcept override;
+		virtual const std::string &default_value() const noexcept override;
 		virtual void revert(int priority_hi, int priority_lo) override;
 
 		virtual void set_default_value(std::string &&newvalue) override;
@@ -248,7 +249,7 @@ private:
 	void throw_options_exception_if_appropriate(condition_type condition, std::ostringstream &error_stream);
 
 	// internal state
-	std::vector<entry::shared_ptr>                      m_entries;              // cannonical list of entries
+	std::vector<entry::shared_ptr>                      m_entries;              // canonical list of entries
 	std::unordered_map<std::string, entry::weak_ptr>    m_entrymap;             // map for fast lookup
 	std::string                                         m_command;              // command found
 	std::vector<std::string>                            m_command_arguments;    // command arguments

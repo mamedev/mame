@@ -44,7 +44,6 @@
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
@@ -200,10 +199,10 @@ READ8_MEMBER( pegasus_state::pegasus_protection_r )
 void pegasus_state::pegasus_mem(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x0000, 0x2fff)      // mapped by the cartslots 1-3
+	//map(0x0000, 0x2fff)      // mapped by the cartslots 1-3
 	map(0xb000, 0xbdff).ram();
 	map(0xbe00, 0xbfff).ram().share("videoram");
-	//AM_RANGE(0xc000, 0xdfff)      // mapped by the cartslots 4-5
+	//map(0xc000, 0xdfff)      // mapped by the cartslots 4-5
 	map(0xe000, 0xe1ff).r(FUNC(pegasus_state::pegasus_protection_r));
 	map(0xe200, 0xe3ff).rw(FUNC(pegasus_state::pegasus_pcg_r), FUNC(pegasus_state::pegasus_pcg_w));
 	map(0xe400, 0xe403).mirror(0x1fc).rw(m_pia_u, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -463,15 +462,15 @@ image_init_result pegasus_state::load_cart(device_image_interface &image, generi
 void pegasus_state::machine_start()
 {
 	if (m_exp_00->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_00));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(*m_exp_00, FUNC(generic_slot_device::read_rom)));
 	if (m_exp_01->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_01));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8sm_delegate(*m_exp_01, FUNC(generic_slot_device::read_rom)));
 	if (m_exp_02->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_02));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2fff, read8sm_delegate(*m_exp_02, FUNC(generic_slot_device::read_rom)));
 	if (m_exp_0c->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xcfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_0c));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xcfff, read8sm_delegate(*m_exp_0c, FUNC(generic_slot_device::read_rom)));
 	if (m_exp_0d->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd000, 0xdfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_0d));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd000, 0xdfff, read8sm_delegate(*m_exp_0d, FUNC(generic_slot_device::read_rom)));
 }
 
 void pegasus_state::machine_reset()
@@ -488,27 +487,27 @@ void pegasus_state::init_pegasus()
 	pegasus_decrypt_rom(base);
 }
 
-MACHINE_CONFIG_START(pegasus_state::pegasus)
+void pegasus_state::pegasus(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))  // actually a 6809C - 4MHZ clock coming in, 1MHZ internally
-	MCFG_DEVICE_PROGRAM_MAP(pegasus_mem)
+	MC6809(config, m_maincpu, XTAL(4'000'000));  // actually a 6809C - 4MHZ clock coming in, 1MHZ internally
+	m_maincpu->set_addrmap(AS_PROGRAM, &pegasus_state::pegasus_mem);
 
 	TIMER(config, "pegasus_firq").configure_periodic(FUNC(pegasus_state::pegasus_firq), attotime::from_hz(400));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(pegasus_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 16*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 16*16-1)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pegasus)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(pegasus_state::screen_update));
+	screen.set_size(32*8, 16*16);
+	screen.set_visarea(0, 32*8-1, 0, 16*16-1);
+	screen.set_palette("palette");
+	GFXDECODE(config, "gfxdecode", "palette", gfx_pegasus);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
 	PIA6821(config, m_pia_s, 0);
@@ -526,33 +525,25 @@ MACHINE_CONFIG_START(pegasus_state::pegasus)
 	m_pia_u->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	m_pia_u->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_GENERIC_SOCKET_ADD("exp00", generic_plain_slot, "pegasus_cart")
-	MCFG_GENERIC_LOAD(pegasus_state, exp00_load)
-
-	MCFG_GENERIC_SOCKET_ADD("exp01", generic_plain_slot, "pegasus_cart")
-	MCFG_GENERIC_LOAD(pegasus_state, exp01_load)
-
-	MCFG_GENERIC_SOCKET_ADD("exp02", generic_plain_slot, "pegasus_cart")
-	MCFG_GENERIC_LOAD(pegasus_state, exp02_load)
-
-	MCFG_GENERIC_SOCKET_ADD("exp0c", generic_plain_slot, "pegasus_cart")
-	MCFG_GENERIC_LOAD(pegasus_state, exp0c_load)
-
-	MCFG_GENERIC_SOCKET_ADD("exp0d", generic_plain_slot, "pegasus_cart")
-	MCFG_GENERIC_LOAD(pegasus_state, exp0d_load)
+	GENERIC_SOCKET(config, "exp00", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp00_load));
+	GENERIC_SOCKET(config, "exp01", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp01_load));
+	GENERIC_SOCKET(config, "exp02", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp02_load));
+	GENERIC_SOCKET(config, "exp0c", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp0c_load));
+	GENERIC_SOCKET(config, "exp0d", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp0d_load));
 
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED|CASSETTE_MOTOR_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("pegasus_cart");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pegasus_state::pegasusm)
+void pegasus_state::pegasusm(machine_config &config)
+{
 	pegasus(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(pegasusm_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &pegasus_state::pegasusm_mem);
+}
 
 
 /* ROM definition */

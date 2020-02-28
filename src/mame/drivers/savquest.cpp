@@ -156,7 +156,7 @@ uint8_t savquest_state::mtxc_config_r(int function, int reg)
 
 void savquest_state::mtxc_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:MXTC: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:MXTC: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 
 	#if 1
 	switch(reg)
@@ -299,7 +299,7 @@ uint8_t savquest_state::piix4_config_r(int function, int reg)
 
 void savquest_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 
@@ -740,7 +740,7 @@ void savquest_state::savquest_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw(FUNC(savquest_state::smram_r), FUNC(savquest_state::smram_w)); //AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
+	map(0x000a0000, 0x000bffff).rw(FUNC(savquest_state::smram_r), FUNC(savquest_state::smram_w)); //.rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	map(0x000f0000, 0x000fffff).bankr("bios_f0000").w(FUNC(savquest_state::bios_f0000_ram_w));
 	map(0x000e0000, 0x000e3fff).bankr("bios_e0000").w(FUNC(savquest_state::bios_e0000_ram_w));
@@ -770,7 +770,7 @@ void savquest_state::savquest_io(address_map &map)
 
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 
-//  AM_RANGE(0x5000, 0x5007) // routes to port $eb
+//  map(0x5000, 0x5007) // routes to port $eb
 }
 
 #define AT_KEYB_HELPER(bit, text, key1) \
@@ -812,19 +812,20 @@ void savquest_isa16_cards(device_slot_interface &device)
 	device.option_add("sb16", ISA16_SOUND_BLASTER_16);
 }
 
-MACHINE_CONFIG_START(savquest_state::savquest)
-	MCFG_DEVICE_ADD("maincpu", PENTIUM2, 450000000) // actually Pentium II 450
-	MCFG_DEVICE_PROGRAM_MAP(savquest_map)
-	MCFG_DEVICE_IO_MAP(savquest_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+void savquest_state::savquest(machine_config &config)
+{
+	PENTIUM2(config, m_maincpu, 450000000); // actually Pentium II 450
+	m_maincpu->set_addrmap(AS_PROGRAM, &savquest_state::savquest_map);
+	m_maincpu->set_addrmap(AS_IO, &savquest_state::savquest_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 	DS12885(config.replace(), "rtc");
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, savquest_state, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, savquest_state, intel82371ab_pci_r, intel82371ab_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(13, DEVICE_SELF, savquest_state, pci_3dfx_r, pci_3dfx_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device( 0, FUNC(savquest_state::intel82439tx_pci_r), FUNC(savquest_state::intel82439tx_pci_w));
+	pcibus.set_device( 7, FUNC(savquest_state::intel82371ab_pci_r), FUNC(savquest_state::intel82371ab_pci_w));
+	pcibus.set_device(13, FUNC(savquest_state::pci_3dfx_r), FUNC(savquest_state::pci_3dfx_w));
 
 	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
@@ -837,7 +838,7 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	isa16_device &isa(ISA16(config, "isa", 0)); // FIXME: determine ISA bus clock
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
-	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "isa", savquest_isa16_cards, "sb16", false)
+	ISA16_SLOT(config, "isa1", 0, "isa", savquest_isa16_cards, "sb16", false);
 
 	/* video hardware */
 	pcvideo_s3_vga(config);
@@ -848,13 +849,13 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	m_voodoo->set_screen_tag("screen");
 	m_voodoo->set_cpu_tag(m_maincpu);
 	m_voodoo->vblank_callback().set(FUNC(savquest_state::vblank_assert));
-MACHINE_CONFIG_END
+}
 
 ROM_START( savquest )
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD( "p2xbl_award_451pg.bin", 0x00000, 0x040000, CRC(37d0030e) SHA1(c6773d0e02325116f95c497b9953f59a9ac81317) )
 
-	ROM_REGION( 0x10000, "video_bios", 0 ) // 1st half is 2.04.14, second half is 2.01.11
+	ROM_REGION32_LE( 0x10000, "video_bios", 0 ) // 1st half is 2.04.14, second half is 2.01.11
 	ROM_LOAD( "vgabios.bin",   0x000000, 0x010000, CRC(a81423d6) SHA1(a099af621ce7fbaa55a2d9947d9f07e04f1b5fca) )
 
 	ROM_REGION( 0x080, "rtc", 0 )    /* default NVRAM */

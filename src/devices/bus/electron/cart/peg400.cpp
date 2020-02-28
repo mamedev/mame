@@ -79,7 +79,7 @@ void electron_peg400_device::device_start()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t electron_peg400_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
+uint8_t electron_peg400_device::read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
 {
 	uint8_t data = 0xff;
 
@@ -122,14 +122,14 @@ uint8_t electron_peg400_device::read(address_space &space, offs_t offset, int in
 //  write - cartridge data write
 //-------------------------------------------------
 
-void electron_peg400_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
+void electron_peg400_device::write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
 {
 	if (infc)
 	{
 		switch (offset & 0xff)
 		{
 		case 0xc0:
-			wd1770_control_w(space, 0, data);
+			wd1770_control_w(data);
 			break;
 		case 0xc4:
 		case 0xc5:
@@ -153,7 +153,7 @@ void electron_peg400_device::write(address_space &space, offs_t offset, uint8_t 
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE8_MEMBER(electron_peg400_device::wd1770_control_w)
+void electron_peg400_device::wd1770_control_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 

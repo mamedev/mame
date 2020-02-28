@@ -53,8 +53,7 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	DECLARE_READ32_MEMBER(eeprom_r);
-	DECLARE_WRITE32_MEMBER(eeprom_set_w);
-	DECLARE_WRITE32_MEMBER(eeprom_clear_w);
+	DECLARE_WRITE32_MEMBER(eeprom_w);
 
 	DECLARE_READ32_MEMBER(cpld_r);
 	DECLARE_WRITE32_MEMBER(cpld_w);
@@ -88,24 +87,14 @@ READ32_MEMBER(_39in1_state::eeprom_r)
 	return (m_eeprom->do_read() << 5) | (1 << 1); // Must be on.  Probably a DIP switch.
 }
 
-WRITE32_MEMBER(_39in1_state::eeprom_set_w)
+WRITE32_MEMBER(_39in1_state::eeprom_w)
 {
-	if (BIT(data, 2))
+	if (BIT(mem_mask, 2))
 		m_eeprom->cs_write(ASSERT_LINE);
-	if (BIT(data, 3))
-		m_eeprom->clk_write(ASSERT_LINE);
-	if (BIT(data, 4))
-		m_eeprom->di_write(1);
-}
-
-WRITE32_MEMBER(_39in1_state::eeprom_clear_w)
-{
-	if (BIT(data, 2))
-		m_eeprom->cs_write(ASSERT_LINE);
-	if (BIT(data, 3))
-		m_eeprom->clk_write(CLEAR_LINE);
-	if (BIT(data, 4))
-		m_eeprom->di_write(0);
+	if (BIT(mem_mask, 3))
+		m_eeprom->clk_write(BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
+	if (BIT(mem_mask, 4))
+		m_eeprom->di_write(BIT(data, 4));
 }
 
 READ32_MEMBER(_39in1_state::cpld_r)
@@ -198,7 +187,7 @@ READ32_MEMBER(_39in1_state::prot_cheater_r)
 void _39in1_state::driver_init()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler (0xa0151648, 0xa015164b, read32_delegate(FUNC(_39in1_state::prot_cheater_r), this));
+	space.install_read_handler (0xa0151648, 0xa015164b, read32_delegate(*this, FUNC(_39in1_state::prot_cheater_r)));
 }
 
 void _39in1_state::_39in1_map(address_map &map)
@@ -206,12 +195,12 @@ void _39in1_state::_39in1_map(address_map &map)
 	map(0x00000000, 0x0007ffff).rom();
 	map(0x00400000, 0x005fffff).rom().region("data", 0);
 	map(0x04000000, 0x047fffff).rw(FUNC(_39in1_state::cpld_r), FUNC(_39in1_state::cpld_w));
-	map(0x40000000, 0x400002ff).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_dma_r), FUNC(pxa255_periphs_device::pxa255_dma_w));
-	map(0x40400000, 0x40400083).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_i2s_r), FUNC(pxa255_periphs_device::pxa255_i2s_w));
-	map(0x40a00000, 0x40a0001f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_ostimer_r), FUNC(pxa255_periphs_device::pxa255_ostimer_w));
-	map(0x40d00000, 0x40d00017).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_intc_r), FUNC(pxa255_periphs_device::pxa255_intc_w));
-	map(0x40e00000, 0x40e0006b).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_gpio_r), FUNC(pxa255_periphs_device::pxa255_gpio_w));
-	map(0x44000000, 0x4400021f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_lcd_r), FUNC(pxa255_periphs_device::pxa255_lcd_w));
+	map(0x40000000, 0x400002ff).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::dma_r), FUNC(pxa255_periphs_device::dma_w));
+	map(0x40400000, 0x40400083).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::i2s_r), FUNC(pxa255_periphs_device::i2s_w));
+	map(0x40a00000, 0x40a0001f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::ostimer_r), FUNC(pxa255_periphs_device::ostimer_w));
+	map(0x40d00000, 0x40d00017).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::intc_r), FUNC(pxa255_periphs_device::intc_w));
+	map(0x40e00000, 0x40e0006b).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::gpio_r), FUNC(pxa255_periphs_device::gpio_w));
+	map(0x44000000, 0x4400021f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::lcd_r), FUNC(pxa255_periphs_device::lcd_w));
 	map(0xa0000000, 0xa07fffff).ram().share("ram");
 }
 
@@ -281,15 +270,15 @@ void _39in1_state::_39in1(machine_config &config)
 	EEPROM_93C66_16BIT(config, "eeprom");
 
 	PXA255_PERIPHERALS(config, m_pxa_periphs, 200000000, m_maincpu);
-	m_pxa_periphs->gpio0_set_cb().set(FUNC(_39in1_state::eeprom_set_w));
-	m_pxa_periphs->gpio0_clear_cb().set(FUNC(_39in1_state::eeprom_clear_w));
-	m_pxa_periphs->gpio0_in_cb().set(FUNC(_39in1_state::eeprom_r));
+	m_pxa_periphs->gpio0_write().set(FUNC(_39in1_state::eeprom_w));
+	m_pxa_periphs->gpio0_read().set(FUNC(_39in1_state::eeprom_r));
 }
 
-MACHINE_CONFIG_START(_39in1_state::_60in1)
+void _39in1_state::_60in1(machine_config &config)
+{
 	_39in1(config);
 	MCFG_MACHINE_START_OVERRIDE(_39in1_state,60in1)
-MACHINE_CONFIG_END
+}
 
 ROM_START( 39in1 )
 	// main program, encrypted
@@ -408,6 +397,18 @@ ROM_START( 19in1 )
 	ROM_LOAD16_WORD_SWAP( "19in1_eeprom.bin", 0x000, 0x200, NO_DUMP )
 ROM_END
 
+// TODO: encryption is different from 39in1 and 60in1
+ROM_START( rodent )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "exterminator.u2", 0x00000, 0x80000, CRC(23c1d21f) SHA1(349565b0f0a015196827707cabb8d9ce6560d2cc) )
+
+	ROM_REGION32_LE( 0x200000, "data", 0 )
+	ROM_LOAD( "m29w160db.u19", 0x000000, 0x200000, CRC(665ee79c) SHA1(35896b97378e8cd78e99d4527b9dc7392e545e17) )
+
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD( "93c66.u32", 0x000, 0x200, CRC(c311c7bc) SHA1(8328002b7f6a8b7a3ffca079b7960bc990211d7b) )
+ROM_END
+
 GAME(2004, 4in1a,  39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "4 in 1 MAME bootleg (set 1, ver 3.00)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
 GAME(2004, 4in1b,  39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "4 in 1 MAME bootleg (set 2)",                       MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
 GAME(2004, 19in1,  39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "19 in 1 MAME bootleg",                              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
@@ -416,3 +417,4 @@ GAME(2004, 48in1,  39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "boo
 GAME(2004, 48in1b, 39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "48 in 1 MAME bootleg (set 2, ver 3.09, alt flash)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
 GAME(2004, 48in1a, 39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "48 in 1 MAME bootleg (set 3, ver 3.02)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
 GAME(2004, 60in1,  39in1, _60in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "60 in 1 MAME bootleg (ver 3.00)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2005, rodent, 0,     _39in1, 39in1, _39in1_state, driver_init, ROT270, "The Game Room", "Rodent Exterminator",                         MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)

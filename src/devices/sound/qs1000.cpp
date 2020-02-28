@@ -2,7 +2,7 @@
 // copyright-holders:Philip Bennett
 /***************************************************************************
 
-    qs1000.c
+    qs1000.cpp
 
     QS1000 device emulator.
 

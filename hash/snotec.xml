@@ -8,7 +8,7 @@
 		<publisher>Bandai</publisher>
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x40000">
-				<rom name="SNC_Conan2.ic" size="0x40000" crc="47a3ce5e" sha1="2f9653ef01026d8a8f8c3036bda533336ebc7e0a" offset="0" />
+				<rom name="SNC_Conan2.ic" size="0x40000" crc="47a3ce5e" sha1="2f9653ef01026d8a8f8c3036bda533336ebc7e0a"/>
 			</dataarea>
 			<dataarea name="eeprom" size="0x4000">
 			</dataarea>
@@ -21,7 +21,7 @@
 		<publisher>Bandai</publisher>
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x40000">
-				<rom name="SNC_Tamago.ic1" size="0x40000" crc="3900e281" sha1="8b2faf3961e4a873a513f426056da188af37b2b5" offset="0" />
+				<rom name="SNC_Tamago.ic1" size="0x40000" crc="3900e281" sha1="8b2faf3961e4a873a513f426056da188af37b2b5"/>
 			</dataarea>
 			<dataarea name="eeprom" size="0x4000">
 			</dataarea>
@@ -35,7 +35,7 @@
 		<publisher>Bandai</publisher>
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x80000">
-				<rom name="SNCVC-MAIL.IC3" size="0x80000" crc="a3246a56" sha1="616b060cab85076571c47edf30f312535196e41a" offset="0" />
+				<rom name="SNCVC-MAIL.IC3" size="0x80000" crc="a3246a56" sha1="616b060cab85076571c47edf30f312535196e41a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -46,7 +46,7 @@
 		<publisher>Bandai</publisher>
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x40000">
-				<rom name="SNC-PET1.IC1" size="0x40000" crc="1ba10001" sha1="6ab6e9d79d6f60dc07c951ec94369e6059351744" offset="0" />
+				<rom name="SNC-PET1.IC1" size="0x40000" crc="1ba10001" sha1="6ab6e9d79d6f60dc07c951ec94369e6059351744"/>
 			</dataarea>
 		</part>
 	</software>
@@ -57,7 +57,7 @@
 		<publisher>Bandai</publisher>
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x80000">
-				<rom name="SNC-CONAN3.IC1" size="0x80000" crc="f93d6149" sha1="b624db8fd47cae79357de4d60d41d88ebe1f089d" offset="0" />
+				<rom name="SNC-CONAN3.IC1" size="0x80000" crc="f93d6149" sha1="b624db8fd47cae79357de4d60d41d88ebe1f089d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -68,7 +68,7 @@
 		<publisher>Bandai</publisher>
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x40000">
-				<rom name="BANDAIP1.IC1" size="0x40000" crc="dc8bd361" sha1="d88498321c3038afd6b917005860bd118fe31aa2" offset="0" />
+				<rom name="BANDAIP1.IC1" size="0x40000" crc="dc8bd361" sha1="d88498321c3038afd6b917005860bd118fe31aa2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -79,7 +79,7 @@
 		<publisher>Bandai</publisher>
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x40000">
-				<rom name="Audition.ic1" size="0x40000" crc="685fc899" sha1="0e203ed002450031663d6626380d39b88dc7b1ab" offset="0" />
+				<rom name="Audition.ic1" size="0x40000" crc="685fc899" sha1="0e203ed002450031663d6626380d39b88dc7b1ab"/>
 			</dataarea>
 			<dataarea name="eeprom" size="0x4000">
 			</dataarea>
@@ -92,7 +92,7 @@
 		<publisher>Bandai</publisher>
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x40000">
-				<rom name="LH532KV6.IC1" size="0x40000" crc="edf3cc1e" sha1="0b759ff7dd2bd6809e5634679f758de106fed654" offset="0" />
+				<rom name="LH532KV6.IC1" size="0x40000" crc="edf3cc1e" sha1="0b759ff7dd2bd6809e5634679f758de106fed654"/>
 			</dataarea>
 		</part>
 	</software>
@@ -103,7 +103,7 @@
 		<publisher>Bandai</publisher>
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x40000">
-				<rom name="LH532KWU.ic1" size="0x40000" crc="b0017e0d" sha1="0147f0c61fa47509971222cbacfafd382ed2e31d" offset="0" />
+				<rom name="LH532KWU.ic1" size="0x40000" crc="b0017e0d" sha1="0147f0c61fa47509971222cbacfafd382ed2e31d"/>
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
 			</dataarea>

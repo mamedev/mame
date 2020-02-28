@@ -78,17 +78,17 @@ void naughtyb_state::naughtyb_palette(palette_device &palette) const
 		// red component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i+0x100], 0);
-		int const r = combine_2_weights(weights, bit0, bit1);
+		int const r = combine_weights(weights, bit0, bit1);
 
 		// green component
 		bit0 = BIT(color_prom[i], 2);
 		bit1 = BIT(color_prom[i+0x100], 2);
-		int const g = combine_2_weights(weights, bit0, bit1);
+		int const g = combine_weights(weights, bit0, bit1);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 1);
 		bit1 = BIT(color_prom[i+0x100], 1);
-		int const b = combine_2_weights(weights, bit0, bit1);
+		int const b = combine_weights(weights, bit0, bit1);
 
 		palette.set_pen_color(bitswap<8>(i, 5, 7, 6, 2, 1, 0, 4, 3), rgb_t(r, g, b));
 	}

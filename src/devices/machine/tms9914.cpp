@@ -177,15 +177,7 @@ tms9914_device::tms9914_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig , TMS9914 , tag , owner , clock),
 	  m_dio_read_func(*this),
 	  m_dio_write_func(*this),
-	  m_signal_wr_fns{
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this) },
+	  m_signal_wr_fns(*this),
 	  m_int_write_func(*this),
 	  m_accrq_write_func(*this)
 {
@@ -241,7 +233,7 @@ WRITE_LINE_MEMBER(tms9914_device::ren_w)
 }
 
 // Register I/O
-WRITE8_MEMBER(tms9914_device::reg8_w)
+void tms9914_device::write(offs_t offset, uint8_t data)
 {
 	LOG_REG("W %u=%02x\n" , offset , data);
 
@@ -323,7 +315,7 @@ WRITE8_MEMBER(tms9914_device::reg8_w)
 	}
 }
 
-READ8_MEMBER(tms9914_device::reg8_r)
+uint8_t tms9914_device::read(offs_t offset)
 {
 	uint8_t res;
 
@@ -481,9 +473,7 @@ void tms9914_device::device_start()
 
 	m_dio_read_func.resolve_safe(0xff);
 	m_dio_write_func.resolve_safe();
-	for (auto& f : m_signal_wr_fns) {
-		f.resolve_safe();
-	}
+	m_signal_wr_fns.resolve_all_safe();
 	m_int_write_func.resolve_safe();
 	m_accrq_write_func.resolve_safe();
 

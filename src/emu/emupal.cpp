@@ -21,83 +21,82 @@ DEFINE_DEVICE_TYPE(PALETTE, palette_device, "palette", "palette")
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, init_delegate &&init, u32 entries, u32 indirect)
 	: palette_device(mconfig, tag, owner, 0U)
 {
-	set_entries(entries);
-	set_indirect_entries(indirect);
-	set_init(std::move(init));
+	set_entries(entries, indirect);
+	m_init = std::move(init);
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, black_t, u32 entries)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_all_black), tag, this), entries)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_all_black)), entries)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, mono_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_monochrome), tag, this), 2)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_monochrome)), 2)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, mono_inv_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_monochrome_inverted), tag, this), 2)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_monochrome_inverted)), 2)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, mono_hi_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_monochrome_highlight), tag, this), 3)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_monochrome_highlight)), 3)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_rgb), tag, this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_3bit_rgb)), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rbg_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_rbg), tag, this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_3bit_rbg)), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, grb_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_grb), tag, this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_3bit_grb)), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, gbr_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_gbr), tag, this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_3bit_gbr)), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, brg_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_brg), tag, this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_3bit_brg)), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_bgr), tag, this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_3bit_bgr)), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_555_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_rgb_555), tag, this), 32768)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_rgb_555)), 32768)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, grb_555_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_grb_555), tag, this), 32768)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_grb_555)), 32768)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_555_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_bgr_555), tag, this), 32768)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_bgr_555)), 32768)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_565_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_rgb_565), tag, this), 65536)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_rgb_565)), 65536)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_565_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_bgr_565), tag, this), 65536)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_bgr_565)), 65536)
 {
 }
 
@@ -114,7 +113,7 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 	, m_endianness()
 	, m_endianness_supplied(false)
 	, m_prom_region(*this, finder_base::DUMMY_TAG)
-	, m_init()
+	, m_init(*this)
 	, m_raw_to_rgb()
 {
 }
@@ -214,6 +213,12 @@ palette_device &palette_device::set_format(irgb_4444_t, u32 entries)
 palette_device &palette_device::set_format(rgbi_4444_t, u32 entries)
 {
 	set_format(2, &raw_to_rgb_converter::standard_irgb_decoder<4,4,4,4, 0,12,8,4>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(ibgr_4444_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_irgb_decoder<4,4,4,4, 12,0,4,8>, entries);
 	return *this;
 }
 
@@ -337,6 +342,24 @@ palette_device &palette_device::set_format(rrrrggggbbbbrgbx_t, u32 entries)
 	return *this;
 }
 
+palette_device &palette_device::set_format(xrgbrrrrggggbbbb_bit0_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit0_decoder, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xrgbrrrrggggbbbb_bit4_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit4_decoder, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xbgrbbbbggggrrrr_bit0_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::xBGRBBBBGGGGRRRR_bit0_decoder, entries);
+	return *this;
+}
+
 
 //**************************************************************************
 //  GENERIC WRITE HANDLERS
@@ -373,35 +396,35 @@ inline void palette_device::update_for_write(offs_t byte_offset, int bytes_modif
 //  write - write a byte to the base paletteram
 //-------------------------------------------------
 
-WRITE8_MEMBER(palette_device::write8)
+void palette_device::write8(offs_t offset, u8 data)
 {
 	m_paletteram.write8(offset, data);
 	update_for_write(offset, 1);
 }
 
-WRITE16_MEMBER(palette_device::write16)
+void palette_device::write16(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_paletteram.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);
 }
 
-WRITE32_MEMBER(palette_device::write32)
+void palette_device::write32(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_paletteram.write32(offset, data, mem_mask);
 	update_for_write(offset * 4, 4);
 }
 
-READ8_MEMBER(palette_device::read8)
+u8 palette_device::read8(offs_t offset)
 {
 	return m_paletteram.read8(offset);
 }
 
-READ16_MEMBER(palette_device::read16)
+u16 palette_device::read16(offs_t offset)
 {
 	return m_paletteram.read16(offset);
 }
 
-READ32_MEMBER(palette_device::read32)
+u32 palette_device::read32(offs_t offset)
 {
 	return m_paletteram.read32(offset);
 }
@@ -412,24 +435,24 @@ READ32_MEMBER(palette_device::read32)
 //  paletteram
 //-------------------------------------------------
 
-WRITE8_MEMBER(palette_device::write8_ext)
+void palette_device::write8_ext(offs_t offset, u8 data)
 {
 	m_paletteram_ext.write8(offset, data);
 	update_for_write(offset, 1);
 }
 
-WRITE16_MEMBER(palette_device::write16_ext)
+void palette_device::write16_ext(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_paletteram_ext.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);
 }
 
-READ8_MEMBER(palette_device::read8_ext)
+u8 palette_device::read8_ext(offs_t offset)
 {
 	return m_paletteram_ext.read8(offset);
 }
 
-READ16_MEMBER(palette_device::read16_ext)
+u16 palette_device::read16_ext(offs_t offset)
 {
 	return m_paletteram_ext.read16(offset);
 }
@@ -440,7 +463,7 @@ READ16_MEMBER(palette_device::read16_ext)
 //  paletteram, updating indirect colors
 //-------------------------------------------------
 
-WRITE8_MEMBER(palette_device::write_indirect)
+void palette_device::write_indirect(offs_t offset, u8 data)
 {
 	m_paletteram.write8(offset, data);
 	update_for_write(offset, 1, true);
@@ -452,7 +475,7 @@ WRITE8_MEMBER(palette_device::write_indirect)
 //  paletteram, updating indirect colors
 //-------------------------------------------------
 
-WRITE8_MEMBER(palette_device::write_indirect_ext)
+void palette_device::write_indirect_ext(offs_t offset, u8 data)
 {
 	m_paletteram_ext.write8(offset, data);
 	update_for_write(offset, 1, true);
@@ -471,7 +494,7 @@ WRITE8_MEMBER(palette_device::write_indirect_ext)
 void palette_device::device_start()
 {
 	// bind the init function
-	m_init.bind_relative_to(*owner());
+	m_init.resolve();
 
 	// find the memory, if present
 	const memory_share *share = memshare(tag());
@@ -479,10 +502,11 @@ void palette_device::device_start()
 	{
 		// find the extended (split) memory, if present
 		std::string tag_ext = std::string(tag()).append("_ext");
-		const memory_share *share_ext = memshare(tag_ext.c_str());
+		const memory_share *share_ext = memshare(tag_ext);
 
 		// make sure we have specified a format
-		assert_always(m_raw_to_rgb.bytes_per_entry() > 0, "Palette has memory share but no format specified");
+		if (m_raw_to_rgb.bytes_per_entry() <= 0)
+			throw emu_fatalerror("palette_device(%s): Palette has memory share but no format specified", tag());
 
 		// determine bytes per entry and configure
 		int bytes_per_entry = m_raw_to_rgb.bytes_per_entry();
@@ -498,7 +522,8 @@ void palette_device::device_start()
 		if (m_membits_supplied)
 		{
 			// forcing width only makes sense when narrower than the native bus width
-			assert_always(m_membits < share->bitwidth(), "Improper use of MCFG_PALETTE_MEMBITS");
+			if (m_membits >= share->bitwidth())
+				throw emu_fatalerror("palette_device(%s): Improper use of MCFG_PALETTE_MEMBITS", tag());
 			m_paletteram.set_membits(m_membits);
 			if (share_ext != nullptr)
 				m_paletteram_ext.set_membits(m_membits);
@@ -508,7 +533,8 @@ void palette_device::device_start()
 		if (m_endianness_supplied)
 		{
 			// forcing endianness only makes sense when the RAM is narrower than the palette format and not split
-			assert_always((share_ext == nullptr && m_paletteram.membits() / 8 < bytes_per_entry), "Improper use of MCFG_PALETTE_ENDIANNESS");
+			if (share_ext || (m_paletteram.membits() / 8) >= bytes_per_entry)
+				throw emu_fatalerror("palette_device(%s): Improper use of MCFG_PALETTE_ENDIANNESS", tag());
 			m_paletteram.set_endianness(m_endianness);
 		}
 	}
@@ -759,5 +785,13 @@ rgb_t raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit4_decoder(u32 raw)
 	u8 const r = pal5bit(((raw >> 8) & 0x0f) | ((raw >> 10) & 0x10));
 	u8 const g = pal5bit(((raw >> 4) & 0x0f) | ((raw >> 9)  & 0x10));
 	u8 const b = pal5bit(((raw >> 0) & 0x0f) | ((raw >> 8)  & 0x10));
+	return rgb_t(r, g, b);
+}
+
+rgb_t raw_to_rgb_converter::xBGRBBBBGGGGRRRR_bit0_decoder(u32 raw)
+{
+	u8 const r = pal5bit(((raw << 1) & 0x1e) | ((raw >> 12) & 0x01));
+	u8 const g = pal5bit(((raw >> 3) & 0x1e) | ((raw >> 13) & 0x01));
+	u8 const b = pal5bit(((raw >> 7) & 0x1e) | ((raw >> 14) & 0x01));
 	return rgb_t(r, g, b);
 }

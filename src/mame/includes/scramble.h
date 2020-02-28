@@ -24,7 +24,8 @@ public:
 		m_tmsprom(*this, "tmsprom"),
 		m_soundram(*this, "soundram"),
 		m_digitalker(*this, "digitalker"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_dial(*this, "DIAL")
 	{
 	}
 
@@ -36,8 +37,10 @@ public:
 	optional_device<digitalker_device> m_digitalker;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_custom_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ckongs_coinage_r);
+	optional_ioport m_dial;
+
+	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_dial_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(ckongs_coinage_r);
 	DECLARE_READ8_MEMBER(hncholms_prot_r);
 	DECLARE_READ8_MEMBER(scramble_soundram_r);
 	DECLARE_READ8_MEMBER(mars_ppi8255_0_r);

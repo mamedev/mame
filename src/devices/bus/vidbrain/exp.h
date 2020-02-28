@@ -43,13 +43,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define VIDEOBRAIN_EXPANSION_SLOT_TAG       "exp"
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -57,7 +50,7 @@ class videobrain_expansion_slot_device;
 
 // ======================> device_videobrain_expansion_card_interface
 
-class device_videobrain_expansion_card_interface : public device_slot_card_interface
+class device_videobrain_expansion_card_interface : public device_interface
 {
 	friend class videobrain_expansion_slot_device;
 
@@ -73,8 +66,8 @@ protected:
 	virtual uint8_t* videobrain_ram_pointer(running_machine &machine, size_t size);
 
 	// runtime
-	virtual uint8_t videobrain_bo_r(address_space &space, offs_t offset, int cs1, int cs2) { return 0; }
-	virtual void videobrain_bo_w(address_space &space, offs_t offset, uint8_t data, int cs1, int cs2) { }
+	virtual uint8_t videobrain_bo_r(offs_t offset, int cs1, int cs2) { return 0; }
+	virtual void videobrain_bo_w(offs_t offset, uint8_t data, int cs1, int cs2) { }
 	virtual void videobrain_extres_w() { }
 
 	videobrain_expansion_slot_device *m_slot;
@@ -90,7 +83,7 @@ protected:
 // ======================> videobrain_expansion_slot_device
 
 class videobrain_expansion_slot_device : public device_t,
-											public device_slot_interface,
+											public device_single_card_slot_interface<device_videobrain_expansion_card_interface>,
 											public device_image_interface
 {
 public:
@@ -109,15 +102,15 @@ public:
 	auto extres_wr_callback() { return m_write_extres.bind(); }
 
 	// computer interface
-	uint8_t bo_r(address_space &space, offs_t offset, int cs1, int cs2);
-	void bo_w(address_space &space, offs_t offset, uint8_t data, int cs1, int cs2);
+	uint8_t bo_r(offs_t offset, int cs1, int cs2) { return m_cart ? m_cart->videobrain_bo_r(offset, cs1, cs2) : 0; }
+	void bo_w(offs_t offset, uint8_t data, int cs1, int cs2) { if (m_cart) m_cart->videobrain_bo_w(offset, data, cs1, cs2); }
 
-	DECLARE_READ8_MEMBER( cs1_r ) { return bo_r(space, offset + 0x1000, 0, 1); }
-	DECLARE_WRITE8_MEMBER( cs1_w ) { bo_w(space, offset + 0x1000, data, 0, 1); }
-	DECLARE_READ8_MEMBER( cs2_r ) { return bo_r(space, offset + 0x1800, 1, 0); }
-	DECLARE_WRITE8_MEMBER( cs2_w ) { bo_w(space, offset + 0x1800, data, 1, 0); }
-	DECLARE_READ8_MEMBER( unmap_r ) { return bo_r(space, offset + 0x3000, 1, 0); }
-	DECLARE_WRITE8_MEMBER( unmap_w ) { bo_w(space, offset + 0x3000, data, 1, 0); }
+	uint8_t cs1_r(offs_t offset) { return bo_r(offset + 0x1000, 0, 1); }
+	void cs1_w(offs_t offset, uint8_t data) { bo_w(offset + 0x1000, data, 0, 1); }
+	uint8_t cs2_r(offs_t offset) { return bo_r(offset + 0x1800, 1, 0); }
+	void cs2_w(offs_t offset, uint8_t data) { bo_w(offset + 0x1800, data, 1, 0); }
+	uint8_t unmap_r(offs_t offset) { return bo_r(offset + 0x3000, 1, 0); }
+	void unmap_w(offs_t offset, uint8_t data) { bo_w(offset + 0x3000, data, 1, 0); }
 
 	// cartridge interface
 	DECLARE_WRITE_LINE_MEMBER( extres_w ) { m_write_extres(state); }
@@ -130,15 +123,15 @@ protected:
 	virtual image_init_result call_load() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "vidbrain_cart"; }
-	virtual const char *file_extensions() const override { return "bin"; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "vidbrain_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;

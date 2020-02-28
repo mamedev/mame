@@ -369,7 +369,7 @@ void rvoice_state::rvoicepc(machine_config &config)
 	//hd63701_cpu_device &playercpu(HD63701(config "playercpu", XTAL(7'372'800))); // not dumped yet
 	//playercpu.set_addrmap(AS_PROGRAM, &rvoice_state::hd63701_slave_mem);
 	//playercpu.set_addrmap(AS_PROGRAM, &rvoice_state::hd63701_slave_io);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	mos6551_device &acia(MOS6551(config, "acia65c51", 0));
 	acia.set_xtal(1.8432_MHz_XTAL);

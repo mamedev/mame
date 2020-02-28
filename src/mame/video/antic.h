@@ -161,7 +161,7 @@ private:
 	uint8_t   m_cclock[256+32];     /* color clock buffer filled by ANTIC */
 	uint8_t   m_pmbits[256+32];     /* player missile buffer filled by GTIA */
 	std::unique_ptr<uint8_t[]>   m_prio_table[64];    /* player/missile priority tables */
-	VIDEO   *m_video[312];        /* video buffer */
+	std::unique_ptr<VIDEO[]>     m_video;             /* video buffer */
 	std::unique_ptr<uint32_t[]>  m_cclk_expand;       /* shared buffer for the following: */
 	uint32_t  *m_pf_21;             /* 1cclk 2 color txt 2,3 */
 	uint32_t  *m_pf_x10b;           /* 1cclk 4 color txt 4,5, gfx D,E */

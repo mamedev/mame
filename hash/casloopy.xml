@@ -3,9 +3,7 @@
 <softwarelist name="casloopy" description="Casio Loopy cartridges">
 
 <!-- Undumped titles:
-- Little Romance (リトルロマンス)
 - Chakura-kun no Omajinai Paradise (チャクラくんのおまじないパラダイス)
-- Magical Shop [add-on to extract images from vhs/dvd?]
 -->
 
 	<software name="animelnd">
@@ -16,7 +14,7 @@
 		<info name="alt_name" value="あにめらんど"/>
 		<part name="cart" interface="loopy_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="animelnd.bin" size="2097152" crc="665cd0a2" sha1="8d50867aba721185560fc92bed75c92263a1da39" offset="0" />
+				<rom name="animelnd.bin" size="2097152" crc="665cd0a2" sha1="8d50867aba721185560fc92bed75c92263a1da39"/>
 			</dataarea>
 		</part>
 	</software>
@@ -29,7 +27,7 @@
 		<info name="alt_name" value="ドリームチェンジ 小金ちゃんのファッションパーティー"/>
 		<part name="cart" interface="loopy_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="dreamchg.bin" size="2097152" crc="0b850185" sha1="b5d73661ea83167d2b07516c7c66a8a85b28415b" offset="0" />
+				<rom name="dreamchg.bin" size="2097152" crc="0b850185" sha1="b5d73661ea83167d2b07516c7c66a8a85b28415b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +40,21 @@
 		<info name="alt_name" value="HARIHARIシールパラダイス"/>
 		<part name="cart" interface="loopy_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="harihari.bin" size="2097152" crc="39a417d6" sha1="1adbd97181b61a1a65e21976b0146e9dd80fbdbf" offset="0" />
+				<rom name="harihari.bin" size="2097152" crc="39a417d6" sha1="1adbd97181b61a1a65e21976b0146e9dd80fbdbf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ltlromance">
+		<description>Little Romance</description>
+		<year>1996</year>
+		<publisher>Casio</publisher>
+		<info name="serial" value="XK-503"/>
+		<info name="alt_name" value="リトルロマンス"/>
+		<part name="cart" interface="loopy_cart">
+			<dataarea name="rom" size="0x3000000">
+				<rom name="d23c16000.ic104" size="0x200000" crc="947a96c3" sha1="df27293c136420d4c21724517953510292319433" offset="0x000000" />
+				<rom name="d23c8000.ic105" size="0x100000" crc="a868e597" sha1="87226d26dbb3a95ce8f75a595bd874af6e5cb17b" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -55,7 +67,7 @@
 		<info name="alt_name" value="似顔絵アーティスト"/>
 		<part name="cart" interface="loopy_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="nigaoart.bin" size="2097152" crc="63d59881" sha1="d2b830acf8440e4726e851514d609700375b27db" offset="0" />
+				<rom name="nigaoart.bin" size="2097152" crc="63d59881" sha1="d2b830acf8440e4726e851514d609700375b27db"/>
 			</dataarea>
 		</part>
 	</software>
@@ -68,7 +80,7 @@
 		<info name="alt_name" value="わんわん愛情物語"/>
 		<part name="cart" interface="loopy_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="wanwanam.bin" size="2097152" crc="291ab2bc" sha1="77a63cf194c5b06633e25b43916629b6f3428870" offset="0" />
+				<rom name="wanwanam.bin" size="2097152" crc="291ab2bc" sha1="77a63cf194c5b06633e25b43916629b6f3428870"/>
 			</dataarea>
 		</part>
 	</software>
@@ -81,7 +93,7 @@
 		<info name="alt_name" value="パソコン・コレクション"/>
 		<part name="cart" interface="loopy_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="pccllect.bin" size="2097152" crc="9cd4d282" sha1="15ac5a8e71fc8371505da8368d04c9634655d1d5" offset="0" />
+				<rom name="pccllect.bin" size="2097152" crc="9cd4d282" sha1="15ac5a8e71fc8371505da8368d04c9634655d1d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -108,7 +120,20 @@
 		<info name="alt_name" value="ルピトンのワンダーパレット"/>
 		<part name="cart" interface="loopy_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="lupiton.bin" size="0x200000" crc="338a5af7" sha1="ddb3e2b363ef0325a1370511f3692ca47031cb46" offset="0x000000" />
+				<rom name="lupiton.bin" size="0x200000" crc="338a5af7" sha1="ddb3e2b363ef0325a1370511f3692ca47031cb46" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vswordp">
+		<description>Video Seal Wordprocessor</description>
+		<year>1995</year>
+		<publisher>Casio</publisher>
+		<info name="serial" value="XK-700"/>
+		<info name="alt_name" value="Magical Shop"/>
+		<part name="cart" interface="loopy_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="mx23c8100.lsi102" size="0x100000" crc="5764591f" sha1="16a2ade7e08f16e44d5c74c714840df1b48da4ad" />
 			</dataarea>
 		</part>
 	</software>

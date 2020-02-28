@@ -22,7 +22,7 @@ uint32_t karnov_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	m_bg_tilemap->set_scrollx(m_scroll[0]);
 	m_bg_tilemap->set_scrolly(m_scroll[1]);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x800, 0);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(2), m_spriteram->buffer(), 0x800);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -64,8 +64,8 @@ void karnov_state::playfield_w(offs_t offset, u16 data, u16 mem_mask)
 VIDEO_START_MEMBER(karnov_state,karnov)
 {
 	/* Allocate bitmap & tilemap */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(karnov_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(karnov_state::get_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(karnov_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(karnov_state::get_fix_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
 }
@@ -73,8 +73,8 @@ VIDEO_START_MEMBER(karnov_state,karnov)
 VIDEO_START_MEMBER(karnov_state,wndrplnt)
 {
 	/* Allocate bitmap & tilemap */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(karnov_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(karnov_state::get_fix_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(karnov_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(karnov_state::get_fix_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
 }

@@ -1577,16 +1577,14 @@ READ32_MEMBER(gba_lcd_device::video_r)
 		break;
 	}
 
-	assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_lcd_device");
+	if (offset >= ARRAY_LENGTH(reg_names) / 2)
+		throw emu_fatalerror("gba_lcd_device::video_r: Not enough register names in gba_lcd_device");
 
 	if (ACCESSING_BITS_0_15)
-	{
 		verboselog(*this, 2, "GBA I/O Read: %s = %04x\n", reg_names[offset * 2], retval & 0x0000ffff);
-	}
+
 	if (ACCESSING_BITS_16_31)
-	{
 		verboselog(*this, 2, "GBA I/O Read: %s = %04x\n", reg_names[offset * 2 + 1], (retval & 0xffff0000) >> 16);
-	}
 
 	return retval;
 }
@@ -1595,16 +1593,14 @@ WRITE32_MEMBER(gba_lcd_device::video_w)
 {
 	COMBINE_DATA(&m_regs[offset]);
 
-	assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_lcd_device");
+	if (offset >= ARRAY_LENGTH(reg_names) / 2)
+		throw emu_fatalerror("gba_lcd_device::video_w: Not enough register names in gba_lcd_device");
 
 	if (ACCESSING_BITS_0_15)
-	{
 		verboselog(*this, 2, "GBA I/O Write: %s = %04x\n", reg_names[offset * 2], data & 0x0000ffff);
-	}
+
 	if (ACCESSING_BITS_16_31)
-	{
 		verboselog(*this, 2, "GBA I/O Write: %s = %04x\n", reg_names[offset * 2 + 1], (data & 0xffff0000) >> 16);
-	}
 
 	switch (offset)
 	{
@@ -1807,11 +1803,12 @@ void gba_lcd_device::device_reset()
 	m_hbl_timer->adjust(attotime::never);
 }
 
-MACHINE_CONFIG_START(gba_lcd_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'777'216) / 4, 308, 0, 240, 228, 0, 160)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, gba_lcd_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+void gba_lcd_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_raw(XTAL(16'777'216) / 4, 308, 0, 240, 228, 0, 160);
+	screen.set_screen_update(FUNC(gba_lcd_device::screen_update));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(gba_lcd_device::gba_palette), 32768);
-MACHINE_CONFIG_END
+}

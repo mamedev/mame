@@ -42,6 +42,8 @@ public:
 	// IRQ logic - 5 = VINT, 7 = DLC
 	void check_vint_irq();
 
+	void set_frameoffset(uint16_t offset) { m_frameoffset = offset; };
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -61,6 +63,7 @@ private:
 	uint8_t m_buffer0[0x1000];
 	uint8_t m_buffer1[0x1000];
 	uint8_t m_framesync;
+	uint16_t m_frameoffset;
 
 #ifdef M2COMM_SIMULATION
 	uint8_t m_linkenable;

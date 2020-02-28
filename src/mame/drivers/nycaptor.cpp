@@ -3,7 +3,7 @@
 /***************************************************************************
     N.Y. Captor - Taito '85
 
-     Driver by Tomasz Slanina  analog [at] op.pl
+     Driver by Tomasz Slanina
 ****************************************************************************
   Hardware similar to Fairyland Story
   Cycle Shooting (Taito '86) is running on (almost) the same hardware
@@ -749,7 +749,7 @@ void nycaptor_state::nycaptor(machine_config &config)
 
 	TAITO68705_MCU(config, m_bmcu, 2000000);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -798,7 +798,6 @@ void nycaptor_state::nycaptor(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -811,6 +810,7 @@ void nycaptor_state::cyclshtg(machine_config &config)
 
 	Z80(config, m_subcpu, 8000000/2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &nycaptor_state::cyclshtg_slave_map);
+	m_subcpu->set_addrmap(AS_IO, &nycaptor_state::bronx_slave_io_map);
 	m_subcpu->set_vblank_int("screen", FUNC(nycaptor_state::irq0_line_hold));
 
 	Z80(config, m_audiocpu, 8000000/2);
@@ -821,7 +821,7 @@ void nycaptor_state::cyclshtg(machine_config &config)
 	TAITO68705_MCU(config, m_bmcu, 2000000);
 #endif
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -868,7 +868,6 @@ void nycaptor_state::cyclshtg(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -889,7 +888,7 @@ void nycaptor_state::bronx(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nycaptor_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(nycaptor_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	config.m_minimum_quantum = attotime::from_hz(120);
+	config.set_maximum_quantum(attotime::from_hz(120));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -936,7 +935,6 @@ void nycaptor_state::bronx(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -976,17 +974,20 @@ ROM_START( nycaptor )
 	ROM_LOAD( "a50_14",   0x1c000, 0x4000, CRC(24b2f1bf) SHA1(4757aec2e4b99ce33d993ce1e19ee46a4eb76e86) )
 ROM_END
 
+// note, a mix of a80 and a97 codes, are there multiple versions of this game? the a97 gfx ROM doesn't match the bronx bootleg, so maybe the bootleg is based off the a80 version?
 ROM_START( cyclshtg )
-	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "a97_01.i17",   0x00000, 0x4000, CRC(686fac1a) SHA1(46d17cb98f064413bb76c5d869f8061d2771cda0) )
 	ROM_LOAD( "a97_02.i16",   0x04000, 0x4000, CRC(48a812f9) SHA1(8ab18cb8d6a8b7ce1ed1a4009f5435ce4b0937b4) )
-	ROM_LOAD( "a97_03.u15",   0x10000, 0x4000, CRC(67ad3067) SHA1(2e355653e91c093abe7db0a3d55d5a3f95c4a2e3) )
-	ROM_LOAD( "a97_04.u14",   0x14000, 0x4000, CRC(804e6445) SHA1(5b6771c5729faf62d5002d090c0b9c5ca5cb9ad6) )
+	ROM_LOAD( "a97_03.u15",   0x10000, 0x4000, BAD_DUMP CRC(67ad3067) SHA1(2e355653e91c093abe7db0a3d55d5a3f95c4a2e3) ) // first half of data is missing compared to bronx (rest not 100% identical when decrypted, so can't use bootleg data)
+	ROM_LOAD( "a97_04.u14",   0x14000, 0x4000, BAD_DUMP CRC(804e6445) SHA1(5b6771c5729faf62d5002d090c0b9c5ca5cb9ad6) ) // ^
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "a97_05.u22",   0x0000, 0x4000, CRC(fdc36c4f) SHA1(cae2d3f07c5bd6de9d40ff7d385b999e7dc9ce82) )
 	ROM_LOAD( "a80_06.u23",   0x4000, 0x4000, CRC(2769c5ab) SHA1(b8f5a4a8c70c8d37d5e92b37faa0e25b287b3fb2) )
-	ROM_LOAD( "a97_06.i24",   0x8000, 0x4000, CRC(c0473a54) SHA1(06fa7345a44a72995146e973c2cd7a14499f4310) )
+
+	ROM_REGION( 0x08000, "user1", 0 )
+	ROM_LOAD( "a97_06.i24",   0x4000, 0x4000, BAD_DUMP CRC(c0473a54) SHA1(06fa7345a44a72995146e973c2cd7a14499f4310) ) // see above
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a80_16.i26",   0x0000, 0x4000, CRC(ce171a48) SHA1(e5ae9bb22f58c8857737bc6f5317866819a4e4d1) )
@@ -1246,9 +1247,9 @@ ROM_START( colt )
 	ROM_LOAD( "04.bin",   0x00000, 0x4000, CRC(dc61fdb2) SHA1(94fdd95082936b2445008aee60381ebe35385b4a) )
 	ROM_LOAD( "03.bin",   0x04000, 0x4000, CRC(5835b8b1) SHA1(25a48660f8fb166f996133fb9113d1566dbae281) )
 	ROM_LOAD( "02.bin",   0x10000, 0x4000, CRC(89c99a28) SHA1(1a4fdb5c13569699dfbf2bde0aeeb5e7fcc22ef9) )
+	ROM_RELOAD(           0x14000, 0x4000)
 	ROM_LOAD( "01.bin",   0x18000, 0x4000, CRC(9b0948f3) SHA1(a55e09243640ec56aa22e4b6d47165b02b880eb7) )
-	ROM_COPY( "maincpu",   0x10000, 0x014000, 0x04000 )
-	ROM_COPY( "maincpu",   0x18000, 0x01c000, 0x04000 )
+	ROM_RELOAD(           0x1c000, 0x4000)
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "05.bin",   0x0000, 0x4000, CRC(2b6e017a) SHA1(60715e1c6fbcdd2c0e114035c342ba587dfc1b4b) )
@@ -1302,7 +1303,7 @@ void nycaptor_state::init_colt()
 }
 
 GAME( 1985, nycaptor, 0,        nycaptor, nycaptor, nycaptor_state, init_nycaptor, ROT0,  "Taito",   "N.Y. Captor",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, cyclshtg, 0,        cyclshtg, cyclshtg, nycaptor_state, init_cyclshtg, ROT90, "Taito",   "Cycle Shooting", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-/* bootlegs */
-GAME( 1986, bronx,    cyclshtg, bronx,    bronx,    nycaptor_state, init_bronx,    ROT90, "bootleg", "Bronx",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, colt,     nycaptor, bronx,    colt,     nycaptor_state, init_colt,     ROT0,  "bootleg", "Colt",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1986, cyclshtg, 0,        cyclshtg, cyclshtg, nycaptor_state, init_cyclshtg, ROT90, "Taito",   "Cycle Shooting", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bronx,    cyclshtg, bronx,    bronx,    nycaptor_state, init_bronx,    ROT90, "bootleg", "Bronx",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

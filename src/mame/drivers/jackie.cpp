@@ -53,6 +53,7 @@ Note
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class jackie_state : public driver_device
@@ -76,7 +77,7 @@ public:
 
 	void init_jackie();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	DECLARE_READ_LINE_MEMBER(hopper_r);
 
 private:
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
@@ -164,14 +165,14 @@ TILE_GET_INFO_MEMBER(jackie_state::get_reel_tile_info)
 
 void jackie_state::video_start()
 {
-	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jackie_state::get_reel_tile_info<0>),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jackie_state::get_reel_tile_info<1>),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jackie_state::get_reel_tile_info<2>),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackie_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackie_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackie_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	for (int i = 0; i < 3; i++)
 		m_reel_tilemap[i]->set_scroll_cols(64);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jackie_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackie_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,  8,  64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
@@ -374,7 +375,7 @@ void jackie_state::io_map(address_map &map)
 	map(0x8000, 0xffff).r(FUNC(jackie_state::expram_r));
 }
 
-CUSTOM_INPUT_MEMBER(jackie_state::hopper_r)
+READ_LINE_MEMBER(jackie_state::hopper_r)
 {
 	if (m_hopper) return !(m_screen->frame_number()%10);
 	return machine().input().code_pressed(KEYCODE_H);
@@ -453,7 +454,7 @@ static INPUT_PORTS_START( jackie )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9) PORT_NAME("Attendent")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF,jackie_state,hopper_r, nullptr) PORT_NAME("HPSW")    // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jackie_state, hopper_r) PORT_NAME("HPSW")    // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )   // test (press during boot)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")

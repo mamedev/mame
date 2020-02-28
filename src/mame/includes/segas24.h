@@ -60,7 +60,9 @@ public:
 	void init_sgmast();
 
 	void dcclub(machine_config &config);
+	void dcclubj(machine_config &config);
 	void mahmajn(machine_config &config);
+	void sgmastj(machine_config &config);
 	void system24_floppy(machine_config &config);
 	void system24_floppy_dcclub(machine_config &config);
 	void system24_floppy_fd1094(machine_config &config);
@@ -195,6 +197,8 @@ private:
 	void roughrac_common_map(address_map &map);
 	void roughrac_cpu1_map(address_map &map);
 	void roughrac_cpu2_map(address_map &map);
+	void dcclubj_cpu1_map(address_map &map);
+	void dcclubj_cpu2_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_SEGAS24_H

@@ -371,20 +371,21 @@ void poker72_state::machine_reset()
 	membank("bank1")->set_entry(0);
 }
 
-MACHINE_CONFIG_START(poker72_state::poker72)
+void poker72_state::poker72(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,8000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(poker72_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", poker72_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 8000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &poker72_state::poker72_map);
+	m_maincpu->set_vblank_int("screen", FUNC(poker72_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(poker72_state, screen_update_poker72)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
+	screen.set_screen_update(FUNC(poker72_state::screen_update_poker72));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_poker72);
 	PALETTE(config, m_palette, FUNC(poker72_state::poker72_palette), 0xe00);
@@ -395,7 +396,7 @@ MACHINE_CONFIG_START(poker72_state::poker72)
 	ay.port_a_read_callback().set_ioport("SW2");
 	ay.port_b_read_callback().set_ioport("SW3");
 	ay.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 

@@ -35,16 +35,17 @@ wpc_dmd_device::~wpc_dmd_device()
 {
 }
 
-MACHINE_CONFIG_START(wpc_dmd_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, wpc_dmd_device, screen_update)
-	MCFG_SCREEN_SIZE(128*4, 32*4)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128*4-1, 0, 32*4-1)
+void wpc_dmd_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(wpc_dmd_device::screen_update));
+	screen.set_size(128*4, 32*4);
+	screen.set_visarea(0, 128*4-1, 0, 32*4-1);
 
 	TIMER(config, "scanline").configure_periodic(FUNC(wpc_dmd_device::scanline_timer), attotime::from_hz(60*4*32));
-MACHINE_CONFIG_END
+}
 
 void wpc_dmd_device::device_start()
 {

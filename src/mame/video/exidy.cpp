@@ -270,7 +270,7 @@ void exidy_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 		break;
 	default:
-		assert_always(false, "Unknown id in exidy_state::device_timer");
+		throw emu_fatalerror("Unknown id in exidy_state::device_timer");
 	}
 }
 

@@ -67,7 +67,7 @@ WRITE16_MEMBER(lockon_state::lockon_crtc_w)
 TIMER_CALLBACK_MEMBER(lockon_state::cursor_callback)
 {
 	if (m_main_inten)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // V30
 
 	m_cursor_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
@@ -281,7 +281,7 @@ WRITE16_MEMBER(lockon_state::lockon_ground_ctrl_w)
 
 TIMER_CALLBACK_MEMBER(lockon_state::bufend_callback)
 {
-	m_ground->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_ground->set_input_line_and_vector(0, HOLD_LINE, 0xff); // V30
 	m_object->set_input_line(NEC_INPUT_LINE_POLL, ASSERT_LINE);
 }
 
@@ -886,7 +886,7 @@ void lockon_state::hud_draw( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 void lockon_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lockon_state::get_lockon_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lockon_state::get_lockon_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap->set_transparent_pen(0);
 
 	/* Allocate the two frame buffers for rotation */

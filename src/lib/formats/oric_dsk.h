@@ -7,9 +7,10 @@
     Oric disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_ORIC_DSK_H
+#define MAME_FORMATS_ORIC_DSK_H
 
-#ifndef ORIC_DSK_H
-#define ORIC_DSK_H
+#pragma once
 
 #include "flopimg.h"
 
@@ -29,4 +30,4 @@ public:
 
 extern const floppy_format_type FLOPPY_ORIC_DSK_FORMAT;
 
-#endif /* ORIC_DSK_H */
+#endif // MAME_FORMATS_ORIC_DSK_H

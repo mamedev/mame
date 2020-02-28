@@ -39,10 +39,26 @@ ie15_device::ie15_device(const machine_config &mconfig, device_type type, const 
 	, m_p_videoram(*this, "video")
 	, m_p_chargen(*this, "chargen")
 	, m_beeper(*this, "beeper")
-	, m_rs232(*this, "rs232")
 	, m_screen(*this, "screen")
 	, m_keyboard(*this, "keyboard")
 	, m_io_keyboard(*this, "io_keyboard")
+	, m_lat_led(*this, "lat_led")
+	, m_nr_led(*this, "nr_led")
+	, m_pch_led(*this, "pch_led")
+	, m_dup_led(*this, "dup_led")
+	, m_lin_led(*this, "lin_led")
+	, m_red_led(*this, "red_led")
+	, m_sdv_led(*this, "sdv_led")
+	, m_prd_led(*this, "prd_led")
+	, m_rs232_conn_txd_handler(*this)
+	, m_rs232_conn_dtr_handler(*this)
+	, m_rs232_conn_rts_handler(*this)
+	  // Until the UART is implemented
+	, m_rs232_txbaud(*this, "RS232_TXBAUD")
+	, m_rs232_rxbaud(*this, "RS232_RXBAUD")
+	, m_rs232_databits(*this, "RS232_DATABITS")
+	, m_rs232_parity(*this, "RS232_PARITY")
+	, m_rs232_stopbits(*this, "RS232_STOPBITS")
 {
 }
 
@@ -228,7 +244,7 @@ void ie15_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	}
 }
 
-WRITE_LINE_MEMBER(ie15_device::serial_rx_callback)
+WRITE_LINE_MEMBER(ie15_device::rs232_conn_rxd_w)
 {
 	device_serial_interface::rx_w(state);
 }
@@ -243,7 +259,7 @@ void ie15_device::rcv_complete()
 void ie15_device::tra_callback()
 {
 	uint8_t bit = transmit_register_get_data_bit();
-	m_rs232->write_txd(bit);
+	m_rs232_conn_txd_handler(bit);
 }
 
 void ie15_device::tra_complete()
@@ -282,6 +298,24 @@ WRITE8_MEMBER(ie15_device::serial_w)
 WRITE8_MEMBER(ie15_device::serial_speed_w)
 {
 	return;
+}
+
+WRITE_LINE_MEMBER(ie15_device::update_serial)
+{
+	int startbits = 1;
+	int databits = m_rs232_databits->read();
+	parity_t parity_table[] = { PARITY_NONE, PARITY_ODD, PARITY_EVEN, PARITY_MARK, PARITY_SPACE };
+	parity_t parity = parity_table[m_rs232_parity->read()];
+	stop_bits_t stopbits_table[] = { STOP_BITS_1, STOP_BITS_2 };
+	stop_bits_t stopbits = stopbits_table[m_rs232_stopbits->read()];
+
+	set_data_frame(startbits, databits, parity, stopbits);
+
+	int txbaud = m_rs232_txbaud->read();
+	set_tra_rate(txbaud);
+
+	int rxbaud = m_rs232_rxbaud->read();
+	set_rcv_rate(rxbaud);
 }
 
 READ8_MEMBER(ie15_device::flag_r)
@@ -375,6 +409,46 @@ INPUT_PORTS_START( ie15 )
 	PORT_DIPNAME(ie15_keyboard_device::IE_KB_LIN, ie15_keyboard_device::IE_KB_LIN, "LIN (Online)")
 	PORT_DIPSETTING(0x00, "Off")
 	PORT_DIPSETTING(ie15_keyboard_device::IE_KB_LIN, "On")
+
+	// Until the UART is implemented
+	PORT_START("RS232_RXBAUD")
+	PORT_CONFNAME(0xffff, 9600, "RX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFSETTING(300, "300")
+	PORT_CONFSETTING(600, "600")
+	PORT_CONFSETTING(1200, "1200")
+	PORT_CONFSETTING(2400, "2400")
+	PORT_CONFSETTING(4800, "4800")
+	PORT_CONFSETTING(9600, "9600")
+	PORT_CONFSETTING(19200, "19200")
+
+	PORT_START("RS232_TXBAUD")
+	PORT_CONFNAME(0xffff, 9600, "TX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFSETTING(300, "300")
+	PORT_CONFSETTING(600, "600")
+	PORT_CONFSETTING(1200, "1200")
+	PORT_CONFSETTING(2400, "2400")
+	PORT_CONFSETTING(4800, "4800")
+	PORT_CONFSETTING(9600, "9600")
+	PORT_CONFSETTING(19200, "19200")
+
+	PORT_START("RS232_DATABITS")
+	PORT_CONFNAME(0xf, 8, "Data Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFSETTING(7, "7")
+	PORT_CONFSETTING(8, "8")
+
+	PORT_START("RS232_PARITY")
+	PORT_CONFNAME(0x7, 0, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFSETTING(0, "None")
+	PORT_CONFSETTING(1, "Odd")
+	PORT_CONFSETTING(2, "Even")
+	PORT_CONFSETTING(3, "Mark")
+	PORT_CONFSETTING(4, "Space")
+
+	PORT_START("RS232_STOPBITS")
+	PORT_CONFNAME(0x3, 1, "Stop Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFSETTING(1, "1")
+	PORT_CONFSETTING(2, "2")
+
 INPUT_PORTS_END
 
 WRITE16_MEMBER( ie15_device::kbd_put )
@@ -390,8 +464,24 @@ WRITE16_MEMBER( ie15_device::kbd_put )
 	}
 }
 
+void ie15_device::device_resolve_objects()
+{
+	m_rs232_conn_dtr_handler.resolve_safe();
+	m_rs232_conn_rts_handler.resolve_safe();
+	m_rs232_conn_txd_handler.resolve_safe();
+}
+
 void ie15_device::device_start()
 {
+	m_lat_led.resolve();
+	m_nr_led.resolve();
+	m_pch_led.resolve();
+	m_dup_led.resolve();
+	m_lin_led.resolve();
+	m_red_led.resolve();
+	m_sdv_led.resolve();
+	m_prd_led.resolve();
+
 	m_hblank_timer = timer_alloc(TIMER_HBLANK);
 	m_hblank_timer->adjust(attotime::never);
 
@@ -402,6 +492,8 @@ void ie15_device::device_start()
 
 void ie15_device::device_reset()
 {
+	update_serial(0);
+
 	memset(&m_video, 0, sizeof(m_video));
 	m_kb_ruslat = m_long_beep = m_kb_control = m_kb_data = m_kb_flag0 = 0;
 	m_kb_flag = IE_TRUE;
@@ -499,14 +591,14 @@ void ie15_device::update_leds()
 {
 	uint8_t data = m_io_keyboard->read();
 
-	machine().output().set_value("lat_led", m_kb_ruslat ^ 1);
-	machine().output().set_value("nr_led", BIT(m_kb_control, ie15_keyboard_device::IE_KB_NR_BIT) ^ 1);
-	machine().output().set_value("pch_led", BIT(data, ie15_keyboard_device::IE_KB_PCH_BIT) ^ 1);
-	machine().output().set_value("dup_led", BIT(data, ie15_keyboard_device::IE_KB_DUP_BIT) ^ 1);
-	machine().output().set_value("lin_led", BIT(data, ie15_keyboard_device::IE_KB_LIN_BIT) ^ 1);
-	machine().output().set_value("red_led", BIT(data, ie15_keyboard_device::IE_KB_RED_BIT) ^ 1);
-	machine().output().set_value("sdv_led", BIT(m_kb_control, ie15_keyboard_device::IE_KB_SDV_BIT) ^ 1);
-	machine().output().set_value("prd_led", 1); // XXX
+	m_lat_led = m_kb_ruslat ^ 1;
+	m_nr_led = BIT(m_kb_control, ie15_keyboard_device::IE_KB_NR_BIT) ^ 1;
+	m_pch_led = BIT(data, ie15_keyboard_device::IE_KB_PCH_BIT) ^ 1;
+	m_dup_led = BIT(data, ie15_keyboard_device::IE_KB_DUP_BIT) ^ 1;
+	m_lin_led = BIT(data, ie15_keyboard_device::IE_KB_LIN_BIT) ^ 1;
+	m_red_led = BIT(data, ie15_keyboard_device::IE_KB_RED_BIT) ^ 1;
+	m_sdv_led = BIT(m_kb_control, ie15_keyboard_device::IE_KB_SDV_BIT) ^ 1;
+	m_prd_led = 1; // XXX
 }
 
 /*
@@ -579,9 +671,6 @@ void ie15_device::ie15core(machine_config &config)
 
 	/* Devices */
 	IE15_KEYBOARD(config, m_keyboard, 0).keyboard_cb().set(FUNC(ie15_device::kbd_put));
-
-	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
-	m_rs232->rxd_handler().set(FUNC(ie15_device::serial_rx_callback));
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 2400);

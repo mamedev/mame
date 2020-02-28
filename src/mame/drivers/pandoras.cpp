@@ -98,7 +98,7 @@ WRITE8_MEMBER(pandoras_state::i8039_irqen_and_status_w)
 
 WRITE8_MEMBER(pandoras_state::pandoras_z80_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE_LINE_MEMBER(pandoras_state::coin_counter_1_w)
@@ -140,7 +140,7 @@ void pandoras_state::pandoras_slave_map(address_map &map)
 	map(0x1a02, 0x1a02).portr("P2");
 	map(0x1a03, 0x1a03).portr("DSW3");
 	map(0x1c00, 0x1c00).portr("DSW2");
-//  AM_RANGE(0x1e00, 0x1e00) AM_READNOP                                                     /* ??? seems to be important */
+//  map(0x1e00, 0x1e00).nopr();                                                     /* ??? seems to be important */
 	map(0x8000, 0x8000).w("watchdog", FUNC(watchdog_timer_device::reset_w));        /* watchdog reset */
 	map(0xa000, 0xa000).w(FUNC(pandoras_state::pandoras_cpua_irqtrigger_w));                           /* cause FIRQ on CPU A */
 	map(0xc000, 0xc7ff).ram().share("share4");                                      /* Shared RAM with the CPU A */
@@ -305,8 +305,8 @@ READ8_MEMBER(pandoras_state::pandoras_portB_r)
 	return (m_audiocpu->total_cycles() / 512) & 0x0f;
 }
 
-MACHINE_CONFIG_START(pandoras_state::pandoras)
-
+void pandoras_state::pandoras(machine_config &config)
+{
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, MASTER_CLOCK/6);  /* CPU A */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pandoras_state::pandoras_master_map);
@@ -323,7 +323,7 @@ MACHINE_CONFIG_START(pandoras_state::pandoras)
 	m_mcu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
 	m_mcu->p2_out_cb().set(FUNC(pandoras_state::i8039_irqen_and_status_w));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - needed for correct synchronization of the sound CPUs */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - needed for correct synchronization of the sound CPUs */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // C3
 	mainlatch.q_out_cb<0>().set(FUNC(pandoras_state::cpua_irq_enable_w)); // ENA
@@ -337,14 +337,14 @@ MACHINE_CONFIG_START(pandoras_state::pandoras)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pandoras_state, screen_update_pandoras)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pandoras_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(pandoras_state::screen_update_pandoras));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(pandoras_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pandoras);
 	PALETTE(config, m_palette, FUNC(pandoras_state::pandoras_palette), 16*16+16*16, 32);
@@ -360,10 +360,11 @@ MACHINE_CONFIG_START(pandoras_state::pandoras)
 	aysnd.port_b_read_callback().set(FUNC(pandoras_state::pandoras_portB_r));
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.4);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.12); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 /***************************************************************************
@@ -372,6 +373,44 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+
+/*
+A PCB picture shows the following label format:
+
+PANDORA'S PAL
+A1   J13
+
+Visible ROM labels on the GX328 main board PWB(A)20001109B PCB:
+PANDORA'S PAL   A1   13J
+PANDORA'S PAL   A1   12J
+PANDORA'S PAL   A1   10J
+PANDORA'S PAL   A1   9J
+  -- J14 is an empty socket --
+PANDORA'S PAL   A1   17J
+PANDORA'S PAL   A1   18J
+PANDORA'S PAL   A1   19J
+
+PANDORA'S PAL   A1   18A
+PANDORA'S PAL   A1   19A
+
+PANDORA'S PAL   A1   5J
+
+BPROM at 16A stamped 328F14
+BPROM at 17G stamped 328F15
+BPROM at A2 not visible in picture
+
+ROMs labels on the GX328 sound board PWB(B)3000154A PCB:
+PANDORA'S PAL   A1     6C
+PANDORA'S PAL   A1     7E
+
+
+PCB stickered:
+
+Pandora's Palace
+KOSUKA
+(c) Konami 1984
+
+*/
 ROM_START( pandoras )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64K for the CPU A */
 	ROM_LOAD( "pand_j13.cpu",   0x08000, 0x02000, CRC(7a0fe9c5) SHA1(e68c8d76d1abb69ac72b0e2cd8c1dfc540064ee3) )

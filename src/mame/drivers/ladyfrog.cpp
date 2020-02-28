@@ -89,7 +89,7 @@ TIMER_CALLBACK_MEMBER(ladyfrog_state::nmi_callback)
 
 WRITE8_MEMBER(ladyfrog_state::sound_command_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ladyfrog_state::nmi_callback),this), data);
 }
 
@@ -299,7 +299,7 @@ void ladyfrog_state::ladyfrog(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ladyfrog_state::ladyfrog_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(ladyfrog_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -340,7 +340,6 @@ void ladyfrog_state::ladyfrog(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.25); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }

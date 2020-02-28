@@ -136,7 +136,7 @@ void nes_ffe8_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_ffe3_device::write_h)
+void nes_ffe3_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("mapper8 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -174,7 +174,7 @@ void nes_ffe4_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 }
 
-WRITE8_MEMBER(nes_ffe4_device::write_l)
+void nes_ffe4_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("mapper6 write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -202,7 +202,7 @@ WRITE8_MEMBER(nes_ffe4_device::write_l)
 	}
 }
 
-WRITE8_MEMBER(nes_ffe4_device::chr_w)
+void nes_ffe4_device::chr_w(offs_t offset, uint8_t data)
 {
 	int bank = offset >> 10;
 	if (m_exram_enabled)
@@ -212,7 +212,7 @@ WRITE8_MEMBER(nes_ffe4_device::chr_w)
 		m_chr_access[bank][offset & 0x3ff] = data;
 }
 
-READ8_MEMBER(nes_ffe4_device::chr_r)
+uint8_t nes_ffe4_device::chr_r(offs_t offset)
 {
 	int bank = offset >> 10;
 	if (m_exram_enabled)
@@ -222,7 +222,7 @@ READ8_MEMBER(nes_ffe4_device::chr_r)
 }
 
 
-WRITE8_MEMBER(nes_ffe4_device::write_h)
+void nes_ffe4_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("mapper6 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -257,7 +257,7 @@ WRITE8_MEMBER(nes_ffe4_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_ffe8_device::write_l)
+void nes_ffe8_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("mapper17 write_l, offset: %04x, data: %02x\n", offset, data));
 

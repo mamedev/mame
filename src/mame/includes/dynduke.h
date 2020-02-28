@@ -8,6 +8,7 @@
 #include "audio/seibu.h"
 #include "video/bufsprite.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class dynduke_state : public driver_device
 {

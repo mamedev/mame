@@ -30,6 +30,14 @@ Notes:
 - a Blocken PCB shot shows a 48 MHz xtal, game is definitely too slow at
   8 MHz (noticeable thru colour cycling effects)
 - Confirmed OSC is 48MHz and OKI resonator is 1.056MHz.
+- Hebereke no Popoon has various debug mode switches, the ones found so far:
+  $30878e: bit 0 enable, active low.
+           If enabled correctly all of the non gameplay screens become
+       text stubs;
+  $aff14: a non-zero value enables CPU usage in 2p mode.
+          As a side-effect this also makes winning condition to never
+      satisfy, it goes on indefinitely with the selected characters and
+      input methods.
 
 ***************************************************************************/
 
@@ -106,6 +114,11 @@ WRITE16_MEMBER(shangha3_state::irq_ack_w)
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
+uint8_t shangha3_state::cgrom_r(offs_t offset)
+{
+	return m_cgrom[offset];
+}
+
 void shangha3_state::shangha3_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
@@ -139,7 +152,7 @@ void shangha3_state::heberpop_map(address_map &map)
 	map(0x300000, 0x30ffff).ram().share("ram"); /* gfx & work ram */
 	map(0x340001, 0x340001).w(FUNC(shangha3_state::flipscreen_w));
 	map(0x360000, 0x360001).w(FUNC(shangha3_state::gfxlist_addr_w));
-	map(0x800000, 0xb7ffff).rom().region("gfx1", 0);
+	map(0x800000, 0xb7ffff).r(FUNC(shangha3_state::cgrom_r));
 }
 
 void shangha3_state::blocken_map(address_map &map)
@@ -156,7 +169,7 @@ void shangha3_state::blocken_map(address_map &map)
 	map(0x300000, 0x30ffff).ram().share("ram"); /* gfx & work ram */
 	map(0x340001, 0x340001).w(FUNC(shangha3_state::flipscreen_w));
 	map(0x360000, 0x360001).w(FUNC(shangha3_state::gfxlist_addr_w));
-	map(0x800000, 0xb7ffff).rom().region("gfx1", 0);
+	map(0x800000, 0xb7ffff).r(FUNC(shangha3_state::cgrom_r));
 }
 
 
@@ -719,7 +732,7 @@ void shangha3_state::init_heberpop()
 	m_do_shadows = 0;
 
 	// sound CPU runs in IM 0
-	m_audiocpu->set_input_line_vector(0, 0xff);  /* RST 38h */
+	m_audiocpu->set_input_line_vector(0, 0xff);  /* Z80 - RST 38h */
 }
 
 void shangha3_state::init_blocken()

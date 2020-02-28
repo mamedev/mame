@@ -111,14 +111,14 @@ void isbc_218a_device::device_reset()
 //  mcs0_r - chip select 0 read
 //-------------------------------------------------
 
-uint8_t isbc_218a_device::mcs0_r(address_space &space, offs_t offset)
+uint8_t isbc_218a_device::mcs0_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
 	switch (BIT(offset, 0))
 	{
-	case 0: data = m_fdc->msr_r(space, 0); break;
-	case 1: data = m_fdc->fifo_r(space, 0); break;
+	case 0: data = m_fdc->msr_r(); break;
+	case 1: data = m_fdc->fifo_r(); break;
 	}
 
 	return data;
@@ -129,11 +129,11 @@ uint8_t isbc_218a_device::mcs0_r(address_space &space, offs_t offset)
 //  mcs0_w - chip select 0 write
 //-------------------------------------------------
 
-void isbc_218a_device::mcs0_w(address_space &space, offs_t offset, uint8_t data)
+void isbc_218a_device::mcs0_w(offs_t offset, uint8_t data)
 {
 	switch (BIT(offset, 0))
 	{
-	case 1: m_fdc->fifo_w(space, 0, data); break;
+	case 1: m_fdc->fifo_w(data); break;
 	}
 }
 
@@ -142,7 +142,7 @@ void isbc_218a_device::mcs0_w(address_space &space, offs_t offset, uint8_t data)
 //  mcs1_r - chip select 1 read
 //-------------------------------------------------
 
-uint8_t isbc_218a_device::mcs1_r(address_space &space, offs_t offset)
+uint8_t isbc_218a_device::mcs1_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -159,7 +159,7 @@ uint8_t isbc_218a_device::mcs1_r(address_space &space, offs_t offset)
 //  mcs1_w - chip select 1 write
 //-------------------------------------------------
 
-void isbc_218a_device::mcs1_w(address_space &space, offs_t offset, uint8_t data)
+void isbc_218a_device::mcs1_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -182,7 +182,7 @@ void isbc_218a_device::mcs1_w(address_space &space, offs_t offset, uint8_t data)
 //  mdack_r - DMA acknowledge read
 //-------------------------------------------------
 
-uint8_t isbc_218a_device::mdack_r(address_space &space, offs_t offset)
+uint8_t isbc_218a_device::mdack_r(offs_t offset)
 {
 	return m_fdc->dma_r();
 }
@@ -192,7 +192,7 @@ uint8_t isbc_218a_device::mdack_r(address_space &space, offs_t offset)
 //  mdack_w - DMA acknowledge write
 //-------------------------------------------------
 
-void isbc_218a_device::mdack_w(address_space &space, offs_t offset, uint8_t data)
+void isbc_218a_device::mdack_w(offs_t offset, uint8_t data)
 {
 	m_fdc->dma_w(data);
 }

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina,Ryan Holtz
+// copyright-holders:Tomasz Slanina, Ryan Holtz
 /*
  2010.04.05. stephh
 
@@ -13,15 +13,20 @@
  2003.01.01. Tomasz Slanina
 
   changes :
-    - nmi generation ( incorrect freq probably)
+    - nmi generation (incorrect freq probably)
     - music/sfx (partially)
     - more sprite tiles (twice than before)
     - fixed sprites flips
     - scrolling (2nd game level)
     - better colors (weird 'hack' .. but works in most cases ( comparing with screens from emustatus ))
     - dips - lives
-    - visible area .. a bit smaller (at least bg 'generation' is not visible for scrolling levels )
+    - visible area .. a bit smaller (at least bg 'generation' is not visible for scrolling levels)
     - cpu clock .. now 4 mhz
+
+  TODO :
+    - Bridgepiece helicopters joining from the right side don't fly forward, this is especially a problem
+      on the 3rd level making it impossible to complete it.
+      What is it not caused by: memory map mirrors, spriteram writeonly, power-on ram contents
 */
 
 #include "emu.h"
@@ -31,6 +36,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class skyarmy_state : public driver_device
@@ -147,7 +153,7 @@ void skyarmy_state::skyarmy_palette(palette_device &palette) const
 
 void skyarmy_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skyarmy_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skyarmy_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap->set_scroll_cols(32);
 }
 
@@ -214,10 +220,10 @@ void skyarmy_state::skyarmy_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8fff).ram().w(FUNC(skyarmy_state::videoram_w)).share("videoram"); /* Video RAM */
-	map(0x9000, 0x93ff).ram().w(FUNC(skyarmy_state::colorram_w)).share("colorram"); /* Color RAM */
-	map(0x9800, 0x983f).ram().share("spriteram"); /* Sprites */
-	map(0x9840, 0x985f).ram().share("scrollram");  /* Scroll RAM */
+	map(0x8800, 0x8fff).ram().w(FUNC(skyarmy_state::videoram_w)).share("videoram");
+	map(0x9000, 0x93ff).ram().w(FUNC(skyarmy_state::colorram_w)).share("colorram");
+	map(0x9800, 0x983f).ram().share("spriteram");
+	map(0x9840, 0x985f).ram().share("scrollram");
 	map(0xa000, 0xa000).portr("DSW");
 	map(0xa001, 0xa001).portr("P1");
 	map(0xa002, 0xa002).portr("P2");
@@ -320,13 +326,13 @@ static GFXDECODE_START( gfx_skyarmy )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 8 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(skyarmy_state::skyarmy)
-
-	MCFG_DEVICE_ADD("maincpu", Z80,4000000)
-	MCFG_DEVICE_PROGRAM_MAP(skyarmy_map)
-	MCFG_DEVICE_IO_MAP(skyarmy_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skyarmy_state,  irq0_line_hold)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(skyarmy_state, nmi_source, 650)    /* Hz */
+void skyarmy_state::skyarmy(machine_config &config)
+{
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &skyarmy_state::skyarmy_map);
+	m_maincpu->set_addrmap(AS_IO, &skyarmy_state::skyarmy_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(skyarmy_state::irq0_line_hold));
+	m_maincpu->set_periodic_int(FUNC(skyarmy_state::nmi_source), attotime::from_hz(650));
 
 	ls259_device &latch(LS259(config, "latch")); // 11C
 	latch.q_out_cb<0>().set(FUNC(skyarmy_state::coin_counter_w));
@@ -336,13 +342,13 @@ MACHINE_CONFIG_START(skyarmy_state::skyarmy)
 	latch.q_out_cb<7>().set_nop(); // video RAM buffering?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8,32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8,32*8-1,1*8,31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(skyarmy_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8,32*8);
+	screen.set_visarea(0*8,32*8-1,1*8,31*8-1);
+	screen.set_screen_update(FUNC(skyarmy_state::screen_update));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skyarmy);
 	PALETTE(config, m_palette, FUNC(skyarmy_state::skyarmy_palette), 32);
@@ -351,7 +357,7 @@ MACHINE_CONFIG_START(skyarmy_state::skyarmy)
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, "ay0", 2500000).add_route(ALL_OUTPUTS, "mono", 0.15);
 	AY8910(config, "ay1", 2500000).add_route(ALL_OUTPUTS, "mono", 0.15);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( skyarmy )

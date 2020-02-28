@@ -322,7 +322,7 @@ public:
 
 	void init_nss();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
+	DECLARE_READ_LINE_MEMBER(game_over_flag_r);
 
 private:
 	required_device<cpu_device> m_bioscpu;
@@ -380,12 +380,12 @@ void nss_state::snes_map(address_map &map)
 
 READ8_MEMBER(nss_state::spc_ram_100_r)
 {
-	return m_spc700->spc_ram_r(space, offset + 0x100);
+	return m_spc700->spc_ram_r(offset + 0x100);
 }
 
 WRITE8_MEMBER(nss_state::spc_ram_100_w)
 {
-	m_spc700->spc_ram_w(space, offset + 0x100, data);
+	m_spc700->spc_ram_w(offset + 0x100, data);
 }
 
 void nss_state::spc_mem(address_map &map)
@@ -652,7 +652,7 @@ void nss_state::machine_start()
 }
 
 
-CUSTOM_INPUT_MEMBER(nss_state::game_over_flag_r)
+READ_LINE_MEMBER(nss_state::game_over_flag_r)
 {
 	return m_game_over_flag;
 }
@@ -665,7 +665,7 @@ static INPUT_PORTS_START( snes )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("FP")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nss_state,game_over_flag_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(nss_state, game_over_flag_r)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Restart Button")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Page Up Button")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Page Down Button")
@@ -832,22 +832,22 @@ void nss_state::machine_reset()
 	m_joy_flag = 1;
 }
 
-MACHINE_CONFIG_START(nss_state::nss)
-
+void nss_state::nss(machine_config &config)
+{
 	/* base snes hardware */
-	MCFG_DEVICE_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68Mhz, also 3.58Mhz */
-	MCFG_DEVICE_PROGRAM_MAP(snes_map)
+	_5A22(config, m_maincpu, MCLK_NTSC);   /* 2.68Mhz, also 3.58Mhz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nss_state::snes_map);
 
 	// runs at 24.576 MHz / 12 = 2.048 MHz
-	MCFG_DEVICE_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
-	MCFG_DEVICE_PROGRAM_MAP(spc_mem)
+	SPC700(config, m_soundcpu, XTAL(24'576'000) / 12);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &nss_state::spc_mem);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* nss hardware */
-	MCFG_DEVICE_ADD("bios", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(bios_map)
-	MCFG_DEVICE_IO_MAP(bios_io_map)
+	Z80(config, m_bioscpu, 4000000);
+	m_bioscpu->set_addrmap(AS_PROGRAM, &nss_state::bios_map);
+	m_bioscpu->set_addrmap(AS_IO, &nss_state::bios_io_map);
 
 	M50458(config, m_m50458, 4000000, "osd"); /* TODO: correct clock */
 	S3520CF(config, m_s3520cf); /* RTC */
@@ -857,32 +857,33 @@ MACHINE_CONFIG_START(nss_state::nss)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("spc700", SNES_SOUND)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	SNES_SOUND(config, m_spc700, XTAL(24'576'000) / 12);
+	m_spc700->add_route(0, "lspeaker", 1.00);
+	m_spc700->add_route(1, "rspeaker", 1.00);
 
 	/* video hardware */
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
 	config.set_default_layout(layout_dualhsxs);
 
 	// SNES PPU
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
-	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nss_state, nss_vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
+	m_screen->set_video_attributes(VIDEO_VARIABLE_WIDTH);
+	m_screen->set_screen_update(FUNC(snes_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(nss_state::nss_vblank_irq));
 
 	SNES_PPU(config, m_ppu, MCLK_NTSC);
 	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
 	m_ppu->set_screen("screen");
 
 	// NSS
-	MCFG_SCREEN_ADD("osd", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(288+22, 216+22)
-	MCFG_SCREEN_VISIBLE_AREA(0, 288-1, 0, 216-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nss_state,screen_update)
-MACHINE_CONFIG_END
+	screen_device &osd(SCREEN(config, "osd", SCREEN_TYPE_RASTER));
+	osd.set_refresh_hz(60);
+	osd.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	osd.set_size(288+22, 216+22);
+	osd.set_visarea(0, 288-1, 0, 216-1);
+	osd.set_screen_update(FUNC(nss_state::screen_update));
+}
 
 /***************************************************************************
 

@@ -14,6 +14,11 @@
 
 #include "emu.h"
 
+#ifdef __sun
+#define ASIO_DISABLE_DEV_POLL
+#define ASIO_HAS_EPOLL
+#endif
+
 #include <thread>
 #include <set>
 #include "asio.h"
@@ -21,7 +26,7 @@
 class output_client
 {
 public:
-  virtual ~output_client() {}
+  virtual ~output_client() = default;
   virtual void deliver(std::string &msg) = 0;
 };
 
@@ -155,7 +160,7 @@ public:
 
   void deliver_to_all(std::string msg)
   {
-	for (auto client: m_clients)
+	for (const auto &client: m_clients)
 	  client->deliver(msg);
   }
 
@@ -192,9 +197,7 @@ public:
 	{
 	}
 
-	virtual ~output_network()
-	{
-	}
+	virtual ~output_network() = default;
 
 	virtual int init(const osd_options &options) override
 	{

@@ -16,9 +16,10 @@
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/digitalk.h"
-#include "sound/discrete.h"
+#include "machine/netlist.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 namespace {
 
@@ -73,7 +74,8 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
-		, m_discrete(*this, "konami")
+		, m_netlist(*this, "konami")
+		, m_filter_ctl(*this, "konami:ctl%u", 0)
 		, m_fake_select(*this, "FAKE_SELECT")
 		, m_tenspot_game_dsw(*this, {"IN2_GAME0", "IN2_GAME1", "IN2_GAME2", "IN2_GAME3", "IN2_GAME4", "IN2_GAME5", "IN2_GAME6", "IN2_GAME7", "IN2_GAME8", "IN2_GAME9"})
 		, m_spriteram(*this, "spriteram")
@@ -99,10 +101,9 @@ public:
 	DECLARE_WRITE8_MEMBER(scramble_background_green_w);
 	DECLARE_WRITE8_MEMBER(scramble_background_blue_w);
 	DECLARE_WRITE8_MEMBER(galaxian_gfxbank_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(gmgalax_port_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(azurian_port_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kingball_muxbit_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kingball_noise_r);
+	template <int N> DECLARE_READ_LINE_MEMBER(azurian_port_r);
+	DECLARE_READ_LINE_MEMBER(kingball_muxbit_r);
+	DECLARE_READ_LINE_MEMBER(kingball_noise_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(moonwar_dial_r);
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 	DECLARE_WRITE8_MEMBER(start_lamp_w);
@@ -116,7 +117,7 @@ public:
 	DECLARE_WRITE8_MEMBER(theend_ppi8255_w);
 	DECLARE_WRITE8_MEMBER(theend_protection_w);
 	DECLARE_READ8_MEMBER(theend_protection_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(theend_protection_alt_r);
+	template <int N> DECLARE_READ_LINE_MEMBER(theend_protection_alt_r);
 	DECLARE_WRITE8_MEMBER(explorer_sound_control_w);
 	DECLARE_READ8_MEMBER(sfx_sample_io_r);
 	DECLARE_WRITE8_MEMBER(sfx_sample_io_w);
@@ -158,7 +159,6 @@ public:
 	DECLARE_WRITE8_MEMBER(froggeram_ppi8255_w);
 	DECLARE_WRITE8_MEMBER(artic_gfxbank_w);
 	DECLARE_READ8_MEMBER(tenspot_dsw_read);
-	DECLARE_INPUT_CHANGED_MEMBER(gmgalax_game_changed);
 	DECLARE_WRITE8_MEMBER(konami_sound_control_w);
 	DECLARE_READ8_MEMBER(konami_sound_timer_r);
 	DECLARE_WRITE8_MEMBER(konami_portc_0_w);
@@ -180,7 +180,6 @@ public:
 	void init_galaxian();
 	void init_nolock();
 	void init_azurian();
-	void init_gmgalax();
 	void init_pisces();
 	void init_batman2();
 	void init_frogg();
@@ -211,6 +210,7 @@ public:
 	void init_explorer();
 	void init_amigo2();
 	void init_mandinga();
+	void init_mandingaeg();
 	void init_sfx();
 	void init_atlantis();
 	void init_scobra();
@@ -239,7 +239,7 @@ public:
 	void tenspot_set_game_bank(int bank, int from_game);
 	uint32_t screen_update_galaxian(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt_w);
-	DECLARE_WRITE_LINE_MEMBER(tenspot_interrupt_w);
+	DECLARE_INPUT_CHANGED_MEMBER(tenspot_fake);
 	TIMER_DEVICE_CALLBACK_MEMBER(checkmaj_irq0_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(scramble_stars_blink_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timefgtr_scanline);
@@ -314,7 +314,6 @@ public:
 	void pacmanbl(machine_config &config);
 	void quaak(machine_config &config);
 	void galaxian(machine_config &config);
-	void gmgalax(machine_config &config);
 	void tenspot(machine_config &config);
 	void froggers(machine_config &config);
 	void froggervd(machine_config &config);
@@ -426,8 +425,8 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
-	optional_device<discrete_device> m_discrete;
-
+	optional_device<netlist_mame_sound_device> m_netlist;
+	optional_device_array<netlist_mame_logic_input_device, 12> m_filter_ctl;
 	optional_ioport m_fake_select;
 	optional_ioport_array<10> m_tenspot_game_dsw;
 
@@ -441,7 +440,6 @@ protected:
 	int m_numspritegens;
 	int m_counter_74ls161[2];
 	int m_direction[2];
-	uint8_t m_gmgalax_selected_game;
 	uint8_t m_zigzag_ay8910_latch;
 	uint8_t m_kingball_speech_dip;
 	uint8_t m_kingball_sound;
@@ -487,6 +485,28 @@ protected:
 	void videight_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 	void fourplay_map(address_map &map);
 	void videight_map(address_map &map);
+};
+
+class gmgalax_state : public galaxian_state
+{
+public:
+	gmgalax_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galaxian_state(mconfig, type, tag)
+		, m_glin(*this, "GLIN%u", 0U)
+		, m_gmin(*this, "GMIN%u", 0U)
+	{ }
+
+	void gmgalax(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(game_changed);
+	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(port_r);
+
+	void init_gmgalax();
+
+private:
+	uint8_t m_selected_game;
+	required_ioport_array<3> m_glin;
+	required_ioport_array<3> m_gmin;
 };
 
 #endif // MAME_INCLUDES_GALAXIAN_H

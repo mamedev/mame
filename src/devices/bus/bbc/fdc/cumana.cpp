@@ -137,7 +137,7 @@ void bbc_cumanafdc_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_cumanafdc_device::read)
+uint8_t bbc_cumanafdc_device::read(offs_t offset)
 {
 	uint8_t data;
 
@@ -152,7 +152,7 @@ READ8_MEMBER(bbc_cumanafdc_device::read)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_cumanafdc_device::write)
+void bbc_cumanafdc_device::write(offs_t offset, uint8_t data)
 {
 	if (offset & 0x04)
 	{

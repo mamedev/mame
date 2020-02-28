@@ -36,13 +36,14 @@ DEFINE_DEVICE_TYPE(NUBUS_VIKBW, nubus_vikbw_device, "nb_vikbw", "Moniterm Viking
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nubus_vikbw_device::device_add_mconfig)
-	MCFG_SCREEN_ADD( VIKBW_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_vikbw_device, screen_update)
-	MCFG_SCREEN_SIZE(1024,768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-	MCFG_SCREEN_REFRESH_RATE(70)
-MACHINE_CONFIG_END
+void nubus_vikbw_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, VIKBW_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(nubus_vikbw_device::screen_update));
+	screen.set_size(1024, 768);
+	screen.set_visarea(0, 1024-1, 0, 768-1);
+	screen.set_refresh_hz(70);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -91,8 +92,8 @@ void nubus_vikbw_device::device_start()
 	install_bank(slotspace+0x40000, slotspace+0x40000+VRAM_SIZE-1, "bank_vikbw", &m_vram[0]);
 	install_bank(slotspace+0x940000, slotspace+0x940000+VRAM_SIZE-1, "bank_vikbw2", &m_vram[0]);
 
-	nubus().install_device(slotspace, slotspace+3, read32_delegate(FUNC(nubus_vikbw_device::viking_enable_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_disable_w), this));
-	nubus().install_device(slotspace+0x80000, slotspace+0x80000+3, read32_delegate(FUNC(nubus_vikbw_device::viking_ack_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_ack_w), this));
+	nubus().install_device(slotspace, slotspace+3, read32_delegate(*this, FUNC(nubus_vikbw_device::viking_enable_r)), write32_delegate(*this, FUNC(nubus_vikbw_device::viking_disable_w)));
+	nubus().install_device(slotspace+0x80000, slotspace+0x80000+3, read32_delegate(*this, FUNC(nubus_vikbw_device::viking_ack_r)), write32_delegate(*this, FUNC(nubus_vikbw_device::viking_ack_w)));
 }
 
 //-------------------------------------------------

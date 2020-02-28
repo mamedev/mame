@@ -142,7 +142,7 @@ TIMER_CALLBACK_MEMBER(cloud9_state::clock_irq)
 }
 
 
-CUSTOM_INPUT_MEMBER(cloud9_state::get_vblank)
+READ_LINE_MEMBER(cloud9_state::vblank_r)
 {
 	int scanline = m_screen->vpos();
 	return (~m_syncprom[scanline & 0xff] >> 1) & 1;
@@ -289,7 +289,7 @@ static INPUT_PORTS_START( cloud9 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cloud9_state,get_vblank, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cloud9_state, vblank_r)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -330,7 +330,7 @@ static INPUT_PORTS_START( firebeas )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cloud9_state,get_vblank, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cloud9_state, vblank_r)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )

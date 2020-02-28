@@ -76,7 +76,7 @@ void newbrain_state::video_start()
 	save_item(NAME(m_tvl));
 }
 
-void newbrain_state::screen_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void newbrain_state::do_screen_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int columns = m_80l ? 80 : 40;
 	int excess = m_32_40 ? 4 : 24;
@@ -155,13 +155,9 @@ void newbrain_state::screen_update(bitmap_rgb32 &bitmap, const rectangle &clipre
 uint32_t newbrain_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_tvp)
-	{
-		screen_update(bitmap, cliprect);
-	}
+		do_screen_update(bitmap, cliprect);
 	else
-	{
 		bitmap.fill(rgb_t::black(), cliprect);
-	}
 
 	return 0;
 }
@@ -186,14 +182,15 @@ GFXDECODE_END
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(newbrain_state::newbrain_video)
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DRIVER(newbrain_state, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(640, 250)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
+void newbrain_state::newbrain_video(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_screen_update(FUNC(newbrain_state::screen_update));
+	screen.set_refresh_hz(50);
+	screen.set_size(640, 250);
+	screen.set_visarea(0, 639, 0, 249);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_newbrain)
-MACHINE_CONFIG_END
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_newbrain);
+}

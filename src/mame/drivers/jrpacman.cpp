@@ -131,7 +131,7 @@ private:
 
 WRITE8_MEMBER(jrpacman_state::jrpacman_interrupt_vector_w)
 {
-	m_maincpu->set_input_line_vector(0, data);
+	m_maincpu->set_input_line_vector(0, data); // Z80
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 

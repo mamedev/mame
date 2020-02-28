@@ -150,7 +150,7 @@ WRITE8_MEMBER( de_3b_state::sound_w )
 {
 	m_sound_data = data;
 	if(m_sound_data != 0xfe)
-		m_decobsmt->bsmt_comms_w(space,offset,m_sound_data);
+		m_decobsmt->bsmt_comms_w(m_sound_data);
 }
 
 READ8_MEMBER( de_3b_state::dmd_status_r )

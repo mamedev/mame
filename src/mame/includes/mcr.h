@@ -15,12 +15,14 @@
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/watchdog.h"
+#include "audio/bally.h"
 #include "audio/midway.h"
 #include "audio/csd.h"
 #include "sound/samples.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 /* constants */
 #define MAIN_OSC_MCR_I      XTAL(19'968'000)
@@ -126,7 +128,7 @@ protected:
 	optional_device<midway_cheap_squeak_deluxe_device> m_cheap_squeak_deluxe;
 	optional_device<midway_sounds_good_device> m_sounds_good;
 	optional_device<midway_turbo_cheap_squeak_device> m_turbo_cheap_squeak;
-	optional_device<midway_squawk_n_talk_device> m_squawk_n_talk;
+	optional_device<bally_squawk_n_talk_device> m_squawk_n_talk;
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -212,7 +214,7 @@ private:
 	emu_timer *m_ipu_watchdog_timer;
 
 	required_device<z80_device> m_ipu;
-	required_device<z80dart_device> m_ipu_sio;
+	required_device<z80sio_device> m_ipu_sio;
 	required_device<z80ctc_device> m_ipu_ctc;
 	required_device<z80pio_device> m_ipu_pio0;
 	required_device<z80pio_device> m_ipu_pio1;

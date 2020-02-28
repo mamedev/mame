@@ -209,10 +209,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(airraid_state::cshooter_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // updates scroll resgiters
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* Z80 - RST 10h */
 
 	if(scanline == 250) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* Z80 - RST 08h */
 }
 
 
@@ -258,19 +258,18 @@ void airraid_state::airraid_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSW2");
 	map(0xc004, 0xc004).portr("DSW1");
 	map(0xc500, 0xc500).w(FUNC(airraid_state::cshooter_c500_w));
-//  AM_RANGE(0xc600, 0xc600) AM_WRITE(cshooter_c600_w)            // see notes
+//  map(0xc600, 0xc600).w(FUNC(airraid_state::cshooter_c600_w));            // see notes
 	map(0xc700, 0xc700).w(FUNC(airraid_state::cshooter_c700_w));
-//  AM_RANGE(0xc801, 0xc801) AM_WRITE(cshooter_c801_w)            // see notes
+//  map(0xc801, 0xc801).w(FUNC(airraid_state::cshooter_c801_w));            // see notes
 	map(0xd000, 0xd7ff).ram().w(m_airraid_video, FUNC(airraid_video_device::txram_w)).share("txram");
 	map(0xd800, 0xd8ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xda00, 0xdaff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xdc00, 0xdc0f).ram().w(m_airraid_video, FUNC(airraid_video_device::vregs_w)).share("vregs");
-//  AM_RANGE(0xdc10, 0xdc10) AM_RAM
+//  map(0xdc10, 0xdc10).ram();
 	map(0xdc11, 0xdc11).w(FUNC(airraid_state::bank_w));
-//  AM_RANGE(0xdc19, 0xdc19) AM_RAM
-//  AM_RANGE(0xdc1e, 0xdc1e) AM_RAM
-//  AM_RANGE(0xdc1f, 0xdc1f) AM_RAM
-
+//  map(0xdc19, 0xdc19).ram();
+//  map(0xdc1e, 0xdc1e).ram();
+//  map(0xdc1f, 0xdc1f).ram();
 	map(0xde00, 0xde0f).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w));
 	map(0xe000, 0xfdff).ram().share("mainram");
 	map(0xfe00, 0xffff).ram().share("sprite_ram");
@@ -389,19 +388,19 @@ INPUT_PORTS_END
 
 
 
-MACHINE_CONFIG_START(airraid_state::airraid)
-
+void airraid_state::airraid(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80,XTAL(12'000'000)/2)        /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(airraid_map)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);        /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &airraid_state::airraid_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(airraid_state::cshooter_scanline), "airraid_vid:screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)      /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(airraid_sound_map)
-	MCFG_DEVICE_OPCODES_MAP(airraid_sound_decrypted_opcodes_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181)/4));      /* verified on pcb */
+	audiocpu.set_addrmap(AS_PROGRAM, &airraid_state::airraid_sound_map);
+	audiocpu.set_addrmap(AS_OPCODES, &airraid_state::airraid_sound_decrypted_opcodes_map);
+	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x100);
 
@@ -422,14 +421,14 @@ MACHINE_CONFIG_START(airraid_state::airraid)
 	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 
 	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(airraid_state::airraid_crypt)
+void airraid_state::airraid_crypt(machine_config &config)
+{
 	airraid(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_OPCODES, &airraid_state::decrypted_opcodes_map);
+}
 
 
 

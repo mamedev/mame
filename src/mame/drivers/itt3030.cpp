@@ -266,7 +266,7 @@ private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<i8741_device> m_kbdmcu;
+	required_device<i8741a_device> m_kbdmcu;
 	required_device<ram_device> m_ram;
 	required_device<crt5027_device> m_crtc;
 	required_device<address_map_bank_device> m_48kbank;
@@ -311,7 +311,7 @@ void itt3030_state::itt3030_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x20, 0x2f).rw(m_crtc, FUNC(crt5027_device::read), FUNC(crt5027_device::write));
-	map(0x30, 0x31).rw(m_kbdmcu, FUNC(i8741_device::upi41_master_r), FUNC(i8741_device::upi41_master_w));
+	map(0x30, 0x31).rw(m_kbdmcu, FUNC(i8741a_device::upi41_master_r), FUNC(i8741a_device::upi41_master_w));
 	map(0x32, 0x32).w(FUNC(itt3030_state::beep_w));
 	map(0x35, 0x35).r(FUNC(itt3030_state::vsync_r));
 	map(0x50, 0x53).rw(FUNC(itt3030_state::fdc_r), FUNC(itt3030_state::fdc_w));
@@ -695,32 +695,32 @@ void itt3030_state::machine_reset()
 	m_curfloppy = nullptr;
 }
 
-MACHINE_CONFIG_START(itt3030_state::itt3030)
-
+void itt3030_state::itt3030(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(itt3030_map)
-	MCFG_DEVICE_IO_MAP(itt3030_io)
+	Z80(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &itt3030_state::itt3030_map);
+	m_maincpu->set_addrmap(AS_IO, &itt3030_state::itt3030_io);
 
 	// Schematics + i8278 datasheet says:
 	// Port 1 goes to the keyboard matrix.
 	// bits 0-2 select bit to read back, bits 3-6 choose column to read from, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
 	// T0 is the key matrix return
 	// pin 23 is the UPI-41 host IRQ line, it's unknown how it's connected to the Z80
-	I8741(config, m_kbdmcu, 6_MHz_XTAL);
+	I8741A(config, m_kbdmcu, 6_MHz_XTAL);
 	m_kbdmcu->t0_in_cb().set(FUNC(itt3030_state::kbd_matrix_r));
 	m_kbdmcu->p1_out_cb().set(FUNC(itt3030_state::kbd_matrix_w));
 	m_kbdmcu->p2_in_cb().set(FUNC(itt3030_state::kbd_port2_r));
 	m_kbdmcu->p2_out_cb().set(FUNC(itt3030_state::kbd_port2_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
-	MCFG_SCREEN_UPDATE_DRIVER(itt3030_state, screen_update)
-	MCFG_SCREEN_SIZE(80*8, 24*12)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*12-1)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(250));
+	m_screen->set_screen_update(FUNC(itt3030_state::screen_update));
+	m_screen->set_size(80*8, 24*12);
+	m_screen->set_visarea(0, 80*8-1, 0, 24*12-1);
+	m_screen->set_palette(m_palette);
 
 	/* devices */
 	ADDRESS_MAP_BANK(config, "lowerbank").set_map(&itt3030_state::lower48_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0xc000);
@@ -745,7 +745,7 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

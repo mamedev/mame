@@ -24,23 +24,22 @@ SMS Display Timing
 ------------------
     For more information, please see:
     - http://cgfm2.emuviews.com/txt/msvdp.txt
-    - http://www.smspower.org/forums/viewtopic.php?p=44198
+    - http://www.smspower.org/forums/viewtopic.php?p=37142
+    - http://www.smspower.org/forums/viewtopic.php?p=92925
 
 A scanline contains the following sections:
-  - horizontal sync     9  E9-ED   => HSYNC high
-  - left blanking       2  ED-EE
-  - color burst        14  EE-F5   => increment line counter/generate interrupts/etc
-  - left blanking       8  F5-F9
-  - left border        13  F9-FF
-  - active display    256  00-7F
-  - right border       15  80-87
-  - right blanking      8  87-8B
-  - horizontal sync    17  8B-93   => HSYNC low
+  - horizontal sync    26  E9-F5   => HSYNC low
+  - left blanking       2  F6-F6   => HSYNC high
+  - color burst        14  F7-FD
+  - left blanking       8  FE-01
+  - left border        13  02-08
+  - active display    256  08-88
+  - right border       15  88-8F
+  - right blanking      8  90-93
 
-  Although the processing done for a section happens when HCount is in the
-  specified range (e.g. 00-7F for active display), probably there is a delay
-  until its signal is shown on screen, as happens on the TMS9918 chip
-  according to this timing diagram:
+  Probably the processing done for the active display occurs when HCount
+  is in the 00-7F range and there is a delay until its signal is shown on
+  screen, as happens on the TMS9918 chip according to this timing diagram:
       http://www.smspower.org/Development/TMS9918MasterTimingDiagram
 
 
@@ -88,12 +87,12 @@ PAL frame timing
 #define BOTTOM_BORDER         4
 #define BOTTOM_BLANKING       5
 
-static constexpr uint8_t ntsc_192[6] = { 3, 13, 27, 192, 24, 3 };
-static constexpr uint8_t ntsc_224[6] = { 3, 13, 11, 224,  8, 3 };
-static constexpr uint8_t ntsc_240[6] = { 3, 13,  3, 240,  0, 3 };
-static constexpr uint8_t pal_192[6]  = { 3, 13, 54, 192, 48, 3 };
-static constexpr uint8_t pal_224[6]  = { 3, 13, 38, 224, 32, 3 };
-static constexpr uint8_t pal_240[6]  = { 3, 13, 30, 240, 24, 3 };
+static constexpr u8 ntsc_192[6] = { 3, 13, 27, 192, 24, 3 };
+static constexpr u8 ntsc_224[6] = { 3, 13, 11, 224,  8, 3 };
+static constexpr u8 ntsc_240[6] = { 3, 13,  3, 240,  0, 3 };
+static constexpr u8 pal_192[6]  = { 3, 13, 54, 192, 48, 3 };
+static constexpr u8 pal_224[6]  = { 3, 13, 38, 224, 32, 3 };
+static constexpr u8 pal_240[6]  = { 3, 13, 30, 240, 24, 3 };
 
 #define VINT_HPOS             0
 #define VINT_FLAG_HPOS        1
@@ -104,59 +103,117 @@ static constexpr uint8_t pal_240[6]  = { 3, 13, 30, 240, 24, 3 };
 #define SPROVR_HPOS           6
 #define SPRCOL_BASEHPOS       7
 
-static constexpr uint8_t line_315_5124[8] = { 24, 24, 26, 28 /* not verified */, 21, 23, 24, 59 };
-static constexpr uint8_t line_315_5377[8] = { 26, 26, 27, 28 /* not verified */, 24, 28, 26, 62 };
+static constexpr u8 line_315_5124[8] = { 24, 24, 26, 28 /* not verified */, 21, 23, 24, 59 };
+static constexpr u8 line_315_5377[8] = { 26, 26, 27, 28 /* not verified */, 24, 28, 26, 62 };
 
 #define DISPLAY_DISABLED_HPOS 24 /* not verified, works if above 18 (for 'pstrike2') and below 25 (for 'fantdizzy') */
 #define DISPLAY_CB_HPOS       2  /* fixes 'roadrash' (SMS game) title scrolling, due to line counter reload timing */
 
-#define DRAW_TIME_GG          94      /* 9 + 2 + 14 + 8 + 13 + 96/2 */
-#define DRAW_TIME_SMS         46      /* 9 + 2 + 14 + 8 + 13 */
+#define DRAW_TIME_GG         111      /* 26 + 2 + 14 + 8 + 13 + 96/2 */
+#define DRAW_TIME_SMS         63      /* 26 + 2 + 14 + 8 + 13 */
 
 
 DEFINE_DEVICE_TYPE(SEGA315_5124, sega315_5124_device, "sega315_5124", "Sega 315-5124 SMS1 VDP")
 DEFINE_DEVICE_TYPE(SEGA315_5246, sega315_5246_device, "sega315_5246", "Sega 315-5246 SMS2 VDP")
 DEFINE_DEVICE_TYPE(SEGA315_5377, sega315_5377_device, "sega315_5377", "Sega 315-5377 Gamegear VDP")
 
-
+// (reference for VDP colors : http://www.sega-16.com/forum/showthread.php?30530-SMS-VDP-output-levels)
 void sega315_5124_device::sega315_5124_palette(palette_device &palette) const
 {
+	static const u8 level[4] = {0,90,173,255};
 	for (int i = 0; i < 64; i++)
 	{
-		const int r = i & 0x03;
-		const int g = (i & 0x0c) >> 2;
-		const int b = (i & 0x30) >> 4;
-		palette.set_pen_color(i, pal2bit(r), pal2bit(g), pal2bit(b));
+		const u8 r = i & 0x03;
+		const u8 g = (i & 0x0c) >> 2;
+		const u8 b = (i & 0x30) >> 4;
+		palette.set_pen_color(i, level[r], level[g], level[b]);
 	}
 	// sms and sg1000-mark3 uses a different palette for modes 0 to 3 - see http://www.smspower.org/Development/Palette
 	// TMS9918 palette
-	palette.set_pen_color(64+ 0,   0,   0,   0); // palette.set_pen_color(64+ 0,   0,   0,   0);
-	palette.set_pen_color(64+ 1,   0,   0,   0); // palette.set_pen_color(64+ 1,   0,   0,   0);
-	palette.set_pen_color(64+ 2,   0, 170,   0); // palette.set_pen_color(64+ 2,  33, 200,  66);
-	palette.set_pen_color(64+ 3,   0, 255,   0); // palette.set_pen_color(64+ 3,  94, 220, 120);
-	palette.set_pen_color(64+ 4,   0,   0,  85); // palette.set_pen_color(64+ 4,  84,  85, 237);
-	palette.set_pen_color(64+ 5,   0,   0, 255); // palette.set_pen_color(64+ 5, 125, 118, 252);
-	palette.set_pen_color(64+ 6,  85,   0,   0); // palette.set_pen_color(64+ 6, 212,  82,  77);
-	palette.set_pen_color(64+ 7,   0, 255, 255); // palette.set_pen_color(64+ 7,  66, 235, 245);
-	palette.set_pen_color(64+ 8, 170,   0,   0); // palette.set_pen_color(64+ 8, 252,  85,  84);
-	palette.set_pen_color(64+ 9, 255,   0,   0); // palette.set_pen_color(64+ 9, 255, 121, 120);
-	palette.set_pen_color(64+10,  85,  85,   0); // palette.set_pen_color(64+10, 212, 193,  84);
-	palette.set_pen_color(64+11, 255, 255,   0); // palette.set_pen_color(64+11, 230, 206, 128);
-	palette.set_pen_color(64+12,   0,  85,   0); // palette.set_pen_color(64+12,  33, 176,  59);
-	palette.set_pen_color(64+13, 255,   0, 255); // palette.set_pen_color(64+13, 201,  91, 186);
-	palette.set_pen_color(64+14,  85,  85,  85); // palette.set_pen_color(64+14, 204, 204, 204);
-	palette.set_pen_color(64+15, 255, 255, 255); // palette.set_pen_color(64+15, 255, 255, 255);
+	palette.set_pen_color(64+ 0, level[0], level[0], level[0]); // palette.set_pen_color(64+ 0,   0,   0,   0);
+	palette.set_pen_color(64+ 1, level[0], level[0], level[0]); // palette.set_pen_color(64+ 1,   0,   0,   0);
+	palette.set_pen_color(64+ 2, level[0], level[2], level[0]); // palette.set_pen_color(64+ 2,  33, 200,  66);
+	palette.set_pen_color(64+ 3, level[0], level[3], level[0]); // palette.set_pen_color(64+ 3,  94, 220, 120);
+	palette.set_pen_color(64+ 4, level[0], level[0], level[1]); // palette.set_pen_color(64+ 4,  84,  85, 237);
+	palette.set_pen_color(64+ 5, level[0], level[0], level[3]); // palette.set_pen_color(64+ 5, 125, 118, 252);
+	palette.set_pen_color(64+ 6, level[1], level[0], level[0]); // palette.set_pen_color(64+ 6, 212,  82,  77);
+	palette.set_pen_color(64+ 7, level[0], level[3], level[3]); // palette.set_pen_color(64+ 7,  66, 235, 245);
+	palette.set_pen_color(64+ 8, level[2], level[0], level[0]); // palette.set_pen_color(64+ 8, 252,  85,  84);
+	palette.set_pen_color(64+ 9, level[3], level[0], level[0]); // palette.set_pen_color(64+ 9, 255, 121, 120);
+	palette.set_pen_color(64+10, level[1], level[1], level[0]); // palette.set_pen_color(64+10, 212, 193,  84);
+	palette.set_pen_color(64+11, level[3], level[3], level[0]); // palette.set_pen_color(64+11, 230, 206, 128);
+	palette.set_pen_color(64+12, level[0], level[1], level[0]); // palette.set_pen_color(64+12,  33, 176,  59);
+	palette.set_pen_color(64+13, level[3], level[0], level[3]); // palette.set_pen_color(64+13, 201,  91, 186);
+	palette.set_pen_color(64+14, level[1], level[1], level[1]); // palette.set_pen_color(64+14, 204, 204, 204);
+	palette.set_pen_color(64+15, level[3], level[3], level[3]); // palette.set_pen_color(64+15, 255, 255, 255);
+}
+
+
+void sega315_5246_device::sega315_5246_palette(palette_device &palette) const
+{
+	// bit different output level compare to 315_5124
+	static const u8 level[4] = {0,89,174,255};
+	for (int i = 0; i < 64; i++)
+	{
+		const u8 r = i & 0x03;
+		const u8 g = (i & 0x0c) >> 2;
+		const u8 b = (i & 0x30) >> 4;
+		palette.set_pen_color(i, level[r], level[g], level[b]);
+	}
+	// TMS9918 palette (see sega315_5124_palette)
+	palette.set_pen_color(64+ 0, level[0], level[0], level[0]); // palette.set_pen_color(64+ 0,   0,   0,   0);
+	palette.set_pen_color(64+ 1, level[0], level[0], level[0]); // palette.set_pen_color(64+ 1,   0,   0,   0);
+	palette.set_pen_color(64+ 2, level[0], level[2], level[0]); // palette.set_pen_color(64+ 2,  33, 200,  66);
+	palette.set_pen_color(64+ 3, level[0], level[3], level[0]); // palette.set_pen_color(64+ 3,  94, 220, 120);
+	palette.set_pen_color(64+ 4, level[0], level[0], level[1]); // palette.set_pen_color(64+ 4,  84,  85, 237);
+	palette.set_pen_color(64+ 5, level[0], level[0], level[3]); // palette.set_pen_color(64+ 5, 125, 118, 252);
+	palette.set_pen_color(64+ 6, level[1], level[0], level[0]); // palette.set_pen_color(64+ 6, 212,  82,  77);
+	palette.set_pen_color(64+ 7, level[0], level[3], level[3]); // palette.set_pen_color(64+ 7,  66, 235, 245);
+	palette.set_pen_color(64+ 8, level[2], level[0], level[0]); // palette.set_pen_color(64+ 8, 252,  85,  84);
+	palette.set_pen_color(64+ 9, level[3], level[0], level[0]); // palette.set_pen_color(64+ 9, 255, 121, 120);
+	palette.set_pen_color(64+10, level[1], level[1], level[0]); // palette.set_pen_color(64+10, 212, 193,  84);
+	palette.set_pen_color(64+11, level[3], level[3], level[0]); // palette.set_pen_color(64+11, 230, 206, 128);
+	palette.set_pen_color(64+12, level[0], level[1], level[0]); // palette.set_pen_color(64+12,  33, 176,  59);
+	palette.set_pen_color(64+13, level[3], level[0], level[3]); // palette.set_pen_color(64+13, 201,  91, 186);
+	palette.set_pen_color(64+14, level[1], level[1], level[1]); // palette.set_pen_color(64+14, 204, 204, 204);
+	palette.set_pen_color(64+15, level[3], level[3], level[3]); // palette.set_pen_color(64+15, 255, 255, 255);
 }
 
 
 void sega315_5377_device::sega315_5377_palette(palette_device &palette) const
 {
+	// TODO : linear? measure this
 	for (int i = 0; i < 4096; i++)
 	{
-		const int r = i & 0x000f;
-		const int g = (i & 0x00f0) >> 4;
-		const int b = (i & 0x0f00) >> 8;
+		const u8 r = i & 0x000f;
+		const u8 g = (i & 0x00f0) >> 4;
+		const u8 b = (i & 0x0f00) >> 8;
 		palette.set_pen_color(i, pal4bit(r), pal4bit(g), pal4bit(b));
+	}
+}
+
+
+void sega315_5313_mode4_device::sega315_5313_palette(palette_device &palette) const
+{
+	// non-linear (reference : http://gendev.spritesmind.net/forum/viewtopic.php?f=22&t=2188)
+	static const u8 level[15] = {0,29,52,70,87,101,116,130,144,158,172,187,206,228,255};
+	for (int i = 0; i < 512; i++)
+	{
+		const u8 r = (i & 0x0007) >> 0;
+		const u8 g = (i & 0x0038) >> 3;
+		const u8 b = (i & 0x01c0) >> 6;
+		palette.set_pen_color(i + (512 * 0), level[r << 1], level[g << 1], level[b << 1]); // normal
+		palette.set_pen_color(i + (512 * 1), level[r], level[g], level[b]); // shadow
+		palette.set_pen_color(i + (512 * 2), level[7 + r], level[7 + g], level[7 + b]); // hilight
+	}
+	// seperated SMS compatible mode color
+	static const u8 sms_level[4] = {0,99,162,255};
+	for (int i = 0; i < 64; i++)
+	{
+		const u8 r = (i & 0x0003) >> 0;
+		const u8 g = (i & 0x000c) >> 2;
+		const u8 b = (i & 0x0030) >> 4;
+		palette.set_pen_color(i + (512 * 3), sms_level[r], sms_level[g], sms_level[b]); // normal
 	}
 }
 
@@ -164,20 +221,23 @@ void sega315_5377_device::sega315_5377_palette(palette_device &palette) const
 // default address map
 void sega315_5124_device::sega315_5124(address_map &map)
 {
-	map(0x0000, VRAM_SIZE-1).ram();
+	if (!has_configured_map(0))
+		map(0x0000, VRAM_SIZE-1).ram();
 }
 
 
-sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: sega315_5124_device(mconfig, SEGA315_5124, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0x00, 0x0f, 4, 8, line_315_5124)
 {
 }
 
 
-sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing)
+sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
+	, device_mixer_interface(mconfig, *this, 2)
+	, m_hcounter_divide(1)
 	, m_cram_size(cram_size)
 	, m_line_timing(line_timing)
 	, m_palette_offset(palette_offset)
@@ -185,35 +245,37 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_max_sprite_zoom_hcount(max_sprite_zoom_hcount)
 	, m_max_sprite_zoom_vcount(max_sprite_zoom_vcount)
 	, m_is_pal(false)
-	, m_int_cb(*this)
-	, m_csync_cb(*this)
-	, m_pause_cb(*this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(), address_map_constructor(FUNC(sega315_5124_device::sega315_5124), this))
-	, m_palette(*this, "palette")
+	, m_vblank_cb(*this)
+	, m_n_csync_cb(*this)
+	, m_n_int_cb(*this)
+	, m_n_nmi_cb(*this)
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(FUNC(sega315_5124_device::sega315_5124), this))
+	, m_palette_lut(*this, "palette_lut")
+	, m_snsnd(*this, "snsnd")
 {
 }
 
 
-sega315_5246_device::sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega315_5246_device::sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: sega315_5124_device(mconfig, SEGA315_5246, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0x00, 0x0f, 8, 8, line_315_5124)
 {
 }
 
 
-sega315_5246_device::sega315_5246_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing)
+sega315_5246_device::sega315_5246_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing)
 	: sega315_5124_device(mconfig, type, tag, owner, clock, cram_size, palette_offset, reg_num_mask, max_sprite_zoom_hcount, max_sprite_zoom_vcount, line_timing)
 {
 }
 
 
 // Embedded mode 4 support of the 315-5313 VDP (see 315_5313.cpp), used by Sega Genesis/Mega Drive
-sega315_5313_mode4_device::sega315_5313_mode4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing)
+sega315_5313_mode4_device::sega315_5313_mode4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing)
 	: sega315_5246_device(mconfig, type, tag, owner, clock, cram_size, palette_offset, reg_num_mask, max_sprite_zoom_hcount, max_sprite_zoom_vcount, line_timing)
 {
 }
 
 
-sega315_5377_device::sega315_5377_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega315_5377_device::sega315_5377_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: sega315_5246_device(mconfig, SEGA315_5377, tag, owner, clock, SEGA315_5377_CRAM_SIZE, 0x10, 0x0f, 8, 8, line_315_5377)
 {
 }
@@ -328,12 +390,12 @@ void sega315_5124_device::set_frame_timing()
 }
 
 
-READ8_MEMBER( sega315_5124_device::vcount_read )
+u8 sega315_5124_device::vcount_read()
 {
 	const int active_scr_start = m_frame_timing[VERTICAL_SYNC] + m_frame_timing[TOP_BLANKING] + m_frame_timing[TOP_BORDER];
 	int vpos = screen().vpos();
 
-	if (screen().hpos() < m_line_timing[VCOUNT_CHANGE_HPOS])
+	if (screen_hpos() < m_line_timing[VCOUNT_CHANGE_HPOS])
 	{
 		vpos--;
 		if (vpos < 0)
@@ -344,22 +406,22 @@ READ8_MEMBER( sega315_5124_device::vcount_read )
 }
 
 
-READ8_MEMBER( sega315_5124_device::hcount_read )
+u8 sega315_5124_device::hcount_read()
 {
+	m_hcounter_latched = false;
 	return m_hcounter;
 }
 
 
-void sega315_5124_device::hcount_latch_at_hpos(int hpos)
+void sega315_5124_device::hcount_latch()
 {
-	const int active_scr_start = 46;      /* 9 + 2 + 14 + 8 + 13 */
-
 	/* The hcount value returned by the VDP seems to be based on the previous hpos */
-	int hclock = hpos - 1;
+	int hclock = screen_hpos() - 1;
 	if (hclock < 0)
 		hclock += WIDTH;
 
-	m_hcounter = ((hclock - active_scr_start) >> 1) & 0xff;
+	m_hcounter = ((hclock - 46) >> 1) & 0xff;
+	m_hcounter_latched = true;
 }
 
 
@@ -399,7 +461,7 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 			/* Draw left border */
 			rec.min_x = LBORDER_START;
 			rec.max_x = LBORDER_START + LBORDER_WIDTH - 1;
-			m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
+			m_tmpbitmap.fill(m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]), rec);
 			m_y1_bitmap.fill((m_reg[0x07] & 0x0f) ? 1 : 0, rec);
 		}
 		break;
@@ -414,7 +476,7 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 			/* Draw right border */
 			rec.min_x = LBORDER_START + LBORDER_WIDTH + 256;
 			rec.max_x = rec.min_x + RBORDER_WIDTH - 1;
-			m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
+			m_tmpbitmap.fill(m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]), rec);
 			m_y1_bitmap.fill((m_reg[0x07] & 0x0f) ? 1 : 0, rec);
 		}
 		break;
@@ -424,10 +486,10 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 		{
 			if (BIT(m_reg[0x00], 4))
 			{
-				m_irq_state = 1;
+				m_n_int_state = 0;
 
-				if (!m_int_cb.isnull())
-					m_int_cb(ASSERT_LINE);
+				if (!m_n_int_cb.isnull())
+					m_n_int_cb(ASSERT_LINE);
 			}
 		}
 		break;
@@ -437,19 +499,42 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 		{
 			if (BIT(m_reg[0x01], 5))
 			{
-				m_irq_state = 1;
+				m_n_int_state = 0;
 
-				if (!m_int_cb.isnull())
-					m_int_cb(ASSERT_LINE);
+				if (!m_n_int_cb.isnull())
+					m_n_int_cb(ASSERT_LINE);
 			}
 		}
 		break;
 
 	case TIMER_NMI:
-		if (!m_pause_cb.isnull())
-			m_pause_cb(0);
+		if (!m_n_nmi_in_state)
+		{
+			if (m_n_nmi_state)
+				m_n_nmi_cb(ASSERT_LINE);
+		}
+		else
+		{
+			if (!m_n_nmi_state)
+				m_n_nmi_cb(CLEAR_LINE);
+		}
+		m_n_nmi_state = m_n_nmi_in_state;
 		break;
 	}
+}
+
+
+void sega315_5124_device::vblank_end(int vpos)
+{
+	m_nmi_timer->adjust(screen().time_until_pos(vpos, m_line_timing[NMI_HPOS]));
+}
+
+
+void sega315_5377_device::vblank_end(int vpos)
+{
+	// Assume the VBlank line is used to trigger the NMI logic performed by the 315-5378 chip.
+	if (!m_vblank_cb.isnull())
+		m_vblank_cb(0);
 }
 
 
@@ -465,7 +550,7 @@ void sega315_5124_device::process_line_timer()
 	m_reg8copy = m_reg[0x08];
 
 	/* Check if the /CSYNC signal must be active (low) */
-	if (!m_csync_cb.isnull())
+	if (!m_n_csync_cb.isnull())
 	{
 		/* /CSYNC is signals /HSYNC and /VSYNC (both internals) ANDed together.
 		   According to Charles MacDonald, /HSYNC goes low for 28 pixels on beginning
@@ -476,7 +561,7 @@ void sega315_5124_device::process_line_timer()
 		*/
 		if (vpos == 0 || vpos > (m_frame_timing[VERTICAL_SYNC] + 1))
 		{
-			m_csync_cb(0);
+			m_n_csync_cb(0);
 		}
 	}
 
@@ -517,6 +602,8 @@ void sega315_5124_device::process_line_timer()
 		{
 			m_vint_timer->adjust(screen().time_until_pos(vpos, m_line_timing[VINT_HPOS]));
 			m_pending_status |= STATUS_VINT;
+			if (!m_vblank_cb.isnull())
+				m_vblank_cb(1);
 		}
 
 		/* Draw borders */
@@ -572,7 +659,8 @@ void sega315_5124_device::process_line_timer()
 		/* Check if we're on the last line of the top border */
 		if (vpos == vpos_limit + m_frame_timing[TOP_BORDER] - 1)
 		{
-			m_nmi_timer->adjust(screen().time_until_pos(vpos, m_line_timing[NMI_HPOS]));
+			m_hcounter_latched = false;
+			vblank_end(vpos);
 		}
 
 		/* Draw borders */
@@ -592,10 +680,10 @@ void sega315_5124_device::process_line_timer()
 }
 
 
-READ8_MEMBER( sega315_5124_device::data_read )
+u8 sega315_5124_device::data_read()
 {
 	/* Return data buffer contents */
-	const uint8_t temp = m_buffer;
+	const u8 temp = m_buffer;
 
 	/* Clear pending write flag */
 	m_pending_control_write = false;
@@ -623,7 +711,7 @@ void sega315_5124_device::check_pending_flags()
 	   return some position in the beginning of next line. To ensure the instruction
 	   will get updated status, here a maximum hpos is set if the timer reports no
 	   remaining time, what could also occur due to the ahead time of the timeslice. */
-	int const hpos = (m_pending_flags_timer->remaining() == attotime::zero) ? (WIDTH - 1) : screen().hpos();
+	int const hpos = (m_pending_flags_timer->remaining() == attotime::zero) ? (WIDTH - 1) : screen_hpos();
 
 	if ((m_pending_hint) && hpos >= m_line_timing[HINT_HPOS])
 	{
@@ -653,9 +741,9 @@ void sega315_5124_device::check_pending_flags()
 }
 
 
-READ8_MEMBER( sega315_5124_device::control_read )
+u8 sega315_5124_device::control_read()
 {
-	uint8_t temp;
+	u8 temp;
 
 	check_pending_flags();
 	temp = m_status;
@@ -667,14 +755,14 @@ READ8_MEMBER( sega315_5124_device::control_read )
 
 		/* Clear status flags */
 		m_hint_occurred = false;
-		m_status = uint8_t(~(STATUS_VINT | STATUS_SPROVR | STATUS_SPRCOL));
+		m_status = u8(~(STATUS_VINT | STATUS_SPROVR | STATUS_SPRCOL));
 
-		if (m_irq_state == 1)
+		if (m_n_int_state == 0)
 		{
-			m_irq_state = 0;
+			m_n_int_state = 1;
 
-			if (!m_int_cb.isnull())
-				m_int_cb(CLEAR_LINE);
+			if (!m_n_int_cb.isnull())
+				m_n_int_cb(CLEAR_LINE);
 		}
 	}
 
@@ -682,7 +770,7 @@ READ8_MEMBER( sega315_5124_device::control_read )
 }
 
 
-void sega315_5124_device::write_memory(uint8_t data)
+void sega315_5124_device::write_memory(u8 data)
 {
 	switch (m_addrmode)
 	{
@@ -702,7 +790,7 @@ void sega315_5124_device::write_memory(uint8_t data)
 }
 
 
-void sega315_5313_mode4_device::write_memory(uint8_t data)
+void sega315_5313_mode4_device::write_memory(u8 data)
 {
 	switch (m_addrmode)
 	{
@@ -720,7 +808,7 @@ void sega315_5313_mode4_device::write_memory(uint8_t data)
 }
 
 
-WRITE8_MEMBER( sega315_5124_device::data_write )
+void sega315_5124_device::data_write(u8 data)
 {
 	/* Clear pending write flag */
 	m_pending_control_write = false;
@@ -730,7 +818,7 @@ WRITE8_MEMBER( sega315_5124_device::data_write )
 }
 
 
-void sega315_5124_device::load_vram_addr(uint8_t data)
+void sega315_5124_device::load_vram_addr(u8 data)
 {
 	// Seems like the latched data is passed straight through
 	// to the address register when in the middle of doing a command.
@@ -742,7 +830,7 @@ void sega315_5124_device::load_vram_addr(uint8_t data)
 }
 
 
-void sega315_5313_mode4_device::load_vram_addr(uint8_t data)
+void sega315_5313_mode4_device::load_vram_addr(u8 data)
 {
 	if (m_pending_control_write)
 		m_control_write_data_latch = data;
@@ -751,7 +839,7 @@ void sega315_5313_mode4_device::load_vram_addr(uint8_t data)
 }
 
 
-WRITE8_MEMBER( sega315_5124_device::control_write )
+void sega315_5124_device::control_write(u8 data)
 {
 	if (!m_pending_control_write)
 	{
@@ -799,11 +887,11 @@ WRITE8_MEMBER( sega315_5124_device::control_write )
 				break;
 			case 1:
 				set_display_settings();
-				if (screen().hpos() <= DISPLAY_DISABLED_HPOS)
+				if (screen_hpos() <= DISPLAY_DISABLED_HPOS)
 					m_display_disabled = !BIT(m_reg[0x01], 6);
 				break;
 			case 8:
-				if (screen().hpos() <= m_line_timing[XSCROLL_HPOS])
+				if (screen_hpos() <= m_line_timing[XSCROLL_HPOS])
 					m_reg8copy = m_reg[0x08];
 			}
 
@@ -814,10 +902,10 @@ WRITE8_MEMBER( sega315_5124_device::control_write )
 				// For HINT disabling through register 00:
 				// "Line IRQ VCount" test, of Flubba's VDPTest ROM, disables HINT to wait
 				// for next VINT, but HINT occurs when the operation is about to execute.
-				// So here, where the setting is done, the irq_state needs to be cleared.
+				// So here, where the setting is done, the /INT state needs to be cleared.
 				//
 				// For VINT disabling through register 01:
-				// When running eagles5 on the smskr driver the irq_state is 1 because of some
+				// When running eagles5 on the smskr driver the /INT state is 0 because of some
 				// previous HINTs that occurred. eagles5 sets register 01 to 0x02 and expects
 				// the irq state to be cleared after that.
 				// The following bit of code takes care of that.
@@ -825,28 +913,28 @@ WRITE8_MEMBER( sega315_5124_device::control_write )
 				if ((reg_num == 0 && !BIT(m_reg[0x00], 4)) ||
 						(reg_num == 1 && !BIT(m_reg[0x01], 5)))
 				{
-					if (m_irq_state == 1)
+					if (m_n_int_state == 0)
 					{
-						m_irq_state = 0;
+						m_n_int_state = 1;
 
-						if (!m_int_cb.isnull())
+						if (!m_n_int_cb.isnull())
 						{
-							m_int_cb(CLEAR_LINE);
+							m_n_int_cb(CLEAR_LINE);
 						}
 					}
 				}
 				else
 				{
 					// For register 01 and VINT enabling:
-					// Assert the IRQ line for the scoreboard of robocop3,
+					// Assert the /INT line for the scoreboard of robocop3,
 					// on the sms/smspal driver, be displayed correctly.
 					//
 					// Assume the same behavior for reg0+HINT.
 					//
-					m_irq_state = 1;
+					m_n_int_state = 0;
 
-					if (!m_int_cb.isnull())
-						m_int_cb(ASSERT_LINE);
+					if (!m_n_int_cb.isnull())
+						m_n_int_cb(ASSERT_LINE);
 				}
 			}
 			m_addrmode = 0;
@@ -859,13 +947,13 @@ WRITE8_MEMBER( sega315_5124_device::control_write )
 }
 
 
-uint16_t sega315_5124_device::name_table_row_mode4(int row)
+u16 sega315_5124_device::name_table_row_mode4(int row)
 {
 	return ((row >> 3) << 6) & (((m_reg[0x02] & 0x01) << 10) | ((m_reg[0x04] & 0x03) << 11) | 0x23ff);
 }
 
 
-uint16_t sega315_5246_device::name_table_row_mode4(int row)
+u16 sega315_5246_device::name_table_row_mode4(int row)
 {
 	return (row >> 3) << 6;
 }
@@ -897,7 +985,7 @@ void sega315_5124_device::draw_leftmost_pixels_mode4(int *line_buffer, int *prio
 
 	// Load data of bit plane 1 for the selected tile.
 	const int tmp_bit_plane_1 = space().read_byte((tile_selected << 5) + ((parse_line & 0x07) << 2) + 0x01);
-	const uint8_t pen_bit_1 = BIT(tmp_bit_plane_1, 7 - pixel_x);
+	const u8 pen_bit_1 = BIT(tmp_bit_plane_1, 7 - pixel_x);
 
 	for (int pixel_plot_x = 0; pixel_plot_x < fine_x_scroll; pixel_plot_x++)
 	{
@@ -931,7 +1019,7 @@ void sega315_5124_device::draw_scanline_mode4(int *line_buffer, int *priority_se
 	const int fine_x_scroll = (x_scroll & 0x07);
 
 	int scroll_mod;
-	uint16_t name_table_address;
+	u16 name_table_address;
 	if (m_y_pixels != 192)
 	{
 		name_table_address = ((m_reg[0x02] & 0x0c) << 10) | 0x0700;
@@ -953,7 +1041,7 @@ void sega315_5124_device::draw_scanline_mode4(int *line_buffer, int *priority_se
 		/* vertical scrolling when bit 7 of reg[0x00] is set */
 		const int y_scroll = (BIT(m_reg[0x00], 7) && (tile_column > 23)) ? 0 : m_reg9copy;
 
-		const uint16_t tile_data = space().read_word(name_table_address + name_table_row_mode4((line + y_scroll) % scroll_mod) + table_column);
+		const u16 tile_data = space().read_word(name_table_address + name_table_row_mode4((line + y_scroll) % scroll_mod) + table_column);
 
 		const int tile_selected = (tile_data & 0x01ff);
 		const int priority_select = tile_data & PRIORITY_BIT;
@@ -978,12 +1066,12 @@ void sega315_5124_device::draw_scanline_mode4(int *line_buffer, int *priority_se
 
 		for (int pixel_x = 0; pixel_x < 8; pixel_x++)
 		{
-			const uint8_t pen_bit_0 = BIT(bit_plane_0, 7 - pixel_x);
-			const uint8_t pen_bit_1 = BIT(bit_plane_1, 7 - pixel_x);
-			const uint8_t pen_bit_2 = BIT(bit_plane_2, 7 - pixel_x);
-			const uint8_t pen_bit_3 = BIT(bit_plane_3, 7 - pixel_x);
+			const u8 pen_bit_0 = BIT(bit_plane_0, 7 - pixel_x);
+			const u8 pen_bit_1 = BIT(bit_plane_1, 7 - pixel_x);
+			const u8 pen_bit_2 = BIT(bit_plane_2, 7 - pixel_x);
+			const u8 pen_bit_3 = BIT(bit_plane_3, 7 - pixel_x);
 
-			uint8_t pen_selected = (pen_bit_3 << 3 | pen_bit_2 << 2 | pen_bit_1 << 1 | pen_bit_0);
+			u8 pen_selected = (pen_bit_3 << 3 | pen_bit_2 << 2 | pen_bit_1 << 1 | pen_bit_0);
 			if (palette_selected)
 				pen_selected |= 0x10;
 
@@ -1000,25 +1088,25 @@ void sega315_5124_device::draw_scanline_mode4(int *line_buffer, int *priority_se
 }
 
 
-uint16_t sega315_5124_device::sprite_attributes_addr_mode4(uint16_t base)
+u16 sega315_5124_device::sprite_attributes_addr_mode4(u16 base)
 {
 	return base & ((BIT(m_reg[0x05], 0) << 7) | 0x3f7f);
 }
 
 
-uint16_t sega315_5246_device::sprite_attributes_addr_mode4(uint16_t base)
+u16 sega315_5246_device::sprite_attributes_addr_mode4(u16 base)
 {
 	return base;
 }
 
 
-uint8_t sega315_5124_device::sprite_tile_mask_mode4(uint8_t tile_number)
+u8 sega315_5124_device::sprite_tile_mask_mode4(u8 tile_number)
 {
 	return tile_number & (((m_reg[0x06] & 0x03) << 6) | 0x3f);
 }
 
 
-uint8_t sega315_5246_device::sprite_tile_mask_mode4(uint8_t tile_number)
+u8 sega315_5246_device::sprite_tile_mask_mode4(u8 tile_number)
 {
 	return tile_number;
 }
@@ -1029,7 +1117,7 @@ void sega315_5124_device::sprite_count_overflow(int line, int sprite_index)
 	/* Overflow is flagged only on active display and when VINT isn't active */
 	if (!(m_status & STATUS_VINT) && line >= 0 && line < m_frame_timing[ACTIVE_DISPLAY_V])
 	{
-		uint8_t sprite_number_bits;
+		u8 sprite_number_bits;
 		m_pending_status |= STATUS_SPROVR;
 		if (sprite_index < 14)
 			sprite_number_bits = (sprite_index + 1) / 2;
@@ -1096,7 +1184,7 @@ void sega315_5124_device::select_sprites(int line)
 				{
 					const int sprite_x = space().read_byte(m_sprite_base + sprite_index + 1);
 					int sprite_tile_selected = space().read_byte(m_sprite_base + sprite_index + 2);
-					const uint8_t flags = space().read_byte(m_sprite_base + sprite_index + 3);
+					const u8 flags = space().read_byte(m_sprite_base + sprite_index + 3);
 
 					int sprite_line = parse_line - sprite_y;
 
@@ -1249,7 +1337,7 @@ void sega315_5313_mode4_device::sprite_collision(int line, int sprite_col_x)
 		// This function is been used to check for sprite collision of
 		// the 315-5313 VDP, that occurs before the active screen is
 		// drawn, so it must not flag a collision again when drawing.
-		if (screen().hpos() < m_draw_time)
+		if (screen_hpos() < m_draw_time)
 		{
 			m_pending_status |= STATUS_SPRCOL;
 			m_pending_sprcol_x = m_line_timing[SPRCOL_BASEHPOS];
@@ -1265,28 +1353,28 @@ void sega315_5124_device::draw_sprites_mode4(int *line_buffer, int *priority_sel
 
 	bool sprite_col_occurred = false;
 	int sprite_col_x = 255;
-	uint8_t collision_buffer[256] = { 0 };
+	u8 collision_buffer[256] = { 0 };
 
 	// Draw sprite layer
 	for (int sprite_buffer_index = m_sprite_count - 1; sprite_buffer_index >= 0; sprite_buffer_index--)
 	{
 		const int sprite_x = m_sprite_x[sprite_buffer_index];
 		const int sprite_tile_selected = m_sprite_tile_selected[sprite_buffer_index];
-		const uint16_t sprite_pattern_line = m_sprite_pattern_line[sprite_buffer_index];
+		const u16 sprite_pattern_line = m_sprite_pattern_line[sprite_buffer_index];
 		const int zoom_scale = sprite_buffer_index < m_max_sprite_zoom_hcount ? m_sprite_zoom_scale : 1;
 
-		const uint8_t bit_plane_0 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x00);
-		const uint8_t bit_plane_1 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x01);
-		const uint8_t bit_plane_2 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x02);
-		const uint8_t bit_plane_3 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x03);
+		const u8 bit_plane_0 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x00);
+		const u8 bit_plane_1 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x01);
+		const u8 bit_plane_2 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x02);
+		const u8 bit_plane_3 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x03);
 
 		for (int pixel_x = 0; pixel_x < 8; pixel_x++)
 		{
-			const uint8_t pen_bit_0 = BIT(bit_plane_0, 7 - pixel_x);
-			const uint8_t pen_bit_1 = BIT(bit_plane_1, 7 - pixel_x);
-			const uint8_t pen_bit_2 = BIT(bit_plane_2, 7 - pixel_x);
-			const uint8_t pen_bit_3 = BIT(bit_plane_3, 7 - pixel_x);
-			const uint8_t pen_selected = (pen_bit_3 << 3 | pen_bit_2 << 2 | pen_bit_1 << 1 | pen_bit_0) | 0x10;
+			const u8 pen_bit_0 = BIT(bit_plane_0, 7 - pixel_x);
+			const u8 pen_bit_1 = BIT(bit_plane_1, 7 - pixel_x);
+			const u8 pen_bit_2 = BIT(bit_plane_2, 7 - pixel_x);
+			const u8 pen_bit_3 = BIT(bit_plane_3, 7 - pixel_x);
+			const u8 pen_selected = (pen_bit_3 << 3 | pen_bit_2 << 2 | pen_bit_1 << 1 | pen_bit_0) | 0x10;
 
 			if (pen_selected == 0x10) // Transparent palette so skip draw
 				continue;
@@ -1352,15 +1440,15 @@ void sega315_5124_device::draw_sprites_tms9918_mode(int *line_buffer, int line)
 
 	bool sprite_col_occurred = false;
 	int sprite_col_x = 255;
-	uint8_t collision_buffer[256] = { 0 };
+	u8 collision_buffer[256] = { 0 };
 
 	/* Draw sprite layer */
 	for (int sprite_buffer_index = m_sprite_count - 1; sprite_buffer_index >= 0; sprite_buffer_index--)
 	{
 		int sprite_x = m_sprite_x[sprite_buffer_index];
 		int sprite_tile_selected = m_sprite_tile_selected[sprite_buffer_index];
-		const uint16_t sprite_pattern_line = m_sprite_pattern_line[sprite_buffer_index];
-		const uint8_t flags = m_sprite_flags[sprite_buffer_index];
+		const u16 sprite_pattern_line = m_sprite_pattern_line[sprite_buffer_index];
+		const u8 flags = m_sprite_flags[sprite_buffer_index];
 		const int pen_selected = m_palette_offset + (flags & 0x0f);
 		const int zoom_scale = sprite_buffer_index < m_max_sprite_zoom_hcount ? m_sprite_zoom_scale : 1;
 
@@ -1375,7 +1463,7 @@ void sega315_5124_device::draw_sprites_tms9918_mode(int *line_buffer, int line)
 				sprite_x += (zoom_scale > 1 ? 16 : 8);
 			}
 
-			uint8_t pattern = space().read_byte(sprite_pattern_line + sprite_tile_selected * 8);
+			u8 pattern = space().read_byte(sprite_pattern_line + sprite_tile_selected * 8);
 
 			for (int pixel_x = 0; pixel_x < 8; pixel_x++)
 			{
@@ -1421,23 +1509,23 @@ void sega315_5124_device::draw_sprites_tms9918_mode(int *line_buffer, int line)
 // Display mode 2 (Graphics II Mode)
 void sega315_5124_device::draw_scanline_mode2(int *line_buffer, int line)
 {
-	const uint16_t name_table_base = ((m_reg[0x02] & 0x0f) << 10) + ((line >> 3) * 32);
-	const uint16_t color_base = ((m_reg[0x03] & 0x80) << 6);
+	const u16 name_table_base = ((m_reg[0x02] & 0x0f) << 10) + ((line >> 3) * 32);
+	const u16 color_base = ((m_reg[0x03] & 0x80) << 6);
 	const int color_mask = ((m_reg[0x03] & 0x7f) << 3) | 0x07;
-	const uint16_t pattern_base = ((m_reg[0x04] & 0x04) << 11);
+	const u16 pattern_base = ((m_reg[0x04] & 0x04) << 11);
 	const int pattern_mask = ((m_reg[0x04] & 0x03) << 8) | 0xff;
 	const int pattern_offset = (line & 0xc0) << 2;
 
 	/* Draw background layer */
 	for (int tile_column = 0; tile_column < 32; tile_column++)
 	{
-		const uint8_t name = space().read_byte(name_table_base + tile_column);
-		const uint8_t pattern = space().read_byte(pattern_base + (((pattern_offset + name) & pattern_mask) * 8) + (line & 0x07) );
-		const uint8_t colors = space().read_byte(color_base + (((pattern_offset + name) & color_mask) * 8) + (line & 0x07) );
+		const u8 name = space().read_byte(name_table_base + tile_column);
+		const u8 pattern = space().read_byte(pattern_base + (((pattern_offset + name) & pattern_mask) * 8) + (line & 0x07) );
+		const u8 colors = space().read_byte(color_base + (((pattern_offset + name) & color_mask) * 8) + (line & 0x07) );
 
 		for (int pixel_x = 0; pixel_x < 8; pixel_x++)
 		{
-			uint8_t pen_selected;
+			u8 pen_selected;
 			const int pixel_plot_x = (tile_column << 3) + pixel_x;
 
 			if (BIT(pattern, 7 - pixel_x))
@@ -1462,16 +1550,16 @@ void sega315_5124_device::draw_scanline_mode2(int *line_buffer, int line)
 // Display mode 0 (Graphics I Mode)
 void sega315_5124_device::draw_scanline_mode0(int *line_buffer, int line)
 {
-	const uint16_t name_base = ((m_reg[0x02] & 0x0f) << 10) + ((line >> 3) * 32);
-	const uint16_t color_base = ((m_reg[0x03] << 6) & (VRAM_SIZE - 1));
-	const uint16_t pattern_base = ((m_reg[0x04] << 11) & (VRAM_SIZE - 1));
+	const u16 name_base = ((m_reg[0x02] & 0x0f) << 10) + ((line >> 3) * 32);
+	const u16 color_base = ((m_reg[0x03] << 6) & (VRAM_SIZE - 1));
+	const u16 pattern_base = ((m_reg[0x04] << 11) & (VRAM_SIZE - 1));
 
 	/* Draw background layer */
 	for (int tile_column = 0; tile_column < 32; tile_column++)
 	{
-		const uint8_t name = space().read_byte(name_base + tile_column);
-		const uint8_t pattern = space().read_byte(pattern_base + (name << 3) + (line & 0x07));
-		const uint8_t colors = space().read_byte(color_base + (name >> 3));
+		const u8 name = space().read_byte(name_base + tile_column);
+		const u8 pattern = space().read_byte(pattern_base + (name << 3) + (line & 0x07));
+		const u8 colors = space().read_byte(color_base + (name >> 3));
 
 		for (int pixel_x = 0; pixel_x < 8; pixel_x++)
 		{
@@ -1496,8 +1584,8 @@ void sega315_5124_device::draw_scanline_mode0(int *line_buffer, int line)
 // Display mode 1 (Text Mode)
 void sega315_5124_device::draw_scanline_mode1(int *line_buffer, int line)
 {
-	const uint16_t name_base = ((m_reg[0x02] & 0x0f) << 10) + ((line >> 3) * 32);
-	const uint16_t pattern_base = ((m_reg[0x04] << 11) & (VRAM_SIZE - 1));
+	const u16 name_base = ((m_reg[0x02] & 0x0f) << 10) + ((line >> 3) * 32);
+	const u16 pattern_base = ((m_reg[0x04] << 11) & (VRAM_SIZE - 1));
 
 	for (int pixel_plot_x = 0; pixel_plot_x < 8; pixel_plot_x++)
 	{
@@ -1507,8 +1595,8 @@ void sega315_5124_device::draw_scanline_mode1(int *line_buffer, int line)
 	/* Draw background layer */
 	for (int tile_column = 0; tile_column < 40; tile_column++)
 	{
-		const uint8_t name = space().read_byte(name_base + tile_column);
-		const uint8_t pattern = space().read_byte(pattern_base + (name << 3) + (line & 0x07));
+		const u8 name = space().read_byte(name_base + tile_column);
+		const u8 pattern = space().read_byte(pattern_base + (name << 3) + (line & 0x07));
 
 		for (int pixel_x = 0; pixel_x < 6; pixel_x++)
 		{
@@ -1536,14 +1624,14 @@ void sega315_5124_device::draw_scanline_mode1(int *line_buffer, int line)
 // Display mode 3 (Multicolor Mode)
 void sega315_5124_device::draw_scanline_mode3(int *line_buffer, int line)
 {
-	const uint16_t name_base = ((m_reg[0x02] & 0x0f) << 10) + ((line >> 3) * 32);
-	const uint16_t pattern_base = ((m_reg[0x04] << 11) & (VRAM_SIZE - 1));
+	const u16 name_base = ((m_reg[0x02] & 0x0f) << 10) + ((line >> 3) * 32);
+	const u16 pattern_base = ((m_reg[0x04] << 11) & (VRAM_SIZE - 1));
 
 	/* Draw background layer */
 	for (int tile_column = 0; tile_column < 32; tile_column++)
 	{
-		const uint8_t name = space().read_byte(name_base + tile_column);
-		const uint8_t pattern = space().read_byte(pattern_base + (name << 3) + (((line >> 3) & 3) << 1) + ((line & 4) >> 2));
+		const u8 name = space().read_byte(name_base + tile_column);
+		const u8 pattern = space().read_byte(pattern_base + (name << 3) + (((line >> 3) & 3) << 1) + ((line & 4) >> 2));
 
 		for (int pixel_x = 0; pixel_x < 8; pixel_x++)
 		{
@@ -1623,7 +1711,7 @@ void sega315_5124_device::draw_scanline(int pixel_offset_x, int pixel_plot_y, in
 
 		rec.min_x = pixel_offset_x;
 		rec.max_x = pixel_offset_x + 255;
-		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
+		m_tmpbitmap.fill(m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]), rec);
 		m_y1_bitmap.fill((m_reg[0x07] & 0x0f) ? 1 : 0, rec);
 	}
 	else
@@ -1635,8 +1723,8 @@ void sega315_5124_device::draw_scanline(int pixel_offset_x, int pixel_plot_y, in
 
 void sega315_5124_device::blit_scanline(int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line)
 {
-	uint32_t *p_bitmap = &m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x);
-	uint8_t  *p_y1 = &m_y1_bitmap.pix8(pixel_plot_y + line, pixel_offset_x);
+	u32 *p_bitmap = &m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x);
+	u8  *p_y1 = &m_y1_bitmap.pix8(pixel_plot_y + line, pixel_offset_x);
 	int x = 0;
 
 	if (m_vdp_mode == 4 && BIT(m_reg[0x00], 5))
@@ -1644,7 +1732,7 @@ void sega315_5124_device::blit_scanline(int *line_buffer, int *priority_selected
 		/* Fill column 0 with overscan color from m_reg[0x07] */
 		do
 		{
-			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
+			p_bitmap[x] = m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]);
 			p_y1[x] = (m_reg[0x07] & 0x0f) ? 1 : 0;
 		}
 		while(++x < 8);
@@ -1652,7 +1740,7 @@ void sega315_5124_device::blit_scanline(int *line_buffer, int *priority_selected
 
 	do
 	{
-		p_bitmap[x] = m_palette->pen(line_buffer[x]);
+		p_bitmap[x] = m_palette_lut->pen(line_buffer[x]);
 		p_y1[x] = (priority_selected[x] & 0x0f) ? 1 : 0;
 	}
 	while(++x < 256);
@@ -1667,14 +1755,14 @@ void sega315_5377_device::blit_scanline(int *line_buffer, int *priority_selected
 	}
 	else
 	{
-		uint32_t *p_bitmap = &m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x);
-		uint8_t  *p_y1 = &m_y1_bitmap.pix8(pixel_plot_y + line, pixel_offset_x);
+		u32 *p_bitmap = &m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x);
+		u8  *p_y1 = &m_y1_bitmap.pix8(pixel_plot_y + line, pixel_offset_x);
 		int x = 0;
 
 		/* border on left side of the GG active screen */
 		do
 		{
-			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
+			p_bitmap[x] = m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]);
 			p_y1[x] = (m_reg[0x07] & 0x0f) ? 1 : 0;
 		}
 		while (++x < 48);
@@ -1683,7 +1771,7 @@ void sega315_5377_device::blit_scanline(int *line_buffer, int *priority_selected
 		{
 			do
 			{
-				p_bitmap[x] = m_palette->pen(line_buffer[x]);
+				p_bitmap[x] = m_palette_lut->pen(line_buffer[x]);
 				p_y1[x] = (priority_selected[x] & 0x0f) ? 1 : 0;
 			}
 			while (++x < 208);
@@ -1693,7 +1781,7 @@ void sega315_5377_device::blit_scanline(int *line_buffer, int *priority_selected
 			/* top/bottom GG border */
 			do
 			{
-				p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
+				p_bitmap[x] = m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]);
 				p_y1[x] = (m_reg[0x07] & 0x0f) ? 1 : 0;
 			}
 			while (++x < 208);
@@ -1702,7 +1790,7 @@ void sega315_5377_device::blit_scanline(int *line_buffer, int *priority_selected
 		/* border on right side of the GG active screen */
 		do
 		{
-			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
+			p_bitmap[x] = m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]);
 			p_y1[x] = (m_reg[0x07] & 0x0f) ? 1 : 0;
 		}
 		while (++x < 256);
@@ -1756,9 +1844,30 @@ void sega315_5377_device::update_palette()
 }
 
 
-void sega315_5124_device::cram_write(uint8_t data)
+void sega315_5313_mode4_device::update_palette()
 {
-	uint16_t address = m_addr & m_cram_mask;
+	/* Exit if palette has no changes */
+	if (!m_cram_dirty)
+	{
+		return;
+	}
+	m_cram_dirty = false;
+
+	if (m_vdp_mode != 4)
+	{
+		return;
+	}
+
+	for (int i = 0; i < 32; i++)
+	{
+		m_current_palette[i] = (512 * 3) + (m_CRAM[i] & 0x3f);
+	}
+}
+
+
+void sega315_5124_device::cram_write(u8 data)
+{
+	u16 address = m_addr & m_cram_mask;
 	if (data != m_CRAM[address])
 	{
 		m_CRAM[address] = data;
@@ -1767,7 +1876,7 @@ void sega315_5124_device::cram_write(uint8_t data)
 }
 
 
-void sega315_5377_device::cram_write(uint8_t data)
+void sega315_5377_device::cram_write(u8 data)
 {
 	if (m_sega315_5124_compatibility_mode)
 	{
@@ -1777,7 +1886,7 @@ void sega315_5377_device::cram_write(uint8_t data)
 	{
 		if (m_addr & 1)
 		{
-			uint16_t address = (m_addr & m_cram_mask) & ~1;
+			u16 address = (m_addr & m_cram_mask) & ~1;
 			if (m_buffer != m_CRAM[address] || data != m_CRAM[address + 1])
 			{
 				m_CRAM[address] = m_buffer;
@@ -1789,7 +1898,7 @@ void sega315_5377_device::cram_write(uint8_t data)
 }
 
 
-uint32_t sega315_5124_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 sega315_5124_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_tmpbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -1819,7 +1928,7 @@ void sega315_5313_mode4_device::stop_timers()
     DEVICE INTERFACE
 *****************************************************************************/
 
-void sega315_5124_device::vdp_postload()
+void sega315_5124_device::device_post_load()
 {
 	set_frame_timing();
 }
@@ -1827,9 +1936,10 @@ void sega315_5124_device::vdp_postload()
 void sega315_5124_device::device_start()
 {
 	/* Resolve callbacks */
-	m_int_cb.resolve();
-	m_csync_cb.resolve();
-	m_pause_cb.resolve();
+	m_vblank_cb.resolve();
+	m_n_csync_cb.resolve();
+	m_n_int_cb.resolve();
+	m_n_nmi_cb.resolve();
 
 	/* Make temp bitmap for rendering */
 	screen().register_screen_bitmap(m_tmpbitmap);
@@ -1862,11 +1972,14 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_control_write_data_latch));
 	save_item(NAME(m_sega315_5124_compatibility_mode));
 	save_item(NAME(m_display_disabled));
-	save_item(NAME(m_irq_state));
+	save_item(NAME(m_n_int_state));
+	save_item(NAME(m_n_nmi_state));
+	save_item(NAME(m_n_nmi_in_state));
 	save_item(NAME(m_vdp_mode));
 	save_item(NAME(m_y_pixels));
 	save_item(NAME(m_line_counter));
 	save_item(NAME(m_hcounter));
+	save_item(NAME(m_hcounter_latched));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_current_palette));
 
@@ -1886,8 +1999,6 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_max_sprite_zoom_hcount));
 	save_item(NAME(m_max_sprite_zoom_vcount));
 	save_item(NAME(m_CRAM));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(sega315_5124_device::vdp_postload), this));
 }
 
 
@@ -1899,7 +2010,7 @@ void sega315_5124_device::device_reset()
 	m_reg[0x02] = 0x0e;
 	m_reg[0x0a] = 0xff;
 
-	m_status = m_pending_status = uint8_t(~(STATUS_VINT | STATUS_SPROVR | STATUS_SPRCOL));
+	m_status = m_pending_status = u8(~(STATUS_VINT | STATUS_SPROVR | STATUS_SPRCOL));
 	m_pending_sprcol_x = 0;
 	m_pending_control_write = false;
 	m_pending_hint = false;
@@ -1914,9 +2025,12 @@ void sega315_5124_device::device_reset()
 	m_cram_dirty = true;
 	m_buffer = 0;
 	m_control_write_data_latch = 0;
-	m_irq_state = 0;
+	m_n_int_state = 1;
+	m_n_nmi_state = 1;
+	m_n_nmi_in_state = 1;
 	m_line_counter = 0;
 	m_hcounter = 0;
+	m_hcounter_latched = false;
 	m_draw_time = DRAW_TIME_SMS;
 
 	std::fill(std::begin(m_current_palette), std::end(m_current_palette), 0);
@@ -1933,7 +2047,15 @@ void sega315_5124_device::device_reset()
 
 void sega315_5124_device::device_add_mconfig(machine_config &config)
 {
-	PALETTE(config, m_palette, FUNC(sega315_5124_device::sega315_5124_palette), SEGA315_5124_PALETTE_SIZE);
+	PALETTE(config, m_palette_lut, FUNC(sega315_5124_device::sega315_5124_palette), SEGA315_5124_PALETTE_SIZE);
+
+	SEGAPSG(config, m_snsnd, DERIVED_CLOCK(1, 3)).add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+}
+
+void sega315_5246_device::device_add_mconfig(machine_config &config)
+{
+	sega315_5124_device::device_add_mconfig(config);
+	m_palette_lut->set_init(FUNC(sega315_5246_device::sega315_5246_palette));
 }
 
 void sega315_5377_device::device_reset()
@@ -1949,6 +2071,23 @@ void sega315_5377_device::device_reset()
 void sega315_5377_device::device_add_mconfig(machine_config &config)
 {
 	sega315_5246_device::device_add_mconfig(config);
-	m_palette->set_entries(SEGA315_5377_PALETTE_SIZE);
-	m_palette->set_init(FUNC(sega315_5377_device::sega315_5377_palette));
+
+	m_palette_lut->set_entries(SEGA315_5377_PALETTE_SIZE);
+	m_palette_lut->set_init(FUNC(sega315_5377_device::sega315_5377_palette));
+
+	GAMEGEAR(config.replace(), m_snsnd, DERIVED_CLOCK(1, 3));
+	m_snsnd->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_snsnd->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+}
+
+//-------------------------------------------------
+//  device_add_mconfig - add machine configuration
+//-------------------------------------------------
+
+void sega315_5313_mode4_device::device_add_mconfig(machine_config &config)
+{
+	sega315_5246_device::device_add_mconfig(config);
+
+	m_palette_lut->set_entries((512 * 3) + 64);
+	m_palette_lut->set_init(FUNC(sega315_5313_mode4_device::sega315_5313_palette));
 }

@@ -21,9 +21,9 @@
 #include "emu.h"
 #include "zx8302.h"
 
-#include "machine/microdrv.h"
+#include "imagedev/microdrv.h"
 
-#include <time.h>
+#include <ctime>
 
 
 

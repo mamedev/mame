@@ -21,19 +21,19 @@
 
 class compis_graphics_slot_device;
 
-class device_compis_graphics_card_interface : public device_slot_card_interface
+class device_compis_graphics_card_interface : public device_interface
 {
 public:
-	virtual uint8_t mcs0_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void mcs0_w(address_space &space, offs_t offset, uint8_t data) { }
-	virtual uint8_t mcs1_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void mcs1_w(address_space &space, offs_t offset, uint8_t data) { }
-	virtual uint16_t pcs3_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void pcs3_w(address_space &space, offs_t offset, uint16_t data) { }
-	virtual uint8_t pcs6_6_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void pcs6_6_w(address_space &space, offs_t offset, uint8_t data) { }
-	virtual uint8_t dma_ack_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void dma_ack_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t mcs0_r(offs_t offset) { return 0xff; }
+	virtual void mcs0_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t mcs1_r(offs_t offset) { return 0xff; }
+	virtual void mcs1_w(offs_t offset, uint8_t data) { }
+	virtual uint16_t pcs3_r(offs_t offset) { return 0xff; }
+	virtual void pcs3_w(offs_t offset, uint16_t data) { }
+	virtual uint8_t pcs6_6_r(offs_t offset) { return 0xff; }
+	virtual void pcs6_6_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t dma_ack_r(offs_t offset) { return 0xff; }
+	virtual void dma_ack_w(offs_t offset, uint8_t data) { }
 
 protected:
 	// construction/destruction
@@ -45,8 +45,7 @@ protected:
 
 // ======================> compis_graphics_slot_device
 
-class compis_graphics_slot_device : public device_t,
-							   public device_slot_interface
+class compis_graphics_slot_device : public device_t, public device_single_card_slot_interface<device_compis_graphics_card_interface>
 {
 public:
 	// construction/destruction
@@ -64,16 +63,16 @@ public:
 	auto drq() { return m_write_dma_request.bind(); }
 
 	// computer interface
-	DECLARE_READ8_MEMBER( mcs0_r ) { return m_card ? m_card->mcs0_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( mcs0_w ) { if (m_card) m_card->mcs0_w(space, offset, data); }
-	DECLARE_READ8_MEMBER( mcs1_r ) { return m_card ? m_card->mcs1_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( mcs1_w ) { if (m_card) m_card->mcs1_w(space, offset, data); }
-	DECLARE_READ16_MEMBER( pcs3_r ) { return m_card ? m_card->pcs3_r(space, offset) : 0xff; }
-	DECLARE_WRITE16_MEMBER( pcs3_w ) { if (m_card) m_card->pcs3_w(space, offset, data); }
-	DECLARE_READ8_MEMBER( pcs6_6_r ) { return m_card ? m_card->pcs6_6_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( pcs6_6_w ) { if (m_card) m_card->pcs6_6_w(space, offset, data); }
-	DECLARE_READ8_MEMBER( dma_ack_r ) { return m_card ? m_card->dma_ack_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( dma_ack_w ) { if (m_card) m_card->dma_ack_w(space, offset, data); }
+	uint8_t mcs0_r(offs_t offset) { return m_card ? m_card->mcs0_r(offset) : 0xff; }
+	void mcs0_w(offs_t offset, uint8_t data) { if (m_card) m_card->mcs0_w(offset, data); }
+	uint8_t mcs1_r(offs_t offset) { return m_card ? m_card->mcs1_r(offset) : 0xff; }
+	void mcs1_w(offs_t offset, uint8_t data) { if (m_card) m_card->mcs1_w(offset, data); }
+	uint8_t pcs3_r(offs_t offset) { return m_card ? m_card->pcs3_r(offset) : 0xff; }
+	void pcs3_w(offs_t offset, uint8_t data) { if (m_card) m_card->pcs3_w(offset, data); }
+	uint8_t pcs6_6_r(offs_t offset) { return m_card ? m_card->pcs6_6_r(offset) : 0xff; }
+	void pcs6_6_w(offs_t offset, uint8_t data) { if (m_card) m_card->pcs6_6_w(offset, data); }
+	uint8_t dma_ack_r(offs_t offset) { return m_card ? m_card->dma_ack_r(offset) : 0xff; }
+	void dma_ack_w(offs_t offset, uint8_t data) { if (m_card) m_card->dma_ack_w(offset, data); }
 
 	// card interface
 	DECLARE_WRITE_LINE_MEMBER( dma_request_w ) { m_write_dma_request(state); }
@@ -81,7 +80,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override { if (m_card) get_card_device()->reset(); }
 
 	devcb_write_line   m_write_dma_request;
 

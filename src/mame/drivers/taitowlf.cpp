@@ -130,7 +130,7 @@ uint8_t taitowlf_state::mtxc_config_r(int function, int reg)
 
 void taitowlf_state::mtxc_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 
 	switch(reg)
 	{
@@ -204,7 +204,7 @@ uint8_t taitowlf_state::piix4_config_r(int function, int reg)
 
 void taitowlf_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 
@@ -286,7 +286,7 @@ void taitowlf_state::taitowlf_map(address_map &map)
 	map(0x000f0000, 0x000fffff).bankr("bank1");
 	map(0x000f0000, 0x000fffff).w(FUNC(taitowlf_state::bios_ram_w));
 	map(0x00100000, 0x01ffffff).ram();
-//  AM_RANGE(0xf8000000, 0xf83fffff) AM_ROM AM_REGION("user3", 0)
+//  map(0xf8000000, 0xf83fffff).rom().region("user3", 0);
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);   /* System BIOS */
 }
 
@@ -369,18 +369,18 @@ void taitowlf_state::taitowlf_palette(palette_device &palette) const
 }
 #endif
 
-MACHINE_CONFIG_START(taitowlf_state::taitowlf)
-
+void taitowlf_state::taitowlf(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PENTIUM, 200000000)
-	MCFG_DEVICE_PROGRAM_MAP(taitowlf_map)
-	MCFG_DEVICE_IO_MAP(taitowlf_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	PENTIUM(config, m_maincpu, 200000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitowlf_state::taitowlf_map);
+	m_maincpu->set_addrmap(AS_IO, &taitowlf_state::taitowlf_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, taitowlf_state, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, taitowlf_state, intel82371ab_pci_r, intel82371ab_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device(0, FUNC(taitowlf_state::intel82439tx_pci_r), FUNC(taitowlf_state::intel82439tx_pci_w));
+	pcibus.set_device(7, FUNC(taitowlf_state::intel82371ab_pci_r), FUNC(taitowlf_state::intel82371ab_pci_w));
 
 	pcat_common(config);
 
@@ -389,15 +389,15 @@ MACHINE_CONFIG_START(taitowlf_state::taitowlf)
 	pcvideo_vga(config);
 #else
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitowlf_state, screen_update_taitowlf)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(taitowlf_state::screen_update_taitowlf));
 	PALETTE(config, m_palette, FUNC(taitowlf_state::taitowlf_palette), 256);
 #endif
-MACHINE_CONFIG_END
+}
 
 void taitowlf_state::init_taitowlf()
 {

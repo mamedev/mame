@@ -56,6 +56,7 @@ ToDo:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class chanbara_state : public driver_device
@@ -175,8 +176,8 @@ TILE_GET_INFO_MEMBER(chanbara_state::get_bg2_tile_info)
 
 void chanbara_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chanbara_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,8, 8, 32, 32);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chanbara_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,16, 16, 16, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chanbara_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,8, 8, 32, 32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chanbara_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS,16, 16, 16, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 }
 
@@ -256,26 +257,26 @@ void chanbara_state::chanbara_map(address_map &map)
 /* verified from M6809 code */
 static INPUT_PORTS_START( chanbara )
 	PORT_START ("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )       /* code at 0xedc0 */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:5")       /* code at 0xedc0 */
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x20, "3" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )       /* table at 0xc249 (2 * 2 words) */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:7")       /* table at 0xc249 (2 * 2 words) */
 	PORT_DIPSETTING(    0x40, "50k and 70k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
@@ -394,24 +395,24 @@ void chanbara_state::machine_reset()
 	m_scrollhi = 0;
 }
 
-MACHINE_CONFIG_START(chanbara_state::chanbara)
-
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(12'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(chanbara_map)
+void chanbara_state::chanbara(machine_config &config)
+{
+	MC6809E(config, m_maincpu, XTAL(12'000'000)/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &chanbara_state::chanbara_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(57.4122)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(57.4122);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
 	// DECO video CRTC
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,16,240)
-	MCFG_SCREEN_UPDATE_DRIVER(chanbara_state, screen_update_chanbara)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen.set_raw(XTAL(12'000'000)/2,384,0,256,272,16,240);
+	screen.set_screen_update(FUNC(chanbara_state::screen_update_chanbara));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_chanbara)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chanbara);
 
 	PALETTE(config, m_palette, FUNC(chanbara_state::chanbara_palette), 256);
 
@@ -422,7 +423,7 @@ MACHINE_CONFIG_START(chanbara_state::chanbara)
 	ymsnd.port_a_write_callback().set(FUNC(chanbara_state::chanbara_ay_out_0_w));
 	ymsnd.port_b_write_callback().set(FUNC(chanbara_state::chanbara_ay_out_1_w));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( chanbara )

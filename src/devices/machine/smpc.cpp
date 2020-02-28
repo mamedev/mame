@@ -180,7 +180,7 @@ DEFINE_DEVICE_TYPE(SMPC_HLE, smpc_hle_device, "smpc_hle", "Sega Saturn SMPC HLE 
 // "uplift_submaps unhandled case: range straddling slots."
 void smpc_hle_device::smpc_regs(address_map &map)
 {
-//  ADDRESS_MAP_UNMAP_HIGH
+//  map.unmap_value_high();
 	map(0x00, 0x0d).w(FUNC(smpc_hle_device::ireg_w));
 	map(0x1f, 0x1f).w(FUNC(smpc_hle_device::command_register_w));
 	map(0x20, 0x5f).r(FUNC(smpc_hle_device::oreg_r));
@@ -205,7 +205,7 @@ void smpc_hle_device::smpc_regs(address_map &map)
 smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SMPC_HLE, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	  m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, address_map_constructor(), address_map_constructor(FUNC(smpc_hle_device::smpc_regs), this)),
+	  m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, address_map_constructor(FUNC(smpc_hle_device::smpc_regs), this)),
 	m_mini_nvram(*this, "smem"),
 	m_mshres(*this),
 	m_mshnmi(*this),

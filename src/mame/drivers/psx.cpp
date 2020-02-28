@@ -29,17 +29,15 @@
 
 #include <zlib.h>
 
-#define PSXCD_TAG   "psxcd"
-
 class psx1_state : public driver_device
 {
 public:
-	psx1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	psx1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "maincpu:ram"),
 		m_parallel(*this, "parallel"),
-		m_psxcd(*this, PSXCD_TAG)
+		m_psxcd(*this, "psxcd")
 	{
 	}
 
@@ -68,7 +66,7 @@ protected:
 	int load_psf(std::vector<uint8_t> buffer);
 	DECLARE_READ16_MEMBER(parallel_r);
 	DECLARE_WRITE16_MEMBER(parallel_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(psx_exe_load);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_exe);
 	void cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	required_device<psxcpu_device> m_maincpu;
@@ -484,7 +482,7 @@ WRITE16_MEMBER(psx1_state::parallel_w)
 	}
 }
 
-QUICKLOAD_LOAD_MEMBER(psx1_state, psx_exe_load)
+QUICKLOAD_LOAD_MEMBER(psx1_state::quickload_exe)
 {
 	m_exe_buffer.resize(quickload_size);
 
@@ -521,8 +519,8 @@ void psx1_state::subcpu_map(address_map &map)
 void psx1_state::psx_base(machine_config &config)
 {
 	m_maincpu->set_addrmap(AS_PROGRAM, &psx1_state::psx_map);
-	m_maincpu->cd_read().set(PSXCD_TAG, FUNC(psxcd_device::read));
-	m_maincpu->cd_write().set(PSXCD_TAG, FUNC(psxcd_device::write));
+	m_maincpu->cd_read().set(m_psxcd, FUNC(psxcd_device::read));
+	m_maincpu->cd_write().set(m_psxcd, FUNC(psxcd_device::write));
 	m_maincpu->subdevice<ram_device>("ram")->set_default_size("2M");
 
 	psxcontrollerports_device &controllers(PSXCONTROLLERPORTS(config, "controllers", 0));
@@ -545,8 +543,7 @@ void psx1_state::psx_base(machine_config &config)
 	spu.add_route(0, "lspeaker", 1.00);
 	spu.add_route(1, "rspeaker", 1.00);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(psx1_state, psx_exe_load), this), "cpe,exe,psf,psx", 0);
+	QUICKLOAD(config, "quickload", "cpe,exe,psf,psx").set_load_callback(FUNC(psx1_state::quickload_exe));
 
 	PSX_PARALLEL_SLOT(config, "parallel", psx_parallel_devices, nullptr);
 

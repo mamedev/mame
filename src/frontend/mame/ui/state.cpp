@@ -203,8 +203,8 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 	}
 
 	// set up custom render proc
-	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-	custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
+	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
 
 	// pause if appropriate
 	if (!m_pause_checked)

@@ -48,6 +48,11 @@
     less than 2 MiB onboard. As the community is still alive we can hope for
     a fix for this problem; so we make the size configurable.
 
+    According to the Genmod setup instructions, the Horizon Ramdisks do not
+    decode the AMA/AMB/AMC lines, so it is important to modify them when
+    running with the Genmod system. This can be done with the configuration
+    setting "Genmod fix".
+
 *****************************************************************************/
 
 #include "emu.h"
@@ -81,8 +86,6 @@ horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, co
 	m_ram(*this, RAMREGION),
 	m_nvram(*this, NVRAMREGION),
 	m_ros(*this, ROSREGION),
-	m_select6_value(0),
-	m_select_all(0),
 	m_page(0),
 	m_cru_horizon(0),
 	m_cru_phoenix(0),
@@ -91,7 +94,8 @@ horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, co
 	m_split_mode(false),
 	m_rambo_mode(false),
 	m_hideswitch(false),
-	m_use_rambo(false)
+	m_use_rambo(false),
+	m_genmod_fix(false)
 {
 }
 
@@ -185,7 +189,7 @@ READ8Z_MEMBER(horizon_ramdisk_device::readz)
 
 	if (!m_rambo_mode)
 	{
-		if ((offset & m_select_mask) == m_select_value)
+		if (in_dsr_space(offset, m_genmod_fix))
 		{
 			if ((offset & 0x1800) == 0x1800)
 			{
@@ -203,12 +207,12 @@ READ8Z_MEMBER(horizon_ramdisk_device::readz)
 	}
 	else
 	{
-		if ((offset & m_select_mask)==m_select_value)
+		if (in_dsr_space(offset, m_genmod_fix))
 		{
 			*value = m_ros->pointer()[offset & 0x1fff];
 			LOGMASKED(LOG_READ, "offset=%04x (Rambo) -> %02x\n", offset&0xffff,  *value);
 		}
-		if ((offset & m_select_mask)==m_select6_value)
+		if (in_cart_space(offset, m_genmod_fix))
 		{
 			// In RAMBO mode the page numbers are multiples of 4
 			// (encompassing 4 Horizon pages)
@@ -219,7 +223,7 @@ READ8Z_MEMBER(horizon_ramdisk_device::readz)
 	}
 }
 
-WRITE8_MEMBER(horizon_ramdisk_device::write)
+void horizon_ramdisk_device::write(offs_t offset, uint8_t data)
 {
 	// 32K expansion
 	// According to the manual, "this memory is not affected by the HIDE switch"
@@ -251,7 +255,7 @@ WRITE8_MEMBER(horizon_ramdisk_device::write)
 
 	if (!m_rambo_mode)
 	{
-		if ((offset & m_select_mask) == m_select_value)
+		if (in_dsr_space(offset, m_genmod_fix))
 		{
 			if ((offset & 0x1800) == 0x1800)
 			{
@@ -269,12 +273,12 @@ WRITE8_MEMBER(horizon_ramdisk_device::write)
 	}
 	else
 	{
-		if ((offset & m_select_mask)==m_select_value)
+		if (in_dsr_space(offset, m_genmod_fix))
 		{
 			m_ros->pointer()[offset & 0x1fff] = data;
 			LOGMASKED(LOG_WRITE, "offset=%04x (Rambo) <- %02x\n", offset&0xffff,  data);
 		}
-		if ((offset & m_select_mask)==m_select6_value)
+		if (in_cart_space(offset, m_genmod_fix))
 		{
 			// In RAMBO mode the page numbers are multiples of 4
 			// (encompassing 4 Horizon pages)
@@ -303,7 +307,7 @@ void horizon_ramdisk_device::setbit(int& page, int pattern, bool set)
 	}
 }
 
-WRITE8_MEMBER(horizon_ramdisk_device::cruwrite)
+void horizon_ramdisk_device::cruwrite(offs_t offset, uint8_t data)
 {
 	int size = ioport("HORIZONSIZE")->read();
 	int split_bit = size + 10;
@@ -376,8 +380,6 @@ void horizon_ramdisk_device::device_start(void)
 	m_cru_horizon = 0;
 	m_cru_phoenix = 0;
 
-	save_item(NAME(m_select6_value));
-	save_item(NAME(m_select_all));
 	save_item(NAME(m_page));
 	save_item(NAME(m_cru_horizon));
 	save_item(NAME(m_cru_phoenix));
@@ -391,21 +393,6 @@ void horizon_ramdisk_device::device_start(void)
 
 void horizon_ramdisk_device::device_reset(void)
 {
-	if (m_genmod)
-	{
-		m_select_mask = 0x1fe000;
-		m_select_value = 0x174000;
-		m_select6_value = 0x176000;
-		m_select_all = 0x170000;
-	}
-	else
-	{
-		m_select_mask = 0x7e000;
-		m_select_value = 0x74000;
-		m_select6_value = 0x76000;
-		m_select_all = 0x70000;
-	}
-
 	m_cru_horizon = ioport("CRUHOR")->read();
 	m_cru_phoenix = ioport("CRUPHOE")->read();
 
@@ -418,6 +405,8 @@ void horizon_ramdisk_device::device_reset(void)
 	m_hideswitch = (ioport("HORIZONACT")->read()!=0);
 
 	m_use_rambo = (ioport("RAMBO")->read()!=0);
+
+	m_genmod_fix = (ioport("GENMODFIX")->read()!=0);
 
 	m_page = 0;
 	m_selected = false;
@@ -456,7 +445,7 @@ INPUT_PORTS_START( horizon )
 		PORT_DIPSETTING(    0x02, "Geneve mode" )
 
 	PORT_START( "HORIZONACT" )
-	PORT_DIPNAME( 0x01, 0x00, "Horizon hideswitch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, horizon_ramdisk_device, hs_changed, nullptr)
+	PORT_DIPNAME( 0x01, 0x00, "Horizon hideswitch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, horizon_ramdisk_device, hs_changed, 0)
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
@@ -476,6 +465,11 @@ INPUT_PORTS_START( horizon )
 		PORT_CONFSETTING( 0x01, "4 MiB")
 		PORT_CONFSETTING( 0x02, "8 MiB")
 		PORT_CONFSETTING( 0x03, "16 MiB")
+
+	PORT_START( "GENMODFIX" )
+	PORT_CONFNAME( 0x01, 0x00, "Horizon Genmod fix" )
+		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
+		PORT_CONFSETTING( 0x01, DEF_STR( On ))
 
 INPUT_PORTS_END
 

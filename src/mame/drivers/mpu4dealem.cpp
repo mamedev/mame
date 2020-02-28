@@ -39,7 +39,7 @@ private:
 	optional_shared_ptr<uint8_t> m_dealem_videoram;
 	DECLARE_MACHINE_RESET(dealem_vid);
 	void dealem_palette(palette_device &palette) const;
-	uint32_t screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dealem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(dealem_vsync_changed);
 	required_device<gfxdecode_device> m_gfxdecode;
 	void dealem_memmap(address_map &map);
@@ -107,16 +107,16 @@ void mpu4dealem_state::dealem_palette(palette_device &palette) const
 		bit0 = BIT(*color_prom, 0);
 		bit1 = BIT(*color_prom, 1);
 		bit2 = BIT(*color_prom, 2);
-		int const r = combine_3_weights(weights_r, bit0, bit1, bit2);
+		int const r = combine_weights(weights_r, bit0, bit1, bit2);
 		/* green component */
 		bit0 = BIT(*color_prom, 3);
 		bit1 = BIT(*color_prom, 4);
 		bit2 = BIT(*color_prom, 5);
-		int const g = combine_3_weights(weights_g, bit0, bit1, bit2);
+		int const g = combine_weights(weights_g, bit0, bit1, bit2);
 		/* blue component */
 		bit0 = BIT(*color_prom, 6);
 		bit1 = BIT(*color_prom, 7);
-		int const b = combine_2_weights(weights_b, bit0, bit1);
+		int const b = combine_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
@@ -124,7 +124,7 @@ void mpu4dealem_state::dealem_palette(palette_device &palette) const
 }
 
 
-uint32_t mpu4dealem_state::screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mpu4dealem_state::screen_update_dealem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int count = 0;
 	for (int y = 0; y < 32; y++)
@@ -159,7 +159,7 @@ void mpu4dealem_state::dealem_memmap(address_map &map)
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-/*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) */ //Runs hoppers
+/*  map(0x08e0, 0x08e7).rw(FUNC(mpu4dealem_state::68681_duart_r), FUNC(mpu4dealem_state::68681_duart_w)); */ //Runs hoppers
 
 	map(0x0900, 0x0907).rw(m_6840ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));/* PTM6840 IC2 */
 
@@ -196,12 +196,13 @@ MACHINE_RESET_MEMBER(mpu4dealem_state,dealem_vid)
 
 
 /* machine driver for Zenitone Deal 'Em board */
-MACHINE_CONFIG_START(mpu4dealem_state::dealem)
+void mpu4dealem_state::dealem(machine_config &config)
+{
 	MCFG_MACHINE_START_OVERRIDE(mpu4dealem_state,mod2)                          /* main mpu4 board initialisation */
 	MCFG_MACHINE_RESET_OVERRIDE(mpu4dealem_state,dealem_vid)
 
-	MCFG_DEVICE_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(dealem_memmap)
+	MC6809(config, m_maincpu, MPU4_MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4dealem_state::dealem_memmap);
 
 	mpu4_common(config);
 
@@ -214,23 +215,22 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE((54+1)*8, (32+1)*8)                    /* Taken from 6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)      /* Taken from 6845 init, registers 01 & 06 */
-	MCFG_SCREEN_REFRESH_RATE(56)                            /* Measured accurately from the flip-flop, but 6845 handles this */
-	MCFG_SCREEN_UPDATE_DRIVER(mpu4dealem_state, screen_update_dealem)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size((54+1)*8, (32+1)*8);                    /* Taken from 6845 init, registers 00 & 04. Normally programmed with (value-1) */
+	screen.set_visarea(0*8, 40*8-1, 0*8, 31*8-1);      /* Taken from 6845 init, registers 01 & 06 */
+	screen.set_refresh_hz(56);                            /* Measured accurately from the flip-flop, but 6845 handles this */
+	screen.set_screen_update(FUNC(mpu4dealem_state::screen_update_dealem));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dealem)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dealem);
 
-	PALETTE(config, "palette", FUNC(mpu4dealem_state::dealem_palette), 32);
+	PALETTE(config, m_palette, FUNC(mpu4dealem_state::dealem_palette), 32);
 
-	hd6845_device &crtc(HD6845(config, "crtc", MPU4_MASTER_CLOCK / 4 / 8)); /* HD68B45 */
+	hd6845s_device &crtc(HD6845S(config, "crtc", MPU4_MASTER_CLOCK / 4 / 8)); /* HD68B45 */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.out_vsync_callback().set(FUNC(mpu4dealem_state::dealem_vsync_changed));
-MACHINE_CONFIG_END
+}
 
 
 

@@ -36,20 +36,20 @@ should be 312, but 312 = 39*8 so it doesn't look right because a divider by 39 i
 
 DEFINE_DEVICE_TYPE(SP0250, sp0250_device, "sp0250", "GI SP0250 LPC")
 
-sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SP0250, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_amp(0),
-		m_pitch(0),
-		m_repeat(0),
-		m_pcount(0),
-		m_rcount(0),
-		m_playing(0),
-		m_RNG(0),
-		m_stream(nullptr),
-		m_voiced(0),
-		m_fifo_pos(0),
-		m_drq(*this)
+sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SP0250, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_amp(0),
+	m_pitch(0),
+	m_repeat(0),
+	m_pcount(0),
+	m_rcount(0),
+	m_playing(0),
+	m_RNG(0),
+	m_stream(nullptr),
+	m_voiced(0),
+	m_fifo_pos(0),
+	m_drq(*this)
 {
 	for (auto & elem : m_fifo)
 	{
@@ -75,7 +75,7 @@ void sp0250_device::device_start()
 	m_drq.resolve_safe();
 	if (!m_drq.isnull())
 	{
-		m_drq( ASSERT_LINE);
+		m_drq(ASSERT_LINE);
 		m_tick_timer= machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sp0250_device::timer_tick), this));
 		m_tick_timer->adjust(attotime::from_hz(clock()) * CLOCK_DIVIDER, 0, attotime::from_hz(clock()) * CLOCK_DIVIDER);
 	}
@@ -104,7 +104,7 @@ static int16_t sp0250_gc(uint8_t v)
 	// Internal ROM to the chip, cf. manual
 	static const uint16_t coefs[128] =
 	{
-			0,   9,  17,  25,  33,  41,  49,  57,  65,  73,  81,  89,  97, 105, 113, 121,
+		  0,   9,  17,  25,  33,  41,  49,  57,  65,  73,  81,  89,  97, 105, 113, 121,
 		129, 137, 145, 153, 161, 169, 177, 185, 193, 201, 203, 217, 225, 233, 241, 249,
 		257, 265, 273, 281, 289, 297, 301, 305, 309, 313, 317, 321, 325, 329, 333, 337,
 		341, 345, 349, 353, 357, 361, 365, 369, 373, 377, 381, 385, 389, 393, 397, 401,
@@ -122,9 +122,6 @@ static int16_t sp0250_gc(uint8_t v)
 
 void sp0250_device::load_values()
 {
-	int f;
-
-
 	m_filter[0].B = sp0250_gc(m_fifo[ 0]);
 	m_filter[0].F = sp0250_gc(m_fifo[ 1]);
 	m_amp         = sp0250_ga(m_fifo[ 2]);
@@ -147,7 +144,7 @@ void sp0250_device::load_values()
 	m_pcount = 0;
 	m_rcount = 0;
 
-	for (f = 0; f < 6; f++)
+	for (int f = 0; f < 6; f++)
 		m_filter[f].z1 = m_filter[f].z2 = 0;
 
 	m_playing = 1;
@@ -185,13 +182,11 @@ uint8_t sp0250_device::drq_r()
 void sp0250_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *output = outputs[0];
-	int i;
-	for (i = 0; i < samples; i++)
+	for (int i = 0; i < samples; i++)
 	{
 		if (m_playing)
 		{
 			int16_t z0;
-			int f;
 
 			if (m_voiced)
 			{
@@ -214,7 +209,7 @@ void sp0250_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				m_RNG >>= 1;
 			}
 
-			for (f = 0; f < 6; f++)
+			for (int f = 0; f < 6; f++)
 			{
 				z0 += ((m_filter[f].z1 * m_filter[f].F) >> 8)
 					+ ((m_filter[f].z2 * m_filter[f].B) >> 9);

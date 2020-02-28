@@ -75,7 +75,7 @@ class s100_bus_device;
 
 // ======================> device_s100_card_interface
 
-class device_s100_card_interface : public device_slot_card_interface
+class device_s100_card_interface : public device_interface
 {
 	friend class s100_bus_device;
 	template <class ElementType> friend class simple_list;
@@ -99,12 +99,12 @@ public:
 	virtual void s100_vi7_w(int state) { }
 
 	// memory access
-	virtual uint8_t s100_smemr_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void s100_mwrt_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t s100_smemr_r(offs_t offset) { return 0xff; }
+	virtual void s100_mwrt_w(offs_t offset, uint8_t data) { }
 
 	// I/O access
-	virtual uint8_t s100_sinp_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void s100_sout_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t s100_sinp_r(offs_t offset) { return 0xff; }
+	virtual void s100_sout_w(offs_t offset, uint8_t data) { }
 
 	// configuration access
 	virtual void s100_phlda_w(int state) { }
@@ -121,6 +121,8 @@ public:
 protected:
 	// construction/destruction
 	device_s100_card_interface(const machine_config &mconfig, device_t &device);
+
+	virtual void interface_pre_start() override;
 
 	s100_bus_device  *m_bus;
 
@@ -159,11 +161,11 @@ public:
 
 	void add_card(device_s100_card_interface *card);
 
-	DECLARE_READ8_MEMBER( smemr_r );
-	DECLARE_WRITE8_MEMBER( mwrt_w );
+	uint8_t smemr_r(offs_t offset);
+	void mwrt_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( sinp_r );
-	DECLARE_WRITE8_MEMBER( sout_w );
+	uint8_t sinp_r(offs_t offset);
+	void sout_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
@@ -213,7 +215,7 @@ private:
 
 // ======================> s100_slot_device
 
-class s100_slot_device : public device_t, public device_slot_interface
+class s100_slot_device : public device_t, public device_single_card_slot_interface<device_s100_card_interface>
 {
 public:
 	// construction/destruction
@@ -228,6 +230,9 @@ public:
 	}
 	s100_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template <typename T> void set_bus(T &&tag) { m_bus.set_tag(std::forward<T>(tag)); }
+
+protected:
 	// device-level overrides
 	virtual void device_start() override;
 

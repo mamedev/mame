@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, Tyson Smith
 /*
-		Silicon Graphics LG1 "Light" graphics board used as
-		entry level graphics in the Indigo and IRIS Crimson.
+        Silicon Graphics LG1 "Light" graphics board used as
+        entry level graphics in the Indigo and IRIS Crimson.
 */
 
 #ifndef MAME_VIDEO_LIGHT_H

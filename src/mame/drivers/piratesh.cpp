@@ -342,7 +342,7 @@ READ16_MEMBER(piratesh_state::K056832_rom_r)
 	uint16_t offs;
 
 	offs = (m_control & 2 ? 0x1000 : 0) + offset;
-	return m_k056832->piratesh_rom_r(space, offs, mem_mask);
+	return m_k056832->piratesh_rom_r(offs);
 }
 
 
@@ -405,7 +405,7 @@ void piratesh_state::piratesh_map(address_map &map)
 	map(0x084000, 0x087fff).ram();
 	map(0x100000, 0x10001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); // CRTC
 	map(0x180000, 0x18003f).w(m_k056832, FUNC(k056832_device::word_w)); // TILEMAP
-	map(0x280000, 0x280007).w(m_k055673, FUNC(k055673_device::k053246_word_w)); // SPRITES
+	map(0x280000, 0x280007).w(m_k055673, FUNC(k055673_device::k053246_w)); // SPRITES
 	map(0x290000, 0x29000f).r(m_k055673, FUNC(k055673_device::k055673_ps_rom_word_r)); // SPRITES
 	map(0x290010, 0x29001f).w(m_k055673, FUNC(k055673_device::k055673_reg_word_w)); // SPRITES
 	map(0x2a0000, 0x2a0fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w)); // SPRITES
@@ -490,7 +490,7 @@ static INPUT_PORTS_START( piratesh )
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("k053250", k053250ps_device, dmairq_r)
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // FIXME: NCPU from 053246 (DMA)
-	PORT_BIT( 0x0c00, IP_ACTIVE_HIGH, IPT_CUSTOM )PORT_CUSTOM_MEMBER(DEVICE_SELF, piratesh_state, battery_r, nullptr)
+	PORT_BIT( 0x0c00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(piratesh_state, battery_r)
 
 	PORT_START("HELM")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1)
@@ -507,7 +507,7 @@ static INPUT_PORTS_START( piratesh )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
-	PORT_BIT( 0x1800, IP_ACTIVE_HIGH, IPT_CUSTOM )PORT_CUSTOM_MEMBER(DEVICE_SELF, piratesh_state, helm_r, nullptr)
+	PORT_BIT( 0x1800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(piratesh_state, helm_r)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -616,7 +616,7 @@ void piratesh_state::piratesh(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-//  MCFG_SCREEN_REFRESH_RATE(60)
+//  screen.set_refresh_hz(60);
 	screen.set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223); // TODO
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(600));
 	screen.set_size(64*8, 32*8);
@@ -626,8 +626,8 @@ void piratesh_state::piratesh(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::BGRx_888, 2048).enable_shadows().enable_hilights();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(piratesh_state::piratesh_tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_4PIRATESH, 1, 0);
+	m_k056832->set_tile_callback(FUNC(piratesh_state::piratesh_tile_callback));
+	m_k056832->set_config(K056832_BPP_4PIRATESH, 1, 0);
 	m_k056832->set_palette("palette");
 
 	K055555(config, m_k055555, 0);
@@ -635,14 +635,14 @@ void piratesh_state::piratesh(machine_config &config)
 	K053250PS(config, m_k053250, 12000000, "palette", "screen", -16, 0);
 
 	K055673(config, m_k055673, 0);
-	m_k055673->set_sprite_callback(FUNC(piratesh_state::piratesh_sprite_callback), this);
-	m_k055673->set_config("gfx2", K055673_LAYOUT_PS, -60, 24);
+	m_k055673->set_sprite_callback(FUNC(piratesh_state::piratesh_sprite_callback));
+	m_k055673->set_config(K055673_LAYOUT_PS, -60, 24);
 	m_k055673->set_palette("palette");
 
 	// ????
 	//K053246(config, m_k053246, 0);
-	//m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback), this);
-	//m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48+1, 23);
+	//m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback));
+	//m_k053246->set_config("k053246", NORMAL_PLANE_ORDER, -48+1, 23);
 	//m_k053246->set_palette(m_palette);
 
 	K054338(config, "k054338", 0, m_k055555).set_alpha_invert(1);
@@ -664,11 +664,11 @@ ROM_START( piratesh )
 	ROM_LOAD16_WORD_SWAP( "360ua-c04.4p", 0x000000, 0x80000, CRC(6d69dd90) SHA1(ccbdbfea406d9cbc3f242211290ba82ccbbe3795) )
 
 	/* tiles */
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASE00 ) // 27C4096
+	ROM_REGION( 0x80000, "k056832", ROMREGION_ERASE00 ) // 27C4096
 	ROM_LOAD( "360ua-a01.17g", 0x000000, 0x80000, CRC(e39153f5) SHA1(5da9132a2c24a15b55c3f65c26e2ad0467411a88) )
 
 	/* sprites */
-	ROM_REGION( 0x80000*8, "gfx2", ROMREGION_ERASE00 ) // 27C4096
+	ROM_REGION( 0x80000*8, "k055673", ROMREGION_ERASE00 ) // 27C4096
 	ROM_LOAD16_BYTE( "360ua-a02.21l", 0x000000, 0x80000, CRC(82207997) SHA1(fe143285a12fab5227e883113d798acad7bf4c97) )
 	ROM_LOAD16_BYTE( "360ua-a03.23l", 0x000001, 0x80000, CRC(a9e36d51) SHA1(1a8de8d8d2abfee5ac0f0822e203846f7f5f1767) )
 

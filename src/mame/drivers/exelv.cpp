@@ -380,7 +380,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portd_w)
 READ8_MEMBER(exelv_state::rom_r)
 {
 	if (m_cart && m_cart->exists())
-		return m_cart->read_rom(space, offset + 0x200);
+		return m_cart->read_rom(offset + 0x200);
 
 	return 0;
 }
@@ -500,7 +500,7 @@ void exelv_state::exl100(machine_config &config)
 	subcpu.in_portd().set(FUNC(exelv_state::tms7041_portd_r));
 	subcpu.out_portd().set(FUNC(exelv_state::tms7041_portd_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	TMS3556(config, m_tms3556);
 
@@ -521,7 +521,7 @@ void exelv_state::exl100(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
-	// MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
+	//SPEECHROM(config, "vsm", 0);
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();
@@ -554,7 +554,7 @@ void exelv_state::exeltel(machine_config &config)
 	subcpu.in_portd().set(FUNC(exelv_state::tms7041_portd_r));
 	subcpu.out_portd().set(FUNC(exelv_state::tms7041_portd_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	TMS3556(config, m_tms3556);
 

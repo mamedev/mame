@@ -336,7 +336,6 @@ void hyperspt_state::hyperspt(machine_config &config)
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
@@ -349,7 +348,6 @@ void hyperspt_state::hyperspt(machine_config &config)
 
 void hyperspt_state::hyprolyb_adpcm_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x1000, 0x1000).r("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::data_r));
 	map(0x1001, 0x1001).r("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::ready_r));
 	map(0x1002, 0x1002).w("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::msm_data_w));

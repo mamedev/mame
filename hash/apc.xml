@@ -8,7 +8,7 @@
 		<publisher>Software 2000, Inc</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="219313">
-				<rom name="apctd_17.imd" size="219313" crc="9fab869d" sha1="0d289b791a6bae6cbe58f67455c5967a9c5f50f2" offset="0" status="baddump"/>
+				<rom name="apctd_17.imd" size="219313" crc="9fab869d" sha1="0d289b791a6bae6cbe58f67455c5967a9c5f50f2" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 		<info name="Usage Notes" value="Needs CP/M to run" />
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="247485">
-				<rom name="progdisp.imd" size="247485" crc="1439ffbc" sha1="f27c3c078c7845ac0a6f19d9922d9fd9a1fc6371" offset="0" status="baddump"/>
+				<rom name="progdisp.imd" size="247485" crc="1439ffbc" sha1="f27c3c078c7845ac0a6f19d9922d9fd9a1fc6371" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32,7 +32,7 @@
 		<publisher>Digital Research Inc. / MicroPro International Corporation</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="968467">
-				<rom name="cbas86.imd" size="968467" crc="53b50a58" sha1="798cc6983e27996e75bd6991adc8c610382d1613" offset="0" />
+				<rom name="cbas86.imd" size="968467" crc="53b50a58" sha1="798cc6983e27996e75bd6991adc8c610382d1613"/>
 			</dataarea>
 		</part>
 	</software>
@@ -43,7 +43,7 @@
 		<publisher>Digital Research Inc.</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="968467">
-				<rom name="cbas86.imd" size="968467" crc="53b50a58" sha1="798cc6983e27996e75bd6991adc8c610382d1613" offset="0" />
+				<rom name="cbas86.imd" size="968467" crc="53b50a58" sha1="798cc6983e27996e75bd6991adc8c610382d1613"/>
 			</dataarea>
 		</part>
 	</software>
@@ -55,7 +55,7 @@
 		<publisher>Digital Research Inc.</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="528712">
-				<rom name="cpm8607.imd" size="528712" crc="1a2ed7e0" sha1="bd09143b47164bacb63292b28508e90418431d21" offset="0" />
+				<rom name="cpm8607.imd" size="528712" crc="1a2ed7e0" sha1="bd09143b47164bacb63292b28508e90418431d21"/>
 			</dataarea>
 		</part>
 	</software>
@@ -66,7 +66,7 @@
 		<publisher>Digital Research Inc.</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="528202">
-				<rom name="cpm8609.imd" size="528202" crc="d79b4c11" sha1="9101166d668663c9190bb1fbcd5b4ab8f984305c" offset="0" />
+				<rom name="cpm8609.imd" size="528202" crc="d79b4c11" sha1="9101166d668663c9190bb1fbcd5b4ab8f984305c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -77,7 +77,7 @@
 		<publisher>Digital Research Inc.</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="1021251">
-				<rom name="cpm86pda.imd" size="1021251" crc="b3d1a4ea" sha1="2e5ec3c168814f789d6f11edd9a7f857c469f3e8" offset="0" />
+				<rom name="cpm86pda.imd" size="1021251" crc="b3d1a4ea" sha1="2e5ec3c168814f789d6f11edd9a7f857c469f3e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -88,7 +88,7 @@
 		<publisher>Digital Research Inc.</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="1021107">
-				<rom name="cpmsrc.imd" size="1021107" crc="3dd2dd37" sha1="fd2e9d1f894dde75c87e1acb518358c55cb70116" offset="0" />
+				<rom name="cpmsrc.imd" size="1021107" crc="3dd2dd37" sha1="fd2e9d1f894dde75c87e1acb518358c55cb70116"/>
 			</dataarea>
 		</part>
 	</software>
@@ -99,12 +99,12 @@
 		<publisher>Digital Research Inc.</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="528577">
-				<rom name="system disk.imd" size="528577" crc="77740b9c" sha1="68fc418696502b3576e72396e534991e6fa58def" offset="0" />
+				<rom name="system disk.imd" size="528577" crc="77740b9c" sha1="68fc418696502b3576e72396e534991e6fa58def"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_8">
 			<dataarea name="flop" size="530346">
-				<rom name="work disk.imd" size="530346" crc="cd83ba3f" sha1="e53ea3c777dde8a2d3bf5c53f0f4377d26a1b155" offset="0" />
+				<rom name="work disk.imd" size="530346" crc="cd83ba3f" sha1="e53ea3c777dde8a2d3bf5c53f0f4377d26a1b155"/>
 			</dataarea>
 		</part>
 	</software>
@@ -115,7 +115,7 @@
 		<publisher>Ashton-Tate</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="157525">
-				<rom name="dbaseii cpm.imd" size="157525" crc="efe39153" sha1="6d28384a2ead7796a66bc3495ad09e2f2adf69a7" offset="0" />
+				<rom name="dbaseii cpm.imd" size="157525" crc="efe39153" sha1="6d28384a2ead7796a66bc3495ad09e2f2adf69a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -126,7 +126,7 @@
 		<publisher>RSP Inc.</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="270625">
-				<rom name="dbaseii dos.imd" size="270625" crc="54ab92e7" sha1="4d545e3d6bdded0f9e84f6869ea61a818c0924d8" offset="0" />
+				<rom name="dbaseii dos.imd" size="270625" crc="54ab92e7" sha1="4d545e3d6bdded0f9e84f6869ea61a818c0924d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -137,17 +137,17 @@
 		<publisher>Digital Research Inc.</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="476926">
-				<rom name="grafdraw.imd" size="476926" crc="7b21305f" sha1="acd00e4b87ea7af6df8ba24c93453d8ee281d519" offset="0" status="baddump"/>
+				<rom name="grafdraw.imd" size="476926" crc="7b21305f" sha1="acd00e4b87ea7af6df8ba24c93453d8ee281d519" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_8">
 			<dataarea name="flop" size="180551">
-				<rom name="grafdraw documentation.imd" size="180551" crc="f00a567d" sha1="9e45f417d086301f0a735e30f068653398928d47" offset="0" status="baddump"/>
+				<rom name="grafdraw documentation.imd" size="180551" crc="f00a567d" sha1="9e45f417d086301f0a735e30f068653398928d47" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_8">
 			<dataarea name="flop" size="638916">
-				<rom name="graphdraw source code.imd" size="638916" crc="6e1593dc" sha1="f20b91a65a8d2e3bdaf98014486913f6026c4d1e" offset="0" status="baddump"/>
+				<rom name="graphdraw source code.imd" size="638916" crc="6e1593dc" sha1="f20b91a65a8d2e3bdaf98014486913f6026c4d1e" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -158,12 +158,12 @@
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="659388">
-				<rom name="md211sys.imd" size="659388" crc="19747f2f" sha1="36e0330d14fc1d5f3bf741491bdc0b048c51f958" offset="0" />
+				<rom name="md211sys.imd" size="659388" crc="19747f2f" sha1="36e0330d14fc1d5f3bf741491bdc0b048c51f958"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_8">
 			<dataarea name="flop" size="670646">
-				<rom name="md211lst.imd" size="670646" crc="69526b75" sha1="ba8cffcfbfc0ff5cb73e6998f07437338c322659" offset="0" />
+				<rom name="md211lst.imd" size="670646" crc="69526b75" sha1="ba8cffcfbfc0ff5cb73e6998f07437338c322659"/>
 			</dataarea>
 		</part>
 	</software>
@@ -175,7 +175,7 @@
 		<info name="Usage Notes" value="Needs MS-DOS" />
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="125376">
-				<rom name="multplan.imd" size="125376" crc="e1a83ed0" sha1="847ec2c647574284bb45790bf3536cafa317ca5f" offset="0" />
+				<rom name="multplan.imd" size="125376" crc="e1a83ed0" sha1="847ec2c647574284bb45790bf3536cafa317ca5f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -186,7 +186,7 @@
 		<publisher>unknown</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="215269">
-				<rom name="nec.imd" size="215269" crc="1f85b4a1" sha1="bef73b0123e41f549996abcc8b7e70cdd370d12b" offset="0" />
+				<rom name="nec.imd" size="215269" crc="1f85b4a1" sha1="bef73b0123e41f549996abcc8b7e70cdd370d12b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -197,7 +197,7 @@
 		<publisher>NEC</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="379840">
-				<rom name="nec_bios.imd" size="379840" crc="fdbc296e" sha1="c95a6b7eff031ed6664cb4e25385168ffbdadedd" offset="0" />
+				<rom name="nec_bios.imd" size="379840" crc="fdbc296e" sha1="c95a6b7eff031ed6664cb4e25385168ffbdadedd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -208,7 +208,7 @@
 		<publisher>NEC</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="1114403">
-				<rom name="necbios.imd" size="1114403" crc="fb98b653" sha1="c350f90cad32da3b57792c680bdea8ca02a92116" offset="0" />
+				<rom name="necbios.imd" size="1114403" crc="fb98b653" sha1="c350f90cad32da3b57792c680bdea8ca02a92116"/>
 			</dataarea>
 		</part>
 	</software>
@@ -221,7 +221,7 @@
 		<info name="Usage Notes" value="Isn't bootable" />
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="121913">
-				<rom name="necdemo.imd" size="121913" crc="bf278a5f" sha1="a576a7536117ce4201780eda0e7fa6008735d952" offset="0" status="baddump"/>
+				<rom name="necdemo.imd" size="121913" crc="bf278a5f" sha1="a576a7536117ce4201780eda0e7fa6008735d952" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -232,7 +232,7 @@
 		<publisher>unknown</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="920523">
-				<rom name="pubdom.imd" size="920523" crc="412691e0" sha1="6009993da96fdab082ec4255c893aa77480f29e7" offset="0" status="baddump"/>
+				<rom name="pubdom.imd" size="920523" crc="412691e0" sha1="6009993da96fdab082ec4255c893aa77480f29e7" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -243,7 +243,7 @@
 		<publisher>Software 2000, Inc</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="804751">
-				<rom name="tdapc_01.imd" size="804751" crc="b1f6a794" sha1="be3dfe302ada17d8ead3f084cf43e45e6e868dd1" offset="0" />
+				<rom name="tdapc_01.imd" size="804751" crc="b1f6a794" sha1="be3dfe302ada17d8ead3f084cf43e45e6e868dd1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -254,7 +254,7 @@
 		<publisher>Software 2000, Inc</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="784100">
-				<rom name="tdapc_02.imd" size="784100" crc="88839695" sha1="40ac9a8ee136a4219d5f0e480a60122117c1231d" offset="0" />
+				<rom name="tdapc_02.imd" size="784100" crc="88839695" sha1="40ac9a8ee136a4219d5f0e480a60122117c1231d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -265,7 +265,7 @@
 		<publisher>Software 2000, Inc</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="828734">
-				<rom name="tdapc_03.imd" size="828734" crc="9ccd96f1" sha1="a9d1e3946175edb81c7d58764086cbc5bc5ca964" offset="0" />
+				<rom name="tdapc_03.imd" size="828734" crc="9ccd96f1" sha1="a9d1e3946175edb81c7d58764086cbc5bc5ca964"/>
 			</dataarea>
 		</part>
 	</software>
@@ -276,7 +276,7 @@
 		<publisher>NEC</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="584410">
-				<rom name="tdapc_06.imd" size="584410" crc="604db5a9" sha1="3cd0239dcd60df0659390353a1c4024c8e697870" offset="0" />
+				<rom name="tdapc_06.imd" size="584410" crc="604db5a9" sha1="3cd0239dcd60df0659390353a1c4024c8e697870"/>
 			</dataarea>
 		</part>
 	</software>
@@ -287,7 +287,7 @@
 		<publisher>Software 2000, Inc</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="796023">
-				<rom name="tdapc_99.imd" size="796023" crc="8bdd283f" sha1="0c320d11d841a72b3bae72d9cac4a1b2a61b015f" offset="0" />
+				<rom name="tdapc_99.imd" size="796023" crc="8bdd283f" sha1="0c320d11d841a72b3bae72d9cac4a1b2a61b015f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -298,12 +298,12 @@
 		<publisher>Ticom</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="204329">
-				<rom name="ticom.imd" size="204329" crc="30cf2acb" sha1="922ac3913d81e53742924e19b54e160be1430c6c" offset="0" />
+				<rom name="ticom.imd" size="204329" crc="30cf2acb" sha1="922ac3913d81e53742924e19b54e160be1430c6c"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_8">
 			<dataarea name="flop" size="423604">
-				<rom name="ticoma.imd" size="423604" crc="6478a559" sha1="b93bed6d371e55318a3b06890069d92b6d1d3d85" offset="0" />
+				<rom name="ticoma.imd" size="423604" crc="6478a559" sha1="b93bed6d371e55318a3b06890069d92b6d1d3d85"/>
 			</dataarea>
 		</part>
 	</software>
@@ -314,7 +314,7 @@
 		<publisher>Bridgeport Machines / Textron</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="1141985">
-				<rom name="ucsd136.imd" size="1141985" crc="66b4f6cb" sha1="280dcb66864e87c2a81335cd413eb8b8fd14c08f" offset="0" />
+				<rom name="ucsd136.imd" size="1141985" crc="66b4f6cb" sha1="280dcb66864e87c2a81335cd413eb8b8fd14c08f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -325,7 +325,7 @@
 		<publisher>Bridgeport Machines / Textron</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="1144230">
-				<rom name="ucsd136d.imd" size="1144230" crc="3838765e" sha1="78ad79495fa7f03bd44868c4d1a495f44f5df6b6" offset="0" />
+				<rom name="ucsd136d.imd" size="1144230" crc="3838765e" sha1="78ad79495fa7f03bd44868c4d1a495f44f5df6b6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -336,7 +336,7 @@
 		<publisher>Bridgeport Machines / Textron</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="935810">
-				<rom name="ucsd136s.imd" size="935810" crc="ab5a92d3" sha1="e29d1d32b8aeb154cebbe534b435b8ce3cf92293" offset="0" />
+				<rom name="ucsd136s.imd" size="935810" crc="ab5a92d3" sha1="e29d1d32b8aeb154cebbe534b435b8ce3cf92293"/>
 			</dataarea>
 		</part>
 	</software>
@@ -347,7 +347,7 @@
 		<publisher>Bridgeport Machines / Textron</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="1149394">
-				<rom name="ucsd137.imd" size="1149394" crc="ec58ec89" sha1="5e80ca120b2255ded65b78905eac7a2830212cf6" offset="0" />
+				<rom name="ucsd137.imd" size="1149394" crc="ec58ec89" sha1="5e80ca120b2255ded65b78905eac7a2830212cf6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -358,7 +358,7 @@
 		<publisher>NEC</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="971078">
-				<rom name="util.imd" size="971078" crc="08714744" sha1="32bcc99b5e43b9f56103737915aa0591684e6ad6" offset="0" />
+				<rom name="util.imd" size="971078" crc="08714744" sha1="32bcc99b5e43b9f56103737915aa0591684e6ad6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -369,7 +369,7 @@
 		<publisher>Digital Research Inc.</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="836352">
-				<rom name="utility.imd" size="836352" crc="f7954176" sha1="0b63715e0edae30841bc17008d2d08aa3e1522ee" offset="0" />
+				<rom name="utility.imd" size="836352" crc="f7954176" sha1="0b63715e0edae30841bc17008d2d08aa3e1522ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -382,7 +382,7 @@
 		<info name="Usage Notes" value="Needs MS-DOS" />
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="216341">
-				<rom name="wordstar.imd" size="216341" crc="ed0e792b" sha1="e5f713735046211ac79db132dcbf92dd8a7e27d6" offset="0" />
+				<rom name="wordstar.imd" size="216341" crc="ed0e792b" sha1="e5f713735046211ac79db132dcbf92dd8a7e27d6"/>
 			</dataarea>
 		</part>
 	</software>

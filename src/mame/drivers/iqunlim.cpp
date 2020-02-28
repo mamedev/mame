@@ -55,19 +55,25 @@ A4 = MAX232
 #include "emu.h"
 #include "screen.h"
 #include "cpu/m68000/m68000.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 class iqunlim_state : public driver_device
 {
 public:
-	iqunlim_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
-	{ }
+	iqunlim_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_cart(*this, "cartslot")
+		{ }
 
 	void iqunlim(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<generic_slot_device> m_cart;
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void iqunlim_mem(address_map &map);
@@ -87,19 +93,37 @@ void iqunlim_state::iqunlim_mem(address_map &map)
 static INPUT_PORTS_START( iqunlim )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(iqunlim_state::iqunlim)
+DEVICE_IMAGE_LOAD_MEMBER(iqunlim_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+
+void iqunlim_state::iqunlim(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // DragonBall EZ (MC68EZ328) (68k core) (is the xtal correct? this was from the other hardware)
-	MCFG_DEVICE_PROGRAM_MAP(iqunlim_mem)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2); // DragonBall EZ (MC68EZ328) (68k core) (is the xtal correct? this was from the other hardware)
+	m_maincpu->set_addrmap(AS_PROGRAM, &iqunlim_state::iqunlim_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER( iqunlim_state, screen_update )
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(iqunlim_state::screen_update));
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "iqunlim_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(iqunlim_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("iqunlim_cart");
+}
 
 ROM_START( iqunlim )
 	ROM_REGION(0x200000, "maincpu", 0)

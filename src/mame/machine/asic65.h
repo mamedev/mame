@@ -22,26 +22,26 @@ enum {
 class asic65_device : public device_t
 {
 public:
-	asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint8_t type)
+	asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u8 type)
 		: asic65_device(mconfig, tag, owner, clock)
 	{
 		set_type(type);
 	}
 
-	asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
-	void set_type(uint8_t type) { m_asic65_type = type; }
+	void set_type(u8 type) { m_asic65_type = type; }
 
 	void reset_line(int state);
-	DECLARE_WRITE16_MEMBER( data_w );
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_READ16_MEMBER( io_r );
+	void data_w(offs_t offset, u16 data);
+	u16 read();
+	u16 io_r();
 
-	DECLARE_WRITE16_MEMBER( m68k_w );
-	DECLARE_READ16_MEMBER( m68k_r );
-	DECLARE_WRITE16_MEMBER( stat_w );
-	DECLARE_READ16_MEMBER( stat_r );
+	void m68k_w(u16 data);
+	u16 m68k_r();
+	void stat_w(u16 data);
+	u16 stat_r();
 
 	enum
 	{
@@ -58,23 +58,23 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	uint8_t   m_asic65_type;
-	int     m_command;
-	uint16_t  m_param[32];
-	uint16_t  m_yorigin;
-	uint8_t   m_param_index;
-	uint8_t   m_result_index;
-	uint8_t   m_reset_state;
-	uint8_t   m_last_bank;
+	u8   m_asic65_type;
+	int  m_command;
+	u16  m_param[32];
+	u16  m_yorigin;
+	u8   m_param_index;
+	u8   m_result_index;
+	u8   m_reset_state;
+	u8   m_last_bank;
 
 	/* ROM-based interface states */
 	required_device<tms32010_device> m_ourcpu;
-	uint8_t   m_tfull;
-	uint8_t   m_68full;
-	uint8_t   m_cmd;
-	uint8_t   m_xflg;
-	uint16_t  m_68data;
-	uint16_t  m_tdata;
+	u8   m_tfull;
+	u8   m_68full;
+	u8   m_cmd;
+	u8   m_xflg;
+	u16  m_68data;
+	u16  m_tdata;
 
 	FILE * m_log;
 

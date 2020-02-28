@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "machine/74259.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class gaelco_state : public driver_device
 {

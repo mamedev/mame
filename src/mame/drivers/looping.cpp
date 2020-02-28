@@ -69,6 +69,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 /*************************************
@@ -216,18 +217,18 @@ void looping_state::looping_palette(palette_device &palette) const
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		int const r = combine_3_weights(rweights, bit0, bit1, bit2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		int const g = combine_3_weights(gweights, bit0, bit1, bit2);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		int const b = combine_2_weights(bweights, bit0, bit1);
+		int const b = combine_weights(bweights, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -251,7 +252,7 @@ TILE_GET_INFO_MEMBER(looping_state::get_tile_info)
 
 void looping_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(looping_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(looping_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	m_bg_tilemap->set_scroll_cols(0x20);
 }
@@ -419,7 +420,7 @@ WRITE_LINE_MEMBER(looping_state::looping_spcint)
 
 WRITE8_MEMBER(looping_state::looping_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(INT_9980A_LEVEL2, ASSERT_LINE);
 }
 
@@ -567,7 +568,7 @@ void looping_state::looping_map(address_map &map)
 
 void looping_state::looping_io_map(address_map &map)
 {
-	map(0x400, 0x407).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x0800, 0x080f).w("mainlatch", FUNC(ls259_device::write_d0));
 }
 
 
@@ -587,8 +588,8 @@ void looping_state::looping_sound_map(address_map &map)
 
 void looping_state::looping_sound_io_map(address_map &map)
 {
-	map(0x000, 0x007).w("sen0", FUNC(ls259_device::write_d0));
-	map(0x008, 0x00f).w("sen1", FUNC(ls259_device::write_d0));
+	map(0x0000, 0x000f).w("sen0", FUNC(ls259_device::write_d0));
+	map(0x0010, 0x001f).w("sen1", FUNC(ls259_device::write_d0));
 }
 
 
@@ -684,7 +685,6 @@ void looping_state::looping(machine_config &config)
 
 	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
@@ -933,7 +933,7 @@ void looping_state::init_looping()
 		rom[i] = bitswap<8>(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x7007, read8_delegate(FUNC(looping_state::protection_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x7007, read8_delegate(*this, FUNC(looping_state::protection_r)));
 }
 
 

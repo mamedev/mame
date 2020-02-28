@@ -291,11 +291,6 @@ Filter Board
 #include "sound/c140.h"
 #include "sound/ym2151.h"
 
-
-// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
-#define MCFG_SCREEN_RAW_PARAMS_NAMCO480I \
-	MCFG_SCREEN_RAW_PARAMS(12288000*2, 768, 0, 496, 264*2,0,480)
-
 #define ENABLE_LOGGING      0
 
 #define NAMCOS21_NUM_COLORS 0x8000
@@ -858,39 +853,40 @@ void namcos21_state::configure_c148_standard(machine_config &config)
 	m_slave_intc->link_c148_device(m_master_intc);
 }
 
-MACHINE_CONFIG_START(namcos21_state::winrun)
-	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
-	MCFG_DEVICE_PROGRAM_MAP(winrun_master_map)
+void namcos21_state::winrun(machine_config &config)
+{
+	M68000(config, m_maincpu, 49.152_MHz_XTAL / 4); /* Master */
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos21_state::winrun_master_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(namcos21_state::screen_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
-	MCFG_DEVICE_PROGRAM_MAP(winrun_slave_map)
+	M68000(config, m_slave, 49.152_MHz_XTAL / 4); /* Slave */
+	m_slave->set_addrmap(AS_PROGRAM, &namcos21_state::winrun_slave_map);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, 3072000) /* Sound */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
+	MC6809E(config, m_audiocpu, 49.152_MHz_XTAL / 24); /* Sound */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos21_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(namcos21_state::irq0_line_hold), attotime::from_hz(2*60));
 
 	configure_c65_namcos21(config);
 
 	NAMCOS21_DSP(config, m_namcos21_dsp, 0);
 	m_namcos21_dsp->set_renderer_tag("namcos21_3d");
 
-	MCFG_DEVICE_ADD("gpu", M68000,12288000) /* graphics coprocessor */
-	MCFG_DEVICE_PROGRAM_MAP(winrun_gpu_map)
+	m68000_device &gpu(M68000(config, "gpu", 49.152_MHz_XTAL / 4)); /* graphics coprocessor */
+	gpu.set_addrmap(AS_PROGRAM, &namcos21_state::winrun_gpu_map);
 
 	configure_c148_standard(config);
 	NAMCO_C148(config, m_gpu_intc, 0, "gpu", false);
 	NAMCO_C139(config, m_sci, 0);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* 100 CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
-	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
+	m_screen->set_raw(49.152_MHz_XTAL / 2, 768, 0, 496, 264*2, 0, 480);
+	m_screen->set_screen_update(FUNC(namcos21_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, NAMCOS21_NUM_COLORS);
 
@@ -905,11 +901,12 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 
 	C140(config, m_c140, 8000000/374);
 	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
+	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.50);
 	m_c140->add_route(1, "rspeaker", 0.50);
 
-	YM2151(config, "ymsnd", 3579580).add_route(0, "lspeaker", 0.30).add_route(1, "rspeaker", 0.30);
-MACHINE_CONFIG_END
+	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "lspeaker", 0.30).add_route(1, "rspeaker", 0.30);
+}
 
 
 ROM_START( winrun )

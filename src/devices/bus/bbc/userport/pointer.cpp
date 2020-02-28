@@ -261,17 +261,17 @@ TIMER_CALLBACK_MEMBER(bbc_pointer_device::pointer_poll)
 	}
 }
 
-READ8_MEMBER(bbc_amxmouse_device::pb_r)
+uint8_t bbc_amxmouse_device::pb_r()
 {
 	return (m_buttons->read() & 0xe0) | (m_xdir << 0) | (m_ydir << 2) | 0x1a;
 }
 
-READ8_MEMBER(bbc_m512mouse_device::pb_r)
+uint8_t bbc_m512mouse_device::pb_r()
 {
 	return (m_buttons->read() & 0x07) | (m_xdir << 3) | (m_ydir << 4) | 0xe0;
 }
 
-READ8_MEMBER(bbc_tracker_device::pb_r)
+uint8_t bbc_tracker_device::pb_r()
 {
 	return (m_buttons->read() & 0x07) | (m_xdir << 3) | (m_ydir << 4) | 0xe0;
 }

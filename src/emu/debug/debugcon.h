@@ -28,6 +28,7 @@
 /* flags for command parsing */
 #define CMDFLAG_NONE                        (0x0000)
 #define CMDFLAG_KEEP_QUOTES                 (0x0001)
+#define CMDFLAG_CUSTOM_HELP                 (0x0002)
 
 /* values for the error code in a command error */
 #define CMDERR_NONE                         (0)
@@ -111,13 +112,16 @@ public:
 private:
 	void exit();
 
+	void execute_help_custom(int ref, const std::vector<std::string> &params);
+
 	void trim_parameter(char **paramptr, bool keep_quotes);
 	CMDERR internal_execute_command(bool execute, int params, char **param);
 	CMDERR internal_parse_command(const std::string &original_command, bool execute);
 
 	struct debug_command
 	{
-		debug_command * next;
+		debug_command(const char *_command, u32 _flags, int _ref, int _minparams, int _maxparams, std::function<void(int, const std::vector<std::string> &)> _handler);
+
 		char            command[32];
 		const char *    params;
 		const char *    help;
@@ -133,7 +137,7 @@ private:
 	text_buffer     *m_console_textbuf;
 	text_buffer     *m_errorlog_textbuf;
 
-	debug_command   *m_commandlist;
+	std::forward_list<debug_command> m_commandlist;
 
 	std::unique_ptr<std::istream> m_source_file;        // script source file
 };

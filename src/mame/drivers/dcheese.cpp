@@ -58,14 +58,17 @@ void dcheese_state::update_irq_state()
 }
 
 
-IRQ_CALLBACK_MEMBER(dcheese_state::irq_callback)
+uint8_t dcheese_state::iack_r(offs_t offset)
 {
-	/* auto-ack the IRQ */
-	m_irq_state[irqline] = 0;
-	update_irq_state();
+	if (!machine().side_effects_disabled())
+	{
+		/* auto-ack the IRQ */
+		m_irq_state[offset] = 0;
+		update_irq_state();
+	}
 
 	/* vector is 0x40 + index */
-	return 0x40 + irqline;
+	return 0x40 + offset;
 }
 
 
@@ -76,10 +79,13 @@ void dcheese_state::signal_irq(u8 which)
 }
 
 
-INTERRUPT_GEN_MEMBER(dcheese_state::vblank)
+WRITE_LINE_MEMBER(dcheese_state::vblank)
 {
-	logerror("---- VBLANK ----\n");
-	signal_irq(4);
+	if (state)
+	{
+		logerror("---- VBLANK ----\n");
+		signal_irq(4);
+	}
 }
 
 
@@ -104,12 +110,6 @@ void dcheese_state::machine_start()
  *  I/O ports
  *
  *************************************/
-
-CUSTOM_INPUT_MEMBER(dcheese_state::sound_latch_state_r)
-{
-	return m_soundlatch->pending_r();
-}
-
 
 WRITE16_MEMBER(dcheese_state::eeprom_control_w)
 {
@@ -185,6 +185,10 @@ void dcheese_state::main_cpu_map(address_map &map)
 	map(0x300000, 0x300001).w(FUNC(dcheese_state::blitter_unknown_w));
 }
 
+void dcheese_state::main_fc7_map(address_map &map)
+{
+	map(0xfffff0, 0xfffff9).r(FUNC(dcheese_state::iack_r)).umask16(0x00ff);
+}
 
 
 /*************************************
@@ -235,7 +239,7 @@ static INPUT_PORTS_START( dcheese )
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )      /* low 5 bits read as a unit */
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM )     /* sound->main buffer status (0=empty) */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, nullptr)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -285,7 +289,7 @@ static INPUT_PORTS_START( lottof2 )
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )      /* low 5 bits read as a unit */
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM )     /* sound->main buffer status (0=empty) */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, nullptr)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -333,7 +337,7 @@ static INPUT_PORTS_START( fredmem )
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )      /* low 5 bits read as a unit */
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM )     /* sound->main buffer status (0=empty) */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, nullptr)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -376,8 +380,7 @@ void dcheese_state::dcheese(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, MAIN_OSC);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dcheese_state::main_cpu_map);
-	m_maincpu->set_vblank_int("screen", FUNC(dcheese_state::vblank));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(dcheese_state::irq_callback));
+	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &dcheese_state::main_fc7_map);
 
 	M6809(config, m_audiocpu, SOUND_OSC/16); // TODO : Unknown CPU type
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dcheese_state::sound_cpu_map);
@@ -396,6 +399,7 @@ void dcheese_state::dcheese(machine_config &config)
 	m_screen->set_visarea(0, 319, 0, 239);
 	m_screen->set_screen_update(FUNC(dcheese_state::screen_update));
 	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(dcheese_state::vblank));
 
 	PALETTE(config, "palette", FUNC(dcheese_state::dcheese_palette), 65536);
 

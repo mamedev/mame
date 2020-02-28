@@ -106,13 +106,13 @@ void divebomb_state::decode_proms(palette_device &palette, const uint8_t * rgn, 
 	for (uint32_t i = 0; i < size; ++i)
 	{
 		uint32_t const rdata = rgn[i + size*2] & 0x0f;
-		uint32_t const r = combine_4_weights(rweights, BIT(rdata, 0), BIT(rdata, 1), BIT(rdata, 2), BIT(rdata, 3));
+		uint32_t const r = combine_weights(rweights, BIT(rdata, 0), BIT(rdata, 1), BIT(rdata, 2), BIT(rdata, 3));
 
 		uint32_t const gdata = rgn[i + size] & 0x0f;
-		uint32_t const g = combine_4_weights(gweights, BIT(gdata, 0), BIT(gdata, 1), BIT(gdata, 2), BIT(gdata, 3));
+		uint32_t const g = combine_weights(gweights, BIT(gdata, 0), BIT(gdata, 1), BIT(gdata, 2), BIT(gdata, 3));
 
 		uint32_t const bdata = rgn[i] & 0x0f;
-		uint32_t const b = combine_4_weights(bweights, BIT(bdata, 0), BIT(bdata, 1), BIT(bdata, 2), BIT(bdata, 3));
+		uint32_t const b = combine_weights(bweights, BIT(bdata, 0), BIT(bdata, 1), BIT(bdata, 2), BIT(bdata, 3));
 
 		if (!inv)
 			palette.set_pen_color(index + i, rgb_t(r, g, b));
@@ -133,7 +133,7 @@ void divebomb_state::divebomb_palette(palette_device &palette) const
 
 VIDEO_START_MEMBER(divebomb_state,divebomb)
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(divebomb_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(divebomb_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scrolly(0, 16);
 }

@@ -45,18 +45,18 @@ void pandoras_state::pandoras_palette(palette_device &palette) const
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		int const r = combine_3_weights(rweights, bit0, bit1, bit2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		int const g = combine_3_weights(gweights, bit0, bit1, bit2);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		int const b = combine_2_weights(bweights, bit0, bit1);
+		int const b = combine_weights(bweights, bit0, bit1);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(pandoras_state::get_tile_info0)
 
 void pandoras_state::video_start()
 {
-	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pandoras_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pandoras_state::get_tile_info0)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	save_item(NAME(m_flipscreen));
 }

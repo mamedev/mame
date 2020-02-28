@@ -85,7 +85,7 @@ public:
 	required_device<z80dma_device> m_dma1;
 	required_device<z80dma_device> m_dma2;
 	required_device<z80dart_device> m_dart;
-	required_device<scc8530_t> m_scc;
+	required_device<scc8530_legacy_device> m_scc;
 	required_device<z8536_device> m_cio;
 	required_device<fd1797_device> m_fdc;
 	required_device<e0516_device> m_rtc;
@@ -124,7 +124,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 
-	IRQ_CALLBACK_MEMBER( abc1600_int_ack );
+	void cpu_space_map(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 

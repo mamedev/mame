@@ -19,7 +19,7 @@
 #include "bus/rs232/rs232.h"
 #include "machine/eepromser.h"
 #include "sound/spkrdev.h"
-//#include "video/crt9028.h"
+#include "video/crt9028.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -29,6 +29,7 @@ public:
 	cardinal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_eeprom(*this, "eeprom")
+		, m_vtlc(*this, "vtlc")
 		, m_speaker(*this, "speaker")
 		, m_rs232(*this, "rs232")
 		, m_address_select(false)
@@ -41,8 +42,6 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	u8 p1_r();
 	void p1_w(u8 data);
 
@@ -51,9 +50,10 @@ private:
 
 	void prog_map(address_map &map);
 	void ext_map(address_map &map);
+	void ram_map(address_map &map);
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	//required_device<crt9028_device> m_vtlc;
+	required_device<crt9028_device> m_vtlc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<rs232_port_device> m_rs232;
 
@@ -64,11 +64,6 @@ private:
 void cardinal_state::machine_start()
 {
 	save_item(NAME(m_address_select));
-}
-
-u32 cardinal_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
 }
 
 u8 cardinal_state::p1_r()
@@ -90,12 +85,12 @@ void cardinal_state::p1_w(u8 data)
 
 u8 cardinal_state::vtlc_r()
 {
-	return 0xff;
+	return m_vtlc->read(m_address_select);
 }
 
 void cardinal_state::vtlc_w(u8 data)
 {
-	logerror("%s: Writing %02X to CRT9028 %s register\n", machine().describe_context(), data, m_address_select ? "address" : "data");
+	m_vtlc->write(m_address_select, data);
 }
 
 void cardinal_state::prog_map(address_map &map)
@@ -106,6 +101,11 @@ void cardinal_state::prog_map(address_map &map)
 void cardinal_state::ext_map(address_map &map)
 {
 	map(0, 0).mirror(0xffff).rw(FUNC(cardinal_state::vtlc_r), FUNC(cardinal_state::vtlc_w));
+}
+
+void cardinal_state::ram_map(address_map &map)
+{
+	map(0x000, 0x7ff).ram();
 }
 
 
@@ -133,13 +133,12 @@ void cardinal_state::cardinal(machine_config &config)
 
 	EEPROM_93C06_16BIT(config, m_eeprom);
 
-	//CRT9028_000(config, m_vtlc, 10.92_MHz_XTAL);
-	//m_vtlc->set_screen("screen");
-	//m_vtlc->vsync_callback().set_inputline("maincpu", MCS51_INT0_LINE);
+	CRT9028_000(config, m_vtlc, 10.92_MHz_XTAL);
+	m_vtlc->set_screen("screen");
+	m_vtlc->set_addrmap(0, &cardinal_state::ram_map);
+	m_vtlc->vsync_callback().set_inputline("maincpu", MCS51_INT0_LINE).invert();
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(10.92_MHz_XTAL, 700, 0, 560, 260, 0, 240);
-	screen.set_screen_update(FUNC(cardinal_state::screen_update));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.05);

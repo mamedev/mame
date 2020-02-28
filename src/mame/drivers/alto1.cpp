@@ -30,8 +30,9 @@ private:
 static INPUT_PORTS_START( alto1 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(alto1_state::alto1)
-MACHINE_CONFIG_END
+void alto1_state::alto1(machine_config &config)
+{
+}
 
 ROM_START( alto1 )
 	ROM_REGION( 0x4000, "roms", 0 )

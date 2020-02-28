@@ -19,6 +19,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_tilegen(*this, "tilegen%u", 1U),
 		m_spritegen(*this, "spritegen"),
 		m_soundlatch(*this, "soundlatch") { }
@@ -32,6 +33,7 @@ public:
 	/* devices */
 	required_device<h6280_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device_array<deco_bac06_device, 2> m_tilegen;
 	required_device<deco_mxc06_device> m_spritegen;
 	required_device<generic_latch_8_device> m_soundlatch;
