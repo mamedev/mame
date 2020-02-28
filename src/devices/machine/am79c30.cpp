@@ -988,7 +988,7 @@ void am79c30a_device::set_dmr4(u8 data)
 		if ((data & 0x03) == 0)
 			LOG("%s: Receiver threshold = 1 byte\n", machine().describe_context());
 		else
-			LOG("%s: Receiver threshold = %d/%d bytes\n", machine().describe_context(), 1 << (data & 0x03), std::min((data & 0x03) * 8 + 8, 30);
+			LOG("%s: Receiver threshold = %d/%d bytes\n", machine().describe_context(), 1 << (data & 0x03), std::min((data & 0x03) * 8 + 8, 30));
 	}
 	if ((m_dmr4 & 0x0c) != (data & 0x0c))
 	{
