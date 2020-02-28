@@ -67,8 +67,6 @@ deco_ace_device::deco_ace_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, DECO_ACE, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_palette_interface(mconfig, *this),
-	m_palette_effect_min(0x100),
-	m_palette_effect_max(0xfff),
 	m_paletteram(nullptr),
 	m_paletteram_buffered(nullptr),
 	m_ace_ram(nullptr)
@@ -96,8 +94,6 @@ void deco_ace_device::device_start()
 
 void deco_ace_device::device_reset()
 {
-	m_palette_effect_min = 0x100; /* Screenshots seem to suggest ACE fades do not affect playfield 1 palette (0-255) */
-	m_palette_effect_max = 0xfff;
 	memset(m_ace_ram.get(),0,0x28);
 }
 
@@ -173,41 +169,24 @@ void deco_ace_device::palette_update()
 		int b = (m_paletteram_buffered[i] >>16) & 0xff;
 		int g = (m_paletteram_buffered[i] >> 8) & 0xff;
 		int r = (m_paletteram_buffered[i] >> 0) & 0xff;
+		set_pen_color(i + 2048, rgb_t(r, g, b)); // raw palettes
 
-		if ((i>=m_palette_effect_min) && (i<=m_palette_effect_max))
+		switch (mode)
 		{
-			switch (mode)
-			{
-				default:
-				case 0x1100: // multiplicative fade
-					/* Yeah, this should really be fixed point, I know */
-					b = std::max<int>(0, std::min<int>(255, u8((b + (((fadeptb - b) * fadepsb) / 255)))));
-					g = std::max<int>(0, std::min<int>(255, u8((g + (((fadeptg - g) * fadepsg) / 255)))));
-					r = std::max<int>(0, std::min<int>(255, u8((r + (((fadeptr - r) * fadepsr) / 255)))));
-					break;
-				case 0x1000: // additive fade, correct?
-					b = std::min(b + fadepsb, 0xff);
-					g = std::min(g + fadepsg, 0xff);
-					r = std::min(r + fadepsr, 0xff);
-					break;
-			}
+			default:
+			case 0x1100: // multiplicative fade
+				/* Yeah, this should really be fixed point, I know */
+				b = std::max<int>(0, std::min<int>(255, u8((b + (((fadeptb - b) * fadepsb) / 255)))));
+				g = std::max<int>(0, std::min<int>(255, u8((g + (((fadeptg - g) * fadepsg) / 255)))));
+				r = std::max<int>(0, std::min<int>(255, u8((r + (((fadeptr - r) * fadepsr) / 255)))));
+				break;
+			case 0x1000: // additive fade, correct?
+				b = std::min(b + fadepsb, 0xff);
+				g = std::min(g + fadepsg, 0xff);
+				r = std::min(r + fadepsr, 0xff);
+				break;
 		}
-		set_pen_color(i, rgb_t(r, g, b));
-	}
-}
-
-/*************************************************************************
-
-    set_palette_effect_max : Change Palette effect max bound (uses boogwing)
-
-*************************************************************************/
-
-void deco_ace_device::set_palette_effect_max(uint32_t val)
-{
-	if (m_palette_effect_max != val)
-	{
-		m_palette_effect_max = val;
-		palette_update();
+		set_pen_color(i, rgb_t(r, g, b)); // faded palettes
 	}
 }
 

@@ -266,6 +266,8 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 			const bool alpha2 = (!(priColAlphaPal1 & 0x1000));
 
 			// Apply sprite bitmap 0 according to priority rules
+			u16 coloffs = ((m_pri & 4) == 0) ? 0x800 : 0;
+			bool sprite1_drawn = false;
 			if ((priColAlphaPal0 & 0xff) != 0)
 			{
 				/*
@@ -278,20 +280,28 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 				*/
 				if ((pri0 & 0x3) == 0 || (pri0 & 0x3) == 1 || ((pri0 & 0x3) == 2 && mixAlphaTilemap)) // Spri0 on top of everything, or under alpha playfield
 				{
-					destLine[x] = pal0[(priColAlphaPal0 & 0xff) + col0];
+					destLine[x] = pal0[coloffs | ((priColAlphaPal0 & 0xff) + col0)];
+					sprite1_drawn = true;
 				}
 				else if ((pri0 & 0x3) == 2) // Spri0 under top playfield
 				{
 					if (tilemapPri[x] < 4)
-						destLine[x] = pal0[(priColAlphaPal0 & 0xff) + col0];
+					{
+						destLine[x] = pal0[coloffs | ((priColAlphaPal0 & 0xff) + col0)];
+						sprite1_drawn = true;
+					}
 				}
 				else // Spri0 under top & middle playfields
 				{
 					if (tilemapPri[x] < 2)
-						destLine[x] = pal0[(priColAlphaPal0 & 0xff) + col0];
+					{
+						destLine[x] = pal0[coloffs | ((priColAlphaPal0 & 0xff) + col0)];
+						sprite1_drawn = true;
+					}
 				}
 			}
 
+			coloffs = (((m_pri & 4) == 0) && sprite1_drawn) ? 0x800 : 0;
 			/* Alpha values are tied to ACE ram... */
 			int alpha = ((!alpha1) || alpha2) ? m_deco_ace->get_alpha((col1 & 0x8) ? (0x4 + ((col1 & 0x3) / 2)) : ((col1 & 0x7) / 2)) : 0xff;
 
@@ -316,16 +326,17 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 
 					if (pri1 == 0 && (((priColAlphaPal0 & 0xff) == 0 || ((pri0 & 0x3) != 0 && (pri0 & 0x3) != 1 && (pri0 & 0x3) != 2))))
 					{
-						if ((m_pri & 1) == 0 || ((m_pri & 1) == 1 && tilemapPri[x] < 4) || ((m_pri & 1) == 1 && mixAlphaTilemap))
-							destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
+						if ((m_pri & 1) == 0 || ((m_pri & 1) == 1 && tilemapPri[x] < 4) || ((m_pri & 1) == 1 &&
+							(mixAlphaTilemap && ((alphaTilemap[x] & 0xf) == 0))))
+							destLine[x] = alpha_blend_r32(destLine[x], pal1[coloffs | ((priColAlphaPal1 & 0xff) + col1)], alpha);
 					}
 					else if (pri1 == 1 && ((m_pri & 1) == 0 || tilemapPri[x] < 4)
 						&& ((priColAlphaPal0 & 0xff) == 0 || ((pri0 & 0x3) != 0 && (pri0 & 0x3) != 1)))
-						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[coloffs | ((priColAlphaPal1 & 0xff) + col1)], alpha);
 					else if (pri1 == 2) // TODO
-						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[coloffs | ((priColAlphaPal1 & 0xff) + col1)], alpha);
 					else if (pri1 == 3) // TODO
-						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[coloffs | ((priColAlphaPal1 & 0xff) + col1)], alpha);
 				}
 				else
 				{
@@ -335,13 +346,13 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 					    Pri 0 - Under sprite 0 pri 0, over all tilemaps
 					*/
 					if (pri1 == 0 && ((priColAlphaPal0 & 0xff) == 0 || ((pri0 & 0x3) != 0)))
-						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[coloffs | ((priColAlphaPal1 & 0xff) + col1)], alpha);
 					else if (pri1 == 1) // TODO
-						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[coloffs | ((priColAlphaPal1 & 0xff) + col1)], alpha);
 					else if (pri1 == 2) // TODO
-						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[coloffs | ((priColAlphaPal1 & 0xff) + col1)], alpha);
 					else if (pri1 == 3) // TODO
-						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[coloffs | ((priColAlphaPal1 & 0xff) + col1)], alpha);
 				}
 			}
 
@@ -358,7 +369,7 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 						/* Alpha values are tied to ACE ram */
 						int alpha = m_deco_ace->get_alpha(0x17 + (((p & 0xf0) >> 4) / 2));
 
-						destLine[x] = alpha_blend_r32(destLine[x], pal2[p], alpha);
+						destLine[x] = alpha_blend_r32(destLine[x], pal2[coloffs | p], alpha);
 					}
 				}
 			}
@@ -373,12 +384,12 @@ u32 nslasher_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2].get(), m_pf_rowscroll[3].get());
 
 	/* This is not a conclusive test for deciding if tilemap needs alpha blending */
-	if (m_deco_ace->get_aceram(0x17) != 0x0 && m_pri)
+	if (m_deco_ace->get_aceram(0x17) != 0x0 && (m_pri & 3))
 		alphaTilemap = true;
 
 	screen.priority().fill(0, cliprect);
 
-	bitmap.fill(m_deco_ace->pen(0x200), cliprect);
+	bitmap.fill(m_deco_ace->pen(0x300), cliprect); // TODO : verify this from real hardware
 
 	/* Draw sprites to temporary bitmaps, saving alpha & priority info for later mixing */
 	m_sprgen[0]->set_pix_raw_shift(8);

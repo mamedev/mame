@@ -975,7 +975,8 @@ void deco32_state::eeprom_w(u8 data)
 	// -6------  eeprom cs
 	// --5-----  eeprom clk
 	// ---4----  eeprom di
-	// ----32--  unknown
+	// ----3---  unknown
+	// -----2--  color fading effect (0 = without obj1, 1 = with obj1) (used in nslasher, TODO : not implemented)
 	// ------1-  bg2/3 joint mode (8bpp) (not used by fghthist?)
 	// -------0  layer priority
 
@@ -983,7 +984,7 @@ void deco32_state::eeprom_w(u8 data)
 	m_eeprom->di_write(BIT(data, 4));
 	m_eeprom->cs_write(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
 
-	pri_w(data & 0x03);
+	pri_w(data & 0x07);
 }
 
 void dragngun_state::eeprom_w(u8 data)
@@ -1816,19 +1817,19 @@ static GFXDECODE_START( gfx_dragngun )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_tattass )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 128 ) /* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,         0, 128 ) /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         0, 128 ) /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout_5bpp, 1536,  16 ) /* Sprites 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,  1024+256,  32 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0x800, 128 ) /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 128 ) /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0, 128 ) /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout_5bpp, 0x600,  16 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,      0x500,  16 ) /* Sprites 16x16 */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_nslasher )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 128 ) /* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,         0, 128 ) /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         0, 128 ) /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout_5bpp, 1024,  16 ) /* Sprites 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,      1536,  32 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0x800, 128 ) /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 128 ) /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0, 128 ) /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout_5bpp, 0x400,  16 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,      0x600,  16 ) /* Sprites 16x16 */
 GFXDECODE_END
 
 

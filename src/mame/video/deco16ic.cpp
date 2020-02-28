@@ -443,6 +443,11 @@ void deco16ic_device::custom_tilemap_draw(
 	u8 pmask
 	)
 {
+	typename _BitmapClass::pixel_t *dest;
+	int rgb;
+	if (sizeof(*dest) == 2) rgb = 0;
+	else rgb = 1;
+
 	tilemap_t *tilemap0 = BIT(control1, 7) ? tilemap0_8x8 : tilemap0_16x16;
 	tilemap_t *tilemap1 = BIT(control1, 7) ? tilemap1_8x8 : tilemap1_16x16;
 	const bitmap_ind16 *src_bitmap0 = tilemap0 ? &tilemap0->pixmap() : nullptr;
@@ -502,7 +507,9 @@ void deco16ic_device::custom_tilemap_draw(
 
 			if ((flags & TILEMAP_DRAW_OPAQUE) || (p & trans_mask))
 			{
-				bitmap.pix(y, x) = m_gfxdecode->palette().pen(p);
+				dest = &bitmap.pix(y);
+				if (!rgb) dest[x] = p;
+				else dest[x] = m_gfxdecode->palette().pen(p);
 				if (screen.priority().valid())
 				{
 					u8 *pri = &screen.priority().pix8(y);
