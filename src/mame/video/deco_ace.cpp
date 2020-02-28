@@ -169,7 +169,7 @@ void deco_ace_device::palette_update()
 		int b = (m_paletteram_buffered[i] >>16) & 0xff;
 		int g = (m_paletteram_buffered[i] >> 8) & 0xff;
 		int r = (m_paletteram_buffered[i] >> 0) & 0xff;
-		set_pen_color(i + 2048, rgb_t(r, g, b)); // static palettes
+		set_pen_color(i + 2048, rgb_t(r, g, b)); // raw palettes
 
 		switch (mode)
 		{
