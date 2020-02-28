@@ -32,7 +32,6 @@ public:
 	DECLARE_WRITE16_MEMBER( buffered_palette16_w );
 	DECLARE_WRITE16_MEMBER( ace_w );
 	void palette_update();
-	void set_palette_effect_max(uint32_t val);
 	uint16_t get_aceram(uint8_t val);
 	uint8_t get_alpha(uint8_t val);
 	DECLARE_WRITE16_MEMBER( palette_dma_w );
@@ -44,12 +43,10 @@ protected:
 	virtual void device_post_load() override;
 
 	// device_palette_interface overrides
-	virtual uint32_t palette_entries() const override { return 2048; }
+	virtual uint32_t palette_entries() const override { return 2048 * 2; }
 
 private:
 	// internal state
-	uint32_t m_palette_effect_min;
-	uint32_t m_palette_effect_max;
 	std::unique_ptr<uint32_t[]> m_paletteram;
 	std::unique_ptr<uint32_t[]> m_paletteram_buffered;
 	std::unique_ptr<uint16_t[]> m_ace_ram;
