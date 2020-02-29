@@ -100,7 +100,7 @@ private:
 	virtual void video_start() override;
 
 	optional_device<m68010_device> m_maincpu, m_gfxcpu;
-	optional_device<i8051_device> m_gfxsubcpu, m_datacpu, m_iocpu;
+	optional_device<mcs51_cpu_device> m_gfxsubcpu, m_datacpu, m_iocpu;
 	optional_shared_ptr<uint16_t> m_mainram, m_extram, m_vram;
 
 	DECLARE_READ16_MEMBER(buserr_r)
