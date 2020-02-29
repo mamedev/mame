@@ -72,6 +72,8 @@ void ps6_base_state::machine_start()
 {
 	m_nvram_ptr = make_unique_clear<u8[]>(0x400);
 	subdevice<nvram_device>("nvram")->set_base(&m_nvram_ptr[0], 0x400);
+
+	save_pointer(NAME(m_nvram_ptr), 0x400);
 }
 
 u8 polysix_state::ext_r(offs_t offset)
