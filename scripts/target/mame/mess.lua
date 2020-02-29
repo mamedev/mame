@@ -4306,6 +4306,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/solbourne.cpp",
 	MAME_DIR .. "src/mame/drivers/swyft.cpp",
 	MAME_DIR .. "src/mame/drivers/symbolics.cpp",
+	MAME_DIR .. "src/mame/drivers/synthex.cpp",
 	MAME_DIR .. "src/mame/drivers/sys2900.cpp",
 	MAME_DIR .. "src/mame/drivers/sys9002.cpp",
 	MAME_DIR .. "src/mame/drivers/systec.cpp",
