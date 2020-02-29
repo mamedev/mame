@@ -13,11 +13,9 @@ driver by Hau, Nicola Salmoria
 special thanks to Nekomata, NTD & code-name'Siberia'
 
 TODO:
-- wrong background in fstarfrc title
-  (Video ref. ->
-  https://www.youtube.com/watch?v=EXBTNk-0ejk,
-  https://www.youtube.com/watch?v=5iZtgWqUz6c,
-  https://www.youtube.com/watch?v=cgj81VA7j_Y)
+- measure video timing, especially vblank+interrupt length:
+  fstarfrc relies on the interrupt being held for a while,
+  otherwise the titlescreen background goes wrong
 - there could be some priorities problems in riot
   (more noticeable in level 2)
 
@@ -337,7 +335,6 @@ void tecmo16_state::fstarfrc(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, MASTER_CLOCK/2);          /* 12MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo16_state::fstarfrc_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tecmo16_state::irq5_line_hold));
 
 	Z80(config, m_audiocpu, MASTER_CLOCK/6);         /* 4MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tecmo16_state::sound_map);
@@ -349,11 +346,12 @@ void tecmo16_state::fstarfrc(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000)); // not accurate
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(tecmo16_state::screen_update));
-	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ5);
+	m_screen->screen_vblank().append(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tecmo16);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_444, 4096);
