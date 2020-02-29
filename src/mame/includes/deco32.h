@@ -178,13 +178,17 @@ public:
 private:
 	required_device<deco_ace_device> m_deco_ace;
 
+	void tilemap_color_bank_w(u8 data);
+	void sprite1_color_bank_w(u8 data);
+	void sprite2_color_bank_w(u8 data);
 	void tattass_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(tattass_sound_irq_w);
 	u16 nslasher_debug_r();
 
 	virtual void video_start() override;
 
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	u16 port_b_tattass();
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
@@ -192,7 +196,8 @@ private:
 	void nslasher_map(address_map &map);
 	void tattass_map(address_map &map);
 
-	void mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
+	void mix_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
+	void mix_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
 
 	std::unique_ptr<bitmap_ind16> m_tilemap_alpha_bitmap;
 
