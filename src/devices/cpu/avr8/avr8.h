@@ -11,7 +11,7 @@
       the existing opcodes has been shown to wildly corrupt the video output in Craft, so one can assume that the
       existing timing is 100% correct.
 
-      Unimplemented opcodes: ELPM, SPM, SPM Z+, EIJMP, SLEEP, BREAK, WDR, EICALL, JMP, CALL
+      Unimplemented opcodes: SPM, SPM Z+, SLEEP, BREAK, WDR, EICALL, JMP, CALL
 
     - Changelist -
       23 Dec. 2012 [Sandro Ronco]
@@ -74,15 +74,7 @@ public:
 	uint32_t m_shifted_pc;
 
 protected:
-	enum
-	{
-		CPU_TYPE_ATMEGA88,
-		CPU_TYPE_ATMEGA644,
-		CPU_TYPE_ATMEGA1280,
-		CPU_TYPE_ATMEGA2560
-	};
-
-	avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t address_mask, address_map_constructor internal_map, uint8_t cpu_type);
+	avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t address_mask, address_map_constructor internal_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -112,7 +104,6 @@ protected:
 
 	// bootloader
 	uint16_t m_boot_size;
-	uint8_t m_cpu_type;
 
 	// Fuses
 	uint8_t m_lfuses;
@@ -136,7 +127,6 @@ protected:
 	uint8_t m_spi_prescale;
 	uint8_t m_spi_prescale_count;
 	int8_t m_spi_prescale_countdown;
-	static const uint8_t spi_clock_divisor[8];
 	void enable_spi();
 	void disable_spi();
 	void spi_update_masterslave_select();
@@ -226,6 +216,7 @@ DECLARE_DEVICE_TYPE(ATMEGA88,   atmega88_device)
 DECLARE_DEVICE_TYPE(ATMEGA644,  atmega644_device)
 DECLARE_DEVICE_TYPE(ATMEGA1280, atmega1280_device)
 DECLARE_DEVICE_TYPE(ATMEGA2560, atmega2560_device)
+DECLARE_DEVICE_TYPE(ATTINY15,   attiny15_device)
 
 // ======================> atmega88_device
 
@@ -271,6 +262,16 @@ public:
 
 	virtual void update_interrupt(int source) override;
 	void atmega2560_internal_map(address_map &map);
+};
+
+// ======================> atmega88_device
+
+class attiny15_device : public avr8_device
+{
+public:
+	// construction/destruction
+	attiny15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void attiny15_internal_map(address_map &map);
 };
 
 /***************************************************************************
