@@ -262,6 +262,7 @@ function toolchain(_buildDir, _subDir)
 			end
 			premake.gcc.cc  = toolchainPrefix .. "gcc"
 			premake.gcc.cxx = toolchainPrefix .. "g++"
+			premake.gcc.ar  = toolchainPrefix .. "gcc-ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-mingw32-gcc")
 		end
 
@@ -274,6 +275,7 @@ function toolchain(_buildDir, _subDir)
 			end
 			premake.gcc.cc  = toolchainPrefix .. "gcc"
 			premake.gcc.cxx = toolchainPrefix .. "g++"
+			premake.gcc.ar  = toolchainPrefix .. "gcc-ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-mingw64-gcc")
 		end
 
