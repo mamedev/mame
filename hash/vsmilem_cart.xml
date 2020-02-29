@@ -125,7 +125,7 @@ Language:
 |        | 80-084322(NL)     | TinkerBell                                                                                |
 |        | 80-084323(UK)     | TinkerBell                                                                                |
 |   XX   | 80-084324(GE)     | TinkerBell                                                                                |
-|        | 80-084325(FR)     | La fee Clochette                                                                          |
+|   XX   | 80-084325(FR)     | La fée Clochette                                                                          |
 |        | 80-084326(PT)     | Sininho (84336 on cart)                                                                   |
 |        | 80-084327(SP)     | Campanilla                                                                                |
 +========+===================+===========================================================================================+
@@ -214,7 +214,7 @@ Language:
 |        | 80-084603(UK)     | Cinderella - Cinderella's Magic Wishes                                                    |
 |   XX   | 80-084604(GE)     | Cinderella - Lernen im Maerchenland                                                       |
 |   XX   | 80-084604(GE)     | Cinderella - Lernen im Maerchenland (Rev. 2?)                                             |
-|        | 80-084605(FR)     | Cendrillon - ?????                                                                        |
+|   XX   | 80-084605(FR)     | Cendrillon - Le rêve enchanté de Cendrillon                                               |
 +========+===================+===========================================================================================+
 |        | 80-084620(US)     | <Unknown> (Should be Orange colored Finding Nemo)                                         |
 |        | 80-084624(GE)     | Findet Nemo - Nemos Unterwasserabenteuer                                                  |
@@ -372,6 +372,18 @@ Language:
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="80-084604.bin" size="8388608" crc="9170597a" sha1="2c3235e7e8986b1c62af6b218a8ba49bb3571345" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderlamf" cloneof="cinderlamg" supported="no">
+		<description>Walt Disney Cendrillon - Le rêve enchanté de Cendrillon (France)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084605(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="084605 - Cendrillon (Motion) (FR).bin" size="8388608" crc="d594cf40" sha1="69350029a2382b1849efd73c7a4429da5564d28f" />
 			</dataarea>
 		</part>
 	</software>
@@ -838,6 +850,19 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="C84324.u1" size="8388608" crc="9e207566" sha1="bb3e180a2c69306b56f08909a05dc83309be0f09" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tinkermf" cloneof="tinkerm" supported="no">
+		<description>La fée Clochette (France)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084325(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084325 - La Fee Clochette (Motion) (FR).bin" size="8388608" crc="0b2645fd" sha1="8ad3b1f8082852c947c1c5a22a82e954861a0cc5" />
 			</dataarea>
 		</part>
 	</software>
