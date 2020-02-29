@@ -262,7 +262,7 @@ ROM_START( wxstar4k )
 	ROM_LOAD16_BYTE( "u79 rom.bin",  0x000001, 0x010000, CRC(11df2d70) SHA1(ac6cdb5290c90b043562464dc001fc5e3d26f7c6) )
 	ROM_LOAD16_BYTE( "u80 rom.bin",  0x000000, 0x010000, CRC(23e15f22) SHA1(a630bda39c0beec7e7fc3834178ec8a6fece70c8) )
 
-	ROM_REGION(0x2000, "eeprom", 0 ) /* CPU board EEPROM */
+	ROM_REGION16_BE(0x4000, "eeprom", 0 ) /* CPU board EEPROM */
 	ROM_LOAD( "u72 eeprom.bin", 0x000000, 0x002000, CRC(f775b4d6) SHA1(a0895177c381919f9bfd99ee35edde0dd5fa379c) )
 
 	ROM_REGION(0x2000, "datacpu", 0) /* P8344 (i8051 plus SDLC decoder) on Data board */
