@@ -86,8 +86,8 @@ mc6844_device::mc6844_device(const machine_config &mconfig, const char *tag, dev
 	, m_out_drq2_cb(*this)
 	, m_in_memr_cb(*this)
 	, m_out_memw_cb(*this)
-	, m_in_ior_cb{ { *this },{ *this },{ *this },{ *this } }
-	, m_out_iow_cb{ { *this },{ *this },{ *this },{ *this } }
+	, m_in_ior_cb(*this)
+	, m_out_iow_cb(*this)
 	, m_state(STATE_S0)
 	, m_icount(0)
 {
@@ -105,11 +105,8 @@ void mc6844_device::device_resolve_objects()
 	m_in_memr_cb.resolve_safe(0);
 	m_out_memw_cb.resolve_safe();
 
-	for(auto &cb : m_in_ior_cb)
-			cb.resolve_safe(0);
-	for(auto &cb : m_out_iow_cb)
-			cb.resolve_safe();
-
+	m_in_ior_cb.resolve_all_safe(0);
+	m_out_iow_cb.resolve_all_safe();
 }
 
 //-------------------------------------------------

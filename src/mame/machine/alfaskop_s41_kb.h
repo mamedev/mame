@@ -30,7 +30,7 @@ protected:
 	virtual tiny_rom_entry const *device_rom_region() const override;
 
 	required_device<m6802_cpu_device> m_mcu;
-		required_device<mc6846_device> m_mc6846;
+	required_device<mc6846_device> m_mc6846;
 	required_ioport_array<6>       m_rows;
 	devcb_write_line               m_txd_cb; // Callback for KBD-> S41
 	devcb_write8                   m_leds_cb; // Callback for all 8 leds -> layout

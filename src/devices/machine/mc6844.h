@@ -81,8 +81,8 @@ protected:
 	devcb_write_line    m_out_drq2_cb;
 	devcb_read8 m_in_memr_cb;
 	devcb_write8 m_out_memw_cb;
-	devcb_read8 m_in_ior_cb[4];
-	devcb_write8 m_out_iow_cb[4];
+	devcb_read8::array<4> m_in_ior_cb;
+	devcb_write8::array<4> m_out_iow_cb;
 
 	/* channel_data structure holds info about each 6844 DMA channel */
 	struct m6844_channel_data

@@ -3138,7 +3138,9 @@ end
 
 --------------------------------------------------
 -- NEC 78K
---@src/devices/cpu/upd78k/upd78k.h,CPUS["UPD78K"] = true
+--@src/devices/cpu/upd78k/upd78k0.h,CPUS["UPD78K"] = true
+--@src/devices/cpu/upd78k/upd78k2.h,CPUS["UPD78K"] = true
+--@src/devices/cpu/upd78k/upd78k3.h,CPUS["UPD78K"] = true
 --------------------------------------------------
 
 if (CPUS["UPD78K"]~=null) then
