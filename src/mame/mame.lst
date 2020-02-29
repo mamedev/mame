@@ -37967,6 +37967,9 @@ sym1                            // Synertek SYM-1
 @source:symbolics.cpp
 s3670                           //
 
+@source:synthex.cpp
+synthex                         //
+
 @source:sys2900.cpp
 sys2900                         //
 

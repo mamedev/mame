@@ -861,6 +861,7 @@ swtpc8212.cpp
 swyft.cpp
 sym1.cpp
 symbolics.cpp
+synthex.cpp
 sys2900.cpp
 sys9002.cpp
 systec.cpp
