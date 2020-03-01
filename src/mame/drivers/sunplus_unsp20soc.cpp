@@ -3,7 +3,7 @@
 /*
     (unSP 2.0 based System on a Chip)
 
-    JAKKS call this GPAC800, other sources call it GPL16250
+    JAKKS call this GPAC800, other sources (including Pac-Man Connect and Play test mode) call it GPL16250 
 
     die markings GCM394
      - Smart Fit Park
@@ -1049,13 +1049,95 @@ static INPUT_PORTS_START( jak_s500 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-ROM_START(smartfp)
+static INPUT_PORTS_START( paccon ) // for Test Mode hold buttons 1+2 until the screen starts changing colours (happens after the copyright display)
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) // PAL/NTSC flag
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) // '***'
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) // '***'
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) // 'A'
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) // '*C*  (doesn't exist?) (cheat)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) // 'B'
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED ) // '***'
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) // '*MENU*' (doesn't exist?)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED ) // '***'
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED ) // '***'
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED ) // '***'
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED ) // '***'
+
+	PORT_START("IN1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+ROM_START( smartfp )
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("smartfitpark.bin", 0x000000, 0x800000, CRC(ada84507) SHA1(a3a80bf71fae62ebcbf939166a51d29c24504428))
 ROM_END
+
+ROM_START( paccon )
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("pacmanconnect.bin", 0x000000, 0x400000, CRC(8567cdc7) SHA1(cef4e003142e479169e4438ab33558436ee9ee68) )
+ROM_END
+
 
 ROM_START( tkmag220 )
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
@@ -1285,6 +1367,10 @@ CONS(2009, smartfp,   0, 0, base, smartfp,  gcm394_game_state, empty_init, "Fish
 CONS(200?, tkmag220,  0, 0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
+
+// also sold as "Pac-Man Connect & Play 35th Anniversary" (same ROM?)
+CONS(2012, paccon, 0, 0, wrlshunt, paccon, jak_s500_game_state, init_wrlshunt, "Bandai", "Pac-Man Connect & Play (Feb 14 2012 10:46:23)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
 
 CONS(2009, jak_s500, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(200?, jak_totm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // Toys on the Move has ISSI 404A
