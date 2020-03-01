@@ -15,7 +15,8 @@ special thanks to Nekomata, NTD & code-name'Siberia'
 TODO:
 - measure video timing, especially vblank+interrupt length:
   fstarfrc relies on the interrupt being held for a while,
-  otherwise the titlescreen background goes wrong
+  otherwise the titlescreen background goes wrong.
+  If I had to guess: 24/4(6MHz) pixel clock, 384 hclocks, 264 scanlines
 - there could be some priorities problems in riot
   (more noticeable in level 2)
 
@@ -345,7 +346,7 @@ void tecmo16_state::fstarfrc(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
+	m_screen->set_refresh_hz(59.17);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000)); // not accurate
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
