@@ -143,8 +143,10 @@ WRITE_LINE_MEMBER(device_hp80_io_interface::halt_w)
 }
 
 #include "82937.h"
+#include "82939.h"
 
 void hp80_io_slot_devices(device_slot_interface &device)
 {
 	device.option_add("82937_hpib" , HP82937_IO_CARD);
+	device.option_add("82939_serial" , HP82939_IO_CARD);
 }
