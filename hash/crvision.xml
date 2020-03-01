@@ -28,6 +28,30 @@ follows no pattern and was probably based only on the chip availability at manuf
 time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 -->
 
+<!-- Dick Smith catalog numbers, taken from advertisements:
+
+Y-1600 : Wizzard console
+Y-2600 : Funvision console
+Y-1605 : Basic (cart)
+Y-1607 : Storage Cassette Unit (a cassette recorder)
+Y-1608 : Moving-key keyboard
+Y-1610 : Tank Attack
+Y-1612, Y-1685 : Astro Pinball (it had 2 catalog numbers)
+Y-1620 : Wimbledon Tennis / Dick Smith Championship Tennis
+Y-1622 : Police Jump
+Y-1630 : Auto Chase
+Y-1635 : Music Maker
+Y-1640 : Crazy Chicky
+Y-1645 : Soccer
+Y-1650 : Planet Defender
+Y-1660 : Air/Sea Attack
+Y-1670 : Skiing
+Y-1680 : Mouse Puzzle
+B-6196 : First Book of Wizzard Programs
+?????? : Helicopter Rescue, Speed Race, Deep Sea Adventure (these were promised, but never heard of again)
+
+-->
+
 <!-- Creativision carts were universal (Japanese NTSC dumps turned out to be the same as worldwide PAL ones). -->
 <softwarelist name="crvision" description="V-Tech Creativision cartridges">
 
