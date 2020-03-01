@@ -3823,6 +3823,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/tvgame.cpp",
 	MAME_DIR .. "src/mame/drivers/spg110.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx.cpp",
+	MAME_DIR .. "src/mame/drivers/spg2xx_skannerztv.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_jakks.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_jakks_gkr.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_jakks_tvtouch.cpp",
