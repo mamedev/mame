@@ -326,7 +326,7 @@ void vgmviz_device::init_palette(palette_device &palette) const
 		double v = 1.0;
 
 		double c = s * v;
-		double x = c * (1 - abs(fmod(h / 60.0, 2.0) - 1.0));
+		double x = c * (1 - fabs(fmod(h / 60.0, 2.0) - 1.0));
 		double m = v - c;
 		double rs = 0.0;
 		double gs = 0.0;
