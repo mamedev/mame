@@ -1296,7 +1296,7 @@ void z80sio_channel::sync_tx_sr_empty()
 
 void z80dart_channel::sync_tx_sr_empty()
 {
-	LOG("%s (sync mode not supported by DART)\n", FUNCNAME); 
+	LOG("%s (sync mode not supported by DART)\n", FUNCNAME);
 }
 
 bool z80sio_channel::get_tx_empty() const
