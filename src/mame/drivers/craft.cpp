@@ -30,6 +30,7 @@ public:
 	craft_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_dac(*this, "dac")
 	{
 	}
@@ -51,6 +52,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<avr8_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<dac_byte_interface> m_dac;
 
 	uint32_t m_last_cycles;
@@ -102,11 +104,12 @@ WRITE8_MEMBER(craft_state::port_w)
 				video_update();
 				if (BIT(pins, 1))
 				{
-					m_frame_start_cycle = m_maincpu->get_elapsed_cycles();
+					m_frame_start_cycle = machine().time().as_ticks(MASTER_CLOCK);
 				}
 			}
 			if (BIT(changed, 3))
 			{
+				printf("%d, %d\n", m_screen->hpos(), m_screen->vpos());
 				video_update();
 				m_latched_color = (pins & 0x08) ? (m_port_c & 0x3f) : 0x3f;
 			}
@@ -115,9 +118,9 @@ WRITE8_MEMBER(craft_state::port_w)
 		}
 
 		case AVR8_IO_PORTC:
-			video_update();
 			m_port_c = data;
 			m_latched_color = m_port_c;
+			video_update();
 			break;
 
 		case AVR8_IO_PORTD:
@@ -152,7 +155,7 @@ void craft_state::craft_io_map(address_map &map)
 
 void craft_state::video_update()
 {
-	uint64_t cycles = m_maincpu->get_elapsed_cycles();
+	uint64_t cycles = machine().time().as_ticks(MASTER_CLOCK);
 	uint32_t frame_cycles = (uint32_t)(cycles - m_frame_start_cycle);
 
 	if (m_last_cycles < frame_cycles)
@@ -243,9 +246,9 @@ void craft_state::craft(machine_config &config)
 	m_maincpu->set_eeprom_tag("eeprom");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MASTER_CLOCK, 635, 47, 527, 525, 36, 516);
-	screen.set_screen_update(FUNC(craft_state::screen_update));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK, 635, 47, 527, 525, 36, 516);
+	m_screen->set_screen_update(FUNC(craft_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "avr8").front_center();

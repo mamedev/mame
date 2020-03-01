@@ -143,13 +143,13 @@ WRITE8_MEMBER(uzebox_state::port_b_w)
 		{
 			line_update();
 
-			uint32_t cycles = (uint32_t)(m_maincpu->get_elapsed_cycles() - m_line_start_cycles);
+			uint32_t cycles = (uint32_t)(machine().time().as_ticks(MASTER_CLOCK) - m_line_start_cycles);
 			if (cycles < 1000 && m_vpos >= 448)
 				m_vpos = INTERLACED ? ((m_vpos ^ 0x01) & 0x01) : 0;
 			else if (cycles > 1000)
 				m_vpos += 2;
 
-			m_line_start_cycles = m_maincpu->get_elapsed_cycles();
+			m_line_start_cycles = machine().time().as_ticks(MASTER_CLOCK);
 			m_line_pos_cycles = 0;
 		}
 
@@ -236,7 +236,7 @@ INPUT_PORTS_END
 
 void uzebox_state::line_update()
 {
-	uint32_t cycles = (uint32_t)(m_maincpu->get_elapsed_cycles() - m_line_start_cycles) / 2;
+	uint32_t cycles = (uint32_t)(machine().time().as_ticks(MASTER_CLOCK) - m_line_start_cycles) / 2;
 	rgb_t color = rgb_t(pal3bit(m_port_c >> 0), pal3bit(m_port_c >> 3), pal2bit(m_port_c >> 6));
 
 	for (uint32_t x = m_line_pos_cycles; x < cycles; x++)
