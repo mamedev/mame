@@ -23,7 +23,7 @@ Name                    Year    Board          Notes
 Sengoku Ace         (J) 1993    SH201B
 Gun Bird            (J) 1994    KA302C
 Battle K-Road       (J) 1994    ""
-Strikers 1945       (J) 1995    SH403/SH404    SH403 is similiar to KA302C
+Strikers 1945       (J) 1995    SH403/SH404    SH403 is similar to KA302C
 Tengai              (J) 1996    SH404          SH404 has MCU, ymf278-b for sound and gfx banking
 ---------------------------------------------------------------------------
 
@@ -81,6 +81,7 @@ This was pointed out by Bart Puype
 #include "includes/psikyo.h"
 
 #include "cpu/z80/z80.h"
+#include "cpu/z80/lz8420m.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/2610intf.h"
@@ -1082,11 +1083,11 @@ void psikyo_state::sngkace(machine_config &config)
 void psikyo_state::gunbird(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, 16000000);
+	M68EC020(config, m_maincpu, 16_MHz_XTAL);  // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_map);
 	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);  /* ! LZ8420M (Z80 core) ! */
+	LZ8420M(config, m_audiocpu, 16_MHz_XTAL / 2);  // 8 MHz (16 / 2)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psikyo_state::gunbird_sound_io_map);
 
@@ -1110,7 +1111,7 @@ void psikyo_state::gunbird(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono",  1.0);
 
@@ -1166,20 +1167,20 @@ void psikyo_state::s1945bl(machine_config &config) /* Bootleg hardware based on 
 void psikyo_state::s1945(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, 16000000);
+	M68EC020(config, m_maincpu, 16_MHz_XTAL);  // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::s1945_map);
 	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);  /* ! LZ8420M (Z80 core) ! */
+	LZ8420M(config, m_audiocpu, 16_MHz_XTAL / 2);  // 8 MHz (16 / 2)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psikyo_state::s1945_sound_io_map);
 
-	PIC16C57(config, "mcu", 4000000).set_disable();  /* 4 MHz? */ /* Internal ROM is't dumped */
+	PIC16C57(config, "mcu", 4_MHz_XTAL).set_disable();  // Internal ROM isn't dumped (there's one weirdly sized dump available from a Korean version, actually. TODO: verify it's good and hook it up)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: accurate measurements
-	m_screen->set_refresh_hz(59.90);
+	m_screen->set_refresh_hz(59.9229);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
@@ -1197,7 +1198,7 @@ void psikyo_state::s1945(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ymf278b_device &ymf(YMF278B(config, "ymf", 33.8688_MHz_XTAL));
-	ymf.irq_handler().set_inputline("audiocpu", 0);
+	ymf.irq_handler().set_inputline(m_audiocpu, 0);
 	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -1633,7 +1634,7 @@ OSC:    16.000MHz
         14.3181MHz
         33.8688MHz (YMF)
         4.000MHz (PIC)
-
+SYNCS:  HSync 15.2183kHz, VSync 59.9229Hz
 1-U59   security (PIC16C57; not dumped)
 
 ***************************************************************************/

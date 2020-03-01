@@ -123,7 +123,7 @@ private:
 //  device_pc9801_slot_card_interface *m_card;
 	required_address_space m_memspace;
 	required_address_space m_iospace;
-	devcb_write_line m_int_callback[7];
+	devcb_write_line::array<7> m_int_callback;
 };
 
 

@@ -31,10 +31,10 @@ DEFINE_DEVICE_TYPE(MOS6529, mos6529_device, "mos6529", "MOS 6529")
 //  mos6529_device - constructor
 //-------------------------------------------------
 
-mos6529_device::mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MOS6529, tag, owner, clock),
+mos6529_device::mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MOS6529, tag, owner, clock),
 	m_input(0),
-	m_p_handler{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	m_p_handler(*this)
 {
 }
 
@@ -46,8 +46,7 @@ mos6529_device::mos6529_device(const machine_config &mconfig, const char *tag, d
 void mos6529_device::device_start()
 {
 	// resolve callbacks
-	for (int i = 0; i < 8; i++)
-		m_p_handler[i].resolve_safe();
+	m_p_handler.resolve_all_safe();
 }
 
 

@@ -116,6 +116,9 @@
     <ClCompile Include="..\devices\net_lib.cpp" />
     <ClCompile Include="..\devices\nld_2102A.cpp" />
     <ClCompile Include="..\devices\nld_2716.cpp" />
+    <ClCompile Include="..\devices\nld_4006.cpp" />
+    <ClCompile Include="..\devices\nld_7442.cpp" />
+    <ClCompile Include="..\devices\nld_7492.cpp" />
     <ClCompile Include="..\devices\nld_7497.cpp" />
     <ClCompile Include="..\devices\nld_schmitt.cpp" />
     <ClCompile Include="..\devices\nld_tms4800.cpp" />
@@ -200,6 +203,7 @@
     <ClInclude Include="..\devices\net_lib.h" />
     <ClInclude Include="..\devices\nld_2102A.h" />
     <ClInclude Include="..\devices\nld_2716.h" />
+    <ClInclude Include="..\devices\nld_7442.h" />
     <ClInclude Include="..\devices\nld_7497.h" />
     <ClInclude Include="..\devices\nld_schmitt.h" />
     <ClInclude Include="..\devices\nld_tms4800.h" />

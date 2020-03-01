@@ -60,7 +60,7 @@ public:
 		m_buffer_overflows(0)
 	{
 	}
-	virtual ~sound_direct_sound() { }
+	virtual ~sound_direct_sound() = default;
 
 	virtual int init(osd_options const &options) override;
 	virtual void exit() override;
@@ -541,7 +541,7 @@ error:
 //  destroy_buffers
 //============================================================
 
-void sound_direct_sound::destroy_buffers(void)
+void sound_direct_sound::destroy_buffers()
 {
 	// stop any playback
 	if (m_stream_buffer)

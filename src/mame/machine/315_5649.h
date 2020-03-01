@@ -61,12 +61,12 @@ protected:
 
 private:
 	// callbacks
-	devcb_read8 m_in_port_cb[7];
-	devcb_write8 m_out_port_cb[7];
-	devcb_read8 m_an_port_cb[8];
-	devcb_read8 m_serial_rd_cb[2];
-	devcb_write8 m_serial_wr_cb[2];
-	devcb_read16 m_cnt_cb[4];
+	devcb_read8::array<7> m_in_port_cb;
+	devcb_write8::array<7> m_out_port_cb;
+	devcb_read8::array<8> m_an_port_cb;
+	devcb_read8::array<2> m_serial_rd_cb;
+	devcb_write8::array<2> m_serial_wr_cb;
+	devcb_read16::array<4> m_cnt_cb;
 
 	uint8_t m_port_value[7];
 	uint8_t m_port_config;

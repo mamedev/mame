@@ -221,9 +221,9 @@ model1io2_device::model1io2_device(const machine_config &mconfig, const char *ta
 	m_led_comm_err(*this, "led_comm_err"),
 	m_lightgun_ports(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG}),
 	m_read_cb(*this), m_write_cb(*this),
-	m_in_cb{ {*this}, {*this}, {*this} },
+	m_in_cb(*this),
 	m_drive_read_cb(*this), m_drive_write_cb(*this),
-	m_an_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
+	m_an_cb(*this),
 	m_output_cb(*this),
 	m_secondary_controls(false),
 	m_lcd_data(0),
@@ -242,16 +242,10 @@ void model1io2_device::device_start()
 
 	m_read_cb.resolve_safe(0xff);
 	m_write_cb.resolve_safe();
-
-	for (unsigned i = 0; i < 3; i++)
-		m_in_cb[i].resolve_safe(0xff);
-
+	m_in_cb.resolve_all_safe(0xff);
 	m_drive_read_cb.resolve_safe(0xff);
 	m_drive_write_cb.resolve_safe();
-
-	for (unsigned i = 0; i < 8; i++)
-		m_an_cb[i].resolve_safe(0xff);
-
+	m_an_cb.resolve_all_safe(0xff);
 	m_output_cb.resolve_safe();
 
 	// register for save states

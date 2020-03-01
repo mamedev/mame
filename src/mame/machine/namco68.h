@@ -61,8 +61,8 @@ private:
 	devcb_read8        m_in_ph_cb;
 	devcb_read8        m_in_pdsw_cb;
 
-	devcb_read8   m_port_analog_in_cb[8];
-	devcb_read8   m_port_dial_in_cb[4];
+	devcb_read8::array<8> m_port_analog_in_cb;
+	devcb_read8::array<4> m_port_dial_in_cb;
 
 	devcb_read8        m_dp_in;
 	devcb_write8       m_dp_out;

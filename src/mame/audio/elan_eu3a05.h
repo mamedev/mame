@@ -4,6 +4,7 @@
 #ifndef MAME_AUDIO_ELAN_EU3A05_H
 #define MAME_AUDIO_ELAN_EU3A05_H
 
+#include "sound/okiadpcm.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -40,6 +41,7 @@ private:
 	uint32_t m_sound_byte_address[6];
 	uint32_t m_sound_byte_len[6];
 	uint32_t m_sound_current_nib_pos[6];
+	oki_adpcm_state m_adpcm[6];
 
 	uint8_t m_sound_trigger;
 	uint8_t m_sound_unk;
@@ -68,10 +70,10 @@ private:
 
 	DECLARE_READ8_MEMBER(elan_eu3a05_50a8_r);
 
-	DECLARE_READ8_MEMBER(reg50a4_r) { return m_50a4; }
-	DECLARE_WRITE8_MEMBER(reg50a4_w) { m_50a4 = data; }
-	DECLARE_READ8_MEMBER(reg50a9_r) { return m_50a9; }
-	DECLARE_WRITE8_MEMBER(reg50a9_w) { m_50a9 = data; }
+	DECLARE_READ8_MEMBER(reg50a4_r);
+	DECLARE_WRITE8_MEMBER(reg50a4_w);
+	DECLARE_READ8_MEMBER(reg50a9_r);
+	DECLARE_WRITE8_MEMBER(reg50a9_w);
 
 	DECLARE_READ8_MEMBER(elan_eu3a05_sound_volume_r);
 	DECLARE_WRITE8_MEMBER(elan_eu3a05_sound_volume_w);
@@ -79,7 +81,7 @@ private:
 	DECLARE_WRITE8_MEMBER(write_unmapped);
 	DECLARE_READ8_MEMBER(read_unmapped);
 
-	devcb_write_line m_sound_end_cb[6];
+	devcb_write_line::array<6> m_sound_end_cb;
 };
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_SOUND, elan_eu3a05_sound_device)

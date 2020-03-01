@@ -55,10 +55,10 @@ DEFINE_DEVICE_TYPE(AM9513A, am9513a_device, "am9513a", "Am9513A STC")
 //-------------------------------------------------
 
 am9513_device::am9513_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_am9513a)
-	: device_t(mconfig, type, tag, owner, clock),
-		m_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}},
-		m_fout_cb(*this),
-		m_is_am9513a(is_am9513a)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_out_cb(*this)
+	, m_fout_cb(*this)
+	, m_is_am9513a(is_am9513a)
 {
 }
 
@@ -80,8 +80,7 @@ am9513a_device::am9513a_device(const machine_config &mconfig, const char *tag, d
 void am9513_device::device_start()
 {
 	// Resolve callbacks
-	for (auto &cb : m_out_cb)
-		cb.resolve_safe();
+	m_out_cb.resolve_all_safe();
 	m_fout_cb.resolve();
 
 	// Power-on reset

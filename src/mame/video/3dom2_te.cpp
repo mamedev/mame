@@ -1224,9 +1224,9 @@ void m2_te_device::setup_triangle(uint32_t flags)
 	if ((vb.y - vc.y) < 0.0f) a |= 2;
 	if ((vc.y - va.y) < 0.0f) a |= 1;
 
-	const se_vtx *v1 = NULL;
-	const se_vtx *v2 = NULL;
-	const se_vtx *v3 = NULL;
+	const se_vtx *v1 = nullptr;
+	const se_vtx *v2 = nullptr;
+	const se_vtx *v3 = nullptr;
 
 	switch (a)
 	{

@@ -3227,6 +3227,26 @@ ROM_START( porter )
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
 ROM_END
 
+ROM_START( portera )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "port_man_sub_1.a1",  0x0000, 0x0800, CRC(09b80d10) SHA1(d2de4023fd71434fa9f53b5a900fc962729882e0) )
+	ROM_LOAD( "port_man_sub_2.a2",  0x0800, 0x0800, CRC(c86973fb) SHA1(f635da2662da18f81f2da2df0a44d6684bab0505) )
+	ROM_LOAD( "port_man_sub_3.b2",  0x1000, 0x0800, CRC(610b2da8) SHA1(8c4030fefa67a1841cdef2b26546fcafad95631d) )
+	ROM_LOAD( "port_man_sub_4.c1",  0x1800, 0x0800, CRC(5a3b3584) SHA1(f17e7429f9ace6e0c53b957e078969ca2565d366) )
+	ROM_LOAD( "port_man_sub_5.d1",  0x2000, 0x0800, CRC(2a34cfba) SHA1(74b19a0de47a02f2125bc8790196ad8f675f3c8d) )
+	ROM_LOAD( "port_man_sub_6.e2",  0x2800, 0x0800, CRC(58c01681) SHA1(ef1c7035960073299348092226f69927ebbc8e69) )
+	ROM_LOAD( "port_man_sub_7.f2",  0x3000, 0x0800, CRC(72a38ad0) SHA1(df07d5514d987eecd43e9a24113add8be9a67129) )
+	ROM_LOAD( "port_man_sub_8.f1",  0x3800, 0x0800, CRC(d7017450) SHA1(8e901c40ceab4ddbeaaafe0384729a431e0aedd0) )
+	ROM_LOAD( "port_man_sub_9.1d",  0x4000, 0x1000, CRC(2459fe44) SHA1(55d70eca43aa4497eaaedbddf639a87973d439b4) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "port_man_4k.kl",     0x0000, 0x1000, CRC(71e3debd) SHA1(c0f4caa7f6f64016c6c339085925e5f831948d3d) )
+	ROM_LOAD( "port_man_4k.hj",     0x1000, 0x1000, CRC(b66a763d) SHA1(995b473b1942ff666b0989993587e41e89542172) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "port_man_82s123.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
 ROM_START( tazzmang )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tazzm1.4k",    0x0000, 0x1000, CRC(a14480a1) SHA1(60dac6b57e8331cc4daedaf87faf3e3acc68f378) )
@@ -3677,6 +3697,7 @@ GAME( 1984, bagmanm2,  bagman,   bagmanmc,  bagmanmc,  galaxold_state, empty_ini
 GAME( 1982, dkongjrm,  dkongjr,  dkongjrm,  dkongjrm,  galaxold_state, empty_init,     ROT90,  "bootleg", "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 1)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrmc, dkongjr,  dkongjrmc, dkongjrmc, galaxold_state, empty_init,     ROT90,  "bootleg (Centromatic)", "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 2)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // sprites leave artifacts
 GAME( 1982, porter,    dockman,  porter,    porter,    galaxold_state, empty_init,     ROT90,  "bootleg", "Port Man (bootleg on Moon Cresta hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+GAME( 1982, portera,   dockman,  porter,    porter,    galaxold_state, empty_init,     ROT90,  "bootleg", "El Estivador (Spanish bootleg of Port Man on Galaxian hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
 GAME( 1982, tazzmang,  tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, tazzmang2, tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware with Starfield)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, bongo,     0,        bongo,     bongo,     galaxold_state, empty_init,     ROT90,  "Jetsoft", "Bongo", MACHINE_SUPPORTS_SAVE )

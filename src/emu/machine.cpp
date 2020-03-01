@@ -526,8 +526,8 @@ std::string running_machine::get_statename(const char *option) const
 			int name_found = 0;
 
 			// find length of the device name
-			int end1 = statename_str.find("/", pos + 3);
-			int end2 = statename_str.find("%", pos + 3);
+			int end1 = statename_str.find('/', pos + 3);
+			int end2 = statename_str.find('%', pos + 3);
 			int end;
 
 			if ((end1 != -1) && (end2 != -1))
@@ -1245,7 +1245,7 @@ running_machine::notifier_callback_item::notifier_callback_item(machine_notify_d
 //-------------------------------------------------
 
 running_machine::logerror_callback_item::logerror_callback_item(logerror_callback func)
-	: m_func(func)
+	: m_func(std::move(func))
 {
 }
 

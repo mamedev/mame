@@ -476,7 +476,7 @@ void deco16ic_device::custom_tilemap_draw(
 		src_x &= width_mask;
 
 		/* boogwing */
-		for (int x = cliprect.left(); x < cliprect.right(); x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			if (rowscroll_ptr && BIT(control1, 5))
 				column_offset = rowscroll_ptr[0x200 + ((src_x & 0x1ff) / col_type)];

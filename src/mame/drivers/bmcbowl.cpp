@@ -3,7 +3,7 @@
 /*
 BMC Bowling (c) 1994.05 BMC, Ltd
 
-- TS 2004.10.22 - analog[at]op.pl
+- TS 2004.10.22
 
   Game is almost playable, especially with NVRAM_HACK (undefine it
   to get real nvram  access, but sometimes it's impossible to get back to

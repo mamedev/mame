@@ -42,8 +42,8 @@ Konami PWB 402218 boards
 
  Notes and TODOs:
  - Priorities not understood and wrong in places of GX-based games, apparently controlled by PROM
- - X/Y scroll effects not handled well by current K052109(TMNT tilemaps) emulation.
-   Mario Roulette glitches "resolved" using hack, Fuusen Pentai still have issues with column scroll (not OK with -6 added to column index).
+ - X/Y scroll effects not 100% handled by current K052109(TMNT tilemaps) emulation.
+   Mario Roulette issues currently "resolved" using hack.
 
 ***************************************************************************/
 
@@ -1066,9 +1066,9 @@ ROM_START( mariorou )
 ROM_END
 
 // Konami PWB 452093A boards (TMNT tilemaps)
-GAME( 1991, mariorou, 0,     mariorou, mario,    konmedal_state, mario_init,   ROT0, "Konami", "Mario Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1993, shuriboy, 0,     shuriboy, shuriboy, konmedal_state, shuri_init,   ROT0, "Konami", "Shuriken Boy", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1993, fuusenpn, 0,     fuusenpn, fuusenpn, konmedal_state, fuusen_init,  ROT0, "Konami", "Fuusen Pentai", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1991, mariorou, 0,     mariorou, mario,    konmedal_state, mario_init,   ROT0, "Konami", "Mario Roulette", MACHINE_SUPPORTS_SAVE)
+GAME( 1993, shuriboy, 0,     shuriboy, shuriboy, konmedal_state, shuri_init,   ROT0, "Konami", "Shuriken Boy", MACHINE_SUPPORTS_SAVE)
+GAME( 1993, fuusenpn, 0,     fuusenpn, fuusenpn, konmedal_state, fuusen_init,  ROT0, "Konami", "Fuusen Pentai", MACHINE_SUPPORTS_SAVE)
 
 // Konami PWB 452574A boards (GX tilemaps)
 GAME( 1994, buttobi,  0,     ddboy,    ddboy,    konmedal_state, buttobi_init, ROT0, "Konami", "Buttobi Striker", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
@@ -1076,4 +1076,4 @@ GAME( 1994, ddboy,    0,     ddboy,    ddboy,    konmedal_state, ddboy_init,   R
 
 // Konami PWB 402218 boards (GX tilemaps)
 GAME( 1994, ddboya,   ddboy, tsukande, ddboy,    konmedal_state, ddboy_init,   ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, tsuka_init,   ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, tsuka_init,   ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_SUPPORTS_SAVE)

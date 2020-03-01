@@ -1246,7 +1246,7 @@ void suna8_state::sparkman_map(address_map &map)
 	map(0xc001, 0xc001).portr("P2");                         // P2
 	map(0xc002, 0xc002).portr("DSW1");                       // DSW 1
 	map(0xc003, 0xc003).portr("DSW2");                       // DSW 2
-	map(0xc080, 0xc080).portr("BUTTONS");                    // Buttons
+	map(0xc080, 0xc080).mirror(0x01).portr("BUTTONS");       // Buttons
 	map(0xc0a3, 0xc0a3).r(FUNC(suna8_state::sparkman_c0a3_r));   // ???
 
 	map(0xc200, 0xc27f).w(FUNC(suna8_state::sparkman_spritebank_w));   // Sprite RAM Bank

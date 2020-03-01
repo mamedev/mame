@@ -27,6 +27,9 @@
     Thus we assume that in the TI console (option 1) the sound chip has
     also been removed.
 
+    The EVPC has one configuration option:
+       VRAM may be set to 128K or 192K.
+
     Important note: The DSR (firmware) of the EVPC expects a memory expansion
     to be present; otherwise, the configuration (using CALL EVPC) will crash.
     There is no warning if the 32K expansion is not present.
@@ -416,6 +419,7 @@ void snug_enhanced_video_device::device_reset()
 	m_dsr_page = 0;
 	m_RAMEN = false;
 	m_selected = false;
+	m_video->set_vram_size((ioport("EVPC-MEM")->read()==0)? 0x20000 : 0x30000);
 }
 
 void snug_enhanced_video_device::device_stop()
@@ -469,6 +473,11 @@ INPUT_PORTS_START( ti99_evpc )
 	PORT_DIPNAME( 0x01, 0x00, "EVPC Configuration" )
 		PORT_DIPSETTING(    0x00, "DIP" )
 		PORT_DIPSETTING(    0x01, "NOVRAM" )
+
+	PORT_START( "EVPC-MEM" )
+	PORT_CONFNAME( 0x01, 0x00, "EVPC video memory" )
+		PORT_DIPSETTING(    0x00, "128K" )
+		PORT_DIPSETTING(    0x01, "192K" )
 INPUT_PORTS_END
 
 const tiny_rom_entry *snug_enhanced_video_device::device_rom_region() const
@@ -485,7 +494,7 @@ void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
 {
 	// video hardware
 	V9938(config, m_video, XTAL(21'477'272)); // typical 9938 clock, not verified
-	m_video->set_vram_size(0x20000);
+
 	m_video->int_cb().set(FUNC(snug_enhanced_video_device::video_interrupt_in));
 	m_video->set_screen(TI_SCREEN_TAG);
 	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));

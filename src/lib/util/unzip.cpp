@@ -1159,7 +1159,7 @@ archive_file::error zip_file_impl::decompress_data_type_8(std::uint64_t offset, 
 	}
 
 	// loop until we're done
-	while (1)
+	while (true)
 	{
 		// read in the next chunk of data
 		std::uint32_t read_length(0);

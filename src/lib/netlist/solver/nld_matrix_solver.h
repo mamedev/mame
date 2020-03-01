@@ -177,7 +177,7 @@ namespace solver
 		// after every call to solve, update inputs must be called.
 		// this can be done as well as a batch to ease parallel processing.
 
-		const netlist_time solve(netlist_time_ext now);
+		netlist_time solve(netlist_time_ext now);
 		void update_inputs();
 
 		bool has_dynamic_devices() const noexcept { return !m_dynamic_devices.empty(); }

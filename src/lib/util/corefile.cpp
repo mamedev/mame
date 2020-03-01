@@ -143,7 +143,7 @@ class core_proxy_file : public core_file
 {
 public:
 	core_proxy_file(core_file &file) : m_file(file) { }
-	virtual ~core_proxy_file() override { }
+	virtual ~core_proxy_file() override = default;
 	virtual osd_file::error compress(int level) override { return m_file.compress(level); }
 
 	virtual int seek(std::int64_t offset, int whence) override { return m_file.seek(offset, whence); }
@@ -395,7 +395,7 @@ int core_text_file::getc()
 
 		// fetch the next character
 		char16_t utf16_buffer[UTF16_CHAR_MAX];
-		char32_t uchar = char32_t(~0);
+		auto uchar = char32_t(~0);
 		switch (m_text_type)
 		{
 		default:
@@ -647,7 +647,7 @@ bool core_in_memory_file::eof() const
 {
 	// check for buffered chars
 	if (has_putback())
-		return 0;
+		return false;
 
 	// if the offset == length, we're at EOF
 	return (m_offset >= m_length);
@@ -1231,15 +1231,6 @@ osd_file::error core_file::load(std::string const &filename, std::vector<uint8_t
 
 	// close the file and return data
 	return osd_file::error::NONE;
-}
-
-
-/*-------------------------------------------------
-    protected constructor
--------------------------------------------------*/
-
-core_file::core_file()
-{
 }
 
 } // namespace util

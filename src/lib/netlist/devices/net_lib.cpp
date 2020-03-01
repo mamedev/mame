@@ -38,6 +38,7 @@ namespace devices
 		LIB_ENTRY(VCVS)
 		LIB_ENTRY(VCCS)
 		LIB_ENTRY(CCCS)
+		LIB_ENTRY(CCVS)
 		LIB_ENTRY(LVCCS)
 		LIB_ENTRY(opamp)
 		LIB_ENTRY(nc_pin)

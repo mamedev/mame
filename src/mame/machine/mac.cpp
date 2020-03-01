@@ -1482,7 +1482,6 @@ WRITE8_MEMBER(mac_state::mac_via_out_a_pmu)
 //  printf("%02x to PM\n", data);
 	#endif
 	m_pm_data_send = data;
-	return;
 }
 
 WRITE8_MEMBER(mac_state::mac_via_out_b)

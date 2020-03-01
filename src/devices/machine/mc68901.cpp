@@ -1436,7 +1436,10 @@ void mc68901_device::tx_clock()
 
 			// automatic turnaround enables the receiver
 			if (m_tsr & TSR_AUTO_TURNAROUND)
+			{
 				m_rsr |= RSR_RCV_ENABLE;
+				m_tsr &= ~TSR_AUTO_TURNAROUND;
+			}
 		}
 		else if ((m_tsr & TSR_BUFFER_EMPTY) && !(m_tsr & TSR_UNDERRUN_ERROR) && !send_break)
 		{

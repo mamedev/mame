@@ -239,6 +239,7 @@ Notes:
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
+#include <math.h>
 
 
 // CD controller IRQ types
@@ -2037,20 +2038,20 @@ WRITE_LINE_MEMBER(towns_state::towns_scsi_drq)
 // Volume ports - I/O ports 0x4e0-0x4e3
 // 0x4e0 = input volume level
 // 0x4e1 = input channel select
-//         4 = Line in, left channel
-//         5 = Line in, right channel
+//         0 = Line in, left channel
+//         1 = Line in, right channel
 // 0x4e2 = output volume level
 // 0x4e3 = output channel select
+//         0 = CD-DA left channel
+//         1 = CD-DA right channel
 //         2 = MIC
 //         3 = MODEM
-//         4 = CD-DA left channel
-//         5 = CD-DA right channel
 READ8_MEMBER(towns_state::towns_volume_r)
 {
 	switch(offset)
 	{
 	case 2:
-		return(m_towns_volume[m_towns_volume_select]);
+		return(m_towns_volume[m_towns_volume_select & 3]);
 	case 3:
 		return m_towns_volume_select;
 	default:
@@ -2058,20 +2059,35 @@ READ8_MEMBER(towns_state::towns_volume_r)
 	}
 }
 
+void towns_state::cdda_db_to_gain(float db)
+{
+	float gain = powf(10, db / 20.0f);
+	int port = m_towns_volume_select & 3;
+	if(port > 1)
+		return;
+	if(db > 0)
+		gain = 0;
+	m_cdda->set_output_gain(port, gain);
+}
+
 WRITE8_MEMBER(towns_state::towns_volume_w)
 {
 	switch(offset)
 	{
 	case 2:
-		m_towns_volume[m_towns_volume_select] = data;
-		if(m_towns_volume_select == 4)
-			m_cdda->set_output_gain(0, data / 64.0f);
-		if(m_towns_volume_select == 5)
-			m_cdda->set_output_gain(1, data / 64.0f);
+		m_towns_volume[m_towns_volume_select & 3] = data;
+		if(!(m_towns_volume_select & 4) || (m_towns_volume_select & 0x18))
+			return;
+		cdda_db_to_gain((~data & 0x3f) * -0.5f);
 		break;
 	case 3:  // select channel
-		if(data < 8)
-			m_towns_volume_select = data;
+		m_towns_volume_select = data;
+		if(!(data & 4))
+			cdda_db_to_gain(1);
+		else if(data & 8)
+			cdda_db_to_gain(0);
+		else if(data & 0x10)
+			cdda_db_to_gain(-32.0f);
 		break;
 	default:
 		logerror("SND: Volume port %i set to %02x\n",offset,data);

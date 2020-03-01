@@ -5,6 +5,10 @@
 // Emulator for HP Capricorn CPU
 // *****************************
 //
+// References:
+// HP 00085-90444, Nov 81, HP83/85 Assembler ROM manual
+// US Patent 4,424,563 describing the architecture of HP85
+//
 #ifndef MAME_CPU_CAPRICORN_CAPRICORN_H
 #define MAME_CPU_CAPRICORN_CAPRICORN_H
 
@@ -16,6 +20,13 @@ public:
 	capricorn_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint8_t flatten_burst();
+
+	// This CB reports the start of LMA (Load Memory Address) cycles
+	// Its parameter is true when starting a LMARD cycle
+	auto lma_cb() { return m_lma_out.bind(); }
+
+	// Tap into fetched opcodes
+	auto opcode_cb() { return m_opcode_func.bind(); }
 
 protected:
 	// device_t overrides
@@ -61,13 +72,16 @@ private:
 	uint16_t m_start_addr;  // Start address of burst
 	uint16_t m_curr_addr;   // Current address in burst
 
+	devcb_write8 m_opcode_func;
+	devcb_write_line m_lma_out;
+
 	// Effective Addresses
 	// When b17 = 0, b15..b0 hold 16-bit memory address
 	// When b17 = 1, b5..b0 hold register index
 	typedef unsigned ea_addr_t;
 
-	void start_mem_burst(ea_addr_t addr);
-	uint16_t read_u16(ea_addr_t addr);
+	void start_mem_burst(ea_addr_t addr , bool lmard = false);
+	uint16_t read_u16(ea_addr_t addr , bool lmard = true);
 	void write_u16(ea_addr_t addr , uint16_t v);
 	uint8_t RM(ea_addr_t& addr);
 	void WM(ea_addr_t& addr , uint8_t v);
@@ -86,6 +100,7 @@ private:
 	ea_addr_t get_ea_lit_dir();
 	ea_addr_t get_ea_reg_indir();
 	ea_addr_t get_ea_idx_dir();
+	ea_addr_t get_ea_jsbx();
 	ea_addr_t get_ea_lit_indir();
 	ea_addr_t get_ea_idx_indir();
 

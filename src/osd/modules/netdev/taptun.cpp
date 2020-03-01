@@ -40,7 +40,7 @@ public:
 	taptun_module() : osd_module(OSD_NETDEV_PROVIDER, "taptun"), netdev_module()
 	{
 	}
-	virtual ~taptun_module() { }
+	virtual ~taptun_module() = default;
 
 	virtual int init(const osd_options &options);
 	virtual void exit();
@@ -337,7 +337,7 @@ int netdev_tap::recv_dev(uint8_t **buf)
 
 static CREATE_NETDEV(create_tap)
 {
-	class netdev_tap *dev = global_alloc(netdev_tap(ifname, ifdev, rate));
+	auto *dev = global_alloc(netdev_tap(ifname, ifdev, rate));
 	return dynamic_cast<osd_netdev *>(dev);
 }
 

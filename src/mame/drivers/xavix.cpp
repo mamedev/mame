@@ -55,12 +55,12 @@
             3   Idaten Jump /TOMY/Japan                                                                         -           -               -           -               -                   -                       -
             4   Tokyo Friend Park 2 Special /EPOCH/Japan                                                        -           -               -           -               -                   -                       -
             5   Masked Rider HIBIKI /BANDAI/Japan                                                               -           -               -           -               -                   -                       -
-            6   Magic Ranger Battle /BANDAI/Japan                                                               -           -               -           -               -                   -                       -
+            6   Magic Ranger Battle /BANDAI/Japan                                                               -           -               -           -               -                   -                       dumped
             7   Accessory cartridge for Super TV computer "ECC Junior"/EPOCH/Japan                              -           -               -           -               -                   -                       -
             8   Wild Adventure Mini Golf Game /Hasbro/USA                                                       MGFA        x8              48          4M              24C04               SSD 98 PL7351-181       dumped
             9   MX DIRT REBEL Game /Hasbro/USA                                                                  MTXA        x8              48          8M              24C04               SSD 2000 NEC 85605-621  dumped
             10  Dokodemo Doraemon Japan Travel Game DX /EPOCH/Japan                                             -           -               -           -               -                   -                       -
-            11  Tomas Plarail /TOMY/Japan                                                                       -           -               -           -               -                   -                       -
+            11  Tomas Plarail /TOMY/Japan                                                                       -           -               -           -               -                   -                       -  dumped?
             12  Thomas TV Personal Computer /EPOCH/Japan                                                        -           -               -           -               -                   -                       -
             13  STAR WARS Light Saber Battle /TOMY/Japan                                                        -           -               -           -               -                   -                       -
             14  Jala Jaland /atlus/Japan                                                                        -           -               -           -               -                   -                       -        (is this the arcade release of Jara-Ja Land /TAKARA/Japan below?, Atlas are an arcade distributor and arcade version is confirmed)
@@ -82,7 +82,7 @@
             13  All star Festival Quize /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
             14  e-kara mix /TAKARA/Japan                                                                        -           -               -           -               -                   -                       -
             15  Jumping Popira /TAKARA/Japan                                                                    -           -               -           -               -                   -                       -
-            16  Tour around Japan. I'm a Prarail motorman /TOMY/Japan                                           -           -               -           -               -                   -                       -
+            16  Tour around Japan. I'm a Prarail motorman /TOMY/Japan                                           -           -               -           -               -                   -                       dumped
             17  TV mail PC "Mercot /EPOCH/Japan                                                                 -           -               -           -               -                   -                       -
             18  Play TV Monster Truck /RADICA/USA                                                               74026       x8              48          4M              none                SSD 98 PL7351-181       dumped
             19  Play TV Madden Football /RADICA/USA                                                             74021       x8              48          4M              none                SSD 98 PL7351-181       dumped
@@ -115,7 +115,7 @@
             22  Dual Station /TAKARA/Japan                                                                      -           -               -           -               -                   -                       -
             23  Gei-Geki GoGo! Shooting /TAKARA/Japan                                                           -           -               -           -               -                   -                       dumped
             24  Let's fish a big one. Exciting fishing! /EPOCH/Japan                                            -           -               -           -               -                   -                       -
-            25  Champion Pinball /TOMY/Japan                                                                    -           -               -           -               -                   -                       -
+            25  Champion Pinball /TOMY/Japan                                                                    -           -               -           -               -                   -                       dumped
             26  Excite Fishing DX                                                                               EF2J        x8              48          4M              24C08               SSD 98 PL7351-181       dumped
     2002    1   Accessory cartridge for Slot machine "Gin-gin maru TV" /TAKARA/Japan                            -           -               -           -               -                   -                       dumped
             2   Wildest computer robot "Daigander" (Korean version) /TAKARA/Korea                               -           -               -           -               -                   -                       -
@@ -544,6 +544,159 @@ static INPUT_PORTS_START( xavix_i2c )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( epo_tfit )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // select
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // back
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( tomcpin )
+	PORT_INCLUDE(xavix_i2c)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Right Flipper")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Left Flipper")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Launch Ball")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Nudge")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Right Flipper")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Left Flipper")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Launch Ball")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Nudge")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mrangbat )
+	PORT_INCLUDE(xavix_i2c)
+
+	PORT_MODIFY("IN0")
+	PORT_DIPNAME( 0x01, 0x00, "IN0" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0x01, 0x00, "IN1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("EX0") // NOT A JOYSTICK!!
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_16WAY // Red/Up 1
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_16WAY // Red/Up 2
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_16WAY // Green / Circle / Right 2
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_16WAY // Pink / Star / Left 2
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_16WAY // Blue / Square / Right 1
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_16WAY // Yellow / Triangle / Left 1
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON8 )
+
+
+	PORT_START("EX1")
+	PORT_DIPNAME( 0x01, 0x00, "EX1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("EX2")
+	PORT_DIPNAME( 0x01, 0x00, "EX2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( epo_bowl )
@@ -1708,6 +1861,22 @@ void xavix_i2c_state::xavix2002_i2c_24c04(machine_config &config)
 	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // 24C04
 }
 
+void xavix_i2c_state::xavix2002_i2c_mrangbat(machine_config &config)
+{
+	xavix2002(config);
+
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24C02?
+
+	m_xavix2002io->read_0_callback().set_ioport("EX0");
+	//m_xavix2002io->write_0_callback().set(FUNC(xavix_i2c_jmat_state::write_extended_io0));
+	m_xavix2002io->read_1_callback().set_ioport("EX1");
+	//m_xavix2002io->write_1_callback().set(FUNC(xavix_i2c_jmat_state::write_extended_io1));
+	m_xavix2002io->read_2_callback().set_ioport("EX2");
+	//m_xavix2002io->write_2_callback().set(FUNC(xavix_i2c_jmat_state::write_extended_io2));
+
+}
+
+
 void xavix_state::init_xavix()
 {
 	m_rgnlen = memregion("bios")->bytes();
@@ -1934,6 +2103,18 @@ ROM_START( tcarnavi )
 	ROM_LOAD("navi.bin", 0x000000, 0x400000, CRC(f4e693fb) SHA1(be37b35f1e1e661e10187253c2c3aa9858a90812) )
 ROM_END
 
+ROM_START( tomcpin )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("championpinball.bin", 0x000000, 0x400000, CRC(24f6d753) SHA1(3d3b39692bef8156da9e350b456c4e2f0af74484) )
+ROM_END
+
+ROM_START( tomplc )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("imaplayrailconductor.bin", 0x000000, 0x400000, CRC(b775d0ed) SHA1(33142509b11bbe45b0b9222232033dd64ef01ff2) )
+ROM_END
+
+
+
 /*
     The e-kara cartridges require the BIOS rom to map into 2nd external bus space as they fetch palette data from
     it etc.
@@ -2128,6 +2309,10 @@ CONS( 2003, jarajal,   0,          0,  xavix_nv,         jarajal,  xavix_state, 
 
 CONS( 2003, tcarnavi,  0,          0,  xavix_nv,         jarajal,  xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Tomica Carnavi Drive (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
+CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c02,  tomcpin,  xavix_i2c_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2004, tomplc,   0,          0,  xavix_i2c_24c02,  tomcpin,  xavix_i2c_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
 
 /* Music titles: Emulation note:
    SEEPROM write appears to work (save NVRAM file looks valid) but game fails to read it back properly, fails backup data checksum, and blanks it again.
@@ -2188,7 +2373,6 @@ ROM_START( epo_ebox )
 	ROM_LOAD("exciteboxing.bin", 0x000000, 0x400000, CRC(e25ae4f5) SHA1(7f7b613f0ab8f43f5cad0d13de538921e77cae9c) )
 ROM_END
 
-
 ROM_START( ttv_sw )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "jedi.bin", 0x000000, 0x800000, CRC(51cae5fd) SHA1(1ed8d556f31b4182259ca8c766d60c824d8d9744) )
@@ -2213,6 +2397,7 @@ ROM_START( ban_onep )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("onepiece.bin", 0x000000, 0x800000, CRC(c5cb5a5f) SHA1(db85f6cc48d77c5a4967b9b8e2999167e3dfc8c8) )
 ROM_END
+
 
 CONS( 2002, epo_ebox, 0, 0, xavix2000_nv,        epo_epp,     xavix_state,             init_xavix, "Epoch / SSD Company LTD",       "Excite Boxing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // doesn't use XaviX2000 extra opcodes, but had that type of CPU
  // die not confirmed, but uses extra opcodes.  (hangs on title screen due to combination of freq_timer_done nested interrupts tripping, and waiting on bits in input ports to change
@@ -2241,11 +2426,6 @@ CONS( 2004, ban_onep, 0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_sta
 
    The 'Domyos Interactive System (DiS)' released in France by Decathlon appears to be identical to XaviXPORT (but for PAL regions, and with an entirely different software range)
 */
-
-ROM_START( tmy_thom )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
-	ROM_LOAD( "thomastank.bin", 0x000000, 0x800000, CRC(a52a23be) SHA1(e5b3500239d9e56eb5405f7585982959e5a162da) )
-ROM_END
 
 // XaviXPORT
 ROM_START( xavtenni )
@@ -2313,8 +2493,23 @@ ROM_START( domdance )
 	ROM_LOAD( "xpfitnessdance.bin", 0x000000, 0x1000000, CRC(3170dd41) SHA1(9c9b4f1d8e7c5097271bb8712463ad93c8d55d97) )
 ROM_END
 
-// TODO: does it have an SEEPROM? why does it hang? full title?
-CONS( 2005, tmy_thom, 0, 0, xavix2002_i2c_24c04, xavix_i2c,  xavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",  "Thomas and Friends (Tomy)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+
+ROM_START( mrangbat )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("powerrangerspad.bin", 0x000000, 0x400000, CRC(d3a98775) SHA1(485c66242dd0ee436a278d23005aece48d606431) )
+ROM_END
+
+ROM_START( tmy_thom )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "thomastank.bin", 0x000000, 0x800000, CRC(a52a23be) SHA1(e5b3500239d9e56eb5405f7585982959e5a162da) )
+ROM_END
+
+ROM_START( epo_tfit )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("tennisfitness.bin", 0x000000, 0x400000, CRC(cbf65bd2) SHA1(30b3da6f061b2dd91679db42a050f715901beb87) )
+ROM_END
+
 
 CONS( 2004, xavtenni, 0, 0, xavix2002_i2c_24c04, xavix_i2c,  xavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2004, xavbaseb, 0, 0, xavix2002_i2c_24c04, xavix_i2c,  xavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Baseball (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -2345,3 +2540,10 @@ CONS( 2008, domfitch, 0, 0, xavix2002_i2c_jmat, xavixp, xavix_i2c_jmat_state, in
 CONS( 2007, domdance, 0, 0, xavix2002_i2c_jmat, xavixp, xavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Dance (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // some DIS games run on XaviX 2 instead, see xavix2.cpp for Domyos Fitness Adventure and Domyos Bike Concept
+
+CONS( 2005, mrangbat, 0, 0, xavix2002_i2c_mrangbat, mrangbat,   xavix_i2c_state, init_xavix, "Bandai / SSD Company LTD", "Mahou Taiketsu Magiranger - Magimat de Dance & Battle (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2004, epo_tfit, 0, 0, xavix2002_i2c_24c04,    epo_tfit,   xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD",  "Excite Sports Tennis x Fitness (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Epoch Tennis and Fitness has 24LC04
+
+// TODO: does it have an SEEPROM? why does it hang? full title?
+CONS( 2005, tmy_thom, 0, 0, xavix2002_i2c_24c04,    xavix_i2c,  xavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",   "Thomas and Friends (Tomy)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

@@ -169,8 +169,8 @@ private:
 	devcb_read8 m_read_k;
 	devcb_write8 m_write_o;
 	devcb_write8 m_write_p;
-	devcb_read8 m_read_r[4];
-	devcb_write8 m_write_r[4];
+	devcb_read8::array<4> m_read_r;
+	devcb_write8::array<4> m_write_r;
 	devcb_read_line m_read_si;
 	devcb_write_line m_write_so;
 

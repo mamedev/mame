@@ -42,8 +42,8 @@ DEFINE_DEVICE_TYPE(VS9209, vs9209_device, "vs9209", "VS9209 I/O")
 
 vs9209_device::vs9209_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, VS9209, tag, owner, clock)
-	, m_input_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_output_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_input_cb(*this)
+	, m_output_cb(*this)
 {
 }
 
@@ -54,10 +54,8 @@ vs9209_device::vs9209_device(const machine_config &mconfig, const char *tag, dev
 void vs9209_device::device_start()
 {
 	// resolve callbacks
-	for (auto &cb : m_input_cb)
-		cb.resolve();
-	for (auto &cb : m_output_cb)
-		cb.resolve();
+	m_input_cb.resolve_all();
+	m_output_cb.resolve_all();
 
 	std::fill(std::begin(m_data_latch), std::end(m_data_latch), 0);
 

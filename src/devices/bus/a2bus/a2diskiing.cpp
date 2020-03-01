@@ -23,6 +23,7 @@
 
 DEFINE_DEVICE_TYPE(A2BUS_DISKIING, a2bus_diskiing_device, "a2diskiing", "Apple Disk II NG controller (16-sector)")
 DEFINE_DEVICE_TYPE(A2BUS_DISKIING13, a2bus_diskiing13_device, "diskii13", "Apple Disk II NG controller (13-sector)")
+DEFINE_DEVICE_TYPE(A2BUS_APPLESURANCE, a2bus_applesurance_device, "a2surance", "Applesurance Diagnostic Controller")
 
 #define WOZFDC_TAG         "wozfdc"
 #define DISKII_ROM_REGION  "diskii_rom"
@@ -40,6 +41,11 @@ ROM_END
 ROM_START( diskiing13 )
 	ROM_REGION(0x100, DISKII_ROM_REGION, 0)
 	ROM_LOAD( "341-0009.bin", 0x000000, 0x000100, CRC(d34eb2ff) SHA1(afd060e6f35faf3bb0146fa889fc787adf56330a) )
+ROM_END
+
+ROM_START( applesurance )
+	ROM_REGION(0x1000, DISKII_ROM_REGION, 0)
+	ROM_LOAD( "applesurance 3.0 - 2732.bin", 0x000000, 0x001000, CRC(64eafec7) SHA1(723dc6cd32de5a0f27af7503764185ac58904c05) )
 ROM_END
 
 FLOPPY_FORMATS_MEMBER( diskiing_device::floppy_formats )
@@ -82,6 +88,11 @@ const tiny_rom_entry *a2bus_diskiing13_device::device_rom_region() const
 	return ROM_NAME( diskiing13 );
 }
 
+const tiny_rom_entry *a2bus_applesurance_device::device_rom_region() const
+{
+	return ROM_NAME( applesurance );
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -102,6 +113,12 @@ a2bus_diskiing_device::a2bus_diskiing_device(const machine_config &mconfig, cons
 
 a2bus_diskiing13_device::a2bus_diskiing13_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	diskiing_device(mconfig, A2BUS_DISKIING13, tag, owner, clock)
+{
+}
+
+a2bus_applesurance_device::a2bus_applesurance_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	diskiing_device(mconfig, A2BUS_APPLESURANCE, tag, owner, clock),
+	m_c800_bank(1)
 {
 }
 
@@ -145,4 +162,30 @@ void diskiing_device::write_c0nx(uint8_t offset, uint8_t data)
 uint8_t diskiing_device::read_cnxx(uint8_t offset)
 {
 	return m_rom[offset];
+}
+
+uint8_t a2bus_applesurance_device::read_cnxx(uint8_t offset)
+{
+	return m_rom[offset+0x800];
+}
+
+uint8_t a2bus_applesurance_device::read_c800(uint16_t offset)
+{
+	if (offset == 0x7ff)
+	{
+		m_c800_bank = 1;
+	}
+
+	if (!m_c800_bank)
+	{
+		return m_rom[offset];
+	}
+
+	return m_rom[offset+0x800];
+}
+
+void a2bus_applesurance_device::device_reset()
+{
+	m_c800_bank = 1;
+	diskiing_device::device_reset();
 }

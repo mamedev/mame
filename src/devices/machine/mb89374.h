@@ -78,8 +78,8 @@ private:
 	inline void set_po2(int state);
 	inline void set_po3(int state);
 
-	devcb_write_line   m_out_irq_cb;
-	devcb_write_line   m_out_po_cb[4];
+	devcb_write_line m_out_irq_cb;
+	devcb_write_line::array<4> m_out_po_cb;
 
 	// pins
 	int m_irq;

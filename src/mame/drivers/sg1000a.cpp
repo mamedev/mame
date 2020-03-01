@@ -2,7 +2,7 @@
 // copyright-holders:Tomasz Slanina
 /*********************************************************
 Sega hardware based on their SG-1000 console
-Driver by Tomasz Slanina  analog [at] op.pl
+Driver by Tomasz Slanina
 
 
 Supported games :

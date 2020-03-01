@@ -71,7 +71,7 @@ void driver_device::set_game_driver(const game_driver &game)
 
 void driver_device::static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback)
 {
-	downcast<driver_device &>(device).m_callbacks[type] = callback;
+	downcast<driver_device &>(device).m_callbacks[type] = std::move(callback);
 }
 
 

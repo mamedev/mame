@@ -78,8 +78,8 @@ protected:
 
 	void m6803_mem(address_map &map);
 
-	devcb_read8 m_in_port_func[4];
-	devcb_write8 m_out_port_func[4];
+	devcb_read8::array<4> m_in_port_func;
+	devcb_write8::array<4> m_out_port_func;
 
 	devcb_write_line m_out_sc2_func;
 	devcb_write_line m_out_sertx_func;

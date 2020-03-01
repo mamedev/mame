@@ -188,14 +188,17 @@ void mephisto_modena_state::modena(machine_config &config)
 
 ROM_START( modena )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_DEFAULT_BIOS("v2")
+	ROM_LOAD("modena_12aug1992_441d.u3", 0x0000, 0x8000, CRC(dd7b4920) SHA1(4606b9d1f8a30180aabedfc0ed3cca0c96618524) )
+ROM_END
 
-	ROM_SYSTEM_BIOS( 0, "v1", "V1" )
-	ROMX_LOAD("modena_4929_270192.u3",    0x0000, 0x8000, CRC(99212677) SHA1(f0565e5441fb38df201176d01793c953886b0303), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "v2", "V2" )
-	ROMX_LOAD("modena_12aug1992_441d.u3", 0x0000, 0x8000, CRC(dd7b4920) SHA1(4606b9d1f8a30180aabedfc0ed3cca0c96618524), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 2, "v2a", "V2A" )
-	ROMX_LOAD("27c256_457f.u3",           0x0000, 0x8000, CRC(2889082c) SHA1(b63f0d856793b4f87471837e2219ce2a42fe18de), ROM_BIOS(2) )
+ROM_START( modenaa )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD("27c256_457f.u3", 0x0000, 0x8000, CRC(2889082c) SHA1(b63f0d856793b4f87471837e2219ce2a42fe18de) )
+ROM_END
+
+ROM_START( modenab )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD("modena_4929_270192.u3", 0x0000, 0x8000, CRC(99212677) SHA1(f0565e5441fb38df201176d01793c953886b0303) )
 ROM_END
 
 
@@ -204,5 +207,7 @@ ROM_END
     Game driver(s)
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS                   INIT        COMPANY             FULLNAME           FLAGS */
-CONS( 1992, modena,   0,      0,      modena,   modena, mephisto_modena_state,  empty_init, "Hegener + Glaser", "Mephisto Modena", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS                   INIT        COMPANY             FULLNAME                   FLAGS */
+CONS( 1992, modena,   0,      0,      modena,   modena, mephisto_modena_state,  empty_init, "Hegener + Glaser", "Mephisto Modena (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1992, modenaa,  modena, 0,      modena,   modena, mephisto_modena_state,  empty_init, "Hegener + Glaser", "Mephisto Modena (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1992, modenab,  modena, 0,      modena,   modena, mephisto_modena_state,  empty_init, "Hegener + Glaser", "Mephisto Modena (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

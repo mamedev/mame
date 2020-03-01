@@ -54,9 +54,9 @@ e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, d
 	, m_vram2(*this, "vram2")
 	, m_osc(0), m_svd(0), m_lcd_control(0), m_lcd_contrast(0)
 	, m_pixel_update_cb(*this)
-	, m_write_r{{*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_read_p{{*this}, {*this}, {*this}, {*this}}
-	, m_write_p{{*this}, {*this}, {*this}, {*this}}
+	, m_write_r(*this)
+	, m_read_p(*this)
+	, m_write_p(*this)
 	, m_r_dir(0), m_p_dir(0), m_p_pullup(0), m_dfk0(0), m_256_src_pulse(0), m_core_256_handle(nullptr)
 	, m_watchdog_count(0), m_clktimer_count(0), m_stopwatch_on(0), m_swl_cur_pulse(0), m_swl_slice(0)
 	, m_swl_count(0), m_swh_count(0), m_prgtimer_select(0), m_prgtimer_on(0), m_prgtimer_src_pulse(0)
@@ -76,14 +76,9 @@ void e0c6s46_device::device_start()
 	e0c6200_cpu_device::device_start();
 
 	// find ports
-	for (int i = 0; i < 5; i++)
-		m_write_r[i].resolve_safe();
-
-	for (int i = 0; i < 4; i++)
-	{
-		m_read_p[i].resolve_safe(0);
-		m_write_p[i].resolve_safe();
-	}
+	m_write_r.resolve_all_safe();
+	m_read_p.resolve_all_safe(0);
+	m_write_p.resolve_all_safe();
 
 	m_pixel_update_cb.resolve();
 

@@ -144,8 +144,8 @@ m68hc05_device::m68hc05_device(
 			type,
 			{ s_hc_ops, s_hc_cycles, addr_width, 0x00ff, 0x00c0, vector_mask, M68HC05_VECTOR_SWI },
 			internal_map)
-	, m_port_cb_r{ *this, *this, *this, *this }
-	, m_port_cb_w{ *this, *this, *this, *this }
+	, m_port_cb_r(*this)
+	, m_port_cb_w(*this)
 	, m_port_bits{ 0xff, 0xff, 0xff, 0xff }
 	, m_port_interrupt{ 0x00, 0x00, 0x00, 0x00 }
 	, m_port_input{ 0xff, 0xff, 0xff, 0xff }
@@ -446,8 +446,8 @@ void m68hc05_device::device_start()
 	m6805_base_device::device_start();
 
 	// resolve callbacks
-	for (devcb_read8 &cb : m_port_cb_r) cb.resolve();
-	for (devcb_write8 &cb : m_port_cb_w) cb.resolve_safe();
+	m_port_cb_r.resolve_all();
+	m_port_cb_w.resolve_all_safe();
 	m_tcmp_cb.resolve_safe();
 
 	// save digital I/O

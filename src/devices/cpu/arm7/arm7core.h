@@ -356,12 +356,14 @@ static const int sRegisterTable[ARM7_NUM_MODES][18] =
 #define INSN_RD_SHIFT               12
 #define INSN_COND_SHIFT             28
 
+#define INSN_COPRO_OP1      ((uint32_t) 0x00e00000u)
 #define INSN_COPRO_N        ((uint32_t) 0x00100000u)
 #define INSN_COPRO_CREG     ((uint32_t) 0x000f0000u)
 #define INSN_COPRO_AREG     ((uint32_t) 0x0000f000u)
 #define INSN_COPRO_CPNUM    ((uint32_t) 0x00000f00u)
 #define INSN_COPRO_OP2      ((uint32_t) 0x000000e0u)
 #define INSN_COPRO_OP3      ((uint32_t) 0x0000000fu)
+#define INSN_COPRO_OP1_SHIFT        21
 #define INSN_COPRO_N_SHIFT          20
 #define INSN_COPRO_CREG_SHIFT       16
 #define INSN_COPRO_AREG_SHIFT       12

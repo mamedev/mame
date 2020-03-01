@@ -113,6 +113,7 @@ Street Fighter II: The World Warrior (USA 910522, Rev. G)          90629B-3   ST
 Street Fighter II: The World Warrior (USA 910522, Rev. H)          90629B-3   STF29            IOB1  90632C-1     CPS-B-13  DL-0411-10008  C632
 Street Fighter II: The World Warrior (USA 910522, Rev. I)          90629B-3   STF29            IOB1  90632C-1     CPS-B-14  DL-0411-10009  C632
 Street Fighter II: The World Warrior (USA 911101)                  90629B-3   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
+Street Fighter II: The World Warrior (USA 920312)                  90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (Japan 910214)                90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (Japan 910306)                90629B-3   STF29            IOB1  90632C-1     CPS-B-12  DL-0411-10007  C632
 Street Fighter II: The World Warrior (Japan 910411)                90629B-3   STF29            IOB1  90632C-1     CPS-B-15  DL-0411-10010  C632
@@ -1497,6 +1498,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2uh",       CPS_B_13,     mapper_STF29,  0x36 },
 	{"sf2ui",       CPS_B_14,     mapper_STF29,  0x36 },
 	{"sf2uk",       CPS_B_17,     mapper_STF29,  0x36 },
+	{"sf2um",       CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2j",        CPS_B_13,     mapper_STF29,  0x36 },
 	{"sf2j17",      CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2ja",       CPS_B_17,     mapper_STF29,  0x36 },

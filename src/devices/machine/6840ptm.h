@@ -102,7 +102,7 @@ private:
 
 	double m_external_clock[3];
 
-	devcb_write_line m_out_cb[3];
+	devcb_write_line::array<3> m_out_cb;
 	devcb_write_line m_irq_cb;
 
 	uint8_t m_control_reg[3];

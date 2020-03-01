@@ -50,6 +50,12 @@
           25        RESERVED2
           24        RESERVED3
 
+
+-------
+
+        CPU die markings on Big Buck Hunter "SunplusmM LU9001"
+
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -61,13 +67,13 @@
 
 
 
-class hyperscan_state : public driver_device
+class spg29x_game_state : public driver_device
 {
 public:
-	hyperscan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
-		{ }
+	spg29x_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+	{ }
 
 	void hyperscan(machine_config &config);
 
@@ -157,6 +163,22 @@ private:
 	spg290_i2c      m_i2c;
 	emu_timer *     m_update_timer;
 	emu_timer *     m_i2c_timer;
+
+
+};
+
+class spg29x_nand_game_state : public spg29x_game_state
+{
+public:
+	spg29x_nand_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		spg29x_game_state(mconfig, type, tag)
+	{ }
+
+	void nand_init(int blocksize, int blocksize_stripped);
+	void nand_init210();
+
+private:
+	std::vector<uint8_t> m_strippedrom;
 };
 
 
@@ -190,7 +212,7 @@ static void log_spg290_regs(device_t *device,uint8_t module, uint16_t reg, uint3
 #endif
 
 
-READ32_MEMBER(hyperscan_state::spg290_regs_r)
+READ32_MEMBER(spg29x_game_state::spg290_regs_r)
 {
 	uint32_t addr = offset << 2;
 	uint32_t data = 0;
@@ -236,7 +258,7 @@ READ32_MEMBER(hyperscan_state::spg290_regs_r)
 	return data;
 }
 
-WRITE32_MEMBER(hyperscan_state::spg290_regs_w)
+WRITE32_MEMBER(spg29x_game_state::spg290_regs_w)
 {
 	uint32_t addr = offset << 2;
 
@@ -397,17 +419,17 @@ WRITE32_MEMBER(hyperscan_state::spg290_regs_w)
 #endif
 }
 
-inline uint32_t hyperscan_state::spg290_read_mem(uint32_t offset)
+inline uint32_t spg29x_game_state::spg290_read_mem(uint32_t offset)
 {
 	return m_maincpu->space(0).read_dword(offset);
 }
 
-inline void hyperscan_state::spg290_write_mem(uint32_t offset, uint32_t data)
+inline void spg29x_game_state::spg290_write_mem(uint32_t offset, uint32_t data)
 {
 	return m_maincpu->space(0).write_dword(offset, data);
 }
 
-void hyperscan_state::spg290_argb1555(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t posy, uint16_t posx, uint16_t argb)
+void spg29x_game_state::spg290_argb1555(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t posy, uint16_t posx, uint16_t argb)
 {
 	if (!(argb & 0x8000) && cliprect.contains(posx, posy))
 	{
@@ -416,7 +438,7 @@ void hyperscan_state::spg290_argb1555(bitmap_rgb32 &bitmap, const rectangle &cli
 	}
 }
 
-void hyperscan_state::spg290_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t posy, uint16_t posx, uint16_t rgb, uint32_t transrgb)
+void spg29x_game_state::spg290_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t posy, uint16_t posx, uint16_t rgb, uint32_t transrgb)
 {
 	if ((!(transrgb & 0x10000) || (transrgb & 0xffff) != rgb) && cliprect.contains(posx, posy))
 	{
@@ -425,7 +447,7 @@ void hyperscan_state::spg290_rgb565(bitmap_rgb32 &bitmap, const rectangle &clipr
 	}
 }
 
-void hyperscan_state::spg290_blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, uint32_t *palettes, uint32_t buf_start)
+void spg29x_game_state::spg290_blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, uint32_t *palettes, uint32_t buf_start)
 {
 	uint32_t sprite_base = buf_start + ((control & 0xffff) << 8);
 	uint16_t sprite_x    = (control >> 16) & 0x3ff;
@@ -462,7 +484,7 @@ void hyperscan_state::spg290_blit_sprite(bitmap_rgb32 &bitmap, const rectangle &
 		}
 }
 
-void hyperscan_state::spg290_blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb)
+void spg29x_game_state::spg290_blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb)
 {
 	for (int y=0; y<512; y++)
 	{
@@ -488,13 +510,13 @@ void hyperscan_state::spg290_blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &
 	}
 }
 
-void hyperscan_state::spg290_blit_character(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb)
+void spg29x_game_state::spg290_blit_character(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb)
 {
 	// TODO
 }
 
 
-uint32_t hyperscan_state::spg290_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t spg29x_game_state::spg290_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_ppu.control & 0x1000)
 	{
@@ -526,7 +548,7 @@ uint32_t hyperscan_state::spg290_screen_update(screen_device &screen, bitmap_rgb
 	return 0;
 }
 
-void hyperscan_state::spg290_timers_update()
+void spg29x_game_state::spg290_timers_update()
 {
 	for(auto & elem : m_timers)
 		if (elem.control & 0x80000000)
@@ -553,7 +575,7 @@ void hyperscan_state::spg290_timers_update()
 		}
 }
 
-WRITE_LINE_MEMBER(hyperscan_state::spg290_vblank_irq)
+WRITE_LINE_MEMBER(spg29x_game_state::spg290_vblank_irq)
 {
 	if (state && m_ppu.irq_control & 0x01)      // VBlanking Start IRQ
 	{
@@ -568,7 +590,7 @@ WRITE_LINE_MEMBER(hyperscan_state::spg290_vblank_irq)
 }
 
 
-void hyperscan_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void spg29x_game_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -587,11 +609,11 @@ void hyperscan_state::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 }
 
-void hyperscan_state::spg290_mem(address_map &map)
+void spg29x_game_state::spg290_mem(address_map &map)
 {
 	map.global_mask(0x1fffffff);
 	map(0x00000000, 0x00ffffff).ram().mirror(0x07000000);
-	map(0x08000000, 0x09ffffff).rw(FUNC(hyperscan_state::spg290_regs_r), FUNC(hyperscan_state::spg290_regs_w));
+	map(0x08000000, 0x09ffffff).rw(FUNC(spg29x_game_state::spg290_regs_r), FUNC(spg29x_game_state::spg290_regs_w));
 	map(0x0a000000, 0x0a003fff).ram();                         // internal SRAM
 	map(0x0b000000, 0x0b007fff).rom().region("spg290", 0);  // internal ROM
 	map(0x10000000, 0x100fffff).rom().region("bios", 0).mirror(0x0e000000);
@@ -603,13 +625,13 @@ static INPUT_PORTS_START( hyperscan )
 INPUT_PORTS_END
 
 
-void hyperscan_state::machine_start()
+void spg29x_game_state::machine_start()
 {
 	m_update_timer = timer_alloc(TIMER_SPG290);
 	m_i2c_timer = timer_alloc(TIMER_I2C);
 }
 
-void hyperscan_state::machine_reset()
+void spg29x_game_state::machine_reset()
 {
 	memset(&m_ppu, 0, sizeof(spg290_ppu));
 	memset(&m_miu, 0, sizeof(spg290_miu));
@@ -621,11 +643,11 @@ void hyperscan_state::machine_reset()
 }
 
 
-void hyperscan_state::hyperscan(machine_config &config)
+void spg29x_game_state::hyperscan(machine_config &config)
 {
 	/* basic machine hardware */
 	SCORE7(config, m_maincpu, XTAL(27'000'000) * 4);   // 108MHz S+core 7
-	m_maincpu->set_addrmap(AS_PROGRAM, &hyperscan_state::spg290_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg29x_game_state::spg290_mem);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("hyperscan");
 
@@ -633,15 +655,57 @@ void hyperscan_state::hyperscan(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(FUNC(hyperscan_state::spg290_screen_update));
+	screen.set_screen_update(FUNC(spg29x_game_state::spg290_screen_update));
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.screen_vblank().set(FUNC(hyperscan_state::spg290_vblank_irq));
+	screen.screen_vblank().set(FUNC(spg29x_game_state::spg290_vblank_irq));
+}
+
+
+
+void spg29x_nand_game_state::nand_init(int blocksize, int blocksize_stripped)
+{
+	uint8_t* rom = memregion("nand")->base();
+	int size = memregion("nand")->bytes();
+
+	int numblocks = size / blocksize;
+
+	m_strippedrom.resize(numblocks * blocksize_stripped);
+
+	for (int i = 0; i < numblocks; i++)
+	{
+		const int base = i * blocksize;
+		const int basestripped = i * blocksize_stripped;
+
+		for (int j = 0; j < blocksize_stripped; j++)
+		{
+			m_strippedrom[basestripped + j] = rom[base + j];
+		}
+	}
+
+	// debug to allow for easy use of unidasm.exe
+	if (0)
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"stripped_%s", machine().system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(&m_strippedrom[0], blocksize_stripped * numblocks, 1, fp);
+			fclose(fp);
+		}
+	}
+}
+
+void spg29x_nand_game_state::nand_init210()
+{
+	nand_init(0x210, 0x200);
 }
 
 
 /* ROM definition */
-ROM_START( hs )
+ROM_START( hyprscan )
 	ROM_REGION( 0x100000, "bios", ROMREGION_32BIT | ROMREGION_LE )
 	ROM_LOAD32_DWORD("hyperscan.bin", 0x000000, 0x100000, CRC(ce346a14) SHA1(560cb747e7193e6781d4b8b0bd4d7b45d3d28690))
 
@@ -649,8 +713,23 @@ ROM_START( hs )
 	ROM_LOAD32_DWORD("spg290.bin", 0x000000, 0x008000, NO_DUMP)     // 256Kbit SPG290 internal ROM
 ROM_END
 
+ROM_START( jak_bbsf )
+	ROM_REGION( 0x100000, "bios", ROMREGION_32BIT | ROMREGION_LE | ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x4200000, "nand", 0 )
+	ROM_LOAD("bigbucksafari.bin", 0x000000, 0x4200000, CRC(dc5f9bf1) SHA1(27893c396d62f353ced52ef88fd9ade5c051598f) )
+
+	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
+	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
+ROM_END
+
 
 /* Driver */
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY   FULLNAME     FLAGS
-COMP( 2006, hs,   0,      0,      hyperscan, hyperscan, hyperscan_state, empty_init, "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 2006, hyprscan,   0,      0,      hyperscan, hyperscan, spg29x_game_state, empty_init, "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+// Big Buck Hunter has ISSI 404A (24C04)
+COMP( 2009, jak_bbsf,   0,      0,      hyperscan, hyperscan, spg29x_nand_game_state, nand_init210, "JAKKS Pacific Inc", "Big Buck Hunter Safari (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Big Buck Safari has ISSI 416A (24C16)
+
+

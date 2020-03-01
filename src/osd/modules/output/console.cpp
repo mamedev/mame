@@ -18,7 +18,7 @@ public:
 	: osd_module(OSD_OUTPUT_PROVIDER, "console"), output_module()
 	{
 	}
-	virtual ~output_console() { }
+	virtual ~output_console() = default;
 
 	virtual int init(const osd_options &options) override { return 0; }
 	virtual void exit() override { }

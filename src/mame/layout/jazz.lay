@@ -19,7 +19,7 @@ TODO
 	  <bounds x="0" y="0" width="1280" height="1024" />
 	</screen>
 	<bezel name="led0" element="led">
-	  <bounds x="1240" y="1024" width="40" height="50" />
+	  <bounds x="1230" y="1024" width="40" height="50" />
 	</bezel>
   </view>
 </mamelayout>

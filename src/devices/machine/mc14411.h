@@ -92,7 +92,7 @@ private:
 	static const int s_counter_divider[16];
 	static const int s_divider_select[4];
 
-	devcb_write_line m_out_fx_cbs[16];
+	devcb_write_line::array<16> m_out_fx_cbs;
 
 	uint32_t m_divider; // main divider to use, 0-3 column index into counter_divider
 	uint32_t m_reset;   // Reset line state

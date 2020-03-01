@@ -380,12 +380,12 @@ ROM_END
 
 ROM_START( polgar10 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_DEFAULT_BIOS("v101")
+	ROM_LOAD("polg.10mhz_v_10.0", 0x00000, 0x10000, CRC(7c1960d4) SHA1(4d15b51f9e6f7943815945cd56078ca512a964d4) )
+ROM_END
 
-	ROM_SYSTEM_BIOS( 0, "v100", "V10.0" )
-	ROMX_LOAD("polg.10mhz_v_10.0", 0x00000, 0x10000, CRC(7c1960d4) SHA1(4d15b51f9e6f7943815945cd56078ca512a964d4), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "v101", "V10.1" )
-	ROMX_LOAD("polg_101.bin",      0x00000, 0x10000, CRC(8fb6afa4) SHA1(d1cf868302a665ff351686b26a149ced0045fc81), ROM_BIOS(1) )
+ROM_START( polgar101 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("polg_101.bin", 0x00000, 0x10000, CRC(8fb6afa4) SHA1(d1cf868302a665ff351686b26a149ced0045fc81) )
 ROM_END
 
 ROM_START( mrisc )
@@ -404,27 +404,30 @@ ROM_END
 
 ROM_START( academy )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_DEFAULT_BIOS("en")
+	ROM_LOAD("acad4000.bin", 0x4000, 0x4000, CRC(ee1222b5) SHA1(98541d87755a7186b69b9723cc4adbd07f20f0e2) )
+	ROM_LOAD("acad8000.bin", 0x8000, 0x8000, CRC(a967922b) SHA1(1327903ff89bf96d72c930c400f367ae19e3ec68) )
+ROM_END
 
-	ROM_SYSTEM_BIOS( 0, "en", "English" )
-	ROMX_LOAD("acad4000.bin",         0x4000, 0x4000, CRC(ee1222b5) SHA1(98541d87755a7186b69b9723cc4adbd07f20f0e2), ROM_BIOS(0) )
-	ROMX_LOAD("acad8000.bin",         0x8000, 0x8000, CRC(a967922b) SHA1(1327903ff89bf96d72c930c400f367ae19e3ec68), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "de", "German (06-03-89)" )
-	ROMX_LOAD("academy_16k_6.3.89",   0x4000, 0x4000, CRC(900a0001) SHA1(174a6bc3bde55994c603e232fcb45fccd62f11f6), ROM_BIOS(1) )
-	ROMX_LOAD("academy_32k_6.3.89",   0x8000, 0x8000, CRC(e313d084) SHA1(ced5712d34fcc81bedcd741b7ac9e2ba17bf5235), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 2, "deo", "German (04-10-88)" )
-	ROMX_LOAD("academy_16k_04.10.88", 0x4000, 0x4000, CRC(fb4d83c4) SHA1(f5132042c3b5a17c173f81eaa57e313ff0bb848e), ROM_BIOS(2) )
-	ROMX_LOAD("academy_32k_04.10.88", 0x8000, 0x8000, CRC(478155db) SHA1(d363ab6d5bc0f47a6cdfa5132b77535ef8da8256), ROM_BIOS(2) )
+ROM_START( academyg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("academy_16k_6.3.89", 0x4000, 0x4000, CRC(900a0001) SHA1(174a6bc3bde55994c603e232fcb45fccd62f11f6) )
+	ROM_LOAD("academy_32k_6.3.89", 0x8000, 0x8000, CRC(e313d084) SHA1(ced5712d34fcc81bedcd741b7ac9e2ba17bf5235) )
+ROM_END
+
+ROM_START( academyga )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("academy_16k_04.10.88", 0x4000, 0x4000, CRC(fb4d83c4) SHA1(f5132042c3b5a17c173f81eaa57e313ff0bb848e) )
+	ROM_LOAD("academy_32k_04.10.88", 0x8000, 0x8000, CRC(478155db) SHA1(d363ab6d5bc0f47a6cdfa5132b77535ef8da8256) )
 ROM_END
 
 ROM_START( milano )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_DEFAULT_BIOS("v102")
+	ROM_LOAD("milano102.bin", 0x0000, 0x10000, CRC(0e9c8fe1) SHA1(e9176f42d86fe57e382185c703c7eff7e63ca711) )
+ROM_END
 
-	ROM_SYSTEM_BIOS( 0, "v101", "V1.01" )
-	ROMX_LOAD("milano101.bin", 0x0000, 0x10000, CRC(22efc0be) SHA1(921607d6dacf72c0686b8970261c43e2e244dc9f), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "v102", "V1.02" )
-	ROMX_LOAD("milano102.bin", 0x0000, 0x10000, CRC(0e9c8fe1) SHA1(e9176f42d86fe57e382185c703c7eff7e63ca711), ROM_BIOS(1) )
+ROM_START( milanoa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("milano101.bin", 0x0000, 0x10000, CRC(22efc0be) SHA1(921607d6dacf72c0686b8970261c43e2e244dc9f) )
 ROM_END
 
 ROM_START( nshort )
@@ -437,13 +440,19 @@ ROM_END
     Game driver(s)
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS                   INIT        COMPANY             FULLNAME                     FLAGS */
-CONS( 1989, polgar,   0,      0,      polgar,   polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, polgar10, polgar, 0,      polgar10, polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar 10MHz",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1992, mrisc,    0,      0,      mrisc,    polgar, mephisto_risc_state,    empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc 1MB",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1994, mrisc2,   mrisc,  0,      mrisc,    polgar, mephisto_risc_state,    empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc II",   MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT   CLASS                   INIT        COMPANY             FULLNAME                  FLAGS */
+CONS( 1989, polgar,    0,       0,      polgar,   polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, polgar10,  polgar,  0,      polgar10, polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, polgar101, polgar,  0,      polgar10, polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1992, mrisc,     0,       0,      mrisc,    polgar, mephisto_risc_state,    empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc 1MB", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1994, mrisc2,    mrisc,   0,      mrisc,    polgar, mephisto_risc_state,    empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 // not modular boards
-CONS( 1989, academy,  0,      0,      academy,  polgar, mephisto_academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy",          MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, milano,   0,      0,      milano,   polgar, mephisto_milano_state,  empty_init, "Hegener + Glaser", "Mephisto Milano",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1993, nshort,   milano, 0,      milano,   polgar, mephisto_milano_state,  empty_init, "Hegener + Glaser", "Mephisto Nigel Short",      MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, academy,   0,       0,      academy,  polgar, mephisto_academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, academyg,  academy, 0,      academy,  polgar, mephisto_academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 06-03-89)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, academyga, academy, 0,      academy,  polgar, mephisto_academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 04-10-88)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1991, milano,    0,       0,      milano,   polgar, mephisto_milano_state,  empty_init, "Hegener + Glaser", "Mephisto Milano (v1.02)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, milanoa,   milano,  0,      milano,   polgar, mephisto_milano_state,  empty_init, "Hegener + Glaser", "Mephisto Milano (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1993, nshort,    milano,  0,      milano,   polgar, mephisto_milano_state,  empty_init, "Hegener + Glaser", "Mephisto Nigel Short", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

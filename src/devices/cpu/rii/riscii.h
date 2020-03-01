@@ -80,7 +80,7 @@ public:
 	auto out_portk_cb() { return m_port_out_cb[9].bind(); }
 
 protected:
-	riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, unsigned addrbits, unsigned pcbits, u32 datastart, unsigned bankbits, u8 maxbank, u8 post_id_mask, address_map_constructor regs);
+	riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, unsigned addrbits, unsigned pcbits, unsigned bankbits, u8 maxbank, u8 post_id_mask, address_map_constructor regs);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -193,6 +193,8 @@ protected:
 	u8 tr2c_r();
 	u8 sfcr_r();
 	void sfcr_w(u8 data);
+	void spht_reload();
+	TIMER_CALLBACK_MEMBER(speech_timer);
 	u8 addl_r();
 	void addl_w(u8 data);
 	u8 addm_r();
@@ -291,12 +293,11 @@ private:
 
 	// device callbacks
 	devcb_read8 m_porta_in_cb;
-	devcb_read8 m_port_in_cb[10];
-	devcb_write8 m_port_out_cb[10];
+	devcb_read8::array<10> m_port_in_cb;
+	devcb_write8::array<10> m_port_out_cb;
 
 	// model-specific parameters
 	const u32 m_pcmask;
-	const u32 m_datastart;
 	const u32 m_tbptmask;
 	const u8 m_bankmask;
 	const u8 m_maxbank;
@@ -354,6 +355,7 @@ private:
 	u8 m_sphtcon;
 	u8 m_sphtrl;
 	u8 m_vocon;
+	emu_timer *m_speech_timer;
 
 	// execution sequencing
 	s32 m_icount;

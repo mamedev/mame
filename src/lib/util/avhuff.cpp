@@ -679,18 +679,6 @@ uint16_t *avhuff_encoder::deltarle_encoder::rle_and_histo_bitmap(const uint8_t *
 //**************************************************************************
 
 /**
- * @fn  avhuff_decoder::avhuff_decoder()
- *
- * @brief   -------------------------------------------------
- *            avhuff_decoder - constructor
- *          -------------------------------------------------.
- */
-
-avhuff_decoder::avhuff_decoder()
-{
-}
-
-/**
  * @fn  void avhuff_decoder::configure(const avhuff_decompress_config &config)
  *
  * @brief   -------------------------------------------------

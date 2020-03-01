@@ -108,7 +108,7 @@ TODO:
   "THE MICROPHONE IS OUT OF CONTROL, SO THIS GAME DEPENDS ON THE BUTTONS"
   There's no additional hw or connectors on the pcb
   (except for small (bit 0 - ON, bit 1 - ON)  DSW near AY chips )
-  Tomasz Slanina -  dox@space.pl
+  Tomasz Slanina
 
 Notes:
   The microphone is for summoning clouds. The game falls back to use

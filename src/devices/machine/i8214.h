@@ -42,7 +42,9 @@ public:
 	uint8_t a_r();
 	DECLARE_READ8_MEMBER(vector_r);
 	void b_w(uint8_t data);
+	void b_sgs_w(uint8_t data);
 	void r_w(int line, int state);
+	void r_all_w(uint8_t data);
 
 protected:
 	// device-level overrides

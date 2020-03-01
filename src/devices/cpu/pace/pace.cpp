@@ -68,8 +68,8 @@ pace_device::pace_device(const machine_config &mconfig, device_type type, const 
 	, m_space(nullptr)
 	, m_cache(nullptr)
 	, m_bps_callback(*this)
-	, m_jc_callback{{*this}, {*this}, {*this}}
-	, m_flag_callback{{*this}, {*this}, {*this}, {*this}}
+	, m_jc_callback(*this)
+	, m_flag_callback(*this)
 	, m_fr(0xffff)
 	, m_pc(0)
 	, m_mdr(0)
@@ -120,10 +120,8 @@ void pace_device::device_resolve_objects()
 {
 	// resolve callbacks
 	m_bps_callback.resolve_safe(0);
-	for (auto &cb : m_jc_callback)
-		cb.resolve_safe(0);
-	for (auto &cb : m_flag_callback)
-		cb.resolve_safe();
+	m_jc_callback.resolve_all_safe(0);
+	m_flag_callback.resolve_all_safe();
 }
 
 

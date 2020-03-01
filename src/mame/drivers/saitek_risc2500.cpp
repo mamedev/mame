@@ -318,20 +318,23 @@ void risc2500_state::risc2500(machine_config &config)
 /* ROM definitions */
 
 ROM_START( risc2500 )
-	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE )
-	ROM_SYSTEM_BIOS( 0, "v104", "v1.04" )
-	ROMX_LOAD("s2500_v104.bin", 0x000000, 0x020000, CRC(84a06178) SHA1(66f4d9f53de6da865a3ebb4af1d6a3e245c59a3c), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS( 1, "v103", "v1.03" )
-	ROMX_LOAD("s2500_v103.bin", 0x000000, 0x020000, CRC(7a707e82) SHA1(87187fa58117a442f3abd30092cfcc2a4d7c7efc), ROM_BIOS(1))
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD("risc2500_v.1.04.u7", 0x000000, 0x020000, CRC(84a06178) SHA1(66f4d9f53de6da865a3ebb4af1d6a3e245c59a3c) ) // M27C1001
 ROM_END
 
-ROM_START( montreux )
-	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE )
-	ROM_SYSTEM_BIOS( 0, "v100", "v1.00" )
-	ROMX_LOAD("montreux.bin", 0x000000, 0x040000, CRC(db374cf3) SHA1(44dd60d56779084326c3dfb41d2137ebf0b4e0ac), ROM_BIOS(0))
+ROM_START( risc2500a )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD("risc2500_v.1.03.u7", 0x000000, 0x020000, CRC(7a707e82) SHA1(87187fa58117a442f3abd30092cfcc2a4d7c7efc) )
+ROM_END
+
+ROM_START( montreux ) // v1.00
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD("rt17b_103_u_7.u7", 0x000000, 0x040000, CRC(db374cf3) SHA1(44dd60d56779084326c3dfb41d2137ebf0b4e0ac) ) // 27C020-15
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME              FLAGS */
-CONS( 1992, risc2500, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
-CONS( 1995, montreux, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // after Saitek bought Hegener + Glaser
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS */
+CONS( 1992, risc2500,  0,        0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500 (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
+CONS( 1992, risc2500a, risc2500, 0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500 (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
+
+CONS( 1995, montreux,  0,        0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // after Saitek bought Hegener + Glaser

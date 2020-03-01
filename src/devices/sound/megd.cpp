@@ -37,7 +37,7 @@ u32 meg_disassembler::b(u64 opc, u32 start, u32 count)
   return (opc >> start) & ((1 << count) - 1);
 }
 
-void meg_disassembler::append(std::string &r, std::string e)
+void meg_disassembler::append(std::string &r, const std::string &e)
 {
 	if(r != "")
 		r += " ; ";

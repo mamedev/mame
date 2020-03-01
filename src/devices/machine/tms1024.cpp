@@ -27,8 +27,8 @@ DEFINE_DEVICE_TYPE(TMS1025, tms1025_device, "tms1025", "TMS1025 I/O Expander")
 tms1024_device::tms1024_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_h(0), m_s(0), m_std(0), m_ms(0)
-	, m_read_port{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_write_port{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_read_port(*this)
+	, m_write_port(*this)
 {
 }
 
@@ -51,10 +51,8 @@ tms1025_device::tms1025_device(const machine_config &mconfig, const char *tag, d
 void tms1024_device::device_start()
 {
 	// resolve callbacks (there is no port 0)
-	for (devcb_read8 &cb : m_read_port)
-		cb.resolve_safe(0);
-	for (devcb_write8 &cb : m_write_port)
-		cb.resolve_safe();
+	m_read_port.resolve_all_safe(0);
+	m_write_port.resolve_all_safe();
 
 	// register for savestates
 	save_item(NAME(m_h));

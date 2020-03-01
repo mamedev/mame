@@ -279,8 +279,8 @@ m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, const char *ta
 
 m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles, address_map_constructor internal)
 	: m6800_cpu_device(mconfig, type, tag, owner, clock, insn, cycles, internal)
-	, m_in_port_func{{*this}, {*this}, {*this}, {*this}}
-	, m_out_port_func{{*this}, {*this}, {*this}, {*this}}
+	, m_in_port_func(*this)
+	, m_out_port_func(*this)
 	, m_out_sc2_func(*this)
 	, m_out_sertx_func(*this)
 {
@@ -701,10 +701,10 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 
 void m6801_cpu_device::device_resolve_objects()
 {
-	for (auto &cb : m_in_port_func)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_out_port_func)
-		cb.resolve_safe();
+	m6800_cpu_device::device_resolve_objects();
+
+	m_in_port_func.resolve_all_safe(0xff);
+	m_out_port_func.resolve_all_safe();
 	m_out_sc2_func.resolve_safe();
 	m_out_sertx_func.resolve_safe();
 }

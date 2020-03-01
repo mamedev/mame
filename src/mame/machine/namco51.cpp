@@ -333,8 +333,8 @@ namco_51xx_device::namco_51xx_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, NAMCO_51XX, tag, owner, clock)
 	, m_cpu(*this, "mcu")
 	, m_screen(*this, finder_base::DUMMY_TAG)
-	, m_in{ { *this }, { *this }, { *this }, { *this } }
-	, m_out{ { *this }, { *this } }
+	, m_in(*this)
+	, m_out(*this)
 	, m_lastcoins(0)
 	, m_lastbuttons(0)
 	, m_mode(0)
@@ -350,12 +350,10 @@ namco_51xx_device::namco_51xx_device(const machine_config &mconfig, const char *
 void namco_51xx_device::device_start()
 {
 	/* resolve our read callbacks */
-	for (devcb_read8 &cb : m_in)
-		cb.resolve_safe(0);
+	m_in.resolve_all_safe(0);
 
 	/* resolve our write callbacks */
-	for (devcb_write8 &cb : m_out)
-		cb.resolve_safe();
+	m_out.resolve_all_safe();
 
 	save_item(NAME(m_lastcoins));
 	save_item(NAME(m_lastbuttons));

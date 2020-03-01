@@ -59,11 +59,13 @@ public:
 	void swtpc09d3(machine_config &config);
 	void swtpc09u(machine_config &config);
 	void swtpc09(machine_config &config);
+	void swtpc09o(machine_config &config);
 
 	void init_swtpc09();
 	void init_swtpc09i();
 	void init_swtpc09u();
 	void init_swtpc09d3();
+	void init_swtpc09o();
 
 	DECLARE_INPUT_CHANGED_MEMBER(maincpu_clock_change);
 	DECLARE_INPUT_CHANGED_MEMBER(fdc_clock_change);
@@ -135,6 +137,7 @@ private:
 	void mp09_mem(address_map &map);
 	void uniflex_dmaf2_mem(address_map &map);
 	void uniflex_dmaf3_mem(address_map &map);
+	void os9_mem(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -186,6 +189,7 @@ private:
 	emu_timer *m_floppy_motor_timer;
 	floppy_image_device *m_fdc_floppy; // Current selected floppy.
 	uint8_t m_fdc_side;                // Current floppy side.
+	uint8_t m_fdc_dden;                // Current dden state.
 	uint8_t m_dmaf3_via_porta;
 	uint8_t m_dmaf3_via_portb;
 	uint8_t m_active_interrupt;

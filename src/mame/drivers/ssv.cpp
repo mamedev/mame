@@ -43,9 +43,9 @@ STA-0001B   P1-105A     96? Meosis Magic                            Sammy
 STA-0001B   ?           97  Joryuu Syougi Kyoushitsu (3)            Visco
 STA-0001B   VISCO-JJ1   97  Koi Koi Shimasho 2                      Visco
 STA-0001B   P1-112A     97  Mahjong Hyper Reaction 2                Sammy
-STA-0001B   ?           97  Monster Slider                          Visco / Datt
-STA-0001    ?           97  Super Real Mahjong P7                   Seta
-STA-0001B   ?           98  Gourmet Battle Quiz Ryorioh CooKing     Visco
+STA-0001B   STS-0001    97  Monster Slider                          Visco / Datt
+STA-0001    dedicated   97  Super Real Mahjong P7                   Seta
+STA-0001B   VISCO-JJ1   98  Gourmet Battle Quiz Ryorioh CooKing     Visco
 STA-0001B   P1-112C     98  Pachinko Sexy Reaction                  Sammy
 STA-0001B   B1-001A     99  Pachinko Sexy Reaction 2                Sammy
 STA-0001B   P1-112C     99  Change Air Blade                        Visco

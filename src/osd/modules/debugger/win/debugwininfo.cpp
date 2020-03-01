@@ -437,7 +437,7 @@ LRESULT debugwin_info::window_proc(UINT message, WPARAM wparam, LPARAM lparam)
 	// get min/max info: set the minimum window size
 	case WM_GETMINMAXINFO:
 		{
-			MINMAXINFO *minmax = (MINMAXINFO *)lparam;
+			auto *minmax = (MINMAXINFO *)lparam;
 			minmax->ptMinTrackSize.x = m_minwidth;
 			minmax->ptMinTrackSize.y = m_minheight;
 			minmax->ptMaxSize.x = minmax->ptMaxTrackSize.x = m_maxwidth;
@@ -575,14 +575,14 @@ LRESULT CALLBACK debugwin_info::static_window_proc(HWND wnd, UINT message, WPARA
 	{
 		// set the info pointer
 		CREATESTRUCT const *const createinfo = (CREATESTRUCT *)lparam;
-		debugwin_info *const info = (debugwin_info *)createinfo->lpCreateParams;
+		auto *const info = (debugwin_info *)createinfo->lpCreateParams;
 		SetWindowLongPtr(wnd, GWLP_USERDATA, (LONG_PTR)createinfo->lpCreateParams);
 		if (info->m_handler)
 			SetWindowLongPtr(wnd, GWLP_WNDPROC, (LONG_PTR)info->m_handler);
 		return 0;
 	}
 
-	debugwin_info *const info = (debugwin_info *)(uintptr_t)GetWindowLongPtr(wnd, GWLP_USERDATA);
+	auto *const info = (debugwin_info *)(uintptr_t)GetWindowLongPtr(wnd, GWLP_USERDATA);
 	if (info == nullptr)
 		return DefWindowProc(wnd, message, wparam, lparam);
 

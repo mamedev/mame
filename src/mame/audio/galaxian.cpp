@@ -78,7 +78,7 @@ TODO:
  * it is only listed once and given as 15k. This is more in line with recordings
  */
 #define GAL_R34                 RES_K(5.1)
-#define MCRST_R34                   RES_K(15)
+#define MCRST_R34               RES_K(15)
 
 #define GAL_R35                 RES_K(150)
 #define GAL_R36                 RES_K(22)
@@ -391,14 +391,14 @@ DEFINE_DEVICE_TYPE(GALAXIAN_SOUND, galaxian_sound_device, "galaxian_sound", "Gal
 DEFINE_DEVICE_TYPE(MOONCRST_SOUND, mooncrst_sound_device, "mooncrst_sound", "Mooncrst Custom Sound")
 
 galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: galaxian_sound_device(mconfig, GALAXIAN_SOUND, tag, owner, clock)
+	: galaxian_sound_device(mconfig, GALAXIAN_SOUND, tag, owner, clock)
 {
 }
 
 galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-: device_t(mconfig, type, tag, owner, clock)
-, m_discrete(*this, "discrete")
-, m_lfo_val(0)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_discrete(*this, "discrete")
+	, m_lfo_val(0)
 {
 }
 
@@ -498,7 +498,7 @@ WRITE8_MEMBER( galaxian_sound_device::sound_w )
 }
 
 mooncrst_sound_device::mooncrst_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: galaxian_sound_device(mconfig, MOONCRST_SOUND, tag, owner, clock)
+	: galaxian_sound_device(mconfig, MOONCRST_SOUND, tag, owner, clock)
 {
 }
 

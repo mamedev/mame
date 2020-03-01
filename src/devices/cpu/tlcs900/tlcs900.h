@@ -788,7 +788,7 @@ private:
 	devcb_write8   m_porte_write;
 
 	// analogue inputs, sampled at 10 bits
-	devcb_read16   m_an_read[8];
+	devcb_read16::array<8> m_an_read;
 };
 
 #endif // MAME_CPU_TLCS900_TLCS900_H

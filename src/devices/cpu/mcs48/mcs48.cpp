@@ -92,9 +92,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "mcs48.h"
 #include "mcs48dsm.h"
+
+#include "debugger.h"
 
 
 /***************************************************************************
@@ -218,11 +219,11 @@ mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type ty
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, ( ( ram_size == 64 ) ? 6 : ( ( ram_size == 128 ) ? 7 : 8 ) ), 0
 					, (ram_size == 64) ? address_map_constructor(FUNC(mcs48_cpu_device::data_6bit), this) : (ram_size == 128) ? address_map_constructor(FUNC(mcs48_cpu_device::data_7bit), this) : address_map_constructor(FUNC(mcs48_cpu_device::data_8bit), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
-	, m_port_in_cb{{*this}, {*this}}
-	, m_port_out_cb{{*this}, {*this}}
+	, m_port_in_cb(*this)
+	, m_port_out_cb(*this)
 	, m_bus_in_cb(*this)
 	, m_bus_out_cb(*this)
-	, m_test_in_cb{{*this}, {*this}}
+	, m_test_in_cb(*this)
 	, m_t0_clk_func(*this)
 	, m_prog_out_cb(*this)
 	, m_psw(0)
@@ -1119,14 +1120,11 @@ void mcs48_cpu_device::device_start()
 	m_io = (m_feature_mask & EXT_BUS_FEATURE) != 0 ? &space(AS_IO) : nullptr;
 
 	// resolve callbacks
-	for (auto &cb : m_port_in_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_port_out_cb)
-		cb.resolve_safe();
+	m_port_in_cb.resolve_all_safe(0xff);
+	m_port_out_cb.resolve_all_safe();
 	m_bus_in_cb.resolve_safe(0xff);
 	m_bus_out_cb.resolve_safe();
-	for (auto &cb : m_test_in_cb)
-		cb.resolve_safe(0);
+	m_test_in_cb.resolve_all_safe(0);
 	m_prog_out_cb.resolve_safe();
 
 	/* set up the state table */

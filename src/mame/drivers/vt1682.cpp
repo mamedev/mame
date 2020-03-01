@@ -59,8 +59,8 @@
 */
 
 #include "emu.h"
-#include "machine/m6502_vt1682.h"
-#include "machine/m6502_vh2009.h"
+#include "machine/m6502_swap_op_d2_d7.h"
+#include "machine/m6502_swap_op_d5_d6.h"
 #include "machine/vt1682_io.h"
 #include "machine/vt1682_uio.h"
 #include "machine/vt1682_alu.h"
@@ -113,11 +113,11 @@ public:
 		m_bank(*this, "cartbank"),
 		m_screen(*this, "screen"),
 		m_soundcpu(*this, "soundcpu"),
-		m_maincpu_alu(*this, "mainalu"),
-		m_soundcpu_alu(*this, "soundalu"),
 		m_soundcpu_timer_a_dev(*this, "snd_timera_dev"),
 		m_soundcpu_timer_b_dev(*this, "snd_timerb_dev"),
 		m_system_timer_dev(*this, "sys_timer_dev"),
+		m_maincpu_alu(*this, "mainalu"),
+		m_soundcpu_alu(*this, "soundalu"),
 		m_spriteram(*this, "spriteram"),
 		m_vram(*this, "vram"),
 		m_sound_share(*this, "sound_share"),
@@ -141,19 +141,30 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 	void vt_vt1682_map(address_map& map);
+	void vt_vt1682_sound_map(address_map& map);
 
 	required_device<address_map_bank_device> m_fullrom;
 	required_memory_bank m_bank;
 	required_device<screen_device> m_screen;
-
-private:
 	required_device<cpu_device> m_soundcpu;
-	required_device<vrt_vt1682_alu_device> m_maincpu_alu;
-	required_device<vrt_vt1682_alu_device> m_soundcpu_alu;
+
+	DECLARE_WRITE_LINE_MEMBER(soundcpu_timera_irq);
+	DECLARE_WRITE_LINE_MEMBER(soundcpu_timerb_irq);
+
+	DECLARE_WRITE_LINE_MEMBER(maincpu_timer_irq);
 
 	required_device<vrt_vt1682_timer_device> m_soundcpu_timer_a_dev;
 	required_device<vrt_vt1682_timer_device> m_soundcpu_timer_b_dev;
 	required_device<vrt_vt1682_timer_device> m_system_timer_dev;
+
+	void vt_vt1682_ntscbase(machine_config& config);
+	void vt_vt1682_palbase(machine_config& config);
+	void vt_vt1682_common(machine_config& config);
+
+private:
+	required_device<vrt_vt1682_alu_device> m_maincpu_alu;
+	required_device<vrt_vt1682_alu_device> m_soundcpu_alu;
+
 
 	required_device<address_map_bank_device> m_spriteram;
 	required_device<address_map_bank_device> m_vram;
@@ -163,9 +174,6 @@ private:
 	required_device<timer_device> m_render_timer;
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
-	void vt_vt1682_sound_map(address_map& map);
-
-
 
 	void rom_map(address_map& map);
 
@@ -565,11 +573,6 @@ private:
 
 	/* Support */
 
-	DECLARE_WRITE_LINE_MEMBER(soundcpu_timera_irq);
-	DECLARE_WRITE_LINE_MEMBER(soundcpu_timerb_irq);
-
-	DECLARE_WRITE_LINE_MEMBER(maincpu_timer_irq);
-
 	DECLARE_WRITE8_MEMBER(vt1682_timer_enable_trampoline_w)
 	{
 		// this is used for raster interrpt effects, despite not being a scanline timer, so knowing when it triggers is useful, so trampoline it to avoid passing m_screen to the device
@@ -626,10 +629,10 @@ public:
 	void intech_interact(machine_config& config);
 	void intech_interact_bank(machine_config& config);
 
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(portb_r) { return 0x00;/*uint8_t ret = machine().rand() & 0xf; LOGMASKED(LOG_OTHER, "%s: portb_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_READ8_MEMBER(portd_r) { return 0x00;/*uint8_t ret = machine().rand() & 0xf; LOGMASKED(LOG_OTHER, "%s: portd_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
+	virtual DECLARE_READ8_MEMBER(porta_r);
+	virtual DECLARE_READ8_MEMBER(portb_r) { return 0x00;/*uint8_t ret = machine().rand() & 0xf; LOGMASKED(LOG_OTHER, "%s: portb_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
+	virtual DECLARE_READ8_MEMBER(portc_r);
+	virtual DECLARE_READ8_MEMBER(portd_r) { return 0x00;/*uint8_t ret = machine().rand() & 0xf; LOGMASKED(LOG_OTHER, "%s: portd_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
 
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
@@ -653,6 +656,24 @@ private:
 	required_ioport m_io_p2;
 	required_ioport m_io_p3;
 	required_ioport m_io_p4;
+};
+
+class vt1682_dance_state : public vt_vt1682_state
+{
+public:
+	vt1682_dance_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt_vt1682_state(mconfig, type, tag),
+		m_io_p1(*this, "IN0")
+	{ }
+
+	void vt1682_dance(machine_config& config);
+
+protected:
+	DECLARE_READ8_MEMBER(uio_porta_r);
+	DECLARE_WRITE8_MEMBER(uio_porta_w);
+
+private:
+	required_ioport m_io_p1;
 };
 
 class vt1682_exsport_state : public vt_vt1682_state
@@ -2756,18 +2777,28 @@ READ8_MEMBER(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_r)
 WRITE8_MEMBER(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_w)
 {
 	// PQ2 Enable is also used for ROM banking along with Program Bank 0 select
+	uint32_t clock = m_maincpu->clock();
 
 	LOGMASKED(LOG_OTHER, "%s: vt1682_210b_misc_cs_prg0_bank_sel_w writing: %02x\n", machine().describe_context(), data);
 	m_210b_misc_cs_prg0_bank_sel = data;
 
-	// TODO: allow PAL
 	if (data & 0x80)
 	{
-		m_system_timer_dev->set_clock(TIMER_ALT_SPEED_NTSC);
+		if (clock == 21477272/4)
+			m_system_timer_dev->set_clock(TIMER_ALT_SPEED_NTSC);
+		else if (clock == 26601712/5)
+			m_system_timer_dev->set_clock(TIMER_ALT_SPEED_PAL);
+		else
+			logerror("setting alt timings with unknown main CPU frequency %d\n", clock);
 	}
 	else
 	{
-		m_system_timer_dev->set_clock(MAIN_CPU_CLOCK_NTSC);
+		if (clock == 21477272/4)
+			m_system_timer_dev->set_clock(MAIN_CPU_CLOCK_NTSC);
+		else if (clock == 26601712/5)
+			m_system_timer_dev->set_clock(MAIN_CPU_CLOCK_PAL);
+		else
+			logerror("setting alt timings with unknown main CPU frequency %d\n", clock);
 	}
 
 	update_banks();
@@ -5400,24 +5431,15 @@ static GFXDECODE_START( gfx_test )
 GFXDECODE_END
 
 
-
-
-void vt_vt1682_state::vt_vt1682(machine_config &config)
+void vt_vt1682_state::vt_vt1682_ntscbase(machine_config& config)
 {
 	/* basic machine hardware */
-	M6502_VT1682(config, m_maincpu, MAIN_CPU_CLOCK_NTSC);
+	M6502_SWAP_OP_D2_D7(config, m_maincpu, MAIN_CPU_CLOCK_NTSC);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_map);
 	//m_maincpu->set_vblank_int("screen", FUNC(vt_vt1682_state::nmi));
 
 	M6502(config, m_soundcpu, SOUND_CPU_CLOCK_NTSC);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_sound_map);
-
-	TIMER(config, "scantimer").configure_scanline(FUNC(vt_vt1682_state::scanline), "screen", 0, 1);
-	TIMER(config, m_render_timer).configure_periodic(FUNC(vt_vt1682_state::line_render_start), attotime::never);
-
-	VT_VT1682_ALU(config, m_maincpu_alu, 0);
-	VT_VT1682_ALU(config, m_soundcpu_alu, 0);
-	m_soundcpu_alu->set_sound_alu(); // different logging conditions
 
 	VT_VT1682_TIMER(config, m_soundcpu_timer_a_dev, SOUND_CPU_CLOCK_NTSC);
 	m_soundcpu_timer_a_dev->write_irq_callback().set(FUNC(vt_vt1682_state::soundcpu_timera_irq));
@@ -5426,6 +5448,50 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	m_soundcpu_timer_b_dev->write_irq_callback().set(FUNC(vt_vt1682_state::soundcpu_timerb_irq));
 	VT_VT1682_TIMER(config, m_system_timer_dev, MAIN_CPU_CLOCK_NTSC);
 	m_system_timer_dev->write_irq_callback().set(FUNC(vt_vt1682_state::maincpu_timer_irq));
+
+	/* video hardware */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(300, 262); // 262 for NTSC, might be 261 if Vblank line is changed
+	m_screen->set_visarea(0, 256-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(vt_vt1682_state::screen_update));
+}
+
+void vt_vt1682_state::vt_vt1682_palbase(machine_config& config)
+{
+	M6502_SWAP_OP_D2_D7(config, m_maincpu, MAIN_CPU_CLOCK_PAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_map);
+	//m_maincpu->set_vblank_int("screen", FUNC(vt_vt1682_state::nmi));
+
+	M6502(config, m_soundcpu, SOUND_CPU_CLOCK_PAL);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_sound_map);
+
+	VT_VT1682_TIMER(config, m_soundcpu_timer_a_dev, SOUND_CPU_CLOCK_PAL);
+	m_soundcpu_timer_a_dev->write_irq_callback().set(FUNC(vt_vt1682_state::soundcpu_timera_irq));
+	m_soundcpu_timer_a_dev->set_sound_timer(); // different logging conditions
+	VT_VT1682_TIMER(config, m_soundcpu_timer_b_dev, SOUND_CPU_CLOCK_PAL);
+	m_soundcpu_timer_b_dev->write_irq_callback().set(FUNC(vt_vt1682_state::soundcpu_timerb_irq));
+	VT_VT1682_TIMER(config, m_system_timer_dev, MAIN_CPU_CLOCK_PAL);
+	m_system_timer_dev->write_irq_callback().set(FUNC(vt_vt1682_state::maincpu_timer_irq));
+
+	/* video hardware */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_refresh_hz(50.0070);
+	m_screen->set_size(300, 312); // 312? for PAL
+	m_screen->set_visarea(0, 256-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(vt_vt1682_state::screen_update));
+}
+
+void vt_vt1682_state::vt_vt1682_common(machine_config& config)
+{
+	TIMER(config, "scantimer").configure_scanline(FUNC(vt_vt1682_state::scanline), "screen", 0, 1);
+	TIMER(config, m_render_timer).configure_periodic(FUNC(vt_vt1682_state::line_render_start), attotime::never);
+
+	VT_VT1682_ALU(config, m_maincpu_alu, 0);
+	VT_VT1682_ALU(config, m_soundcpu_alu, 0);
+	m_soundcpu_alu->set_sound_alu(); // different logging conditions
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -5441,14 +5507,6 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	VT_VT1682_IO(config, m_io, 0);
 	VT_VT1682_UIO(config, m_uio, 0);
 
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(300, 262); // 262 for NTSC, might be 261 if Vblank line is changed
-	m_screen->set_visarea(0, 256-1, 0, 240-1);
-	m_screen->set_screen_update(FUNC(vt_vt1682_state::screen_update));
-
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -5461,6 +5519,13 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	voltage_regulator_device &rightvref(VOLTAGE_REGULATOR(config, "rightvref", 0));
 	rightvref.add_route(0, "rightdac", 1.0, DAC_VREF_POS_INPUT);
 	rightvref.add_route(0, "rightdac", -1.0, DAC_VREF_NEG_INPUT);
+}
+
+
+void vt_vt1682_state::vt_vt1682(machine_config &config)
+{
+	vt_vt1682_ntscbase(config);
+	vt_vt1682_common(config);
 }
 
 void intec_interact_state::machine_start()
@@ -5579,6 +5644,18 @@ static INPUT_PORTS_START( miwi2 )
 
 	PORT_MODIFY("IN3") // the 2nd drum appears to act like a single 2nd player controller? (even if none of the player 2 controls work in this port for intec?)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // Pink Drum in Drum Master
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( 110dance )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Pad Up-Right")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Pad Up-Left")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Back")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Select / Start")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Pad Up") PORT_16WAY // NOT A JOYSTICK!!
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Pad Down") PORT_16WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Pad Left") PORT_16WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Pad Right") PORT_16WAY
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( exsprt48 )
@@ -5730,7 +5807,8 @@ WRITE8_MEMBER(vt1682_exsport_state::uiob_w)
 
 void intec_interact_state::intech_interact(machine_config& config)
 {
-	vt_vt1682_state::vt_vt1682(config);
+	vt_vt1682_ntscbase(config);
+	vt_vt1682_common(config);
 
 	m_io->porta_in().set(FUNC(intec_interact_state::porta_r));
 	m_io->porta_out().set(FUNC(intec_interact_state::porta_w));
@@ -5755,6 +5833,20 @@ void intec_interact_state::intech_interact(machine_config& config)
 	m_rightdac->add_route(0, "mono", 0.5);
 }
 
+
+
+READ8_MEMBER(vt1682_dance_state::uio_porta_r)
+{
+	uint8_t ret = m_io_p1->read();
+	logerror("%s: porta_r returning: %02x (INPUTS)\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt1682_dance_state::uio_porta_w)
+{
+	logerror("%s: porta_w writing: %02x (INPUTS)\n", machine().describe_context(), data);
+}
+
 void intec_interact_state::intech_interact_bank(machine_config& config)
 {
 	intech_interact(config);
@@ -5764,7 +5856,8 @@ void intec_interact_state::intech_interact_bank(machine_config& config)
 
 void vt1682_exsport_state::vt1682_exsport(machine_config& config)
 {
-	vt_vt1682_state::vt_vt1682(config);
+	vt_vt1682_ntscbase(config);
+	vt_vt1682_common(config);
 
 	m_uio->portb_in().set(FUNC(vt1682_exsport_state::uiob_r));
 	m_uio->portb_out().set(FUNC(vt1682_exsport_state::uiob_w));
@@ -5772,18 +5865,45 @@ void vt1682_exsport_state::vt1682_exsport(machine_config& config)
 
 void vt1682_exsport_state::vt1682_exsportp(machine_config& config)
 {
-	vt_vt1682_state::vt_vt1682(config);
-	// TODO, different clocks, timings etc.!
-	m_screen->set_refresh_hz(50);
+	vt_vt1682_palbase(config);
+	vt_vt1682_common(config);
+
+	m_uio->portb_in().set(FUNC(vt1682_exsport_state::uiob_r));
+	m_uio->portb_out().set(FUNC(vt1682_exsport_state::uiob_w));
 }
 
+void vt1682_dance_state::vt1682_dance(machine_config& config)
+{
+	vt_vt1682_palbase(config);
+	vt_vt1682_common(config);
+
+	M6502(config.replace(), m_maincpu, MAIN_CPU_CLOCK_PAL); // no opcode bitswap
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt1682_dance_state::vt_vt1682_map);
+
+	m_leftdac->reset_routes();
+	m_rightdac->reset_routes();
+
+	config.device_remove(":lspeaker");
+	config.device_remove(":rspeaker");
+
+	SPEAKER(config, "mono").front_center();
+	m_leftdac->add_route(0, "mono", 0.5);
+	m_rightdac->add_route(0, "mono", 0.5);
+
+	m_uio->porta_in().set(FUNC(vt1682_dance_state::uio_porta_r));
+	m_uio->porta_out().set(FUNC(vt1682_dance_state::uio_porta_w));
+}
 
 
 void vt1682_wow_state::vt1682_wow(machine_config& config)
 {
-	vt1682_exsport_state::vt1682_exsport(config);
+	vt_vt1682_palbase(config);
+	vt_vt1682_common(config);
 
-	M6502_VH2009(config.replace(), m_maincpu, MAIN_CPU_CLOCK_NTSC); // doesn't use the same bitswap as the other VT1682 games...
+	m_uio->portb_in().set(FUNC(vt1682_exsport_state::uiob_r));
+	m_uio->portb_out().set(FUNC(vt1682_exsport_state::uiob_w));
+
+	M6502_SWAP_OP_D5_D6(config.replace(), m_maincpu, MAIN_CPU_CLOCK_NTSC); // doesn't use the same bitswap as the other VT1682 games...
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt1682_wow_state::vt_vt1682_map);
 }
 
@@ -5851,7 +5971,7 @@ ROM_START( exsprt48 )
 ROM_END
 
 // differs by 2 bytes from above, the rasters glitch in MotorStorm in a different way, so it's likely an NTSC/PAL difference?
-ROM_START( exsprt48a )
+ROM_START( itvg48 )
 	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "48in1sports.bin", 0x00000, 0x2000000, CRC(8e490541) SHA1(aeb01b3d7229fc888b36aaa924fe6b10597a7783) )
 ROM_END
@@ -5862,6 +5982,10 @@ ROM_START( wowwg )
 	ROM_RELOAD(0x1000000,0x1000000)
 ROM_END
 
+ROM_START( 110dance )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "110songdancemat.bin", 0x00000, 0x2000000, CRC(cd668e41) SHA1(975bfe05f4cce047860b05766bc8539218f6014f) )
+ROM_END
 
 
 // TODO: this is a cartridge based system (actually, verify this, it seems some versions simply had built in games) move these to SL if verified as from cartridge config
@@ -5903,13 +6027,12 @@ CONS( 200?, intg5410,  0,  0,  intech_interact_bank, miwi2, intec_interact_state
 
 
 // the timing code for MotorStorm differs between these sets (although fails wiht our emulation in both cases, even if the game runs fine in other collections)
-CONS( 200?, exsprt48,   0,         0,  vt1682_exsport,    exsprt48, vt1682_exsport_state, regular_init,  "Excite", "Excite Sports Wireless Interactive TV Game - 48-in-1 (set 1, NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "32 Arcade, 8 Sports, 8 Stadium"
-CONS( 200?, exsprt48a,  exsprt48,  0,  vt1682_exsportp,   exsprt48, vt1682_exsport_state, regular_init,  "Excite", "Excite Sports Wireless Interactive TV Game - 48-in-1 (set 2, PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // ^
-
+CONS( 200?, exsprt48,   0,         0,  vt1682_exsport,    exsprt48, vt1682_exsport_state, regular_init,  "Excite", "Excite Sports Wireless Interactive TV Game - 48-in-1 (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "32 Arcade, 8 Sports, 8 Stadium"
+CONS( 200?, itvg48,     exsprt48,  0,  vt1682_exsportp,   exsprt48, vt1682_exsport_state, regular_init,  "TaiKee", "Interactive TV Games 48-in-1 (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // ^
 /*
-There is at least one alt US version of this also on VT1682
+There is at least one alt US version of Excite Sports Wireless Interactive TV Game - 48-in-1 also on VT1682
 
-Still advertised as 48-in-1, 8 Interactive Sports Games, 8 Olympic games, 32 Arcade Games
+It is still advertised as 48-in-1, 8 Interactive Sports Games, 8 Olympic games, 32 Arcade Games
 see https://www.youtube.com/watch?v=tHMX71daHAk
 Changes:
 Dancing as extra under Music
@@ -5919,5 +6042,10 @@ Ball Shoot instead of 'Noshery' under Arcade
 This might be a regional / store thing if some places didn't want to sell a unit with a Poker game in it?
 */
 
-CONS( 200?, wowwg,  0,  0,  vt1682_wow, exsprt48, vt1682_wow_state, regular_init, "Wow", "Wow Wireless Gaming", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // needs high colour line mode for main menu
-// NJ Pocket 60-in-1 (NJ-250) is meant to have similar games, so might fit here
+// Timings are broken in the Bomberman game ('Explosion') even on real hardware (raster effect to keep status bar in place doesn't work) because the game is still coded to use NTSC timings even if this is a PAL unit.  This was fixed in other PAL releases (eg. 110dance)
+// 'Riding Horse' on the other hand actually needs PAL timings, so this unit clearly was designed for PAL regions, however 'Explosion' was left broken.
+CONS( 200?, wowwg,  0,  0,  vt1682_wow, exsprt48, vt1682_wow_state, regular_init, "Wow", "Wow Wireless Gaming (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // needs high colour line mode for main menu
+
+CONS( 200?, 110dance,  0,  0,  vt1682_dance, 110dance, vt1682_dance_state, regular_init, "<unknown>", "Retro Dance Mat (110 song Super StepMania + 9-in-1 games) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+
+// NJ Pocket 60-in-1 (NJ-250) is meant to have similar games to the mini-games found in wowwg and 110dance, so almost certainly fits here

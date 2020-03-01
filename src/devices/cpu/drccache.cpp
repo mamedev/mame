@@ -245,7 +245,7 @@ void drc_cache::request_oob_codegen(drc_oob_delegate callback, void *param1, voi
 	new (oob) oob_handler();
 
 	// fill it in
-	oob->m_callback = callback;
+	oob->m_callback = std::move(callback);
 	oob->m_param1 = param1;
 	oob->m_param2 = param2;
 

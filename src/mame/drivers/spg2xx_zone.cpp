@@ -46,8 +46,10 @@ public:
 	{ }
 
 	void zone40(machine_config &config);
+	void zone40p(machine_config &config);
 
 	void init_zone40();
+	void init_reactmd();
 
 
 protected:
@@ -60,7 +62,9 @@ private:
 	DECLARE_READ16_MEMBER(zone40_porta_r);
 	DECLARE_WRITE16_MEMBER(zone40_porta_w);
 	required_region_ptr<uint16_t> m_romregion;
-	uint8_t m_z40_rombase;
+	uint16_t m_z40_rombase;
+	uint16_t m_porta_dat;
+	int m_romsize;
 };
 
 
@@ -105,17 +109,24 @@ WRITE16_MEMBER(zone40_state::zone40_porta_w)
 {
 	wireless60_porta_w(space, offset, data);
 
-	if ((data & 0x00ff) != m_z40_rombase)
-	{
-		m_z40_rombase = data & 0x00ff;
-		m_maincpu->invalidate_cache();
-	}
+	m_z40_rombase = (m_z40_rombase & 0xff00) | (data & 0x0ff);
+
+	// toggled twice before games in the same 64MB bank, toggled once before games in a different 64MB bank
+	if ((data & 0x2000) && (!(m_porta_dat & 0x2000)))
+		m_z40_rombase ^= 0x0100;
+
+	m_porta_dat = data;
+
+	//logerror("%s: zone40_porta_w %04x z80 bank is now %04x \n", machine().describe_context(), data, m_z40_rombase);
+
+	m_maincpu->invalidate_cache();
+
 }
 
 READ16_MEMBER(zone40_state::zone40_porta_r)
 {
 	uint16_t ret = wireless60_porta_r(space, offset) & (0x0300 | m_w60_p1_ctrl_mask | m_w60_p2_ctrl_mask);
-	ret = (ret & 0xff00) | m_z40_rombase;
+	ret = (ret & 0xdf00) | (m_porta_dat & 0x20ff);
 	return ret;
 }
 
@@ -123,7 +134,7 @@ READ16_MEMBER(zone40_state::zone40_porta_r)
 READ16_MEMBER(zone40_state::z40_rom_r)
 {
 	// due to granularity of rom bank this manual method is safer
-	return m_romregion[(offset + (m_z40_rombase * 0x20000)) & 0x1ffffff];
+	return m_romregion[(offset + (m_z40_rombase * 0x20000)) & (m_romsize-1)];
 }
 
 void zone40_state::mem_map_z40(address_map &map)
@@ -147,10 +158,14 @@ void zone40_state::machine_start()
 	wireless60_state::machine_start();
 
 	save_item(NAME(m_z40_rombase));
+	save_item(NAME(m_porta_dat));
 
 	m_z40_rombase = 0xe0;
+	m_porta_dat = 0x20e0;
 	m_w60_p1_ctrl_mask = 0x0400;
 	m_w60_p2_ctrl_mask = 0x1000;
+
+	m_romsize = (memregion("maincpu")->bytes()/2);
 }
 
 void wireless60_state::machine_reset()
@@ -163,7 +178,7 @@ void wireless60_state::machine_reset()
 void zone40_state::machine_reset()
 {
 	wireless60_state::machine_reset();
-	m_z40_rombase = 0xe0;
+	m_z40_rombase = 0x1e0;
 	m_maincpu->invalidate_cache();
 	m_maincpu->reset();
 }
@@ -214,6 +229,13 @@ void zone40_state::zone40(machine_config &config)
 	m_maincpu->porta_in().set(FUNC(zone40_state::zone40_porta_r));
 }
 
+void zone40_state::zone40p(machine_config &config)
+{
+	zone40(config);
+	m_maincpu->set_pal(true);
+	m_screen->set_refresh_hz(50);
+}
+
 
 void wireless60_state::init_lx_jg7415()
 {
@@ -252,17 +274,49 @@ void zone40_state::init_zone40()
 
 	for (int i = 0; i < size/2; i++)
 	{
-		ROM[i] = ROM[i] ^ 0xbb88;
-
 		ROM[i] = bitswap<16>(ROM[i], 11, 10, 3,  2,  4,  12, 5,  13,
 									 9,  1,  8,  0,  6,  7,  14, 15);
+
+		ROM[i] = ROM[i] ^ 0xa5a5;
 	}
 }
+
+
+void zone40_state::init_reactmd()
+{
+	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
+
+	for (int i = 0; i < size/2; i++)
+	{
+		ROM[i] = bitswap<16>(ROM[i], 15, 13, 14, 12,  7,  6,  5,  4,
+									 11, 10, 9,  8,   3,  1,  2,  0);
+
+		ROM[i] = ROM[i] ^ 0xa5a5;
+	}
+}
+
+
 
 ROM_START( zone40 )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "zone40.bin", 0x0000, 0x4000000, CRC(4ba1444f) SHA1(de83046ab93421486668a247972ad6d3cda19440) )
 ROM_END
+
+ROM_START( reactmd )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 ) // this contains the SunPlus games
+	ROM_LOAD16_WORD_SWAP( "reactor_md_sunplus-full.bin", 0x0000, 0x4000000, CRC(843aa58c) SHA1(07cdc6d4aa0057939c145ece01a9aca73c7f1f2b) )
+	ROM_IGNORE(0x4000000) // the 2nd half of the ROM can't be accessed by the PCB (address line tied low) (contains garbage? data)
+
+	ROM_REGION( 0x2000000, "mdrom", ROMREGION_ERASE00 ) // this contains the MD games and main boot menu
+	ROM_LOAD16_WORD_SWAP( "reactormd.bin", 0x0000, 0x2000000, CRC(fe9664a4) SHA1(d475b524f576c9d1d90aed20c7467cc652396baf) )
+ROM_END
+
+ROM_START( itvg49 )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "49in1sports.bin", 0x0000, 0x8000000, CRC(bb8a1c4e) SHA1(a493177de7365037b67ead0155a902313722a61c) )
+ROM_END
+
 
 ROM_START( zone60 )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
@@ -287,12 +341,18 @@ ROM_START( lx_jg7415 )
 	ROM_LOAD16_WORD_SWAP( "rom.bin", 0x0000, 0x10000000, CRC(59442e00) SHA1(7e91cf6b19c37f9b4fa4dc21e241c6634d6a6f95) )
 ROM_END
 
-// these don't have real motion controls
-CONS( 2009, zone40,   0, 0, zone40,     wirels60, zone40_state,      init_zone40,     "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 40",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2010, zone60,   0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle's Soft / Ultimate Products (HK) Ltd",  "Zone 60",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, zone100,  0, 0, wireless60, wirels60, wireless60_state,  init_zone100,    "Jungle's Soft / Ultimate Products (HK) Ltd",  "Zone 100",    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit was black, menus still show white controllers, unlike wireless 60
-CONS( 2010, wirels60, 0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle Soft / Kids Station Toys Inc",         "Wireless 60", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2011, lx_jg7415,0, 0, wireless60, wirels60, wireless60_state,  init_lx_jg7415,  "Lexibook",  "Lexibook JG7415 120-in-1",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2009, zone40,   0, 0, zone40,     wirels60, zone40_state,      init_zone40,     "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 40",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, itvg49,   0, 0, zone40p,    wirels60, zone40_state,      init_reactmd,    "TaiKee",                                      "Interactive TV Games 49-in-1 (PAL)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Badminton hangs, otherwise everything runs
+
+CONS( 2010, zone60,   0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle's Soft / Ultimate Products (HK) Ltd",  "Zone 60",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, zone100,  0, 0, wireless60, wirels60, wireless60_state,  init_zone100,    "Jungle's Soft / Ultimate Products (HK) Ltd",  "Zone 100",                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit was black, menus still show white controllers, unlike wireless 60
+CONS( 2010, wirels60, 0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle Soft / Kids Station Toys Inc",         "Wireless 60",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2011, lx_jg7415,0, 0, wireless60, wirels60, wireless60_state,  init_lx_jg7415,  "Lexibook",                                    "Lexibook JG7415 120-in-1",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 
+// Two systems in one unit - Genesis on a Chip and SunPlus, only the SunPlus part is currently emulated.  Genesis on a chip is a very poor implementation with many issues on real hardware.
+// This should actually boot to a menu on the MD size, with the SunPlus only being enabled if selected from that menu.  MD side menu runs in some enhanced / custom MD mode tho.
+// Badminton hangs, as it does in the 49-in-1 above
+CONS( 2009, reactmd,  0, 0, zone40p,    wirels60, zone40_state,      init_reactmd,    "AtGames / Sega",                              "Reactor MD (PAL)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

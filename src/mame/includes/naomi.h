@@ -27,6 +27,7 @@ naomi.h -> NAOMI includes
 #include "machine/jvsdev.h"
 #include "machine/jvs13551.h"
 #include "machine/m3comm.h"
+#include "machine/gunsense.h"
 #include "dc.h"
 
 enum {
@@ -50,6 +51,7 @@ class naomi_state : public dc_state
 	void naomi_base(machine_config &config);
 	void naomim2(machine_config &config);
 	void naomim2_kb(machine_config &config);
+	void naomim2_gun(machine_config &config);
 	void naomi(machine_config &config);
 	void naomim1(machine_config &config);
 	void naomigd(machine_config &config);

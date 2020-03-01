@@ -3,7 +3,7 @@
 /********************************************************************
  Eolith 32 bits hardware: Gradation 2D system
 
- driver by Tomasz Slanina    analog [at] op.pl
+ driver by Tomasz Slanina
  and       Pierpaolo Prazzoli
 
  Main CPU:

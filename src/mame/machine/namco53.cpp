@@ -140,12 +140,12 @@ ROM_END
 
 DEFINE_DEVICE_TYPE(NAMCO_53XX, namco_53xx_device, "namco53", "Namco 53xx")
 
-namco_53xx_device::namco_53xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_53XX, tag, owner, clock),
+namco_53xx_device::namco_53xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NAMCO_53XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
 	m_portO(0),
 	m_k(*this),
-	m_in{ { *this }, { *this }, { *this }, { *this } },
+	m_in(*this),
 	m_p(*this)
 {
 }
@@ -157,8 +157,7 @@ void namco_53xx_device::device_start()
 {
 	/* resolve our read/write callbacks */
 	m_k.resolve_safe(0);
-	for (devcb_read8 &cb : m_in)
-		cb.resolve_safe(0);
+	m_in.resolve_all_safe(0);
 	m_p.resolve_safe();
 
 	m_irq_cleared_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namco_53xx_device::irq_clear), this));

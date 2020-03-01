@@ -35,8 +35,8 @@ DEFINE_DEVICE_TYPE(VRENDER0_SOC, vrender0soc_device, "vrender0", "MagicEyes VRen
 //  vrender0soc_device - constructor
 //-------------------------------------------------
 
-vrender0soc_device::vrender0soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VRENDER0_SOC, tag, owner, clock),
+vrender0soc_device::vrender0soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, VRENDER0_SOC, tag, owner, clock),
 	m_host_cpu(*this, finder_base::DUMMY_TAG),
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
@@ -46,7 +46,7 @@ vrender0soc_device::vrender0soc_device(const machine_config &mconfig, const char
 	m_rspeaker(*this, "rspeaker"),
 	m_uart(*this, "uart%u", 0),
 	m_crtcregs(*this, "crtcregs"),
-	write_tx{ { *this }, { *this } }
+	write_tx(*this)
 {
 }
 
@@ -131,9 +131,9 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	VIDEO_VRENDER0(config, m_vr0vid, 14318180);
-	#ifdef IDLE_LOOP_SPEEDUP
+#ifdef IDLE_LOOP_SPEEDUP
 	m_vr0vid->idleskip_cb().set(FUNC(vrender0soc_device::idle_skip_speedup_w));
-	#endif
+#endif
 
 	PALETTE(config, m_palette, palette_device::RGB_565);
 
@@ -168,8 +168,7 @@ void vrender0soc_device::device_start()
 	for (i = 0; i < 4; i++)
 		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb),this), (void*)(uintptr_t)i);
 
-	for (auto &cb : write_tx)
-		cb.resolve_safe();
+	write_tx.resolve_all_safe();
 
 	for (i = 0; i < 2; i++)
 	{

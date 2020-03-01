@@ -1,8 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
-/* 'Zone' systems */
-
 #include "emu.h"
 #include "includes/spg2xx.h"
 

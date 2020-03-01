@@ -215,7 +215,7 @@ public:
 	using ptr = std::unique_ptr<file>;
 
 
-	~file();
+	~file() = default;
 
 	// create a new, empty XML file
 	static ptr create();
@@ -231,7 +231,7 @@ public:
 
 
 private:
-	file();
+	file() = default;
 };
 
 

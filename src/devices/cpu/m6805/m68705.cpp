@@ -221,8 +221,8 @@ m6805_hmos_device::m6805_hmos_device(machine_config const &mconfig, char const *
 	, m_port_input{ 0xff, 0xff, 0xff, 0xff }
 	, m_port_latch{ 0xff, 0xff, 0xff, 0xff }
 	, m_port_ddr{ 0x00, 0x00, 0x00, 0x00 }
-	, m_port_cb_r{ { *this },{ *this },{ *this },{ *this } }
-	, m_port_cb_w{ { *this },{ *this },{ *this },{ *this } }
+	, m_port_cb_r(*this)
+	, m_port_cb_w(*this)
 	, m_ram_size(ram_size)
 {
 }
@@ -412,8 +412,8 @@ void m6805_hmos_device::device_start()
 
 	// initialise digital I/O
 	for (u8 &input : m_port_input) input = 0xff;
-	for (devcb_read8 &cb : m_port_cb_r) cb.resolve();
-	for (devcb_write8 &cb : m_port_cb_w) cb.resolve_safe();
+	m_port_cb_r.resolve_all();
+	m_port_cb_w.resolve_all_safe();
 
 	add_port_latch_state<0>();
 	add_port_latch_state<1>();

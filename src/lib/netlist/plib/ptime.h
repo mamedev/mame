@@ -82,7 +82,7 @@ namespace plib
 		}
 
 		template <typename M>
-		C14CONSTEXPR ptime &operator*=(const M factor) noexcept
+		C14CONSTEXPR ptime &operator*=(const M &factor) noexcept
 		{
 			static_assert(plib::is_integral<M>::value, "Factor must be an integral type");
 			m_time *= factor;
@@ -117,32 +117,32 @@ namespace plib
 			return static_cast<mult_type>(m_time / rhs.m_time);
 		}
 
-		friend constexpr bool operator<(const ptime lhs, const ptime rhs) noexcept
+		friend constexpr bool operator<(const ptime &lhs, const ptime &rhs) noexcept
 		{
 			return (lhs.m_time < rhs.m_time);
 		}
 
-		friend constexpr bool operator>(const ptime lhs, const ptime rhs) noexcept
+		friend constexpr bool operator>(const ptime &lhs, const ptime &rhs) noexcept
 		{
 			return (rhs < lhs);
 		}
 
-		friend constexpr bool operator<=(const ptime lhs, const ptime rhs) noexcept
+		friend constexpr bool operator<=(const ptime &lhs, const ptime &rhs) noexcept
 		{
 			return !(lhs > rhs);
 		}
 
-		friend constexpr bool operator>=(const ptime lhs, const ptime rhs) noexcept
+		friend constexpr bool operator>=(const ptime &lhs, const ptime &rhs) noexcept
 		{
 			return !(lhs < rhs);
 		}
 
-		friend constexpr bool operator==(const ptime lhs, const ptime rhs) noexcept
+		friend constexpr bool operator==(const ptime &lhs, const ptime &rhs) noexcept
 		{
 			return lhs.m_time == rhs.m_time;
 		}
 
-		friend constexpr bool operator!=(const ptime lhs, const ptime rhs) noexcept
+		friend constexpr bool operator!=(const ptime &lhs, const ptime &rhs) noexcept
 		{
 			return !(lhs == rhs);
 		}

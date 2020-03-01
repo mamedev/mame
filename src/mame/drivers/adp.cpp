@@ -5,7 +5,7 @@
 adp Gauselmann (Merkur) games from '90 running on similar hardware.
 (68k + HD63484 + YM2149)
 
-Skeleton driver by TS -  analog at op.pl
+Skeleton driver by TS
 
 TODO:
 (almost everything)

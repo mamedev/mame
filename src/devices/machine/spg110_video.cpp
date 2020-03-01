@@ -344,7 +344,7 @@ READ16_MEMBER(spg110_video_device::spg110_2063_r)
 	// checks for bits 0x20 and 0x08 in the IRQ function (all IRQs point to the same place)
 
 	// HACK! jak_spdo checks for 0x400 or 0x200 starting some of the games
-	return m_video_irq_status | 0x600;
+	return m_video_irq_status | 0x0600; /* | 0x0002; */
 }
 
 WRITE16_MEMBER(spg110_video_device::spg110_2063_w)

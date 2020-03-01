@@ -1023,7 +1023,7 @@ void md_base_state::md2_pal(machine_config &config)
 
 WRITE8_MEMBER(md_base_state::megadriv_tas_callback)
 {
-	return; // writeback not allowed
+	// writeback not allowed
 }
 
 void md_base_state::megadriv_init_common()

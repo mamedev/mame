@@ -49,7 +49,7 @@ dpb7000_brush_store_card_device::dpb7000_brush_store_card_device(const machine_c
 	, m_oe_brush(false)
 	, m_brush_write(false)
 	, m_store_write_out(*this)
-	, m_data_out{{*this}, {*this}, {*this}}
+	, m_data_out(*this)
 	, m_pal(*this, "pal")
 {
 }

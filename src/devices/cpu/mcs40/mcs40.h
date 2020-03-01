@@ -185,15 +185,16 @@ private:
 	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 
 	// bus snooping callback
-	bus_cycle_delegate      m_bus_cycle_cb;
+	bus_cycle_delegate          m_bus_cycle_cb;
 
 	// output callbacks
-	devcb_write_line        m_sync_cb;
-	devcb_write_line        m_cm_rom_cb[2], m_cm_ram_cb[4];
-	devcb_write_line        m_cy_cb, m_stp_ack_cb;
+	devcb_write_line            m_sync_cb;
+	devcb_write_line::array<2>  m_cm_rom_cb;
+	devcb_write_line::array<4>  m_cm_ram_cb;
+	devcb_write_line            m_cy_cb, m_stp_ack_cb;
 
 	// 4008/4009 or 4289 output callbacks
-	devcb_write_line        m_4289_pm_cb, m_4289_f_l_cb;
+	devcb_write_line            m_4289_pm_cb, m_4289_f_l_cb;
 
 	// configuration
 	bool const  m_extended_cm;

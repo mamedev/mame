@@ -1,3 +1,4 @@
+
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 
@@ -81,6 +82,20 @@ static void ccfunc_log_write(void *param)
 	((unsp_device *)param)->cfunc_log_write();
 }
 #endif
+
+void unsp_device::cfunc_muls()
+{
+	const uint32_t op = m_core->m_arg0;
+	const uint16_t size = ((op >> 3) & 15) ? ((op >> 3) & 15) : 16;
+	const uint16_t rd = (op >> 9) & 7;
+	const uint16_t rs = op & 7;
+	execute_muls_ss(rd, rs, size);
+}
+
+static void ccfunc_muls(void *param)
+{
+	((unsp_device *)param)->cfunc_muls();
+}
 
 /***************************************************************************
     CACHE MANAGEMENT
@@ -634,12 +649,9 @@ void unsp_device::generate_add_lpc(drcuml_block &block, int32_t offset)
 
 void unsp_device::generate_update_nzsc(drcuml_block &block)
 {
-	UML_XOR(block, I1, I1, 0x0000ffff);
-	UML_SEXT(block, I1, I1, SIZE_WORD);
-	UML_SEXT(block, I2, I2, SIZE_WORD);
-	UML_CMP(block, I2, I1);
-	UML_SETc(block, uml::COND_L, I1);
-	UML_ROLINS(block, mem(&m_core->m_r[REG_SR]), I1, UNSP_S_SHIFT, UNSP_S);
+	UML_XOR(block, I1, I1, I2);
+	UML_TEST(block, I1, 0x8000);
+	UML_SETc(block, uml::COND_NZ, I2);
 
 	UML_TEST(block, I3, 0x8000);
 	UML_SETc(block, uml::COND_NZ, I1);
@@ -648,6 +660,9 @@ void unsp_device::generate_update_nzsc(drcuml_block &block)
 	UML_TEST(block, I3, 0x10000);
 	UML_SETc(block, uml::COND_NZ, I1);
 	UML_ROLINS(block, mem(&m_core->m_r[REG_SR]), I1, UNSP_C_SHIFT, UNSP_C);
+	UML_CMP(block, I2, I1);
+	UML_SETc(block, uml::COND_NE, I1);
+	UML_ROLINS(block, mem(&m_core->m_r[REG_SR]), I1, UNSP_S_SHIFT, UNSP_S);
 
 	UML_TEST(block, I3, 0x0000ffff);
 	UML_SETc(block, uml::COND_Z, I1);
@@ -767,6 +782,20 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 				UML_JMPc(block, uml::COND_NZ, skip_branch);
 				UML_TEST(block, mem(&m_core->m_r[REG_SR]), UNSP_S);
 				UML_JMPc(block, uml::COND_NZ, skip_branch);
+				break;
+
+			case 12: // JVC
+				UML_ROLAND(block, I0, mem(&m_core->m_r[REG_SR]), 32-UNSP_S_SHIFT, 1);
+				UML_ROLAND(block, I1, mem(&m_core->m_r[REG_SR]), 32-UNSP_N_SHIFT, 1);
+				UML_CMP(block, I0, I1);
+				UML_JMPc(block, uml::COND_NE, skip_branch);
+				break;
+
+			case 13: // JVS
+				UML_ROLAND(block, I0, mem(&m_core->m_r[REG_SR]), 32-UNSP_S_SHIFT, 1);
+				UML_ROLAND(block, I1, mem(&m_core->m_r[REG_SR]), 32-UNSP_N_SHIFT, 1);
+				UML_CMP(block, I0, I1);
+				UML_JMPc(block, uml::COND_E, skip_branch);
 				break;
 
 			case 14: // JMP
@@ -970,6 +999,14 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 						UML_MOV(block, mem(&m_core->m_enable_fiq), 1);
 						break;
 
+					case 4:
+						UML_MOV(block, mem(&m_core->m_fir_move), 1);
+						break;
+
+					case 5:
+						UML_MOV(block, mem(&m_core->m_fir_move), 0);
+						break;
+
 					case 8:
 						UML_MOV(block, mem(&m_core->m_enable_irq), 0);
 						break;
@@ -990,16 +1027,20 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 						// nop
 						break;
 
-					case 4: // should be 1.2 only but jak_care triggers, see notes in non-drc
-						break;
-
-					case 5: // ^^
-						break;
-
 					default:
 						logerror("unsp drc interrupt flags %02x\n", op & 0x3f);
 						return false;
 				}
+				return true;
+
+			case 0x06:
+			case 0x07:
+				if (opa == 7)
+					return false;
+
+				// MULS
+				UML_MOV(block, mem(&m_core->m_arg0), desc->opptr.w[0]);
+				UML_CALLC(block, ccfunc_muls, this);
 				return true;
 
 			default:

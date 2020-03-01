@@ -179,7 +179,7 @@ protected:
 	uint32_t m_domainAccessControl;
 	uint8_t m_decoded_access_control[16];
 
-	uint8_t m_archRev;          // ARM architecture revision (3, 4, and 5 are valid)
+	uint8_t m_archRev;          // ARM architecture revision (3, 4, 5, and 6 are valid)
 	uint32_t m_archFlags;        // architecture flags
 
 	uint32_t m_vectorbase;
@@ -674,6 +674,12 @@ class arm1176jzf_s_cpu_device : public arm11_cpu_device
 public:
 	// construction/destruction
 	arm1176jzf_s_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual DECLARE_READ32_MEMBER( arm7_rt_r_callback ) override;
+	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback ) override;
+
+protected:
+	virtual void device_reset() override;
 };
 
 class igs036_cpu_device : public arm946es_cpu_device

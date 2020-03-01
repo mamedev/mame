@@ -38,7 +38,7 @@ public:
 		: osd_module(OSD_SOUND_PROVIDER, "portaudio"), sound_module()
 	{
 	}
-	virtual ~sound_pa() { }
+	virtual ~sound_pa() = default;
 
 	virtual int init(osd_options const &options) override;
 	virtual void exit() override;

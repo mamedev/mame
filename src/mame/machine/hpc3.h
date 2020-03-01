@@ -197,11 +197,11 @@ protected:
 	devcb_write_line m_enet_reset_cb;
 	devcb_write_line m_enet_loopback_cb;
 	devcb_write_line m_enet_intr_out_cb;
-	devcb_read8 m_hd_rd_cb[2];
-	devcb_write8 m_hd_wr_cb[2];
-	devcb_read8 m_hd_dma_rd_cb[2];
-	devcb_write8 m_hd_dma_wr_cb[2];
-	devcb_write_line m_hd_reset_cb[2];
+	devcb_read8::array<2> m_hd_rd_cb;
+	devcb_write8::array<2> m_hd_wr_cb;
+	devcb_read8::array<2> m_hd_dma_rd_cb;
+	devcb_write8::array<2> m_hd_dma_wr_cb;
+	devcb_write_line::array<2> m_hd_reset_cb;
 	devcb_read8 m_bbram_rd_cb;
 	devcb_write8 m_bbram_wr_cb;
 	devcb_read_line m_eeprom_dati_cb;

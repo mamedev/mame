@@ -69,7 +69,7 @@ public:
 		: osd_module(OSD_OUTPUT_PROVIDER, "windows"), output_module(), m_output_hwnd(nullptr), m_clientlist(nullptr)
 	{
 	}
-	virtual ~output_win32() { }
+	virtual ~output_win32() = default;
 
 	virtual int init(const osd_options &options) override;
 	virtual void exit() override;
@@ -326,7 +326,7 @@ LRESULT output_win32::send_id_string(HWND hwnd, LPARAM id)
 	// allocate memory for the message
 	datalen = sizeof(copydata_id_string) + strlen(name) + 1;
 	std::vector<uint8_t> buffer(datalen);
-	copydata_id_string *temp = (copydata_id_string *)&buffer[0];
+	auto *temp = (copydata_id_string *)&buffer[0];
 	temp->id = id;
 	strcpy(temp->string, name);
 

@@ -120,9 +120,9 @@ private:
 	uint16_t read_panel_keys_register();
 	devcb_read16 m_rc_read_cb;
 	devcb_read16 m_buttons_read_cb;
-	devcb_read8 m_iodev_read_cb[16];
-	devcb_write8 m_iodev_write_cb[16];
-	devcb_read8 m_iodev_status_cb[16];
+	devcb_read8::array<16> m_iodev_read_cb;
+	devcb_write8::array<16> m_iodev_write_cb;
+	devcb_read8::array<16> m_iodev_status_cb;
 	uint8_t m_mode;
 };
 

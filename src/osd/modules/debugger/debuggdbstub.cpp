@@ -327,7 +327,7 @@ public:
 	{
 	}
 
-	virtual ~debug_gdbstub() { }
+	virtual ~debug_gdbstub() = default;
 
 	virtual int init(const osd_options &options) override;
 	virtual void exit() override;
@@ -346,9 +346,9 @@ public:
 	bool is_thread_id_ok(const char *buf);
 
 	void handle_character(char ch);
-	void send_nack(void);
-	void send_ack(void);
-	void handle_packet(void);
+	void send_nack();
+	void send_ack();
+	void handle_packet();
 
 	enum cmd_reply
 	{
@@ -387,12 +387,12 @@ public:
 
 	readbuf_state m_readbuf_state;
 
-	void generate_target_xml(void);
+	void generate_target_xml();
 
-	int readchar(void);
+	int readchar();
 
 	void send_reply(const char *str);
-	void send_stop_packet(void);
+	void send_stop_packet();
 
 private:
 	running_machine *m_machine;
@@ -449,7 +449,7 @@ int debug_gdbstub::init(const osd_options &options)
 }
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::exit(void)
+void debug_gdbstub::exit()
 {
 }
 
@@ -460,7 +460,7 @@ void debug_gdbstub::init_debugger(running_machine &machine)
 }
 
 //-------------------------------------------------------------------------
-int debug_gdbstub::readchar(void)
+int debug_gdbstub::readchar()
 {
 	// NOTE: we don't use m_socket.getc() because it does not work with
 	//       sockets (it assumes seeking is possible).
@@ -497,7 +497,7 @@ static std::string escape_packet(const std::string src)
 }
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::generate_target_xml(void)
+void debug_gdbstub::generate_target_xml()
 {
 	// Note: we do not attempt to replicate the regnum values from old
 	//       GDB clients that did not support target.xml.
@@ -622,7 +622,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 }
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::debugger_update(void)
+void debug_gdbstub::debugger_update()
 {
 	while ( true )
 	{
@@ -634,13 +634,13 @@ void debug_gdbstub::debugger_update(void)
 }
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::send_nack(void)
+void debug_gdbstub::send_nack()
 {
 	m_socket.puts("-");
 }
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::send_ack(void)
+void debug_gdbstub::send_ack()
 {
 	m_socket.puts("+");
 }
@@ -1090,7 +1090,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_Z(const char *buf)
 
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::send_stop_packet(void)
+void debug_gdbstub::send_stop_packet()
 {
 	int signal = 5; // GDB_SIGNAL_TRAP
 	std::string reply = string_format("T%02x", signal);
@@ -1119,7 +1119,7 @@ void debug_gdbstub::send_stop_packet(void)
 }
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::handle_packet(void)
+void debug_gdbstub::handle_packet()
 {
 	// For any command not supported by the stub, an empty response
 	// (‘$#00’) should be returned. That way it is possible to extend

@@ -308,6 +308,12 @@ ROM_START( sencosmo )
 	// attempts to write to 0x380000 for flash user data? different Flash type?
 ROM_END
 
+ROM_START( senstriv )
+	ROM_REGION16_BE( 0x400000, "flash", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "senariosportstriviapro_m5m29gt320_001c0020.bin", 0x000000, 0x400000, CRC(095ffbca) SHA1(d91328855a9ca542ba38253d2353545dc8b47fa4) ) // chip was 'flipped' (reverse pinout)
+	// attempts to write to 0x380000 for flash user data? different Flash type?
+ROM_END
+
 ROM_START( senmil )
 	ROM_REGION16_BE( 0x800000, "flash", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "wwtbam_nouserdata.bin", 0x000000, 0x800000, CRC(b2626df6) SHA1(f06943d63dbb1c9d211cb35b40dcb18cb8b39ecd) )
@@ -324,4 +330,5 @@ CONS( 2005, senbbs,      0,     0,        senbbs,       senbbs,    spg2xx_senari
 CONS( 2005, senapren,    0,     0,        senbbs,       senappren, spg2xx_senario_bbs_state,   empty_init, "Senario", "The Apprentice (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2005, senpmate,    0,     0,        senbbs,       senpmate,  spg2xx_senario_bbs_state,   empty_init, "Senario", "The Perfect Mate (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2005, sencosmo,    0,     0,        sencosmo,     sencosmo,  spg2xx_senario_cosmo_state, empty_init, "Senario", "Cosmo Girl (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, senstriv,    0,     0,        sencosmo,     sencosmo,  spg2xx_senario_cosmo_state, empty_init, "Senario", "Sports Trivia Professional Edition (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2005?,senmil,      0,     0,        senmil,       senmil,    spg2xx_senario_mil_state,   empty_init, "Senario", "Who Wants to Be a Millionaire? (Senario, Plug and Play, US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

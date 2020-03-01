@@ -2,21 +2,19 @@
 // copyright-holders:Ryan Holtz
 /****************************************************************************
 
-    drivers/sgi_ip2.cpp
-    SGI IRIS 3130 skeleton driver with some meat on its bones
-
-    by Ryan Holtz
+    SGI IRIS 3130 skeleton driver
 
         0x00000000 - ?              RAM (?)
         0x30000000 - 0x30017fff     ROM (3x32k)
         0x30800000 - 0x30800000     Mouse Buttons (1)
         0x31000000 - 0x31000001     Mouse Quadrature (2)
+        0x31800000 - 0x31800001     DIP Switches
         0x32000000 - 0x3200000f     DUART0 (serial console on channel B at 19200 baud 8N1, channel A set to 600 baud 8N1 (mouse?))
         0x32800000 - 0x3280000f     DUART1 (printer/modem?)
         0x33000000 - 0x330007ff     SRAM (2k)
         0x34000000 - 0x34000000     Clock Control (1)
         0x35000000 - 0x35000000     Clock Data (1)
-        0x36000000 - 0x36000000     OS Base (1)
+        0x36000000 - 0x36000000     Kernel Base (1)
         0x38000000 - 0x38000001     Status Register (2)
         0x39000000 - 0x39000000     Parity control (1)
         0x3a000000 - 0x3a000000     Multibus Protection (1)
@@ -27,10 +25,7 @@
         0x3f000000 - 0x3f000001     Stack Limit (2)
 
     TODO:
-        Hook up keyboard
-        Hook up mouse
-        Hook up graphics
-        Hook up mass storage
+        Most everything
 
     Interrupts:
         M68K:
@@ -39,376 +34,563 @@
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "imagedev/snapquik.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/mc146818.h" /* TOD clock */
-#include "machine/mc68681.h" /* DUART0, DUART1 */
+#include "machine/bankdev.h"
+#include "machine/mc146818.h"
+#include "machine/mc68681.h"
 
+#include <vector>
 
-class sgi_ip2_state : public driver_device
+#define LOG_RTC             (1 << 0)
+#define LOG_INVALID_SEGMENT (1 << 1)
+#define LOG_OTHER           (1 << 2)
+
+#define VERBOSE     (LOG_OTHER)
+
+#include "logmacro.h"
+
+class iris3000_state : public driver_device
 {
 public:
-	sgi_ip2_state(const machine_config &mconfig, device_type type, const char *tag)
+	iris3000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_duarta(*this, "duart68681a"),
 		m_duartb(*this, "duart68681b"),
-		m_bss(*this, "bss"),
-		m_ptmap(*this, "ptmap"),
-		m_rtc(*this, "rtc")
+		m_text_data_space(*this, "text_data"),
+		m_stack_space(*this, "stack"),
+		m_kernel_space(*this, "kernel"),
+		m_system_space(*this, "system"),
+		m_multibus_mem_space(*this, "multibus_mem"),
+		m_multibus_io_space(*this, "multibus_io"),
+		m_geometry_pipe_space(*this, "geometry_pipe"),
+		m_fpa_space(*this, "fpa"),
+		m_page_table_map(*this, "ptmap"),
+		m_rtc(*this, "rtc"),
+		m_dips(*this, "DIPS")
 	{
 	}
 
-	void sgi_ip2(machine_config &config);
+	void iris3130(machine_config &config);
 
-	void init_sgi_ip2();
+	DECLARE_QUICKLOAD_LOAD_MEMBER(load_romboard);
 
 private:
-	DECLARE_READ8_MEMBER(sgi_ip2_m_but_r);
-	DECLARE_WRITE8_MEMBER(sgi_ip2_m_but_w);
-	DECLARE_READ16_MEMBER(sgi_ip2_m_quad_r);
-	DECLARE_WRITE16_MEMBER(sgi_ip2_m_quad_w);
-	DECLARE_READ16_MEMBER(sgi_ip2_swtch_r);
-	DECLARE_READ8_MEMBER(sgi_ip2_clock_ctl_r);
-	DECLARE_WRITE8_MEMBER(sgi_ip2_clock_ctl_w);
-	DECLARE_READ8_MEMBER(sgi_ip2_clock_data_r);
-	DECLARE_WRITE8_MEMBER(sgi_ip2_clock_data_w);
-	DECLARE_READ8_MEMBER(sgi_ip2_os_base_r);
-	DECLARE_WRITE8_MEMBER(sgi_ip2_os_base_w);
-	DECLARE_READ16_MEMBER(sgi_ip2_status_r);
-	DECLARE_WRITE16_MEMBER(sgi_ip2_status_w);
-	DECLARE_READ8_MEMBER(sgi_ip2_parctl_r);
-	DECLARE_WRITE8_MEMBER(sgi_ip2_parctl_w);
-	DECLARE_READ8_MEMBER(sgi_ip2_mbp_r);
-	DECLARE_WRITE8_MEMBER(sgi_ip2_mbp_w);
-	DECLARE_READ32_MEMBER(sgi_ip2_ptmap_r);
-	DECLARE_WRITE32_MEMBER(sgi_ip2_ptmap_w);
-	DECLARE_READ16_MEMBER(sgi_ip2_tdbase_r);
-	DECLARE_WRITE16_MEMBER(sgi_ip2_tdbase_w);
-	DECLARE_READ16_MEMBER(sgi_ip2_tdlmt_r);
-	DECLARE_WRITE16_MEMBER(sgi_ip2_tdlmt_w);
-	DECLARE_READ16_MEMBER(sgi_ip2_stkbase_r);
-	DECLARE_WRITE16_MEMBER(sgi_ip2_stkbase_w);
-	DECLARE_READ16_MEMBER(sgi_ip2_stklmt_r);
-	DECLARE_WRITE16_MEMBER(sgi_ip2_stklmt_w);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void text_data_map(address_map &map);
+	void stack_map(address_map &map);
+	void kernel_map(address_map &map);
+	void system_map(address_map &map);
+	void multibus_mem_map(address_map &map);
+	void multibus_io_map(address_map &map);
+	void geometry_pipe_map(address_map &map);
+	void fpa_map(address_map &map);
+
+	DECLARE_READ32_MEMBER(mmu_r);
+	DECLARE_WRITE32_MEMBER(mmu_w);
+
+	DECLARE_READ8_MEMBER(mouse_buttons_r);
+	DECLARE_WRITE8_MEMBER(mouse_buttons_w);
+	DECLARE_READ16_MEMBER(mouse_quad_r);
+	DECLARE_WRITE16_MEMBER(mouse_quad_w);
+	DECLARE_READ16_MEMBER(dips_r);
+	DECLARE_READ8_MEMBER(clock_ctrl_r);
+	DECLARE_WRITE8_MEMBER(clock_ctrl_w);
+	DECLARE_READ8_MEMBER(clock_data_r);
+	DECLARE_WRITE8_MEMBER(clock_data_w);
+	DECLARE_READ8_MEMBER(kernel_base_r);
+	DECLARE_WRITE8_MEMBER(kernel_base_w);
+	DECLARE_READ16_MEMBER(status_r);
+	DECLARE_WRITE16_MEMBER(status_w);
+	DECLARE_READ8_MEMBER(parity_ctrl_r);
+	DECLARE_WRITE8_MEMBER(parity_ctrl_w);
+	DECLARE_READ8_MEMBER(multibus_prot_r);
+	DECLARE_WRITE8_MEMBER(multibus_prot_w);
+	DECLARE_READ32_MEMBER(page_table_map_r);
+	DECLARE_WRITE32_MEMBER(page_table_map_w);
+	DECLARE_READ16_MEMBER(text_data_base_r);
+	DECLARE_WRITE16_MEMBER(text_data_base_w);
+	DECLARE_READ16_MEMBER(text_data_limit_r);
+	DECLARE_WRITE16_MEMBER(text_data_limit_w);
+	DECLARE_READ16_MEMBER(stack_base_r);
+	DECLARE_WRITE16_MEMBER(stack_base_w);
+	DECLARE_READ16_MEMBER(stack_limit_r);
+	DECLARE_WRITE16_MEMBER(stack_limit_w);
+	DECLARE_READ8_MEMBER(romboard_r);
+	DECLARE_WRITE8_MEMBER(romboard_w);
 	DECLARE_WRITE_LINE_MEMBER(duarta_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
-	required_device<cpu_device> m_maincpu;
-	void sgi_ip2_map(address_map &map);
 
+	void mem_map(address_map &map);
+
+	required_device<m68020_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_mainram;
 	required_device<mc68681_device> m_duarta;
 	required_device<mc68681_device> m_duartb;
-	required_shared_ptr<uint32_t> m_bss;
-	required_shared_ptr<uint32_t> m_ptmap;
-	required_device<mc146818_device> m_rtc;
 
-	uint8_t m_mbut;
-	uint16_t m_mquad;
-	uint16_t m_tdbase;
-	uint16_t m_tdlmt;
-	uint16_t m_stkbase;
-	uint16_t m_stklmt;
-	uint8_t m_parctl;
-	uint8_t m_mbp;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
+	required_device<address_map_bank_device> m_text_data_space;
+	required_device<address_map_bank_device> m_stack_space;
+	required_device<address_map_bank_device> m_kernel_space;
+	required_device<address_map_bank_device> m_system_space;
+	required_device<address_map_bank_device> m_multibus_mem_space;
+	required_device<address_map_bank_device> m_multibus_io_space;
+	required_device<address_map_bank_device> m_geometry_pipe_space;
+	required_device<address_map_bank_device> m_fpa_space;
+
+	required_shared_ptr<uint32_t> m_page_table_map;
+	required_device<mc146818_device> m_rtc;
+	required_ioport m_dips;
+
+	enum
+	{
+		MOUSE_BUTTON_RIGHT      = 0x01,
+		MOUSE_BUTTON_MIDDLE     = 0x02,
+		MOUSE_BUTTON_LEFT       = 0x04,
+		BOARD_REV1              = 0x60, /* Board revision - #1 */
+		BOARD_REV2              = 0x50, /* Board revision - #2 */
+
+		MOUSE_XFIRE     = 0x01, /* X Quadrature Fired, active low */
+		MOUSE_XCHANGE   = 0x02, /* MOUSE_XCHANGE ? x-- : x++ */
+		MOUSE_YFIRE     = 0x04, /* Y Quadrature Fired, active low */
+		MOUSE_YCHANGE   = 0x08, /* MOUSE_YCHANGE ? y-- : y++ */
+
+		PAR_UR      = 0x01, /* Check parity on user-mode reads */
+		PAR_UW      = 0x02, /* Check parity on user-mode writes */
+		PAR_KR      = 0x04, /* Check parity on kernel-mode reads */
+		PAR_KW      = 0x08, /* Check parity on kernel-mode writes */
+		PAR_DIS0    = 0x10, /* Disable access to DUART0 and LEDs */
+		PAR_DIS1    = 0x20, /* Disable access to DUART1 */
+		PAR_MBR     = 0x40, /* Check parity on multibus reads */
+		PAR_MBW     = 0x80, /* Check parity on multibus writes */
+
+		MBP_DCACC   = 0x01, /* Display controller access (I/O page 4) */
+		MBP_UCACC   = 0x02, /* Update controller access (I/O page 3) */
+		MBP_GFACC   = 0x04, /* Allow GF access (I/O page 1) */
+		MBP_DMACC   = 0x08, /* Allow GL2 DMA access (0x8nnnnn - x0bnnnnn) */
+		MBP_LIOACC  = 0x10, /* Allow lower I/O access (0x0nnnnn - 0x7nnnnn) */
+		MBP_HIOACC  = 0x20, /* Allow upper I/O access (0x8nnnnn - 0xfnnnnn) */
+		MBP_LMACC   = 0x40, /* Allow lower memory access (0x0nnnnn - 0x7nnnnn) */
+		MBP_HMACC   = 0x80, /* Allow upper memory access (0x8nnnnn - 0xfnnnnn) */
+
+		STATUS_DIAG0        = 0,
+		STATUS_DIAG1        = 1,
+		STATUS_DIAG2        = 2,
+		STATUS_DIAG3        = 3,
+		STATUS_ENABEXT      = 4,
+		STATUS_ENABINT      = 5,
+		STATUS_BINIT        = 6,
+		STATUS_NOTBOOT      = 7,
+		STATUS_USERFPA      = 8,
+		STATUS_USERGE       = 9,
+		STATUS_SLAVE        = 10,
+		STATUS_ENABCBRQ     = 11,
+		STATUS_NOTGEMASTER  = 12,
+		STATUS_GENBAD       = 13,
+		STATUS_ENABWDOG     = 14,
+		STATUS_QUICK_TOUT   = 15
+	};
+
+	std::vector<uint8_t> m_file_data;
+	uint8_t m_mouse_buttons;
+	uint16_t m_mouse_quadrature;
+	uint16_t m_text_data_base;
+	uint16_t m_text_data_limit;
+	uint16_t m_stack_base;
+	uint16_t m_stack_limit;
+	uint16_t m_status;
+	uint8_t m_parity_ctrl;
+	uint8_t m_multibus_prot;
 };
 
-
-#define VERBOSE_LEVEL ( 0 )
-
-#define ENABLE_VERBOSE_LOG (0)
-
-inline void ATTR_PRINTF(3,4) sgi_ip2_state::verboselog( int n_level, const char *s_fmt, ... )
+QUICKLOAD_LOAD_MEMBER(iris3000_state::load_romboard)
 {
-#if ENABLE_VERBOSE_LOG
-	if( VERBOSE_LEVEL >= n_level )
+	m_file_data.resize(quickload_size);
+
+	if (!quickload_size || image.fread(&m_file_data[0], quickload_size) != quickload_size)
 	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror("%s: %s", machine().describe_context(), buf);
+		m_file_data.clear();
+		return image_init_result::FAIL;
 	}
-#endif
+	return image_init_result::PASS;
 }
 
 /***************************************************************************
     MACHINE FUNCTIONS
 ***************************************************************************/
 
-#define MBUT_RIGHT      0x01    /* Right button */
-#define MBUT_MIDDLE     0x02    /* Middle button */
-#define MBUT_LEFT       0x04    /* Left button */
-#define BOARD_REV1      0x60    /* Board revision - #1 */
-#define BOARD_REV2      0x50    /* Board revision - #2 */
-
-
-READ8_MEMBER(sgi_ip2_state::sgi_ip2_m_but_r)
+READ32_MEMBER(iris3000_state::mmu_r)
 {
-	verboselog(0, "sgi_ip2_m_but_r: %02x\n", m_mbut | BOARD_REV1);
-	return m_mbut | BOARD_REV1;
-}
+	const uint8_t type = (offset >> 26) & 0xf;
+	const uint32_t vaddr = offset & 0x03ffffff;
 
-WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_m_but_w)
-{
-	verboselog(0, "sgi_ip2_m_but_w: %02x\n", data);
-	m_mbut = data;
-}
+	const uint32_t page_offset = vaddr & 0x000003ff;
+	const uint32_t page_index = (vaddr >> 10) & 0x3fff;
+	const uint32_t phys_page = m_page_table_map[page_index] & 0x1fff;
+	const uint32_t paddr = (phys_page << 10) | page_offset;
 
-#define MOUSE_XFIRE     0x01    /* X Quadrature Fired, active low */
-#define MOUSE_XCHANGE   0x02    /* MOUSE_XCHANGE ? x-- : x++ */
-#define MOUSE_YFIRE     0x04    /* Y Quadrature Fired, active low */
-#define MOUSE_YCHANGE   0x08    /* MOUSE_YCHANGE ? y-- : y++ */
-
-
-READ16_MEMBER(sgi_ip2_state::sgi_ip2_m_quad_r)
-{
-	verboselog(0, "sgi_ip2_m_quad_r: %04x\n", m_mquad);
-	return m_mquad;
-}
-
-WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_m_quad_w)
-{
-	verboselog(0, "sgi_ip2_m_quad_w = %04x & %04x\n", data, mem_mask);
-	COMBINE_DATA(&m_mquad);
-}
-
-READ16_MEMBER(sgi_ip2_state::sgi_ip2_swtch_r)
-{
-	verboselog(0, "sgi_ip2_swtch_r: %04x\n", ioport("SWTCH")->read());
-	return ioport("SWTCH")->read();
-}
-
-READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_r)
-{
-	uint8_t ret = m_rtc->read(1);
-	verboselog(1, "sgi_ip2_clock_ctl_r: %02x\n", ret);
+	uint32_t ret;
+	switch (type)
+	{
+	case 0: // Text/Data Segment
+		ret = m_text_data_space->read32(paddr, mem_mask);
+		break;
+	case 1: // Stack Segment
+		ret = m_stack_space->read32(paddr, mem_mask);
+		break;
+	case 2: // Kernel Segment
+		ret = m_kernel_space->read32(paddr, mem_mask);
+		break;
+	case 3: // System Segment
+		ret = m_system_space->read32(vaddr, mem_mask);
+		break;
+	case 4: // Multibus Memory Segment
+		ret = m_multibus_mem_space->read32(vaddr, mem_mask);
+		break;
+	case 5: // Multibus I/O Segment
+		ret = m_multibus_io_space->read32(vaddr, mem_mask);
+		break;
+	case 6: // Geometry Pipe Segment
+		ret = m_geometry_pipe_space->read32(vaddr, mem_mask);
+		break;
+	case 15: // Floating-Point Accelerator Segment
+		ret = m_fpa_space->read32(vaddr, mem_mask);
+		break;
+	default: // Unused/Unknown Segment
+		LOGMASKED(LOG_INVALID_SEGMENT, "%s: Invalid segment read: %08x & %08x\n", machine().describe_context(), offset << 2, mem_mask);
+		ret = 0;
+		break;
+	}
 	return ret;
 }
 
-WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_w)
+WRITE32_MEMBER(iris3000_state::mmu_w)
 {
-	verboselog(1, "sgi_ip2_clock_ctl_w: %02x\n", data);
+	const uint8_t type = (offset >> 26) & 0xf;
+	const uint32_t vaddr = offset & 0x03ffffff;
+
+	const uint32_t page_offset = vaddr & 0x000003ff;
+	const uint32_t page_index = (vaddr >> 10) & 0x3fff;
+	const uint32_t phys_page = m_page_table_map[page_index] & 0x1fff;
+	const uint32_t paddr = (phys_page << 10) | page_offset;
+
+	switch (type)
+	{
+	case 0: // Text/Data Segment
+		m_text_data_space->write32(paddr, data, mem_mask);
+		break;
+	case 1: // Stack Segment
+		m_stack_space->write32(paddr, data, mem_mask);
+		break;
+	case 2: // Kernel Segment
+		m_kernel_space->write32(paddr, data, mem_mask);
+		break;
+	case 3: // System Segment
+		m_system_space->write32(vaddr, data, mem_mask);
+		break;
+	case 4: // Multibus Memory Segment
+		m_multibus_mem_space->write32(vaddr, data, mem_mask);
+		break;
+	case 5: // Multibus I/O Segment
+		m_multibus_io_space->write32(vaddr, data, mem_mask);
+		break;
+	case 6: // Geometry Pipe Segment
+		m_geometry_pipe_space->write32(vaddr, data, mem_mask);
+		break;
+	case 15: // Floating-Point Accelerator Segment
+		m_fpa_space->write32(vaddr, data, mem_mask);
+		break;
+	default: // Unused/Unknown Segment
+		LOGMASKED(LOG_INVALID_SEGMENT, "%s: Invalid segment write: %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
+		break;
+	}
+}
+
+READ8_MEMBER(iris3000_state::mouse_buttons_r)
+{
+	LOGMASKED(LOG_OTHER, "%s: mouse_buttons_r: %02x\n", machine().describe_context(), m_mouse_buttons | BOARD_REV1);
+	return m_mouse_buttons | BOARD_REV1;
+}
+
+WRITE8_MEMBER(iris3000_state::mouse_buttons_w)
+{
+	LOGMASKED(LOG_OTHER, "%s: mouse_buttons_w (ignored): %02x\n", machine().describe_context(), data);
+}
+
+READ16_MEMBER(iris3000_state::mouse_quad_r)
+{
+	LOGMASKED(LOG_OTHER, "%s: mouse_quad_r: %04x & %04x\n", machine().describe_context(), m_mouse_quadrature, mem_mask);
+	return m_mouse_quadrature;
+}
+
+WRITE16_MEMBER(iris3000_state::mouse_quad_w)
+{
+	LOGMASKED(LOG_OTHER, "%s: mouse_quad_w (ignored): %04x & %04x\n", machine().describe_context(), data, mem_mask);
+}
+
+READ16_MEMBER(iris3000_state::dips_r)
+{
+	const uint16_t data = m_dips->read();
+	LOGMASKED(LOG_OTHER, "%s: dips_r: %04x & %04x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+READ8_MEMBER(iris3000_state::clock_ctrl_r)
+{
+	const uint8_t data = m_rtc->read(1);
+	LOGMASKED(LOG_RTC, "%s: clock_ctrl_r: %02x\n", machine().describe_context(), data);
+	return data;
+}
+
+WRITE8_MEMBER(iris3000_state::clock_ctrl_w)
+{
+	LOGMASKED(LOG_RTC, "%s: clock_ctrl_w: %02x\n", machine().describe_context(), data);
 	m_rtc->write(1, data);
 }
 
-READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_data_r)
+READ8_MEMBER(iris3000_state::clock_data_r)
 {
-	uint8_t ret = m_rtc->read(0);
-	verboselog(1, "sgi_ip2_clock_data_r: %02x\n", ret);
-	return ret;
+	uint8_t data = m_rtc->read(0);
+	LOGMASKED(LOG_RTC, "%s: clock_data_r: %02x\n", machine().describe_context(), data);
+	return data;
 }
 
-WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_clock_data_w)
+WRITE8_MEMBER(iris3000_state::clock_data_w)
 {
-	verboselog(1, "sgi_ip2_clock_data_w: %02x\n", data);
+	LOGMASKED(LOG_RTC, "%s: clock_data_w: %02x\n", machine().describe_context(), data);
 	m_rtc->write(0, data);
 }
 
-
-READ8_MEMBER(sgi_ip2_state::sgi_ip2_os_base_r)
+READ8_MEMBER(iris3000_state::kernel_base_r)
 {
 	switch(offset)
 	{
 		default:
-			verboselog(0, "sgi_ip2_os_base_r: Unknown Register %08x\n", 0x36000000 + offset);
+			LOGMASKED(LOG_OTHER, "%s: kernel_base_r: Unknown Register %08x\n", machine().describe_context(), 0x36000000 + offset);
 			break;
 	}
 	return 0;
 }
 
-WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_os_base_w)
+WRITE8_MEMBER(iris3000_state::kernel_base_w)
 {
 	switch(offset)
 	{
 		default:
-			verboselog(0, "sgi_ip2_os_base_w: Unknown Register %08x = %02x\n", 0x36000000 + offset, data);
+			LOGMASKED(LOG_OTHER, "%s: kernel_base_w: Unknown Register %08x = %02x\n", machine().describe_context(), 0x36000000 + offset, data);
 			break;
 	}
 }
 
-READ16_MEMBER(sgi_ip2_state::sgi_ip2_status_r)
+READ16_MEMBER(iris3000_state::status_r)
 {
-	switch(offset)
-	{
-		default:
-			verboselog(0, "sgi_ip2_status_r: Unknown Register %08x & %04x\n", 0x38000000 + (offset << 1), mem_mask);
-			break;
-	}
-	return 0;
+	LOGMASKED(LOG_OTHER, "%s: status_r: %04x & %04x\n", machine().describe_context(), m_status, mem_mask);
+	return m_status;
 }
 
-WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_status_w)
+WRITE16_MEMBER(iris3000_state::status_w)
 {
-	switch(offset)
-	{
-		default:
-			verboselog(0, "sgi_ip2_status_w: Unknown Register %08x = %04x & %04x\n", 0x38000000 + (offset << 1), data, mem_mask);
-			break;
-	}
+	LOGMASKED(LOG_OTHER, "%s: status_w: %04x & %04x (DIAG:%x, ENABEXT:%d, ENABINT:%d, BINIT:%d, NOTBOOT:%d)\n", machine().describe_context(), data, mem_mask,
+		data & 0xf, BIT(data, STATUS_ENABEXT), BIT(data, STATUS_ENABINT), BIT(data, STATUS_BINIT), BIT(data, STATUS_NOTBOOT));
+	LOGMASKED(LOG_OTHER, "%s:                       (USERFPA:%d, USERGE:%d, SLAVE:%d, ENABCBRQ:%d)\n", machine().describe_context(),
+		BIT(data, STATUS_USERFPA), BIT(data, STATUS_USERGE), BIT(data, STATUS_SLAVE), BIT(data, STATUS_ENABCBRQ));
+	LOGMASKED(LOG_OTHER, "%s:                       (NOTGEMASTER:%d, GENBAD:%d, ENABWDOG:%d, QUICK_TOUT:%d)\n", machine().describe_context(),
+		BIT(data, STATUS_NOTGEMASTER), BIT(data, STATUS_GENBAD), BIT(data, STATUS_ENABWDOG), BIT(data, STATUS_QUICK_TOUT));
+	COMBINE_DATA(&m_status);
 }
 
-#define PAR_UR      0x01    /* Check parity on user-mode reads */
-#define PAR_UW      0x02    /* Check parity on user-mode writes */
-#define PAR_KR      0x04    /* Check parity on kernel-mode reads */
-#define PAR_KW      0x08    /* Check parity on kernel-mode writes */
-#define PAR_DIS0    0x10    /* Disable access to DUART0 and LEDs */
-#define PAR_DIS1    0x20    /* Disable access to DUART1 */
-#define PAR_MBR     0x40    /* Check parity on multibus reads */
-#define PAR_MBW     0x80    /* Check parity on multibus writes */
-
-
-READ8_MEMBER(sgi_ip2_state::sgi_ip2_parctl_r)
+READ8_MEMBER(iris3000_state::parity_ctrl_r)
 {
-	verboselog(0, "sgi_ip2_parctl_r: %02x\n", m_parctl);
-	return m_parctl;
+	LOGMASKED(LOG_OTHER, "%s: parity_ctrl_r: %02x\n", m_parity_ctrl);
+	return m_parity_ctrl;
 }
 
-WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_parctl_w)
+WRITE8_MEMBER(iris3000_state::parity_ctrl_w)
 {
-	verboselog(0, "sgi_ip2_parctl_w: %02x\n", data);
-	m_parctl = data;
+	LOGMASKED(LOG_OTHER, "%s: parity_ctrl_w: %02x\n", machine().describe_context(), data);
+	m_parity_ctrl = data;
 }
 
-#define MBP_DCACC   0x01    /* Display controller access (I/O page 4) */
-#define MBP_UCACC   0x02    /* Update controller access (I/O page 3) */
-#define MBP_GFACC   0x04    /* Allow GF access (I/O page 1) */
-#define MBP_DMACC   0x08    /* Allow GL2 DMA access (0x8nnnnn - x0bnnnnn) */
-#define MBP_LIOACC  0x10    /* Allow lower I/O access (0x0nnnnn - 0x7nnnnn) */
-#define MBP_HIOACC  0x20    /* Allow upper I/O access (0x8nnnnn - 0xfnnnnn) */
-#define MBP_LMACC   0x40    /* Allow lower memory access (0x0nnnnn - 0x7nnnnn) */
-#define MBP_HMACC   0x80    /* Allow upper memory access (0x8nnnnn - 0xfnnnnn) */
-
-
-READ8_MEMBER(sgi_ip2_state::sgi_ip2_mbp_r)
+READ8_MEMBER(iris3000_state::multibus_prot_r)
 {
-	verboselog(0, "sgi_ip2_mbp_r: %02x\n", m_mbp);
-	return m_mbp;
+	LOGMASKED(LOG_OTHER, "%s: multibus_prot_r: %02x\n", machine().describe_context(), m_multibus_prot);
+	return m_multibus_prot;
 }
 
-WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_mbp_w)
+WRITE8_MEMBER(iris3000_state::multibus_prot_w)
 {
-	verboselog(0, "sgi_ip2_mbp_w: %02x\n", data);
-	m_mbp = data;
+	LOGMASKED(LOG_OTHER, "%s: multibus_prot_w: %02x\n", machine().describe_context(), data);
+	m_multibus_prot = data;
 }
 
-
-READ32_MEMBER(sgi_ip2_state::sgi_ip2_ptmap_r)
+READ32_MEMBER(iris3000_state::page_table_map_r)
 {
-	verboselog(0, "sgi_ip2_ptmap_r: %08x = %08x & %08x\n", 0x3b000000 + (offset << 2), m_ptmap[offset], mem_mask);
-	return m_ptmap[offset];
+	LOGMASKED(LOG_OTHER, "%s: page_table_map_r: %08x = %08x & %08x\n", machine().describe_context(), 0x3b000000 + (offset << 2), m_page_table_map[offset], mem_mask);
+	return m_page_table_map[offset];
 }
 
-WRITE32_MEMBER(sgi_ip2_state::sgi_ip2_ptmap_w)
+WRITE32_MEMBER(iris3000_state::page_table_map_w)
 {
-	verboselog(0, "sgi_ip2_ptmap_w: %08x = %08x & %08x\n", 0x3b000000 + (offset << 2), data, mem_mask);
-	COMBINE_DATA(&m_ptmap[offset]);
+	LOGMASKED(LOG_OTHER, "%s: page_table_map_w: %08x = %08x & %08x\n", machine().describe_context(), 0x3b000000 + (offset << 2), data, mem_mask);
+	COMBINE_DATA(&m_page_table_map[offset]);
+}
+
+READ16_MEMBER(iris3000_state::text_data_base_r)
+{
+	LOGMASKED(LOG_OTHER, "%s: text_data_base_r: %04x & %04x\n", machine().describe_context(), m_text_data_base, mem_mask);
+	return m_text_data_base;
+}
+
+WRITE16_MEMBER(iris3000_state::text_data_base_w)
+{
+	LOGMASKED(LOG_OTHER, "%s: text_data_base_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_text_data_base);
 }
 
 
-READ16_MEMBER(sgi_ip2_state::sgi_ip2_tdbase_r)
+READ16_MEMBER(iris3000_state::text_data_limit_r)
 {
-	verboselog(0, "sgi_ip2_tdbase_r: %04x\n", m_tdbase);
-	return m_tdbase;
+	LOGMASKED(LOG_OTHER, "%s: text_data_limit_r: %04x & %04x\n", machine().describe_context(), m_text_data_limit, mem_mask);
+	return m_text_data_limit;
 }
 
-WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_tdbase_w)
+WRITE16_MEMBER(iris3000_state::text_data_limit_w)
 {
-	verboselog(0, "sgi_ip2_tdbase_w: %04x & %04x\n", data, mem_mask);
-	COMBINE_DATA(&m_tdbase);
-}
-
-
-READ16_MEMBER(sgi_ip2_state::sgi_ip2_tdlmt_r)
-{
-	verboselog(0, "sgi_ip2_tdlmt_r: %04x\n", m_tdlmt);
-	return m_tdlmt;
-}
-
-WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_tdlmt_w)
-{
-	verboselog(0, "sgi_ip2_tdlmt_w: %04x & %04x\n", data, mem_mask);
-	COMBINE_DATA(&m_tdlmt);
+	LOGMASKED(LOG_OTHER, "%s: text_data_limit_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_text_data_limit);
 }
 
 
-READ16_MEMBER(sgi_ip2_state::sgi_ip2_stkbase_r)
+READ16_MEMBER(iris3000_state::stack_base_r)
 {
-	verboselog(0, "sgi_ip2_stkbase_r: %04x\n", m_stkbase);
-	return m_stkbase;
+	LOGMASKED(LOG_OTHER, "%s: stack_base_r: %04x & %04x\n", machine().describe_context(), m_stack_base, mem_mask);
+	return m_stack_base;
 }
 
-WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_stkbase_w)
+WRITE16_MEMBER(iris3000_state::stack_base_w)
 {
-	verboselog(0, "sgi_ip2_stkbase_w: %04x & %04x\n", data, mem_mask);
-	COMBINE_DATA(&m_stkbase);
+	LOGMASKED(LOG_OTHER, "%s: stack_base_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_stack_base);
 }
 
 
-READ16_MEMBER(sgi_ip2_state::sgi_ip2_stklmt_r)
+READ16_MEMBER(iris3000_state::stack_limit_r)
 {
-	verboselog(0, "sgi_ip2_stklmt_r: %04x\n", m_stklmt);
-	return m_stklmt;
+	LOGMASKED(LOG_OTHER, "%s: stack_limit_r: %04x & %04x\n", machine().describe_context(), m_stack_limit, mem_mask);
+	return m_stack_limit;
 }
 
-WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_stklmt_w)
+WRITE16_MEMBER(iris3000_state::stack_limit_w)
 {
-	verboselog(0, "sgi_ip2_stklmt_w: %04x & %04x\n", data, mem_mask);
-	COMBINE_DATA(&m_stklmt);
+	LOGMASKED(LOG_OTHER, "%s: stack_limit_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_stack_limit);
 }
 
-void sgi_ip2_state::machine_start()
+READ8_MEMBER(iris3000_state::romboard_r)
+{
+	const uint8_t data = offset < m_file_data.size() ? m_file_data[offset] : 0;
+	LOGMASKED(LOG_OTHER, "%s: romboard_r: %08x = %02x\n", machine().describe_context(), 0x40000000 + offset, data);
+	return data;
+}
+
+WRITE8_MEMBER(iris3000_state::romboard_w)
+{
+	if (offset > m_file_data.size())
+		m_file_data.resize(offset + 1);
+	m_file_data[offset] = data;
+	LOGMASKED(LOG_OTHER, "%s: romboard write: %08x = %02x\n", machine().describe_context(), 0x40000000 + offset, data);
+}
+
+void iris3000_state::machine_start()
 {
 }
 
-void sgi_ip2_state::machine_reset()
+void iris3000_state::machine_reset()
 {
+	uint32_t *src = (uint32_t*)(memregion("maincpu")->base());
+	uint32_t *dst = m_mainram;
+	memcpy(dst, src, 8);
 }
 
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
 
-
-void sgi_ip2_state::sgi_ip2_map(address_map &map)
+void iris3000_state::text_data_map(address_map &map)
 {
-	map(0x00000000, 0x00ffffff).ram().share("mainram");
-	map(0x02100000, 0x0210ffff).ram().share("bss"); // ??? I don't understand the need for this...
-	map(0x30000000, 0x30017fff).rom().region("maincpu", 0);
-	map(0x30800000, 0x30800003).rw(FUNC(sgi_ip2_state::sgi_ip2_m_but_r), FUNC(sgi_ip2_state::sgi_ip2_m_but_w));
-	map(0x31000000, 0x31000003).rw(FUNC(sgi_ip2_state::sgi_ip2_m_quad_r), FUNC(sgi_ip2_state::sgi_ip2_m_quad_w));
-	map(0x31800000, 0x31800003).r(FUNC(sgi_ip2_state::sgi_ip2_swtch_r));
-	map(0x32000000, 0x3200000f).rw(m_duarta, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
-	map(0x32800000, 0x3280000f).rw(m_duartb, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
-	map(0x33000000, 0x330007ff).ram();
-	map(0x34000000, 0x34000003).rw(FUNC(sgi_ip2_state::sgi_ip2_clock_ctl_r), FUNC(sgi_ip2_state::sgi_ip2_clock_ctl_w));
-	map(0x35000000, 0x35000003).rw(FUNC(sgi_ip2_state::sgi_ip2_clock_data_r), FUNC(sgi_ip2_state::sgi_ip2_clock_data_w));
-	map(0x36000000, 0x36000003).rw(FUNC(sgi_ip2_state::sgi_ip2_os_base_r), FUNC(sgi_ip2_state::sgi_ip2_os_base_w));
-	map(0x38000000, 0x38000003).rw(FUNC(sgi_ip2_state::sgi_ip2_status_r), FUNC(sgi_ip2_state::sgi_ip2_status_w));
-	map(0x39000000, 0x39000003).rw(FUNC(sgi_ip2_state::sgi_ip2_parctl_r), FUNC(sgi_ip2_state::sgi_ip2_parctl_w));
-	map(0x3a000000, 0x3a000003).rw(FUNC(sgi_ip2_state::sgi_ip2_mbp_r), FUNC(sgi_ip2_state::sgi_ip2_mbp_w));
-	map(0x3b000000, 0x3b003fff).rw(FUNC(sgi_ip2_state::sgi_ip2_ptmap_r), FUNC(sgi_ip2_state::sgi_ip2_ptmap_w)).share("ptmap");
-	map(0x3c000000, 0x3c000003).rw(FUNC(sgi_ip2_state::sgi_ip2_tdbase_r), FUNC(sgi_ip2_state::sgi_ip2_tdbase_w));
-	map(0x3d000000, 0x3d000003).rw(FUNC(sgi_ip2_state::sgi_ip2_tdlmt_r), FUNC(sgi_ip2_state::sgi_ip2_tdlmt_w));
-	map(0x3e000000, 0x3e000003).rw(FUNC(sgi_ip2_state::sgi_ip2_stkbase_r), FUNC(sgi_ip2_state::sgi_ip2_stkbase_w));
-	map(0x3f000000, 0x3f000003).rw(FUNC(sgi_ip2_state::sgi_ip2_stklmt_r), FUNC(sgi_ip2_state::sgi_ip2_stklmt_w));
+	map(0x0000000, 0x03fffff).ram().share("mainram");
+}
+
+void iris3000_state::stack_map(address_map &map)
+{
+	map(0x0000000, 0x03fffff).ram().share("mainram");
+}
+
+void iris3000_state::kernel_map(address_map &map)
+{
+	map(0x0000000, 0x03fffff).ram().share("mainram");
+}
+
+void iris3000_state::system_map(address_map &map)
+{
+	map(0x0000000, 0x0017fff).rom().region("maincpu", 0);
+	map(0x0800000, 0x0800003).rw(FUNC(iris3000_state::mouse_buttons_r), FUNC(iris3000_state::mouse_buttons_w));
+	map(0x1000000, 0x1000003).rw(FUNC(iris3000_state::mouse_quad_r), FUNC(iris3000_state::mouse_quad_w));
+	map(0x1800000, 0x1800003).r(FUNC(iris3000_state::dips_r));
+	map(0x2000000, 0x200000f).rw(m_duarta, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
+	map(0x2800000, 0x280000f).rw(m_duartb, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
+	map(0x3000000, 0x30007ff).ram();
+	map(0x4000000, 0x4000003).rw(FUNC(iris3000_state::clock_ctrl_r), FUNC(iris3000_state::clock_ctrl_w));
+	map(0x5000000, 0x5000003).rw(FUNC(iris3000_state::clock_data_r), FUNC(iris3000_state::clock_data_w));
+	map(0x6000000, 0x6000003).rw(FUNC(iris3000_state::kernel_base_r), FUNC(iris3000_state::kernel_base_w));
+	map(0x8000000, 0x8000003).rw(FUNC(iris3000_state::status_r), FUNC(iris3000_state::status_w));
+	map(0x9000000, 0x9000003).rw(FUNC(iris3000_state::parity_ctrl_r), FUNC(iris3000_state::parity_ctrl_w));
+	map(0xa000000, 0xa000003).rw(FUNC(iris3000_state::multibus_prot_r), FUNC(iris3000_state::multibus_prot_w));
+	map(0xb000000, 0xb00ffff).rw(FUNC(iris3000_state::page_table_map_r), FUNC(iris3000_state::page_table_map_w)).share("ptmap");
+	map(0xc000000, 0xc000003).rw(FUNC(iris3000_state::text_data_base_r), FUNC(iris3000_state::text_data_base_w));
+	map(0xd000000, 0xd000003).rw(FUNC(iris3000_state::text_data_limit_r), FUNC(iris3000_state::text_data_limit_w));
+	map(0xe000000, 0xe000003).rw(FUNC(iris3000_state::stack_base_r), FUNC(iris3000_state::stack_base_w));
+	map(0xf000000, 0xf000003).rw(FUNC(iris3000_state::stack_limit_r), FUNC(iris3000_state::stack_limit_w));
+}
+
+void iris3000_state::multibus_mem_map(address_map &map)
+{
+	map(0x0200000, 0x03fffff).r(FUNC(iris3000_state::romboard_r));
+}
+
+void iris3000_state::multibus_io_map(address_map &map)
+{
+}
+
+void iris3000_state::geometry_pipe_map(address_map &map)
+{
+}
+
+void iris3000_state::fpa_map(address_map &map)
+{
+}
+
+void iris3000_state::mem_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(FUNC(iris3000_state::mmu_r), FUNC(iris3000_state::mmu_w));
 }
 
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(sgi_ip2_state::duarta_irq_handler)
+WRITE_LINE_MEMBER(iris3000_state::duarta_irq_handler)
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, state);
 }
 
-WRITE_LINE_MEMBER(sgi_ip2_state::duartb_irq_handler)
+WRITE_LINE_MEMBER(iris3000_state::duartb_irq_handler)
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, state);
 }
@@ -422,28 +604,40 @@ static DEVICE_INPUT_DEFAULTS_START( ip2_terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-void sgi_ip2_state::sgi_ip2(machine_config &config)
+void iris3000_state::iris3130(machine_config &config)
 {
 	/* basic machine hardware */
 	M68020(config, m_maincpu, 16000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sgi_ip2_state::sgi_ip2_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &iris3000_state::mem_map);
+
+	ADDRESS_MAP_BANK(config, "text_data").set_map(&iris3000_state::text_data_map).set_options(ENDIANNESS_BIG, 32, 32);
+	ADDRESS_MAP_BANK(config, "stack").set_map(&iris3000_state::stack_map).set_options(ENDIANNESS_BIG, 32, 32);
+	ADDRESS_MAP_BANK(config, "kernel").set_map(&iris3000_state::kernel_map).set_options(ENDIANNESS_BIG, 32, 32);
+	ADDRESS_MAP_BANK(config, "system").set_map(&iris3000_state::system_map).set_options(ENDIANNESS_BIG, 32, 32);
+	ADDRESS_MAP_BANK(config, "multibus_mem").set_map(&iris3000_state::multibus_mem_map).set_options(ENDIANNESS_BIG, 32, 32);
+	ADDRESS_MAP_BANK(config, "multibus_io").set_map(&iris3000_state::multibus_io_map).set_options(ENDIANNESS_BIG, 32, 32);
+	ADDRESS_MAP_BANK(config, "geometry_pipe").set_map(&iris3000_state::geometry_pipe_map).set_options(ENDIANNESS_BIG, 32, 32);
+	ADDRESS_MAP_BANK(config, "fpa").set_map(&iris3000_state::fpa_map).set_options(ENDIANNESS_BIG, 32, 32);
 
 	MC68681(config, m_duarta, 3.6864_MHz_XTAL); /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
-	m_duarta->irq_cb().set(FUNC(sgi_ip2_state::duarta_irq_handler));
+	m_duarta->irq_cb().set(FUNC(iris3000_state::duarta_irq_handler));
 	m_duarta->b_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	MC68681(config, m_duartb, 3.6864_MHz_XTAL); /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
-	m_duartb->irq_cb().set(FUNC(sgi_ip2_state::duartb_irq_handler));
+	m_duartb->irq_cb().set(FUNC(iris3000_state::duartb_irq_handler));
 
 	MC146818(config, m_rtc, 4.194304_MHz_XTAL);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set(m_duarta, FUNC(mc68681_device::rx_b_w));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(ip2_terminal));
+
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", ""));
+	quickload.set_load_callback(FUNC(iris3000_state::load_romboard));
 }
 
-static INPUT_PORTS_START( sgi_ip2 )
-	PORT_START("SWTCH")
+static INPUT_PORTS_START( iris3130 )
+	PORT_START("DIPS")
 	PORT_DIPNAME( 0x8000, 0x8000, "Master/Slave" )
 	PORT_DIPSETTING(    0x0000, "Slave" )
 	PORT_DIPSETTING(    0x8000, "Master" )
@@ -487,15 +681,7 @@ static INPUT_PORTS_START( sgi_ip2 )
 	PORT_DIPSETTING(    0x000d, "DSD Tape Boot (1)" )
 	PORT_DIPSETTING(    0x000e, "DSD Tape Boot (2)" )
 	PORT_DIPSETTING(    0x000f, "DSD Hard Disk Boot" )
-
 INPUT_PORTS_END
-
-void sgi_ip2_state::init_sgi_ip2()
-{
-	uint32_t *src = (uint32_t*)(memregion("maincpu")->base());
-	uint32_t *dst = m_mainram;
-	memcpy(dst, src, 8);
-}
 
 /***************************************************************************
 
@@ -503,12 +689,12 @@ void sgi_ip2_state::init_sgi_ip2()
 
 ***************************************************************************/
 
-ROM_START( sgi_ip2 )
+ROM_START( iris3130 )
 	ROM_REGION32_BE(0x18000, "maincpu", 0)
 	ROM_LOAD( "sgi-ip2-u91.nolabel.od",    0x00000, 0x8000, CRC(32e1f6b5) SHA1(2bd928c3fe2e364b9a38189158e9bad0e5271a59) )
 	ROM_LOAD( "sgi-ip2-u92.nolabel.od",    0x08000, 0x8000, CRC(13dbfdb3) SHA1(3361fb62f7a8c429653700bccfc3e937f7508182) )
 	ROM_LOAD( "sgi-ip2-u93.ip2.2-008.od",  0x10000, 0x8000, CRC(bf967590) SHA1(1aac48e4f5531a25c5482f64de5cd3c7a9931f11) )
 ROM_END
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                 FULLNAME           FLAGS
-COMP( 1985, sgi_ip2, 0,      0,      sgi_ip2, sgi_ip2, sgi_ip2_state, init_sgi_ip2, "Silicon Graphics Inc", "IRIS 3130 (IP2)", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME           FLAGS
+COMP( 1985, iris3130, 0,      0,      iris3130, iris3130, iris3000_state, empty_init, "Silicon Graphics Inc", "IRIS 3130 (IP2)", MACHINE_IS_SKELETON )

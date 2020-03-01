@@ -226,7 +226,7 @@ public:
 	{
 	}
 
-	virtual ~sound_xaudio2() { }
+	virtual ~sound_xaudio2() = default;
 
 	bool probe() override;
 	int init(osd_options const &options) override;

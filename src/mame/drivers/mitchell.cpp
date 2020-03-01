@@ -2020,6 +2020,45 @@ ROM_START( pangbb ) // Same bootleg hardware as pangba, but with original YM2413
 	ROM_LOAD( "10", 0x010000, 0x10000, CRC(082151ee) SHA1(0857b9f7430e0fc6217eafbaf008ff9da8e7a493) )
 ROM_END
 
+// Sound: Z80 (GoldStar Z8400A PS) + OKI M5205 + YM2413 + Xtal 10.000MHz
+ROM_START( pangbc )
+	ROM_REGION( 2*0x50000, "maincpu", 0 )
+	ROM_LOAD( "27c512-1.bin", 0x50000, 0x08000, CRC(f5e4a6c3) SHA1(2679d67877769389e726d601294c986e4bafabe6) )
+	ROM_CONTINUE( 0x00000, 0x08000 )
+	ROM_LOAD( "27c010.bin",   0x60000, 0x04000, CRC(a128522f) SHA1(476adab8a5a4fae2c5022f89f36598ce275a070d) )
+	ROM_CONTINUE( 0x10000, 0x04000 )
+	ROM_CONTINUE( 0x64000, 0x04000 )
+	ROM_CONTINUE( 0x14000, 0x04000 )
+	ROM_CONTINUE( 0x68000, 0x04000 )
+	ROM_CONTINUE( 0x18000, 0x04000 )
+	ROM_CONTINUE( 0x6c000, 0x04000 )
+	ROM_CONTINUE( 0x1c000, 0x04000 )
+	ROM_LOAD( "27c512.bin",   0x70000, 0x04000, CRC(48d0e236) SHA1(d459bf1c500d5110c300212552449cbdae2a9dfd) )
+	ROM_CONTINUE( 0x20000, 0x04000 )
+	ROM_CONTINUE( 0x74000, 0x04000 )
+	ROM_CONTINUE( 0x24000, 0x04000 )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Sound Z80 + M5205 samples
+	ROM_LOAD( "27c512-2.bin", 0x00000, 0x10000, CRC(09c43210) SHA1(79b5aed2c5d6d9110129885e8979c1f13b7b8aac) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT | ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "pang.14", 0x000001, 0x10000, CRC(c90095ee) SHA1(bf380f289eb42030a9f911aa5f697ba76f5723db) )
+	ROM_LOAD16_BYTE( "7.bin",   0x000000, 0x10000, CRC(0725d6ad) SHA1(de2efab47b4958d24c065ce52dcf4fab3c8d4274) )
+	ROM_LOAD16_BYTE( "pang.13", 0x020001, 0x10000, CRC(a49e98ec) SHA1(8a3d13bd755b58b0bc1d1497363409a1eeade129) )
+	ROM_LOAD16_BYTE( "pang.5",  0x020000, 0x10000, CRC(5804ae3e) SHA1(33de9aea7aa201aa650b0b6c5347713bf10cc13d) )
+
+	ROM_LOAD16_BYTE( "pang.16", 0x080001, 0x10000, CRC(bc508935) SHA1(1a11144b563befc11015d75e3867c07329ee6f32) )
+	ROM_LOAD16_BYTE( "pang.8",  0x080000, 0x10000, CRC(53a99bb6) SHA1(ffb75c5541d7c1478f05717b2cfa4bfe9b4654cd) )
+	ROM_LOAD16_BYTE( "pang.15", 0x0a0001, 0x10000, CRC(bf5c09b9) SHA1(f66a901292b190aa39dc2460363307e94c358d4d) )
+	ROM_LOAD16_BYTE( "pang.7",  0x0a0000, 0x10000, CRC(8b718670) SHA1(c22005a665a9e0bcfc3ddbc22ca4a2a261224ce1) )
+
+	ROM_REGION( 0x040000, "gfx2", ROMREGION_INVERT )
+	ROM_LOAD( "pang.11", 0x020000, 0x10000, CRC(07191732) SHA1(7de03ddb07b2afad311b9ed5c84e04bef62d0050) )
+	ROM_LOAD( "pang.9",  0x030000, 0x10000, CRC(6496be82) SHA1(9c7ef4c6c3a0361f3118339a0c63b0923045d6c3) )
+	ROM_LOAD( "pang.12", 0x000000, 0x10000, CRC(fa247a04) SHA1(b5cab5f65eb3af3deeea6afba955056ca51f39af) )
+	ROM_LOAD( "pang.10", 0x010000, 0x10000, CRC(082151ee) SHA1(0857b9f7430e0fc6217eafbaf008ff9da8e7a493) )
+ROM_END
+
 ROM_START( cworld )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "cw05.bin", 0x00000, 0x08000, CRC(d3c1723d) SHA1(b67f63e39f4301909c967555222820b54e98a205) )
@@ -2701,6 +2740,7 @@ GAME( 1989, pangba,      pang,     pangba,     pang,       mitchell_state, init_
 GAME( 1989, pangb2,      pang,     pang,       pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pangbb,      pang,     spangbl,    pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pangbp,      pang,     pang,       pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 6)", MACHINE_NOT_WORKING ) // Missing the contents of a battery backed RAM
+GAME( 1989, pangbc,      pang,     spangbl,    pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 7)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, cworld,      0,        pang,       qtono1,     mitchell_state, init_cworld,     ROT0,   "Capcom",                    "Capcom World (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, hatena,      0,        pang,       qtono1,     mitchell_state, init_hatena,     ROT0,   "Capcom",                    "Adventure Quiz 2 - Hatena? no Daibouken (Japan 900228)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, spang,       0,        pangnv,     pang,       mitchell_state, init_spang,      ROT0,   "Mitchell",                  "Super Pang (World 900914)", MACHINE_SUPPORTS_SAVE )

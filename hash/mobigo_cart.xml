@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="mobigo_cart" description="VTech Mobigo Cartridges">
+
+	<!-- 52-250704 - Mobigo 2 Game Cartridge (Internal Game) (ger) is a dummy cartridge to enable the game in the BIOS -->
+
+	<software name="kfpand2" supported="no">
+		<description>Kung Fu Panda 2 (Germany) (80-252004)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-252004 - kung fu panda 2 (ger).bin" size="0x1000000" crc="88b0b148" sha1="a2ce8915c8acf3a9c7741cae7fcc51aa59895de9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penmad" supported="no">
+		<description>Die Pinguine aus Madagascar - Operation Krone (Germany) (80-250304)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250304 - die pinguine aus madagascar - operation krone (ger).bin" size="0x1000000" crc="847620f3" sha1="0cc8449ba6fabb1b5dc6045171e978d25fcff1c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmwunder" supported="no">
+		<description>Micky Maus - Wunderhaus (Germany) (80-250504)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250504 - micky maus - wunderhaus (ger).bin" size="0x1000000" crc="90467973" sha1="7abcf0064ad961b6a22f43cf78158a8e37905800"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ben10" supported="no">
+		<description>Ben 10 - UltimateAlien - Mine der Gedanken (Germany) (80-250604)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250604 - ben 10 - ultimatealien - mine der gedanken (ger).bin" size="0x1000000" crc="22dcb2b8" sha1="12628f4ae7cf6e059dd5e7db99e3080dc804cf27"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dora" supported="no">
+		<description>Dora - Tag des Zwillings (Germany) (80-250804)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250804 - dora - tag des zwillings (ger).bin" size="0x1000000" crc="4d38d6be" sha1="fe6ec3c4febb91f7f5d2450ce1a8a78956e2c453"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dprinces" supported="no">
+		<description>Disney Princess (Germany) (80-251104)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251104 - disney princess (ger).bin" size="0x1000000" crc="3919d5c1" sha1="1ee7bed2ed36dca4bcedfef382fdfb75f47f19fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carstoon" supported="no">
+		<description>Cars Toon - Hooks unglaubliche Geschichten (Germany) (80-251204)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251204 - cars toon - hooks unglaubliche geschichten (ger).bin" size="0x1000000" crc="d36ea48d" sha1="aaa90b3b44a77ea0dd013b38c7d789e23e4a6f55"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rapunzel" supported="no">
+		<description>Rapunzel - Neu verföhnt (Germany) (80-251704)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251704 - rapunzel - neu verfohnt (ger).bin" size="0x1000000" crc="23cd9cd4" sha1="ef9ee2f21ff741668d65ea343f4b47e4472fada7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cars2" supported="no">
+		<description>Cars 2 (Germany) (80-251904)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251904 - cars 2 (ger).bin" size="0x1000000" crc="9c3ae94a" sha1="ed7c52e7121a337a662c9196499d4ff8a1482f96"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teamumiz" supported="no">
+		<description>Team Umizoomi - Die große Umiauto Rettung (Germany) (80-252504)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80252504 - team umizoomi - die grosse umiauto rettung (ger).bin" size="0x1000000" crc="48a52f91" sha1="c34865bbbd3a0854e3e6876673ad9c721531278c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chugg" supported="no">
+		<description>Chuggington (Germany) (80-251804)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251804 - chuggington (ger).bin" size="0x1000000" crc="62bd91aa" sha1="b8e185107f1764d469cca37472a18553fe1e55fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tstory3" supported="no">
+		<description>Toy Story 3 (Germany) (80-250104)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250104 - toy story 3 (ger).bin" size="0x1000000" crc="caafa975" sha1="0dd2b13a05711412493255fcf2b8ac31a3445800"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fishrek" supported="no">
+		<description>Für immer Shrek (Germany) (80-250004)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250004 - fur immer shrek (ger).bin" size="0x1000000" crc="812a3f90" sha1="1cbd4728201c76b4fb26a8523b080330515153d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="tstory3a" supported="no"> <!-- part #? full title? region? -->
+		<description>Toy Story 3</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="mobigotoystory3.bin" size="0x1000000" crc="bf7bc6e1" sha1="cc86160f29848d6620923cffd0f740a593ba2d94"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickey" supported="no"> <!-- part #? full title? region? -->
+		<description>Mickey Mouse</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="mobigomickey.bin" size="0x1000000" crc="51671cd0" sha1="73a2d1a0a8701d3a5daaa98972af545b4b448bf2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tangled" supported="no"> <!-- part #? full title? region? -->
+		<description>Tangled</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="mobigotangled.bin" size="0x1000000" crc="8883ecf6" sha1="b51cff0333644e758a4cc7ef26b2365e9a58877c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this is from a special large scale Kiosk unit, which should also have a unique BIOS.  Maybe move into driver as a hardcodd cart once BIOS is dumped rather than having it here? -->
+	<software name="kiosk" supported="no">
+		<description>Mobigo Kiosk (Germany)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="mobigo kiosk cartridge (ger).bin" size="0x2000000" crc="8026b80d" sha1="ded9e5dcf89f30b6011e826da466f7cd6bbd5a2d"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

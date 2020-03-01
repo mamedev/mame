@@ -63,11 +63,8 @@ private:
 
 void sega_beena_state::beena_arm7_map(address_map &map)
 {
-	if (m_cart && m_cart->exists())
-	{
-		map(0x00000000, 0x000001ff).rom().bankr("cartbank");
-		map(0x80000000, 0x807fffff).rom().bankr("cartbank");
-	}
+	map(0x00000000, 0x000001ff).rom().bankr("cartbank");
+	map(0x80000000, 0x807fffff).rom().bankr("cartbank");
 }
 
 void sega_beena_state::machine_start()
@@ -79,8 +76,11 @@ void sega_beena_state::machine_start()
 		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
 		m_bank->configure_entries(0, (m_cart_region->bytes() + 0x7fffff) / 0x800000, m_cart_region->base(), 0x800000);
-		m_bank->set_entry(0);
 	}
+	else
+		m_bank->configure_entries(0, 1, memregion("bios")->base(), 0x800000);
+
+	m_bank->set_entry(0);
 }
 
 void sega_beena_state::machine_reset()

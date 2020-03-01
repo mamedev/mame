@@ -18,6 +18,12 @@
 
 class cmi01a_device : public device_t, public device_sound_interface {
 public:
+	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t channel)
+		: cmi01a_device(mconfig, tag, owner, clock)
+	{
+		m_channel = channel;
+	}
+
 	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto irq_callback() { return m_irq_cb.bind(); }
@@ -50,9 +56,10 @@ private:
 	void run_voice();
 	void update_wave_addr(int inc);
 
+	uint32_t    m_channel;
 	emu_timer * m_zx_timer;
-	uint8_t       m_zx_flag;
-	uint8_t       m_zx_ff;
+	uint8_t     m_zx_flag;
+	uint8_t     m_zx_ff;
 
 	std::unique_ptr<uint8_t[]>    m_wave_ram;
 	uint16_t  m_segment_cnt;

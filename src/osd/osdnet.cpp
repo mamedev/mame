@@ -116,7 +116,7 @@ int netdev_count()
 	return netdev_list.size();
 }
 
-void osd_list_network_adapters(void)
+void osd_list_network_adapters()
 {
 	#ifdef USE_NETWORK
 	int num_devs = netdev_list.size();

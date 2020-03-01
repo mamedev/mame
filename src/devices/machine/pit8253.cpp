@@ -59,7 +59,7 @@ pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, d
 pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, pit_type chip_type) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_clk{0, 0, 0},
-	m_out_handler{{*this}, {*this}, {*this}},
+	m_out_handler(*this),
 	m_counter(*this, "counter%u", 0U),
 	m_type(chip_type)
 {

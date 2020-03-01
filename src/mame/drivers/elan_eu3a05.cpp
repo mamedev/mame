@@ -104,17 +104,19 @@
 #include "machine/elan_eu3a05gpio.h"
 #include "machine/elan_eu3a05sys.h"
 #include "video/elan_eu3a05vid.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 class elan_eu3a05_state : public driver_device
 {
 public:
 	elan_eu3a05_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_sys(*this, "sys"),
+		m_gpio(*this, "gpio"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_ram(*this, "ram"),
-		m_gpio(*this, "gpio"),
-		m_sys(*this, "sys"),
 		m_sound(*this, "eu3a05sound"),
 		m_vid(*this, "vid"),
 		m_pixram(*this, "pixram"),
@@ -129,6 +131,14 @@ public:
 	void elan_sudoku(machine_config &config);
 
 
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<elan_eu3a05sys_device> m_sys;
+	required_device<elan_eu3a05gpio_device> m_gpio;
+
 private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -142,17 +152,12 @@ private:
 	void elan_eu3a05_map(address_map &map);
 	void elan_sudoku_map(address_map &map);
 
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_ram;
-	required_device<elan_eu3a05gpio_device> m_gpio;
-	required_device<elan_eu3a05sys_device> m_sys;
 	required_device<elan_eu3a05_sound_device> m_sound;
 	required_device<elan_eu3a05vid_device> m_vid;
 	required_shared_ptr<uint8_t> m_pixram;
@@ -167,6 +172,94 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sound_end4) { m_sys->generate_custom_interrupt(6); }
 	DECLARE_WRITE_LINE_MEMBER(sound_end5) { m_sys->generate_custom_interrupt(7); }
 };
+
+class elan_eu3a05_buzztime_state : public elan_eu3a05_state
+{
+public:
+	elan_eu3a05_buzztime_state(const machine_config &mconfig, device_type type, const char *tag) :
+		elan_eu3a05_state(mconfig, type, tag),
+		m_cart(*this, "cartslot")
+	{ }
+
+	void elan_buzztime(machine_config& config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	//DECLARE_READ8_MEMBER(random_r) { return machine().rand(); }
+	DECLARE_READ8_MEMBER(porta_r);
+	DECLARE_WRITE8_MEMBER(portb_w);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
+	required_device<generic_slot_device> m_cart;
+};
+
+void elan_eu3a05_buzztime_state::machine_start()
+{
+	elan_eu3a05_state::machine_start();
+
+	// if there's a cart make sure we can see it
+	if (m_cart && m_cart->exists())
+	{
+		uint8_t *rom = memregion("maincpu")->base();
+		uint8_t* cart = m_cart->get_rom_base();
+		std::copy(&cart[0x000000], &cart[0x200000], &rom[0x200000]);
+	}
+	else
+	{
+		uint8_t *rom = memregion("maincpu")->base();
+		uint8_t* bios = memregion("bios")->base();
+		std::copy(&bios[0x000000], &bios[0x200000], &rom[0x200000]);
+	}
+}
+
+DEVICE_IMAGE_LOAD_MEMBER(elan_eu3a05_buzztime_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	if (size != 0x200000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return image_init_result::FAIL;
+	}
+
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_NATIVE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+void elan_eu3a05_buzztime_state::elan_buzztime(machine_config &config)
+{
+	elan_eu3a05_state::elan_eu3a05(config);
+
+	m_sys->set_alt_timer();
+
+	m_gpio->read_0_callback().set(FUNC(elan_eu3a05_buzztime_state::porta_r)); // I/O lives in here
+//  m_gpio->read_1_callback().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
+//  m_gpio->read_2_callback().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
+	m_gpio->write_1_callback().set(FUNC(elan_eu3a05_buzztime_state::portb_w)); // control related
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "buzztime_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(elan_eu3a05_buzztime_state::cart_load));
+
+	SOFTWARE_LIST(config, "buzztime_cart").set_original("buzztime_cart");
+}
+
+READ8_MEMBER(elan_eu3a05_buzztime_state::porta_r)
+{
+	logerror("%s: porta_r\n", machine().describe_context());
+	return machine().rand();
+}
+
+WRITE8_MEMBER(elan_eu3a05_buzztime_state::portb_w)
+{
+	logerror("%s: portb_w %02x\n", machine().describe_context(), data);
+}
+
 
 void elan_eu3a05_state::video_start()
 {
@@ -576,7 +669,6 @@ void elan_eu3a05_state::airblsjs(machine_config& config)
 	m_sys->set_pal(); // TODO: also set PAL clocks
 }
 
-
 ROM_START( rad_tetr )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "tetrisrom.bin", 0x000000, 0x100000, CRC(40538e08) SHA1(1aef9a2c678e39243eab8d910bb7f9f47bae0aee) )
@@ -615,7 +707,12 @@ ROM_START( carlecfg )
 ROM_END
 
 
+ROM_START( buzztime )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "buzztimeunit.bin", 0x000000, 0x200000, CRC(8ba3569c) SHA1(3e704338a53daed63da90aba0db4f6adb5bccd21) )
+ROM_END
 
 
 CONS( 2004, rad_sinv, 0, 0, elan_eu3a05, rad_sinv, elan_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
@@ -624,6 +721,10 @@ CONS( 2004, rad_tetr, 0, 0, elan_eu3a05, rad_tetr, elan_eu3a05_state, empty_init
 
 // ROM contains the string "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com"  PCB has datecode of "050423" (23rd April 2005)
 CONS( 2005, airblsjs, 0, 0, airblsjs, airblsjs, elan_eu3a05_state, empty_init, "Advance Bright Ltd", "Air-Blaster Joystick (AB1500, PAL)", MACHINE_NOT_WORKING )
+
+CONS( 2004, buzztime, 0, 0, elan_buzztime, sudoku, elan_eu3a05_buzztime_state, empty_init, "Cadaco", "Buzztime Home Trivia System", MACHINE_NOT_WORKING )
+
+// Below are probably not EU3A05 but use similar modes (possibly EU3A13?)
 
 CONS( 2006, sudoelan, 0,        0, elan_sudoku,  sudoku,   elan_eu3a05_state, empty_init,  "Senario / All in 1 Products Ltd",  "Ultimate Sudoku TV Edition 3-in-1", MACHINE_NOT_WORKING )
 

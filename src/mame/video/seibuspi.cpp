@@ -288,7 +288,7 @@ void seibuspi_state::tilemap_dma_start_w(u32 data)
 	/* fore layer row scroll */
 	if (m_rowscroll_enable)
 	{
-		std::copy_n(&m_mainram[index], 0x800/4, &m_tilemap_ram[0x1800/4]); // 0x2800/4?
+		std::copy_n(&m_mainram[index], 0x800/4, &m_tilemap_ram[0x2800/4]);
 		index += 0x800/4;
 	}
 
@@ -308,7 +308,7 @@ void seibuspi_state::tilemap_dma_start_w(u32 data)
 	/* middle layer row scroll */
 	if (m_rowscroll_enable)
 	{
-		std::copy_n(&m_mainram[index], 0x800/4, &m_tilemap_ram[0x2800/4]); // 0x1800/4?
+		std::copy_n(&m_mainram[index], 0x800/4, &m_tilemap_ram[0x1800/4]);
 		index += 0x800/4;
 	}
 
@@ -565,9 +565,7 @@ void seibuspi_state::combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &clip
 	{
 		int rx = sx;
 		if (rowscroll)
-		{
-			rx += rowscroll[(y + sy) & yscroll_mask];
-		}
+			rx += rowscroll[(y + 19) & yscroll_mask]; // adder value probably not hardcoded but came from CRTC
 
 		u32 *dest = &bitmap.pix32(y);
 		const u16 *src = &pen_bitmap.pix16((y + sy) & yscroll_mask);

@@ -2357,7 +2357,7 @@ Core Misc Options
 
 **\-confirm_quit**
 
-    Display a Confirm Quit dialong to screen on exit, requiring one extra step
+    Display a Confirm Quit dialog to screen on exit, requiring one extra step
     to exit MAME.
 
     The default is OFF (**-noconfirm_quit**).

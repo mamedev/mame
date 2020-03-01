@@ -68,9 +68,6 @@ static void expat_element_end(void *data, const XML_Char *name);
     XML FILE OBJECTS
 ***************************************************************************/
 
-file::file() { }
-file::~file() { }
-
 
 /*-------------------------------------------------
     create - create a new, empty XML file
@@ -757,7 +754,7 @@ const char *normalize_string(const char *string)
 
 static void *expat_malloc(size_t size)
 {
-	uint32_t *result = (uint32_t *)malloc(size + 4 * sizeof(uint32_t));
+	auto *result = (uint32_t *)malloc(size + 4 * sizeof(uint32_t));
 	*result = size;
 	return &result[4];
 }
@@ -840,7 +837,7 @@ static bool expat_setup_parser(parse_info &info, parse_options const *opts)
 
 static void expat_element_start(void *data, const XML_Char *name, const XML_Char **attributes)
 {
-	parse_info *info = (parse_info *) data;
+	auto *info = (parse_info *) data;
 	data_node **curnode = &info->curnode;
 	data_node *newnode;
 	int attr;
@@ -869,7 +866,7 @@ static void expat_element_start(void *data, const XML_Char *name, const XML_Char
 
 static void expat_data(void *data, const XML_Char *s, int len)
 {
-	parse_info *info = (parse_info *) data;
+	auto *info = (parse_info *) data;
 	data_node **curnode = &info->curnode;
 	(*curnode)->append_value(s, len);
 }
@@ -882,7 +879,7 @@ static void expat_data(void *data, const XML_Char *s, int len)
 
 static void expat_element_end(void *data, const XML_Char *name)
 {
-	parse_info *info = (parse_info *) data;
+	auto *info = (parse_info *) data;
 	data_node **curnode = &info->curnode;
 
 	/* strip leading/trailing spaces from the value data */

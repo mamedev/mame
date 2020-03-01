@@ -45,10 +45,10 @@ public:
 	auto in_pb() { return m_in_pb_cb.bind(); }
 	auto out_pb() { return m_out_pb_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	u8 io_r(offs_t offset);
+	void io_w(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER( memory_r );
+	u8 memory_r(offs_t offset);
 
 protected:
 	// device-level overrides

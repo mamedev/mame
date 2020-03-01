@@ -172,7 +172,7 @@ tms9901_device::tms9901_device(const machine_config &mconfig, const char *tag, d
 	m_clockdiv(0),
 	m_timer_int_pending(false),
 	m_read_port(*this),
-	m_write_p{{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this},{*this}},
+	m_write_p(*this),
 	m_interrupt(*this)
 {
 }
@@ -599,8 +599,7 @@ void tms9901_device::device_start()
 	}
 
 	m_read_port.resolve();
-	for (auto &cb : m_write_p)
-		cb.resolve_safe();
+	m_write_p.resolve_all_safe();
 	m_interrupt.resolve();
 
 	m_clock_register = 0;

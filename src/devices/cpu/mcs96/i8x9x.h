@@ -110,7 +110,7 @@ private:
 		u16 time;
 	};
 
-	devcb_read16 m_ach_cb[8];
+	devcb_read16::array<8> m_ach_cb;
 	devcb_write8 m_hso_cb;
 	devcb_write8 m_serial_tx_cb;
 

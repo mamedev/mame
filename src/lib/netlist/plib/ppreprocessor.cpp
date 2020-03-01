@@ -56,7 +56,7 @@ namespace plib {
 		pstring e = plib::pfmt("{1}:{2}:0: error: {3}\n")
 				(m_stack.back().m_name, m_stack.back().m_lineno, err);
 		m_stack.pop_back();
-		while (m_stack.size() > 0)
+		while (!m_stack.empty())
 		{
 			if (m_stack.size() == 1)
 				trail = trail_first;
@@ -226,7 +226,6 @@ namespace plib {
 			{
 				pstring s(STR);
 				pi++;
-				// FIXME : \"
 				while (pi < tmp.size() && tmp[pi] != STR)
 				{
 					s += tmp[pi];
@@ -236,38 +235,51 @@ namespace plib {
 				tmpret.push_back(s);
 			}
 			else
-				if (!remove_ws || (tmp[pi] != " " && tmp[pi] != "\t"))
-					tmpret.push_back(tmp[pi]);
+			{
+				pstring tok=tmp[pi];
+				if (tok.size() >= 2 && pi < tmp.size() - 2 )
+				{
+					auto sc=tok.substr(0,1);
+					auto ec=tok.substr(tok.size()-1, 1);
+					if ((sc == "." || (sc>="0" && sc<="9")) && (ec=="e" || ec=="E"))
+					{
+						// looks like an incomplete float due splitting by - or +
+						tok = tok + tmp[pi+1] + tmp[pi+2];
+						pi += 2;
+					}
+				}
+				if (!remove_ws || (tok != " " && tok != "\t"))
+					tmpret.push_back(tok);
+			}
 			pi++;
 		}
+
 		if (!concat)
 			return tmpret;
-		else
+
+		// FIXME: error if concat at beginning or end
+		string_list ret;
+		pi = 0;
+		while (pi<tmpret.size())
 		{
-			// FIXME: error if concat at beginning or end
-			string_list ret;
-			pi = 0;
-			while (pi<tmpret.size())
+			if (tmpret[pi] == "##")
 			{
-				if (tmpret[pi] == "##")
-				{
-					while (ret.back() == " " || ret.back() == "\t")
-						ret.pop_back();
-					pstring cc = ret.back();
+				while (ret.back() == " " || ret.back() == "\t")
 					ret.pop_back();
-					pi++;
-					while (pi < tmpret.size() && (tmpret[pi] == " " || tmpret[pi] == "\t"))
-						pi++;
-					if (pi == tmpret.size())
-						error("## found at end of sequence");
-					ret.push_back(cc + tmpret[pi]);
-				}
-				else
-					ret.push_back(tmpret[pi]);
+				pstring cc = ret.back();
+				ret.pop_back();
 				pi++;
+				while (pi < tmpret.size() && (tmpret[pi] == " " || tmpret[pi] == "\t"))
+					pi++;
+				if (pi == tmpret.size())
+					error("## found at end of sequence");
+				ret.push_back(cc + tmpret[pi]);
 			}
-			return ret;
+			else
+				ret.push_back(tmpret[pi]);
+			pi++;
 		}
+		return ret;
 	}
 
 	bool ppreprocessor::is_valid_token(const pstring &str)
@@ -435,13 +447,12 @@ namespace plib {
 			m_state = LINE_CONTINUATION;
 			return {"", false};
 		}
-		else
-			m_state = PROCESS;
+
+		m_state = PROCESS;
 
 		line = process_comments(m_line);
 
 		pstring lt = plib::trim(plib::replace_all(line, "\t", " "));
-		// FIXME ... revise and extend macro handling
 		if (plib::startsWith(lt, "#"))
 		{
 			string_list lti(psplit(lt, " ", true));
@@ -449,7 +460,6 @@ namespace plib {
 			{
 				m_if_level++;
 				lt = replace_macros(lt);
-				//std::vector<pstring> t(psplit(replace_all(lt.substr(3), " ", ""), m_expr_sep));
 				auto t(simple_iter<ppreprocessor>(this, tokenize(lt.substr(3), m_expr_sep, true, true)));
 				auto val = static_cast<int>(prepro_expr(t, 255));
 				t.skip_ws();
@@ -572,13 +582,11 @@ namespace plib {
 			}
 			return { "", false };
 		}
-		else
-		{
-			if (m_if_flag == 0)
-				return { replace_macros(lt), true };
-			else
-				return { "", false };
-		}
+
+		if (m_if_flag == 0)
+			return { replace_macros(lt), true };
+
+		return { "", false };
 	}
 
 	void ppreprocessor::push_out(const pstring &s)
@@ -590,7 +598,7 @@ namespace plib {
 
 	void ppreprocessor::process_stack()
 	{
-		while (m_stack.size() > 0)
+		while (!m_stack.empty())
 		{
 			pstring line;
 			pstring linemarker = pfmt("# {1} \"{2}\"\n")(m_stack.back().m_lineno, m_stack.back().m_name);
@@ -611,7 +619,7 @@ namespace plib {
 					last_skipped = true;
 			}
 			m_stack.pop_back();
-			if (m_stack.size() > 0)
+			if (!m_stack.empty())
 			{
 				linemarker = pfmt("# {1} \"{2}\" 2\n")(m_stack.back().m_lineno, m_stack.back().m_name);
 				push_out(linemarker);

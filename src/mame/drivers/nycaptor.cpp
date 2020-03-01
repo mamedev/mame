@@ -3,7 +3,7 @@
 /***************************************************************************
     N.Y. Captor - Taito '85
 
-     Driver by Tomasz Slanina  analog [at] op.pl
+     Driver by Tomasz Slanina
 ****************************************************************************
   Hardware similar to Fairyland Story
   Cycle Shooting (Taito '86) is running on (almost) the same hardware

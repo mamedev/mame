@@ -16,6 +16,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <ostream>
 
 // ----------------------------------------------------------------------------------------
 // pstring: semi-immutable strings ...
@@ -186,8 +187,8 @@ public:
 	pstring_t& operator+=(const pstring_t &string) { m_str.append(string.m_str); return *this; }
 	pstring_t& operator+=(const code_t c) { traits_type::encode(c, m_str); return *this; }
 	friend pstring_t operator+(const pstring_t &lhs, const pstring_t &rhs) { return pstring_t(lhs) += rhs; }
-	friend pstring_t operator+(const pstring_t &lhs, const code_t rhs) { return pstring_t(lhs) += rhs; }
-	friend pstring_t operator+(const code_t lhs, const pstring_t &rhs) { return pstring_t(1, lhs) += rhs; }
+	friend pstring_t operator+(const pstring_t &lhs, code_t rhs) { return pstring_t(lhs) += rhs; }
+	friend pstring_t operator+(code_t lhs, const pstring_t &rhs) { return pstring_t(1, lhs) += rhs; }
 
 	// comparison operators
 	bool operator==(const pstring_t &string) const noexcept { return (compare(string) == 0); }
@@ -251,42 +252,43 @@ struct putf8_traits
 		const auto p1 = reinterpret_cast<const unsigned char *>(p);
 		if ((*p1 & 0xE0) == 0xC0)
 			return 2;
-		else if ((*p1 & 0xF0) == 0xE0)
+		if ((*p1 & 0xF0) == 0xE0)
 			return 3;
-		else if ((*p1 & 0xF8) == 0xF0)
+		if ((*p1 & 0xF8) == 0xF0)
 			return 4;
-		else
-		{
-			// valid utf8: ((*p1 & 0x80) == 0x00)
-			// However, we return 1 here.
-			return 1;
-		}
+
+		// valid utf8: ((*p1 & 0x80) == 0x00)
+		// However, we return 1 here.
+		return 1;
 	}
+
 	static std::size_t codelen(const code_t c) noexcept
 	{
 		if (c < 0x0080)
 			return 1;
-		else if (c < 0x800)
+		if (c < 0x800)
 			return 2;
-		else if (c < 0x10000)
+		if (c < 0x10000)
 			return 3;
-		else // U+10000 U+1FFFFF
-			return 4; // no checks
+		// U+10000 U+1FFFFF
+		return 4; // no checks
 	}
+
 	static code_t code(const mem_t *p) noexcept
 	{
 		const auto p1 = reinterpret_cast<const unsigned char *>(p);
 		if ((*p1 & 0x80) == 0x00)
 			return *p1;
-		else if ((*p1 & 0xE0) == 0xC0)
+		if ((*p1 & 0xE0) == 0xC0)
 			return static_cast<code_t>(((p1[0] & 0x3f) << 6) | (p1[1] & 0x3f));
-		else if ((*p1 & 0xF0) == 0xE0)
+		if ((*p1 & 0xF0) == 0xE0)
 			return static_cast<code_t>(((p1[0] & 0x1f) << 12) | ((p1[1] & 0x3f) << 6) | ((p1[2] & 0x3f) << 0));
-		else if ((*p1 & 0xF8) == 0xF0)
+		if ((*p1 & 0xF8) == 0xF0)
 			return static_cast<code_t>(((p1[0] & 0x0f) << 18) | ((p1[1] & 0x3f) << 12) | ((p1[2] & 0x3f) << 6)  | ((p1[3] & 0x3f) << 0));
-		else
-			return 0xFFFD; // unicode-replacement character
+
+		return 0xFFFD; // unicode-replacement character
 	}
+
 	static void encode(const code_t c, string_type &s)
 	{
 		if (c < 0x0080)
@@ -312,6 +314,7 @@ struct putf8_traits
 			s += static_cast<mem_t>(0x80 | (c & 0x3f));
 		}
 	}
+
 	static const mem_t *nthcode(const mem_t *p, const std::size_t n) noexcept
 	{
 		const mem_t *p1 = p;
@@ -409,8 +412,8 @@ struct pwchar_traits
 			}
 			return ret;
 		}
-		else
-			return p.size();
+
+		return p.size();
 	}
 
 	static std::size_t codelen(const mem_t *p) noexcept
@@ -420,16 +423,16 @@ struct pwchar_traits
 			auto c = static_cast<uint16_t>(*p);
 			return ((c & 0xd800) == 0xd800) ? 2 : 1;
 		}
-		else
-			return 1;
+
+		return 1;
 	}
 
 	static std::size_t codelen(const code_t c) noexcept
 	{
 		if (sizeof(wchar_t) == 2)
 			return ((c & 0xd800) == 0xd800) ? 2 : 1;
-		else
-			return 1;
+
+		return 1;
 	}
 
 	static code_t code(const mem_t *p)
@@ -444,8 +447,8 @@ struct pwchar_traits
 			}
 			return static_cast<code_t>(c);
 		}
-		else
-			return static_cast<code_t>(*p);
+
+		return static_cast<code_t>(*p);
 	}
 
 	static void encode(code_t c, string_type &s)
@@ -475,8 +478,8 @@ struct pwchar_traits
 				p += codelen(p);
 			return p;
 		}
-		else
-			return p + n;
+
+		return p + n;
 	}
 };
 

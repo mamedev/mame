@@ -14,8 +14,6 @@ public:
 	mct_adr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <typename T> void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }
-
 	auto out_int_dma_cb() { return m_out_int_dma.bind(); }
 	auto out_int_device_cb() { return m_out_int_device.bind(); }
 	auto out_int_timer_cb() { return m_out_int_timer.bind(); }
@@ -28,6 +26,9 @@ public:
 	template <unsigned DRQ> DECLARE_WRITE_LINE_MEMBER(drq) { set_drq_line(DRQ, state); }
 
 	void map(address_map &map);
+
+	u64 r4k_r(offs_t offset, u64 mem_mask) { return space(0).read_qword(offset << 3, mem_mask); }
+	void r4k_w(offs_t offset, u64 data, u64 mem_mask) { space(0).write_qword(offset << 3, data, mem_mask); }
 
 	u16 isr_r();
 	u16 imr_r() { return m_imr; }
@@ -42,6 +43,9 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 	//virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
+	u32 dma_r(offs_t offset, u32 mem_mask);
+	void dma_w(offs_t offset, u32 data, u32 mem_mask);
+
 private:
 	void dma(address_map &map);
 
@@ -54,16 +58,16 @@ private:
 
 	u32 translate_address(u32 logical_address);
 
+	address_space_config m_io_config;
 	address_space_config m_dma_config;
-	required_address_space m_bus;
 
 	devcb_write_line m_out_int_dma;
 	devcb_write_line m_out_int_device;
 	devcb_write_line m_out_int_timer;
 	devcb_read32 m_eisa_iack;
 
-	devcb_read8 m_dma_r[4];
-	devcb_write8 m_dma_w[4];
+	devcb_read8::array<4> m_dma_r;
+	devcb_write8::array<4> m_dma_w;
 	bool m_drq_active[4];
 
 	emu_timer *m_irq_check;

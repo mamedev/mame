@@ -149,7 +149,7 @@ namespace plib {
 			}
 			catch (...)
 			{
-				this->deallocate(mem, sizeof(T));
+				deallocate(mem, sizeof(T));
 				throw;
 			}
 		}
@@ -165,7 +165,7 @@ namespace plib {
 			}
 			catch (...)
 			{
-				this->deallocate(mem, sizeof(T));
+				deallocate(mem, sizeof(T));
 				throw;
 			}
 		}

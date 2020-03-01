@@ -2,7 +2,7 @@
 // copyright-holders:Jarek Burczynski, Tomasz Slanina
 /***************************************************************************
 
-Driver by Jarek Burczynski, started by Tomasz Slanina  dox@space.pl
+Driver by Jarek Burczynski, started by Tomasz Slanina
 Lots of hardware info from Guru
 
 memory map :

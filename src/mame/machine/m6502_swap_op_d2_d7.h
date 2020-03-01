@@ -2,23 +2,23 @@
 // copyright-holders:David Shah, David Haywood
 /***************************************************************************
 
-    m6502_vt1682.h
+    m6502_swap_op_d2_d7.h
 
     6502 with instruction scrambling
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_M6502_VT1682_H
-#define MAME_CPU_M6502_VT1682_H
+#ifndef MAME_M6502_SWAP_OP_D2_D7_H
+#define MAME_M6502_SWAP_OP_D2_D7_H
 
 #pragma once
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m6502d.h"
 
-class m6502_vt1682 : public m6502_device {
+class m6502_swap_op_d2_d7 : public m6502_device {
 public:
-	m6502_vt1682(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m6502_swap_op_d2_d7(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	class mi_decrypt : public mi_default {
@@ -48,6 +48,6 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
-DECLARE_DEVICE_TYPE(M6502_VT1682, m6502_vt1682)
+DECLARE_DEVICE_TYPE(M6502_SWAP_OP_D2_D7, m6502_swap_op_d2_d7)
 
-#endif // MAME_CPU_M6502_VT1682_H
+#endif // MAME_M6502_SWAP_OP_D2_D7_H

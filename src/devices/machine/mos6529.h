@@ -59,7 +59,7 @@ protected:
 
 	uint8_t m_input;
 
-	devcb_write_line m_p_handler[8];
+	devcb_write_line::array<8> m_p_handler;
 };
 
 

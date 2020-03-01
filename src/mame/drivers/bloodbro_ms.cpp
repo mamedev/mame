@@ -157,21 +157,21 @@ ROM_START( bloodbrom )
 	ROM_LOAD( "51-1-b_bb526.ic26",  0xe0000, 0x10000, CRC(1c2d70b0) SHA1(703f1acbcdaa7ff539f58829890d25b51a2e269e) )
 	ROM_LOAD( "51-1-b_bb527.ic27",  0xf0000, 0x10000, CRC(a73cd7a5) SHA1(9106565d1c8a8e0efa8f5035106f3cdac2189107) )
 
-	ROM_REGION( 0x0400, "proms", 0 )    /* PROMs (function unknown) */
+	ROM_REGION( 0x0400, "proms", 0 )    // PROMs (function unknown)
 	ROM_LOAD( "1-2_110_tbp18s030.ic20",  0x000, 0x020, NO_DUMP )
-	ROM_LOAD( "2_211_82s129.ic4",        0x100, 0x100, NO_DUMP )
-	ROM_LOAD( "2_202_82s129.ic12",       0x200, 0x100, NO_DUMP )
+	ROM_LOAD( "2_211_82s129.ic4",        0x100, 0x100, CRC(4f8c3e63) SHA1(0aa68fa1de6ca945027366a06752e834bbbc8d09) )
+	ROM_LOAD( "2_202_82s129.ic12",       0x200, 0x100, CRC(e434128a) SHA1(ef0f6d8daef8b25211095577a182cdf120a272c1) )
 	ROM_LOAD( "51-1_p0502_82s129n.ic10", 0x300, 0x100, NO_DUMP )
 
 	ROM_REGION( 0x1000, "plds", ROMREGION_ERASEFF )
-	ROM_LOAD( "6-1_606_gal16v8-20hb1.ic13",    0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "6-1_646_gal16v8-20hb1.ic7",     0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "4-3_403_gal16v8-25hb1.ic29",    0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "4-3-a_p0403_pal16r8acn.ic29",   0x000, 0x104, NO_DUMP )
-	ROM_LOAD( "4-3-b_403_gal16v8-25hb1.ic19",  0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "51-1_503_gal16v8-25lp.ic48",    0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "51-1-b_5146_gal16v8-20hb1.ic9", 0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "51-1-b_5246_gal16v8-20hb1.ic8", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "6-1_606_gal16v8-20hb1.ic13",    0x000, 0x117, NO_DUMP ) // Protected
+	ROM_LOAD( "6-1_646_gal16v8-20hb1.ic7",     0x000, 0x117, NO_DUMP ) // Protected
+	ROM_LOAD( "4-3_403_gal16v8-25hb1.ic29",    0x000, 0x117, NO_DUMP ) // Protected
+	ROM_LOAD( "4-3-a_p0403_pal16r8acn.ic29",   0x000, 0x104, CRC(506156cc) SHA1(5560671fc2c9872ed28620491af5dc486909fc6e) )
+	ROM_LOAD( "4-3-b_403_gal16v8-25hb1.ic19",  0x000, 0x117, NO_DUMP ) // Protected
+	ROM_LOAD( "51-1_503_gal16v8-25lp.ic48",    0x000, 0x117, NO_DUMP ) // Protected
+	ROM_LOAD( "51-1-b_5146_gal16v8-20hb1.ic9", 0x000, 0x117, NO_DUMP ) // Protected
+	ROM_LOAD( "51-1-b_5246_gal16v8-20hb1.ic8", 0x000, 0x117, NO_DUMP ) // Protected
 ROM_END
 
 GAME( 199?, bloodbrom,  bloodbro,  bloodbrom,  bloodbrom,  bloodbro_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Blood Bros. (Modular System)", MACHINE_IS_SKELETON )

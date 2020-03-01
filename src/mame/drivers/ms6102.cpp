@@ -86,7 +86,7 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { m_pic->r_w(N, state?0:1); }
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq) { m_pic->r_w(N, state ? 0 : 1); }
 
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(display_attr);
@@ -233,8 +233,7 @@ WRITE8_MEMBER(ms6102_state::kbd_uart_clock_w)
 
 WRITE8_MEMBER(ms6102_state::pic_w)
 {
-	m_pic->b_w((data & 7) ^ 7);
-	m_pic->sgs_w(BIT(data, 3) ^ 1);
+	m_pic->b_sgs_w(~data);
 }
 
 WRITE8_MEMBER(ms6102_state::vdack_w)
@@ -248,7 +247,7 @@ WRITE8_MEMBER(ms6102_state::vdack_w)
 IRQ_CALLBACK_MEMBER(ms6102_state::ms6102_int_ack)
 {
 	m_maincpu->set_input_line(I8085_INTR_LINE, CLEAR_LINE);
-	return 0xc7 | (m_pic->a_r() << 3);
+	return 0xc7 | ((m_pic->a_r() ^ 7) << 3);
 }
 
 

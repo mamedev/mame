@@ -293,7 +293,8 @@ offs_t we32100_disassembler::dasm_30xx(std::ostream &stream, offs_t &pc, const w
 	u8 op = opcodes.r8(pc++);
 
 	switch (op)
-	{   case 0x09:
+	{
+	case 0x09:
 		stream << "MVERNO";
 		break;
 

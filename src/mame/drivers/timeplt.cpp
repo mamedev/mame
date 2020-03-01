@@ -599,6 +599,28 @@ ROM_START( spaceplt )
 	ROM_LOAD( "timeplt.e12",  0x0140, 0x0100, CRC(f7b7663e) SHA1(151bd2dff4e4ef76d6438c1ab2cae71f987b9dad) ) /* char lookup table */
 ROM_END
 
+ROM_START( spaceplta )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1",          0x0000, 0x2000, CRC(c6672087) SHA1(1efaaf83dd11af18e947b428c3d9e70b075faf30) )
+	ROM_LOAD( "2",          0x2000, 0x2000, CRC(5b246c47) SHA1(a5e49eea9ac21b7a498ce5b2c2c30e0a45ce582e) )
+	ROM_LOAD( "3",          0x4000, 0x2000, CRC(cc9e745e) SHA1(387c748667399573f20d00467f2f6693e10588d3) )
+
+	ROM_REGION( 0x10000, "timeplt_audio:tpsound", 0 )
+	ROM_LOAD( "4",          0x0000, 0x1000, CRC(d66da813) SHA1(408fca4515e8af84211df3e204c8776b2f8adb23) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "5",          0x0000, 0x2000, CRC(76caa8af) SHA1(f81bb73877d415a6587a32bddaad6db8a8fd4941) )
+
+	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_LOAD( "6",          0x0000, 0x2000, CRC(86ab1ae7) SHA1(8e3f84aa6b2c21e7e1383ea1811fd99a4d940a23) ) // difference to spaceplt: erased Konami
+	ROM_LOAD( "7",          0x2000, 0x2000, CRC(e8ca87b9) SHA1(5dd30d3fb9fd8cf9e6a8e37e7ea858c7fd038a7e) )
+
+	ROM_REGION( 0x0240, "proms", 0 )
+	ROM_LOAD( "timeplt.b4",   0x0000, 0x0020, CRC(34c91839) SHA1(f62e279e21fce171231d3139be7adabe1f4b8c2e) ) /* palette */
+	ROM_LOAD( "timeplt.b5",   0x0020, 0x0020, CRC(463b2b07) SHA1(9ad275365eba4869f94749f39ff8705d92056a10) ) /* palette */
+	ROM_LOAD( "timeplt.e9",   0x0040, 0x0100, CRC(4bbb2150) SHA1(678433b21aae1daa938e32d3293eeed529a42ef9) ) /* sprite lookup table */
+	ROM_LOAD( "timeplt.e12",  0x0140, 0x0100, CRC(f7b7663e) SHA1(151bd2dff4e4ef76d6438c1ab2cae71f987b9dad) ) /* char lookup table */
+ROM_END
 
 ROM_START( psurge )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -686,12 +708,13 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, timeplt,  0,       timeplt,  timeplt,  timeplt_state, empty_init, ROT90,  "Konami", "Time Pilot", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, timepltc, timeplt, timeplt,  timeplt,  timeplt_state, empty_init, ROT90,  "Konami (Centuri license)", "Time Pilot (Centuri)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, timeplta, timeplt, timeplt,  timeplt,  timeplt_state, empty_init, ROT90,  "Konami (Atari license)", "Time Pilot (Atari)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, spaceplt, timeplt, timeplt,  timeplt,  timeplt_state, empty_init, ROT90,  "bootleg", "Space Pilot", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, timeplt,   0,       timeplt,  timeplt,  timeplt_state, empty_init, ROT90,  "Konami", "Time Pilot", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, timepltc,  timeplt, timeplt,  timeplt,  timeplt_state, empty_init, ROT90,  "Konami (Centuri license)", "Time Pilot (Centuri)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, timeplta,  timeplt, timeplt,  timeplt,  timeplt_state, empty_init, ROT90,  "Konami (Atari license)", "Time Pilot (Atari)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, spaceplt,  timeplt, timeplt,  timeplt,  timeplt_state, empty_init, ROT90,  "bootleg", "Space Pilot (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, spaceplta, timeplt, timeplt,  timeplt,  timeplt_state, empty_init, ROT90,  "bootleg", "Space Pilot (set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, psurge,   0,       psurge,   psurge,   timeplt_state, empty_init, ROT270, "Vision Electronics", "Power Surge", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, psurge,    0,       psurge,   psurge,   timeplt_state, empty_init, ROT270, "Vision Electronics", "Power Surge", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, chkun,    0,       chkun,    chkun,    timeplt_state, empty_init, ROT90,  "Peni", "Chance Kun (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, bikkuric, 0,       bikkuric, bikkuric, timeplt_state, empty_init, ROT90,  "Peni", "Bikkuri Card (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chkun,     0,       chkun,    chkun,    timeplt_state, empty_init, ROT90,  "Peni", "Chance Kun (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, bikkuric,  0,       bikkuric, bikkuric, timeplt_state, empty_init, ROT90,  "Peni", "Bikkuri Card (Japan)", MACHINE_SUPPORTS_SAVE )

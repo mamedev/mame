@@ -77,12 +77,12 @@ DEFINE_DEVICE_TYPE(Z80CTC_CHANNEL, z80ctc_channel_device, "z80ctc_channel", "Z80
 //-------------------------------------------------
 
 z80ctc_device::z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, Z80CTC, tag, owner, clock),
-		device_z80daisy_interface(mconfig, *this),
-		m_intr_cb(*this),
-		m_zc_cb{*this, *this, *this, *this},
-		m_vector(0),
-		m_channel(*this, "ch%u", 0U)
+	: device_t(mconfig, Z80CTC, tag, owner, clock)
+	, device_z80daisy_interface(mconfig, *this)
+	, m_intr_cb(*this)
+	, m_zc_cb(*this)
+	, m_vector(0)
+	, m_channel(*this, "ch%u", 0U)
 {
 }
 
@@ -145,8 +145,7 @@ void z80ctc_device::device_resolve_objects()
 {
 	// resolve callbacks
 	m_intr_cb.resolve_safe();
-	for (auto &cb : m_zc_cb)
-		cb.resolve_safe();
+	m_zc_cb.resolve_all_safe();
 }
 
 

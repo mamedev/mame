@@ -178,7 +178,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 			}
 
 			std::string sampler = input["sampler"].GetString();
-			bgfx_input_pair* input_pair = new bgfx_input_pair(i, sampler, texture_name, texture_names, selection, chains, screen_index);
+			auto* input_pair = new bgfx_input_pair(i, sampler, texture_name, texture_names, selection, chains, screen_index);
 			inputs.push_back(input_pair);
 		}
 	}

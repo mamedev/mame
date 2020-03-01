@@ -29,7 +29,7 @@ void ics2115_device::device_start()
 {
 	m_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_0),this), this);
 	m_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_1),this), this);
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 33075);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock() / (32 * 32));
 
 	m_irq_cb.resolve_safe();
 
@@ -104,6 +104,7 @@ void ics2115_device::device_reset()
 	m_irq_pending = 0;
 	//possible re-suss
 	m_active_osc = 31;
+	m_stream->set_sample_rate(clock() / ((m_active_osc + 1) * 32));
 	m_osc_select = 0;
 	m_reg_select = 0;
 	m_vmode = 0;
@@ -134,6 +135,11 @@ void ics2115_device::device_reset()
 		elem.vol.mode = 0;
 		elem.state.value = 0;
 	}
+}
+
+void ics2115_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / ((m_active_osc + 1) * 32));
 }
 
 //TODO: improve using next-state logic from column 126 of patent 5809466
@@ -719,7 +725,10 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 		case 0x0e: // Active Voices
 			//Does this value get added to 1? Not sure. Could trace for writes of 32.
 			if (ACCESSING_BITS_8_15)
+			{
 				m_active_osc = (data >> 8) & 0x1f; // & 0x1f ? (Guessing)
+				m_stream->set_sample_rate(clock() / ((m_active_osc + 1) * 32));
+			}
 			break;
 		//2X8 ?
 		case 0x10: // [osc] Oscillator Control
@@ -982,6 +991,7 @@ void ics2115_device::recalc_timer(int timer)
 	//u64 period = m_timer[timer].preset * (m_timer[timer].scale << 16) / 60;
 
 	//New formula based on O.Galibert's reverse engineering of ICS2115 card firmware
+	// TODO : Related to input clock?
 	u64 period  = ((m_timer[timer].scale & 0x1f) + 1) * (m_timer[timer].preset + 1);
 	period = (period << (4 + (m_timer[timer].scale >> 5)))*78125/2646;
 

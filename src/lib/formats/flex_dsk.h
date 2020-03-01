@@ -23,8 +23,7 @@ public:
 	virtual const char *extensions() const override;
 	virtual int identify(io_generic *io, uint32_t form_factor) override;
 	virtual int find_size(io_generic *io, uint32_t form_factor) override;
-	virtual void build_sector_description(const format &f, uint8_t *sectdata, desc_s *sectors, int track, int head) const override;
-	virtual void check_compatibility(floppy_image *image, std::vector<int> &candidates) override;
+	virtual const wd177x_format::format &get_track_format(const format &f, int head, int track) override;
 
 private:
 	struct sysinfo_sector
@@ -46,6 +45,9 @@ private:
 		uint8_t unused2[216];
 	} info;
 	static const format formats[];
+	static const format formats_head1[];
+	static const format formats_track0[];
+	static const format formats_head1_track0[];
 
 	uint8_t boot0_sector_id;
 	uint8_t boot1_sector_id;
