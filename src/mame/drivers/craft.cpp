@@ -99,13 +99,10 @@ WRITE8_MEMBER(craft_state::port_w)
 			uint8_t old_port_b = m_port_b;
 			uint8_t pins = data;
 			uint8_t changed = pins ^ old_port_b;
-			if (BIT(changed, 1))
+			if (BIT(changed, 1) && BIT(data, 1))
 			{
+				m_frame_start_cycle = machine().time().as_ticks(MASTER_CLOCK);
 				video_update();
-				if (BIT(pins, 1))
-				{
-					m_frame_start_cycle = machine().time().as_ticks(MASTER_CLOCK);
-				}
 			}
 			if (BIT(changed, 3))
 			{
@@ -117,9 +114,9 @@ WRITE8_MEMBER(craft_state::port_w)
 		}
 
 		case AVR8_IO_PORTC:
+			video_update();
 			m_port_c = data;
 			m_latched_color = m_port_c;
-			video_update();
 			break;
 
 		case AVR8_IO_PORTD:
