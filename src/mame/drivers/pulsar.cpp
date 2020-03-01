@@ -43,7 +43,7 @@ X - Test off-board memory banks
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/msm5832.h"
 #include "machine/i8255.h"
 #include "machine/com8116.h"
