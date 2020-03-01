@@ -17,9 +17,6 @@
 #include <cmath>
 
 
-#define min(a, b) ((a > b) ? b : a)
-#define max(a, b) ((a > b) ? a : b)
-
 static float lerp(float a, float b, float f)
 {
 	return (b - a) * f + a;
@@ -161,7 +158,7 @@ void vgmviz_device::apply_waterfall()
 		for (int i = 0; i < bar_step; i++)
 		{
 			int permuted = WDL_fft_permute(FFT_LENGTH / 2, (bar * bar_step) + i);
-			val = max(bins[0][permuted].re + bins[1][permuted].re, val);
+			val = std::max<WDL_FFT_REAL>(bins[0][permuted].re + bins[1][permuted].re, val);
 		}
 		int level = (int)(log(val * 32768.0) * 31.0);
 		m_waterfall_buf[m_waterfall_length % (FFT_LENGTH / 2 + 16)][255 - bar] = (level < 0) ? 0 : (level > 255 ? 255 : level);
@@ -194,7 +191,7 @@ void vgmviz_device::find_levels()
 	int samples_found = 0;
 	do
 	{
-		for (int i = min(FFT_LENGTH - 1, m_audio_count[read_index]); i >= 0 && samples_remaining > 0; i--, samples_remaining--)
+		for (int i = std::min<int>(FFT_LENGTH - 1, m_audio_count[read_index]); i >= 0 && samples_remaining > 0; i--, samples_remaining--)
 		{
 			for (int chan = 0; chan < 2; chan++)
 			{
