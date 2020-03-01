@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    screen.c
+    screen.cpp
 
     Core MAME screen device.
 
@@ -1726,6 +1726,7 @@ void screen_device::create_composited_bitmap()
 					*dst++ = src[x >> 15];
 				}
 			}
+			break;
 		}
 
 		case BITMAP_FORMAT_RGB32:
