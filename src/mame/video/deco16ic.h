@@ -100,6 +100,9 @@ public:
 	/* used by cninjabl */
 	void set_enable(int tmap, int enable );
 
+	/* used by nslasher */
+	void set_tilemap_colour_bank(int tmap, int bank);
+
 	template<class _BitmapClass>
 	void custom_tilemap_draw(
 			screen_device &screen,
