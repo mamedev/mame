@@ -1835,6 +1835,7 @@ crysprim                        // (c) 2003
 cryspriu                        // (c) 2006
 csd                             // (c) 2002
 csdce                           // (c) 2003
+csdjc                           // (c) 2003
 csdm                            // (c) 2003
 csdq                            // (c) 2002
 csret                           // (c) 2006
@@ -1973,6 +1974,7 @@ qsheba                          // (c) 2003
 raprichs                        // (c) 2005
 redbara6                        // (c) 2002
 redbarfl                        // (c) 2003
+redbarjc                        // (c) 2003
 reelrkfl                        // (c) 201?
 retsama6                        // (c) 2002
 roadtrip                        // (c) 2005
@@ -18634,6 +18636,7 @@ kbadlandsh                      // GX455 (c) 1984
 @source:konendev.cpp
 konendev                        // Konami Endeavour BIOS
 aadvent                         // African Adventure
+blkrose                         // Black Rose Rapid Fire Grand Prix
 dragnfly                        // Dragonfly
 enchlamp                        // Enchanted Lamp
 gypmagic                        // Gypsy Magic
