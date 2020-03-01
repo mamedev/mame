@@ -13,7 +13,7 @@
 #include "machine/nvram.h"
 #include "machine/rstbuf.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "video/mc6845.h"
 #include "screen.h"
 

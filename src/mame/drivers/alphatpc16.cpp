@@ -51,7 +51,7 @@ via the PC 16 Terminal, operates independently after programming), connects to t
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "video/ef9345.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/pic8259.h"
 #include "machine/timer.h"
 #include "machine/ram.h"

@@ -11,7 +11,7 @@
 //#include "bus/rs232/rs232.h"
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "video/scn2674.h"
 #include "screen.h"
 

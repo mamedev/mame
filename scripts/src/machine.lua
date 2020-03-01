@@ -3337,18 +3337,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/z80dart.h,MACHINES["Z80DART"] = true
----------------------------------------------------
-
-if (MACHINES["Z80DART"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/z80dart.cpp",
-		MAME_DIR .. "src/devices/machine/z80dart.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/z80sio.h,MACHINES["Z80SIO"] = true
 ---------------------------------------------------
 

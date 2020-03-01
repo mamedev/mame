@@ -11,7 +11,7 @@ Skeleton driver for Qume QVT-103 video display terminal.
 #include "cpu/mcs48/mcs48.h"
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "video/crt9007.h"
 #include "emupal.h"
 #include "screen.h"

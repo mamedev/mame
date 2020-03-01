@@ -7,17 +7,9 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "formats/imageutl.h"
 #include "includes/mtx.h"
-#include "cpu/z80/z80.h"
-#include "imagedev/cassette.h"
-#include "machine/ram.h"
-#include "imagedev/snapquik.h"
-#include "bus/centronics/ctronics.h"
-#include "machine/z80ctc.h"
-#include "machine/z80dart.h"
-#include "video/tms9928a.h"
-#include "sound/sn76496.h"
+
+#include "formats/imageutl.h"
 
 /***************************************************************************
     READ/WRITE HANDLERS

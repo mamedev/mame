@@ -28,8 +28,8 @@ Oxx,yy          = Out port
 #include "machine/am9519.h"
 #include "machine/com8116.h"
 #include "machine/ram.h"
-#include "machine/z80dart.h"
 #include "machine/z80pio.h"
+#include "machine/z80sio.h"
 
 #define Z80_TAG         "u45"
 #define Z80DART_0_TAG   "u14"

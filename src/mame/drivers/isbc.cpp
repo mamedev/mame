@@ -25,7 +25,6 @@ able to deal with 256byte sectors so fails to load the irmx 512byte sector image
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
-//#include "machine/z80dart.h"
 #include "machine/z80sio.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/isbx/isbx.h"
@@ -449,7 +448,6 @@ void isbc_state::isbc286(machine_config &config)
 	pit.set_clk<0>(XTAL(22'118'400)/18);
 	pit.out_handler<0>().set(m_pic_0, FUNC(pic8259_device::ir0_w));
 	pit.set_clk<1>(XTAL(22'118'400)/18);
-//  pit.out_handler<1>().set(m_uart8274, FUNC(z80dart_device::rxtxcb_w));
 	pit.out_handler<1>().set(m_uart8274, FUNC(i8274_device::rxtxcb_w));
 	pit.set_clk<2>(XTAL(22'118'400)/18);
 	pit.out_handler<2>().set(FUNC(isbc_state::isbc286_tmr2_w));
@@ -491,26 +489,14 @@ void isbc_state::isbc286(machine_config &config)
 #endif
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
-#if 0
-	rs232a.rxd_handler().set(m_uart8274, FUNC(z80dart_device::rxa_w));
-	rs232a.dcd_handler().set(m_uart8274, FUNC(z80dart_device::dcda_w));
-	rs232a.cts_handler().set(m_uart8274, FUNC(z80dart_device::ctsa_w));
-#else
 	rs232a.rxd_handler().set(m_uart8274, FUNC(i8274_device::rxa_w));
 	rs232a.dcd_handler().set(m_uart8274, FUNC(i8274_device::dcda_w));
 	rs232a.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsa_w));
-#endif
 
 	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, "terminal"));
-#if 0
-	rs232b.rxd_handler().set(m_uart8274, FUNC(z80dart_device::rxb_w));
-	rs232b.dcd_handler().set(m_uart8274, FUNC(z80dart_device::dcdb_w));
-	rs232b.cts_handler().set(m_uart8274, FUNC(z80dart_device::ctsb_w));
-#else
 	rs232b.rxd_handler().set(m_uart8274, FUNC(i8274_device::rxb_w));
 	rs232b.dcd_handler().set(m_uart8274, FUNC(i8274_device::dcdb_w));
 	rs232b.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsb_w));
-#endif
 	rs232b.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(isbc286_terminal));
 
 	ISBX_SLOT(config, m_sbx[0], 0, isbx_cards, nullptr);

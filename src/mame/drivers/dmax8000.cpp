@@ -29,7 +29,7 @@ What there is of the schematic shows no sign of a daisy chain or associated inte
 #include "machine/wd_fdc.h"
 #include "machine/z80daisy.h"
 #include "machine/z80pio.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80ctc.h"
 #include "machine/mm58274c.h"
 #include "bus/rs232/rs232.h"

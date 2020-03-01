@@ -12,9 +12,9 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
+#include "machine/z80sio.h"
 
 #define Z80_TAG         "u30"
 #define Z80CTC_TAG      "u20"

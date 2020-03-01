@@ -17,7 +17,7 @@
 #include "bus/mtx/exp.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
 #include "machine/ram.h"

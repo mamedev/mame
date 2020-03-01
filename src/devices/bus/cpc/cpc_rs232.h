@@ -12,7 +12,7 @@
 #pragma once
 
 #include "cpcexp.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/pit8253.h"
 #include "bus/rs232/rs232.h"
 
