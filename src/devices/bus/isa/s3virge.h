@@ -22,6 +22,8 @@ public:
 	// construction/destruction
 	s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto linear_config_changed() { return m_linear_config_changed_cb.bind(); }
+
 	virtual READ8_MEMBER(port_03b0_r) override;
 	virtual WRITE8_MEMBER(port_03b0_w) override;
 	virtual READ8_MEMBER(port_03c0_r) override;
@@ -54,6 +56,7 @@ public:
 	uint32_t get_linear_address() { return s3virge.linear_address; }
 	void set_linear_address(uint32_t addr) { s3virge.linear_address = addr; }
 	uint8_t get_linear_address_size() { return s3virge.linear_address_size; }
+	uint32_t get_linear_address_size_full() { return s3virge.linear_address_size_full; }
 	bool is_linear_address_active() { return s3virge.linear_address_enable; }
 	bool is_new_mmio_active() { return s3.cr53 & 0x08; }
 	uint16_t dest_stride()
@@ -236,11 +239,18 @@ protected:
 	}
 	uint32_t GetROP(uint8_t rop, uint32_t src, uint32_t dst, uint32_t pat);
 	bool advance_pixel();
+
+	devcb_write_line m_linear_config_changed_cb;
+
 private:
 	emu_timer* m_draw_timer;
 	void bitblt_step();
 	void bitblt_colour_step();
 	void bitblt_monosrc_step();
+	void line2d_step();
+	void poly2d_step();
+	void line3d_step();
+	void poly3d_step();
 	void add_command(int cmd_type);
 	void command_start();
 	void command_finish();
