@@ -2698,7 +2698,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
 			<dataarea name="rom" size="8388608">
-				<rom name="092885 - Ratatouille (FR).bin" size="8388608" crc="f7b6a151" sha1="e8d7078726b077d1bf0a13b715de4a03fd93189c" />
+				<rom name="092885 - Ratatouille (FR).bin" size="8388608" crc="f7b6a151" sha1="d16ae71df4d9fec9ae30962b46fc503dd450a998" />
 			</dataarea>
 		</part>
 	</software>
@@ -3060,7 +3060,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
 			<dataarea name="rom" size="8388608">
-				<rom name="092865 - Shrek Le Troisieme (FR).bin" size="8388608" crc="7cc9922c" sha1="c936505dabc4043665f429a9109a1e533b9dc311" />
+				<rom name="092865 - Shrek Le Troisieme (FR).bin" size="8388608" crc="7cc9922c" sha1="c45ce64db0c5580ce8339ab114b849955e58fed4" />
 			</dataarea>
 		</part>
 	</software>
