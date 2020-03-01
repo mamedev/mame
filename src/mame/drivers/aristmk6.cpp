@@ -4,7 +4,6 @@
 
 Aristocrat MK6 (2000)
 Product numbers: 410480, 410481, 410556, 410557
-                 410485 (System EPROM Board)
 
 Hitachi SH4 7750
 NEC PowerVR Neon 250 (PMX1-LC)
@@ -14,14 +13,34 @@ PCI PLX9054
 
 Aristocrat MK6 XP (2002)
 Product numbers: 410540, 410541
-                 410663 (Storage Expansion Board)
 
 same as above except:
 - Altera APEX instead of FLEX
 - doesn't have PCI controller
 
+System EPROM Board
+Product number: 410485
+
+Storage Expansion Board
+Product number: 410663
+
+SPC 2.5 Type II Board
+Product number: 432825
+
 notes:
 0x0001CA1E - critical error handler in BIOS, R4 - pointer to error message
+
+Comms protocols:
+
+The "Malaysian" games are actually casino versions and may be generic to all regions, however the region for the 15011025 system software is currently unknown.
+These games use the ASP1000 protocol.
+The reason the region is currently called Malaysia is that there seems to be code for RM (ringgit) denominations in the system software.
+
+Queensland games use the QCOM protocol.
+
+The South Australian system set and game (only one dumped so far) uses the VLC (Video Lottery Consultants) protocol.
+
+Victorian games (none are dumped) use either VLC or QCOM depending on the game and/or the operator the machines were designed for. Victoria had two "rival" gaming operators during the MK6's lifetime.
 
 */
 
@@ -312,8 +331,8 @@ void aristmk6_state::aristmk6_map(address_map &map)
 	map(0x12000010, 0x12000017).w(FUNC(aristmk6_state::eeprom_w));
 	map(0x12000078, 0x1200007f).nopw(); // watchdog ??
 	map(0x12000080, 0x12000087).nopw(); // 0-1-2 written here repeatedly, diag LED or smth ?
-	map(0x120000E0, 0x120000E7).r(FUNC(aristmk6_state::hwver_r));
-	map(0x120000E8, 0x12000107).r(FUNC(aristmk6_state::irqpend_r));
+	map(0x120000e0, 0x120000e7).r(FUNC(aristmk6_state::hwver_r));
+	map(0x120000e8, 0x12000107).r(FUNC(aristmk6_state::irqpend_r));
 	map(0x12000108, 0x12000127).w(FUNC(aristmk6_state::irqen_w));
 	map(0x12400010, 0x12400017).rw(m_uart1, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x12400018, 0x1240001f).rw(m_uart0, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
@@ -379,143 +398,145 @@ BIOS/set chips are known to be in 3 locations depending on the PCB used:
 "System Left"  is at u70 on MK6 and MK6XP boards, u3 on MK6 System EPROM board and u10 on storage expansion board
 The earliest BIOSes used 4 chips, leaving room for only 4 game EPROMs on a standard MK6 board
 
+Earlier BIOSes are usually not compatible with later games.
+
 To test whether the BIOS loading is fine, let's check the correct endianness of text string in CPU space
 typically at around 0x3100-0x3200, 0x3600-0x3700 for Left/Right BIOS dumps (2 files)
 */
 
 #define ARISTMK6_BIOS \
 	ROM_REGION( 0x0400000, "maincpu", ROMREGION_ERASEFF) \
-	ROM_SYSTEM_BIOS( 0, "au-nsw1",   "Aristocrat MK6 Base (02010114, NSW/ACT)" ) \
-	ROM_LOAD64_WORD_BIOS( 0, "02010114.u84", 0x0000000, 0x0100000, CRC(183e3836) SHA1(4c802d0cd010bc007acb3a83e37aaa29b2d13d87) ) /* From Arabian Nights & Helen of Troy */ \
-	ROM_LOAD64_WORD_BIOS( 0, "02010114.u71", 0x0000002, 0x0100000, CRC(8f83c3dd) SHA1(a5f9d80b4b515b24299d0241e1665cfd9da8bab7) ) \
-	ROM_LOAD64_WORD_BIOS( 0, "02010114.u83", 0x0000004, 0x0100000, CRC(945104d7) SHA1(e372d0cf889c72b5d001b26fe4a925a28486537f) ) \
-	ROM_LOAD64_WORD_BIOS( 0, "02010114.u70", 0x0000006, 0x0100000, CRC(3ba4379f) SHA1(84367f12c4c9224d2ab9cae83ae8727de338408c) ) \
-	ROM_SYSTEM_BIOS( 1, "au-nsw2",   "Aristocrat MK6 Base (02010201, NSW/ACT)" ) \
-	ROM_LOAD64_WORD_BIOS( 1, "02010201.u84", 0x0000000, 0x0100000, CRC(0920930f) SHA1(771b0f62442d1c75b1bb59ad82365b7ab8747173) ) /* From Money Tree & Go For Green */ \
-	ROM_LOAD64_WORD_BIOS( 1, "02010201.u71", 0x0000002, 0x0100000, CRC(24d5614a) SHA1(fdcf3826dccc72b74b66379b1411cf211d5a1670) ) \
-	ROM_LOAD64_WORD_BIOS( 1, "02010201.u83", 0x0000004, 0x0100000, CRC(5f64a20c) SHA1(397404ab6d2a1aa3c1fc77bb9421fef7079b65a5) ) \
-	ROM_LOAD64_WORD_BIOS( 1, "02010201.u70", 0x0000006, 0x0100000, CRC(9b2db442) SHA1(d512398a2d9257bd385dc50d61c63cd1a47300ba) ) \
-	ROM_SYSTEM_BIOS( 2, "au-nsw3",   "Aristocrat MK6 Base (02061013, NSW/ACT)" ) \
-	ROM_LOAD32_WORD_BIOS( 2, "02061013_right.u83", 0x0000000, 0x0100000, CRC(7a8619a5) SHA1(bd03ddb68817c1660b009e102ccf69e5b603b875) ) \
-	ROM_LOAD32_WORD_BIOS( 2, "02061013_left.u70",  0x0000002, 0x0100000, CRC(e70a7007) SHA1(0935f924866162d9c0fbdbb99391cbf730a04b76) ) \
-	ROM_SYSTEM_BIOS( 3, "au-nsw4",   "Aristocrat MK6 Base (03010301, NSW/ACT)" ) \
-	ROM_LOAD64_WORD_BIOS( 3, "03010301.u84", 0x0000000, 0x0100000, CRC(a34a9f16) SHA1(b8750e6ceb1715da8e5ac2f0183254e29a042641) ) /* From Queen of the Nile Special Edition */ \
-	ROM_LOAD64_WORD_BIOS( 3, "03010301.u71", 0x0000002, 0x0100000, CRC(d793440a) SHA1(dced4c04bde13293af77a9a1f4c5c606e3758de0) ) \
-	ROM_LOAD64_WORD_BIOS( 3, "03010301.u83", 0x0000004, 0x0100000, CRC(c8580554) SHA1(58b8bfff2f8d298c4e3be2b01900800c45fa7ad7) ) \
-	ROM_LOAD64_WORD_BIOS( 3, "03010301.u70", 0x0000006, 0x0100000, CRC(5ae69121) SHA1(36dd3f9aaf5f7d2751d1954d67f898bc3ec71f3b) ) \
-	ROM_SYSTEM_BIOS( 4, "au-nsw5",   "Aristocrat MK6 Base (04010501, NSW/ACT)" ) \
-	ROM_LOAD32_WORD_BIOS( 4, "04010501_right.u83", 0x0000000, 0x0100000, CRC(3daefb7a) SHA1(411471713219f4bab5ccf5fe7a12a6c138c8c550) ) /* From Diamonds Forever */ \
-	ROM_LOAD32_WORD_BIOS( 4, "04010501_left.u70",  0x0000002, 0x0100000, CRC(21182775) SHA1(7c5b7f5aba3babc85f512a8f7d4ebc0d83eb842a) ) \
-	ROM_SYSTEM_BIOS( 5, "au-nsw6",   "Aristocrat MK6 Base (05010601, NSW/ACT)" ) \
-	ROM_LOAD32_WORD_BIOS( 5, "05010601_right.u83", 0x0000000, 0x0100000, CRC(c12eac11) SHA1(683b9ddc323865ace7dca37d13b55de6e42759a5) ) /* From Thai Princess & Venetian Nights */ \
-	ROM_LOAD32_WORD_BIOS( 5, "05010601_left.u70",  0x0000002, 0x0100000, CRC(b3e6b4a0) SHA1(3bf398c9257579f8e51ce716d6ebfa74fa510273) ) \
-	ROM_SYSTEM_BIOS( 6, "au-nsw7",   "Aristocrat MK6 Base (07010801, NSW/ACT)" ) \
-	ROM_LOAD32_WORD_BIOS( 6, "07010801_right.u83", 0x0000000, 0x0200000, CRC(8c148c11) SHA1(5ff3be18455b4f04675fec8d5b9d881295c65e23) ) /* From Jailbreak */ \
-	ROM_LOAD32_WORD_BIOS( 6, "07010801_left.u70",  0x0000002, 0x0200000, CRC(8e92af68) SHA1(00d2bb655b7964a9652896741210ec534df0b0d2) ) \
+	ROM_SYSTEM_BIOS( 0, "au-nsw1",   "Aristocrat MK6 Base (24013001, NSW/ACT)" ) \
+	ROM_LOAD32_WORD_BIOS( 0, "24013001_right.u83", 0x0000000, 0x0200000, CRC(e97afedf) SHA1(10ca3b015afaff5d7812f0f5207b2535602136a5) ) /* From Wild Stallion */ \
+	ROM_LOAD32_WORD_BIOS( 0, "24013001_left.u70",  0x0000002, 0x0200000, CRC(06ae7e07) SHA1(39a45575b66906d73b519988d1001c99b05c5f34) ) \
+	ROM_SYSTEM_BIOS( 1, "au-nsw2",   "Aristocrat MK6 Base (21012901, NSW/ACT)" ) \
+	ROM_LOAD32_WORD_BIOS( 1, "21012901_right.u83", 0x0000000, 0x0200000, CRC(757618f2) SHA1(43f9a3e7d544979f8c6974945914d9e099b02abd) ) /* From Red Baron */ \
+	ROM_LOAD32_WORD_BIOS( 1, "21012901_left.u70",  0x0000002, 0x0200000, CRC(0d271470) SHA1(5cd4b604bfe2fd7e9a8d08e1c7c97f17ae068479) ) \
+	ROM_SYSTEM_BIOS( 2, "au-nsw3",   "Aristocrat MK6 Base (19012801, NSW/ACT)" ) \
+	ROM_LOAD32_WORD_BIOS( 2, "19012801_right.u83", 0x0000000, 0x0200000, CRC(5b20a96c) SHA1(5fd916b7cc2cdd51bf7dd212c1114f94dc9c7926) ) /* From Cactus Corral & Cashman Tonight & Heart of Vegas & Moonlight Waltz */ \
+	ROM_LOAD32_WORD_BIOS( 2, "19012801_left.u70",  0x0000002, 0x0200000, CRC(b03bd17c) SHA1(f281e80f6dda5b727ed71d2deebe3b0ff548773f) ) \
+	ROM_SYSTEM_BIOS( 3, "au-nsw4",   "Aristocrat MK6 Base (14011913, NSW/ACT)" ) \
+	ROM_LOAD32_WORD_BIOS( 3, "14011913_right.u83", 0x0000000, 0x0200000, CRC(01d13b89) SHA1(b1013366d0803dfbec5a5f90f6a5cea862de0513) ) \
+	ROM_LOAD32_WORD_BIOS( 3, "14011913_left.u70",  0x0000002, 0x0200000, CRC(9a4cefdf) SHA1(6c15bc565ede8af19361d60ee1e6657a8055c92c) ) \
+	ROM_SYSTEM_BIOS( 4, "au-nsw5",   "Aristocrat MK6 Base (13012001, NSW/ACT)" ) \
+	ROM_LOAD32_WORD_BIOS( 4, "13012001_right.u83", 0x0000000, 0x0200000, CRC(e627dbfa) SHA1(4fedbe0975ceb7dc0ebebf18a7708d78984db9b7) ) /* From Grizzly & Queen of the Nile */ \
+	ROM_LOAD32_WORD_BIOS( 4, "13012001_left.u70",  0x0000002, 0x0200000, CRC(38e8f659) SHA1(88c6acba99b0aca023c6f4d27c061c231490e9e0) ) \
+	ROM_SYSTEM_BIOS( 5, "au-nsw6",   "Aristocrat MK6 Base (11011901, NSW/ACT)" ) \
+	ROM_LOAD32_WORD_BIOS( 5, "11011901_right.u83", 0x0000000, 0x0200000, CRC(73dcb11c) SHA1(69ae4f32a0c9141b2a82ff3935b0cd20333d2964) ) \
+	ROM_LOAD32_WORD_BIOS( 5, "11011901_left.u70",  0x0000002, 0x0200000, CRC(d3dd2210) SHA1(3548f8cc39859d3f44a55f6bae48966a2d48e0eb) ) \
+	ROM_SYSTEM_BIOS( 6, "au-nsw7",   "Aristocrat MK6 Base (11011501, NSW/ACT)" ) \
+	ROM_LOAD32_WORD_BIOS( 6, "11011501_right.u83", 0x0000000, 0x0200000, CRC(de4c3aed) SHA1(21596a2edd20eb7de7a4ec8900a270b09c8f326f) ) \
+	ROM_LOAD32_WORD_BIOS( 6, "11011501_left.u70",  0x0000002, 0x0200000, CRC(c5cc3461) SHA1(5b43c4cb6110a6ccf67cd0f3789253f6872b20c4) ) \
 	ROM_SYSTEM_BIOS( 7, "au-nsw8",   "Aristocrat MK6 Base (09011001, NSW/ACT)" ) \
 	ROM_LOAD32_WORD_BIOS( 7, "09011001_right.u83", 0x0000000, 0x0200000, CRC(8a853f80) SHA1(9a75498f7b02c81a483b4e1c158f35f0ee4c0112) ) \
 	ROM_LOAD32_WORD_BIOS( 7, "09011001_left.u70",  0x0000002, 0x0200000, CRC(229c2e63) SHA1(91fd2b1acb69efe073647e93db9f11042add2feb) ) \
-	ROM_SYSTEM_BIOS( 8, "au-nsw9",   "Aristocrat MK6 Base (11011501, NSW/ACT)" ) \
-	ROM_LOAD32_WORD_BIOS( 8, "11011501_right.u83", 0x0000000, 0x0200000, CRC(de4c3aed) SHA1(21596a2edd20eb7de7a4ec8900a270b09c8f326f) ) \
-	ROM_LOAD32_WORD_BIOS( 8, "11011501_left.u70",  0x0000002, 0x0200000, CRC(c5cc3461) SHA1(5b43c4cb6110a6ccf67cd0f3789253f6872b20c4) ) \
-	ROM_SYSTEM_BIOS( 9, "au-nsw10",   "Aristocrat MK6 Base (11011901, NSW/ACT)" ) \
-	ROM_LOAD32_WORD_BIOS( 9, "11011901_right.u83", 0x0000000, 0x0200000, CRC(73dcb11c) SHA1(69ae4f32a0c9141b2a82ff3935b0cd20333d2964) ) \
-	ROM_LOAD32_WORD_BIOS( 9, "11011901_left.u70",  0x0000002, 0x0200000, CRC(d3dd2210) SHA1(3548f8cc39859d3f44a55f6bae48966a2d48e0eb) ) \
-	ROM_SYSTEM_BIOS( 10, "au-nsw11",   "Aristocrat MK6 Base (13012001, NSW/ACT)" ) \
-	ROM_LOAD32_WORD_BIOS( 10, "13012001_right.u83", 0x0000000, 0x0200000, CRC(e627dbfa) SHA1(4fedbe0975ceb7dc0ebebf18a7708d78984db9b7) ) /* From Grizzly & Queen of the Nile */ \
-	ROM_LOAD32_WORD_BIOS( 10, "13012001_left.u70",  0x0000002, 0x0200000, CRC(38e8f659) SHA1(88c6acba99b0aca023c6f4d27c061c231490e9e0) ) \
-	ROM_SYSTEM_BIOS( 11, "au-nsw12",   "Aristocrat MK6 Base (14011913, NSW/ACT)" ) \
-	ROM_LOAD32_WORD_BIOS( 11, "14011913_right.u83", 0x0000000, 0x0200000, CRC(01d13b89) SHA1(b1013366d0803dfbec5a5f90f6a5cea862de0513) ) \
-	ROM_LOAD32_WORD_BIOS( 11, "14011913_left.u70",  0x0000002, 0x0200000, CRC(9a4cefdf) SHA1(6c15bc565ede8af19361d60ee1e6657a8055c92c) ) \
-	ROM_SYSTEM_BIOS( 12, "au-nsw13",   "Aristocrat MK6 Base (19012801, NSW/ACT)" ) \
-	ROM_LOAD32_WORD_BIOS( 12, "19012801_right.u83", 0x0000000, 0x0200000, CRC(5b20a96c) SHA1(5fd916b7cc2cdd51bf7dd212c1114f94dc9c7926) ) /* From Cactus Corral & Cashman Tonight & Heart of Vegas & Moonlight Waltz */ \
-	ROM_LOAD32_WORD_BIOS( 12, "19012801_left.u70",  0x0000002, 0x0200000, CRC(b03bd17c) SHA1(f281e80f6dda5b727ed71d2deebe3b0ff548773f) ) \
-	ROM_SYSTEM_BIOS( 13, "au-nsw14",   "Aristocrat MK6 Base (21012901, NSW/ACT)" ) \
-	ROM_LOAD32_WORD_BIOS( 13, "21012901_right.u83", 0x0000000, 0x0200000, CRC(757618f2) SHA1(43f9a3e7d544979f8c6974945914d9e099b02abd) ) /* From Red Baron */ \
-	ROM_LOAD32_WORD_BIOS( 13, "21012901_left.u70",  0x0000002, 0x0200000, CRC(0d271470) SHA1(5cd4b604bfe2fd7e9a8d08e1c7c97f17ae068479) ) \
-	ROM_SYSTEM_BIOS( 14, "au-nsw15",   "Aristocrat MK6 Base (24013001, NSW/ACT)" ) \
-	ROM_LOAD32_WORD_BIOS( 14, "24013001_right.u83", 0x0000000, 0x0200000, CRC(e97afedf) SHA1(10ca3b015afaff5d7812f0f5207b2535602136a5) ) /* From Wild Stallion */ \
-	ROM_LOAD32_WORD_BIOS( 14, "24013001_left.u70",  0x0000002, 0x0200000, CRC(06ae7e07) SHA1(39a45575b66906d73b519988d1001c99b05c5f34) ) \
+	ROM_SYSTEM_BIOS( 8, "au-nsw9",   "Aristocrat MK6 Base (07010801, NSW/ACT)" ) \
+	ROM_LOAD32_WORD_BIOS( 8, "07010801_right.u83", 0x0000000, 0x0200000, CRC(8c148c11) SHA1(5ff3be18455b4f04675fec8d5b9d881295c65e23) ) /* From Jailbreak */ \
+	ROM_LOAD32_WORD_BIOS( 8, "07010801_left.u70",  0x0000002, 0x0200000, CRC(8e92af68) SHA1(00d2bb655b7964a9652896741210ec534df0b0d2) ) \
+	ROM_SYSTEM_BIOS( 9, "au-nsw10",   "Aristocrat MK6 Base (05010601, NSW/ACT)" ) \
+	ROM_LOAD32_WORD_BIOS( 9, "05010601_right.u83", 0x0000000, 0x0100000, CRC(c12eac11) SHA1(683b9ddc323865ace7dca37d13b55de6e42759a5) ) /* From Thai Princess & Venetian Nights */ \
+	ROM_LOAD32_WORD_BIOS( 9, "05010601_left.u70",  0x0000002, 0x0100000, CRC(b3e6b4a0) SHA1(3bf398c9257579f8e51ce716d6ebfa74fa510273) ) \
+	ROM_SYSTEM_BIOS( 10, "au-nsw11",   "Aristocrat MK6 Base (04010501, NSW/ACT)" ) \
+	ROM_LOAD32_WORD_BIOS( 10, "04010501_right.u83", 0x0000000, 0x0100000, CRC(3daefb7a) SHA1(411471713219f4bab5ccf5fe7a12a6c138c8c550) ) /* From Diamonds Forever */ \
+	ROM_LOAD32_WORD_BIOS( 10, "04010501_left.u70",  0x0000002, 0x0100000, CRC(21182775) SHA1(7c5b7f5aba3babc85f512a8f7d4ebc0d83eb842a) ) \
+	ROM_SYSTEM_BIOS( 11, "au-nsw12",   "Aristocrat MK6 Base (03010301, NSW/ACT)" ) \
+	ROM_LOAD64_WORD_BIOS( 11, "03010301.u84", 0x0000000, 0x0100000, CRC(a34a9f16) SHA1(b8750e6ceb1715da8e5ac2f0183254e29a042641) ) /* From Queen of the Nile Special Edition */ \
+	ROM_LOAD64_WORD_BIOS( 11, "03010301.u71", 0x0000002, 0x0100000, CRC(d793440a) SHA1(dced4c04bde13293af77a9a1f4c5c606e3758de0) ) \
+	ROM_LOAD64_WORD_BIOS( 11, "03010301.u83", 0x0000004, 0x0100000, CRC(c8580554) SHA1(58b8bfff2f8d298c4e3be2b01900800c45fa7ad7) ) \
+	ROM_LOAD64_WORD_BIOS( 11, "03010301.u70", 0x0000006, 0x0100000, CRC(5ae69121) SHA1(36dd3f9aaf5f7d2751d1954d67f898bc3ec71f3b) ) \
+	ROM_SYSTEM_BIOS( 12, "au-nsw13",   "Aristocrat MK6 Base (02061013, NSW/ACT)" ) \
+	ROM_LOAD32_WORD_BIOS( 12, "02061013_right.u83", 0x0000000, 0x0100000, CRC(7a8619a5) SHA1(bd03ddb68817c1660b009e102ccf69e5b603b875) ) \
+	ROM_LOAD32_WORD_BIOS( 12, "02061013_left.u70",  0x0000002, 0x0100000, CRC(e70a7007) SHA1(0935f924866162d9c0fbdbb99391cbf730a04b76) ) \
+	ROM_SYSTEM_BIOS( 13, "au-nsw14",   "Aristocrat MK6 Base (02010201, NSW/ACT)" ) \
+	ROM_LOAD64_WORD_BIOS( 13, "02010201.u84", 0x0000000, 0x0100000, CRC(0920930f) SHA1(771b0f62442d1c75b1bb59ad82365b7ab8747173) ) /* From Money Tree & Go For Green */ \
+	ROM_LOAD64_WORD_BIOS( 13, "02010201.u71", 0x0000002, 0x0100000, CRC(24d5614a) SHA1(fdcf3826dccc72b74b66379b1411cf211d5a1670) ) \
+	ROM_LOAD64_WORD_BIOS( 13, "02010201.u83", 0x0000004, 0x0100000, CRC(5f64a20c) SHA1(397404ab6d2a1aa3c1fc77bb9421fef7079b65a5) ) \
+	ROM_LOAD64_WORD_BIOS( 13, "02010201.u70", 0x0000006, 0x0100000, CRC(9b2db442) SHA1(d512398a2d9257bd385dc50d61c63cd1a47300ba) ) \
+	ROM_SYSTEM_BIOS( 14, "au-nsw15",   "Aristocrat MK6 Base (02010114, NSW/ACT)" ) \
+	ROM_LOAD64_WORD_BIOS( 14, "02010114.u84", 0x0000000, 0x0100000, CRC(183e3836) SHA1(4c802d0cd010bc007acb3a83e37aaa29b2d13d87) ) /* From Arabian Nights & Helen of Troy */ \
+	ROM_LOAD64_WORD_BIOS( 14, "02010114.u71", 0x0000002, 0x0100000, CRC(8f83c3dd) SHA1(a5f9d80b4b515b24299d0241e1665cfd9da8bab7) ) \
+	ROM_LOAD64_WORD_BIOS( 14, "02010114.u83", 0x0000004, 0x0100000, CRC(945104d7) SHA1(e372d0cf889c72b5d001b26fe4a925a28486537f) ) \
+	ROM_LOAD64_WORD_BIOS( 14, "02010114.u70", 0x0000006, 0x0100000, CRC(3ba4379f) SHA1(84367f12c4c9224d2ab9cae83ae8727de338408c) ) \
 	ROM_SYSTEM_BIOS( 15, "au-sa1",   "Aristocrat MK6 Base (03030708, South Australia)" ) \
 	ROM_LOAD32_WORD_BIOS( 15, "03030708_right.u83", 0x0000000, 0x0100000, CRC(b4b3c6a5) SHA1(5747f98a6eaa5c24a23d1d76a28b33a3bfbbfd1f) ) /* From Scatter Magic II SA */ \
 	ROM_LOAD32_WORD_BIOS( 15, "03030708_left.u70",  0x0000002, 0x0100000, CRC(4e5ad823) SHA1(77ab1c29c6172cfdcef776222a72b2b44114d4da) ) \
 	ROM_SYSTEM_BIOS( 16, "my",   "Aristocrat MK6 Base (15011025, Malaysia)" ) \
 	ROM_LOAD32_WORD_BIOS( 16, "15011025_right.u83", 0x0000000, 0x0200000, CRC(bf21a975) SHA1(a251b1a7342387300689cd50fe4ce7975b903ac5) ) \
 	ROM_LOAD32_WORD_BIOS( 16, "15011025_left.u70",  0x0000002, 0x0200000, CRC(c02e14b0) SHA1(6bf98927813519dfe60e582dbe5be3ccd87f7c91) ) \
-	ROM_SYSTEM_BIOS( 17, "au-qld1",   "Aristocrat MK6 Base (14011605, Queensland))" ) \
-	ROM_LOAD32_WORD_BIOS( 17, "14011605_right.u83", 0x0000000, 0x0200000, CRC(2bec5b74) SHA1(854733cada75e632f01f7096d4740ed4941a3d5b) ) /* From Moon Fire - Jackpot Carnival */ \
-	ROM_LOAD32_WORD_BIOS( 17, "14011605_left.u70",  0x0000002, 0x0200000, CRC(cd26d4f0) SHA1(40822714abf08aeb08d827dbd8cd099f86803754) ) \
-	ROM_SYSTEM_BIOS( 18, "au-qld2",   "Aristocrat MK6 Base (20012305, Queensland)" ) \
-	ROM_LOAD32_WORD_BIOS( 18, "20012305_right.u83", 0x0000000, 0x0200000, CRC(e436c1f5) SHA1(62ee529cc971fd76aa2ccc15778e3f0c40e3e47f) ) /* From Spring Festival */ \
-	ROM_LOAD32_WORD_BIOS( 18, "20012305_left.u70",  0x0000002, 0x0200000, CRC(ea8961cc) SHA1(0ebc7c3b94a6e01ee984af4711043130d9670bd3) ) \
-	ROM_SYSTEM_BIOS( 19, "au-qld3",   "Aristocrat MK6 Base (20012605, Queensland)" ) \
-	ROM_LOAD32_WORD_BIOS( 19, "20012605_right.u83", 0x0000000, 0x0200000, CRC(045b82ad) SHA1(b8e4f9f826970d83ae5fd2f2898de12ad1bf2d24) ) \
-	ROM_LOAD32_WORD_BIOS( 19, "20012605_left.u70",  0x0000002, 0x0200000, CRC(87331111) SHA1(6cdc2d81f68de23af18a975a6f27ddec246be405) ) \
-	ROM_SYSTEM_BIOS( 20, "au-qld4",   "Aristocrat MK6 Base (01040505, Queensland)" ) \
-	ROM_LOAD64_WORD_BIOS( 20, "01040505.u84", 0x0000000, 0x0100000, CRC(cf5a9d1e) SHA1(0ebba478fc883831d70b0fa95f43e5f93b07ae9e) ) /* From Show Me The Money */ \
-	ROM_LOAD64_WORD_BIOS( 20, "01040505.u71", 0x0000002, 0x0100000, CRC(f56ea77e) SHA1(319be1bee66a289e2c1f6beec07758f79aa0cf16) ) \
-	ROM_LOAD64_WORD_BIOS( 20, "01040505.u83", 0x0000004, 0x0100000, CRC(90f32169) SHA1(228be8b4a9eb6b2acf7f7a7561bd194009936026) ) \
-	ROM_LOAD64_WORD_BIOS( 20, "01040505.u70", 0x0000006, 0x0100000, CRC(b9ddea66) SHA1(f4bfdeada39a3f0094d6468b7374a34f88f5df7f) ) \
+	ROM_SYSTEM_BIOS( 17, "au-qld1",   "Aristocrat MK6 Base (25012805, Queensland)" ) \
+	ROM_LOAD32_WORD_BIOS( 17, "25012805_right.u83", 0x0000000, 0x0200000, CRC(2ecd8da8) SHA1(389e9668b2ba4fffed5d2721b2ce70d502fb9f67) ) \
+	ROM_LOAD32_WORD_BIOS( 17, "25012805_left.u70",  0x0000002, 0x0200000, CRC(996f32ce) SHA1(cf21bef745986fcbd298167453c7b8e5945ce602) ) \
+	ROM_SYSTEM_BIOS( 18, "au-qld2",   "Aristocrat MK6 Base (20012605, Queensland)" ) \
+	ROM_LOAD32_WORD_BIOS( 18, "20012605_right.u83", 0x0000000, 0x0200000, CRC(045b82ad) SHA1(b8e4f9f826970d83ae5fd2f2898de12ad1bf2d24) ) \
+	ROM_LOAD32_WORD_BIOS( 18, "20012605_left.u70",  0x0000002, 0x0200000, CRC(87331111) SHA1(6cdc2d81f68de23af18a975a6f27ddec246be405) ) \
+	ROM_SYSTEM_BIOS( 19, "au-qld3",   "Aristocrat MK6 Base (20012305, Queensland)" ) \
+	ROM_LOAD32_WORD_BIOS( 19, "20012305_right.u83", 0x0000000, 0x0200000, CRC(e436c1f5) SHA1(62ee529cc971fd76aa2ccc15778e3f0c40e3e47f) ) /* From Spring Festival */ \
+	ROM_LOAD32_WORD_BIOS( 19, "20012305_left.u70",  0x0000002, 0x0200000, CRC(ea8961cc) SHA1(0ebc7c3b94a6e01ee984af4711043130d9670bd3) ) \
+	ROM_SYSTEM_BIOS( 20, "au-qld4",   "Aristocrat MK6 Base (14011605, Queensland))" ) \
+	ROM_LOAD32_WORD_BIOS( 20, "14011605_right.u83", 0x0000000, 0x0200000, CRC(2bec5b74) SHA1(854733cada75e632f01f7096d4740ed4941a3d5b) ) /* From Moon Fire - Jackpot Carnival */ \
+	ROM_LOAD32_WORD_BIOS( 20, "14011605_left.u70",  0x0000002, 0x0200000, CRC(cd26d4f0) SHA1(40822714abf08aeb08d827dbd8cd099f86803754) ) \
 	ROM_SYSTEM_BIOS( 21, "au-qld5",   "Aristocrat MK6 Base (04041205, Queensland)" ) \
 	ROM_LOAD32_WORD_BIOS( 21, "04041205_right.u83", 0x0000000, 0x0100000, CRC(ca6bc86c) SHA1(69fe7fc35694e4cd7f861bff4ec3a6165a81df6e) ) \
 	ROM_LOAD32_WORD_BIOS( 21, "04041205_left.u70",  0x0000002, 0x0100000, CRC(dfb9a119) SHA1(814a5a7877392aec4e4871d7f0e19d2fbd717409) ) \
 	ROM_SYSTEM_BIOS( 22, "au-qld6",   "Aristocrat MK6 Base (03130334, Queensland)" ) \
 	ROM_LOAD32_WORD_BIOS( 22, "03130334_right.u83", 0x0000000, 0x0200000, CRC(bce3d97f) SHA1(da36377cc1465022a2434703adee63bf48c71a9c) ) \
 	ROM_LOAD32_WORD_BIOS( 22, "03130334_left.u70",  0x0000002, 0x0200000, CRC(02175fde) SHA1(4e9a9e1e803a0c84b06aec99dc3147dd7a919eee) ) \
-	ROM_SYSTEM_BIOS( 23, "au-qld7",   "Aristocrat MK6 Base (25012805, Queensland)" ) \
-	ROM_LOAD32_WORD_BIOS( 23, "25012805_right.u83", 0x0000000, 0x0200000, CRC(2ecd8da8) SHA1(389e9668b2ba4fffed5d2721b2ce70d502fb9f67) ) \
-	ROM_LOAD32_WORD_BIOS( 23, "25012805_left.u70",  0x0000002, 0x0200000, CRC(996f32ce) SHA1(cf21bef745986fcbd298167453c7b8e5945ce602) ) \
-	ROM_SYSTEM_BIOS( 24, "us1",   "Aristocrat MK6 Base (01.02.08, USA)" ) \
-	ROM_LOAD32_WORD_BIOS( 24, "01.02.08_right.u2", 0x0000000, 0x0100000, CRC(aaaeac8c) SHA1(a565e5fcb4f55f31e7d36be40eec234248a66efd) ) \
-	ROM_LOAD32_WORD_BIOS( 24, "01.02.08_left.u3",  0x0000002, 0x0100000, CRC(f29fd1bf) SHA1(33e043d2616e10a1c7a0936c3d208f9bcc2ca6f3) ) \
-	ROM_SYSTEM_BIOS( 25, "us2",   "Aristocrat MK6 Base (01.03.03a, USA)" ) \
-	ROM_LOAD32_WORD_BIOS( 25, "01.03.03a_right.u83", 0x0000000, 0x0200000, CRC(253415f4) SHA1(50dc77ad87bc6be1932dda2fd4865602c8c49729) ) \
-	ROM_LOAD32_WORD_BIOS( 25, "01.03.03a_left.u70",  0x0000002, 0x0200000, CRC(4ab5dd40) SHA1(a6812cc624e6a98ea7b0697e2797fe10ba8e303e) ) \
-	ROM_SYSTEM_BIOS( 26, "us3",   "Aristocrat MK6 Base (01.03.03e, USA)" ) \
-	ROM_LOAD32_WORD_BIOS( 26, "01.03.03e_right.u83", 0x0000000, 0x0200000, CRC(2255e263) SHA1(5e9e093aaa17172f47a14c3baf7f6f0f73b19398) ) \
-	ROM_LOAD32_WORD_BIOS( 26, "01.03.03e_left.u70",  0x0000002, 0x0200000, CRC(ea50729a) SHA1(14b5a71bfb91ac366ddcb5f77fb54127808f8163) ) \
-	ROM_SYSTEM_BIOS( 27, "us4",   "Aristocrat MK6 Base (01.03.05, USA)" ) \
-	ROM_LOAD32_WORD_BIOS( 27, "01.03.05_right.u83", 0x0000000, 0x0200000, CRC(2c7f1ec3) SHA1(d03167f43ed6f9596080d91472695829378cef0a) ) \
-	ROM_LOAD32_WORD_BIOS( 27, "01.03.05_left.u70",  0x0000002, 0x0200000, CRC(0095e3f9) SHA1(d2e8786158b1ab0a614aab21cf1d14cbc04754af) ) \
-	ROM_SYSTEM_BIOS( 28, "us5",   "Aristocrat MK6 Base (01.03.06, USA)" ) \
-	ROM_LOAD32_WORD_BIOS( 28, "01.03.06_right.u83", 0x0000000, 0x0200000, CRC(bd48ca55) SHA1(8fb1576cbeb1c64c358880714740195d2e73e03e) ) /* From Diamond Eyes US */ \
-	ROM_LOAD32_WORD_BIOS( 28, "01.03.06_left.u70",  0x0000002, 0x0200000, CRC(2f9d9a29) SHA1(fdebfaca9a579d7249379f19aef22fbfd66bf943) ) \
-	ROM_SYSTEM_BIOS( 29, "us6",   "Aristocrat MK6 Base (01.03.07, USA)" ) \
-	ROM_LOAD32_WORD_BIOS( 29, "01.03.07_right.u83", 0x0000000, 0x0200000, CRC(2ebccc4e) SHA1(9342724e4451e9ab24ceae208284b50abd4f0be3) ) \
-	ROM_LOAD32_WORD_BIOS( 29, "01.03.07_left.u70",  0x0000002, 0x0200000, CRC(a3632da4) SHA1(1c96a88e86095b81801ab88e36a4cdfa4b893265) ) \
-	ROM_SYSTEM_BIOS( 30, "us7",   "Aristocrat MK6 Base (01.03.14, USA)" ) \
+	ROM_SYSTEM_BIOS( 23, "au-qld7",   "Aristocrat MK6 Base (01040505, Queensland)" ) \
+	ROM_LOAD64_WORD_BIOS( 23, "01040505.u84", 0x0000000, 0x0100000, CRC(cf5a9d1e) SHA1(0ebba478fc883831d70b0fa95f43e5f93b07ae9e) ) /* From Show Me The Money */ \
+	ROM_LOAD64_WORD_BIOS( 23, "01040505.u71", 0x0000002, 0x0100000, CRC(f56ea77e) SHA1(319be1bee66a289e2c1f6beec07758f79aa0cf16) ) \
+	ROM_LOAD64_WORD_BIOS( 23, "01040505.u83", 0x0000004, 0x0100000, CRC(90f32169) SHA1(228be8b4a9eb6b2acf7f7a7561bd194009936026) ) \
+	ROM_LOAD64_WORD_BIOS( 23, "01040505.u70", 0x0000006, 0x0100000, CRC(b9ddea66) SHA1(f4bfdeada39a3f0094d6468b7374a34f88f5df7f) ) \
+	ROM_SYSTEM_BIOS( 24, "us1",   "Aristocrat MK6 Base (01.04.11, US)" ) \
+	ROM_LOAD32_WORD_BIOS( 24, "01.04.11_right.u83", 0x0000000, 0x0200000, CRC(2dae8ca0) SHA1(7a0fb38b4c1ac7195d15bdab6f0cfb16c78430f0) ) \
+	ROM_LOAD32_WORD_BIOS( 24, "01.04.11_left.u70",  0x0000002, 0x0200000, CRC(787f2b07) SHA1(2548289e44f4b935346b759afb5383bdbac04c3e) ) \
+	ROM_SYSTEM_BIOS( 25, "us2",   "Aristocrat MK6 Base (01.04.10, US)" ) \
+	ROM_LOAD32_WORD_BIOS( 25, "01.04.10_right.u83", 0x0000000, 0x0200000, CRC(82ce2fcc) SHA1(4c8fb3db084a67e99d1420b3f895a06ce9ef5ec2) ) \
+	ROM_LOAD32_WORD_BIOS( 25, "01.04.10_left.u70",  0x0000002, 0x0200000, CRC(9d9d52c1) SHA1(b957220cdbedd516c219d1bfc28807ce466df93f) ) \
+	ROM_SYSTEM_BIOS( 26, "us3",   "Aristocrat MK6 Base (01.04.08, US)" ) \
+	ROM_LOAD32_WORD_BIOS( 26, "01.04.08_right.u83", 0x0000000, 0x0200000, CRC(95333304) SHA1(7afe49d6c5e4d6820f349778557daa88c5366a51) ) /* From Bob and Dolly, also u20 on EPROM expansion board */ \
+	ROM_LOAD32_WORD_BIOS( 26, "01.04.08_left.u70",  0x0000002, 0x0200000, CRC(0dfcad10) SHA1(53798be000304aed38909f5fd8470a68bedd8229) ) /* also u10 on EPROM expansion board */ \
+	ROM_SYSTEM_BIOS( 27, "us4",   "Aristocrat MK6 Base (01.04.07, US)" ) \
+	ROM_LOAD32_WORD_BIOS( 27, "01.04.07_right.u83", 0x0000000, 0x0200000, CRC(23c28e22) SHA1(98f24a1f86232b6c2c288a61ec7d60c867f192e5) ) \
+	ROM_LOAD32_WORD_BIOS( 27, "01.04.07_left.u70",  0x0000002, 0x0200000, CRC(acfb0fe0) SHA1(b1a772d7978e6ff4406a5bb39a71cb3f89608e72) ) \
+	ROM_SYSTEM_BIOS( 28, "us5",   "Aristocrat MK6 Base (01.04.04, US)" ) \
+	ROM_LOAD32_WORD_BIOS( 28, "01.04.04_right.u83", 0x0000000, 0x0200000, CRC(e57ba02d) SHA1(8e29403e6b619eeab41dc171221720bc7820ccdc) ) \
+	ROM_LOAD32_WORD_BIOS( 28, "01.04.04_left.u70",  0x0000002, 0x0200000, CRC(b984a92c) SHA1(90f7a61302caee40195c08565bdac856a3234c1d) ) \
+	ROM_SYSTEM_BIOS( 29, "us6",   "Aristocrat MK6 Base (01.03.17, US)" ) \
+	ROM_LOAD32_WORD_BIOS( 29, "01.03.17_right.u83", 0x0000000, 0x0200000, CRC(1582714b) SHA1(92d0a15314ffe526159bef9a364898dd1ebdfde7) ) \
+	ROM_LOAD32_WORD_BIOS( 29, "01.03.17_left.u70",  0x0000002, 0x0200000, CRC(a88193dc) SHA1(c9e1d483edaecd318d2e5fc8a54e84516c93e0ca) ) \
+	ROM_SYSTEM_BIOS( 30, "us7",   "Aristocrat MK6 Base (01.03.14, US)" ) \
 	ROM_LOAD32_WORD_BIOS( 30, "01.03.14_right.u83", 0x0000000, 0x0200000, CRC(889ffd82) SHA1(9c98c9cdcf5f7d05095f11006418133029e9f0f8) ) /* From 5 Dragons US */ \
 	ROM_LOAD32_WORD_BIOS( 30, "01.03.14_left.u70",  0x0000002, 0x0200000, CRC(7138fec4) SHA1(f81331d1875ac574d3e6c98be218ff25c6c7be5a) ) \
-	ROM_SYSTEM_BIOS( 31, "us8",   "Aristocrat MK6 Base (01.03.17, USA)" ) \
-	ROM_LOAD32_WORD_BIOS( 31, "01.03.17_right.u83", 0x0000000, 0x0200000, CRC(1582714b) SHA1(92d0a15314ffe526159bef9a364898dd1ebdfde7) ) \
-	ROM_LOAD32_WORD_BIOS( 31, "01.03.17_left.u70",  0x0000002, 0x0200000, CRC(a88193dc) SHA1(c9e1d483edaecd318d2e5fc8a54e84516c93e0ca) ) \
-	ROM_SYSTEM_BIOS( 32, "us9",   "Aristocrat MK6 Base (01.04.14, USA)" ) \
-	ROM_LOAD32_WORD_BIOS( 32, "01.04.04_right.u83", 0x0000000, 0x0200000, CRC(e57ba02d) SHA1(8e29403e6b619eeab41dc171221720bc7820ccdc) ) \
-	ROM_LOAD32_WORD_BIOS( 32, "01.04.04_left.u70",  0x0000002, 0x0200000, CRC(b984a92c) SHA1(90f7a61302caee40195c08565bdac856a3234c1d) ) \
-	ROM_SYSTEM_BIOS( 33, "us10",   "Aristocrat MK6 Base (01.04.07, USA)" ) \
-	ROM_LOAD32_WORD_BIOS( 33, "01.04.07_right.u83", 0x0000000, 0x0200000, CRC(23c28e22) SHA1(98f24a1f86232b6c2c288a61ec7d60c867f192e5) ) \
-	ROM_LOAD32_WORD_BIOS( 33, "01.04.07_left.u70",  0x0000002, 0x0200000, CRC(acfb0fe0) SHA1(b1a772d7978e6ff4406a5bb39a71cb3f89608e72) ) \
-	ROM_SYSTEM_BIOS( 34, "us11",   "Aristocrat MK6 Base (01.04.08, USA)" ) \
-	ROM_LOAD32_WORD_BIOS( 34, "01.04.08_right.u83", 0x0000000, 0x0200000, CRC(95333304) SHA1(7afe49d6c5e4d6820f349778557daa88c5366a51) ) /* From Bob and Dolly, also u20 on EPROM expansion board */ \
-	ROM_LOAD32_WORD_BIOS( 34, "01.04.08_left.u70",  0x0000002, 0x0200000, CRC(0dfcad10) SHA1(53798be000304aed38909f5fd8470a68bedd8229) ) /* also u10 on EPROM expansion board */ \
-	ROM_SYSTEM_BIOS( 35, "us12",   "Aristocrat MK6 Base (01.04.10, USA)" ) \
-	ROM_LOAD32_WORD_BIOS( 35, "01.04.10_right.u83", 0x0000000, 0x0200000, CRC(82ce2fcc) SHA1(4c8fb3db084a67e99d1420b3f895a06ce9ef5ec2) ) \
-	ROM_LOAD32_WORD_BIOS( 35, "01.04.10_left.u70",  0x0000002, 0x0200000, CRC(9d9d52c1) SHA1(b957220cdbedd516c219d1bfc28807ce466df93f) ) \
-	ROM_SYSTEM_BIOS( 36, "us13",   "Aristocrat MK6 Base (01.04.11, USA)" ) \
-	ROM_LOAD32_WORD_BIOS( 36, "01.04.11_right.u83", 0x0000000, 0x0200000, CRC(2dae8ca0) SHA1(7a0fb38b4c1ac7195d15bdab6f0cfb16c78430f0) ) \
-	ROM_LOAD32_WORD_BIOS( 36, "01.04.11_left.u70",  0x0000002, 0x0200000, CRC(787f2b07) SHA1(2548289e44f4b935346b759afb5383bdbac04c3e) ) \
-	ROM_SYSTEM_BIOS( 37, "set-us1",   "Aristocrat MK6 Set Chips (06.02.04, USA)" ) \
-	ROM_LOAD32_WORD_BIOS( 37, "06.02.04_right.u2", 0x0000000, 0x0100000, CRC(1cf5a853) SHA1(64d17efcce702df7a0b0e151293199478e25226d) ) \
-	ROM_LOAD32_WORD_BIOS( 37, "06.02.04_left.u3",  0x0000002, 0x0100000, CRC(117b75f2) SHA1(2129286853d3c50b8a943b71334d4ef6b98adc05) ) \
-	ROM_SYSTEM_BIOS( 38, "set-us2",   "Aristocrat MK6 Set Chips (06.02.20, USA)" ) \
-	ROM_LOAD32_WORD_BIOS( 38, "06.02.20_right.u83", 0x0000000, 0x0100000, CRC(e4001f60) SHA1(5da34efb1ac0f7c84a48e09363d20cfecda4bcf1) ) \
-	ROM_LOAD32_WORD_BIOS( 38, "06.02.20_left.u70",  0x0000002, 0x0100000, CRC(199ed3b9) SHA1(e3ee81ffd713f09e35a10c38e4f59282e2c5cd30) ) \
-	ROM_SYSTEM_BIOS( 39, "set-us3",   "Aristocrat MK6 Set Chips (06.03.03, USA)" ) \
-	ROM_LOAD32_WORD_BIOS( 39, "06.03.03_right.u2", 0x0000000, 0x0100000, CRC(98763498) SHA1(246e95cc12eb34f946b2f4938c59217718f6d841) ) \
-	ROM_LOAD32_WORD_BIOS( 39, "06.03.03_left.u3",  0x0000002, 0x0100000, CRC(a6924238) SHA1(b71ab39bf9c1fdbab556028138749e8c040ec83c) ) \
-	ROM_SYSTEM_BIOS( 40, "set-us4",   "Aristocrat MK6 Set Chips (06.03.04, USA)" ) \
-	ROM_LOAD32_WORD_BIOS( 40, "06.03.04_right.u2", 0x0000000, 0x0100000, CRC(6f5f5ef1) SHA1(70a43fba4de47ed8dcf38b25eafd5873f3428e72) ) \
-	ROM_LOAD32_WORD_BIOS( 40, "06.03.04_left.u3",  0x0000002, 0x0100000, CRC(7034f26b) SHA1(7be78f23bec38d05240cdfe1186ec0c8291f5a1c) )
+	ROM_SYSTEM_BIOS( 31, "us8",   "Aristocrat MK6 Base (01.03.07, US)" ) \
+	ROM_LOAD32_WORD_BIOS( 31, "01.03.07_right.u83", 0x0000000, 0x0200000, CRC(2ebccc4e) SHA1(9342724e4451e9ab24ceae208284b50abd4f0be3) ) \
+	ROM_LOAD32_WORD_BIOS( 31, "01.03.07_left.u70",  0x0000002, 0x0200000, CRC(a3632da4) SHA1(1c96a88e86095b81801ab88e36a4cdfa4b893265) ) \
+	ROM_SYSTEM_BIOS( 32, "us9",   "Aristocrat MK6 Base (01.03.06, US)" ) \
+	ROM_LOAD32_WORD_BIOS( 32, "01.03.06_right.u83", 0x0000000, 0x0200000, CRC(bd48ca55) SHA1(8fb1576cbeb1c64c358880714740195d2e73e03e) ) /* From Diamond Eyes US */ \
+	ROM_LOAD32_WORD_BIOS( 32, "01.03.06_left.u70",  0x0000002, 0x0200000, CRC(2f9d9a29) SHA1(fdebfaca9a579d7249379f19aef22fbfd66bf943) ) \
+	ROM_SYSTEM_BIOS( 33, "us10",   "Aristocrat MK6 Base (01.03.05, US)" ) \
+	ROM_LOAD32_WORD_BIOS( 33, "01.03.05_right.u83", 0x0000000, 0x0200000, CRC(2c7f1ec3) SHA1(d03167f43ed6f9596080d91472695829378cef0a) ) \
+	ROM_LOAD32_WORD_BIOS( 33, "01.03.05_left.u70",  0x0000002, 0x0200000, CRC(0095e3f9) SHA1(d2e8786158b1ab0a614aab21cf1d14cbc04754af) ) \
+	ROM_SYSTEM_BIOS( 34, "us11",   "Aristocrat MK6 Base (01.03.03e, US)" ) \
+	ROM_LOAD32_WORD_BIOS( 34, "01.03.03e_right.u83", 0x0000000, 0x0200000, CRC(2255e263) SHA1(5e9e093aaa17172f47a14c3baf7f6f0f73b19398) ) \
+	ROM_LOAD32_WORD_BIOS( 34, "01.03.03e_left.u70",  0x0000002, 0x0200000, CRC(ea50729a) SHA1(14b5a71bfb91ac366ddcb5f77fb54127808f8163) ) \
+	ROM_SYSTEM_BIOS( 35, "us12",   "Aristocrat MK6 Base (01.03.03a, US)" ) \
+	ROM_LOAD32_WORD_BIOS( 35, "01.03.03a_right.u83", 0x0000000, 0x0200000, CRC(253415f4) SHA1(50dc77ad87bc6be1932dda2fd4865602c8c49729) ) \
+	ROM_LOAD32_WORD_BIOS( 35, "01.03.03a_left.u70",  0x0000002, 0x0200000, CRC(4ab5dd40) SHA1(a6812cc624e6a98ea7b0697e2797fe10ba8e303e) ) \
+	ROM_SYSTEM_BIOS( 36, "us13",   "Aristocrat MK6 Base (01.02.08, US)" ) \
+	ROM_LOAD32_WORD_BIOS( 36, "01.02.08_right.u2", 0x0000000, 0x0100000, CRC(aaaeac8c) SHA1(a565e5fcb4f55f31e7d36be40eec234248a66efd) ) \
+	ROM_LOAD32_WORD_BIOS( 36, "01.02.08_left.u3",  0x0000002, 0x0100000, CRC(f29fd1bf) SHA1(33e043d2616e10a1c7a0936c3d208f9bcc2ca6f3) ) \
+	ROM_SYSTEM_BIOS( 37, "set-us1",   "Aristocrat MK6 Set Chips (06.03.04, US)" ) \
+	ROM_LOAD32_WORD_BIOS( 37, "06.03.04_right.u2", 0x0000000, 0x0100000, CRC(6f5f5ef1) SHA1(70a43fba4de47ed8dcf38b25eafd5873f3428e72) ) \
+	ROM_LOAD32_WORD_BIOS( 37, "06.03.04_left.u3",  0x0000002, 0x0100000, CRC(7034f26b) SHA1(7be78f23bec38d05240cdfe1186ec0c8291f5a1c) ) \
+	ROM_SYSTEM_BIOS( 38, "set-us2",   "Aristocrat MK6 Set Chips (06.03.03, US)" ) \
+	ROM_LOAD32_WORD_BIOS( 38, "06.03.03_right.u2", 0x0000000, 0x0100000, CRC(98763498) SHA1(246e95cc12eb34f946b2f4938c59217718f6d841) ) \
+	ROM_LOAD32_WORD_BIOS( 38, "06.03.03_left.u3",  0x0000002, 0x0100000, CRC(a6924238) SHA1(b71ab39bf9c1fdbab556028138749e8c040ec83c) ) \
+	ROM_SYSTEM_BIOS( 39, "set-us3",   "Aristocrat MK6 Set Chips (06.02.20, US)" ) \
+	ROM_LOAD32_WORD_BIOS( 39, "06.02.20_right.u83", 0x0000000, 0x0100000, CRC(e4001f60) SHA1(5da34efb1ac0f7c84a48e09363d20cfecda4bcf1) ) \
+	ROM_LOAD32_WORD_BIOS( 39, "06.02.20_left.u70",  0x0000002, 0x0100000, CRC(199ed3b9) SHA1(e3ee81ffd713f09e35a10c38e4f59282e2c5cd30) ) \
+	ROM_SYSTEM_BIOS( 40, "set-us4",   "Aristocrat MK6 Set Chips (06.02.04, US)" ) \
+	ROM_LOAD32_WORD_BIOS( 40, "06.02.04_right.u2", 0x0000000, 0x0100000, CRC(1cf5a853) SHA1(64d17efcce702df7a0b0e151293199478e25226d) ) \
+	ROM_LOAD32_WORD_BIOS( 40, "06.02.04_left.u3",  0x0000002, 0x0100000, CRC(117b75f2) SHA1(2129286853d3c50b8a943b71334d4ef6b98adc05) )
 
 ROM_START( aristmk6 )
 	ARISTMK6_BIOS
@@ -524,7 +545,9 @@ ROM_END
 
 
 /*
-ROM labels all look basically the same (as with aristmk5.cpp boards)
+EPROM labels all look basically the same between games
+
+Standard platform:
 
     +--------------------------------------------------+
     | 20151911                                     NSW |
@@ -534,19 +557,67 @@ ROM labels all look basically the same (as with aristmk5.cpp boards)
     +--------------------------------------------------+
 
 "ID string" + "Region" + "Game Name" + "Combination No." + "ROM size"
-+ "ROM numbers" + "Copyright" + "Location"
++ "Number of EPROMs" + "Copyright" + "Board location"
 
-we reduce this to "ID string"."Location" for simplicity, also for games which we
-don't have pictures for.
+USA platform:
+
+    +--------------------------------------------------+
+    | 0251312-U86   Series:01   M27V322   Mk6USA       |
+    | Diamond Eyes                                     |
+    | E6A2D2DA                                         |
+    | 4B5B-B5BF / 1E6C64C8 / 6FC8B9B6                  |
+    | Copyright � 2003 Aristocrat Technologies, Inc.   |
+    +--------------------------------------------------+
+
+"ID string" + "Board location" + "Series" + "EPROM type" + "Platform"
++ "Game Name" + "Checksums" + "Copyright"
+
+We reduce this to "ID string"."Location" in the filenames for simplicity, also for games which we don't have pictures for.
 
 Decoding the game ID:
-In the Australian style, the ID is split into four parts: Version number, Manufacturer, Game ID with the last two digits serving an unknown purpose (usually 11 but sometimes 21, 31 or 41 etc.)
+On the standard or "Australian" platform, the ID is split into four parts: Version number, Manufacturer, Game ID with the last two digits serving an unknown purpose (usually 11 but sometimes 21, 31 or 41 etc.)
 In the case of the above game, this would be 2 (version), 0 (Aristocrat), 1519, 11.
 For Jubilee games, the second digit is a J rather than a zero.
 
-On US games, the ID format is different:
-The US game ID seems to be split into three parts: Version number, manufacturer and Game ID, for example 0151178 (adonisa6).
+Note that in the Machine Identification menu, the last two digits of the ID are replaced with AV (standard software) or AD (demo software aka show program).
+
+On the USA platform, the ID format is different:
+The game ID seems to be split into three parts: Version number, manufacturer and Game ID, for example 0151178 (adonisa6).
 In this case, the version number would be 01, followed by manufacturer (seems to always be 5), then 1178 for the game ID.
+US games also show the ROM checksum on the label.
+
+Game EPROMs are M27V322 (4MB), system/setchip EPROMs are M27V800 (1MB) or M27V160 (2MB). All three types have 42 pins.
+
+Currently there are no dumps of the SPC (serial protocol converter) boards.
+On the SPC2 PCB there is a 32-pin EPROM located at U3.
+On SPC2.5 boards, the chip is a 32-pin PLCC rather than DIP, and is located at U19.
+
+SPC2:
+
+    +------------------------------------------------+
+    | GAMBS2M 01.06.17    U3                         |
+    | V. 01.06.17                                    |
+    | 8H37 / 3B68 / 00DF3B68                         |
+    |                                                |
+    | Copyright � 2011 Aristocrat Technologies, Inc. |
+    +------------------------------------------------+
+
+SPC2.5:
+U19 (program chip)
+    +--------------+
+    |              |
+    |GAMBS2.5M     |
+    |V. 02.06.28   |
+    |69P1          |
+    |              |
+    +--------------+
+
+U14 (configuration chip)
+    +----------+
+    | U14      |
+    | SPC2.5   |
+    | 1.3.3(0) |
+    +----------+
 */
 
 
@@ -565,7 +636,6 @@ ROM_END
 // we just append a "sp__" prefix for the moment
 ROM_START( 5dragsp )
 	ARISTMK6_BIOS
-
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("sp__20161011.u86", 0x0000000, 0x0400000, CRC(726f45a0) SHA1(b48227f4438b52857f43d26baa216a3b1d1fd27f) )
 	ROM_LOAD32_WORD("sp__20161011.u73", 0x0000002, 0x0400000, CRC(6188048d) SHA1(d03d2ef8ce744f6523bc5a3775013764386acdf5) )
@@ -577,12 +647,12 @@ ROM_END
 ROM_START( 5dragce )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
-	ROM_LOAD32_WORD("0152309.u86", 0x0000000, 0x0400000, CRC(1c3fd707) SHA1(3a9fc3e865c43ae0afa31954b2372487eb729d8a) ) /* m27v322 */
-	ROM_LOAD32_WORD("0152309.u73", 0x0000002, 0x0400000, CRC(7298e59b) SHA1(b104aec9be996bacad74120f461ad8cd7ef96e09) ) /* m27v322 */
-	ROM_LOAD32_WORD("0152309.u85", 0x0800000, 0x0400000, CRC(4af3cae0) SHA1(79eb28b403aacf3ec7f52a5b3ff9e59ea35933c6) ) /* m27v322 */
-	ROM_LOAD32_WORD("0152309.u72", 0x0800002, 0x0400000, CRC(e399df66) SHA1(d85a8011ab62b899b18873e4296c12da4291870a) ) /* m27v322 */
-	ROM_LOAD32_WORD("0152309.u84", 0x1000000, 0x0400000, CRC(f37a1ce5) SHA1(8684d64b20e1fe853e3b0f1a31796cddeb8b0dee) ) /* m27v322 */
-	ROM_LOAD32_WORD("0152309.u71", 0x1000002, 0x0400000, CRC(a0f5999e) SHA1(0be0d58588adbdbc7b728f164538d03509f13fe5) ) /* m27v322 */
+	ROM_LOAD32_WORD("0152309.u86", 0x0000000, 0x0400000, CRC(1c3fd707) SHA1(3a9fc3e865c43ae0afa31954b2372487eb729d8a) )
+	ROM_LOAD32_WORD("0152309.u73", 0x0000002, 0x0400000, CRC(7298e59b) SHA1(b104aec9be996bacad74120f461ad8cd7ef96e09) )
+	ROM_LOAD32_WORD("0152309.u85", 0x0800000, 0x0400000, CRC(4af3cae0) SHA1(79eb28b403aacf3ec7f52a5b3ff9e59ea35933c6) )
+	ROM_LOAD32_WORD("0152309.u72", 0x0800002, 0x0400000, CRC(e399df66) SHA1(d85a8011ab62b899b18873e4296c12da4291870a) )
+	ROM_LOAD32_WORD("0152309.u84", 0x1000000, 0x0400000, CRC(f37a1ce5) SHA1(8684d64b20e1fe853e3b0f1a31796cddeb8b0dee) )
+	ROM_LOAD32_WORD("0152309.u71", 0x1000002, 0x0400000, CRC(a0f5999e) SHA1(0be0d58588adbdbc7b728f164538d03509f13fe5) )
 ROM_END
 
 
@@ -597,17 +667,17 @@ ROM_START( 5koipp )
 	ROM_LOAD32_WORD("10250711.u71", 0x1000002, 0x0400000, CRC(460e7ddb) SHA1(e6326523fb7c1c44cd0f01cd43d59d86a72c0d1d) )
 ROM_END
 
+
 ROM_START( 15lions )
 	ARISTMK6_BIOS
-
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10166211.u86", 0x0000000, 0x0400000, CRC(89107b2c) SHA1(34f9b51c62b37f2c3d43e9c50128028d3a4ce4a4) )
 	ROM_LOAD32_WORD("10166211.u73", 0x0000002, 0x0400000, CRC(ecdc158f) SHA1(0e93f3a6084eaf4934cd131cd3bc24030eca1f83) )
 ROM_END
 
+
 ROM_START( 50lions )
 	ARISTMK6_BIOS
-
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10120511.u86", 0x0000000, 0x0400000, CRC(0e5c86f1) SHA1(84e329e664ace697f9ea4ace08612089e0964732) )
 	ROM_LOAD32_WORD("10120511.u73", 0x0000002, 0x0400000, CRC(1c1f2297) SHA1(13fb8c83d8ce2340ef554490c21a38da7b47c666) )
@@ -616,7 +686,6 @@ ROM_END
 
 ROM_START( 50lionsm )
 	ARISTMK6_BIOS
-
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10156111.u86", 0x0000000, 0x0400000, CRC(c3791531) SHA1(b9c60be9624463eb591f2baf421ff90b8763449b) )
 	ROM_LOAD32_WORD("10156111.u73", 0x0000002, 0x0400000, CRC(ec1b699b) SHA1(5a6ad7c7eb02443e42ee6a88525ae95a2b0a3195) )
@@ -725,7 +794,6 @@ ROM_END
 
 ROM_START( antcleom )
 	ARISTMK6_BIOS
-
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10177211.u86", 0x0000000, 0x0400000, CRC(4897f4ed) SHA1(0a071528b0c2cb4c42d4535bed406849a6187d9d) )
 	ROM_LOAD32_WORD("10177211.u73", 0x0000002, 0x0400000, CRC(41b7d75d) SHA1(5c25e0bc65560b17b80c4430ae9d925a0f245e6c) )
@@ -767,10 +835,10 @@ ROM_END
 ROM_START( arwincm )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
-	ROM_LOAD32_WORD("0151065.u86", 0x0000000, 0x0400000, CRC(961cca3d) SHA1(f5bd3fdb8863688a1bf96dcd74a261860a008952) ) /* m27v322 */
-	ROM_LOAD32_WORD("0151065.u73", 0x0000002, 0x0400000, CRC(0c3e441c) SHA1(763879bae2b256c2c4edddc99507b3c54cbab976) ) /* m27v322 */
-	ROM_LOAD32_WORD("0151065.u85", 0x0800000, 0x0400000, CRC(498b2ab7) SHA1(7f1da5ff34572c1f27f9a0735b8a9571b34ac17e) ) /* m27v322 */
-	ROM_LOAD32_WORD("0151065.u72", 0x0800002, 0x0400000, CRC(3a133d96) SHA1(4c7dc422c3e0a81da1f81267d525e3a90a7d79d7) ) /* m27v322 */
+	ROM_LOAD32_WORD("0151065.u86", 0x0000000, 0x0400000, CRC(961cca3d) SHA1(f5bd3fdb8863688a1bf96dcd74a261860a008952) )
+	ROM_LOAD32_WORD("0151065.u73", 0x0000002, 0x0400000, CRC(0c3e441c) SHA1(763879bae2b256c2c4edddc99507b3c54cbab976) )
+	ROM_LOAD32_WORD("0151065.u85", 0x0800000, 0x0400000, CRC(498b2ab7) SHA1(7f1da5ff34572c1f27f9a0735b8a9571b34ac17e) )
+	ROM_LOAD32_WORD("0151065.u72", 0x0800002, 0x0400000, CRC(3a133d96) SHA1(4c7dc422c3e0a81da1f81267d525e3a90a7d79d7) )
 ROM_END
 
 
@@ -911,14 +979,14 @@ ROM_END
 ROM_START( bobdolly )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
-	ROM_LOAD32_WORD("0352298.u21", 0x0000000, 0x0400000, CRC(d3657369) SHA1(621fb20238f10e06c486dfbd6460f94047898a42) ) /* 27v322 */
-	ROM_LOAD32_WORD("0352298.u11", 0x0000002, 0x0400000, CRC(8e32da10) SHA1(28a49ecc3bab512e5828c96392d6fa4ff9394a0f) ) /* 27v322 */
-	ROM_LOAD32_WORD("0352298.u22", 0x0800000, 0x0400000, CRC(47429081) SHA1(23d996aa522c2f9beadf1fdb7c0584ca939917da) ) /* 27v322 */
-	ROM_LOAD32_WORD("0352298.u12", 0x0800002, 0x0400000, CRC(4302ae5e) SHA1(fe1d122093ad9234a7a5337b3a4c2de7fe046822) ) /* 27v322 */
-	ROM_LOAD32_WORD("0352298.u23", 0x1000000, 0x0400000, CRC(e73883db) SHA1(6382386ac6f576c739c959cbf6b6df2605496845) ) /* 27v322 */
-	ROM_LOAD32_WORD("0352298.u13", 0x1000002, 0x0400000, CRC(a9726ec5) SHA1(cdf78adc3ebcd50e503b2587564493a91b73f578) ) /* 27v322 */
-	ROM_LOAD32_WORD("0352298.u24", 0x1800000, 0x0400000, CRC(0f1a6b7c) SHA1(17686829a1a64f6d8982e015067f2d08bcb00402) ) /* 27v322 */
-	ROM_LOAD32_WORD("0352298.u14", 0x1800002, 0x0400000, CRC(3646c16d) SHA1(c52fab2e11f39c126bcbbb348750bbf30ff96090) ) /* 27v322 */
+	ROM_LOAD32_WORD("0352298.u21", 0x0000000, 0x0400000, CRC(d3657369) SHA1(621fb20238f10e06c486dfbd6460f94047898a42) )
+	ROM_LOAD32_WORD("0352298.u11", 0x0000002, 0x0400000, CRC(8e32da10) SHA1(28a49ecc3bab512e5828c96392d6fa4ff9394a0f) )
+	ROM_LOAD32_WORD("0352298.u22", 0x0800000, 0x0400000, CRC(47429081) SHA1(23d996aa522c2f9beadf1fdb7c0584ca939917da) )
+	ROM_LOAD32_WORD("0352298.u12", 0x0800002, 0x0400000, CRC(4302ae5e) SHA1(fe1d122093ad9234a7a5337b3a4c2de7fe046822) )
+	ROM_LOAD32_WORD("0352298.u23", 0x1000000, 0x0400000, CRC(e73883db) SHA1(6382386ac6f576c739c959cbf6b6df2605496845) )
+	ROM_LOAD32_WORD("0352298.u13", 0x1000002, 0x0400000, CRC(a9726ec5) SHA1(cdf78adc3ebcd50e503b2587564493a91b73f578) )
+	ROM_LOAD32_WORD("0352298.u24", 0x1800000, 0x0400000, CRC(0f1a6b7c) SHA1(17686829a1a64f6d8982e015067f2d08bcb00402) )
+	ROM_LOAD32_WORD("0352298.u14", 0x1800002, 0x0400000, CRC(3646c16d) SHA1(c52fab2e11f39c126bcbbb348750bbf30ff96090) )
 ROM_END
 
 
@@ -980,7 +1048,7 @@ ROM_START( bmbugs )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("0351180.u86", 0x0000000, 0x0400000, CRC(f5c204f9) SHA1(592fac02d26ec5edffce862fcce67869430028dd) )
-	ROM_LOAD32_WORD("0351180.u73", 0x0000002, 0x0400000, CRC(79dd907f) SHA1(06352c55ff36a82f4d0550b1723667f3287c4923) ) /* 27v322 */
+	ROM_LOAD32_WORD("0351180.u73", 0x0000002, 0x0400000, CRC(79dd907f) SHA1(06352c55ff36a82f4d0550b1723667f3287c4923) )
 ROM_END
 
 
@@ -1099,7 +1167,6 @@ ROM_END
 
 ROM_START( csdm )
 	ARISTMK6_BIOS
-
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("20131511.u86", 0x0000000, 0x0400000, CRC(06f78c92) SHA1(e8bd3f18831dfb5c644321541fa9e75ae9e83688) )
 	ROM_LOAD32_WORD("20131511.u73", 0x0000002, 0x0400000, CRC(5b2468b6) SHA1(085aa44343f11fdf5ab7cc1ca56ddb0ba5cafc36) )
@@ -1110,7 +1177,6 @@ ROM_END
 
 ROM_START( csdq )
 	ARISTMK6_BIOS
-
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10121111.u86", 0x0000000, 0x0400000, CRC(cbcabeae) SHA1(ebc951037bfda441833beb5b0ca102dc76fcc901) )
 	ROM_LOAD32_WORD("10121111.u73", 0x0000002, 0x0400000, CRC(4bb97e62) SHA1(8144b6ec8a69b12fd4e4641999a988ad6a9e5160) )
@@ -1128,6 +1194,18 @@ ROM_START( csdce )
 	ROM_LOAD32_WORD("30149511.u72", 0x0800002, 0x0400000, CRC(f74e7f25) SHA1(5b43b54c10141b845d0de1d4f3dd54b833bd2d2a) )
 	ROM_LOAD32_WORD("30149511.u84", 0x1000000, 0x0400000, CRC(15a5fb71) SHA1(bb2025e4a85ba77daf8bb6b55e38a8b8250f90f3) )
 	ROM_LOAD32_WORD("30149511.u71", 0x1000002, 0x0400000, CRC(32fcccb0) SHA1(a0fa260dadf4b6c659eaa60f67a3e552dbb1807b) )
+ROM_END
+
+
+ROM_START( csdjc )
+	ARISTMK6_BIOS
+	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("20156611.u86", 0x0000000, 0x0400000, CRC(85f8338a) SHA1(c32cfcbc67fd753f9fa7bcb3e53a44f6315d297d) )
+	ROM_LOAD32_WORD("20156611.u73", 0x0000002, 0x0400000, CRC(354fb92d) SHA1(6974de53cb9ec87d3ac3147a315ffaa79b65f058) )
+	ROM_LOAD32_WORD("20156611.u85", 0x0800000, 0x0400000, CRC(37c104b6) SHA1(0616eabb5191fd089671ab7183cf24880dcaadfd) )
+	ROM_LOAD32_WORD("20156611.u72", 0x0800002, 0x0400000, CRC(07ac6bda) SHA1(563ae31d713d57c04906fc756e77310326b4c839) )
+	ROM_LOAD32_WORD("20156611.u84", 0x1000000, 0x0400000, CRC(3f1a5d66) SHA1(e80044f988dec6052972187956560f365fae5f9b) )
+	ROM_LOAD32_WORD("20156611.u71", 0x1000002, 0x0400000, CRC(c77ba62d) SHA1(2bae686d491ffb55078fd44384a8ed6ead282139) )
 ROM_END
 
 
@@ -1161,7 +1239,6 @@ ROM_END
 
 ROM_START( crysprim )
 	ARISTMK6_BIOS
-
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10155811.u86", 0x0000000, 0x0400000, CRC(b046ea06) SHA1(0c0310bc0afb8bac630ac0570d5b9df6a992cfdb) )
 	ROM_LOAD32_WORD("10155811.u73", 0x0000002, 0x0400000, CRC(b52cac8a) SHA1(65bb5d73933df6d53a079e4efe00ea29649e3201) )
@@ -1233,12 +1310,12 @@ ROM_END
 ROM_START( dimeyece )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
-	ROM_LOAD32_WORD("0152039.u86", 0x0000000, 0x0400000, CRC(926ce073) SHA1(12f0aa1e387f0f87be92afb9a917a30d51a63277) ) /* m27v322 */
-	ROM_LOAD32_WORD("0152039.u73", 0x0000002, 0x0400000, CRC(235ba6ca) SHA1(3534b4f74531a42543383b55a2c57853b1d3f4f1) ) /* m27v322 */
-	ROM_LOAD32_WORD("0152039.u85", 0x0800000, 0x0400000, CRC(f6ef5d9c) SHA1(94505a470ad65e75c6c984ec163ce92c558f491a) ) /* m27v322 */
-	ROM_LOAD32_WORD("0152039.u72", 0x0800002, 0x0400000, CRC(9f6b5923) SHA1(739d3848998ddbfaf577982c12d8edd19c348548) ) /* m27v322 */
-	ROM_LOAD32_WORD("0152039.u84", 0x1000000, 0x0400000, CRC(6d0dea65) SHA1(ee23c0fe2ecb5adb5e383757ade9be17880e6b45) ) /* m27v322 */
-	ROM_LOAD32_WORD("0152039.u71", 0x1000002, 0x0400000, CRC(5706aa40) SHA1(d847bd0a4e210e3f065aa59129ee4654e3087909) ) /* m27v322 */
+	ROM_LOAD32_WORD("0152039.u86", 0x0000000, 0x0400000, CRC(926ce073) SHA1(12f0aa1e387f0f87be92afb9a917a30d51a63277) )
+	ROM_LOAD32_WORD("0152039.u73", 0x0000002, 0x0400000, CRC(235ba6ca) SHA1(3534b4f74531a42543383b55a2c57853b1d3f4f1) )
+	ROM_LOAD32_WORD("0152039.u85", 0x0800000, 0x0400000, CRC(f6ef5d9c) SHA1(94505a470ad65e75c6c984ec163ce92c558f491a) )
+	ROM_LOAD32_WORD("0152039.u72", 0x0800002, 0x0400000, CRC(9f6b5923) SHA1(739d3848998ddbfaf577982c12d8edd19c348548) )
+	ROM_LOAD32_WORD("0152039.u84", 0x1000000, 0x0400000, CRC(6d0dea65) SHA1(ee23c0fe2ecb5adb5e383757ade9be17880e6b45) )
+	ROM_LOAD32_WORD("0152039.u71", 0x1000002, 0x0400000, CRC(5706aa40) SHA1(d847bd0a4e210e3f065aa59129ee4654e3087909) )
 ROM_END
 
 
@@ -1439,10 +1516,10 @@ ROM_END
 ROM_START( flamoljc )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
-	ROM_LOAD32_WORD("0251048.u86", 0x0000000, 0x0400000, CRC(2ea7c6d9) SHA1(cd887f0689737fd447786b966297ea3994fb8cb7) ) /* m27v322 */
-	ROM_LOAD32_WORD("0251048.u73", 0x0000002, 0x0400000, CRC(c8337682) SHA1(e87c5be62528e2e73659ce73a17d1ea21ed3ccf0) ) /* m27v322 */
-	ROM_LOAD32_WORD("0251048.u85", 0x0800000, 0x0400000, CRC(2661893a) SHA1(4a79f0b638f5d4fdfa7dcc7661afe3ae1823e6ce) ) /* m27v322 */
-	ROM_LOAD32_WORD("0251048.u72", 0x0800002, 0x0400000, CRC(330c1988) SHA1(0d7dae49495c5b164121cd756d6e22af17a9b41b) ) /* m27v322 */
+	ROM_LOAD32_WORD("0251048.u86", 0x0000000, 0x0400000, CRC(2ea7c6d9) SHA1(cd887f0689737fd447786b966297ea3994fb8cb7) )
+	ROM_LOAD32_WORD("0251048.u73", 0x0000002, 0x0400000, CRC(c8337682) SHA1(e87c5be62528e2e73659ce73a17d1ea21ed3ccf0) )
+	ROM_LOAD32_WORD("0251048.u85", 0x0800000, 0x0400000, CRC(2661893a) SHA1(4a79f0b638f5d4fdfa7dcc7661afe3ae1823e6ce) )
+	ROM_LOAD32_WORD("0251048.u72", 0x0800002, 0x0400000, CRC(330c1988) SHA1(0d7dae49495c5b164121cd756d6e22af17a9b41b) )
 ROM_END
 
 
@@ -1467,10 +1544,10 @@ ROM_END
 ROM_START( frogwld )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
-	ROM_LOAD32_WORD("0251114.u86", 0x0000000, 0x0400000, CRC(feb93395) SHA1(56c0f9b0e3616bc57a564220303c13f60fc72df8) ) /* m27v322 */
-	ROM_LOAD32_WORD("0251114.u73", 0x0000002, 0x0400000, CRC(f058f8f3) SHA1(02efb3de7765e917fb6c29cbfdd90845fb3f0a7b) ) /* m27v322 */
-	ROM_LOAD32_WORD("0251114.u85", 0x0800000, 0x0400000, CRC(b4165c0f) SHA1(823179a70841f49c8100d8d77620548ceea01550) ) /* m27v322 */
-	ROM_LOAD32_WORD("0251114.u72", 0x0800002, 0x0400000, CRC(36f8066f) SHA1(c8a3dc25488d7d578e05bf247b2d3e0959f5c511) ) /* m27v322 */
+	ROM_LOAD32_WORD("0251114.u86", 0x0000000, 0x0400000, CRC(feb93395) SHA1(56c0f9b0e3616bc57a564220303c13f60fc72df8) )
+	ROM_LOAD32_WORD("0251114.u73", 0x0000002, 0x0400000, CRC(f058f8f3) SHA1(02efb3de7765e917fb6c29cbfdd90845fb3f0a7b) )
+	ROM_LOAD32_WORD("0251114.u85", 0x0800000, 0x0400000, CRC(b4165c0f) SHA1(823179a70841f49c8100d8d77620548ceea01550) )
+	ROM_LOAD32_WORD("0251114.u72", 0x0800002, 0x0400000, CRC(36f8066f) SHA1(c8a3dc25488d7d578e05bf247b2d3e0959f5c511) )
 ROM_END
 
 
@@ -1752,7 +1829,6 @@ ROM_END
 
 ROM_START( indremmm )
 	ARISTMK6_BIOS
-
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10130711.u86", 0x0000000, 0x0400000, CRC(db13eaf5) SHA1(c2e743b72c2a280266d55642e40c3a7a740052db) )
 	ROM_LOAD32_WORD("10130711.u73", 0x0000002, 0x0400000, CRC(a5e3dca5) SHA1(e585841064dc98398169bcd0cd04269bbcfaf77c) )
@@ -1794,10 +1870,10 @@ ROM_END
 ROM_START( jefffox )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
-	ROM_LOAD32_WORD("0351068.u86", 0x0000000, 0x0400000, CRC(6b0a7eb3) SHA1(cd99fed52643afa596bfbf4a18deca42043520ef) ) /* m27v322 */
-	ROM_LOAD32_WORD("0351068.u73", 0x0000002, 0x0400000, CRC(4b778a84) SHA1(d11b2aefcaa2ac22fea80faab524f82511b6344a) ) /* m27v322 */
-	ROM_LOAD32_WORD("0351068.u85", 0x0800000, 0x0400000, CRC(52d5395e) SHA1(57b854e516881bc208b48ed82fdef25059e2efab) ) /* m27v322 */
-	ROM_LOAD32_WORD("0351068.u72", 0x0800002, 0x0400000, CRC(ff2ff01d) SHA1(c0d17b3d9907d3876c7a1dbc19b023afcffb2bb1) ) /* m27v322 */
+	ROM_LOAD32_WORD("0351068.u86", 0x0000000, 0x0400000, CRC(6b0a7eb3) SHA1(cd99fed52643afa596bfbf4a18deca42043520ef) )
+	ROM_LOAD32_WORD("0351068.u73", 0x0000002, 0x0400000, CRC(4b778a84) SHA1(d11b2aefcaa2ac22fea80faab524f82511b6344a) )
+	ROM_LOAD32_WORD("0351068.u85", 0x0800000, 0x0400000, CRC(52d5395e) SHA1(57b854e516881bc208b48ed82fdef25059e2efab) )
+	ROM_LOAD32_WORD("0351068.u72", 0x0800002, 0x0400000, CRC(ff2ff01d) SHA1(c0d17b3d9907d3876c7a1dbc19b023afcffb2bb1) )
 ROM_END
 
 
@@ -1936,8 +2012,8 @@ ROM_END
 ROM_START( lovestuk )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
-	ROM_LOAD32_WORD("0152583.u86", 0x0000000, 0x0400000, CRC(c374ee56) SHA1(18b084c32a4dad6dacd3eeaf6ba430053405dbe8) )     /* 27v322 */
-	ROM_LOAD32_WORD("0152583.u73", 0x0000002, 0x0400000, BAD_DUMP CRC(421f717d) SHA1(29eaecef6dd389329a8cfdcfa4bf3f90252eb096) )    /* 27v322 */
+	ROM_LOAD32_WORD("0152583.u86", 0x0000000, 0x0400000, CRC(c374ee56) SHA1(18b084c32a4dad6dacd3eeaf6ba430053405dbe8) )
+	ROM_LOAD32_WORD("0152583.u73", 0x0000002, 0x0400000, BAD_DUMP CRC(421f717d) SHA1(29eaecef6dd389329a8cfdcfa4bf3f90252eb096) )
 ROM_END
 
 
@@ -2096,10 +2172,10 @@ ROM_END
 ROM_START( mystarr )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
-	ROM_LOAD32_WORD("0151009.u86", 0x0000000, 0x0400000, CRC(8a1475ac) SHA1(c948f0ca991b64d9a07e42fdb346e6df450718f2) ) /* m27v322 */
-	ROM_LOAD32_WORD("0151009.u73", 0x0000002, 0x0400000, CRC(7b8ed0d9) SHA1(6ea4bddedef955513e841ee14ec5e6ded23c1ea7) ) /* m27v322 */
-	ROM_LOAD32_WORD("0151009.u85", 0x0800000, 0x0400000, CRC(ea82c5db) SHA1(01db2730b1eec5c9f5c011525459ec72903761cc) ) /* m27v322 */
-	ROM_LOAD32_WORD("0151009.u72", 0x0800002, 0x0400000, CRC(4aa6e68b) SHA1(5f015885c15fd206053d23983a38dd1dbb8f89ce) ) /* m27v322 */
+	ROM_LOAD32_WORD("0151009.u86", 0x0000000, 0x0400000, CRC(8a1475ac) SHA1(c948f0ca991b64d9a07e42fdb346e6df450718f2) )
+	ROM_LOAD32_WORD("0151009.u73", 0x0000002, 0x0400000, CRC(7b8ed0d9) SHA1(6ea4bddedef955513e841ee14ec5e6ded23c1ea7) )
+	ROM_LOAD32_WORD("0151009.u85", 0x0800000, 0x0400000, CRC(ea82c5db) SHA1(01db2730b1eec5c9f5c011525459ec72903761cc) )
+	ROM_LOAD32_WORD("0151009.u72", 0x0800002, 0x0400000, CRC(4aa6e68b) SHA1(5f015885c15fd206053d23983a38dd1dbb8f89ce) )
 ROM_END
 
 
@@ -2116,10 +2192,10 @@ ROM_END
 ROM_START( mysteycmu )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
-	ROM_LOAD32_WORD("0251024.u86", 0x0000000, 0x0400000, CRC(a7bdbd03) SHA1(0e763933c082163de85c408be91d216d6545e9d7) ) /* m27v322 */
-	ROM_LOAD32_WORD("0251024.u73", 0x0000002, 0x0400000, CRC(85ad1a00) SHA1(d4f1d86647eb7724c94c3cfa89d5545a20323e62) ) /* m27v322 */
-	ROM_LOAD32_WORD("0251024.u85", 0x0800000, 0x0400000, CRC(ee781c0f) SHA1(7729a55e1d5ff7b8a373dda8a0798374ff60a89b) ) /* m27v322 */
-	ROM_LOAD32_WORD("0251024.u72", 0x0800002, 0x0400000, CRC(380a868e) SHA1(a1ac6ec1a760f8bbf68b3b86cf5dd4623dc130c7) ) /* m27v322 */
+	ROM_LOAD32_WORD("0251024.u86", 0x0000000, 0x0400000, CRC(a7bdbd03) SHA1(0e763933c082163de85c408be91d216d6545e9d7) )
+	ROM_LOAD32_WORD("0251024.u73", 0x0000002, 0x0400000, CRC(85ad1a00) SHA1(d4f1d86647eb7724c94c3cfa89d5545a20323e62) )
+	ROM_LOAD32_WORD("0251024.u85", 0x0800000, 0x0400000, CRC(ee781c0f) SHA1(7729a55e1d5ff7b8a373dda8a0798374ff60a89b) )
+	ROM_LOAD32_WORD("0251024.u72", 0x0800002, 0x0400000, CRC(380a868e) SHA1(a1ac6ec1a760f8bbf68b3b86cf5dd4623dc130c7) )
 ROM_END
 
 
@@ -2206,10 +2282,10 @@ ROM_END
 ROM_START( parislgtu )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
-	ROM_LOAD32_WORD("0251031.u86", 0x0000000, 0x0400000, CRC(5224e683) SHA1(8b0dbb2fcea4d1a522160d8a6634687c5bad8acd) ) /* m27v322 */
-	ROM_LOAD32_WORD("0251031.u73", 0x0000002, 0x0400000, CRC(d0587548) SHA1(30d0021a78ee79c6f66fb27c8c484427a5a2db1b) ) /* m27v322 */
-	ROM_LOAD32_WORD("0251031.u85", 0x0800000, 0x0400000, CRC(e7ed0bf4) SHA1(39cb9744462f10fc791d6c604631c1182da9466b) ) /* m27v322 */
-	ROM_LOAD32_WORD("0251031.u72", 0x0800002, 0x0400000, CRC(8dc6a0ec) SHA1(855e8f5c6752bfc4ba25116a20ed82dfb4912c07) ) /* m27v322 */
+	ROM_LOAD32_WORD("0251031.u86", 0x0000000, 0x0400000, CRC(5224e683) SHA1(8b0dbb2fcea4d1a522160d8a6634687c5bad8acd) )
+	ROM_LOAD32_WORD("0251031.u73", 0x0000002, 0x0400000, CRC(d0587548) SHA1(30d0021a78ee79c6f66fb27c8c484427a5a2db1b) )
+	ROM_LOAD32_WORD("0251031.u85", 0x0800000, 0x0400000, CRC(e7ed0bf4) SHA1(39cb9744462f10fc791d6c604631c1182da9466b) )
+	ROM_LOAD32_WORD("0251031.u72", 0x0800002, 0x0400000, CRC(8dc6a0ec) SHA1(855e8f5c6752bfc4ba25116a20ed82dfb4912c07) )
 ROM_END
 
 
@@ -2426,16 +2502,16 @@ ROM_END
 ROM_START( pwsuper )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
-	ROM_LOAD32_WORD("0154019.u21", 0x0000000, 0x0400000, CRC(48f60a2c) SHA1(0d27d544991b3403672250ff79c5bbbf35cdf175) ) /* m27v322 */
-	ROM_LOAD32_WORD("0154019.u11", 0x0000002, 0x0400000, CRC(678b0be2) SHA1(16f5460d67a1e897390e0c03b847511f5c14156a) ) /* m27v322 */
-	ROM_LOAD32_WORD("0154019.u22", 0x0800000, 0x0400000, CRC(5354cff5) SHA1(bf818e53a432aa8e7a2578dbb367be2c5f51bb16) ) /* m27v322 */
-	ROM_LOAD32_WORD("0154019.u12", 0x0800002, 0x0400000, CRC(9dbdefb7) SHA1(445a24233b435e3812747d8376addf969fea5cd2) ) /* m27v322 */
-	ROM_LOAD32_WORD("0154019.u23", 0x1000000, 0x0400000, CRC(43b44f26) SHA1(5410eea0a4911a274a794d6b27e369fb98c6edf7) ) /* m27v322 */
-	ROM_LOAD32_WORD("0154019.u13", 0x1000002, 0x0400000, CRC(ae04211a) SHA1(8db4fc936fa6d0e0a372b81f2e9590047522b843) ) /* m27v322 */
-	ROM_LOAD32_WORD("0154019.u24", 0x1800000, 0x0400000, CRC(a850af7f) SHA1(8d029de0083aad57ddd8b36153214b40cd388d56) ) /* m27v322 */
-	ROM_LOAD32_WORD("0154019.u14", 0x1800002, 0x0400000, CRC(dbb073f1) SHA1(e3a7f14cabab613453baffde3b592889d11578e7) ) /* m27v322 */
-	ROM_LOAD32_WORD("0154019.u25", 0x2000000, 0x0400000, CRC(2c7fe966) SHA1(42fc364dded0ce079ce4970b1f951c6a0ebf6c51) ) /* m27v322 */
-	ROM_LOAD32_WORD("0154019.u15", 0x2000002, 0x0400000, CRC(5f9b8ef7) SHA1(f0c954d1f448f2061dbe284c78eddcfcb5afdc7c) ) /* m27v322 */
+	ROM_LOAD32_WORD("0154019.u21", 0x0000000, 0x0400000, CRC(48f60a2c) SHA1(0d27d544991b3403672250ff79c5bbbf35cdf175) )
+	ROM_LOAD32_WORD("0154019.u11", 0x0000002, 0x0400000, CRC(678b0be2) SHA1(16f5460d67a1e897390e0c03b847511f5c14156a) )
+	ROM_LOAD32_WORD("0154019.u22", 0x0800000, 0x0400000, CRC(5354cff5) SHA1(bf818e53a432aa8e7a2578dbb367be2c5f51bb16) )
+	ROM_LOAD32_WORD("0154019.u12", 0x0800002, 0x0400000, CRC(9dbdefb7) SHA1(445a24233b435e3812747d8376addf969fea5cd2) )
+	ROM_LOAD32_WORD("0154019.u23", 0x1000000, 0x0400000, CRC(43b44f26) SHA1(5410eea0a4911a274a794d6b27e369fb98c6edf7) )
+	ROM_LOAD32_WORD("0154019.u13", 0x1000002, 0x0400000, CRC(ae04211a) SHA1(8db4fc936fa6d0e0a372b81f2e9590047522b843) )
+	ROM_LOAD32_WORD("0154019.u24", 0x1800000, 0x0400000, CRC(a850af7f) SHA1(8d029de0083aad57ddd8b36153214b40cd388d56) )
+	ROM_LOAD32_WORD("0154019.u14", 0x1800002, 0x0400000, CRC(dbb073f1) SHA1(e3a7f14cabab613453baffde3b592889d11578e7) )
+	ROM_LOAD32_WORD("0154019.u25", 0x2000000, 0x0400000, CRC(2c7fe966) SHA1(42fc364dded0ce079ce4970b1f951c6a0ebf6c51) )
+	ROM_LOAD32_WORD("0154019.u15", 0x2000002, 0x0400000, CRC(5f9b8ef7) SHA1(f0c954d1f448f2061dbe284c78eddcfcb5afdc7c) )
 ROM_END
 
 
@@ -2583,6 +2659,18 @@ ROM_START( redbarfl )
 ROM_END
 
 
+ROM_START( redbarjc )
+	ARISTMK6_BIOS
+	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("10160911.u86", 0x0000000, 0x0400000, CRC(fbeda427) SHA1(ef16afa9e672eedd0008239c08d622a8fb7f5926) )
+	ROM_LOAD32_WORD("10160911.u73", 0x0000002, 0x0400000, CRC(fee10f9a) SHA1(74f07bcf50fb9c009556e8e8387874cca11bdd2b) )
+	ROM_LOAD32_WORD("10160911.u85", 0x0800000, 0x0400000, CRC(74a2d581) SHA1(eaee3ff5423aab0fbc965eacc2be7c3a7d6d6b45) )
+	ROM_LOAD32_WORD("10160911.u72", 0x0800002, 0x0400000, CRC(d071b4d4) SHA1(b81e1ba000bd27a43582cc126ee7ab21c68b6924) )
+	ROM_LOAD32_WORD("10160911.u84", 0x1000000, 0x0400000, CRC(c34e320b) SHA1(8b4ffbd99270b89903385751816c54e5b5e71ce3) )
+	ROM_LOAD32_WORD("10160911.u71", 0x1000002, 0x0400000, CRC(1d46694e) SHA1(331826afb6c3baa5703ceb55f7850809baba9418) )
+ROM_END
+
+
 ROM_START( reelrkfl )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
@@ -2682,10 +2770,10 @@ ROM_END
 ROM_START( sealdeal )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
-	ROM_LOAD32_WORD("0251029.u86", 0x0000000, 0x0400000, CRC(ea6b666b) SHA1(ad80042770f8e66e7455010b46d81873689f63db) ) /* m27v322 */
-	ROM_LOAD32_WORD("0251029.u73", 0x0000002, 0x0400000, CRC(383d55a9) SHA1(81bef0ed325ef7208403afa6d7af458c755a4de3) ) /* m27v322 */
-	ROM_LOAD32_WORD("0251029.u85", 0x0800000, 0x0400000, CRC(a6327726) SHA1(2c0f02a8d361bcbfc007b9d75a4b7b685aa2b1ac) ) /* m27v322 */
-	ROM_LOAD32_WORD("0251029.u72", 0x0800002, 0x0400000, CRC(43ef1218) SHA1(e1d03cd9845ac81a71b5a0471d146addc2f56e0e) ) /* m27v322 */
+	ROM_LOAD32_WORD("0251029.u86", 0x0000000, 0x0400000, CRC(ea6b666b) SHA1(ad80042770f8e66e7455010b46d81873689f63db) )
+	ROM_LOAD32_WORD("0251029.u73", 0x0000002, 0x0400000, CRC(383d55a9) SHA1(81bef0ed325ef7208403afa6d7af458c755a4de3) )
+	ROM_LOAD32_WORD("0251029.u85", 0x0800000, 0x0400000, CRC(a6327726) SHA1(2c0f02a8d361bcbfc007b9d75a4b7b685aa2b1ac) )
+	ROM_LOAD32_WORD("0251029.u72", 0x0800002, 0x0400000, CRC(43ef1218) SHA1(e1d03cd9845ac81a71b5a0471d146addc2f56e0e) )
 ROM_END
 
 
@@ -2810,10 +2898,10 @@ ROM_END
 ROM_START( stardrftu )
 	ARISTMK6_BIOS
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
-	ROM_LOAD32_WORD("0451341.u86", 0x0000000, 0x0400000, CRC(73023e64) SHA1(4d2d586a1e91ac5bac379994973dffcf9f3a3293) ) /* m27v322 */
-	ROM_LOAD32_WORD("0451341.u73", 0x0000002, 0x0400000, CRC(3e59b84f) SHA1(3148d48df74c35681759a234d7aa746cbb0afb0e) ) /* m27v322 */
-	ROM_LOAD32_WORD("0451341.u85", 0x0800000, 0x0400000, CRC(689ded33) SHA1(5d5b744321313c4618ecf319827c778be646245f) ) /* m27v322 */
-	ROM_LOAD32_WORD("0451341.u72", 0x0800002, 0x0400000, CRC(dc7a30c1) SHA1(8f24c18efd6171cda7ca841d3b275937e35e2be8) ) /* m27v322 */
+	ROM_LOAD32_WORD("0451341.u86", 0x0000000, 0x0400000, CRC(73023e64) SHA1(4d2d586a1e91ac5bac379994973dffcf9f3a3293) )
+	ROM_LOAD32_WORD("0451341.u73", 0x0000002, 0x0400000, CRC(3e59b84f) SHA1(3148d48df74c35681759a234d7aa746cbb0afb0e) )
+	ROM_LOAD32_WORD("0451341.u85", 0x0800000, 0x0400000, CRC(689ded33) SHA1(5d5b744321313c4618ecf319827c778be646245f) )
+	ROM_LOAD32_WORD("0451341.u72", 0x0800002, 0x0400000, CRC(dc7a30c1) SHA1(8f24c18efd6171cda7ca841d3b275937e35e2be8) )
 ROM_END
 
 
@@ -2925,12 +3013,11 @@ ROM_END
 
 ROM_START( thaiprncm )
 	ARISTMK6_BIOS
-
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("30127721.u86", 0x0000000, 0x0400000, CRC(3cb5124b) SHA1(70f6d66793c433054557da4c9f2f033bbb640bd6) )
 	ROM_LOAD32_WORD("30127721.u73", 0x0000002, 0x0400000, CRC(531f05ab) SHA1(929285de219c033bdee5f8011e9a0a07b344375e) )
 	ROM_LOAD32_WORD("30127721.u85", 0x0800000, 0x0400000, CRC(90c345e0) SHA1(1cf5b237eca68749a7baa147b9b15b3e139d7951) )
-	ROM_LOAD32_WORD("30127721.u72", 0x0800002, 0x0100000, BAD_DUMP CRC(613cea6b) SHA1(f04a3ee53074b7cd84879d752df5dbb80437475e) ) // wrong size?!
+	ROM_LOAD32_WORD("30127721.u72", 0x0800002, 0x0100000, BAD_DUMP CRC(613cea6b) SHA1(f04a3ee53074b7cd84879d752df5dbb80437475e) ) // wrong size!
 ROM_END
 
 
@@ -3072,7 +3159,6 @@ ROM_END
 
 ROM_START( whalecsh )
 	ARISTMK6_BIOS
-
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("20155711.u86", 0x0000000, 0x0400000, CRC(11bcb378) SHA1(56de7fee7631c2e468a1f1845ff9d74db56051f0) )
 	ROM_LOAD32_WORD("20155711.u73", 0x0000002, 0x0400000, CRC(3b6d2292) SHA1(87e50f3ed6629c697cff59ec425b098704450993) )
@@ -3123,7 +3209,6 @@ ROM_END
 
 ROM_START( wheregldm )
 	ARISTMK6_BIOS
-
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("20177111.u86", 0x0000000, 0x0400000, CRC(d09fd746) SHA1(6c805f7c535a6c08a836b94c0351d498751ac9e9) )
 	ROM_LOAD32_WORD("20177111.u73", 0x0000002, 0x0400000, CRC(3007f8d1) SHA1(a76a227b8157d80b08e224807345a56da4c326fd) )
@@ -3136,7 +3221,6 @@ ROM_END
 
 ROM_START( wheregldq )
 	ARISTMK6_BIOS
-
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("20184811.u86", 0x0000000, 0x0400000, CRC(95da579c) SHA1(230a18b76e72f09ea74543bd6a7a31ae51bf651e) )
 	ROM_LOAD32_WORD("20184811.u73", 0x0000002, 0x0400000, CRC(c35095ec) SHA1(637c5cfbb985716140a0e123c23ba13bffc2e734) )
@@ -3275,7 +3359,6 @@ ROM_END
 
 ROM_START( wwaysm )
 	ARISTMK6_BIOS
-
 	ROM_REGION64_LE( 0x4000000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10130111.u86", 0x0000000, 0x0400000, CRC(2968765c) SHA1(ba2c67c4be4063d8506cc8127c31b4df2609650b) )
 	ROM_LOAD32_WORD("10130111.u73", 0x0000002, 0x0400000, CRC(a1e0d77e) SHA1(df4d45d8c4dcfdb1fae4b5d5a0adfa0464c61828) )
@@ -3388,6 +3471,7 @@ GAME( 2002, csdsp,      csd,      aristmk6, aristmk6, aristmk6_state, empty_init
 GAME( 2003, csdm,       csd,      aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Choy Sun Doa (20131511, Malaysia)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 688,    A - 23/01/03
 GAME( 2002, csdq,       csd,      aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Choy Sun Doa (10121111, Queensland)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 688, C - 05/07/02
 GAME( 2003, csdce,      csd,      aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Choy Sun Doa - Cash Express (30149511, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 688,    A - 03/02/03
+GAME( 2003, csdjc,      csd,      aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Choy Sun Doa - Jackpot Carnival (20156611, Queensland)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 688,    G - 04/12/03
 GAME( 2006, csret,      aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Choy Sun Returns (20212211, NSW/ACT)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 744/2,    B - 15/08/06
 GAME( 2005, corrida,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Corrida de Toros (30178311, NSW/ACT)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 771,    D - 22/03/05
 GAME( 2003, cryspri,    aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Crystal Springs (10144411, NSW/ACT)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 740,    A - 28/05/03
@@ -3527,6 +3611,7 @@ GAME( 2003, qsheba,     aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init
 GAME( 2005, raprichs,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Rapid Riches (10194211, NSW/ACT)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 762,    D - 09/03/05
 GAME( 2002, redbara6,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Red Baron (10119911, NSW/ACT)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 709,    B - 21/11/02
 GAME( 2003, redbarfl,   redbara6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Red Baron - Fast Lane (10160711, Queensland)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 709,    E - 04/12/03
+GAME( 2003, redbarjc,   redbara6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Red Baron - Jackpot Carnival (10160911, Queensland)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 709,    E - 04/12/03, same date string as above
 // The following is clearly not a year 2000 game (an ID of #2986 would be from around 2010, note similar ID number region to buckstop/werewildq), the date string is most likely unchanged from the original MK5 20 line version which actually was released in 2000.
 GAME( 201?, reelrkfl,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Reelin-n-Rockin - Fast Lane (10298611, Queensland)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 628/2, E - 20/12/00
 GAME( 2002, retsama6,   aristmk6, aristmk6, aristmk6, aristmk6_state, empty_init, ROT0, "Aristocrat", "Return of the Samurai (10117211, NSW/ACT)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 628/10,    A - 26/08/02

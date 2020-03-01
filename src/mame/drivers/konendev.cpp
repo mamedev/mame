@@ -488,6 +488,19 @@ ROM_START( aadvent )
 	ROM_LOAD( "flash", 0x0000, 0x1800000, NO_DUMP )
 ROM_END
 
+// Black Rose Rapid Fire Grand Prix (Queensland)
+ROM_START( blkrose )
+	ROM_REGION32_BE( 0x200000, "program", 0 )
+	ROM_LOAD32_WORD_SWAP( "blr8qb16_01h.u75", 0x00000, 0x080000, CRC(693bbc64) SHA1(2988ef414b0a4aa11b20709a497265d8c74343b3) )
+	ROM_LOAD32_WORD_SWAP( "blr8qb16_02l.u66", 0x00002, 0x080000, CRC(3999a94e) SHA1(72d4dd2aa15dcff266b0bf7c5dfb54c34b17cb4e) )
+
+	ROM_REGION( 0x200000, "ifu", 0 )
+	ROM_LOAD( "2q14prog_ifu.u190", 0x00000, 0x080000, CRC(00e4eb51) SHA1(38c7c28da6d980f9c7447ad31416ccb321c20e25) )
+
+	ROM_REGION32_BE( 0x1800000, "flash", ROMREGION_ERASE00 )
+	ROM_LOAD( "blr8q211.fmu", 0x0000, 0x1800000, NO_DUMP ) // BLR8Q211.FMU Chk-GR: 13BB, SD: E1F4 BROSERGP 6 x 2M Konami
+ROM_END
+
 // Dragonfly (Russia)
 ROM_START( dragnfly )
 	ENDEAVOUR_BIOS
@@ -573,6 +586,7 @@ ROM_START( monshow )
 ROM_END
 
 // Rapid Fire 5 (NSW)
+// Same game as Black Rose
 ROM_START( rapfire5 )
 	ROM_REGION32_BE( 0x200000, "program", 0 )
 	ROM_LOAD32_WORD_SWAP( "r056na12_01h.u75", 0x00000, 0x080000, CRC(bed72d6c) SHA1(2bc4d88ed62aaed9fb0c75ee7153c81d8e6f38d9) )
@@ -692,13 +706,14 @@ void konendev_state::init_enchlamp()
 }
 
 // BIOS
-GAME( 200?, konendev, 0, konendev, konendev, konendev_state, init_enchlamp, ROT0,  "Konami", "Konami Endeavour BIOS", MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
+GAME( 200?, konendev, 0,        konendev, konendev, konendev_state, init_enchlamp, ROT0,  "Konami", "Konami Endeavour BIOS", MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
 
 // has flash dump
 GAME( 200?, enchlamp, konendev, konendev, konendev, konendev_state, init_enchlamp, ROT0,  "Konami", "Enchanted Lamp (Konami Endeavour, Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // missing flash
 GAME( 200?, aadvent,  konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "African Adventure (Konami Endeavour, Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, blkrose,  0,        konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Black Rose Rapid Fire Grand Prix (Konami Endeavour, Queensland)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, dragnfly, konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Dragonfly (Konami Endeavour, Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, gypmagic, konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Gypsy Magic (Konami Endeavour, Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, incanp,   konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Incan Pyramid (Konami Endeavour, Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
@@ -706,7 +721,7 @@ GAME( 200?, jestmagi, konendev, konendev, konendev, konendev_state, init_konende
 GAME( 200?, luckfoun, konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Lucky Fountain (Konami Endeavour, Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, mohicans, konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Mohican Sun (Konami Endeavour, Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, monshow,  konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "The Monster Show (Konami Endeavour, Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, rapfire5, 0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Rapid Fire 5 (Konami Endeavour, NSW)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, rapfire5, 0,        konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Rapid Fire 5 (Konami Endeavour, NSW)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, romanl,   konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Roman Legions (Konami Endeavour, Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, safemon,  konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Safe Money (Konami Endeavour, Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 200?, showqn,   konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Show Queen (Konami Endeavour, Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
@@ -715,4 +730,4 @@ GAME( 200?, sultanw,  konendev, konendev, konendev, konendev_state, init_konende
 GAME( 200?, whiterus, konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "White Russia (Konami Endeavour, Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // clear chip (not a game)
-GAME( 200?, konzero,  0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Zero (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, konzero,  0,        konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Zero (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
