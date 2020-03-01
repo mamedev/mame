@@ -77,8 +77,6 @@ READ8_MEMBER(hp_1mb5_device::cpu_r)
 		// Read IB
 		res = m_ib;
 		if (m_ibf) {
-			machine().scheduler().boost_interleave(attotime::from_usec(50) , attotime::from_usec(100));
-			space.device().execute().spin();
 			m_ibf = false;
 			update_halt();
 		}
@@ -92,14 +90,13 @@ READ8_MEMBER(hp_1mb5_device::cpu_r)
 WRITE8_MEMBER(hp_1mb5_device::cpu_w)
 {
 	LOG("WR %u=%02x\n" , offset , data);
-	bool need_resched = false;
 
 	switch (offset) {
 	case 0:
 		// Write CR
 		m_cr = data;
-		need_resched |= set_reset(BIT(m_cr , 7));
-		need_resched |= set_int(!BIT(m_cr , 0));
+		set_reset(BIT(m_cr , 7));
+		set_int(!BIT(m_cr , 0));
 		break;
 
 	case 1:
@@ -109,17 +106,11 @@ WRITE8_MEMBER(hp_1mb5_device::cpu_w)
 		update_halt();
 		break;
 	}
-	if (need_resched) {
-		LOG("resched %s\n" , space.device().tag());
-		machine().scheduler().boost_interleave(attotime::from_usec(5) , attotime::from_usec(100));
-		space.device().execute().spin();
-	}
 }
 
 READ8_MEMBER(hp_1mb5_device::uc_r)
 {
 	uint8_t res = 0;
-	bool need_resched = false;
 
 	switch (offset) {
 	case 0:
@@ -137,14 +128,10 @@ READ8_MEMBER(hp_1mb5_device::uc_r)
 		// Read OB
 		res = m_ob;
 		m_obf = false;
-		need_resched |= update_halt();
+		update_halt();
 		break;
 	}
 
-	if (need_resched) {
-		LOG("resched %s\n" , space.device().tag());
-		space.device().execute().spin();
-	}
 	//LOG("RDU %u=%02x\n" , offset , res);
 	return res;
 }
@@ -152,31 +139,24 @@ READ8_MEMBER(hp_1mb5_device::uc_r)
 WRITE8_MEMBER(hp_1mb5_device::uc_w)
 {
 	//LOG("WRU %u=%02x SR=%02x\n" , offset , data , m_sr);
-	bool need_resched = false;
 
 	switch (offset) {
 	case 0:
 		// Write SR
 		if (!BIT(m_sr , 0) && BIT(data , 0)) {
-			need_resched |= set_service(true);
+			set_service(true);
 		}
 		m_sr = data;
 		m_hlten = BIT(m_sr , 7);
-		if (update_halt() && !m_halt) {
-			need_resched = true;
-		}
+		update_halt();
 		break;
 
 	case 1:
 		// Write IB
 		m_ib = data;
 		m_ibf = true;
-		need_resched |= update_halt();
+		update_halt();
 		break;
-	}
-	if (need_resched) {
-		LOG("resched %s\n" , space.device().tag());
-		space.device().execute().spin();
 	}
 }
 
@@ -251,50 +231,38 @@ void hp_1mb5_device::device_reset()
 	m_int_handler(true);
 }
 
-bool hp_1mb5_device::set_service(bool new_service)
+void hp_1mb5_device::set_service(bool new_service)
 {
 	if (new_service != m_service) {
 		m_service = new_service;
 		LOG("irl=%d\n" , m_service);
 		m_irl_handler(m_service);
-		return true;
-	} else {
-		return false;
 	}
 }
 
-bool hp_1mb5_device::update_halt()
+void hp_1mb5_device::update_halt()
 {
 	bool new_halt = m_hlten && m_obf && !m_ibf;
 	if (new_halt != m_halt) {
 		LOG("HALT=%d\n" , new_halt);
 		m_halt = new_halt;
 		m_halt_handler(m_halt);
-		return true;
-	} else {
-		return false;
 	}
 }
 
-bool hp_1mb5_device::set_reset(bool new_reset)
+void hp_1mb5_device::set_reset(bool new_reset)
 {
 	if (new_reset != m_reset) {
 		m_reset = new_reset;
 		m_reset_handler(m_reset);
-		return true;
-	} else {
-		return false;
 	}
 }
 
-bool hp_1mb5_device::set_int(bool new_int)
+void hp_1mb5_device::set_int(bool new_int)
 {
 	if (new_int != m_cint) {
 		m_cint = new_int;
 		LOG("cint=%d\n" , m_cint);
 		m_int_handler(m_cint);
-		return true;
-	} else {
-		return false;
 	}
 }

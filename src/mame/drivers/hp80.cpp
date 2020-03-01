@@ -221,6 +221,7 @@ void hp80_base_state::hp80_base(machine_config &config)
 	HP_CAPRICORN(config, m_cpu, CPU_CLOCK);
 	m_cpu->set_addrmap(AS_PROGRAM, &hp80_base_state::cpu_mem_map);
 	m_cpu->set_irq_acknowledge_callback(FUNC(hp80_base_state::irq_callback));
+	config.set_perfect_quantum(m_cpu);
 
 	ADDRESS_MAP_BANK(config, "rombank").set_map(&hp80_base_state::rombank_mem_map).set_options(ENDIANNESS_LITTLE, 8, 21, HP80_OPTROM_SIZE);
 
