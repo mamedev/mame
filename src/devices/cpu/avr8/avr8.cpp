@@ -683,7 +683,6 @@ avr8_device::avr8_device(const machine_config &mconfig, const char *tag, device_
 	, m_spi_prescale_count(0)
 	, m_addr_mask(addr_mask)
 	, m_interrupt_pending(false)
-	, m_elapsed_cycles(0)
 {
 }
 
@@ -841,7 +840,6 @@ void avr8_device::device_start()
 	// Misc.
 	save_item(NAME(m_addr_mask));
 	save_item(NAME(m_interrupt_pending));
-	save_item(NAME(m_elapsed_cycles));
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -895,7 +893,6 @@ void avr8_device::device_reset()
 
 	m_ocr2_not_reached_yet = true;
 	m_interrupt_pending = false;
-	m_elapsed_cycles = 0;
 }
 
 //-------------------------------------------------
@@ -1104,7 +1101,6 @@ void avr8_device::timer_tick(int cycles)
 {
 	for (int count = 0; count < cycles; count++)
 	{
-		m_elapsed_cycles++;
 		if (m_spi_active && m_spi_prescale > 0 && m_spi_prescale_countdown >= 0)
 		{
 			m_spi_prescale_count++;

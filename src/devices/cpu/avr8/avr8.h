@@ -66,7 +66,6 @@ public:
 
 	// public interfaces
 	virtual void update_interrupt(int source);
-	uint64_t get_elapsed_cycles() const { return m_elapsed_cycles; }
 
 	// register handling
 	DECLARE_WRITE8_MEMBER(regs_w);
@@ -142,7 +141,6 @@ protected:
 
 	// other internal states
 	int m_icount;
-	uint64_t m_elapsed_cycles;
 
 	// memory access
 	inline void push(uint8_t val);
