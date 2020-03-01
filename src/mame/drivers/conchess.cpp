@@ -35,7 +35,8 @@ note: XTAL goes to 4020, 4020 /2 goes to CPU clock, and other dividers to
 IRQ and beeper. On A0, IRQ is active for ~31.2us.
 
 P(A1) + M(A0) (Princhess)
-- dual-module, each module has its own 6502
+- dual-module, each module has its own 6502 - need verification, more likely
+  2nd module has no CPU
 - ?
 
 T8 (Plymate Amsterdam)
