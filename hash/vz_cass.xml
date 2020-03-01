@@ -1,11 +1,36 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
+<!-- Dick Smith hardware catalog numbers, taken from advertisements:
+
+X-7200  VZ-200 Computer
+X-7205  16K RAM pac (VZ-200 only)
+X-7207  Datasette
+X-7208  Four-colour printer/plotter
+X-7210  Printer Interface pac
+X-7212  2 joysticks and interface pac
+K-3618  Glass RTTY kit
+B-7200  Introduction to Computing
+B-7202  First Book of Programs
+B-7204  Technical Manual
+B-7206  Getting Started
+B-7208  Further Programming
+B-7210  Giant Book of Games
+X-7300  VZ-300 Computer
+X-7302  Disk Drive
+X-7304  Disk Controller pac
+X-7306  16K RAM pac (VZ-300 only)
+X-7307  Computer + Datasette + 2 games + 2 educational
+X-7310  Data Cassette (recorder)
+X-7312  Joysticks
+X-7315  Joysticks and Interface pac
+
+-->
+
 <!--
 
 List of known tape releases by Dick Smith Electronics in Australia:
 
-X-7274  Attack of the Killer Tomatoes
 X-7231  Match Box
 X-7232  Poker
 X-7233  Hangman
@@ -13,21 +38,21 @@ X-7234  Slot Machine/Knock Off/Russian Roulette
 X-7235  Blackjack
 X-7236  Circus (*)
 X-7237  Biorhythm/Pair Matching/Calendar
-X-7238  Horse Race
-X-7239  Invaders (*)
+X-7238  Horse Race (Horse Racing/Rabbit Racing)
+X-7239  VZ Invaders (*)
 X-7240  Dynasty Derby
 X-7241  Learjet
-X-7242  Ghost Hunter (*)
+X-7242  VZ Ghost Hunter (*)
 X-7243  Hoppy (*)
 X-7244  Super Snake
 X-7245  Knights and Dragons
-X-7247  Star Blaster (*)
+X-7247  Super Star Blaster (*)
 X-7248  VZ-Asteroids
 X-7249  Air Traffic Controller
 X-7250  Lunar Lander
 X-7251  Statistics 1
 X-7252  Statistics 2
-X-7253  Matrix
+X-7253  Matrix  (Mathematical Matrices)
 X-7254  Tennis Lesson/Golf Lesson
 X-7255  Introduction to BASIC
 X-7256  Elementary Geometry
@@ -45,6 +70,7 @@ X-7270  Panik (*)
 X-7271  Othello
 X-7272  Dracula's Castle
 X-7273  Backgammon
+X-7274  Attack of the Killer Tomatoes
 X-7275  VZ Chess (*)
 X-7276  Music Writer
 X-7278  Disassembler
@@ -53,11 +79,14 @@ X-7280  Hex Utilities
 X-7281  Word Processor
 X-7282  Editor Assembler
 X-7285  Spell'O'Matic 1 & 2
-X-7286  Spell'O'Matic 3 & 4
-X-7287  Flashword 1 & 2
-X-7288  Flashword 3 & 4
+X-7286  Spell'O'Matic 3 & 4, Spot the Goodie, Jumble Decipher
+X-7287  Flashword 1 & 2 (Flashcard?)
+X-7288  Flashword 3 & 4 (Flashcard?)
 X-7289  Metric Spycatcher
 X-7290  Whizkid Spycatcher
+X-7291  Entertainment 4-pack special
+X-7292  Programme 4-pack special
+X-7293  Financial 4-pack special
 X-7330  Sprite Generator
 X-7331  Formula One
 X-7332  Galaxon (*)

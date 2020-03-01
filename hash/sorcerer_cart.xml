@@ -12,6 +12,87 @@ Four cartridges were made for this computer one of which was a hardware device, 
 
 -->
 
+<!-- Dick Smith catalog numbers, taken from advertisements:
+
+X-1190, X-3000 : Sorcerer 8K
+X-1192, X-3001 : Sorcerer 16K
+X-3002 : Sorcerer MkII 32K
+X-3005 : Dust Cover
+X-3010 : S100 Expansion Unit
+X-3085 : Word Processor Pac
+X-3090 : Development Pac
+X-3095 : Eprom Pac
+X-3110 : Serial Data Cable (connect 2 cassette players to sorcerer with remote control)
+X-3112 : Printer Interface Cable (Centronics)
+X-3205 : Micropolis Disk Drive 1043/II Master Unit (77 tracks, 16 sectors, 256 bytes/sector = 315392 bytes)
+X-3208 : Micropolis Disk Drive 1023/II Slave Unit
+X-3220 : Exidy Quad Density Disk Drive, 308K
+X-3300 : S100 Board - 2 parallel and 2 serial
+X-3301 : S100 Board - 2 parallel and 2 serial (kit)
+X-3305 : S100 Board - Music Synthesiser
+X-3306 : S100 Board - Music Synthesiser (kit)
+X-3310 : S100 Board - 8K/16K Eprom Programmer, and 4k/8K Eprom Board
+X-3311 : S100 Board - 8K/16K Eprom Programmer, and 4k/8K Eprom Board (kit)
+X-3600 : Yahtzee
+X-3601 : Air Traffic Controller
+X-3602 : Blackjack
+X-3603 : Sorcerer Music Program
+X-3604 : Wumpus
+X-3606 : Touch Typing Tutor
+X-3607 : Basic Tutorial
+X-3608 : Machine Code Tutorial
+X-3611 : Rubix
+X-3614 : Grotnik Wars
+X-3616 : Galaxians
+X-3620 : Magic Maze
+X-3621 : Plot
+X-3622 : Z-80 Disassembler
+X-3623 : Shape Maker
+X-3624 : Debug
+X-3625 : ZAP 80
+X-3626 : Martian Invaders
+X-3627 : Nike II
+X-3628 : Tank Trap
+X-3629 : Forth
+X-3631 : Graphic Games
+X-3632 : Smart Alec
+X-3633 : Astro Attacker
+X-3634 : Pirate Adventure
+X-3634 : Asteroids (number was re-used)
+X-3635 : Mission Impossible
+X-3636 : Voodoo Castle
+X-3637 : Dumb Terminal V3
+X-3638 : The Count
+X-3639 : Wilderness
+X-3666 : Animated Graphics
+X-3700 : Microledger (General Ledger)
+X-3702 : Micropay (Accounts Payable)
+X-3704 : Microrec (Accounts Receivable)
+X-3710 : CP/M Plus Microsoft Basic for Micropolis Quad Drives
+X-3711 : CP/M Plus Microsoft Basic for Micropolis Dual Drives
+X-3712 : Microsoft Extended Basic for FDS
+X-3714 : Copyfile
+X-3715 : CP/M for Micropolis Quad Drives
+X-3716 : CP/M for Micropolis Dual Drives
+X-3720 : Word Processor Linker for Micropolis Quad Drives
+X-3721 : Word Processor Linker for Micropolis Dual Drives
+X-3725 : DSKCITOH/Print (Hard Sector)
+X-3726 : DSKCITOH/Print (Soft Sector)(FDS)
+B-6100 : Technical Manual
+B-6101 : Guided Tour Operation Manual
+B-6102 : Short Tour Basic Manual
+B-6103 : Introduction to Sorcerer Basic
+B-6105 : Word Processing Manual
+B-6106 : Development Tour Manual
+B-6108 : Software Manual
+B-6110 : Small Business
+B-6112 : Educational and Scientific
+B-6114 : Fun & Games No 1
+B-6116 : Fun & Games No 2
+B-6118 : Home & Economics
+
+-->
+
 <softwarelist name="sorcerer_cart" description="Exidy Sorcerer cartridges">
 
 	<software name="basicpac">

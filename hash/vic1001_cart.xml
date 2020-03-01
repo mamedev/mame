@@ -17,6 +17,45 @@
 
 -->
 
+<!-- Dick Smith catalog numbers, taken from advertisements:
+
+X-2000 : VIC-20 Computer
+X-2005 : Datasette (the cassette recorder)
+X-2007 : Floppy Drive
+X-2009 : Printer
+X-2011 : Memory Motherboard (Expansion Expander)
+X-2020 : Joystick
+X-2022 : Set of 2 Paddles
+X-2031 : Car Chase (cass)
+X-2032 : VIC 21 Casino Game (cass)
+X-2033 : Blue Meanies (cass)
+X-2034 : Biorhythm (cass)
+X-2035 : Space Math (cass)
+X-2036 : Slither/Super Slither (cass)
+X-2037 : Recreation Park (cass)
+X-2045 : Programmable Character Set (cass)
+X-2048 : Vic Avengers (cart)
+X-2049 : Superslot (cart)
+X-2050 : Jelly Monsters (cart)
+X-2051 : Super Alien (cart)
+X-2052 : Super Lander (cart)
+X-2053 : Draw Poker (cart)
+X-2054 : Midnight Drive (cart)
+X-2055 : Rat Race (cart)
+X-2075 : Maths Hurdler
+X-2076 : Pak Bomber
+X-2077 : Skiier
+B-2001 : Introduction to Computing
+B-2002 : Introduction to Basic
+B-2003 : Personal Computing on the VIC-20
+B-2004 : Programmers Reference Guide
+B-2005 : Learn Computer Programming
+B-2006 : VIC Revealed
+B-2007 : Innovative Computing
+
+-->
+
+
 <softwarelist name="vic1001_cart" description="Commodore VIC-1001 / VIC-20 cartridges">
 
 	<software name="worldwar">
