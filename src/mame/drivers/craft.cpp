@@ -109,7 +109,6 @@ WRITE8_MEMBER(craft_state::port_w)
 			}
 			if (BIT(changed, 3))
 			{
-				printf("%d, %d\n", m_screen->hpos(), m_screen->vpos());
 				video_update();
 				m_latched_color = (pins & 0x08) ? (m_port_c & 0x3f) : 0x3f;
 			}
