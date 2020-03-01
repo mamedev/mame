@@ -1292,12 +1292,12 @@ void avr8_device::timer1_tick()
 	int32_t wgm1 = ((m_r[AVR8_REGIDX_TCCR1B] & AVR8_TCCR1B_WGM1_32_MASK) >> 1) |
 					(m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_WGM1_10_MASK);
 
-	int32_t compare_mode[2] = { (m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1A_MASK) >> AVR8_TCCR1A_COM1A_SHIFT,
-								(m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1B_MASK) >> AVR8_TCCR1A_COM1B_SHIFT };
-	uint16_t ocr1[2] = { static_cast<uint16_t>((m_r[AVR8_REGIDX_OCR1AH] << 8) | m_r[AVR8_REGIDX_OCR1AL]),
-						static_cast<uint16_t>((m_r[AVR8_REGIDX_OCR1BH] << 8) | m_r[AVR8_REGIDX_OCR1BL]) };
-	uint8_t ocf1[2] = { (1 << AVR8_TIFR1_OCF1A_SHIFT), (1 << AVR8_TIFR1_OCF1B_SHIFT) };
-	uint8_t int1[2] = { AVR8_INTIDX_OCF1A, AVR8_INTIDX_OCF1B };
+	const uint16_t ocr1[2] = { static_cast<uint16_t>((m_r[AVR8_REGIDX_OCR1AH] << 8) | m_r[AVR8_REGIDX_OCR1AL]),
+						       static_cast<uint16_t>((m_r[AVR8_REGIDX_OCR1BH] << 8) | m_r[AVR8_REGIDX_OCR1BL]) };
+	static const uint8_t s_com_mask[2] = { AVR8_TCCR1A_COM1A_MASK, AVR8_TCCR1A_COM1B_MASK };
+	static const uint8_t s_com_shift[2] = { AVR8_TCCR1A_COM1A_SHIFT, AVR8_TCCR1A_COM1B_SHIFT };
+	static const uint8_t s_ocf1[2] = { (1 << AVR8_TIFR1_OCF1A_SHIFT), (1 << AVR8_TIFR1_OCF1B_SHIFT) };
+	static const uint8_t s_int1[2] = { AVR8_INTIDX_OCF1A, AVR8_INTIDX_OCF1B };
 	int32_t increment = m_timer_increment[1];
 
 	for (int32_t reg = AVR8_REG_A; reg <= AVR8_REG_B; reg++)
@@ -1320,8 +1320,8 @@ void avr8_device::timer1_tick()
 					count = 0;
 					increment = 0;
 				}
-				m_r[AVR8_REGIDX_TIFR1] |= ocf1[reg];
-				update_interrupt(int1[reg]);
+				m_r[AVR8_REGIDX_TIFR1] |= s_ocf1[reg];
+				update_interrupt(s_int1[reg]);
 			}
 			else if (count == 0)
 			{
@@ -1331,8 +1331,8 @@ void avr8_device::timer1_tick()
 					update_interrupt(AVR8_INTIDX_TOV1);
 				}
 
-				m_r[AVR8_REGIDX_TIFR1] &= ~ocf1[reg];
-				update_interrupt(int1[reg]);
+				m_r[AVR8_REGIDX_TIFR1] &= ~s_ocf1[reg];
+				update_interrupt(s_int1[reg]);
 			}
 			break;
 
@@ -1347,7 +1347,8 @@ void avr8_device::timer1_tick()
 					increment = 0;
 				}
 
-				switch (compare_mode[reg])
+				const int32_t compare_mode = (m_r[AVR8_REGIDX_TCCR1A] & s_com_mask[reg]) >> s_com_shift[reg];
+				switch (compare_mode)
 				{
 				case 0: /* Normal Operation; OC1A/B disconnected */
 					break;
@@ -1371,8 +1372,8 @@ void avr8_device::timer1_tick()
 					break;
 				}
 
-				m_r[AVR8_REGIDX_TIFR1] |= ocf1[reg];
-				update_interrupt(int1[reg]);
+				m_r[AVR8_REGIDX_TIFR1] |= s_ocf1[reg];
+				update_interrupt(s_int1[reg]);
 			}
 			else if (count == 0)
 			{
@@ -1382,7 +1383,8 @@ void avr8_device::timer1_tick()
 					update_interrupt(AVR8_INTIDX_TOV1);
 				}
 
-				switch (compare_mode[reg])
+				const int32_t compare_mode = (m_r[AVR8_REGIDX_TCCR1A] & s_com_mask[reg]) >> s_com_shift[reg];
+				switch (compare_mode)
 				{
 				case 0: /* Normal Operation; OC1A/B disconnected */
 					break;
@@ -1406,8 +1408,8 @@ void avr8_device::timer1_tick()
 					break;
 				}
 
-				m_r[AVR8_REGIDX_TIFR1] &= ~ocf1[reg];
-				update_interrupt(int1[reg]);
+				m_r[AVR8_REGIDX_TIFR1] &= ~s_ocf1[reg];
+				update_interrupt(s_int1[reg]);
 			}
 			break;
 
