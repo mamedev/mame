@@ -10497,7 +10497,7 @@ cmpchess
 cncchess
 
 @source:compmahj.cpp
-compmahj			// 1987 Nintendo Computer Mahjong
+compmahj            // 1987 Nintendo Computer Mahjong
 
 @source:compucolor.cpp
 compclr2                        //
@@ -15063,6 +15063,7 @@ nfb96h                          // (c) 1996 Amcoe
 nfb96i                          // (c) 1996 Amcoe
 nfb96j                          // (c) 1996 Amcoe
 nfb96k                          // (c) 1996 Amcoe
+nfb96l                          // (c) 1996 Amcoe
 nfb96se                         // bootleg
 nfb96sea                        // bootleg
 nfb96seb                        // bootleg
