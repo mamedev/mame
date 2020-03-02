@@ -153,6 +153,7 @@ private:
 	required_shared_ptr<u16> m_bgram;
 
 	/* video-related */
+	bool m_refresh = true;
 	tilemap_t  *m_bg_tilemap;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -176,6 +177,7 @@ TILE_GET_INFO_MEMBER(k3_state::get_tile_info)
 void k3_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(k3_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	save_item(NAME(m_refresh));
 }
 
 void k3_state::k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
@@ -250,15 +252,23 @@ void k3_state::k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_eleme
 	}
 }
 
+// sprite limitation reference : https://www.youtube.com/watch?v=_7V_SrEQwSY
+// TODO : measure from real hardware
 void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	const u32 max_cycle = 432 * 262; // max usable cycle for sprites, TODO : related to whole screen?
+	u32 cycle = 0;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	u16 *source = m_spriteram[0];
 	u16 *source2 = m_spriteram[1];
-	u16 *finish = source + 0x1000 / 2; // TODO : Not of all spriteram are used
+	u16 *finish = source + (m_spriteram[0].bytes() / 2);
 
 	while (source < finish)
 	{
+		cycle += 4 + 128; // 4 cycle per reading RAM, 128? cycle per each tiles
+		if (cycle > max_cycle)
+			break;
+
 		int xpos = (source[0] & 0xff00) >> 8 | (source2[0] & 0x0001) << 8;
 		int ypos = (source[0] & 0x00ff) >> 0;
 		u32 tileno = (source2[0] & 0x7ffe) >> 1;
@@ -276,8 +286,11 @@ void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 u32 k3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, cliprect);
+	if (m_refresh)
+	{
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		draw_sprites(bitmap, cliprect); // delayed?
+	}
 	return 0;
 }
 
@@ -294,6 +307,13 @@ void k3_state::scrolly_w(u16 data)
 
 void k3_state::k3_soundbanks_w(u16 data)
 {
+	/*
+		---- ---- ---x ---- Unknown
+		---- ---- ---- -x-- OKI1 Bank
+		---- ---- ---- --x- OKI0 Bank
+		---- ---- ---- ---x VRAM access flip-flop
+	*/
+	m_refresh = BIT(data, 0); // rising edge
 	m_oki[1]->set_rom_bank(BIT(data, 2));
 	m_oki[0]->set_rom_bank(BIT(data, 1));
 }
@@ -307,12 +327,13 @@ void k3_state::flagrall_soundbanks_w(offs_t offset, u16 data, u16 mem_mask)
 
 	// 0x80 - ?
 	// 0x40 - ?
-	// 0x20 - toggles, might trigger vram -> buffer transfer?
+	// 0x20 - VRAM access flip-flop
 	// 0x10 - unknown, always on?
 	// 0x08 - ?
 	// 0x06 - oki bank
 	// 0x01 - ?
 
+	m_refresh = BIT(~data, 5); // falling edge
 	if (data & 0xfcc9)
 		popmessage("unk control %04x", data & 0xfcc9);
 
