@@ -251,7 +251,7 @@ namespace devices
 	{
 		NETLIB_CONSTRUCTOR(logic_inputN)
 		, m_Q(*this, "Q{}")
-		, m_IN(*this, "IN", false)
+		, m_IN(*this, "IN", 0)
 		// make sure we get the family first
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		, m_supply(*this)

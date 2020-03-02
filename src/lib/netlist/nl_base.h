@@ -1733,10 +1733,6 @@ namespace netlist
 	class object_array_t : public plib::uninitialised_array_t<C, N>
 	{
 	public:
-		struct init
-		{
-			std::array<const char *, N> p;
-		};
 		template<typename... Args>
 		object_array_t(core_device_t &dev, const std::initializer_list<const char *> &names, Args&&... args)
 		{
