@@ -134,7 +134,7 @@ namespace analog
 	NETLIB_TIMESTEP(L)
 	{
 		// Gpar should support convergence
-		m_I += m_I + m_G * deltaV();
+		m_I += m_G * deltaV();
 		m_G = step / m_L() + m_gmin;
 		set_mat( m_G, -m_G, -m_I,
 				-m_G,  m_G,  m_I);

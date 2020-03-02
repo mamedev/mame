@@ -11,17 +11,17 @@
 	
 	int main()
 	{
-	    // Change IC86 output every micro second
+	    // Change IC86 output every micro second starting at 1ms
 		for (std::size_t i=0;i<256;i++)
-		  printf("%.9f,IC86.D.IN,%d\n", (double) i / 1.0e6, (int)i);
+		  printf("%.9f,IC86.D.IN,%d\n", (double) i / 1.0e6 + 1.0e-3, (int)i);
 	}
 
  * Run these commands: 
  * 
  * c++ x.cpp
  * ./a.out > src/lib/netlist/examples/turkey_shoot.csv
- * ./nltool -c run -t 0.0003 -f src/lib/netlist/examples/turkey_shoot.cpp -i src/lib/netlist/examples/turkey_shoot.csv -l BLUE
- * ./nlwav -f tab -o x.tab -s 0.0000005 -i 0.000001 -n 256 log_BLUE.log
+ * ./nltool -c run -t 0.0013 -f src/lib/netlist/examples/turkey_shoot.cpp -i src/lib/netlist/examples/turkey_shoot.csv -l BLUE
+ * ./nlwav -f tab -o x.tab -s 0.0010005 -i 0.000001 -n 256 log_BLUE.log
  * 
  * x.tab now contains 256 values representing the different output levels:
  * low 4 bits: color value
@@ -102,9 +102,7 @@ NETLIST_START(turkey_shoot_schematics)
 
 	TTL_INPUT(BLANK, 0)
 	
-	//IND(L1, 0.0000047) // FIXME:Inductor model needs verification
-	RES(L1, 1)
-	RES(L1R, 1) // series resistance of inductor
+	IND(L1, 0.0000047) // FIXME:Inductor model needs verification
 	
 	CAP(C60, CAP_U(0.1))
 	CAP(C54, CAP_P(47))
@@ -173,8 +171,6 @@ NETLIST_START(turkey_shoot_schematics)
 	NET_C(R35.1, Q4.C, C60.1, L1.2)
 
 	NET_C(I_V12, L1.1)
-	NET_C(I_V12, L1R.1)
-	NET_C(L1R.2, L1.1)
 
 	NET_C(Q4.E, R30.1, R29.1, R28.1, R31.1)
 	
