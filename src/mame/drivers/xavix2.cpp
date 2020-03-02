@@ -49,7 +49,7 @@ private:
 
 	u16 m_port0_ddr;
 	u32 m_port0_full;
-	u8  m_port0_dataw, m_port0_data;
+	u8  m_port0_dataw;
 	u8  m_port0_maskw, m_port0_maskr;
 
 	u16 m_gpu0_adr,  m_gpu0_count,  m_gpu1_adr,  m_gpu1_count;
@@ -465,18 +465,10 @@ u16 xavix2_state::port0_ddr_r()
 
 void xavix2_state::port0_update()
 {
-	u8 old = m_port0_data;
-	m_port0_data &= ~m_port0_maskw;
-	m_port0_data |= (m_port0_dataw & m_port0_maskw);
-//	logerror("%s: port0 %04x -> %04x (%04x)\n", machine().describe_context(), old, m_port0_data, m_port0_dataw);
 	if (m_port0_maskw & 0x20)
-		m_i2cmem->write_sda((m_port0_dataw >> 5) & 0x1);
+		m_i2cmem->write_sda(BIT(m_port0_dataw, 5));
 	if (m_port0_maskw & 0x10)
-		m_i2cmem->write_scl((m_port0_dataw >> 4) & 0x1);
-	if ((old ^ m_port0_dataw) & 0x30) {
-		m_port0_data &= ~m_port0_maskr;
-		m_port0_data |= ((m_i2cmem->read_sda() << 5) & m_port0_maskr);
-	}
+		m_i2cmem->write_scl(BIT(m_port0_dataw, 4));
 }
 
 void xavix2_state::port0_w(u32 data)
@@ -497,7 +489,9 @@ u32 xavix2_state::port0_r()
 }
 u8 xavix2_state::port0_r8()
 {
-	u8 data = (m_port0_dataw & m_port0_maskw) | (m_port0_data & m_port0_maskr);
+	u8 data = (m_port0_dataw & m_port0_maskw);
+	if (m_port0_maskr & 0x20)
+		data |= m_i2cmem->read_sda() << 5;
 	return data;
 }
 
