@@ -155,7 +155,7 @@ private:
 	/* video-related */
 	std::unique_ptr<u16[]> m_spriteram_buffer[2];
 	std::unique_ptr<u16[]> m_bgram_buffer;
-	bool m_refresh = true;
+	bool m_refresh = false;
 	tilemap_t  *m_bg_tilemap;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -262,7 +262,7 @@ void k3_state::k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_eleme
 // TODO : measure values from real hardware
 void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const u32 max_cycle = 432 * 262; // max usable cycle for sprites, TODO : related to whole screen?
+	const u32 max_cycle = m_screen->width() * m_screen->height(); // max usable cycle for sprites, TODO : related to whole screen?
 	u32 cycle = 0;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	u16 *source = m_spriteram_buffer[0].get();
@@ -293,7 +293,7 @@ void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 u32 k3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, cliprect); // delayed?
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
@@ -669,10 +669,7 @@ void k3_state::flagrall(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1945kiii);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	m_screen->set_raw(XTAL(27'000'000)/4, 432, 0, 320, 315, 0, 240); // ~49.61Hz, reference : https://www.youtube.com/watch?v=CuGrTiQs4ww
 	m_screen->set_screen_update(FUNC(k3_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -694,7 +691,7 @@ void k3_state::k3(machine_config &config)
 	OKIM6295(config, m_oki[1], MASTER_CLOCK/16, okim6295_device::PIN7_HIGH);  /* dividers? */
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_screen->set_raw(XTAL(27'000'000)/4, 432, 0, 320, 262, 0, 224); // ~60Hz
 }
 
 
