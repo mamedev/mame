@@ -28,6 +28,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_i2cmem(*this, "i2cmem")
+		, m_port0(*this, "port0")
 	{ }
 
 	void xavix2(machine_config &config);
@@ -41,6 +42,7 @@ private:
 	required_device<xavix2_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<i2c_24c08_device> m_i2cmem;
+	required_ioport m_port0;
 
 	u32 m_dma_src;
 	u16 m_dma_dst;
@@ -487,11 +489,10 @@ u32 xavix2_state::port0_r()
 {
 	return (m_port0_full & 0xff00ffff) | (port0_r8() << 16);
 }
+
 u8 xavix2_state::port0_r8()
 {
-	u8 data = (m_port0_dataw & m_port0_maskw);
-	if (m_port0_maskr & 0x20)
-		data |= m_i2cmem->read_sda() << 5;
+	u8 data = (m_port0_dataw & m_port0_maskw) | (m_port0->read() & m_port0_maskr);
 	return data;
 }
 
@@ -611,6 +612,12 @@ void xavix2_state::machine_reset()
 }
 
 static INPUT_PORTS_START( xavix2 )
+	PORT_START("port0")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
 INPUT_PORTS_END
 
 void xavix2_state::xavix2(machine_config &config)
