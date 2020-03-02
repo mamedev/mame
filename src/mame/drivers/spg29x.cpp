@@ -713,6 +713,18 @@ ROM_START( hyprscan )
 	ROM_LOAD32_DWORD("spg290.bin", 0x000000, 0x008000, NO_DUMP)     // 256Kbit SPG290 internal ROM
 ROM_END
 
+
+ROM_START( jak_bbh )
+	ROM_REGION( 0x100000, "bios", ROMREGION_32BIT | ROMREGION_LE | ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x4200000, "nand", 0 ) // ID returned C25A, read as what appears to be a compatible type.
+	ROM_LOAD("bigbuckhunterpro_as_hy27us0812a_c25a.bin", 0x000000, 0x4200000, CRC(e2627540) SHA1(c8c6e5fbc4084fa695390bbb4e1e52e671f050da) )
+
+	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
+	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
+ROM_END
+
+
 ROM_START( jak_bbsf )
 	ROM_REGION( 0x100000, "bios", ROMREGION_32BIT | ROMREGION_LE | ROMREGION_ERASE00 )
 
@@ -729,7 +741,9 @@ ROM_END
 //    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY   FULLNAME     FLAGS
 COMP( 2006, hyprscan,   0,      0,      hyperscan, hyperscan, spg29x_game_state, empty_init, "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-// Big Buck Hunter has ISSI 404A (24C04)
-COMP( 2009, jak_bbsf,   0,      0,      hyperscan, hyperscan, spg29x_nand_game_state, nand_init210, "JAKKS Pacific Inc", "Big Buck Hunter Safari (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Big Buck Safari has ISSI 416A (24C16)
+// There were 1 player and 2 player versions for these JAKKS guns.  The 2nd gun appears to be simply a controller (no AV connectors) but as they were separate products with the 2 player verisons being released up to a year after the original, the code could differ.
+// If they differ, it is currently uncertain which versions these ROMs are from
+COMP( 2009, jak_bbh,    0,      0,      hyperscan, hyperscan, spg29x_nand_game_state, nand_init210, "JAKKS Pacific Inc", "Big Buck Hunter Pro (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) //has ISSI 404A (24C04)
+COMP( 2011, jak_bbsf,   0,      0,      hyperscan, hyperscan, spg29x_nand_game_state, nand_init210, "JAKKS Pacific Inc", "Big Buck Safari (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // has ISSI 416A (24C16)
 
 
