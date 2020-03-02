@@ -86,4 +86,15 @@
 		</part>
 	</software>
 
+	<software name="rockmang" supported="no">
+		<description>Rockman X3 Buster Battle (game)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="bdesignm_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom loadflag="load16_word_swap" name="g04_rockman.bin" size="0x20000" crc="bbca31a7" sha1="5606c8ee6b893cd529499581d8227505a736d14d" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
