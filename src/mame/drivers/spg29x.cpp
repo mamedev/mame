@@ -77,11 +77,13 @@ public:
 
 	void hyperscan(machine_config &config);
 
-private:
+protected:
+	virtual void machine_reset() override;
+
 	required_device<score7_cpu_device> m_maincpu;
+private:
 
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	uint32_t spg290_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -176,6 +178,9 @@ public:
 
 	void nand_init(int blocksize, int blocksize_stripped);
 	void nand_init210();
+
+protected:
+	void machine_reset() override;
 
 private:
 	std::vector<uint8_t> m_strippedrom;
@@ -642,6 +647,31 @@ void spg29x_game_state::machine_reset()
 	m_maincpu->set_state_int(SCORE_CR + 29, 0x20000000);
 }
 
+void spg29x_nand_game_state::machine_reset()
+{
+	spg29x_game_state::machine_reset();
+
+	uint32_t bootstrap_ram_start = (m_strippedrom[0x0c] << 0) | (m_strippedrom[0x0d] << 8) | (m_strippedrom[0x0e] << 16) | (m_strippedrom[0x0f] << 24);
+	uint32_t bootstrap_ram_end   = (m_strippedrom[0x10] << 0) | (m_strippedrom[0x11] << 8) | (m_strippedrom[0x12] << 16) | (m_strippedrom[0x13] << 24);
+	uint32_t bootstrap_ram_boot  = (m_strippedrom[0x14] << 0) | (m_strippedrom[0x15] << 8) | (m_strippedrom[0x16] << 16) | (m_strippedrom[0x17] << 24);
+
+	// there is a 0x01 at 0x26, possibly related to source location / block in NAND to copy from?
+
+	logerror("NAND Bootstrap RAM start: %08x RAM end: %08x RAM boot: %08x", bootstrap_ram_start, bootstrap_ram_end, bootstrap_ram_boot);
+
+	uint32_t sourceaddr = 0x10000;
+	for (uint32_t addr = bootstrap_ram_start; addr <= bootstrap_ram_end; addr++)
+	{
+		address_space& mem = m_maincpu->space(AS_PROGRAM);
+		uint8_t byte = m_strippedrom[sourceaddr];
+		mem.write_byte(addr, byte);
+		sourceaddr++;
+	}
+
+	// probably jumped to from internal ROM?
+	m_maincpu->set_state_int(SCORE_PC, bootstrap_ram_boot);
+}
+
 
 void spg29x_game_state::hyperscan(machine_config &config)
 {
@@ -684,7 +714,7 @@ void spg29x_nand_game_state::nand_init(int blocksize, int blocksize_stripped)
 	}
 
 	// debug to allow for easy use of unidasm.exe
-	if (0)
+	if (1)
 	{
 		FILE *fp;
 		char filename[256];
