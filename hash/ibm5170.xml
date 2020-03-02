@@ -2113,7 +2113,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos7fr" cloneof="pcdos7" supported="no">
 		<description>PC DOS 7.0 (French)</description>
 		<year>1995</year>
@@ -2145,7 +2144,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos7ja" cloneof="pcdos7" supported="no">
 		<description>PC DOS 7.0 (Japanese)</description>
 		<year>1995</year>
@@ -2198,7 +2196,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos7ko" cloneof="pcdos7" supported="no">
 		<description>PC DOS 7.0 (Korean)</description>
 		<year>1995</year>
@@ -2246,7 +2243,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos7ru" cloneof="pcdos7" supported="no">
 		<description>PC DOS 7.0 (Russian)</description>
 		<year>1995</year>
@@ -2279,7 +2275,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos7engb" cloneof="pcdos7" supported="no">
 		<description>PC DOS 7.0 (UK English)</description>
 		<year>1995</year>
@@ -2570,7 +2565,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos2kzhs" cloneof="pcdos2k" supported="no">
 		<description>IBM PC DOS 2000 (Simplified Chinese)</description>
 		<year>1998</year>
