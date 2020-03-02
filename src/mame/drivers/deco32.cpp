@@ -874,6 +874,15 @@ DECOSPR_PRIORITY_CB_MEMBER( captaven_state::captaven_pri_callback )
 	}
 }
 
+DECOSPR_PRIORITY_CB_MEMBER( fghthist_state::fghthist_pri_callback )
+{
+	u32 mask = GFX_PMASK_8; // under the text layer
+	if (extpri)
+		mask |= GFX_PMASK_4; // under the uppermost playfield
+
+	return mask;
+}
+
 DECO16IC_BANK_CB_MEMBER( captaven_state::bank_callback )
 {
 	return (bank & 0x20) << 9;
@@ -1966,6 +1975,7 @@ void fghthist_state::fghthist(machine_config &config)
 
 	DECO_SPRITE(config, m_sprgen[0], 0);
 	m_sprgen[0]->set_gfx_region(3);
+	m_sprgen[0]->set_pri_callback(FUNC(fghthist_state::fghthist_pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO146PROT(config, m_ioprot, 0);

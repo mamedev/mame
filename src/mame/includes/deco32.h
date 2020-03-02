@@ -153,6 +153,7 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	DECOSPR_PRIORITY_CB_MEMBER(fghthist_pri_callback);
 
 	void fghthist_map(address_map &map);
 	void fghthsta_memmap(address_map &map);
