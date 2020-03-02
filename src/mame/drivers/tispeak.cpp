@@ -398,6 +398,16 @@ K28 modules:
   - emulate other known devices
 
 
+Dick Smith catalog numbers, taken from advertisements:
+
+X-1300, Y-1300 : T.I. Speak & Spell
+X-1301 : Super Stumper 1 (for Speak & Spell)
+X-1302 : Super Stumper 2 (for Speak & Spell)
+X-1305 : Vowell Power (for Speak & Spell)
+Y-1310 : T.I. Speak & Math
+Y-1313 : T.I. Speak & Read
+Y-1320 : T.I. Dataman
+
 ***************************************************************************/
 
 #include "emu.h"

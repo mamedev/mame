@@ -8130,6 +8130,19 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="crystalca">
+		<description>Crystal Caves (1.0)</description>
+		<year>1991</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Apogee Software" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="caves.img" size="737280" crc="a733f13a" sha1="8557004c1e1464ad4e500a0661c0d2e7e9561b49"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cycles">
 		<description>The Cycles</description>
 		<year>1989</year>
@@ -9911,7 +9924,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="menace">
-		<description>Menace</description>
+		<description>Menace (5.25")</description>
 		<year>1989</year>
 		<publisher>Psygnosis</publisher>
 		<info name="developer" value="DMA Design Limited" />
@@ -9923,6 +9936,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Menace [Psygnosis] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="634084e8" sha1="b0a103cb6dcc30486f3e585b1accbe1393afbada"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="menace35" cloneof="menace">
+		<description>Menace (3.5")</description>
+		<year>1989</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="DMA Design Limited" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Menace.img" size="737280" crc="94e7307c" sha1="430573d0d4867a724e6241dbfb0120439aa1d5cc"/>
 			</dataarea>
 		</part>
 	</software>

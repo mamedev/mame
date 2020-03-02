@@ -4,6 +4,22 @@
 Info from Atariage and Atarimania
 -->
 
+<!-- Dick Smith catalog numbers, taken from advertisements:
+
+X-1400 : Atari VCS console
+X-1404 : Video Chess
+X-1405 : Circus Atari
+X-1406 : Space Invaders
+X-1407 : Sky Diver
+X-1408 : Air Sea Battle
+X-1409 : Bowling
+X-1410 : Outlaw
+X-1411 : Breakout
+X-1413 : Night Driver
+X-1414 : Streetracer
+
+-->
+
 <softwarelist name="a2600" description="Atari 2600 cartridges">
 
 	<software name="adventp">

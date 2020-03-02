@@ -825,6 +825,7 @@ spg2xx_lexibook.cpp
 spg2xx_mysprtch.cpp
 spg2xx_pdc.cpp
 spg2xx_playvision.cpp
+spg2xx_skannerztv.cpp
 spg2xx_senario.cpp
 spg2xx_senario_poker.cpp
 spg2xx_shredmjr.cpp

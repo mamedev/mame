@@ -52,7 +52,7 @@ PAGE SEL bit in PORT0 set to 1:
 #include "machine/z80daisy.h"
 #include "machine/keyboard.h"
 #include "machine/timer.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80sti.h"
 #include "video/mc6845.h"

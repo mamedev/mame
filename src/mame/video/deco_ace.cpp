@@ -13,7 +13,13 @@
 
     Bytes 0 to 0x1f : Alpha Control
     Tattoo Assassins :
-    Bytes 0x00 to 0x16(0x58) - object alpha control?
+    Bytes 0x00 to 0x07(0x1c) - object alpha control per palette/priority / 8
+    Bytes 0x08(0x20) to 0x16(0x58) - used, unknown condition/purpose (possibly object)
+    Bytes 0x17(0x5c) to 0x1f(0x7c) - tilemap alpha control
+
+    Night slashers :
+    Bytes 0x00 to 0x05(0x14) - object alpha control per palette / 2 (if ((pix & 0x900) != 0x100))
+    Bytes 0x06(0x18) to 0x16(0x58) - unused/unknown
     Bytes 0x17(0x5c) to 0x1f(0x7c) - tilemap alpha control
 
     Boogie Wings:

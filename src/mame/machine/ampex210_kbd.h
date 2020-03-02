@@ -12,6 +12,13 @@ public:
 	// construction/destruction
 	ampex230_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
+	// callback configuration
+	auto data_out_callback() { return m_data_out_callback.bind(); }
+	auto clock_out_callback() { return m_clock_out_callback.bind(); }
+
+	// external control input
+	DECLARE_WRITE_LINE_MEMBER(strobe_w);
+
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -21,13 +28,16 @@ protected:
 	virtual void device_start() override;
 
 private:
-	// handlers
+	// MCU port handlers
 	u8 bus_r();
-	DECLARE_READ_LINE_MEMBER(t0_r);
-	DECLARE_READ_LINE_MEMBER(t1_r);
 	void p1_w(u8 data);
 	void p2_w(u8 data);
 
+	// callback objects
+	devcb_write_line m_data_out_callback;
+	devcb_write_line m_clock_out_callback;
+
+	// device finders
 	required_device<mcs48_cpu_device> m_mcu;
 	required_ioport_array<14> m_key_row;
 

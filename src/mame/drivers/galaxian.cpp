@@ -9869,6 +9869,9 @@ ROM_START( mooncrs5 )
 	ROM_LOAD( "f_f_e.bin", 0x2800, 0x0800, CRC(6e84a927) SHA1(82e8e825d157c3c947a3a222bca059a735169c7d) )
 	ROM_LOAD( "f_f_f.bin", 0x3000, 0x0800, CRC(b45af1e8) SHA1(d7020774707234acdaef5c655f667d5ee9e54a13) )
 	ROM_LOAD( "f_r_f.bin", 0x3800, 0x0800, BAD_DUMP CRC(2d36a3e6) SHA1(9b7b5203dd421a4d9bb310594edd30f5111e9e40) ) // 1st and 2nd half identical, misses the second half of code
+	// let's use the mooncrs2 ROM for now (1/2 m7.bin == (1/2 || 2/2) f_r_f.bin)
+	// Remove the BAD_DUMP flag when confirmed being identical via another dump.
+	ROM_LOAD( "m7.bin",    0x3800, 0x0800, BAD_DUMP CRC(957ee078) SHA1(472038dedfc01c995be889ea93d4df8bef2b874c) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "r_r_a.bin", 0x0000, 0x0800, CRC(528da705) SHA1(d726ee18b79774c982f88afb2a508eb5d5783193) )

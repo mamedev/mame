@@ -216,7 +216,6 @@ void synthex_state::driver_start()
 	{
 		u16 addr_swapped = bitswap<14>(offset, 13, 12, 11, 7, 3, 1, 0, 2, 4, 5, 6, 8, 9, 10);
 		u8 data_swapped = bitswap<8>(romdata[addr_swapped], 5, 1, 4, 3, 2, 0, 6, 7);
-		osd_printf_verbose("program[$%04X] = $%02X <- ROM[$%04X] = $%02X\n", offset + 0xd000, data_swapped, addr_swapped, romdata[addr_swapped]);
 		program[offset] = data_swapped;
 	}
 }

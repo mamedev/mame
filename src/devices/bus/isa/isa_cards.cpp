@@ -23,6 +23,7 @@
 #include "svga_trident.h"
 #include "num9rev.h"
 #include "eis_hgb107x.h"
+#include "ex1280.h"
 
 // storage
 #include "fdc.h"
@@ -209,7 +210,9 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("bt542bh", BT542BH);
 	device.option_add("bt545s", BT545S);
 	device.option_add("dcb", NOVELL_DCB);
+	device.option_add("ex1280", ISA16_EX1280);
 	device.option_add("ultra12f", ULTRA12F);
+	device.option_add("ultra12f32", ULTRA12F32);
 	device.option_add("ultra14f", ULTRA14F);
 	device.option_add("ultra24f", ULTRA24F); // actually an EISA card
 	device.option_add("dc320b", TEKRAM_DC320B); // actually an EISA card
