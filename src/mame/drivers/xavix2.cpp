@@ -28,7 +28,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_i2cmem(*this, "i2cmem")
-		, m_port0(*this, "port0")
+		, m_pio(*this, "pio")
 	{ }
 
 	void xavix2(machine_config &config);
@@ -42,17 +42,16 @@ private:
 	required_device<xavix2_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<i2c_24c08_device> m_i2cmem;
-	required_ioport m_port0;
+	required_ioport m_pio;
 
 	u32 m_dma_src;
 	u16 m_dma_dst;
 	u16 m_dma_count;
 	emu_timer *m_dma_timer;
 
-	u16 m_port0_ddr;
-	u32 m_port0_full;
-	u8  m_port0_dataw;
-	u8  m_port0_maskw, m_port0_maskr;
+	u32 m_pio_mode[2];
+	u32 m_pio_dataw;
+	u32 m_pio_mask_out;
 
 	u16 m_gpu0_adr,  m_gpu0_count,  m_gpu1_adr,  m_gpu1_count;
 	u16 m_gpu0b_adr, m_gpu0b_count, m_gpu1b_adr, m_gpu1b_count;
@@ -121,13 +120,11 @@ private:
 	u8 debug_port_r();
 	u8 debug_port_status_r();
 
-	void port0_ddr_w(u16 data);
-	u16 port0_ddr_r();
-	void port0_update();
-	void port0_w(u32 data);
-	void port0_w8(u8 data);
-	u32 port0_r();
-	u8 port0_r8();
+	void pio_mode_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 pio_mode_r(offs_t offset);
+	void pio_update();
+	void pio_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 pio_r();
 
 	void crtc_w(offs_t reg, u16 data);
 
@@ -296,7 +293,7 @@ void xavix2_state::gpu1_trigger_w(u8 data)
 
 void xavix2_state::gpu_update(u16 count, u16 adr)
 {
-	int list[count];
+	int *list = new int[count];
 	for(u32 i=0; i != count; i++) {
 		u64 command = m_maincpu->space(AS_PROGRAM).read_qword(adr + 8*i);
 		list[i] = (command & 0x1fe00000) | i;
@@ -353,6 +350,7 @@ void xavix2_state::gpu_update(u16 count, u16 adr)
 			}
 		}
 	}
+	delete list;
 }
 
 void xavix2_state::gpu_descsize_w(u16 data)
@@ -446,53 +444,41 @@ u8 xavix2_state::debug_port_status_r()
 	return 1<<1;
 }
 
-void xavix2_state::port0_ddr_w(u16 data)
+void xavix2_state::pio_mode_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	//	logerror("%s: port0 ddr %04x -> %04x\n", machine().describe_context(), m_port0_ddr, data);
-	m_port0_ddr = data;
-	m_port0_maskr = m_port0_maskw = 0;
-	for (u32 i=0; i<8; i++) {
-		m_port0_maskr |= ((data & 3) == 0) ? 1 << i : 0;
-		m_port0_maskw |= ((data & 3) == 3) ? 1 << i : 0;
-		data >>= 2;
+	COMBINE_DATA(&m_pio_mode[offset]);
+	//	logerror("%s: pio mode%d %08x %08x -> %08x\n", machine().describe_context(), offset, data, mem_mask, m_pio_mode[offset]);
+	m_pio_mask_out = 0;
+	for (u32 i=0; i<32; i++) {
+		m_pio_mask_out |= (((m_pio_mode[i / 16] >> ((i % 16) * 2)) & 3) == 3) ? 1 << i : 0;
 	}
-	//	logerror("%s: port0 maskr %04x, maskw %04x\n", machine().describe_context(), m_port0_maskr, m_port0_maskw);
-	port0_update();
+	//	logerror("%s: pio mode in0 %08x, out %08x\n", machine().describe_context(), m_pio_mask_out);
+	pio_update();
 }
 
-u16 xavix2_state::port0_ddr_r()
+u32 xavix2_state::pio_mode_r(offs_t offset)
 {
-	return m_port0_ddr;
+	return m_pio_mode[offset];
 }
 
-void xavix2_state::port0_update()
+void xavix2_state::pio_update()
 {
-	if (m_port0_maskw & 0x20)
-		m_i2cmem->write_sda(BIT(m_port0_dataw, 5));
-	if (m_port0_maskw & 0x10)
-		m_i2cmem->write_scl(BIT(m_port0_dataw, 4));
+	if (BIT(m_pio_mask_out, 21))
+		m_i2cmem->write_sda(BIT(m_pio_dataw, 21));
+	if (BIT(m_pio_mask_out, 20))
+		m_i2cmem->write_scl(BIT(m_pio_dataw, 20));
 }
 
-void xavix2_state::port0_w(u32 data)
+void xavix2_state::pio_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_port0_full = data;
-	port0_w8(data >> 16);
+	COMBINE_DATA(&m_pio_dataw);
+	pio_update();
 }
 
-void xavix2_state::port0_w8(u8 data)
+u32 xavix2_state::pio_r()
 {
-	m_port0_dataw = data;
-	port0_update();
-}
-
-u32 xavix2_state::port0_r()
-{
-	return (m_port0_full & 0xff00ffff) | (port0_r8() << 16);
-}
-
-u8 xavix2_state::port0_r8()
-{
-	u8 data = (m_port0_dataw & m_port0_maskw) | (m_port0->read() & m_port0_maskr);
+	u32 data = (m_pio->read() & ~m_pio_mask_out) | (m_pio_dataw & m_pio_mask_out);
+	logerror("%s: pio read %08x\n", machine().describe_context(), data);
 	return data;
 }
 
@@ -548,8 +534,8 @@ void xavix2_state::mem(address_map &map)
 	map(0xffffe00c, 0xffffe00c).w(FUNC(xavix2_state::dma_control_w));
 	map(0xffffe010, 0xffffe010).rw(FUNC(xavix2_state::dma_status_r), FUNC(xavix2_state::dma_status_w));
 
-	map(0xffffe204, 0xffffe205).rw(FUNC(xavix2_state::port0_ddr_r), FUNC(xavix2_state::port0_ddr_w));
-	map(0xffffe208, 0xffffe20b).rw(FUNC(xavix2_state::port0_r), FUNC(xavix2_state::port0_w));
+	map(0xffffe200, 0xffffe207).rw(FUNC(xavix2_state::pio_mode_r), FUNC(xavix2_state::pio_mode_w));
+	map(0xffffe208, 0xffffe20b).rw(FUNC(xavix2_state::pio_r), FUNC(xavix2_state::pio_w));
 	map(0xffffe238, 0xffffe238).rw(FUNC(xavix2_state::debug_port_r), FUNC(xavix2_state::debug_port_w));
 	map(0xffffe239, 0xffffe239).r(FUNC(xavix2_state::debug_port_status_r));
 
@@ -612,12 +598,39 @@ void xavix2_state::machine_reset()
 }
 
 static INPUT_PORTS_START( xavix2 )
-	PORT_START("port0")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cancel") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+	PORT_START("pio")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON3)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON4)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON5)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON6)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON7)
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON8)
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON9)
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON10)
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON11)
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON12)
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON13)
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON14)
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON15)
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON16)
+	PORT_BIT(0x00004000, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2)
+	PORT_BIT(0x00008000, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2)
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("B/Execute")
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("D/Cancel")
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)
+	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_CUSTOM) // i2c clock
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(2)
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(2)
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_PLAYER(2)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_PLAYER(2)
+	PORT_BIT(0x04000000, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_PLAYER(2)
+	PORT_BIT(0x08000000, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_PLAYER(2)
+	PORT_BIT(0x10000000, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_PLAYER(2)
+	PORT_BIT(0x20000000, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_PLAYER(2)
+	PORT_BIT(0x40000000, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_PLAYER(2)
+	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 void xavix2_state::xavix2(machine_config &config)
