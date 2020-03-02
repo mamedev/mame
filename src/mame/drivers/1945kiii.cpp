@@ -127,7 +127,7 @@ public:
 	void k3(machine_config &config);
 
 private:
-	void bgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void vram_buffer(bool newval);
 	void scrollx_w(u16 data);
 	void scrolly_w(u16 data);
 	void k3_soundbanks_w(u16 data);
@@ -153,6 +153,8 @@ private:
 	required_shared_ptr<u16> m_bgram;
 
 	/* video-related */
+	std::unique_ptr<u16[]> m_spriteram_buffer[2];
+	std::unique_ptr<u16[]> m_bgram_buffer;
 	bool m_refresh = true;
 	tilemap_t  *m_bg_tilemap;
 	required_device<cpu_device> m_maincpu;
@@ -162,21 +164,25 @@ private:
 };
 
 
-void k3_state::bgram_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	COMBINE_DATA(&m_bgram[offset]);
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
 TILE_GET_INFO_MEMBER(k3_state::get_tile_info)
 {
-	int tileno = m_bgram[tile_index];
+	int tileno = m_bgram_buffer[tile_index];
 	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);
 }
 
 void k3_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(k3_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	for (int i = 0; i < 2; i++)
+	{
+		const u32 size = m_spriteram[i].bytes() / 2;
+		m_spriteram_buffer[i] = make_unique_clear<u16[]>(size);
+		save_pointer(NAME(m_spriteram_buffer[i]), size, i);
+	}
+	const u32 size = m_bgram.bytes() / 2;
+	m_bgram_buffer = make_unique_clear<u16[]>(size);
+	save_pointer(NAME(m_bgram_buffer), size);
+
 	save_item(NAME(m_refresh));
 }
 
@@ -253,14 +259,14 @@ void k3_state::k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_eleme
 }
 
 // sprite limitation reference : https://www.youtube.com/watch?v=_7V_SrEQwSY
-// TODO : measure from real hardware
+// TODO : measure values from real hardware
 void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const u32 max_cycle = 432 * 262; // max usable cycle for sprites, TODO : related to whole screen?
 	u32 cycle = 0;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	u16 *source = m_spriteram[0];
-	u16 *source2 = m_spriteram[1];
+	u16 *source = m_spriteram_buffer[0].get();
+	u16 *source2 = m_spriteram_buffer[1].get();
 	u16 *finish = source + (m_spriteram[0].bytes() / 2);
 
 	while (source < finish)
@@ -286,14 +292,30 @@ void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 u32 k3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_refresh)
-	{
-		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-		draw_sprites(bitmap, cliprect); // delayed?
-	}
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect); // delayed?
 	return 0;
 }
 
+void k3_state::vram_buffer(bool newval)
+{
+	const bool oldval = m_refresh;
+	if (!oldval && newval)
+	{
+		for (int j = 0; j < 2; j++)
+		{
+			const u32 size = m_spriteram[j].bytes() / 2;
+			for (int i = 0; i < size; i++)
+				m_spriteram_buffer[j][i] = m_spriteram[j][i];
+		}
+		const u32 size = m_bgram.bytes() / 2;
+		for (int i = 0; i < size; i++)
+			m_bgram_buffer[i] = m_bgram[i];
+
+		m_bg_tilemap->mark_all_dirty();
+	}
+	m_refresh = newval;
+}
 
 void k3_state::scrollx_w(u16 data)
 {
@@ -313,7 +335,7 @@ void k3_state::k3_soundbanks_w(u16 data)
 		---- ---- ---- --x- OKI0 Bank
 		---- ---- ---- ---x VRAM access flip-flop
 	*/
-	m_refresh = BIT(data, 0); // rising edge
+	vram_buffer(BIT(data, 0)); // rising edge
 	m_oki[1]->set_rom_bank(BIT(data, 2));
 	m_oki[0]->set_rom_bank(BIT(data, 1));
 }
@@ -333,7 +355,7 @@ void k3_state::flagrall_soundbanks_w(offs_t offset, u16 data, u16 mem_mask)
 	// 0x06 - oki bank
 	// 0x01 - ?
 
-	m_refresh = BIT(~data, 5); // falling edge
+	vram_buffer(BIT(~data, 5)); // falling edge
 	if (data & 0xfcc9)
 		popmessage("unk control %04x", data & 0xfcc9);
 
@@ -352,7 +374,7 @@ void k3_state::k3_base_map(address_map &map)
 	map(0x200000, 0x2003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x240000, 0x240fff).ram().share(m_spriteram[0]);
 	map(0x280000, 0x280fff).ram().share(m_spriteram[1]);
-	map(0x2c0000, 0x2c07ff).ram().w(FUNC(k3_state::bgram_w)).share(m_bgram);
+	map(0x2c0000, 0x2c07ff).ram().share(m_bgram);
 	map(0x2c0800, 0x2c0fff).ram(); // or does k3 have a bigger tilemap? (flagrall is definitely 32x32 tiles)
 	map(0x340000, 0x340001).w(FUNC(k3_state::scrollx_w));
 	map(0x380000, 0x380001).w(FUNC(k3_state::scrolly_w));
