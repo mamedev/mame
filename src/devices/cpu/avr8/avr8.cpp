@@ -110,7 +110,16 @@ enum
 	AVR8_SREG_S,
 	AVR8_SREG_H,
 	AVR8_SREG_T,
-	AVR8_SREG_I
+	AVR8_SREG_I,
+
+	AVR8_SREG_MASK_C = 0x01,
+	AVR8_SREG_MASK_Z = 0x02,
+	AVR8_SREG_MASK_N = 0x04,
+	AVR8_SREG_MASK_V = 0x08,
+	AVR8_SREG_MASK_S = 0x10,
+	AVR8_SREG_MASK_H = 0x20,
+	AVR8_SREG_MASK_T = 0x40,
+	AVR8_SREG_MASK_I = 0x80
 };
 
 // I/O Enums
@@ -188,8 +197,9 @@ enum
 
 static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
 
-#define SREG_R(b) ((m_r[AVR8_REGIDX_SREG] & (1 << (b))) >> (b))
-#define SREG_W(b,v) m_r[AVR8_REGIDX_SREG] = (m_r[AVR8_REGIDX_SREG] & ~(1 << (b))) | ((v) << (b))
+#define SREG_R(b)	((m_r[AVR8_REGIDX_SREG] & (1 << (b))) >> (b))
+#define SREG_W(b,v)	m_r[AVR8_REGIDX_SREG] = (m_r[AVR8_REGIDX_SREG] & ~(1 << (b))) | ((v) << (b))
+#define SREG		m_r[AVR8_REGIDX_SREG]
 #define NOT(x) (1 - (x))
 
 // Opcode-Parsing Defines
@@ -622,7 +632,7 @@ void attiny15_device::attiny15_internal_map(address_map &map)
 //-------------------------------------------------
 
 atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, tag, owner, clock, ATMEGA88, 0x0fff, address_map_constructor(FUNC(atmega88_device::atmega88_internal_map), this))
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA88, 0x0fff, address_map_constructor(FUNC(atmega88_device::atmega88_internal_map), this), 3)
 {
 }
 
@@ -631,7 +641,7 @@ atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 atmega644_device::atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, tag, owner, clock, ATMEGA644, 0xffff, address_map_constructor(FUNC(atmega644_device::atmega644_internal_map), this))
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA644, 0xffff, address_map_constructor(FUNC(atmega644_device::atmega644_internal_map), this), 3)
 {
 }
 
@@ -640,7 +650,7 @@ atmega644_device::atmega644_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, tag, owner, clock, ATMEGA1280, 0x1ffff, address_map_constructor(FUNC(atmega1280_device::atmega1280_internal_map), this))
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA1280, 0x1ffff, address_map_constructor(FUNC(atmega1280_device::atmega1280_internal_map), this), 6)
 {
 }
 
@@ -649,7 +659,7 @@ atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, tag, owner, clock, ATMEGA2560, 0x1ffff, address_map_constructor(FUNC(atmega2560_device::atmega2560_internal_map), this))
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA2560, 0x1ffff, address_map_constructor(FUNC(atmega2560_device::atmega2560_internal_map), this), 6)
 {
 }
 
@@ -658,7 +668,7 @@ atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 attiny15_device::attiny15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, tag, owner, clock, ATTINY15, 0x03ff, address_map_constructor(FUNC(attiny15_device::attiny15_internal_map), this))
+	: avr8_device(mconfig, tag, owner, clock, ATTINY15, 0x03ff, address_map_constructor(FUNC(attiny15_device::attiny15_internal_map), this), 2)
 {
 }
 
@@ -666,7 +676,7 @@ attiny15_device::attiny15_device(const machine_config &mconfig, const char *tag,
 //  avr8_device - constructor
 //-------------------------------------------------
 
-avr8_device::avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t addr_mask, address_map_constructor internal_map)
+avr8_device::avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t addr_mask, address_map_constructor internal_map, int32_t num_timers)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_shifted_pc(0)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 22)
@@ -678,6 +688,7 @@ avr8_device::avr8_device(const machine_config &mconfig, const char *tag, device_
 	, m_efuses(0xff)
 	, m_lock_bits(0xff)
 	, m_pc(0)
+	, m_num_timers(num_timers)
 	, m_spi_active(false)
 	, m_spi_prescale(0)
 	, m_spi_prescale_count(0)
@@ -830,6 +841,10 @@ void avr8_device::device_start()
 	save_item(NAME(m_timer_prescale));
 	save_item(NAME(m_timer_prescale_count));
 	save_item(NAME(m_ocr2_not_reached_yet));
+	save_item(NAME(m_wgm1));
+	save_item(NAME(m_timer1_compare_mode));
+	save_item(NAME(m_ocr1));
+	save_item(NAME(m_timer1_count));
 
 	// SPI
 	save_item(NAME(m_spi_active));
@@ -843,6 +858,21 @@ void avr8_device::device_start()
 
 	// set our instruction counter
 	set_icountptr(m_icount);
+
+	populate_ops();
+
+	m_add_flag_cache = std::make_unique<uint8_t[]>(0x10000);
+	m_adc_flag_cache = std::make_unique<uint8_t[]>(0x20000);
+	m_sub_flag_cache = std::make_unique<uint8_t[]>(0x10000);
+	m_sbc_flag_cache = std::make_unique<uint8_t[]>(0x40000);
+	m_bool_flag_cache = std::make_unique<uint8_t[]>(0x100);
+	m_shift_flag_cache = std::make_unique<uint8_t[]>(0x10000);
+	populate_add_flag_cache();
+	populate_adc_flag_cache();
+	populate_sub_flag_cache();
+	populate_sbc_flag_cache();
+	populate_bool_flag_cache();
+	populate_shift_flag_cache();
 }
 
 //-------------------------------------------------
@@ -883,13 +913,22 @@ void avr8_device::device_reset()
 	m_spi_prescale = 0;
 	m_spi_prescale_count = 0;
 
-	for (int t = 0; t <= 5; t++)
+	for (int t = 0; t < m_num_timers; t++)
 	{
 		m_timer_top[t] = 0;
 		m_timer_increment[t] = 1;
 		m_timer_prescale[t] = 0;
 		m_timer_prescale_count[t] = 0;
 	}
+
+	m_wgm1 = 0;
+	m_timer1_compare_mode[0] = 0;
+	m_timer1_compare_mode[1] = 0;
+	for (int reg = AVR8_REG_A; reg <= AVR8_REG_C; reg++)
+	{
+		m_ocr1[reg] = 0;
+	}
+	m_timer1_count = 0;
 
 	m_ocr2_not_reached_yet = true;
 	m_interrupt_pending = false;
@@ -1097,9 +1136,9 @@ void atmega2560_device::update_interrupt(int source)
 //**************************************************************************
 //  REGISTER HANDLING
 //**************************************************************************
-void avr8_device::timer_tick(int cycles)
+void avr8_device::timer_tick()
 {
-	for (int count = 0; count < cycles; count++)
+	for (int count = 0; count < m_opcycles; count++)
 	{
 		if (m_spi_active && m_spi_prescale > 0 && m_spi_prescale_countdown >= 0)
 		{
@@ -1114,7 +1153,7 @@ void avr8_device::timer_tick(int cycles)
 			}
 		}
 
-		for (int t = 0; t <= 5; t++)
+		for (int t = 0; t < m_num_timers; t++)
 		{
 			if (m_timer_prescale[t] != 0)
 			{
@@ -1284,46 +1323,38 @@ void avr8_device::update_ocr0(uint8_t newval, uint8_t reg)
 
 // Timer 1 Handling
 
-void avr8_device::timer1_tick()
+inline void avr8_device::timer1_tick()
 {
 	/* TODO: Handle comparison, setting OC1A pin, detection of BOTTOM and TOP */
 
-	uint16_t count = (m_r[AVR8_REGIDX_TCNT1H] << 8) | m_r[AVR8_REGIDX_TCNT1L];
-	int32_t wgm1 = ((m_r[AVR8_REGIDX_TCCR1B] & AVR8_TCCR1B_WGM1_32_MASK) >> 1) |
-					(m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_WGM1_10_MASK);
-
-	const uint16_t ocr1[2] = { static_cast<uint16_t>((m_r[AVR8_REGIDX_OCR1AH] << 8) | m_r[AVR8_REGIDX_OCR1AL]),
-						       static_cast<uint16_t>((m_r[AVR8_REGIDX_OCR1BH] << 8) | m_r[AVR8_REGIDX_OCR1BL]) };
-	static const uint8_t s_com_mask[2] = { AVR8_TCCR1A_COM1A_MASK, AVR8_TCCR1A_COM1B_MASK };
-	static const uint8_t s_com_shift[2] = { AVR8_TCCR1A_COM1A_SHIFT, AVR8_TCCR1A_COM1B_SHIFT };
 	static const uint8_t s_ocf1[2] = { (1 << AVR8_TIFR1_OCF1A_SHIFT), (1 << AVR8_TIFR1_OCF1B_SHIFT) };
 	static const uint8_t s_int1[2] = { AVR8_INTIDX_OCF1A, AVR8_INTIDX_OCF1B };
 	int32_t increment = m_timer_increment[1];
 
 	for (int32_t reg = AVR8_REG_A; reg <= AVR8_REG_B; reg++)
 	{
-		switch (wgm1)
+		switch (m_wgm1)
 		{
 		case WGM1_CTC_OCR:
-			if (count == 0xffff)
+			if (m_timer1_count == 0xffff)
 			{
 				m_r[AVR8_REGIDX_TIFR1] |= AVR8_TIFR1_TOV1_MASK;
 				update_interrupt(AVR8_INTIDX_TOV1);
-				count = 0;
+				m_timer1_count = 0;
 				increment = 0;
 			}
 
-			if (count == ocr1[reg])
+			if (m_timer1_count == m_ocr1[reg])
 			{
 				if (reg == 0)
 				{
-					count = 0;
+					m_timer1_count = 0;
 					increment = 0;
 				}
 				m_r[AVR8_REGIDX_TIFR1] |= s_ocf1[reg];
 				update_interrupt(s_int1[reg]);
 			}
-			else if (count == 0)
+			else if (m_timer1_count == 0)
 			{
 				if (reg == 0)
 				{
@@ -1337,18 +1368,17 @@ void avr8_device::timer1_tick()
 			break;
 
 		case WGM1_FAST_PWM_OCR:
-			if (count == ocr1[reg])
+			if (m_timer1_count == m_ocr1[reg])
 			{
 				if (reg == 0)
 				{
 					m_r[AVR8_REGIDX_TIFR1] |= AVR8_TIFR1_TOV1_MASK;
 					update_interrupt(AVR8_INTIDX_TOV1);
-					count = 0;
+					m_timer1_count = 0;
 					increment = 0;
 				}
 
-				const int32_t compare_mode = (m_r[AVR8_REGIDX_TCCR1A] & s_com_mask[reg]) >> s_com_shift[reg];
-				switch (compare_mode)
+				switch (m_timer1_compare_mode[reg] & 3)
 				{
 				case 0: /* Normal Operation; OC1A/B disconnected */
 					break;
@@ -1375,7 +1405,7 @@ void avr8_device::timer1_tick()
 				m_r[AVR8_REGIDX_TIFR1] |= s_ocf1[reg];
 				update_interrupt(s_int1[reg]);
 			}
-			else if (count == 0)
+			else if (m_timer1_count == 0)
 			{
 				if (reg == 0)
 				{
@@ -1383,8 +1413,7 @@ void avr8_device::timer1_tick()
 					update_interrupt(AVR8_INTIDX_TOV1);
 				}
 
-				const int32_t compare_mode = (m_r[AVR8_REGIDX_TCCR1A] & s_com_mask[reg]) >> s_com_shift[reg];
-				switch (compare_mode)
+				switch (m_timer1_compare_mode[reg] & 3)
 				{
 				case 0: /* Normal Operation; OC1A/B disconnected */
 					break;
@@ -1414,14 +1443,12 @@ void avr8_device::timer1_tick()
 			break;
 
 		default:
-			LOGMASKED(LOG_TIMER1 | LOG_UNKNOWN, "%s: timer1_tick: Unknown waveform generation mode: %02x\n", machine().describe_context(), wgm1);
+			LOGMASKED(LOG_TIMER1 | LOG_UNKNOWN, "%s: timer1_tick: Unknown waveform generation mode: %02x\n", machine().describe_context(), m_wgm1);
 			break;
 		}
 	}
 
-	count += increment;
-	m_r[AVR8_REGIDX_TCNT1H] = (count >> 8) & 0xff;
-	m_r[AVR8_REGIDX_TCNT1L] = count & 0xff;
+	m_timer1_count += increment;
 }
 
 void avr8_device::update_timer_waveform_gen_mode(uint8_t t, uint8_t mode)
@@ -1483,6 +1510,10 @@ void avr8_device::update_timer_waveform_gen_mode(uint8_t t, uint8_t mode)
 		break;
 	}
 
+	if (t == 1)
+	{
+		m_wgm1 = ((m_r[AVR8_REGIDX_TCCR1B] & AVR8_TCCR1B_WGM1_32_MASK) >> 1) | (m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_WGM1_10_MASK);
+	}
 	if (m_timer_top[t] == -1)
 	{
 		m_timer_top[t] = 0;
@@ -1502,6 +1533,9 @@ void avr8_device::changed_tccr1a(uint8_t data)
 	{
 		update_timer_waveform_gen_mode(1, AVR8_WGM1);
 	}
+
+	m_timer1_compare_mode[AVR8_REG_A] = (m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1A_MASK) >> AVR8_TCCR1A_COM1A_SHIFT;
+	m_timer1_compare_mode[AVR8_REG_B] = (m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1B_MASK) >> AVR8_TCCR1A_COM1B_SHIFT;
 }
 
 void avr8_device::update_timer1_input_noise_canceler()
@@ -1547,12 +1581,11 @@ void avr8_device::changed_tccr1b(uint8_t data)
 
 void avr8_device::update_ocr1(uint16_t newval, uint8_t reg)
 {
-	uint8_t *p_reg_h = (reg == AVR8_REG_A) ? &m_r[AVR8_REGIDX_OCR1AH] : &m_r[AVR8_REGIDX_OCR1BH];
-	uint8_t *p_reg_l = (reg == AVR8_REG_A) ? &m_r[AVR8_REGIDX_OCR1AL] : &m_r[AVR8_REGIDX_OCR1BL];
-	*p_reg_h = (uint8_t)(newval >> 8);
-	*p_reg_l = (uint8_t)newval;
-
-	// Nothing needs to be done? All handled in timer callback
+	static const int32_t s_high_indices[3] = { AVR8_REGIDX_OCR1AH, AVR8_REGIDX_OCR1BH, AVR8_REGIDX_OCR1CH };
+	static const int32_t s_low_indices[3] =  { AVR8_REGIDX_OCR1AL, AVR8_REGIDX_OCR1BL, AVR8_REGIDX_OCR1CL };
+	m_r[s_high_indices[reg]] = (uint8_t)(newval >> 8);
+	m_r[s_low_indices[reg]]  = (uint8_t)newval;
+	m_ocr1[reg] = newval;
 }
 
 // Timer 2 Handling
@@ -2488,11 +2521,11 @@ WRITE8_MEMBER(avr8_device::regs_w)
 		break;
 
 	case AVR8_REGIDX_TCNT1L:
-		AVR8_TCNT1L = data;
+		m_timer1_count = (m_timer1_count & 0xff00) | data;
 		break;
 
 	case AVR8_REGIDX_TCNT1H:
-		AVR8_TCNT1H = data;
+		m_timer1_count = (m_timer1_count & 0x00ff) | (data << 8);
 		break;
 
 	case AVR8_REGIDX_ICR1L:
@@ -2870,7 +2903,9 @@ READ8_MEMBER(avr8_device::regs_r)
 
 
 	case AVR8_REGIDX_TCNT1L:
+		return (uint8_t)m_timer1_count;
 	case AVR8_REGIDX_TCNT1H:
+		return (uint8_t)(m_timer1_count >> 8);
 	case AVR8_REGIDX_TCNT2:
 	case AVR8_REGIDX_UCSR0A:
 		return m_r[offset];
@@ -2923,6 +2958,7 @@ void avr8_device::execute_set_input(int inputnum, int state)
 {
 }
 
+#include "avr8ops.hxx"
 
 //-------------------------------------------------
 //  execute_run - execute a timeslice's worth of
@@ -2931,940 +2967,22 @@ void avr8_device::execute_set_input(int inputnum, int state)
 
 void avr8_device::execute_run()
 {
-	uint32_t op;
-	int32_t offs;
-	uint8_t rd;
-	uint8_t rr;
-	uint8_t res;
-	uint16_t pd;
-	uint32_t pd32;
-	int16_t sd;
-	int32_t opcycles;
-
 	while (m_icount > 0)
 	{
-		opcycles = 1;
-
 		m_pc &= m_addr_mask;
 		m_shifted_pc &= (m_addr_mask << 1) | 1;
 
 		debugger_instruction_hook(m_shifted_pc);
 
-		op = (uint32_t)m_program->read_word(m_shifted_pc);
-
-		switch (op & 0xf000)
-		{
-		case 0x0000:
-			switch (op & 0x0f00)
-			{
-			case 0x0000:    // NOP
-				break;
-			case 0x0100:    // MOVW Rd+1:Rd,Rr+1:Rd
-				m_r[(RD4(op) << 1) + 1] = m_r[(RR4(op) << 1) + 1];
-				m_r[RD4(op) << 1] = m_r[RR4(op) << 1];
-				break;
-			case 0x0200:    // MULS Rd,Rr
-				sd = (int8_t)m_r[16 + RD4(op)] * (int8_t)m_r[16 + RR4(op)];
-				m_r[1] = (sd >> 8) & 0x00ff;
-				m_r[0] = sd & 0x00ff;
-				SREG_W(AVR8_SREG_C, (sd & 0x8000) ? 1 : 0);
-				SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
-				opcycles = 2;
-				break;
-			case 0x0300:    // Multiplication
-				switch (MULCONST2(op))
-				{
-				case 0x0000: // MULSU Rd,Rr
-					sd = (int8_t)m_r[16 + RD3(op)] * (uint8_t)m_r[16 + RR3(op)];
-					m_r[1] = (sd >> 8) & 0x00ff;
-					m_r[0] = sd & 0x00ff;
-					SREG_W(AVR8_SREG_C, (sd & 0x8000) ? 1 : 0);
-					SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
-					opcycles = 2;
-					break;
-				case 0x0001: // FMUL Rd,Rr
-					sd = (uint8_t)m_r[16 + RD3(op)] * (uint8_t)m_r[16 + RR3(op)];
-					sd <<= 1;
-					m_r[1] = (sd >> 8) & 0x00ff;
-					m_r[0] = sd & 0x00ff;
-					SREG_W(AVR8_SREG_C, (sd & 0x8000) ? 1 : 0);
-					SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
-					opcycles = 2;
-					break;
-				case 0x0002: // FMULS Rd,Rr
-					sd = (int8_t)m_r[16 + RD3(op)] * (int8_t)m_r[16 + RR3(op)];
-					sd <<= 1;
-					m_r[1] = (sd >> 8) & 0x00ff;
-					m_r[0] = sd & 0x00ff;
-					SREG_W(AVR8_SREG_C, (sd & 0x8000) ? 1 : 0);
-					SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
-					opcycles = 2;
-					break;
-				case 0x0003: // FMULSU Rd,Rr
-					sd = (int8_t)m_r[16 + RD3(op)] * (uint8_t)m_r[16 + RR3(op)];
-					sd <<= 1;
-					m_r[1] = (sd >> 8) & 0x00ff;
-					m_r[0] = sd & 0x00ff;
-					SREG_W(AVR8_SREG_C, (sd & 0x8000) ? 1 : 0);
-					SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
-					opcycles = 2;
-					break;
-				}
-				break;
-			case 0x0400:
-			case 0x0500:
-			case 0x0600:
-			case 0x0700:    // CPC Rd,Rr
-				rd = m_r[RD5(op)];
-				rr = m_r[RR5(op)];
-				res = rd - (rr + SREG_R(AVR8_SREG_C));
-				SREG_W(AVR8_SREG_H, (NOT(BIT(rd,3)) & BIT(rr,3)) | (BIT(rr,3) & BIT(res,3)) | (BIT(res,3) & NOT(BIT(rd,3))));
-				SREG_W(AVR8_SREG_V, (BIT(rd,7) & NOT(BIT(rr,7)) & NOT(BIT(res,7))) | (NOT(BIT(rd,7)) & BIT(rr,7) & BIT(res,7)));
-				SREG_W(AVR8_SREG_N, BIT(res,7));
-				SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-				SREG_W(AVR8_SREG_Z, (res == 0) ? SREG_R(AVR8_SREG_Z) : 0);
-				SREG_W(AVR8_SREG_C, (NOT(BIT(rd,7)) & BIT(rr,7)) | (BIT(rr,7) & BIT(res,7)) | (BIT(res,7) & NOT(BIT(rd,7))));
-				break;
-			case 0x0800:
-			case 0x0900:
-			case 0x0a00:
-			case 0x0b00:    // SBC Rd,Rr
-				rd = m_r[RD5(op)];
-				rr = m_r[RR5(op)];
-				res = rd - (rr + SREG_R(AVR8_SREG_C));
-				m_r[RD5(op)] = res;
-				SREG_W(AVR8_SREG_H, (NOT(BIT(rd,3)) & BIT(rr,3)) | (BIT(rr,3) & BIT(res,3)) | (BIT(res,3) & NOT(BIT(rd,3))));
-				SREG_W(AVR8_SREG_V, (BIT(rd,7) & NOT(BIT(rr,7)) & NOT(BIT(res,7))) | (NOT(BIT(rd,7)) & BIT(rr,7) & BIT(res,7)));
-				SREG_W(AVR8_SREG_N, BIT(res,7));
-				SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-				SREG_W(AVR8_SREG_Z, (res == 0) ? SREG_R(AVR8_SREG_Z) : 0);
-				SREG_W(AVR8_SREG_C, (NOT(BIT(rd,7)) & BIT(rr,7)) | (BIT(rr,7) & BIT(res,7)) | (BIT(res,7) & NOT(BIT(rd,7))));
-				break;
-			case 0x0c00:
-			case 0x0d00:
-			case 0x0e00:
-			case 0x0f00:    // ADD Rd,Rr
-				rd = m_r[RD5(op)];
-				rr = m_r[RR5(op)];
-				res = rd + rr;
-				m_r[RD5(op)] = res;
-				SREG_W(AVR8_SREG_H, (BIT(rd,3) & BIT(rr,3)) | (BIT(rr,3) & NOT(BIT(res,3))) | (NOT(BIT(res,3)) & BIT(rd,3)));
-				SREG_W(AVR8_SREG_V, (BIT(rd,7) & BIT(rr,7) & NOT(BIT(res,7))) | (NOT(BIT(rd,7)) & NOT(BIT(rr,7)) & BIT(res,7)));
-				SREG_W(AVR8_SREG_N, BIT(res,7));
-				SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-				SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-				SREG_W(AVR8_SREG_C, (BIT(rd,7) & BIT(rr,7)) | (BIT(rr,7) & NOT(BIT(res,7))) | (NOT(BIT(res,7)) & BIT(rd,7)));
-				break;
-			}
-			break;
-		case 0x1000:
-			switch (op & 0x0c00)
-			{
-			case 0x0000:    // CPSE Rd,Rr
-				rd = m_r[RD5(op)];
-				rr = m_r[RR5(op)];
-				if (rd == rr)
-				{
-					op = (uint32_t)m_program->read_word(m_shifted_pc + 2);
-					opcycles += is_long_opcode(op) ? 2 : 1;
-					m_pc += is_long_opcode(op) ? 2 : 1;
-				}
-				break;
-			case 0x0400:    // CP Rd,Rr
-				rd = m_r[RD5(op)];
-				rr = m_r[RR5(op)];
-				res = rd - rr;
-				SREG_W(AVR8_SREG_H, (NOT(BIT(rd,3)) & BIT(rr,3)) | (BIT(rr,3) & BIT(res,3)) | (BIT(res,3) & NOT(BIT(rd,3))));
-				SREG_W(AVR8_SREG_V, (BIT(rd,7) & NOT(BIT(rr,7)) & NOT(BIT(res,7))) | (NOT(BIT(rd,7)) & BIT(rr,7) & BIT(res,7)));
-				SREG_W(AVR8_SREG_N, BIT(res,7));
-				SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-				SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-				SREG_W(AVR8_SREG_C, (NOT(BIT(rd,7)) & BIT(rr,7)) | (BIT(rr,7) & BIT(res,7)) | (BIT(res,7) & NOT(BIT(rd,7))));
-				break;
-			case 0x0800:    // SUB Rd,Rr
-				rd = m_r[RD5(op)];
-				rr = m_r[RR5(op)];
-				res = rd - rr;
-				m_r[RD5(op)] = res;
-				SREG_W(AVR8_SREG_H, (NOT(BIT(rd,3)) & BIT(rr,3)) | (BIT(rr,3) & BIT(res,3)) | (BIT(res,3) & NOT(BIT(rd,3))));
-				SREG_W(AVR8_SREG_V, (BIT(rd,7) & NOT(BIT(rr,7)) & NOT(BIT(res,7))) | (NOT(BIT(rd,7)) & BIT(rr,7) & BIT(res,7)));
-				SREG_W(AVR8_SREG_N, BIT(res,7));
-				SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-				SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-				SREG_W(AVR8_SREG_C, (NOT(BIT(rd,7)) & BIT(rr,7)) | (BIT(rr,7) & BIT(res,7)) | (BIT(res,7) & NOT(BIT(rd,7))));
-				break;
-			case 0x0c00:    // ADC Rd,Rr
-				rd = m_r[RD5(op)];
-				rr = m_r[RR5(op)];
-				res = rd + rr + SREG_R(AVR8_SREG_C);
-				m_r[RD5(op)] = res;
-				SREG_W(AVR8_SREG_H, (BIT(rd,3) & BIT(rr,3)) | (BIT(rr,3) & NOT(BIT(res,3))) | (NOT(BIT(res,3)) & BIT(rd,3)));
-				SREG_W(AVR8_SREG_V, (BIT(rd,7) & BIT(rr,7) & NOT(BIT(res,7))) | (NOT(BIT(rd,7)) & NOT(BIT(rr,7)) & BIT(res,7)));
-				SREG_W(AVR8_SREG_N, BIT(res,7));
-				SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-				SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-				SREG_W(AVR8_SREG_C, (BIT(rd,7) & BIT(rr,7)) | (BIT(rr,7) & NOT(BIT(res,7))) | (NOT(BIT(res,7)) & BIT(rd,7)));
-				break;
-			}
-			break;
-		case 0x2000:
-			switch (op & 0x0c00)
-			{
-			case 0x0000:    // AND Rd,Rr
-				rd = m_r[RD5(op)];
-				rr = m_r[RR5(op)];
-				rd &= rr;
-				SREG_W(AVR8_SREG_V, 0);
-				SREG_W(AVR8_SREG_N, BIT(rd,7));
-				SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-				SREG_W(AVR8_SREG_Z, (rd == 0) ? 1 : 0);
-				m_r[RD5(op)] = rd;
-				break;
-			case 0x0400:    // EOR Rd,Rr
-				rd = m_r[RD5(op)];
-				rr = m_r[RR5(op)];
-				rd ^= rr;
-				SREG_W(AVR8_SREG_V, 0);
-				SREG_W(AVR8_SREG_N, BIT(rd,7));
-				SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-				SREG_W(AVR8_SREG_Z, (rd == 0) ? 1 : 0);
-				m_r[RD5(op)] = rd;
-				break;
-			case 0x0800:    // OR Rd,Rr
-				rd = m_r[RD5(op)];
-				rr = m_r[RR5(op)];
-				rd |= rr;
-				SREG_W(AVR8_SREG_V, 0);
-				SREG_W(AVR8_SREG_N, BIT(rd,7));
-				SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-				SREG_W(AVR8_SREG_Z, (rd == 0) ? 1 : 0);
-				m_r[RD5(op)] = rd;
-				break;
-			case 0x0c00:    // MOV Rd,Rr
-				m_r[RD5(op)] = m_r[RR5(op)];
-				break;
-			}
-			break;
-		case 0x3000:    // CPI Rd,K
-			rd = m_r[16 + RD4(op)];
-			rr = KCONST8(op);
-			res = rd - rr;
-			SREG_W(AVR8_SREG_H, (NOT(BIT(rd,3)) & BIT(rr,3)) | (BIT(rr,3) & BIT(res,3)) | (BIT(res,3) & NOT(BIT(rd,3))));
-			SREG_W(AVR8_SREG_V, (BIT(rd,7) & NOT(BIT(rr,7)) & NOT(BIT(res,7))) | (NOT(BIT(rd,7)) & BIT(rr,7) & BIT(res,7)));
-			SREG_W(AVR8_SREG_N, BIT(res,7));
-			SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-			SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-			SREG_W(AVR8_SREG_C, (NOT(BIT(rd,7)) & BIT(rr,7)) | (BIT(rr,7) & BIT(res,7)) | (BIT(res,7) & NOT(BIT(rd,7))));
-			break;
-		case 0x4000:    // SBCI Rd,K
-			rd = m_r[16 + RD4(op)];
-			rr = KCONST8(op);
-			res = rd - (rr + SREG_R(AVR8_SREG_C));
-			m_r[16 + RD4(op)] = res;
-			SREG_W(AVR8_SREG_H, (NOT(BIT(rd,3)) & BIT(rr,3)) | (BIT(rr,3) & BIT(res,3)) | (BIT(res,3) & NOT(BIT(rd,3))));
-			SREG_W(AVR8_SREG_V, (BIT(rd,7) & NOT(BIT(rr,7)) & NOT(BIT(res,7))) | (NOT(BIT(rd,7)) & BIT(rr,7) & BIT(res,7)));
-			SREG_W(AVR8_SREG_N, BIT(res,7));
-			SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-			SREG_W(AVR8_SREG_Z, (res == 0) ? SREG_R(AVR8_SREG_Z) : 0);
-			SREG_W(AVR8_SREG_C, (NOT(BIT(rd,7)) & BIT(rr,7)) | (BIT(rr,7) & BIT(res,7)) | (BIT(res,7) & NOT(BIT(rd,7))));
-			break;
-		case 0x5000:    // SUBI Rd,K
-			rd = m_r[16 + RD4(op)];
-			rr = KCONST8(op);
-			res = rd - rr;
-			m_r[16 + RD4(op)] = res;
-			SREG_W(AVR8_SREG_H, (NOT(BIT(rd,3)) & BIT(rr,3)) | (BIT(rr,3) & BIT(res,3)) | (BIT(res,3) & NOT(BIT(rd,3))));
-			SREG_W(AVR8_SREG_V, (BIT(rd,7) & NOT(BIT(rr,7)) & NOT(BIT(res,7))) | (NOT(BIT(rd,7)) & BIT(rr,7) & BIT(res,7)));
-			SREG_W(AVR8_SREG_N, BIT(res,7));
-			SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-			SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-			SREG_W(AVR8_SREG_C, (NOT(BIT(rd,7)) & BIT(rr,7)) | (BIT(rr,7) & BIT(res,7)) | (BIT(res,7) & NOT(BIT(rd,7))));
-			break;
-		case 0x6000:    // ORI Rd,K
-			rd = m_r[16 + RD4(op)];
-			rr = KCONST8(op);
-			rd |= rr;
-			SREG_W(AVR8_SREG_V, 0);
-			SREG_W(AVR8_SREG_N, BIT(rd,7));
-			SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-			SREG_W(AVR8_SREG_Z, (rd == 0) ? 1 : 0);
-			m_r[16 + RD4(op)] = rd;
-			break;
-		case 0x7000:    // ANDI Rd,K
-			rd = m_r[16 + RD4(op)];
-			rr = KCONST8(op);
-			rd &= rr;
-			SREG_W(AVR8_SREG_V, 0);
-			SREG_W(AVR8_SREG_N, BIT(rd,7));
-			SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-			SREG_W(AVR8_SREG_Z, (rd == 0) ? 1 : 0);
-			m_r[16 + RD4(op)] = rd;
-			break;
-		case 0x8000:
-		case 0xa000:
-			switch (op & 0x0208)
-			{
-			case 0x0000:    // LDD Rd,Z+q
-				m_r[RD5(op)] = m_data->read_byte(ZREG + QCONST6(op));
-				opcycles = 2;
-				break;
-			case 0x0008:    // LDD Rd,Y+q
-				m_r[RD5(op)] = m_data->read_byte(YREG + QCONST6(op));
-				opcycles = 2;
-				break;
-			case 0x0200:    // STD Z+q,Rr
-				m_data->write_byte(ZREG + QCONST6(op), m_r[RD5(op)]);
-				opcycles = 2;
-				break;
-			case 0x0208:    // STD Y+q,Rr
-				m_data->write_byte(YREG + QCONST6(op), m_r[RD5(op)]);
-				opcycles = 2;
-				break;
-			}
-			break;
-		case 0x9000:
-			switch (op & 0x0f00)
-			{
-			case 0x0000:
-			case 0x0100:
-				switch (op & 0x000f)
-				{
-				case 0x0000:    // LDS Rd,k
-					op <<= 16;
-					m_pc++;
-					m_shifted_pc += 2;
-					op |= m_program->read_word(m_shifted_pc);
-					m_r[RD5(op >> 16)] = m_data->read_byte(op & 0x0000ffff);
-					opcycles = 2;
-					break;
-				case 0x0001:    // LD Rd,Z+
-					pd = ZREG;
-					m_r[RD5(op)] = m_data->read_byte(pd);
-					pd++;
-					m_r[31] = (pd >> 8) & 0x00ff;
-					m_r[30] = pd & 0x00ff;
-					opcycles = 2;
-					break;
-				case 0x0002:    // LD Rd,-Z
-					pd = ZREG;
-					pd--;
-					m_r[RD5(op)] = m_data->read_byte(pd);
-					m_r[31] = (pd >> 8) & 0x00ff;
-					m_r[30] = pd & 0x00ff;
-					opcycles = 2;
-					break;
-				case 0x0004:    // LPM Rd,Z
-					m_r[RD5(op)] = m_program->read_byte(ZREG);
-					opcycles = 3;
-					break;
-				case 0x0005:    // LPM Rd,Z+
-					pd = ZREG;
-					m_r[RD5(op)] = m_program->read_byte(pd);
-					pd++;
-					m_r[31] = (pd >> 8) & 0x00ff;
-					m_r[30] = pd & 0x00ff;
-					opcycles = 3;
-					break;
-				case 0x0006:    // ELPM Rd,Z
-					m_r[RD5(op)] = m_program->read_byte((m_r[AVR8_REGIDX_RAMPZ] << 16) | ZREG);
-					opcycles = 3;
-					break;
-				case 0x0007:    // ELPM Rd,Z+
-					pd32 = (m_r[AVR8_REGIDX_RAMPZ] << 16) | ZREG;
-					m_r[RD5(op)] = m_program->read_byte(pd32);
-					pd32++;
-					m_r[AVR8_REGIDX_RAMPZ] = (pd32 >> 16) & 0x00ff;
-					m_r[31] = (pd32 >> 8) & 0x00ff;
-					m_r[30] = pd32 & 0x00ff;
-					opcycles = 3;
-					break;
-				case 0x0009:    // LD Rd,Y+
-					pd = YREG;
-					m_r[RD5(op)] = m_data->read_byte(pd);
-					pd++;
-					m_r[29] = (pd >> 8) & 0x00ff;
-					m_r[28] = pd & 0x00ff;
-					opcycles = 2;
-					break;
-				case 0x000a:    // LD Rd,-Y
-					pd = YREG;
-					pd--;
-					m_r[RD5(op)] = m_data->read_byte(pd);
-					m_r[29] = (pd >> 8) & 0x00ff;
-					m_r[28] = pd & 0x00ff;
-					opcycles = 2;
-					break;
-				case 0x000c:    // LD Rd,X
-					m_r[RD5(op)] = m_data->read_byte(XREG);
-					opcycles = 2;
-					break;
-				case 0x000d:    // LD Rd,X+
-					pd = XREG;
-					m_r[RD5(op)] = m_data->read_byte(pd);
-					pd++;
-					m_r[27] = (pd >> 8) & 0x00ff;
-					m_r[26] = pd & 0x00ff;
-					opcycles = 2;
-					break;
-				case 0x000e:    // LD Rd,-X
-					pd = XREG;
-					pd--;
-					m_r[RD5(op)] = m_data->read_byte(pd);
-					m_r[27] = (pd >> 8) & 0x00ff;
-					m_r[26] = pd & 0x00ff;
-					opcycles = 2;
-					break;
-				case 0x000f:    // POP Rd
-					m_r[RD5(op)] = pop();
-					opcycles = 2;
-					break;
-				default:
-					unimplemented_opcode(op);
-					break;
-				}
-				break;
-			case 0x0200:
-			case 0x0300:
-				switch (op & 0x000f)
-				{
-				case 0x0000:    // STS k,Rr
-					op <<= 16;
-					m_pc++;
-					m_shifted_pc += 2;
-					op |= m_program->read_word(m_shifted_pc);
-					m_data->write_byte(op & 0x0000ffff, m_r[RD5(op >> 16)]);
-					opcycles = 2;
-					break;
-				case 0x0001:    // ST Z+,Rd
-					pd = ZREG;
-					m_data->write_byte(pd, m_r[RD5(op)]);
-					pd++;
-					m_r[31] = (pd >> 8) & 0x00ff;
-					m_r[30] = pd & 0x00ff;
-					opcycles = 2;
-					break;
-				case 0x0002:    // ST -Z,Rd
-					pd = ZREG;
-					pd--;
-					m_data->write_byte(pd, m_r[RD5(op)]);
-					m_r[31] = (pd >> 8) & 0x00ff;
-					m_r[30] = pd & 0x00ff;
-					opcycles = 2;
-					break;
-				case 0x0009:    // ST Y+,Rd
-					pd = YREG;
-					m_data->write_byte(pd, m_r[RD5(op)]);
-					pd++;
-					m_r[29] = (pd >> 8) & 0x00ff;
-					m_r[28] = pd & 0x00ff;
-					opcycles = 2;
-					break;
-				case 0x000a:    // ST -Y,Rd
-					pd = YREG;
-					pd--;
-					m_data->write_byte(pd, m_r[RD5(op)]);
-					m_r[29] = (pd >> 8) & 0x00ff;
-					m_r[28] = pd & 0x00ff;
-					opcycles = 2;
-					break;
-				case 0x000c:    // ST X,Rd
-					m_data->write_byte(XREG, m_r[RD5(op)]);
-					break;
-				case 0x000d:    // ST X+,Rd
-					pd = XREG;
-					m_data->write_byte(pd, m_r[RD5(op)]);
-					pd++;
-					m_r[27] = (pd >> 8) & 0x00ff;
-					m_r[26] = pd & 0x00ff;
-					opcycles = 2;
-					break;
-				case 0x000e:    // ST -X,Rd
-					pd = XREG;
-					pd--;
-					m_data->write_byte(pd, m_r[RD5(op)]);
-					m_r[27] = (pd >> 8) & 0x00ff;
-					m_r[26] = pd & 0x00ff;
-					opcycles = 2;
-					break;
-				case 0x000f:    // PUSH Rd
-					push(m_r[RD5(op)]);
-					opcycles = 2;
-					break;
-				default:
-					unimplemented_opcode(op);
-					break;
-				}
-				break;
-			case 0x0400:
-				switch (op & 0x000f)
-				{
-				case 0x0000:    // COM Rd
-					rd = m_r[RD5(op)];
-					res = ~rd;
-					SREG_W(AVR8_SREG_C, 1);
-					SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-					SREG_W(AVR8_SREG_N, BIT(res,7));
-					SREG_W(AVR8_SREG_V, 0);
-					SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-					m_r[RD5(op)] = res;
-					break;
-				case 0x0001:    // NEG Rd
-					rd = m_r[RD5(op)];
-					res = 0 - rd;
-					SREG_W(AVR8_SREG_C, (res == 0) ? 0 : 1);
-					SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-					SREG_W(AVR8_SREG_N, BIT(res,7));
-					SREG_W(AVR8_SREG_V, (res == 0x80) ? 1 : 0);
-					SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-					SREG_W(AVR8_SREG_H, BIT(res,3) | BIT(rd,3));
-					m_r[RD5(op)] = res;
-					break;
-				case 0x0002:    // SWAP Rd
-					rd = m_r[RD5(op)];
-					m_r[RD5(op)] = (rd >> 4) | (rd << 4);
-					break;
-				case 0x0003:    // INC Rd
-					rd = m_r[RD5(op)];
-					res = rd + 1;
-					SREG_W(AVR8_SREG_V, (rd == 0x7f) ? 1 : 0);
-					SREG_W(AVR8_SREG_N, BIT(res,7));
-					SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-					SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-					m_r[RD5(op)] = res;
-					break;
-				case 0x0005:    // ASR Rd
-					rd = m_r[RD5(op)];
-					res = (rd & 0x80) | (rd >> 1);
-					SREG_W(AVR8_SREG_C, BIT(rd,0));
-					SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-					SREG_W(AVR8_SREG_N, BIT(rd,7));
-					SREG_W(AVR8_SREG_V, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_C));
-					SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-					m_r[RD5(op)] = res;
-					break;
-				case 0x0006:    // LSR Rd
-					rd = m_r[RD5(op)];
-					res = rd >> 1;
-					SREG_W(AVR8_SREG_C, BIT(rd,0));
-					SREG_W(AVR8_SREG_Z, (res == 0) ? 1 :0);
-					SREG_W(AVR8_SREG_N, 0);
-					SREG_W(AVR8_SREG_V, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_C));
-					SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-					m_r[RD5(op)] = res;
-					break;
-				case 0x0007:    // ROR Rd
-					rd = m_r[RD5(op)];
-					res = rd >> 1;
-					res |= (SREG_R(AVR8_SREG_C) << 7);
-					SREG_W(AVR8_SREG_C, BIT(rd,0));
-					SREG_W(AVR8_SREG_Z, (res == 0) ? 1 :0);
-					SREG_W(AVR8_SREG_N, BIT(res,7));
-					SREG_W(AVR8_SREG_V, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_C));
-					SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-					m_r[RD5(op)] = res;
-					break;
-				case 0x0008:
-					switch (op & 0x00f0)
-					{
-					case 0x0000:    // SEC
-					case 0x0010:    // SEZ
-					case 0x0020:    // SEN
-					case 0x0030:    // SEV
-					case 0x0040:    // SES
-					case 0x0050:    // SEH
-					case 0x0060:    // SET
-					case 0x0070:    // SEI
-						SREG_W((op >> 4) & 0x07, 1);
-						break;
-					case 0x0080:    // CLC
-					case 0x0090:    // CLZ
-					case 0x00a0:    // CLN
-					case 0x00b0:    // CLV
-					case 0x00c0:    // CLS
-					case 0x00d0:    // CLH
-					case 0x00e0:    // CLT
-					case 0x00f0:    // CLI
-						SREG_W((op >> 4) & 0x07, 0);
-						break;
-					}
-					break;
-				case 0x0009:
-					switch (op & 0x00f0)
-					{
-					case 0x0000:    // IJMP
-						m_pc = ZREG - 1;
-						opcycles = 2;
-						break;
-					case 0x0010:    // EIJMP
-						m_pc = (m_r[AVR8_REGIDX_EIND] << 16 | ZREG) - 1;
-						opcycles = 2;
-						break;
-					default:
-						unimplemented_opcode(op);
-						break;
-					}
-					break;
-				case 0x000a:    // DEC Rd
-					rd = m_r[RD5(op)];
-					res = rd - 1;
-					SREG_W(AVR8_SREG_V, (rd == 0x7f) ? 1 : 0);
-					SREG_W(AVR8_SREG_N, BIT(res,7));
-					SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-					SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-					m_r[RD5(op)] = res;
-					break;
-				case 0x000c:
-				case 0x000d:    // JMP k
-					offs = KCONST22(op) << 16;
-					m_pc++;
-					m_shifted_pc += 2;
-					offs |= m_program->read_word(m_shifted_pc);
-					m_pc = offs;
-					m_pc--;
-					opcycles = 3;
-					break;
-				case 0x000e:    // CALL k
-				case 0x000f:
-					push((m_pc + 2) & 0x00ff);
-					push(((m_pc + 2) >> 8) & 0x00ff);
-					offs = KCONST22(op) << 16;
-					m_pc++;
-					m_shifted_pc += 2;
-					offs |= m_program->read_word(m_shifted_pc);
-					m_pc = offs;
-					m_pc--;
-					opcycles = 4;
-					break;
-				default:
-					unimplemented_opcode(op);
-					break;
-				}
-				break;
-			case 0x0500:
-				switch (op & 0x000f)
-				{
-				case 0x0000:    // COM Rd
-					rd = m_r[RD5(op)];
-					res = ~rd;
-					SREG_W(AVR8_SREG_C, 1);
-					SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-					SREG_W(AVR8_SREG_N, BIT(res,7));
-					SREG_W(AVR8_SREG_V, 0);
-					SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-					m_r[RD5(op)] = res;
-					break;
-				case 0x0001:    // NEG Rd
-					rd = m_r[RD5(op)];
-					res = 0 - rd;
-					SREG_W(AVR8_SREG_C, (res == 0) ? 0 : 1);
-					SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-					SREG_W(AVR8_SREG_N, BIT(res,7));
-					SREG_W(AVR8_SREG_V, (res == 0x80) ? 1 : 0);
-					SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-					SREG_W(AVR8_SREG_H, BIT(res,3) | BIT(rd,3));
-					m_r[RD5(op)] = res;
-					break;
-				case 0x0002:    // SWAP Rd
-					rd = m_r[RD5(op)];
-					m_r[RD5(op)] = (rd >> 4) | (rd << 4);
-					break;
-				case 0x0003:    // INC Rd
-					rd = m_r[RD5(op)];
-					res = rd + 1;
-					SREG_W(AVR8_SREG_V, (rd == 0x7f) ? 1 : 0);
-					SREG_W(AVR8_SREG_N, BIT(res,7));
-					SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-					SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-					m_r[RD5(op)] = res;
-					break;
-				case 0x0005:    // ASR Rd
-					rd = m_r[RD5(op)];
-					res = (rd & 0x80) | (rd >> 1);
-					SREG_W(AVR8_SREG_C, BIT(rd,0));
-					SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-					SREG_W(AVR8_SREG_N, BIT(rd,7));
-					SREG_W(AVR8_SREG_V, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_C));
-					SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-					m_r[RD5(op)] = res;
-					break;
-				case 0x0006:    // LSR Rd
-					rd = m_r[RD5(op)];
-					res = rd >> 1;
-					SREG_W(AVR8_SREG_C, BIT(rd,0));
-					SREG_W(AVR8_SREG_Z, (res == 0) ? 1 :0);
-					SREG_W(AVR8_SREG_N, 0);
-					SREG_W(AVR8_SREG_V, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_C));
-					SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-					m_r[RD5(op)] = res;
-					break;
-				case 0x0007:    // ROR Rd
-					rd = m_r[RD5(op)];
-					res = rd >> 1;
-					res |= (SREG_R(AVR8_SREG_C) << 7);
-					SREG_W(AVR8_SREG_C, BIT(rd,0));
-					SREG_W(AVR8_SREG_Z, (res == 0) ? 1 :0);
-					SREG_W(AVR8_SREG_N, BIT(res,7));
-					SREG_W(AVR8_SREG_V, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_C));
-					SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-					m_r[RD5(op)] = res;
-					break;
-				case 0x0008:
-					switch (op & 0x00f0)
-					{
-					case 0x0000:    // RET
-						m_pc = pop() << 8;
-						m_pc |= pop();
-						m_pc--;
-						opcycles = 4;
-						break;
-					case 0x0010:    // RETI
-						m_pc = pop() << 8;
-						m_pc |= pop();
-						m_pc--;
-						SREG_W(AVR8_SREG_I, 1);
-						opcycles = 4;
-						break;
-					case 0x0080:    // SLEEP
-						m_pc--;
-						opcycles = 1;
-						//unimplemented_opcode(op);
-						break;
-					case 0x0090:    // BREAK
-						unimplemented_opcode(op);
-						break;
-					case 0x00a0:    // WDR
-						LOGMASKED(LOG_WDOG, "%s: Watchdog reset opcode\n", machine().describe_context());
-						opcycles = 1;
-						break;
-					case 0x00c0:    // LPM
-						m_r[0] = m_program->read_byte(ZREG);
-						opcycles = 3;
-						break;
-					case 0x00d0:    // ELPM
-						unimplemented_opcode(op);
-						break;
-					case 0x00e0:    // SPM
-						unimplemented_opcode(op);
-						break;
-					case 0x00f0:    // SPM Z+
-						unimplemented_opcode(op);
-						break;
-					default:
-						unimplemented_opcode(op);
-						break;
-					}
-					break;
-				case 0x0009:
-					switch (op & 0x00f0)
-					{
-					case 0x0000:    // ICALL
-						push((m_pc + 1) & 0x00ff);
-						push(((m_pc + 1) >> 8) & 0x00ff);
-						m_pc = ZREG;
-						m_pc--;
-						opcycles = 3;
-						break;
-					case 0x0010:    // EICALL
-						unimplemented_opcode(op);
-						break;
-					default:
-						unimplemented_opcode(op);
-						break;
-					}
-					break;
-				case 0x000a:    // DEC Rd
-					rd = m_r[RD5(op)];
-					res = rd - 1;
-					SREG_W(AVR8_SREG_V, (rd == 0x7f) ? 1 : 0);
-					SREG_W(AVR8_SREG_N, BIT(res,7));
-					SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-					SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
-					m_r[RD5(op)] = res;
-					break;
-				case 0x000c:
-				case 0x000d:    // JMP k
-					//op <<= 8;
-					//op |= oprom[pos++];
-					//op <<= 8;
-					//op |= oprom[pos++];
-					unimplemented_opcode(op);
-					break;
-				case 0x000e:
-				case 0x000f:    // CALL k
-					//op <<= 8;
-					//op |= oprom[pos++];
-					//op <<= 8;
-					//op |= oprom[pos++];
-					unimplemented_opcode(op);
-					break;
-				}
-				break;
-			case 0x0600:    // ADIW Rd+1:Rd,K
-				rd = m_r[24 + (DCONST(op) << 1)];
-				rr = m_r[25 + (DCONST(op) << 1)];
-				pd = rd;
-				pd |= rr << 8;
-				pd += KCONST6(op);
-				SREG_W(AVR8_SREG_V, BIT(pd,15) & NOT(BIT(rr,7)));
-				SREG_W(AVR8_SREG_N, BIT(pd,15));
-				SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-				SREG_W(AVR8_SREG_Z, (pd == 0) ? 1 : 0);
-				SREG_W(AVR8_SREG_C, NOT(BIT(pd,15)) & BIT(rr,7));
-				m_r[24 + (DCONST(op) << 1)] = pd & 0x00ff;
-				m_r[25 + (DCONST(op) << 1)] = (pd >> 8) & 0x00ff;
-				opcycles = 2;
-				break;
-			case 0x0700:    // SBIW Rd+1:Rd,K
-				rd = m_r[24 + (DCONST(op) << 1)];
-				rr = m_r[25 + (DCONST(op) << 1)];
-				pd = rd;
-				pd |= rr << 8;
-				pd -= KCONST6(op);
-				SREG_W(AVR8_SREG_V, NOT(BIT(pd,15)) & BIT(rr,7));
-				SREG_W(AVR8_SREG_N, BIT(pd,15));
-				SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-				SREG_W(AVR8_SREG_Z, (pd == 0) ? 1 : 0);
-				SREG_W(AVR8_SREG_C, BIT(pd,15) & NOT(BIT(rr,7)));
-				m_r[24 + (DCONST(op) << 1)] = pd & 0x00ff;
-				m_r[25 + (DCONST(op) << 1)] = (pd >> 8) & 0x00ff;
-				opcycles = 2;
-				break;
-			case 0x0800:    // CBI A,b
-				m_data->write_byte(32 + ACONST5(op), m_data->read_byte(32 + ACONST5(op)) &~ (1 << RR3(op)));
-				opcycles = 2;
-				break;
-			case 0x0900:    // SBIC A,b
-				if (!BIT(m_data->read_byte(32 + ACONST5(op)), RR3(op)))
-				{
-					op = (uint32_t)m_program->read_word(m_shifted_pc + 2);
-					opcycles = is_long_opcode(op) ? 3 : 2;
-					m_pc += is_long_opcode(op) ? 2 : 1;
-				}
-				break;
-			case 0x0a00:    // SBI A,b
-				m_data->write_byte(32 + ACONST5(op), m_data->read_byte(32 + ACONST5(op)) | (1 << RR3(op)));
-				opcycles = 2;
-				break;
-			case 0x0b00:    // SBIS A,b
-				if (BIT(m_data->read_byte(32 + ACONST5(op)), RR3(op)))
-				{
-					op = (uint32_t)m_program->read_word(m_shifted_pc + 2);
-					opcycles = is_long_opcode(op) ? 3 : 2;
-					m_pc += is_long_opcode(op) ? 2 : 1;
-				}
-				break;
-			case 0x0c00:
-			case 0x0d00:
-			case 0x0e00:
-			case 0x0f00:    // MUL Rd,Rr
-				sd = (uint8_t)m_r[RD5(op)] * (uint8_t)m_r[RR5(op)];
-				m_r[1] = (sd >> 8) & 0x00ff;
-				m_r[0] = sd & 0x00ff;
-				SREG_W(AVR8_SREG_C, (sd & 0x8000) ? 1 : 0);
-				SREG_W(AVR8_SREG_Z, (sd == 0) ? 1 : 0);
-				opcycles = 2;
-				break;
-			}
-			break;
-		case 0xb000:
-			if (op & 0x0800) // OUT A,Rr
-			{
-				m_data->write_byte(32 + ACONST6(op), m_r[RD5(op)]);
-			}
-			else            // IN Rd,A
-			{
-				m_r[RD5(op)] = m_data->read_byte(0x20 + ACONST6(op));
-			}
-			break;
-		case 0xc000:    // RJMP k
-			offs = (int32_t)((op & 0x0800) ? ((op & 0x0fff) | 0xfffff000) : (op & 0x0fff));
-			m_pc += offs;
-			opcycles = 2;
-			break;
-		case 0xd000:    // RCALL k
-			offs = (int32_t)((op & 0x0800) ? ((op & 0x0fff) | 0xfffff000) : (op & 0x0fff));
-			push((m_pc + 1) & 0x00ff);
-			push(((m_pc + 1) >> 8) & 0x00ff);
-			m_pc += offs;
-			opcycles = 3;
-			break;
-		case 0xe000:    // LDI Rd,K
-			m_r[16 + RD4(op)] = KCONST8(op);
-			break;
-		case 0xf000:
-			switch (op & 0x0c00)
-			{
-			case 0x0000: // BRLO through BRIE
-				if (SREG_R(op & 0x0007))
-				{
-					offs = (int32_t)(KCONST7(op));
-					if (offs & 0x40)
-					{
-						offs |= 0xffffff80;
-					}
-					m_pc += offs;
-					opcycles = 2;
-				}
-				break;
-			case 0x0400: // BRSH through BRID
-				if (SREG_R(op & 0x0007) == 0)
-				{
-					offs = (int32_t)(KCONST7(op));
-					if (offs & 0x40)
-					{
-						offs |= 0xffffff80;
-					}
-					m_pc += offs;
-					opcycles = 2;
-				}
-				break;
-			case 0x0800:
-				if (op & 0x0200) // BST Rd, b
-				{
-					SREG_W(AVR8_SREG_T, (BIT(m_r[RD5(op)], RR3(op))) ? 1 : 0);
-				}
-				else            // BLD Rd, b
-				{
-					if (SREG_R(AVR8_SREG_T))
-					{
-						m_r[RD5(op)] |= (1 << RR3(op));
-					}
-					else
-					{
-						m_r[RD5(op)] &= ~(1 << RR3(op));
-					}
-				}
-				break;
-			case 0x0c00:
-				if (op & 0x0200) // SBRS Rd, b
-				{
-					if (BIT(m_r[RD5(op)], RR3(op)))
-					{
-						op = (uint32_t)m_program->read_word(m_shifted_pc + 2);
-						m_pc += is_long_opcode(op) ? 2 : 1;
-						opcycles = is_long_opcode(op) ? 3 : 2;
-					}
-				}
-				else            // SBRC Rd, b
-				{
-					if (!BIT(m_r[RD5(op)], RR3(op)))
-					{
-						op = (uint32_t)m_program->read_word(m_shifted_pc + 2);
-						m_pc += is_long_opcode(op) ? 2 : 1;
-						opcycles = is_long_opcode(op) ? 3 : 2;
-					}
-				}
-				break;
-			}
-			break;
-		}
-
+		const uint16_t op = (uint32_t)m_program->read_word(m_shifted_pc);
+		m_opcycles = m_op_cycles[op];
+		((this)->*(m_op_funcs[op]))(op);
 		m_pc++;
 
 		m_shifted_pc = m_pc << 1;
 
-		m_icount -= opcycles;
+		m_icount -= m_opcycles;
 
-		timer_tick(opcycles);
+		timer_tick();
 	}
 }

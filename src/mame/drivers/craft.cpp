@@ -11,6 +11,7 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "screen.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK    20000000
@@ -31,6 +32,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
 		, m_dac(*this, "dac")
 	{
 	}
@@ -48,11 +50,13 @@ private:
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
 
+	void init_palette(palette_device &palette) const;
 	void video_update();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<avr8_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	required_device<dac_byte_interface> m_dac;
 
 	uint32_t m_last_cycles;
@@ -149,6 +153,17 @@ void craft_state::craft_io_map(address_map &map)
 //  VIDEO
 //**************************************************************************
 
+void craft_state::init_palette(palette_device &palette) const
+{
+	for (int i = 0; i < 0x40; i++)
+	{
+		uint8_t r = 0x55 * ((i & 0x30) >> 4);
+		uint8_t g = 0x55 * ((i & 0x0c) >> 2);
+		uint8_t b = 0x55 * (i & 0x03);
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
 void craft_state::video_update()
 {
 	uint64_t cycles = machine().time().as_ticks(MASTER_CLOCK);
@@ -182,16 +197,14 @@ void craft_state::video_update()
 
 uint32_t craft_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const pen_t *pens = m_palette->pens();
 	for(int y = 0; y < LINES_PER_FRAME; y++)
 	{
-		uint32_t *line = &bitmap.pix32(y);
+		uint32_t *dst = &bitmap.pix32(y);
+		uint8_t *src = &m_pixels[y * LINE_CYCLES];
 		for(int x = 0; x < LINE_CYCLES; x++)
 		{
-			uint8_t pixel = m_pixels[y * LINE_CYCLES + x];
-			uint8_t r = 0x55 * ((pixel & 0x30) >> 4);
-			uint8_t g = 0x55 * ((pixel & 0x0c) >> 2);
-			uint8_t b = 0x55 * (pixel & 0x03);
-			line[x] = 0xff000000 | (r << 16) | (g << 8) | b;
+			*dst++ = pens[*src++];
 		}
 	}
 	return 0;
@@ -245,6 +258,8 @@ void craft_state::craft(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK, 635, 47, 527, 525, 36, 516);
 	m_screen->set_screen_update(FUNC(craft_state::screen_update));
+
+	PALETTE(config, m_palette, FUNC(craft_state::init_palette), 64);
 
 	/* sound hardware */
 	SPEAKER(config, "avr8").front_center();
