@@ -11336,4 +11336,64 @@
 		</part>
 	</software>
 
+<software name="jelwayqb">
+		<description>John Elway's Quarterback</description>
+		<year>1987</year>
+		<publisher>Leland Corporation</publisher>
+		<info name="release" value="2020-03-02"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234775">
+				<rom name="john elway's quarterback.woz" size="234775" crc="ccbe3531" sha1="416b585a5dcd3ed58b4847f5929e19e29f2189ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="kavekark">
+		<description>Kaves of Karkhan</description>
+		<year>1981</year>
+		<publisher>Level-10</publisher>
+		<info name="release" value="2020-03-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234739">
+				<rom name="kaves of karkhan.woz" size="234739" crc="c1b080bf" sha1="5227768941866a258e19a1efeda5d325a60d60c1"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="triad">
+		<description>Triad (Version 1.0)</description>
+		<year>1983</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2020-03-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234768">
+				<rom name="triad.woz" size="234768" crc="fdf9952f" sha1="2751abfb876aa5106de01d797cd137067424f7d9"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="rescfrac">
+		<description>Rescue on Fractalus</description>
+		<year>1985</year>
+		<publisher>Lucasfilm</publisher>
+		<info name="release" value="2020-03-02"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241427">
+				<rom name="rescue on fractalus!.woz" size="241427" crc="3dceafc7" sha1="9295da82b1fa5e213c70ed11cfa2963e4662f1c7"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
