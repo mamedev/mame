@@ -33,4 +33,4 @@ public:
 	void set_physical(bool physical);
 };
 
-#endif
+#endif // MAME_DEBUGGER_WIN_MEMORYVIEWINFO_H

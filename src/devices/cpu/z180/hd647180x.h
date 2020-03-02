@@ -62,8 +62,8 @@ private:
 	void ram_map(address_map &map);
 
 	// port callbacks
-	devcb_read8 m_port_input_cb[7];
-	devcb_write8 m_port_output_cb[6];
+	devcb_read8::array<7> m_port_input_cb;
+	devcb_write8::array<6> m_port_output_cb;
 
 	// internal RAM space
 	address_space_config m_data_config;

@@ -111,72 +111,72 @@ void tms70c46_device::tms70c46_mem(address_map &map)
 
 
 // device definitions
-tms7000_device::tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7000, tag, owner, clock, address_map_constructor(FUNC(tms7000_device::tms7000_mem), this), 0)
+tms7000_device::tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tms7000_device(mconfig, TMS7000, tag, owner, clock, address_map_constructor(FUNC(tms7000_device::tms7000_mem), this), 0)
 {
 }
 
-tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, uint32_t info_flags)
-	: cpu_device(mconfig, type, tag, owner, clock),
+tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, uint32_t info_flags) :
+	cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal),
-	m_port_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}},
-	m_port_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}},
+	m_port_in_cb(*this),
+	m_port_out_cb(*this),
 	m_info_flags(info_flags)
 {
 }
 
-tms7020_device::tms7020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7020, tag, owner, clock, address_map_constructor(FUNC(tms7020_device::tms7020_mem), this), 0)
+tms7020_device::tms7020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tms7000_device(mconfig, TMS7020, tag, owner, clock, address_map_constructor(FUNC(tms7020_device::tms7020_mem), this), 0)
 {
 }
 
-tms7020_exl_device::tms7020_exl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7020_EXL, tag, owner, clock, address_map_constructor(FUNC(tms7020_exl_device::tms7020_mem), this), 0)
+tms7020_exl_device::tms7020_exl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tms7000_device(mconfig, TMS7020_EXL, tag, owner, clock, address_map_constructor(FUNC(tms7020_exl_device::tms7020_mem), this), 0)
 {
 }
 
-tms7040_device::tms7040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7040, tag, owner, clock, address_map_constructor(FUNC(tms7040_device::tms7040_mem), this), 0)
+tms7040_device::tms7040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tms7000_device(mconfig, TMS7040, tag, owner, clock, address_map_constructor(FUNC(tms7040_device::tms7040_mem), this), 0)
 {
 }
 
-tms70c00_device::tms70c00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS70C00, tag, owner, clock, address_map_constructor(FUNC(tms70c00_device::tms7000_mem), this), CHIP_IS_CMOS)
+tms70c00_device::tms70c00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tms7000_device(mconfig, TMS70C00, tag, owner, clock, address_map_constructor(FUNC(tms70c00_device::tms7000_mem), this), CHIP_IS_CMOS)
 {
 }
 
-tms70c20_device::tms70c20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS70C20, tag, owner, clock, address_map_constructor(FUNC(tms70c20_device::tms7020_mem), this), CHIP_IS_CMOS)
+tms70c20_device::tms70c20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tms7000_device(mconfig, TMS70C20, tag, owner, clock, address_map_constructor(FUNC(tms70c20_device::tms7020_mem), this), CHIP_IS_CMOS)
 {
 }
 
-tms70c40_device::tms70c40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS70C40, tag, owner, clock, address_map_constructor(FUNC(tms70c40_device::tms7040_mem), this), CHIP_IS_CMOS)
+tms70c40_device::tms70c40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tms7000_device(mconfig, TMS70C40, tag, owner, clock, address_map_constructor(FUNC(tms70c40_device::tms7040_mem), this), CHIP_IS_CMOS)
 {
 }
 
-tms7001_device::tms7001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7001, tag, owner, clock, address_map_constructor(FUNC(tms7001_device::tms7001_mem), this), CHIP_FAMILY_70X2)
+tms7001_device::tms7001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tms7000_device(mconfig, TMS7001, tag, owner, clock, address_map_constructor(FUNC(tms7001_device::tms7001_mem), this), CHIP_FAMILY_70X2)
 {
 }
 
-tms7041_device::tms7041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7041, tag, owner, clock, address_map_constructor(FUNC(tms7041_device::tms7041_mem), this), CHIP_FAMILY_70X2)
+tms7041_device::tms7041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tms7000_device(mconfig, TMS7041, tag, owner, clock, address_map_constructor(FUNC(tms7041_device::tms7041_mem), this), CHIP_FAMILY_70X2)
 {
 }
 
-tms7002_device::tms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7002, tag, owner, clock, address_map_constructor(FUNC(tms7002_device::tms7002_mem), this), CHIP_FAMILY_70X2)
+tms7002_device::tms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tms7000_device(mconfig, TMS7002, tag, owner, clock, address_map_constructor(FUNC(tms7002_device::tms7002_mem), this), CHIP_FAMILY_70X2)
 {
 }
 
-tms7042_device::tms7042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7042, tag, owner, clock, address_map_constructor(FUNC(tms7042_device::tms7042_mem), this), CHIP_FAMILY_70X2)
+tms7042_device::tms7042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tms7000_device(mconfig, TMS7042, tag, owner, clock, address_map_constructor(FUNC(tms7042_device::tms7042_mem), this), CHIP_FAMILY_70X2)
 {
 }
 
-tms70c46_device::tms70c46_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS70C46, tag, owner, clock, address_map_constructor(FUNC(tms70c46_device::tms70c46_mem), this), CHIP_IS_CMOS)
+tms70c46_device::tms70c46_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tms7000_device(mconfig, TMS70C46, tag, owner, clock, address_map_constructor(FUNC(tms70c46_device::tms70c46_mem), this), CHIP_IS_CMOS)
 {
 }
 
@@ -203,10 +203,8 @@ void tms7000_device::device_start()
 	m_irq_state[TMS7000_INT1_LINE] = false;
 	m_irq_state[TMS7000_INT3_LINE] = false;
 
-	for (auto &cb : m_port_in_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_port_out_cb)
-		cb.resolve_safe();
+	m_port_in_cb.resolve_all_safe(0xff);
+	m_port_out_cb.resolve_all_safe();
 
 	m_idle_state = false;
 	m_idle_halt = false;

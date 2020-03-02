@@ -136,7 +136,7 @@ void osd_vprintf_debug(util::format_argument_pack<std::ostream> const &args)
 //  osd_ticks
 //============================================================
 
-osd_ticks_t osd_ticks(void)
+osd_ticks_t osd_ticks()
 {
 	return std::chrono::high_resolution_clock::now().time_since_epoch().count();
 }
@@ -146,7 +146,7 @@ osd_ticks_t osd_ticks(void)
 //  osd_ticks_per_second
 //============================================================
 
-osd_ticks_t osd_ticks_per_second(void)
+osd_ticks_t osd_ticks_per_second()
 {
 	return std::chrono::high_resolution_clock::period::den / std::chrono::high_resolution_clock::period::num;
 }

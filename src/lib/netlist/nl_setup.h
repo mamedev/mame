@@ -53,10 +53,10 @@
 		setup.register_link_arr( # term1 ", " # __VA_ARGS__);
 
 #define PARAM(name, val)                                                       \
-		setup.register_param(# name, val);
+		setup.register_param(# name, # val);
 
 #define HINT(name, val)                                                        \
-		setup.register_param(# name ".HINT_" # val, 1);
+		setup.register_param(# name ".HINT_" # val, "1");
 
 #define NETDEV_PARAMI(name, param, val)                                        \
 		setup.register_param(# name "." # param, val);
@@ -88,7 +88,7 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		setup.namespace_pop();
 
 #define OPTIMIZE_FRONTIER(attach, r_in, r_out)                                 \
-		setup.register_frontier(# attach, r_in, r_out);
+		setup.register_frontier(# attach, PSTRINGIFY_VA(r_in), PSTRINGIFY_VA(r_out));
 
 // -----------------------------------------------------------------------------
 // truthtable defines
@@ -224,7 +224,7 @@ namespace netlist
 		using model_map_t = std::unordered_map<pstring, pstring>;
 
 		void model_parse(const pstring &model, model_map_t &map);
-		pstring model_string(const model_map_t &map) const;
+		static pstring model_string(const model_map_t &map);
 
 		std::unordered_map<pstring, pstring> m_models;
 		std::unordered_map<pstring, model_map_t> m_cache;
@@ -261,7 +261,7 @@ namespace netlist
 
 		template <typename T>
 		typename std::enable_if<std::is_floating_point<T>::value || std::is_integral<T>::value>::type
-		register_param(const pstring &param, T value)
+		register_param_val(const pstring &param, T value)
 		{
 			register_param_x(param, static_cast<nl_fptype>(value));
 		}
@@ -274,7 +274,7 @@ namespace netlist
 #endif
 
 		void register_lib_entry(const pstring &name, const pstring &sourcefile);
-		void register_frontier(const pstring &attach, nl_fptype r_IN, nl_fptype r_OUT);
+		void register_frontier(const pstring &attach, const pstring &r_IN, const pstring &r_OUT);
 
 		// register a source
 		void register_source(plib::unique_ptr<plib::psource_t> &&src)
@@ -398,7 +398,7 @@ namespace netlist
 		// get family
 		const logic_family_desc_t *family_from_model(const pstring &model);
 
-		void register_dynamic_log_devices();
+		void register_dynamic_log_devices(const std::vector<pstring> &loglist);
 		void resolve_inputs();
 
 		plib::psource_t::stream_ptr get_data_stream(const pstring &name);

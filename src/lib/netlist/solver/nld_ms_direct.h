@@ -30,7 +30,7 @@ namespace solver
 
 		matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name,
 			const analog_net_t::list_t &nets,
-			const solver_parameters_t *params, const std::size_t size);
+			const solver_parameters_t *params, std::size_t size);
 
 		void reset() override { matrix_solver_t::reset(); }
 
@@ -184,7 +184,7 @@ namespace solver
 	matrix_solver_direct_t<FT, SIZE>::matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name,
 		const analog_net_t::list_t &nets,
 		const solver_parameters_t *params,
-		const std::size_t size)
+		std::size_t size)
 	: matrix_solver_ext_t<FT, SIZE>(anetlist, name, nets, params, size)
 	, m_pitch(m_pitch_ABS ? m_pitch_ABS : (((size + 0) + 7) / 8) * 8)
 	, m_A(size, m_pitch)

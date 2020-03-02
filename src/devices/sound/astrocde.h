@@ -89,8 +89,8 @@ private:
 	uint8_t       m_bitswap[256];   /* bitswap table */
 
 	devcb_read8   m_si_callback;
-	devcb_write8  m_so_callback[8];
-	devcb_read8   m_pots[4];
+	devcb_write8::array<8> m_so_callback;
+	devcb_read8::array<4> m_pots;
 };
 
 DECLARE_DEVICE_TYPE(ASTROCADE_IO, astrocade_io_device)

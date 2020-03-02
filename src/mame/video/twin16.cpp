@@ -260,7 +260,7 @@ void twin16_state::spriteram_process(  )
 	m_need_process_spriteram = 0;
 }
 
-void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap )
+void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	const uint16_t *source = 0x1800+m_spriteram->buffer() + 0x800 - 4;
 	const uint16_t *finish = 0x1800+m_spriteram->buffer();
@@ -338,7 +338,7 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap )
 			for( y=0; y<height; y++, pen_data += width/4 )
 			{
 				int sy = (flipy)?(ypos+height-1-y):(ypos+y);
-				if( sy>=16 && sy<256-16 )
+				if( sy>=cliprect.min_y && sy<=cliprect.max_y )
 				{
 					uint16_t *dest = &bitmap.pix16(sy);
 					uint8_t *pdest = &screen.priority().pix8(sy);
@@ -346,7 +346,7 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap )
 					for( x=0; x<width; x++ )
 					{
 						int sx = (flipx)?(xpos+width-1-x):(xpos+x);
-						if( sx>=0 && sx<320 )
+						if( sx>=cliprect.min_x && sx<=cliprect.max_x )
 						{
 							uint16_t pen = pen_data[x>>2]>>((~x&3)<<2)&0xf;
 
@@ -538,7 +538,7 @@ uint32_t twin16_state::screen_update_twin16(screen_device &screen, bitmap_ind16 
 			break;
 	}
 
-	draw_sprites( screen, bitmap );
+	draw_sprites( screen, bitmap, cliprect );
 
 	m_fixed_tmap->draw(screen, bitmap, cliprect, 0);
 	return 0;

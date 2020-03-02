@@ -16,11 +16,10 @@ NETLIST_START(zac1b11142_schematics)
 	TTL_7474_DIP(U3A) // FIXME: need 74LS family model (higher input impedance, half the sink capability)
 	CD4016_DIP(U5D)
 
-	NET_C(VCC, /*U3A.14,*/ U5D.14) // 7474 model doesn't have Vcc pin
-	NET_C(GND, /*U3A.7,*/ U5D.7) // 7474 model doesn't have GND pin
+	NET_C(VCC, U3A.14, U5D.14)
+	NET_C(GND, U3A.7, U5D.7)
 
 	NET_C(VCC, U3A.10, U3A.11, U3A.12, U3A.13) // only half of this chip is used in this audio section - tie up the other inputs
-
 
 	// ANAL1/IOA3/IOA4 -> RULLANTE/CASSA
 
@@ -426,9 +425,6 @@ NETLIST_START(zac1b11142)
 	/* -----------------------------------------------------------------------
 	 * Power terminals
 	 * -----------------------------------------------------------------------*/
-
-	NET_C(VCC, U3A.14)
-	NET_C(GND, U3A.7)
 
 	// Reverse so that volume raises with raising percentage in ui
 	PARAM(P1.REVERSE, 1)

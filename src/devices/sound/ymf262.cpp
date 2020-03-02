@@ -233,7 +233,7 @@ struct OPL3
 	signed int phase_modulation2;   /* phase modulation input (SLOT 3 in 4 operator channels) */
 
 	uint32_t  eg_cnt;                 /* global envelope generator counter    */
-	uint32_t  eg_timer;               /* global envelope generator counter works at frequency = chipclock/288 (288=8*36) */
+	uint32_t  eg_timer;               /* global envelope generator counter works at frequency = chipclock/divider */
 	uint32_t  eg_timer_add;           /* step of eg_timer                     */
 	uint32_t  eg_timer_overflow;      /* envelope generator timer overflows every 1 sample (on real chip) */
 
@@ -278,6 +278,7 @@ struct OPL3
 	uint8_t type;                     /* chip type                    */
 	int clock;                      /* master clock  (Hz)           */
 	int rate;                       /* sampling rate (Hz)           */
+	int divider;                    /* clock divider */
 	double freqbase;                /* frequency base               */
 	attotime TimerBase;         /* Timer base time (==sampling time)*/
 	device_t *device;
@@ -1342,16 +1343,16 @@ static void OPL3_initalize(OPL3 *chip)
 	int i;
 
 	/* frequency base */
-	chip->freqbase  = (chip->rate) ? ((double)chip->clock / (8.0*36)) / chip->rate  : 0;
+	chip->freqbase  = (chip->rate) ? ((double)chip->clock / chip->divider) / chip->rate  : 0;
 #if 0
-	chip->rate = (double)chip->clock / (8.0*36);
+	chip->rate = (double)chip->clock / chip->divider;
 	chip->freqbase  = 1.0;
 #endif
 
 	/* logerror("YMF262: freqbase=%f\n", chip->freqbase); */
 
 	/* Timer base time */
-	chip->TimerBase = chip->clock ? attotime::from_hz(chip->clock) * (8 * 36) : attotime::zero;
+	chip->TimerBase = chip->clock ? attotime::from_hz(chip->clock) * chip->divider : attotime::zero;
 
 	/* make fnumber -> increment counter table */
 	for( i=0 ; i < 1024 ; i++ )
@@ -2358,7 +2359,7 @@ static void OPL3ResetChip(OPL3 *chip)
 /* Create one of virtual YMF262 */
 /* 'clock' is chip clock in Hz  */
 /* 'rate'  is sampling rate  */
-static OPL3 *OPL3Create(device_t *device, int clock, int rate, int type)
+static OPL3 *OPL3Create(device_t *device, int clock, int rate, int type, int divider)
 {
 	OPL3 *chip;
 
@@ -2369,6 +2370,7 @@ static OPL3 *OPL3Create(device_t *device, int clock, int rate, int type)
 
 	chip->device = device;
 	chip->type  = type;
+	chip->divider = divider;
 	OPL3_clock_changed(chip, clock, rate);
 
 	/* reset chip */
@@ -2535,7 +2537,15 @@ static void OPL3_save_state(OPL3 *chip, device_t *device) {
 
 void * ymf262_init(device_t *device, int clock, int rate)
 {
-	void *chip = OPL3Create(device,clock,rate,OPL3_TYPE_YMF262);
+	void *chip = OPL3Create(device,clock,rate,OPL3_TYPE_YMF262,8*36);
+	OPL3_save_state((OPL3 *)chip, device);
+
+	return chip;
+}
+
+void * ymf278b_init(device_t *device, int clock, int rate)
+{
+	void *chip = OPL3Create(device,clock,rate,OPL3_TYPE_YMF262,19*36);
 	OPL3_save_state((OPL3 *)chip, device);
 
 	return chip;

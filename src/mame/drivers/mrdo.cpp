@@ -384,6 +384,38 @@ ROM_START( mrdoy )
 	ROM_LOAD( "j2-u001.bin",  0x0000, 0x0117, CRC(badf5876) SHA1(b301cfc7f8e83408fdcb742f552a0414af6aa16e) ) // PAL16R6 converted to GAL16V8
 ROM_END
 
+/* The white garbled graphics on the title screen should be the Fabremar logo (32px height), but it's drawn as
+   16px height, like the original Taito logo. Since the F4 ROM had a different label than the others and it matches
+   with 'mrdot', someone probably replaced the original F4 Fabremar ROM with the one from Taito. */
+ROM_START( mrdofabr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "md_fabre.a4", 0x0000, 0x2000, CRC(62593aed) SHA1(ac1cc4fa4ee3799e84938333a2a698d1ec0b527b) )
+	ROM_LOAD( "md_fabre.b4", 0x2000, 0x2000, CRC(710058d8) SHA1(168cc179f2266bbf9437445bef9ff7d3358a8e6b) )
+	ROM_LOAD( "md_fabre.c4", 0x4000, 0x2000, CRC(467d12d8) SHA1(7bb85e6a780de1c0c224229ee571cab39098f78d) )
+	ROM_LOAD( "md_fabre.f4", 0x6000, 0x2000, BAD_DUMP CRC(fce9afeb) SHA1(26236a42c1c620975d4480c4315d0c6f112429b6) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "md_fabre.t8", 0x0000, 0x1000, CRC(f2dff901) SHA1(ddc3b38bfd8b822d7803ee51e2c13443b25e39ee) )
+	ROM_LOAD( "md_fabre.u8", 0x1000, 0x1000, CRC(f3e443bd) SHA1(10e134962b0c7500f57d4058cbd0475f5c5fa6ab) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "md_fabre.r8", 0x0000, 0x1000, CRC(dbdc9ffa) SHA1(93f29fc106283eecbba3fd69cf3c4658aa38ab9f) )
+	ROM_LOAD( "md_fabre.n8", 0x1000, 0x1000, CRC(4b9973db) SHA1(8766c51a345a5e63446e65614c6f665ab5fbe0d7) )
+
+	ROM_REGION( 0x2000, "gfx3", 0 )
+	ROM_LOAD( "md_fabre.h5", 0x0000, 0x1000, CRC(e1218cc5) SHA1(d946613a1cf1c97f7533a4f8c2d0078d1b7daaa8) )
+	ROM_LOAD( "md_fabre.k5", 0x1000, 0x1000, CRC(b1f68b04) SHA1(25709cd81c03df51f27cd730fecf86a1daa9e27e) )
+
+	ROM_REGION( 0x0080, "proms", 0 )
+	ROM_LOAD( "82s123.u2",   0x0000, 0x0020, CRC(238a65d7) SHA1(a5b20184a1989db23544296331462ec4d7be7516) )    /* palette (high bits) */
+	ROM_LOAD( "82s123.t2",   0x0020, 0x0020, CRC(ae263dc0) SHA1(7072c100b9d692f5bb12b0c9e304425f534481e2) )    /* palette (low bits) */
+	ROM_LOAD( "82s123.f10n", 0x0040, 0x0020, CRC(16ee4ca2) SHA1(fcba4d103708b9711452009cd29c4f88d2f64cd3) )    /* sprite color lookup table */
+	ROM_LOAD( "82s123.j10",  0x0060, 0x0020, CRC(ff7fe284) SHA1(3ac8e30011c1fcba0ee8f4dc932f82296c3ba143) )    /* timing (not used) */
+
+	ROM_REGION( 0x0200, "pal16r6", 0 )
+	ROM_LOAD( "pal16r6.j2",  0x0000, 0x0117, BAD_DUMP CRC(badf5876) SHA1(b301cfc7f8e83408fdcb742f552a0414af6aa16e) ) // From parent, protected on this set
+ROM_END
+
 ROM_START( yankeedo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a4-01.bin",    0x0000, 0x2000, CRC(03dcfba2) SHA1(c15e3d0c4225e0ca120bcd28aca39632575f8e11) )
@@ -414,11 +446,11 @@ ROM_START( yankeedo )
 ROM_END
 
 
-
-GAME( 1982, mrdo,     0,    mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal",                 "Mr. Do!",             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrdoy,    mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal",                 "Mr. Do! (prototype)", MACHINE_SUPPORTS_SAVE ) /* aka "Yukidaruma" */
-GAME( 1982, mrdot,    mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal (Taito license)", "Mr. Do! (Taito)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrdofix,  mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal (Taito license)", "Mr. Do! (bugfixed)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrlo,     mrdo, mrlo, mrdo, mrdo_state, empty_init, ROT270, "bootleg",                   "Mr. Lo!",             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrdu,     mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "bootleg",                   "Mr. Du!",             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, yankeedo, mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "hack",                      "Yankee DO!",          MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdo,     0,    mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal",                 "Mr. Do!",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdoy,    mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal",                 "Mr. Do! (prototype)",        MACHINE_SUPPORTS_SAVE ) /* aka "Yukidaruma" */
+GAME( 1982, mrdot,    mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal (Taito license)", "Mr. Do! (Taito)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdofix,  mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal (Taito license)", "Mr. Do! (bugfixed)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrlo,     mrdo, mrlo, mrdo, mrdo_state, empty_init, ROT270, "bootleg",                   "Mr. Lo!",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdu,     mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "bootleg",                   "Mr. Du!",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdofabr, mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "bootleg (Fabremar)",        "Mr. Do! (Fabremar bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, yankeedo, mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "hack",                      "Yankee DO!",                 MACHINE_SUPPORTS_SAVE )

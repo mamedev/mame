@@ -32,6 +32,8 @@
 #include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"
 #include "formats/flex_dsk.h"
+#include "formats/os9_dsk.h"
+#include "formats/uniflex_dsk.h"
 
 class ss50_dc5_device : public device_t, public ss50_card_interface
 {
@@ -167,35 +169,39 @@ static INPUT_PORTS_START( dc5 )
 	PORT_CONFSETTING(0, "Inhibits drive selection")
 	PORT_CONFSETTING(1, "Erroneous side select")
 
-	// Debug aid to hard code the density. The FLEX format uses single
-	// density for track zero. Many virtual disks 'fix' the format to be
-	// purely double density and often without properly implement driver
-	// support for that. This setting is an aid to report unexpected
-	// usage, and it attempts to correct that.
+	// Debug aid to hard code the density. The OS9 format can use single
+	// density for track zero head zero. The FLEX format can use single
+	// density for track zero on all heads, and many virtual disks 'fix'
+	// the format to be purely double density and often without properly
+	// implementing driver support for that. This setting is an aid to
+	// report unexpected usage, and it attempts to correct that.
 	PORT_START("EXPECTED_DENSITY")
-	PORT_CONFNAME(0x3, 0, "Expected density")
+	PORT_CONFNAME(0x7, 0, "Expected density")
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(1, "single density") // Purely single density.
-	PORT_CONFSETTING(2, "double density, with single density track zero") // The default FLEX double density format.
-	PORT_CONFSETTING(3, "double density") // Purely double density.
+	PORT_CONFSETTING(2, "double density, with single density track zero head zero") // OS9 format
+	PORT_CONFSETTING(3, "double density, with single density track zero all heads") // The default FLEX double density format.
+	PORT_CONFSETTING(4, "double density") // Purely double density.
 
 	// Debug aid, to check that the sector head or side is set as expected
 	// for the sector ID being read for the FLEX floppy disk format. Many
 	// FLEX disk images were developed for vitural machines that have
-	// little regard for the actual head and can work off the sector ID
-	// and their drivers can set the head incorrectly. E.g. a disk with 18
-	// sectors per side might have a driver switch heads for sectors
-	// above 10. Another issue is that double density disk images are
-	// often 'fixed' so that they are pure double density without being
-	// single density on the first track, and the drivers might still set
-	// the head based on track zero being single density. This aid is not
-	// intended to be a substitute for fixing the drivers but it does help
-	// work through the issues while patching the disks.
+	// little regard for the actual number of heads and can work off the
+	// sector ID and their drivers can set the head incorrectly. E.g. a
+	// disk with 18 sectors per side might have a driver incorrectly switch
+	// heads for sectors above 10. Another issue is that double density
+	// disk images are often 'fixed' so that they are pure double density
+	// without being single density on the first track, and the drivers
+	// might still set the head based on track zero being single
+	// density. This aid is not intended to be a substitute for fixing the
+	// drivers but it does help work through the issues while patching the
+	// disks.
 	PORT_START("EXPECTED_SECTORS")
-	PORT_CONFNAME(0xff, 0, "Expected sectors per side")
+	PORT_CONFNAME(0xff, 0, "FLEX expected sectors per side")
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(10, "10") // 5 1/4" single density 256B
 	PORT_CONFSETTING(15, "15") // 8" single density 256B
+	PORT_CONFSETTING(16, "16") // 5 1/4" double density 256B
 	PORT_CONFSETTING(18, "18") // 5 1/4" double density 256B
 	PORT_CONFSETTING(26, "26") // 8" double density 256B
 	PORT_CONFSETTING(36, "36") // 3.5" 1.4M QD 256B
@@ -204,10 +210,11 @@ static INPUT_PORTS_START( dc5 )
 	// driver sticks to that and if using a double density disk then set a
 	// single density size here.
 	PORT_START("TRACK_ZERO_EXPECTED_SECTORS")
-	PORT_CONFNAME(0xff, 0, "Track zero expected sectors per side")
+	PORT_CONFNAME(0xff, 0, "FLEX track zero expected sectors per side")
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(10, "10") // 5 1/4" single density 256B
 	PORT_CONFSETTING(15, "15") // 8" single density 256B
+	PORT_CONFSETTING(16, "16") // 5 1/4" double density 256B
 	PORT_CONFSETTING(18, "18") // 5 1/4" double density 256B
 	PORT_CONFSETTING(26, "26") // 8" double density 256B
 	PORT_CONFSETTING(36, "36") // 3.5" 1.4M QD 256B
@@ -230,10 +237,12 @@ ioport_constructor ss50_dc5_device::device_input_ports() const
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER( ss50_dc5_device::floppy_formats )
-	FLOPPY_FLEX_FORMAT
+	FLOPPY_MFI_FORMAT,
+	FLOPPY_FLEX_FORMAT,
+	FLOPPY_OS9_FORMAT,
+	FLOPPY_UNIFLEX_FORMAT
 FLOPPY_FORMATS_END
 
-// todo: implement floppy controller cards as slot devices and do this properly
 static void flex_floppies(device_slot_interface &device)
 {
 	device.option_add("sssd35", FLOPPY_525_SSSD_35T); // 35 trks ss sd 5.25
@@ -354,7 +363,7 @@ void ss50_dc5_device::validate_floppy_side(uint8_t cmd)
 
 			if (m_fdc_side != expected_side)
 			{
-				logerror("%s Unexpected size %d for track %d sector %d expected side %d\n", machine().describe_context(), m_fdc_side, track, sector, expected_side);
+				logerror("%s Unexpected side %d for track %d sector %d expected side %d\n", machine().describe_context(), m_fdc_side, track, sector, expected_side);
 				if (m_fdc_selected_floppy)
 				{
 					m_fdc_selected_floppy->ss_w(expected_side);
@@ -362,8 +371,7 @@ void ss50_dc5_device::validate_floppy_side(uint8_t cmd)
 				}
 			}
 		}
-
-		if (expected_sectors)
+		else if (expected_sectors)
 		{
 			uint8_t expected_side = sector > expected_sectors ? 1 : 0;
 
@@ -393,17 +401,17 @@ uint8_t ss50_dc5_device::validate_fdc_dden(uint8_t dden)
 			return 1;
 		case 2:
 		{
-			// Double density with track zero single density.
+			// Double density with track zero head zero single density.
 			uint8_t track = m_fdc->track_r();
 
-			if (track == 0)
+			if (track == 0 && m_fdc_side == 0)
 			{
-				// If this path is call on an update of the
+				// If this path is called on an update of the
 				// second control register then the track need
 				// not be accurate so this message might not
 				// be accurate.
 				if (!dden)
-					logerror("%s Unexpected DDEN %d for single density trak 0\n", machine().describe_context(), dden);
+					logerror("%s Unexpected DDEN %d for single density track 0 head 0\n", machine().describe_context(), dden);
 				return 1;
 			}
 			if (dden)
@@ -411,6 +419,25 @@ uint8_t ss50_dc5_device::validate_fdc_dden(uint8_t dden)
 			return 0;
 		}
 		case 3:
+		{
+			// Double density with track zero all heads single density.
+			uint8_t track = m_fdc->track_r();
+
+			if (track == 0)
+			{
+				// If this path is called on an update of the
+				// second control register then the track need
+				// not be accurate so this message might not
+				// be accurate.
+				if (!dden)
+					logerror("%s Unexpected DDEN %d for single density track 0\n", machine().describe_context(), dden);
+				return 1;
+			}
+			if (dden)
+				logerror("%s Unexpected DDEN %d for double density\n", machine().describe_context(), dden);
+			return 0;
+		}
+		case 4:
 			// Pure double density.
 			if (dden)
 				logerror("%s Unexpected DDEN %d for double density\n", machine().describe_context(), dden);
@@ -518,13 +545,13 @@ WRITE_LINE_MEMBER( ss50_dc5_device::fdc_sso_w )
 			break;
 		case 2:
 		{
-			// Double density with track zero single density.
+			// Double density with track zero head zero single density.
 			uint8_t track = m_fdc->track_r();
 
-			if (track == 0)
+			if (track == 0 && m_fdc_side == 0)
 			{
 				if (state)
-					logerror("Unexpected SSO %d for single density trak 0\n", state);
+					logerror("Unexpected SSO %d for single density track 0 head 0\n", state);
 				m_fdc->dden_w(1);
 			}
 			else
@@ -536,6 +563,25 @@ WRITE_LINE_MEMBER( ss50_dc5_device::fdc_sso_w )
 			break;
 		}
 		case 3:
+		{
+			// Double density with track zero all heads single density.
+			uint8_t track = m_fdc->track_r();
+
+			if (track == 0)
+			{
+				if (state)
+					logerror("Unexpected SSO %d for single density track 0\n", state);
+				m_fdc->dden_w(1);
+			}
+			else
+			{
+				if (!state)
+					logerror("Unexpected SSO %d for double density\n", state);
+				m_fdc->dden_w(0);
+			}
+			break;
+		}
+		case 4:
 			// Pure double density.
 			if (!state)
 				logerror("Unexpected SSO %d for double density\n", state);

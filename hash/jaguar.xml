@@ -257,7 +257,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- throws an exception if the Telegames logo isn't skipped, switching items in main menu causes a glitch on the text -->
+	<!-- switching items in main menu causes a glitch on the text -->
 	<!-- rightmost column of gameplay has odd "overscan" area -->
 	<software name="brutalsp" supported="no">
 		<description>Brutal Sports Football</description>
@@ -719,7 +719,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- throws an exception off the bat -->
+	<!-- black screen -->
 	<software name="ruinerp" supported="no">
 		<description>Ruiner Pinball</description>
 		<year>1995</year>
@@ -803,7 +803,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- throws an exception off the bat -->
+	<!-- gets to title screen (with wrong GFX width) then hangs -->
 	<software name="spacewar" supported="no">
 		<description>Space War 2000</description>
 		<year>2001</year>
@@ -815,7 +815,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- throws an exception off the bat -->
+	<!-- gets to title screen (with wrong GFX width) then hangs -->
 	<software name="spacewarp" cloneof="spacewar" supported="no">
 		<description>Space War 2000 (Prototype)</description>
 		<year>19??</year>
@@ -869,7 +869,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- throws exception after few seconds on title screen -->
+	<!-- boot OK -->
 	<software name="tempst2k" supported="no">
 		<description>Tempest 2000</description>
 		<year>1994</year>

@@ -95,6 +95,7 @@ consolewin_info::~consolewin_info()
 {
 }
 
+
 void consolewin_info::set_cpu(device_t &device)
 {
 	// exit if this cpu is already selected
@@ -443,7 +444,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 			}
 			if (img->device().type() == CASSETTE)
 			{
-				cassette_image_device *const cassette = downcast<cassette_image_device *>(&img->device());
+				auto *const cassette = downcast<cassette_image_device *>(&img->device());
 				bool s;
 				switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX)
 				{

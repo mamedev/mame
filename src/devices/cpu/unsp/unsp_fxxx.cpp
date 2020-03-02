@@ -60,15 +60,11 @@ inline void unsp_device::execute_fxxx_000_group(uint16_t op)
 
 	// MUL us ( signed * unsigned )
 	// MUL      1 1 1 1*  r r r 0*  0 0 0 0   1 r r r     (** = sign bits, fixed here)
-	const uint16_t opa = (op >> 9) & 7;
-	const uint16_t opb = op & 7;
+	const uint16_t rd = (op >> 9) & 7;
+	const uint16_t rs = op & 7;
 	m_core->m_icount -= 12;
-	uint32_t lres = m_core->m_r[opa] * m_core->m_r[opb];
-	if (m_core->m_r[opb] & 0x8000)
-	{
-		lres -= m_core->m_r[opa] << 16;
-	}
-	m_core->m_r[REG_R4] = lres >> 16;
+	int32_t lres = (int32_t)(uint32_t)m_core->m_r[rd] * (int32_t)(int16_t)m_core->m_r[rs];
+	m_core->m_r[REG_R4] = (uint16_t)(lres >> 16);
 	m_core->m_r[REG_R3] = (uint16_t)lres;
 
 	return;
@@ -290,15 +286,13 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 		return;
 
 	case 0xf144: case 0xf344: case 0xf544: case 0xf744: case 0xf944: case 0xfb44: case 0xfd44: case 0xff44:
-		logerror("unimplemented: fir_mov on\n");
 		m_core->m_icount -= 1;
-		//unimplemented_opcode(op); // generalplus_gpac800 games do this on startup
+		m_core->m_fir_move = 1;
 		return;
 
 	case 0xf145: case 0xf345: case 0xf545: case 0xf745: case 0xf945: case 0xfb45: case 0xfd45: case 0xff45:
-		logerror("unimplemented: fir_mov off\n");
 		m_core->m_icount -= 1;
-		//unimplemented_opcode(op); // generalplus_gpac800 games do this on startup
+		m_core->m_fir_move = 0;
 		return;
 
 	case 0xf161: case 0xf361: case 0xf561: case 0xf761: case 0xf961: case 0xfb61: case 0xfd61: case 0xff61:
@@ -392,13 +386,11 @@ void unsp_device::execute_fxxx_101_group(uint16_t op)
 		return;
 
 	case 0xf144: case 0xf344: case 0xf544: case 0xf744: case 0xf944: case 0xfb44: case 0xfd44: case 0xff44:
-		logerror("fir_mov on (shouldn't exist on 1.0, is this 1.2 or does it act as a NOP?)\n");
-		//unimplemented_opcode(op); // jak_care triggers this, which again strongly suggests that everything we have is 1.2 or above even if most new features are unused
+		m_core->m_fir_move = 1;
 		return;
 
 	case 0xf145: case 0xf345: case 0xf545: case 0xf745: case 0xf945: case 0xfb45: case 0xfd45: case 0xff45:
-		logerror("fir_mov off (shouldn't exist on 1.0, is this 1.2 or does it act as a NOP?)\n");
-		//unimplemented_opcode(op); // jak_care triggers this, see above
+		m_core->m_fir_move = 0;
 		return;
 
 	case 0xf160: case 0xf360: case 0xf560: case 0xf760: case 0xf960: case 0xfb60: case 0xfd60: case 0xff60:
@@ -458,8 +450,45 @@ inline void unsp_device::execute_fxxx_110_group(uint16_t op)
 	// MULS    1 1 1 1*  r r r 1*  1 0*s s   s r r r    (1* = sign bit, 1* = sign bit 0* = upper size bit)
 
 	// MULS ss with upper size bit not set
-	unimplemented_opcode(op);
-	//return;
+	const uint16_t size = ((op >> 3) & 7) ? ((op >> 3) & 7) : 16;
+	const uint16_t rd = (op >> 9) & 7;
+	const uint16_t rs = op & 7;
+	execute_muls_ss(rd, rs, size);
+}
+
+void unsp_device::execute_muls_ss(const uint16_t rd, const uint16_t rs, const uint16_t size)
+{
+	const uint32_t rdv = m_core->m_r[rd];
+	const uint32_t rsv = m_core->m_r[rs];
+	int64_t lres = 0;
+	uint16_t values[16];
+	for (uint16_t i = 0; i < size; i++)
+	{
+		values[i] = read16(rdv + i);
+		const uint16_t rhs = read16(rsv + i);
+		uint32_t tres = values[i] * rhs;
+		if (values[i] & 0x8000)
+		{
+			tres -= rhs << 16;
+		}
+		if (rhs & 0x8000)
+		{
+			tres -= values[i] << 16;
+		}
+		lres += (int64_t)(int32_t)tres;
+	}
+	m_core->m_sb = 0;
+	if (m_core->m_fir_move)
+	{
+		for (uint16_t i = size - 1; i > 0; i--)
+		{
+			write16(rdv + i, values[i - 1]);
+		}
+	}
+	m_core->m_r[rd] += size;
+	m_core->m_r[rs] += size;
+	m_core->m_r[REG_R4] = (uint16_t)(lres >> 16);
+	m_core->m_r[REG_R3] = (uint16_t)lres;
 }
 
 inline void unsp_device::execute_fxxx_111_group(uint16_t op)
@@ -472,8 +501,9 @@ inline void unsp_device::execute_fxxx_111_group(uint16_t op)
 	// MULS    1 1 1 1*  r r r 1*  1 1*s s   s r r r    (1* = sign bit, 1* = sign bit 1* = upper size bit)
 
 	// MULS ss with upper size bit set.
-	unimplemented_opcode(op);
-	//return;
+	const uint16_t rd = (op >> 9) & 7;
+	const uint16_t rs = op & 7;
+	execute_muls_ss(rd, rs, ((op >> 3) & 7) + 8);
 }
 
 void unsp_device::execute_fxxx_group(uint16_t op)

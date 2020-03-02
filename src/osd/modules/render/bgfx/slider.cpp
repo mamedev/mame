@@ -103,7 +103,7 @@ int32_t bgfx_slider::update(std::string *str, int32_t newval)
 
 		default:
 		{
-			float *val_ptr = reinterpret_cast<float *>(&m_value);
+			auto *val_ptr = reinterpret_cast<float *>(&m_value);
 			if (newval != SLIDER_NOCHANGE)
 			{
 				*val_ptr = float(newval) * m_step;

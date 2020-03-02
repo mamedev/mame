@@ -2056,6 +2056,22 @@ ROM_END
 //  80286 Desktop
 //**************************************************************************
 
+// Victor V286C - a VGA version exists as well
+// CPU: AMD 802L86-10/S  - one ISA16 extended to ISA8: 1, ISA16: 3 on a riser card - Keyboard-BIOS: AT-KB M5L8042
+// Chipset: Kyocera AT-S.C.1 VER.A 9771A 89432EAI, Kyocera EAST-2A 9850 8938EAI, MB621103 M AT-1A 8944 Z67, MB622436 MAT-2E 8943 W02
+// On board video EGA/CGA/Hercules based on a L1A2919 PARADISE PBI-38306A controller
+// RAM: 640KB on board -  OSC: 48.000, 32.0000MHz, 40MHz, 18.63636MHz
+// Options: Sockets for a Microsoft 900110003 Bus Mouse controller, FPU 80287 and a DS1287 RTC - 2 DIP switches with 12 positions combined
+// Mass storage: 1.2MB floppy, Kyocera KC-30A harddisk on a DTC5187CRH RLL controller
+ROM_START( v286c )
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_LOAD16_BYTE( "system-bios_kyocera_a2-2_lo.bin", 0x18000, 0x4000, CRC(160c4759) SHA1(937c1bb9483efeba895e038b7132e0e7e5a9aaa4) )
+	ROM_LOAD16_BYTE( "system-bios_kyocera_a2-2_hi.bin", 0x18001, 0x4000, CRC(cfe0cbef) SHA1(2610d727d13fa67c7bd9b3545d7846e880c3da37) )
+
+	ROM_REGION(0x4000, "pega", 0)
+	ROM_LOAD( "ega-bios_paradise_video-1.bin", 0x0000, 0x4000, CRC(2db77b0b) SHA1(d31ddbbde5be0b0603e9f569c3f924e0afc7c8e4) )
+ROM_END
+
 // Atari PC 4, PC4X motherboard - Chipset: NEAT CS8221 (P82C206, P82C211, P82C212, P82C215) - ISA8: 1, ISA16: 4 - RAM: 8XSIPP30
 // Paradise Systems PVGA1A-JK, IMSG171P
 // on board: external and internal floppy, digital and analog video, ser, par, keyboard, mouse
@@ -4976,6 +4992,7 @@ COMP( 198?, o286foxii, ibm5170, 0,       atturbo,   0,     at_state,     init_at
 COMP( 1987, m290,      ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Olivetti",    "M290", MACHINE_NOT_WORKING )
 COMP( 1991, pcd204,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Philips",     "PCD204 (PCD200 series)", MACHINE_NOT_WORKING )
 COMP( 1990, profpc33,  ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Profex", "PC 33", MACHINE_NOT_WORKING )
+COMP( 198?, v286c,     ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Victor", "V286C", MACHINE_NOT_WORKING )
 COMP( 1981, wpc250,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Wang Laboratories, Inc.", "PC-250/16", MACHINE_NOT_WORKING )
 COMP( 1990, n8810m30,  ibm5170, 0,       neat,      0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M30", MACHINE_NOT_WORKING )
 COMP( 198?, elt286b,   ibm5170, 0,       neat,      0,     at_state,     init_at,        "Chaintech", "ELT-286B-160B(E)", MACHINE_NOT_WORKING )

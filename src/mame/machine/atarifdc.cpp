@@ -301,7 +301,6 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_cr
 			(m_drv[id].heads == 1) ? "SS" : "DS",
 			(m_drv[id].density == 0) ? "SD" : (m_drv[id].density == 1) ? "MD" : "DD",
 			m_drv[id].seclen);
-	return;
 }
 
 

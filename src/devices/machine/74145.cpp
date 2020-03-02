@@ -61,7 +61,7 @@ DEFINE_DEVICE_TYPE(TTL74145, ttl74145_device, "ttl74145", "TTL74145")
 
 ttl74145_device::ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TTL74145, tag, owner, clock)
-	, m_output_line_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_output_line_cb(*this)
 	, m_number(0)
 {
 }
@@ -74,8 +74,7 @@ ttl74145_device::ttl74145_device(const machine_config &mconfig, const char *tag,
 void ttl74145_device::device_start()
 {
 	/* resolve callbacks */
-	for (std::size_t bit = 0; bit < 10; bit++)
-		m_output_line_cb[bit].resolve_safe();
+	m_output_line_cb.resolve_all_safe();
 
 	// register for state saving
 	save_item(NAME(m_number));

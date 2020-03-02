@@ -428,13 +428,13 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 	m_txca(0),
 	m_rxcb(0),
 	m_txcb(0),
-	m_out_txd_cb{ { *this }, { *this } },
-	m_out_dtr_cb{ { *this }, { *this } },
-	m_out_rts_cb{ { *this }, { *this } },
-	m_out_wreq_cb{ { *this }, { *this } },
-	m_out_sync_cb{ { *this }, { *this } },
-	m_out_rxdrq_cb{ { *this }, { *this } },
-	m_out_txdrq_cb{ { *this }, { *this } },
+	m_out_txd_cb(*this),
+	m_out_dtr_cb(*this),
+	m_out_rts_cb(*this),
+	m_out_wreq_cb(*this),
+	m_out_sync_cb(*this),
+	m_out_rxdrq_cb(*this),
+	m_out_txdrq_cb(*this),
 	m_out_int_cb(*this),
 	m_out_int_state(CLEAR_LINE),
 	m_variant(variant),
@@ -493,20 +493,13 @@ void z80scc_device::device_resolve_objects()
 	LOG("%s\n", FUNCNAME);
 
 	// resolve callbacks
-	m_out_txd_cb[CHANNEL_A].resolve_safe();
-	m_out_dtr_cb[CHANNEL_A].resolve_safe();
-	m_out_rts_cb[CHANNEL_A].resolve_safe();
-	m_out_wreq_cb[CHANNEL_A].resolve_safe();
-	m_out_sync_cb[CHANNEL_A].resolve_safe();
-	m_out_txd_cb[CHANNEL_B].resolve_safe();
-	m_out_dtr_cb[CHANNEL_B].resolve_safe();
-	m_out_rts_cb[CHANNEL_B].resolve_safe();
-	m_out_wreq_cb[CHANNEL_B].resolve_safe();
-	m_out_sync_cb[CHANNEL_B].resolve_safe();
-	m_out_rxdrq_cb[CHANNEL_A].resolve_safe();
-	m_out_txdrq_cb[CHANNEL_A].resolve_safe();
-	m_out_rxdrq_cb[CHANNEL_B].resolve_safe();
-	m_out_txdrq_cb[CHANNEL_B].resolve_safe();
+	m_out_txd_cb.resolve_all_safe();
+	m_out_dtr_cb.resolve_all_safe();
+	m_out_rts_cb.resolve_all_safe();
+	m_out_wreq_cb.resolve_all_safe();
+	m_out_sync_cb.resolve_all_safe();
+	m_out_rxdrq_cb.resolve_all_safe();
+	m_out_txdrq_cb.resolve_all_safe();
 	m_out_int_cb.resolve_safe();
 }
 

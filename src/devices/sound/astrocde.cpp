@@ -84,8 +84,8 @@ astrocade_io_device::astrocade_io_device(const machine_config &mconfig, const ch
 	, m_c_count(0)
 	, m_c_state(0)
 	, m_si_callback(*this)
-	, m_so_callback{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_pots{{*this}, {*this}, {*this}, {*this}}
+	, m_so_callback(*this)
+	, m_pots(*this)
 {
 	memset(m_reg, 0, sizeof(uint8_t)*8);
 	memset(m_bitswap, 0, sizeof(uint8_t)*256);
@@ -101,10 +101,8 @@ astrocade_io_device::astrocade_io_device(const machine_config &mconfig, const ch
 void astrocade_io_device::device_resolve_objects()
 {
 	m_si_callback.resolve_safe(0);
-	for (auto &cb : m_so_callback)
-		cb.resolve_safe();
-	for (auto &pot : m_pots)
-		pot.resolve_safe(0);
+	m_so_callback.resolve_all_safe();
+	m_pots.resolve_all_safe(0);
 }
 
 

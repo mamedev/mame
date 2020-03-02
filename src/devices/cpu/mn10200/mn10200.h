@@ -80,8 +80,8 @@ private:
 	address_space *m_program;
 
 	// i/o handlers
-	devcb_read8 m_read_port[5];
-	devcb_write8 m_write_port[5];
+	devcb_read8::array<5> m_read_port;
+	devcb_write8::array<5> m_write_port;
 
 	int m_cycles;
 

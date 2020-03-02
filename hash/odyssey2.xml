@@ -1794,6 +1794,35 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
+<!-- NTSC Cartidge dumped from a 39SF010 flashrom (1MB) and actual data (2KB) data is repeated to fill space and matches publicly posted rom from author -->
+	<software name="deathrac">
+		<description>Death Race (USA)</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="Ivan Machado" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="DRace_RC04.NTSC.rom" size="2048" crc="91a767de" sha1="26a044c68ff08f574f6649b731b82caca8c0e797" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deathracp">
+		<description>Death Race (Euro)</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="Ivan Machado" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="DRace_RC04.PAL.rom" size="2048" crc="0ca8c961" sha1="3918d6c2c324fba55e8b90acc8d38e540e4ec5c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ktaa">
 		<description>Kill the Attacking Aliens</description>
 		<year>2003</year>

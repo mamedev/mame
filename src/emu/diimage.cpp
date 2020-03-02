@@ -381,7 +381,7 @@ void device_image_interface::setup_working_directory()
 	// get user-specified directory and make sure it exists
 	m_working_directory = device().mconfig().options().sw_path();
 	// if multipath, get first
-	size_t i = m_working_directory.find_first_of(";");
+	size_t i = m_working_directory.find_first_of(';');
 	if (i != std::string::npos)
 		m_working_directory.resize(i);
 	// validate directory

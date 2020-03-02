@@ -239,7 +239,7 @@ protected:
 	size_t const m_dcache_size;
 
 	// I/O
-	devcb_read_line m_in_brcond[4];
+	devcb_read_line::array<4> m_in_brcond;
 	bool m_bus_error;
 };
 

@@ -25,6 +25,7 @@ Driver file for IBM PC, IBM PC XT, and related machines.
 #include "machine/genpc.h"
 #include "machine/i8251.h"
 #include "cpu/i86/i86.h"
+#include "cpu/i86/i186.h"
 #include "cpu/nec/nec.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
@@ -67,6 +68,8 @@ public:
 	void ittxtra(machine_config &config);
 	void cadd810(machine_config &config);
 	void juko16(machine_config &config);
+	void alphatp50(machine_config &config);
+	void mbc16lt(machine_config &config);
 
 	void init_bondwell();
 
@@ -1738,6 +1741,135 @@ ROM_START( spc400d )
 	ROM_LOAD("fb896.u6", 0xc000, 0x4000, CRC(a6f3ad8c) SHA1(1ee012f9a1757eb68150fedc9db16ff356722f72))
 ROM_END
 
+
+/******************************************* Triumph-Adler Alphatronic P10 ***
+Form factor: Desktop
+Links: https://www.marcuslausch.de/2020/01/21/triumph-adler-alphatronic-p10/, http://www.cc-computerarchiv.de/CC-Archiv/bc-alt/gb-triad/gb-triad-6_87.html
+CPU: 8088@4.77MHz on a motherboard branded Super-640
+RAM: 640KB
+Video: Hercules (branded MG-200), monitor: 12" amber
+Mass storage: 2x5.25" DSDD, a single floppy/hdd version was called P20
+Interfaces: V24, Centronics
+On board: RTC
+DIP switches: 1    2    3    4    5    6    7    8    effect
+             OFF                                      default
+                   ON                                 FPU present
+                  OFF                                 FPU absent
+                                  ON   ON             Display: none
+                                 OFF  OFF             monochrome
+                                 OFF   ON             Color 40x25
+                                  ON  OFF             Color 80x25
+                                            ON   ON   1 Floppy disk drive
+                                           OFF   ON   2
+                                            ON  OFF   3
+                                           OFF  OFF   4
+
+*****************************************************************************/
+
+ROM_START( alphatp10 )
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_LOAD("cgab01_04_06.bin", 0x8000, 0x4000, CRC(4f1048e9) SHA1(c5feee7c00fdb7466c6afec753363d11b32983b5))
+	ROM_LOAD("cgab02_04_07.bin", 0xc000, 0x4000, CRC(a95998cb) SHA1(1d939f0b7ea3999c44f98b30c26d36e394b87503))
+ROM_END
+
+
+/******************************************* Triumph-Adler Alphatronic P50 ***
+Form factor: Desktop
+CPU: 80186@6MHz
+RAM: 512KB
+Mass storage: 2x5.25" DSDD-2, a single floppy/hdd (15MB unformatted) version was called P60-1,
+machines with 5.25" DSQD drives (Panasonic  JU465-5 ALY, 720K) had the -2 suffix
+Ports: Parallel, serial (V24) - OSC: 16.0MHz, 12.000MHz, 14.3181MHz - on board battery
+ISA: 5 slots, one occupied by graphics card (P50)
+Graphics: S230790/00 GEJA04, MC6845P based, OSC: 20.0000 MHz, modes: 160x100 (16col. incl. black and white),
+320x200 or 320x400 (4col. altogether: 1/16 for the background, 1 for the foreground (red, green or brown,
+alt. cobalt blue, violet or white), 640x200 or 640x400 (black, white and two intermediate hues)
+Floppy controller: S131005/00A CE0121/8AJ00072 - NEC B9201C, Intel P8272A
+Keyboard: has seperate "Shift Locke" and "Caps Lock" keys, "Clear" key (Ctrl-Clear to clear the screen),
+an "alpha" key and 18 function keys, it has no NumLock key.
+If you load the "tw" utility and press Ctrl-Alpha, you switch the computer into typewriter mode,
+and all typed text goes straight to the printer.
+
+DIP switches: 1    2    3    4    5    6    7    8    effect
+             OFF                                      load OS from floppy disk
+              ON                                      load OS from hard disk
+                       ON    ON                       128KB RAM
+                      OFF    ON                       256KB
+                       ON   OFF                       384KB
+                      OFF   OFF                       512KB
+                                  ON   ON             no monitor connected
+                                 OFF   ON             color graphics monitor 40x25
+                                  ON  OFF             color graphics monitor 80x25
+                                 OFF  OFF             monochrome screen connected
+                                           ON   ON    1 floppy disk drive
+                                          OFF   ON    2, other positions of switches 7 and 8 are not allowed
+*****************************************************************************/
+
+void pc_state::alphatp50(machine_config &config)
+{
+	/* basic machine hardware */
+	I80186(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc_state::pc16_map);
+	m_maincpu->set_addrmap(AS_IO, &pc_state::pc16_io);
+	downcast<i80186_cpu_device &>(*m_maincpu).set_irmx_irq_ack("mb:pic8259", FUNC(pic8259_device::inta_cb));
+
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
+
+	// FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false);
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+
+	/* keyboard */
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+
+	/* internal ram */
+	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("128K, 256K, 384K");
+
+	/* software lists */
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+}
+
+ROM_START( alphatp50 )
+	ROM_REGION16_LE(0x10000, "bios", 0)
+	ROMX_LOAD("pc50ii_even_103_16.4.87.bin", 0x8000, 0x4000, CRC(97067b5b) SHA1(260bdeb0a2640141d707eda7b55f2ad4e9c466cd), ROM_SKIP(1))
+	ROMX_LOAD("pc50ii_odd_104_16.4.87.bin", 0x8001, 0x4000, CRC(a628a056) SHA1(0ea6b1bcb8fe9cdf85a570df5fb169abfd5cbbe8), ROM_SKIP(1))
+ROM_END
+
+
+/********************************************************** Sanyo MBC-16LT ***
+Form factor: Laptop
+Motherboard ID: SPC-500B, ROM BIOS Version 1.03, at least a Version 1.06 exists as well
+CPU: i8088
+Yamaha V6366B-F (graphics), Toshiba T4770, Sanyo MB622110 16LT-Dual, VL82C50A-QC
+Mass storage: 2x3.5" DSDD floppy drives (720KB)
+DIP switches: one block of four DIP switches
+
+*****************************************************************************/
+
+void pc_state::mbc16lt(machine_config &config)
+{
+	pccga(config);
+
+	subdevice<isa8_slot_device>("isa1")->set_default_option("mda");
+	subdevice<isa8_slot_device>("isa2")->set_option_machine_config("fdc_xt", cfg_dual_720K);
+}
+
+ROM_START( mbc16lt ) // screen remains blank
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("fb1d4d.bin", 0xc000, 0x4000, CRC(476df338) SHA1(d04c3d0540de27781252bb70c7031a635e801433))
+
+	// NMC27C64Q EPROM next to a M5M80C49H MCU next to the keyboard connector
+	ROM_REGION(0x2000, "kbd", 0)
+	ROM_LOAD("fc2x.bin", 0x0000, 0x2000, NO_DUMP)
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -1779,11 +1911,14 @@ COMP( 198?, nms9100,        ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 1989, ssam88s,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Samsung",                         "Samtron 88S",           MACHINE_NOT_WORKING )
 COMP( 1988, sx16,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "SX-16",                 MACHINE_NOT_WORKING )
 COMP( 198?, mbc16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "MBC-16",                MACHINE_NOT_WORKING )
+COMP( 198?, mbc16lt,        ibm5150, 0,      mbc16lt,        pccga,    pc_state, empty_init,    "Sanyo",                           "MBC-16LT",              MACHINE_NOT_WORKING )
 COMP( 198?, spc400d,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "SPC-400D",              MACHINE_NOT_WORKING )
 COMP( 1992, iskr3104,       ibm5150, 0,      iskr3104,       pccga,    pc_state, empty_init,    "Schetmash",                       "Iskra 3104",            MACHINE_NOT_WORKING )
 COMP( 1985, sicpc1605,      ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Siemens",                         "Sicomp PC16-05",        MACHINE_NOT_WORKING )
 COMP( 1985, pc7000,         ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "Sharp",                           "PC-7000",               MACHINE_NOT_WORKING )
 COMP( 1987, to16,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Thomson SIMIV",                   "TO16",                  MACHINE_NOT_WORKING )
+COMP( 1985, alphatp10,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Triumph-Adler",                   "Alphatronic P10",       0 )
+COMP( 1985, alphatp50,      ibm5150, 0,      alphatp50,      pccga,    pc_state, empty_init,    "Triumph-Adler",                   "Alphatronic P50",       0 )
 COMP( 198?, hstrtpls,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Vendex",                          "HeadStart Plus",        MACHINE_NOT_WORKING )
 COMP( 1988, laser_turbo_xt, ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser Turbo XT",        0 )
 COMP( 1989, laser_xt3,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser XT/3",            0 )

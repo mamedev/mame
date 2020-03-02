@@ -30,4 +30,4 @@ public:
 	void set_right_column(disasm_right_column contents);
 };
 
-#endif
+#endif // MAME_DEBUGGER_WIN_DISASMVIEWINFO_H

@@ -1104,7 +1104,7 @@
 			<feature name="u2" value="U2 MBC1/1B/1B1" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="dmg-ax▯s-0.u1" size="262144" crc="b1fd41d0" sha1="b6cd446962357d0f560a5c9fae4c917e039fbb77" />
+				<rom name="dmg-axs-0.u1" size="262144" crc="b1fd41d0" sha1="b6cd446962357d0f560a5c9fae4c917e039fbb77" />
 			</dataarea>
 		</part>
 	</software>
@@ -17261,7 +17261,7 @@
 		</part>
 	</software>
 
-	<software name="pokepika">
+	<software name="pokepika" cloneof="pokeyell">
 		<description>Pocket Monsters - Pikachu (Japan, Rev. 3)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>

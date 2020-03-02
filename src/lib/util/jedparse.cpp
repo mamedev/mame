@@ -189,7 +189,7 @@ static void process_field(jed_data *data, const uint8_t *cursrc, const uint8_t *
 
 int jed_parse(const void *data, size_t length, jed_data *result)
 {
-	const uint8_t *cursrc = (const uint8_t *)data;
+	const auto *cursrc = (const uint8_t *)data;
 	const uint8_t *srcend = cursrc + length;
 	const uint8_t *scan;
 	jed_parse_info pinfo;
@@ -283,7 +283,7 @@ int jed_parse(const void *data, size_t length, jed_data *result)
 
 size_t jed_output(const jed_data *data, void *result, size_t length)
 {
-	uint8_t *curdst = (uint8_t *)result;
+	auto *curdst = (uint8_t *)result;
 	uint8_t *dstend = curdst + length;
 	int i, zeros, ones;
 	char tempbuf[256];
@@ -379,7 +379,7 @@ size_t jed_output(const jed_data *data, void *result, size_t length)
 
 int jedbin_parse(const void *data, size_t length, jed_data *result)
 {
-	const uint8_t *cursrc = (const uint8_t *)data;
+	const auto *cursrc = (const uint8_t *)data;
 
 	/* initialize the output */
 	memset(result, 0, sizeof(*result));
@@ -424,7 +424,7 @@ int jedbin_parse(const void *data, size_t length, jed_data *result)
 
 size_t jedbin_output(const jed_data *data, void *result, size_t length)
 {
-	uint8_t *curdst = (uint8_t *)result;
+	auto *curdst = (uint8_t *)result;
 
 	/* ensure we have enough room */
 	if (length >= 4 + (data->numfuses + 7) / 8)

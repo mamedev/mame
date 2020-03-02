@@ -264,6 +264,7 @@ void s3c44b0_device::device_start()
 	m_data_r_cb.resolve_safe(0);
 	m_data_w_cb.resolve();
 
+	m_cache = m_cpu->space(AS_PROGRAM).cache<2, 0, ENDIANNESS_LITTLE>();
 
 	for (int i = 0; i < 6; i++) m_pwm.timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::pwm_timer_exp),this));
 	for (auto & elem : m_uart) elem.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::uart_timer_exp),this));
@@ -536,27 +537,25 @@ void s3c44b0_device::lcd_dma_init()
 
 void s3c44b0_device::lcd_dma_read(int count, uint8_t *data)
 {
-	address_space &space = m_cpu->space(AS_PROGRAM);
-	uint8_t *vram = (uint8_t *)space.get_read_ptr(m_lcd.vramaddr_cur);
 	for (int i = 0; i < count / 2; i++)
 	{
 		if (m_lcd.bswp == 0)
 		{
 			if ((m_lcd.vramaddr_cur & 2) == 0)
 			{
-				data[0] = *(vram + 3);
-				data[1] = *(vram + 2);
+				data[0] = m_cache->read_byte(m_lcd.vramaddr_cur + 3);
+				data[1] = m_cache->read_byte(m_lcd.vramaddr_cur + 2);
 			}
 			else
 			{
-				data[0] = *(vram - 1);
-				data[1] = *(vram - 2);
+				data[0] = m_cache->read_byte(m_lcd.vramaddr_cur - 1);
+				data[1] = m_cache->read_byte(m_lcd.vramaddr_cur - 2);
 			}
 		}
 		else
 		{
-			data[0] = *(vram + 0);
-			data[1] = *(vram + 1);
+			data[0] = m_cache->read_byte(m_lcd.vramaddr_cur + 0);
+			data[1] = m_cache->read_byte(m_lcd.vramaddr_cur + 1);
 		}
 		m_lcd.vramaddr_cur += 2;
 		m_lcd.pagewidth_cur++;
@@ -568,11 +567,6 @@ void s3c44b0_device::lcd_dma_read(int count, uint8_t *data)
 				lcd_dma_reload();
 			}
 			m_lcd.pagewidth_cur = 0;
-			vram = (uint8_t *)space.get_read_ptr(m_lcd.vramaddr_cur);
-		}
-		else
-		{
-			vram += 2;
 		}
 		data += 2;
 	}

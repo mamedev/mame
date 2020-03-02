@@ -25,27 +25,27 @@ public:
 	sega_315_5296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	auto in_pa_callback() { return m_in_pa_cb.bind(); }
-	auto in_pb_callback() { return m_in_pb_cb.bind(); }
-	auto in_pc_callback() { return m_in_pc_cb.bind(); }
-	auto in_pd_callback() { return m_in_pd_cb.bind(); }
-	auto in_pe_callback() { return m_in_pe_cb.bind(); }
-	auto in_pf_callback() { return m_in_pf_cb.bind(); }
-	auto in_pg_callback() { return m_in_pg_cb.bind(); }
-	auto in_ph_callback() { return m_in_ph_cb.bind(); }
+	auto in_pa_callback() { return m_in_port_cb[0].bind(); }
+	auto in_pb_callback() { return m_in_port_cb[1].bind(); }
+	auto in_pc_callback() { return m_in_port_cb[2].bind(); }
+	auto in_pd_callback() { return m_in_port_cb[3].bind(); }
+	auto in_pe_callback() { return m_in_port_cb[4].bind(); }
+	auto in_pf_callback() { return m_in_port_cb[5].bind(); }
+	auto in_pg_callback() { return m_in_port_cb[6].bind(); }
+	auto in_ph_callback() { return m_in_port_cb[7].bind(); }
 
-	auto out_pa_callback() { return m_out_pa_cb.bind(); }
-	auto out_pb_callback() { return m_out_pb_cb.bind(); }
-	auto out_pc_callback() { return m_out_pc_cb.bind(); }
-	auto out_pd_callback() { return m_out_pd_cb.bind(); }
-	auto out_pe_callback() { return m_out_pe_cb.bind(); }
-	auto out_pf_callback() { return m_out_pf_cb.bind(); }
-	auto out_pg_callback() { return m_out_pg_cb.bind(); }
-	auto out_ph_callback() { return m_out_ph_cb.bind(); }
+	auto out_pa_callback() { return m_out_port_cb[0].bind(); }
+	auto out_pb_callback() { return m_out_port_cb[1].bind(); }
+	auto out_pc_callback() { return m_out_port_cb[2].bind(); }
+	auto out_pd_callback() { return m_out_port_cb[3].bind(); }
+	auto out_pe_callback() { return m_out_port_cb[4].bind(); }
+	auto out_pf_callback() { return m_out_port_cb[5].bind(); }
+	auto out_pg_callback() { return m_out_port_cb[6].bind(); }
+	auto out_ph_callback() { return m_out_port_cb[7].bind(); }
 
-	auto out_cnt0_callback() { return m_out_cnt0_cb.bind(); }
-	auto out_cnt1_callback() { return m_out_cnt1_cb.bind(); }
-	auto out_cnt2_callback() { return m_out_cnt2_cb.bind(); }
+	auto out_cnt0_callback() { return m_out_cnt_cb[0].bind(); }
+	auto out_cnt1_callback() { return m_out_cnt_cb[1].bind(); }
+	auto out_cnt2_callback() { return m_out_cnt_cb[2].bind(); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -58,31 +58,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	devcb_read8 m_in_pa_cb;
-	devcb_read8 m_in_pb_cb;
-	devcb_read8 m_in_pc_cb;
-	devcb_read8 m_in_pd_cb;
-	devcb_read8 m_in_pe_cb;
-	devcb_read8 m_in_pf_cb;
-	devcb_read8 m_in_pg_cb;
-	devcb_read8 m_in_ph_cb;
-
-	devcb_write8 m_out_pa_cb;
-	devcb_write8 m_out_pb_cb;
-	devcb_write8 m_out_pc_cb;
-	devcb_write8 m_out_pd_cb;
-	devcb_write8 m_out_pe_cb;
-	devcb_write8 m_out_pf_cb;
-	devcb_write8 m_out_pg_cb;
-	devcb_write8 m_out_ph_cb;
-
-	devcb_write_line m_out_cnt0_cb;
-	devcb_write_line m_out_cnt1_cb;
-	devcb_write_line m_out_cnt2_cb;
-
-	devcb_read8 *m_in_port_cb[8];
-	devcb_write8 *m_out_port_cb[8];
-	devcb_write_line *m_out_cnt_cb[3];
+	devcb_read8::array<8> m_in_port_cb;
+	devcb_write8::array<8> m_out_port_cb;
+	devcb_write_line::array<3> m_out_cnt_cb;
 
 	uint8_t m_output_latch[8];
 	uint8_t m_cnt;

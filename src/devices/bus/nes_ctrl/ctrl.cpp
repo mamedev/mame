@@ -212,13 +212,3 @@ void fc_expansion_devices(device_slot_interface &device)
 	device.option_add("barcode_battler", NES_BARCODE_BATTLER);
 	device.option_add("subor_keyboard", NES_SUBORKEYBOARD);
 }
-
-void majesco_control_port1_devices(device_slot_interface &device)
-{
-	device.option_add("ddr", NES_VT_MAJESCO_DDR);
-}
-
-void majesco_control_port2_devices(device_slot_interface &device)
-{
-	// nothing?
-}

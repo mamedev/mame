@@ -98,9 +98,9 @@ upd71071_device::upd71071_device(const machine_config &mconfig, const char *tag,
 	, m_upd_clock(0)
 	, m_out_hreq_cb(*this)
 	, m_out_eop_cb(*this)
-	, m_dma_read_cb{ {*this}, {*this}, {*this}, {*this} }
-	, m_dma_write_cb{ {*this}, {*this}, {*this}, {*this} }
-	, m_out_dack_cb{ {*this}, {*this}, {*this}, {*this} }
+	, m_dma_read_cb(*this)
+	, m_dma_write_cb(*this)
+	, m_out_dack_cb(*this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -113,12 +113,9 @@ void upd71071_device::device_start()
 {
 	m_out_hreq_cb.resolve_safe();
 	m_out_eop_cb.resolve_safe();
-	for (auto &cb : m_dma_read_cb)
-		cb.resolve_safe(0);
-	for (auto &cb : m_dma_write_cb)
-		cb.resolve_safe();
-	for (auto &cb : m_out_dack_cb)
-		cb.resolve_safe();
+	m_dma_read_cb.resolve_all_safe(0);
+	m_dma_write_cb.resolve_all_safe();
+	m_out_dack_cb.resolve_all_safe();
 	for (auto &elem : m_timer)
 		elem = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd71071_device::dma_transfer_timer), this));
 	m_selected_channel = 0;

@@ -1109,16 +1109,24 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 	}
 
 	off += line * linesize;
-	off &= ~0x01;
+	off &= ~1;
 
 	for(x=rect->min_x;x<rect->max_x;x+=hzoom)
 	{
+		int offpage;
+		int curoff;
 		if(m_video.towns_video_reg[0] & 0x10)
-			off &= 0x3ffff;  // 2 layers
+		{
+			curoff = off & 0x3ffff;
+			offpage = layer;
+		}
 		else
-			off &= 0x7ffff;  // 1 layer
-		colour = (m_towns_gfxvram[off+(layer*0x40000)+1] << 8) | m_towns_gfxvram[off+(layer*0x40000)];
-		if(colour < 0x8000 || !(m_video.towns_video_reg[0] & 0x10))
+		{
+			offpage = (off & 4) >> 2;
+			curoff = ((off & 0x7fff8) >> 1) | (off & 3);
+		}
+		colour = (m_towns_gfxvram[curoff+(offpage*0x40000)+1] << 8) | m_towns_gfxvram[curoff+(offpage*0x40000)];
+		if(colour < 0x8000)
 		{
 			for (pixel = 0; pixel < hzoom; pixel++)
 				bitmap.pix32(scanline, x+pixel) =

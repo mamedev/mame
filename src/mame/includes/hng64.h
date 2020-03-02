@@ -152,7 +152,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	devcb_write8  m_lamps_out_cb[8];
+	devcb_write8::array<8> m_lamps_out_cb;
 };
 
 

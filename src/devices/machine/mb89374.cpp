@@ -99,12 +99,12 @@ enum
 //  mb89374_device - constructor
 //-------------------------------------------------
 
-mb89374_device::mb89374_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: device_t(mconfig, MB89374, tag, owner, clock),
+mb89374_device::mb89374_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock ) :
+	device_t(mconfig, MB89374, tag, owner, clock),
 	device_execute_interface(mconfig, *this),
 	m_icount(0),
 	m_out_irq_cb(*this),
-	m_out_po_cb{ { *this }, { *this }, { *this }, { *this } }
+	m_out_po_cb(*this)
 {
 	// prepare localhost "filename"
 	m_localhost[0] = 0;
@@ -133,8 +133,7 @@ void mb89374_device::device_start()
 
 	// resolve callbacks
 	m_out_irq_cb.resolve_safe();
-	for(auto &cb : m_out_po_cb)
-		cb.resolve_safe();
+	m_out_po_cb.resolve_all_safe();
 
 	// state saving
 	save_item(NAME(m_irq));

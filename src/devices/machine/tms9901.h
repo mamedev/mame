@@ -163,7 +163,7 @@ private:
 	devcb_read8        m_read_port;
 
 	// I/O lines, used for output. When used as inputs, the levels are delivered via the m_read_block
-	devcb_write_line   m_write_p[16];
+	devcb_write_line::array<16> m_write_p;
 
 	// INTREQ pin
 	devcb_write_line   m_interrupt;

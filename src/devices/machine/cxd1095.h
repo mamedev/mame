@@ -75,8 +75,8 @@ protected:
 
 private:
 	// input/output callbacks
-	devcb_read8         m_input_cb[5];
-	devcb_write8        m_output_cb[5];
+	devcb_read8::array<5> m_input_cb;
+	devcb_write8::array<5> m_output_cb;
 
 	// internal state
 	u8                  m_data_latch[5];

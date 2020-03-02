@@ -254,10 +254,14 @@ ROM_START( lexiseal )
 	ROM_LOAD16_WORD_SWAP( "lexibook_seal.bin", 0x0000, 0x1000000, CRC(3529f154) SHA1(f5f142600c6b2d037b97e007364ea2fa228e0163) )
 ROM_END
 
-
+ROM_START( discpal )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "disneyhh.bin", 0x0000, 0x400000, CRC(5fb7f32e) SHA1(795c992826ad4ac66d5438207f1c9b48f9fadc44) )
+ROM_END
 
 
 // Similar, SPG260?, scrambled
 CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_lexiseal_game_state, init_zeus, "Lexibook", "Zeus IG900 20-in-1 (US?)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
 CONS( 200?, lexiseal,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Lexibook / Sit Up Limited", "Seal 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // also has bad sound in Tiger Rescue, but no corrupt tilemap
-
+CONS( 200?, discpal,     0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Performance Designed Products / Disney / Jungle Soft", "Disney Game It! Classic Pals",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// there was also a Game It! Princess Pals

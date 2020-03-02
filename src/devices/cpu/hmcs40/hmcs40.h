@@ -175,9 +175,9 @@ protected:
 	u8 m_r[8];          // R outputs state
 	u16 m_d;            // D pins state
 
-	// i/o handlers
-	devcb_read8 m_read_r[8];
-	devcb_write8 m_write_r[8];
+	// I/O handlers
+	devcb_read8::array<8> m_read_r;
+	devcb_write8::array<8> m_write_r;
 	devcb_read16 m_read_d;
 	devcb_write16 m_write_d;
 

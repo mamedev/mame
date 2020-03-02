@@ -13,6 +13,43 @@
 #include "machine/idectrl.h"
 #include "machine/gdrom.h"
 
+// For ide gdrom controller
+
+class idegdrom_device : public pci_device {
+public:
+	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *image_tag, const char *space_tag, int space_id);
+	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	auto irq_callback() { return irq_cb.bind(); }
+
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	void map_command(address_map &map);
+	void map_control(address_map &map);
+	void map_dma(address_map &map);
+
+	DECLARE_READ32_MEMBER(ide_cs0_r);
+	DECLARE_READ32_MEMBER(ide_cs1_r);
+	DECLARE_WRITE32_MEMBER(ide_cs0_w);
+	DECLARE_WRITE32_MEMBER(ide_cs1_w);
+	DECLARE_WRITE_LINE_MEMBER(ide_irq);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+
+private:
+	required_device<bus_master_ide_controller_device> m_ide;
+	devcb_write_line irq_cb;
+	const char *space_owner_tag;
+	int space_owner_id;
+};
+
+DECLARE_DEVICE_TYPE(IDE_GDROM, idegdrom_device)
+
 class naomi_gdrom_board : public naomi_board
 {
 public:
@@ -36,7 +73,7 @@ public:
 	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void submap(address_map& map) override;
+	virtual void submap(address_map &map) override;
 	void sh4_map(address_map &map);
 	void sh4_io_map(address_map &map);
 	void pic_map(address_map &map);
@@ -87,14 +124,10 @@ public:
 	DECLARE_READ8_MEMBER(pic_dimm_r);
 	DECLARE_WRITE8_MEMBER(pic_dimm_w);
 
-	DECLARE_READ32_MEMBER(ide_cs0_r);
-	DECLARE_READ32_MEMBER(ide_cs1_r);
-	DECLARE_WRITE32_MEMBER(ide_cs0_w);
-	DECLARE_WRITE32_MEMBER(ide_cs1_w);
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	virtual void board_setup_address(uint32_t address, bool is_dma) override;
 	virtual void board_get_buffer(uint8_t *&base, uint32_t &limit) override;
@@ -102,7 +135,7 @@ protected:
 
 private:
 	enum { FILENAME_LENGTH=24 };
-	const int work_mode = 0; // set to 1 and rebuild to enable the cpus
+	int work_mode; // set it different from 0 to enable the cpus and full dimm board emulation
 
 	required_device<sh4_device> m_maincpu;
 	required_device<pic16c622_device> m_securitycpu;
@@ -110,7 +143,8 @@ private:
 	required_device<i2cmem_device> m_i2c1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<sega_315_6154_device> m_315_6154;
-	required_device<bus_master_ide_controller_device> m_ide;
+	required_device<idegdrom_device> m_idegdrom;
+	required_ioport m_debug_dipswitches;
 
 	const char *image_tag;
 	optional_region_ptr<uint8_t> picdata;
@@ -158,5 +192,6 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(NAOMI_GDROM_BOARD, naomi_gdrom_board)
+
 
 #endif // MAME_MACHINE_NAOMIGD_H

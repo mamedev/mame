@@ -222,7 +222,7 @@ bool validity_checker::check_all_matching(const char *string)
 	bool validated_any = false;
 	while (m_drivlist.next())
 	{
-		if (m_drivlist.matches(string, m_drivlist.driver().name))
+		if (driver_list::matches(string, m_drivlist.driver().name))
 		{
 			validate_one(m_drivlist.driver());
 			validated_any = true;
@@ -1418,8 +1418,8 @@ void validity_checker::validate_driver()
 
 	// determine if we are a clone
 	bool is_clone = (strcmp(m_current_driver->parent, "0") != 0);
-	int clone_of = m_drivlist.clone(*m_current_driver);
-	if (clone_of != -1 && (m_drivlist.driver(clone_of).flags & machine_flags::IS_BIOS_ROOT))
+	int clone_of = driver_list::clone(*m_current_driver);
+	if (clone_of != -1 && (driver_list::driver(clone_of).flags & machine_flags::IS_BIOS_ROOT))
 		is_clone = false;
 
 	// if we have at least 100 drivers, validate the clone
@@ -1428,11 +1428,11 @@ void validity_checker::validate_driver()
 		osd_printf_error("Driver is a clone of nonexistent driver %s\n", m_current_driver->parent);
 
 	// look for recursive cloning
-	if (clone_of != -1 && &m_drivlist.driver(clone_of) == m_current_driver)
+	if (clone_of != -1 && &driver_list::driver(clone_of) == m_current_driver)
 		osd_printf_error("Driver is a clone of itself\n");
 
 	// look for clones that are too deep
-	if (clone_of != -1 && (clone_of = m_drivlist.non_bios_clone(clone_of)) != -1)
+	if (clone_of != -1 && (clone_of = driver_list::non_bios_clone(clone_of)) != -1)
 		osd_printf_error("Driver is a clone of a clone\n");
 
 	// make sure the driver name is not too long
@@ -1463,16 +1463,16 @@ void validity_checker::validate_driver()
 		compatible_with = nullptr;
 
 	// check for this driver being compatible with a nonexistent driver
-	if (compatible_with != nullptr && m_drivlist.find(m_current_driver->compatible_with) == -1)
+	if (compatible_with != nullptr && driver_list::find(m_current_driver->compatible_with) == -1)
 		osd_printf_error("Driver is listed as compatible with nonexistent driver %s\n", m_current_driver->compatible_with);
 
 	// check for clone_of and compatible_with being specified at the same time
-	if (m_drivlist.clone(*m_current_driver) != -1 && compatible_with != nullptr)
+	if (driver_list::clone(*m_current_driver) != -1 && compatible_with != nullptr)
 		osd_printf_error("Driver cannot be both a clone and listed as compatible with another system\n");
 
 	// find any recursive dependencies on the current driver
-	for (int other_drv = m_drivlist.compatible_with(*m_current_driver); other_drv != -1; other_drv = m_drivlist.compatible_with(other_drv))
-		if (m_current_driver == &m_drivlist.driver(other_drv))
+	for (int other_drv = driver_list::compatible_with(*m_current_driver); other_drv != -1; other_drv = driver_list::compatible_with(other_drv))
+		if (m_current_driver == &driver_list::driver(other_drv))
 		{
 			osd_printf_error("Driver is recursively compatible with itself\n");
 			break;

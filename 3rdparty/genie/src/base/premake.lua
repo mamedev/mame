@@ -52,7 +52,7 @@
 			end
 
 			if delta then
-				printf("Generating %s...", filename)
+				printf("Generating %q", filename)
 				local f, err = io.open(filename, "wb")
 				if (not f) then
 					error(err, 0)
@@ -67,7 +67,7 @@
 				premake.stats.num_skipped = premake.stats.num_skipped + 1
 			end
 		else
-			printf("Generating %s...", filename)
+			printf("Generating %q", filename)
 
 			local f, err = io.open(filename, "wb")
 			if (not f) then

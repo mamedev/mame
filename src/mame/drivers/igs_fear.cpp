@@ -101,7 +101,7 @@ void igs_fear_state::igs_fear(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ics2115_device &ics(ICS2115(config, "ics", 0));
+	ics2115_device &ics(ICS2115(config, "ics", 33.8688_MHz_XTAL)); // TODO : Correct?
 	ics.irq().set(FUNC(igs_fear_state::sound_irq));
 	ics.add_route(ALL_OUTPUTS, "mono", 5.0);
 }

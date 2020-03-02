@@ -39,11 +39,11 @@ private:
 
 	required_device<cpu_device> m_nmicpu;
 
-	devcb_read8 m_read[4];
+	devcb_read8::array<4> m_read;
 
-	devcb_write_line m_readreq[4];
+	devcb_write_line::array<4> m_readreq;
 
-	devcb_write8 m_write[4];
+	devcb_write8::array<4> m_write;
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_06XX, namco_06xx_device)

@@ -54,12 +54,12 @@ protected:
 
 private:
 	// input/output callbacks
-	devcb_read8         m_input_cb[8];
-	devcb_write8        m_output_cb[8];
+	devcb_read8::array<8> m_input_cb;
+	devcb_write8::array<8> m_output_cb;
 
 	// internal state
-	u8                  m_data_latch[8];
-	u8                  m_data_dir[8];
+	u8 m_data_latch[8];
+	u8 m_data_dir[8];
 };
 
 // device type definition

@@ -9,7 +9,7 @@ Shot Rider                 (c) 1984 Seibu Kaihatsu / Sigma
 driver by
 Lee Taylor
 John Clegg
-Tomasz Slanina  dox@space.pl
+Tomasz Slanina
 
 Notes:
 - I haven't understood how char/sprite priority works. This is used for

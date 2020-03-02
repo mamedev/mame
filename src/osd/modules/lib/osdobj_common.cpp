@@ -475,7 +475,7 @@ void osd_common_t::init(running_machine &machine)
 
 	m_machine = &machine;
 
-	osd_options &options = downcast<osd_options &>(machine.options());
+	auto &options = downcast<osd_options &>(machine.options());
 	// extract the verbose printing option
 	if (options.verbose())
 		set_verbose(true);
@@ -654,7 +654,7 @@ bool osd_common_t::execute_command(const char *command)
 	else if (strcmp(command, OSDCOMMAND_LIST_MIDI_DEVICES) == 0)
 	{
 		osd_module *om = select_module_options(options(), OSD_MIDI_PROVIDER);
-		midi_module *pm = select_module_options<midi_module *>(options(), OSD_MIDI_PROVIDER);
+		auto *pm = select_module_options<midi_module *>(options(), OSD_MIDI_PROVIDER);
 
 		if (om->probe())
 		{

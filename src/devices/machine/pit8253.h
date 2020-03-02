@@ -144,7 +144,7 @@ protected:
 	virtual void readback_command(uint8_t data);
 
 	double m_clk[3];
-	devcb_write_line m_out_handler[3];
+	devcb_write_line::array<3> m_out_handler;
 
 	required_device_array<pit_counter_device, 3> m_counter;
 

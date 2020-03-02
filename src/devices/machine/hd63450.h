@@ -22,8 +22,8 @@ public:
 
 	auto irq_callback() { return m_irq_callback.bind(); }
 	auto dma_end() { return m_dma_end.bind(); }
-	template<int Ch> auto dma_read() { return m_dma_read[Ch].bind(); }
-	template<int Ch> auto dma_write() { return m_dma_write[Ch].bind(); }
+	template <int Ch> auto dma_read() { return m_dma_read[Ch].bind(); }
+	template <int Ch> auto dma_write() { return m_dma_write[Ch].bind(); }
 
 	template <typename T> void set_cpu_tag(T &&cpu_tag) { m_cpu.set_tag(std::forward<T>(cpu_tag)); }
 	void set_clocks(const attotime &clk1, const attotime &clk2, const attotime &clk3, const attotime &clk4)
@@ -82,8 +82,8 @@ private:
 
 	devcb_write_line m_irq_callback;
 	devcb_write8 m_dma_end;
-	devcb_read8 m_dma_read[4];
-	devcb_write8 m_dma_write[4];
+	devcb_read8::array<4> m_dma_read;
+	devcb_write8::array<4> m_dma_write;
 
 	attotime m_our_clock[4];
 	attotime m_burst_clock[4];

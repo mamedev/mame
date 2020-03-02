@@ -429,9 +429,9 @@ am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, 
 		m_out_eop_cb(*this),
 		m_in_memr_cb(*this),
 		m_out_memw_cb(*this),
-		m_in_ior_cb{ { *this }, { *this }, { *this }, { *this } },
-		m_out_iow_cb{ { *this }, { *this }, { *this }, { *this } },
-		m_out_dack_cb{ { *this }, { *this }, { *this }, { *this } }
+		m_in_ior_cb(*this),
+		m_out_iow_cb(*this),
+		m_out_dack_cb(*this)
 {
 }
 
@@ -445,8 +445,8 @@ v5x_dmau_device::v5x_dmau_device(const machine_config &mconfig, const char *tag,
 	: am9517a_device(mconfig, V5X_DMAU, tag, owner, clock)
 	, m_in_mem16r_cb(*this)
 	, m_out_mem16w_cb(*this)
-	, m_in_io16r_cb{ { *this },{ *this },{ *this },{ *this } }
-	, m_out_io16w_cb{ { *this },{ *this },{ *this },{ *this } }
+	, m_in_io16r_cb(*this)
+	, m_out_io16w_cb(*this)
 
 {
 }
@@ -470,12 +470,9 @@ void am9517a_device::device_start()
 	m_out_eop_cb.resolve_safe();
 	m_in_memr_cb.resolve_safe(0);
 	m_out_memw_cb.resolve_safe();
-	for(auto &cb : m_in_ior_cb)
-		cb.resolve_safe(0);
-	for(auto &cb : m_out_iow_cb)
-		cb.resolve_safe();
-	for(auto &cb : m_out_dack_cb)
-		cb.resolve_safe();
+	m_in_ior_cb.resolve_all_safe(0);
+	m_out_iow_cb.resolve_all_safe();
+	m_out_dack_cb.resolve_all_safe();
 
 	for(auto &elem : m_channel)
 	{
@@ -1000,10 +997,8 @@ void v5x_dmau_device::device_start()
 
 	m_in_mem16r_cb.resolve_safe(0);
 	m_out_mem16w_cb.resolve_safe();
-	for (auto &cb : m_in_io16r_cb)
-		cb.resolve_safe(0);
-	for (auto &cb : m_out_io16w_cb)
-		cb.resolve_safe();
+	m_in_io16r_cb.resolve_all_safe(0);
+	m_out_io16w_cb.resolve_all_safe();
 
 	m_selected_channel = 0;
 	m_base = 0;

@@ -28,7 +28,7 @@
 
     TODO:
      - currently implemented very basic set of Q2SD GPU features, required/used by dumped games, should be improved if more games will be found.
-     - hook IRQs from GPU and SPU (not used by dumped games)
+     - hook IRQs from GPU and SPU (not used by dumped games), possible controlled by one write registers in 140010xx area.
 
     Notes:
      - hold Test + Service while booting to initialise RTC NVRAM
@@ -105,6 +105,7 @@ protected:
 	DECLARE_WRITE64_MEMBER(portc_medal_w);
 	DECLARE_READ64_MEMBER(porte_r);
 	DECLARE_WRITE64_MEMBER(porte_w);
+	DECLARE_WRITE64_MEMBER(porte_medal_w);
 	DECLARE_READ16_MEMBER(dipsw_r);
 	u8 m_portc_data = 0xff;
 	u8 m_porte_data = 0xff;
@@ -256,16 +257,30 @@ READ64_MEMBER(gsan_state::portc_r)
 }
 WRITE64_MEMBER(gsan_state::portc_w)
 {
+/* DDR
+    ---- x--- /Coin counter
+    --x- ---- Start button lamp
+    -x-- ---- Right button lamp
+    x--- ---- Left button lamp
+*/
 	m_portc_data = data;
-	// TODO
+
+	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 WRITE64_MEMBER(gsan_state::portc_medal_w)
 {
+/* Medal
+    ---- ---x Medal in counter
+    ---- --x- 100Y in counter
+    ---- -x-- 10Y in counter
+    x--- ---- Hopper
+*/
 	m_portc_data = data;
 
 	m_hopper->motor_w(data & 0x80);
 	machine().bookkeeping().coin_counter_w(0, data & 4);
-	machine().bookkeeping().coin_counter_w(1, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_counter_w(2, data & 1);
 }
 READ64_MEMBER(gsan_state::porte_r)
 {
@@ -273,13 +288,29 @@ READ64_MEMBER(gsan_state::porte_r)
 }
 WRITE64_MEMBER(gsan_state::porte_w)
 {
-	// lamps
-#if 0
-	u8 mask = m_porte_data ^ data;
-	if (mask)
-		logerror("PORT_E mask %02X val %02X\n", mask, data & mask);
-#endif
+/* DDR
+    ---- -x-- Lamp R3
+    ---- x--- Lamp R2
+    ---x ---- Lamp R1
+    --x- ---- Lamp L3
+    -x-- ---- Lamp L2
+    x--- ---- Lamp L1
+*/
 	m_porte_data = data;
+}
+WRITE64_MEMBER(gsan_state::porte_medal_w)
+{
+/* Medal
+    ---- ---x Medal in lock
+    ---- --x- 100Y in lock
+    ---- -x-- 10Y in lock
+    -x-- ---- Button lamp
+*/
+	m_porte_data = data;
+
+	machine().bookkeeping().coin_lockout_w(0, data & 4);
+	machine().bookkeeping().coin_lockout_w(1, data & 2);
+	machine().bookkeeping().coin_lockout_w(2, data & 1);
 }
 
 
@@ -770,6 +801,7 @@ void gsan_state::main_port_medal(address_map &map)
 {
 	main_port(map);
 	map(SH3_PORT_C, SH3_PORT_C + 7).rw(FUNC(gsan_state::portc_r), FUNC(gsan_state::portc_medal_w));
+	map(SH3_PORT_E, SH3_PORT_E + 7).rw(FUNC(gsan_state::porte_r), FUNC(gsan_state::porte_medal_w));
 }
 
 void gsan_state::ymz280b_map_medal(address_map &map)

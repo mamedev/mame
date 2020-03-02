@@ -523,7 +523,7 @@ void windows_osd_interface::init(running_machine &machine)
 	osd_common_t::init(machine);
 
 	const char *stemp;
-	windows_options &options = downcast<windows_options &>(machine.options());
+	auto &options = downcast<windows_options &>(machine.options());
 
 	// determine if we are benchmarking, and adjust options appropriately
 	int bench = options.bench();

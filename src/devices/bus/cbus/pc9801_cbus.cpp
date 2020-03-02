@@ -57,7 +57,7 @@ pc9801_slot_device::pc9801_slot_device(const machine_config &mconfig, const char
 	device_slot_interface(mconfig, *this),
 	m_memspace(*this, finder_base::DUMMY_TAG, -1),
 	m_iospace(*this, finder_base::DUMMY_TAG, -1),
-	m_int_callback{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	m_int_callback(*this)
 {
 }
 
@@ -82,8 +82,7 @@ void pc9801_slot_device::device_config_complete()
 
 void pc9801_slot_device::device_resolve_objects()
 {
-	for (auto &cb : m_int_callback)
-		cb.resolve_safe();
+	m_int_callback.resolve_all_safe();
 }
 
 

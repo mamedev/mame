@@ -103,7 +103,7 @@ private:
 
 	devcb_read8 m_dio_read_func;
 	devcb_write8 m_dio_write_func;
-	devcb_write_line m_signal_wr_fns[ PHI_488_SIGNAL_COUNT ];
+	devcb_write_line::array<PHI_488_SIGNAL_COUNT> m_signal_wr_fns;
 	devcb_write_line m_int_write_func;
 	devcb_write_line m_dmarq_write_func;
 	devcb_read_line m_sys_cntrl_read_func;

@@ -158,25 +158,27 @@ void berlin_state::berlinp(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( berl16 )
+ROM_START( berl16 ) // B003 8C60 CA47
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS( 0, "v003", "V0.03" ) // B003 8C60 CA47
-	ROMX_LOAD("berlin_68000_even.bin",     0x00000, 0x10000, CRC(31337f15) SHA1(0dcacb153a6f8376e6f1c2f3e57e60aad4370740), ROM_SKIP(1) | ROM_BIOS(0) )
-	ROMX_LOAD("berlin_68000_odd_b003.bin", 0x00001, 0x10000, CRC(cc146819) SHA1(e4b2c6e496eff4a657a0718be292f563fb4e5688), ROM_SKIP(1) | ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "v002", "V0.02" ) // B002 8C59 CA47
-	ROMX_LOAD("berlin_68000_even.bin",     0x00000, 0x10000, CRC(31337f15) SHA1(0dcacb153a6f8376e6f1c2f3e57e60aad4370740), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROMX_LOAD("berlin_68000_odd_b002.bin", 0x00001, 0x10000, CRC(513a95f2) SHA1(cbaef0078a119163577e76a78b2110939b17be6b), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_LOAD16_BYTE("berlin_68000_even.bin",     0x00000, 0x10000, CRC(31337f15) SHA1(0dcacb153a6f8376e6f1c2f3e57e60aad4370740) )
+	ROM_LOAD16_BYTE("berlin_68000_odd_b003.bin", 0x00001, 0x10000, CRC(cc146819) SHA1(e4b2c6e496eff4a657a0718be292f563fb4e5688) )
 ROM_END
 
-ROM_START( berlinp ) // B400 8AA1 E785
-	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD("berlin_020_v400.u2", 0x00000, 0x40000, CRC(82fbaf6e) SHA1(729b7cef3dfaecc4594a6178fc4ba6015afa6202) )
+ROM_START( berl16a ) // B002 8C59 CA47
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("berlin_68000_even.bin",     0x00000, 0x10000, CRC(31337f15) SHA1(0dcacb153a6f8376e6f1c2f3e57e60aad4370740) )
+	ROM_LOAD16_BYTE("berlin_68000_odd_b002.bin", 0x00001, 0x10000, CRC(513a95f2) SHA1(cbaef0078a119163577e76a78b2110939b17be6b) )
 ROM_END
 
 ROM_START( berl16l ) // B500 ABD5 CA47
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("berlin_68000_london_even.bin", 0x00000, 0x10000, CRC(0ccddbc6) SHA1(90effdc9f2811a24d450b74ccfb24995ce896b86) )
 	ROM_LOAD16_BYTE("berlin_68000_london_odd.bin",  0x00001, 0x10000, CRC(5edac658) SHA1(18ebebc5ceffd9a01798d8a3709875120bd096f7) )
+ROM_END
+
+ROM_START( berlinp ) // B400 8AA1 E785
+	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
+	ROM_LOAD("berlin_020_v400.u2", 0x00000, 0x40000, CRC(82fbaf6e) SHA1(729b7cef3dfaecc4594a6178fc4ba6015afa6202) )
 ROM_END
 
 ROM_START( berlinpl ) // B500 53CA 3DCE
@@ -191,7 +193,9 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY             FULLNAME                                  FLAGS */
-CONS( 1992, berl16,   0,       0,      berlin,  berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin 68000",                  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1994, berlinp,  0,       0,      berlinp, berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin Professional 68020",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1992, berl16,   0,       0,      berlin,  berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin 68000 (v0.03)",          MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1992, berl16a,  berl16,  0,      berlin,  berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin 68000 (v0.02)",          MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1996, berl16l,  berl16,  0,      berlin,  berlin, berlin_state, empty_init, "Richard Lang",     "Mephisto Berlin 68000 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1994, berlinp,  0,       0,      berlinp, berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin Professional 68020",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1996, berlinpl, berlinp, 0,      berlinp, berlin, berlin_state, empty_init, "Richard Lang",     "Mephisto Berlin Professional 68020 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

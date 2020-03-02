@@ -138,6 +138,8 @@ CPUS["HPC"] = true
 --CPUS["BCP"] = true
 --CPUS["CR16B"] = true
 CPUS["FR"] = true
+CPUS["UPD78K"] = true
+CPUS["KS0164"] = true
 
 --------------------------------------------------
 -- specify available sound cores
@@ -3391,6 +3393,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/y2.cpp",
 	MAME_DIR .. "src/mame/video/powervr2.cpp",
 	MAME_DIR .. "src/mame/video/powervr2.h",
+	MAME_DIR .. "src/mame/machine/gunsense.cpp",
+	MAME_DIR .. "src/mame/machine/gunsense.h",
 	MAME_DIR .. "src/mame/machine/naomi.cpp",
 	MAME_DIR .. "src/mame/machine/naomig1.cpp",
 	MAME_DIR .. "src/mame/machine/naomig1.h",
@@ -5007,8 +5011,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/wms.cpp",
 	MAME_DIR .. "src/mame/drivers/xtom3d.cpp",
 	MAME_DIR .. "src/mame/drivers/xyonix.cpp",
-	MAME_DIR .. "src/mame/includes/xyonix.h",
-	MAME_DIR .. "src/mame/video/xyonix.cpp",
 	MAME_DIR .. "src/mame/drivers/yuvomz80.cpp",
 }
 end

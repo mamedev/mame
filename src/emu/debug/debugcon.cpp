@@ -95,7 +95,7 @@ void debugger_console::exit()
 ***************************************************************************/
 
 debugger_console::debug_command::debug_command(const char *_command, u32 _flags, int _ref, int _minparams, int _maxparams, std::function<void(int, const std::vector<std::string> &)> _handler)
-	: params(nullptr), help(nullptr), handler(_handler), flags(_flags), ref(_ref), minparams(_minparams), maxparams(_maxparams)
+	: params(nullptr), help(nullptr), handler(std::move(_handler)), flags(_flags), ref(_ref), minparams(_minparams), maxparams(_maxparams)
 {
 	strcpy(command, _command);
 }

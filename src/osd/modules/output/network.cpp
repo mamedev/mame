@@ -26,7 +26,7 @@
 class output_client
 {
 public:
-  virtual ~output_client() {}
+  virtual ~output_client() = default;
   virtual void deliver(std::string &msg) = 0;
 };
 
@@ -197,9 +197,7 @@ public:
 	{
 	}
 
-	virtual ~output_network()
-	{
-	}
+	virtual ~output_network() = default;
 
 	virtual int init(const osd_options &options) override
 	{

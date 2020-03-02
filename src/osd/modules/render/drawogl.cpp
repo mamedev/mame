@@ -1649,7 +1649,7 @@ void renderer_ogl::texture_compute_size_type(const render_texinfo *texsource, og
 //  texture_create
 //============================================================
 
-static int gl_checkFramebufferStatus(void)
+static int gl_checkFramebufferStatus()
 {
 	GLenum status;
 	status=(GLenum)pfn_glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT);

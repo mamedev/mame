@@ -6,20 +6,86 @@
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
-=== PCB Info ===
+    PCB Layout and Hardware Info by Guru
 
-  The OSC on the CPU board(DE-0303-3) is 20MHz
-  The OSC on the video board(DE-0304-3) is 24MHz
-  68000 =  20 / 2  (10)
-  6502 =   24 / 16 (1.5)
-  YM3812 = 24 / 8  (3)
-  YM2203 = 24 / 16 (1.5)
-  M6295 is driven by a 1.056MHz resonator, pin 7 is high
-  HSync = 15.6246kHz
-  VSync = 57.4434Hz
 
-TODO : RNG issue? Some behavior isn't correct (ex: BGM randomizer).
+    PCB Layouts
+    -----------
+
+    DE-0303-3    |-----------|     |------------|
+    |------------|-----------|-----|------------|-------------|
+    |                                                         |
+    |                    20MHz                           6264 |
+    |          PV-2A                                          |
+    |          (PAL)                                     X    |
+    |                                 |----|                  |
+    |    SW2                          |    |                  |
+    |                                 | 6  |             X    |
+    |J                                | 8  |                  |
+    |A                                | 0  |                  |
+    |M      EF18.7F   65C02           | 0  |           EF15.9A|
+    |M                                | 0  |                  |
+    |A      5814                      |    |                  |
+    |                                 |----|             X    |
+    |    SW1                                                  |
+    |                                  PV-1                   |
+    |       YM2203   YM3812           (PAL)  PV-0        X    |
+    |                                        (PAL)            |
+    | YM3014  YM3014 M6295                             EF13.4A|
+    | UPC3403  UPC3403  1.056MHz                              |
+    |                                                    6264 |
+    | MB3730         EF17.1E                                  |
+    |---------------------------------------------------------|
+    Notes:
+      68000  - Clock 10.000MHz [20/2]
+      65C02  - Clock 1.500MHz [24/16]
+      YM3812 - Clock 3.000MHz [24/8]
+      YM2203 - Clock 1.500MHz [24/16]
+      M6295  - Clock 1.056MHz (via resonator), pin 7 HIGH
+      YM3014 - Yamaha YM3014B Serial Input Floating D/A Converter
+      6264   - 8kx8 SRAM
+      5814   - 2kx8 SRAM
+      X      - unpopulated DIP28 socket
+      SW1/2  - 8-position DIP Switch
+      MB3730 - Fujitsu MB3730 Audio Power AMP
+      uPC3403- NEC uPC3403 High Performance Quad Operational Amplifier
+      HSync  - 15.6246kHz
+      VSync  - 57.4434Hz
+
+
+    DE-0304-3    |-----------|     |------------|
+    |------------|-----------|-----|------------|-------------|
+    |EF12.14J                                                 |
+    |                                      HM3-65728          |
+    |EF11.13J                                                 |
+    |             |--------|               HM3-65728  EF07.12A|
+    |EF10.11J     |DATAEAST|          PV-3                    |
+    |             |L7B0072 |         (PAL)            EF06.11A|
+    | 2063        |BAC 06  |                                  |
+    |             |--------|                          EF05.9A |
+    | 2063                          5814                      |
+    |           5814                                  EF04.8A |
+    |                                                         |
+    |                               5814                      |
+    |           5814                       |--------| EF03.6A |
+    |                                      |DATAEAST|         |
+    |                                      |L7B0073 | EF02.5A |
+    |                                      |MXC 06  |         |
+    |                  |--------|          |--------| EF01.4A |
+    |EF09.4J           |DATAEAST|                             |
+    |                  |TC17G042|    EF-19.3D         EF00.2A |
+    |EF08.2J           |        |                             |
+    |                  |--------|                      24MHz  |
+    |---------------------------------------------------------|
+    Notes:
+      HM3-65728 - 2kx8 SRAM
+      2063      - 8kx8 SRAM
+      5814      - 2kx8 SRAM
+
+    TODO : RNG issue? Some behavior isn't correct (ex: BGM randomizer).
     reference: https://youtu.be/6azneK6uUnA
+
+
 
 ***************************************************************************/
 

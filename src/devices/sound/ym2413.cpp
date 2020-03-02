@@ -1772,7 +1772,7 @@ ym2413_device::ym2413_device(const machine_config &mconfig, device_type type, co
 	std::fill(std::begin(output), std::end(output), 0);
 }
 
-DEFINE_DEVICE_TYPE(VRC7, vrc7snd_device, "vrc7snd", "Konami VRC7 (Sound)")
+DEFINE_DEVICE_TYPE(VRC7, vrc7snd_device, "vrc7snd", "Konami 053982 VRC VII (Sound)") // die label: D51001
 
 vrc7snd_device::vrc7snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ym2413_device(mconfig, VRC7, tag, owner, clock)

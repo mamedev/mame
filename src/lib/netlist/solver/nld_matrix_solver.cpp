@@ -433,7 +433,7 @@ namespace solver
 			d->timestep(dd);
 	}
 
-	const netlist_time matrix_solver_t::solve(netlist_time_ext now)
+	netlist_time matrix_solver_t::solve(netlist_time_ext now)
 	{
 		const netlist_time_ext delta = now - m_last_step();
 
@@ -561,10 +561,8 @@ namespace solver
 			{
 				m_terms[net_idx].add_terminal(term, ot, true);
 			}
-			// Should this be allowed ?
 			else
 			{
-				m_rails_temp[net_idx].add_terminal(term, ot, true);
 				log().fatal(MF_FOUND_TERM_WITH_MISSING_OTHERNET(term->name()));
 				throw nl_exception(MF_FOUND_TERM_WITH_MISSING_OTHERNET(term->name()));
 			}

@@ -31,7 +31,7 @@ TODO:
   playing back all melody data and reconstructing it to ROM. Visual(decap)
   verification is wanted for: gnw_bfightn, gnw_bjack, gnw_bsweep, gnw_climbern,
   gnw_dkcirc, gnw_dkjrp, gnw_gcliff, gnw_mariocmt, gnw_mariotj, gnw_mbaway,
-  gnw_mmousep, gnw_sbuster, gnw_zelda
+  gnw_mmousep, gnw_pinball, gnw_sbuster, gnw_zelda
 
 ****************************************************************************
 
@@ -75,7 +75,7 @@ JR-55     ms   SM510   Donkey Kong II
 MW-56     ms   SM510   Mario Bros.
 LP-57     ms   SM510   Rain Shower
 TC-58     ms   SM510   Life Boat
-PB-59*    ms   SM511?  Pinball
+PB-59     ms   SM511   Pinball
 BJ-60     ms   SM512   Black Jack
 MG-61     ms   SM510   Squish
 BD-62     ms   SM512   Bomb Sweeper
@@ -2341,6 +2341,79 @@ ROM_START( gnw_lboat )
 
 	ROM_REGION( 155258, "screen_right", 0)
 	ROM_LOAD( "gnw_lboat_right.svg", 0, 155258, CRC(76619ad3) SHA1(b44d57e2f4a2cecf98e402adf802d16c5934d301) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Pinball (model PB-59)
+  * PCB label PB-59
+  * Sharp SM511 label PB-59 53ZD (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_pinball_state : public hh_sm510_state
+{
+public:
+	gnw_pinball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_pinball(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_pinball )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB -- this one multiplies scoring factor
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_pinball_state::gnw_pinball(machine_config &config)
+{
+	sm511_dualv(config, 1920/2, 1271/2, 1920/2, 1286/2);
+}
+
+// roms
+
+ROM_START( gnw_pinball )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "pb-59.program", 0x0000, 0x1000, CRC(d29dab34) SHA1(69ac9ee63eda67360c21627b7d625093709b5cd9) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "pb-59.melody", 0x000, 0x100, BAD_DUMP CRC(5c9ccb55) SHA1(1bada6caf3609f969421087219e6635f4c135282) ) // decap needed for verification
+
+	ROM_REGION( 83191, "screen_top", 0)
+	ROM_LOAD( "gnw_pinball_top.svg", 0, 83191, CRC(abe3edd9) SHA1(b32327b81b788896150e709ab8dc4a2155ae0995) )
+
+	ROM_REGION( 63618, "screen_bottom", 0)
+	ROM_LOAD( "gnw_pinball_bottom.svg", 0, 63618, CRC(1db44191) SHA1(73f73d246630d0b9efeb8dc72f37a2b88f735ceb) )
 ROM_END
 
 
@@ -8868,7 +8941,7 @@ CONS( 1981, gnw_pchute,  0,          0, gnw_pchute,  gnw_pchute,  gnw_pchute_sta
 CONS( 1981, gnw_octopus, 0,          0, gnw_octopus, gnw_octopus, gnw_octopus_state, empty_init, "Nintendo", "Game & Watch: Octopus", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_popeye,  0,          0, gnw_popeye,  gnw_popeye,  gnw_popeye_state,  empty_init, "Nintendo", "Game & Watch: Popeye (Wide Screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_chef,    0,          0, gnw_chef,    gnw_chef,    gnw_chef_state,    empty_init, "Nintendo", "Game & Watch: Chef", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, merrycook,   gnw_chef,   0, merrycook,   gnw_chef,    gnw_chef_state,    empty_init, "Elektronika", "Merry Cook", MACHINE_SUPPORTS_SAVE)
+CONS( 1989, merrycook,   gnw_chef,   0, merrycook,   gnw_chef,    gnw_chef_state,    empty_init, "Elektronika", "Merry Cook", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse (Wide Screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
@@ -8880,15 +8953,16 @@ CONS( 1982, gnw_fireatk, 0,          0, gnw_fireatk, gnw_fireatk, gnw_fireatk_st
 CONS( 1982, gnw_stennis, 0,          0, gnw_stennis, gnw_stennis, gnw_stennis_state, empty_init, "Nintendo", "Game & Watch: Snoopy Tennis", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: Multi Screen
-CONS( 1982, gnw_opanic,  0,          0, gnw_opanic,  gnw_opanic,  gnw_opanic_state,  empty_init, "Nintendo", "Game & Watch: Oil Panic", MACHINE_SUPPORTS_SAVE)
+CONS( 1982, gnw_opanic,  0,          0, gnw_opanic,  gnw_opanic,  gnw_opanic_state,  empty_init, "Nintendo", "Game & Watch: Oil Panic", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gnw_dkong,   0,          0, gnw_dkong,   gnw_dkong,   gnw_dkong_state,   empty_init, "Nintendo", "Game & Watch: Donkey Kong", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gnw_mickdon, 0,          0, gnw_mickdon, gnw_mickdon, gnw_mickdon_state, empty_init, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gnw_ghouse,  0,          0, gnw_ghouse,  gnw_ghouse,  gnw_ghouse_state,  empty_init, "Nintendo", "Game & Watch: Green House", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_dkong2,  0,          0, gnw_dkong2,  gnw_dkong2,  gnw_dkong2_state,  empty_init, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mario,   0,          0, gnw_mario,   gnw_mario,   gnw_mario_state,   empty_init, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_rshower, 0,          0, gnw_rshower, gnw_rshower, gnw_rshower_state, empty_init, "Nintendo", "Game & Watch: Rain Shower", MACHINE_SUPPORTS_SAVE)
-CONS( 1983, gnw_lboat,   0,          0, gnw_lboat,   gnw_lboat,   gnw_lboat_state,   empty_init, "Nintendo", "Game & Watch: Life Boat", MACHINE_SUPPORTS_SAVE)
-CONS( 1985, gnw_bjack,   0,          0, gnw_bjack,   gnw_bjack,   gnw_bjack_state,   empty_init, "Nintendo", "Game & Watch: Black Jack", MACHINE_SUPPORTS_SAVE)
+CONS( 1983, gnw_rshower, 0,          0, gnw_rshower, gnw_rshower, gnw_rshower_state, empty_init, "Nintendo", "Game & Watch: Rain Shower", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_lboat,   0,          0, gnw_lboat,   gnw_lboat,   gnw_lboat_state,   empty_init, "Nintendo", "Game & Watch: Life Boat", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_pinball, 0,          0, gnw_pinball, gnw_pinball, gnw_pinball_state, empty_init, "Nintendo", "Game & Watch: Pinball", MACHINE_SUPPORTS_SAVE )
+CONS( 1985, gnw_bjack,   0,          0, gnw_bjack,   gnw_bjack,   gnw_bjack_state,   empty_init, "Nintendo", "Game & Watch: Black Jack", MACHINE_SUPPORTS_SAVE )
 CONS( 1986, gnw_squish,  0,          0, gnw_squish,  gnw_squish,  gnw_squish_state,  empty_init, "Nintendo", "Game & Watch: Squish", MACHINE_SUPPORTS_SAVE )
 CONS( 1987, gnw_bsweep,  0,          0, gnw_bsweep,  gnw_bsweep,  gnw_bsweep_state,  empty_init, "Nintendo", "Game & Watch: Bomb Sweeper", MACHINE_SUPPORTS_SAVE )
 CONS( 1988, gnw_sbuster, 0,          0, gnw_sbuster, gnw_sbuster, gnw_sbuster_state, empty_init, "Nintendo", "Game & Watch: Safe Buster", MACHINE_SUPPORTS_SAVE )

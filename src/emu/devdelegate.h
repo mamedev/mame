@@ -243,11 +243,12 @@ class device_delegate_array : public std::array<device_delegate<Signature>, Coun
 private:
 	template <unsigned... V>
 	device_delegate_array(device_t &owner, std::integer_sequence<unsigned, V...> const &)
-		: std::array<device_delegate<Signature>, Count>{ make_one<V>(owner)... }
+		: std::array<device_delegate<Signature>, Count>{{ make_one<V>(owner)... }}
 	{
 	}
 
-	template <unsigned N> device_delegate<Signature> make_one(device_t &owner)
+	template <unsigned N>
+	device_delegate<Signature> make_one(device_t &owner)
 	{
 		return device_delegate<Signature>(owner);
 	}

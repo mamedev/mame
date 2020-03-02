@@ -403,7 +403,7 @@ public:
 		// populate the buttons
 		for (butnum = 0; butnum < devinfo->dinput.caps.dwButtons; butnum++)
 		{
-			uintptr_t offset = reinterpret_cast<uintptr_t>(&static_cast<DIMOUSESTATE *>(nullptr)->rgbButtons[butnum]);
+			auto offset = reinterpret_cast<uintptr_t>(&static_cast<DIMOUSESTATE *>(nullptr)->rgbButtons[butnum]);
 
 			// add to the mouse device
 			std::string name = device_item_name(devinfo, offset, default_button_name(butnum), nullptr);
@@ -535,7 +535,7 @@ int dinput_joystick_device::configure()
 	// populate the buttons
 	for (uint32_t butnum = 0; butnum < dinput.caps.dwButtons; butnum++)
 	{
-		uintptr_t offset = reinterpret_cast<uintptr_t>(&static_cast<DIJOYSTATE2 *>(nullptr)->rgbButtons[butnum]);
+		auto offset = reinterpret_cast<uintptr_t>(&static_cast<DIJOYSTATE2 *>(nullptr)->rgbButtons[butnum]);
 		std::string name = dinput_module::device_item_name(this, offset, default_button_name(butnum), nullptr);
 
 		input_item_id itemid;
@@ -602,7 +602,7 @@ public:
 
 static int32_t dinput_joystick_pov_get_state(void *device_internal, void *item_internal)
 {
-	dinput_joystick_device *devinfo = static_cast<dinput_joystick_device *>(device_internal);
+	auto *devinfo = static_cast<dinput_joystick_device *>(device_internal);
 	int povnum = reinterpret_cast<uintptr_t>(item_internal) / 4;
 	int povdir = reinterpret_cast<uintptr_t>(item_internal) % 4;
 	int32_t result = 0;

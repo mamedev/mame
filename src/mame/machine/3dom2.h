@@ -374,8 +374,8 @@ private:
 
 
 	// GPIO
-	devcb_read_line m_gpio_in[4];
-	devcb_write_line m_gpio_out[4];
+	devcb_read_line::array<4> m_gpio_in;
+	devcb_write_line::array<4> m_gpio_out;
 
 	// Registers
 	uint32_t    m_mcfg;

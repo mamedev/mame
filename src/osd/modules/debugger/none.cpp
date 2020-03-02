@@ -22,7 +22,7 @@ public:
 	{
 	}
 
-	virtual ~debug_none() { }
+	virtual ~debug_none() = default;
 
 	virtual int init(const osd_options &options) override { return 0; }
 	virtual void exit() override { }

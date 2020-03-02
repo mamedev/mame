@@ -63,11 +63,11 @@ private:
 	//int m_transfer_size[4];
 	int m_base;
 	int m_upd_clock;
-	devcb_write_line    m_out_hreq_cb;
-	devcb_write_line    m_out_eop_cb;
-	devcb_read16        m_dma_read_cb[4];
-	devcb_write16       m_dma_write_cb[4];
-	devcb_write_line    m_out_dack_cb[4];
+	devcb_write_line m_out_hreq_cb;
+	devcb_write_line m_out_eop_cb;
+	devcb_read16::array<4> m_dma_read_cb;
+	devcb_write16::array<4> m_dma_write_cb;
+	devcb_write_line::array<4> m_out_dack_cb;
 	int m_hreq;
 	int m_eop;
 	optional_device<cpu_device> m_cpu;

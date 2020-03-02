@@ -44,22 +44,30 @@
 
 #define PCONCAT_(a, b) a ## b
 
-#define PSTRINGIFY_1(x)                     #x
-#define PSTRINGIFY_2(x, x2)                 #x, #x2
-#define PSTRINGIFY_3(x, ...)                #x, PSTRINGIFY_2(__VA_ARGS__)
-#define PSTRINGIFY_4(x, ...)                #x, PSTRINGIFY_3(__VA_ARGS__)
-#define PSTRINGIFY_5(x, ...)                #x, PSTRINGIFY_4(__VA_ARGS__)
-#define PSTRINGIFY_6(x, ...)                #x, PSTRINGIFY_5(__VA_ARGS__)
-#define PSTRINGIFY_7(x, ...)                #x, PSTRINGIFY_6(__VA_ARGS__)
-#define PSTRINGIFY_8(x, ...)                #x, PSTRINGIFY_7(__VA_ARGS__)
-#define PSTRINGIFY_9(x, ...)                #x, PSTRINGIFY_8(__VA_ARGS__)
-#define PSTRINGIFY_10(x, ...)               #x, PSTRINGIFY_9(__VA_ARGS__)
-#define PSTRINGIFY_11(x, ...)               #x, PSTRINGIFY_10(__VA_ARGS__)
-#define PSTRINGIFY_12(x, ...)               #x, PSTRINGIFY_11(__VA_ARGS__)
-#define PSTRINGIFY_13(x, ...)               #x, PSTRINGIFY_12(__VA_ARGS__)
-#define PSTRINGIFY_14(x, ...)               #x, PSTRINGIFY_13(__VA_ARGS__)
-#define PSTRINGIFY_15(x, ...)               #x, PSTRINGIFY_14(__VA_ARGS__)
-#define PSTRINGIFY_16(x, ...)               #x, PSTRINGIFY_15(__VA_ARGS__)
+#define PSTRINGIFY_1(x)                             #x
+#define PSTRINGIFY_2(x, x2)                         #x, #x2
+#define PSTRINGIFY_3(x, x2, x3)                     #x, #x2, #x3
+#define PSTRINGIFY_4(x, x2, x3, x4)                 #x, #x2, #x3, #x4
+#define PSTRINGIFY_5(x, x2, x3, x4, x5)             #x, #x2, #x3, #x4, #x5
+#define PSTRINGIFY_6(x, x2, x3, x4, x5, x6)         #x, #x2, #x3, #x4, #x5, #x6
+#define PSTRINGIFY_7(x, x2, x3, x4, x5, x6, x7)     #x, #x2, #x3, #x4, #x5, #x6, #x7
+#define PSTRINGIFY_8(x, x2, x3, x4, x5, x6, x7, x8) #x, #x2, #x3, #x4, #x5, #x6, #x7, #x8
+#define PSTRINGIFY_9(x, x2, x3, x4, x5, x6, x7, x8, x9) \
+	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9
+#define PSTRINGIFY_10(x, x2, x3, x4, x5, x6, x7, x8, x9, xa) \
+	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9, #xa
+#define PSTRINGIFY_11(x, x2, x3, x4, x5, x6, x7, x8, x9, xa, xb) \
+	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9, #xa, #xb
+#define PSTRINGIFY_12(x, x2, x3, x4, x5, x6, x7, x8, x9, xa, xb, xc) \
+	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9, #xa, #xb, #xc
+#define PSTRINGIFY_13(x, x2, x3, x4, x5, x6, x7, x8, x9, xa, xb, xc, xd) \
+	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9, #xa, #xb, #xc, #xd
+#define PSTRINGIFY_14(x, x2, x3, x4, x5, x6, x7, x8, x9, xa, xb, xc, xd, xe) \
+	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9, #xa, #xb, #xc, #xd, #xe
+#define PSTRINGIFY_15(x, x2, x3, x4, x5, x6, x7, x8, x9, xa, xb, xc, xd, xe, xf) \
+	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9, #xa, #xb, #xc, #xd, #xe, #xf
+#define PSTRINGIFY_16(x, x2, x3, x4, x5, x6, x7, x8, x9, xa, xb, xc, xd, xe, xf, x10) \
+	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9, #xa, #xb, #xc, #xd, #xe, #xf, #x10
 
 /// \brief Individually stringify up to 16 arguments
 ///

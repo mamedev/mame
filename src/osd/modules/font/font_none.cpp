@@ -11,7 +11,7 @@
 class osd_font_none : public osd_font
 {
 public:
-	virtual ~osd_font_none() { }
+	virtual ~osd_font_none() = default;
 
 	virtual bool open(std::string const &font_path, std::string const &name, int &height) override { return false; }
 	virtual void close() override { }

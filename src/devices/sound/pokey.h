@@ -278,7 +278,7 @@ private:
 	uint32_t m_p9;              /* poly9 index */
 	uint32_t m_p17;             /* poly17 index */
 
-	devcb_read8 m_pot_r_cb[8];
+	devcb_read8::array<8> m_pot_r_cb;
 	devcb_read8 m_allpot_r_cb;
 	devcb_read8 m_serin_r_cb;
 	devcb_write8 m_serout_w_cb;

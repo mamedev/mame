@@ -6344,6 +6344,9 @@ static INPUT_PORTS_START( twineagl )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
+	// default taken off original Japanese DIP sheet
+	// Cabinet is user choice
+	// We use Licensor Option 2 instead of 1 just to avoid the "For use in Japan"
 	PORT_START("DSW") //2 DSWs - $600001 & 3.b
 	PORT_DIPNAME( 0x0001, 0x0001, "Copyright / License" )   PORT_DIPLOCATION("SW1:1") /* Always "Seta" if sim. players = 1 */
 	PORT_DIPSETTING(      0x0000, "Taito America / Romstar" )   PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x4000)
@@ -6375,12 +6378,12 @@ static INPUT_PORTS_START( twineagl )
 	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) )        PORT_CONDITION("DSW",0x8000,NOTEQUALS,0x8000)
 	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_4C ) )        PORT_CONDITION("DSW",0x8000,NOTEQUALS,0x8000)
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )        PORT_CONDITION("DSW",0x8000,NOTEQUALS,0x8000)
-	PORT_DIPNAME( 0x0300, 0x0100, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal )  )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Easy )    )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Hard )    )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c00, 0x0000, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0c00, "Never" )
 	PORT_DIPSETTING(      0x0800, "500K Only" )
 	PORT_DIPSETTING(      0x0400, "1000K Only" )

@@ -191,6 +191,7 @@ const double XTAL::known_xtals[] = {
 	 12'854'400, /* 12.8544_MHz_XTAL       Alphatronic P3 */
 	 12'936'000, /* 12.936_MHz_XTAL        CDC 721 */
 	 12'979'200, /* 12.9792_MHz_XTAL       Exidy 440 */
+	 13'000'000, /* 13_MHz_XTAL            STM Pied Piper dot clock */
 	 13'300'000, /* 13.3_MHz_XTAL          BMC bowling */
 	 13'330'560, /* 13.33056_MHz_XTAL      Taito L */
 	 13'333'000, /* 13.333_MHz_XTAL        Ojanko High School */
@@ -354,6 +355,7 @@ const double XTAL::known_xtals[] = {
 	 32'256'000, /* 32.256_MHz_XTAL        Hitachi MB-6890 */
 	 32'317'400, /* 32.3174_MHz_XTAL       DEC VT330, VT340 */
 	 32'530'470, /* 32.53047_MHz_XTAL      Seta 2 */
+	 32'768'000, /* 32.768_MHz_XTAL        Roland D-50 audio clock */
 	 33'000'000, /* 33_MHz_XTAL            Sega Model 3 video board */
 	 33'264'000, /* 33.264_MHz_XTAL        Hazeltine 1500 terminal */
 	 33'330'000, /* 33.33_MHz_XTAL         Sharp X68000 XVI */
@@ -504,7 +506,7 @@ void XTAL::validate(const std::string &message) const
 		fail(m_base_clock, message);
 }
 
-void XTAL::fail(double base_clock, std::string message)
+void XTAL::fail(double base_clock, const std::string &message)
 {
 	std::string full_message = util::string_format("Unknown crystal value %.0f. ", base_clock);
 	if(xtal_error_low && xtal_error_high)

@@ -21,7 +21,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	devcb_write_line m_bit_handlers[8];
+	devcb_write_line::array<8> m_bit_handlers;
 
 	int m_bits[8];
 };

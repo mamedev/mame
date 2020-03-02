@@ -1337,7 +1337,7 @@ void gba_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0c000000, 0x0cffffff, "rom3");
 
 		std::string region_tag;
-		memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GBASLOT_ROM_REGION_TAG).c_str());
+		memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GBASLOT_ROM_REGION_TAG));
 
 		// install ROM accesses
 		membank("rom1")->set_base(cart_rom->base());
@@ -1387,7 +1387,7 @@ void gba_state::machine_start()
 		if (m_cart->get_type() == GBA_3DMATRIX)
 		{
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0x08800000, 0x088001ff, write32_delegate(*m_cart, FUNC(gba_cart_slot_device::write_mapper)));
-			memory_region *cart_romhlp = memregion(region_tag.assign(m_cart->tag()).append(GBAHELP_ROM_REGION_TAG).c_str());
+			memory_region *cart_romhlp = memregion(region_tag.assign(m_cart->tag()).append(GBAHELP_ROM_REGION_TAG));
 			membank("rom1")->set_base(cart_romhlp->base());
 		}
 

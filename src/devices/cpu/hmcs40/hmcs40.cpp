@@ -94,8 +94,8 @@ hmcs40_cpu_device::hmcs40_cpu_device(const machine_config &mconfig, device_type 
 	, m_family(family)
 	, m_polarity(polarity)
 	, m_stack_levels(stack_levels)
-	, m_read_r{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_write_r{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_read_r(*this)
+	, m_write_r(*this)
 	, m_read_d(*this)
 	, m_write_d(*this)
 {
@@ -206,12 +206,8 @@ void hmcs40_cpu_device::device_start()
 	reset_prescaler();
 
 	// resolve callbacks
-	for (int i = 0; i < 8; i++)
-	{
-		m_read_r[i].resolve_safe(m_polarity & 0xf);
-		m_write_r[i].resolve_safe();
-	}
-
+	m_read_r.resolve_all_safe(m_polarity & 0xf);
+	m_write_r.resolve_all_safe();
 	m_read_d.resolve_safe(m_polarity);
 	m_write_d.resolve_safe();
 

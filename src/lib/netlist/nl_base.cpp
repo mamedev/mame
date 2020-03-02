@@ -35,7 +35,6 @@ namespace netlist
 	public:
 		logic_family_ttl_t() : logic_family_desc_t()
 		{
-			m_fixed_V = nlconst::magic(5.0);
 			m_low_thresh_PCNT = nlconst::magic(0.8 / 5.0);
 			m_high_thresh_PCNT = nlconst::magic(2.0 / 5.0);
 			// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
@@ -62,14 +61,15 @@ namespace netlist
 	public:
 		logic_family_cd4xxx_t() : logic_family_desc_t()
 		{
-			m_fixed_V = nlconst::magic(0.0);
 			m_low_thresh_PCNT = nlconst::magic(1.5 / 5.0);
 			m_high_thresh_PCNT = nlconst::magic(3.5 / 5.0);
 			// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
 			m_low_VO = nlconst::magic(0.05);
 			m_high_VO = nlconst::magic(0.05); // 4.95
-			m_R_low = nlconst::magic(10.0);
-			m_R_high = nlconst::magic(10.0);
+			// https://www.classe.cornell.edu/~ib38/teaching/p360/lectures/wk09/l26/EE2301Exp3F10.pdf
+			// typical CMOS may sink 0.4mA while output stays <= 0.4V
+			m_R_low = nlconst::magic(500.0);
+			m_R_high = nlconst::magic(500.0);
 		}
 		unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
 		unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
@@ -214,6 +214,20 @@ namespace netlist
 
 		// Initialize factory
 		devices::initialize_factory(m_setup->factory());
+
+		// Add default include file
+		using a = plib::psource_str_t<plib::psource_t>;
+		const pstring content =
+		"#define RES_R(res) (res)            \n"
+		"#define RES_K(res) ((res) * 1e3)    \n"
+		"#define RES_M(res) ((res) * 1e6)    \n"
+		"#define CAP_U(cap) ((cap) * 1e-6)   \n"
+		"#define CAP_N(cap) ((cap) * 1e-9)   \n"
+		"#define CAP_P(cap) ((cap) * 1e-12)  \n"
+		"#define IND_U(ind) ((ind) * 1e-6)   \n"
+		"#define IND_N(ind) ((ind) * 1e-9)   \n"
+		"#define IND_P(ind) ((ind) * 1e-12)  \n";
+		setup().add_include(plib::make_unique<a>("netlist/devices/net_lib.h", content));
 		NETLIST_NAME(base)(*m_setup);
 	}
 
@@ -547,6 +561,7 @@ namespace netlist
 		, m_active_outputs(*this, "m_active_outputs", 1)
 	{
 		set_logic_family(owner.logic_family());
+		//printf("%s %f %f\n", this->name().c_str(), logic_family()->R_low(), logic_family()->R_high());
 		if (logic_family() == nullptr)
 			set_logic_family(family_TTL());
 		owner.state().register_device(this->name(), owned_pool_ptr<core_device_t>(this, false));

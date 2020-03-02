@@ -91,8 +91,6 @@ void nes_control_port2_devices(device_slot_interface &device);
 void fc_control_port1_devices(device_slot_interface &device);
 void fc_control_port2_devices(device_slot_interface &device);
 void fc_expansion_devices(device_slot_interface &device);
-void majesco_control_port1_devices(device_slot_interface &device);
-void majesco_control_port2_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_NES_CTRL_CTRL_H

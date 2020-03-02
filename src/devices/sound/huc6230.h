@@ -55,7 +55,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(adpcm_timer);
 
-	devcb_read8 m_adpcm_update_cb[2];
+	devcb_read8::array<2> m_adpcm_update_cb;
 	devcb_write8 m_vca_cb;
 };
 

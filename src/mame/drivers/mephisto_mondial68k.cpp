@@ -4,6 +4,7 @@
 /***************************************************************************
 
 Mephisto Mondial 68000XL
+The chess engine is actually the one from Mephisto Dallas.
 
 Hardware:
 - TS68000CP12 @ 12MHz
@@ -91,6 +92,12 @@ void mondial68k_state::machine_reset()
 	m_dac_data = 0;
 }
 
+
+
+/******************************************************************************
+    I/O
+******************************************************************************/
+
 TIMER_DEVICE_CALLBACK_MEMBER(mondial68k_state::refresh_leds)
 {
 	for (int i=0; i<16; i++)
@@ -111,7 +118,10 @@ WRITE8_MEMBER( mondial68k_state::lcd_dlen_w )
 WRITE8_MEMBER( mondial68k_state::lcd_data_w )
 {
 	if (m_lcd_shift > 0 && m_lcd_shift < 0x21)
+	{
 		m_display->write_element((m_lcd_shift - 1) / 8, (m_lcd_shift - 1) % 8, BIT(data, 0));
+		m_display->update();
+	}
 }
 
 WRITE8_MEMBER( mondial68k_state::speaker_w )
@@ -153,6 +163,12 @@ READ8_MEMBER(mondial68k_state::inputs_r)
 	return data;
 }
 
+
+
+/******************************************************************************
+    Address Maps
+******************************************************************************/
+
 void mondial68k_state::mondial68k_mem(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
@@ -167,6 +183,11 @@ void mondial68k_state::mondial68k_mem(address_map &map)
 	map(0xc00000, 0xc03fff).ram();
 }
 
+
+
+/******************************************************************************
+    Input Ports
+******************************************************************************/
 
 static INPUT_PORTS_START( mondial68k )
 	PORT_START("IN.0")
@@ -195,6 +216,11 @@ static INPUT_PORTS_START( mondial68k )
 INPUT_PORTS_END
 
 
+
+/******************************************************************************
+    Machine Configs
+******************************************************************************/
+
 void mondial68k_state::mondial68k(machine_config &config)
 {
 	/* basic machine hardware */
@@ -204,10 +230,12 @@ void mondial68k_state::mondial68k(machine_config &config)
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(100));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
-	m_display->set_segmask(0xf, 0x7f);
+	m_display->set_segmask(0xf, 0xff);
+	m_display->set_segmask(0x8, 0x7f); // last digit: DP segment unused
 	m_display->output_digit().set([this](offs_t offset, u8 data) { m_digits[offset] = bitswap<8>(data, 7,4,5,0,1,2,3,6); });
 	config.set_default_layout(layout_mephisto_mondial68k);
 
@@ -220,19 +248,21 @@ void mondial68k_state::mondial68k(machine_config &config)
 }
 
 
-/***************************************************************************
-  ROM definitions
-***************************************************************************/
+
+/******************************************************************************
+    ROM Definitions
+******************************************************************************/
 
 ROM_START( mondl68k )
-	ROM_REGION16_BE( 0x1000000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("68000xl_u_06.11.87", 0x0000, 0x8000, CRC(aebe482a) SHA1(900c91ec836cd65e4cd38e50555976ab8064be41) )
 	ROM_LOAD16_BYTE("68000xl_l_06.11.87", 0x0001, 0x8000, CRC(564e32c5) SHA1(8c9df46bc5ced114e72fb663f1055d775b8e2e0b) )
 ROM_END
 
 
+
 /***************************************************************************
-  Game drivers
+    Game Drivers
 ***************************************************************************/
 
 /*    YEAR, NAME,      PARENT    COMPAT  MACHINE      INPUT       CLASS             INIT        COMPANY             FULLNAME                     FLAGS */

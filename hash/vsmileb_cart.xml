@@ -82,25 +82,6 @@ VTech V.Smile Baby cartridges
 |        | 80-099240(US)     | Backyardigans: Big Backyard Adventures                                     |
 +========+===================+============================================================================+
 
-VTech V.Baby cartridges. Note that the VTech V.Baby is not the same console as the VTech V.Smile Baby.
-The V.Baby currently have no dumps available, hence the carts are temporarily listed here.
-+========+===================+============================================================================+
-| Dumped |      Serial       |                                    Name                                    |
-+========+===================+============================================================================+
-|        | 80-107100-001(US) | Meet Me at the Zoo                                                         |
-|   **   | 80-107122-022(US) | Aventuras en el Zoo (cart without ROM)                                     |
-+========+===================+============================================================================+
-|        | 80-220000(US)     | The World of Eric Carle - The Very Hungry Caterpillar                      |
-+========+===================+============================================================================+
-|  SOON  | 80-220507-022(SP) | El jardín de los sueños (green sticker: "P ○○○○")                          |
-+========+===================+============================================================================+
-|        | 80-220600(US)     | Backyardigans                                                              |
-+========+===================+============================================================================+
-|        | 80-220700(US)     | Noah's Ark - Animal Adventures                                             |
-+========+===================+============================================================================+
-|        | 80-220800(US)     | Mother Goose                                                               |
-+========+===================+============================================================================+
-
 -->
 
 <softwarelist name="vsmileb_cart" description="VTech V.Smile Baby cartridges">
@@ -110,12 +91,12 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099064(GE)" />
-		<part name="cart" interface="vsmileb_cart">
+		<part name="cart" interface="vsmile_cart">
 			<feature name="pcb" value="707154" />
 			<feature name="pcb_model" value="707154-3" />
 			<feature name="u4" value="U4" /> <!-- ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="27-08788-000.u4" size="8388608" crc="581e16f9" sha1="330b309644db9f017d275b9df0ffe7530ed5bcef" offset="0" />
+				<rom name="27-08788-000.u4" size="8388608" crc="581e16f9" sha1="330b309644db9f017d275b9df0ffe7530ed5bcef" />
 			</dataarea>
 		</part>
 	</software>
@@ -125,12 +106,12 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099067(SP)" />
-		<part name="cart" interface="vsmileb_cart">
+		<part name="cart" interface="vsmile_cart">
 			<feature name="pcb" value="707154" />
 			<feature name="pcb_model" value="707154-2" />
 			<feature name="u4" value="U4" /> <!-- ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="99067 - Un Dia en la Granja (SP).bin" size="8388608" crc="03735215" sha1="228dc683ba1f7f7f4a61a34b29d61fe9077d2cab" offset="0" />
+				<rom name="99067 - Un Dia en la Granja (SP).bin" size="8388608" crc="03735215" sha1="228dc683ba1f7f7f4a61a34b29d61fe9077d2cab" />
 			</dataarea>
 		</part>
 	</software>
@@ -140,12 +121,12 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099004(GE)" />
-		<part name="cart" interface="vsmileb_cart">
+		<part name="cart" interface="vsmile_cart">
 			<feature name="pcb" value="707154" />
 			<feature name="pcb_model" value="707154-3" />
 			<feature name="u4" value="U4" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="99004.u4" size="8388608" crc="7b48544b" sha1="a736ef1313762c493a366990406c3a7393457b6e" offset="0" />
+				<rom name="99004.u4" size="8388608" crc="7b48544b" sha1="a736ef1313762c493a366990406c3a7393457b6e" />
 			</dataarea>
 		</part>
 	</software>
@@ -155,9 +136,9 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099020(US)" />
-		<part name="cart" interface="vsmileb_cart">
+		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="099020.bin" size="8388608" crc="a3ac4cd4" sha1="3562c632e0a1e70cb9e382ebb823449757afed67" offset="0" />
+				<rom name="099020.bin" size="8388608" crc="a3ac4cd4" sha1="3562c632e0a1e70cb9e382ebb823449757afed67" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -167,12 +148,12 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 		<year>2007?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099034(SE)" />
-		<part name="cart" interface="vsmileb_cart">
+		<part name="cart" interface="vsmile_cart">
 			<feature name="pcb" value="707154" />
 			<feature name="pcb_model" value="707154-4" />
 			<feature name="u4" value="U4" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="99034.u4" size="8388608" crc="5dbe1c20" sha1="51f56cedbe99fc7438429a4c02c08f65d2313790" offset="0" />
+				<rom name="99034.u4" size="8388608" crc="5dbe1c20" sha1="51f56cedbe99fc7438429a4c02c08f65d2313790" />
 			</dataarea>
 		</part>
 	</software>

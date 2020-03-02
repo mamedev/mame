@@ -1977,10 +1977,10 @@ ROM_END
 
 ROM_START( gratia )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "94019_26_ver1.0.26", 0x000003, 0x80000, CRC(f398cba5) SHA1(11e06abebfdfc8a99b5c56e9f6ed389f645b6c72) ) /* Labeled 94019  (26)Ver1,0  with the Kanji verson of the game name before "(26)" */
-	ROM_LOAD32_BYTE( "94019_27_ver1.0.27", 0x000002, 0x80000, CRC(ba3318c5) SHA1(9b100988b998c39b586b51fe9fee874dbf711610) ) /* Labeled 94019  (27)Ver1,0  with the Kanji verson of the game name before "(27)" */
-	ROM_LOAD32_BYTE( "94019_28_ver1.0.28", 0x000001, 0x80000, CRC(e0762e89) SHA1(a567c347e7f73f1ef1c753d14ac4f58311380fac) ) /* Labeled 94019  (28)Ver1,0  with the Kanji verson of the game name before "(28)" */
-	ROM_LOAD32_BYTE( "94019_29_ver1.0.29", 0x000000, 0x80000, CRC(8059800b) SHA1(7548d01b6ea15e962353b3585db6515e5819e5ce) ) /* Labeled 94019  (29)Ver1,0  with the Kanji verson of the game name before "(29)" */
+	ROM_LOAD32_BYTE( "94019_26_ver1.0.26", 0x000003, 0x80000, CRC(f398cba5) SHA1(11e06abebfdfc8a99b5c56e9f6ed389f645b6c72) ) /* Labeled 94019  (26)Ver1,0  with the Kanji version of the game name before "(26)" */
+	ROM_LOAD32_BYTE( "94019_27_ver1.0.27", 0x000002, 0x80000, CRC(ba3318c5) SHA1(9b100988b998c39b586b51fe9fee874dbf711610) ) /* Labeled 94019  (27)Ver1,0  with the Kanji version of the game name before "(27)" */
+	ROM_LOAD32_BYTE( "94019_28_ver1.0.28", 0x000001, 0x80000, CRC(e0762e89) SHA1(a567c347e7f73f1ef1c753d14ac4f58311380fac) ) /* Labeled 94019  (28)Ver1,0  with the Kanji version of the game name before "(28)" */
+	ROM_LOAD32_BYTE( "94019_29_ver1.0.29", 0x000000, 0x80000, CRC(8059800b) SHA1(7548d01b6ea15e962353b3585db6515e5819e5ce) ) /* Labeled 94019  (29)Ver1,0  with the Kanji version of the game name before "(29)" */
 
 	ROM_REGION( 0x0c00000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr94019-01.13", 0x000000, 0x200000, CRC(92d8ae9b) SHA1(02b36e6e14b28a9830e07fd328772dbb20b76889) )
@@ -2001,7 +2001,7 @@ ROM_START( gratia )
 	ROM_LOAD( "94019_2.030",0x000000, 0x080000, CRC(f9543fcf) SHA1(8466c7893bc6c43e2a80b8f91a776fd0a345ea6c) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
-	ROM_LOAD( "94019_21ver1.0.21",0x000000, 0x040000, CRC(6e8dd039) SHA1(f1e69c9b40b14ba0f8377a6d9b6c3933919bc803) ) /* Labeled 94019  (21)Ver1,0  with the Kanji verson of the game name before "(21)" */
+	ROM_LOAD( "94019_21ver1.0.21",0x000000, 0x040000, CRC(6e8dd039) SHA1(f1e69c9b40b14ba0f8377a6d9b6c3933919bc803) ) /* Labeled 94019  (21)Ver1,0  with the Kanji version of the game name before "(21)" */
 
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
 	ROM_LOAD( "mr92042-01.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
@@ -2013,10 +2013,10 @@ ROM_END
 
 ROM_START( gratiaa )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "94019_26_ver1.0.26", 0x000003, 0x80000, CRC(f398cba5) SHA1(11e06abebfdfc8a99b5c56e9f6ed389f645b6c72) ) /* Labeled 94019  (26)Ver1,0  with the Kanji verson of the game name before "(26)" */
-	ROM_LOAD32_BYTE( "94019_27_ver1.0.27", 0x000002, 0x80000, CRC(ba3318c5) SHA1(9b100988b998c39b586b51fe9fee874dbf711610) ) /* Labeled 94019  (27)Ver1,0  with the Kanji verson of the game name before "(27)" */
-	ROM_LOAD32_BYTE( "94019_28_ver1.0.28", 0x000001, 0x80000, CRC(e0762e89) SHA1(a567c347e7f73f1ef1c753d14ac4f58311380fac) ) /* Labeled 94019  (28)Ver1,0  with the Kanji verson of the game name before "(28)" */
-	ROM_LOAD32_BYTE( "94019_29_ver1.0.29", 0x000000, 0x80000, CRC(8059800b) SHA1(7548d01b6ea15e962353b3585db6515e5819e5ce) ) /* Labeled 94019  (29)Ver1,0  with the Kanji verson of the game name before "(29)" */
+	ROM_LOAD32_BYTE( "94019_26_ver1.0.26", 0x000003, 0x80000, CRC(f398cba5) SHA1(11e06abebfdfc8a99b5c56e9f6ed389f645b6c72) ) /* Labeled 94019  (26)Ver1,0  with the Kanji version of the game name before "(26)" */
+	ROM_LOAD32_BYTE( "94019_27_ver1.0.27", 0x000002, 0x80000, CRC(ba3318c5) SHA1(9b100988b998c39b586b51fe9fee874dbf711610) ) /* Labeled 94019  (27)Ver1,0  with the Kanji version of the game name before "(27)" */
+	ROM_LOAD32_BYTE( "94019_28_ver1.0.28", 0x000001, 0x80000, CRC(e0762e89) SHA1(a567c347e7f73f1ef1c753d14ac4f58311380fac) ) /* Labeled 94019  (28)Ver1,0  with the Kanji version of the game name before "(28)" */
+	ROM_LOAD32_BYTE( "94019_29_ver1.0.29", 0x000000, 0x80000, CRC(8059800b) SHA1(7548d01b6ea15e962353b3585db6515e5819e5ce) ) /* Labeled 94019  (29)Ver1,0  with the Kanji version of the game name before "(29)" */
 
 	ROM_REGION( 0x0c00000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr94019-01.13", 0x000000, 0x200000, CRC(92d8ae9b) SHA1(02b36e6e14b28a9830e07fd328772dbb20b76889) )
@@ -2035,10 +2035,10 @@ ROM_START( gratiaa )
 	ROM_LOAD( "mr94019-07.10", 0x000000, 0x200000, BAD_DUMP CRC(561a786b) SHA1(23df08d50801bd6e4a2f12dd3bb50632ff77f0f2) ) /* HAND CRAFTED: decrypted & re-encrypted 94019_2.07 - marked BAD_DUMP until proper ROM redump */
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
-	ROM_LOAD( "94019_30ver1.0.30",0x000000, 0x080000, CRC(026b5379) SHA1(b9237477f1bf8ae83174e8231492fe667e6d6a13) ) /* Labeled 94019  (21)Ver1,0  with the Kanji verson of the game name before "(30)" */
+	ROM_LOAD( "94019_30ver1.0.30",0x000000, 0x080000, CRC(026b5379) SHA1(b9237477f1bf8ae83174e8231492fe667e6d6a13) ) /* Labeled 94019  (21)Ver1,0  with the Kanji version of the game name before "(30)" */
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
-	ROM_LOAD( "94019_21ver1.0.21",0x000000, 0x040000, CRC(6e8dd039) SHA1(f1e69c9b40b14ba0f8377a6d9b6c3933919bc803) ) /* Labeled 94019  (21)Ver1,0  with the Kanji verson of the game name before "(21)" */
+	ROM_LOAD( "94019_21ver1.0.21",0x000000, 0x040000, CRC(6e8dd039) SHA1(f1e69c9b40b14ba0f8377a6d9b6c3933919bc803) ) /* Labeled 94019  (21)Ver1,0  with the Kanji version of the game name before "(21)" */
 
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
 	ROM_LOAD( "mr92042-01.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
@@ -2338,8 +2338,51 @@ ROM_START( akiss )
 	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
-// Version 1.1 known to exist, labeled as: P-47 ACES 3/31 ROM 26 Ver1.1 - uses the same MB-94166 EB91022-20101 rom board.
+/*
+P-47 Aces Ver 1.1  -  Observed fixes:
+  Sound effects bug. Due to a timer bug, sound effects may be delayed by multiple seconds.
+  The sound test in the test menu now works.
+*/
 ROM_START( p47aces )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
+	ROM_LOAD32_BYTE( "p-47_aces_3-31_rom_26_ver1.1.26", 0x000003, 0x80000, CRC(99c0e211) SHA1(6fc3b1e5ddadda85934145a2e62b55ccb2011fb5) ) /* Labeled "P-47 ACES 3/31  ROM 26 Ver1.1" */
+	ROM_LOAD32_BYTE( "p-47_aces_3-31_rom_27_ver1.1.27", 0x000002, 0x80000, CRC(2a0c107a) SHA1(1d83bd55acaad62a5823f09b1683f846631fdeca) ) /* Labeled "P-47 ACES 3/31  ROM 27 Ver1.1" */
+	ROM_LOAD32_BYTE( "p-47_aces_3-31_rom_28_ver1.1.28", 0x000001, 0x80000, CRC(53509d28) SHA1(44e6388ade514bb747a84bfef17f852393b44a37) ) /* Labeled "P-47 ACES 3/31  ROM 28 Ver1.1" */
+	ROM_LOAD32_BYTE( "p-47_aces_3-31_rom_29_ver1.1.29", 0x000000, 0x80000, CRC(91e7b7da) SHA1(f3a0e193c59e285d97a7ea9bc92a7b3c5c009532) ) /* Labeled "P-47 ACES 3/31  ROM 29 Ver1.1" */
+
+	ROM_REGION( 0xe00000, "sprite", 0 ) /* sprites */
+	ROM_LOAD32_WORD( "mr94020-02.1",  0x000002, 0x200000, CRC(28732d3c) SHA1(15b2687bcad31793fc7d6a9dc3eccb7ad9b5f659) )
+	ROM_LOAD32_WORD( "mr94020-01.13", 0x000000, 0x200000, CRC(a6ccf999) SHA1(5d32fb6f6987ede6c125bec9581da4695ad64dff) )
+	ROM_LOAD32_WORD( "mr94020-04.2",  0x400002, 0x200000, CRC(128db576) SHA1(f6561f54f6b95842a5f14d29682449bf0d837a85) )
+	ROM_LOAD32_WORD( "mr94020-03.14", 0x400000, 0x200000, CRC(efc52b38) SHA1(589caaaba4e3ddaf41e05f0f12b8d4bc6d63fa5c) )
+	ROM_LOAD32_WORD( "mr94020-06.3",  0x800002, 0x200000, CRC(324cd504) SHA1(79b3ef3ae0aa14d903113ccf5b57d459c329cf12) )
+	ROM_LOAD32_WORD( "mr94020-05.15", 0x800000, 0x200000, CRC(ca164b17) SHA1(ea1cb0894632442f40d321b5843125f874768aae) )
+	ROM_LOAD32_WORD( "mr94020-08.4",  0xc00002, 0x100000, CRC(4b3372be) SHA1(cdc7d7615b6b5d45ca071b2967980dc6c6294ac0) )
+	ROM_LOAD32_WORD( "mr94020-07.16", 0xc00000, 0x100000, CRC(c23c5467) SHA1(5ff51ecb86ccbae2af160599890e13a7cc70072d) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* roz tiles */
+	ROM_LOAD( "mr94020-11.11", 0x000000, 0x200000, CRC(c1fe16b3) SHA1(8b9d2483ba06ab8072676e73d949c696535b3d26) )
+	ROM_LOAD( "mr94020-12.12", 0x200000, 0x200000, CRC(75871325) SHA1(9191263a52ec6ac325cf6130b35be7cdd1ec2f50) )
+
+	ROM_REGION( 0x400000, "gfx3", 0 ) /* bg tiles */
+	ROM_LOAD( "mr94020-10.10", 0x000000, 0x200000, CRC(a44e9e06) SHA1(ff51796e160d996e931b92049e6214982f270caa) ) /* unlike other sets, the ROM number & socket number match - it's correct */
+	ROM_LOAD( "mr94020-09.9",  0x200000, 0x200000, CRC(226014a6) SHA1(090bdc1f6d2b9d33b431dbb49a457a4bb36cd3ad) )
+
+	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_LOAD( "p-47_ver1.0-30.30", 0x000000, 0x080000, CRC(7ba90fad) SHA1(c0a3d4458816f00b8f5eb4b6d4531d1abeaccbe5) ) /* Labeled "P-47 Ver1.0 -30" */
+
+	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
+	ROM_LOAD( "p-47_ver1.0-21.21", 0x000000, 0x040000, CRC(f2d43927) SHA1(69ac20f339a515d58cafbcd6f7d7982ca5cda681) ) /* Labeled "P-47 Ver1.0 -21" */
+
+	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
+	ROM_LOAD( "mr92042-01.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
+	ROM_LOAD( "mr94020-13.23", 0x200000, 0x200000, CRC(547fa4d4) SHA1(8a5ecb3300646762f63d37a27e643e1f6ce5e775) )
+
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+ROM_END
+
+ROM_START( p47acesa )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
 	ROM_LOAD32_BYTE( "p47_ver1.0-26.26", 0x000003, 0x80000, CRC(e017b819) SHA1(942fb48e8bb3a263534a0351a1a9979d786bc475) ) /* Labeled "P-47 Ver1.0 -26" */
 	ROM_LOAD32_BYTE( "p47_ver1.0-27.27", 0x000002, 0x80000, CRC(bd1b81e0) SHA1(b15f157fe3a30295f999a4c285da2d6f22d7fba6) ) /* Labeled "P-47 Ver1.0 -27" */
@@ -2634,7 +2677,8 @@ GAME( 1994, suchie2o,  suchie2,  ms32, suchie2,  ms32_state, init_suchie2,    RO
 GAME( 1995, desertwr,  0,        ms32, desertwr, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, gametngk,  0,        ms32, gametngk, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, tetrisp,   0,        ms32, tetrisp,  ms32_state, init_ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, p47aces,   0,        ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",         "P-47 Aces (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47aces,   0,        ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",         "P-47 Aces (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47acesa,  p47aces,  ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",         "P-47 Aces (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, akiss,     0,        ms32, suchie2,  ms32_state, init_kirarast,   ROT0,   "Jaleco",         "Mahjong Angel Kiss (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, gratia,    0,        ms32, gratia,   ms32_state, init_ss92047_01, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, gratiaa,   gratia,   ms32, gratia,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

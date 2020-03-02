@@ -22,6 +22,7 @@ public:
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 	auto write_irq_callback() { return m_irq_cb.bind(); }
+	auto channel_irq_callback() { return m_ch_irq_cb.bind(); }
 
 	DECLARE_READ16_MEMBER(audio_r);
 	virtual DECLARE_WRITE16_MEMBER(audio_w);
@@ -321,11 +322,21 @@ protected:
 		AUDIO_EQ_GAIN32_MASK            = 0x7f7f
 	};
 
+	struct adpcm36_state
+	{
+		uint16_t m_remaining;
+		uint16_t m_header;
+		int16_t m_prevsamp[2];
+	};
+
 	static const device_timer_id TIMER_BEAT = 3;
+	static const device_timer_id TIMER_IRQ = 4;
+
 	void check_irqs(const uint16_t changed);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_stop() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	uint16_t read_space(offs_t offset);
@@ -334,7 +345,8 @@ protected:
 	bool advance_channel(const uint32_t channel);
 	bool fetch_sample(const uint32_t channel);
 	void loop_channel(const uint32_t channel);
-
+	uint16_t decode_adpcm36_nybble(const uint32_t channel, const uint8_t data);
+	void read_adpcm36_header(const uint32_t channel);
 
 	bool m_debug_samples;
 	bool m_debug_rates;
@@ -354,9 +366,11 @@ protected:
 	uint16_t m_audio_curr_beat_base_count;
 
 	emu_timer *m_audio_beat;
+	emu_timer *m_channel_irq[16];
 
 	sound_stream *m_stream;
 	oki_adpcm_state m_adpcm[16];
+	adpcm36_state m_adpcm36_state[16];
 
 	static const uint32_t s_rampdown_frame_counts[8];
 	static const uint32_t s_envclk_frame_counts[16];
@@ -364,7 +378,7 @@ protected:
 private:
 	devcb_read16 m_space_read_cb;
 	devcb_write_line m_irq_cb;
-
+	devcb_write_line m_ch_irq_cb;
 };
 
 class spg110_audio_device : public spg2xx_audio_device

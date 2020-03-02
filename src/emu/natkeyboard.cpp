@@ -350,9 +350,9 @@ natural_keyboard::natural_keyboard(running_machine &machine)
 void natural_keyboard::configure(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty)
 {
 	// set the callbacks
-	m_queue_chars = queue_chars;
-	m_accept_char = accept_char;
-	m_charqueue_empty = charqueue_empty;
+	m_queue_chars = std::move(queue_chars);
+	m_accept_char = std::move(accept_char);
+	m_charqueue_empty = std::move(charqueue_empty);
 }
 
 
@@ -638,7 +638,7 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 				{
 					if (!(curshift & ~mask))
 					{
-						// fetch the code, ignoring 0 and shiters
+						// fetch the code, ignoring 0 and shifters
 						std::vector<char32_t> const codes = field.keyboard_codes(curshift);
 						for (char32_t code : codes)
 						{

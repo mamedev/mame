@@ -80,8 +80,8 @@ private:
 	address_space *m_regs;
 
 	// callbacks
-	devcb_read8 m_input_cb[4];
-	devcb_write8 m_output_cb[4];
+	devcb_read8::array<4> m_input_cb;
+	devcb_write8::array<4> m_output_cb;
 
 	uint32_t m_rom_size;
 

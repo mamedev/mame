@@ -453,13 +453,13 @@ protected:
 	int m_txcb;
 
 	// internal state
-	devcb_write_line    m_out_txd_cb[2];
-	devcb_write_line    m_out_dtr_cb[2];
-	devcb_write_line    m_out_rts_cb[2];
-	devcb_write_line    m_out_wreq_cb[2];
-	devcb_write_line    m_out_sync_cb[2];
-	devcb_write_line    m_out_rxdrq_cb[2];
-	devcb_write_line    m_out_txdrq_cb[2];
+	devcb_write_line::array<2> m_out_txd_cb;
+	devcb_write_line::array<2> m_out_dtr_cb;
+	devcb_write_line::array<2> m_out_rts_cb;
+	devcb_write_line::array<2> m_out_wreq_cb;
+	devcb_write_line::array<2> m_out_sync_cb;
+	devcb_write_line::array<2> m_out_rxdrq_cb;
+	devcb_write_line::array<2> m_out_txdrq_cb;
 
 	devcb_write_line    m_out_int_cb;
 

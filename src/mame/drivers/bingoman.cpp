@@ -49,7 +49,7 @@
 
   1x Trimmer/pot @ r34
 
-  a shitload of jumpers...
+  a large amount of jumpers...
 
   There are 3 games P03, P07 and P14 (2 roms each), plus main code.
   Also 2 sound ROMs.

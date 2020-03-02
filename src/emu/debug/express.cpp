@@ -252,8 +252,8 @@ integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name
 
 integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, symbol_table::getter_func getter, symbol_table::setter_func setter, const std::string &format)
 	: symbol_entry(table, SMT_INTEGER, name, format),
-		m_getter(getter),
-		m_setter(setter),
+		m_getter(std::move(getter)),
+		m_setter(std::move(setter)),
 		m_value(0)
 {
 }
@@ -305,7 +305,7 @@ function_symbol_entry::function_symbol_entry(symbol_table &table, const char *na
 	: symbol_entry(table, SMT_FUNCTION, name, ""),
 		m_minparams(minparams),
 		m_maxparams(maxparams),
-		m_execute(execute)
+		m_execute(std::move(execute))
 {
 }
 
@@ -381,9 +381,9 @@ symbol_table::symbol_table(void *globalref, symbol_table *parent)
 void symbol_table::configure_memory(void *param, valid_func valid, read_func read, write_func write)
 {
 	m_memory_param = param;
-	m_memory_valid = valid;
-	m_memory_read = read;
-	m_memory_write = write;
+	m_memory_valid = std::move(valid);
+	m_memory_read = std::move(read);
+	m_memory_write = std::move(write);
 }
 
 

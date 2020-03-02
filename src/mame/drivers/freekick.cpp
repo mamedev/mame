@@ -4,7 +4,7 @@
 
 Free Kick  - (c) 1987 Sega / Nihon System (made by Nihon, licensed to Sega)
 
-Driver by Tomasz Slanina  dox@space.pl
+Driver by Tomasz Slanina
 based on initial work made by David Haywood
 
 Z80 @ 3MHz (12.000/4)

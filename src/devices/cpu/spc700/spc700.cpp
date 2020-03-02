@@ -415,11 +415,11 @@ uint32_t spc700_device::EA_ABS()   {return OPER_16_IMM();}
 uint32_t spc700_device::EA_ABX()   {return EA_ABS() + REG_X;}
 uint32_t spc700_device::EA_ABY()   {return EA_ABS() + REG_Y;}
 uint32_t spc700_device::EA_AXI()   {return OPER_16_ABX();}
-uint32_t spc700_device::EA_DP()   {return OPER_8_IMM();}
+uint32_t spc700_device::EA_DP()    {return OPER_8_IMM();}
 uint32_t spc700_device::EA_DPX()   {return (EA_DP() + REG_X)&0xff;}
 uint32_t spc700_device::EA_DPY()   {return (EA_DP() + REG_Y)&0xff;}
 uint32_t spc700_device::EA_DXI()   {return OPER_16_DPX();}
-uint32_t spc700_device::EA_DIY()   {uint32_t addr = OPER_16_DP(); if((addr&0xff00) != ((addr+REG_Y)&0xff00)) CLK(1); return addr + REG_Y;}
+uint32_t spc700_device::EA_DIY()   {uint32_t addr = OPER_16_DP(); return addr + REG_Y;}
 uint32_t spc700_device::EA_XI()    {return REG_X;}
 uint32_t spc700_device::EA_XII()   {uint32_t val = REG_X;REG_X = MAKE_UINT_8(REG_X+1);return val;}
 uint32_t spc700_device::EA_YI()    {return REG_Y;}
@@ -1181,16 +1181,18 @@ void spc700_device::SET_FLAG_I(uint32_t value)
 			CLK(BCLK);                                                      \
 			DST     = EA_##MODE();                                          \
 			FLAG_NZ = read_8_##MODE(DST);                                   \
-			write_8_##MODE(DST, FLAG_N & ~REG_A);                           \
-			FLAG_NZ &= REG_A
+			m_spc_int16 = (short)REG_A - (short)(read_8_##MODE(DST)); \
+			write_8_##MODE(DST, FLAG_NZ & ~REG_A); \
+			FLAG_NZ = MAKE_UINT_8(m_spc_int16);
 
 /* Test and Set Bits */
 #define OP_TSET1(BCLK, MODE)                                                \
 			CLK(BCLK);                                                      \
 			DST     = EA_##MODE();                                          \
 			FLAG_NZ = read_8_##MODE(DST);                                   \
-			write_8_##MODE(DST, FLAG_N | REG_A);                            \
-			FLAG_NZ &= REG_A
+		m_spc_int16 = (short)REG_A - (short)(read_8_##MODE(DST)); \
+		write_8_##MODE(DST, FLAG_NZ | REG_A); \
+		FLAG_NZ = MAKE_UINT_8(m_spc_int16);
 
 /* Exchange high and low nybbles of accumulator */
 #define OP_XCN(BCLK)                                                        \

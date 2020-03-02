@@ -155,7 +155,7 @@
 		<publisher>Sega Toys</publisher>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
-				<rom loadflag="load16_word_swap" name="S-100042-1000 - Pocket Monsters Best Wishes! Chinou Ikusei Pokémon Daiundoukai (Japan).bin" size="0x00800000" crc="a88ec549" sha1="866b56789fcb118e1ac50a8214a630a092aadd2f" />
+				<rom loadflag="load16_word_swap" name="S-100042-1000 - Pocket Monsters Best Wishes! Chinou Ikusei Pokemon Daiundoukai (Japan).bin" size="0x00800000" crc="a88ec549" sha1="866b56789fcb118e1ac50a8214a630a092aadd2f" />
 			</dataarea>
 			<dataarea name="pages" size="0x3000000"> <!-- book pages -->
 				<rom name="0 - 0001.png" size="0x00800000" crc="a88ec549" sha1="866b56789fcb118e1ac50a8214a630a092aadd2f" />

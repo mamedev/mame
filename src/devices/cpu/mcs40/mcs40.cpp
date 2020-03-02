@@ -105,8 +105,8 @@ mcs40_cpu_device_base::mcs40_cpu_device_base(
 	, m_cache(nullptr)
 	, m_bus_cycle_cb(*this)
 	, m_sync_cb(*this)
-	, m_cm_rom_cb{ { *this }, { *this } }
-	, m_cm_ram_cb{ { *this }, { *this }, { *this }, { *this }, }
+	, m_cm_rom_cb(*this)
+	, m_cm_ram_cb(*this)
 	, m_cy_cb(*this), m_stp_ack_cb(*this)
 	, m_4289_pm_cb(*this), m_4289_f_l_cb(*this)
 	, m_extended_cm(extended_cm)
@@ -146,12 +146,8 @@ void mcs40_cpu_device_base::device_start()
 
 	m_bus_cycle_cb.resolve();
 	m_sync_cb.resolve_safe();
-	m_cm_rom_cb[0].resolve_safe();
-	m_cm_rom_cb[1].resolve_safe();
-	m_cm_ram_cb[0].resolve_safe();
-	m_cm_ram_cb[1].resolve_safe();
-	m_cm_ram_cb[2].resolve_safe();
-	m_cm_ram_cb[3].resolve_safe();
+	m_cm_rom_cb.resolve_all_safe();
+	m_cm_ram_cb.resolve_all_safe();
 	m_cy_cb.resolve_safe();
 	m_stp_ack_cb.resolve_safe();
 	m_4289_pm_cb.resolve_safe();

@@ -40,7 +40,7 @@ iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const ch
 	m_scc1(*this, AM85C30_TAG),
 	m_screen(*this, finder_base::DUMMY_TAG),
 	m_cpu(*this, finder_base::DUMMY_TAG),
-	m_in_cb{ { *this },{ *this },{ *this } },
+	m_in_cb(*this),
 	m_trackx_cb(*this),
 	m_tracky_cb(*this),
 	m_gunx_cb(*this),
@@ -106,8 +106,7 @@ void iteagle_fpga_device::device_start()
 	m_timer = timer_alloc(0, nullptr);
 
 	// Switch IO
-	for (unsigned i = 0; i < IO_NUM; i++)
-		m_in_cb[i].resolve_safe(0xffff);
+	m_in_cb.resolve_all_safe(0xffff);
 	// Track IO
 	m_trackx_cb.resolve_safe(0xff);
 	m_tracky_cb.resolve_safe(0xff);

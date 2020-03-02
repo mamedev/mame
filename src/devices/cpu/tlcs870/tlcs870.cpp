@@ -111,10 +111,10 @@ tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type optype
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_intram(*this, "intram")
 	, m_dbr(*this, "dbr")
-	, m_port_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_port_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_port_analog_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_serial_out_cb{{*this}, {*this}}
+	, m_port_in_cb(*this)
+	, m_port_out_cb(*this)
+	, m_port_analog_in_cb(*this)
+	, m_serial_out_cb(*this)
 {
 }
 
@@ -1240,14 +1240,10 @@ void tlcs870_device::device_start()
 
 	set_icountptr(m_icount);
 
-	for (auto &cb : m_port_in_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_port_out_cb)
-		cb.resolve_safe();
-	for (auto &cb : m_port_analog_in_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_serial_out_cb)
-		cb.resolve_safe();
+	m_port_in_cb.resolve_all_safe(0xff);
+	m_port_out_cb.resolve_all_safe();
+	m_port_analog_in_cb.resolve_all_safe(0xff);
+	m_serial_out_cb.resolve_all_safe();
 
 	m_serial_transmit_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::sio0_transmit_cb), this));
 	m_serial_transmit_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::sio1_transmit_cb), this));

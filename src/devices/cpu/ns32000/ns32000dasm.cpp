@@ -360,7 +360,7 @@ int8_t ns32000_disassembler::short2int(uint8_t val)
 	return (val & 0x08) ? val | 0xf0 : val;
 }
 
-std::string ns32000_disassembler::mnemonic_index(std::string form, std::string itype, std::string ftype)
+std::string ns32000_disassembler::mnemonic_index(std::string form, const std::string &itype, const std::string &ftype)
 {
 	if (itype.size() && form.find('i') != std::string::npos)
 		form.replace(form.find('i'), 1, itype);

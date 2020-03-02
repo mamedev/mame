@@ -40,9 +40,9 @@ DEFINE_DEVICE_TYPE(M37450, m37450_device, "m37450", "Mitsubishi M37450")
 m3745x_device::m3745x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map) :
 	m740_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
-	m_read_p{{*this}, {*this}, {*this}, {*this}},
-	m_write_p{{*this}, {*this}, {*this}, {*this}},
-	m_read_ad{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
+	m_read_p(*this),
+	m_write_p(*this),
+	m_read_ad(*this),
 	m_intreq1(0),
 	m_intreq2(0),
 	m_intctrl1(0),
@@ -58,15 +58,9 @@ m3745x_device::m3745x_device(const machine_config &mconfig, device_type type, co
 
 void m3745x_device::device_start()
 {
-	for (int i = 0; i < 4; i++)
-	{
-		m_read_p[i].resolve_safe(0);
-		m_write_p[i].resolve_safe();
-	}
-	for (int i = 0; i < 8; i++)
-	{
-		m_read_ad[i].resolve_safe(0);
-	}
+	m_read_p.resolve_all_safe(0);
+	m_write_p.resolve_all_safe();
+	m_read_ad.resolve_all_safe(0);
 
 	for (int i = 0; i < NUM_TIMERS; i++)
 	{

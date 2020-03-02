@@ -237,7 +237,7 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 
 LRESULT CALLBACK editwin_info::static_edit_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
-	editwin_info *const info = (editwin_info *)uintptr_t(GetWindowLongPtr(wnd, GWLP_USERDATA));
+	auto *const info = (editwin_info *)uintptr_t(GetWindowLongPtr(wnd, GWLP_USERDATA));
 	assert(info->m_editwnd == wnd);
 	return info->edit_proc(message, wparam, lparam);
 }

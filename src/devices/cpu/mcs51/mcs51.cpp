@@ -10,6 +10,8 @@
  *   8052 Product Line (8032,8052,8752)
  *   8054 Product Line (8054)
  *   8058 Product Line (8058)
+ *   80552 Product Line (80552, 83552, 87552)
+ *   80562 Product Line (80562, 83562, 87562)
  *
  *   Copyright Steve Ellenoff, all rights reserved.
  *
@@ -87,7 +89,7 @@
  *
  *****************************************************************************/
 
-/* TODO: Varios
+/* TODO: Various
  *  - EA pin - defined by architecture, must implement:
  *    1 means external access, bypassing internal ROM
  *  - T0 output clock ?
@@ -100,6 +102,7 @@
  *      actually use 80CXX, i.e. CMOS versions.
  *      "Normal" 805X will return a 0 if reading from a output port which has
  *      a 0 written to it's latch. At least cardline expects a 1 here.
+ * - ADC support for 80552/80562 (controls analog inputs for Arctic Thunder)
  *
  * Done: (Couriersud)
  * - Merged DS5002FP
@@ -272,8 +275,8 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	, m_num_interrupts(5)
 	, m_sfr_ram(*this, "sfr_ram")
 	, m_scratchpad(*this, "scratchpad")
-	, m_port_in_cb{{*this}, {*this}, {*this}, {*this}}
-	, m_port_out_cb{{*this}, {*this}, {*this}, {*this}}
+	, m_port_in_cb(*this)
+	, m_port_out_cb(*this)
 	, m_serial_tx_cb(*this)
 	, m_serial_rx_cb(*this)
 	, m_rtemp(0)
@@ -2128,11 +2131,8 @@ void mcs51_cpu_device::device_start()
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
-	for (auto &cb : m_port_in_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_port_out_cb)
-		cb.resolve_safe();
-
+	m_port_in_cb.resolve_all_safe(0xff);
+	m_port_out_cb.resolve_all_safe();
 	m_serial_rx_cb.resolve_safe(0);
 	m_serial_tx_cb.resolve_safe();
 

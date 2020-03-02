@@ -692,6 +692,72 @@ void gaelco2_state::play2000_map(address_map &map)
 	map(0xfe8000, 0xfeffff).ram().share("shareram");                                                                       /* Work RAM */
 }
 
+READ16_MEMBER(gaelco2_state::srollnd_share_sim_r)
+{
+	uint16_t ret = m_shareram[offset];
+
+	if (m_maincpu->pc() == 0x0083d0)
+		ret = 0x0000;
+
+	if (m_maincpu->pc() == 0x0085B0)
+		ret = 0x0000;
+
+	if (m_maincpu->pc() == 0x00839e)
+		ret = 0x0000;
+
+	if (m_maincpu->pc() == 0x0035a6)
+		ret = 0x0000;
+
+	if (m_maincpu->pc() == 0x00857e) // after restoring default values (write back to nvram)
+		ret = 0x0000;
+
+
+	// reads a bunch of data (game specific? backup ram? default backup ram?) from device (0x180 words - copied to start of RAM)
+	if (m_maincpu->pc() == 0x83da)
+	{
+		ret = 0x0000;
+
+		if (offset == 0x274 / 2)
+		{
+			//  ret = 0x3112; // checked after copy, otherwise you get password? prompt
+
+			// the 'password' for bootup (reset to default values) is stored at 13454 in ROM
+			// sequence value: 0800 0800 1000 4000 2000
+			// default key:    x    x    c    b    v
+
+			// the 'password' in service mode checks the following (stored after above) (anything related to countability or where changing it might clear things)
+			// sequence value: 0800 1000 0400 0800 4000
+			// default key:    x    c    z    x    b
+
+			// 0400 0800 1000 2000 4000  (just a default unused sequence?)
+			// z    x    c    v    b
+
+			// 0400 0400 1000 0800 4000  for advanced internal options in service mode
+			// z    z    c    x   b
+		}
+	}
+
+
+	logerror("%s: srollnd_share_sim_r %04x: %04x (%04x)\n", machine().describe_context(), offset, ret, mem_mask);
+
+	return ret;
+}
+
+WRITE16_MEMBER(gaelco2_state::srollnd_share_sim_w)
+{
+	if (m_maincpu->pc() != 0x552)
+		logerror("%s: srollnd_share_sim_w %04x: %04x (%04x)\n", machine().describe_context(), offset, data, mem_mask);
+	COMBINE_DATA(&m_shareram[offset]);
+}
+
+void gaelco2_state::srollnd_map(address_map& map)
+{
+	play2000_map(map);
+
+	map(0xfe8000, 0xfeffff).ram().rw(FUNC(gaelco2_state::srollnd_share_sim_r), FUNC(gaelco2_state::srollnd_share_sim_w)).share("shareram");
+}
+
+
 static INPUT_PORTS_START( play2000 )
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) // Coin1
@@ -834,6 +900,27 @@ ROM_START( play2000_50i )
 	ROM_LOAD( "palce16v8h.u29",  0x0000, 0x0117, BAD_DUMP CRC(4a0a6f39) SHA1(57351e471649391c9abf110828fe2f128fe84eee) )
 ROM_END
 
+
+ROM_START( srollnd )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "nd2.u44",    0x000001, 0x010000, CRC(ee3ec213) SHA1(80a08839327bf8215abfad1fececac64da6fbcb2) )
+	ROM_LOAD16_BYTE( "nd1.u45",    0x000000, 0x010000, CRC(4bf20c7b) SHA1(b483f74fed25139e92359b178f6548b867c999e4) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
+	ROM_LOAD( "srollnd.ds5002fp", 0x00000, 0x8000, NO_DUMP )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	DS5002FP_SET_MON( 0x19 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x0a00000, "gfx1", ROMREGION_ERASE00 ) /* GFX + Sound */
+	ROM_LOAD( "nd5.u49", 0x0000000, 0x080000, CRC(5ec78408) SHA1(1a5b3a0bdbd36bf6607e47dedf31f4b9a7b89667) )
+	ROM_LOAD( "nd3.u51", 0x0200000, 0x020000, CRC(e19ac5b8) SHA1(980a3b339f6958e5e04ea624f26dabd2e06f0c68) )
+	ROM_LOAD( "nd6.u48", 0x0400000, 0x020000, CRC(81cd4097) SHA1(94c7f0d3c21070039dbef9fc43d0f5f2619dad5a) )
+	ROM_LOAD( "nd4.u58", 0x0600000, 0x020000, CRC(8c66cd09) SHA1(5cf0a001bfd46c1e955f7952f8a42a001beaf43c) )
+ROM_END
+
 void gaelco2_state::play2000(machine_config &config)
 {
 	/* basic machine hardware */
@@ -843,6 +930,45 @@ void gaelco2_state::play2000(machine_config &config)
 
 	GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(32'000'000) / 2).set_addrmap(0, &gaelco2_state::mcu_hostmem_map); /* 16 MHz */
 	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
+
+	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.1);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*16, 32*16);
+	screen.set_visarea(0, 384-1, 16, 256-1);
+	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
+	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
+	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+
+	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
+
+	/* sound hardware */
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(34'000'000) / 34));
+	gaelco.set_device_rom_tag("gfx1");
+	gaelco.set_bank_offsets(0 * 0x080000, 0 * 0x080000, 0 * 0x080000, 0 * 0x080000);
+	gaelco.add_route(0, "lspeaker", 1.0);
+	gaelco.add_route(1, "rspeaker", 1.0);
+}
+
+void gaelco2_state::srollnd(machine_config& config)
+{
+	/* basic machine hardware */
+	M68000(config, m_maincpu, XTAL(20'000'000 / 2));
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco2_state::srollnd_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gaelco2_state::irq6_line_hold));
+
+	// not dumped
+	//GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(32'000'000) / 2).set_addrmap(0, &gaelco2_state::mcu_hostmem_map); /* ? MHz */
+	//config.set_perfect_quantum("gaelco_ds5002fp:mcu");
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
@@ -1263,6 +1389,7 @@ REF: 940411
     the byte at 0x1ff in the rom at u44 controls the language / region settings
     and even allows for an alt. title of Lizard Hunt
 
+    Bits        Usage
     Bits        Usage
     ---------------------------------------------------------------------------------
     0000 1000   Title (0x00 = LIZARD HUNT, 0x08 = ALLIGATOR HUNT)
@@ -2494,6 +2621,8 @@ GAME( 1998, bangj,       bang,      bang,             bang,     bang_state,    i
 GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v7.0i) (Italy)",  0 )
 GAME( 1999, play2000_50i,play2000,  play2000,         play2000, gaelco2_state, empty_init,     ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.0i) (Italy)",  MACHINE_NOT_WORKING ) // bad dump
 GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)",  0 )
+
+GAME( 1998, srollnd,     0,         srollnd,          play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Super Roller (v7.0)",  MACHINE_NOT_WORKING ) // missing ds5002fp dump
 
 // Gym equipment
 GAME( 1997, sltpcycl,   0,          saltcrdi,         saltcrdi, gaelco2_state, init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", 0 ) // Same board and ROM as Pro Reclimber

@@ -43,8 +43,7 @@
 #else
 
 #define SOLVER(name, freq)                                                  \
-		NET_REGISTER_DEV(SOLVER, name)                                      \
-		PARAM(name.FREQ, freq)
+		NET_REGISTER_DEVEXT(SOLVER, name, freq)
 
 #include "nld_system.h"
 

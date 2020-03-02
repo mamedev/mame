@@ -147,7 +147,7 @@ public:
 	};
 
 	// construction/destruction
-	core_options();
+	core_options() = default;
 	core_options(const core_options &) = delete;
 	core_options(core_options &&) = default;
 	core_options& operator=(const core_options &) = delete;
@@ -213,7 +213,7 @@ private:
 		simple_entry(simple_entry &&) = delete;
 		simple_entry& operator=(const simple_entry &) = delete;
 		simple_entry& operator=(simple_entry &&) = delete;
-		~simple_entry();
+		virtual ~simple_entry();
 
 		// getters
 		virtual const char *value() const noexcept override;

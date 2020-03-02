@@ -55,12 +55,12 @@ private:
 
 WRITE8_MEMBER(konin_state::picu_b_w)
 {
-	m_picu->b_w(data ^ 7);
+	m_picu->b_w(data);
 }
 
 WRITE_LINE_MEMBER(konin_state::picu_r3_w)
 {
-	m_picu->r_w(3, !state);
+	m_picu->r_w(4, !state);
 }
 
 void konin_state::konin_mem(address_map &map)

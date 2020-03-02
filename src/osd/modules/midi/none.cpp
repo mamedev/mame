@@ -21,20 +21,20 @@ public:
 	: osd_module(OSD_MIDI_PROVIDER, "pm"), midi_module()
 	{
 	}
-	virtual ~none_module() { }
+	virtual ~none_module() = default;
 
 	virtual int init(const osd_options &options) override;
 	virtual void exit() override;
 
 	virtual osd_midi_device *create_midi_device() override;
-	virtual void list_midi_devices(void) override;
+	virtual void list_midi_devices() override;
 };
 
 
 class osd_midi_device_none : public osd_midi_device
 {
 public:
-	virtual ~osd_midi_device_none() { }
+	virtual ~osd_midi_device_none() = default;
 	virtual bool open_input(const char *devname) override;
 	virtual bool open_output(const char *devname) override;
 	virtual void close() override;
@@ -58,7 +58,7 @@ void none_module::exit()
 {
 }
 
-void none_module::list_midi_devices(void)
+void none_module::list_midi_devices()
 {
 	osd_printf_warning("\nMIDI is not supported in this build\n");
 }

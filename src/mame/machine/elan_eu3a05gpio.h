@@ -10,9 +10,12 @@ class elan_eu3a05gpio_device : public device_t
 public:
 	elan_eu3a05gpio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto read_0_callback() { return m_space_read0_cb.bind(); }
-	auto read_1_callback() { return m_space_read1_cb.bind(); }
-	auto read_2_callback() { return m_space_read2_cb.bind(); }
+	auto write_0_callback() { return m_write_0_callback.bind(); }
+	auto write_1_callback() { return m_write_1_callback.bind(); }
+	auto write_2_callback() { return m_write_2_callback.bind(); }
+	auto read_0_callback() { return m_read_0_callback.bind(); }
+	auto read_1_callback() { return m_read_1_callback.bind(); }
+	auto read_2_callback() { return m_read_2_callback.bind(); }
 
 	DECLARE_READ8_MEMBER(gpio_r);
 	DECLARE_WRITE8_MEMBER(gpio_w);
@@ -25,9 +28,12 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	devcb_read8 m_space_read0_cb;
-	devcb_read8 m_space_read1_cb;
-	devcb_read8 m_space_read2_cb;
+	devcb_write8 m_write_0_callback;
+	devcb_write8 m_write_1_callback;
+	devcb_write8 m_write_2_callback;
+	devcb_read8 m_read_0_callback;
+	devcb_read8 m_read_1_callback;
+	devcb_read8 m_read_2_callback;
 
 	uint8_t read_port_data(int which);
 	uint8_t read_direction(int which);

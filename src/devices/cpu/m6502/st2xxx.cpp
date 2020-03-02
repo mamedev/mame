@@ -37,8 +37,8 @@
 st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram)
 	: r65c02_device(mconfig, type, tag, owner, clock)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_bits, 0)
-	, m_in_port_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_out_port_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_in_port_cb(*this)
+	, m_out_port_cb(*this)
 	, m_prr_mask(data_bits <= 14 ? 0 : ((u16(1) << (data_bits - 14)) - 1) | (has_banked_ram ? 0x8000 : 0))
 	, m_drr_mask(data_bits <= 15 ? 0 : ((u16(1) << (data_bits - 15)) - 1) | (has_banked_ram ? 0x8000 : 0))
 	, m_pdata{0}
@@ -84,10 +84,8 @@ device_memory_interface::space_config_vector st2xxx_device::memory_space_config(
 
 void st2xxx_device::device_resolve_objects()
 {
-	for (auto &cb : m_in_port_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_out_port_cb)
-		cb.resolve_safe();
+	m_in_port_cb.resolve_all_safe(0xff);
+	m_out_port_cb.resolve_all_safe();
 }
 
 TIMER_CALLBACK_MEMBER(st2xxx_device::bt_interrupt)

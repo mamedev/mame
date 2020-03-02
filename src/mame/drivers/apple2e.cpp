@@ -157,6 +157,7 @@ Address bus A0-A11 is Y0-Y11
 #include "bus/a2bus/a2vulcan.h"
 #include "bus/a2bus/4play.h"
 #include "bus/a2bus/computereyes2.h"
+#include "bus/a2bus/byte8251.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -2469,10 +2470,16 @@ READ8_MEMBER(apple2e_state::c800_r)
 {
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
+		uint8_t rv = 0xff;
+
+		if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
+		{
+			rv = m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
+		}
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		m_intc8rom = false;
 		update_slotrom_banks();
-		return 0xff;
+		return rv;
 	}
 
 	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
@@ -2525,6 +2532,11 @@ WRITE8_MEMBER(apple2e_state::c800_w)
 		return;
 	}
 
+	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
+	{
+		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
+	}
+
 	if (offset == 0x7ff)
 	{
 		if (!machine().side_effects_disabled())
@@ -2533,13 +2545,6 @@ WRITE8_MEMBER(apple2e_state::c800_w)
 			m_intc8rom = false;
 			update_slotrom_banks();
 		}
-
-		return;
-	}
-
-	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
-	{
-		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
 	}
 }
 
@@ -4208,6 +4213,8 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("vulcan", A2BUS_VULCANIIE); /* Applied Engineering Vulcan IDE drive */
 	device.option_add("4play", A2BUS_4PLAY); /* 4Play Joystick Card (Rev. B) */
 	device.option_add("ceyes2", A2BUS_COMPUTEREYES2); /* ComputerEyes/2 Video Digitizer */
+	device.option_add("applesurance", A2BUS_APPLESURANCE);  /* Applesurance Diagnostic Controller */
+	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
 }
 
 static void apple2eaux_cards(device_slot_interface &device)

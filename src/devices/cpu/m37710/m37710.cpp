@@ -61,8 +61,9 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "m37710.h"
+
+#include "debugger.h"
 #include "m37710cm.h"
 #include "m37710il.h"
 
@@ -308,9 +309,9 @@ void m37730s2_device::map(address_map &map)
 m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, map_delegate)
-	, m_port_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_port_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_analog_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_port_in_cb(*this)
+	, m_port_out_cb(*this)
+	, m_analog_cb(*this)
 {
 }
 
@@ -1309,12 +1310,9 @@ void m37710_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
 
-	for (auto &cb : m_port_in_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_port_out_cb)
-		cb.resolve_safe();
-	for (auto &cb : m_analog_cb)
-		cb.resolve_safe(0);
+	m_port_in_cb.resolve_all_safe(0xff);
+	m_port_out_cb.resolve_all_safe();
+	m_analog_cb.resolve_all_safe(0);
 
 	m_ICount = 0;
 

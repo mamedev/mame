@@ -57,7 +57,7 @@ bool windows_osd_interface::video_init()
 	window_init();
 
 	// create the windows
-	windows_options &options = downcast<windows_options &>(machine().options());
+	auto &options = downcast<windows_options &>(machine().options());
 	for (int index = 0; index < video_config.numscreens; index++)
 	{
 		win_window_info::create(machine(), index, m_monitor_module->pick_monitor(options, index), &windows[index]);

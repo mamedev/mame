@@ -165,10 +165,10 @@ private:
 	address_space *m_io;
 	int     m_icount;
 
-	devcb_read8   m_port_in_cb[8];
-	devcb_write8  m_port_out_cb[8];
-	devcb_read8   m_port_analog_in_cb[8];
-	devcb_write_line m_serial_out_cb[2];
+	devcb_read8::array<8>   m_port_in_cb;
+	devcb_write8::array<8>  m_port_out_cb;
+	devcb_read8::array<8>   m_port_analog_in_cb;
+	devcb_write_line::array<2> m_serial_out_cb;
 
 
 	uint8_t m_port_out_latch[8];

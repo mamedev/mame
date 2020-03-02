@@ -8,11 +8,11 @@
 
 DEFINE_DEVICE_TYPE(ELAN_EU3A05_SOUND, elan_eu3a05_sound_device, "elan_eu3a05sound", "Elan EU3A05 / EU3A14 Sound")
 
-#define LOG_AUDIO       (1U << 0)
+#define LOG_AUDIO       (1U << 1)
 
 #define LOG_ALL         (LOG_AUDIO)
 
-#define VERBOSE             (0)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 
@@ -23,7 +23,7 @@ elan_eu3a05_sound_device::elan_eu3a05_sound_device(const machine_config &mconfig
 	m_space_config("regs", ENDIANNESS_NATIVE, 8, 6, 0, address_map_constructor(FUNC(elan_eu3a05_sound_device::map), this)),
 	m_stream(nullptr),
 	m_space_read_cb(*this),
-	m_sound_end_cb{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this } }
+	m_sound_end_cb(*this)
 {
 }
 
@@ -56,8 +56,7 @@ void elan_eu3a05_sound_device::device_start()
 	m_space_read_cb.resolve_safe(0);
 	m_stream = stream_alloc(0, 1, 8000);
 
-	for (devcb_write_line &cb : m_sound_end_cb)
-		cb.resolve_safe();
+	m_sound_end_cb.resolve_all_safe();
 
 	save_item(NAME(m_sound_byte_address));
 	save_item(NAME(m_sound_byte_len));
@@ -77,6 +76,7 @@ void elan_eu3a05_sound_device::device_reset()
 		m_sound_byte_address[i] = 0;
 		m_sound_byte_len[i] = 0;
 		m_sound_current_nib_pos[i] = 0;
+		m_adpcm[i].reset();
 	}
 
 	m_isstopped = 0x3f;
@@ -100,10 +100,13 @@ void elan_eu3a05_sound_device::sound_stream_update(sound_stream &stream, stream_
 	// reset the output stream
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
 
+	int volume = m_volumes[0] | (m_volumes[1] << 8);
+
 	int outpos = 0;
 	// loop while we still have samples to generate
 	while (samples-- != 0)
 	{
+		int total = 0;
 		for (int channel = 0; channel < 6; channel++)
 		{
 			if (!((m_isstopped >> channel) & 1))
@@ -115,19 +118,18 @@ void elan_eu3a05_sound_device::sound_stream_update(sound_stream &stream, stream_
 				int nibble = m_space_read_cb(readoffset);
 
 				nibble = nibble >> ((m_sound_current_nib_pos[channel] & 1) ? 0 : 4);
-				nibble &= 0x0f;
+				uint16_t decoded = (uint16_t)m_adpcm[channel].clock(nibble & 0xf);
+				decoded = (decoded * ((volume >> (channel * 2)) & 3)) / 3;
+				decoded <<= 4;
 
-				// it's actually some form of ADPCM? but apparently NOT the OKI ADPCM
-				if (nibble & 0x08)
-					nibble -= 0x10;
-
-				outputs[0][outpos] += nibble * 0x100;
+				total += (int32_t)(int16_t)decoded - 0x8000;
 
 				m_sound_current_nib_pos[channel]++;
 
 				if (m_sound_current_nib_pos[channel] >= m_sound_byte_len[channel] * 2)
 				{
 					m_sound_current_nib_pos[channel] = 0;
+					m_adpcm[channel].reset();
 					m_isstopped |= (1 << channel);
 
 					// maybe, seems to match the system IRQ mask when the sound interrupts are enabled?
@@ -140,6 +142,7 @@ void elan_eu3a05_sound_device::sound_stream_update(sound_stream &stream, stream_
 				//LOGMASKED( LOG_AUDIO, "m_isstopped %02x channel %d is NOT active %08x %06x\n", m_isstopped, channel, m_sound_byte_address[channel], m_sound_current_nib_pos[channel]);
 			}
 		}
+		outputs[0][outpos] = total / 6;
 		outpos++;
 	}
 }
@@ -314,8 +317,12 @@ void elan_eu3a05_sound_device::handle_sound_trigger(int which)
 
 	if (m_isstopped & (1 << which)) // golden tee will repeatedly try to start the music on the title screen (although could depend on a status read first?)
 	{
-		m_sound_current_nib_pos[which] = 0;
-		m_isstopped &= ~(1 << which);
+		if (m_sound_byte_len[which])
+		{
+			m_sound_current_nib_pos[which] = 0;
+			m_isstopped &= ~(1 << which);
+			m_adpcm[which].reset();
+		}
 	}
 }
 
@@ -330,21 +337,50 @@ READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_50a8_r)
 
 READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_volume_r)
 {
+	LOGMASKED( LOG_AUDIO, "%s: sound_volume_r (offset %d, data %02x)\n", machine().describe_context(), offset, m_volumes[offset]);
 	return m_volumes[offset];
 }
 
 WRITE8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_volume_w)
 {
+	m_stream->update();
+
+	LOGMASKED( LOG_AUDIO, "%s: sound_volume_w (offset %d, data %02x)\n", machine().describe_context(), offset, data);
 	m_volumes[offset] = data;
 }
 
 READ8_MEMBER(elan_eu3a05_sound_device::read_unmapped)
 {
-	logerror("%s: elan_eu3a05_sound_device::read_unmapped (offset %02x)\n", machine().describe_context(), offset);
+	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_sound_device::read_unmapped (offset %02x)\n", machine().describe_context(), offset);
 	return 0x00;
 }
 
 WRITE8_MEMBER(elan_eu3a05_sound_device::write_unmapped)
 {
-	logerror("%s: elan_eu3a05_sound_device::write_unmapped (offset %02x) (data %02x)\n", machine().describe_context(), offset, data);
+	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_sound_device::write_unmapped (offset %02x) (data %02x)\n", machine().describe_context(), offset, data);
 }
+
+READ8_MEMBER(elan_eu3a05_sound_device::reg50a4_r)
+{
+	LOGMASKED( LOG_AUDIO, "%s: reg50a4_r (unknown) (data %02x)\n", machine().describe_context(), m_50a4);
+	return m_50a4;
+}
+
+WRITE8_MEMBER(elan_eu3a05_sound_device::reg50a4_w)
+{
+	LOGMASKED( LOG_AUDIO, "%s: reg50a4_w (unknown) (data %02x)\n", machine().describe_context(), data);
+	m_50a4 = data;
+}
+
+READ8_MEMBER(elan_eu3a05_sound_device::reg50a9_r)
+{
+	LOGMASKED( LOG_AUDIO, "%s: reg50a9_r (IRQ mask?) (data %02x)\n", machine().describe_context(), m_50a9);
+	return m_50a9;
+}
+
+WRITE8_MEMBER(elan_eu3a05_sound_device::reg50a9_w)
+{
+	LOGMASKED( LOG_AUDIO, "%s: reg50a4_w (IRQ mask?) (data %02x)\n", machine().describe_context(), data);
+	m_50a9 = data;
+}
+

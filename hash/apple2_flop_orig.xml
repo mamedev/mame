@@ -10400,4 +10400,712 @@
 		</part>
 	</software>
 
+	<software name="advprgkt">
+		<description>Adventure Programming Kit (Versoin 10.84)</description>
+		<year>1984</year>
+		<publisher>Salty Software</publisher>
+		<info name="release" value="2020-01-24"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple ][+ or later. -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234823">
+				<rom name="adventure programming kit.woz" size="234823" crc="4da9593c" sha1="cc495b95c1c2cd9134e47865b913f7e9bfa4e41a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lgcyanct">
+		<description>Legacy of the Ancients</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2020-01-24"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="242988">
+				<rom name="legacy of the ancients side 1.woz" size="242988" crc="ec4191a1" sha1="94cb308a22c03c669417611d5441a1c437165626"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="234796">
+				<rom name="legacy of the ancients side 2.woz" size="234796" crc="fbec7b4c" sha1="a094c00d4a38959ee45dde1c22f7699ae142711d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="241452">
+				<rom name="legacy of the ancients side 3.woz" size="241452" crc="f433fe37" sha1="3b30805dd474f75923363c74d12e75e950c74382"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="241452">
+				<rom name="legacy of the ancients side 4.woz" size="241452" crc="5f13fdfd" sha1="b38eb9353f999d780b5f56a53c4a6b7330715686"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mingchal">
+		<description>Ming's Challenge</description>
+		<year>1982</year>
+		<publisher>Micro Fun</publisher>
+		<info name="release" value="2020-01-24"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="233746">
+				<rom name="ming's challenge.woz" size="233746" crc="155dd8de" sha1="14179cd6704f849c0446c7f0402e71cf70742e24"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragneye">
+		<description>The Dragon's Eye</description>
+		<year>1981</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2020-01-24"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234775">
+				<rom name="the dragon's eye.woz" size="234775" crc="0c51846e" sha1="69c5812255ee8c46724ff531ef3ad656199d0a77"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mn2049ii">
+		<description>Miner 2049er II</description>
+		<year>1984</year>
+		<publisher>Micro Fun</publisher>
+		<info name="release" value="2020-01-24"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234769">
+				<rom name="miner 2049er ii.woz" size="234769" crc="6ba9469f" sha1="b20e14d8a1dc69438c195e7512d6389aa1b83e94"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trcrsnct">
+		<description>The Tracer Sanction</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2020-01-24"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234785">
+				<rom name="the tracer sanction side a.woz" size="234785" crc="17b27251" sha1="f2179fdbaf0a9da30ccd64a176d19d4576fc2fc0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234785">
+				<rom name="the tracer sanction side b.woz" size="234785" crc="4f60a127" sha1="6b202a70c0c769c177d36fdd8c20c492014d1993"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sumrgms2">
+		<description>Summer Games II</description>
+		<year>1985</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2020-01-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234963">
+				<rom name="summer games ii side a.woz" size="234963" crc="f42076b9" sha1="38aeed0677d67a34844b29b76d2cd4211df8c479"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234963">
+				<rom name="summer games ii side b.woz" size="234963" crc="76abeacd" sha1="a49c9e066bc164f6d3af5e355b30fbfbb5b31ea6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srpstr10">
+		<description>The Serpent's Star (Version 1.0)</description>
+		<year>1983</year>
+		<publisher>Ultrasoft</publisher>
+		<info name="release" value="2020-01-26"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- Note: due to subtle emulation bugs and extremely finicky copy
+		protection, this disk may reboot one or more times before loading. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234770">
+				<rom name="the serpent's star side a.woz" size="234770" crc="197cce52" sha1="900bf3e4ab89b538620fe35445833618c3a2e1b9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234770">
+				<rom name="the serpent's star side b.woz" size="234770" crc="ee240f18" sha1="4938d02b15b2d4b626dfd0a14514cf09a06a0afa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dallasq">
+		<description>The Dallas Quest</description>
+		<year>1984</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2020-01-31"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="239978">
+				<rom name="the dallas quest side a.woz" size="239978" crc="62d0d0f4" sha1="3169c6013e3fe94b62a2a1e23ad3cff5a2d55b7a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot"/>
+			<dataarea name="flop" size="88938">
+				<rom name="the dallas quest side b (boot).woz" size="88938" crc="1d58f16d" sha1="7e43338a09abe35b575b79dc8246659ad8c4c348"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tzoner11">
+		<description>Time Zone (Version 1.1)</description>
+		<year>1982</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2020-02-08"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="234882">
+				<rom name="time zone v1.1 disk a.woz" size="234882" crc="9dd9bcbb" sha1="18ad98f30f49af2fa9f9cae99ad77b4709f21ac4" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="234882">
+				<rom name="time zone v1.1 disk b.woz" size="234882" crc="b0e640d9" sha1="f568d25a10a624937b5c0a7f5a7d285e9706e214" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="234882">
+				<rom name="time zone v1.1 disk c.woz" size="234882" crc="f1bc7998" sha1="875c3c74236477c2aefad415b2906490b6c5b134" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="234882">
+				<rom name="time zone v1.1 disk d.woz" size="234882" crc="fe0c102d" sha1="f7cbca00e759c4395baabbcd3b142d487d4785c1" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="234882">
+				<rom name="time zone v1.1 disk e.woz" size="234882" crc="30bc6bde" sha1="12f1badcaddf514ea2ad8adc91134f8a17996122" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk F"/>
+			<dataarea name="flop" size="234882">
+				<rom name="time zone v1.1 disk f.woz" size="234882" crc="93963177" sha1="fb4fabaa5ef5f2d2530682ac4a4ddec64b1b2824" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk G"/>
+			<dataarea name="flop" size="234882">
+				<rom name="time zone v1.1 disk g.woz" size="234882" crc="3ee201e6" sha1="97006b422e543c845e46c5e85a1f65758c2c146c" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk H"/>
+			<dataarea name="flop" size="234882">
+				<rom name="time zone v1.1 disk h.woz" size="234882" crc="efba5ced" sha1="6399284ba922097e794731a70babbd5d91b864bb" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk I"/>
+			<dataarea name="flop" size="234882">
+				<rom name="time zone v1.1 disk i.woz" size="234882" crc="57ca6357" sha1="ca7f12495f0c014a6a8395fb36c82ee9f372c0dc" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk J"/>
+			<dataarea name="flop" size="234882">
+				<rom name="time zone v1.1 disk j.woz" size="234882" crc="afb5b9d2" sha1="b5323943e5f04f7e773a26a593fdd5697b58ac29" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Disk K"/>
+			<dataarea name="flop" size="234882">
+				<rom name="time zone v1.1 disk k.woz" size="234882" crc="ae166b20" sha1="2901bb34acd69e8c2bceddaa3141b6d7f09403e7" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Disk L"/>
+			<dataarea name="flop" size="234882">
+				<rom name="time zone v1.1 disk l.woz" size="234882" crc="e5521794" sha1="7eb9d72811f682c06cb087ad195900930197746d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mhntrny">
+		<description>Manhunter: New York (Version 1.0I)</description>
+		<year>1988</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2020-02-07"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="234919">
+				<rom name="manhunter new york disk 1a.woz" size="234919" crc="96c8587e" sha1="2aec0648930b62687a932f80d69ab2605688842b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="234919">
+				<rom name="manhunter new york disk 1b.woz" size="234919" crc="9dbe9ae4" sha1="e8a645f7ff422b6be32f75256a5e40e83a092ab1" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="234919">
+				<rom name="manhunter new york disk 2a.woz" size="234919" crc="372c02d4" sha1="e82c31e350534d8138fd9e1cfe8b983c2c40b9c9" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="234919">
+				<rom name="manhunter new york disk 2b.woz" size="234919" crc="66b6fc66" sha1="7de67f998494cbeb7d68db6c7d92d3641f873320" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A"/>
+			<dataarea name="flop" size="234919">
+				<rom name="manhunter new york disk 3a.woz" size="234919" crc="bbbc6ba4" sha1="f6a58e97209d816af9791e588dbf32b4e50a7d42" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B"/>
+			<dataarea name="flop" size="234919">
+				<rom name="manhunter new york disk 3b.woz" size="234919" crc="9f6d1070" sha1="445b1bd2a597ea5da6dc8f4a85fa1ccc85eb9683" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side A"/>
+			<dataarea name="flop" size="234919">
+				<rom name="manhunter new york disk 4a.woz" size="234919" crc="49602f21" sha1="a01d3a92bd66bb51bb2e7f7fd1a6f2660dc21958" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side B"/>
+			<dataarea name="flop" size="234919">
+				<rom name="manhunter new york disk 4b.woz" size="234919" crc="c17ff13f" sha1="2c7b125772e7df2053b230638e17cb727f9778e9" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 Side A"/>
+			<dataarea name="flop" size="234919">
+				<rom name="manhunter new york disk 5a.woz" size="234919" crc="351bd475" sha1="82c6f68a1637af5c8efc5e723caeb0dca0c152d5" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 Side B"/>
+			<dataarea name="flop" size="234919">
+				<rom name="manhunter new york disk 5b.woz" size="234919" crc="68b7fd76" sha1="3e1e5df1f15d6e103b5be42c54d1d75fac268609" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6 Side A"/>
+			<dataarea name="flop" size="234919">
+				<rom name="manhunter new york disk 6a.woz" size="234919" crc="dd91e136" sha1="65a5748fa9c914950e32a18d45ce29ef0694a099" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6 Side B"/>
+			<dataarea name="flop" size="234919">
+				<rom name="manhunter new york disk 6b.woz" size="234919" crc="ca8be96b" sha1="cdf685059ae672824e84c8fe303301397d73b120" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mstrt21">
+		<description>MasterType (Version 2.1)</description>
+		<year>1984</year>
+		<publisher>Scarborough Systems</publisher>
+		<info name="release" value="2020-02-06"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- Due to its use of double hi-res graphics, it requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241632">
+				<rom name="mastertype v2.1.woz" size="241632" crc="2e3f25b3" sha1="944ee9e263ce5cceee795ede0dd5d8829d26cb15" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garftrv">
+		<description>Garfield Trivia Game</description>
+		<year>1989</year>
+		<publisher>Developmental Learning Materials</publisher>
+		<info name="release" value="2020-02-06"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241463">
+				<rom name="garfield trivia game.woz" size="241463" crc="dfb2a731" sha1="7def8dbddb0149d4c74fc5c6a9c53f6db26d9232" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="specprpt">
+		<description>Spectrum: Programs and Patterns</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-02-06"/>
+		<sharedfeat name="compatibility" value="A2fP,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234751">
+				<rom name="spectrum- patterns and programs.woz" size="234751" crc="7b5a279a" sha1="f433ecbcbebd17f6d86925ce8c085d49ac4ab164" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expamazn">
+		<description>Expedition Amazon</description>
+		<year>1983</year>
+		<publisher>Penguin Software</publisher>
+		<info name="release" value="2020-02-18"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235507">
+				<rom name="expedition amazon side a.woz" size="235507" crc="b318d4dd" sha1="bff9901632fd32337cb0e400a9b79328f74c4414" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B (Boot)"/>
+			<dataarea name="flop" size="235507">
+				<rom name="expedition amazon side b (boot).woz" size="235507" crc="25f68170" sha1="10601a71523d05c46918983176f96364643b1248" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="221bbv11">
+		<description>221B Baker Street (Version 1.1)</description>
+		<year>1986</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2020-02-18"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="234878">
+				<rom name="221b baker st. disk 1 - program disk.woz" size="234878" crc="c7776abc" sha1="340a2728d675c5dccd3210b29e5dce1fc4388c65" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Case disk"/>
+			<dataarea name="flop" size="234875">
+				<rom name="221b baker st. disk 2 - case disk.woz" size="234875" crc="6da11041" sha1="deae0f24fe1c50f034520840e7760dd859682bb4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcckbook">
+		<description>Micro Cookbook (Version 3.00)</description>
+		<year>1987</year>
+		<publisher>Pinpoint Publishing</publisher>
+		<info name="release" value="2020-02-18"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="234790">
+				<rom name="micro cookbook disk 1 - program disk.woz" size="234790" crc="b7d60576" sha1="cba756bba183ed3f0245082c2c10c4da05c6bb7b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - A new look at microwave cooking"/>
+			<dataarea name="flop" size="234809">
+				<rom name="micro cookbook disk 2 - a new look at microwave cooking.woz" size="234809" crc="86cc4519" sha1="e4eee7f1899abdec25bd23cf3f12ca7dd23b8866" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Appetizers"/>
+			<dataarea name="flop" size="234788">
+				<rom name="micro cookbook disk 3 - appetizers.woz" size="234788" crc="4e2bb138" sha1="daa65dc1037d0336f039be991f34ffb3e7c37479" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Basic recipes"/>
+			<dataarea name="flop" size="234791">
+				<rom name="micro cookbook disk 4 - basic recipes.woz" size="234791" crc="ee791790" sha1="a6ca48c4743aa1713ea2f7deeb9e3218bb934f01" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 - Colozona special diet recipes"/>
+			<dataarea name="flop" size="234807">
+				<rom name="micro cookbook disk 5 - colozona special diet recipes.woz" size="234807" crc="cfa1bfdd" sha1="197f20cbc03c981e7cbf38766eecd05a29919f1e" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6 - Daily breads and beyond"/>
+			<dataarea name="flop" size="234801">
+				<rom name="micro cookbook disk 6 - daily breads and beyond.woz" size="234801" crc="53fe0c89" sha1="326f5cd4748185c088a2ba2c4699a4c763da7dc6" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7 - Desserts"/>
+			<dataarea name="flop" size="234786">
+				<rom name="micro cookbook disk 7 - desserts.woz" size="234786" crc="26250338" sha1="64a2821910ee33a1f5dd2fffeab8569301d242d8" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8 - Family favorites"/>
+			<dataarea name="flop" size="234794">
+				<rom name="micro cookbook disk 8 - family favorites.woz" size="234794" crc="798a301b" sha1="39078c6290a5cce4b31d89e68def8be3abbb5572" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 9 - Food processor cookery"/>
+			<dataarea name="flop" size="234800">
+				<rom name="micro cookbook disk 9 - food processor cookery.woz" size="234800" crc="262d3636" sha1="666e5be2f865ecad93202398a52fe9370325d68a" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 10 - Holiday meals"/>
+			<dataarea name="flop" size="234792">
+				<rom name="micro cookbook disk 10 - holiday meals.woz" size="234792" crc="ae82bc5b" sha1="802e38f80649290a0a1250f054d2b5f3c97343f8" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 11 - Kid's cookery"/>
+			<dataarea name="flop" size="234792">
+				<rom name="micro cookbook disk 11 - kid's cookery.woz" size="234792" crc="39bc3cb8" sha1="2597286f35a41589f8124b4f49d2ed9fd50867db" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 12 - Meatless meals"/>
+			<dataarea name="flop" size="234793">
+				<rom name="micro cookbook disk 12 - meatless meals.woz" size="234793" crc="efb8f0e9" sha1="0d6514c09861f093edbe260864ad8acbb8899d39" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 13 - Soups and salads"/>
+			<dataarea name="flop" size="234793">
+				<rom name="micro cookbook disk 13 - soups and salads.woz" size="234793" crc="191c1a3a" sha1="59a6b8e961d26f641477b5f735016aac581e57b2" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 14 - World of wok cookery"/>
+			<dataarea name="flop" size="234799">
+				<rom name="micro cookbook disk 14 - world of wok cookery.woz" size="234799" crc="b0a206c4" sha1="faef296570822716489c3b15c8a61336969e4be3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="altregof">
+		<description>Alter Ego (female version)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2020-02-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="241437">
+				<rom name="alter ego - female version - disk 1a.woz" size="241437" crc="a08e8f56" sha1="c90e6087662186c8aa9daa7ef5cef2b67334357a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="234781">
+				<rom name="alter ego - female version - disk 1b.woz" size="234781" crc="ed3d7039" sha1="2b7db817b4fb2ca8c93c0aafdde150aae50eeb1f" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="234781">
+				<rom name="alter ego - female version - disk 2a.woz" size="234781" crc="6569875e" sha1="56b830103a45bc14ec9a02dccb3c4de602e59350" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="234781">
+				<rom name="alter ego - female version - disk 2b.woz" size="234781" crc="ee0e46c8" sha1="f44263f95a9c0acc1c0dbb6f11719c880cb9dde7" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A"/>
+			<dataarea name="flop" size="234781">
+				<rom name="alter ego - female version - disk 3a.woz" size="234781" crc="aa2bcd8c" sha1="a9de65ca9a0fb64c19ae0de44373c6ac066fb45e" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B"/>
+			<dataarea name="flop" size="234781">
+				<rom name="alter ego - female version - disk 3b.woz" size="234781" crc="97d5aee3" sha1="f512e4c84f2086f9ac84b567eaf517d0e5047651" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alterego">
+		<description>Alter Ego (male version)</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2020-02-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="241435">
+				<rom name="alter ego - male version - disk 1a.woz" size="241435" crc="1496257d" sha1="86e1caf423475ef4c98f6ac39d2c2be1d6b3258e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="234779">
+				<rom name="alter ego - male version - disk 1b.woz" size="234779" crc="3e75c9e8" sha1="ed4e0fee9d9b277d50adc65b75ddd993d4ae27f0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="241435">
+				<rom name="alter ego - male version - disk 2a.woz" size="241435" crc="e51ed263" sha1="76ed38677d7477d82b70990936c92cb8cf76b9fd" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="234779">
+				<rom name="alter ego - male version - disk 2b.woz" size="234779" crc="f32d44ab" sha1="85f83c606b6d166f145a1555698bc3ccc53f6d1c" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A"/>
+			<dataarea name="flop" size="241435">
+				<rom name="alter ego - male version - disk 3a.woz" size="241435" crc="4a5ca9d4" sha1="1acad32473a0b5c78aca09ada2824f111e0ff197" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B"/>
+			<dataarea name="flop" size="234779">
+				<rom name="alter ego - male version - disk 3b.woz" size="234779" crc="dee58649" sha1="a59ed9d990d7b9d77ee7b468c509e49749987179" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmblbugs">
+		<description>Tumble Bugs</description>
+		<year>1982</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2020-02-10"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234781">
+				<rom name="tumble bugs.woz" size="234781" crc="5d25965a" sha1="471e6bddba99ff85cc4945ca1b7dbc46366490d9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trans1985">
+		<description>Transylvania (1985 Version)</description>
+		<year>1985</year>
+		<publisher>Penguin Software</publisher>
+		<info name="release" value="2020-02-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="241472">
+				<rom name="transylvania 1985 side a.woz" size="241472" crc="2c8f80ae" sha1="0fcb96cced72a4fbfb4aaf383313d5c135eb4665" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="241472">
+				<rom name="transylvania 1985 side b.woz" size="241472" crc="d6c4136f" sha1="3a04c95791f31cc3d2cc6165ac5d194948cbd898" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trisland">
+		<description>Treasure Island</description>
+		<year>1985</year>
+		<publisher>Windham Classics</publisher>
+		<info name="release" value="2020-02-08"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234852">
+				<rom name="treasure island side a.woz" size="234852" crc="8990c495" sha1="eed208fe2c6fb17a45ae2f522442969d12112d17" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234852">
+				<rom name="treasure island side b.woz" size="234852" crc="84e20cf7" sha1="99aeadaf4b420a4d7b25934ba47c4b44845ef2aa" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="234852">
+				<rom name="treasure island side c.woz" size="234852" crc="869e455f" sha1="cb83a938e54f1b262c2e49dfcb107566d8f5e60f" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
+			<dataarea name="flop" size="234852">
+				<rom name="treasure island side d.woz" size="234852" crc="96f345f3" sha1="dd2b097d6a48510dc3c1a0f005c218ca40a5ae28" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gencgame">
+		<description>Generic Computer Games</description>
+		<year>1982</year>
+		<publisher>Huntington Computing</publisher>
+		<info name="release" value="2020-02-08"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+		<!--"Generic Computer Games" is a 1982 pair of action games developed by Kieth Vilt and distributed by Huntington Computing. It requires a 48K Apple ][+ or later.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234873">
+				<rom name="generic computer games.woz" size="234873" crc="85d333f6" sha1="eebdbaab826298355df82a3859fa9e33af5fa922" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

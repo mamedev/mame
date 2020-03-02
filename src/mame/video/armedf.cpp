@@ -35,8 +35,8 @@ TILEMAP_MAPPER_MEMBER(armedf_state::armedf_scan_type3)
 
 TILE_GET_INFO_MEMBER(armedf_state::get_nb1414m4_tx_tile_info)
 {
-	int tile_number = m_text_videoram[tile_index] & 0xff;
-	int attributes;
+	u8 tile_number = m_text_videoram[tile_index] & 0xff;
+	u8 attributes;
 
 	/* TODO: Armed F doesn't seem to use the NB1414M4! */
 	//if (m_scroll_type == 1)
@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_nb1414m4_tx_tile_info)
 		attributes = m_text_videoram[tile_index + 0x400] & 0xff;
 
 		// TODO: skip drawing the NB1414M4 params, how the HW actually handles this?
-		if(tile_index < 0x12)
+		if (tile_index < 0x12)
 			tile_number = attributes = 0x00;
 	}
 
@@ -61,8 +61,8 @@ TILE_GET_INFO_MEMBER(armedf_state::get_nb1414m4_tx_tile_info)
 
 TILE_GET_INFO_MEMBER(armedf_state::get_armedf_tx_tile_info)
 {
-	int tile_number = m_text_videoram[tile_index] & 0xff;
-	int attributes;
+	u8 tile_number = m_text_videoram[tile_index] & 0xff;
+	u8 attributes;
 
 	/* TODO: Armed F doesn't seem to use the NB1414M4! */
 	//if (m_scroll_type == 1)
@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_armedf_tx_tile_info)
 	//{
 	//  attributes = m_text_videoram[tile_index + 0x400] & 0xff;
 //
-	//  if(tile_index < 0x12) /* don't draw the NB1414M4 params! TODO: could be a better fix */
+	//  if (tile_index < 0x12) /* don't draw the NB1414M4 params! TODO: could be a better fix */
 	//      tile_number = attributes = 0x00;
 	//}
 
@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_armedf_tx_tile_info)
 
 TILE_GET_INFO_MEMBER(armedf_state::get_fg_tile_info)
 {
-	int data = m_fg_videoram[tile_index];
+	const u16 data = m_fg_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(1,
 			data&0x7ff,
 			data>>11,
@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(armedf_state::get_bg_tile_info)
 {
-	int data = m_bg_videoram[tile_index];
+	const u16 data = m_bg_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(2,
 			data & 0x3ff,
 			data >> 11,
@@ -128,11 +128,6 @@ VIDEO_START_MEMBER(armedf_state,terraf)
 
 	if (m_scroll_type != 1)
 		m_tx_tilemap->set_scrollx(0, -128);
-
-	m_text_videoram = std::make_unique<uint8_t[]>(0x1000);
-	memset(m_text_videoram.get(), 0x00, 0x1000);
-
-	save_pointer(NAME(m_text_videoram), 0x1000);
 }
 
 VIDEO_START_MEMBER(armedf_state,armedf)
@@ -150,11 +145,6 @@ VIDEO_START_MEMBER(armedf_state,armedf)
 
 	if (m_scroll_type != 1)
 		m_tx_tilemap->set_scrollx(0, -128);
-
-	m_text_videoram = std::make_unique<uint8_t[]>(0x1000);
-	memset(m_text_videoram.get(), 0x00, 0x1000);
-
-	save_pointer(NAME(m_text_videoram), 0x1000);
 }
 
 /***************************************************************************
@@ -163,88 +153,70 @@ VIDEO_START_MEMBER(armedf_state,armedf)
 
 ***************************************************************************/
 
-READ8_MEMBER(armedf_state::nb1414m4_text_videoram_r)
+u8 armedf_state::text_videoram_r(offs_t offset)
 {
 	return m_text_videoram[offset];
 }
 
-WRITE8_MEMBER(armedf_state::nb1414m4_text_videoram_w)
+void armedf_state::text_videoram_w(offs_t offset, u8 data)
 {
 	m_text_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-READ8_MEMBER(armedf_state::armedf_text_videoram_r)
-{
-	return m_text_videoram[offset];
-}
-
-WRITE8_MEMBER(armedf_state::armedf_text_videoram_w)
-{
-	m_text_videoram[offset] = data;
-	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
-}
-
-WRITE16_MEMBER(armedf_state::armedf_fg_videoram_w)
+void armedf_state::fg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(armedf_state::armedf_bg_videoram_w)
+void armedf_state::bg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(armedf_state::terraf_fg_scrolly_w)
+void armedf_state::terrafb_fg_scrolly_w(u8 data)
 {
-	if (ACCESSING_BITS_8_15)
+	m_fg_scrolly = (data & 0xff) | (m_fg_scrolly & 0x300);
+	m_waiting_msb = 1;
+}
+
+void armedf_state::terrafb_fg_scrollx_w(u8 data)
+{
+	if (m_waiting_msb)
 	{
-		m_fg_scrolly = ((data >> 8) & 0xff) | (m_fg_scrolly & 0x300);
-		m_waiting_msb = 1;
+		m_scroll_msb = data;
+		m_fg_scrollx = (m_fg_scrollx & 0xff) | (((m_scroll_msb >> 4) & 3) << 8);
+		m_fg_scrolly = (m_fg_scrolly & 0xff) | (((m_scroll_msb >> 0) & 3) << 8);
+		//popmessage("%04X %04X %04X",data,m_fg_scrollx,m_fg_scrolly);
 	}
+	else
+		m_fg_scrollx = (data & 0xff) | (m_fg_scrollx & 0x300);
 }
 
-WRITE16_MEMBER(armedf_state::terraf_fg_scrollx_w)
+void armedf_state::terrafb_fg_scroll_msb_arm_w(u8 data)
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		if (m_waiting_msb)
-		{
-			m_scroll_msb = data >> 8;
-			m_fg_scrollx = (m_fg_scrollx & 0xff) | (((m_scroll_msb >> 4) & 3) << 8);
-			m_fg_scrolly = (m_fg_scrolly & 0xff) | (((m_scroll_msb >> 0) & 3) << 8);
-			//popmessage("%04X %04X %04X",data,m_fg_scrollx,m_fg_scrolly);
-		}
-		else
-			m_fg_scrollx = ((data >> 8) & 0xff) | (m_fg_scrollx & 0x300);
-	}
+	m_waiting_msb = 0;
 }
 
-WRITE16_MEMBER(armedf_state::terraf_fg_scroll_msb_arm_w)
-{
-	if (ACCESSING_BITS_8_15)
-		m_waiting_msb = 0;
-}
-
-WRITE16_MEMBER(armedf_state::armedf_fg_scrollx_w)
+void armedf_state::fg_scrollx_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_fg_scrollx);
 }
 
-WRITE16_MEMBER(armedf_state::armedf_fg_scrolly_w)
+void armedf_state::fg_scrolly_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_fg_scrolly);
 }
 
-WRITE16_MEMBER(armedf_state::armedf_bg_scrollx_w)
+void armedf_state::bg_scrollx_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bg_scrollx);
 	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
 }
 
-WRITE16_MEMBER(armedf_state::armedf_bg_scrolly_w)
+void armedf_state::bg_scrolly_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bg_scrolly);
 	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
@@ -260,11 +232,14 @@ WRITE16_MEMBER(armedf_state::armedf_bg_scrolly_w)
 
 /* custom code to handle color cycling effect, handled by m_spr_pal_clut */
 void armedf_state::armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							uint32_t code,uint32_t color, uint32_t clut,int flipx,int flipy,int offsx,int offsy,
-							int transparent_color)
+							u32 code,u32 color, u32 clut,int flipx,int flipy,int offsx,int offsy,
+							bitmap_ind8 &primap, u32 pmask, int transparent_color)
 {
+	// high bit of the mask is implicitly on
+	pmask |= 1 << 31;
+
 	const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-	const uint8_t *source_base = gfx->get_data(code % gfx->elements());
+	const u8 *source_base = gfx->get_data(code % gfx->elements());
 	int x_index_base, y_index, sx, sy, ex, ey;
 	int xinc, yinc;
 
@@ -311,15 +286,19 @@ void armedf_state::armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,g
 		{
 			for (y = sy; y < ey; y++)
 			{
-				const uint8_t *source = source_base + y_index*gfx->rowbytes();
-				uint16_t *dest = &dest_bmp.pix16(y);
+				const u8 *source = source_base + y_index*gfx->rowbytes();
+				u16 *dest = &dest_bmp.pix16(y);
+				u8 *destpri = &primap.pix8(y);
 				int x_index = x_index_base;
 				for (x = sx; x < ex; x++)
 				{
 					int c = (source[x_index] & ~0xf) | ((m_spr_pal_clut[clut*0x10+(source[x_index] & 0xf)]) & 0xf);
 					if (c != transparent_color)
-						dest[x] = pal[c];
-
+					{
+						if (((1 << (destpri[x] & 0x1f)) & pmask) == 0)
+							dest[x] = pal[c];
+						destpri[x] = 0x1f;
+					}
 					x_index += xinc;
 				}
 				y_index += yinc;
@@ -329,13 +308,13 @@ void armedf_state::armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,g
 }
 
 
-void armedf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void armedf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap )
 {
-	uint16_t *buffered_spriteram = m_spriteram->buffer();
-	int offs;
+	u16 *buffered_spriteram = m_spriteram->buffer();
 
-	for (offs = 0; offs < m_spriteram->bytes() / 2; offs += 4)
+	for (int offs = (m_spriteram->bytes() / 2) - 4; offs >= 0; offs -= 4)
 	{
+		u32 pmask = 0;
 		int code = buffered_spriteram[offs + 1]; /* ??YX?TTTTTTTTTTT */
 		int flipx = code & 0x2000;
 		int flipy = code & 0x1000;
@@ -343,6 +322,18 @@ void armedf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		int clut = (buffered_spriteram[offs + 2]) & 0x7f;
 		int sx = buffered_spriteram[offs + 3];
 		int sy = m_sprite_offy + 240 - (buffered_spriteram[offs + 0] & 0x1ff);
+		int pri = ((buffered_spriteram[offs + 0] & 0x3000) >> 12);
+		if (pri == 3) // mimic previous driver behavior, correct?
+			continue;
+
+		if (pri >= 1)
+			pmask |= GFX_PMASK_4;
+		if (pri >= 2)
+			pmask |= GFX_PMASK_2;
+		/*
+		if (pri >= 3)
+		    pmask |= GFX_PMASK_1;
+		*/
 
 		if (flip_screen())
 		{
@@ -352,18 +343,15 @@ void armedf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipy = !flipy;     /* in all the games supported by this driver */
 		}
 
-		if (((buffered_spriteram[offs + 0] & 0x3000) >> 12) == priority)
-		{
-			armedf_drawgfx(bitmap,cliprect,m_gfxdecode->gfx(3),
-				code & 0xfff,
-				color,clut,
-				flipx,flipy,
-				sx,sy,15);
-		}
+		armedf_drawgfx(bitmap,cliprect,m_gfxdecode->gfx(3),
+			code & 0xfff,
+			color,clut,
+			flipx,flipy,
+			sx,sy,primap,pmask,15);
 	}
 }
 
-uint32_t armedf_state::screen_update_armedf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 armedf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int sprite_enable = m_vreg & 0x200;
 
@@ -375,7 +363,7 @@ uint32_t armedf_state::screen_update_armedf(screen_device &screen, bitmap_ind16 
 	{
 		case 0: /* terra force, kozure ookami */
 		case 2: /* legion */
-		case 3: /* crazy climber */
+		case 3: /* crazy climber 2 */
 			m_fg_tilemap->set_scrollx(0, (m_fg_scrollx & 0x3ff));
 			m_fg_tilemap->set_scrolly(0, (m_fg_scrolly & 0x3ff));
 			break;
@@ -387,24 +375,16 @@ uint32_t armedf_state::screen_update_armedf(screen_device &screen, bitmap_ind16 
 
 	}
 
-	bitmap.fill(0xff, cliprect );
+	screen.priority().fill(0, cliprect);
+	bitmap.fill(0xff, cliprect);
 
-	m_tx_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
-
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-	if (sprite_enable)
-		draw_sprites(bitmap, cliprect, 2);
-
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 1);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 4);
 
 	if (sprite_enable)
-		draw_sprites(bitmap, cliprect, 1);
-
-	m_tx_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
-
-	if (sprite_enable)
-		draw_sprites(bitmap, cliprect, 0);
+		draw_sprites(bitmap, cliprect, screen.priority());
 
 	return 0;
 }

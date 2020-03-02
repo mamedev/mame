@@ -16,7 +16,7 @@
 #include "emu.h"
 #include "sound/beep.h"
 
-#define BEEP_RATE (48000)
+#define BEEP_RATE (384000)
 
 
 // device type definition

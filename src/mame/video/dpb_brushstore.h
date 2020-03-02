@@ -116,7 +116,7 @@ protected:
 
 	// Output Lines
 	devcb_write_line m_store_write_out;
-	devcb_write8 m_data_out[STRIPE_COUNT];
+	devcb_write8::array<STRIPE_COUNT> m_data_out;
 
 	// Devices
 	required_memory_region m_pal;

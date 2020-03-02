@@ -87,8 +87,8 @@ protected:
 	u8 m_ms;     // mode select pin, default to read mode
 
 	// callbacks
-	devcb_read8 m_read_port[7];
-	devcb_write8 m_write_port[7];
+	devcb_read8::array<7> m_read_port;
+	devcb_write8::array<7> m_write_port;
 };
 
 

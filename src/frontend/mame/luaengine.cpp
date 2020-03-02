@@ -785,6 +785,7 @@ void lua_engine::initialize()
  * emu.keypost(keys) - post keys to natural keyboard
  * emu.wait(len) - wait for len within coroutine
  * emu.lang_translate(str) - get translation for str if available
+ * emu.subst_env(str) - substitute environment variables with values for str
  *
  * emu.register_prestart(callback) - register callback before reset
  * emu.register_start(callback) - register callback after reset
@@ -879,6 +880,11 @@ void lua_engine::initialize()
 		});
 	emu["lang_translate"] = &lang_translate;
 	emu["pid"] = &osd_getpid;
+	emu["subst_env"] = [](const std::string &str) {
+			std::string result;
+			osd_subst_env(result, str);
+			return result;
+		};
 
 
 /*  emu_file library
@@ -1498,13 +1504,11 @@ void lua_engine::initialize()
  * #log - entry count
  */
 
-	auto text_buffer_type = sol().registry().create_simple_usertype<wrap_textbuf>("new", sol::no_constructor);
-	text_buffer_type.set("__metatable", [](){});
-	text_buffer_type.set("__newindex", [](){});
-	text_buffer_type.set("__index", [](wrap_textbuf &buf, int index) { return text_buffer_get_seqnum_line(buf.textbuf, index - 1); });
-	text_buffer_type.set("__len", [](wrap_textbuf &buf) { return text_buffer_num_lines(buf.textbuf) + text_buffer_line_index_to_seqnum(buf.textbuf, 0) - 1; });
-	sol().registry().set_usertype("text_buffer", text_buffer_type);
-
+	sol().registry().new_usertype<wrap_textbuf>("text_buffer", "new", sol::no_constructor,
+			"__metatable", [](){},
+			"__newindex", [](){},
+			"__index", [](wrap_textbuf &buf, int index) { return text_buffer_get_seqnum_line(buf.textbuf, index - 1); },
+			"__len", [](wrap_textbuf &buf) { return text_buffer_num_lines(buf.textbuf) + text_buffer_line_index_to_seqnum(buf.textbuf, 0) - 1; });
 
 /*  device_debug library (requires debugger to be active)
  *

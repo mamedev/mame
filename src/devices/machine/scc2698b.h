@@ -121,10 +121,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	devcb_write_line write_intr_A, write_intr_B, write_intr_C, write_intr_D;
-	devcb_write_line write_tx[8];
-	devcb_write_line write_mpp1[8];
-	devcb_write_line write_mpp2[8];
-	devcb_write_line write_mpo[8];
+	devcb_write_line::array<8> write_tx;
+	devcb_write_line::array<8> write_mpp1;
+	devcb_write_line::array<8> write_mpp2;
+	devcb_write_line::array<8> write_mpo;
 
 	scc2698b_channel* get_channel(int port);
 

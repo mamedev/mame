@@ -7587,6 +7587,17 @@
 		</part>
 	</software>
 
+	<software name="tagplus">
+		<description>Tågplusguiden - Vinter–Våren 1998</description>
+		<year>1998</year>
+		<publisher>Förlags AB Sveriges Kommunikationer</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="tagplus.img" size="1474560" crc="0791df49" sha1="9e6135848f43a84909d49bb147a300ef22c5611c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Bundled with "TMS320C5x DSK - Applications Guide" by Texas Instruments. TI ID: BPRA063 -->
 	<software name="tms320c5x">
 		<description>TMS320C5x DSK - Applications Guide - Application Software</description>
@@ -9125,6 +9136,23 @@
 		</part>
 	</software>
 
+	<software name="cfodder2">
+		<description>Cannon Fodder 2</description>
+		<year>1994</year>
+		<publisher>Virgin</publisher>
+		<info name="developer" value="Sensible Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Cannon Fodder 2 [Virgin Interactive Entertainment] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="d81d4719" sha1="c597e10cbf4573726ad60d8a3ecd0566f3ae34c4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Cannon Fodder 2 [Virgin Interactive Entertainment] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="d4e2aa4b" sha1="119e74068858e5a409fa79ef3302a2012d843ac2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cischeat">
 		<!-- Dumped via Kryoflux -->
 		<description>Cisco Heat - All American Police Car Race</description>
@@ -10044,6 +10072,30 @@
 		</part>
 	</software>
 
+	<software name="epcrashb">
+		<description>Epic Pinball: Crash and Burn</description>
+		<year>1994</year>
+		<publisher>The B&amp;N Companies</publisher>
+		<info name="developer" value="Epic Megagames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Epic Pinball - Crash and Burn [The B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="f56c626d" sha1="a4c564a77d0da32d93a053d6bcfd33864b043e69"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epcyborg">
+		<description>Epic Pinball: Cyborgirl</description>
+		<year>1994</year>
+		<publisher>The B&amp;N Companies</publisher>
+		<info name="developer" value="Epic Megagames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Epic Pinball - Cyborgirl [The B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7370af3e" sha1="6ae169ff06c03da063ac72cb3318b76facbf0559"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="epdeepsea">
 		<description>Epic Pinball: Deep Sea</description>
 		<year>1994</year>
@@ -10053,6 +10105,31 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Pinball Deep Sea [B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="caae0723" sha1="625694111fc8cf946d2009caa3c6ca927e0c6779"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="epenigma">
+		<description>Epic Pinball: Enigma</description>
+		<year>1994</year>
+		<publisher>The B&amp;N Companies</publisher>
+		<info name="developer" value="Epic Megagames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Epic Pinball - Enigma [The B&amp;N Companies] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="f603258e" sha1="4e8e9f8ea096979faeb5a0f5c316ee15227d3758"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epsharew">
+		<description>Epic Pinball (shareware version - Mr. Disk release)</description>
+		<year>1993</year>
+		<publisher>The B&amp;N Companies</publisher>
+		<info name="developer" value="Epic Megagames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Epic Pinball (shareware version - Mr. Disk release) [The B&amp;N Companies] [1993] [3.5DD] [Disk 1 of 1].img" size="737280" crc="16488379" sha1="1c94029d3ab7913e353d96e1d2aa4c2a20129bb4"/>
 			</dataarea>
 		</part>
 	</software>

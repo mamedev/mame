@@ -104,7 +104,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	devcb_write_line m_outputs[OUT_COUNT];
+	devcb_write_line::array<OUT_COUNT> m_outputs;
 	bool m_outputs_hooked[OUT_COUNT];
 	emu_timer *m_timers[OUT_COUNT];
 	signal_type m_type;

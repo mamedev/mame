@@ -37,6 +37,8 @@ namespace plib {
 			POW,
 			SIN,
 			COS,
+			MIN,
+			MAX,
 			RAND, /// random number between 0 and 1
 			TRUNC,
 			PUSH_CONST,

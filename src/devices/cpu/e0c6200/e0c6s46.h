@@ -95,9 +95,9 @@ private:
 	pixel_update_delegate m_pixel_update_cb;
 
 	// i/o ports
-	devcb_write8 m_write_r[5];
-	devcb_read8 m_read_p[4];
-	devcb_write8 m_write_p[4];
+	devcb_write8::array<5> m_write_r;
+	devcb_read8::array<4> m_read_p;
+	devcb_write8::array<4> m_write_p;
 	void write_r(u8 port, u8 data);
 	void write_r4_out();
 	void write_p(u8 port, u8 data);

@@ -48,9 +48,6 @@ public:
 	template <std::size_t Bit> auto read_p() { return m_read_p[Bit].bind(); }
 	template <std::size_t Bit> auto write_p() { return m_write_p[Bit].bind(); }
 
-	devcb_read8  m_read_p[4];
-	devcb_write8 m_write_p[4];
-
 	DECLARE_READ8_MEMBER(ports_r);
 	DECLARE_WRITE8_MEMBER(ports_w);
 	DECLARE_READ8_MEMBER(tmrirq_r);
@@ -74,6 +71,9 @@ protected:
 
 	void recalc_irqs();
 	void recalc_timer(int timer);
+
+	devcb_read8::array<4>  m_read_p;
+	devcb_write8::array<4> m_write_p;
 
 	uint8_t m_ports[6], m_ddrs[6];
 	uint8_t m_intctrl, m_tmrctrl;
