@@ -112,7 +112,6 @@ void captaven_state::video_start()
 
 void fghthist_state::video_start()
 {
-	m_sprgen[0]->alloc_sprite_bitmap();
 	deco32_state::allocate_spriteram(0);
 	deco32_state::allocate_rowscroll(0x2000/4, 0x2000/4, 0x2000/4, 0x2000/4);
 	deco32_state::allocate_buffered_palette();
@@ -219,29 +218,26 @@ u32 fghthist_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());
 	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2].get(), m_pf_rowscroll[3].get());
 
-	// sprites are flipped relative to tilemaps
-	m_sprgen[0]->set_flip_screen(true);
-	m_sprgen[0]->draw_sprites(bitmap, cliprect, m_spriteram16_buffered[0].get(), 0x800);
-
 	/* Draw screen */
 	m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
 
 	if (m_pri & 1)
 	{
 		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-		m_sprgen[0]->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
 		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 	}
 	else
 	{
 		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
-		m_sprgen[0]->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
 		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 	}
 
-	m_sprgen[0]->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 1024, 0x1ff);
+	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 8);
 
-	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	// sprites are flipped relative to tilemaps
+	m_sprgen[0]->set_flip_screen(true);
+	m_sprgen[0]->draw_sprites(bitmap, cliprect, m_spriteram16_buffered[0].get(), 0x800);
+
 	return 0;
 }
 
