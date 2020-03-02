@@ -16,7 +16,7 @@ namespace netlist
 	NETLIB_OBJECT(74165)
 	{
 		NETLIB_CONSTRUCTOR(74165)
-		, m_DATA(*this, {{ "H", "G", "F", "E", "D", "C", "B", "A" }})
+		, m_DATA(*this, { "H", "G", "F", "E", "D", "C", "B", "A" })
 		, m_SER(*this, "SER")
 		, m_SH_LDQ(*this, "SH_LDQ")
 		, m_CLK(*this, "CLK")

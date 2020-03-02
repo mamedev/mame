@@ -16,10 +16,10 @@ namespace netlist
 	NETLIB_OBJECT(2716)
 	{
 		NETLIB_CONSTRUCTOR(2716)
-		, m_A(*this, {{ "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10" }})
+		, m_A(*this, { "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10" })
 		, m_GQ(*this, "GQ")
 		, m_EPQ(*this, "EPQ")
-		, m_D(*this, {{ "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7" }})
+		, m_D(*this, { "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7" })
 		, m_last_EPQ(*this, "m_last_EPQ", 1)
 		, m_ROM(*this, "ROM")
 		, m_power_pins(*this)

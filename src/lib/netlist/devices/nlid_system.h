@@ -246,6 +246,37 @@ namespace devices
 		param_model_t m_FAMILY;
 		NETLIB_NAME(power_pins) m_supply;
 	};
+	template<std::size_t N>
+	NETLIB_OBJECT(logic_inputN)
+	{
+		NETLIB_CONSTRUCTOR(logic_inputN)
+		, m_Q(*this, "Q{}")
+		, m_IN(*this, "IN", false)
+		// make sure we get the family first
+		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
+		, m_supply(*this)
+		{
+			set_logic_family(state().setup().family_from_model(m_FAMILY()));
+			for (auto &q : m_Q)
+				q.set_logic_family(this->logic_family());
+		}
+
+		NETLIB_UPDATEI() { }
+		NETLIB_RESETI() { for (auto &q : m_Q) q.initial(0); }
+		NETLIB_UPDATE_PARAMI()
+		{
+			//printf("%s %d\n", name().c_str(), m_IN());
+			for (std::size_t i=0; i<N; i++)
+				m_Q[i].push((m_IN()>>i) & 1, netlist_time::from_nsec(1));
+		}
+
+	private:
+		object_array_t<logic_output_t, N> m_Q;
+
+		param_int_t m_IN;
+		param_model_t m_FAMILY;
+		NETLIB_NAME(power_pins) m_supply;
+	};
 
 	NETLIB_OBJECT(analog_input)
 	{

@@ -22,7 +22,7 @@ namespace devices
 	NETLIB_OBJECT(74153)
 	{
 		NETLIB_CONSTRUCTOR(74153)
-		, m_C(*this, {{"C0", "C1", "C2", "C3"}}, NETLIB_DELEGATE(74153, sub))
+		, m_C(*this, {"C0", "C1", "C2", "C3"}, NETLIB_DELEGATE(74153, sub))
 		, m_G(*this, "G", NETLIB_DELEGATE(74153, sub))
 		, m_Y(*this, "AY") //FIXME: Change netlists
 		, m_chan(*this, "m_chan", 0)

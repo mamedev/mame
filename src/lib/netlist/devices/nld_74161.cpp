@@ -32,7 +32,7 @@ namespace netlist
 		, m_ENABLET(*this, "ENABLET")
 		, m_cnt(*this, "m_cnt", 0)
 		, m_last_CLK(*this, "m_last_CLK", 0)
-		, m_Q(*this, {{"QA", "QB", "QC", "QD"}})
+		, m_Q(*this, {"QA", "QB", "QC", "QD"})
 		, m_RCO(*this, "RCO")
 		, m_power_pins(*this)
 		{

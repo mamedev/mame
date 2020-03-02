@@ -20,8 +20,8 @@ namespace netlist
 		, m_C1C2(*this, "C1C2")
 		, m_C3C4(*this, "C3C4")
 		, m_last_Q(*this, "m_last_Q", 0)
-		, m_D(*this, {{"D1", "D2", "D3", "D4"}})
-		, m_Q(*this, {{"Q1", "Q2", "Q3", "Q4"}})
+		, m_D(*this, {"D1", "D2", "D3", "D4"})
+		, m_Q(*this, {"Q1", "Q2", "Q3", "Q4"})
 		, m_power_pins(*this)
 		{
 			register_subalias("Q1", m_Q[0]);
@@ -44,7 +44,7 @@ namespace netlist
 	NETLIB_OBJECT_DERIVED(7475, 7477)
 	{
 		NETLIB_CONSTRUCTOR_DERIVED(7475, 7477)
-		, m_QQ(*this, {{"QQ1", "QQ2", "QQ3", "QQ4"}})
+		, m_QQ(*this, {"QQ1", "QQ2", "QQ3", "QQ4"})
 		{
 		}
 

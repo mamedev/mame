@@ -30,6 +30,7 @@
 
 #include <unordered_map>
 #include <vector>
+#include <initializer_list>
 
 //============================================================
 //  MACROS / New Syntax
@@ -86,7 +87,7 @@ class NETLIB_NAME(name) : public device_t
 /// \brief Used to define the destructor of a netlist device.
 /// The use of a destructor for netlist device should normally not be necessary.
 
-#define NETLIB_DESTRUCTOR(name) public: virtual ~NETLIB_NAME(name)() noexcept
+#define NETLIB_DESTRUCTOR(name) public: virtual ~NETLIB_NAME(name)() noexcept override
 
 /// \brief Define an extended constructor and add further parameters to it.
 /// The macro allows to add further parameters to a device constructor. This is
@@ -1737,11 +1738,28 @@ namespace netlist
 			std::array<const char *, N> p;
 		};
 		template<typename... Args>
-		object_array_t(core_device_t &dev, init names, Args&&... args)
+		object_array_t(core_device_t &dev, const std::initializer_list<const char *> &names, Args&&... args)
+		{
+			passert_always_msg(names.size() == N, "initializer_list size mismatch");
+			std::size_t i = 0;
+			for (auto &n : names)
+				this->emplace(i++, dev, pstring(n), std::forward<Args>(args)...);
+		}
+
+		template<typename... Args>
+		object_array_t(core_device_t &dev, const pstring &fmt, Args&&... args)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, pstring(names.p[i]), std::forward<Args>(args)...);
+				this->emplace(i, dev, plib::pfmt(fmt)(i), std::forward<Args>(args)...);
 		}
+
+		template<typename... Args>
+		object_array_t(core_device_t &dev, std::size_t offset, const pstring &fmt, Args&&... args)
+		{
+			for (std::size_t i = 0; i<N; i++)
+				this->emplace(i, dev, plib::pfmt(fmt)(i+offset), std::forward<Args>(args)...);
+		}
+
 	};
 
 	// -----------------------------------------------------------------------------
