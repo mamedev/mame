@@ -177,13 +177,15 @@ public:
 	{ }
 
 	void nand_init(int blocksize, int blocksize_stripped);
-	void nand_init210();
+	void nand_jak_bbh();
+	void nand_jak_bbsf();
 
 protected:
 	void machine_reset() override;
 
 private:
 	std::vector<uint8_t> m_strippedrom;
+	int m_firstvector;
 };
 
 
@@ -651,9 +653,9 @@ void spg29x_nand_game_state::machine_reset()
 {
 	spg29x_game_state::machine_reset();
 
-	uint32_t bootstrap_ram_start = (m_strippedrom[0x0c] << 0) | (m_strippedrom[0x0d] << 8) | (m_strippedrom[0x0e] << 16) | (m_strippedrom[0x0f] << 24);
-	uint32_t bootstrap_ram_end   = (m_strippedrom[0x10] << 0) | (m_strippedrom[0x11] << 8) | (m_strippedrom[0x12] << 16) | (m_strippedrom[0x13] << 24);
-	uint32_t bootstrap_ram_boot  = (m_strippedrom[0x14] << 0) | (m_strippedrom[0x15] << 8) | (m_strippedrom[0x16] << 16) | (m_strippedrom[0x17] << 24);
+	uint32_t bootstrap_ram_start = (m_strippedrom[m_firstvector+0] << 0) | (m_strippedrom[m_firstvector+1] << 8) | (m_strippedrom[m_firstvector+2] << 16) | (m_strippedrom[m_firstvector+3] << 24);
+	uint32_t bootstrap_ram_end   = (m_strippedrom[m_firstvector+4] << 0) | (m_strippedrom[m_firstvector+5] << 8) | (m_strippedrom[m_firstvector+6] << 16) | (m_strippedrom[m_firstvector+7] << 24);
+	uint32_t bootstrap_ram_boot  = (m_strippedrom[m_firstvector+8] << 0) | (m_strippedrom[m_firstvector+9] << 8) | (m_strippedrom[m_firstvector+10] << 16) | (m_strippedrom[m_firstvector+11] << 24);
 
 	// there is a 0x01 at 0x26, possibly related to source location / block in NAND to copy from?
 
@@ -714,7 +716,7 @@ void spg29x_nand_game_state::nand_init(int blocksize, int blocksize_stripped)
 	}
 
 	// debug to allow for easy use of unidasm.exe
-	if (1)
+	if (0)
 	{
 		FILE *fp;
 		char filename[256];
@@ -728,10 +730,18 @@ void spg29x_nand_game_state::nand_init(int blocksize, int blocksize_stripped)
 	}
 }
 
-void spg29x_nand_game_state::nand_init210()
+void spg29x_nand_game_state::nand_jak_bbh()
 {
 	nand_init(0x210, 0x200);
+	m_firstvector = 0xc;
 }
+
+void spg29x_nand_game_state::nand_jak_bbsf()
+{
+	nand_init(0x210, 0x200);
+	m_firstvector = 0x8;
+}
+
 
 
 /* ROM definition */
@@ -773,7 +783,7 @@ COMP( 2006, hyprscan,   0,      0,      hyperscan, hyperscan, spg29x_game_state,
 
 // There were 1 player and 2 player versions for these JAKKS guns.  The 2nd gun appears to be simply a controller (no AV connectors) but as they were separate products with the 2 player verisons being released up to a year after the original, the code could differ.
 // If they differ, it is currently uncertain which versions these ROMs are from
-COMP( 2009, jak_bbh,    0,      0,      hyperscan, hyperscan, spg29x_nand_game_state, nand_init210, "JAKKS Pacific Inc", "Big Buck Hunter Pro (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) //has ISSI 404A (24C04)
-COMP( 2011, jak_bbsf,   0,      0,      hyperscan, hyperscan, spg29x_nand_game_state, nand_init210, "JAKKS Pacific Inc", "Big Buck Safari (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // has ISSI 416A (24C16)
+COMP( 2009, jak_bbh,    0,      0,      hyperscan, hyperscan, spg29x_nand_game_state, nand_jak_bbh, "JAKKS Pacific Inc", "Big Buck Hunter Pro (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) //has ISSI 404A (24C04)
+COMP( 2011, jak_bbsf,   0,      0,      hyperscan, hyperscan, spg29x_nand_game_state, nand_jak_bbsf,"JAKKS Pacific Inc", "Big Buck Safari (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // has ISSI 416A (24C16)
 
 
