@@ -15062,6 +15062,7 @@ nfb96g                          // (c) 1996 Amcoe
 nfb96h                          // (c) 1996 Amcoe
 nfb96i                          // (c) 1996 Amcoe
 nfb96j                          // (c) 1996 Amcoe
+nfb96k                          // (c) 1996 Amcoe
 nfb96se                         // bootleg
 nfb96sea                        // bootleg
 nfb96seb                        // bootleg
@@ -35040,6 +35041,7 @@ sh_141                          //
 skc_090                         //
 skc_103                         //
 skc_105                         //
+sman_102ef                      //
 sman_130ef                      //
 sman_130ei                      //
 sman_130es                      //
@@ -37062,6 +37064,7 @@ speedatk                        // CB-0 (c) SetaKikaku
 @source:speedbal.cpp
 musicbal                        // (c) 1987
 speedbal                        // (c) 1987
+speedbala                       // (c) 1987
 
 @source:speedspn.cpp
 speedspn                        // (c) 1994
