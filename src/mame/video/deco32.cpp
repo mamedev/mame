@@ -335,7 +335,7 @@ void nslasher_state::mix_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, c
 					    Alpha rules:
 
 					    Pri 0 - Over all tilemaps, but under sprite 0 pri 0, pri 1, pri 2
-					    Pri 1 - Under uppermost tilemap, sprite 0 pri 0, pri 1?
+					    Pri 1 - Under uppermost tilemap, sprite 0 pri 0, pri 1, pri 2(or over)
 					    Pri 2 -
 					    Pri 3 -
 					*/
@@ -347,7 +347,7 @@ void nslasher_state::mix_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, c
 							destLine[x] = alpha_blend_r32(destLine[x], pal1[coloffs | ((priColAlphaPal1 & 0xff) + col1)], alpha);
 					}
 					else if (pri1 == 1 && ((m_pri & 1) == 0 || tilemapPri[x] < 4)
-						&& ((priColAlphaPal0 & 0xff) == 0 || ((pri0 & 0x3) != 0 && (pri0 & 0x3) != 1)))
+						&& ((priColAlphaPal0 & 0xff) == 0 || ((pri0 & 0x3) != 0 && (pri0 & 0x3) != 1 && ((m_pri & 1) == 0 || (pri0 & 0x3) != 2))))
 						destLine[x] = alpha_blend_r32(destLine[x], pal1[coloffs | ((priColAlphaPal1 & 0xff) + col1)], alpha);
 					else if (pri1 == 2) // TODO
 						destLine[x] = alpha_blend_r32(destLine[x], pal1[coloffs | ((priColAlphaPal1 & 0xff) + col1)], alpha);
