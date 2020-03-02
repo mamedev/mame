@@ -18682,6 +18682,10 @@ kontest                         // GX800 (c) 198? (Japan)
 @source:kopunch.cpp
 kopunch                         // 834-0103 (c) 1981 Sega
 
+@source:korgdss1.cpp
+dss1                            //
+dssmsrk                         //
+
 @source:korgm1.cpp
 korgm1                          //
 korgm1ex                        //
