@@ -11257,4 +11257,83 @@
 		</part>
 	</software>
 
+<software name="braingme">
+		<description>The Brain Game</description>
+		<year>1984</year>
+		<publisher>The Millenium Group</publisher>
+		<info name="release" value="2020-03-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234784">
+				<rom name="the brain game.woz" size="234784" crc="7e8e0f5d" sha1="76135fb63e62af75d27b0167f9712bbe61f1678a"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="cntdsht">
+		<description>Countdown to Shutdown</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2020-03-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241431">
+				<rom name="countdown to shutdown.woz" size="241431" crc="59f9a15f" sha1="0f95f179cb84b57e33a9a0a535b4d36b2d2e3189"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="brdtale2">
+		<description>The Bard's Tale II: The Destiny Knight</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2020-03-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Boot disk"/>
+			<dataarea name="flop" size="228149">
+				<rom name="the bard's tale ii - boot disk.woz" size="228149" crc="d9b0aa1a" sha1="afe776009a359625f7626ba8534245d16717d592"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Character disk"/>
+			<dataarea name="flop" size="234805">
+				<rom name="the bard's tale ii - character disk.woz" size="234805" crc="2b16a6c7" sha1="d48ee9b3deb4346b7bbb5899adcd3206f0fb48fc"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Dungeon 1 disk"/>
+			<dataarea name="flop" size="234805">
+				<rom name="the bard's tale ii - dungeon 1 disk.woz" size="234805" crc="c5214293" sha1="49f1b0559be3a94cf1e7b0c1190c57c25e3d8fb4"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Dungeon 2 disk"/>
+			<dataarea name="flop" size="234805">
+				<rom name="the bard's tale ii - dungeon 2 disk.woz" size="234805" crc="d33c5544" sha1="078606ec01c59137b9a50bd18ebc4410a800302a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizplus">
+		<description>Wizplus</description>
+		<year>1982</year>
+		<publisher>Datamost</publisher>
+		<info name="release" value="2020-03-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234768">
+				<rom name="wizplus.woz" size="234768" crc="f60920a3" sha1="a640aec03dc8bddf434b43318ae80f54d5c1ab8c"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
