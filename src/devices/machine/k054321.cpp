@@ -40,6 +40,7 @@ DEFINE_DEVICE_TYPE(K054321, k054321_device, "k054321", "K054321 Maincpu-Soundcpu
 void k054321_device::main_map(address_map &map)
 {
 	map(0x0, 0x0).w(FUNC(k054321_device::active_w));
+	//map(0x1, 0x1) Used but unknown, xexex(0xd6002) writes 0x0000
 	map(0x2, 0x2).w(FUNC(k054321_device::volume_reset_w));
 	map(0x3, 0x3).w(FUNC(k054321_device::volume_up_w));
 	map(0x4, 0x4).w(FUNC(k054321_device::dummy_w));
