@@ -998,7 +998,7 @@ checks whether the user is typing the program printed in the manual, for each le
 		<publisher>Carl A. Echols</publisher>
 		<part name="cass" interface="apf_cass">
 			<dataarea name="cass" size="1073282">
-				<rom name="carl_echols_treasure_hunt.wav" size="1073282" crc="f98c3972" sha1="f3fd8dbba89d45bcc5b9659022e2f9c192ebb072"/>
+				<rom name="Treasure Hunt (Carl A Echols)(1982).wav" size="1073282" crc="f98c3972" sha1="f3fd8dbba89d45bcc5b9659022e2f9c192ebb072"/>
 			</dataarea>
 		</part>
 	</software>
