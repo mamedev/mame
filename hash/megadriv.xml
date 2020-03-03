@@ -25131,16 +25131,16 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sonic2p11" cloneof="sonic2">
+	<software name="sonic2p11" cloneof="sonic2" supported="no">
 		<description>Sonic the Hedgehog 2 (World, final prototype 19921102)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="md sonic2 0 2-11.eprom" size="262144" crc="1f1260f9" sha1="40dd11fb557fc54c0115eb0bf43f090c5b00b200" offset="0x000001" loadflag="load16_byte"/> <!-- MD Sonic2 0 2/11 -->
-				<rom name="md sonic2 1 2-11.eprom" size="262144" crc="bfa5f8c7" sha1="a54cadff1b49373472a6c2fcd0f7c8c7655a04d7" offset="0x000000" loadflag="load16_byte"/> <!-- MD Sonic2 1 2/11 -->
-				<rom name="md sonic2 2 2-11.eprom" size="262144" crc="d75b618f" sha1="37276337a7c1516ea3781677e6b2bbe53b27e403" offset="0x080001" loadflag="load16_byte"/> <!-- MD Sonic2 2 2/11 -->
-				<rom name="md sonic2 3 2-11.eprom" size="262144" crc="c2293c87" sha1="3e467e24c220bd8128c03fb79e45d42d86fcc851" offset="0x080000" loadflag="load16_byte"/> <!-- MD Sonic2 3 2/11 -->
+				<rom loadflag="load16_byte" name="md sonic2 0 2-11.eprom" size="262144" crc="1f1260f9" sha1="40dd11fb557fc54c0115eb0bf43f090c5b00b200" offset="0x000001"/> <!-- MD Sonic2 0 2/11 -->
+				<rom loadflag="load16_byte" name="md sonic2 1 2-11.eprom" size="262144" crc="bfa5f8c7" sha1="a54cadff1b49373472a6c2fcd0f7c8c7655a04d7" offset="0x000000"/> <!-- MD Sonic2 1 2/11 -->
+				<rom loadflag="load16_byte" name="md sonic2 2 2-11.eprom" size="262144" crc="d75b618f" sha1="37276337a7c1516ea3781677e6b2bbe53b27e403" offset="0x080001"/> <!-- MD Sonic2 2 2/11 -->
+				<rom loadflag="load16_byte" name="md sonic2 3 2-11.eprom" size="262144" crc="c2293c87" sha1="3e467e24c220bd8128c03fb79e45d42d86fcc851" offset="0x080000"/> <!-- MD Sonic2 3 2/11 -->
 			</dataarea>
 		</part>
 	</software>
@@ -25200,16 +25200,15 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="megadriv_cart"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="sonic 3 0 md 3-11 2.eprom" size="262144" crc="f1013d40" sha1="dba64a8a12cc8b3a2b92684a4f06df8fc9bbb20e" offset="0x000001" loadflag="load16_byte" /> <!-- Sonic 3 0 MD 3\11 2 -->
 				<rom name="sonic 3 1 md 3-11 2.eprom" size="262144" crc="87765386" sha1="fb1c803f9a40892a5d4125bfec163f9372357c46" offset="0x000000" loadflag="load16_byte" /> <!-- Sonic 3 1 MD 3\11 2 -->
 				<rom name="sonic 3 2 md 3-11 2.eprom" size="262144" crc="4e0d637f" sha1="5b8f8048a68b7a41fbaa096742b62eb89a474086" offset="0x080001" loadflag="load16_byte" /> <!-- Sonic 3 2 MD 3\11 2 -->
 				<rom name="sonic 3 3 md 3-11 2.eprom" size="262144" crc="46546c5b" sha1="f4be05074ee1e883fe99a0a5136989b061f837fd" offset="0x080000" loadflag="load16_byte" /> <!-- Sonic 3 3 MD 3\11 2 -->
-				<rom name="sonic 3 4 md 3-11 2.eprom" size="262144" crc="4a6f9ad9" sha1="a386d8e7b24d50c4ce6796e240e1595dff1cf1db" offset="0x140001" loadflag="load16_byte" /> <!-- Sonic 3 4 MD 3\11 2 -->
-				<rom name="sonic 3 5 md 3-11 2.eprom" size="262144" crc="d064c206" sha1="b979be1ce6c7c7accd824146aea50e8cd5ebce5b" offset="0x140000" loadflag="load16_byte" /> <!-- Sonic 3 5 MD 3\11 2 -->
-				<rom name="sonic 3 6 md 3-11 2.eprom" size="262144" crc="fa68199e" sha1="37104cf987361a1a52edae10a30abdf01c42c129" offset="0x1c0001" loadflag="load16_byte" /> <!-- Sonic 3 6 MD 3\11 2 -->
-				<rom name="sonic 3 7 md 3-11 2.eprom" size="262144" crc="81987c07" sha1="a5c227ea2b7cd388863b4721ac6989800652dfe7" offset="0x1c0000" loadflag="load16_byte" /> <!-- Sonic 3 7 MD 3\11 2 -->
+				<rom name="sonic 3 4 md 3-11 2.eprom" size="262144" crc="4a6f9ad9" sha1="a386d8e7b24d50c4ce6796e240e1595dff1cf1db" offset="0x100001" loadflag="load16_byte" /> <!-- Sonic 3 4 MD 3\11 2 -->
+				<rom name="sonic 3 5 md 3-11 2.eprom" size="262144" crc="d064c206" sha1="b979be1ce6c7c7accd824146aea50e8cd5ebce5b" offset="0x100000" loadflag="load16_byte" /> <!-- Sonic 3 5 MD 3\11 2 -->
+				<rom name="sonic 3 6 md 3-11 2.eprom" size="262144" crc="fa68199e" sha1="37104cf987361a1a52edae10a30abdf01c42c129" offset="0x180001" loadflag="load16_byte" /> <!-- Sonic 3 6 MD 3\11 2 -->
+				<rom name="sonic 3 7 md 3-11 2.eprom" size="262144" crc="81987c07" sha1="a5c227ea2b7cd388863b4721ac6989800652dfe7" offset="0x180000" loadflag="load16_byte" /> <!-- Sonic 3 7 MD 3\11 2 -->
 			</dataarea>
 		</part>
 	</software>
