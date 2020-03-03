@@ -350,7 +350,7 @@ void xavix2_state::gpu_update(u16 count, u16 adr)
 			}
 		}
 	}
-	delete list;
+	delete[] list;
 }
 
 void xavix2_state::gpu_descsize_w(u16 data)
