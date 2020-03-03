@@ -988,6 +988,7 @@ FORMATS["HECT_TAP"] = true
 FORMATS["HTI_TAP"] = true
 FORMATS["HPI_DSK"] = true
 FORMATS["HP_IPC_DSK"] = true
+FORMATS["IBMXDF_DSK"] = true
 FORMATS["IMG_DSK"] = true
 FORMATS["IQ151_DSK"] = true
 FORMATS["ITT3030_DSK"] = true
