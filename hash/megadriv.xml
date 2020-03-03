@@ -25131,16 +25131,16 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sonic2p11" cloneof="sonic2" supported="no">
+	<software name="sonic2p11" cloneof="sonic2">
 		<description>Sonic the Hedgehog 2 (World, final prototype 19921102)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom loadflag="load16_byte" name="md sonic2 0 2-11.eprom" size="262144" crc="1f1260f9" sha1="40dd11fb557fc54c0115eb0bf43f090c5b00b200" offset="0x000001"/> <!-- MD Sonic2 0 2/11 -->
-				<rom loadflag="load16_byte" name="md sonic2 1 2-11.eprom" size="262144" crc="bfa5f8c7" sha1="a54cadff1b49373472a6c2fcd0f7c8c7655a04d7" offset="0x000000"/> <!-- MD Sonic2 1 2/11 -->
-				<rom loadflag="load16_byte" name="md sonic2 2 2-11.eprom" size="262144" crc="d75b618f" sha1="37276337a7c1516ea3781677e6b2bbe53b27e403" offset="0x080001"/> <!-- MD Sonic2 2 2/11 -->
-				<rom loadflag="load16_byte" name="md sonic2 3 2-11.eprom" size="262144" crc="c2293c87" sha1="3e467e24c220bd8128c03fb79e45d42d86fcc851" offset="0x080000"/> <!-- MD Sonic2 3 2/11 -->
+				<rom name="md sonic2 0 2-11.eprom" size="262144" crc="1f1260f9" sha1="40dd11fb557fc54c0115eb0bf43f090c5b00b200" offset="0x000000"/> <!-- MD Sonic2 0 2/11 -->
+				<rom name="md sonic2 1 2-11.eprom" size="262144" crc="bfa5f8c7" sha1="a54cadff1b49373472a6c2fcd0f7c8c7655a04d7" offset="0x040000"/> <!-- MD Sonic2 1 2/11 -->
+				<rom name="md sonic2 2 2-11.eprom" size="262144" crc="d75b618f" sha1="37276337a7c1516ea3781677e6b2bbe53b27e403" offset="0x080000"/> <!-- MD Sonic2 2 2/11 -->
+				<rom name="md sonic2 3 2-11.eprom" size="262144" crc="c2293c87" sha1="3e467e24c220bd8128c03fb79e45d42d86fcc851" offset="0x0c0000"/> <!-- MD Sonic2 3 2/11 -->
 			</dataarea>
 		</part>
 	</software>
