@@ -3940,6 +3940,8 @@ if (BUSES["HP80_IO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/hp80_io/hp80_io.cpp",
 		MAME_DIR .. "src/devices/bus/hp80_io/hp80_io.h",
+		MAME_DIR .. "src/devices/bus/hp80_io/82900.cpp",
+		MAME_DIR .. "src/devices/bus/hp80_io/82900.h",
 		MAME_DIR .. "src/devices/bus/hp80_io/82937.cpp",
 		MAME_DIR .. "src/devices/bus/hp80_io/82937.h",
 		MAME_DIR .. "src/devices/bus/hp80_io/82939.cpp",
