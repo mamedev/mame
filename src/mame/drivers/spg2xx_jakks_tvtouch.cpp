@@ -279,6 +279,14 @@ ROM_START( tvtchspd )
 	ROM_LOAD16_WORD_SWAP( "touchspiderman.bin", 0x000000, 0x400000, CRC(7646f265) SHA1(3b029d9d1dc57f4cae809f177205d8372d722461) )
 ROM_END
 
+ROM_START( tvtchsb )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "touchspongebob.bin", 0x000000, 0x400000, CRC(a6d7f544) SHA1(fc15b3d2bbbd951d82c81bef59f45506d6c4e2e3) )
+ROM_END
+
+
 // TV Touch Games (these are re-release versions of classic JAKKS games but using a touchpad controller)
-CONS( 2012, tvtchsw, 0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific Inc / Code Mystics", "TV Touch Games: Star Wars Original Trilogy", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Touch games have 24C04
+CONS( 2012, tvtchsw,  0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific Inc / Code Mystics", "TV Touch Games: Star Wars Original Trilogy", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Touch games have 24C04
 CONS( 2012, tvtchspd, 0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific Inc / Code Mystics", "TV Touch Games: Spider-Man in Villain Round-Up", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2012, tvtchsb,  0, 0, tvtouch, tvtouch, jakks_tvtouch_state, empty_init, "JAKKS Pacific Inc / Code Mystics", "TV Touch Games: SpongeBob SquarePants Jellyfish Dodge", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// Cut the Rope was planned but never released

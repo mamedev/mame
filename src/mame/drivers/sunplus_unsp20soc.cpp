@@ -235,8 +235,59 @@ void generalplus_gpspispi_game_state::machine_reset()
 
 void wrlshunt_game_state::init_wrlshunt()
 {
-	m_sdram.resize(0x400000); // 0x400000 bytes, 0x800000 words
+	m_sdram.resize(0x400000); // 0x400000 words, 0x800000 bytes
 }
+
+void wrlshunt_game_state::init_ths()
+{
+	m_sdram.resize(0x400000); // 0x400000 words, 0x800000 bytes (verify)
+
+	// encryption?
+	{
+		uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+		int size = memregion("maincpu")->bytes();
+
+		for (int i = 0x0000 / 2; i < size / 2; i++)
+		{
+			rom[i] = bitswap<16>(rom[i],  15,14,13,12,
+				                          11,10,9,8,
+				                          7,6,5,4,	
+				                          2,3,1,0);
+
+			if (rom[i] & 0x0002) rom[i] ^= 0x0004;
+			
+			// must be somtehing address based too..
+			if (i & 1)
+			{
+				if (rom[i] & 0x0008) rom[i] ^= 0x0004;
+			}
+			else
+			{
+				if (rom[i] & 0x0002) rom[i] ^= 0x0004;
+			}
+
+		}
+	}
+
+
+	if (0)
+	{
+		uint8_t* rom = memregion("maincpu")->base();
+		int size = memregion("maincpu")->bytes();
+
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"decrypted_%s", machine().system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(rom, size, 1, fp);
+			fclose(fp);
+		}
+	}
+}
+
+
 
 READ16_MEMBER(generalplus_gpac800_game_state::cs0_r)
 {
@@ -1163,6 +1214,14 @@ ROM_START(jak_totm)
 	ROM_LOAD16_WORD_SWAP("toysonthemove.bin", 0x000000, 0x800000, CRC(d08fb72a) SHA1(1fea98542ef7c65eef31afb70fd50952b4cef1c1) )
 ROM_END
 
+ROM_START(jak_ths)
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("tripleplaysports.bin", 0x000000, 0x800000, CRC(a7816ee1) SHA1(78195b01eba9ba2cd03c43545b767dee302654bc) )
+ROM_END
+
 
 ROM_START(wrlshunt)
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
@@ -1374,6 +1433,7 @@ CONS(2012, paccon, 0, 0, wrlshunt, paccon, jak_s500_game_state, init_wrlshunt, "
 
 CONS(2009, jak_s500, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(200?, jak_totm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // Toys on the Move has ISSI 404A
+CONS(2009, jak_ths,  0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_ths,      "JAKKS Pacific Inc", "Triple Header Sports (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 

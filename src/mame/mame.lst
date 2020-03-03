@@ -37137,6 +37137,7 @@ jak_sbfc                        //
 @source:spg2xx_jakks_tvtouch.cpp
 tvtchsw
 tvtchspd
+tvtchsb
 
 @source:spg2xx_lexibook.cpp
 lexizeus                        // Lexibook
@@ -37779,6 +37780,7 @@ starfigh                        // (c) 1990 SunA
 paccon
 jak_s500
 jak_totm
+jak_ths
 smartfp                         // Smart Fit Park
 wlsair60                        // Wireless Air 60
 wrlshunt                        // Wireless: Hunting Video Game System
