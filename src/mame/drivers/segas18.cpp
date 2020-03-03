@@ -1156,19 +1156,19 @@ static INPUT_PORTS_START( mwalk )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x08, 0x00, "Player Vitality" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Player Vitality" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x10, 0x00, "Play Mode" ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, "Play Mode" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, "2 Players" )
 	PORT_DIPSETTING(    0x00, "3 Players" )
-	PORT_DIPNAME( 0x20, 0x00, "Coin Chute" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Coin Chute" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "Common" )
 	PORT_DIPSETTING(    0x00, "Individual" )
-	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
@@ -1179,18 +1179,13 @@ static INPUT_PORTS_START( mwalka )
 	PORT_INCLUDE( mwalk )
 
 	PORT_MODIFY("DSW")
-	//"SW2:1" not divert from "mwalk"
-	//"SW2:2" not divert from "mwalk"
-	//"SW2:3" not divert from "mwalk"
-	//"SW2:4" not divert from "mwalk"
+	// inverts the meaning of these two dips, to follow suit with the US 3P cabinet
 	PORT_DIPNAME( 0x10, 0x10, "Play Mode" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, "2 Players" )
 	PORT_DIPSETTING(    0x10, "3 Players" )
 	PORT_DIPNAME( 0x20, 0x20, "Coin Chute" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, "Common" )
 	PORT_DIPSETTING(    0x20, "Individual" )
-	//"SW2:7" not divert from "mwalk"
-	//"SW2:8" not divert from "mwalk"
 INPUT_PORTS_END
 
 
