@@ -2701,6 +2701,18 @@
 		</part>
 	</software>
 
+	<software name="leviathan" supported="no">
+		<description>Leviathan (Euro)</description>
+		<year>1987</year>
+		<publisher>English Software</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="425024">
+				<rom name="leviathan.stx" size="425024" crc="05e0caa6" sha1="f18afa94caa21cc090ef8234fb3a61c435908c70" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lightcor" supported="no">
 		<!-- SPS (CAPS) release 3297 -->
 		<description>The Light Corridor (Euro)</description>
