@@ -355,7 +355,7 @@ ROM_START( speedbala ) // seems to have a more complete hidden test mode, with a
 	ROM_LOAD( "9.u45",  0x00000, 0x08000, CRC(b567e85e) SHA1(7036792ea70ad48384f348399ed9b136272fedb6) )    /* bg tiles */
 	ROM_LOAD( "5.u46",  0x08000, 0x08000, CRC(b0eae4ba) SHA1(baee3fcb1399c56efaa5f97912de324d7b38f286) )
 	ROM_LOAD( "8.u47",  0x10000, 0x08000, CRC(d2bfbdb6) SHA1(b552b055450f438729c83337f561d05b6518ae75) )
-	ROM_LOAD( "4.u48",  0x18000, 0x08000, BAD_DUMP CRC(1d23a130) SHA1(aabf7c46f9299ffb8b8ca92839622d000a470a0b) ) // dump had bit 6 stuck, using the one from the parent while waiting for a redump. Should match anyway
+	ROM_LOAD( "4.u48",  0x18000, 0x08000, CRC(1d23a130) SHA1(aabf7c46f9299ffb8b8ca92839622d000a470a0b) )
 
 	ROM_REGION( 0x10000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "7.u67",  0x00000, 0x08000, CRC(9f1b33d1) SHA1(1f8be8f8e6a2ee99a7dafeead142ccc629fa792d) )   /* sprites */
