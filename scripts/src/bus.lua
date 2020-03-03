@@ -125,6 +125,8 @@ if (BUSES["ACORN"]~=null) then
 		MAME_DIR .. "src/devices/bus/acorn/cms/fdc.h",
 		MAME_DIR .. "src/devices/bus/acorn/cms/hires.cpp",
 		MAME_DIR .. "src/devices/bus/acorn/cms/hires.h",
+		MAME_DIR .. "src/devices/bus/acorn/cms/ieee.cpp",
+		MAME_DIR .. "src/devices/bus/acorn/cms/ieee.h",
 		MAME_DIR .. "src/devices/bus/acorn/system/32k.cpp",
 		MAME_DIR .. "src/devices/bus/acorn/system/32k.h",
 		MAME_DIR .. "src/devices/bus/acorn/system/8k.cpp",

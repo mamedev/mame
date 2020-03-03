@@ -159,6 +159,7 @@ void device_acorn_bus_interface::interface_pre_start()
 #include "cms/4080term.h"
 #include "cms/fdc.h"
 #include "cms/hires.h"
+#include "cms/ieee.h"
 
 void acorn_bus_devices(device_slot_interface &device)
 {
@@ -187,4 +188,5 @@ void cms_bus_devices(device_slot_interface &device)
 	device.option_add("4080term", CMS_4080TERM);  /* CMS 40/80 Video Terminal Card */
 	device.option_add("fdc", CMS_FDC);            /* CMS Floppy Disc Controller */
 	device.option_add("hires", CMS_HIRES);        /* CMS High Resolution Colour Graphics Card */
+	device.option_add("ieee", CMS_IEEE);          /* CMS IEEE Interface */
 }

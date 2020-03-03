@@ -78,7 +78,7 @@ void cms_4080term_device::device_add_mconfig(machine_config &config)
 	m_screen->set_screen_update("ef9345", FUNC(ef9345_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_cms_4080term);
-	PALETTE(config, "palette").set_entries(8);
+	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
 	EF9345(config, m_ef9345, 0);
 	m_ef9345->set_screen("screen");

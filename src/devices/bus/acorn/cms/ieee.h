@@ -2,34 +2,29 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    CMS Floppy Disc Controller Board
+    CMS IEEE Controller Board
 
 **********************************************************************/
 
 
-#ifndef MAME_BUS_ACORN_CMS_FDC_H
-#define MAME_BUS_ACORN_CMS_FDC_H
-
-#pragma once
+#ifndef MAME_BUS_ACORN_CMS_IEEE_H
+#define MAME_BUS_ACORN_CMS_IEEE_H
 
 #include "bus/acorn/bus.h"
-#include "imagedev/floppy.h"
-#include "machine/wd_fdc.h"
-#include "formats/acorn_dsk.h"
+#include "bus/ieee488/ieee488.h"
+#include "machine/tms9914.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class cms_fdc_device :
+class cms_ieee_device:
 	public device_t,
 	public device_acorn_bus_interface
 {
 public:
 	// construction/destruction
-	cms_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	cms_ieee_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -39,16 +34,15 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_READ8_MEMBER(wd1770_state_r);
-	DECLARE_WRITE8_MEMBER(wd1770_control_w);
+	DECLARE_WRITE_LINE_MEMBER(bus_irq_w);
 
-	required_device<wd_fdc_device_base> m_fdc;
-	required_device_array<floppy_connector, 3> m_floppy;
+	required_device<ieee488_device> m_ieee;
+	required_device<tms9914_device> m_tms9914;
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(CMS_FDC, cms_fdc_device)
+DECLARE_DEVICE_TYPE(CMS_IEEE, cms_ieee_device);
 
 
-#endif // MAME_BUS_ACORN_CMS_FDC_H
+#endif /* MAME_BUS_ACORN_CMS_IEEE_H */
