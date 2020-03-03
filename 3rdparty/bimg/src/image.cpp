@@ -4001,12 +4001,20 @@ namespace bimg
 
 		TextureFormat::Enum format = TextureFormat::Unknown;
 		bool hasAlpha = false;
+		bool srgb = false;
 
 		for (uint32_t ii = 0; ii < BX_COUNTOF(s_translateKtxFormat); ++ii)
 		{
 			if (s_translateKtxFormat[ii].m_internalFmt == glInternalFormat)
 			{
 				format = TextureFormat::Enum(ii);
+				break;
+			}
+
+			if (s_translateKtxFormat[ii].m_internalFmtSrgb == glInternalFormat)
+			{
+				format = TextureFormat::Enum(ii);
+				srgb = true;
 				break;
 			}
 		}
@@ -4038,7 +4046,7 @@ namespace bimg
 		_imageContainer.m_cubeMap     = numFaces > 1;
 		_imageContainer.m_ktx         = true;
 		_imageContainer.m_ktxLE       = fromLittleEndian;
-		_imageContainer.m_srgb        = false;
+		_imageContainer.m_srgb        = srgb;
 
 		if (TextureFormat::Unknown == format)
 		{
@@ -5564,11 +5572,16 @@ namespace bimg
 		return total;
 	}
 
-	static int32_t imageWriteKtxHeader(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, uint32_t _numLayers, bx::Error* _err)
+	static int32_t imageWriteKtxHeader(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, uint32_t _numLayers, bool _srgb, bx::Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
 
 		const KtxFormatInfo& tfi = s_translateKtxFormat[_format];
+
+		uint32_t internalFmt = tfi.m_internalFmt;
+		if (_srgb && tfi.m_internalFmtSrgb != KTX_ZERO) {
+			internalFmt = tfi.m_internalFmtSrgb;
+		}
 
 		int32_t total = 0;
 		total += bx::write(_writer, "\xabKTX 11\xbb\r\n\x1a\n", 12, _err);
@@ -5576,7 +5589,7 @@ namespace bimg
 		total += bx::write(_writer, uint32_t(0), _err); // glType
 		total += bx::write(_writer, uint32_t(1), _err); // glTypeSize
 		total += bx::write(_writer, uint32_t(0), _err); // glFormat
-		total += bx::write(_writer, tfi.m_internalFmt, _err); // glInternalFormat
+		total += bx::write(_writer, internalFmt, _err); // glInternalFormat
 		total += bx::write(_writer, tfi.m_fmt, _err); // glBaseInternalFormat
 		total += bx::write(_writer, _width, _err);
 		total += bx::write(_writer, _height, _err);
@@ -5590,12 +5603,12 @@ namespace bimg
 		return total;
 	}
 
-	int32_t imageWriteKtx(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, uint32_t _numLayers, const void* _src, bx::Error* _err)
+	int32_t imageWriteKtx(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, uint32_t _numLayers, bool _srgb, const void* _src, bx::Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
 
 		int32_t total = 0;
-		total += imageWriteKtxHeader(_writer, _format, _cubeMap, _width, _height, _depth, _numMips, _numLayers, _err);
+		total += imageWriteKtxHeader(_writer, _format, _cubeMap, _width, _height, _depth, _numMips, _numLayers, _srgb, _err);
 
 		if (!_err->isOk() )
 		{
@@ -5658,6 +5671,7 @@ namespace bimg
 			, _imageContainer.m_depth
 			, _imageContainer.m_numMips
 			, _imageContainer.m_numLayers
+			, _imageContainer.m_srgb
 			, _err
 			);
 
