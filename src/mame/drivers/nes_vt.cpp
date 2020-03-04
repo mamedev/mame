@@ -190,10 +190,10 @@ private:
 
 	/* Extra IO */
 	DECLARE_WRITE8_MEMBER(extra_io_control_w);
-	DECLARE_READ8_MEMBER(extrain_01_r);
-	DECLARE_READ8_MEMBER(extrain_23_r);
-	DECLARE_WRITE8_MEMBER(extraout_01_w);
-	DECLARE_WRITE8_MEMBER(extraout_23_w);
+	virtual DECLARE_READ8_MEMBER(extrain_01_r);
+	virtual DECLARE_READ8_MEMBER(extrain_23_r);
+	virtual DECLARE_WRITE8_MEMBER(extraout_01_w);
+	virtual DECLARE_WRITE8_MEMBER(extraout_23_w);
 
 
 	DECLARE_WRITE8_MEMBER(chr_w);
@@ -272,6 +272,16 @@ public:
 
 protected:
 	virtual void machine_reset() override;
+};
+
+class nes_vt_timetp36_state : public nes_vt_state
+{
+public:
+	nes_vt_timetp36_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_state(mconfig, type, tag)
+	{ }
+
+protected:
 };
 
 class nes_vt_hum_state : public nes_vt_state
@@ -1706,8 +1716,8 @@ void nes_vt_state::nes_vt_map(address_map &map)
 	map(0x4100, 0x410b).r(FUNC(nes_vt_state::vt03_410x_r)).w(FUNC(nes_vt_state::vt03_410x_w));
 	// 0x410c unused
 	map(0x410d, 0x410d).w(FUNC(nes_vt_state::extra_io_control_w));
-	map(0x410e, 0x410e).r(FUNC(nes_vt_state::extrain_01_r));
-	map(0x410f, 0x410f).r(FUNC(nes_vt_state::extrain_23_r));
+	map(0x410e, 0x410e).rw(FUNC(nes_vt_state::extrain_01_r), FUNC(nes_vt_state::extraout_01_w));
+	map(0x410f, 0x410f).rw(FUNC(nes_vt_state::extrain_23_r), FUNC(nes_vt_state::extraout_23_w));
 	// 0x4114 RS232 timer (low)
 	// 0x4115 RS232 timer (high)
 	// 0x4116 unused
@@ -2201,6 +2211,72 @@ static INPUT_PORTS_START( majgnc )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("5 / BET")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("4")
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( timetp36 )
+	PORT_INCLUDE(nes_vt)
+
+	PORT_MODIFY("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("B")
+
+	PORT_MODIFY("IO1") // no 2nd player
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("EXTRAIN0") // see code at 8084, 808D, 809A  ... code at 8064 instead seems to be reading 8 bits with a shifter too?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("X") // used in the NAM-1975 rip-off 'Army Strike'
+	PORT_DIPNAME( 0x0002, 0x0002, "0" )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("EXTRAIN1")
+	PORT_DIPNAME( 0x0001, 0x0001, "1" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("EXTRAIN2")
+	PORT_DIPNAME( 0x0001, 0x0001, "2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("EXTRAIN3")
+	PORT_DIPNAME( 0x0001, 0x0001, "3" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 void nes_vt_sudoku_state::init_sudoku()
 {
@@ -2698,7 +2774,7 @@ CONS( 200?, sudopptv,  0, 0,  nes_vt,        nes_vt, nes_vt_waixing_state, empty
 CONS( 200?, megapad,   0, 0,  nes_vt,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
 
  // needs PCM samples, all games appear playable but has 'hard, middle, easy' 3 pos slider that needs emulating, and x + y buttons that also need adding (assuming they're not hardware turbo buttons)
-CONS( 200?, timetp36,  0, 0,  nes_vt,        nes_vt, nes_vt_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, timetp36,  0, 0,  nes_vt,        timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // this is VT09 based
 // it boots, most games correct, but palette issues in some games still (usually they appear greyscale)
