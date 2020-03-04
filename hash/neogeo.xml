@@ -1018,7 +1018,7 @@
 	</software>
 
 	<software name="burningfpb" cloneof="burningf">
-		<!-- later prototype, but Sx, Cx, Vx etc. not yet final, marked V07 -->
+		<!-- later prototype, but Sx, Cx, Vx etc. not yet final, Eproms are labeled Ver07 from Feb 1991 -->
 		<description>Burning Fight (prototype, newer, V07)</description>
 		<year>1991</year>
 		<publisher>SNK</publisher>
