@@ -13,20 +13,19 @@
 
 #pragma once
 
-
-#define HP80_IO_FIRST_SC  3   // Lowest SC used by I/O cards
+#define HP80_IO_SC_OFFSET   5
 
 #define PORT_HP80_IO_SC(_default_sc)              \
 	PORT_START("SC") \
-	PORT_CONFNAME(0xf , (_default_sc) - HP80_IO_FIRST_SC , "Select Code") \
-	PORT_CONFSETTING(0 , "3")\
-	PORT_CONFSETTING(1 , "4")\
-	PORT_CONFSETTING(2 , "5")\
-	PORT_CONFSETTING(3 , "6")\
-	PORT_CONFSETTING(4 , "7")\
-	PORT_CONFSETTING(5 , "8")\
-	PORT_CONFSETTING(6 , "9")\
-	PORT_CONFSETTING(7 , "10")
+	PORT_CONFNAME(0xf , (_default_sc) + HP80_IO_SC_OFFSET , "Select Code") \
+	PORT_CONFSETTING(8 , "3")\
+	PORT_CONFSETTING(9 , "4")\
+	PORT_CONFSETTING(10 , "5")\
+	PORT_CONFSETTING(11 , "6")\
+	PORT_CONFSETTING(12 , "7")\
+	PORT_CONFSETTING(13 , "8")\
+	PORT_CONFSETTING(14 , "9")\
+	PORT_CONFSETTING(15 , "10")
 
 void hp80_io_slot_devices(device_slot_interface &device);
 
