@@ -1441,7 +1441,17 @@ READ16_MEMBER(gcm394_base_video_device::palette_r)
 
 WRITE16_MEMBER(gcm394_base_video_device::video_701c_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_701c_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_701c_w (unknown video reg?) %04x\n", machine().describe_context(), data);
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::video_701d_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_701d_w (unknown video reg?) %04x\n", machine().describe_context(), data);
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::video_701e_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_701e_w (unknown video reg?) %04x\n", machine().describe_context(), data);
 }
 
 
