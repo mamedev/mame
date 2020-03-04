@@ -1932,8 +1932,8 @@ ROM_START( kurikint )
 	ROM_LOAD( "b42-02.ic5",  0x80000, 0x80000, CRC(1a52e65c) SHA1(20a1fc4d02b5928fb01444079692e23d178c6297) )
 	
 	ROM_REGION( 0x022e, "plds", 0 )
-	ROM_LOAD( "gal16v8-b42-03.ic4.bin",  0x0000, 0x0117, CRC(f7150d37) SHA1(10f9190b89c802e0722fd6ba0f17ba97d463f434) )  /* derived, but verified  Pal Stamped B42-03 */
-	ROM_LOAD( "gal16v8-b42-04.ic21.bin", 0x0117, 0x0117, CRC(b57b806c) SHA1(04cbb008256b7317ebf366327dfd38ead8eaf94e) )  /* derived, but verified  Pal Stamped B42-04 */
+	ROM_LOAD( "gal16v8-b42-03.ic4.bin",  0x0000, 0x0117, CRC(f7150d37) SHA1(10f9190b89c802e0722fd6ba0f17ba97d463f434) )  /* derived, but verified, PAL16L8 Stamped B42-03 */
+	ROM_LOAD( "gal16v8-b42-04.ic21.bin", 0x0117, 0x0117, CRC(b57b806c) SHA1(04cbb008256b7317ebf366327dfd38ead8eaf94e) )  /* derived, but verified, PAL16L8 Stamped B42-04 */
 ROM_END
 
 ROM_START( kurikintw )
@@ -1949,8 +1949,8 @@ ROM_START( kurikintw )
 	ROM_LOAD( "b42-02.ic5",  0x80000, 0x80000, CRC(1a52e65c) SHA1(20a1fc4d02b5928fb01444079692e23d178c6297) )
 
 	ROM_REGION( 0x022e, "plds", 0 )
-	ROM_LOAD( "gal16v8-b42-03.ic4.bin",  0x0000, 0x0117, CRC(f7150d37) SHA1(10f9190b89c802e0722fd6ba0f17ba97d463f434) )  /* derived, but verified  Pal Stamped B42-03 */
-	ROM_LOAD( "gal16v8-b42-04.ic21.bin", 0x0117, 0x0117, CRC(b57b806c) SHA1(04cbb008256b7317ebf366327dfd38ead8eaf94e) )  /* derived, but verified  Pal Stamped B42-04 */
+	ROM_LOAD( "gal16v8-b42-03.ic4.bin",  0x0000, 0x0117, CRC(f7150d37) SHA1(10f9190b89c802e0722fd6ba0f17ba97d463f434) )  /* derived, but verified, PAL16L8 Stamped B42-03 */
+	ROM_LOAD( "gal16v8-b42-04.ic21.bin", 0x0117, 0x0117, CRC(b57b806c) SHA1(04cbb008256b7317ebf366327dfd38ead8eaf94e) )  /* derived, but verified, PAL16L8 Stamped B42-04 */
 ROM_END
 
 ROM_START( kurikintu )
@@ -1966,8 +1966,8 @@ ROM_START( kurikintu )
 	ROM_LOAD( "b42-02.ic5",  0x80000, 0x80000, CRC(1a52e65c) SHA1(20a1fc4d02b5928fb01444079692e23d178c6297) )
 	
 	ROM_REGION( 0x022e, "plds", 0 )
-	ROM_LOAD( "gal16v8-b42-03.ic4.bin",  0x0000, 0x0117, CRC(f7150d37) SHA1(10f9190b89c802e0722fd6ba0f17ba97d463f434) )  /* derived, but verified  Pal Stamped B42-03 */
-	ROM_LOAD( "gal16v8-b42-04.ic21.bin", 0x0117, 0x0117, CRC(b57b806c) SHA1(04cbb008256b7317ebf366327dfd38ead8eaf94e) )  /* derived, but verified  Pal Stamped B42-04 */
+	ROM_LOAD( "gal16v8-b42-03.ic4.bin",  0x0000, 0x0117, CRC(f7150d37) SHA1(10f9190b89c802e0722fd6ba0f17ba97d463f434) )  /* derived, but verified, PAL16L8 Stamped B42-03 */
+	ROM_LOAD( "gal16v8-b42-04.ic21.bin", 0x0117, 0x0117, CRC(b57b806c) SHA1(04cbb008256b7317ebf366327dfd38ead8eaf94e) )  /* derived, but verified, PAL16L8 Stamped B42-04 */
 ROM_END
 
 ROM_START( kurikintj )
@@ -1983,8 +1983,8 @@ ROM_START( kurikintj )
 	ROM_LOAD( "b42-02.ic5",  0x80000, 0x80000, CRC(1a52e65c) SHA1(20a1fc4d02b5928fb01444079692e23d178c6297) )
 
 	ROM_REGION( 0x022e, "plds", 0 )
-	ROM_LOAD( "gal16v8-b42-03.ic4.bin",  0x0000, 0x0117, CRC(f7150d37) SHA1(10f9190b89c802e0722fd6ba0f17ba97d463f434) )  /* derived, but verified  Pal Stamped B42-03 */
-	ROM_LOAD( "gal16v8-b42-04.ic21.bin", 0x0117, 0x0117, CRC(b57b806c) SHA1(04cbb008256b7317ebf366327dfd38ead8eaf94e) )  /* derived, but verified  Pal Stamped B42-04 */
+	ROM_LOAD( "gal16v8-b42-03.ic4.bin",  0x0000, 0x0117, CRC(f7150d37) SHA1(10f9190b89c802e0722fd6ba0f17ba97d463f434) )  /* derived, but verified, PAL16L8 Stamped B42-03 */
+	ROM_LOAD( "gal16v8-b42-04.ic21.bin", 0x0117, 0x0117, CRC(b57b806c) SHA1(04cbb008256b7317ebf366327dfd38ead8eaf94e) )  /* derived, but verified, PAL16L8 Stamped B42-04 */
 ROM_END
 
 ROM_START( kurikinta )
