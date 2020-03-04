@@ -488,7 +488,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="conflict">
+	<software name="cnflctvn">
 		<description>Conflict in Vietnam</description>
 		<year>1986</year>
 		<publisher>MicroProse</publisher>
@@ -8098,6 +8098,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Commander Keen in Keen Dreams (USA).img" size="737280" crc="a080a939" sha1="02d296965f32d84b5a180132062f11dc13005394"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conflict">
+		<description>Conflict</description>
+		<year>1990</year>
+		<publisher>16 Blitz</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2152124">
+				<rom name="conflict.mfm" size="2152124" crc="b43b9afc" sha1="8cf07476ea3ac53448043d67294e0ec1adb48ecd"/>
 			</dataarea>
 		</part>
 	</software>
