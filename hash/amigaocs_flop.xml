@@ -150,6 +150,24 @@
 		</part>
 	</software>
 
+	<software name="16bitkomix" supported="no">
+		<description>16 Bit Komix (Euro)</description>
+		<year>1991</year>
+		<publisher>Codemasters</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 (Treasure Island Dizzy, Pro Tennis Simulator, Mig-29)" />
+			<dataarea name="flop" size="2150251">
+				<rom name="komix1.mfm" size="2150251" crc="62b63967" sha1="d35c830e6e2ca75b1aa51116f55ff3a269350923"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 (BMX Simulator)" />
+			<dataarea name="flop" size="2150243">
+				<rom name="komix2.mfm" size="2150243" crc="f2802691" sha1="944e39e2c3e325590f038cd4d778fa19c419f0ab"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="1869" supported="no">
 		<!-- SPS (CAPS) release 417 -->
 		<description>1869 - Erlebte Geschichte Teil I (Euro)</description>
