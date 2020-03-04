@@ -577,9 +577,6 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 			uint32_t xx = (tile_w * x0 - xscroll) & (total_width-1);
 			uint32_t tile = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
 
-			uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
-			if (x0 & 1)
-				palette >>= 8;
 
 
 			if (!tile)
@@ -589,19 +586,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 			uint32_t tileattr = attr_reg;
 			uint32_t tilectrl = ctrl_reg;
 
-#if 0
-			if ((ctrl_reg & 2) == 0)
-			{   // -(1) bld(1) flip(2) pal(4)
-				tileattr &= ~0x000c;
-				tileattr |= (palette >> 2) & 0x000c;    // flip
 
-				tileattr &= ~0x0f00;
-				tileattr |= (palette << 8) & 0x0f00;    // palette
-
-				tilectrl &= ~0x0100;
-				tilectrl |= (palette << 2) & 0x0100;    // blend
-			}
-#endif
 			bool blend;
 			bool row_scroll;
 			bool flip_x;
@@ -612,18 +597,47 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 			row_scroll = (tilectrl & 0x0010);
 
 
-			if ((ctrl_reg & 2) == 0)
+			if ((ctrl_reg & 2) == 0) // RegSet:0
 			{
+				uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
+				if (x0 & 1)
+					palette >>= 8;
+
 				flip_x = 0;
 				yflipmask = 0;
 				palette_offset = (palette & 0x0f) << 4;
+
+				//tileattr &= ~0x000c;
+				//tileattr |= (palette >> 2) & 0x000c;    // flip
+
+				//tileattr &= ~0x0f00;
+				//tileattr |= (palette << 8) & 0x0f00;    // palette
+
+				//tilectrl &= ~0x0100;
+				//tilectrl |= (palette << 2) & 0x0100;    // blend
 			}
-			else // jak_car2 uses this mode for sky ingame
+			else // RegSet:1
 			{
-				flip_x = (tileattr & TILE_X_FLIP);
-				yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
-				palette_offset = (tileattr & 0x0f00) >> 4;
-				tile |= (palette & 0x0007) << 16;
+				if (m_alt_tile_addressing == 0)
+				{
+					// smartfp needs the attribute table to contain extra tile bits even if regset is 1
+					uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
+					if (x0 & 1)
+						palette >>= 8;
+
+					tile |= (palette & 0x0007) << 16;
+
+					flip_x = (tileattr & TILE_X_FLIP);
+					yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
+					palette_offset = (tileattr & 0x0f00) >> 4;
+
+				}
+				else
+				{
+					flip_x = (tileattr & TILE_X_FLIP);
+					yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
+					palette_offset = (tileattr & 0x0f00) >> 4;
+				}
 			}
 
 

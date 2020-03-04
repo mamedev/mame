@@ -317,21 +317,22 @@ void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 		uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & 0xff) - 0x10;
 		uint32_t xx = (tile_w * x0 - xscroll) & 0x1ff;
 		uint16_t tile = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
-		uint16_t palette = 0;
 
 		if (!tile)
 			continue;
-
-		palette = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
-		if (x0 & 1)
-			palette >>= 8;
-		else
-			palette &= 0x00ff;
 
 		uint32_t tileattr = attr;
 		uint32_t tilectrl = ctrl;
 		if ((ctrl & 2) == 0)
 		{   // -(1) bld(1) flip(2) pal(4)
+
+			uint16_t palette = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
+			if (x0 & 1)
+				palette >>= 8;
+			else
+				palette &= 0x00ff;
+
+
 			tileattr &= ~0x000c;
 			tileattr |= (palette >> 2) & 0x000c;    // flip
 
