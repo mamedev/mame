@@ -84,6 +84,7 @@
 DEFINE_DEVICE_TYPE(R4000, r4000_device, "r4000", "MIPS R4000")
 DEFINE_DEVICE_TYPE(R4400, r4400_device, "r4400", "MIPS R4400")
 DEFINE_DEVICE_TYPE(R4600, r4600_device, "r4600", "QED R4600")
+DEFINE_DEVICE_TYPE(R5000, r5000_device, "r5000", "MIPS R5000")
 
 r4000_base_device::r4000_base_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size icache_size, cache_size dcache_size)
 	: cpu_device(mconfig, type, tag, owner, clock)
@@ -609,10 +610,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 			break;
 
 		default:
-			// * Operation codes marked with an asterisk cause reserved
-			// instruction exceptions in all current implementations and are
-			// reserved for future versions of the architecture.
-			cpu_exception(EXCEPTION_RI);
+			handle_reserved_instruction(op);
 			break;
 		}
 		break;
@@ -816,7 +814,9 @@ void r4000_base_device::cpu_execute(u32 const op)
 	case 0x12: // COP2
 		cp2_execute(op);
 		break;
-	//case 0x13: // *
+	case 0x13: // COP1X
+		cp1x_execute(op);
+		break;
 	case 0x14: // BEQL
 		if (m_r[RSREG] == m_r[RTREG])
 		{
@@ -1044,7 +1044,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 	case 0x32: // LWC2
 		cp2_execute(op);
 		break;
-	//case 0x33: // *
+	// case 0x33: *
 	case 0x34: // LLD
 		load_linked<u64>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](u64 address, u64 data)
@@ -1116,6 +1116,33 @@ void r4000_base_device::cpu_execute(u32 const op)
 		// versions of the architecture.
 		cpu_exception(EXCEPTION_RI);
 		break;
+	}
+}
+
+void r4000_base_device::handle_reserved_instruction(u32 const op)
+{
+	// Unahdnled operation codes cause reserved instruction
+	// exceptions in all current implementations and are
+	// reserved for future versions of the architecture.
+	cpu_exception(EXCEPTION_RI);
+}
+
+void r5000_device::handle_reserved_instruction(u32 const op)
+{
+	switch (op & 0x3f)
+	{
+	case 0x33: // PREF (effective no-op)
+		break;
+	default:
+		switch (op >> 26)
+		{
+		case 0x0a: // MOVN
+			if (m_r[RTREG] == 0) { if (RDREG) m_r[RDREG] = m_r[RSREG]; }
+			break;
+		case 0x0b: // MOVZ
+			if (m_r[RTREG] != 0) { if (RDREG) m_r[RDREG] = m_r[RSREG]; }
+			break;
+		}
 	}
 }
 
@@ -2597,6 +2624,186 @@ void r4000_base_device::cp1_execute(u32 const op)
 	case 0x3d: // SDC1
 		if ((SR & SR_FR) || !(RTREG & 1))
 			store<u64>(ADDR(m_r[RSREG], s16(op)), m_f[RTREG]);
+		break;
+	}
+}
+
+void r4000_base_device::cp1x_execute(u32 const op)
+{
+	if (!(SR & SR_CU1))
+	{
+		cpu_exception(EXCEPTION_CP1);
+		return;
+	}
+
+	logerror("cp1x not supported < R5000 (%s)\n", machine().describe_context());
+}
+
+void r5000_device::cp1x_execute(u32 const op)
+{
+	if (!(SR & SR_CU1))
+	{
+		cpu_exception(EXCEPTION_CP1);
+		return;
+	}
+
+	switch (op & 0x3f)
+	{
+	case 0x00: // LWXC1
+		load<u32>(s64(s32(u32(m_r[RSREG]) + u32(m_r[RTREG]))),
+			[this, op](u32 data)
+			{
+				if (SR & SR_FR)
+					m_f[RTREG] = (m_f[RTREG] & ~0xffffffffULL) | data;
+				else
+					if (RTREG & 1)
+						// load the high half of the even floating point register
+						m_f[RTREG & ~1] = (u64(data) << 32) | u32(m_f[RTREG & ~1]);
+					else
+						// load the low half of the even floating point register
+						m_f[RTREG & ~1] = (m_f[RTREG & ~1] & ~0xffffffffULL) | data;
+			});
+		break;
+	case 0x01: // LDXC1
+		load<u64>(s64(s32(u32(m_r[RSREG]) + u32(m_r[RTREG]))),
+			[this, op](u64 data)
+			{
+				if ((SR & SR_FR) || !(RTREG & 1))
+					m_f[RTREG] = data;
+			});
+		break;
+	case 0x08: // SWXC1
+		if (SR & SR_FR)
+			store<u32>(s64(s32(u32(m_r[RSREG]) + u32(m_r[RTREG]))), u32(m_f[RTREG]));
+		else
+			if (RTREG & 1)
+				// store the high half of the even floating point register
+				store<u32>(s64(s32(u32(m_r[RSREG]) + u32(m_r[RTREG]))), u32(m_f[RTREG & ~1] >> 32));
+			else
+				// store the low half of the even floating point register
+				store<u32>(s64(s32(u32(m_r[RSREG]) + u32(m_r[RTREG]))), u32(m_f[RTREG & ~1]));
+		break;
+	case 0x09: // SDXC1
+		if ((SR & SR_FR) || !(RTREG & 1))
+			store<u64>(s64(s32(u32(m_r[RSREG]) + u32(m_r[RTREG]))), m_f[RTREG]);
+		break;
+	case 0x0f: // PREFX
+		// Do nothing for now (implementations are permitted to do this)
+		break;
+	case 0x20: // MADD.S
+		if ((SR & SR_FR) || !(op & ODD_REGS))
+		{
+			float32_t const fr = float32_t{ u32(m_f[FRREG]) };
+			float32_t const fs = float32_t{ u32(m_f[FSREG]) };
+			float32_t const ft = float32_t{ u32(m_f[FTREG]) };
+
+			if (cp1_op(fr) && cp1_op(fs) && cp1_op(ft))
+				cp1_set(FDREG, f32_add(f32_mul(fs, ft), fr).v);
+		}
+		break;
+	case 0x21: // MADD.D
+		if ((SR & SR_FR) || !(op & ODD_REGS))
+		{
+			float64_t const fr = float64_t{ m_f[FRREG] };
+			float64_t const fs = float64_t{ m_f[FSREG] };
+			float64_t const ft = float64_t{ m_f[FTREG] };
+
+			if (cp1_op(fr) && cp1_op(fs) && cp1_op(ft))
+				cp1_set(FDREG, f64_add(f64_mul(fs, ft), fr).v);
+		}
+		break;
+	case 0x28: // MSUB.S
+		if ((SR & SR_FR) || !(op & ODD_REGS))
+		{
+			float32_t const fr = float32_t{ u32(m_f[FRREG]) };
+			float32_t const fs = float32_t{ u32(m_f[FSREG]) };
+			float32_t const ft = float32_t{ u32(m_f[FTREG]) };
+
+			if (cp1_op(fr) && cp1_op(fs) && cp1_op(ft))
+				cp1_set(FDREG, f32_sub(f32_mul(fs, ft), fr).v);
+		}
+		break;
+	case 0x29: // MSUB.D
+		if ((SR & SR_FR) || !(op & ODD_REGS))
+		{
+			float64_t const fr = float64_t{ m_f[FRREG] };
+			float64_t const fs = float64_t{ m_f[FSREG] };
+			float64_t const ft = float64_t{ m_f[FTREG] };
+
+			if (cp1_op(fr) && cp1_op(fs) && cp1_op(ft))
+				cp1_set(FDREG, f64_sub(f64_mul(fs, ft), fr).v);
+		}
+		break;
+	case 0x30: // NMADD.S
+		if ((SR & SR_FR) || !(op & ODD_REGS))
+		{
+			float32_t const fr = float32_t{ u32(m_f[FRREG]) };
+			float32_t const fs = float32_t{ u32(m_f[FSREG]) };
+			float32_t const ft = float32_t{ u32(m_f[FTREG]) };
+
+			if (cp1_op(fr) && cp1_op(fs) && cp1_op(ft))
+				cp1_set(FDREG, f32_mul(f32_add(f32_mul(fs, ft), fr), i32_to_f32(-1)).v);
+		}
+		break;
+	case 0x31: // NMADD.D
+		if ((SR & SR_FR) || !(op & ODD_REGS))
+		{
+			float64_t const fr = float64_t{ m_f[FRREG] };
+			float64_t const fs = float64_t{ m_f[FSREG] };
+			float64_t const ft = float64_t{ m_f[FTREG] };
+
+			if (cp1_op(fr) && cp1_op(fs) && cp1_op(ft))
+				cp1_set(FDREG, f64_mul(f64_add(f64_mul(fs, ft), fr), i32_to_f64(-1)).v);
+		}
+		break;
+	case 0x38: // NMSUB.S
+		if ((SR & SR_FR) || !(op & ODD_REGS))
+		{
+			float32_t const fr = float32_t{ u32(m_f[FRREG]) };
+			float32_t const fs = float32_t{ u32(m_f[FSREG]) };
+			float32_t const ft = float32_t{ u32(m_f[FTREG]) };
+
+			if (cp1_op(fr) && cp1_op(fs) && cp1_op(ft))
+				cp1_set(FDREG, f32_mul(f32_sub(f32_mul(fs, ft), fr), i32_to_f32(-1)).v);
+		}
+		break;
+	case 0x39: // NMSUB.D
+		if ((SR & SR_FR) || !(op & ODD_REGS))
+		{
+			float64_t const fr = float64_t{ m_f[FRREG] };
+			float64_t const fs = float64_t{ m_f[FSREG] };
+			float64_t const ft = float64_t{ m_f[FTREG] };
+
+			if (cp1_op(fr) && cp1_op(fs) && cp1_op(ft))
+				cp1_set(FDREG, f64_mul(f64_sub(f64_mul(fs, ft), fr), i32_to_f64(-1)).v);
+		}
+		break;
+	case 0x24:      /* MADD.W */
+		logerror("cp1x unsupported op (%s): MADD.W\n", machine().describe_context());
+		break;
+	case 0x25:      /* MADD.L */
+		logerror("cp1x unsupported op (%s): MADD.L\n", machine().describe_context());
+		break;
+	case 0x2c:      /* MSUB.W */
+		logerror("cp1x unsupported op (%s): MSUB.W\n", machine().describe_context());
+		break;
+	case 0x2d:      /* MSUB.L */
+		logerror("cp1x unsupported op (%s): MSUB.L\n", machine().describe_context());
+		break;
+	case 0x34:      /* NMADD.W */
+		logerror("cp1x unsupported op (%s): NMADD.W\n", machine().describe_context());
+		break;
+	case 0x35:      /* NMADD.L */
+		logerror("cp1x unsupported op (%s): NMADD.L\n", machine().describe_context());
+		break;
+	case 0x3c:      /* NMSUB.W */
+		logerror("cp1x unsupported op (%s): NMSUB.W\n", machine().describe_context());
+		break;
+	case 0x3d:      /* NMSUB.L */
+		logerror("cp1x unsupported op (%s): NMSUB.L\n", machine().describe_context());
+		break;
+	default:
+		logerror("cp1x unsupported op (%s): [unknown]\n", machine().describe_context());
 		break;
 	}
 }
