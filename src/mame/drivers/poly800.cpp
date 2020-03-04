@@ -144,5 +144,5 @@ ROM_START(poly800ii)
 ROM_END
 
 SYST(1984, poly800,    0, 0, poly800,    poly800, poly800_state,   empty_init, "Korg", "Poly-800 Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
-SYST(1984, poly800mdk, 0, 0, poly800mdk, poly800, poly800_state,   empty_init, "Korg", "Poly-800 Programmable Polyphonic Synthesizer with MIDI Dump Kit", MACHINE_IS_SKELETON)
+SYST(1984, poly800mdk, 0, 0, poly800mdk, poly800, poly800_state,   empty_init, "Korg", "Poly-800 Programmable Polyphonic Synthesizer (MIDI Dump Kit)", MACHINE_IS_SKELETON)
 SYST(1986, poly800ii,  0, 0, poly800ii,  poly800, poly800ii_state, empty_init, "Korg", "Poly-800II Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
