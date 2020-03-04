@@ -241,50 +241,6 @@ void wrlshunt_game_state::init_wrlshunt()
 void wrlshunt_game_state::init_ths()
 {
 	m_sdram.resize(0x400000); // 0x400000 words, 0x800000 bytes (verify)
-
-	// encryption?
-	{
-		uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
-		int size = memregion("maincpu")->bytes();
-
-		for (int i = 0x0000 / 2; i < size / 2; i++)
-		{
-			rom[i] = bitswap<16>(rom[i],  15,14,13,12,
-				                          11,10,9,8,
-				                          7,6,5,4,	
-				                          2,3,1,0);
-
-			if (rom[i] & 0x0002) rom[i] ^= 0x0004;
-			
-			// must be somtehing address based too..
-			if (i & 1)
-			{
-				if (rom[i] & 0x0008) rom[i] ^= 0x0004;
-			}
-			else
-			{
-				if (rom[i] & 0x0002) rom[i] ^= 0x0004;
-			}
-
-		}
-	}
-
-
-	if (0)
-	{
-		uint8_t* rom = memregion("maincpu")->base();
-		int size = memregion("maincpu")->bytes();
-
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(rom, size, 1, fp);
-			fclose(fp);
-		}
-	}
 }
 
 
@@ -1219,7 +1175,7 @@ ROM_START(jak_ths)
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP("tripleplaysports.bin", 0x000000, 0x800000, BAD_DUMP CRC(a7816ee1) SHA1(78195b01eba9ba2cd03c43545b767dee302654bc) )
+	ROM_LOAD16_WORD_SWAP("tripleplaysports.bin", 0x000000, 0x800000, CRC(2b5f8734) SHA1(57bccaa70f0efbf3da3259b74f3082d1a14c9908) )
 ROM_END
 
 
