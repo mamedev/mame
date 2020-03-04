@@ -38,9 +38,10 @@ public:
 
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
-	void get_sprites();
+	void get_sprites(const rectangle cliprect);
+	void copy_sprites(const rectangle cliprect);
 
-
+	bitmap_ind16 &screen_bitmap() { return m_screenbitmap; }
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -63,8 +64,10 @@ private:
 	};
 
 	// general
-	void zdrawgfxzoom(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, u32 code, u32 color, bool flipx, bool flipy, int sx, int sy, int scalex, int scaley, int zpos);
-	void zdrawgfxzoom(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, u32 code, u32 color, bool flipx, bool flipy, int sx, int sy, int scalex, int scaley, int zpos);
+	void zdrawgfxzoom(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, u32 code, u32 color, bool flipx, bool flipy, int sx, int sy, int scalex, int scaley, u8 prival);
+
+	void copybitmap(bitmap_ind16 &dest_bmp, const rectangle &clip, u8 pri);
+	void copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &clip, u8 pri);
 
 	// C355 Motion Object Emulation
 	// for pal_xor, supply either 0x0 (normal) or 0xf (palette mapping reversed)
@@ -81,6 +84,8 @@ private:
 	int m_palxor;
 	u16 m_position[4];
 	std::unique_ptr<u16 []> m_spriteram[2];
+	bitmap_ind16 m_tempbitmap;
+	bitmap_ind16 m_screenbitmap;
 
 	int m_scrolloffs[2];
 	//u32 m_ramsize;
