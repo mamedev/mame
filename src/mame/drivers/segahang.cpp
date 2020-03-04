@@ -68,7 +68,7 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 	m_shadow = ~data & 0x40;
 
 	// bit 5: Z80 RESET line
-    m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	// bit 4: enable display
 	m_segaic16vid->set_display_enable(data & 0x10);
