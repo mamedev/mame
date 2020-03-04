@@ -259,8 +259,6 @@ protected:
 	int m_maxgfxelement;
 	void decodegfx(const char* tag);
 
-	int m_global_y_mask;
-
 	int m_pal_displaybank_high;
 	int m_alt_tile_addressing;
 };

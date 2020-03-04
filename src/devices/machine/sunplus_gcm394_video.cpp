@@ -35,7 +35,6 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	m_space_read_cb(*this),
 	m_rowscroll(*this, "^rowscroll"),
 	m_rowzoom(*this, "^rowzoom"),
-	m_global_y_mask(0x1ff),
 	m_pal_displaybank_high(0),
 	m_alt_tile_addressing(0)
 {
@@ -267,7 +266,6 @@ void gcm394_base_video_device::device_start()
 	save_item(NAME(m_spriteextra));
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_maxgfxelement));
-	save_item(NAME(m_global_y_mask));
 	save_item(NAME(m_pal_displaybank_high));
 	save_item(NAME(m_alt_tile_addressing));
 }
@@ -550,29 +548,32 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 
 		int total_width;
 		int use_alt_drawmode = m_alt_tile_addressing;
+		int y_mask = 0;
 
 		// just a guess based on this being set on the higher resolution tilemaps we've seen, could be 100% incorrect register
 		if ((attr_reg >> 14) & 0x2)
 		{
 			total_width = 1024;
+			y_mask = 0x1ff;
 		//  use_alt_drawmode = 1; // probably doesn't control this
 		}
 		else
 		{
 			total_width = 512;
+			y_mask = 0xff;
 		//  use_alt_drawmode = 0; // probably doesn't control this
 		}
 
 		uint32_t tile_count_x = total_width / tile_w;
 
-		uint32_t bitmap_y = (scanline + yscroll);// &0xff;
+		uint32_t bitmap_y = (scanline + yscroll) & y_mask;
 		uint32_t y0 = bitmap_y / tile_h;
 		uint32_t tile_scanline = bitmap_y % tile_h;
 		uint32_t tile_address = tile_count_x * y0;
 
 		for (uint32_t x0 = 0; x0 < tile_count_x; x0++, tile_address++)
 		{
-			uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & m_global_y_mask) - 0x10;
+			uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & y_mask) - 0x10;
 			uint32_t xx = (tile_w * x0 - xscroll);// &0x1ff;
 			uint32_t tile = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
 
