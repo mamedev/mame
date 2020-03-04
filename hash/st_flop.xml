@@ -4259,6 +4259,18 @@
 		</part>
 	</software>
 
+	<software name="striker" supported="no">
+		<description>Striker (Euro)</description>
+		<year>1993</year>
+		<publisher>Gremlin Graphics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="847952">
+				<rom name="striker.stx" size="847952" crc="f9fe0cc2" sha1="d8bb86e94d6ee5df312f6eb80f72d92edb2fb326" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stryx" supported="no">
 		<!-- SPS (CAPS) release 3172 -->
 		<description>Stryx (Euro)</description>
