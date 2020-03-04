@@ -574,7 +574,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		for (uint32_t x0 = 0; x0 < tile_count_x; x0++, tile_address++)
 		{
 			uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & y_mask) - 0x10;
-			uint32_t xx = (tile_w * x0 - xscroll);// &0x1ff;
+			uint32_t xx = (tile_w * x0 - xscroll) & (total_width-1);
 			uint32_t tile = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
 
 			uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
@@ -801,15 +801,17 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 		for (int i = 0; i < 4; i++)
 		{
+			const int draw_all = 1;
+
 			if (1)
 			{
-				draw_page(cliprect, scanline, i, (m_page0_addr_lsb | (m_page0_addr_msb<<16)), m_tmap0_regs, m_tmap0_scroll);
-				draw_page(cliprect, scanline, i, (m_page1_addr_lsb | (m_page1_addr_msb<<16)), m_tmap1_regs, m_tmap1_scroll);
-				draw_page(cliprect, scanline, i, (m_page2_addr_lsb | (m_page2_addr_msb<<16)), m_tmap2_regs, m_tmap2_scroll);
-				draw_page(cliprect, scanline, i, (m_page3_addr_lsb | (m_page3_addr_msb<<16)), m_tmap3_regs, m_tmap3_scroll);
+				if ((!(machine().input().code_pressed(KEYCODE_Q))) || draw_all) draw_page(cliprect, scanline, i, (m_page0_addr_lsb | (m_page0_addr_msb<<16)), m_tmap0_regs, m_tmap0_scroll);
+				if ((!(machine().input().code_pressed(KEYCODE_W))) || draw_all) draw_page(cliprect, scanline, i, (m_page1_addr_lsb | (m_page1_addr_msb<<16)), m_tmap1_regs, m_tmap1_scroll);
+				if ((!(machine().input().code_pressed(KEYCODE_E))) || draw_all) draw_page(cliprect, scanline, i, (m_page2_addr_lsb | (m_page2_addr_msb<<16)), m_tmap2_regs, m_tmap2_scroll);
+				if ((!(machine().input().code_pressed(KEYCODE_R))) || draw_all) draw_page(cliprect, scanline, i, (m_page3_addr_lsb | (m_page3_addr_msb<<16)), m_tmap3_regs, m_tmap3_scroll);
 
 			}
-			draw_sprites(cliprect, scanline, i);
+			if ((!(machine().input().code_pressed(KEYCODE_T))) || draw_all) draw_sprites(cliprect, scanline, i);
 		}
 	}
 
