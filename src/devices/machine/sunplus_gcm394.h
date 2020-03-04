@@ -302,6 +302,7 @@ private:
 
 	DECLARE_READ16_MEMBER(spi_7944_rxdata_r);
 	DECLARE_READ16_MEMBER(spi_7945_misc_control_reg_r);
+	DECLARE_WRITE16_MEMBER(spi_7942_txdata_w);
 
 	DECLARE_WRITE16_MEMBER(unkarea_7960_w);
 	DECLARE_READ16_MEMBER(unkarea_7961_r);

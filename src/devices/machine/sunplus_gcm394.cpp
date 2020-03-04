@@ -11,7 +11,7 @@
 
 
 
-
+#define LOG_GCM394_SPI            (1U << 4)
 #define LOG_GCM394_IO             (1U << 3)
 #define LOG_GCM394_SYSDMA         (1U << 2)
 #define LOG_GCM394                (1U << 1)
@@ -555,7 +555,7 @@ READ16_MEMBER(sunplus_gcm394_base_device::unkarea_78d8_r)
 	return machine().rand();
 }
 
-// **************************************** 79xx region stubs *************************************************
+// **************************************** 793x uknown region stubs *************************************************
 
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7934_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7934_r\n", machine().describe_context()); return 0x0000; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7934_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7934_w %04x\n", machine().describe_context(), data); m_7934 = data; }
@@ -569,22 +569,30 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7935_w)
 	//checkirq6();
 }
 
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_r\n", machine().describe_context()); return 0x0000; }
+WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_w %04x\n", machine().describe_context(), data); m_7936 = data; }
+
+// **************************************** 794x SPI *************************************************
+
 // these are related to the accelerometer values on jak_g500 (8-bit signed) and also the SPI reads for bkrankp
 READ16_MEMBER(sunplus_gcm394_base_device::spi_7944_rxdata_r)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::spi_7944_rxdata_r\n", machine().describe_context());
+	LOGMASKED(LOG_GCM394_SPI, "%s:sunplus_gcm394_base_device::spi_7944_rxdata_r\n", machine().describe_context());
 	return machine().rand();
 }
 
 READ16_MEMBER(sunplus_gcm394_base_device::spi_7945_misc_control_reg_r)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::spi_7945_misc_control_reg_r\n", machine().describe_context());
+	LOGMASKED(LOG_GCM394_SPI, "%s:sunplus_gcm394_base_device::spi_7945_misc_control_reg_r\n", machine().describe_context());
 	return machine().rand();// &0x0007;
 }
 
+WRITE16_MEMBER(sunplus_gcm394_base_device::spi_7942_txdata_w)
+{
+	LOGMASKED(LOG_GCM394_SPI, "%s:sunplus_gcm394_base_device::spi_7942_txdata_w %04x\n", machine().describe_context(), data);
+}
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_r\n", machine().describe_context()); return 0x0000; }
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_w %04x\n", machine().describe_context(), data); m_7936 = data; }
+// **************************************** 796x unknown *************************************************
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7960_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7960_w %04x\n", machine().describe_context(), data); m_7960 = data; }
 
@@ -814,7 +822,7 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x0078fb, 0x0078fb).r(FUNC(sunplus_gcm394_base_device::unkarea_78fb_status_r));
 
 	// ######################################################################################################################################################################################
-	// 79xx - misc?
+	// 793x - misc?
 	// ######################################################################################################################################################################################
 
 	// possible rtc?
@@ -822,12 +830,20 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x007935, 0x007935).rw(FUNC(sunplus_gcm394_base_device::unkarea_7935_r), FUNC(sunplus_gcm394_base_device::unkarea_7935_w));
 	map(0x007936, 0x007936).rw(FUNC(sunplus_gcm394_base_device::unkarea_7936_r), FUNC(sunplus_gcm394_base_device::unkarea_7936_w));
 
+	// ######################################################################################################################################################################################
+	// 794x - SPI
+	// ######################################################################################################################################################################################
+
 	//7940 P_SPI_Ctrl     - SPI Control Register
 	//7941 P_SPI_TXStatus - SPI Transmit Status Register
-	//7942 P_SPI_TXData   - SPI Transmit FIFO Register
+	map(0x007942, 0x007942).w(FUNC(sunplus_gcm394_base_device::spi_7942_txdata_w)); //7942 P_SPI_TXData   - SPI Transmit FIFO Register
 	//7943 P_SPI_RXStatus - SPI Receive Status Register
 	map(0x007944, 0x007944).r(FUNC(sunplus_gcm394_base_device::spi_7944_rxdata_r));           // 7944 P_SPI_RXData - SPI Receive FIFO Register    (jak_s500 accelerometer)   (also the SPI ROM DMA input port for bkrankp?)
 	map(0x007945, 0x007945).r(FUNC(sunplus_gcm394_base_device::spi_7945_misc_control_reg_r)); // 7945 P_SPI_Misc   - SPI Misc Control Register    (jak_s500 accelerometer)
+
+	// ######################################################################################################################################################################################
+	// 796x - unknown
+	// ######################################################################################################################################################################################
 
 	// possible adc?
 	map(0x007960, 0x007960).w(FUNC(sunplus_gcm394_base_device::unkarea_7960_w));
