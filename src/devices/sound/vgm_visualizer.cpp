@@ -12,15 +12,17 @@
 
 #include "emu.h"
 #include "sound/vgm_visualizer.h"
-#include "fft.h"
+
+#include "wdlfft/fft.h"
 
 #include <cmath>
 
 
-static float lerp(float a, float b, float f)
+constexpr float lerp(float a, float b, float f)
 {
 	return (b - a) * f + a;
 }
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES

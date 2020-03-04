@@ -1551,7 +1551,5 @@ if (SOUNDS["VGMVIZ"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/vgm_visualizer.cpp",
 		MAME_DIR .. "src/devices/sound/vgm_visualizer.h",
-		MAME_DIR .. "src/devices/sound/fft.cpp",
-		MAME_DIR .. "src/devices/sound/fft.h",
 	}
 end
