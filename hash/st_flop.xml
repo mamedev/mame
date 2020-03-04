@@ -4090,6 +4090,18 @@
 		</part>
 	</software>
 
+	<software name="spidertr1" cloneof="spidertr" supported="no">
+		<description>Spidertronic (Euro, Smash 16)</description>
+		<year>1990</year>
+		<publisher>Smash 16</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="415008">
+				<rom name="spidertronic.stx" size="415008" crc="78214642" sha1="3838054a74b86a5d3b16e4683f50728f9ab20a78" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spitfr40" supported="no">
 		<!-- SPS (CAPS) release 3101 -->
 		<description>Spitfire 40 (Euro)</description>
