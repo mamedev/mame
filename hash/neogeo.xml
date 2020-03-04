@@ -981,7 +981,7 @@
 
 	<software name="burningfpa" cloneof="burningf">
 		<!-- later prototype - Sx, Vx and Cx data all matches final game, but with different rom arranagement, Px & Mx unique -->
-		<description>Burning Fight (prototype, ver 23.3, 910326)</description>
+		<description>Burning Fight (prototype, near final, ver 23.3, 910326)</description>
 		<year>1991</year>
 		<publisher>SNK</publisher>
 		<sharedfeat name="release" value="AES" />
@@ -1013,6 +1013,45 @@
 				<rom loadflag="load32_byte" name="018_c6_8135.c16" offset="0x200002" size="0x080000" crc="95e220e6" sha1="cef4f7c697ab6d20e1b5c85df773d0f1a79e3008" />
 				<rom loadflag="load32_byte" name="018_c7_d009.c17" offset="0x200001" size="0x080000" crc="41326c0d" sha1="64bbecb560d2795ae5292776604ea318a9ae53a6" />
 				<rom loadflag="load32_byte" name="018_c8_dc63.c18" offset="0x200003" size="0x080000" crc="ed3b1f04" sha1="0cb0d30e294e7ff398d553d0f08befb53ac65269" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="burningfpb" cloneof="burningf">
+		<!-- later prototype, but Sx, Cx, Vx etc. not yet final, marked V07 -->
+		<description>Burning Fight (prototype, newer, V07)</description>
+		<year>1991</year>
+		<publisher>SNK</publisher>
+		<sharedfeat name="release" value="AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_byte" name="p1.bin" offset="0x000001" size="0x080000" crc="f05ce157" sha1="87c515ba009ef952942434f48d9a3849d354b6e3" />
+				<rom loadflag="load16_byte" name="p2.bin" offset="0x000000" size="0x080000" crc="768ddc90" sha1="a125f7bcadf4d8630ae3d08911fe061d15252c76" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="s1.bin" crc="3effc183" sha1="706bf3649bd08798be031263b9edadb7ecfa122a" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="m1.bin" crc="3031af09" sha1="72d3776f8c818f5db984e7a1b2fa7cb4a9c8d1ee" />
+			</dataarea>
+			<dataarea name="ymsnd" size="0x200000">
+				<rom name="v11.bin" offset="0x000000" size="0x080000" crc="20b40b70" sha1="21e0e069650ad4a90567509f2932bb74f3f4205a" />
+				<rom name="v12.bin" offset="0x080000" size="0x080000" crc="a0bcf260" sha1="5d1f2613cf4a292557f37e6f44a90b20d11ed8cd" /> <!-- matches final -->
+				<rom name="v13.bin" offset="0x100000" size="0x080000" crc="a4e0e58a" sha1="33e9b60e3aaca8e3f625a4238ec768ea04cd58d0" />
+				<rom name="v24-bad.bin" offset="0x180000" size="0x080000" crc="4389e65a" sha1="2f18ac9ba390bb09abacefc9ccfa3bd6a45d515b" status="baddump" /> <!-- chip was physically damaged -->
+				<rom name="018_v24_22ee.v24" offset="0x180000" size="0x080000" crc="924e3d69" sha1="927091f9a098f00eb303f5567f4ee926bcb170e3" /> <!-- load over it with the final data, could be different however -->
+			</dataarea>
+			<dataarea name="sprites" size="0x400000">
+				<!-- note, load32_byte -->
+				<rom loadflag="load32_byte" name="c1.bin" offset="0x000000" size="0x080000" crc="8fd6a9bb" sha1="8f840385ba8e8a7f3d6260f48f1ecb27ccf05c5c" />
+				<rom loadflag="load32_byte" name="c2.bin" offset="0x000002" size="0x080000" crc="7c3464b8" sha1="3f3544a7a70827b81ce6978627b7f21edf0072c7" />
+				<rom loadflag="load32_byte" name="c3.bin" offset="0x000001" size="0x080000" crc="0ac8f1be" sha1="66d22a7a58fe86ed747bb27e480254826e1d921b" />
+				<rom loadflag="load32_byte" name="c4.bin" offset="0x000003" size="0x080000" crc="3af6b235" sha1="e8903a8ab92e6df29f80b9fe6c5926038e2b2896" />
+				<rom loadflag="load32_byte" name="c5.bin" offset="0x200000" size="0x080000" crc="707205ab" sha1="fe6a1122958084a04ffa9892004d3f3513f43fa2" />
+				<rom loadflag="load32_byte" name="c6.bin" offset="0x200002" size="0x080000" crc="10d0d2cf" sha1="f1df3b327ab9af71ed6d03a3b788334928c4dbae" />
+				<rom loadflag="load32_byte" name="c7.bin" offset="0x200001" size="0x080000" crc="def06900" sha1="4106203f0a14e6c723cacf77ba75ce3aea563a34" />
+				<rom loadflag="load32_byte" name="c8.bin" offset="0x200003" size="0x080000" crc="6fdc1691" sha1="3842735456550734b703a0243c38dd83d4722b0c" />
 			</dataarea>
 		</part>
 	</software>
