@@ -556,7 +556,7 @@ void namco_c355spr_device::copy_sprites(const rectangle cliprect)
 
 			while (sprite_ptr != m_sprite_end[no])
 			{
-				if ((sprite_ptr->disable == false))
+				if (sprite_ptr->disable == false)
 				{
 					rectangle clip = sprite_ptr->clip;
 					clip &= cliprect;
