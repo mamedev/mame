@@ -16,6 +16,18 @@
 		</part>
 	</software>
 
+	<software name="1943" supported="no">
+		<description>1943 (Euro)</description>
+		<year>1987</year>
+		<publisher>Kixx</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="425024">
+				<rom name="1943.stx" size="425024" crc="0e65cf47" sha1="3e9db2e46b1b3506d79456a7e427b10471b3ceb0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="500gp" supported="no">
 		<!-- SPS (CAPS) release 3271 -->
 		<description>500cc Grand Prix (Euro)</description>
