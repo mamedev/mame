@@ -447,7 +447,8 @@ void gcm394_game_state::cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, ui
 {
 	// wipe existing mappings;
 	m_memory->get_program()->unmap_readwrite(0, (0x8000000*5)-1);
-
+	m_memory->get_program()->nop_readwrite(0, (0x8000000*5)-1); // stop logging spam if video params are invalid
+	
 	int start_address = 0;
 	int end_address;
 
