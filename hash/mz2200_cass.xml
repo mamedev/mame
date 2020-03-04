@@ -47,7 +47,7 @@
         <year>1983</year>
         <publisher>Hudson</publisher>
         <info name="serial" value="WB-1004"/>
-        <info name="alt_title" value="パワーフェイJレ"/>
+        <info name="alt_title" value="パワーフェイル"/>
         <part name="cass1" interface="mz_cass">
             <dataarea name="cass" size="2145580">
                 <rom name="wb-1004.wav" size="2145580" crc="eecf0e2a" sha1="8263a0ba92c6e9f3d94fed0d7005591841d4d826" />
