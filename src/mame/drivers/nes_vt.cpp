@@ -2511,6 +2511,11 @@ ROM_START( megapad )
 	ROM_LOAD( "megapad.bin", 0x00000, 0x200000, CRC(1eb603a8) SHA1(3de6f0620a0db0558daa7fd7ccf08d9d5607a6af) )
 ROM_END
 
+ROM_START( timetp36 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "36in1.bin", 0x00000, 0x400000, CRC(e2fb8a6c) SHA1(163d257dd0e6dc19c8fab19cc363ea8be659c40a) )
+ROM_END
+
 ROM_START( ddrstraw )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "straws-ddr.bin", 0x00000, 0x200000, CRC(ce94e53a) SHA1(10c6970205a4df28086029c0a348225f57bf0cc5) ) // 26LV160 Flash
@@ -2685,13 +2690,15 @@ CONS( 2006, vgtablet,  0, 0,  nes_vt_vg,        nes_vt, nes_vt_hh_state, empty_i
 // There is a 2004 Majesco Frogger "TV game" that appears to contain the same version of Frogger as above but with no other games, so probably fits here.
 CONS( 2004, majkon,    0, 0,  nes_vt_vg_baddma, nes_vt, nes_vt_hh_state, empty_init, "Majesco (licensed from Konami)", "Konami Collector's Series Arcade Advanced", MACHINE_NOT_WORKING ) // raster timing is broken for Frogger, palette issues
 
-CONS( 200?, majgnc,    0, 0,  nes_vt_majgnc, majgnc, nes_vt_majgnc_state, empty_init, "Majesco", "Golden Nugget Casino", MACHINE_NOT_WORKING )
+CONS( 200?, majgnc,    0, 0,  nes_vt_majgnc, majgnc, nes_vt_majgnc_state,  empty_init, "Majesco", "Golden Nugget Casino", MACHINE_NOT_WORKING )
 
 // small black unit, dpad on left, 4 buttons (A,B,X,Y) on right, Start/Reset/Select in middle, unit text "Sudoku Plug & Play TV Game"
-CONS( 200?, sudopptv,    0, 0,  nes_vt, nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_NOT_WORKING )
+CONS( 200?, sudopptv,  0, 0,  nes_vt,        nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_NOT_WORKING )
 
-CONS( 200?, megapad,   0,        0,  nes_vt, nes_vt, nes_vt_waixing_state, empty_init, "Waixing",         "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
+CONS( 200?, megapad,   0, 0,  nes_vt,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
 
+ // needs PCM samples, all games appear playable but has 'hard, middle, easy' 3 pos slider that needs emulating, and x + y buttons that also need adding (assuming they're not hardware turbo buttons)
+CONS( 200?, timetp36,  0, 0,  nes_vt,        nes_vt, nes_vt_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // this is VT09 based
 // it boots, most games correct, but palette issues in some games still (usually they appear greyscale)
