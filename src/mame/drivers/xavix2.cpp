@@ -477,9 +477,7 @@ void xavix2_state::pio_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 xavix2_state::pio_r()
 {
-	u32 data = (m_pio->read() & ~m_pio_mask_out) | (m_pio_dataw & m_pio_mask_out);
-	logerror("%s: pio read %08x\n", machine().describe_context(), data);
-	return data;
+	return (m_pio->read() & ~m_pio_mask_out) | (m_pio_dataw & m_pio_mask_out);
 }
 
 /*
