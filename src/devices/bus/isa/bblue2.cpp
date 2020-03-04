@@ -12,6 +12,7 @@
  *   Parallel port test fails if set to LPT2
  */
 
+#include "emu.h"
 #include "bblue2.h"
 
 
