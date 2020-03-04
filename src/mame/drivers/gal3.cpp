@@ -139,8 +139,6 @@ better notes (complete chip lists) for each board still needed
 #include "video/namcos21_3d.h"
 #include "emupal.h"
 
-#define NAMCOS21_NUM_COLORS 0x8000
-
 class gal3_state : public driver_device
 {
 public:
@@ -210,7 +208,7 @@ uint32_t gal3_state::screen_update_left(screen_device &screen, bitmap_ind16 &bit
 {
 	bitmap.fill(0xff, cliprect); // TODO : actually laserdisc layer
 	screen.priority().fill(0, cliprect);
-	m_c355spr[0]->get_sprites(); // TODO : buffered?
+	m_c355spr[0]->get_sprites(cliprect); // TODO : buffered?
 
 	int i;
 	char mst[18], slv[18];
@@ -264,7 +262,7 @@ uint32_t gal3_state::screen_update_right(screen_device &screen, bitmap_ind16 &bi
 {
 	bitmap.fill(0xff, cliprect); // TODO : actually laserdisc layer
 	screen.priority().fill(0, cliprect);
-	m_c355spr[1]->get_sprites(); // TODO : buffered?
+	m_c355spr[1]->get_sprites(cliprect); // TODO : buffered?
 
 	static int pivot = 15;
 	int pri;
@@ -627,7 +625,7 @@ void gal3_state::gal3(machine_config &config)
 	lscreen.set_screen_update(FUNC(gal3_state::screen_update_left));
 	lscreen.set_palette(m_palette[0]);
 
-	PALETTE(config, m_palette[0]).set_format(palette_device::xBRG_888, NAMCOS21_NUM_COLORS);
+	PALETTE(config, m_palette[0]).set_format(palette_device::xBRG_888, 0x10000/2);
 	m_palette[0]->set_membits(16);
 
 	NAMCO_C355SPR(config, m_c355spr[0], 0);
@@ -657,7 +655,7 @@ void gal3_state::gal3(machine_config &config)
 	rscreen.set_screen_update(FUNC(gal3_state::screen_update_right));
 	rscreen.set_palette(m_palette[1]);
 
-	PALETTE(config, m_palette[1]).set_format(palette_device::xBRG_888, NAMCOS21_NUM_COLORS);
+	PALETTE(config, m_palette[1]).set_format(palette_device::xBRG_888, 0x10000/2);
 	m_palette[1]->set_membits(16);
 
 	NAMCO_C355SPR(config, m_c355spr[1], 0);

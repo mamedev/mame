@@ -273,8 +273,6 @@ Namco System 21 Video Hardware
 
 #define ENABLE_LOGGING      0
 
-#define NAMCOS21_NUM_COLORS 0x8000
-
 class namcos21_c67_state : public driver_device
 {
 public:
@@ -370,7 +368,7 @@ uint32_t namcos21_c67_state::screen_update(screen_device &screen, bitmap_ind16 &
 	int pri;
 	bitmap.fill(0xff, cliprect );
 	screen.priority().fill(0, cliprect);
-	m_c355spr->get_sprites(); // TODO : buffered?
+	m_c355spr->get_sprites(cliprect); // TODO : buffered?
 
 	m_c355spr->draw(screen, bitmap, cliprect, 2 );
 
@@ -816,7 +814,7 @@ void namcos21_c67_state::namcos21(machine_config &config)
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
 
-	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, NAMCOS21_NUM_COLORS);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, 0x10000/2);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
