@@ -41,7 +41,10 @@ public:
 	void get_sprites(const rectangle cliprect);
 	void copy_sprites(const rectangle cliprect);
 
+	void clear_screen_bitmap() { m_screenbitmap.fill(0xffff); }
+	void clear_screen_bitmap(const rectangle cliprect) { m_screenbitmap.fill(0xffff, cliprect); }
 	bitmap_ind16 &screen_bitmap() { return m_screenbitmap; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -242,6 +242,8 @@ void namco_c355spr_device::copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &c
 						}
 					}
 				}
+				else if (srcrender[x] != 0xffff)
+					dest[x] = pal[srcrender[x]];
 			}
 		}
 	}
@@ -275,6 +277,8 @@ void namco_c355spr_device::copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &c
 						}
 					}
 				}
+				else if (srcrender[x] != 0xffff)
+					dest[x] = pal[srcrender[x]];
 			}
 		}
 	}
