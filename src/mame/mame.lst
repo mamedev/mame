@@ -31076,6 +31076,7 @@ burningf                        // 0018 (c) 1991 SNK
 burningfh                       // 0018 (c) 1991 SNK
 burningfp                       // 0018 (c) 1991 SNK (prototype)
 burningfpa                      // 0018 (c) 1991 SNK (prototype)
+burningfpb                      // 0018 (c) 1991 SNK (prototype)
 crswd2bl                        // 0054 bootleg made from CD version
 crsword                         // 0037 (c) 1991 Alpha Denshi Co.
 ct2k3sa                         // bootleg of kof2001
@@ -37089,6 +37090,7 @@ karaokd2
 
 @source:spg29x.cpp
 hyprscan                        //
+jak_bbh
 jak_bbsf
 
 @source:spg29x_lexibook_jg7425.cpp
@@ -37150,6 +37152,7 @@ jak_sbfc                        //
 @source:spg2xx_jakks_tvtouch.cpp
 tvtchsw
 tvtchspd
+tvtchsb
 
 @source:spg2xx_lexibook.cpp
 lexizeus                        // Lexibook
@@ -37792,6 +37795,7 @@ starfigh                        // (c) 1990 SunA
 paccon
 jak_s500
 jak_totm
+jak_ths
 smartfp                         // Smart Fit Park
 wlsair60                        // Wireless Air 60
 wrlshunt                        // Wireless: Hunting Video Game System

@@ -61,6 +61,10 @@ public:
 	DECLARE_WRITE16_MEMBER(tmap3_tilebase_lsb_w);
 	DECLARE_WRITE16_MEMBER(tmap3_tilebase_msb_w);
 
+	DECLARE_WRITE16_MEMBER(video_701c_w);
+	DECLARE_WRITE16_MEMBER(video_701d_w);
+	DECLARE_WRITE16_MEMBER(video_701e_w);
+
 	DECLARE_READ16_MEMBER(sprite_7022_gfxbase_lsb_r);
 	DECLARE_READ16_MEMBER(sprite_702d_gfxbase_msb_r);
 
@@ -116,8 +120,7 @@ public:
 	DECLARE_READ16_MEMBER(spriteram_r);
 
 	DECLARE_READ16_MEMBER(video_7051_r);
-	DECLARE_WRITE16_MEMBER(video_701c_w);
-
+	
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 
 	virtual void device_add_mconfig(machine_config& config) override;

@@ -3720,6 +3720,33 @@ ROM_START( burningfpa ) /* later prototype - Sx, Vx and Cx data all matches fina
 	ROM_LOAD32_BYTE( "018_c8_dc63.c8", 0x200003, 0x80000, CRC(ed3b1f04) SHA1(0cb0d30e294e7ff398d553d0f08befb53ac65269) ) /* Plane 3 */
 ROM_END
 
+ROM_START( burningfpb ) /* later prototype, but Sx, Cx, Vx etc. not yet final, Eproms are labeled Ver07 from Feb 1991 */
+	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
+	ROM_LOAD16_BYTE( "p1.bin", 0x000001, 0x080000, CRC(f05ce157) SHA1(87c515ba009ef952942434f48d9a3849d354b6e3) )
+	ROM_LOAD16_BYTE( "p2.bin", 0x000000, 0x080000, CRC(768ddc90) SHA1(a125f7bcadf4d8630ae3d08911fe061d15252c76) )
+
+	NEO_SFIX_128K( "s1.bin", CRC(3effc183) SHA1(706bf3649bd08798be031263b9edadb7ecfa122a) )
+
+	NEO_BIOS_AUDIO_128K( "m1.bin", CRC(3031af09) SHA1(72d3776f8c818f5db984e7a1b2fa7cb4a9c8d1ee) )
+
+	ROM_REGION( 0x200000, "cslot1:ymsnd", 0 )
+	ROM_LOAD( "v11.bin", 0x000000, 0x080000, CRC(20b40b70) SHA1(21e0e069650ad4a90567509f2932bb74f3f4205a) )
+	ROM_LOAD( "v12.bin", 0x080000, 0x080000, CRC(a0bcf260) SHA1(5d1f2613cf4a292557f37e6f44a90b20d11ed8cd) ) // matches final
+	ROM_LOAD( "v13.bin", 0x100000, 0x080000, CRC(a4e0e58a) SHA1(33e9b60e3aaca8e3f625a4238ec768ea04cd58d0) )
+	ROM_LOAD( "v24-bad.bin", 0x180000, 0x080000, BAD_DUMP CRC(4389e65a) SHA1(2f18ac9ba390bb09abacefc9ccfa3bd6a45d515b) ) // chip was physically damaged
+	ROM_LOAD( "018_v24_22ee.v24", 0x180000, 0x080000, CRC(924e3d69) SHA1(927091f9a098f00eb303f5567f4ee926bcb170e3) ) // load over it with the final data, could be different however
+
+	ROM_REGION( 0x400000, "cslot1:sprites", 0 ) // note, ROM_LOAD32_BYTE
+	ROM_LOAD32_BYTE( "c1.bin", 0x000000, 0x80000, CRC(8fd6a9bb) SHA1(8f840385ba8e8a7f3d6260f48f1ecb27ccf05c5c) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "c2.bin", 0x000002, 0x80000, CRC(7c3464b8) SHA1(3f3544a7a70827b81ce6978627b7f21edf0072c7) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "c3.bin", 0x000001, 0x80000, CRC(0ac8f1be) SHA1(66d22a7a58fe86ed747bb27e480254826e1d921b) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "c4.bin", 0x000003, 0x80000, CRC(3af6b235) SHA1(e8903a8ab92e6df29f80b9fe6c5926038e2b2896) ) /* Plane 3 */
+	ROM_LOAD32_BYTE( "c5.bin", 0x200000, 0x80000, CRC(707205ab) SHA1(fe6a1122958084a04ffa9892004d3f3513f43fa2) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "c6.bin", 0x200002, 0x80000, CRC(10d0d2cf) SHA1(f1df3b327ab9af71ed6d03a3b788334928c4dbae) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "c7.bin", 0x200001, 0x80000, CRC(def06900) SHA1(4106203f0a14e6c723cacf77ba75ce3aea563a34) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "c8.bin", 0x200003, 0x80000, CRC(6fdc1691) SHA1(3842735456550734b703a0243c38dd83d4722b0c) ) /* Plane 3 */
+ROM_END
+
 ROM_START( burningfp ) /* early prototype - all roms were hand labeled with CRCs, dumps verified against them */ /* AES VERSION */
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_BYTE( "018_p1_9397.p1", 0x000001, 0x080000, CRC(5b4032e7) SHA1(55df91dad6f484d3d49c28ab5972700bf71a8662) )
@@ -11751,7 +11778,8 @@ GAME( 1991, sengoku,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1991, sengokuh,   sengoku,  neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Sengoku / Sengoku Denshou (NGH-017, US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, burningf,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Burning Fight (NGM-018 ~ NGH-018)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, burningfh,  burningf, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Burning Fight (NGH-018, US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, burningfpa, burningf, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Burning Fight (prototype, ver 23.3, 910326)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, burningfpa, burningf, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Burning Fight (prototype, near final, ver 23.3, 910326)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, burningfpb, burningf, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Burning Fight (prototype, newer, V07)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, burningfp,  burningf, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Burning Fight (prototype, older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, lbowling,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "League Bowling (NGM-019 ~ NGH-019)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, gpilots,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Ghost Pilots (NGM-020 ~ NGH-020)", MACHINE_SUPPORTS_SAVE )
