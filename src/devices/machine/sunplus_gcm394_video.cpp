@@ -4,6 +4,8 @@
 
     SunPlus GCM394-series SoC peripheral emulation (Video)
 
+	This is very similar to spg2xx but with additional features, layers and modes
+
 **********************************************************************/
 
 #include "emu.h"
@@ -21,6 +23,8 @@ DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "SunPlus G
 
 #include "logmacro.h"
 
+#define VIDEO_IRQ_ENABLE    m_7062
+#define VIDEO_IRQ_STATUS    m_7063
 
 gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
@@ -217,6 +221,9 @@ void gcm394_base_video_device::device_start()
 		decodegfx(":maincpu");
 
 	m_space_read_cb.resolve_safe(0);
+	
+	m_screenpos_timer = timer_alloc(TIMER_SCREENPOS);
+	m_screenpos_timer->adjust(attotime::never);
 
 
 	save_item(NAME(m_screenbuf));
@@ -244,6 +251,8 @@ void gcm394_base_video_device::device_start()
 	save_item(NAME(m_7063));
 	save_item(NAME(m_702a));
 	save_item(NAME(m_7030_brightness));
+	save_item(NAME(m_7036));
+	save_item(NAME(m_7037));
 	save_item(NAME(m_703c_tvcontrol1));
 	save_item(NAME(m_7042_sprite));
 	save_item(NAME(m_7080));
@@ -305,6 +314,8 @@ void gcm394_base_video_device::device_reset()
 
 	m_702a = 0x0000;
 	m_7030_brightness = 0x0000;
+	m_7036 = 0x0000;
+	m_7037 = 0x0000;
 	m_703c_tvcontrol1 = 0x0000;
 
 	m_7042_sprite = 0x0000;
@@ -1156,6 +1167,7 @@ WRITE16_MEMBER(gcm394_base_video_device::sprite_7042_extra_w)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::sprite_7042_extra_w %04x\n", machine().describe_context(), data);
 	m_7042_sprite = data;
+	//popmessage("extra modes %04x\n", data);
 }
 
 
@@ -1193,6 +1205,15 @@ WRITE16_MEMBER(gcm394_base_video_device::video_dma_size_trigger_w)
 	}
 
 	m_videodma_size = 0x0000;
+
+	if (VIDEO_IRQ_ENABLE & 4)
+	{
+		const uint16_t old = VIDEO_IRQ_STATUS;
+		VIDEO_IRQ_STATUS |= 4;
+		const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
+		if (changed)
+			check_video_irq();
+	}
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::video_dma_unk_w)
@@ -1283,33 +1304,34 @@ WRITE16_MEMBER(gcm394_base_video_device::video_703a_palettebank_w)
 READ16_MEMBER(gcm394_base_video_device::videoirq_source_enable_r)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::videoirq_source_enable_r\n", machine().describe_context());
-	return m_7062;
+	return VIDEO_IRQ_ENABLE;
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::videoirq_source_enable_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::videoirq_source_enable_w %04x\n", machine().describe_context(), data);
-	m_7062 = data;
+	LOGMASKED(LOG_GCM394_VIDEO, "video_w: Video IRQ Enable = %04x (DMA:%d, Timing:%d, Blanking:%d)\n", data, BIT(data, 2), BIT(data, 1), BIT(data, 0));
+	const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
+	VIDEO_IRQ_ENABLE = data & 0x0007;
+	const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
+	if (changed)
+		check_video_irq();
 }
 
 READ16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_r)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7063_videoirq_source_r\n", machine().describe_context());
-	return machine().rand();
+	return VIDEO_IRQ_STATUS;
 }
 
 
 WRITE16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_ack_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7063_videoirq_source_ack_w %04x\n", machine().describe_context(), data);
-	m_7063 = data;
-
-	// ack or enable? happens near start of the IRQ
-	if (data & 0x01)
-	{
-		m_video_irq_status &= ~1;
+	LOGMASKED(LOG_GCM394_VIDEO, "video_w: Video IRQ Acknowledge = %04x\n", data);
+	const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
+	VIDEO_IRQ_STATUS &= ~data;
+	const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
+	if (changed)
 		check_video_irq();
-	}
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::video_702a_w)
@@ -1340,6 +1362,28 @@ WRITE16_MEMBER(gcm394_base_video_device::video_7030_brightness_w)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7030_brightness_w %04x\n", machine().describe_context(), data);
 	m_7030_brightness = data;
+}
+
+void gcm394_base_video_device::update_raster_split_position()
+{
+	// this might need updating to handle higher res modes
+	LOGMASKED(LOG_GCM394_VIDEO, "update_raster_split_position: %04x,%04x\n", m_7037, m_7036);
+	if (m_7037 < 160 && m_7036 < 240)
+		m_screenpos_timer->adjust(m_screen->time_until_pos(m_7036, m_7037 << 1));
+	else
+		m_screenpos_timer->adjust(attotime::never);
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::split_irq_vpos_w)
+{
+	m_7036 = data & 0x1ff;
+	update_raster_split_position();
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::split_irq_hpos_w)
+{
+	m_7037 = data & 0x1ff;
+	update_raster_split_position();
 }
 
 READ16_MEMBER(gcm394_base_video_device::video_703c_tvcontrol1_r)
@@ -1468,26 +1512,48 @@ WRITE16_MEMBER(gcm394_base_video_device::video_701e_w)
 
 void gcm394_base_video_device::check_video_irq()
 {
-	m_video_irq_cb((m_video_irq_status & 1) ? ASSERT_LINE : CLEAR_LINE);
+	LOGMASKED(LOG_GCM394_VIDEO, "%ssserting Video IRQ (%04x, %04x)\n", (VIDEO_IRQ_STATUS & VIDEO_IRQ_ENABLE) ? "A" : "Dea", VIDEO_IRQ_STATUS, VIDEO_IRQ_ENABLE);
+	m_video_irq_cb((VIDEO_IRQ_STATUS & VIDEO_IRQ_ENABLE) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(gcm394_base_video_device::vblank)
 {
-	int i = 0x0001;
-
 	if (!state)
 	{
-		m_video_irq_status &= ~i;
+		VIDEO_IRQ_STATUS &= ~1;
+		LOGMASKED(LOG_GCM394_VIDEO, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
 		check_video_irq();
 		return;
 	}
 
-	//if (m_video_irq_enable & 1)
+	if (VIDEO_IRQ_ENABLE & 1)
 	{
-		m_video_irq_status |= i;
+		VIDEO_IRQ_STATUS |= 1;
+		LOGMASKED(LOG_GCM394_VIDEO, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
 		check_video_irq();
 	}
 }
+
+void gcm394_base_video_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case TIMER_SCREENPOS:
+		{
+			if (VIDEO_IRQ_ENABLE & 2)
+			{
+				VIDEO_IRQ_STATUS |= 2;
+				check_video_irq();
+			}
+			m_screen->update_partial(m_screen->vpos());
+
+			// fire again, jak_dbz pinball needs this
+			m_screenpos_timer->adjust(m_screen->time_until_pos(m_7036, m_7037 << 1));
+			break;
+		}
+	}
+}
+
 
 static GFXDECODE_START( gfx )
 GFXDECODE_END

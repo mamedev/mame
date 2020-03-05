@@ -81,6 +81,10 @@ public:
 
 	DECLARE_READ16_MEMBER(video_703a_palettebank_r);
 	DECLARE_WRITE16_MEMBER(video_703a_palettebank_w);
+	
+	void update_raster_split_position();
+	DECLARE_WRITE16_MEMBER(split_irq_vpos_w);
+	DECLARE_WRITE16_MEMBER(split_irq_hpos_w);
 
 	DECLARE_READ16_MEMBER(videoirq_source_enable_r);
 	DECLARE_WRITE16_MEMBER(videoirq_source_enable_w);
@@ -145,6 +149,8 @@ protected:
 		TILE_Y_FLIP             = 0x0008
 	};
 
+	static const device_timer_id TIMER_SCREENPOS = 2;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	inline void check_video_irq();
 
@@ -220,6 +226,8 @@ protected:
 
 	uint16_t m_702a;
 	uint16_t m_7030_brightness;
+	uint16_t m_7036;
+	uint16_t m_7037;
 	uint16_t m_703c_tvcontrol1;
 
 	uint16_t m_7042_sprite;
@@ -243,6 +251,7 @@ protected:
 
 	void unk_vid_regs_w(int which, int offset, uint16_t data);
 
+	emu_timer *m_screenpos_timer;
 	uint16_t m_video_irq_status;
 
 	uint16_t m_spriteram[0x400];
