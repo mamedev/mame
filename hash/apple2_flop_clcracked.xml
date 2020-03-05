@@ -36245,4 +36245,40 @@
 		</part>
 	</software>
 
+	<software name="teltm320">
+		<description>Telling Time (Version 3.2.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Gamco Industries</publisher>
+		<info name="release" value="2020-03-03"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="telling time v3.2.0 (4am crack).dsk" size="143360" crc="e8745ab8" sha1="84cd18cb483369a29f46050d5ccaa84143e59224"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="money316">
+		<description>Money (Version 3.1.6) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Gamco Industries</publisher>
+		<info name="release" value="2020-03-03"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="money v3.1.6 (4am crack).dsk" size="143360" crc="d27e714f" sha1="d8238aedd8f1312621d29c794eb62a53dd948bbd"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="cyborgv2">
+		<description>Cyborg (Version 2) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Sentient Software</publisher>
+		<info name="release" value="2020-03-03"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="cyborg v2 (4am crack).dsk" size="143360" crc="8521d84b" sha1="7030a8ce8b0bc42504e6cea68e8345bf3f7265ac"/>
+			</dataarea>
+		</part>
+	</software>
+	
 </softwarelist>
