@@ -23,8 +23,6 @@ DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "SunPlus G
 
 #include "logmacro.h"
 
-#define VIDEO_IRQ_ENABLE    m_7062
-#define VIDEO_IRQ_STATUS    m_7063
 
 gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
@@ -247,8 +245,8 @@ void gcm394_base_video_device::device_start()
 	save_item(NAME(m_tmap3_scroll));
 	save_item(NAME(m_707f));
 	save_item(NAME(m_703a_palettebank));
-	save_item(NAME(m_7062));
-	save_item(NAME(m_7063));
+	save_item(NAME(m_video_irq_enable));
+	save_item(NAME(m_video_irq_status));
 	save_item(NAME(m_702a));
 	save_item(NAME(m_7030_brightness));
 	save_item(NAME(m_xirqpos));
@@ -270,7 +268,6 @@ void gcm394_base_video_device::device_start()
 	save_item(NAME(m_page2_addr_msb));
 	save_item(NAME(m_page3_addr_lsb));
 	save_item(NAME(m_page3_addr_msb));
-	save_item(NAME(m_video_irq_status));
 	save_item(NAME(m_spriteram));
 	save_item(NAME(m_spriteextra));
 	save_item(NAME(m_paletteram));
@@ -309,8 +306,8 @@ void gcm394_base_video_device::device_reset()
 
 	m_707f = 0x0000;
 	m_703a_palettebank = 0x0000;
-	m_7062 = 0x0000;
-	m_7063 = 0x0000;
+	m_video_irq_enable = 0x0000;
+	m_video_irq_status = 0x0000;
 
 	m_702a = 0x0000;
 	m_7030_brightness = 0x0000;
@@ -334,8 +331,6 @@ void gcm394_base_video_device::device_reset()
 	m_videodma_size = 0x0000;
 	m_videodma_dest = 0x0000;
 	m_videodma_source = 0x0000;
-
-	m_video_irq_status = 0x0000;
 
 	m_sprite_7022_gfxbase_lsb = 0;
 	m_sprite_702d_gfxbase_msb = 0;
@@ -1206,11 +1201,11 @@ WRITE16_MEMBER(gcm394_base_video_device::video_dma_size_trigger_w)
 
 	m_videodma_size = 0x0000;
 
-	if (VIDEO_IRQ_ENABLE & 4)
+	if (m_video_irq_enable & 4)
 	{
-		const uint16_t old = VIDEO_IRQ_STATUS;
-		VIDEO_IRQ_STATUS |= 4;
-		const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
+		const uint16_t old = m_video_irq_status;
+		m_video_irq_status |= 4;
+		const uint16_t changed = old ^ (m_video_irq_enable & m_video_irq_status);
 		if (changed)
 			check_video_irq();
 	}
@@ -1304,15 +1299,15 @@ WRITE16_MEMBER(gcm394_base_video_device::video_703a_palettebank_w)
 READ16_MEMBER(gcm394_base_video_device::videoirq_source_enable_r)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::videoirq_source_enable_r\n", machine().describe_context());
-	return VIDEO_IRQ_ENABLE;
+	return m_video_irq_enable;
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::videoirq_source_enable_w)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "videoirq_source_enable_w: Video IRQ Enable = %04x (DMA:%d, Timing:%d, Blanking:%d)\n", data, BIT(data, 2), BIT(data, 1), BIT(data, 0));
-	const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
-	VIDEO_IRQ_ENABLE = data & 0x0007;
-	const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
+	const uint16_t old = m_video_irq_enable & m_video_irq_status;
+	m_video_irq_enable = data & 0x0007;
+	const uint16_t changed = old ^ (m_video_irq_enable & m_video_irq_status);
 	if (changed)
 		check_video_irq();
 }
@@ -1320,16 +1315,16 @@ WRITE16_MEMBER(gcm394_base_video_device::videoirq_source_enable_w)
 READ16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_r)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7063_videoirq_source_r\n", machine().describe_context());
-	return VIDEO_IRQ_STATUS;
+	return m_video_irq_status;
 }
 
 
 WRITE16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_ack_w)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "video_7063_videoirq_source_ack_w: Video IRQ Acknowledge = %04x\n", data);
-	const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
-	VIDEO_IRQ_STATUS &= ~data;
-	const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
+	const uint16_t old = m_video_irq_enable & m_video_irq_status;
+	m_video_irq_status &= ~data;
+	const uint16_t changed = old ^ (m_video_irq_enable & m_video_irq_status);
 	if (changed)
 		check_video_irq();
 }
@@ -1519,24 +1514,24 @@ WRITE16_MEMBER(gcm394_base_video_device::video_701e_w)
 
 void gcm394_base_video_device::check_video_irq()
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%ssserting Video IRQ (%04x, %04x)\n", (VIDEO_IRQ_STATUS & VIDEO_IRQ_ENABLE) ? "A" : "Dea", VIDEO_IRQ_STATUS, VIDEO_IRQ_ENABLE);
-	m_video_irq_cb((VIDEO_IRQ_STATUS & VIDEO_IRQ_ENABLE) ? ASSERT_LINE : CLEAR_LINE);
+	LOGMASKED(LOG_GCM394_VIDEO, "%ssserting Video IRQ (%04x, %04x)\n", (m_video_irq_status & m_video_irq_enable) ? "A" : "Dea", m_video_irq_status, m_video_irq_enable);
+	m_video_irq_cb((m_video_irq_status & m_video_irq_enable) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(gcm394_base_video_device::vblank)
 {
 	if (!state)
 	{
-		VIDEO_IRQ_STATUS &= ~1;
-		LOGMASKED(LOG_GCM394_VIDEO, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
+		m_video_irq_status &= ~1;
+		LOGMASKED(LOG_GCM394_VIDEO, "Setting video IRQ status to %04x\n", m_video_irq_status);
 		check_video_irq();
 		return;
 	}
 
-	if (VIDEO_IRQ_ENABLE & 1)
+	if (m_video_irq_enable & 1)
 	{
-		VIDEO_IRQ_STATUS |= 1;
-		LOGMASKED(LOG_GCM394_VIDEO, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
+		m_video_irq_status |= 1;
+		LOGMASKED(LOG_GCM394_VIDEO, "Setting video IRQ status to %04x\n", m_video_irq_status);
 		check_video_irq();
 	}
 }
@@ -1547,9 +1542,9 @@ void gcm394_base_video_device::device_timer(emu_timer &timer, device_timer_id id
 	{
 		case TIMER_SCREENPOS:
 		{
-			if (VIDEO_IRQ_ENABLE & 2)
+			if (m_video_irq_enable & 2)
 			{
-				VIDEO_IRQ_STATUS |= 2;
+				m_video_irq_status |= 2;
 				check_video_irq();
 			}
 

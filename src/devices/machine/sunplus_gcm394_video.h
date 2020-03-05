@@ -221,8 +221,8 @@ protected:
 
 	uint16_t m_707f;
 	uint16_t m_703a_palettebank;
-	uint16_t m_7062;
-	uint16_t m_7063;
+	uint16_t m_video_irq_enable;
+	uint16_t m_video_irq_status;
 
 	uint16_t m_702a;
 	uint16_t m_7030_brightness;
@@ -252,7 +252,6 @@ protected:
 	void unk_vid_regs_w(int which, int offset, uint16_t data);
 
 	emu_timer *m_screenpos_timer;
-	uint16_t m_video_irq_status;
 
 	uint16_t m_spriteram[0x400];
 	uint16_t m_spriteextra[0x400];
