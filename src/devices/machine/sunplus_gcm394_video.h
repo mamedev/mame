@@ -83,8 +83,8 @@ public:
 	DECLARE_WRITE16_MEMBER(video_703a_palettebank_w);
 	
 	void update_raster_split_position();
-	DECLARE_WRITE16_MEMBER(split_irq_vpos_w);
-	DECLARE_WRITE16_MEMBER(split_irq_hpos_w);
+	DECLARE_WRITE16_MEMBER(split_irq_xpos_w);
+	DECLARE_WRITE16_MEMBER(split_irq_ypos_w);
 
 	DECLARE_READ16_MEMBER(videoirq_source_enable_r);
 	DECLARE_WRITE16_MEMBER(videoirq_source_enable_w);
@@ -226,8 +226,8 @@ protected:
 
 	uint16_t m_702a;
 	uint16_t m_7030_brightness;
-	uint16_t m_7036;
-	uint16_t m_7037;
+	uint16_t m_xirqpos;
+	uint16_t m_yirqpos;
 	uint16_t m_703c_tvcontrol1;
 
 	uint16_t m_7042_sprite;

@@ -251,8 +251,8 @@ void gcm394_base_video_device::device_start()
 	save_item(NAME(m_7063));
 	save_item(NAME(m_702a));
 	save_item(NAME(m_7030_brightness));
-	save_item(NAME(m_7036));
-	save_item(NAME(m_7037));
+	save_item(NAME(m_xirqpos));
+	save_item(NAME(m_yirqpos));
 	save_item(NAME(m_703c_tvcontrol1));
 	save_item(NAME(m_7042_sprite));
 	save_item(NAME(m_7080));
@@ -314,8 +314,8 @@ void gcm394_base_video_device::device_reset()
 
 	m_702a = 0x0000;
 	m_7030_brightness = 0x0000;
-	m_7036 = 0x0000;
-	m_7037 = 0x0000;
+	m_xirqpos = 0x0000;
+	m_yirqpos = 0x0000;
 	m_703c_tvcontrol1 = 0x0000;
 
 	m_7042_sprite = 0x0000;
@@ -1309,7 +1309,7 @@ READ16_MEMBER(gcm394_base_video_device::videoirq_source_enable_r)
 
 WRITE16_MEMBER(gcm394_base_video_device::videoirq_source_enable_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "video_w: Video IRQ Enable = %04x (DMA:%d, Timing:%d, Blanking:%d)\n", data, BIT(data, 2), BIT(data, 1), BIT(data, 0));
+	LOGMASKED(LOG_GCM394_VIDEO, "videoirq_source_enable_w: Video IRQ Enable = %04x (DMA:%d, Timing:%d, Blanking:%d)\n", data, BIT(data, 2), BIT(data, 1), BIT(data, 0));
 	const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
 	VIDEO_IRQ_ENABLE = data & 0x0007;
 	const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
@@ -1326,7 +1326,7 @@ READ16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_r)
 
 WRITE16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_ack_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "video_w: Video IRQ Acknowledge = %04x\n", data);
+	LOGMASKED(LOG_GCM394_VIDEO, "video_7063_videoirq_source_ack_w: Video IRQ Acknowledge = %04x\n", data);
 	const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
 	VIDEO_IRQ_STATUS &= ~data;
 	const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
@@ -1367,22 +1367,29 @@ WRITE16_MEMBER(gcm394_base_video_device::video_7030_brightness_w)
 void gcm394_base_video_device::update_raster_split_position()
 {
 	// this might need updating to handle higher res modes
-	LOGMASKED(LOG_GCM394_VIDEO, "update_raster_split_position: %04x,%04x\n", m_7037, m_7036);
-	if (m_7037 < 160 && m_7036 < 240)
-		m_screenpos_timer->adjust(m_screen->time_until_pos(m_7036, m_7037 << 1));
+	LOGMASKED(LOG_GCM394_VIDEO, "update_raster_split_position: %04x,%04x\n", m_yirqpos, m_xirqpos);
+	if (m_xirqpos < 300 && m_yirqpos < 240)
+	{
+		m_screenpos_timer->adjust(m_screen->time_until_pos(m_yirqpos, m_xirqpos));
+		//printf("setting irq timer for y:%d x:%d", m_yirqpos, m_xirqpos);
+	}
 	else
 		m_screenpos_timer->adjust(attotime::never);
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::split_irq_vpos_w)
+WRITE16_MEMBER(gcm394_base_video_device::split_irq_ypos_w)
 {
-	m_7036 = data & 0x1ff;
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:split_irq_ypos_w %04x\n", machine().describe_context(), data);
+
+	m_yirqpos = data & 0x1ff;
 	update_raster_split_position();
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::split_irq_hpos_w)
+WRITE16_MEMBER(gcm394_base_video_device::split_irq_xpos_w)
 {
-	m_7037 = data & 0x1ff;
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:split_irq_xpos_w %04x\n", machine().describe_context(), data);
+
+	m_xirqpos = data & 0x1ff;
 	update_raster_split_position();
 }
 
@@ -1545,10 +1552,13 @@ void gcm394_base_video_device::device_timer(emu_timer &timer, device_timer_id id
 				VIDEO_IRQ_STATUS |= 2;
 				check_video_irq();
 			}
+
+			//printf("firing irq timer\n");
+
 			m_screen->update_partial(m_screen->vpos());
 
 			// fire again, jak_dbz pinball needs this
-			m_screenpos_timer->adjust(m_screen->time_until_pos(m_7036, m_7037 << 1));
+			m_screenpos_timer->adjust(m_screen->time_until_pos(m_yirqpos, m_xirqpos));
 			break;
 		}
 	}
