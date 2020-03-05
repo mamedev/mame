@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
+// Digi Makeover - this uses a camrea and touchpad, both currently unsupported
+//  - why do we need a hack to boot?
+
 #include "emu.h"
 #include "includes/spg2xx.h"
 #include "machine/nvram.h"
@@ -12,11 +15,11 @@ public:
 		spg2xx_game_state(mconfig, type, tag)
 	{ }
 
-	void init_digi();
 	void digimake(machine_config &config);
 	void mem_map_digi(address_map& map);
 
 private:
+	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
 };
 
 void spg2xx_game_digimake_state::mem_map_digi(address_map &map)
@@ -187,17 +190,38 @@ void spg2xx_game_digimake_state::digimake(machine_config &config)
 	m_maincpu->porta_in().set(FUNC(spg2xx_game_digimake_state::base_porta_r));
 	m_maincpu->portb_in().set(FUNC(spg2xx_game_digimake_state::base_portb_r));
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_digimake_state::base_portc_r));
+
+	m_maincpu->portc_out().set(FUNC(spg2xx_game_digimake_state::portc_w));
+
 }
 
-void spg2xx_game_digimake_state::init_digi()
+WRITE16_MEMBER(spg2xx_game_digimake_state::portc_w)
 {
-	init_crc();
-//  skips IRQ wait, but then there are no gfx
-//	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
-//	rom[0x5210] = 0xf165;
-//	rom[0x5211] = 0xf165;
-}
+	logerror("%s: portc_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+		(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+		(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+		(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+		(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+		(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+		(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+		(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+		(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+		(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+		(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+		(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+		(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+		(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+		(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
 
+	// HACK! force vbl interrupt to be on, I'm guessing some check is failing causing it to remain off otherwise?
+	if (m_maincpu->pc() == 0xaf5a)
+	{
+		address_space& mem = m_maincpu->space(AS_PROGRAM);
+		mem.write_word(0x2862, 0x0003);
+	}
+}
 
 ROM_START( rad_digi )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -205,4 +229,4 @@ ROM_START( rad_digi )
 ROM_END
 
 
-CONS( 2005, rad_digi,  0,        0, digimake, rad_digi,   spg2xx_game_digimake_state, init_digi, "Radica", "Digi Makeover (Girl Tech)",   MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 2005, rad_digi,  0,        0, digimake, rad_digi,   spg2xx_game_digimake_state, init_crc, "Radica", "Digi Makeover (Girl Tech)",   MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
