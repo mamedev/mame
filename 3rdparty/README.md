@@ -70,6 +70,4 @@ utf8proc - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 wdlfft - [zlib license](http://opensource.org/licenses/Zlib)
 
-winpcap - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
-
 zlib - [zlib license](http://opensource.org/licenses/Zlib)
