@@ -566,7 +566,7 @@ USA platform:
     | Diamond Eyes                                     |
     | E6A2D2DA                                         |
     | 4B5B-B5BF / 1E6C64C8 / 6FC8B9B6                  |
-    | Copyright � 2003 Aristocrat Technologies, Inc.   |
+    | Copyright © 2003 Aristocrat Technologies, Inc.   |
     +--------------------------------------------------+
 
 "ID string" + "Board location" + "Series" + "EPROM type" + "Platform"
@@ -599,7 +599,7 @@ SPC2:
     | V. 01.06.17                                    |
     | 8H37 / 3B68 / 00DF3B68                         |
     |                                                |
-    | Copyright � 2011 Aristocrat Technologies, Inc. |
+    | Copyright © 2011 Aristocrat Technologies, Inc. |
     +------------------------------------------------+
 
 SPC2.5:
