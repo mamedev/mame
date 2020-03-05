@@ -1580,13 +1580,13 @@ READ8_MEMBER(nes_vt_state::extrain_23_r)
 WRITE8_MEMBER(nes_vt_state::extraout_01_w)
 {
 	// TODO: use callbacks for this as output can be hooked up to anything
-	logerror("%s: extraout_01_w %02x\n", data);
+	logerror("%s: extraout_01_w %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(nes_vt_state::extraout_23_w)
 {
 	// TODO: use callbacks for this as output can be hooked up to anything
-	logerror("%s: extraout_23_w %02x\n", data);
+	logerror("%s: extraout_23_w %02x\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(nes_vt_state::rs232flags_region_r)
