@@ -318,7 +318,7 @@ void speedbal_state::init_speedbal()
 
 ***************************************************************************/
 
-ROM_START( speedbal ) // seems to have a more complete hidden test mode, with a 'hard test' that's note enabled in the parent
+ROM_START( speedbal ) // seems to have a more complete hidden test mode, with a 'hard test' that's not enabled in the alternate Speed Ball rom set
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.u14",  0x0000,  0x8000, CRC(94c6f107) SHA1(cd7ada17f0f59623cf615df68c5f8f4077377820) )
 	ROM_LOAD( "3.u15",  0x8000,  0x8000, CRC(a036687f) SHA1(fc2cd683cd6a9a75ab6b188f7b4592b355a569e0) )
