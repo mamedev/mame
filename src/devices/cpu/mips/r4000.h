@@ -356,9 +356,11 @@ protected:
 	// cp1 implementation
 	void cp1_unimplemented();
 	template <typename T> bool cp1_op(T op);
-	void cp1_execute(u32 const op);
+	virtual void cp1_execute(u32 const op);
 	virtual void cp1x_execute(u32 const op);
 	template <typename T> void cp1_set(unsigned const reg, T const data);
+	void cp1_mov_s(u32 const op);
+	void cp1_mov_d(u32 const op);
 
 	// cp2 implementation
 	void cp2_execute(u32 const op);
@@ -486,6 +488,10 @@ public:
 
 private:
 	virtual void handle_reserved_instruction(u32 const op) override;
+	virtual void cp1_execute(u32 const op) override;
 	virtual void cp1x_execute(u32 const op) override;
+
+	static u32 const s_fcc_masks[8];
+	static u32 const s_fcc_shifts[8];
 };
 #endif // MAME_CPU_MIPS_R4000_H
