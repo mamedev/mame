@@ -49,6 +49,12 @@
 
     V.Baby HY27UF081G2A (2048+64) x 64 x 1024
 
+
+
+	Non-emulation bugs (happen on real hardware):
+		paccon:  Pac-Man - Bottom set of Power Pills are squashed.
+		         Galaga - Incorrect sprite used for left shot in 'Double Ship' mode
+
 */
 
 #include "emu.h"

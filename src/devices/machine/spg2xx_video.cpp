@@ -225,6 +225,7 @@ void spg2xx_video_device::draw_bitmap(const rectangle& cliprect, uint32_t scanli
 
 	//printf("draw bitmap bases %04x %04x\n", tilemap, palette_map);
 
+	//uint32_t xscroll = regs[0];
 	uint32_t yscroll = regs[1];
 
 	int realline = (scanline + yscroll) & 0xff;
@@ -243,30 +244,47 @@ void spg2xx_video_device::draw_bitmap(const rectangle& cliprect, uint32_t scanli
 		palette &= 0x00ff;
 
 	//const int linewidth = 320 / 2;
-	int sourcebase = tile | (palette << 16); // this is correct for Texas Hold'em - TODO: get from a register?
+	int sourcebase = tile | (palette << 16);
 
 	uint32_t* dest = &m_screenbuf[320 * scanline];
 
-	for (int i = 0; i < 320 / 2; i++)
+	uint32_t ctrl = regs[3];
+
+	if (ctrl & 0x80) // HiColor mode (rad_digi)
 	{
-		uint8_t palette_entry;
-		uint16_t color;
-		const uint16_t data = space.read_word(sourcebase + i);
-
-		palette_entry = (data & 0x00ff);
-		color = m_paletteram[palette_entry];
-
-		if (!(color & 0x8000))
+		for (int i = 0; i < 320; i++)
 		{
-			dest[(i * 2)+0] = m_rgb555_to_rgb888[color & 0x7fff];
+			const uint16_t data = space.read_word(sourcebase + i);
+
+			if (!(data & 0x8000))
+			{
+				dest[i] = m_rgb555_to_rgb888[data & 0x7fff];
+			}
 		}
-
-		palette_entry = (data & 0xff00) >> 8;
-		color = m_paletteram[palette_entry];
-
-		if (!(color & 0x8000))
+	}
+	else
+	{
+		for (int i = 0; i < 320 / 2; i++)
 		{
-			dest[(i * 2)+1] = m_rgb555_to_rgb888[color & 0x7fff];
+			uint8_t palette_entry;
+			uint16_t color;
+			const uint16_t data = space.read_word(sourcebase + i);
+
+			palette_entry = (data & 0x00ff);
+			color = m_paletteram[palette_entry];
+
+			if (!(color & 0x8000))
+			{
+				dest[(i * 2) + 0] = m_rgb555_to_rgb888[color & 0x7fff];
+			}
+
+			palette_entry = (data & 0xff00) >> 8;
+			color = m_paletteram[palette_entry];
+
+			if (!(color & 0x8000))
+			{
+				dest[(i * 2) + 1] = m_rgb555_to_rgb888[color & 0x7fff];
+			}
 		}
 	}
 }
