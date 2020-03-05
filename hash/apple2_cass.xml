@@ -1484,6 +1484,19 @@
 		</part>
 	</software>
 
+	<software name="mahjong">
+		<description>Shi-ri Mahjong</description>
+		<year>1980</year>
+		<publisher>Tsukumo Original Software</publisher>
+		<info name="alt_title" value="四人麻雀" />
+		<info name="usage" value="*30.4000R" />
+		<part name="cass" interface="apple2_cass">
+			<dataarea name="cass" size="13945900">
+				<rom name="mahjong.wav" size="13945900" crc="759a0dcd" sha1="c5a7d8fc691bc73c7963bdc4bfbfbd58508b8577"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mazegame">
 		<description>Maze Game</description>
 		<year>1978</year>
