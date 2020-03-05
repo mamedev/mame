@@ -2240,11 +2240,11 @@ static INPUT_PORTS_START( timetp36 )
 	PORT_DIPNAME( 0x01, 0x01, "Unknown Bit 3" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x04, "Difficulty?" ) // guess since it has 3 possible values and the slider has 3 positions
-	PORT_DIPSETTING(    0x06, "0" )
-	PORT_DIPSETTING(    0x04, "1" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x00, "2 (duplicate)" )
+	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Difficulty ) ) // 3 possible slider positions
+	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) ) // 3 minutes timer in Bombs Away
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) ) // 2 minute 30
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) ) // 2 minute
+	PORT_DIPSETTING(    0x00, "Hard (duplicate)" )
 	PORT_DIPNAME( 0x08, 0x08, "Unknown Bit 4" ) //  ... code at 8064 instead seems to be reading 8 bits with a shifter? stored at 0x67 (investigate)
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
