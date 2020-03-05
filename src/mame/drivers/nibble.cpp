@@ -336,7 +336,7 @@ GFXDECODE_END
 
 void nibble_state::nibble(machine_config &config)
 {
-	UPD7811(config, m_maincpu, MASTER_CLOCK / 3); // type guessed; clock not verified
+	UPD7811(config, m_maincpu, MASTER_CLOCK); // type guessed; clock not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &nibble_state::nibble_map);
 	//m_maincpu->set_vblank_int("screen", FUNC(nibble_state::nibble_interrupt));
 

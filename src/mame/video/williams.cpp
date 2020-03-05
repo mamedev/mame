@@ -194,6 +194,8 @@ void williams2_state::video_start()
 	state_save_register();
 	save_item(NAME(m_tilemap_xscroll));
 	save_item(NAME(m_fg_color));
+	save_item(NAME(m_gain));
+	save_item(NAME(m_offset));
 }
 
 
@@ -271,7 +273,6 @@ uint32_t blaster_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-
 uint32_t williams2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rgb_t pens[16];
@@ -303,7 +304,38 @@ uint32_t williams2_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 	return 0;
 }
 
+uint32_t mysticm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	rgb_t pens[16];
 
+	/* draw the background */
+	//printf("y %d %d %d\n", cliprect.min_y, cliprect.max_y, m_screen->vpos());
+	m_bg_tilemap->mark_all_dirty();
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	/* loop over rows */
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		/* fetch the relevant pens */
+		for (int x = 1; x < 16; x++)
+			pens[x] = m_palette->pen_color(color_decode(m_fg_color, 1, y) * 16 + x);
+
+		uint8_t *source = &m_videoram[y];
+		uint32_t *dest = &bitmap.pix32(y);
+
+		/* loop over columns */
+		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
+		{
+			int pix = source[(x/2) * 256];
+
+			if (pix & 0xf0)
+				dest[x+0] = pens[pix >> 4];
+			if (pix & 0x0f)
+				dest[x+1] = pens[pix & 0x0f];
+		}
+	}
+	return 0;
+}
 
 /*************************************
  *
@@ -336,16 +368,298 @@ void williams_state::palette_init(palette_device &palette) const
 	}
 }
 
+rgb_t williams2_state::calc_col(uint16_t lo, uint16_t hi)
+{
+	/*
+	 *  frgb contains channel output voltages created with this netlist file:
+	 *  	src/lib/netlist/examples/turkey_shoot.cpp
+	 *  Instructions to create the table are found in turkey_shoot.cpp
+	 *
+	 *  FIXME: The long term plan is to include the functionality of
+	 *  nltool/nlwav into the netlist core, launch a netlist run and
+	 *  create the table on the fly. This however needs some significant
+	 *  investment. This table is a float table since integer would loose
+	 *  dynamic range during offset and gain adjustments.
+	 *
+	 */
 
+	static const float frgb[256] =
+	{
+		0.001889,
+		0.002456,
+		0.003196,
+		0.004384,
+		0.005272,
+		0.007672,
+		0.011345,
+		0.017759,
+		0.018643,
+		0.03103,
+		0.051912,
+		0.087251,
+		0.1256,
+		0.204967,
+		0.331644,
+		0.529628,
+		0.002524,
+		0.003306,
+		0.004371,
+		0.006072,
+		0.007386,
+		0.010812,
+		0.016096,
+		0.02509,
+		0.02687,
+		0.043747,
+		0.070899,
+		0.114042,
+		0.159992,
+		0.250108,
+		0.391104,
+		0.607433,
+		0.003522,
+		0.004666,
+		0.006254,
+		0.008766,
+		0.010795,
+		0.015856,
+		0.023585,
+		0.036228,
+		0.039487,
+		0.062206,
+		0.096916,
+		0.148811,
+		0.20338,
+		0.305447,
+		0.462741,
+		0.700199,
+		0.004941,
+		0.006607,
+		0.00895,
+		0.012619,
+		0.015683,
+		0.022944,
+		0.033832,
+		0.050765,
+		0.056018,
+		0.085033,
+		0.127452,
+		0.187886,
+		0.25112,
+		0.364998,
+		0.53879,
+		0.797876,
+		0.006857,
+		0.009233,
+		0.012592,
+		0.017771,
+		0.022172,
+		0.03212,
+		0.046615,
+		0.06811,
+		0.075696,
+		0.110906,
+		0.160678,
+		0.229149,
+		0.300735,
+		0.42593,
+		0.61584,
+		0.896241,
+		0.010113,
+		0.01368,
+		0.018726,
+		0.02625,
+		0.032735,
+		0.046462,
+		0.065809,
+		0.092996,
+		0.103803,
+		0.146292,
+		0.204648,
+		0.282479,
+		0.364084,
+		0.502781,
+		0.712244,
+		1.018759,
+		0.015744,
+		0.021251,
+		0.028944,
+		0.039945,
+		0.049446,
+		0.068127,
+		0.093445,
+		0.127285,
+		0.14231,
+		0.193004,
+		0.261153,
+		0.349656,
+		0.443068,
+		0.597642,
+		0.830444,
+		1.168267,
+		0.024223,
+		0.032378,
+		0.043467,
+		0.058612,
+		0.071646,
+		0.09563,
+		0.127147,
+		0.167588,
+		0.187237,
+		0.246001,
+		0.32398,
+		0.423282,
+		0.528958,
+		0.699986,
+		0.957283,
+		1.328146,
+		0.03429,
+		0.045182,
+		0.059626,
+		0.078588,
+		0.094882,
+		0.123449,
+		0.160233,
+		0.206173,
+		0.230031,
+		0.295596,
+		0.382005,
+		0.490617,
+		0.607092,
+		0.792615,
+		1.071663,
+		1.471949,
+		0.053106,
+		0.068185,
+		0.087712,
+		0.112105,
+		0.132967,
+		0.167685,
+		0.211656,
+		0.265082,
+		0.295044,
+		0.369837,
+		0.467993,
+		0.58972,
+		0.721623,
+		0.927771,
+		1.23799,
+		1.680648,
+		0.083576,
+		0.103924,
+		0.129726,
+		0.160516,
+		0.186838,
+		0.228722,
+		0.281144,
+		0.343382,
+		0.381103,
+		0.46708,
+		0.5795,
+		0.717377,
+		0.86859,
+		1.100548,
+		1.449999,
+		1.946101,
+		0.124032,
+		0.149904,
+		0.182177,
+		0.219335,
+		0.251408,
+		0.300484,
+		0.361692,
+		0.433113,
+		0.479348,
+		0.577076,
+		0.704911,
+		0.860274,
+		1.032601,
+		1.292736,
+		1.685276,
+		2.240223,
+		0.175706,
+		0.207011,
+		0.245689,
+		0.289706,
+		0.327912,
+		0.384501,
+		0.455038,
+		0.536297,
+		0.592068,
+		0.702442,
+		0.847309,
+		1.021943,
+		1.217772,
+		1.509243,
+		1.949852,
+		2.570528,
+		0.24927,
+		0.287025,
+		0.333877,
+		0.385984,
+		0.431717,
+		0.497443,
+		0.579727,
+		0.673464,
+		0.741572,
+		0.868017,
+		1.034559,
+		1.234123,
+		1.460333,
+		1.79207,
+		2.295118,
+		3.001228,
+		0.357357,
+		0.403448,
+		0.460931,
+		0.52375,
+		0.579557,
+		0.656404,
+		0.754715,
+		0.865436,
+		0.950203,
+		1.097887,
+		1.293872,
+		1.527752,
+		1.795589,
+		2.182008,
+		2.770169,
+		3.593798,
+		0.494255,
+		0.549094,
+		0.61884,
+		0.693823,
+		0.760527,
+		0.851544,
+		0.968276,
+		1.098965,
+		1.203912,
+		1.377026,
+		1.608183,
+		1.882244,
+		2.200036,
+		2.652345,
+		3.342626,
+		4.215708,
+	};
+	uint16_t i, ur, ug, ub;
+	float r, g, b;
+
+	/* update the palette entry */
+	i =  (hi >> 4) & 15;
+	ub = (hi >> 0) & 15;
+	ur = (lo >> 0) & 15;
+	ug = (lo >> 4) & 15;
+
+	r = std::min(1.0f, frgb[i * 16 + ur] * m_gain[0] / 0.5f / 4.22f + m_offset[0]);
+	g = std::min(1.0f, frgb[i * 16 + ug] * m_gain[1] / 0.5f / 4.22f + m_offset[1]);
+	b = std::min(1.0f, frgb[i * 16 + ub] * m_gain[2] / 0.5f / 4.22f + m_offset[2]);
+	return rgb_t((int) (r * 255), (int) (g * 255), (int) (b * 255));
+}
 
 void williams2_state::paletteram_w(offs_t offset, u8 data)
 {
-	static const uint8_t ztable[16] =
-	{
-		0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8,  0x9,
-		0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11
-	};
-	uint8_t entry_lo, entry_hi, i, r, g, b;
+	uint16_t entry_lo, entry_hi;
 
 	/* set the new value */
 	m_paletteram[offset] = data;
@@ -354,14 +668,16 @@ void williams2_state::paletteram_w(offs_t offset, u8 data)
 	entry_lo = m_paletteram[offset & ~1];
 	entry_hi = m_paletteram[offset |  1];
 
-	/* update the palette entry */
-	i = ztable[(entry_hi >> 4) & 15];
-	b = ((entry_hi >> 0) & 15) * i;
-	g = ((entry_lo >> 4) & 15) * i;
-	r = ((entry_lo >> 0) & 15) * i;
-	m_palette->set_pen_color(offset / 2, rgb_t(r, g, b));
+	m_bg_tilemap->mark_all_dirty();
+
+	m_palette->set_pen_color(offset / 2, calc_col(entry_lo, entry_hi));
 }
 
+void williams2_state::rebuild_palette()
+{
+	for (offs_t i=0; i<2048; i++)
+		paletteram_w(i, m_paletteram[i]);
+}
 
 void williams2_state::fg_select_w(u8 data)
 {
@@ -384,6 +700,10 @@ u8 williams_state::video_counter_r()
 		return 0xfc;
 }
 
+u8 williams2_state::video_counter_r()
+{
+	return m_screen->vpos() & 0xff;
+}
 
 
 /*************************************
@@ -404,20 +724,41 @@ TILE_GET_INFO_MEMBER(williams2_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
 }
 
-TILE_GET_INFO_MEMBER(mysticm_state::get_tile_info)
+int mysticm_state::color_decode(uint8_t base_col, int sig_J1, int y)
 {
-	int mask = m_gfxdecode->gfx(0)->elements() - 1;
-	int data = m_tileram[tile_index];
-	int y = (tile_index >> 1) & 7;
-	int color = 0; // TODO: This seems highly suspect. Could it be why the palette doesn't work in mysticm?
+	int v = y << 6;
+	int sig_W11 = (v >> 11) & 1;
+	int sig_W12 = (v >> 12) & 1;
+	int sig_W13 = (v >> 13) & 1;
+
+	// J1 connected to BACKSEL
+
+	// Cascading inputs ">" and "=" are set to "H", thus
+	// cascading input "<" (connected to W11) has no effect
+	// according to truthtable for 7485.
+	// FIXME: Investigate further.
 
 	/* IC79 is a 74LS85 comparator that controls the low bit */
-	int a = 1 | ((color & 1) << 2) | ((color & 1) << 3);
-	int b = ((y & 6) >> 1);
-	int casc = (y & 1);
-	color = (a > b) || ((a == b) && !casc);
+	int a = 1 | ((base_col & 1) << 2) | ((base_col & 1) << 3);
+	int b = (sig_W12 << 0) | (sig_W13 << 1) | (0 << 2) | (sig_J1 << 3);
+	int color = (a > b) || ((a == b) && !sig_W11);
 
-	SET_TILE_INFO_MEMBER(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
+	//return ((base_col & 0x04) >> 1) | ((base_col & 0x02) << 1) | (base_col & 0x38) | color;
+	return (base_col & 0x3e) | color;
+}
+
+TILE_GET_INFO_MEMBER(mysticm_state::get_tile_info)
+{
+	int color = color_decode(m_bg_color, 0, (tile_index << 4) & 0xff);
+
+	int mask = m_gfxdecode->gfx(0)->elements() - 1;
+	int data = m_tileram[tile_index];
+
+	//SET_TILE_INFO_MEMBER(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
+
+	m_bg_tilemap->set_palette_offset((color & 0x3e) << 4);
+	SET_TILE_INFO_MEMBER(0, data & mask, color & 1, (data & ~mask) ? TILE_FLIPX : 0);
+
 }
 
 TILE_GET_INFO_MEMBER(joust2_state::get_tile_info)
@@ -443,7 +784,10 @@ void williams2_state::bg_select_w(u8 data)
 void mysticm_state::bg_select_w(u8 data)
 {
 	/* IC79 is a 74LS85 comparator that controls the low bit */
-	m_bg_tilemap->set_palette_offset((data & 0x3e) << 4);
+	//printf("bg %d %d\n", data, data & 1);
+	m_bg_color = data;
+	//m_bg_tilemap->set_palette_offset((data & 0x3e) << 4);
+	m_bg_tilemap->mark_all_dirty();
 }
 
 void joust2_state::bg_select_w(u8 data)

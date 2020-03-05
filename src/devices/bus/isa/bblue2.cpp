@@ -12,8 +12,11 @@
  *   Parallel port test fails if set to LPT2
  */
 
-#include "bblue2.h"
+#include "emu.h"
 
+#include "bblue2.h"
+#include "bus/rs232/terminal.h"
+#include "bus/rs232/null_modem.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -174,6 +177,7 @@ isa8_babyblue2_device::isa8_babyblue2_device(const machine_config &mconfig, cons
 	, m_dsw3(*this, "SW3")
 	, m_h2(*this, "H2")
 	, m_ram(*this, "z80ram")
+	, m_devices_installed(false)
 {
 }
 
@@ -205,19 +209,22 @@ void isa8_babyblue2_device::device_reset()
 	lptloc = (m_h2->read() & 0x01) ? 0x278 : 0x378;
 	z80lptloc = (m_h2->read() & 0x01) ? 0x10 : 0x50;
 
-	// map Z80 LPT port based on jumper setting
-	m_z80->space(AS_IO).install_readwrite_handler(z80lptloc, z80lptloc+7, read8_delegate(m_parallel, FUNC(pc_lpt_device::read)), write8_delegate(m_parallel, FUNC(pc_lpt_device::write)));
-	
 	// halt Z80
 	m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	
-	m_isa->install_device(ioloc, ioloc+1, read8_delegate(*this, FUNC(isa8_babyblue2_device::z80_control_r)), write8_delegate(*this, FUNC(isa8_babyblue2_device::z80_control_w)));
-	m_isa->install_device(lptloc, lptloc+7, read8_delegate(m_parallel, FUNC(pc_lpt_device::read)), write8_delegate(m_parallel, FUNC(pc_lpt_device::write)));
-	m_isa->install_device(0x3f8, 0x03ff, read8sm_delegate(m_serial1, FUNC(ins8250_device::ins8250_r)), write8sm_delegate(m_serial1, FUNC(ins8250_device::ins8250_w)));
-	m_isa->install_device(0x2f8, 0x02ff, read8sm_delegate(m_serial2, FUNC(ins8250_device::ins8250_r)), write8sm_delegate(m_serial2, FUNC(ins8250_device::ins8250_w)));
-	// TODO: RTC
-	m_isa->install_memory(ramloc, ramloc+0xffff, read8_delegate(*this, FUNC(isa8_babyblue2_device::z80_ram_r)),write8_delegate(*this, FUNC(isa8_babyblue2_device::z80_ram_w)));
-	
+
+	if(!m_devices_installed)  // will need a hard reset to put DIP switch and jumper changes into effect
+	{
+		// map Z80 LPT port based on jumper setting
+		m_z80->space(AS_IO).install_readwrite_handler(z80lptloc, z80lptloc+7, read8_delegate(m_parallel, FUNC(pc_lpt_device::read)), write8_delegate(m_parallel, FUNC(pc_lpt_device::write)));
+		
+		m_isa->install_device(ioloc, ioloc+1, read8_delegate(*this, FUNC(isa8_babyblue2_device::z80_control_r)), write8_delegate(*this, FUNC(isa8_babyblue2_device::z80_control_w)));
+		m_isa->install_device(lptloc, lptloc+7, read8_delegate(m_parallel, FUNC(pc_lpt_device::read)), write8_delegate(m_parallel, FUNC(pc_lpt_device::write)));
+		m_isa->install_device(0x3f8, 0x03ff, read8sm_delegate(m_serial1, FUNC(ins8250_device::ins8250_r)), write8sm_delegate(m_serial1, FUNC(ins8250_device::ins8250_w)));
+		m_isa->install_device(0x2f8, 0x02ff, read8sm_delegate(m_serial2, FUNC(ins8250_device::ins8250_r)), write8sm_delegate(m_serial2, FUNC(ins8250_device::ins8250_w)));
+		// TODO: RTC
+		m_isa->install_memory(ramloc, ramloc+0xffff, read8_delegate(*this, FUNC(isa8_babyblue2_device::z80_ram_r)),write8_delegate(*this, FUNC(isa8_babyblue2_device::z80_ram_w)));
+		m_devices_installed = true;
+	}
 }
 
 READ8_MEMBER(isa8_babyblue2_device::z80_control_r)

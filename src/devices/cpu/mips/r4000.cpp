@@ -86,6 +86,9 @@ DEFINE_DEVICE_TYPE(R4400, r4400_device, "r4400", "MIPS R4400")
 DEFINE_DEVICE_TYPE(R4600, r4600_device, "r4600", "QED R4600")
 DEFINE_DEVICE_TYPE(R5000, r5000_device, "r5000", "MIPS R5000")
 
+u32 const r5000_device::s_fcc_masks[8] = { (1U << 23), (1U << 25), (1U << 26), (1U << 27), (1U << 28), (1U << 29), (1U << 30), (1U << 31) };
+u32 const r5000_device::s_fcc_shifts[8] = { 23, 25, 26, 27, 28, 29, 30, 31 };
+
 r4000_base_device::r4000_base_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size icache_size, cache_size dcache_size)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config_le("program", ENDIANNESS_LITTLE, 64, 32)
@@ -732,7 +735,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 			// * Operation codes marked with an asterisk cause reserved
 			// instruction exceptions in all current implementations and are
 			// reserved for future versions of the architecture.
-			cpu_exception(EXCEPTION_RI);
+			handle_reserved_instruction(op);
 			break;
 		}
 		break;
@@ -1044,7 +1047,6 @@ void r4000_base_device::cpu_execute(u32 const op)
 	case 0x32: // LWC2
 		cp2_execute(op);
 		break;
-	// case 0x33: *
 	case 0x34: // LLD
 		load_linked<u64>(ADDR(m_r[RSREG], s16(op)),
 			[this, op](u64 address, u64 data)
@@ -1114,14 +1116,14 @@ void r4000_base_device::cpu_execute(u32 const op)
 		// * Operation codes marked with an asterisk cause reserved instruction
 		// exceptions in all current implementations and are reserved for future
 		// versions of the architecture.
-		cpu_exception(EXCEPTION_RI);
+		handle_reserved_instruction(op);
 		break;
 	}
 }
 
 void r4000_base_device::handle_reserved_instruction(u32 const op)
 {
-	// Unahdnled operation codes cause reserved instruction
+	// Unhandled operation codes cause reserved instruction
 	// exceptions in all current implementations and are
 	// reserved for future versions of the architecture.
 	cpu_exception(EXCEPTION_RI);
@@ -1129,21 +1131,33 @@ void r4000_base_device::handle_reserved_instruction(u32 const op)
 
 void r5000_device::handle_reserved_instruction(u32 const op)
 {
-	switch (op & 0x3f)
+	switch (op >> 26)
 	{
-	case 0x33: // PREF (effective no-op)
-		break;
-	default:
-		switch (op >> 26)
+	case 0x00: // SPECIAL
+		switch (op & 0x3f)
 		{
-		case 0x0a: // MOVN
+		case 0x01: // MOVT / MOVF
+			if (((m_fcr31 >> s_fcc_shifts[(op >> 18) & 7]) & 1) == ((op >> 16) & 1))
+			{
+				if (RDREG)
+				{
+					m_r[RDREG] = m_r[RSREG];
+				}
+			}
+			return;
+		case 0x0a: // MOVZ
 			if (m_r[RTREG] == 0) { if (RDREG) m_r[RDREG] = m_r[RSREG]; }
-			break;
-		case 0x0b: // MOVZ
+			return;
+		case 0x0b: // MOVN
 			if (m_r[RTREG] != 0) { if (RDREG) m_r[RDREG] = m_r[RSREG]; }
-			break;
+			return;
 		}
+		break;
+	case 0x33: // PREF (effective no-op)
+		return;
 	}
+
+	r4000_base_device::handle_reserved_instruction(op);
 }
 
 void r4000_base_device::cpu_exception(u32 exception, u16 const vector)
@@ -1631,6 +1645,485 @@ template <> bool r4000_base_device::cp1_op<float64_t>(float64_t op)
 		return true;
 }
 
+void r5000_device::cp1_execute(u32 const op)
+{
+	if (!(SR & SR_CU1))
+	{
+		cpu_exception(EXCEPTION_CP1);
+		return;
+	}
+
+	softfloat_exceptionFlags = 0;
+	switch (op >> 26)
+	{
+	case 0x11: // COP1
+	switch ((op >> 21) & 0x1f)
+	{
+		case 0x10: // S
+		{
+			switch (op & 0x3f)
+			{
+			case 0x11: // MOVF.S / MOVT.S
+				if (((m_fcr31 >> s_fcc_shifts[(op >> 18) & 7]) & 1) == ((op >> 16) & 1))
+					cp1_mov_s(op);
+				return;
+			case 0x12: // MOVZ.S
+				if (m_r[RTREG] == 0)
+					cp1_mov_s(op);
+				return;
+			case 0x13: // MOVN.S
+				if (m_r[RTREG] != 0)
+					cp1_mov_s(op);
+				return;
+			case 0x15: // RECIP.S
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					float32_t const fs = float32_t{ u32(m_f[FSREG]) };
+
+					if (cp1_op(fs))
+					{
+						cp1_set(FDREG, f32_div(i32_to_f32(1), fs).v);
+					}
+				}
+				return;
+			case 0x16: // RSQRT.S
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					float32_t const fs = float32_t{ u32(m_f[FSREG]) };
+
+					if (cp1_op(fs))
+					{
+						cp1_set(FDREG, f32_div(i32_to_f32(1), f32_sqrt(fs)).v);
+					}
+				}
+				return;
+			case 0x30: // C.F.S (false)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+					m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				return;
+			case 0x31: // C.UN.S (unordered)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					// detect unordered
+					f32_eq(float32_t{ u32(m_f[FSREG]) }, float32_t{ u32(m_f[FTREG]) });
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				}
+				return;
+			case 0x32: // C.EQ.S (equal)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f32_eq(float32_t{ u32(m_f[FSREG]) }, float32_t{ u32(m_f[FTREG]) }))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				}
+				return;
+			case 0x33: // C.UEQ.S (unordered equal)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f32_eq(float32_t{ u32(m_f[FSREG]) }, float32_t{ u32(m_f[FTREG]) }) || (softfloat_exceptionFlags & softfloat_flag_invalid))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				}
+				return;
+			case 0x34: // C.OLT.S (less than)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f32_lt(float32_t{ u32(m_f[FSREG]) }, float32_t{ u32(m_f[FTREG]) }))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				}
+				return;
+			case 0x35: // C.ULT.S (unordered less than)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f32_lt(float32_t{ u32(m_f[FSREG]) }, float32_t{ u32(m_f[FTREG]) }) || (softfloat_exceptionFlags & softfloat_flag_invalid))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				}
+				return;
+			case 0x36: // C.OLE.S (less than or equal)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f32_le(float32_t{ u32(m_f[FSREG]) }, float32_t{ u32(m_f[FTREG]) }))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				}
+				return;
+			case 0x37: // C.ULE.S (unordered less than or equal)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f32_le(float32_t{ u32(m_f[FSREG]) }, float32_t{ u32(m_f[FTREG]) }) || (softfloat_exceptionFlags & softfloat_flag_invalid))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				}
+				return;
+
+			case 0x38: // C.SF.S (signalling false)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					// detect unordered
+					f32_eq(float32_t{ u32(m_f[FSREG]) }, float32_t{ u32(m_f[FTREG]) });
+
+					m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+					{
+						m_fcr31 |= FCR31_CV;
+						cpu_exception(EXCEPTION_FPE);
+					}
+				}
+				return;
+			case 0x39: // C.NGLE.S (not greater, less than or equal)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					// detect unordered
+					f32_eq(float32_t{ u32(m_f[FSREG]) }, float32_t{ u32(m_f[FTREG]) });
+
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+					{
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7] | FCR31_CV;
+						cpu_exception(EXCEPTION_FPE);
+					}
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				}
+				return;
+			case 0x3a: // C.SEQ.S (signalling equal)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f32_eq(float32_t{ u32(m_f[FSREG]) }, float32_t{ u32(m_f[FTREG]) }))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+					{
+						m_fcr31 |= FCR31_CV;
+						cpu_exception(EXCEPTION_FPE);
+					}
+				}
+				return;
+			case 0x3b: // C.NGL.S (not greater or less than)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f32_eq(float32_t{ u32(m_f[FSREG]) }, float32_t{ u32(m_f[FTREG]) }) || (softfloat_exceptionFlags & softfloat_flag_invalid))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+					{
+						m_fcr31 |= FCR31_CV;
+						cpu_exception(EXCEPTION_FPE);
+					}
+				}
+				return;
+			case 0x3c: // C.LT.S (less than)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f32_lt(float32_t{ u32(m_f[FSREG]) }, float32_t{ u32(m_f[FTREG]) }))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+					{
+						m_fcr31 |= FCR31_CV;
+						cpu_exception(EXCEPTION_FPE);
+					}
+				}
+				return;
+			case 0x3d: // C.NGE.S (not greater or equal)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f32_lt(float32_t{ u32(m_f[FSREG]) }, float32_t{ u32(m_f[FTREG]) }) || (softfloat_exceptionFlags & softfloat_flag_invalid))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+					{
+						m_fcr31 |= FCR31_CV;
+						cpu_exception(EXCEPTION_FPE);
+					}
+				}
+				return;
+			case 0x3e: // C.LE.S (less than or equal)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f32_le(float32_t{ u32(m_f[FSREG]) }, float32_t{ u32(m_f[FTREG]) }))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+					{
+						m_fcr31 |= FCR31_CV;
+						cpu_exception(EXCEPTION_FPE);
+					}
+				}
+				return;
+			case 0x3f: // C.NGT.S (not greater than)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f32_le(float32_t{ u32(m_f[FSREG]) }, float32_t{ u32(m_f[FTREG]) }) || (softfloat_exceptionFlags & softfloat_flag_invalid))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+					{
+						m_fcr31 |= FCR31_CV;
+						cpu_exception(EXCEPTION_FPE);
+					}
+				}
+				return;
+			}
+		}
+		case 0x11: // D
+			switch (op & 0x3f)
+			{
+			case 0x11: // MOVF.D / MOVT.D
+				if (((m_fcr31 >> s_fcc_shifts[(op >> 18) & 7]) & 1) == ((op >> 16) & 1))
+					cp1_mov_d(op);
+				return;
+			case 0x12: // MOVZ.D
+				if (m_r[RTREG] == 0)
+					cp1_mov_d(op);
+				return;
+			case 0x13: // MOVN.D
+				if (m_r[RTREG] != 0)
+					cp1_mov_d(op);
+				return;
+			case 0x15: // RECIP.D
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					float64_t const fs = float64_t{ m_f[FSREG] };
+
+					if (cp1_op(fs))
+					{
+						cp1_set(FDREG, f64_div(i32_to_f64(1), fs).v);
+					}
+				}
+				return;
+			case 0x16: // RSQRT.D
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					float64_t const fs = float64_t{ m_f[FSREG] };
+
+					if (cp1_op(fs))
+					{
+						cp1_set(FDREG, f64_div(i32_to_f64(1), f64_sqrt(fs)).v);
+					}
+				}
+				return;
+			case 0x30: // C.F.D (false)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+					m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				return;
+			case 0x31: // C.UN.D (unordered)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					// detect unordered
+					f64_eq(float64_t{ m_f[FSREG] }, float64_t{ m_f[FTREG] });
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				}
+				return;
+			case 0x32: // C.EQ.D (equal)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f64_eq(float64_t{ m_f[FSREG] }, float64_t{ m_f[FTREG] }))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				}
+				return;
+			case 0x33: // C.UEQ.D (unordered equal)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f64_eq(float64_t{ m_f[FSREG] }, float64_t{ m_f[FTREG] }) || (softfloat_exceptionFlags & softfloat_flag_invalid))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				}
+				return;
+			case 0x34: // C.OLT.D (less than)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f64_lt(float64_t{ m_f[FSREG] }, float64_t{ m_f[FTREG] }))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				}
+				return;
+			case 0x35: // C.ULT.D (unordered less than)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f64_lt(float64_t{ m_f[FSREG] }, float64_t{ m_f[FTREG] }) || (softfloat_exceptionFlags & softfloat_flag_invalid))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				}
+				return;
+			case 0x36: // C.OLE.D (less than or equal)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f64_le(float64_t{ m_f[FSREG] }, float64_t{ m_f[FTREG] }))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				}
+				return;
+			case 0x37: // C.ULE.D (unordered less than or equal)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f64_le(float64_t{ m_f[FSREG] }, float64_t{ m_f[FTREG] }) || (softfloat_exceptionFlags & softfloat_flag_invalid))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				}
+				return;
+
+			case 0x38: // C.SF.D (signalling false)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					// detect unordered
+					f64_eq(float64_t{ m_f[FSREG] }, float64_t{ m_f[FTREG] });
+
+					m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+					{
+						m_fcr31 |= FCR31_CV;
+						cpu_exception(EXCEPTION_FPE);
+					}
+				}
+				return;
+			case 0x39: // C.NGLE.D (not greater, less than or equal)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					// detect unordered
+					f64_eq(float64_t{ m_f[FSREG] }, float64_t{ m_f[FTREG] });
+
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+					{
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7] | FCR31_CV;
+						cpu_exception(EXCEPTION_FPE);
+					}
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+				}
+				return;
+			case 0x3a: // C.SEQ.D (signalling equal)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f64_eq(float64_t{ m_f[FSREG] }, float64_t{ m_f[FTREG] }))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+					{
+						m_fcr31 |= FCR31_CV;
+						cpu_exception(EXCEPTION_FPE);
+					}
+				}
+				return;
+			case 0x3b: // C.NGL.D (not greater or less than)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f64_eq(float64_t{ m_f[FSREG] }, float64_t{ m_f[FTREG] }) || (softfloat_exceptionFlags & softfloat_flag_invalid))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+					{
+						m_fcr31 |= FCR31_CV;
+						cpu_exception(EXCEPTION_FPE);
+					}
+				}
+				return;
+			case 0x3c: // C.LT.D (less than)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f64_lt(float64_t{ m_f[FSREG] }, float64_t{ m_f[FTREG] }))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+					{
+						m_fcr31 |= FCR31_CV;
+						cpu_exception(EXCEPTION_FPE);
+					}
+				}
+				return;
+			case 0x3d: // C.NGE.D (not greater or equal)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f64_lt(float64_t{ m_f[FSREG] }, float64_t{ m_f[FTREG] }) || (softfloat_exceptionFlags & softfloat_flag_invalid))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+					{
+						m_fcr31 |= FCR31_CV;
+						cpu_exception(EXCEPTION_FPE);
+					}
+				}
+				return;
+			case 0x3e: // C.LE.D (less than or equal)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f64_le(float64_t{ m_f[FSREG] }, float64_t{ m_f[FTREG] }))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+					{
+						m_fcr31 |= FCR31_CV;
+						cpu_exception(EXCEPTION_FPE);
+					}
+				}
+				return;
+			case 0x3f: // C.NGT.D (not greater than)
+				if ((SR & SR_FR) || !(op & ODD_REGS))
+				{
+					if (f64_le(float64_t{ m_f[FSREG] }, float64_t{ m_f[FTREG] }) || (softfloat_exceptionFlags & softfloat_flag_invalid))
+						m_fcr31 |= s_fcc_masks[(op >> 18) & 7];
+					else
+						m_fcr31 &= ~s_fcc_masks[(op >> 18) & 7];
+
+					if (softfloat_exceptionFlags & softfloat_flag_invalid)
+					{
+						m_fcr31 |= FCR31_CV;
+						cpu_exception(EXCEPTION_FPE);
+					}
+				}
+				return;
+			}
+			return;
+		}
+	}
+
+	r4000_base_device::cp1_execute(op);
+}
+
 void r4000_base_device::cp1_execute(u32 const op)
 {
 	if (!(SR & SR_CU1))
@@ -1832,23 +2325,7 @@ void r4000_base_device::cp1_execute(u32 const op)
 				}
 				break;
 			case 0x06: // MOV.S
-				if (SR & SR_FR)
-					m_f[FDREG] = (m_f[FDREG] & ~0xffffffffULL) | u32(m_f[FSREG]);
-				else
-					if (FDREG & 1)
-						if (FSREG & 1)
-							// move high half to high half
-							m_f[FDREG & ~1] = (m_f[FSREG & ~1] & ~0xffffffffULL) | u32(m_f[FDREG & ~1]);
-						else
-							// move low half to high half
-							m_f[FDREG & ~1] = (m_f[FSREG & ~1] << 32) | u32(m_f[FDREG & ~1]);
-					else
-						if (FSREG & 1)
-							// move high half to low half
-							m_f[FDREG & ~1] = (m_f[FDREG & ~1] & ~0xffffffffULL) | (m_f[FSREG & ~1] >> 32);
-						else
-							// move low half to low half
-							m_f[FDREG & ~1] = (m_f[FDREG & ~1] & ~0xffffffffULL) | u32(m_f[FSREG & ~1]);
+				cp1_mov_s(op);
 				break;
 			case 0x07: // NEG.S
 				if ((SR & SR_FR) || !(op & ODD_REGS))
@@ -2228,8 +2705,7 @@ void r4000_base_device::cp1_execute(u32 const op)
 				}
 				break;
 			case 0x06: // MOV.D
-				if ((SR & SR_FR) || !(op & ODD_REGS))
-					m_f[FDREG] = m_f[FSREG];
+				cp1_mov_d(op);
 				break;
 			case 0x07: // NEG.D
 				if ((SR & SR_FR) || !(op & ODD_REGS))
@@ -2626,6 +3102,33 @@ void r4000_base_device::cp1_execute(u32 const op)
 			store<u64>(ADDR(m_r[RSREG], s16(op)), m_f[RTREG]);
 		break;
 	}
+}
+
+void r4000_base_device::cp1_mov_s(u32 const op)
+{
+	if (SR & SR_FR)
+		m_f[FDREG] = (m_f[FDREG] & ~0xffffffffULL) | u32(m_f[FSREG]);
+	else
+		if (FDREG & 1)
+			if (FSREG & 1)
+				// move high half to high half
+				m_f[FDREG & ~1] = (m_f[FSREG & ~1] & ~0xffffffffULL) | u32(m_f[FDREG & ~1]);
+			else
+				// move low half to high half
+				m_f[FDREG & ~1] = (m_f[FSREG & ~1] << 32) | u32(m_f[FDREG & ~1]);
+		else
+			if (FSREG & 1)
+				// move high half to low half
+				m_f[FDREG & ~1] = (m_f[FDREG & ~1] & ~0xffffffffULL) | (m_f[FSREG & ~1] >> 32);
+			else
+				// move low half to low half
+				m_f[FDREG & ~1] = (m_f[FDREG & ~1] & ~0xffffffffULL) | u32(m_f[FSREG & ~1]);
+}
+
+void r4000_base_device::cp1_mov_d(u32 const op)
+{
+	if ((SR & SR_FR) || !(op & ODD_REGS))
+		m_f[FDREG] = m_f[FSREG];
 }
 
 void r4000_base_device::cp1x_execute(u32 const op)

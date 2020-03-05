@@ -8537,6 +8537,27 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="topofun">
+		<description>Fiendish Freddy's Big Top o' Fun</description>
+		<year>1989</year>
+		<publisher>Gray Matter</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="fiendish freddy's big top o' fun disk 1.img" size="737280" crc="1e73d5a4" sha1="71ab79a1799dd0b3f1b6c4392619843e8f188699"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="fiendish freddy's big top o' fun disk 2.img" size="737280" crc="90560866" sha1="1064c340c50d756ca50dff256e44dde404d812c6"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="fiendish freddy's big top o' fun disk 3.img" size="737280" crc="0c44f7ee" sha1="fe5336601a11cbc8464d24aab57f1f4c225feab6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="finalchs">
 		<!-- uses Final ChessCard ISA card, ROM v3.6 (incompatible with older version) -->
 		<!-- installer v2.0, program v1.9 -->

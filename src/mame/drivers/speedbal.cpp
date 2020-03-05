@@ -256,8 +256,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_speedbal )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  256, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  512, 16 )
+	GFXDECODE_ENTRY( "chars", 0, charlayout,  256, 16 )
+	GFXDECODE_ENTRY( "bgtiles", 0, tilelayout,  512, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,   0, 16 )
 GFXDECODE_END
 
@@ -318,29 +318,7 @@ void speedbal_state::init_speedbal()
 
 ***************************************************************************/
 
-ROM_START( speedbal )
-	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64K for code: main */
-	ROM_LOAD( "sb1.bin",  0x0000,  0x8000, CRC(1c242e34) SHA1(8b2e8983e0834c99761ce2b5ea765dba56e77964) )
-	ROM_LOAD( "sb3.bin",  0x8000,  0x8000, CRC(7682326a) SHA1(15a72bf088a9adfaa50c11202b4970e07c309a21) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64K for second CPU: sound */
-	ROM_LOAD( "sb2.bin",  0x0000,  0x8000, CRC(e6a6d9b7) SHA1(35d228d13d4305f606fdd84adad1d6e435f4b7ce) )
-
-	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "sb10.bin", 0x00000, 0x08000, CRC(36dea4bf) SHA1(60095f482af4595a39be5ae6def8cd30298c1ef8) )    /* chars */
-
-	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "sb9.bin",  0x00000, 0x08000, CRC(b567e85e) SHA1(7036792ea70ad48384f348399ed9b136272fedb6) )    /* bg tiles */
-	ROM_LOAD( "sb5.bin",  0x08000, 0x08000, CRC(b0eae4ba) SHA1(baee3fcb1399c56efaa5f97912de324d7b38f286) )
-	ROM_LOAD( "sb8.bin",  0x10000, 0x08000, CRC(d2bfbdb6) SHA1(b552b055450f438729c83337f561d05b6518ae75) )
-	ROM_LOAD( "sb4.bin",  0x18000, 0x08000, CRC(1d23a130) SHA1(aabf7c46f9299ffb8b8ca92839622d000a470a0b) )
-
-	ROM_REGION( 0x10000, "sprites", ROMREGION_INVERT )
-	ROM_LOAD( "sb7.bin",  0x00000, 0x08000, CRC(9f1b33d1) SHA1(1f8be8f8e6a2ee99a7dafeead142ccc629fa792d) )   /* sprites */
-	ROM_LOAD( "sb6.bin",  0x08000, 0x08000, CRC(0e2506eb) SHA1(56f779266b977819063c475b84ca246fc6d8d6a7) )
-ROM_END
-
-ROM_START( speedbala ) // seems to have a more complete hidden test mode, with a 'hard test' that's note enabled in the parent
+ROM_START( speedbal ) // seems to have a more complete hidden test mode, with a 'hard test' that's not enabled in the alternate Speed Ball rom set
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.u14",  0x0000,  0x8000, CRC(94c6f107) SHA1(cd7ada17f0f59623cf615df68c5f8f4077377820) )
 	ROM_LOAD( "3.u15",  0x8000,  0x8000, CRC(a036687f) SHA1(fc2cd683cd6a9a75ab6b188f7b4592b355a569e0) )
@@ -348,39 +326,61 @@ ROM_START( speedbala ) // seems to have a more complete hidden test mode, with a
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "2.u100",  0x0000,  0x8000, CRC(e6a6d9b7) SHA1(35d228d13d4305f606fdd84adad1d6e435f4b7ce) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "10.u50", 0x00000, 0x08000, CRC(36dea4bf) SHA1(60095f482af4595a39be5ae6def8cd30298c1ef8) )    /* chars */
+	ROM_REGION( 0x08000, "chars", 0 )
+	ROM_LOAD( "10.u50", 0x00000, 0x08000, CRC(36dea4bf) SHA1(60095f482af4595a39be5ae6def8cd30298c1ef8) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "9.u45",  0x00000, 0x08000, CRC(b567e85e) SHA1(7036792ea70ad48384f348399ed9b136272fedb6) )    /* bg tiles */
+	ROM_REGION( 0x20000, "bgtiles", 0 )
+	ROM_LOAD( "9.u45",  0x00000, 0x08000, CRC(b567e85e) SHA1(7036792ea70ad48384f348399ed9b136272fedb6) )
 	ROM_LOAD( "5.u46",  0x08000, 0x08000, CRC(b0eae4ba) SHA1(baee3fcb1399c56efaa5f97912de324d7b38f286) )
 	ROM_LOAD( "8.u47",  0x10000, 0x08000, CRC(d2bfbdb6) SHA1(b552b055450f438729c83337f561d05b6518ae75) )
 	ROM_LOAD( "4.u48",  0x18000, 0x08000, CRC(1d23a130) SHA1(aabf7c46f9299ffb8b8ca92839622d000a470a0b) )
 
 	ROM_REGION( 0x10000, "sprites", ROMREGION_INVERT )
-	ROM_LOAD( "7.u67",  0x00000, 0x08000, CRC(9f1b33d1) SHA1(1f8be8f8e6a2ee99a7dafeead142ccc629fa792d) )   /* sprites */
+	ROM_LOAD( "7.u67",  0x00000, 0x08000, CRC(9f1b33d1) SHA1(1f8be8f8e6a2ee99a7dafeead142ccc629fa792d) )
 	ROM_LOAD( "6.u68",  0x08000, 0x08000, CRC(0e2506eb) SHA1(56f779266b977819063c475b84ca246fc6d8d6a7) )
 ROM_END
 
+ROM_START( speedbala )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sb1.bin",  0x0000,  0x8000, CRC(1c242e34) SHA1(8b2e8983e0834c99761ce2b5ea765dba56e77964) )
+	ROM_LOAD( "sb3.bin",  0x8000,  0x8000, CRC(7682326a) SHA1(15a72bf088a9adfaa50c11202b4970e07c309a21) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "sb2.bin",  0x0000,  0x8000, CRC(e6a6d9b7) SHA1(35d228d13d4305f606fdd84adad1d6e435f4b7ce) )
+
+	ROM_REGION( 0x08000, "chars", 0 )
+	ROM_LOAD( "sb10.bin", 0x00000, 0x08000, CRC(36dea4bf) SHA1(60095f482af4595a39be5ae6def8cd30298c1ef8) )
+
+	ROM_REGION( 0x20000, "bgtiles", 0 )
+	ROM_LOAD( "sb9.bin",  0x00000, 0x08000, CRC(b567e85e) SHA1(7036792ea70ad48384f348399ed9b136272fedb6) )
+	ROM_LOAD( "sb5.bin",  0x08000, 0x08000, CRC(b0eae4ba) SHA1(baee3fcb1399c56efaa5f97912de324d7b38f286) )
+	ROM_LOAD( "sb8.bin",  0x10000, 0x08000, CRC(d2bfbdb6) SHA1(b552b055450f438729c83337f561d05b6518ae75) )
+	ROM_LOAD( "sb4.bin",  0x18000, 0x08000, CRC(1d23a130) SHA1(aabf7c46f9299ffb8b8ca92839622d000a470a0b) )
+
+	ROM_REGION( 0x10000, "sprites", ROMREGION_INVERT )
+	ROM_LOAD( "sb7.bin",  0x00000, 0x08000, CRC(9f1b33d1) SHA1(1f8be8f8e6a2ee99a7dafeead142ccc629fa792d) )
+	ROM_LOAD( "sb6.bin",  0x08000, 0x08000, CRC(0e2506eb) SHA1(56f779266b977819063c475b84ca246fc6d8d6a7) )
+ROM_END
+
 ROM_START( musicbal )
-	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64K for code: main - encrypted */
+	ROM_REGION( 0x10000, "maincpu", 0 ) // encrypted
 	ROM_LOAD( "01.bin",  0x0000,  0x8000, CRC(412298a2) SHA1(3c3247b466880cd78dd7f7f73911f475352c15df) )
 	ROM_LOAD( "03.bin",  0x8000,  0x8000, CRC(fdf14446) SHA1(9e52810ebc2b18d83f349fb78884b3c380d93903) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64K for second CPU: sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "02.bin",  0x0000,  0x8000, CRC(b7d3840d) SHA1(825289c3ca51284a47cfc4937a18d098183c396a) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "10.bin",  0x00000, 0x08000, CRC(5afd3c42) SHA1(5b9a44ef03e5519c9601bb636eb26768cf800278) )    /* chars */
+	ROM_REGION( 0x08000, "chars", 0 )
+	ROM_LOAD( "10.bin",  0x00000, 0x08000, CRC(5afd3c42) SHA1(5b9a44ef03e5519c9601bb636eb26768cf800278) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "09.bin",  0x00000, 0x08000, CRC(dcde4233) SHA1(99f204ddc97ee45330ea3cb0bc2971cd95f8e1ac) )    /* bg tiles */
+	ROM_REGION( 0x20000, "bgtiles", 0 )
+	ROM_LOAD( "09.bin",  0x00000, 0x08000, CRC(dcde4233) SHA1(99f204ddc97ee45330ea3cb0bc2971cd95f8e1ac) )
 	ROM_LOAD( "05.bin",  0x08000, 0x08000, CRC(e1eec437) SHA1(ce77f3bb01db80ec69da9639d193d8656f9c6692) )
 	ROM_LOAD( "08.bin",  0x10000, 0x08000, CRC(7e7af52b) SHA1(3bb1c5abfb1fe53f01520e93124708df6750d8b5) )
 	ROM_LOAD( "04.bin",  0x18000, 0x08000, CRC(bf931a33) SHA1(b2ab5c6103af0e0508f08fd58b425e5acfe9ef8a) )
 
 	ROM_REGION( 0x10000, "sprites", ROMREGION_INVERT ) // still contain Speed Ball logos!
-	ROM_LOAD( "07.bin",  0x00000, 0x08000, CRC(310e1e23) SHA1(290f3e1c7b907165fe60a4ebe7a8b04b2451b3b1) )   /* sprites */
+	ROM_LOAD( "07.bin",  0x00000, 0x08000, CRC(310e1e23) SHA1(290f3e1c7b907165fe60a4ebe7a8b04b2451b3b1) )
 	ROM_LOAD( "06.bin",  0x08000, 0x08000, CRC(2e7772f8) SHA1(caded1a72356501282e627e23718c30cb8f09370) )
 ROM_END
 

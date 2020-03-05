@@ -34,7 +34,7 @@ Addons (w/ yellow Smartridges)
 |        | 80-091443(UK)     | V.Smile Smart Keyboard                                                     |
 |   XX   | 80-091444(GE)     | Schreibspaß (52-091444 on back label)                                      |
 |        | 80-091447(SP)     | Teclado Interactivo V.Smile                                                |
-|        | 80-091445(FR)     | V.Smile TIP TAP                                                |
+|   XX   | 80-091445(FR)     | V.Smile Clavier Tip Tap                                                    |
 +========+===================+============================================================================+
 |        | 80-03600(US)      | V.Smile PC Pal Island                                                      |
 +========+===================+============================================================================+
@@ -46,7 +46,7 @@ Addons (w/ yellow Smartridges)
 |   XX   | 80-067000(US)     | V.Smile Art Studio                                                         |
 |        | 80-067003(UK)     | V.Smile Art Studio                                                         |
 |   XX   | 80-067004(GE)     | V.Smile Zeichenatelier (Magic Malboard)                                    |
-|        | 80-067005(FR)     | V.Smile Studio De Dessin                                                   |
+|   XX   | 80-067005(FR)     | V.Smile Studio De Dessin                                                   |
 |        |          (DK)     | V.Smile Tegnestudie                                                        |
 |   XX   | 80-067021(SE)     | V.Smile Tecknarstudio                                                      |
 |        | 80-067022(SP)     | V.Smile Estudio de Arte (orange)                                           |
@@ -298,7 +298,7 @@ Regular game cartridges
 |   XX   | 80-092244-204(GE) | Cinderella - Lernen im Märchenland (2008) (52-092244-205(GER) on back label)                   |
 |   XX   | 80-092245(FR)     | Cendrillon - Le rêve enchanté de Cendrillon                                                    |
 |   XX   | 80-092245-105(FR) | Cendrillon - Le rêve enchanté de Cendrillon                                                    |
-|        | 80-092245-205(FR) | Cendrillon - Le reve enchante de Cendrillon                                                    |
+|   XX   | 80-092245-205(FR) | Cendrillon - Le rêve enchanté de Cendrillon                                                    |
 |        | 80-092246(PT)     | Cinderela - Os Sonhos Magicos da Cinderela (Cart#92256)                                        |
 |   XX   | 80-092247(SP)     | La Cenicienta - Los sueños mágicos de Cenicienta (non motion#, but V.Motion in spanish catalog)|
 |   XX   | 80-092247-122(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (white/light pink cart label background)      |
@@ -326,8 +326,8 @@ Regular game cartridges
 |   XX   | 80-092285-105(FR) | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano                                   |
 |        | 80-092285-1?5(FR) | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano (NTSC French-Canadian)            |
 |        | 80-092286(PT)     | Dora - em busca das pecas perdidas (cart# 92296)                                               |
-|   XX   | 80-092287-222(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora (purple, no # on front label, 52-092287-222(SP) on back label)
 |        | 80-092287-122(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora                                         |
+|   XX   | 80-092287-222(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora (purple, no # on front label, 52-092287-222(SP) on back label)
 +========+===================+================================================================================================+
 |   XX   | 80-092300(US)     | Bob the Builder - Bob's Busy Day                                                               |
 |   XX   | 80-092303(UK)     | Bob the Builder - Bob's Busy Day                                                               |
@@ -454,7 +454,7 @@ Regular game cartridges
 |        | 80-092620(US)     | Lil' Bratz - Friends, Fashion and Fun                                                          |
 |        | 80-092623(UK)     | Lil' Bratz - Friends, Fashion and Fun                                                          |
 |   XX   | 80-092627(SP)     | Lil' Bratz - Amigos, Moda y Diversión                                                          |
-|        | 80-092625(FR)     | Lil' Bratz - Complices, Cools et Class'                                                          |
+|        | 80-092625(FR)     | Lil' Bratz - Complices, Cools et Class'                                                        |
 +========+===================+================================================================================================+
 |   XX   | 80-092640(US)     | Superman - The Greatest Hero                                                                   |
 |   XX   | 80-092642(NL)     | Superman - De Grootste Held                                                                    |
@@ -510,7 +510,7 @@ Regular game cartridges
 |   XX   | 80-092862(NL)     | Shrek de Derde - Arthurs Schooldag Avontuur                                                    |
 |   XX   | 80-092863(UK)     | Shrek the Third: Arthur's School Day Adventure                                                 |
 |   XX   | 80-092864(GE)     | Shrek der Dritte - Ein Spannender Schultag                                                     |
-|   XX   | 80-092865(FR)     | Shrek Le Troisieme - L'aventure d'Arthur                                                          |
+|   XX   | 80-092865(FR)     | Shrek Le Troisieme - L'aventure d'Arthur                                                       |
 |        | 80-092867(SP)     | Shrek Tercero - En Busca de Arturo                                                             |
 +========+===================+================================================================================================+
 |        | 80-092880(US)     | Ratatouille - Remy's New Recipes                                                               |
@@ -530,7 +530,7 @@ Regular game cartridges
 |   XX   | 80-092920(US)     | Cranium - Partyland Park                                                                       |
 |        | 80-092922(UK)     | Cranium - Partyland Park                                                                       |
 |   XX   | 80-092924(GE)     | Cranium - Freizeit Park                                                                        |
-|        | 80-092925(FR)     | Cranium - Le Parc D'attractions                                                                |
+|   XX   | 80-092925(FR)     | Cranium - Le Parc D'attractions                                                                |
 |   XX   | 80-092927(SP)     | Cranium - Parque de atracciones de Cranium (52-092927(SP) on back label)                       |
 +========+===================+================================================================================================+
 |        | 80-092940(US)     | <Unknown> (should be Mickey Mouse Clubhouse, 80-084180 exists in V.Link database)              |
@@ -1390,6 +1390,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" />
 			<dataarea name="rom" size="8388608">
 				<rom name="092245-105 - Cendrillon (FR).bin" size="8388608" crc="b199c517" sha1="7ae42f873aa0c533c716e6e94d00cbc74002b002" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="cinderlafr205" cloneof="cinderla" supported="no">
+		<description>Walt Disney Cendrillon - Le rêve enchanté de Cendrillon (France, Rev. 205)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092245-205(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092245-205 - Cendrillon (FR).bin" size="8388608" crc="d15de2f6" sha1="65b9ea951a7dae2b09b38cd29c1ac18ee5624047" />
 			</dataarea>
 		</part>
 	</software>
@@ -2618,6 +2634,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="80-092924 - Cranium - Freizeit Park - Ein Jahrmarkt voller Spiel- und Lernspass (GER).bin" size="8388608" crc="ccaa8438" sha1="33e6c815d669888bdf6d43a4aade97e8a9e693ea" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="partyprkf" cloneof="partyprk" supported="no">
+		<description>Cranium - Le Parc D'Attractions (France)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092925(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092925 - Cranium Le Parc D Attractions (FR).bin" size="8388608" crc="d805b153" sha1="c17c4eac3e6b2ed974dc6793104fd9e6f3e0243c" />
 			</dataarea>
 		</part>
 	</software>
@@ -3950,6 +3982,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<!-- No inputs, uses a keyboard controller -->
+	<software name="smartkbf" supported="no"> <!-- Will be clone of "smartkb" once found and dumped. -->
+		<description>V.Smile Clavier Tip Tap (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-091445(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="091445 - Vsmile Tip Tap (FR).bin" size="8388608" crc="93a8cc75" sha1="3fc1e93f18782b3f38ec7d97b3c70f8a9358230d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Crashes MAME -->
 	<software name="techart" supported="no">
 		<description>V.Smile Art Studio (USA)</description>
@@ -3985,6 +4033,24 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u3" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="4194304">
 				<rom name="GER-509.u3" size="4194304" crc="ae5f4fe2" sha1="1c5428da7464182e6ee0585d1ebc211f91667238" />
+			</dataarea>
+			<dataarea name="nvram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="techartf" cloneof="techart" supported="no">
+		<description>V.Smile Studio De Dessin (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-067005(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_nvram" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u2" value="U2" />
+			<feature name="u3" value="" />
+			<dataarea name="rom" size="4194304">
+				<rom name="67005 - Vsmile Studio De Dessin (FR).bin" size="4194304" crc="fec3361e" sha1="42ae399bc442bb9dbeb4b9aa5fe9d1e721664849" />
 			</dataarea>
 			<dataarea name="nvram" size="131072">
 			</dataarea>

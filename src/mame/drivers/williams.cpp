@@ -765,6 +765,22 @@ void williams2_state::sound_map(address_map &map)
  *
  *************************************/
 
+static INPUT_PORTS_START( monitor_controls )
+	PORT_START("REDG")
+	PORT_ADJUSTER( 85, "Monitor Gain Red" ) PORT_MINMAX(0, 250) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 0)
+	PORT_START("GREENG")
+	PORT_ADJUSTER( 135, "Monitor Gain Green" ) PORT_MINMAX(0, 250) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 1)
+	PORT_START("BLUEG")
+	PORT_ADJUSTER( 76, "Monitor Gain Blue" ) PORT_MINMAX(0, 250) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 2)
+	PORT_START("REDO")
+	PORT_ADJUSTER( 100, "Monitor Offset Red" ) PORT_MINMAX(0, 200) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 3)
+	PORT_START("GREENO")
+	PORT_ADJUSTER( 100, "Monitor Offset Green" ) PORT_MINMAX(0, 200) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 4)
+	PORT_START("BLUEO")
+	PORT_ADJUSTER( 100, "Monitor Offset Blue" ) PORT_MINMAX(0, 200) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 5)
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( defender )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Fire")
@@ -1350,6 +1366,8 @@ static INPUT_PORTS_START( mysticm )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_INCLUDE(monitor_controls)
 INPUT_PORTS_END
 
 
@@ -1392,6 +1410,8 @@ static INPUT_PORTS_START( tshoot )
 
 	PORT_START("GUNY")
 	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_X ) PORT_MINMAX(0,0x3f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+
+	PORT_INCLUDE(monitor_controls)
 INPUT_PORTS_END
 
 
@@ -1432,6 +1452,8 @@ static INPUT_PORTS_START( inferno )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_PLAYER(2)
+
+	PORT_INCLUDE(monitor_controls)
 INPUT_PORTS_END
 
 
@@ -1466,6 +1488,8 @@ static INPUT_PORTS_START( joust2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Flap") PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_INCLUDE(monitor_controls)
 INPUT_PORTS_END
 
 
@@ -1831,6 +1855,9 @@ void mysticm_state::mysticm(machine_config &config)
 {
 	williams2_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mysticm_state::d000_map);
+
+	m_screen->set_raw(MASTER_CLOCK*2/3, 512, 8, 284, 256, 8, 248);
+	m_screen->set_screen_update(FUNC(mysticm_state::screen_update));
 
 	/* pia */
 	m_pia[0]->irqa_handler().set_inputline("maincpu", M6809_FIRQ_LINE);

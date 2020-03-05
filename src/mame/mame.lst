@@ -12287,6 +12287,7 @@ drgnmst2                        // (c) 1994
 
 @source:dribling.cpp
 dribling                        // (c) 1983 Model Racing
+driblinga                       // (c) 1983 Model Racing
 driblingbr                      // bootleg
 driblingo                       // (c) 1983 Olympia
 
@@ -18683,6 +18684,10 @@ kontest                         // GX800 (c) 198? (Japan)
 
 @source:kopunch.cpp
 kopunch                         // 834-0103 (c) 1981 Sega
+
+@source:korgds8.cpp
+ds8                             //
+korg707                         //
 
 @source:korgdss1.cpp
 dss1                            //
@@ -40988,6 +40993,7 @@ cv_11                           //
 cv_13                           //
 cv_14                           //
 cv_20h                          //
+cv_d52                          //
 jy_03                           //
 jy_11                           //
 jy_12                           //
