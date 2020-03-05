@@ -103,6 +103,7 @@ public:
 	{ }
 
 	void nes_vt_base(machine_config& config);
+	void nes_vt_base_pal(machine_config& config);
 
 	void nes_vt(machine_config& config);
 
@@ -429,8 +430,6 @@ public:
 		m_ablpinb_in0_val(0),
 		m_plunger(*this, "PLUNGER")
 	{ }
-
-	void nes_vt_ablpinb(machine_config& config);
 
 protected:
 	virtual void machine_start() override;
@@ -1934,7 +1933,7 @@ void nes_vt_state::nes_vt_base(machine_config &config)
 	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void nes_vt_ablpinb_state::nes_vt_ablpinb(machine_config &config)
+void nes_vt_state::nes_vt_base_pal(machine_config &config)
 {
 	nes_vt_base(config);
 
@@ -1953,6 +1952,8 @@ void nes_vt_ablpinb_state::nes_vt_ablpinb(machine_config &config)
 	m_screen->set_size(32 * 8, 312);
 	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
 }
+
+
 
 void nes_vt_sudoku_state::nes_vt_sudoku(machine_config &config)
 {
@@ -2726,7 +2727,7 @@ CONS( 200?, vtboxing,     0,  0,  nes_vt, nes_vt, nes_vt_state, empty_init, "VRT
 
 // Menu system clearly started off as 'vtpinball'  Many elements seem similar to Family Pinball for the Famicom.
 // 050329 (29th March 2005) date on PCB
-CONS( 2005, ablpinb, 0,  0,  nes_vt_ablpinb,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ablpinb, 0,  0,  nes_vt_base_pal,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 
 // Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo.  Box says "Plug and Play Sudoku"
@@ -2752,8 +2753,8 @@ CONS( 200?, sudopptv,  0, 0,  nes_vt,        nes_vt, nes_vt_waixing_state, empty
 
 CONS( 200?, megapad,   0, 0,  nes_vt,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
 
- // needs PCM samples, all games appear playable but has 'hard, middle, easy' 3 pos slider that needs emulating, and x + y buttons that also need adding (assuming they're not hardware turbo buttons)
-CONS( 200?, timetp36,  0, 0,  nes_vt,        timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+ // needs PCM samples, Y button is not mapped (not used by any of the games?)
+CONS( 200?, timetp36,  0, 0,  nes_vt_base_pal,        timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // this is VT09 based
 // it boots, most games correct, but palette issues in some games still (usually they appear greyscale)
