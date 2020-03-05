@@ -2126,6 +2126,18 @@
 		</part>
 	</software>
 
+	<software name="puckman">
+		<description>Puck Man</description>
+		<year>1981</year>
+		<publisher>Star Craft</publisher>
+		<info name="usage" value="*200.1200R" />
+		<part name="cass" interface="apple2_cass">
+			<dataarea name="cass" size="13283372">
+				<rom name="puck man.wav" size="13283372" crc="f94b379f" sha1="dd3e8102aef02adcd01cf84f1738297fb8909a71"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="quizbasb">
 		<description>Quiz Baseball</description>
 		<year>1980</year>
