@@ -603,15 +603,9 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 				if (x0 & 1)
 					palette >>= 8;
 
-				flip_x = 0;
-				yflipmask = 0;
+				flip_x = palette & 0x0010;
+				yflipmask = (palette & 0x0020) ? tile_h - 1 : 0;
 				palette_offset = (palette & 0x0f) << 4;
-
-				//tileattr &= ~0x000c;
-				//tileattr |= (palette >> 2) & 0x000c;    // flip
-
-				//tileattr &= ~0x0f00;
-				//tileattr |= (palette << 8) & 0x0f00;    // palette
 
 				//tilectrl &= ~0x0100;
 				//tilectrl |= (palette << 2) & 0x0100;    // blend
