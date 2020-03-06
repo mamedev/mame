@@ -14,8 +14,10 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/am9513.h"
 #include "machine/am9517a.h"
+#include "machine/com8116.h"
 #include "machine/i8255.h"
 #include "machine/input_merger.h"
+#include "machine/scn_pci.h"
 #include "video/i8275.h"
 #include "emupal.h"
 #include "screen.h"
@@ -71,10 +73,13 @@ void unistar_state::unistar_io(address_map &map)
 {
 	//map.unmap_value_high();
 	map(0x00, 0x0f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x80, 0x83).rw("pcia", FUNC(scn2651_device::read), FUNC(scn2651_device::write));
 	map(0x84, 0x84).portr("CONFIG");
 	map(0x8c, 0x8d).rw("stc", FUNC(am9513_device::read8), FUNC(am9513_device::write8));
-	map(0x94, 0x97).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x90, 0x93).rw("pcib", FUNC(scn2651_device::read), FUNC(scn2651_device::write));
+	map(0x94, 0x97).rw("pio", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x98, 0x99).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write));
+	map(0x9c, 0x9c).w("dbrg", FUNC(k1135ab_device::str_stt_w));
 	// ports used: 00,02,03(W),08(RW),09,0A,0B,0D,0F(W),80,81(R),82,83(W),84(R),8C,8D(W),94(R),97,98(W),99(RW)
 	// if nonzero returned from port 94, it goes into test mode.
 }
@@ -129,6 +134,7 @@ void unistar_state::unistar(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &unistar_state::unistar_mem);
 	m_maincpu->set_addrmap(AS_IO, &unistar_state::unistar_io);
 
+	INPUT_MERGER_ANY_HIGH(config, "rst65").output_handler().set_inputline(m_maincpu, I8085_RST65_LINE);
 	INPUT_MERGER_ANY_HIGH(config, "rst75").output_handler().set_inputline(m_maincpu, I8085_RST75_LINE);
 
 	am9517a_device &dmac(AM9517A(config, "dmac", 20_MHz_XTAL / 4)); // Intel P8237A-5
@@ -143,7 +149,20 @@ void unistar_state::unistar(machine_config &config)
 	stc.fout_cb().set("stc", FUNC(am9513_device::source1_w));
 	// TODO: figure out what OUT1-OUT4 should do (timer 5 is unused)
 
-	I8255A(config, "ppi");
+	scn2651_device &pcia(SCN2651(config, "pcia", 20_MHz_XTAL / 4));
+	pcia.rxrdy_handler().set("rst65", FUNC(input_merger_device::in_w<0>));
+	pcia.txrdy_handler().set("rst65", FUNC(input_merger_device::in_w<1>));
+
+	scn2651_device &pcib(SCN2651(config, "pcib", 20_MHz_XTAL / 4));
+	pcib.rxrdy_handler().set_inputline(m_maincpu, I8085_RST55_LINE);
+
+	k1135ab_device &dbrg(K1135AB(config, "dbrg", 5.0688_MHz_XTAL));
+	dbrg.fr_handler().set("pcia", FUNC(scn2651_device::rxc_w));
+	dbrg.fr_handler().append("pcia", FUNC(scn2651_device::txc_w));
+	dbrg.ft_handler().set("pcib", FUNC(scn2651_device::rxc_w));
+	dbrg.ft_handler().append("pcib", FUNC(scn2651_device::txc_w));
+
+	I8255A(config, "pio");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
