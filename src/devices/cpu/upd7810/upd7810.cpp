@@ -1327,10 +1327,10 @@ void upd7810_device::handle_timers(int cycles)
 		switch (TMM & 0x60) /* timer 1 clock source */
 		{
 		case 0x00:  /* clock divided by 12 (machine cycles divided by 4) */
-			upd7810_handle_timer1(cycles, 12/3);
+			upd7810_handle_timer1(cycles, 4);
 			break;
 		case 0x20:  /* clock divided by 384 (machine cycles divided by 128) */
-			upd7810_handle_timer1(cycles, 384/3);
+			upd7810_handle_timer1(cycles, 128);
 			break;
 		case 0x40:  /* external signal at TI */
 			break;
