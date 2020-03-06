@@ -1306,11 +1306,11 @@ void upd7810_device::handle_timers(int cycles)
 	{
 		switch (TMM & 0x0c) /* timer 0 clock source */
 		{
-		case 0x00:  /* clock divided by 12 */
-			upd7810_handle_timer0(cycles, 12);
+		case 0x00:  /* clock divided by 12 (machine cycles divided by 4) */
+			upd7810_handle_timer0(cycles, 4);
 			break;
-		case 0x04:  /* clock divided by 384 */
-			upd7810_handle_timer0(cycles, 384);
+		case 0x04:  /* clock divided by 384 (machine cycles divided by 128) */
+			upd7810_handle_timer0(cycles, 128);
 			break;
 		case 0x08:  /* external signal at TI */
 			break;
@@ -1326,11 +1326,11 @@ void upd7810_device::handle_timers(int cycles)
 	{
 		switch (TMM & 0x60) /* timer 1 clock source */
 		{
-		case 0x00:  /* clock divided by 12 */
-			upd7810_handle_timer1(cycles, 12);
+		case 0x00:  /* clock divided by 12 (machine cycles divided by 4) */
+			upd7810_handle_timer1(cycles, 12/3);
 			break;
-		case 0x20:  /* clock divided by 384 */
-			upd7810_handle_timer1(cycles, 384);
+		case 0x20:  /* clock divided by 384 (machine cycles divided by 128) */
+			upd7810_handle_timer1(cycles, 384/3);
 			break;
 		case 0x40:  /* external signal at TI */
 			break;
@@ -1344,11 +1344,11 @@ void upd7810_device::handle_timers(int cycles)
 	if (0x02 == (TMM & 0x03))
 	{
 		OVCF += cycles;
-		while (OVCF >= 3)
+		while (OVCF >= 1)
 		{
 			TO ^= 1;
 			m_to_func(TO);
-			OVCF -= 3;
+			OVCF -= 1;
 		}
 	}
 
@@ -1361,9 +1361,9 @@ void upd7810_device::handle_timers(int cycles)
 	{
 		OVCE += cycles;
 		/* clock divided by 12 */
-		while (OVCE >= 12)
+		while (OVCE >= 12/3)
 		{
-			OVCE -= 12;
+			OVCE -= 12/3;
 			ECNT++;
 			/* Interrupt Control Circuit */
 			if (ETM0 == ECNT)
@@ -1412,9 +1412,9 @@ void upd7810_device::handle_timers(int cycles)
 		break;
 	case 0x01:      /* internal clock divided by 384 */
 		OVCS += cycles;
-		while (OVCS >= 384)
+		while (OVCS >= 384/3)
 		{
-			OVCS -= 384;
+			OVCS -= 384/3;
 			if (0 == (EDGES ^= 1))
 				upd7810_sio_input();
 			else
@@ -1423,9 +1423,9 @@ void upd7810_device::handle_timers(int cycles)
 		break;
 	case 0x02:      /* internal clock divided by 24 */
 		OVCS += cycles;
-		while (OVCS >= 24)
+		while (OVCS >= 24/3)
 		{
-			OVCS -= 24;
+			OVCS -= 24/3;
 			if (0 == (EDGES ^= 1))
 				upd7810_sio_input();
 			else
@@ -1441,9 +1441,9 @@ void upd7810_device::handle_timers(int cycles)
 		/* reset A/D converter */
 		m_adcnt = 0;
 		if (ANM & 0x10)
-			m_adtot = 144;
+			m_adtot = 144/3;
 		else
-			m_adtot = 192;
+			m_adtot = 192/3;
 		m_adout = 0;
 		m_shdone = 0;
 		if (ANM & 0x01)
@@ -1548,7 +1548,7 @@ void upd7801_device::handle_timers(int cycles)
 			m_to_func(TO);
 
 			/* Reload the timer */
-			m_ovc0 = 16 * ( TM0 + ( ( TM1 & 0x0f ) << 8 ) );
+			m_ovc0 = 8 * ( TM0 + ( ( TM1 & 0x0f ) << 8 ) );
 		}
 	}
 }
