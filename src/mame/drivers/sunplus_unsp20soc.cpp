@@ -1144,6 +1144,16 @@ ROM_START( smartfp )
 	ROM_LOAD16_WORD_SWAP("smartfitpark.bin", 0x000000, 0x800000, CRC(ada84507) SHA1(a3a80bf71fae62ebcbf939166a51d29c24504428))
 ROM_END
 
+ROM_START( gormiti )
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("gormiti.bin", 0x000000, 0x800000, CRC(71b82d41) SHA1(169b35dc7bdd05b7b32176ddf901ace27736cb86) )
+ROM_END
+
+
+
 ROM_START( paccon )
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
@@ -1387,6 +1397,10 @@ ROM_END
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
 CONS(2009, smartfp,   0, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(200?, tkmag220,  0, 0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// die on this one is 'GCM420'
+CONS(2013, gormiti,   0, 0, base, smartfp,  gcm394_game_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
 
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
 

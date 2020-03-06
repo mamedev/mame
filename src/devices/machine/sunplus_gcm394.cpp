@@ -152,6 +152,7 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 
 	address_space& mem = this->space(AS_PROGRAM);
 	source &= 0x0fffffff;
+	length &= 0x0fffffff; // gormiti
 
 	for (int i = 0; i < length; i++)
 	{
