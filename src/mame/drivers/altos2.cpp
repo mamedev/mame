@@ -69,12 +69,12 @@ void altos2_state::machine_reset()
 
 READ8_MEMBER(altos2_state::vpac_r)
 {
-	return m_vpac->read(space, offset >> 1);
+	return m_vpac->read(offset >> 1);
 }
 
 WRITE8_MEMBER(altos2_state::vpac_w)
 {
-	m_vpac->write(space, offset >> 1, data);
+	m_vpac->write(offset >> 1, data);
 }
 
 WRITE8_MEMBER(altos2_state::video_mode_w)
