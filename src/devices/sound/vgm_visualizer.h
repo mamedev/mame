@@ -70,8 +70,8 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	double m_audio_buf[2][2][FFT_LENGTH];
-	double m_fft_buf[2][FFT_LENGTH];
+	float m_audio_buf[2][2][FFT_LENGTH];
+	float m_fft_buf[2][FFT_LENGTH];
 	int m_current_rate;
 	int m_audio_fill_index;
 	int m_audio_frames_available;
@@ -80,10 +80,10 @@ protected:
 
 	int m_waterfall_length;
 	int m_waterfall_buf[1024][256];
-	double m_curr_levels[2];
-	double m_curr_peaks[2];
-	double m_window[FFT_LENGTH];
-	double m_power;
+	float m_curr_levels[2];
+	float m_curr_peaks[2];
+	float m_window[FFT_LENGTH];
+	float m_power;
 };
 
 #endif // MAME_SOUND_VGMVIZ_H

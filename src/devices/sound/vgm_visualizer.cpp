@@ -76,15 +76,15 @@ void vgmviz_device::device_start()
 
 void vgmviz_device::fill_window()
 {
-	double window_pos_delta = (3.14159265358979 * 2) / FFT_LENGTH;
-	double power = 0;
+	float window_pos_delta = (3.14159265358979f * 2) / FFT_LENGTH;
+	float power = 0;
 	for (int i = 0; i < (FFT_LENGTH / 2) + 1; i++)
 	{
-		double window_pos = i * window_pos_delta;
-		m_window[i] = 0.53836 - cos(window_pos) * 0.46164;
+		float window_pos = i * window_pos_delta;
+		m_window[i] = 0.53836f - cosf(window_pos) * 0.46164f;
 		power += m_window[i];
 	}
-	power = 0.5 / (power * 2.0 - m_window[FFT_LENGTH / 2]);
+	power = 0.5f / (power * 2.0f - m_window[FFT_LENGTH / 2]);
 	for (int i = 0; i < (FFT_LENGTH / 2) + 1; i++)
 	{
 		m_window[i] *= power;
@@ -99,11 +99,11 @@ void vgmviz_device::fill_window()
 
 void vgmviz_device::apply_window(uint32_t buf_index)
 {
-	double *audio_l = m_audio_buf[buf_index][0];
-	double *audio_r = m_audio_buf[buf_index][1];
-	double *buf_l = m_fft_buf[0];
-	double *buf_r = m_fft_buf[1];
-	double *window = m_window;
+	float *audio_l = m_audio_buf[buf_index][0];
+	float *audio_r = m_audio_buf[buf_index][1];
+	float *buf_l = m_fft_buf[0];
+	float *buf_r = m_fft_buf[1];
+	float *window = m_window;
 	for (int i = 0; i < (FFT_LENGTH / 2) + 1; i++)
 	{
 		*buf_l++ = *audio_l++ * *window;
@@ -133,7 +133,7 @@ void vgmviz_device::apply_fft()
 		for (int chan = 0; chan < 2; chan++)
 		{
 			WDL_FFT_COMPLEX* cmpl = (WDL_FFT_COMPLEX*)m_fft_buf[chan] + i;
-			cmpl->re = sqrt(cmpl->re * cmpl->re + cmpl->im * cmpl->im);
+			cmpl->re = sqrtf(cmpl->re * cmpl->re + cmpl->im * cmpl->im);
 		}
 	}
 }
@@ -156,13 +156,13 @@ void vgmviz_device::apply_waterfall()
 		{
 			continue;
 		}
-		double val = 0.0;
+		float val = 0.0f;
 		for (int i = 0; i < bar_step; i++)
 		{
 			int permuted = WDL_fft_permute(FFT_LENGTH / 2, (bar * bar_step) + i);
 			val = std::max<WDL_FFT_REAL>(bins[0][permuted].re + bins[1][permuted].re, val);
 		}
-		int level = (int)(log(val * 32768.0) * 31.0);
+		int level = int(logf(val * 32768.0f) * 31.0f);
 		m_waterfall_buf[m_waterfall_length % (FFT_LENGTH / 2 + 16)][255 - bar] = (level < 0) ? 0 : (level > 255 ? 255 : level);
 	}
 	m_waterfall_length++;
@@ -177,15 +177,15 @@ void vgmviz_device::find_levels()
 {
 	if (m_audio_frames_available < 2 || m_current_rate == 0)
 	{
-		m_curr_levels[0] = 0.0;
-		m_curr_levels[1] = 0.0;
-		m_curr_peaks[0] = 0.0;
-		m_curr_peaks[1] = 0.0;
+		m_curr_levels[0] = 0.0f;
+		m_curr_levels[1] = 0.0f;
+		m_curr_peaks[0] = 0.0f;
+		m_curr_peaks[1] = 0.0f;
 		return;
 	}
 
-	m_curr_levels[0] = 0.0;
-	m_curr_levels[1] = 0.0;
+	m_curr_levels[0] = 0.0f;
+	m_curr_levels[1] = 0.0f;
 
 	int read_index = m_audio_fill_index;
 	const int samples_needed = m_current_rate / 60;
@@ -229,17 +229,17 @@ void vgmviz_device::device_reset()
 {
 	for (int i = 0; i < 2; i++)
 	{
-		memset(m_audio_buf[i][0], 0, sizeof(double) * FFT_LENGTH);
-		memset(m_audio_buf[i][1], 0, sizeof(double) * FFT_LENGTH);
+		memset(m_audio_buf[i][0], 0, sizeof(float) * FFT_LENGTH);
+		memset(m_audio_buf[i][1], 0, sizeof(float) * FFT_LENGTH);
 		m_audio_count[i] = 0;
 	}
-	memset(m_fft_buf[0], 0, sizeof(double) * FFT_LENGTH);
-	memset(m_fft_buf[1], 0, sizeof(double) * FFT_LENGTH);
+	memset(m_fft_buf[0], 0, sizeof(float) * FFT_LENGTH);
+	memset(m_fft_buf[1], 0, sizeof(float) * FFT_LENGTH);
 	m_current_rate = 0;
 	m_audio_fill_index = 0;
 	m_audio_frames_available = 0;
-	memset(m_curr_levels, 0, sizeof(double) * 2);
-	memset(m_curr_peaks, 0, sizeof(double) * 2);
+	memset(m_curr_levels, 0, sizeof(float) * 2);
+	memset(m_curr_peaks, 0, sizeof(float) * 2);
 
 	m_waterfall_length = 0;
 	for (int i = 0; i < 1024; i++)
@@ -275,7 +275,7 @@ void vgmviz_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		for (int i = 0; i < m_outputs; i++)
 		{
-			m_audio_buf[m_audio_fill_index][i][m_audio_count[m_audio_fill_index]] = (outputs[i][pos] + 32768.0) / 65336.0;
+			m_audio_buf[m_audio_fill_index][i][m_audio_count[m_audio_fill_index]] = (outputs[i][pos] + 32768.0f) / 65336.0f;
 		}
 
 		m_audio_count[m_audio_fill_index]++;
@@ -427,8 +427,8 @@ uint32_t vgmviz_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	const int black_idx = (512 + FFT_LENGTH / 2);
 	for (int chan = 0; chan < 2; chan++)
 	{
-		int level = (int)(m_curr_levels[chan] * 255.0);
-		int peak = (int)(m_curr_peaks[chan] * 255.0);
+		int level = int(m_curr_levels[chan] * 255.0f);
+		int peak = int(m_curr_peaks[chan] * 255.0f);
 		for (int y = 0; y < 512; y++)
 		{
 			int bar_y = 255 - (y >> 1);
@@ -440,7 +440,7 @@ uint32_t vgmviz_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			}
 		}
 		chan_x += 8;
-		m_curr_peaks[chan] *= 0.99;
+		m_curr_peaks[chan] *= 0.99f;
 	}
 
 	int total_bars = FFT_LENGTH / 2;
@@ -452,8 +452,8 @@ uint32_t vgmviz_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			continue;
 		}
 		int permuted = WDL_fft_permute(FFT_LENGTH/2, bar);
-		double val = (bins[0][permuted].re + bins[1][permuted].re) * 0.5;
-		int level = (int)(log(val * 32768.0) * 63.0);
+		float val = (bins[0][permuted].re + bins[1][permuted].re) * 0.5f;
+		int level = int(logf(val * 32768.0f) * 63.0f);
 		for (int y = 0; y < 512; y++)
 		{
 			int bar_y = 511 - y;
