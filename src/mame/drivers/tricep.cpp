@@ -16,7 +16,7 @@
 #include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/mc2661.h"
+#include "machine/scn_pci.h"
 
 class tricep_state : public driver_device
 {
@@ -40,7 +40,7 @@ private:
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
-	required_device_array<mc2661_device, 4> m_usart;
+	required_device_array<scn2651_device, 4> m_usart;
 	required_shared_ptr<uint16_t> m_p_ram;
 
 	uint8_t m_mux;
@@ -106,20 +106,20 @@ void tricep_state::tricep(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tricep_state::tricep_mem);
 	// TODO: MC68451 MMU
 
-	MC2661(config, m_usart[0], 5.0688_MHz_XTAL);
+	SCN2651(config, m_usart[0], 5.0688_MHz_XTAL);
 	m_usart[0]->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_usart[0]->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_usart[0]->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	MC2661(config, m_usart[1], 5.0688_MHz_XTAL);
-	MC2661(config, m_usart[2], 5.0688_MHz_XTAL);
-	MC2661(config, m_usart[3], 5.0688_MHz_XTAL);
+	SCN2651(config, m_usart[1], 5.0688_MHz_XTAL);
+	SCN2651(config, m_usart[2], 5.0688_MHz_XTAL);
+	SCN2651(config, m_usart[3], 5.0688_MHz_XTAL);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set(m_usart[0], FUNC(mc2661_device::rx_w));
-	rs232.dsr_handler().set(m_usart[0], FUNC(mc2661_device::dsr_w));
-	rs232.dcd_handler().set(m_usart[0], FUNC(mc2661_device::dcd_w));
-	rs232.cts_handler().set(m_usart[0], FUNC(mc2661_device::cts_w));
+	rs232.rxd_handler().set(m_usart[0], FUNC(scn2651_device::rxd_w));
+	rs232.dsr_handler().set(m_usart[0], FUNC(scn2651_device::dsr_w));
+	rs232.dcd_handler().set(m_usart[0], FUNC(scn2651_device::dcd_w));
+	rs232.cts_handler().set(m_usart[0], FUNC(scn2651_device::cts_w));
 	rs232.set_option_device_input_defaults("terminal", terminal_defaults);
 }
 

@@ -30,9 +30,9 @@
 #include "machine/am9517a.h"
 #include "machine/i8255.h"
 #include "machine/im6402.h"
-#include "machine/mc2661.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
+#include "machine/scn_pci.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/wangpckb.h"
@@ -101,7 +101,7 @@ private:
 	required_device<i8255_device> m_ppi;
 	required_device<pit8253_device> m_pit;
 	required_device<im6402_device> m_uart;
-	required_device<mc2661_device> m_epci;
+	required_device<scn_pci_device> m_epci;
 	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
 	required_device<floppy_image_device> m_floppy0;
@@ -764,8 +764,8 @@ void wangpc_state::wangpc_io(address_map &map)
 	map(0x1028, 0x1029); //.w(FUNC(wangpc_state::)); (?)
 	map(0x1040, 0x1047).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x1060, 0x1063).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x1080, 0x1087).r(m_epci, FUNC(mc2661_device::read)).umask16(0x00ff);
-	map(0x1088, 0x108f).w(m_epci, FUNC(mc2661_device::write)).umask16(0x00ff);
+	map(0x1080, 0x1087).r(m_epci, FUNC(scn_pci_device::read)).umask16(0x00ff);
+	map(0x1088, 0x108f).w(m_epci, FUNC(scn_pci_device::write)).umask16(0x00ff);
 	map(0x10a0, 0x10bf).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
 	map(0x10c2, 0x10c7).w(FUNC(wangpc_state::dma_page_w)).umask16(0x00ff);
 	map(0x10e0, 0x10e0).rw(FUNC(wangpc_state::status_r), FUNC(wangpc_state::timer0_irq_clr_w));
@@ -915,7 +915,7 @@ WRITE_LINE_MEMBER( wangpc_state::dack3_w )
 
 void wangpc_state::check_level1_interrupts()
 {
-	int state = !m_timer2_irq || m_epci->rxrdy_r() || m_epci->txemt_r() || !m_centronics_ack || !m_dav || m_centronics_busy;
+	int state = !m_timer2_irq || !m_epci->rxrdy_r() || !m_epci->txemt_dschg_r() || !m_centronics_ack || !m_dav || m_centronics_busy;
 
 	m_pic->ir1_w(state);
 }
@@ -982,7 +982,7 @@ READ8_MEMBER( wangpc_state::ppi_pb_r )
 	data |= m_timer2_irq;
 
 	// serial interrupt
-	data |= !(m_epci->rxrdy_r() | m_epci->txemt_r()) << 1;
+	data |= (m_epci->rxrdy_r() & m_epci->txemt_dschg_r()) << 1;
 
 	// parallel port interrupt
 	data |= m_centronics_ack << 2;
@@ -1321,7 +1321,7 @@ void wangpc_state::wangpc(machine_config &config)
 	m_uart->dr_callback().set(FUNC(wangpc_state::uart_dr_w));
 	m_uart->tbre_callback().set(FUNC(wangpc_state::uart_tbre_w));
 
-	MC2661(config, m_epci, 0);
+	SCN2661C(config, m_epci, 5'068'800);
 	m_epci->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	m_epci->rxrdy_handler().set(FUNC(wangpc_state::epci_irq_w));
 	m_epci->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
@@ -1347,7 +1347,10 @@ void wangpc_state::wangpc(machine_config &config)
 	m_centronics->set_output_latch(*m_cent_data_out);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_epci, FUNC(mc2661_device::rx_w));
+	rs232.rxd_handler().set(m_epci, FUNC(scn_pci_device::rxd_w));
+	rs232.cts_handler().set(m_epci, FUNC(scn_pci_device::cts_w));
+	rs232.dsr_handler().set(m_epci, FUNC(scn_pci_device::dsr_w));
+	rs232.dcd_handler().set(m_epci, FUNC(scn_pci_device::dcd_w));
 
 	WANGPC_KEYBOARD(config, "wangpckb").txd_handler().set(m_uart, FUNC(im6402_device::write_rri));
 

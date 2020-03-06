@@ -9,9 +9,9 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 //#include "bus/rs232/rs232.h"
-#include "machine/mc2661.h"
 #include "machine/nvram.h"
 #include "machine/rstbuf.h"
+#include "machine/scn_pci.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "video/mc6845.h"
@@ -114,8 +114,8 @@ void falcots_state::ts1_io_map(address_map &map)
 	map(0xe8, 0xe8).r(FUNC(falcots_state::key_status_r));
 	map(0xf0, 0xf0).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0xf1, 0xf1).w(m_crtc, FUNC(mc6845_device::register_w));
-	map(0xf8, 0xfb).r("pci", FUNC(mc2661_device::read));
-	map(0xfc, 0xff).w("pci", FUNC(mc2661_device::write));
+	map(0xf8, 0xfb).r("pci", FUNC(scn2651_device::read));
+	map(0xfc, 0xff).w("pci", FUNC(scn2651_device::write));
 }
 
 void falcots_state::mem_map(address_map &map)
@@ -374,7 +374,7 @@ void falcots_state::ts1(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x NEC D444C + battery?
 
-	mc2661_device &pci(MC2661(config, "pci", 15.2064_MHz_XTAL / 3)); // SCN2651N
+	scn2651_device &pci(SCN2651(config, "pci", 15.2064_MHz_XTAL / 3)); // SCN2651N
 	pci.txrdy_handler().set(m_rstbuf, FUNC(rst_pos_buffer_device::rst1_w));
 	pci.rxrdy_handler().set(m_rstbuf, FUNC(rst_pos_buffer_device::rst2_w));
 
