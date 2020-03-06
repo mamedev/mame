@@ -7372,6 +7372,22 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="baal">
+		<description>Baal</description>
+		<year>1989</year>
+		<publisher>Psyclapse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="baal disk 1.img" size="737280" crc="102a86bd" sha1="fec351afd3f4a3dd8b8f1b2ceeb0d3154036d843"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="baal disk 2.img" size="737280" crc="9598117f" sha1="2ff39a052d6c263675eb62e556116b53ed23bd11"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="babyjo">
 		<!-- Dumped via Kryoflux -->
 		<description>Baby Jo in "Going Home"</description>
