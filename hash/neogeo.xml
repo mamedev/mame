@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- The list contains both MVS and AES cartridges.
+     The list contains both MVS and AES cartridges.
 
      For the majority of official titles the actual ROM data contained in the cartridges is compatible across systems, the actual codepath taken
      depends upon the bios used.
@@ -14,7 +16,7 @@
      The primary MVS / AES releases are marked in the list for documentation purposes, typically the first AES release is just a later revision
      of the game code with additional bugfixes etc. when compared to the primary MVS release.
 
-     Todo: games which are actually incompatible between systems (the first release of kof2001, and many of the bootlegs / hacks) should be
+     TODO: games which are actually incompatible between systems (the first release of kof2001, and many of the bootlegs / hacks) should be
            tagged with compatibility tags.
 
 -->

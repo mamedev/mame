@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
   Credits:
   - Maintainers : Fabio Priuli, Yakushi~Kabuto
   - Cart profiles : Yakushi~Kabuto
@@ -13,9 +14,8 @@
   - - JohnDie (~180 carts)
   - - Zidanax (~130 carts)
   - - Ecco and RedScorpion (72 carts)
--->
 
-<!--
+
 Undumped
 
  Confirmed?   Source     Title
@@ -136,9 +136,8 @@ Undumped
   - Waterworld - USA, for 199?, unknown dev
   - Whirlo - USA, for 199?, Namco
   - Wile E Coyote's Revenge (later prototype) - USA, for 199?, Sunsoft
--->
 
-<!--
+
 Documentation of Super Famicom PCB labels
 
 The labels printed on the PCB can be analysed as four parts: [Code 1]-[Code 2]-[Code 3]-[Code 4]
@@ -262,9 +261,8 @@ Known revisions and their timeline approximaions (W.I.P):
 -?                 ⊆ t(F413)
 -?                 ⊆ t(F413A)
 -[1995/42,1995/42] ⊆ t(F413B)
--->
 
-<!--
+
 Cartridges labels (W.I.P)
 
 - Japan catalogue product code:
@@ -348,9 +346,8 @@ SHVC-039 : (To be confirmed) Broadcast Satellaview-X ROM pak, unlike memory paks
 SHVC-040 : Broadcast Satellaview-X cassette (衛星放送対応カセット), later revision although the difference is unclear
 SHVC-041 : Super Famicom memory cassette (SFメモリカセット), white cartridges hosting flashed titles from the 'Nintendo Power' library
 SHVC-042 : Super Game Boy 2 cartridge, only released in Japan
--->
 
-<!--
+
 The software list will be divided into the following categories:
 [L01] Documented prototype and demo cartridges : images from confirmed non-retail cartridges
 [L02] Unconfirmed prototype and demo cartridges : roms not confirmed to exist on a non-retail cartridge at this time

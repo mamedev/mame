@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="pc88va" description="NEC PC-88VA disk images">
 
 <!-- Possibly Undumped PC88VA games:

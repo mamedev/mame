@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
 
 Image formats:
 
@@ -44,9 +44,7 @@ Not sure if there are others whose protection has been cracked...
 
 TODO: check the first byte in the 1.44MB images below!!
 
--->
 
-<!--
 Missing dumps
 
 Arkham Products
@@ -383,10 +381,7 @@ Sailor fuku Ikenai Taiken Kokuhaku Shuu Vol.1 Lost Virgin
 Sailor fuku Ikenai Taiken Kokuhaku Shuu Vol.2 Temptation
 Sailor fuku Ikenai Taiken Kokuhaku Shuu Vol.3 Ecstasy
 
--->
 
-
-<!--
 Most info on release dates and Jpn titles come from the following (wonderful) resources
  * http://www.8-bits.info/
  * http://mercenaryforce.web.fc2.com/x68k/x68000.html

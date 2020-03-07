@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
-<!-- Many thanks to Luca Antignano for the help with this software list -->
 <!--
+license:CC0
+
+Many thanks to Luca Antignano for the help with this software list
+
 A couple of comments about the 6k/8k images:
 - game code occupies 6k, but there can be different chips inside the actual carts:
   1x8k eprom, 2x4k eproms or 1x2k + 1x4k eproms. In the 1x8k case, the console
@@ -11,9 +13,6 @@ Carts were found where the remaining part is empty, and carts were found where t
 lower 2k are repeated (see the Alt dumps below), but the dumps are basically the
 same and a Creativision would not see the difference between them.
 
--->
-
-<!--
 Notes from Luca:
 1. In real carts, roms sometimes are EPROMs with a sticker, but the same data could
 well be found on EPROMs with no stickers or with a different sticker (due to different
@@ -26,9 +25,8 @@ based on a specific model
 chips. The choice of PCB for each game and the presence of ROMs split into different sizes
 follows no pattern and was probably based only on the chip availability at manufacturing
 time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
--->
 
-<!-- Dick Smith catalog numbers, taken from advertisements:
+Dick Smith catalog numbers, taken from advertisements:
 
 Y-1600 : Wizzard console
 Y-2600 : Funvision console
@@ -50,9 +48,8 @@ Y-1680 : Mouse Puzzle
 B-6196 : First Book of Wizzard Programs
 ?????? : Helicopter Rescue, Speed Race, Deep Sea Adventure (these were promised, but never heard of again)
 
+Creativision carts were universal (Japanese NTSC dumps turned out to be the same as worldwide PAL ones).
 -->
-
-<!-- Creativision carts were universal (Japanese NTSC dumps turned out to be the same as worldwide PAL ones). -->
 <softwarelist name="crvision" description="V-Tech Creativision cartridges">
 
 	<software name="airsea">
@@ -138,7 +135,7 @@ B-6196 : First Book of Wizzard Programs
 		</part>
 	</software>
 
-<!-- Reminder: Basic got found both in PCB with 2 chips (4k+8k) and in PCB with 3 chips (4k+4k+4k)... split accordingly! -->
+	<!-- Reminder: Basic got found both in PCB with 2 chips (4k+8k) and in PCB with 3 chips (4k+4k+4k)... split accordingly! -->
 	<software name="basico2">
 		<description>Creativision Basic (1982, Release 2)</description>
 		<year>1982</year>
@@ -496,7 +493,7 @@ B-6196 : First Book of Wizzard Programs
 		</part>
 	</software>
 
-<!-- Reminder: Tennis 8k got found both in PCB with 2 chips (4k+4k) and in PCB with 1 chip (8k)... split accordingly! -->
+	<!-- Reminder: Tennis 8k got found both in PCB with 2 chips (4k+4k) and in PCB with 1 chip (8k)... split accordingly! -->
 	<software name="tennisa" cloneof="tennis">
 		<description>Tennis (Wimbledon, 8k Cart)</description>
 		<year>1982</year>
@@ -565,7 +562,7 @@ B-6196 : First Book of Wizzard Programs
 		</part>
 	</software>
 
-<!-- Reminder: Tennis 8k got found both in PCB with 2 chips (4k+4k) and in PCB with 1 chip (8k)... split accordingly! -->
+	<!-- Reminder: Tennis 8k got found both in PCB with 2 chips (4k+4k) and in PCB with 1 chip (8k)... split accordingly! -->
 	<software name="tennisd2a" cloneof="tennis">
 		<description>Tennis (Dick Smith, 8k Cart)</description>
 		<year>1982</year>

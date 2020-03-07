@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Dick Smith catalog numbers, taken from advertisements:
+Dick Smith catalog numbers, taken from advertisements:
 
 X-1200 : Channel F console
 X-1201 : Blackjack

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
 
 To investigate:
   - Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GB version?
@@ -18,10 +18,6 @@ Unreleased (music source code exists, possibly no prototypes exist)
 - Katharsis
 - Hero's Quest
 
--->
-
-
-<!--
 
  Info on the PCB codes, based on Tauwasser's notes and research
 

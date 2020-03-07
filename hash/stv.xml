@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
     Note: Most games do not support multi cart system - the ones that are has the text "CART-AM" in the header.
     All titles that doesn't support it have a supported="no" flag.
 -->

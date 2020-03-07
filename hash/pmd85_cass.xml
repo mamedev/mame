@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- For now tape loading only works in PMD-85.1 -->
+For now tape loading only works in PMD-85.1
+-->
 
 <softwarelist name="pmd85_cass" description="Tesla PMD-85 cassettes">
 <!-- From TOSEC -->

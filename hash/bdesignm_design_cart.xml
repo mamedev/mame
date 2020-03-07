@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
     Game cartridges for Bandai Design Master
 
     Design carts, these plug into the Game carts, they're data ROMs, they do not contain boot vectors

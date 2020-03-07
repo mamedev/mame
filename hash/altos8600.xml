@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="altos8600" description="Altos 8600 floppies">
 
 	<software name="diag" supported="no"><!-- boots but then can't run any commands -->

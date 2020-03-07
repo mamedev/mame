@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
 
     Missing stuff:
 
@@ -15,9 +16,8 @@
 
     Compiled by K1W1.
 
--->
 
-<!-- Dick Smith catalog numbers, taken from advertisements:
+Dick Smith catalog numbers, taken from advertisements:
 
 X-2000 : VIC-20 Computer
 X-2005 : Datasette (the cassette recorder)

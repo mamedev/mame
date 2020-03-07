@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Acorn BBC Master ROM Cartridges -->
+Acorn BBC Master ROM Cartridges
 
-<!-- Loading Instructions:
+    Loading Instructions:
 
       Hold down the SHIFT key and SPACEbar and press and release the BREAK key.
 -->

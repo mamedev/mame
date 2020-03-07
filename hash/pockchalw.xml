@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
 
  List of software from ja.wikipedia.org
  Notice that this list might be missing different variants (for different ages),
@@ -31,9 +31,7 @@
  高校受験(英・社・理)      [dumped]
  実技4教科              [dumped]
 
- -->
-
-
+-->
 
 <softwarelist name="pockchalw" description="Pocket Challenge W cartridges">
 

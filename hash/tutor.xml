@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Tomy Tutor and Pyuuta Cartridges
+Tomy Tutor and Pyuuta Cartridges
 Here's a list of known software packages and peripherals. There are 50 documented cartridges, counting both Japanese and American domestic releases; however, some are Japan-only, and a few are verifiably vapourware or were never otherwise released.
 
 Info Taken from: http://www.floodgap.com/retrobits/tomy/carts.html
@@ -74,7 +76,6 @@ Bubblegum Street (Unreleased)
 Battlefighter (Original) (Unreleased - Prototype Stage)
 3-D Shooting (Unreleased)
 3-D Maze (Unreleased)
-
 
 -->
 

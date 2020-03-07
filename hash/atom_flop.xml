@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Acorn Atom - Floppy disk images -->
+Acorn Atom - Floppy disk images
 
-<!-- Loading Instructions:
+    Loading Instructions:
 
     *DOS - enters the DOS. The LOAD and SAVE commands apply now to disk, not cassette. Use the BREAK key to return to the cassette basic.
     *DIR - load the directory information into a buffer (but does not show it). This is a sort of mount command.

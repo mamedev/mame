@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Acorn Electron ROM Cartridges -->
+Acorn Electron ROM Cartridges
 
-<!-- This list contains all known cartridges for the Acorn Electron. The Acorn Plus 1 expansion unit is required to add the two cartridge slots. -->
+This list contains all known cartridges for the Acorn Electron. The Acorn Plus 1 expansion unit is required to add the two cartridge slots.
+-->
 
 <softwarelist name="electron_cart" description="Acorn Electron cartridges">
 

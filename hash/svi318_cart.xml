@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
 Info Taken from here: http://www.samdal.com/SVIDOCS/SVI_Softwares_for_SVI318-328.pdf
 
 These Cartridges are not dumped:
 Just Write JR. SD294C
 Amoured Assault SD233C // Was availible on Cartridge and/or Tape
-
-
 -->
 
 <softwarelist name="svi318_cart" description="Spectravision SVI-318 cartridges">

@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
      The original tapes have died long ago, so these were loaded from the
      archived quickloads into MAME, then saved to wav files.
      Release dates are between 1981 and 1987, but precise dates are unknown.
@@ -9,9 +11,9 @@
      Meaning of numbers: 1-99 = for BASIC (32 columns); 100-119 = for BASIC (80 columns); 400-499 = Machine Language;
                          150-299 = ported from Microbee; 300-329 = BASIC, ported from Exidy Sorcerer;
                          500-529 = Machine Language, ported from Exidy Sorcerer. All porting done by Robbbert.
- -->
  
- <!-- Dick Smith catalog numbers, taken from advertisements:
+
+Dick Smith catalog numbers, taken from advertisements:
 
 K-3600 : Nova-80 (original name), Super-80 Computer kit
 K-3601 : Keyboard (included in K-3600)

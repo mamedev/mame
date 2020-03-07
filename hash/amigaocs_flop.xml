@@ -1,13 +1,14 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- General purpose software list for Amiga software with a MINIMUM requirement of the OCS chipset (A500 / A1000)
+    General purpose software list for Amiga software with a MINIMUM requirement of the OCS chipset (A500 / A1000)
     This is the original Amiga chipset, not all games are 100% forward compatible, but that will be marked later
     Some games benefit from, or require RAM expansions, this will also be marked later.
 
     Anything requiring a minimum of the ECS or AGA chipsets has been moved to separate lists
--->
-<!--
+
     Most images for the initial import are from SPS / CAPS collections
 
     todo (SPS):
@@ -30,9 +31,8 @@
     - add Utilities (separate lists?)
     - add list to document various Amiga viruses (maybe, if I'm feeling perverted)
 
--->
 
-<!-- Virus Warning
+    Virus Warning
 
     The following original discs were mastered with viruses on them
     ref: http://eab.abime.net/showthread.php?t=65171

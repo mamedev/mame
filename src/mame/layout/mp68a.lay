@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 	<element name="redled" defstate="0">
 		<disk state="0"><color red="0.3" green="0.0" blue="0.0" /></disk>

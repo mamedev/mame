@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Acorn BBC Master - 80186 Co-Processor discs -->
+Acorn BBC Master - 80186 Co-Processor discs
+-->
 
 <softwarelist name="bbc_flop_80186" description="Acorn 80186 Co-Processor discs">
 
