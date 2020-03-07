@@ -29,7 +29,7 @@ public:
 	unistar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_p_chargen(*this, "chargen")
+		, m_chargen(*this, "chargen")
 	{ }
 
 	void unistar(machine_config &config);
@@ -48,7 +48,7 @@ private:
 	void unistar_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	required_region_ptr<u8> m_p_chargen;
+	required_region_ptr<u8> m_chargen;
 };
 
 
@@ -80,12 +80,38 @@ void unistar_state::unistar_io(address_map &map)
 	map(0x94, 0x97).rw("pio", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x98, 0x99).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0x9c, 0x9c).w("dbrg", FUNC(k1135ab_device::str_stt_w));
-	// ports used: 00,02,03(W),08(RW),09,0A,0B,0D,0F(W),80,81(R),82,83(W),84(R),8C,8D(W),94(R),97,98(W),99(RW)
-	// if nonzero returned from port 94, it goes into test mode.
 }
 
 /* Input ports */
 static INPUT_PORTS_START( unistar )
+	PORT_START("SW2")
+	PORT_DIPNAME(0x0f, 0x00, "Baud Rate") PORT_DIPLOCATION("SW2:1,2,3,4")
+	PORT_DIPSETTING(0x0e, "50")
+	PORT_DIPSETTING(0x0d, "75")
+	PORT_DIPSETTING(0x0c, "110")
+	PORT_DIPSETTING(0x0b, "134.5")
+	PORT_DIPSETTING(0x0a, "150")
+	PORT_DIPSETTING(0x09, "300")
+	PORT_DIPSETTING(0x08, "600")
+	PORT_DIPSETTING(0x07, "1200")
+	PORT_DIPSETTING(0x06, "1800")
+	PORT_DIPSETTING(0x05, "2000")
+	PORT_DIPSETTING(0x04, "2400")
+	PORT_DIPSETTING(0x03, "3600")
+	PORT_DIPSETTING(0x02, "4800")
+	PORT_DIPSETTING(0x01, "7200")
+	PORT_DIPSETTING(0x00, "9600")
+	PORT_DIPNAME(0x30, 0x00, "Parity") PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(0x00, "None")
+	PORT_DIPSETTING(0x30, "Even")
+	PORT_DIPSETTING(0x10, "Odd")
+	PORT_DIPNAME(0x40, 0x00, "Data Bits") PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(0x40, "7")
+	PORT_DIPSETTING(0x00, "8")
+	PORT_DIPNAME(0x80, 0x00, "Terminal Mode") PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(0x80, "Local/Test")
+	PORT_DIPSETTING(0x00, "Online")
+
 	PORT_START("CONFIG")
 	PORT_DIPNAME(0x01, 0x01, "Screen Refresh Rate")
 	PORT_DIPSETTING(0x01, "50 Hz")
@@ -162,7 +188,8 @@ void unistar_state::unistar(machine_config &config)
 	dbrg.ft_handler().set("pcib", FUNC(scn2651_device::rxc_w));
 	dbrg.ft_handler().append("pcib", FUNC(scn2651_device::txc_w));
 
-	I8255A(config, "pio");
+	i8255_device &pio(I8255A(config, "pio"));
+	pio.in_pa_callback().set_ioport("SW2");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
