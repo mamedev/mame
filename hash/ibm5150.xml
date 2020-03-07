@@ -10546,6 +10546,24 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="pwrdrift">
+		<description>Power Drift</description>
+		<year>1990</year>
+		<publisher>Activision</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Game/EGA Data Disc"/>
+			<dataarea name="flop" size = "2152145">
+				<rom name="power drift disk 1.mfm" size="2152145" crc="22e3d286" sha1="5951424c3e88dd34fd6ad7855933c6c299ef81ea"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="CGA/MCGA Data Disc"/>
+			<dataarea name="flop" size = "2152123">
+				<rom name="power drift disk 2.mfm" size="2152123" crc="0908919d" sha1="775e37a340f321d08faeae460953bf922b359c8e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="prehist">
 		<description>Prehistorik (cracked)</description>
 		<year>1991</year>
