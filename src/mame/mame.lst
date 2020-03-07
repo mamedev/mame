@@ -31436,6 +31436,7 @@ gprnrs16
 ddrdismx                        // (c) 2006 Majesco / Konami [(c) 2001 Disney on title screen]
 ddrstraw                        // (c) 2006 Majesco / Konami
 megapad
+timetp36
 majkon
 majgnc
 sudopptv
@@ -37121,6 +37122,9 @@ pballpup
 swclone
 dreamlss
 
+@source:spg2xx_digimake.cpp
+rad_digi
+
 @source:spg2xx_dreamlife.cpp
 dreamlif                        //
 dsgnwrld
@@ -37804,6 +37808,7 @@ jak_s500
 jak_totm
 jak_ths
 smartfp                         // Smart Fit Park
+gormiti
 wlsair60                        // Wireless Air 60
 wrlshunt                        // Wireless: Hunting Video Game System
 tkmag220                        //
@@ -37821,6 +37826,7 @@ bkrankp
 
 @source:sunplus_unsp20soc_mobigo.cpp
 mobigo
+mobigos
 mobigo2
 
 @source:supbtime.cpp
