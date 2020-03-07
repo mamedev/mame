@@ -12937,7 +12937,7 @@ GAME( 1979, galaxianbl3, galaxian, galaxian,   zerotime,   galaxian_state, init_
 GAME( 1980, galaxrf,     galaxian, galaxian,   galaxrf,    galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)",          "Galaxian (Recreativos Franco S.A. Spanish bootleg)",                                           MACHINE_SUPPORTS_SAVE )
 GAME( 1980, galaxrfgg,   galaxian, galaxian,   galaxrf,    galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)",          "Galaxian Growing Galaxip / Galaxian Nave Creciente (Recreativos Franco S.A. Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, galaxrcgg,   galaxian, galaxian,   galaxrf,    galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Covadonga)",            "Galaxian Growing Galaxip / Galaxian Nave Creciente (Recreativos Covadonga Spanish bootleg)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1979, galaxianrp,  galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "bootleg (Valadon Automation / René Pierre)", "Galaxian (René Pierre bootleg)",                                                               MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galaxianrp,  galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "bootleg (Valadon Automation / Rene Pierre)", "Galaxian (Rene Pierre bootleg)",                                                               MACHINE_SUPPORTS_SAVE )
 
 // These have the extra 'linescroll effect' title screens, like Moon Alien 2 but made out of a random tile, they lack an energy bar.
 GAME( 1979, moonaln,     galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "Namco / Nichibutsu (Karateco license?)", "Moon Alien",                     MACHINE_SUPPORTS_SAVE ) // or bootleg?
