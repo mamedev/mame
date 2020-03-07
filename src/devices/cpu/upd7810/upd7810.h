@@ -239,6 +239,7 @@ protected:
 	uint8_t   m_op;     /* opcode */
 	uint8_t   m_op2;    /* opcode part 2 */
 	uint8_t   m_iff;    /* interrupt enable flip flop */
+	uint8_t   m_iff_pending;
 	uint8_t   m_psw;    /* processor status word */
 	PAIR    m_ea;     /* extended accumulator */
 	PAIR    m_va;     /* accumulator + vector register */
