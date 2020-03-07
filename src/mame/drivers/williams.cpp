@@ -484,19 +484,9 @@
      0  0  1  x   x  x  x  x   x  x  x  x   x  x  x  x  2000-3FFF   CS PIA IC4
      1  1  1  x   x  x  x  x   x  x  x  x   x  x  x  x  E000-FFFF   8K ROM
 
-TODO:
-Mystic Marathon colors are very likely incorrectly derived from schematics.
-
-The video DAC is in the lower right corner of the schematic on page 11 of the Mystic Marathon Drawing Set,
-or page 19 of the Turkey Shoot Service Manual (both are identical as far can be seen).   Both schematics
-are available at http://arcarc.xmission.com/PDF_Arcade_Williams/
-
-It's a RAM-based palette with 4 bit red, green, blue and brightness/intensity components. It looks like the
-brightness component (from IC76, the uppermost of the four 2148 SRAMs) should be combined with the color
-components in a more complicated way than simply multiplying them like MAME does.
-
-Reference video: https://www.youtube.com/watch?v=R5OeC6Wc_yI
-
+Reference videos: https://www.youtube.com/watch?v=R5OeC6Wc_yI
+				  https://www.youtube.com/watch?v=3J_EZ1OXlww
+				  https://www.youtube.com/watch?v=zxZ48iJShSU
 
 ***************************************************************************/
 
@@ -767,17 +757,17 @@ void williams2_state::sound_map(address_map &map)
 
 static INPUT_PORTS_START( monitor_controls )
 	PORT_START("REDG")
-	PORT_ADJUSTER( 85, "Monitor Gain Red" ) PORT_MINMAX(0, 250) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 0)
+	PORT_ADJUSTER( 80, "Monitor Gain Red" ) PORT_MINMAX(0, 250) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 0)
 	PORT_START("GREENG")
-	PORT_ADJUSTER( 135, "Monitor Gain Green" ) PORT_MINMAX(0, 250) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 1)
+	PORT_ADJUSTER( 73, "Monitor Gain Green" ) PORT_MINMAX(0, 250) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 1)
 	PORT_START("BLUEG")
-	PORT_ADJUSTER( 76, "Monitor Gain Blue" ) PORT_MINMAX(0, 250) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 2)
+	PORT_ADJUSTER( 81, "Monitor Gain Blue" ) PORT_MINMAX(0, 250) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 2)
 	PORT_START("REDO")
-	PORT_ADJUSTER( 100, "Monitor Offset Red" ) PORT_MINMAX(0, 200) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 3)
+	PORT_ADJUSTER( 73, "Monitor Offset Red" ) PORT_MINMAX(0, 200) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 3)
 	PORT_START("GREENO")
 	PORT_ADJUSTER( 100, "Monitor Offset Green" ) PORT_MINMAX(0, 200) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 4)
 	PORT_START("BLUEO")
-	PORT_ADJUSTER( 100, "Monitor Offset Blue" ) PORT_MINMAX(0, 200) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 5)
+	PORT_ADJUSTER( 78, "Monitor Offset Blue" ) PORT_MINMAX(0, 200) PORT_CHANGED_MEMBER(DEVICE_SELF, mysticm_state, rgb_gain, 5)
 INPUT_PORTS_END
 
 
@@ -1517,7 +1507,7 @@ static const gfx_layout williams2_layout =
 
 
 static GFXDECODE_START( gfx_williams2 )
-	GFXDECODE_ENTRY( "gfx1", 0, williams2_layout, 0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, williams2_layout, 0, 64 )
 GFXDECODE_END
 
 

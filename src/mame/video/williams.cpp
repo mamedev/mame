@@ -311,7 +311,7 @@ uint32_t mysticm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	/* draw the background */
 	//printf("y %d %d %d\n", cliprect.min_y, cliprect.max_y, m_screen->vpos());
 	m_bg_tilemap->mark_all_dirty();
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
 	/* loop over rows */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -374,6 +374,11 @@ rgb_t williams2_state::calc_col(uint16_t lo, uint16_t hi)
 	 *  frgb contains channel output voltages created with this netlist file:
 	 *  	src/lib/netlist/examples/turkey_shoot.cpp
 	 *  Instructions to create the table are found in turkey_shoot.cpp
+	 *
+	 *  Reference videos: https://www.youtube.com/watch?v=R5OeC6Wc_yI
+	 *                    https://www.youtube.com/watch?v=3J_EZ1OXlww
+	 *                    https://www.youtube.com/watch?v=zxZ48iJShSU
+	 *
 	 *
 	 *  FIXME: The long term plan is to include the functionality of
 	 *  nltool/nlwav into the netlist core, launch a netlist run and
@@ -646,14 +651,25 @@ rgb_t williams2_state::calc_col(uint16_t lo, uint16_t hi)
 	float r, g, b;
 
 	/* update the palette entry */
+
 	i =  (hi >> 4) & 15;
 	ub = (hi >> 0) & 15;
-	ur = (lo >> 0) & 15;
 	ug = (lo >> 4) & 15;
+	ur = (lo >> 0) & 15;
 
-	r = std::min(1.0f, frgb[i * 16 + ur] * m_gain[0] / 0.5f / 4.22f + m_offset[0]);
-	g = std::min(1.0f, frgb[i * 16 + ug] * m_gain[1] / 0.5f / 4.22f + m_offset[1]);
-	b = std::min(1.0f, frgb[i * 16 + ub] * m_gain[2] / 0.5f / 4.22f + m_offset[2]);
+	// normalize
+	r = frgb[i * 16 + ur] / 4.22f;
+	g = frgb[i * 16 + ug] / 4.22f;
+	b = frgb[i * 16 + ub] / 4.22f;
+	// cut off
+	r = std::max(r + m_offset[0], 0.0f);
+	g = std::max(g + m_offset[1], 0.0f);
+	b = std::max(b + m_offset[2], 0.0f);
+	// drive
+	r = std::min(r * m_gain[0] / 0.25f, 1.0f);
+	g = std::min(g * m_gain[1] / 0.25f, 1.0f);
+	b = std::min(b * m_gain[2] / 0.25f, 1.0f);
+
 	return rgb_t((int) (r * 255), (int) (g * 255), (int) (b * 255));
 }
 
@@ -731,11 +747,19 @@ int mysticm_state::color_decode(uint8_t base_col, int sig_J1, int y)
 	int sig_W12 = (v >> 12) & 1;
 	int sig_W13 = (v >> 13) & 1;
 
-	// J1 connected to BACKSEL
+	// There are four "jumpers" in the schematics.
+	// J3 and J4 allow to turn off background tilemaps completely.
+	// BACKSEL (active low) in this case is forced to high.
+	// J1 and J2 allow to turn on/off "sky" processing. In this case,
+	// for sky (up to ~1/3 of vertical resolution an alternative palette
+	// is used. For mysticm it is connected to BACKSEL.
 
 	// Cascading inputs ">" and "=" are set to "H", thus
 	// cascading input "<" (connected to W11) has no effect
-	// according to truthtable for 7485.
+	// according to truthtable for 7485. Thus there are two possibilities:
+	// a. A real 7485 works different to the datasheet
+	// b. input "=" on the real board is connected to GND.
+
 	// FIXME: Investigate further.
 
 	/* IC79 is a 74LS85 comparator that controls the low bit */
@@ -743,6 +767,10 @@ int mysticm_state::color_decode(uint8_t base_col, int sig_J1, int y)
 	int b = (sig_W12 << 0) | (sig_W13 << 1) | (0 << 2) | (sig_J1 << 3);
 	int color = (a > b) || ((a == b) && !sig_W11);
 
+	// mysticm schematics show Page1 and Page2 crossed, i.e.
+	// Page1 -> B2 (IC80) and Page2 -> B1 (IC80)
+	// This does not produce colors observed on real hardware.
+	// FIXME: Verify Page1 and Page2 connections.
 	//return ((base_col & 0x04) >> 1) | ((base_col & 0x02) << 1) | (base_col & 0x38) | color;
 	return (base_col & 0x3e) | color;
 }
@@ -754,10 +782,13 @@ TILE_GET_INFO_MEMBER(mysticm_state::get_tile_info)
 	int mask = m_gfxdecode->gfx(0)->elements() - 1;
 	int data = m_tileram[tile_index];
 
-	//SET_TILE_INFO_MEMBER(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
+	//m_bg_tilemap->set_palette_offset((color & 0x3e) << 4);
+	//SET_TILE_INFO_MEMBER(0, data & mask, color & 1, (data & ~mask) ? TILE_FLIPX : 0);
+	m_bg_tilemap->set_palette_offset(0);
+	SET_TILE_INFO_MEMBER(0, data & mask, (color & 0x3f), (data & ~mask) ? TILE_FLIPX : 0);
 
-	m_bg_tilemap->set_palette_offset((color & 0x3e) << 4);
-	SET_TILE_INFO_MEMBER(0, data & mask, color & 1, (data & ~mask) ? TILE_FLIPX : 0);
+	//gfx_element *gfx = tileinfo.decoder->gfx(0);
+	//printf("%d %d %d %d\n", gfx->elements(), gfx->colorbase(), gfx->granularity(), gfx->colors());
 
 }
 
@@ -784,9 +815,7 @@ void williams2_state::bg_select_w(u8 data)
 void mysticm_state::bg_select_w(u8 data)
 {
 	/* IC79 is a 74LS85 comparator that controls the low bit */
-	//printf("bg %d %d\n", data, data & 1);
 	m_bg_color = data;
-	//m_bg_tilemap->set_palette_offset((data & 0x3e) << 4);
 	m_bg_tilemap->mark_all_dirty();
 }
 

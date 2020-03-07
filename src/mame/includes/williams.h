@@ -315,8 +315,8 @@ public:
 		m_bank8000(*this, "bank8000"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_tileram(*this, "williams2_tile"),
-		m_gain({0.85f, 1.35f, 0.76f}),
-		m_offset({0.0f, 0.0f, 0.0f})
+		m_gain({0.8f, 0.73f, 0.81f}),
+		m_offset({-0.27f, 0.0f, -0.22f})
 	{ }
 
 	void williams2_base(machine_config &config);
