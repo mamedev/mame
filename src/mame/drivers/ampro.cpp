@@ -27,7 +27,7 @@ of a hard drive of up to 88MB.
 #include "machine/output_latch.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 #include "machine/timer.h"
 #include "softlist.h"

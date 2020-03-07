@@ -267,9 +267,11 @@ void m6801_cpu_device::m6803_mem(address_map &map)
 
 DEFINE_DEVICE_TYPE(M6801, m6801_cpu_device, "m6801", "Motorola MC6801")
 DEFINE_DEVICE_TYPE(M6803, m6803_cpu_device, "m6803", "Motorola MC6803")
+DEFINE_DEVICE_TYPE(M6803E, m6803e_cpu_device, "m6803e", "Motorola MC6803E")
 DEFINE_DEVICE_TYPE(HD6301, hd6301_cpu_device, "hd6301", "Hitachi HD6301")
 DEFINE_DEVICE_TYPE(HD63701, hd63701_cpu_device, "hd63701", "Hitachi HD63701")
 DEFINE_DEVICE_TYPE(HD6303R, hd6303r_cpu_device, "hd6303r", "Hitachi HD6303R")
+DEFINE_DEVICE_TYPE(HD6303X, hd6303x_cpu_device, "hd6303x", "Hitachi HD6303X")
 DEFINE_DEVICE_TYPE(HD6303Y, hd6303y_cpu_device, "hd6303y", "Hitachi HD6303Y")
 
 m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -291,6 +293,11 @@ m6803_cpu_device::m6803_cpu_device(const machine_config &mconfig, const char *ta
 {
 }
 
+m6803e_cpu_device::m6803e_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m6801_cpu_device(mconfig, M6803E, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor(FUNC(m6803e_cpu_device::m6803_mem), this))
+{
+}
+
 hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hd6301_cpu_device(mconfig, HD6301, tag, owner, clock)
 {
@@ -308,6 +315,11 @@ hd63701_cpu_device::hd63701_cpu_device(const machine_config &mconfig, const char
 
 hd6303r_cpu_device::hd6303r_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hd6301_cpu_device(mconfig, HD6303R, tag, owner, clock)
+{
+}
+
+hd6303x_cpu_device::hd6303x_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hd6301_cpu_device(mconfig, HD6303X, tag, owner, clock)
 {
 }
 
@@ -1281,6 +1293,11 @@ std::unique_ptr<util::disasm_interface> m6801_cpu_device::create_disassembler()
 }
 
 std::unique_ptr<util::disasm_interface> m6803_cpu_device::create_disassembler()
+{
+	return std::make_unique<m680x_disassembler>(6803);
+}
+
+std::unique_ptr<util::disasm_interface> m6803e_cpu_device::create_disassembler()
 {
 	return std::make_unique<m680x_disassembler>(6803);
 }

@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- see https://www.obsoleteworlds.com/gameking.html for some images of GameKing carts running on both an original unit, and a GameKing 3 with added colour -->
+see https://www.obsoleteworlds.com/gameking.html for some images of GameKing carts running on both an original unit, and a GameKing 3 with added colour
 
-<!-- Cartridge Pinout
 
-               _______
+Cartridge Pinout
+                _______
          VCC = |01   31| = GND
           NC - |02   32| - NC
           NC - |03   33| - NC

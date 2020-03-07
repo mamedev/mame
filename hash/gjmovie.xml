@@ -1,9 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="gjmovie" description="VTech Genius Junior Movie cartridges">
 
-<!-- According to the boxart, this is compatible with: Junior Movie/Leader Movie
-     A (later) sticker says compatibility extends to Leader Action -->
+	<!-- According to the boxart, this is compatible with: Junior Movie/Leader Movie
+	    A (later) sticker says compatibility extends to Leader Action -->
 	<software name="wuz" supported="no">
 		<description>Wort-und Zahlenspaß</description>
 		<year>1993</year>

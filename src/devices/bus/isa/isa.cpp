@@ -371,6 +371,11 @@ bool isa8_device::is_option_rom_space_available(offs_t start, int size)
 	return true;
 }
 
+void isa8_device::unmap_readwrite(offs_t start, offs_t end)
+{
+	m_memspace->unmap_readwrite(start, end);
+}
+
 // interrupt request from isa card
 WRITE_LINE_MEMBER( isa8_device::irq2_w ) { m_out_irq2_cb(state); }
 WRITE_LINE_MEMBER( isa8_device::irq3_w ) { m_out_irq3_cb(state); }

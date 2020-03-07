@@ -441,6 +441,7 @@ MACHINES["AM25S55X"] = true
 MACHINES["AM2847"] = true
 MACHINES["AM2910"] = true
 MACHINES["AM53CF96"] = true
+MACHINES["AM79C30"] = true
 MACHINES["AM79C90"] = true
 MACHINES["AM9513"] = true
 MACHINES["AM9517A"] = true
@@ -545,7 +546,6 @@ MACHINES["MB89352"] = true
 MACHINES["MB89371"] = true
 MACHINES["MC14411"] = true
 MACHINES["MC146818"] = true
-MACHINES["MC2661"] = true
 MACHINES["MC6843"] = true
 MACHINES["MC6844"] = true
 MACHINES["MC6846"] = true
@@ -625,6 +625,7 @@ MACHINES["SATURN"] = true
 MACHINES["SCC68070"] = true
 --MACHINES["SCSI"] = true
 MACHINES["SCC2698B"] = true
+MACHINES["SCN_PCI"] = true
 MACHINES["SCUDSP"] = true
 MACHINES["SECFLASH"] = true
 MACHINES["SEIBU_COP"] = true
@@ -690,7 +691,6 @@ MACHINES["X76F100"] = true
 MACHINES["YM2148"] = true
 MACHINES["YM3802"] = true
 MACHINES["Z80CTC"] = true
-MACHINES["Z80DART"] = true
 MACHINES["Z80SIO"] = true
 MACHINES["Z80SCC"] = true
 MACHINES["Z80DMA"] = true
@@ -988,6 +988,7 @@ FORMATS["HECT_TAP"] = true
 FORMATS["HTI_TAP"] = true
 FORMATS["HPI_DSK"] = true
 FORMATS["HP_IPC_DSK"] = true
+FORMATS["IBMXDF_DSK"] = true
 FORMATS["IMG_DSK"] = true
 FORMATS["IQ151_DSK"] = true
 FORMATS["ITT3030_DSK"] = true
@@ -1185,6 +1186,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"kaypro",
 		"koei",
 		"kontron",
+		"korg",
 		"kurzweil",
 		"kyocera",
 		"leapfrog",
@@ -2623,6 +2625,15 @@ files {
 	MAME_DIR .. "src/mame/drivers/kdt6.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "korg")
+files {
+	MAME_DIR .. "src/mame/drivers/korgds8.cpp",
+	MAME_DIR .. "src/mame/drivers/korgdss1.cpp",
+	MAME_DIR .. "src/mame/drivers/korgm1.cpp",
+	MAME_DIR .. "src/mame/drivers/poly800.cpp",
+	MAME_DIR .. "src/mame/drivers/polysix.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "kurzweil")
 files {
 	MAME_DIR .. "src/mame/drivers/krz2000.cpp",
@@ -2954,6 +2965,7 @@ files {
 	MAME_DIR .. "src/mame/machine/vt1682_alu.cpp",
 	MAME_DIR .. "src/mame/machine/vt1682_timer.h",
 	MAME_DIR .. "src/mame/machine/vt1682_timer.cpp",
+	MAME_DIR .. "src/mame/drivers/compmahj.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "nokia")
@@ -3221,6 +3233,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/roland_d50.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_d110.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_mt32.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_r8.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_sc55.cpp",
 	MAME_DIR .. "src/mame/drivers/tb303.cpp",
 	MAME_DIR .. "src/mame/drivers/tr606.cpp",
@@ -3821,6 +3834,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/tvgame.cpp",
 	MAME_DIR .. "src/mame/drivers/spg110.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx.cpp",
+	MAME_DIR .. "src/mame/drivers/spg2xx_skannerztv.cpp",
+	MAME_DIR .. "src/mame/drivers/spg2xx_digimake.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_jakks.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_jakks_gkr.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_jakks_tvtouch.cpp",
@@ -4301,6 +4316,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/solbourne.cpp",
 	MAME_DIR .. "src/mame/drivers/swyft.cpp",
 	MAME_DIR .. "src/mame/drivers/symbolics.cpp",
+	MAME_DIR .. "src/mame/drivers/synthex.cpp",
 	MAME_DIR .. "src/mame/drivers/sys2900.cpp",
 	MAME_DIR .. "src/mame/drivers/sys9002.cpp",
 	MAME_DIR .. "src/mame/drivers/systec.cpp",

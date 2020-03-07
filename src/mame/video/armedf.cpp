@@ -332,7 +332,7 @@ void armedf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 			pmask |= GFX_PMASK_2;
 		/*
 		if (pri >= 3)
-			pmask |= GFX_PMASK_1;
+		    pmask |= GFX_PMASK_1;
 		*/
 
 		if (flip_screen())

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    screen.c
+    screen.cpp
 
     Core MAME screen device.
 
@@ -1726,6 +1726,7 @@ void screen_device::create_composited_bitmap()
 					*dst++ = src[x >> 15];
 				}
 			}
+			break;
 		}
 
 		case BITMAP_FORMAT_RGB32:
@@ -1794,7 +1795,8 @@ bool screen_device::update_quads()
 
 void screen_device::update_burnin()
 {
-// TODO: other than being unnecessary (we should use our rand function first off), this is a simplification of how analog signals really works!
+// TODO: other than being unnecessary, this is a simplification of how analog signals really works!
+// It's important not to use machine().rand() here, it can cause machine().rand() used in emulation to desync.
 #undef rand
 	if (!m_burnin.valid())
 		return;

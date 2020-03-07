@@ -413,9 +413,7 @@ void ip24_state::indy_5015(machine_config &config)
 {
 	ip24(config);
 
-	R4000(config, m_maincpu, 50000000*3);
-	//m_maincpu->set_icache_size(32768);
-	//m_maincpu->set_dcache_size(32768);
+	R5000(config, m_maincpu, 50000000*3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
 }
 
@@ -424,8 +422,6 @@ void ip24_state::indy_4613(machine_config &config)
 	ip24(config);
 
 	R4600(config, m_maincpu, 33333333*4);
-	//m_maincpu->set_icache_size(16384);
-	//m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
 }
 
@@ -434,8 +430,6 @@ void ip24_state::indy_4610(machine_config &config)
 	ip24(config);
 
 	R4600(config, m_maincpu, 33333333*3);
-	//m_maincpu->set_icache_size(16384);
-	//m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
 }
 
@@ -449,8 +443,6 @@ void ip22_state::wd33c93_2(device_t *device)
 void ip22_state::indigo2_4415(machine_config &config)
 {
 	R4400(config, m_maincpu, 50000000*3);
-	//m_maincpu->set_icache_size(32768);
-	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
 	ip24_base(config);
@@ -547,5 +539,5 @@ ROM_END
 //    YEAR  NAME          PARENT     COMPAT  MACHINE       INPUT CLASS       INIT        COMPANY                 FULLNAME                   FLAGS
 COMP( 1993, indy_4610,    0,         0,      indy_4610,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 100MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_NODEVICE_MICROPHONE )
 COMP( 1993, indy_4613,    indy_4610, 0,      indy_4613,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 133MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_NODEVICE_MICROPHONE )
-COMP( 1996, indy_5015,    indy_4610, 0,      indy_5015,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R5000, 150MHz)",    MACHINE_NOT_WORKING )
+COMP( 1996, indy_5015,    indy_4610, 0,      indy_5015,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R5000, 150MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_NODEVICE_MICROPHONE )
 COMP( 1993, indigo2_4415, 0,         0,      indigo2_4415, ip24, ip22_state, empty_init, "Silicon Graphics Inc", "Indigo2 (R4400, 150MHz)", MACHINE_NOT_WORKING )

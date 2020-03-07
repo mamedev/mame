@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
-<!-- The Pocket Challenge V2 appears to be compatible with the Wonderswan from a software point of view -->
-
 <!--
+license:CC0
+
+The Pocket Challenge V2 appears to be compatible with the Wonderswan from a software point of view
+
  List of software from ja.wikipedia.org (which might miss some later re-release)
 
  * 進研ゼミ 中学講座
@@ -30,7 +31,7 @@
  高校受験5教科パック+入試テーマ別特講
  高校受験EX (合格特講700)
 
- -->
+-->
 
 <softwarelist name="pockchalv2" description="Pocket Challenge V2 cartridges">
 

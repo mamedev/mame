@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- Thanks to DCMOTO (http://dcmoto.free.fr) for info! -->
+<!--
+license:CC0
+
+Thanks to DCMOTO (http://dcmoto.free.fr) for info!
+-->
 <softwarelist name="to8_cass" description="Thomson TO8 cassetes">
 
 	<software name="bactron">

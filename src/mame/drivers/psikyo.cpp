@@ -1083,11 +1083,11 @@ void psikyo_state::sngkace(machine_config &config)
 void psikyo_state::gunbird(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, 16000000);
+	M68EC020(config, m_maincpu, 16_MHz_XTAL);  // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_map);
 	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
 
-	LZ8420M(config, m_audiocpu, 4000000);  /* ! LZ8420M (Z80 core) ! */
+	LZ8420M(config, m_audiocpu, 16_MHz_XTAL / 2);  // 8 MHz (16 / 2)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psikyo_state::gunbird_sound_io_map);
 
@@ -1111,7 +1111,7 @@ void psikyo_state::gunbird(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono",  1.0);
 
@@ -1167,11 +1167,11 @@ void psikyo_state::s1945bl(machine_config &config) /* Bootleg hardware based on 
 void psikyo_state::s1945(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, 16_MHz_XTAL);
+	M68EC020(config, m_maincpu, 16_MHz_XTAL);  // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::s1945_map);
 	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
 
-	LZ8420M(config, m_audiocpu, 16_MHz_XTAL / 2);  /* ! LZ8420M (Z80 core) ! */
+	LZ8420M(config, m_audiocpu, 16_MHz_XTAL / 2);  // 8 MHz (16 / 2)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psikyo_state::s1945_sound_io_map);
 

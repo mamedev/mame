@@ -15,7 +15,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6800/m6801.h"
-#include "machine/mc2661.h"
+#include "machine/scn_pci.h"
 
 
 

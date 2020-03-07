@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
+license:CC0
+
+NOTE: This list is here only to document available dumps and it's not used (yet) by MAME!
 -->
 <softwarelist name="lisa2" description="Apple Lisa 2">
 

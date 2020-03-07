@@ -80,7 +80,7 @@ ROM_START(d50) // Newer PCB with silkscreen "Roland || D-50, D-550 || MAIN BOARD
 	// ic29 is empty on boards with tc534000-sized Mask ROMs
 ROM_END
 
-ROM_START(d50a) // Older PCB with silkscreen "Roland || D-50 MAIN BOARD || ASSY 76180090" and trace layer ID "22925445 00" and a PGA LA32 "R15229851 || MB87136A || 8706 E02" at IC31, though the oldest service manual supposedly claims it could have an "MB87136" with no A as well. This board only supports the split PCM roms unless hand-modified. This board has a factory greenwire fix for a missing trace from the IC8 Chorus ASIC MB87137-001 pin 59 to the IC1 DRAM D41416 pin 17.
+ROM_START(d50o) // Older PCB with silkscreen "Roland || D-50 MAIN BOARD || ASSY 76180090" and trace layer ID "22925445 00" and a PGA LA32 "R15229851 || MB87136A || 8706 E02" at IC31, though the oldest service manual supposedly claims it could have an "MB87136" with no A as well. This board only supports the split PCM roms unless hand-modified. This board has a factory greenwire fix for a missing trace from the IC8 Chorus ASIC MB87137-001 pin 59 to the IC1 DRAM D41416 pin 17.
 	ROM_REGION(0x10000, "progrom", 0)
 	ROM_SYSTEM_BIOS(0, "v1.10cfw", "ROM Version 1.10 maybe user patched") // "        D-50    Ver 1.10                Thanks to Eric & Adrian.  30G7 C.410/7.4"
 	ROMX_LOAD("roland__1-11__2-1-96_greg.v1.10.ic22", 0x00000, 0x10000, CRC(7fc199c5) SHA1(3fc889d6c44f8b40de6619a3427d0c89730dd9b3), ROM_BIOS(0)) // this particular dump came from a handwritten label eprom chip labeled "Roland || 1-11 2/1/96 Greg" so it could be original code, but it was a hand-made update chip by some operator in the past. It is possible this code has a user-bugfix applied to it, though, given the 1-11 in the label.
@@ -119,5 +119,5 @@ ROM_START(d550) // Newer PCB with silkscreen "Roland || D-50, D-550 || MAIN BOAR
 ROM_END
 
 SYST(1987, d50,  0,   0, d50, d50, roland_d50_state, empty_init, "Roland", "D-50 Linear Synthesizer (Ver. 2.xx)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST(1987, d50a, d50, 0, d50, d50, roland_d50_state, empty_init, "Roland", "D-50 Linear Synthesizer (Ver. 1.xx)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(1987, d50o, d50, 0, d50, d50, roland_d50_state, empty_init, "Roland", "D-50 Linear Synthesizer (Ver. 1.xx)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 SYST(1987, d550, d50, 0, d50, d50, roland_d50_state, empty_init, "Roland", "D-550 Linear Synthesizer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

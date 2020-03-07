@@ -144,6 +144,19 @@ protected:
 };
 
 
+class m6803e_cpu_device : public m6801_cpu_device
+{
+public:
+	m6803e_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return clocks; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return cycles; }
+
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+};
+
+
 class hd6301_cpu_device : public m6801_cpu_device
 {
 public:
@@ -179,6 +192,17 @@ public:
 };
 
 
+// DP-64S package: HD6303XP,  HD63A03XP,  HD63B03XP
+// FP-80  package: HD6303XF,  HD63A03XF,  HD63B03XF
+// CP-68  package: HD6303XCP, HD63A03XCP, HD63B03XCP
+// Not fully emulated yet
+class hd6303x_cpu_device : public hd6301_cpu_device
+{
+public:
+	hd6303x_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 // DP-64S package: HD6303YP,  HD63A03YP,  HD63B03YP,  HD63C03YP
 // FP-64  package: HD6303YF,  HD63A03YF,  HD63B03YF,  HD63C03YF
 // FP-64A package: HD6303YH,  HD63A03YH,  HD63B03YH,  HD63C03YH
@@ -193,9 +217,11 @@ public:
 
 DECLARE_DEVICE_TYPE(M6801, m6801_cpu_device)
 DECLARE_DEVICE_TYPE(M6803, m6803_cpu_device)
+DECLARE_DEVICE_TYPE(M6803E, m6803e_cpu_device)
 DECLARE_DEVICE_TYPE(HD6301, hd6301_cpu_device)
 DECLARE_DEVICE_TYPE(HD63701, hd63701_cpu_device)
 DECLARE_DEVICE_TYPE(HD6303R, hd6303r_cpu_device)
+DECLARE_DEVICE_TYPE(HD6303X, hd6303x_cpu_device)
 DECLARE_DEVICE_TYPE(HD6303Y, hd6303y_cpu_device)
 
 #endif // MAME_CPU_M6800_M6801_H

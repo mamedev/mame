@@ -4,7 +4,7 @@
 
     Imagetek I4100 / I4220 / I4300 device files
 
-    device emulation by Angelo Salese, 
+    device emulation by Angelo Salese,
     based off from original metro.cpp implementation by Luca Elia & David Haywood
 
     TODO:
@@ -21,8 +21,8 @@
       diverges, the blitter is responsible of the upload fwiw;
     - Some gfx problems in ladykill, 3kokushi, puzzli, gakusai, seem related to how we handle
       windows, wrapping, read-modify-write areas;
-    - puzzli: emulate hblank irq and fix video routines here (water effect not emulated, 
-      confirmed on PCB ref). Are the screen_ctrl_w "led" bits actually buffer latches 
+    - puzzli: emulate hblank irq and fix video routines here (water effect not emulated,
+      confirmed on PCB ref). Are the screen_ctrl_w "led" bits actually buffer latches
       for the layers? They get written in the middle of the screen, may also be v2 specific.
     - Unemulated flip screen.
 

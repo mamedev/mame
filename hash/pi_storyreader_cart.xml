@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="pi_storyreader_cart" description="Publications International Ltd. Story Reader cartridges">
 
 	<!-- carts have either one or two globs in them -->
@@ -286,7 +289,7 @@
 	</software>
 
 	<!-- German carts -->
-	
+
 	<software name="carsger" supported="no">
 		<description>Cars (Germany)</description>
 		<year>200?</year>
@@ -297,9 +300,9 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dasdsch" supported="no">
-		<description>Das Dschungel-Buch (Germany)</description>
+		<description>Das Dschungelbuch (Germany)</description>
 		<year>200?</year>
 		<publisher>Publications International Ltd. / Disney</publisher>
 		<part name="cart" interface="pi_storyreader_cart">
@@ -308,9 +311,9 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="koniglow" supported="no">
-		<description>Der Konig der Lowen (Germany)</description>
+		<description>Der König der Löwen (Germany)</description>
 		<year>200?</year>
 		<publisher>Publications International Ltd. / Disney</publisher>
 		<part name="cart" interface="pi_storyreader_cart">
@@ -343,7 +346,7 @@
 	</software>
 
 	<software name="puuhtag" supported="no">
-		<description>Winnie Puuh - Ein sturmischer Tag (Germany)</description>
+		<description>Winnie Puuh - Ein stürmischer Tag (Germany)</description>
 		<year>200?</year>
 		<publisher>Publications International Ltd. / Disney</publisher>
 		<part name="cart" interface="pi_storyreader_cart">
@@ -351,8 +354,8 @@
 				<rom name="winnie puuh - ein sturmischer tag (ger).bin" size="0x100000" crc="d39bc8a0" sha1="745d946dc744d9fe1fba68425e6af8758945e0b7" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="puuhhung" supported="no">
 		<description>Winnie Puuh hat keinen Hunger (Germany)</description>
 		<year>200?</year>
@@ -362,6 +365,6 @@
 				<rom name="winnie puuh hat keinen hunger (ger).bin" size="0x100000" crc="be1c90f1" sha1="08f2972bd69764952ae02f9cd0ba993fdc582705" />
 			</dataarea>
 		</part>
-	</software>		
-	
+	</software>
+
 </softwarelist>

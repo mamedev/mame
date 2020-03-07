@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 	<element name="spotlight0"><text string="spot 1" state="1"/></element>
 	<element name="spotlight1"><text string="spot 2" state="1"/></element>

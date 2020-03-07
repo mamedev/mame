@@ -12,7 +12,7 @@
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "video/scn2674.h"
 #include "screen.h"
 
@@ -27,7 +27,7 @@ public:
 	{ }
 
 	void ampex210p(machine_config &config);
-	void ampex230(machine_config &config);
+	void ampex230p(machine_config &config);
 
 private:
 	void common_video(machine_config &config);
@@ -185,7 +185,7 @@ void ampex210_state::ampex210p(machine_config &config)
 	screen.set_screen_update("pvtc", FUNC(scn2672_device::screen_update));
 }
 
-void ampex210_state::ampex230(machine_config &config)
+void ampex210_state::ampex230p(machine_config &config)
 {
 	Z80(config, m_maincpu, 3.6864_MHz_XTAL); // Z80ACPU; clock uncertain
 	m_maincpu->set_addrmap(AS_PROGRAM, &ampex210_state::ampex230_mem);
@@ -230,7 +230,7 @@ ROM_START(ampex210p) // Z80 (+6551,MC2672,3515260-01, 3 xtals, speaker) // 8k ra
 	ROM_LOAD("35-526-01.u3", 0x0000, 0x1000, CRC(4659bcd2) SHA1(554574f55ed875baba0a6133648c44df763cc5c4))
 ROM_END
 
-ROM_START(ampex230)
+ROM_START(ampex230p) // EPROMs stickered "© 1989 AMPEX CORP."
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("230_u11.bin", 0x0000, 0x8000, CRC(c8f93719) SHA1(81019b42245ca60c7de3ee5d3194c4d22fd38a8d))
 
@@ -238,5 +238,5 @@ ROM_START(ampex230)
 	ROM_LOAD("230_u2.bin", 0x0000, 0x2000, CRC(7143b773) SHA1(616d3c0c1a1f7a00bf16857324043955ab842994))
 ROM_END
 
-COMP(1989, ampex210p, 0, 0, ampex210p, ampex210p, ampex210_state, empty_init, "Ampex", "210+", MACHINE_IS_SKELETON)
-COMP(1989, ampex230,  0, 0, ampex230,  ampex210p, ampex210_state, empty_init, "Ampex", "230", MACHINE_IS_SKELETON)
+COMP(1988, ampex210p, 0, 0, ampex210p, ampex210p, ampex210_state, empty_init, "Ampex", "Ampex 210 plus Terminal (v3.0)", MACHINE_IS_SKELETON)
+COMP(1988, ampex230p, 0, 0, ampex230p, ampex210p, ampex210_state, empty_init, "Ampex", "Ampex 230 plus Terminal (v4.0)", MACHINE_IS_SKELETON)

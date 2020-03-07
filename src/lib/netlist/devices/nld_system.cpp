@@ -73,6 +73,9 @@ namespace devices
 	NETLIB_DEVICE_IMPL(gnd,                 "GNDA",                   "")
 	NETLIB_DEVICE_IMPL(netlistparams,       "PARAMETER",              "")
 
+	using NETLIB_NAME(logic_input8) = NETLIB_NAME(logic_inputN)<8>;
+	NETLIB_DEVICE_IMPL(logic_input8,         "LOGIC_INPUT8",            "IN,FAMILY")
+
 	NETLIB_DEVICE_IMPL(logic_input,         "LOGIC_INPUT",            "IN,FAMILY")
 	NETLIB_DEVICE_IMPL_ALIAS(logic_input_ttl, logic_input, "TTL_INPUT", "IN")
 

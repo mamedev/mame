@@ -5,13 +5,13 @@
 
 #pragma once
 
-typedef device_delegate<uint16_t (uint16_t pri)> decospr_pri_cb_delegate;
-typedef device_delegate<uint16_t (uint16_t col)> decospr_col_cb_delegate;
+typedef device_delegate<uint16_t (uint16_t pri, bool extpri)> decospr_pri_cb_delegate;
+typedef device_delegate<uint16_t (uint16_t col, bool extcol)> decospr_col_cb_delegate;
 
 
 // function definition for a callback
-#define DECOSPR_PRIORITY_CB_MEMBER(_name)   uint16_t _name(uint16_t pri)
-#define DECOSPR_COLOUR_CB_MEMBER(_name)     uint16_t _name(uint16_t col)
+#define DECOSPR_PRIORITY_CB_MEMBER(_name)   uint16_t _name(uint16_t pri, bool extpri)
+#define DECOSPR_COLOUR_CB_MEMBER(_name)     uint16_t _name(uint16_t col, bool extcol)
 
 
 class decospr_device : public device_t, public device_video_interface

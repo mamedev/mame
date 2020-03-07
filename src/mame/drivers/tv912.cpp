@@ -182,12 +182,12 @@ WRITE8_MEMBER(tv912_state::p2_w)
 
 READ8_MEMBER(tv912_state::crtc_r)
 {
-	return m_crtc->read(space, bitswap<4>(offset, 5, 4, 1, 0));
+	return m_crtc->read(bitswap<4>(offset, 5, 4, 1, 0));
 }
 
 WRITE8_MEMBER(tv912_state::crtc_w)
 {
-	m_crtc->write(space, bitswap<4>(offset, 5, 4, 1, 0), data);
+	m_crtc->write(bitswap<4>(offset, 5, 4, 1, 0), data);
 }
 
 READ8_MEMBER(tv912_state::keyboard_r)

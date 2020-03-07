@@ -443,6 +443,12 @@ void deco16ic_device::custom_tilemap_draw(
 	u8 pmask
 	)
 {
+	typename _BitmapClass::pixel_t *dest;
+	int rgb;
+	if (sizeof(*dest) == 2) rgb = 0;
+	else rgb = 1;
+
+	gfx_element *gfx = m_gfxdecode->gfx(BIT(control1, 7) ? m_pf12_8x8_gfx_bank : m_pf12_16x16_gfx_bank);
 	tilemap_t *tilemap0 = BIT(control1, 7) ? tilemap0_8x8 : tilemap0_16x16;
 	tilemap_t *tilemap1 = BIT(control1, 7) ? tilemap1_8x8 : tilemap1_16x16;
 	const bitmap_ind16 *src_bitmap0 = tilemap0 ? &tilemap0->pixmap() : nullptr;
@@ -489,20 +495,22 @@ void deco16ic_device::custom_tilemap_draw(
 			{
 				if (!is_tattoo)
 				{
-					// does boogie wings actually use this, or is the tattoo assassing code correct in this mode?
+					// does boogie wings actually use this, or is the tattoo assassin code correct in this mode?
 					p |= (src_bitmap1->pix16((src_y + column_offset) & height_mask, src_x) & combine_mask) << combine_shift;
 				}
 				else
 				{
 					const u16 p2 = src_bitmap1->pix16((src_y + column_offset) & height_mask, src_x);
-					p = 0x200 + (((p & 0x30) << 4) | (p & 0x0f) | ((p2 & 0x0f) << 4));
+					p = gfx->colorbase() + (m_pf1_colour_bank * gfx->granularity()) + (((p & 0x30) << 4) | (p & 0x0f) | ((p2 & 0x0f) << 4));
 				}
 			}
 			src_x = (src_x + 1) & width_mask;
 
 			if ((flags & TILEMAP_DRAW_OPAQUE) || (p & trans_mask))
 			{
-				bitmap.pix(y, x) = m_gfxdecode->palette().pen(p);
+				dest = &bitmap.pix(y);
+				if (!rgb) dest[x] = p;
+				else dest[x] = m_gfxdecode->palette().pen(p);
 				if (screen.priority().valid())
 				{
 					u8 *pri = &screen.priority().pix8(y);
@@ -543,8 +551,35 @@ void deco16ic_device::set_tilemap_colour_mask(int tmap, int mask)
 {
 	switch (tmap)
 	{
-	case 0: m_pf1_colourmask = mask; break;
-	case 1: m_pf2_colourmask = mask; break;
+	case 0: m_pf1_colourmask = mask; m_pf1_tilemap_16x16->mark_all_dirty(); m_pf1_tilemap_8x8->mark_all_dirty(); break;
+	case 1: m_pf2_colourmask = mask; m_pf2_tilemap_16x16->mark_all_dirty(); m_pf2_tilemap_8x8->mark_all_dirty(); break;
+	}
+}
+
+void deco16ic_device::set_tilemap_colour_bank(int tmap, int bank)
+{
+	switch (tmap)
+	{
+	case 0:
+		if (m_pf1_colour_bank != bank)
+		{
+			m_pf1_colour_bank = bank;
+			if (m_pf1_tilemap_16x16)
+				m_pf1_tilemap_16x16->mark_all_dirty();
+			if (m_pf1_tilemap_8x8)
+				m_pf1_tilemap_8x8->mark_all_dirty();
+		}
+		break;
+	case 1:
+		if (m_pf2_colour_bank != bank)
+		{
+			m_pf2_colour_bank = bank;
+			if (m_pf2_tilemap_16x16)
+				m_pf2_tilemap_16x16->mark_all_dirty();
+			if (m_pf2_tilemap_8x8)
+				m_pf2_tilemap_8x8->mark_all_dirty();
+		}
+		break;
 	}
 }
 

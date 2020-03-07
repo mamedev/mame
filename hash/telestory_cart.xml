@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
 
 Cart pinout:
 
@@ -148,12 +148,23 @@ Undumped carts:
 	</software>
 
 	<software name="spongeb" supported="no">
-		<description>SponegeBob SquarePants - Ice-Cream Dreams / Stop the Presses! (USA)</description>
+		<description>SpongeBob SquarePants - Ice-Cream Dreams / Stop the Presses! (USA)</description>
 		<year>2006</year>
 		<publisher>JAKKS Pacific / Toymax / HotGen</publisher>
 		<part name="cart" interface="telestory_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="telestoryspongebob.bin" size="0x800000" crc="fe969a30" sha1="05945f07ad45032328336b8d10475d06553507fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomas" supported="no">
+		<description>Thomas &amp; Friends - Thomas Visits the Toy Shop / Thomas' Milkshake Mix</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax / HotGen</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestory_thomasvisitstoyshop_milkshakemix.bin" size="0x800000" crc="4b99c75d" sha1="a3885e435b0bf5a87f3952da2880c36d118af17e"/>
 			</dataarea>
 		</part>
 	</software>

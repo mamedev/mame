@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- Thanks to DCMOTO (http://dcmoto.free.fr) for info! -->
+<!--
+license:CC0
+
+Thanks to DCMOTO (http://dcmoto.free.fr) for info!
+-->
 <softwarelist name="mo5_cass" description="Thomson MO5 cassettes">
 
 <!-- Applications -->

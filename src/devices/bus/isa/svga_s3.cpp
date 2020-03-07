@@ -150,6 +150,17 @@ void isa16_s3virge_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update(m_vga, FUNC(s3virge_vga_device::screen_update));
 
 	S3VIRGE(config, m_vga, 0).set_screen("screen");
+	m_vga->linear_config_changed().set(FUNC(isa16_s3virge_device::linear_config_changed_w));
+}
+
+//-------------------------------------------------
+//  linear_config_changed_w - callback to indicate
+//  enabling, disabling, or changig of the linear
+//  framebuffer configuration.
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(isa16_s3virge_device::linear_config_changed_w)
+{
 }
 
 //-------------------------------------------------
@@ -229,6 +240,33 @@ void isa16_s3virgedx_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update(m_vga, FUNC(s3virgedx_vga_device::screen_update));
 
 	S3VIRGEDX(config, m_vga, 0).set_screen("screen");
+	m_vga->linear_config_changed().set(FUNC(isa16_s3virgedx_device::linear_config_changed_w));
+}
+
+//-------------------------------------------------
+//  linear_config_changed_w - callback to indicate
+//  enabling, disabling, or changig of the linear
+//  framebuffer configuration.
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(isa16_s3virgedx_device::linear_config_changed_w)
+{
+	const bool old = m_lfb_enable;
+	m_lfb_enable = state;
+	if (state)
+	{
+		if (old)
+		{
+			m_isa->unmap_readwrite(m_lfb_start, m_lfb_end);
+		}
+		m_lfb_start = m_vga->get_linear_address();
+		m_lfb_end = m_lfb_start + m_vga->get_linear_address_size_full() - 1;
+		m_isa->install_memory(m_lfb_start, m_lfb_end, read8_delegate(*m_vga, FUNC(s3virge_vga_device::fb_r)), write8_delegate(*m_vga, FUNC(s3virge_vga_device::fb_w)));
+	}
+	else
+	{
+		m_isa->unmap_readwrite(m_lfb_start, m_lfb_end);
+	}
 }
 
 //-------------------------------------------------
@@ -271,6 +309,10 @@ void isa16_s3virgedx_device::device_start()
 	m_isa->install_device(0x03d0, 0x03df, read8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03d0_r)), write8_delegate(*m_vga, FUNC(s3virge_vga_device::port_03d0_w)));
 
 	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(*m_vga, FUNC(s3virge_vga_device::mem_r)), write8_delegate(*m_vga, FUNC(s3virge_vga_device::mem_w)));
+
+	save_item(NAME(m_lfb_enable));
+	save_item(NAME(m_lfb_start));
+	save_item(NAME(m_lfb_end));
 }
 
 //-------------------------------------------------
@@ -279,6 +321,9 @@ void isa16_s3virgedx_device::device_start()
 
 void isa16_s3virgedx_device::device_reset()
 {
+	m_lfb_enable = m_vga->is_linear_address_active();
+	m_lfb_start = m_vga->get_linear_address();
+	m_lfb_end = m_lfb_start + m_vga->get_linear_address_size_full() - 1;
 }
 
 
@@ -309,6 +354,17 @@ void isa16_stealth3d2kpro_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update(m_vga, FUNC(s3virgedx_rev1_vga_device::screen_update));
 
 	S3VIRGEDX1(config, m_vga, 0).set_screen("screen");
+	m_vga->linear_config_changed().set(FUNC(isa16_stealth3d2kpro_device::linear_config_changed_w));
+}
+
+//-------------------------------------------------
+//  linear_config_changed_w - callback to indicate
+//  enabling, disabling, or changig of the linear
+//  framebuffer configuration.
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(isa16_stealth3d2kpro_device::linear_config_changed_w)
+{
 }
 
 //-------------------------------------------------

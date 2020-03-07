@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
 
 V.Smile Motion:               80-08****  (Smartridges are orange)
 V.Smile Smartbook Software:   80-089***  (Smartridges are red)
@@ -34,7 +34,7 @@ Addons (w/ yellow Smartridges)
 |        | 80-091443(UK)     | V.Smile Smart Keyboard                                                     |
 |   XX   | 80-091444(GE)     | Schreibspaß (52-091444 on back label)                                      |
 |        | 80-091447(SP)     | Teclado Interactivo V.Smile                                                |
-|        | 80-091445(FR)     | V.Smile TIP TAP                                                |
+|   XX   | 80-091445(FR)     | V.Smile Clavier Tip Tap                                                    |
 +========+===================+============================================================================+
 |        | 80-03600(US)      | V.Smile PC Pal Island                                                      |
 +========+===================+============================================================================+
@@ -46,7 +46,7 @@ Addons (w/ yellow Smartridges)
 |   XX   | 80-067000(US)     | V.Smile Art Studio                                                         |
 |        | 80-067003(UK)     | V.Smile Art Studio                                                         |
 |   XX   | 80-067004(GE)     | V.Smile Zeichenatelier (Magic Malboard)                                    |
-|        | 80-067005(FR)     | V.Smile Studio De Dessin                                                   |
+|   XX   | 80-067005(FR)     | V.Smile Studio De Dessin                                                   |
 |        |          (DK)     | V.Smile Tegnestudie                                                        |
 |   XX   | 80-067021(SE)     | V.Smile Tecknarstudio                                                      |
 |        | 80-067022(SP)     | V.Smile Estudio de Arte (orange)                                           |
@@ -59,7 +59,7 @@ Addons (w/ yellow Smartridges)
 |        | 80-091322(NL)     | V.Smile Muziek en Leer Mat                                                 |
 |        | 80-091323(UK)     | V.Smile Dance'n'Learn                                                      |
 |   XX   | 80-091324(GE)     | V.Smile Tanz Mit Center (cart labeled as "Lern- und Tanzmatte")            |
-|        | 80-091325(FR)     | V.Smile Défi Gym (box labeled as "Tapis Multisport")                       |
+|   XX   | 80-091325(FR)     | V.Smile Défi Gym (box labeled as "Tapis Multisport")                       |
 |   XX   | 80-091327(SP)     | V.Smile Gimnasio Interactivo                                               |
 +========+===================+============================================================================+
 
@@ -247,8 +247,8 @@ Regular game cartridges
 |        | 80-092163-103(UK) | Scooby-Doo! - Funland Frenzy                                                                   |
 |        | 80-092163-293(UK) | Scooby-Doo! - Funland Frenzy (Yellow, only Scooby on label might be motion version)            |
 |   XX   | 80-092164(GE)     | Scooby-Doo! - Im Lernpark                                                                      |
-|   XX   | 80-092165(FR)     | Scooby-Doo! - Panique à Funland                                                                |
-|        | 80-092165(FR)     | Scooby-Doo! - Panique à Funland (translucent blue cart)                                        |
+|   XX   | 80-092165(FR)     | Scooby-Doo! - Panique à Funland (same ROM on purple and translucent blue carts)                |
+|   XX   | 80-092165-105(FR) | Scooby-Doo! - Panique à Funland                                                                |
 |   XX   | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (translucent blue cart)                                     |
 |   XX   | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (purple, # on back label)                                   |
 |   XX   | 80-092173(DK)     | Scooby-Doo! - Sjov i forlystelsesparken                                                        |
@@ -267,7 +267,7 @@ Regular game cartridges
 |   XX   | 80-092202(NL)     | Aladdin - De wonderwereld van Aladdin                                                          |
 |        | 80-092203(UK)     | Aladdin - Aladdin's Wonders of the World                                                       |
 |   XX   | 80-092204(GE)     | Aladdin - Aladdins Welt der Wunder                                                             |
-|        | 80-092205(FR)     | Aladdin - Les fabuleuses aventures d'Aladdin                                                   |
+|   XX   | 80-092205(FR)     | Aladdin - Les fabuleuses aventures d'Aladdin                                                   |
 |   XX   | 80-092207(SP)     | Aladdin - El Maravilloso Mundo de Aladdin (52-92207(SP) on back label)                         |
 |        | 80-092210(KOR)    | Aladdin - 알라딘의 신비한 모험 게임 (50-92210(KOR) on back label)                                 |
 +========+===================+================================================================================================+
@@ -276,7 +276,7 @@ Regular game cartridges
 |        |          (IT)     | Toy Story 2 - Operazione: Salvataggio di Woody! (GPZ06503)                                     |
 |   XX   | 80-092223(UK)     | Toy Story 2 - Operation Rescue Woody!                                                          |
 |   XX   | 80-092224(GE)     | Toy Story 2 - Woodys Spannende Rettung                                                         |
-|        | 80-092225(FR)     | Toy Story 2 - Buzz à la Rescousse!                                                             |
+|   XX   | 80-092225(FR)     | Toy Story 2 - Buzz à la Rescousse!                                                             |
 |        | 80-092226(PT)     | Toy Story 2 - O Resgate de Woody (92236 on cart)                                               |
 |   XX   | 80-092227(SP)     | Toy Story 2 - El Rescate De Woody (52-92227(SP) on back label)                                 |
 |        |          (DK)     | Toy Story 2 - Operation: Red Woody!                                                            |
@@ -296,8 +296,8 @@ Regular game cartridges
 |   XX   | 80-092244-104(GE) | Cinderella - Lernen im Märchenland (2007)                                                      |
 |   XX   | 80-092244-204(GE) | Cinderella - Lernen im Märchenland (2008) (52-092244-205(GER) on back label)                   |
 |   XX   | 80-092245(FR)     | Cendrillon - Le rêve enchanté de Cendrillon                                                    |
-|        | 80-092245-105(FR) | Cendrillon - Le rêve enchanté de Cendrillon                                                    |
-|        | 80-092245-205(FR) | Cendrillon - Le reve enchante de Cendrillon                                                    |
+|   XX   | 80-092245-105(FR) | Cendrillon - Le rêve enchanté de Cendrillon                                                    |
+|   XX   | 80-092245-205(FR) | Cendrillon - Le rêve enchanté de Cendrillon                                                    |
 |        | 80-092246(PT)     | Cinderela - Os Sonhos Magicos da Cinderela (Cart#92256)                                        |
 |   XX   | 80-092247(SP)     | La Cenicienta - Los sueños mágicos de Cenicienta (non motion#, but V.Motion in spanish catalog)|
 |   XX   | 80-092247-122(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (white/light pink cart label background)      |
@@ -311,21 +311,22 @@ Regular game cartridges
 |        | 80-092260(US)     | Elmo's World - Elmo's Big Discoveries                                                          |
 |   XX   | 80-092264(GE)     | Elmos großes Abenteuer                                                                         |
 |   XX   | 80-092265(FR)     | Le Monde d'Elmo - Les Grandes Découvertes D'Elmo                                               |
-|   XX   | 80-092267(SP)     | Mundo Elmo - Grandes descubrimientos de Elmo (52-92267(SP) on back label, green sticker: "529 ○○○○")
+|   XX   | 80-092267(SP)     | Mundo Elmo - Grandes descubrimientos de Elmo (52-92267(SP) on back label)                      |
 +========+===================+================================================================================================+
 |   XX   | 80-092280(US)     | Dora The Explorer - Dora's Fit-it Adventure                                                    |
-|        | 80-092280-101(US) | Dora The Explorer - Dora's Fit-it Adventure (ALT)                                              |
-|   XX   | 80-092280-201(US) | Dora The Explorer - Dora's Fit-it Adventure (ALT 2)                                            |
+|        | 80-092280-101(US) | Dora The Explorer - Dora's Fit-it Adventure (alt)                                              |
+|   XX   | 80-092280-201(US) | Dora The Explorer - Dora's Fit-it Adventure (alt 2)                                            |
 |        | 80-092282(NL)     | Dora - Doras Reparatie Avontuur!                                                               |
 |   XX   | 80-092283(UK)     | Dora The Explorer - Dora's Fit-it Adventure (same ROM as "80-092280(US)"                       |
-|   XX   | 80-092283-103(UK) | Dora The Explorer - Dora's Fit-it Adventure (ALT, orange sticker: "723 ○●○○")                  |
+|   XX   | 80-092283-103(UK) | Dora The Explorer - Dora's Fit-it Adventure (alt)                                              |
 |        | 80-092284(GE)     | Dora - Doras Reparatur-Abenteuer                                                               |
 |   XX   | 80-092284-104(GE) | Dora - Doras Reparatur-Abenteuer                                                               |
 |   XX   | 80-092285(FR)     | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano                                   |
+|   XX   | 80-092285-105(FR) | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano                                   |
 |        | 80-092285-1?5(FR) | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano (NTSC French-Canadian)            |
 |        | 80-092286(PT)     | Dora - em busca das pecas perdidas (cart# 92296)                                               |
-|   XX   | 80-092287-222(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora (purple, no # on front label, 52-092287-222(SP) on back label)
 |        | 80-092287-122(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora                                         |
+|   XX   | 80-092287-222(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora (purple, no # on front label, 52-092287-222(SP) on back label)
 +========+===================+================================================================================================+
 |   XX   | 80-092300(US)     | Bob the Builder - Bob's Busy Day                                                               |
 |   XX   | 80-092303(UK)     | Bob the Builder - Bob's Busy Day                                                               |
@@ -381,7 +382,7 @@ Regular game cartridges
 |   XX   | 80-092422(NL)     | Finding Nemo - De wonderwereld van Nemo                                                        |
 |        | 80-092423(UK)     | Finding Nemo - Nemo's Ocean Discoveries                                                        |
 |   XX   | 80-092424(GE)     | Findet Nemo - Nemos Unterwasserabenteuer (52-92424(GER) on back label, "VT8321" silscreened on the cart)
-|        | 80-092425(FR)     | Le Monde de Nemo - Nemo à la découverte de l'océan                                             |
+|   XX   | 80-092425(FR)     | Le Monde de Nemo - Nemo à la découverte de l'océan                                             |
 |   XX   | 80-092436(PT)     | A Procura de Nemo - À descoberta do Oceano  (Cart#92436, 52-092436(Port) on back label)        |
 |   XX   | 80-092427(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo (52-92427(SP) on back label)                     |
 |        |          (CN)     | 海底总动员                                                                                      |
@@ -396,7 +397,7 @@ Regular game cartridges
 |        | 80-092460(US)     | Sesame Street - Bert and Ernie's Imagination Adventure                                         |
 |        | 80-092462(NL)     | Sesamstraat - Bert and Ernie's Fantasie Avontuur                                               |
 |   XX   | 80-092464(GE)     | Sesame Street - Ernie and Berts Fantastisches Abenteuer                                        |
-|        | 80-092465(FR)     | 5, Rue Sesame - Les Aventures Imaginaires d'Ernest et Bert                                     |
+|   XX   | 80-092465(FR)     | 5, Rue Sesame - Les Aventures Imaginaires d'Ernest et Bert                                     |
 |   XX   | 80-092467(SP)     | Barrio Sésamo - El Mundo Fantástico de Epi y Blas (no # on front label, 52-92467(SP) on back label)
 +========+===================+================================================================================================+
 |        | 80-092480(US)     | The Batman - Gotham City Rescue                                                                |
@@ -404,7 +405,7 @@ Regular game cartridges
 |        | 80-092482(NL)     | The Batman - De Redding van Gotham City                                                        |
 |   XX   | 80-092483(UK)     | The Batman - Gotham City Rescue                                                                |
 |        | 80-092484(GE)     | The Batman - Rettung von Gotham City                                                           |
-|        | 80-092485(FR)     | The Batman - Panique a Gotham City                                                             |
+|   XX   | 80-092485(FR)     | The Batman - Panique à Gotham City                                                             |
 |   XX   | 80-092487(SP)     | The Batman - Rescate en Gotham City                                                            |
 |        |          (CN)     | 蝙蝠侠 - 拯救城市                                                                                |
 +========+===================+================================================================================================+
@@ -452,7 +453,7 @@ Regular game cartridges
 |        | 80-092620(US)     | Lil' Bratz - Friends, Fashion and Fun                                                          |
 |        | 80-092623(UK)     | Lil' Bratz - Friends, Fashion and Fun                                                          |
 |   XX   | 80-092627(SP)     | Lil' Bratz - Amigos, Moda y Diversión                                                          |
-|        | 80-092625(FR)     | Lil' Bratz - Complices, Cools et Class'                                                          |
+|        | 80-092625(FR)     | Lil' Bratz - Complices, Cools et Class'                                                        |
 +========+===================+================================================================================================+
 |   XX   | 80-092640(US)     | Superman - The Greatest Hero                                                                   |
 |   XX   | 80-092642(NL)     | Superman - De Grootste Held                                                                    |
@@ -486,7 +487,7 @@ Regular game cartridges
 |        | 80-092822(NL)     | Voetbal                                                                                        |
 |        | 80-092823(UK)     | Football Challenge                                                                             |
 |   XX   | 80-092824(GE)     | Fußball Schule                                                                                 |
-|        | 80-092825(FR)     | Football Challenge                                                                             |
+|   XX   | 80-092825(FR)     | Football Challenge                                                                             |
 |        | 80-092826(PT)     | Football Challenge (cart# 92836)                                                               |
 |   XX   | 80-092827(SP)     | Campeonato de Fútbol                                                                           |
 +========+===================+================================================================================================+
@@ -508,7 +509,7 @@ Regular game cartridges
 |   XX   | 80-092862(NL)     | Shrek de Derde - Arthurs Schooldag Avontuur                                                    |
 |   XX   | 80-092863(UK)     | Shrek the Third: Arthur's School Day Adventure                                                 |
 |   XX   | 80-092864(GE)     | Shrek der Dritte - Ein Spannender Schultag                                                     |
-|        | 80-092865(FR)     | Shrek Troisieme - L'aventure d'Arthur                                                          |
+|   XX   | 80-092865(FR)     | Shrek Le Troisieme - L'aventure d'Arthur                                                       |
 |        | 80-092867(SP)     | Shrek Tercero - En Busca de Arturo                                                             |
 +========+===================+================================================================================================+
 |        | 80-092880(US)     | Ratatouille - Remy's New Recipes                                                               |
@@ -517,7 +518,7 @@ Regular game cartridges
 |        | 80-092883(UK)     | Ratatouille - Remy's New Recipes                                                               |
 |   XX   | 80-092884(GE)     | Ratatouille - Remys neue Rezepte                                                               |
 |        | 80-092884-104(GE) | Ratatouille - Remys neue Rezepte (ALT)                                                         |
-|        | 80-092885(FR)     | Ratatouille - Les nouvelles recettes de Rémy                                                   |
+|   XX   | 80-092885(FR)     | Ratatouille - Les nouvelles recettes de Rémy                                                   |
 |   XX   | 80-092887(SP)     | Ratatouille - Las recetas del Remy (52-092887(SP) on back label)                               |
 +========+===================+================================================================================================+
 |   XX   | 80-092900(US)     | Go Diego Go! - Save the Animal Familes!                                                        |
@@ -528,7 +529,7 @@ Regular game cartridges
 |   XX   | 80-092920(US)     | Cranium - Partyland Park                                                                       |
 |        | 80-092922(UK)     | Cranium - Partyland Park                                                                       |
 |   XX   | 80-092924(GE)     | Cranium - Freizeit Park                                                                        |
-|        | 80-092925(FR)     | Cranium - Le Parc D'attractions                                                                |
+|   XX   | 80-092925(FR)     | Cranium - Le Parc D'attractions                                                                |
 |   XX   | 80-092927(SP)     | Cranium - Parque de atracciones de Cranium (52-092927(SP) on back label)                       |
 +========+===================+================================================================================================+
 |        | 80-092940(US)     | <Unknown> (should be Mickey Mouse Clubhouse, 80-084180 exists in V.Link database)              |
@@ -553,7 +554,7 @@ Regular game cartridges
 |   XX   | 80-092980(US)     | Disney's Little Einsteins: The Glass Slipper Ball                                              |
 |        | 80-092983(UK)     | Disney's Little Einsteins: The Glass Slipper Ball (purple cart on front of UK box, but V.Motion listed)
 |   XX   | 80-092984(GE)     | Kleine Einsteins                                                                               |
-|        | 80-092985(FR)     | Disney - Les petits Einsteins: Le bal du soulier de verre                                      |
+|   XX   | 80-092985(FR)     | Disney - Les petits Einsteins: Le bal du soulier de verre                                      |
 |   XX   | 80-092987(SP)     | Little Einsteins de Disney: El baile del zapatito de cristal                                   |
 +========+===================+================================================================================================+
 |        |          (CN)     | 小学英语 - Primary English                                                                      |
@@ -621,6 +622,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92204.u1" size="8388608" crc="dfa7b720" sha1="c4f7bcbe95c7eb5dfd0dd97f5d496db6ac158ea6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aladdinf" cloneof="aladdini">
+		<description>Disney Aladdin - Les fabuleuses aventures d'Aladdin (France)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092205(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="92205 - Aladdin (FR).bin" size="8388608" crc="08aa0570" sha1="ba7268cb7ffe858abbb69745dbf2279e0bb8b234" />
 			</dataarea>
 		</part>
 	</software>
@@ -948,6 +964,20 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<dataarea name="rom" size="8388608">
 				<rom name="Batman - Gotham City Rescue (Europe).bin" size="8388608" crc="fde620e9" sha1="81d014800f06bb964f23919fa16f9d14c8189c7d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batmanf" cloneof="batmanuk">
+		<description>The Batman - Panique à Gotham City (France)</description>
+		<year>2006</year> <!-- (s06) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092485(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="92485 - Batman (FR).bin" size="8388608" crc="8a550348" sha1="11f77c4973d29c962567390e41879c86a759c93b" />
 			</dataarea>
 		</part>
 	</software>
@@ -1376,6 +1406,38 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<!-- No inputs -->
+	<software name="cinderlafr105" cloneof="cinderla" supported="no">
+		<description>Disney Princesses Cendrillon - Le rêve enchanté de Cendrillon (France, Rev. 105)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092245-105(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092245-105 - Cendrillon (FR).bin" size="8388608" crc="b199c517" sha1="7ae42f873aa0c533c716e6e94d00cbc74002b002" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="cinderlafr205" cloneof="cinderla" supported="no">
+		<description>Walt Disney Cendrillon - Le rêve enchanté de Cendrillon (France, Rev. 205)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092245-205(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092245-205 - Cendrillon (FR).bin" size="8388608" crc="d15de2f6" sha1="65b9ea951a7dae2b09b38cd29c1ac18ee5624047" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cinderlas" cloneof="cinderla">
 		<description>Walt Disney La Cenicienta - Los sueños mágicos de Cenicienta (Spain)</description>
 		<year>2005</year>
@@ -1583,6 +1645,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<!-- No inputs -->
+	<software name="dorafr105" cloneof="dorar201" supported="no">
+		<description>Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano (France, Rev. 105)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092285-105(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092285-105 - Dora (FR).bin" size="8388608" crc="645876b1" sha1="fe6710e69f5e26ec4299301532238654cf2b748c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
 	<software name="dorasr222" cloneof="dorar201" supported="no">
 		<description>Nick Jr. Dora La Exploradora - La Aventura arregla-todo de Dora (Spain, Rev. 222)</description>
 		<year>2007</year> <!-- 2009 on cart -->
@@ -1698,6 +1776,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="50-092424 - Findet Nemo - Nemos Unterwasserabenteuer (GER).bin" size="8388608" crc="71518458" sha1="a20f59c29391fc2b3ece92b599e42c98d846fdfe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="findnemof" cloneof="findnemo">
+		<description>Disney/Pixar Le Monde de Nemo - Nemo à la découverte de l'océan (France)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="50-092425(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092425 - Le Monde De Nemo (FR).bin" size="8388608" crc="36486f80" sha1="6b2887136474c8d6a111973582cb8607e657c70d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1822,6 +1915,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<!-- No inputs, uses a dance mat controller -->
+	<software name="jamgymf" cloneof="jamgymg" supported="no"> <!-- Will be clone of "jamgym" once found and dumped. -->
+		<description>V.Smile Défi Gym (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-091325(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="91325 - Vsmile Tapis Multisport (FR).bin" size="8388608" crc="31c55c70" sha1="c7c3abe7b8c634a8b96dac826aea42780012f549" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs, uses a dance mat controller -->
 	<software name="jamgyms" cloneof="jamgymg" supported="no">
 		<description>Gimnasio Interactivo V.Smile (Spain)</description>
 		<year>200?</year>
@@ -1870,6 +1979,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92984-3.u1" size="8388608" crc="8f671aa7" sha1="a6a0a5cd5c5bf14c1b546354bfe9209820955975" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="ltleinstnf" cloneof="ltleinstnr5" supported="no">
+		<description>Disney - Les petits Einsteins - Le bal du soulier de verre (France)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092985(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092985 - Les Petits Einsteins (FR).bin" size="8388608" crc="6608d3d1" sha1="023b69ef0939cc8a8879f94498be16f8b2ad4341" />
 			</dataarea>
 		</part>
 	</software>
@@ -2558,6 +2683,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<!-- No inputs -->
+	<software name="partyprkf" cloneof="partyprk" supported="no">
+		<description>Cranium - Le Parc D'Attractions (France)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092925(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092925 - Cranium Le Parc D Attractions (FR).bin" size="8388608" crc="d805b153" sha1="c17c4eac3e6b2ed974dc6793104fd9e6f3e0243c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
 	<software name="partyprks" cloneof="partyprk" supported="no">
 		<description>Cranium - Parque de Atracciones de Cranium (Spain)</description>
 		<year>2008</year>
@@ -2618,6 +2759,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92884.u1" size="8388608" crc="d8e36793" sha1="e8d7078726b077d1bf0a13b715de4a03fd93189c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="ratatf" supported="no">
+		<description>Disney/Pixar Ratatouille - Les nouvelles recettes de Rémy (France)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092885(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092885 - Ratatouille (FR).bin" size="8388608" crc="f7b6a151" sha1="d16ae71df4d9fec9ae30962b46fc503dd450a998" />
 			</dataarea>
 		</part>
 	</software>
@@ -2748,9 +2905,10 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="scoobydof" cloneof="scoobydor301">
-		<description>Scooby-Doo - Panique à Funland (France)</description>
-		<year>200?</year>
+	<!-- No inputs -->
+	<software name="scoobydof" cloneof="scoobydor301" supported="no">
+		<description>Scooby-Doo! - Panique à Funland (France)</description>
+		<year>2004</year> <!-- (s04) -->
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092165(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -2761,6 +2919,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92165.u1" size="8388608" crc="ba35c0ac" sha1="9c1525f0da65deeadeef5aa6e43477775804da88" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="scoobydofr105" cloneof="scoobydor301" supported="no">
+		<description>Scooby-Doo! - Panique à Funland (France, Rev. 105)</description>
+		<year>2007</year> <!-- (s07) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092165-105(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092165-105 - Scooby Doo (FR).bin" size="8388608" crc="7dece294" sha1="8be50d4cf732b7e56e101647eb39e0ad09fbc51c" />
 			</dataarea>
 		</part>
 	</software>
@@ -2834,7 +3008,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="erniebrt">
+	<software name="erniebrtg">
 		<description>Ernies &amp; Berts Fantastisches Abenteuer (Germany)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -2851,7 +3025,23 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="erniebrts" cloneof="erniebrt">
+	<!-- No inputs -->
+	<software name="erniebrtf" cloneof="erniebrtg" supported="no">
+		<description>Les aventures de imagniares d'Ernest et Bart (France)</description>
+		<year>2006</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092465(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="92465 - Les aventures de imagniares d Ernest et Bart (FR).bin" size="8388608" crc="80da2b1d" sha1="0e16fabbef582893e51503a018d8e6edfe2a3fee" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="erniebrts" cloneof="erniebrtg">
 		<description>Barrio Sésamo - El Mundo Fantástico de Epi y Blas (Spain)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -2903,23 +3093,6 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="shrek3g" cloneof="shrek3">
-		<description>DreamWorks Shrek der Dritte - Ein Spannender Schultag (Germany)</description>
-		<year>2007</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-092864(GE)" />
-		<part name="cart" interface="vsmile_cart">
-			<feature name="slot" value="vsmile_rom" />
-			<feature name="pcb" value="707180" />
-			<feature name="pcb_model" value="707180-3" />
-			<feature name="cart_type" value="lilac" />
-			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92864(2).u1" size="8388608" crc="0f11e49d" sha1="c936505dabc4043665f429a9109a1e533b9dc311" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="shrek3nl" cloneof="shrek3">
 		<description>Shrek De Derde - Arthurs Schooldag Avontuur (Netherlands)</description>
 		<year>2007?</year>
@@ -2948,6 +3121,39 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<dataarea name="rom" size="8388608">
 				<rom name="Shrek the Third - Arthur's School Day Adventure (Europe).bin" size="8388608" crc="7f06555c" sha1="b1082ab883cdb3caf5f87831cbe1a8623b41e88e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrek3g" cloneof="shrek3">
+		<description>DreamWorks Shrek der Dritte - Ein Spannender Schultag (Germany)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092864(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92864(2).u1" size="8388608" crc="0f11e49d" sha1="c936505dabc4043665f429a9109a1e533b9dc311" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="shrek3f" cloneof="shrek3" supported="no">
+		<description>DreamWorks Shrek Le Troisieme - L'aventure d'Arthur (France)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092865(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092865 - Shrek Le Troisieme (FR).bin" size="8388608" crc="7cc9922c" sha1="c45ce64db0c5580ce8339ab114b849955e58fed4" />
 			</dataarea>
 		</part>
 	</software>
@@ -3047,6 +3253,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92824.u1" size="8388608" crc="620b9ebb" sha1="e22ff87a03c6cac3186613a9e804dd6d4e3a3dc4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soccerchf" cloneof="soccerch">
+		<description>V.Smile Football Challenge (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092825(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="92825 - Football Challenge (FR).bin" size="8388608" crc="fab25b07" sha1="11364600cb1a55edc4358c236d3b4cc0bf7b6c1a" />
 			</dataarea>
 		</part>
 	</software>
@@ -3545,6 +3766,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<software name="toystor2f" cloneof="toystor2">
+		<description>Disney/Pixar Toy Story 2 - Buzz à la Rescousse! (France)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092225(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="92225 - Toy Story 2 (FR).bin" size="8388608" crc="be47bd65" sha1="391420bab3ec9c5a82bfe6aa4af5ec5e519f21fb" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="toystor2s" cloneof="toystor2">
 		<description>Disney/Pixar Toy Story 2 - El Rescate De Woody (Spain)</description>
 		<year>2005</year>
@@ -3837,6 +4073,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<!-- No inputs, uses a keyboard controller -->
+	<software name="smartkbf" supported="no"> <!-- Will be clone of "smartkb" once found and dumped. -->
+		<description>V.Smile Clavier Tip Tap (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-091445(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="091445 - Vsmile Tip Tap (FR).bin" size="8388608" crc="93a8cc75" sha1="3fc1e93f18782b3f38ec7d97b3c70f8a9358230d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Crashes MAME -->
 	<software name="techart" supported="no">
 		<description>V.Smile Art Studio (USA)</description>
@@ -3872,6 +4124,24 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u3" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="4194304">
 				<rom name="GER-509.u3" size="4194304" crc="ae5f4fe2" sha1="1c5428da7464182e6ee0585d1ebc211f91667238" />
+			</dataarea>
+			<dataarea name="nvram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="techartf" cloneof="techart" supported="no">
+		<description>V.Smile Studio De Dessin (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-067005(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_nvram" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u2" value="U2" />
+			<feature name="u3" value="" />
+			<dataarea name="rom" size="4194304">
+				<rom name="67005 - Vsmile Studio De Dessin (FR).bin" size="4194304" crc="fec3361e" sha1="42ae399bc442bb9dbeb4b9aa5fe9d1e721664849" />
 			</dataarea>
 			<dataarea name="nvram" size="131072">
 			</dataarea>

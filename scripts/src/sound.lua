@@ -1541,3 +1541,15 @@ if (SOUNDS["SWP30"]~=null) then
 		MAME_DIR .. "src/devices/sound/swp30.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/sound/vgm_visualizer.h,SOUNDS["VGMVIZ"] = true
+---------------------------------------------------
+
+if (SOUNDS["VGMVIZ"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/vgm_visualizer.cpp",
+		MAME_DIR .. "src/devices/sound/vgm_visualizer.h",
+	}
+end

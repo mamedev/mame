@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
      The original tapes have died long ago, so these were loaded from the
      archived quickloads into MAME, then saved to wav files.
      Release dates are between 1981 and 1987, but precise dates are unknown.
@@ -9,7 +11,33 @@
      Meaning of numbers: 1-99 = for BASIC (32 columns); 100-119 = for BASIC (80 columns); 400-499 = Machine Language;
                          150-299 = ported from Microbee; 300-329 = BASIC, ported from Exidy Sorcerer;
                          500-529 = Machine Language, ported from Exidy Sorcerer. All porting done by Robbbert.
- -->
+ 
+
+Dick Smith catalog numbers, taken from advertisements:
+
+K-3600 : Nova-80 (original name), Super-80 Computer kit
+K-3601 : Keyboard (included in K-3600)
+K-3602 : Basic (cass)
+K-3603 : IC socket set
+K-3604 : Basic (roms)
+K-3606 : S100 Expansion kit
+K-3607 : Lowercase character generator kit
+K-3610 : Serial interface card (for S100 interface)(kit)
+Z-9100 : Z-80 CPU (included in K-3600)
+M-2325 : Power transformer
+H-3200 : Metal Case
+H-8402 : Bare main PCB (included in K-3600)
+P-2670 : S100 socket (included in K-3606)
+X-3790 : Debug/Disassembler
+X-3791 : Editor-Assembler
+
+These 2 games were never advertised, but since the details are available...
+
+X-3792 : Dungeon Dilemma
+X-3607 : Horse Race
+
+-->
+
 <softwarelist name="super80_cass" description="Super-80 cassettes">
 <!--
      Sold in Dick Smith stores and intended for use with super80 and super80d, recorded at 300 baud.

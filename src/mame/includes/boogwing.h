@@ -48,6 +48,7 @@ public:
 	required_shared_ptr<uint16_t> m_decrypted_opcodes;
 
 	uint16_t m_priority;
+	bitmap_ind16 m_temp_bitmap;
 	bitmap_ind16 m_alpha_tmap_bitmap;
 
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);

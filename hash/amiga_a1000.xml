@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- This list contains the system software specific to the Amiga 1000 -->
+This list contains the system software specific to the Amiga 1000
+-->
 
 <softwarelist name="amiga_a1000" description="Commodore Amiga 1000 System disks">
 

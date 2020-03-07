@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
 Info Taken from here: http://www.samdal.com/SVIDOCS/SVI_Softwares_for_SVI318-328.pdf
                       http://www.samdal.com/svsoftware.htm
 
@@ -114,8 +116,6 @@ Grave Digger (198x)
 Fortune Valley (198x)
 Trach Man (198x)
 Ballonies (198x)
-
-
 -->
 
 <softwarelist name="svi318_cass" description="Spectravision SVI-318 cassettes">

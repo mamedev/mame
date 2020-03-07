@@ -5,17 +5,31 @@
 #include "includes/spg2xx.h"
 
 
-class spg2xx_lexiseal_game_state : public spg2xx_game_state
+class spg2xx_lexizeus_game_state : public spg2xx_game_state
 {
 public:
-	spg2xx_lexiseal_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+	spg2xx_lexizeus_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		spg2xx_game_state(mconfig, type, tag)
 	{ }
 
-	void lexiseal(machine_config& config);
 	void lexizeus(machine_config &config);
 
 	void init_zeus();
+
+protected:
+	//virtual void machine_start() override;
+	//virtual void machine_reset() override;
+};
+
+
+class spg2xx_lexiseal_game_state : public spg2xx_lexizeus_game_state
+{
+public:
+	spg2xx_lexiseal_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_lexizeus_game_state(mconfig, type, tag)
+	{ }
+
+	void lexiseal(machine_config& config);
 
 protected:
 	//virtual void machine_start() override;
@@ -186,13 +200,16 @@ INPUT_PORTS_END
 
 WRITE16_MEMBER(spg2xx_lexiseal_game_state::portb_w)
 {
-	//logerror("%s: portb_w %04x\n", machine().describe_context(), data);
+	logerror("%s: portb_w %04x %04x\n", machine().describe_context(), data, mem_mask);
 
-	// only 2 banks
-	if (data == 0x5f)
+	// mem_mask is set to fc when writing banks
+
+	if ((data&mem_mask) == 0x5c)
 		switch_bank(0);
-	else if (data == 0xdf)
+	else if ((data&mem_mask) == 0xdc)
 		switch_bank(1);
+	else if ((data&mem_mask) == 0x7c)
+		switch_bank(2);
 }
 
 
@@ -205,7 +222,7 @@ void spg2xx_lexiseal_game_state::lexiseal(machine_config &config)
 	m_maincpu->portc_in().set_ioport("P3");
 }
 
-void spg2xx_lexiseal_game_state::lexizeus(machine_config &config)
+void spg2xx_lexizeus_game_state::lexizeus(machine_config &config)
 {
 	non_spg_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_lexiseal_game_state::mem_map_4m);
@@ -214,7 +231,7 @@ void spg2xx_lexiseal_game_state::lexizeus(machine_config &config)
 	m_maincpu->portc_in().set_ioport("P3");
 }
 
-void spg2xx_lexiseal_game_state::init_zeus()
+void spg2xx_lexizeus_game_state::init_zeus()
 {
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -259,9 +276,67 @@ ROM_START( discpal )
 	ROM_LOAD16_WORD_SWAP( "disneyhh.bin", 0x0000, 0x400000, CRC(5fb7f32e) SHA1(795c992826ad4ac66d5438207f1c9b48f9fadc44) )
 ROM_END
 
+/*
 
-// Similar, SPG260?, scrambled
-CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_lexiseal_game_state, init_zeus, "Lexibook", "Zeus IG900 20-in-1 (US?)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
+VG Caplet ROM pinout from Sean Riddle (2 ROMs in single package)
+
+BSIC M6MLT947 pinout
+wide SOP64 footprint
+end with 2 circles denotes pin 1 end
+24MB with 2 chip enables
+/CE1 L, CE2 H is 16MB, /CE1 H, CE2 L is 8MB
+do not drive /CE1 and /CE2 both L at the same time
+
+1  N/C          64 N/C
+2  A15          63 A16
+3  A14          62 /CE1
+4  A13          61 VCC
+5  A12          60 N/C
+6  A11          59 GND
+7  A10          58 N/C
+8  A9           57 D15
+9  A8           56 D7
+10 A21          55 D14
+11 A20          54 D6
+12 N/C          53 D13
+13 N/C          52 D5
+14 VCC          51 D12
+15 VCC          50 D4
+16 N/C          49 GND
+17 N/C          48 VCC
+18 N/C          47 D11
+19 N/C          46 D3
+20 A22          45 D10
+21 also A21     44 D2
+22 A19          43 D9
+23 A18          42 D1
+24 A17          41 D8
+25 A7           40 D0
+26 A6           39 /OE
+27 A5           38 GND
+28 A4           37 N/C
+29 A3           36 /CE2
+30 A2           35 A0
+31 A1           34 N/C
+32 N/C          33 N/C
+
+*/
+
+ROM_START( vgcaplet )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "capleth.bin", 0x0000000, 0x1000000, CRC(f6cad3a7) SHA1(54167ab7651cf7a758ae36c443e74d3919e7fd6d) )
+	ROM_LOAD16_WORD_SWAP( "capletl.bin", 0x1000000, 0x0800000, CRC(1ae2fa49) SHA1(62f41d45da011c1dfb35c1111a478798c2b33aaf) )
+ROM_END
+
+// these all have the same ROM scrambling
+
+CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_lexizeus_game_state, init_zeus, "Lexibook", "Zeus IG900 20-in-1 (US?)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
+
 CONS( 200?, lexiseal,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Lexibook / Sit Up Limited", "Seal 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // also has bad sound in Tiger Rescue, but no corrupt tilemap
-CONS( 200?, discpal,     0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Performance Designed Products / Disney / Jungle Soft", "Disney Game It! Classic Pals",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// there are versions of the Seal that actually show Lexibook on the boot screen rather than just the unit
+
+CONS( 200?, discpal,     0,     0,        lexizeus,     lexiseal, spg2xx_lexizeus_game_state, init_zeus, "Performance Designed Products / Disney / Jungle Soft", "Disney Game It! Classic Pals",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // there was also a Game It! Princess Pals
+
+CONS( 200?, vgcaplet,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Performance Designed Products (licensed by Taito / Data East)", "VG Pocket Caplet Fast Acting 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// there was also a 35 game version of the Caplet

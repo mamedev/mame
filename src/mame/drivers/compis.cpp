@@ -63,7 +63,7 @@
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 
 #define I80186_TAG      "ic1"
 #define I80130_TAG      "ic15"
@@ -793,14 +793,14 @@ void compis_state::compis(machine_config &config)
 	TIMER(config, "tape").configure_periodic(FUNC(compis_state::tape_tick), attotime::from_hz(44100));
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
-	rs232a.rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
-	rs232a.dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcda_w));
-	rs232a.cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsa_w));
+	rs232a.rxd_handler().set(m_mpsc, FUNC(i8274_device::rxa_w));
+	rs232a.dcd_handler().set(m_mpsc, FUNC(i8274_device::dcda_w));
+	rs232a.cts_handler().set(m_mpsc, FUNC(i8274_device::ctsa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
-	rs232b.rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxb_w));
-	rs232b.dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcdb_w));
-	rs232b.cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
+	rs232b.rxd_handler().set(m_mpsc, FUNC(i8274_device::rxb_w));
+	rs232b.dcd_handler().set(m_mpsc, FUNC(i8274_device::dcdb_w));
+	rs232b.cts_handler().set(m_mpsc, FUNC(i8274_device::ctsb_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(compis_state::write_centronics_busy));

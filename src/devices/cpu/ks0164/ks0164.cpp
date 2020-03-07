@@ -20,7 +20,7 @@ void ks0164_device::device_start()
 {
 	state_add(STATE_GENPC,     "GENPC",     m_pc).callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     m_pc).callexport().noshow();
-	
+
 	save_item(NAME(m_pc));
 	set_icountptr(m_icount);
 
@@ -43,7 +43,7 @@ uint32_t ks0164_device::execute_max_cycles() const noexcept
 }
 
 uint32_t ks0164_device::execute_input_lines() const noexcept
-{	
+{
 	return 0;
 }
 

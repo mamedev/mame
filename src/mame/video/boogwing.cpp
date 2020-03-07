@@ -9,6 +9,7 @@ void boogwing_state::video_start()
 	m_priority = 0;
 	m_sprgen[0]->alloc_sprite_bitmap();
 	m_sprgen[1]->alloc_sprite_bitmap();
+	m_screen->register_screen_bitmap(m_temp_bitmap);
 	m_screen->register_screen_bitmap(m_alpha_tmap_bitmap);
 	save_item(NAME(m_priority));
 }
@@ -22,7 +23,7 @@ void boogwing_state::video_start()
  fixed, with manual mixing you have full control.
 
  apparently priority is based on a PROM, that should be used if possible.
- 
+
  Reference video : https://www.youtube.com/watch?v=mRdIlP_erBM (Live stream)
 */
 void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -32,7 +33,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 	bitmap_ind16 *sprite_bitmap1, *sprite_bitmap2, *alpha_tmap_bitmap;
 	bitmap_ind8* priority_bitmap;
 
-	uint16_t priority = m_priority;
+	uint16_t priority = m_priority & 0x7;
 
 	sprite_bitmap1 = &m_sprgen[0]->get_sprite_temp_bitmap();
 	sprite_bitmap2 = &m_sprgen[1]->get_sprite_temp_bitmap();
@@ -40,7 +41,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 	priority_bitmap = &screen.priority();
 
 	uint32_t* dstline;
-	uint16_t *srcline1, *srcline2, *srcline3;
+	uint16_t *srcline1, *srcline2, *srcline3, *tmapline;
 	uint8_t *srcpriline;
 
 	for (y=cliprect.top();y<=cliprect.bottom();y++)
@@ -48,6 +49,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 		srcline1=&sprite_bitmap1->pix16(y,0);
 		srcline2=&sprite_bitmap2->pix16(y,0);
 		srcline3=&alpha_tmap_bitmap->pix16(y,0);
+		tmapline=&m_temp_bitmap.pix16(y,0);
 		srcpriline=&priority_bitmap->pix8(y,0);
 
 		dstline=&bitmap.pix32(y,0);
@@ -57,6 +59,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 			uint16_t pix1 = srcline1[x];
 			uint16_t pix2 = srcline2[x];
 			uint16_t pix3 = srcline3[x];
+			uint16_t tmappix = tmapline[x];
 
 			/* Here we have
 			 pix1 - raw pixel / colour / priority data from first 1st chip
@@ -187,41 +190,48 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 			pix2 - same as before  ^^
 			*/
 
+			const u16 calculated_coloffs = (m_priority & 8) ? 0x800 : 0;
 			int drawnpixe1 = 0;
 			if (pix1 & 0xf)
 			{
 				if (pri1 > bgpri)
 				{
-					dstline[x] = paldata[(pix1&0x1ff)+0x500];
+					dstline[x] = paldata[calculated_coloffs | ((pix1&0x1ff)+0x500)];
 					drawnpixe1 |= 1;
 				}
 			}
 
 			if (pix2 & 0xf)
 			{
+				if ((drawnpixe1 == 0) && (tmappix != 0xffff))
+					dstline[x] = paldata[calculated_coloffs | tmappix];
+
 				if (pri2 > bgpri)
 				{
 					if ((!drawnpixe1) || (spri2 > spri1))
 					{
 						if (alpha2>=0xff)
 						{
-							dstline[x] = paldata[(pix2&0xff)+0x700];
+							dstline[x] = paldata[calculated_coloffs | ((pix2&0xff)+0x700)];
 						}
 						else
 						{
 							uint32_t base = dstline[x];
-							dstline[x] = alpha_blend_r32(base, paldata[(pix2&0xff)+0x700], alpha2);
+							dstline[x] = alpha_blend_r32(base, paldata[calculated_coloffs | ((pix2&0xff)+0x700)], alpha2);
 						}
 						drawnpixe1 |= 2;
 					}
 				}
 			}
 
+			if ((drawnpixe1 == 0) && (tmappix != 0xffff))
+				dstline[x] = paldata[tmappix];
+
 			// alpha blended tilemap handling
 			if (pix3 & 0xf)
 			{
 				// TODO : sprite vs playfield priority, actual behavior of shadowing
-				if ((m_priority & 0x7) == 0x3)
+				if (priority == 0x3)
 				{
 					bool bg2_drawed = (bgpri == 8) && (!drawnpixe1);
 					bool sprite1_drawed = (drawnpixe1 & 1) && (pri1 <= pri3);
@@ -229,7 +239,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 					if ((bg2_drawed) || ((sprite1_drawed && (~drawnpixe1 & 2)) || (sprite2_drawed && (~drawnpixe1 & 1)) || (sprite1_drawed && sprite2_drawed)))
 					{
 						if (((pix2 & 0x900) != 0x900) || ((spri2 <= spri1) && sprite1_drawed))
-							dstline[x] = alpha_blend_r32(dstline[x], paldata[pix3], alpha3);
+							dstline[x] = alpha_blend_r32(dstline[x], paldata[((drawnpixe1 & 3) ? calculated_coloffs : 0) | pix3], alpha3);
 					}
 				}
 			}
@@ -256,30 +266,31 @@ uint32_t boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rg
 
 	/* Draw playfields */
 	bitmap.fill(m_deco_ace->pen(0x400), cliprect); /* pen not confirmed */
+	m_temp_bitmap.fill(0xffff, cliprect);
 	screen.priority().fill(0);
 
 	// bit&0x8 is definitely some kind of palette effect
 	// bit&0x4 combines playfields
 	if ((priority & 0x7) == 0x5)
 	{
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 32);
+		m_deco_tilegen[0]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, m_temp_bitmap, cliprect, 0, 32);
 	}
 	else if ((priority & 0x7) == 0x4)
 	{
-		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 32);
+		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, m_temp_bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_deco_tilegen[0]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, 0, 32);
 	}
 	else if ((priority & 0x7) == 0x1 || (priority & 0x7) == 0x2)
 	{
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 8);
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 32);
+		m_deco_tilegen[1]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_deco_tilegen[0]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, 0, 8);
+		m_deco_tilegen[1]->tilemap_1_draw(screen, m_temp_bitmap, cliprect, 0, 32);
 	}
 	else if ((priority & 0x7) == 0x3)
 	{
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 8);
+		m_deco_tilegen[1]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_deco_tilegen[0]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, 0, 8);
 
 		// This mode uses playfield 3 to shadow sprites & playfield 2 (instead of
 		// regular alpha-blending, the destination is inverted).  Not yet implemented.
@@ -288,9 +299,9 @@ uint32_t boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rg
 	}
 	else
 	{
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 8);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 32);
+		m_deco_tilegen[1]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_deco_tilegen[1]->tilemap_1_draw(screen, m_temp_bitmap, cliprect, 0, 8);
+		m_deco_tilegen[0]->tilemap_2_draw(screen, m_temp_bitmap, cliprect, 0, 32);
 	}
 
 	mix_boogwing(screen,bitmap,cliprect);

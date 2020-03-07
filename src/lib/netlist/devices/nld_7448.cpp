@@ -27,7 +27,7 @@ namespace netlist
 		, m_BIQ(*this, "BIQ")
 		, m_RBIQ(*this, "RBIQ")
 		, m_state(*this, "m_state", 0)
-		, m_Q(*this, {{"a", "b", "c", "d", "e", "f", "g"}})
+		, m_Q(*this, {"a", "b", "c", "d", "e", "f", "g"})
 		, m_power_pins(*this)
 		{
 		}

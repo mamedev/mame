@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
     Game cartridges for Bandai Design Master
 
     Design carts, these plug into the Game carts, they're data ROMs, they do not contain boot vectors
@@ -71,6 +73,17 @@
 		</part>
 	</software>
 
+	<software name="slamdunkm" supported="no">
+		<description>From TV Animation Slam Dunk (design)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="bdesignm_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom loadflag="load16_word_swap" name="m02_slamdunk.bin" size="0x20000" crc="7771b8b3" sha1="e133f61202e31424ce2c4638a65f11e14ace6f6e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sf2m" supported="no">
 		<description>Super Street Fighter 2 (design)</description>
 		<year>1995</year>
@@ -78,6 +91,17 @@
 		<part name="cart" interface="bdesignm_cart">
 			<dataarea name="rom" size="0x20000">
 				<rom loadflag="load16_word_swap" name="m03_streetfighterii.bin" size="0x20000" crc="f4a59015" sha1="a607628a4fbae143e34294a4363c286feb21d770" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockmanm" supported="no">
+		<description>Rockman X3 Buster Battle (design)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="bdesignm_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom loadflag="load16_word_swap" name="m04_rockman.bin" size="0x20000" crc="54c0e613" sha1="2927224268b0ef0a99513d8fda10be23395cabf6" />
 			</dataarea>
 		</part>
 	</software>

@@ -850,7 +850,7 @@ HT-81400
 BB35-E012-0A09
 REV.1
 
-I couldn't find a data sheet, but I did see 
+I couldn't find a data sheet, but I did see
 
 "81300 is described as PCM speech synthesizer 5.6s" and
 "81400 as PCM speech synthesizer 8.4s" (which is 50% larger)

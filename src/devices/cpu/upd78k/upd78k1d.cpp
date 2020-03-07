@@ -774,7 +774,7 @@ const char *const upd78138_disassembler::s_sfrp_names[128] =
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	"IF0", nullptr, "MK0", nullptr, "PR0", nullptr, "ISM0", nullptr,
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr	
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 };
 
 upd78148_disassembler::upd78148_disassembler()
@@ -835,5 +835,5 @@ const char *const upd78148_disassembler::s_sfrp_names[128] =
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	"IF0", nullptr, "MK0", nullptr, "PR0", nullptr, "ISM0", nullptr,
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr	
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 };

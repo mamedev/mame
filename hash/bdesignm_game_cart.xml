@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
     Game cartridges for Bandai Design Master
 
     Game carts, these plug into the system
@@ -82,6 +84,17 @@
 		<part name="cart" interface="bdesignm_cart">
 			<dataarea name="rom" size="0x20000">
 				<rom loadflag="load16_word_swap" name="g03_sailormoon.bin" size="0x20000" crc="641f20e6" sha1="b9f3a37385eeaf2e66b28ad5bac24a8a9cd46bdd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockmang" supported="no">
+		<description>Rockman X3 Buster Battle (game)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="bdesignm_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom loadflag="load16_word_swap" name="g04_rockman.bin" size="0x20000" crc="bbca31a7" sha1="5606c8ee6b893cd529499581d8227505a736d14d" />
 			</dataarea>
 		</part>
 	</software>

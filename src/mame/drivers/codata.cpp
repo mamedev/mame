@@ -40,7 +40,7 @@ void codata_state::mem_map(address_map &map)
 	map(0x000000, 0x1fffff).ram().share("rambase");
 	map(0x200000, 0x203fff).rom().region("bios", 0);
 	map(0x400000, 0x403fff).rom().region("bios", 0x4000);
-	map(0x600000, 0x600007).mirror(0x1ffff8).rw("uart", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w)).umask16(0xff00);
+	map(0x600000, 0x600007).mirror(0x1ffff8).rw("uart", FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w)).umask16(0xff00);
 	map(0x800000, 0x800003).mirror(0x1ffffc).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 	map(0xe00000, 0xe00001).mirror(0x1ffffe).portr("INPUT");
 	//map(0xa00000, 0xbfffff) page map (rw)
@@ -67,7 +67,7 @@ void codata_state::codata(machine_config &config)
 	M68000(config, m_maincpu, 16_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &codata_state::mem_map);
 
-	upd7201_new_device &uart(UPD7201_NEW(config, "uart", 16_MHz_XTAL / 4));
+	upd7201_device &uart(UPD7201(config, "uart", 16_MHz_XTAL / 4));
 	uart.out_txda_callback().set("rs423a", FUNC(rs232_port_device::write_txd));
 	uart.out_dtra_callback().set("rs423a", FUNC(rs232_port_device::write_dtr));
 	uart.out_rtsa_callback().set("rs423a", FUNC(rs232_port_device::write_rts));
@@ -78,18 +78,18 @@ void codata_state::codata(machine_config &config)
 	timer.out1_cb().set_nop(); // Timer 1 = "Abort/Reset" (watchdog)
 	timer.out2_cb().set_inputline(m_maincpu, M68K_IRQ_6); // Timer 2
 	timer.out3_cb().set_inputline(m_maincpu, M68K_IRQ_7); // Refresh
-	timer.out4_cb().set("uart", FUNC(upd7201_new_device::rxca_w));
-	timer.out4_cb().append("uart", FUNC(upd7201_new_device::txca_w));
-	timer.out5_cb().set("uart", FUNC(upd7201_new_device::rxcb_w));
-	timer.out5_cb().append("uart", FUNC(upd7201_new_device::txcb_w));
+	timer.out4_cb().set("uart", FUNC(upd7201_device::rxca_w));
+	timer.out4_cb().append("uart", FUNC(upd7201_device::txca_w));
+	timer.out5_cb().set("uart", FUNC(upd7201_device::rxcb_w));
+	timer.out5_cb().append("uart", FUNC(upd7201_device::txcb_w));
 
 	rs232_port_device &rs423a(RS232_PORT(config, "rs423a", default_rs232_devices, "terminal"));
-	rs423a.rxd_handler().set("uart", FUNC(upd7201_new_device::rxa_w));
-	rs423a.dsr_handler().set("uart", FUNC(upd7201_new_device::dcda_w));
-	rs423a.cts_handler().set("uart", FUNC(upd7201_new_device::ctsa_w));
+	rs423a.rxd_handler().set("uart", FUNC(upd7201_device::rxa_w));
+	rs423a.dsr_handler().set("uart", FUNC(upd7201_device::dcda_w));
+	rs423a.cts_handler().set("uart", FUNC(upd7201_device::ctsa_w));
 
 	rs232_port_device &rs423b(RS232_PORT(config, "rs423b", default_rs232_devices, nullptr));
-	rs423b.rxd_handler().set("uart", FUNC(upd7201_new_device::rxb_w));
+	rs423b.rxd_handler().set("uart", FUNC(upd7201_device::rxb_w));
 }
 
 /* ROM definition */

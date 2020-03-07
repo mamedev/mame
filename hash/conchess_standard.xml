@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="conchess_standard" description="Conchess Standard Modules">
+
+	<software name="l">
+		<description>Conchess L</description>
+		<year>1983</year>
+		<publisher>Consumenta Computer / Loproc</publisher>
+		<part name="cart" interface="conchess_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom value="0x00" size="0x2000" offset="0x0000" loadflag="fill" />
+				<rom name="l_book.bin" size="0x2000" crc="a2e2682f" sha1="a0cd3297e46943eaff2466c65dde0857828ff929" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

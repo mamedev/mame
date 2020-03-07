@@ -66,7 +66,7 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
     Keys: Z
 
     PC=ECC72; 'HMODE' screen
-	TODO: find an actual way to access above, at worst find a suitable entry point -AS;
+    TODO: find an actual way to access above, at worst find a suitable entry point -AS;
 
 *******************************************************************************************/
 
@@ -518,10 +518,10 @@ static INPUT_PORTS_START( goodejan )
 	PORT_DIPSETTING(      0x0200, "2000" )
 	PORT_DIPSETTING(      0x0100, "1000" )
 	PORT_DIPSETTING(      0x0000, "3000" )
-/*  
- *  [totmejan] 
+/*
+ *  [totmejan]
  *  Before every hand game calls a subroutine at 0xe7c19, and reads these 2 bits from 0x01A28 work RAM buffer.
- *  This affects the tile distribution RNG via a complex algo for the end goal of giving the player a more or less 
+ *  This affects the tile distribution RNG via a complex algo for the end goal of giving the player a more or less
  *  favorable hand depending on the setting.
  */
 	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) )         PORT_DIPLOCATION("DSWB:3,4")
@@ -613,9 +613,9 @@ void goodejan_state::goodejan(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	// guess: assume ~59.61 Hz like toki, assume clock coming from the otherwise unused 12 MHz XTal 
+	// guess: assume ~59.61 Hz like toki, assume clock coming from the otherwise unused 12 MHz XTal
 	// (audio one don't give valid ranges for the provided HSync)
-	screen.set_raw(GOODEJAN_MHZ3/2, 390, 0, 256, 258, 16, 240); 
+	screen.set_raw(GOODEJAN_MHZ3/2, 390, 0, 256, 258, 16, 240);
 	screen.set_screen_update(FUNC(goodejan_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(goodejan_state::vblank_irq));

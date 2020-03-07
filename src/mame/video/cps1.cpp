@@ -3101,8 +3101,8 @@ uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitm
 	}
 	else
 	{
-		// CPS2 apparently always force the background to black. Several games would
-		// should a blue screen during boot if we used the same code as CPS1.
+		// CPS2 apparently always forces the background to black. Several games would
+		// show a blue screen during boot if we used the same code as CPS1.
 		// Maybe Capcom changed the background handling due to the problems that
 		// it caused on several monitors (because the background extended into the
 		// blanking area instead of going black, causing the monitor to clip).

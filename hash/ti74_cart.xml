@@ -1,9 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
-<softwarelist name="ti74_cart" description="TI-74 cartridges">
-
 <!--
+license:CC0
 
     Not dumped yet:
     - Chemical Engineering
@@ -14,6 +12,7 @@
 
 -->
 
+<softwarelist name="ti74_cart" description="TI-74 cartridges">
 
 	<software name="finance">
 		<description>Finance</description>

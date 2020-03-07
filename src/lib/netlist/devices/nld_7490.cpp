@@ -34,7 +34,7 @@ namespace devices
 		, m_cnt(*this, "m_cnt", 0)
 		, m_last_A(*this, "m_last_A", 0)
 		, m_last_B(*this, "m_last_B", 0)
-		, m_Q(*this, {{"QA", "QB", "QC", "QD"}})
+		, m_Q(*this, {"QA", "QB", "QC", "QD"})
 		, m_power_pins(*this)
 		{
 		}

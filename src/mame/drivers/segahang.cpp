@@ -52,6 +52,7 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 	//
 	//  D7 : FLIPC (1= flip screen, 0= normal orientation)
 	//  D6 : SHADE0 (1= highlight, 0= shadow)
+	//  D5 : Z80 /RESET
 	//  D4 : /KILL (1= screen on, 0= screen off)
 	//  D3 : LAMP2
 	//  D2 : LAMP1
@@ -65,6 +66,9 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 
 	// bit 6: shadow/highlight control
 	m_shadow = ~data & 0x40;
+
+	// bit 5: Z80 RESET line
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	// bit 4: enable display
 	m_segaic16vid->set_display_enable(data & 0x10);

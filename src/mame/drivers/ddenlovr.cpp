@@ -103,7 +103,7 @@ TODO:
 
 - mjflove: Transparency problems in title screen, staff roll and gal display (the background is not visible)
 
-- mjflove: 1st level sports a slot-like gal rotation that is hidden in 2nd with a solid green color. 
+- mjflove: 1st level sports a slot-like gal rotation that is hidden in 2nd with a solid green color.
   Most likely a bug, related to above?
 
 - implement palette RAM enable in most games. Done for seljan2 (in a convoluted way).
@@ -160,11 +160,11 @@ The drawing operation is verified (quiz365) to modify ddenlovr_blit_y.
 
 enum { BLIT_NEXT = 0, BLIT_LINE, BLIT_COPY, BLIT_SKIP, BLIT_CHANGE_NUM, BLIT_CHANGE_PEN, BLIT_UNKNOWN, BLIT_STOP };
 
-static const int ddenlovr_commands[8]   = { BLIT_NEXT,    BLIT_LINE,       BLIT_COPY,       BLIT_SKIP,      
+static const int ddenlovr_commands[8]   = { BLIT_NEXT,    BLIT_LINE,       BLIT_COPY,       BLIT_SKIP,
 											BLIT_UNKNOWN, BLIT_CHANGE_NUM, BLIT_CHANGE_PEN, BLIT_STOP   };
-static const int hanakanz_commands[8]   = { BLIT_NEXT,    BLIT_CHANGE_PEN, BLIT_CHANGE_NUM, BLIT_UNKNOWN,   
+static const int hanakanz_commands[8]   = { BLIT_NEXT,    BLIT_CHANGE_PEN, BLIT_CHANGE_NUM, BLIT_UNKNOWN,
 											BLIT_SKIP,    BLIT_COPY,       BLIT_LINE,       BLIT_STOP   };
-static const int mjflove_commands[8]    = { BLIT_STOP,    BLIT_CHANGE_PEN, BLIT_CHANGE_NUM, BLIT_UNKNOWN,   
+static const int mjflove_commands[8]    = { BLIT_STOP,    BLIT_CHANGE_PEN, BLIT_CHANGE_NUM, BLIT_UNKNOWN,
 											BLIT_SKIP,    BLIT_COPY,       BLIT_LINE,       BLIT_NEXT   };
 
 class ddenlovr_state : public dynax_state
@@ -8232,16 +8232,16 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( hparadis )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00) 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")    /* IN1 - Player 2 */
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -8282,16 +8282,16 @@ static INPUT_PORTS_START( hparadis )
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // L
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // PON
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // "w"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // Flip Flop
@@ -9641,6 +9641,8 @@ MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
 	m_romdata[1] = 0;
 
 	memset(m_palram, 0, ARRAY_LENGTH(m_palram));
+
+	m_blitter_irq_handler(1);
 }
 
 MACHINE_START_MEMBER(ddenlovr_state,rongrong)
@@ -9857,7 +9859,6 @@ void ddenlovr_state::quizchq(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::quizchq_portmap);
 	maincpu.in_pa_callback().set(FUNC(ddenlovr_state::rongrong_input_r));
 	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::rongrong_select_w));
-	// bit 5 of 0x1b (SIO CTSB?) = blitter busy
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,rongrong)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -9876,6 +9877,7 @@ void ddenlovr_state::quizchq(machine_config &config)
 
 	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg0));
 	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg1));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::ctsb_w));
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
 
@@ -13067,4 +13069,4 @@ GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, ddenlovr_state, empty_init
 GAME( 1999, jongtei,   0,        jongtei,   jongtei,  ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Jong-Tei [BET] (Japan, NM532-01)",                              MACHINE_NO_COCKTAIL  )
 GAME( 2000, mjgnight,  0,        mjgnight,  mjgnight, ddenlovr_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night [BET] (Japan, TSM003-01)",                       MACHINE_NO_COCKTAIL  )
 GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, ddenlovr_state, empty_init,    ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin [BET] (Japan, T017-PB-00)",                           MACHINE_NO_COCKTAIL  )
-GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, ddenlovr_state, init_momotaro, ROT0, "Techno-Top",                                  "Mahjong Momotarou [BET] (Japan, T027-RB-01)",	                         MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, ddenlovr_state, init_momotaro, ROT0, "Techno-Top",                                  "Mahjong Momotarou [BET] (Japan, T027-RB-01)",                             MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

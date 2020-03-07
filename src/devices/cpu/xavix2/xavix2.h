@@ -24,7 +24,7 @@ protected:
 		F_MASK = 15,
 		F_I = 16
 	};
-		
+
 	static const u8 bpo[8];
 
 	virtual void device_start() override;
@@ -46,7 +46,6 @@ protected:
 	u32 m_pc;
 	u32 m_r[8], m_hr[64];
 	u32 m_ilr1;
-	u8 m_f;
 	u8 m_if1;
 
 	bool m_int_line, m_wait;
@@ -83,7 +82,7 @@ protected:
 			f |= F_C;
 		if(((v1 ^ r) & (v2 ^ r)) & 0x80000000)
 			f |= F_V;
-		m_f = (m_f & ~F_MASK) | f;
+		m_hr[4] = (m_hr[4] & ~F_MASK) | f;
 		return r;
 	}
 
@@ -94,11 +93,11 @@ protected:
 			f |= F_Z;
 		if(r & 0x80000000)
 			f |= F_N;
-		if(((v1 & r) | ((~v2) & (v1 | r))) & 0x80000000)
+		if(((v2 & r) | ((~v1) & (v2 | r))) & 0x80000000)
 			f |= F_C;
-		if(((v1 ^ v2) & (v2 ^ r)) & 0x80000000)
+		if(((v1 ^ v2) & (v1 ^ r)) & 0x80000000)
 			f |= F_V;
-		m_f = (m_f & ~F_MASK) | f;
+		m_hr[4] = (m_hr[4] & ~F_MASK) | f;
 		return r;
 	}
 
@@ -108,67 +107,67 @@ protected:
 			f |= F_Z;
 		if(r & 0x80000000)
 			f |= F_N;
-		m_f = (m_f & ~F_MASK) | f;
+		m_hr[4] = (m_hr[4] & ~F_MASK) | f;
 		return r;		
 	}		
 
 	inline u32 do_lsl(u32 v1, u32 shift) {
 		if(!shift) {
-			m_f = (m_f & ~F_MASK) | (v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z);
+			m_hr[4] = (m_hr[4] & ~F_MASK) | (v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z);
 			return v1;
 		} else if(shift < 32) {
 			u32 r = v1 << shift;
 			u32 f = v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z;
 			if(v1 & (1 << (32-shift)))
 				f |= F_C;
-			m_f = (m_f & ~F_MASK) | f;
+			m_hr[4] = (m_hr[4] & ~F_MASK) | f;
 			return r;
 		} else if(shift == 32) {
-			m_f = (m_f & ~F_MASK) | (v1 & 1 ? F_C|F_Z : F_Z);
+			m_hr[4] = (m_hr[4] & ~F_MASK) | (v1 & 1 ? F_C|F_Z : F_Z);
 			return 0;
 		} else {
-			m_f = (m_f & ~F_MASK) | F_Z;
+			m_hr[4] = (m_hr[4] & ~F_MASK) | F_Z;
 			return 0;
 		}
 	}
 
 	inline u32 do_lsr(u32 v1, u32 shift) {
 		if(!shift) {
-			m_f = (m_f & ~F_MASK) | (v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z);
+			m_hr[4] = (m_hr[4] & ~F_MASK) | (v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z);
 			return v1;
 		} else if(shift < 32) {
 			u32 r = v1 >> shift;
 			u32 f = v1 ? 0 : F_Z;
 			if(v1 & (1 << (shift - 1)))
 				f |= F_C;
-			m_f = (m_f & ~F_MASK) | f;
+			m_hr[4] = (m_hr[4] & ~F_MASK) | f;
 			return r;
 		} else if(shift == 32) {
-			m_f = (m_f & ~F_MASK) | (v1 & 0x80000000 ? F_C|F_Z : F_Z);
+			m_hr[4] = (m_hr[4] & ~F_MASK) | (v1 & 0x80000000 ? F_C|F_Z : F_Z);
 			return 0;
 		} else {
-			m_f = (m_f & ~F_MASK) | F_Z;
+			m_hr[4] = (m_hr[4] & ~F_MASK) | F_Z;
 			return 0;
 		}
 	}
 
 	inline u32 do_asr(u32 v1, u32 shift) {
 		if(!shift) {
-			m_f = (m_f & ~F_MASK) | (v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z);
+			m_hr[4] = (m_hr[4] & ~F_MASK) | (v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z);
 			return v1;
 		} else if(shift < 32) {
 			u32 r = static_cast<s32>(v1) >> shift;
 			u32 f = v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z;
 			if(v1 & (1 << (shift - 1)))
 				f |= F_C;
-			m_f = (m_f & ~F_MASK) | f;
+			m_hr[4] = (m_hr[4] & ~F_MASK) | f;
 			return r;
 		} else {
 			if(v1 & 0x80000000) {
-				m_f = (m_f & ~F_MASK) | F_C;
+				m_hr[4] = (m_hr[4] & ~F_MASK) | F_C;
 				return 0xffffffff;
 			} else {
-				m_f = (m_f & ~F_MASK) | F_Z;
+				m_hr[4] = (m_hr[4] & ~F_MASK) | F_Z;
 				return 0;
 			}
 		}

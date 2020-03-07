@@ -208,7 +208,7 @@ NETLIST_START(stuntcyc)
 	RES(R8, 330)
 	CAP(C2, CAP_U(0.1))
 	QBJT_SW(Q11, "2N3644")
-	
+
 	NET_C(D2.A, R8.1, Q10.C)
 	NET_C(COIN_Q, D2.K)
 

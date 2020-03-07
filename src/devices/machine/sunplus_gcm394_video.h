@@ -61,6 +61,10 @@ public:
 	DECLARE_WRITE16_MEMBER(tmap3_tilebase_lsb_w);
 	DECLARE_WRITE16_MEMBER(tmap3_tilebase_msb_w);
 
+	DECLARE_WRITE16_MEMBER(video_701c_w);
+	DECLARE_WRITE16_MEMBER(video_701d_w);
+	DECLARE_WRITE16_MEMBER(video_701e_w);
+
 	DECLARE_READ16_MEMBER(sprite_7022_gfxbase_lsb_r);
 	DECLARE_READ16_MEMBER(sprite_702d_gfxbase_msb_r);
 
@@ -77,6 +81,10 @@ public:
 
 	DECLARE_READ16_MEMBER(video_703a_palettebank_r);
 	DECLARE_WRITE16_MEMBER(video_703a_palettebank_w);
+	
+	void update_raster_split_position();
+	DECLARE_WRITE16_MEMBER(split_irq_xpos_w);
+	DECLARE_WRITE16_MEMBER(split_irq_ypos_w);
 
 	DECLARE_READ16_MEMBER(videoirq_source_enable_r);
 	DECLARE_WRITE16_MEMBER(videoirq_source_enable_w);
@@ -116,8 +124,7 @@ public:
 	DECLARE_READ16_MEMBER(spriteram_r);
 
 	DECLARE_READ16_MEMBER(video_7051_r);
-	DECLARE_WRITE16_MEMBER(video_701c_w);
-
+	
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 
 	virtual void device_add_mconfig(machine_config& config) override;
@@ -142,6 +149,8 @@ protected:
 		TILE_Y_FLIP             = 0x0008
 	};
 
+	static const device_timer_id TIMER_SCREENPOS = 2;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	inline void check_video_irq();
 
@@ -212,11 +221,13 @@ protected:
 
 	uint16_t m_707f;
 	uint16_t m_703a_palettebank;
-	uint16_t m_7062;
-	uint16_t m_7063;
+	uint16_t m_video_irq_enable;
+	uint16_t m_video_irq_status;
 
 	uint16_t m_702a;
 	uint16_t m_7030_brightness;
+	uint16_t m_xirqpos;
+	uint16_t m_yirqpos;
 	uint16_t m_703c_tvcontrol1;
 
 	uint16_t m_7042_sprite;
@@ -240,7 +251,7 @@ protected:
 
 	void unk_vid_regs_w(int which, int offset, uint16_t data);
 
-	uint16_t m_video_irq_status;
+	emu_timer *m_screenpos_timer;
 
 	uint16_t m_spriteram[0x400];
 	uint16_t m_spriteextra[0x400];
@@ -255,8 +266,6 @@ protected:
 
 	int m_maxgfxelement;
 	void decodegfx(const char* tag);
-
-	int m_global_y_mask;
 
 	int m_pal_displaybank_high;
 	int m_alt_tile_addressing;

@@ -10,32 +10,32 @@ class vic_pl192_device : public device_t, public device_memory_interface
 {
 public:
 	vic_pl192_device(const machine_config &mconfig, const char* tag, device_t *owner, uint32_t clock = 0);
-	
+
 	auto out_irq_cb() { return m_out_irq_func.bind(); }
 	auto out_fiq_cb() { return m_out_fiq_func.bind(); }
-	
+
 	template<unsigned IRQ>
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { set_irq_line(IRQ, state); }
 
-    void map(address_map &map);
+	void map(address_map &map);
 
 protected:
 	vic_pl192_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	
+
 	// device-level overrides
-    virtual void device_resolve_objects() override;
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-    virtual space_config_vector memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
 	static constexpr device_timer_id TIMER_CHECK_IRQ = 0;
 
 	void set_irq_line(int irq, int state);
 
-    address_space_config m_mmio_config;
+	address_space_config m_mmio_config;
 
 	devcb_write_line m_out_irq_func;
 	devcb_write_line m_out_fiq_func;

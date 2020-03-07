@@ -13,7 +13,7 @@ offs_t upd78k2_disassembler::dasm_01xx(std::ostream &stream, u8 op2, offs_t pc, 
 {
 	if (op2 == 0x05)
 	{
-		u8 op3 = opcodes.r8(pc + 3);
+		u8 op3 = opcodes.r8(pc + 2);
 		if ((op3 & 0xed) == 0x89)
 		{
 			util::stream_format(stream, "%-8s&[%s]", BIT(op3, 4) ? "ROL4" : "ROR4", BIT(op3, 1) ? "HL" : "DE");
@@ -33,10 +33,10 @@ offs_t upd78k2_disassembler::dasm_01xx(std::ostream &stream, u8 op2, offs_t pc, 
 	}
 	else if (op2 == 0x06)
 	{
-		u8 op3 = opcodes.r8(pc + 3);
+		u8 op3 = opcodes.r8(pc + 2);
 		if ((op3 & 0x70) < 0x30 && (BIT(op3, 7) ? (op3 & 0x0f) == 0 : BIT(op3, 3) || (op3 & 0x03) == 0))
 		{
-			util::stream_format(stream, "%-8s", BIT(op3, 3) ? s_alu_ops[op3 & 0x07] : BIT(op2, 2) ? "XCH" : "MOV");
+			util::stream_format(stream, "%-8s", BIT(op3, 3) ? s_alu_ops[op3 & 0x07] : BIT(op3, 2) ? "XCH" : "MOV");
 			if (!BIT(op3, 7))
 				stream << "A,";
 			stream << "&";
@@ -50,7 +50,7 @@ offs_t upd78k2_disassembler::dasm_01xx(std::ostream &stream, u8 op2, offs_t pc, 
 	}
 	else if (op2 == 0x09)
 	{
-		u8 op3 = opcodes.r8(pc + 3);
+		u8 op3 = opcodes.r8(pc + 2);
 		if ((op3 & 0xfe) == 0xf0)
 		{
 			util::stream_format(stream, "%-8s", "MOV");
@@ -67,18 +67,18 @@ offs_t upd78k2_disassembler::dasm_01xx(std::ostream &stream, u8 op2, offs_t pc, 
 	}
 	else if (op2 == 0x0a)
 	{
-		u8 op3 = opcodes.r8(pc + 3);
+		u8 op3 = opcodes.r8(pc + 2);
 		if (!BIT(op3, 6) && (BIT(op3, 7) ? (op3 & 0x0f) == 0 : BIT(op3, 3) || (op3 & 0x03) == 0))
 		{
-			util::stream_format(stream, "%-8s", BIT(op2, 3) ? s_alu_ops[op3 & 0x07] : BIT(op3, 2) ? "XCH" : "MOV");
-			if (!BIT(op2, 7))
+			util::stream_format(stream, "%-8s", BIT(op3, 3) ? s_alu_ops[op3 & 0x07] : BIT(op3, 2) ? "XCH" : "MOV");
+			if (!BIT(op3, 7))
 				stream << "A,";
 			stream << "&";
-			if (BIT(op2, 4))
-				format_ix_base16(stream, BIT(op2, 5) ? "B" : "A", opcodes.r16(pc + 2));
+			if (BIT(op3, 4))
+				format_ix_base16(stream, BIT(op3, 5) ? "B" : "A", opcodes.r16(pc + 3));
 			else
-				format_ix_disp16(stream, BIT(op2, 5) ? "HL" : "DE", opcodes.r16(pc + 2));
-			if (BIT(op2, 7))
+				format_ix_disp16(stream, BIT(op3, 5) ? "HL" : "DE", opcodes.r16(pc + 3));
+			if (BIT(op3, 7))
 				stream << ",A";
 			return 5 | SUPPORTED;
 		}
@@ -87,7 +87,7 @@ offs_t upd78k2_disassembler::dasm_01xx(std::ostream &stream, u8 op2, offs_t pc, 
 	}
 	else if (op2 == 0x16)
 	{
-		u8 op3 = opcodes.r8(pc + 3);
+		u8 op3 = opcodes.r8(pc + 2);
 		if ((op3 & 0x60) != 0x60 && (BIT(op3, 7) ? (op3 & 0x0f) == 0x00 : BIT(op3, 3) || (op3 & 0x03) == 0x00))
 		{
 			util::stream_format(stream, "%-8s", BIT(op3, 3) ? s_alu_ops[op3 & 0x07] : BIT(op3, 2) ? "XCH" : "MOV");
@@ -229,9 +229,9 @@ offs_t upd78k2_disassembler::dasm_29(std::ostream &stream, offs_t pc, const upd7
 offs_t upd78k2_disassembler::dasm_38(std::ostream &stream, u8 op, offs_t pc, const upd78k2_disassembler::data_buffer &opcodes)
 {
 	util::stream_format(stream, "%-8s", BIT(op, 0) ? "XCH" : "MOV");
-	format_saddr(stream, opcodes.r8(pc + 1));
-	stream << ",";
 	format_saddr(stream, opcodes.r8(pc + 2));
+	stream << ",";
+	format_saddr(stream, opcodes.r8(pc + 1));
 	return 3 | SUPPORTED;
 }
 
@@ -272,9 +272,9 @@ offs_t upd78k2_disassembler::dasm_50(std::ostream &stream, u8 op)
 offs_t upd78k2_disassembler::dasm_78(std::ostream &stream, u8 op, offs_t pc, const upd78k2_disassembler::data_buffer &opcodes)
 {
 	util::stream_format(stream, "%-8s", s_alu_ops[op & 0x07]);
-	format_saddr(stream, opcodes.r8(pc + 1));
-	stream << ",";
 	format_saddr(stream, opcodes.r8(pc + 2));
+	stream << ",";
+	format_saddr(stream, opcodes.r8(pc + 1));
 	return 3 | SUPPORTED;
 }
 

@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- Software from here: http://rainbow-100.com -->
+<!--
+license:CC0
+
+Software from here: http://rainbow-100.com
+-->
 
 <softwarelist name="rainbow" description="DEC Rainbow 100 Disk Images">
 	<software name="concpm86">

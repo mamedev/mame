@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 	<element name="busy_text" defstate="0">
 		<text string="BUSY" state="1">

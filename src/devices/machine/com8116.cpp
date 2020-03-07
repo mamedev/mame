@@ -45,7 +45,7 @@ const int com8116_device::divisors_16X_5_0688MHz[16] =
 const int com8116_device::divisors_16X_6_01835MHz[16] =
 	{ 7523, 5015, 3420, 2797, 2508, 1881, 1254, 627, 313, 209, 188, 157, 104, 78, 39, 20 };
 
-// SMC/COM5016(T)-5 and WD WD-1943-05; Synertek SY2661-1 and 2 are NOT the same as this despite using same clock speed, see below
+// SMC/COM5016(T)-5 and WD WD-1943-05; Synertek SY2661-1 and 2 are NOT the same as this despite using same clock speed
 // SMC/COM8156(T)-5 is the same chip but clocked twice as fast and 32x clocks per baud instead of 16x
 // Motorola K1135C is similar, with undivided 4.9152 MHz on pin 1
 // baud rates are 50, 75, 110, 134.5, 150, 300, 600, 1200, 1800, 2000, 2400, 3600, 4800, 7200, 9600, 19200
@@ -79,16 +79,6 @@ const int com8116_device::divisors_16X_4_6080MHz[16] =
 	{ 5760, 3840, 2618, 2141, 1920, 960, 480, 240, 160, 144, 120, 80, 60, 40, 30, 15 };
 
 // COM8046 combines the -6 and STD tables into one device as a 32-entry table
-
-// Synertek SY2661-1 (from http://bitsavers.informatik.uni-stuttgart.de/pdf/synertek/_dataBooks/Synertek_1981-1982_Data_Catalog.pdf page 3-40 (pdf page 139))
-// baud rates are 50, 75, 110, 134.5, 150, 200, 300, 600, 1050, 1200, 1800, 2000, 2400, 4800, 9600, 19200
-const int com8116_device::divisors_16X_4_9152MHz_SY2661_1[16] =
-	{ 6144, 4096, 2793, 2284, 2048, 1536, 1024, 512, 292, 256, 171, 154, 128, 64, 32, 16 };
-
-// Synertek SY2661-2 (from http://bitsavers.informatik.uni-stuttgart.de/pdf/synertek/_dataBooks/Synertek_1981-1982_Data_Catalog.pdf page 3-40 (pdf page 139))
-// baud rates are 45.5, 50, 75, 110, 134.5, 150, 300, 600, 1200, 1800, 2000, 2400, 4800, 9600, 19200, 38400
-const int com8116_device::divisors_16X_4_9152MHz_SY2661_2[16] =
-	{ 6752, 6144, 4096, 2793, 2284, 2048, 1024, 512, 256, 171, 154, 128, 64, 32, 16, 8 };
 
 //**************************************************************************
 //  LIVE DEVICE

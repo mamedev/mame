@@ -198,29 +198,42 @@ uint32_t sh34_base_device::sh4_handle_tcpr2_addr_r(uint32_t mem_mask)
 
 void sh34_base_device::sh4_handle_tstr_addr_w(uint32_t data, uint32_t mem_mask)
 {
-	uint32_t old2 = m_SH4_TSTR;
+	uint32_t chg = m_SH4_TSTR;
 	COMBINE_DATA(&m_SH4_TSTR);
+	chg ^= m_SH4_TSTR;
 
-	if (old2 & 1)
-		m_SH4_TCNT0 = compute_ticks_timer(m_timer[0], m_pm_clock, tcnt_div[m_SH4_TCR0 & 7]);
-	if ((m_SH4_TSTR & 1) == 0) {
-		m_timer[0]->adjust(attotime::never);
-	} else
-		sh4_timer_recompute(0);
+	if (chg & 1)
+	{
+		if ((m_SH4_TSTR & 1) == 0)
+		{
+			m_SH4_TCNT0 = compute_ticks_timer(m_timer[0], m_pm_clock, tcnt_div[m_SH4_TCR0 & 7]);
+			m_timer[0]->adjust(attotime::never);
+		}
+		else
+			sh4_timer_recompute(0);
+	}
 
-	if (old2 & 2)
-		m_SH4_TCNT1 = compute_ticks_timer(m_timer[1], m_pm_clock, tcnt_div[m_SH4_TCR1 & 7]);
-	if ((m_SH4_TSTR & 2) == 0) {
-		m_timer[1]->adjust(attotime::never);
-	} else
-		sh4_timer_recompute(1);
+	if (chg & 2)
+	{
+		if ((m_SH4_TSTR & 2) == 0)
+		{
+			m_SH4_TCNT1 = compute_ticks_timer(m_timer[1], m_pm_clock, tcnt_div[m_SH4_TCR1 & 7]);
+			m_timer[1]->adjust(attotime::never);
+		}
+		else
+			sh4_timer_recompute(1);
+	}
 
-	if (old2 & 4)
-		m_SH4_TCNT2 = compute_ticks_timer(m_timer[2], m_pm_clock, tcnt_div[m_SH4_TCR2 & 7]);
-	if ((m_SH4_TSTR & 4) == 0) {
-		m_timer[2]->adjust(attotime::never);
-	} else
-		sh4_timer_recompute(2);
+	if (chg & 4)
+	{
+		if ((m_SH4_TSTR & 4) == 0)
+		{
+			m_SH4_TCNT2 = compute_ticks_timer(m_timer[2], m_pm_clock, tcnt_div[m_SH4_TCR2 & 7]);
+			m_timer[2]->adjust(attotime::never);
+		}
+		else
+			sh4_timer_recompute(2);
+	}
 }
 
 void sh34_base_device::sh4_handle_tcr0_addr_w(uint32_t data, uint32_t mem_mask)
@@ -265,31 +278,16 @@ void sh34_base_device::sh4_handle_tcr2_addr_w(uint32_t data, uint32_t mem_mask)
 void sh34_base_device::sh4_handle_tcor0_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_TCOR0);
-	if (m_SH4_TSTR & 1)
-	{
-		m_SH4_TCNT0 = compute_ticks_timer(m_timer[0], m_pm_clock, tcnt_div[m_SH4_TCR0 & 7]);
-		sh4_timer_recompute(0);
-	}
 }
 
 void sh34_base_device::sh4_handle_tcor1_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_TCOR1);
-	if (m_SH4_TSTR & 2)
-	{
-		m_SH4_TCNT1 = compute_ticks_timer(m_timer[1], m_pm_clock, tcnt_div[m_SH4_TCR1 & 7]);
-		sh4_timer_recompute(1);
-	}
 }
 
 void sh34_base_device::sh4_handle_tcor2_addr_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_TCOR2);
-	if (m_SH4_TSTR & 4)
-	{
-		m_SH4_TCNT2 = compute_ticks_timer(m_timer[2], m_pm_clock, tcnt_div[m_SH4_TCR2 & 7]);
-		sh4_timer_recompute(2);
-	}
 }
 
 void sh34_base_device::sh4_handle_tcnt0_addr_w(uint32_t data, uint32_t mem_mask)

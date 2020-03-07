@@ -18,7 +18,7 @@ Keyboard: P8035L CPU, undumped 2716 labelled "358_2758", XTAL marked "4608-300-1
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/x2212.h"
 #include "sound/beep.h"
 //#include "video/crt9006.h"
@@ -69,12 +69,12 @@ void altos2_state::machine_reset()
 
 READ8_MEMBER(altos2_state::vpac_r)
 {
-	return m_vpac->read(space, offset >> 1);
+	return m_vpac->read(offset >> 1);
 }
 
 WRITE8_MEMBER(altos2_state::vpac_w)
 {
-	m_vpac->write(space, offset >> 1, data);
+	m_vpac->write(offset >> 1, data);
 }
 
 WRITE8_MEMBER(altos2_state::video_mode_w)

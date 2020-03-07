@@ -45,8 +45,8 @@ Chipsets (VIA Pro133A):
 - VT82C694X Northbridge
 - VT82C686A Southbridge
 
-Note: Entirely different motherboard/chipset hardware (most likely needs its own driver). This game's storage device has a 
-copy protection scheme that "locks" the storage device to the motherboard's serial number. If a drive doesn't match the 
+Note: Entirely different motherboard/chipset hardware (most likely needs its own driver). This game's storage device has a
+copy protection scheme that "locks" the storage device to the motherboard's serial number. If a drive doesn't match the
 motherboard's serial number, the game launcher will give an error.
 
 I/O boards:

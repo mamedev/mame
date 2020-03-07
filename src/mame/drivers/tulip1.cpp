@@ -5,24 +5,24 @@
     CompuData Tulip System I
 
     Hardware:
-	- I8086 CPU
-	- I8087 FPU (optional)
-	- I8089 I/O Processor (optional)
-	- 8 kb ROM, 4 + 8 kb graphics ROM
-	- 128 to 896 kb RAM
-	- 2x TC5517AP VRAM
-	- HD46505SP-2 CRT (+ 7220?)
-	- MC68B50P ACIA (for the keyboard?)
-	- 8256A-P MUART
-	- WD2793PL-02 FDC
+    - I8086 CPU
+    - I8087 FPU (optional)
+    - I8089 I/O Processor (optional)
+    - 8 kb ROM, 4 + 8 kb graphics ROM
+    - 128 to 896 kb RAM
+    - 2x TC5517AP VRAM
+    - HD46505SP-2 CRT (+ 7220?)
+    - MC68B50P ACIA (for the keyboard?)
+    - 8256A-P MUART
+    - WD2793PL-02 FDC
 
-	TODO:
-	- No MUART emulation which handles interrupts, timers, serial and
-	  parallel interfaces.
+    TODO:
+    - No MUART emulation which handles interrupts, timers, serial and
+      parallel interfaces.
 
-	Notes:
-	- If you hit the keyboard a few times it tries to load the OS first
-	  from floppy and then from the hard drive.
+    Notes:
+    - If you hit the keyboard a few times it tries to load the OS first
+      from floppy and then from the hard drive.
 
 ***************************************************************************/
 
@@ -84,18 +84,18 @@ void tulip1_state::mem_map(address_map &map)
 void tulip1_state::io_map(address_map &map)
 {
 	map(0xfc00, 0xfc07).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write)).umask16(0x00ff);
-//	map(0xfca0, 0xfcaf) // ?
-//	map(0xfcb0) // ?
-//	map(0xfc80) // ?
+//  map(0xfca0, 0xfcaf) // ?
+//  map(0xfcb0) // ?
+//  map(0xfc80) // ?
 	map(0xfc91, 0xfc91).lr8(NAME([]() -> u8 { return 0x04; })); // ?
-//	map(0xfd00, 0xfd1f) // muart
+//  map(0xfd00, 0xfd1f) // muart
 	map(0xfd98, 0xfd98).rw(m_acia, FUNC(acia6850_device::status_r), FUNC(acia6850_device::control_w));
 	map(0xfd9c, 0xfd9c).rw(m_acia, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));
 	map(0xfe00, 0xfe00).w(m_crtc, FUNC(hd6845s_device::address_w));
 	map(0xfe02, 0xfe02).rw(m_crtc, FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
-//	map(0xfe82) // ?
-//	map(0xff00, 0xff1f) // ?
-//	map(0xff30) // ?
+//  map(0xfe82) // ?
+//  map(0xff00, 0xff1f) // ?
+//  map(0xff30) // ?
 }
 
 static INPUT_PORTS_START( tulip1 )

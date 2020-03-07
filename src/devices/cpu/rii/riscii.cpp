@@ -19,7 +19,7 @@
 #include "riscii.h"
 #include "riidasm.h"
 
-#define LOG_TBRD (1 << 1U)
+#define LOG_TBRD (1U << 1)
 #include "logmacro.h"
 
 // device type definitions
@@ -1504,7 +1504,7 @@ void riscii_series_device::execute_inc(u8 reg, bool a)
 void riscii_series_device::execute_dec(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
-	u16 tmp = (u16(m_regs->read_byte(addr)) + 0xff) & 0x1ff;
+	u16 tmp = u16(m_regs->read_byte(addr)) + 0xff;
 	if (a)
 		acc_w(tmp & 0xff);
 	else

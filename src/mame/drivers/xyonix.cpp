@@ -85,7 +85,7 @@ private:
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 
-//	MC6845_UPDATE_ROW(crtc_update_row);
+//  MC6845_UPDATE_ROW(crtc_update_row);
 };
 
 void xyonix_state::machine_start()
@@ -401,7 +401,7 @@ void xyonix_state::xyonix(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(16_MHz_XTAL / 2, 508, 0, 320, 256, 0, 224); // 8 MHz?
 	screen.set_screen_update(FUNC(xyonix_state::screen_update));
-//	screen.set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
+//  screen.set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_xyonix);
@@ -412,7 +412,7 @@ void xyonix_state::xyonix(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
-//	m_crtc->set_update_row_callback(FUNC(xyonix_state::crtc_update_row));
+//  m_crtc->set_update_row_callback(FUNC(xyonix_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(xyonix_state::nmiclk_w));
 
 	/* sound hardware */

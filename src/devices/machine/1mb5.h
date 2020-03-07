@@ -71,10 +71,10 @@ private:
 	bool m_reset;
 	bool m_halt;
 
-	bool set_service(bool new_service);
-	bool update_halt();
-	bool set_reset(bool new_reset);
-	bool set_int(bool new_int);
+	void set_service(bool new_service);
+	void update_halt();
+	void set_reset(bool new_reset);
+	void set_int(bool new_int);
 };
 
 // device type definition

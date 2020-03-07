@@ -15,7 +15,7 @@
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/watchdog.h"
 #include "audio/bally.h"
 #include "audio/midway.h"
@@ -214,7 +214,7 @@ private:
 	emu_timer *m_ipu_watchdog_timer;
 
 	required_device<z80_device> m_ipu;
-	required_device<z80dart_device> m_ipu_sio;
+	required_device<z80sio_device> m_ipu_sio;
 	required_device<z80ctc_device> m_ipu_ctc;
 	required_device<z80pio_device> m_ipu_pio0;
 	required_device<z80pio_device> m_ipu_pio1;

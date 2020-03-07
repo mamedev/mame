@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="ibm5170" description="IBM PC/AT disk images">
 
 	<software name="advdiags">
@@ -464,7 +467,7 @@
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="rom" size = "1474560">
+			<dataarea name="flop" size = "1474560">
 				<rom name="blueflops-2.0.14-bf-2.img" size="1474560" crc="622b1adc" sha1="c413aea75c4696da41dfc95b71503eb25e3e8a0f"/>
 			</dataarea>
 		</part>
@@ -2113,7 +2116,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos7fr" cloneof="pcdos7" supported="no">
 		<description>PC DOS 7.0 (French)</description>
 		<year>1995</year>
@@ -2145,7 +2147,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos7ja" cloneof="pcdos7" supported="no">
 		<description>PC DOS 7.0 (Japanese)</description>
 		<year>1995</year>
@@ -2198,7 +2199,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos7ko" cloneof="pcdos7" supported="no">
 		<description>PC DOS 7.0 (Korean)</description>
 		<year>1995</year>
@@ -2246,7 +2246,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos7ru" cloneof="pcdos7" supported="no">
 		<description>PC DOS 7.0 (Russian)</description>
 		<year>1995</year>
@@ -2279,7 +2278,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos7engb" cloneof="pcdos7" supported="no">
 		<description>PC DOS 7.0 (UK English)</description>
 		<year>1995</year>
@@ -2570,7 +2568,6 @@
 		</part>
 	</software>
 
-	<!-- IBM Extended Density Format not supported -->
 	<software name="pcdos2kzhs" cloneof="pcdos2k" supported="no">
 		<description>IBM PC DOS 2000 (Simplified Chinese)</description>
 		<year>1998</year>
@@ -5090,6 +5087,67 @@
 		</part>
 	</software>
 
+	<software name="asuscd" supported="no">
+		<description>ASUS DVD / CD-ROM Drive Installation Disk Rev 1.5</description>
+		<year>1999</year>
+		<publisher>ASUSTek Computer</publisher>
+		<info name="version" value="1.5" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="ASUSCD150.img" size="1474560" crc="c020bf23" sha1="5bc80b05edec41a8523d59711498f8c64ddd0778"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdrom20" supported="no">
+		<description>CD-ROM Device Driver Version 2.00</description>
+		<year>1995</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="version" value="2.00" />
+		<info name="serial" value="PART NO: 53.00037.001" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="CD-ROM Device Driver.img" size="737280" crc="c7651d24" sha1="729a7cf901ad58990201da39a7bbd0967b6d2b20"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdrom22">
+		<description>CD-ROM/DVD-ROM drive IDE/ATAPI interface V2.2</description>
+		<year>1999</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="version" value="2.2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="CD-ROM_DVD-ROM_DRIVE_IDE_ATAPI_INTERFACE_v2.2.img" size="1474560" crc="a26cbdcb" sha1="e35eeb62c1b2c144defd3fbf0cd5ade5655e6505"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdrom32" supported="no">
+		<description>CD-ROM driver ATAPI (Version 3.2)</description>
+		<year>1999</year>
+		<publisher>CD Tech?</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="cdtech cd-rom driver atapi (version 3.2).img" size="1474560" crc="d41648aa" sha1="82728df751577e77591b544d4b77d781ad1457ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Contains drivers for various makes and models; the MAME ATAPI CD-ROM device is compatible with e.g. the "COMPAQ", "NEC", and "TATUNG" drivers -->
+	<software name="cdgod55">
+		<description>CD-ROM God Boot Disk Version 5.5 BETA2</description>
+		<year>1998</year>
+		<publisher>Kristopher Marciniak</publisher>
+		<info name="version" value="5.5 BETA2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="cdgod55.img" size="1474560" crc="f31ebbea" sha1="76af4556a48abe31eb6eaec83ab6131ea79f788a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gd542x">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>CL GD542X Video</description>
@@ -5187,17 +5245,6 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="crystal semiconductor corp cs4237b (version 1.80) (37bxx3d-141296-34).img" size="1474560" crc="adc33367" sha1="ead63de3a30fcf996a4c8cd2b9c6f914363ee7c3"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cdrom32">
-		<description>CD-ROM driver ATAPI (Version 3.2)</description>
-		<year>1999</year>
-		<publisher>CD Tech?</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="cdtech cd-rom driver atapi (version 3.2).img" size="1474560" crc="d41648aa" sha1="82728df751577e77591b544d4b77d781ad1457ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5302,7 +5349,7 @@
 		</part>
 	</software>
 
-	<software name="hscd414">
+	<software name="hscd414" supported="no">
 		<description>High-Speed CD-ROM Driver (Version 4.14)</description>
 		<year>199?</year>
 		<publisher>Philips</publisher>
@@ -5505,6 +5552,20 @@
 		</part>
 	</software>
 
+	<software name="lgcdrom">
+		<description>MS-DOS CD-ROM Extensions With Device Driver - Installation Disk Ver 1.25</description>
+		<year>1997</year>
+		<publisher>LG</publisher>
+		<info name="version" value="1.25" />
+		<info name="serial" value="P/N. 3171H-1011A / S0050802" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- 1024-byte footer removed from 1475584-byte image -->
+			<dataarea name="flop" size = "1474560">
+				<rom name="cd-driver-1.25.img" size="1474560" crc="2ae76e35" sha1="ddf5f96010cb183188af2dbc1e7f6a4e5e2c3f4d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fastart">
 		<description>MS-DOS FASTART/SYSTEM - The Compaq Personal Computer FASTART/SYSTEM Diskette</description>
 		<year>1992</year>
@@ -5533,7 +5594,7 @@
 		</part>
 	</software>
 
-	<software name="neccd110">
+	<software name="neccd110" supported="no">
 		<description>NEC Atapi-IDE CD-Rom Driver (Rev D011V110.ENG019)</description>
 		<year>1995</year>
 		<publisher>NEC</publisher>
@@ -9152,7 +9213,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cischeat">
 		<!-- Dumped via Kryoflux -->
 		<description>Cisco Heat - All American Police Car Race</description>
@@ -9450,7 +9511,7 @@
 	</software>
 
 	<software name="crystalc">
-		<description>Crystal Caves</description>
+		<description>Crystal Caves (1.0a)</description>
 		<year>1991</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="Apogee Software" />
@@ -10094,8 +10155,8 @@
 				<rom name="Epic Pinball - Cyborgirl [The B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7370af3e" sha1="6ae169ff06c03da063ac72cb3318b76facbf0559"/>
 			</dataarea>
 		</part>
-	</software>		
-	
+	</software>
+
 	<software name="epdeepsea">
 		<description>Epic Pinball: Deep Sea</description>
 		<year>1994</year>
@@ -10108,7 +10169,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 
 	<software name="epenigma">
 		<description>Epic Pinball: Enigma</description>
@@ -10133,7 +10194,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="epicpin1">
 		<description>Epic Pinball Pack 1 (v2.1)</description>
 		<year>1994</year>

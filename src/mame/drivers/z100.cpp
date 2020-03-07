@@ -152,10 +152,10 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
 #include "machine/74123.h"
 #include "machine/6821pia.h"
 #include "machine/input_merger.h"
-#include "machine/mc2661.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/rescap.h"
+#include "machine/scn_pci.h"
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
@@ -234,7 +234,7 @@ private:
 	required_device<pic8259_device> m_pics;
 	required_device<fd1797_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppies;
-	required_device_array<mc2661_device, 2> m_epci;
+	required_device_array<scn2661b_device, 2> m_epci;
 	required_device<ttl74123_device> m_keyclick;
 	required_device<ttl74123_device> m_keybeep;
 	required_device<beep_device> m_beeper;
@@ -489,8 +489,8 @@ void z100_state::z100_io(address_map &map)
 //  map(0xde, 0xde) light pen
 	map(0xe0, 0xe3).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //main board
 	map(0xe4, 0xe7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xe8, 0xeb).rw(m_epci[0], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
-	map(0xec, 0xef).rw(m_epci[1], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+	map(0xe8, 0xeb).rw(m_epci[0], FUNC(scn2661b_device::read), FUNC(scn2661b_device::write));
+	map(0xec, 0xef).rw(m_epci[1], FUNC(scn2661b_device::read), FUNC(scn2661b_device::write));
 	map(0xf0, 0xf1).rw(m_pics, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf2, 0xf3).rw(m_picm, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf4, 0xf5).rw("kbdc", FUNC(i8041a_device::upi41_master_r), FUNC(i8041a_device::upi41_master_w));
@@ -855,11 +855,11 @@ void z100_state::z100(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppies[2], z100_floppies, nullptr, floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppies[3], z100_floppies, nullptr, floppy_image_device::default_floppy_formats);
 
-	MC2661(config, m_epci[0], 4.9152_MHz_XTAL); // First 2661-2 serial port (printer)
+	SCN2661B(config, m_epci[0], 4.9152_MHz_XTAL); // First 2661-2 serial port (printer)
 	m_epci[0]->txrdy_handler().set("epci0int", FUNC(input_merger_device::in_w<0>));
 	m_epci[0]->rxrdy_handler().set("epci0int", FUNC(input_merger_device::in_w<1>));
 
-	MC2661(config, m_epci[1], 4.9152_MHz_XTAL); // Second 2661-2 serial port (modem)
+	SCN2661B(config, m_epci[1], 4.9152_MHz_XTAL); // Second 2661-2 serial port (modem)
 	m_epci[1]->txrdy_handler().set("epci1int", FUNC(input_merger_device::in_w<0>));
 	m_epci[1]->rxrdy_handler().set("epci1int", FUNC(input_merger_device::in_w<1>));
 

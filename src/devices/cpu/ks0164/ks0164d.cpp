@@ -186,7 +186,7 @@ offs_t ks0164_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			return instructions[i].cb(stream, opcode, opcodes, pc);
 
 	abort();
-			
+
 #if 0
 	} else if((opcode & 0xf80f) == 0xc800) // c808?
 		util::stream_format(stream, "store.w -(%s), %s", regs[(opcode >> 4) & 7], regs[(opcode >> 7) & 7]);

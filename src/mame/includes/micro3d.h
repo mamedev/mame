@@ -14,8 +14,8 @@
 #include "cpu/mcs51/mcs51.h"
 #include "sound/upd7759.h"
 #include "machine/adc0844.h"
-#include "machine/mc2661.h"
 #include "machine/mc68681.h"
+#include "machine/scn_pci.h"
 #include "emupal.h"
 
 
@@ -208,7 +208,7 @@ private:
 	void soundmem_prg(address_map &map);
 	void vgbmem(address_map &map);
 
-	required_device<mc2661_device> m_vgb_uart;
+	required_device<scn2651_device> m_vgb_uart;
 };
 
 #endif // MAME_INCLUDES_MICRO3D_H

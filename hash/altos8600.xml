@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="altos8600" description="Altos 8600 floppies">
+
+	<software name="diag" supported="no"><!-- boots but then can't run any commands -->
+		<description>Altos Diagnostic Executive</description>
+		<year>1982</year>
+		<publisher>Altos Computer Systems</publisher>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="272766">
+				<rom name="cdc114dg.imd" size="272766" crc="665efeeb" sha1="a9184447c46dfa11b961928f55c92f7ea1559b41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenix22b" supported="no"><!-- stops halfway through boot process -->
+		<description>Xenix v2.2b</description>
+		<year>1982</year>
+		<publisher>Altos Computer Systems</publisher>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="350249">
+				<rom name="x22root.imd" size="350249" crc="8212bdaf" sha1="f156519c6ef434d517ce320c36c85869c8726248"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

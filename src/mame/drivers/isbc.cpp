@@ -25,7 +25,6 @@ able to deal with 256byte sectors so fails to load the irmx 512byte sector image
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
-//#include "machine/z80dart.h"
 #include "machine/z80sio.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/isbx/isbx.h"
@@ -89,7 +88,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8251_device> m_uart8251;
 //  optional_device<i8274_device> m_uart8274;
-	optional_device<i8274_new_device> m_uart8274;
+	optional_device<i8274_device> m_uart8274;
 	required_device<pic8259_device> m_pic_0;
 	optional_device<pic8259_device> m_pic_1;
 	optional_device<centronics_device> m_centronics;
@@ -189,7 +188,7 @@ void isbc_state::isbc286_io(address_map &map)
 	map(0x00c8, 0x00cf).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x00c8, 0x00cf).w(FUNC(isbc_state::upperen_w)).umask16(0xff00);
 	map(0x00d0, 0x00d7).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
-	map(0x00d8, 0x00df).rw(m_uart8274, FUNC(i8274_new_device::cd_ba_r), FUNC(i8274_new_device::cd_ba_w)).umask16(0x00ff);
+	map(0x00d8, 0x00df).rw(m_uart8274, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
 	map(0x0100, 0x0100).w("isbc_215g", FUNC(isbc_215g_device::write));
 }
 
@@ -449,8 +448,7 @@ void isbc_state::isbc286(machine_config &config)
 	pit.set_clk<0>(XTAL(22'118'400)/18);
 	pit.out_handler<0>().set(m_pic_0, FUNC(pic8259_device::ir0_w));
 	pit.set_clk<1>(XTAL(22'118'400)/18);
-//  pit.out_handler<1>().set(m_uart8274, FUNC(z80dart_device::rxtxcb_w));
-	pit.out_handler<1>().set(m_uart8274, FUNC(i8274_new_device::rxtxcb_w));
+	pit.out_handler<1>().set(m_uart8274, FUNC(i8274_device::rxtxcb_w));
 	pit.set_clk<2>(XTAL(22'118'400)/18);
 	pit.out_handler<2>().set(FUNC(isbc_state::isbc286_tmr2_w));
 
@@ -479,7 +477,7 @@ void isbc_state::isbc286(machine_config &config)
 	m_uart8274->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 	m_uart8274->out_int_callback().set(FUNC(isbc_state::isbc_uart8274_irq));
 #else
-	I8274_NEW(config, m_uart8274, XTAL(16'000'000)/4);
+	I8274(config, m_uart8274, XTAL(16'000'000)/4);
 	m_uart8274->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	m_uart8274->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	m_uart8274->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -491,26 +489,14 @@ void isbc_state::isbc286(machine_config &config)
 #endif
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
-#if 0
-	rs232a.rxd_handler().set(m_uart8274, FUNC(z80dart_device::rxa_w));
-	rs232a.dcd_handler().set(m_uart8274, FUNC(z80dart_device::dcda_w));
-	rs232a.cts_handler().set(m_uart8274, FUNC(z80dart_device::ctsa_w));
-#else
-	rs232a.rxd_handler().set(m_uart8274, FUNC(i8274_new_device::rxa_w));
-	rs232a.dcd_handler().set(m_uart8274, FUNC(i8274_new_device::dcda_w));
-	rs232a.cts_handler().set(m_uart8274, FUNC(i8274_new_device::ctsa_w));
-#endif
+	rs232a.rxd_handler().set(m_uart8274, FUNC(i8274_device::rxa_w));
+	rs232a.dcd_handler().set(m_uart8274, FUNC(i8274_device::dcda_w));
+	rs232a.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, "terminal"));
-#if 0
-	rs232b.rxd_handler().set(m_uart8274, FUNC(z80dart_device::rxb_w));
-	rs232b.dcd_handler().set(m_uart8274, FUNC(z80dart_device::dcdb_w));
-	rs232b.cts_handler().set(m_uart8274, FUNC(z80dart_device::ctsb_w));
-#else
-	rs232b.rxd_handler().set(m_uart8274, FUNC(i8274_new_device::rxb_w));
-	rs232b.dcd_handler().set(m_uart8274, FUNC(i8274_new_device::dcdb_w));
-	rs232b.cts_handler().set(m_uart8274, FUNC(i8274_new_device::ctsb_w));
-#endif
+	rs232b.rxd_handler().set(m_uart8274, FUNC(i8274_device::rxb_w));
+	rs232b.dcd_handler().set(m_uart8274, FUNC(i8274_device::dcdb_w));
+	rs232b.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsb_w));
 	rs232b.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(isbc286_terminal));
 
 	ISBX_SLOT(config, m_sbx[0], 0, isbx_cards, nullptr);

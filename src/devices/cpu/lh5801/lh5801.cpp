@@ -9,8 +9,8 @@
  *   - Fixed the flags in the ROL/ROR/SHL/SHR opcodes.
  *   - Fixed decimal add/sub opcodes.
  *
- * based on info found on an artikel for the tandy trs80 pc2
- * and on "PC1500 Technical reference manual"
+ * Based on info found in an article for the Tandy TRS-80 PC2
+ * and in the PC1500 Technical Reference Manual.
  *
  *****************************************************************************/
 
@@ -172,9 +172,9 @@ void lh5801_cpu_device::state_string_export(const device_state_entry &entry, std
 
 void lh5801_cpu_device::device_reset()
 {
-	P = (m_program->read_byte(0xfffe)<<8) | m_program->read_byte(0xffff);
+	P = (m_program->read_byte(0xfffe) << 8) | m_program->read_byte(0xffff);
 
-	m_idle=0;
+	m_idle = 0;
 
 	memset(m_ir_flipflop, 0, sizeof(m_ir_flipflop));
 	memset(m_lines_status, 0, sizeof(m_lines_status));
@@ -188,27 +188,27 @@ void lh5801_cpu_device::check_irq()
 		//NMI interrupt
 		m_ir_flipflop[0] = 0;
 		lh5801_push(m_t);
-		m_t&=~IE;
+		m_t &= ~IE;
 		lh5801_push_word(P);
-		P = (m_program->read_byte(0xfffc)<<8) | m_program->read_byte(0xfffd);
+		P = (m_program->read_byte(0xfffc) << 8) | m_program->read_byte(0xfffd);
 	}
 	else if (m_ir_flipflop[1] && (m_t & IE))
 	{
-		//counter interrupt (counter not yet implemented)
+		// Counter interrupt (counter not yet implemented)
 		m_ir_flipflop[1] = 0;
 		lh5801_push(m_t);
-		m_t&=~IE;
+		m_t &= ~IE;
 		lh5801_push_word(P);
-		P = (m_program->read_byte(0xfffa)<<8) | m_program->read_byte(0xfffb);
+		P = (m_program->read_byte(0xfffa) << 8) | m_program->read_byte(0xfffb);
 	}
 	else if (m_ir_flipflop[2] && (m_t & IE))
 	{
-		//MI interrupt
+		// MI interrupt
 		m_ir_flipflop[2] = 0;
 		lh5801_push(m_t);
-		m_t&=~IE;
+		m_t &= ~IE;
 		lh5801_push_word(P);
-		P = (m_program->read_byte(0xfff8)<<8) | m_program->read_byte(0xfff9);
+		P = (m_program->read_byte(0xfff8) << 8) | m_program->read_byte(0xfff9);
 	}
 }
 
@@ -234,7 +234,7 @@ void lh5801_cpu_device::execute_run()
 
 void lh5801_cpu_device::execute_set_input(int irqline, int state)
 {
-	switch( irqline)
+	switch (irqline)
 	{
 		case LH5801_LINE_MI:
 			if (m_lines_status[0] == CLEAR_LINE && state == ASSERT_LINE)

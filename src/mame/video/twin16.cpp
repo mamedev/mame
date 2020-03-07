@@ -331,8 +331,8 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 				xpos = 320-xpos-width;
 				flipx = !flipx;
 			}
-			if( xpos>cliprect.max_x ) xpos -= 65536;
-			if( ypos>cliprect.max_y ) ypos -= 65536;
+			if( xpos>=320 ) xpos -= 65536;
+			if( ypos>=256 ) ypos -= 65536;
 
 			/* slow slow slow, but it's ok for now */
 			for( y=0; y<height; y++, pen_data += width/4 )

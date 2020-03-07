@@ -38,17 +38,17 @@ public:
 	void set_split_read(int split) { m_split_read_reg = split; }
 
 	// I/O operations
-	DECLARE_READ8_MEMBER( index_r );
-	DECLARE_READ8_MEMBER( pal_r );
-	DECLARE_READ8_MEMBER( mask_r );
-	DECLARE_WRITE8_MEMBER( index_w );
-	DECLARE_WRITE8_MEMBER( index_r_w );
-	DECLARE_WRITE8_MEMBER( pal_w );
-	DECLARE_WRITE8_MEMBER( mask_w );
+	uint8_t index_r();
+	uint8_t pal_r();
+	uint8_t mask_r();
+	void index_w(uint8_t data);
+	void index_r_w(uint8_t data);
+	void pal_w(uint8_t data);
+	void mask_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( ramdac_pal_r );
-	DECLARE_WRITE8_MEMBER( ramdac_rgb666_w );
-	DECLARE_WRITE8_MEMBER( ramdac_rgb888_w );
+	uint8_t ramdac_pal_r(offs_t offset);
+	void ramdac_rgb666_w(offs_t offset, uint8_t data);
+	void ramdac_rgb888_w(offs_t offset, uint8_t data);
 
 	void ramdac_palram(address_map &map);
 

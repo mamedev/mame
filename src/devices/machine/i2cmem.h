@@ -59,7 +59,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -93,7 +92,6 @@ protected:
 	std::vector<uint8_t> m_page;
 	int m_page_offset;
 	int m_page_written_size;
-	bool m_in_write;
 };
 
 #define DECLARE_I2C_DEVICE(name) \

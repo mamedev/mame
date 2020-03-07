@@ -160,11 +160,11 @@ private:
 	void lh5801_push(uint8_t data);
 	void lh5801_push_word(uint16_t data);
 	void lh5801_jmp(uint16_t adr);
-	void lh5801_branch_plus(int doit);
-	void lh5801_branch_minus(int doit);
+	void lh5801_branch_plus(int taken);
+	void lh5801_branch_minus(int taken);
 	void lh5801_lop();
 	void lh5801_sjp();
-	void lh5801_vector(int doit, int nr);
+	void lh5801_vector(int taken, int nr);
 	void lh5801_aex();
 	void lh5801_drl(address_space &space, int adr);
 	void lh5801_drr(address_space &space, int adr);
@@ -174,7 +174,6 @@ private:
 	void lh5801_shr();
 	void lh5801_am(int value);
 	void lh5801_ita();
-
 };
 
 

@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 
 <softwarelist name="aquarius" description="Mattel Aquarius cartridges">
 
 	<software name="addtot">
-		<description>Advanced Dungeons and Dragons: Treasue of Tarmin</description>
+		<description>Advanced Dungeons and Dragons: Treasure of Tarmin</description>
 		<year>1982</year>
 		<publisher>TRS Hobbies, Inc.</publisher>
 		<info name="serial" value="4023" />
@@ -134,7 +137,7 @@
 	</software>
 
 	<software name="demo">
-		<description>MarqueeDemo</description>
+		<description>Marquee Demo</description>
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
