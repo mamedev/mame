@@ -727,11 +727,11 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 		x_max = 0x200;
 	}
 
-	// m_7042_sprite is f7 on smartfp
-	//                  01 on wrlshunt
-	// this is not enough to conclude anything
 
-	if ((m_7042_sprite & 0x00ff) == 0x01)
+	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
+	if ((m_7042_sprite & 0x0010) == 0x10)
+		addressing_mode = 0;
+	else
 		addressing_mode = 1;
 
 	if (addressing_mode == 0)
@@ -1314,6 +1314,8 @@ WRITE16_MEMBER(gcm394_base_video_device::video_707f_w)
 	}
 
 	m_707f = data;
+
+	//popmessage("707f is %04x\n", data);
 }
 
 READ16_MEMBER(gcm394_base_video_device::video_703a_palettebank_r)
