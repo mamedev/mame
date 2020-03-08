@@ -8910,6 +8910,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="anotherw">
+		<description>Another World</description>
+		<year>1991</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="developer" value="Delphine Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Another World [U.S. Gold] [1991] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="4eb64a42" sha1="b04f581b6c14c4b592b89f1875e645f7c03a90d6"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="amd80gad">
 		<description>AMD 80C287 Game and Demo</description>
 		<year>199?</year>
@@ -10829,6 +10841,53 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="humans" supported="no">
+		<description>The Humans (3.5" DD)</description>
+		<year>1993</year>
+		<publisher>GameTek</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Humans [GameTek] [1992] [3.5DD] [Disk 1 of 4].img" size="737280" crc="c495a6cc" sha1="a052eecea85a433e32af3b95502ac5d4ff9e8dd6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Humans [GameTek] [1992] [3.5DD] [Disk 2 of 4].img" size="737280" crc="da7599e7" sha1="d18b191a07a820620d173deff0fd40c7f8d3a8f0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Humans [GameTek] [1992] [3.5DD] [Disk 3 of 4].img" size="737280" crc="5d567b00" sha1="964a7d5814a91a830e66376b1960575d3ed82935"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Humans [GameTek] [1992] [3.5DD] [Disk 4 of 4].img" size="737280" crc="07c709d5" sha1="49cbff728b2f7eabb08b6fd909c9e9bce14f241f"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="humans_525" cloneof="humans">
+		<description>The Humans (5.25" HD)</description>
+		<year>1993</year>
+		<publisher>GameTek</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1228800">
+				<rom name="The Humans [GameTek] [1992] [5.25HD] [Disk 1 of 3].img" size="1228800" crc="2dc56954" sha1="25877a02d07686f71e9bfc74a6e507a02a859c56"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1228800">
+				<rom name="The Humans [GameTek] [1992] [5.25HD] [Disk 2 of 3].img" size="1228800" crc="f376ef79" sha1="7a7f3b829edba812e88a81a958549eb4099bd9cd"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1228800">
+				<rom name="The Humans [GameTek] [1992] [5.25HD] [Disk 3 of 3].img" size="1228800" crc="1e0e73ed" sha1="e0fcd8422b91c8d3ea00e5706be871e9a4cf408c"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="incait">
 		<description>Inca (Italian)</description>
 		<year>1992</year>
@@ -12262,7 +12321,7 @@ license:CC0
 	</software>
 
 	<software name="monkeyit" cloneof="monkeyk">
-		<description>The Secret of Monkey Island (Italian)</description>
+		<description>The Secret of Monkey Island (Italy)</description>
 		<year>1991</year>
 		<publisher>Lucasfilm Games</publisher>
 		<info name="developer" value="Lucasfilm Games" />
@@ -12270,22 +12329,22 @@ license:CC0
 		<info name="version" value="(VGA) Italian 1.0, 24 May 1991" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Secret of Monkey Island (Italian) [Lucasfilm Games] [1991] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="855256e3" sha1="045f3698543055e11ce6dd570f39e7233feca51a"/>
+				<rom name="The Secret of Monkey Island (Italy) [Lucasfilm Games] [1991] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="855256e3" sha1="045f3698543055e11ce6dd570f39e7233feca51a"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Secret of Monkey Island (Italian) [Lucasfilm Games] [1991] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="56320b7b" sha1="e4c6ac3d5409b4b2d6a397d96a45c0c40b558c5f"/>
+				<rom name="The Secret of Monkey Island (Italy) [Lucasfilm Games] [1991] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="56320b7b" sha1="e4c6ac3d5409b4b2d6a397d96a45c0c40b558c5f"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Secret of Monkey Island (Italian) [Lucasfilm Games] [1991] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="456bfda5" sha1="14f1075199e39f9a033c073ba4dbed85c8937ebf"/>
+				<rom name="The Secret of Monkey Island (Italy) [Lucasfilm Games] [1991] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="456bfda5" sha1="14f1075199e39f9a033c073ba4dbed85c8937ebf"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Secret of Monkey Island (Italian) [Lucasfilm Games] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="2aab0101" sha1="689d2958ec39ab1dbdee508c66b4d8aedde71126"/>
+				<rom name="The Secret of Monkey Island (Italy) [Lucasfilm Games] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="2aab0101" sha1="689d2958ec39ab1dbdee508c66b4d8aedde71126"/>
 			</dataarea>
 		</part>
 	</software>
