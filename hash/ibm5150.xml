@@ -8205,7 +8205,7 @@ has been replaced with an all-zero block. -->
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="d-generation disk 1.img" size="737280" crc="9edd6f84" sha1="9ad37d011d01d050fe6aa1acebf380f209b6c75d"/>
+				<rom name="d-generation disk 2.img" size="737280" crc="9edd6f84" sha1="9ad37d011d01d050fe6aa1acebf380f209b6c75d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9707,6 +9707,20 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- dumped from an Olivetti Prodest PC1 branded release -->
+	<software name="lunarexp">
+		<description>Lunar Explorer - A Space Flight Simulator</description>
+		<year>1986</year>
+		<publisher>Electric Transit</publisher>
+		<info name="developer" value="L. Roberts" />
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lunar_Explorer.dsk" size="737280" crc="60fd5f00" sha1="86c28a56a3e3b021adbba1728f525c08883029e5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lurkingh">
 		<description>The Lurking Horror</description>
 		<year>1987</year>
@@ -9956,20 +9970,6 @@ has been replaced with an all-zero block. -->
 		<part name="flop10" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Martian Memorandum [Access Software] [1991] [3.5DD] [Disk 10 of 10].img" size="737280" crc="0f00431f" sha1="8ae7b980f688a404dbf8d76581536dee7a7f5d16"/>
-			</dataarea>
-		</part>
-	</software>
-	
-	<!-- dumped from an Olivetti Prodest PC1 branded release -->
-	<software name="lunarexp">
-		<description>Lunar Explorer - A Space Flight Simulator</description>
-		<year>1986</year>
-		<publisher>Electric Transit</publisher>
-		<info name="developer" value="L. Roberts" />
-		<info name="version" value="1.1" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Lunar_Explorer.dsk" size="737280" crc="60fd5f00" sha1="86c28a56a3e3b021adbba1728f525c08883029e5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11077,7 +11077,7 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="monkey_35" cloneof="monkey">
+	<software name="monkey35" cloneof="monkey">
 		<description>The Secret of Monkey Island (3.5", EGA version)</description>
 		<year>1990</year>
 		<publisher>Lucasfilm Games</publisher>
