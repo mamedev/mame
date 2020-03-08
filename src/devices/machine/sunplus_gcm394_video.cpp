@@ -697,7 +697,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 }
 
 
-void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr)
+void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t base_addr)
 {
 	uint32_t bitmap_addr = (m_sprite_702d_gfxbase_msb << 16) | m_sprite_7022_gfxbase_lsb;
 	uint32_t tile = m_spriteram[base_addr + 0];
@@ -731,7 +731,7 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 	//                  01 on wrlshunt
 	// this is not enough to conclude anything
 
-	if (m_7042_sprite == 0x01)
+	if ((m_7042_sprite & 0x00ff) == 0x01)
 		addressing_mode = 1;
 
 	if (addressing_mode == 0)
@@ -746,15 +746,15 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 	const uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
 
-	
+
 	if (!(m_7042_sprite & SPRITE_COORD_TL_MASK))
 	{
-	    x = ((screenwidth/2) + x) - w / 2;
-	    y = ((screenheight/2) - y) - (h / 2) + 8;
+		x = ((screenwidth / 2) + x) - w / 2;
+		y = ((screenheight / 2) - y) - (h / 2) + 8;
 	}
-	
 
-	x &= (x_max-1);
+
+	x &= (x_max - 1);
 	y &= 0x01ff;
 
 	uint32_t tile_line = ((scanline - y) + 0x200) % h;
@@ -802,7 +802,12 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 
 void gcm394_base_video_device::draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority)
 {
-	for (uint32_t n = 0; n < 0x100; n++)
+	// paccon suggests this, does older hardware have similar?
+	int numsprites = (m_7042_sprite & 0xff00) >> 8;
+	if (numsprites == 0)
+		numsprites = 0x100;
+
+	for (uint32_t n = 0; n < numsprites; n++)
 	{
 		draw_sprite(cliprect, scanline, priority, 4 * n);
 	}

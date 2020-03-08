@@ -263,12 +263,12 @@ WRITE16_MEMBER(generalplus_gpac800_game_state::cs0_w)
 
 READ16_MEMBER(generalplus_gpac800_game_state::cs1_r)
 {
-	return m_sdram[offset & 0x3fffff];
+	return m_sdram[offset & (m_sdram_kwords-1)];
 }
 
 WRITE16_MEMBER(generalplus_gpac800_game_state::cs1_w)
 {
-	m_sdram[offset & 0x3fffff] = data;
+	m_sdram[offset & (m_sdram_kwords-1)] = data;
 }
 
 READ8_MEMBER(generalplus_gpac800_game_state::read_nand)
@@ -1680,7 +1680,7 @@ void generalplus_gpac800_game_state::machine_reset()
 
 void generalplus_gpac800_game_state::nand_init210()
 {
-	m_sdram.resize(0x400000); // 0x400000 words (0x800000 bytes)
+	m_sdram.resize(m_sdram_kwords); 
 	m_sdram2.resize(0x10000);
 
 	m_nandblocksize = 0x210;
@@ -1689,9 +1689,15 @@ void generalplus_gpac800_game_state::nand_init210()
 	m_vectorbase = 0x6fe0;
 }
 
+void generalplus_gpac800_game_state::nand_init210_32mb()
+{
+	m_sdram_kwords = 0x400000 * 4;
+	nand_init210();
+}
+
 void generalplus_gpac800_game_state::nand_init840()
 {
-	m_sdram.resize(0x400000); // 0x400000 words (0x800000 bytes)
+	m_sdram.resize(m_sdram_kwords);
 	m_sdram2.resize(0x10000);
 
 	m_nandblocksize = 0x840;
@@ -1747,10 +1753,10 @@ CONS(200?, vbaby,    0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac
 
 // There were 1 player and 2 player versions for several of the JAKKS guns.  The 2nd gun appears to be simply a controller (no AV connectors) but as they were separate products with the 2 player verisons being released up to a year after the original, the code could differ.
 // If they differ, it is currently uncertain which versions these ROMs are from
-CONS(2012, jak_wdzh, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "The Walking Dead: Zombie Hunter (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // gun games all had Atmel 16CM (24C16).
-CONS(2013, jak_swc,  0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Star Wars Clone Trooper (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(2013, jak_duck, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Duck Commander (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // no 2 Player version was released
-CONS(2014, jak_wdbg, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "The Walking Dead: Battleground (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2012, jak_wdzh, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,       "JAKKS Pacific Inc",                   "The Walking Dead: Zombie Hunter (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // gun games all had Atmel 16CM (24C16).
+CONS(2013, jak_swc,  0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc",                   "Star Wars Clone Trooper (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2013, jak_duck, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc",                   "Duck Commander (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // no 2 Player version was released
+CONS(2014, jak_wdbg, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc",                   "The Walking Dead: Battleground (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 
 ROM_START( bkrankp )
