@@ -8664,6 +8664,17 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="gosim">
+		<description>Go Simulator</description>
+		<year>1992</year>
+		<publisher>Infogrames</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="go simulator.img" size="737280" crc="dd9399d9" sha1="5b002e6a7cd87b3b0dc67c77793160b388cdc365"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="goldrush">
 		<description>Gold Rush (Version 2.01, 5.25")</description>
 		<year>1988</year>
