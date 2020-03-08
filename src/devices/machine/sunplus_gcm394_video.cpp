@@ -730,11 +730,11 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 
 	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
 	if ((m_7042_sprite & 0x0010) == 0x10)
-		addressing_mode = 0;
+		addressing_mode = 0; // smartfp, paccon
 	else
 		addressing_mode = 1;
 
-	if (addressing_mode == 0)
+	if (addressing_mode == 0) // smartfp, paccon
 		tile |= m_spriteextra[base_addr / 4] << 16;
 
 	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
@@ -769,17 +769,26 @@ void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t s
 
 	bool blend = (attr & 0x4000);
 
-	bool flip_x = false;
+	bool flip_x;
+	uint8_t bpp;
+	uint32_t yflipmask;
+	uint32_t palette_offset;
 
 	// different attribute use?
-	if (addressing_mode == 0)
+	if (addressing_mode == 0) // smartfp, paccon
 	{
 		flip_x = (attr & TILE_X_FLIP);
+		bpp = attr & 0x0003;
+		yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
+		palette_offset = (attr & 0x0f00) >> 4;
 	}
-
-	const uint8_t bpp = attr & 0x0003;
-	const uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
-	uint32_t palette_offset = (attr & 0x0f00) >> 4;
+	else
+	{
+		flip_x = 0;// (attr & TILE_X_FLIP); // wrlshunt, jak_totm, jak_s550 do not want this to be flip bit, gormiti does.  also configurable, or error in spriteram content?
+		bpp = attr & 0x0003;
+		yflipmask = 0;// attr& TILE_Y_FLIP ? h - 1 : 0; // see flipx comment
+		palette_offset = (attr & 0x0f00) >> 4;
+	}
 
 	//palette_offset |= 0x0d00;
 	palette_offset |= 0x0500;
