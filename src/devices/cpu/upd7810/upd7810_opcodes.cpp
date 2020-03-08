@@ -9147,7 +9147,7 @@ void upd7810_device::DCX_EA()
 /* aa: 1010 1010 */
 void upd7810_device::EI()
 {
-	IFF = 1;
+	m_iff_pending = 1;
 }
 
 /* ab: 1010 1011 dddd dddd */
@@ -9277,7 +9277,7 @@ void upd7810_device::RETS()
 /* ba: 1011 1010 */
 void upd7810_device::DI()
 {
-	IFF = 0;
+	IFF = m_iff_pending = 0;
 }
 
 /* bb: 1011 1011 dddd dddd */
