@@ -1553,3 +1553,15 @@ if (SOUNDS["VGMVIZ"]~=null) then
 		MAME_DIR .. "src/devices/sound/vgm_visualizer.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/sound/s_dsp.h,SOUNDS["S_DSP"] = true
+---------------------------------------------------
+
+if (SOUNDS["S_DSP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/s_dsp.cpp",
+		MAME_DIR .. "src/devices/sound/s_dsp.h",
+	}
+end

@@ -4244,3 +4244,15 @@ if (MACHINES["I3002"]~=null) then
 		MAME_DIR .. "src/devices/machine/i3002.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/s_smp.h,MACHINES["S_SMP"] = true
+---------------------------------------------------
+
+if (MACHINES["S_SMP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/s_smp.cpp",
+		MAME_DIR .. "src/devices/machine/s_smp.h",
+	}
+end
