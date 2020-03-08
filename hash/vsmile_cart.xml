@@ -977,7 +977,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<dataarea name="rom" size="8388608">
-				<rom name="92485 - Batman (FR).bin" size="8388608" crc="8a550348" sha1="11f77c4973d29c962567390e41879c86a759c93b" />
+				<rom name="92485 - Batman (FR).bin" size="8388608" crc="8a550348" sha1="1cbc6f64ff5bd78f8dc760025467c1715c6a11c2" />
 			</dataarea>
 		</part>
 	</software>
