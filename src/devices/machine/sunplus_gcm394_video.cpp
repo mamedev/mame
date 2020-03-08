@@ -1435,6 +1435,14 @@ READ16_MEMBER(gcm394_base_video_device::video_7051_r)
 	return retdat;
 }
 
+READ16_MEMBER(gcm394_base_video_device::video_70e0_r)
+{
+	uint16_t retdat = machine().rand();
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_70e0_r (returning %04x)\n", machine().describe_context(), retdat);
+	return retdat;
+}
+
+
 // this block get set once, in a single function, could be important
 WRITE16_MEMBER(gcm394_base_video_device::video_7080_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7080_w %04x\n", machine().describe_context(), data); m_7080 = data; }
 WRITE16_MEMBER(gcm394_base_video_device::video_7081_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7081_w %04x\n", machine().describe_context(), data); m_7081 = data; }
