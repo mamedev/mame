@@ -1456,9 +1456,9 @@ void upd7810_device::handle_timers(int cycles)
 		/* reset A/D converter */
 		m_adcnt = 0;
 		if (ANM & 0x10)
-			m_adtot = 144/3;
+			m_adtot = 144;
 		else
-			m_adtot = 192/3;
+			m_adtot = 192;
 		m_adout = 0;
 		m_shdone = 0;
 		if (ANM & 0x01)
