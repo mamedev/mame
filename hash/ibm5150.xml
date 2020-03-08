@@ -8178,6 +8178,22 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="dgenerat">
+		<description>D/Generation</description>
+		<year>1991</year>
+		<publisher>Mindscape</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2152168">
+				<rom name="d-generation disk 1.mfm" size="2152168" crc="756e26ef" sha1="e1e92af049161913812ba061262ce552a4db05b5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="d-generation disk 1.img" size="737280" crc="9edd6f84" sha1="9ad37d011d01d050fe6aa1acebf380f209b6c75d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dmnstomb">
 		<description>Demon's Tomb - The Awakening</description>
 		<year>1989</year>
