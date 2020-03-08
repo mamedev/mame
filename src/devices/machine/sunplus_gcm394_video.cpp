@@ -365,6 +365,17 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 	{
 		words_per_tile = 8; // seems to be correct for sprites regardless of size / bpp on smartfp
 	}
+	
+	int x_max;
+	if (m_707f & 0x0010)
+	{
+		x_max = 0x400;
+	}
+	else
+	{
+		x_max = 0x200;
+	}
+
 
 	uint32_t m = (bitmap_addr) + (words_per_tile * tile + bits_per_row * (line ^ yflipmask));
 
@@ -428,9 +439,9 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 		if (RowScroll)
 			xx -= 0;// (int16_t)m_scrollram[yy & 0x1ff];
 
-		//xx &= 0x01ff;
-		//if (xx >= 0x01c0)
-		//  xx -= 0x0200;
+		xx &= (x_max-1);
+		if (xx >= (x_max-0x40))
+			xx -= x_max;
 
 		if (xx >= 0 && xx <= cliprect.max_x)
 		{
@@ -702,6 +713,20 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 
 	int addressing_mode = 0;
 
+	int screenwidth, screenheight, x_max;
+	if (m_707f & 0x0010)
+	{
+		screenwidth = 640;
+		screenheight = 480;
+		x_max = 0x400;
+	}
+	else
+	{
+		screenwidth = 320;
+		screenheight = 240;
+		x_max = 0x200;
+	}
+
 	// m_7042_sprite is f7 on smartfp
 	//                  01 on wrlshunt
 	// this is not enough to conclude anything
@@ -709,7 +734,8 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 	if (m_7042_sprite == 0x01)
 		addressing_mode = 1;
 
-	tile |= m_spriteextra[base_addr / 4] << 16;
+	if (addressing_mode == 0)
+		tile |= m_spriteextra[base_addr / 4] << 16;
 
 	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
 	{
@@ -719,15 +745,16 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 	const uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
 	const uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
-	/*
-	if (!(m_video_regs[0x42] & SPRITE_COORD_TL_MASK))
-	{
-	    x = (160 + x) - w / 2;
-	    y = (120 - y) - (h / 2) + 8;
-	}
-	*/
 
-	x &= 0x01ff;
+	
+	if (!(m_7042_sprite & SPRITE_COORD_TL_MASK))
+	{
+	    x = ((screenwidth/2) + x) - w / 2;
+	    y = ((screenheight/2) - y) - (h / 2) + 8;
+	}
+	
+
+	x &= (x_max-1);
 	y &= 0x01ff;
 
 	uint32_t tile_line = ((scanline - y) + 0x200) % h;

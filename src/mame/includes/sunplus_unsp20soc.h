@@ -258,6 +258,7 @@ public:
 	}
 
 	void wrlshunt(machine_config &config);
+	void paccon(machine_config &config);
 
 	void init_wrlshunt();
 	void init_ths();

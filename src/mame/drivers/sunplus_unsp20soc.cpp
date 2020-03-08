@@ -353,6 +353,14 @@ void wrlshunt_game_state::wrlshunt(machine_config &config)
 	gcm394_game_state::base(config);
 }
 
+void wrlshunt_game_state::paccon(machine_config &config)
+{
+	gcm394_game_state::base(config);
+
+	m_maincpu->set_clock(96000000); // needs to be somewhere in this region or the emulator running on the SunPlus is too slow
+}
+
+
 void tkmag220_game_state::tkmag220(machine_config &config)
 {
 	gcm394_game_state::base(config);
@@ -1567,7 +1575,7 @@ CONS(2013, gormiti,   0, 0, base, gormiti,  gcm394_game_state, empty_init, "Gioc
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
 
 // also sold as "Pac-Man Connect & Play 35th Anniversary" (same ROM?)
-CONS(2012, paccon, 0, 0, wrlshunt, paccon, jak_s500_game_state, init_wrlshunt, "Bandai", "Pac-Man Connect & Play (Feb 14 2012 10:46:23)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2012, paccon, 0, 0, paccon, paccon, jak_s500_game_state, init_wrlshunt, "Bandai", "Pac-Man Connect & Play (Feb 14 2012 10:46:23)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 
 CONS(2009, jak_s500, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
