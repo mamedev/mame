@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /****************************************************************************
 
-    Skeleton driver for Korg DS-8 synthesizer.
+    Skeleton driver for Korg DS-8 & 707 synthesizers.
 
 ****************************************************************************/
 
@@ -33,12 +33,14 @@ public:
 	}
 
 	void ds8(machine_config &config);
+	void korg707(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
+	HD44780_PIXEL_UPDATE(korg707_pixel_update);
 
 	u8 kbd_sw_r();
 	void scan_w(u8 data);
@@ -70,6 +72,12 @@ void korg_ds8_state::machine_start()
 HD44780_PIXEL_UPDATE(korg_ds8_state::lcd_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 40)
+		bitmap.pix16(line * 8 + y, pos * 6 + x) = state;
+}
+
+HD44780_PIXEL_UPDATE(korg_ds8_state::korg707_pixel_update)
+{
+	if (x < 5 && y < 8 && line < 2 && pos < 20)
 		bitmap.pix16(line * 8 + y, pos * 6 + x) = state;
 }
 
@@ -231,6 +239,19 @@ void korg_ds8_state::ds8(machine_config &config)
 	fm.add_route(1, "rspeaker", 1.00);
 }
 
+void korg_ds8_state::korg707(machine_config &config)
+{
+	ds8(config);
+
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_size(6*20, 8*2);
+	screen.set_visarea_full();
+
+	hd44780_device &lcdc(*subdevice<hd44780_device>("lcdc"));
+	lcdc.set_lcd_size(2, 20);
+	lcdc.set_pixel_update_cb(FUNC(korg_ds8_state::korg707_pixel_update));
+}
+
 ROM_START(ds8)
 	ROM_REGION(0x8000, "program", 0)
 	ROM_LOAD("870214.ic9", 0x0000, 0x8000, CRC(6b418e7c) SHA1(f16f9d87f1d424335a04ab36fef9386ed0b7b159))
@@ -241,5 +262,5 @@ ROM_START(korg707)
 	ROM_LOAD("870904.ic7", 0x0000, 0x8000, CRC(3eb80aae) SHA1(8574f48c9a1724c483ac8ee7c82ea46d1f583d6d)) // 27C256
 ROM_END
 
-SYST(1986, ds8,     0, 0, ds8, ds8, korg_ds8_state, empty_init, "Korg", "DS-8 Digital Synthesizer",    MACHINE_IS_SKELETON)
-SYST(1987, korg707, 0, 0, ds8, ds8, korg_ds8_state, empty_init, "Korg", "707 Performance Synthesizer", MACHINE_IS_SKELETON)
+SYST(1986, ds8,     0, 0, ds8,     ds8, korg_ds8_state, empty_init, "Korg", "DS-8 Digital Synthesizer",    MACHINE_IS_SKELETON)
+SYST(1987, korg707, 0, 0, korg707, ds8, korg_ds8_state, empty_init, "Korg", "707 Performing Synthesizer", MACHINE_IS_SKELETON)
