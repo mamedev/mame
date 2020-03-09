@@ -373,6 +373,8 @@ To Do / Unknowns:
     - Need to sort out the video status register.
     - Find out how exactly how sound CPU communication really works in bgaregga/batrider/bbakraid
         current emulation seems to work (plays all sounds), but there are still some unknown reads/writes
+    - Music timing is bit different on bbakraid.
+        reference : https://www.youtube.com/watch?v=zjrWs0iHQ5A
 
 Notes on Power Kick coin inputs:
 - The 10 yen input is "Key In" according to the bookkeeping screen, but is
