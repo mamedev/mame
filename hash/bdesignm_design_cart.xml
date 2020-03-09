@@ -106,4 +106,15 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="shonen" supported="no">
+		<description>Weekly Shonen Jump Special (design)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="bdesignm_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom loadflag="load16_word_swap" name="weekly_shonen_jump_special.bin" size="0x20000" crc="eb255397" sha1="c16b4f7194dbf486775ace47a54afee198565a80" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
