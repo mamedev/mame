@@ -36281,4 +36281,23 @@
 		</part>
 	</software>
 	
+	<software name="ndcarmen">
+		<description>Where in North Dakota is Carmen Sandiego? (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2020-03-09"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in north dakota is carmen sandiego (4am crack) side a.dsk" size="143360" crc="72421125" sha1="9f673c85383c89b2ddd92d8379af8c130daf2d0d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="where in north dakota is carmen sandiego (4am crack) side b.dsk" size="143360" crc="7235925f" sha1="67758499be96c5844cdcd12a9ae91e49d6d15794"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

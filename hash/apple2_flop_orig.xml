@@ -11396,4 +11396,25 @@
 		</part>
 	</software>
 
+	<software name="ndcarmen">
+		<description>Where in North Dakota is Carmen Sandiego?</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2020-03-09"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234963">
+				<rom name="where in north dakota is carmen sandiego side a.woz" size="234963" crc="482c92f4" sha1="e59481a41d75aca6e670cf9ea87c6f0a1b14646a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234963">
+				<rom name="where in north dakota is carmen sandiego side b.woz" size="234963" crc="cf47fe0c" sha1="25c5bbbdf0f4265e0a63de456c3a4258d87afc95"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
