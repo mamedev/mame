@@ -18463,6 +18463,16 @@ wndrplnt                        // (c) 1987 Data East Corporation (Japan)
 @source:kas89.cpp
 kas89                           // 1989, SFC S.R.L.
 
+@source:kawai_k1.cpp
+k1                              //
+k1m                             //
+k1r                             //
+k1rii                           //
+
+@source:kawai_k5.cpp
+k5                              //
+k5m                             //
+
 @source:kaypro.cpp
 kaypro1                         // Kaypro 1
 kaypro10                        // Kaypro 10/83

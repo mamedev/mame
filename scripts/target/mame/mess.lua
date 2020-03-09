@@ -1183,6 +1183,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"intv",
 		"isc",
 		"jazz",
+		"kawai",
 		"kaypro",
 		"koei",
 		"kontron",
@@ -2603,6 +2604,12 @@ files {
 	MAME_DIR .. "src/mame/includes/jazz.h",
 	MAME_DIR .. "src/mame/machine/mct_adr.cpp",
 	MAME_DIR .. "src/mame/machine/mct_adr.h",
+}
+
+createMESSProjects(_target, _subtarget, "kawai")
+files {
+	MAME_DIR .. "src/mame/drivers/kawai_k1.cpp",
+	MAME_DIR .. "src/mame/drivers/kawai_k5.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "kaypro")
