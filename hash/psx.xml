@@ -40001,8 +40001,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="bokukoku" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="bokukoku" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Boku ha Koukuu Kanseikan (Japan) [SLPS-02514].bin" size="639163056" crc="24aca42e" sha1="8fe3478a496cf1a203024579350b4bbc8bb406ee"/>
 		<rom name="Boku ha Koukuu Kanseikan (Japan) [SLPS-02514].cue" size="461" crc="a34c94ac" sha1="8168fd940feb783e7e8ca351da41c85e69b8d716"/>
 		-->
@@ -40015,7 +40017,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="boku ha koukuu kanseikan (japan) [slps-02514]" sha1="4bd1ad337dcfbafc4c7b3d7179f28ae2240f364a"/>
+				<disk name="boku ha koukuu kanseikan (japan) [slps-02514]" sha1="4bd1ad337dcfbafc4c7b3d7179f28ae2240f364a" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -40396,8 +40398,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="cclimb2k" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="cclimb2k" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Crazy Climber 2000 (Japan) [SLPS-02582].bin" size="201352368" crc="6829ff6a" sha1="ca0db94aa6e57c0122074ee15894cbab2085b36c"/>
 		<rom name="Crazy Climber 2000 (Japan) [SLPS-02582].cue" size="103" crc="c93eabc8" sha1="21c695178ff12871208a2f4570d35e7a43653a36"/>
 		-->
@@ -40410,7 +40414,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="crazy climber 2000 (japan) [slps-02582]" sha1="df5edab83e97a5b05c72f7844d4ae1357a2b7085"/>
+				<disk name="crazy climber 2000 (japan) [slps-02582]" sha1="df5edab83e97a5b05c72f7844d4ae1357a2b7085" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -40519,8 +40523,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="choroqwf" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="choroqwf" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Choro-Q Wonderful! (Japan) [SLPS-02205].bin" size="80290224" crc="3211773a" sha1="e60192c75062fe014d325ecf51ab754922e1afb3"/>
 		<rom name="Choro-Q Wonderful! (Japan) [SLPS-02205].cue" size="454" crc="284f596a" sha1="36b8e31f663933982fd365c6070ec903b3ec060e"/>
 		-->
@@ -40533,7 +40539,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="choro-q wonderful! (japan) [slps-02205]" sha1="daf3e93d1f331b0692b319184838183f6400d86e"/>
+				<disk name="choro-q wonderful! (japan) [slps-02205]" sha1="daf3e93d1f331b0692b319184838183f6400d86e" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -45198,7 +45204,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- this should be a 2 cd game -->
 	<!-- boot OK, 2nd disc is missing from the set -->
 	<software name="happyslv" supported="no">
 		<!-- 
@@ -45218,13 +45223,11 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 				<disk name="happy salvage (japan) (disc 1) [slps-02821]" sha1="84c6e3ffc33f67f4a2e9714c9ca89f550008a8c4" status="baddump"/>
 			</diskarea>
 		</part>
-<!--
-    <part name="cdrom2" interface="psx_cdrom">
-        <diskarea name="cdrom">
-            <disk name="happy salvage (japan) (disc 2) [slps-02822]" sha1=""/>
-        </diskarea>
-    </part>
--->
+		<part name="cdrom2" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="happy salvage (japan) (disc 2) [slps-02822]" status="nodump"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<!-- boot OK -->
@@ -46656,8 +46659,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="k1gp98" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="k1gp98" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Fighting Illusion - K-1 Grand Prix '98 (Japan) [SLPS-01696].bin" size="723828000" crc="28058ede" sha1="83e5eabbccbfcbc7d5821b559cd813db22227926"/>
 		<rom name="Fighting Illusion - K-1 Grand Prix '98 (Japan) [SLPS-01696].cue" size="1467" crc="eaba7d07" sha1="33e6c82ceef1ff702bb3ee3ce54eba644fda47c1"/>
 		-->
@@ -46670,7 +46675,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="fighting illusion - k-1 grand prix '98 (japan) [slps-01696]" sha1="1f09afe562642e3a24c02009e311f05374b73c34"/>
+				<disk name="fighting illusion - k-1 grand prix '98 (japan) [slps-01696]" sha1="1f09afe562642e3a24c02009e311f05374b73c34" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -47019,8 +47024,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK -->
 	<software name="kazenotm" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Kaze no Notam (Japan) (Track 1) [SLPS-00912].bin" size="290848320" crc="2252ef28" sha1="a19710da07c62950ccf2192dcf5927d033be6a55"/>
 		<rom name="Kaze no Notam (Japan) (Track 2) [SLPS-00912].bin" size="37046352" crc="4ff10625" sha1="35d845a346df6ad33f97b209c7a77fd89794fc1e"/>
 		<rom name="Kaze no Notam (Japan) [SLPS-00912].cue" size="213" crc="bc4ddc8e" sha1="1ab4b55bc4668af1629a0bdb8935eb0523ed4434"/>
@@ -47034,7 +47041,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kaze no notam (japan) [slps-00912]" sha1="f5f16d62c8783f2367648339ac2dbc3747beeaa6"/>
+				<disk name="kaze no notam (japan) [slps-00912]" sha1="f5f16d62c8783f2367648339ac2dbc3747beeaa6" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -47120,8 +47127,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="kenkiipp" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="kenkiipp" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Kenki Ippatsu! Crane Master ni Narou! (Japan) [SLPS-02831].bin" size="345233616" crc="60fa9613" sha1="570c6214fbac49349e4e3140815d99bdfe2d30c3"/>
 		<rom name="Kenki Ippatsu! Crane Master ni Narou! (Japan) [SLPS-02831].cue" size="122" crc="2f1a573e" sha1="108b766e15c550835a81eac1163e5047d06ab5c3"/>
 		-->
@@ -47134,7 +47143,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kenki ippatsu! crane master ni narou! (japan) [slps-02831]" sha1="50c254b40a133784f10e3610e166d0087f3c9f30"/>
+				<disk name="kenki ippatsu! crane master ni narou! (japan) [slps-02831]" sha1="50c254b40a133784f10e3610e166d0087f3c9f30" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -47499,8 +47508,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="kof98" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="kof98" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="King of Fighters '98, The (Japan) [SLPM-86201].bin" size="276526992" crc="b420a1e1" sha1="62078947115a54bea52cc3c7ea3bb54a3764f3a5"/>
 		<rom name="King of Fighters '98, The (Japan) [SLPM-86201].cue" size="110" crc="b4a60b1a" sha1="53746cb3cbbdffd1b64c3aac20e59e89d9da1b69"/>
 		-->
@@ -47513,7 +47524,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="king of fighters '98, the (japan) [slpm-86201]" sha1="145f8a0d2ef9bb17ba9183a565f7a634c59224e3"/>
+				<disk name="king of fighters '98, the (japan) [slpm-86201]" sha1="145f8a0d2ef9bb17ba9183a565f7a634c59224e3" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -48056,8 +48067,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="ldragoonj" cloneof="ldragoon" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="ldragoonj" cloneof="ldragoon" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Legend of Dragoon, The (Japan) (Disc 1) [SCPS-10119].bin" size="515657184" crc="8306c035" sha1="2a6c6c6fc689e76fb60824e4d5bd882219d6c450"/>
 		<rom name="Legend of Dragoon, The (Japan) (Disc 1) [SCPS-10119].cue" size="468" crc="4fef23de" sha1="d66f265bb9f76ef886e14af7ffd86041863c3c5f"/>
 
@@ -48079,22 +48092,22 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="legend of dragoon, the (japan) (disc 1) [scps-10119]" sha1="a7be80d5521580dc9a6deb6d3d4248aa80712266"/>
+				<disk name="legend of dragoon, the (japan) (disc 1) [scps-10119]" sha1="a7be80d5521580dc9a6deb6d3d4248aa80712266" status="baddump"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="legend of dragoon, the (japan) (disc 2) [scps-10120]" sha1="cb2549e12cf1f3ef5a9c6cde29091e340b4d95d3"/>
+				<disk name="legend of dragoon, the (japan) (disc 2) [scps-10120]" sha1="cb2549e12cf1f3ef5a9c6cde29091e340b4d95d3" status="baddump"/>
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="legend of dragoon, the (japan) (disc 3) [scps-10121]" sha1="47d68fdc4e06366360cd62881d5b022e33b4634e"/>
+				<disk name="legend of dragoon, the (japan) (disc 3) [scps-10121]" sha1="47d68fdc4e06366360cd62881d5b022e33b4634e" status="baddump"/>
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="legend of dragoon, the (japan) (disc 4) [scps-10122]" sha1="7b63238d1dae7cf0cd64f55a1e57e6e64e1fb089"/>
+				<disk name="legend of dragoon, the (japan) (disc 4) [scps-10122]" sha1="7b63238d1dae7cf0cd64f55a1e57e6e64e1fb089" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -48432,8 +48445,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="ldawn3" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="ldawn3" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Lunatic Dawn III (Japan) (Track 1) [SLPS-01749].bin" size="284048688" crc="bf796818" sha1="10a309580092c67865c046da36c96517645857b9"/>
 		<rom name="Lunatic Dawn III (Japan) (Track 2) [SLPS-01749].bin" size="37046352" crc="4ff10625" sha1="35d845a346df6ad33f97b209c7a77fd89794fc1e"/>
 		<rom name="Lunatic Dawn III (Japan) [SLPS-01749].cue" size="219" crc="cfaa312e" sha1="bbcae92c6efed5e7604954223cb9999d0724d7e3"/>
@@ -48447,7 +48462,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lunatic dawn iii (japan) [slps-01749]" sha1="2e94fe1d8eaf99f46ecda3d986f229fab1086b7f"/>
+				<disk name="lunatic dawn iii (japan) [slps-01749]" sha1="2e94fe1d8eaf99f46ecda3d986f229fab1086b7f" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -48802,8 +48817,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="marionet" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="marionet" supported="yes">
+		<!--
+		Unknown source
 		<rom name="Marionette Company (Japan) [SLPS-02058].bin" size="663724992" crc="8097c851" sha1="71b8441858052644bd08539e9b9770373b5f3253"/>
 		<rom name="Marionette Company (Japan) [SLPS-02058].cue" size="1379" crc="e437fc15" sha1="550f0fcb1475124e4a9c137d529b2315c448ce42"/>
 		-->
@@ -48816,7 +48833,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="marionette company (japan) [slps-02058]" sha1="0abdcfafb696e9e95bdf26414054d9174c2247a2"/>
+				<disk name="marionette company (japan) [slps-02058]" sha1="0abdcfafb696e9e95bdf26414054d9174c2247a2" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -48964,8 +48981,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="mconant1" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="mconant1" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Meitantei Conan - Trick Trick Vol.1 (Japan) [SLPS-03548].bin" size="170287152" crc="6bfa89a0" sha1="e3e6982de8eb6fb9932d9de27b43aef50ceb08a2"/>
 		<rom name="Meitantei Conan - Trick Trick Vol.1 (Japan) [SLPS-03548].cue" size="120" crc="00d0fe1d" sha1="bcc98d7f0fcd4f6cea177ce9791927e5ce2a126a"/>
 		-->
@@ -48978,7 +48997,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="meitantei conan - trick trick vol.1 (japan) [slps-03548]" sha1="892532ae34f76a0335b7cac30a718ea1592bb189"/>
+				<disk name="meitantei conan - trick trick vol.1 (japan) [slps-03548]" sha1="892532ae34f76a0335b7cac30a718ea1592bb189" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -49291,9 +49310,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
         </part>
     </software>
 
-	<!-- this should be a 2 cd game -->
+	<!-- boot OK, 2nd disc is missing from the set -->
 	<software name="metamorv" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Himitsu Sentai Metamor V Deluxe (Japan) (Disc 1) [SLPS-01626].bin" size="539010192" crc="b1f5731d" sha1="4ce244fa224d9664f244a387517494639e99a062"/>
 		<rom name="Himitsu Sentai Metamor V Deluxe (Japan) (Disc 1) [SLPS-01626].cue" size="125" crc="081f5055" sha1="7d7557d8457d706ef7543ba15a17ed6938a05264"/>
 		-->
@@ -49306,7 +49326,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="himitsu sentai metamor v deluxe (japan) (disc 1) [slps-01626]" sha1="5621c1d350dc9eb7be2ebfea2f4b459493982f6a"/>
+				<disk name="himitsu sentai metamor v deluxe (japan) (disc 1) [slps-01626]" sha1="5621c1d350dc9eb7be2ebfea2f4b459493982f6a" status="baddump"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="psx_cdrom">
@@ -50228,8 +50248,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- this should be a 2 cd game -->
-	<!-- Hangs at NEC Interchannel logo -->
+	<!-- Hangs at NEC Interchannel logo, 2nd disc is missing from the set -->
 	<software name="natsuiro" supported="no">
 		<!-- 
 		Unknown source
@@ -54766,8 +54785,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-<!-- this should be a 2 cd game -->
-	<!-- boot OK -->
+	<!-- boot OK, 2nd disc is missing from the set -->
 	<software name="silentmb" supported="no">
 		<!-- 
 		Unknown source
@@ -54781,18 +54799,16 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<info name="release" value="19981223" />
 		<info name="alt_title" value="サイレントメビウス 幻影の堕天使"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="psx_cdrom">
+		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="silent mobius - genei no datenshi (japan) (disc 1) [slps-01803]" sha1="b0541155d1368e9c7af9e830ae3d2ba31a909768" status="baddump"/>
 			</diskarea>
 		</part>
-<!--
-    <part name="cdrom2" interface="psx_cdrom">
-        <diskarea name="cdrom">
-            <disk name="silent mobius - genei no datenshi (japan) (disc 2) [slps-01804]" sha1=""/>
-        </diskarea>
-    </part>
--->
+		<part name="cdrom2" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="silent mobius - genei no datenshi (japan) (disc 2) [slps-01804]" status="nodump"/>
+			</diskarea>
+		</part>
 	</software>
 
 	<!-- boot OK -->
