@@ -203,6 +203,9 @@ READ16_MEMBER(jak_s500_game_state::porta_r)
 	//if (mem.read_word(0x236271) == 0x4846)
 	//  mem.write_word(0x236271, 0x4840);    // jak_totm force service mode
 
+	//if (mem.read_word(0x22D6F7) == 0x4846)
+	//  mem.write_word(0x22D6F7, 0x4840);    // jak_pf force service mode
+
 	return data;
 }
 
@@ -1323,6 +1326,14 @@ ROM_START(jak_s500)
 	ROM_LOAD16_WORD_SWAP("spbwheel.bin", 0x000000, 0x800000, CRC(6ba1d335) SHA1(1bb3e4d02c7b35dd4d336971c6a9f82071cc6ce1) )
 ROM_END
 
+ROM_START(jak_pf)
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("phineas.bin", 0x000000, 0x800000, CRC(bb18f70d) SHA1(4e3c204e44efe9186809404521ebeac348c45fac))
+ROM_END
+
 ROM_START(jak_prft)
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
@@ -1330,6 +1341,16 @@ ROM_START(jak_prft)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("powerrangerssword.bin", 0x000000, 0x800000, CRC(77bc8aea) SHA1(a2efaa718d8ecece46cebb9f0f13a8fa10fc2826) )
 ROM_END
+
+ROM_START(jak_tink)
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("disneyfairies.bin", 0x000000, 0x800000, CRC(566dae87) SHA1(3abe1b7d578ed9255101bfec0e4bb4d6dc0aa0b7) )
+ROM_END
+
+
 
 
 
@@ -1563,7 +1584,9 @@ CONS(2012, paccon, 0, 0, paccon, paccon, jak_s500_game_state, init_wrlshunt, "Ba
 
 
 CONS(2009, jak_s500, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2010, jak_pf,   0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // build date is 2009, but onscreen display is 2010
 CONS(2009, jak_prft, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Power Rangers Force In Time (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_tink, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Tinker Bell and the Lost Treasure (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(200?, jak_totm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // Toys on the Move has ISSI 404A
 CONS(2009, jak_ths,  0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_ths,      "JAKKS Pacific Inc", "Triple Header Sports (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
