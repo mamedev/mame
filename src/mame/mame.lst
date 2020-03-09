@@ -34540,13 +34540,14 @@ hangzo
 @source:roland_cm32p.cpp
 cm32p                           //
 
+@source:roland_d10.cpp
+d10                             //
+d110                            //
+
 @source:roland_d50.cpp
 d50                             //
 d50o                            //
 d550                            //
-
-@source:roland_d110.cpp
-d110                            //
 
 @source:roland_mt32.cpp
 cm32l                           //
