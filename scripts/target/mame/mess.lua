@@ -2609,6 +2609,7 @@ files {
 createMESSProjects(_target, _subtarget, "kawai")
 files {
 	MAME_DIR .. "src/mame/drivers/kawai_k1.cpp",
+	MAME_DIR .. "src/mame/drivers/kawai_k4.cpp",
 	MAME_DIR .. "src/mame/drivers/kawai_k5.cpp",
 }
 
