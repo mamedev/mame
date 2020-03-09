@@ -22,11 +22,18 @@ AY-3-8910 @ 1.789766MHz [10.7386/6]
 10 position DIPSW
 NOTE! switches 1, 3 & 5 must be ON or the game will not boot.
 
+== MSX2 hardware version:
+
+It's on the same PCB as sfkick, but with a small daughterboard for the sound chip, and no epoxy block.
+Positions originally for YM2203 and extra Z80 are not populated.
+
 TODO:
-- A timer apparently expires when beating stage 4 (signalled by a long beeping sound).
+- pengadvb: add dipswitch
+- pengadvb: A timer apparently expires when beating stage 4 (signalled by a long beeping sound).
   Player needs to insert another credit and press start button (?) in order to continue.
   Is this timer supposed to be shown on screen or there are additional 7-LEDs not handled?
-- The CBK1029 PCB is also emulated by sfkick.cpp. Merge drivers? The board is differently populated.
+- pengadvb2: V9938 video chip with 64KB VRAM instead of TMS9128, game works ok though
+- pengadvb2: The CBK1029 PCB is also emulated by sfkick.cpp. Merge drivers? The board is differently populated.
 
 ***************************************************************************/
 
@@ -55,6 +62,10 @@ public:
 	void init_pengadvb();
 	void init_pengadvb2();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	uint8_t mem_r(offs_t offset);
 	void mem_w(offs_t offset, uint8_t data);
@@ -66,8 +77,6 @@ private:
 	uint8_t ppi_port_b_r();
 	void ppi_port_c_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void pengadvb_decrypt(const char* region);
 	void bank_mem(address_map &map);
 	void io_mem(address_map &map);
@@ -173,14 +182,14 @@ static INPUT_PORTS_START( pengadvb2 ) // reads are scrambled
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1 ) // also used for button 2 (pistol)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // button2?
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -189,11 +198,11 @@ static INPUT_PORTS_START( pengadvb2 ) // reads are scrambled
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Lives after the first" ) PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x03, "0" )
-	PORT_DIPSETTING(    0x02, "1" )
-	PORT_DIPSETTING(    0x01, "2" )
-	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0xa4, 0xa4, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:3,4,5")
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_2C ) )
@@ -241,7 +250,6 @@ void pengadvb_state::ppi_port_a_w(uint8_t data)
 
 uint8_t pengadvb_state::ppi_port_b_r()
 {
-	// TODO: dipswitch
 	switch (m_kb_matrix_row)
 	{
 		case 0x00:
@@ -269,7 +277,8 @@ void pengadvb_state::ppi_port_c_w(uint8_t data)
 ***************************************************************************/
 
 void pengadvb_state::pengadvb(machine_config &config)
-{   /* basic machine hardware */
+{
+	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(10'738'635)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pengadvb_state::program_mem);
 	m_maincpu->set_addrmap(AS_IO, &pengadvb_state::io_mem);
@@ -385,5 +394,5 @@ ROM_START( pengadvb2 ) // CBK1029 PCB
 	ROM_LOAD( "7e",  0x18000, 0x8000, CRC(60764899) SHA1(a75e59c2ecf8cebdb99708cb18390157ad7b6993) )
 ROM_END
 
-GAME( 1988, pengadvb,         0, pengadvb, pengadvb,  pengadvb_state, init_pengadvb,  ROT0, "bootleg (Screen) / Konami", "Penguin Adventure (bootleg of MSX version, encrypted)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, pengadvb,  0,        pengadvb, pengadvb,  pengadvb_state, init_pengadvb,  ROT0, "bootleg (Screen)", "Penguin Adventure (bootleg of MSX version, encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, pengadvb2, pengadvb, pengadvb, pengadvb2, pengadvb_state, init_pengadvb2, ROT0, "bootleg (Comet)", "Penguin Adventure (bootleg of MSX version, not encrypted)", MACHINE_SUPPORTS_SAVE )
