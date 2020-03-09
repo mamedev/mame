@@ -2458,10 +2458,14 @@ ROM_START( xavbox )
 	ROM_LOAD( "xpboxing.bin", 0x000000, 0x800000, CRC(b61e7717) SHA1(162b9c53ac8c9d7b6972db44f7bc1cb0a7837b70) )
 ROM_END
 
+// Several of the XaviXport and DiS games are 2 glob setups (and must have some kind of banking)
 
 ROM_START( xavjmat )
-	ROM_REGION( 0x1000000, "bios", ROMREGION_ERASE00 )
-	ROM_LOAD( "xpjmat.bin", 0x000000, 0x1000000, CRC(71a51eef) SHA1(41fd2c3013d1c86756046ec9174e94400f8fa06d) )
+	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "u2", 0x0000000, 0x0800000, CRC(1420640d) SHA1(dd714cd57cff885293688f74f69b5c1726e20ec0) )
+
+	ROM_REGION( 0x0800000, "biosu3", ROMREGION_ERASE00 )
+	ROM_LOAD( "u3", 0x0000000, 0x0800000, CRC(52dc318c) SHA1(dc50e0747ba29cfb1048fd4a55d26870086c869b) )
 ROM_END
 
 // currently copies the wrong code into RAM to execute (due to extended ROM size, and possible banking)
@@ -2470,28 +2474,46 @@ ROM_END
 //         needs to come from 006be2d3 (so still from lower 8MB, not upper 8MB)
 
 ROM_START( xavmusic )
-	ROM_REGION( 0x1000000, "bios", ROMREGION_ERASE00 )
-	ROM_LOAD( "xpmusicandcircuit.bin", 0x000000, 0x1000000, CRC(e06129d2) SHA1(d074d0dd85ce870f435da3c066a7f52b50999665) )
+	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "u2", 0x0000000, 0x0800000, CRC(e7c8ad59) SHA1(d47fac8b480de4db88a1b306ff8830a65d1738a3) )
+
+	ROM_REGION( 0x0800000, "biosu3", ROMREGION_ERASE00 )
+	ROM_LOAD( "u3", 0x0000000, 0x0800000, CRC(977c956f) SHA1(debc086d0cf6c391002ad163e7bfaa2f010cc8f5) )
 ROM_END
 
 
 // Domyos DiS (XaviX 2002 based titles)
 ROM_START( domfitex )
-	ROM_REGION( 0x1000000, "bios", ROMREGION_ERASE00 )
-	ROM_LOAD( "xpfitnessexercise.bin", 0x000000, 0x1000000, CRC(f1089229) SHA1(803df8ba0a05cb004a4238c6c71ea1ffa4428990) )
+	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "u2", 0x0000000, 0x0800000,  CRC(841fe3cd) SHA1(8678b8a0c5198b24169a84dbe3ae979bb0838f23) )
+
+	ROM_REGION( 0x0800000, "biosu3", ROMREGION_ERASE00 )
+	ROM_LOAD( "u3", 0x0000000, 0x0800000, CRC(1dc844ea) SHA1(c23da9006227f7fe4982998c17759d403a47472a) )
 ROM_END
 
 ROM_START( domfitch )
-	ROM_REGION( 0x1000000, "bios", ROMREGION_ERASE00 )
-	ROM_LOAD( "xpfitnesschallenge.bin", 0x000000, 0x1000000, CRC(e0a4093d) SHA1(2692ac03f8be4f86a4777ad0c365cbab7b469e3b) )
+	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "u2", 0x0000000, 0x0800000, CRC(0ff2a7a6) SHA1(9b924cc4330e3f8d9204390854048fe2325bfdf7) )
+
+	ROM_REGION( 0x0800000, "biosu3", ROMREGION_ERASE00 )
+	ROM_LOAD( "u3", 0x0000000, 0x0800000, CRC(284583f6) SHA1(bd2d5304f1e01eed656b5de957ec0a0330a3d969) )
 ROM_END
 
 ROM_START( domdance )
-	ROM_REGION( 0x1000000, "bios", ROMREGION_ERASE00 )
-	ROM_LOAD( "xpfitnessdance.bin", 0x000000, 0x1000000, CRC(3170dd41) SHA1(9c9b4f1d8e7c5097271bb8712463ad93c8d55d97) )
+	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "u2", 0x0000000, 0x0800000, CRC(74f9499d) SHA1(a64235075e32567cd6d2ab7b1284efcb8e7538e2) )
+
+	ROM_REGION( 0x0800000, "biosu3", ROMREGION_ERASE00 )
+	ROM_LOAD( "u3", 0x0000000, 0x0800000, CRC(e437565c) SHA1(f6db219ea14404b698ca453f6e50c726b2e77abb) )
 ROM_END
 
+ROM_START( domstepc )
+	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "u2", 0x0000000, 0x0800000, CRC(cb37b5e9) SHA1(b742e3db98f36720adf5af9096c6bc235279de12) )
 
+	ROM_REGION( 0x0800000, "biosu3", ROMREGION_ERASE00 )
+	ROM_LOAD( "u3", 0x0000000, 0x0800000, CRC(dadaa744) SHA1(fd7ca77232a8fe228fc93b0a8a47ba3260349d90) )
+ROM_END
 
 ROM_START( mrangbat )
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
@@ -2536,6 +2558,7 @@ CONS( 2007, xavmusic, 0, 0, xavix2002_i2c_jmat,  xavix,      xavix_i2c_jmat_stat
 CONS( 2008, domfitex, 0, 0, xavix2002_i2c_jmat, xavixp, xavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Exercises (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2008, domfitch, 0, 0, xavix2002_i2c_jmat, xavixp, xavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Challenge (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2007, domdance, 0, 0, xavix2002_i2c_jmat, xavixp, xavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Dance (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, domstepc, 0, 0, xavix2002_i2c_jmat, xavixp, xavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Step Concept (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // some DIS games run on XaviX 2 instead, see xavix2.cpp for Domyos Fitness Adventure and Domyos Bike Concept
 

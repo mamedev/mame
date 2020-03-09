@@ -37825,6 +37825,9 @@ starfigh                        // (c) 1990 SunA
 @source:sunplus_unsp20soc.cpp
 paccon
 jak_s500
+jak_pf
+jak_prft
+jak_tink
 jak_totm
 jak_ths
 smartfp                         // Smart Fit Park
@@ -41422,6 +41425,7 @@ xavmusic                        //
 domfitex                        //
 domfitch                        //
 domdance                        //
+domstepc                        //
 
 @source:xavix2.cpp
 ltv_naru                        //

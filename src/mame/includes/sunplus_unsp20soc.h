@@ -111,6 +111,7 @@ public:
 	generalplus_gpac800_game_state(const machine_config& mconfig, device_type type, const char* tag) :
 		gcm394_game_state(mconfig, type, tag),
 		m_nandregion(*this, "nandrom"),
+		m_sdram_kwords(0x400000), // 0x400000 words (0x800000 bytes)
 		m_initial_copy_words(0x2000)
 	{
 	}
@@ -118,6 +119,7 @@ public:
 	void generalplus_gpac800(machine_config &config);
 
 	void nand_init210();
+	void nand_init210_32mb();
 	void nand_init840();
 	void nand_wlsair60();
 	void nand_vbaby();
@@ -148,6 +150,7 @@ private:
 	int m_nandblocksize;
 	int m_nandblocksize_stripped;
 
+	int m_sdram_kwords;
 	int m_initial_copy_words;
 	int m_vectorbase;
 };
@@ -258,6 +261,7 @@ public:
 	}
 
 	void wrlshunt(machine_config &config);
+	void paccon(machine_config &config);
 
 	void init_wrlshunt();
 	void init_ths();

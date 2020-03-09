@@ -365,6 +365,17 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 	{
 		words_per_tile = 8; // seems to be correct for sprites regardless of size / bpp on smartfp
 	}
+	
+	int x_max;
+	if (m_707f & 0x0010)
+	{
+		x_max = 0x400;
+	}
+	else
+	{
+		x_max = 0x200;
+	}
+
 
 	uint32_t m = (bitmap_addr) + (words_per_tile * tile + bits_per_row * (line ^ yflipmask));
 
@@ -428,9 +439,9 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 		if (RowScroll)
 			xx -= 0;// (int16_t)m_scrollram[yy & 0x1ff];
 
-		//xx &= 0x01ff;
-		//if (xx >= 0x01c0)
-		//  xx -= 0x0200;
+		xx &= (x_max-1);
+		if (xx >= (x_max-0x40))
+			xx -= x_max;
 
 		if (xx >= 0 && xx <= cliprect.max_x)
 		{
@@ -686,7 +697,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 }
 
 
-void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr)
+void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t base_addr)
 {
 	uint32_t bitmap_addr = (m_sprite_702d_gfxbase_msb << 16) | m_sprite_7022_gfxbase_lsb;
 	uint32_t tile = m_spriteram[base_addr + 0];
@@ -702,14 +713,29 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 
 	int addressing_mode = 0;
 
-	// m_7042_sprite is f7 on smartfp
-	//                  01 on wrlshunt
-	// this is not enough to conclude anything
+	int screenwidth, screenheight, x_max;
+	if (m_707f & 0x0010)
+	{
+		screenwidth = 640;
+		screenheight = 480;
+		x_max = 0x400;
+	}
+	else
+	{
+		screenwidth = 320;
+		screenheight = 240;
+		x_max = 0x200;
+	}
 
-	if (m_7042_sprite == 0x01)
+
+	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
+	if ((m_7042_sprite & 0x0010) == 0x10)
+		addressing_mode = 0; // smartfp, paccon
+	else
 		addressing_mode = 1;
 
-	tile |= m_spriteextra[base_addr / 4] << 16;
+	if (addressing_mode == 0) // smartfp, paccon
+		tile |= m_spriteextra[base_addr / 4] << 16;
 
 	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
 	{
@@ -719,15 +745,16 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 	const uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
 	const uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
-	/*
-	if (!(m_video_regs[0x42] & SPRITE_COORD_TL_MASK))
-	{
-	    x = (160 + x) - w / 2;
-	    y = (120 - y) - (h / 2) + 8;
-	}
-	*/
 
-	x &= 0x01ff;
+
+	if (!(m_7042_sprite & SPRITE_COORD_TL_MASK))
+	{
+		x = ((screenwidth / 2) + x) - w / 2;
+		y = ((screenheight / 2) - y) - (h / 2) + 8;
+	}
+
+
+	x &= (x_max - 1);
 	y &= 0x01ff;
 
 	uint32_t tile_line = ((scanline - y) + 0x200) % h;
@@ -742,17 +769,26 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 
 	bool blend = (attr & 0x4000);
 
-	bool flip_x = false;
+	bool flip_x;
+	uint8_t bpp;
+	uint32_t yflipmask;
+	uint32_t palette_offset;
 
 	// different attribute use?
-	if (addressing_mode == 0)
+	if (addressing_mode == 0) // smartfp, paccon
 	{
 		flip_x = (attr & TILE_X_FLIP);
+		bpp = attr & 0x0003;
+		yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
+		palette_offset = (attr & 0x0f00) >> 4;
 	}
-
-	const uint8_t bpp = attr & 0x0003;
-	const uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
-	uint32_t palette_offset = (attr & 0x0f00) >> 4;
+	else
+	{
+		flip_x = 0;// (attr & TILE_X_FLIP); // wrlshunt, jak_totm, jak_s550 do not want this to be flip bit, gormiti does.  also configurable, or error in spriteram content?
+		bpp = attr & 0x0003;
+		yflipmask = 0;// attr& TILE_Y_FLIP ? h - 1 : 0; // see flipx comment
+		palette_offset = (attr & 0x0f00) >> 4;
+	}
 
 	//palette_offset |= 0x0d00;
 	palette_offset |= 0x0500;
@@ -775,7 +811,12 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 
 void gcm394_base_video_device::draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority)
 {
-	for (uint32_t n = 0; n < 0x100; n++)
+	// paccon suggests this, does older hardware have similar?
+	int numsprites = (m_7042_sprite & 0xff00) >> 8;
+	if (numsprites == 0)
+		numsprites = 0x100;
+
+	for (uint32_t n = 0; n < numsprites; n++)
 	{
 		draw_sprite(cliprect, scanline, priority, 4 * n);
 	}
@@ -1282,6 +1323,8 @@ WRITE16_MEMBER(gcm394_base_video_device::video_707f_w)
 	}
 
 	m_707f = data;
+
+	//popmessage("707f is %04x\n", data);
 }
 
 READ16_MEMBER(gcm394_base_video_device::video_703a_palettebank_r)
@@ -1407,6 +1450,14 @@ READ16_MEMBER(gcm394_base_video_device::video_7051_r)
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7051_r (returning %04x)\n", machine().describe_context(), retdat);
 	return retdat;
 }
+
+READ16_MEMBER(gcm394_base_video_device::video_70e0_r)
+{
+	uint16_t retdat = machine().rand();
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_70e0_r (returning %04x)\n", machine().describe_context(), retdat);
+	return retdat;
+}
+
 
 // this block get set once, in a single function, could be important
 WRITE16_MEMBER(gcm394_base_video_device::video_7080_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7080_w %04x\n", machine().describe_context(), data); m_7080 = data; }
