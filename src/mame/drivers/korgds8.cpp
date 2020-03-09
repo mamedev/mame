@@ -203,6 +203,7 @@ void korg_ds8_state::ds8(machine_config &config)
 	m_maincpu->pc_out_cb().set("lcdc", FUNC(hd44780_device::rs_w)).bit(5);
 	m_maincpu->pc_out_cb().append("lcdc", FUNC(hd44780_device::rw_w)).bit(6);
 	m_maincpu->pc_out_cb().append("lcdc", FUNC(hd44780_device::e_w)).bit(7);
+	m_maincpu->set_pc_pullups(0x0e);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // µPD4364 + battery
 
