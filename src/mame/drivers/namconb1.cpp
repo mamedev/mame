@@ -1799,8 +1799,8 @@ ROM_END
 
 ROM_START( outfxiesa ) /* briefly shows "For use in Japan" notice, but Japanese text removed from game play. A Korean version? */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_WORD( "mprl.11c", 0x00002, 0x80000, CRC(22cd638d) SHA1(7b11ded9f2265678bb96b3fb706ed5fa37745511) ) // no labels on ROMS
-	ROM_LOAD32_WORD( "mpru.11d", 0x00000, 0x80000, CRC(a50f1cf9) SHA1(1c07c7e1ff2bb621c6fb249ae2e650097ce53aea) ) // no labels on ROMS
+	ROM_LOAD32_WORD( "mprl.11c", 0x00002, 0x80000, CRC(22cd638d) SHA1(7b11ded9f2265678bb96b3fb706ed5fa37745511) ) // no label on ROM
+	ROM_LOAD32_WORD( "mpru.11d", 0x00000, 0x80000, CRC(a50f1cf9) SHA1(1c07c7e1ff2bb621c6fb249ae2e650097ce53aea) ) // no label on ROM
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
 	ROM_LOAD( "ou1spr0.5b", 0, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
