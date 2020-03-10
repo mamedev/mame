@@ -39,11 +39,13 @@ public:
 
 	void triviaquiz(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<tms9995_device> m_maincpu;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void prg_map(address_map &map);
 	void io_map(address_map &map);
 };
@@ -103,7 +105,7 @@ void triviaquiz_state::triviaquiz(machine_config &config)
 
 	tms9129_device &vdp(TMS9129(config, "vdp", 10.738635_MHz_XTAL)); //TMS9129NL, 10.73864 XTAL on one PCB, 10.70000 on another
 	vdp.set_screen("screen");
-	vdp.set_vram_size(0x1000); // ?
+	vdp.set_vram_size(0x4000); // verified
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 }
