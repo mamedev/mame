@@ -455,10 +455,10 @@ WRITE32_MEMBER(midzeus2_state::crusnexo_leds_w)
 
 /*************************************
  *
- *  Firewwire access (Zeus 2 only)
+ *  Firewire/IEEE 1394 access (Zeus 2 only)
  *
  *************************************/
-READ32_MEMBER(midzeus_state::firewire_r)
+READ32_MEMBER(midzeus_state::firewire_r) //Hardware: TSB12LV01A link layer controller and IBM IBM21S851 physical layer (PHY) transceiver.
 {
 	uint32_t retVal = 0;
 	if (offset < 0x40)
