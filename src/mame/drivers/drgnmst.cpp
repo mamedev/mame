@@ -302,11 +302,12 @@ INPUT_PORTS_END
 
 static const gfx_layout char8x8_layout =
 {
-	8,8,
-	RGN_FRAC(1,1),
+	16,8,
+	RGN_FRAC(1,2),
 	4,
 	{ 24,8,16, 0 },
-	{ 0,1,2,3,4,5,6,7 },
+	{ RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+1,RGN_FRAC(1,2)+2,RGN_FRAC(1,2)+3,RGN_FRAC(1,2)+4,RGN_FRAC(1,2)+5,RGN_FRAC(1,2)+6,RGN_FRAC(1,2)+7,
+		0,1,2,3,4,5,6,7 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	8*32
 };

@@ -88,9 +88,9 @@ inline bool tilemap_t::gfx_elements_changed()
 	// iterate over all used gfx types and set the dirty flag if any of them have changed
 	for (int gfxnum = 0; usedmask != 0; usedmask >>= 1, gfxnum++)
 		if ((usedmask & 1) != 0)
-			if (m_gfx_dirtyseq[gfxnum] != m_tileinfo.decoder->gfx(gfxnum)->dirtyseq())
+			if (m_gfx_dirtyseq[gfxnum] != m_tileinfo.gfx->dirtyseq())
 			{
-				m_gfx_dirtyseq[gfxnum] = m_tileinfo.decoder->gfx(gfxnum)->dirtyseq();
+				m_gfx_dirtyseq[gfxnum] = m_tileinfo.gfx->dirtyseq();
 				isdirty = true;
 			}
 
@@ -809,7 +809,7 @@ g_profiler.start(PROFILER_TILEMAP_UPDATE);
 	// draw the tile, using either direct or transparent
 	u32 x0 = m_tilewidth * col;
 	u32 y0 = m_tileheight * row;
-	m_tileflags[logindex] = tile_draw(m_tileinfo.pen_data, x0, y0,
+	m_tileflags[logindex] = tile_draw(m_tileinfo.gfx, m_tileinfo.pen_data, m_tileinfo.xoffs, m_tileinfo.yoffs, x0, y0,
 		m_tileinfo.palette_base, m_tileinfo.category, m_tileinfo.group, flags, m_tileinfo.pen_mask);
 
 	// if mask data is specified, apply it
@@ -820,7 +820,7 @@ g_profiler.start(PROFILER_TILEMAP_UPDATE);
 	if (m_tileinfo.gfxnum != 0xff && (m_gfx_used & (1 << m_tileinfo.gfxnum)) == 0)
 	{
 		m_gfx_used |= 1 << m_tileinfo.gfxnum;
-		m_gfx_dirtyseq[m_tileinfo.gfxnum] = m_tileinfo.decoder->gfx(m_tileinfo.gfxnum)->dirtyseq();
+		m_gfx_dirtyseq[m_tileinfo.gfxnum] = m_tileinfo.gfx->dirtyseq();
 	}
 
 g_profiler.stop();
@@ -834,7 +834,7 @@ g_profiler.stop();
 //  the palette_base
 //-------------------------------------------------
 
-u8 tilemap_t::tile_draw(const u8 *pendata, u32 x0, u32 y0, u32 palette_base, u8 category, u8 group, u8 flags, u8 pen_mask)
+u8 tilemap_t::tile_draw(gfx_element *gfx, const u8 *pendata, u32 gfx_xoffs, u32 gfx_yoffs, u32 x0, u32 y0, u32 palette_base, u8 category, u8 group, u8 flags, u8 pen_mask)
 {
 	// OR in the force layer flags
 	category |= flags & (TILE_FORCE_LAYER0 | TILE_FORCE_LAYER1 | TILE_FORCE_LAYER2);
@@ -860,6 +860,7 @@ u8 tilemap_t::tile_draw(const u8 *pendata, u32 x0, u32 y0, u32 palette_base, u8 
 	u8 andmask = ~0, ormask = 0;
 	for (u16 ty = 0; ty < m_tileheight; ty++)
 	{
+		const u8 *rowdata = pendata + (((ty + gfx_yoffs) % gfx->height()) * gfx->rowbytes());
 		u16 *pixptr = &m_pixmap.pix16(y0, x0);
 		u8 *flagsptr = &m_flagsmap.pix8(y0, x0);
 
@@ -870,7 +871,7 @@ u8 tilemap_t::tile_draw(const u8 *pendata, u32 x0, u32 y0, u32 palette_base, u8 
 		int xoffs = 0;
 		for (u16 tx = 0; tx < m_tilewidth; tx++)
 		{
-			u8 pen = (*pendata++) & pen_mask;
+			u8 pen = rowdata[(tx + gfx_xoffs) % gfx->width()] & pen_mask;
 			u8 map = penmap[pen];
 			pixptr[xoffs] = palette_base + pen;
 			flagsptr[xoffs] = map | category;
@@ -1548,7 +1549,7 @@ void tilemap_t::draw_debug(screen_device &screen, bitmap_rgb32 &dest, u32 scroll
 //  get_info_debug - extract info for one tile
 //-------------------------------------------------
 
-void tilemap_t::get_info_debug(u32 col, u32 row, u8 &gfxnum, u32 &code, u32 &color)
+void tilemap_t::get_info_debug(u32 col, u32 row, u8 &gfxnum, u32 &code, u32 &color, u32 &xoffs, u32 &yoffs)
 {
 	// first map to the memory index
 	tilemap_memory_index memindex = memory_index(col, row);
@@ -1559,9 +1560,11 @@ void tilemap_t::get_info_debug(u32 col, u32 row, u8 &gfxnum, u32 &code, u32 &col
 	// get the GFX number and code
 	gfxnum = m_tileinfo.gfxnum;
 	code = m_tileinfo.code;
+	xoffs = m_tileinfo.xoffs;
+	yoffs = m_tileinfo.yoffs;
 
 	// work back from the palette base to get the color
-	const gfx_element &gfx = *m_tileinfo.decoder->gfx(gfxnum);
+	const gfx_element &gfx = *m_tileinfo.gfx;
 	color = (m_tileinfo.palette_base - gfx.colorbase()) / gfx.granularity();
 }
 

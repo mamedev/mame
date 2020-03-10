@@ -372,6 +372,7 @@ typedef u32 tilemap_memory_index;
 struct tile_data
 {
 	device_gfx_interface *decoder;  // set in tilemap_t::init()
+	gfx_element *gfx;               // required
 	const u8 *      pen_data;       // required
 	const u8 *      mask_data;      // required
 	pen_t           palette_base;   // defaults to 0
@@ -380,12 +381,16 @@ struct tile_data
 	u8              flags;          // defaults to 0; one or more of TILE_* flags above
 	u8              pen_mask;       // defaults to 0xff; mask to apply to pen_data while rendering the tile
 	u8              gfxnum;         // defaults to 0xff; specify index of gfx for auto-invalidation on dirty
+	u32             xoffs;          // defaults to 0; x offset of pen_data
+	u32             yoffs;          // defaults to 0; y offset of pen_data
 	u32             code;
 
-	void set(u8 _gfxnum, u32 rawcode, u32 rawcolor, u8 _flags)
+	void set(u8 _gfxnum, u32 rawcode, u32 rawcolor, u8 _flags, u8 _xoffs = 0, u8 _yoffs = 0)
 	{
-		gfx_element *gfx = decoder->gfx(_gfxnum);
+		gfx = decoder->gfx(_gfxnum);
 		code = rawcode % gfx->elements();
+		xoffs = _xoffs;
+		yoffs = _yoffs;
 		pen_data = gfx->get_data(code);
 		palette_base = gfx->colorbase() + gfx->granularity() * (rawcolor % gfx->colors());
 		flags = _flags;
@@ -457,7 +462,7 @@ public:
 	bitmap_ind8 &flagsmap() { pixmap_update(); return m_flagsmap; }
 	u8 *tile_flags() { pixmap_update(); return &m_tileflags[0]; }
 	tilemap_memory_index memory_index(u32 col, u32 row) { return m_mapper(col, row, m_cols, m_rows); }
-	void get_info_debug(u32 col, u32 row, u8 &gfxnum, u32 &code, u32 &color);
+	void get_info_debug(u32 col, u32 row, u8 &gfxnum, u32 &code, u32 &color, u32 &xoffs, u32 &yoffs);
 
 	// setters
 	void enable(bool enable = true) { m_enable = enable; }
@@ -550,7 +555,7 @@ private:
 	// internal drawing
 	void pixmap_update();
 	void tile_update(logical_index logindex, u32 col, u32 row);
-	u8 tile_draw(const u8 *pendata, u32 x0, u32 y0, u32 palette_base, u8 category, u8 group, u8 flags, u8 pen_mask);
+	u8 tile_draw(gfx_element *gfx, const u8 *pendata, u32 gfx_xoffs, u32 gfx_yoffs, u32 x0, u32 y0, u32 palette_base, u8 category, u8 group, u8 flags, u8 pen_mask);
 	u8 tile_apply_bitmask(const u8 *maskdata, u32 x0, u32 y0, u8 category, u8 flags);
 	void configure_blit_parameters(blit_parameters &blit, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, u32 flags, u8 priority, u8 priority_mask);
 	template<class _BitmapClass> void draw_common(screen_device &screen, _BitmapClass &dest, const rectangle &cliprect, u32 flags, u8 priority, u8 priority_mask);
@@ -795,6 +800,9 @@ private:
 
 // useful macro inside of a TILE_GET_INFO callback to set tile information
 #define SET_TILE_INFO_MEMBER(GFX,CODE,COLOR,FLAGS)  tileinfo.set(GFX, CODE, COLOR, FLAGS)
+
+// useful macro inside of a TILE_GET_INFO callback to set tile information with gfx offset
+#define SET_TILE_INFO_MEMBER_OFFS(GFX,CODE,COLOR,FLAGS,XOFFS,YOFFS)  tileinfo.set(GFX, CODE, COLOR, FLAGS, XOFFS, YOFFS)
 
 // Macros for setting tile attributes in the TILE_GET_INFO callback:
 //   TILE_FLIP_YX assumes that flipy is in bit 1 and flipx is in bit 0

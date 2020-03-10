@@ -3326,22 +3326,11 @@ in a corrupt WDUD screen. ffightub is now fixed since a genuine pcb surfaced.
 
 static const gfx_layout cps1_layout8x8 =
 {
-	8,8,
+	16,8,
 	RGN_FRAC(1,1),
 	4,
 	{ 24, 16, 8, 0 },
-	{ STEP8(0, 1) },
-	{ STEP8(0, 4*16) },
-	64*8
-};
-
-static const gfx_layout cps1_layout8x8_2 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 24, 16, 8, 0 },
-	{ STEP8(32, 1) },
+	{ STEP8(0, 1), STEP8(32, 1) },
 	{ STEP8(0, 4*16) },
 	64*8
 };
@@ -3370,7 +3359,6 @@ static const gfx_layout cps1_layout32x32 =
 
 GFXDECODE_START( gfx_cps1 )
 	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8,   0, 0x100 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8_2, 0, 0x100 )
 	GFXDECODE_ENTRY( "gfx", 0, cps1_layout16x16, 0, 0x100 )
 	GFXDECODE_ENTRY( "gfx", 0, cps1_layout32x32, 0, 0x100 )
 GFXDECODE_END

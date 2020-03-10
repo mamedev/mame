@@ -1138,11 +1138,11 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 		uint32_t col = ((xpixel / pixelscale + state.tilemap.xoffs) / tilemap->tilewidth()) % tilemap->cols();
 		uint32_t row = ((ypixel / pixelscale + state.tilemap.yoffs) / tilemap->tileheight()) % tilemap->rows();
 		uint8_t gfxnum;
-		uint32_t code, color;
-		tilemap->get_info_debug(col, row, gfxnum, code, color);
-		util::stream_format(title_buf, " @ %d,%d = GFX%d #%X:%X",
+		uint32_t code, color, xoffs, yoffs;
+		tilemap->get_info_debug(col, row, gfxnum, code, color, xoffs, yoffs);
+		util::stream_format(title_buf, " @ %d,%d = GFX%d #%X:%X @ %d,%d",
 							col * tilemap->tilewidth(), row * tilemap->tileheight(),
-							int(gfxnum), code, color);
+							int(gfxnum), code, color, xoffs, yoffs);
 	}
 	else
 		util::stream_format(title_buf, " %dx%d OFFS %d,%d", tilemap->width(), tilemap->height(), state.tilemap.xoffs, state.tilemap.yoffs);
