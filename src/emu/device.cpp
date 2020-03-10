@@ -84,7 +84,6 @@ emu::detail::device_registrar const registered_device_types;
 
 device_t::device_t(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: m_type(type)
-	, m_searchpath(type.shortname())
 	, m_owner(owner)
 	, m_next(nullptr)
 
@@ -119,6 +118,24 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 
 device_t::~device_t()
 {
+}
+
+
+//-------------------------------------------------
+//  searchpath - get the media search path for a
+//  device
+//-------------------------------------------------
+
+std::vector<std::string> device_t::searchpath() const
+{
+	std::vector<std::string> result;
+	device_t const *system(owner());
+	while (system && !dynamic_cast<driver_device const *>(system))
+		system = system->owner();
+	if (system)
+		result = system->searchpath();
+	result.emplace(result.begin(), shortname());
+	return result;
 }
 
 

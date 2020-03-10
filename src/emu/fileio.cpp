@@ -283,24 +283,6 @@ osd_file::error emu_file::open(const std::string &name)
 	return open_next();
 }
 
-osd_file::error emu_file::open(const std::string &name1, const std::string &name2)
-{
-	// concatenate the strings and do a standard open
-	return open(name1 + name2);
-}
-
-osd_file::error emu_file::open(const std::string &name1, const std::string &name2, const std::string &name3)
-{
-	// concatenate the strings and do a standard open
-	return open(name1 + name2 + name3);
-}
-
-osd_file::error emu_file::open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4)
-{
-	// concatenate the strings and do a standard open
-	return open(name1 + name2 + name3 + name4);
-}
-
 osd_file::error emu_file::open(const std::string &name, u32 crc)
 {
 	// remember the filename and CRC info

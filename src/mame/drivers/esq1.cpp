@@ -580,7 +580,7 @@ void esq1_state::send_through_panel(uint8_t data)
 INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 {
 	u8 offset = 0;
-	if (strncmp(machine().basename(), "sq80", 4) == 0)
+	if (strncmp(machine().basename().c_str(), "sq80", 4) == 0)
 	 {
 		if (!kpc_calibrated)
 		 { // ack SQ80 keyboard calibration
