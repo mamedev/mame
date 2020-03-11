@@ -166,13 +166,13 @@ TILE_GET_INFO_MEMBER(dunhuang_state::get_tile_info)
 {
 	uint16_t code = m_videoram[tile_index];
 	uint8_t color = m_colorram[tile_index] & 0x0f;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 TILE_GET_INFO_MEMBER(dunhuang_state::get_tile_info2)
 {
 	uint16_t code = m_videoram2[tile_index];
 	uint8_t color = m_colorram2[tile_index] & 0x0f;
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 void dunhuang_state::video_start()

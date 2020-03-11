@@ -362,7 +362,7 @@ TILE_GET_INFO_MEMBER(dmndrby_state::get_dmndrby_tile_info)
 	int flipx = (attr&0x40)>>6;
 
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code,
 			col,
 			TILE_FLIPYX(flipx) );

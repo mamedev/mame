@@ -111,18 +111,18 @@ TILE_GET_INFO_MEMBER(gottlieb_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index];
 	if ((code & 0x80) == 0)
-		SET_TILE_INFO_MEMBER(m_gfxcharlo, code, 0, 0);
+		tileinfo.set(m_gfxcharlo, code, 0, 0);
 	else
-		SET_TILE_INFO_MEMBER(m_gfxcharhi, code, 0, 0);
+		tileinfo.set(m_gfxcharhi, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(gottlieb_state::get_screwloo_bg_tile_info)
 {
 	int code = m_videoram[tile_index];
 	if ((code & 0xc0) == 0)
-		SET_TILE_INFO_MEMBER(m_gfxcharlo, code, 0, 0);
+		tileinfo.set(m_gfxcharlo, code, 0, 0);
 	else
-		SET_TILE_INFO_MEMBER(m_gfxcharhi, code, 0, 0);
+		tileinfo.set(m_gfxcharhi, code, 0, 0);
 }
 
 

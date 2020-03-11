@@ -304,7 +304,7 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_bg_tile_info)
 	int tile  = m_vram[tile_index + m_bg_rambank[0]];
 	int color = m_vram[tile_index + m_bg_rambank[1]];
 
-	SET_TILE_INFO_MEMBER(1, tile,
+	tileinfo.set(1, tile,
 		m_bg_color_base + (color & 0x3f),
 		TILE_FLIPYX((color & 0x00c0) >> 6));
 }
@@ -314,7 +314,7 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_fg_tile_info)
 	int tile  = m_vram[tile_index + m_fg_rambank[0]];
 	int color = m_vram[tile_index + m_fg_rambank[1]];
 
-	SET_TILE_INFO_MEMBER(1, tile,
+	tileinfo.set(1, tile,
 		m_fg_color_base + (color & 0x3f),
 		TILE_FLIPYX((color & 0x00c0) >> 6));
 }
@@ -323,7 +323,7 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_tx_tile_info)
 {
 	int tile = m_vram[tile_index + m_tx_rambank];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		(tile & 0x07ff) | ((m_ctrl[4 + ((tile & 0x800) >> 11)]>>8) << 11),
 		m_tx_color_base + ((tile >> 12) & 0x0f),
 		0);

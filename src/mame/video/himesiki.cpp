@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(himesiki_state::get_bg_tile_info)
 
 	code &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(0, code, col, 0);
+	tileinfo.set(0, code, col, 0);
 }
 
 void himesiki_state::video_start()

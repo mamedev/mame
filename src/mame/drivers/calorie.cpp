@@ -152,7 +152,7 @@ TILE_GET_INFO_MEMBER(calorie_state::get_bg_tile_info)
 	int color = src[bg_base + tile_index + 0x100] & 0x0f;
 	int flag  = src[bg_base + tile_index + 0x100] & 0x40 ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flag);
+	tileinfo.set(1, code, color, flag);
 }
 
 TILE_GET_INFO_MEMBER(calorie_state::get_fg_tile_info)
@@ -160,7 +160,7 @@ TILE_GET_INFO_MEMBER(calorie_state::get_fg_tile_info)
 	int code  = ((m_fg_ram[tile_index + 0x400] & 0x30) << 4) | m_fg_ram[tile_index];
 	int color = m_fg_ram[tile_index + 0x400] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX((m_fg_ram[tile_index + 0x400] & 0xc0) >> 6));
+	tileinfo.set(0, code, color, TILE_FLIPYX((m_fg_ram[tile_index + 0x400] & 0xc0) >> 6));
 }
 
 

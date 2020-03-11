@@ -96,7 +96,7 @@ TILE_GET_INFO_MEMBER(yiear_state::get_bg_tile_info)
 //  int color = (attr & 0xf0) >> 4;
 	int flags = ((attr & 0x80) ? TILE_FLIPX : 0) | ((attr & 0x40) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0, code, 0, flags);
+	tileinfo.set(0, code, 0, flags);
 }
 
 void yiear_state::video_start()

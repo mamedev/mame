@@ -162,7 +162,7 @@ TILE_GET_INFO_MEMBER(chanbara_state::get_bg_tile_info)
 	int color = (m_colorram[tile_index] >> 1) & 0x1f;
 	//int flipy = (m_colorram[tile_index]) & 0x01; // not on this layer (although bit is used)
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(chanbara_state::get_bg2_tile_info)
@@ -171,7 +171,7 @@ TILE_GET_INFO_MEMBER(chanbara_state::get_bg2_tile_info)
 	int color = (m_colorram2[tile_index] >> 1) & 0x1f;
 	int flipy = (m_colorram2[tile_index]) & 0x01;
 
-	SET_TILE_INFO_MEMBER(2, code, color, TILE_FLIPXY(flipy));
+	tileinfo.set(2, code, color, TILE_FLIPXY(flipy));
 }
 
 void chanbara_state::video_start()

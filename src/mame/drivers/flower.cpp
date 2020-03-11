@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(flower_state::get_bg_tile_info)
 	int code = m_bgvram[tile_index];
 	int color = (m_bgvram[tile_index+0x100] & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(flower_state::get_fg_tile_info)
@@ -172,7 +172,7 @@ TILE_GET_INFO_MEMBER(flower_state::get_fg_tile_info)
 	int code = m_fgvram[tile_index];
 	int color = (m_fgvram[tile_index+0x100] & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 void flower_state::video_start()

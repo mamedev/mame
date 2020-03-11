@@ -20,7 +20,7 @@ TILE_GET_INFO_MEMBER(mitchell_state::get_tile_info)
 {
 	uint8_t attr = m_colorram[tile_index];
 	int code = m_videoram[2 * tile_index] + (m_videoram[2 * tile_index + 1] << 8);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			attr & 0x7f,
 			(attr & 0x80) ? TILE_FLIPX : 0);

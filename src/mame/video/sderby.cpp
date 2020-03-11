@@ -12,7 +12,7 @@ TILE_GET_INFO_MEMBER(sderby_state::get_sderby_tile_info)
 	tileno = m_videoram[tile_index*2];
 	colour = m_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
+	tileinfo.set(1,tileno,colour,0);
 }
 
 WRITE16_MEMBER(sderby_state::sderby_videoram_w)
@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(sderby_state::get_sderby_md_tile_info)
 	tileno = m_md_videoram[tile_index*2];
 	colour = m_md_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(1,tileno,colour+16,0);
+	tileinfo.set(1,tileno,colour+16,0);
 }
 
 WRITE16_MEMBER(sderby_state::sderby_md_videoram_w)
@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(sderby_state::get_sderby_fg_tile_info)
 	tileno = m_fg_videoram[tile_index*2];
 	colour = m_fg_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0,tileno,colour+32,0);
+	tileinfo.set(0,tileno,colour+32,0);
 }
 
 WRITE16_MEMBER(sderby_state::sderby_fg_videoram_w)

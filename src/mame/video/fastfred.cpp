@@ -84,7 +84,7 @@ TILE_GET_INFO_MEMBER(fastfred_state::get_tile_info)
 	uint16_t code = m_charbank | m_videoram[tile_index];
 	uint8_t color = m_colorbank | (m_attributesram[2 * x + 1] & 0x07);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -294,18 +294,18 @@ TILE_GET_INFO_MEMBER(fastfred_state::imago_get_tile_info_bg)
 	uint16_t code = m_charbank * 0x100 + m_videoram[tile_index];
 	uint8_t color = m_colorbank | (m_attributesram[2 * x + 1] & 0x07);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(fastfred_state::imago_get_tile_info_fg)
 {
 	int code = m_imago_fg_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(2, code, 2, 0);
+	tileinfo.set(2, code, 2, 0);
 }
 
 TILE_GET_INFO_MEMBER(fastfred_state::imago_get_tile_info_web)
 {
-	SET_TILE_INFO_MEMBER(3, tile_index & 0x1ff, 0, 0);
+	tileinfo.set(3, tile_index & 0x1ff, 0, 0);
 }
 
 WRITE8_MEMBER(fastfred_state::imago_fg_videoram_w )

@@ -406,7 +406,7 @@ TILE_GET_INFO_MEMBER(tc0100scn_base_device::get_bg_tile_info)
 	if (!m_tc0100scn_cb.isnull())
 		m_tc0100scn_cb(&code, &color);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			((color + m_bg_colbank[Colbank]) & 0xff),
 			TILE_FLIPYX((attr & 0xc000) >> 14));
@@ -417,7 +417,7 @@ TILE_GET_INFO_MEMBER(tc0100scn_base_device::get_tx_tile_info)
 {
 	int attr = m_ram[Offset + tile_index];
 
-	SET_TILE_INFO_MEMBER(Gfx,
+	tileinfo.set(Gfx,
 			attr & 0x00ff,
 			((attr & 0x3f00) >> 8) + m_tx_colbank,
 			TILE_FLIPYX((attr & 0xc000) >> 14));

@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_fg_tile_info)
 
 	if (m_vreg&1) code |= 0x1000;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			attr>>4,
 			0);
@@ -115,7 +115,7 @@ TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_reel_tile_info)
 	if (m_vreg & 0x4) code |= 0x100;
 	if (m_vreg & 0x8) code |= 0x200;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			0,
 			0);

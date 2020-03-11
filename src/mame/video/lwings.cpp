@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(lwings_state::get_fg_tile_info)
 {
 	int code = m_fgvideoram[tile_index];
 	int color = m_fgvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code + ((color & 0xc0) << 2),
 			color & 0x0f,
 			TILE_FLIPYX((color & 0x30) >> 4));
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(lwings_state::lwings_get_bg1_tile_info)
 {
 	int code = m_bg1videoram[tile_index];
 	int color = m_bg1videoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code + ((color & 0xe0) << 3),
 			color & 0x07,
 			TILE_FLIPYX((color & 0x18) >> 3));
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(lwings_state::trojan_get_bg1_tile_info)
 	int code = m_bg1videoram[tile_index];
 	int color = m_bg1videoram[tile_index + 0x400];
 	code += (color & 0xe0)<<3;
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			m_bg2_avenger_hw ? ((color & 7) ^ 6) : (color & 7),
 			((color & 0x10) ? TILE_FLIPX : 0));
@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(lwings_state::get_bg2_tile_info)
 	tile_index = (tile_index + m_bg2_image * 0x20) & mask;
 	code = rom[tile_index];
 	color = rom[tile_index + 1];
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			code + ((color & 0x80) << 1),
 			color & 0x07,
 			TILE_FLIPYX((color & 0x30) >> 4));

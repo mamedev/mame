@@ -1041,14 +1041,14 @@ TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_16x16_1x1_tile_info )
 {
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_16x16_1x1(tile_region,tileno,(int)tile_index);
-	SET_TILE_INFO_MEMBER(tile_region, tileno, 0, 0);
+	tileinfo.set(tile_region, tileno, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_32x32_1x1_tile_info )
 {
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_1x1(tile_region,tileno,(int)tile_index);
-	SET_TILE_INFO_MEMBER(tile_region, tileno, 0, 0);
+	tileinfo.set(tile_region, tileno, 0, 0);
 }
 
 
@@ -1056,14 +1056,14 @@ TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_16x16_16x16_tile_info )
 {
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_16x16_16x16(tile_region,tileno,(int)tile_index);
-	SET_TILE_INFO_MEMBER(tile_region, tileno, 0, 0);
+	tileinfo.set(tile_region, tileno, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_32x32_16x16_tile_info )
 {
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_16x16(tile_region,tileno,(int)tile_index);
-	SET_TILE_INFO_MEMBER(tile_region, tileno, 0, 0);
+	tileinfo.set(tile_region, tileno, 0, 0);
 }
 
 // non-tilemap functions to get a pixel from a 'tilemap' based on the above, but looking up each pixel, as to avoid the heavy cache bitmap

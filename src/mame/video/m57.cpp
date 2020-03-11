@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(m57_state::get_tile_info)
 	uint8_t attr = m_videoram[tile_index * 2 + 0];
 	uint16_t code = m_videoram[tile_index * 2 + 1] | ((attr & 0xc0) << 2);
 
-	SET_TILE_INFO_MEMBER(0, code, attr & 0x0f, TILE_FLIPXY(attr >> 4));
+	tileinfo.set(0, code, attr & 0x0f, TILE_FLIPXY(attr >> 4));
 }
 
 

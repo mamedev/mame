@@ -11,7 +11,7 @@ TILE_GET_INFO_MEMBER(speedspn_state::get_tile_info)
 	int code = m_vidram[tile_index*2+1] | (m_vidram[tile_index*2] << 8);
 	int attr = m_attram[tile_index^0x400];
 
-	SET_TILE_INFO_MEMBER(0,code,attr & 0x3f,(attr & 0x80) ? TILE_FLIPX : 0);
+	tileinfo.set(0,code,attr & 0x3f,(attr & 0x80) ? TILE_FLIPX : 0);
 }
 
 void speedspn_state::video_start()

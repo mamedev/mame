@@ -333,7 +333,7 @@ TILE_GET_INFO_MEMBER(drw80pkr_state::get_bg_tile_info)
 	int color = m_color_ram[tile_index];
 	int code = m_video_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void drw80pkr_state::video_start()

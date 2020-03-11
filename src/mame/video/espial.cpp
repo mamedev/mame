@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(espial_state::get_tile_info)
 	uint8_t code = m_videoram[tile_index];
 	uint8_t col = m_colorram[tile_index];
 	uint8_t attr = m_attributeram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 					code | ((attr & 0x03) << 8),
 					col & 0x3f,
 					TILE_FLIPYX(attr >> 2));

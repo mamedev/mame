@@ -162,7 +162,7 @@ TILE_GET_INFO_MEMBER(egghunt_state::get_bg_tile_info)
 //          code += 0;
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, colour, 0);
+	tileinfo.set(0, code, colour, 0);
 }
 
 READ8_MEMBER(egghunt_state::egghunt_bgram_r)

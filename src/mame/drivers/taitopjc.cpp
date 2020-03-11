@@ -213,7 +213,7 @@ TILE_GET_INFO_MEMBER(taitopjc_state::tile_get_info)
 	int tile = (val & 0xfff);
 	int flags = 0;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, flags);
+	tileinfo.set(0, tile, color, flags);
 }
 
 TILEMAP_MAPPER_MEMBER(taitopjc_state::tile_scan_layer0)

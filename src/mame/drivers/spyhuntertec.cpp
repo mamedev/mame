@@ -228,13 +228,13 @@ TILE_GET_INFO_MEMBER(spyhuntertec_state::spyhunt_get_bg_tile_info)
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index];
 	int code = (data & 0x3f) | ((data >> 1) & 0x40);
-	SET_TILE_INFO_MEMBER(0, code, 0, (data & 0x40) ? TILE_FLIPY : 0);
+	tileinfo.set(0, code, 0, (data & 0x40) ? TILE_FLIPY : 0);
 }
 
 
 TILE_GET_INFO_MEMBER(spyhuntertec_state::spyhunt_get_alpha_tile_info)
 {
-	SET_TILE_INFO_MEMBER(2, m_spyhunt_alpharam[tile_index], 0, 0);
+	tileinfo.set(2, m_spyhunt_alpharam[tile_index], 0, 0);
 }
 
 

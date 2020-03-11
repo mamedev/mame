@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info)
 {
 	uint8_t code  =   m_textram[ tile_index * 2 + 0 ];
 	uint8_t color =   m_textram[ tile_index * 2 + 1 ];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code + (color << 8),
 			(color & 0xf0) >> 4,
 			0);

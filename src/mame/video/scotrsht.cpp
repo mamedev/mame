@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(scotrsht_state::get_bg_tile_info)
 
 	// data & 0x80 -> tile priority?
 
-	SET_TILE_INFO_MEMBER(0, code, color, flag);
+	tileinfo.set(0, code, color, flag);
 }
 
 /* Same as Jailbreak + palette bank */

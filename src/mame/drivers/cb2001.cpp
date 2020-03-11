@@ -496,7 +496,7 @@ TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel1_tile_info)
 
 	int colour = 0;//= (cb2001_out_c&0x7) + 8;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code+0x800,
 			colour,
 			0);
@@ -513,7 +513,7 @@ TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel2_tile_info)
 
 	int colour = 0;//(cb2001_out_c&0x7) + 8;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code+0x800,
 			colour,
 			0);
@@ -530,7 +530,7 @@ TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel3_tile_info)
 
 	code &=0xff;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code+0x800,
 			colour,
 			0);

@@ -67,7 +67,7 @@ TILE_GET_INFO_MEMBER(bigstrkb_state::get_tile_info)
 	tileno = m_videoram[tile_index] & 0x0fff;
 	col=    m_videoram[tile_index] & 0xf000;
 
-	SET_TILE_INFO_MEMBER(0,tileno,col>>12,0);
+	tileinfo.set(0,tileno,col>>12,0);
 }
 
 WRITE16_MEMBER(bigstrkb_state::videoram_w)
@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(bigstrkb_state::get_tile2_info)
 	tileno = m_videoram2[tile_index] & 0x0fff;
 	col=    m_videoram2[tile_index] & 0xf000;
 
-	SET_TILE_INFO_MEMBER(1,tileno,col>>12,0);
+	tileinfo.set(1,tileno,col>>12,0);
 }
 
 WRITE16_MEMBER(bigstrkb_state::videoram2_w)
@@ -100,7 +100,7 @@ TILE_GET_INFO_MEMBER(bigstrkb_state::get_tile3_info)
 	tileno = m_videoram3[tile_index] & 0x0fff;
 	col=    m_videoram3[tile_index] & 0xf000;
 
-	SET_TILE_INFO_MEMBER(1,tileno+0x2000,(col>>12)+(0x100/16),0);
+	tileinfo.set(1,tileno+0x2000,(col>>12)+(0x100/16),0);
 }
 
 WRITE16_MEMBER(bigstrkb_state::videoram3_w)

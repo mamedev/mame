@@ -163,14 +163,14 @@ TILE_GET_INFO_MEMBER(ddayjlc_state::get_tile_info_bg)
 	color |= (attr & 0x40) >> 3;
 
 	tileinfo.category = BIT(attr,7);
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	tileinfo.set(2, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(ddayjlc_state::get_tile_info_fg)
 {
 	int code = m_videoram[tile_index] + (m_char_bank << 8);
 
-	SET_TILE_INFO_MEMBER(1, code, 0, 0);
+	tileinfo.set(1, code, 0, 0);
 }
 
 void ddayjlc_state::video_start()

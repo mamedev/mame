@@ -147,7 +147,7 @@ TILE_GET_INFO_MEMBER(jokrwild_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] | ((attr & 0xc0) << 2);
 	int color = (attr & 0x0f);
 
-	SET_TILE_INFO_MEMBER(0, code , color , 0);
+	tileinfo.set(0, code , color , 0);
 }
 
 void jokrwild_state::video_start()

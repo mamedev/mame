@@ -270,7 +270,7 @@ TILE_GET_INFO_MEMBER(gluck2_state::get_tile_info)
 	int bank = ((attr & 0xc0) >> 5 ) + ((attr & 0x02) >> 1 );   /* bits 1-6-7 handle the gfx banks */
 	int color = (attr & 0x3c) >> 2;                             /* bits 2-3-4-5 handle the color */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 

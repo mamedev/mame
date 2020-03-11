@@ -242,28 +242,28 @@ TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc0_tile_info )
 	int tile = m_sc0_vram[tile_index] & 0xfff;
 	int color = (m_sc0_vram[tile_index] >> 12) & 0x0f;
 //  tile+=(m_seibucrtc_sc0bank<<12);
-	SET_TILE_INFO_MEMBER(1, tile, color, 0);
+	tileinfo.set(1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc2_tile_info )
 {
 	int tile = m_sc2_vram[tile_index] & 0xfff;
 	int color = (m_sc2_vram[tile_index] >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(2, tile, color, 0);
+	tileinfo.set(2, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc1_tile_info )
 {
 	int tile = m_sc1_vram[tile_index] & 0xfff;
 	int color = (m_sc1_vram[tile_index] >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(3, tile, color, 0);
+	tileinfo.set(3, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc3_tile_info )
 {
 	int tile = m_sc3_vram[tile_index] & 0xfff;
 	int color = (m_sc3_vram[tile_index] >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(4, tile, color, 0);
+	tileinfo.set(4, tile, color, 0);
 }
 
 void sengokmj_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)

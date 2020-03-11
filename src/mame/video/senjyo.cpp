@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_fg_tile_info)
 	if (m_is_senjyo && (tile_index & 0x1f) >= 32-8)
 		flags |= TILE_FORCE_LAYER0;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_fgvideoram[tile_index] + ((attr & 0x10) << 4),
 			attr & 0x07,
 			flags);
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::senjyo_bg1_tile_info)
 {
 	uint8_t code = m_bg1videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			(code & 0x70) >> 4,
 			0);
@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::starforc_bg1_tile_info)
 	/* they wired bit 7 of the tile code in place of bit 4 to get the color code */
 	uint8_t code = m_bg1videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			bitswap<3>(((code & 0xe0) >> 5), 1, 0, 2),
 			0);
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_bg2_tile_info)
 {
 	uint8_t code = m_bg2videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code,
 			(code & 0xe0) >> 5,
 			0);
@@ -68,7 +68,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_bg3_tile_info)
 {
 	uint8_t code = m_bg3videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			code,
 			(code & 0xe0) >> 5,
 			0);

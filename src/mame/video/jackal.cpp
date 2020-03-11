@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(jackal_state::get_bg_tile_info)
 	int color = 0;//attr & 0x0f;
 	int flags = ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x20) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 void jackal_state::video_start()

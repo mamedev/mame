@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(orbit_state::get_tile_info)
 	if (m_flip_screen)
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(3, code & 0x3f, 0, flags);
+	tileinfo.set(3, code & 0x3f, 0, flags);
 }
 
 

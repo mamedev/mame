@@ -165,7 +165,7 @@ void segag80r_state::spaceod_bg_init_palette()
 TILE_GET_INFO_MEMBER(segag80r_state::spaceod_get_tile_info)
 {
 	int code = memregion("gfx2")->base()[tile_index + 0x1000 * (m_spaceod_bg_control >> 6)];
-	SET_TILE_INFO_MEMBER(1, code + 0x100 * ((m_spaceod_bg_control >> 2) & 1), 0, 0);
+	tileinfo.set(1, code + 0x100 * ((m_spaceod_bg_control >> 2) & 1), 0, 0);
 }
 
 
@@ -180,7 +180,7 @@ TILEMAP_MAPPER_MEMBER(segag80r_state::spaceod_scan_rows)
 TILE_GET_INFO_MEMBER(segag80r_state::bg_get_tile_info)
 {
 	int code = memregion("gfx2")->base()[tile_index];
-	SET_TILE_INFO_MEMBER(1, code + 0x100 * m_bg_char_bank, code >> 4, 0);
+	tileinfo.set(1, code + 0x100 * m_bg_char_bank, code >> 4, 0);
 }
 
 

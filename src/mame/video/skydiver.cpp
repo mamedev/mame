@@ -25,7 +25,7 @@ void skydiver_state::machine_reset()
 TILE_GET_INFO_MEMBER(skydiver_state::get_tile_info)
 {
 	uint8_t code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code & 0x3f, code >> 6, 0);
+	tileinfo.set(0, code & 0x3f, code >> 6, 0);
 }
 
 

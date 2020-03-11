@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(namco_c123tmap_device::get_tile_info)
 	int tile, mask;
 	m_tilemapinfo.cb(vram[tile_index], &tile, &mask);
 	tileinfo.mask_data = m_mask + mask * 8;
-	SET_TILE_INFO_MEMBER(0, tile, 0, 0);
+	tileinfo.set(0, tile, 0, 0);
 } /* get_tile_info */
 
 void namco_c123tmap_device::init_scroll(int flip) // 8 bit control with external flip screen value

@@ -341,7 +341,7 @@ TILE_GET_INFO_MEMBER(toki_ms_state::get_tile_info)
 	u16 code = (m_vram[tile_index] & 0xfff) | 0x1000;
 	u8 color = (m_vram[tile_index] >> 12);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(toki_ms_state::get_bk1_info)
@@ -351,7 +351,7 @@ TILE_GET_INFO_MEMBER(toki_ms_state::get_bk1_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			color,
 			0);
@@ -364,7 +364,7 @@ TILE_GET_INFO_MEMBER(toki_ms_state::get_bk2_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			tile,
 			color,
 			0);

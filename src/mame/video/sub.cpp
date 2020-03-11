@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(sub_state::get_tile_info)
 	int code = m_vram[tile_index] | ((m_attr[tile_index]&0xe0)<<3);
 	int color = (m_attr[tile_index]&0x1f)+0x40;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 WRITE8_MEMBER(sub_state::vram_w)

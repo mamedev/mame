@@ -375,7 +375,7 @@ TILE_GET_INFO_MEMBER(ltcasino_state::ltcasino_tile_info)
 
 	code |= BIT(attr, 7) << 8;
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(ltcasino_state::ltcasin2_tile_info)
@@ -386,7 +386,7 @@ TILE_GET_INFO_MEMBER(ltcasino_state::ltcasin2_tile_info)
 
 	code |= BIT(attr, 7) << 8;
 
-	SET_TILE_INFO_MEMBER(0, code, ((attr & 0x70) >> 1) | (attr & 7), 0);
+	tileinfo.set(0, code, ((attr & 0x70) >> 1) | (attr & 7), 0);
 }
 
 uint32_t ltcasino_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

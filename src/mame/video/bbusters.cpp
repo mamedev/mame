@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(bbusters_state_base::get_tile_info)
 {
 	uint16_t tile = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,tile&0xfff,tile>>12,0);
+	tileinfo.set(0,tile&0xfff,tile>>12,0);
 }
 
 template<int Layer, int Gfx>
@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(bbusters_state_base::get_pf_tile_info)
 {
 	uint16_t tile = m_pf_data[Layer][tile_index];
 
-	SET_TILE_INFO_MEMBER(Gfx,tile&0xfff,tile>>12,0);
+	tileinfo.set(Gfx,tile&0xfff,tile>>12,0);
 }
 
 WRITE16_MEMBER(bbusters_state_base::video_w)

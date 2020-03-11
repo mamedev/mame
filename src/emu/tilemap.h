@@ -793,14 +793,11 @@ private:
 // function definition for a logical-to-memory mapper
 #define TILEMAP_MAPPER_MEMBER(_name)    tilemap_memory_index _name(u32 col, u32 row, u32 num_cols, u32 num_rows)
 
-// useful macro inside of a TILE_GET_INFO callback to set tile information
-#define SET_TILE_INFO_MEMBER(GFX,CODE,COLOR,FLAGS)  tileinfo.set(GFX, CODE, COLOR, FLAGS)
-
-// Macros for setting tile attributes in the TILE_GET_INFO callback:
+// Helpers for setting tile attributes in the TILE_GET_INFO callback:
 //   TILE_FLIP_YX assumes that flipy is in bit 1 and flipx is in bit 0
 //   TILE_FLIP_XY assumes that flipy is in bit 0 and flipx is in bit 1
-#define TILE_FLIPYX(YX)                 ((YX) & 3)
-#define TILE_FLIPXY(XY)                 ((((XY) & 2) >> 1) | (((XY) & 1) << 1))
+template <typename T> constexpr u8 TILE_FLIPYX(T yx) { return u8(yx & 3); }
+template <typename T> constexpr u8 TILE_FLIPXY(T xy) { return u8(((xy & 2) >> 1) | ((xy & 1) << 1)); }
 
 
 

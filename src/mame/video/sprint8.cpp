@@ -79,7 +79,7 @@ TILE_GET_INFO_MEMBER(sprint8_state::get_tile_info1)
 
 	}
 
-	SET_TILE_INFO_MEMBER(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
+	tileinfo.set(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 
@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(sprint8_state::get_tile_info2)
 	else
 		color = 17;
 
-	SET_TILE_INFO_MEMBER(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
+	tileinfo.set(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 

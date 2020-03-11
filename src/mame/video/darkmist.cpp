@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_bgtile_info)
 	code+=(attr&3)<<8;
 	pal=(attr>>4) & 0xf;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 		code,
 		pal,
 		0);
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_fgtile_info)
 	code+=(attr&3)<<8;
 	pal=(attr>>4) & 0xf;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 		code,
 		pal,
 		0);
@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
 
 	code+=(attr&1)<<8;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		code,
 		pal & 0xf,
 		0);

@@ -28,7 +28,7 @@ inline void fromance_state::get_fromance_tile_info( tile_data &tileinfo, int til
 				m_local_videoram[layer][0x2000 + tile_index];
 	int color = m_local_videoram[layer][tile_index] & 0x7f;
 
-	SET_TILE_INFO_MEMBER(layer, tile, color, 0);
+	tileinfo.set(layer, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(fromance_state::get_fromance_bg_tile_info){ get_fromance_tile_info(tileinfo, tile_index, 0); }
@@ -41,7 +41,7 @@ inline void fromance_state::get_nekkyoku_tile_info( tile_data &tileinfo, int til
 				m_local_videoram[layer][0x1000 + tile_index];
 	int color = m_local_videoram[layer][tile_index + 0x2000] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(layer, tile, color, 0);
+	tileinfo.set(layer, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(fromance_state::get_nekkyoku_bg_tile_info){ get_nekkyoku_tile_info(tileinfo, tile_index, 0); }

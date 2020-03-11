@@ -52,7 +52,7 @@ TILEMAP_MAPPER_MEMBER(m10_state::tilemap_scan)
 
 TILE_GET_INFO_MEMBER(m10_state::get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], m_colorram[tile_index] & 0x07, 0);
+	tileinfo.set(0, m_videoram[tile_index], m_colorram[tile_index] & 0x07, 0);
 }
 
 

@@ -200,7 +200,7 @@ TILEMAP_MAPPER_MEMBER(decocass_state::bgvideoram_scan_cols )
 TILE_GET_INFO_MEMBER(decocass_state::get_bg_l_tile_info)
 {
 	int color = (m_color_center_bot >> 7) & 1;
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			m_bgvideoram[tile_index] >> 4,
 			color * 4 + 1,
 			0);
@@ -211,7 +211,7 @@ TILE_GET_INFO_MEMBER(decocass_state::get_bg_l_tile_info)
 TILE_GET_INFO_MEMBER(decocass_state::get_bg_r_tile_info )
 {
 	int color = (m_color_center_bot >> 7) & 1;
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			m_bgvideoram[tile_index] >> 4,
 			color * 4 + 1,
 			TILE_FLIPY);
@@ -223,7 +223,7 @@ TILE_GET_INFO_MEMBER(decocass_state::get_fg_tile_info )
 {
 	uint8_t code = m_fgvideoram[tile_index];
 	uint8_t attr = m_colorram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			256 * (attr & 3) + code,
 			BIT(m_color_center_bot, 0),
 			0);

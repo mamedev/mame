@@ -550,7 +550,7 @@ TILE_GET_INFO_MEMBER(pgm_state::get_tx_tile_info)
 	const u32 colour = (m_tx_videoram[tile_index * 2 + 1] & 0x3e) >> 1;
 	const u8  flipyx = (m_tx_videoram[tile_index * 2 + 1] & 0xc0) >> 6;
 
-	SET_TILE_INFO_MEMBER(0,tileno,colour,TILE_FLIPYX(flipyx));
+	tileinfo.set(0,tileno,colour,TILE_FLIPYX(flipyx));
 }
 
 /* BG Layer */
@@ -569,7 +569,7 @@ TILE_GET_INFO_MEMBER(pgm_state::get_bg_tile_info)
 	const u32 colour = (m_bg_videoram[tile_index * 2 + 1] & 0x3e) >> 1;
 	const u8  flipyx = (m_bg_videoram[tile_index * 2 + 1] & 0xc0) >> 6;
 
-	SET_TILE_INFO_MEMBER(1,tileno,colour,TILE_FLIPYX(flipyx));
+	tileinfo.set(1,tileno,colour,TILE_FLIPYX(flipyx));
 }
 
 

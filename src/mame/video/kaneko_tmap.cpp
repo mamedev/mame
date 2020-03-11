@@ -129,7 +129,7 @@ TILE_GET_INFO_MEMBER(kaneko_view2_tilemap_device::get_tile_info)
 	if (!m_view2_cb.isnull())
 		m_view2_cb(Layer, &code);
 
-	SET_TILE_INFO_MEMBER(0, code, (attr >> 2) & 0x3f, TILE_FLIPXY(attr & 3));
+	tileinfo.set(0, code, (attr >> 2) & 0x3f, TILE_FLIPXY(attr & 3));
 	tileinfo.category = (attr >> 8) & 7;
 }
 

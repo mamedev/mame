@@ -1241,7 +1241,7 @@ TILE_GET_INFO_MEMBER(coinmstr_state::get_bg_tile_info)
 
 	tile |= (m_attr_ram3[tile_index + 0x0240] & 0x03) << (6+4);
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 void coinmstr_state::video_start()
