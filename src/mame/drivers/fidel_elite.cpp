@@ -512,7 +512,6 @@ void eag_state::eag2100(machine_config &config)
 	eag(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(6_MHz_XTAL);
 	m_mainmap->set_addrmap(AS_PROGRAM, &eag_state::eag2100_map);
 }
 
@@ -713,11 +712,40 @@ ROM_END
 
 ROM_START( feag2100 )
 	ROM_REGION( 0x10000, "mainmap", 0 )
-	ROM_LOAD("el2100.2",  0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
-	ROM_LOAD("el2100.3",  0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
+	ROM_LOAD("el2100_2.ic5", 0xc000, 0x2000, CRC(76fec42f) SHA1(34660edb8458919fd179e93fdab3fe428a6625d0) )
+	ROM_LOAD("el2100_3.ic4", 0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
 
 	ROM_REGION( 0x8000, "rombank", 0 )
-	ROM_LOAD("el2100.1",  0x0000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
+	ROM_LOAD("el2100_1.ic9", 0x0000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107.ic16", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
+	ROM_RELOAD(                 0x1000, 0x1000)
+	ROMX_LOAD("101-64101.ic16", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
+	ROMX_LOAD("101-64105.ic16", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
+	ROMX_LOAD("101-64106.ic16", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) )
+ROM_END
+
+ROM_START( feag2100a ) // model 6088
+	ROM_REGION( 0x10000, "mainmap", 0 )
+	ROM_LOAD("2100_c_black.ic5",  0xc000, 0x2000, CRC(454eb839) SHA1(83d206464c194b022d43913b5f4092a8201f36b9) )
+	ROM_LOAD("2100_c_green.ic4",  0xe000, 0x2000, CRC(f1f76a63) SHA1(337b4572b743d383c6a12c360875d37682de3647) )
+
+	ROM_REGION( 0x8000, "rombank", 0 )
+	ROM_LOAD("2100_c_orange.ic9", 0x0000, 0x8000, CRC(feeff71c) SHA1(87614ca850848581d946193efa317181ef9c7a09) )
 
 	// speech ROM
 	ROM_DEFAULT_BIOS("en")
@@ -748,13 +776,14 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT  STATE        INIT          COMPANY, FULLNAME, FLAGS
-CONS( 1983, feasbu,   0,      0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1984, feasgla,  feasbu, 0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1984, fepriv,   feasbu, 0, eas_priv, eas,   elite_state, empty_init,   "Fidelity Deutschland", "Elite Private Line (red version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+//    YEAR  NAME       PARENT CMP MACHINE   INPUT  STATE        INIT          COMPANY, FULLNAME, FLAGS
+CONS( 1983, feasbu,    0,      0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, feasgla,   feasbu, 0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, fepriv,    feasbu, 0, eas_priv, eas,   elite_state, empty_init,   "Fidelity Deutschland", "Elite Private Line (red version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 
-CONS( 1982, fpres,    0,      0, pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1983, fpresbu,  fpres,  0, pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1982, fpres,     0,      0, pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1983, fpresbu,   fpres,  0, pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 
-CONS( 1986, feag,     0,      0, eag,      eag,   eag_state,   empty_init,   "Fidelity Electronics", "Elite Avant Garde (model 6081)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1986, feag2100, feag,   0, eag2100,  eag,   eag_state,   init_eag2100, "Fidelity Electronics", "Elite Avant Garde 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1986, feag,      0,      0, eag,      eag,   eag_state,   empty_init,   "Fidelity Electronics", "Elite Avant Garde (model 6081)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1986, feag2100,  feag,   0, eag2100,  eag,   eag_state,   init_eag2100, "Fidelity Electronics", "Elite Avant Garde 2100 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1986, feag2100a, feag,   0, eag2100,  eag,   eag_state,   init_eag2100, "Fidelity Electronics", "Elite Avant Garde 2100 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
