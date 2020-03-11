@@ -132,7 +132,7 @@ void mb90082_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE_LINE_MEMBER( mb90082_device::set_cs_line )
+void mb90082_device::set_cs_line(int state)
 {
 	m_reset_line = state;
 
@@ -143,7 +143,7 @@ WRITE_LINE_MEMBER( mb90082_device::set_cs_line )
 }
 
 
-WRITE8_MEMBER( mb90082_device::write )
+void mb90082_device::write(uint8_t data)
 {
 	uint16_t dat;
 

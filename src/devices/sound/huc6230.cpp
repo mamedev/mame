@@ -52,7 +52,7 @@ WRITE8_MEMBER( huc6230_device::write )
 	m_stream->update();
 	if (offset < 0x10)
 	{
-		m_psg->c6280_w(space, offset, data, mem_mask);
+		m_psg->c6280_w(offset, data);
 	}
 	else if (offset < 0x11)
 	{

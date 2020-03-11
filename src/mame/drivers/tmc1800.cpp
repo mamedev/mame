@@ -286,7 +286,7 @@ WRITE8_MEMBER( tmc2000_state::bankswitch_w )
 	m_rac = BIT(data, 0);
 	bankswitch();
 
-	m_cti->tone_latch_w(space, 0, data);
+	m_cti->tone_latch_w(data);
 }
 
 WRITE8_MEMBER( nano_state::bankswitch_w )
@@ -297,7 +297,7 @@ WRITE8_MEMBER( nano_state::bankswitch_w )
 	program.install_ram(0x0000, 0x0fff, 0x7000, ram);
 
 	/* write to CDP1864 tone latch */
-	m_cti->tone_latch_w(space, 0, data);
+	m_cti->tone_latch_w(data);
 }
 
 READ8_MEMBER( tmc1800_state::dispon_r )
@@ -629,7 +629,7 @@ WRITE8_MEMBER( tmc2000_state::dma_w )
 	m_color = ~(m_colorram[offset & 0x1ff]) & 0x07;
 
 	m_cti->con_w(0); // HACK
-	m_cti->dma_w(space, offset, data);
+	m_cti->dma_w(data);
 }
 
 // OSCOM Nano

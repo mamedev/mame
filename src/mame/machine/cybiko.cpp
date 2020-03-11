@@ -88,15 +88,15 @@ void cybiko_state::machine_reset()
 READ16_MEMBER( cybiko_state::cybiko_lcd_r )
 {
 	uint16_t data = 0;
-	if (ACCESSING_BITS_8_15) data |= (m_crtc->reg_idx_r(space, offset) << 8);
-	if (ACCESSING_BITS_0_7) data |= (m_crtc->reg_dat_r(space, offset) << 0);
+	if (ACCESSING_BITS_8_15) data |= (m_crtc->reg_idx_r() << 8);
+	if (ACCESSING_BITS_0_7) data |= (m_crtc->reg_dat_r() << 0);
 	return data;
 }
 
 WRITE16_MEMBER( cybiko_state::cybiko_lcd_w )
 {
-	if (ACCESSING_BITS_8_15) m_crtc->reg_idx_w(space, offset, (data >> 8) & 0xff);
-	if (ACCESSING_BITS_0_7) m_crtc->reg_dat_w(space, offset, (data >> 0) & 0xff);
+	if (ACCESSING_BITS_8_15) m_crtc->reg_idx_w((data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7) m_crtc->reg_dat_w((data >> 0) & 0xff);
 }
 
 int cybiko_state::cybiko_key_r( offs_t offset, int mem_mask)

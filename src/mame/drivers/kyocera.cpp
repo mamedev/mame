@@ -534,21 +534,18 @@ void tandy200_state::stbk_w(uint8_t data)
 
 uint8_t kc85_state::lcd_r(offs_t offset)
 {
-	address_space &space = machine().dummy_space();
 	uint8_t data = 0;
 
 	for (uint8_t i = 0; i < 10; i++)
-		data |= m_lcdc[i]->read(space, offset);
+		data |= m_lcdc[i]->read(offset);
 
 	return data;
 }
 
 void kc85_state::lcd_w(offs_t offset, uint8_t data)
 {
-	address_space &space = machine().dummy_space();
-
 	for (uint8_t i = 0; i < 10; i++)
-		m_lcdc[i]->write(space, offset, data);
+		m_lcdc[i]->write(offset, data);
 }
 
 /* Memory Maps */

@@ -34,10 +34,10 @@ public:
 	void set_palette_mode(vtxx_pal_mode pmode) { m_pal_mode = pmode; }
 	void set_201x_descramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5);
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
-	virtual DECLARE_READ8_MEMBER(palette_read) override;
-	virtual DECLARE_WRITE8_MEMBER(palette_write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+	virtual uint8_t palette_read(offs_t offset) override;
+	virtual void palette_write(offs_t offset, uint8_t data) override;
 
 	virtual uint32_t palette_entries() const override { return 256; }
 	virtual uint32_t palette_indirect_entries() const override { return 4*16*8; }

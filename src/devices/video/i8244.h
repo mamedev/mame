@@ -35,10 +35,10 @@ public:
 	auto irq_cb() { return m_irq_func.bind(); }
 	auto postprocess_cb() { return m_postprocess_func.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ_LINE_MEMBER(vblank);
-	DECLARE_READ_LINE_MEMBER(hblank);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	int vblank();
+	int hblank();
 	void i8244_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

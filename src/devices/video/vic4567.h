@@ -121,9 +121,9 @@ public:
 	auto lightpen_y_callback() { return m_lightpen_y_cb.bind(); }
 	auto c64_mem_r_callback() { return m_c64_mem_r_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_READ8_MEMBER(port_r);
+	void port_w(offs_t offset, uint8_t data);
+	void palette_w(offs_t offset, uint8_t data);
+	uint8_t port_r(offs_t offset);
 
 	void raster_interrupt_gen();
 	uint32_t video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);

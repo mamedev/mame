@@ -86,10 +86,10 @@ READ8_MEMBER( tandy2k_state::videoram_r )
 	uint16_t data = program.read_word(addr);
 
 	// character
-	m_drb0->write(space, 0, data & 0xff);
+	m_drb0->write(data & 0xff);
 
 	// attributes
-	m_drb1->write(space, 0, data >> 8);
+	m_drb1->write(data >> 8);
 
 	return data & 0xff;
 }
