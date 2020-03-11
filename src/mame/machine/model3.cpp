@@ -294,12 +294,12 @@ READ32_MEMBER(model3_state::rtc72421_r)
 {
 	int reg = offset;
 	uint32_t data;
-	data = m_rtc->read(space, reg) << 24;
+	data = m_rtc->read(reg) << 24;
 	data |= 0x30000;    /* these bits are set to pass the battery voltage test */
 	return data;
 }
 
 WRITE32_MEMBER(model3_state::rtc72421_w)
 {
-	m_rtc->write(space, offset, data >> 24);
+	m_rtc->write(offset, data >> 24);
 }

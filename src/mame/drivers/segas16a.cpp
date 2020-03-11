@@ -747,7 +747,7 @@ READ16_MEMBER( segas16a_state::aceattaca_custom_io_r )
 
 		case 0x3000/2:
 			if (BIT(offset, 4))
-				return m_cxdio->read(space, offset & 0x0f);
+				return m_cxdio->read(offset & 0x0f);
 			break;
 	}
 	return standard_io_r(space, offset, mem_mask);
@@ -760,7 +760,7 @@ WRITE16_MEMBER( segas16a_state::aceattaca_custom_io_w )
 		case 0x3000/2:
 			if (BIT(offset, 4))
 			{
-				m_cxdio->write(space, offset & 0x0f, data);
+				m_cxdio->write(offset & 0x0f, data);
 				return;
 			}
 			break;
