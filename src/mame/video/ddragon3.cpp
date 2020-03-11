@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(ddragon3_state::get_bg_tile_info)
 	int code = (attr & 0x0fff) | ((m_bg_tilebase & 0x01) << 12);
 	int color = ((attr & 0xf000) >> 12);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -76,7 +76,7 @@ TILE_GET_INFO_MEMBER(ddragon3_state::get_fg_tile_info)
 	tilebase =  &m_fg_videoram[tile_index*2];
 	tileno =  (tilebase[1] & 0x1fff);
 	colbank = (tilebase[0] & 0x000f);
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tileno,
 			colbank,
 			TILE_FLIPYX((tilebase[0] & 0x00c0) >> 6));
@@ -104,7 +104,7 @@ TILE_GET_INFO_MEMBER(wwfwfest_state::get_fg0_tile_info)
 	tilebase =  &m_fg0_videoram[tile_index*2];
 	tileno =  (tilebase[0] & 0x00ff) | ((tilebase[1] & 0x000f) << 8);
 	colbank = (tilebase[1] & 0x00f0) >> 4;
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			tileno,
 			colbank,
 			0);

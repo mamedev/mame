@@ -318,8 +318,8 @@ void segahang_state::sharrier_i8751_sim()
 	// signal a VBLANK to the main CPU
 	m_maincpu->set_input_line(4, HOLD_LINE);
 
-	// clear add lifes protection flag
-	m_workram[0x0f0/2] = 0;
+	// disable timer-based protection
+	m_workram[0x090/2] = 1;
 
 	// read I/O ports
 	m_workram[0x492/2] = (m_adc_ports[0]->read() << 8) | m_adc_ports[1]->read();

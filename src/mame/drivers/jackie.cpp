@@ -134,7 +134,7 @@ TILE_GET_INFO_MEMBER(jackie_state::get_fg_tile_info)
 {
 	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
 	int tile = code & 0x1fff;
-	SET_TILE_INFO_MEMBER(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
+	tileinfo.set(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
 WRITE8_MEMBER(jackie_state::fg_tile_w)
@@ -160,7 +160,7 @@ template<uint8_t Which>
 TILE_GET_INFO_MEMBER(jackie_state::get_reel_tile_info)
 {
 	int code = m_reel_ram[Which][tile_index];
-	SET_TILE_INFO_MEMBER(1, code, 0, 0);
+	tileinfo.set(1, code, 0, 0);
 }
 
 void jackie_state::video_start()

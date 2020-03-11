@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(quizdna_state::get_bg_tile_info)
 	if (code>0x7fff)
 		code &= 0x83ff;
 
-	SET_TILE_INFO_MEMBER(1, code, col, 0);
+	tileinfo.set(1, code, col, 0);
 }
 
 TILE_GET_INFO_MEMBER(quizdna_state::get_fg_tile_info)
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(quizdna_state::get_fg_tile_info)
 	col >>= 5;
 	col = (col & 3) | ((col & 4) << 1);
 
-	SET_TILE_INFO_MEMBER(0, code, col, 0);
+	tileinfo.set(0, code, col, 0);
 }
 
 

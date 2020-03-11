@@ -14,7 +14,7 @@ TILE_GET_INFO_MEMBER(wgp_state::get_piv_tile_info)
 	const u16 tilenum = m_pivram[tile_index + Offset];    /* 3 blocks of $2000 */
 	const u16 attr = m_pivram[tile_index + Offset + 0x8000];  /* 3 blocks of $2000 */
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tilenum & 0x3fff,
 			(attr & 0x3f),  /* attr & 0x1 ?? */
 			TILE_FLIPYX((attr & 0xc0) >> 6));

@@ -111,7 +111,7 @@ TILE_GET_INFO_MEMBER(hyperspt_state::get_bg_tile_info)
 	int color = m_colorram[tile_index] & 0x0f;
 	int flags = ((m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) | ((m_colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 void hyperspt_state::video_start()
@@ -181,7 +181,7 @@ TILE_GET_INFO_MEMBER(hyperspt_state::roadf_get_bg_tile_info)
 	int color = m_colorram[tile_index] & 0x0f;
 	int flags = (m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 VIDEO_START_MEMBER(hyperspt_state,roadf)

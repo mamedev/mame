@@ -152,7 +152,7 @@ offs_t romp_disassembler::disassemble(std::ostream &stream, offs_t pc, data_buff
 		case 0x9f: util::stream_format(stream, "mttbi  %s,%d", gpr[R2], R3 + 16); break; // move to test bit immediate lower half
 
 		case 0xa0: util::stream_format(stream, "sari   %s,%d", gpr[R2], R3); break; // shift algebraic right immediate
-		case 0xa1: util::stream_format(stream, "sari   %s,%d", gpr[R2] + 16, R3); break; // shift algebraic right immediate plus sixteen
+		case 0xa1: util::stream_format(stream, "sari   %s,%d", gpr[R2], R3 + 16); break; // shift algebraic right immediate plus sixteen
 		// a2, a3
 		case 0xa4: util::stream_format(stream, "lis    %s,%d", gpr[R2], R3); break; // load immediate short
 		// a5, a6, a7

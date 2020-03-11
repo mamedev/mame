@@ -238,7 +238,7 @@ TILE_GET_INFO_MEMBER(gp9001vdp_device::get_tile_info)
 	}
 
 	const u32 color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			color,
 			0);

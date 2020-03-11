@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(xxmissio_state::get_bg_tile_info)
 	int code = ((m_bgram[0x400 | tile_index] & 0xc0) << 2) | m_bgram[0x000 | tile_index];
 	int color =  m_bgram[0x400 | tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	tileinfo.set(2, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(xxmissio_state::get_fg_tile_info)
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(xxmissio_state::get_fg_tile_info)
 	int code = m_fgram[0x000 | tile_index];
 	int color = m_fgram[0x400 | tile_index] & 0x07;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void xxmissio_state::video_start()

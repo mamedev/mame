@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(microtan_state::get_bg_tile_info)
 	int gfxn = m_chunky_buffer[tile_index];
 	int code = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(gfxn, code, 0, 0);
+	tileinfo.set(gfxn, code, 0, 0);
 }
 
 void microtan_state::video_start()

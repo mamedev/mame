@@ -88,7 +88,7 @@ private:
 TILE_GET_INFO_MEMBER(koftball_state::get_t1_tile_info)
 {
 	int data = m_bmc_1_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			data,
 			0,
 			0);
@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(koftball_state::get_t1_tile_info)
 TILE_GET_INFO_MEMBER(koftball_state::get_t2_tile_info)
 {
 	int data = m_bmc_2_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			data,
 			0,
 			0);

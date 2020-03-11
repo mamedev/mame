@@ -150,7 +150,7 @@ TILE_GET_INFO_MEMBER(wyvernf0_state::get_bg_tile_info)
 	int code = m_bgram[offs] + (m_bgram[offs+1] << 8);
 	int color = 0 + ((code & 0x3000) >> 12);
 
-	SET_TILE_INFO_MEMBER(1, code, color, TILE_FLIPXY(code >> 14));
+	tileinfo.set(1, code, color, TILE_FLIPXY(code >> 14));
 }
 TILE_GET_INFO_MEMBER(wyvernf0_state::get_fg_tile_info)
 {
@@ -158,7 +158,7 @@ TILE_GET_INFO_MEMBER(wyvernf0_state::get_fg_tile_info)
 	int code = m_fgram[offs] + (m_fgram[offs+1] << 8);
 	int color = 8 + ((code & 0x3000) >> 12);
 
-	SET_TILE_INFO_MEMBER(1, code, color, TILE_FLIPXY(code >> 14));
+	tileinfo.set(1, code, color, TILE_FLIPXY(code >> 14));
 }
 
 void wyvernf0_state::video_start()

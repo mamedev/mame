@@ -15,7 +15,7 @@
 TILE_GET_INFO_MEMBER(tail2nos_state::get_tile_info)
 {
 	uint16_t code = m_txvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code & 0x1fff) + (m_txbank << 13),
 			((code & 0xe000) >> 13) + m_txpalette * 16,
 			0);

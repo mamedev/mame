@@ -17,7 +17,7 @@
 TILE_GET_INFO_MEMBER(msisaac_state::get_fg_tile_info)
 {
 	int tile_number = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			0x10,
 			0);
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(msisaac_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(msisaac_state::get_bg_tile_info)
 {
 	int tile_number = m_videoram2[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			0x100 + tile_number,
 			0x30,
 			0);
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(msisaac_state::get_bg2_tile_info)
 	/* graphics 0 or 1 */
 	int gfx_b = (m_bg2_textbank >> 3) & 1;
 
-	SET_TILE_INFO_MEMBER(gfx_b,
+	tileinfo.set(gfx_b,
 			tile_number,
 			0x20,
 			0);

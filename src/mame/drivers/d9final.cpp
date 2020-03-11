@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(d9final_state::get_sc0_tile_info)
 	int tile = ((m_hi_vram[tile_index] & 0x3f)<<8) | m_lo_vram[tile_index];
 	int color = m_cram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);

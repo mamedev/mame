@@ -182,7 +182,7 @@ TILE_GET_INFO_MEMBER(system1_state::tile_get_info)
 	u32 code = ((tiledata >> 4) & 0x800) | (tiledata & 0x7ff);
 	u32 color = (tiledata >> 5) & 0xff;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 

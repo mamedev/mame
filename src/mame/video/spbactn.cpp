@@ -16,7 +16,7 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_bg_tile_info)
 {
 	int attr = m_bgvideoram[tile_index];
 	int tileno = m_bgvideoram[tile_index+0x2000];
-	SET_TILE_INFO_MEMBER(1, tileno, ((attr & 0x00f0)>>4), 0);
+	tileinfo.set(1, tileno, ((attr & 0x00f0)>>4), 0);
 }
 
 
@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_fg_tile_info)
 	if (attr & 0x0008)
 		color += 0x0010;
 
-	SET_TILE_INFO_MEMBER(0, tileno, color, 0);
+	tileinfo.set(0, tileno, color, 0);
 }
 
 
@@ -107,7 +107,7 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_extra_tile_info)
 {
 	int tileno = m_extraram[(tile_index*2)+1];
 	tileno |= m_extraram[(tile_index*2)] << 8;
-	SET_TILE_INFO_MEMBER(3, tileno, 0, 0);
+	tileinfo.set(3, tileno, 0, 0);
 }
 
 

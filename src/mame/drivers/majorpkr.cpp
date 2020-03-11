@@ -538,7 +538,7 @@ TILE_GET_INFO_MEMBER(majorpkr_state::bg_get_tile_info)
 {
 	int code = m_bg_vram[2 * tile_index] + (m_bg_vram[2 * tile_index + 1] << 8);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code & 0x1fff),
 			code >> 13,
 			0);
@@ -548,7 +548,7 @@ TILE_GET_INFO_MEMBER(majorpkr_state::fg_get_tile_info)
 {
 	int code = m_fg_vram[2 * tile_index] + (m_fg_vram[2 * tile_index + 1] << 8);
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			(code & 0x07ff),
 			code >> 13,
 			(code & (1 << 12)) ? (TILE_FLIPX|TILE_FLIPY) : 0);

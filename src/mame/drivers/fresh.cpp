@@ -116,7 +116,7 @@ TILE_GET_INFO_MEMBER(fresh_state::get_fresh_bg_tile_info)
 	int tileno, pal;
 	tileno = m_bg_videoram[tile_index];
 	pal = m_attr_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(1, tileno, pal, 0);
+	tileinfo.set(1, tileno, pal, 0);
 }
 
 
@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(fresh_state::get_fresh_bg_2_tile_info)
 	int tileno, pal;
 	tileno = m_bg_2_videoram[tile_index];
 	pal = m_attr_2_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, tileno, pal, 0);
+	tileinfo.set(0, tileno, pal, 0);
 }
 
 

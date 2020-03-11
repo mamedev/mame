@@ -4652,13 +4652,16 @@ ROM_START( sci )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
 	ROM_LOAD( "c09-16.17", 0x00000, 0x10000, CRC(7245a6f6) SHA1(5bdde4e3bcde8c59dc84478c3cc079d7ef8ee9c5) )
+	ROM_LOAD( "c09-17.24", 0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) ) // same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-18.25", 0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) ) // same data also found on Racing Beat, Double Axle & Battle Shark
 	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // road/sprite priority and palette select
 	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // road A/B internal priority
-//  ROM_LOAD( "c09-21.2",  0x00000, 0x00???, NO_DUMP ) /* pals (Guru dump) */
-//  ROM_LOAD( "c09-22.3",  0x00000, 0x00???, NO_DUMP )
-//  ROM_LOAD( "c09-24.22", 0x00000, 0x00???, NO_DUMP )
-//  ROM_LOAD( "c09-25.25", 0x00000, 0x00???, NO_DUMP )
-//  ROM_LOAD( "c09-26.26", 0x00000, 0x00???, NO_DUMP )
+	ROM_LOAD( "c09-19_pal16l8b.ic67", 0x00000, 0x00104, CRC(a0608442) SHA1(bcda5ef6582e82b2b369c24474bb14bd29e5d537) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-21_pal20l8b.ic2",  0x00000, 0x00144, CRC(583f9214) SHA1(1a5f3e9619bf6ba95f92ce9d12917014db8853a1) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-22_pal16l8b.ic3",  0x00000, 0x00104, CRC(b506d7a7) SHA1(603eb14d2703b94ae80894daa7f9f25890b7918c) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-24_pal20l8b.ic22", 0x00000, 0x00144, CRC(2ff83694) SHA1(c6594b1cfd3958d9b4ddb8d68d506929cfa0a759) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-25_pal20l8b.ic25", 0x00000, 0x00144, CRC(c69bf3fc) SHA1(83f1cc9f475aed47e969b77059f3332ef5068981) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-26_pal16l8b.ic26", 0x00000, 0x00104, CRC(36a8eb27) SHA1(8ec25c860e6568a3d1a7e7a8ed6a6397f135455c) ) // MMI PAL16L8B
 ROM_END
 
 ROM_START( scia )
@@ -4700,8 +4703,16 @@ ROM_START( scia )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
 	ROM_LOAD( "c09-16.17", 0x00000, 0x10000, CRC(7245a6f6) SHA1(5bdde4e3bcde8c59dc84478c3cc079d7ef8ee9c5) )
-	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // road/sprite priority and palette select
-	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // road A/B internal priority
+	ROM_LOAD( "c09-17.24", 0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) ) // AMD AM27S33 BPROM - same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-18.25", 0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) ) // AMD AM27S33 BPROM - same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // AMD AM27S21 BPROM - road/sprite priority and palette select
+	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // AMD AM27S21 BPROM - road A/B internal priority
+	ROM_LOAD( "c09-19_pal16l8b.ic67", 0x00000, 0x00104, CRC(a0608442) SHA1(bcda5ef6582e82b2b369c24474bb14bd29e5d537) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-21_pal20l8b.ic2",  0x00000, 0x00144, CRC(583f9214) SHA1(1a5f3e9619bf6ba95f92ce9d12917014db8853a1) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-22_pal16l8b.ic3",  0x00000, 0x00104, CRC(b506d7a7) SHA1(603eb14d2703b94ae80894daa7f9f25890b7918c) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-24_pal20l8b.ic22", 0x00000, 0x00144, CRC(2ff83694) SHA1(c6594b1cfd3958d9b4ddb8d68d506929cfa0a759) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-25_pal20l8b.ic25", 0x00000, 0x00144, CRC(c69bf3fc) SHA1(83f1cc9f475aed47e969b77059f3332ef5068981) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-26_pal16l8b.ic26", 0x00000, 0x00104, CRC(36a8eb27) SHA1(8ec25c860e6568a3d1a7e7a8ed6a6397f135455c) ) // MMI PAL16L8B
 ROM_END
 
 ROM_START( scij )
@@ -4743,8 +4754,16 @@ ROM_START( scij )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
 	ROM_LOAD( "c09-16.17", 0x00000, 0x10000, CRC(7245a6f6) SHA1(5bdde4e3bcde8c59dc84478c3cc079d7ef8ee9c5) )
-	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // road/sprite priority and palette select
-	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // road A/B internal priority
+	ROM_LOAD( "c09-17.24", 0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) ) // AMD AM27S33 BPROM - same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-18.25", 0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) ) // AMD AM27S33 BPROM - same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // AMD AM27S21 BPROM - road/sprite priority and palette select
+	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // AMD AM27S21 BPROM - road A/B internal priority
+	ROM_LOAD( "c09-19_pal16l8b.ic67", 0x00000, 0x00104, CRC(a0608442) SHA1(bcda5ef6582e82b2b369c24474bb14bd29e5d537) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-21_pal20l8b.ic2",  0x00000, 0x00144, CRC(583f9214) SHA1(1a5f3e9619bf6ba95f92ce9d12917014db8853a1) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-22_pal16l8b.ic3",  0x00000, 0x00104, CRC(b506d7a7) SHA1(603eb14d2703b94ae80894daa7f9f25890b7918c) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-24_pal20l8b.ic22", 0x00000, 0x00144, CRC(2ff83694) SHA1(c6594b1cfd3958d9b4ddb8d68d506929cfa0a759) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-25_pal20l8b.ic25", 0x00000, 0x00144, CRC(c69bf3fc) SHA1(83f1cc9f475aed47e969b77059f3332ef5068981) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-26_pal16l8b.ic26", 0x00000, 0x00104, CRC(36a8eb27) SHA1(8ec25c860e6568a3d1a7e7a8ed6a6397f135455c) ) // MMI PAL16L8B
 ROM_END
 
 ROM_START( sciu )
@@ -4786,8 +4805,16 @@ ROM_START( sciu )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
 	ROM_LOAD( "c09-16.17", 0x00000, 0x10000, CRC(7245a6f6) SHA1(5bdde4e3bcde8c59dc84478c3cc079d7ef8ee9c5) )
-	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // road/sprite priority and palette select
-	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // road A/B internal priority
+	ROM_LOAD( "c09-17.24", 0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) ) // AMD AM27S33 BPROM - same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-18.25", 0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) ) // AMD AM27S33 BPROM - same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // AMD AM27S21 BPROM - road/sprite priority and palette select
+	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // AMD AM27S21 BPROM - road A/B internal priority
+	ROM_LOAD( "c09-19_pal16l8b.ic67", 0x00000, 0x00104, CRC(a0608442) SHA1(bcda5ef6582e82b2b369c24474bb14bd29e5d537) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-21_pal20l8b.ic2",  0x00000, 0x00144, CRC(583f9214) SHA1(1a5f3e9619bf6ba95f92ce9d12917014db8853a1) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-22_pal16l8b.ic3",  0x00000, 0x00104, CRC(b506d7a7) SHA1(603eb14d2703b94ae80894daa7f9f25890b7918c) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-24_pal20l8b.ic22", 0x00000, 0x00144, CRC(2ff83694) SHA1(c6594b1cfd3958d9b4ddb8d68d506929cfa0a759) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-25_pal20l8b.ic25", 0x00000, 0x00144, CRC(c69bf3fc) SHA1(83f1cc9f475aed47e969b77059f3332ef5068981) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-26_pal16l8b.ic26", 0x00000, 0x00104, CRC(36a8eb27) SHA1(8ec25c860e6568a3d1a7e7a8ed6a6397f135455c) ) // MMI PAL16L8B
 ROM_END
 
 ROM_START( scin )
@@ -4829,8 +4856,16 @@ ROM_START( scin )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
 	ROM_LOAD( "c09-16.17", 0x00000, 0x10000, CRC(7245a6f6) SHA1(5bdde4e3bcde8c59dc84478c3cc079d7ef8ee9c5) )
-	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // road/sprite priority and palette select
-	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // road A/B internal priority
+	ROM_LOAD( "c09-17.24", 0x00000, 0x00400, CRC(10728853) SHA1(45d7cc8e06fbe01295cc2194bca9586f0ef8b12b) ) // AMD AM27S33 BPROM - same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-18.25", 0x00000, 0x00400, CRC(643e8bfc) SHA1(a6e6086fb8fbd102e01ec72fe60a4232f5909565) ) // AMD AM27S33 BPROM - same data also found on Racing Beat, Double Axle & Battle Shark
+	ROM_LOAD( "c09-20.71", 0x00000, 0x00100, CRC(cd8ffd80) SHA1(133bcd291a3751bce5293cb6b685f87258e8db19) ) // AMD AM27S21 BPROM - road/sprite priority and palette select
+	ROM_LOAD( "c09-23.14", 0x00000, 0x00100, CRC(fbf81f30) SHA1(c868452c334792345dcced075f6df69cff9e31ca) ) // AMD AM27S21 BPROM - road A/B internal priority
+	ROM_LOAD( "c09-19_pal16l8b.ic67", 0x00000, 0x00104, CRC(a0608442) SHA1(bcda5ef6582e82b2b369c24474bb14bd29e5d537) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-21_pal20l8b.ic2",  0x00000, 0x00144, CRC(583f9214) SHA1(1a5f3e9619bf6ba95f92ce9d12917014db8853a1) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-22_pal16l8b.ic3",  0x00000, 0x00104, CRC(b506d7a7) SHA1(603eb14d2703b94ae80894daa7f9f25890b7918c) ) // MMI PAL16L8B
+	ROM_LOAD( "c09-24_pal20l8b.ic22", 0x00000, 0x00144, CRC(2ff83694) SHA1(c6594b1cfd3958d9b4ddb8d68d506929cfa0a759) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-25_pal20l8b.ic25", 0x00000, 0x00144, CRC(c69bf3fc) SHA1(83f1cc9f475aed47e969b77059f3332ef5068981) ) // MMI PAL20L8B
+	ROM_LOAD( "c09-26_pal16l8b.ic26", 0x00000, 0x00104, CRC(36a8eb27) SHA1(8ec25c860e6568a3d1a7e7a8ed6a6397f135455c) ) // MMI PAL16L8B
 
 ROM_END
 

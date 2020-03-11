@@ -162,7 +162,7 @@ TILE_GET_INFO_MEMBER(blackt96_state::get_tx_tile_info)
 	uint8_t color = m_tilemapram[tile_index*2+1] & 0x0f;
 	tile += m_txt_bank * 0x100;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			color,
 			0);

@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(equites_state::equites_fg_info)
 	int tile = m_fg_videoram[2 * tile_index];
 	int color = m_fg_videoram[2 * tile_index + 1] & 0x1f;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 	if (color & 0x10)
 		tileinfo.flags |= TILE_FORCE_LAYER0;
 }
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(splndrbt_state::splndrbt_fg_info)
 	int tile = m_fg_videoram[2 * tile_index] + (m_fg_char_bank << 8);
 	int color = m_fg_videoram[2 * tile_index + 1] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 	if (color & 0x10)
 		tileinfo.flags |= TILE_FORCE_LAYER0;
 }
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(equites_state::equites_bg_info)
 	int color = (data & 0xf000) >> 12;
 	int fxy = (data & 0x0600) >> 9;
 
-	SET_TILE_INFO_MEMBER(1, tile, color, TILE_FLIPXY(fxy));
+	tileinfo.set(1, tile, color, TILE_FLIPXY(fxy));
 }
 
 TILE_GET_INFO_MEMBER(splndrbt_state::splndrbt_bg_info)
@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(splndrbt_state::splndrbt_bg_info)
 	int color = (data & 0xf800) >> 11;
 	int fxy = (data & 0x0600) >> 9;
 
-	SET_TILE_INFO_MEMBER(1, tile, color, TILE_FLIPXY(fxy));
+	tileinfo.set(1, tile, color, TILE_FLIPXY(fxy));
 	tileinfo.group = color;
 }
 

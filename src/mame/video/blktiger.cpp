@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(blktiger_state::get_bg_tile_info)
 	};
 	uint8_t attr = m_scroll_ram[2 * tile_index + 1];
 	int color = (attr & 0x78) >> 3;
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_scroll_ram[2 * tile_index] + ((attr & 0x07) << 8),
 			color,
 			(attr & 0x80) ? TILE_FLIPX : 0);
@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(blktiger_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(blktiger_state::get_tx_tile_info)
 {
 	uint8_t attr = m_txvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_txvideoram[tile_index] + ((attr & 0xe0) << 3),
 			attr & 0x1f,
 			0);

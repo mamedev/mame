@@ -77,7 +77,7 @@ template<int Layer>
 TILE_GET_INFO_MEMBER(psikyo_state::get_tile_info)
 {
 	u16 code = ((u16 *)m_vram[Layer].target())[BYTE_XOR_BE(tile_index)];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			(code & 0x1fff) + 0x2000 * m_tilemap_bank[Layer],
 			((code >> 13) & 7) + (Layer * 0x40),
 			0);

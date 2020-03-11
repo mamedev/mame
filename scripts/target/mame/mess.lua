@@ -1185,6 +1185,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"intv",
 		"isc",
 		"jazz",
+		"kawai",
 		"kaypro",
 		"koei",
 		"kontron",
@@ -2605,6 +2606,13 @@ files {
 	MAME_DIR .. "src/mame/machine/mct_adr.h",
 }
 
+createMESSProjects(_target, _subtarget, "kawai")
+files {
+	MAME_DIR .. "src/mame/drivers/kawai_k1.cpp",
+	MAME_DIR .. "src/mame/drivers/kawai_k4.cpp",
+	MAME_DIR .. "src/mame/drivers/kawai_k5.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "kaypro")
 files {
 	MAME_DIR .. "src/mame/drivers/kaypro.cpp",
@@ -3230,8 +3238,8 @@ files {
 createMESSProjects(_target, _subtarget, "roland")
 files {
 	MAME_DIR .. "src/mame/drivers/roland_cm32p.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_d10.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_d50.cpp",
-	MAME_DIR .. "src/mame/drivers/roland_d110.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_mt32.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_r8.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_sc55.cpp",

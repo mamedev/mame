@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    hashfile.c
+    hashfile.cpp
 
     Code for parsing hash info (*.hsi) files
 
@@ -10,11 +10,15 @@
 
 #include "emu.h"
 #include "hashfile.h"
-#include "pool.h"
-#include "emuopts.h"
-#include "hash.h"
+
 #include "drivenum.h"
+#include "emuopts.h"
+
+#include "hash.h"
+#include "pool.h"
+
 #include <pugixml.hpp>
+
 
 /*-------------------------------------------------
     hashfile_lookup
@@ -24,7 +28,7 @@ static bool read_hash_config(const char *hash_path, const util::hash_collection 
 {
 	/* open a file */
 	emu_file file(hash_path, OPEN_FLAG_READ);
-	if (file.open(sysname, ".hsi") != osd_file::error::NONE)
+	if (file.open(std::string(sysname) + ".hsi") != osd_file::error::NONE)
 	{
 		return false;
 	}

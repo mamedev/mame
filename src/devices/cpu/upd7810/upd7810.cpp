@@ -425,6 +425,11 @@ upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, 
 	, m_pf_out_cb(*this)
 	, m_pt_in_cb(*this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map)
+	, m_pa_pullups(0xff)
+	, m_pb_pullups(0xff)
+	, m_pc_pullups(0xff)
+	, m_pd_pullups(0xff)
+	, m_pf_pullups(0xff)
 {
 }
 
@@ -659,20 +664,17 @@ void upd7810_device::WP(offs_t port, uint8_t data)
 	{
 	case UPD7810_PORTA:
 		m_pa_out = data;
-//      data = (data & ~m_ma) | (m_pa_in & m_ma);
-		data = (data & ~m_ma) | (m_ma); // NS20031401
+		data = (data & ~m_ma) | (m_pa_pullups & m_ma);
 		m_pa_out_cb(data);
 		break;
 	case UPD7810_PORTB:
 		m_pb_out = data;
-//      data = (data & ~m_mb) | (m_pb_in & m_mb);
-		data = (data & ~m_mb) | (m_mb); // NS20031401
+		data = (data & ~m_mb) | (m_pb_pullups & m_mb);
 		m_pb_out_cb(data);
 		break;
 	case UPD7810_PORTC:
 		m_pc_out = data;
-//      data = (data & ~m_mc) | (m_pc_in & m_mc);
-		data = (data & ~m_mc) | (m_mc); // NS20031401
+		data = (data & ~m_mc) | (m_pc_pullups & m_mc);
 		if (m_mcc & 0x01)   /* PC0 = TxD output */
 			data = (data & ~0x01) | (m_txd & 1 ? 0x01 : 0x00);
 		if (m_mcc & 0x02)   /* PC1 = RxD input */
@@ -696,7 +698,7 @@ void upd7810_device::WP(offs_t port, uint8_t data)
 		switch (m_mm & 0x07)
 		{
 		case 0x00:          /* PD input mode, PF port mode */
-			data = m_pd_in;
+			data = m_pd_pullups;
 			break;
 		case 0x01:          /* PD output mode, PF port mode */
 			data = m_pd_out;
@@ -708,7 +710,7 @@ void upd7810_device::WP(offs_t port, uint8_t data)
 		break;
 	case UPD7810_PORTF:
 		m_pf_out = data;
-		data = (data & ~m_mf) | (m_pf_in & m_mf);
+		data = (data & ~m_mf) | (m_pf_pullups & m_mf);
 		switch (m_mm & 0x06)
 		{
 		case 0x00:          /* PD input/output mode, PF port mode */

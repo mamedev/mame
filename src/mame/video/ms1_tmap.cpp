@@ -228,7 +228,7 @@ TILE_GET_INFO_MEMBER(megasys1_tilemap_device::get_scroll_tile_info_8x8)
 {
 	uint16_t code = m_scrollram[tile_index];
 	uint16_t tile = ((code & 0xfff) + m_tile_bank) * m_8x8_scroll_factor;
-	SET_TILE_INFO_MEMBER(0, tile, code >> (16 - m_bits_per_color_code), 0);
+	tileinfo.set(0, tile, code >> (16 - m_bits_per_color_code), 0);
 }
 
 TILE_GET_INFO_MEMBER(megasys1_tilemap_device::get_scroll_tile_info_16x16)
@@ -237,7 +237,7 @@ TILE_GET_INFO_MEMBER(megasys1_tilemap_device::get_scroll_tile_info_16x16)
 	uint16_t tile = ((code & 0xfff) + m_tile_bank) * m_16x16_scroll_factor;
 	tile+= tile_index & 3;
 
-	SET_TILE_INFO_MEMBER(0, tile, code >> (16 - m_bits_per_color_code), 0);
+	tileinfo.set(0, tile, code >> (16 - m_bits_per_color_code), 0);
 }
 
 READ16_MEMBER(megasys1_tilemap_device::scroll_r)

@@ -143,7 +143,7 @@ TILE_GET_INFO_MEMBER(seabattl_state::get_bg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1, code, (color & 0x7), 0);
+	tileinfo.set(1, code, (color & 0x7), 0);
 }
 
 WRITE8_MEMBER(seabattl_state::seabattl_videoram_w)

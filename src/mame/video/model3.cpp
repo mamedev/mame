@@ -221,7 +221,7 @@ do { \
 	uint16_t t = BYTE_REVERSE16(tiles[(tile_index & 3) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0)]); \
 	int tile = ((t << 1) & 0x7ffe) | ((t >> 15) & 0x1); \
 	int color = (t & 0x7ff0) >> 4; \
-	SET_TILE_INFO_MEMBER(0, tile, color, 0); \
+	tileinfo.set(0, tile, color, 0); \
 } while (0)
 
 #define MODEL3_TILE_INFO8(address)  \
@@ -230,7 +230,7 @@ do { \
 	uint16_t t = BYTE_REVERSE16(tiles[(tile_index & 3) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0)]); \
 	int tile = ((t << 1) & 0x7ffe) | ((t >> 15) & 0x1); \
 	int color = (t & 0x7f00) >> 8; \
-	SET_TILE_INFO_MEMBER(1, tile >> 1, color, 0); \
+	tileinfo.set(1, tile >> 1, color, 0); \
 } while (0)
 
 TILE_GET_INFO_MEMBER(model3_state::tile_info_layer0_4bit) { MODEL3_TILE_INFO4(0x000); }

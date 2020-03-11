@@ -135,7 +135,7 @@ TILE_GET_INFO_MEMBER(flyball_state::get_tile_info)
 	if ((flags & TILE_FLIPX) && (flags & TILE_FLIPY))
 		code += 64;
 
-	SET_TILE_INFO_MEMBER(0, code, 0, flags);
+	tileinfo.set(0, code, 0, flags);
 }
 
 

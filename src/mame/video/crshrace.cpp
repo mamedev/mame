@@ -15,14 +15,14 @@ TILE_GET_INFO_MEMBER(crshrace_state::get_tile_info1)
 {
 	int code = m_videoram1[tile_index];
 
-	SET_TILE_INFO_MEMBER(1, (code & 0xfff) + (m_roz_bank << 12), code >> 12, 0);
+	tileinfo.set(1, (code & 0xfff) + (m_roz_bank << 12), code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(crshrace_state::get_tile_info2)
 {
 	int code = m_videoram2[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 

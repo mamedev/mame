@@ -68,7 +68,7 @@ void load_translation(emu_options &m_options)
 	strreplace(name, "(", "");
 	strreplace(name, ")", "");
 	emu_file file(m_options.language_path(), OPEN_FLAG_READ);
-	if (file.open(name, PATH_SEPARATOR "strings.mo") != osd_file::error::NONE)
+	if (file.open(name + PATH_SEPARATOR "strings.mo") != osd_file::error::NONE)
 	{
 		osd_printf_error("Error opening translation file %s\n", name);
 		return;

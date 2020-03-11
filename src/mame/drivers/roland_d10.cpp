@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert, Jonathan Gevaryahu
 /*************************************************************************************************
 
-    Roland D-110 driver
+    Roland D-10/D-110 driver
 
     Driver by Olivier Galibert and Jonathan Gevaryahu
 
@@ -25,6 +25,9 @@
 #include "video/msm6222b.h"
 #include "emupal.h"
 #include "screen.h"
+
+static INPUT_PORTS_START( d10 )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( d110 )
 	PORT_START("SC0")
@@ -49,10 +52,10 @@ static INPUT_PORTS_START( d110 )
 INPUT_PORTS_END
 
 
-class d110_state : public driver_device
+class roland_d10_state : public driver_device
 {
 public:
-	d110_state(const machine_config &mconfig, device_type type, const char *tag)
+	roland_d10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_ram(*this, "ram")
 		, m_rams(*this, "rams")
@@ -63,6 +66,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void d10(machine_config &config);
 	void d110(machine_config &config);
 
 protected:
@@ -79,9 +83,10 @@ private:
 	DECLARE_READ16_MEMBER(port0_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
-	void d110_palette(palette_device &palette) const;
+	void d10_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void d10_map(address_map &map);
 	void d110_map(address_map &map);
 
 	uint8_t  m_lcd_data_buffer[256];
@@ -99,7 +104,7 @@ private:
 };
 
 
-uint32_t d110_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t roland_d10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t y,ra,gfx;
 	uint16_t sy=0,x;
@@ -130,7 +135,7 @@ uint32_t d110_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-void d110_state::machine_start()
+void roland_d10_state::machine_start()
 {
 	m_rams->set_base(m_ram->pointer(), 32768);
 	m_memcs->set_base(m_memc->pointer(), 32768);
@@ -144,14 +149,14 @@ void d110_state::machine_start()
 	m_lcd_data_buffer_pos = 0;
 }
 
-void d110_state::machine_reset()
+void roland_d10_state::machine_reset()
 {
 	//  midi_timer->adjust(attotime::from_hz(1));
 	m_midi_pos = 0;
 	m_port0 = 0x80; // battery ok
 }
 
-WRITE8_MEMBER(d110_state::lcd_ctrl_w)
+WRITE8_MEMBER(roland_d10_state::lcd_ctrl_w)
 {
 	m_lcd->control_w(data);
 	for(int i=0; i != m_lcd_data_buffer_pos; i++)
@@ -159,13 +164,13 @@ WRITE8_MEMBER(d110_state::lcd_ctrl_w)
 	m_lcd_data_buffer_pos = 0;
 }
 
-READ8_MEMBER(d110_state::lcd_ctrl_r)
+READ8_MEMBER(roland_d10_state::lcd_ctrl_r)
 {
 	// Busy flag in the msm622b is bit 7, while the software expects it in bit 0...
 	return m_lcd->control_r() >> 7;
 }
 
-WRITE8_MEMBER(d110_state::lcd_data_w)
+WRITE8_MEMBER(roland_d10_state::lcd_data_w)
 {
 	if(m_lcd_data_buffer_pos == sizeof(m_lcd_data_buffer)) {
 		logerror("Warning: lcd data buffer overflow (%04x)\n", m_maincpu->pc());
@@ -174,18 +179,18 @@ WRITE8_MEMBER(d110_state::lcd_data_w)
 	m_lcd_data_buffer[m_lcd_data_buffer_pos++] = data;
 }
 
-WRITE8_MEMBER(d110_state::bank_w)
+WRITE8_MEMBER(roland_d10_state::bank_w)
 {
 	membank("bank")->set_entry(data);
 }
 
-WRITE16_MEMBER(d110_state::midi_w)
+WRITE16_MEMBER(roland_d10_state::midi_w)
 {
 	logerror("midi_out %02x\n", data);
 	m_midi = data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(d110_state::midi_timer_cb)
+TIMER_DEVICE_CALLBACK_MEMBER(roland_d10_state::midi_timer_cb)
 {
 	const static uint8_t midi_data[3] = { 0x91, 0x40, 0x7f };
 	m_midi = midi_data[m_midi_pos++];
@@ -195,17 +200,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(d110_state::midi_timer_cb)
 		m_midi_timer->adjust(attotime::from_hz(1250));
 }
 
-READ16_MEMBER(d110_state::port0_r)
+READ16_MEMBER(roland_d10_state::port0_r)
 {
 	return m_port0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(d110_state::samples_timer_cb)
+TIMER_DEVICE_CALLBACK_MEMBER(roland_d10_state::samples_timer_cb)
 {
 	m_port0 ^= 0x10;
 }
 
-WRITE8_MEMBER(d110_state::so_w)
+WRITE8_MEMBER(roland_d10_state::so_w)
 {
 	// bit 0   = led
 	// bit 1-2 = reverb program a13/a14
@@ -214,31 +219,42 @@ WRITE8_MEMBER(d110_state::so_w)
 	//  logerror("so: rw=%d bank=%d led=%d\n", (data >> 3) & 1, (data >> 1) & 3, data & 1);
 }
 
-void d110_state::d110_palette(palette_device &palette) const
+void roland_d10_state::d10_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0, 255, 0));
 	palette.set_pen_color(1, rgb_t(0, 0, 0));
 }
 
-void d110_state::d110_map(address_map &map)
+void roland_d10_state::d10_map(address_map &map)
 {
-	map(0x0100, 0x0100).w(FUNC(d110_state::bank_w));
-	map(0x0200, 0x0200).w(FUNC(d110_state::so_w));
-	map(0x021a, 0x021a).portr("SC0").nopw();
-	map(0x021c, 0x021c).portr("SC1");
-	map(0x0300, 0x0300).w(FUNC(d110_state::lcd_data_w));
-	map(0x0380, 0x0380).rw(FUNC(d110_state::lcd_ctrl_r), FUNC(d110_state::lcd_ctrl_w));
+	map(0x0100, 0x0100).w(FUNC(roland_d10_state::bank_w));
+	map(0x0200, 0x0200).w(FUNC(roland_d10_state::so_w));
+	map(0x0300, 0x0300).w(FUNC(roland_d10_state::lcd_data_w));
+	map(0x0380, 0x0380).rw(FUNC(roland_d10_state::lcd_ctrl_r), FUNC(roland_d10_state::lcd_ctrl_w));
 	map(0x1000, 0x7fff).rom().region("maincpu", 0x1000);
 	map(0x8000, 0xbfff).bankrw("bank");
 	map(0xc000, 0xffff).bankrw("fixed");
 }
 
-void d110_state::d110(machine_config &config)
+void roland_d10_state::d110_map(address_map &map)
+{
+	map(0x0100, 0x0100).w(FUNC(roland_d10_state::bank_w));
+	map(0x0200, 0x0200).w(FUNC(roland_d10_state::so_w));
+	map(0x021a, 0x021a).portr("SC0").nopw();
+	map(0x021c, 0x021c).portr("SC1");
+	map(0x0300, 0x0300).w(FUNC(roland_d10_state::lcd_data_w));
+	map(0x0380, 0x0380).rw(FUNC(roland_d10_state::lcd_ctrl_r), FUNC(roland_d10_state::lcd_ctrl_w));
+	map(0x1000, 0x7fff).rom().region("maincpu", 0x1000);
+	map(0x8000, 0xbfff).bankrw("bank");
+	map(0xc000, 0xffff).bankrw("fixed");
+}
+
+void roland_d10_state::d10(machine_config &config)
 {
 	P8098(config, m_maincpu, 12_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &d110_state::d110_map);
-	m_maincpu->serial_tx_cb().set(FUNC(d110_state::midi_w));
-	m_maincpu->in_p0_cb().set(FUNC(d110_state::port0_r));
+	m_maincpu->set_addrmap(AS_PROGRAM, &roland_d10_state::d10_map);
+	m_maincpu->serial_tx_cb().set(FUNC(roland_d10_state::midi_w));
+	m_maincpu->in_p0_cb().set(FUNC(roland_d10_state::port0_r));
 
 // Battery-backed main ram
 	RAM( config, "ram" ).set_default_size( "32K" );
@@ -250,20 +266,49 @@ void d110_state::d110(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
-	screen.set_screen_update(FUNC(d110_state::screen_update));
+	screen.set_screen_update(FUNC(roland_d10_state::screen_update));
 //  screen.set_size(20*6-1, 2*9-1);
 	screen.set_size(16*6-1, (16*6-1)*3/4);
 	screen.set_visarea(0, 16*6-2, 0, (16*6-1)*3/4-1);
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(d110_state::d110_palette), 2);
+	PALETTE(config, "palette", FUNC(roland_d10_state::d10_palette), 2);
 
 	MSM6222B_01(config, m_lcd, 0);
 
-	TIMER(config, m_midi_timer).configure_generic(FUNC(d110_state::midi_timer_cb));
+	TIMER(config, m_midi_timer).configure_generic(FUNC(roland_d10_state::midi_timer_cb));
 
-	TIMER(config,  "samples_timer").configure_periodic(FUNC(d110_state::samples_timer_cb), attotime::from_hz(32000*2) );
+	TIMER(config,  "samples_timer").configure_periodic(FUNC(roland_d10_state::samples_timer_cb), attotime::from_hz(32000*2) );
 }
+
+void roland_d10_state::d110(machine_config &config)
+{
+	d10(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &roland_d10_state::d110_map);
+}
+
+ROM_START( d10 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_DEFAULT_BIOS( "106" )
+
+	ROM_SYSTEM_BIOS( 0, "102", "Firmware 1.02" )
+	ROMX_LOAD( "d-10_v1.02_a.ic14",            1,   0x8000, CRC(71162a61) SHA1(a39f6ea90682346bc259615198eac18c1f0ad0bd), ROM_BIOS(0) | ROM_SKIP(1) )
+	ROMX_LOAD( "d-10_v1.02_b.ic13",            0,   0x8000, CRC(99def0ed) SHA1(ff6d3f88a3cdfa901bd0e9a83350ea2842fd16bc), ROM_BIOS(0) | ROM_SKIP(1) )
+
+	ROM_SYSTEM_BIOS( 1, "106", "Firmware 1.06" )
+	ROMX_LOAD( "d-10a_1.06.ic14",              1,   0x8000, CRC(ea90848a) SHA1(1689b47210e4033b922816a1817c430358d96641), ROM_BIOS(1) | ROM_SKIP(1) ) // AM27C256-200DC
+	ROMX_LOAD( "d-10b_1.06.ic13",              0,   0x8000, CRC(26dbbf48) SHA1(f6063c2e3000e08a0dc3e45c8ee9400916f5493c), ROM_BIOS(1) | ROM_SKIP(1) ) // AM27C256-155DC
+
+	ROM_REGION( 0x20000, "presets", 0 )
+	ROM_LOAD(  "r15179873-lh5310-97.ic12",     0,  0x20000, CRC(580a8f9e) SHA1(05587a0542b01625dcde37de5bb339880e47eb93) )
+
+	ROM_REGION( 0x100000, "la32", 0 )
+	ROM_LOAD(  "r15179878-hn62304bpc99.ic27",  0,       0x80000, CRC(e117e6ab) SHA1(6760d14900161b8715c2bfd4ebe997877087c90c) )
+	ROM_LOAD(  "r15179880-hn62304bpd10.ic28",  0x80000, 0x80000, CRC(b329f945) SHA1(9c59f50518a070461b2ec6cb4e43ee7cc1e905b6) )
+
+	ROM_REGION( 0x8000, "boss", 0 )
+	ROM_LOAD(  "r15179879-hn623257pz20.ic33",  0,   0x8000, CRC(5d34174e) SHA1(17bd2887711c5c5458aba6d3be5972b2096eb450) )
+ROM_END
 
 ROM_START( d110 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -286,4 +331,5 @@ ROM_START( d110 )
 	ROM_LOAD(  "r15179879.ic6.bin",            0,   0x8000, CRC(5d34174e) SHA1(17bd2887711c5c5458aba6d3be5972b2096eb450) )
 ROM_END
 
-CONS( 1988, d110, 0, 0, d110, d110, d110_state, empty_init, "Roland", "D110", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST( 1988, d10,  0,   0, d10,  d10,  roland_d10_state, empty_init, "Roland", "D-10 Multi Timbral Linear Synthesizer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST( 1988, d110, d10, 0, d110, d110, roland_d10_state, empty_init, "Roland", "D-110 Multi Timbral Sound Module",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

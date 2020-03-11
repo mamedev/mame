@@ -145,7 +145,7 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_tile_info)
 	tile_number = m_tilevram[Layer][2 * tile_index + 1] & 0x7fff;
 	attrib = m_tilevram[Layer][2 * tile_index];
 	color = attrib & 0x3f;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			color,
 			0);

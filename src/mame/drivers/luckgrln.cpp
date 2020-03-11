@@ -179,7 +179,7 @@ TILE_GET_INFO_MEMBER(luckgrln_state::get_reel_tile_info)
 	code |= (attr & 0xe0)<<3;
 
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			col,
 			0);

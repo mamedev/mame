@@ -73,7 +73,7 @@ void suprloco_state::suprloco_palette(palette_device &palette) const
 TILE_GET_INFO_MEMBER(suprloco_state::get_tile_info)
 {
 	uint8_t attr = m_videoram[2*tile_index+1];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[2*tile_index] | ((attr & 0x03) << 8),
 			(attr & 0x1c) >> 2,
 			0);

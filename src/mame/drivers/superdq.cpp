@@ -80,7 +80,7 @@ TILE_GET_INFO_MEMBER(superdq_state::get_tile_info)
 {
 	int tile = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, tile, m_color_bank, 0);
+	tileinfo.set(0, tile, m_color_bank, 0);
 }
 
 void superdq_state::video_start()

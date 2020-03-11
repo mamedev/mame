@@ -128,7 +128,7 @@ TILE_GET_INFO_MEMBER(redclash_state::get_fg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = (m_videoram[tile_index] & 0x70) >> 4; // ??
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 

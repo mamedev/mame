@@ -118,7 +118,7 @@ TILE_GET_INFO_MEMBER(airraid_video_device::get_bg_tile_info)
 
 	tile |= (attr & 0x70) << 4;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			attr&0xf,
 			0);
@@ -131,7 +131,7 @@ TILE_GET_INFO_MEMBER(airraid_video_device::get_fg_tile_info)
 
 	tile |= (attr & 0x70) << 4;
 
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			tile,
 			attr&0xf,
 			0);
@@ -143,7 +143,7 @@ TILE_GET_INFO_MEMBER(airraid_video_device::get_cstx_tile_info)
 	int attr = (m_txram[tile_index*2+1]);
 	int color = attr & 0xf;
 
-	SET_TILE_INFO_MEMBER(0, (code << 1) | ((attr & 0x20) >> 5), color, 0);
+	tileinfo.set(0, (code << 1) | ((attr & 0x20) >> 5), color, 0);
 }
 
 

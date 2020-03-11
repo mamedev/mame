@@ -147,7 +147,7 @@ void pc080sn_device::common_get_pc080sn_bg_tile_info( tile_data &tileinfo, int t
 		attr = ram[tile_index];
 	}
 
-	SET_TILE_INFO_MEMBER(gfxnum,
+	tileinfo.set(gfxnum,
 			code,
 			(attr & 0x1ff),
 			TILE_FLIPYX((attr & 0xc000) >> 14));
@@ -173,7 +173,7 @@ void pc080sn_device::common_get_pc080sn_fg_tile_info( tile_data &tileinfo, int t
 		attr = ram[tile_index];
 	}
 
-	SET_TILE_INFO_MEMBER(gfxnum,
+	tileinfo.set(gfxnum,
 			code,
 			(attr & 0x1ff),
 			TILE_FLIPYX((attr & 0xc000) >> 14));

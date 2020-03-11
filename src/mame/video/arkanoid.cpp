@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(arkanoid_state::get_bg_tile_info)
 	int code = m_videoram[offs + 1] + ((m_videoram[offs] & 0x07) << 8) + 2048 * m_gfxbank;
 	int color = ((m_videoram[offs] & 0xf8) >> 3) + 32 * m_palettebank;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void arkanoid_state::video_start()

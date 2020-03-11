@@ -116,7 +116,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_bg)
 {
 	u16 code_hi = m_vram_bg[ 2 * tile_index + 0];
 	u16 code_lo = m_vram_bg[ 2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code_hi,
 			code_lo & 0xf,
 			0);
@@ -136,7 +136,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_fg)
 {
 	u16 code_hi = m_vram_fg[ 2 * tile_index + 0];
 	u16 code_lo = m_vram_fg[ 2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code_hi,
 			code_lo & 0xf,
 			0);
@@ -153,7 +153,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rot)
 {
 	u16 code_hi = m_vram_rot[ 2 * tile_index + 0];
 	u16 code_lo = m_vram_rot[ 2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code_hi,
 			code_lo & 0xf,
 			0);
@@ -169,7 +169,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_bg)
 {
 	u16 code_hi = m_rocknms_sub_vram_bg[ 2 * tile_index + 0];
 	u16 code_lo = m_rocknms_sub_vram_bg[ 2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code_hi,
 			code_lo & 0xf,
 			0);
@@ -186,7 +186,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_fg)
 {
 	u16 code_hi = m_rocknms_sub_vram_fg[ 2 * tile_index + 0];
 	u16 code_lo = m_rocknms_sub_vram_fg[ 2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code_hi,
 			code_lo & 0xf,
 			0);
@@ -203,7 +203,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_rot)
 {
 	u16 code_hi = m_rocknms_sub_vram_rot[ 2 * tile_index + 0];
 	u16 code_lo = m_rocknms_sub_vram_rot[ 2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code_hi,
 			code_lo & 0xf,
 			0);
@@ -682,7 +682,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::stepstag_get_tile_info_fg)
 	//logerror("tile_idx[$%2x]=$%3x, palette=$%2x\n", tile_index, code_hi, code_lo);////
 	if (m_vram_fg[2 * tile_index + 1] != 0)
 		logerror("VRAM ASCII Haut-Mot Non-Zero!!!\n");/////////
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code_hi,
 			code_lo,
 			0);

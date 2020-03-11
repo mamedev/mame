@@ -187,14 +187,14 @@ private:
 TILE_GET_INFO_MEMBER(quizpun2_state::get_bg_tile_info)
 {
 	uint16_t code = m_bg_ram[ tile_index * 2 ] + m_bg_ram[ tile_index * 2 + 1 ] * 256;
-	SET_TILE_INFO_MEMBER(0, code, code >> 12, TILE_FLIPXY((code & 0x800) >> 11));
+	tileinfo.set(0, code, code >> 12, TILE_FLIPXY((code & 0x800) >> 11));
 }
 
 TILE_GET_INFO_MEMBER(quizpun2_state::get_fg_tile_info)
 {
 	uint16_t code  = m_fg_ram[ tile_index * 4 ]/* + m_fg_ram[ tile_index * 4 + 1 ] * 256*/;
 	uint8_t  color = m_fg_ram[ tile_index * 4 + 2 ];
-	SET_TILE_INFO_MEMBER(1, code, color / 2, 0);
+	tileinfo.set(1, code, color / 2, 0);
 }
 
 WRITE8_MEMBER(quizpun2_state::bg_ram_w)

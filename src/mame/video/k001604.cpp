@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_8x8)
 	if (val & 0x800000)
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, flags);
+	tileinfo.set(0, tile, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_roz)
@@ -181,7 +181,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_roz)
 
 	tile += m_roz_size ? 0x800 : 0x2000;
 
-	SET_TILE_INFO_MEMBER(m_roz_size, tile, color, flags);
+	tileinfo.set(m_roz_size, tile, color, flags);
 }
 
 

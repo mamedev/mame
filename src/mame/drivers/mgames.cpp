@@ -273,7 +273,7 @@ TILE_GET_INFO_MEMBER( mgames_state::tile_info )
 	uint8_t code = m_video[tile_index];
 	uint8_t color = m_video[tile_index + 0x400] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void mgames_state::machine_start()

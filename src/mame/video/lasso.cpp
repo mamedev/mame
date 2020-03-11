@@ -115,7 +115,7 @@ TILE_GET_INFO_MEMBER(lasso_state::lasso_get_bg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 					code + ((uint16_t)m_gfxbank << 8),
 					color & 0x0f,
 					0);
@@ -127,7 +127,7 @@ TILE_GET_INFO_MEMBER(lasso_state::wwjgtin_get_track_tile_info)
 	int code = ROM[tile_index];
 	int color = ROM[tile_index + 0x2000];
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 					code,
 					color & 0x0f,
 					0);
@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(lasso_state::pinbo_get_bg_tile_info)
 	int code  = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 					code + ((color & 0x30) << 4),
 					color & 0x0f,
 					0);

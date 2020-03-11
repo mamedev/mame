@@ -207,7 +207,7 @@ TILE_GET_INFO_MEMBER(efdt_state::get_tile_info_0)
 	//int code = data + (xtra << 8);
 	int code = data + m_tilebank;
 
-	SET_TILE_INFO_MEMBER(0, code, pal, 0);
+	tileinfo.set(0, code, pal, 0);
 }
 
 TILE_GET_INFO_MEMBER(efdt_state::get_tile_info_1)
@@ -216,7 +216,7 @@ TILE_GET_INFO_MEMBER(efdt_state::get_tile_info_1)
 
 	int code = data;
 
-	SET_TILE_INFO_MEMBER(1, code, 0x1c, 0);
+	tileinfo.set(1, code, 0x1c, 0);
 }
 
 void efdt_state::video_start()

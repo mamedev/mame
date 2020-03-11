@@ -85,7 +85,7 @@ TILE_GET_INFO_MEMBER(patapata_state::get_bg_tile_info)
 {
 	int tileno = m_bg_videoram[tile_index];
 	int pal = tileno>>12;
-	SET_TILE_INFO_MEMBER(0, tileno&0x1fff, pal, 0);
+	tileinfo.set(0, tileno&0x1fff, pal, 0);
 }
 
 WRITE16_MEMBER(patapata_state::fg_videoram_w)
@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(patapata_state::get_fg_tile_info)
 	int tileno = m_fg_videoram[tile_index];
 	int pal = tileno>>12;
 
-	SET_TILE_INFO_MEMBER(1, (tileno&0x0fff)+(bank*0x1000), pal, 0);
+	tileinfo.set(1, (tileno&0x0fff)+(bank*0x1000), pal, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(patapata_state::pagescan)

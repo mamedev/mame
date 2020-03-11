@@ -246,7 +246,7 @@ TILE_GET_INFO_MEMBER(looping_state::get_tile_info)
 {
 	int tile_number = m_videoram[tile_index];
 	int color = m_colorram[(tile_index & 0x1f) * 2 + 1] & 0x07;
-	SET_TILE_INFO_MEMBER(0, tile_number, color, 0);
+	tileinfo.set(0, tile_number, color, 0);
 }
 
 

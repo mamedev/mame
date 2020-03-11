@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(spdodgeb_state::get_bg_tile_info)
 {
 	uint8_t code = m_videoram[tile_index];
 	uint8_t attr = m_videoram[tile_index + 0x800];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code + ((attr & 0x1f) << 8),
 			((attr & 0xe0) >> 5) + 8 * m_tile_palbank,
 			0);

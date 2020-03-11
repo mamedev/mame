@@ -128,7 +128,7 @@ inline void tumbleb_state::get_bg_tile_info( tile_data &tileinfo, int tile_index
 {
 	int data = gfx_base[tile_index];
 
-	SET_TILE_INFO_MEMBER(gfx_bank,
+	tileinfo.set(gfx_bank,
 			(data & 0x0fff) | (m_tilebank >> 2),
 			data >> 12,
 			0);
@@ -141,7 +141,7 @@ TILE_GET_INFO_MEMBER(tumbleb_state::get_fg_tile_info)
 {
 	int data = m_pf1_data[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(data & 0x0fff) | m_tilebank,
 			data >> 12,
 			0);
@@ -152,7 +152,7 @@ inline void tumbleb_state::get_fncywld_bg_tile_info( tile_data &tileinfo, int ti
 	int data = gfx_base[tile_index * 2];
 	int attr = gfx_base[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(gfx_bank,
+	tileinfo.set(gfx_bank,
 			data & 0x1fff,
 			attr & 0x1f,
 			0);
@@ -166,7 +166,7 @@ TILE_GET_INFO_MEMBER(tumbleb_state::get_fncywld_fg_tile_info)
 	int data = m_pf1_data[tile_index * 2];
 	int attr = m_pf1_data[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			data & 0x1fff,
 			attr & 0x1f,
 			0);
@@ -178,7 +178,7 @@ inline void tumbleb_state::pangpang_get_bg_tile_info( tile_data &tileinfo, int t
 	int data = gfx_base[tile_index * 2 + 1];
 	int attr = gfx_base[tile_index * 2];
 
-	SET_TILE_INFO_MEMBER(gfx_bank,
+	tileinfo.set(gfx_bank,
 			data & 0x1fff,
 			(attr >>12) & 0xf,
 			0);
@@ -189,7 +189,7 @@ inline void tumbleb_state::pangpang_get_bg2x_tile_info( tile_data &tileinfo, int
 	int data = gfx_base[tile_index * 2 + 1];
 	int attr = gfx_base[tile_index * 2];
 
-	SET_TILE_INFO_MEMBER(gfx_bank,
+	tileinfo.set(gfx_bank,
 			(data & 0xfff) + 0x1000,
 			(attr >>12) & 0xf,
 			0);
@@ -204,7 +204,7 @@ TILE_GET_INFO_MEMBER(tumbleb_state::pangpang_get_fg_tile_info)
 	int data = m_pf1_data[tile_index * 2 + 1];
 	int attr = m_pf1_data[tile_index * 2];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			data & 0x1fff,
 			(attr >> 12)& 0x1f,
 			0);

@@ -916,7 +916,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac_tile_info)
 
 	colour = (m_psac_colorbase << 4) + col;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, TILE_FLIPYX(flip));
+	tileinfo.set(0, tileno, colour, TILE_FLIPYX(flip));
 }
 
 
@@ -957,7 +957,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_tile_info)
 	if (tmap[(base_index*2)+1] & 0x20) flip |= TILE_FLIPY;
 	if (tmap[(base_index*2)+1] & 0x10) flip |= TILE_FLIPX;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, flip);
+	tileinfo.set(0, tileno, colour, flip);
 	}
 
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
@@ -978,7 +978,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
 	if (tmap[(base_index*2)+1] & 0x20) flip |= TILE_FLIPY;
 	if (tmap[(base_index*2)+1] & 0x10) flip |= TILE_FLIPX;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, flip);
+	tileinfo.set(0, tileno, colour, flip);
 	}
 
 
@@ -1004,7 +1004,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1a_tile_info)
 	if (flipx) flip |= TILE_FLIPX;
 	if (flipy) flip |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(1, tileno, colour, flip);
+	tileinfo.set(1, tileno, colour, flip);
 }
 
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1b_tile_info)
@@ -1026,7 +1026,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1b_tile_info)
 	if (flipx) flip |= TILE_FLIPX;
 	if (flipy) flip |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, flip);
+	tileinfo.set(0, tileno, colour, flip);
 }
 
 K056832_CB_MEMBER(konamigx_state::type2_tile_callback)

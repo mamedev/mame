@@ -69,6 +69,12 @@ public:
 	auto pd_out_cb() { return m_pd_out_cb.bind(); }
 	auto pf_out_cb() { return m_pf_out_cb.bind(); }
 
+	void set_pa_pullups(uint8_t p) { m_pa_pullups = p; }
+	void set_pb_pullups(uint8_t p) { m_pb_pullups = p; }
+	void set_pc_pullups(uint8_t p) { m_pc_pullups = p; }
+	void set_pd_pullups(uint8_t p) { m_pd_pullups = p; }
+	void set_pf_pullups(uint8_t p) { m_pf_pullups = p; }
+
 	auto pt_in_cb() { return m_pt_in_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER(pa_w);
@@ -282,6 +288,11 @@ protected:
 	uint8_t   m_pc_out;
 	uint8_t   m_pd_out;
 	uint8_t   m_pf_out;
+	uint8_t   m_pa_pullups;
+	uint8_t   m_pb_pullups;
+	uint8_t   m_pc_pullups;
+	uint8_t   m_pd_pullups;
+	uint8_t   m_pf_pullups;
 	uint8_t   m_cr0;    /* analog digital conversion register 0 */
 	uint8_t   m_cr1;    /* analog digital conversion register 1 */
 	uint8_t   m_cr2;    /* analog digital conversion register 2 */

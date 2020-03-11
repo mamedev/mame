@@ -522,7 +522,7 @@ TILE_GET_INFO_MEMBER(videopkr_state::get_bg_tile_info)
 	int attr = m_color_ram[offs] + ioport("IN2")->read(); /* Color Switch Action */
 	int code = m_video_ram[offs];
 	int color = attr;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 

@@ -105,7 +105,7 @@ TILE_GET_INFO_MEMBER(seicupbl_state::get_sc0_tileinfo)
 	tile &= 0xfff;
 	//tile |= m_back_gfx_bank;        /* Heatbrl uses banking */
 
-	SET_TILE_INFO_MEMBER(1,tile,color,0);
+	tileinfo.set(1,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(seicupbl_state::get_sc1_tileinfo)
@@ -118,7 +118,7 @@ TILE_GET_INFO_MEMBER(seicupbl_state::get_sc1_tileinfo)
 	tile |= 0x1000;
 	color += 0x10;
 
-	SET_TILE_INFO_MEMBER(1,tile,color,0);
+	tileinfo.set(1,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(seicupbl_state::get_sc2_tileinfo)
@@ -128,7 +128,7 @@ TILE_GET_INFO_MEMBER(seicupbl_state::get_sc2_tileinfo)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(4,tile,color,0);
+	tileinfo.set(4,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(seicupbl_state::get_sc3_tileinfo)
@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(seicupbl_state::get_sc3_tileinfo)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	tileinfo.set(0,tile,color,0);
 }
 
 void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)

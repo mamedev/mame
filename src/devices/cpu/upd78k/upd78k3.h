@@ -98,6 +98,8 @@ public:
 	upd78312_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	upd78312_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map);
+
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -113,7 +115,17 @@ private:
 	void sfr_map(address_map &map);
 };
 
-// device type declaration
+// ======================> upd78310_device
+
+class upd78310_device : public upd78312_device
+{
+public:
+	// device type constructor
+	upd78310_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+// device type declarations
+DECLARE_DEVICE_TYPE(UPD78310, upd78310_device)
 DECLARE_DEVICE_TYPE(UPD78312, upd78312_device)
 
 #endif // MAME_CPU_UPD78K_UPD7832_H

@@ -546,6 +546,15 @@ ROM_START( atetrisb3 )
 	ROM_LOAD( "pal16r4b-2cn.6",    0xa00, 0x104, NO_DUMP )
 ROM_END
 
+ROM_START( atetrisb4 ) // bootleg on an unusually big PCB for this game
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",    0x10000, 0x8000, CRC(56589096) SHA1(df0ff776f3e3506c86d703d2283db59a576abea6) ) // only difference is the credits for 'video graphics' where changed
+	ROM_CONTINUE(         0x08000, 0x8000 )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "2.bin", 0x0000, 0x10000, CRC(70859030) SHA1(bb6bf88b75be3a81672e0aa30a8cbd7181bc87d0) ) // unique, but extremely similar to the one of the original
+ROM_END
+
 /*
 atetb3482: Atari Tetris bootleg with additional UM3482 and Z80 (with its ROM)
   __________________________________________________________________
@@ -704,7 +713,8 @@ GAME( 1988, atetrisa,  atetris, atetris,   atetris,  atetris_state,     init_ate
 GAME( 1988, atetrisb,  atetris, atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, atetrisb2, atetris, atetrisb2, atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, atetrisb3, atetris, atetrisb3, atetris,  atetris_mcu_state, init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetb3482, atetris, atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 4, with UM3482)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, atetrisb4, atetris, atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetb3482, atetris, atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 5, with UM3482)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, atetrisbp, atetris, atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "Atari Games", "Tetris (bartop, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1989, atetrisc,  atetris, atetris,   atetrisc, atetris_state,     init_atetris, ROT270, "Atari Games", "Tetris (cocktail set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, atetrisc2, atetris, atetris,   atetrisc, atetris_state,     init_atetris, ROT270, "Atari Games", "Tetris (cocktail set 2)", MACHINE_SUPPORTS_SAVE )

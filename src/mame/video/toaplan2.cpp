@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(toaplan2_state::get_text_tile_info)
 	const u16 attrib = m_tx_videoram[tile_index];
 	const u32 tile_number = attrib & 0x3ff;
 	const u32 color = attrib >> 10;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			color,
 			0);

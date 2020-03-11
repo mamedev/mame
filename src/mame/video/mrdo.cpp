@@ -135,7 +135,7 @@ void mrdo_state::mrdo_palette(palette_device &palette) const
 TILE_GET_INFO_MEMBER(mrdo_state::get_bg_tile_info)
 {
 	uint8_t attr = m_bgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_bgvideoram[tile_index + 0x400] + ((attr & 0x80) << 1),
 			attr & 0x3f,
 			(attr & 0x40) ? TILE_FORCE_LAYER0 : 0);
@@ -144,7 +144,7 @@ TILE_GET_INFO_MEMBER(mrdo_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(mrdo_state::get_fg_tile_info)
 {
 	uint8_t attr = m_fgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_fgvideoram[tile_index+0x400] + ((attr & 0x80) << 1),
 			attr & 0x3f,
 			(attr & 0x40) ? TILE_FORCE_LAYER0 : 0);

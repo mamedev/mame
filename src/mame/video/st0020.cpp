@@ -169,7 +169,7 @@ TILE_GET_INFO_MEMBER(st0020_device::get_tile_info)
 	if (m_is_st0032)    color = (color & 0x1ff) * ((color & 0x200) ? 4 : 16);
 	else                color = color * ((m_regs[Layer * 4 + 3] & 0x0100) ? 2 : 8);
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(st0020_device::scan_16x16)

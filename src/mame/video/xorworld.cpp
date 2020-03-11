@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(xorworld_state::get_bg_tile_info)
 	int data = m_videoram[tile_index];
 	int code = data & 0x0fff;
 
-	SET_TILE_INFO_MEMBER(0, code, data >> 12, 0);
+	tileinfo.set(0, code, data >> 12, 0);
 }
 
 void xorworld_state::video_start()

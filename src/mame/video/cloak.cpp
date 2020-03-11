@@ -156,7 +156,7 @@ TILE_GET_INFO_MEMBER(cloak_state::get_bg_tile_info)
 	uint8_t *videoram = m_videoram;
 	int code = videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 void cloak_state::video_start()

@@ -167,7 +167,7 @@ private:
 TILE_GET_INFO_MEMBER(k3_state::get_tile_info)
 {
 	int tileno = m_bgram_buffer[tile_index];
-	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);
+	tileinfo.set(1, tileno, 0, 0);
 }
 
 void k3_state::video_start()

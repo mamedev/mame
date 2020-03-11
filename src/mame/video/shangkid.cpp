@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(shangkid_state::get_bg_tile_info)
 		*/
 		color = attributes>>3;
 		color = (color&0x03)|((color&0x1c)<<1);
-		SET_TILE_INFO_MEMBER(0,
+		tileinfo.set(0,
 				tile_number,
 				color,
 				(attributes&0x04)?TILE_FLIPX:0);
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(shangkid_state::get_bg_tile_info)
 		    x-------    flipx?
 		*/
 		color = (attributes>>2)&0x1f;
-		SET_TILE_INFO_MEMBER(0,
+		tileinfo.set(0,
 				tile_number,
 				color,
 				(attributes&0x80)?TILE_FLIPX:0);

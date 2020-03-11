@@ -605,7 +605,7 @@ bool samples_device::load_samples()
 		return false;
 
 	// iterate over ourself
-	const char *basename = machine().basename();
+	const std::string &basename = machine().basename();
 	samples_iterator iter(*this);
 	const char *altbasename = iter.altbasename();
 
@@ -618,15 +618,15 @@ bool samples_device::load_samples()
 	{
 		// attempt to open as FLAC first
 		emu_file file(machine().options().sample_path(), OPEN_FLAG_READ);
-		osd_file::error filerr = file.open(basename, PATH_SEPARATOR, samplename, ".flac");
+		osd_file::error filerr = file.open(util::string_format("%s" PATH_SEPARATOR "%s.flac", basename, samplename));
 		if (filerr != osd_file::error::NONE && altbasename != nullptr)
-			filerr = file.open(altbasename, PATH_SEPARATOR, samplename, ".flac");
+			filerr = file.open(util::string_format("%s" PATH_SEPARATOR "%s.flac", altbasename, samplename));
 
 		// if not, try as WAV
 		if (filerr != osd_file::error::NONE)
-			filerr = file.open(basename, PATH_SEPARATOR, samplename, ".wav");
+			filerr = file.open(util::string_format("%s" PATH_SEPARATOR "%s.wav", basename, samplename));
 		if (filerr != osd_file::error::NONE && altbasename != nullptr)
-			filerr = file.open(altbasename, PATH_SEPARATOR, samplename, ".wav");
+			filerr = file.open(util::string_format("%s" PATH_SEPARATOR "%s.wav", altbasename, samplename));
 
 		// if opened, read it
 		if (filerr == osd_file::error::NONE)

@@ -140,7 +140,7 @@ TILE_GET_INFO_MEMBER(edevices_device::get_bg_tile_info)
 	int tileno = m_bg_videoram[tile_index] & 0x1fff;
 	int colour = (m_bg_videoram[tile_index] & 0xe000) >> 13;
 
-	SET_TILE_INFO_MEMBER(4, tileno, colour, 0);
+	tileinfo.set(4, tileno, colour, 0);
 }
 
 TILE_GET_INFO_MEMBER(edevices_device::get_mlow_tile_info)
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(edevices_device::get_mlow_tile_info)
 	int tileno = m_mlow_videoram[tile_index] & 0x1fff;
 	int colour = (m_mlow_videoram[tile_index] & 0xe000) >> 13;
 
-	SET_TILE_INFO_MEMBER(3, tileno, colour, 0);
+	tileinfo.set(3, tileno, colour, 0);
 }
 
 TILE_GET_INFO_MEMBER(edevices_device::get_mhigh_tile_info)
@@ -156,7 +156,7 @@ TILE_GET_INFO_MEMBER(edevices_device::get_mhigh_tile_info)
 	int tileno = m_mhigh_videoram[tile_index] & 0x1fff;
 	int colour = (m_mhigh_videoram[tile_index] & 0xe000) >> 13;
 
-	SET_TILE_INFO_MEMBER(2, tileno, colour, 0);
+	tileinfo.set(2, tileno, colour, 0);
 }
 
 TILE_GET_INFO_MEMBER(edevices_device::get_tx_tile_info)
@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(edevices_device::get_tx_tile_info)
 	int tileno = m_tx_videoram[tile_index] & 0x1fff;
 	int colour = (m_tx_videoram[tile_index] & 0xe000) >> 13;
 
-	SET_TILE_INFO_MEMBER(1, tileno, colour, 0);
+	tileinfo.set(1, tileno, colour, 0);
 }
 
 

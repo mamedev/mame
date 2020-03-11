@@ -104,7 +104,7 @@ TILE_GET_INFO_MEMBER(mole_state::get_bg_tile_info)
 {
 	uint16_t code = m_tileram[tile_index];
 
-	SET_TILE_INFO_MEMBER((code & 0x200) ? 1 : 0, code & 0x1ff, 0, 0);
+	tileinfo.set((code & 0x200) ? 1 : 0, code & 0x1ff, 0, 0);
 }
 
 void mole_state::video_start()

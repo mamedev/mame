@@ -24,7 +24,7 @@ TILE_GET_INFO_MEMBER(slapfght_state::get_pf_tile_info)
 	int tile = m_videoram[tile_index] | ((m_colorram[tile_index] & 0x03) << 8);
 	int color = (m_colorram[tile_index] >> 3) & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(slapfght_state::get_pf1_tile_info)
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(slapfght_state::get_pf1_tile_info)
 	int tile = m_videoram[tile_index] | ((m_colorram[tile_index] & 0x0f) << 8);
 	int color = (m_colorram[tile_index] & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(1, tile, color, 0);
+	tileinfo.set(1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(slapfght_state::get_fix_tile_info)
@@ -40,7 +40,7 @@ TILE_GET_INFO_MEMBER(slapfght_state::get_fix_tile_info)
 	int tile = m_fixvideoram[tile_index] | ((m_fixcolorram[tile_index] & 0x03) << 8);
 	int color = (m_fixcolorram[tile_index] & 0xfc) >> 2;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 

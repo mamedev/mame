@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(vball_state::get_bg_tile_info)
 {
 	uint8_t code = m_videoram[tile_index];
 	uint8_t attr = m_attribram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code + ((attr & 0x1f) << 8) + (m_gfxset<<8),
 			(attr >> 5) & 0x7,
 			0);

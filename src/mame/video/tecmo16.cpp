@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(tecmo16_state::fg_get_tile_info)
 	/* bit 4 controls blending */
 	//tileinfo.category = (m_colorram[tile_index] & 0x10) >> 4;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile,
 			color,
 			0);
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(tecmo16_state::bg_get_tile_info)
 	int tile = m_videoram2[tile_index] & 0x1fff;
 	int color = (m_colorram2[tile_index] & 0x0f);
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile,
 			color,
 			0);
@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(tecmo16_state::bg_get_tile_info)
 TILE_GET_INFO_MEMBER(tecmo16_state::tx_get_tile_info)
 {
 	int tile = m_charram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile & 0x0fff,
 			tile >> 12,
 			0);

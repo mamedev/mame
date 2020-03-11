@@ -277,7 +277,7 @@ TILE_GET_INFO_MEMBER(dreamwld_state::get_tile_info)
 {
 	const u16 tileno = m_vram[Layer][tile_index];
 	const u16 colour = tileno >> 13;
-	SET_TILE_INFO_MEMBER(1, (tileno & 0x1fff) | (m_tilebank[Layer] << 13), (Layer * 0x40) + colour, 0);
+	tileinfo.set(1, (tileno & 0x1fff) | (m_tilebank[Layer] << 13), (Layer * 0x40) + colour, 0);
 }
 
 

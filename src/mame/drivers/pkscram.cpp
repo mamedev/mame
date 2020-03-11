@@ -224,7 +224,7 @@ TILE_GET_INFO_MEMBER(pkscram_state::get_bg_tile_info)
 	int const tile  = m_bgtilemap_ram[tile_index*2];
 	int const color = m_bgtilemap_ram[tile_index*2 + 1] & 0x7f;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(pkscram_state::get_md_tile_info)
@@ -232,7 +232,7 @@ TILE_GET_INFO_MEMBER(pkscram_state::get_md_tile_info)
 	int const tile  = m_mdtilemap_ram[tile_index*2];
 	int const color = m_mdtilemap_ram[tile_index*2 + 1] & 0x7f;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(pkscram_state::get_fg_tile_info)
@@ -240,7 +240,7 @@ TILE_GET_INFO_MEMBER(pkscram_state::get_fg_tile_info)
 	int const tile  = m_fgtilemap_ram[tile_index*2];
 	int const color = m_fgtilemap_ram[tile_index*2 + 1] & 0x7f;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(pkscram_state::scanline_callback)
