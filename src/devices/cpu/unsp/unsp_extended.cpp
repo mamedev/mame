@@ -56,7 +56,6 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 	case 0x02:
 	{
 		// register decoding could be incorrect here
-
 		// Ext Push/Pop
 		if (ximm & 0x8000)
 		{
@@ -313,13 +312,24 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		// Rx = Rx op [A6]
 		// A  = B  op C
 
-		//uint8_t aluop = (ximm & 0xf000) >> 12;
-		//uint8_t rx = (ximm & 0x0e00) >> 9;
-		//uint8_t a6 = (ximm & 0x003f) >> 0;
+		uint8_t aluop = (ximm & 0xf000) >> 12;
+		uint8_t rx = (ximm & 0x0e00) >> 9;
+		uint8_t a6 = (ximm & 0x003f) >> 0;
 
-		logerror("(Extended group 8 'Rx=Rx op [A6]' form) unimplemented ");
+		uint16_t b = m_core->m_r[rx + 8];
+		uint16_t c = read16(a6);
 
-		unimplemented_opcode(op, ximm);
+		uint32_t storeaddr = a6; // dest address for STORE
+		uint32_t lres;
+
+		bool write = do_basic_alu_ops(aluop, lres, b, c, storeaddr, true);
+
+		if (write)
+		{
+			// A = Rx
+			m_core->m_r[rx + 8] = (uint16_t)lres;
+		}
+
 		return;
 	}
 	}
