@@ -101,7 +101,7 @@ TILE_GET_INFO_MEMBER(battlane_state::get_tile_info_bg)
 	int gfxn = (attr & 0x01) + 1;
 	int color = (attr >> 1) & 0x03;
 
-	SET_TILE_INFO_MEMBER(gfxn, code, color, 0);
+	tileinfo.set(gfxn, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(battlane_state::battlane_tilemap_scan_rows_2x2)

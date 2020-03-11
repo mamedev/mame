@@ -20,7 +20,7 @@ TILE_GET_INFO_MEMBER(quizpani_state::bg_tile_info)
 {
 	int code = m_bg_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			(code & 0xfff) + (0x1000 * m_bgbank),
 			code >> 12,
 			0);
@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(quizpani_state::txt_tile_info)
 {
 	int code = m_txt_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code & 0xfff) + (0x1000 * m_txtbank),
 			code >> 12,
 			0);

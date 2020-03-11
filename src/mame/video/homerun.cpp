@@ -107,7 +107,7 @@ TILE_GET_INFO_MEMBER(homerun_state::get_tile_info)
 	u32 const tileno = (m_videoram[tile_index]) | ((m_videoram[tile_index | 0x1000] & 0x38) << 5) | ((m_gfx_ctrl & 1) << 11);
 	u16 const palno = (m_videoram[tile_index | 0x1000] & 0x07);
 
-	SET_TILE_INFO_MEMBER(0, tileno, palno, 0);
+	tileinfo.set(0, tileno, palno, 0);
 }
 
 

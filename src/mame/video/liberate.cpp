@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(liberate_state::get_back_tile_info)
 		bank = 3;
 	else
 		bank = 2;
-	SET_TILE_INFO_MEMBER(bank, tile & 0x7f, m_background_color, 0);
+	tileinfo.set(bank, tile & 0x7f, m_background_color, 0);
 }
 
 TILE_GET_INFO_MEMBER(liberate_state::get_fix_tile_info)
@@ -78,7 +78,7 @@ TILE_GET_INFO_MEMBER(liberate_state::get_fix_tile_info)
 	tile = videoram[tile_index] + (colorram[tile_index] << 8);
 	color = (colorram[tile_index] & 0x70) >> 4;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(liberate_state::prosport_get_back_tile_info)
@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(liberate_state::prosport_get_back_tile_info)
 
 	tile += m_io_ram[0]&0x20; //Pro Bowling bg tiles banking bit
 
-	SET_TILE_INFO_MEMBER(8, tile, 0, 0);
+	tileinfo.set(8, tile, 0, 0);
 }
 
 /***************************************************************************/

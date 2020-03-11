@@ -30,7 +30,7 @@ inline void m72_state::m72_m81_get_tile_info(tile_data &tileinfo,int tile_index,
 	else pri = 0;
 /* attr & 0x0010 is used in bchopper and hharry, more priority? */
 
-	SET_TILE_INFO_MEMBER(gfxnum,
+	tileinfo.set(gfxnum,
 			code & 0x3fff,
 			attr & 0x000f,
 			TILE_FLIPYX((code & 0xc000) >> 14));
@@ -70,7 +70,7 @@ TILE_GET_INFO_MEMBER(m72_state::rtype2_get_tile_info)
 /* (m_videoram[N][tile_index+2] & 0x10) is used by majtitle on the green, but it's not clear for what */
 /* (m_videoram[N][tile_index+3] & 0xfe) are used as well */
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			attr & 0x000f,
 			TILE_FLIPYX((attr & 0x0060) >> 5));

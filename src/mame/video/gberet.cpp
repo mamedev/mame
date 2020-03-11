@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(gberet_state::get_bg_tile_info)
 	tileinfo.group = color;
 	tileinfo.category = (attr & 0x80) >> 7;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 VIDEO_START_MEMBER(gberet_state,gberet)

@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(xybots_state::get_alpha_tile_info)
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 7;
 	int opaque = data & 0x8000;
-	SET_TILE_INFO_MEMBER(2, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
+	tileinfo.set(2, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(xybots_state::get_playfield_tile_info)
 	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
-	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
+	tileinfo.set(0, code, color, (data >> 15) & 1);
 }
 
 

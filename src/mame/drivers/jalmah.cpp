@@ -281,7 +281,7 @@ TILE_GET_INFO_MEMBER(urashima_state::get_tile_info_urashima)
 	uint16_t tile = code & 0xfff;
 	int region = (TileChip == 0) ? m_tile_bank : 3;
 
-	SET_TILE_INFO_MEMBER(region,
+	tileinfo.set(region,
 			tile,
 			code >> 12,
 			0);

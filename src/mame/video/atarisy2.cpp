@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(atarisy2_state::get_alpha_tile_info)
 	uint16_t data = m_alpha_tilemap->basemem_read(tile_index);
 	int code = data & 0x3ff;
 	int color = (data >> 13) & 0x07;
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	tileinfo.set(2, code, color, 0);
 }
 
 
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(atarisy2_state::get_playfield_tile_info)
 	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
 	int code = (m_playfield_tile_bank[(data >> 10) & 1] << 10) | (data & 0x3ff);
 	int color = (data >> 11) & 7;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 	tileinfo.category = (~data >> 14) & 3;
 }
 

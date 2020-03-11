@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(fortyl_state::get_bg_tile_info)
 		code = (code & 0x3f) | tile_l_bank | 0x100;
 	code |= tile_h_bank;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			(tile_attrib & 0x07) | ((m_color_bank == true) ? 0x20 : 0),
 			0);

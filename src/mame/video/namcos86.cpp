@@ -98,7 +98,7 @@ inline void namcos86_state::get_tile_info(tile_data &tileinfo,int tile_index,int
 	else
 		tile_offs = ((m_tile_address_prom[((layer & 1) << 4) + ((attr & 0x03) << 2)] & 0x0e) >> 1) * 0x100 + m_tilebank * 0x800;
 
-	SET_TILE_INFO_MEMBER((layer & 2) ? 1 : 0,
+	tileinfo.set((layer & 2) ? 1 : 0,
 			vram[2*tile_index] + tile_offs,
 			attr,
 			0);

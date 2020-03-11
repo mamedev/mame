@@ -115,7 +115,7 @@ TILE_GET_INFO_MEMBER(mario_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index] + 256 * m_gfx_bank;
 	int color = 8 + (m_videoram[tile_index] >> 5) + 16 * m_palette_bank;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void mario_state::video_start()

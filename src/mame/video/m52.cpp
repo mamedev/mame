@@ -139,7 +139,7 @@ TILE_GET_INFO_MEMBER(m52_state::get_tile_info)
 		flag |= TILE_FORCE_LAYER0; /* lines 0 to 6 are opaqe? */
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, color & 0x7f, flag);
+	tileinfo.set(0, code, color & 0x7f, flag);
 }
 
 

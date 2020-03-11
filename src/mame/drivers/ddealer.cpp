@@ -196,7 +196,7 @@ WRITE16_MEMBER(ddealer_state::flipscreen_w)
 TILE_GET_INFO_MEMBER(ddealer_state::get_back_tile_info)
 {
 	int code = m_back_vram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code & 0xfff,
 			code >> 12,
 			0);

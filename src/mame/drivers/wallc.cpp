@@ -222,7 +222,7 @@ WRITE8_MEMBER(wallc_state::videoram_w)
 
 TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index] | 0x100, 1, 0);
+	tileinfo.set(0, m_videoram[tile_index] | 0x100, 1, 0);
 }
 
 TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_unkitpkr)
@@ -233,12 +233,12 @@ TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_unkitpkr)
 	if (m_bookkeeping_mode || (tile_index & 0x1f) < 0x08 || (tile_index & 0x1f) >= 0x10)
 		code |= 0x100;
 
-	SET_TILE_INFO_MEMBER(0, code, 1, 0);
+	tileinfo.set(0, code, 1, 0);
 }
 
 TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_sidampkr)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index] | 0x100, 0, 0);
+	tileinfo.set(0, m_videoram[tile_index] | 0x100, 0, 0);
 }
 
 void wallc_state::video_start()

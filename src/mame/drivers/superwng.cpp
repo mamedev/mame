@@ -130,7 +130,7 @@ TILE_GET_INFO_MEMBER(superwng_state::get_bg_tile_info)
 	int flipx=(attr&0x80) ? TILE_FLIPX : 0;
 	int flipy=(attr&0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, attr & 0xf, flipx|flipy);
+	tileinfo.set(0, code, attr & 0xf, flipx|flipy);
 }
 
 TILE_GET_INFO_MEMBER(superwng_state::get_fg_tile_info)
@@ -145,7 +145,7 @@ TILE_GET_INFO_MEMBER(superwng_state::get_fg_tile_info)
 	int flipx=(attr&0x80) ? TILE_FLIPX : 0;
 	int flipy=(attr&0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, attr & 0xf, flipx|flipy);
+	tileinfo.set(0, code, attr & 0xf, flipx|flipy);
 }
 
 void superwng_state::video_start()

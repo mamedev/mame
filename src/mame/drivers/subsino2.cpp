@@ -263,7 +263,7 @@ inline void subsino2_state::ss9601_get_tile_info(layer_t *l, tile_data &tileinfo
 		case TILE_8x32:     addr = tile_index & (~0x180);   offs = (tile_index/0x80) & 3;                           break;
 		case TILE_64x32:    addr = tile_index & (~0x187);   offs = ((tile_index/0x80) & 3) + (tile_index & 7) * 4;  break;
 	}
-	SET_TILE_INFO_MEMBER(0, l->videoram[addr] + offs, 0, 0);
+	tileinfo.set(0, l->videoram[addr] + offs, 0, 0);
 }
 
 // Layer 0

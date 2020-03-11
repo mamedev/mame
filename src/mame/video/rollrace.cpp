@@ -14,7 +14,7 @@ TILE_GET_INFO_MEMBER(rollrace_state::get_fg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[(tile_index & 0x1f)*2+1] & 0x1f;
 
-	SET_TILE_INFO_MEMBER(RA_FGCHAR_BASE + m_chrbank,
+	tileinfo.set(RA_FGCHAR_BASE + m_chrbank,
 		code,
 		color,
 		TILE_FLIPY);

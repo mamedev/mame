@@ -69,12 +69,12 @@ void timelimt_state::timelimt_palette(palette_device &palette) const
 
 TILE_GET_INFO_MEMBER(timelimt_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1, m_bg_videoram[tile_index], 0, 0);
+	tileinfo.set(1, m_bg_videoram[tile_index], 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(timelimt_state::get_fg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
+	tileinfo.set(0, m_videoram[tile_index], 0, 0);
 }
 
 void timelimt_state::video_start()

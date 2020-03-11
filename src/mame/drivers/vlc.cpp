@@ -292,7 +292,7 @@ TILE_GET_INFO_MEMBER( nevada_state::get_bg_tile_info )
 	//int bank = (attr & 0x02) >> 1;
 	//int color = (attr & 0x3c) >> 2;
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 
 }
 

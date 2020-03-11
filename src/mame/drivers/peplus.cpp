@@ -952,7 +952,7 @@ TILE_GET_INFO_MEMBER(peplus_state::get_bg_tile_info)
 		color += 0x10;
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void peplus_state::video_start()

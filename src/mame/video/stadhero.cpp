@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(stadhero_state::get_pf1_tile_info)
 	int color=tile >> 12;
 
 	tile=tile&0xfff;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);

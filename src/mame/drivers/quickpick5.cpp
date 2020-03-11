@@ -217,7 +217,7 @@ TILE_GET_INFO_MEMBER(quickpick5_state::ttl_get_tile_info)
 	attr >>= 3;
 	attr &= ~1;
 
-	SET_TILE_INFO_MEMBER(m_ttl_gfx_index, code, attr, 0);
+	tileinfo.set(m_ttl_gfx_index, code, attr, 0);
 }
 
 uint32_t quickpick5_state::screen_update_quickpick5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

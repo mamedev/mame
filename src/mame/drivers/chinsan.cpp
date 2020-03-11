@@ -392,7 +392,7 @@ TILE_GET_INFO_MEMBER( chinsan_state::tile_info )
 	// -----210  unknown
 	uint8_t color = m_color_ram[tile_index] >> 3;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 

@@ -92,19 +92,19 @@ public:
 TILE_GET_INFO_MEMBER(cultures_state::get_bg1_tile_info)
 {
 	int const code = m_bg1_rom[0x200000/2 + m_bg1_bank * 0x80000/2 + tile_index];
-	SET_TILE_INFO_MEMBER(1, code, code >> 12, 0);
+	tileinfo.set(1, code, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(cultures_state::get_bg2_tile_info)
 {
 	int const code = m_bg2_rom[0x200000/2 + m_bg2_bank * 0x80000/2 + tile_index];
-	SET_TILE_INFO_MEMBER(2, code, code >> 12, 0);
+	tileinfo.set(2, code, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(cultures_state::get_bg0_tile_info)
 {
 	int const code = m_bg0_videoram[tile_index * 2] + (m_bg0_videoram[tile_index * 2 + 1] << 8);
-	SET_TILE_INFO_MEMBER(0, code, code >> 12, 0);
+	tileinfo.set(0, code, code >> 12, 0);
 }
 
 void cultures_state::video_start()

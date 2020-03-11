@@ -85,7 +85,7 @@ TILE_GET_INFO_MEMBER(namco_c169roz_device::get_info)
 	m_c169_cb(m_videoram[tile_index&(m_ramsize-1)] & 0x3fff, &tile, &mask, Which); // need to mask with ramsize because the nb1/fl games have twice as much RAM, presumably the tilemaps mirror in ns2?
 
 	tileinfo.mask_data = m_mask + 32 * mask;
-	SET_TILE_INFO_MEMBER(0, tile, 0/*color*/, 0/*flag*/);
+	tileinfo.set(0, tile, 0/*color*/, 0/*flag*/);
 }
 
 TILEMAP_MAPPER_MEMBER( namco_c169roz_device::mapper )

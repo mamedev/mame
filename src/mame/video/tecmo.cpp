@@ -26,7 +26,7 @@
 TILE_GET_INFO_MEMBER(tecmo_state::get_bg_tile_info)
 {
 	uint8_t attr = m_bgvideoram[tile_index+0x200];
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			m_bgvideoram[tile_index] + ((attr & 0x07) << 8),
 			attr >> 4,
 			0);
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(tecmo_state::get_fg_tile_info)
 {
 	uint8_t attr = m_fgvideoram[tile_index+0x200];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			m_fgvideoram[tile_index] + ((attr & 0x07) << 8),
 			attr >> 4,
 			0);
@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_bg_tile_info)
 {
 	uint8_t attr = m_bgvideoram[tile_index+0x200];
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			m_bgvideoram[tile_index] + ((attr & 0x70) << 4),
 			attr & 0x0f,
 			0);
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_bg_tile_info)
 TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_fg_tile_info)
 {
 	uint8_t attr = m_fgvideoram[tile_index+0x200];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			m_fgvideoram[tile_index] + ((attr & 0x70) << 4),
 			attr & 0x0f,
 			0);
@@ -62,7 +62,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_fg_tile_info)
 TILE_GET_INFO_MEMBER(tecmo_state::get_tx_tile_info)
 {
 	uint8_t attr = m_txvideoram[tile_index+0x400];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_txvideoram[tile_index] + ((attr & 0x03) << 8),
 			attr >> 4,
 			0);

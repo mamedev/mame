@@ -137,7 +137,7 @@ TILE_GET_INFO_MEMBER(yunsung8_state::get_bg_tile_info)
 	int code  =  m_bg_vram[0x1000 + tile_index * 2 + 0] + m_bg_vram[0x1000 + tile_index * 2 + 1] * 256;
 	int color =  m_bg_vram[0x0800 + tile_index] & 0x07;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			color,
 			0);
@@ -153,7 +153,7 @@ TILE_GET_INFO_MEMBER(yunsung8_state::get_fg_tile_info)
 	int code  =  m_fg_vram[0x1000 + tile_index * 2 + 0] + m_fg_vram[0x1000 + tile_index * 2 + 1] * 256;
 	int color =  m_fg_vram[0x0800 + tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			color,
 			0);

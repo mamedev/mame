@@ -310,21 +310,21 @@ TILE_GET_INFO_MEMBER(limenko_state::get_bg_tile_info)
 {
 	const u32 tile  = m_bg_videoram[tile_index] & 0x7ffff;
 	const u32 color = (m_bg_videoram[tile_index]>>28) & 0xf;
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(limenko_state::get_md_tile_info)
 {
 	const u32 tile  = m_md_videoram[tile_index] & 0x7ffff;
 	const u32 color = (m_md_videoram[tile_index]>>28) & 0xf;
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(limenko_state::get_fg_tile_info)
 {
 	const u32 tile  = m_fg_videoram[tile_index] & 0x7ffff;
 	const u32 color = (m_fg_videoram[tile_index]>>28) & 0xf;
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 void limenko_state::draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,u8 width, u8 height,

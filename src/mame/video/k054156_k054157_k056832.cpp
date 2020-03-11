@@ -508,7 +508,7 @@ void k056832_device::get_tile_info(  tile_data &tileinfo, int tile_index, int pa
 
 	m_k056832_cb(layer, &code, &color, &flags, &priority);
 
-	SET_TILE_INFO_MEMBER(m_gfx_num,
+	tileinfo.set(m_gfx_num,
 			code,
 			color,
 			flags);

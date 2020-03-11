@@ -144,7 +144,7 @@ TILE_GET_INFO_MEMBER(lockon_state::get_lockon_tile_info)
 	uint32_t col = (m_char_ram[tile_index] >> 10) & 0x3f;
 
 	col = (col & 0x1f) + (col & 0x20 ? 64 : 0);
-	SET_TILE_INFO_MEMBER(0, tileno, col, 0);
+	tileinfo.set(0, tileno, col, 0);
 }
 
 

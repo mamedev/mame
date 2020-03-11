@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info0)
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code+bank*256,
 			1 + 64 * (attr & 0x0f),
 			0);
@@ -73,7 +73,7 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info1)
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code+bank*256,
 			0 + 64 * (attr & 0x0f),
 			0);

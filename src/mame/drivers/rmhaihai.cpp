@@ -127,7 +127,7 @@ TILE_GET_INFO_MEMBER(rmhaihai_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + (m_gfxbank << 12) + ((attr & 0x07) << 8) + ((attr & 0x80) << 4);
 	int color = (m_gfxbank << 5) + (attr >> 3);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void rmhaihai_state::video_start()

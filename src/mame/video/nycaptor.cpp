@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(nycaptor_state::get_tile_info)
 	}
 #endif
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[tile_index * 2] + ((m_videoram[tile_index * 2 + 1] & 0xc0) << 2) + 0x400 * m_char_bank,
 			pal, 0
 			);

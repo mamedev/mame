@@ -68,7 +68,7 @@ TILE_GET_INFO_MEMBER(drtomy_state::get_tile_info_fg)
 {
 	int code  = m_videoram_fg[tile_index] & 0xfff;
 	int color = (m_videoram_fg[tile_index] & 0xf000) >> 12;
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	tileinfo.set(2, code, color, 0);
 }
 
 
@@ -76,7 +76,7 @@ TILE_GET_INFO_MEMBER(drtomy_state::get_tile_info_bg)
 {
 	int code  = m_videoram_bg[tile_index] & 0xfff;
 	int color = (m_videoram_bg[tile_index] & 0xf000) >> 12;
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 

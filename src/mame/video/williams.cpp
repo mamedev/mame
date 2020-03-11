@@ -737,7 +737,7 @@ TILE_GET_INFO_MEMBER(williams2_state::get_tile_info)
 	/* On tshoot and inferno, IC79 is a 74LS157 selector jumpered to be enabled */
 	int color = y;
 
-	SET_TILE_INFO_MEMBER(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
+	tileinfo.set(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
 }
 
 int mysticm_state::color_decode(uint8_t base_col, int sig_J1, int y)
@@ -783,9 +783,9 @@ TILE_GET_INFO_MEMBER(mysticm_state::get_tile_info)
 	int data = m_tileram[tile_index];
 
 	//m_bg_tilemap->set_palette_offset((color & 0x3e) << 4);
-	//SET_TILE_INFO_MEMBER(0, data & mask, color & 1, (data & ~mask) ? TILE_FLIPX : 0);
+	//tileinfo.set(0, data & mask, color & 1, (data & ~mask) ? TILE_FLIPX : 0);
 	m_bg_tilemap->set_palette_offset(0);
-	SET_TILE_INFO_MEMBER(0, data & mask, (color & 0x3f), (data & ~mask) ? TILE_FLIPX : 0);
+	tileinfo.set(0, data & mask, (color & 0x3f), (data & ~mask) ? TILE_FLIPX : 0);
 
 	//gfx_element *gfx = tileinfo.decoder->gfx(0);
 	//printf("%d %d %d %d\n", gfx->elements(), gfx->colorbase(), gfx->granularity(), gfx->colors());
@@ -800,7 +800,7 @@ TILE_GET_INFO_MEMBER(joust2_state::get_tile_info)
 	/* IC79 is a 74LS157 selector jumpered to be disabled */
 	int color = 0;
 
-	SET_TILE_INFO_MEMBER(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
+	tileinfo.set(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
 }
 
 /* based on the board type, only certain bits are used */

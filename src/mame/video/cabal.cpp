@@ -18,7 +18,7 @@ TILE_GET_INFO_MEMBER(cabal_state::get_back_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile,
 			color,
 			0);
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(cabal_state::get_text_tile_info)
 
 	tile &= 0x3ff;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);

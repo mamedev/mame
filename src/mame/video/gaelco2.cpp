@@ -111,7 +111,7 @@ TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info)
 	const u16 data2 = m_videoram[(((m_vregs[Layer] >> 9) & 0x07) * 0x2000 / 2) + ((tile_index << 1) + 1)];
 	const u32 code = ((data & 0x07) << 16) | (data2 & 0xffff);
 
-	SET_TILE_INFO_MEMBER(0, code, ((data >> 9) & 0x7f), TILE_FLIPXY((data >> 6) & 0x03));
+	tileinfo.set(0, code, ((data >> 9) & 0x7f), TILE_FLIPXY((data >> 6) & 0x03));
 }
 
 
@@ -144,7 +144,7 @@ TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_dual)
 	const u16 data2 = m_videoram[(((m_vregs[Layer] >> 9) & 0x07) * 0x2000 / 2) + ((tile_index << 1) + 1)];
 	const u32 code = ((data & 0x07) << 16) | (data2 & 0xffff);
 
-	SET_TILE_INFO_MEMBER(0, code, (Layer * 0x40) + ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
+	tileinfo.set(0, code, (Layer * 0x40) + ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
 }
 
 

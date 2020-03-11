@@ -236,7 +236,7 @@ TILE_GET_INFO_MEMBER(tnx1_state::get_fg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void tnx1_state::video_start()

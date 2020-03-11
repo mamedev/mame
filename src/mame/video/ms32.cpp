@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_tx_tile_info)
 	tileno = m_txram[tile_index *2]   & 0xffff;
 	colour = m_txram[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO_MEMBER(2,tileno,colour,0);
+	tileinfo.set(2,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(ms32_state::get_ms32_roz_tile_info)
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_roz_tile_info)
 	tileno = m_rozram[tile_index *2]   & 0xffff;
 	colour = m_rozram[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
+	tileinfo.set(0,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(ms32_state::get_ms32_bg_tile_info)
@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_bg_tile_info)
 	tileno = m_bgram[tile_index *2]   & 0xffff;
 	colour = m_bgram[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
+	tileinfo.set(1,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(ms32_state::get_ms32_extra_tile_info)
@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_extra_tile_info)
 	tileno = m_f1superb_extraram[tile_index *2]   & 0xffff;
 	colour = m_f1superb_extraram[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO_MEMBER(3,tileno,colour+0x50,0);
+	tileinfo.set(3,tileno,colour+0x50,0);
 }
 
 

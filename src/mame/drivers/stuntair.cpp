@@ -192,7 +192,7 @@ TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_fg_tile_info)
 
 	// where does the FG palette come from? it's a 1bpp layer..
 
-	SET_TILE_INFO_MEMBER(0, tileno & 0x7f, 0, opaque ? TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
+	tileinfo.set(0, tileno & 0x7f, 0, opaque ? TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
 }
 
 TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
@@ -201,7 +201,7 @@ TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
 	tileno |= (m_bgattrram[tile_index] & 0x08)<<5;
 	int colour = (m_bgattrram[tile_index] & 0x07);
 
-	SET_TILE_INFO_MEMBER(1, tileno, colour, 0);
+	tileinfo.set(1, tileno, colour, 0);
 }
 
 

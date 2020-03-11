@@ -13,7 +13,7 @@
 template<int Layer>
 TILE_GET_INFO_MEMBER(tecmosys_state::get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(Layer,
+	tileinfo.set(Layer,
 			m_vram[Layer][2*tile_index+1],
 			(m_vram[Layer][2*tile_index]&0x3f),
 			TILE_FLIPYX((m_vram[Layer][2*tile_index]&0xc0)>>6));

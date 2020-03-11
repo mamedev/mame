@@ -105,7 +105,7 @@ TILE_GET_INFO_MEMBER(skyarmy_state::get_tile_info)
 	int code = m_videoram[tile_index];
 	int attr = bitswap<3>(m_colorram[tile_index], 0, 1, 2);
 
-	SET_TILE_INFO_MEMBER(0, code, attr, 0);
+	tileinfo.set(0, code, attr, 0);
 }
 
 WRITE8_MEMBER(skyarmy_state::videoram_w)

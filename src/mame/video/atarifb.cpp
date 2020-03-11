@@ -25,7 +25,7 @@ void atarifb_state::get_tile_info_common( tile_data &tileinfo, tilemap_memory_in
 	if (disable)
 		code = 0;   /* I *know* this is a space */
 
-	SET_TILE_INFO_MEMBER(0, code, 0, (flip ? TILE_FLIPX | TILE_FLIPY : 0));
+	tileinfo.set(0, code, 0, (flip ? TILE_FLIPX | TILE_FLIPY : 0));
 }
 
 
@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(atarifb_state::field_get_tile_info)
 	int code = m_field_videoram[tile_index] & 0x3f;
 	int flipyx = m_field_videoram[tile_index] >> 6;
 
-	SET_TILE_INFO_MEMBER(1, code, 0, TILE_FLIPYX(flipyx));
+	tileinfo.set(1, code, 0, TILE_FLIPYX(flipyx));
 }
 
 

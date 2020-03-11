@@ -207,7 +207,7 @@ TILE_GET_INFO_MEMBER(orca_ovg_40c_device::get_bg_tile_info)
 	int code = m_videoram_2[tile_index];
 	int color = (m_attributeram[(tile_index & 0x1f) << 1 | 1] >> 4) & 0x07;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(orca_ovg_40c_device::get_fg_tile_info)
@@ -215,7 +215,7 @@ TILE_GET_INFO_MEMBER(orca_ovg_40c_device::get_fg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = (m_attributeram[(tile_index & 0x1f) << 1 | 1] >> 0) & 0x07;
 
-	SET_TILE_INFO_MEMBER(3, code, color, 0);
+	tileinfo.set(3, code, color, 0);
 }
 
 void orca_ovg_40c_device::draw_bullets( bitmap_rgb32 &bitmap, const rectangle &cliprect )

@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(taotaido_state::bg_tile_info)
 
 	code |= m_bgbank[bank] << 9;
 
-	SET_TILE_INFO_MEMBER(1, code, col, 0);
+	tileinfo.set(1, code, col, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(taotaido_state::tilemap_scan_rows)

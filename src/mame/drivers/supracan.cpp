@@ -353,7 +353,7 @@ void supracan_state::get_tilemap_info_common(int layer, tile_data &tileinfo, int
 	int flipxy = (supracan_vram[count] & 0x0c00) >> 10;
 	int palette = ((supracan_vram[count] & 0xf000) >> 12) + palette_bank;
 
-	SET_TILE_INFO_MEMBER(region, tile, palette, TILE_FLIPXY(flipxy));
+	tileinfo.set(region, tile, palette, TILE_FLIPXY(flipxy));
 }
 
 // I wonder how different this really is.. my guess, not at all.
@@ -381,7 +381,7 @@ void supracan_state::get_roz_tilemap_info(int layer, tile_data &tileinfo, int co
 		if (count & 0x20) tile ^= 1;
 		tile |= (count & 0xc0) >> 2;
 
-		SET_TILE_INFO_MEMBER(region, tile, 0, 0);
+		tileinfo.set(region, tile, 0, 0);
 		return;
 	}
 
@@ -404,7 +404,7 @@ void supracan_state::get_roz_tilemap_info(int layer, tile_data &tileinfo, int co
 	int flipxy = (supracan_vram[count] & 0x0c00) >> 10;
 	int palette = ((supracan_vram[count] & 0xf000) >> 12) + palette_bank;
 
-	SET_TILE_INFO_MEMBER(region, tile, palette, TILE_FLIPXY(flipxy));
+	tileinfo.set(region, tile, palette, TILE_FLIPXY(flipxy));
 }
 
 

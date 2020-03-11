@@ -88,7 +88,7 @@ TILE_GET_INFO_MEMBER(bestleag_state::get_tx_tile_info)
 {
 	int code = m_txram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code & 0x0fff)|0x8000,
 			(code & 0xf000) >> 12,
 			0);
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(bestleag_state::get_bg_tile_info)
 {
 	int code = m_bgram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			(code & 0x0fff),
 			(code & 0xf000) >> 12,
 			0);
@@ -108,7 +108,7 @@ TILE_GET_INFO_MEMBER(bestleag_state::get_fg_tile_info)
 {
 	int code = m_fgram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			(code & 0x0fff)|0x1000,
 			((code & 0xf000) >> 12)|0x10,
 			0);

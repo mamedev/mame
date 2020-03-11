@@ -40,26 +40,26 @@ template<unsigned Layer, unsigned Gfx>
 TILE_GET_INFO_MEMBER(nmk16_state::common_get_bg_tile_info)
 {
 	const u16 code = m_bgvideoram[Layer][(m_tilerambank << 13) | tile_index];
-	SET_TILE_INFO_MEMBER(Gfx, (code & 0xfff) | (m_bgbank << 12), code >> 12, 0);
+	tileinfo.set(Gfx, (code & 0xfff) | (m_bgbank << 12), code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(nmk16_state::common_get_tx_tile_info)
 {
 	const u16 code = m_txvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code & 0xfff, code >> 12, 0);
+	tileinfo.set(0, code & 0xfff, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(nmk16_state::bioship_get_bg_tile_info)
 {
 	const u16 code = m_tilemap_rom[(m_bioship_background_bank << 13) | tile_index]; // ROM Based
-	SET_TILE_INFO_MEMBER(3, code & 0xfff, code >> 12, 0);
+	tileinfo.set(3, code & 0xfff, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(nmk16_state::bjtwin_get_bg_tile_info)
 {
 	const u16 code = m_bgvideoram[0][tile_index];
 	const u8 bank = BIT(code, 11);
-	SET_TILE_INFO_MEMBER(bank,
+	tileinfo.set(bank,
 			(code & 0x7ff) + ((bank) ? (m_bgbank << 11) : 0),
 			code >> 12,
 			0);
@@ -399,7 +399,7 @@ u32 nmk16_state::screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitma
 TILE_GET_INFO_MEMBER(afega_state::get_bg_tile_info_8bit)
 {
 	const u16 code = m_bgvideoram[0][tile_index];
-	SET_TILE_INFO_MEMBER(1, code, 0, 0);
+	tileinfo.set(1, code, 0, 0);
 }
 
 VIDEO_START_MEMBER(afega_state,grdnstrm)

@@ -112,7 +112,7 @@ void zaccaria_state::zaccaria_palette(palette_device &palette) const
 TILE_GET_INFO_MEMBER(zaccaria_state::get_tile_info)
 {
 	uint8_t attr = m_videoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[tile_index] + ((attr & 0x03) << 8),
 			((attr & 0x0c) >> 2) + ((m_attributesram[2 * (tile_index % 32) + 1] & 0x07) << 2),
 			0);
