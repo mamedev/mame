@@ -19,8 +19,8 @@
 
 #include "emu.h"
 #include "cpu/mcs96/i8x9x.h"
+#include "machine/bankdev.h"
 #include "machine/nvram.h"
-#include "machine/ram.h"
 #include "machine/timer.h"
 #include "video/msm6222b.h"
 #include "emupal.h"
@@ -57,9 +57,8 @@ class roland_d10_state : public driver_device
 public:
 	roland_d10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_ram(*this, "ram")
+		, m_bank(*this, "bank")
 		, m_rams(*this, "rams")
-		, m_memc(*this, "memc")
 		, m_memcs(*this, "memcs")
 		, m_lcd(*this, "lcd")
 		, m_midi_timer(*this, "midi_timer")
@@ -74,29 +73,32 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(so_w);
-	DECLARE_WRITE16_MEMBER(midi_w);
-	DECLARE_READ8_MEMBER(lcd_ctrl_r);
-	DECLARE_WRITE8_MEMBER(lcd_ctrl_w);
-	DECLARE_WRITE8_MEMBER(lcd_data_w);
-	DECLARE_READ16_MEMBER(port0_r);
+	void bank_w(uint8_t data);
+	uint8_t fixed_r(offs_t offset);
+	void fixed_w(offs_t offset, uint8_t data);
+	void so_w(uint8_t data);
+	void midi_w(uint8_t data);
+	uint8_t lcd_ctrl_r();
+	void lcd_ctrl_w(uint8_t data);
+	void lcd_data_w(uint8_t data);
+	uint8_t port0_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
 	void d10_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void d10_map(address_map &map);
+	void d10_bank_map(address_map &map);
 	void d110_map(address_map &map);
+	void d110_bank_map(address_map &map);
 
 	uint8_t  m_lcd_data_buffer[256];
 	int      m_lcd_data_buffer_pos;
 	uint8_t  m_midi;
 	int      m_midi_pos;
 	uint8_t  m_port0;
-	required_device<ram_device> m_ram;
+	required_device<address_map_bank_device> m_bank;
 	required_device<nvram_device> m_rams;
-	required_device<ram_device> m_memc;
 	required_device<nvram_device> m_memcs;
 	required_device<msm6222b_device> m_lcd;
 	required_device<timer_device> m_midi_timer;
@@ -137,15 +139,6 @@ uint32_t roland_d10_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 
 void roland_d10_state::machine_start()
 {
-	m_rams->set_base(m_ram->pointer(), 32768);
-	m_memcs->set_base(m_memc->pointer(), 32768);
-
-	membank("bank")->configure_entries(0x00, 4, memregion("maincpu")->base(), 0x4000);
-	membank("bank")->configure_entries(0x10, 2, m_ram->pointer(), 0x4000);
-	membank("bank")->configure_entries(0x20, 8, memregion("presets")->base(), 0x4000);
-	membank("bank")->configure_entries(0x30, 2, m_memc->pointer(), 0x4000);
-	membank("fixed")->set_base(m_ram->pointer());
-
 	m_lcd_data_buffer_pos = 0;
 }
 
@@ -156,7 +149,7 @@ void roland_d10_state::machine_reset()
 	m_port0 = 0x80; // battery ok
 }
 
-WRITE8_MEMBER(roland_d10_state::lcd_ctrl_w)
+void roland_d10_state::lcd_ctrl_w(uint8_t data)
 {
 	m_lcd->control_w(data);
 	for(int i=0; i != m_lcd_data_buffer_pos; i++)
@@ -164,13 +157,13 @@ WRITE8_MEMBER(roland_d10_state::lcd_ctrl_w)
 	m_lcd_data_buffer_pos = 0;
 }
 
-READ8_MEMBER(roland_d10_state::lcd_ctrl_r)
+uint8_t roland_d10_state::lcd_ctrl_r()
 {
 	// Busy flag in the msm622b is bit 7, while the software expects it in bit 0...
 	return m_lcd->control_r() >> 7;
 }
 
-WRITE8_MEMBER(roland_d10_state::lcd_data_w)
+void roland_d10_state::lcd_data_w(uint8_t data)
 {
 	if(m_lcd_data_buffer_pos == sizeof(m_lcd_data_buffer)) {
 		logerror("Warning: lcd data buffer overflow (%04x)\n", m_maincpu->pc());
@@ -179,12 +172,22 @@ WRITE8_MEMBER(roland_d10_state::lcd_data_w)
 	m_lcd_data_buffer[m_lcd_data_buffer_pos++] = data;
 }
 
-WRITE8_MEMBER(roland_d10_state::bank_w)
+void roland_d10_state::bank_w(uint8_t data)
 {
-	membank("bank")->set_entry(data);
+	m_bank->set_bank(data);
 }
 
-WRITE16_MEMBER(roland_d10_state::midi_w)
+uint8_t roland_d10_state::fixed_r(offs_t offset)
+{
+	return m_bank->space(0).read_byte(0x40000 + offset);
+}
+
+void roland_d10_state::fixed_w(offs_t offset, uint8_t data)
+{
+	m_bank->space(0).write_byte(0x40000 + offset, data);
+}
+
+void roland_d10_state::midi_w(uint8_t data)
 {
 	logerror("midi_out %02x\n", data);
 	m_midi = data;
@@ -200,7 +203,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(roland_d10_state::midi_timer_cb)
 		m_midi_timer->adjust(attotime::from_hz(1250));
 }
 
-READ16_MEMBER(roland_d10_state::port0_r)
+uint8_t roland_d10_state::port0_r()
 {
 	return m_port0;
 }
@@ -210,7 +213,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(roland_d10_state::samples_timer_cb)
 	m_port0 ^= 0x10;
 }
 
-WRITE8_MEMBER(roland_d10_state::so_w)
+void roland_d10_state::so_w(uint8_t data)
 {
 	// bit 0   = led
 	// bit 1-2 = reverb program a13/a14
@@ -232,8 +235,17 @@ void roland_d10_state::d10_map(address_map &map)
 	map(0x0300, 0x0300).w(FUNC(roland_d10_state::lcd_data_w));
 	map(0x0380, 0x0380).rw(FUNC(roland_d10_state::lcd_ctrl_r), FUNC(roland_d10_state::lcd_ctrl_w));
 	map(0x1000, 0x7fff).rom().region("maincpu", 0x1000);
-	map(0x8000, 0xbfff).bankrw("bank");
-	map(0xc000, 0xffff).bankrw("fixed");
+	map(0x8000, 0xbfff).m(m_bank, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xffff).rw(FUNC(roland_d10_state::fixed_r), FUNC(roland_d10_state::fixed_w));
+}
+
+void roland_d10_state::d10_bank_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
+	map(0x40000, 0x47fff).ram();
+	map(0x80000, 0x87fff).ram().share("rams");
+	map(0xa0000, 0xbffff).rom().region("presets", 0);
+	map(0xc0000, 0xc7fff).ram().share("memcs");
 }
 
 void roland_d10_state::d110_map(address_map &map)
@@ -245,8 +257,16 @@ void roland_d10_state::d110_map(address_map &map)
 	map(0x0300, 0x0300).w(FUNC(roland_d10_state::lcd_data_w));
 	map(0x0380, 0x0380).rw(FUNC(roland_d10_state::lcd_ctrl_r), FUNC(roland_d10_state::lcd_ctrl_w));
 	map(0x1000, 0x7fff).rom().region("maincpu", 0x1000);
-	map(0x8000, 0xbfff).bankrw("bank");
-	map(0xc000, 0xffff).bankrw("fixed");
+	map(0x8000, 0xbfff).m(m_bank, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xffff).rw(FUNC(roland_d10_state::fixed_r), FUNC(roland_d10_state::fixed_w));
+}
+
+void roland_d10_state::d110_bank_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
+	map(0x40000, 0x47fff).ram().share("rams");
+	map(0x80000, 0x9ffff).rom().region("presets", 0);
+	map(0xc0000, 0xc7fff).ram().share("memcs");
 }
 
 void roland_d10_state::d10(machine_config &config)
@@ -256,12 +276,17 @@ void roland_d10_state::d10(machine_config &config)
 	m_maincpu->serial_tx_cb().set(FUNC(roland_d10_state::midi_w));
 	m_maincpu->in_p0_cb().set(FUNC(roland_d10_state::port0_r));
 
+	ADDRESS_MAP_BANK(config, m_bank);
+	m_bank->set_endianness(ENDIANNESS_LITTLE);
+	m_bank->set_data_width(8); // FIXME: actually 16 with dynamic bus sizing
+	m_bank->set_addr_width(20);
+	m_bank->set_stride(0x4000);
+	m_bank->set_addrmap(0, &roland_d10_state::d10_bank_map);
+
 // Battery-backed main ram
-	RAM( config, "ram" ).set_default_size( "32K" );
 	NVRAM(config, m_rams, nvram_device::DEFAULT_ALL_0);
 
 // Shall become a proper memcard device someday
-	RAM( config, m_memc ).set_default_size( "32K" );
 	NVRAM( config, m_memcs, nvram_device::DEFAULT_ALL_0 );
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -285,6 +310,8 @@ void roland_d10_state::d110(machine_config &config)
 {
 	d10(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_d10_state::d110_map);
+	//m_bank->set_data_width(8);
+	m_bank->set_addrmap(0, &roland_d10_state::d110_bank_map);
 }
 
 ROM_START( d10 )
