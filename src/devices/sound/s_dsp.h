@@ -76,6 +76,11 @@ private:
 
 	inline u16 vptr(u8 sd, u8 v) { return read_word((sd << 8) + (m_dsp_regs[v + 4] << 2)); }           /* Ptr to start of sample data  */
 	inline u16 lptr(u8 sd, u8 v) { return read_word((sd << 8) + (m_dsp_regs[v + 4] << 2) + 2); }       /* Loop pointer in sample data  */
+	inline u16 pitch(u8 v) { (m_dsp_regs[v + 2] | (m_dsp_regs[v + 3] << 8)) & 0x3fff; }
+
+	/* Make reading the ADSR code easier */
+	inline u8 SL(u8 v) { return m_dsp_regs[(v << 4) + 6] >> 5; }         /* Returns SUSTAIN level        */
+	inline u8 SR(u8 v) { return m_dsp_regs[(v << 4) + 6] & 0x1f; }       /* Returns SUSTAIN rate         */
 
 	void dsp_reset();
 	void dsp_update(s16 *sound_ptr);

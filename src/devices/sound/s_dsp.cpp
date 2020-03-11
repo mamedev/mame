@@ -135,13 +135,6 @@ static const int ENVCNT[0x20]
 	};
 
 
-/* Make reading the ADSR code easier */
-#define SL( v )         (m_dsp_regs[((v) << 4) + 6] >> 5)         /* Returns SUSTAIN level        */
-#define SR( v )         (m_dsp_regs[((v) << 4) + 6] & 0x1f)       /* Returns SUSTAIN rate         */
-
-/* Handle endianness */
-#define LEtoME16( x ) little_endianize_int16(x)
-
 ALLOW_SAVE_TYPE(s_dsp_device::env_state_t32);
 
 
@@ -365,7 +358,7 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 			continue;
 		}
 
-		vp->pitch = LEtoME16(*((u16 *)&m_dsp_regs[V + 2])) & 0x3fff;
+		vp->pitch = pitch(V);
 
 #ifndef NO_PMOD
 		/* Pitch mod uses OUTX from last voice for this one.  Luckily we haven't
