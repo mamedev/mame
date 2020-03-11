@@ -3694,6 +3694,10 @@ ROM_END
 
 MACHINE_START_MEMBER(konamigx_state,konamigx)
 {
+	m_soundcpu->space(AS_PROGRAM).install_write_tap(0x200000, 0x2004ff, "snd", [this](offs_t offset, u16 &data, u16 mem_mask) {
+														logerror("%10d write %06x %04x %04x\n", machine().time().as_ticks(18432000), offset, data, mem_mask);
+													});
+
 	m_lamp.resolve();
 
 	save_item(NAME(m_sound_ctrl));
