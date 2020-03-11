@@ -517,11 +517,50 @@ void nes_sh6578_state::vram_map(address_map& map)
 
 uint32_t nes_sh6578_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
+	// nametable base depends on bits in 0x2008, it isn't fixed at 0x2000 as it is on a NES
+	int address = 0;
+	const pen_t *paldata = m_palette->pens();
+
+	// pages are 32 tiles high, not 30 as on NES
 	for (int y = 0; y < 32; y++)
 	{
 		for (int x = 0; x < 32; x++)
 		{
+			// character gfx pointer and palette select are encoded in a pair of bytes, not using separate attribute table for palette
+			uint16_t tileaddr;
+			tileaddr = (m_vram->read8(address) << 0);
+			address++;
+			tileaddr |= (m_vram->read8(address) << 8);
+			address++;
 
+			uint8_t pal = (tileaddr & 0xf000) >> 12;
+			tileaddr &= 0x0fff;
+			tileaddr <<= 4;
+
+			for (int yy = 0; yy < 8; yy++)
+			{
+				uint32_t* destptr = &bitmap.pix32((y*8)+ yy);
+
+				uint8_t plane0 = m_vram->read8(tileaddr+0);
+				uint8_t plane1 = m_vram->read8(tileaddr+8);
+				uint8_t plane2 = m_vram->read8(tileaddr+16);
+				uint8_t plane3 = m_vram->read8(tileaddr+24);
+
+				for (int xx = 0; xx < 8; xx++)
+				{
+					uint8_t pixval = ((plane0 >> (7-xx)) & 1) << 0;
+					pixval |= ((plane1 >> (7-xx)) & 1) << 1;
+					pixval |= ((plane2 >> (7-xx)) & 1) << 2;
+					pixval |= ((plane3 >> (7-xx)) & 1) << 3;
+
+					pixval |= ((pal & 0xc) << 2);
+
+					destptr[(x * 8) + xx] = paldata[pixval];
+				}
+
+				tileaddr++;
+
+			}
 
 		}
 	}
