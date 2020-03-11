@@ -40,6 +40,7 @@ public:
 	void rad_crik(machine_config &config);
 	void non_spg_base(machine_config &config);
 	void abltenni(machine_config &config);
+	void comil(machine_config &config);
 	void tvsprt10(machine_config &config);
 	void guitarfv(machine_config &config);
 	void tmntmutm(machine_config &config);
@@ -103,6 +104,25 @@ private:
 	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+};
+
+class spg2xx_game_comil_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_comil_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_porta_data(0),
+		m_extra_in(*this, "EXTRA%u", 0U)
+	{ }
+
+	void comil(machine_config &config);
+
+private:
+	DECLARE_READ16_MEMBER(porta_r);
+	DECLARE_WRITE16_MEMBER(porta_w) override;
+	DECLARE_READ16_MEMBER(portb_r);
+	uint16_t m_porta_data;
+	required_ioport_array<8> m_extra_in;
 };
 
 class spg2xx_game_swclone_state : public spg2xx_game_state

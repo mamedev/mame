@@ -72,6 +72,7 @@ public:
 	auto int_callback() { return m_int_callback.bind(); }
 
 	/* routines */
+	rgb_t nespal_to_RGB(int color_intensity, int color_num);
 	virtual void init_palette();
 	void init_palette(bool indirect);
 	virtual uint32_t palette_entries() const override { return 4*16*8; }

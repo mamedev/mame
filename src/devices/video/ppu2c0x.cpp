@@ -322,15 +322,8 @@ void ppu2c0x_device::init_palette()
 	init_palette(false);
 }
 
-void ppu2c0x_device::init_palette(bool indirect)
+rgb_t ppu2c0x_device::nespal_to_RGB(int color_intensity, int color_num)
 {
-	/* This routine builds a palette using a transformation from */
-	/* the YUV (Y, B-Y, R-Y) to the RGB color space */
-
-	/* The NES has a 64 color palette                        */
-	/* 16 colors, with 4 luminance levels for each color     */
-	/* The 16 colors circle around the YUV color space,      */
-
 	const double tint = 0.22; /* adjust to taste */
 	const double hue = 287.0;
 
@@ -345,6 +338,68 @@ void ppu2c0x_device::init_palette(bool indirect)
 		{ 0.29, 0.45, 0.73, 0.9 },
 		{ 0, 0.24, 0.47, 0.77 }
 	};
+
+	double sat;
+	double y, u, v;
+	double rad;
+
+	switch (color_num)
+	{
+	case 0:
+		sat = 0; rad = 0;
+		y = brightness[0][color_intensity];
+		break;
+
+	case 13:
+		sat = 0; rad = 0;
+		y = brightness[2][color_intensity];
+		break;
+
+	case 14:
+	case 15:
+		sat = 0; rad = 0; y = 0;
+		break;
+
+	default:
+		sat = tint;
+		rad = M_PI * ((color_num * 30 + hue) / 180.0);
+		y = brightness[1][color_intensity];
+		break;
+	}
+
+	u = sat * cos(rad);
+	v = sat * sin(rad);
+
+	/* Transform to RGB */
+	double R = (y + Kv * v) * 255.0;
+	double G = (y - (Kb * Ku * u + Kr * Kv * v) / (1 - Kb - Kr)) * 255.0;
+	double B = (y + Ku * u) * 255.0;
+
+	/* Clipping, in case of saturation */
+	if (R < 0)
+		R = 0;
+	if (R > 255)
+		R = 255;
+	if (G < 0)
+		G = 0;
+	if (G > 255)
+		G = 255;
+	if (B < 0)
+		B = 0;
+	if (B > 255)
+		B = 255;
+
+	return rgb_t(floor(R + .5), floor(G + .5), floor(B + .5));
+}
+
+void ppu2c0x_device::init_palette(bool indirect)
+{
+	/* This routine builds a palette using a transformation from */
+	/* the YUV (Y, B-Y, R-Y) to the RGB color space */
+
+	/* The NES has a 64 color palette                        */
+	/* 16 colors, with 4 luminance levels for each color     */
+	/* The 16 colors circle around the YUV color space,      */
 
 	int entry = 0;
 
@@ -375,61 +430,13 @@ void ppu2c0x_device::init_palette(bool indirect)
 			/* loop through the 16 colors */
 			for (int color_num = 0; color_num < 16; color_num++)
 			{
-				double sat;
-				double y, u, v;
-				double rad;
-
-				switch (color_num)
-				{
-				case 0:
-					sat = 0; rad = 0;
-					y = brightness[0][color_intensity];
-					break;
-
-				case 13:
-					sat = 0; rad = 0;
-					y = brightness[2][color_intensity];
-					break;
-
-				case 14:
-				case 15:
-					sat = 0; rad = 0; y = 0;
-					break;
-
-				default:
-					sat = tint;
-					rad = M_PI * ((color_num * 30 + hue) / 180.0);
-					y = brightness[1][color_intensity];
-					break;
-				}
-
-				u = sat * cos(rad);
-				v = sat * sin(rad);
-
-				/* Transform to RGB */
-				double R = (y + Kv * v) * 255.0;
-				double G = (y - (Kb * Ku * u + Kr * Kv * v) / (1 - Kb - Kr)) * 255.0;
-				double B = (y + Ku * u) * 255.0;
-
-				/* Clipping, in case of saturation */
-				if (R < 0)
-					R = 0;
-				if (R > 255)
-					R = 255;
-				if (G < 0)
-					G = 0;
-				if (G > 255)
-					G = 255;
-				if (B < 0)
-					B = 0;
-				if (B > 255)
-					B = 255;
+				rgb_t col = nespal_to_RGB(color_intensity, color_num);
 
 				/* Round, and set the value */
 				if (indirect)
-					set_indirect_color(entry++, rgb_t(floor(R + .5), floor(G + .5), floor(B + .5)));
+					set_indirect_color(entry++, col);
 				else
-					set_pen_color(entry++, floor(R + .5), floor(G + .5), floor(B + .5));
+					set_pen_color(entry++, col);
 			}
 		}
 	}
