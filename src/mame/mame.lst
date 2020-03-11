@@ -39551,6 +39551,10 @@ vs4jc                           // 2004.09 Virtua Striker 4 (Japan) (Rev C)
 @source:triplhnt.cpp
 triplhnt                        // 008422-008791    1977/04 [6800]
 
+@source:triviaquiz.cpp
+triviaqz                        // 1985 Intermatic Manufacturing
+triviaqz2                       // 1985 Intermatic Manufacturing
+
 @source:trivrus.cpp
 trivrus                         // 2009 AGT. Trivia R Us
 
