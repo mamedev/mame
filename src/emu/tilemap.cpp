@@ -860,7 +860,10 @@ u8 tilemap_t::tile_draw(gfx_element *gfx, const u8 *pendata, u32 gfx_xoffs, u32 
 	u8 andmask = ~0, ormask = 0;
 	for (u16 ty = 0; ty < m_tileheight; ty++)
 	{
-		const u8 *rowdata = pendata + (((ty + gfx_yoffs) % gfx->height()) * gfx->rowbytes());
+		if (gfx_yoffs >= gfx->height())
+			gfx_yoffs = 0;
+
+		const u8 *rowdata = pendata + (gfx_yoffs * gfx->rowbytes());
 		u16 *pixptr = &m_pixmap.pix16(y0, x0);
 		u8 *flagsptr = &m_flagsmap.pix8(y0, x0);
 
@@ -869,16 +872,22 @@ u8 tilemap_t::tile_draw(gfx_element *gfx, const u8 *pendata, u32 gfx_xoffs, u32 
 
 		// 8bpp data
 		int xoffs = 0;
+		int draw_xoffs = gfx_xoffs;
 		for (u16 tx = 0; tx < m_tilewidth; tx++)
 		{
-			u8 pen = rowdata[(tx + gfx_xoffs) % gfx->width()] & pen_mask;
+			if (draw_xoffs >= gfx->width())
+				draw_xoffs = 0;
+
+			u8 pen = rowdata[draw_xoffs] & pen_mask;
 			u8 map = penmap[pen];
 			pixptr[xoffs] = palette_base + pen;
 			flagsptr[xoffs] = map | category;
 			andmask &= map;
 			ormask |= map;
 			xoffs += dx0;
+			draw_xoffs++;
 		}
+		gfx_yoffs++;
 	}
 	return andmask ^ ormask;
 }
