@@ -26,7 +26,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_bank(*this, "cartbank"),
 		m_fullrom(*this, "fullrom"),
-		m_vram(*this, "vram")
+		m_vram(*this, "vram"),
+		m_screen(*this, "screen")
 	{ }
 	
 	void nes_sh6578(machine_config& config);
@@ -45,6 +46,7 @@ private:
 	required_memory_bank m_bank;
 	required_device<address_map_bank_device> m_fullrom;
 	required_device<address_map_bank_device> m_vram;
+	required_device<screen_device> m_screen;
 
 	DECLARE_READ8_MEMBER(bankswitch_r);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
@@ -323,6 +325,16 @@ READ8_MEMBER(nes_sh6578_state::read_ppu)
 		case 0x00:
 			return m_2000;
 
+		case 0x02:
+		{
+			uint8_t ret = 0x00;
+			int vblank = m_screen->vpos() > 239 ? 1 : 0;
+
+			if (vblank) ret |= 0x80;
+
+			return ret;
+		}
+
 		default:
 			//return ppu2c0x_device::read(space, offset);
 			return 0x00;
@@ -441,11 +453,11 @@ void nes_sh6578_state::nes_sh6578(machine_config& config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(nes_sh6578_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
-	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_size(32 * 8, 262);
-	screen.set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
-	screen.set_screen_update("ppu", FUNC(nes_sh6578_state::screen_update));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(32 * 8, 262);
+	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
+	m_screen->set_screen_update(FUNC(nes_sh6578_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
