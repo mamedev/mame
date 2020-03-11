@@ -8868,6 +8868,58 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="aitd2">
+		<description>Alone in the Dark 2</description>
+		<year>1993</year>
+		<publisher>Infogrames</publisher>
+		<info name="developer" value="Infogrames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="f1a73e14" sha1="4ca20f2461f843a3bf52e7870254493bf39e090d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 2 of 9].img" size="1474560" crc="769f58cf" sha1="45c5e1848c43c81b02b5989afde8d8019e374d30"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 3 of 9].img" size="1474560" crc="b1a99152" sha1="55ba003447e46e2b685077b8fdb585a5711406a3"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 4 of 9].img" size="1474560" crc="a3a0dc74" sha1="b25f772eb044a3160b886812c29f097def5f2df0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 5 of 9].img" size="1474560" crc="1491f7f1" sha1="2905e81bb0a3fb2dc60fcf39c1daae3f938a23ca"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 6 of 9].img" size="1474560" crc="14b3105c" sha1="6f0d47336d7790708660e4f15c108a575b54698b"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 7 of 9].img" size="1474560" crc="60d7f101" sha1="091ea0d63720413455165326275bcd1bff11d3ef"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 8 of 9].img" size="1474560" crc="299d0b20" sha1="20bc9dc7a93f88b4f86d2ee54ced8453f7d6935f"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 9 of 9].img" size="1474560" crc="ee746f7e" sha1="4c7eebda892101aa51eda8dfa6f41de8eee52461"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="amazon">
 		<description>Amazon - Guardians of Eden</description>
 		<year>1992</year>
@@ -10350,7 +10402,7 @@ license:CC0
 	</software>
 
 	<software name="kyrandiafr" cloneof="kyrandia">
-		<description>Fables &amp; Fiends - The Legend of Kyrandia Book One (French)</description>
+		<description>Fables &amp; Fiends - The Legend of Kyrandia Book One (France)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
 		<info name="version" value="1.7" />
@@ -10378,7 +10430,7 @@ license:CC0
 	</software>
 
 	<software name="hofde">
-		<description>Fables &amp; Fiends - The Hand of Fate (German)</description>
+		<description>Fables &amp; Fiends - The Hand of Fate (Germany)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive Entertainment</publisher>
 		<info name="version" value="1.41" />
