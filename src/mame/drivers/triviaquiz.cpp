@@ -149,7 +149,7 @@ void triviaquiz_state::triviaquiz(machine_config &config)
 
 
 ROM_START( triviaqz )
-	ROM_REGION(0x6000, "maincpu", 0) \
+	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD( "ic6_qn_e1c.bin", 0x0000, 0x2000, CRC(b0e8c85a) SHA1(da61b6b0bdad6cea8e46f25bcdd9c1ecf21a6a4f) )
 	ROM_LOAD( "ic5_qn_e2b.bin", 0x2000, 0x2000, CRC(662a8fb4) SHA1(7c021da698b57d2cd34e15780737be831c937f00) )
 	ROM_LOAD( "ic4_qn_e3.bin",  0x4000, 0x2000, CRC(5fb41252) SHA1(2701e12b6d3da5e4bba1d224851a6bd42093e1d7) )
@@ -163,7 +163,7 @@ ROM_START( triviaqz )
 ROM_END
 
 ROM_START( triviaqz2 )
-	ROM_REGION(0x6000, "maincpu", 0) \
+	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD( "ic6_qn_e1a.bin", 0x0000, 0x2000, CRC(529f5252) SHA1(1676d372b32efeb34f68d804fd630d6c8de15bc0) )
 	ROM_LOAD( "ic5_qn_e2.bin",  0x2000, 0x2000, CRC(8e26e49e) SHA1(f99001b4a44754f7fa4e4535a1895c09922d2099) )
 	ROM_LOAD( "ic4_qn_e3.bin",  0x4000, 0x2000, CRC(5fb41252) SHA1(2701e12b6d3da5e4bba1d224851a6bd42093e1d7) )
