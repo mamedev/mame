@@ -129,3 +129,5 @@ void menu_about::handle()
 		stack_pop();
 	}
 }
+
+};
