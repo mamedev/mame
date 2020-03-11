@@ -196,16 +196,15 @@ void nes_sh6578_state::do_dma()
 			}
 			else
 			{
-				uint32_t trueaddress = (realsourceaddress & 0x7fff);
-
-				readdat = m_maincpu->space(AS_PROGRAM).read_byte(trueaddress);
 				//logerror("reading from system area %04x\n", realsourceaddress);
+				uint32_t trueaddress = (realsourceaddress & 0x7fff);
+				readdat = m_maincpu->space(AS_PROGRAM).read_byte(trueaddress);
 			}
 
 			if (m_dma_control & 0x20)
 			{
-				// write to work RAM
-				logerror("writing to WORK RAM %04x %02x\n", realdestaddress, readdat);
+				//logerror("writing to WORK RAM %04x %02x\n", realdestaddress, readdat);
+				m_maincpu->space(AS_PROGRAM).write_byte(realdestaddress, readdat);
 			}
 			else
 			{
@@ -466,6 +465,9 @@ void nes_sh6578_state::nes_sh6578_map(address_map& map)
 
 
 	map(0x5000, 0x57ff).ram();
+
+	map(0x5800, 0x7fff).ram(); // cpatrolm seems to expect RAM here too?
+
 	map(0x8000, 0x8fff).rw(FUNC(nes_sh6578_state::bank0_r), FUNC(nes_sh6578_state::bank0_w));
 	map(0x9000, 0x9fff).rw(FUNC(nes_sh6578_state::bank1_r), FUNC(nes_sh6578_state::bank1_w));
 	map(0xa000, 0xafff).rw(FUNC(nes_sh6578_state::bank2_r), FUNC(nes_sh6578_state::bank2_w));
