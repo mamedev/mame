@@ -951,6 +951,9 @@ void spg2xx_game_comil_state::comil(machine_config &config)
 
 	spg2xx_base(config);
 
+	m_maincpu->set_pal(true);
+	m_screen->set_refresh_hz(50);
+
 	m_maincpu->porta_in().set(FUNC(spg2xx_game_comil_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(spg2xx_game_comil_state::portb_r));
 
@@ -1343,7 +1346,7 @@ CONS( 2007, rad_fb2,   0,        0, rad_skat, rad_fb2,    spg2xx_game_state, ini
 // ABL TV Games
 CONS( 2006, abltenni,    0,     0,        abltenni,       abltenni,    spg2xx_game_state, empty_init, "Advance Bright Ltd / V-Tac Technology Co Ltd.", "Wireless Tennis (WT2000, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2008, comil,       0,     0,        comil,          comil,       spg2xx_game_comil_state, empty_init, "Character Options", "Who Wants To Be A Millionaire (UK, Character Options)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, comil,       0,     0,        comil,          comil,       spg2xx_game_comil_state, empty_init, "Character Options", "Who Wants to Be a Millionaire? (Character Options, Plug and Play, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // same as Excalibur Decathlon? not the same as the ABL game
 CONS( 2006, tvsprt10,    0,     0,        tvsprt10,       tvsprt10,    spg2xx_game_state, init_tvsprt10, "Simba / V-Tac Technology Co Ltd.",              "TV Sports 10-in-1 / Decathlon Athletic Sport Games", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
