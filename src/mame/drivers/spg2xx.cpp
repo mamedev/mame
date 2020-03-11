@@ -646,6 +646,49 @@ static INPUT_PORTS_START( abltenni )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( comil )
+	PORT_START("EXTRA0")
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("50:50")
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Phone A Friend")
+	PORT_BIT( 0x4, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Ask The Audience")
+	PORT_BIT( 0x8, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Walk Away")
+
+	PORT_START("EXTRA1")
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x4, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("C")
+	PORT_BIT( 0x8, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("D")
+
+	PORT_START("EXTRA2")
+	PORT_BIT( 0xf, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRA3")
+	PORT_BIT( 0xf, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRA4")
+	PORT_BIT( 0xf, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRA5")
+	PORT_BIT( 0xf, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRA6")
+	PORT_BIT( 0xf, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRA7")
+	PORT_BIT( 0xf, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED ) // multiplex select for Port B
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED ) // multiplexed inputs
+	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( guitarfv )
 	PORT_START("P1")  // Button 1 + 2 and start for service mode
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -869,6 +912,50 @@ void spg2xx_game_state::abltenni(machine_config &config)
 	m_maincpu->porta_in().set_ioport("P1");
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3");
+}
+
+READ16_MEMBER(spg2xx_game_comil_state::porta_r)
+{
+	uint16_t data = m_porta_data;
+	logerror("%s: Port A Read: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+WRITE16_MEMBER(spg2xx_game_comil_state::porta_w)
+{
+	logerror("%s: Port A Write: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
+	m_porta_data = data;
+}
+
+READ16_MEMBER(spg2xx_game_comil_state::portb_r)
+{
+	uint16_t data = m_io_p2->read() & 0xfff0;
+
+	if (!(m_porta_data & 0x0001)) data |= (m_extra_in[0]->read() & 0xf);
+	if (!(m_porta_data & 0x0002)) data |= (m_extra_in[1]->read() & 0xf);
+	if (!(m_porta_data & 0x0004)) data |= (m_extra_in[2]->read() & 0xf);
+	if (!(m_porta_data & 0x0008)) data |= (m_extra_in[3]->read() & 0xf);
+	if (!(m_porta_data & 0x0010)) data |= (m_extra_in[4]->read() & 0xf);
+	if (!(m_porta_data & 0x0020)) data |= (m_extra_in[5]->read() & 0xf);
+	if (!(m_porta_data & 0x0040)) data |= (m_extra_in[6]->read() & 0xf);
+	if (!(m_porta_data & 0x0080)) data |= (m_extra_in[7]->read() & 0xf);
+
+	logerror("%s: Port B Read: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void spg2xx_game_comil_state::comil(machine_config &config)
+{
+	SPG28X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_comil_state::mem_map_4m);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_comil_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_comil_state::portb_r));
+
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_comil_state::porta_w));
+	//m_maincpu->portb_out().set(FUNC(spg2xx_game_comil_state::portb_w));
 }
 
 void spg2xx_game_state::guitarfv(machine_config &config)
@@ -1136,6 +1223,11 @@ ROM_START( abltenni )
 	ROM_LOAD16_WORD_SWAP( "ablpnpwirelesstennis.bin", 0x000000, 0x400000, CRC(66bd8ef1) SHA1(a83640d5d9e84e10d29a065a61e0d7bbec16c6e4) )
 ROM_END
 
+ROM_START( comil )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "ukmillionaire.bin", 0x000000, 0x400000, CRC(b7e8e126) SHA1(fc76dba672eb5c4c115e16d8ea4a45a6e859f87c) )
+ROM_END
+
 ROM_START( tvsprt10 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "tvsports10in1.bin", 0x000000, 0x400000, CRC(98b79889) SHA1(b0ba534d59b794bb38c071c70ab5bcf711364e06) )
@@ -1250,6 +1342,8 @@ CONS( 2007, rad_fb2,   0,        0, rad_skat, rad_fb2,    spg2xx_game_state, ini
 
 // ABL TV Games
 CONS( 2006, abltenni,    0,     0,        abltenni,       abltenni,    spg2xx_game_state, empty_init, "Advance Bright Ltd / V-Tac Technology Co Ltd.", "Wireless Tennis (WT2000, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2008, comil,       0,     0,        comil,          comil,       spg2xx_game_comil_state, empty_init, "Character Options", "Who Wants To Be A Millionaire (UK, Character Options)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // same as Excalibur Decathlon? not the same as the ABL game
 CONS( 2006, tvsprt10,    0,     0,        tvsprt10,       tvsprt10,    spg2xx_game_state, init_tvsprt10, "Simba / V-Tac Technology Co Ltd.",              "TV Sports 10-in-1 / Decathlon Athletic Sport Games", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

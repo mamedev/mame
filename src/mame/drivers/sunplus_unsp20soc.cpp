@@ -195,7 +195,7 @@ READ16_MEMBER(jak_s500_game_state::porta_r)
 	uint16_t data = m_io[0]->read();
 	logerror("%s: Port A Read: %04x\n", machine().describe_context(), data);
 
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	//address_space& mem = m_maincpu->space(AS_PROGRAM);
 
 	//if (mem.read_word(0x22b408) == 0x4846)
 	//  mem.write_word(0x22b408, 0x4840);    // jak_s500 force service mode
@@ -206,8 +206,8 @@ READ16_MEMBER(jak_s500_game_state::porta_r)
 	//if (mem.read_word(0x22D6F7) == 0x4846)
 	//  mem.write_word(0x22D6F7, 0x4840);    // jak_pf force service mode
 
-	if (mem.read_word(0x23E295) == 0x4846)
-	  mem.write_word(0x23E295, 0x4840);    // jak_smwm force service mode
+	//if (mem.read_word(0x23E295) == 0x4846)
+	//  mem.write_word(0x23E295, 0x4840);    // jak_smwm force service mode
 
 	return data;
 }
