@@ -86,6 +86,9 @@ private:
 	DECLARE_WRITE8_MEMBER(write_palette);
 	DECLARE_READ8_MEMBER(read_palette);
 
+	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(io_w);
+
 	int m_iniital_startup_state;
 	std::vector<uint8_t> m_palette_ram;
 
@@ -108,6 +111,11 @@ private:
 	void nes_sh6578_map(address_map& map);
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
+
+	// this might be game specific
+	uint8_t m_previo;
+	uint8_t m_iolatch;
+	bool m_isbanked;
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(nes_sh6578_state::scanline)
@@ -159,14 +167,14 @@ READ8_MEMBER(nes_sh6578_state::dma_r)
 {
 	switch (offset)
 	{
-	case 0x00: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Control :  %02x\n", machine().describe_context(), offset); return m_dma_control;
-	case 0x01: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Bank Select : %02x\n", machine().describe_context(), offset); return m_dma_bank;
-	case 0x02: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Source Address Low : %02x\n", machine().describe_context(), offset); return m_dma_source[0];
-	case 0x03: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Source Address High : %02x\n", machine().describe_context(), offset); return m_dma_source[1];
-	case 0x04: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Destination Address Low : %02x\n", machine().describe_context(), offset); return m_dma_dest[0];
-	case 0x05: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Destination Address High : %02x\n", machine().describe_context(), offset); return m_dma_dest[1];
-	case 0x06: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Length Low : %02x\n", machine().describe_context(), offset); return m_dma_length[0];
-	case 0x07: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Length High : %02x\n", machine().describe_context(), offset); return m_dma_length[1];
+	case 0x00: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Control : %02x\n", machine().describe_context(), offset, m_dma_control); return m_dma_control & 0x7f;
+	case 0x01: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Bank Select\n", machine().describe_context(), offset); return m_dma_bank;
+	case 0x02: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Source Address Low\n", machine().describe_context(), offset); return m_dma_source[0];
+	case 0x03: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Source Address High\n", machine().describe_context(), offset); return m_dma_source[1];
+	case 0x04: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Destination Address Low\n", machine().describe_context(), offset); return m_dma_dest[0];
+	case 0x05: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Destination Address High\n", machine().describe_context(), offset); return m_dma_dest[1];
+	case 0x06: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Length Low\n", machine().describe_context(), offset); return m_dma_length[0];
+	case 0x07: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Length High\n", machine().describe_context(), offset); return m_dma_length[1];
 	}
 	return 0x00;
 }
@@ -214,8 +222,10 @@ void nes_sh6578_state::do_dma()
 			realsourceaddress++;
 			realdestaddress++;
 		}
-
 	}
+
+	m_dma_length[0] = 0;
+	m_dma_length[1] = 0;
 }
 
 WRITE8_MEMBER(nes_sh6578_state::dma_w)
@@ -385,13 +395,13 @@ rgb_t nes_sh6578_state::nespal_to_RGB(int color_intensity, int color_num)
 
 READ8_MEMBER(nes_sh6578_state::read_palette)
 {
-	logerror("%s: nes_sh6578_state::read_ppu : Palette Entry %02x\n", machine().describe_context(), offset);
+	//logerror("%s: nes_sh6578_state::read_ppu : Palette Entry %02x\n", machine().describe_context(), offset);
 	return m_palette_ram[offset];
 }
 
 WRITE8_MEMBER(nes_sh6578_state::write_palette)
 {
-	logerror("%s: nes_sh6578_state::write_ppu : Palette Entry %02x : %02x\n", machine().describe_context(), offset, data);
+	//logerror("%s: nes_sh6578_state::write_ppu : Palette Entry %02x : %02x\n", machine().describe_context(), offset, data);
 	m_palette_ram[offset] = data;
 
 	rgb_t col = nespal_to_RGB((data & 0x30) >> 4, data & 0x0f);
@@ -445,6 +455,35 @@ WRITE8_MEMBER(nes_sh6578_state::write_ppu)
 	}
 }
 
+READ8_MEMBER(nes_sh6578_state::io_r)
+{
+	uint8_t ret = m_iolatch & 0x01;
+	m_iolatch >>= 1;
+	return ret;
+}
+
+WRITE8_MEMBER(nes_sh6578_state::io_w)
+{
+	if ((data != 0x00) && (data != 0x01) && (data != 0x02) && (data != 0x03))
+		printf("%s: io_w : unexpected value : %02x\n", machine().describe_context().c_str(), data);
+
+	if ((m_previo & 0x01) != (data & 0x01))
+	{
+		// latch on rising or falling?
+		if (!data)
+		{
+			m_iolatch = ioport("IN")->read();
+		}
+	}
+
+	if (m_isbanked)
+	{
+		m_bank->set_entry((data>>1)&1);
+	}
+
+	m_previo = data;
+}
+
 
 void nes_sh6578_state::nes_sh6578_map(address_map& map)
 {
@@ -454,6 +493,9 @@ void nes_sh6578_state::nes_sh6578_map(address_map& map)
 	map(0x2040, 0x207f).rw(FUNC(nes_sh6578_state::read_palette), FUNC(nes_sh6578_state::write_palette));
 	
 	map(0x4014, 0x4014).w(FUNC(nes_sh6578_state::sprite_dma_w));
+
+	map(0x4016, 0x4016).rw(FUNC(nes_sh6578_state::io_r), FUNC(nes_sh6578_state::io_w));
+
 
 	map(0x4020, 0x4020).w(FUNC(nes_sh6578_state::timing_setting_control_w));
 
@@ -479,6 +521,15 @@ void nes_sh6578_state::nes_sh6578_map(address_map& map)
 }
 
 static INPUT_PORTS_START(nes_sh6578)
+	PORT_START("IN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
 INPUT_PORTS_END
 
 void nes_sh6578_state::video_start()
@@ -496,12 +547,24 @@ void nes_sh6578_state::machine_reset()
 		m_palette_ram[i] = 0x00;
 
 	m_iniital_startup_state = 0;
+	m_bank->set_entry(0);
 }
 
 void nes_sh6578_state::machine_start()
 {
 	m_bank->configure_entry(0, memregion("maincpu")->base() + 0x0000000);
 	m_bank->set_entry(0);
+
+	if (memregion("maincpu")->bytes() == 0x200000)
+	{
+		m_isbanked = true;
+		m_bank->configure_entry(1, memregion("maincpu")->base() + 0x100000);
+	}
+	else
+	{
+		m_isbanked = false;
+	}
+
 }
 
 // SH6578 can address 20-bit address space (1MB of ROM)
@@ -513,6 +576,7 @@ void nes_sh6578_state::rom_map(address_map& map)
 void nes_sh6578_state::vram_map(address_map& map)
 {
 	map(0x0000, 0x27ff).ram();
+	map(0x2800, 0x7fff).nopr();
 	map(0x8000, 0xffff).ram();
 }
 
@@ -632,5 +696,5 @@ CONS( 2001, ts_handy11,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, in
 
 CONS( 200?, cpatrolm,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init_nes_sh6578, "<unknown>", "City Patrolman", MACHINE_NOT_WORKING )
 
-// this writes the 0x65 0x76 startup code to 0x4031, but the ROM is larger than expected, extra banking?
+// ROM is banked
 CONS( 200?, ablwikid,   0,        0,  nes_sh6578, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Advance Bright Ltd.",         "Wikid Joystick", MACHINE_NOT_WORKING ) // or Wik!d Joystick
