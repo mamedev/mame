@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include "cpu/mips/r4000.h"
-
 class gio64_device;
 
 class gio64_slot_device : public device_t, public device_slot_interface
@@ -20,11 +18,9 @@ class gio64_slot_device : public device_t, public device_slot_interface
 public:
 	enum slot_type_t : uint32_t
 	{
-		GIO64_SLOT_GFX,
-		GIO64_SLOT_EXP0,
-		GIO64_SLOT_EXP1,
-
-		GIO64_SLOT_COUNT
+		GIO64_SLOT_GFX  = 0,
+		GIO64_SLOT_EXP0 = 1,
+		GIO64_SLOT_EXP1 = 2,
 	};
 
 	// construction/destruction
@@ -37,13 +33,10 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 		m_gio64.set_tag(std::forward<T>(gio64_tag));
-		m_slot_type = slot_type;
 	}
-	gio64_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gio64_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, slot_type_t slot_type = GIO64_SLOT_EXP0);
 
 protected:
-	gio64_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_resolve_objects() override;
@@ -51,7 +44,7 @@ protected:
 
 	// configuration
 	required_device<gio64_device> m_gio64;
-	slot_type_t m_slot_type;
+	slot_type_t const m_slot_type;
 
 	DECLARE_READ32_MEMBER(timeout_r);
 	DECLARE_WRITE32_MEMBER(timeout_w);
@@ -76,16 +69,9 @@ public:
 protected:
 	device_gio64_card_interface(const machine_config &mconfig, device_t &device);
 
-	virtual void interface_validity_check(validity_checker &valid) const override;
 	virtual void interface_pre_start() override;
-	virtual void interface_post_start() override;
-	virtual void install_device() = 0;
-
-	gio64_device &gio64() { assert(m_gio64); return *m_gio64; }
 
 	gio64_device *m_gio64;
-	const char *m_gio64_slottag;
-	gio64_slot_device::slot_type_t m_slot_type;
 };
 
 
@@ -99,41 +85,35 @@ public:
 	gio64_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
 		: gio64_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
 
 	gio64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 	template <int N> auto interrupt_cb() { return m_interrupt_cb[N].bind(); }
 
 	virtual space_config_vector memory_space_config() const override;
 
 	const address_space_config m_space_config;
 
-	void add_gio64_card(gio64_slot_device::slot_type_t slot_type, device_gio64_card_interface *card);
 	device_gio64_card_interface *get_gio64_card(int slot);
 
-	template<typename T> void install_graphics(T &device, void (T::*map)(class address_map &map), uint64_t unitmask = ~u64(0))
+	template<typename T> void install_card(gio64_slot_device::slot_type_t slot_type, T &device, void (T::*map)(class address_map &map))
 	{
-		m_space->install_device(0x000000, 0x3fffff, device, map, unitmask);
-	}
+		m_device_list[slot_type] = &device;
 
-	template<typename T> void install_expansion(int index, T &device, void (T::*map)(class address_map &map), uint64_t unitmask = ~u64(0))
-	{
-		if (index == 0)
-			m_space->install_device(0x400000, 0x5fffff, device, map, unitmask);
-		else if (index == 1)
-			m_space->install_device(0x600000, 0x9fffff, device, map, unitmask);
-		else
-			fatalerror("Invalid SGI GIO64 expansion slot index: %d\n", index);
+		switch (slot_type)
+		{
+		case gio64_slot_device::GIO64_SLOT_GFX:  space(0).install_device(0x000000, 0x3fffff, device, map); break;
+		case gio64_slot_device::GIO64_SLOT_EXP0: space(0).install_device(0x400000, 0x5fffff, device, map); break;
+		case gio64_slot_device::GIO64_SLOT_EXP1: space(0).install_device(0x600000, 0x9fffff, device, map); break;
+		}
 	}
 
 	template <int N> DECLARE_WRITE_LINE_MEMBER(interrupt) { m_interrupt_cb[N](state); }
 
-	DECLARE_READ64_MEMBER(read);
-	DECLARE_WRITE64_MEMBER(write);
+	u64 read(offs_t offset, u64 mem_mask);
+	void write(offs_t offset, u64 data, u64 mem_mask);
 
 protected:
 	gio64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -143,20 +123,10 @@ protected:
 	virtual void device_start() override;
 
 	// internal state
-	required_device<r4000_base_device> m_maincpu;
-	address_space *m_space;
-
 	device_gio64_card_interface *m_device_list[3];
 
 private:
 	devcb_write_line::array<3> m_interrupt_cb;
-
-	DECLARE_READ64_MEMBER(no_gfx_r);
-	DECLARE_READ64_MEMBER(no_exp0_r);
-	DECLARE_READ64_MEMBER(no_exp1_r);
-	DECLARE_WRITE64_MEMBER(no_gfx_w);
-	DECLARE_WRITE64_MEMBER(no_exp0_w);
-	DECLARE_WRITE64_MEMBER(no_exp1_w);
 };
 
 DECLARE_DEVICE_TYPE(GIO64, gio64_device)
