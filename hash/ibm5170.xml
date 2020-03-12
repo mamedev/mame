@@ -9109,6 +9109,43 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="steelskyf">
+		<description>Beneath a Steel Sky (France)</description>
+		<year>1994</year>
+		<publisher>Virgin</publisher>
+		<info name="developer" value="Revolution Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="6b5e3247" sha1="b4cc255abfc5f72fc5c5dbea1aca595c92bbe70a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="49c4e105" sha1="25ab45d316be2cb2551d3d47efd60bddd0959cd9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="902136fd" sha1="5bc6e36e2facae5e7b5ace84a13787cac050941e"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="0b2df06f" sha1="ff8ce38870c22e078ab288d7f165c20dcd0943dd"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="675693e5" sha1="efc84ebe51581650857e553cba1fd27cbd607d8a"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="c7ec313f" sha1="bf18daa98d1387f96ec97c91a18b7775ba67a87c"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="bibadv">
 		<description>Bible Adventures</description>
 		<year>1992</year>
@@ -12125,6 +12162,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="pbfant">
+		<description>Pinball Fantasies</description>
+		<year>1994</year>
+		<publisher>21st Century Entertainment</publisher>
+		<info name="developer" value="Digital Illusions" />
+		<info name="ported by" value="FrontLine Design" />
+		<info name="version" value="V1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pinball Fantasies [21st Century Entertainment] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="354ad00b" sha1="574e4fbf971355b57dd8ea652ae53bf67c036799"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pinball Fantasies [21st Century Entertainment] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="430f267d" sha1="56fb78a071ee464fa8d578a8f991da262b9e9ded"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<!-- Fatal error: i386: Called modrm_to_EA with modrm value F5! -->
 	<software name="powdoll" supported="no">
 		<description>POWER DoLLS</description>
