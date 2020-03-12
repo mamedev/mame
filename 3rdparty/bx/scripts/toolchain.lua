@@ -331,16 +331,6 @@ function toolchain(_buildDir, _libDir)
 		elseif "linux-arm-gcc" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-arm-gcc"))
 
-		elseif "linux-steamlink" == _OPTIONS["gcc"] then
-			if not os.getenv("MARVELL_SDK_PATH") then
-				print("Set MARVELL_SDK_PATH environment variable.")
-			end
-
-			premake.gcc.cc  = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-gcc"
-			premake.gcc.cxx = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-g++"
-			premake.gcc.ar  = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-linux-steamlink"))
-
 		elseif "mingw-gcc" == _OPTIONS["gcc"] then
 			if not os.getenv("MINGW") then
 				print("Set MINGW environment variable.")
@@ -856,29 +846,6 @@ function toolchain(_buildDir, _libDir)
 			"-Wl,-z,now",
 		}
 
-	configuration { "linux-steamlink" }
-		targetdir (path.join(_buildDir, "steamlink/bin"))
-		objdir (path.join(_buildDir, "steamlink/obj"))
-		libdirs { path.join(_libDir, "lib/steamlink") }
-		includedirs { path.join(bxDir, "include/compat/linux") }
-		defines {
-			"__STEAMLINK__=1", -- There is no special prefedined compiler symbol to detect SteamLink, faking it.
-		}
-		buildoptions {
-			"-Wfatal-errors",
-			"-Wunused-value",
-			"-Wundef",
-			"-pthread",
-			"-marm",
-			"-mfloat-abi=hard",
-			"--sysroot=$(MARVELL_SDK_PATH)/rootfs",
-		}
-		linkoptions {
-			"-static-libgcc",
-			"-static-libstdc++",
-			"--sysroot=$(MARVELL_SDK_PATH)/rootfs",
-		}
-
 	configuration { "android-arm" }
 		targetdir (path.join(_buildDir, "android-arm/bin"))
 		objdir (path.join(_buildDir, "android-arm/obj"))
@@ -1264,13 +1231,7 @@ function strip()
 			"$(SILENT) $(ANDROID_NDK_X86)/bin/i686-linux-android-strip -s \"$(TARGET)\""
 		}
 
-	configuration { "linux-steamlink", "Release" }
-		postbuildcommands {
-			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) $(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-strip -s \"$(TARGET)\""
-		}
-
-	configuration { "linux-* or rpi", "not linux-steamlink", "Release" }
+	configuration { "linux-* or rpi", "Release" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) strip -s \"$(TARGET)\""
