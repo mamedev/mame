@@ -167,7 +167,9 @@ public:
 		m_flash(*this, "flash"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_vblank(*this, "VBLANK")
+		m_vblank(*this, "VBLANK"),
+		m_sndrom(*this, "soundcpu"),
+		m_sndrombank(*this, "sndrombank")
 	{ }
 
 	void dgpix(machine_config &config);
@@ -190,6 +192,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ks0164_device> m_soundcpu;
 	required_ioport m_vblank;
+	required_region_ptr<u16> m_sndrom;
+	required_memory_bank m_sndrombank;
 
 	std::unique_ptr<u16[]> m_vram;
 	int m_vbuffer;
@@ -197,6 +201,8 @@ private:
 	int m_old_vbuf;
 	u32 m_flash_cmd;
 	s32 m_first_offset;
+	u16 m_sndrombank_val;
+	u16 m_sndrombank_mask;
 
 	u32 flash_r(offs_t offset);
 	void flash_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -210,8 +216,21 @@ private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 	void snd_map(address_map &map);
+	u16 snd_rom_bank_r();
+	void snd_rom_bank_w(offs_t, u16 data, u16 mem_mask);
 };
 
+u16 dgpix_state::snd_rom_bank_r()
+{
+	return m_sndrombank->entry();
+}
+
+void dgpix_state::snd_rom_bank_w(offs_t, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_sndrombank_val);
+	logerror("bank4000 = %04x\n", m_sndrombank_val);
+	m_sndrombank->set_entry(m_sndrombank_val & m_sndrombank_mask);
+}
 
 u32 dgpix_state::flash_r(offs_t offset)
 {
@@ -348,7 +367,11 @@ void dgpix_state::io_map(address_map &map)
 
 void dgpix_state::snd_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
+	map(0x0000, 0x3fff).rom();
+	map(0x0020, 0x007f).unmaprw();
+	map(0x0062, 0x0063).rw(FUNC(dgpix_state::snd_rom_bank_r), FUNC(dgpix_state::snd_rom_bank_w));
+	map(0x4000, 0x7fff).bankr("sndrombank");
+	map(0xe000, 0xffff).ram();
 }
 
 static INPUT_PORTS_START( dgpix )
@@ -415,6 +438,11 @@ void dgpix_state::machine_start()
 	save_item(NAME(m_flash_cmd));
 	save_item(NAME(m_first_offset));
 	save_item(NAME(m_old_vbuf));
+	save_item(NAME(m_sndrombank_val));
+
+	m_sndrombank->configure_entries(0, m_sndrom.bytes()/0x4000, m_sndrom, 0x4000);
+	m_sndrombank->set_entry(0);
+	m_sndrombank_mask = m_sndrom.bytes()/0x4000 - 1;
 }
 
 void dgpix_state::machine_reset()
@@ -423,6 +451,9 @@ void dgpix_state::machine_reset()
 	m_flash_cmd = 0;
 	m_first_offset = -1;
 	m_old_vbuf = 3;
+
+	m_sndrombank_val = 0;
+	m_sndrombank->set_entry(0);
 }
 
 
