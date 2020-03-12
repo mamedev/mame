@@ -1047,25 +1047,37 @@ void upd7810_device::MOV_MCC_A()
 /* 4d d2: 0100 1101 1101 0010 */
 void upd7810_device::MOV_MA_A()
 {
+	if (MA == A)
+		return;
 	MA = A;
+	WP(UPD7810_PORTA, m_pa_out);
 }
 
 /* 4d d3: 0100 1101 1101 0011 */
 void upd7810_device::MOV_MB_A()
 {
+	if (MB == A)
+		return;
 	MB = A;
+	WP(UPD7810_PORTB, m_pb_out);
 }
 
 /* 4d d4: 0100 1101 1101 0100 */
 void upd7810_device::MOV_MC_A()
 {
+	if (MC == A)
+		return;
 	MC = A;
+	WP(UPD7810_PORTC, m_pc_out);
 }
 
 /* 4d d7: 0100 1101 1101 0111 */
 void upd7810_device::MOV_MF_A()
 {
+	if (MF == A)
+		return;
 	MF = A;
+	WP(UPD7810_PORTF, m_pf_out);
 }
 
 /* 4d d8: 0100 1101 1101 1000 */
