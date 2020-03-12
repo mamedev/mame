@@ -41475,8 +41475,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="ddrbh" supported="no">
-		<!-- Unknown source
+	<!-- boot OK, no BGM on the FMV -->
+	<software name="ddrbh" supported="partial">
+		<!-- 
+		Unknown source
 		<rom name="Dance Dance Revolution - Best Hits (Japan) [SLPM-86693].bin" size="362038656" crc="ecea4fb6" sha1="07dc01655ffffadadf98f5f45f2653e556001dec"/>
 		<rom name="Dance Dance Revolution - Best Hits (Japan) [SLPM-86693].cue" size="121" crc="245caeee" sha1="5963da9bcec5fd304e97aafddd54e9d527b29bc7"/>
 		-->
@@ -41489,7 +41491,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dance dance revolution - best hits (japan) [slpm-86693]" sha1="9aa2b2f04e7d46da015def495e6016f70e26da29"/>
+				<disk name="dance dance revolution - best hits (japan) [slpm-86693]" sha1="9aa2b2f04e7d46da015def495e6016f70e26da29" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -41513,9 +41515,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- boot ok -->
-	<software name="deadlysk" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="deadlysk" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Deadly Skies (Japan) [SLPS-01036].bin" size="400383312" crc="58f60c86" sha1="52a06b9081eaacbd8798e95d07c9281667809270"/>
 		<rom name="Deadly Skies (Japan) [SLPS-01036].cue" size="929" crc="0008f22d" sha1="1b6ee41b9db5ae643b56fe91e9315bf37a0a78be"/>
 		-->
@@ -41528,14 +41531,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="deadly skies (japan) [slps-01036]" sha1="fd98db17a6eb40541e4a889efa2fd8b1a6311f01"/>
+				<disk name="deadly skies (japan) [slps-01036]" sha1="fd98db17a6eb40541e4a889efa2fd8b1a6311f01" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<!-- black screen -->
-	<software name="deathwng" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="deathwng" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Death Wing (Japan) [SLPS-00489].bin" size="474758256" crc="0f850461" sha1="8fd7770d1847cf15c72970c12215225a5287490e"/>
 		<rom name="Death Wing (Japan) [SLPS-00489].cue" size="943" crc="bae5188c" sha1="c59df9ee490e1e53228612097670d19f8a6b677b"/>
 		-->
@@ -41548,7 +41552,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="death wing (japan) [slps-00489]" sha1="9271c5df8547a41b1db9791f5d315a9c447f7899"/>
+				<disk name="death wing (japan) [slps-00489]" sha1="9271c5df8547a41b1db9791f5d315a9c447f7899" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -46474,8 +46478,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="jellyfsh" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="jellyfsh" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Jellyfish - The Healing Friend (Japan) [SLPS-02892].bin" size="397770240" crc="57eb5483" sha1="fe62219c82d5686cf97c259ad741a3016bd11c58"/>
 		<rom name="Jellyfish - The Healing Friend (Japan) [SLPS-02892].cue" size="1050" crc="10ef6a60" sha1="26f09322167157acefc6c0f68e9f876049c3d142"/>
 		-->
@@ -46487,7 +46493,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="jellyfish - the healing friend (japan) [slps-02892]" sha1="ae61d655bbd877956cdf539640b272689f1e1d64"/>
+				<disk name="jellyfish - the healing friend (japan) [slps-02892]" sha1="ae61d655bbd877956cdf539640b272689f1e1d64" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -46680,8 +46686,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="kaeruehn" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="kaeruehn" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Kaeru no Ehon - Nakushita Kioku wo Motomete (Japan) [SLPS-02332].bin" size="264077856" crc="885bf380" sha1="a6b76cf6552e0ed974a9f2199d6a847ed5be67bc"/>
 		<rom name="Kaeru no Ehon - Nakushita Kioku wo Motomete (Japan) [SLPS-02332].cue" size="128" crc="0e2f0686" sha1="d096a50712d81f9ba8d0b2bff93d342988813b27"/>
 		-->
@@ -46694,7 +46702,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kaeru no ehon - nakushita kioku wo motomete (japan) [slps-02332]" sha1="d837cfc7df0aa1796573bb3af66a3fe123f7ac0b"/>
+				<disk name="kaeru no ehon - nakushita kioku wo motomete (japan) [slps-02332]" sha1="d837cfc7df0aa1796573bb3af66a3fe123f7ac0b" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -46783,8 +46791,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="kamenher" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="kamenher" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Kids Station - Kamen Rider Heroes (Japan) [SLPS-03403].bin" size="289902816" crc="cd91083c" sha1="645c898787bef2518ebd2871aa5160acf7493511"/>
 		<rom name="Kids Station - Kamen Rider Heroes (Japan) [SLPS-03403].cue" size="118" crc="15d38023" sha1="bd8714a4f777342f7da7c3d992fed9bb35b5c7ba"/>
 		-->
@@ -47575,8 +47585,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="kohnishg" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="kohnishg" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Kohni Shogun (Japan) [SLPS-02955].bin" size="370487040" crc="e900a7a6" sha1="aadfa2e883f140242d4b273fbe1856c2f35ef258"/>
 		<rom name="Kohni Shogun (Japan) [SLPS-02955].cue" size="97" crc="1b43c3a7" sha1="98d0c1184241a855429c174eb59db67cdb022570"/>
 		-->
@@ -47589,7 +47601,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kohni shogun (japan) [slps-02955]" sha1="37f70a98a332feae16368cb16d8ff2f0d0989bc1"/>
+				<disk name="kohni shogun (japan) [slps-02955]" sha1="37f70a98a332feae16368cb16d8ff2f0d0989bc1" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -47678,8 +47690,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="koryuki" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="koryuki" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Kouryuuki (Japan) [SLPS-01338].bin" size="567502320" crc="38c2ccd5" sha1="6effcdde4391a37eeedb33535d68f6d2d7d57d89"/>
 		<rom name="Kouryuuki (Japan) [SLPS-01338].cue" size="1616" crc="cc53d8b7" sha1="5459b0fb45714d8ff0b5163925342104ae478ec3"/>
 		-->
@@ -47692,7 +47706,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kouryuuki (japan) [slps-01338]" sha1="86672827c28529318919ac552aca3bba6ea99564"/>
+				<disk name="kouryuuki (japan) [slps-01338]" sha1="86672827c28529318919ac552aca3bba6ea99564" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -47718,8 +47732,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="koyasai" supported="no">
-		<!-- Unknown source
+	<!-- boot OK, inputs stops working at memory card screen -->
+	<software name="koyasai" supported="partial">
+		<!-- 
+		Unknown source
 		<rom name="Koyasai - A Sherd of Youthful Memories (Japan) [SLPS-01775].bin" size="727570032" crc="eef10961" sha1="42109210bf178e00922f9848f57078dc28aef295"/>
 		<rom name="Koyasai - A Sherd of Youthful Memories (Japan) [SLPS-01775].cue" size="187" crc="7968d83c" sha1="69c244479732e708896c795b7b5db4e779e56e55"/>
 		-->
@@ -47732,7 +47748,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="koyasai - a sherd of youthful memories (japan) [slps-01775]" sha1="83efca563b60a03de80d3f18499a2526943d021d"/>
+				<disk name="koyasai - a sherd of youthful memories (japan) [slps-01775]" sha1="83efca563b60a03de80d3f18499a2526943d021d" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -47932,8 +47948,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- black screen after PS logo -->
 	<software name="lagnaclg" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Lagnacure Legend (Japan) [SLPS-02832].bin" size="350824320" crc="65c72cac" sha1="a98b0c2d6f4c60a04909dff6fe98086b0a86e576"/>
 		<rom name="Lagnacure Legend (Japan) [SLPS-02832].cue" size="101" crc="9ff7b942" sha1="fad9aaf8145515e983d7ad9aea117279dd8ca588"/>
 		-->
@@ -47946,7 +47964,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lagnacure legend (japan) [slps-02832]" sha1="a336b58efb1d8c7c1f1bc4b7c9629b2b17a0b938"/>
+				<disk name="lagnacure legend (japan) [slps-02832]" sha1="a336b58efb1d8c7c1f1bc4b7c9629b2b17a0b938" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -48962,8 +48980,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="mconansa" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="mconansa" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Meitantei Conan - Saikou no Partner (Japan) [SLPS-03425].bin" size="674993424" crc="99923848" sha1="e485abc582026898e5b254fb8f82019c57706278"/>
 		<rom name="Meitantei Conan - Saikou no Partner (Japan) [SLPS-03425].cue" size="119" crc="a2ab6486" sha1="8731b7220e6dbd9ca32182d18ff6694474373d0d"/>
 		-->
@@ -48976,7 +48996,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="meitantei conan - saikou no partner (japan) [slps-03425]" sha1="025978cc54b06dd4abf8f43c8764d204c7bf1a4b"/>
+				<disk name="meitantei conan - saikou no partner (japan) [slps-03425]" sha1="025978cc54b06dd4abf8f43c8764d204c7bf1a4b" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
