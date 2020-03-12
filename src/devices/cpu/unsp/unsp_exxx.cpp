@@ -12,7 +12,7 @@
 #define LOG_UNSP_MULS            (1U << 1)
 #define LOG_UNSP_SHIFTS          (1U << 2)
 
-#define VERBOSE             (0)
+#define VERBOSE             (LOG_UNSP_SHIFTS)
 
 #include "logmacro.h"
 
@@ -269,11 +269,11 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		case 0x05:
 		{
 			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsror %s  (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
-			const uint32_t rdval = m_core->m_r[rd];
+			const uint32_t rdval = m_core->m_r[rd] << 16;
 			const int shift = (m_core->m_r[rs] & 0x01f);
-			const uint32_t res = rdval << shift;
+			const uint32_t res = rdval >> shift;
 			m_core->m_r[REG_R3] |= (uint16_t)res;
-			m_core->m_r[REG_R4] |= (uint16_t)(res >> 16);
+			m_core->m_r[REG_R4] = (uint16_t)(res >> 16);
 			LOGMASKED(LOG_UNSP_SHIFTS, "result: %04x%04x\n", m_core->m_r[REG_R4], m_core->m_r[REG_R3]);
 			return;
 		}
