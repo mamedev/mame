@@ -57,7 +57,6 @@
 #define BX_PLATFORM_OSX        0
 #define BX_PLATFORM_PS4        0
 #define BX_PLATFORM_RPI        0
-#define BX_PLATFORM_STEAMLINK  0
 #define BX_PLATFORM_WINDOWS    0
 #define BX_PLATFORM_WINRT      0
 #define BX_PLATFORM_XBOXONE    0
@@ -184,10 +183,6 @@
 #	include <sys/cdefs.h> // Defines __BIONIC__ and includes android/api-level.h
 #	undef  BX_PLATFORM_ANDROID
 #	define BX_PLATFORM_ANDROID __ANDROID_API__
-#elif defined(__STEAMLINK__)
-// SteamLink compiler defines __linux__
-#	undef  BX_PLATFORM_STEAMLINK
-#	define BX_PLATFORM_STEAMLINK 1
 #elif defined(__VCCOREVER__)
 // RaspberryPi compiler defines __linux__
 #	undef  BX_PLATFORM_RPI
@@ -274,7 +269,6 @@
 	||  BX_PLATFORM_OSX        \
 	||  BX_PLATFORM_PS4        \
 	||  BX_PLATFORM_RPI        \
-	||  BX_PLATFORM_STEAMLINK  \
 	)
 
 ///
@@ -290,7 +284,6 @@
 	||  BX_PLATFORM_OSX        \
 	||  BX_PLATFORM_PS4        \
 	||  BX_PLATFORM_RPI        \
-	||  BX_PLATFORM_STEAMLINK  \
 	||  BX_PLATFORM_WINDOWS    \
 	||  BX_PLATFORM_WINRT      \
 	||  BX_PLATFORM_XBOXONE    \
@@ -317,7 +310,6 @@
 ///
 #define BX_PLATFORM_OS_EMBEDDED (0 \
 	||  BX_PLATFORM_RPI            \
-	||  BX_PLATFORM_STEAMLINK      \
 	)
 
 ///
@@ -390,8 +382,6 @@
 #	define BX_PLATFORM_NAME "PlayStation 4"
 #elif BX_PLATFORM_RPI
 #	define BX_PLATFORM_NAME "RaspberryPi"
-#elif BX_PLATFORM_STEAMLINK
-#	define BX_PLATFORM_NAME "SteamLink"
 #elif BX_PLATFORM_WINDOWS
 #	define BX_PLATFORM_NAME "Windows"
 #elif BX_PLATFORM_WINRT
