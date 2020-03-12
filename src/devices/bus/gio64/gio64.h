@@ -26,7 +26,7 @@ public:
 	// construction/destruction
 	template <typename T, typename U>
 	gio64_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&gio64_tag, slot_type_t slot_type, U &&opts, const char *dflt)
-		: gio64_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: gio64_slot_device(mconfig, tag, owner, (uint32_t)0, slot_type)
 	{
 		option_reset();
 		opts(*this);
