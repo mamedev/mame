@@ -15,11 +15,11 @@ WRITE8_MEMBER( tmc600_state::vismac_data_w )
 	switch (m_vismac_reg_latch & 0x07)
 	{
 	case 2: m_vismac_color_latch = data & 0x0f; break;
-	case 3: m_vis->out3_w(space, ma, data); break;
-	case 4: m_vis->out4_w(space, ma, data); break;
-	case 5: m_vis->out5_w(space, ma, data); break;
-	case 6: m_vis->out6_w(space, ma, data); break;
-	case 7: m_vis->out7_w(space, ma, data); break;
+	case 3: m_vis->out3_w(data); break;
+	case 4: m_vis->out4_w(ma); break;
+	case 5: m_vis->out5_w(ma); break;
+	case 6: m_vis->out6_w(ma); break;
+	case 7: m_vis->out7_w(ma); break;
 	}
 }
 

@@ -570,7 +570,7 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
 
 	// bit 6 = speech chip DATA PRESENT pin; high then low to make the chip read data
 	if ((previous & 0x40) == 0 && (data & 0x40) != 0)
-		m_sp0250->write(space, 0, m_sp0250_latch);
+		m_sp0250->write(m_sp0250_latch);
 
 	// bit 7 goes to the speech chip RESET pin
 	if ((previous ^ data) & 0x80)

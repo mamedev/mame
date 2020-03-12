@@ -224,7 +224,7 @@ READ8_MEMBER( vic20_state::read )
 			}
 			else if (offset >= 0x9000 && offset < 0x9010)
 			{
-				data = m_vic->read(space, offset & 0x0f);
+				data = m_vic->read(offset & 0x0f);
 			}
 			break;
 
@@ -299,7 +299,7 @@ WRITE8_MEMBER( vic20_state::write )
 			}
 			else if (offset >= 0x9000 && offset < 0x9010)
 			{
-				m_vic->write(space, offset & 0x0f, data);
+				m_vic->write(offset & 0x0f, data);
 			}
 			break;
 

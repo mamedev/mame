@@ -154,7 +154,7 @@ void battlera_state::battlera_portmap(address_map &map)
 
 WRITE_LINE_MEMBER(battlera_state::adpcm_int)
 {
-	m_msm->write_data(m_msm5205next >> 4);
+	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_toggle = 1 - m_toggle;

@@ -267,7 +267,7 @@ WRITE8_MEMBER(card_state::speech_w)
 	if (m_speech == nullptr)
 		return;
 
-	m_speech->data_w(space, 0, data & 0x3f);
+	m_speech->data_w(data & 0x3f);
 	m_speech->start_w(1);
 	m_speech->start_w(0);
 }

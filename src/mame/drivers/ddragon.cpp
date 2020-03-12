@@ -440,13 +440,13 @@ void ddragon_state::dd_adpcm_int( int chip )
 	}
 	else if (m_adpcm_data[chip] != -1)
 	{
-		m_adpcm[chip]->write_data(m_adpcm_data[chip] & 0x0f);
+		m_adpcm[chip]->data_w(m_adpcm_data[chip] & 0x0f);
 		m_adpcm_data[chip] = -1;
 	}
 	else
 	{
 		m_adpcm_data[chip] = m_adpcm_rom[chip][m_adpcm_pos[chip]++];
-		m_adpcm[chip]->write_data(m_adpcm_data[chip] >> 4);
+		m_adpcm[chip]->data_w(m_adpcm_data[chip] >> 4);
 	}
 }
 

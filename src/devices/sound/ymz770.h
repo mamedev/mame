@@ -26,7 +26,7 @@ public:
 	// construction/destruction
 	ymz770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(write);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -113,13 +113,15 @@ public:
 	// construction/destruction
 	ymz774_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(read);
+	uint8_t read(offs_t offset);
+
 protected:
 	virtual void internal_reg_write(uint8_t reg, uint8_t data) override;
 	virtual uint32_t get_phrase_offs(int phrase) override { int ph = phrase * 4; return ((m_rom[ph] & 0x0f) << 24 | m_rom[ph + 1] << 16 | m_rom[ph + 2] << 8 | m_rom[ph + 3]) * 2; };
 	virtual uint32_t get_seq_offs(int sqn) override { int sq = sqn * 4 + 0x2000; return ((m_rom[sq] & 0x0f) << 24 | m_rom[sq + 1] << 16 | m_rom[sq + 2] << 8 | m_rom[sq + 3]) * 2; };
 	uint32_t get_sqc_offs(int sqc) { int sq = sqc * 4 + 0x6000; return ((m_rom[sq] & 0x0f) << 24 | m_rom[sq + 1] << 16 | m_rom[sq + 2] << 8 | m_rom[sq + 3]) * 2; };
 	virtual void sequencer() override;
+
 private:
 	int m_bank;
 	uint32_t volinc[256];

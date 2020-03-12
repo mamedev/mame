@@ -95,13 +95,13 @@ WRITE_LINE_MEMBER(tecmo_state::adpcm_int)
 		m_msm->reset_w(1);
 	else if (m_adpcm_data != -1)
 	{
-		m_msm->write_data(m_adpcm_data & 0x0f);
+		m_msm->data_w(m_adpcm_data & 0x0f);
 		m_adpcm_data = -1;
 	}
 	else
 	{
 		m_adpcm_data = m_adpcm_rom[m_adpcm_pos++];
-		m_msm->write_data(m_adpcm_data >> 4);
+		m_msm->data_w(m_adpcm_data >> 4);
 	}
 }
 

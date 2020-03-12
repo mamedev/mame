@@ -461,7 +461,7 @@ WRITE_LINE_MEMBER(csc_state::pia0_ca2_w)
 WRITE8_MEMBER(csc_state::pia1_pa_w)
 {
 	// d0-d5: TSI C0-C5
-	m_speech->data_w(space, 0, data & 0x3f);
+	m_speech->data_w(data & 0x3f);
 
 	// d0-d7: data for the 4 7seg leds, bits are ABFGHCDE (H is extra led)
 	m_7seg_data = bitswap<8>(data,0,1,5,6,7,2,3,4);

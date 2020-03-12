@@ -727,7 +727,7 @@ WRITE_LINE_MEMBER(opwolf_state::msm5205_vck_w)
 {
 	if (m_adpcm_data[N] != -1)
 	{
-		m_msm[N]->write_data(m_adpcm_data[N] & 0x0f);
+		m_msm[N]->data_w(m_adpcm_data[N] & 0x0f);
 		m_adpcm_data[N] = -1;
 		if (m_adpcm_pos[N] == m_adpcm_end[N])
 		{
@@ -739,7 +739,7 @@ WRITE_LINE_MEMBER(opwolf_state::msm5205_vck_w)
 	{
 		m_adpcm_data[N] = memregion("adpcm")->base()[m_adpcm_pos[N]];
 		m_adpcm_pos[N] = (m_adpcm_pos[N] + 1) & 0x7ffff;
-		m_msm[N]->write_data(m_adpcm_data[N] >> 4);
+		m_msm[N]->data_w(m_adpcm_data[N] >> 4);
 	}
 }
 

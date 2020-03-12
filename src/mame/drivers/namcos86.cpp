@@ -302,7 +302,7 @@ WRITE8_MEMBER(namcos86_state::cus115_w)
 		case 1:
 		case 2:
 		case 3:
-			m_63701x->namco_63701x_w(space, (offset & 0x1e00) >> 9,data);
+			m_63701x->write((offset & 0x1e00) >> 9, data);
 			break;
 
 		case 4:

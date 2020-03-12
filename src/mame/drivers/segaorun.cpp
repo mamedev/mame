@@ -892,7 +892,7 @@ void segaorun_state::sound_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm", FUNC(segapcm_device::sega_pcm_r), FUNC(segapcm_device::sega_pcm_w));
+	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm", FUNC(segapcm_device::read), FUNC(segapcm_device::write));
 	map(0xf800, 0xffff).ram();
 }
 

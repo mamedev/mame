@@ -266,7 +266,7 @@ WRITE8_MEMBER(elite_state::ppi_porta_w)
 {
 	// d0-d5: TSI C0-C5
 	// d6: TSI START line
-	m_speech->data_w(space, 0, data & 0x3f);
+	m_speech->data_w(data & 0x3f);
 	m_speech->start_w(data >> 6 & 1);
 
 	// d7: printer? (black wire to LED pcb)

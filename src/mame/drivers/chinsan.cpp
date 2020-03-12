@@ -420,7 +420,7 @@ WRITE_LINE_MEMBER( chinsan_state::adpcm_int_w )
 		uint8_t *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
-		m_adpcm->write_data(m_adpcm_data & 0xf);
+		m_adpcm->data_w(m_adpcm_data & 0xf);
 		m_trigger ^= 1;
 		if (m_trigger == 0)
 		{

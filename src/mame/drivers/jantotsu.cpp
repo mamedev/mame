@@ -320,7 +320,7 @@ WRITE_LINE_MEMBER(jantotsu_state::jan_adpcm_int)
 		uint8_t *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
-		m_adpcm->write_data(m_adpcm_data & 0xf);
+		m_adpcm->data_w(m_adpcm_data & 0xf);
 		m_adpcm_trigger ^= 1;
 		if (m_adpcm_trigger == 0)
 		{

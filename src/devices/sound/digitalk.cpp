@@ -685,7 +685,7 @@ int digitalker_device::digitalker_0_intr_r()
 	return digitalker_intr_r();
 }
 
-WRITE8_MEMBER( digitalker_device::digitalker_data_w )
+void digitalker_device::digitalker_data_w(uint8_t data)
 {
 	m_data = data;
 }

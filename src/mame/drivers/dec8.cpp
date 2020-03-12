@@ -303,7 +303,7 @@ WRITE_LINE_MEMBER(dec8_state::csilver_adpcm_int)
 	if (m_toggle)
 		m_audiocpu->set_input_line(m6502_device::IRQ_LINE, HOLD_LINE);
 
-	m_msm->write_data(m_msm5205next >> 4);
+	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 }
 

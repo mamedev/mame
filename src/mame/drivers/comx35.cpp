@@ -226,7 +226,7 @@ READ8_MEMBER( comx35_state::mem_r )
 	}
 	else if (offset >= 0xf400 && offset < 0xf800)
 	{
-		data = m_vis->char_ram_r(space, offset & 0x3ff);
+		data = m_vis->char_ram_r(offset & 0x3ff);
 	}
 
 	return data;
@@ -247,11 +247,11 @@ WRITE8_MEMBER( comx35_state::mem_w )
 	}
 	else if (offset >= 0xf400 && offset < 0xf800)
 	{
-		m_vis->char_ram_w(space, offset & 0x3ff, data);
+		m_vis->char_ram_w(offset & 0x3ff, data);
 	}
 	else if (offset >= 0xf800)
 	{
-		m_vis->page_ram_w(space, offset & 0x3ff, data);
+		m_vis->page_ram_w(offset & 0x3ff, data);
 	}
 }
 

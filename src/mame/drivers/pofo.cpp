@@ -381,7 +381,7 @@ WRITE8_MEMBER( portfolio_state::dtmf_w )
 
 	m_dtmf->mode_w(!BIT(data, 7));
 	m_dtmf->a0_w(!BIT(data, 7));
-	m_dtmf->write(space, 0, data & 0x3f);
+	m_dtmf->write(data & 0x3f);
 	m_dtmf->strobe_w(BIT(data, 6));
 }
 

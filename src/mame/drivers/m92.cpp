@@ -399,7 +399,7 @@ void m92_state::sound_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
 	map(0xa0000, 0xa3fff).ram();
-	map(0xa8000, 0xa803f).rw("irem", FUNC(iremga20_device::irem_ga20_r), FUNC(iremga20_device::irem_ga20_w)).umask16(0x00ff);
+	map(0xa8000, 0xa803f).rw("irem", FUNC(iremga20_device::read), FUNC(iremga20_device::write)).umask16(0x00ff);
 	map(0xa8040, 0xa8043).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
 	map(0xa8044, 0xa8044).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0xa8046, 0xa8046).w("soundlatch2", FUNC(generic_latch_8_device::write));

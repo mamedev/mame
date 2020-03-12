@@ -1771,8 +1771,8 @@ void nemesis_state::nemesis(machine_config &config)
 	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
 	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
-	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
-	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
 	ay2.add_route(0, "filter2", 1.00);
 	ay2.add_route(1, "filter3", 1.00);
 	ay2.add_route(2, "filter4", 1.00);
@@ -1835,8 +1835,8 @@ void nemesis_state::gx400(machine_config &config)
 	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
 	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
-	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
-	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
 	ay2.add_route(0, "filter2", 1.00);
 	ay2.add_route(1, "filter3", 1.00);
 	ay2.add_route(2, "filter4", 1.00);
@@ -1901,8 +1901,8 @@ void nemesis_state::konamigt(machine_config &config)
 	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
 	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
-	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
-	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
 	ay2.add_route(0, "filter2", 1.00);
 	ay2.add_route(1, "filter3", 1.00);
 	ay2.add_route(2, "filter4", 1.00);
@@ -1965,8 +1965,8 @@ void nemesis_state::rf2_gx400(machine_config &config)
 	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
 	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
-	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
-	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
 	ay2.add_route(0, "filter2", 1.00);
 	ay2.add_route(1, "filter3", 1.00);
 	ay2.add_route(2, "filter4", 1.00);
@@ -2973,8 +2973,8 @@ void nemesis_state::bubsys(machine_config &config)
 	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
 	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
-	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
-	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
 	ay2.add_route(0, "filter2", 1.00);
 	ay2.add_route(1, "filter3", 1.00);
 	ay2.add_route(2, "filter4", 1.00);

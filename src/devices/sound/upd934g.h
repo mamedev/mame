@@ -29,7 +29,7 @@ public:
 	// configuration
 	auto data_callback() { return m_data_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER(write);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

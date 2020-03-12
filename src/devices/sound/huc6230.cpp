@@ -46,7 +46,7 @@ void huc6230_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 /* MAME specific code                                                       */
 /*--------------------------------------------------------------------------*/
 
-WRITE8_MEMBER( huc6230_device::write )
+void huc6230_device::write(offs_t offset, uint8_t data)
 {
 	/* Update stream */
 	m_stream->update();

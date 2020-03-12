@@ -194,7 +194,7 @@ void k005289_device::make_mixer_table(int voices)
 }
 
 
-WRITE8_MEMBER( k005289_device::k005289_control_A_w )
+void k005289_device::control_A_w(uint8_t data)
 {
 	m_stream->update();
 
@@ -203,7 +203,7 @@ WRITE8_MEMBER( k005289_device::k005289_control_A_w )
 }
 
 
-WRITE8_MEMBER( k005289_device::k005289_control_B_w )
+void k005289_device::control_B_w(uint8_t data)
 {
 	m_stream->update();
 
@@ -212,19 +212,19 @@ WRITE8_MEMBER( k005289_device::k005289_control_B_w )
 }
 
 
-WRITE8_MEMBER( k005289_device::ld1_w )
+void k005289_device::ld1_w(offs_t offset)
 {
 	m_freq_latch[0] = 0xfff - offset;
 }
 
 
-WRITE8_MEMBER( k005289_device::ld2_w )
+void k005289_device::ld2_w(offs_t offset)
 {
 	m_freq_latch[1] = 0xfff - offset;
 }
 
 
-WRITE8_MEMBER( k005289_device::tg1_w )
+void k005289_device::tg1_w(uint8_t data)
 {
 	m_stream->update();
 
@@ -232,7 +232,7 @@ WRITE8_MEMBER( k005289_device::tg1_w )
 }
 
 
-WRITE8_MEMBER( k005289_device::tg2_w )
+void k005289_device::tg2_w(uint8_t data)
 {
 	m_stream->update();
 

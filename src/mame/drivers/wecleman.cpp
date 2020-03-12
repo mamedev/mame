@@ -722,13 +722,13 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_hs_w)
 template<int Chip>
 READ8_MEMBER(wecleman_state::hotchase_k007232_r)
 {
-	return m_k007232[Chip]->read(space, offset ^ 1);
+	return m_k007232[Chip]->read(offset ^ 1);
 }
 
 template<int Chip>
 WRITE8_MEMBER(wecleman_state::hotchase_k007232_w)
 {
-	m_k007232[Chip]->write(space, offset ^ 1, data);
+	m_k007232[Chip]->write(offset ^ 1, data);
 }
 
 void wecleman_state::hotchase_sound_map(address_map &map)

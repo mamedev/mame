@@ -118,7 +118,7 @@ void namco_63701x_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 
 
-WRITE8_MEMBER( namco_63701x_device::namco_63701x_w )
+void namco_63701x_device::write(offs_t offset, uint8_t data)
 {
 	int ch = offset / 2;
 

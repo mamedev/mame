@@ -339,14 +339,14 @@ WRITE_LINE_MEMBER(champwr_state::msm5205_vck)
 {
 	if (m_adpcm_data != -1)
 	{
-		m_msm->write_data(m_adpcm_data & 0x0f);
+		m_msm->data_w(m_adpcm_data & 0x0f);
 		m_adpcm_data = -1;
 	}
 	else
 	{
 		m_adpcm_data = m_adpcm_rgn[m_adpcm_pos];
 		m_adpcm_pos = (m_adpcm_pos + 1) & 0x1ffff;
-		m_msm->write_data(m_adpcm_data >> 4);
+		m_msm->data_w(m_adpcm_data >> 4);
 	}
 }
 
