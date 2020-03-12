@@ -79,6 +79,8 @@ files {
 	MAME_DIR .. "src/frontend/mame/media_ident.h",
 	MAME_DIR .. "src/frontend/mame/pluginopts.cpp",
 	MAME_DIR .. "src/frontend/mame/pluginopts.h",
+	MAME_DIR .. "src/frontend/mame/ui/about.cpp",
+	MAME_DIR .. "src/frontend/mame/ui/about.h",
 	MAME_DIR .. "src/frontend/mame/ui/analogipt.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/analogipt.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/auditmenu.cpp",

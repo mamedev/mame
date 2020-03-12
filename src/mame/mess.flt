@@ -39,6 +39,7 @@ alcat7100.cpp
 alesis.cpp
 alesis_qs.cpp
 alfaskop41xx.cpp
+alphajuno.cpp
 alphasma.cpp
 alphatpc16.cpp
 alphatpx.cpp
@@ -750,6 +751,7 @@ rmnimbus.cpp
 roland_cm32p.cpp
 roland_d10.cpp
 roland_d50.cpp
+roland_jx3p.cpp
 roland_mt32.cpp
 roland_r8.cpp
 roland_sc55.cpp
