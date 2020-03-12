@@ -3237,6 +3237,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "roland")
 files {
+	MAME_DIR .. "src/mame/drivers/alphajuno.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_cm32p.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_d10.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_d50.cpp",

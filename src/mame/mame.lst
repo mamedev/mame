@@ -1159,6 +1159,10 @@ kyros                           // (c) 1987 World Games
 kyrosj                          // (c) 1986 Alpha Denshi Co.
 sstingry                        // (c) 1986 Alpha Denshi Co.
 
+@source:alphajuno.cpp
+ajuno1                          //
+ajuno2                          //
+
 @source:alphasma.cpp
 asma2k                          //
 asmapro                         //
