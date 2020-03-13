@@ -212,13 +212,13 @@ void k005289_device::control_B_w(uint8_t data)
 }
 
 
-void k005289_device::ld1_w(offs_t offset)
+void k005289_device::ld1_w(offs_t offset, uint8_t data)
 {
 	m_freq_latch[0] = 0xfff - offset;
 }
 
 
-void k005289_device::ld2_w(offs_t offset)
+void k005289_device::ld2_w(offs_t offset, uint8_t data)
 {
 	m_freq_latch[1] = 0xfff - offset;
 }

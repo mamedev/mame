@@ -16,8 +16,8 @@ public:
 
 	void control_A_w(uint8_t data);
 	void control_B_w(uint8_t data);
-	void ld1_w(offs_t offset);
-	void ld2_w(offs_t offset);
+	void ld1_w(offs_t offset, uint8_t data);
+	void ld2_w(offs_t offset, uint8_t data);
 	void tg1_w(uint8_t data);
 	void tg2_w(uint8_t data);
 
