@@ -246,13 +246,9 @@ READ8_MEMBER( psion1_state::switchoff_r )
 void psion_state::psion_int_reg(address_map &map)
 {
 	// FIXME: this should all be made internal to the CPU device
-	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6301x_cpu_device::m6801_io));
-	map(0x0001, 0x0001).w(m_maincpu, FUNC(hd6301x_cpu_device::p2_ddr_2bit_w));
+	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6301x_cpu_device::hd6301x_io));
 	map(0x0008, 0x0008).rw(FUNC(psion_state::tcsr_r), FUNC(psion_state::tcsr_w));
 	map(0x0014, 0x0014).r(FUNC(psion_state::rcp5c_r));
-	map(0x0015, 0x0015).r(m_maincpu, FUNC(hd6301x_cpu_device::p5_data_r)).nopw();
-	map(0x0016, 0x0016).w(m_maincpu, FUNC(hd6301x_cpu_device::p6_ddr_w));
-	map(0x0017, 0x0017).rw(m_maincpu, FUNC(hd6301x_cpu_device::p6_data_r), FUNC(hd6301x_cpu_device::p6_data_w));
 }
 
 void psion1_state::psion1_mem(address_map &map)

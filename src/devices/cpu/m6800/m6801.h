@@ -254,15 +254,7 @@ public:
 	auto out_p7_cb() { return m_out_portx_func[2].bind(); }
 
 	// TODO: privatize eventually
-	void p2_ddr_2bit_w(uint8_t data);
-	void p5_ddr_w(uint8_t data);
-	uint8_t p5_data_r();
-	void p5_data_w(uint8_t data);
-	void p6_ddr_w(uint8_t data);
-	uint8_t p6_data_r();
-	void p6_data_w(uint8_t data);
-	uint8_t p7_data_r();
-	void p7_data_w(uint8_t data);
+	void hd6301x_io(address_map &map);
 
 protected:
 	hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -273,6 +265,16 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void write_port2() override;
+
+	void p2_ddr_2bit_w(uint8_t data);
+	void p5_ddr_w(uint8_t data);
+	uint8_t p5_data_r();
+	void p5_data_w(uint8_t data);
+	void p6_ddr_w(uint8_t data);
+	uint8_t p6_data_r();
+	void p6_data_w(uint8_t data);
+	uint8_t p7_data_r();
+	void p7_data_w(uint8_t data);
 
 	devcb_read8::array<2> m_in_portx_func;
 	devcb_write8::array<3> m_out_portx_func;
