@@ -11,7 +11,8 @@
 */
 
 #include "emu.h"
-#include "cpu/m6502/n2a03.h"
+#include "cpu/m6502/m6502.h"
+#include "sound/nes_apu.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -29,6 +30,7 @@ public:
 		m_vram(*this, "vram"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_apu(*this, "nesapu"),
 		m_in(*this, "IN%u", 0U)
 	{ }
 	
@@ -45,12 +47,13 @@ protected:
 	WRITE8_MEMBER(sprite_dma_w);
 
 private:
-	required_device<n2a03_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_bank;
 	required_device<address_map_bank_device> m_fullrom;
 	required_device<address_map_bank_device> m_vram;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<nesapu_device> m_apu;
 
 	rgb_t nespal_to_RGB(int color_intensity, int color_num);
 
@@ -91,6 +94,14 @@ private:
 	DECLARE_READ8_MEMBER(io0_r);
 	DECLARE_READ8_MEMBER(io1_r);
 	DECLARE_WRITE8_MEMBER(io_w);
+
+	DECLARE_READ8_MEMBER(psg1_4014_r);
+	DECLARE_READ8_MEMBER(psg1_4015_r);
+	DECLARE_WRITE8_MEMBER(psg1_4015_w);
+	DECLARE_WRITE8_MEMBER(psg1_4017_w);
+	DECLARE_READ8_MEMBER(apu_read_mem);
+
+	DECLARE_WRITE_LINE_MEMBER(apu_irq);
 
 	int m_iniital_startup_state;
 	std::vector<uint8_t> m_palette_ram;
@@ -241,6 +252,7 @@ void nes_sh6578_state::do_dma()
 		}
 	}
 
+	// but games seem to be making quite a few DMA writes with lengths that seem too large? buggy code?
 	//m_dma_length[0] = 0;
 	//m_dma_length[1] = 0;
 }
@@ -505,7 +517,7 @@ WRITE8_MEMBER(nes_sh6578_state::write_ppu)
 		m_vram->write8(m_vramaddr, data);
 
 		if (m_2000 & 4)
-			m_vramaddr += 32;
+			m_vramaddr += 64; // big race and pioneer racing in ts_handy11 need this to be 64, not 32
 		else
 			m_vramaddr++;
 
@@ -556,6 +568,38 @@ WRITE8_MEMBER(nes_sh6578_state::io_w)
 }
 
 
+READ8_MEMBER(nes_sh6578_state::psg1_4014_r)
+{
+	return m_apu->read(0x14);
+}
+
+READ8_MEMBER(nes_sh6578_state::psg1_4015_r)
+{
+	return m_apu->read(0x15);
+}
+
+WRITE8_MEMBER(nes_sh6578_state::psg1_4015_w)
+{
+	m_apu->write(0x15, data);
+}
+
+WRITE8_MEMBER(nes_sh6578_state::psg1_4017_w)
+{
+	m_apu->write(0x17, data);
+}
+
+WRITE_LINE_MEMBER(nes_sh6578_state::apu_irq)
+{
+	// unimplemented
+}
+
+READ8_MEMBER(nes_sh6578_state::apu_read_mem)
+{
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+
+
 void nes_sh6578_state::nes_sh6578_map(address_map& map)
 {
 	map(0x0000, 0x1fff).ram();
@@ -565,8 +609,11 @@ void nes_sh6578_state::nes_sh6578_map(address_map& map)
 	
 	map(0x4014, 0x4014).w(FUNC(nes_sh6578_state::sprite_dma_w));
 
+	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
+	map(0x4014, 0x4014).r(FUNC(nes_sh6578_state::psg1_4014_r));
+	map(0x4015, 0x4015).rw(FUNC(nes_sh6578_state::psg1_4015_r), FUNC(nes_sh6578_state::psg1_4015_w));
 	map(0x4016, 0x4016).rw(FUNC(nes_sh6578_state::io0_r), FUNC(nes_sh6578_state::io_w));
-	map(0x4017, 0x4017).r(FUNC(nes_sh6578_state::io1_r));
+	map(0x4017, 0x4017).rw(FUNC(nes_sh6578_state::io1_r), FUNC(nes_sh6578_state::psg1_4017_w));
 
 	map(0x4020, 0x4020).w(FUNC(nes_sh6578_state::timing_setting_control_w));
 
@@ -776,10 +823,17 @@ uint32_t nes_sh6578_state::screen_update(screen_device& screen, bitmap_rgb32& bi
 	return 0;
 }
 
+// from n2a03.h verify that it actually uses these
+#define N2A03_NTSC_XTAL           XTAL(21'477'272)
+#define N2A03_PAL_XTAL            XTAL(26'601'712)
+#define NTSC_APU_CLOCK      (N2A03_NTSC_XTAL/12) /* 1.7897726666... MHz */
+#define PAL_APU_CLOCK       (N2A03_PAL_XTAL/16) /* 1.662607 MHz */
+#define PALC_APU_CLOCK      (N2A03_PAL_XTAL/15) /* 1.77344746666... MHz */
+
 void nes_sh6578_state::nes_sh6578(machine_config& config)
 {
 	/* basic machine hardware */
-	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	M6502(config, m_maincpu, NTSC_APU_CLOCK); // regular M6502 core, not N2A03?
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_sh6578_state::nes_sh6578_map);
 
 	ADDRESS_MAP_BANK(config, m_fullrom).set_map(&nes_sh6578_state::rom_map).set_options(ENDIANNESS_NATIVE, 8, 20, 0x100000);
@@ -799,7 +853,12 @@ void nes_sh6578_state::nes_sh6578(machine_config& config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	// have to add the APU separately due to using M6502
+	NES_APU(config, m_apu, NTSC_APU_CLOCK);
+	m_apu->irq().set(FUNC(nes_sh6578_state::apu_irq));
+	m_apu->mem_read().set(FUNC(nes_sh6578_state::apu_read_mem));
+	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void nes_sh6578_state::nes_sh6578_pal(machine_config& config)
@@ -807,6 +866,7 @@ void nes_sh6578_state::nes_sh6578_pal(machine_config& config)
 	nes_sh6578(config);
 
 	m_maincpu->set_clock(PALC_APU_CLOCK);
+	m_apu->set_clock(PALC_APU_CLOCK);
 
 	m_screen->set_refresh_hz(50.0070);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66 / (PALC_APU_CLOCK.dvalue() / 1000000)) *
