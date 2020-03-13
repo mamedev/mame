@@ -6,9 +6,13 @@
 
     driver by Mathis Rosenhauer
 
+	Notes:
+	- In stop mode press p1 start to freeze the screen, p2 start to resume
+
     TODO:
     - missing high bit of sprite X coordinate? (see round 2 and 3 of attract
       mode in crzrally)
+	- crzrally: emulate steering wheel;
 
 ***************************************************************************/
 
@@ -84,61 +88,62 @@ static INPUT_PORTS_START( holeland )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	// change any dipswitch in input test to show the list of settings
 	PORT_START("DSW1")
-	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-	PORT_DIPSETTING(    0x04, "Nihongo" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Japanese ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "60000" )
 	PORT_DIPSETTING(    0x20, "90000" )
-	PORT_DIPNAME( 0x40, 0x00, "Fase 3 Difficulty")
+	PORT_DIPNAME( 0x40, 0x00, "Phase 3 Difficulty") PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x80, 0x80, "Coin Mode" )
+	PORT_DIPNAME( 0x80, 0x80, "Coin Mode" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, "A" )
 	PORT_DIPSETTING(    0x00, "B" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x00, "Coin Case" )
+	PORT_DIPNAME( 0x03, 0x00, "Coin Case" ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x03, "4" )
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x0c, "5" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x40, 0x40, "Monsters" )
+	PORT_DIPNAME( 0x40, 0x40, "Monsters" ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, "Min" )
 	PORT_DIPSETTING(    0x00, "Max" )
-	PORT_DIPNAME( 0x80, 0x80, "Mode" ) /* seems to have no effect */
+	PORT_DIPNAME( 0x80, 0x80, "Mode" ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, "Stop" )
 	PORT_DIPSETTING(    0x80, "Play" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( holeland2 )
-		PORT_INCLUDE( holeland )
+	PORT_INCLUDE( holeland )
 
-		PORT_MODIFY("DSW1")
-		PORT_DIPNAME( 0x04, 0x04, DEF_STR( Language ) )
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-		PORT_DIPSETTING(    0x04, DEF_STR( Spanish ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Spanish ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( crzrally )
@@ -160,51 +165,51 @@ static INPUT_PORTS_START( crzrally )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PC=1f37 (from 1f6c): accelerator in steering wheel mode
 
 	PORT_START("DSW1")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x00, "Drive" )
+	PORT_DIPNAME( 0x0c, 0x00, "Drive" ) PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, "A" )
 	PORT_DIPSETTING(    0x04, "B" )
 	PORT_DIPSETTING(    0x08, "C" )
 	PORT_DIPSETTING(    0x0c, "D" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x60, 0x60, "Extra Time" )
+	PORT_DIPNAME( 0x60, 0x60, "Extra Time" ) PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x20, "5 Sec" )
 	PORT_DIPSETTING(    0x40, "10 Sec" )
 	PORT_DIPSETTING(    0x60, "15 Sec" )
-	PORT_DIPNAME( 0x80, 0x00, "Coin Mode" )
+	PORT_DIPNAME( 0x80, 0x00, "Coin Mode" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Controller ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Controller ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Joystick ) )
-	PORT_DIPSETTING(    0x00, "Wheel" )
-	PORT_DIPNAME( 0x80, 0x80, "Mode" ) /* seems to have no effect */
+	PORT_DIPSETTING(    0x00, "Steering Wheel" )
+	PORT_DIPNAME( 0x80, 0x80, "Mode" ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, "Stop" )
 	PORT_DIPSETTING(    0x80, "Play" )
 INPUT_PORTS_END
@@ -292,10 +297,8 @@ void holeland_state::holeland(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*16, 32*16);
-	screen.set_visarea(0*16, 32*16-1, 2*16, 30*16-1);
+	// TODO: 448i, compensate.
+	screen.set_raw((20000000/4)*4, 332*2, 0, 256*2, 256*2, 16*2, 240*2);
 	screen.set_screen_update(FUNC(holeland_state::screen_update_holeland));
 	screen.set_palette(m_palette);
 
@@ -321,40 +324,6 @@ void holeland_state::holeland(machine_config &config)
 	speech.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-/*
-
-Crazy Rally
-Tecfri, 1985
-
-PCB Layout
-|----------------------------------------------|
-|                   20MHz                      |
-|  Z80                                         |
-|                                        PAL   |
-|              3.7D      2149                  |
-|  AY-3-8910                                   |
-|  DSW2   DSW1 2.7F      2149         82S147.1F|
-|1                                             |
-|8 AY-3-8910   1.7G       5.5G                 |
-|W           555                               |
-|A                        4.5H                 |
-|Y                                             |
-|     VOL                 2128          9.1I   |
-|         741                                  |
-|    TDA1510                            8.1K   |
-|              2149  2149  PAL                 |
-|   82S129.9L  2149  2149  PAL          7.1L   |
-|   82S129.9M  2149  2149  PAL                 |
-|   82S129.9N  2149  2149               6.1N   |
-|----------------------------------------------|
-Notes:
-      Z80 clock - 5.000MHz [20/4]
-      AY3-8910 clock - 1.25MHz [20/16]
-      VSync - 59Hz
-      HSync - 15.08kHz
-
-*/
-
 void holeland_state::crzrally(machine_config &config)
 {
 	/* basic machine hardware */
@@ -373,10 +342,7 @@ void holeland_state::crzrally(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(20000000/4, 332, 0, 256, 256, 16, 240);
 	screen.set_screen_update(FUNC(holeland_state::screen_update_crzrally));
 	screen.set_palette(m_palette);
 
@@ -460,6 +426,40 @@ ROM_START( holeland2 )
 	ROM_LOAD( "82s129.3l", 0x0100, 0x0100, CRC(f6682705) SHA1(1ab952c1e2a45e9b0dc9144f50711f99f6b1ebc4) )  /* Green component */
 	ROM_LOAD( "82s129.3n", 0x0200, 0x0100, CRC(3d7b3af6) SHA1(0c4f95b26e9fe25a5d8c79f06e7ceab78a07d35c) )  /* Blue component */
 ROM_END
+
+/*
+
+Crazy Rally
+Tecfri, 1985
+
+PCB Layout
+|----------------------------------------------|
+|                   20MHz                      |
+|  Z80                                         |
+|                                        PAL   |
+|              3.7D      2149                  |
+|  AY-3-8910                                   |
+|  DSW2   DSW1 2.7F      2149         82S147.1F|
+|1                                             |
+|8 AY-3-8910   1.7G       5.5G                 |
+|W           555                               |
+|A                        4.5H                 |
+|Y                                             |
+|     VOL                 2128          9.1I   |
+|         741                                  |
+|    TDA1510                            8.1K   |
+|              2149  2149  PAL                 |
+|   82S129.9L  2149  2149  PAL          7.1L   |
+|   82S129.9M  2149  2149  PAL                 |
+|   82S129.9N  2149  2149               6.1N   |
+|----------------------------------------------|
+Notes:
+      Z80 clock - 5.000MHz [20/4]
+      AY3-8910 clock - 1.25MHz [20/16]
+      VSync - 59Hz
+      HSync - 15.08kHz
+
+*/
 
 ROM_START( crzrally )
 	ROM_REGION( 0x10000, "maincpu", 0 )
