@@ -47,6 +47,29 @@ Systemskiva för hårdskiveenhet [version 7242]
 		</part>
 	</software>
 
+	<software name="ma2">
+		<description>MA2 info (skollicens)</description>
+		<year>19??</year>
+		<publisher>Hjärsta Mediakonsult Handelsbolag</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="113003">
+				<rom name="ma2.td0" size="113003" crc="5bede5b3" sha1="b6753ede4cc24ef8c0d4ba503302aebc27cc1e10" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skriv">
+		<description>Skriv lätt, skriv rätt (version 7532)</description>
+		<year>19??</year>
+		<publisher>Telenova</publisher>
+		<info name="serial" value="24-33825-7" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="140545">
+				<rom name="skriv1.td0" size="140545" crc="69c68426" sha1="5bc886ec8cae72a70e1d31a8fca3ebe963117be2" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msdos32">
 		<description>MS-DOS v3.2 (version 7331)</description>
 		<year>1987</year>
