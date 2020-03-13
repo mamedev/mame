@@ -19,6 +19,14 @@
 #include "machine/bankdev.h"
 #include "machine/timer.h"
 
+#define LOG_DMA       (1U << 10)
+#define LOG_PPU       (1U << 0)
+
+//#define VERBOSE             (LOG_PPU)
+#define VERBOSE             (0)
+
+#include "logmacro.h"
+
 class nes_sh6578_state : public driver_device
 {
 public:
@@ -195,14 +203,14 @@ READ8_MEMBER(nes_sh6578_state::dma_r)
 {
 	switch (offset)
 	{
-	case 0x00: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Control : %02x\n", machine().describe_context(), offset, m_dma_control); return m_dma_control & 0x7f;
-	case 0x01: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Bank Select\n", machine().describe_context(), offset); return m_dma_bank;
-	case 0x02: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Source Address Low\n", machine().describe_context(), offset); return m_dma_source[0];
-	case 0x03: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Source Address High\n", machine().describe_context(), offset); return m_dma_source[1];
-	case 0x04: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Destination Address Low\n", machine().describe_context(), offset); return m_dma_dest[0];
-	case 0x05: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Destination Address High\n", machine().describe_context(), offset); return m_dma_dest[1];
-	case 0x06: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Length Low\n", machine().describe_context(), offset); return m_dma_length[0];
-	case 0x07: logerror("%s: nes_sh6578_state::dma_r offset %01x : DMA Length High\n", machine().describe_context(), offset); return m_dma_length[1];
+	case 0x00: LOGMASKED(LOG_DMA, "%s: nes_sh6578_state::dma_r offset %01x : DMA Control : %02x\n", machine().describe_context(), offset, m_dma_control); return m_dma_control & 0x7f;
+	case 0x01: LOGMASKED(LOG_DMA, "%s: nes_sh6578_state::dma_r offset %01x : DMA Bank Select\n", machine().describe_context(), offset); return m_dma_bank;
+	case 0x02: LOGMASKED(LOG_DMA, "%s: nes_sh6578_state::dma_r offset %01x : DMA Source Address Low\n", machine().describe_context(), offset); return m_dma_source[0];
+	case 0x03: LOGMASKED(LOG_DMA, "%s: nes_sh6578_state::dma_r offset %01x : DMA Source Address High\n", machine().describe_context(), offset); return m_dma_source[1];
+	case 0x04: LOGMASKED(LOG_DMA, "%s: nes_sh6578_state::dma_r offset %01x : DMA Destination Address Low\n", machine().describe_context(), offset); return m_dma_dest[0];
+	case 0x05: LOGMASKED(LOG_DMA, "%s: nes_sh6578_state::dma_r offset %01x : DMA Destination Address High\n", machine().describe_context(), offset); return m_dma_dest[1];
+	case 0x06: LOGMASKED(LOG_DMA, "%s: nes_sh6578_state::dma_r offset %01x : DMA Length Low\n", machine().describe_context(), offset); return m_dma_length[0];
+	case 0x07: LOGMASKED(LOG_DMA, "%s: nes_sh6578_state::dma_r offset %01x : DMA Length High\n", machine().describe_context(), offset); return m_dma_length[1];
 	}
 	return 0x00;
 }
@@ -215,7 +223,7 @@ void nes_sh6578_state::do_dma()
 		uint16_t dma_dest = m_dma_dest[0] | (m_dma_dest[1] << 8);
 		uint16_t dma_length = m_dma_length[0] | (m_dma_length[1] << 8);
 
-		logerror("Doing DMA :%02x bank:%02x: source:%04x dest:%04x length:%04x\n", m_dma_control, m_dma_bank, dma_source, dma_dest, dma_length);
+		LOGMASKED(LOG_DMA, "Doing DMA :%02x bank:%02x: source:%04x dest:%04x length:%04x\n", m_dma_control, m_dma_bank, dma_source, dma_dest, dma_length);
 
 		uint16_t realsourceaddress = dma_source;
 		uint16_t realdestaddress = dma_dest;
@@ -262,43 +270,43 @@ WRITE8_MEMBER(nes_sh6578_state::dma_w)
 	switch (offset)
 	{
 	case 0x0:
-		logerror("%s: nes_sh6578_state::dma_w offset %01x : DMA Control : %02x\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_DMA, "%s: nes_sh6578_state::dma_w offset %01x : DMA Control : %02x\n", machine().describe_context(), offset, data);
 		m_dma_control = data;
 		do_dma();
 		break;
 
 	case 0x1:
-		logerror("%s: nes_sh6578_state::dma_w offset %01x : DMA Bank Select : %02x\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_DMA, "%s: nes_sh6578_state::dma_w offset %01x : DMA Bank Select : %02x\n", machine().describe_context(), offset, data);
 		m_dma_bank = data;
 		break;
 
 	case 0x2:
-		logerror("%s: nes_sh6578_state::dma_w offset %01x : DMA Source Address Low : %02x\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_DMA, "%s: nes_sh6578_state::dma_w offset %01x : DMA Source Address Low : %02x\n", machine().describe_context(), offset, data);
 		m_dma_source[0] = data;
 		break;
 
 	case 0x3:
-		logerror("%s: nes_sh6578_state::dma_w offset %01x : DMA Source Address High : %02x\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_DMA, "%s: nes_sh6578_state::dma_w offset %01x : DMA Source Address High : %02x\n", machine().describe_context(), offset, data);
 		m_dma_source[1] = data;
 		break;
 
 	case 0x4:
-		logerror("%s: nes_sh6578_state::dma_w offset %01x : DMA Destination Address Low : %02x\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_DMA, "%s: nes_sh6578_state::dma_w offset %01x : DMA Destination Address Low : %02x\n", machine().describe_context(), offset, data);
 		m_dma_dest[0] = data;
 		break;
 
 	case 0x5:
-		logerror("%s: nes_sh6578_state::dma_w offset %01x : DMA Destination Address High : %02x\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_DMA, "%s: nes_sh6578_state::dma_w offset %01x : DMA Destination Address High : %02x\n", machine().describe_context(), offset, data);
 		m_dma_dest[1] = data;
 		break;
 
 	case 0x6:
-		logerror("%s: nes_sh6578_state::dma_w offset %01x : DMA Length Low : %02x\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_DMA, "%s: nes_sh6578_state::dma_w offset %01x : DMA Length Low : %02x\n", machine().describe_context(), offset, data);
 		m_dma_length[0] = data;
 		break;
 
 	case 0x7:
-		logerror("%s: nes_sh6578_state::dma_w offset %01x : DMA Length High : %02x\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_DMA, "%s: nes_sh6578_state::dma_w offset %01x : DMA Length High : %02x\n", machine().describe_context(), offset, data);
 		m_dma_length[1] = data;
 		break;
 	}
@@ -443,7 +451,7 @@ READ8_MEMBER(nes_sh6578_state::read_ppu)
 	switch (offset)
 	{
 	case 0x08:
-		logerror("%s: nes_sh6578_state::read_ppu : Color Select & PNT Start Address\n", machine().describe_context());
+		LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::read_ppu : Color Select & PNT Start Address\n", machine().describe_context());
 		return m_colsel_pntstart;
 
 	case 0x00:
@@ -465,7 +473,7 @@ READ8_MEMBER(nes_sh6578_state::read_ppu)
 	case 0x07: return m_2007;
 
 	default:
-		logerror("%s: nes_sh6578_state::read_ppu : unhandled offset %02x\n", machine().describe_context(), offset);
+		LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::read_ppu : unhandled offset %02x\n", machine().describe_context(), offset);
 		return 0x00;
 	}
 }
@@ -475,18 +483,18 @@ WRITE8_MEMBER(nes_sh6578_state::write_ppu)
 	switch (offset)
 	{
 	case 0x08:
-		logerror("%s: nes_sh6578_state::write_ppu : Color Select & PNT Start Address : %02x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu : Color Select & PNT Start Address : %02x\n", machine().describe_context(), data);
 		m_colsel_pntstart = data;
 		break;
 
-	case 0x00: m_2000 = data; logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
-	case 0x01: m_2001 = data; logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
-	case 0x02: m_2002 = data; logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
-	case 0x03: m_2003 = data; logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
-	case 0x04: m_2004 = data; logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
+	case 0x00: m_2000 = data; LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
+	case 0x01: m_2001 = data; LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
+	case 0x02: m_2002 = data; LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
+	case 0x03: m_2003 = data; LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
+	case 0x04: m_2004 = data; LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
 	case 0x05:
 	{
-		logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data);
 		if (m_scrollreg_firstwrite)
 		{
 			m_scrollreg = (m_scrollreg & 0xff00) | data;
@@ -504,7 +512,7 @@ WRITE8_MEMBER(nes_sh6578_state::write_ppu)
 
 	case 0x06:
 	{
-		logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data);
 		m_vramaddr <<= 8;
 		m_vramaddr = (m_vramaddr & 0xff00) | data;
 		logerror("  vram address is now %04x\n", m_vramaddr);
@@ -513,7 +521,7 @@ WRITE8_MEMBER(nes_sh6578_state::write_ppu)
 
 	case 0x07:
 	{
-		logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data);
 		m_vram->write8(m_vramaddr, data);
 
 		if (m_2000 & 4)
