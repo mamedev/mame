@@ -28,7 +28,8 @@ public:
 		m_fullrom(*this, "fullrom"),
 		m_vram(*this, "vram"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_in(*this, "IN%u", 0U)
 	{ }
 	
 	void nes_sh6578(machine_config& config);
@@ -86,7 +87,8 @@ private:
 	DECLARE_WRITE8_MEMBER(write_palette);
 	DECLARE_READ8_MEMBER(read_palette);
 
-	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_READ8_MEMBER(io0_r);
+	DECLARE_READ8_MEMBER(io1_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 
 	int m_iniital_startup_state;
@@ -120,10 +122,12 @@ private:
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
+
 	// this might be game specific
 	uint8_t m_previo;
-	uint8_t m_iolatch;
+	uint8_t m_iolatch[2];
 	bool m_isbanked;
+	required_ioport_array<2> m_in;
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(nes_sh6578_state::scanline)
@@ -493,10 +497,17 @@ WRITE8_MEMBER(nes_sh6578_state::write_ppu)
 	}
 }
 
-READ8_MEMBER(nes_sh6578_state::io_r)
+READ8_MEMBER(nes_sh6578_state::io0_r)
 {
-	uint8_t ret = m_iolatch & 0x01;
-	m_iolatch >>= 1;
+	uint8_t ret = m_iolatch[0] & 0x01;
+	m_iolatch[0] >>= 1;
+	return ret;
+}
+
+READ8_MEMBER(nes_sh6578_state::io1_r)
+{
+	uint8_t ret = m_iolatch[1] & 0x01;
+	m_iolatch[1] >>= 1;
 	return ret;
 }
 
@@ -508,9 +519,10 @@ WRITE8_MEMBER(nes_sh6578_state::io_w)
 	if ((m_previo & 0x01) != (data & 0x01))
 	{
 		// latch on rising or falling?
-		if (!data)
+		if (!(data & 0x01))
 		{
-			m_iolatch = ioport("IN")->read();
+			m_iolatch[0] = m_in[0]->read();
+			m_iolatch[1] = m_in[1]->read();
 		}
 	}
 
@@ -532,8 +544,8 @@ void nes_sh6578_state::nes_sh6578_map(address_map& map)
 	
 	map(0x4014, 0x4014).w(FUNC(nes_sh6578_state::sprite_dma_w));
 
-	map(0x4016, 0x4016).rw(FUNC(nes_sh6578_state::io_r), FUNC(nes_sh6578_state::io_w));
-
+	map(0x4016, 0x4016).rw(FUNC(nes_sh6578_state::io0_r), FUNC(nes_sh6578_state::io_w));
+	map(0x4017, 0x4017).r(FUNC(nes_sh6578_state::io1_r));
 
 	map(0x4020, 0x4020).w(FUNC(nes_sh6578_state::timing_setting_control_w));
 
@@ -559,7 +571,7 @@ void nes_sh6578_state::nes_sh6578_map(address_map& map)
 }
 
 static INPUT_PORTS_START(nes_sh6578)
-	PORT_START("IN")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
@@ -568,6 +580,9 @@ static INPUT_PORTS_START(nes_sh6578)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void nes_sh6578_state::video_start()
