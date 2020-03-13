@@ -267,9 +267,7 @@ protected:
 	virtual void write_port2() override;
 
 	void p2_ddr_2bit_w(uint8_t data);
-	void p5_ddr_w(uint8_t data);
 	uint8_t p5_data_r();
-	void p5_data_w(uint8_t data);
 	void p6_ddr_w(uint8_t data);
 	uint8_t p6_data_r();
 	void p6_data_w(uint8_t data);
@@ -315,12 +313,26 @@ public:
 };
 
 
+class hd6301y_cpu_device : public hd6301x_cpu_device
+{
+public:
+	// TODO: privatize eventually
+	void hd6301y_io(address_map &map);
+
+protected:
+	hd6301y_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	void p5_ddr_w(uint8_t data);
+	void p5_data_w(uint8_t data);
+};
+
+
 // DP-64S package: HD6301Y0P,  HD63A01Y0P,  HD63B01Y0P,  HD63C01Y0P
 // FP-64  package: HD6301Y0F,  HD63A01Y0F,  HD63B01Y0F,  HD63C01Y0F
 // FP-64A package: HD6301Y0H,  HD63A01Y0H,  HD63B01Y0H,  HD63C01Y0H
 // CP-68  package: HD6301Y0CP, HD63A01Y0CP, HD63B01Y0CP, HD63C01Y0CP
 // Not fully emulated yet
-class hd6301y0_cpu_device : public hd6301x_cpu_device
+class hd6301y0_cpu_device : public hd6301y_cpu_device
 {
 public:
 	hd6301y0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -329,7 +341,7 @@ public:
 
 // DC-64S package: HD63701Y0C, HD63A701Y0C, HD63B701Y0C, HD63C701Y0C
 // Not fully emulated yet
-class hd63701y0_cpu_device : public hd6301x_cpu_device
+class hd63701y0_cpu_device : public hd6301y_cpu_device
 {
 public:
 	hd63701y0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -341,7 +353,7 @@ public:
 // FP-64A package: HD6303YH,  HD63A03YH,  HD63B03YH,  HD63C03YH
 // CP-68  package: HD6303YCP, HD63A03YCP, HD63B03YCP, HD63C03YCP
 // Not fully emulated yet
-class hd6303y_cpu_device : public hd6301x_cpu_device
+class hd6303y_cpu_device : public hd6301y_cpu_device
 {
 public:
 	hd6303y_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

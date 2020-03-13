@@ -24,6 +24,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_mcu(*this, "mcu"),
 		m_msm1(*this, "msm1"),
 		m_msm2(*this, "msm2"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -36,7 +37,7 @@ public:
 
 	void spdodgeb(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(mcu63705_busy_r);
+	DECLARE_READ_LINE_MEMBER(mcu_busy_r);
 
 protected:
 	virtual void machine_start() override;
@@ -46,6 +47,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_mcu;
 	required_device<msm5205_device> m_msm1;
 	required_device<msm5205_device> m_msm2;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -61,8 +63,8 @@ private:
 	int m_adpcm_end[2];
 	int m_adpcm_idle[2];
 	int m_adpcm_data[2];
-	int m_mcu63701_command;
-	int m_inputs[4];
+	uint8_t m_mcu_status;
+	uint8_t m_inputs[5];
 	uint8_t m_tapc[4];
 	uint8_t m_last_port[2];
 	uint8_t m_last_dash[2];
@@ -81,7 +83,10 @@ private:
 
 	DECLARE_WRITE8_MEMBER(spd_adpcm_w);
 	DECLARE_READ8_MEMBER(mcu63701_r);
-	DECLARE_WRITE8_MEMBER(mcu63701_w);
+	void mcu_data_w(offs_t offset, uint8_t data);
+	void mcu_status_w(uint8_t data);
+	void mcu_nmi_w(uint8_t data);
+
 	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -98,10 +103,10 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void mcu63705_update_inputs();
 	void spd_adpcm_int(msm5205_device *device, int chip);
 	void spdodgeb_map(address_map &map);
 	void spdodgeb_sound_map(address_map &map);
+	void mcu_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_SPDODGEB_H

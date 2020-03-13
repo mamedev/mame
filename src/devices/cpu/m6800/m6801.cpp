@@ -256,7 +256,7 @@ void m6801_cpu_device::m6803_mem(address_map &map)
 void hd6301x_cpu_device::hd6301x_io(address_map &map)
 {
 	map(0x0001, 0x0001).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::p2_ddr_2bit_w));
-	map(0x0002, 0x0002).rw(FUNC(hd6301x_cpu_device::p1_data_r), FUNC(hd6301x_cpu_device::p1_data_w));
+	map(0x0002, 0x0002).rw(FUNC(hd6301x_cpu_device::p1_data_r), FUNC(hd6301x_cpu_device::p1_data_w)); // TODO: external except in single-chip mode
 	map(0x0003, 0x0003).rw(FUNC(hd6301x_cpu_device::p2_data_r), FUNC(hd6301x_cpu_device::p2_data_w));
 	map(0x0004, 0x0004).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::p3_ddr_w)); // TODO: external except in single-chip mode
 	map(0x0005, 0x0005).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::p4_ddr_w)); // TODO: external except in single-chip mode
@@ -285,6 +285,17 @@ void hd6301x_cpu_device::hd6301x_io(address_map &map)
 	//map(0x001c, 0x001c).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::tconr_w));
 	//map(0x001d, 0x001d).rw(FUNC(hd6301x_cpu_device::t2cnt_r), FUNC(hd6301x_cpu_device::t2cnt_w));
 	//map(0x001f, 0x001f).rw(FUNC(hd6301x_cpu_device::tstreg_r), FUNC(hd6301x_cpu_device::tstreg_w));
+}
+
+void hd6301y_cpu_device::hd6301y_io(address_map &map)
+{
+	hd6301x_io(map);
+	map(0x0000, 0x0000).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p1_ddr_w)); // TODO: external except in single-chip mode
+	map(0x0001, 0x0001).w(FUNC(hd6301y_cpu_device::p2_ddr_w));
+	map(0x0015, 0x0015).w(FUNC(hd6301y_cpu_device::p5_data_w));
+	//map(0x001e, 0x001e).rw(FUNC(hd6301y_cpu_device::sci_trcsr2_r), FUNC(hd6301y_cpu_device::sci_trcsr2_w));
+	map(0x0020, 0x0020).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p5_ddr_w));
+	//map(0x0021, 0x0021).rw(FUNC(hd6301y_cpu_device::p6_csr_r), FUNC(hd6301y_cpu_device::p6_csr_w));
 }
 
 
@@ -367,18 +378,23 @@ hd6303x_cpu_device::hd6303x_cpu_device(const machine_config &mconfig, const char
 {
 }
 
+hd6301y_cpu_device::hd6301y_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: hd6301x_cpu_device(mconfig, type, tag, owner, clock)
+{
+}
+
 hd6301y0_cpu_device::hd6301y0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301x_cpu_device(mconfig, HD6301Y0, tag, owner, clock)
+	: hd6301y_cpu_device(mconfig, HD6301Y0, tag, owner, clock)
 {
 }
 
 hd63701y0_cpu_device::hd63701y0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301x_cpu_device(mconfig, HD63701Y0, tag, owner, clock)
+	: hd6301y_cpu_device(mconfig, HD63701Y0, tag, owner, clock)
 {
 }
 
 hd6303y_cpu_device::hd6303y_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6301x_cpu_device(mconfig, HD6303Y, tag, owner, clock)
+	: hd6301y_cpu_device(mconfig, HD6303Y, tag, owner, clock)
 {
 }
 
@@ -1137,7 +1153,7 @@ void m6801_cpu_device::p4_data_w(uint8_t data)
 	m_out_port_func[3](0, (m_port_data[3] & m_port_ddr[3]) | (m_port_ddr[3] ^ 0xff), m_port_ddr[3]);
 }
 
-void hd6301x_cpu_device::p5_ddr_w(uint8_t data)
+void hd6301y_cpu_device::p5_ddr_w(uint8_t data)
 {
 	LOGPORT("Port 5 Data Direction Register: %02x\n", data);
 
@@ -1156,7 +1172,7 @@ uint8_t hd6301x_cpu_device::p5_data_r()
 		return (m_in_portx_func[0]() & (m_portx_ddr[0] ^ 0xff)) | (m_portx_data[0] & m_portx_ddr[0]);
 }
 
-void hd6301x_cpu_device::p5_data_w(uint8_t data)
+void hd6301y_cpu_device::p5_data_w(uint8_t data)
 {
 	LOGPORT("Port 5 Data Register: %02x\n", data);
 
