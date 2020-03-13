@@ -420,7 +420,7 @@ void namcos86_state::wndrmomo_cpu2_map(address_map &map)
 
 void namcos86_state::common_mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw("mcu", FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m("mcu", FUNC(hd63701v0_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram();
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));
 	map(0x1400, 0x1fff).ram();
@@ -1057,7 +1057,7 @@ void namcos86_state::hopmappy(machine_config &config)
 	m_cpu2->set_addrmap(AS_PROGRAM, &namcos86_state::hopmappy_cpu2_map);
 	m_cpu2->set_vblank_int("screen", FUNC(namcos86_state::irq0_line_assert));
 
-	HD63701(config, m_mcu, XTAL(49'152'000)/8);    /* or compatible 6808 with extra instructions */
+	HD63701V0(config, m_mcu, XTAL(49'152'000)/8);    /* or compatible 6808 with extra instructions */
 	m_mcu->set_addrmap(AS_PROGRAM, &namcos86_state::hopmappy_mcu_map);
 	m_mcu->in_p1_cb().set_ioport("IN2");
 	m_mcu->in_p2_cb().set_constant(0xff);  /* leds won't work otherwise */

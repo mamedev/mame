@@ -50,7 +50,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(psion_on);
 
 protected:
-	required_device<hd63701_cpu_device> m_maincpu;
+	required_device<hd6301x_cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 	required_device<beep_device> m_beep;
 	required_device<datapack_device> m_pack1;
@@ -85,8 +85,16 @@ protected:
 
 	uint8_t kb_read();
 	void update_banks();
-	DECLARE_WRITE8_MEMBER( hd63701_int_reg_w );
-	DECLARE_READ8_MEMBER( hd63701_int_reg_r );
+	void port2_ddr_w(uint8_t data);
+	void port2_w(uint8_t data);
+	uint8_t port2_r();
+	void tcsr_w(uint8_t data);
+	uint8_t tcsr_r();
+	uint8_t rcp5c_r();
+	uint8_t port5_r();
+	void port6_ddr_w(uint8_t data);
+	void port6_w(uint8_t data);
+	uint8_t port6_r();
 	void io_rw(address_space &space, uint16_t offset);
 	DECLARE_WRITE8_MEMBER( io_w );
 	DECLARE_READ8_MEMBER( io_r );
@@ -94,6 +102,7 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 
 	HD44780_PIXEL_UPDATE(lz_pixel_update);
+	void psion_int_reg(address_map &map);
 	void psioncm_mem(address_map &map);
 	void psionla_mem(address_map &map);
 	void psionlam_mem(address_map &map);

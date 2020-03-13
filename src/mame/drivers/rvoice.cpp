@@ -363,7 +363,7 @@ void rvoice_state::null_kbd_put(u8 data)
 void rvoice_state::rvoicepc(machine_config &config)
 {
 	/* basic machine hardware */
-	HD63701(config, m_maincpu, XTAL(7'372'800));
+	HD63701Y0(config, m_maincpu, XTAL(7'372'800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &rvoice_state::hd63701_main_mem);
 
 	//hd63701_cpu_device &playercpu(HD63701(config "playercpu", XTAL(7'372'800))); // not dumped yet

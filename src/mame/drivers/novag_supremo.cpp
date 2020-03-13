@@ -78,7 +78,7 @@ void supremo_state::machine_start()
 
 void supremo_state::main_map(address_map &map)
 {
-	map(0x0000, 0x000e).rw(m_maincpu, FUNC(hd6303y_cpu_device::m6801_io_r), FUNC(hd6303y_cpu_device::m6801_io_w));
+	map(0x0000, 0x000e).m(m_maincpu, FUNC(hd6303y_cpu_device::m6801_io));
 	map(0x0040, 0x013f).ram(); // internal
 	map(0x4000, 0x47ff).ram();
 	map(0x8000, 0xffff).rom();

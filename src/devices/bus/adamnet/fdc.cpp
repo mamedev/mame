@@ -79,7 +79,7 @@ const tiny_rom_entry *adam_fdc_device::device_rom_region() const
 
 void adam_fdc_device::adam_fdc_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw(M6801_TAG, FUNC(m6801_cpu_device::m6801_io_r), FUNC(m6801_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m(M6801_TAG, FUNC(m6801_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram();
 	map(0x0400, 0x07ff).ram().writeonly().share("ram");
 	map(0x0800, 0x0800).mirror(0x3ff).r(WD2793_TAG, FUNC(wd2793_device::status_r));

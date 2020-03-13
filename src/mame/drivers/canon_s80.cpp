@@ -42,7 +42,7 @@ void canons80_state::canons80_map(address_map &map)
 void canons80_state::canons80(machine_config &config)
 {
 	/* basic machine hardware */
-	hd6301_cpu_device &maincpu(HD6301(config, "maincpu", 5000000)); /* hd63a01xop 5 MHz guessed: TODO: check on PCB */
+	hd6301x0_cpu_device &maincpu(HD6301X0(config, "maincpu", 5000000)); /* hd63a01xop 5 MHz guessed: TODO: check on PCB */
 	maincpu.set_addrmap(AS_PROGRAM, &canons80_state::canons80_map);
 }
 
