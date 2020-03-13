@@ -2,11 +2,15 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
+
+Undumped:
+
+Ekologi-akvariet (nät/skollicens) [24-34203, 1987-07-27]
 -->
 <softwarelist name="compis" description="Telenova Compis disk images">
 
 	<software name="abcenkat">
-		<description>ABC enkät etikett klockan (Swe)</description>
+		<description>ABC enkät etikett klockan</description>
 		<year>1989</year>
 		<publisher>Gävle DPC</publisher>
 
@@ -19,7 +23,7 @@ license:CC0
 	</software>
 
 	<software name="demospel">
-		<description>Demospel (Swe)</description>
+		<description>Demospel</description>
 		<year>19??</year>
 		<publisher>DataNova</publisher>
 
@@ -55,7 +59,7 @@ license:CC0
 	</software>
 
 	<software name="system2">
-		<description>Systemskiva II (Swe)</description>
+		<description>Systemskiva II</description>
 		<year>1986</year>
 		<publisher>Telenova</publisher>
 
