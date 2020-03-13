@@ -20,6 +20,7 @@ protected:
 	void tmp90840_regs(address_map &map);
 	void tmp90840_mem(address_map &map);
 	void tmp90841_mem(address_map &map);
+	void tmp90844_regs(address_map &map);
 	void tmp90ph44_mem(address_map &map);
 	void tmp91640_mem(address_map &map);
 	void tmp91641_mem(address_map &map);
@@ -76,6 +77,10 @@ protected:
 	void tmod_w(uint8_t data);
 	uint8_t tclk_r();
 	void tclk_w(uint8_t data);
+	uint8_t t01mod_r();
+	void t01mod_w(uint8_t data);
+	uint8_t t23mod_r();
+	void t23mod_w(uint8_t data);
 	void treg_8bit_w(offs_t offset, uint8_t data);
 	uint8_t t4mod_r();
 	void t4mod_w(uint8_t data);
