@@ -284,6 +284,8 @@ private:
 	virtual DECLARE_WRITE16_MEMBER(cs0_w) override;
 	virtual DECLARE_READ16_MEMBER(cs1_r) override;
 	virtual DECLARE_WRITE16_MEMBER(cs1_w) override;
+
+	int m_romwords_mask;
 };
 
 class jak_s500_game_state : public wrlshunt_game_state

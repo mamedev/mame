@@ -503,7 +503,7 @@ READ8_MEMBER(nes_sh6578_state::io_r)
 WRITE8_MEMBER(nes_sh6578_state::io_w)
 {
 	if ((data != 0x00) && (data != 0x01) && (data != 0x02) && (data != 0x03))
-		printf("%s: io_w : unexpected value : %02x\n", machine().describe_context().c_str(), data);
+		logerror("%s: io_w : unexpected value : %02x\n", machine().describe_context(), data);
 
 	if ((m_previo & 0x01) != (data & 0x01))
 	{
