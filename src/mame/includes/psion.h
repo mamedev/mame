@@ -68,8 +68,6 @@ protected:
 
 	uint8_t m_port2_ddr;  // datapack i/o ddr
 	uint8_t m_port2;      // datapack i/o data bus
-	uint8_t m_port6_ddr;  // datapack control lines ddr
-	uint8_t m_port6;      // datapack control lines
 
 	// RAM/ROM banks
 	required_shared_ptr<uint8_t> m_ram;
@@ -92,7 +90,6 @@ protected:
 	uint8_t tcsr_r();
 	uint8_t rcp5c_r();
 	uint8_t port5_r();
-	void port6_ddr_w(uint8_t data);
 	void port6_w(uint8_t data);
 	uint8_t port6_r();
 	void io_rw(address_space &space, uint16_t offset);

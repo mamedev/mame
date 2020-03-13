@@ -2,7 +2,8 @@
 // copyright-holders:Aaron Giles
 
 #include "emu.h"
-#include "cpu/m6800/m6801.h"
+#include "m6801.h"
+#include "6800dasm.h"
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_TX      (1U << 1)
@@ -312,6 +313,8 @@ hd6303r_cpu_device::hd6303r_cpu_device(const machine_config &mconfig, const char
 
 hd6301x_cpu_device::hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: hd6301_cpu_device(mconfig, type, tag, owner, clock)
+	, m_in_portx_func(*this)
+	, m_out_portx_func(*this)
 {
 }
 
@@ -389,7 +392,7 @@ void m6801_cpu_device::check_timer_event()
 		{
 			m_port_data[1] &= ~2;
 			m_port_data[1] |= (m_tcsr & TCSR_OLVL) << 1;
-			m_port2_written = 1;
+			m_port2_written = true;
 			write_port2();
 		}
 	}
@@ -434,6 +437,8 @@ void m6801_cpu_device::CLEANUP_COUNTERS()
 	TOH -= CTH;
 	CTH = 0;
 	SET_TIMER_EVENT;
+	if (CTD >= m_timer_next)
+		check_timer_event();
 }
 
 void m6801_cpu_device::set_rmcr(uint8_t data)
@@ -556,7 +561,7 @@ void m6801_cpu_device::serial_transmit()
 		{
 			m_out_sertx_func((m_tx == 1) ? ASSERT_LINE : CLEAR_LINE);
 		}
-		m_port2_written = 1;
+		m_port2_written = true;
 		write_port2();
 	}
 }
@@ -738,6 +743,14 @@ void m6801_cpu_device::device_resolve_objects()
 	m_out_sertx_func.resolve_safe();
 }
 
+void hd6301x_cpu_device::device_resolve_objects()
+{
+	m6801_cpu_device::device_resolve_objects();
+
+	m_in_portx_func.resolve_all_safe(0xff);
+	m_out_portx_func.resolve_all_safe();
+}
+
 
 void m6801_cpu_device::device_start()
 {
@@ -793,6 +806,16 @@ void m6801_cpu_device::device_start()
 	save_item(NAME(m_sc1_state));
 }
 
+void hd6301x_cpu_device::device_start()
+{
+	m6801_cpu_device::device_start();
+
+	std::fill(std::begin(m_portx_data), std::end(m_portx_data), 0);
+
+	save_item(NAME(m_portx_ddr));
+	save_item(NAME(m_portx_data));
+}
+
 void m6801_cpu_device::device_reset()
 {
 	m6800_cpu_device::device_reset();
@@ -806,7 +829,7 @@ void m6801_cpu_device::device_reset()
 	m_port_data[0] = 0;
 	m_p3csr = 0x00;
 	m_p3csr_is3_flag_read = 0;
-	m_port2_written = 0;
+	m_port2_written = false;
 	m_port3_latched = 0;
 	/* TODO: on reset port 2 should be read to determine the operating mode (bits 0-2) */
 	m_tcsr = 0x00;
@@ -833,6 +856,14 @@ void m6801_cpu_device::device_reset()
 	set_rmcr(0);
 }
 
+void hd6301x_cpu_device::device_reset()
+{
+	m6801_cpu_device::device_reset();
+
+	m_portx_ddr[0] = 0x00;
+	m_portx_ddr[1] = 0x00;
+}
+
 
 void m6801_cpu_device::write_port2()
 {
@@ -852,6 +883,21 @@ void m6801_cpu_device::write_port2()
 	}
 
 	data &= 0x1f;
+
+	m_out_port_func[1](data);
+}
+
+void hd6301x_cpu_device::write_port2()
+{
+	if (!m_port2_written) return;
+
+	uint8_t ddr = m_port_ddr[1];
+	uint8_t data = (m_port_data[1] & ddr) | (ddr ^ 0xff);
+
+	if (m_trcsr & M6801_TRCSR_TE)
+	{
+		data = (data & 0xef) | (m_tx << 4);
+	}
 
 	m_out_port_func[1](data);
 }
@@ -923,7 +969,7 @@ void m6801_cpu_device::p2_data_w(uint8_t data)
 	LOGPORT("Port 2 Data Register: %02x\n", data);
 
 	m_port_data[1] = data;
-	m_port2_written = 1;
+	m_port2_written = true;
 	write_port2();
 }
 
@@ -1042,6 +1088,75 @@ void m6801_cpu_device::p4_data_w(uint8_t data)
 
 	m_port_data[3] = data;
 	m_out_port_func[3]((m_port_data[3] & m_port_ddr[3]) | (m_port_ddr[3] ^ 0xff));
+}
+
+void hd6301x_cpu_device::p5_ddr_w(uint8_t data)
+{
+	LOGPORT("Port 5 Data Direction Register: %02x\n", data);
+
+	if (m_portx_ddr[0] != data)
+	{
+		m_portx_ddr[0] = data;
+		m_out_portx_func[0]((m_portx_data[0] & m_portx_ddr[0]) | (m_portx_ddr[0] ^ 0xff));
+	}
+}
+
+uint8_t hd6301x_cpu_device::p5_data_r()
+{
+	if(m_portx_ddr[0] == 0xff)
+		return m_portx_data[0];
+	else
+		return (m_in_portx_func[0]() & (m_portx_ddr[0] ^ 0xff)) | (m_portx_data[0] & m_portx_ddr[0]);
+}
+
+void hd6301x_cpu_device::p5_data_w(uint8_t data)
+{
+	LOGPORT("Port 5 Data Register: %02x\n", data);
+
+	m_portx_data[0] = data;
+	m_out_portx_func[0]((m_portx_data[0] & m_portx_ddr[0]) | (m_portx_ddr[0] ^ 0xff));
+}
+
+void hd6301x_cpu_device::p6_ddr_w(uint8_t data)
+{
+	LOGPORT("Port 6 Data Direction Register: %02x\n", data);
+
+	if (m_portx_ddr[1] != data)
+	{
+		m_portx_ddr[1] = data;
+		m_out_portx_func[1]((m_portx_data[1] & m_portx_ddr[1]) | (m_portx_ddr[1] ^ 0xff));
+	}
+}
+
+uint8_t hd6301x_cpu_device::p6_data_r()
+{
+	if(m_portx_ddr[1] == 0xff)
+		return m_portx_data[1];
+	else
+		return (m_in_portx_func[1]() & (m_portx_ddr[1] ^ 0xff)) | (m_portx_data[1] & m_portx_ddr[1]);
+}
+
+void hd6301x_cpu_device::p6_data_w(uint8_t data)
+{
+	LOGPORT("Port 6 Data Register: %02x\n", data);
+
+	m_portx_data[1] = data;
+	m_out_portx_func[1]((m_portx_data[1] & m_portx_ddr[1]) | (m_portx_ddr[1] ^ 0xff));
+}
+
+uint8_t hd6301x_cpu_device::p7_data_r()
+{
+	return 0xe0 | m_portx_data[2];
+}
+
+void hd6301x_cpu_device::p7_data_w(uint8_t data)
+{
+	LOGPORT("Port 7 Data Register: %02x\n", data);
+
+	data &= 0x1f;
+
+	m_portx_data[2] = data;
+	m_out_portx_func[2](m_portx_data[2]);
 }
 
 uint8_t m6801_cpu_device::tcsr_r()

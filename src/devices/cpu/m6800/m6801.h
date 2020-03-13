@@ -144,7 +144,7 @@ protected:
 	uint8_t   m_trcsr, m_rmcr, m_rdr, m_tdr, m_rsr, m_tsr;
 	int     m_rxbits, m_txbits, m_txstate, m_trcsr_read_tdre, m_trcsr_read_orfe, m_trcsr_read_rdrf, m_tx, m_ext_serclock;
 	bool    m_use_ext_serclock;
-	int     m_port2_written;
+	bool    m_port2_written;
 
 	int     m_latch09;
 
@@ -168,7 +168,7 @@ protected:
 
 	void check_timer_event();
 	void set_rmcr(uint8_t data);
-	void write_port2();
+	virtual void write_port2();
 	int m6800_rx();
 	void serial_transmit();
 	void serial_receive();
@@ -246,8 +246,38 @@ public:
 
 class hd6301x_cpu_device : public hd6301_cpu_device
 {
+public:
+	auto in_p5_cb() { return m_in_portx_func[0].bind(); }
+	auto out_p5_cb() { return m_out_portx_func[0].bind(); }
+	auto in_p6_cb() { return m_in_portx_func[1].bind(); }
+	auto out_p6_cb() { return m_out_portx_func[1].bind(); }
+	auto out_p7_cb() { return m_out_portx_func[2].bind(); }
+
+	// TODO: privatize eventually
+	void p5_ddr_w(uint8_t data);
+	uint8_t p5_data_r();
+	void p5_data_w(uint8_t data);
+	void p6_ddr_w(uint8_t data);
+	uint8_t p6_data_r();
+	void p6_data_w(uint8_t data);
+	uint8_t p7_data_r();
+	void p7_data_w(uint8_t data);
+
 protected:
 	hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_resolve_objects() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void write_port2() override;
+
+	devcb_read8::array<2> m_in_portx_func;
+	devcb_write8::array<3> m_out_portx_func;
+
+	uint8_t m_portx_ddr[2];
+	uint8_t m_portx_data[3];
 };
 
 

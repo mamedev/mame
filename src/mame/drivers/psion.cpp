@@ -111,11 +111,6 @@ uint8_t psion_state::port5_r()
 	return kb_read() | ioport("BATTERY")->read() | ioport("ON")->read() | (m_kb_counter == 0x7ff)<<1 | m_pulse<<1;
 }
 
-void psion_state::port6_ddr_w(uint8_t data)
-{
-	m_port6_ddr = data;
-}
-
 void psion_state::port6_w(uint8_t data)
 {
 	/*
@@ -129,10 +124,8 @@ void psion_state::port6_w(uint8_t data)
 	---- --x- reset line
 	---- ---x clock line
 	*/
-	m_port6 = (data & m_port6_ddr) | (m_port6 & ~m_port6_ddr);
-
-	m_pack1->control_w((m_port6 & 0x8f) | (m_port6 & 0x10));
-	m_pack2->control_w((m_port6 & 0x8f) | ((m_port6 & 0x20) >> 1));
+	m_pack1->control_w((data & 0x8f) | (data & 0x10));
+	m_pack2->control_w((data & 0x8f) | ((data & 0x20) >> 1));
 }
 
 uint8_t psion_state::port6_r()
@@ -263,9 +256,9 @@ void psion_state::psion_int_reg(address_map &map)
 	map(0x0003, 0x0003).rw(FUNC(psion_state::port2_r), FUNC(psion_state::port2_w));
 	map(0x0008, 0x0008).rw(FUNC(psion_state::tcsr_r), FUNC(psion_state::tcsr_w));
 	map(0x0014, 0x0014).r(FUNC(psion_state::rcp5c_r));
-	map(0x0015, 0x0015).r(FUNC(psion_state::port5_r)).nopw();
-	map(0x0016, 0x0016).w(FUNC(psion_state::port6_ddr_w));
-	map(0x0017, 0x0017).rw(FUNC(psion_state::port6_r), FUNC(psion_state::port6_w));
+	map(0x0015, 0x0015).r(m_maincpu, FUNC(hd6301x_cpu_device::p5_data_r)).nopw();
+	map(0x0016, 0x0016).w(m_maincpu, FUNC(hd6301x_cpu_device::p6_ddr_w));
+	map(0x0017, 0x0017).rw(m_maincpu, FUNC(hd6301x_cpu_device::p6_data_r), FUNC(hd6301x_cpu_device::p6_data_w));
 }
 
 void psion1_state::psion1_mem(address_map &map)
@@ -520,8 +513,6 @@ void psion_state::machine_start()
 	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_port2_ddr));
 	save_item(NAME(m_port2));
-	save_item(NAME(m_port6_ddr));
-	save_item(NAME(m_port6));
 	save_pointer(NAME(m_paged_ram), m_ram_bank_count * 0x4000);
 }
 
@@ -592,6 +583,9 @@ void psion_state::psion_2lines(machine_config &config)
 {
 	/* basic machine hardware */
 	HD6303X(config, m_maincpu, 3.6864_MHz_XTAL); // internal operating frequency is 0.9216 MHz
+	m_maincpu->in_p5_cb().set(FUNC(psion_state::port5_r));
+	m_maincpu->in_p6_cb().set(FUNC(psion_state::port6_r));
+	m_maincpu->out_p6_cb().set(FUNC(psion_state::port6_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -642,6 +636,9 @@ void psion1_state::psion1(machine_config &config)
 	psion_2lines(config);
 	HD6301X0(config.replace(), m_maincpu, 3.6864_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &psion1_state::psion1_mem);
+	m_maincpu->in_p5_cb().set(FUNC(psion1_state::port5_r));
+	m_maincpu->in_p6_cb().set(FUNC(psion1_state::port6_r));
+	m_maincpu->out_p6_cb().set(FUNC(psion1_state::port6_w));
 
 	subdevice<timer_device>("nmi_timer")->set_start_delay(attotime::from_seconds(1));
 
