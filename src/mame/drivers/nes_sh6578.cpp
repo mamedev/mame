@@ -107,7 +107,9 @@ private:
 	uint8_t m_2002;
 	uint8_t m_2003;
 	uint8_t m_2004;
-	uint8_t m_2005;
+	uint16_t m_scrollreg;
+	bool m_scrollreg_firstwrite;
+
 	uint16_t m_vramaddr;
 	uint8_t m_2007;
 
@@ -445,11 +447,10 @@ READ8_MEMBER(nes_sh6578_state::read_ppu)
 	case 0x01: return m_2001;
 	case 0x03: return m_2003;
 	case 0x04: return m_2004;
-	case 0x05: return m_2005;
 	case 0x07: return m_2007;
 
 	default:
-		//return ppu2c0x_device::read(space, offset);
+		logerror("%s: nes_sh6578_state::read_ppu : unhandled offset %02x\n", machine().describe_context(), offset);
 		return 0x00;
 	}
 }
@@ -468,7 +469,22 @@ WRITE8_MEMBER(nes_sh6578_state::write_ppu)
 	case 0x02: m_2002 = data; logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
 	case 0x03: m_2003 = data; logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
 	case 0x04: m_2004 = data; logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
-	case 0x05: m_2005 = data; logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
+	case 0x05:
+	{
+		logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
+		if (m_scrollreg_firstwrite)
+		{
+			m_scrollreg = (m_scrollreg & 0xff00) | data;
+			m_scrollreg_firstwrite = false;
+		}
+		else
+		{
+			m_scrollreg = (m_scrollreg & 0x00ff) | (data<<8);
+			m_scrollreg_firstwrite = true;
+		}
+		break;
+	}
+
 	case 0x06:
 	{
 		logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data);
@@ -607,8 +623,11 @@ void nes_sh6578_state::machine_reset()
 	m_2002 = 0;
 	m_2003 = 0;
 	m_2004 = 0;
-	m_2005 = 0;
 	m_2007 = 0;
+
+	m_scrollreg = 0x00;
+	m_scrollreg_firstwrite = true;
+
 }
 
 void nes_sh6578_state::machine_start()
@@ -645,34 +664,40 @@ void nes_sh6578_state::vram_map(address_map& map)
 uint32_t nes_sh6578_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
 	// nametable base depends on bits in 0x2008, it isn't fixed at 0x2000 as it is on a NES
-	int address = 0;
 	const pen_t *paldata = m_palette->pens();
 
-	int tilebase = 0x0000;
 
-	// if this is 1 then tilebase is 0x2000 but there can only be one page
-	if (m_colsel_pntstart & 1)
-		tilebase = 0x2000;
-
-
-
-	int xscrollmsb = m_2000 & 0x1;
-	int yscrollmsb = (m_2000 & 0x2)>>1;
-
-	if (!(m_colsel_pntstart & 1))
-	{
-		if (xscrollmsb)
-			tilebase += 0x800;
-
-		if (yscrollmsb)
-			tilebase += 0x1000;
-	}
-
-	address += tilebase;
 
 	// pages are 32 tiles high, not 30 as on NES
-	for (int y = 0; y < 32; y++)
+	for (int scanline = 0; scanline < 240; scanline++)
 	{
+		int address = 0;
+		int tilebase = 0x0000;
+
+		// if this is 1 then tilebase is 0x2000 but there can only be one page
+		if (m_colsel_pntstart & 1)
+			tilebase = 0x2000;
+
+		int xscrollmsb = m_2000 & 0x1;
+		int yscrollmsb = (m_2000 & 0x2)>>1;
+
+		if (!(m_colsel_pntstart & 1))
+		{
+			if (xscrollmsb)
+				tilebase += 0x800;
+
+			if (yscrollmsb)
+				tilebase += 0x1000;
+		}
+
+		address += tilebase;
+
+		int y = (scanline >> 3);
+
+		address += y * 0x40;
+
+		int tileline = scanline & 7;
+
 		for (int x = 0; x < 32; x++)
 		{
 			// character gfx pointer and palette select are encoded in a pair of bytes, not using separate attribute table for palette
@@ -686,31 +711,25 @@ uint32_t nes_sh6578_state::screen_update(screen_device& screen, bitmap_rgb32& bi
 			tileaddr &= 0x0fff;
 			tileaddr <<= 4;
 
-			for (int yy = 0; yy < 8; yy++)
+
+			uint32_t* destptr = &bitmap.pix32(scanline);
+
+			uint8_t plane0 = m_vram->read8(tileaddr+0+tileline);
+			uint8_t plane1 = m_vram->read8(tileaddr+8+tileline);
+			uint8_t plane2 = m_vram->read8(tileaddr+16+tileline);
+			uint8_t plane3 = m_vram->read8(tileaddr+24+tileline);
+
+			for (int xx = 0; xx < 8; xx++)
 			{
-				uint32_t* destptr = &bitmap.pix32((y*8)+ yy);
+				uint8_t pixval = ((plane0 >> (7-xx)) & 1) << 0;
+				pixval |= ((plane1 >> (7-xx)) & 1) << 1;
+				pixval |= ((plane2 >> (7-xx)) & 1) << 2;
+				pixval |= ((plane3 >> (7-xx)) & 1) << 3;
 
-				uint8_t plane0 = m_vram->read8(tileaddr+0);
-				uint8_t plane1 = m_vram->read8(tileaddr+8);
-				uint8_t plane2 = m_vram->read8(tileaddr+16);
-				uint8_t plane3 = m_vram->read8(tileaddr+24);
+				pixval |= ((pal & 0xc) << 2);
 
-				for (int xx = 0; xx < 8; xx++)
-				{
-					uint8_t pixval = ((plane0 >> (7-xx)) & 1) << 0;
-					pixval |= ((plane1 >> (7-xx)) & 1) << 1;
-					pixval |= ((plane2 >> (7-xx)) & 1) << 2;
-					pixval |= ((plane3 >> (7-xx)) & 1) << 3;
-
-					pixval |= ((pal & 0xc) << 2);
-
-					destptr[(x * 8) + xx] = paldata[pixval];
-				}
-
-				tileaddr++;
-
+				destptr[(x * 8) + xx] = paldata[pixval];
 			}
-
 		}
 	}
 
