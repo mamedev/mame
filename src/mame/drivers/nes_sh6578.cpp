@@ -101,6 +101,14 @@ private:
 	uint8_t m_dma_length[2];
 
 	uint8_t m_2000;
+	uint8_t m_2001;
+	uint8_t m_2002;
+	uint8_t m_2003;
+	uint8_t m_2004;
+	uint8_t m_2005;
+	uint16_t m_vramaddr;
+	uint8_t m_2007;
+
 	uint8_t m_colsel_pntstart;
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
@@ -224,8 +232,8 @@ void nes_sh6578_state::do_dma()
 		}
 	}
 
-	m_dma_length[0] = 0;
-	m_dma_length[1] = 0;
+	//m_dma_length[0] = 0;
+	//m_dma_length[1] = 0;
 }
 
 WRITE8_MEMBER(nes_sh6578_state::dma_w)
@@ -430,6 +438,12 @@ READ8_MEMBER(nes_sh6578_state::read_ppu)
 		return ret;
 	}
 
+	case 0x01: return m_2001;
+	case 0x03: return m_2003;
+	case 0x04: return m_2004;
+	case 0x05: return m_2005;
+	case 0x07: return m_2007;
+
 	default:
 		//return ppu2c0x_device::read(space, offset);
 		return 0x00;
@@ -445,9 +459,33 @@ WRITE8_MEMBER(nes_sh6578_state::write_ppu)
 		m_colsel_pntstart = data;
 		break;
 
-	case 0x00:
-		m_2000 = data;
+	case 0x00: m_2000 = data; logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
+	case 0x01: m_2001 = data; logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
+	case 0x02: m_2002 = data; logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
+	case 0x03: m_2003 = data; logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
+	case 0x04: m_2004 = data; logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
+	case 0x05: m_2005 = data; logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
+	case 0x06:
+	{
+		logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data);
+		m_vramaddr <<= 8;
+		m_vramaddr = (m_vramaddr & 0xff00) | data;
+		logerror("  vram address is now %04x\n", m_vramaddr);
 		break;
+	}
+
+	case 0x07:
+	{
+		logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data);
+		m_vram->write8(m_vramaddr, data);
+
+		if (m_2000 & 4)
+			m_vramaddr += 32;
+		else
+			m_vramaddr++;
+
+		break;
+	}
 
 	default:
 		break;
@@ -548,6 +586,14 @@ void nes_sh6578_state::machine_reset()
 
 	m_iniital_startup_state = 0;
 	m_bank->set_entry(0);
+
+	m_2000 = 0;
+	m_2001 = 0;
+	m_2002 = 0;
+	m_2003 = 0;
+	m_2004 = 0;
+	m_2005 = 0;
+	m_2007 = 0;
 }
 
 void nes_sh6578_state::machine_start()
@@ -586,6 +632,28 @@ uint32_t nes_sh6578_state::screen_update(screen_device& screen, bitmap_rgb32& bi
 	// nametable base depends on bits in 0x2008, it isn't fixed at 0x2000 as it is on a NES
 	int address = 0;
 	const pen_t *paldata = m_palette->pens();
+
+	int tilebase = 0x0000;
+
+	// if this is 1 then tilebase is 0x2000 but there can only be one page
+	if (m_colsel_pntstart & 1)
+		tilebase = 0x2000;
+
+
+
+	int xscrollmsb = m_2000 & 0x1;
+	int yscrollmsb = (m_2000 & 0x2)>>1;
+
+	if (!(m_colsel_pntstart & 1))
+	{
+		if (xscrollmsb)
+			tilebase += 0x800;
+
+		if (yscrollmsb)
+			tilebase += 0x1000;
+	}
+
+	address += tilebase;
 
 	// pages are 32 tiles high, not 30 as on NES
 	for (int y = 0; y < 32; y++)
