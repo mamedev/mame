@@ -36,20 +36,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(psion_state::nmi_timer)
 
 uint8_t psion_state::kb_read()
 {
-	static const char *const bitnames[] = {"K1", "K2", "K3", "K4", "K5", "K6", "K7"};
-	uint8_t line, data = 0x7c;
+	uint8_t data = 0x7c;
 
 	if (m_kb_counter)
 	{
-		for (line = 0; line < 7; line++)
+		for (int line = 0; line < 7; line++)
 			if (m_kb_counter == (0x7f & ~(1 << line)))
-				data = machine().root_device().ioport(bitnames[line])->read();
+				data = m_kb_lines[line]->read();
 	}
 	else
 	{
 		//Read all the input lines
-		for (line = 0; line < 7; line++)
-			data &= machine().root_device().ioport(bitnames[line])->read();
+		for (int line = 0; line < 7; line++)
+			data &= m_kb_lines[line]->read();
 	}
 
 	return data & 0x7c;
@@ -64,22 +63,17 @@ void psion_state::update_banks()
 		membank("rombank")->set_entry(m_rom_bank);
 }
 
-void psion_state::port2_ddr_w(uint8_t data)
-{
-	m_port2_ddr = data;
-}
-
-void psion_state::port2_w(uint8_t data)
+void psion_state::port2_w(offs_t offset, uint8_t data, uint8_t ddr)
 {
 	/* datapack i/o data bus */
-	m_pack1->data_w(data & m_port2_ddr);
-	m_pack2->data_w(data & m_port2_ddr);
+	m_pack1->data_w(data & ddr);
+	m_pack2->data_w(data & ddr);
 }
 
 uint8_t psion_state::port2_r()
 {
 	/* datapack i/o data bus */
-	return (m_pack1->data_r() | m_pack2->data_r()) & (~m_port2_ddr);
+	return m_pack1->data_r() | m_pack2->data_r();
 }
 
 void psion_state::tcsr_w(uint8_t data)
@@ -135,7 +129,7 @@ uint8_t psion_state::port6_r()
 }
 
 /* Read/Write common */
-void psion_state::io_rw(address_space &space, uint16_t offset)
+void psion_state::io_rw(uint16_t offset)
 {
 	if (machine().side_effects_disabled())
 		return;
@@ -202,7 +196,7 @@ WRITE8_MEMBER( psion_state::io_w )
 		m_lcdc->write(offset & 0x01, data);
 		break;
 	default:
-		io_rw(space, offset);
+		io_rw(offset);
 	}
 }
 
@@ -213,7 +207,8 @@ READ8_MEMBER( psion_state::io_r )
 	case 0x80:
 		return m_lcdc->read(offset & 0x01);
 	default:
-		io_rw(space, offset);
+		if (!machine().side_effects_disabled())
+			io_rw(offset);
 	}
 
 	return 0;
@@ -252,8 +247,7 @@ void psion_state::psion_int_reg(address_map &map)
 {
 	// FIXME: this should all be made internal to the CPU device
 	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6301x_cpu_device::m6801_io));
-	map(0x0001, 0x0001).w(FUNC(psion_state::port2_ddr_w));
-	map(0x0003, 0x0003).rw(FUNC(psion_state::port2_r), FUNC(psion_state::port2_w));
+	map(0x0001, 0x0001).w(m_maincpu, FUNC(hd6301x_cpu_device::p2_ddr_2bit_w));
 	map(0x0008, 0x0008).rw(FUNC(psion_state::tcsr_r), FUNC(psion_state::tcsr_w));
 	map(0x0014, 0x0014).r(FUNC(psion_state::rcp5c_r));
 	map(0x0015, 0x0015).r(m_maincpu, FUNC(hd6301x_cpu_device::p5_data_r)).nopw();
@@ -511,8 +505,6 @@ void psion_state::machine_start()
 	save_item(NAME(m_pulse));
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_ram_bank));
-	save_item(NAME(m_port2_ddr));
-	save_item(NAME(m_port2));
 	save_pointer(NAME(m_paged_ram), m_ram_bank_count * 0x4000);
 }
 
@@ -583,6 +575,8 @@ void psion_state::psion_2lines(machine_config &config)
 {
 	/* basic machine hardware */
 	HD6303X(config, m_maincpu, 3.6864_MHz_XTAL); // internal operating frequency is 0.9216 MHz
+	m_maincpu->in_p2_cb().set(FUNC(psion_state::port2_r));
+	m_maincpu->out_p2_cb().set(FUNC(psion_state::port2_w));
 	m_maincpu->in_p5_cb().set(FUNC(psion_state::port5_r));
 	m_maincpu->in_p6_cb().set(FUNC(psion_state::port6_r));
 	m_maincpu->out_p6_cb().set(FUNC(psion_state::port6_w));
@@ -636,6 +630,8 @@ void psion1_state::psion1(machine_config &config)
 	psion_2lines(config);
 	HD6301X0(config.replace(), m_maincpu, 3.6864_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &psion1_state::psion1_mem);
+	m_maincpu->in_p2_cb().set(FUNC(psion1_state::port2_r));
+	m_maincpu->out_p2_cb().set(FUNC(psion1_state::port2_w));
 	m_maincpu->in_p5_cb().set(FUNC(psion1_state::port5_r));
 	m_maincpu->in_p6_cb().set(FUNC(psion1_state::port6_r));
 	m_maincpu->out_p6_cb().set(FUNC(psion1_state::port6_w));

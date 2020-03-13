@@ -254,6 +254,7 @@ public:
 	auto out_p7_cb() { return m_out_portx_func[2].bind(); }
 
 	// TODO: privatize eventually
+	void p2_ddr_2bit_w(uint8_t data);
 	void p5_ddr_w(uint8_t data);
 	uint8_t p5_data_r();
 	void p5_data_w(uint8_t data);
