@@ -108,6 +108,55 @@ void sns_sa1_device::device_start()
 	m_nmi_vector = 0;
 	m_bank_c_hi = 0;
 	m_bank_c_rom = 0;
+
+	save_item(NAME(m_internal_ram));
+	save_item(NAME(m_sa1_ctrl));
+	save_item(NAME(m_scpu_sie));
+	save_item(NAME(m_sa1_reset));
+	save_item(NAME(m_sa1_nmi));
+	save_item(NAME(m_sa1_irq));
+	save_item(NAME(m_scpu_ctrl));
+	save_item(NAME(m_sa1_sie));
+	save_item(NAME(m_irq_vector));
+	save_item(NAME(m_nmi_vector));
+	save_item(NAME(m_hcount));
+	save_item(NAME(m_vcount));
+	save_item(NAME(m_bank_c_hi));
+	save_item(NAME(m_bank_c_rom));
+	save_item(NAME(m_bank_d_hi));
+	save_item(NAME(m_bank_d_rom));
+	save_item(NAME(m_bank_e_hi));
+	save_item(NAME(m_bank_e_rom));
+	save_item(NAME(m_bank_f_hi));
+	save_item(NAME(m_bank_f_rom));
+	save_item(NAME(m_bwram_snes));
+	save_item(NAME(m_bwram_sa1));
+	save_item(NAME(m_bwram_sa1_source));
+	save_item(NAME(m_bwram_sa1_format));
+	save_item(NAME(m_bwram_write_snes));
+	save_item(NAME(m_bwram_write_sa1));
+	save_item(NAME(m_bwpa_sa1));
+	save_item(NAME(m_iram_write_snes));
+	save_item(NAME(m_iram_write_sa1));
+	save_item(NAME(m_dma_ctrl));
+	save_item(NAME(m_dma_ccparam));
+	save_item(NAME(m_src_addr));
+	save_item(NAME(m_dst_addr));
+	save_item(NAME(m_dma_cnt));
+	save_item(NAME(m_brf_reg));
+	save_item(NAME(m_math_ctlr));
+	save_item(NAME(m_math_overflow));
+	save_item(NAME(m_math_a));
+	save_item(NAME(m_math_b));
+	save_item(NAME(m_math_res));
+	save_item(NAME(m_vda));
+	save_item(NAME(m_vbit));
+	save_item(NAME(m_vlen));
+	save_item(NAME(m_drm));
+	save_item(NAME(m_scpu_flags));
+	save_item(NAME(m_sa1_flags));
+	save_item(NAME(m_hcr));
+	save_item(NAME(m_vcr));
 }
 
 void sns_sa1_device::device_reset()
@@ -313,6 +362,70 @@ void sns_sa1_device::dma_transfer()
 
 void sns_sa1_device::dma_cctype1_transfer()
 {
+	while (m_dma_cnt--)
+	{
+		uint8_t data = 0; // open bus?
+		uint32_t dma_src = m_src_addr++;
+		uint32_t dma_dst = m_dst_addr++;
+
+		// source and destination cannot be the same
+		// source = { 0=ROM, 1=BWRAM, 2=IRAM }
+		// destination = { 0=IRAM, 1=BWRAM }
+		if ((m_dma_ctrl & 0x03) == 1 && (m_dma_ctrl & 0x04) == 0x04) continue;
+		if ((m_dma_ctrl & 0x03) == 2 && (m_dma_ctrl & 0x04) == 0x00) continue;
+
+		switch (m_dma_ctrl & 0x03)
+		{
+			case 0: // ROM
+				if ((dma_src & 0x408000) == 0x008000 && (dma_src & 0x800000) == 0x000000)
+				{
+					data = read_l(dma_src & 0x7fffff);
+				}
+				if ((dma_src & 0x408000) == 0x008000 && (dma_src & 0x800000) == 0x800000)
+				{
+					data = read_h(dma_src & 0x7fffff);
+				}
+				if ((dma_src & 0xc00000) == 0xc00000)
+				{
+					data = read_h(dma_src & 0x7fffff);
+				}
+				break;
+
+			case 1: // BWRAM
+				if ((dma_src & 0x40e000) == 0x006000)
+				{
+					data = read_bwram((m_bwram_sa1 * 0x2000) + (dma_src & 0x1fff));
+				}
+				if ((dma_src & 0xf00000) == 0x400000)
+				{
+					data = read_bwram(dma_src & 0xfffff);
+				}
+				break;
+
+			case 2: // IRAM
+				data = read_iram(dma_src);
+				break;
+		}
+
+		switch (m_dma_ctrl & 0x04)
+		{
+			case 0x00:  // IRAM
+				write_iram(dma_dst, data);
+				break;
+
+			case 0x04:  // BWRAM
+				if ((dma_dst & 0x40e000) == 0x006000)
+				{
+					write_bwram((m_bwram_sa1 * 0x2000) + (dma_dst & 0x1fff), data);
+				}
+				if ((dma_dst & 0xf00000) == 0x400000)
+				{
+					write_bwram(dma_dst & 0xfffff, data);
+				}
+				break;
+		}
+	}
+
 	m_scpu_flags |= SCPU_IRQ_CHARCONV;
 	recalc_irqs();
 }
@@ -670,12 +783,10 @@ void sns_sa1_device::write_regs(uint32_t offset, uint8_t data)
 				if (!(m_dma_ctrl & 0x20) && !(m_dma_ctrl & 0x04)) // Normal DMA to IRAM
 				{
 					dma_transfer();
-//                  printf("SA-1: normal DMA to IRAM\n");
 				}
 
 				if (m_dma_ctrl & 0x20 && m_dma_ctrl & 0x10) // CC DMA Type 1
 				{
-//                  printf("SA-1: CC DMA type 1\n");
 					dma_cctype1_transfer();
 				}
 			}
