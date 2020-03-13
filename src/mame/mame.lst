@@ -37124,6 +37124,7 @@ speglsht                        // (c) 1994 Seta
 @source:spg110.cpp
 jak_capb                        //
 jak_spdmo                       //
+jak_spdmoa
 conyteni                        //
 conyping                        //
 conyfght
@@ -37145,9 +37146,11 @@ rad_fb2                         //
 mattelcs                        //
 comil                           //
 abltenni                        //
+fordrace
 tvsprt10                        //
 decathln
 wiwi18                          //
+foxsport
 guitarfv
 guitarss
 jjstrip
@@ -37838,6 +37841,7 @@ starfigh                        // (c) 1990 SunA
 
 @source:sunplus_unsp20soc.cpp
 paccon
+lazertag
 jak_s500
 jak_smwm
 jak_pf
