@@ -19,7 +19,7 @@
 #include "machine/bankdev.h"
 #include "machine/timer.h"
 
-#define LOG_DMA       (1U << 10)
+#define LOG_DMA       (1U << 1)
 #define LOG_PPU       (1U << 0)
 
 //#define VERBOSE             (LOG_PPU)
@@ -39,6 +39,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_apu(*this, "nesapu"),
+		m_timer(*this, "timer"),
 		m_in(*this, "IN%u", 0U)
 	{ }
 	
@@ -62,6 +63,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<nesapu_device> m_apu;
+	required_device<timer_device> m_timer;
 
 	rgb_t nespal_to_RGB(int color_intensity, int color_num);
 
@@ -93,6 +95,9 @@ private:
 
 	DECLARE_WRITE8_MEMBER(timing_setting_control_w);
 	DECLARE_WRITE8_MEMBER(initial_startup_w);
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE8_MEMBER(timer_config_w);
+	DECLARE_WRITE8_MEMBER(timer_value_w);
 
 	DECLARE_WRITE8_MEMBER(write_ppu);
 	DECLARE_READ8_MEMBER(read_ppu);
@@ -133,6 +138,8 @@ private:
 	uint16_t m_vramaddr;
 	uint8_t m_2007;
 
+	uint8_t m_irqmask;
+
 	uint8_t m_colsel_pntstart;
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
@@ -146,6 +153,8 @@ private:
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_expired);
+	int m_timerval;
 
 	// this might be game specific
 	uint8_t m_previo;
@@ -352,6 +361,35 @@ WRITE8_MEMBER(nes_sh6578_state::initial_startup_w)
 		logerror("initial_startup_w invalid write (already failed) (%02x)\n", data);
 	}
 }
+
+WRITE8_MEMBER(nes_sh6578_state::irq_mask_w)
+{
+	m_irqmask = data;
+
+	if (m_irqmask & 0x80)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(nes_sh6578_state::timer_config_w)
+{
+	logerror("%s: nes_sh6578_state::timer_config_w : %02x (at pos y: %d x: %d )\n", machine().describe_context(), data, m_screen->vpos(), m_screen->hpos() );
+
+	if ((data & 0x80) && (data & 0x20))
+	{
+		m_timer->adjust(m_screen->scan_period() * m_timerval);
+	}
+	else
+	{
+		m_timer->adjust(attotime::never);
+	}
+}
+
+WRITE8_MEMBER(nes_sh6578_state::timer_value_w)
+{
+	logerror("%s: nes_sh6578_state::timer_value_w : %02x\n", machine().describe_context(), data);
+	m_timerval = data;
+}
+
 
 WRITE8_MEMBER(nes_sh6578_state::timing_setting_control_w)
 {
@@ -626,6 +664,10 @@ void nes_sh6578_state::nes_sh6578_map(address_map& map)
 	map(0x4020, 0x4020).w(FUNC(nes_sh6578_state::timing_setting_control_w));
 
 	map(0x4031, 0x4031).w(FUNC(nes_sh6578_state::initial_startup_w));
+	map(0x4032, 0x4032).w(FUNC(nes_sh6578_state::irq_mask_w));
+
+	map(0x4034, 0x4034).w(FUNC(nes_sh6578_state::timer_config_w));
+	map(0x4035, 0x4035).w(FUNC(nes_sh6578_state::timer_value_w));
 
 	map(0x4040, 0x4047).rw(FUNC(nes_sh6578_state::bankswitch_r), FUNC(nes_sh6578_state::bankswitch_w));
 
@@ -690,6 +732,8 @@ void nes_sh6578_state::machine_reset()
 
 	m_colsel_pntstart = 0;
 
+	m_irqmask = 0xff;
+	m_timerval = 0x00;
 }
 
 void nes_sh6578_state::machine_start()
@@ -772,7 +816,7 @@ uint32_t nes_sh6578_state::screen_update(screen_device& screen, bitmap_rgb32& bi
 	const pen_t *paldata = m_palette->pens();
 
 	// pages are 32 tiles high, not 30 as on NES
-	for (int scanline = 0; scanline < 240; scanline++)
+	for (int scanline = cliprect.min_y; scanline <= cliprect.max_y; scanline++)
 	{
 		int xscrollmsb = m_2000 & 0x1;
 		int yscrollmsb = (m_2000 & 0x2)>>1;
@@ -831,6 +875,18 @@ uint32_t nes_sh6578_state::screen_update(screen_device& screen, bitmap_rgb32& bi
 	return 0;
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(nes_sh6578_state::timer_expired)
+{
+	if (!(m_irqmask & 0x80))
+	{
+		//printf("timer expired on line %d\n", m_screen->vpos());
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
+
+	m_timer->adjust(attotime::never);
+}
+
+
 // from n2a03.h verify that it actually uses these
 #define N2A03_NTSC_XTAL           XTAL(21'477'272)
 #define N2A03_PAL_XTAL            XTAL(26'601'712)
@@ -856,6 +912,9 @@ void nes_sh6578_state::nes_sh6578(machine_config& config)
 	m_screen->set_size(32 * 8, 262);
 	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
 	m_screen->set_screen_update(FUNC(nes_sh6578_state::screen_update));
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
+
+	TIMER(config, m_timer).configure_periodic(FUNC(nes_sh6578_state::timer_expired), attotime::never);
 
 	PALETTE(config, m_palette).set_entries(0x40);
 
