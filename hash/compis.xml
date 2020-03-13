@@ -93,4 +93,16 @@ Systemskiva för hårdskiveenhet [version 7242]
 		</part>
 	</software>
 
+	<software name="distrib">
+		<description>Distributionskunskap (version 8014)</description>
+		<year>19??</year>
+		<publisher>Telenova</publisher>
+		<info name="serial" value="24-33362" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209534">
+				<rom name="distributionskunskap.mfm" size="2209534" crc="145c545d" sha1="8bfdd67985af6b4626b9ec56c36e4ef5aea17909"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
