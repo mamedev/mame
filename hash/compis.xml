@@ -6,6 +6,7 @@ license:CC0
 Undumped:
 
 Ekologi-akvariet (nät/skollicens) [24-34203, 1987-07-27]
+Systemskiva för hårdskiveenhet [version 7242]
 -->
 <softwarelist name="compis" description="Telenova Compis disk images">
 
@@ -52,8 +53,8 @@ Ekologi-akvariet (nät/skollicens) [24-34203, 1987-07-27]
 		<publisher>Telenova</publisher>
 		<info name="release" value="19870609" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="557550">
-				<rom name="compismsdos.imd" size="557550" crc="5919305f" sha1="5cacb6344c96eba5c99a134e573cb4571751b892"/>
+			<dataarea name="flop" size="737280">
+				<rom name="compismsdos.img" size="737280" crc="4abfe76c" sha1="ecac054d4044675d53454a7878f9b9438d29d818"/>
 			</dataarea>
 		</part>
 	</software>
@@ -63,8 +64,8 @@ Ekologi-akvariet (nät/skollicens) [24-34203, 1987-07-27]
 		<year>1986</year>
 		<publisher>Telenova</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="671503">
-				<rom name="compissys2.imd" size="671503" crc="13ca7af8" sha1="c6c1e747d5e5899a31ceb2fc7f83b0ac6593bf08"/>
+			<dataarea name="flop" size="737280">
+				<rom name="compissys2.img" size="737280" crc="2eb61d13" sha1="d96a3aeb2dde991e840b3f4938b904feca72abef"/>
 			</dataarea>
 		</part>
 	</software>
