@@ -33,15 +33,15 @@ Addons (w/ yellow Smartridges)
 |        | 80-091440(US)     | V.Smile Smart Keyboard                                                     |
 |        | 80-091443(UK)     | V.Smile Smart Keyboard                                                     |
 |   XX   | 80-091444(GE)     | Schreibspaß (52-091444 on back label)                                      |
-|        | 80-091447(SP)     | Teclado Interactivo V.Smile                                                |
 |   XX   | 80-091445(FR)     | V.Smile Clavier Tip Tap                                                    |
+|        | 80-091447(SP)     | Teclado Interactivo V.Smile                                                |
 +========+===================+============================================================================+
 |        | 80-03600(US)      | V.Smile PC Pal Island                                                      |
 +========+===================+============================================================================+
 |   XX   | 80-036800(US)     | V.Smile PC Pal Island (cart serial)                                        |
 |   XX   | 80-036804(GE)     | V.Smile Mein erster Mausklick (52-036804(GE) on back label)                |
+|   XX   | 80-036805(FR)     | V.Smile Mes premiers clics                                                 |
 |   XX   | 80-036822(SP)     | V.Smile PC (52-036822(SP) on back label)                                   |
-|        | 80-036805(FR)     | V.Smile Mes premiers clics
 +========+===================+============================================================================+
 |   XX   | 80-067000(US)     | V.Smile Art Studio                                                         |
 |        | 80-067003(UK)     | V.Smile Art Studio                                                         |
@@ -75,13 +75,14 @@ Regular game cartridges
 |   XX   | 80-090003-003(UK) | Up                                                                                             |
 |        | 80-090004(GE)     | Oben                                                                                           |
 |   XX   | 80-090004-004(GE) | Oben                                                                                           |
-|        | 80-090005(FR)     | La Haut                                                                                        |
+|        | 80-090005(FR)     | Là-Haut                                                                                        |
+|   XX   | 80-090005-005(FR) | Là-Haut                                                                                        |
 |   XX   | 80-090007-022(SP) | Up                                                                                             |
 +========+===================+================================================================================================+
 |        | 80-090020(US)     | Handy Manny                                                                                    |
 |        | 80-090023(UK)     | Handy Manny                                                                                    |
 |   XX   | 80-090024(GE)     | Meister Manny's Werkzeugkiste                                                                  |
-|        | 80-090025(FR)     | Manny Et Ses Outils                                                                            |
+|   XX   | 80-090025(FR)     | Manny Et Ses Outils                                                                            |
 +========+===================+================================================================================================+
 |        | 80-090040(US)     | Wow! Wow! Wubbzy! - Attack of the 50-Foot Fleegle                                              |
 +========+===================+================================================================================================+
@@ -139,7 +140,7 @@ Regular game cartridges
 |        | 80-092003(UK)     | Alphabet Park Adventure (Red Haired Girl Version)                                              |
 |   XX   | 80-092004(GE)     | Abenteuer im ABC Park                                                                          |
 |   XX   | 80-092004(GE)     | Abenteuer im ABC Park (Rev. 3, translucent blue cart)                                          |
-|   XX   | 80-092005(FR)     | ABC Land Aventure                                                                              |
+|   XX   | 80-092005(FR)     | ABC Land Aventure (same ROM on purple and translucent blue carts)                              |
 |        | 80-092006(PT)     | ABC Adventure (EAN is 3417768920162 cart#92016)                                                |
 |   XX   | 80-092007(SP)     | Aventuras en el Parque Alfabeto (purple, no # on label, 92007 on PCB)                          |
 |        | 80-092007(SP)     | Aventuras en el Parque Alfabeto (translucent blue cart, no # on label)                         |
@@ -149,7 +150,7 @@ Regular game cartridges
 |        | 80-092020(US)     | The Adventures of Little Red Riding Hood                                                       |
 |        | 80-092023(UK)     | The Adventures of Little Red Riding Hood (no # on label, but box says 'colours')               |
 |   XX   | 80-092024(GE)     | Entdecke die Welt von Rotkäppchen                                                              |
-|        | 80-092025(FR)     | Les aventures du Le Petit Chaperon Rouge                                                       |
+|   XX   | 80-092025(FR)     | Les aventures du Le Petit Chaperon Rouge                                                       |
 +========+===================+================================================================================================+
 |        | 80-092040(US)     | Learnin' Wheels  (blue car with guy driving)                                                   |
 |        | 80-092043(UK)     | Learnin' Wheels                                                                                |
@@ -183,7 +184,7 @@ Regular game cartridges
 |        | 80-092082(NL)     | Mickey Mouse - De wonderwereld van Mickey                                                      |
 |        | 80-092083(UK)     | Mickey Mouse - Mickey's Magical Adventure                                                      |
 |   XX   | 80-092084(GE)     | Micky - Mickys magisches Abenteuer                                                             |
-|        | 80-092085(FR)     | Mickey - Mickey a la recherche de Pluto                                                        |
+|   XX   | 80-092085(FR)     | Mickey - Mickey à la recherche de Pluto                                                        |
 |        | 80-092086(PT)     | Mickey - A Aventura Mágica de Mickey (EAN is 3417768920964 cart 92096)                         |
 |   XX   | 80-092087(SP)     | Mickey - La Aventura Mágica de Mickey (no # on label, 92087 on PCB)                            |
 |        |          (DK)     | Mickey                                                                                         |
@@ -424,7 +425,7 @@ Regular game cartridges
 |        |          (IT)     | Spider-Man la sfida del dottor Ock  (V.Smile pocket bundle only?)                              |
 |        | 80-092523(UK)     | Spider-Man & Friends Doc Ock's Challenge                                                       |
 |   XX   | 80-092524(GE)     | Spider-Man & Freunde Wettkampf im Space Labor                                                  |
-|        | 80-092525(FR)     | Spider-Man & ses amis Le défi du docteur Ock                                                   |
+|   XX   | 80-092525(FR)     | Spider-Man & ses amis Le défi du docteur Ock                                                   |
 |   XX   | 80-092527(SP)     | Spider-Man y Amigos - La Aventura Del Doctor Octopus (52-92527(SP) on back label)              |
 +========+===================+================================================================================================+
 |   XX   | 80-092540(US)     | Noddy - Detective for a Day                                                                    |
@@ -433,7 +434,7 @@ Regular game cartridges
 |        | 80-092544(GE)     | Noddy - Detektiv fuer einen Tag (need pic to confirm, manual cover says -104)                  |
 |   XX   | 80-092544-104(GE) | Noddy - Detektiv fuer einen Tag (ALT)                                                          |
 |   XX   | 80-092545(FR)     | Oui-Oui - Détective d'un Jour                                                                  |
-|        | 80-092545-105(FR) | Oui-Oui - Détective d'un Jour (ALT)                                                            |
+|   XX   | 80-092545-105(FR) | Oui-Oui - Détective d'un Jour (ALT)                                                            |
 |   XX   | 80-092556(PT)     | Noddy - Detective por um dia (092556(Port) on cart)                                            |
 +========+===================+================================================================================================+
 |        | 80-092560(US)     | 101 Dalmations (one pic on german site with USA code)                                          |
@@ -470,6 +471,7 @@ Regular game cartridges
 |   XX   | 80-092663(UK)     | Cars - Rev It Up In Radiator Springs                                                           |
 |   XX   | 80-092664(GE)     | Cars - Vollgas in Radiator Springs                                                             |
 |   XX   | 80-092665(FR)     | Cars - Quatre Roues                                                                            |
+|   XX   | 80-092665-105(FR) | Cars - Quatre Roues                                                                            |
 |        | 80-092666(PT)     | Carros - Aventura em Radiator Springs (92676 on cart)                                          |
 |   XX   | 80-092667(SP)     | Cars - Acelera el Motor en Radiador Springs                                                    |
 |   XX   | 80-092673(DK)     | Biler - Ræs i Kølerkildekøbing                                                                 |
@@ -524,7 +526,7 @@ Regular game cartridges
 |   XX   | 80-092900(US)     | Go Diego Go! - Save the Animal Familes!                                                        |
 |        | 80-092902(NL)     | Go Diego Go! - Red de dierenfamilies!                                                          |
 |        | 80-092903(UK)     | Go Diego Go! - Save the Animal Familes!                                                        |
-|        | 80-092905(FR)     | Go Diego! - À la rescousse des animaux!                                                        |
+|   XX   | 80-092905(FR)     | Go Diego! - À la rescousse des animaux!                                                        |
 +========+===================+================================================================================================+
 |   XX   | 80-092920(US)     | Cranium - Partyland Park                                                                       |
 |        | 80-092922(UK)     | Cranium - Partyland Park                                                                       |
@@ -537,7 +539,7 @@ Regular game cartridges
 |   XX   | 80-092942(NL)     | Mickey Mouse Clubhause                                                                         |
 |        | 80-092943(UK)     | Mickey Mouse Clubhouse                                                                         |
 |   XX   | 80-092944(GE)     | Micky Maus Wunderhaus                                                                          |
-|        | 80-092945(FR)     | La Maison de Mickey                                                                            |
+|   XX   | 80-092945(FR)     | La Maison de Mickey                                                                            |
 |   XX   | 80-092947(SP)     | La Casa de Mickey Mouse (52-092947(SP) on back label)                                          |
 |        |          (DK)     | Mickey Mouse Clubhouse                                                                         |
 |   XX   | 80-092954(SE)     | Mickey Mouse Clubhouse                                                                         |
@@ -548,7 +550,7 @@ Regular game cartridges
 |        | 80-092962(NL)     | Kung Fu Panda - Het pad van de panda                                                           |
 |   XX   | 80-092963(UK)     | Kung Fu Panda - Path of the Panda                                                              |
 |   XX   | 80-092964(GE)     | Kung Fu Panda - Der Weg des Panda                                                              |
-|        | 80-092965(FR)     | Kung Fu Panda - La Mission de Po                                                               |
+|   XX   | 80-092965(FR)     | Kung Fu Panda - La Mission de Po                                                               |
 |   XX   | 80-092967(SP)     | Kung Fu Panda - Aventura en el Valle de la Paz (52-092967(SP) on back label)                   |
 +========+===================+================================================================================================+
 |   XX   | 80-092980(US)     | Disney's Little Einsteins: The Glass Slipper Ball                                              |
@@ -671,6 +673,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92024.u1" size="8388608" crc="cdeb71f9" sha1="21d2ecf5bc22fa94a1015de6f670415b6d42a3b1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="redhoodf" cloneof="redhoodg" supported="no">
+		<description>Les adventures du Petit Chaperon Rouge (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092025(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="92025 - Petit Chaperon Rouge (FR).bin" size="8388608" crc="a22ffa89" sha1="4e2daa67b0617b3ea4a0e05eb2eb5a5550645d20" />
 			</dataarea>
 		</part>
 	</software>
@@ -1264,9 +1282,25 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<!-- No inputs -->
+	<software name="carsfr105" cloneof="carsr201" supported="no">
+		<description>Disney/Pixar Cars - Quatre Roues (France, Rev. 105)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092665-105(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092665-105 - Cars (FR).bin" size="8388608" crc="155d969f" sha1="4871fb0a95bd2f41f67863091fa22b8fdd3a67e0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="carss" cloneof="carsr201">
 		<description>Disney/Pixar Cars - Acelera el Motor en Radiador Springs (Spain)</description>
-		<year>2006</year>
+		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092667(SP)" />
 		<part name="cart" interface="vsmile_cart">
@@ -1896,6 +1930,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<!-- No inputs -->
+	<software name="godiegof" cloneof="godiegor2" supported="no">
+		<description>Nickelodeon Go Diego! - À la rescousse des animaux! (France)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092905(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092905 - Go Diego (FR).bin" size="0x800000" crc="d5b9f1f6" sha1="92ffecb0a9572279bc9d2f0449868a24c7d772f9" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- No inputs, uses a dance mat controller -->
 	<software name="jamgymg" supported="no"> <!-- Will be clone of "jamgym" once found and dumped. -->
 		<description>V.Smile Tanz Mit Center (Germany)</description>
@@ -2180,6 +2230,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<!-- No inputs -->
+	<software name="kungfupf" cloneof="kungfupuk" supported="no">
+		<description>Kung Fu Panda - La Mission de Po (France)</description>
+		<year>2008?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="52-092965(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092965 - Kung Fu Panda (FR).bin" size="8388608" crc="78a27935" sha1="98a8e09ec7fad004cf8540e33d0994bd1821c1cc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
 	<software name="kungfups" cloneof="kungfupuk" supported="no">
 		<description>Kung Fu Panda - Aventura en el Valle de la Paz (Spain)</description>
 		<year>2008</year>
@@ -2231,6 +2297,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<!-- No inputs -->
+	<software name="mannyf" supported="no">
+		<description>Disney Manny et ses outils (France)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-090025(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="090025 - Manny Et Ses Outils (FR).bin" size="8388608" crc="48c88e25" sha1="da63116c0822ee862dc6ef166b4c0d83ac6fe91c" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mickymag">
 		<description>Disney's Mickey Mouse - Mickey's Magical Adventure (USA)</description>
 		<year>2005</year>
@@ -2271,6 +2353,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92084.u1" size="8388608" crc="e50692f3" sha1="5c5a338e0186fdd643441455c778780ef5936042" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- UNSP: illegal ALU optype 07 at 2a0001 -->
+	<software name="mickymagf" cloneof="mickymag" supported="no">
+		<description>Disney Mickey - Meickey à la Recherche De Pluto (France)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092085(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092085 - Mickey a la Recherche De Pluto (FR).bin" size="8388608" crc="223f11b1" sha1="a212a6e78d9563aff2850d60299c92e525368bac" />
 			</dataarea>
 		</part>
 	</software>
@@ -2322,6 +2420,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92944-3.u1" size="8388608" crc="11695793" sha1="ea58234636d544dbf6d3f65508fcf5263355636f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="mickeychf" cloneof="mickeychgr3" supported="no">
+		<description>Disney La Maison De Mickey (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092945(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092945 - La Maison De Mickey (FR).bin" size="8388608" crc="157efcc0" sha1="2a712003caaeb69bfa7548a96ef13824dc57f578" />
 			</dataarea>
 		</part>
 	</software>
@@ -2530,6 +2644,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<!-- No inputs -->
+	<software name="noddyfr105" cloneof="noddy" supported="no">
+		<description>Oui-Oui - Détective d'un Jour (France, Rev. 105)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092545-105(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092545-105 - OuiOui (FR).bin" size="8388608" crc="4b73c776" sha1="470ddae3e26da0b9fe1c6a1670517b3e70c71d91" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="noddyp" cloneof="noddy">
 		<description>Noddy - Detective Por um Dia (Portugal)</description>
 		<year>200?</year>
@@ -2564,7 +2694,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<!-- No inputs, uses keyboard and mouse -->
-	<software name="pcpalisg" cloneof="pcpalisr3">
+	<software name="pcpalisg" cloneof="pcpalisr3" supported="no">
 		<description>V.Smile Mein erster Mausklick (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2577,6 +2707,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="80-036804 - Mein erster Mausklick (GER).bin" size="8388608" crc="df4474f0" sha1="d858eb61efe23643a45c10ee1c332344caaed0fd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs, uses keyboard and mouse -->
+	<software name="pcpalisf" cloneof="pcpalisr3" supported="no">
+		<description>V.Smile Mes Premiers Clics (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-036805(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="036805 - Mes Premiers Clics (FR).bin" size="8388608" crc="7e2380db" sha1="be870a2a60157022d4849fab22515ae0ab716b68" />
 			</dataarea>
 		</part>
 	</software>
@@ -2612,6 +2758,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="90004 ok.u1" size="8388608" crc="e1b9c194" sha1="a5547757e566a854c5dc1173565c7de47e4877f2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="upfr005" supported="no">
+		<description>Disney/Pixar Là-Haut (France, Rev. 005)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-090005-005(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="090005-005 - La-Haut (FR).bin" size="8388608" crc="10df22ee" sha1="b12bbf91e3cc9a28cdb960f7a6465d4551184381" />
 			</dataarea>
 		</part>
 	</software>
@@ -3302,6 +3464,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92524.u1" size="8388608" crc="eb9e2303" sha1="07ee3fba4e850487c365fd883ac1fb53a25d0028" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spiderdocf" cloneof="spiderdocg">
+		<description>Spider-Man &amp; ses amis - Le Défi Du Docteur Ock (France)</description>
+		<year>2006</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092525(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="92525 - Spiderman Le Defi Du Docteur Ock (FR).bin" size="8388608" crc="ecd7acf1" sha1="c0a46f1d777b31f44f38df36247430a4930e7fd5" />
 			</dataarea>
 		</part>
 	</software>
