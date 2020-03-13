@@ -100,11 +100,58 @@ void tlcs90_device::tmp91641_mem(address_map &map)
 	tmp90840_regs(map);
 }
 
+void tlcs90_device::tmp90844_regs(address_map &map)
+{
+	map(0xffc0, 0xfff7).rw(FUNC(tlcs90_device::reserved_r), FUNC(tlcs90_device::reserved_w));
+	//map(0xffc0, 0xffc0).rw(FUNC(tlcs90_device::p0_r), FUNC(tlcs90_device::p0_w));
+	//map(0xffc1, 0xffc1).w(FUNC(tlcs90_device::p0cr_w));
+	//map(0xffc2, 0xffc2).rw(FUNC(tlcs90_device::p1_r), FUNC(tlcs90_device::p1_w));
+	//map(0xffc3, 0xffc3).w(FUNC(tlcs90_device::p1cr_w));
+	//map(0xffc4, 0xffc4).rw(FUNC(tlcs90_device::p2_r), FUNC(tlcs90_device::p2_w));
+	//map(0xffc5, 0xffc5).w(FUNC(tlcs90_device::p2cr_w));
+	map(0xffc6, 0xffc6).rw(FUNC(tlcs90_device::p3_r), FUNC(tlcs90_device::p3_w));
+	//map(0xffc7, 0xffc7).w(FUNC(tlcs90_device::p3cr_w));
+	map(0xffc8, 0xffc8).rw(FUNC(tlcs90_device::p4_r), FUNC(tlcs90_device::p4_w));
+	//map(0xffc9, 0xffc9).w(FUNC(tlcs90_device::p4cr_w));
+	map(0xffca, 0xffca).r(FUNC(tlcs90_device::p5_r)) /*w(FUNC(tlcs90_device::p5_w))*/;
+	map(0xffcb, 0xffcb).rw(FUNC(tlcs90_device::p6_r), FUNC(tlcs90_device::p6_w));
+	map(0xffcc, 0xffcc).rw(FUNC(tlcs90_device::p7_r), FUNC(tlcs90_device::p7_w));
+	map(0xffcd, 0xffcd).w(FUNC(tlcs90_device::p67cr_w));
+	//map(0xffce, 0xffce).rw(FUNC(tlcs90_device::p23fr_r), FUNC(tlcs90_device::p23fr_w));
+	//map(0xffcf, 0xffcf).rw(FUNC(tlcs90_device::p4fr_r), FUNC(tlcs90_device::p4fr_w));
+	//map(0xffd0, 0xffd0).rw(FUNC(tlcs90_device::p67fr_r), FUNC(tlcs90_device::p67fr_w));
+	//map(0xffd1, 0xffd1).rw(FUNC(tlcs90_device::p25fr_r), FUNC(tlcs90_device::p25fr_w));
+	//map(0xffd2, 0xffd2).rw(FUNC(tlcs90_device::wdmod_r), FUNC(tlcs90_device::wdmod_w));
+	//map(0xffd3, 0xffd3).w(FUNC(tlcs90_device::wdcr_w));
+	map(0xffd4, 0xffd7).w(FUNC(tlcs90_device::treg_8bit_w));
+	map(0xffd8, 0xffd8).rw(FUNC(tlcs90_device::t01mod_r), FUNC(tlcs90_device::t01mod_w));
+	map(0xffd9, 0xffd9).rw(FUNC(tlcs90_device::t23mod_r), FUNC(tlcs90_device::t23mod_w));
+	//map(0xffda, 0xffda).rw(FUNC(tlcs90_device::tffcr_r), FUNC(tlcs90_device::tffcr_w));
+	//map(0xffdb, 0xffdb).rw(FUNC(tlcs90_device::trdc_r), FUNC(tlcs90_device::trdc_w));
+	map(0xffdc, 0xffdc).rw(FUNC(tlcs90_device::trun_r), FUNC(tlcs90_device::trun_w));
+	map(0xffe0, 0xffe3). /*r(FUNC(tlcs90_device::cap_16bit_r)).*/ w(FUNC(tlcs90_device::treg_16bit_w));
+	map(0xffe4, 0xffe4).rw(FUNC(tlcs90_device::t4mod_r), FUNC(tlcs90_device::t4mod_w));
+	//map(0xffe5, 0xffe5).rw(FUNC(tlcs90_device::t4ffcr_r), FUNC(tlcs90_device::t4ffcr_w));
+	//map(0xffe6, 0xffe6).rw(FUNC(tlcs90_device::scmod_r), FUNC(tlcs90_device::scmod_w));
+	//map(0xffe7, 0xffe7).rw(FUNC(tlcs90_device::sccr_r), FUNC(tlcs90_device::sccr_w));
+	//map(0xffe8, 0xffe8).rw(FUNC(tlcs90_device::scbuf_r), FUNC(tlcs90_device::scbuf_w));
+	//map(0xffe9, 0xffe9).rw(FUNC(tlcs90_device::brgcr_r), FUNC(tlcs90_device::brgcr_w));
+	map(0xffea, 0xffea). /*r(FUNC(tlcs90_device::irfl_r).*/ w(FUNC(tlcs90_device::irf_clear_w));
+	//map(0xffeb, 0xffeb).rw(FUNC(tlcs90_device::irfh_r), FUNC(tlcs90_device::p1fr_w));
+	//map(0xffef, 0xffef).rw(FUNC(tlcs90_device::status_r), FUNC(tlcs90_device::status_w));
+	//map(0xffef, 0xffef).rw(FUNC(tlcs90_device::admod_r), FUNC(tlcs90_device::admod_w));
+	//map(0xfff0, 0xfff3).r(FUNC(tlcs90_device::adreg_r));
+	map(0xfff4, 0xfff4). /*r(FUNC(tlcs90_device::intel_r).*/ w(FUNC(tlcs90_device::intel_w));
+	map(0xfff5, 0xfff5). /*r(FUNC(tlcs90_device::inteh_r).*/ w(FUNC(tlcs90_device::inteh_w));
+	//map(0xfff6, 0xfff6).rw(FUNC(tlcs90_device::dmael_r), FUNC(tlcs90_device::dmael_w));
+	//map(0xfff7, 0xfff7).rw(FUNC(tlcs90_device::dmaeh_r), FUNC(tlcs90_device::dmaeh_w));
+}
+
 void tlcs90_device::tmp90ph44_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();    // 16KB PROM (internal)
 	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
-	tmp90840_regs(map);           // TODO: has 8 more registers
+	tmp90844_regs(map);
 }
 
 
@@ -2486,6 +2533,28 @@ void tlcs90_device::tclk_w(uint8_t data)
 	m_tclk = data;
 }
 
+uint8_t tlcs90_device::t01mod_r()
+{
+	return (m_tmod & 0x0f) << 4 | (m_tclk & 0x0f);
+}
+
+void tlcs90_device::t01mod_w(uint8_t data)
+{
+	m_tmod = (m_tmod & 0xf0) | (data & 0xf0) >> 4;
+	m_tclk = (m_tclk & 0xf0) | (data & 0x0f);
+}
+
+uint8_t tlcs90_device::t23mod_r()
+{
+	return (m_tmod & 0xf0) | (m_tclk & 0xf0) >> 4;
+}
+
+void tlcs90_device::t23mod_w(uint8_t data)
+{
+	m_tmod = (data & 0xf0) | (m_tmod & 0x0f);
+	m_tclk = (data & 0x0f) << 4 | (m_tclk & 0x0f);
+}
+
 void tlcs90_device::treg_8bit_w(offs_t offset, uint8_t data)
 {
 	m_treg_8bit[offset] = data;
@@ -2602,14 +2671,14 @@ uint8_t tlcs90_device::reserved_r(offs_t offset)
 {
 	uint16_t iobase = 0xffc0;
 	if (!machine().side_effects_disabled())
-		logerror("Read from unimplemented SFR at %04X\n", iobase + offset);
+		logerror("%04X: Read from unimplemented SFR at %04X\n", m_pc.w.l, iobase + offset);
 	return 0;
 }
 
 void tlcs90_device::reserved_w(offs_t offset, uint8_t data)
 {
 	uint16_t iobase = 0xffc0;
-	logerror("Write to unimplemented SFR at %04X\n", iobase + offset);
+	logerror("%04X: Write %02X to unimplemented SFR at %04X\n", m_pc.w.l, data, iobase + offset);
 }
 
 void tlcs90_device::t90_start_timer(int i)
