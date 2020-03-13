@@ -33,6 +33,7 @@ public:
 	{ }
 	
 	void nes_sh6578(machine_config& config);
+	void nes_sh6578_pal(machine_config& config);
 
 	void init_nes_sh6578();
 
@@ -121,6 +122,8 @@ private:
 	void rom_map(address_map& map);
 	void vram_map(address_map& map);
 	void nes_sh6578_map(address_map& map);
+
+	uint16_t get_tileaddress(uint8_t x, uint8_t y, bool ishigh);
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
@@ -471,17 +474,19 @@ WRITE8_MEMBER(nes_sh6578_state::write_ppu)
 	case 0x04: m_2004 = data; logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
 	case 0x05:
 	{
-		logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
+		logerror("%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data);
 		if (m_scrollreg_firstwrite)
 		{
 			m_scrollreg = (m_scrollreg & 0xff00) | data;
 			m_scrollreg_firstwrite = false;
+
 		}
 		else
 		{
 			m_scrollreg = (m_scrollreg & 0x00ff) | (data<<8);
 			m_scrollreg_firstwrite = true;
 		}
+
 		break;
 	}
 
@@ -628,6 +633,8 @@ void nes_sh6578_state::machine_reset()
 	m_scrollreg = 0x00;
 	m_scrollreg_firstwrite = true;
 
+	m_colsel_pntstart = 0;
+
 }
 
 void nes_sh6578_state::machine_start()
@@ -660,46 +667,79 @@ void nes_sh6578_state::vram_map(address_map& map)
 	map(0x8000, 0xffff).ram();
 }
 
+uint16_t nes_sh6578_state::get_tileaddress(uint8_t x, uint8_t y, bool ishigh)
+{
+	if (!ishigh)
+	{
+		x &= 0x3f; // can't be bigger than 64x64;
+		y &= 0x3f;
+
+		if (x & 0x20) // right hand side of tilemap
+		{
+			x &= 0x1f;
+			if (y & 0x20) // bottom of tilemap
+			{
+				y &= 0x1f;
+				return 0x1800 + (x * 2) + (y * 0x40);
+			}
+			else
+			{
+				//y &= 0x1f;
+				return 0x0800 + (x * 2) + (y * 0x40);
+			}
+		}
+		else // left hand side of tilemap
+		{
+			//x &= 0x1f;
+			if (y & 0x20) // bottom of tilemap
+			{
+				y &= 0x1f;
+				return 0x1000 + (x * 2) + (y * 0x40);
+			}
+			else
+			{
+				//y &= 0x1f;
+				return 0x0000 + (x * 2) + (y * 0x40);
+			}
+		}
+	}
+	else
+	{
+		x &= 0x1f;
+		y &= 0x1f;
+
+		return 0x2000 + (x * 2) + (y * 0x40);
+	}
+}
 
 uint32_t nes_sh6578_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-	// nametable base depends on bits in 0x2008, it isn't fixed at 0x2000 as it is on a NES
 	const pen_t *paldata = m_palette->pens();
-
-
 
 	// pages are 32 tiles high, not 30 as on NES
 	for (int scanline = 0; scanline < 240; scanline++)
 	{
-		int address = 0;
-		int tilebase = 0x0000;
-
-		// if this is 1 then tilebase is 0x2000 but there can only be one page
-		if (m_colsel_pntstart & 1)
-			tilebase = 0x2000;
-
 		int xscrollmsb = m_2000 & 0x1;
 		int yscrollmsb = (m_2000 & 0x2)>>1;
 
-		if (!(m_colsel_pntstart & 1))
-		{
-			if (xscrollmsb)
-				tilebase += 0x800;
+		uint16_t yscroll = (m_scrollreg & 0xff00) >> 8;
+		yscroll |= (yscrollmsb << 8);
 
-			if (yscrollmsb)
-				tilebase += 0x1000;
-		}
+		uint16_t xscroll = m_scrollreg & 0x00ff;
+		xscroll |= (xscrollmsb << 8);
 
-		address += tilebase;
+		int realy = scanline + yscroll;
 
-		int y = (scanline >> 3);
-
-		address += y * 0x40;
-
-		int tileline = scanline & 7;
+		int y = realy >> 3;
+		int tileline = realy & 7;
 
 		for (int x = 0; x < 32; x++)
 		{
+			int xtile = x + (xscroll >> 3);
+
+			// nametable base depends on bits in 0x2008, it isn't fixed at 0x2000 as it is on a NES
+			uint16_t address = get_tileaddress(xtile, y, (m_colsel_pntstart & 1) ? true : false);
+
 			// character gfx pointer and palette select are encoded in a pair of bytes, not using separate attribute table for palette
 			uint16_t tileaddr;
 			tileaddr = (m_vram->read8(address) << 0);
@@ -762,7 +802,18 @@ void nes_sh6578_state::nes_sh6578(machine_config& config)
 	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+void nes_sh6578_state::nes_sh6578_pal(machine_config& config)
+{
+	nes_sh6578(config);
 
+	m_maincpu->set_clock(PALC_APU_CLOCK);
+
+	m_screen->set_refresh_hz(50.0070);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66 / (PALC_APU_CLOCK.dvalue() / 1000000)) *
+		(310 - 291 + 1 + 2)));
+	m_screen->set_size(32 * 8, 312);
+	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
+}
 
 void nes_sh6578_state::init_nes_sh6578()
 {
@@ -791,12 +842,12 @@ ROM_START( ablwikid )
 ROM_END
 
 
-CONS( 1997, bandgpad,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Multi Game Player Gamepad", MACHINE_NOT_WORKING )
+CONS( 1997, bandgpad,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Multi Game Player Gamepad", MACHINE_NOT_WORKING )
 
 // possibly newer than 2001
-CONS( 2001, ts_handy11,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Techno Source", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING )
+CONS( 2001, ts_handy11,  0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Techno Source", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING )
 
-CONS( 200?, cpatrolm,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init_nes_sh6578, "<unknown>", "City Patrolman", MACHINE_NOT_WORKING )
+CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "TimeTop", "City Patrolman", MACHINE_NOT_WORKING )
 
 // ROM is banked
-CONS( 200?, ablwikid,   0,        0,  nes_sh6578, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Advance Bright Ltd.",         "Wikid Joystick", MACHINE_NOT_WORKING ) // or Wik!d Joystick
+CONS( 200?, ablwikid,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Advance Bright Ltd.", "Wikid Joystick", MACHINE_NOT_WORKING ) // or Wik!d Joystick
