@@ -182,6 +182,7 @@ CRUCLK*  51||52  DBIN
 #include "ti_fdc.h"
 #include "bwg.h"
 #include "hfdc.h"
+#include "cc_fdc.h"
 #include "pcode.h"
 #include "myarcmem.h"
 #include "samsmem.h"
@@ -490,6 +491,8 @@ void ti99_peribox_slot_standard(device_slot_interface &device)
 	device.option_add("bwg",      TI99_BWG);
 	device.option_add("hfdc",     TI99_HFDC);
 	device.option_add("tifdc",    TI99_FDC);
+	device.option_add("ccdcc",    TI99_CCDCC);
+	device.option_add("ccfdc",    TI99_CCFDC);
 }
 
 void peribox_device::device_add_mconfig(machine_config &config)
@@ -529,6 +532,8 @@ void ti99_peribox_slot_evpc(device_slot_interface &device)
 	device.option_add("bwg",      TI99_BWG);
 	device.option_add("hfdc",     TI99_HFDC);
 	device.option_add("tifdc",    TI99_FDC);
+	device.option_add("ccdcc",    TI99_CCDCC);
+	device.option_add("ccfdc",    TI99_CCFDC);
 }
 
 void peribox_ev_device::device_add_mconfig(machine_config &config)
@@ -578,6 +583,8 @@ void ti99_peribox_slot_geneve(device_slot_interface &device)
 	device.option_add("usbsm",    TI99_USBSM);
 	device.option_add("hfdc",     TI99_HFDC);
 	device.option_add("tifdc",    TI99_FDC);
+	device.option_add("ccdcc",    TI99_CCDCC);
+	device.option_add("ccfdc",    TI99_CCFDC);
 }
 
 void peribox_gen_device::device_add_mconfig(machine_config &config)
@@ -629,6 +636,8 @@ void ti99_peribox_slot_sgcpu(device_slot_interface &device)
 	device.option_add("bwg",      TI99_BWG);
 	device.option_add("hfdc",     TI99_HFDC);
 	device.option_add("tifdc",    TI99_FDC);
+	device.option_add("ccdcc",    TI99_CCDCC);
+	device.option_add("ccfdc",    TI99_CCFDC);
 }
 
 void peribox_sg_device::device_add_mconfig(machine_config &config)

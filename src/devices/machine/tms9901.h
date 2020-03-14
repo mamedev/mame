@@ -68,6 +68,9 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	bool read_bit(int bit);
+	void write_bit(int bit, bool set);
+
 	auto p_out_cb(int n) { return m_write_p[n].bind(); }
 	auto read_cb() { return m_read_port.bind(); }
 	auto intreq_cb() { return m_interrupt.bind(); }
