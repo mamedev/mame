@@ -9,14 +9,31 @@ Info for original games comes from http://mc-1000.wikispaces.com/fitas+cce
     Undumped (?):
      F-16 - Unknown
      F-17 - Unknown
-     F-19 - Controle de Despesas
      F-23 - Unknown
      F-29 - Unknown
+
+    When the tape finishes loading, some of these programs will clear the screen and seem to do nothing. Press Ctrl+C then RUN.
+    If you press Ctrl+C while in a graphics mode, you may not be able to read anything. Type TEXT to fix this.
+
 -->
 
 <softwarelist name="mc1000_cass" description="CCE MC-1000 cassettes">
 
 	<!-- Original programs -->
+
+	<software name="despesas">
+		<description>Controle de Despesas</description>
+		<year>198?</year>
+		<publisher>CCE Soft</publisher>
+		<info name="usage" value="Load with LOAD" />
+		<info name="serial" value="F-19" />
+
+		<part name="cass1" interface="mc1000_cass">
+			<dataarea name="cass" size="1019132">
+				<rom name="f19.wav" size="1019132" crc="989d3110" sha1="4f68b03f6b1b71d25d95054b972b2af33af261c1"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="analeco">
 		<description>Analise Economica</description>
@@ -751,6 +768,42 @@ Info for original games comes from http://mc-1000.wikispaces.com/fitas+cce
 		</part>
 	</software>
 
+	<software name="artifact">
+		<description>Teste de Color Artifacting</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load with LOAD" />
+		<part name="cass1" interface="mc1000_cass">
+			<dataarea name="cass" size="28122">
+				<rom name="artifact.wav" size="28122" crc="fe7114ad" sha1="eac779957eefbfab9cbdf561e910120e42179608"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compcara">
+		<description>Compcara</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load with LOAD" />
+		<part name="cass1" interface="mc1000_cass">
+			<dataarea name="cass" size="57126">
+				<rom name="compcara.wav" size="57126" crc="585ac0fb" sha1="a9fe172eeb5045521b5677eb23e8ee2a16eed55e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="modvideo">
+		<description>Modvideo</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load with LOAD" />
+		<part name="cass1" interface="mc1000_cass">
+			<dataarea name="cass" size="47018">
+				<rom name="modvideo.wav" size="47018" crc="bb93489e" sha1="31446af02ab4a98733e2c641f10150035b809048"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Type-in BASIC programs -->
 
 	<!--
@@ -792,19 +845,21 @@ Info for original games comes from http://mc-1000.wikispaces.com/fitas+cce
             </dataarea>
         </part>
     </software>
-
+-->
     <software name="aventura">
         <description>Aventura</description>
         <year>19??</year>
-        <publisher>&lt;type-in&gt;</publisher>
+        <publisher>&lt;unknown&gt;</publisher>
 
         <part name="cass1" interface="mc1000_cass">
-            <dataarea name="cass" size="702764">
-                <rom name="aventura.wav" size="702764" crc="82a6263b" sha1="834d9511e22f5c34244923108366201e82b89179"/>
+<!--            <dataarea name="cass" size="702764">
+                <rom name="aventura.wav" size="702764" crc="82a6263b" sha1="834d9511e22f5c34244923108366201e82b89179"/> -->
+            <dataarea name="cass" size="168558">
+                <rom name="aventura.wav" size="168558" crc="208c0c8b" sha1="169010d35d4fa3a63cf00f5758717e57fd4754e2"/>
             </dataarea>
         </part>
     </software>
-
+<!--
     <software name="awari">
         <description>Awari</description>
         <year>19??</year>
@@ -845,19 +900,21 @@ Info for original games comes from http://mc-1000.wikispaces.com/fitas+cce
             </dataarea>
         </part>
     </software>
-
+-->
     <software name="circulos">
         <description>Circulos</description>
         <year>19??</year>
-        <publisher>&lt;type-in&gt;</publisher>
+        <publisher>&lt;unknown&gt;</publisher>
 
         <part name="cass1" interface="mc1000_cass">
-            <dataarea name="cass" size="176812">
-                <rom name="circulos.wav" size="176812" crc="402caaea" sha1="614201ff32f80c91bf433243bc046eee78e190bf"/>
+<!--            <dataarea name="cass" size="176812">
+                <rom name="circulos.wav" size="176812" crc="402caaea" sha1="614201ff32f80c91bf433243bc046eee78e190bf"/> -->
+            <dataarea name="cass" size="40350">
+                <rom name="circulos.wav" size="40350" crc="007a7c30" sha1="0002df62b1b37cd1c3d5b0db3a7a86f733604106"/>
             </dataarea>
         </part>
     </software>
-
+<!--
     <software name="comecome">
         <description>Come Come</description>
         <year>19??</year>
@@ -910,19 +967,21 @@ Info for original games comes from http://mc-1000.wikispaces.com/fitas+cce
             </dataarea>
         </part>
     </software>
-
+-->
     <software name="explosao">
         <description>Explosao</description>
         <year>19??</year>
         <publisher>&lt;type-in&gt;</publisher>
 
         <part name="cass1" interface="mc1000_cass">
-            <dataarea name="cass" size="549964">
-                <rom name="explosao.wav" size="549964" crc="d231d3af" sha1="a3cce871efa9f8762257ac7ea47c71311f25920f"/>
+<!--            <dataarea name="cass" size="549964">
+                <rom name="explosao.wav" size="549964" crc="d231d3af" sha1="a3cce871efa9f8762257ac7ea47c71311f25920f"/> -->
+            <dataarea name="cass" size="130822">
+                <rom name="explosao.wav" size="130822" crc="0b46f290" sha1="821b95bd675097d5ffba1c4c97898d20c9d10bb3"/>
             </dataarea>
         </part>
     </software>
-
+<!--
     <software name="grafic3d">
         <description>Graficos em 3D</description>
         <year>19??</year>
