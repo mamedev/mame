@@ -11611,6 +11611,19 @@ license:CC0
 		</part>
 	</software>
 	
+	<software name="lotus3">
+		<description>Lotus - The Ultimate Challenge</description>
+		<year>1993</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="developer" value="Magnetic Fields" />
+		<info name="version" value="Version 14/07/93" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Lotus - The Ultimate Challenge [Gremlin] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="0a34718f" sha1="16756f96d9fb444ddea58969b354fe205c1701c6"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="laacc">
 		<description>LucasArts Air Combat Classics</description>
 		<year>1994</year>
