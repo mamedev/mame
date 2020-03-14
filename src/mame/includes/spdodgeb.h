@@ -58,24 +58,13 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	int m_toggle;
 	int m_adpcm_pos[2];
 	int m_adpcm_end[2];
 	int m_adpcm_idle[2];
 	int m_adpcm_data[2];
 	uint8_t m_mcu_status;
 	uint8_t m_inputs[5];
-	uint8_t m_tapc[4];
-	uint8_t m_last_port[2];
-	uint8_t m_last_dash[2];
-#if 0
-	int m_running[2];
-	int m_jumped[2];
-	int m_prev[2][2];
-	int m_countup[2][2];
-	int m_countdown[2][2];
-	int m_prev[2];
-#endif
+
 	int m_tile_palbank;
 	int m_sprite_palbank;
 	tilemap_t *m_bg_tilemap;

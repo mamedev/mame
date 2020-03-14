@@ -153,12 +153,7 @@ void spdodgeb_state::mcu_map(address_map &map)
 
 READ_LINE_MEMBER(spdodgeb_state::mcu_busy_r)
 {
-#if 0
-	m_toggle ^= 0x01;
-	return m_toggle;
-#else
 	return BIT(m_mcu_status, 7);
-#endif
 }
 
 static INPUT_PORTS_START( spdodgeb )
@@ -268,30 +263,22 @@ GFXDECODE_END
 
 void spdodgeb_state::machine_start()
 {
-	save_item(NAME(m_toggle));
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_end));
 	save_item(NAME(m_adpcm_idle));
 	save_item(NAME(m_adpcm_data));
 	save_item(NAME(m_mcu_status));
 	save_item(NAME(m_inputs));
-	save_item(NAME(m_tapc));
-	save_item(NAME(m_last_port));
-	save_item(NAME(m_last_dash));
 }
 
 void spdodgeb_state::machine_reset()
 {
-	m_toggle = 0;
 	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
 	m_adpcm_end[0] = m_adpcm_end[1] = 0;
 	m_adpcm_idle[0] = m_adpcm_data[1] = 0;
 	m_adpcm_data[0] = m_adpcm_data[1] = -1;
 	m_mcu_status = 0;
 	memset(m_inputs, 0, sizeof(m_inputs));
-	memset(m_tapc, 0, sizeof(m_tapc));
-	m_last_port[0] = m_last_port[1] = 0;
-	m_last_dash[0] = m_last_dash[1] = 0;
 }
 
 void spdodgeb_state::spdodgeb(machine_config &config)
