@@ -202,7 +202,7 @@ void ks0164_cpu_device::do_alu(u16 opcode, u16 v2)
 		m_r[r] = snz(m_r[r] ^ v2);
 		break;
 	case 6:   // set
-		m_r[r] = v2;
+		m_r[r] = snz(v2);
 		break;
 	case 7: { // mul
 		u32 res;
