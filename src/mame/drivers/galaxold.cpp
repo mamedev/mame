@@ -1198,6 +1198,15 @@ static INPUT_PORTS_START( ckongmc )
 	PORT_DIPSETTING(    0x81, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ckongmc2 )
+	PORT_INCLUDE (ckongmc )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( ckonggx )
 	PORT_START("IN0")
@@ -2925,6 +2934,27 @@ ROM_START( ckongmc )
 	ROM_LOAD( "ck_cp.bin",     0x0000, 0x0020, CRC(7e0b79cb) SHA1(72ef3eb5f09e10c13dcf6fd568a6d16658055a16) )
 ROM_END
 
+ROM_START( ckongmc2 ) // RE013c + RE014c PCBs
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dkprom1.bin",  0x0000, 0x0800, CRC(0fc3bea3) SHA1(fce1dfa404be37b948bcab5d1fb0d1c86b6615af) )
+	ROM_LOAD( "dkprom2.bin",  0x0800, 0x0800, CRC(5a321026) SHA1(db77bfa4a458439bb94e991cc9c35d95c77dd2df) )
+	ROM_LOAD( "dkprom3.bin",  0x1000, 0x0800, CRC(c6c018e0) SHA1(87c87610cc98eb226b4e9f3ee7e6c9d4f574095c) )
+	ROM_LOAD( "dkprom4.bin",  0x1800, 0x0800, CRC(2141e537) SHA1(941320ede2addc68879cf1a09f18f821126d71fa) )
+	ROM_LOAD( "dkprom5.bin",  0x2000, 0x0800, CRC(74f15a59) SHA1(a8a806dcd949c4bce6161bf7c2477f1a2fda7bf0) )
+	ROM_LOAD( "dkprom6.bin",  0x2800, 0x0800, CRC(5f8a4544) SHA1(ccc88d1f0a599afd2762bdbadf2b34812b1f27a0) )
+	ROM_LOAD( "dkprom7.bin",  0x3000, 0x0800, CRC(8e0be5c3) SHA1(e29ded9f290931a671a1883b75ae60e94b2c3709) )
+	ROM_LOAD( "dkprom8.bin",  0x3800, 0x0800, CRC(82290105) SHA1(441173d7f9080a7d7439ffbe9224501ef7ea7282) )
+	ROM_LOAD( "dkprom9.bin",  0x4000, 0x0800, CRC(5a9ee1ed) SHA1(1bc420a42a4931c389b4f8db451de7c59786dfbc) )
+	ROM_LOAD( "dkprom10.bin", 0x4800, 0x0800, CRC(da9216d8) SHA1(79dcc754c9f1b64b4ed89976a8a62c549cea4026) )
+	ROM_LOAD( "dkprom11.bin", 0x5000, 0x0800, CRC(61900dc8) SHA1(12e96d4fb99c74a71707b3cf2bb74dacec5a0d72) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "dkpromhj.bin", 0x0000, 0x1000, CRC(7866d2cb) SHA1(62dd8b80bc0459c7337d8a8cb83e53b999e7f4a9) )
+	ROM_LOAD( "dkpromkl.bin", 0x1000, 0x1000, CRC(7311a101) SHA1(49d54c8b94cae4ba81d7a7684eaa4e87815bb4da) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // not in this set
+	ROM_LOAD( "ck_cp.bin",     0x0000, 0x0020, BAD_DUMP CRC(7e0b79cb) SHA1(72ef3eb5f09e10c13dcf6fd568a6d16658055a16) )
+ROM_END
 
 void galaxold_state::init_ckonggx()
 {
@@ -3141,7 +3171,7 @@ ROM_START( scrambler )
 	ROM_LOAD( "c01s.6e",      0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
-ROM_START( scrambleo )
+ROM_START( scrambleo ) // MR-1A + MP-28 PCBs
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.bin",        0x0000, 0x0800, CRC(55313343) SHA1(3a5988e108aaf7af6498fb1cabef12b2f75858d5) )
 	ROM_LOAD( "2.bin",        0x0800, 0x0800, CRC(af61bdfe) SHA1(f3414adc243e4687db3ae9c4f003663215a52b6b) )
@@ -3766,7 +3796,8 @@ void galaxold_state::init_guttangt()
 GAME( 1981, vpool,     hustler,  mooncrst,  vpool,     galaxold_state, empty_init,     ROT90,  "bootleg", "Video Pool (bootleg on Moon Cresta hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, rockclim,  0,        rockclim,  rockclim,  galaxold_state, empty_init,     ROT180, "Taito", "Rock Climber", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, ckongg,    ckong,    ckongg,    ckongg,    galaxold_state, empty_init,     ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ckongmc,   ckong,    ckongmc,   ckongmc,   galaxold_state, empty_init,     ROT90,  "bootleg", "Crazy Kong (bootleg on Moon Cresta hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // set was marked as 'King Kong on Galaxian'
+GAME( 1981, ckongmc,   ckong,    ckongmc,   ckongmc,   galaxold_state, empty_init,     ROT90,  "bootleg", "Crazy Kong (bootleg on Moon Cresta hardware, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // set was marked as 'King Kong on Galaxian'
+GAME( 1981, ckongmc2,  ckong,    ckongmc,   ckongmc2,  galaxold_state, empty_init,     ROT90,  "bootleg", "Crazy Kong (bootleg on Moon Cresta hardware, set 2)", MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // undumped color PROM
 GAME( 1981, ckonggx,   ckong,    ckongg,    ckonggx,   galaxold_state, init_ckonggx,   ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, ckongcv,   ckong,    ckongg,    ckonggx,   galaxold_state, init_ckonggx,   ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 2)", MACHINE_NOT_WORKING )
 GAME( 1982, ckongis,   ckong,    ckongg,    ckonggx,   galaxold_state, init_ckonggx,   ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 3)", MACHINE_NOT_WORKING )
