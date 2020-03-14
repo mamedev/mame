@@ -213,8 +213,8 @@ void president_state::prschess(machine_config &config)
 
 ROM_START( prschess )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("y03_rl", 0xc000, 0x2000, CRC(862c3f42) SHA1(e2d2f1d7a0382b0774e86ca83e270dab1df700c2) ) // HN482764G
-	ROM_LOAD("y03_rh", 0xe000, 0x2000, CRC(ef95cb9f) SHA1(02f763cf9cab1b4be8964ddb5d93efb05a898123) ) // "
+	ROM_LOAD("yo3_rl", 0xc000, 0x2000, CRC(862c3f42) SHA1(e2d2f1d7a0382b0774e86ca83e270dab1df700c2) ) // HN482764G
+	ROM_LOAD("yo3_rh", 0xe000, 0x2000, CRC(ef95cb9f) SHA1(02f763cf9cab1b4be8964ddb5d93efb05a898123) ) // "
 ROM_END
 
 } // anonymous namespace
