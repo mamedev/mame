@@ -7,7 +7,7 @@ SciSys President Chess (model 231)
 
 The ROMs are inside a module, at the top-right. No known upgrades were released.
 Apparently the chessboard was not that reliable. The manual even says to flip the
-computer and shake it when one of the reed sensors is malfunctioning.
+computer and shake it when one of the sensors is malfunctioning.
 
 Hardware notes:
 - 6502A @ 2MHz
@@ -67,8 +67,7 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(leds0_w);
-	DECLARE_WRITE8_MEMBER(leds1_w);
+	DECLARE_WRITE8_MEMBER(leds_w);
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(input_r);
 
@@ -95,15 +94,9 @@ void president_state::update_display()
 	m_display->matrix(1 << m_inp_mux, led_data);
 }
 
-WRITE8_MEMBER(president_state::leds0_w)
+WRITE8_MEMBER(president_state::leds_w)
 {
-	m_led_data[0] = ~data;
-	update_display();
-}
-
-WRITE8_MEMBER(president_state::leds1_w)
-{
-	m_led_data[1] = ~data;
+	m_led_data[offset >> 8] = ~data;
 	update_display();
 }
 
@@ -143,8 +136,7 @@ READ8_MEMBER(president_state::input_r)
 void president_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x4000, 0x4000).w(FUNC(president_state::leds0_w));
-	map(0x4100, 0x4100).w(FUNC(president_state::leds1_w));
+	map(0x4000, 0x4000).select(0x0100).w(FUNC(president_state::leds_w));
 	map(0x4200, 0x4200).w(FUNC(president_state::control_w));
 	map(0x4300, 0x4300).r(FUNC(president_state::input_r));
 	map(0xc000, 0xffff).rom();
