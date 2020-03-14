@@ -34,8 +34,13 @@ private:
  	sound_stream *m_stream;	
 	memory_access_cache<1, 0, ENDIANNESS_BIG> *m_mem_cache;
 
-	u16 m_bank1_select, m_bank2_select;
 	u32 m_bank1_base, m_bank2_base;
+	u16 m_bank1_select, m_bank2_select;
+
+	u16 m_sregs[0x20][0x20];
+
+	u8 m_unk60;
+	u8 m_voice_select;
 
 	void cpu_map(address_map &map);
 
@@ -49,6 +54,13 @@ private:
 	void bank1_select_w(offs_t, u16 data, u16 mem_mask);
 	u16 bank2_select_r();
 	void bank2_select_w(offs_t, u16 data, u16 mem_mask);
+
+	u8 unk60_r();
+	void unk60_w(u8 data);
+	u8 voice_select_r();
+	void voice_select_w(u8 data);
+	u16 voice_r(offs_t offset);
+	void voice_w(offs_t offset, u16 data, u16 mem_mask);	
 };
 
 DECLARE_DEVICE_TYPE(KS0164, ks0164_device)

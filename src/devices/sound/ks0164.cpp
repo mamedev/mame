@@ -60,6 +60,9 @@ void ks0164_device::device_reset()
 	m_bank1_base = 0;
 	m_bank2_select = 0;
 	m_bank2_base = 0;
+	memset(m_sregs, 0, sizeof(m_sregs));
+	m_unk60 = 0;
+	m_voice_select = 0;
 }
 
 u16 ks0164_device::vec_r(offs_t offset, u16 mem_mask)
@@ -114,10 +117,46 @@ void ks0164_device::bank2_select_w(offs_t, u16 data, u16 mem_mask)
 	m_bank2_base = m_bank2_select << 14;
 }
 
+u16 ks0164_device::voice_r(offs_t offset)
+{
+	return m_sregs[m_voice_select & 0x1f][offset];
+}
+
+void ks0164_device::voice_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_sregs[m_voice_select & 0x1f][offset]);
+	logerror("voice %02x.%02x = %04x (%04x)\n", m_voice_select & 0x1f, offset, m_sregs[m_voice_select & 0x1f][offset], m_cpu->pc());
+}
+
+u8 ks0164_device::unk60_r()
+{
+	return m_unk60;
+}
+
+void ks0164_device::unk60_w(u8 data)
+{
+	m_unk60 = data;
+	logerror("unk60 = %02x (%04x)\n", m_unk60, m_cpu->pc());
+}
+
+u8 ks0164_device::voice_select_r()
+{
+	return m_voice_select;
+}
+
+void ks0164_device::voice_select_w(u8 data)
+{
+	m_voice_select = data;
+	logerror("voice_select = %02x (%04x)\n", m_voice_select, m_cpu->pc());
+}
+
 void ks0164_device::cpu_map(address_map &map)
 {
 	map(0x0000, 0x001f).r(FUNC(ks0164_device::vec_r));
 
+	map(0x0020, 0x005f).rw(FUNC(ks0164_device::voice_r), FUNC(ks0164_device::voice_w));
+	map(0x0060, 0x0060).rw(FUNC(ks0164_device::unk60_r), FUNC(ks0164_device::unk60_w));
+	map(0x0061, 0x0061).rw(FUNC(ks0164_device::voice_select_r), FUNC(ks0164_device::voice_select_w));
 	map(0x0062, 0x0063).rw(FUNC(ks0164_device::bank1_select_r), FUNC(ks0164_device::bank1_select_w));
 	map(0x0064, 0x0065).rw(FUNC(ks0164_device::bank2_select_r), FUNC(ks0164_device::bank2_select_w));
 
