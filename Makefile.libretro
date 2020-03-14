@@ -143,6 +143,9 @@ endif
 ifneq ($(FORCE_DRC_C_BACKEND),)
 	PLATFLAGS += FORCE_DRC_C_BACKEND="$(FORCE_DRC_C_BACKEND)"
 endif
+ifeq ($(platform),unix)
+  PLATFLAGS += -static-libgcc -static-libstdc++
+endif
 
 ###########################################################################
 #
