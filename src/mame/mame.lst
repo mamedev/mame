@@ -10502,7 +10502,7 @@ cmpchess
 cncchess
 
 @source:compmahj.cpp
-compmahj            // 1987 Nintendo Computer Mahjong
+compmahj                        // 1983 Nintendo Computer Mah-jong Yakuman
 
 @source:compucolor.cpp
 compclr2                        //
@@ -34976,6 +34976,9 @@ ccdelta1                        //
 @source:saitek_mark5.cpp
 ccmk5
 ccmk6
+
+@source:saitek_president.cpp
+prschess
 
 @source:saitek_risc2500.cpp
 risc2500                        //
