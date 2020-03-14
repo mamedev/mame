@@ -287,7 +287,7 @@ void ks0164_cpu_device::execute_run()
 			// ALU functions with other register
 			// 10ff frrr Ssss w100
 			u16 rv = m_r[(opcode >> 4) & 7];
-			u16 v = opcode & 0x0004 ? rv : opcode & 0x0080 ? s8(rv) : u8(rv);
+			u16 v = opcode & 0x0008 ? rv : opcode & 0x0080 ? s8(rv) : u8(rv);
 
 			do_alu(opcode, v);
 			break;
@@ -298,7 +298,7 @@ void ks0164_cpu_device::execute_run()
 			// 10ff frrr S... w101
 			u16 rv = m_program_cache->read_word(m_r[R_PC]);
 			m_r[R_PC] += 2;
-			u16 v = opcode & 0x0004 ? rv : opcode & 0x0080 ? s8(rv) : u8(rv);
+			u16 v = opcode & 0x0008 ? rv : opcode & 0x0080 ? s8(rv) : u8(rv);
 
 			do_alu(opcode, v);
 			break;
@@ -308,7 +308,7 @@ void ks0164_cpu_device::execute_run()
 			// ALU functions from memory indexed
 			// 10ff frrr Ssss w110
 			u16 a = m_r[(opcode >> 4) & 7];
-			u16 v = opcode & 0x0004 ? m_program->read_word(a) : opcode & 0x0080 ? s8(m_program->read_byte(a)) : u8(m_program->read_byte(a));
+			u16 v = opcode & 0x0008 ? m_program->read_word(a) : opcode & 0x0080 ? s8(m_program->read_byte(a)) : u8(m_program->read_byte(a));
 			m_icount -= 2;
 
 			do_alu(opcode, v);
@@ -320,7 +320,7 @@ void ks0164_cpu_device::execute_run()
 			// 10ff frrr Ssss w111
 			u16 a = m_r[(opcode >> 4) & 7] + m_program_cache->read_word(m_r[R_PC]);
 			m_r[R_PC] += 2;
-			u16 v = opcode & 0x0004 ? m_program->read_word(a) : opcode & 0x0080 ? s8(m_program->read_byte(a)) : u8(m_program->read_byte(a));
+			u16 v = opcode & 0x0008 ? m_program->read_word(a) : opcode & 0x0080 ? s8(m_program->read_byte(a)) : u8(m_program->read_byte(a));
 			m_icount -= 2;
 
 			do_alu(opcode, v);

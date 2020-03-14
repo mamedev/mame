@@ -63,6 +63,8 @@ void ks0164_device::device_reset()
 	memset(m_sregs, 0, sizeof(m_sregs));
 	m_unk60 = 0;
 	m_voice_select = 0;
+	m_irqen_76 = 0;
+	m_irqen_77 = 0;
 }
 
 u16 ks0164_device::vec_r(offs_t offset, u16 mem_mask)
@@ -128,6 +130,28 @@ void ks0164_device::voice_w(offs_t offset, u16 data, u16 mem_mask)
 	logerror("voice %02x.%02x = %04x (%04x)\n", m_voice_select & 0x1f, offset, m_sregs[m_voice_select & 0x1f][offset], m_cpu->pc());
 }
 
+u8 ks0164_device::irqen_76_r()
+{
+	return m_irqen_76;
+}
+
+void ks0164_device::irqen_76_w(u8 data)
+{
+	m_irqen_76 = data;
+	logerror("irqen_76 = %02x (%04x)\n", m_irqen_76, m_cpu->pc());
+}
+
+u8 ks0164_device::irqen_77_r()
+{
+	return m_irqen_77;
+}
+
+void ks0164_device::irqen_77_w(u8 data)
+{
+	m_irqen_77 = data;
+	logerror("irqen_77 = %02x (%04x)\n", m_irqen_77, m_cpu->pc());
+}
+
 u8 ks0164_device::unk60_r()
 {
 	return m_unk60;
@@ -159,6 +183,9 @@ void ks0164_device::cpu_map(address_map &map)
 	map(0x0061, 0x0061).rw(FUNC(ks0164_device::voice_select_r), FUNC(ks0164_device::voice_select_w));
 	map(0x0062, 0x0063).rw(FUNC(ks0164_device::bank1_select_r), FUNC(ks0164_device::bank1_select_w));
 	map(0x0064, 0x0065).rw(FUNC(ks0164_device::bank2_select_r), FUNC(ks0164_device::bank2_select_w));
+
+	map(0x0076, 0x0076).rw(FUNC(ks0164_device::irqen_76_r), FUNC(ks0164_device::irqen_76_w));
+	map(0x0077, 0x0077).rw(FUNC(ks0164_device::irqen_77_r), FUNC(ks0164_device::irqen_77_w));
 
 	map(0x0080, 0x3fff).r(FUNC(ks0164_device::rom_r));
 	map(0x4000, 0x7fff).rw(FUNC(ks0164_device::bank1_r), FUNC(ks0164_device::bank1_w));

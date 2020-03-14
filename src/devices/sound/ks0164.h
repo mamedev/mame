@@ -41,6 +41,7 @@ private:
 
 	u8 m_unk60;
 	u8 m_voice_select;
+	u8 m_irqen_76, m_irqen_77;
 
 	void cpu_map(address_map &map);
 
@@ -55,6 +56,10 @@ private:
 	u16 bank2_select_r();
 	void bank2_select_w(offs_t, u16 data, u16 mem_mask);
 
+	u8 irqen_76_r();
+	void irqen_76_w(u8 data);
+	u8 irqen_77_r();
+	void irqen_77_w(u8 data);
 	u8 unk60_r();
 	void unk60_w(u8 data);
 	u8 voice_select_r();
