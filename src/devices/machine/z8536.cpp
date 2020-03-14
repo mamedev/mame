@@ -66,7 +66,7 @@ static char const *const CTMS_DCS[] = { "Pulse", "One-shot", "Square Wave", "Do 
 
 void cio_base_device::get_interrupt_vector()
 {
-	uint8_t vector = 0xff;
+	u8 vector = 0xff;
 
 	if (m_register[MASTER_INTERRUPT_CONTROL] & MICR_MIE)
 	{
@@ -194,9 +194,9 @@ void cio_base_device::check_interrupt()
 //  read_register - read from register
 //-------------------------------------------------
 
-uint8_t cio_base_device::read_register(offs_t offset)
+u8 cio_base_device::read_register(offs_t offset)
 {
-	uint8_t data;
+	u8 data;
 
 	switch (offset)
 	{
@@ -271,7 +271,7 @@ uint8_t cio_base_device::read_register(offs_t offset)
 //  read_register - masked read from register
 //-------------------------------------------------
 
-uint8_t cio_base_device::read_register(offs_t offset, uint8_t mask)
+u8 cio_base_device::read_register(offs_t offset, u8 mask)
 {
 	return read_register(offset) & mask;
 }
@@ -281,7 +281,7 @@ uint8_t cio_base_device::read_register(offs_t offset, uint8_t mask)
 //  write_register - write to register
 //-------------------------------------------------
 
-void cio_base_device::write_register(offs_t offset, uint8_t data)
+void cio_base_device::write_register(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -431,7 +431,7 @@ void cio_base_device::write_register(offs_t offset, uint8_t data)
 
 	case PORT_C_DATA:
 		{
-		uint8_t mask = (data & 0xf0) | (data >> 4);
+		u8 mask = (data & 0xf0) | (data >> 4);
 
 		m_output[PORT_C] = (m_output[PORT_C] & mask) | ((data & 0x0f) & (mask ^ 0xff));
 
@@ -552,9 +552,9 @@ void cio_base_device::write_register(offs_t offset, uint8_t data)
 //  write_register - masked write to register
 //-------------------------------------------------
 
-void cio_base_device::write_register(offs_t offset, uint8_t data, uint8_t mask)
+void cio_base_device::write_register(offs_t offset, u8 data, u8 mask)
 {
-	uint8_t combined_data = (data & mask) | (m_register[offset] & (mask ^ 0xff));
+	u8 combined_data = (data & mask) | (m_register[offset] & (mask ^ 0xff));
 
 	write_register(offset, combined_data);
 }
@@ -717,9 +717,9 @@ void cio_base_device::gate(device_timer_id id, int state)
 
 void cio_base_device::match_pattern(int port)
 {
-	uint8_t pms = m_register[PORT_A_MODE_SPECIFICATION + (port << 3)];
-	uint8_t pm = m_register[PORT_A_PATTERN_MASK + (port << 3)];
-	uint8_t ddr = m_register[PORT_A_DATA_DIRECTION + (port << 3)];
+	u8 pms = m_register[PORT_A_MODE_SPECIFICATION + (port << 3)];
+	u8 pm = m_register[PORT_A_PATTERN_MASK + (port << 3)];
+	u8 ddr = m_register[PORT_A_DATA_DIRECTION + (port << 3)];
 
 	switch ((pms & PMS_PMS_MASK) >> 1)
 	{
@@ -749,7 +749,7 @@ void cio_base_device::external_port_w(int port, int bit, int state)
 	case PORT_B:
 		{
 		assert((PORT_A_DATA_DIRECTION + (port << 3)) >= 0 && (PORT_A_DATA_DIRECTION + (port << 3)) < ARRAY_LENGTH(m_register));
-		uint8_t ddr = m_register[PORT_A_DATA_DIRECTION + (port << 3)];
+		u8 ddr = m_register[PORT_A_DATA_DIRECTION + (port << 3)];
 
 		if (!BIT(ddr, bit)) return;
 
@@ -776,7 +776,7 @@ void cio_base_device::external_port_w(int port, int bit, int state)
 //  cio_base_device - constructor
 //-------------------------------------------------
 
-cio_base_device::cio_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+cio_base_device::cio_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_write_irq(*this),
 	m_read_pa(*this),
@@ -794,7 +794,7 @@ cio_base_device::cio_base_device(const machine_config &mconfig, device_type type
 //  z8036_device - constructor
 //-------------------------------------------------
 
-z8036_device::z8036_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+z8036_device::z8036_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	cio_base_device(mconfig, Z8036, tag, owner, clock)
 {
 }
@@ -804,7 +804,7 @@ z8036_device::z8036_device(const machine_config &mconfig, const char *tag, devic
 //  z8536_device - constructor
 //-------------------------------------------------
 
-z8536_device::z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+z8536_device::z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	cio_base_device(mconfig, Z8536, tag, owner, clock),
 	device_z80daisy_interface(mconfig, *this)
 {
@@ -997,7 +997,7 @@ int cio_base_device::intack_r()
 //  read - register read (Z-Bus)
 //-------------------------------------------------
 
-READ8_MEMBER( z8036_device::read )
+u8 z8036_device::read(offs_t offset)
 {
 	return is_reset() ? 0 : read_register(offset);
 }
@@ -1007,9 +1007,9 @@ READ8_MEMBER( z8036_device::read )
 //  read - register read (universal bus)
 //-------------------------------------------------
 
-READ8_MEMBER( z8536_device::read )
+u8 z8536_device::read(offs_t offset)
 {
-	uint8_t data = 0;
+	u8 data = 0;
 
 	if (!is_reset())
 	{
@@ -1047,7 +1047,7 @@ READ8_MEMBER( z8536_device::read )
 //  write - register write (Z-Bus)
 //-------------------------------------------------
 
-WRITE8_MEMBER( z8036_device::write )
+void z8036_device::write(offs_t offset, u8 data)
 {
 	if (is_reset())
 	{
@@ -1067,7 +1067,7 @@ WRITE8_MEMBER( z8036_device::write )
 //  write - register write (universal bus)
 //-------------------------------------------------
 
-WRITE8_MEMBER( z8536_device::write )
+void z8536_device::write(offs_t offset, u8 data)
 {
 	if (is_reset())
 	{

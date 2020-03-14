@@ -104,7 +104,7 @@ public:
 
 protected:
 	// construction/destruction
-	cio_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cio_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -364,10 +364,10 @@ protected:
 	void get_interrupt_vector();
 	void check_interrupt();
 
-	uint8_t read_register(offs_t offset);
-	uint8_t read_register(offs_t offset, uint8_t mask);
-	void write_register(offs_t offset, uint8_t data);
-	void write_register(offs_t offset, uint8_t data, uint8_t mask);
+	u8 read_register(offs_t offset);
+	u8 read_register(offs_t offset, u8 mask);
+	void write_register(offs_t offset, u8 data);
+	void write_register(offs_t offset, u8 data, u8 mask);
 
 	bool counter_enabled(device_timer_id id);
 	bool counter_external_output(device_timer_id id);
@@ -397,17 +397,17 @@ private:
 	int m_irq;
 
 	// register state
-	uint8_t m_register[48];
+	u8 m_register[48];
 
 	// input/output port state
-	uint8_t m_input[3];
-	uint8_t m_output[3];
-	uint8_t m_buffer[3];
-	uint8_t m_match[3];
+	u8 m_input[3];
+	u8 m_output[3];
+	u8 m_buffer[3];
+	u8 m_match[3];
 
 	// timers
 	emu_timer *m_timer;
-	uint16_t m_counter[3];
+	u16 m_counter[3];
 };
 
 // ======================> z8036_device
@@ -416,10 +416,10 @@ class z8036_device : public cio_base_device
 {
 public:
 	// construction/destruction
-	z8036_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z8036_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 };
 
 // ======================> z8536_device
@@ -428,10 +428,10 @@ class z8536_device : public cio_base_device, public device_z80daisy_interface
 {
 public:
 	// construction/destruction
-	z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
@@ -446,7 +446,7 @@ protected:
 private:
 	// control state machine
 	bool m_state0;
-	uint8_t m_pointer;
+	u8 m_pointer;
 };
 
 

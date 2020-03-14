@@ -634,12 +634,12 @@ WRITE8_MEMBER( abc1600_state::scc_w )
 
 READ8_MEMBER( abc1600_state::cio_r )
 {
-	return m_cio->read(space, A2_A1);
+	return m_cio->read(A2_A1);
 }
 
 WRITE8_MEMBER( abc1600_state::cio_w )
 {
-	m_cio->write(space, A2_A1, data);
+	m_cio->write(A2_A1, data);
 }
 
 READ8_MEMBER( abc1600_state::cio_pa_r )
