@@ -2522,7 +2522,7 @@ READ16_MEMBER(setaroul_state::rtc_r)
 		++offset;
 	if (offset / 2 >= 7)
 		return 0;
-	return (m_rtc->read(space, offset / 2, mem_mask) >> ((offset & 1) * 4)) & 0xf;
+	return (m_rtc->read(offset / 2) >> ((offset & 1) * 4)) & 0xf;
 }
 
 WRITE16_MEMBER(setaroul_state::rtc_w)
@@ -3200,7 +3200,7 @@ READ16_MEMBER(jockeyc_state::rtc_r)
 		++offset;
 	if (offset / 2 >= 7)
 		return 0;
-	return (m_rtc->read(space, offset / 2, mem_mask) >> ((offset & 1) * 4)) & 0xf;
+	return (m_rtc->read(offset / 2) >> ((offset & 1) * 4)) & 0xf;
 }
 
 WRITE16_MEMBER(jockeyc_state::rtc_w)
@@ -8573,7 +8573,7 @@ void setaroul_state::setaroul(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
 	/* devices */
-	UPD4992(config, m_rtc); // ! Actually D4911C !
+	UPD4992(config, m_rtc, 32'768); // ! Actually D4911C !
 	ACIA6850(config, "acia0", 0);
 	TICKET_DISPENSER(config, "hopper", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
@@ -9825,7 +9825,7 @@ void jockeyc_state::jockeyc(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, jockeyc)
 	/* devices */
-	UPD4992(config, m_rtc); // ! Actually D4911C !
+	UPD4992(config, m_rtc, 32'768); // ! Actually D4911C !
 	ACIA6850(config, "acia0", 0);
 	TICKET_DISPENSER(config, "hopper1", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 	TICKET_DISPENSER(config, "hopper2", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);

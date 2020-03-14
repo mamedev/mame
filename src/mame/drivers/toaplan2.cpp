@@ -3784,7 +3784,7 @@ void toaplan2_state::pwrkick(machine_config &config)
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pwrkick_68k_mem);
 
-	UPD4992(config, m_rtc);
+	UPD4992(config, m_rtc, 32'768);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -3819,7 +3819,7 @@ void toaplan2_state::othldrby(machine_config &config)
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::othldrby_68k_mem);
 
-	UPD4992(config, m_rtc);
+	UPD4992(config, m_rtc, 32'768);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
