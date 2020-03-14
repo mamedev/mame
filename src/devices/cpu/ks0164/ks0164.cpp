@@ -8,20 +8,20 @@
 #include "ks0164d.h"
 #include "debugger.h"
 
-DEFINE_DEVICE_TYPE(KS0164, ks0164_device, "ks0164", "Samsung KS0164 audio processor")
+DEFINE_DEVICE_TYPE(KS0164CPU, ks0164_cpu_device, "ks0164cpu", "Samsung KS0164 audio processor")
 
-const u16 ks0164_device::imask[16] = {
+const u16 ks0164_cpu_device::imask[16] = {
 	0x0001, 0x0003, 0x0007, 0x000f, 0x001f, 0x003f, 0x007f, 0x00ff,
 	0x01ff, 0x03ff, 0x07ff, 0x0fff, 0x1fff, 0x3fff, 0x7fff, 0xffff
 };
 
-ks0164_device::ks0164_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, KS0164, tag, owner, clock)
+ks0164_cpu_device::ks0164_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, KS0164CPU, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16)
 {
 }
 
-void ks0164_device::device_start()
+void ks0164_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_program_cache = m_program->cache<1, 0, ENDIANNESS_BIG>();
@@ -48,29 +48,29 @@ void ks0164_device::device_start()
 	memset(m_r, 0, sizeof(m_r));
 }
 
-void ks0164_device::device_reset()
+void ks0164_cpu_device::device_reset()
 {
 	m_irq = 1;
 	memset(m_r, 0, sizeof(m_r));
 	m_r[R_PSW] = F_I;
 }
 
-uint32_t ks0164_device::execute_min_cycles() const noexcept
+uint32_t ks0164_cpu_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
 
-uint32_t ks0164_device::execute_max_cycles() const noexcept
+uint32_t ks0164_cpu_device::execute_max_cycles() const noexcept
 {
 	return 5;
 }
 
-uint32_t ks0164_device::execute_input_lines() const noexcept
+uint32_t ks0164_cpu_device::execute_input_lines() const noexcept
 {
 	return 16;
 }
 
-void ks0164_device::execute_set_input(int inputnum, int state)
+void ks0164_cpu_device::execute_set_input(int inputnum, int state)
 {
 	if(state)
 		m_irq |= 1 << inputnum;
@@ -78,19 +78,19 @@ void ks0164_device::execute_set_input(int inputnum, int state)
 		m_irq &= ~(1 << inputnum);
 }
 
-device_memory_interface::space_config_vector ks0164_device::memory_space_config() const
+device_memory_interface::space_config_vector ks0164_cpu_device::memory_space_config() const
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
 }
 
-std::unique_ptr<util::disasm_interface> ks0164_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> ks0164_cpu_device::create_disassembler()
 {
 	return std::make_unique<ks0164_disassembler>();
 }
 
-void ks0164_device::state_string_export(const device_state_entry &entry, std::string &str) const
+void ks0164_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch(entry.index()) {
 	case STATE_GENFLAGS:
@@ -105,7 +105,7 @@ void ks0164_device::state_string_export(const device_state_entry &entry, std::st
 	}
 }
 
-void ks0164_device::handle_irq()
+void ks0164_cpu_device::handle_irq()
 {
 	u16 mask = m_irq & imask[m_r[R_PSW] & 15];
 	if(mask) {
@@ -130,7 +130,7 @@ void ks0164_device::handle_irq()
 	}
 }
 
-u16 ks0164_device::snz(u16 r)
+u16 ks0164_cpu_device::snz(u16 r)
 {
 	u16 f = 0;
 	if(!r)
@@ -141,7 +141,7 @@ u16 ks0164_device::snz(u16 r)
 	return r;		
 }		
 
-void ks0164_device::do_alu(u16 opcode, u16 v2)
+void ks0164_cpu_device::do_alu(u16 opcode, u16 v2)
 {
 	int r = (opcode >> 8) & 7;
 	switch((opcode >> 11) & 7) {
@@ -227,12 +227,12 @@ void ks0164_device::do_alu(u16 opcode, u16 v2)
 	}
 }
 
-void ks0164_device::unk(u16 opcode)
+void ks0164_cpu_device::unk(u16 opcode)
 {
 	logerror("Unknown opcode %04x at address %04x\n", opcode, m_r[R_PC]-2);
 }
 
-void ks0164_device::execute_run()
+void ks0164_cpu_device::execute_run()
 {
 	while(m_icount > 0) {
 		if(m_irq)

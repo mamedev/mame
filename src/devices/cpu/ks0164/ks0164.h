@@ -8,10 +8,10 @@
 
 #pragma once
 
-class ks0164_device : public cpu_device
+class ks0164_cpu_device : public cpu_device
 {
 public:
-	ks0164_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ks0164_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	enum {
@@ -69,6 +69,6 @@ enum {
 	KS0164_PC,
 };
 
-DECLARE_DEVICE_TYPE(KS0164, ks0164_device)
+DECLARE_DEVICE_TYPE(KS0164CPU, ks0164_cpu_device)
 
 #endif
