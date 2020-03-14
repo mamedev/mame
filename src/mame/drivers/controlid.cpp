@@ -102,7 +102,7 @@ WRITE8_MEMBER(controlidx628_state::p1_w)
 {
 	if ((BIT(m_p1_data, 6) == 0) && (BIT(data, 6) == 1)) // on raising-edge of bit 6
 	{
-		m_lcdc->write(space, BIT(data, 7), m_p0_data);
+		m_lcdc->write(BIT(data, 7), m_p0_data);
 	}
 	// P1.0 is also used as a serial I/O clock
 	m_p1_data = data;

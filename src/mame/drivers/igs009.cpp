@@ -152,7 +152,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel1_tile_info)
 {
 	int code = m_reel1_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code)+(((tile_index+1)&0x3)*0x100),
 			(code & 0x80) ? 0xc : 0,
 			0);
@@ -163,7 +163,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel1_tile_info)
 {
 	int code = m_reel1_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code*4)+(tile_index&0x3),
 			0,
 			0);
@@ -180,7 +180,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel2_tile_info)
 {
 	int code = m_reel2_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code)+(((tile_index+1)&0x3)*0x100),
 			(code & 0x80) ? 0xc : 0,
 			0);
@@ -190,7 +190,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel2_tile_info)
 {
 	int code = m_reel2_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code*4)+(tile_index&0x3),
 			0,
 			0);
@@ -208,7 +208,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel3_tile_info)
 {
 	int code = m_reel3_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code)+(((tile_index+1)&0x3)*0x100),
 			(code & 0x80) ? 0xc : 0,
 			0);
@@ -218,7 +218,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel3_tile_info)
 {
 	int code = m_reel3_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code*4)+(tile_index&0x3),
 			0,
 			0);
@@ -236,7 +236,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel4_tile_info)
 {
 	int code = m_reel4_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code)+(((tile_index+1)&0x3)*0x100),
 			(code & 0x80) ? 0xc : 0,
 			0);
@@ -246,7 +246,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel4_tile_info)
 {
 	int code = m_reel4_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code*4)+(tile_index&0x3),
 			0,
 			0);
@@ -264,7 +264,7 @@ WRITE8_MEMBER(igs009_state::bg_scroll_w)
 TILE_GET_INFO_MEMBER(igs009_state::get_fg_tile_info)
 {
 	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
-	SET_TILE_INFO_MEMBER(1, code, (4*(code >> 14)+3), 0);
+	tileinfo.set(1, code, (4*(code >> 14)+3), 0);
 }
 
 WRITE8_MEMBER(igs009_state::fg_tile_w)

@@ -312,7 +312,7 @@ WRITE8_MEMBER(gb_state::gb_io2_w)
 		m_bios_disable = true;
 	}
 	else
-		m_ppu->video_w(space, offset, data);
+		m_ppu->video_w(offset, data);
 }
 
 #ifdef MAME_DEBUG
@@ -637,7 +637,7 @@ WRITE8_MEMBER(gb_state::gbc_io2_w)
 		default:
 			break;
 	}
-	m_ppu->video_w(space, offset, data);
+	m_ppu->video_w(offset, data);
 }
 
 READ8_MEMBER(gb_state::gbc_io2_r)
@@ -653,7 +653,7 @@ READ8_MEMBER(gb_state::gbc_io2_r)
 	default:
 		break;
 	}
-	return m_ppu->video_r(space, offset);
+	return m_ppu->video_r(offset);
 }
 
 /****************************************************************************
@@ -719,7 +719,7 @@ READ8_MEMBER(megaduck_state::megaduck_video_r)
 	{
 		offset ^= 0x0C;
 	}
-	data = m_ppu->video_r(space, offset);
+	data = m_ppu->video_r(offset);
 	if (offset)
 		return data;
 	return bitswap<8>(data,7,0,5,4,6,3,2,1);
@@ -735,7 +735,7 @@ WRITE8_MEMBER(megaduck_state::megaduck_video_w)
 	{
 		offset ^= 0x0C;
 	}
-	m_ppu->video_w(space, offset, data);
+	m_ppu->video_w(offset, data);
 }
 
 /* Map megaduck audio offset to game boy audio offsets */

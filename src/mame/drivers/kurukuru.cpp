@@ -460,7 +460,7 @@ private:
 WRITE_LINE_MEMBER(kurukuru_state::kurukuru_msm5205_vck)
 {
 	m_soundirq->rst30_w(1);
-	m_adpcm->write_data(m_adpcm_data);
+	m_adpcm->data_w(m_adpcm_data);
 }
 
 

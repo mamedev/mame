@@ -312,7 +312,7 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info)
 		}
 	}
 
-	SET_TILE_INFO_MEMBER(m_pf12_16x16_gfx_bank,
+	tileinfo.set(m_pf12_16x16_gfx_bank,
 			(tile & 0xfff) | m_pf2_bank,
 			(colour & m_pf2_colourmask) + m_pf2_colour_bank,
 			flags);
@@ -343,14 +343,14 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info)
 		// Captain America operates this chip in 8bpp mode.
 		// In 8bpp mode you appear to only get 1 layer, not 2, but you also
 		// have an extra 2 tile bits, and 2 less colour bits.
-		SET_TILE_INFO_MEMBER(m_pf12_16x16_gfx_bank,
+		tileinfo.set(m_pf12_16x16_gfx_bank,
 				(tile & 0x3fff) | m_pf1_bank,
 				((colour & m_pf1_colourmask) + m_pf1_colour_bank)>>2,
 				flags);
 	}
 	else
 	{
-		SET_TILE_INFO_MEMBER(m_pf12_16x16_gfx_bank,
+		tileinfo.set(m_pf12_16x16_gfx_bank,
 				(tile & 0xfff) | m_pf1_bank,
 				(colour & m_pf1_colourmask) + m_pf1_colour_bank,
 				flags);
@@ -377,7 +377,7 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info_b)
 		}
 	}
 
-	SET_TILE_INFO_MEMBER(m_pf12_8x8_gfx_bank,
+	tileinfo.set(m_pf12_8x8_gfx_bank,
 			(tile & 0xfff) | m_pf2_bank,
 			(colour & m_pf2_colourmask) + m_pf2_colour_bank,
 			flags);
@@ -403,7 +403,7 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info_b)
 		}
 	}
 
-	SET_TILE_INFO_MEMBER(m_pf12_8x8_gfx_bank,
+	tileinfo.set(m_pf12_8x8_gfx_bank,
 			(tile & 0xfff) | m_pf1_bank,
 			(colour & m_pf1_colourmask) + m_pf1_colour_bank,
 			flags);

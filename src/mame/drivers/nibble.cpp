@@ -118,7 +118,7 @@ TILE_GET_INFO_MEMBER(nibble_state::get_bg_tile_info)
 */
 	uint8_t code = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0 /* bank */, code, 0 /* color */, 0);
+	tileinfo.set(0 /* bank */, code, 0 /* color */, 0);
 }
 
 void nibble_state::video_start()

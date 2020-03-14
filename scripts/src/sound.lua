@@ -1553,3 +1553,15 @@ if (SOUNDS["VGMVIZ"]~=null) then
 		MAME_DIR .. "src/devices/sound/vgm_visualizer.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/sound/ks0164.h,SOUNDS["KS0164"] = true
+---------------------------------------------------
+
+if (SOUNDS["KS0164"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/ks0164.cpp",
+		MAME_DIR .. "src/devices/sound/ks0164.h",
+	}
+end

@@ -675,7 +675,7 @@ READ8_MEMBER( thomson_state::to7_modem_mea8000_r )
 
 	if ( m_io_mconfig->read() & 1 )
 	{
-		return m_mea8000->read(space, offset);
+		return m_mea8000->read(offset);
 	}
 	else
 	{
@@ -697,7 +697,7 @@ WRITE8_MEMBER( thomson_state::to7_modem_mea8000_w )
 {
 	if ( m_io_mconfig->read() & 1 )
 	{
-		m_mea8000->write(space, offset, data);
+		m_mea8000->write(offset, data);
 	}
 	else
 	{

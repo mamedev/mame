@@ -21,7 +21,7 @@
         <year>1983</year>
         <publisher>Hudson</publisher>
         <info name="serial" value="WB-1002"/>
-        <info name="alt_title" value="ベジタフツレクラッシュ"/>
+        <info name="alt_title" value="ベジタブルクラッシュ"/>
         <part name="cass1" interface="mz_cass">
             <dataarea name="cass" size="1233964">
                 <rom name="wb-1002.wav" size="1233964" crc="953f5d0e" sha1="527f9bfef1fd0a923ce982ef971602c86820c26b" />

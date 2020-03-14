@@ -365,14 +365,14 @@ TILE_GET_INFO_MEMBER( zwackery_state::get_bg_tile_info )
 {
 	uint16_t data = m_videoram[tile_index];
 	int color = (data >> 13) & 7;
-	SET_TILE_INFO_MEMBER(0, data & 0x3ff, color, TILE_FLIPYX(data >> 11));
+	tileinfo.set(0, data & 0x3ff, color, TILE_FLIPYX(data >> 11));
 }
 
 TILE_GET_INFO_MEMBER( zwackery_state::get_fg_tile_info )
 {
 	uint16_t data = m_videoram[tile_index];
 	int color = (data >> 13) & 7;
-	SET_TILE_INFO_MEMBER(2, data & 0x3ff, color, TILE_FLIPYX(data >> 11));
+	tileinfo.set(2, data & 0x3ff, color, TILE_FLIPYX(data >> 11));
 	tileinfo.category = (color != 0);
 }
 

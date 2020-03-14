@@ -437,7 +437,7 @@ TILE_GET_INFO_MEMBER( popper_state::layer0_tile_info )
 	// high priority only applies if a color is set
 	tileinfo.category = BIT(attr, 7) && (attr & 0x70);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( popper_state::layer1_tile_info )
@@ -448,7 +448,7 @@ TILE_GET_INFO_MEMBER( popper_state::layer1_tile_info )
 
 	tileinfo.category = BIT(attr, 7);
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 

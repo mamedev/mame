@@ -31,9 +31,9 @@ public:
 		, m_pio(*this, "pio")
 	{ }
 
-	void xavix2(machine_config &config);
+	virtual void config(machine_config &config);
 
-private:
+protected:
 	enum {
 		IRQ_TIMER =  7,
 		IRQ_DMA   = 12
@@ -41,7 +41,7 @@ private:
 
 	required_device<xavix2_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<i2c_24c08_device> m_i2cmem;
+	optional_device<i2cmem_device> m_i2cmem;
 	required_ioport m_pio;
 
 	u32 m_dma_src;
@@ -122,7 +122,7 @@ private:
 
 	void pio_mode_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 pio_mode_r(offs_t offset);
-	void pio_update();
+	virtual void pio_update() = 0;
 	void pio_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 pio_r();
 
@@ -134,6 +134,26 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void mem(address_map &map);
+};
+
+class naruto_state : public xavix2_state
+{
+public:
+	using xavix2_state::xavix2_state;
+	virtual void config(machine_config& config) override;
+
+protected:
+	virtual void pio_update() override;
+};
+
+class domyos_state : public xavix2_state
+{
+public:
+	using xavix2_state::xavix2_state;
+	virtual void config(machine_config& config) override;
+
+protected:
+	virtual void pio_update() override;
 };
 
 u32 xavix2_state::rgb555_888(u16 color)
@@ -461,12 +481,20 @@ u32 xavix2_state::pio_mode_r(offs_t offset)
 	return m_pio_mode[offset];
 }
 
-void xavix2_state::pio_update()
+void naruto_state::pio_update()
 {
 	if (BIT(m_pio_mask_out, 21))
 		m_i2cmem->write_sda(BIT(m_pio_dataw, 21));
 	if (BIT(m_pio_mask_out, 20))
 		m_i2cmem->write_scl(BIT(m_pio_dataw, 20));
+}
+
+void domyos_state::pio_update()
+{
+	if (BIT(m_pio_mask_out, 16))
+		m_i2cmem->write_sda(BIT(m_pio_dataw, 16));
+	if (BIT(m_pio_mask_out, 17))
+		m_i2cmem->write_scl(BIT(m_pio_dataw, 17));
 }
 
 void xavix2_state::pio_w(offs_t offset, u32 data, u32 mem_mask)
@@ -595,7 +623,7 @@ void xavix2_state::machine_reset()
 	m_bg_color = 0;
 }
 
-static INPUT_PORTS_START( xavix2 )
+static INPUT_PORTS_START( naruto )
 	PORT_START("pio")
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON3)
 	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON4)
@@ -631,7 +659,43 @@ static INPUT_PORTS_START( xavix2 )
 	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-void xavix2_state::xavix2(machine_config &config)
+static INPUT_PORTS_START(domyos)
+	PORT_START("pio")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON1)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON2)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON3)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON4)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON5)
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON6)
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON7)
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON8)
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON9)
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON10)
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_BUTTON11)
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON12)
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON13)
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON14)
+	PORT_BIT(0x00004000, IP_ACTIVE_HIGH, IPT_BUTTON15)
+	PORT_BIT(0x00008000, IP_ACTIVE_HIGH, IPT_BUTTON16)
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_CUSTOM) // i2c clock
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(2)
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(2)
+	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_PLAYER(2)
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_PLAYER(2)
+	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_PLAYER(2)
+	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_PLAYER(2)
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_PLAYER(2)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_PLAYER(2)
+	PORT_BIT(0x04000000, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_PLAYER(2)
+	PORT_BIT(0x08000000, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_PLAYER(2)
+	PORT_BIT(0x10000000, IP_ACTIVE_HIGH, IPT_BUTTON13) PORT_PLAYER(2)
+	PORT_BIT(0x20000000, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_PLAYER(2)
+	PORT_BIT(0x40000000, IP_ACTIVE_HIGH, IPT_BUTTON15) PORT_PLAYER(2)
+	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_BUTTON16) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+void xavix2_state::config(machine_config &config)
 {
 	// unknown CPU 'SSD 2002-2004 NEC 800208-51'
 	XAVIX2(config, m_maincpu, 98'000'000);
@@ -645,8 +709,6 @@ void xavix2_state::xavix2(machine_config &config)
 	m_screen->set_size(640, 400);
 	m_screen->set_visarea(0, 639, 0, 399);
 
-	I2C_24C08(config, m_i2cmem);
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -654,6 +716,19 @@ void xavix2_state::xavix2(machine_config &config)
 	// unknown sound hardware
 }
 
+void naruto_state::config(machine_config& config)
+{
+	xavix2_state::config(config);
+
+	I2C_24C08(config, m_i2cmem);
+}
+
+void domyos_state::config(machine_config& config)
+{
+	xavix2_state::config(config);
+
+	I2C_24C64(config, m_i2cmem);
+}
 
 ROM_START( ltv_naru )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
@@ -671,13 +746,13 @@ ROM_START( dombikec )
 ROM_END
 
 
-CONS( 2006, ltv_naru, 0, 0, xavix2, xavix2, xavix2_state, empty_init, "Bandai / SSD Company LTD", "Let's TV Play Naruto", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ltv_naru, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's TV Play Naruto", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // These are for the 'Domyos Interactive System' other Domyos Interactive System games can be found in xavix.cpp (the SoC is inside the cartridge, base acts as a 'TV adapter' only)
 
 // Has SEEPROM and an RTC.  Adventure has the string DOMYSSDCOLTD a couple of times.
-CONS( 2008, domfitad, 0, 0, xavix2, xavix2, xavix2_state, empty_init, "Decathlon / SSD Company LTD", "Domyos Fitness Adventure (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2008, dombikec, 0, 0, xavix2, xavix2, xavix2_state, empty_init, "Decathlon / SSD Company LTD", "Domyos Bike Concept (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, domfitad, 0, 0, config, domyos, domyos_state, empty_init, "Decathlon / SSD Company LTD", "Domyos Fitness Adventure (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, dombikec, 0, 0, config, domyos, domyos_state, empty_init, "Decathlon / SSD Company LTD", "Domyos Bike Concept (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 
 

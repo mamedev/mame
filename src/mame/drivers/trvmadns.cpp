@@ -271,7 +271,7 @@ TILE_GET_INFO_MEMBER(trvmadns_state::tile_info)
 	uint8_t color = (attr >> 3) & 0x0f;
 	uint8_t flags = TILE_FLIPXY((attr >> 1) & 0x03);
 
-	SET_TILE_INFO_MEMBER(0, tile, color, flags);
+	tileinfo.set(0, tile, color, flags);
 }
 
 

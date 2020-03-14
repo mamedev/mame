@@ -280,6 +280,7 @@ SOUNDS["MM5837"] = true
 --SOUNDS["DAVE"] = true
 SOUNDS["LC7535"] = true
 --SOUNDS["UPD934G"] = true
+SOUNDS["KS0164"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -4975,6 +4976,7 @@ files {
 	MAME_DIR .. "src/mame/video/thedeep.cpp",
 	MAME_DIR .. "src/mame/drivers/tickee.cpp",
 	MAME_DIR .. "src/mame/drivers/tmspoker.cpp",
+	MAME_DIR .. "src/mame/drivers/triviaquiz.cpp",
 	MAME_DIR .. "src/mame/drivers/truco.cpp",
 	MAME_DIR .. "src/mame/includes/truco.h",
 	MAME_DIR .. "src/mame/video/truco.cpp",

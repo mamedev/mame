@@ -47,7 +47,7 @@ ppu_vt03pal_device::ppu_vt03pal_device(const machine_config& mconfig, const char
 }
 
 
-READ8_MEMBER(ppu_vt03_device::palette_read)
+uint8_t ppu_vt03_device::palette_read(offs_t offset)
 {
 	if (m_201x_regs[0] & 0x80)
 	{
@@ -55,7 +55,7 @@ READ8_MEMBER(ppu_vt03_device::palette_read)
 	}
 	else
 	{
-		return ppu2c0x_device::palette_read(space, offset);
+		return ppu2c0x_device::palette_read(offset);
 	}
 }
 
@@ -157,7 +157,7 @@ void ppu_vt03_device::set_new_pen(int i)
 
 }
 
-WRITE8_MEMBER(ppu_vt03_device::palette_write)
+void ppu_vt03_device::palette_write(offs_t offset, uint8_t data)
 {
 	//logerror("pal write %d %02x\n", offset, data);
 	// why is the check pal_mask = (m_pal_mode == PAL_MODE_NEW_VG) ? 0x08 : 0x80 in set_2010_reg and 0x04 : 0x80 here?
@@ -172,15 +172,15 @@ WRITE8_MEMBER(ppu_vt03_device::palette_write)
 	{
 		//if(m_pal_mode == PAL_MODE_NEW_VG) // ddrdismx writes the palette before setting the register but doesn't use 'PAL_MODE_NEW_VG', Konami logo is missing if you don't allow writes to be stored for when we switch
 		m_newpal[offset & 0xff] = data;
-		ppu2c0x_device::palette_write(space, offset, data);
+		ppu2c0x_device::palette_write(offset, data);
 	}
 }
 
-READ8_MEMBER(ppu_vt03_device::read)
+uint8_t ppu_vt03_device::read(offs_t offset)
 {
 	if (offset <= 0xf)
 	{
-		return ppu2c0x_device::read(space, offset);
+		return ppu2c0x_device::read(offset);
 	}
 	else if (offset <= 0x1f)
 	{
@@ -500,11 +500,11 @@ void ppu_vt03_device::set_2010_reg(uint8_t data)
 	m_201x_regs[0x0] = data;
 }
 
-WRITE8_MEMBER(ppu_vt03_device::write)
+void ppu_vt03_device::write(offs_t offset, uint8_t data)
 {
 	if (offset < 0x10)
 	{
-		ppu2c0x_device::write(space, offset, data);
+		ppu2c0x_device::write(offset, data);
 	}
 	else
 	{

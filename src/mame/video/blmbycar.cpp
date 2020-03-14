@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(blmbycar_state::get_tile_info)
 {
 	uint16_t code = m_vram[Layer][tile_index * 2 + 0];
 	uint16_t attr = m_vram[Layer][tile_index * 2 + 1];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			attr & 0x1f,
 			TILE_FLIPYX((attr >> 6) & 3));

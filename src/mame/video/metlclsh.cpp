@@ -71,7 +71,7 @@ TILEMAP_MAPPER_MEMBER(metlclsh_state::metlclsh_bgtilemap_scan)
 
 TILE_GET_INFO_MEMBER(metlclsh_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1, m_bgram[tile_index] + (m_gfxbank << 7), 0, 0);
+	tileinfo.set(1, m_bgram[tile_index] + (m_gfxbank << 7), 0, 0);
 }
 
 WRITE8_MEMBER(metlclsh_state::metlclsh_bgram_w)
@@ -114,7 +114,7 @@ TILE_GET_INFO_MEMBER(metlclsh_state::get_fg_tile_info)
 {
 	uint8_t code = m_fgram[tile_index + 0x000];
 	uint8_t attr = m_fgram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(2, code + ((attr & 0x03) << 8), (attr >> 5) & 3, 0);
+	tileinfo.set(2, code + ((attr & 0x03) << 8), (attr >> 5) & 3, 0);
 	tileinfo.category = ((attr & 0x80) ? 1 : 2);
 }
 

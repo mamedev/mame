@@ -141,8 +141,8 @@ public:
 		audit_status        m_status;               // status of audit on this item
 		audit_substatus     m_substatus;            // finer-detail status
 		const char *        m_name;                 // name of item
-		uint64_t              m_explength;            // expected length of item
-		uint64_t              m_length;               // actual length of item
+		uint64_t            m_explength;            // expected length of item
+		uint64_t            m_length;               // actual length of item
 		util::hash_collection     m_exphashes;            // expected hash data
 		util::hash_collection     m_hashes;               // actual hash information
 		device_t *          m_shared_device;        // device that shares the rom
@@ -174,7 +174,7 @@ private:
 	record_list                 m_record_list;
 	const driver_enumerator &   m_enumerator;
 	const char *                m_validation;
-	const char *                m_searchpath;
+	std::string                 m_searchpath;
 };
 
 

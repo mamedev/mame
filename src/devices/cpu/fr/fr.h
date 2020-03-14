@@ -2,10 +2,9 @@
 // copyright-holders:AJR
 
 #ifndef MAME_CPU_FR_FR_H
-#define MAME_CPU_FR_FR_H 1
+#define MAME_CPU_FR_FR_H
 
 #pragma once
-
 
 class fr_cpu_device : public cpu_device
 {
@@ -57,13 +56,17 @@ private:
 	s32 m_icount;
 };
 
-class mb91101a_device : public fr_cpu_device
+class mb91f155a_device : public fr_cpu_device
 {
 public:
 	// device type constructor
-	mb91101a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mb91f155a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	void internal_map(address_map &map);
 };
 
-DECLARE_DEVICE_TYPE(MB91101A, mb91101a_device)
+// device type declaration
+DECLARE_DEVICE_TYPE(MB91F155A, mb91f155a_device)
 
 #endif // MAME_CPU_FR_FR_H

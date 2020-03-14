@@ -289,7 +289,7 @@ WRITE8_MEMBER(excel_state::ttl_w)
 
 		// Q0-Q5: TSI C0-C5
 		// Q7: TSI START line
-		m_speech->data_w(space, 0, m_speech_data & 0x3f);
+		m_speech->data_w(m_speech_data & 0x3f);
 		m_speech->start_w(m_speech_data >> 7 & 1);
 	}
 }

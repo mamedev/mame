@@ -43,11 +43,11 @@ TILE_GET_INFO_MEMBER(nemesis_state::get_bg_tile_info)
 
 	if (code & 0xf800)
 	{
-		SET_TILE_INFO_MEMBER(0, code & 0x7ff, color & 0x7f, flags );
+		tileinfo.set(0, code & 0x7ff, color & 0x7f, flags );
 	}
 	else
 	{
-		SET_TILE_INFO_MEMBER(0, 0, 0x00, 0 );
+		tileinfo.set(0, 0, 0x00, 0 );
 		tileinfo.pen_data = m_blank_tile;
 	}
 
@@ -78,11 +78,11 @@ TILE_GET_INFO_MEMBER(nemesis_state::get_fg_tile_info)
 
 	if (code & 0xf800)
 	{
-		SET_TILE_INFO_MEMBER(0, code & 0x7ff, color & 0x7f, flags );
+		tileinfo.set(0, code & 0x7ff, color & 0x7f, flags );
 	}
 	else
 	{
-		SET_TILE_INFO_MEMBER(0, 0, 0x00, 0 );
+		tileinfo.set(0, 0, 0x00, 0 );
 		tileinfo.pen_data = m_blank_tile;
 	}
 

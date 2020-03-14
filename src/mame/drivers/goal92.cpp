@@ -223,7 +223,7 @@ WRITE_LINE_MEMBER(goal92_state::irqhandler)
 
 WRITE_LINE_MEMBER(goal92_state::goal92_adpcm_int)
 {
-	m_msm->write_data(m_msm5205next);
+	m_msm->data_w(m_msm5205next);
 	m_msm5205next >>= 4;
 	m_adpcm_toggle^= 1;
 

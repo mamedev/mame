@@ -179,13 +179,13 @@ TILE_GET_INFO_MEMBER(igs017_igs031_device::get_fg_tile_info)
 {
 	const u16 code = m_fg_videoram[tile_index * 4 + 0] + (m_fg_videoram[tile_index * 4 + 1] << 8);
 	const u16 attr = m_fg_videoram[tile_index * 4 + 2] + (m_fg_videoram[tile_index * 4 + 3] << 8);
-	SET_TILE_INFO_MEMBER(0, code, COLOR(attr), TILE_FLIPXY(attr >> 5));
+	tileinfo.set(0, code, COLOR(attr), TILE_FLIPXY(attr >> 5));
 }
 TILE_GET_INFO_MEMBER(igs017_igs031_device::get_bg_tile_info)
 {
 	const u16 code = m_bg_videoram[tile_index * 4 + 0] + (m_bg_videoram[tile_index * 4 + 1] << 8);
 	const u16 attr = m_bg_videoram[tile_index * 4 + 2] + (m_bg_videoram[tile_index * 4 + 3] << 8);
-	SET_TILE_INFO_MEMBER(0, code, COLOR(attr)+8, TILE_FLIPXY(attr >> 5));
+	tileinfo.set(0, code, COLOR(attr)+8, TILE_FLIPXY(attr >> 5));
 }
 
 void igs017_igs031_device::fg_w(offs_t offset, u8 data)

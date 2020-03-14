@@ -244,7 +244,7 @@ WRITE_LINE_MEMBER(de_2_state::ym2151_irq_w)
 
 WRITE_LINE_MEMBER(de_2_state::msm5205_irq_w)
 {
-	m_msm5205->write_data(m_sample_data >> 4);
+	m_msm5205->data_w(m_sample_data >> 4);
 	if(m_more_data)
 	{
 		if(m_nmi_enable)

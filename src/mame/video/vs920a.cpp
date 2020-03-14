@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(vs920a_text_tilemap_device::get_tile_info)
 	tileno = data & 0xFFF;
 	pal =   (data >> 12) & 0xF;
 
-	SET_TILE_INFO_MEMBER(m_gfx_region, tileno, m_pal_base + pal, 0);
+	tileinfo.set(m_gfx_region, tileno, m_pal_base + pal, 0);
 }
 
 WRITE16_MEMBER(vs920a_text_tilemap_device::vram_w)

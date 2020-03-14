@@ -63,15 +63,16 @@ public:
 		// are non-rendering and non-vblank.
 	};
 
-	virtual DECLARE_READ8_MEMBER( read );
-	virtual DECLARE_WRITE8_MEMBER( write );
-	virtual DECLARE_READ8_MEMBER( palette_read );
-	virtual DECLARE_WRITE8_MEMBER( palette_write );
+	virtual uint8_t read(offs_t offset);
+	virtual void write(offs_t offset, uint8_t data);
+	virtual uint8_t palette_read(offs_t offset);
+	virtual void palette_write(offs_t offset, uint8_t data);
 
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	auto int_callback() { return m_int_callback.bind(); }
 
 	/* routines */
+	rgb_t nespal_to_RGB(int color_intensity, int color_num);
 	virtual void init_palette();
 	void init_palette(bool indirect);
 	virtual uint32_t palette_entries() const override { return 4*16*8; }

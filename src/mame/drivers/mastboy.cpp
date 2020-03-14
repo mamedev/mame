@@ -595,7 +595,7 @@ WRITE8_MEMBER(mastboy_state::msm5205_data_w)
 
 WRITE_LINE_MEMBER(mastboy_state::adpcm_int)
 {
-	m_msm->write_data(m_m5205_next);
+	m_msm->data_w(m_m5205_next);
 	m_m5205_next >>= 4;
 
 	m_m5205_part ^= 1;

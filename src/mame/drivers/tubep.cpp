@@ -536,12 +536,12 @@ WRITE_LINE_MEMBER(tubep_state::rjammer_adpcm_vck)
 
 	if (m_ls74 == 1)
 	{
-		m_msm->write_data((m_ls377 >> 0) & 15);
+		m_msm->data_w((m_ls377 >> 0) & 15);
 		m_soundcpu->set_input_line(0, ASSERT_LINE);
 	}
 	else
 	{
-		m_msm->write_data((m_ls377 >> 4) & 15);
+		m_msm->data_w((m_ls377 >> 4) & 15);
 	}
 
 }

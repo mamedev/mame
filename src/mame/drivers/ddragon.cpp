@@ -440,13 +440,13 @@ void ddragon_state::dd_adpcm_int( int chip )
 	}
 	else if (m_adpcm_data[chip] != -1)
 	{
-		m_adpcm[chip]->write_data(m_adpcm_data[chip] & 0x0f);
+		m_adpcm[chip]->data_w(m_adpcm_data[chip] & 0x0f);
 		m_adpcm_data[chip] = -1;
 	}
 	else
 	{
 		m_adpcm_data[chip] = m_adpcm_rom[chip][m_adpcm_pos[chip]++];
-		m_adpcm[chip]->write_data(m_adpcm_data[chip] >> 4);
+		m_adpcm[chip]->data_w(m_adpcm_data[chip] >> 4);
 	}
 }
 
@@ -948,7 +948,7 @@ void ddragon_state::ddragon(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddragon_state::ddragon_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ddragon_state::ddragon_scanline), "screen", 0, 1);
 
-	HD63701(config, m_subcpu, MAIN_CLOCK / 2);  /* HD63701YOP, 6 MHz / 4 internally */
+	HD63701Y0(config, m_subcpu, MAIN_CLOCK / 2);  /* HD63701YOP, 6 MHz / 4 internally */
 	m_subcpu->set_addrmap(AS_PROGRAM, &ddragon_state::sub_map);
 
 	MC6809(config, m_soundcpu, MAIN_CLOCK / 2); /* HD68A09P, 6 MHz / 4 internally */

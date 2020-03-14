@@ -113,7 +113,7 @@ private:
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile1_info)
 {
 	uint16_t code = m_videoram1_buffer[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			0,
 			0);
@@ -122,7 +122,7 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile1_info)
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile2_info)
 {
 	uint16_t code = m_videoram2_buffer[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			1,
 			0);
@@ -131,7 +131,7 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile2_info)
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile3_info)
 {
 	uint16_t code = m_videoram3_buffer[tile_index];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code,
 			2,
 			0);

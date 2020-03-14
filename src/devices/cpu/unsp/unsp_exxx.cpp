@@ -9,10 +9,10 @@
 
 #include "unspdasm.h"
 
-#define LOG_UNSP_SHIFTS          (1U << 2)
 #define LOG_UNSP_MULS            (1U << 1)
+#define LOG_UNSP_SHIFTS          (1U << 2)
 
-#define VERBOSE             (0)
+#define VERBOSE             (LOG_UNSP_SHIFTS)
 
 #include "logmacro.h"
 
@@ -128,7 +128,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 			const uint16_t opb = op & 7;
 			m_core->m_icount -= 12;
 
-			LOGMASKED(LOG_UNSP_MULS, "%s: MUL su with %04x (signed) * %04x (unsigned) : ", machine().describe_context(), m_core->m_r[opa], m_core->m_r[opb]);
+			LOGMASKED(LOG_UNSP_MULS, "%s: MUL su with %04x (signed) * %04x (unsigned) (fra:%d) :\n", machine().describe_context(), m_core->m_r[opa], m_core->m_r[opb], m_core->m_fra);
 
 			uint32_t lres = m_core->m_r[opa] * m_core->m_r[opb];
 			if (m_core->m_r[opa] & 0x8000)
@@ -178,100 +178,103 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		switch (shift)
 		{
 		case 0x00:
-			LOGMASKED(LOG_UNSP_SHIFTS, "%s = %s asr %s\n", regs[rd], regs[rd], regs[rs]);
-			unimplemented_opcode(op);
-			return;
-
-		case 0x01: // jak_car2 on starting a game
 		{
-			LOGMASKED(LOG_UNSP_SHIFTS, "%s = %s asror %s\n", regs[rd], regs[rd], regs[rs]);
-			if (rd != 4) // 4 = R4 3 = R3 - the 'register bleeding' is only verified as needed between r3/r4, so bail for other regs until verified
-				unimplemented_opcode(op);
+			LOGMASKED(LOG_UNSP_SHIFTS, "%s = %s asr %s\n", regs[rd], regs[rd], regs[rs]);
 
-			uint32_t res = (uint16_t)(m_core->m_r[rd]);
+			uint32_t rdval = (uint16_t)(m_core->m_r[rd]);
 			int shift = (m_core->m_r[rs] & 0x01f);
-			res <<= 16;
+			if (shift == 0)
+				return;
 
-			if (res & 0x80000000)
+			uint32_t res;
+			if (BIT(rd, (32 - shift)))
 			{
-				res = res >> shift;
-				res |= (0xffffffff << (32 - shift));
-
-				m_core->m_r[rd] = (res >> 16);
-				m_core->m_r[rd - 1] |= (res & 0xffff); // register bleeding?
+				if (shift >= 16)
+				{
+					res = 0x0000ffff;
+				}
+				else
+				{
+					res = (rdval >> shift) | (uint16_t)(0xffff0000 >> shift);
+				}
 			}
 			else
 			{
-				res = res >> shift;
-				m_core->m_r[rd] = (res >> 16);
-				m_core->m_r[rd - 1] |= (res & 0xffff); // register bleeding?
+				if (shift >= 16)
+				{
+					res = 0;
+				}
+				else
+				{
+					res = rdval >> shift;
+				}
 			}
 
-			LOGMASKED(LOG_UNSP_SHIFTS, "result %04x\n", m_core->m_r[rd]);
+			LOGMASKED(LOG_UNSP_SHIFTS, "result: %08x\n", res);
+			m_core->m_r[rd] = res;
+			return;
+		}
+
+		case 0x01: // jak_car2 on starting a game
+		{
+			LOGMASKED(LOG_UNSP_SHIFTS, "%s = %s asror %s (%04x %04x)\n", regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+
+			const int32_t rdval = (int32_t)(m_core->m_r[rd] << 16);
+			const int shift = (m_core->m_r[rs] & 0x01f);
+			const uint32_t res = rdval >> shift;
+			m_core->m_r[REG_R3] |= (uint16_t)res;
+			m_core->m_r[REG_R4] |= (uint16_t)(res >> 16);
+			LOGMASKED(LOG_UNSP_SHIFTS, "result: %04x%04x\n", m_core->m_r[REG_R4], m_core->m_r[REG_R3]);
 			return;
 		}
 
 		case 0x02:
-			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsl %s (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
-
-			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) << (m_core->m_r[rs] & 0x01f));
-
-			LOGMASKED(LOG_UNSP_SHIFTS, "result %04x\n", m_core->m_r[rd]);
-
+		{
+			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsl %s (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			const uint32_t rdval = (uint16_t)(m_core->m_r[rd]);
+			const int shift = (m_core->m_r[rs] & 0x01f);
+			const uint32_t res = (uint16_t)(rdval << shift);
+			LOGMASKED(LOG_UNSP_SHIFTS, "result: %08x\n", res);
+			m_core->m_r[rd] = res;
 			return;
+		}
 
 		case 0x03:
 		{
 			// wrlshunt uses this
-			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lslor %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lslor %s  (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 
-			if (rd != 3) // 4 = R4 3 = R3 - the 'register bleeding' is only verified as needed between r3/r4, so bail for other regs until verified
-				unimplemented_opcode(op);
-
-			uint32_t res = (uint16_t)(m_core->m_r[rd]);
-
-			res <<= (m_core->m_r[rs] & 0x01f);
-
-			m_core->m_r[rd] = (res & 0xffff);
-			m_core->m_r[rd + 1] |= (res >> 16); // register bleeding?
-
-			LOGMASKED(LOG_UNSP_SHIFTS, "result %04x\n", m_core->m_r[rd]);
+			const uint32_t rdval = m_core->m_r[rd];
+			const int shift = (m_core->m_r[rs] & 0x01f);
+			const uint32_t res = rdval << shift;
+			m_core->m_r[REG_R3] = (uint16_t)res;
+			m_core->m_r[REG_R4] |= (uint16_t)(res >> 16);
+			LOGMASKED(LOG_UNSP_SHIFTS, "result: %04x%04x\n", m_core->m_r[REG_R4], m_core->m_r[REG_R3]);
 			return;
 		}
 
 		case 0x04:
-			// smartfp loops increasing shift by 4 up to values of 28? (but regs are 16-bit?)
-			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsr %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
-			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) >> (m_core->m_r[rs] & 0x1f));
-			LOGMASKED(LOG_UNSP_SHIFTS, "result %04x\n", m_core->m_r[rd]);
+		{
+			// smartfp loops increasing shift by 4 up to values of 28
+			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsr %s  (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+
+			const uint32_t rdval = (uint16_t)(m_core->m_r[rd]);
+			const int shift = (m_core->m_r[rs] & 0x01f);
+			const uint32_t res = (uint16_t)(rdval >> shift);
+			LOGMASKED(LOG_UNSP_SHIFTS, "result: %08x\n", res);
+			m_core->m_r[rd] = res;
 			return;
+		}
 
 		case 0x05:
 		{
-			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsror %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
-
-			if (rd != 4) // 4 = R4 3 = R3 - the 'register bleeding' is only verified as needed between r3/r4, so bail for other regs until verified
-				unimplemented_opcode(op);
-
-			uint32_t res = (uint16_t)(m_core->m_r[rd]);
-
-			res <<= 16;
-
-			res = res >> (m_core->m_r[rs] & 0x01f);
-
-			// register bleeding behavior needed (for example) in jak_cars2 nand browser when increasing upper digits of address
-			// TODO: check if I'm missing something becaus this doesn't really seem logical, maybe other code is meant to take care of those bits?
-			//  (although R3/R4 are the 'MR' register used for multiply stuff, so maybe there is some logic to this?)
-
-			// code attempts to put a 32-bit value in r4/r3 then shift it like this?
-			//3c990: e92a            r4 = r4 lsl r2
-			//3c991: e73a            r3 = r3 lslor r2
-
-			m_core->m_r[rd] = (res >> 16);
-			m_core->m_r[rd - 1] |= (res & 0xffff); // register bleeding?
-
-
-			LOGMASKED(LOG_UNSP_SHIFTS, "result %04x\n", m_core->m_r[rd]);
+			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsror %s  (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			const uint32_t rdval = m_core->m_r[rd] << 16;
+			const int shift = (m_core->m_r[rs] & 0x01f);
+			const uint32_t res = rdval >> shift;
+			m_core->m_r[REG_R3] |= (uint16_t)res;
+			m_core->m_r[REG_R4] = (uint16_t)(res >> 16);
+			LOGMASKED(LOG_UNSP_SHIFTS, "result: %04x%04x\n", m_core->m_r[REG_R4], m_core->m_r[REG_R3]);
 			return;
 		}
 

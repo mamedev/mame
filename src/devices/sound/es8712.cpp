@@ -177,7 +177,7 @@ void es8712_device::play()
  *
 ***********************************************************************************************/
 
-WRITE8_MEMBER(es8712_device::write)
+void es8712_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -200,7 +200,7 @@ WRITE8_MEMBER(es8712_device::write)
 	m_start &= 0xfffff; m_end &= 0xfffff;
 }
 
-READ8_MEMBER(es8712_device::read)
+uint8_t es8712_device::read(offs_t offset)
 {
 	// busy state (other bits unknown)
 	if (offset == 0)
@@ -209,12 +209,12 @@ READ8_MEMBER(es8712_device::read)
 	return 0;
 }
 
-WRITE8_MEMBER(es8712_device::msm_w)
+void es8712_device::msm_w(offs_t offset, uint8_t data)
 {
 	m_msm_write_cb(offset, data);
 }
 
-WRITE_LINE_MEMBER(es8712_device::msm_int)
+void es8712_device::msm_int(int state)
 {
 	if (!state || !m_playing)
 		return;

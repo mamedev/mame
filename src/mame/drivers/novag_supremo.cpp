@@ -16,8 +16,8 @@ Supremo also had a "limited edition" rerelease in 1990, plastic is fake-wood
 instead of black, otherwise it's the same game.
 
 TODO:
-- does not work, most likely due to incomplete cpu emulation
-  (extra I/O ports, unemulated timer registers)
+- does not work, most likely due to incomplete cpu emulation (unemulated timer registers)
+- is 1988 version the same ROM?
 
 ******************************************************************************/
 
@@ -78,7 +78,7 @@ void supremo_state::machine_start()
 
 void supremo_state::main_map(address_map &map)
 {
-	map(0x0000, 0x000e).rw(m_maincpu, FUNC(hd6303y_cpu_device::m6801_io_r), FUNC(hd6303y_cpu_device::m6801_io_w));
+	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6303y_cpu_device::hd6301y_io));
 	map(0x0040, 0x013f).ram(); // internal
 	map(0x4000, 0x47ff).ram();
 	map(0x8000, 0xffff).rom();
@@ -135,5 +135,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT     CLASS          INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1988, supremo, 0,      0,      supremo,  supremo, supremo_state, empty_init, "Novag", "Supremo", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1990, supremo, 0,      0,      supremo,  supremo, supremo_state, empty_init, "Novag", "Supremo - Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 

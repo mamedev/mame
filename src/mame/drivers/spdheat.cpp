@@ -85,7 +85,7 @@ TILE_GET_INFO_MEMBER(spdheat_state::get_fg_tile_info)
 	uint16_t data = m_fg_ram[screen][tile_index];
 	uint16_t code = data & 0x07ff;
 	uint16_t color = (data & 0x3800) >> 12;
-	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX((data & 0xc000) >> 14));
+	tileinfo.set(0, code, color, TILE_FLIPYX((data & 0xc000) >> 14));
 }
 
 

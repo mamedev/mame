@@ -39,6 +39,7 @@ alcat7100.cpp
 alesis.cpp
 alesis_qs.cpp
 alfaskop41xx.cpp
+alphajuno.cpp
 alphasma.cpp
 alphatpc16.cpp
 alphatpx.cpp
@@ -433,6 +434,9 @@ jupiter.cpp
 k1003.cpp
 k28.cpp
 k8915.cpp
+kawai_k1.cpp
+kawai_k4.cpp
+kawai_k5.cpp
 kaypro.cpp
 kc.cpp
 kdt6.cpp
@@ -745,8 +749,9 @@ riscpc.cpp
 rm380z.cpp
 rmnimbus.cpp
 roland_cm32p.cpp
-roland_d110.cpp
+roland_d10.cpp
 roland_d50.cpp
+roland_jx3p.cpp
 roland_mt32.cpp
 roland_r8.cpp
 roland_sc55.cpp
@@ -762,6 +767,7 @@ saitek_corona.cpp
 saitek_cp2000.cpp
 saitek_delta1.cpp
 saitek_mark5.cpp
+saitek_president.cpp
 saitek_risc2500.cpp
 saitek_ssystem3.cpp
 saitek_stratos.cpp

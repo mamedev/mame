@@ -76,7 +76,7 @@ private:
 	required_device<mc6809e_device> m_maincpu;
 	required_device<mc6809e_device> m_subcpu;
 	required_device<mc6809e_device> m_audiocpu;
-	required_device<hd63701_cpu_device> m_mcu;
+	required_device<hd63701v0_cpu_device> m_mcu;
 	required_device<namco_c116_device> m_c116;
 	required_device<namco_c117_device> m_c117;
 	required_device<namco_c123tmap_device> m_c123tmap;

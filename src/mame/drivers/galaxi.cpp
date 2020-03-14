@@ -139,31 +139,31 @@ private:
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg1_tile_info)
 {
 	uint16_t code = m_bg1_ram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, 0x10 + (code >> 12), 0);
+	tileinfo.set(0, code, 0x10 + (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg2_tile_info)
 {
 	uint16_t code = m_bg2_ram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, 0x10 + (code >> 12), 0);
+	tileinfo.set(0, code, 0x10 + (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg3_tile_info)
 {
 	uint16_t code = m_bg3_ram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, (code >> 12), 0);
+	tileinfo.set(0, code, (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg4_tile_info)
 {
 	uint16_t code = m_bg4_ram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, (code >> 12), 0);
+	tileinfo.set(0, code, (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_fg_tile_info)
 {
 	uint16_t code = m_fg_ram[tile_index];
-	SET_TILE_INFO_MEMBER(1, code, 0x20 + (code >> 12), 0);
+	tileinfo.set(1, code, 0x20 + (code >> 12), 0);
 }
 
 WRITE16_MEMBER(galaxi_state::bg1_w)

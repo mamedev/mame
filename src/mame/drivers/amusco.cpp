@@ -181,7 +181,7 @@ TILE_GET_INFO_MEMBER(amusco_state::get_bg_tile_info)
 	if (BIT(code, 15) && !m_blink_state)
 		code = 0;
 
-	SET_TILE_INFO_MEMBER(
+	tileinfo.set(
 							0 /* bank */,
 							code & 0x3ff,
 							color,

@@ -267,7 +267,7 @@ WRITE8_MEMBER(a7800_state::tia_w)
 			m_ctrl_reg = data;
 		}
 	}
-	m_tia->tia_sound_w(space, offset, data);
+	m_tia->tia_sound_w(offset, data);
 }
 
 

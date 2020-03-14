@@ -12,8 +12,8 @@
 #include "fr.h"
 #include "frdasm.h"
 
-// device type definitions
-DEFINE_DEVICE_TYPE(MB91101A, mb91101a_device, "mb91101a", "Fujitsu MB91101A")
+// device type definition
+DEFINE_DEVICE_TYPE(MB91F155A, mb91f155a_device, "mb91f155a", "Fujitsu MB91F155A")
 
 fr_cpu_device::fr_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int addrbits, address_map_constructor map)
 	: cpu_device(mconfig, type, tag, owner, clock)
@@ -30,9 +30,15 @@ fr_cpu_device::fr_cpu_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-mb91101a_device::mb91101a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: fr_cpu_device(mconfig, MB91101A, tag, owner, clock, 32, address_map_constructor())
+mb91f155a_device::mb91f155a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: fr_cpu_device(mconfig, MB91F155A, tag, owner, clock, 24, address_map_constructor(FUNC(mb91f155a_device::internal_map), this))
 {
+}
+
+void mb91f155a_device::internal_map(address_map &map)
+{
+	// TODO: I/O registers
+	map(0x001000, 0x008fff).ram();
 }
 
 std::unique_ptr<util::disasm_interface> fr_cpu_device::create_disassembler()

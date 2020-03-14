@@ -16,10 +16,10 @@ public:
 	auto irq() { return m_irq_cb.bind(); }
 	auto drq() { return m_drq_cb.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(dack_r);
-	DECLARE_WRITE8_MEMBER(dack_w);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t dack_r();
+	void dack_w(uint8_t data);
 
 protected:
 	virtual void device_start() override;

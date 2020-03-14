@@ -1644,6 +1644,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"pang3r1",     CPS_B_21_DEF, mapper_pang3 },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */   // should use one of these three CP1B1F,CP1B8K,CP1B9K
 	{"pang3j",      CPS_B_21_DEF, mapper_pang3 },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */   // should use one of these three CP1B1F,CP1B8K,CP1B9K
 	{"pang3b",      CPS_B_21_DEF, mapper_pang3 },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */   // should use one of these three CP1B1F,CP1B8K,CP1B9K
+	{"pang3b2",     CPS_B_21_DEF, mapper_pang3 },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */   // should use one of these three CP1B1F,CP1B8K,CP1B9K
 	{"ganbare",     CPS_B_21_DEF, mapper_sfzch },   // wrong, this set uses GBPR2, dumped but equations still not added
 
 	/* CPS Changer */
@@ -2193,14 +2194,14 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile0_info)
 	     should alternate between the left and right side of the 16x16 tiles */
 	gfxset = (tile_index & 0x20) >> 5;
 
-	SET_TILE_INFO_MEMBER(gfxset,
+	tileinfo.set(gfxset,
 			code,
 			(attr & 0x1f) + 0x20,
 			TILE_FLIPYX((attr & 0x60) >> 5));
 	tileinfo.group = (attr & 0x0180) >> 7;
 
 	// for out of range tiles, switch to fully transparent data
-	// (but still call SET_TILE_INFO_MEMBER, otherwise problems might occur on boot e.g. unsquad)
+	// (but still call tileinfo.set, otherwise problems might occur on boot e.g. unsquad)
 	if (code == -1)
 		tileinfo.pen_data = m_empty_tile;
 }
@@ -2212,7 +2213,7 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile1_info)
 
 	code = gfxrom_bank_mapper(GFXTYPE_SCROLL2, code);
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code,
 			(attr & 0x1f) + 0x40,
 			TILE_FLIPYX((attr & 0x60) >> 5));
@@ -2230,14 +2231,14 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile2_info)
 
 	code = gfxrom_bank_mapper(GFXTYPE_SCROLL3, code);
 
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			code,
 			(attr & 0x1f) + 0x60,
 			TILE_FLIPYX((attr & 0x60) >> 5));
 	tileinfo.group = (attr & 0x0180) >> 7;
 
 	// for out of range tiles, switch to fully transparent data
-	// (but still call SET_TILE_INFO_MEMBER, otherwise problems might occur on boot e.g. unsquad)
+	// (but still call tileinfo.set, otherwise problems might occur on boot e.g. unsquad)
 	if (code == -1)
 		tileinfo.pen_data = m_empty_tile;
 }

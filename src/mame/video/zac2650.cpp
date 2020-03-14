@@ -114,7 +114,7 @@ TILE_GET_INFO_MEMBER(zac2650_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 void zac2650_state::video_start()

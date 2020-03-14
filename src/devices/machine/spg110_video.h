@@ -27,6 +27,8 @@ public:
 		m_screen.set_tag(std::forward<U>(screen_tag));
 	}
 
+	void set_video_irq_spidman(bool is_spiderman) { m_is_spiderman = is_spiderman; }
+
 	void map_video(address_map &map);
 
 	double hue2rgb(double p, double q, double t);

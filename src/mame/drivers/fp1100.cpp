@@ -37,6 +37,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/upd7810/upd7810.h"
+#include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "video/mc6845.h"
 #include "sound/beep.h"
@@ -77,12 +78,8 @@ protected:
 private:
 	DECLARE_WRITE8_MEMBER(main_bank_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(main_to_sub_w);
-	DECLARE_READ8_MEMBER(sub_to_main_r);
 	DECLARE_WRITE8_MEMBER(slot_bank_w);
 	DECLARE_READ8_MEMBER(slot_id_r);
-	DECLARE_READ8_MEMBER(main_to_sub_r);
-	DECLARE_WRITE8_MEMBER(sub_to_main_w);
 	DECLARE_WRITE8_MEMBER(colour_control_w);
 	DECLARE_WRITE8_MEMBER(kbd_row_w);
 	DECLARE_WRITE8_MEMBER(porta_w);
@@ -100,8 +97,6 @@ private:
 	void handle_int_to_main();
 
 	uint8_t m_irq_mask;
-	uint8_t m_latch_main_to_sub;
-	uint8_t m_latch_sub_to_main;
 	uint8_t m_slot_num;
 	uint8_t m_kbd_row;
 	uint8_t m_col_border;
@@ -206,19 +201,6 @@ WRITE8_MEMBER( fp1100_state::irq_mask_w )
 	LOG("%s: IRQmask=%X\n",machine().describe_context(),data);
 }
 
-// send byte from main to latch
-WRITE8_MEMBER( fp1100_state::main_to_sub_w )
-{
-	LOG("%s: From main:%X\n",machine().describe_context(),data);
-	m_latch_main_to_sub = data;
-}
-
-READ8_MEMBER( fp1100_state::sub_to_main_r )
-{
-	LOG("%s: To main:%X\n",machine().describe_context(),m_latch_sub_to_main);
-	return m_latch_sub_to_main;
-}
-
 WRITE8_MEMBER( fp1100_state::slot_bank_w )
 {
 	m_slot_num = (data & 3) | (m_slot_num & 4);
@@ -242,23 +224,10 @@ void fp1100_state::io_map(address_map &map)
 	map.unmap_value_high();
 	//map(0x0000, 0xfeff) slot memory area
 	map(0xff00, 0xff7f).rw(FUNC(fp1100_state::slot_id_r), FUNC(fp1100_state::slot_bank_w));
-	map(0xff80, 0xffff).r(FUNC(fp1100_state::sub_to_main_r));
+	map(0xff80, 0xffff).r("sub2main", FUNC(generic_latch_8_device::read));
 	map(0xff80, 0xff9f).w(FUNC(fp1100_state::irq_mask_w));
 	map(0xffa0, 0xffbf).w(FUNC(fp1100_state::main_bank_w));
-	map(0xffc0, 0xffff).w(FUNC(fp1100_state::main_to_sub_w));
-}
-
-READ8_MEMBER( fp1100_state::main_to_sub_r )
-{
-	LOG("%s: To sub:%X\n",machine().describe_context(),m_latch_main_to_sub);
-	return m_latch_main_to_sub;
-}
-
-// send byte from sub to latch
-WRITE8_MEMBER( fp1100_state::sub_to_main_w )
-{
-	m_latch_sub_to_main = data;
-	LOG("%s: From sub:%X\n",machine().describe_context(),data);
+	map(0xffc0, 0xffff).w("main2sub", FUNC(generic_latch_8_device::write));
 }
 
 /*
@@ -301,7 +270,8 @@ void fp1100_state::sub_map(address_map &map)
 	map(0xe000, 0xe000).mirror(0x3fe).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xe001, 0xe001).mirror(0x3fe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0xe400, 0xe7ff).portr("DSW").w(FUNC(fp1100_state::kbd_row_w));
-	map(0xe800, 0xebff).rw(FUNC(fp1100_state::main_to_sub_r), FUNC(fp1100_state::sub_to_main_w));
+	map(0xe800, 0xebff).r("main2sub", FUNC(generic_latch_8_device::read));
+	map(0xe800, 0xebff).w("sub2main", FUNC(generic_latch_8_device::write));
 	map(0xec00, 0xefff).lw8(NAME([this] (u8 data) { m_subcpu->set_input_line(UPD7810_INTF0, CLEAR_LINE); }));
 	map(0xf000, 0xf3ff).w(FUNC(fp1100_state::colour_control_w));
 	map(0xf400, 0xff7f).rom().region("sub_ipl", 0x2400);
@@ -651,8 +621,6 @@ void fp1100_state::machine_reset()
 	membank("bankw0")->set_entry(0); // always write to ram
 
 	m_irq_mask = 0;
-	m_latch_sub_to_main = 0;
-	m_latch_main_to_sub = 0;
 	m_slot_num = 0;
 	m_kbd_row = 0;
 	m_col_border = 0;
@@ -690,6 +658,9 @@ void fp1100_state::fp1100(machine_config &config)
 	sub.pc_in_cb().set(FUNC(fp1100_state::portc_r));
 	sub.pc_out_cb().set(FUNC(fp1100_state::portc_w));
 	sub.txd_func().set([this] (bool state) { m_cassbit = state; });
+
+	GENERIC_LATCH_8(config, "main2sub");
+	GENERIC_LATCH_8(config, "sub2main");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

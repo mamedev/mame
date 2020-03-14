@@ -239,7 +239,7 @@ void msm5205_device::update_adpcm()
  *    Handle an update of the VCK status of a chip (1 is reset ON, 0 is reset OFF)
  *    This function can use selector = MSM5205_SEX only
  */
-WRITE_LINE_MEMBER(msm5205_device::vclk_w)
+void msm5205_device::vclk_w(int state)
 {
 	if (get_prescaler() != 0)
 		logerror("Error: vclk_w() called but VCK selected master mode\n");
@@ -255,7 +255,7 @@ WRITE_LINE_MEMBER(msm5205_device::vclk_w)
  *    Handle an update of the reset status of a chip (1 is reset ON, 0 is reset OFF)
  */
 
-WRITE_LINE_MEMBER(msm5205_device::reset_w)
+void msm5205_device::reset_w(int state)
 {
 	m_reset = state;
 }
@@ -264,7 +264,7 @@ WRITE_LINE_MEMBER(msm5205_device::reset_w)
  *    Handle an update of the data to the chip
  */
 
-void msm5205_device::write_data(int data)
+void msm5205_device::data_w(uint8_t data)
 {
 	if (m_bitwidth == 4)
 		m_data = data & 0x0f;
@@ -311,7 +311,7 @@ void msm5205_device::playmode_w(int select)
 	}
 }
 
-WRITE_LINE_MEMBER(msm5205_device::s1_w)
+void msm5205_device::s1_w(int state)
 {
 	if (m_s1 != bool(state))
 	{
@@ -321,7 +321,7 @@ WRITE_LINE_MEMBER(msm5205_device::s1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(msm5205_device::s2_w)
+void msm5205_device::s2_w(int state)
 {
 	if (m_s2 != bool(state))
 	{

@@ -92,7 +92,7 @@ TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_1)
 {
 	uint8_t *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6);
 
-	SET_TILE_INFO_MEMBER(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
+	tileinfo.set(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
 }
 
 
@@ -100,13 +100,13 @@ TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_2)
 {
 	uint8_t *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6) + 0x80;
 
-	SET_TILE_INFO_MEMBER(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
+	tileinfo.set(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
 }
 
 
 TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_FG)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
+	tileinfo.set(0, m_videoram[tile_index], 0, 0);
 }
 
 WRITE8_MEMBER(madalien_state::madalien_videoram_w)

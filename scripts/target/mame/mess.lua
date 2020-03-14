@@ -431,7 +431,7 @@ MACHINES["8530SCC"] = true
 MACHINES["AAKARTDEV"] = true
 MACHINES["ACIA6850"] = true
 MACHINES["ACORN_VIDC"] = true
---MACHINES["ADC0804"] = true
+MACHINES["ADC0804"] = true
 MACHINES["ADC0808"] = true
 MACHINES["ADC083X"] = true
 MACHINES["ADC1038"] = true
@@ -1183,6 +1183,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"intv",
 		"isc",
 		"jazz",
+		"kawai",
 		"kaypro",
 		"koei",
 		"kontron",
@@ -2605,6 +2606,13 @@ files {
 	MAME_DIR .. "src/mame/machine/mct_adr.h",
 }
 
+createMESSProjects(_target, _subtarget, "kawai")
+files {
+	MAME_DIR .. "src/mame/drivers/kawai_k1.cpp",
+	MAME_DIR .. "src/mame/drivers/kawai_k4.cpp",
+	MAME_DIR .. "src/mame/drivers/kawai_k5.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "kaypro")
 files {
 	MAME_DIR .. "src/mame/drivers/kaypro.cpp",
@@ -3229,14 +3237,17 @@ files {
 
 createMESSProjects(_target, _subtarget, "roland")
 files {
+	MAME_DIR .. "src/mame/drivers/alphajuno.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_cm32p.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_d10.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_d50.cpp",
-	MAME_DIR .. "src/mame/drivers/roland_d110.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_jx3p.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_mt32.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_r8.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_sc55.cpp",
 	MAME_DIR .. "src/mame/drivers/tb303.cpp",
 	MAME_DIR .. "src/mame/drivers/tr606.cpp",
+	MAME_DIR .. "src/mame/machine/pg200.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "rolm")
@@ -3264,6 +3275,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/saitek_cp2000.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_delta1.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_mark5.cpp",
+	MAME_DIR .. "src/mame/drivers/saitek_president.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_risc2500.cpp",
 	MAME_DIR .. "src/mame/includes/saitek_stratos.h",
 	MAME_DIR .. "src/mame/drivers/saitek_ssystem3.cpp",

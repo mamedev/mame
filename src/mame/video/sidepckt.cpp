@@ -54,7 +54,7 @@ void sidepckt_state::sidepckt_palette(palette_device &palette) const
 TILE_GET_INFO_MEMBER(sidepckt_state::get_tile_info)
 {
 	uint8_t attr = m_colorram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[tile_index] + ((attr & 0x07) << 8),
 			((attr & 0x10) >> 3) | ((attr & 0x20) >> 5),
 			TILE_FLIPX);

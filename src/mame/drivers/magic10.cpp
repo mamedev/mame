@@ -229,7 +229,7 @@ WRITE16_MEMBER(magic10_state::layer2_videoram_w)
 
 TILE_GET_INFO_MEMBER(magic10_state::get_layer0_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 		m_layer0_videoram[tile_index * 2],
 		m_layer0_videoram[tile_index * 2 + 1] & 0x0f,
 		TILE_FLIPYX((m_layer0_videoram[tile_index * 2 + 1] & 0xc0) >> 6));
@@ -237,7 +237,7 @@ TILE_GET_INFO_MEMBER(magic10_state::get_layer0_tile_info)
 
 TILE_GET_INFO_MEMBER(magic10_state::get_layer1_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 		m_layer1_videoram[tile_index * 2],
 		m_layer1_videoram[tile_index * 2 + 1] & 0x0f,
 		TILE_FLIPYX((m_layer1_videoram[tile_index * 2 + 1] & 0xc0) >> 6));
@@ -245,7 +245,7 @@ TILE_GET_INFO_MEMBER(magic10_state::get_layer1_tile_info)
 
 TILE_GET_INFO_MEMBER(magic10_state::get_layer2_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		m_layer2_videoram[tile_index * 2],
 		m_layer2_videoram[tile_index * 2 + 1] & 0x0f,0);
 }

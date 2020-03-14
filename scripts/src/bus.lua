@@ -3142,6 +3142,8 @@ if (BUSES["TI99"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99/peb/peribox.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/bwg.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/peb/bwg.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/cc_fdc.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/cc_fdc.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/evpc.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/peb/evpc.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/hfdc.cpp",

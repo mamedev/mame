@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(appoooh_state::get_fg_tile_info)
 {
 	int code = m_fg_videoram[tile_index] + 256 * ((m_fg_colorram[tile_index] >> 5) & 7);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			m_fg_colorram[tile_index] & 0x0f,
 			(m_fg_colorram[tile_index] & 0x10 ) ? TILEMAP_FLIPX : 0
@@ -109,7 +109,7 @@ TILE_GET_INFO_MEMBER(appoooh_state::get_bg_tile_info)
 {
 	int code = m_bg_videoram[tile_index] + 256 * ((m_bg_colorram[tile_index] >> 5) & 7);
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			m_bg_colorram[tile_index] & 0x0f,
 			(m_bg_colorram[tile_index] & 0x10 ) ? TILEMAP_FLIPX : 0

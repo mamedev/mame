@@ -1478,7 +1478,7 @@ void rmnimbus_state::rmni_sound_reset()
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_porta_w)
 {
-	m_msm->write_data(data);
+	m_msm->data_w(data);
 
 	// Mouse code needs a copy of this.
 	m_ay8910_a=data;

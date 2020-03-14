@@ -162,7 +162,7 @@ WRITE_LINE_MEMBER(fromance_state::fromance_adpcm_int)
 	/* clock the data through */
 	if (m_vclk_left)
 	{
-		m_msm->write_data(m_adpcm_data >> 4);
+		m_msm->data_w(m_adpcm_data >> 4);
 		m_adpcm_data <<= 4;
 		m_vclk_left--;
 	}

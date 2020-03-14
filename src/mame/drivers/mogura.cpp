@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(mogura_state::get_mogura_tile_info)
 	int code = m_tileram[tile_index];
 	int attr = m_tileram[tile_index + 0x800];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			(attr >> 1) & 7,
 			0);

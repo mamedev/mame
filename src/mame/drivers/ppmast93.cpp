@@ -344,7 +344,7 @@ GFXDECODE_END
 TILE_GET_INFO_MEMBER(ppmast93_state::get_bg_tile_info)
 {
 	int code = (m_bgram[tile_index*2+1] << 8) | m_bgram[tile_index*2];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code & 0x0fff,
 			(code & 0xf000) >> 12,
 			0);
@@ -353,7 +353,7 @@ TILE_GET_INFO_MEMBER(ppmast93_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(ppmast93_state::get_fg_tile_info)
 {
 	int code = (m_fgram[tile_index*2+1] << 8) | m_fgram[tile_index*2];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code & 0x0fff)+0x1000,
 			(code & 0xf000) >> 12,
 			0);

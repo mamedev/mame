@@ -124,6 +124,7 @@ public:
 	DECLARE_READ16_MEMBER(spriteram_r);
 
 	DECLARE_READ16_MEMBER(video_7051_r);
+	DECLARE_READ16_MEMBER(video_70e0_r);
 	
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 

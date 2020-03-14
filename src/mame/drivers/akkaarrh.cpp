@@ -157,7 +157,7 @@ TILE_GET_INFO_MEMBER(akkaarrh_state::get_tile_info)
 {
 	int data = m_videoram[tile_index];
 	int data2 = m_videoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(0, data, data2 & 0xf, TILE_FLIPYX(data2 >> 6));
+	tileinfo.set(0, data, data2 & 0xf, TILE_FLIPYX(data2 >> 6));
 }
 
 WRITE8_MEMBER(akkaarrh_state::videoram_w)

@@ -483,7 +483,7 @@ TILE_GET_INFO_MEMBER(galaxian_state::bg_get_tile_info)
 	if (m_extend_tile_info_ptr != nullptr)
 		(this->*m_extend_tile_info_ptr)(&code, &color, attrib, x);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 

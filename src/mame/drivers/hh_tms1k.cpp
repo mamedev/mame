@@ -9300,7 +9300,7 @@ void speechp_state::update_display()
 WRITE16_MEMBER(speechp_state::write_r)
 {
 	// R5-R9: TSI C0-C5
-	m_speech->data_w(space, 0, data >> 5 & 0x3f);
+	m_speech->data_w(data >> 5 & 0x3f);
 
 	// R10: TSI START line
 	m_speech->start_w(data >> 10 & 1);

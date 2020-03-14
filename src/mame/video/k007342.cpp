@@ -280,7 +280,7 @@ void k007342_device::get_tile_info( tile_data &tileinfo, int tile_index, int lay
 		m_callback(layer, m_regs[1], &code, &color, &flags);
 
 
-	SET_TILE_INFO_MEMBER(m_gfxnum,
+	tileinfo.set(m_gfxnum,
 			code,
 			color,
 			flags);

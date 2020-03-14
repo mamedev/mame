@@ -21,7 +21,7 @@ WRITE8_MEMBER(_4enraya_state::fenraya_videoram_w)
 TILE_GET_INFO_MEMBER(_4enraya_state::get_tile_info)
 {
 	int code = m_videoram[tile_index * 2] + (m_videoram[tile_index * 2 + 1] << 8);
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 void _4enraya_state::video_start()

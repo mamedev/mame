@@ -242,7 +242,7 @@ device_memory_interface::space_config_vector sed1330_device::memory_space_config
 //  status_r -
 //-------------------------------------------------
 
-READ8_MEMBER( sed1330_device::status_r )
+uint8_t sed1330_device::status_r()
 {
 	if (!machine().side_effects_disabled())
 		LOG("SED1330 Status Read: %s\n", m_bf ? "busy" : "ready");
@@ -255,7 +255,7 @@ READ8_MEMBER( sed1330_device::status_r )
 //  command_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( sed1330_device::command_w )
+void sed1330_device::command_w(uint8_t data)
 {
 	m_ir = data;
 	m_pbc = 0;
@@ -288,7 +288,7 @@ WRITE8_MEMBER( sed1330_device::command_w )
 //  data_r -
 //-------------------------------------------------
 
-READ8_MEMBER( sed1330_device::data_r )
+uint8_t sed1330_device::data_r()
 {
 	uint8_t data = 0;
 
@@ -337,7 +337,7 @@ READ8_MEMBER( sed1330_device::data_r )
 //  data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( sed1330_device::data_w )
+void sed1330_device::data_w(uint8_t data)
 {
 	switch (m_ir)
 	{

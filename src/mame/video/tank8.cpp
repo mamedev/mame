@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(tank8_state::get_tile_info)
 			color |= 4;
 	}
 
-	SET_TILE_INFO_MEMBER(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
+	tileinfo.set(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 

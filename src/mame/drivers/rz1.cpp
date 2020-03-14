@@ -232,12 +232,12 @@ READ8_MEMBER( rz1_state::upd934g_b_data_r )
 
 WRITE8_MEMBER( rz1_state::upd934g_c_w )
 {
-	m_pg[0]->write(space, offset >> 8, data);
+	m_pg[0]->write(offset >> 8, data);
 }
 
 WRITE8_MEMBER( rz1_state::upd934g_b_w )
 {
-	m_pg[1]->write(space, offset >> 8, data);
+	m_pg[1]->write(offset >> 8, data);
 }
 
 READ8_MEMBER( rz1_state::port_a_r )

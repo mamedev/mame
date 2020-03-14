@@ -240,7 +240,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_cobracom_fix_tile_info)
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0xe000) >> 13;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile & 0xfff,
 			color,
 			0);
@@ -274,7 +274,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_ghostb_fix_tile_info)
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0xc00) >> 10;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile & 0x3ff,
 			color,
 			0);
@@ -316,7 +316,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_oscar_fix_tile_info)
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0xf000) >> 14;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile&0xfff,
 			color,
 			0);
@@ -377,7 +377,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_lastmisn_tile_info)
 	else
 		tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile & 0xfff,
 			color,
 			0);
@@ -389,7 +389,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_lastmisn_fix_tile_info)
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0xc000) >> 14;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile&0xfff,
 			color,
 			0);
@@ -437,7 +437,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_fix_tile_info)
 
 	tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -452,7 +452,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_tile_info)
 	tile = tile & 0x3ff;
 	bank = (tile / 0x100) + 2;
 
-	SET_TILE_INFO_MEMBER(bank,
+	tileinfo.set(bank,
 			tile,
 			color,
 			0);
@@ -511,7 +511,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_gondo_fix_tile_info)
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0x7000) >> 12;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile&0xfff,
 			color,
 			0);
@@ -528,7 +528,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_gondo_tile_info)
 	else
 		tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile&0xfff,
 			color,
 			0);

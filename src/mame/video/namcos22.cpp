@@ -1751,7 +1751,7 @@ TILE_GET_INFO_MEMBER(namcos22_state::get_text_tile_info)
 	* ----.xx--.----.---- flip
 	* ----.--xx.xxxx.xxxx code
 	*/
-	SET_TILE_INFO_MEMBER(0, data & 0x03ff, data >> 12, TILE_FLIPYX((data & 0x0c00) >> 10));
+	tileinfo.set(0, data & 0x03ff, data >> 12, TILE_FLIPYX((data & 0x0c00) >> 10));
 }
 
 WRITE32_MEMBER(namcos22_state::namcos22_textram_w)

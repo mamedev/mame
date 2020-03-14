@@ -508,7 +508,7 @@ void megasys1_state::p47b_adpcm_w(offs_t offset, u8 data)
 {
 	// bit 6 is always set
 	m_p47b_adpcm[offset]->reset_w(BIT(data, 7));
-	m_p47b_adpcm[offset]->write_data(data & 0x0f);
+	m_p47b_adpcm[offset]->data_w(data & 0x0f);
 	m_p47b_adpcm[offset]->vclk_w(1);
 	m_p47b_adpcm[offset]->vclk_w(0);
 }

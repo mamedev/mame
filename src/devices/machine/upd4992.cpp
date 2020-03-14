@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(UPD4992, upd4992_device, "upd4992", "uPD4992 RTC")
 //  upd4992_device - constructor
 //-------------------------------------------------
 
-upd4992_device::upd4992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+upd4992_device::upd4992_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, UPD4992, tag, owner, clock)
 	, device_rtc_interface(mconfig, *this)
 	, m_timer_clock(nullptr)
@@ -114,12 +114,12 @@ xxxx ---- Mode register
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( upd4992_device::read )
+u8 upd4992_device::read(offs_t offset)
 {
 	return m_rtc_regs[offset];
 }
 
-WRITE8_MEMBER( upd4992_device::write )
+void upd4992_device::write(offs_t offset, u8 data)
 {
 	if(offset == 7)
 	{

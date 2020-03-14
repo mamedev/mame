@@ -648,7 +648,7 @@ void cdp1869_device::draw_char(bitmap_rgb32 &bitmap, const rectangle &rect, int 
 //  out3_w - register 3 write
 //-------------------------------------------------
 
-WRITE8_MEMBER( cdp1869_device::out3_w )
+void cdp1869_device::out3_w(uint8_t data)
 {
 	/*
 	  bit   description
@@ -675,7 +675,7 @@ WRITE8_MEMBER( cdp1869_device::out3_w )
 //  out4_w - register 4 write
 //-------------------------------------------------
 
-WRITE8_MEMBER( cdp1869_device::out4_w )
+void cdp1869_device::out4_w(offs_t offset)
 {
 	/*
 	  bit   description
@@ -711,7 +711,7 @@ WRITE8_MEMBER( cdp1869_device::out4_w )
 //  out5_w - register 5 write
 //-------------------------------------------------
 
-WRITE8_MEMBER( cdp1869_device::out5_w )
+void cdp1869_device::out5_w(offs_t offset)
 {
 	/*
 	  bit   description
@@ -760,7 +760,7 @@ WRITE8_MEMBER( cdp1869_device::out5_w )
 //  out6_w - register 6 write
 //-------------------------------------------------
 
-WRITE8_MEMBER( cdp1869_device::out6_w )
+void cdp1869_device::out6_w(offs_t offset)
 {
 	/*
 	  bit   description
@@ -791,7 +791,7 @@ WRITE8_MEMBER( cdp1869_device::out6_w )
 //  out7_w - register 7 write
 //-------------------------------------------------
 
-WRITE8_MEMBER( cdp1869_device::out7_w )
+void cdp1869_device::out7_w(offs_t offset)
 {
 	/*
 	  bit   description
@@ -822,7 +822,7 @@ WRITE8_MEMBER( cdp1869_device::out7_w )
 //  char_ram_r - character RAM read
 //-------------------------------------------------
 
-READ8_MEMBER( cdp1869_device::char_ram_r )
+uint8_t cdp1869_device::char_ram_r(offs_t offset)
 {
 	uint8_t cma = offset & 0x0f;
 	uint16_t pma;
@@ -851,7 +851,7 @@ READ8_MEMBER( cdp1869_device::char_ram_r )
 //  char_ram_w - character RAM write
 //-------------------------------------------------
 
-WRITE8_MEMBER( cdp1869_device::char_ram_w )
+void cdp1869_device::char_ram_w(offs_t offset, uint8_t data)
 {
 	uint8_t cma = offset & 0x0f;
 	uint16_t pma;
@@ -880,7 +880,7 @@ WRITE8_MEMBER( cdp1869_device::char_ram_w )
 //  page_ram_r - page RAM read
 //-------------------------------------------------
 
-READ8_MEMBER( cdp1869_device::page_ram_r )
+uint8_t cdp1869_device::page_ram_r(offs_t offset)
 {
 	uint16_t pma;
 
@@ -901,7 +901,7 @@ READ8_MEMBER( cdp1869_device::page_ram_r )
 //  page_ram_w - page RAM write
 //-------------------------------------------------
 
-WRITE8_MEMBER( cdp1869_device::page_ram_w )
+void cdp1869_device::page_ram_w(offs_t offset, uint8_t data)
 {
 	uint16_t pma;
 
@@ -922,7 +922,7 @@ WRITE8_MEMBER( cdp1869_device::page_ram_w )
 //  page_ram_w - predisplay
 //-------------------------------------------------
 
-READ_LINE_MEMBER( cdp1869_device::predisplay_r )
+int cdp1869_device::predisplay_r()
 {
 	return m_prd;
 }
@@ -932,7 +932,7 @@ READ_LINE_MEMBER( cdp1869_device::predisplay_r )
 //  pal_ntsc_r - PAL/NTSC
 //-------------------------------------------------
 
-READ_LINE_MEMBER( cdp1869_device::pal_ntsc_r )
+int cdp1869_device::pal_ntsc_r()
 {
 	return m_read_pal_ntsc();
 }

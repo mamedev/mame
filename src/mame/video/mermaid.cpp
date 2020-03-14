@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(mermaid_state::get_bg_tile_info)
 	int sx = tile_index % 32;
 	int color = (sx >= 26) ? 0 : 1;
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	tileinfo.set(2, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(mermaid_state::get_fg_tile_info)
@@ -151,7 +151,7 @@ TILE_GET_INFO_MEMBER(mermaid_state::get_fg_tile_info)
 	code |= m_rougien_gfxbank1 * 0x2800;
 	code |= m_rougien_gfxbank2 * 0x2400;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 void mermaid_state::video_start()

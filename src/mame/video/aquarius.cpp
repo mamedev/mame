@@ -62,7 +62,7 @@ TILE_GET_INFO_MEMBER(aquarius_state::aquarius_gettileinfo)
 	int color = m_colorram[tile_index];
 	int flags = 0;
 
-	SET_TILE_INFO_MEMBER(bank, code, color, flags);
+	tileinfo.set(bank, code, color, flags);
 }
 
 void aquarius_state::video_start()

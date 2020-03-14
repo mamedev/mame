@@ -336,7 +336,7 @@ WRITE_LINE_MEMBER( pce_cd_device::msm5205_int )
 	/* Supply new ADPCM data */
 	msm_data = (m_msm_nibble) ? (m_adpcm_ram[m_msm_start_addr] & 0x0f) : ((m_adpcm_ram[m_msm_start_addr] & 0xf0) >> 4);
 
-	m_msm->write_data(msm_data);
+	m_msm->data_w(msm_data);
 	m_msm_nibble ^= 1;
 
 	if (m_msm_nibble == 0)

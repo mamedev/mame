@@ -297,7 +297,7 @@ void astrocade_io_device::state_save_register()
  *
  *************************************/
 
-WRITE8_MEMBER(astrocade_io_device::write)
+void astrocade_io_device::write(offs_t offset, uint8_t data)
 {
 	if ((offset & 8) != 0)
 		offset = (offset >> 8) & 7;
@@ -312,14 +312,14 @@ WRITE8_MEMBER(astrocade_io_device::write)
 }
 
 
-READ8_MEMBER(astrocade_io_device::read)
+uint8_t astrocade_io_device::read(offs_t offset)
 {
 	if ((offset & 0x0f) < 0x08)
 	{
 		if (!machine().side_effects_disabled())
-			m_so_callback[offset & 7](space, 0, offset >> 8);
+			m_so_callback[offset & 7](0, offset >> 8);
 
-		return m_si_callback(space, offset & 7);
+		return m_si_callback(offset & 7);
 	}
 	else if ((offset & 0x0f) >= 0x0c)
 		return m_pots[offset & 3]();

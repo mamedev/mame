@@ -19,7 +19,7 @@
 TILE_GET_INFO_MEMBER(kyugo_state::get_fg_tile_info)
 {
 	int code = m_fgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 					code,
 					2 * m_color_codes[code >> 3] + m_fgcolor,
 					0);
@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(kyugo_state::get_bg_tile_info)
 {
 	int code = m_bgvideoram[tile_index];
 	int attr = m_bgattribram[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 					code | ((attr & 0x03) << 8),
 					(attr >> 4) | (m_bgpalbank << 4),
 					TILE_FLIPYX((attr & 0x0c) >> 2));

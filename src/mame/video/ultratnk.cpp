@@ -39,9 +39,9 @@ TILE_GET_INFO_MEMBER(ultratnk_state::tile_info)
 	uint8_t code = m_videoram[tile_index];
 
 	if (code & 0x20)
-		SET_TILE_INFO_MEMBER(0, code, code >> 6, 0);
+		tileinfo.set(0, code, code >> 6, 0);
 	else
-		SET_TILE_INFO_MEMBER(0, code, 4, 0);
+		tileinfo.set(0, code, 4, 0);
 }
 
 

@@ -80,7 +80,7 @@ TILE_GET_INFO_MEMBER(tigeroad_state::get_bg_tile_info)
 	int color = attr & 0x0f;
 	int flags = (attr & 0x20) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 	tileinfo.group = (attr & 0x10) ? 1 : 0;
 }
 
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(tigeroad_state::get_fg_tile_info)
 	int color = attr & 0x0f;
 	int flags = (attr & 0x10) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 TILEMAP_MAPPER_MEMBER(tigeroad_state::tigeroad_tilemap_scan)

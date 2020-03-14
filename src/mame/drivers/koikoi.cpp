@@ -105,7 +105,7 @@ TILE_GET_INFO_MEMBER(koikoi_state::get_tile_info)
 	int color = (m_videoram[tile_index + 0x400] & 0x1f);
 	int flip  = (m_videoram[tile_index + 0x400] & 0x80) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flip);
+	tileinfo.set(0, code, color, flip);
 }
 
 void koikoi_state::koikoi_palette(palette_device &palette) const

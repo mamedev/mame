@@ -22,7 +22,7 @@ TILE_GET_INFO_MEMBER(angelkds_state::get_tx_tile_info)
 	int tileno;
 
 	tileno = m_txvideoram[tile_index] + (m_txbank * 0x100);
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	tileinfo.set(0, tileno, 0, 0);
 }
 
 WRITE8_MEMBER(angelkds_state::angelkds_txvideoram_w)
@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(angelkds_state::get_bgtop_tile_info)
 	tileno = m_bgtopvideoram[tile_index];
 
 	tileno += m_bgtopbank * 0x100 ;
-	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);
+	tileinfo.set(1, tileno, 0, 0);
 }
 
 WRITE8_MEMBER(angelkds_state::angelkds_bgtopvideoram_w)
@@ -85,7 +85,7 @@ TILE_GET_INFO_MEMBER(angelkds_state::get_bgbot_tile_info)
 	tileno = m_bgbotvideoram[tile_index];
 
 	tileno += m_bgbotbank * 0x100 ;
-	SET_TILE_INFO_MEMBER(2, tileno, 1, 0);
+	tileinfo.set(2, tileno, 1, 0);
 }
 
 WRITE8_MEMBER(angelkds_state::angelkds_bgbotvideoram_w)

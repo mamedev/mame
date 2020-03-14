@@ -205,7 +205,6 @@ void wy100_state::wy100(machine_config &config)
 	m_maincpu->p1_out_cb().append("spkrgate", FUNC(input_merger_device::in_w<0>)).bit(7);
 	m_maincpu->p2_out_cb().set(FUNC(wy100_state::p2_w));
 	m_maincpu->t0_in_cb().set("keyboard", FUNC(wy100_keyboard_device::sense_r)).invert();
-	//m_maincpu->t1_in_cb().set(m_pci, FUNC(mc2661_device::rxrdy_r)).invert();
 	m_maincpu->t1_in_cb().set(m_pci, FUNC(scn2651_device::rxrdy_r));
 
 	WY100_KEYBOARD(config, "keyboard");

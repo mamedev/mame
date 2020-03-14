@@ -130,14 +130,14 @@ TILE_GET_INFO_MEMBER(lbeach_state::get_bg_tile_info)
 	// d6,d7: color
 	uint8_t code = m_bg_vram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1, code & 0x1f, code >> 6 & 3, 0);
+	tileinfo.set(1, code & 0x1f, code >> 6 & 3, 0);
 }
 
 TILE_GET_INFO_MEMBER(lbeach_state::get_fg_tile_info)
 {
 	uint8_t code = m_fg_vram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 void lbeach_state::video_start()

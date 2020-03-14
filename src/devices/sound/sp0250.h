@@ -12,7 +12,7 @@ public:
 
 	auto drq() { return m_drq.bind(); }
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(uint8_t data);
 	uint8_t drq_r();
 
 protected:

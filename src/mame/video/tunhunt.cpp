@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(tunhunt_state::get_fg_tile_info)
 	int color = attr >> 6;
 	int flags = color ? TILE_FORCE_LAYER0 : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 void tunhunt_state::video_start()

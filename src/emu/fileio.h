@@ -106,9 +106,6 @@ public:
 
 	// open/close
 	osd_file::error open(const std::string &name);
-	osd_file::error open(const std::string &name1, const std::string &name2);
-	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3);
-	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4);
 	osd_file::error open(const std::string &name, u32 crc);
 	osd_file::error open(const std::string &name1, const std::string &name2, u32 crc);
 	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, u32 crc);

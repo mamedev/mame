@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(suna8_state::get_tile_info)
 		code = m_spriteram[ 2 * tile_index + 0 ];
 		attr = m_spriteram[ 2 * tile_index + 1 ];
 	}
-	SET_TILE_INFO_MEMBER(m_page / 8,
+	tileinfo.set(m_page / 8,
 			( (attr & 0x03) << 8 ) + code + m_tiles*0x400,
 			(attr >> 2) & 0xf,
 			TILE_FLIPYX( (attr >> 6) & 3 ));

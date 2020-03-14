@@ -18,7 +18,7 @@ void st0016_cpu_device::st0016_cpu_internal_map(address_map &map)
 	map(0xd000, 0xdfff).r(FUNC(st0016_cpu_device::st0016_sprite2_ram_r)).w(FUNC(st0016_cpu_device::st0016_sprite2_ram_w));
 	map(0xea00, 0xebff).r(FUNC(st0016_cpu_device::st0016_palette_ram_r)).w(FUNC(st0016_cpu_device::st0016_palette_ram_w));
 	map(0xec00, 0xec1f).r(FUNC(st0016_cpu_device::st0016_character_ram_r)).w(FUNC(st0016_cpu_device::st0016_character_ram_w));
-	map(0xe900, 0xe9ff).rw("stsnd", FUNC(st0016_device::st0016_snd_r), FUNC(st0016_device::st0016_snd_w)); /* sound regs 8 x $20 bytes, see notes */
+	map(0xe900, 0xe9ff).rw("stsnd", FUNC(st0016_device::snd_r), FUNC(st0016_device::snd_w)); /* sound regs 8 x $20 bytes, see notes */
 }
 
 

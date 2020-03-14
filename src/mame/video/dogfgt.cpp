@@ -53,7 +53,7 @@ void dogfgt_state::dogfgt_palette(palette_device &palette) const
 
 TILE_GET_INFO_MEMBER(dogfgt_state::get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_bgvideoram[tile_index],
 			m_bgvideoram[tile_index + 0x400] & 0x03,
 			0);

@@ -1914,17 +1914,14 @@ void screen_device::finalize_burnin()
 
 	// compute the name and create the file
 	emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	osd_file::error filerr = file.open(machine().basename(), PATH_SEPARATOR "burnin-", this->tag()+1, ".png") ;
+	osd_file::error filerr = file.open(util::string_format("%s" PATH_SEPARATOR "burnin-%s.png", machine().basename(), tag() + 1));
 	if (filerr == osd_file::error::NONE)
 	{
 		png_info pnginfo;
-		char text[256];
 
 		// add two text entries describing the image
-		sprintf(text,"%s %s", emulator_info::get_appname(), emulator_info::get_build_version());
-		pnginfo.add_text("Software", text);
-		sprintf(text, "%s %s", machine().system().manufacturer, machine().system().type.fullname());
-		pnginfo.add_text("System", text);
+		pnginfo.add_text("Software", util::string_format("%s %s", emulator_info::get_appname(), emulator_info::get_build_version()).c_str());
+		pnginfo.add_text("System", util::string_format("%s %s", machine().system().manufacturer, machine().system().type.fullname()).c_str());
 
 		// now do the actual work
 		png_write_bitmap(file, &pnginfo, finalmap, 0, nullptr);

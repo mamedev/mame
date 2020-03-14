@@ -184,7 +184,7 @@ READ8_MEMBER(baraduke_state::soundkludge_r)
 
 void baraduke_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw("mcu", FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));/* internal registers */
+	map(0x0000, 0x001f).m("mcu", FUNC(hd63701v0_cpu_device::m6801_io));/* internal registers */
 	map(0x0080, 0x00ff).ram();                             /* built in RAM */
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); /* PSG device, shared RAM */
 	map(0x1105, 0x1105).r(FUNC(baraduke_state::soundkludge_r));             /* cures speech */
@@ -369,7 +369,7 @@ void baraduke_state::baraduke(machine_config &config)
 	MC6809E(config, m_maincpu, XTAL(49'152'000)/32); // 68A09E
 	m_maincpu->set_addrmap(AS_PROGRAM, &baraduke_state::baraduke_map);
 
-	HD63701(config, m_mcu, XTAL(49'152'000)/8);
+	HD63701V0(config, m_mcu, XTAL(49'152'000)/8);
 	m_mcu->set_addrmap(AS_PROGRAM, &baraduke_state::mcu_map);
 	m_mcu->in_p1_cb().set(FUNC(baraduke_state::inputport_r));         /* input ports read */
 	m_mcu->out_p1_cb().set(FUNC(baraduke_state::inputport_select_w)); /* input port select */
