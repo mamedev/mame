@@ -1150,6 +1150,8 @@ if (VIDEOS["PPU2C0X"]~=null) then
 		MAME_DIR .. "src/devices/video/ppu2c0x.h",
 		MAME_DIR .. "src/devices/video/ppu2c0x_vt.cpp",
 		MAME_DIR .. "src/devices/video/ppu2c0x_vt.h",
+		MAME_DIR .. "src/devices/video/ppu2c0x_sh6578.cpp",
+		MAME_DIR .. "src/devices/video/ppu2c0x_sh6578.h",
 	}
 end
 
