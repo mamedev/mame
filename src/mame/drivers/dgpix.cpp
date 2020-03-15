@@ -210,7 +210,36 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
+
+	void mpu401_data_w(offs_t, u32 data, u32 mem_mask);
+	void mpu401_ctrl_w(offs_t, u32 data, u32 mem_mask);
+	u32 mpu401_data_r(offs_t, u32 mem_mask);
+	u32 mpu401_status_r();
 };
+
+void dgpix_state::mpu401_data_w(offs_t, u32 data, u32 mem_mask)
+{
+	if(ACCESSING_BITS_0_7)
+		m_sound->mpu401_data_w(data);
+}
+
+void dgpix_state::mpu401_ctrl_w(offs_t, u32 data, u32 mem_mask)
+{
+	if(ACCESSING_BITS_0_7)
+		m_sound->mpu401_ctrl_w(data);
+}
+
+u32 dgpix_state::mpu401_data_r(offs_t, u32 mem_mask)
+{
+	if(ACCESSING_BITS_0_7)
+		return m_sound->mpu401_data_r();
+	return 0;
+}
+
+u32 dgpix_state::mpu401_status_r()
+{
+	return m_sound->mpu401_status_r();
+}
 
 u32 dgpix_state::flash_r(offs_t offset)
 {
@@ -340,9 +369,8 @@ void dgpix_state::io_map(address_map &map)
 	map(0x0a10, 0x0a13).portr("INPUTS");
 	map(0x0200, 0x0203).w(FUNC(dgpix_state::coin_w));
 	map(0x0c00, 0x0c03).nopw(); // writes only: 1, 0, 1 at startup
-	map(0x0c80, 0x0c83).nopw(); // sound commands / latches
-	map(0x0c80, 0x0c83).nopr(); //read at startup -> cmp 0xFE
-	map(0x0c84, 0x0c87).nopr(); // sound status, checks bit 0x40 and 0x80
+	map(0x0c80, 0x0c83).rw(FUNC(dgpix_state::mpu401_data_r), FUNC(dgpix_state::mpu401_data_w));
+	map(0x0c84, 0x0c87).rw(FUNC(dgpix_state::mpu401_status_r), FUNC(dgpix_state::mpu401_ctrl_w));
 }
 
 static INPUT_PORTS_START( dgpix )

@@ -29,6 +29,14 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
+	enum {
+		MPUS_RX_FULL = 0x01,
+		MPUS_TX_FULL = 0x02,
+		MPUS_RX_CTRL = 0x04,
+		MPUS_TX_INT  = 0x40,
+		MPUS_RX_INT  = 0x80
+	};
+
 	optional_memory_region m_mem_region;
 	required_device<ks0164_cpu_device> m_cpu;
 	address_space_config m_mem_config;
@@ -40,6 +48,10 @@ private:
 	u16 m_bank1_select, m_bank2_select;
 
 	u16 m_sregs[0x20][0x20];
+
+	u8 m_mpu_in;
+	u8 m_mpu_out;	
+	u8 m_mpu_status;
 
 	u8 m_unk60;
 	u8 m_voice_select;
@@ -69,6 +81,12 @@ private:
 	void voice_select_w(u8 data);
 	u16 voice_r(offs_t offset);
 	void voice_w(offs_t offset, u16 data, u16 mem_mask);	
+	void mpuin_set(bool control, u8 data);
+
+	u8 mpu401_r();
+	void mpu401_w(u8 data);
+	u8 mpu401_istatus_r();
+	void mpu401_istatus_w(u8 data);
 };
 
 DECLARE_DEVICE_TYPE(KS0164, ks0164_device)
