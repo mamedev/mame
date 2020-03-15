@@ -192,6 +192,8 @@ protected:
 	int                         m_scanline;         /* scanline count */
 	std::unique_ptr<uint8_t[]>  m_spriteram;           /* sprite ram */
 
+	int m_videoram_addr_mask;
+	int m_global_refresh_mask;
 	int m_line_write_increment_large;
 	bool m_paletteram_in_ppuspace; // sh6578 doesn't have the palette in PPU space, so various side-effects don't apply
 	std::vector<uint8_t>		m_palette_ram;		    /* shouldn't be in main memory! */

@@ -23,6 +23,8 @@ ppu_sh6578_device::ppu_sh6578_device(const machine_config& mconfig, device_type 
 {
 	m_paletteram_in_ppuspace = false;
 	m_line_write_increment_large = 32;
+	m_videoram_addr_mask = 0xffff;
+	m_global_refresh_mask = 0xffff;
 }
 
 ppu_sh6578_device::ppu_sh6578_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :

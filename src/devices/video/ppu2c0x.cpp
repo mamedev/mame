@@ -123,6 +123,8 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, internal_map),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_scanline(0),  // reset the scanline count
+	m_videoram_addr_mask(0x3fff),
+	m_global_refresh_mask(0x7fff),
 	m_line_write_increment_large(32),
 	m_paletteram_in_ppuspace(false),
 	m_tile_page(0),
@@ -1310,7 +1312,7 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 		else
 		{
 			/* first write */
-			m_refresh_latch &= 0x7fe0;
+			m_refresh_latch &= (0xffe0 & m_global_refresh_mask);
 			m_refresh_latch |= (data & 0xf8) >> 3;
 
 			m_x_fine = data & 7;
@@ -1324,7 +1326,7 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 		if (m_toggle)
 		{
 			/* second write */
-			m_refresh_latch &= 0x7f00;
+			m_refresh_latch &= (0xff00 & m_global_refresh_mask);
 			m_refresh_latch |= data;
 			m_refresh_data = m_refresh_latch;
 
@@ -1335,7 +1337,7 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 		{
 			/* first write */
 			m_refresh_latch &= 0x00ff;
-			m_refresh_latch |= (data & 0x3f) << 8;
+			m_refresh_latch |= (data & (m_videoram_addr_mask >>8) ) << 8;
 			//logerror("vram addr write 1: %02x, %04x (scanline: %d)\n", data, m_refresh_latch, m_scanline);
 		}
 
@@ -1344,7 +1346,7 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 
 	case PPU_DATA: /* 7 */
 	{
-		int tempAddr = m_videomem_addr & 0x3fff;
+		int tempAddr = m_videomem_addr & m_videoram_addr_mask;
 
 		if (!m_latch.isnull())
 			m_latch(tempAddr);
