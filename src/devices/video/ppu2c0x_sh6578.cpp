@@ -114,7 +114,7 @@ void ppu_sh6578_device::read_tile_plane_data(int address, int color)
 
 void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int color_bits, int address, int start_x, pen_t back_pen, uint32_t*& dest, const pen_t* color_table)
 {
-	int color = (((color_byte >> color_bits) & 0x03));
+	int color = color_byte & 0x03;
 
 	read_tile_plane_data(address, color);
 
@@ -135,9 +135,6 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 		dest++;
 	}
 }
-
-
-
 
 void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 {
@@ -185,7 +182,6 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 	while (m_tilecount < 34)
 	{
 		int color_byte;
-		int color_bits;
 		int index1;
 		int page2, address;
 
@@ -197,16 +193,13 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 		/* Figure out which byte in the color table to use */
 		color_byte = readbyte(index1 + 1);
 
-		/* figure out which bits in the color table to use */
-		color_bits = ((index1 & 0x40) >> 4) + (index1 & 0x02);
-
 		if (start_x < VISIBLE_SCREEN_WIDTH)
 		{
 			address = ((page2 | (color_byte<<8)) & 0x0fff) << 4;
 			// plus something that accounts for y
 			address += scroll_y_fine;
 
-			draw_tile(line_priority, color_byte, color_bits, address, start_x, back_pen, dest, color_table);
+			draw_tile(line_priority, (color_byte >> 12) & 0xf, 0, address, start_x, back_pen, dest, color_table);
 
 			start_x += 8;
 
@@ -246,12 +239,12 @@ void ppu_sh6578_device::write(offs_t offset, uint8_t data)
 	}
 	else if (offset == 0x8)
 	{
-
+		LOGMASKED(LOG_PPU_EXTRA, "%s: ppu_sh6578_device::write : Color Select & PNT Start Address : %02x\n", machine().describe_context(), data);
+		m_colsel_pntstart = data;
 	}
 	else
 	{
-		LOGMASKED(LOG_PPU_EXTRA, "%s: ppu_sh6578_device::write : Color Select & PNT Start Address : %02x\n", machine().describe_context(), data);
-		m_colsel_pntstart = data;
+		LOGMASKED(LOG_PPU_EXTRA, "%s: ppu_sh6578_device::write : unhandled offset %02x : %02x\n", machine().describe_context(), offset, data);
 	}
 }
 
@@ -269,6 +262,7 @@ uint8_t ppu_sh6578_device::read(offs_t offset)
 	}
 	else
 	{
+		LOGMASKED(LOG_PPU_EXTRA, "%s: ppu_sh6578_device::read : unhandled offset %02x\n", machine().describe_context(), offset);
 		return 0x00;
 	}
 }
