@@ -52,6 +52,7 @@ void ks0164_device::device_start()
 
 	m_stream = stream_alloc(0, 2, 44100);
 	m_mem_cache = space().cache<1, 0, ENDIANNESS_BIG>();
+	m_timer = timer_alloc(0);
 }
 
 void ks0164_device::device_reset()
@@ -65,6 +66,16 @@ void ks0164_device::device_reset()
 	m_voice_select = 0;
 	m_irqen_76 = 0;
 	m_irqen_77 = 0;
+	m_timer_interrupt = false;
+
+	m_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+}
+
+void ks0164_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_timer_interrupt = true;
+	if(m_irqen_76 & 0x40)
+		m_cpu->set_input_line(14, ASSERT_LINE);
 }
 
 u16 ks0164_device::vec_r(offs_t offset, u16 mem_mask)
@@ -138,7 +149,15 @@ u8 ks0164_device::irqen_76_r()
 void ks0164_device::irqen_76_w(u8 data)
 {
 	m_irqen_76 = data;
-	logerror("irqen_76 = %02x (%04x)\n", m_irqen_76, m_cpu->pc());
+	if(m_irqen_76 & 0x40)
+		m_cpu->set_input_line(14, m_timer_interrupt ? ASSERT_LINE : CLEAR_LINE);
+
+	else {
+		m_timer_interrupt = false;
+		m_cpu->set_input_line(14, CLEAR_LINE);
+	}
+
+	//	logerror("irqen_76 = %02x (%04x)\n", m_irqen_76, m_cpu->pc());
 }
 
 u8 ks0164_device::irqen_77_r()

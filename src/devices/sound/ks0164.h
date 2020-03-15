@@ -26,12 +26,14 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual space_config_vector memory_space_config() const override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	optional_memory_region m_mem_region;
 	required_device<ks0164_cpu_device> m_cpu;
 	address_space_config m_mem_config;
  	sound_stream *m_stream;	
+	emu_timer *m_timer;
 	memory_access_cache<1, 0, ENDIANNESS_BIG> *m_mem_cache;
 
 	u32 m_bank1_base, m_bank2_base;
@@ -42,6 +44,7 @@ private:
 	u8 m_unk60;
 	u8 m_voice_select;
 	u8 m_irqen_76, m_irqen_77;
+	bool m_timer_interrupt;
 
 	void cpu_map(address_map &map);
 
