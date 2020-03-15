@@ -7,6 +7,13 @@
 #include "emu.h"
 #include "video/ppu2c0x_sh6578.h"
 
+#define LOG_PPU_EXTRA       (1U << 0)
+
+//#define VERBOSE             (LOG_PPU_EXTRA)
+#define VERBOSE             (0)
+
+#include "logmacro.h"
+
 // devices
 DEFINE_DEVICE_TYPE(PPU_SH6578, ppu_sh6578_device, "ppu_sh6578", "SH6578 PPU (NTSC)")
 DEFINE_DEVICE_TYPE(PPU_SH6578PAL, ppu_sh6578pal_device, "ppu_sh6578pal", "SH6578 PPU (PAL)")
@@ -15,6 +22,7 @@ ppu_sh6578_device::ppu_sh6578_device(const machine_config& mconfig, device_type 
 	ppu2c0x_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ppu_sh6578_device::ppu_internal_map), this))
 {
 	m_paletteram_in_ppuspace = false;
+	m_line_write_increment_large = 64;
 }
 
 ppu_sh6578_device::ppu_sh6578_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
@@ -53,6 +61,7 @@ void ppu_sh6578_device::device_start()
 void ppu_sh6578_device::device_reset()
 {
 	ppu2c0x_device::device_reset();
+	m_colsel_pntstart = 0x00;
 }
 
 void ppu_sh6578_device::draw_background(uint8_t* line_priority)
@@ -77,7 +86,8 @@ void ppu_sh6578_device::write(offs_t offset, uint8_t data)
 	}
 	else
 	{
-
+		LOGMASKED(LOG_PPU_EXTRA, "%s: ppu_sh6578_device::write : Color Select & PNT Start Address : %02x\n", machine().describe_context(), data);
+		m_colsel_pntstart = data;
 	}
 }
 
@@ -90,7 +100,8 @@ uint8_t ppu_sh6578_device::read(offs_t offset)
 	}
 	else if (offset == 0x8)
 	{
-		return 0x00;
+		LOGMASKED(LOG_PPU_EXTRA, "%s: ppu_sh6578_device::read : Color Select & PNT Start Address\n", machine().describe_context());
+		return m_colsel_pntstart;
 	}
 	else
 	{
@@ -100,10 +111,10 @@ uint8_t ppu_sh6578_device::read(offs_t offset)
 
 void ppu_sh6578_device::palette_write(offs_t offset, uint8_t data)
 {
-
+	m_palette_ram[offset] = data;
 }
 
 uint8_t ppu_sh6578_device::palette_read(offs_t offset)
 {
-	return 0x00;
+	return m_palette_ram[offset];
 }

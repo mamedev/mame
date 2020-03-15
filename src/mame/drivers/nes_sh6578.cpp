@@ -37,7 +37,6 @@ public:
 		m_ppu(*this, "ppu"),
 		m_bank(*this, "cartbank"),
 		m_fullrom(*this, "fullrom"),
-		//m_vram(*this, "vram"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_apu(*this, "nesapu"),
@@ -62,7 +61,6 @@ private:
 	required_device<ppu_sh6578_device> m_ppu;
 	required_memory_bank m_bank;
 	required_device<address_map_bank_device> m_fullrom;
-	//required_device<address_map_bank_device> m_vram;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<nesapu_device> m_apu;
@@ -102,11 +100,6 @@ private:
 	DECLARE_WRITE8_MEMBER(timer_config_w);
 	DECLARE_WRITE8_MEMBER(timer_value_w);
 
-//	DECLARE_WRITE8_MEMBER(write_ppu);
-//	DECLARE_READ8_MEMBER(read_ppu);
-//	DECLARE_WRITE8_MEMBER(write_palette);
-//	DECLARE_READ8_MEMBER(read_palette);
-
 	DECLARE_READ8_MEMBER(io0_r);
 	DECLARE_READ8_MEMBER(io1_r);
 	DECLARE_WRITE8_MEMBER(io_w);
@@ -130,31 +123,14 @@ private:
 	uint8_t m_dma_dest[2];
 	uint8_t m_dma_length[2];
 
-	/*
-	uint8_t m_2000;
-	uint8_t m_2001;
-	uint8_t m_2002;
-	uint8_t m_2003;
-	uint8_t m_2004;
-	uint16_t m_scrollreg;
-	bool m_scrollreg_firstwrite;
-
-	uint16_t m_vramaddr;
-	uint8_t m_2007;
-	*/
-
 	uint8_t m_irqmask;
-
-	uint8_t m_colsel_pntstart;
-	//TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	void do_dma();
 
 	void rom_map(address_map& map);
-	void vram_map(address_map& map);
 	void nes_sh6578_map(address_map& map);
 
-	uint16_t get_tileaddress(uint8_t x, uint8_t y, bool ishigh);
+	//uint16_t get_tileaddress(uint8_t x, uint8_t y, bool ishigh);
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
@@ -168,20 +144,7 @@ private:
 	required_ioport_array<2> m_in;
 };
 
-#if 0
-TIMER_DEVICE_CALLBACK_MEMBER(nes_sh6578_state::scanline)
-{
-	int scanline = param;
 
-	if (scanline == 240)
-	{
-		if (m_2000 & 0x80)
-		{
-			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-		}
-	}
-}
-#endif
 
 uint8_t nes_sh6578_state::bank_r(int bank, uint16_t offset)
 {
@@ -268,8 +231,7 @@ void nes_sh6578_state::do_dma()
 			}
 			else
 			{
-				// TODO
-				//m_vram->write8(realdestaddress, readdat);
+				m_ppu->space(AS_PROGRAM).write_byte(realdestaddress, readdat);
 			}
 
 			realsourceaddress++;
@@ -280,7 +242,6 @@ void nes_sh6578_state::do_dma()
 	// but games seem to be making quite a few DMA writes with lengths that seem too large? buggy code?
 	//m_dma_length[0] = 0;
 	//m_dma_length[1] = 0;
-
 }
 
 WRITE8_MEMBER(nes_sh6578_state::dma_w)
@@ -404,190 +365,6 @@ WRITE8_MEMBER(nes_sh6578_state::timing_setting_control_w)
 {
 	logerror("%s: nes_sh6578_state::timing_setting_control_w : %02x\n", machine().describe_context(), data);
 }
-
-#if 0
-// borrowed from ppu2c0x.cpp, doesn't currently handle color emphasis!
-rgb_t nes_sh6578_state::nespal_to_RGB(int color_intensity, int color_num)
-{
-	const double tint = 0.22; /* adjust to taste */
-	const double hue = 287.0;
-
-	const double Kr = 0.2989;
-	const double Kb = 0.1145;
-	const double Ku = 2.029;
-	const double Kv = 1.140;
-
-	static const double brightness[3][4] =
-	{
-		{ 0.50, 0.75, 1.0, 1.0 },
-		{ 0.29, 0.45, 0.73, 0.9 },
-		{ 0, 0.24, 0.47, 0.77 }
-	};
-
-	double sat;
-	double y, u, v;
-	double rad;
-
-	switch (color_num)
-	{
-	case 0:
-		sat = 0; rad = 0;
-		y = brightness[0][color_intensity];
-		break;
-
-	case 13:
-		sat = 0; rad = 0;
-		y = brightness[2][color_intensity];
-		break;
-
-	case 14:
-	case 15:
-		sat = 0; rad = 0; y = 0;
-		break;
-
-	default:
-		sat = tint;
-		rad = M_PI * ((color_num * 30 + hue) / 180.0);
-		y = brightness[1][color_intensity];
-		break;
-	}
-
-	u = sat * cos(rad);
-	v = sat * sin(rad);
-
-	/* Transform to RGB */
-	double R = (y + Kv * v) * 255.0;
-	double G = (y - (Kb * Ku * u + Kr * Kv * v) / (1 - Kb - Kr)) * 255.0;
-	double B = (y + Ku * u) * 255.0;
-
-	/* Clipping, in case of saturation */
-	if (R < 0)
-		R = 0;
-	if (R > 255)
-		R = 255;
-	if (G < 0)
-		G = 0;
-	if (G > 255)
-		G = 255;
-	if (B < 0)
-		B = 0;
-	if (B > 255)
-		B = 255;
-
-	return rgb_t(floor(R + .5), floor(G + .5), floor(B + .5));
-}
-#endif
-
-#if 0
-READ8_MEMBER(nes_sh6578_state::read_palette)
-{
-	//logerror("%s: nes_sh6578_state::read_ppu : Palette Entry %02x\n", machine().describe_context(), offset);
-	return m_palette_ram[offset];
-}
-
-WRITE8_MEMBER(nes_sh6578_state::write_palette)
-{
-	//logerror("%s: nes_sh6578_state::write_ppu : Palette Entry %02x : %02x\n", machine().describe_context(), offset, data);
-	m_palette_ram[offset] = data;
-
-	rgb_t col = nespal_to_RGB((data & 0x30) >> 4, data & 0x0f);
-	m_palette->set_pen_color(offset, col);
-}
-#endif
-
-#if 0
-READ8_MEMBER(nes_sh6578_state::read_ppu)
-{
-	switch (offset)
-	{
-	case 0x08:
-		LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::read_ppu : Color Select & PNT Start Address\n", machine().describe_context());
-		return m_colsel_pntstart;
-
-	case 0x00:
-		return m_2000;
-
-	case 0x02:
-	{
-		uint8_t ret = 0x00;
-		int vblank = m_screen->vpos() > 239 ? 1 : 0;
-
-		if (vblank) ret |= 0x80;
-
-		return ret;
-	}
-
-	case 0x01: return m_2001;
-	case 0x03: return m_2003;
-	case 0x04: return m_2004;
-	case 0x07: return m_2007;
-
-	default:
-		LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::read_ppu : unhandled offset %02x\n", machine().describe_context(), offset);
-		return 0x00;
-	}
-}
-
-WRITE8_MEMBER(nes_sh6578_state::write_ppu)
-{
-	switch (offset)
-	{
-	case 0x08:
-		LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu : Color Select & PNT Start Address : %02x\n", machine().describe_context(), data);
-		m_colsel_pntstart = data;
-		break;
-
-	case 0x00: m_2000 = data; LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
-	case 0x01: m_2001 = data; LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
-	case 0x02: m_2002 = data; LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
-	case 0x03: m_2003 = data; LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
-	case 0x04: m_2004 = data; LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data); break;
-	case 0x05:
-	{
-		LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data);
-		if (m_scrollreg_firstwrite)
-		{
-			m_scrollreg = (m_scrollreg & 0xff00) | data;
-			m_scrollreg_firstwrite = false;
-
-		}
-		else
-		{
-			m_scrollreg = (m_scrollreg & 0x00ff) | (data<<8);
-			m_scrollreg_firstwrite = true;
-		}
-
-		break;
-	}
-
-	case 0x06:
-	{
-		LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data);
-		m_vramaddr <<= 8;
-		m_vramaddr = (m_vramaddr & 0xff00) | data;
-		logerror("  vram address is now %04x\n", m_vramaddr);
-		break;
-	}
-
-	case 0x07:
-	{
-		LOGMASKED(LOG_PPU, "%s: nes_sh6578_state::write_ppu offset %02x : %02x\n", machine().describe_context(), offset, data);
-		m_vram->write8(m_vramaddr, data);
-
-		if (m_2000 & 4)
-			m_vramaddr += 64; // big race and pioneer racing in ts_handy11 need this to be 64, not 32
-		else
-			m_vramaddr++;
-
-		break;
-	}
-
-	default:
-		break;
-		//ppu2c0x_device::write(space, offset, data);
-	}
-}
-#endif
 
 
 READ8_MEMBER(nes_sh6578_state::io0_r)
@@ -774,15 +551,9 @@ void nes_sh6578_state::rom_map(address_map& map)
 	map(0x00000, 0xfffff).bankr("cartbank");
 }
 
-#if 0
-void nes_sh6578_state::vram_map(address_map& map)
-{
-	map(0x0000, 0x27ff).ram();
-	map(0x2800, 0x7fff).nopr();
-	map(0x8000, 0xffff).ram();
-}
-#endif
 
+
+#if 0
 uint16_t nes_sh6578_state::get_tileaddress(uint8_t x, uint8_t y, bool ishigh)
 {
 	if (!ishigh)
@@ -827,6 +598,7 @@ uint16_t nes_sh6578_state::get_tileaddress(uint8_t x, uint8_t y, bool ishigh)
 		return 0x2000 + (x * 2) + (y * 0x40);
 	}
 }
+#endif 
 
 #if 0
 uint32_t nes_sh6578_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
@@ -925,10 +697,6 @@ void nes_sh6578_state::nes_sh6578(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_sh6578_state::nes_sh6578_map);
 
 	ADDRESS_MAP_BANK(config, m_fullrom).set_map(&nes_sh6578_state::rom_map).set_options(ENDIANNESS_NATIVE, 8, 20, 0x100000);
-
-	//ADDRESS_MAP_BANK(config, m_vram).set_map(&nes_sh6578_state::vram_map).set_options(ENDIANNESS_NATIVE, 8, 16, 0x10000);
-
-	//TIMER(config, "scantimer").configure_scanline(FUNC(nes_sh6578_state::scanline), "screen", 0, 1);
 
 	PPU_SH6578(config, m_ppu, N2A03_NTSC_XTAL);
 	m_ppu->set_cpu_tag(m_maincpu);

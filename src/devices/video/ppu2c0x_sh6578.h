@@ -32,6 +32,8 @@ private:
 
 	virtual void draw_sprites(uint8_t* line_priority) override;
 	virtual void draw_background(uint8_t* line_priority) override;
+
+	uint8_t m_colsel_pntstart;
 };
 
 class ppu_sh6578pal_device : public ppu_sh6578_device

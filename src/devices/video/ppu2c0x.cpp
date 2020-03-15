@@ -128,6 +128,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, internal_map),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_scanline(0),  // reset the scanline count
+	m_line_write_increment_large(32),
 	m_paletteram_in_ppuspace(false),
 	m_scanline_callback_proc(*this),
 	m_hblank_callback_proc(*this),
@@ -1250,7 +1251,7 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 		m_tile_page = (data & PPU_CONTROL0_CHR_SELECT) >> 2;
 		m_sprite_page = (data & PPU_CONTROL0_SPR_SELECT) >> 1;
 
-		m_add = (data & PPU_CONTROL0_INC) ? 32 : 1;
+		m_add = (data & PPU_CONTROL0_INC) ? m_line_write_increment_large : 1;
 		//logerror("control0 write: %02x (scanline: %d)\n", data, m_scanline);
 		break;
 
