@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-// Samsung Semiconductor KS0164 Wavetable Wavetable Synthesizer
+// Samsung Semiconductor KS0164 Wavetable Synthesizer
 
 #include "emu.h"
 #include "ks0164.h"
