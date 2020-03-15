@@ -38,7 +38,6 @@ public:
 		m_bank(*this, "cartbank"),
 		m_fullrom(*this, "fullrom"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
 		m_apu(*this, "nesapu"),
 		m_timer(*this, "timer"),
 		m_in(*this, "IN%u", 0U)
@@ -62,11 +61,8 @@ private:
 	required_memory_bank m_bank;
 	required_device<address_map_bank_device> m_fullrom;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 	required_device<nesapu_device> m_apu;
 	required_device<timer_device> m_timer;
-
-	//rgb_t nespal_to_RGB(int color_intensity, int color_num);
 
 	DECLARE_READ8_MEMBER(bankswitch_r);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
@@ -113,7 +109,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
 
 	int m_iniital_startup_state;
-	//std::vector<uint8_t> m_palette_ram;
 
 	uint8_t m_bankswitch[8];
 
@@ -500,29 +495,8 @@ void nes_sh6578_state::machine_reset()
 	for (int i = 0; i < 8; i++)
 		m_bankswitch[i] = i;
 
-	/*
-	m_palette_ram.resize(0x40);
-
-	for (int i = 0; i < 0x40; i++)
-		m_palette_ram[i] = 0x00;
-	*/
-
 	m_iniital_startup_state = 0;
 	m_bank->set_entry(0);
-
-	/*
-	m_2000 = 0;
-	m_2001 = 0;
-	m_2002 = 0;
-	m_2003 = 0;
-	m_2004 = 0;
-	m_2007 = 0;
-
-	m_scrollreg = 0x00;
-	m_scrollreg_firstwrite = true;
-
-	m_colsel_pntstart = 0;
-	*/
 
 	m_irqmask = 0xff;
 	m_timerval = 0x00;
@@ -542,7 +516,6 @@ void nes_sh6578_state::machine_start()
 	{
 		m_isbanked = false;
 	}
-
 }
 
 // SH6578 can address 20-bit address space (1MB of ROM)
@@ -712,8 +685,6 @@ void nes_sh6578_state::nes_sh6578(machine_config& config)
 	m_screen->set_screen_update(FUNC(nes_sh6578_state::screen_update));
 
 	TIMER(config, m_timer).configure_periodic(FUNC(nes_sh6578_state::timer_expired), attotime::never);
-
-	PALETTE(config, m_palette).set_entries(0x40);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
