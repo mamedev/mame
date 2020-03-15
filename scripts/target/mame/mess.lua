@@ -303,6 +303,7 @@ SOUNDS["IOPSPU"] = true
 SOUNDS["SWP00"] = true
 SOUNDS["SWP20"] = true
 SOUNDS["SWP30"] = true
+SOUNDS["ROLANDPCM"] = true
 
 --------------------------------------------------
 -- specify available video cores

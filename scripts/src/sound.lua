@@ -1543,6 +1543,18 @@ if (SOUNDS["SWP30"]~=null) then
 end
 
 ---------------------------------------------------
+-- Roland sample players
+--@src/devices/sound/rolandpcm.h,SOUNDS["ROLANDPCM"] = true
+---------------------------------------------------
+
+if (SOUNDS["ROLANDPCM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/rolandpcm.cpp",
+		MAME_DIR .. "src/devices/sound/rolandpcm.h",
+	}
+end
+
+---------------------------------------------------
 --
 --@src/devices/sound/vgm_visualizer.h,SOUNDS["VGMVIZ"] = true
 ---------------------------------------------------
