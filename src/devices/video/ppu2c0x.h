@@ -82,6 +82,7 @@ public:
 	virtual void draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t *&dest, const pen_t *color_table);
 	virtual void draw_tile(uint8_t *line_priority, int color_byte, int color_bits, int address, int start_x, pen_t back_pen, uint32_t *&dest, const pen_t *color_table);
 	void draw_background( uint8_t *line_priority );
+	void draw_background_pen();
 
 	virtual void read_sprite_plane_data(int address);
 	virtual void make_sprite_pixel_data(uint8_t &pixel_data, int flipx);
@@ -90,6 +91,10 @@ public:
 
 	void draw_sprites(uint8_t *line_priority);
 	void render_scanline();
+	virtual void scanline_increment_fine_ycounter();
+	void update_visible_enabled_scanline();
+	void update_visible_disabled_scanline();
+	void update_visible_scanline();
 	void update_scanline();
 
 	void spriteram_dma(address_space &space, const uint8_t page);

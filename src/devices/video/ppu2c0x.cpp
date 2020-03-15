@@ -759,6 +759,21 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 	}
 }
 
+void ppu2c0x_device::draw_background_pen()
+{
+	bitmap_rgb32& bitmap = *m_bitmap;
+
+	/* setup the color mask and colortable to use */
+	uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0xf0 : 0xff;
+
+	/* cache the background pen */
+	pen_t back_pen = pen(m_back_color & color_mask);
+
+	// Fill this scanline with the background pen.
+	for (int i = 0; i < bitmap.width(); i++)
+		bitmap.pix32(m_scanline, i) = back_pen;
+}
+
 void ppu2c0x_device::read_sprite_plane_data(int address)
 {
 	m_planebuf[0] = readbyte((address + 0) & 0x1fff);
@@ -879,9 +894,9 @@ void ppu2c0x_device::draw_sprites(uint8_t* line_priority)
 		if (sprite_count == 8)
 		{
 			m_regs[PPU_STATUS] |= PPU_STATUS_8SPRITES;
-			//          logerror ("> 8 sprites, scanline: %d\n", m_scanline);
+			//logerror ("> 8 sprites, scanline: %d\n", m_scanline);
 
-						/* the real NES only draws up to 8 sprites - the rest should be invisible */
+			/* the real NES only draws up to 8 sprites - the rest should be invisible */
 			break;
 		}
 
@@ -977,20 +992,12 @@ void ppu2c0x_device::render_scanline()
 
 	/* see if we need to render the background */
 	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND)
+	{
 		draw_background(line_priority);
+	}
 	else
 	{
-		bitmap_rgb32& bitmap = *m_bitmap;
-
-		/* setup the color mask and colortable to use */
-		uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0xf0 : 0xff;
-
-		/* cache the background pen */
-		pen_t back_pen = pen(m_back_color & color_mask);
-
-		// Fill this scanline with the background pen.
-		for (int i = 0; i < bitmap.width(); i++)
-			bitmap.pix32(m_scanline, i) = back_pen;
+		draw_background_pen();
 	}
 
 	m_draw_phase = PPU_DRAW_OAM;
@@ -1004,76 +1011,95 @@ void ppu2c0x_device::render_scanline()
 	g_profiler.stop();
 }
 
+void ppu2c0x_device::scanline_increment_fine_ycounter()
+{
+	/* increment the fine y-scroll */
+	m_refresh_data += 0x1000;
+
+	/* if it's rolled, increment the coarse y-scroll */
+	if (m_refresh_data & 0x8000)
+	{
+		uint16_t tmp;
+		tmp = (m_refresh_data & 0x03e0) + 0x20;
+		m_refresh_data &= 0x7c1f;
+
+		/* handle bizarro scrolling rollover at the 30th (not 32nd) vertical tile */
+		if (tmp == 0x03c0)
+			m_refresh_data ^= 0x0800;
+		else
+			m_refresh_data |= (tmp & 0x03e0);
+
+		//logerror("updating refresh_data: %04x\n", m_refresh_data);
+	}
+}
+
+void ppu2c0x_device::update_visible_enabled_scanline()
+{
+	if (m_scanline_timer->remaining() == attotime::zero)
+	{
+		/* If background or sprites are enabled, copy the ppu address latch */
+		/* Copy only the scroll x-coarse and the x-overflow bit */
+		m_refresh_data &= ~0x041f;
+		m_refresh_data |= (m_refresh_latch & 0x041f);
+	}
+
+	//logerror("updating refresh_data: %04x (scanline: %d)\n", m_refresh_data, m_scanline);
+	render_scanline();
+}
+
+void ppu2c0x_device::update_visible_disabled_scanline()
+{
+	bitmap_rgb32& bitmap = *m_bitmap;
+	pen_t back_pen;
+
+	/* setup the color mask and colortable to use */
+	uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0xf0 : 0xff;
+
+	back_pen = pen(m_back_color & color_mask);
+
+	if (m_paletteram_in_ppuspace)
+	{
+		/* cache the background pen */
+		if (m_videomem_addr >= 0x3f00)
+		{
+			// If the PPU's VRAM address happens to point into palette ram space while
+			// both the sprites and background are disabled, the PPU paints the scanline
+			// with the palette entry at the VRAM address instead of the usual background
+			// pen. Micro Machines makes use of this feature.
+			int pen_num = m_palette_ram[(m_videomem_addr & 0x03) ? (m_videomem_addr & 0x1f) : 0];
+
+			back_pen = pen(pen_num);
+		}
+	}
+
+	// Fill this scanline with the background pen.
+	for (int i = 0; i < bitmap.width(); i++)
+		bitmap.pix32(m_scanline, i) = back_pen;
+}
+
+void ppu2c0x_device::update_visible_scanline()
+{
+	/* Render this scanline if appropriate */
+	if (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES))
+	{
+		update_visible_enabled_scanline();
+	}
+	else
+	{
+		update_visible_disabled_scanline();
+	}
+
+	if (m_scanline_timer->remaining() == attotime::zero)
+	{
+		scanline_increment_fine_ycounter();
+	}
+}
+
 void ppu2c0x_device::update_scanline()
 {
 	if (m_scanline <= BOTTOM_VISIBLE_SCANLINE)
 	{
-		/* Render this scanline if appropriate */
-		if (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES))
-		{
-			if (m_scanline_timer->remaining() == attotime::zero)
-			{
-				/* If background or sprites are enabled, copy the ppu address latch */
-				/* Copy only the scroll x-coarse and the x-overflow bit */
-				m_refresh_data &= ~0x041f;
-				m_refresh_data |= (m_refresh_latch & 0x041f);
-			}
-
-			//          logerror("updating refresh_data: %04x (scanline: %d)\n", m_refresh_data, m_scanline);
-			render_scanline();
-		}
-		else
-		{
-			bitmap_rgb32& bitmap = *m_bitmap;
-			pen_t back_pen;
-
-			/* setup the color mask and colortable to use */
-			uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0xf0 : 0xff;
-
-			back_pen = pen(m_back_color & color_mask);
-
-			if (m_paletteram_in_ppuspace)
-			{
-				/* cache the background pen */
-				if (m_videomem_addr >= 0x3f00)
-				{
-					// If the PPU's VRAM address happens to point into palette ram space while
-					// both the sprites and background are disabled, the PPU paints the scanline
-					// with the palette entry at the VRAM address instead of the usual background
-					// pen. Micro Machines makes use of this feature.
-					int pen_num = m_palette_ram[(m_videomem_addr & 0x03) ? (m_videomem_addr & 0x1f) : 0];
-
-					back_pen = pen(pen_num);
-				}
-			}
-
-
-			// Fill this scanline with the background pen.
-			for (int i = 0; i < bitmap.width(); i++)
-				bitmap.pix32(m_scanline, i) = back_pen;
-		}
-
-		if (m_scanline_timer->remaining() == attotime::zero)
-		{
-			/* increment the fine y-scroll */
-			m_refresh_data += 0x1000;
-
-			/* if it's rolled, increment the coarse y-scroll */
-			if (m_refresh_data & 0x8000)
-			{
-				uint16_t tmp;
-				tmp = (m_refresh_data & 0x03e0) + 0x20;
-				m_refresh_data &= 0x7c1f;
-
-				/* handle bizarro scrolling rollover at the 30th (not 32nd) vertical tile */
-				if (tmp == 0x03c0)
-					m_refresh_data ^= 0x0800;
-				else
-					m_refresh_data |= (tmp & 0x03e0);
-
-				//logerror("updating refresh_data: %04x\n", m_refresh_data);
-			}
-		}
+		update_visible_scanline();
 	}
 }
 
