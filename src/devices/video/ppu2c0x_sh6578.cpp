@@ -97,7 +97,9 @@ void ppu_sh6578_device::read_tile_plane_data(int address, int color)
 
 void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int color_bits, int address, int start_x, pen_t back_pen, uint32_t*& dest, const pen_t* color_table)
 {
-	int color = color_byte & 0x03;
+	int color = color_byte;
+
+	color &= 0xc;
 
 	read_tile_plane_data(address, color);
 
@@ -105,7 +107,16 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 	for (int i = 0; i < 8; i++)
 	{
 		uint8_t pix;
-		shift_tile_plane_data(pix);
+
+		pix =  ((m_planebuf[0] & 0x80) >> 7);
+		pix |= ((m_planebuf[1] & 0x80) >> 6);
+		pix |= ((m_extplanebuf[0] & 0x80) >> 5);
+		pix |= ((m_extplanebuf[1] & 0x80) >> 4);
+
+		m_planebuf[0] <<= 1;
+		m_planebuf[1] <<= 1;
+		m_extplanebuf[0] <<= 1;
+		m_extplanebuf[1] <<= 1;
 
 		if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
 		{
@@ -113,8 +124,8 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 
 			if (pix)
 			{
-				const pen_t* paldata = &color_table[4 * color];
-				pen = this->pen(paldata[pix]);
+				uint8_t palval = m_palette_ram[(pix | color << 2)] & 0x3f;
+				pen = this->pen(palval);
 			}
 			else
 			{
