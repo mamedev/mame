@@ -34590,6 +34590,12 @@ gr700                           //
 jx3p                            //
 mks30                           //
 
+@source:roland_jx8p.cpp
+jx10                            //
+jx8p                            //
+jx8po                           //
+mks70                           //
+
 @source:roland_mt32.cpp
 cm32l                           //
 mt32                            //
