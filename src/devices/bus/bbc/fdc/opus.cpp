@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(BBC_OPUS1770, bbc_opus1770_device, "bbc_opus1770", "Opus D-DO
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( opus2791 )
+//  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER( bbc_opusfdc_device::floppy_formats )
@@ -37,7 +37,7 @@ FLOPPY_FORMATS_MEMBER( bbc_opusfdc_device::floppy_formats )
 	FLOPPY_FSD_FORMAT,
 	FLOPPY_OPUS_DDOS_FORMAT,
 	FLOPPY_OPUS_DDCPM_FORMAT
-FLOPPY_FORMATS_END0
+FLOPPY_FORMATS_END
 
 static void bbc_floppies_525(device_slot_interface &device)
 {
@@ -47,6 +47,10 @@ static void bbc_floppies_525(device_slot_interface &device)
 	device.option_add("525dd",   FLOPPY_525_DD);
 	device.option_add("525qd",   FLOPPY_525_QD);
 }
+
+//-------------------------------------------------
+//  ROM( opus )
+//-------------------------------------------------
 
 ROM_START( opus8272 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
