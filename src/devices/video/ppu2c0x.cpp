@@ -35,11 +35,6 @@
 	CONSTANTS
 ***************************************************************************/
 
-/* constant definitions */
-#define VISIBLE_SCREEN_WIDTH         (32*8) /* Visible screen width */
-#define VISIBLE_SCREEN_HEIGHT        (30*8) /* Visible screen height */
-#define SPRITERAM_SIZE          0x100   /* spriteram size */
-
 /* default monochromatic colortable */
 static const pen_t default_colortable_mono[] =
 {
@@ -130,25 +125,25 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 	m_scanline(0),  // reset the scanline count
 	m_line_write_increment_large(32),
 	m_paletteram_in_ppuspace(false),
+	m_tile_page(0),
+	m_back_color(0),
+	m_refresh_data(0),
+	m_x_fine(0),
+	m_tilecount(0),
+	m_latch(*this),
 	m_scanline_callback_proc(*this),
 	m_hblank_callback_proc(*this),
 	m_vidaccess_callback_proc(*this),
 	m_int_callback(*this),
-	m_refresh_data(0),
 	m_refresh_latch(0),
-	m_x_fine(0),
 	m_toggle(0),
 	m_add(1),
 	m_videomem_addr(0),
 	m_data_latch(0),
 	m_buffered_data(0),
-	m_tile_page(0),
 	m_sprite_page(0),
-	m_back_color(0),
 	m_scan_scale(1), // set the scan scale (this is for dual monitor vertical setups)
-	m_tilecount(0),
 	m_draw_phase(0),
-	m_latch(*this),
 	m_use_sprite_write_limitation(true)
 {
 	for (auto& elem : m_regs)
@@ -309,7 +304,7 @@ void ppu2c0x_device::device_start()
 //  readbyte - read a byte at the given address
 //-------------------------------------------------
 
-inline uint8_t ppu2c0x_device::readbyte(offs_t address)
+uint8_t ppu2c0x_device::readbyte(offs_t address)
 {
 	return space().read_byte(address);
 }

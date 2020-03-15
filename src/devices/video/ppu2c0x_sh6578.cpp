@@ -64,9 +64,173 @@ void ppu_sh6578_device::device_reset()
 	m_colsel_pntstart = 0x00;
 }
 
+void ppu_sh6578_device::scanline_increment_fine_ycounter()
+{
+	/* increment the fine y-scroll */
+	m_refresh_data += 0x1000;
+
+	/* if it's rolled, increment the coarse y-scroll */
+	if (m_refresh_data & 0x8000)
+	{
+		uint16_t tmp;
+		tmp = (m_refresh_data & 0x03e0) + 0x20;
+		m_refresh_data &= 0x7c1f;
+
+		if (tmp == 0x0400)
+			m_refresh_data ^= 0x0800;
+		else
+			m_refresh_data |= (tmp & 0x03e0);
+
+		//logerror("updating refresh_data: %04x\n", m_refresh_data);
+	}
+}
+
+
+void ppu_sh6578_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t*& dest, const pen_t* color_table)
+{
+	pen_t pen;
+
+	if (pix)
+	{
+		const pen_t* paldata = &color_table[4 * color];
+		pen = this->pen(paldata[pix]);
+	}
+	else
+	{
+		pen = back_pen;
+	}
+
+	*dest = pen;
+}
+
+void ppu_sh6578_device::read_tile_plane_data(int address, int color)
+{
+	m_planebuf[0] = readbyte(address);
+	m_planebuf[1] = readbyte(address + 8);
+
+	m_extplanebuf[0] = readbyte(address + 16);
+	m_extplanebuf[1] = readbyte(address + 24);
+}
+
+void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int color_bits, int address, int start_x, pen_t back_pen, uint32_t*& dest, const pen_t* color_table)
+{
+	int color = (((color_byte >> color_bits) & 0x03));
+
+	read_tile_plane_data(address, color);
+
+	/* render the pixel */
+	for (int i = 0; i < 8; i++)
+	{
+		uint8_t pix;
+		shift_tile_plane_data(pix);
+
+		if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
+		{
+			draw_tile_pixel(pix, color, back_pen, dest, color_table);
+
+			// priority marking
+			if (pix)
+				line_priority[start_x + i] |= 0x02;
+		}
+		dest++;
+	}
+}
+
+
+
+
 void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 {
+	bitmap_rgb32& bitmap = *m_bitmap;
 
+	uint8_t color_mask;
+	const pen_t* color_table;
+
+	/* setup the color mask and colortable to use */
+	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+	{
+		color_mask = 0xf0;
+		color_table = m_colortable_mono.get();
+	}
+	else
+	{
+		color_mask = 0xff;
+		color_table = m_colortable.get();
+	}
+
+	/* cache the background pen */
+	pen_t back_pen = pen(m_back_color & color_mask);
+
+	/* determine where in the nametable to start drawing from */
+	/* based on the current scanline and scroll regs */
+	uint8_t  scroll_x_coarse = m_refresh_data & 0x001f;
+	uint8_t  scroll_y_coarse = (m_refresh_data & 0x03e0) >> 5;
+	uint16_t nametable = (m_refresh_data & 0x0c00);
+	uint8_t  scroll_y_fine = (m_refresh_data & 0x7000) >> 12;
+
+	int x = scroll_x_coarse;
+
+	int ppu_nametable_base = (m_colsel_pntstart & 1) ? 0x2000 : 0x0000;
+
+	/* get the tile index */
+	int tile_index = ((nametable<<1) | ppu_nametable_base) + scroll_y_coarse * 64;
+
+	/* set up dest */
+	int start_x = (m_x_fine ^ 0x07) - 7;
+	uint32_t* dest = &bitmap.pix32(m_scanline, start_x);
+
+	m_tilecount = 0;
+
+	/* draw the 32 or 33 tiles that make up a line */
+	while (m_tilecount < 34)
+	{
+		int color_byte;
+		int color_bits;
+		int index1;
+		int page2, address;
+
+		index1 = tile_index + (x << 1);
+
+		// page2 is the output of the nametable read (this section is the FIRST read per tile!)
+		page2 = readbyte(index1);
+
+		/* Figure out which byte in the color table to use */
+		color_byte = readbyte(index1 + 1);
+
+		/* figure out which bits in the color table to use */
+		color_bits = ((index1 & 0x40) >> 4) + (index1 & 0x02);
+
+		if (start_x < VISIBLE_SCREEN_WIDTH)
+		{
+			address = ((page2 | (color_byte<<8)) & 0x0fff) << 4;
+			// plus something that accounts for y
+			address += scroll_y_fine;
+
+			draw_tile(line_priority, color_byte, color_bits, address, start_x, back_pen, dest, color_table);
+
+			start_x += 8;
+
+			/* move to next tile over and toggle the horizontal name table if necessary */
+			x++;
+			if (x > 31)
+			{
+				x = 0;
+				tile_index ^= 0x800;
+			}
+		}
+		m_tilecount++;
+	}
+
+	/* if the left 8 pixels for the background are off, blank 'em */
+	if (!(m_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND_L8))
+	{
+		dest = &bitmap.pix32(m_scanline);
+		for (int i = 0; i < 8; i++)
+		{
+			*(dest++) = back_pen;
+			line_priority[i] ^= 0x02;
+		}
+	}
 }
 
 void ppu_sh6578_device::draw_sprites(uint8_t* line_priority)

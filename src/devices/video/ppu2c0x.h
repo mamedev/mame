@@ -29,6 +29,10 @@
 #define PPU_DRAW_BG       0
 #define PPU_DRAW_OAM      1
 
+/* constant definitions */
+#define VISIBLE_SCREEN_WIDTH         (32*8) /* Visible screen width */
+#define VISIBLE_SCREEN_HEIGHT        (30*8) /* Visible screen height */
+#define SPRITERAM_SIZE          0x100   /* spriteram size */
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
@@ -188,39 +192,41 @@ protected:
 	int m_line_write_increment_large;
 	bool m_paletteram_in_ppuspace; // sh6578 doesn't have the palette in PPU space, so various side-effects don't apply
 	std::vector<uint8_t>		m_palette_ram;		    /* shouldn't be in main memory! */
+	std::unique_ptr<bitmap_rgb32>                m_bitmap;          /* target bitmap */
+	int                         m_regs[PPU_MAX_REG];        /* registers */
+	int                         m_tile_page;            /* current tile page */
+	int                         m_back_color;           /* background color */
+	int                         m_refresh_data;         /* refresh-related */
+	int                         m_x_fine;               /* refresh-related */
+	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
+	std::unique_ptr<pen_t[]>    m_colortable;          /* color table modified at run time */
+	std::unique_ptr<pen_t[]>    m_colortable_mono;     /* monochromatic color table modified at run time */
+	latch_delegate              m_latch;
+
+
+	uint8_t readbyte(offs_t address);
 private:
 	static constexpr device_timer_id TIMER_HBLANK = 0;
 	static constexpr device_timer_id TIMER_NMI = 1;
 	static constexpr device_timer_id TIMER_SCANLINE = 2;
 
-	inline uint8_t readbyte(offs_t address);
 	inline void writebyte(offs_t address, uint8_t data);
 
-	std::unique_ptr<bitmap_rgb32>                m_bitmap;          /* target bitmap */
-	std::unique_ptr<pen_t[]>    m_colortable;          /* color table modified at run time */
-	std::unique_ptr<pen_t[]>    m_colortable_mono;     /* monochromatic color table modified at run time */
 
 	scanline_delegate           m_scanline_callback_proc;   /* optional scanline callback */
 	hblank_delegate             m_hblank_callback_proc; /* optional hblank callback */
 	vidaccess_delegate          m_vidaccess_callback_proc;  /* optional video access callback */
 	devcb_write_line            m_int_callback;         /* nmi access callback from interface */
 
-	int                         m_regs[PPU_MAX_REG];        /* registers */
-	int                         m_refresh_data;         /* refresh-related */
 	int                         m_refresh_latch;        /* refresh-related */
-	int                         m_x_fine;               /* refresh-related */
 	int                         m_toggle;               /* used to latch hi-lo scroll */
 	int                         m_add;              /* vram increment amount */
 	int                         m_videomem_addr;        /* videomem address pointer */
 	int                         m_data_latch;           /* latched videomem data */
 	int                         m_buffered_data;
-	int                         m_tile_page;            /* current tile page */
 	int                         m_sprite_page;          /* current sprite page */
-	int                         m_back_color;           /* background color */
 	int                         m_scan_scale;           /* scan scale */
-	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
 	int                         m_draw_phase;           /* MMC5 uses different regs for BG and OAM */
-	latch_delegate              m_latch;
 
 	// timers
 	emu_timer                   *m_hblank_timer;        /* hblank period at end of each scanline */
