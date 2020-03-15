@@ -119,6 +119,8 @@ public:
 
 	void ppu2c0x(address_map &map);
 protected:
+	ppu2c0x_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor internal_map);
+
 	// registers definition
 	enum
 	{
@@ -178,7 +180,7 @@ protected:
 	int                         m_scanline;         /* scanline count */
 	std::unique_ptr<uint8_t[]>  m_spriteram;           /* sprite ram */
 
-
+	bool m_paletteram_in_ppuspace; // sh6578 doesn't have the palette in PPU space, so various side-effects don't apply
 private:
 	static constexpr device_timer_id TIMER_HBLANK = 0;
 	static constexpr device_timer_id TIMER_NMI = 1;
@@ -208,7 +210,7 @@ private:
 	int                         m_tile_page;            /* current tile page */
 	int                         m_sprite_page;          /* current sprite page */
 	int                         m_back_color;           /* background color */
-	uint8_t                     m_palette_ram[0x20];        /* shouldn't be in main memory! */
+	std::vector<uint8_t>		m_palette_ram;		    /* shouldn't be in main memory! */
 	int                         m_scan_scale;           /* scan scale */
 	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
 	int                         m_draw_phase;           /* MMC5 uses different regs for BG and OAM */
