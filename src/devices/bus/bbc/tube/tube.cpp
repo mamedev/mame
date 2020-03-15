@@ -46,7 +46,8 @@ bbc_tube_slot_device::bbc_tube_slot_device(const machine_config &mconfig, const 
 	device_t(mconfig, BBC_TUBE_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_bbc_tube_interface>(mconfig, *this),
 	m_card(nullptr),
-	m_irq_handler(*this)
+	m_irq_handler(*this),
+	m_insert_rom(true)
 {
 }
 
