@@ -228,7 +228,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 			hdma(cpu0space);
 
 		if (m_screen->vpos() > 0)
-			m_screen->update_partial((m_ppu->interlace() == 2) ? (m_ppu->current_vert() * m_ppu->interlace()) : m_ppu->current_vert());
+			m_screen->update_partial((m_ppu->interlace() == 2) ? (m_ppu->current_vert() * m_ppu->interlace()) : m_ppu->current_vert() - 1);
 	}
 
 	// signal hblank
