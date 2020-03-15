@@ -803,6 +803,57 @@ void ppu2c0x_device::read_extra_sprite_bits(int sprite_index)
 	// needed for some clones
 }
 
+void ppu2c0x_device::draw_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, uint8_t* line_priority)
+{
+	if (pixel_data)
+	{
+		/* has the background (or another sprite) already been drawn here? */
+		if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
+		{
+			if (!line_priority[sprite_xpos + pixel])
+			{
+				/* no, draw */
+				draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data, bitmap);
+			}
+			/* indicate that a sprite was drawn at this location, even if it's not seen */
+			line_priority[sprite_xpos + pixel] |= 0x01;
+		}
+	}
+
+	/* set the "sprite 0 hit" flag if appropriate */
+	if (sprite_index == 0 && (pixel_data & 0x03) && ((sprite_xpos + pixel) < 255) && (line_priority[sprite_xpos + pixel] & 0x02))
+		m_regs[PPU_STATUS] |= PPU_STATUS_SPRITE0_HIT;
+}
+
+void ppu2c0x_device::draw_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, uint8_t* line_priority)
+{
+	if (pixel_data)
+	{
+		if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
+		{
+			/* has another sprite been drawn here? */
+			if (!(line_priority[sprite_xpos + pixel] & 0x01))
+			{
+				/* no, draw */
+				draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data, bitmap);
+				line_priority[sprite_xpos + pixel] |= 0x01;
+			}
+		}
+	}
+
+	/* set the "sprite 0 hit" flag if appropriate */
+	if (sprite_index == 0 && (pixel_data & 0x03) && ((sprite_xpos + pixel) < 255) && (line_priority[sprite_xpos + pixel] & 0x02))
+		m_regs[PPU_STATUS] |= PPU_STATUS_SPRITE0_HIT;
+}
+
+int ppu2c0x_device::apply_sprite_pattern_page(int index1, int size)
+{
+	if (size == 8)
+		index1 += ((m_sprite_page == 0) ? 0 : 0x1000);
+
+	return index1;
+}
+
 void ppu2c0x_device::draw_sprites(uint8_t* line_priority)
 {
 	bitmap_rgb32& bitmap = *m_bitmap;
@@ -881,8 +932,8 @@ void ppu2c0x_device::draw_sprites(uint8_t* line_priority)
 		}
 
 		index1 = tile * 16;
-		if (size == 8)
-			index1 += ((m_sprite_page == 0) ? 0 : 0x1000);
+
+		index1 = apply_sprite_pattern_page(index1, size);
 
 		read_sprite_plane_data(index1 + sprite_line);
 
@@ -913,24 +964,7 @@ void ppu2c0x_device::draw_sprites(uint8_t* line_priority)
 				/* is this pixel non-transparent? */
 				if (sprite_xpos + pixel >= first_pixel)
 				{
-					if (pixel_data)
-					{
-						/* has the background (or another sprite) already been drawn here? */
-						if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
-						{
-							if (!line_priority[sprite_xpos + pixel])
-							{
-								/* no, draw */
-								draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data, bitmap);
-							}
-							/* indicate that a sprite was drawn at this location, even if it's not seen */
-							line_priority[sprite_xpos + pixel] |= 0x01;
-						}
-					}
-
-					/* set the "sprite 0 hit" flag if appropriate */
-					if (sprite_index == 0 && (pixel_data & 0x03) && ((sprite_xpos + pixel) < 255) && (line_priority[sprite_xpos + pixel] & 0x02))
-						m_regs[PPU_STATUS] |= PPU_STATUS_SPRITE0_HIT;
+					draw_sprite_pixel_low(bitmap, pixel_data, pixel, sprite_xpos, color, sprite_index, line_priority);
 				}
 			}
 		}
@@ -945,23 +979,7 @@ void ppu2c0x_device::draw_sprites(uint8_t* line_priority)
 				/* is this pixel non-transparent? */
 				if (sprite_xpos + pixel >= first_pixel)
 				{
-					if (pixel_data)
-					{
-						if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
-						{
-							/* has another sprite been drawn here? */
-							if (!(line_priority[sprite_xpos + pixel] & 0x01))
-							{
-								/* no, draw */
-								draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data, bitmap);
-								line_priority[sprite_xpos + pixel] |= 0x01;
-							}
-						}
-					}
-
-					/* set the "sprite 0 hit" flag if appropriate */
-					if (sprite_index == 0 && (pixel_data & 0x03) && ((sprite_xpos + pixel) < 255) && (line_priority[sprite_xpos + pixel] & 0x02))
-						m_regs[PPU_STATUS] |= PPU_STATUS_SPRITE0_HIT;
+					draw_sprite_pixel_high(bitmap, pixel_data, pixel, sprite_xpos, color, sprite_index, line_priority);
 				}
 			}
 		}

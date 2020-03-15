@@ -245,10 +245,24 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 	}
 }
 
+void ppu_sh6578_device::read_sprite_plane_data(int address)
+{
+	m_planebuf[0] = readbyte((address + 0) & 0x3fff);
+	m_planebuf[1] = readbyte((address + 8) & 0x3fff);
+}
+
+
+int ppu_sh6578_device::apply_sprite_pattern_page(int index1, int size)
+{
+	index1 += (((m_colsel_pntstart >> 2) & 0x3) * 0x1000);
+	return index1;
+}
+
+/*
 void ppu_sh6578_device::draw_sprites(uint8_t* line_priority)
 {
-
 }
+*/
 
 void ppu_sh6578_device::write(offs_t offset, uint8_t data)
 {

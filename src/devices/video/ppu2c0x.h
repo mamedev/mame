@@ -91,8 +91,11 @@ public:
 	virtual void read_sprite_plane_data(int address);
 	virtual void make_sprite_pixel_data(uint8_t &pixel_data, int flipx);
 	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap);
+	virtual void draw_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, uint8_t* line_priority);
+	virtual void draw_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, uint8_t* line_priority);
 	virtual void read_extra_sprite_bits(int sprite_index);
 
+	virtual int apply_sprite_pattern_page(int index1, int size);
 	virtual void draw_sprites(uint8_t *line_priority);
 	void render_scanline();
 	virtual void scanline_increment_fine_ycounter();

@@ -159,7 +159,7 @@ void nes_sh6578_state::bank_w(int bank, uint16_t offset, uint8_t data)
 
 WRITE8_MEMBER(nes_sh6578_state::sprite_dma_w)
 {
-	//	int source = (data & 7);
+	m_ppu->spriteram_dma(space, data);
 }
 
 READ8_MEMBER(nes_sh6578_state::bankswitch_r)
