@@ -34605,6 +34605,10 @@ tb303                           // Roland
 @source:roland_tr606.cpp
 tr606                           // Roland
 
+@source:roland_tr707.cpp
+tr707                           //
+tr727                           //
+
 @source:rollerg.cpp
 rollerg                         // GX999 (c) 1991 (US)
 rollergj                        // GX999 (c) 1991 (Japan)

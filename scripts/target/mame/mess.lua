@@ -3249,6 +3249,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/roland_sc55.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tb303.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tr606.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_tr707.cpp",
 	MAME_DIR .. "src/mame/machine/pg200.cpp",
 }
 
