@@ -122,9 +122,14 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 		{
 			pen_t pen;
 
-			if (pix)
+			uint8_t palval = m_palette_ram[(pix | color << 2)] & 0x3f;
+
+			bool trans = false;
+			if ((palval & 0x1f) == 0x1f)
+				trans = true;
+
+			if (!trans)
 			{
-				uint8_t palval = m_palette_ram[(pix | color << 2)] & 0x3f;
 				pen = this->pen(palval);
 			}
 			else
@@ -135,7 +140,7 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 			*dest = pen;		
 
 			// priority marking
-			if (pix)
+			if (!trans)
 				line_priority[start_x + i] |= 0x02;
 		}
 		dest++;
@@ -213,7 +218,7 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 			// plus something that accounts for y
 			address += scroll_y_fine;
 
-			draw_tile(line_priority, (color_byte >> 12) & 0xf, 0, address, start_x, back_pen, dest, color_table);
+			draw_tile(line_priority, (color_byte >> 4) & 0xf, 0, address, start_x, back_pen, dest, color_table);
 
 			start_x += 8;
 
