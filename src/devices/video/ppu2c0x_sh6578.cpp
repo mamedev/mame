@@ -54,6 +54,16 @@ void ppu_sh6578_device::device_reset()
 	ppu2c0x_device::device_reset();
 }
 
+void ppu_sh6578_device::draw_background(uint8_t* line_priority)
+{
+
+}
+
+void ppu_sh6578_device::draw_sprites(uint8_t* line_priority)
+{
+
+}
+
 void ppu_sh6578_device::write(offs_t offset, uint8_t data)
 {
 	if (offset < 0x8)
@@ -85,4 +95,14 @@ uint8_t ppu_sh6578_device::read(offs_t offset)
 	{
 		return 0x00;
 	}
+}
+
+void ppu_sh6578_device::palette_write(offs_t offset, uint8_t data)
+{
+
+}
+
+uint8_t ppu_sh6578_device::palette_read(offs_t offset)
+{
+	return 0x00;
 }

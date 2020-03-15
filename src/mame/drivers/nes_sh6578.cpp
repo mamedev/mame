@@ -11,6 +11,7 @@
 */
 
 #include "emu.h"
+#include "video/ppu2c0x_sh6578.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/nes_apu.h"
 #include "emupal.h"
@@ -33,6 +34,7 @@ public:
 	nes_sh6578_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ppu(*this, "ppu"),
 		m_bank(*this, "cartbank"),
 		m_fullrom(*this, "fullrom"),
 		m_vram(*this, "vram"),
@@ -57,6 +59,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<ppu_sh6578_device> m_ppu;
 	required_memory_bank m_bank;
 	required_device<address_map_bank_device> m_fullrom;
 	required_device<address_map_bank_device> m_vram;
@@ -65,7 +68,7 @@ private:
 	required_device<nesapu_device> m_apu;
 	required_device<timer_device> m_timer;
 
-	rgb_t nespal_to_RGB(int color_intensity, int color_num);
+	//rgb_t nespal_to_RGB(int color_intensity, int color_num);
 
 	DECLARE_READ8_MEMBER(bankswitch_r);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
@@ -99,10 +102,10 @@ private:
 	DECLARE_WRITE8_MEMBER(timer_config_w);
 	DECLARE_WRITE8_MEMBER(timer_value_w);
 
-	DECLARE_WRITE8_MEMBER(write_ppu);
-	DECLARE_READ8_MEMBER(read_ppu);
-	DECLARE_WRITE8_MEMBER(write_palette);
-	DECLARE_READ8_MEMBER(read_palette);
+//	DECLARE_WRITE8_MEMBER(write_ppu);
+//	DECLARE_READ8_MEMBER(read_ppu);
+//	DECLARE_WRITE8_MEMBER(write_palette);
+//	DECLARE_READ8_MEMBER(read_palette);
 
 	DECLARE_READ8_MEMBER(io0_r);
 	DECLARE_READ8_MEMBER(io1_r);
@@ -117,7 +120,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
 
 	int m_iniital_startup_state;
-	std::vector<uint8_t> m_palette_ram;
+	//std::vector<uint8_t> m_palette_ram;
 
 	uint8_t m_bankswitch[8];
 
@@ -127,6 +130,7 @@ private:
 	uint8_t m_dma_dest[2];
 	uint8_t m_dma_length[2];
 
+	/*
 	uint8_t m_2000;
 	uint8_t m_2001;
 	uint8_t m_2002;
@@ -137,11 +141,12 @@ private:
 
 	uint16_t m_vramaddr;
 	uint8_t m_2007;
+	*/
 
 	uint8_t m_irqmask;
 
 	uint8_t m_colsel_pntstart;
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	//TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	void do_dma();
 
@@ -163,6 +168,7 @@ private:
 	required_ioport_array<2> m_in;
 };
 
+#if 0
 TIMER_DEVICE_CALLBACK_MEMBER(nes_sh6578_state::scanline)
 {
 	int scanline = param;
@@ -175,7 +181,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nes_sh6578_state::scanline)
 		}
 	}
 }
-
+#endif
 
 uint8_t nes_sh6578_state::bank_r(int bank, uint16_t offset)
 {
@@ -190,7 +196,7 @@ void nes_sh6578_state::bank_w(int bank, uint16_t offset, uint8_t data)
 	uint32_t address;
 	address = offset & 0x00fff;                   // 0x00fff part of address
 	address |= (m_bankswitch[bank] & 0xff) << 12; // 0xff000 part of address
-	return m_fullrom->write8(address, data);
+	m_fullrom->write8(address, data);
 }
 
 WRITE8_MEMBER(nes_sh6578_state::sprite_dma_w)
@@ -226,6 +232,7 @@ READ8_MEMBER(nes_sh6578_state::dma_r)
 
 void nes_sh6578_state::do_dma()
 {
+#if 0
 	if (m_dma_control & 0x80)
 	{
 		uint16_t dma_source = m_dma_source[0] | (m_dma_source[1] << 8);
@@ -272,6 +279,7 @@ void nes_sh6578_state::do_dma()
 	// but games seem to be making quite a few DMA writes with lengths that seem too large? buggy code?
 	//m_dma_length[0] = 0;
 	//m_dma_length[1] = 0;
+#endif
 }
 
 WRITE8_MEMBER(nes_sh6578_state::dma_w)
@@ -396,6 +404,7 @@ WRITE8_MEMBER(nes_sh6578_state::timing_setting_control_w)
 	logerror("%s: nes_sh6578_state::timing_setting_control_w : %02x\n", machine().describe_context(), data);
 }
 
+#if 0
 // borrowed from ppu2c0x.cpp, doesn't currently handle color emphasis!
 rgb_t nes_sh6578_state::nespal_to_RGB(int color_intensity, int color_num)
 {
@@ -466,8 +475,9 @@ rgb_t nes_sh6578_state::nespal_to_RGB(int color_intensity, int color_num)
 
 	return rgb_t(floor(R + .5), floor(G + .5), floor(B + .5));
 }
+#endif
 
-
+#if 0
 READ8_MEMBER(nes_sh6578_state::read_palette)
 {
 	//logerror("%s: nes_sh6578_state::read_ppu : Palette Entry %02x\n", machine().describe_context(), offset);
@@ -482,8 +492,9 @@ WRITE8_MEMBER(nes_sh6578_state::write_palette)
 	rgb_t col = nespal_to_RGB((data & 0x30) >> 4, data & 0x0f);
 	m_palette->set_pen_color(offset, col);
 }
+#endif
 
-
+#if 0
 READ8_MEMBER(nes_sh6578_state::read_ppu)
 {
 	switch (offset)
@@ -575,6 +586,8 @@ WRITE8_MEMBER(nes_sh6578_state::write_ppu)
 		//ppu2c0x_device::write(space, offset, data);
 	}
 }
+#endif
+
 
 READ8_MEMBER(nes_sh6578_state::io0_r)
 {
@@ -649,14 +662,12 @@ READ8_MEMBER(nes_sh6578_state::apu_read_mem)
 void nes_sh6578_state::nes_sh6578_map(address_map& map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2008).rw(FUNC(nes_sh6578_state::read_ppu), FUNC(nes_sh6578_state::write_ppu));
-	
-	map(0x2040, 0x207f).rw(FUNC(nes_sh6578_state::read_palette), FUNC(nes_sh6578_state::write_palette));
-	
-	map(0x4014, 0x4014).w(FUNC(nes_sh6578_state::sprite_dma_w));
+	map(0x2000, 0x2008).rw(m_ppu, FUNC(ppu_sh6578_device::read), FUNC(ppu_sh6578_device::write));  
 
+	map(0x2040, 0x207f).rw(m_ppu, FUNC(ppu_sh6578_device::palette_read), FUNC(ppu_sh6578_device::palette_write));
+	
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
-	map(0x4014, 0x4014).r(FUNC(nes_sh6578_state::psg1_4014_r));
+	map(0x4014, 0x4014).rw(FUNC(nes_sh6578_state::psg1_4014_r), FUNC(nes_sh6578_state::sprite_dma_w));
 	map(0x4015, 0x4015).rw(FUNC(nes_sh6578_state::psg1_4015_r), FUNC(nes_sh6578_state::psg1_4015_w));
 	map(0x4016, 0x4016).rw(FUNC(nes_sh6578_state::io0_r), FUNC(nes_sh6578_state::io_w));
 	map(0x4017, 0x4017).rw(FUNC(nes_sh6578_state::io1_r), FUNC(nes_sh6578_state::psg1_4017_w));
@@ -672,7 +683,6 @@ void nes_sh6578_state::nes_sh6578_map(address_map& map)
 	map(0x4040, 0x4047).rw(FUNC(nes_sh6578_state::bankswitch_r), FUNC(nes_sh6578_state::bankswitch_w));
 
 	map(0x4048, 0x404f).rw(FUNC(nes_sh6578_state::dma_r), FUNC(nes_sh6578_state::dma_w));
-
 
 	map(0x5000, 0x57ff).ram();
 
@@ -712,14 +722,17 @@ void nes_sh6578_state::machine_reset()
 	for (int i = 0; i < 8; i++)
 		m_bankswitch[i] = i;
 
+	/*
 	m_palette_ram.resize(0x40);
 
 	for (int i = 0; i < 0x40; i++)
 		m_palette_ram[i] = 0x00;
+	*/
 
 	m_iniital_startup_state = 0;
 	m_bank->set_entry(0);
 
+	/*
 	m_2000 = 0;
 	m_2001 = 0;
 	m_2002 = 0;
@@ -731,6 +744,7 @@ void nes_sh6578_state::machine_reset()
 	m_scrollreg_firstwrite = true;
 
 	m_colsel_pntstart = 0;
+	*/
 
 	m_irqmask = 0xff;
 	m_timerval = 0x00;
@@ -811,6 +825,7 @@ uint16_t nes_sh6578_state::get_tileaddress(uint8_t x, uint8_t y, bool ishigh)
 	}
 }
 
+#if 0
 uint32_t nes_sh6578_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
 	const pen_t *paldata = m_palette->pens();
@@ -874,6 +889,7 @@ uint32_t nes_sh6578_state::screen_update(screen_device& screen, bitmap_rgb32& bi
 
 	return 0;
 }
+#endif
 
 TIMER_DEVICE_CALLBACK_MEMBER(nes_sh6578_state::timer_expired)
 {
@@ -894,6 +910,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(nes_sh6578_state::timer_expired)
 #define PAL_APU_CLOCK       (N2A03_PAL_XTAL/16) /* 1.662607 MHz */
 #define PALC_APU_CLOCK      (N2A03_PAL_XTAL/15) /* 1.77344746666... MHz */
 
+uint32_t nes_sh6578_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+{
+	return m_ppu->screen_update(screen, bitmap, cliprect);
+}
+
 void nes_sh6578_state::nes_sh6578(machine_config& config)
 {
 	/* basic machine hardware */
@@ -904,15 +925,20 @@ void nes_sh6578_state::nes_sh6578(machine_config& config)
 
 	ADDRESS_MAP_BANK(config, m_vram).set_map(&nes_sh6578_state::vram_map).set_options(ENDIANNESS_NATIVE, 8, 16, 0x10000);
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(nes_sh6578_state::scanline), "screen", 0, 1);
+	//TIMER(config, "scantimer").configure_scanline(FUNC(nes_sh6578_state::scanline), "screen", 0, 1);
+
+	PPU_SH6578(config, m_ppu, N2A03_NTSC_XTAL);
+	m_ppu->set_cpu_tag(m_maincpu);
+	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(32 * 8, 262);
-	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
+	m_screen->set_refresh_hz(60.0988);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) *
+							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
+	m_screen->set_size(32*8, 262);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(nes_sh6578_state::screen_update));
-	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	TIMER(config, m_timer).configure_periodic(FUNC(nes_sh6578_state::timer_expired), attotime::never);
 
@@ -935,11 +961,16 @@ void nes_sh6578_state::nes_sh6578_pal(machine_config& config)
 	m_maincpu->set_clock(PALC_APU_CLOCK);
 	m_apu->set_clock(PALC_APU_CLOCK);
 
+	PPU_SH6578PAL(config.replace(), m_ppu, N2A03_PAL_XTAL);
+	m_ppu->set_cpu_tag(m_maincpu);
+	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
 	m_screen->set_refresh_hz(50.0070);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66 / (PALC_APU_CLOCK.dvalue() / 1000000)) *
-		(310 - 291 + 1 + 2)));
+		(ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL - ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC + 1 + 2)));
 	m_screen->set_size(32 * 8, 312);
 	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
+
 }
 
 void nes_sh6578_state::init_nes_sh6578()

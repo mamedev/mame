@@ -81,7 +81,7 @@ public:
 	virtual void shift_tile_plane_data(uint8_t &pix);
 	virtual void draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t *&dest, const pen_t *color_table);
 	virtual void draw_tile(uint8_t *line_priority, int color_byte, int color_bits, int address, int start_x, pen_t back_pen, uint32_t *&dest, const pen_t *color_table);
-	void draw_background( uint8_t *line_priority );
+	virtual void draw_background( uint8_t *line_priority );
 	void draw_background_pen();
 
 	virtual void read_sprite_plane_data(int address);
@@ -89,7 +89,7 @@ public:
 	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap);
 	virtual void read_extra_sprite_bits(int sprite_index);
 
-	void draw_sprites(uint8_t *line_priority);
+	virtual void draw_sprites(uint8_t *line_priority);
 	void render_scanline();
 	virtual void scanline_increment_fine_ycounter();
 	void update_visible_enabled_scanline();
@@ -186,6 +186,7 @@ protected:
 	std::unique_ptr<uint8_t[]>  m_spriteram;           /* sprite ram */
 
 	bool m_paletteram_in_ppuspace; // sh6578 doesn't have the palette in PPU space, so various side-effects don't apply
+	std::vector<uint8_t>		m_palette_ram;		    /* shouldn't be in main memory! */
 private:
 	static constexpr device_timer_id TIMER_HBLANK = 0;
 	static constexpr device_timer_id TIMER_NMI = 1;
@@ -215,7 +216,6 @@ private:
 	int                         m_tile_page;            /* current tile page */
 	int                         m_sprite_page;          /* current sprite page */
 	int                         m_back_color;           /* background color */
-	std::vector<uint8_t>		m_palette_ram;		    /* shouldn't be in main memory! */
 	int                         m_scan_scale;           /* scan scale */
 	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
 	int                         m_draw_phase;           /* MMC5 uses different regs for BG and OAM */

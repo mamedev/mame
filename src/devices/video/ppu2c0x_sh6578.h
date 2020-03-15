@@ -16,6 +16,11 @@ class ppu_sh6578_device : public ppu2c0x_device
 public:
 	ppu_sh6578_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual uint8_t palette_read(offs_t offset) override;
+	virtual void palette_write(offs_t offset, uint8_t data) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+	virtual uint8_t read(offs_t offset) override;
+
 protected:
 	ppu_sh6578_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	
@@ -25,8 +30,8 @@ private:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void write(offs_t offset, uint8_t data) override;
-	virtual uint8_t read(offs_t offset) override;
+	virtual void draw_sprites(uint8_t* line_priority) override;
+	virtual void draw_background(uint8_t* line_priority) override;
 };
 
 class ppu_sh6578pal_device : public ppu_sh6578_device
