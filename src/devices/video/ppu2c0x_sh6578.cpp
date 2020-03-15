@@ -86,23 +86,6 @@ void ppu_sh6578_device::scanline_increment_fine_ycounter()
 }
 
 
-void ppu_sh6578_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t*& dest, const pen_t* color_table)
-{
-	pen_t pen;
-
-	if (pix)
-	{
-		const pen_t* paldata = &color_table[4 * color];
-		pen = this->pen(paldata[pix]);
-	}
-	else
-	{
-		pen = back_pen;
-	}
-
-	*dest = pen;
-}
-
 void ppu_sh6578_device::read_tile_plane_data(int address, int color)
 {
 	m_planebuf[0] = readbyte(address);
@@ -126,7 +109,19 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 
 		if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
 		{
-			draw_tile_pixel(pix, color, back_pen, dest, color_table);
+			pen_t pen;
+
+			if (pix)
+			{
+				const pen_t* paldata = &color_table[4 * color];
+				pen = this->pen(paldata[pix]);
+			}
+			else
+			{
+				pen = back_pen;
+			}
+
+			*dest = pen;		
 
 			// priority marking
 			if (pix)
@@ -167,10 +162,8 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 
 	int x = scroll_x_coarse;
 
-	int ppu_nametable_base = (m_colsel_pntstart & 1) ? 0x2000 : 0x0000;
-
 	/* get the tile index */
-	int tile_index = ((nametable<<1) | ppu_nametable_base) + scroll_y_coarse * 64;
+	int tile_index = (nametable<<1) + scroll_y_coarse * 64;
 
 	/* set up dest */
 	int start_x = (m_x_fine ^ 0x07) - 7;
@@ -186,6 +179,16 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 		int page2, address;
 
 		index1 = tile_index + (x << 1);
+
+		if (m_colsel_pntstart & 1)
+		{
+			index1 &= 0x7ff;
+			index1 += 0x2000;
+		}
+		else
+		{
+			index1 &= 0x1fff;
+		}
 
 		// page2 is the output of the nametable read (this section is the FIRST read per tile!)
 		page2 = readbyte(index1);
