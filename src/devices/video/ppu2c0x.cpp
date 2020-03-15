@@ -257,9 +257,9 @@ void ppu2c0x_device::device_start()
 	m_colortable = std::make_unique<pen_t[]>(ARRAY_LENGTH(default_colortable));
 	m_colortable_mono = std::make_unique<pen_t[]>(ARRAY_LENGTH(default_colortable_mono));
 
-	m_palette_ram.resize(0x40);
+	m_palette_ram.resize(0x20);
 
-	for (int i = 0; i < 0x40; i++)
+	for (int i = 0; i < 0x20; i++)
 		m_palette_ram[i] = 0x00;
 
 	/* initialize the color tables */

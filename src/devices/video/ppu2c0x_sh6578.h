@@ -18,10 +18,15 @@ public:
 
 protected:
 	ppu_sh6578_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	
+	void ppu_internal_map(address_map& map);
 
 private:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void write(offs_t offset, uint8_t data) override;
+	virtual uint8_t read(offs_t offset) override;
 };
 
 class ppu_sh6578pal_device : public ppu_sh6578_device
