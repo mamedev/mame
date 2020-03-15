@@ -37,7 +37,7 @@ public:
 		m_ppu(*this, "ppu"),
 		m_bank(*this, "cartbank"),
 		m_fullrom(*this, "fullrom"),
-		m_vram(*this, "vram"),
+		//m_vram(*this, "vram"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_apu(*this, "nesapu"),
@@ -62,7 +62,7 @@ private:
 	required_device<ppu_sh6578_device> m_ppu;
 	required_memory_bank m_bank;
 	required_device<address_map_bank_device> m_fullrom;
-	required_device<address_map_bank_device> m_vram;
+	//required_device<address_map_bank_device> m_vram;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<nesapu_device> m_apu;
@@ -232,7 +232,7 @@ READ8_MEMBER(nes_sh6578_state::dma_r)
 
 void nes_sh6578_state::do_dma()
 {
-#if 0
+
 	if (m_dma_control & 0x80)
 	{
 		uint16_t dma_source = m_dma_source[0] | (m_dma_source[1] << 8);
@@ -268,7 +268,8 @@ void nes_sh6578_state::do_dma()
 			}
 			else
 			{
-				m_vram->write8(realdestaddress, readdat);
+				// TODO
+				//m_vram->write8(realdestaddress, readdat);
 			}
 
 			realsourceaddress++;
@@ -279,7 +280,7 @@ void nes_sh6578_state::do_dma()
 	// but games seem to be making quite a few DMA writes with lengths that seem too large? buggy code?
 	//m_dma_length[0] = 0;
 	//m_dma_length[1] = 0;
-#endif
+
 }
 
 WRITE8_MEMBER(nes_sh6578_state::dma_w)
@@ -773,12 +774,14 @@ void nes_sh6578_state::rom_map(address_map& map)
 	map(0x00000, 0xfffff).bankr("cartbank");
 }
 
+#if 0
 void nes_sh6578_state::vram_map(address_map& map)
 {
 	map(0x0000, 0x27ff).ram();
 	map(0x2800, 0x7fff).nopr();
 	map(0x8000, 0xffff).ram();
 }
+#endif
 
 uint16_t nes_sh6578_state::get_tileaddress(uint8_t x, uint8_t y, bool ishigh)
 {
@@ -923,7 +926,7 @@ void nes_sh6578_state::nes_sh6578(machine_config& config)
 
 	ADDRESS_MAP_BANK(config, m_fullrom).set_map(&nes_sh6578_state::rom_map).set_options(ENDIANNESS_NATIVE, 8, 20, 0x100000);
 
-	ADDRESS_MAP_BANK(config, m_vram).set_map(&nes_sh6578_state::vram_map).set_options(ENDIANNESS_NATIVE, 8, 16, 0x10000);
+	//ADDRESS_MAP_BANK(config, m_vram).set_map(&nes_sh6578_state::vram_map).set_options(ENDIANNESS_NATIVE, 8, 16, 0x10000);
 
 	//TIMER(config, "scantimer").configure_scanline(FUNC(nes_sh6578_state::scanline), "screen", 0, 1);
 
