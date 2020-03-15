@@ -34599,6 +34599,12 @@ r8mk2                           //
 @source:roland_sc55.cpp
 sc55                            // 1991 Sound Canvas SC-55
 
+@source:roland_tb303.cpp
+tb303                           // Roland
+
+@source:roland_tr606.cpp
+tr606                           // Roland
+
 @source:rollerg.cpp
 rollerg                         // GX999 (c) 1991 (US)
 rollergj                        // GX999 (c) 1991 (Japan)
@@ -38754,9 +38760,6 @@ ivg09                           //
 @source:taxidriv.cpp
 taxidriv                        // [1984 Graphic Techno]
 
-@source:tb303.cpp
-tb303                           // Roland
-
 @source:tbowl.cpp
 tbowl                           // 6206 - (c) 1987 Tecmo
 tbowla                          //
@@ -39497,9 +39500,6 @@ tp84b                           // GX388 (c) 1984
 
 @source:tr175.cpp
 tr175                           // Relisys
-
-@source:tr606.cpp
-tr606                           // Roland
 
 @source:trackfld.cpp
 atlantol                        // bootleg

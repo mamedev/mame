@@ -757,6 +757,8 @@ roland_jx3p.cpp
 roland_mt32.cpp
 roland_r8.cpp
 roland_sc55.cpp
+roland_tb303.cpp
+roland_tr606.cpp
 rt1715.cpp
 rvoice.cpp
 rx78.cpp
@@ -886,7 +888,6 @@ tandy1t.cpp
 tandy2k.cpp
 tasc.cpp
 tavernie.cpp
-tb303.cpp
 tdv2324.cpp
 tec1.cpp
 tecnbras.cpp
@@ -936,7 +937,6 @@ tmc600.cpp
 tomy_princ.cpp
 tosh1000.cpp
 tr175.cpp
-tr606.cpp
 tranz330.cpp
 tricep.cpp
 trkfldch.cpp
