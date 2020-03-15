@@ -22,7 +22,7 @@ ppu_sh6578_device::ppu_sh6578_device(const machine_config& mconfig, device_type 
 	ppu2c0x_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ppu_sh6578_device::ppu_internal_map), this))
 {
 	m_paletteram_in_ppuspace = false;
-	m_line_write_increment_large = 64;
+	m_line_write_increment_large = 32;
 }
 
 ppu_sh6578_device::ppu_sh6578_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
