@@ -805,9 +805,17 @@ void ppu2c0x_device::read_extra_sprite_bits(int sprite_index)
 	// needed for some clones
 }
 
-void ppu2c0x_device::draw_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, uint8_t* line_priority)
+bool ppu2c0x_device::is_spritepixel_opaque(int pixel_data, int color)
 {
 	if (pixel_data)
+		return true;
+	else
+		return false;
+}
+
+void ppu2c0x_device::draw_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, uint8_t* line_priority)
+{
+	if (is_spritepixel_opaque(pixel_data, color))
 	{
 		/* has the background (or another sprite) already been drawn here? */
 		if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
@@ -829,7 +837,7 @@ void ppu2c0x_device::draw_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data,
 
 void ppu2c0x_device::draw_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, uint8_t* line_priority)
 {
-	if (pixel_data)
+	if (is_spritepixel_opaque(pixel_data, color))
 	{
 		if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
 		{

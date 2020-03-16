@@ -87,6 +87,11 @@ void ppu_sh6578_device::scanline_increment_fine_ycounter()
 	}
 }
 
+void ppu_sh6578_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap)
+{
+	uint8_t palval = m_palette_ram[(pixel_data | color << 2)] & 0x3f;
+	bitmap.pix32(m_scanline, sprite_xpos + pixel) = this->pen(palval);
+}
 
 void ppu_sh6578_device::read_tile_plane_data(int address, int color)
 {
@@ -136,7 +141,8 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 			}
 			else
 			{
-				pen = back_pen;
+				uint8_t palval = m_palette_ram[0x0] & 0x3f;
+				pen = this->pen(palval);
 			}
 
 			*dest = pen;		
