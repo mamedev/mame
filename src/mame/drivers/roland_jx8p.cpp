@@ -66,7 +66,7 @@ void roland_jx8p_state::gate_array_w(offs_t offset, u8 data)
 void roland_jx8p_state::jx8p_assigner_map(address_map &map)
 {
 	map(0x0000, 0x001f).m(m_assignercpu, FUNC(hd6303r_cpu_device::m6801_io));
-	map(0x0040, 0x00ff).ram(); // internal RAM
+	map(0x0080, 0x00ff).ram(); // internal RAM
 	map(0x2000, 0x3fff).rw("cartslot", FUNC(generic_slot_device::read_ram), FUNC(generic_slot_device::write_ram));
 	map(0x4000, 0x4007).mirror(0x1ff8).r(FUNC(roland_jx8p_state::switches_r));
 	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(roland_jx8p_state::leds_w));
@@ -78,7 +78,7 @@ void roland_jx8p_state::jx8p_assigner_map(address_map &map)
 void roland_jx8p_state::superjx_assigner_map(address_map &map)
 {
 	map(0x0000, 0x001f).m(m_assignercpu, FUNC(hd6303r_cpu_device::m6801_io));
-	map(0x0040, 0x00ff).ram(); // internal RAM
+	map(0x0080, 0x00ff).ram(); // internal RAM
 	map(0x1000, 0x17ff).mirror(0x800).rw(FUNC(roland_jx8p_state::gate_array_r), FUNC(roland_jx8p_state::gate_array_w));
 	map(0x2000, 0x3fff).rw("cartslot", FUNC(generic_slot_device::read_ram), FUNC(generic_slot_device::write_ram));
 	map(0x4000, 0x4007).mirror(0xff8).r(FUNC(roland_jx8p_state::switches_r));
@@ -399,15 +399,18 @@ ROM_END
 
 ROM_START(mks70)
 	ROM_REGION(0x8000, "assigner", 0)
-	ROM_LOAD("a-v103.ic6", 0x0000, 0x8000, CRC(9d43f917) SHA1(fa9a1c8d5dd2c19bee2650aa3f7080773d90f8ef))
+	ROM_SYSTEM_BIOS(0, "v108", "Ver. 1.08")
+	ROMX_LOAD("mks70_v108-a.ic6", 0x0000, 0x8000, CRC(d0f2ed4e) SHA1(3f052684fbccf30cef391dc0420673002279d8e0), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v103", "Ver. 1.03")
+	ROMX_LOAD("a-v103.ic6", 0x0000, 0x8000, CRC(9d43f917) SHA1(fa9a1c8d5dd2c19bee2650aa3f7080773d90f8ef), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "displaycpu", 0)
 	ROM_LOAD("upd7538a-013_15179240.ic3", 0x0000, 0x1000, NO_DUMP)
 
-	ROM_REGION(0x4000, "lower:program", 0)
+	ROM_REGION(0x4000, "lower:program", 0) // no change between 1.03 and 1.06
 	ROM_LOAD("b-v103.ic1", 0x0000, 0x4000, CRC(d568f6d3) SHA1(78b723ad1e606f0fefc0ee17297172c1842e6bb6))
 
-	ROM_REGION(0x4000, "upper:program", 0)
+	ROM_REGION(0x4000, "upper:program", 0) // no change between 1.03 and 1.06
 	ROM_LOAD("c-v103.ic1", 0x0000, 0x4000, CRC(4808729c) SHA1(0adcfa405d6f5be7c4c32ffa5b2e224c66e72f74))
 ROM_END
 
