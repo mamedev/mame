@@ -608,14 +608,14 @@ ROM_END
 
 
 /*
-	Following pinout was used for dumping (it is possible upper 2 address lines are swapped, we must swap them to match the mywicodx banking at least)
+	Following pinout was used for dumping
 
       +------------------+
   VCC -|01              70|- VCC
-  A24 -|02              69|- A21
+  A23 -|02              69|- A21
   VCC -|03              68|- A22
   A18 -|04              67|- A08
-  A23 -|05              66|- A09
+  A24 -|05              66|- A09
   A07 -|06              65|- A10
   A06 -|07              64|- A11
   A05 -|08              63|- A12
@@ -652,10 +652,7 @@ ROM_END
 // Sunplus QL8041C die
 ROM_START( oplayer )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "oplayer.bin", 0x0000000, 0x1000000, CRC(3dfa79e4) SHA1(fb658437e2db7114af03b2915e098871aa30b235) )
-	ROM_CONTINUE(0x2000000, 0x1000000)
-	ROM_CONTINUE(0x1000000, 0x1000000)
-	ROM_CONTINUE(0x3000000, 0x1000000)
+	ROM_LOAD16_WORD_SWAP( "oplayer.bin", 0x0000000, 0x4000000, CRC(aa09c358) SHA1(df2855cdfdf2b693636cace8768e579b9d5bc657) )
 ROM_END
 
 

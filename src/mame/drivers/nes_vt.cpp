@@ -2671,6 +2671,12 @@ ROM_START( unkra200 ) // "Winbond 25Q64FVSIG 1324" SPI ROM
 	ROM_LOAD( "retro_machine_rom", 0x00000, 0x800000, CRC(0e824aa7) SHA1(957e98868559ecc22b3fa42c76692417b76bf132) )
 ROM_END
 
+ROM_START( denv150 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "denver150in1.bin", 0x00000, 0x1000000, CRC(6b3819d7) SHA1(b0039945ce44a52ea224ab736d5f3c6980409b5d) ) // 2nd half is blank
+ROM_END
+
+
 ROM_START( ppgc200g )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "m29dw641.u2", 0x00000, 0x800000, CRC(b16dc677) SHA1(c1984fde4caf9345d41d127db946d1c21ec43ae0) )
@@ -2814,6 +2820,7 @@ CONS( 201?, red5mam,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty
 // some menu gfx broken, probably because this is a bad dump
 CONS( 2015, dgun2573,  0,  0,  nes_vt_fp, nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "My Arcade Gamer V Portable Gaming System (DGUN-2573)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+CONS( 201?, denv150,   0,  0,  nes_vt_fp, nes_vt, nes_vt_hh_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
