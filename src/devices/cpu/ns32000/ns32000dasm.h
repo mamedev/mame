@@ -64,6 +64,14 @@ private:
 		offs_t dasm_flags;
 	};
 
+	enum class operand_class
+	{
+		SOURCE,
+		DESTINATION,
+		ADDRESS,
+		SCALED_INDEX
+	};
+
 	static const NS32000_OPCODE format0_op[1];
 	static const NS32000_OPCODE format1_op[16];
 	static const NS32000_OPCODE format2_op[8];
@@ -109,7 +117,7 @@ private:
 	static inline std::string get_options(uint8_t opts);
 	static inline std::string get_reg_list(offs_t &pc, const data_buffer &opcodes, bool reverse);
 
-	void stream_gen(std::ostream &stream, u8 gen_addr, u8 op_len, offs_t &pc, const data_buffer &opcodes);
+	void stream_gen(std::ostream &stream, u8 gen_addr, u8 op_len, operand_class op_class, offs_t &pc, const data_buffer &opcodes);
 
 	u32 m_base_pc;
 };
