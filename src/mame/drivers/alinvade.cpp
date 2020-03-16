@@ -41,11 +41,11 @@ public:
 	void alinvade(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(irqmask_r);
-	DECLARE_WRITE8_MEMBER(irqmask_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(sounden_w);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	uint8_t irqmask_r();
+	void irqmask_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void sounden_w(uint8_t data);
+	void vblank_irq(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void alinvade_map(address_map &map);
@@ -80,23 +80,23 @@ DISCRETE_SOUND_START(alinvade_discrete)
 
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER( alinvade_state::sound_w )
+void  alinvade_state::sound_w(uint8_t data)
 {
 	m_discrete->write(NODE_01, (data^0x3f)<<2);
 }
 
-WRITE8_MEMBER( alinvade_state::sounden_w )
+void alinvade_state::sounden_w(uint8_t data)
 {
 	machine().sound().system_enable(data == 4);
 }
 
-READ8_MEMBER(alinvade_state::irqmask_r)
+uint8_t alinvade_state::irqmask_r()
 {
 	return 0; // TODO: might be anything
 }
 
 
-WRITE8_MEMBER(alinvade_state::irqmask_w)
+void alinvade_state::irqmask_w(uint8_t data)
 {
 	if((!(m_irqff & 1)) && (data & 1)) // f/f, active high? If the above actually returns 0xff this could be active low ...
 		m_irqmask^= 1;
@@ -201,7 +201,7 @@ uint32_t alinvade_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-WRITE_LINE_MEMBER(alinvade_state::vblank_irq)
+void alinvade_state::vblank_irq(int state)
 {
 	if (state && BIT(m_irqmask, 0))
 		m_maincpu->set_input_line(0,HOLD_LINE);

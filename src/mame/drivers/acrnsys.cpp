@@ -101,8 +101,8 @@ private:
 	void kbd_put(u8 data);
 	void kbd_put_pb(u8 data);
 
-	DECLARE_READ8_MEMBER(kbd_r);
-	DECLARE_WRITE_LINE_MEMBER(bus_nmi_w);
+	uint8_t kbd_r();
+	void bus_nmi_w(int state);
 
 	void a6502_mem(address_map &map);
 	void a6809_mem(address_map &map);
@@ -155,7 +155,7 @@ void acrnsys_state::machine_reset()
 }
 
 
-WRITE_LINE_MEMBER(acrnsys_state::bus_nmi_w)
+void acrnsys_state::bus_nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
@@ -326,7 +326,7 @@ void acrnsys_state::kbd_put(uint8_t data)
 	m_kbd_data = data | 0x80;
 }
 
-READ8_MEMBER(acrnsys_state::kbd_r)
+uint8_t acrnsys_state::kbd_r()
 {
 	uint8_t data = m_kbd_data;
 

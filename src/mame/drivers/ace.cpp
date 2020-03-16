@@ -65,10 +65,10 @@ public:
 	void ace(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(ace_objpos_w);
-	DECLARE_WRITE8_MEMBER(ace_characterram_w);
-	DECLARE_WRITE8_MEMBER(ace_scoreram_w);
-	DECLARE_READ8_MEMBER(unk_r);
+	void ace_objpos_w(offs_t offset, uint8_t data);
+	void ace_characterram_w(offs_t offset, uint8_t data);
+	void ace_scoreram_w(offs_t offset, uint8_t data);
+	uint8_t unk_r();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -90,7 +90,7 @@ private:
 };
 
 
-WRITE8_MEMBER(aceal_state::ace_objpos_w)
+void aceal_state::ace_objpos_w(offs_t offset, uint8_t data)
 {
 	m_objpos[offset] = data;
 }
@@ -118,7 +118,7 @@ uint32_t aceal_state::screen_update_ace(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-WRITE8_MEMBER(aceal_state::ace_characterram_w)
+void aceal_state::ace_characterram_w(offs_t offset, uint8_t data)
 {
 	if (m_characterram[offset] != data)
 	{
@@ -132,13 +132,13 @@ WRITE8_MEMBER(aceal_state::ace_characterram_w)
 	}
 }
 
-WRITE8_MEMBER(aceal_state::ace_scoreram_w)
+void aceal_state::ace_scoreram_w(offs_t offset, uint8_t data)
 {
 	m_scoreram[offset] = data;
 	m_gfxdecode->gfx(4)->mark_dirty(offset / 32);
 }
 
-READ8_MEMBER(aceal_state::unk_r)
+uint8_t aceal_state::unk_r()
 {
 	return machine().rand() & 0xff;
 }
