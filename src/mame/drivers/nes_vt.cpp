@@ -2782,13 +2782,27 @@ CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empt
 CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
 CONS( 2016, rtvgc300,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
 
-// Also Lexibook Compact Cyber Arcade - Cars
-//      Lexibook Compact Cyber Arcade - Paw Patrol
-//      Lexibook Compact Cyber Arcade - Barbie
-//      Lexibook Compact Cyber Arcade - Finding Dory
-//      Lexibook Compact Cyber Arcade - Marvel Ultimate Spiderman
-//      Lexibook Compact Cyber Arcade - PJ Masks
-// more?
+/* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme 
+
+    (handhekd units, use standard AAA batteries)
+	Lexibook Compact Cyber Arcade - Cars
+	Lexibook Compact Cyber Arcade - Paw Patrol
+	Lexibook Compact Cyber Arcade - Barbie
+	Lexibook Compact Cyber Arcade - Finding Dory
+	Lexibook Compact Cyber Arcade - Marvel Ultimate Spiderman
+	Lexibook Compact Cyber Arcade - PJ Masks
+  
+	(Handheld units, but different form factor to Compact Cyber Arcade, charged via USB)
+	Lexibook Console Colour - Minnie Mouse
+	Lexibook Console Colour - Disney's Planes
+	Lexibook Console Colour - Barbie
+
+    (units for use with TV)
+	Lexibook Retro TV Game Console (300 Games) - Cars
+	Lexibook Retro TV Game Console (300 Games) - Frozen 
+
+	(more?)
+*/
 
 // intial code isn't valid? scrambled?
 CONS( 201?, red5mam,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING )
