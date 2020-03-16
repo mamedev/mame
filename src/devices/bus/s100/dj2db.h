@@ -13,6 +13,7 @@
 
 #include "s100.h"
 #include "imagedev/floppy.h"
+#include "machine/ay31015.h"
 #include "machine/com8116.h"
 #include "machine/wd_fdc.h"
 
@@ -49,13 +50,13 @@ protected:
 	virtual void s100_phantom_w(int state) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( fr_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 	// internal state
 	required_device<mb8866_device> m_fdc;
 	required_device<com8116_device> m_dbrg;
+	required_device<ay31015_device> m_uart;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
