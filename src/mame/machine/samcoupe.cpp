@@ -225,15 +225,13 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_ext_mem_w)
 
 READ8_MEMBER(samcoupe_state::samcoupe_rtc_r)
 {
-	address_space &spaceio = m_maincpu->space(AS_IO);
-	return m_rtc->read(spaceio, offset >> 12);
+	return m_rtc->read(offset >> 12);
 }
 
 
 WRITE8_MEMBER(samcoupe_state::samcoupe_rtc_w)
 {
-	address_space &spaceio = m_maincpu->space(AS_IO);
-	m_rtc->write(spaceio, offset >> 12, data);
+	m_rtc->write(offset >> 12, data);
 }
 
 

@@ -326,7 +326,7 @@ void ymz770_device::sequencer()
 //  write - write to the chip's registers
 //-------------------------------------------------
 
-WRITE8_MEMBER( ymz770_device::write )
+void ymz770_device::write(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 	{
@@ -471,7 +471,7 @@ ymz774_device::ymz774_device(const machine_config &mconfig, const char *tag, dev
 	}
 }
 
-READ8_MEMBER(ymz774_device::read)
+uint8_t ymz774_device::read(offs_t offset)
 {
 	if (offset & 1)
 	{

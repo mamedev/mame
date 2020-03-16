@@ -1438,7 +1438,7 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 			/* transferring 1st nibble */
 			m_adpcm_data = memregion("adpcm")->base()[m_adpcm_pos];
 			m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
-			m_msm->write_data(m_adpcm_data >> 4);
+			m_msm->data_w(m_adpcm_data >> 4);
 
 			if (m_adpcm_pos == m_adpcm_end)
 			{
@@ -1451,7 +1451,7 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 		else
 		{
 			/* transferring 2nd nibble */
-			m_msm->write_data(m_adpcm_data & 0x0f);
+			m_msm->data_w(m_adpcm_data & 0x0f);
 			m_adpcm_data = -1;
 		}
 	}

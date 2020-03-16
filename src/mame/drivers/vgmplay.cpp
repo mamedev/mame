@@ -3184,8 +3184,8 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_YM2612_1, vgmplay_device::A_YM2612_1 + 3).w(m_ym2612[1], FUNC(ym2612_device::write));
 	map(vgmplay_device::A_YM2151_0, vgmplay_device::A_YM2151_0 + 1).w(m_ym2151[0], FUNC(ym2151_device::write));
 	map(vgmplay_device::A_YM2151_1, vgmplay_device::A_YM2151_1 + 1).w(m_ym2151[1], FUNC(ym2151_device::write));
-	map(vgmplay_device::A_SEGAPCM_0, vgmplay_device::A_SEGAPCM_0 + 0x7ff).w(m_segapcm[0], FUNC(segapcm_device::sega_pcm_w));
-	map(vgmplay_device::A_SEGAPCM_1, vgmplay_device::A_SEGAPCM_1 + 0x7ff).w(m_segapcm[1], FUNC(segapcm_device::sega_pcm_w));
+	map(vgmplay_device::A_SEGAPCM_0, vgmplay_device::A_SEGAPCM_0 + 0x7ff).w(m_segapcm[0], FUNC(segapcm_device::write));
+	map(vgmplay_device::A_SEGAPCM_1, vgmplay_device::A_SEGAPCM_1 + 0x7ff).w(m_segapcm[1], FUNC(segapcm_device::write));
 	map(vgmplay_device::A_RF5C68, vgmplay_device::A_RF5C68 + 0xf).w(m_rf5c68, FUNC(rf5c68_device::rf5c68_w));
 	map(vgmplay_device::A_RF5C68_RAM, vgmplay_device::A_RF5C68_RAM + 0xffff).w(m_rf5c68, FUNC(rf5c68_device::rf5c68_mem_w));
 	map(vgmplay_device::A_YM2203_0, vgmplay_device::A_YM2203_0 + 1).w(m_ym2203[0], FUNC(ym2203_device::write));
@@ -3286,8 +3286,8 @@ void vgmplay_state::soundchips_map(address_map &map)
 	// TODO: es5505
 	map(vgmplay_device::A_X1_010_0, vgmplay_device::A_X1_010_0 + 0x1fff).w(m_x1_010[0], FUNC(x1_010_device::write));
 	map(vgmplay_device::A_X1_010_1, vgmplay_device::A_X1_010_1 + 0x1fff).w(m_x1_010[1], FUNC(x1_010_device::write));
-	map(vgmplay_device::A_GA20_0, vgmplay_device::A_GA20_0 + 0x1f).w(m_ga20[0], FUNC(iremga20_device::irem_ga20_w));
-	map(vgmplay_device::A_GA20_1, vgmplay_device::A_GA20_1 + 0x1f).w(m_ga20[1], FUNC(iremga20_device::irem_ga20_w));
+	map(vgmplay_device::A_GA20_0, vgmplay_device::A_GA20_0 + 0x1f).w(m_ga20[0], FUNC(iremga20_device::write));
+	map(vgmplay_device::A_GA20_1, vgmplay_device::A_GA20_1 + 0x1f).w(m_ga20[1], FUNC(iremga20_device::write));
 }
 
 void vgmplay_state::soundchips16_map(address_map &map)

@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "ui/mainmenu.h"
 
+#include "ui/about.h"
 #include "ui/analogipt.h"
 #include "ui/barcode.h"
 #include "ui/cheatopt.h"
@@ -132,6 +133,10 @@ void menu_main::populate(float &customtop, float &custombottom)
 
 	item_append(menu_item_type::SEPARATOR);
 
+	item_append(_("About..."), "", 0, (void *)ABOUT);
+
+	item_append(menu_item_type::SEPARATOR);
+
 //  item_append(_("Quit from Machine"), nullptr, 0, (void *)QUIT_GAME);
 
 	item_append(_("Select New Machine"), "", 0, (void *)SELECT_GAME);
@@ -236,6 +241,10 @@ void menu_main::handle()
 				menu::stack_push<simple_menu_select_game>(ui(), container(), nullptr);
 			else
 				menu::stack_push<menu_select_game>(ui(), container(), nullptr);
+			break;
+
+		case ABOUT:
+			menu::stack_push<menu_about>(ui(), container());
 			break;
 
 		case BIOS_SELECTION:

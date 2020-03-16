@@ -1206,7 +1206,7 @@ WRITE16_MEMBER( stbook_state::lcd_control_w )
 
 void st_state::ikbd_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw(HD6301V1_TAG, FUNC(hd6301_cpu_device::m6801_io_r), FUNC(hd6301_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m(HD6301V1_TAG, FUNC(hd6301_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram();
 	map(0xf000, 0xffff).rom().region(HD6301V1_TAG, 0);
 }
@@ -2052,7 +2052,7 @@ void st_state::common(machine_config &config)
 
 void st_state::keyboard(machine_config &config)
 {
-	hd6301_cpu_device &ikbd(HD6301(config, HD6301V1_TAG, Y2/8));
+	hd6301v1_cpu_device &ikbd(HD6301V1(config, HD6301V1_TAG, Y2/8));
 	ikbd.set_addrmap(AS_PROGRAM, &st_state::ikbd_map);
 	ikbd.in_p1_cb().set(FUNC(st_state::ikbd_port1_r));
 	ikbd.in_p2_cb().set(FUNC(st_state::ikbd_port2_r));

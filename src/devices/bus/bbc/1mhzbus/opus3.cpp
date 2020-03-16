@@ -50,7 +50,7 @@ DEFINE_DEVICE_TYPE(BBC_OPUSA, bbc_opusa_device, "bbc_opusa", "Opus Challenger AD
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( opus3 )
+//  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER(bbc_opus3_device::floppy_formats)
@@ -61,13 +61,17 @@ FLOPPY_FORMATS_MEMBER(bbc_opus3_device::floppy_formats)
 	FLOPPY_FSD_FORMAT,
 	FLOPPY_OPUS_DDOS_FORMAT,
 	FLOPPY_OPUS_DDCPM_FORMAT
-FLOPPY_FORMATS_END0
+FLOPPY_FORMATS_END
 
 void bbc_floppies(device_slot_interface &device)
 {
 	device.option_add("525qd", FLOPPY_525_QD);
 }
 
+
+//-------------------------------------------------
+//  ROM( opus3 )
+//-------------------------------------------------
 
 ROM_START( opus3 )
 	ROM_REGION(0x4000, "exp_rom", 0)

@@ -189,13 +189,13 @@ WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
 	}
 	else if (m_adpcm_data != -1)
 	{
-		m_msm->write_data(m_adpcm_data & 0x0f);
+		m_msm->data_w(m_adpcm_data & 0x0f);
 		m_adpcm_data = -1;
 	}
 	else
 	{
 		m_adpcm_data = memregion("adpcm")->base()[m_adpcm_pos++];
-		m_msm->write_data(m_adpcm_data >> 4);
+		m_msm->data_w(m_adpcm_data >> 4);
 	}
 }
 

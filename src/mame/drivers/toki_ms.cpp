@@ -530,7 +530,7 @@ WRITE8_MEMBER(toki_ms_state::adpcm_w)
 	m_msm->reset_w(BIT(data, 4));
 
 	m_adpcm_data = data & 0xf;
-	//m_msm->write_data(data & 0xf);
+	//m_msm->data_w(data & 0xf);
 //  m_msm->vclk_w(BIT(data, 7));
 	//m_msm->vclk_w(1);
 	//m_msm->vclk_w(0);
@@ -679,7 +679,7 @@ void toki_ms_state::machine_start()
 
 WRITE_LINE_MEMBER(toki_ms_state::adpcm_int)
 {
-	m_msm->write_data(m_adpcm_data);
+	m_msm->data_w(m_adpcm_data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 

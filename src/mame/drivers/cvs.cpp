@@ -376,7 +376,7 @@ READ8_MEMBER(cvs_state::cvs_speech_command_r)
 {
 	/* FIXME: this was by observation on board ???
 	 *          -bit 7 is TMS status (active LO) */
-	return ((m_tms5110->ctl_r(space, 0) ^ 1) << 7) | (m_soundlatch->read() & 0x7f);
+	return ((m_tms5110->ctl_r() ^ 1) << 7) | (m_soundlatch->read() & 0x7f);
 }
 
 
@@ -394,7 +394,7 @@ WRITE8_MEMBER(cvs_state::cvs_tms5110_ctl_w)
 			(m_tms5110_ctl_data[1] << 3);   /* CTL8 */
 
 	LOG(("CVS: Speech CTL = %04x %02x %02x\n",  ctl, offset, data));
-	m_tms5110->ctl_w(space, 0, ctl);
+	m_tms5110->ctl_w(ctl);
 }
 
 

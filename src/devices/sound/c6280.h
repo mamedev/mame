@@ -13,7 +13,7 @@ public:
 	c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// write only
-	DECLARE_WRITE8_MEMBER( c6280_w );
+	void c6280_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

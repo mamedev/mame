@@ -32,7 +32,7 @@
 
 #define SINGLE_INSTRUCTION_MODE (0)
 
-#define ENABLE_UNSP_DRC         (1)
+#define ENABLE_UNSP_DRC         (0)
 
 #define UNSP_LOG_OPCODES        (0)
 #define UNSP_LOG_REGS           (0)
@@ -61,13 +61,16 @@ enum
 	UNSP_IRQ_EN,
 	UNSP_FIQ_EN,
 	UNSP_FIR_MOV_EN,
-	UNSP_IRQ,
-	UNSP_FIQ,
-#if UNSP_LOG_OPCODES || UNSP_LOG_REGS
 	UNSP_SB,
+	UNSP_AQ,
+	UNSP_FRA,
+	UNSP_BNK,
+	UNSP_INE,
+#if UNSP_LOG_OPCODES || UNSP_LOG_REGS
+	UNSP_PRI,
 	UNSP_LOG_OPS
 #else
-	UNSP_SB
+	UNSP_PRI
 #endif
 };
 
@@ -100,6 +103,9 @@ public:
 
 	void set_ds(uint16_t ds);
 	uint16_t get_ds();
+
+	void set_fr(uint16_t fr);
+	uint16_t get_fr();
 
 	inline void ccfunc_unimplemented();
 	void invalidate_cache();
@@ -152,7 +158,12 @@ protected:
 		REG_R4,
 		REG_BP,
 		REG_SR,
-		REG_PC
+		REG_PC,
+
+		REG_SR1 = 0,
+		REG_SR2,
+		REG_SR3,
+		REG_SR4
 	};
 
 	/* internal compiler state */
@@ -168,15 +179,19 @@ protected:
 	struct internal_unsp_state
 	{
 		uint32_t m_r[16]; // required to be 32 bits due to DRC
+		uint32_t m_secbank[4];
 		uint32_t m_enable_irq;
 		uint32_t m_enable_fiq;
 		uint32_t m_fir_move;
-		uint32_t m_irq;
 		uint32_t m_fiq;
-		uint32_t m_curirq;
+		uint32_t m_irq;
 		uint32_t m_sirq;
 		uint32_t m_sb;
-		uint32_t m_saved_sb[3];
+		uint32_t m_aq;
+		uint32_t m_fra;
+		uint32_t m_bnk;
+		uint32_t m_ine;
+		uint32_t m_pri;
 
 		uint32_t m_arg0;
 		uint32_t m_arg1;
@@ -375,8 +390,6 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint32_t m_secondary_r[8];
-
 	enum
 	{
 		UNSP20_R8 = 0,

@@ -281,6 +281,7 @@ SOUNDS["MM5837"] = true
 SOUNDS["LC7535"] = true
 --SOUNDS["UPD934G"] = true
 SOUNDS["S_DSP"] = true
+SOUNDS["KS0164"] = true
 
 --------------------------------------------------
 -- specify available video cores

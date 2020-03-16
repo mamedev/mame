@@ -531,7 +531,7 @@ WRITE8_MEMBER( mpt02_state::dma_w )
 	m_color = m_color_ram[addr];
 
 	m_cti->con_w(0); // HACK
-	m_cti->dma_w(space, offset, data);
+	m_cti->dma_w(data);
 }
 
 /* Machine Initialization */

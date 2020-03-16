@@ -361,7 +361,7 @@ WRITE_LINE_MEMBER(borntofi_state::adpcm_int)
 	}
 	else
 	{
-		m_msm[Voice]->write_data(m_adpcm_rom[start / 2] >> ((start & 1) * 4));
+		m_msm[Voice]->data_w(m_adpcm_rom[start / 2] >> ((start & 1) * 4));
 		m_adpcm_nibble[Voice]++;
 	}
 }

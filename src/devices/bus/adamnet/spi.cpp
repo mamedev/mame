@@ -44,7 +44,7 @@ const tiny_rom_entry *adam_spi_device::device_rom_region() const
 
 void adam_spi_device::adam_spi_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw(m_maincpu, FUNC(m6801_cpu_device::m6801_io_r), FUNC(m6801_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m(m_maincpu, FUNC(m6801_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram();
 	map(0xf800, 0xffff).rom().region("m6801", 0);
 }

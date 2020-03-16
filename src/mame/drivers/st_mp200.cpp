@@ -354,7 +354,7 @@ WRITE_LINE_MEMBER( st_mp200_state::u11_ca2_w )
 	{
 		if (BIT(m_u10a, 7))
 		{
-			m_s14001a->data_w(generic_space(), 0, m_u10a & 0x3f);
+			m_s14001a->data_w(m_u10a & 0x3f);
 			m_s14001a->start_w(1);
 			m_s14001a->start_w(0);
 		}

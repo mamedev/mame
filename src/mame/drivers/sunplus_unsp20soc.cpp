@@ -155,7 +155,7 @@ void gcm394_game_state::cs_map_base(address_map& map)
 
 READ16_MEMBER(wrlshunt_game_state::cs0_r)
 {
-	return m_romregion[offset & 0x3ffffff];
+	return m_romregion[offset & m_romwords_mask];
 }
 
 WRITE16_MEMBER(wrlshunt_game_state::cs0_w)
@@ -177,6 +177,7 @@ WRITE16_MEMBER(wrlshunt_game_state::cs1_w)
 
 void wrlshunt_game_state::machine_start()
 {
+	m_romwords_mask = (memregion("maincpu")->bytes()/2)-1;
 	save_item(NAME(m_sdram));
 }
 
@@ -205,6 +206,9 @@ READ16_MEMBER(jak_s500_game_state::porta_r)
 
 	//if (mem.read_word(0x22D6F7) == 0x4846)
 	//  mem.write_word(0x22D6F7, 0x4840);    // jak_pf force service mode
+
+	//if (mem.read_word(0x23E295) == 0x4846)
+	//  mem.write_word(0x23E295, 0x4840);    // jak_smwm force service mode
 
 	return data;
 }
@@ -1318,6 +1322,14 @@ ROM_START( tkmag220 )
 	ROM_LOAD16_WORD_SWAP( "u1g-2a.u2", 0x0000000, 0x8000000, CRC(0fd769a1) SHA1(df19402bcd20075483d63fb98fb3fa42bd33ccfd) )
 ROM_END
 
+ROM_START(lazertag)
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("lazertag.bin", 0x000000, 0x1000000, CRC(8bf16a28) SHA1(90d05e1876332324b074e4845e28b90fcb007122) )
+ROM_END
+
 ROM_START(jak_s500)
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
@@ -1325,6 +1337,15 @@ ROM_START(jak_s500)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("spbwheel.bin", 0x000000, 0x800000, CRC(6ba1d335) SHA1(1bb3e4d02c7b35dd4d336971c6a9f82071cc6ce1) )
 ROM_END
+
+ROM_START(jak_smwm)
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("spidersense.bin", 0x000000, 0x800000, CRC(e0676d0e) SHA1(01c01852fe4aea799c09ebbb6870b2f6e92085c4) )
+ROM_END
+
 
 ROM_START(jak_pf)
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
@@ -1582,8 +1603,10 @@ CONS(2013, gormiti,   0, 0, base, gormiti,  gcm394_game_state, empty_init, "Gioc
 // also sold as "Pac-Man Connect & Play 35th Anniversary" (same ROM?)
 CONS(2012, paccon, 0, 0, paccon, paccon, jak_s500_game_state, init_wrlshunt, "Bandai", "Pac-Man Connect & Play (Feb 14 2012 10:46:23)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
+CONS(2008, lazertag, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "Tiger Electronics", "Lazer Tag Video Game Module", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2009, jak_s500, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_smwm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Spider-Man Web Master (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2010, jak_pf,   0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // build date is 2009, but onscreen display is 2010
 CONS(2009, jak_prft, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Power Rangers Force In Time (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, jak_tink, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Tinker Bell and the Lost Treasure (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

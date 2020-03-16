@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "6800dasm.h"
-
 enum
 {
 	M6800_PC=1, M6800_S, M6800_A, M6800_B, M6800_X, M6800_CC,

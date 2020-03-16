@@ -16,8 +16,8 @@ public:
 
 	auto port_write() { return m_port_write_handler.bind(); }
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
 
 	/*
 	The 007232 has two channels and produces two outputs. The volume control

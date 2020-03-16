@@ -6,20 +6,20 @@
 
 DEFINE_DEVICE_TYPE(SPG110_VIDEO, spg110_video_device, "spg110_video", "SPG110 System-on-a-Chip (Video)")
 
-spg110_video_device::spg110_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_memory_interface(mconfig, *this)
-	, m_space_config("spg110_video", ENDIANNESS_BIG, 16, 32, 0, address_map_constructor(FUNC(spg110_video_device::map_video), this))
-	, m_cpu(*this, finder_base::DUMMY_TAG)
-	, m_screen(*this, finder_base::DUMMY_TAG)
-	, m_palette(*this, "palette")
-	, m_gfxdecode(*this, "gfxdecode")
-	, m_palram(*this, "palram")
-	, m_palctrlram(*this, "palctrlram")
-	, m_sprtileno(*this, "sprtileno")
-	, m_sprattr1(*this, "sprattr1")
-	, m_sprattr2(*this, "sprattr2")
-	, m_video_irq_cb(*this)
+spg110_video_device::spg110_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	m_space_config("spg110_video", ENDIANNESS_BIG, 16, 32, 0, address_map_constructor(FUNC(spg110_video_device::map_video), this)),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_screen(*this, finder_base::DUMMY_TAG),
+	m_palette(*this, "palette"),
+	m_gfxdecode(*this, "gfxdecode"),
+	m_palram(*this, "palram"),
+	m_palctrlram(*this, "palctrlram"),
+	m_sprtileno(*this, "sprtileno"),
+	m_sprattr1(*this, "sprattr1"),
+	m_sprattr2(*this, "sprattr2"),
+	m_video_irq_cb(*this)
 {
 }
 
@@ -550,11 +550,6 @@ void spg110_video_device::device_start()
 	save_item(NAME(m_2036_scroll));
 
 	m_video_irq_cb.resolve();
-
-	if (!strcmp(machine().system().name, "jak_spdmo"))
-		m_is_spiderman = true;
-	else
-		m_is_spiderman = false;
 }
 
 void spg110_video_device::device_reset()

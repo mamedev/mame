@@ -183,7 +183,7 @@ WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
 			adpcm_data >>= 4;
 		++m_adpcm_data_offs;
 
-		m_msm->write_data(adpcm_data & 0x0f);
+		m_msm->data_w(adpcm_data & 0x0f);
 	}
 }
 

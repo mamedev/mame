@@ -1446,7 +1446,7 @@ READ16_MEMBER( segas16b_state::aceattac_custom_io_r )
 
 		case 0x3000/2:
 			if (BIT(offset, 4))
-				return m_cxdio->read(space, offset & 0x0f);
+				return m_cxdio->read(offset & 0x0f);
 			else // TODO: use uPD4701A device
 			switch (offset & 0x1b)
 			{
@@ -1473,7 +1473,7 @@ WRITE16_MEMBER( segas16b_state::aceattac_custom_io_w )
 		case 0x3000/2:
 			if (BIT(offset, 4))
 			{
-				m_cxdio->write(space, offset & 0x0f, data);
+				m_cxdio->write(offset & 0x0f, data);
 				return;
 			}
 			break;

@@ -16,21 +16,22 @@
 
 DEFINE_DEVICE_TYPE(SPG110, spg110_device, "spg110", "SPG110 System-on-a-Chip")
 
-spg110_device::spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal)
-	: unsp_device(mconfig, type, tag, owner, clock, internal)
-	, device_mixer_interface(mconfig, *this, 2)
-	, m_screen(*this, finder_base::DUMMY_TAG)
-	, m_spg_io(*this, "spg_io")
-	, m_spg_video(*this, "spg_video")
-	, m_spg_audio(*this, "spgaudio")
-	, m_porta_out(*this)
-	, m_portb_out(*this)
-	, m_portc_out(*this)
-	, m_porta_in(*this)
-	, m_portb_in(*this)
-	, m_portc_in(*this)
-	, m_adc_in(*this)
-	, m_chip_sel(*this)
+spg110_device::spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal) :
+	unsp_device(mconfig, type, tag, owner, clock, internal),
+	device_mixer_interface(mconfig, *this, 2),
+	m_screen(*this, finder_base::DUMMY_TAG),
+	m_spg_io(*this, "spg_io"),
+	m_spg_video(*this, "spg_video"),
+	m_spg_audio(*this, "spgaudio"),
+	m_porta_out(*this),
+	m_portb_out(*this),
+	m_portc_out(*this),
+	m_porta_in(*this),
+	m_portb_in(*this),
+	m_portc_in(*this),
+	m_adc_in(*this),
+	m_chip_sel(*this),
+	m_is_spiderman(false)
 {
 }
 
@@ -182,4 +183,5 @@ void spg110_device::device_start()
 void spg110_device::device_reset()
 {
 	unsp_device::device_reset();
+	m_spg_video->set_video_irq_spidman(m_is_spiderman);
 }

@@ -224,14 +224,14 @@ WRITE8_MEMBER( scramble_state::ad2083_tms5110_ctrl_w )
 {
 	static const int tbl[8] = {0,4,2,6,1,5,3,7};
 
-	m_tmsprom->bit_w(space, 0, tbl[data & 0x07]);
+	m_tmsprom->bit_w(tbl[data & 0x07]);
 	switch (data>>3)
 	{
 		case 0x01:
-			m_tmsprom->rom_csq_w(space, 1, 0);
+			m_tmsprom->rom_csq_w(1, 0);
 			break;
 		case 0x03:
-			m_tmsprom->rom_csq_w(space, 0, 0);
+			m_tmsprom->rom_csq_w(0, 0);
 			break;
 		case 0x00:
 			/* Rom 2 select */

@@ -8868,6 +8868,58 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="aitd2">
+		<description>Alone in the Dark 2</description>
+		<year>1993</year>
+		<publisher>Infogrames</publisher>
+		<info name="developer" value="Infogrames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="f1a73e14" sha1="4ca20f2461f843a3bf52e7870254493bf39e090d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 2 of 9].img" size="1474560" crc="769f58cf" sha1="45c5e1848c43c81b02b5989afde8d8019e374d30"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 3 of 9].img" size="1474560" crc="b1a99152" sha1="55ba003447e46e2b685077b8fdb585a5711406a3"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 4 of 9].img" size="1474560" crc="a3a0dc74" sha1="b25f772eb044a3160b886812c29f097def5f2df0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 5 of 9].img" size="1474560" crc="1491f7f1" sha1="2905e81bb0a3fb2dc60fcf39c1daae3f938a23ca"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 6 of 9].img" size="1474560" crc="14b3105c" sha1="6f0d47336d7790708660e4f15c108a575b54698b"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 7 of 9].img" size="1474560" crc="60d7f101" sha1="091ea0d63720413455165326275bcd1bff11d3ef"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 8 of 9].img" size="1474560" crc="299d0b20" sha1="20bc9dc7a93f88b4f86d2ee54ced8453f7d6935f"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 [Infogrames] [1993] [3.5HD] [Disk 9 of 9].img" size="1474560" crc="ee746f7e" sha1="4c7eebda892101aa51eda8dfa6f41de8eee52461"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="amazon">
 		<description>Amazon - Guardians of Eden</description>
 		<year>1992</year>
@@ -9057,6 +9109,43 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="steelskyf">
+		<description>Beneath a Steel Sky (France)</description>
+		<year>1994</year>
+		<publisher>Virgin</publisher>
+		<info name="developer" value="Revolution Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="6b5e3247" sha1="b4cc255abfc5f72fc5c5dbea1aca595c92bbe70a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="49c4e105" sha1="25ab45d316be2cb2551d3d47efd60bddd0959cd9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="902136fd" sha1="5bc6e36e2facae5e7b5ace84a13787cac050941e"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="0b2df06f" sha1="ff8ce38870c22e078ab288d7f165c20dcd0943dd"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="675693e5" sha1="efc84ebe51581650857e553cba1fd27cbd607d8a"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Beneath a Steel Sky (fr) [Virgin] [1994] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="c7ec313f" sha1="bf18daa98d1387f96ec97c91a18b7775ba67a87c"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="bibadv">
 		<description>Bible Adventures</description>
 		<year>1992</year>
@@ -10350,7 +10439,7 @@ license:CC0
 	</software>
 
 	<software name="kyrandiafr" cloneof="kyrandia">
-		<description>Fables &amp; Fiends - The Legend of Kyrandia Book One (French)</description>
+		<description>Fables &amp; Fiends - The Legend of Kyrandia Book One (France)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
 		<info name="version" value="1.7" />
@@ -10378,7 +10467,7 @@ license:CC0
 	</software>
 
 	<software name="hofde">
-		<description>Fables &amp; Fiends - The Hand of Fate (German)</description>
+		<description>Fables &amp; Fiends - The Hand of Fate (Germany)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive Entertainment</publisher>
 		<info name="version" value="1.41" />
@@ -11511,6 +11600,30 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lostvik">
+		<description>The Lost Vikings</description>
+		<year>1993</year>
+		<publisher>Interplay</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Lost Vikings [Interplay] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="f4ca8940" sha1="ca83858d3b2d6eb10edef2dbeeedc842ba2ebb52"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="lotus3">
+		<description>Lotus - The Ultimate Challenge</description>
+		<year>1993</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="developer" value="Magnetic Fields" />
+		<info name="version" value="Version 14/07/93" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Lotus - The Ultimate Challenge [Gremlin] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="0a34718f" sha1="16756f96d9fb444ddea58969b354fe205c1701c6"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="laacc">
 		<description>LucasArts Air Combat Classics</description>
 		<year>1994</year>
@@ -12073,6 +12186,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="pbfant">
+		<description>Pinball Fantasies</description>
+		<year>1994</year>
+		<publisher>21st Century Entertainment</publisher>
+		<info name="developer" value="Digital Illusions" />
+		<info name="ported by" value="FrontLine Design" />
+		<info name="version" value="V1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pinball Fantasies [21st Century Entertainment] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="354ad00b" sha1="574e4fbf971355b57dd8ea652ae53bf67c036799"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pinball Fantasies [21st Century Entertainment] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="430f267d" sha1="56fb78a071ee464fa8d578a8f991da262b9e9ded"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<!-- Fatal error: i386: Called modrm_to_EA with modrm value F5! -->
 	<software name="powdoll" supported="no">
 		<description>POWER DoLLS</description>

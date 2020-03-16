@@ -33,10 +33,12 @@ Notes:
   The additional PCM ROMs are mapped to 0x100000 .. 0x17FFFF (IC19) and 0x200000 .. 0x27FFFF according to the sample table in IC18.
 - The sound chip has 32 voices. Voice 0 is reserved by the firmware for reading data from the PCM ROM.
   The firmware allocates voices from back to front, i.e. voice 31 first.
+- The "PCM sound chip" itself doesn't seem to support panning.
+  Maybe it just has 6 outputs (one for each part, like the U-110) and an additional DSP does the rest.
 
 
 TODO:
-- actual sound emulation
+- figure out how "freeing a voice" works - right now the firmware gets stuck when playing the 32th note.
 - add PCM card support
 
 
@@ -227,9 +229,11 @@ Some routine locations
 #include "cpu/mcs96/i8x9x.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+#include "sound/rolandpcm.h"
 #include "video/msm6222b.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 // unscramble address: ROM dump offset -> proper (descrambled) offset
@@ -250,6 +254,7 @@ static INPUT_PORTS_START( cm32p )
 	PORT_START("SERVICE")   // connected to Port 0 of the P8098 CPU.
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test Switch") PORT_TOGGLE PORT_CODE(KEYCODE_F2) // SW A (checked during boot)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: Check/Tune") PORT_CODE(KEYCODE_B) // SW B
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM card inserted") PORT_TOGGLE PORT_CODE(KEYCODE_C)
 
 	PORT_START("SW")    // test switches, accessed by reading from address 0x1300
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: MSB Adj.") PORT_CODE(KEYCODE_1)   // SW 1
@@ -269,12 +274,15 @@ public:
 
 	void cm32p(machine_config &config);
 
+	void init_cm32p();
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
 	required_device<i8x9x_device> cpu;
+	required_device<rolandpcm_device> pcm;
 	required_device<msm6222b_device> lcd;
 	required_device<timer_device> midi_timer;
 	required_device<ram_device> some_ram;
@@ -305,7 +313,6 @@ private:
 
 	u8 midi;
 	int midi_pos;
-	u8 port0;
 	u8 sound_io_buffer[0x100];
 	u8 dsp_io_buffer[0x80];
 };
@@ -313,6 +320,7 @@ private:
 cm32p_state::cm32p_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag)
 	, cpu(*this, "maincpu")
+	, pcm(*this, "pcm")
 	, lcd(*this, "lcd")
 	, midi_timer(*this, "midi_timer")
 	, some_ram(*this, "some_ram")
@@ -370,7 +378,6 @@ void cm32p_state::machine_reset()
 {
 	midi_timer->adjust(attotime::from_hz(1));
 	midi_pos = 0;
-	port0 = 0;
 }
 
 WRITE8_MEMBER(cm32p_state::lcd_ctrl_w)
@@ -408,14 +415,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(cm32p_state::midi_timer_cb)
 
 READ16_MEMBER(cm32p_state::port0_r)
 {
-	return port0 | service_port->read();
+	return service_port->read();
 }
 
 READ8_MEMBER(cm32p_state::pcmrom_r)
 {
-	offs_t romOfs = SCRAMBLE_ADDRESS(offset);
-	const u8* pcm_rom = memregion("pcm32")->base();
-	return UNSCRAMBLE_DATA(pcm_rom[romOfs]);
+	const u8* pcm_rom = memregion("pcm")->base();
+	return pcm_rom[offset];
 }
 
 READ8_MEMBER(cm32p_state::dsp_io_r)
@@ -455,6 +461,19 @@ WRITE8_MEMBER(cm32p_state::dsp_io_w)
 
 READ8_MEMBER(cm32p_state::snd_io_r)
 {
+	// lots of offset modification magic to achieve the following:
+	//  - offsets 00..1F are "sound chip read"
+	//  - offsets 20..3F are a readback of what was written to registers 00..1F
+	//  - This behaviour is reversed for offset 01/21, which is used for reading the PCM sample tables.
+	// All this is just for making debugging easier, as it allows one to check the
+	// register state using the Memory Viewer.
+	if (offset == 0x01 || offset == 0x21)
+		offset ^= 0x20; // remove when PCM data readback via sound chip is confirmed to work
+	if (offset < 0x20)
+		return pcm->read(offset);
+	if (offset < 0x40)
+		offset -= 0x20;
+
 	if (offset == 0x01)
 	{
 		// code for reading from the PCM sample table is at 0xB027
@@ -490,6 +509,8 @@ WRITE8_MEMBER(cm32p_state::snd_io_w)
 	//  11/13/15/17 - voice enable mask (11 = least significant 8 bits, 17 = most significant 8 bits)
 	//  1A - ??
 	//  1F - voice select
+	if (offset < 0x20)
+		pcm->write(offset, data);
 	sound_io_buffer[offset] = data;
 }
 
@@ -500,7 +521,7 @@ READ8_MEMBER(cm32p_state::test_sw_r)
 
 TIMER_DEVICE_CALLBACK_MEMBER(cm32p_state::samples_timer_cb)
 {
-	port0 ^= 0x10;
+	// TODO: does this trigger something?
 }
 
 void cm32p_state::mt32_palette(palette_device &palette) const
@@ -518,8 +539,7 @@ void cm32p_state::cm32p_map(address_map &map)
 	map(0x1400, 0x14ff).rw(FUNC(cm32p_state::snd_io_r), FUNC(cm32p_state::snd_io_w));   // sound chip area
 	map(0x2000, 0x20ff).rom().region("maincpu", 0x2000);    // init vector @ 2080
 	map(0x2100, 0x3fff).ram();  // main RAM
-	map(0x4000, 0xbfff).rom().region("maincpu", 0x4000);
-	map(0xc000, 0xffff).r(FUNC(cm32p_state::pcmrom_r)); // show descrambled PCM ROM (for debugging)
+	map(0x4000, 0xffff).rom().region("maincpu", 0x4000);
 }
 
 void cm32p_state::cm32p(machine_config &config)
@@ -529,6 +549,13 @@ void cm32p_state::cm32p(machine_config &config)
 	maincpu.ach7_cb().set_ioport("A7");
 	maincpu.serial_tx_cb().set(FUNC(cm32p_state::midi_w));
 	maincpu.in_p0_cb().set(FUNC(cm32p_state::port0_r));
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	ROLANDPCM(config, pcm, 16.384_MHz_XTAL);
+	pcm->add_route(0, "lspeaker", 1.0);
+	pcm->add_route(1, "rspeaker", 1.0);
 
 	RAM(config, some_ram).set_default_size("8K");
 
@@ -548,15 +575,33 @@ void cm32p_state::cm32p(machine_config &config)
 	TIMER(config, "samples_timer").configure_periodic(FUNC(cm32p_state::samples_timer_cb), attotime::from_hz(32000*2));
 }
 
+void cm32p_state::init_cm32p()
+{
+	// Roland did a fair amount of scrambling on the address and data lines.
+	// Only the first 0x20 bytes of the ROMs are readable text in a raw dump.
+	uint8_t* src = static_cast<uint8_t*>(memregion("pcmorg")->base());
+	uint8_t* dst = static_cast<uint8_t*>(memregion("pcm")->base());
+	for (offs_t bank_ofs = 0x00; bank_ofs < 0x400000; bank_ofs += 0x080000)
+	{
+		offs_t dstpos;
+		for (offs_t srcpos = 0x00; srcpos < 0x80000; srcpos ++)
+		{
+			dstpos = UNSCRAMBLE_ADDRESS(srcpos);
+			dst[bank_ofs + dstpos] = UNSCRAMBLE_DATA(src[bank_ofs + srcpos]);
+		}
+	}
+}
+
 ROM_START( cm32p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cm-32_p__1.0.0.am27c512.7d.ic9",  0x000000, 0x10000, CRC(6f2f6dfd) SHA1(689f77c1d56f923ef1dab7d993a124c47736bc56) ) // "CM-32 P // 1 0 0 <filled bubbles in red marker>" sticker on an AM27C512-150DC eprom @ IC9
 
-	ROM_REGION( 0x400000, "pcm32", 0 )
+	ROM_REGION( 0x400000, "pcmorg", 0 ) // ROMs before descrambling
 	ROM_LOAD( "roland__r15179970__mb834000a-20__3b1_aa__8917_r00.45f.ic18", 0x000000, 0x80000, CRC(8e53b2a3) SHA1(4872530870d5079776e80e477febe425dc0ec1df) ) // markings under chip footprint are "MB834000A-20P-G-3B1"
 	// 0x080000 .. 0x0FFFFF is reserved for the PCM card
 	ROM_LOAD( "roland__r15179971__mb834000a-20__3b2_aa__8919_r02.34f.ic19", 0x100000, 0x80000, CRC(c8220761) SHA1(49e55fa672020f95fd9c858ceaae94d6db93df7d) ) // markings under chip footprint are "MB834000A20P-G-3B2" (including the missing dash, which is a typo on the board silkscreen)
 	ROM_LOAD( "roland__r15179972__hn62304bpe98__9d1_japan.3f.ic20", 0x200000, 0x80000, CRC(733c4054) SHA1(9b6b59ab74e5bf838702abb087c408aaa85b7b1f) ) // markings under chip footprint are "HN62304BPE98"
+	ROM_REGION( 0x400000, "pcm", ROMREGION_ERASEFF )    // ROMs after descrambling
 ROM_END
 
-CONS( 1989, cm32p, 0, 0, cm32p, cm32p, cm32p_state, empty_init, "Roland", "CM-32P", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1989, cm32p, 0, 0, cm32p, cm32p, cm32p_state, init_cm32p, "Roland", "CM-32P", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

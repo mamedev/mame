@@ -540,7 +540,7 @@ WRITE8_MEMBER(berzerk_state::audio_w)
 		{
 		/* write data to the S14001 */
 		case 0:
-			m_s14001a->data_w(space, 0, data & 0x3f);
+			m_s14001a->data_w(data & 0x3f);
 
 			/* clock the chip -- via a 555 timer */
 			m_s14001a->start_w(1);

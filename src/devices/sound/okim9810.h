@@ -39,21 +39,21 @@ public:
 	void write_tmp_register(uint8_t command);
 	void write_command(uint8_t command);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( tmp_register_w );
+	uint8_t read();
+	void write(uint8_t data);
+	void tmp_register_w(uint8_t data);
 
 	// serial read/write handlers
-	DECLARE_WRITE_LINE_MEMBER( serial_w );
-	DECLARE_WRITE_LINE_MEMBER( si_w );
-	DECLARE_WRITE_LINE_MEMBER( sd_w );
-	DECLARE_WRITE_LINE_MEMBER( ud_w );
-	DECLARE_WRITE_LINE_MEMBER( cmd_w );
-	DECLARE_READ_LINE_MEMBER( so_r );
-	DECLARE_READ_LINE_MEMBER( sr0_r );
-	DECLARE_READ_LINE_MEMBER( sr1_r );
-	DECLARE_READ_LINE_MEMBER( sr2_r );
-	DECLARE_READ_LINE_MEMBER( sr3_r );
+	void serial_w(int state);
+	void si_w(int state);
+	void sd_w(int state);
+	void ud_w(int state);
+	void cmd_w(int state);
+	int so_r();
+	int sr0_r();
+	int sr1_r();
+	int sr2_r();
+	int sr3_r();
 
 protected:
 	enum

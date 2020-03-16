@@ -117,7 +117,7 @@ protected:
 			return v1;
 		} else if(shift < 32) {
 			u32 r = v1 << shift;
-			u32 f = v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z;
+			u32 f = r ? r & 0x80000000 ? F_N : 0 : F_Z;
 			if(v1 & (1 << (32-shift)))
 				f |= F_C;
 			m_hr[4] = (m_hr[4] & ~F_MASK) | f;
@@ -137,7 +137,7 @@ protected:
 			return v1;
 		} else if(shift < 32) {
 			u32 r = v1 >> shift;
-			u32 f = v1 ? 0 : F_Z;
+			u32 f = r ? 0 : F_Z;
 			if(v1 & (1 << (shift - 1)))
 				f |= F_C;
 			m_hr[4] = (m_hr[4] & ~F_MASK) | f;
@@ -157,7 +157,7 @@ protected:
 			return v1;
 		} else if(shift < 32) {
 			u32 r = static_cast<s32>(v1) >> shift;
-			u32 f = v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z;
+			u32 f = r ? r & 0x80000000 ? F_N : 0 : F_Z;
 			if(v1 & (1 << (shift - 1)))
 				f |= F_C;
 			m_hr[4] = (m_hr[4] & ~F_MASK) | f;

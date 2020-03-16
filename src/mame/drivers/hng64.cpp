@@ -496,9 +496,9 @@ READ32_MEMBER(hng64_state::hng64_rtc_r)
 
 		// bit 4 disables "system log reader" (the device is 4-bit? so this bit is not from the device?)
 		if ((rtc_addr & 0xf) == 0xd)
-			return m_rtc->read(space, (rtc_addr) & 0xf) | 0x10;
+			return m_rtc->read((rtc_addr) & 0xf) | 0x10;
 
-		return m_rtc->read(space, (rtc_addr) & 0xf);
+		return m_rtc->read((rtc_addr) & 0xf);
 	}
 	else
 	{
@@ -566,7 +566,7 @@ WRITE32_MEMBER(hng64_state::hng64_rtc_w)
 	if (offset & 1)
 	{
 		// RTC is mapped to 1 byte (4-bits used) in every 8 bytes so we can't even install this with a umask
-		m_rtc->write(space, (offset >> 1) & 0xf, data);
+		m_rtc->write((offset >> 1) & 0xf, data);
 	}
 	else
 	{

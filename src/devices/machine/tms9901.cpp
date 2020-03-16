@@ -316,10 +316,15 @@ void tms9901_device::set_int_line(int n, int state)
 */
 READ8_MEMBER( tms9901_device::read )
 {
-	int crubit = offset & 0x01f;
+	return read_bit(offset)? 0x01 : 0x00;
+}
+
+bool tms9901_device::read_bit(int bit)
+{
+	int crubit = bit & 0x01f;
 
 	if (crubit == 0)
-		return m_clock_mode? 1 : 0;
+		return m_clock_mode;
 
 	if (crubit > 15)
 	{
@@ -329,8 +334,8 @@ READ8_MEMBER( tms9901_device::read )
 		else
 		{
 			// Positive logic; should be 0 if there is no connection.
-			if (m_read_port.isnull()) return 0;
-			return m_read_port((crubit<=P6)? crubit : P6+P0-crubit);
+			if (m_read_port.isnull()) return false;
+			return m_read_port((crubit<=P6)? crubit : P6+P0-crubit)!=0;
 		}
 	}
 
@@ -338,9 +343,9 @@ READ8_MEMBER( tms9901_device::read )
 	if (m_clock_mode)
 	{
 		if (crubit == 15)    // bit 15 in clock mode = /INTREQ
-			return (m_int_pending)? 0 : 1;
+			return !m_int_pending;
 
-		return BIT(m_clock_read_register, crubit-1);
+		return BIT(m_clock_read_register, crubit-1)!=0;
 	}
 	else
 	{
@@ -352,7 +357,7 @@ READ8_MEMBER( tms9901_device::read )
 		if (crubit>INT6 && is_output(22-crubit))
 			return output_value(22-crubit);
 		else
-			return m_read_port.isnull()? 1 : m_read_port(crubit);
+			return m_read_port.isnull()? true : (m_read_port(crubit)!=0);
 	}
 }
 
@@ -369,7 +374,11 @@ READ8_MEMBER( tms9901_device::read )
 */
 WRITE8_MEMBER( tms9901_device::write )
 {
-	data &= 1;  // clear extra bits
+	write_bit(offset, data!=0);
+}
+
+void tms9901_device::write_bit(int offset, bool data)
+{
 	int crubit = offset & 0x001f;
 
 	if (crubit >= 16)

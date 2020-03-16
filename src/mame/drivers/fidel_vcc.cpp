@@ -215,7 +215,7 @@ WRITE8_MEMBER(vcc_state::ppi_porta_w)
 
 	// d0-d5: TSI C0-C5
 	// d7: TSI START line
-	m_speech->data_w(space, 0, data & 0x3f);
+	m_speech->data_w(data & 0x3f);
 	m_speech->start_w(data >> 7 & 1);
 
 	// d6: language latch data

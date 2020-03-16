@@ -1159,6 +1159,11 @@ kyros                           // (c) 1987 World Games
 kyrosj                          // (c) 1986 Alpha Denshi Co.
 sstingry                        // (c) 1986 Alpha Denshi Co.
 
+@source:alphajuno.cpp
+ajuno1                          //
+ajuno2                          //
+mks50                           //
+
 @source:alphasma.cpp
 asma2k                          //
 asmapro                         //
@@ -10498,7 +10503,7 @@ cmpchess
 cncchess
 
 @source:compmahj.cpp
-compmahj            // 1987 Nintendo Computer Mahjong
+compmahj                        // 1983 Nintendo Computer Mah-jong Yakuman
 
 @source:compucolor.cpp
 compclr2                        //
@@ -13462,6 +13467,7 @@ feasbu                          //
 feasgla                         //
 feag                            //
 feag2100                        //
+feag2100a                       //
 fepriv                          //
 fpres                           //
 fpresbu                         //
@@ -14178,6 +14184,7 @@ ckongg                          // 1981 bootleg
 ckonggx                         //
 ckongis                         //
 ckongmc                         // 1981 bootleg
+ckongmc2                        // 1981 bootleg
 dkongjrm                        // bootleg
 dkongjrmc                       // bootleg (Centromatic)
 drivfrcb                        // bootleg
@@ -14199,6 +14206,7 @@ rockclim                        // (c)1981 Taito
 scramb2                         // bootleg
 scramb3                         // bootleg
 scramblb                        // bootleg
+scrambleo                       // bootleg
 scrambler                       // bootleg
 spcwarp                         // 1983 Century Electronics UK LTD
 tazzmang                        // bootleg
@@ -15054,6 +15062,7 @@ nc96h                           // (c) 1996 Amcoe
 nc96i                           // (c) 1996 Amcoe
 nc96j                           // (c) 1996 Amcoe
 nc96k                           // (c) 1996 Amcoe
+nc96l                           // (c) 1996 Amcoe
 nc96txt                         // (c) 2000 Amcoe
 ncb3                            // (c) 199? Dyna Electronics
 nfb96                           // (c) 1996 Amcoe
@@ -15737,6 +15746,7 @@ gnw_bfightn                     // Nintendo
 gnw_bjack                       // Nintendo
 gnw_boxing                      // Nintendo
 gnw_bsweep                      // Nintendo
+gnw_cgrab                       // Nintendo
 gnw_chef                        // Nintendo
 gnw_climber                     // Nintendo
 gnw_climbern                    // Nintendo
@@ -18381,6 +18391,12 @@ jungleyo
 
 @source:junior.cpp
 junior                          //
+
+@source:juno106.cpp
+juno106                         //
+
+@source:juno6.cpp
+juno6                           //
 
 @source:junofrst.cpp
 junofrst                        // GX310 (c) 1983 Konami
@@ -34366,6 +34382,7 @@ dngrtrck                        // Petaco bootleg
 gutangtn                        // GX359 (c) 1982 Konami + Sega license
 jackler                         // 1 9 8 2 (Jungler Bootleg)
 jungler                         // GX327 (c) 1981 Konami
+junglero                        // Olympia license
 junglers                        // GX327 (c) 1981 Stern
 locoboot                        // bootleg
 locomotn                        // GX359 (c) 1982 Konami + Centuri license
@@ -34568,6 +34585,17 @@ d50                             //
 d50o                            //
 d550                            //
 
+@source:roland_jx3p.cpp
+gr700                           //
+jx3p                            //
+mks30                           //
+
+@source:roland_jx8p.cpp
+jx10                            //
+jx8p                            //
+jx8po                           //
+mks70                           //
+
 @source:roland_mt32.cpp
 cm32l                           //
 mt32                            //
@@ -34579,6 +34607,16 @@ r8mk2                           //
 
 @source:roland_sc55.cpp
 sc55                            // 1991 Sound Canvas SC-55
+
+@source:roland_tb303.cpp
+tb303                           // Roland
+
+@source:roland_tr606.cpp
+tr606                           // Roland
+
+@source:roland_tr707.cpp
+tr707                           //
+tr727                           //
 
 @source:rollerg.cpp
 rollerg                         // GX999 (c) 1991 (US)
@@ -34963,6 +35001,9 @@ ccdelta1                        //
 @source:saitek_mark5.cpp
 ccmk5
 ccmk6
+
+@source:saitek_president.cpp
+prschess
 
 @source:saitek_risc2500.cpp
 risc2500                        //
@@ -35429,6 +35470,7 @@ bloxeedc                        // (c) 1989 Sega / Elorg
 bloxeedu                        // (c) 1989 Sega / Elorg
 borench                         // (c) 1990 Sega
 borencha                        // (c) 1990 Sega
+borenchj                        // (c) 1990 Sega
 column2j                        // (c) 1990 Sega
 columns                         // (c) 1990 Sega
 columns2                        // (c) 1990 Sega
@@ -37112,6 +37154,7 @@ speglsht                        // (c) 1994 Seta
 @source:spg110.cpp
 jak_capb                        //
 jak_spdmo                       //
+jak_spdmoa
 conyteni                        //
 conyping                        //
 conyfght
@@ -37131,10 +37174,13 @@ rad_skatp                       //
 rad_crik                        //
 rad_fb2                         //
 mattelcs                        //
+comil                           //
 abltenni                        //
+fordrace
 tvsprt10                        //
 decathln
 wiwi18                          //
+foxsport
 guitarfv
 guitarss
 jjstrip
@@ -37825,7 +37871,9 @@ starfigh                        // (c) 1990 SunA
 
 @source:sunplus_unsp20soc.cpp
 paccon
+lazertag
 jak_s500
+jak_smwm
 jak_pf
 jak_prft
 jak_tink
@@ -38725,9 +38773,6 @@ ivg09                           //
 @source:taxidriv.cpp
 taxidriv                        // [1984 Graphic Techno]
 
-@source:tb303.cpp
-tb303                           // Roland
-
 @source:tbowl.cpp
 tbowl                           // 6206 - (c) 1987 Tecmo
 tbowla                          //
@@ -39468,9 +39513,6 @@ tp84b                           // GX388 (c) 1984
 
 @source:tr175.cpp
 tr175                           // Relisys
-
-@source:tr606.cpp
-tr606                           // Roland
 
 @source:trackfld.cpp
 atlantol                        // bootleg

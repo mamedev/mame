@@ -580,32 +580,32 @@ private:
 
 READ16_MEMBER( cdtv_state::clock_r )
 {
-	return m_rtc->read(space, offset / 2);
+	return m_rtc->read(offset / 2);
 }
 
 WRITE16_MEMBER( cdtv_state::clock_w )
 {
-	m_rtc->write(space, offset / 2, data);
+	m_rtc->write(offset / 2, data);
 }
 
 READ16_MEMBER( a2000_state::clock_r )
 {
-	return m_rtc->read(space, offset / 2);
+	return m_rtc->read(offset / 2);
 }
 
 WRITE16_MEMBER( a2000_state::clock_w )
 {
-	m_rtc->write(space, offset / 2, data);
+	m_rtc->write(offset / 2, data);
 }
 
 READ16_MEMBER( a500p_state::clock_r )
 {
-	return m_rtc->read(space, offset / 2);
+	return m_rtc->read(offset / 2);
 }
 
 WRITE16_MEMBER( a500p_state::clock_w )
 {
-	m_rtc->write(space, offset / 2, data);
+	m_rtc->write(offset / 2, data);
 }
 
 

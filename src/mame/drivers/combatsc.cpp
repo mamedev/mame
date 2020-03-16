@@ -405,7 +405,7 @@ WRITE8_MEMBER(combatsc_state::combatscb_msm_w)
 	membank("bl_abank")->set_entry(BIT(data, 7));
 
 	m_msm->reset_w(BIT(data, 4));
-	m_msm->write_data(data & 0x0f);
+	m_msm->data_w(data & 0x0f);
 }
 
 WRITE8_MEMBER(combatsc_state::combatscb_sound_irq_ack)

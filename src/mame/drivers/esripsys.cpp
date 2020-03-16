@@ -284,9 +284,9 @@ READ8_MEMBER(esripsys_state::g_iobus_r)
 		case 0x10:
 			return ioport("IO_1")->read();
 		case 0x11:
-			return ioport("JOYSTICK_X")->read();
+			return ioport("STICKX")->read();
 		case 0x12:
-			return ioport("JOYSTICK_Y")->read();
+			return ioport("STICKY")->read();
 		case 0x16:
 			return m_io_firq_status;
 		case 0x18:
@@ -453,11 +453,11 @@ static INPUT_PORTS_START( turbosub )
 	PORT_START("IO_2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("JOYSTICK_X")
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_MINMAX(0xff, 0x00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200)
+	PORT_START("STICKX")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
 
-	PORT_START("JOYSTICK_Y")
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_MINMAX(0xff, 0x00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200)
+	PORT_START("STICKY")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30)
 INPUT_PORTS_END
 
 

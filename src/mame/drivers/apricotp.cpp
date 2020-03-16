@@ -574,7 +574,7 @@ void fp_state::fp(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &fp_state::fp_io);
 	m_maincpu->set_irq_acknowledge_callback(I8259A_TAG, FUNC(pic8259_device::inta_cb));
 
-	HD6301(config, m_soundcpu, 2000000);
+	HD6301V1(config, m_soundcpu, 2000000);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &fp_state::sound_mem);
 	m_soundcpu->set_disable();
 

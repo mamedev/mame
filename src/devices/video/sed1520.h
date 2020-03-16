@@ -36,12 +36,12 @@ public:
 	template <typename... T> void set_screen_update_cb(T &&... args) { m_screen_update_cb.set(std::forward<T>(args)...); }
 
 	// device interface
-	virtual DECLARE_WRITE8_MEMBER(write);
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(control_write);
-	virtual DECLARE_READ8_MEMBER(status_read);
-	virtual DECLARE_WRITE8_MEMBER(data_write);
-	virtual DECLARE_READ8_MEMBER(data_read);
+	virtual void write(offs_t offset, uint8_t data);
+	virtual uint8_t read(offs_t offset);
+	virtual void control_write(uint8_t data);
+	virtual uint8_t status_read();
+	virtual void data_write(uint8_t data);
+	virtual uint8_t data_read();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:

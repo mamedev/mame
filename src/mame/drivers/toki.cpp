@@ -118,7 +118,7 @@ READ16_MEMBER(toki_state::pip_r)
 
 WRITE_LINE_MEMBER(toki_state::tokib_adpcm_int)
 {
-	m_msm->write_data(m_msm5205next);
+	m_msm->data_w(m_msm5205next);
 	m_msm5205next >>= 4;
 
 	m_toggle ^= 1;
