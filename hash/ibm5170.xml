@@ -12079,6 +12079,28 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mk">
+		<description>Mortal Kombat</description>
+		<year>1993</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="developer" value="Midway" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Mortal Kombat [Acclaim Entertainment] [1993] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="04a7ca95" sha1="194e24826fcd7e33f24ba1f5d6b0a26c421eb8f6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Mortal Kombat [Acclaim Entertainment] [1993] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="fce97e16" sha1="38f52943a43ad3efdad8b1428d24c069aaf7fe80"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Mortal Kombat [Acclaim Entertainment] [1993] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="b1958166" sha1="bb5c7de84cf51d44f09c149598257330e5768ebf"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="mystict">
 		<description>Mystic Towers</description>
 		<year>1994</year>
