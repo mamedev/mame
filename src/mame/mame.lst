@@ -37290,6 +37290,7 @@ lx_jg7415                       //
 @source:spg2xx_zone_32bit.cpp
 mywicodx                        //
 zon32bit                        // Zone 32-bit
+oplayer
 
 @source:spiders.cpp
 spiders                         // (c) 1981 Sigma Ent. Inc.
