@@ -234,7 +234,7 @@ u16 ks0164_device::voice_r(offs_t offset)
 void ks0164_device::voice_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_sregs[m_voice_select & 0x1f][offset]);
-	if(m_cpu->pc() < 0x5f94 || m_cpu->pc() > 0x5fc0)
+	if(1 || m_cpu->pc() < 0x5f94 || m_cpu->pc() > 0x5fc0)
 		logerror("voice %02x.%02x = %04x (%04x)\n", m_voice_select & 0x1f, offset, m_sregs[m_voice_select & 0x1f][offset], m_cpu->pc());
 }
 

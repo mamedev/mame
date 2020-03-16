@@ -403,7 +403,12 @@ void ks0164_cpu_device::execute_run()
 			case 2: {
 				// Bit set in register
 				// 1110 .rrr bbbb .001
-				m_r[(opcode >> 8) & 7] |= 1 << ((opcode >> 4) & 0xf);
+				if(m_r[(opcode >> 8) & 7] & (1 << ((opcode >> 4) & 0xf)))
+					m_r[R_PSW] &= ~F_Z;
+				else {
+					m_r[R_PSW] |=  F_Z;
+					m_r[(opcode >> 8) & 7] |= 1 << ((opcode >> 4) & 0xf);
+				}
 				break;
 			}
 
@@ -557,7 +562,11 @@ void ks0164_cpu_device::execute_run()
 			case 2: {
 				// Bit clear in register
 				// 1110 .rrr bbbb .001
-				m_r[(opcode >> 8) & 7] &= ~(1 << ((opcode >> 4) & 0xf));
+				if(m_r[(opcode >> 8) & 7] & (1 << ((opcode >> 4) & 0xf))) {
+					m_r[(opcode >> 8) & 7] &= ~(1 << ((opcode >> 4) & 0xf));
+					m_r[R_PSW] &= ~F_Z;
+				} else
+					m_r[R_PSW] |=  F_Z;
 				break;
 			}
 
