@@ -318,7 +318,7 @@ void cclimber_state::swimmer_set_background_pen()
 
 
 
-WRITE8_MEMBER(cclimber_state::cclimber_colorram_w)
+void cclimber_state::cclimber_colorram_w(offs_t offset, uint8_t data)
 {
 	/* A5 is not connected, there is only 0x200 bytes of RAM */
 	m_colorram[offset & ~0x20] = data;
@@ -326,25 +326,25 @@ WRITE8_MEMBER(cclimber_state::cclimber_colorram_w)
 }
 
 
-WRITE_LINE_MEMBER(cclimber_state::flip_screen_x_w)
+void cclimber_state::flip_screen_x_w(int state)
 {
 	m_flip_x = state;
 }
 
 
-WRITE_LINE_MEMBER(cclimber_state::flip_screen_y_w)
+void cclimber_state::flip_screen_y_w(int state)
 {
 	m_flip_y = state;
 }
 
 
-WRITE_LINE_MEMBER(cclimber_state::sidebg_enable_w)
+void cclimber_state::sidebg_enable_w(int state)
 {
 	m_swimmer_side_background_enabled = state;
 }
 
 
-WRITE_LINE_MEMBER(cclimber_state::palette_bank_w)
+void cclimber_state::palette_bank_w(int state)
 {
 	m_swimmer_palettebank = state;
 }

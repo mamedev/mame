@@ -62,46 +62,46 @@ void kyugo_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(kyugo_state::fgvideoram_w)
+void kyugo_state::fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(kyugo_state::bgvideoram_w)
+void kyugo_state::bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(kyugo_state::bgattribram_w)
+void kyugo_state::bgattribram_w(offs_t offset, uint8_t data)
 {
 	m_bgattribram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-READ8_MEMBER(kyugo_state::spriteram_2_r)
+uint8_t kyugo_state::spriteram_2_r(offs_t offset)
 {
 	// only the lower nibble is connected
-	return m_spriteram_2[offset] | 0xf0;
+	return m_spriteram[1][offset] | 0xf0;
 }
 
 
-WRITE8_MEMBER(kyugo_state::scroll_x_lo_w)
+void kyugo_state::scroll_x_lo_w(uint8_t data)
 {
 	m_scroll_x_lo = data;
 }
 
 
-WRITE8_MEMBER(kyugo_state::gfxctrl_w)
+void kyugo_state::gfxctrl_w(uint8_t data)
 {
-	/* bit 0 is scroll MSB */
+	// bit 0 is scroll MSB
 	m_scroll_x_hi = data & 0x01;
 
-	/* bit 5 is front layer color (Son of Phoenix only) */
+	// bit 5 is front layer color (Son of Phoenix only)
 	if (m_fgcolor != ((data & 0x20) >> 5))
 	{
 		m_fgcolor = (data & 0x20) >> 5;
@@ -109,7 +109,7 @@ WRITE8_MEMBER(kyugo_state::gfxctrl_w)
 		m_fg_tilemap->mark_all_dirty();
 	}
 
-	/* bit 6 is background palette bank */
+	// bit 6 is background palette bank
 	if (m_bgpalbank != ((data & 0x40) >> 6))
 	{
 		m_bgpalbank = (data & 0x40) >> 6;
@@ -121,13 +121,13 @@ WRITE8_MEMBER(kyugo_state::gfxctrl_w)
 }
 
 
-WRITE8_MEMBER(kyugo_state::scroll_y_w)
+void kyugo_state::scroll_y_w(uint8_t data)
 {
 	m_scroll_y = data;
 }
 
 
-WRITE_LINE_MEMBER(kyugo_state::flipscreen_w)
+void kyugo_state::flipscreen_w(int state)
 {
 	flip_screen_set(state);
 }
@@ -141,10 +141,10 @@ WRITE_LINE_MEMBER(kyugo_state::flipscreen_w)
 
 void kyugo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* sprite information is scattered through memory */
-	/* and uses a portion of the text layer memory (outside the visible area) */
-	uint8_t *spriteram_area1 = &m_spriteram_1[0x28];
-	uint8_t *spriteram_area2 = &m_spriteram_2[0x28];
+	// sprite information is scattered through memory
+	// and uses a portion of the text layer memory (outside the visible area)
+	uint8_t *spriteram_area1 = &m_spriteram[0][0x28];
+	uint8_t *spriteram_area2 = &m_spriteram[1][0x28];
 	uint8_t *spriteram_area3 = &m_fgvideoram[0x28];
 
 	int flip = flip_screen();
