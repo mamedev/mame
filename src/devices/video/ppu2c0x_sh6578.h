@@ -35,9 +35,12 @@ private:
 	void read_tile_plane_data(int address, int color) override;
 	void draw_tile(uint8_t* line_priority, int color_byte, int color_bits, int address, int start_x, pen_t back_pen, uint32_t*& dest, const pen_t* color_table) override;
 
-	virtual void draw_sprites(uint8_t* line_priority) override;
+	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap) override;
+	//virtual void draw_sprites(uint8_t* line_priority) override;
 	virtual void draw_background(uint8_t* line_priority) override;
-	
+	virtual int apply_sprite_pattern_page(int index1, int size) override;
+	virtual void read_sprite_plane_data(int address) override;
+
 	uint8_t m_extplanebuf[2];
 	uint8_t m_colsel_pntstart;
 };

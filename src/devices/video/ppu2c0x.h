@@ -91,8 +91,12 @@ public:
 	virtual void read_sprite_plane_data(int address);
 	virtual void make_sprite_pixel_data(uint8_t &pixel_data, int flipx);
 	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap);
+	virtual bool is_spritepixel_opaque(int pixel_data, int color);
+	virtual void draw_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, uint8_t* line_priority);
+	virtual void draw_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, uint8_t* line_priority);
 	virtual void read_extra_sprite_bits(int sprite_index);
 
+	virtual int apply_sprite_pattern_page(int index1, int size);
 	virtual void draw_sprites(uint8_t *line_priority);
 	void render_scanline();
 	virtual void scanline_increment_fine_ycounter();
@@ -189,6 +193,8 @@ protected:
 	int                         m_scanline;         /* scanline count */
 	std::unique_ptr<uint8_t[]>  m_spriteram;           /* sprite ram */
 
+	int m_videoram_addr_mask;
+	int m_global_refresh_mask;
 	int m_line_write_increment_large;
 	bool m_paletteram_in_ppuspace; // sh6578 doesn't have the palette in PPU space, so various side-effects don't apply
 	std::vector<uint8_t>		m_palette_ram;		    /* shouldn't be in main memory! */

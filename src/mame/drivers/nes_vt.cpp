@@ -2666,10 +2666,21 @@ ROM_START( mc_tv200 )
 	ROM_LOAD( "s29gl064n90.bin", 0x00000, 0x800000, CRC(ae1905d2) SHA1(11582055713ba937c1ad32c4ada8683eebc1c83c) )
 ROM_END
 
+ROM_START( techni4 )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "technigame.bin", 0x00000, 0x200000, CRC(3c96b1b1) SHA1(1acc81b26e740327bd6d9faa5a96ab027a48dd77) )
+ROM_END
+
 ROM_START( unkra200 ) // "Winbond 25Q64FVSIG 1324" SPI ROM
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "retro_machine_rom", 0x00000, 0x800000, CRC(0e824aa7) SHA1(957e98868559ecc22b3fa42c76692417b76bf132) )
 ROM_END
+
+ROM_START( denv150 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "denver150in1.bin", 0x00000, 0x1000000, CRC(6b3819d7) SHA1(b0039945ce44a52ea224ab736d5f3c6980409b5d) ) // 2nd half is blank
+ROM_END
+
 
 ROM_START( ppgc200g )
 	ROM_REGION( 0x800000, "mainrom", 0 )
@@ -2782,13 +2793,27 @@ CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empt
 CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
 CONS( 2016, rtvgc300,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
 
-// Also Lexibook Compact Cyber Arcade - Cars
-//      Lexibook Compact Cyber Arcade - Paw Patrol
-//      Lexibook Compact Cyber Arcade - Barbie
-//      Lexibook Compact Cyber Arcade - Finding Dory
-//      Lexibook Compact Cyber Arcade - Marvel Ultimate Spiderman
-//      Lexibook Compact Cyber Arcade - PJ Masks
-// more?
+/* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme 
+
+    (handhekd units, use standard AAA batteries)
+	Lexibook Compact Cyber Arcade - Cars
+	Lexibook Compact Cyber Arcade - Paw Patrol
+	Lexibook Compact Cyber Arcade - Barbie
+	Lexibook Compact Cyber Arcade - Finding Dory
+	Lexibook Compact Cyber Arcade - Marvel Ultimate Spiderman
+	Lexibook Compact Cyber Arcade - PJ Masks
+  
+	(Handheld units, but different form factor to Compact Cyber Arcade, charged via USB)
+	Lexibook Console Colour - Minnie Mouse
+	Lexibook Console Colour - Disney's Planes
+	Lexibook Console Colour - Barbie
+
+    (units for use with TV)
+	Lexibook Retro TV Game Console (300 Games) - Cars
+	Lexibook Retro TV Game Console (300 Games) - Frozen 
+
+	(more?)
+*/
 
 // intial code isn't valid? scrambled?
 CONS( 201?, red5mam,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING )
@@ -2800,12 +2825,14 @@ CONS( 201?, red5mam,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty
 // some menu gfx broken, probably because this is a bad dump
 CONS( 2015, dgun2573,  0,  0,  nes_vt_fp, nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "My Arcade Gamer V Portable Gaming System (DGUN-2573)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+CONS( 201?, denv150,   0,  0,  nes_vt_fp, nes_vt, nes_vt_hh_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
 CONS( 200?, polmega,   0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_vh2009_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
 CONS( 200?, silv35,    0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_vh2009_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_NOT_WORKING )
-
+// die is marked as VH2009, as above, but no scrambled opcodes here
+CONS( 201?, techni4,   0,  0,  nes_vt_base_pal,      nes_vt, nes_vt_state,        empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )
 
 
 // same encryption as above, but seems like newer hardware (or the above aren't using most of the features)
