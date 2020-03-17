@@ -20,6 +20,106 @@
 
     Known issues:
         * attract mode in Son of Phoenix doesn't work
+ ***************************************************************************
+
+Repulse bootleg
+Hardware Info By Guru
+
+PCB Layout
+----------
+
+Top PCB
+
+ |------------------------------------------------|
+ |                          PAL                   |
+|-|       2016        PAL                         |
+| |                                               |
+| |       ROM.2K            Z80                   |
+| |                                               |
+| |       ROM.2J   ROM.4J                         |
+| |                                               |
+|-|       ROM.2H   ROM.4H                         |
+ |                                                |
+ |        ROM.2F   ROM.4F              AY-3-8910  |
+ |                                                |
+ |1             Z80                    AY-3-8910  |
+ |8                                               |
+ |W                                      DSW2     |
+ |A                                               |
+ |Y                                      DSW1     |
+ |           AMP      VOL                         |
+ |------------------------------------------------|
+Notes:
+      2016      - 2kx8 SRAM
+      Z80       - Clock 3.072MHz [18.432/6] (both)
+      AY-3-8910 - Clock 1.536MHz [18.432/12] (both)
+      HSync     - 15.5154kHz
+      VSync     - 59.6575Hz
+
+      ALL ROMs match the original set.
+      ROM CRC32 Table (to match ROMs from original to bootleg locations)
+      ------------------------------------------------------------------
+      Location    CRC32      Repulse ROM-set Name
+      2K                    86b267f3   repulse.b4
+      2J                    197e314c   3.j2
+      2H                    b3c6a886   2.h2
+      2F                    c485c621   1.f2
+      4J                    57a8e900   7.j4
+      4H                    99129918   repulse.b6
+      4F                    fb2b7c9d   repulse.b5
+
+
+Bottom PCB
+
+ |-----------------------------------------------------------------------------|
+ |                             18.432MHz                                       |
+|-|                                                                            |
+| |                                                                            |
+| |                                                                            |
+| |               2016                                              2016  2016 |
+| |                                                                            |
+| |                                   2114                                     |
+|-|                                                                            |
+ |                        6148        2114                                     |
+ |                                                    ROM.9H  ROM.10H  ROM.11H |
+ |                6148    6148                                                 |
+ |                             PROM.5H%                                        |
+ |                6148                                                         |
+ |                                                                             |
+ |  PROM.1H                                                                    |
+ |  PROM.1G                                                                    |
+ |  PROM.1F                                                                    |
+ |                                                                             |
+ |                                                                               |
+ |                ROM.4A      ROM.6A  ROM.7A  ROM.8A  ROM.9A  ROM.10A  ROM.11A |
+ |                                                                             |
+ |-----------------------------------------------------------------------------|
+Notes:
+      2016  - 2kx8 SRAM
+      6148  - 1kx4 SRAM
+      2114  - 1kx4 SRAM
+      PROM* - 82S129 Bi-Polar PROM
+      PROM% - Package looks like other PROMs so it might be a PROM but no part# on it
+
+      ALL ROMs match the original set.
+      ROM CRC32 Table (to match ROMs from original to bootleg locations)
+      ------------------------------------------------------------------
+      Location    CRC32      Repulse ROM-set Name
+      4A                    c79f05eb*  repulse.a11
+      6A          0e9f757e   8.6a
+      7A          f7d2e650   9.7a
+      8A                    e717baf4   10.8a
+      9A                    04b2250b   11.9a
+      10A                   d110e140   12.10a
+      11A                   8fdc713c   13.11a
+      9H                    c9213469   15.9h
+      10H                   7de5d39e   16.10h
+      11H                   0ba5f72c   17.11h
+
+      * This ROM is a 2764 with the data doubled. The original dumped ROM at A11 is only 4k
+        so held in a 2732 EPROM. The original ROM might be the same and doubled to fill a
+        2764 like the bootleg was but possibly chopped in half for emulation, hence the 4k
+        size of the original ROM compared to the 8k size of the bootleg ROM.
 
 ***************************************************************************/
 
@@ -198,7 +298,7 @@ void kyugo_state::srdmissn_sub_portmap(address_map &map)
 
 static INPUT_PORTS_START( common )
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("DSW2:1,2,3")
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
@@ -207,7 +307,7 @@ static INPUT_PORTS_START( common )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("DSW2:4,5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
@@ -216,8 +316,8 @@ static INPUT_PORTS_START( common )
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )               PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )               PORT_DIPLOCATION("DSW2:8")
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -252,23 +352,23 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gyrodine )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                        PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "DSW1:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "DSW1:4" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )               PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )               PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, "20000 50000" )
 	PORT_DIPSETTING(    0x00, "40000 70000" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )                  PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                                        PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -277,34 +377,34 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( repulse )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                        PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, "Every 50000" )
 	PORT_DIPSETTING(    0x00, "Every 70000" )
-	PORT_DIPNAME( 0x08, 0x08, "Slow Motion" )
+	PORT_DIPNAME( 0x08, 0x08, "Slow Motion" )               PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0x10,  0x10, "Invulnerability (Cheat)")
+	PORT_DIPNAME(0x10,  0x10, "Invulnerability (Cheat)")    PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Sound Test" )
+	PORT_DIPNAME( 0x20, 0x20, "Sound Test" )                PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                                        PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_INCLUDE( common )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("DSW2:7,8")
 	PORT_DIPSETTING(    0xc0, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
@@ -313,27 +413,27 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( airwolf )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                        PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x01, "6" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x08, "Slow Motion" )
+	PORT_DIPNAME( 0x08, 0x08, "Slow Motion" )               PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Invulnerability (Cheat)")
+	PORT_DIPNAME( 0x10, 0x10, "Invulnerability (Cheat)")    PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Sound Test" )
+	PORT_DIPNAME( 0x20, 0x20, "Sound Test" )                PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                    PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -345,7 +445,7 @@ static INPUT_PORTS_START( skywolf )
 	PORT_INCLUDE( airwolf )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                    PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -354,27 +454,27 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( flashgal )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                    PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, "Every 50000" )
 	PORT_DIPSETTING(    0x00, "Every 70000" )
-	PORT_DIPNAME( 0x08, 0x08, "Slow Motion" )
+	PORT_DIPNAME( 0x08, 0x08, "Slow Motion" )               PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Sound Test" )
+	PORT_DIPNAME( 0x20, 0x20, "Sound Test" )                PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                    PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -383,27 +483,27 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( srdmissn )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                        PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Life/Continue" )
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Life/Continue" )       PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, "Every 50000/No" )
 	PORT_DIPSETTING(    0x00, "Every 70000/Yes" )
-	PORT_DIPNAME( 0x08, 0x08, "Slow Motion" )
+	PORT_DIPNAME( 0x08, 0x08, "Slow Motion" )               PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0x10,  0x10, "Invulnerability (Cheat)")
+	PORT_DIPNAME(0x10,  0x10, "Invulnerability (Cheat)")    PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Sound Test" )
+	PORT_DIPNAME( 0x20, 0x20, "Sound Test" )                PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                    PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -412,27 +512,27 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( legend )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                        PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Life/Continue" )
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Life/Continue" )       PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, "Every 50000/No" )
 	PORT_DIPSETTING(    0x00, "Every 70000/Yes" )
-	PORT_DIPNAME( 0x08, 0x08, "Slow Motion" )
+	PORT_DIPNAME( 0x08, 0x08, "Slow Motion" )               PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  /* probably unused */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:5")  /* probably unused */
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Sound Test" )
+	PORT_DIPNAME( 0x20, 0x20, "Sound Test" )                PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                    PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
