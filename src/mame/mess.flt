@@ -439,6 +439,7 @@ k8915.cpp
 kawai_k1.cpp
 kawai_k4.cpp
 kawai_k5.cpp
+kawai_r100.cpp
 kaypro.cpp
 kc.cpp
 kdt6.cpp

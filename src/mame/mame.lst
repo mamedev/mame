@@ -18494,6 +18494,9 @@ k4r                             //
 k5                              //
 k5m                             //
 
+@source:kawai_r100.cpp
+r100                            //
+
 @source:kaypro.cpp
 kaypro1                         // Kaypro 1
 kaypro10                        // Kaypro 10/83
