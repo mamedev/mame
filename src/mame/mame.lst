@@ -12962,6 +12962,9 @@ embargo                         //
 @source:emma2.cpp
 emma2                           // 1979 L.J.Technical Systems
 
+@source:emu3.cpp
+emu3                            //
+
 @source:enigma2.cpp
 enigma2                         // (c) 1981 Game Plan (Zilec Electronics license)
 enigma2a                        // (c) 1984 Zilec Electronics (bootleg?)
