@@ -2639,6 +2639,7 @@ createMESSProjects(_target, _subtarget, "korg")
 files {
 	MAME_DIR .. "src/mame/drivers/korgds8.cpp",
 	MAME_DIR .. "src/mame/drivers/korgdss1.cpp",
+	MAME_DIR .. "src/mame/drivers/korgdw8k.cpp",
 	MAME_DIR .. "src/mame/drivers/korgm1.cpp",
 	MAME_DIR .. "src/mame/drivers/poly800.cpp",
 	MAME_DIR .. "src/mame/drivers/polysix.cpp",
