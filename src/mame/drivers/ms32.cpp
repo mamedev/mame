@@ -77,10 +77,8 @@ Some of the roms for each game are encrypted:
 
 The only difference between the two Gratia sets are the encrypted ROMs in each set (they use
 different custom chips). The program ROMs are the same, as is all non encrypted graphics data.
-94019_30ver1.0.30 matches 94019_2.030 when both are decrypted with their respective encryption
-routines.  Due to the badly dumped mr94019-07.10, it hasn't been verified that it's data is
-identical to 94019_2.07 when both are decrypted. Waiting for a proper redump of mr94019-07.10
-for verification.
+It's been verified that when the encrypted data is decrypted with it's respective algorithms
+the data in both sets match 100%
 
 
 ToDo / Notes
@@ -2031,8 +2029,7 @@ ROM_START( gratiaa )
 	ROM_LOAD( "mr94019-09.11", 0x200000, 0x200000, CRC(711ab08b) SHA1(185b80b965ac3aba4857b4f83637008c2c1cc6ff) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
-//  ROM_LOAD( "mr94019-07.10", 0x000000, 0x200000, BAD_DUMP CRC(acb75824) SHA1(3b43e00a2d240761565042c8feead25a83ef0eb1) )  // FIXED BITS (xxxxxxxx11111111)
-	ROM_LOAD( "mr94019-07.10", 0x000000, 0x200000, BAD_DUMP CRC(561a786b) SHA1(23df08d50801bd6e4a2f12dd3bb50632ff77f0f2) ) /* HAND CRAFTED: decrypted & re-encrypted 94019_2.07 - marked BAD_DUMP until proper ROM redump */
+	ROM_LOAD( "mr94019-07.10", 0x000000, 0x200000, CRC(561a786b) SHA1(23df08d50801bd6e4a2f12dd3bb50632ff77f0f2) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
 	ROM_LOAD( "94019_30ver1.0.30",0x000000, 0x080000, CRC(026b5379) SHA1(b9237477f1bf8ae83174e8231492fe667e6d6a13) ) /* Labeled 94019  (21)Ver1,0  with the Kanji version of the game name before "(30)" */
