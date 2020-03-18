@@ -9051,6 +9051,23 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="nicklunl">
+		<description>Jack Nicklaus' Unlimited Golf &amp; Course Design</description>
+		<year>1990</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Sculptured Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Jack Nicklaus Unlimited Golf [Accolade] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="2c708b7c" sha1="b10a8e1e66582abda086d1280946c04fc30abc7b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Jack Nicklaus Unlimited Golf [Accolade] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="3f404ebf" sha1="77efb0ca161598d044bb5d049f8af67b65a06713"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shogun">
 		<description>James Clavell's Shogun (set 1)</description>
 		<year>1987</year>
