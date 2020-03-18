@@ -8929,7 +8929,7 @@ has been replaced with an all-zero block. -->
 
 	<software name="indycrus">
 		<!-- Dumped via Kryoflux -->
-		<description>Indiana Jones And The Last Crusade - The Action Game (Kixx release)</description>
+		<description>Indiana Jones and the Last Crusade - The Action Game (Kixx release)</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="developer" value="LucasFilm Games" />
@@ -8937,6 +8937,44 @@ has been replaced with an all-zero block. -->
 			<!-- Copy-protected key disk -->
 			<dataarea name="flop" size = "2157701">
 				<rom name="Indiana Jones And The Last Crusade - The Action Game (Kixx release) [US Gold] [1989] [3.5DD] [Disk 1 of 1].mfm" size="2157701" crc="6f298760" sha1="36b0d48fd1a2e881a59971da2734d65feb2497c2"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="indy3adv">
+		<description>Indiana Jones and the Last Crusade - The Graphic Adventure</description>
+		<year>1989</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="developer" value="Lucasfilm Games" />
+		<info name="version" value="Version PC 1.3 8/14/89" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Indiana Jones and the Last Crusade - The Graphic Adventure [US Gold] [1989] [5.25DD] [Disk 1 of 6].img" size="368640" crc="1803dbdd" sha1="f70d8f7b208263132e5edc2fde3b274a51da9955"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Indiana Jones and the Last Crusade - The Graphic Adventure [US Gold] [1989] [5.25DD] [Disk 2 of 6].img" size="368640" crc="8c2a810c" sha1="3efb1d826360870c33c42090b22a55405f7efca5"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Indiana Jones and the Last Crusade - The Graphic Adventure [US Gold] [1989] [5.25DD] [Disk 3 of 6].img" size="368640" crc="f26bf19e" sha1="8b1def9ef353990f45bbf4d3a0e48971f932f0d3"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Indiana Jones and the Last Crusade - The Graphic Adventure [US Gold] [1989] [5.25DD] [Disk 4 of 6].img" size="368640" crc="1c38b72d" sha1="e244806d335df8cacc00b596278186dab4e2702a"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Indiana Jones and the Last Crusade - The Graphic Adventure [US Gold] [1989] [5.25DD] [Disk 5 of 6].img" size="368640" crc="76dae07e" sha1="3536f3456077b2b338b19479b98c9351c847ef21"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Indiana Jones and the Last Crusade - The Graphic Adventure [US Gold] [1989] [5.25DD] [Disk 6 of 6].img" size="368640" crc="53ce5771" sha1="394860a6c9ddc31f372413a01d949ee2f5684f3d"/>
 			</dataarea>
 		</part>
 	</software>
