@@ -110,11 +110,14 @@ public:
 		, m_upd7759(*this, "upd")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_io(*this, "io")
 	{
 	}
 
 	void segac2(machine_config &config);
 	void segac(machine_config &config);
+
+	void segac2_tfrceacjpb(machine_config &config);
 
 	void init_c2boot();
 	void init_bloxeedc();
@@ -198,6 +201,7 @@ private:
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<sega_315_5296_device> m_io;
 
 	int prot_func_dummy(int in);
 	int prot_func_columns(int in);
@@ -1597,15 +1601,15 @@ void segac2_state::segac(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
 
-	sega_315_5296_device &io(SEGA_315_5296(config, "io", XL2_CLOCK/6)); // clock divider guessed
-	io.in_pa_callback().set_ioport("P1");
-	io.in_pb_callback().set_ioport("P2");
-	io.in_pc_callback().set(FUNC(segac2_state::io_portc_r));
-	io.out_pd_callback().set(FUNC(segac2_state::io_portd_w));
-	io.in_pe_callback().set_ioport("SERVICE");
-	io.in_pf_callback().set_ioport("COINAGE");
-	io.in_pg_callback().set_ioport("DSW");
-	io.out_ph_callback().set(FUNC(segac2_state::io_porth_w));
+	SEGA_315_5296(config, m_io, XL2_CLOCK/6); // clock divider guessed
+	m_io->in_pa_callback().set_ioport("P1");
+	m_io->in_pb_callback().set_ioport("P2");
+	m_io->in_pc_callback().set(FUNC(segac2_state::io_portc_r));
+	m_io->out_pd_callback().set(FUNC(segac2_state::io_portd_w));
+	m_io->in_pe_callback().set_ioport("SERVICE");
+	m_io->in_pf_callback().set_ioport("COINAGE");
+	m_io->in_pg_callback().set_ioport("DSW");
+	m_io->out_ph_callback().set(FUNC(segac2_state::io_porth_w));
 
 	/* video hardware */
 	SEGA315_5313(config, m_vdp, XL2_CLOCK, m_maincpu);
@@ -1651,6 +1655,12 @@ void segac2_state::segac2(machine_config &config)
 
 	/* sound hardware */
 	UPD7759(config, m_upd7759, XL1_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void segac2_state::segac2_tfrceacjpb(machine_config& config)
+{
+	segac2(config);
+	m_io->set_ignore_read_direction();
 }
 
 
@@ -1808,6 +1818,22 @@ ROM_START( tfrceacj ) /* Thunder Force AC (Japan)  (c)1990 Technosoft / Sega - 8
 	ROM_REGION( 0x040000, "upd", 0 )
 	ROM_LOAD( "epr-13655.ic4", 0x000000, 0x040000, CRC(e09961f6) SHA1(e109b5f41502b765d191f22e3bbcff97d6defaa1) )
 ROM_END
+
+/* This set has significantly different code addresses to both the Genesis Thunder Force III and the arcade Thunder Force AC, and seems to sit somewhere between them
+   Some sources indicate it's a hack, but it might be a hack of an otherwise unsupported set, with the protection removed, for bootleggers to sell at a profit.
+   This specific dump was sourced from a PCB sold in Canada */
+ROM_START( tfrceacjpb ) // protection chip simply marked T-FORCE (not used outside of startup init?)
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "ic32_t.f.ac_075f.ic32", 0x000000, 0x040000, CRC(2167dd93) SHA1(0e5b8eb87e07e6e5cecf096e6b62e15ff7406bba) )
+	ROM_LOAD16_BYTE( "ic31_t.f.ac_0d26.id31", 0x000001, 0x040000, CRC(ebf02bba) SHA1(effdc60837063ba04b7b4517e57a240b29a199e1) )
+	/* 0x080000 - 0x100000 Empty */
+	ROM_LOAD16_BYTE( "ic34_t.f.ac_549d.ic34", 0x100000, 0x040000, CRC(902ad2ec) SHA1(58db20ca5888110e97f80e7df9dac1b8e9817562) )
+	ROM_LOAD16_BYTE( "ic33_t.f.ac_d131.ic33", 0x100001, 0x040000, CRC(b162219d) SHA1(ad022307019b4a70cb532e1101cb5ed8d31f10e2) )
+
+	ROM_REGION( 0x040000, "upd", ROMREGION_ERASE00 )
+	// empty socket (not used)
+ROM_END
+
 
 
 ROM_START( tfrceacb ) /* Thunder Force AC (Bootleg)  (c)1990 Technosoft / Sega */
@@ -2623,6 +2649,7 @@ GAME( 1990, column2j,  columns2, segac,  columns2,        segac2_state,    init_
 GAME( 1990, tfrceac,   0,        segac2, tfrceac,         segac2_state,    init_tfrceac,  ROT0,   "Technosoft / Sega", "Thunder Force AC", 0 )
 GAME( 1990, tfrceacj,  tfrceac,  segac2, tfrceac,         segac2_state,    init_tfrceac,  ROT0,   "Technosoft / Sega", "Thunder Force AC (Japan)", 0 )
 GAME( 1990, tfrceacb,  tfrceac,  segac2, tfrceac,         segac2_state,    init_tfrceacb, ROT0,   "bootleg", "Thunder Force AC (bootleg)", 0 )
+GAME( 1990, tfrceacjpb,tfrceac,  segac2_tfrceacjpb, tfrceac,         segac2_state,    init_tfrceac,  ROT0,   "Technosoft / Sega", "Thunder Force AC (Japan, prototype, bootleg)", 0 )
 
 GAME( 1990, borench,   0,        segac2, borench,         segac2_state,    init_borench,  ROT0,   "Sega", "Borench (set 1)", 0 )
 GAME( 1990, borencha,  borench,  segac2, borench,         segac2_state,    init_borench,  ROT0,   "Sega", "Borench (set 2)", 0 )
