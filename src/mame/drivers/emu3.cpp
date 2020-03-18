@@ -33,10 +33,10 @@ private:
 void emu3_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x007fff).rom().region("bootprom", 0);
-	map(0x010000, 0x1fffff).ram();
+	map(0x010000, 0x01ffff).ram();
 	map(0x050000, 0x050007).w("fdc", FUNC(wd1772_device::write)).umask16(0x00ff);
 	map(0x050008, 0x05000f).r("fdc", FUNC(wd1772_device::read)).umask16(0x00ff);
-	//map(0x300000, 0x30000f).rw("scsic", FUNC(ncr5380n_device::read), FUNC(ncr5830_device::write)).umask16(0x00ff);
+	//map(0x300000, 0x30000f).rw("scsic", FUNC(ncr5380n_device::read), FUNC(ncr5830n_device::write)).umask16(0x00ff);
 	map(0x400000, 0xbfffff).ram();
 }
 
