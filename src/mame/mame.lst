@@ -12962,6 +12962,9 @@ embargo                         //
 @source:emma2.cpp
 emma2                           // 1979 L.J.Technical Systems
 
+@source:emu2.cpp
+emu2                            //
+
 @source:emu3.cpp
 emu3                            //
 
