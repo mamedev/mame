@@ -67,6 +67,7 @@ private:
 	enum class operand_class
 	{
 		SOURCE,
+		BITPOS,
 		DESTINATION,
 		ADDRESS,
 		SCALED_INDEX
@@ -113,6 +114,7 @@ private:
 	uint8_t opcode_format(uint8_t byte);
 	int8_t short2int(uint8_t val);
 	static inline int32_t get_disp(offs_t &pc, const data_buffer &opcodes);
+	static inline std::string format_disp(int32_t disp);
 	static inline std::string get_option_list(uint8_t cfg);
 	static inline std::string get_options(uint8_t opts);
 	static inline std::string get_reg_list(offs_t &pc, const data_buffer &opcodes, bool reverse);
