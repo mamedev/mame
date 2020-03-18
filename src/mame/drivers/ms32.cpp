@@ -154,7 +154,7 @@ Tetris Plus 2 (tp2m32)
 Best Bout Boxing (bbbxing)
 Wangan Sensou / Desert War (desertwr)
 Second Earth Gratia (92047-01 version) (gratia)
-*Second Earth Gratia  (91022-10 version) (gratiaa) (redump needed)
+Second Earth Gratia (91022-10 version) (gratiaa)
 F-1 Super Battle (f1superb)
 
 Idol Janshi Su-Chi-Pi 2 (suchie2)
