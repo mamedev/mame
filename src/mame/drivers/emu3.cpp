@@ -33,10 +33,11 @@ private:
 void emu3_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x007fff).rom().region("bootprom", 0);
-	map(0x010000, 0x01ffff).ram();
+	map(0x008000, 0x027fff).ram();
 	map(0x050000, 0x050007).w("fdc", FUNC(wd1772_device::write)).umask16(0x00ff);
 	map(0x050008, 0x05000f).r("fdc", FUNC(wd1772_device::read)).umask16(0x00ff);
-	//map(0x300000, 0x30000f).rw("scsic", FUNC(ncr5380n_device::read), FUNC(ncr5830n_device::write)).umask16(0x00ff);
+	//map(0x300000, 0x30000f).rw("hdc", FUNC(ncr5380n_device::read), FUNC(ncr5830n_device::write)).umask16(0x00ff);
+	map(0x390000, 0x390007).rw("timer", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 	map(0x400000, 0xbfffff).ram();
 }
 
@@ -55,11 +56,11 @@ void emu3_state::emu3(machine_config &config)
 
 	WD1772(config, "fdc", 16_MHz_XTAL / 2);
 
-	pit8254_device &pit(PIT8254(config, "pit")); // 8254-2
+	pit8254_device &pit(PIT8254(config, "timer")); // 8254-2
 	pit.set_clk<0>(20_MHz_XTAL / 2);
 	pit.set_clk<1>(16_MHz_XTAL / 16);
 
-	//NCR5380N(config, "scsic");
+	//NCR5380N(config, "hdc");
 
 	SCC85230(config, "uart", 16_MHz_XTAL / 4);
 }
