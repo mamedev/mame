@@ -224,20 +224,20 @@ uint8_t psikyo_state::s1945_mcu_control_r()
 }
 
 template<int Layer>
-WRITE32_MEMBER(psikyo_state::vram_w)
+u16 psikyo_state::vram_r(offs_t offset)
+{
+	return m_vram[Layer][offset];
+}
+
+template<int Layer>
+void psikyo_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
-	for (int size = 0; size < 4; size++)
+	const u32 tilemap_indexes = m_tilemap[Layer]->rows() * m_tilemap[Layer]->cols();
+	while (offset < tilemap_indexes)
 	{
-		if (ACCESSING_BITS_16_31)
-		{
-			m_tilemap[Layer][size]->mark_tile_dirty(offset * 2);
-		}
-
-		if (ACCESSING_BITS_0_15)
-		{
-			m_tilemap[Layer][size]->mark_tile_dirty(offset * 2 + 1);
-		}
+		m_tilemap[Layer]->mark_tile_dirty(offset);
+		offset += 0x1000;
 	}
 }
 
@@ -255,8 +255,8 @@ void psikyo_state::psikyo_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();                                                                 // ROM (not all used)
 	map(0x400000, 0x401fff).ram().share("spriteram");       // Sprites, buffered by two frames (list buffered + fb buffered)
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");    // Palette
-	map(0x800000, 0x801fff).ram().w(FUNC(psikyo_state::vram_w<0>)).share("vram_0");                // Layer 0
-	map(0x802000, 0x803fff).ram().w(FUNC(psikyo_state::vram_w<1>)).share("vram_1");                // Layer 1
+	map(0x800000, 0x801fff).rw(FUNC(psikyo_state::vram_r<0>), FUNC(psikyo_state::vram_w<0>)).share("vram_0");                // Layer 0
+	map(0x802000, 0x803fff).rw(FUNC(psikyo_state::vram_r<1>), FUNC(psikyo_state::vram_w<1>)).share("vram_1");                // Layer 1
 	map(0x804000, 0x807fff).ram().share("vregs");                                                  // RAM + Vregs
 //  map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::input_r));                                        // Depends on board
 //  map(0xc00004, 0xc0000b).w(FUNC(psikyo_state::s1945_mcu_w));                                    // MCU on sh404
@@ -290,8 +290,8 @@ void psikyo_state::psikyo_bootleg_map(address_map &map)
 
 	map(0x400000, 0x401fff).ram().share("spriteram");       // Sprites, buffered by two frames (list buffered + fb buffered)
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");    // Palette
-	map(0x800000, 0x801fff).ram().w(FUNC(psikyo_state::vram_w<0>)).share("vram_0");                // Layer 0
-	map(0x802000, 0x803fff).ram().w(FUNC(psikyo_state::vram_w<1>)).share("vram_1");                // Layer 1
+	map(0x800000, 0x801fff).rw(FUNC(psikyo_state::vram_r<0>), FUNC(psikyo_state::vram_w<0>)).share("vram_0");                // Layer 0
+	map(0x802000, 0x803fff).rw(FUNC(psikyo_state::vram_r<1>), FUNC(psikyo_state::vram_w<1>)).share("vram_1");                // Layer 1
 	map(0x804000, 0x807fff).ram().share("vregs");                                                  // RAM + Vregs
 	map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::gunbird_input_r));                                // input ports
 
@@ -1053,7 +1053,6 @@ void psikyo_state::sngkace(machine_config &config)
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
-	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
@@ -1100,7 +1099,6 @@ void psikyo_state::gunbird(machine_config &config)
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
-	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
@@ -1142,7 +1140,6 @@ void psikyo_state::s1945bl(machine_config &config) /* Bootleg hardware based on 
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update_bootleg));
 	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank_bootleg));
-	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
@@ -1186,7 +1183,6 @@ void psikyo_state::s1945(machine_config &config)
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
-	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
@@ -1249,7 +1245,7 @@ ROM_START( samuraia )
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
 	ROM_LOAD( "u11.bin",  0x000000, 0x040000, CRC(11a04d91) SHA1(5d146a9a39a70f2ee212ceab9a5469598432449e) ) // x1xxxxxxxxxxxxxxxx = 0xFF
 
 ROM_END
@@ -1272,7 +1268,7 @@ ROM_START( sngkace )
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
 	ROM_LOAD( "u11.bin",  0x000000, 0x040000, CRC(11a04d91) SHA1(5d146a9a39a70f2ee212ceab9a5469598432449e) ) // x1xxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
@@ -1295,7 +1291,7 @@ ROM_START( sngkacea ) // the roms have a very visible "." symbol after the numbe
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
 	ROM_LOAD( "u11.bin",  0x000000, 0x040000, CRC(11a04d91) SHA1(5d146a9a39a70f2ee212ceab9a5469598432449e) ) // x1xxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
@@ -1341,7 +1337,7 @@ ROM_START( gunbird )
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
 	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(0905aeb2) SHA1(8cca09f7dfe3f804e77515f7b1b1bdbeb7bb3d80) )
 
 	ROM_REGION( 0x0002, "pals", 0 )
@@ -1372,7 +1368,7 @@ ROM_START( gunbirdk )
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
 	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(0905aeb2) SHA1(8cca09f7dfe3f804e77515f7b1b1bdbeb7bb3d80) )
 ROM_END
 
@@ -1399,7 +1395,7 @@ ROM_START( gunbirdj )
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
 	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(0905aeb2) SHA1(8cca09f7dfe3f804e77515f7b1b1bdbeb7bb3d80) )
 ROM_END
 
@@ -1427,7 +1423,7 @@ ROM_START( btlkroad )
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(0f33049f) SHA1(ca4fd5f3906685ace1af40b75f5678231d7324e8) )
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
 	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(30d541ed) SHA1(6f7fb5f5ecbce7c086185392de164ebb6887e780) )
 
 	ROM_REGION( 0x0400, "plds", 0 )
@@ -1459,7 +1455,7 @@ ROM_START( btlkroadk )
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(0f33049f) SHA1(ca4fd5f3906685ace1af40b75f5678231d7324e8) )
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
 	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(30d541ed) SHA1(6f7fb5f5ecbce7c086185392de164ebb6887e780) )
 
 	ROM_REGION( 0x0400, "plds", 0 )
@@ -1506,7 +1502,7 @@ ROM_START( s1945n )
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(a44a4a9b) SHA1(5378256752d709daed0b5f4199deebbcffe84e10) )
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 ROM_END
 
@@ -1533,7 +1529,7 @@ ROM_START( s1945nj )
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(a44a4a9b) SHA1(5378256752d709daed0b5f4199deebbcffe84e10) )
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 ROM_END
 
@@ -1555,7 +1551,7 @@ ROM_START( s1945bl ) /* closely based on s1945nj set, unsurprising because it's 
 	ROM_REGION( 0x100000, "oki", 0 )    /* OKI Samples */
 	ROM_LOAD( "rv27c040.m6",  0x000000, 0x080000, CRC(c22e5b65) SHA1(d807bd7c136d6b51f54258b44ebf3eecbd5b35fa) )
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
 	// in 27c010-a 0x460E:01 but should 0x00. Might be bit rot or error when bootleggers copied U1 as all other graphics data matches.
 	ROM_LOAD16_BYTE( "27c010-b",  0x000000, 0x020000, CRC(e38d5ab7) SHA1(73a708ebc305cb6297efd3296da23c87898e805e) ) // u1.bin  [even]  IDENTICAL
 	ROM_LOAD16_BYTE( "27c010-a",  0x000001, 0x020000, CRC(cb8c65ec) SHA1(a55c5c5067b50a1243e7ba60fa1f9569bfed5de8) ) // u1.bin  [odd]   99.999237%
@@ -1662,7 +1658,7 @@ ROM_START( s1945 )
 	ROM_REGION( 0x400000, "ymf", 0 )    /* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a839cf47) SHA1(e179eb505c80d5bb3ccd9e228f2cf428c62b72ee) )    // 8 bit signed pcm (16KHz)
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 
 ROM_END
@@ -1690,7 +1686,7 @@ ROM_START( s1945a )
 	ROM_REGION( 0x400000, "ymf", 0 )    /* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a839cf47) SHA1(e179eb505c80d5bb3ccd9e228f2cf428c62b72ee) )    // 8 bit signed pcm (16KHz)
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 
 ROM_END
@@ -1718,7 +1714,7 @@ ROM_START( s1945j )
 	ROM_REGION( 0x400000, "ymf", 0 )    /* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a839cf47) SHA1(e179eb505c80d5bb3ccd9e228f2cf428c62b72ee) )    // 8 bit signed pcm (16KHz)
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 
 ROM_END
@@ -1746,7 +1742,7 @@ ROM_START( s1945k ) /* Same MCU as the current parent set, region dip has no eff
 	ROM_REGION( 0x400000, "ymf", 0 )    /* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a839cf47) SHA1(e179eb505c80d5bb3ccd9e228f2cf428c62b72ee) )    // 8 bit signed pcm (16KHz)
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 
 ROM_END
@@ -1796,7 +1792,7 @@ ROM_START( tengai )
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a63633c5) SHA1(89e75a40518926ebcc7d88dea86c01ba0bb496e5) )    // 8 bit signed pcm (16KHz)
 	ROM_LOAD( "u62.bin",  0x200000, 0x200000, CRC(3ad0c357) SHA1(35f78cfa2eafa93ab96b24e336f569ee84af06b6) )
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(681d7d55) SHA1(b0b28471440d747adbc4d22d1918f89f6ede1615) )
 
 ROM_END
@@ -1824,7 +1820,7 @@ ROM_START( tengaij )
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a63633c5) SHA1(89e75a40518926ebcc7d88dea86c01ba0bb496e5) )    // 8 bit signed pcm (16KHz)
 	ROM_LOAD( "u62.bin",  0x200000, 0x200000, CRC(3ad0c357) SHA1(35f78cfa2eafa93ab96b24e336f569ee84af06b6) )
 
-	ROM_REGION( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(681d7d55) SHA1(b0b28471440d747adbc4d22d1918f89f6ede1615) )
 
 ROM_END
