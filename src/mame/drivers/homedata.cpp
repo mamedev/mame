@@ -1454,6 +1454,7 @@ void homedata_state::mjikaga(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &homedata_state::mjikaga_map);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &homedata_state::mjikaga_upd7807_map);
 
+	m_audiocpu->set_clock(9000000*2); // clearly wrong, but necessary to avoid audio CPU getting stuck until communications are better understood
 	config.set_maximum_quantum(attotime::from_hz(9000)); // boost synch a bit more, otherwise the game fails to start
 }
 
@@ -2271,6 +2272,6 @@ GAME( 1992?,jogakuen,  0,        jogakuen, jogakuen, homedata_state, empty_init,
 GAME( 1990, lemnangl,  0,        lemnangl, pteacher, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Lemon Angel (Japan)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mjprivat,  0,        lemnangl, pteacher, homedata_state, empty_init,    ROT0, "Matoba",     "Mahjong Private (Japan)",                             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991?,mjikaga,   0,        mjikaga,  mjikaga,  homedata_state, empty_init,    ROT0, "Mitchell",   "Mahjong Ikaga Desu ka (Japan)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1991?,mjikaga,   0,        mjikaga,  mjikaga,  homedata_state, empty_init,    ROT0, "Mitchell",   "Mahjong Ikaga Desu ka (Japan)",                       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1988, mirderby,  0,        mirderby, mirderby, homedata_state, init_mirderby, ROT0, "Home Data?", "Miracle Derby - Ascot",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
