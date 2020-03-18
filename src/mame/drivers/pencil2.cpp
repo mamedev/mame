@@ -144,7 +144,7 @@ void pencil2_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x0f).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x00, 0x0f).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x10, 0x1f).w(FUNC(pencil2_state::port10_w));
 	map(0x30, 0x3f).w(FUNC(pencil2_state::port30_w));
 	map(0x80, 0x9f).w(FUNC(pencil2_state::port80_w));

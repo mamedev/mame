@@ -228,7 +228,7 @@ void econet_e01_device::e01_mem(address_map &map)
 	map(0xfc28, 0xfc28).mirror(0x00c3).rw(FUNC(econet_e01_device::network_irq_enable_r), FUNC(econet_e01_device::network_irq_enable_w));
 	map(0xfc2c, 0xfc2c).mirror(0x00c3).portr("FLAP");
 	map(0xfc30, 0xfc30).mirror(0x00c0).rw(FUNC(econet_e01_device::hdc_data_r), FUNC(econet_e01_device::hdc_data_w));
-	map(0xfc31, 0xfc31).mirror(0x00c0).r("scsi_ctrl_in", FUNC(input_buffer_device::bus_r));
+	map(0xfc31, 0xfc31).mirror(0x00c0).r("scsi_ctrl_in", FUNC(input_buffer_device::read));
 	map(0xfc32, 0xfc32).mirror(0x00c0).w(FUNC(econet_e01_device::hdc_select_w));
 	map(0xfc33, 0xfc33).mirror(0x00c0).w(FUNC(econet_e01_device::hdc_irq_enable_w));
 }
@@ -249,7 +249,7 @@ void econet_e01_device::device_add_mconfig(machine_config &config)
 
 	// devices
 	via6522_device &via(VIA6522(config, R6522_TAG, 8_MHz_XTAL / 4));
-	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	via.irq_handler().set(FUNC(econet_e01_device::via_irq_w));
 
 	MC6854(config, m_adlc, 0);

@@ -171,7 +171,7 @@ void trs80dt1_state::io_map(address_map &map)
 	map(0xac00, 0xafff).r(FUNC(trs80dt1_state::key_r));
 	map(0xb000, 0xb3ff).portr("X9");
 	map(0xb400, 0xb7ff).w(FUNC(trs80dt1_state::store_w));
-	map(0xb800, 0xbbff).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0xb800, 0xbbff).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0xbc00, 0xbc01).mirror(0x3fe).rw(m_crtc, FUNC(i8276_device::read), FUNC(i8276_device::write)); // i8276
 }
 

@@ -848,7 +848,7 @@ void nc100_state::nc100_io(address_map &map)
 	map(0x10, 0x13).rw(FUNC(nc100_state::nc_memory_management_r), FUNC(nc100_state::nc_memory_management_w));
 	map(0x20, 0x20).w(FUNC(nc100_state::nc100_memory_card_wait_state_w));
 	map(0x30, 0x30).w(FUNC(nc100_state::nc100_uart_control_w));
-	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x50, 0x53).w(FUNC(nc100_state::nc_sound_w));
 	map(0x60, 0x60).w(FUNC(nc100_state::nc_irq_mask_w));
 	map(0x70, 0x70).w(FUNC(nc100_state::nc100_poweroff_control_w));
@@ -1251,7 +1251,7 @@ void nc200_state::nc200_io(address_map &map)
 	map(0x10, 0x13).rw(FUNC(nc200_state::nc_memory_management_r), FUNC(nc200_state::nc_memory_management_w));
 	map(0x20, 0x20).w(FUNC(nc200_state::nc200_memory_card_wait_state_w));
 	map(0x30, 0x30).w(FUNC(nc200_state::nc200_uart_control_w));
-	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x50, 0x53).w(FUNC(nc200_state::nc_sound_w));
 	map(0x60, 0x60).w(FUNC(nc200_state::nc_irq_mask_w));
 	map(0x70, 0x70).w(FUNC(nc200_state::nc200_poweroff_control_w));

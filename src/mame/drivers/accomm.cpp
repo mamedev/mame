@@ -847,7 +847,7 @@ void accomm_state::accomm(machine_config &config)
 
 	/* via */
 	VIA6522(config, m_via, 16_MHz_XTAL / 16);
-	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
 
 	/* acia */

@@ -53,7 +53,7 @@ void mtx_state::mtx_io(address_map &map)
 	map(0x01, 0x01).rw("tms9929a", FUNC(tms9929a_device::vram_read), FUNC(tms9929a_device::vram_write));
 	map(0x02, 0x02).rw("tms9929a", FUNC(tms9929a_device::register_read), FUNC(tms9929a_device::register_write));
 	map(0x03, 0x03).rw(FUNC(mtx_state::mtx_sound_strobe_r), FUNC(mtx_state::mtx_cst_w));
-	map(0x04, 0x04).r(FUNC(mtx_state::mtx_prt_r)).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x04, 0x04).r(FUNC(mtx_state::mtx_prt_r)).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x05, 0x05).rw(FUNC(mtx_state::mtx_key_lo_r), FUNC(mtx_state::mtx_sense_w));
 	map(0x06, 0x06).rw(FUNC(mtx_state::mtx_key_hi_r), FUNC(mtx_state::mtx_sound_latch_w));
 	//  map(0x07, 0x07) PIO

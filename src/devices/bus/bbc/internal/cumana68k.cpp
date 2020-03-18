@@ -89,8 +89,8 @@ void bbc_cumana68k_device::device_add_mconfig(machine_config &config)
 	INPUT_BUFFER(config, m_sasi_data_in);
 
 	PIA6821(config, m_pia_sasi, 0);
-	m_pia_sasi->readpa_handler().set(m_sasi_data_in, FUNC(input_buffer_device::bus_r));
-	m_pia_sasi->writepa_handler().set(m_sasi_data_out, FUNC(output_latch_device::bus_w));
+	m_pia_sasi->readpa_handler().set(m_sasi_data_in, FUNC(input_buffer_device::read));
+	m_pia_sasi->writepa_handler().set(m_sasi_data_out, FUNC(output_latch_device::write));
 	m_pia_sasi->writepb_handler().set(FUNC(bbc_cumana68k_device::pia_sasi_pb_w));
 	m_pia_sasi->readcb1_handler().set_constant(1); // tied to +5V
 	m_pia_sasi->cb2_handler().set(m_sasibus, FUNC(scsi_port_device::write_rst));

@@ -135,7 +135,7 @@ void ampro_state::ampro_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(FUNC(ampro_state::port00_w)); // system
-	map(0x01, 0x01).w("pio", FUNC(output_latch_device::bus_w)); // printer data
+	map(0x01, 0x01).w("pio", FUNC(output_latch_device::write)); // printer data
 	map(0x02, 0x02).w(FUNC(ampro_state::set_strobe)); // printer strobe
 	map(0x03, 0x03).w(FUNC(ampro_state::clear_strobe)); // printer strobe
 	map(0x20, 0x27).rw(m_ncr, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)); // scsi chip

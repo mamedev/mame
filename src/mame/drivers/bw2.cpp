@@ -192,7 +192,7 @@ void bw2_state::bw2_io(address_map &map)
 	map(0x20, 0x21).m(m_lcdc, FUNC(msm6255_device::map));
 	map(0x30, 0x3f).rw(m_exp, FUNC(bw2_expansion_slot_device::slot_r), FUNC(bw2_expansion_slot_device::slot_w));
 	map(0x40, 0x41).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x50, 0x50).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x50, 0x50).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x60, 0x63).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write));
 	map(0x70, 0x7f).rw(m_exp, FUNC(bw2_expansion_slot_device::modsel_r), FUNC(bw2_expansion_slot_device::modsel_w));
 }

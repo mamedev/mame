@@ -485,8 +485,8 @@ void a7150_state::a7150(machine_config &config)
 
 	// IFSP port on processor card
 	i8255_device &ppi(I8255(config, "ppi8255"));
-//  ppi.in_pa_callback().set("cent_status_in", FUNC(input_buffer_device::bus_r));
-//  ppi.out_pb_callback().set("cent_data_out", output_latch_device::bus_w));
+//  ppi.in_pa_callback().set("cent_status_in", FUNC(input_buffer_device::read));
+//  ppi.out_pb_callback().set("cent_data_out", output_latch_device::write));
 	ppi.out_pc_callback().set(FUNC(a7150_state::ppi_c_w));
 
 	PIT8253(config, m_pit8253, 0);

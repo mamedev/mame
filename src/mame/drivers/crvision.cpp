@@ -151,9 +151,9 @@ void crvision_state::crvision_map(address_map &map)
 	map(0x4000, 0x7fff).bankr(BANK_ROM2);
 	map(0x8000, 0xbfff).bankr(BANK_ROM1);
 //  map(0xc000, 0xe7ff).bankrw(3);
-	map(0xe800, 0xe800).w(m_cent_data_out, FUNC(output_latch_device::bus_w));
-	map(0xe801, 0xe801).r("cent_status_in", FUNC(input_buffer_device::bus_r));
-	map(0xe801, 0xe801).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
+	map(0xe800, 0xe800).w(m_cent_data_out, FUNC(output_latch_device::write));
+	map(0xe801, 0xe801).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0xe801, 0xe801).w("cent_ctrl_out", FUNC(output_latch_device::write));
 //  map(0xe802, 0xf7ff).bankrw(4);
 	map(0xf800, 0xffff).rom().region(M6502_TAG, 0);
 }

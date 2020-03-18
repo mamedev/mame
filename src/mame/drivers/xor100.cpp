@@ -511,7 +511,7 @@ void xor100_state::xor100(machine_config &config)
 	brg.ft_handler().append(m_uart_b, FUNC(i8251_device::write_rxc));
 
 	i8255_device &ppi(I8255A(config, I8255A_TAG));
-	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ppi.out_pb_callback().set(m_centronics, FUNC(centronics_device::write_strobe));
 	ppi.in_pc_callback().set(FUNC(xor100_state::i8255_pc_r));
 

@@ -141,10 +141,10 @@ void fc100_state::fc100_io(address_map &map)
 	map(0x23, 0x23).w("psg", FUNC(ay8910_device::address_w));
 	map(0x31, 0x31).w(FUNC(fc100_state::port31_w));
 	map(0x33, 0x33).w(FUNC(fc100_state::port33_w));
-	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x42, 0x42).nopw(); // bit 0 could be printer select
 	map(0x43, 0x43).w(FUNC(fc100_state::port43_w));
-	map(0x44, 0x44).r("cent_status_in", FUNC(input_buffer_device::bus_r));
+	map(0x44, 0x44).r("cent_status_in", FUNC(input_buffer_device::read));
 	map(0x60, 0x61).w(FUNC(fc100_state::port60_w));
 	map(0x70, 0x71).w(FUNC(fc100_state::port70_w));
 	map(0xb0, 0xb0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));

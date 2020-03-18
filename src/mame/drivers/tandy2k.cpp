@@ -1025,7 +1025,7 @@ void tandy2k_state::tandy2k(machine_config &config)
 
 	// devices
 	I8255A(config, m_i8255a);
-	m_i8255a->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_i8255a->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_i8255a->in_pb_callback().set(FUNC(tandy2k_state::ppi_pb_r));
 	m_i8255a->out_pc_callback().set(FUNC(tandy2k_state::ppi_pc_w));
 

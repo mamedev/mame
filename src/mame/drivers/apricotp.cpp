@@ -443,7 +443,7 @@ void fp_state::fp_io(address_map &map)
 	map(0x000, 0x007).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
 	map(0x008, 0x00f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x018, 0x01f).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
-	map(0x020, 0x020).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x020, 0x020).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x022, 0x022).w(FUNC(fp_state::pint_clr_w));
 	map(0x024, 0x024).r(FUNC(fp_state::prtr_snd_r));
 	map(0x026, 0x026).w(SN76489AN_TAG, FUNC(sn76489a_device::write));

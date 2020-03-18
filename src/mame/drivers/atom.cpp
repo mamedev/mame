@@ -729,7 +729,7 @@ void atom_state::atom(machine_config &config)
 	TIMER(config, "hz2400").configure_periodic(FUNC(atom_state::cassette_output_tick), attotime::from_hz(4806));
 
 	via6522_device &via(VIA6522(config, R6522_TAG, X2/4));
-	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	via.ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
 	via.irq_handler().set_inputline(SY6502_TAG, M6502_IRQ_LINE);
 
@@ -833,7 +833,7 @@ void atom_state::atombb(machine_config &config)
 	TIMER(config, "hz2400").configure_periodic(FUNC(atom_state::cassette_output_tick), attotime::from_hz(4806));
 
 	via6522_device &via(VIA6522(config, R6522_TAG, X2/4));
-	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	via.ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
 	via.irq_handler().set_inputline(SY6502_TAG, M6502_IRQ_LINE);
 
