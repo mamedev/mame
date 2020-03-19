@@ -25,8 +25,12 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_pages(*this, "pages")
 		, m_scannercpu(*this, "scannercpu")
+		, m_scan0(*this, "SCAN%u", 0U)
+		, m_scan32(*this, "SCAN%u", 32U)
+		, m_scan40(*this, "SCAN%u", 40U)
 		, m_page_select{0, 0, 0, 0}
 		, m_page_reset(true)
+		, m_scan_select(0)
 	{
 	}
 
@@ -42,6 +46,8 @@ private:
 	u8 dma_paged_r(offs_t offset);
 	void dma_paged_w(offs_t offset, u8 data);
 	void page_select_w(offs_t offset, u8 data);
+	void scan_select_w(u8 data);
+	u8 scan_buffer_r();
 
 	void mem_map(address_map &map);
 	void paged_mem_map(address_map &map);
@@ -53,14 +59,20 @@ private:
 	required_device<address_map_bank_device> m_pages;
 	required_device<z80_device> m_scannercpu;
 
+	required_ioport_array<16> m_scan0;
+	required_ioport_array<2> m_scan32;
+	required_ioport_array<2> m_scan40;
+
 	u8 m_page_select[4];
 	bool m_page_reset;
+	u8 m_scan_select;
 };
 
 void emu2_state::machine_start()
 {
 	save_item(NAME(m_page_select));
 	save_item(NAME(m_page_reset));
+	save_item(NAME(m_scan_select));
 }
 
 void emu2_state::machine_reset()
@@ -94,6 +106,21 @@ void emu2_state::page_select_w(offs_t offset, u8 data)
 	if (!machine().side_effects_disabled())
 		m_page_reset = false;
 	m_page_select[offset] = data & 0x0f;
+}
+
+void emu2_state::scan_select_w(u8 data)
+{
+	m_scan_select = data;
+}
+
+u8 emu2_state::scan_buffer_r()
+{
+	if (!BIT(m_scan_select, 5))
+		return m_scan0[m_scan_select & 0x0f]->read();
+	else if (m_scan_select & 0x06)
+		return (BIT(m_scan_select, 3) ? m_scan40 : m_scan32)[m_scan_select & 1]->read();
+	else
+		return 0xff;
 }
 
 void emu2_state::mem_map(address_map &map)
@@ -131,14 +158,74 @@ void emu2_state::scanner_mem_map(address_map &map)
 void emu2_state::scanner_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x34, 0x34).mirror(0x80).r("adc", FUNC(adc0809_device::data_r));
-	map(0x36, 0x36).mirror(0x80).w("adc", FUNC(adc0809_device::address_data_start_w));
+	map(0x34, 0x34).mirror(0x81).r("adc", FUNC(adc0809_device::data_r));
+	map(0x36, 0x36).mirror(0x81).w("adc", FUNC(adc0809_device::address_data_start_w));
+	map(0x38, 0x38).mirror(0x81).r(FUNC(emu2_state::scan_buffer_r));
 	map(0x50, 0x53).mirror(0x8c).rw("scannerpio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x60, 0x63).mirror(0x8c).rw("scannerctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
 
 static INPUT_PORTS_START(emu2)
+	PORT_START("SCAN0")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN1")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN3")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN4")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN5")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN6")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN7")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN8")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN9")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN10")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN11")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN12")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN13")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN14")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN15")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN32")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN33")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN40")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("SCAN41")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
 INPUT_PORTS_END
 
 static const z80_daisy_config main_daisy_chain[] =
@@ -180,6 +267,7 @@ void emu2_state::emu2(machine_config &config)
 
 	z80pio_device &mainpio(Z80PIO(config, "mainpio", 20_MHz_XTAL / 5)); // Z80A PIO (IC24)
 	mainpio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	mainpio.out_pa_callback().set("scannerpio", FUNC(z80pio_device::port_a_write));
 
 	z80sio_device &disksio(Z80SIO(config, "disksio", 20_MHz_XTAL / 5)); // Z80A SIO/2 (IC126)
 	disksio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -216,6 +304,8 @@ void emu2_state::emu2(machine_config &config)
 
 	z80pio_device &scannerpio(Z80PIO(config, "scannerpio", 20_MHz_XTAL / 5)); // Z80A PIO (IC46)
 	scannerpio.out_int_callback().set_inputline(m_scannercpu, INPUT_LINE_IRQ0);
+	scannerpio.out_pa_callback().set("mainpio", FUNC(z80pio_device::port_a_write));
+	scannerpio.out_pb_callback().set(FUNC(emu2_state::scan_select_w));
 }
 
 ROM_START(emu2)
