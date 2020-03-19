@@ -194,8 +194,7 @@ void sgi_ge5_device::device_reset()
 
 	set_int(false);
 
-	m_state = DECODE;
-	suspend(SUSPEND_REASON_HALT, false);
+	m_state = STALL;
 }
 
 device_memory_interface::space_config_vector sgi_ge5_device::memory_space_config() const
@@ -218,6 +217,10 @@ void sgi_ge5_device::execute_run()
 	{
 		switch (m_state)
 		{
+		case STALL:
+			m_icount = 0;
+			break;
+
 		case DECODE:
 			debugger_instruction_hook(m_pc);
 
@@ -263,7 +266,6 @@ void sgi_ge5_device::execute_run()
 					// fifo read stall
 					m_state = READ;
 					m_icount = 0;
-					suspend(SUSPEND_REASON_TRIGGER, false);
 				}
 				else
 					m_bus = m_fifo_read();
@@ -378,7 +380,7 @@ void sgi_ge5_device::execute_run()
 				break;
 			case 0xc: // stall
 				LOG("stall\n");
-				suspend(SUSPEND_REASON_HALT, false);
+				m_state = STALL;
 				m_icount = 0;
 				break;
 			case 0xd: // call less than
@@ -586,7 +588,7 @@ void sgi_ge5_device::command_w(offs_t offset, u16 data, u16 mem_mask)
 	{
 	case 0x00: // clear stall
 		LOG("clear stall\n");
-		resume(SUSPEND_REASON_HALT);
+		m_state = DECODE;
 		debugger_exception_hook(0);
 		break;
 
@@ -601,6 +603,7 @@ void sgi_ge5_device::command_w(offs_t offset, u16 data, u16 mem_mask)
 		break;
 	}
 }
+
 template u32 sgi_ge5_device::code_r<false>(offs_t offset);
 template u32 sgi_ge5_device::code_r<true>(offs_t offset);
 template void sgi_ge5_device::code_w<false>(offs_t offset, u32 data, u32 mem_mask);
