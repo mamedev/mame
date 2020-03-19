@@ -11534,4 +11534,94 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ndc500b">
+		<description>North Dakota Cities with Population Under 500 (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-18"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234807">
+				<rom name="north dakota cities with population under 500 database.woz" size="234807" crc="26fd3aae" sha1="6065680920edb68a51f5b8babb6e7dcc38630403"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndc500u">
+		<description>North Dakota Cities with Population 500 and Above (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-18"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234811">
+				<rom name="north dakota cities with population 500 and above database.woz" size="234811" crc="c5ca75ae" sha1="81fc62349dd3afdecc1db519ebb700404f71058d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndcnty">
+		<description>North Dakota Counties (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-18"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234783">
+				<rom name="north dakota counties database.woz" size="234783" crc="d6df23a4" sha1="ef48c731e1e245b3b2f12ca13cde757703924015"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndexplor">
+		<description>North Dakota Explorers (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-18"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234784">
+				<rom name="north dakota explorers database.woz" size="234784" crc="84f60ca6" sha1="bf064dc7c8a3eda897d4794f361336431681d6fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndindtrb">
+		<description>North Dakota Indian Tribes (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-18"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="north dakota indian tribes.woz" size="234788" crc="0c8540c3" sha1="2e0e93a04b9002f9732d3a92086e4958b57aac9a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndminrls">
+		<description>Minerals of North Dakota (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-18"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234786">
+				<rom name="minerals of north dakota.woz" size="234786" crc="16c550e4" sha1="1221551a2df3a59e5b81e328863ab0c672107605"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
