@@ -853,6 +853,7 @@ spg2xx_smarttv.cpp
 spg2xx_telestory.cpp
 spg2xx_tvgogo.cpp
 spg2xx_vii.cpp
+spg2xx_wiwi.cpp
 spg2xx_zone.cpp
 spg2xx_zone_32bit.cpp
 squale.cpp

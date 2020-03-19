@@ -31455,6 +31455,7 @@ lxcmcysw
 lxcmcyfz
 lxcmcydp
 rtvgc300
+rtvgc300fz
 red5mam
 cybar120
 mc_dg101
@@ -37199,8 +37200,6 @@ abltenni                        //
 fordrace
 tvsprt10                        //
 decathln
-wiwi18                          //
-foxsport
 guitarfv
 guitarss
 jjstrip
@@ -37303,6 +37302,11 @@ tvgogo                          //
 
 @source:spg2xx_vii.cpp
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
+
+@source:spg2xx_wiwi.cpp
+wiwi18                          //
+foxsport
+lexifit
 
 @source:spg2xx_zone.cpp
 wirels60                        // Wireless 60

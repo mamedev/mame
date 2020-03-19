@@ -47,7 +47,6 @@ public:
 
 
 	void init_crc();
-	void init_wiwi18();
 	void init_tvsprt10();
 
 protected:
