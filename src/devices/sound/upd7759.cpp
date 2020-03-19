@@ -167,6 +167,7 @@ upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, 
 	, m_first_valid_header(0)
 	, m_offset(0)
 	, m_repeat_offset(0)
+	, m_start_delay(0)
 	, m_adpcm_state(0)
 	, m_adpcm_data(0)
 	, m_sample(0)
@@ -412,7 +413,7 @@ void upd775x_device::advance_state()
 			 * Depending on the state the chip was in just before the /MD was set to 0 (reset, standby
 			 * or just-finished-playing-previous-sample) this number can range from 35 up to ~24000).
 			 * It also varies slightly from test to test, but not much - a few cycles at most.) */
-			m_clocks_left = 70; /* 35 - breaks cotton */
+			m_clocks_left = 35 + m_start_delay; /* 35 - breaks cotton */
 			m_state = STATE_FIRST_REQ;
 			break;
 

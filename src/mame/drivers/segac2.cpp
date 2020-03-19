@@ -118,6 +118,7 @@ public:
 	void segac(machine_config &config);
 
 	void segac2_tfrceacjpb(machine_config &config);
+	void segac2_ribbit(machine_config &config);
 
 	void init_c2boot();
 	void init_bloxeedc();
@@ -1663,6 +1664,13 @@ void segac2_state::segac2_tfrceacjpb(machine_config& config)
 	m_io->set_ignore_read_direction();
 }
 
+// Ribbit does random measure of UPD7759 sample #A playback time and reset to round 1 if its not in expected range (see routine @1D8D2)
+// current UPD code is too fast, add slight delay
+void segac2_state::segac2_ribbit(machine_config& config)
+{
+	segac2(config);
+	m_upd7759->set_start_delay(250);
+}
 
 
 /******************************************************************************
@@ -2655,8 +2663,8 @@ GAME( 1990, borench,   0,        segac2, borench,         segac2_state,    init_
 GAME( 1990, borencha,  borench,  segac2, borench,         segac2_state,    init_borench,  ROT0,   "Sega", "Borench (set 2)", 0 )
 GAME( 1990, borenchj,  borench,  segac2, borench,         segac2_state,    init_borench,  ROT0,   "Sega", "Borench (Japan)", 0 )
 
-GAME( 1991, ribbit,    0,        segac2, ribbit,          segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit!", 0 )
-GAME( 1991, ribbitj,   ribbit,   segac2, ribbitj,         segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit! (Japan)", 0 )
+GAME( 1991, ribbit,    0,        segac2_ribbit, ribbit,          segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit!", 0 )
+GAME( 1991, ribbitj,   ribbit,   segac2_ribbit, ribbitj,         segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit! (Japan)", 0 )
 
 GAME( 1991, twinsqua,  0,        segac2, twinsqua,        segac2_state,    init_twinsqua, ROT0,   "Sega", "Twin Squash", 0 )
 
