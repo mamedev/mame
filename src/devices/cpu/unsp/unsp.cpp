@@ -319,7 +319,15 @@ void unsp_device::device_reset()
 	m_core->m_enable_irq = 0;
 	m_core->m_enable_fiq = 0;
 	m_core->m_fir_move = 1;
+	m_core->m_sb = 0;
+	m_core->m_aq = 0;
+	m_core->m_fra = 0;
+	m_core->m_bnk = 0;
+	m_core->m_ine = 0;
 	m_core->m_pri = 8;
+	m_core->m_fiq = 0;
+	m_core->m_irq = 0;
+	m_core->m_sirq = 0;
 }
 
 void unsp_20_device::device_reset()
