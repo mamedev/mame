@@ -11689,4 +11689,44 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ndnotper">
+		<description>Notable People of North Dakota (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-19"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234792">
+				<rom name="notable people of north dakota.woz" size="234792" crc="73752e7c" sha1="b3b24917dc6c21636ac676ecf81d4616546e5aa9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndprkhs">
+		<description>North Dakota Parks and Historical Sites (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-19"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234801">
+				<rom name="north dakota parks and historical sites.woz" size="234801" crc="e4648f2b" sha1="3c2cfef269ed387988705717f8b369bd502d2505"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
