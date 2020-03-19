@@ -11406,6 +11406,12 @@ license:CC0
 		<info name="release" value="2020-03-09"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 64K Apple II+ or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="234963">
@@ -11416,6 +11422,269 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="234963">
 				<rom name="where in north dakota is carmen sandiego side b.woz" size="234963" crc="cf47fe0c" sha1="25c5bbbdf0f4265e0a63de456c3a4258d87afc95"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cndalman">
+		<description>Carmen's North Dakota Almanac Database (version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-11"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="carmen's north dakota almanac database.woz" size="234788" crc="757d3e67" sha1="618423e72b222f16e6624750d80e09aecf6f4656"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndcrmn98">
+		<description>Where in North Dakota is Carmen Sandiego (Version 0.98 beta)</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2020-03-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!-- This is v0.98 beta, labeled as "for workshops and demonstrations
+		only." It is not copy protected. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235025">
+				<rom name="where in north dakota is carmen sandiego v0.98 beta side a.woz" size="235025" crc="ce6d7066" sha1="d690a7dfbe00b1f43fce826356995a7fdfa39fe8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235025">
+				<rom name="where in north dakota is carmen sandiego v0.98 beta side b.woz" size="235025" crc="3c638e67" sha1="3d6f235b01a80644ff37e22ed4f51a7a642c8dcb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndcrmnb1">
+		<description>Where in North Dakota is Carmen Sandiego (Version 1.0 final beta)</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2020-03-17"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234980">
+				<rom name="where in north dakota is carmen sandiego v1.0-final-beta side a.woz" size="234980" crc="1fc431b1" sha1="e1bf54f99059247657d72ef67e7196c9fc592120"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234980">
+				<rom name="where in north dakota is carmen sandiego v1.0-final-beta side b.woz" size="234980" crc="f9412d0b" sha1="e611506a904841cf644ffb58d24705d68fe70429"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gaflndd">
+		<description>Governors and First Ladies of North Dakota Database (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-17"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234813">
+				<rom name="governors and first ladies of north dakota database.woz" size="234813" crc="9fddb019" sha1="2be825d65d27591e49654873de30086b496af70d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndagridb">
+		<description>North Dakota Agriculture Database (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-17"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234795">
+				<rom name="north dakota agriculture database.woz" size="234795" crc="7dfea486" sha1="b0504bc333ffc3b2ff70bea46b3607e62a7ef2cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndcity16">
+		<description>North Dakota Cities (Version 1.6)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-17"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234766">
+				<rom name="north dakota cities v1.6 side a.woz" size="234766" crc="01172d62" sha1="7fe5771d7d99a7cc4ebe3ad1cb479ee60d6b1fa9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234766">
+				<rom name="north dakota cities v1.6 side b.woz" size="234766" crc="afbbd59d" sha1="1841f97fd13834b83bb02954b5ecf8d5aba054da"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndc500b">
+		<description>North Dakota Cities with Population Under 500 (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-18"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234807">
+				<rom name="north dakota cities with population under 500 database.woz" size="234807" crc="26fd3aae" sha1="6065680920edb68a51f5b8babb6e7dcc38630403"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndc500u">
+		<description>North Dakota Cities with Population 500 and Above (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-18"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234811">
+				<rom name="north dakota cities with population 500 and above database.woz" size="234811" crc="c5ca75ae" sha1="81fc62349dd3afdecc1db519ebb700404f71058d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndcnty">
+		<description>North Dakota Counties (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-18"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234783">
+				<rom name="north dakota counties database.woz" size="234783" crc="d6df23a4" sha1="ef48c731e1e245b3b2f12ca13cde757703924015"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndexplor">
+		<description>North Dakota Explorers (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-18"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234784">
+				<rom name="north dakota explorers database.woz" size="234784" crc="84f60ca6" sha1="bf064dc7c8a3eda897d4794f361336431681d6fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndindtrb">
+		<description>North Dakota Indian Tribes (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-18"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="north dakota indian tribes.woz" size="234788" crc="0c8540c3" sha1="2e0e93a04b9002f9732d3a92086e4958b57aac9a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndminrls">
+		<description>Minerals of North Dakota (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-18"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234786">
+				<rom name="minerals of north dakota.woz" size="234786" crc="16c550e4" sha1="1221551a2df3a59e5b81e328863ab0c672107605"/>
 			</dataarea>
 		</part>
 	</software>
