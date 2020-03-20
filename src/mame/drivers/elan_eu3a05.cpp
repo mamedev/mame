@@ -851,4 +851,4 @@ CONS( 2006, sudoelan, 0,        0, elan_sudoku,  sudoku,   elan_eu3a05_state, em
 CONS( 200?, carlecfg, 0,        0, elan_sudoku,  carlecfg,   elan_eu3a05_state, empty_init,  "Excalibur Electronics Inc",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
 
 // see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game)
-CONS( 2006, pvmilfin, 0,        0, elan_sudoku,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", "Haluatko miljon‰‰riksi? (Finland)", MACHINE_NOT_WORKING )
+CONS( 2006, pvmilfin, 0,        0, elan_sudoku,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", "Haluatko miljon\xc3\xa4\xc3\xa4riksi? (Finland)", MACHINE_NOT_WORKING )
