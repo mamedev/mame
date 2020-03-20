@@ -242,6 +242,7 @@ public:
 	void airblsjs(machine_config& config);
 
 	void elan_sudoku(machine_config &config);
+	void elan_pvmilfin(machine_config &config);
 
 
 protected:
@@ -774,6 +775,15 @@ void elan_eu3a05_state::elan_sudoku(machine_config& config)
 	m_sys->set_alt_timer(); // for Carl Edwards'
 }
 
+void elan_eu3a05_state::elan_pvmilfin(machine_config& config)
+{
+	elan_eu3a05(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a05_state::elan_sudoku_map);
+	m_vid->set_is_pvmilfin();
+	m_sys->set_alt_timer();
+	m_sys->set_pal(); // TODO: also set PAL clocks
+	m_screen->set_refresh_hz(50);
+}
 
 void elan_eu3a05_state::airblsjs(machine_config& config)
 {
@@ -851,4 +861,4 @@ CONS( 2006, sudoelan, 0,        0, elan_sudoku,  sudoku,   elan_eu3a05_state, em
 CONS( 200?, carlecfg, 0,        0, elan_sudoku,  carlecfg,   elan_eu3a05_state, empty_init,  "Excalibur Electronics Inc",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
 
 // see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game)
-CONS( 2006, pvmilfin, 0,        0, elan_sudoku,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", "Haluatko miljon\xc3\xa4\xc3\xa4riksi? (Finland)", MACHINE_NOT_WORKING )
+CONS( 2006, pvmilfin, 0,        0, elan_pvmilfin,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", "Haluatko miljon\xc3\xa4\xc3\xa4riksi? (Finland)", MACHINE_NOT_WORKING )
