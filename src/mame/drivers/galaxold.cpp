@@ -2952,8 +2952,8 @@ ROM_START( ckongmc2 ) // RE013c + RE014c PCBs
 	ROM_LOAD( "dkpromhj.bin", 0x0000, 0x1000, CRC(7866d2cb) SHA1(62dd8b80bc0459c7337d8a8cb83e53b999e7f4a9) )
 	ROM_LOAD( "dkpromkl.bin", 0x1000, 0x1000, CRC(7311a101) SHA1(49d54c8b94cae4ba81d7a7684eaa4e87815bb4da) )
 
-	ROM_REGION( 0x0020, "proms", 0 ) // not in this set
-	ROM_LOAD( "ck_cp.bin",     0x0000, 0x0020, BAD_DUMP CRC(7e0b79cb) SHA1(72ef3eb5f09e10c13dcf6fd568a6d16658055a16) )
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "dk_cprom.bin",     0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 void galaxold_state::init_ckonggx()
@@ -3186,8 +3186,8 @@ ROM_START( scrambleo ) // MR-1A + MP-28 PCBs
 	ROM_LOAD( "gfx_h.bin",        0x0000, 0x0800, CRC(4708845b) SHA1(a8b1ad19a95a9d35050a2ab7194cc96fc5afcdc9) )
 	ROM_LOAD( "gfx_m.bin",        0x0800, 0x0800, CRC(11fd2887) SHA1(69844e48bb4d372cac7ae83c953df573c7ecbb7f) )
 
-	ROM_REGION( 0x0020, "proms", 0 ) // not dumped for this set
-	ROM_LOAD( "c01s.6e",      0x0000, 0x0020, BAD_DUMP CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "sc_cprom.bin",      0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
 ROM_END
 
 ROM_START( 4in1 )
