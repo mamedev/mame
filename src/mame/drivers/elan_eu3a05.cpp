@@ -819,6 +819,13 @@ ROM_START( carlecfg )
 	ROM_RELOAD(0x300000,0x100000)
 ROM_END
 
+ROM_START( pvmilfin )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "fwwtbam.bin", 0x000000, 0x200000, CRC(2cfef9ab) SHA1(b64f55e36b59790a310ae33154774ac613b5d49f) )
+	ROM_RELOAD(0x200000,0x200000)
+ROM_END
+
+
 
 ROM_START( buzztime )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
@@ -842,3 +849,6 @@ CONS( 2004, buzztime, 0, 0, elan_buzztime, sudoku, elan_eu3a05_buzztime_state, e
 CONS( 2006, sudoelan, 0,        0, elan_sudoku,  sudoku,   elan_eu3a05_state, empty_init,  "Senario / All in 1 Products Ltd",  "Ultimate Sudoku TV Edition 3-in-1", MACHINE_NOT_WORKING )
 
 CONS( 200?, carlecfg, 0,        0, elan_sudoku,  carlecfg,   elan_eu3a05_state, empty_init,  "Excalibur Electronics Inc",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
+
+// see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game)
+CONS( 2006, pvmilfin, 0,        0, elan_sudoku,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", "Haluatko miljon‰‰riksi? (Finland)", MACHINE_NOT_WORKING )

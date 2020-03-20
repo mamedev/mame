@@ -435,7 +435,8 @@ READ8_MEMBER(nes_sh6578_state::apu_read_mem)
 void nes_sh6578_state::nes_sh6578_map(address_map& map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2008).rw(m_ppu, FUNC(ppu_sh6578_device::read), FUNC(ppu_sh6578_device::write));  
+	map(0x2000, 0x2007).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));  
+	map(0x2008, 0x2008).rw(m_ppu, FUNC(ppu_sh6578_device::read_extended), FUNC(ppu_sh6578_device::write_extended));  
 
 	map(0x2040, 0x207f).rw(m_ppu, FUNC(ppu_sh6578_device::palette_read), FUNC(ppu_sh6578_device::palette_write));
 	

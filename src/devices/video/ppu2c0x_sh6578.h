@@ -18,8 +18,8 @@ public:
 
 	virtual uint8_t palette_read(offs_t offset) override;
 	virtual void palette_write(offs_t offset, uint8_t data) override;
-	virtual void write(offs_t offset, uint8_t data) override;
-	virtual uint8_t read(offs_t offset) override;
+	virtual void write_extended(offs_t offset, uint8_t data);
+	virtual uint8_t read_extended(offs_t offset);
 
 protected:
 	ppu_sh6578_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
