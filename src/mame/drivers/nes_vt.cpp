@@ -2153,7 +2153,7 @@ void nes_vt_hh_state::nes_vt_fp(machine_config &config)
 
 void nes_vt_hh_state::nes_vt_fp_pal(machine_config &config)
 {
-	nes_vt_4k_ram(config);
+	nes_vt_4k_ram_pal(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_fp_map);
 
 	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB12);
@@ -2974,7 +2974,7 @@ CONS( 201?, mc_tv200,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_ini
  // probably another Thumbs Up product? cursor doesn't work unless nes_vt_hh machine is used? possibly newer than VT02 as it runs from an SPI ROM, might just not use enhanced features.  Some minor game name changes to above (eg Smackdown just becomes Wrestling)
 CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt_hh, nes_vt, nes_vt_hh_state, empty_init, "<unknown>", "200 in 1 Retro Arcade", MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 201?, rminitv,     0,        0,  nes_vt_fp_pal, nes_vt, nes_vt_hh_state, empty_init, "<unknown>", "Retro 'Mini TV' Console 300-in-1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2015, rminitv,     0,        0,  nes_vt_fp_pal, nes_vt, nes_vt_hh_state, empty_init, "Orb Gaming", "Retro 'Mini TV' Console 300-in-1", MACHINE_IMPERFECT_GRAPHICS )
 
 // available in a number of colours, with various brands, but likely all the same.
 // This was a red coloured pad, contains various unlicensed bootleg reskinned NES game eg Blob Buster is a hack of Dig Dug 2 and there are also hacks of Xevious, Donkey Kong Jr, Donkey Kong 3 and many others.
