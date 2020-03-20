@@ -176,74 +176,66 @@ void ppu_vt03_device::palette_write(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t ppu_vt03_device::read(offs_t offset)
+
+uint8_t ppu_vt03_device::read_extended(offs_t offset)
 {
-	if (offset <= 0xf)
+	offset += 0x10;
+	logerror("%s: read from extended PPU reg %02x\n", machine().describe_context(), offset);
+
+	switch (offset)
 	{
-		return ppu2c0x_device::read(offset);
-	}
-	else if (offset <= 0x1f)
-	{
-		logerror("%s: read from reg %02x\n", machine().describe_context(), offset);
+	case 0x10:
+		return m_201x_regs[0x0];
 
-		switch (offset)
-		{
-		case 0x10:
-			return m_201x_regs[0x0];
+	case 0x11:
+		return m_201x_regs[0x1];
 
-		case 0x11:
-			return m_201x_regs[0x1];
+	case 0x12:
+		return m_201x_regs[m_2012_2017_descramble[0]];
 
-		case 0x12:
-			return m_201x_regs[m_2012_2017_descramble[0]];
+	case 0x13:
+		return m_201x_regs[m_2012_2017_descramble[1]];
 
-		case 0x13:
-			return m_201x_regs[m_2012_2017_descramble[1]];
+	case 0x14:
+		return m_201x_regs[m_2012_2017_descramble[2]];
 
-		case 0x14:
-			return m_201x_regs[m_2012_2017_descramble[2]];
+	case 0x15:
+		return m_201x_regs[m_2012_2017_descramble[3]];
 
-		case 0x15:
-			return m_201x_regs[m_2012_2017_descramble[3]];
+	case 0x16:
+		return m_201x_regs[m_2012_2017_descramble[4]];
 
-		case 0x16:
-			return m_201x_regs[m_2012_2017_descramble[4]];
+	case 0x17:
+		return m_201x_regs[m_2012_2017_descramble[5]];
 
-		case 0x17:
-			return m_201x_regs[m_2012_2017_descramble[5]];
+	case 0x18:
+		return m_201x_regs[0x8];
 
-		case 0x18:
-			return m_201x_regs[0x8];
+	case 0x19:
+		return 0x00;
 
-		case 0x19:
-			return 0x00;
+	case 0x1a:
+		return m_201x_regs[0xa];
 
-		case 0x1a:
-			return m_201x_regs[0xa];
+	case 0x1b:
+		return 0x00;
 
-		case 0x1b:
-			return 0x00;
+	case 0x1c:
+		return 0x00;
 
-		case 0x1c:
-			return 0x00;
+	case 0x1d:
+		return 0x00;
 
-		case 0x1d:
-			return 0x00;
+	case 0x1e:
+		return 0x00;
 
-		case 0x1e:
-			return 0x00;
-
-		case 0x1f:
-			return 0x00;
-		}
-	}
-	else
-	{
+	case 0x1f:
 		return 0x00;
 	}
 
 	return 0x00;
 }
+
 
 void ppu_vt03_device::init_palette()
 {
@@ -500,83 +492,78 @@ void ppu_vt03_device::set_2010_reg(uint8_t data)
 	m_201x_regs[0x0] = data;
 }
 
-void ppu_vt03_device::write(offs_t offset, uint8_t data)
+void ppu_vt03_device::write_extended(offs_t offset, uint8_t data)
 {
-	if (offset < 0x10)
+	offset += 0x10;
+	logerror("%s: write to extended PPU reg 0x20%02x %02x\n", machine().describe_context(), offset, data);
+	switch (offset)
 	{
-		ppu2c0x_device::write(offset, data);
-	}
-	else
-	{
-		logerror("%s: write to reg 0x20%02x %02x\n", machine().describe_context(), offset, data);
-		switch (offset)
-		{
-		case 0x10:
-			set_2010_reg(data);
-			break;
+	case 0x10:
+		set_2010_reg(data);
+		break;
 
-		case 0x11:
-			m_201x_regs[0x1] = data;
-			break;
+	case 0x11:
+		m_201x_regs[0x1] = data;
+		break;
 
-		case 0x12:
-			m_201x_regs[m_2012_2017_descramble[0]] = data;
-			break;
+	case 0x12:
+		m_201x_regs[m_2012_2017_descramble[0]] = data;
+		break;
 
-		case 0x13:
-			m_201x_regs[m_2012_2017_descramble[1]] = data;
-			break;
+	case 0x13:
+		m_201x_regs[m_2012_2017_descramble[1]] = data;
+		break;
 
-		case 0x14:
-			m_201x_regs[m_2012_2017_descramble[2]] = data;
-			break;
+	case 0x14:
+		m_201x_regs[m_2012_2017_descramble[2]] = data;
+		break;
 
-		case 0x15:
-			m_201x_regs[m_2012_2017_descramble[3]] = data;
-			break;
+	case 0x15:
+		m_201x_regs[m_2012_2017_descramble[3]] = data;
+		break;
 
-		case 0x16:
-			m_201x_regs[m_2012_2017_descramble[4]] = data;
-			break;
+	case 0x16:
+		m_201x_regs[m_2012_2017_descramble[4]] = data;
+		break;
 
-		case 0x17:
-			logerror("set reg 7 %02x\n", data);
-			m_201x_regs[m_2012_2017_descramble[5]] = data;
-			break;
+	case 0x17:
+		logerror("set reg 7 %02x\n", data);
+		m_201x_regs[m_2012_2017_descramble[5]] = data;
+		break;
 
-		case 0x18:
-			logerror("set reg 8 %02x\n", data);
-			m_201x_regs[0x8] = data;
-			break;
+	case 0x18:
+		logerror("set reg 8 %02x\n", data);
+		m_201x_regs[0x8] = data;
+		break;
 
-		case 0x19:
-			// reset gun port (value doesn't matter)
-			break;
+	case 0x19:
+		// reset gun port (value doesn't matter)
+		break;
 
-		case 0x1a:
-			m_201x_regs[0xa] = data;
-			break;
+	case 0x1a:
+		m_201x_regs[0xa] = data;
+		break;
 
-		case 0x1b:
-			// unused
-			break;
+	case 0x1b:
+		// unused
+		break;
 
-		case 0x1c:
-			// (READ) x-coordinate of gun
-			break;
+	case 0x1c:
+		// (READ) x-coordinate of gun
+		break;
 
-		case 0x1d:
-			// (READ) y-coordinate of gun
-			break;
+	case 0x1d:
+		// (READ) y-coordinate of gun
+		break;
 
-		case 0x1e:
-			// (READ) x-coordinate of gun 2
-			break;
+	case 0x1e:
+		// (READ) x-coordinate of gun 2
+		break;
 
-		case 0x1f:
-			// (READ) y-coordinate of gun 2
-			break;
-		}
+	case 0x1f:
+		// (READ) y-coordinate of gun 2
+		break;
 	}
 }
+
 

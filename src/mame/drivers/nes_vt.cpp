@@ -1017,11 +1017,16 @@ void nes_vt_state::machine_start()
 	save_item(NAME(m_410x));
 	save_item(NAME(m_413x));
 
+	save_item(NAME(m_411c));
+	save_item(NAME(m_411d));
+	save_item(NAME(m_4242));
+
 	save_item(NAME(m_8000_addr_latch));
 
 	save_item(NAME(m_timer_irq_enabled));
 	save_item(NAME(m_timer_running));
 	save_item(NAME(m_timer_val));
+	save_item(NAME(m_vdma_ctrl));
 
 	m_ntram = std::make_unique<uint8_t[]>(0x2000);
 	save_pointer(NAME(m_ntram), 0x2000);
@@ -1714,7 +1719,9 @@ WRITE8_MEMBER(nes_vt_sudoku_state::in0_w)
 void nes_vt_state::nes_vt_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x2000, 0x3fff).mask(0x001f).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));        /* PPU registers */
+	// ddrdismx relies on the mirroring
+	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));						/* standard PPU registers */
+	map(0x2010, 0x201f).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));   /* extra VT PPU registers */
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
 	map(0x4014, 0x4014).r(FUNC(nes_vt_state::psg1_4014_r)).w(FUNC(nes_vt_state::vt_dma_w));
@@ -1777,7 +1784,8 @@ void nes_vt_cy_state::nes_vt_bt_map(address_map &map)
 void nes_vt_hh_state::nes_vt_hh_map(address_map &map)
 {
 	map(0x0000, 0x1fff).mask(0x0fff).ram();
-	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));        /* PPU registers */
+	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));						/* standard PPU registers */
+	map(0x2010, 0x201f).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));   /* extra VT PPU registers */
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
 	map(0x4015, 0x4015).rw(FUNC(nes_vt_hh_state::psg1_4015_r), FUNC(nes_vt_hh_state::psg1_4015_w)); /* PSG status / first control register */
@@ -1827,7 +1835,8 @@ void nes_vt_hh_state::nes_vt_fp_map(address_map &map)
 void nes_vt_dg_state::nes_vt_dg_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));        /* PPU registers */
+	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));						/* standard PPU registers */
+	map(0x2010, 0x201f).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));   /* extra VT PPU registers */
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
 	map(0x4015, 0x4015).rw(FUNC(nes_vt_dg_state::psg1_4015_r), FUNC(nes_vt_dg_state::psg1_4015_w)); /* PSG status / first control register */
