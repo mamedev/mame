@@ -233,7 +233,8 @@ Regular game cartridges
 |        | 80-092143-103(UK) | Spider-Man & Friends - Secret Missions (ALT)                                                   |
 |   XX   | 80-092144(GE)     | Spider-Man & Freunde - Geheime Missionen                                                       |
 |   XX   | 80-092145(FR)     | Spider-Man & ses amis - Missions Secrètes (white webs)                                         |
-|        | 80-092145-105(FR) | Spider-Man & ses amis - Missions Secrètes (yellow webs)                                        |
+|   XX   | 80-092145-105(FR) | Spider-Man & ses amis - Missions Secrètes (yellow webs)                                        |
+|   XX   | 80-092145-305(FR) | Spider-Man & ses amis - Missions Secrètes                                                      |
 |        | 80-092146(PT)     | Spider-man & Amigos - Missoes Secretas                                                         |
 |   XX   | 80-092147(SP)     | Spider-Man y Amigos - Misiones Secretas (white webs, 2005)                                     |
 |        | 80-092147-122(SP) | Spider-Man y Amigos - Misiones Secretas (yellow webs, 2007)                                    |
@@ -498,7 +499,7 @@ Regular game cartridges
 |        | 80-092842(NL)     | Wall-E                                                                                         |
 |        | 80-092843(UK)     | Wall-E                                                                                         |
 |   XX   | 80-092844(GE)     | Wall-E                                                                                         |
-|        | 80-092845(FR)     | Wall-E                                                                                         |
+|   XX   | 80-092845(FR)     | Wall-E                                                                                         |
 |   XX   | 80-092847(SP)     | Wall-E (52-092847 on back label)                                                               |
 |        |          (DK)     | Wall-E                                                                                         |
 |   XX   | 80-092854(SE)     | Wall-E                                                                                         |
@@ -511,7 +512,8 @@ Regular game cartridges
 |   XX   | 80-092862(NL)     | Shrek de Derde - Arthurs Schooldag Avontuur                                                    |
 |   XX   | 80-092863(UK)     | Shrek the Third: Arthur's School Day Adventure                                                 |
 |   XX   | 80-092864(GE)     | Shrek der Dritte - Ein Spannender Schultag                                                     |
-|   XX   | 80-092865(FR)     | Shrek Le Troisieme - L'aventure d'Arthur                                                       |
+|   XX   | 80-092865(FR)     | Shrek Le Troisième - L'aventure d'Arthur                                                       |
+|   XX   | 80-092865-105(FR) | Shrek Le Troisième - L'aventure d'Arthur                                                       |
 |        | 80-092867(SP)     | Shrek Tercero - En Busca de Arturo                                                             |
 +========+===================+================================================================================================+
 |        | 80-092880(US)     | Ratatouille - Remy's New Recipes                                                               |
@@ -3306,7 +3308,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<!-- No inputs -->
 	<software name="shrek3f" cloneof="shrek3" supported="no">
-		<description>DreamWorks Shrek Le Troisieme - L'aventure d'Arthur (France)</description>
+		<description>DreamWorks Shrek Le Troisième - L'aventure d'Arthur (France)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092865(FR)" />
@@ -3316,6 +3318,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" />
 			<dataarea name="rom" size="8388608">
 				<rom name="092865 - Shrek Le Troisieme (FR).bin" size="8388608" crc="7cc9922c" sha1="c45ce64db0c5580ce8339ab114b849955e58fed4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="shrek3fr105" cloneof="shrek3" supported="no">
+		<description>DreamWorks Shrek Le Troisième - L'aventure d'Arthur (France, Rev. 105)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092865-105(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092865-105 - Shrek Le Troisieme (FR).bin" size="8388608" crc="a1380b79" sha1="311d1658e921a99cd3126a1ef0c2d8baa8a84d70" />
 			</dataarea>
 		</part>
 	</software>
@@ -3562,6 +3580,38 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92145.u1" size="8388608" crc="906b0ab6" sha1="da5435366a439afd70ff210c0e655839f66fbef3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="spidermisfr105" cloneof="spidermisr101" supported="no">
+		<description>Marvel Spider-Man &amp; ses amis - Missions secrètes (France, Rev. 105)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092145-105(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092145-105 - Spiderman Missions Secretes (FR).bin" size="8388608" crc="81bcdabd" sha1="ab284a43d44e7745d1e9ced6794a5a13bff3b09f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="spidermisfr305" cloneof="spidermisr101" supported="no">
+		<description>Marvel Spider-Man &amp; ses amis - Missions secrètes (France, Rev. 305)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092145-305(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092145-305 - Spiderman Missions Secretes (FR).bin" size="8388608" crc="922a7274" sha1="a954a9e9aab93fa6bbcd12fb3651fa9937986400" />
 			</dataarea>
 		</part>
 	</software>
@@ -4005,6 +4055,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92844-3.u1" size="8388608" crc="f4be4391" sha1="5e43c9dd4759218578d1a8364540db8bc6bc6416" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="wallef" cloneof="walleg" supported="no">
+		<description>Disney/Pixar Wall-E (France)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092845(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092845 - Wall E (FR).bin" size="8388608" crc="b5122dfc" sha1="6b62641082104fa8bde2a40c8969d3b036dcc58e" />
 			</dataarea>
 		</part>
 	</software>
