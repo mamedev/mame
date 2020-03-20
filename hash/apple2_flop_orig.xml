@@ -11689,4 +11689,144 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ndnotper">
+		<description>Notable People of North Dakota (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-19"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234792">
+				<rom name="notable people of north dakota.woz" size="234792" crc="73752e7c" sha1="b3b24917dc6c21636ac676ecf81d4616546e5aa9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndprkhs">
+		<description>North Dakota Parks and Historical Sites (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-19"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234801">
+				<rom name="north dakota parks and historical sites.woz" size="234801" crc="e4648f2b" sha1="3c2cfef269ed387988705717f8b369bd502d2505"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndplants">
+		<description>North Dakota Plants (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-19"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234781">
+				<rom name="north dakota plants.woz" size="234781" crc="6c978fc3" sha1="ad24084bf410dff2aaa584367dc26b83b2f0c88b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndsymbls">
+		<description>North Dakota Symbols (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-19"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234782">
+				<rom name="north dakota symbols.woz" size="234782" crc="4e904c78" sha1="e8f19de16437067e1aea7256a0983f79229873d4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndsenrep">
+		<description>North Dakota U.S. Senators and Representatives (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-19"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234808">
+				<rom name="north dakota u.s. senators and representatives.woz" size="234808" crc="e7c06937" sha1="c81e2fb70ff021b203db05b43a974a8e8145fc57"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndwildlf">
+		<description>North Dakota Wildlife (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-19"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234783">
+				<rom name="north dakota wildlife.woz" size="234783" crc="39e62a9b" sha1="bbffd66cdef57839e6c15e3fd72f0e6526c39e64"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndpride">
+		<description>North Dakota Pride (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-19"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234780">
+				<rom name="north dakota pride.woz" size="234780" crc="436ed557" sha1="2067daae9ae657f2df24a556a2d7cef724598a30"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
