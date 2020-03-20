@@ -108,6 +108,7 @@ public:
 	void nes_vt(machine_config& config);
 
 	void nes_vt_4k_ram(machine_config& config);
+	void nes_vt_4k_ram_pal(machine_config& config);
 
 	/* OneBus read callbacks for getting sprite and tile data during rendering */
 	DECLARE_READ8_MEMBER(spr_r);
@@ -418,6 +419,7 @@ public:
 	void nes_vt_vg(machine_config& config);
 	void nes_vt_vg_baddma(machine_config& config);
 	void nes_vt_fp(machine_config& config);
+	void nes_vt_fp_pal(machine_config& config);
 
 private:
 	void nes_vt_hh_map(address_map& map);
@@ -2042,6 +2044,12 @@ void nes_vt_state::nes_vt_4k_ram(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_4k_ram_map);
 }
 
+void nes_vt_state::nes_vt_4k_ram_pal(machine_config &config)
+{
+	nes_vt_base_pal(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_4k_ram_map);
+}
+
 void nes_vt_cy_state::nes_vt_cy(machine_config &config)
 {
 	nes_vt_4k_ram(config);
@@ -2138,6 +2146,14 @@ INPUT_PORTS_END
 void nes_vt_hh_state::nes_vt_fp(machine_config &config)
 {
 	nes_vt_4k_ram(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_fp_map);
+
+	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB12);
+}
+
+void nes_vt_hh_state::nes_vt_fp_pal(machine_config &config)
+{
+	nes_vt_4k_ram_pal(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_fp_map);
 
 	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB12);
@@ -2712,6 +2728,11 @@ ROM_START( unkra200 ) // "Winbond 25Q64FVSIG 1324" SPI ROM
 	ROM_LOAD( "retro_machine_rom", 0x00000, 0x800000, CRC(0e824aa7) SHA1(957e98868559ecc22b3fa42c76692417b76bf132) )
 ROM_END
 
+ROM_START( rminitv )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "29gl256.bin", 0x00000, 0x2000000, CRC(cb4048d4) SHA1(9877ce5716d13f8498abfc1cbfaefa9426205d3e) )
+ROM_END
+
 ROM_START( denv150 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "denver150in1.bin", 0x00000, 0x1000000, CRC(6b3819d7) SHA1(b0039945ce44a52ea224ab736d5f3c6980409b5d) ) // 2nd half is blank
@@ -2953,6 +2974,7 @@ CONS( 201?, mc_tv200,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_ini
  // probably another Thumbs Up product? cursor doesn't work unless nes_vt_hh machine is used? possibly newer than VT02 as it runs from an SPI ROM, might just not use enhanced features.  Some minor game name changes to above (eg Smackdown just becomes Wrestling)
 CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt_hh, nes_vt, nes_vt_hh_state, empty_init, "<unknown>", "200 in 1 Retro Arcade", MACHINE_IMPERFECT_GRAPHICS )
 
+CONS( 2015, rminitv,     0,        0,  nes_vt_fp_pal, nes_vt, nes_vt_hh_state, empty_init, "Orb Gaming", "Retro 'Mini TV' Console 300-in-1", MACHINE_IMPERFECT_GRAPHICS )
 
 // available in a number of colours, with various brands, but likely all the same.
 // This was a red coloured pad, contains various unlicensed bootleg reskinned NES game eg Blob Buster is a hack of Dig Dug 2 and there are also hacks of Xevious, Donkey Kong Jr, Donkey Kong 3 and many others.
