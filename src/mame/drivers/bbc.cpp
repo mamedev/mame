@@ -1020,6 +1020,8 @@ void bbc_state::bbcb(machine_config &config)
 	m_internal->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<5>));
 	m_internal->nmi_handler().set(FUNC(bbc_state::bus_nmi_w));
 
+	m_irqs->output_handler().append(m_internal, FUNC(bbc_internal_slot_device::irq6502_w));
+
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_ls_b").set_original("bbcb_cass");
 	SOFTWARE_LIST(config, "flop_ls_b").set_original("bbcb_flop");
