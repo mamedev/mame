@@ -3166,7 +3166,7 @@ void taitoz_state::screen_config(machine_config &config, int vdisp_start, int vd
 //  contcirc and enforce uses a narrower visible area (checked via service mode),
 //  confirm if they outputs the same syncs.
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(26'686'000)/4, 426, 0, 320, 261, vdisp_start, vdisp_end);
+	m_screen->set_raw(XTAL(26'686'000)/4, 424, 0, 320, 262, vdisp_start, vdisp_end);
 }
 
 void taitoz_state::contcirc(machine_config &config)
