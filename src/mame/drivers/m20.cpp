@@ -879,6 +879,19 @@ ROM_START(m40)
 	ROM_REGION(0x4000, "apb_bios", ROMREGION_ERASEFF) // Processor board with 8086
 ROM_END
 
+// CPU board: Z8001BPS CPU, Z8010BPS MMU, 32MHz XTAL, P8253 PIT, MC68B50P ACIA, 1 4-dip bank, 512K RAM
+// FDC board: D765AC-2 FDC, D8237AC-5 DMAC, GA04-CF11051, TMP8253P-5, 1 4-dip bank, 1 barely readable chip (AMI8520JFT or something resembling it)
+// there are other undocumented PCBs. It uses 2x 8 inch floppy drives
+ROM_START(m44) // TODO: implement different hardware. Split to another driver?
+	ROM_REGION( 0x14000, "maincpu", 0 ) // 14 MAR. 86 REL B.1
+	ROM_LOAD16_BYTE( "pd30.128.c06", 0x0000, 0x4000, CRC(8155dc69) SHA1(ed65f842e2857ad10170c697d945745fd7d47f9c) )
+	ROM_LOAD16_BYTE( "pd29.128.a06", 0x0001, 0x4000, CRC(74d7de4b) SHA1(dd3a69ff29a2f1292f3a7db73bd2447bd664e54b) )
+
+	ROM_REGION( 0x114, "plds", 0 )
+	ROM_LOAD( "pl46.j09", 0x000, 0x114, NO_DUMP ) // PLD, chip type unknown
+ROM_END
+
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME           FLAGS
 COMP( 1981, m20,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1981, m40,  m20,    0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1986, m44,  m20,    0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M44", MACHINE_IS_SKELETON )
