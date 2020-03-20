@@ -275,6 +275,18 @@ protected:
 	virtual void machine_reset() override;
 };
 
+class nes_vt_waixing_alt_state : public nes_vt_waixing_state
+{
+public:
+	nes_vt_waixing_alt_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_waixing_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void machine_reset() override;
+};
+
+
 class nes_vt_timetp36_state : public nes_vt_state
 {
 public:
@@ -1976,7 +1988,12 @@ void nes_vt_waixing_state::machine_reset()
 	nes_vt_state::machine_reset();
 
 	m_ppu->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4); // reasonable
-//  set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
+}
+
+void nes_vt_waixing_alt_state::machine_reset()
+{
+	nes_vt_waixing_state::machine_reset();
+	set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
 }
 
 void nes_vt_hum_state::machine_reset()
@@ -2670,6 +2687,12 @@ ROM_START( mc_tv200 )
 	ROM_LOAD( "s29gl064n90.bin", 0x00000, 0x800000, CRC(ae1905d2) SHA1(11582055713ba937c1ad32c4ada8683eebc1c83c) )
 ROM_END
 
+
+ROM_START( ablmini )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "ablmini.bin", 0x00000, 0x800000, CRC(e65a2c3a) SHA1(9b4811e5b50b67d74b9602471767b8bcd24dd59b) )
+ROM_END
+
 ROM_START( techni4 )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "technigame.bin", 0x00000, 0x200000, CRC(3c96b1b1) SHA1(1acc81b26e740327bd6d9faa5a96ab027a48dd77) )
@@ -2767,6 +2790,8 @@ CONS( 200?, majgnc,    0, 0,  nes_vt_majgnc, majgnc, nes_vt_majgnc_state,  empty
 CONS( 200?, sudopptv,  0, 0,  nes_vt,        nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_NOT_WORKING )
 
 CONS( 200?, megapad,   0, 0,  nes_vt,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
+
+CONS( 200?, ablmini,   0, 0,  nes_vt,        nes_vt, nes_vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
 
  // needs PCM samples, Y button is not mapped (not used by any of the games?)
 CONS( 200?, timetp36,  0, 0,  nes_vt_base_pal,        timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
