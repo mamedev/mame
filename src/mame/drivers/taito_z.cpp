@@ -1277,7 +1277,6 @@ DIP switches are not verified
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/2610intf.h"
-#include "screen.h"
 #include "speaker.h"
 
 #include "contcirc.lh"
@@ -3161,11 +3160,17 @@ void taitoz_state::machine_reset()
 	m_ioc220_port = 0;
 }
 
-/* Contcirc vis area seems narrower than the other games... */
+void taitoz_state::screen_config(machine_config &config, int vdisp_start, int vdisp_end)
+{
+//  26.860 MHz comes from the video board, assume /4 pixel clock
+//  contcirc and enforce uses a narrower visible area (checked via service mode),
+//  confirm if they outputs the same syncs.
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(26'686'000)/4, 426, 0, 320, 261, vdisp_start, vdisp_end);
+}
 
 void taitoz_state::contcirc(machine_config &config)
 {
-	/* basic machine hardware */
 	M68000(config, m_maincpu, 12000000);   /* 12 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitoz_state::contcirc_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitoz_state::irq6_line_hold));
@@ -3185,14 +3190,9 @@ void taitoz_state::contcirc(machine_config &config)
 	m_tc0040ioc->write_4_callback().set(FUNC(taitoz_state::coin_control_w));
 	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 3*8, 31*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 24, 248);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
@@ -3253,13 +3253,9 @@ void taitoz_state::chasehq(machine_config &config)
 	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_chasehq));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_chasehq));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_chasehq);
 
@@ -3320,13 +3316,9 @@ void taitoz_state::enforce(machine_config &config)
 	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
- // TODO: Apply to the whole driver
- // 26.860 MHz comes from the video board, assume /4 pixel clock
- // vertical visible area comes from service mode
-	screen.set_raw(XTAL(26'686'000)/4, 426, 0, 320, 261, 24, 248);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 24, 248);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
@@ -3383,14 +3375,9 @@ void taitoz_state::bshark_base(machine_config &config)
 	m_tc0220ioc->write_4_callback().set(FUNC(taitoz_state::coin_control_w));
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_bshark));
-	screen.set_palette("palette");
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_bshark));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
@@ -3465,13 +3452,9 @@ void taitoz_state::sci(machine_config &config)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_sci));
-	screen.set_palette("palette");
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_sci));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
@@ -3538,13 +3521,9 @@ void taitoz_state::nightstr(machine_config &config)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_chasehq));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_chasehq));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_chasehq);
 
@@ -3605,13 +3584,9 @@ void taitoz_state::aquajack(machine_config &config)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_aquajack));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_aquajack));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
@@ -3677,13 +3652,9 @@ void taitoz_state::spacegun(machine_config &config)
 	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_spacegun));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_spacegun));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
@@ -3738,13 +3709,9 @@ void taitoz_state::dblaxle(machine_config &config)
 	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_dblaxle));
-	screen.set_palette("palette");
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_dblaxle));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
@@ -3805,13 +3772,9 @@ void taitoz_state::racingb(machine_config &config)
 	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_racingb));
-	screen.set_palette("palette");
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_racingb));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
