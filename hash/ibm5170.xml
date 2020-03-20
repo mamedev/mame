@@ -10538,6 +10538,23 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="flashb">
+		<description>Flashback</description>
+		<year>1993</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="developer" value="Delphine Software International" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Flashback [U.S. Gold] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ace6d8a0" sha1="c728b35d3ebc08024b9685b78c3bcc570f049c25"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Flashback [U.S. Gold] [1993] [3.5DD] [Disk 2 of 2].img" size="737280" crc="e311edd2" sha1="e5369816adae87079ebae924f11c6b8bf204f576"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="pharkas">
 		<description>Freddy Pharkas, Frontier Pharmacist</description>
 		<year>1993</year>
