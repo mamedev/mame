@@ -18750,6 +18750,9 @@ korgm1p1                        //
 korgm1r                         //
 korgm1rex                       //
 
+@source:korgz3.cpp
+korgz3                          //
+
 @source:kramermc.cpp
 kramermc                        // 1987 Kramer MC
 
