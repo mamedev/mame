@@ -192,6 +192,9 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
 			drq_cb(drq);
 		}
 		hld = false;
+
+		mon_cb(1); // Clear the MON* line
+
 		intrq_cond = 0;
 		live_abort();
 	} else if(state && !mr) {
@@ -1340,7 +1343,8 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 	case IDLE:
 		if(motor_control || head_control) {
 			motor_timeout ++;
-			if(motor_control && motor_timeout >= 5) {
+			// Spindown delay is 9 revs according to spec
+			if(motor_control && motor_timeout >= 8) {
 				status &= ~S_MON;
 				mon_cb(1);
 				if(floppy && !disable_motor_control)

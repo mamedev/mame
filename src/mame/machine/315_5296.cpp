@@ -37,7 +37,7 @@ sega_315_5296_device::sega_315_5296_device(const machine_config &mconfig, const 
 	m_in_port_cb(*this),
 	m_out_port_cb(*this),
 	m_out_cnt_cb(*this),
-	m_ignore_read_direction(false)
+	m_dir_override(0xff)
 {
 }
 
@@ -56,6 +56,7 @@ void sega_315_5296_device::device_start()
 	save_item(NAME(m_output_latch));
 	save_item(NAME(m_cnt));
 	save_item(NAME(m_dir));
+	save_item(NAME(m_dir_override));
 }
 
 //-------------------------------------------------
@@ -89,7 +90,7 @@ READ8_MEMBER( sega_315_5296_device::read )
 		// port A to H
 		case 0x0: case 0x1: case 0x2: case 0x3: case 0x4: case 0x5: case 0x6: case 0x7:
 			// if the port is configured as an output, return the last thing written
-			if ((m_dir & 1 << offset) && (m_ignore_read_direction == false))
+			if (m_dir & m_dir_override & 1 << offset)
 				return m_output_latch[offset];
 
 			// otherwise, return an input port

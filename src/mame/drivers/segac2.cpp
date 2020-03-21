@@ -1661,14 +1661,15 @@ void segac2_state::segac2(machine_config &config)
 void segac2_state::segac2_tfrceacjpb(machine_config& config)
 {
 	segac2(config);
-	m_io->set_ignore_read_direction();
+	m_io->set_ddr_override(0xf); // game erroneously writes 0x58 to DDR
 }
 
-// Ribbit does random measure of UPD7759 sample #A playback time and reset to round 1 if its not in expected range (see routine @1D8D2)
-// current UPD code is too fast, add slight delay
 void segac2_state::segac2_ribbit(machine_config& config)
 {
 	segac2(config);
+
+	// Ribbit does random measure of UPD7759 sample #A playback time and reset to round 1 if it's not in expected range (see routine @1D8D2)
+	// current UPD code is too fast, add slight delay
 	m_upd7759->set_start_delay(250);
 }
 

@@ -16,7 +16,8 @@ Supremo also had a "limited edition" rerelease in 1990, plastic is fake-wood
 instead of black, otherwise it's the same game.
 
 TODO:
-- does not work, most likely due to incomplete cpu emulation (unemulated timer registers)
+- does not work, most likely due to incomplete cpu emulation (unemulated timer registers),
+  could also be a bad rom dump on top of that
 - is 1988 version the same ROM?
 
 ******************************************************************************/
