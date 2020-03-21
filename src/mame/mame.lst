@@ -35027,7 +35027,7 @@ ccdelta1                        //
 ccmk5
 ccmk6
 
-@source:saitek_president.cpp
+@source:saitek_prschess.cpp
 prschess
 
 @source:saitek_risc2500.cpp
