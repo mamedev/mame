@@ -429,6 +429,12 @@ void tilemap_t::init_common(
 	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dx_flipped));
 	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dy));
 	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dy_flipped));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_rows));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_cols));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_tilewidth));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_tileheight));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_width));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_height));
 
 	// reset everything after a load
 	machine().save().register_postload(save_prepost_delegate(FUNC(tilemap_t::postload), this));
@@ -481,6 +487,57 @@ tilemap_t &tilemap_t::init(
 	return *this;
 }
 
+//-------------------------------------------------
+//  resize - resize tilemap
+//-------------------------------------------------
+
+void tilemap_t::resize(u16 tilewidth, u16 tileheight, u32 cols, u32 rows)
+{
+	// populate tilemap metrics
+	m_rows = rows;
+	m_cols = cols;
+	m_tilewidth = tilewidth;
+	m_tileheight = tileheight;
+
+	if (m_old_rows != m_rows || m_old_cols != m_cols || m_old_tilewidth != m_tilewidth || m_old_tileheight != m_tileheight)
+	{
+		m_width = cols * tilewidth;
+		m_height = rows * tileheight;
+
+		if (m_old_width != m_width || m_old_height != m_height)
+		{
+			// reset scroll information
+			if (m_old_height < m_height)
+			{
+				m_rowscroll.resize(m_height);
+				memset(&m_rowscroll[0], 0, m_height*sizeof(m_rowscroll[0]));
+			}
+			if (m_old_width < m_width)
+			{
+				m_colscroll.resize(m_width);
+				memset(&m_colscroll[0], 0, m_width*sizeof(m_colscroll[0]));
+			}
+
+			// allocate pixmap
+			m_pixmap.resize(m_width, m_height);
+
+			// allocate transparency mapping
+			m_flagsmap.resize(m_width, m_height);
+
+			m_old_width = m_width;
+			m_old_height = m_height;
+		}
+
+		// create the initial mappings
+		mappings_create();
+
+		// update tilemap metrics
+		m_old_rows = m_rows;
+		m_old_cols = m_cols;
+		m_old_tilewidth = m_tilewidth;
+		m_old_tileheight = m_tileheight;
+	}
+}
 
 //-------------------------------------------------
 //  ~tilemap_t - destructor
@@ -668,6 +725,7 @@ tilemap_memory_index tilemap_t::scan_cols_flip_xy(u32 col, u32 row, u32 num_cols
 
 void tilemap_t::postload()
 {
+	resize(m_tilewidth, m_tileheight, m_cols, m_rows);
 	mappings_update();
 }
 

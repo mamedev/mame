@@ -347,7 +347,7 @@ constexpr u32 TILEMAP_FLIPY = TILE_FLIPY;            // draw the tilemap vertica
 constexpr u32 TILE_LINE_DISABLED = 0x80000000;
 
 // standard mappers
-enum tilemap_standard_mapper
+enum tilemap_standard_mapper : int
 {
 	TILEMAP_SCAN_ROWS = 0,
 	TILEMAP_SCAN_ROWS_FLIP_X,
@@ -474,6 +474,9 @@ public:
 	void set_scroll_cols(u32 scroll_cols) { assert(scroll_cols <= m_width); m_scrollcols = scroll_cols; }
 	void set_flip(u32 attributes) { if (m_attributes != attributes) { m_attributes = attributes; mappings_update(); } }
 
+	// dynamic configurations
+	void resize(u16 tilewidth, u16 tileheight, u32 cols, u32 rows);
+
 	// dirtying
 	void mark_mapping_dirty() { mappings_update(); }
 	void mark_tile_dirty(tilemap_memory_index memindex);
@@ -572,6 +575,14 @@ private:
 	u16                         m_tileheight;           // height of a single tile in pixels
 	u32                         m_width;                // width of the full tilemap in pixels
 	u32                         m_height;               // height of the full tilemap in pixels
+
+	// basic "old" tilemap metrics, for post load
+	u32                         m_old_rows;             // number of tile rows
+	u32                         m_old_cols;             // number of tile columns
+	u16                         m_old_tilewidth;        // width of a single tile in pixels
+	u16                         m_old_tileheight;       // height of a single tile in pixels
+	u32                         m_old_width;            // width of the full tilemap in pixels
+	u32                         m_old_height;           // height of the full tilemap in pixels
 
 	// logical <-> memory mappings
 	tilemap_mapper_delegate     m_mapper;               // callback to map a row/column to a memory index

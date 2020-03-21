@@ -1116,7 +1116,7 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 
 	// figure out the title
 	std::ostringstream title_buf;
-	util::stream_format(title_buf, "TILEMAP %d/%d", state.tilemap.which + 1, mui.machine().tilemap().count());
+	util::stream_format(title_buf, "TILEMAP %d/%d = %X", state.tilemap.which + 1, mui.machine().tilemap().count(), tilemap->palette_offset());
 
 	// if the mouse pointer is over a tile, add some info about its coordinates and color
 	int32_t mouse_target_x, mouse_target_y;

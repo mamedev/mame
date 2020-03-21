@@ -77,14 +77,16 @@ private:
 	uint16_t m_scrolly;
 	uint16_t m_scroll_flag;
 	uint16_t m_tile_bank;
-	tilemap_t *m_tmap;
-	tilemap_t *m_tilemap[2][4];
+	tilemap_t *m_tilemap;
+
+	inline bool is_8x8() { return BIT(m_scroll_flag, 4); }
+	inline u8 size_factor() { return m_scroll_flag & 3; }
 
 	// helpers
-	TILEMAP_MAPPER_MEMBER(scan_8x8);
-	TILEMAP_MAPPER_MEMBER(scan_16x16);
-	TILE_GET_INFO_MEMBER(get_scroll_tile_info_8x8);
-	TILE_GET_INFO_MEMBER(get_scroll_tile_info_16x16);
+	TILEMAP_MAPPER_MEMBER(tile_scan);
+	TILE_GET_INFO_MEMBER(get_scroll_tile_info);
+
+	void resize();
 };
 
 // device type definition
