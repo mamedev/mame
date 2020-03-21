@@ -67,7 +67,7 @@ void menu_main::populate(float &customtop, float &custombottom)
 	if (ui().machine_info().has_analog())
 		item_append(_("Analog Controls"), "", 0, (void *)ANALOG);
 	if (ui().machine_info().has_dips())
-		item_append(_("Dip Switches"), "", 0, (void *)SETTINGS_DIP_SWITCHES);
+		item_append(_("DIP Switches"), "", 0, (void *)SETTINGS_DIP_SWITCHES);
 	if (ui().machine_info().has_configs())
 		item_append(_("Machine Configuration"), "", 0, (void *)SETTINGS_DRIVER_CONFIG);
 
@@ -133,7 +133,7 @@ void menu_main::populate(float &customtop, float &custombottom)
 
 	item_append(menu_item_type::SEPARATOR);
 
-	item_append(_("About..."), "", 0, (void *)ABOUT);
+	item_append(string_format(_("About %s"), emulator_info::get_appname()), "", 0, (void *)ABOUT);
 
 	item_append(menu_item_type::SEPARATOR);
 
