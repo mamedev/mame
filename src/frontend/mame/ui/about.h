@@ -7,16 +7,17 @@
     "About" modal
 
 ***************************************************************************/
-
 #ifndef MAME_FRONTEND_UI_ABOUT_H
 #define MAME_FRONTEND_UI_ABOUT_H
 
 #pragma once
 
 #include "ui/menu.h"
+
 #include <vector>
 
 namespace ui {
+
 class menu_about : public menu
 {
 public:
@@ -29,7 +30,6 @@ private:
 
 	bool m_pause_checked;
 	bool m_was_paused;
-	std::vector<std::string> m_lines;
 };
 
 } // namespace ui
