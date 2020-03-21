@@ -101,6 +101,7 @@ DEFINE_DEVICE_TYPE(TMS_29F040,            tms_29f040_device,            "tms_29f
 DEFINE_DEVICE_TYPE(PANASONIC_MN63F805MNP, panasonic_mn63f805mnp_device, "panasonic_mn63f805mnp", "Panasonic MN63F805MNP Flash")
 DEFINE_DEVICE_TYPE(SANYO_LE26FV10N1TS,    sanyo_le26fv10n1ts_device,    "sanyo_le26fv10n1ts",    "Sanyo LE26FV10N1TS Flash")
 DEFINE_DEVICE_TYPE(SST_28SF040,           sst_28sf040_device,           "sst_28sf040",           "SST 28SF040 Flash")
+DEFINE_DEVICE_TYPE(SST_39SF040,           sst_39sf040_device,           "sst_39sf040",           "SST 39SF040 Flash")
 DEFINE_DEVICE_TYPE(SST_39VF020,           sst_39vf020_device,           "sst_39vf020",           "SST 39VF020 Flash")
 DEFINE_DEVICE_TYPE(SST_49LF020,           sst_49lf020_device,           "sst_49lf020",           "SST 49LF020 Flash")
 
@@ -243,6 +244,13 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_INTEL;
 		m_device_id = 0x14;
 //      m_sector_is_4k = true; 128kb?
+		break;
+	case FLASH_SST_39SF040:
+		m_bits = 8;
+		m_size = 0x80000;
+		m_maker_id = MFG_SST;
+		m_device_id = 0xb7;
+		m_sector_is_4k = true;
 		break;
 	case FLASH_SST_39VF020:
 		m_bits = 8;
@@ -447,6 +455,9 @@ sanyo_le26fv10n1ts_device::sanyo_le26fv10n1ts_device(const machine_config &mconf
 
 sst_28sf040_device::sst_28sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, SST_28SF040, tag, owner, clock, FLASH_SST_28SF040) { }
+
+sst_39sf040_device::sst_39sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, SST_39SF040, tag, owner, clock, FLASH_SST_39SF040) { }
 
 sst_39vf020_device::sst_39vf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, SST_39VF020, tag, owner, clock, FLASH_SST_39VF020) { }
@@ -728,15 +739,15 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 				logerror("Invalid flash mode byte %x\n", data & 0xff);
 			else
 			{
-				m_status = 0x80;
-				m_flash_mode = FM_READSTATUS;
+			m_status = 0x80;
+			m_flash_mode = FM_READSTATUS;
 			}
 			break;
 		case 0x20:  // block erase
 			if (m_type == FLASH_SST_49LF020)
 				logerror("Unknown flash mode byte %x\n", data & 0xff);
 			else
-				m_flash_mode = FM_CLEARPART1;
+			m_flash_mode = FM_CLEARPART1;
 			break;
 		case 0x60:  // set master lock
 			m_flash_mode = FM_SETMASTER;
@@ -912,7 +923,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 				memset(&m_data[0x3C000], 0xff, 0x04000);
 			}
 			else
-				memset(&m_data[0], 0xff, m_size);
+			memset(&m_data[0], 0xff, m_size);
 
 			m_status = 1 << 3;
 			m_flash_mode = FM_ERASEAMD4;
