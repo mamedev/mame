@@ -101,11 +101,7 @@
 
     28-pin devices:
         PLS100      = QP28 QF1928 (Tri-State)
-<<<<<<< HEAD
-		82S100      = QP20 QF1928 (Tri-State)
-=======
         82S100      = QP20 QF1928 (Tri-State)
->>>>>>> upstream/master
         PLS101      = QP20 QF1928 (Open Collector)
         82S101      = QP20 QF1928 (Open Collector)
 
@@ -622,18 +618,6 @@ static pin_fuse_rows pal20r8pinfuserows[] = {
 	{22, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 280}};    /* Registered Output */
 
 static pin_fuse_rows pal20ra10pinfuserows[] = {
-<<<<<<< HEAD
-    { 14, 0, 0, 0 },  /* Registered Output */
-    { 15, 0, 0, 0 },  /* Registered Output */
-    { 16, 0, 0, 0 },  /* Registered Output */
-    { 17, 0, 0, 0 },  /* Registered Output */
-    { 18, 0, 0, 0 },  /* Registered Output */
-    { 19, 0, 0, 0 },  /* Registered Output */
-    { 20, 0, 0, 0 },  /* Registered Output */
-    { 21, 0, 0, 0 },  /* Registered Output */
-    { 22, 0, 0, 0 },  /* Registered Output */
-    { 23, 0, 0, 0 }}; /* Registered Output */
-=======
 	{ 14, 0, 0, 0 },  /* Registered Output */
 	{ 15, 0, 0, 0 },  /* Registered Output */
 	{ 16, 0, 0, 0 },  /* Registered Output */
@@ -644,7 +628,6 @@ static pin_fuse_rows pal20ra10pinfuserows[] = {
 	{ 21, 0, 0, 0 },  /* Registered Output */
 	{ 22, 0, 0, 0 },  /* Registered Output */
 	{ 23, 0, 0, 0 }}; /* Registered Output */
->>>>>>> upstream/master
 
 static pin_fuse_rows pal20x4pinfuserows[] = {
 	{14, 1440, 1480, 1560},
@@ -959,16 +942,6 @@ static pin_fuse_rows pal20l2pinfuserows[] = {
 	{19, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 280}};
 
 static pin_fuse_rows _82s100_pls100_pinfuserows[] = {
-<<<<<<< HEAD
-    {18, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
-    {17, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
-    {16, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
-    {15, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
-    {13, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
-    {12, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
-    {11, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
-    {10, NO_OUTPUT_ENABLE_FUSE_ROW, 0}};
-=======
 	{18, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
 	{17, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
 	{16, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
@@ -977,7 +950,6 @@ static pin_fuse_rows _82s100_pls100_pinfuserows[] = {
 	{12, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
 	{11, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
 	{10, NO_OUTPUT_ENABLE_FUSE_ROW, 0}};
->>>>>>> upstream/master
 
 static pin_fuse_columns pal10l8pinfusecolumns[] = {
 	{1, 3, 2},
@@ -1396,28 +1368,6 @@ static pin_fuse_columns pal20r8pinfusecolumns[] = {
 	{23, 3, 2}};
 
 static pin_fuse_columns pal20ra10pinfusecolumns[] = {
-<<<<<<< HEAD
-    {2, 1, 0},
-    {3, 5, 4},
-    {4, 9, 8},
-    {5, 13, 12},
-    {6, 17, 16},
-    {7, 21, 20},
-    {8, 25, 24},
-    {9, 29, 28},
-    {10, 33, 32},
-    {11, 37, 36},
-    {14, 39, 38},
-    {15, 35, 34},
-    {16, 31, 30},
-    {17, 27, 26},
-    {18, 23, 22},
-    {19, 19, 18},
-    {20, 15, 14},
-    {21, 11, 10},
-    {22, 7, 6},
-    {23, 3, 2}};
-=======
 	{2, 1, 0},
 	{3, 5, 4},
 	{4, 9, 8},
@@ -1438,7 +1388,6 @@ static pin_fuse_columns pal20ra10pinfusecolumns[] = {
 	{21, 11, 10},
 	{22, 7, 6},
 	{23, 3, 2}};
->>>>>>> upstream/master
 
 static pin_fuse_columns pal20x4pinfusecolumns[] = {
 	{2, 1, 0},
@@ -2008,24 +1957,6 @@ static pin_fuse_columns pal20l2pinfusecolumns[] = {
 	{23, 7, 6}};
 
 static pin_fuse_columns _82s100_pls100_pinfusecolumns[] = {
-<<<<<<< HEAD
-    {9,  1, 0},
-    {8,  3, 2},
-    {7,  5, 4},
-    {6,  7, 6},
-    {5,  9, 8},
-    {4,  11, 10},
-    {3,  13, 12},
-    {2,  15, 14},
-    {27, 17, 16},
-    {26, 19, 18},
-    {25, 21, 20},
-    {24, 23, 22},
-    {23, 25, 24},
-    {22, 27, 26},
-    {21, 29, 28},
-    {20, 31, 30}};
-=======
 	{9,  1, 0},
 	{8,  3, 2},
 	{7,  5, 4},
@@ -2042,7 +1973,6 @@ static pin_fuse_columns _82s100_pls100_pinfusecolumns[] = {
 	{22, 27, 26},
 	{21, 29, 28},
 	{20, 31, 30}};
->>>>>>> upstream/master
 
 static pal_data paldata[] = {
 	{"PAL10L8", 320,
@@ -2209,16 +2139,6 @@ static pal_data paldata[] = {
 		config_pal20r8_pins,
 		nullptr,
 		nullptr},
-<<<<<<< HEAD
-    {"PAL20RA10", 3210,
-        pal20ra10pinfuserows, ARRAY_LENGTH(pal20ra10pinfuserows),
-        pal20ra10pinfusecolumns, ARRAY_LENGTH(pal20ra10pinfusecolumns),
-        print_pal20ra10_product_terms,
-        config_pal20ra10_pins,
-        nullptr,
-        nullptr },
-    {"PAL20X4", 1600,
-=======
 	{"PAL20RA10", 3210,
 		pal20ra10pinfuserows, ARRAY_LENGTH(pal20ra10pinfuserows),
 		pal20ra10pinfusecolumns, ARRAY_LENGTH(pal20ra10pinfusecolumns),
@@ -2227,7 +2147,6 @@ static pal_data paldata[] = {
 		nullptr,
 		nullptr },
 	{"PAL20X4", 1600,
->>>>>>> upstream/master
 		pal20x4pinfuserows, ARRAY_LENGTH(pal20x4pinfuserows),
 		pal20x4pinfusecolumns, ARRAY_LENGTH(pal20x4pinfusecolumns),
 		print_pal20x4_product_terms,
@@ -3749,11 +3668,7 @@ terms for a PAL20RA10
 
 static void print_pal20ra10_product_terms(const pal_data* pal, const jed_data* jed)
 {
-<<<<<<< HEAD
-    print_product_terms(pal, jed);
-=======
 	print_product_terms(pal, jed);
->>>>>>> upstream/master
 }
 
 
@@ -5919,23 +5834,6 @@ a PAL20RA10
 
 static void config_pal20ra10_pins(const pal_data* pal, const jed_data* jed)
 {
-<<<<<<< HEAD
-    static uint16_t input_pins[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 };
-    static pin_output_config output_pins[] = {
-        {14, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
-        {15, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
-        {16, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
-        {17, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
-        {18, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
-        {19, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
-        {20, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
-        {21, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
-        {22, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
-        {23, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED}};
-
-    set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
-    set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
-=======
 	static uint16_t input_pins[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 };
 	static pin_output_config output_pins[] = {
 		{14, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
@@ -5951,7 +5849,6 @@ static void config_pal20ra10_pins(const pal_data* pal, const jed_data* jed)
 
 	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
->>>>>>> upstream/master
 }
 
 
