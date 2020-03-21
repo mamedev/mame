@@ -654,7 +654,7 @@ void fp1100_state::fp1100(machine_config &config)
 	sub.set_addrmap(AS_PROGRAM, &fp1100_state::sub_map);
 	sub.pa_out_cb().set(FUNC(fp1100_state::porta_w));
 	sub.pb_in_cb().set(FUNC(fp1100_state::portb_r));
-	sub.pb_out_cb().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	sub.pb_out_cb().set("cent_data_out", FUNC(output_latch_device::write));
 	sub.pc_in_cb().set(FUNC(fp1100_state::portc_r));
 	sub.pc_out_cb().set(FUNC(fp1100_state::portc_w));
 	sub.txd_func().set([this] (bool state) { m_cassbit = state; });

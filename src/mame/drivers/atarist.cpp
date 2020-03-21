@@ -1997,7 +1997,7 @@ void st_state::common(machine_config &config)
 	m_ymsnd->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ymsnd->set_resistors_load(RES_K(1), 0, 0);
 	m_ymsnd->port_a_write_callback().set(FUNC(st_state::psg_pa_w));
-	m_ymsnd->port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ymsnd->port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::write));
 
 	// devices
 	WD1772(config, m_fdc, Y2/4);
@@ -2213,7 +2213,7 @@ void stbook_state::stbook(machine_config &config)
 	ym3439.set_flags(AY8910_SINGLE_OUTPUT);
 	ym3439.set_resistors_load(RES_K(1), 0, 0);
 	ym3439.port_a_write_callback().set(FUNC(stbook_state::psg_pa_w));
-	ym3439.port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ym3439.port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ym3439.add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	MC68901(config, m_mfp, U517/8);

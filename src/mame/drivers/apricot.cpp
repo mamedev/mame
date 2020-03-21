@@ -402,8 +402,8 @@ void apricot_state::apricot(machine_config &config)
 
 	// devices
 	I8255A(config, m_ppi, 0);
-	m_ppi->in_pa_callback().set("cent_data_in", FUNC(input_buffer_device::bus_r));
-	m_ppi->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ppi->in_pa_callback().set("cent_data_in", FUNC(input_buffer_device::read));
+	m_ppi->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_ppi->out_pb_callback().set(FUNC(apricot_state::i8255_portb_w));
 	m_ppi->in_pc_callback().set(FUNC(apricot_state::i8255_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(apricot_state::i8255_portc_w));

@@ -372,7 +372,7 @@ void tvc_state::tvc_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(FUNC(tvc_state::border_color_w));
-	map(0x01, 0x01).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x01, 0x01).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x02, 0x02).w(FUNC(tvc_state::bank_w));
 	map(0x03, 0x03).w(FUNC(tvc_state::keyboard_w));
 	map(0x04, 0x06).w(FUNC(tvc_state::sound_w));

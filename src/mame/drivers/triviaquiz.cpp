@@ -22,6 +22,12 @@
     Norway kjendiser 2
     Norway pop-musikk 2
     Norway sport 2
+
+    TODO:
+    * hook up questions ROMs
+    * sound
+    * nvram?
+    * https://www.tvspels-nostalgi.com/pcb_unk.htm shows red background. Faulty PCB adapter or bad emulation?
 */
 
 #include "emu.h"
@@ -74,34 +80,34 @@ void triviaquiz_state::io_map(address_map &map)
 
 static INPUT_PORTS_START( triviaquiz )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // gives 'bad switch'
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // gives 'bad switch'
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // hack to get in game, if this and the two below aren't low it gets stuck 'faulty link problem, call attendant'
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // gives 'bad switch'
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN4 ) // gives 10 credits
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) // gives 2 credits
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) // gives 5 credits
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // gives 1 credit
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // gives 'bad switch'
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // gives 'bad switch'
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) // these work also as start buttons?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // hack to get in game
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // gives 'bad switch'
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // gives 'bad switch'
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Insert / clear advertising") // gives the possibility to insert customized advertising
+	PORT_SERVICE( 0x08, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // hack to get in game
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // gives 'bad switch'
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // gives 'bad switch'
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // gives 'bad switch'
 
 	PORT_START("DSW1") // only read at boot
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "SW1:1")
@@ -111,7 +117,9 @@ static INPUT_PORTS_START( triviaquiz )
 	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW1:5")
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 
 	// DSW2 not populated
 INPUT_PORTS_END
@@ -176,5 +184,5 @@ ROM_START( triviaqz2 )
 	ROM_LOAD( "norway_historie_1.bin",   0x20000, 0x8000, CRC(b2fbce41) SHA1(9e94fc4efd03aff180a5bd94727f5be59647af52) )
 ROM_END
 
-GAME( 1985, triviaqz,         0, triviaquiz, triviaquiz, triviaquiz_state, empty_init, ROT0, "Intermatic Manufacturing", "Trivia Quiz (set 1)",  MACHINE_IS_SKELETON ) // currently stuck at 'fault link problem - call attendant'
-GAME( 1985, triviaqz2, triviaqz, triviaquiz, triviaquiz, triviaquiz_state, empty_init, ROT0, "Intermatic Manufacturing", "Trivia Quiz (set 2)",  MACHINE_IS_SKELETON ) // currently stuck at 'fault link problem - call attendant'
+GAME( 1985, triviaqz,         0, triviaquiz, triviaquiz, triviaquiz_state, empty_init, ROT0, "Intermatic Manufacturing", "Professor Trivia (set 1)",  MACHINE_IS_SKELETON ) // or Trivia Video Quiz? Professor Trivia appears on more screens
+GAME( 1985, triviaqz2, triviaqz, triviaquiz, triviaquiz, triviaquiz_state, empty_init, ROT0, "Intermatic Manufacturing", "Professor Trivia (set 2)",  MACHINE_IS_SKELETON ) // both need question ROMs hook up

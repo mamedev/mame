@@ -4,6 +4,7 @@
 /******************************************************************************
 
 SciSys President Chess (model 231)
+(not to be confused with Saitek Kasparov President)
 
 The ROMs are inside a module, at the top-right. No known upgrades were released.
 Apparently the chessboard was not that reliable. The manual even says to flip the
@@ -31,15 +32,15 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "saitek_president.lh" // clickable
+#include "saitek_prschess.lh" // clickable
 
 
 namespace {
 
-class president_state : public driver_device
+class prschess_state : public driver_device
 {
 public:
-	president_state(const machine_config &mconfig, device_type type, const char *tag) :
+	prschess_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
@@ -75,7 +76,7 @@ private:
 	u8 m_led_data[2] = { 0, 0 };
 };
 
-void president_state::machine_start()
+void prschess_state::machine_start()
 {
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
@@ -87,20 +88,20 @@ void president_state::machine_start()
     I/O
 ******************************************************************************/
 
-void president_state::update_display()
+void prschess_state::update_display()
 {
 	u16 led_data = m_led_data[1] << 8 | m_led_data[0];
 	led_data = bitswap<16>(led_data, 15,14,5,4,3,2,1,0,7,6,13,12,11,10,9,8);
 	m_display->matrix(1 << m_inp_mux, led_data);
 }
 
-WRITE8_MEMBER(president_state::leds_w)
+WRITE8_MEMBER(prschess_state::leds_w)
 {
 	m_led_data[offset >> 8] = ~data;
 	update_display();
 }
 
-WRITE8_MEMBER(president_state::control_w)
+WRITE8_MEMBER(prschess_state::control_w)
 {
 	// d0-d3: input mux, led select
 	m_inp_mux = data & 0xf;
@@ -112,7 +113,7 @@ WRITE8_MEMBER(president_state::control_w)
 	// other: ?
 }
 
-READ8_MEMBER(president_state::input_r)
+READ8_MEMBER(prschess_state::input_r)
 {
 	u8 data = 0;
 
@@ -133,12 +134,12 @@ READ8_MEMBER(president_state::input_r)
     Address Maps
 ******************************************************************************/
 
-void president_state::main_map(address_map &map)
+void prschess_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x4000, 0x4000).select(0x0100).w(FUNC(president_state::leds_w));
-	map(0x4200, 0x4200).w(FUNC(president_state::control_w));
-	map(0x4300, 0x4300).r(FUNC(president_state::input_r));
+	map(0x4000, 0x4000).select(0x0100).w(FUNC(prschess_state::leds_w));
+	map(0x4200, 0x4200).w(FUNC(prschess_state::control_w));
+	map(0x4300, 0x4300).r(FUNC(prschess_state::input_r));
 	map(0xc000, 0xffff).rom();
 }
 
@@ -184,12 +185,12 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void president_state::prschess(machine_config &config)
+void prschess_state::prschess(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 2000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &president_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(president_state::nmi_line_pulse), attotime::from_hz(100)); // guessed
+	m_maincpu->set_addrmap(AS_PROGRAM, &prschess_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(prschess_state::nmi_line_pulse), attotime::from_hz(100)); // guessed
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -197,7 +198,7 @@ void president_state::prschess(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8+1, 16);
-	config.set_default_layout(layout_saitek_president);
+	config.set_default_layout(layout_saitek_prschess);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -225,5 +226,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1982, prschess, 0,      0, prschess, prschess, president_state, empty_init, "SciSys", "President Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1982, prschess, 0,      0, prschess, prschess, prschess_state, empty_init, "SciSys", "President Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

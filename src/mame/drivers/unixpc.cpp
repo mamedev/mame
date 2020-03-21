@@ -330,10 +330,10 @@ void unixpc_state::unixpc_mem(address_map &map)
 	map(0x470000, 0x470001).r(FUNC(unixpc_state::line_printer_r));
 	map(0x480000, 0x480001).w(FUNC(unixpc_state::rtc_w));
 	map(0x490000, 0x490001).select(0x7000).w(FUNC(unixpc_state::tcr_w));
-	map(0x4a0000, 0x4a0000).w("mreg", FUNC(output_latch_device::bus_w));
+	map(0x4a0000, 0x4a0000).w("mreg", FUNC(output_latch_device::write));
 	map(0x4d0000, 0x4d7fff).w(FUNC(unixpc_state::diskdma_ptr_w));
 	map(0x4e0001, 0x4e0001).w(FUNC(unixpc_state::disk_control_w)).cswidth(16);
-	map(0x4f0001, 0x4f0001).w("printlatch", FUNC(output_latch_device::bus_w));
+	map(0x4f0001, 0x4f0001).w("printlatch", FUNC(output_latch_device::write));
 	map(0xe00000, 0xe0000f).rw(m_hdc, FUNC(wd1010_device::read), FUNC(wd1010_device::write)).umask16(0x00ff);
 	map(0xe10000, 0xe10007).rw(m_wd2797, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write)).umask16(0x00ff);
 	map(0xe30000, 0xe30001).r(FUNC(unixpc_state::rtc_r));

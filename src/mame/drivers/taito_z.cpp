@@ -1277,11 +1277,11 @@ DIP switches are not verified
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/2610intf.h"
-#include "screen.h"
 #include "speaker.h"
 
 #include "contcirc.lh"
 #include "dblaxle.lh"
+#include "enforce.lh"
 
 
 void taitoz_state::parse_cpu_control()
@@ -1404,6 +1404,13 @@ CUSTOM_INPUT_MEMBER(taitoz_state::brake_pedal_r)
 	return retval[m_brake.read_safe(0) & 7];
 }
 
+// enforceja only, 3 bits applied on both pots
+template <int axis> CUSTOM_INPUT_MEMBER(taitoz_state::adstick_r)
+{
+	static const u8 retval[8] = { 0,1,3,2,6,7,5,4 };
+	u8 raw_value = ((axis == 0 ? m_stickx : m_sticky).read_safe(0) >> 5) & 7;
+	return retval[raw_value];
+}
 
 u8 taitoz_state::contcirc_input_bypass_r()
 {
@@ -2402,8 +2409,8 @@ static INPUT_PORTS_START( enforce )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)    /* Bomb */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)    /* Laser */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Gatling Gun") PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Laser") PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2425,6 +2432,19 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( enforceja )
 	PORT_INCLUDE(enforce)
 
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitoz_state, adstick_r<0>);
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitoz_state, adstick_r<1>);
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Shifter") PORT_TOGGLE PORT_PLAYER(1)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_MODIFY("DSWA")
 	TAITO_COINAGE_JAPAN_OLD_LOC(SW A)
 
@@ -2432,8 +2452,14 @@ static INPUT_PORTS_START( enforceja )
 	PORT_DIPNAME( 0x30, 0x30, "3D Effects" )                 PORT_DIPLOCATION("SW B:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x10, "In Game Only" )
 	PORT_DIPSETTING(    0x00, "In Game Only" )
+	PORT_DIPSETTING(    0x10, "In Game Only (duplicate)" )
+	
+	PORT_START("STICKX")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(4) PORT_PLAYER(1)
+
+	PORT_START("STICKY")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(4) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bshark )
@@ -3134,11 +3160,17 @@ void taitoz_state::machine_reset()
 	m_ioc220_port = 0;
 }
 
-/* Contcirc vis area seems narrower than the other games... */
+void taitoz_state::screen_config(machine_config &config, int vdisp_start, int vdisp_end)
+{
+//  26.860 MHz comes from the video board, assume /4 pixel clock
+//  contcirc and enforce uses a narrower visible area (checked via service mode),
+//  confirm if they outputs the same syncs.
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(26'686'000)/4, 424, 0, 320, 262, vdisp_start, vdisp_end);
+}
 
 void taitoz_state::contcirc(machine_config &config)
 {
-	/* basic machine hardware */
 	M68000(config, m_maincpu, 12000000);   /* 12 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitoz_state::contcirc_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitoz_state::irq6_line_hold));
@@ -3158,14 +3190,9 @@ void taitoz_state::contcirc(machine_config &config)
 	m_tc0040ioc->write_4_callback().set(FUNC(taitoz_state::coin_control_w));
 	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 3*8, 31*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 24, 248);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
@@ -3226,13 +3253,9 @@ void taitoz_state::chasehq(machine_config &config)
 	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_chasehq));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_chasehq));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_chasehq);
 
@@ -3293,13 +3316,9 @@ void taitoz_state::enforce(machine_config &config)
 	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 31*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 24, 248);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
@@ -3356,14 +3375,9 @@ void taitoz_state::bshark_base(machine_config &config)
 	m_tc0220ioc->write_4_callback().set(FUNC(taitoz_state::coin_control_w));
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_bshark));
-	screen.set_palette("palette");
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_bshark));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
@@ -3438,13 +3452,9 @@ void taitoz_state::sci(machine_config &config)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_sci));
-	screen.set_palette("palette");
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_sci));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
@@ -3511,13 +3521,9 @@ void taitoz_state::nightstr(machine_config &config)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_chasehq));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_chasehq));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_chasehq);
 
@@ -3578,13 +3584,9 @@ void taitoz_state::aquajack(machine_config &config)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_aquajack));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_aquajack));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
@@ -3650,13 +3652,9 @@ void taitoz_state::spacegun(machine_config &config)
 	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_spacegun));
-	screen.set_palette(m_tc0110pcr);
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_spacegun));
+	m_screen->set_palette(m_tc0110pcr);
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
@@ -3711,13 +3709,9 @@ void taitoz_state::dblaxle(machine_config &config)
 	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_dblaxle));
-	screen.set_palette("palette");
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_dblaxle));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
@@ -3778,13 +3772,9 @@ void taitoz_state::racingb(machine_config &config)
 	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(taitoz_state::screen_update_racingb));
-	screen.set_palette("palette");
+	screen_config(config, 16, 256);
+	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_racingb));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
@@ -5559,7 +5549,7 @@ GAMEL(1988, chasehqu,   chasehq,  chasehq,   chasehq,   taitoz_state, empty_init
 
 GAME( 1988, enforce,    0,        enforce,   enforce,   taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Enforce (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, enforcej,   enforce,  enforce,   enforcej,  taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Enforce (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, enforceja,  enforce,  enforce,   enforceja, taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Enforce (Japan, Analog Controls)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1988, enforceja,  enforce,  enforce,  enforceja, taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Enforce (Japan, Analog Controls)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_enforce )
 
 GAME( 1989, bshark,     0,        bshark,    bshark,    taitoz_state, init_bshark, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Battle Shark (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, bsharku,    bshark,   bshark,    bsharku,   taitoz_state, init_bshark, ORIENTATION_FLIP_X, "Taito America Corporation", "Battle Shark (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

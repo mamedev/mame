@@ -85,6 +85,13 @@ void elan_eu3a05vid_device::set_is_sudoku()
 	m_spritebase = 0x1000;
 }
 
+void elan_eu3a05vid_device::set_is_pvmilfin()
+{
+	m_bytes_per_tile_entry = 4;
+	m_vrambase = 0x200;
+	m_spritebase = 0x1000; // not verified
+}
+
 uint8_t elan_eu3a05vid_device::read_spriteram(int offset)
 {
 	address_space& cpuspace = m_cpu->space(AS_PROGRAM);

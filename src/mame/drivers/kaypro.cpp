@@ -93,7 +93,7 @@ void kaypro_state::kaypro484_io(address_map &map)
 	map(0x0c, 0x0f).rw("sio_2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x10, 0x13).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	map(0x14, 0x17).rw(FUNC(kaypro_state::kaypro484_system_port_r), FUNC(kaypro_state::kaypro484_system_port_w));
-	map(0x18, 0x1b).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x18, 0x1b).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x1c, 0x1c).rw(FUNC(kaypro_state::kaypro484_status_r), FUNC(kaypro_state::kaypro484_index_w));
 	map(0x1d, 0x1d).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(kaypro_state::kaypro484_register_w));
 	map(0x1f, 0x1f).rw(FUNC(kaypro_state::kaypro484_videoram_r), FUNC(kaypro_state::kaypro484_videoram_w));
@@ -250,7 +250,7 @@ void kaypro_state::kayproii(machine_config &config)
 
 	Z80PIO(config, m_pio_g, 20_MHz_XTAL / 8);
 	m_pio_g->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_pio_g->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio_g->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 
 	Z80PIO(config, m_pio_s, 20_MHz_XTAL / 8);
 	m_pio_s->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

@@ -587,8 +587,8 @@ void elwro800_state::elwro800(machine_config &config)
 
 	I8255A(config, m_i8255, 0);
 	m_i8255->in_pa_callback().set_ioport("JOY");
-	m_i8255->in_pb_callback().set("cent_data_in", FUNC(input_buffer_device::bus_r));
-	m_i8255->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_i8255->in_pb_callback().set("cent_data_in", FUNC(input_buffer_device::read));
+	m_i8255->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_i8255->in_pc_callback().set(FUNC(elwro800_state::i8255_port_c_r));
 	m_i8255->out_pc_callback().set(FUNC(elwro800_state::i8255_port_c_w));
 

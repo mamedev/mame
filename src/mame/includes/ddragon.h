@@ -142,8 +142,7 @@ private:
 	DECLARE_WRITE8_MEMBER(ddragon_interrupt_w);
 	DECLARE_WRITE8_MEMBER(ddragon2_sub_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(ddragon2_sub_irq_w);
-	DECLARE_READ8_MEMBER(ddragon_hd63701_internal_registers_r);
-	DECLARE_WRITE8_MEMBER(ddragon_hd63701_internal_registers_w);
+	void sub_port6_w(uint8_t data);
 	DECLARE_READ8_MEMBER(ddragon_comram_r);
 	DECLARE_WRITE8_MEMBER(ddragon_comram_w);
 	DECLARE_WRITE8_MEMBER(dd_adpcm_w);
@@ -159,6 +158,7 @@ private:
 	void ddragonba_sub_map(address_map &map);
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
+	void sub_6309_map(address_map &map);
 };
 
 

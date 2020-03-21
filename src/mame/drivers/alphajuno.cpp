@@ -9,7 +9,10 @@
 #include "emu.h"
 //#include "bus/midi/midi.h"
 #include "cpu/mcs51/mcs51.h"
-//#include "machine/nvram.h"
+#include "machine/nvram.h"
+#include "video/hd44780.h"
+#include "emupal.h"
+#include "screen.h"
 
 class alphajuno_state : public driver_device
 {
@@ -17,17 +20,49 @@ public:
 	alphajuno_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_lcdc(*this, "lcdc")
 	{
 	}
 
 	void ajuno1(machine_config &config);
+	void mks50(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
 
 private:
+	HD44780_PIXEL_UPDATE(lcd_pixel_update);
+
+	void lcd_w(offs_t offset, u8 data);
+
 	void prog_map(address_map &map);
 	void ext_map(address_map &map);
+	void mks50_ext_map(address_map &map);
+
+	void palette_init(palette_device &palette);
 
 	required_device<mcs51_cpu_device> m_maincpu;
+	required_device<hd44780_device> m_lcdc;
 };
+
+void alphajuno_state::machine_reset()
+{
+}
+
+HD44780_PIXEL_UPDATE(alphajuno_state::lcd_pixel_update)
+{
+	if (x < 5 && y < 8 && line < 2 && pos < 8)
+		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
+}
+
+
+void alphajuno_state::lcd_w(offs_t offset, u8 data)
+{
+	if (offset == 0)
+		m_lcdc->control_w(data);
+	else
+		m_lcdc->data_w(data);
+}
 
 void alphajuno_state::prog_map(address_map &map)
 {
@@ -36,6 +71,14 @@ void alphajuno_state::prog_map(address_map &map)
 
 void alphajuno_state::ext_map(address_map &map)
 {
+	map(0x2000, 0x27ff).mirror(0xd800).ram().share("nvram");
+	map(0x8000, 0x8008).w(FUNC(alphajuno_state::lcd_w));
+}
+
+void alphajuno_state::mks50_ext_map(address_map &map)
+{
+	map(0x8000, 0x8008).w(FUNC(alphajuno_state::lcd_w));
+	map(0xe000, 0xffff).ram().share("nvram");
 }
 
 static INPUT_PORTS_START(ajuno1)
@@ -44,15 +87,67 @@ INPUT_PORTS_END
 static INPUT_PORTS_START(ajuno2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(mks50)
+INPUT_PORTS_END
+
+void alphajuno_state::palette_init(palette_device &palette)
+{
+	palette.set_pen_color(0, rgb_t(131, 136, 139));
+	palette.set_pen_color(1, rgb_t( 92,  83,  88));
+}
+
 void alphajuno_state::ajuno1(machine_config &config)
 {
 	I8032(config, m_maincpu, 12_MHz_XTAL); // P8032AH
 	m_maincpu->set_addrmap(AS_PROGRAM, &alphajuno_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &alphajuno_state::ext_map);
 
-	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5517APL + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5517APL + battery
 
 	//MB87123(config, "dco", 12_MHz_XTAL);
+
+	// LCD: LM16155A or LM16155B
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
+	screen.set_size(6*16, 8*1);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette", FUNC(alphajuno_state::palette_init), 2);
+
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 8);
+	m_lcdc->set_pixel_update_cb(FUNC(alphajuno_state::lcd_pixel_update));
+	m_lcdc->set_busy_factor(0.005);
+}
+
+void alphajuno_state::mks50(machine_config &config)
+{
+	I80C31(config, m_maincpu, 12_MHz_XTAL); // MSM80C31P
+	m_maincpu->set_addrmap(AS_PROGRAM, &alphajuno_state::prog_map);
+	m_maincpu->set_addrmap(AS_IO, &alphajuno_state::mks50_ext_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5564PL-20 + battery
+
+	//MB87123(config, "dco", 12_MHz_XTAL);
+
+	// LCD Unit: DM011Z-1DL3
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
+	screen.set_size(6*16, 8*1);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette", FUNC(alphajuno_state::palette_init), 2);
+
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 8);
+	m_lcdc->set_pixel_update_cb(FUNC(alphajuno_state::lcd_pixel_update));
+	m_lcdc->set_busy_factor(0.05);
 }
 
 // Original EPROM labels specify major and minor revisions with punch grids; "U" (update?) tag is separate.
@@ -73,6 +168,12 @@ ROM_START(ajuno2)
 	ROMX_LOAD("ju-2_2_4.ic24", 0x0000, 0x4000, CRC(bfedda17) SHA1(27eee472befdbc7d7ed0caaf359775d8ff3c836a), ROM_BIOS(2)) // M5M27C128
 ROM_END
 
+ROM_START(mks50)
+	ROM_REGION(0x4000, "program", 0)
+	ROM_LOAD("mks-50_v1.02.ic7", 0x0000, 0x4000, CRC(a342f90e) SHA1(8eed986051abfdf55167c179dc7c7f0822a3ba0c))
+ROM_END
+
 SYST(1985, ajuno1, 0, 0, ajuno1, ajuno1, alphajuno_state, empty_init, "Roland", "Alpha Juno-1 (JU-1) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
 //SYST(1985, hs10, ajuno1, 0, ajuno1, ajuno1, alphajuno_state, empty_init, "Roland", "SynthPlus 10 (HS-10) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
 SYST(1986, ajuno2, 0, 0, ajuno1, ajuno2, alphajuno_state, empty_init, "Roland", "Alpha Juno-2 (JU-2) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1987, mks50, 0, 0, mks50, mks50, alphajuno_state, empty_init, "Roland", "MKS-50 Synthesizer Module", MACHINE_IS_SKELETON)

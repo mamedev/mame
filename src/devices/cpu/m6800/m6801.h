@@ -166,7 +166,10 @@ protected:
 	virtual void EAT_CYCLES() override;
 	virtual void CLEANUP_COUNTERS() override;
 
-	void check_timer_event();
+	virtual void modified_tcsr();
+	virtual void set_timer_event();
+	virtual void modified_counters();
+	virtual void check_timer_event();
 	void set_rmcr(uint8_t data);
 	virtual void write_port2();
 	int m6800_rx();
@@ -274,11 +277,29 @@ protected:
 	uint8_t p7_data_r();
 	void p7_data_w(uint8_t data);
 
+	uint8_t tcsr2_r();
+	void tcsr2_w(uint8_t data);
+	uint8_t ocr2h_r();
+	void ocr2h_w(uint8_t data);
+	uint8_t ocr2l_r();
+	void ocr2l_w(uint8_t data);
+
+	virtual void m6800_check_irq2() override;
+	virtual void modified_tcsr() override;
+	virtual void set_timer_event() override;
+	virtual void modified_counters() override;
+	virtual void check_timer_event() override;
+	virtual void CLEANUP_COUNTERS() override;
+
 	devcb_read8::array<2> m_in_portx_func;
 	devcb_write8::array<3> m_out_portx_func;
 
 	uint8_t m_portx_ddr[2];
 	uint8_t m_portx_data[3];
+
+	uint8_t m_tcsr2;
+	uint8_t m_pending_tcsr2;
+	PAIR    m_output_compare2;
 };
 
 

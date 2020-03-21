@@ -71,6 +71,7 @@ const double XTAL::known_xtals[] = {
 	  1'008'000, /* 1.008_MHz_XTAL         Acorn Microcomputer (System 1) */
 	  1'056'000, /* 1.056_MHz_XTAL         Resonator - OKI M6295 on Trio The Punch h/w */
 	  1'294'400, /* 1.2944_MHz_XTAL        BBN BitGraph PSG */
+	  1'600'000, /* 1.6_MHz_XTAL           Resonator - Roland TR-707 */
 	  1'689'600, /* 1.6896_MHz_XTAL        Diablo 1355WP Printer */
 	  1'750'000, /* 1.75_MHz_XTAL          RCA CDP1861 */
 	  1'797'100, /* 1.7971_MHz_XTAL        SWTPC 6800 (with MIKBUG) */

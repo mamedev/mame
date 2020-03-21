@@ -337,7 +337,7 @@ void trs80m2_state::z80_io(address_map &map)
 	map(0xef, 0xef).w(FUNC(trs80m2_state::drvslt_w));
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0xf4, 0xf7).rw(Z80SIO_TAG, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
-	map(0xf8, 0xf8).rw(m_dmac, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0xf8, 0xf8).rw(m_dmac, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0xf9, 0xf9).w(FUNC(trs80m2_state::rom_enable_w));
 	map(0xfc, 0xfc).r(FUNC(trs80m2_state::keyboard_r)).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0xfd, 0xfd).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -751,7 +751,7 @@ void trs80m2_state::trs80m2(machine_config &config)
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio->in_pa_callback().set(FUNC(trs80m2_state::pio_pa_r));
 	m_pio->out_pa_callback().set(FUNC(trs80m2_state::pio_pa_w));
-	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pio->out_brdy_callback().set(FUNC(trs80m2_state::strobe_w));
 
 	z80sio_device& sio(Z80SIO(config, Z80SIO_TAG, 8_MHz_XTAL / 2)); // SIO/0
@@ -844,7 +844,7 @@ void trs80m16_state::trs80m16(machine_config &config)
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio->in_pa_callback().set(FUNC(trs80m2_state::pio_pa_r));
 	m_pio->out_pa_callback().set(FUNC(trs80m2_state::pio_pa_w));
-	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pio->out_brdy_callback().set(FUNC(trs80m2_state::strobe_w));
 
 	z80sio_device& sio(Z80SIO(config, Z80SIO_TAG, 8_MHz_XTAL / 2));

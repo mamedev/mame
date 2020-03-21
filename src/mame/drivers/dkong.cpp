@@ -876,7 +876,7 @@ void dkong_state::dkong3_map(address_map &map)
 void dkong_state::dkong3_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(m_z80dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));  /* dma controller */
+	map(0x00, 0x00).rw(m_z80dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));  /* dma controller */
 }
 
 /* Epos conversions */

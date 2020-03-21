@@ -728,7 +728,7 @@ void m5_state::m5_io(address_map &map)
 	map(0x35, 0x35).mirror(0x08).portr("Y5");
 	map(0x36, 0x36).mirror(0x08).portr("Y6");
 	map(0x37, 0x37).mirror(0x08).portr("JOY");
-	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x50, 0x50).mirror(0x0f).rw(FUNC(m5_state::sts_r), FUNC(m5_state::com_w));
 //  map(0x60, 0x63) SIO
 	map(0x6c, 0x6c).rw(FUNC(m5_state::mem64KBI_r), FUNC(m5_state::mem64KBI_w)); //EM-64/64KBI paging
@@ -1049,7 +1049,7 @@ void brno_state::brno_io(address_map &map)
 	map(0x35, 0x35).portr("Y5");
 	map(0x36, 0x36).portr("Y6");
 	map(0x37, 0x37).portr("JOY");
-	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x50, 0x50).mirror(0x0f).rw(FUNC(brno_state::sts_r), FUNC(brno_state::com_w));
 //  map(0x60, 0x63)                                                                            //  SIO
 	map(0x64, 0x67).rw(FUNC(brno_state::mmu_r), FUNC(brno_state::mmu_w));                           //  MMU - page select (ramdisk memory paging)

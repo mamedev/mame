@@ -1596,7 +1596,7 @@ void amiga_state::amiga_base(machine_config &config)
 	m_cia_0->irq_wr_callback().set(FUNC(amiga_state::cia_0_irq));
 	m_cia_0->pa_rd_callback().set_ioport("cia_0_port_a");
 	m_cia_0->pa_wr_callback().set(FUNC(amiga_state::cia_0_port_a_write));
-	m_cia_0->pb_wr_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_cia_0->pb_wr_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_cia_0->pc_wr_callback().set(m_centronics, FUNC(centronics_device::write_strobe));
 	m_cia_0->sp_wr_callback().set("kbd", FUNC(amiga_keyboard_bus_device::kdat_in_w)).invert();
 

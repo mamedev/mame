@@ -86,10 +86,10 @@ void slicer_state::slicer_io(address_map &map)
 	map(0x0080, 0x00ff).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff); //PCS1
 	map(0x0100, 0x010f).mirror(0x0070).w("drivelatch", FUNC(ls259_device::write_d0)).umask16(0x00ff); //PCS2
 	// TODO: 0x180 sets ack
-	map(0x0180, 0x0180).r("sasi_data_in", FUNC(input_buffer_device::bus_r)).w("sasi_data_out", FUNC(output_latch_device::bus_w)).umask16(0x00ff); //PCS3
-	map(0x0181, 0x0181).r("sasi_ctrl_in", FUNC(input_buffer_device::bus_r));
-	map(0x0184, 0x0184).r("sasi_data_in", FUNC(input_buffer_device::bus_r)).w("sasi_data_out", FUNC(output_latch_device::bus_w)).umask16(0x00ff);
-	map(0x0185, 0x0185).r("sasi_ctrl_in", FUNC(input_buffer_device::bus_r));
+	map(0x0180, 0x0180).r("sasi_data_in", FUNC(input_buffer_device::read)).w("sasi_data_out", FUNC(output_latch_device::write)).umask16(0x00ff); //PCS3
+	map(0x0181, 0x0181).r("sasi_ctrl_in", FUNC(input_buffer_device::read));
+	map(0x0184, 0x0184).r("sasi_data_in", FUNC(input_buffer_device::read)).w("sasi_data_out", FUNC(output_latch_device::write)).umask16(0x00ff);
+	map(0x0185, 0x0185).r("sasi_ctrl_in", FUNC(input_buffer_device::read));
 }
 
 static void slicer_floppies(device_slot_interface &device)

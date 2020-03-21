@@ -315,7 +315,7 @@ void hhtiger_state::z80_mem(address_map &map)
 void hhtiger_state::z80_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x03).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x00, 0x03).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x04, 0x07).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x10, 0x17).rw(m_tms9914, FUNC(tms9914_device::read), FUNC(tms9914_device::write)); // ??
 	map(0x1e, 0x1e).r(FUNC(hhtiger_state::disable_rom_r));

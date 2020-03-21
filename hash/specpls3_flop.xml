@@ -9,7 +9,38 @@ license:CC0
 
 <softwarelist name="specpls3_flop" description="Sinclair ZX Spectrum +3 disk images">
 
-	<!-- SPS / CAPS Releases -->
+<!--
+	SPS / CAPS Releases
+
+	Known missing IPF dumps:
+		3585	LED Storm: Lazer Enhanced Destruction	
+		3607	Rock Star Ate My Hamster	
+		3625	Tiger Road
+-->
+
+	<software name="qoscrup">
+		<!-- SPS (CAPS) release 3529 -->
+		<description>A Question of Scruples - The Computer Edition</description>
+		<year>1987</year>
+		<publisher>Leisure Genius</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3529 - question of scruples, a - the computer edition (europe).ipf" size="236460" crc="34d8887c" sha1="2e402eb208ce6695930a8d7e042c4b1f0f7e6944" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qos">
+		<!-- SPS (CAPS) release 3601 -->
+		<description>A Question of Sport</description>
+		<year>1989</year>
+		<publisher>Elite Systems</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3601 - question of sport, a (europe).ipf" size="236460" crc="8402bbeb" sha1="0f47e7c7326ad484f2222579c6395e29031a0115" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="aforce">
 		<!-- SPS (CAPS) release 3500 -->
@@ -91,18 +122,6 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3554 - bloodwych (europe).ipf" size="236460" crc="cb66aed6" sha1="b7bab317718a478e48a689a8ebd125a498504ebe" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="boggit">
-		<!-- SPS (CAPS) release 3555 -->
-		<description>The Boggit - Bored Too</description>
-		<year>1986</year>
-		<publisher>CRL Group</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="236460">
-				<rom name="3555 - boggit, the - bored too (europe).ipf" size="236460" crc="c9dc8d41" sha1="ae1aff98a4e60bf6272c8955a224a7b0e890c40e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -236,18 +255,6 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="260585">
 				<rom name="3563 - dark fusion (europe).ipf" size="260585" crc="9495182c" sha1="bb94b445a9909ba39f21119dcc43dbd1497aed20" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="deep">
-		<!-- SPS (CAPS) release 3506 -->
-		<description>The Deep</description>
-		<year>1988</year>
-		<publisher>U.S. Gold</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="266891">
-				<rom name="3506 - deep, the (europe).ipf" size="266891" crc="e4844d2b" sha1="95dee7ccae5613c9b04efdbde5e2bc6c69a1e735" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -512,7 +519,7 @@ license:CC0
 		<publisher>U.S. Gold</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="259471">
-				<rom name="ghouls'n'ghosts.ipf" size="259471" crc="5f056018" sha1="1d84d01a5d349843bcd4743bfb23c7a82ad9704c" offset="0" />
+				<rom name="3512 - ghouls 'n' ghosts (europe).ipf" size="259471" crc="5f056018" sha1="1d84d01a5d349843bcd4743bfb23c7a82ad9704c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -541,18 +548,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="herolanc">
-		<!-- SPS (CAPS) release 3513 -->
-		<description>Heroes of the Lance</description>
-		<year>1988</year>
-		<publisher>U.S. Gold</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="237465">
-				<rom name="3513 - heroes of the lance (europe).ipf" size="237465" crc="d25d5414" sha1="2caf612f85dc9b790102df5f6a76d90c3408c8db" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="heroqst">
 		<!-- SPS (CAPS) release 3514 -->
 		<description>Hero Quest</description>
@@ -561,6 +556,18 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="239805">
 				<rom name="3514 - heroquest (europe).ipf" size="239805" crc="fc8bb800" sha1="96538aa2fd28b7ae66916590479b0596afcc495c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="herolanc">
+		<!-- SPS (CAPS) release 3513 -->
+		<description>Heroes of the Lance</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="237465">
+				<rom name="3513 - heroes of the lance (europe).ipf" size="237465" crc="d25d5414" sha1="2caf612f85dc9b790102df5f6a76d90c3408c8db" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -637,29 +644,17 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lmohican">
-		<!-- SPS (CAPS) release 3584 -->
-		<description>The Last Mohican</description>
-		<year>1987</year>
-		<publisher>CRL Group</publisher>
+<!--	<software name="ledstorm">-->
+		<!-- SPS (CAPS) release 3585 -->
+<!--		<description>LED Storm Rally 2011</description>
+		<year>1988</year>
+		<publisher>Go!</publisher>
 		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="236460">
-				<rom name="3584 - last mohican, the (europe).ipf" size="236460" crc="ed3f624d" sha1="222b93b8e83987c8e5b83f4eb68dee8227bffc64" offset="0" />
+			<dataarea name="flop" size="266892">
+				<rom name="3585 - led storm - lazer enhanced destruction (europe).ipf" size="266892" crc="a861168e" sha1="" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="lightcor">
-		<!-- SPS (CAPS) release 3517 -->
-		<description>The Light Corridor</description>
-		<year>1991</year>
-		<publisher>Infogrames</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="125316">
-				<rom name="3517 - light corridor, the (europe).ipf" size="125316" crc="ef3b80cd" sha1="568f29ba7d1a498432737543af07ba57c4adb26c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+	</software>-->
 
 	<software name="lmidnght">
 		<!-- SPS (CAPS) release 3518 -->
@@ -794,18 +789,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ninjawar">
-		<!-- SPS (CAPS) release 3522 -->
-		<description>The Ninja Warriors</description>
-		<year>1990</year>
-		<publisher>Virgin Games</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="241110">
-				<rom name="3522 - ninja warriors, the (europe).ipf" size="241110" crc="4eb0abeb" sha1="e1ef8de2788953c9399515796ee1309ea33ccd3f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="northstr">
 		<!-- SPS (CAPS) release 3592 -->
 		<description>North Star</description>
@@ -891,18 +874,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pawn">
-		<!-- SPS (CAPS) release 3525 -->
-		<description>The Pawn</description>
-		<year>1987</year>
-		<publisher>Rainbird Software</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="236460">
-				<rom name="3525 - pawn, the (europe).ipf" size="236460" crc="468012a2" sha1="1402a94935992789fdbffa1aa07140d56eeba435" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pipmania">
 		<!-- SPS (CAPS) release 3597 -->
 		<description>Pipe Mania</description>
@@ -960,30 +931,6 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3599 - pro tennis tour (europe).ipf" size="236460" crc="e1e4448b" sha1="b8abc334bf1604934e293c133fdbe3946e744975" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="qoscrup">
-		<!-- SPS (CAPS) release 3529 -->
-		<description>A Question of Scruples - The Computer Edition</description>
-		<year>1987</year>
-		<publisher>Leisure Genius</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="236460">
-				<rom name="3529 - question of scruples, a - the computer edition (europe).ipf" size="236460" crc="34d8887c" sha1="2e402eb208ce6695930a8d7e042c4b1f0f7e6944" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="qos">
-		<!-- SPS (CAPS) release 3601 -->
-		<description>A Question of Sport</description>
-		<year>1989</year>
-		<publisher>Elite Systems</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="236460">
-				<rom name="3601 - question of sport, a (europe).ipf" size="236460" crc="8402bbeb" sha1="0f47e7c7326ad484f2222579c6395e29031a0115" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1059,6 +1006,18 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+<!--	<software name="rockhams">-->
+		<!-- SPS (CAPS) release 3607 -->
+<!--		<description>Rock Star Ate My Hamster</description>
+		<year>1989</year>
+		<publisher>Code Masters</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3607 - rock star ate my hamster (europe).ipf" size="234180" crc="7cbd3549" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>-->
 
 	<software name="rthunder">
 		<!-- SPS (CAPS) release 3608 -->
@@ -1206,18 +1165,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="spywholm">
-		<!-- SPS (CAPS) release 3615 -->
-		<description>The Spy Who Loved Me</description>
-		<year>1990</year>
-		<publisher>Domark</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="234180">
-				<rom name="3615 - spy who loved me, the (europe).ipf" size="234180" crc="6d638747" sha1="30763ad2f43935d7b63fdec20e62858357742b77" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="stalingr">
 		<!-- SPS (CAPS) release 3535 -->
 		<description>Stalingrad</description>
@@ -1286,18 +1233,6 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3618 - subbuteo - the computer game (europe).ipf" size="236460" crc="2bc39232" sha1="b4933dd0e5420e1f8c977192cef1dc09dcc0ec81" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sunxword">
-		<!-- SPS (CAPS) release 3619 -->
-		<description>The Sun Computer Crosswords Volume 1</description>
-		<year>1988</year>
-		<publisher>Akom</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="236460">
-				<rom name="3619 - sun computer crosswords volume 1, the (europe).ipf" size="236460" crc="e87a9910" sha1="5c3c7cc4c1d3ae851a1631bfb5a25ec324b33783" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1386,6 +1321,103 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="boggit">
+		<!-- SPS (CAPS) release 3555 -->
+		<description>The Boggit - Bored Too</description>
+		<year>1986</year>
+		<publisher>CRL Group</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3555 - boggit, the - bored too (europe).ipf" size="236460" crc="c9dc8d41" sha1="ae1aff98a4e60bf6272c8955a224a7b0e890c40e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deep">
+		<!-- SPS (CAPS) release 3506 -->
+		<description>The Deep</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="266891">
+				<rom name="3506 - deep, the (europe).ipf" size="266891" crc="e4844d2b" sha1="95dee7ccae5613c9b04efdbde5e2bc6c69a1e735" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lmohican">
+		<!-- SPS (CAPS) release 3584 -->
+		<description>The Last Mohican</description>
+		<year>1987</year>
+		<publisher>CRL Group</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3584 - last mohican, the (europe).ipf" size="236460" crc="ed3f624d" sha1="222b93b8e83987c8e5b83f4eb68dee8227bffc64" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lightcor">
+		<!-- SPS (CAPS) release 3517 -->
+		<description>The Light Corridor</description>
+		<year>1991</year>
+		<publisher>Infogrames</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="125316">
+				<rom name="3517 - light corridor, the (europe).ipf" size="125316" crc="ef3b80cd" sha1="568f29ba7d1a498432737543af07ba57c4adb26c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninjawar">
+		<!-- SPS (CAPS) release 3522 -->
+		<description>The Ninja Warriors</description>
+		<year>1990</year>
+		<publisher>Virgin Games</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="241110">
+				<rom name="3522 - ninja warriors, the (europe).ipf" size="241110" crc="4eb0abeb" sha1="e1ef8de2788953c9399515796ee1309ea33ccd3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pawn">
+		<!-- SPS (CAPS) release 3525 -->
+		<description>The Pawn</description>
+		<year>1987</year>
+		<publisher>Rainbird Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3525 - pawn, the (europe).ipf" size="236460" crc="468012a2" sha1="1402a94935992789fdbffa1aa07140d56eeba435" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spywholm">
+		<!-- SPS (CAPS) release 3615 -->
+		<description>The Spy Who Loved Me</description>
+		<year>1990</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3615 - spy who loved me, the (europe).ipf" size="234180" crc="6d638747" sha1="30763ad2f43935d7b63fdec20e62858357742b77" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="sunxword">
+		<!-- SPS (CAPS) release 3619 -->
+		<description>The Sun Computer Crosswords Volume 1</description>
+		<year>1988</year>
+		<publisher>Akom</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3619 - sun computer crosswords volume 1, the (europe).ipf" size="236460" crc="e87a9910" sha1="5c3c7cc4c1d3ae851a1631bfb5a25ec324b33783" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tblade">
 		<!-- SPS (CAPS) release 3623 -->
 		<description>Thunder Blade</description>
@@ -1409,6 +1441,18 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+<!--	<software name="tigeroad">-->
+		<!-- SPS (CAPS) release 3625 -->
+<!--		<description>Tiger Road</description>
+		<year>1988</year>
+		<publisher>Go!</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="266892">
+				<rom name="3625 - tiger road (europe).ipf" size="266892" crc="f47981e2" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>-->
 
 	<software name="totrecal">
 		<!-- SPS (CAPS) release 3542 -->
@@ -2641,8 +2685,8 @@ license:CC0
 		<year>1988</year>
 		<publisher>Topo Soft</publisher>
 		<part name="flop1" interface="floppy_3">
-			<feature name="part_id" value="Side A"/>
 		<!-- Side missing from dump, using same as parent set -->
+		<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="180224">
 				<rom name="transfer +3 (1988)(topo soft)(es)(side a).dsk" size="180224" crc="ce9356db" sha1="3c20847d71a2ff8227ba0205b5fecad8bb3597d0" offset="0" />
 			</dataarea>
@@ -5090,8 +5134,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="mknitrila" cloneof="mknitril">
+	<!-- May be the same edition as the IPF -->
 		<description>Magic Knight Trilogy (alt)</description>
 		<year>1988</year>
 		<publisher>Mastertronic</publisher>
@@ -5201,8 +5245,8 @@ license:CC0
 				<rom name="mega box - satan + astro marine corps (1991)(dinamic)(es)(side a).dsk" size="214784" crc="ee89887d" sha1="6f496382613dbebfd3f039cbe065ce90a806d4ac" offset="0" />
 			</dataarea>
 		</part>
-<!-- Disk 2 Side B seems to contain an unreadable copy of Disk 2 Side A. Needs investigation. -->
 		<part name="flop4" interface="floppy_3">
+		<!-- Disk 2 Side B seems to contain an unreadable copy of Disk 2 Side A. Needs investigation. -->
 			<feature name="part_id" value="Disk 2, Side B: Satan + Astro Marine Corps"/>
 			<dataarea name="flop" size="212736">
 				<rom name="mega box - satan + astro marine corps (1991)(dinamic)(es)(en)(side b).dsk" size="212736" crc="28a2d57c" sha1="96585c649730dc6434bd3c766b9e68212da0c3c1" offset="0" />
@@ -5407,8 +5451,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-<!-- Both sides contain the same games, dumps are only slightly different by the end -->
 	<software name="operast1">
+	<!-- Both sides contain the same games, dumps are only slightly different by the end -->
 		<description>Opera Storys 1</description>
 		<year>1989</year>
 		<publisher>Opera Soft</publisher>
@@ -5604,8 +5648,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="pirate33a" cloneof="pirate33">
+	<!-- May be the same edition as the IPF -->
 		<description>Pirate 3 +3 (alt)</description>
 		<year>1987</year>
 		<publisher>Pirate Software</publisher>
@@ -5905,8 +5949,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="shootdska" cloneof="shootdsk">
+	<!-- May be the same edition as the IPF -->
 		<description>Shootacular Disk 2 (alt)</description>
 		<year>1988</year>
 		<publisher>Alternative Software</publisher>
@@ -6105,8 +6149,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="sportdska" cloneof="sportdsk">
+	<!-- May be the same edition as the IPF -->
 		<description>Sportacular Disk 1 (alt)</description>
 		<year>1988</year>
 		<publisher>Alternative Software</publisher>
@@ -6175,8 +6219,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="sunxworda" cloneof="sunxword">
+	<!-- May be the same edition as the IPF -->
 		<description>The Sun Computer Crosswords Volume 1 (alt)</description>
 		<year>1988</year>
 		<publisher>Akom</publisher>
@@ -6420,8 +6464,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-<!-- Labeled as "bad dump" in TOSEC for some reason, but it's the same dump at World of Spectrum. -->
 	<software name="totalerb">
+	<!-- Labeled as "bad dump" in TOSEC for some reason, but it's the same dump at World of Spectrum. -->
 		<description>Total</description>
 		<year>1989</year>
 		<publisher>Erbe Software</publisher>
@@ -7061,8 +7105,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="aforcea" cloneof="aforce">
+	<!-- May be the same edition as the IPF -->
 		<description>Action Force - International Heroes (alt)</description>
 		<year>1987</year>
 		<publisher>Virgin Games</publisher>
@@ -7074,8 +7118,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="aforce2a" cloneof="aforce2">
+	<!-- May be the same edition as the IPF -->
 		<description>Action Force II - International Heroes (alt)</description>
 		<year>1988</year>
 		<publisher>Virgin Games</publisher>
@@ -7099,8 +7143,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="tiebreaka" cloneof="tiebreak">
+	<!-- May be the same edition as the IPF -->
 		<description>Adidas Championship Tie-Break (alt)</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>
@@ -7166,8 +7210,8 @@ license:CC0
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B"/>
 		<!-- Side missing from dump, using same as parent set -->
+			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="214784">
 				<rom name="afterburner (1988)(activision)(side b).dsk" size="214784" crc="d3330013" sha1="8348adc6e09bc227ab85ae032d6f9d8f968e1310" offset="0" />
 			</dataarea>
@@ -7486,8 +7530,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="arturaa" cloneof="artura">
+	<!-- May be the same edition as the IPF -->
 		<description>Artura (alt)</description>
 		<year>1989</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -7716,8 +7760,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="badlandsa" cloneof="badlands">
+	<!-- May be the same edition as the IPF -->
 		<description>Badlands (alt)</description>
 		<year>1990</year>
 		<publisher>Domark</publisher>
@@ -7989,8 +8033,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC) -->
 	<software name="bestialw">
+	<!-- This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC) -->
 		<description>Bestial Warrior</description>
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
@@ -8009,8 +8053,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="bhcopa" cloneof="bhcop">
+	<!-- May be the same edition as the IPF -->
 		<description>Beverly Hills Cop (alt)</description>
 		<year>1990</year>
 		<publisher>Tynesoft</publisher>
@@ -8106,8 +8150,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="bloodwyca" cloneof="bloodwyc">
+	<!-- May be the same edition as the IPF -->
 		<description>Bloodwych (alt)</description>
 		<year>1990</year>
 		<publisher>Image Works</publisher>
@@ -8119,8 +8163,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="boggita" cloneof="boggit">
+	<!-- May be the same edition as the IPF -->
 		<description>The Boggit - Bored Too (alt)</description>
 		<year>1986</year>
 		<publisher>CRL Group</publisher>
@@ -8151,8 +8195,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="bookdeada" cloneof="bookdead">
+	<!-- May be the same edition as the IPF -->
 		<description>Book of the Dead (alt)</description>
 		<year>1987</year>
 		<publisher>CRL Group</publisher>
@@ -8260,8 +8304,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="bbrga" cloneof="bbrg">
+	<!-- May be the same edition as the IPF -->
 		<description>Buffalo Bill's Wild West Show (alt)</description>
 		<year>1989</year>
 		<publisher>Tynesoft</publisher>
@@ -8333,8 +8377,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="butchilla" cloneof="butchill">
+	<!-- May be the same edition as the IPF -->
 		<description>Butcher Hill (alt)</description>
 		<year>1989</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -8454,7 +8498,7 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This is the dump at World of Spectrum -->
+<!-- This is the dump in World of Spectrum -->
 	<software name="cptplnet">
 		<description>Captain Planet and the Planeteers</description>
 		<year>1991</year>
@@ -8491,8 +8535,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="carrierca" cloneof="carrierc">
+	<!-- May be the same edition as the IPF -->
 		<description>Carrier Command (alt)</description>
 		<year>1989</year>
 		<publisher>Rainbird Software</publisher>
@@ -8552,8 +8596,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This is an old version, dated 20171114 -->
 	<software name="cvaniasia" cloneof="cvaniasi">
+	<!-- This is an old version, dated 20171114 -->
 		<description>Castlevania - Spectral Interlude (alt)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
@@ -8565,8 +8609,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This is an old version, dated 20171114 -->
 	<software name="cvaniasispa" cloneof="cvaniasi">
+	<!-- This is an old version, dated 20171114 -->
 		<description>Castlevania - Spectral Interlude (Spa) (alt)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
@@ -8578,8 +8622,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This is an old version, dated 20171117 -->
 	<software name="cvaniasiita" cloneof="cvaniasi">
+	<!-- This is an old version, dated 20171117 -->
 		<description>Castlevania - Spectral Interlude (Ita) (alt)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
@@ -8591,8 +8635,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This is an old version, dated 20171114 -->
 	<software name="cvaniasirua" cloneof="cvaniasi">
+	<!-- This is an old version, dated 20171114 -->
 		<description>Castlevania - Spectral Interlude (Rus) (alt)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
@@ -8604,8 +8648,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This is an old version, dated 20171116 -->
 	<software name="cvaniasipoa" cloneof="cvaniasi">
+	<!-- This is an old version, dated 20171116 -->
 		<description>Castlevania - Spectral Interlude (Pol) (alt)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
@@ -8683,8 +8727,8 @@ license:CC0
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
+		<!-- Side B image shared with other master disks from Zeppelin Games. Verified at World of Spectrum. -->
 			<feature name="part_id" value="Side B"/>
-	<!-- Side B image shared with other master disks from Zeppelin Games. Verified at World of Spectrum. -->
 			<dataarea name="flop" size="256">
 				<rom name="zeppelin games master disk side b.dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98" offset="0" />
 			</dataarea>
@@ -8703,8 +8747,8 @@ license:CC0
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
+		<!-- Side B image shared with other master disks from Zeppelin Games. Verified at World of Spectrum. -->
 			<feature name="part_id" value="Side B"/>
-	<!-- Side B image shared with other master disks from Zeppelin Games. Verified at World of Spectrum. -->
 			<dataarea name="flop" size="256">
 				<rom name="zeppelin games master disk side b.dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98" offset="0" />
 			</dataarea>
@@ -8798,8 +8842,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="chicag30a" cloneof="chicag30">
+	<!-- May be the same edition as the IPF -->
 		<description>Chicago 30's (alt)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
@@ -8811,8 +8855,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="chicag30b" cloneof="chicag30">
+	<!-- May be the same edition as the IPF -->
 		<description>Chicago 30's (alt 2)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
@@ -8970,7 +9014,7 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-<!-- This is the dump from World of Spectrum -->
+<!-- This is the dump in World of Spectrum -->
 	<software name="clschss4a" cloneof="clschss4">
 		<description>Colossus Chess 4 (alt)</description>
 		<year>1986</year>
@@ -8983,8 +9027,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- TOSEC specifies that it's "Side A", may require a Side B at some point? -->
 	<software name="clschss4b" cloneof="clschss4">
+	<!-- TOSEC specifies that it's "Side A", may require a Side B at some point? -->
 		<description>Colossus Chess 4 (alt 2)</description>
 		<year>1986</year>
 		<publisher>CDS Microsystems</publisher>
@@ -9009,19 +9053,28 @@ license:CC0
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="comtracr">
+	<!-- This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC) -->
 		<description>Comando Tracer</description>
-		<year>1989</year>
+		<year>1988</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
+		<!-- Dump of side A might come from standalone version -->
+			<feature name="part_id" value="Side A: ZX Spectrum"/>
 			<dataarea name="flop" size="75008">
-				<rom name="comando tracer (1989)(dinamic)(es).dsk" size="75008" crc="985c2136" sha1="be76783bd8429b9f3ec2cd8702e7419b1c632ee6" offset="0" />
+				<rom name="comando tracer (1988)(dinamic)(es).dsk" size="75008" crc="985c2136" sha1="be76783bd8429b9f3ec2cd8702e7419b1c632ee6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Amstrad CPC"/>
+			<dataarea name="flop" size = "69871">
+				<rom name="comando tracer (s) (1988) (cpm) [original].dsk" size="69871" crc="0261b785" sha1="767457b02516699c9d463f6c0ba69402fe87a813" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-<!-- May be a clone of combatsc -->
 	<software name="combatsg">
+	<!-- May be a clone of combatsc -->
 		<description>Combat School + Gryzor Preview</description>
 		<year>1987</year>
 		<publisher>Ocean Software</publisher>
@@ -9069,8 +9122,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="corruptna" cloneof="corruptn">
+	<!-- May be the same edition as the IPF -->
 		<description>Corruption (alt)</description>
 		<year>1988</year>
 		<publisher>Rainbird Software</publisher>
@@ -9082,8 +9135,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="corruptnb" cloneof="corruptn">
+	<!-- May be the same edition as the IPF -->
 		<description>Corruption (alt 2)</description>
 		<year>1988</year>
 		<publisher>Rainbird Software</publisher>
@@ -9095,8 +9148,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="corruptnc" cloneof="corruptn">
+	<!-- May be the same edition as the IPF -->
 		<description>Corruption (alt 3)</description>
 		<year>1988</year>
 		<publisher>Rainbird Software</publisher>
@@ -9228,8 +9281,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="cybernoda" cloneof="cybernod">
+	<!-- May be the same edition as the IPF -->
 		<description>Cybernoid - The Fighting Machine (alt)</description>
 		<year>1988</year>
 		<publisher>Hewson Consultants</publisher>
@@ -9241,8 +9294,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="cyberno2a" cloneof="cyberno2">
+	<!-- May be the same edition as the IPF -->
 		<description>Cybernoid II - The Revenge (alt)</description>
 		<year>1988</year>
 		<publisher>Hewson Consultants</publisher>
@@ -9315,8 +9368,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="dandare3a" cloneof="dandare3">
+	<!-- May be the same edition as the IPF -->
 		<description>Dan Dare III - The Escape (alt)</description>
 		<year>1990</year>
 		<publisher>Virgin Games</publisher>
@@ -9347,8 +9400,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="darkfusna" cloneof="darkfusn">
+	<!-- May be the same edition as the IPF -->
 		<description>Dark Fusion (alt)</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -9480,8 +9533,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="deepa" cloneof="deep">
+	<!-- May be the same edition as the IPF -->
 		<description>The Deep (alt)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
@@ -9505,8 +9558,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="deflektra" cloneof="deflektr">
+	<!-- May be the same edition as the IPF -->
 		<description>Deflektor (alt)</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -9578,8 +9631,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="dominatra" cloneof="dominatr">
+	<!-- May be the same edition as the IPF -->
 		<description>Dominator (alt)</description>
 		<year>1989</year>
 		<publisher>System 3 Software</publisher>
@@ -9811,8 +9864,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="echelona" cloneof="echelon">
+	<!-- May be the same edition as the IPF -->
 		<description>Echelon (alt)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
@@ -10004,8 +10057,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="erika" cloneof="erik">
+	<!-- May be the same edition as the IPF -->
 		<description>Erik - the Phantom of the Opera (alt)</description>
 		<year>1987</year>
 		<publisher>Crysys</publisher>
@@ -10041,8 +10094,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="espionaga" cloneof="espionag">
+	<!-- May be the same edition as the IPF -->
 		<description>Espionage (alt)</description>
 		<year>1988</year>
 		<publisher>Grandslam Entertainments</publisher>
@@ -10115,8 +10168,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="f16comba" cloneof="f16comb">
+	<!-- May be the same edition as the IPF -->
 		<description>F-16 Combat Pilot (alt)</description>
 		<year>1991</year>
 		<publisher>Digital Integration</publisher>
@@ -10140,8 +10193,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="federatna" cloneof="federatn">
+	<!-- May be the same edition as the IPF -->
 		<description>Federation (alt)</description>
 		<year>1988</year>
 		<publisher>CRL Group</publisher>
@@ -10252,8 +10305,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="fireflya" cloneof="firefly">
+	<!-- May be the same edition as the IPF -->
 		<description>Firefly (alt)</description>
 		<year>1988</year>
 		<publisher>Ocean Software</publisher>
@@ -10278,8 +10331,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="fisha" cloneof="fish">
+	<!-- May be the same edition as the IPF -->
 		<description>Fish! (alt)</description>
 		<year>1989</year>
 		<publisher>Rainbird Software</publisher>
@@ -10339,8 +10392,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="footdir2a" cloneof="footdir2">
+	<!-- May be the same edition as the IPF -->
 		<description>Football Director II (alt)</description>
 		<year>1987</year>
 		<publisher>D&amp;H Games</publisher>
@@ -10383,8 +10436,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="foty2a" cloneof="foty2">
+	<!-- May be the same edition as the IPF -->
 		<description>Footballer of the Year 2 (alt)</description>
 		<year>1989</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -10591,8 +10644,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="garfielda" cloneof="garfield">
+	<!-- May be the same edition as the IPF -->
 		<description>Garfield - Big, Fat, Hairy Deal (alt)</description>
 		<year>1988</year>
 		<publisher>The Edge</publisher>
@@ -10604,8 +10657,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="linekskla" cloneof="linekskl">
+	<!-- May be the same edition as the IPF -->
 		<description>Gary Lineker's Super Skills (alt)</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -10617,8 +10670,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="lineksssa" cloneof="lineksss">
+	<!-- May be the same edition as the IPF -->
 		<description>Gary Lineker's Super Star Soccer (alt)</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -10630,8 +10683,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="lineksssb" cloneof="lineksss">
+	<!-- May be the same edition as the IPF -->
 		<description>Gary Lineker's Super Star Soccer (alt 2)</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -10643,8 +10696,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="gauntletb" cloneof="gauntlet">
+	<!-- May be the same edition as the IPF -->
 		<description>Gauntlet (alt 2)</description>
 		<year>1987</year>
 		<publisher>U.S. Gold</publisher>
@@ -10656,8 +10709,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="gauntleta" cloneof="gauntlet">
+	<!-- May be the same edition as the IPF -->
 		<description>Gauntlet (alt)</description>
 		<year>1987</year>
 		<publisher>U.S. Gold</publisher>
@@ -10669,8 +10722,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="gauntlt2a" cloneof="gauntlt2">
+	<!-- May be the same edition as the IPF -->
 		<description>Gauntlet II (alt)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
@@ -10701,8 +10754,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="gazza2a" cloneof="gazza2">
+	<!-- May be the same edition as the IPF -->
 		<description>Gazza II (alt)</description>
 		<year>1990</year>
 		<publisher>Empire Software</publisher>
@@ -10769,8 +10822,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="ghoulsa" cloneof="ghouls">
+	<!-- May be the same edition as the IPF -->
 		<description>Ghouls 'n' Ghosts (alt)</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
@@ -11080,8 +11133,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="hatea" cloneof="hate">
+	<!-- May be the same edition as the IPF -->
 		<description>H.A.T.E. - Hostile All Terrain Encounter (alt)</description>
 		<year>1989</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -11179,8 +11232,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="heroqsta" cloneof="heroqst">
+	<!-- May be the same edition as the IPF -->
 		<description>Hero Quest (alt)</description>
 		<year>1991</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -11192,8 +11245,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="heroqstb" cloneof="heroqst">
+	<!-- May be the same edition as the IPF -->
 		<description>Hero Quest (alt 2)</description>
 		<year>1991</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -11205,8 +11258,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="heroqstc" cloneof="heroqst">
+	<!-- May be the same edition as the IPF -->
 		<description>Hero Quest (alt 3)</description>
 		<year>1991</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -11218,8 +11271,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="heroqstd" cloneof="heroqst">
+	<!-- May be the same edition as the IPF -->
 		<description>Hero Quest (alt 4)</description>
 		<year>1991</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -11303,8 +11356,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="herolanca" cloneof="herolanc">
+	<!-- May be the same edition as the IPF -->
 		<description>Heroes of the Lance (alt)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
@@ -11426,8 +11479,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="hkma" cloneof="hkm">
+	<!-- May be the same edition as the IPF -->
 		<description>H.K.M. - Human Killing Machine (alt)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
@@ -11709,8 +11762,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="ironlorda" cloneof="ironlord">
+	<!-- May be the same edition as the IPF -->
 		<description>Iron Lord (alt)</description>
 		<year>1989</year>
 		<publisher>Ubi Soft</publisher>
@@ -11741,8 +11794,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="italia90a" cloneof="italia90">
+	<!-- May be the same edition as the IPF -->
 		<description>Italia '90 - World Cup Soccer (alt)</description>
 		<year>1989</year>
 		<publisher>Virgin Games</publisher>
@@ -11767,8 +11820,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="offroada" cloneof="offroad">
+	<!-- May be the same edition as the IPF -->
 		<description>Ivan 'Ironman' Stewart's Super Off Road (alt)</description>
 		<year>1990</year>
 		<publisher>Virgin Games</publisher>
@@ -11953,8 +12006,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="dalglisha" cloneof="dalglish">
+	<!-- May be the same edition as the IPF -->
 		<description>Kenny Dalglish Soccer Match (alt)</description>
 		<year>1990</year>
 		<publisher>Impressions</publisher>
@@ -11978,8 +12031,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="kickoffa" cloneof="kickoff">
+	<!-- May be the same edition as the IPF -->
 		<description>Kick Off (alt)</description>
 		<year>1989</year>
 		<publisher>Anco Software</publisher>
@@ -12138,6 +12191,7 @@ license:CC0
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="ledstorm">
+	<!-- May be the same edition as the IPF -->
 		<description>LED Storm Rally 2011</description>
 		<year>1988</year>
 		<publisher>Go!</publisher>
@@ -12216,8 +12270,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="lmohicana" cloneof="lmohican">
+	<!-- May be the same edition as the IPF -->
 		<description>The Last Mohican (alt)</description>
 		<year>1987</year>
 		<publisher>CRL Group</publisher>
@@ -12301,8 +12355,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="lightcora" cloneof="lightcor">
+	<!-- May be the same edition as the IPF -->
 		<description>The Light Corridor (alt)</description>
 		<year>1991</year>
 		<publisher>Infogrames</publisher>
@@ -12314,8 +12368,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="lightcorb" cloneof="lightcor">
+	<!-- May be the same edition as the IPF -->
 		<description>The Light Corridor (alt 2)</description>
 		<year>1991</year>
 		<publisher>Infogrames</publisher>
@@ -12327,8 +12381,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="lightcorc" cloneof="lightcor">
+	<!-- May be the same edition as the IPF -->
 		<description>The Light Corridor (alt 3)</description>
 		<year>1991</year>
 		<publisher>Infogrames</publisher>
@@ -12388,8 +12442,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="lonewolfa" cloneof="lonewolf">
+	<!-- May be the same edition as the IPF -->
 		<description>Lone Wolf - The Mirror of Death (alt)</description>
 		<year>1991</year>
 		<publisher>Audiogenic Software</publisher>
@@ -12473,8 +12527,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="lotusa" cloneof="lotus">
+	<!-- May be the same edition as the IPF -->
 		<description>Lotus Esprit Turbo Challenge (alt)</description>
 		<year>1990</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -12486,8 +12540,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="mask3a" cloneof="mask3">
+	<!-- May be the same edition as the IPF -->
 		<description>Mask III - Venom Strikes Back (alt)</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -12621,8 +12675,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="mastersa" cloneof="masters">
+	<!-- May be the same edition as the IPF -->
 		<description>Masters of the Universe - The Movie (alt)</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -12701,8 +12755,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="megapocla" cloneof="megapocl">
+	<!-- May be the same edition as the IPF -->
 		<description>MegaApocalypse (alt)</description>
 		<year>1988</year>
 		<publisher>Martech Games</publisher>
@@ -12750,8 +12804,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="mickeya" cloneof="mickey">
+	<!-- May be the same edition as the IPF -->
 		<description>Mickey Mouse - The Computer Game (alt)</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -12932,8 +12986,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="montypyta" cloneof="montypyt">
+	<!-- May be the same edition as the IPF -->
 		<description>Monty Python's Flying Circus (alt)</description>
 		<year>1990</year>
 		<publisher>Virgin Games</publisher>
@@ -13196,19 +13250,6 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="131584">
 				<rom name="narco police (1990)(dinamic)(es)(en).dsk" size="131584" crc="732da12d" sha1="856417a7c4902b5a88398dadf8528aab4527880d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-<!-- Spanish version includes Army Moves as a bonus. -->
-	<software name="navymovesp" cloneof="navymove">
-		<description>Navy Moves (Spa)</description>
-		<year>1988</year>
-		<publisher>Dinamic Software</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="166400">
-				<rom name="navy moves + army moves (1988)(dinamic)(es).dsk" size="166400" crc="ac230638" sha1="6eb9dd96efe181d0d9f09698501f5fb3f4d77a10" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13502,8 +13543,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="northstra" cloneof="northstr">
+	<!-- May be the same edition as the IPF -->
 		<description>North Star (alt)</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -13749,8 +13790,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="p47thuna" cloneof="p47thun">
+	<!-- May be the same edition as the IPF -->
 		<description>P-47 Thunderbolt (alt)</description>
 		<year>1990</year>
 		<publisher>Firebird Software</publisher>
@@ -13762,8 +13803,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="phmpegasa" cloneof="phmpegas">
+	<!-- May be the same edition as the IPF -->
 		<description>P.H.M. Pegasus (alt)</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
@@ -13775,8 +13816,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="paclanda" cloneof="pacland">
+	<!-- May be the same edition as the IPF -->
 		<description>Pac-Land (alt)</description>
 		<year>1989</year>
 		<publisher>Grandslam Entertainments - Quicksilva</publisher>
@@ -13855,8 +13896,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="passshta" cloneof="passsht">
+	<!-- May be the same edition as the IPF -->
 		<description>Passing Shot (alt)</description>
 		<year>1989</year>
 		<publisher>Image Works</publisher>
@@ -13880,8 +13921,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="pawna" cloneof="pawn">
+	<!-- May be the same edition as the IPF -->
 		<description>The Pawn v2.4 (alt)</description>
 		<year>1987</year>
 		<publisher>Rainbird Software</publisher>
@@ -13893,8 +13934,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="pawnb" cloneof="pawn">
+	<!-- May be the same edition as the IPF -->
 		<description>The Pawn v2.4 (alt 2)</description>
 		<year>1987</year>
 		<publisher>Rainbird Software</publisher>
@@ -14038,8 +14079,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="pipmaniaa" cloneof="pipmania">
+	<!-- May be the same edition as the IPF -->
 		<description>Pipe Mania (alt)</description>
 		<year>1990</year>
 		<publisher>Empire Software</publisher>
@@ -14070,8 +14111,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="platoona" cloneof="platoon">
+	<!-- May be the same edition as the IPF -->
 		<description>Platoon (alt)</description>
 		<year>1988</year>
 		<publisher>Ocean Software</publisher>
@@ -14083,8 +14124,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="predatr2a" cloneof="predatr2">
+	<!-- May be the same edition as the IPF -->
 		<description>Predator 2 (alt)</description>
 		<year>1991</year>
 		<publisher>Image Works</publisher>
@@ -14133,8 +14174,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="protennta" cloneof="protennt">
+	<!-- May be the same edition as the IPF -->
 		<description>Pro Tennis Tour (alt)</description>
 		<year>1990</year>
 		<publisher>Ubi Soft</publisher>
@@ -14232,8 +14273,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="qoscrupa" cloneof="qoscrup">
+	<!-- May be the same edition as the IPF -->
 		<description>A Question of Scruples - The Computer Edition (alt)</description>
 		<year>1987</year>
 		<publisher>Leisure Genius</publisher>
@@ -14245,8 +14286,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="qosa" cloneof="qos">
+	<!-- May be the same edition as the IPF -->
 		<description>A Question of Sport (alt)</description>
 		<year>1989</year>
 		<publisher>Elite Systems</publisher>
@@ -14270,8 +14311,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="rbibb2a" cloneof="rbibb2">
+	<!-- May be the same edition as the IPF -->
 		<description>R.B.I. 2 Baseball (alt)</description>
 		<year>1991</year>
 		<publisher>Domark</publisher>
@@ -14314,8 +14355,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="rbislanda" cloneof="rbisland">
+	<!-- May be the same edition as the IPF -->
 		<description>Rainbow Islands (alt)</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>
@@ -14370,8 +14411,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="renegadea" cloneof="renegade">
+	<!-- May be the same edition as the IPF -->
 		<description>Renegade (alt)</description>
 		<year>1987</year>
 		<publisher>Imagine Software</publisher>
@@ -14383,8 +14424,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="renegadeb" cloneof="renegade">
+	<!-- May be the same edition as the IPF -->
 		<description>Renegade (alt 2)</description>
 		<year>1987</year>
 		<publisher>Imagine Software</publisher>
@@ -14396,21 +14437,21 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-<!-- This is the dump from World of Spectrum -->
 	<software name="rescatla">
+	<!-- This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC) -->
 		<description>Rescate Atlantida</description>
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
-			<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A: ZX Spectrum"/>
 			<dataarea name="flop" size="150272">
-				<rom name="rescate atlantida (1989)(dinamic)(es)(en)(side a).dsk" size="150272" crc="2bbc9650" sha1="9b7d423d415a9535958da60ec26624f89bc3563c" offset="0" />
+				<rom name="rescate atlantida (spectrum + amstrad) - side 1.dsk" size="150272" crc="2bbc9650" sha1="9b7d423d415a9535958da60ec26624f89bc3563c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B: Amstrad CPC"/>
 			<dataarea name="flop" size="166400">
-				<rom name="rescate atlantida (1989)(dinamic)(es)(en)(side b).dsk" size="166400" crc="a7d4f505" sha1="9d2ede9cb0ba5c96e6967a9df42425e55099fc06" offset="0" />
+				<rom name="rescate atlantida (spectrum + amstrad) - side 2.dsk" size="166400" crc="a7d4f505" sha1="9d2ede9cb0ba5c96e6967a9df42425e55099fc06" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -14476,8 +14517,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="rexa" cloneof="rex">
+	<!-- May be the same edition as the IPF -->
 		<description>Rex (alt)</description>
 		<year>1988</year>
 		<publisher>Martech Games</publisher>
@@ -14556,8 +14597,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="roadblsta" cloneof="roadblst">
+	<!-- May be the same edition as the IPF -->
 		<description>Road Blasters (alt)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
@@ -14605,8 +14646,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="robocop2a" cloneof="robocop2">
+	<!-- May be the same edition as the IPF -->
 		<description>Robocop 2 (alt)</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>
@@ -14618,8 +14659,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="robocop2b" cloneof="robocop2">
+	<!-- May be the same edition as the IPF -->
 		<description>Robocop 2 (alt 2)</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>
@@ -14650,8 +14691,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="rthundera" cloneof="rthunder">
+	<!-- May be the same edition as the IPF -->
 		<description>Rolling Thunder (alt)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
@@ -14714,8 +14755,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="rungaunta" cloneof="rungaunt">
+	<!-- May be the same edition as the IPF -->
 		<description>Run the Gauntlet (alt)</description>
 		<year>1989</year>
 		<publisher>Ocean Software</publisher>
@@ -14775,8 +14816,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="saintgrva" cloneof="saintgrv">
+	<!-- May be the same edition as the IPF -->
 		<description>Saint &amp; Greavsie (alt)</description>
 		<year>1989</year>
 		<publisher>Grandslam Entertainments</publisher>
@@ -14880,8 +14921,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="scrabdxa" cloneof="scrabdx">
+	<!-- May be the same edition as the IPF -->
 		<description>Scrabble Deluxe (alt)</description>
 		<year>1987</year>
 		<publisher>Leisure Genius</publisher>
@@ -15210,8 +15251,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="simcitya" cloneof="simcity">
+	<!-- May be the same edition as the IPF -->
 		<description>Sim City (alt)</description>
 		<year>1990</year>
 		<publisher>Infogrames</publisher>
@@ -15266,8 +15307,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="skatballa" cloneof="skatball">
+	<!-- May be the same edition as the IPF -->
 		<description>Skateball (alt)</description>
 		<year>1988</year>
 		<publisher>Ubi Soft</publisher>
@@ -15279,8 +15320,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="skullxboa" cloneof="skullxbo">
+	<!-- May be the same edition as the IPF -->
 		<description>Skull &amp; Crossbones (alt)</description>
 		<year>1991</year>
 		<publisher>Domark</publisher>
@@ -15347,8 +15388,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="snoopya" cloneof="snoopy">
+	<!-- May be the same edition as the IPF -->
 		<description>Snoopy (alt)</description>
 		<year>1990</year>
 		<publisher>The Edge</publisher>
@@ -15408,8 +15449,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="soldlghta" cloneof="soldlght">
+	<!-- May be the same edition as the IPF -->
 		<description>Soldier of Light (alt)</description>
 		<year>1988</year>
 		<publisher>ACE Software</publisher>
@@ -15457,8 +15498,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="spacecrsa" cloneof="spacecrs">
+	<!-- May be the same edition as the IPF -->
 		<description>Space Crusade (alt)</description>
 		<year>1992</year>
 		<publisher>Gremlin Graphics Software</publisher>
@@ -15582,8 +15623,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="spywholma" cloneof="spywholm">
+	<!-- May be the same edition as the IPF -->
 		<description>The Spy Who Loved Me (alt)</description>
 		<year>1990</year>
 		<publisher>Domark</publisher>
@@ -15639,8 +15680,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="stalingra" cloneof="stalingr">
+	<!-- May be the same edition as the IPF -->
 		<description>Stalingrad (alt)</description>
 		<year>1988</year>
 		<publisher>CCS</publisher>
@@ -15688,8 +15729,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="starwarsa" cloneof="starwars">
+	<!-- May be the same edition as the IPF -->
 		<description>Star Wars (alt)</description>
 		<year>1987</year>
 		<publisher>Domark</publisher>
@@ -15713,8 +15754,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="starglida" cloneof="starglid">
+	<!-- May be the same edition as the IPF -->
 		<description>Starglider (alt)</description>
 		<year>1986</year>
 		<publisher>Rainbird Software</publisher>
@@ -15738,8 +15779,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="cchaplina" cloneof="cchaplin">
+	<!-- May be the same edition as the IPF -->
 		<description>Starring Charlie Chaplin (alt)</description>
 		<year>1987</year>
 		<publisher>U.S. Gold</publisher>
@@ -15830,8 +15871,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="subbuteoa" cloneof="subbuteo">
+	<!-- May be the same edition as the IPF -->
 		<description>Subbuteo - The Computer Game (alt)</description>
 		<year>1990</year>
 		<publisher>Electronic Zoo</publisher>
@@ -15875,8 +15916,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="suprcycla" cloneof="suprcycl">
+	<!-- May be the same edition as the IPF -->
 		<description>Super Cycle (alt)</description>
 		<year>1987</year>
 		<publisher>U.S. Gold</publisher>
@@ -15912,8 +15953,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="ssinva" cloneof="ssinv">
+	<!-- May be the same edition as the IPF -->
 		<description>Super Space Invaders (alt)</description>
 		<year>1991</year>
 		<publisher>Domark</publisher>
@@ -15925,8 +15966,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="ssinvb" cloneof="ssinv">
+	<!-- May be the same edition as the IPF -->
 		<description>Super Space Invaders (alt 2)</description>
 		<year>1991</year>
 		<publisher>Domark</publisher>
@@ -15938,8 +15979,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="ssinvc" cloneof="ssinv">
+	<!-- May be the same edition as the IPF -->
 		<description>Super Space Invaders (alt 3)</description>
 		<year>1991</year>
 		<publisher>Domark</publisher>
@@ -15951,8 +15992,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="ssinvd" cloneof="ssinv">
+	<!-- May be the same edition as the IPF -->
 		<description>Super Space Invaders (alt 4)</description>
 		<year>1991</year>
 		<publisher>Domark</publisher>
@@ -16014,8 +16055,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This is an older version of the game, dated 20170922 -->
 	<software name="swoiannaa" cloneof="swoianna">
+	<!-- This is an older version of the game, dated 20170922 -->
 		<description>The Sword of IANNA (alt)</description>
 		<year>2017</year>
 		<publisher>RetroWorks</publisher>
@@ -16105,8 +16146,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="taipana" cloneof="taipan">
+	<!-- May be the same edition as the IPF -->
 		<description>Tai-Pan (alt)</description>
 		<year>1987</year>
 		<publisher>Ocean Software</publisher>
@@ -16227,8 +16268,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="tmhta" cloneof="tmht">
+	<!-- May be the same edition as the IPF -->
 		<description>Teenage Mutant Hero Turtles (alt)</description>
 		<year>1990</year>
 		<publisher>Image Works</publisher>
@@ -16241,8 +16282,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="tmhtb" cloneof="tmht">
+	<!-- May be the same edition as the IPF -->
 		<description>Teenage Mutant Hero Turtles (alt 2)</description>
 		<year>1990</year>
 		<publisher>Image Works</publisher>
@@ -16267,8 +16308,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="term2a" cloneof="term2">
+	<!-- May be the same edition as the IPF -->
 		<description>Terminator 2 - Judgment Day (alt)</description>
 		<year>1991</year>
 		<publisher>Ocean Software</publisher>
@@ -16376,8 +16417,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="tbladea" cloneof="tblade">
+	<!-- May be the same edition as the IPF -->
 		<description>Thunder Blade (alt)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
@@ -16389,8 +16430,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="tbladeb" cloneof="tblade">
+	<!-- May be the same edition as the IPF -->
 		<description>Thunder Blade (alt 2)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
@@ -16459,8 +16500,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="thdrcatsa" cloneof="thdrcats">
+	<!-- May be the same edition as the IPF -->
 		<description>Thundercats (alt)</description>
 		<year>1987</year>
 		<publisher>Elite Systems</publisher>
@@ -16637,7 +16678,7 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-<!-- This is the dump in World of Spectrum, but original version was password protected (rerelease or hack?) -->
+<!-- This is the dump in World of Spectrum, but original version was password protected (possible mod) -->
 	<software name="tmhtsp2" cloneof="tmht">
 		<description>Tortugas Ninja (unprotected)</description>
 		<year>1990</year>
@@ -16662,8 +16703,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="totrecala" cloneof="totrecal">
+	<!-- May be the same edition as the IPF -->
 		<description>Total Recall (alt)</description>
 		<year>1991</year>
 		<publisher>Ocean Software</publisher>
@@ -16699,8 +16740,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="brookinga" cloneof="brooking">
+	<!-- May be the same edition as the IPF -->
 		<description>Trevor Brooking's World Cup Glory (alt)</description>
 		<year>1990</year>
 		<publisher>Challenge</publisher>
@@ -17139,8 +17180,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="vigilanta" cloneof="vigilant">
+	<!-- May be the same edition as the IPF -->
 		<description>Vigilante (alt)</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
@@ -17152,8 +17193,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="vigilantb" cloneof="vigilant">
+	<!-- May be the same edition as the IPF -->
 		<description>Vigilante (alt 2)</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
@@ -17165,8 +17206,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="vigilantc" cloneof="vigilant">
+	<!-- May be the same edition as the IPF -->
 		<description>Vigilante (alt 3)</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
@@ -17306,18 +17347,6 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<software name="wanderer">
-		<description>Wanderer</description>
-		<year>1989</year>
-		<publisher>MCM Software</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="85760">
-				<rom name="wanderer (1989)(mcm)(es)(en)[re-release].dsk" size="85760" crc="79b50978" sha1="3d3101f5d9ea075b837fe68caff99eb0947c811a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="wander3d">
 		<description>Wanderer 3D</description>
 		<year>1989</year>
@@ -17325,6 +17354,18 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="214784">
 				<rom name="wanderer 3d (1989)(elite systems).dsk" size="214784" crc="4c413eed" sha1="0b9044bc343f198521e09ec8b09c95799d4f9209" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
+	<software name="wander3dsp" cloneof="wander3d">
+		<description>Wanderer 3D (Spa)</description>
+		<year>1989</year>
+		<publisher>MCM Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="85760">
+				<rom name="wanderer (1989)(mcm)(es)(en)[re-release].dsk" size="85760" crc="79b50978" sha1="3d3101f5d9ea075b837fe68caff99eb0947c811a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -17342,8 +17383,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="warmidlea" cloneof="warmidle">
+	<!-- May be the same edition as the IPF -->
 		<description>War in Middle Earth (alt)</description>
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
@@ -17386,8 +17427,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="welltrisa" cloneof="welltris">
+	<!-- May be the same edition as the IPF -->
 		<description>Welltris (alt)</description>
 		<year>1991</year>
 		<publisher>Infogrames</publisher>
@@ -17466,8 +17507,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="wcboxmana" cloneof="wcboxman">
+	<!-- May be the same edition as the IPF -->
 		<description>World Championship Boxing Manager (alt)</description>
 		<year>1990</year>
 		<publisher>Goliath Games</publisher>
@@ -17585,8 +17626,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="xouta" cloneof="xout">
+	<!-- May be the same edition as the IPF -->
 		<description>X-Out (alt)</description>
 		<year>1990</year>
 		<publisher>Rainbow Arts</publisher>
@@ -17618,8 +17659,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="xenona" cloneof="xenon">
+	<!-- May be the same edition as the IPF -->
 		<description>Xenon (alt)</description>
 		<year>1988</year>
 		<publisher>Melbourne House</publisher>
@@ -17651,7 +17692,7 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- This is the dump at World of Spectrum -->
+	<!-- This is the dump in World of Spectrum -->
 	<software name="xenophoba" cloneof="xenophob">
 		<description>Xenophobe (alt)</description>
 		<year>1989</year>
@@ -17664,8 +17705,8 @@ license:CC0
 	</software>
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
-	<!-- May be the same edition as the IPF -->
 	<software name="xybotsa" cloneof="xybots">
+	<!-- May be the same edition as the IPF -->
 		<description>Xybots (alt)</description>
 		<year>1989</year>
 		<publisher>Domark</publisher>
@@ -19641,11 +19682,11 @@ license:CC0
 	</software>
 
 	<software name="narcsp" cloneof="narc">
-	<!-- This dump of Side A has been manually fixed, a new untampered one may be needed for verification. -->
 		<description>NARC (Spa)</description>
 		<year>1990</year>
 		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
+		<!-- This dump of Side A has been manually fixed, a new untampered one may be needed for verification. -->
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size = "226048">
 				<rom name="Narc - Side 1 (Erbe) [corregido].dsk" size="226048" crc="b2979f21" sha1="823b6e45197c40924b16cf4d61c1ace03cc035a3" offset="0"/>
@@ -19659,21 +19700,34 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC) -->
+	<software name="navymovesp" cloneof="navymove">
+	<!-- Spanish version includes Army Moves as a bonus. -->
+		<description>Navy Moves (Spa)</description>
+		<year>1988</year>
+		<publisher>Dinamic Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="166817">
+				<rom name="navy moves (doble edicion) (side a).dsk" size="166817" crc="718149f4" sha1="5018740f71bc2ae08343f4040590cfa2550333bf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="navymovespa" cloneof="navymove">
+	<!-- This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC) -->
+	<!-- Code in both sides is identical to their respective Spanish individual releases -->
 		<description>Navy Moves (Spa) (alt)</description>
 		<year>1988</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: ZX Spectrum"/>
-			<dataarea name="flop" size="166817">
-				<rom name="Navy Moves (Doble Edicion) (side A).dsk" size="166817" crc="718149f4" sha1="5018740f71bc2ae08343f4040590cfa2550333bf" offset="0" />
+			<dataarea name="flop" size = "166400">
+				<rom name="navy moves (spectrum + amstrad) - side 1 (spectrum).dsk" size="166400" crc="65a30aca" sha1="e7ba54851e45d717a9205b0219a0dde16a30028e" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
 			<feature name="part_id" value="Side B: Amstrad CPC"/>
 			<dataarea name="flop" size="214784">
-				<rom name="navy moves (1988)(dinamic)(es)(en)(side b).dsk" size="214784" crc="c32323a2" sha1="da30c11411368b22474b032f39e8f8b968f7903b" offset="0" />
+				<rom name="navy moves (spectrum + amstrad) - side 2 (amstrad).dsk" size="214784" crc="c32323a2" sha1="da30c11411368b22474b032f39e8f8b968f7903b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -19730,11 +19784,11 @@ license:CC0
 	</software>
 
 	<software name="rescatlac" cloneof="rescatla">
-	<!-- This dump of Side A has been manually fixed, a new untampered one may be needed for verification. -->
 		<description>Rescate Atlantida (alt 3)</description>
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
+		<!-- This dump of Side A has been manually fixed, a new untampered one may be needed for verification. -->
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size = "150659">
 				<rom name="Rescate Atlantida - Side 1 [restaurada].dsk" size="150659" crc="b4ba8c14" sha1="e10d4fc6f2fe250dfda0cbd491b136cd99c3a1c7" offset="0"/>
@@ -19874,8 +19928,8 @@ license:CC0
 
 <!-- Other floppy images -->
 
-	<!-- This version is dated 20180316 -->
 	<software name="cvaniasi">
+	<!-- This version is dated 20180316 -->
 		<description>Castlevania - Spectral Interlude</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
@@ -19886,8 +19940,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- This version is dated 20180316 -->
 	<software name="cvaniasiit" cloneof="cvaniasi">
+	<!-- This version is dated 20180316 -->
 		<description>Castlevania - Spectral Interlude (Ita)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
@@ -19898,8 +19952,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- This version is dated 20180316 -->
 	<software name="cvaniasipo" cloneof="cvaniasi">
+	<!-- This version is dated 20180316 -->
 		<description>Castlevania - Spectral Interlude (Pol)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
@@ -19910,8 +19964,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- This version is dated 20180316 -->
 	<software name="cvaniasiru" cloneof="cvaniasi">
+	<!-- This version is dated 20180316 -->
 		<description>Castlevania - Spectral Interlude (Rus)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
@@ -19922,8 +19976,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- This version is dated 20180316 -->
 	<software name="cvaniasisp" cloneof="cvaniasi">
+	<!-- This version is dated 20180316 -->
 		<description>Castlevania - Spectral Interlude (Spa)</description>
 		<year>2015</year>
 		<publisher>Rewind Team</publisher>
@@ -20182,8 +20236,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: Amstrad CPC, Side B: ZX Spectrum) -->
 	<software name="mercs">
+	<!-- This is a dual-system Spectrum/Amstrad release (Side A: Amstrad CPC, Side B: ZX Spectrum) -->
 		<description>Mercs</description>
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
@@ -20230,8 +20284,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- This image came from a dual-system Spectrum/Amstrad release (Side A: Amstrad CPC, Side B: ZX Spectrum) -->
 	<software name="oblitera" cloneof="obliter">
+	<!-- This is a dual-system Spectrum/Amstrad release (Side A: Amstrad CPC, Side B: ZX Spectrum) -->
 		<description>Obliterator (alt)</description>
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
@@ -20584,6 +20638,7 @@ license:CC0
 	</software>
 
 	<software name="tigeroad">
+	<!-- May be the same edition as the IPF -->
 		<description>Tiger Road</description>
 		<year>1988</year>
 		<publisher>Go!</publisher>
@@ -20682,8 +20737,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- This dump includes a question pack for Trivial Pursuit Genus Edition on side B, currently unknown if it was accidentally included with the official release. -->
 	<software name="lc10pr11">
+	<!-- This dump includes a question pack for Trivial Pursuit Genus Edition on side B, currently unknown if it was accidentally included with the official release. -->
 		<description>LC-10 Colour Screen printer v 1.1 (+2a/+3)</description>
 		<year>1990</year>
 		<publisher>Datel Electronics</publisher>

@@ -423,7 +423,7 @@ void sage2_state::sage2(machine_config &config)
 	ppi0.out_pc_callback().set(FUNC(sage2_state::ppi0_pc_w));
 
 	i8255_device &ppi1(I8255A(config, I8255A_1_TAG));
-	ppi1.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi1.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ppi1.in_pb_callback().set(FUNC(sage2_state::ppi1_pb_r));
 	ppi1.out_pc_callback().set(FUNC(sage2_state::ppi1_pc_w));
 

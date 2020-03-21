@@ -34,6 +34,32 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
+	void init_cannonb();
+	void init_cannonb2();
+	void init_cclimber();
+	void init_cclimberj();
+	void init_ckongb();
+	void init_dking();
+	void init_rpatrol();
+	void init_toprollr();
+	void init_yamato();
+
+	void root(machine_config &config);
+	void bagmanf(machine_config &config);
+	void cannonb(machine_config &config);
+	void cclimber(machine_config &config);
+	void cclimberx(machine_config &config);
+	void ckongb(machine_config &config);
+	void guzzler(machine_config &config);
+	void rpatrol(machine_config &config);
+	void swimmer(machine_config &config);
+	void toprollr(machine_config &config);
+	void yamato(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -66,30 +92,22 @@ public:
 	tilemap_t *m_toproller_bg_tilemap;
 	std::unique_ptr<uint8_t[]> m_opcodes;
 
-	DECLARE_WRITE8_MEMBER(swimmer_sh_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(yamato_p0_w);
-	DECLARE_WRITE8_MEMBER(yamato_p1_w);
-	DECLARE_READ8_MEMBER(yamato_p0_r);
-	DECLARE_READ8_MEMBER(yamato_p1_r);
-	DECLARE_WRITE_LINE_MEMBER(toprollr_rombank_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_READ8_MEMBER(bagmanf_a000_r);
-	DECLARE_WRITE8_MEMBER(cclimber_colorram_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
-	DECLARE_WRITE_LINE_MEMBER(sidebg_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
+	void swimmer_sh_soundlatch_w(uint8_t data);
+	void yamato_p0_w(uint8_t data);
+	void yamato_p1_w(uint8_t data);
+	uint8_t yamato_p0_r();
+	uint8_t yamato_p1_r();
+	void toprollr_rombank_w(int state);
+	void nmi_mask_w(int state);
+	uint8_t bagmanf_a000_r();
+	void cclimber_colorram_w(offs_t offset, uint8_t data);
+	void flip_screen_x_w(int state);
+	void flip_screen_y_w(int state);
+	void sidebg_enable_w(int state);
+	void palette_bank_w(int state);
+	void vblank_irq(int state);
+	void bagmanf_vblank_irq(int state);
 
-	virtual void machine_start() override;
-	void init_cclimber();
-	void init_yamato();
-	void init_ckongb();
-	void init_toprollr();
-	void init_cclimberj();
-	void init_cannonb2();
-	void init_cannonb();
-	void init_dking();
-	void init_rpatrol();
 	DECLARE_VIDEO_START(cclimber);
 	void cclimber_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(swimmer);
@@ -118,24 +136,14 @@ public:
 	void swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 	void cclimber_decode(const uint8_t convtable[8][16]);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	DECLARE_WRITE_LINE_MEMBER(bagmanf_vblank_irq);
-	void root(machine_config &config);
-	void swimmer(machine_config &config);
-	void guzzler(machine_config &config);
-	void toprollr(machine_config &config);
-	void cannonb(machine_config &config);
-	void yamato(machine_config &config);
-	void bagmanf(machine_config &config);
-	void cclimber(machine_config &config);
-	void cclimberx(machine_config &config);
-	void ckongb(machine_config &config);
 	void bagmanf_map(address_map &map);
 	void cannonb_map(address_map &map);
 	void cclimber_map(address_map &map);
 	void cclimber_portmap(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void guzzler_map(address_map &map);
+	void rpatrol_map(address_map &map);
+	void rpatrol_portmap(address_map &map);
 	void swimmer_audio_map(address_map &map);
 	void swimmer_audio_portmap(address_map &map);
 	void swimmer_map(address_map &map);

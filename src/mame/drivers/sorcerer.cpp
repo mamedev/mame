@@ -210,7 +210,7 @@ void sorcerer_state::sorcerer_io(address_map &map)
 	map(0xfc, 0xfc).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
 	map(0xfd, 0xfd).rw(FUNC(sorcerer_state::port_fd_r), FUNC(sorcerer_state::port_fd_w));
 	map(0xfe, 0xfe).rw(FUNC(sorcerer_state::port_fe_r), FUNC(sorcerer_state::port_fe_w));
-	map(0xff, 0xff).r("cent_status_in", FUNC(input_buffer_device::bus_r));
+	map(0xff, 0xff).r("cent_status_in", FUNC(input_buffer_device::read));
 	map(0xff, 0xff).w(FUNC(sorcerer_state::port_ff_w));
 }
 
@@ -230,7 +230,7 @@ void sorcerer_state::sorcererb_io(address_map &map)
 	sorcerer_io(map);
 	map(0x30, 0x33).rw(m_fdc3, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	map(0x34, 0x37).rw(FUNC(sorcerer_state::port34_r), FUNC(sorcerer_state::port34_w));
-	map(0x38, 0x3b).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x38, 0x3b).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 }
 
 void sorcerer_state::sorcererd_io(address_map &map)

@@ -11,6 +11,14 @@
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
 
+//
+// Set to 0 to use a linearized diode model in the range exceeding
+// maximum dissipation. The intention is to have a faster
+// convergence but this yet not really is observable
+//
+
+#define USE_TEXTBOOK_DIODE	(1)
+
 namespace netlist
 {
 namespace analog
@@ -147,8 +155,9 @@ namespace analog
 			  , nlconst::magic(1)
 			  , nlconst::magic(1e-15)
 			  , nlconst::magic(300.0));
+			m_name = name;
 		}
-
+		pstring m_name;
 		// Basic math
 		//
 		// I(V) = f(V)
@@ -162,7 +171,7 @@ namespace analog
 		{
 			if (TYPE == diode_e::BIPOLAR)
 			{
-				//printf("%s: %g %g\n", m_name.c_str(), nVd, (nl_fptype) m_Vd);
+#if USE_TEXTBOOK_DIODE
 				if (nVd > m_Vcrit)
 				{
 					// if the old voltage is less than zero and new is above
@@ -187,6 +196,28 @@ namespace analog
 					m_Id = IseVDVt - m_Is;
 					m_G = IseVDVt * m_VtInv + m_gmin;
 				}
+#else
+				//printf("%s: %g %g\n", m_name.c_str(), nVd, (nl_fptype) m_Vd);
+				m_Vd = nVd;
+				if (nVd > m_Vcrit)
+				{
+					m_Id = m_Icrit_p_Is - m_Is + (m_Vd - m_Vcrit) * m_Icrit_p_Is * m_VtInv;
+					m_G = m_Icrit_p_Is * m_VtInv + m_gmin;
+				}
+				else if (m_Vd < m_Vmin)
+				{
+					m_G = m_gmin;
+					//m_Id = m_Imin + (m_Vd - m_Vmin) * m_gmin;
+					//m_Imin = m_gmin * m_Vt - m_Is;
+					m_Id = (m_Vd - m_Vmin + m_Vt) * m_gmin - m_Is;
+				}
+				else
+				{
+					const auto IseVDVt = plib::exp(m_logIs + m_Vd * m_VtInv);
+					m_Id = IseVDVt - m_Is;
+					m_G = IseVDVt * m_VtInv + m_gmin;
+				}
+#endif
 			}
 			else if (TYPE == diode_e::MOS)
 			{
@@ -212,14 +243,29 @@ namespace analog
 			m_gmin = gmin;
 
 			m_Vt = n * temp * nlconst::k_b() / nlconst::Q_e();
+			m_VtInv = plib::reciprocal(m_Vt);
 
+#if USE_TEXTBOOK_DIODE
 			m_Vmin = nlconst::magic(-5.0) * m_Vt;
-
 			// Vcrit : f(V) has smallest radius of curvature rho(V) == min(rho(v))
 			m_Vcrit = m_Vt * plib::log(m_Vt / m_Is / nlconst::sqrt2());
-			m_VtInv = plib::reciprocal(m_Vt);
-		}
+#else
+			m_Vmin = plib::log(m_gmin * m_Vt / m_Is) * m_Vt;
+			//m_Imin = plib::exp(m_logIs + m_Vmin * m_VtInv) - m_Is;
+			//m_Imin = m_gmin * m_Vt - m_Is;
+			// Fixme: calculate max dissipation voltage - use use 0.5 (500mW) here for typical diode
+			// P = V * I = V * (Is*exp(V/Vt) - Is)
+			// P ~= V * I = V * Is*exp(V/Vt)
+			// ln(P/Is) = ln(V)+V/Vt ~= V - 1 + V/vt
+			// V = (1+ln(P/Is))/(1 + 1/Vt)
 
+			m_Vcrit = (1.0 + plib::log(0.5 / m_Is)) / (1.0 + m_VtInv);
+			//printf("Vcrit: %f\n", m_Vcrit);
+			m_Icrit_p_Is = plib::exp(m_logIs + m_Vcrit * m_VtInv);
+			//m_Icrit = plib::exp(m_logIs + m_Vcrit * m_VtInv) - m_Is;
+#endif
+
+		}
 
 		nl_fptype I() const noexcept { return m_Id; }
 		nl_fptype G() const noexcept  { return m_G; }
@@ -241,6 +287,10 @@ namespace analog
 
 		nl_fptype m_VtInv;
 		nl_fptype m_Vcrit;
+#if !USE_TEXTBOOK_DIODE
+		//nl_fptype m_Imin;
+		nl_fptype m_Icrit_p_Is;
+#endif
 	};
 
 

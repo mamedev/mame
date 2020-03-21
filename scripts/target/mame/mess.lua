@@ -303,6 +303,7 @@ SOUNDS["IOPSPU"] = true
 SOUNDS["SWP00"] = true
 SOUNDS["SWP20"] = true
 SOUNDS["SWP30"] = true
+SOUNDS["ROLANDPCM"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -1144,6 +1145,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"elektor",
 		"elektrka",
 		"elektron",
+		"emusys",
 		"ensoniq",
 		"enterprise",
 		"entex",
@@ -2203,6 +2205,12 @@ files {
 	MAME_DIR .. "src/mame/drivers/elektronmono.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "emusys")
+files {
+	MAME_DIR .. "src/mame/drivers/emu2.cpp",
+	MAME_DIR .. "src/mame/drivers/emu3.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "ensoniq")
 files {
 	MAME_DIR .. "src/mame/drivers/esq1.cpp",
@@ -2611,6 +2619,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/kawai_k1.cpp",
 	MAME_DIR .. "src/mame/drivers/kawai_k4.cpp",
 	MAME_DIR .. "src/mame/drivers/kawai_k5.cpp",
+	MAME_DIR .. "src/mame/drivers/kawai_r100.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "kaypro")
@@ -2637,7 +2646,9 @@ createMESSProjects(_target, _subtarget, "korg")
 files {
 	MAME_DIR .. "src/mame/drivers/korgds8.cpp",
 	MAME_DIR .. "src/mame/drivers/korgdss1.cpp",
+	MAME_DIR .. "src/mame/drivers/korgdw8k.cpp",
 	MAME_DIR .. "src/mame/drivers/korgm1.cpp",
+	MAME_DIR .. "src/mame/drivers/korgz3.cpp",
 	MAME_DIR .. "src/mame/drivers/poly800.cpp",
 	MAME_DIR .. "src/mame/drivers/polysix.cpp",
 }
@@ -3238,16 +3249,23 @@ files {
 createMESSProjects(_target, _subtarget, "roland")
 files {
 	MAME_DIR .. "src/mame/drivers/alphajuno.cpp",
+	MAME_DIR .. "src/mame/drivers/juno106.cpp",
+	MAME_DIR .. "src/mame/drivers/juno6.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_cm32p.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_d10.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_d50.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_jx3p.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_jx8p.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_mt32.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_r8.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_sc55.cpp",
-	MAME_DIR .. "src/mame/drivers/tb303.cpp",
-	MAME_DIR .. "src/mame/drivers/tr606.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_tb303.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_tr606.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_tr707.cpp",
+	MAME_DIR .. "src/mame/audio/jx8p_synth.cpp",
+	MAME_DIR .. "src/mame/audio/jx8p_synth.h",
 	MAME_DIR .. "src/mame/machine/pg200.cpp",
+	MAME_DIR .. "src/mame/machine/pg200.h",
 }
 
 createMESSProjects(_target, _subtarget, "rolm")
@@ -3275,7 +3293,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/saitek_cp2000.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_delta1.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_mark5.cpp",
-	MAME_DIR .. "src/mame/drivers/saitek_president.cpp",
+	MAME_DIR .. "src/mame/drivers/saitek_prschess.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_risc2500.cpp",
 	MAME_DIR .. "src/mame/includes/saitek_stratos.h",
 	MAME_DIR .. "src/mame/drivers/saitek_ssystem3.cpp",
@@ -3857,6 +3875,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/spg2xx_senario_poker.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_mysprtch.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_vii.cpp",
+	MAME_DIR .. "src/mame/drivers/spg2xx_wiwi.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_ican.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_playvision.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_shredmjr.cpp",

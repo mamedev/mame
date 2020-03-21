@@ -1162,6 +1162,7 @@ sstingry                        // (c) 1986 Alpha Denshi Co.
 @source:alphajuno.cpp
 ajuno1                          //
 ajuno2                          //
+mks50                           //
 
 @source:alphasma.cpp
 asma2k                          //
@@ -12928,6 +12929,7 @@ airblsjs
 buzztime
 sudoelan
 carlecfg
+pvmilfin
 
 @source:electra.cpp
 avenger                         // (c) 1975 Electra
@@ -12960,6 +12962,12 @@ embargo                         //
 
 @source:emma2.cpp
 emma2                           // 1979 L.J.Technical Systems
+
+@source:emu2.cpp
+emu2                            //
+
+@source:emu3.cpp
+emu3                            //
 
 @source:enigma2.cpp
 enigma2                         // (c) 1981 Game Plan (Zilec Electronics license)
@@ -15061,6 +15069,7 @@ nc96h                           // (c) 1996 Amcoe
 nc96i                           // (c) 1996 Amcoe
 nc96j                           // (c) 1996 Amcoe
 nc96k                           // (c) 1996 Amcoe
+nc96l                           // (c) 1996 Amcoe
 nc96txt                         // (c) 2000 Amcoe
 ncb3                            // (c) 199? Dyna Electronics
 nfb96                           // (c) 1996 Amcoe
@@ -15744,6 +15753,7 @@ gnw_bfightn                     // Nintendo
 gnw_bjack                       // Nintendo
 gnw_boxing                      // Nintendo
 gnw_bsweep                      // Nintendo
+gnw_cgrab                       // Nintendo
 gnw_chef                        // Nintendo
 gnw_climber                     // Nintendo
 gnw_climbern                    // Nintendo
@@ -18389,6 +18399,12 @@ jungleyo
 @source:junior.cpp
 junior                          //
 
+@source:juno106.cpp
+juno106                         //
+
+@source:juno6.cpp
+juno6                           //
+
 @source:junofrst.cpp
 junofrst                        // GX310 (c) 1983 Konami
 junofrstg                       // GX310 (c) 1983 Konami + Gottlieb license
@@ -18484,6 +18500,9 @@ k4r                             //
 @source:kawai_k5.cpp
 k5                              //
 k5m                             //
+
+@source:kawai_r100.cpp
+r100                            //
 
 @source:kaypro.cpp
 kaypro1                         // Kaypro 1
@@ -18719,12 +18738,20 @@ korg707                         //
 dss1                            //
 dssmsrk                         //
 
+@source:korgdw8k.cpp
+dw8000                          //
+dw8000ex                        //
+ex8000                          //
+
 @source:korgm1.cpp
 korgm1                          //
 korgm1ex                        //
 korgm1p1                        //
 korgm1r                         //
 korgm1rex                       //
+
+@source:korgz3.cpp
+korgz3                          //
 
 @source:kramermc.cpp
 kramermc                        // 1987 Kramer MC
@@ -19324,6 +19351,7 @@ ptrmj                           // M14 (c) 1979
 @source:m20.cpp
 m20                             //
 m40                             //
+m44                             //
 
 @source:m24.cpp
 m21                             // Olivetti M21 Portable
@@ -31432,6 +31460,7 @@ lxcmcysw
 lxcmcyfz
 lxcmcydp
 rtvgc300
+rtvgc300fz
 red5mam
 cybar120
 mc_dg101
@@ -31482,6 +31511,7 @@ mc_hh210
 dvnimbus
 cbrs8
 mc_tv200
+rminitv
 unkra200
 ppgc200g
 fcpocket
@@ -31489,6 +31519,10 @@ mog_m320
 fapocket
 zdog
 otrail
+denv150
+techni4
+ablmini
+senwld
 
 @source:vt1682.cpp
 ii8in1
@@ -32492,6 +32526,10 @@ pentagon                        //
 olypeopl                        // Olympia People PC
 
 @source:peplus.cpp
+im1p1952                        // (c) 1995 IGT - International Game Technology
+im1p19s1                        // (c) 1995 IGT - International Game Technology
+im2p1929                        // (c) 1995 IGT - International Game Technology
+im3p1940                        // (c) 1995 IGT - International Game Technology
 pebe0014                        // (c) 1994 IGT - International Game Technology
 pebe0014a                       // (c) 1994 IGT - International Game Technology
 peip0028                        // (c) 1987 IGT - International Game Technology
@@ -34581,6 +34619,12 @@ gr700                           //
 jx3p                            //
 mks30                           //
 
+@source:roland_jx8p.cpp
+jx10                            //
+jx8p                            //
+jx8po                           //
+mks70                           //
+
 @source:roland_mt32.cpp
 cm32l                           //
 mt32                            //
@@ -34592,6 +34636,16 @@ r8mk2                           //
 
 @source:roland_sc55.cpp
 sc55                            // 1991 Sound Canvas SC-55
+
+@source:roland_tb303.cpp
+tb303                           // Roland
+
+@source:roland_tr606.cpp
+tr606                           // Roland
+
+@source:roland_tr707.cpp
+tr707                           //
+tr727                           //
 
 @source:rollerg.cpp
 rollerg                         // GX999 (c) 1991 (US)
@@ -34977,7 +35031,7 @@ ccdelta1                        //
 ccmk5
 ccmk6
 
-@source:saitek_president.cpp
+@source:saitek_prschess.cpp
 prschess
 
 @source:saitek_risc2500.cpp
@@ -35403,6 +35457,9 @@ seabattla                       // (c) 1980
 @source:sealy.cpp
 crzyddz                         // (c) 2004? Sealy
 
+@source:sealy_fr.cpp
+snowbwar                         // (c) 201? Sealy
+
 @source:seattle.cpp
 biofreak                        // (c) 1997 Midway Games (prototype)
 blitz                           // (c) 1997 Midway Games
@@ -35445,6 +35502,7 @@ bloxeedc                        // (c) 1989 Sega / Elorg
 bloxeedu                        // (c) 1989 Sega / Elorg
 borench                         // (c) 1990 Sega
 borencha                        // (c) 1990 Sega
+borenchj                        // (c) 1990 Sega
 column2j                        // (c) 1990 Sega
 columns                         // (c) 1990 Sega
 columns2                        // (c) 1990 Sega
@@ -35481,6 +35539,7 @@ tantrkor                        // (c) 1992 Sega
 tfrceac                         // (c) 1990 Sega / Technosoft
 tfrceacb                        // bootleg
 tfrceacj                        // (c) 1990 Sega / Technosoft
+tfrceacjpb                      // prototype / bootleg
 twinsqua                        // (c) 1991 Sega
 wwmarine                        // (c) 1992 Sega
 zunkyou                         // (c) 1994 Sega
@@ -37153,8 +37212,8 @@ abltenni                        //
 fordrace
 tvsprt10                        //
 decathln
-wiwi18                          //
-foxsport
+decathlna
+ablkickb
 guitarfv
 guitarss
 jjstrip
@@ -37258,6 +37317,11 @@ tvgogo                          //
 @source:spg2xx_vii.cpp
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 
+@source:spg2xx_wiwi.cpp
+wiwi18                          //
+foxsport
+lexifit
+
 @source:spg2xx_zone.cpp
 wirels60                        // Wireless 60
 zone40                          // Zone 40
@@ -37270,6 +37334,7 @@ lx_jg7415                       //
 @source:spg2xx_zone_32bit.cpp
 mywicodx                        //
 zon32bit                        // Zone 32-bit
+oplayer
 
 @source:spiders.cpp
 spiders                         // (c) 1981 Sigma Ent. Inc.
@@ -37854,6 +37919,7 @@ jak_tink
 jak_totm
 jak_ths
 smartfp                         // Smart Fit Park
+smartfps
 gormiti
 wlsair60                        // Wireless Air 60
 wrlshunt                        // Wireless: Hunting Video Game System
@@ -38747,9 +38813,6 @@ ivg09                           //
 @source:taxidriv.cpp
 taxidriv                        // [1984 Graphic Techno]
 
-@source:tb303.cpp
-tb303                           // Roland
-
 @source:tbowl.cpp
 tbowl                           // 6206 - (c) 1987 Tecmo
 tbowla                          //
@@ -39490,9 +39553,6 @@ tp84b                           // GX388 (c) 1984
 
 @source:tr175.cpp
 tr175                           // Relisys
-
-@source:tr606.cpp
-tr606                           // Roland
 
 @source:trackfld.cpp
 atlantol                        // bootleg

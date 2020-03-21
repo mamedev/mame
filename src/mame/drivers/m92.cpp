@@ -1884,7 +1884,10 @@ Chips used are...
 Nanao 08J27504A1
 Nanao 08J27291A5  @ 14.31818MHz
 
-Are these hacks?  Why is there a localized and World versions if they are hacks?
+The general consensus surrounding The Alpha Renewal version is: The US / World versions of Undercover Cops were originally released
+unfinished with lots of incomplete elements and different character names.  The Japanese version was much more complete. As a result
+the US / World versions were re-released with all the missing features from the Japanese version under the 'Alpha Renewal' title. So
+basically the subtitle might have been a "playful" reminder "this renews the alpha version to be the final version"  ;-)
 
 */
 

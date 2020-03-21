@@ -161,7 +161,7 @@ void luxor_55_21046_device::luxor_55_21046_io(address_map &map)
 	map(0x58, 0x58).mirror(0x0007).select(0xff00).r(FUNC(luxor_55_21046_device::_9a_r));
 	map(0x68, 0x6b).mirror(0xff00).r(m_fdc, FUNC(fd1793_device::read));
 	map(0x78, 0x7b).mirror(0xff00).w(m_fdc, FUNC(fd1793_device::write));
-	map(0x80, 0x80).mirror(0xff77).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x80, 0x80).mirror(0xff77).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 }
 
 
