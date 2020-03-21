@@ -72,6 +72,7 @@
  @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
+ *MP3260   TMS1000   1979, Electroplay Quickfire
  @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  @MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
@@ -775,7 +776,7 @@ ROM_START( mathmagi )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
 	ROM_LOAD( "tms1100_mathmagi_output.pla", 0, 365, NO_DUMP )
 ROM_END
 
@@ -1327,18 +1328,10 @@ static INPUT_PORTS_START( zodiac )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// output PLA is not decapped, dumped electronically
-static const u16 zodiac_output_pla[0x20] =
-{
-	0x01, 0x08, 0xa0, 0xa8, 0x40, 0x48, 0xe0, 0xe8, 0x06, 0x10, 0xa6, 0xb0, 0x46, 0x50, 0xe6, 0xf0,
-	0x7e, 0x0c, 0xb6, 0x9e, 0xcc, 0xda, 0xfa, 0x0e, 0xfe, 0xce, 0xee, 0xbc, 0xf2, 0x3c, 0x70, 0x7c
-};
-
 void zodiac_state::zodiac(machine_config &config)
 {
 	/* basic machine hardware */
 	TMS1100(config, m_maincpu, 500000); // approximation - RC osc. R=18K, C=100pF
-	m_maincpu->set_output_pla(zodiac_output_pla);
 	m_maincpu->k().set(FUNC(zodiac_state::read_k));
 	m_maincpu->r().set(FUNC(zodiac_state::write_r));
 	m_maincpu->o().set(FUNC(zodiac_state::write_o));
@@ -1362,8 +1355,11 @@ ROM_START( zodiac )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, BAD_DUMP CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
 	ROM_LOAD( "tms1100_zodiac_output.pla", 0, 365, NO_DUMP )
+
+	ROM_REGION16_LE( 0x40, "maincpu:opla_b", ROMREGION_ERASE00 ) // verified, electronic dump
+	ROM_LOAD16_BYTE( "tms1100_zodiac_output.bin", 0, 0x20, CRC(d35d64cb) SHA1(315e7ca9a18a06ff7dc0b95c6f119e093b15a41f) )
 ROM_END
 
 
@@ -2966,22 +2962,10 @@ static INPUT_PORTS_START( cnfball2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// output PLA is not decapped
-static const u16 cnfball2_output_pla[0x20] =
-{
-	// first half was dumped electronically
-	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x40, 0x01, 0x08, 0x02, 0x04, 0x00,
-
-	// rest is unused, game only outputs with status bit clear
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0
-};
-
 void cnfball2_state::cnfball2(machine_config &config)
 {
 	/* basic machine hardware */
 	TMS1100(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->set_output_pla(cnfball2_output_pla);
 	m_maincpu->k().set(FUNC(cnfball2_state::read_k));
 	m_maincpu->r().set(FUNC(cnfball2_state::write_r));
 	m_maincpu->o().set(FUNC(cnfball2_state::write_o));
@@ -3005,8 +2989,11 @@ ROM_START( cnfball2 )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
 	ROM_LOAD( "tms1100_cnfball2_output.pla", 0, 365, NO_DUMP )
+
+	ROM_REGION16_LE( 0x40, "maincpu:opla_b", ROMREGION_ERASE00 ) // verified, electronic dump, 2nd half unused
+	ROM_LOAD16_BYTE( "tms1100_cnfball2_output.bin", 0, 0x20, CRC(c51d7404) SHA1(3a00c69b52b7d0dd12ccd66428130592c7e06240) )
 ROM_END
 
 
@@ -6126,7 +6113,7 @@ ROM_START( elecbowl )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, BAD_DUMP CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
 	ROM_LOAD( "tms1100_elecbowl_output.pla", 0, 365, NO_DUMP )
 ROM_END
 
@@ -8760,7 +8747,7 @@ ROM_START( alphie )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, BAD_DUMP CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) ) // not in patent description
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
 	ROM_LOAD( "tms1000_alphie_output.pla", 0, 365, NO_DUMP ) // "
 ROM_END
 
@@ -8928,20 +8915,12 @@ static INPUT_PORTS_START( tcfballa )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Display")
 INPUT_PORTS_END
 
-// output PLA is not decapped, dumped electronically
-static const u16 tcfballa_output_pla[0x20] =
-{
-	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x00, 0x46, 0x70, 0x00, 0x00, 0x00,
-	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
-
 void tcfballa_state::tcfballa(machine_config &config)
 {
 	tcfball(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(375000); // approximation - RC osc. R=47K, C=50pF
-	m_maincpu->set_output_pla(tcfballa_output_pla);
 
 	config.set_default_layout(layout_tcfballa);
 }
@@ -8954,8 +8933,11 @@ ROM_START( tcfballa )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
 	ROM_LOAD( "tms1100_tcfballa_output.pla", 0, 365, NO_DUMP )
+
+	ROM_REGION16_LE( 0x40, "maincpu:opla_b", ROMREGION_ERASE00 ) // verified, electronic dump
+	ROM_LOAD16_BYTE( "tms1100_tcfballa_output.bin", 0, 0x20, CRC(887ad9a5) SHA1(a2bac48f555df098c1f1f0fa663e5bcb989b8987) )
 ROM_END
 
 
@@ -9131,7 +9113,7 @@ ROM_START( tandy12 )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, BAD_DUMP CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
 	ROM_LOAD( "tms1100_tandy12_output.pla", 0, 365, NO_DUMP )
 ROM_END
 
@@ -12075,18 +12057,10 @@ static INPUT_PORTS_START( ssports4 )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// output PLA is not decapped, dumped electronically
-static const u16 ssports4_output_pla[0x20] =
-{
-	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x00, 0x40, 0x40, 0x40, 0x40, 0x40
-};
-
 void ssports4_state::ssports4(machine_config &config)
 {
 	/* basic machine hardware */
 	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->set_output_pla(ssports4_output_pla);
 	m_maincpu->k().set(FUNC(ssports4_state::read_k));
 	m_maincpu->r().set(FUNC(ssports4_state::write_r));
 	m_maincpu->o().set(FUNC(ssports4_state::write_o));
@@ -12111,8 +12085,11 @@ ROM_START( ssports4 )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
 	ROM_LOAD( "tms1100_ssports4_output.pla", 0, 365, NO_DUMP )
+
+	ROM_REGION16_LE( 0x40, "maincpu:opla_b", ROMREGION_ERASE00 ) // verified, electronic dump
+	ROM_LOAD16_BYTE( "tms1100_ssports4_output.bin", 0, 0x20, CRC(cd6f162f) SHA1(3348edb697e996b5ab82be54076b9cd444e0f2b1) )
 ROM_END
 
 
