@@ -240,14 +240,15 @@ private:
 	void do_dma(uint8_t data, bool has_ntsc_bug);
 };
 
-class nes_vt_vh2009_state : public nes_vt_state
+class nes_vt_swap_op_d5_d6_state : public nes_vt_state
 {
 public:
-	nes_vt_vh2009_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt_swap_op_d5_d6_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
 	void nes_vt_vh2009(machine_config& config);
+	void nes_vt_senwld(machine_config& config);
 
 protected:
 
@@ -2166,14 +2167,21 @@ void nes_vt_dg_state::nes_vt_fa(machine_config &config)
 }
 
 
-void nes_vt_vh2009_state::nes_vt_vh2009(machine_config &config)
+void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009(machine_config &config)
 {
 	nes_vt(config);
 
 	M6502_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_vh2009_state::nes_vt_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::nes_vt_map);
 
 	//m_ppu->set_palette_mode(PAL_MODE_NEW_VG); // gives better title screens, but worse ingame, must be able to switch
+}
+
+void nes_vt_swap_op_d5_d6_state::nes_vt_senwld(machine_config &config)
+{
+	nes_vt_vh2009(config);
+
+	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
 }
 
 static INPUT_PORTS_START( nes_vt_fp )
@@ -2714,7 +2722,7 @@ ROM_END
 
 ROM_START( senwld )
 	ROM_REGION( 0x80000, "mainrom", 0 )
-	ROM_LOAD( "winlosedraw.bin", 0x00000, 0x80000, CRC(111905d2) SHA1(11582055713ba937c1ad32c4ada8683eebc1c83c) )
+	ROM_LOAD( "winlosedraw.bin", 0x00000, 0x80000, CRC(55910bf8) SHA1(c3a7594979d2167be13bf5235c454a22e1f4bb44))
 ROM_END
 
 ROM_START( ablmini )
@@ -2895,14 +2903,14 @@ CONS( 201?, denv150,   0,  0,  nes_vt_fp, nes_vt, nes_vt_hh_state, empty_init, "
 
 
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
-CONS( 200?, polmega,   0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_vh2009_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
-CONS( 200?, silv35,    0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_vh2009_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_NOT_WORKING )
+CONS( 200?, polmega,   0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
+CONS( 200?, silv35,    0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_NOT_WORKING )
 // die is marked as VH2009, as above, but no scrambled opcodes here
 CONS( 201?, techni4,   0,  0,  nes_vt_base_pal,      nes_vt, nes_vt_state,        empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )
 
 
 // same encryption as above, but seems like newer hardware (or the above aren't using most of the features)
-CONS( 200?, lpgm240,    0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_vh2009_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
+CONS( 200?, lpgm240,    0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
 
 // this has 'Shark' and 'Octopus' etc. like mc_dgear but uses scrambled bank registers
 CONS( 200?, mc_sp69,   0,  0,  nes_vt,    nes_vt, nes_vt_sp69_state, empty_init, "<unknown>", "Sports Game 69 in 1", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND)
@@ -2997,5 +3005,5 @@ CONS( 2016, mog_m320,   0,        0,  nes_vt_hh, nes_vt, nes_vt_hh_state, empty_
 
 CONS( 2017, otrail,     0,        0,  nes_vt_dg, nes_vt, nes_vt_dg_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2005, senwld,   0,          0,  nes_vt_vh2009,    nes_vt, nes_vt_vh2009_state, empty_init, "Senario", "Win, Lose or Draw (Senario)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // needs RAM in banked space, Alpha display emulating, Touchpad emulating etc.
+CONS( 2005, senwld,   0,          0,  nes_vt_senwld,    nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Win, Lose or Draw (Senario)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // needs RAM in banked space, Alpha display emulating, Touchpad emulating etc.
 
