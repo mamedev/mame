@@ -2712,6 +2712,10 @@ ROM_START( mc_tv200 )
 	ROM_LOAD( "s29gl064n90.bin", 0x00000, 0x800000, CRC(ae1905d2) SHA1(11582055713ba937c1ad32c4ada8683eebc1c83c) )
 ROM_END
 
+ROM_START( senwld )
+	ROM_REGION( 0x80000, "mainrom", 0 )
+	ROM_LOAD( "winlosedraw.bin", 0x00000, 0x80000, CRC(111905d2) SHA1(11582055713ba937c1ad32c4ada8683eebc1c83c) )
+ROM_END
 
 ROM_START( ablmini )
 	ROM_REGION( 0x800000, "mainrom", 0 )
@@ -2993,4 +2997,5 @@ CONS( 2016, mog_m320,   0,        0,  nes_vt_hh, nes_vt, nes_vt_hh_state, empty_
 
 CONS( 2017, otrail,     0,        0,  nes_vt_dg, nes_vt, nes_vt_dg_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
+CONS( 2005, senwld,   0,          0,  nes_vt_vh2009,    nes_vt, nes_vt_vh2009_state, empty_init, "Senario", "Win, Lose or Draw (Senario)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // needs RAM in banked space, Alpha display emulating, Touchpad emulating etc.
 
