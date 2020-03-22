@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/upd78k/upd78k3.h"
+#include "machine/mb63h149.h"
 
 class roland_d50_state : public driver_device
 {
@@ -19,6 +20,7 @@ public:
 	}
 
 	void d50(machine_config &config);
+	void d550(machine_config &config);
 
 private:
 	void mem_map(address_map &map);
@@ -45,7 +47,17 @@ void roland_d50_state::d50(machine_config &config)
 
 	// LCD unit is LM402802 (D-50) or LM402551 (D-550)
 
+	MB63H149(config, "key", 32.768_MHz_XTAL / 2); // on Dyna Scan Board
+	//key.int_callback().set_inputline(m_maincpu, upd78312_device::INT2_LINE);
+
 	//MB87136(config, "synthe", 32.768_MHz_XTAL);
+}
+
+void roland_d50_state::d550(machine_config &config)
+{
+	d50(config);
+
+	config.device_remove("key");
 }
 
 // the internal date format for the external program roms is as such:
@@ -118,6 +130,6 @@ ROM_START(d550) // Newer PCB with silkscreen "Roland || D-50, D-550 || MAIN BOAR
 	// ic29 is empty on boards with tc534000-sized Mask ROMs
 ROM_END
 
-SYST(1987, d50,  0,   0, d50, d50, roland_d50_state, empty_init, "Roland", "D-50 Linear Synthesizer (Ver. 2.xx)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST(1987, d50o, d50, 0, d50, d50, roland_d50_state, empty_init, "Roland", "D-50 Linear Synthesizer (Ver. 1.xx)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST(1987, d550, d50, 0, d50, d50, roland_d50_state, empty_init, "Roland", "D-550 Linear Synthesizer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(1987, d50,  0,   0, d50,  d50, roland_d50_state, empty_init, "Roland", "D-50 Linear Synthesizer (Ver. 2.xx)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(1987, d50o, d50, 0, d50,  d50, roland_d50_state, empty_init, "Roland", "D-50 Linear Synthesizer (Ver. 1.xx)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(1987, d550, d50, 0, d550, d50, roland_d50_state, empty_init, "Roland", "D-550 Linear Synthesizer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

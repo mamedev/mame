@@ -20,6 +20,7 @@
 #include "emu.h"
 #include "cpu/mcs96/i8x9x.h"
 #include "machine/bankdev.h"
+#include "machine/mb63h149.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "video/msm6222b.h"
@@ -289,6 +290,9 @@ void roland_d10_state::d10(machine_config &config)
 // Shall become a proper memcard device someday
 	NVRAM( config, m_memcs, nvram_device::DEFAULT_ALL_0 );
 
+	MB63H149(config, "key", 16.384_MHz_XTAL);
+	//key.int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(FUNC(roland_d10_state::screen_update));
@@ -309,9 +313,12 @@ void roland_d10_state::d10(machine_config &config)
 void roland_d10_state::d110(machine_config &config)
 {
 	d10(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_d10_state::d110_map);
 	//m_bank->set_data_width(8);
 	m_bank->set_addrmap(0, &roland_d10_state::d110_bank_map);
+
+	config.device_remove("key");
 }
 
 ROM_START( d10 )
