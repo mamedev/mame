@@ -138,6 +138,10 @@ tilemap038_device::tilemap038_device(const machine_config &mconfig, const char *
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 	, m_gfxno(0)
 	, m_038_cb(*this)
+	, m_xoffs(0)
+	, m_flipped_xoffs(0)
+	, m_yoffs(0)
+	, m_flipped_yoffs(0)
 {
 }
 

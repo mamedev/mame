@@ -100,6 +100,14 @@ protected:
 	virtual void device_post_load() override;
 
 private:
+
+	enum
+	{
+		TYPE_ZOOM = 0,
+		TYPE_NOZOOM = 1,
+		TYPE_ISPWRINST2 = 2
+	};
+
 	void (cave_state::*m_get_sprite_info)(int chip);
 	void (cave_state::*m_sprite_draw)(int chip, int priority);
 
@@ -116,6 +124,7 @@ private:
 	void soundlatch_ack_w(u8 data);
 	void gaia_coin_w(u8 data);
 	u16 donpachi_videoregs_r(offs_t offset);
+	template<int Chip> void videoregs_w(offs_t offset, u16 data, u16 mem_mask);
 	void korokoro_leds_w(offs_t offset, u16 data, u16 mem_mask);
 	template<int Chip> void pwrinst2_vctrl_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 sailormn_input0_r();
