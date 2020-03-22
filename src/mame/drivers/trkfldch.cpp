@@ -303,19 +303,22 @@ void trkfldch_state::draw_sprites(screen_device& screen, bitmap_ind16& bitmap, c
 		   m_spriteram[i + 1]  yyyy yyyy
 		   m_spriteram[i + 2]  tttt tttt
 		   m_spriteram[i + 3]  xxxx xxxx
-		   m_spriteram[i + 4]  --zfF-t-x
+		   m_spriteram[i + 4]  --zfF-tdx
 
 		   p = palette bits
-		   t = tile bites
+		   t = tile bits
 		   y = y pos bits
 		   x = x pos bits
 		   z = priority
 		   fF = x/y flip
+		   d = pixel double
 		*/
 
 		int y = m_spriteram[i + 1];
 		int x = m_spriteram[i + 3];
 		int tile = m_spriteram[i + 2];
+
+		int doublesize = m_spriteram[i + 4] & 0x02;
 
 		int tilehigh = m_spriteram[i + 4] & 0x04;
 		int tilehigh2 = m_spriteram[i + 0] & 0x04;
@@ -361,8 +364,7 @@ void trkfldch_state::draw_sprites(screen_device& screen, bitmap_ind16& bitmap, c
 
 		}
 
-
-		gfx->transpen(bitmap, cliprect, tile + tilegfxbase, pal, flipx, flipy, x, y, 0);
+		gfx->zoom_transpen(bitmap, cliprect, tile + tilegfxbase, pal, flipx, flipy, x, y, doublesize ? 0x20000 : 0x10000, doublesize ? 0x20000 : 0x10000, 0);
 	}
 }
 
