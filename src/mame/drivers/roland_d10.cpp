@@ -235,6 +235,7 @@ void roland_d10_state::d10_map(address_map &map)
 	map(0x0200, 0x0200).w(FUNC(roland_d10_state::so_w));
 	map(0x0300, 0x0300).w(FUNC(roland_d10_state::lcd_data_w));
 	map(0x0380, 0x0380).rw(FUNC(roland_d10_state::lcd_ctrl_r), FUNC(roland_d10_state::lcd_ctrl_w));
+	map(0x0c00, 0x0dff).rw("key", FUNC(mb63h149_device::read), FUNC(mb63h149_device::write));
 	map(0x1000, 0x7fff).rom().region("maincpu", 0x1000);
 	map(0x8000, 0xbfff).m(m_bank, FUNC(address_map_bank_device::amap8));
 	map(0xc000, 0xffff).rw(FUNC(roland_d10_state::fixed_r), FUNC(roland_d10_state::fixed_w));
