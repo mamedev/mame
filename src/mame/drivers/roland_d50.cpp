@@ -8,7 +8,9 @@
 
 #include "emu.h"
 #include "cpu/upd78k/upd78k3.h"
+#include "machine/bankdev.h"
 #include "machine/mb63h149.h"
+#include "machine/nvram.h"
 
 class roland_d50_state : public driver_device
 {
@@ -16,6 +18,7 @@ public:
 	roland_d50_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_eram(*this, "eram")
 	{
 	}
 
@@ -25,22 +28,36 @@ public:
 private:
 	void d50_mem_map(address_map &map);
 	void d550_mem_map(address_map &map);
+	void eram_map(address_map &map);
 
 	required_device<upd78312_device> m_maincpu;
+	required_device<address_map_bank_device> m_eram;
 };
 
 
 void roland_d50_state::d50_mem_map(address_map &map)
 {
 	// Internal ROM is enabled at 0000–1FFF (+5V pullup on EA pin)
-	map(0x2000, 0xf3ff).rom().region("progrom", 0x2000); // TODO: banking?
+	map(0x2000, 0x7fff).rom().region("progrom", 0x2000);
+	map(0x8000, 0xbfff).m(m_eram, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xdfff).ram();
 	map(0xf400, 0xf7ff).rw("keyscan", FUNC(mb63h149_device::read), FUNC(mb63h149_device::write));
 }
 
 void roland_d50_state::d550_mem_map(address_map &map)
 {
 	// Internal ROM is enabled at 0000–1FFF (+5V pullup on EA pin)
-	map(0x2000, 0xfdff).rom().region("progrom", 0x2000); // TODO: banking?
+	map(0x2000, 0x7fff).rom().region("progrom", 0x2000);
+	map(0x8000, 0xbfff).m(m_eram, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xdfff).ram();
+}
+
+void roland_d50_state::eram_map(address_map &map)
+{
+	map(0x00000, 0x07fff).ram().share("toneram");
+	//map(0x08000, 0x0ffff).rw(FUNC(roland_d50_state::memcard_r), FUNC(roland_d50_state::memcard_w));
+	map(0x10000, 0x13fff).mirror(0x4000).rom().region("progrom", 0x8000);
+	map(0x18000, 0x1bfff).mirror(0x4000).rom().region("progrom", 0xc000);
 }
 
 
@@ -52,6 +69,15 @@ void roland_d50_state::d50(machine_config &config)
 {
 	UPD78312(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_d50_state::d50_mem_map);
+
+	ADDRESS_MAP_BANK(config, m_eram);
+	m_eram->set_addrmap(0, &roland_d50_state::eram_map);
+	m_eram->set_data_width(8);
+	m_eram->set_endianness(ENDIANNESS_LITTLE);
+	m_eram->set_addr_width(17);
+	m_eram->set_stride(0x4000);
+
+	NVRAM(config, "toneram", nvram_device::DEFAULT_ALL_0); // HM62256LP-12 + battery
 
 	// LCD unit is LM402802 (D-50) or LM402551 (D-550)
 
