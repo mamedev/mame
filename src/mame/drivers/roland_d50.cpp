@@ -23,16 +23,24 @@ public:
 	void d550(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void d50_mem_map(address_map &map);
+	void d550_mem_map(address_map &map);
 
 	required_device<upd78312_device> m_maincpu;
 };
 
 
-void roland_d50_state::mem_map(address_map &map)
+void roland_d50_state::d50_mem_map(address_map &map)
 {
 	// Internal ROM is enabled at 0000–1FFF (+5V pullup on EA pin)
-	map(0x2000, 0xfdff).rom().region("progrom", 0x2000); // TODO: banking
+	map(0x2000, 0xf3ff).rom().region("progrom", 0x2000); // TODO: banking?
+	map(0xf400, 0xf7ff).rw("keyscan", FUNC(mb63h149_device::read), FUNC(mb63h149_device::write));
+}
+
+void roland_d50_state::d550_mem_map(address_map &map)
+{
+	// Internal ROM is enabled at 0000–1FFF (+5V pullup on EA pin)
+	map(0x2000, 0xfdff).rom().region("progrom", 0x2000); // TODO: banking?
 }
 
 
@@ -43,12 +51,12 @@ INPUT_PORTS_END
 void roland_d50_state::d50(machine_config &config)
 {
 	UPD78312(config, m_maincpu, 12_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &roland_d50_state::mem_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &roland_d50_state::d50_mem_map);
 
 	// LCD unit is LM402802 (D-50) or LM402551 (D-550)
 
-	MB63H149(config, "key", 32.768_MHz_XTAL / 2); // on Dyna Scan Board
-	//key.int_callback().set_inputline(m_maincpu, upd78312_device::INT2_LINE);
+	MB63H149(config, "keyscan", 32.768_MHz_XTAL / 2); // on Dyna Scan Board
+	//keyscan.int_callback().set_inputline(m_maincpu, upd78312_device::INT2_LINE);
 
 	//MB87136(config, "synthe", 32.768_MHz_XTAL);
 }
@@ -56,8 +64,9 @@ void roland_d50_state::d50(machine_config &config)
 void roland_d50_state::d550(machine_config &config)
 {
 	d50(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &roland_d50_state::d550_mem_map);
 
-	config.device_remove("key");
+	config.device_remove("keyscan");
 }
 
 // the internal date format for the external program roms is as such:

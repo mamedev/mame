@@ -81,7 +81,7 @@ void alphajuno_state::ajuno1_ext_map(address_map &map)
 void alphajuno_state::ajuno2_ext_map(address_map &map)
 {
 	map(0x2000, 0x27ff).mirror(0xd800).ram().share("nvram");
-	map(0x5000, 0x57ff).mirror(0x800).rw("key", FUNC(mb63h149_device::read), FUNC(mb63h149_device::write));
+	map(0x5000, 0x57ff).mirror(0x800).rw("keyscan", FUNC(mb63h149_device::read), FUNC(mb63h149_device::write));
 	map(0x8000, 0x8008).w(FUNC(alphajuno_state::lcd_w));
 }
 
@@ -138,8 +138,8 @@ void alphajuno_state::ajuno2(machine_config &config)
 	ajuno1(config);
 	m_maincpu->set_addrmap(AS_IO, &alphajuno_state::ajuno2_ext_map);
 
-	mb63h149_device &key(MB63H149(config, "key", 12_MHz_XTAL));
-	key.int_callback().set_inputline(m_maincpu, MCS51_INT0_LINE);
+	mb63h149_device &keyscan(MB63H149(config, "keyscan", 12_MHz_XTAL));
+	keyscan.int_callback().set_inputline(m_maincpu, MCS51_INT0_LINE);
 }
 
 void alphajuno_state::mks50(machine_config &config)

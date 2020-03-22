@@ -61,7 +61,7 @@ void roland_jx8p_state::jx8p_assigner_map(address_map &map)
 	map(0x2000, 0x3fff).rw("cartslot", FUNC(generic_slot_device::read_ram), FUNC(generic_slot_device::write_ram));
 	map(0x4000, 0x4007).mirror(0x1ff8).r(FUNC(roland_jx8p_state::switches_r));
 	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(roland_jx8p_state::leds_w));
-	map(0x8000, 0x87ff).mirror(0x1800).rw("key", FUNC(mb63h149_device::read), FUNC(mb63h149_device::write));
+	map(0x8000, 0x87ff).mirror(0x1800).rw("keyscan", FUNC(mb63h149_device::read), FUNC(mb63h149_device::write));
 	map(0xa000, 0xa7ff).mirror(0x1800).ram().share("nvram");
 	map(0xc000, 0xffff).rom().region("assigner", 0);
 }
@@ -70,7 +70,7 @@ void roland_jx8p_state::superjx_assigner_map(address_map &map)
 {
 	map(0x0000, 0x001f).m(m_assignercpu, FUNC(hd6303r_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram(); // internal RAM
-	map(0x1000, 0x17ff).mirror(0x800).rw("key", FUNC(mb63h149_device::read), FUNC(mb63h149_device::write));
+	map(0x1000, 0x17ff).mirror(0x800).rw("keyscan", FUNC(mb63h149_device::read), FUNC(mb63h149_device::write));
 	map(0x2000, 0x3fff).rw("cartslot", FUNC(generic_slot_device::read_ram), FUNC(generic_slot_device::write_ram));
 	map(0x4000, 0x4007).mirror(0xff8).r(FUNC(roland_jx8p_state::switches_r));
 	map(0x5000, 0x5000).mirror(0xfff).w(FUNC(roland_jx8p_state::leds_w));
@@ -315,8 +315,8 @@ void roland_jx8p_state::jx8p(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5517APL + battery
 
-	mb63h149_device &key(MB63H149(config, "key", 16_MHz_XTAL));
-	key.int_callback().set_inputline(m_assignercpu, HD6301_IRQ_LINE);
+	mb63h149_device &keyscan(MB63H149(config, "keyscan", 16_MHz_XTAL));
+	keyscan.int_callback().set_inputline(m_assignercpu, HD6301_IRQ_LINE);
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, nullptr, "jx8p_cart");
 
@@ -331,7 +331,7 @@ void roland_jx8p_state::jx8po(machine_config &config)
 {
 	jx8p(config);
 
-	MB63H130(config.replace(), "key", 16_MHz_XTAL); // no INT
+	MB63H130(config.replace(), "keyscan", 16_MHz_XTAL); // no INT
 }
 
 void roland_jx8p_state::jx10(machine_config &config)
@@ -341,8 +341,8 @@ void roland_jx8p_state::jx10(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5564PL-20 + battery
 
-	mb63h149_device &key(MB63H149(config, "key", 16_MHz_XTAL));
-	key.int_callback().set_inputline(m_assignercpu, HD6301_IRQ_LINE);
+	mb63h149_device &keyscan(MB63H149(config, "keyscan", 16_MHz_XTAL));
+	keyscan.int_callback().set_inputline(m_assignercpu, HD6301_IRQ_LINE);
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, nullptr, "jx8p_cart");
 
