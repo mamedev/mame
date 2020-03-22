@@ -1938,6 +1938,8 @@ void z180_device::device_reset()
 
 void z8s180_device::device_reset()
 {
+	z180_device::device_reset();
+
 	m_asci_ext[0] = 0x00;
 	m_asci_ext[1] = 0x00;
 	m_cmr = 0x00;
