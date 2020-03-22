@@ -699,8 +699,8 @@ pofo.cpp
 poisk1.cpp
 pokemini.cpp
 poly.cpp
-poly88.cpp
 poly800.cpp
+poly88.cpp
 poly880.cpp
 polysix.cpp
 powerstack.cpp
@@ -846,10 +846,10 @@ spg2xx_lexibook.cpp
 spg2xx_mysprtch.cpp
 spg2xx_pdc.cpp
 spg2xx_playvision.cpp
-spg2xx_skannerztv.cpp
 spg2xx_senario.cpp
 spg2xx_senario_poker.cpp
 spg2xx_shredmjr.cpp
+spg2xx_skannerztv.cpp
 spg2xx_smarttv.cpp
 spg2xx_telestory.cpp
 spg2xx_tvgogo.cpp
@@ -1087,7 +1087,6 @@ zx.cpp
 //jaguar.cpp
 +jaguar
 +jaguarcd
-//konamim2.cpp
 //neogeo.cpp
 +aes
 //vectrex.cpp
