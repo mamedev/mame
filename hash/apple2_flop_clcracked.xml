@@ -36456,4 +36456,178 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ndnotper">
+		<description>Notable People of North Dakota (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-22"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="notable people of north dakota (4am crack).dsk" size="143360" crc="b9067082" sha1="aded144536c675b7477f68b516d1c022387f338f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndprkhs">
+		<description>North Dakota Parks and Historical Sites (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<info name="release" value="2020-03-22"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota parks and historical sites (4am crack).dsk" size="143360" crc="1be8abde" sha1="fd4df9a60c3fd7bcc1425c56a321dad23cfce47d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndplants">
+		<description>North Dakota Plants (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-22"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota plants (4am crack).dsk" size="143360" crc="8d2dd87b" sha1="de9512d06ed1312e5fb78cd223d65989b1a25c85"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndpride">
+		<description>North Dakota Pride (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-22"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota pride (4am crack).dsk" size="143360" crc="71d7071e" sha1="ac7d7d584af4280b8d8d354f1362a42974c71efa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndsymbls">
+		<description>North Dakota Symbols (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-22"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota symbols (4am crack).dsk" size="143360" crc="d330ff70" sha1="e9c92bdb500e2c27e30b7a77d4ebab0b958398f0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndsenrep">
+		<description>North Dakota U.S. Senators and Representatives (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-22"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota u.s. senators and representatives (4am crack).dsk" size="143360" crc="990ca91d" sha1="6cf57c50159fc7cf90981f68e69e6c469411816f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndwildlf">
+		<description>North Dakota Wildlife (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-22"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota wildlife (4am crack).dsk" size="143360" crc="68ee645d" sha1="c961bd1abff360b5d9c677766c9f6746b313502b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsmpndra">
+		<description>The Wreck of the BSM Pandora (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Simulations Publications</publisher>
+		<info name="release" value="2020-03-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the wreck of the bsm pandora (4am crack).dsk" size="143360" crc="1cf7e5a6" sha1="9cf6d57eb525f45d70081a3be1ffe36453e145ad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seavoyms">
+		<description>The Sea Voyagers (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2020-03-22"/>
+		<!--
+			Keyboard overlay available at:
+			https://ia601404.us.archive.org/23/items/TheSeaVoyagers4amCrack/The%20Sea%20Voyagers%20%284am%20crack%29.txt
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the sea voyagers (4am crack).dsk" size="143360" crc="21466949" sha1="e277b1e1419432826046bc1feb39fa601da71b66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndminrls">
+		<description>Minerals of North Dakota (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-22"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="minerals of north dakota (4am crack).dsk" size="143360" crc="d62e156e" sha1="239bb06cb1e088d2d35d47260aa6f0736656ca8e"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
