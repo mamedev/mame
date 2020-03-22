@@ -36366,4 +36366,94 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ndc500b">
+		<description>North Dakota Cities with Population Under 500 (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-21"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota cities with population under 500 (4am crack).dsk" size="143360" crc="1986d96c" sha1="6162436dac03758b35d6e7b61da619afd799f5cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndc500u">
+		<description>North Dakota Cities With Population 500 and Above (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-21"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota cities with population 500 and above (4am crack).dsk" size="143360" crc="186b2e5e" sha1="26ccb43cc26effa373063ab2ed7ec9f19e572a2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndcnty">
+		<description>North Dakota Counties (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-21"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota counties (4am crack).dsk" size="143360" crc="e1b6370b" sha1="4e44496ffb32564dbe50a91da88d44f4975cbc23"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndexplor">
+		<description>North Dakota Explorers (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-21"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota explorers (4am crack).dsk" size="143360" crc="8fab16d9" sha1="9f1d0da2ae81925843d2b670c5c549d009d69525"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ndindtrb">
+		<description>North Dakota Indian Tribes (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>North Dakota Database Project</publisher>
+		<info name="release" value="2020-03-21"/>
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
+		set. Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
+		-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="north dakota indian tribes (4am crack).dsk" size="143360" crc="f4b7d0ca" sha1="86239cacfe478db1e71527ad351e09fc13e1327b"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
