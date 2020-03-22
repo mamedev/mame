@@ -217,12 +217,12 @@ void cave_state::get_sprite_info_cave(int chip)
 		int x, y;
 		int total_width_f, total_height_f;
 
-		if (m_spritetype[0] == 2)    /* Hot Dog Storm */
+		if ((m_videoregs[chip][5] & 0x3000) == 0)    // if bit 12/13 is 0 (or seperated per X and Y?)
 		{
 			x = (source[0] & 0x3ff) << 8;
 			y = (source[1] & 0x3ff) << 8;
 		}
-		else                        /* all others */
+		else
 		{
 			x = source[0] << 2;
 			y = source[1] << 2;
@@ -275,7 +275,7 @@ void cave_state::get_sprite_info_cave(int chip)
 			sprite->ycount0 = sprite->zoomy_re - 1;
 		}
 
-		if (m_spritetype[0] == 2)
+		if ((m_videoregs[chip][5] & 0x3000) == 0)
 		{
 			x >>= 8;
 			y >>= 8;
@@ -343,7 +343,7 @@ void cave_state::get_sprite_info_donpachi(int chip)
 		u32 code       = source[1] + ((attr & 3) << 16);
 		int x          = source[2] & 0x3ff;
 
-		if (m_spritetype[0] == 3)    /* pwrinst2 */
+		if (m_spritetype[0] & TYPE_ISPWRINST2)    /* pwrinst2 */
 			y = (source[3] + 1) & 0x3ff;
 		else
 			y = source[3] & 0x3ff;
@@ -367,7 +367,7 @@ void cave_state::get_sprite_info_donpachi(int chip)
 		int flipx    = attr & 0x0008;
 		int flipy    = attr & 0x0004;
 
-		if (m_spritetype[0] == 3)    /* pwrinst2 */
+		if (m_spritetype[0] & TYPE_ISPWRINST2)    /* pwrinst2 */
 		{
 			sprite->priority = ((attr & 0x0010) >> 4) + 2;
 			sprite->base_pen = m_sprite_base_pal + ((((attr & 0x3f00) >> 8) + ((attr & 0x0020) << 1)) * m_sprite_granularity);
@@ -398,7 +398,7 @@ void cave_state::get_sprite_info_donpachi(int chip)
 
 void cave_state::sprite_init()
 {
-	if (m_spritetype[0] == 0 || m_spritetype[0] == 2) // most of the games
+	if ((m_spritetype[0] & TYPE_NOZOOM) == 0) // most of the games
 	{
 		m_get_sprite_info = &cave_state::get_sprite_info_cave;
 		m_spritetype[1] = CAVE_SPRITETYPE_ZOOM;
