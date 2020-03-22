@@ -9,6 +9,7 @@
 #include "emu.h"
 //#include "bus/midi/midi.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/mb63h149.h"
 #include "machine/nvram.h"
 #include "video/hd44780.h"
 #include "emupal.h"
@@ -25,6 +26,7 @@ public:
 	}
 
 	void ajuno1(machine_config &config);
+	void ajuno2(machine_config &config);
 	void mks50(machine_config &config);
 
 protected:
@@ -123,6 +125,14 @@ void alphajuno_state::ajuno1(machine_config &config)
 	m_lcdc->set_busy_factor(0.005);
 }
 
+void alphajuno_state::ajuno2(machine_config &config)
+{
+	ajuno1(config);
+
+	mb63h149_device &key(MB63H149(config, "key", 12_MHz_XTAL));
+	key.int_callback().set_inputline(m_maincpu, MCS51_INT0_LINE);
+}
+
 void alphajuno_state::mks50(machine_config &config)
 {
 	I80C31(config, m_maincpu, 12_MHz_XTAL); // MSM80C31P
@@ -175,5 +185,5 @@ ROM_END
 
 SYST(1985, ajuno1, 0, 0, ajuno1, ajuno1, alphajuno_state, empty_init, "Roland", "Alpha Juno-1 (JU-1) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
 //SYST(1985, hs10, ajuno1, 0, ajuno1, ajuno1, alphajuno_state, empty_init, "Roland", "SynthPlus 10 (HS-10) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
-SYST(1986, ajuno2, 0, 0, ajuno1, ajuno2, alphajuno_state, empty_init, "Roland", "Alpha Juno-2 (JU-2) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1986, ajuno2, 0, 0, ajuno2, ajuno2, alphajuno_state, empty_init, "Roland", "Alpha Juno-2 (JU-2) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
 SYST(1987, mks50, 0, 0, mks50, mks50, alphajuno_state, empty_init, "Roland", "MKS-50 Synthesizer Module", MACHINE_IS_SKELETON)
