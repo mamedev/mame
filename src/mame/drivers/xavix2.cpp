@@ -594,10 +594,10 @@ void xavix2_state::mem(address_map &map)
 
 uint32_t xavix2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-  if(machine().input().code_pressed_once(KEYCODE_8))
-	irq_raise(8);
-  if(machine().input().code_pressed_once(KEYCODE_0))
-	irq_raise(10);
+	if(machine().input().code_pressed_once(KEYCODE_8))
+		irq_raise(8);
+	if(machine().input().code_pressed_once(KEYCODE_0))
+		irq_raise(10);
 
 	constexpr int dx = 0x400 - 320;
 	constexpr int dy = 0x200 - 200;
