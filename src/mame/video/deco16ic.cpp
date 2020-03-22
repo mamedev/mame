@@ -42,7 +42,8 @@
     Heavy Smash                 MBG     156     52              141                         153,153,153
     Night Slashers DE-0397-0    MBH     156     52,52,52        74, 141         104         153,153,153,99,200
     Night Slashers DE-0395-1    MBH     156     52,52,52        74, 141         104         113,113,153,99,200
-    Locked N Loaded             MBM     101     ?               74, 74          146         113,186,187
+3   Locked N Loaded             MBM     156     ?               74, 74          146         153,186,187
+4   Locked N Loaded (Conv.)     MBM     101     ?               74, 74          146         113,186,187
     Joe & Mac Return            MBN     156     52              141                         223,223
 2   Charlie Ninja               MBR     156     52              141                         223,223
     World Cup Volleyball 95     MBX     156     52              141             ?
@@ -61,7 +62,8 @@
 
 Note 1: Mitchell game on DECO PCB board number DEC-22V0 (S-NK-3220)
 Note 2: Mitchell games on DECO PCB board number MT5601-0
-Note 3: Fighter's History uses the 156 Encrypted ARM cpu with the encryption disabled
+Note 3: Fighter's History, Locked N Loaded uses the 156 Encrypted ARM cpu with the encryption disabled
+Note 4: Dragon gun conversion PCB
 Note *: Ganbare! Gonta!! 2 / Lady Killer Part 2 - Party Time
 
 Note: A version of Night Slashers runs on the DE-0395-1 using the 156 encryption, while a version
