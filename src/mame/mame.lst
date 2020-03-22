@@ -39644,6 +39644,7 @@ trivrus                         // 2009 AGT. Trivia R Us
 trkfldch                        // (c) 2007 Konami
 my1stddr                        // (c) 2006 Konami
 abl4play
+shtscore
 
 @source:trs80.cpp
 ht108064                        // Hradstechnika Szvetkezet HT-1080Z/64
