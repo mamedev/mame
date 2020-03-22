@@ -3258,6 +3258,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/roland_jx8p.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_mt32.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_r8.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_s10.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_sc55.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tb303.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tr606.cpp",
