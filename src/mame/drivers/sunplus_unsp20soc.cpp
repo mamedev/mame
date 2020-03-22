@@ -3,7 +3,7 @@
 /*
     (unSP 2.0 based System on a Chip)
 
-    JAKKS call this GPAC800, other sources (including Pac-Man Connect and Play test mode) call it GPL16250 
+    JAKKS call this GPAC800, other sources (including Pac-Man Connect and Play test mode) call it GPL16250
 
     die markings GCM394
      - Smart Fit Park
@@ -51,9 +51,9 @@
 
 
 
-	Non-emulation bugs (happen on real hardware):
-		paccon:  Pac-Man - Bottom set of Power Pills are squashed.
-		         Galaga - Incorrect sprite used for left shot in 'Double Ship' mode
+    Non-emulation bugs (happen on real hardware):
+        paccon:  Pac-Man - Bottom set of Power Pills are squashed.
+                 Galaga - Incorrect sprite used for left shot in 'Double Ship' mode
 
 */
 
@@ -469,7 +469,7 @@ void gcm394_game_state::cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, ui
 	// wipe existing mappings;
 	m_memory->get_program()->unmap_readwrite(0, (0x8000000*5)-1);
 	m_memory->get_program()->nop_readwrite(0, (0x8000000*5)-1); // stop logging spam if video params are invalid
-	
+
 	int start_address = 0;
 	int end_address;
 
@@ -1737,7 +1737,7 @@ void generalplus_gpac800_game_state::machine_reset()
 
 void generalplus_gpac800_game_state::nand_init210()
 {
-	m_sdram.resize(m_sdram_kwords); 
+	m_sdram.resize(m_sdram_kwords);
 	m_sdram2.resize(0x10000);
 
 	m_nandblocksize = 0x210;

@@ -1723,7 +1723,7 @@ void nes_vt_state::nes_vt_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	// ddrdismx relies on the mirroring
-	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));						/* standard PPU registers */
+	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                      /* standard PPU registers */
 	map(0x2010, 0x201f).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));   /* extra VT PPU registers */
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
@@ -1787,7 +1787,7 @@ void nes_vt_cy_state::nes_vt_bt_map(address_map &map)
 void nes_vt_hh_state::nes_vt_hh_map(address_map &map)
 {
 	map(0x0000, 0x1fff).mask(0x0fff).ram();
-	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));						/* standard PPU registers */
+	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                      /* standard PPU registers */
 	map(0x2010, 0x201f).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));   /* extra VT PPU registers */
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
@@ -1838,7 +1838,7 @@ void nes_vt_hh_state::nes_vt_fp_map(address_map &map)
 void nes_vt_dg_state::nes_vt_dg_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));						/* standard PPU registers */
+	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                      /* standard PPU registers */
 	map(0x2010, 0x201f).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));   /* extra VT PPU registers */
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
@@ -2274,7 +2274,7 @@ static INPUT_PORTS_START( timetp36 )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	// where does the 'Y' button map? no games use it?
-	PORT_START("EXTRAIN0") // see code at 8084, stored at 0x66  
+	PORT_START("EXTRAIN0") // see code at 8084, stored at 0x66
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("X") // used in the NAM-1975 rip-off 'Army Strike'
 	PORT_DIPNAME( 0x02, 0x02, "Unknown Bit 0" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -2868,25 +2868,25 @@ CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empt
 CONS( 2016, rtvgc300,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
 CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
 
-/* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme 
+/* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
 
     (handhekd units, use standard AAA batteries)
-	Lexibook Compact Cyber Arcade - Cars
-	Lexibook Compact Cyber Arcade - Paw Patrol
-	Lexibook Compact Cyber Arcade - Barbie
-	Lexibook Compact Cyber Arcade - Finding Dory
-	Lexibook Compact Cyber Arcade - Marvel Ultimate Spiderman
-	Lexibook Compact Cyber Arcade - PJ Masks
-  
-	(Handheld units, but different form factor to Compact Cyber Arcade, charged via USB)
-	Lexibook Console Colour - Minnie Mouse
-	Lexibook Console Colour - Disney's Planes
-	Lexibook Console Colour - Barbie
+    Lexibook Compact Cyber Arcade - Cars
+    Lexibook Compact Cyber Arcade - Paw Patrol
+    Lexibook Compact Cyber Arcade - Barbie
+    Lexibook Compact Cyber Arcade - Finding Dory
+    Lexibook Compact Cyber Arcade - Marvel Ultimate Spiderman
+    Lexibook Compact Cyber Arcade - PJ Masks
+
+    (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB)
+    Lexibook Console Colour - Minnie Mouse
+    Lexibook Console Colour - Disney's Planes
+    Lexibook Console Colour - Barbie
 
     (units for use with TV)
-	Lexibook Retro TV Game Console (300 Games) - Cars
+    Lexibook Retro TV Game Console (300 Games) - Cars
 
-	(more?)
+    (more?)
 */
 
 // intial code isn't valid? scrambled?

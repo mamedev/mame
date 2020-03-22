@@ -62,39 +62,39 @@
 #include "avr8dasm.h"
 #include "debugger.h"
 
-#define LOG_UNKNOWN			(1 << 1)
-#define LOG_BOOT			(1 << 2)
-#define LOG_TIMER0			(1 << 3)
-#define LOG_TIMER1			(1 << 4)
-#define LOG_TIMER2			(1 << 5)
-#define LOG_TIMER3			(1 << 6)
-#define LOG_TIMER4			(1 << 7)
-#define LOG_TIMER5			(1 << 8)
-#define LOG_TIMER0_TICK		(1 << 9)
-#define LOG_TIMER1_TICK		(1 << 10)
-#define LOG_TIMER2_TICK		(1 << 11)
-#define LOG_TIMER3_TICK		(1 << 12)
-#define LOG_TIMER4_TICK		(1 << 13)
-#define LOG_TIMER5_TICK		(1 << 14)
-#define LOG_EEPROM			(1 << 15)
-#define LOG_GPIO			(1 << 16)
-#define LOG_WDOG			(1 << 17)
-#define LOG_CLOCK			(1 << 18)
-#define LOG_POWER			(1 << 19)
-#define LOG_OSC				(1 << 20)
-#define LOG_PINCHG			(1 << 21)
-#define LOG_EXTMEM			(1 << 22)
-#define LOG_ADC				(1 << 23)
-#define LOG_DIGINPUT		(1 << 24)
-#define LOG_ASYNC			(1 << 25)
-#define LOG_TWI				(1 << 26)
-#define LOG_UART			(1 << 27)
-#define LOG_TIMERS			(LOG_TIMER0 | LOG_TIMER1 | LOG_TIMER2 | LOG_TIMER3 | LOG_TIMER4 | LOG_TIMER5)
-#define LOG_TIMER_TICKS		(LOG_TIMER0_TICK | LOG_TIMER1_TICK | LOG_TIMER2_TICK | LOG_TIMER3_TICK | LOG_TIMER4_TICK | LOG_TIMER5_TICK)
-#define LOG_ALL				(LOG_UNKNOWN | LOG_BOOT | LOG_TIMERS | LOG_TIMER_TICKS | LOG_EEPROM | LOG_GPIO | LOG_WDOG | LOG_CLOCK | LOG_POWER \
+#define LOG_UNKNOWN         (1 << 1)
+#define LOG_BOOT            (1 << 2)
+#define LOG_TIMER0          (1 << 3)
+#define LOG_TIMER1          (1 << 4)
+#define LOG_TIMER2          (1 << 5)
+#define LOG_TIMER3          (1 << 6)
+#define LOG_TIMER4          (1 << 7)
+#define LOG_TIMER5          (1 << 8)
+#define LOG_TIMER0_TICK     (1 << 9)
+#define LOG_TIMER1_TICK     (1 << 10)
+#define LOG_TIMER2_TICK     (1 << 11)
+#define LOG_TIMER3_TICK     (1 << 12)
+#define LOG_TIMER4_TICK     (1 << 13)
+#define LOG_TIMER5_TICK     (1 << 14)
+#define LOG_EEPROM          (1 << 15)
+#define LOG_GPIO            (1 << 16)
+#define LOG_WDOG            (1 << 17)
+#define LOG_CLOCK           (1 << 18)
+#define LOG_POWER           (1 << 19)
+#define LOG_OSC             (1 << 20)
+#define LOG_PINCHG          (1 << 21)
+#define LOG_EXTMEM          (1 << 22)
+#define LOG_ADC             (1 << 23)
+#define LOG_DIGINPUT        (1 << 24)
+#define LOG_ASYNC           (1 << 25)
+#define LOG_TWI             (1 << 26)
+#define LOG_UART            (1 << 27)
+#define LOG_TIMERS          (LOG_TIMER0 | LOG_TIMER1 | LOG_TIMER2 | LOG_TIMER3 | LOG_TIMER4 | LOG_TIMER5)
+#define LOG_TIMER_TICKS     (LOG_TIMER0_TICK | LOG_TIMER1_TICK | LOG_TIMER2_TICK | LOG_TIMER3_TICK | LOG_TIMER4_TICK | LOG_TIMER5_TICK)
+#define LOG_ALL             (LOG_UNKNOWN | LOG_BOOT | LOG_TIMERS | LOG_TIMER_TICKS | LOG_EEPROM | LOG_GPIO | LOG_WDOG | LOG_CLOCK | LOG_POWER \
 							 LOG_OSC | LOG_PINCHG | LOG_EXTMEM | LOG_ADC | LOG_DIGINPUT | LOG_ASYNC | LOG_TWI | LOG_UART)
 
-#define VERBOSE				(0)
+#define VERBOSE             (0)
 #include "logmacro.h"
 
 //**************************************************************************
@@ -197,9 +197,9 @@ enum
 
 static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
 
-#define SREG_R(b)	((m_r[AVR8_REGIDX_SREG] & (1 << (b))) >> (b))
-#define SREG_W(b,v)	m_r[AVR8_REGIDX_SREG] = (m_r[AVR8_REGIDX_SREG] & ~(1 << (b))) | ((v) << (b))
-#define SREG		m_r[AVR8_REGIDX_SREG]
+#define SREG_R(b)   ((m_r[AVR8_REGIDX_SREG] & (1 << (b))) >> (b))
+#define SREG_W(b,v) m_r[AVR8_REGIDX_SREG] = (m_r[AVR8_REGIDX_SREG] & ~(1 << (b))) | ((v) << (b))
+#define SREG        m_r[AVR8_REGIDX_SREG]
 #define NOT(x) (1 - (x))
 
 // Opcode-Parsing Defines
@@ -1744,7 +1744,7 @@ void avr8_device::timer4_tick()
 	// uint8_t compare_mode[2] = { (m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1A_MASK) >> AVR8_TCCR1A_COM1A_SHIFT,
 	//                             (m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1B_MASK) >> AVR8_TCCR1A_COM1B_SHIFT };
 	// uint16_t ocr4[2] = { static_cast<uint16_t>((m_r[AVR8_REGIDX_OCR4AH] << 8) | m_r[AVR8_REGIDX_OCR4AL]),
-						    // static_cast<uint16_t>((m_r[AVR8_REGIDX_OCR4BH] << 8) | m_r[AVR8_REGIDX_OCR4BL]) };
+							// static_cast<uint16_t>((m_r[AVR8_REGIDX_OCR4BH] << 8) | m_r[AVR8_REGIDX_OCR4BL]) };
 	// TODO  uint8_t ocf4[2] = { (1 << AVR8_TIFR4_OCF4A_SHIFT), (1 << AVR8_TIFR4_OCF4B_SHIFT) };
 	// TODO  uint8_t int4[2] = { AVR8_INTIDX_OCF4A, AVR8_INTIDX_OCF4B };
 	int32_t increment = m_timer_increment[4];
@@ -1934,7 +1934,7 @@ void avr8_device::timer5_tick()
 	case WGM5_PWM_8_PC:
 	case WGM5_PWM_9_PC:
 	case WGM5_PWM_10_PC:
-//	  case WGM5_CTC_OCR:
+//    case WGM5_CTC_OCR:
 	case WGM5_FAST_PWM_8:
 	case WGM5_FAST_PWM_9:
 	case WGM5_FAST_PWM_10:
@@ -2874,18 +2874,18 @@ READ8_MEMBER(avr8_device::regs_r)
 	case AVR8_REGIDX_GPIOR0:
 	case AVR8_REGIDX_GPIOR1:
 	case AVR8_REGIDX_GPIOR2:
-//    case AVR8_REGIDX_UCSR0B:	 // TODO: needed for Replicator 1
-	case AVR8_REGIDX_SPDR:	 // TODO: needed for Replicator 1
-	case AVR8_REGIDX_SPSR:	 // TODO: needed for Replicator 1
-//    case AVR8_REGIDX_ADCSRA:	 // TODO: needed for Replicator 1
-//    case AVR8_REGIDX_ADCSRB:	 // TODO: needed for Replicator 1
+//    case AVR8_REGIDX_UCSR0B:   // TODO: needed for Replicator 1
+	case AVR8_REGIDX_SPDR:   // TODO: needed for Replicator 1
+	case AVR8_REGIDX_SPSR:   // TODO: needed for Replicator 1
+//    case AVR8_REGIDX_ADCSRA:   // TODO: needed for Replicator 1
+//    case AVR8_REGIDX_ADCSRB:   // TODO: needed for Replicator 1
 	case AVR8_REGIDX_SPL:
 	case AVR8_REGIDX_SPH:
 	case AVR8_REGIDX_SREG:
 	case AVR8_REGIDX_TIMSK0:
 	case AVR8_REGIDX_TIMSK1:
 	case AVR8_REGIDX_TIMSK2:
-//    case AVR8_REGIDX_TIMSK3:	// TODO: needed for Replicator 1
+//    case AVR8_REGIDX_TIMSK3:  // TODO: needed for Replicator 1
 	case AVR8_REGIDX_TIMSK4:
 	case AVR8_REGIDX_TIMSK5:
 		return m_r[offset];

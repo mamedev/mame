@@ -6,13 +6,13 @@
     Double Density, Double-sided
 
     Two flavors:
-    
+
     * Original controller
       Named "PEB-DCC"
       Single 16K EPROM or two 8K EPROMs (selectable by jumper; only 2x8K emulated)
       Two PALs
       WD2793
-      
+
     * Modified controller with redesigned PCB
       Named "CorComp FDC Rev A"
       Two 8K EPROMs (by Millers Graphics, 3rd party HW/SW contributor)
@@ -21,7 +21,7 @@
 
     Michael Zapf
     March 2020
-    
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -75,21 +75,21 @@ namespace bus { namespace ti99 { namespace peb {
 corcomp_fdc_device::corcomp_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock):
 	  device_t(mconfig, type, tag, owner, clock),
 	  device_ti99_peribox_card_interface(mconfig, *this),
-  	  m_wdc(*this, WDC_TAG),
-   	  m_decpal(nullptr),
-  	  m_ctrlpal(nullptr),
-  	  m_motormf(*this, MOTORMF_TAG),
-  	  m_tms9901(*this, TMS9901_TAG),
- 	  m_buffer_ram(*this, BUFFER),
-  	  m_dsrrom(nullptr),
-  	  m_cardsel(false),
-  	  m_banksel(false),
-  	  m_selected_drive(0),
-  	  m_address(0),
-  	  m_writing(false)
-{ 
+	  m_wdc(*this, WDC_TAG),
+	  m_decpal(nullptr),
+	  m_ctrlpal(nullptr),
+	  m_motormf(*this, MOTORMF_TAG),
+	  m_tms9901(*this, TMS9901_TAG),
+	  m_buffer_ram(*this, BUFFER),
+	  m_dsrrom(nullptr),
+	  m_cardsel(false),
+	  m_banksel(false),
+	  m_selected_drive(0),
+	  m_address(0),
+	  m_writing(false)
+{
 }
- 
+
 SETADDRESS_DBIN_MEMBER( corcomp_fdc_device::setaddress_dbin )
 {
 	// Do not allow setaddress for debugger
@@ -100,7 +100,7 @@ SETADDRESS_DBIN_MEMBER( corcomp_fdc_device::setaddress_dbin )
 }
 
 /*
-	Provides the current address to the PALs.
+    Provides the current address to the PALs.
 */
 uint16_t corcomp_fdc_device::get_address()
 {
@@ -108,9 +108,9 @@ uint16_t corcomp_fdc_device::get_address()
 }
 
 /*
-	Before the 9901 configures the P11 pin as output, it delivers Z output,
-	which is pulled down by R10 on the board. We implement this by using a
-	variable.
+    Before the 9901 configures the P11 pin as output, it delivers Z output,
+    which is pulled down by R10 on the board. We implement this by using a
+    variable.
 */
 bool corcomp_fdc_device::upper_bank()
 {
@@ -128,8 +128,8 @@ bool corcomp_fdc_device::write_access()
 }
 
 /*
-	The Debugging access must not have any side effect on the controller.
-	We only allow access to the EPROM and RAM.
+    The Debugging access must not have any side effect on the controller.
+    We only allow access to the EPROM and RAM.
 */
 void corcomp_fdc_device::debug_read(offs_t offset, uint8_t* value)
 {
@@ -137,20 +137,20 @@ void corcomp_fdc_device::debug_read(offs_t offset, uint8_t* value)
 
 	m_address = offset;
 	*value = 0x00;
-	
+
 	if (m_ctrlpal->selectram())
 	{
 		// SRAM selected
 		*value = m_buffer_ram->pointer()[m_address & 0x7f] & 0xf0;  // only the first 4 bits
 	}
-		
+
 	if (m_ctrlpal->selectdsr())
 	{
 		// EPROM selected
 		uint16_t base = m_banksel? 0x2000 : 0;
 		uint8_t* rom = &m_dsrrom[base | (m_address & 0x1fff)];
 		*value = *rom;
-	}	
+	}
 	m_address = saveaddress;
 }
 
@@ -161,7 +161,7 @@ void corcomp_fdc_device::debug_write(offs_t offset, uint8_t data)
 	if (m_ctrlpal->selectram())
 	{
 		m_buffer_ram->pointer()[m_address & 0x7f] = data & 0xf0;  // only the first 4 bits
-	}	
+	}
 	m_address = saveaddress;
 }
 
@@ -175,7 +175,7 @@ void corcomp_fdc_device::operate_ready_line()
 }
 
 /*
-	Callbacks from the WDC chip
+    Callbacks from the WDC chip
 */
 WRITE_LINE_MEMBER( corcomp_fdc_device::fdc_irq_w )
 {
@@ -201,36 +201,36 @@ READ8Z_MEMBER(corcomp_fdc_device::readz)
 		debug_read(offset, value);
 		return;
 	}
-	
+
 	if (m_ctrlpal->selectram())
 	{
 		// SRAM selected
 		*value = m_buffer_ram->pointer()[m_address & 0x7f] & 0xf0;  // only the first 4 bits
 		LOGMASKED(LOG_RAM, "Read RAM: %04x -> %02x\n", m_address & 0xffff, *value);
 	}
-	
+
 	if (m_ctrlpal->selectwdc())
 	{
 		// WDC selected
 		*value = m_wdc->read((m_address >> 1)&0x03);
 		LOGMASKED(LOG_CONTR, "Read FDC: %04x -> %02x\n", m_address & 0xffff, *value);
 	}
-	
+
 	if (m_ctrlpal->selectdsr())
 	{
 		// EPROM selected
 		uint16_t base = m_banksel? 0x2000 : 0;
 		uint8_t* rom = &m_dsrrom[base | (m_address & 0x1fff)];
 		*value = *rom;
-		
+
 		if (WORD_ALIGNED(m_address))
 		{
-			uint16_t val = (*rom << 8) | (*(rom+1)); 
+			uint16_t val = (*rom << 8) | (*(rom+1));
 			LOGMASKED(LOG_EPROM, "Read DSR: %04x (page %d)-> %04x\n", m_address & 0xffff, base>>13, val);
 		}
 	}
 }
-	
+
 void corcomp_fdc_device::write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled())
@@ -244,7 +244,7 @@ void corcomp_fdc_device::write(offs_t offset, uint8_t data)
 		LOGMASKED(LOG_RAM, "Write RAM: %04x <- %02x\n", m_address & 0xffff, data&0xf0);
 		m_buffer_ram->pointer()[m_address & 0x7f] = data & 0xf0;  // only the first 4 bits
 	}
-	
+
 	if (m_ctrlpal->selectwdc())
 	{
 		// WDC selected
@@ -297,9 +297,9 @@ READ8_MEMBER( corcomp_fdc_device::tms9901_input )
 	// INT6: Switch 2
 	// INT7: Switch 4
 	// INT8: Switch 6
-	// INT9: -	
+	// INT9: -
 	// P9: MotorMF
-	// P12: WDCu11.28 (HLD) 
+	// P12: WDCu11.28 (HLD)
 	const uint8_t dipswitch[] = { 0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 
 	switch (offset)
@@ -396,7 +396,7 @@ WRITE_LINE_MEMBER( corcomp_fdc_device::motor_w )
 }
 
 /*
-	Push the P11 state to the variable.
+    Push the P11 state to the variable.
 */
 WRITE_LINE_MEMBER( corcomp_fdc_device::select_bank )
 {
@@ -487,10 +487,10 @@ void corcomp_fdc_device::common_config(machine_config& config)
 	m_wdc->intrq_wr_callback().set(FUNC(corcomp_fdc_device::fdc_irq_w));
 	m_wdc->drq_wr_callback().set(FUNC(corcomp_fdc_device::fdc_drq_w));
 	m_wdc->hld_wr_callback().set(FUNC(corcomp_fdc_device::fdc_hld_w));
-	
+
 	TMS9901(config, m_tms9901, 0);
 	m_tms9901->read_cb().set(FUNC(corcomp_fdc_device::tms9901_input));
-	
+
 	// Outputs
 	// P0: LED (DSR?), PALu2.1
 	// P1: MFu6.clk (Motor)
@@ -505,7 +505,7 @@ void corcomp_fdc_device::common_config(machine_config& config)
 	// P11: ROMBNK
 	// P13: -
 	// P14: -
-	// P15: -	
+	// P15: -
 	m_tms9901->p_out_cb(0).set(FUNC(corcomp_fdc_device::select_card));
 	m_tms9901->p_out_cb(1).set(MOTORMF_TAG, FUNC(ttl74123_device::b_w));
 	m_tms9901->p_out_cb(4).set(FUNC(corcomp_fdc_device::select_dsk));
@@ -515,7 +515,7 @@ void corcomp_fdc_device::common_config(machine_config& config)
 	m_tms9901->p_out_cb(8).set(FUNC(corcomp_fdc_device::select_dsk));
 	m_tms9901->p_out_cb(10).set(WDC_TAG, FUNC(wd_fdc_device_base::dden_w));
 	m_tms9901->p_out_cb(11).set(FUNC(corcomp_fdc_device::select_bank));
-	
+
 	// Motor monoflop
 	TTL74123(config, m_motormf, 0);
 	m_motormf->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
@@ -532,7 +532,7 @@ void corcomp_fdc_device::common_config(machine_config& config)
 	FLOPPY_CONNECTOR(config, "3", ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound(true);
 
 	// SRAM 2114 1Kx4
-	RAM(config, BUFFER).set_default_size("1k").set_default_value(0);	
+	RAM(config, BUFFER).set_default_size("1k").set_default_value(0);
 }
 
 // ============================================================================
@@ -541,20 +541,20 @@ void corcomp_fdc_device::common_config(machine_config& config)
 
 corcomp_dcc_device::corcomp_dcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
 	  corcomp_fdc_device(mconfig, TI99_CCDCC, tag, owner, clock)
-{ 
+{
 }
 
 void corcomp_dcc_device::device_add_mconfig(machine_config& config)
 {
 	WD2793(config, m_wdc, 4_MHz_XTAL / 4);
 	common_config(config);
-	
+
 	// For the 2793, attach the HLT line
 	m_tms9901->p_out_cb(3).set(WDC_TAG, FUNC(wd_fdc_device_base::hlt_w));
-	
+
 	// PAL circuits are connected in device_config_complete
 	CCDCC_PALU2(config, CCDCC_PALU2_TAG, 0);
-	CCDCC_PALU1(config, CCDCC_PALU1_TAG, 0);	
+	CCDCC_PALU1(config, CCDCC_PALU1_TAG, 0);
 }
 
 ROM_START( cc_dcc )
@@ -581,8 +581,8 @@ const tiny_rom_entry *corcomp_dcc_device::device_rom_region() const
 }
 
 // ========================================================================
-//    PAL circuits on the CorComp board  
-// ======================================================================== 
+//    PAL circuits on the CorComp board
+// ========================================================================
 
 ccfdc_dec_pal_device::ccfdc_dec_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	:  device_t(mconfig, type, tag, owner, clock),
@@ -607,7 +607,7 @@ void ccfdc_dec_pal_device::device_config_complete()
 }
 
 /*
-	Indicates 9901 addressing.
+    Indicates 9901 addressing.
 */
 READ_LINE_MEMBER( ccfdc_dec_pal_device::address9901 )
 {
@@ -615,7 +615,7 @@ READ_LINE_MEMBER( ccfdc_dec_pal_device::address9901 )
 }
 
 /*
-	Indicates SRAM addressing.
+    Indicates SRAM addressing.
 */
 READ_LINE_MEMBER( ccfdc_dec_pal_device::addressram )
 {
@@ -624,7 +624,7 @@ READ_LINE_MEMBER( ccfdc_dec_pal_device::addressram )
 }
 
 /*
-	Indicates WDC addressing.
+    Indicates WDC addressing.
 */
 READ_LINE_MEMBER( ccfdc_dec_pal_device::addresswdc )
 {
@@ -633,7 +633,7 @@ READ_LINE_MEMBER( ccfdc_dec_pal_device::addresswdc )
 }
 
 /*
-	Indicates DSR addressing.
+    Indicates DSR addressing.
 */
 READ_LINE_MEMBER( ccfdc_dec_pal_device::address4 )
 {
@@ -642,7 +642,7 @@ READ_LINE_MEMBER( ccfdc_dec_pal_device::address4 )
 }
 
 /*
-	Indicates SRAM selection.
+    Indicates SRAM selection.
 */
 READ_LINE_MEMBER( ccfdc_sel_pal_device::selectram )
 {
@@ -651,7 +651,7 @@ READ_LINE_MEMBER( ccfdc_sel_pal_device::selectram )
 }
 
 /*
-	Indicates WDC selection.
+    Indicates WDC selection.
 */
 READ_LINE_MEMBER( ccfdc_sel_pal_device::selectwdc )
 {
@@ -659,18 +659,18 @@ READ_LINE_MEMBER( ccfdc_sel_pal_device::selectwdc )
 }
 
 /*
-	Indicates EPROM selection.
+    Indicates EPROM selection.
 */
 READ_LINE_MEMBER( ccfdc_sel_pal_device::selectdsr )
 {
 	return (m_decpal->address4()
 		&& !m_decpal->addresswdc()
-		&& !(m_decpal->addressram() && (m_board->upper_bank())))		
+		&& !(m_decpal->addressram() && (m_board->upper_bank())))
 		? ASSERT_LINE : CLEAR_LINE;
 }
 
 // ========================================================================
-//    PAL circuits on the original CorComp board  
+//    PAL circuits on the original CorComp board
 //    PAL u2 is the address decoder, delivering its results to the
 //    selector PAL u1.
 // ========================================================================
@@ -686,7 +686,7 @@ ccdcc_palu1_device::ccdcc_palu1_device(const machine_config &mconfig, const char
 }
 
 /*
-	Wait state logic
+    Wait state logic
 */
 READ_LINE_MEMBER( ccdcc_palu1_device::ready_out )
 {
@@ -697,8 +697,8 @@ READ_LINE_MEMBER( ccdcc_palu1_device::ready_out )
 	bool noterm = m_wdc->intrq_r()==CLEAR_LINE;                // There is no interrupt yet
 	bool motor = (m_motormf->q_r()==1);                        // The disk is spinning
 
-	line_state ready = (wdc && lastdig && trap && waitbyte && noterm && motor)?	CLEAR_LINE : ASSERT_LINE; // then clear READY and thus trigger wait states	    
-	
+	line_state ready = (wdc && lastdig && trap && waitbyte && noterm && motor)? CLEAR_LINE : ASSERT_LINE; // then clear READY and thus trigger wait states
+
 	LOGMASKED(LOG_READY, "READY = %d (%d,%d,%d,%d,%d,%d)\n", ready, wdc, lastdig, trap, waitbyte, noterm, motor);
 	return ready;
 }
@@ -715,25 +715,25 @@ void ccdcc_palu1_device::device_config_complete()
 
 corcomp_fdca_device::corcomp_fdca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
 	  corcomp_fdc_device(mconfig, TI99_CCFDC, tag, owner, clock)
-{ 
+{
 }
 
 void corcomp_fdca_device::device_add_mconfig(machine_config& config)
 {
 	WD1773(config, m_wdc, 8_MHz_XTAL);
 	common_config(config);
-	
+
 	// PAL circuits are connected in device_config_complete
 	CCFDC_PALU12(config, CCFDC_PALU12_TAG, 0);
-	CCFDC_PALU6(config, CCFDC_PALU6_TAG, 0);	
+	CCFDC_PALU6(config, CCFDC_PALU6_TAG, 0);
 }
 
 /*
-	READY trap circuitry on the revised board (U10)
+    READY trap circuitry on the revised board (U10)
 */
 bool corcomp_fdca_device::ready_trap_active()
 {
-	return m_tms9901->read_bit(tms9901_device::P2) 
+	return m_tms9901->read_bit(tms9901_device::P2)
 		&& ((m_address & 6)==6)
 		&& (m_motormf->q_r()==1);
 }
@@ -757,7 +757,7 @@ const tiny_rom_entry *corcomp_fdca_device::device_rom_region() const
 }
 
 // ========================================================================
-//    PAL circuits on the revised CorComp board  
+//    PAL circuits on the revised CorComp board
 //    PAL u12 is the address decoder, delivering its results to the
 //    selector PAL u6.
 // ========================================================================
@@ -768,8 +768,8 @@ ccfdc_palu12_device::ccfdc_palu12_device(const machine_config &mconfig, const ch
 }
 
 /*
-	Indicates 9901 addressing. In this PAL version, the A9 address line is
-	also used.
+    Indicates 9901 addressing. In this PAL version, the A9 address line is
+    also used.
 */
 READ_LINE_MEMBER( ccfdc_palu12_device::address9901 )
 {
@@ -782,20 +782,20 @@ ccfdc_palu6_device::ccfdc_palu6_device(const machine_config &mconfig, const char
 }
 
 /*
-	Indicates WDC selection. Also checks whether A12 and /WE match.
-	That is, when writing (/WE=0), A12 must be 1 (addresses 5ff8..e),
-	otherwise (/WE=1), A12 must be 0 (addresses 5ff0..6)
+    Indicates WDC selection. Also checks whether A12 and /WE match.
+    That is, when writing (/WE=0), A12 must be 1 (addresses 5ff8..e),
+    otherwise (/WE=1), A12 must be 0 (addresses 5ff0..6)
 */
 READ_LINE_MEMBER( ccfdc_palu6_device::selectwdc )
 {
-	return (m_decpal->addresswdc() 
+	return (m_decpal->addresswdc()
 		&& ((m_board->get_address()&1)==0)
 		&& (((m_board->get_address()&8)!=0)==(m_board->write_access())))? ASSERT_LINE : CLEAR_LINE;
 }
 
 /*
-	Indicates EPROM selection. The Rev A selector PAL leads back some of 
-	its outputs for this calculation.
+    Indicates EPROM selection. The Rev A selector PAL leads back some of
+    its outputs for this calculation.
 */
 READ_LINE_MEMBER( ccfdc_palu6_device::selectdsr )
 {
@@ -803,8 +803,8 @@ READ_LINE_MEMBER( ccfdc_palu6_device::selectdsr )
 }
 
 /*
-	Wait state logic. The Rev A selector relies on an AND circuit on the
-	board which evaluates whether the trap is active.
+    Wait state logic. The Rev A selector relies on an AND circuit on the
+    board which evaluates whether the trap is active.
 */
 
 READ_LINE_MEMBER( ccfdc_palu6_device::ready_out )
@@ -815,8 +815,8 @@ READ_LINE_MEMBER( ccfdc_palu6_device::ready_out )
 	bool waitbyte = m_wdc->drq_r()==CLEAR_LINE;          // We are waiting for a byte
 	bool noterm = m_wdc->intrq_r()==CLEAR_LINE;          // There is no interrupt yet
 
-	line_state ready = (wdc && even && trap && waitbyte && noterm)?	CLEAR_LINE : ASSERT_LINE; // then clear READY and thus trigger wait states	    
-	
+	line_state ready = (wdc && even && trap && waitbyte && noterm)? CLEAR_LINE : ASSERT_LINE; // then clear READY and thus trigger wait states
+
 	LOGMASKED(LOG_READY, "READY = %d (%d,%d,%d,%d,%d)\n", ready, wdc, even, trap, waitbyte, noterm);
 	return ready;
 }

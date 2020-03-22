@@ -772,7 +772,7 @@ static INPUT_PORTS_START( greenber )
 	PORT_START("DSW")
 	PORT_DIPNAME(0x03, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING (  0x03, "2" )
-//	PORT_DIPSETTING (  0x02, "3" ) // dupe
+//  PORT_DIPSETTING (  0x02, "3" ) // dupe
 	PORT_DIPSETTING (  0x01, "3" )
 	PORT_DIPSETTING (  0x00, "4" )
 	PORT_DIPNAME(0x08, 0x00, "Replay" )

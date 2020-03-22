@@ -245,7 +245,7 @@ INPUT_PORTS_END
 
 WRITE16_MEMBER(spg2xx_game_mysprt_orig_state::porta_w)
 {
-	// this seems like nice clean logic, based on writes and how the port direction is set, 
+	// this seems like nice clean logic, based on writes and how the port direction is set,
 	// mysprtch and mysptqvc work fine with this logic, but mysprtcp is more problematic, especially in test mode, see other function
 
 	logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,

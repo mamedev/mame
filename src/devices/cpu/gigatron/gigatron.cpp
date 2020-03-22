@@ -119,7 +119,7 @@ void gigatron_cpu_device::init()
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_inReg));
 	save_item(NAME(m_pc));
-	
+
 	m_outx_cb.resolve_safe();
 }
 

@@ -2311,7 +2311,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mindmirr">
 		<description>Timothy Leary's Mind Mirror</description>
 		<year>1986</year>
@@ -8481,7 +8481,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dynablst" supported="partial">
 	<!-- Need an adaptator connected to the parallel port to play-->
 		<description>Dyna Blaster</description>
@@ -8940,7 +8940,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="indy3adv">
 		<description>Indiana Jones and the Last Crusade - The Graphic Adventure</description>
 		<year>1989</year>
@@ -11159,7 +11159,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="agidemos">
 		<description>Sierra Demo</description>
 		<year>1987</year>

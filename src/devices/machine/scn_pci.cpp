@@ -1212,18 +1212,18 @@ void scn_pci_device::write_mode(u8 data)
 		if ((data & 0x03) != 0)
 		{
 			LOGMASKED(LOG_INIT, "Asynchronous %dX mode: %d data bits, %s parity, %s stop bit%s\n",
-			                    BIT(data, 1) ? (BIT(data, 0) ? 64 : 16) : 1,
-			                    ((data & 0x0c) >> 2) + 5,
-			                    BIT(data, 4) ? (BIT(data, 5) ? "even" : "odd") : "no",
-			                    s_stop_bit_desc[(data & 0xc0) >> 6], (data & 0xc0) != 0x40 ? "s" : "");
+								BIT(data, 1) ? (BIT(data, 0) ? 64 : 16) : 1,
+								((data & 0x0c) >> 2) + 5,
+								BIT(data, 4) ? (BIT(data, 5) ? "even" : "odd") : "no",
+								s_stop_bit_desc[(data & 0xc0) >> 6], (data & 0xc0) != 0x40 ? "s" : "");
 		}
 		else
 		{
 			LOGMASKED(LOG_INIT, "Synchronous 1X mode: %s%s SYN, %d data bits, %s parity\n",
-			                    BIT(data, 6) ? "transparent " : "",
-			                    BIT(data, 7) ? "single" : "double",
-			                    ((data & 0x0c) >> 2) + 5,
-			                    BIT(data, 4) ? (BIT(data, 5) ? "even" : "odd") : "no");
+								BIT(data, 6) ? "transparent " : "",
+								BIT(data, 7) ? "single" : "double",
+								((data & 0x0c) >> 2) + 5,
+								BIT(data, 4) ? (BIT(data, 5) ? "even" : "odd") : "no");
 			if (m_is_aci)
 				logerror("%s: Invalid synchronous mode configured\n", machine().describe_context());
 		}
@@ -1258,9 +1258,9 @@ void scn_pci_device::write_mode(u8 data)
 			else if (BIT(data, 4))
 			{
 				LOGMASKED(LOG_INIT, "%sRxC (%.1f baud with %s output)\n",
-				                    BIT(data, 5) ? "Internal TxC/" : "External TxC, internal ",
-				                    baud_rate,
-				                    BIT(data, 7) ? "BKDET" : BIT(data, 6) ? "16X" : "1X");
+									BIT(data, 5) ? "Internal TxC/" : "External TxC, internal ",
+									baud_rate,
+									BIT(data, 7) ? "BKDET" : BIT(data, 6) ? "16X" : "1X");
 
 				// BKDET output
 				if (BIT(data, 7))
@@ -1269,8 +1269,8 @@ void scn_pci_device::write_mode(u8 data)
 			else if (BIT(data, 5))
 			{
 				LOGMASKED(LOG_INIT, "Internal TxC (%.1f baud with %s output), external RxC\n",
-				                    baud_rate,
-				                    BIT(data, 6) ? "16X" : "1X");
+									baud_rate,
+									BIT(data, 6) ? "16X" : "1X");
 			}
 			else
 				LOGMASKED(LOG_INIT, "External TxC, external RxC (may be indepedent)\n");

@@ -22,7 +22,7 @@ SEND(from console)              RECEIVE (to console)
 
 Buttons
 BLO:
-Bit 0	  Up
+Bit 0     Up
 Bit 1     Down
 Bit 2     2/B
 Bit 3     1/A
@@ -33,8 +33,8 @@ Bit 7     Unused
 BHI:      Unused
 
 Port A
-Bit 0	  Enable "Left" Controller
-Bit 1	  Enable "Right" Controller	
+Bit 0     Enable "Left" Controller
+Bit 1     Enable "Right" Controller
 
 Player
 0:
@@ -44,7 +44,7 @@ D:
 E:
 65:  monsters
 B5:  items
-     
+
 doPlayer(player)
      var_3 = player - 1
      pData = Player[var_3]
@@ -233,7 +233,7 @@ doPlayer(player)
                          Retries[var_3] = 3
                break
      doPlayerMore(player)
-     
+
 doPlayerMore(player)
      var_2 = WaitCycle[player-1]
      if(var_2 == 0) return
@@ -277,7 +277,7 @@ doPlayerMore(player)
                return
           case 1:
                ClearPlayer(player)
-               return     
+               return
      ClearPlayer(player)
      if(player == 1)
           byte_1238 |= 40h

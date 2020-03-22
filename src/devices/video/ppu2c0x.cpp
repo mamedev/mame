@@ -32,7 +32,7 @@
 
 
 /***************************************************************************
-	CONSTANTS
+    CONSTANTS
 ***************************************************************************/
 
 /* default monochromatic colortable */
@@ -428,14 +428,14 @@ void ppu2c0x_device::init_palette(bool indirect)
 
 		switch (color_emphasis)
 		{
-			case 0: r_mod = 1.0;  g_mod = 1.0;  b_mod = 1.0;  break;
-			case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
-			case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
-			case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
-			case 4: r_mod = .741; g_mod = .987; b_mod = 1.0;  break;
-			case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
-			case 6: r_mod = 1.02; g_mod = .98;  b_mod = .653; break;
-			case 7: r_mod = .75;  g_mod = .75;  b_mod = .75;  break;
+		    case 0: r_mod = 1.0;  g_mod = 1.0;  b_mod = 1.0;  break;
+		    case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
+		    case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
+		    case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
+		    case 4: r_mod = .741; g_mod = .987; b_mod = 1.0;  break;
+		    case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
+		    case 6: r_mod = 1.02; g_mod = .98;  b_mod = .653; break;
+		    case 7: r_mod = .75;  g_mod = .75;  b_mod = .75;  break;
 		}
 		*/
 

@@ -145,7 +145,7 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 				pen = this->pen(palval);
 			}
 
-			*dest = pen;		
+			*dest = pen;
 
 			// priority marking
 			if (!trans)

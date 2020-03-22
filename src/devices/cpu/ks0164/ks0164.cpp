@@ -138,8 +138,8 @@ u16 ks0164_cpu_device::snz(u16 r)
 	if(r & 0x8000)
 		f |= F_N;
 	m_r[R_PSW] = (m_r[R_PSW] & ~F_MASK) | f;
-	return r;		
-}		
+	return r;
+}
 
 void ks0164_cpu_device::do_alu(u16 opcode, u16 v2)
 {
@@ -384,7 +384,7 @@ void ks0164_cpu_device::execute_run()
 			case 0: {
 				// Push all registers
 				// 1100 .... .... .001
-				
+
 				m_program->write_word(m_r[R_SP] - 2, m_r[0]);
 				m_program->write_word(m_r[R_SP] - 4, m_r[1]);
 				m_program->write_word(m_r[R_SP] - 6, m_r[2]);
@@ -475,7 +475,7 @@ void ks0164_cpu_device::execute_run()
 			case 0: {
 				// Push all registers
 				// 1100 .... .... .011
-				
+
 				m_r[0] = m_program->read_word(m_r[R_SP] + 6);
 				m_r[1] = m_program->read_word(m_r[R_SP] + 4);
 				m_r[2] = m_program->read_word(m_r[R_SP] + 2);
@@ -741,7 +741,7 @@ void ks0164_cpu_device::execute_run()
 		default:
 			unk(opcode);
 			break;
-		}			
+		}
 
 		m_r[R_ZERO] = 0;
 	}

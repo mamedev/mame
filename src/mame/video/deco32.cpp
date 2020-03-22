@@ -322,7 +322,7 @@ void nslasher_state::mix_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, c
 			int alpha = ((!alpha1) || alpha2) ? m_deco_ace->get_alpha((col1 & 0x8) ? (0x4 + ((col1 & 0x3) / 2)) : ((col1 & 0x7) / 2)) : 0xff;
 
 			/* I don't really understand how object ACE ram is really hooked up,
-				 the only obvious place in Night Slashers is the stagecoach in level 2 */
+			     the only obvious place in Night Slashers is the stagecoach in level 2 */
 
 			col1 = (col1 % gfx1->colors()) * gfx1->granularity();
 			// Apply sprite bitmap 1 according to priority rules
@@ -524,7 +524,7 @@ void nslasher_state::mix_tattass(screen_device &screen, bitmap_rgb32 &bitmap, co
 			int alpha = m_deco_ace->get_alpha(col1 / 8);
 
 			/* I don't really understand how object ACE ram is really hooked up,
-				 the only obvious place in Night Slashers is the stagecoach in level 2 */
+			     the only obvious place in Night Slashers is the stagecoach in level 2 */
 
 			col1 = ((col1 & 0xf) % gfx1->colors()) * gfx1->granularity();
 			// Apply sprite bitmap 1 according to priority rules

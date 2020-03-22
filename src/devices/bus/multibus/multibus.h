@@ -5,7 +5,7 @@
     multibus.h
 
     Intel Multibus
-    
+
     P1 Multibus connector:
 
     Power supplies
@@ -58,17 +58,17 @@
     81  +5Vdc      82  +5Vdc
     83  +5Vdc      84  +5Vdc
     85  GND        86  GND
-    
+
     P2 Multibus connector:
-    
+
     1-54 reserved for iLBX bus
-    
+
     Address
     55  ADR16/     56  ADR17/
     57  ADR14/     58  ADR15/
-    
+
     59-60 reserved for iLBx bus
-        
+
 *********************************************************************/
 
 #ifndef MAME_BUS_MULTIBUS_MULTIBUS_H
@@ -92,7 +92,7 @@ public:
 
 	// Set memory space
 	void install_mem_rw(address_space& space);
-	
+
 	auto irq0_callback() { return m_irq_cb[0].bind(); }
 	auto irq1_callback() { return m_irq_cb[1].bind(); }
 	auto irq2_callback() { return m_irq_cb[2].bind(); }
@@ -102,7 +102,7 @@ public:
 	auto irq6_callback() { return m_irq_cb[6].bind(); }
 	auto irq7_callback() { return m_irq_cb[7].bind(); }
 	auto irqa_callback() { return m_irqa_cb.bind(); }
-	
+
 	DECLARE_WRITE_LINE_MEMBER( irq0_w );
 	DECLARE_WRITE_LINE_MEMBER( irq1_w );
 	DECLARE_WRITE_LINE_MEMBER( irq2_w );
@@ -112,10 +112,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq6_w );
 	DECLARE_WRITE_LINE_MEMBER( irq7_w );
 	DECLARE_WRITE_LINE_MEMBER( irqa_w );
-	
+
 protected:
 	virtual void device_start() override;
-	
+
 	devcb_write_line::array<8> m_irq_cb;
 	devcb_write_line           m_irqa_cb;
 
@@ -129,7 +129,7 @@ public:
 
 	// Set CPU memory space
 	virtual void install_mem_rw(address_space& space) = 0;
-	
+
 protected:
 	device_multibus_interface(const machine_config &mconfig , device_t &device);
 	virtual ~device_multibus_interface();

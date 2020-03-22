@@ -485,8 +485,8 @@
      1  1  1  x   x  x  x  x   x  x  x  x   x  x  x  x  E000-FFFF   8K ROM
 
 Reference videos: https://www.youtube.com/watch?v=R5OeC6Wc_yI
-				  https://www.youtube.com/watch?v=3J_EZ1OXlww
-				  https://www.youtube.com/watch?v=zxZ48iJShSU
+                  https://www.youtube.com/watch?v=3J_EZ1OXlww
+                  https://www.youtube.com/watch?v=zxZ48iJShSU
 
 ***************************************************************************/
 

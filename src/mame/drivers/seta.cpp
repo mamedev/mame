@@ -6348,8 +6348,8 @@ static INPUT_PORTS_START( twineagl )
 	// Cabinet is user choice
 	// We use Licensor Option 2 instead of 1 just to avoid the "For use in Japan"
 	// TODO: the copyright dips actually don't have any effect on a real (European) PCB
-	// Most likely these are overwritten by the lead JPs that the board has 
-	// (4x3 near SW2 at J2, 2x3 near two empty ROM sockets U31/U37 at C10). 
+	// Most likely these are overwritten by the lead JPs that the board has
+	// (4x3 near SW2 at J2, 2x3 near two empty ROM sockets U31/U37 at C10).
 	PORT_START("DSW") //2 DSWs - $600001 & 3.b
 	PORT_DIPNAME( 0x0001, 0x0001, "Copyright / License" )   PORT_DIPLOCATION("SW1:1") /* Always "Seta" if sim. players = 1 */
 	PORT_DIPSETTING(      0x0000, "Taito America / Romstar" )   PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x4000)

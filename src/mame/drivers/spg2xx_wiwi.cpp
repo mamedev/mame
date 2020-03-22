@@ -231,15 +231,15 @@ INPUT_PORTS_END
 
 void spg2xx_game_wiwi18_state::init_wiwi18()
 {
-	// workaround for security checks on startup	
-	
+	// workaround for security checks on startup
+
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 	if (rom[0x1ca259]==0x4e04) rom[0x1ca259] = 0xf165; // wiwi18
 	if (rom[0x1355a4]==0x4e04) rom[0x1355a4] = 0xf165; // foxsport
 
 	if (rom[0x362e1c]==0x4e04) rom[0x362e1c] = 0xf165; // lexifit
 	if (rom[0x4c7f4d]==0x4e04) rom[0x4c7f4d] = 0xf165; // lexifit (2nd bank)
-	                               
+
 }
 
 

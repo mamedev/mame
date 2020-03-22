@@ -1530,15 +1530,15 @@ READ16_MEMBER( segas16b_state::hwchamp_custom_io_r )
 					return result;
 				case 0x30/2: // c43035
 					/*
-						Signals, affects blocking and stance (both fists down, both fists up, up/down or down/up)
-						According to service mode:
-						---- --00 no status for right trigger
-						---- --01 down
-						---- --10 up
-						---- --11 both (signals) in red, mustn't occur most likely
-						---- xx-- same applied to left trigger
-						According to the flyer, cabinet has two sticks that can be moved up/down and/or towards the cabinet,
-						simulating punch motions.
+					    Signals, affects blocking and stance (both fists down, both fists up, up/down or down/up)
+					    According to service mode:
+					    ---- --00 no status for right trigger
+					    ---- --01 down
+					    ---- --10 up
+					    ---- --11 both (signals) in red, mustn't occur most likely
+					    ---- xx-- same applied to left trigger
+					    According to the flyer, cabinet has two sticks that can be moved up/down and/or towards the cabinet,
+					    simulating punch motions.
 					*/
 					u8 left = m_hwc_left_limit->read();
 					u8 right = m_hwc_right_limit->read();
@@ -1553,7 +1553,7 @@ READ16_MEMBER( segas16b_state::hwchamp_custom_io_r )
 						result |= 1 << 1;
 					if (right > 0xc0)
 						result |= 1 << 0;
-										
+
 					return result;
 			}
 			break;
@@ -1574,7 +1574,7 @@ WRITE16_MEMBER( segas16b_state::hwchamp_custom_io_w )
 						case 0:
 							m_hwc_input_value = m_hwc_monitor->read();
 							break;
-						
+
 						// TODO: order of these two flipped when returning a status of 0xf0 instead of open bus in r 0x30?
 						case 1:
 							m_hwc_input_value = m_hwc_right->read();
@@ -2874,7 +2874,7 @@ static INPUT_PORTS_START( hwchamp )
 
 	PORT_START("RIGHT_LIMIT")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(32) PORT_PLAYER(2) PORT_NAME("Right Y Limit")
-	
+
 	PORT_START("LEFT_LIMIT")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(32) PORT_PLAYER(1) PORT_NAME("Left Y Limit")
 INPUT_PORTS_END

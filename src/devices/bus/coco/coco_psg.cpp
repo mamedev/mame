@@ -200,15 +200,15 @@ WRITE8_MEMBER(coco_psg_device::scs_write)
 
 	case 0x1d:
 		/* control register
-				BIT FUNCTION
-				0   YM2149 MASTER CLOCK; 0=2MHz, 1=1MHz
-				1   Gameport A SEL signal (pin 7 of controller port A)
-				2   Gameport B SEL signal (pin 7 of controller port B)
-				3   Write Enable (for FLASH/SRAM); 0=disabled, 1=enabled
-				4   Autostart enable; 0=enabled, 1=disabled
-				5   FLASH programming enable; 0=disabled, 1=enabled
-				6   not used
-				7   not used
+		        BIT FUNCTION
+		        0   YM2149 MASTER CLOCK; 0=2MHz, 1=1MHz
+		        1   Gameport A SEL signal (pin 7 of controller port A)
+		        2   Gameport B SEL signal (pin 7 of controller port B)
+		        3   Write Enable (for FLASH/SRAM); 0=disabled, 1=enabled
+		        4   Autostart enable; 0=enabled, 1=disabled
+		        5   FLASH programming enable; 0=disabled, 1=enabled
+		        6   not used
+		        7   not used
 		*/
 		m_control = data;
 

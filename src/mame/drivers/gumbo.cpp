@@ -369,8 +369,8 @@ ROM_END
 ROM_START( mspuzzleb )
 	/* all the roms for this set needs a full redump, the PCB was in pretty bad condition and data reads were not consistent */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
-//	ROM_LOAD16_BYTE( "u1.rom", 0x00001, 0x20000, BAD_DUMP CRC(ec940df4) SHA1(20bb6e2757868cf8fbbb11e05adf8c1d625ee172) )
-//	ROM_LOAD16_BYTE( "u2.rom", 0x00000, 0x20000, BAD_DUMP CRC(7b9cac82) SHA1(c5edfb3fbdf43219ba317c18222e671ebed94469) )
+//  ROM_LOAD16_BYTE( "u1.rom", 0x00001, 0x20000, BAD_DUMP CRC(ec940df4) SHA1(20bb6e2757868cf8fbbb11e05adf8c1d625ee172) )
+//  ROM_LOAD16_BYTE( "u2.rom", 0x00000, 0x20000, BAD_DUMP CRC(7b9cac82) SHA1(c5edfb3fbdf43219ba317c18222e671ebed94469) )
 	ROM_LOAD16_BYTE( "u1.u1", 0x00001, 0x40000, CRC(5e96ea17) SHA1(9b4cfa32e386eacca4e65190d29978cf9cf08fbc) ) /* identical halves - use program ROMs from mspuzzlea for now */
 	ROM_LOAD16_BYTE( "u2.u2", 0x00000, 0x40000, CRC(8f161b0c) SHA1(783dbb34ae5fb7603558c17a39abbe0a93e3a01f) ) /* identical halves - use program ROMs from mspuzzlea for now  */
 

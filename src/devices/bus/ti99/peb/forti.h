@@ -2,11 +2,11 @@
 // copyright-holders:Michael Zapf
 /*******************************************************************************
     FORTi Sound card
-    
+
     4 x TMS9919 sound generators
     4 sound outputs; may be coupled to two stereo outputs
-        
-    Michael Zapf 
+
+    Michael Zapf
     March 2020
 
 *******************************************************************************/
