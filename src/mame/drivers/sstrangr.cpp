@@ -159,7 +159,7 @@ void sstrangr_state::sstrangr_io_map(address_map &map)
 
 
 static INPUT_PORTS_START( sstrangr )
-	PORT_START("DSW")
+	PORT_START("DSW") // 1 x 5-dip bank
 	PORT_DIPNAME( 0x03, 0x01, "Extra Play" )
 	PORT_DIPSETTING(    0x00, "Never" )
 	PORT_DIPSETTING(    0x01, "3000" )
@@ -197,7 +197,7 @@ INPUT_PORTS_END
 void sstrangr_state::sstrangr(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 1996800);   /* clock is a guess, taken from mw8080bw */
+	I8080(config, m_maincpu, 2047840);   // measured on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &sstrangr_state::sstrangr_map);
 	m_maincpu->set_addrmap(AS_IO, &sstrangr_state::sstrangr_io_map);
 	m_maincpu->set_periodic_int(FUNC(sstrangr_state::irq0_line_hold), attotime::from_hz(2*60));
