@@ -34634,6 +34634,11 @@ r8                              //
 r8m                             //
 r8mk2                           //
 
+@source:roland_s10.cpp
+mks100                          //
+s10                             //
+s220                            //
+
 @source:roland_sc55.cpp
 sc55                            // 1991 Sound Canvas SC-55
 

@@ -458,7 +458,7 @@ inline void unsp_device::trigger_fiq()
 
 inline void unsp_device::trigger_irq(int line)
 {
-	if ((m_core->m_ine == 0 && m_core->m_irq == 1) || m_core->m_pri <= line)
+	if ((m_core->m_ine == 0 && m_core->m_irq == 1) || m_core->m_pri <= line || !m_core->m_enable_irq)
 		return;
 
 	m_core->m_irq = 1;
