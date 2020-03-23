@@ -1224,6 +1224,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"ne",
 		"nec",
 		"netronic",
+		"news_r3k",
 		"next",
 		"nintendo",
 		"nokia",
@@ -2927,6 +2928,11 @@ files {
 	MAME_DIR .. "src/mame/includes/elf.h",
 	MAME_DIR .. "src/mame/drivers/exp85.cpp",
 	MAME_DIR .. "src/mame/includes/exp85.h",
+}
+
+createMESSProjects(_target, _subtarget, "news_r3k")
+files {
+	MAME_DIR .. "src/mame/drivers/news_r3k.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "next")
