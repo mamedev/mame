@@ -31435,6 +31435,7 @@ nespal                          // Nintendo Entertainment System PAL
 @source:nes_clone.cpp
 pjoypj001
 afbm7800
+dnce2000
 
 @source:nes_sh6578.cpp
 bandgpad
