@@ -209,7 +209,7 @@ void nes_clone_state::nes_clone(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
 	m_screen->set_size(32*8, 262);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
-	m_screen->set_screen_update("ppu", FUNC(ppu2c0x_device::screen_update));
+	m_screen->set_screen_update(m_ppu, FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C02(config, m_ppu);
 	m_ppu->set_cpu_tag("maincpu");
@@ -232,9 +232,9 @@ void nes_clone_state::nes_clone_pal(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66 / (PALC_APU_CLOCK.dvalue() / 1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL - ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC + 1 + 2)));
 	m_screen->set_size(32 * 8, 312);
 	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
-	m_screen->set_screen_update("ppu", FUNC(ppu2c0x_device::screen_update));
+	m_screen->set_screen_update(m_ppu, FUNC(ppu2c0x_device::screen_update));
 
-	PPU_2C02(config, m_ppu);
+	PPU_PALC(config, m_ppu);
 	m_ppu->set_cpu_tag("maincpu");
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
