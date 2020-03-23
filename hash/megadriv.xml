@@ -7764,7 +7764,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only Europe and Japan are confirmed -->
 	<software name="sor">
-		<description>Streets of Rage (Euro, USA, Rev. A) ~ Bare Knuckle - Ikari no Tetsuken (Jpn, Rev. A)</description>
+		<description>Streets of Rage (Euro, USA, Rev. A) ~ Bare Knuckle - Ikari no Tekken (Jpn, Rev. A)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4050 (JPN)"/>
@@ -7782,7 +7782,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only Europe and Japan are confirmed -->
 	<software name="sora" cloneof="sor">
-		<description>Streets of Rage (Euro, USA) ~ Bare Knuckle - Ikari no Tetsuken (Jpn)</description>
+		<description>Streets of Rage (Euro, USA) ~ Bare Knuckle - Ikari no Tekken (Jpn)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4050 (JPN)"/>
@@ -7800,7 +7800,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only Euro is confirmed -->
 	<software name="sor2">
-		<description>Streets of Rage II (Euro) ~ Bare Knuckle II - Shitou e no Chingonka (Jpn)</description>
+		<description>Streets of Rage II (Euro) ~ Bare Knuckle II - Shitou e no Requiem (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4091 (JPN)"/>
