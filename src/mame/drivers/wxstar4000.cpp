@@ -59,6 +59,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
+#include "machine/icm7170.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "video/bt47x.h"
@@ -78,7 +79,8 @@ public:
 		m_iocpu(*this, "iocpu"),
 		m_mainram(*this, "extram"),
 		m_extram(*this, "extram"),
-		m_vram(*this, "vram")
+		m_vram(*this, "vram"),
+		m_rtc(*this, "rtc")
 	{ }
 
 	void wxstar4k(machine_config &config);
@@ -102,6 +104,7 @@ private:
 	optional_device<m68010_device> m_maincpu, m_gfxcpu;
 	optional_device<mcs51_cpu_device> m_gfxsubcpu, m_datacpu, m_iocpu;
 	optional_shared_ptr<uint16_t> m_mainram, m_extram, m_vram;
+	required_device<icm7170_device> m_rtc;
 
 	DECLARE_READ16_MEMBER(buserr_r)
 	{
@@ -255,6 +258,8 @@ void wxstar4k_state::wxstar4k(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_888, 256);
+
+	ICM7170(config, m_rtc, XTAL(32'768));
 }
 
 ROM_START( wxstar4k )

@@ -1445,6 +1445,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/icm7170.h,MACHINES["ICM7170"] = true
+---------------------------------------------------
+
+if (MACHINES["ICM7170"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/icm7170.cpp",
+		MAME_DIR .. "src/devices/machine/icm7170.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/idectrl.h,MACHINES["IDECTRL"] = true
 --@src/devices/machine/vt83c461.h,MACHINES["IDECTRL"] = true
 ---------------------------------------------------
