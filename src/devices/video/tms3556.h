@@ -38,7 +38,7 @@ public:
 	static constexpr unsigned TOTAL_HEIGHT = 250 + TOP_BORDER + BOTTOM_BORDER;
 
 	// construction/destruction
-	tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint8_t vram_r();
 	void vram_w(uint8_t data);
