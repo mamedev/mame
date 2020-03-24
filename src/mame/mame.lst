@@ -34645,6 +34645,11 @@ mks100                          //
 s10                             //
 s220                            //
 
+@source:roland_s50.cpp
+s50                             //
+s550                            //
+w30                             //
+
 @source:roland_sc55.cpp
 sc55                            // 1991 Sound Canvas SC-55
 
