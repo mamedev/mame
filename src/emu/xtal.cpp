@@ -142,6 +142,7 @@ const double XTAL::known_xtals[] = {
 	  8'867'236, /* 8.867236_MHz_XTAL      RCA CDP1869 PAL color clock (~2x PAL subcarrier) */
 	  8'867'238, /* 8.867238_MHz_XTAL      ETI-660 (~2x PAL subcarrier) */
 	  8'945'000, /* 8.945_MHz_XTAL         Hit Me */
+	  8'960'000, /* 8.96_MHz_XTAL          Casio CZ-101 (divided by 2 for Music LSI) */
 	  9'000'000, /* 9_MHz_XTAL             Homedata PCBs */
 	  9'216'000, /* 9.216_MHz_XTAL         Univac UTS 20 */
 	  9'600'000, /* 9.6_MHz_XTAL           WD37C65 second clock (for 300 KB/sec rate) */
