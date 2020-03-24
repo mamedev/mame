@@ -24,14 +24,16 @@
     Norway sport 2
 
     TODO:
-    * sound
-    * nvram?
-    * https://www.tvspels-nostalgi.com/pcb_unk.htm shows red background. Faulty PCB adapter or bad emulation?
+    * sound (discrete?)
+    * https://www.tvspels-nostalgi.com/pcb_unk.htm shows red background. Faulty harness or bad emulation?
+    * several unmapped read and writes both in program and in IO map
+    * proper fix for the 'faulty link problem, call attendant' message
 */
 
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
 #include "machine/bankdev.h"
+#include "machine/nvram.h"
 #include "video/tms9928a.h"
 #include "screen.h"
 
@@ -47,7 +49,6 @@ public:
 	void triviaquiz(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
@@ -60,20 +61,19 @@ private:
 };
 
 
-void triviaquiz_state::prg_map(address_map &map) // TODO: check everything
+void triviaquiz_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom().region("maincpu", 0);
 	map(0x6000, 0x7fff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
 	map(0x6000, 0x6000).lw8(NAME([this] (uint8_t data) { m_bankdev->set_bank(data); }));
 	map(0x8000, 0x8000).rw("vdp", FUNC(tms9129_device::vram_read), FUNC(tms9129_device::vram_write));
 	map(0x8002, 0x8002).rw("vdp", FUNC(tms9129_device::register_read), FUNC(tms9129_device::register_write));
-	// map(0x8040, 0x8040).w
 	map(0x8100, 0x8100).portr("IN0");
 	map(0x8200, 0x8200).portr("IN1");
 	map(0x8300, 0x8300).portr("IN2");
 	map(0x8600, 0x8600).portr("DSW1");
-	// map(0x8700, 0x8700).portr("DSW2"); // not populated
-	map(0xa000, 0xa7ff).ram();
+	map(0x8700, 0x8700).nopr(); // DSW2, not populated
+	map(0xa000, 0xa7ff).ram().share("nvram");
 	map(0xe000, 0xe7ff).ram();
 }
 
@@ -105,7 +105,7 @@ static INPUT_PORTS_START( triviaquiz )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // gives 'bad switch'
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // gives 'bad switch'
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) // these work also as start buttons?
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) // these work also as start buttons
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
@@ -122,7 +122,7 @@ static INPUT_PORTS_START( triviaquiz )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // gives 'bad switch'
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // gives 'bad switch'
 
-	PORT_START("DSW1") // only read at boot
+	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "SW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "SW1:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW1:3")
@@ -130,17 +130,12 @@ static INPUT_PORTS_START( triviaquiz )
 	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW1:5")
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW1:7")
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 
 	// DSW2 not populated
 INPUT_PORTS_END
-
-
-void triviaquiz_state::machine_start()
-{
-}
 
 void triviaquiz_state::machine_reset()
 {
@@ -160,6 +155,8 @@ void triviaquiz_state::triviaquiz(machine_config &config)
 	m_bankdev->set_data_width(8);
 	m_bankdev->set_addr_width(20);
 	m_bankdev->set_stride(0x2000);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	tms9129_device &vdp(TMS9129(config, "vdp", 10.738635_MHz_XTAL)); //TMS9129NL, 10.73864 XTAL on one PCB, 10.70000 on another
 	vdp.set_screen("screen");
@@ -203,5 +200,5 @@ ROM_START( triviaqz2 )
 	ROM_LOAD( "norway_historie_1.bin",   0x20000, 0x8000, CRC(b2fbce41) SHA1(9e94fc4efd03aff180a5bd94727f5be59647af52) )
 ROM_END
 
-GAME( 1985, triviaqz,         0, triviaquiz, triviaquiz, triviaquiz_state, empty_init, ROT0, "Intermatic Manufacturing", "Professor Trivia (set 1)",  MACHINE_IS_SKELETON ) // or Trivia Video Quiz? Professor Trivia appears on more screens
-GAME( 1985, triviaqz2, triviaqz, triviaquiz, triviaquiz, triviaquiz_state, empty_init, ROT0, "Intermatic Manufacturing", "Professor Trivia (set 2)",  MACHINE_IS_SKELETON ) // both need question ROMs hook up
+GAME( 1985, triviaqz,         0, triviaquiz, triviaquiz, triviaquiz_state, empty_init, ROT0, "Intermatic Manufacturing", "Professor Trivia (set 1)",  MACHINE_NO_SOUND ) // or Trivia Video Quiz? Professor Trivia appears on more screens
+GAME( 1985, triviaqz2, triviaqz, triviaquiz, triviaquiz, triviaquiz_state, empty_init, ROT0, "Intermatic Manufacturing", "Professor Trivia (set 2)",  MACHINE_NO_SOUND )
