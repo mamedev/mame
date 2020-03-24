@@ -10,9 +10,8 @@
  *   - interrupts
  *   - scsi
  *   - dma
- *   - video
  *   - sound
- *   - keyboard/mouse
+ *   - mouse
  */
 
 #include "emu.h"
@@ -27,6 +26,7 @@
 #include "machine/z80scc.h"
 #include "machine/am79c90.h"
 #include "machine/upd765.h"
+#include "machine/news_kbd.h"
 
 // video
 #include "screen.h"
@@ -52,7 +52,7 @@
 class news_r3k_state : public driver_device
 {
 public:
-	news_r3k_state(machine_config const &mconfig, device_type type, const char *tag)
+	news_r3k_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this, "cpu")
 		, m_ram(*this, "ram")
@@ -60,8 +60,11 @@ public:
 		, m_scc(*this, "scc")
 		, m_net(*this, "net")
 		, m_fdc(*this, "fdc")
+		, m_lcd(*this, "lcd")
+		, m_kbd(*this, "kbd")
 		, m_serial(*this, "serial%u", 0U)
 		, m_scsibus(*this, "scsi")
+		, m_vram(*this, "vram")
 		, m_led(*this, "led%u", 0U)
 	{
 	}
@@ -83,6 +86,9 @@ public:
 	void init_common();
 
 protected:
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
+
+	void kbd_irq(int state);
 	void debug_w(u8 data);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -95,12 +101,17 @@ protected:
 	required_device<am7990_device> m_net;
 	required_device<upd72065_device> m_fdc;
 
+	required_device<screen_device> m_lcd;
+	required_device<news_hle_kbd_device> m_kbd;
+
 	required_device_array<rs232_port_device, 2> m_serial;
 	required_device<nscsi_bus_device> m_scsibus;
 
-	std::unique_ptr<u16[]> m_net_ram;
-
+	required_shared_ptr<u32> m_vram;
 	output_finder<4> m_led;
+
+	std::unique_ptr<u16[]> m_net_ram;
+	u8 m_kbd_status;
 };
 
 FLOPPY_FORMATS_MEMBER(news_r3k_state::floppy_formats)
@@ -112,6 +123,8 @@ void news_r3k_state::machine_start()
 	m_led.resolve();
 
 	m_net_ram = std::make_unique<u16[]>(8192);
+
+	m_kbd_status = 0;
 }
 
 void news_r3k_state::machine_reset()
@@ -126,6 +139,16 @@ void news_r3k_state::init_common()
 
 void news_r3k_state::cpu_map(address_map &map)
 {
+	// FIXME: silence a lot of unhandled graphics addresses
+	map(0x187702b0, 0x187702b3).nopw().umask32(0xffff);
+	map(0x187c0000, 0x187c0003).nopw(); // palette?
+	map(0x187e0000, 0x187e000f).nopw(); // lcdc?
+	map(0x18f702b0, 0x18f702b3).nopw().umask32(0xffff);
+	map(0x18fc0000, 0x18fc0003).nopw(); // palette?
+	map(0x18fe0000, 0x18fe0003).nopw(); // lcdc?
+
+	map(0x08000000, 0x080fffff).ram().share("vram");
+
 	map(0x1fc00000, 0x1fc1ffff).rom().region("eprom", 0);
 
 	//map(0x1fc40004, 0x1fc40004).w().umask32(0xff); ??
@@ -135,12 +158,17 @@ void news_r3k_state::cpu_map(address_map &map)
 	//map(0x1fc80006, 0x1fc80006); // itimer
 	map(0x1fcc0003, 0x1fcc0003).w(FUNC(news_r3k_state::debug_w));
 
+	map(0x1fd00000, 0x1fd00000).r(m_kbd, FUNC(news_hle_kbd_device::data_r));
+	map(0x1fd00001, 0x1fd00001).lr8([this]() { return m_kbd_status; }, "kbd_status_r");
+	map(0x1fd00002, 0x1fd00002).lw8([this](u8 data) { m_kbd->reset(); }, "kbd_reset_w");
+	map(0x1fd40000, 0x1fd40003).noprw().umask32(0xffff); // FIXME: ignore buzzer for now
+
 	//map(0x1fe00000, 0x1fe0000f); // dmac 0448
 	//map(0x1fe00100, 0x1fe00100); // scsi
 	map(0x1fe00200, 0x1fe00203).m(m_fdc, FUNC(upd72069_device::map)).umask32(0xffff);
 	//map(0x1fe00300, 0x1fe00307); // sound
 
-	map(0x1fe40000, 0x1fe40003).portr("SW2").umask32(0xff);
+	map(0x1fe40000, 0x1fe40003).portr("SW2");
 	map(0x1fe80000, 0x1fe800ff).rom().region("idrom", 0);
 
 	map(0x1fec0000, 0x1fec0003).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
@@ -155,14 +183,26 @@ void news_r3k_state::cpu_map(address_map &map)
 
 static INPUT_PORTS_START(nws3260)
 	PORT_START("SW2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	// TODO: other combinations of switches 1-3 may be valid
+	PORT_DIPNAME(0x07000000, 0x02000000, "Display") PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(0x00000000, "Console")
+	PORT_DIPSETTING(0x02000000, "LCD")
+	PORT_DIPNAME(0x08000000, 0x00000000, "Boot Device") PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(0x00000000, "Disk")
+	PORT_DIPSETTING(0x08000000, "Network")
+	PORT_DIPNAME(0x10000000, 0x00000000, "Automatic Boot") PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(0x00000000, DEF_STR(Off))
+	PORT_DIPSETTING(0x10000000, DEF_STR(On))
+	PORT_DIPNAME(0x20000000, 0x00000000, "Diagnostic Mode") PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(0x00000000, DEF_STR(Off))
+	PORT_DIPSETTING(0x20000000, DEF_STR(On))
+	// TODO: not completely clear what this switch does
+	PORT_DIPNAME(0x40000000, 0x00000000, "RAM") PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(0x00000000, "Enabled")
+	PORT_DIPSETTING(0x40000000, "Disabled")
+	PORT_DIPNAME(0x80000000, 0x00000000, "Console Baud") PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(0x00000000, "9600")
+	PORT_DIPSETTING(0x80000000, "1200")
 
 	PORT_START("SW3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
@@ -170,6 +210,35 @@ static INPUT_PORTS_START(nws3260)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
 INPUT_PORTS_END
+
+u32 news_r3k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
+{
+	u32 *pixel_pointer = m_vram;
+
+	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+	{
+		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 4)
+		{
+			u32 const pixel_data = *pixel_pointer++;
+
+			bitmap.pix(y, x + 0) = u8(pixel_data >> 24) ? rgb_t::white() : rgb_t::black();
+			bitmap.pix(y, x + 1) = u8(pixel_data >> 16) ? rgb_t::white() : rgb_t::black();
+			bitmap.pix(y, x + 2) = u8(pixel_data >> 8) ? rgb_t::white() : rgb_t::black();
+			bitmap.pix(y, x + 3) = u8(pixel_data >> 0) ? rgb_t::white() : rgb_t::black();
+		}
+	}
+
+	return 0;
+}
+
+void news_r3k_state::kbd_irq(int state)
+{
+	// TODO: relay irq to cpu
+	if (state)
+		m_kbd_status |= 2;
+	else
+		m_kbd_status &= ~2;
+}
 
 void news_r3k_state::debug_w(u8 data)
 {
@@ -193,6 +262,7 @@ void news_r3k_state::common(machine_config &config)
 	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
 
 	// 12 SIMM slots
+	// 30pin 4Mbyte SIMMs with parity?
 	RAM(config, m_ram);
 	m_ram->set_default_size("16M");
 
@@ -238,7 +308,17 @@ void news_r3k_state::common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:5", news_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", news_scsi_devices, "cdrom");
 
-	// TODO: HD64646FS LCD controller
+	/*
+	 * FIXME: the screen is supposed to be an 1120x780 monochrome (black/white)
+	 * LCD, with an HD64646FS LCD controller. The boot prom is happy if we just
+	 * ignore the LCDC and pretend the screen is 1024 pixels wide.
+	 */
+	SCREEN(config, m_lcd, SCREEN_TYPE_LCD);
+	m_lcd->set_raw(47923200, 1024, 0, 1023, 780, 0, 779);
+	m_lcd->set_screen_update(FUNC(news_r3k_state::screen_update));
+
+	NEWS_HLE_KBD(config, m_kbd);
+	m_kbd->irq_out().set(*this, FUNC(news_r3k_state::kbd_irq));
 }
 
 void news_r3k_state::nws3260(machine_config &config)
