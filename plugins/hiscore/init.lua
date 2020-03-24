@@ -22,7 +22,7 @@ end
 function hiscore.startplugin()
 
 	local hiscoredata_path = "hiscore.dat";
-	local hiscore_path = "hi";
+	local hiscore_path = manager:options().entries.homepath:value() .. "/hi";  -- 2fix: homepath = "." on linux?
 	local config_path = lfs.env_replace(manager:options().entries.inipath:value():match("[^;]+") .. "/hiscore.ini");
 
 	local current_checksum = 0;
@@ -107,16 +107,16 @@ function hiscore.startplugin()
 	  local rm_match_crc = 0;
 	  if emu.softname() ~= "" then
 		local soft = emu.softname():match("([^:]*)$")
-		rm_match = emu.romname() .. ',' .. soft .. ':';
+		rm_match = '^' .. emu.romname() .. ',' .. soft .. ':';
 	  elseif manager:machine().images["cart"] and manager:machine().images["cart"]:filename() ~= nil then
 		local basename = string.gsub(manager:machine().images["cart"]:filename(), "(.*/)(.*)", "%2");
 		local filename = string.gsub(basename, "(.*)(%..*)", "%1");   -- strip the extension (e.g. ".nes")
-		rm_match = emu.romname() .. "," .. filename .. ':';
+		rm_match = '^' .. emu.romname() .. "," .. filename .. ':';
 		rm_match_crc = emu.romname() .. ",crc32=" .. string.format("%x", manager:machine().images["cart"]:crc()) .. ':';
 	  elseif manager:machine().images["cdrom"] and manager:machine().images["cdrom"]:filename() ~= nil then
 		local basename = string.gsub(manager:machine().images["cdrom"]:filename(), "(.*/)(.*)", "%2");
 		local filename = string.gsub(basename, "(.*)(%..*)", "%1");   -- strip the extension (e.g. ".cue")
-		rm_match = emu.romname() .. "," .. filename .. ':';
+		rm_match = '^' .. emu.romname() .. "," .. filename .. ':';
 		--rm_match_crc = string.format("%x", manager:machine().images["cdrom"]:crc()) .. ':';  -- always 0 with cdrom media?
 	  else
 		rm_match = emu.romname() .. ':';
@@ -197,7 +197,9 @@ function hiscore.startplugin()
 	  if not output then
 		-- attempt to create the directory, and try again
 		lfs.mkdir( hiscore_path );
-		lfs.mkdir( hiscore_path .. '/' .. emu.romname() );
+		if manager:machine().images["cart"] or manager:machine().images["cdrom"] then
+			lfs.mkdir( hiscore_path .. '/' .. emu.romname() );
+		end
 		output = io.open(get_file_name(), "wb");
 	  end
 	  emu.print_verbose("hiscore: write_scores output")
@@ -345,4 +347,3 @@ function hiscore.startplugin()
 end
 
 return exports
-
