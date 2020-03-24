@@ -2,8 +2,8 @@
   "plugin": {
 	"name": "hiscore",
 	"description": "Hiscore support",
-	"version": "1.0.0",
-	"author": "borgar@borgar.net",
+	"version": "1.1.0",
+	"author": "borgar@borgar.net & eadmaster",
 	"type": "plugin",
 	"start": "false"
   }
