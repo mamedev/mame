@@ -111,7 +111,7 @@ static INPUT_PORTS_START( jak_mpac )
 	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DIALX") // for Pole Position, joystick can be twisted like a dial/wheel (limited?) (check range) (note, range is different to GKR unit)
-	PORT_BIT(0x03ff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_MINMAX(0x00,0x03ff)
+	PORT_BIT(0x03ff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x03ff)
 INPUT_PORTS_END
 
 void jakks_state::base_config(machine_config& config)
