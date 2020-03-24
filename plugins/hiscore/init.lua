@@ -95,22 +95,25 @@ function hiscore.startplugin()
 	end
 
 
-	local function read_hiscore_dat ()
-	  local file = io.open( hiscoredata_path, "r" );
+	local function read_hiscore_dat (hiscoredata_path)
+	  -- emu.print_verbose( "hiscore_plugin_path: " .. hiscore_plugin_path );
+	  local file = io.open( hiscore_plugin_path .. "/" .. hiscoredata_path, "r" );
+	  if file == nil then
+		-- file not found
+		emu.print_verbose( "hiscore file not found: " .. hiscoredata_path );
+		return ""
+	  end
 	  local rm_match;
 	  local rm_match_crc = 0;
-	  if not file then
-		file = io.open( hiscore_plugin_path .. "/console_hiscore.dat", "r" );
-	  end
 	  if emu.softname() ~= "" then
 		local soft = emu.softname():match("([^:]*)$")
 		rm_match = emu.romname() .. ',' .. soft .. ':';
-	  elseif manager:machine().images["cart"]:filename() ~= nil then
+	  elseif manager:machine().images["cart"] and manager:machine().images["cart"]:filename() ~= nil then
 		local basename = string.gsub(manager:machine().images["cart"]:filename(), "(.*/)(.*)", "%2");
 		local filename = string.gsub(basename, "(.*)(%..*)", "%1");   -- strip the extension (e.g. ".nes")
 		rm_match = emu.romname() .. "," .. filename .. ':';
 		rm_match_crc = emu.romname() .. ",crc32=" .. string.format("%x", manager:machine().images["cart"]:crc()) .. ':';
-	  elseif manager:machine().images["cdrom"]:filename() ~= nil then
+	  elseif manager:machine().images["cdrom"] and manager:machine().images["cdrom"]:filename() ~= nil then
 		local basename = string.gsub(manager:machine().images["cdrom"]:filename(), "(.*/)(.*)", "%2");
 		local filename = string.gsub(basename, "(.*)(%..*)", "%1");   -- strip the extension (e.g. ".cue")
 		rm_match = emu.romname() .. "," .. filename .. ':';
@@ -172,11 +175,11 @@ function hiscore.startplugin()
 	  if emu.softname() ~= "" then
 		local soft = emu.softname():match("([^:]*)$")
 		r = hiscore_path .. '/' .. emu.romname() .. '/' .. soft .. ".hi";
-	  elseif manager:machine().images["cart"]:filename() ~= nil then
+	  elseif manager:machine().images["cart"] and manager:machine().images["cart"]:filename() ~= nil then
 		local basename = string.gsub(manager:machine().images["cart"]:filename(), "(.*/)(.*)", "%2")
 		local filename = string.gsub(basename, "(.*)(%..*)", "%1");   -- strip the extension (e.g. ".nes")
 		r = hiscore_path .. '/' .. emu.romname() .. '/' .. filename .. ".hi";
-	  elseif manager:machine().images["cdrom"]:filename() ~= nil then
+	  elseif manager:machine().images["cdrom"] and manager:machine().images["cdrom"]:filename() ~= nil then
 		local basename = string.gsub(manager:machine().images["cdrom"]:filename(), "(.*/)(.*)", "%2");
 		local filename = string.gsub(basename, "(.*)(%..*)", "%1");   -- strip the media extension (e.g. ".cue")
 		r = hiscore_path .. '/' .. emu.romname() .. '/' .. filename .. ".hi";
@@ -306,7 +309,11 @@ function hiscore.startplugin()
 		last_write_time = -10
 		emu.print_verbose("Starting " .. emu.gamename())
 		config_read = read_config();
-		local dat = read_hiscore_dat()
+		local dat = read_hiscore_dat("hiscore.dat")
+		if dat and dat == "" then
+			-- nothing found, try in console_hiscore.dat instead
+			dat = read_hiscore_dat("console_hiscore.dat")
+		end
 		if dat and dat ~= "" then
 			emu.print_verbose( "hiscore: found hiscore.dat entry for " .. emu.romname() );
 			res, positions = pcall(parse_table, dat);
@@ -338,3 +345,4 @@ function hiscore.startplugin()
 end
 
 return exports
+
