@@ -273,7 +273,7 @@ void roland_d10_state::d110_bank_map(address_map &map)
 
 void roland_d10_state::d10(machine_config &config)
 {
-	P8098(config, m_maincpu, 12_MHz_XTAL);
+	P8098(config, m_maincpu, 12_MHz_XTAL); // N8097BH
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_d10_state::d10_map);
 	m_maincpu->serial_tx_cb().set(FUNC(roland_d10_state::midi_w));
 	m_maincpu->in_p0_cb().set(FUNC(roland_d10_state::port0_r));
@@ -315,6 +315,7 @@ void roland_d10_state::d110(machine_config &config)
 {
 	d10(config);
 
+	// D-110 ties BUSWIDTH to GND to make all external accesses 8 bits wide
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_d10_state::d110_map);
 	//m_bank->set_data_width(8);
 	m_bank->set_addrmap(0, &roland_d10_state::d110_bank_map);
