@@ -236,14 +236,14 @@ void roland_d10_state::d10_map(address_map &map)
 	map(0x0300, 0x0300).w(FUNC(roland_d10_state::lcd_data_w));
 	map(0x0380, 0x0380).rw(FUNC(roland_d10_state::lcd_ctrl_r), FUNC(roland_d10_state::lcd_ctrl_w));
 	map(0x0c00, 0x0dff).rw("keyscan", FUNC(mb63h149_device::read), FUNC(mb63h149_device::write));
-	map(0x1000, 0x7fff).rom().region("maincpu", 0x1000);
-	map(0x8000, 0xbfff).m(m_bank, FUNC(address_map_bank_device::amap8));
+	map(0x1000, 0x7fff).rom().region("firmware", 0x1000);
+	map(0x8000, 0xbfff).m(m_bank, FUNC(address_map_bank_device::amap16));
 	map(0xc000, 0xffff).rw(FUNC(roland_d10_state::fixed_r), FUNC(roland_d10_state::fixed_w));
 }
 
 void roland_d10_state::d10_bank_map(address_map &map)
 {
-	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
+	map(0x00000, 0x0ffff).rom().region("firmware", 0);
 	map(0x40000, 0x47fff).ram();
 	map(0x80000, 0x87fff).ram().share("rams");
 	map(0xa0000, 0xbffff).rom().region("presets", 0);
@@ -254,18 +254,19 @@ void roland_d10_state::d110_map(address_map &map)
 {
 	map(0x0100, 0x0100).w(FUNC(roland_d10_state::bank_w));
 	map(0x0200, 0x0200).w(FUNC(roland_d10_state::so_w));
-	map(0x021a, 0x021a).portr("SC0").nopw();
-	map(0x021c, 0x021c).portr("SC1");
+	map(0x021a, 0x021b).portr("SC0").nopw();
+	map(0x021c, 0x021d).portr("SC1");
 	map(0x0300, 0x0300).w(FUNC(roland_d10_state::lcd_data_w));
 	map(0x0380, 0x0380).rw(FUNC(roland_d10_state::lcd_ctrl_r), FUNC(roland_d10_state::lcd_ctrl_w));
-	map(0x1000, 0x7fff).rom().region("maincpu", 0x1000);
+	//map(0x1000, 0x7fff).rom().region("firmware", 0x1000);
+	map(0x1000, 0x7fff).lr8([this](offs_t offset) { return m_bank->space(0).read_byte(offset + 0x01000); }, "firmware_r");
 	map(0x8000, 0xbfff).m(m_bank, FUNC(address_map_bank_device::amap8));
 	map(0xc000, 0xffff).rw(FUNC(roland_d10_state::fixed_r), FUNC(roland_d10_state::fixed_w));
 }
 
 void roland_d10_state::d110_bank_map(address_map &map)
 {
-	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
+	map(0x00000, 0x0ffff).rom().region("firmware", 0);
 	map(0x40000, 0x47fff).ram().share("rams");
 	map(0x80000, 0x9ffff).rom().region("presets", 0);
 	map(0xc0000, 0xc7fff).ram().share("memcs");
@@ -273,14 +274,14 @@ void roland_d10_state::d110_bank_map(address_map &map)
 
 void roland_d10_state::d10(machine_config &config)
 {
-	P8098(config, m_maincpu, 12_MHz_XTAL); // N8097BH
+	N8097BH(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_d10_state::d10_map);
 	m_maincpu->serial_tx_cb().set(FUNC(roland_d10_state::midi_w));
 	m_maincpu->in_p0_cb().set(FUNC(roland_d10_state::port0_r));
 
 	ADDRESS_MAP_BANK(config, m_bank);
 	m_bank->set_endianness(ENDIANNESS_LITTLE);
-	m_bank->set_data_width(8); // FIXME: actually 16 with dynamic bus sizing
+	m_bank->set_data_width(16);
 	m_bank->set_addr_width(20);
 	m_bank->set_stride(0x4000);
 	m_bank->set_addrmap(0, &roland_d10_state::d10_bank_map);
@@ -317,14 +318,14 @@ void roland_d10_state::d110(machine_config &config)
 
 	// D-110 ties BUSWIDTH to GND to make all external accesses 8 bits wide
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_d10_state::d110_map);
-	//m_bank->set_data_width(8);
+	m_bank->set_data_width(8);
 	m_bank->set_addrmap(0, &roland_d10_state::d110_bank_map);
 
 	config.device_remove("keyscan");
 }
 
 ROM_START( d10 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION16_LE( 0x10000, "firmware", 0 )
 	ROM_DEFAULT_BIOS( "106" )
 
 	ROM_SYSTEM_BIOS( 0, "102", "Firmware 1.02" )
@@ -335,7 +336,7 @@ ROM_START( d10 )
 	ROMX_LOAD( "d-10a_1.06.ic14",              1,   0x8000, CRC(ea90848a) SHA1(1689b47210e4033b922816a1817c430358d96641), ROM_BIOS(1) | ROM_SKIP(1) ) // AM27C256-200DC
 	ROMX_LOAD( "d-10b_1.06.ic13",              0,   0x8000, CRC(26dbbf48) SHA1(f6063c2e3000e08a0dc3e45c8ee9400916f5493c), ROM_BIOS(1) | ROM_SKIP(1) ) // AM27C256-155DC
 
-	ROM_REGION( 0x20000, "presets", 0 )
+	ROM_REGION16_LE( 0x20000, "presets", 0 )
 	ROM_LOAD(  "r15179873-lh5310-97.ic12",     0,  0x20000, CRC(580a8f9e) SHA1(05587a0542b01625dcde37de5bb339880e47eb93) )
 
 	ROM_REGION( 0x100000, "la32", 0 )
@@ -347,7 +348,7 @@ ROM_START( d10 )
 ROM_END
 
 ROM_START( d110 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "firmware", 0 )
 	ROM_DEFAULT_BIOS( "110" )
 
 	ROM_SYSTEM_BIOS( 0, "106", "Firmware 1.06" )

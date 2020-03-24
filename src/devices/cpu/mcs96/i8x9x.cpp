@@ -12,8 +12,8 @@
 #include "i8x9x.h"
 #include "i8x9xd.h"
 
-i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
-	mcs96_device(mconfig, type, tag, owner, clock, 8, address_map_constructor(FUNC(i8x9x_device::internal_regs), this)),
+i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int data_width) :
+	mcs96_device(mconfig, type, tag, owner, clock, data_width, address_map_constructor(FUNC(i8x9x_device::internal_regs), this)),
 	m_ach_cb(*this),
 	m_hso_cb(*this),
 	m_serial_tx_cb(*this),
@@ -491,17 +491,29 @@ void i8x9x_device::internal_update(u64 current_time)
 	recompute_bcount(event_time);
 }
 
-c8095_device::c8095_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	i8x9x_device(mconfig, C8095, tag, owner, clock)
+c8095_90_device::c8095_90_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	i8x9x_device(mconfig, C8095_90, tag, owner, clock, 16)
+{
+}
+
+n8097bh_device::n8097bh_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	i8x9x_device(mconfig, N8097BH, tag, owner, clock, 16)
 {
 }
 
 p8098_device::p8098_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	i8x9x_device(mconfig, P8098, tag, owner, clock)
+	i8x9x_device(mconfig, P8098, tag, owner, clock, 8)
 {
 }
 
-DEFINE_DEVICE_TYPE(C8095, c8095_device, "c8095", "Intel C8095")
+p8798_device::p8798_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	i8x9x_device(mconfig, P8798, tag, owner, clock, 8)
+{
+}
+
+DEFINE_DEVICE_TYPE(C8095_90, c8095_90_device, "c8095_90", "Intel C8095-90")
+DEFINE_DEVICE_TYPE(N8097BH, n8097bh_device, "n8097bh", "Intel N8097BH")
 DEFINE_DEVICE_TYPE(P8098, p8098_device, "p8098", "Intel P8098")
+DEFINE_DEVICE_TYPE(P8798, p8798_device, "p8798", "Intel P8798")
 
 #include "cpu/mcs96/i8x9x.hxx"

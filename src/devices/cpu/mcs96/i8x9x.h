@@ -53,7 +53,7 @@ public:
 	void serial_w(u8 val);
 
 protected:
-	i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int data_width);
 
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
@@ -147,9 +147,14 @@ private:
 	void serial_send_done();
 };
 
-class c8095_device : public i8x9x_device {
+class c8095_90_device : public i8x9x_device {
 public:
-	c8095_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	c8095_90_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class n8097bh_device : public i8x9x_device {
+public:
+	n8097bh_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class p8098_device : public i8x9x_device {
@@ -157,7 +162,14 @@ public:
 	p8098_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
-DECLARE_DEVICE_TYPE(C8095, c8095_device)
+class p8798_device : public i8x9x_device {
+public:
+	p8798_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+DECLARE_DEVICE_TYPE(C8095_90, c8095_90_device)
+DECLARE_DEVICE_TYPE(N8097BH, n8097bh_device)
 DECLARE_DEVICE_TYPE(P8098, p8098_device)
+DECLARE_DEVICE_TYPE(P8798, p8798_device)
 
 #endif // MAME_CPU_MCS96_I8X9X_H

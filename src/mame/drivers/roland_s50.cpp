@@ -39,8 +39,6 @@ protected:
 
 	u8 floppy_status_r();
 	u8 floppy_unknown_r();
-	u8 fdc_r(offs_t offset);
-	void fdc_w(offs_t offset, u8 data);
 
 	void vram_map(address_map &map);
 
@@ -105,16 +103,6 @@ u8 roland_s50_state::floppy_unknown_r()
 	return 1;
 }
 
-u8 roland_s50_state::fdc_r(offs_t offset)
-{
-	return m_fdc->read(offset >> 1);
-}
-
-void roland_s50_state::fdc_w(offs_t offset, u8 data)
-{
-	m_fdc->write(offset >> 1, data);
-}
-
 WRITE_LINE_MEMBER(roland_w30_state::fdc_irq_w)
 {
 }
@@ -140,10 +128,10 @@ void roland_s50_state::s50_mem_map(address_map &map)
 	map(0x4000, 0xbfff).ram(); // TODO: banking
 	map(0xc200, 0xc200).r(FUNC(roland_s50_state::floppy_status_r));
 	map(0xc300, 0xc300).r(FUNC(roland_s50_state::floppy_unknown_r));
-	//map(0xc800, 0xc807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
-	map(0xc800, 0xc800).select(6).rw(FUNC(roland_s50_state::fdc_r), FUNC(roland_s50_state::fdc_w));
+	map(0xc800, 0xc807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
 	map(0xd200, 0xd200).r(m_vdp, FUNC(tms3556_device::vram_r));
-	map(0xd202, 0xd202).nopr().w(m_vdp, FUNC(tms3556_device::vram_w));
+	map(0xd202, 0xd203).nopr();
+	map(0xd202, 0xd202).w(m_vdp, FUNC(tms3556_device::vram_w));
 	map(0xd204, 0xd204).rw(m_vdp, FUNC(tms3556_device::reg_r), FUNC(tms3556_device::reg_w));
 }
 
@@ -153,10 +141,10 @@ void roland_s50_state::s550_mem_map(address_map &map)
 	map(0x4000, 0xbfff).ram(); // TODO: banking
 	map(0xc200, 0xc200).r(FUNC(roland_s50_state::floppy_status_r));
 	map(0xc300, 0xc300).r(FUNC(roland_s50_state::floppy_unknown_r));
-	//map(0xc800, 0xc807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
-	map(0xc800, 0xc800).select(6).rw(FUNC(roland_s50_state::fdc_r), FUNC(roland_s50_state::fdc_w));
+	map(0xc800, 0xc807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
 	map(0xd000, 0xd000).r(m_vdp, FUNC(tms3556_device::vram_r));
-	map(0xd002, 0xd002).nopr().w(m_vdp, FUNC(tms3556_device::vram_w));
+	map(0xd002, 0xd003).nopr();
+	map(0xd002, 0xd002).w(m_vdp, FUNC(tms3556_device::vram_w));
 	map(0xd004, 0xd004).rw(m_vdp, FUNC(tms3556_device::reg_r), FUNC(tms3556_device::reg_w));
 }
 
@@ -202,7 +190,7 @@ static void s50_floppies(device_slot_interface &device)
 
 void roland_s50_state::s50(machine_config &config)
 {
-	C8095(config, m_maincpu, 24_MHz_XTAL / 2); // C8095-90
+	C8095_90(config, m_maincpu, 24_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_s50_state::s50_mem_map);
 
 	mb63h149_device &keyscan(MB63H149(config, "keyscan", 24_MHz_XTAL / 2));
@@ -252,7 +240,7 @@ void roland_s50_state::s550(machine_config &config)
 
 void roland_w30_state::w30(machine_config &config)
 {
-	P8098(config, m_maincpu, 24_MHz_XTAL / 2); // 8097BH
+	N8097BH(config, m_maincpu, 24_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_w30_state::w30_mem_map);
 
 	mb63h149_device &keyscan(MB63H149(config, "keyscan", 24_MHz_XTAL / 2));
@@ -327,7 +315,7 @@ void roland_w30_state::s330(machine_config &config)
 #endif
 
 ROM_START(s50)
-	ROM_REGION(0x4000, "program", 0)
+	ROM_REGION16_LE(0x4000, "program", 0)
 	// PROMs contain identical data but are mapped with even bytes loaded from IC64 and odd bytes from IC65
 	ROM_LOAD("s-50.ic64", 0x0000, 0x4000, CRC(9a911016) SHA1(00a829d7921556c41d872c10b7bbb82b62b6c5cf))
 	ROM_LOAD("s-50.ic65", 0x0000, 0x4000, CRC(9a911016) SHA1(00a829d7921556c41d872c10b7bbb82b62b6c5cf))
@@ -337,7 +325,7 @@ ROM_START(s50)
 ROM_END
 
 ROM_START(s550)
-	ROM_REGION(0x4000, "program", 0)
+	ROM_REGION16_LE(0x4000, "program", 0)
 	// PROMs contain identical data but are mapped with even bytes loaded from IC6 and odd bytes from IC3
 	ROM_LOAD("s-550_2-0-0.ic6", 0x0000, 0x4000, CRC(9dbc93b7) SHA1(bd9219772773f51e5ad7872daa1eaf03ec23f2c5))
 	ROM_LOAD("s-550_2-0-0.ic3", 0x0000, 0x4000, CRC(9dbc93b7) SHA1(bd9219772773f51e5ad7872daa1eaf03ec23f2c5))
@@ -347,7 +335,7 @@ ROM_START(s550)
 ROM_END
 
 ROM_START(w30)
-	ROM_REGION(0x4000, "program", 0)
+	ROM_REGION16_LE(0x4000, "program", 0)
 	ROM_LOAD16_BYTE("w-30_1-0-3.ic19", 0x0000, 0x2000, CRC(4aa83074) SHA1(6d6f3f9dc58a4aed7cbc5d8cfce4a8b3bc2a276a))
 	ROM_LOAD16_BYTE("w-30_1-0-3.ic20", 0x0001, 0x2000, CRC(9c5e3c7f) SHA1(42a0463322be5f965967d531d3636376785c9820))
 ROM_END
