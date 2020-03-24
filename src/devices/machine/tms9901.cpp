@@ -314,7 +314,7 @@ void tms9901_device::set_int_line(int n, int state)
      (in this order). When configured as outputs, reading returns the latched
      values.
 */
-READ8_MEMBER( tms9901_device::read )
+uint8_t tms9901_device::read(offs_t offset)
 {
 	return read_bit(offset)? 0x01 : 0x00;
 }
@@ -372,7 +372,7 @@ bool tms9901_device::read_bit(int bit)
      15      Clock mode: /RST2; Interrupt mode: Set Mask 15
      16..31  Set P(n-16) as output, latch value, and output it
 */
-WRITE8_MEMBER( tms9901_device::write )
+void tms9901_device::write(offs_t offset, uint8_t data)
 {
 	write_bit(offset, data!=0);
 }
@@ -486,7 +486,7 @@ void tms9901_device::timer_clock_in(line_state clk)
     a CLK line controlled by the CPU, like the TMS99xx systems.
     In that case, clock is set to 0.
 */
-WRITE_LINE_MEMBER( tms9901_device::phi_line )
+void tms9901_device::phi_line(int state)
 {
 	if (state==ASSERT_LINE)
 	{
@@ -573,7 +573,7 @@ void tms9901_device::device_reset()
 /*
     RST1 input line (active low; using ASSERT/CLEAR).
 */
-WRITE_LINE_MEMBER( tms9901_device::rst1_line )
+void tms9901_device::rst1_line(int state)
 {
 	if (state==ASSERT_LINE) do_reset();
 }

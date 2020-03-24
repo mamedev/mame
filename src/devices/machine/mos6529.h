@@ -41,17 +41,17 @@ public:
 
 	template <std::size_t Bit> auto p_handler() { return m_p_handler[Bit].bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read();
+	void write(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( write_p0 ) { if (state) m_input |= 1; else m_input &= ~1; }
-	DECLARE_WRITE_LINE_MEMBER( write_p1 ) { if (state) m_input |= 2; else m_input &= ~2; }
-	DECLARE_WRITE_LINE_MEMBER( write_p2 ) { if (state) m_input |= 4; else m_input &= ~4; }
-	DECLARE_WRITE_LINE_MEMBER( write_p3 ) { if (state) m_input |= 8; else m_input &= ~8; }
-	DECLARE_WRITE_LINE_MEMBER( write_p4 ) { if (state) m_input |= 16; else m_input &= ~16; }
-	DECLARE_WRITE_LINE_MEMBER( write_p5 ) { if (state) m_input |= 32; else m_input &= ~32; }
-	DECLARE_WRITE_LINE_MEMBER( write_p6 ) { if (state) m_input |= 64; else m_input &= ~64; }
-	DECLARE_WRITE_LINE_MEMBER( write_p7 ) { if (state) m_input |= 128; else m_input &= ~128; }
+	void write_p0(int state) { if (state) m_input |= 1; else m_input &= ~1; }
+	void write_p1(int state) { if (state) m_input |= 2; else m_input &= ~2; }
+	void write_p2(int state) { if (state) m_input |= 4; else m_input &= ~4; }
+	void write_p3(int state) { if (state) m_input |= 8; else m_input &= ~8; }
+	void write_p4(int state) { if (state) m_input |= 16; else m_input &= ~16; }
+	void write_p5(int state) { if (state) m_input |= 32; else m_input &= ~32; }
+	void write_p6(int state) { if (state) m_input |= 64; else m_input &= ~64; }
+	void write_p7(int state) { if (state) m_input |= 128; else m_input &= ~128; }
 
 protected:
 	// device-level overrides

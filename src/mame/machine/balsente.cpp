@@ -248,8 +248,8 @@ READ8_MEMBER(balsente_state::novram_8bit_r)
 
 WRITE8_MEMBER(balsente_state::novram_8bit_w)
 {
-	m_novram[0]->write(space, offset, data & 0x0f);
-	m_novram[1]->write(space, offset, data >> 4);
+	m_novram[0]->write(offset, data & 0x0f);
+	m_novram[1]->write(offset, data >> 4);
 }
 
 

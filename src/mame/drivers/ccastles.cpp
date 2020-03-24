@@ -282,14 +282,14 @@ WRITE_LINE_MEMBER(ccastles_state::nvram_store_w)
 
 READ8_MEMBER(ccastles_state::nvram_r)
 {
-	return (m_nvram_4b->read(space, offset) & 0x0f) | (m_nvram_4a->read(space, offset) << 4);
+	return (m_nvram_4b->read(space, offset) & 0x0f) | (m_nvram_4a->read(space,offset) << 4);
 }
 
 
 WRITE8_MEMBER(ccastles_state::nvram_w)
 {
-	m_nvram_4b->write(space, offset, data);
-	m_nvram_4a->write(space, offset, data >> 4);
+	m_nvram_4b->write(offset, data);
+	m_nvram_4a->write(offset, data >> 4);
 }
 
 

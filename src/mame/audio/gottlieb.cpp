@@ -75,7 +75,7 @@ WRITE8_MEMBER( gottlieb_sound_r0_device::write )
 	uint8_t pb0_3 = data ^ 15;
 	uint8_t pb4_7 = ioport("SB0")->read() & 0x90;
 	m_sndcmd = pb0_3 | pb4_7;
-	m_r6530->write(space, offset, m_sndcmd);
+	m_r6530->write(offset, m_sndcmd);
 }
 
 

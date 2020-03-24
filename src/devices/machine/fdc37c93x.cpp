@@ -553,12 +553,12 @@ void fdc37c93x_device::map_lpt(address_map &map)
 
 READ8_MEMBER(fdc37c93x_device::lpt_read)
 {
-	return pc_lpt_lptdev->read(space, offset, mem_mask);
+	return pc_lpt_lptdev->read(offset);
 }
 
 WRITE8_MEMBER(fdc37c93x_device::lpt_write)
 {
-	pc_lpt_lptdev->write(space, offset, data, mem_mask);
+	pc_lpt_lptdev->write(offset, data);
 }
 
 void fdc37c93x_device::map_lpt_addresses()

@@ -213,7 +213,7 @@ READ8_MEMBER( tandy2k_state::kbint_clr_r )
 		m_kb->busy_w(1);
 		m_pic1->ir0_w(CLEAR_LINE);
 
-		return m_pc_keyboard->read(space, 0);
+		return m_pc_keyboard->read();
 	}
 
 	return 0xff;

@@ -123,7 +123,7 @@ void icm7170_device::nvram_write(emu_file &file)
 }
 
 // non-inherited device functions
-READ8_MEMBER( icm7170_device::read )
+uint8_t icm7170_device::read(offs_t offset)
 {
 	uint8_t data =  m_regs[offset & 0x1f];
 
@@ -132,7 +132,7 @@ READ8_MEMBER( icm7170_device::read )
 	return data;
 }
 
-WRITE8_MEMBER( icm7170_device::write )
+void icm7170_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x1f)
 	{

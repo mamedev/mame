@@ -283,7 +283,7 @@ TIMER_CALLBACK_MEMBER( mc6846_device::timer_one_shot )
 /************************** CPU interface ****************************/
 
 
-READ8_MEMBER(mc6846_device::read)
+uint8_t mc6846_device::read(offs_t offset)
 {
 	switch ( offset )
 	{
@@ -352,7 +352,7 @@ READ8_MEMBER(mc6846_device::read)
 
 
 
-WRITE8_MEMBER(mc6846_device::write)
+void mc6846_device::write(offs_t offset, uint8_t data)
 {
 
 	switch ( offset )

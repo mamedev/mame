@@ -339,7 +339,7 @@ READ8_MEMBER(tandy1000_state::tandy1000_pio_r)
 	case 0:
 		if (m_tandy_ppi_ack)
 		{
-			m_tandy_ppi_porta = m_keyboard->read(space, 0);
+			m_tandy_ppi_porta = m_keyboard->read();
 			m_tandy_ppi_ack = 0;
 		}
 		data = m_tandy_ppi_porta;

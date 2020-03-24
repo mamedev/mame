@@ -18,38 +18,38 @@ public:
 	auto out_irq_callback() { return m_irq_handler.bind(); }
 	auto out_dreq_callback() { return m_dreq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER(bdid_r);
-	DECLARE_READ8_MEMBER(sctl_r);
-	DECLARE_READ8_MEMBER(scmd_r);
-	DECLARE_READ8_MEMBER(tmod_r);
-	DECLARE_READ8_MEMBER(ints_r);
-	DECLARE_READ8_MEMBER(psns_r);
-	DECLARE_READ8_MEMBER(ssts_r);
-	DECLARE_READ8_MEMBER(serr_r);
-	DECLARE_READ8_MEMBER(pctl_r);
-	DECLARE_READ8_MEMBER(mbc_r);
-	DECLARE_READ8_MEMBER(dreg_r);
-	DECLARE_READ8_MEMBER(temp_r);
-	DECLARE_READ8_MEMBER(tch_r);
-	DECLARE_READ8_MEMBER(tcm_r);
-	DECLARE_READ8_MEMBER(tcl_r);
-	DECLARE_READ8_MEMBER(exbf_r);
+	uint8_t bdid_r();
+	uint8_t sctl_r();
+	uint8_t scmd_r();
+	uint8_t tmod_r();
+	uint8_t ints_r();
+	uint8_t psns_r();
+	uint8_t ssts_r();
+	uint8_t serr_r();
+	uint8_t pctl_r();
+	uint8_t mbc_r();
+	uint8_t dreg_r();
+	uint8_t temp_r();
+	uint8_t tch_r();
+	uint8_t tcm_r();
+	uint8_t tcl_r();
+	uint8_t exbf_r();
 
-	DECLARE_WRITE8_MEMBER(bdid_w);
-	DECLARE_WRITE8_MEMBER(sctl_w);
-	DECLARE_WRITE8_MEMBER(scmd_w);
-	DECLARE_WRITE8_MEMBER(tmod_w);
-	DECLARE_WRITE8_MEMBER(ints_w);
-	DECLARE_WRITE8_MEMBER(sdgc_w);
-	DECLARE_WRITE8_MEMBER(pctl_w);
-	DECLARE_WRITE8_MEMBER(dreg_w);
-	DECLARE_WRITE8_MEMBER(temp_w);
-	DECLARE_WRITE8_MEMBER(tch_w);
-	DECLARE_WRITE8_MEMBER(tcm_w);
-	DECLARE_WRITE8_MEMBER(tcl_w);
-	DECLARE_WRITE8_MEMBER(exbf_w);
+	void bdid_w(uint8_t data);
+	void sctl_w(uint8_t data);
+	void scmd_w(uint8_t data);
+	void tmod_w(uint8_t data);
+	void ints_w(uint8_t data);
+	void sdgc_w(uint8_t data);
+	void pctl_w(uint8_t data);
+	void dreg_w(uint8_t data);
+	void temp_w(uint8_t data);
+	void tch_w(uint8_t data);
+	void tcm_w(uint8_t data);
+	void tcl_w(uint8_t data);
+	void exbf_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void reset_w(int state);
 	virtual void scsi_ctrl_changed() override;
 
 	uint8_t dma_r();

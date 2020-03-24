@@ -280,13 +280,13 @@ uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, in
 
 	if (!scs && m_vslsi)
 	{
-		data = m_vslsi->read(space, offset & 0x03);
+		data = m_vslsi->read(offset & 0x03);
 	}
 	else if (!user)
 	{
 		if (m_spi_user)
 		{
-			data = m_spi_user->read(space, 0);
+			data = m_spi_user->read();
 		}
 
 		data &= ~0x04;
@@ -298,7 +298,7 @@ uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, in
 	}
 	else if (!keyport)
 	{
-		data = m_spi_kb->read(space, 0);
+		data = m_spi_kb->read();
 	}
 	else if (!cs0)
 	{
@@ -407,11 +407,11 @@ WRITE8_MEMBER( plus4_state::write )
 
 	if (!scs && m_vslsi)
 	{
-		m_vslsi->write(space, offset & 0x03, data);
+		m_vslsi->write(offset & 0x03, data);
 	}
 	else if (!user && m_spi_user)
 	{
-		m_spi_user->write(space, 0, data);
+		m_spi_user->write(data);
 	}
 	else if (!_6551 && m_acia)
 	{
@@ -423,7 +423,7 @@ WRITE8_MEMBER( plus4_state::write )
 	}
 	else if (!keyport)
 	{
-		m_spi_kb->write(space, 0, data);
+		m_spi_kb->write(data);
 	}
 	else if (offset < 0xfd00 || offset >= 0xff20)
 	{

@@ -555,7 +555,7 @@ READ8_MEMBER(z80net_state::lx388_mc6847_videoram_r)
 
 READ8_MEMBER(z80net_state::lx387_data_r)
 {
-	uint8_t data = m_lx387_kr2376->data_r(space, 0) & 0x7f;
+	uint8_t data = m_lx387_kr2376->data_r() & 0x7f;
 	data |= m_lx387_kr2376->get_output_pin(kr2376_device::KR2376_SO) << 7;
 	return data;
 }

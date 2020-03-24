@@ -39,11 +39,11 @@ public:
 	auto irq() { return m_out_irq_cb.bind(); }
 	auto clkout() { return m_out_1hz_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	// hardware start/stop line
-	DECLARE_WRITE_LINE_MEMBER( h_w );
+	void h_w(int state);
 
 protected:
 	// device-level overrides

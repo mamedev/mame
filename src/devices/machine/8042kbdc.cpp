@@ -134,7 +134,7 @@ void kbdc8042_device::at_8042_check_keyboard()
 {
 	if (!m_keyboard.received && !m_mouse.received)
 	{
-		int data = m_keyboard_dev->read(machine().dummy_space(), 0);
+		int data = m_keyboard_dev->read();
 		if (data)
 			at_8042_receive(data);
 	}
@@ -320,7 +320,7 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 		case 0:
 			m_data = data;
 			m_sending=1;
-			m_keyboard_dev->write(space, 0, data);
+			m_keyboard_dev->write(data);
 			break;
 
 		case 1:
