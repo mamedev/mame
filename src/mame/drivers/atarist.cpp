@@ -45,7 +45,7 @@
 static const int IKBD_MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
 static const int IKBD_MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
 
-static const double DMASOUND_DIV[] = { 640.0*8.0, 640.0*4.0, 640.0*2.0, 640.0 };
+static const double DMASOUND_RATE[] = { Y2/640.0/8.0, Y2/640.0/4.0, Y2/640.0/2.0, Y2/640.0 };
 
 
 //**************************************************************************
@@ -945,7 +945,7 @@ WRITE8_MEMBER( ste_state::sound_dma_control_w )
 		if (!m_dmasnd_active)
 		{
 			dmasound_set_state(1);
-			m_dmasound_timer->adjust(attotime::zero, 0, attotime::from_hz(double(Y2)/DMASOUND_DIV[m_dmasnd_mode & 0x03]));
+			m_dmasound_timer->adjust(attotime::zero, 0, attotime::from_hz(DMASOUND_RATE[m_dmasnd_mode & 0x03]));
 		}
 	}
 	else
