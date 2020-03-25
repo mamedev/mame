@@ -25,9 +25,11 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_sram(*this, "sram")
+		, m_io(*this, "io")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:0")
 		, m_vdp(*this, "vdp")
+		, m_keyscan(*this, "keyscan")
 	{
 	}
 
@@ -39,24 +41,30 @@ protected:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(vdp_timer);
 
+	void p2_w(u8 data);
 	void ioga_out_w(u8 data);
 	u8 floppy_status_r();
 	u8 floppy_unknown_r();
+	u16 key_r(offs_t offset);
+	void key_w(offs_t offset, u16 data);
 
 	void sram_map(address_map &map);
 	void vram_map(address_map &map);
 
 private:
-	void s50_mem_map(address_map &map);
-	void s550_mem_map(address_map &map);
+	void mem_map(address_map &map);
+	void s50_io_map(address_map &map);
+	void s550_io_map(address_map &map);
 
 protected:
 	required_device<i8x9x_device> m_maincpu;
 	required_device<address_map_bank_device> m_sram;
+	optional_device<address_map_bank_device> m_io;
 	required_device<wd_fdc_digital_device_base> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<tms3556_device> m_vdp;
 	//required_device<sa16_device> m_wave;
+	optional_device<mb63h149_device> m_keyscan;
 };
 
 class roland_w30_state : public roland_s50_state
@@ -98,6 +106,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(roland_s50_state::vdp_timer)
 }
 
 
+void roland_s50_state::p2_w(u8 data)
+{
+	m_io->set_bank(BIT(data, 5));
+}
+
 void roland_s50_state::ioga_out_w(u8 data)
 {
 	m_sram->set_bank(BIT(data, 6, 2));
@@ -111,6 +124,16 @@ u8 roland_s50_state::floppy_status_r()
 u8 roland_s50_state::floppy_unknown_r()
 {
 	return 1;
+}
+
+u16 roland_s50_state::key_r(offs_t offset)
+{
+	return m_keyscan->read(offset) << 1;
+}
+
+void roland_s50_state::key_w(offs_t offset, u16 data)
+{
+	m_keyscan->write(offset, data >> 1);
 }
 
 WRITE_LINE_MEMBER(roland_w30_state::fdc_irq_w)
@@ -132,36 +155,39 @@ u8 roland_w30_state::unknown2_status_r()
 }
 
 
-void roland_s50_state::s50_mem_map(address_map &map)
+void roland_s50_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("program", 0);
 	map(0x4000, 0x7fff).ram().share("common");
 	map(0x8000, 0xbfff).m(m_sram, FUNC(address_map_bank_device::amap16));
-	map(0xc000, 0xc000).w(FUNC(roland_s50_state::ioga_out_w));
-	map(0xc200, 0xc200).r(FUNC(roland_s50_state::floppy_status_r));
-	map(0xc300, 0xc300).r(FUNC(roland_s50_state::floppy_unknown_r));
-	map(0xc800, 0xc807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
-	map(0xd200, 0xd200).r(m_vdp, FUNC(tms3556_device::vram_r));
-	map(0xd202, 0xd203).nopr();
-	map(0xd202, 0xd202).w(m_vdp, FUNC(tms3556_device::vram_w));
-	map(0xd204, 0xd204).rw(m_vdp, FUNC(tms3556_device::reg_r), FUNC(tms3556_device::reg_w));
-	//map(0xc000, 0xffff).rw(m_wave, FUNC(rf5c16_device::read), FUNC(rf5c16_device::write)).umask16(0xff00);
+	map(0xc000, 0xffff).m(m_io, FUNC(address_map_bank_device::amap16));
 }
 
-void roland_s50_state::s550_mem_map(address_map &map)
+void roland_s50_state::s50_io_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom().region("program", 0);
-	map(0x4000, 0x7fff).ram().share("common");
-	map(0x8000, 0xbfff).m(m_sram, FUNC(address_map_bank_device::amap16));
-	map(0xc000, 0xc000).w(FUNC(roland_s50_state::ioga_out_w));
-	map(0xc200, 0xc200).r(FUNC(roland_s50_state::floppy_status_r));
-	map(0xc300, 0xc300).r(FUNC(roland_s50_state::floppy_unknown_r));
-	map(0xc800, 0xc807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
-	map(0xd000, 0xd000).r(m_vdp, FUNC(tms3556_device::vram_r));
-	map(0xd002, 0xd003).nopr();
-	map(0xd002, 0xd002).w(m_vdp, FUNC(tms3556_device::vram_w));
-	map(0xd004, 0xd004).rw(m_vdp, FUNC(tms3556_device::reg_r), FUNC(tms3556_device::reg_w));
-	//map(0xc000, 0xffff).rw(m_wave, FUNC(rf5c16_device::read), FUNC(rf5c16_device::write)).umask16(0xff00);
+	map(0x0000, 0x0000).w(FUNC(roland_s50_state::ioga_out_w));
+	map(0x0200, 0x0200).r(FUNC(roland_s50_state::floppy_status_r));
+	map(0x0300, 0x0300).r(FUNC(roland_s50_state::floppy_unknown_r));
+	map(0x0800, 0x0807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
+	map(0x1200, 0x1200).r(m_vdp, FUNC(tms3556_device::vram_r));
+	map(0x1202, 0x1203).nopr();
+	map(0x1202, 0x1202).w(m_vdp, FUNC(tms3556_device::vram_w));
+	map(0x1204, 0x1204).rw(m_vdp, FUNC(tms3556_device::reg_r), FUNC(tms3556_device::reg_w));
+	//map(0x0000, 0x3fff).rw(m_wave, FUNC(rf5c16_device::read), FUNC(rf5c16_device::write)).umask16(0xff00);
+	map(0x4000, 0x4fff).mirror(0x3000).rw(FUNC(roland_s50_state::key_r), FUNC(roland_s50_state::key_w));
+}
+
+void roland_s50_state::s550_io_map(address_map &map)
+{
+	map(0x0000, 0x0000).w(FUNC(roland_s50_state::ioga_out_w));
+	map(0x0200, 0x0200).r(FUNC(roland_s50_state::floppy_status_r));
+	map(0x0300, 0x0300).r(FUNC(roland_s50_state::floppy_unknown_r));
+	map(0x0800, 0x0807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
+	map(0x1000, 0x1000).r(m_vdp, FUNC(tms3556_device::vram_r));
+	map(0x1002, 0x1003).nopr();
+	map(0x1002, 0x1002).w(m_vdp, FUNC(tms3556_device::vram_w));
+	map(0x1004, 0x1004).rw(m_vdp, FUNC(tms3556_device::reg_r), FUNC(tms3556_device::reg_w));
+	//map(0x0000, 0x3fff).rw(m_wave, FUNC(rf5c16_device::read), FUNC(rf5c16_device::write)).umask16(0xff00);
 }
 
 void roland_w30_state::w30_mem_map(address_map &map)
@@ -217,7 +243,8 @@ static void s50_floppies(device_slot_interface &device)
 void roland_s50_state::s50(machine_config &config)
 {
 	C8095_90(config, m_maincpu, 24_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &roland_s50_state::s50_mem_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &roland_s50_state::mem_map);
+	m_maincpu->out_p2_cb().set(FUNC(roland_s50_state::p2_w));
 
 	ADDRESS_MAP_BANK(config, m_sram);
 	m_sram->set_endianness(ENDIANNESS_LITTLE);
@@ -226,8 +253,15 @@ void roland_s50_state::s50(machine_config &config)
 	m_sram->set_stride(0x4000);
 	m_sram->set_addrmap(0, &roland_s50_state::sram_map);
 
-	mb63h149_device &keyscan(MB63H149(config, "keyscan", 24_MHz_XTAL / 2));
-	(void)keyscan; //keyscan.int_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
+	ADDRESS_MAP_BANK(config, m_io);
+	m_io->set_endianness(ENDIANNESS_LITTLE);
+	m_io->set_data_width(16);
+	m_io->set_addr_width(15);
+	m_io->set_stride(0x4000);
+	m_io->set_addrmap(0, &roland_s50_state::s50_io_map);
+
+	MB63H149(config, m_keyscan, 24_MHz_XTAL / 2);
+	//m_keyscan->int_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
 
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1770-00 or WD1772-02
 	//m_fdc->drq_wr_callback().set_inputline(m_maincpu, i8x9x_device::HSI2_LINE);
@@ -236,7 +270,7 @@ void roland_s50_state::s50(machine_config &config)
 	// Floppy unit: FDD4261A0K or FDD4251G0K
 	FLOPPY_CONNECTOR(config, m_floppy, s50_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	//UPD7538A(config, "fipc", 600_kHz_XTAL);
+	//UPD7538A(config, "fipcpu", 600_kHz_XTAL);
 
 	TMS3556(config, m_vdp, 14.3496_MHz_XTAL); // TMS3556NL
 	m_vdp->set_addrmap(0, &roland_s50_state::vram_map);
@@ -264,9 +298,9 @@ void roland_s50_state::s550(machine_config &config)
 {
 	s50(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &roland_s50_state::s550_mem_map);
+	m_io->set_addrmap(0, &roland_s50_state::s550_io_map);
 
-	//UPD7537(config.device_replace(), "fipc", 400_kHz_XTAL);
+	//UPD7537(config.device_replace(), "fipcpu", 400_kHz_XTAL);
 
 	config.device_remove("keyscan");
 }
@@ -283,8 +317,8 @@ void roland_w30_state::w30(machine_config &config)
 	m_sram->set_stride(0x4000);
 	m_sram->set_addrmap(0, &roland_w30_state::sram_map);
 
-	mb63h149_device &keyscan(MB63H149(config, "keyscan", 24_MHz_XTAL / 2));
-	(void)keyscan; //keyscan.int_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
+	MB63H149(config, m_keyscan, 24_MHz_XTAL / 2);
+	//m_keyscan->int_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
 
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1772-02
 	m_fdc->intrq_wr_callback().set(FUNC(roland_w30_state::fdc_irq_w));
@@ -324,6 +358,13 @@ void roland_w30_state::s330(machine_config &config)
 	P8097(config, m_maincpu, 24_MHz_XTAL / 2); // P8097-90
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_w30_state::s330_mem_map);
 
+	ADDRESS_MAP_BANK(config, m_sram);
+	m_sram->set_endianness(ENDIANNESS_LITTLE);
+	m_sram->set_data_width(16);
+	m_sram->set_addr_width(16);
+	m_sram->set_stride(0x4000);
+	m_sram->set_addrmap(0, &roland_w30_state::sram_map);
+
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1772-02
 	m_fdc->intrq_wr_callback().set(FUNC(roland_w30_state::fdc_irq_w));
 	m_fdc->drq_wr_callback().set(FUNC(roland_w30_state::fdc_drq_w));
@@ -360,7 +401,7 @@ ROM_START(s50)
 	ROM_LOAD("s-50.ic64", 0x0000, 0x4000, CRC(9a911016) SHA1(00a829d7921556c41d872c10b7bbb82b62b6c5cf))
 	ROM_LOAD("s-50.ic65", 0x0000, 0x4000, CRC(9a911016) SHA1(00a829d7921556c41d872c10b7bbb82b62b6c5cf))
 
-	ROM_REGION(0x1000, "fipc", 0) // on panel board
+	ROM_REGION(0x1000, "fipcpu", 0) // on panel board
 	ROM_LOAD("upd7538a-013_15179240.ic1", 0x0000, 0x1000, NO_DUMP)
 ROM_END
 
@@ -370,7 +411,7 @@ ROM_START(s550)
 	ROM_LOAD("s-550_2-0-0.ic6", 0x0000, 0x4000, CRC(9dbc93b7) SHA1(bd9219772773f51e5ad7872daa1eaf03ec23f2c5))
 	ROM_LOAD("s-550_2-0-0.ic3", 0x0000, 0x4000, CRC(9dbc93b7) SHA1(bd9219772773f51e5ad7872daa1eaf03ec23f2c5))
 
-	ROM_REGION(0x800, "fipc", 0)
+	ROM_REGION(0x800, "fipcpu", 0)
 	ROM_LOAD("upd7537c-014_15179201.ic35", 0x000, 0x800, NO_DUMP)
 ROM_END
 

@@ -21,6 +21,8 @@ public:
 		I8X9X_HSO_COMMAND,
 		I8X9X_AD_COMMAND,
 		I8X9X_AD_RESULT,
+		I8X9X_PORT1,
+		I8X9X_PORT2,
 		I8X9X_PWM_CONTROL,
 		I8X9X_SBUF_RX,
 		I8X9X_SBUF_TX,
@@ -51,6 +53,10 @@ public:
 	auto in_p2_cb() { return m_in_p2_cb.bind(); }
 
 	void serial_w(u8 val);
+
+	virtual u8 i8x9x_p0_mask() const noexcept { return 0xff; }
+	virtual bool i8x9x_has_p1() const noexcept { return true; }
+	virtual u8 i8x9x_p2_mask() const noexcept { return 0xff; }
 
 protected:
 	i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int data_width);
@@ -129,6 +135,7 @@ private:
 	u8 hsi_mode, hso_command, ad_command;
 	u16 hso_time, ad_result;
 	u8 pwm_control;
+	u8 port1, port2;
 	u8 ios0, ios1, ioc0, ioc1;
 	u8 sbuf, sp_con, sp_stat;
 	u8 serial_send_buf;
@@ -150,6 +157,11 @@ private:
 class c8095_90_device : public i8x9x_device {
 public:
 	c8095_90_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual u8 i8x9x_p0_mask() const noexcept override { return 0xf0; }
+	virtual bool i8x9x_has_p1() const noexcept override { return false; }
+	virtual u8 i8x9x_p2_mask() const noexcept override { return 0x27; }
 };
 
 class n8097bh_device : public i8x9x_device {
@@ -160,11 +172,21 @@ public:
 class p8098_device : public i8x9x_device {
 public:
 	p8098_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual u8 i8x9x_p0_mask() const noexcept override { return 0xf0; }
+	virtual bool i8x9x_has_p1() const noexcept override { return false; }
+	virtual u8 i8x9x_p2_mask() const noexcept override { return 0x27; }
 };
 
 class p8798_device : public i8x9x_device {
 public:
 	p8798_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual u8 i8x9x_p0_mask() const noexcept override { return 0xf0; }
+	virtual bool i8x9x_has_p1() const noexcept override { return false; }
+	virtual u8 i8x9x_p2_mask() const noexcept override { return 0x27; }
 };
 
 DECLARE_DEVICE_TYPE(C8095_90, c8095_90_device)
