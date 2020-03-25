@@ -52,7 +52,7 @@ hp82939_io_card_device::~hp82939_io_card_device()
 
 void hp82939_io_card_device::install_read_write_handlers(address_space& space , uint16_t base_addr)
 {
-	space.install_readwrite_handler(base_addr, base_addr + 1, read8_delegate(*m_translator, FUNC(hp_1mb5_device::cpu_r)), write8_delegate(*m_translator, FUNC(hp_1mb5_device::cpu_w)));
+	space.install_readwrite_handler(base_addr, base_addr + 1, read8sm_delegate(*m_translator, FUNC(hp_1mb5_device::cpu_r)), write8sm_delegate(*m_translator, FUNC(hp_1mb5_device::cpu_w)));
 }
 
 void hp82939_io_card_device::inten()
@@ -166,7 +166,7 @@ READ8_MEMBER(hp82939_io_card_device::p2_r)
 READ8_MEMBER(hp82939_io_card_device::cpu_r)
 {
 	if ((offset & 0x82) == 0x00) {
-		return m_translator->uc_r(space , offset & 1 , mem_mask);
+		return m_translator->uc_r(offset & 1);
 	} else if ((offset & 0x83) == 0x82) {
 		return m_uart->ins8250_r((offset >> 2) & 7);
 	} else {
@@ -177,7 +177,7 @@ READ8_MEMBER(hp82939_io_card_device::cpu_r)
 WRITE8_MEMBER(hp82939_io_card_device::cpu_w)
 {
 	if ((offset & 0x82) == 0x00) {
-		m_translator->uc_w(space , offset & 1 , data , mem_mask);
+		m_translator->uc_w(offset & 1 , data);
 	} else if ((offset & 0x83) == 0x82) {
 		m_uart->ins8250_w((offset >> 2) & 7 , data);
 	}

@@ -1041,10 +1041,10 @@ void seibuspi_state::spi_map(address_map &map)
 	map(0x00000688, 0x00000688).w(FUNC(seibuspi_state::z80_prg_transfer_w));
 	map(0x0000068c, 0x0000068c).w(FUNC(seibuspi_state::z80_enable_w));
 	map(0x0000068e, 0x0000068e).w(FUNC(seibuspi_state::rf2_layer_bank_w));
-	map(0x000006d0, 0x000006d0).w("ds2404", FUNC(ds2404_device::ds2404_1w_reset_w));
-	map(0x000006d4, 0x000006d4).w("ds2404", FUNC(ds2404_device::ds2404_data_w));
-	map(0x000006d8, 0x000006d8).w("ds2404", FUNC(ds2404_device::ds2404_clk_w));
-	map(0x000006dc, 0x000006dc).r("ds2404", FUNC(ds2404_device::ds2404_data_r));
+	map(0x000006d0, 0x000006d0).w("ds2404", FUNC(ds2404_device::_1w_reset_w));
+	map(0x000006d4, 0x000006d4).w("ds2404", FUNC(ds2404_device::data_w));
+	map(0x000006d8, 0x000006d8).w("ds2404", FUNC(ds2404_device::clk_w));
+	map(0x000006dc, 0x000006dc).r("ds2404", FUNC(ds2404_device::data_r));
 	map(0x000006dd, 0x000006dd).r(FUNC(seibuspi_state::spi_ds2404_unknown_r));
 	map(0x00a00000, 0x013fffff).rom().region("sound01", 0);
 }
@@ -1060,10 +1060,10 @@ void seibuspi_state::rdft2_map(address_map &map)
 	map(0x00000688, 0x00000688).w(FUNC(seibuspi_state::z80_prg_transfer_w));
 	map(0x0000068c, 0x0000068c).w(FUNC(seibuspi_state::z80_enable_w));
 	map(0x0000068e, 0x0000068e).w(FUNC(seibuspi_state::rf2_layer_bank_w));
-	map(0x000006d0, 0x000006d0).w("ds2404", FUNC(ds2404_device::ds2404_1w_reset_w));
-	map(0x000006d4, 0x000006d4).w("ds2404", FUNC(ds2404_device::ds2404_data_w));
-	map(0x000006d8, 0x000006d8).w("ds2404", FUNC(ds2404_device::ds2404_clk_w));
-	map(0x000006dc, 0x000006dc).r("ds2404", FUNC(ds2404_device::ds2404_data_r));
+	map(0x000006d0, 0x000006d0).w("ds2404", FUNC(ds2404_device::_1w_reset_w));
+	map(0x000006d4, 0x000006d4).w("ds2404", FUNC(ds2404_device::data_w));
+	map(0x000006d8, 0x000006d8).w("ds2404", FUNC(ds2404_device::clk_w));
+	map(0x000006dc, 0x000006dc).r("ds2404", FUNC(ds2404_device::data_r));
 	map(0x000006dd, 0x000006dd).r(FUNC(seibuspi_state::spi_ds2404_unknown_r));
 	map(0x00a00000, 0x013fffff).rom().region("sound01", 0);
 }
@@ -1077,10 +1077,10 @@ void seibuspi_state::sxx2e_map(address_map &map)
 	map(0x00000684, 0x00000684).r(FUNC(seibuspi_state::sound_fifo_status_r));
 	map(0x00000688, 0x0000068b).noprw(); // ?
 	map(0x0000068c, 0x0000068f).nopw();
-	map(0x000006d0, 0x000006d0).w("ds2404", FUNC(ds2404_device::ds2404_1w_reset_w));
-	map(0x000006d4, 0x000006d4).w("ds2404", FUNC(ds2404_device::ds2404_data_w));
-	map(0x000006d8, 0x000006d8).w("ds2404", FUNC(ds2404_device::ds2404_clk_w));
-	map(0x000006dc, 0x000006dc).r("ds2404", FUNC(ds2404_device::ds2404_data_r));
+	map(0x000006d0, 0x000006d0).w("ds2404", FUNC(ds2404_device::_1w_reset_w));
+	map(0x000006d4, 0x000006d4).w("ds2404", FUNC(ds2404_device::data_w));
+	map(0x000006d8, 0x000006d8).w("ds2404", FUNC(ds2404_device::clk_w));
+	map(0x000006dc, 0x000006dc).r("ds2404", FUNC(ds2404_device::data_r));
 	map(0x000006dd, 0x000006dd).r(FUNC(seibuspi_state::spi_ds2404_unknown_r));
 }
 

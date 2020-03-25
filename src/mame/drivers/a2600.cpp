@@ -67,9 +67,9 @@ READ8_MEMBER(a2600_state::cart_over_all_r)
 	else if (masked_offset < 0x2a0)
 	{
 #if USE_NEW_RIOT
-		ret = m_riot->io_r(space, masked_offset);
+		ret = m_riot->io_r(masked_offset);
 #else
-		ret = m_riot->read(space, masked_offset);
+		ret = m_riot->read(masked_offset);
 #endif
 	}
 	else if (masked_offset < 0x300)
@@ -103,9 +103,9 @@ WRITE8_MEMBER(a2600_state::cart_over_all_w)
 	else if (masked_offset < 0x2a0)
 	{
 #if USE_NEW_RIOT
-		m_riot->io_w(space, masked_offset, data);
+		m_riot->io_w(masked_offset, data);
 #else
-		m_riot->write(space, masked_offset, data);
+		m_riot->write(masked_offset, data);
 #endif
 	}
 	else if (masked_offset < 0x300)

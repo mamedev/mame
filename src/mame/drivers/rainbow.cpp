@@ -1640,7 +1640,7 @@ READ8_MEMBER(rainbow_base_state::corvus_status_r)
 		output().set_value("led2", 0);
 		switch_off_timer->adjust(attotime::from_msec(500));
 
-		uint8_t status = m_corvus_hdc->status_r(space, 0);
+		uint8_t status = m_corvus_hdc->status_r();
 		uint8_t data = BIT(status, 7); // 0x80 BUSY (Set = Busy, Clear = Ready)
 		data |= BIT(status, 6) << 1; // 0x40 DIR. (Controller -> Host, or Host->Controller)
 		return data;

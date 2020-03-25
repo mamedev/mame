@@ -94,7 +94,7 @@ void swim_device::device_reset()
 //  read - reads a byte from the FDC
 //-------------------------------------------------
 
-uint8_t swim_device::read(uint8_t offset)
+uint8_t swim_device::read(offs_t offset)
 {
 	uint8_t result = 0;
 
@@ -128,7 +128,7 @@ uint8_t swim_device::read(uint8_t offset)
 //  write - write a byte to the FDC
 //-------------------------------------------------
 
-void swim_device::write(uint8_t offset, uint8_t data)
+void swim_device::write(offs_t offset, uint8_t data)
 {
 	if (m_swim_mode == SWIM_MODE_IWM)
 	{

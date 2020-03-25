@@ -234,7 +234,7 @@ void kbdc8042_device::device_timer(emu_timer &timer, device_timer_id id, int par
  *      0: Keyboard data in
  */
 
-READ8_MEMBER(kbdc8042_device::data_r)
+uint8_t kbdc8042_device::data_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -310,7 +310,7 @@ READ8_MEMBER(kbdc8042_device::data_r)
 
 
 
-WRITE8_MEMBER(kbdc8042_device::data_w)
+void kbdc8042_device::data_w(offs_t offset, uint8_t data)
 {
 	switch (offset) {
 	case 0:

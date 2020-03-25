@@ -1229,11 +1229,11 @@ READ8_MEMBER(dkong_state::dkong_voice_status_r)
 
 READ8_MEMBER(dkong_state::dkong_tune_r)
 {
-	uint8_t page = m_dev_vp2->read(space, 0) & 0x47;
+	uint8_t page = m_dev_vp2->read(0) & 0x47;
 
 	if ( page & 0x40 )
 	{
-		return (m_ls175_3d->read(space, 0) & 0x0F) | (dkong_voice_status_r(space, 0) << 4);
+		return (m_ls175_3d->read(0) & 0x0F) | (dkong_voice_status_r(space, 0) << 4);
 	}
 	else
 	{

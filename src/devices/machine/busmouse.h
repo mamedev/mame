@@ -34,9 +34,9 @@ protected:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_READ8_MEMBER(ppi_a_r);
-	DECLARE_READ8_MEMBER(ppi_c_r);
-	DECLARE_WRITE8_MEMBER(ppi_c_w);
+	uint8_t ppi_a_r();
+	uint8_t ppi_c_r();
+	void ppi_c_w(uint8_t data);
 
 private:
 	emu_timer *m_irq_timer;

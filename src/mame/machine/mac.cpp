@@ -1169,7 +1169,7 @@ READ16_MEMBER ( mac_state::mac_scc_r )
 {
 	uint16_t result;
 
-	result = m_scc->reg_r(space, offset);
+	result = m_scc->reg_r(offset);
 	return (result << 8) | result;
 }
 
@@ -1177,12 +1177,12 @@ READ16_MEMBER ( mac_state::mac_scc_r )
 
 WRITE16_MEMBER ( mac_state::mac_scc_w )
 {
-	m_scc->reg_w(space, offset, data);
+	m_scc->reg_w(offset, data);
 }
 
 WRITE16_MEMBER ( mac_state::mac_scc_2_w )
 {
-	m_scc->reg_w(space, offset, data >> 8);
+	m_scc->reg_w(offset, data >> 8);
 }
 
 /* ********************************** *

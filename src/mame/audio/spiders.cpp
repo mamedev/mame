@@ -178,7 +178,7 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(spiders_state::spiders_audio_command_w)
 {
-	m_pia[3]->write_porta(data & 0xf8);
+	m_pia[3]->porta_w(data & 0xf8);
 	m_pia[3]->ca1_w(BIT(data, 7));
 }
 

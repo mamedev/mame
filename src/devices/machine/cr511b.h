@@ -52,8 +52,8 @@ public:
 	auto scor_handler() { return m_scor_handler.bind(); }
 	auto xaen_handler() { return m_xaen_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER ( write );
+	uint8_t read();
+	void write(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( enable_w );
 	DECLARE_WRITE_LINE_MEMBER( cmd_w );

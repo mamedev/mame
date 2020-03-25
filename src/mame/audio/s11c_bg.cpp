@@ -45,7 +45,7 @@ WRITE_LINE_MEMBER( s11c_bg_device::pia40_cb2_w)
 
 WRITE8_MEMBER( s11c_bg_device::pia40_pb_w )
 {
-//  m_pia34->write_portb(data);
+//  m_pia34->portb_w(data);
 }
 
 void s11c_bg_device::ctrl_w(uint8_t data)
@@ -55,7 +55,7 @@ void s11c_bg_device::ctrl_w(uint8_t data)
 
 void s11c_bg_device::data_w(uint8_t data)
 {
-	m_pia40->write_portb(data);
+	m_pia40->portb_w(data);
 }
 
 void s11c_bg_device::device_add_mconfig(machine_config &config)

@@ -44,7 +44,7 @@ hp82900_io_card_device::~hp82900_io_card_device()
 
 void hp82900_io_card_device::install_read_write_handlers(address_space& space , uint16_t base_addr)
 {
-	space.install_readwrite_handler(base_addr, base_addr + 1, read8_delegate(*m_translator, FUNC(hp_1mb5_device::cpu_r)), write8_delegate(*m_translator, FUNC(hp_1mb5_device::cpu_w)));
+	space.install_readwrite_handler(base_addr, base_addr + 1, read8sm_delegate(*m_translator, FUNC(hp_1mb5_device::cpu_r)), write8sm_delegate(*m_translator, FUNC(hp_1mb5_device::cpu_w)));
 }
 
 void hp82900_io_card_device::inten()
@@ -116,7 +116,7 @@ READ8_MEMBER(hp82900_io_card_device::cpu_io_r)
 
 	uint8_t res;
 	if (BIT(offset , 6) && (m_addr_latch & 0x82) == 0) {
-		res = m_translator->uc_r(space , m_addr_latch & 1 , mem_mask);
+		res = m_translator->uc_r(m_addr_latch & 1);
 	} else {
 		res = ~0;
 	}
@@ -127,7 +127,7 @@ WRITE8_MEMBER(hp82900_io_card_device::cpu_io_w)
 {
 	m_rom_enabled = false;
 	if (BIT(offset , 6) && (m_addr_latch & 0x82) == 0) {
-		m_translator->uc_w(space , m_addr_latch & 1 , data , mem_mask);
+		m_translator->uc_w(m_addr_latch & 1 , data);
 	} else if (BIT(offset , 7)) {
 		m_addr_latch = data;
 	}

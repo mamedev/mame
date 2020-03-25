@@ -25,8 +25,8 @@ public:
 	auto centronics_fault() { return m_write_centronics_fault.bind(); }
 	auto centronics_select() { return m_write_centronics_select.bind(); }
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
 
 	/* Centronics stuff */
 	DECLARE_WRITE_LINE_MEMBER( centronics_input_strobe );
