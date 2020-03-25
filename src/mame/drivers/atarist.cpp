@@ -45,7 +45,7 @@
 static const int IKBD_MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
 static const int IKBD_MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
 
-static const int DMASOUND_RATE[] = { int(Y2/640/8), int(Y2/640/4), int(Y2/640/2), int(Y2/640) };
+static const double DMASOUND_DIV[] = { 640.0*8.0, 640.0*4.0, 640.0*2.0, 640.0 };
 
 
 //**************************************************************************
@@ -99,25 +99,29 @@ void st_state::flush_dma_fifo()
 {
 	if (m_fdc_fifo_empty[m_fdc_fifo_sel]) return;
 
-	if (m_fdc_dmabytes) {
+	if (m_fdc_dmabytes)
+	{
 		address_space &program = m_maincpu->space(AS_PROGRAM);
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < 8; i++)
+		{
 			uint16_t data = m_fdc_fifo[m_fdc_fifo_sel][i];
 
 			if (LOG) logerror("Flushing DMA FIFO %u data %04x to address %06x\n", m_fdc_fifo_sel, data, m_dma_base);
 
-			if(m_dma_base >= 8)
+			if (m_dma_base >= 8)
 				program.write_word(m_dma_base, data);
 			m_dma_base += 2;
 		}
 		m_fdc_dmabytes -= 16;
-		if (!m_fdc_dmabytes) {
+		if (!m_fdc_dmabytes)
+		{
 			m_fdc_sectors--;
 
 			if (m_fdc_sectors)
 				m_fdc_dmabytes = DMA_SECTOR_SIZE;
 		}
-	} else
+	}
+	else
 		m_dma_error = 0;
 
 	m_fdc_fifo_empty[m_fdc_fifo_sel] = 1;
@@ -130,9 +134,11 @@ void st_state::flush_dma_fifo()
 
 void st_state::fill_dma_fifo()
 {
-	if (m_fdc_dmabytes) {
+	if (m_fdc_dmabytes)
+	{
 		address_space &program = m_maincpu->space(AS_PROGRAM);
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < 8; i++)
+		{
 			uint16_t data = program.read_word(m_dma_base);
 
 			if (LOG) logerror("Filling DMA FIFO %u with data %04x from memory address %06x\n", m_fdc_fifo_sel, data, m_dma_base);
@@ -141,13 +147,15 @@ void st_state::fill_dma_fifo()
 			m_dma_base += 2;
 		}
 		m_fdc_dmabytes -= 16;
-		if (!m_fdc_dmabytes) {
+		if (!m_fdc_dmabytes)
+		{
 			m_fdc_sectors--;
 
 			if (m_fdc_sectors)
 				m_fdc_dmabytes = DMA_SECTOR_SIZE;
 		}
-	} else
+	}
+	else
 		m_dma_error = 0;
 
 	m_fdc_fifo_empty[m_fdc_fifo_sel] = 0;
@@ -434,7 +442,8 @@ WRITE16_MEMBER( st_state::berr_w )
 
 READ16_MEMBER( st_state::berr_r )
 {
-	if(!machine().side_effects_disabled()) {
+	if (!machine().side_effects_disabled())
+	{
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
@@ -936,7 +945,7 @@ WRITE8_MEMBER( ste_state::sound_dma_control_w )
 		if (!m_dmasnd_active)
 		{
 			dmasound_set_state(1);
-			m_dmasound_timer->adjust(attotime::zero, 0, attotime::from_hz(DMASOUND_RATE[m_dmasnd_mode & 0x03]));
+			m_dmasound_timer->adjust(attotime::zero, 0, attotime::from_hz(double(Y2)/DMASOUND_DIV[m_dmasnd_mode & 0x03]));
 		}
 	}
 	else
@@ -1700,11 +1709,11 @@ WRITE8_MEMBER( st_state::psg_pa_w )
 	floppy_image_device *floppy = nullptr;
 	if (!BIT(data, 1))
 		floppy = m_floppy[0]->get_device();
-	else if(!BIT(data, 2))
+	else if (!BIT(data, 2))
 		floppy = m_floppy[1]->get_device();
 
 	// side select
-	if(floppy)
+	if (floppy)
 		floppy->ss_w(BIT(data, 0) ? 0 : 1);
 
 	m_fdc->set_floppy(floppy);
@@ -1744,11 +1753,11 @@ WRITE8_MEMBER( stbook_state::psg_pa_w )
 	floppy_image_device *floppy = nullptr;
 	if (!BIT(data, 1))
 		floppy = m_floppy[0]->get_device();
-	else if(!BIT(data, 2))
+	else if (!BIT(data, 2))
 		floppy = m_floppy[1]->get_device();
 
 	// side select
-	if(floppy)
+	if (floppy)
 		floppy->ss_w(BIT(data, 0) ? 0 : 1);
 
 	m_fdc->set_floppy(floppy);
