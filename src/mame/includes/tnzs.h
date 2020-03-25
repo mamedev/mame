@@ -88,7 +88,7 @@ protected:
 	DECLARE_READ8_MEMBER(mcu_r);
 	DECLARE_WRITE8_MEMBER(mcu_w);
 
-	DECLARE_READ8_MEMBER(analog_r);
+	uint8_t analog_r(offs_t offset);
 
 	void tnzs_sub_map(address_map &map);
 

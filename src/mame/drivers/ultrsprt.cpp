@@ -36,26 +36,26 @@ public:
 	void ultrsprt(machine_config &config);
 
 private:
-	static const uint32_t VRAM_PAGES      = 2;
-	static const uint32_t VRAM_PAGE_BYTES = 512 * 1024;
+	static const u32 VRAM_PAGES      = 2;
+	static const u32 VRAM_PAGE_BYTES = 512 * 1024;
 
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k056800_device> m_k056800;
-	required_shared_ptr<uint32_t> m_workram;
+	required_shared_ptr<u32> m_workram;
 	required_device<palette_device> m_palette;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device_array<upd4701_device, 2> m_upd;
 
 	required_ioport m_service;
 
-	DECLARE_READ8_MEMBER(eeprom_r);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ16_MEMBER(upd1_r);
-	DECLARE_READ16_MEMBER(upd2_r);
-	DECLARE_WRITE32_MEMBER(int_ack_w);
+	u8 eeprom_r();
+	void eeprom_w(u8 data);
+	u16 upd1_r(offs_t offset);
+	u16 upd2_r(offs_t offset);
+	void int_ack_w(u32 data);
 
-	uint32_t screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void sound_map(address_map &map);
 	void ultrsprt_map(address_map &map);
@@ -63,25 +63,25 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	std::unique_ptr<uint8_t[]> m_vram;
-	uint32_t m_cpu_vram_page;
+	std::unique_ptr<u8[]> m_vram;
+	u32 m_cpu_vram_page;
 };
 
 
 /*****************************************************************************/
 
-uint32_t ultrsprt_state::screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 ultrsprt_state::screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *vram = m_vram.get() + (m_cpu_vram_page ^ 1) * VRAM_PAGE_BYTES;
+	u8 *vram = m_vram.get() + (m_cpu_vram_page ^ 1) * VRAM_PAGE_BYTES;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		int fb_index = y * 1024;
-		uint16_t *dest = &bitmap.pix16(y, cliprect.min_x);
+		u16 *dest = &bitmap.pix16(y, cliprect.min_x);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
 		{
-			uint8_t p1 = vram[BYTE4_XOR_BE(fb_index + x + 512)];
+			u8 p1 = vram[BYTE4_XOR_BE(fb_index + x + 512)];
 
 			if (p1 == 0)
 				*dest++ = vram[BYTE4_XOR_BE(fb_index + x)];
@@ -96,18 +96,18 @@ uint32_t ultrsprt_state::screen_update_ultrsprt(screen_device &screen, bitmap_in
 
 /*****************************************************************************/
 
-WRITE32_MEMBER(ultrsprt_state::int_ack_w)
+void ultrsprt_state::int_ack_w(u32 data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
 
-READ8_MEMBER(ultrsprt_state::eeprom_r)
+u8 ultrsprt_state::eeprom_r()
 {
 	return m_service->read();
 }
 
-WRITE8_MEMBER(ultrsprt_state::eeprom_w)
+void ultrsprt_state::eeprom_w(u8 data)
 {
 	/*
 	    .... ...x - EEPROM DI
@@ -123,7 +123,7 @@ WRITE8_MEMBER(ultrsprt_state::eeprom_w)
 	m_eeprom->clk_write(!BIT(data, 1));
 	m_eeprom->cs_write(BIT(data, 2));
 
-	uint32_t vram_page = (data & 0x08) >> 3;
+	u32 vram_page = (data & 0x08) >> 3;
 	if (vram_page != m_cpu_vram_page)
 	{
 		membank("vram")->set_entry(vram_page);
@@ -139,14 +139,14 @@ WRITE8_MEMBER(ultrsprt_state::eeprom_w)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-READ16_MEMBER(ultrsprt_state::upd1_r)
+u16 ultrsprt_state::upd1_r(offs_t offset)
 {
-	return m_upd[0]->read_xy(space, offset * 2) | (m_upd[0]->read_xy(space, offset * 2 + 1) << 8);
+	return m_upd[0]->read_xy(offset * 2) | (m_upd[0]->read_xy(offset * 2 + 1) << 8);
 }
 
-READ16_MEMBER(ultrsprt_state::upd2_r)
+u16 ultrsprt_state::upd2_r(offs_t offset)
 {
-	return m_upd[1]->read_xy(space, offset * 2) | (m_upd[1]->read_xy(space, offset * 2 + 1) << 8);
+	return m_upd[1]->read_xy(offset * 2) | (m_upd[1]->read_xy(offset * 2 + 1) << 8);
 }
 
 /*****************************************************************************/
@@ -218,7 +218,7 @@ void ultrsprt_state::machine_start()
 	/* configure fast RAM regions for DRC */
 	m_maincpu->ppcdrc_add_fastram(0xff000000, 0xff01ffff, false, m_workram);
 
-	m_vram = std::make_unique<uint8_t[]>(VRAM_PAGE_BYTES * VRAM_PAGES);
+	m_vram = std::make_unique<u8[]>(VRAM_PAGE_BYTES * VRAM_PAGES);
 
 	membank("vram")->configure_entries(0, VRAM_PAGES, m_vram.get(), VRAM_PAGE_BYTES);
 

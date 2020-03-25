@@ -931,7 +931,7 @@ READ16_MEMBER( ksys573_state::ge765pwbba_r )
 	{
 	case 0x4c:
 	case 0x4d:
-		return m_upd4701->read_y(space, offset & 1);
+		return m_upd4701->read_y(offset & 1);
 
 	default:
 		verboselog( 0, "ge765pwbba_r: unhandled offset %08x %08x\n", offset, mem_mask );
