@@ -935,7 +935,7 @@ offs_t upd78k3_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		}
 		else if (BIT(op, 1))
 		{
-			util::stream_format(stream, "%-8s%s,", "DBNZ", s_r_names[op & 0x07]);
+			util::stream_format(stream, "%-8s%c,", "DBNZ", BIT(op, 0) ? 'B' : 'C');
 			format_jdisp8(stream, pc + 2, opcodes.r8(pc + 1));
 			return 2 | SUPPORTED;
 		}
