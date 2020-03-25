@@ -100,6 +100,7 @@
         GAL22V10    = QP24 QF5892
 
         PALCE22V10  = QP24 QF5828
+        PAL22V10    = QP24 QF5828
 
     28-pin devices:
         PLS100      = QP28 QF1928 (Tri-State)
@@ -292,7 +293,7 @@ static void print_pal20ra10_product_terms(const pal_data* pal, const jed_data* j
 static void print_pal20x4_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_pal20x8_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_pal20x10_product_terms(const pal_data* pal, const jed_data* jed);
-static void print_palce22v10_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_palce22v10_pal22v10_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_82s153_pls153_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_ck2605_product_terms(const pal_data* pal, const jed_data* jed);
 #if defined(ricoh_pals)
@@ -356,7 +357,7 @@ static void config_pal20ra10_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20x4_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20x8_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20x10_pins(const pal_data* pal, const jed_data* jed);
-static void config_palce22v10_pins(const pal_data* pal, const jed_data* jed);
+static void config_palce22v10_pal22v10_pins(const pal_data* pal, const jed_data* jed);
 static void config_82s153_pls153_pins(const pal_data* pal, const jed_data* jed);
 static void config_ck2605_pins(const pal_data* pal, const jed_data* jed);
 #if defined(ricoh_pals)
@@ -669,7 +670,7 @@ static pin_fuse_rows pal20x10pinfuserows[] = {
 	{22, NO_OUTPUT_ENABLE_FUSE_ROW, 160, 280},   /* Registered Output */
 	{23, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 120}};    /* Registered Output */
 
-static pin_fuse_rows palce22v10pinfuserows[] = {
+static pin_fuse_rows palce22v10_pal22v10pinfuserows[] = {
 	{14, 5368, 5412, 5720},
 	{15, 4884, 4928, 5324},
 	{16, 4312, 4356, 4840},
@@ -1472,7 +1473,7 @@ static pin_fuse_columns pal20x10pinfusecolumns[] = {
 	{23, 3, 2}
 };
 
-static pin_fuse_columns palce22v10pinfusecolumns[] = {
+static pin_fuse_columns palce22v10_pal22v10pinfusecolumns[] = {
 	{1, 1, 0},
 	{2, 5, 4},
 	{3, 9, 8},
@@ -2207,14 +2208,20 @@ static pal_data paldata[] = {
 		config_pal20x10_pins,
 		nullptr,
 		nullptr},
-	/*{"PAL22V10", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
-	{"GAL20V8A", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
+	/*{"GAL20V8A", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
 	{"GAL22V10", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
+    {"PAL22V10", 5828,
+		palce22v10_pal22v10pinfuserows, ARRAY_LENGTH(palce22v10_pal22v10pinfuserows),
+		palce22v10_pal22v10pinfusecolumns, ARRAY_LENGTH(palce22v10_pal22v10pinfusecolumns),
+		print_palce22v10_pal22v10_product_terms,
+		config_palce22v10_pal22v10_pins,
+		nullptr,
+		nullptr},
 	{"PALCE22V10", 5828,
-		palce22v10pinfuserows, ARRAY_LENGTH(palce22v10pinfuserows),
-		palce22v10pinfusecolumns, ARRAY_LENGTH(palce22v10pinfusecolumns),
-		print_palce22v10_product_terms,
-		config_palce22v10_pins,
+		palce22v10_pal22v10pinfuserows, ARRAY_LENGTH(palce22v10_pal22v10pinfuserows),
+		palce22v10_pal22v10pinfusecolumns, ARRAY_LENGTH(palce22v10_pal22v10pinfusecolumns),
+		print_palce22v10_pal22v10_product_terms,
+		config_palce22v10_pal22v10_pins,
 		nullptr,
 		nullptr},
 	{"82S153", 1842,
@@ -3757,11 +3764,11 @@ static void print_pal20x10_product_terms(const pal_data* pal, const jed_data* je
 
 
 /*-------------------------------------------------
-    print_palce22v10_product_terms - prints the product
-    terms for a PALCE22V10
+    print_palce22v10_pal22v10_product_terms - prints the product
+    terms for a PALCE22V10 and PAL22V10
 -------------------------------------------------*/
 
-static void print_palce22v10_product_terms(const pal_data* pal, const jed_data* jed)
+static void print_palce22v10_pal22v10_product_terms(const pal_data* pal, const jed_data* jed)
 {
 	char buffer[200];
 
@@ -6013,18 +6020,18 @@ static void config_pal20x10_pins(const pal_data* pal, const jed_data* jed)
 
 
 /*-------------------------------------------------
-    config_palce22v10_pins - configures the pins for
+    config_palce22v10_pal22v10_pins - configures the pins for
     a PALCE22V10
 -------------------------------------------------*/
 
-static void config_palce22v10_pins(const pal_data* pal, const jed_data* jed)
+static void config_palce22v10_pal22v10_pins(const pal_data* pal, const jed_data* jed)
 {
 	typedef struct _output_logic_macrocell output_logic_macrocell;
 	struct _output_logic_macrocell
 	{
 		uint16_t pin;
 		uint16_t s0_fuse; /* output polarity (0 - low, 1 - high) */
-		uint16_t s1_fuse;/* registers allowed (0 - registered, 1 - not registered) */
+		uint16_t s1_fuse; /* registers allowed (0 - registered, 1 - not registered) */
 	};
 
 	static output_logic_macrocell macrocells[] = {
