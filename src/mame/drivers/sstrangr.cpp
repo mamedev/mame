@@ -197,7 +197,7 @@ INPUT_PORTS_END
 void sstrangr_state::sstrangr(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 2047840);   // measured on PCB
+	I8080A(config, m_maincpu, 2048000); // M5L8080AP, measured 2047840 Hz - TODO: confirm XTAL, probably 18.432/9
 	m_maincpu->set_addrmap(AS_PROGRAM, &sstrangr_state::sstrangr_map);
 	m_maincpu->set_addrmap(AS_IO, &sstrangr_state::sstrangr_io_map);
 	m_maincpu->set_periodic_int(FUNC(sstrangr_state::irq0_line_hold), attotime::from_hz(2*60));

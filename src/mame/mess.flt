@@ -181,6 +181,7 @@ comquest.cpp
 comx35.cpp
 concept.cpp
 conchess.cpp
+conic_cchess2.cpp
 controlid.cpp
 cortex.cpp
 cosmicos.cpp
