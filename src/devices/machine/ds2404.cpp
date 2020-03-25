@@ -6,6 +6,11 @@
 
     RTC + BACKUP RAM
 
+    FIXME: This device implements a parallel interface provided by the
+    Seibu SEI600 for the convenience of SPI emulation. It does not
+    implement the 1-Wire protocol actually used with that ASIC, nor
+    does it implement the alternate 3-Wire serial interface.
+
 **********************************************************************/
 
 #include "emu.h"
