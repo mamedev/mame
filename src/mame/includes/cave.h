@@ -255,6 +255,7 @@ private:
 
 	u16       m_sprite_base_pal;
 	u16       m_sprite_granularity;
+	u32       m_max_sprite_clk[4]; // max usable clock for sprites
 
 	/* misc */
 	int       m_time_vblank_irq;
