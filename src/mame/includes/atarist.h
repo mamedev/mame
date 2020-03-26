@@ -86,6 +86,7 @@ public:
 	st_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M68000_TAG),
+			m_ikbd(*this, HD6301V1_TAG),
 			m_fdc(*this, WD1772_TAG),
 			m_floppy(*this, WD1772_TAG ":%u", 0U),
 			m_mfp(*this, MC68901_TAG),
@@ -127,7 +128,13 @@ public:
 			m_led(*this, "led1")
 	{ }
 
+	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
+
+	void st(machine_config &config);
+
+protected:
 	required_device<m68000_base_device> m_maincpu;
+	required_device<cpu_device> m_ikbd;
 	required_device<wd1772_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<mc68901_device> m_mfp;
@@ -236,6 +243,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( ikbd_tx_w );
 
+	DECLARE_WRITE_LINE_MEMBER( reset_w );
+
 	void toggle_dma_fifo();
 	void flush_dma_fifo();
 	void fill_dma_fifo();
@@ -323,14 +332,11 @@ public:
 	int m_monochrome;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
 	void common(machine_config &config);
-	void st(machine_config &config);
 	void ikbd_map(address_map &map);
 	void cpu_space_map(address_map &map);
 	void st_map(address_map &map);
-protected:
 	void keyboard(machine_config &config);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

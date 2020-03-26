@@ -729,6 +729,15 @@ WRITE_LINE_MEMBER( st_state::write_monochrome )
 	m_mfp->i7_w(m_monochrome);
 }
 
+WRITE_LINE_MEMBER( st_state::reset_w )
+{
+	//glu_reset();
+	m_mfp->reset();
+	//m_ikbd->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	m_fdc->soft_reset();
+	//m_acsi->reset();
+}
+
 
 
 //**************************************************************************
@@ -1993,6 +2002,7 @@ void st_state::common(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, Y2/4);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &st_state::cpu_space_map);
+	m_maincpu->set_reset_callback(FUNC(st_state::reset_w));
 
 	keyboard(config);
 
@@ -2207,6 +2217,7 @@ void stbook_state::stbook(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, U517/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stbook_state::stbook_map);
+	m_maincpu->set_reset_callback(FUNC(st_state::reset_w));
 
 	//COP888(config, COP888_TAG, Y700);
 
