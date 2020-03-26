@@ -2939,6 +2939,8 @@ files {
 createMESSProjects(_target, _subtarget, "news_r3k")
 files {
 	MAME_DIR .. "src/mame/drivers/news_r3k.cpp",
+	MAME_DIR .. "src/mame/machine/dmac_0448.cpp",
+	MAME_DIR .. "src/mame/machine/dmac_0448.h",
 	MAME_DIR .. "src/mame/machine/news_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/news_kbd.h",
 }
