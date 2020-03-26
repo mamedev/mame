@@ -731,9 +731,10 @@ WRITE_LINE_MEMBER( st_state::write_monochrome )
 
 WRITE_LINE_MEMBER( st_state::reset_w )
 {
-	//glu_reset();
+	//glue_reset();
 	m_mfp->reset();
 	m_ikbd->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	m_ymsnd->reset();
 	m_fdc->soft_reset();
 	//m_acsi->reset();
 }
