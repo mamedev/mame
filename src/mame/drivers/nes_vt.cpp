@@ -37,7 +37,7 @@
                  same chipset used in Mogis M320, but uses more advanced feature set.
 
   (more)
-
+  
 
 
   todo (VT03):
@@ -91,14 +91,11 @@ public:
 		m_exin1(*this, "EXTRAIN1"),
 		m_exin2(*this, "EXTRAIN2"),
 		m_exin3(*this, "EXTRAIN3"),
+		m_fullrom(*this, "fullrom"),
 		m_prg(*this, "prg"),
 		m_initial_e000_bank(0xff),
 		m_ntram(nullptr),
 		m_chrram(nullptr),
-		m_prgbank0(*this, "prg_bank0"),
-		m_prgbank1(*this, "prg_bank1"),
-		m_prgbank2(*this, "prg_bank2"),
-		m_prgbank3(*this, "prg_bank3"),
 		m_prgrom(*this, "mainrom")
 	{ }
 
@@ -177,6 +174,7 @@ protected:
 	optional_ioport m_exin2;
 	optional_ioport m_exin3;
 
+	required_device<address_map_bank_device> m_fullrom;
 	required_device<address_map_bank_device> m_prg;
 
 	void nes_vt_4k_ram_map(address_map& map);
@@ -230,14 +228,21 @@ private:
 
 	int calculate_real_video_address(int addr, int extended, int readtype);
 
-	required_memory_bank m_prgbank0;
-	required_memory_bank m_prgbank1;
-	required_memory_bank m_prgbank2;
-	required_memory_bank m_prgbank3;
+	DECLARE_READ8_MEMBER(bank0_r);
+	DECLARE_READ8_MEMBER(bank1_r);
+	DECLARE_READ8_MEMBER(bank2_r);
+	DECLARE_READ8_MEMBER(bank3_r);
+
+	int m_bankaddr[4];
 	required_region_ptr<uint8_t> m_prgrom;
 
 	uint16_t decode_nt_addr(uint16_t addr);
 	void do_dma(uint8_t data, bool has_ntsc_bug);
+
+	DECLARE_READ8_MEMBER(vtspace_r);
+	DECLARE_WRITE8_MEMBER(vtspace_w);
+
+	void rom_map(address_map& map);
 };
 
 class nes_vt_swap_op_d5_d6_state : public nes_vt_state
@@ -498,6 +503,22 @@ protected:
 private:
 };
 
+READ8_MEMBER(nes_vt_state::vtspace_r)
+{
+	return m_prgrom[offset & (m_romsize - 1)];
+}
+
+WRITE8_MEMBER(nes_vt_state::vtspace_w)
+{
+
+}
+
+// VTxx can address 25-bit address space (32MB of ROM)
+void nes_vt_state::rom_map(address_map &map)
+{
+	map(0x0000000, 0x1ffffff).rw(FUNC(nes_vt_state::vtspace_r), FUNC(nes_vt_state::vtspace_w));
+}
+
 /* Standard I/O handlers (NES Controller clone) */
 
 READ8_MEMBER(nes_vt_state::in0_r)
@@ -600,11 +621,11 @@ void nes_vt_state::update_banks()
 	else
 		bank = 0xfe;
 
-	m_prgbank0->set_entry((amod | get_banks(bank)) & (m_numbanks - 1));
+	m_bankaddr[0] = ((amod | get_banks(bank)) );
 
 	// a000-bfff
 	bank = m_410x[0x8];
-	m_prgbank1->set_entry((amod | get_banks(bank)) & (m_numbanks - 1));
+	m_bankaddr[1] = ((amod | get_banks(bank)) );
 
 	// c000-dfff
 	if ((m_410x[0xb] & 0x40) != 0 || (m_410x[0x5] & 0x40) != 0)
@@ -617,11 +638,11 @@ void nes_vt_state::update_banks()
 	else
 		bank = 0xfe;
 
-	m_prgbank2->set_entry((amod | get_banks(bank)) & (m_numbanks - 1));
+	m_bankaddr[2] = ((amod | get_banks(bank)) );
 
 	// e000 - ffff
 	bank = m_initial_e000_bank;
-	m_prgbank3->set_entry((amod | get_banks(bank)) & (m_numbanks - 1));
+	m_bankaddr[3] = ((amod | get_banks(bank)) );
 }
 
 uint16_t nes_vt_state::decode_nt_addr(uint16_t addr)
@@ -907,7 +928,8 @@ READ8_MEMBER(nes_vt_state::spr_r)
 	else
 	{
 		int realaddr = calculate_real_video_address(offset, 0, 1);
-		return m_prgrom[realaddr & (m_romsize - 1)];
+
+		return m_fullrom->read8(realaddr);
 	}
 }
 
@@ -920,7 +942,7 @@ READ8_MEMBER(nes_vt_state::chr_r)
 	else
 	{
 		int realaddr = calculate_real_video_address(offset, 1, 0);
-		return m_prgrom[realaddr & (m_romsize - 1)];
+		return m_fullrom->read8(realaddr);
 	}
 }
 
@@ -932,8 +954,6 @@ WRITE8_MEMBER(nes_vt_state::chr_w)
 		logerror("vram write %04x %02x\n", offset, data);
 		m_chrram[offset] = data;
 	}
-	/*int realaddr = calculate_real_video_address(offset, 1, 0);
-	return m_prgrom[realaddr &  (m_romsize-1)];*/
 }
 
 WRITE8_MEMBER(nes_vt_hh_state::vtfp_411e_w)
@@ -1011,11 +1031,6 @@ void nes_vt_state::machine_start()
 	m_numbanks = m_romsize / 0x2000;
 
 	m_prg->set_bank(0);
-
-	m_prgbank0->configure_entries(0, m_numbanks, &m_prgrom[0x00000], 0x2000);
-	m_prgbank1->configure_entries(0, m_numbanks, &m_prgrom[0x00000], 0x2000);
-	m_prgbank2->configure_entries(0, m_numbanks, &m_prgrom[0x00000], 0x2000);
-	m_prgbank3->configure_entries(0, m_numbanks, &m_prgrom[0x00000], 0x2000);
 
 	save_item(NAME(m_410x));
 	save_item(NAME(m_413x));
@@ -1867,12 +1882,36 @@ void nes_vt_dg_state::nes_vt_fa_map(address_map &map)
 	map(0x4242, 0x4242).w(FUNC(nes_vt_dg_state::vtfp_4242_w));
 }
 
+READ8_MEMBER(nes_vt_state::bank0_r)
+{
+	int address = (m_bankaddr[0] * 0x2000) + offset;
+	return m_fullrom->read8(address);
+}
+
+READ8_MEMBER(nes_vt_state::bank1_r)
+{
+	int address = (m_bankaddr[1] * 0x2000) + offset;
+	return m_fullrom->read8(address);
+}
+
+READ8_MEMBER(nes_vt_state::bank2_r)
+{
+	int address = (m_bankaddr[2] * 0x2000) + offset;
+	return m_fullrom->read8(address);
+}
+
+READ8_MEMBER(nes_vt_state::bank3_r)
+{
+	int address = (m_bankaddr[3] * 0x2000) + offset;
+	return m_fullrom->read8(address);
+}
+
 void nes_vt_state::prg_map(address_map &map)
 {
-	map(0x0000, 0x1fff).bankr("prg_bank0");
-	map(0x2000, 0x3fff).bankr("prg_bank1");
-	map(0x4000, 0x5fff).bankr("prg_bank2");
-	map(0x6000, 0x7fff).bankr("prg_bank3");
+	map(0x0000, 0x1fff).r(FUNC(nes_vt_dg_state::bank0_r));
+	map(0x2000, 0x3fff).r(FUNC(nes_vt_dg_state::bank1_r));
+	map(0x4000, 0x5fff).r(FUNC(nes_vt_dg_state::bank2_r));
+	map(0x6000, 0x7fff).r(FUNC(nes_vt_dg_state::bank3_r));
 }
 
 
@@ -1941,6 +1980,8 @@ void nes_vt_state::nes_vt_base(machine_config &config)
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_ppu->read_bg().set(FUNC(nes_vt_state::chr_r));
 	m_ppu->read_sp().set(FUNC(nes_vt_state::spr_r));
+
+	ADDRESS_MAP_BANK(config, m_fullrom).set_map(&nes_vt_state::rom_map).set_options(ENDIANNESS_NATIVE, 8, 25, 0x2000000);
 
 	ADDRESS_MAP_BANK(config, "prg").set_map(&nes_vt_state::prg_map).set_options(ENDIANNESS_LITTLE, 8, 15, 0x8000);
 
