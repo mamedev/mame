@@ -37256,6 +37256,7 @@ icanpian                        //
 jak_batm                        // The Batman, 2004
 jak_wall                        //
 jak_mk
+jak_mpacw
 
 @source:spg2xx_jakks_gkr.cpp
 jak_wwe                         //
@@ -37278,6 +37279,9 @@ jak_pooh                        //
 jak_care                        //
 jak_nick                        //
 jak_sbfc                        //
+
+@source:spg2xx_jakks_sharp.cpp
+jsc_thom
 
 @source:spg2xx_jakks_tvtouch.cpp
 tvtchsw
