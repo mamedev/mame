@@ -282,4 +282,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT CMP MACHINE    INPUT      STATE          INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, cncchess2, 0,      0, cncchess2, cncchess2, cchess2_state, empty_init, "Conic", "Computer Chess (Conic, model 7012)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, cncchess2, 0,      0, cncchess2, cncchess2, cchess2_state, empty_init, "Conic", "Computer Chess (Conic, model 7012)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
