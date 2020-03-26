@@ -94,8 +94,6 @@
         PAL20X8     = QP24 QF1600
         PAL20X10    = QP24 QF1600
 
-        PAL22V10    = QP24 QF5828?
-
         GAL20V8A    = QP24 QF2706
         GAL22V10    = QP24 QF5892
 
