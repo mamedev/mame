@@ -733,7 +733,7 @@ WRITE_LINE_MEMBER( st_state::reset_w )
 {
 	//glu_reset();
 	m_mfp->reset();
-	//m_ikbd->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	m_ikbd->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	m_fdc->soft_reset();
 	//m_acsi->reset();
 }
