@@ -7,6 +7,137 @@
 /*******************************************************/
 
 
+/*
+********************************************************
+
+Space Stranger hardware info by Guru
+
+This is a black/white Space Invaders clone made by Yachiyo Electric Co. Ltd. using colored cellophane
+to make it look colored. This is probably the same game known as Super Space Stranger on the flyer
+and also has 'Super Space Stranger' printed on the control panel/marquee.
+Super Space Stranger is said to be made by Ban Presto but the hardware is identical to the Yachiyo PCB.
+Additionally there is no evidence in the game or on the control panel or marquee or PCB to suggest it
+was actually made by them, so this info is probably false or guessed, or perhaps Ban Presto just
+distributed it. Either way there is no evidence that Ban Presto manufactured it.
+
+
+Bottom Board
+------------
+
+YD7000-1A
+   |------------------------------------------------|
+   |    18.432MHz                                   |
+   |                  M5L8224              8080     |
+   |                                                |
+   |          7400     7404                         |
+   |                                                |
+   |  7474    7474     7408                7400     |
+   |                                                |
+|--|  7420    7404     7408     74XX       7442     |
+|                                                   |
+|     7404    74XX     74XX     74XX                |
+|5                                         HSS_01   |
+|0    7400    74XX     74XX     74XX                |
+|P                                                  |
+|I    7474    74XX     74XX     74XX       HSS_02   |
+|N                                                  |
+|     7402    74XX     74XX     74XX                |
+|E                                         HSS_03   |
+|D    7408    74XX     74XX     74XX                |
+|G                                                  |
+|E    7404    74XX     74XX     74XX       HSS_04   |
+|                                                   |
+|C            74XX     74XX     74XX                |
+|O                                         HSS_05   |
+|N    7408    74XX     74XX     74XX                |
+|N                                                  |
+|                                          HSS_06   |
+|     7432             4116     4116                |
+|--|                                                |
+   |                   4116     4116       HSS_07   |
+   |          74XX                                  |
+   |                   4116     4116                |
+   |  7400    74XX                         HSS_08   |
+   |                   4116     4116                |
+   |  10MHz   74XX                                  |
+   |                                     DIP24_SKT  |
+   |------------------------------------------------|
+Notes: All IC's shown.
+       Some chips were black but only obfuscated with black paint so easily cleaned off with acetone ^_^
+       Some IC's scratched, shown as 74XX
+       If you have a Space Stranger with non-scratched chips, please help to complete
+       the TTL listing, otherwise when a scratched chip dies it will not be possible
+       to repair it even if it is a common chip because it is unknown and dead.
+
+       8080 CPU  - AM8080 or M5L8080 CPU. Clock 2.048MHz (18.432/9 via M5L8224 Clock Generator IC)
+       M5L8224   - Mitsubishi M5L8224 Clock Generator/Divider IC. Divider is fixed at divide-by-9
+       HSS*      - 2708 EPROMs
+       4116      - Mitsubishi M58759S-25 16k x1-bit DRAM compatible with 4116
+       DIP24_SKT - Empty DIP24 socket
+
+
+Top PCB
+-------
+
+YD7000-2B
+   |----------------------------------------|
+   |                                        |
+   |                                        |
+   |                                        |
+   |                4030     4006           |
+   |                                        |
+   |                                        |
+   |  LM380                  LM3900         |
+|--|                                        |
+|                                           |
+|                            LM3900         |
+|5    53200   7408                          |
+|0                                      VR2 |
+|P    74XX    74XX                          |
+|I                  SW(5)    LM3900         |
+|N    74XX    74XX                          |
+|                                           |
+|E    74XX    74XX           LM3900         |
+|D                                      VR3 |
+|G                                          |
+|E                           LM3900         |
+|                                           |
+|C                                      VR7 |
+|O                           LM3900         |
+|N                                          |
+|N                                      VR4 |
+|                            LM3900         |
+|          74174    7407                    |
+|--|                                    VR1 |
+   |               53204    SN76477         |
+   |                                        |
+   |                                    VR5 |
+   |       74174   53217  1455  M53210      |
+   |                                        |
+   |                      1455         `VR6 |
+   |                                        |
+   |----------------------------------------|
+Notes: All IC's shown.
+       Some chips were black but only obfuscated with black paint so easily cleaned off with acetone ^_^
+       Some IC's scratched, shown as 74XX
+       If you have a Space Stranger with non-scratched chips, please help to complete
+       the TTL listing, otherwise when a scratched chip dies it will not be possible
+       to repair it even if it is a common chip because it is unknown and dead.
+
+       SN76477 - Texas Instruments Complex Sound Generator
+       LM3900  - Quad Operational Amplifier
+       LM380   - 2.5W Power Amplifier
+       1455    - MC1455 equivalent to NE555 Timer
+       VR1-7   - Volume Pots
+       SW(5)   - 5-position DIP Switch marked 'SW'
+       53204   - Mitsubishi branded logic chip equivalent to 7404
+       53217   - Mitsubishi branded logic chip equivalent to 7417
+       53210   - Mitsubishi branded logic chip equivalent to 7410
+       53200   - Mitsubishi branded logic chip equivalent to 7400
+
+********************************************************/
+
+
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "emupal.h"
@@ -28,6 +159,9 @@ public:
 	void sstrngr2(machine_config &config);
 	void sstrangr(machine_config &config);
 
+protected:
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<palette_device> m_palette;
@@ -35,9 +169,7 @@ private:
 
 	uint8_t m_flip_screen;
 
-	DECLARE_WRITE8_MEMBER(port_w);
-
-	virtual void video_start() override;
+	void port_w(uint8_t data);
 
 	uint32_t screen_update_sstrangr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sstrngr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -133,7 +265,7 @@ uint32_t sstrangr_state::screen_update_sstrngr2(screen_device &screen, bitmap_rg
 }
 
 
-WRITE8_MEMBER(sstrangr_state::port_w)
+void sstrangr_state::port_w(uint8_t data)
 {
 	m_flip_screen = data & 0x20;
 }
@@ -160,18 +292,18 @@ void sstrangr_state::sstrangr_io_map(address_map &map)
 
 static INPUT_PORTS_START( sstrangr )
 	PORT_START("DSW") // 1 x 5-dip bank
-	PORT_DIPNAME( 0x03, 0x01, "Extra Play" )
+	PORT_DIPNAME( 0x03, 0x01, "Extra Play" )           PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING(    0x00, "Never" )
 	PORT_DIPSETTING(    0x01, "3000" )
 	PORT_DIPSETTING(    0x02, "4000" )
 	PORT_DIPSETTING(    0x03, "5000" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )       PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x04, "4" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )  PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING(    0x08, "1000" )
 	PORT_DIPSETTING(    0x00, "2000" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* Must be ACTIVE_LOW for game to boot */
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW:5" ) /* Must be ACTIVE_LOW for game to boot */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
@@ -181,7 +313,7 @@ static INPUT_PORTS_START( sstrangr )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_SERVICE( 0x08, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )     PORT_DIPLOCATION("EDGE:1")  // This is probably an edge connector pin
 	PORT_DIPSETTING(    0x10, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -197,7 +329,7 @@ INPUT_PORTS_END
 void sstrangr_state::sstrangr(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080A(config, m_maincpu, 2048000); // M5L8080AP, measured 2047840 Hz - TODO: confirm XTAL, probably 18.432/9
+	I8080A(config, m_maincpu, XTAL(18'432'000)/9); // M5L8080AP, measured 2047840 Hz
 	m_maincpu->set_addrmap(AS_PROGRAM, &sstrangr_state::sstrangr_map);
 	m_maincpu->set_addrmap(AS_IO, &sstrangr_state::sstrangr_io_map);
 	m_maincpu->set_periodic_int(FUNC(sstrangr_state::irq0_line_hold), attotime::from_hz(2*60));
@@ -220,22 +352,22 @@ void sstrangr_state::sstrangr(machine_config &config)
 /*                                                     */
 /*******************************************************/
 
-/* color version of Space Stranger, board has Stranger 2 written on it */
+/* Color version of Space Stranger, board has Stranger 2 written on it */
 
 static INPUT_PORTS_START( sstrngr2 )
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x01, "Extra Play" )
+	PORT_DIPNAME( 0x03, 0x01, "Extra Play" )            PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING(    0x00, "Never" )
 	PORT_DIPSETTING(    0x01, "3000" )
 	PORT_DIPSETTING(    0x02, "4000" )
 	PORT_DIPSETTING(    0x03, "5000" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x04, "4" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING(    0x08, "1000" )
 	PORT_DIPSETTING(    0x00, "2000" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Coinage) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Coinage) )        PORT_DIPLOCATION("SW:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -247,7 +379,7 @@ static INPUT_PORTS_START( sstrngr2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_SERVICE( 0x08, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )     PORT_DIPLOCATION("EDGE:1")  // This is probably an edge connector pin
 	PORT_DIPSETTING(    0x10, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -256,7 +388,7 @@ static INPUT_PORTS_START( sstrngr2 )
 
 	PORT_START("EXT")      /* External switches */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_DIPNAME( 0x02, 0x00, "Player's Bullet Speed (Cheat)" )
+	PORT_DIPNAME( 0x02, 0x00, "Player's Bullet Speed (Cheat)" )  PORT_DIPLOCATION("EXT:1")  // This is probably an edge connector pin
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x02, "Fast" )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
