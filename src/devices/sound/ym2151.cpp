@@ -6,6 +6,7 @@
 
 DEFINE_DEVICE_TYPE(YM2151, ym2151_device, "ym2151", "Yamaha YM2151 OPM")
 DEFINE_DEVICE_TYPE(YM2164, ym2164_device, "ym2164", "Yamaha YM2164 OPP")
+DEFINE_DEVICE_TYPE(YM2414, ym2414_device, "ym2414", "Yamaha YM2414 OPZ")
 
 
 #define FREQ_SH         16  /* 16.16 fixed point (frequency calculations) */
@@ -1711,6 +1712,16 @@ ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, dev
 
 ym2164_device::ym2164_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ym2151_device(mconfig, YM2164, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  ym2414_device - constructor
+//-------------------------------------------------
+
+ym2414_device::ym2414_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ym2151_device(mconfig, YM2414, tag, owner, clock)
 {
 }
 
