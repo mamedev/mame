@@ -21,11 +21,6 @@ Hardware notes:
 - 4KB ROM(AMI), 1KB RAM(2*Synertek 1024x4)
 - beeper, 8*8 leds, plug board
 
-TODO:
-- beeper is more complex than currently emulated, it can do a dual-tone siren
-  when there is an error(leds blink), and it's supposed to turn off when Clear
-  is pressed during boot(leds off). It is connected to one of the 75492 chips.
-
 BTANB:
 - Learn button still works when in modify-mode
 
@@ -35,7 +30,8 @@ BTANB:
 #include "cpu/m6502/m6504.h"
 #include "machine/6821pia.h"
 #include "machine/sensorboard.h"
-#include "sound/beep.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/pwm.h"
 #include "speaker.h"
 
@@ -54,7 +50,7 @@ public:
 		m_pia(*this, "pia%u", 0),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
-		m_beeper(*this, "beeper"),
+		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -73,7 +69,7 @@ private:
 	required_device_array<pia6821_device, 2> m_pia;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<beep_device> m_beeper;
+	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<8> m_inputs;
 
 	// address maps
@@ -81,6 +77,7 @@ private:
 
 	// I/O handlers
 	void update_display();
+	void update_dac();
 	DECLARE_WRITE8_MEMBER(pia0_pa_w);
 	DECLARE_WRITE8_MEMBER(pia0_pb_w);
 	DECLARE_READ8_MEMBER(pia1_pa_r);
@@ -89,12 +86,14 @@ private:
 
 	u8 m_inp_mux = 0;
 	u8 m_led_data = 0;
+	int m_dac_on = 0;
 };
 
 void cchess2_state::machine_start()
 {
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
+	save_item(NAME(m_dac_on));
 }
 
 
@@ -108,11 +107,18 @@ void cchess2_state::update_display()
 	m_display->matrix(m_inp_mux, m_led_data);
 }
 
+void cchess2_state::update_dac()
+{
+	m_dac->write(m_dac_on & BIT(m_inp_mux, 1));
+}
+
 WRITE8_MEMBER(cchess2_state::pia0_pa_w)
 {
 	// d0-d7: input mux/led select
+	// d1: dac data
 	m_inp_mux = data;
 	update_display();
+	update_dac();
 }
 
 WRITE8_MEMBER(cchess2_state::pia0_pb_w)
@@ -148,8 +154,9 @@ READ8_MEMBER(cchess2_state::pia1_pb_r)
 
 WRITE8_MEMBER(cchess2_state::pia1_pb_w)
 {
-	// d7: beeper on
-	m_beeper->set_state(BIT(data, 7));
+	// d7: dac on
+	m_dac_on = BIT(data, 7);
+	update_dac();
 }
 
 
@@ -251,8 +258,8 @@ void cchess2_state::cncchess2(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	BEEP(config, m_beeper, 1000); // wrong, see TODO
-	m_beeper->add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 
