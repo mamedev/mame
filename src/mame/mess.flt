@@ -605,6 +605,7 @@ nes_clone.cpp
 nes_sh6578.cpp
 nes_vt.cpp
 newbrain.cpp
+news_r3k.cpp
 next.cpp
 nforcepc.cpp
 ngen.cpp

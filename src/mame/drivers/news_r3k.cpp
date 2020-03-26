@@ -9,7 +9,6 @@
  * TODO
  *   - interrupts
  *   - scsi
- *   - dma
  *   - sound
  *   - mouse
  */
@@ -26,6 +25,7 @@
 #include "machine/z80scc.h"
 #include "machine/am79c90.h"
 #include "machine/upd765.h"
+#include "machine/dmac_0448.h"
 #include "machine/news_kbd.h"
 
 // video
@@ -56,6 +56,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this, "cpu")
 		, m_ram(*this, "ram")
+		, m_dma(*this, "dma")
 		, m_rtc(*this, "rtc")
 		, m_scc(*this, "scc")
 		, m_net(*this, "net")
@@ -91,15 +92,23 @@ protected:
 	void kbd_irq(int state);
 	void debug_w(u8 data);
 
+	template <unsigned Group, unsigned Number> void irq(int state);
+
+	// TODO: raise/lower existing interrupts
+	void inten_w(offs_t offset, u8 data) { m_inten[offset] = data; }
+	u8 inten_r(offs_t offset) { return m_inten[offset]; }
+	u8 intst_r(offs_t offset) { return m_intst[offset]; }
+
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	// devices
 	required_device<r3000a_device> m_cpu;
 	required_device<ram_device> m_ram;
+	required_device<dmac_0448_device> m_dma;
 	required_device<m48t02_device> m_rtc;
 	required_device<z80scc_device> m_scc;
 	required_device<am7990_device> m_net;
-	required_device<upd72065_device> m_fdc;
+	required_device<upd72067_device> m_fdc;
 
 	required_device<screen_device> m_lcd;
 	required_device<news_hle_kbd_device> m_kbd;
@@ -112,6 +121,10 @@ protected:
 
 	std::unique_ptr<u16[]> m_net_ram;
 	u8 m_kbd_status;
+
+	u8 m_inten[2];
+	u8 m_intst[2];
+	bool m_irq_out[2];
 };
 
 FLOPPY_FORMATS_MEMBER(news_r3k_state::floppy_formats)
@@ -135,6 +148,9 @@ void news_r3k_state::init_common()
 {
 	// map the configured ram
 	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
+
+	// HACK: hardwire the rate until fdc is better understood
+	m_fdc->set_rate(500000);
 }
 
 void news_r3k_state::cpu_map(address_map &map)
@@ -152,8 +168,10 @@ void news_r3k_state::cpu_map(address_map &map)
 	map(0x1fc00000, 0x1fc1ffff).rom().region("eprom", 0);
 
 	//map(0x1fc40004, 0x1fc40004).w().umask32(0xff); ??
-	//map(0x1fc80000, 0x1fc80001); // pinten
-	//map(0x1fc80002, 0x1fc80003); // pintstat
+
+	map(0x1fc80000, 0x1fc80007).nopr();
+	map(0x1fc80000, 0x1fc80001).rw(FUNC(news_r3k_state::inten_r), FUNC(news_r3k_state::inten_w));
+	map(0x1fc80002, 0x1fc80003).r(FUNC(news_r3k_state::intst_r));
 	//map(0x1fc80004, 0x1fc80005); // intclr
 	//map(0x1fc80006, 0x1fc80006); // itimer
 	map(0x1fcc0003, 0x1fcc0003).w(FUNC(news_r3k_state::debug_w));
@@ -163,13 +181,13 @@ void news_r3k_state::cpu_map(address_map &map)
 	map(0x1fd00002, 0x1fd00002).lw8([this](u8 data) { m_kbd->reset(); }, "kbd_reset_w");
 	map(0x1fd40000, 0x1fd40003).noprw().umask32(0xffff); // FIXME: ignore buzzer for now
 
-	//map(0x1fe00000, 0x1fe0000f); // dmac 0448
+	map(0x1fe00000, 0x1fe0000f).m(m_dma, FUNC(dmac_0448_device::map));
 	//map(0x1fe00100, 0x1fe00100); // scsi
-	map(0x1fe00200, 0x1fe00203).m(m_fdc, FUNC(upd72069_device::map)).umask32(0xffff);
+	map(0x1fe00200, 0x1fe00203).m(m_fdc, FUNC(upd72067_device::map));
 	//map(0x1fe00300, 0x1fe00307); // sound
 
 	map(0x1fe40000, 0x1fe40003).portr("SW2");
-	map(0x1fe80000, 0x1fe800ff).rom().region("idrom", 0);
+	map(0x1fe80000, 0x1fe800ff).rom().region("idrom", 0).mirror(0x0003ff00);
 
 	map(0x1fec0000, 0x1fec0003).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
 
@@ -231,6 +249,35 @@ u32 news_r3k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 	return 0;
 }
 
+template <unsigned Group, unsigned Number> void news_r3k_state::irq(int state)
+{
+	LOG("irq group %d number %d state %d\n", Group, Number, state);
+
+	if (state)
+		m_intst[Group] |= (1U << Number);
+	else
+		m_intst[Group] &= ~(1U << Number);
+
+	u8 const irq_out = m_intst[Group] & m_inten[Group];
+	if (Group == 1)
+	{
+		bool const irq0_out = irq_out & 0x1f;
+		bool const irq1_out = irq_out & 0xe0;
+
+		if (irq0_out != m_irq_out[0])
+		{
+			m_irq_out[0] = irq0_out;
+			m_cpu->set_input_line(INPUT_LINE_IRQ0, irq0_out);
+		}
+
+		if (irq1_out != m_irq_out[1])
+		{
+			m_irq_out[1] = irq1_out;
+			m_cpu->set_input_line(INPUT_LINE_IRQ1, irq1_out);
+		}
+	}
+}
+
 void news_r3k_state::kbd_irq(int state)
 {
 	// TODO: relay irq to cpu
@@ -266,6 +313,15 @@ void news_r3k_state::common(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("16M");
 
+	DMAC_0448(config, m_dma, 0);
+	m_dma->set_bus(m_cpu, 0);
+	m_dma->out_int_cb().set(&news_r3k_state::irq<1, 4>, "irq");
+	// TODO: channel 0 scsi
+	m_dma->dma_r_cb<1>().set(m_fdc, FUNC(upd72067_device::dma_r));
+	m_dma->dma_w_cb<1>().set(m_fdc, FUNC(upd72067_device::dma_w));
+	// TODO: channel 2 audio
+	// TODO: channel 3 video
+
 	M48T02(config, m_rtc);
 
 	SCC85C30(config, m_scc, 4.9152_MHz_XTAL);
@@ -293,9 +349,9 @@ void news_r3k_state::common(machine_config &config)
 	m_net->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset >> 1]); });
 
 	// μPD72067, clock?
-	UPD72069(config, m_fdc, 16_MHz_XTAL);
-	//m_fdc->intrq_wr_callback().set_inputline(m_cpu, INPUT_LINE_IRQ4);
-	//m_fdc->drq_wr_callback().set();
+	UPD72067(config, m_fdc, 16_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set(m_dma, FUNC(dmac_0448_device::irq<1>));
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(dmac_0448_device::drq<1>));
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_formats).enable_sound(false);
 
 	// scsi bus and devices
@@ -335,7 +391,7 @@ ROM_START(nws3260)
 	 * This is probably a 4-bit device: only the low 4 bits in each location
 	 * are used, and are merged together into bytes when copied into RAM, with
 	 * the most-significant bits at the lower address. The sum of resulting
-	 * bytes must be zero.
+	 * big-endian 32-bit words must be zero.
 	 *
 	 * offset  purpose
 	 *  0x00   magic number (0x0f 0x0f)
@@ -344,7 +400,7 @@ ROM_START(nws3260)
 	 *  0x60   model number (null-terminated string)
 	 */
 	ROM_REGION32_BE(0x100, "idrom", 0)
-	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(b257474c) SHA1(25908483fe72edd0ff51f58c16f7dbb8e72822e7))
+	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(17a3d9c6) SHA1(d300e6908210f540951211802c38ad7f8037aa15) BAD_DUMP)
 ROM_END
 
 /*   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS           INIT         COMPANY  FULLNAME    FLAGS */
