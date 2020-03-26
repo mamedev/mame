@@ -22,7 +22,7 @@ end
 function hiscore.startplugin()
 
 	local hiscoredata_path = "hiscore.dat";
-	local hiscore_path = "hi";  -- TODO: read actual mame user dir (e.g. "$HOME/.mame")
+	local hiscore_path = "hi";  -- TODO: read the actual mame user dir (e.g. "$HOME/.mame")
 	--local hiscore_path = manager:options().entries.homepath:value() .. "/hi";
 	local config_path = lfs.env_replace(manager:options().entries.inipath:value():match("[^;]+") .. "/hiscore.ini");
 
@@ -110,12 +110,12 @@ function hiscore.startplugin()
 		local soft = emu.softname():match("([^:]*)$")
 		rm_match = '^' .. emu.romname() .. ',' .. soft .. ':';
 	  elseif manager:machine().images["cart"] and manager:machine().images["cart"]:filename() ~= nil then
-		local basename = string.gsub(manager:machine().images["cart"]:filename(), ".*[\\|/](.*)", "%1");
+		local basename = string.gsub(manager:machine().images["cart"]:filename(), ".*[\\/](.*)", "%1");
 		local filename = string.gsub(basename, "(.*)(%..*)", "%1");   -- strip the extension (e.g. ".nes")
 		rm_match = '^' .. emu.romname() .. "," .. filename .. ':';
 		rm_match_crc = emu.romname() .. ",crc32=" .. string.format("%x", manager:machine().images["cart"]:crc()) .. ':';
 	  elseif manager:machine().images["cdrom"] and manager:machine().images["cdrom"]:filename() ~= nil then
-		local basename = string.gsub(manager:machine().images["cdrom"]:filename(), ".*[\\|/](.*)", "%1");
+		local basename = string.gsub(manager:machine().images["cdrom"]:filename(), ".*[\\/](.*)", "%1");
 		local filename = string.gsub(basename, "(.*)(%..*)", "%1");   -- strip the extension (e.g. ".cue")
 		rm_match = '^' .. emu.romname() .. "," .. filename .. ':';
 		--rm_match_crc = string.format("%x", manager:machine().images["cdrom"]:crc()) .. ':';  -- always 0 with cdrom media?
@@ -177,18 +177,17 @@ function hiscore.startplugin()
 		local soft = emu.softname():match("([^:]*)$")
 		r = hiscore_path .. '/' .. emu.romname() .. '/' .. soft .. ".hi";
 	  elseif manager:machine().images["cart"] and manager:machine().images["cart"]:filename() ~= nil then
-		local basename = string.gsub(manager:machine().images["cart"]:filename(), ".*[\\|/](.*)", "%1");
+		local basename = string.gsub(manager:machine().images["cart"]:filename(), ".*[\\/](.*)", "%1");
 		local filename = string.gsub(basename, "(.*)(%..*)", "%1");   -- strip the extension (e.g. ".nes")
 		r = hiscore_path .. '/' .. emu.romname() .. '/' .. filename .. ".hi";
 	  elseif manager:machine().images["cdrom"] and manager:machine().images["cdrom"]:filename() ~= nil then
-		local basename = string.gsub(manager:machine().images["cdrom"]:filename(), ".*[\\|/](.*)", "%1");
+		local basename = string.gsub(manager:machine().images["cdrom"]:filename(), ".*[\\/](.*)", "%1");
 		local filename = string.gsub(basename, "(.*)(%..*)", "%1");   -- strip the media extension (e.g. ".cue")
 		r = hiscore_path .. '/' .. emu.romname() .. '/' .. filename .. ".hi";
 	  else
 		-- arcade games
 		r = hiscore_path .. '/' .. emu.romname() .. ".hi";
 	  end
-	  emu.print_verbose(r)
 	  return r;
 	end
 
@@ -216,6 +215,8 @@ function hiscore.startplugin()
 		output:close();
 	  end
 	  emu.print_verbose("hiscore: write_scores end")
+	  -- TODO: only show if the file is new?
+	  -- manager:machine():popmessage("hiscores saved")
 	end
 
 
@@ -253,6 +254,8 @@ function hiscore.startplugin()
 		  default_checksum = check_scores( positions );
 		  if read_scores( positions ) then
 			emu.print_verbose( "hiscore: scores read OK" );
+			--emu.message("hiscores loaded")  -- no longer supported?
+			manager:machine():popmessage("hiscores loaded")
 		  else
 			-- likely there simply isn't a .hi file around yet
 			emu.print_verbose( "hiscore: scores read FAIL" );
