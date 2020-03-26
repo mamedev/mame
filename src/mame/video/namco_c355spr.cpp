@@ -161,7 +161,7 @@ void namco_c355spr_device::copybitmap(bitmap_ind16 &dest_bmp, const rectangle &c
 								dest[x] = 0x6000|(dest[x] & 0x1fff);
 								break;
 							default:
-								dest[x] = c;
+								dest[x] = gfx(0)->colorbase() + c;
 								break;
 							}
 						}
@@ -193,7 +193,7 @@ void namco_c355spr_device::copybitmap(bitmap_ind16 &dest_bmp, const rectangle &c
 							}
 							else
 							{
-								dest[x] = c;
+								dest[x] = gfx(0)->colorbase() + c;
 							}
 						}
 					}
@@ -208,7 +208,7 @@ void namco_c355spr_device::copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &c
 	device_palette_interface &palette = gfx(0)->palette();
 	const int shadow_offset = (palette.shadows_enabled()) ? palette.entries() : 0;
 	const pen_t black = palette.black_pen();
-	const pen_t *pal = palette.pens();
+	const pen_t *pal = &palette.pen(gfx(0)->colorbase());
 	if (m_palxor)
 	{
 		for (int y = clip.min_y; y <= clip.max_y; y++)
