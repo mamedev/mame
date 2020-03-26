@@ -63,6 +63,7 @@ const double XTAL::known_xtals[] = {
 		400'000, /* 400_kHz_XTAL           Resonator - OKI MSM5205 on Great Swordman h/w */
 		430'000, /* 430_kHz_XTAL           Resonator */
 		455'000, /* 455_kHz_XTAL           Resonator - OKI MSM5205 on Gladiator h/w */
+		500'000, /* 500_kHz_XTAL           Resonator - MIDI clock on various synthesizers (31250 * 16) */
 		512'000, /* 512_kHz_XTAL           Resonator - Toshiba TC8830F */
 		600'000, /* 600_kHz_XTAL           - */
 		640'000, /* 640_kHz_XTAL           Resonator - NEC UPD7759, Texas Instruments Speech Chips @ 8khz */
