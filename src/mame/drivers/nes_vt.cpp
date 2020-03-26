@@ -104,6 +104,8 @@ public:
 
 	void nes_vt_pal(machine_config& config);
 	void nes_vt_pal_2mb(machine_config& config);
+	void nes_vt_pal_4mb(machine_config& config);
+	void nes_vt_pal_8mb(machine_config& config);
 
 	void nes_vt(machine_config& config);
 	void nes_vt_512kb(machine_config& config);
@@ -412,6 +414,8 @@ public:
 	{ }
 
 	void nes_vt_dg(machine_config& config);
+	void nes_vt_dg_baddma_16mb(machine_config& config);
+
 	void nes_vt_fa(machine_config& config);
 
 protected:
@@ -419,6 +423,7 @@ protected:
 
 private:
 	void nes_vt_dg_map(address_map& map);
+	void nes_vt_dg_baddma_map(address_map& map);
 	void nes_vt_fa_map(address_map& map);
 
 	DECLARE_READ8_MEMBER(vtfa_412c_r);
@@ -435,8 +440,15 @@ public:
 
 	void nes_vt_hh(machine_config& config);
 	void nes_vt_vg(machine_config& config);
-	void nes_vt_vg_baddma(machine_config& config);
+	void nes_vt_vg_4mb(machine_config& config);
+	void nes_vt_vg_16mb(machine_config& config);
+
+
+	void nes_vt_vg_1mb_majkon(machine_config& config);
 	void nes_vt_fp(machine_config& config);
+	void nes_vt_fp_32mb(machine_config& config);
+	void nes_vt_fp_16mb(machine_config& config);
+
 	void nes_vt_fp_pal(machine_config& config);
 
 private:
@@ -501,14 +513,14 @@ private:
 	virtual DECLARE_WRITE8_MEMBER(in0_w) override;
 };
 
-class nes_vt_majgnc_state : public nes_vt_state
+class nes_vt_vg_1mb_majgnc_state : public nes_vt_state
 {
 public:
-	nes_vt_majgnc_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt_vg_1mb_majgnc_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_majgnc(machine_config& config);
+	void nes_vt_vg_1mb_majgnc(machine_config& config);
 
 protected:
 
@@ -1912,6 +1924,11 @@ void nes_vt_dg_state::nes_vt_dg_map(address_map &map)
 	map(0x6000, 0x7fff).ram();
 }
 
+void nes_vt_dg_state::nes_vt_dg_baddma_map(address_map& map)
+{
+	nes_vt_dg_map(map);
+	map(0x4014, 0x4014).w(FUNC(nes_vt_hh_state::vt_dma_w));
+}
 
 void nes_vt_dg_state::nes_vt_fa_map(address_map &map)
 {
@@ -2067,10 +2084,11 @@ void nes_vt_sudoku_state::nes_vt_sudoku_512kb(machine_config &config)
 	m_vt_external_space->set_map(&nes_vt_sudoku_state::vt_external_space_map_512kbyte);
 }
 
-void nes_vt_majgnc_state::nes_vt_majgnc(machine_config &config)
+void nes_vt_vg_1mb_majgnc_state::nes_vt_vg_1mb_majgnc(machine_config &config)
 {
 	nes_vt_base(config);
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
+	m_vt_external_space->set_map(&nes_vt_vg_1mb_majgnc_state::vt_external_space_map_1mbyte);
 }
 
 void nes_vt_state::nes_vt(machine_config &config)
@@ -2115,6 +2133,17 @@ void nes_vt_state::nes_vt_pal_2mb(machine_config& config)
 	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_2mbyte);
 }
 
+void nes_vt_state::nes_vt_pal_4mb(machine_config& config)
+{
+	nes_vt_pal(config);
+	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_4mbyte);
+}
+
+void nes_vt_state::nes_vt_pal_8mb(machine_config& config)
+{
+	nes_vt_pal(config);
+	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_8mbyte);
+}
 
 void nes_vt_waixing_state::machine_reset()
 {
@@ -2195,6 +2224,13 @@ void nes_vt_dg_state::nes_vt_dg(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 }
 
+void nes_vt_dg_state::nes_vt_dg_baddma_16mb(machine_config& config)
+{
+	nes_vt_dg(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_dg_baddma_map);
+	m_vt_external_space->set_map(&nes_vt_dg_state::vt_external_space_map_16mbyte);
+}
+
 void nes_vt_hh_state::nes_vt_vg(machine_config &config)
 {
 	nes_vt_dg(config);
@@ -2203,12 +2239,27 @@ void nes_vt_hh_state::nes_vt_vg(machine_config &config)
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
 }
 
-void nes_vt_hh_state::nes_vt_vg_baddma(machine_config &config)
+void nes_vt_hh_state::nes_vt_vg_4mb(machine_config& config)
+{
+	nes_vt_vg(config);
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_4mbyte);
+}
+
+void nes_vt_hh_state::nes_vt_vg_16mb(machine_config& config)
+{
+	nes_vt_vg(config);
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_16mbyte);
+}
+
+void nes_vt_hh_state::nes_vt_vg_1mb_majkon(machine_config &config)
 {
 	nes_vt_dg(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_baddma_map);
 
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
+
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_1mbyte);
+
 }
 
 
@@ -2270,6 +2321,18 @@ void nes_vt_hh_state::nes_vt_fp(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_fp_map);
 
 	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB12);
+}
+
+void nes_vt_hh_state::nes_vt_fp_32mb(machine_config& config)
+{
+	nes_vt_fp(config);
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_32mbyte);
+}
+
+void nes_vt_hh_state::nes_vt_fp_16mb(machine_config& config)
+{
+	nes_vt_fp(config);
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_16mbyte);
 }
 
 void nes_vt_hh_state::nes_vt_fp_pal(machine_config &config)
@@ -2513,8 +2576,9 @@ ROM_START( mc_dgear )
 ROM_END
 
 ROM_START( dgun2500 )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "dgun2500.bin", 0x00000, 0x2000000, CRC(a2f963f3) SHA1(e29ed20ccdcf25b5640a607b3d2c9e6a4944e172) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "dgun2500.bin", 0x00000, 0x1000000, CRC(a2f963f3) SHA1(e29ed20ccdcf25b5640a607b3d2c9e6a4944e172) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(0x1000000)
 ROM_END
 
 ROM_START( dgun2561 )
@@ -2943,29 +3007,29 @@ CONS( 200?, mc_dgear,  0,  0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, 
 
 // all software in this runs in the VT03 enhanced mode, it also includes an actual licensed VT03 port of Frogger.
 // all games work OK except Frogger which has serious graphical issues
-CONS( 2006, vgtablet,  0, 0,  nes_vt_vg,        nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products (licensed by Konami)", "VG Pocket Tablet (VG-4000)", MACHINE_NOT_WORKING ) // raster timing is broken for Frogger
+CONS( 2006, vgtablet,  0, 0,  nes_vt_vg_4mb,        nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products (licensed by Konami)", "VG Pocket Tablet (VG-4000)", MACHINE_NOT_WORKING ) // raster timing is broken for Frogger
 // There is a 2004 Majesco Frogger "TV game" that appears to contain the same version of Frogger as above but with no other games, so probably fits here.
-CONS( 2004, majkon,    0, 0,  nes_vt_vg_baddma, nes_vt, nes_vt_hh_state, empty_init, "Majesco (licensed from Konami)", "Konami Collector's Series Arcade Advanced", MACHINE_NOT_WORKING ) // raster timing is broken for Frogger, palette issues
+CONS( 2004, majkon,    0, 0,  nes_vt_vg_1mb_majkon, nes_vt, nes_vt_hh_state, empty_init, "Majesco (licensed from Konami)", "Konami Collector's Series Arcade Advanced", MACHINE_NOT_WORKING ) // raster timing is broken for Frogger, palette issues
 
-CONS( 200?, majgnc,    0, 0,  nes_vt_majgnc, majgnc, nes_vt_majgnc_state,  empty_init, "Majesco", "Golden Nugget Casino", MACHINE_NOT_WORKING )
+CONS( 200?, majgnc,    0, 0,  nes_vt_vg_1mb_majgnc, majgnc, nes_vt_vg_1mb_majgnc_state,  empty_init, "Majesco", "Golden Nugget Casino", MACHINE_NOT_WORKING )
 
 // small black unit, dpad on left, 4 buttons (A,B,X,Y) on right, Start/Reset/Select in middle, unit text "Sudoku Plug & Play TV Game"
-CONS( 200?, sudopptv,  0, 0,  nes_vt,        nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_NOT_WORKING )
+CONS( 200?, sudopptv,  0, 0,  nes_vt_512kb,        nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_NOT_WORKING )
 
-CONS( 200?, megapad,   0, 0,  nes_vt,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
+CONS( 200?, megapad,   0, 0,  nes_vt_2mb,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
 
 // 060303 date code on PCB
-CONS( 2006, ablmini,   0, 0,  nes_vt_pal, nes_vt, nes_vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, ablmini,   0, 0,  nes_vt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
 
  // needs PCM samples, Y button is not mapped (not used by any of the games?)
-CONS( 200?, timetp36,  0, 0,  nes_vt_pal,        timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, timetp36,  0, 0,  nes_vt_pal_4mb, timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // this is VT09 based
 // it boots, most games correct, but palette issues in some games still (usually they appear greyscale)
 // and colors overall a bit off
-CONS( 2009, cybar120,  0,  0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "Defender", "Defender M2500P 120-in-1", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, vgpocket,  0,  0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products", "VG Pocket (VG-2000)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, vgpmini,   0,  0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products", "VG Pocket Mini (VG-1500)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, cybar120,  0,  0,  nes_vt_vg_16mb, nes_vt, nes_vt_hh_state, empty_init, "Defender", "Defender M2500P 120-in-1", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vgpocket,  0,  0,  nes_vt_vg_4mb, nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products", "VG Pocket (VG-2000)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, vgpmini,   0,  0,  nes_vt_vg_4mb, nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products", "VG Pocket Mini (VG-1500)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
 // VG Pocket Max (VG-2500) (blue case, 75 games)
 // VG Pocket Max (VG-3000) (white case, 75 games) (does the game selection differ, or only the case?)
 // VG Pocket Caplet is likely SunPlus hardware instead. (has common SunPlus games)
@@ -2973,21 +3037,22 @@ CONS( 200?, vgpmini,   0,  0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "
 // Runs fine, non-sport 121 in 1 games perfect, but minor graphical issues in
 // sport games, also no sound in menu or sport games due to missing PCM
 // emulation
-CONS( 200?, dgun2500,  0,  0,  nes_vt_dg, nes_vt, nes_vt_dg_state, empty_init, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+CONS( 200?, dgun2500,  0,  0,  nes_vt_dg_baddma_16mb, nes_vt, nes_vt_dg_state, empty_init, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
 // don't even get to menu. very enhanced chipset, VT368/9?
-CONS( 2012, dgun2561,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
-CONS( 2016, dgun2593,  0,  0,  nes_vt_fp, nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING )
+CONS( 2012, dgun2561,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 2016, dgun2593,  0,  0,  nes_vt_fp, nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 
-CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmc250,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmc250,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
 // GB-NO13-Main-VT389-2 on PCBs
-CONS( 2016, rtvgc300,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
-CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
+CONS( 2016, rtvgc300,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
+
 
 /* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
 
@@ -3011,16 +3076,16 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empt
 */
 
 // intial code isn't valid? scrambled?
-CONS( 201?, red5mam,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING )
+CONS( 201?, red5mam,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 
 
 // boots, same platform with scrambled opcodes as FC pocket
 // palette issues in some games because they actually use the old VT style palette
 // but no way to switch?
 // some menu gfx broken, probably because this is a bad dump
-CONS( 2015, dgun2573,  0,  0,  nes_vt_fp, nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "My Arcade Gamer V Portable Gaming System (DGUN-2573)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2015, dgun2573,  0,  0,  nes_vt_fp_32mb, nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "My Arcade Gamer V Portable Gaming System (DGUN-2573)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 201?, denv150,   0,  0,  nes_vt_fp, nes_vt, nes_vt_hh_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, denv150,   0,  0,  nes_vt_fp_16mb, nes_vt, nes_vt_hh_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
