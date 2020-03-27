@@ -11829,4 +11829,78 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ladytut">
+		<description>Lady Tut</description>
+		<year>1983</year>
+		<publisher>Progame</publisher>
+		<info name="release" value="2020-03-25"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="108284">
+				<rom name="lady tut side a.woz" size="108284" crc="f0416052" sha1="4981fbc8493eafd372724f584cd3621652c51e35"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="94976">
+				<rom name="lady tut side b.woz" size="94976" crc="7961300e" sha1="c8828a6bab99bb933068981c2c4b32b5e9b3c692"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="willwisp">
+		<description>Will O The Wisp</description>
+		<year>1983</year>
+		<publisher>General Masters</publisher>
+		<info name="release" value="2020-03-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234816">
+				<rom name="will o the wisp.woz" size="234816" crc="91741c6b" sha1="9413ad8171a84ec60c8f5f749274595baf5d9de5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprhuey">
+		<description>Super Huey</description>
+		<year>1985</year>
+		<publisher>Cosmi</publisher>
+		<info name="release" value="2020-03-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241466">
+				<rom name="super huey.woz" size="241466" crc="83119753" sha1="787b4172e512850772e36ccf743de0b644a9b39b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maddenfb">
+		<description>John Madden Football</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2020-03-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234810">
+				<rom name="john madden football side a.woz" size="234810" crc="8731f6c6" sha1="9e06385a69fd0045d0b1539fd16bdd8f8c7ca777"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234810">
+				<rom name="john madden football side b.woz" size="234810" crc="3cb6bc97" sha1="a866e7b854c3dfe4206317acf78a8f4b86a82783"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
