@@ -607,7 +607,7 @@ void nes_vt_state::vt_external_space_map_512kbyte(address_map &map)
 void nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte(address_map &map)
 {
 	map(0x0000000, 0x007ffff).rw(FUNC(nes_vt_swap_op_d5_d6_state::vt_rom_r), FUNC(nes_vt_swap_op_d5_d6_state::vtspace_w));
-	map(0x0100000, 0x010dfff).ram(); // clears up to dfff, RAM could be larger
+	map(0x0100000, 0x010ffff).ram();
 	map(0x0180000, 0x01fffff).rw(FUNC(nes_vt_swap_op_d5_d6_state::vt_rom_r), FUNC(nes_vt_swap_op_d5_d6_state::vtspace_w));
 }
 
