@@ -254,15 +254,16 @@ private:
 
 	int calculate_real_video_address(int addr, int extended, int readtype);
 
-	DECLARE_READ8_MEMBER(bank0_r) { int address = (m_bankaddr[0] * 0x2000) + offset; return m_vt_external_space->read8(address); };
-	DECLARE_READ8_MEMBER(bank1_r) { int address = (m_bankaddr[1] * 0x2000) + offset; return m_vt_external_space->read8(address); };
-	DECLARE_READ8_MEMBER(bank2_r) { int address = (m_bankaddr[2] * 0x2000) + offset; return m_vt_external_space->read8(address); };
-	DECLARE_READ8_MEMBER(bank3_r) { int address = (m_bankaddr[3] * 0x2000) + offset; return m_vt_external_space->read8(address); };
+	uint16_t m_real_access_address;
 
-	DECLARE_WRITE8_MEMBER(bank0_w) { int address = (m_bankaddr[0] * 0x2000) + offset; m_vt_external_space->write8(address, data); };
-	DECLARE_WRITE8_MEMBER(bank1_w) { int address = (m_bankaddr[1] * 0x2000) + offset; m_vt_external_space->write8(address, data); };
-	DECLARE_WRITE8_MEMBER(bank2_w) { int address = (m_bankaddr[2] * 0x2000) + offset; m_vt_external_space->write8(address, data); };
-	DECLARE_WRITE8_MEMBER(bank3_w) { int address = (m_bankaddr[3] * 0x2000) + offset; m_vt_external_space->write8(address, data); };
+	DECLARE_READ8_MEMBER(bank0_r) { int address = (m_bankaddr[0] * 0x2000) + offset; m_real_access_address = offset + 0x8000; return m_vt_external_space->read8(address); };
+	DECLARE_READ8_MEMBER(bank1_r) { int address = (m_bankaddr[1] * 0x2000) + offset; m_real_access_address = offset + 0xa000; return m_vt_external_space->read8(address); };
+	DECLARE_READ8_MEMBER(bank2_r) { int address = (m_bankaddr[2] * 0x2000) + offset; m_real_access_address = offset + 0xc000; return m_vt_external_space->read8(address); };
+	DECLARE_READ8_MEMBER(bank3_r) { int address = (m_bankaddr[3] * 0x2000) + offset; m_real_access_address = offset + 0xe000; return m_vt_external_space->read8(address); };
+	DECLARE_WRITE8_MEMBER(bank0_w) { int address = (m_bankaddr[0] * 0x2000) + offset; m_real_access_address = offset + 0x8000; m_vt_external_space->write8(address, data); };
+	DECLARE_WRITE8_MEMBER(bank1_w) { int address = (m_bankaddr[1] * 0x2000) + offset; m_real_access_address = offset + 0xa000; m_vt_external_space->write8(address, data); };
+	DECLARE_WRITE8_MEMBER(bank2_w) { int address = (m_bankaddr[2] * 0x2000) + offset; m_real_access_address = offset + 0xc000; m_vt_external_space->write8(address, data); };
+	DECLARE_WRITE8_MEMBER(bank3_w) { int address = (m_bankaddr[3] * 0x2000) + offset; m_real_access_address = offset + 0xe000; m_vt_external_space->write8(address, data); };
 
 	int m_bankaddr[4];
 
@@ -626,7 +627,6 @@ void nes_vt_cy_state::vt_external_space_map_bitboy_2x16mbyte(address_map &map)
 	map(0x0000000, 0x0ffffff).mirror(0x1000000).rw(FUNC(nes_vt_cy_state::vt_rom_banked_r), FUNC(nes_vt_cy_state::vt03_8000_mapper_w));
 }
 
-
 /* Standard I/O handlers (NES Controller clone) */
 
 READ8_MEMBER(nes_vt_state::in0_r)
@@ -897,7 +897,7 @@ WRITE8_MEMBER(nes_vt_cy_state::vt03_411c_w)
 
 WRITE8_MEMBER(nes_vt_cy_state::vt03_412c_w)
 {
-	printf("%s: vt03_412c_w %02x\n", machine().describe_context().c_str(),  data);
+	logerror("%s: vt03_412c_w %02x\n", machine().describe_context(),  data);
 	m_ahigh = (data & 0x04) ? (1 << 24) : 0x0;
 	//update_banks();
 }
@@ -1431,11 +1431,13 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 
 void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data)
 {
-	uint16_t addr = (offset&0x7fff) + 0x8000;
+	offset &= 0x7fff;
+
+	uint16_t addr = m_real_access_address; // we need the actual write address, not the translated one, to keep bittboy happy
 	if ((m_411d & 0x01) && (m_411d & 0x03))
 	{
 		//CNROM compat
-		logerror("vtxx_cnrom_8000_w (%04x) %02x\n", offset + 0x8000, data);
+		logerror("%s: vtxx_cnrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
 		m_ppu->set_201x_reg(0x6, data * 8);
 		m_ppu->set_201x_reg(0x7, data * 8 + 2);
 		m_ppu->set_201x_reg(0x2, data * 8 + 4);
@@ -1447,13 +1449,13 @@ void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8
 	else if (m_411d & 0x01)
 	{
 		//MMC1 compat, TODO
-		logerror("vtxx_mmc1_8000_w (%04x) %02x\n", offset + 0x8000, data);
+		logerror("%s: vtxx_mmc1_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
 
 	}
 	else if (m_411d & 0x02)
 	{
 		//UNROM compat
-		logerror("vtxx_unrom_8000_w (%04x) %02x\n", offset + 0x8000, data);
+		logerror("%s: vtxx_unrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
 
 		m_410x[0x7] = ((data & 0x0F) << 1);
 		m_410x[0x8] = ((data & 0x0F) << 1) + 1;
@@ -1461,12 +1463,12 @@ void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8
 	}
 	else
 	{
-		//logerror("vtxx_mmc3_8000_w (%04x) %02x\n", offset+0x8000, data );
+		//logerror("%s: vtxx_mmc3_8000_w real address: (%04x) translated address: (%04x) %02x\n",  machine().describe_context(), addr, offset+0x8000, data );
 
 		//MMC3 compat
 		if ((addr < 0xA000) && !(addr & 0x01))
 		{
-			logerror("scrambled_8000_w (%04x) %02x (banking)\n", offset + 0x8000, data);
+			logerror("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (banking)\n",  machine().describe_context(), addr, offset + 0x8000, data);
 			// Bank select
 			m_8000_addr_latch = data & 0x07;
 			// Bank config
@@ -1475,7 +1477,7 @@ void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8
 		}
 		else if ((addr < 0xA000) && (addr & 0x01))
 		{
-			logerror("scrambled_8000_w (%04x) %02x (other scrambled stuff)\n", offset + 0x8000, data);
+			logerror("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (other scrambled stuff)\n",  machine().describe_context(), addr, offset + 0x8000, data);
 
 			switch (m_410x[0x05] & 0x07)
 			{
