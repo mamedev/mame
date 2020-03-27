@@ -1061,7 +1061,7 @@ Known undumped prototypes:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="yastuna1">
 		<description>Yastuna Vol.1 - The Alchemy of Cubes</description>
 		<year>2008</year>
@@ -1072,7 +1072,7 @@ Known undumped prototypes:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="yastuna2">
 		<description>Yastuna Vol.2 - The Space Incident</description>
 		<year>2008</year>

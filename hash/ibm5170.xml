@@ -8919,7 +8919,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="amazon">
 		<description>Amazon - Guardians of Eden</description>
 		<year>1992</year>
@@ -8973,7 +8973,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="amd80gad">
 		<description>AMD 80C287 Game and Demo</description>
 		<year>199?</year>
@@ -9145,7 +9145,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bibadv">
 		<description>Bible Adventures</description>
 		<year>1992</year>
@@ -10554,7 +10554,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pharkas">
 		<description>Freddy Pharkas, Frontier Pharmacist</description>
 		<year>1993</year>
@@ -10972,7 +10972,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="humans_525" cloneof="humans">
 		<description>The Humans (5.25" HD)</description>
 		<year>1993</year>
@@ -10993,7 +10993,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="incait">
 		<description>Inca (Italian)</description>
 		<year>1992</year>
@@ -11627,7 +11627,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lotus3">
 		<description>Lotus - The Ultimate Challenge</description>
 		<year>1993</year>
@@ -11640,7 +11640,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="laacc">
 		<description>LucasArts Air Combat Classics</description>
 		<year>1994</year>
@@ -12117,7 +12117,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mystict">
 		<description>Mystic Towers</description>
 		<year>1994</year>
@@ -12243,7 +12243,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Fatal error: i386: Called modrm_to_EA with modrm value F5! -->
 	<software name="powdoll" supported="no">
 		<description>POWER DoLLS</description>

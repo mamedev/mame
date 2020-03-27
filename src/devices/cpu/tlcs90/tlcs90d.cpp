@@ -65,7 +65,7 @@ tmp90844_disassembler::tmp90844_disassembler()
 }
 
 const char *const tmp90c051_disassembler::ir_names[0x4c] =   {
-	                                        "P2",     "P2CR",   "P3",     "P3CR",
+											"P2",     "P2CR",   "P3",     "P3CR",
 	"P3FR",   "P4",     "P5",     "P45CR",  "P45FR",  "P6",     "P6CR",   "P6FR",
 	"TREG0",  "TREG1",  "TREG2",  "TREG3",  "T01MOD", "T23MOD", "TFFCR",  "TRDC",
 	"TRUN",   "IRF0",   "IRF1",   "IRF2",   "INTE0",  "INTE1",  "INTE2",  "DMAE",

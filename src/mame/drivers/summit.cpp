@@ -111,7 +111,7 @@ void summit_state::mainmap(address_map &map)
 static INPUT_PORTS_START( summit )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
-	PORT_DIPNAME( 0x02, 0x02, "IN0-02" )		// tilt?
+	PORT_DIPNAME( 0x02, 0x02, "IN0-02" )        // tilt?
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x04, 0x04, "IN0-04" )
@@ -120,9 +120,9 @@ static INPUT_PORTS_START( summit )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
-	PORT_DIPNAME( 0x40, 0x40, "Percentage 02" )		// payout percentage
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	// 72
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )	// 70
+	PORT_DIPNAME( 0x40, 0x40, "Percentage 02" )     // payout percentage
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )   // 72
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )  // 70
 	PORT_DIPNAME( 0x80, 0x80, "IN0-80" )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
@@ -138,9 +138,9 @@ static INPUT_PORTS_START( summit )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Down")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )  PORT_NAME("Up")
-	PORT_DIPNAME( 0x40, 0x40, "Percentage 04" )		// payout percentage
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	// 74
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )	// 70
+	PORT_DIPNAME( 0x40, 0x40, "Percentage 04" )     // payout percentage
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )   // 74
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )  // 70
 	PORT_DIPNAME( 0x80, 0x80, "IN1-80" )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
@@ -156,33 +156,33 @@ static INPUT_PORTS_START( summit )
 	PORT_DIPNAME( 0x08, 0x08, "IN2-08" )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN2-10" )		// output to 0x3a00 bit 3
+	PORT_DIPNAME( 0x10, 0x10, "IN2-10" )        // output to 0x3a00 bit 3
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x20, 0x20, "IN2-20" )		// output to 0x3880 bit 3, 0x3a00 bit 1
+	PORT_DIPNAME( 0x20, 0x20, "IN2-20" )        // output to 0x3880 bit 3, 0x3a00 bit 1
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x40, 0x40, "Percentage 08" )		// payout percentage
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	// 78
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )	// 70
+	PORT_DIPNAME( 0x40, 0x40, "Percentage 08" )     // payout percentage
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )   // 78
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )  // 70
 	PORT_DIPNAME( 0x80, 0x80, "IN2-80" )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_BET )	PORT_NAME("Start")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_BET )  PORT_NAME("Start")
 	PORT_DIPNAME( 0x02, 0x02, "IN3-02" )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )	PORT_NAME("50p")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_NAME("50p")
 	PORT_DIPNAME( 0x08, 0x08, "IN3-04" )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2     ) PORT_NAME("Token")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3     ) PORT_NAME("Cash")
-	PORT_DIPNAME( 0x40, 0x40, "Percentage 16" )		// payout percentage
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	// 86
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )	// 70
+	PORT_DIPNAME( 0x40, 0x40, "Percentage 16" )     // payout percentage
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )   // 86
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )  // 70
 	PORT_DIPNAME( 0x80, 0x80, "IN3-80" )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
@@ -342,8 +342,8 @@ void summit_state::out3_w(uint8_t data)
 	// -----2--  10p out
 	// ------1-  toggles rapidly
 	// -------0  unknown
-	
-//	machine().bookkeeping().coin_lockout_w(0, BIT(data, 4));
+
+//  machine().bookkeeping().coin_lockout_w(0, BIT(data, 4));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 3));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 }

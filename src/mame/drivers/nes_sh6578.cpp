@@ -5,9 +5,9 @@
     SH6578 NES clone hardware
     enhanced NES, different to VT / OneBus systems
 
-	video rendering is changed significantly compared to NES so not using NES PPU device
-	has 256x256 pixel pages, attributes are stored next to tile numbers (not in their own table after them) etc.
-	
+    video rendering is changed significantly compared to NES so not using NES PPU device
+    has 256x256 pixel pages, attributes are stored next to tile numbers (not in their own table after them) etc.
+
 */
 
 #include "emu.h"
@@ -42,7 +42,7 @@ public:
 		m_timer(*this, "timer"),
 		m_in(*this, "IN%u", 0U)
 	{ }
-	
+
 	void nes_sh6578(machine_config& config);
 	void nes_sh6578_pal(machine_config& config);
 
@@ -435,11 +435,11 @@ READ8_MEMBER(nes_sh6578_state::apu_read_mem)
 void nes_sh6578_state::nes_sh6578_map(address_map& map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2007).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));  
-	map(0x2008, 0x2008).rw(m_ppu, FUNC(ppu_sh6578_device::read_extended), FUNC(ppu_sh6578_device::write_extended));  
+	map(0x2000, 0x2007).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
+	map(0x2008, 0x2008).rw(m_ppu, FUNC(ppu_sh6578_device::read_extended), FUNC(ppu_sh6578_device::write_extended));
 
 	map(0x2040, 0x207f).rw(m_ppu, FUNC(ppu_sh6578_device::palette_read), FUNC(ppu_sh6578_device::palette_write));
-	
+
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
 	map(0x4014, 0x4014).rw(FUNC(nes_sh6578_state::psg1_4014_r), FUNC(nes_sh6578_state::sprite_dma_w));
 	map(0x4015, 0x4015).rw(FUNC(nes_sh6578_state::psg1_4015_r), FUNC(nes_sh6578_state::psg1_4015_w));

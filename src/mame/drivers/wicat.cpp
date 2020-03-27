@@ -630,7 +630,7 @@ READ8_MEMBER(wicat_state::videosram_r)
 WRITE8_MEMBER(wicat_state::videosram_w)
 {
 	if(!(offset & 0x01))
-		m_videosram->write(space,offset/2,data);
+		m_videosram->write(offset/2,data);
 }
 
 WRITE8_MEMBER(wicat_state::videosram_store_w)
@@ -666,7 +666,7 @@ READ8_MEMBER(wicat_state::video_timer_r)
 			m_videouart->drr_w(1);
 			m_videouart->drr_w(0);
 		}
-		return m_videouart->read(space,0);
+		return m_videouart->read();
 	}
 	return ret;
 }
@@ -675,7 +675,7 @@ WRITE8_MEMBER(wicat_state::video_timer_w)
 {
 	logerror("I/O port 0x%04x write %02x\n",offset,data);
 	if(offset == 0x02)
-		m_videouart->write(space,0,data);
+		m_videouart->write(data);
 }
 
 READ8_MEMBER(wicat_state::video_status_r)

@@ -4,7 +4,7 @@
 
     SunPlus GCM394-series SoC peripheral emulation (Video)
 
-	This is very similar to spg2xx but with additional features, layers and modes
+    This is very similar to spg2xx but with additional features, layers and modes
 
 **********************************************************************/
 
@@ -219,7 +219,7 @@ void gcm394_base_video_device::device_start()
 		decodegfx(":maincpu");
 
 	m_space_read_cb.resolve_safe(0);
-	
+
 	m_screenpos_timer = timer_alloc(TIMER_SCREENPOS);
 	m_screenpos_timer->adjust(attotime::never);
 
@@ -365,7 +365,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 	{
 		words_per_tile = 8; // seems to be correct for sprites regardless of size / bpp on smartfp
 	}
-	
+
 	int x_max;
 	if (m_707f & 0x0010)
 	{

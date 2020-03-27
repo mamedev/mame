@@ -90,7 +90,7 @@ protected:
 	u16 gpu0b_count_r();
 	void gpu0b_count_w(u16 data);
 	void gpu0_trigger_w(u8 data);
-  
+
 	void gpu1_adr_w(u16 data);
 	u16 gpu1b_adr_r();
 	void gpu1b_adr_w(u16 data);
@@ -100,7 +100,7 @@ protected:
 	void gpu1_trigger_w(u8 data);
 
 	void gpu_update(u16 count, u16 adr);
-  
+
 	void gpu_descsize_w(u16 data);
 	void gpu_descdata_w(u16 data);
 	void gpu_adr_w(u16 data);
@@ -467,12 +467,12 @@ u8 xavix2_state::debug_port_status_r()
 void xavix2_state::pio_mode_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_pio_mode[offset]);
-	//	logerror("%s: pio mode%d %08x %08x -> %08x\n", machine().describe_context(), offset, data, mem_mask, m_pio_mode[offset]);
+	//  logerror("%s: pio mode%d %08x %08x -> %08x\n", machine().describe_context(), offset, data, mem_mask, m_pio_mode[offset]);
 	m_pio_mask_out = 0;
 	for (u32 i=0; i<32; i++) {
 		m_pio_mask_out |= (((m_pio_mode[i / 16] >> ((i % 16) * 2)) & 3) == 3) ? 1 << i : 0;
 	}
-	//	logerror("%s: pio mode in0 %08x, out %08x\n", machine().describe_context(), m_pio_mask_out);
+	//  logerror("%s: pio mode in0 %08x, out %08x\n", machine().describe_context(), m_pio_mask_out);
 	pio_update();
 }
 
@@ -594,11 +594,11 @@ void xavix2_state::mem(address_map &map)
 
 uint32_t xavix2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-  if(machine().input().code_pressed_once(KEYCODE_8))
-    irq_raise(8);
-  if(machine().input().code_pressed_once(KEYCODE_0))
-    irq_raise(10);
-  
+	if(machine().input().code_pressed_once(KEYCODE_8))
+		irq_raise(8);
+	if(machine().input().code_pressed_once(KEYCODE_0))
+		irq_raise(10);
+
 	constexpr int dx = 0x400 - 320;
 	constexpr int dy = 0x200 - 200;
 

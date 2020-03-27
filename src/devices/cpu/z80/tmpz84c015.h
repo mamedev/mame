@@ -85,10 +85,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( strobe_a ) { m_pio->strobe_a(state); }
 	DECLARE_WRITE_LINE_MEMBER( strobe_b ) { m_pio->strobe_b(state); }
 
-	DECLARE_WRITE8_MEMBER( pa_w ) { m_pio->port_a_write(data); }
-	DECLARE_READ8_MEMBER( pa_r ) { return m_pio->port_a_read(); }
-	DECLARE_WRITE8_MEMBER( pb_w ) { m_pio->port_b_write(data); }
-	DECLARE_READ8_MEMBER( pb_r ) { return m_pio->port_b_read(); }
+	void pa_w(uint8_t data) { m_pio->port_a_write(data); }
+	uint8_t pa_r() { return m_pio->port_a_read(); }
+	void pb_w(uint8_t data) { m_pio->port_b_write(data); }
+	uint8_t pb_r() { return m_pio->port_b_read(); }
 	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { m_pio->pa0_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { m_pio->pa1_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( pa2_w ) { m_pio->pa2_w(state); }
@@ -108,7 +108,7 @@ public:
 
 	/////////////////////////////////////////////////////////
 
-	DECLARE_WRITE8_MEMBER( irq_priority_w );
+	void irq_priority_w(uint8_t data);
 
 	void tmpz84c015_internal_io_map(address_map &map);
 protected:
@@ -178,12 +178,12 @@ private:
 
 	template<unsigned N> DECLARE_WRITE_LINE_MEMBER( zc_cb_trampoline_w ) { m_zc_cb[N](state); }
 
-	DECLARE_READ8_MEMBER( in_pa_cb_trampoline_r ) { return m_in_pa_cb(); }
-	DECLARE_WRITE8_MEMBER( out_pa_cb_trampoline_w ) { m_out_pa_cb(data); }
+	uint8_t in_pa_cb_trampoline_r() { return m_in_pa_cb(); }
+	void out_pa_cb_trampoline_w(uint8_t data) { m_out_pa_cb(data); }
 	DECLARE_WRITE_LINE_MEMBER( out_ardy_cb_trampoline_w ) { m_out_ardy_cb(state); }
 
-	DECLARE_READ8_MEMBER( in_pb_cb_trampoline_r ) { return m_in_pb_cb(); }
-	DECLARE_WRITE8_MEMBER( out_pb_cb_trampoline_w ) { m_out_pb_cb(data); }
+	uint8_t in_pb_cb_trampoline_r() { return m_in_pb_cb(); }
+	void out_pb_cb_trampoline_w(uint8_t data) { m_out_pb_cb(data); }
 	DECLARE_WRITE_LINE_MEMBER( out_brdy_cb_trampoline_w ) { m_out_brdy_cb(state); }
 };
 

@@ -767,11 +767,11 @@ offs_t upd78k3_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				util::stream_format(stream, "%-8s", "MOV");
 				if (!BIT(op, 1))
 					stream << "A,";
-				u8 sfrp = opcodes.r8(pc + 1);
-				if (sfrp >= 0xfe)
-					util::stream_format(stream, "PSW%c", BIT(sfrp, 0) ? 'H' : 'L');
+				u8 sfr = opcodes.r8(pc + 1);
+				if (sfr >= 0xfe)
+					util::stream_format(stream, "PSW%c", BIT(sfr, 0) ? 'H' : 'L');
 				else
-					format_sfrp(stream, sfrp);
+					format_sfr(stream, sfr);
 				if (BIT(op, 1))
 					stream << ",A";
 			}
@@ -935,7 +935,7 @@ offs_t upd78k3_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		}
 		else if (BIT(op, 1))
 		{
-			util::stream_format(stream, "%-8s%s,", "DBNZ", s_r_names[op & 0x07]);
+			util::stream_format(stream, "%-8s%c,", "DBNZ", BIT(op, 0) ? 'B' : 'C');
 			format_jdisp8(stream, pc + 2, opcodes.r8(pc + 1));
 			return 2 | SUPPORTED;
 		}

@@ -237,7 +237,7 @@ WRITE16_MEMBER(zon32bit_state::portc_w)
 		else
 			m_upperbank &= ~0x0800;
 	}
-		 
+
 	if (oldbank != m_basebank)
 		m_maincpu->invalidate_cache();
 
@@ -268,9 +268,9 @@ void zon32bit_state::mem_map_zon32bit(address_map &map)
 READ16_MEMBER(zon32bit_state::z32_rom_r)
 {
 	/*
-		This has upper and lower bank, which can be changed independently.
-		Banking hookup is currently very hacky as bank values are written
-		to ports then erased at the moment, maybe they latch somehow?
+	    This has upper and lower bank, which can be changed independently.
+	    Banking hookup is currently very hacky as bank values are written
+	    to ports then erased at the moment, maybe they latch somehow?
 	*/
 
 	int base = 0x0000000;
@@ -608,7 +608,7 @@ ROM_END
 
 
 /*
-	Following pinout was used for dumping
+    Following pinout was used for dumping
 
       +------------------+
   VCC -|01              70|- VCC

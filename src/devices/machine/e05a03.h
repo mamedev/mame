@@ -26,8 +26,8 @@ public:
 	auto pe_wr_callback() { return m_write_pe.bind(); }
 	auto data_rd_callback() { return m_read_data.bind(); }
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
 
 	WRITE_LINE_MEMBER( home_w ); /* home position signal */
 	WRITE_LINE_MEMBER( fire_w ); /* printhead solenoids trigger */

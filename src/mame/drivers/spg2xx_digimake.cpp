@@ -127,7 +127,7 @@ static INPUT_PORTS_START( rad_digi ) // some of the inputs seem to act like butt
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "Something" ) 
+	PORT_DIPNAME( 0x0008, 0x0008, "Something" )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )

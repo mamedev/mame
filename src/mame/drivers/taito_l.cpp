@@ -585,8 +585,8 @@ void horshoes_state::horshoes_map(address_map &map)
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xa003).r(FUNC(horshoes_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
 	map(0xa800, 0xa800).select(0x000c).lr8(NAME(
-										   [this](address_space &space, offs_t offset, u8 mem_mask) {
-											   return m_upd4701->read_xy(space, offset >> 2, mem_mask);
+										   [this](offs_t offset) {
+											   return m_upd4701->read_xy(offset >> 2);
 										   }));
 	map(0xa802, 0xa802).r(m_upd4701, FUNC(upd4701_device::reset_x_r));
 	map(0xa803, 0xa803).r(m_upd4701, FUNC(upd4701_device::reset_y_r));
@@ -1930,7 +1930,7 @@ ROM_START( kurikint )
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "b42-01.ic1",  0x00000, 0x80000, CRC(7d1a1fec) SHA1(28311b07673686c18988400d0254533a454f07f4) )
 	ROM_LOAD( "b42-02.ic5",  0x80000, 0x80000, CRC(1a52e65c) SHA1(20a1fc4d02b5928fb01444079692e23d178c6297) )
-	
+
 	ROM_REGION( 0x022e, "plds", 0 )
 	ROM_LOAD( "gal16v8-b42-03.ic4.bin",  0x0000, 0x0117, CRC(f7150d37) SHA1(10f9190b89c802e0722fd6ba0f17ba97d463f434) )  /* derived, but verified, PAL16L8 Stamped B42-03 */
 	ROM_LOAD( "gal16v8-b42-04.ic21.bin", 0x0117, 0x0117, CRC(b57b806c) SHA1(04cbb008256b7317ebf366327dfd38ead8eaf94e) )  /* derived, but verified, PAL16L8 Stamped B42-04 */
@@ -1964,7 +1964,7 @@ ROM_START( kurikintu )
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "b42-01.ic1",  0x00000, 0x80000, CRC(7d1a1fec) SHA1(28311b07673686c18988400d0254533a454f07f4) )
 	ROM_LOAD( "b42-02.ic5",  0x80000, 0x80000, CRC(1a52e65c) SHA1(20a1fc4d02b5928fb01444079692e23d178c6297) )
-	
+
 	ROM_REGION( 0x022e, "plds", 0 )
 	ROM_LOAD( "gal16v8-b42-03.ic4.bin",  0x0000, 0x0117, CRC(f7150d37) SHA1(10f9190b89c802e0722fd6ba0f17ba97d463f434) )  /* derived, but verified, PAL16L8 Stamped B42-03 */
 	ROM_LOAD( "gal16v8-b42-04.ic21.bin", 0x0117, 0x0117, CRC(b57b806c) SHA1(04cbb008256b7317ebf366327dfd38ead8eaf94e) )  /* derived, but verified, PAL16L8 Stamped B42-04 */

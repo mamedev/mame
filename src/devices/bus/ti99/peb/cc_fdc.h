@@ -34,9 +34,9 @@ class corcomp_fdc_device : public device_t, public device_ti99_peribox_card_inte
 	friend class ccfdc_dec_pal_device;
 	friend class ccfdc_sel_pal_device;
 	friend class ccdcc_palu1_device;
-	friend class ccfdc_palu6_device; 
+	friend class ccfdc_palu6_device;
 	friend class ccfdc_palu12_device;
-	
+
 public:
 	DECLARE_READ8Z_MEMBER(readz) override;
 	void write(offs_t offset, uint8_t data) override;
@@ -50,12 +50,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_hld_w );
 	DECLARE_READ8_MEMBER( tms9901_input );
-	DECLARE_WRITE_LINE_MEMBER( select_dsk );	
+	DECLARE_WRITE_LINE_MEMBER( select_dsk );
 	DECLARE_WRITE_LINE_MEMBER( side_select );
 	DECLARE_WRITE_LINE_MEMBER( motor_w );
 	DECLARE_WRITE_LINE_MEMBER( select_card );
 	DECLARE_WRITE_LINE_MEMBER( select_bank );
-		
+
 protected:
 	corcomp_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -76,16 +76,16 @@ protected:
 	// PALs
 	ccfdc_dec_pal_device* m_decpal;
 	ccfdc_sel_pal_device* m_ctrlpal;
-	
+
 	// Lines that are polled by the PAL chips
 	bool card_selected();
 	bool upper_bank();
 	bool write_access();
 	bool ready_trap_active();
-	
+
 	// Deliver the current state of the address bus
 	uint16_t get_address();
-		
+
 	// Wait state logic
 	void operate_ready_line();
 
@@ -94,10 +94,10 @@ protected:
 
 	// Motor monoflop
 	required_device<ttl74123_device> m_motormf;
-	
+
 	// Interface chip
-	required_device<tms9901_device>	m_tms9901;
-	
+	required_device<tms9901_device> m_tms9901;
+
 	// Debugger accessors
 	void debug_read(offs_t offset, uint8_t* value);
 	void debug_write(offs_t offset, uint8_t data);
@@ -107,17 +107,17 @@ protected:
 
 	// DSR ROM
 	uint8_t* m_dsrrom;
-	
+
 	// State of the bank select line. Pulled down initially.
 	bool m_cardsel;
 	bool m_banksel;
 
 	// Selected drive
-	int m_selected_drive;	
-		
+	int m_selected_drive;
+
 	// Recent address
 	int m_address;
-	
+
 	// Write access
 	bool m_writing;
 };
@@ -145,15 +145,15 @@ public:
 	DECLARE_READ_LINE_MEMBER(address4);
 	DECLARE_READ_LINE_MEMBER(addressram);
 	virtual DECLARE_READ_LINE_MEMBER(address9901);
-	
+
 protected:
 	ccfdc_dec_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	void device_start() override { };
-	void device_config_complete() override;	
+	void device_config_complete() override;
 
 	corcomp_fdc_device* m_board;
-	required_device<tms9901_device>	m_tms9901;
+	required_device<tms9901_device> m_tms9901;
 };
 
 // =========== Selector PAL circuit ================
@@ -175,8 +175,8 @@ protected:
 	corcomp_fdc_device* m_board;
 	ccfdc_dec_pal_device* m_decpal;
 	required_device<ttl74123_device> m_motormf;
-	required_device<tms9901_device>	m_tms9901;
-	required_device<wd_fdc_device_base>	m_wdc;
+	required_device<tms9901_device> m_tms9901;
+	required_device<wd_fdc_device_base> m_wdc;
 };
 
 // =========== Specific decoder PAL circuit of the CCDCC ================
@@ -194,7 +194,7 @@ class ccdcc_palu1_device : public ccfdc_sel_pal_device
 public:
 	ccdcc_palu1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ_LINE_MEMBER(ready_out) override;
-	
+
 private:
 	void device_config_complete() override;
 };
@@ -206,7 +206,7 @@ private:
 class corcomp_fdca_device : public corcomp_fdc_device
 {
 	friend class ccfdc_palu6_device;
-	
+
 public:
 	corcomp_fdca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 private:

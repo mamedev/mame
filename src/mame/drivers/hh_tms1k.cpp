@@ -5287,7 +5287,7 @@ WRITE16_MEMBER(ginv2000_state::write_r)
 
 	// R11,R12: TMS1024 S1,S0 (S2 forced high)
 	// R13: TMS1024 STD
-	m_expander->write_s(space, 0, (data >> 12 & 1) | (data >> 10 & 2) | 4);
+	m_expander->write_s((data >> 12 & 1) | (data >> 10 & 2) | 4);
 	m_expander->write_std(data >> 13 & 1);
 
 	// R1-R10: VFD grid
@@ -5298,7 +5298,7 @@ WRITE16_MEMBER(ginv2000_state::write_r)
 WRITE16_MEMBER(ginv2000_state::write_o)
 {
 	// O4-O7: TMS1024 H1-H4
-	m_expander->write_h(space, 0, data >> 4 & 0xf);
+	m_expander->write_h(data >> 4 & 0xf);
 }
 
 READ8_MEMBER(ginv2000_state::read_k)
@@ -11732,7 +11732,7 @@ WRITE16_MEMBER(tbreakup_state::write_r)
 
 	// R3-R5: TMS1025 port S
 	// R2: TMS1025 STD pin
-	m_expander->write_s(space, 0, data >> 3 & 7);
+	m_expander->write_s(data >> 3 & 7);
 	m_expander->write_std(data >> 2 & 1);
 
 	// R0,R1: select digit
@@ -11743,7 +11743,7 @@ WRITE16_MEMBER(tbreakup_state::write_r)
 WRITE16_MEMBER(tbreakup_state::write_o)
 {
 	// O0-O3: TMS1025 port H
-	m_expander->write_h(space, 0, data & 0xf);
+	m_expander->write_h(data & 0xf);
 
 	// O0-O7: led state
 	m_o = data;

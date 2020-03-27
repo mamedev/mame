@@ -119,7 +119,7 @@ void bbc_1mhzbus_slot_device::jim_w(offs_t offset, uint8_t data)
 #include "m2000.h"
 //#include "m5000.h"
 #include "scsi.h"
-//#include "multiform.h"
+#include "multiform.h"
 #include "opus3.h"
 #include "pdram.h"
 #include "pms64k.h"
@@ -146,7 +146,7 @@ void bbc_1mhzbus_devices(device_slot_interface &device)
 	//device.option_add("videodig",   BBC_VIDEODIG);        /* Video Digitiser (RH Electronics) */
 	device.option_add("emrmidi",    BBC_EMRMIDI);         /* EMR Midi Interface */
 	//device.option_add("procyon",    BBC_PROCYON);         /* CST Procyon IEEE Interface */
-	//device.option_add("multiform",  BBC_MULTIFORM);       /* Technomatic Multiform Z80 */
+	device.option_add("multiform",  BBC_MULTIFORM);       /* PEDL Multiform Z80 */
 	device.option_add("opus3",      BBC_OPUS3);           /* Opus Challenger 3 */
 	device.option_add("pdram",      BBC_PDRAM);           /* Micro User Pull Down RAM */
 	device.option_add("pms64k",     BBC_PMS64K);          /* PMS 64K Non-Volatile Ram Module */
@@ -176,7 +176,7 @@ void bbcm_1mhzbus_devices(device_slot_interface &device)
 	//device.option_add("m3000",      BBC_M3000);           /* Hybrid Music 3000 Expander */
 	//device.option_add("m5000",      BBC_M5000);           /* Hybrid Music 5000 Synthesiser */
 	//device.option_add("m87",        BBC_M87);             /* Peartree Music 87 Synthesiser */
-	//device.option_add("multiform",  BBC_MULTIFORM);       /* Technomatic Multiform Z80 */
+	device.option_add("multiform",  BBC_MULTIFORM);       /* PEDL Multiform Z80 */
 	device.option_add("opusa",      BBC_OPUSA);           /* Opus Challenger ADFS */
 	device.option_add("pdram",      BBC_PDRAM);           /* Micro User Pull Down RAM */
 	device.option_add("pms64k",     BBC_PMS64K);          /* PMS 64K Non-Volatile Ram Module */

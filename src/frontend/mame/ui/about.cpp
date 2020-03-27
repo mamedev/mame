@@ -27,7 +27,7 @@ namespace {
 
  ABOUT MODAL
 
- **************************************************/
+**************************************************/
 
 
 //-------------------------------------------------
@@ -36,8 +36,6 @@ namespace {
 
 menu_about::menu_about(mame_ui_manager &mui, render_container &container)
 	: menu(mui, container)
-	, m_pause_checked(false)
-	, m_was_paused(false)
 {
 }
 
@@ -48,12 +46,8 @@ menu_about::menu_about(mame_ui_manager &mui, render_container &container)
 
 menu_about::~menu_about()
 {
-	// resume if appropriate (is the destructor really the right place
-	// to do this sort of activity?)
-	// TODO(mooglyguy): No, it isn't. We should have an explicit menu-exit callback.
-	if (!m_was_paused)
-		machine().resume();
 }
+
 
 //-------------------------------------------------
 //  populate - populates the about modal
@@ -61,15 +55,6 @@ menu_about::~menu_about()
 
 void menu_about::populate(float &customtop, float &custombottom)
 {
-	// pause if appropriate
-	if (!m_pause_checked)
-	{
-		m_was_paused = machine().paused();
-		if (!m_was_paused)
-			machine().pause();
-		m_pause_checked = true;
-	}
-
 	for (char const *const *line = copying_text; *line; ++line)
 		item_append(*line, "", 0, nullptr);
 

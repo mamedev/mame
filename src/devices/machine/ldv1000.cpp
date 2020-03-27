@@ -340,7 +340,7 @@ int32_t pioneer_ldv1000_device::player_update(const vbi_metadata &vbi, int field
 //  an interrupt in the daisy chain
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pioneer_ldv1000_device::ctc_interrupt )
+void pioneer_ldv1000_device::ctc_interrupt(int state)
 {
 	m_z80_cpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -351,7 +351,7 @@ WRITE_LINE_MEMBER( pioneer_ldv1000_device::ctc_interrupt )
 //  the decoder/display chips
 //-------------------------------------------------
 
-WRITE8_MEMBER( pioneer_ldv1000_device::z80_decoder_display_port_w )
+void pioneer_ldv1000_device::z80_decoder_display_port_w(offs_t offset, uint8_t data)
 {
 	/*
 	    TX/RX = /A0 (A0=0 -> TX, A0=1 -> RX)
@@ -382,7 +382,7 @@ WRITE8_MEMBER( pioneer_ldv1000_device::z80_decoder_display_port_w )
 //  decoder/display chips
 //-------------------------------------------------
 
-READ8_MEMBER( pioneer_ldv1000_device::z80_decoder_display_port_r )
+uint8_t pioneer_ldv1000_device::z80_decoder_display_port_r(offs_t offset)
 {
 	// reads from offset 3 constitute actual reads from the display and decoder chips
 	uint8_t result = 0;
@@ -404,7 +404,7 @@ READ8_MEMBER( pioneer_ldv1000_device::z80_decoder_display_port_r )
 //  the controlling system
 //-------------------------------------------------
 
-READ8_MEMBER( pioneer_ldv1000_device::z80_controller_r )
+uint8_t pioneer_ldv1000_device::z80_controller_r()
 {
 	// note that this is a cheesy implementation; the real thing relies on exquisite timing
 	uint8_t result = m_command ^ 0xff;
@@ -417,7 +417,7 @@ READ8_MEMBER( pioneer_ldv1000_device::z80_controller_r )
 //  z80_controller_w - handle status latch writes
 //-------------------------------------------------
 
-WRITE8_MEMBER( pioneer_ldv1000_device::z80_controller_w )
+void pioneer_ldv1000_device::z80_controller_w(uint8_t data)
 {
 	if (LOG_STATUS_CHANGES && data != m_status)
 		logerror("%s:CONTROLLER.W=%02X\n", machine().describe_context(), data);
@@ -430,7 +430,7 @@ WRITE8_MEMBER( pioneer_ldv1000_device::z80_controller_w )
 //  PPI #0
 //-------------------------------------------------
 
-WRITE8_MEMBER( pioneer_ldv1000_device::ppi0_porta_w )
+void pioneer_ldv1000_device::ppi0_porta_w(uint8_t data)
 {
 	m_counter_start = data;
 	if (LOG_PORT_IO)
@@ -443,7 +443,7 @@ WRITE8_MEMBER( pioneer_ldv1000_device::ppi0_porta_w )
 //  PPI #0
 //-------------------------------------------------
 
-READ8_MEMBER( pioneer_ldv1000_device::ppi0_portb_r )
+uint8_t pioneer_ldv1000_device::ppi0_portb_r()
 {
 	return m_counter;
 }
@@ -454,7 +454,7 @@ READ8_MEMBER( pioneer_ldv1000_device::ppi0_portb_r )
 //  PPI #0
 //-------------------------------------------------
 
-READ8_MEMBER( pioneer_ldv1000_device::ppi0_portc_r )
+uint8_t pioneer_ldv1000_device::ppi0_portc_r()
 {
 	/*
 	    $10 = /VSYNC
@@ -477,7 +477,7 @@ READ8_MEMBER( pioneer_ldv1000_device::ppi0_portc_r )
 //  PPI #0
 //-------------------------------------------------
 
-WRITE8_MEMBER( pioneer_ldv1000_device::ppi0_portc_w )
+void pioneer_ldv1000_device::ppi0_portc_w(uint8_t data)
 {
 	/*
 	    $01 = preload on up/down counters
@@ -512,7 +512,7 @@ WRITE8_MEMBER( pioneer_ldv1000_device::ppi0_portc_w )
 //  PPI #1
 //-------------------------------------------------
 
-READ8_MEMBER( pioneer_ldv1000_device::ppi1_porta_r )
+uint8_t pioneer_ldv1000_device::ppi1_porta_r()
 {
 	/*
 	    $01 = /FOCS LOCK
@@ -562,7 +562,7 @@ READ8_MEMBER( pioneer_ldv1000_device::ppi1_porta_r )
 //  PPI #1
 //-------------------------------------------------
 
-WRITE8_MEMBER( pioneer_ldv1000_device::ppi1_portb_w )
+void pioneer_ldv1000_device::ppi1_portb_w(uint8_t data)
 {
 	/*
 	    $01 = /FOCS ON
@@ -615,7 +615,7 @@ WRITE8_MEMBER( pioneer_ldv1000_device::ppi1_portb_w )
 //  PPI #1
 //-------------------------------------------------
 
-WRITE8_MEMBER( pioneer_ldv1000_device::ppi1_portc_w )
+void pioneer_ldv1000_device::ppi1_portc_w(uint8_t data)
 {
 	/*
 	    $01 = AUD 1

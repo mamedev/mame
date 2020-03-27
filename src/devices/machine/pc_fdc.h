@@ -26,10 +26,10 @@ public:
 	virtual void dma_w(uint8_t data) override;
 	virtual uint8_t do_dir_r() override;
 
-	READ8_MEMBER(dor_r);
-	WRITE8_MEMBER(dor_w);
-	READ8_MEMBER(dir_r);
-	WRITE8_MEMBER(ccr_w);
+	uint8_t dor_r();
+	void dor_w(uint8_t data);
+	uint8_t dir_r();
+	void ccr_w(uint8_t data);
 
 	required_device<upd765a_device> fdc;
 
@@ -41,8 +41,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	void irq_w(int state);
+	void drq_w(int state);
 
 	bool irq, drq, fdc_drq, fdc_irq;
 	devcb_write_line intrq_cb, drq_cb;
@@ -59,7 +59,7 @@ public:
 	pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
-	WRITE8_MEMBER(dor_fifo_w);
+	void dor_fifo_w(uint8_t data);
 };
 
 class pc_fdc_at_device : public pc_fdc_family_device {

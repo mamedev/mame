@@ -119,23 +119,23 @@ protected:
 	void timer_w(offs_t offset, uint8_t data, bool ie);
 	uint8_t timer_r(bool ie);
 
-	DECLARE_READ8_MEMBER( rom_r ) { return m_rom[offset]; }
-	DECLARE_READ8_MEMBER( ram_r ) { return m_ram[offset]; }
-	DECLARE_WRITE8_MEMBER( ram_w ) { m_ram[offset] = data; }
-	DECLARE_READ8_MEMBER( pa_data_r );
-	DECLARE_WRITE8_MEMBER( pa_data_w );
-	DECLARE_READ8_MEMBER( pb_data_r );
-	DECLARE_WRITE8_MEMBER( pb_data_w );
-	DECLARE_READ8_MEMBER( pa_ddr_r ) { return m_pa_ddr; }
-	DECLARE_WRITE8_MEMBER( pa_ddr_w );
-	DECLARE_READ8_MEMBER( pb_ddr_r ) { return m_pb_ddr; }
-	DECLARE_WRITE8_MEMBER( pb_ddr_w );
-	DECLARE_READ8_MEMBER( timer_off_r );
-	DECLARE_READ8_MEMBER( timer_on_r );
-	DECLARE_READ8_MEMBER( irq_r );
-	DECLARE_WRITE8_MEMBER( timer_off_w );
-	DECLARE_WRITE8_MEMBER( timer_on_w );
-	DECLARE_WRITE8_MEMBER( edge_w );
+	uint8_t rom_r(offs_t offset) { return m_rom[offset]; }
+	uint8_t ram_r(offs_t offset) { return m_ram[offset]; }
+	void ram_w(offs_t offset, uint8_t data) { m_ram[offset] = data; }
+	uint8_t pa_data_r();
+	void pa_data_w(uint8_t data);
+	uint8_t pb_data_r();
+	void pb_data_w(uint8_t data);
+	uint8_t pa_ddr_r() { return m_pa_ddr; }
+	void pa_ddr_w(uint8_t data);
+	uint8_t pb_ddr_r() { return m_pb_ddr; }
+	void pb_ddr_w(uint8_t data);
+	uint8_t timer_off_r();
+	uint8_t timer_on_r();
+	uint8_t irq_r();
+	void timer_off_w(offs_t offset, uint8_t data);
+	void timer_on_w(offs_t offset, uint8_t data);
+	void edge_w(uint8_t data);
 
 	optional_shared_ptr<uint8_t> m_ram;
 	optional_region_ptr<uint8_t> m_rom;
@@ -225,8 +225,8 @@ public:
 	virtual void io_map(address_map &map);
 
 	// is there a better way to access the memory map when not using m()?
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

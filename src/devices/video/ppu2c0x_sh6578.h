@@ -23,7 +23,7 @@ public:
 
 protected:
 	ppu_sh6578_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	
+
 	void ppu_internal_map(address_map& map);
 
 private:

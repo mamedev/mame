@@ -30,13 +30,13 @@ Simple layout for Push-Over (Summit Coin)
 	<element name="start" defstate="0">
 		<rect state="0"><color red="0.0" green="0.2" blue="0.0" /></rect>
 		<rect state="1"><color red="0.0" green="0.8" blue="0.0" /></rect>
-        <text string="START"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string="START"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 
 	<element name="go" defstate="0">
 		<rect state="0"><color red="0.2" green="0.2" blue="0.0" /></rect>
 		<rect state="1"><color red="0.8" green="0.8" blue="0.0" /></rect>
-        <text string="GO"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string="GO"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 
 	<element name="red" defstate="0">
@@ -84,7 +84,7 @@ Simple layout for Push-Over (Summit Coin)
 			<bounds x="250" y="20" width="40" height="35" />
 		</cpanel>
 
-        <!-- Might not be lamps -->
+		<!-- Might not be lamps -->
 		<cpanel name="lamp_6" element="green">
 			<bounds x="550" y="200" width="20" height="20" />
 		</cpanel>
@@ -107,6 +107,6 @@ Simple layout for Push-Over (Summit Coin)
 			<bounds x="550" y="380" width="20" height="20" />
 		</cpanel>
 
-    </view>
+	</view>
 
 </mamelayout>

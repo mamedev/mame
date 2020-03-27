@@ -498,14 +498,14 @@ template<int Chip>
 READ8_MEMBER(towns_state::towns_dma_r)
 {
 	logerror("DMA#%01x: read register %i\n",Chip,offset);
-	return m_dma[Chip]->read(space, offset);
+	return m_dma[Chip]->read(offset);
 }
 
 template<int Chip>
 WRITE8_MEMBER(towns_state::towns_dma_w)
 {
 	logerror("DMA#%01x: wrote 0x%02x to register %i\n",Chip,data,offset);
-	m_dma[Chip]->write(space, offset, data);
+	m_dma[Chip]->write(offset, data);
 }
 
 /*

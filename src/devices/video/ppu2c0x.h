@@ -197,7 +197,7 @@ protected:
 	int m_global_refresh_mask;
 	int m_line_write_increment_large;
 	bool m_paletteram_in_ppuspace; // sh6578 doesn't have the palette in PPU space, so various side-effects don't apply
-	std::vector<uint8_t>		m_palette_ram;		    /* shouldn't be in main memory! */
+	std::vector<uint8_t>        m_palette_ram;          /* shouldn't be in main memory! */
 	std::unique_ptr<bitmap_rgb32>                m_bitmap;          /* target bitmap */
 	int                         m_regs[PPU_MAX_REG];        /* registers */
 	int                         m_tile_page;            /* current tile page */

@@ -44,7 +44,7 @@ void kawai_k1_state::k1(machine_config &config)
 	UPD78310(config, m_mpu, 12_MHz_XTAL); // µPD78310G-36
 	m_mpu->set_addrmap(AS_PROGRAM, &kawai_k1_state::mem_map);
 
-	NVRAM(config, "toneram", nvram_device::DEFAULT_ALL_0); // LC3564PL-12 + battery	
+	NVRAM(config, "toneram", nvram_device::DEFAULT_ALL_0); // LC3564PL-12 + battery
 }
 
 ROM_START(k1)

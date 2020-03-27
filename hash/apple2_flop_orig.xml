@@ -11171,7 +11171,7 @@ license:CC0
 		<info name="release" value="2020-02-21"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 64K Apple II+ or later. -->
-	
+
 			<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="234791">
@@ -11406,7 +11406,7 @@ license:CC0
 		<info name="release" value="2020-03-09"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 64K Apple II+ or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11433,7 +11433,7 @@ license:CC0
 		<info name="release" value="2020-03-11"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11455,7 +11455,7 @@ license:CC0
 		<!-- It requires a 64K Apple II+ or later. -->
 		<!-- This is v0.98 beta, labeled as "for workshops and demonstrations
 		only." It is not copy protected. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11482,7 +11482,7 @@ license:CC0
 		<info name="release" value="2020-03-17"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 64K Apple II+ or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11509,7 +11509,7 @@ license:CC0
 		<info name="release" value="2020-03-17"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11529,7 +11529,7 @@ license:CC0
 		<info name="release" value="2020-03-17"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11549,7 +11549,7 @@ license:CC0
 		<info name="release" value="2020-03-17"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 64K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11576,7 +11576,7 @@ license:CC0
 		<info name="release" value="2020-03-18"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11596,7 +11596,7 @@ license:CC0
 		<info name="release" value="2020-03-18"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11616,7 +11616,7 @@ license:CC0
 		<info name="release" value="2020-03-18"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11636,7 +11636,7 @@ license:CC0
 		<info name="release" value="2020-03-18"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11656,7 +11656,7 @@ license:CC0
 		<info name="release" value="2020-03-18"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11676,7 +11676,7 @@ license:CC0
 		<info name="release" value="2020-03-18"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11696,7 +11696,7 @@ license:CC0
 		<info name="release" value="2020-03-19"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11716,7 +11716,7 @@ license:CC0
 		<info name="release" value="2020-03-19"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11736,7 +11736,7 @@ license:CC0
 		<info name="release" value="2020-03-19"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11756,7 +11756,7 @@ license:CC0
 		<info name="release" value="2020-03-19"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11776,7 +11776,7 @@ license:CC0
 		<info name="release" value="2020-03-19"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11796,7 +11796,7 @@ license:CC0
 		<info name="release" value="2020-03-19"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/
@@ -11816,7 +11816,7 @@ license:CC0
 		<info name="release" value="2020-03-19"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk 
+		<!-- This is part of the Where in North Dakota is Carmen Sandiego disk
 		set. Please refer to the following website for more details on the
 		history of this particular disk:
 		https://web.archive.org/web/https://gamehistory.org/where-in-north-dakota-is-carmen-sandiego/

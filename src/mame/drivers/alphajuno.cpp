@@ -9,6 +9,7 @@
 #include "emu.h"
 //#include "bus/midi/midi.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/mb63h149.h"
 #include "machine/nvram.h"
 #include "video/hd44780.h"
 #include "emupal.h"
@@ -25,6 +26,7 @@ public:
 	}
 
 	void ajuno1(machine_config &config);
+	void ajuno2(machine_config &config);
 	void mks50(machine_config &config);
 
 protected:
@@ -36,7 +38,8 @@ private:
 	void lcd_w(offs_t offset, u8 data);
 
 	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void ajuno1_ext_map(address_map &map);
+	void ajuno2_ext_map(address_map &map);
 	void mks50_ext_map(address_map &map);
 
 	void palette_init(palette_device &palette);
@@ -69,9 +72,16 @@ void alphajuno_state::prog_map(address_map &map)
 	map(0x0000, 0x3fff).rom().region("program", 0);
 }
 
-void alphajuno_state::ext_map(address_map &map)
+void alphajuno_state::ajuno1_ext_map(address_map &map)
 {
 	map(0x2000, 0x27ff).mirror(0xd800).ram().share("nvram");
+	map(0x8000, 0x8008).w(FUNC(alphajuno_state::lcd_w));
+}
+
+void alphajuno_state::ajuno2_ext_map(address_map &map)
+{
+	map(0x2000, 0x27ff).mirror(0xd800).ram().share("nvram");
+	map(0x5000, 0x57ff).mirror(0x800).rw("keyscan", FUNC(mb63h149_device::read), FUNC(mb63h149_device::write));
 	map(0x8000, 0x8008).w(FUNC(alphajuno_state::lcd_w));
 }
 
@@ -100,7 +110,7 @@ void alphajuno_state::ajuno1(machine_config &config)
 {
 	I8032(config, m_maincpu, 12_MHz_XTAL); // P8032AH
 	m_maincpu->set_addrmap(AS_PROGRAM, &alphajuno_state::prog_map);
-	m_maincpu->set_addrmap(AS_IO, &alphajuno_state::ext_map);
+	m_maincpu->set_addrmap(AS_IO, &alphajuno_state::ajuno1_ext_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5517APL + battery
 
@@ -121,6 +131,15 @@ void alphajuno_state::ajuno1(machine_config &config)
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(alphajuno_state::lcd_pixel_update));
 	m_lcdc->set_busy_factor(0.005);
+}
+
+void alphajuno_state::ajuno2(machine_config &config)
+{
+	ajuno1(config);
+	m_maincpu->set_addrmap(AS_IO, &alphajuno_state::ajuno2_ext_map);
+
+	mb63h149_device &keyscan(MB63H149(config, "keyscan", 12_MHz_XTAL));
+	keyscan.int_callback().set_inputline(m_maincpu, MCS51_INT0_LINE);
 }
 
 void alphajuno_state::mks50(machine_config &config)
@@ -175,5 +194,5 @@ ROM_END
 
 SYST(1985, ajuno1, 0, 0, ajuno1, ajuno1, alphajuno_state, empty_init, "Roland", "Alpha Juno-1 (JU-1) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
 //SYST(1985, hs10, ajuno1, 0, ajuno1, ajuno1, alphajuno_state, empty_init, "Roland", "SynthPlus 10 (HS-10) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
-SYST(1986, ajuno2, 0, 0, ajuno1, ajuno2, alphajuno_state, empty_init, "Roland", "Alpha Juno-2 (JU-2) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1986, ajuno2, 0, 0, ajuno2, ajuno2, alphajuno_state, empty_init, "Roland", "Alpha Juno-2 (JU-2) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
 SYST(1987, mks50, 0, 0, mks50, mks50, alphajuno_state, empty_init, "Roland", "MKS-50 Synthesizer Module", MACHINE_IS_SKELETON)

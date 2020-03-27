@@ -21,8 +21,8 @@ public:
 	auto drq_cb() { return m_drq_cb.bind(); }
 
 	// any publically accessible interfaces needed for runtime
-	DECLARE_READ8_MEMBER( mb89352_r );
-	DECLARE_WRITE8_MEMBER( mb89352_w );
+	uint8_t mb89352_r(offs_t offset);
+	void mb89352_w(offs_t offset, uint8_t data);
 
 	void set_phase(int phase);
 

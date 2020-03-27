@@ -249,13 +249,13 @@ READ16_MEMBER(x68k_state::scc_r )
 	switch(offset)
 	{
 	case 0:
-		return m_scc->reg_r(space, 0);
+		return m_scc->reg_r(0);
 	case 1:
 		return read_mouse();
 	case 2:
-		return m_scc->reg_r(space, 1);
+		return m_scc->reg_r(1);
 	case 3:
-		return m_scc->reg_r(space, 3);
+		return m_scc->reg_r(3);
 	default:
 		return 0xff;
 	}
@@ -268,7 +268,7 @@ WRITE16_MEMBER(x68k_state::scc_w )
 	switch(offset)
 	{
 	case 0:
-		m_scc->reg_w(space, 0,(uint8_t)data);
+		m_scc->reg_w(0,(uint8_t)data);
 		if((m_scc->get_reg_b(5) & 0x02) != m_scc_prev)
 		{
 			if(m_scc->get_reg_b(5) & 0x02)  // Request to Send
@@ -281,13 +281,13 @@ WRITE16_MEMBER(x68k_state::scc_w )
 		}
 		break;
 	case 1:
-		m_scc->reg_w(space, 2,(uint8_t)data);
+		m_scc->reg_w(2,(uint8_t)data);
 		break;
 	case 2:
-		m_scc->reg_w(space, 1,(uint8_t)data);
+		m_scc->reg_w(1,(uint8_t)data);
 		break;
 	case 3:
-		m_scc->reg_w(space, 3,(uint8_t)data);
+		m_scc->reg_w(3,(uint8_t)data);
 		break;
 	}
 	m_scc_prev = m_scc->get_reg_b(5) & 0x02;

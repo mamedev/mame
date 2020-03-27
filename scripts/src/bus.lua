@@ -500,6 +500,8 @@ if (BUSES["BBC_1MHZBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/ieee488.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/m2000.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/m2000.h",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/multiform.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/multiform.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/pdram.cpp",

@@ -250,7 +250,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 						if (((pix2 & 0x900) != 0x900) || ((spri2 <= spri1) && sprite1_drawed))
 						{
 							// TODO: make it functional, check out modes 0x21 and 0x1000.
-							dstline[x] = (m_deco_ace->get_aceram(0x1f) == 0x22) ? 
+							dstline[x] = (m_deco_ace->get_aceram(0x1f) == 0x22) ?
 								sub_blend_r32(dstline[x], paldata[((drawnpixe1 & 3) ? calculated_coloffs : 0) | pix3], alpha3) :
 								alpha_blend_r32(dstline[x], paldata[((drawnpixe1 & 3) ? calculated_coloffs : 0) | pix3], alpha3);
 						}

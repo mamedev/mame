@@ -41,6 +41,7 @@ TODO:
 - Add support for O and C flags in NEG8 instruction
 - Verify MUL (CE D8) and DIV (CE D9)
 - Doublecheck behaviour of CMPN instructions ( CF 60 .. CF 63 )
+- DIV (CE D9) division by zero handling - is supposed to raise a EX4 exception. A real Pokemini unit will freeze. MAME currently will crash.
 
 */
 

@@ -619,12 +619,12 @@ WRITE8_MEMBER( abc1600_state::dart_w )
 
 READ8_MEMBER( abc1600_state::scc_r )
 {
-	return m_scc->reg_r(space, A1_A2);
+	return m_scc->reg_r(A1_A2);
 }
 
 WRITE8_MEMBER( abc1600_state::scc_w )
 {
-	m_scc->reg_w(space, A1_A2, data);
+	m_scc->reg_w(A1_A2, data);
 }
 
 

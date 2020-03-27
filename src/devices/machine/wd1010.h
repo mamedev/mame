@@ -31,11 +31,11 @@ public:
 	auto in_data_callback() { return m_in_data_cb.bind(); }
 	auto out_data_callback() { return m_out_data_cb.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(drdy_w);
-	DECLARE_WRITE_LINE_MEMBER(brdy_w);
+	void drdy_w(int state);
+	void brdy_w(int state);
 
 protected:
 	// device-level overrides

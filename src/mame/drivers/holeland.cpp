@@ -6,13 +6,13 @@
 
     driver by Mathis Rosenhauer
 
-	Notes:
-	- In stop mode press p1 start to freeze the screen, p2 start to resume
+    Notes:
+    - In stop mode press p1 start to freeze the screen, p2 start to resume
 
     TODO:
     - missing high bit of sprite X coordinate? (see round 2 and 3 of attract
       mode in crzrally)
-	- crzrally: emulate steering wheel;
+    - crzrally: emulate steering wheel;
 
 ***************************************************************************/
 

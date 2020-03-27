@@ -17,7 +17,7 @@
 // convergence but this yet not really is observable
 //
 
-#define USE_TEXTBOOK_DIODE	(1)
+#define USE_TEXTBOOK_DIODE  (1)
 
 namespace netlist
 {

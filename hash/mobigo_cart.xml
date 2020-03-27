@@ -343,8 +343,8 @@ license:CC0
 	</software>
 
 
-	<!-- this is from a special large scale Kiosk unit, which should also have a unique BIOS.  
-             Maybe move into driver as a hardcodd cart once BIOS is dumped rather than having it here? -->
+	<!-- this is from a special large scale Kiosk unit, which should also have a unique BIOS.
+	         Maybe move into driver as a hardcodd cart once BIOS is dumped rather than having it here? -->
 	<software name="kioskg" supported="no">
 		<description>Mobigo Kiosk (Germany)</description>
 		<year>201?</year>

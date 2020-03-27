@@ -308,7 +308,7 @@ int upd71071_device::dmarq(int state, int channel)
 	return 0;
 }
 
-READ8_MEMBER(upd71071_device::read)
+uint8_t upd71071_device::read(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -385,7 +385,7 @@ READ8_MEMBER(upd71071_device::read)
 	return ret;
 }
 
-WRITE8_MEMBER(upd71071_device::write)
+void upd71071_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

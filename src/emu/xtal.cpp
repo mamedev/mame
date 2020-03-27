@@ -63,6 +63,7 @@ const double XTAL::known_xtals[] = {
 		400'000, /* 400_kHz_XTAL           Resonator - OKI MSM5205 on Great Swordman h/w */
 		430'000, /* 430_kHz_XTAL           Resonator */
 		455'000, /* 455_kHz_XTAL           Resonator - OKI MSM5205 on Gladiator h/w */
+		500'000, /* 500_kHz_XTAL           Resonator - MIDI clock on various synthesizers (31250 * 16) */
 		512'000, /* 512_kHz_XTAL           Resonator - Toshiba TC8830F */
 		600'000, /* 600_kHz_XTAL           - */
 		640'000, /* 640_kHz_XTAL           Resonator - NEC UPD7759, Texas Instruments Speech Chips @ 8khz */
@@ -122,7 +123,7 @@ const double XTAL::known_xtals[] = {
 	  6'000'000, /* 6_MHz_XTAL             American Poker II, Taito SJ System */
 	  6'144'000, /* 6.144_MHz_XTAL         Used on Alpha Denshi early 80's games sound board, Casio FP-200 and Namco Universal System 16 */
 	  6'400'000, /* 6.4_MHz_XTAL           Textel Compact */
-	  6'500'000, /* 6.5_MHz_XTAL           Jupiter Ace */
+	  6'500'000, /* 6.5_MHz_XTAL           Jupiter Ace, Roland QDD interface */
 	  6'880'000, /* 6.88_MHz_XTAL          Barcrest MPU4 */
 	  6'900'000, /* 6.9_MHz_XTAL           BBN BitGraph CPU */
 	  7'000'000, /* 7_MHz_XTAL             Jaleco Mega System PCBs */
@@ -142,6 +143,7 @@ const double XTAL::known_xtals[] = {
 	  8'867'236, /* 8.867236_MHz_XTAL      RCA CDP1869 PAL color clock (~2x PAL subcarrier) */
 	  8'867'238, /* 8.867238_MHz_XTAL      ETI-660 (~2x PAL subcarrier) */
 	  8'945'000, /* 8.945_MHz_XTAL         Hit Me */
+	  8'960'000, /* 8.96_MHz_XTAL          Casio CZ-101 (divided by 2 for Music LSI) */
 	  9'000'000, /* 9_MHz_XTAL             Homedata PCBs */
 	  9'216'000, /* 9.216_MHz_XTAL         Univac UTS 20 */
 	  9'600'000, /* 9.6_MHz_XTAL           WD37C65 second clock (for 300 KB/sec rate) */
@@ -210,6 +212,7 @@ const double XTAL::known_xtals[] = {
 	 14'300'000, /* 14.3_MHz_XTAL          Agat-7 */
 	 14'314'000, /* 14.314_MHz_XTAL        Taito TTL Board  */
 	 14'318'181, /* 14.318181_MHz_XTAL     Extremely common, used on 100's of PCBs (4x NTSC subcarrier) */
+	 14'349'600, /* 14.3496_MHz_XTAL       Roland S-50 VDP */
 	 14'580'000, /* 14.58_MHz_XTAL         Fortune 32:16 Video Controller */
 	 14'705'882, /* 14.705882_MHz_XTAL     Aleck64 */
 	 14'728'000, /* 14.728_MHz_XTAL        ADM 36 */
@@ -325,6 +328,7 @@ const double XTAL::known_xtals[] = {
 	 26'666'000, /* 26.666_MHz_XTAL        Imagetek I4100/I4220/I4300 */
 	 26'666'666, /* 26.666666_MHz_XTAL     Irem M92 but most use 27MHz */
 	 26'686'000, /* 26.686_MHz_XTAL        Typically used on 90's Taito PCBs to drive the custom chips */
+	 26'880'000, /* 26.88_MHz_XTAL         Roland RF5C36/SA-16 clock (30000 * 896) */
 	 26'989'200, /* 26.9892_MHz_XTAL       TeleVideo 965 */
 	 27'000'000, /* 27_MHz_XTAL            Some Banpresto games macrossp, Irem M92 and 90's Toaplan games */
 	 27'164'000, /* 27.164_MHz_XTAL        Typically used on 90's Taito PCBs to drive the custom chips */

@@ -159,7 +159,7 @@ uint8_t i8214_device::a_r()
 //  8080-compatible interrupt vector
 //-------------------------------------------------
 
-READ8_MEMBER(i8214_device::vector_r)
+uint8_t i8214_device::vector_r()
 {
 	return 0xc7 | (m_a << 3);
 }
@@ -234,7 +234,7 @@ void i8214_device::r_all_w(uint8_t state)
 //  sgs_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8214_device::sgs_w )
+void i8214_device::sgs_w(int state)
 {
 	LOG("%s: sgs_w: %d\n", machine().describe_context(), state);
 
@@ -248,7 +248,7 @@ WRITE_LINE_MEMBER( i8214_device::sgs_w )
 //  etlg_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8214_device::etlg_w )
+void i8214_device::etlg_w(int state)
 {
 	LOG("%s: etlg_w: %d\n", machine().describe_context(), state);
 
@@ -262,7 +262,7 @@ WRITE_LINE_MEMBER( i8214_device::etlg_w )
 //  inte_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8214_device::inte_w )
+void i8214_device::inte_w(int state)
 {
 	LOG("%s: inte_w: %d\n", machine().describe_context(), state);
 

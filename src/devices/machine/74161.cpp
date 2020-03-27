@@ -167,7 +167,7 @@ WRITE_LINE_MEMBER( ttl7416x_device::clock_w )
 	}
 }
 
-WRITE8_MEMBER( ttl7416x_device::p_w )
+void ttl7416x_device::p_w(uint8_t data)
 {
 	m_p = data & 0xf;
 }

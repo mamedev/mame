@@ -442,7 +442,7 @@ void applefdc_base_device::iwm_access(int offset)
 //  read - reads a byte from the FDC
 //-------------------------------------------------
 
-uint8_t applefdc_base_device::read(uint8_t offset)
+uint8_t applefdc_base_device::read(offs_t offset)
 {
 	const applefdc_interface *intf = get_interface();
 	uint8_t result = 0;
@@ -505,7 +505,7 @@ uint8_t applefdc_base_device::read(uint8_t offset)
 //  write - writes a byte to the FDC
 //-------------------------------------------------
 
-void applefdc_base_device::write(uint8_t offset, uint8_t data)
+void applefdc_base_device::write(offs_t offset, uint8_t data)
 {
 	const applefdc_interface *intf = get_interface();
 

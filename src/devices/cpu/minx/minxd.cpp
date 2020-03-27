@@ -317,13 +317,13 @@ case I_16:           /* 16 bit immediate */             \
 	break;                              \
 case D_8:            /* PC + 8 bit displacement (signed) */     \
 	ofs8 = opcodes.r8(pos++);                        \
-	util::stream_format(stream, "%c$%04X", fill, pc + pos - 1 + ofs8);    \
+	util::stream_format(stream, "%c$%04X", fill, pos - 1 + ofs8);    \
 	break;                              \
 case D_16:           /* PC + 16 bit displacement */         \
 	ea = opcodes.r8(pos++);                      \
 	ea += opcodes.r8(pos++) << 8;                    \
 	ea = ea - 1;                            \
-	util::stream_format(stream, "%c$%04X", fill, pc + pos + ea);      \
+	util::stream_format(stream, "%c$%04X", fill, pos + ea);      \
 	break;                              \
 case S_8:            /* SP + 8 bit displacement (signed) */     \
 	ea = opcodes.r8(pos++);                      \

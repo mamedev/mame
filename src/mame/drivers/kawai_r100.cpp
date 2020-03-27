@@ -46,8 +46,8 @@ void kawai_r100_state::r100(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &kawai_r100_state::main_map);
 	//m_maincpu->set_addrmap(AS_DATA, &kawai_r100_state::data_map);
 
-	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0); // MB8464-15LL-SK + battery	
-	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // MB8464-15LL-SK + battery	
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0); // MB8464-15LL-SK + battery
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // MB8464-15LL-SK + battery
 
 	//M60009_AGU_DGU(config, "pcm", 5_MHz_XTAL);
 }

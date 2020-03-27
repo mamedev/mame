@@ -142,7 +142,7 @@ void at28c16_device::nvram_write( emu_file &file )
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE8_MEMBER( at28c16_device::write )
+void at28c16_device::write(offs_t offset, uint8_t data)
 {
 	if( m_last_write >= 0 )
 	{
@@ -180,7 +180,7 @@ WRITE8_MEMBER( at28c16_device::write )
 }
 
 
-READ8_MEMBER( at28c16_device::read )
+uint8_t at28c16_device::read(offs_t offset)
 {
 	if( m_last_write >= 0 )
 	{
