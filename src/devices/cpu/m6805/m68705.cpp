@@ -877,15 +877,15 @@ void m6805_mrom_device::internal_map(address_map &map)
 	 *   6805T2  0000-007f  0080-07ff  0d40-0f83  0f84-0ff7   0ff8-0fff
 	 *   6805U2  0000-007f  0080-00ff  07c0-0f37  0f38-0ff7   0ff8-0fff
 	 *   6805U3  0000-007f             0080-0f37  0f38-0ff7   0ff8-0fff
-         *
-         * Hitachi NMOS variants:
-         *
+	 *
+	 * Hitachi NMOS variants:
+	 *
 	 *   Device  Reg/RAM    Page Zero  Main User  Self Check  Vectors
 	 *   6805S1  0000-007f  0080-00ff  03c0-0783  0784-07f7   07f8-07ff
 	 *   6805S6  0000-007f  0080-00ff  0100-0783  0784-07f7   07f8-07ff
 	 *   6805U1  0000-007f  0080-00ff  0800-0f7f  0f80-0ff7   0ff8-0fff
 	 *   6805V1  0000-007f  0080-00ff  0100-0f7f  0f80-0ff7   0ff8-0fff
-         *   6805W1  0000-007f  0080-00ff  0100-0f79  0f7a-0ff1   0ff2-0fff
+	 *   6805W1  0000-007f  0080-00ff  0100-0f79  0f7a-0ff1   0ff2-0fff
 	 *
 	 * This code assumes that dumps are captured contiguously from address 0 to
 	 * the end of the address range, and are not split by range. Register, RAM
