@@ -456,6 +456,22 @@ private:
 	DECLARE_WRITE8_MEMBER(vt03_411c_w);
 };
 
+class nes_vt_dg_fapocket_state : public nes_vt_dg_state
+{
+public:
+	nes_vt_dg_fapocket_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_dg_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+};
+
+
+
+
 class nes_vt_hh_state : public nes_vt_dg_state
 {
 public:
@@ -485,7 +501,7 @@ public:
 
 private:
 	DECLARE_READ8_MEMBER(vt_rom_banked_r);
-	void vt_external_space_map_fp_4x16mbyte(address_map& map);
+	void vt_external_space_map_fp_2x32mbyte(address_map& map);
 
 	void nes_vt_hh_map(address_map& map);
 	void nes_vt_hh_baddma_map(address_map& map);
@@ -643,9 +659,9 @@ READ8_MEMBER(nes_vt_hh_state::vt_rom_banked_r)
 	return m_prgrom[m_ahigh | offset];
 }
 
-void nes_vt_hh_state::vt_external_space_map_fp_4x16mbyte(address_map &map)
+void nes_vt_hh_state::vt_external_space_map_fp_2x32mbyte(address_map &map)
 {
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).rw(FUNC(nes_vt_hh_state::vt_rom_banked_r), FUNC(nes_vt_hh_state::vt03_8000_mapper_w));
+	map(0x0000000, 0x1ffffff).rw(FUNC(nes_vt_hh_state::vt_rom_banked_r), FUNC(nes_vt_hh_state::vt03_8000_mapper_w));
 }
 
 /* Standard I/O handlers (NES Controller clone) */
@@ -921,15 +937,13 @@ WRITE8_MEMBER(nes_vt_cy_state::vt03_412c_extbank_w)
 	// bittboy (ok), mc_pg150 (not working)
 	logerror("%s: vt03_412c_extbank_w %02x\n", machine().describe_context(),  data);
 	m_ahigh = (data & 0x04) ? (1 << 24) : 0x0;
-	//update_banks();
 }
 
 WRITE8_MEMBER(nes_vt_hh_state::vtfp_412c_extbank_w)
 {
 	// fcpocket
-	printf("%s: vtfp_412c_extbank_w %02x\n", machine().describe_context().c_str(), data);
+	logerror("%s: vtfp_412c_extbank_w %02x\n", machine().describe_context(), data);
 	m_ahigh = (data & 0x01) ? (1 << 25) : 0x0;
-	//update_banks();
 }
 
 WRITE8_MEMBER(nes_vt_dg_state::vtfp_4242_w)
@@ -940,6 +954,7 @@ WRITE8_MEMBER(nes_vt_dg_state::vtfp_4242_w)
 
 WRITE8_MEMBER(nes_vt_hh_state::vtfp_411d_w)
 {
+	// controls chram access and mapper emulation modes in later models
 	logerror("vtfp_411d_w  %02x\n", data);
 	m_411d = data;
 	update_banks();
@@ -952,9 +967,6 @@ WRITE8_MEMBER(nes_vt_dg_state::vtfa_412c_extbank_w)
 	m_ahigh = 0;
 	m_ahigh |= (data & 0x01) ? (1 << 25) : 0x0;
 	m_ahigh |= (data & 0x02) ? (1 << 24) : 0x0;
-
-	//m_ahigh |= (m_cartsel->read() == 0x01) ? (1 << 25) : 0x0;
-	//update_banks();
 }
 
 READ8_MEMBER(nes_vt_dg_state::vtfa_412c_r)
@@ -1207,11 +1219,6 @@ void nes_vt_state::machine_reset()
 	m_411d = 0x00;
 	m_4242 = 0x00;
 
-	if (m_cartsel)
-		m_ahigh = (m_cartsel->read() == 0x01) ? (1 << 25) : 0x0;
-	else
-		m_ahigh = 0;
-
 	m_timer_irq_enabled = 0;
 	m_timer_running = 0;
 	m_timer_val = 0;
@@ -1231,6 +1238,17 @@ void nes_vt_state::machine_reset()
 
 	m_410x_scramble[0x0] = 0x7;
 	m_410x_scramble[0x1] = 0x8;
+}
+
+void nes_vt_dg_fapocket_state::machine_reset()
+{
+	nes_vt_state::machine_reset();
+
+	// fapocket needs this, fcpocket instead reads the switch in software?
+	if (m_cartsel)
+		m_ahigh = (m_cartsel->read() == 0x01) ? (1 << 25) : 0x0;
+	else
+		m_ahigh = 0;
 }
 
 int nes_vt_state::calculate_real_video_address(int addr, int extended, int readtype)
@@ -2431,7 +2449,7 @@ void nes_vt_hh_state::nes_vt_fp(machine_config &config)
 void nes_vt_hh_state::nes_vt_fp_4x16mb(machine_config& config)
 {
 	nes_vt_fp(config);
-	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_fp_4x16mbyte);
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_fp_2x32mbyte);
 }
 
 void nes_vt_hh_state::nes_vt_fp_32mb(machine_config& config)
@@ -3327,11 +3345,11 @@ CONS( 201?, ppgc200g,   0,         0,  nes_vt_8mb, nes_vt, nes_vt_state, empty_i
 
 // New platform with scrambled opcodes, same as DGUN-2561. Runs fine with minor GFX and sound issues in menu
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
-CONS( 2016, fcpocket,   0,        0,  nes_vt_fp_4x16mb, nes_vt_fp, nes_vt_hh_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (4x 16mbyte banks)
+CONS( 2016, fcpocket,   0,        0,  nes_vt_fp_4x16mb, nes_vt_fp, nes_vt_hh_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (2x 32mbyte banks)
 // Probably VT09 or similar
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a ROM high address bit
 // (which can also be overriden by GPIO)
-CONS( 2017, fapocket,   0,        0,  nes_vt_fa_4x16mb, nes_vt_fa, nes_vt_dg_state, empty_init, "<unknown>",   "Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (4x 16mbyte banks)
+CONS( 2017, fapocket,   0,        0,  nes_vt_fa_4x16mb, nes_vt_fa, nes_vt_dg_fapocket_state, empty_init, "<unknown>",   "Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (4x 16mbyte banks)
 
 // Plays intro music but then crashes. same hardware as SY-88x but uses more features
 CONS( 2016, mog_m320,   0,        0,  nes_vt_hh_8mb, nes_vt, nes_vt_hh_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
