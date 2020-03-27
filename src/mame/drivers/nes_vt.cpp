@@ -373,6 +373,10 @@ public:
 	{ }
 
 	void nes_vt_cy(machine_config& config);
+
+	void nes_vt_cy_bigger(machine_config& config);
+
+
 	void nes_vt_bt(machine_config& config);
 	void nes_vt_bt_32mb(machine_config& config);
 
@@ -462,8 +466,9 @@ public:
 
 	void nes_vt_vg_1mb_majkon(machine_config& config);
 	void nes_vt_fp(machine_config& config);
-	void nes_vt_fp_32mb(machine_config& config);
 	void nes_vt_fp_16mb(machine_config& config);
+	void nes_vt_fp_32mb(machine_config& config);
+	void nes_vt_fp_bigger(machine_config& config);
 
 	void nes_vt_fp_pal(machine_config& config);
 	void nes_vt_fp_pal_32mb(machine_config& config);
@@ -2054,9 +2059,9 @@ void nes_vt_state::nes_vt_base(machine_config &config)
 	m_ppu->read_bg().set(FUNC(nes_vt_state::chr_r));
 	m_ppu->read_sp().set(FUNC(nes_vt_state::spr_r));
 
-	ADDRESS_MAP_BANK(config, m_vt_external_space);
+	ADDRESS_MAP_BANK(config, m_vt_external_space); 
 	m_vt_external_space->set_options(ENDIANNESS_NATIVE, 8, 25, 0x2000000);
-	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_32mbyte);
+//	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_32mbyte); // no default map, set according to the ROM size and other things so mirroring works
 
 	ADDRESS_MAP_BANK(config, "prg").set_map(&nes_vt_state::prg_map).set_options(ENDIANNESS_LITTLE, 8, 15, 0x8000);
 
@@ -2249,6 +2254,12 @@ void nes_vt_cy_state::nes_vt_cy(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::nes_vt_cy_map);
 }
 
+void nes_vt_cy_state::nes_vt_cy_bigger(machine_config &config)
+{
+	nes_vt_cy(config);
+	m_vt_external_space->set_map(&nes_vt_cy_state::vt_external_space_map_32mbyte); // must be some banking of this kind of VT can address over 32mb
+}
+
 void nes_vt_cy_state::nes_vt_bt(machine_config &config)
 {
 	nes_vt_4k_ram(config);
@@ -2400,6 +2411,12 @@ void nes_vt_hh_state::nes_vt_fp_32mb(machine_config& config)
 {
 	nes_vt_fp(config);
 	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_32mbyte);
+}
+
+void nes_vt_hh_state::nes_vt_fp_bigger(machine_config& config)
+{
+	nes_vt_fp(config);
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_32mbyte); // must be some kind of banking, or this VT can address > 32Mbyte
 }
 
 void nes_vt_hh_state::nes_vt_fp_16mb(machine_config& config)
@@ -3139,18 +3156,18 @@ CONS( 200?, vgpmini,   0,  0,  nes_vt_vg_4mb, nes_vt, nes_vt_hh_state, empty_ini
 CONS( 200?, dgun2500,  0,  0,  nes_vt_dg_baddma_16mb, nes_vt, nes_vt_dg_state, empty_init, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
 // don't even get to menu. very enhanced chipset, VT368/9?
-CONS( 2012, dgun2561,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 2016, dgun2593,  0,  0,  nes_vt_fp, nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 2012, dgun2561,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 2016, dgun2593,  0,  0,  nes_vt_fp_bigger, nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 
-CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmc250,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmc250,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
 // GB-NO13-Main-VT389-2 on PCBs
-CONS( 2016, rtvgc300,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 2016, rtvgc300,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
 
 /* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
@@ -3175,7 +3192,7 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empt
 */
 
 // intial code isn't valid? scrambled?
-CONS( 201?, red5mam,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 201?, red5mam,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 
 
 // boots, same platform with scrambled opcodes as FC pocket
@@ -3275,7 +3292,7 @@ CONS( 2015, rminitv,     0,        0,  nes_vt_fp_pal_32mb, nes_vt, nes_vt_hh_sta
 
 // available in a number of colours, with various brands, but likely all the same.
 // This was a red coloured pad, contains various unlicensed bootleg reskinned NES game eg Blob Buster is a hack of Dig Dug 2 and there are also hacks of Xevious, Donkey Kong Jr, Donkey Kong 3 and many others.
-CONS( 201?, ppgc200g,   0, 0,  nes_vt_8mb, nes_vt, nes_vt_state, empty_init, "<unknown>", "Plug & Play Game Controller with 200 Games (Supreme 200)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, ppgc200g,   0,         0,  nes_vt_8mb, nes_vt, nes_vt_state, empty_init, "<unknown>", "Plug & Play Game Controller with 200 Games (Supreme 200)", MACHINE_IMPERFECT_GRAPHICS )
 
 // New platform with scrambled opcodes, same as DGUN-2561. Runs fine with minor GFX and sound issues in menu
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
