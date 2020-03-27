@@ -93,10 +93,10 @@ public:
 		m_exin3(*this, "EXTRAIN3"),
 		m_vt_external_space(*this, "vt_ext_space"),
 		m_prg(*this, "prg"),
+		m_prgrom(*this, "mainrom"),
 		m_initial_e000_bank(0xff),
 		m_ntram(nullptr),
-		m_chrram(nullptr),
-		m_prgrom(*this, "mainrom")
+		m_chrram(nullptr)
 	{ }
 
 	void nes_vt_base(machine_config& config);
@@ -167,7 +167,7 @@ protected:
 	DECLARE_READ8_MEMBER(vt03_410x_r);
 
 	/* Misc */
-	uint32_t m_ahigh;
+	uint32_t m_ahigh; // external banking bits
 	void update_banks();
 	uint8_t m_4242;
 	uint8_t m_411c;
@@ -191,6 +191,7 @@ protected:
 
 	required_device<address_map_bank_device> m_vt_external_space;
 	required_device<address_map_bank_device> m_prg;
+	required_region_ptr<uint8_t> m_prgrom;
 
 	void nes_vt_4k_ram_map(address_map& map);
 
@@ -265,7 +266,6 @@ private:
 
 	int m_bankaddr[4];
 
-	required_region_ptr<uint8_t> m_prgrom;
 
 	uint16_t decode_nt_addr(uint16_t addr);
 	void do_dma(uint8_t data, bool has_ntsc_bug);
@@ -386,7 +386,9 @@ public:
 
 
 	void nes_vt_bt(machine_config& config);
-	void nes_vt_bt_32mb(machine_config& config);
+	void nes_vt_bt_2x16mb(machine_config& config);
+
+	void vt_external_space_map_bitboy_2x16mbyte(address_map& map);
 
 private:
 	void nes_vt_cy_map(address_map& map);
@@ -404,6 +406,8 @@ private:
 	DECLARE_READ8_MEMBER(vt03_413x_r);
 	DECLARE_READ8_MEMBER(vt03_414f_r);
 	DECLARE_READ8_MEMBER(vt03_415c_r);
+
+	DECLARE_READ8_MEMBER(vt_rom_banked_r);
 };
 
 class nes_vt_cy_lexibook_state : public nes_vt_cy_state
@@ -611,6 +615,17 @@ void nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte(address_m
 	map(0x0180000, 0x01fffff).rw(FUNC(nes_vt_swap_op_d5_d6_state::vt_rom_r), FUNC(nes_vt_swap_op_d5_d6_state::vtspace_w));
 }
 
+// bitboy is 2 16Mbyte banks
+READ8_MEMBER(nes_vt_cy_state::vt_rom_banked_r)
+{
+	return m_prgrom[m_ahigh | offset];
+}
+
+void nes_vt_cy_state::vt_external_space_map_bitboy_2x16mbyte(address_map &map)
+{
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).rw(FUNC(nes_vt_cy_state::vt_rom_banked_r), FUNC(nes_vt_cy_state::vt03_8000_mapper_w));
+}
+
 
 /* Standard I/O handlers (NES Controller clone) */
 
@@ -699,7 +714,7 @@ uint32_t nes_vt_state::get_banks(uint8_t bnk)
 // 8000 needs to bank in 60000  ( bank 0x30 )
 void nes_vt_state::update_banks()
 {
-	uint32_t amod = m_ahigh >> 13;
+	//uint32_t amod = m_ahigh >> 13;
 
 	uint8_t bank;
 
@@ -714,11 +729,11 @@ void nes_vt_state::update_banks()
 	else
 		bank = 0xfe;
 
-	m_bankaddr[0] = ((amod | get_banks(bank)) );
+	m_bankaddr[0] = ((/*amod |*/ get_banks(bank)) );
 
 	// a000-bfff
 	bank = m_410x[0x8];
-	m_bankaddr[1] = ((amod | get_banks(bank)) );
+	m_bankaddr[1] = ((/*amod |*/ get_banks(bank)) );
 
 	// c000-dfff
 	if ((m_410x[0xb] & 0x40) != 0 || (m_410x[0x5] & 0x40) != 0)
@@ -731,11 +746,11 @@ void nes_vt_state::update_banks()
 	else
 		bank = 0xfe;
 
-	m_bankaddr[2] = ((amod | get_banks(bank)) );
+	m_bankaddr[2] = ((/*amod |*/ get_banks(bank)) );
 
 	// e000 - ffff
 	bank = m_initial_e000_bank;
-	m_bankaddr[3] = ((amod | get_banks(bank)) );
+	m_bankaddr[3] = ((/*amod |*/ get_banks(bank)) );
 }
 
 uint16_t nes_vt_state::decode_nt_addr(uint16_t addr)
@@ -882,16 +897,16 @@ WRITE8_MEMBER(nes_vt_cy_state::vt03_411c_w)
 
 WRITE8_MEMBER(nes_vt_cy_state::vt03_412c_w)
 {
-	logerror("vt03_412c_w %02x\n", data);
+	printf("%s: vt03_412c_w %02x\n", machine().describe_context().c_str(),  data);
 	m_ahigh = (data & 0x04) ? (1 << 24) : 0x0;
-	update_banks();
+	//update_banks();
 }
 
 WRITE8_MEMBER(nes_vt_hh_state::vtfp_412c_w)
 {
 	logerror("vtfp_412c_w %02x\n", data);
 	m_ahigh = (data & 0x01) ? (1 << 25) : 0x0;
-	update_banks();
+	//update_banks();
 }
 
 WRITE8_MEMBER(nes_vt_dg_state::vtfp_4242_w)
@@ -915,7 +930,7 @@ WRITE8_MEMBER(nes_vt_dg_state::vtfa_412c_w)
 	m_ahigh |= (data & 0x02) ? (1 << 24) : 0x0;
 
 	//m_ahigh |= (m_cartsel->read() == 0x01) ? (1 << 25) : 0x0;
-	update_banks();
+	//update_banks();
 }
 
 READ8_MEMBER(nes_vt_dg_state::vtfa_412c_r)
@@ -1401,7 +1416,7 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 
 		}
 	}
-	return m_ahigh | finaladdr;
+	return /*m_ahigh |*/ finaladdr;
 }
 
 /*
@@ -2259,10 +2274,10 @@ void nes_vt_cy_state::nes_vt_bt(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::nes_vt_bt_map);
 }
 
-void nes_vt_cy_state::nes_vt_bt_32mb(machine_config& config)
+void nes_vt_cy_state::nes_vt_bt_2x16mb(machine_config& config)
 {
 	nes_vt_bt(config);
-	m_vt_external_space->set_map(&nes_vt_cy_state::vt_external_space_map_32mbyte);
+	m_vt_external_space->set_map(&nes_vt_cy_state::vt_external_space_map_bitboy_2x16mbyte);
 }
 
 void nes_vt_dg_state::nes_vt_dg(machine_config &config)
@@ -3268,11 +3283,11 @@ CONS( 2016, sy888b,     0,        0,  nes_vt_hh_4mb, nes_vt, nes_vt_hh_state, em
 CONS( 201?, mc_cb280,   0,        0,  nes_vt_hh_4mb, nes_vt, nes_vt_hh_state, empty_init, "CoolBoy",   "Coolboy RS-18 (280 in 1)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Runs well, only issues in SMB3 which crashes
-CONS( 2017, bittboy,    0,        0,  nes_vt_bt_32mb, nes_vt, nes_vt_cy_state, empty_init, "BittBoy",   "BittBoy Mini FC 300 in 1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2017, bittboy,    0,        0,  nes_vt_bt_2x16mb, nes_vt, nes_vt_cy_state, empty_init, "BittBoy",   "BittBoy Mini FC 300 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (2x 16mbyte banks)
 // Runs well, all games seem to work
 CONS( 201?, mc_89in1,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "89 in 1 Mini Game Console (060-92023011V1.0)", MACHINE_IMPERFECT_GRAPHICS )
 // Broken GFX, investigate
-CONS( 201?, mc_pg150,   0,        0,  nes_vt_bt_32mb, nes_vt, nes_vt_cy_state, empty_init, "<unknown>", "Pocket Games 150 in 1", MACHINE_NOT_WORKING )
+CONS( 201?, mc_pg150,   0,        0,  nes_vt_bt_2x16mb, nes_vt, nes_vt_cy_state, empty_init, "<unknown>", "Pocket Games 150 in 1", MACHINE_NOT_WORKING ) // has external banking
 // No title screen, but press start and menu and games run fine. Makes odd
 // memory accesses which probably explain broken title screen
 CONS( 201?, mc_hh210,   0,        0,  nes_vt_4k_ram_16mb, nes_vt, nes_vt_state, empty_init, "<unknown>", "Handheld 210 in 1", MACHINE_NOT_WORKING )
