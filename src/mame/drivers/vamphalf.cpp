@@ -3189,18 +3189,17 @@ READ16_MEMBER(vamphalf_state::jmpbreak_speedup_r)
 	return m_wram[0x906f4 / 2];
 }
 
-READ16_MEMBER(vamphalf_state::jmpbreaka_speedup_r) // TODO
+READ16_MEMBER(vamphalf_state::jmpbreaka_speedup_r)
 {
-	/*if (m_maincpu->pc() == 0x984a)
+	if (m_maincpu->pc() == 0x909ac)
 	{
-	    if (irq_active())
-	        m_maincpu->spin_until_interrupt();
-	    else
-	        m_maincpu->eat_cycles(50);
+		if (irq_active())
+			m_maincpu->spin_until_interrupt();
+		else
+			m_maincpu->eat_cycles(50);
 	}
 
-	return m_wram[0x906f4 / 2];*/
-	return 0xff;
+	return m_wram[0xe1dfc / 2];
 }
 
 READ16_MEMBER(vamphalf_state::poosho_speedup_r)
@@ -3523,7 +3522,7 @@ void vamphalf_state::init_jmpbreak()
 
 void vamphalf_state::init_jmpbreaka()
 {
-	// m_maincpu->space(AS_PROGRAM).install_read_handler(0x00906f4, 0x00906f5, read16_delegate(*this, FUNC(vamphalf_state::jmpbreaka_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00e1dfc, 0x00e1dfd, read16_delegate(*this, FUNC(vamphalf_state::jmpbreaka_speedup_r)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16smo_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
 
 	m_palshift = 0;
