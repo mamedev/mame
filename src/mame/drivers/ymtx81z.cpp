@@ -61,22 +61,55 @@ void ymtx81z_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6303x_cpu_device::hd6301x_io));
 	map(0x0040, 0x00ff).ram(); // internal RAM
-	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym2414_device::read), FUNC(ym2414_device::write));
-	map(0x4000, 0x4001).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
+	map(0x2000, 0x2001).mirror(0x1ffe).rw("ymsnd", FUNC(ym2414_device::read), FUNC(ym2414_device::write));
+	map(0x4000, 0x4001).mirror(0x1ffe).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	map(0x6000, 0x7fff).ram().share("nvram");
 	map(0x8000, 0xffff).bankr("rombank");
 }
 
 static INPUT_PORTS_START(tx81z)
+	PORT_START("P2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED) // actually cassette data
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED) // actually 500 kHz clock
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED) // actually MIDI In data
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Cursor")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_VOLUME_UP) PORT_NAME("Master Volume " UTF8_RIGHT)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_VOLUME_DOWN) PORT_NAME("Master Volume " UTF8_LEFT)
+
+	PORT_START("P5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED) // actually INT1 from YM2414
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON9) PORT_NAME("Store/Eq Copy")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED) // actually MR from analog wait circuit tied to LCDE
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Data Entry Inc")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Data Entry Dec")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Voice Parameter " UTF8_RIGHT)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Voice Parameter " UTF8_LEFT)
+
+	PORT_START("P6")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Play/Perform")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON7) PORT_NAME("Edit/Compare")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON8) PORT_NAME("Utility")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 void ymtx81z_state::tx81z(machine_config &config)
 {
 	HD6303X(config, m_maincpu, 7.15909_MHz_XTAL); // HD63B03XP
 	m_maincpu->set_addrmap(AS_PROGRAM, &ymtx81z_state::mem_map);
+	m_maincpu->in_p2_cb().set_ioport("P2");
+	m_maincpu->in_p5_cb().set_ioport("P5");
+	m_maincpu->in_p6_cb().set_ioport("P6");
 	m_maincpu->out_p6_cb().set_membank("rombank").bit(3);
+	m_maincpu->out_p6_cb().append_output("led1").bit(4);
+	m_maincpu->out_p6_cb().append_output("led2").bit(5);
+	m_maincpu->out_p6_cb().append_output("led3").bit(6);
+	m_maincpu->out_p6_cb().append_output("led4").bit(7);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5564PL-15 + CR2032 battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5564PL-15/-20 + CR2032 battery
 
 	CLOCK(config, "midiclock", 500_kHz_XTAL);
 
