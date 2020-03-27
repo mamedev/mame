@@ -256,14 +256,14 @@ private:
 
 	uint16_t m_real_access_address;
 
-	DECLARE_READ8_MEMBER(bank0_r) { int address = (m_bankaddr[0] * 0x2000) + offset; m_real_access_address = offset + 0x8000; return m_vt_external_space->read8(address); };
-	DECLARE_READ8_MEMBER(bank1_r) { int address = (m_bankaddr[1] * 0x2000) + offset; m_real_access_address = offset + 0xa000; return m_vt_external_space->read8(address); };
-	DECLARE_READ8_MEMBER(bank2_r) { int address = (m_bankaddr[2] * 0x2000) + offset; m_real_access_address = offset + 0xc000; return m_vt_external_space->read8(address); };
-	DECLARE_READ8_MEMBER(bank3_r) { int address = (m_bankaddr[3] * 0x2000) + offset; m_real_access_address = offset + 0xe000; return m_vt_external_space->read8(address); };
-	DECLARE_WRITE8_MEMBER(bank0_w) { int address = (m_bankaddr[0] * 0x2000) + offset; m_real_access_address = offset + 0x8000; m_vt_external_space->write8(address, data); };
-	DECLARE_WRITE8_MEMBER(bank1_w) { int address = (m_bankaddr[1] * 0x2000) + offset; m_real_access_address = offset + 0xa000; m_vt_external_space->write8(address, data); };
-	DECLARE_WRITE8_MEMBER(bank2_w) { int address = (m_bankaddr[2] * 0x2000) + offset; m_real_access_address = offset + 0xc000; m_vt_external_space->write8(address, data); };
-	DECLARE_WRITE8_MEMBER(bank3_w) { int address = (m_bankaddr[3] * 0x2000) + offset; m_real_access_address = offset + 0xe000; m_vt_external_space->write8(address, data); };
+	DECLARE_READ8_MEMBER(bank0_r) { int bank = (offset & 0x6000) >> 13; int address = (m_bankaddr[bank] * 0x2000) + (offset&0x1fff); m_real_access_address = offset + 0x8000; return m_vt_external_space->read8(address); };
+//	DECLARE_READ8_MEMBER(bank1_r) { int address = (m_bankaddr[1] * 0x2000) + offset; m_real_access_address = offset + 0xa000; return m_vt_external_space->read8(address); };
+//	DECLARE_READ8_MEMBER(bank2_r) { int address = (m_bankaddr[2] * 0x2000) + offset; m_real_access_address = offset + 0xc000; return m_vt_external_space->read8(address); };
+//	DECLARE_READ8_MEMBER(bank3_r) { int address = (m_bankaddr[3] * 0x2000) + offset; m_real_access_address = offset + 0xe000; return m_vt_external_space->read8(address); };
+	DECLARE_WRITE8_MEMBER(bank0_w) { int bank = (offset & 0x6000) >> 13; int address = (m_bankaddr[bank] * 0x2000) + (offset&0x1fff); m_real_access_address = offset + 0x8000; m_vt_external_space->write8(address, data); };
+//	DECLARE_WRITE8_MEMBER(bank1_w) { int address = (m_bankaddr[1] * 0x2000) + offset; m_real_access_address = offset + 0xa000; m_vt_external_space->write8(address, data); };
+//	DECLARE_WRITE8_MEMBER(bank2_w) { int address = (m_bankaddr[2] * 0x2000) + offset; m_real_access_address = offset + 0xc000; m_vt_external_space->write8(address, data); };
+//	DECLARE_WRITE8_MEMBER(bank3_w) { int address = (m_bankaddr[3] * 0x2000) + offset; m_real_access_address = offset + 0xe000; m_vt_external_space->write8(address, data); };
 
 	int m_bankaddr[4];
 
@@ -1996,10 +1996,10 @@ void nes_vt_dg_state::nes_vt_fa_map(address_map &map)
 
 void nes_vt_state::prg_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rw(FUNC(nes_vt_state::bank0_r), FUNC(nes_vt_state::bank0_w));
-	map(0x2000, 0x3fff).rw(FUNC(nes_vt_state::bank1_r), FUNC(nes_vt_state::bank1_w));
-	map(0x4000, 0x5fff).rw(FUNC(nes_vt_state::bank2_r), FUNC(nes_vt_state::bank2_w));
-	map(0x6000, 0x7fff).rw(FUNC(nes_vt_state::bank3_r), FUNC(nes_vt_state::bank3_w));
+	map(0x0000, 0x7fff).rw(FUNC(nes_vt_state::bank0_r), FUNC(nes_vt_state::bank0_w));
+//	map(0x2000, 0x3fff).rw(FUNC(nes_vt_state::bank1_r), FUNC(nes_vt_state::bank1_w));
+//	map(0x4000, 0x5fff).rw(FUNC(nes_vt_state::bank2_r), FUNC(nes_vt_state::bank2_w));
+//	map(0x6000, 0x7fff).rw(FUNC(nes_vt_state::bank3_r), FUNC(nes_vt_state::bank3_w));
 }
 
 
