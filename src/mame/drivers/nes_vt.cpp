@@ -92,7 +92,6 @@ public:
 		m_exin2(*this, "EXTRAIN2"),
 		m_exin3(*this, "EXTRAIN3"),
 		m_vt_external_space(*this, "vt_ext_space"),
-		m_prg(*this, "prg"),
 		m_prgrom(*this, "mainrom"),
 		m_initial_e000_bank(0xff),
 		m_ntram(nullptr),
@@ -190,7 +189,6 @@ protected:
 	optional_ioport m_exin3;
 
 	required_device<address_map_bank_device> m_vt_external_space;
-	required_device<address_map_bank_device> m_prg;
 	required_region_ptr<uint8_t> m_prgrom;
 
 	void nes_vt_4k_ram_map(address_map& map);
@@ -210,6 +208,9 @@ protected:
 
 	DECLARE_READ8_MEMBER(vt_rom_r);
 	DECLARE_WRITE8_MEMBER(vtspace_w);
+
+	DECLARE_READ8_MEMBER(external_space_read) { int bank = (offset & 0x6000) >> 13; int address = (m_bankaddr[bank] * 0x2000) + (offset&0x1fff); m_real_access_address = offset + 0x8000; return m_vt_external_space->read8(address); };
+	DECLARE_WRITE8_MEMBER(external_space_write) { int bank = (offset & 0x6000) >> 13; int address = (m_bankaddr[bank] * 0x2000) + (offset&0x1fff); m_real_access_address = offset + 0x8000; m_vt_external_space->write8(address, data); };
 
 private:
 	/* APU handling */
@@ -256,14 +257,6 @@ private:
 
 	uint16_t m_real_access_address;
 
-	DECLARE_READ8_MEMBER(bank0_r) { int bank = (offset & 0x6000) >> 13; int address = (m_bankaddr[bank] * 0x2000) + (offset&0x1fff); m_real_access_address = offset + 0x8000; return m_vt_external_space->read8(address); };
-//	DECLARE_READ8_MEMBER(bank1_r) { int address = (m_bankaddr[1] * 0x2000) + offset; m_real_access_address = offset + 0xa000; return m_vt_external_space->read8(address); };
-//	DECLARE_READ8_MEMBER(bank2_r) { int address = (m_bankaddr[2] * 0x2000) + offset; m_real_access_address = offset + 0xc000; return m_vt_external_space->read8(address); };
-//	DECLARE_READ8_MEMBER(bank3_r) { int address = (m_bankaddr[3] * 0x2000) + offset; m_real_access_address = offset + 0xe000; return m_vt_external_space->read8(address); };
-	DECLARE_WRITE8_MEMBER(bank0_w) { int bank = (offset & 0x6000) >> 13; int address = (m_bankaddr[bank] * 0x2000) + (offset&0x1fff); m_real_access_address = offset + 0x8000; m_vt_external_space->write8(address, data); };
-//	DECLARE_WRITE8_MEMBER(bank1_w) { int address = (m_bankaddr[1] * 0x2000) + offset; m_real_access_address = offset + 0xa000; m_vt_external_space->write8(address, data); };
-//	DECLARE_WRITE8_MEMBER(bank2_w) { int address = (m_bankaddr[2] * 0x2000) + offset; m_real_access_address = offset + 0xc000; m_vt_external_space->write8(address, data); };
-//	DECLARE_WRITE8_MEMBER(bank3_w) { int address = (m_bankaddr[3] * 0x2000) + offset; m_real_access_address = offset + 0xe000; m_vt_external_space->write8(address, data); };
 
 	int m_bankaddr[4];
 
@@ -1135,8 +1128,6 @@ WRITE8_MEMBER(nes_vt_state::nt_w)
 
 void nes_vt_state::machine_start()
 {
-	m_prg->set_bank(0);
-
 	save_item(NAME(m_410x));
 	save_item(NAME(m_413x));
 
@@ -1873,7 +1864,7 @@ void nes_vt_state::nes_vt_map(address_map &map)
 	// 0x411a RS232 TX data
 	// 0x411b RS232 RX data
 
-	map(0x8000, 0xffff).m(m_prg, FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0xffff).rw(FUNC(nes_vt_state::external_space_read), FUNC(nes_vt_state::external_space_write));
 	map(0x6000, 0x7fff).ram();
 }
 
@@ -1921,7 +1912,7 @@ void nes_vt_hh_state::nes_vt_hh_map(address_map &map)
 
 	map(0x4100, 0x410b).r(FUNC(nes_vt_hh_state::vt03_410x_r)).w(FUNC(nes_vt_hh_state::vt03_410x_w));
 
-	map(0x8000, 0xffff).m(m_prg, FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0xffff).rw(FUNC(nes_vt_hh_state::external_space_read), FUNC(nes_vt_hh_state::external_space_write));
 
 	map(0x4034, 0x4034).w(FUNC(nes_vt_hh_state::vt03_4034_w));
 	map(0x4014, 0x4014).r(FUNC(nes_vt_hh_state::psg1_4014_r)).w(FUNC(nes_vt_hh_state::vt_fixed_dma_w));
@@ -1973,7 +1964,7 @@ void nes_vt_dg_state::nes_vt_dg_map(address_map &map)
 
 	map(0x411c, 0x411c).w(FUNC(nes_vt_dg_state::vt03_411c_w));
 
-	map(0x8000, 0xffff).m(m_prg, FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0xffff).rw(FUNC(nes_vt_dg_state::external_space_read), FUNC(nes_vt_dg_state::external_space_write));
 
 	map(0x4034, 0x4034).w(FUNC(nes_vt_dg_state::vt03_4034_w));
 	map(0x4014, 0x4014).r(FUNC(nes_vt_dg_state::psg1_4014_r)).w(FUNC(nes_vt_dg_state::vt_fixed_dma_w));
@@ -1993,15 +1984,6 @@ void nes_vt_dg_state::nes_vt_fa_map(address_map &map)
 	map(0x412c, 0x412c).r(FUNC(nes_vt_dg_state::vtfa_412c_r)).w(FUNC(nes_vt_dg_state::vtfa_412c_w));
 	map(0x4242, 0x4242).w(FUNC(nes_vt_dg_state::vtfp_4242_w));
 }
-
-void nes_vt_state::prg_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rw(FUNC(nes_vt_state::bank0_r), FUNC(nes_vt_state::bank0_w));
-//	map(0x2000, 0x3fff).rw(FUNC(nes_vt_state::bank1_r), FUNC(nes_vt_state::bank1_w));
-//	map(0x4000, 0x5fff).rw(FUNC(nes_vt_state::bank2_r), FUNC(nes_vt_state::bank2_w));
-//	map(0x6000, 0x7fff).rw(FUNC(nes_vt_state::bank3_r), FUNC(nes_vt_state::bank3_w));
-}
-
 
 
 WRITE_LINE_MEMBER(nes_vt_state::apu_irq)
@@ -2072,8 +2054,6 @@ void nes_vt_state::nes_vt_base(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_vt_external_space); 
 	m_vt_external_space->set_options(ENDIANNESS_NATIVE, 8, 25, 0x2000000);
 //	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_32mbyte); // no default map, set according to the ROM size and other things so mirroring works
-
-	ADDRESS_MAP_BANK(config, "prg").set_map(&nes_vt_state::prg_map).set_options(ENDIANNESS_LITTLE, 8, 15, 0x8000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
