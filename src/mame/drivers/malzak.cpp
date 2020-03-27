@@ -408,6 +408,10 @@ ROM_START( malzak2 )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "malzak.1",     0x0000, 0x0800, CRC(74d5ff7b) SHA1(cae326370dc83b86542f9d070e2dc91b1b833356) )
+	
+	ROM_REGION( 0x0100, "nvram", 0 )
+	// default nvram so that game boots in version II off the bat
+	ROM_LOAD( "malzak2.nv",    0x0000, 0x0100, CRC(aadf03d8) SHA1(9d751c4249faab7f5d88d0c99f33468f439641ad) )
 ROM_END
 
 
