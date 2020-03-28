@@ -1291,6 +1291,16 @@ if (CPUS["PIC16C62X"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- Generic PIC16 - Disassembler only
+--@src/devices/cpu/pic16/pic16.h,CPUS["PIC16"] = true
+--------------------------------------------------
+
+if (CPUS["PIC16"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic16/pic16d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pic16/pic16d.h")
+end
+
+--------------------------------------------------
 -- MIPS R3000 (MIPS I/II) series
 --@src/devices/cpu/mips/mips1.h,CPUS["MIPS1"] = true
 --------------------------------------------------
