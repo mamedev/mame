@@ -48,27 +48,27 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(mcr_control_port_w);
-	DECLARE_WRITE8_MEMBER(mcr_paletteram9_w);
-	DECLARE_WRITE8_MEMBER(mcr_90009_videoram_w);
-	DECLARE_WRITE8_MEMBER(mcr_90010_videoram_w);
-	DECLARE_READ8_MEMBER(twotiger_videoram_r);
-	DECLARE_WRITE8_MEMBER(twotiger_videoram_w);
-	DECLARE_WRITE8_MEMBER(mcr_91490_videoram_w);
-	DECLARE_READ8_MEMBER(solarfox_ip0_r);
-	DECLARE_READ8_MEMBER(solarfox_ip1_r);
-	DECLARE_READ8_MEMBER(kick_ip1_r);
-	DECLARE_WRITE8_MEMBER(wacko_op4_w);
-	DECLARE_READ8_MEMBER(wacko_ip1_r);
-	DECLARE_READ8_MEMBER(wacko_ip2_r);
-	DECLARE_READ8_MEMBER(kroozr_ip1_r);
-	DECLARE_WRITE8_MEMBER(kroozr_op4_w);
-	DECLARE_WRITE8_MEMBER(journey_op4_w);
-	DECLARE_WRITE8_MEMBER(twotiger_op4_w);
-	DECLARE_WRITE8_MEMBER(dotron_op4_w);
-	DECLARE_READ8_MEMBER(demoderb_ip1_r);
-	DECLARE_READ8_MEMBER(demoderb_ip2_r);
-	DECLARE_WRITE8_MEMBER(demoderb_op4_w);
+	void mcr_control_port_w(uint8_t data);
+	void mcr_paletteram9_w(offs_t offset, uint8_t data);
+	void mcr_90009_videoram_w(offs_t offset, uint8_t data);
+	void mcr_90010_videoram_w(offs_t offset, uint8_t data);
+	uint8_t twotiger_videoram_r(offs_t offset);
+	void twotiger_videoram_w(offs_t offset, uint8_t data);
+	void mcr_91490_videoram_w(offs_t offset, uint8_t data);
+	uint8_t solarfox_ip0_r();
+	uint8_t solarfox_ip1_r();
+	uint8_t kick_ip1_r();
+	void wacko_op4_w(uint8_t data);
+	uint8_t wacko_ip1_r();
+	uint8_t wacko_ip2_r();
+	uint8_t kroozr_ip1_r();
+	void kroozr_op4_w(uint8_t data);
+	void journey_op4_w(uint8_t data);
+	void twotiger_op4_w(uint8_t data);
+	void dotron_op4_w(uint8_t data);
+	uint8_t demoderb_ip1_r();
+	uint8_t demoderb_ip2_r();
+	void demoderb_op4_w(uint8_t data);
 
 	void init_mcr_91490();
 	void init_kroozr();
@@ -150,11 +150,11 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_READ8_MEMBER(ip0_r);
-	DECLARE_WRITE8_MEMBER(lamps1_w);
-	DECLARE_WRITE8_MEMBER(lamps2_w);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(meters_w);
+	uint8_t ip0_r();
+	void lamps1_w(uint8_t data);
+	void lamps2_w(uint8_t data);
+	void output_w(uint8_t data);
+	void meters_w(uint8_t data);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_in_hit);
 
@@ -191,11 +191,11 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(sio_txda_w);
 	DECLARE_WRITE_LINE_MEMBER(sio_txdb_w);
-	DECLARE_WRITE8_MEMBER(ipu_laserdisk_w);
-	DECLARE_READ8_MEMBER(ipu_watchdog_r);
-	DECLARE_WRITE8_MEMBER(ipu_watchdog_w);
-	DECLARE_READ8_MEMBER(ip2_r);
-	DECLARE_WRITE8_MEMBER(op4_w);
+	void ipu_laserdisk_w(offs_t offset, uint8_t data);
+	uint8_t ipu_watchdog_r();
+	void ipu_watchdog_w(uint8_t data);
+	uint8_t ip2_r();
+	void op4_w(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(ipu_watchdog_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(ipu_interrupt);

@@ -51,11 +51,11 @@ public:
 	void suspend_cpu();
 
 	// read/write
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read();
+	void write(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
-	DECLARE_READ8_MEMBER(ioport_read);
-	DECLARE_WRITE8_MEMBER(ioport_write);
+	uint8_t ioport_read(offs_t offset);
+	void ioport_write(offs_t offset, uint8_t data);
 
 	// configuration
 	template <typename... T> void set_custom_input(int which, uint8_t mask, T &&... args)
@@ -70,9 +70,9 @@ public:
 	}
 
 	// internal communications
-	DECLARE_READ8_MEMBER(irq_clear);
-	DECLARE_WRITE8_MEMBER(status_w);
-	DECLARE_READ8_MEMBER(data_r);
+	uint8_t irq_clear();
+	void status_w(uint8_t data);
+	uint8_t data_r(offs_t offset);
 
 	void ssio_map(address_map &map);
 	static void ssio_input_ports(address_map &map, const char *ssio);
@@ -110,15 +110,15 @@ private:
 
 	// I/O port overrides
 	uint8_t m_custom_input_mask[5];
-	read8_delegate::array<5> m_custom_input;
+	read8smo_delegate::array<5> m_custom_input;
 	uint8_t m_custom_output_mask[2];
-	write8_delegate::array<2> m_custom_output;
+	write8smo_delegate::array<2> m_custom_output;
 
 	INTERRUPT_GEN_MEMBER(clock_14024);
-	DECLARE_WRITE8_MEMBER(porta0_w);
-	DECLARE_WRITE8_MEMBER(portb0_w);
-	DECLARE_WRITE8_MEMBER(porta1_w);
-	DECLARE_WRITE8_MEMBER(portb1_w);
+	void porta0_w(uint8_t data);
+	void portb0_w(uint8_t data);
+	void porta1_w(uint8_t data);
+	void portb1_w(uint8_t data);
 };
 
 
@@ -132,8 +132,8 @@ public:
 	midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 16'000'000);
 
 	// read/write
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read();
+	void write(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
 
 	void soundsgood_map(address_map &map);
@@ -155,8 +155,8 @@ private:
 	uint16_t m_dacval;
 
 	// internal communications
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
+	void porta_w(uint8_t data);
+	void portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 };
 
@@ -171,8 +171,8 @@ public:
 	midway_turbo_cheap_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 8'000'000);
 
 	// read/write
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read();
+	void write(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
 
 	void turbocs_map(address_map &map);
@@ -194,8 +194,8 @@ private:
 	uint16_t m_dacval;
 
 	// internal communications
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
+	void porta_w(uint8_t data);
+	void portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 };
 
