@@ -11,6 +11,8 @@
 #include "cpu/mcs51/mcs51.h"
 #include "machine/mb63h149.h"
 #include "machine/nvram.h"
+#include "machine/rescap.h"
+#include "machine/upd7001.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
@@ -115,6 +117,8 @@ void alphajuno_state::ajuno1(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5517APL + battery
 
 	//MB87123(config, "dco", 12_MHz_XTAL);
+
+	UPD7001(config, "adc", RES_K(27), CAP_P(47));
 
 	// LCD: LM16155A or LM16155B
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));

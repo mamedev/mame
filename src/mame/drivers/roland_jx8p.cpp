@@ -16,8 +16,8 @@
 #include "machine/mb63h149.h"
 #include "machine/nvram.h"
 //#include "machine/pg800.h"
-//#include "machine/rescap.h"
-//#include "machine/upd7001.h"
+#include "machine/rescap.h"
+#include "machine/upd7001.h"
 
 class roland_jx8p_state : public driver_device
 {
@@ -32,6 +32,7 @@ public:
 	void jx8p(machine_config &config);
 	void jx8po(machine_config &config);
 	void jx10(machine_config &config);
+	void mks70(machine_config &config);
 
 private:
 	u8 switches_r(offs_t offset);
@@ -312,6 +313,10 @@ void roland_jx8p_state::jx8p(machine_config &config)
 {
 	HD6303R(config, m_assignercpu, 16_MHz_XTAL / 2); // HD63B03RP
 	m_assignercpu->set_addrmap(AS_PROGRAM, &roland_jx8p_state::jx8p_assigner_map);
+	m_assignercpu->in_p1_cb().set("adc", FUNC(upd7001_device::eoc_so_r)).bit(0);
+	m_assignercpu->out_p1_cb().set("adc", FUNC(upd7001_device::sck_w)).bit(1);
+	m_assignercpu->out_p1_cb().append("adc", FUNC(upd7001_device::si_w)).bit(2);
+	m_assignercpu->out_p1_cb().append("adc", FUNC(upd7001_device::cs_w)).bit(3);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5517APL + battery
 
@@ -320,7 +325,8 @@ void roland_jx8p_state::jx8p(machine_config &config)
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, nullptr, "jx8p_cart");
 
-	//UPD7001(config, "adc", RES_K(27), CAP_P(47));
+	upd7001_device &adc(UPD7001(config, "adc", RES_K(27), CAP_P(47)));
+	adc.dl_w(1);
 
 	//UPD7537(config, "displaycpu", 400_kHz_XTAL);
 
@@ -338,6 +344,10 @@ void roland_jx8p_state::jx10(machine_config &config)
 {
 	HD6303R(config, m_assignercpu, 16_MHz_XTAL / 2); // HD63B03RP
 	m_assignercpu->set_addrmap(AS_PROGRAM, &roland_jx8p_state::superjx_assigner_map);
+	m_assignercpu->in_p1_cb().set("adc", FUNC(upd7001_device::eoc_so_r)).bit(0);
+	m_assignercpu->out_p1_cb().set("adc", FUNC(upd7001_device::sck_w)).bit(1);
+	m_assignercpu->out_p1_cb().append("adc", FUNC(upd7001_device::si_w)).bit(2);
+	m_assignercpu->out_p1_cb().append("adc", FUNC(upd7001_device::cs_w)).bit(3);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5564PL-20 + battery
 
@@ -346,12 +356,23 @@ void roland_jx8p_state::jx10(machine_config &config)
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, nullptr, "jx8p_cart");
 
-	//UPD7001(config, "adc", RES_K(27), CAP_P(47));
+	upd7001_device &adc(UPD7001(config, "adc", RES_K(27), CAP_P(47)));
+	adc.dl_w(1);
 
 	//UPD7538A(config, "displaycpu", 600_kHz_XTAL);
 
 	SUPERJX_SYNTH(config, "lower", 16_MHz_XTAL / 2);
 	SUPERJX_SYNTH(config, "upper", 16_MHz_XTAL / 2);
+}
+
+void roland_jx8p_state::mks70(machine_config &config)
+{
+	jx10(config);
+
+	m_assignercpu->in_p1_cb().set_constant(0x01);
+	m_assignercpu->out_p1_cb().set_nop();
+
+	config.device_remove("adc");
 }
 
 ROM_START(jx8p)
@@ -421,4 +442,4 @@ ROM_END
 SYST(1985, jx8p,  0,    0, jx8p,  jx8p,  roland_jx8p_state, empty_init, "Roland", "JX-8P Polyphonic Synthesizer (Ver. 3.x)", MACHINE_IS_SKELETON)
 SYST(1985, jx8po, jx8p, 0, jx8po, jx8p,  roland_jx8p_state, empty_init, "Roland", "JX-8P Polyphonic Synthesizer (Ver. 2.x)", MACHINE_IS_SKELETON)
 SYST(1986, jx10,  0,    0, jx10,  jx10,  roland_jx8p_state, empty_init, "Roland", "JX-10 Super JX Polyphonic Synthesizer", MACHINE_IS_SKELETON)
-SYST(1987, mks70, jx10, 0, jx10,  mks70, roland_jx8p_state, empty_init, "Roland", "MKS-70 Super JX Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1987, mks70, jx10, 0, mks70, mks70, roland_jx8p_state, empty_init, "Roland", "MKS-70 Super JX Polyphonic Synthesizer", MACHINE_IS_SKELETON)
