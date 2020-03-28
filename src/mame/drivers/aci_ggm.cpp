@@ -449,7 +449,7 @@ void ggm_state::ggm(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "ggm", "bin");
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "ggm");
 	m_cart->set_device_load(FUNC(ggm_state::cartridge));
 	m_cart->set_must_be_loaded(true);
 

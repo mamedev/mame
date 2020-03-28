@@ -92,7 +92,6 @@ public:
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
 		m_language(*this, "language"),
-		m_cart(*this, "cartslot"),
 		m_inputs(*this, "IN.%u", 0),
 		m_rotate(false)
 	{ }
@@ -115,7 +114,6 @@ protected:
 	required_device<s14001a_device> m_speech;
 	required_region_ptr<u8> m_speech_rom;
 	required_region_ptr<u8> m_language;
-	required_device<generic_slot_device> m_cart;
 	required_ioport_array<2> m_inputs;
 
 	// address maps
@@ -125,8 +123,6 @@ protected:
 	// periodic interrupts
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	// I/O handlers
 	void update_display();
@@ -195,18 +191,6 @@ void eag_state::init_eag2100()
 /******************************************************************************
     I/O
 ******************************************************************************/
-
-// cartridge
-
-DEVICE_IMAGE_LOAD_MEMBER(elite_state::cart_load)
-{
-	u32 size = m_cart->common_get_size("rom");
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
-}
-
 
 // TTL/generic
 
@@ -453,9 +437,7 @@ void elite_state::pc(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_scc", "bin,dat");
-	m_cart->set_device_load(FUNC(elite_state::cart_load));
-
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_scc");
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }
 

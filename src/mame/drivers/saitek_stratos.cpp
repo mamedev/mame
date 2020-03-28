@@ -512,7 +512,7 @@ void stratos_state::stratos(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* extension rom */
-	GENERIC_CARTSLOT(config, m_extrom, generic_plain_slot, "saitek_egr", "bin");
+	GENERIC_CARTSLOT(config, m_extrom, generic_plain_slot, "saitek_egr");
 	m_extrom->set_device_load(FUNC(stratos_state::extrom_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr");

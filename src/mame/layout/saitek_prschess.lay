@@ -6,8 +6,6 @@ license:CC0
 
 <!-- define elements -->
 
-	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
-
 	<element name="hl" defstate="0">
 		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
 		<disk state="1">
@@ -426,6 +424,7 @@ license:CC0
 		<element name="8.3" ref="led2"><bounds x="123.25" y="70.666" width="1.5" height="1.5" /></element>
 		<element name="8.5" ref="led2"><bounds x="123.25" y="79.000" width="1.5" height="1.5" /></element>
 
+		<!-- there are no visible button squares, buttons are behind the labels -->
 		<element ref="hl" blend="add" inputtag="IN.0" inputmask="0x80"><bounds x="95" y="32.000" width="10" height="6" /></element>
 		<element ref="hl" blend="add" inputtag="IN.0" inputmask="0x40"><bounds x="95" y="40.333" width="10" height="6" /></element>
 		<element ref="hl" blend="add" inputtag="IN.0" inputmask="0x20"><bounds x="95" y="48.666" width="10" height="6" /></element>

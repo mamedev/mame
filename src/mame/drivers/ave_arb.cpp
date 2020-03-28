@@ -298,7 +298,7 @@ void arb_state::arb(machine_config &config)
 	m_via->set_clock(4_MHz_XTAL/4); // R6522P
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "arb", "bin");
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "arb");
 	m_cart->set_device_load(FUNC(arb_state::cart_load));
 	m_cart->set_must_be_loaded(true);
 
