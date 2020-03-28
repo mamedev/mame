@@ -35058,6 +35058,9 @@ risc2500                        //
 risc2500a                       //
 montreux                        //
 
+@source:saitek_schess.cpp
+schess
+
 @source:saitek_ssystem3.cpp
 ssystem3                        // Chess Champion Super System III / MK III
 

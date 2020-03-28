@@ -784,6 +784,7 @@ saitek_delta1.cpp
 saitek_mark5.cpp
 saitek_prschess.cpp
 saitek_risc2500.cpp
+saitek_schess.cpp
 saitek_ssystem3.cpp
 saitek_stratos.cpp
 saitek_superstar.cpp

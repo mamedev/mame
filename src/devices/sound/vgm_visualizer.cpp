@@ -246,8 +246,24 @@ void vgmviz_device::device_reset()
 	{
 		memset(m_waterfall_buf[i], 0, sizeof(int) * 256);
 	}
+
+	m_spec_mode = SPEC_RAW;
 }
 
+
+//-------------------------------------------------
+//  cycle_spectrogram - cycle the spectrogram mode
+//  among the valid spectrogram modes.
+//-------------------------------------------------
+
+void vgmviz_device::cycle_spectrogram()
+{
+	m_spec_mode = (spec_mode)((int)m_spec_mode + 1);
+	if (m_spec_mode == SPEC_COUNT)
+	{
+		m_spec_mode = SPEC_RAW;
+	}
+}
 
 //-------------------------------------------------
 //  sound_stream_update - update the outgoing
@@ -420,6 +436,8 @@ void vgmviz_device::device_add_mconfig(machine_config &config)
 
 uint32_t vgmviz_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0, cliprect);
+
 	find_levels();
 
 	const pen_t *pal = m_palette->pens();
@@ -443,23 +461,48 @@ uint32_t vgmviz_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		m_curr_peaks[chan] *= 0.99f;
 	}
 
+	int bar_size = 1;
+	switch (m_spec_mode)
+	{
+	default:
+		bar_size = 1;
+		break;
+	case SPEC_BAR4:
+		bar_size = 4;
+		break;
+	case SPEC_BAR8:
+		bar_size = 8;
+		break;
+	case SPEC_BAR16:
+		bar_size = 16;
+		break;
+	}
+
 	int total_bars = FFT_LENGTH / 2;
 	WDL_FFT_COMPLEX *bins[2] = { (WDL_FFT_COMPLEX *)m_fft_buf[0], (WDL_FFT_COMPLEX *)m_fft_buf[1] };
-	for (int bar = 0; bar < total_bars; bar++)
+	for (int bar = 0; bar < total_bars; bar += bar_size)
 	{
 		if (bar < 2)
 		{
 			continue;
 		}
-		int permuted = WDL_fft_permute(FFT_LENGTH/2, bar);
-		float val = (bins[0][permuted].re + bins[1][permuted].re) * 0.5f;
-		int level = int(logf(val * 32768.0f) * 63.0f);
+		float max_val = 0.0f;
+		for (int sub_bar = 0; sub_bar < bar_size && (bar + sub_bar) < total_bars; sub_bar++)
+		{
+			int permuted = WDL_fft_permute(FFT_LENGTH/2, bar + sub_bar);
+			max_val = std::max<float>((bins[0][permuted].re + bins[1][permuted].re) * 0.5f, max_val);
+		}
+		int level = int(logf(max_val * 32768.0f) * 63.0f);
 		for (int y = 0; y < 512; y++)
 		{
 			int bar_y = 511 - y;
 			uint32_t *line = &bitmap.pix32(y + 256);
 			bool lit = bar_y <= level;
-			line[bar + 16] = pal[lit ? (256 + bar) : black_idx];
+			const int x_limit = bar_size == 1 ? 1 : bar_size - 1;
+			for (int x = 0; x < x_limit; x++)
+			{
+				line[(bar - 2) + x + 16] = pal[lit ? (256 + bar) : black_idx];
+			}
 		}
 	}
 
