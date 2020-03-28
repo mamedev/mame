@@ -13162,6 +13162,17 @@ clips onto the player's ear.
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="vpool">
+		<description>Viewpoint 64 (Prototype)</description>
+		<year>1999</year>
+		<publisher>Sammy</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="Viewpoint2064.z64" size="16777216" crc="93a630cb" sha1="defacaf6dbd22962ec0184849ed4a4c53a147454" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="vpool">
 		<description>Virtual Pool 64 (Europe)</description>
