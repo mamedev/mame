@@ -46,8 +46,20 @@ public:
 	vgmviz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	virtual ~vgmviz_device();
 
+	void cycle_spectrogram();
+
 protected:
-	static constexpr int FFT_LENGTH = 1024;
+	enum spec_mode : int
+	{
+		SPEC_RAW,
+		SPEC_BAR4,
+		SPEC_BAR8,
+		SPEC_BAR16,
+
+		SPEC_COUNT
+	};
+
+	static constexpr int FFT_LENGTH = 512;
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -83,7 +95,7 @@ protected:
 	float m_curr_levels[2];
 	float m_curr_peaks[2];
 	float m_window[FFT_LENGTH];
-	float m_power;
+	spec_mode m_spec_mode;
 };
 
 #endif // MAME_SOUND_VGMVIZ_H
