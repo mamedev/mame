@@ -2504,17 +2504,10 @@ ROM_START( swimmerb )
 ROM_END
 
 /*
-<<<<<<< HEAD
-	Guzzler
-
-	CPU/Sound Board: B102-403
-	Video Board:     102-401
-=======
     Guzzler
 
     CPU/Sound Board: B102-403
     Video Board:     102-401
->>>>>>> upstream/master
 */
 
 ROM_START( guzzler )
@@ -2545,19 +2538,11 @@ ROM_START( guzzler )
 ROM_END
 
 /*
-<<<<<<< HEAD
-	Guzzler (Swimmer Conversion)
-
-	CPU/Sound Board:   B102-403
-	Video Board:       102-401
-	CPU Daughterboard: C102-405
-=======
     Guzzler (Swimmer Conversion)
 
     CPU/Sound Board:   B102-403
     Video Board:       102-401
     CPU Daughterboard: C102-405
->>>>>>> upstream/master
 */
 
 ROM_START( guzzlers ) /* Swimmer Conversion, 1k vs 2k romsize in maincpu */
