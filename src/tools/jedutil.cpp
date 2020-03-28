@@ -7492,6 +7492,8 @@ static int print_usage()
 		"  jedutil -view <source.jed> <device> -- dump JED logic equations\n"
 		"  jedutil -view <source.bin> <device> -- dump binary logic equations\n"
 		"  jedutil -viewlist -- view list of supported devices\n"
+		"  jedutil -listcompatible <source.jed> -- list compatible devices\n"
+		"  jedutil -listcompatible <source.bin> -- list compatible devices\n"
 	);
 
 	return 0;
@@ -7746,6 +7748,77 @@ static int command_viewlist(int argc, char *argv[])
 }
 
 
+
+/*-------------------------------------------------
+    command_listcompatible - views the list of
+                             compatible devices
+-------------------------------------------------*/
+
+static int command_listcompatible(int argc, char *argv[])
+{
+	int result = 0;
+	const char *srcfile;
+	int is_jed;
+	jed_data jed;
+	int err;
+	int index;
+
+	if (argc != 1)
+	{
+		return print_usage();
+	}
+
+	/* extract arguments */
+	srcfile = argv[0];
+
+	/* does the source end in '.jed'? */
+	is_jed = is_jed_file(srcfile);
+
+	/* read the source file */
+	err = read_source_file(srcfile);
+	if (err != 0)
+	{
+		result = 1;
+		goto end;
+	}
+
+	/* if the source is JED, convert to binary */
+	if (is_jed)
+	{
+		/* read the JEDEC data */
+		err = jed_parse(srcbuf, srcbuflen, &jed);
+		switch (err)
+		{
+			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid .JED file\n"); result = 1; goto end;
+			case JEDERR_BAD_XMIT_SUM:   fprintf(stderr, "Fatal error: Bad transmission checksum\n"); result = 1; goto end;
+			case JEDERR_BAD_FUSE_SUM:   fprintf(stderr, "Fatal error: Bad fusemap checksum\n"); result = 1; goto end;
+		}
+	}
+	else
+	{
+		/* read the binary data */
+		err = jedbin_parse(srcbuf, srcbuflen, &jed);
+		switch (err)
+		{
+			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid binary JEDEC file\n"); result = 1; goto end;
+		}
+	}
+
+	for (index = 0; index < ARRAY_LENGTH(paldata); ++index)
+	{
+		if (paldata[index].numfuses == jed.numfuses)
+		{
+			printf("%s\n", paldata[index].name);
+		}
+	}
+
+end:
+	free(srcbuf);
+	return result;
+}
+
+
+
 /*-------------------------------------------------
     main - primary entry point
 -------------------------------------------------*/
@@ -7753,9 +7826,10 @@ static int command_viewlist(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	command_entry command_entries[] = {
-		{"-convert",  &command_convert},
-		{"-view",     &command_view},
-		{"-viewlist", &command_viewlist}};
+		{"-convert",        &command_convert},
+		{"-view",           &command_view},
+		{"-viewlist",       &command_viewlist},
+		{"-listcompatible", &command_listcompatible}};
 	int index;
 
 	if (argc < 2)
