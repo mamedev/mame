@@ -43,7 +43,7 @@ Chip#     Type       Sounds Made
 64        EPROM 07   Player Explosion                        |
 65        EPROM 08   Player Shoot then UFO Flying            /
 
-These are schematics available for Space Stranger but the scans are too small to read so completely useless.
+There are schematics available for Space Stranger but the scans are too small to read so completely useless.
 There is another game known as 'Super Space Stranger' that has a service manual available with schematics.
 It is also known as 'Mark Stranger 2' and is a color version of the same game.
 There is a Super Space Stranger flyer that shows the game as b/w with color bars. The game has 'Super Space Stranger'
@@ -315,7 +315,7 @@ Notes: All IC's shown.
 PCB video reference for Space Stranger 2: https://www.youtube.com/watch?v=mn8hCd_uqcI
 
 TODO:
-      * Using sound samples from Space Invaders (real PCB sounds virtually identical anwyay). Get schematics and use netlist instead.
+      * Using sound samples from Space Invaders (real PCB sounds virtually identical anyway). Get schematics and use netlist instead.
       * Fix attract mode and I/O test random sound (should be silent)
       * Screen should flash red when losing a life in Space Stranger 2 (see video reference)
 
