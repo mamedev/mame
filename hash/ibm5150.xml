@@ -8153,6 +8153,33 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="camelot">
+		<description>Conquest of Camelot - The Search for the Grail</description>
+		<year>1988</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="1.001.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="conquest of camelot disk 1.img" size="737280" crc="dac688c5" sha1="8ea08590af7a8f1db5c9c14aaf6191f141410311"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="conquest of camelot disk 2.img" size="737280" crc="88b65db5" sha1="c32bfd802776df4986ae7335ab7182af899de969"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="conquest of camelot disk 3.img" size="737280" crc="1b3a6edb" sha1="1ca7bae05d0c4eb602f64cc4c76939561f56c2be"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="conquest of camelot disk 4.img" size="737280" crc="0425a6aa" sha1="6a5b771e52508035a869bfde3076ee70d15a1899"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crimewav">
 		<description>Crime Wave</description>
 		<year>1990</year>
