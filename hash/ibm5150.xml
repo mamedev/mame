@@ -8900,6 +8900,22 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="harpoon">
+		<description>Harpoon</description>
+		<year>1989</year>
+		<publisher>Three-Sixty</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="harpoon disk 1.img" size="737280" crc="ca8f8d95" sha1="4c1637d7e10ce85ecc9f67a8540acecbe8a4db2d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="harpoon disk 2.img" size="737280" crc="9770fd0e" sha1="1dc0cc6d859eefd664c237969774e9949fd48705"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="herolanc">
 		<description>Heroes of the Lance</description>
 		<year>1991</year>
