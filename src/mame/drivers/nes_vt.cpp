@@ -70,6 +70,7 @@
 #include "cpu/m6502/n2a03.h"
 #include "machine/bankdev.h"
 #include "video/ppu2c0x_vt.h"
+#include "machine/nes_vt.h"
 #include "machine/m6502_vtscr.h"
 #include "machine/m6502_swap_op_d5_d6.h"
 #include "screen.h"
@@ -81,6 +82,7 @@ public:
 	nes_vt_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_soc(*this, "soc"),
 		m_io0(*this, "IO0"),
 		m_io1(*this, "IO1"),
 		m_screen(*this, "screen"),
@@ -146,6 +148,8 @@ protected:
 	void nes_vt_map(address_map& map);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<nes_vt_soc_device> m_soc;
+
 	optional_ioport m_io0;
 	optional_ioport m_io1;
 	uint8_t m_latch0;
@@ -2081,7 +2085,10 @@ uint32_t nes_vt_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap
 void nes_vt_state::nes_vt_base(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502_VTSCR(config, m_maincpu, NTSC_APU_CLOCK); // selectable speed?
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_32mbyte);
+
+	M6502_VTSCR(config, m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
