@@ -337,6 +337,7 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 			const u8 colpri = flags_bitmap.pix8((src_y + column_offset) & height_mask, src_x & width_mask) & 0xf;
 
 			src_x++;
+			// TODO : Convertable masking feature into set_transmask related?
 			if ((flags & TILEMAP_DRAW_OPAQUE) || (p & bppmask))
 			{
 				if ((p & penmask) == pencondition)
