@@ -81,23 +81,18 @@ class nes_vt_state : public driver_device
 public:
 	nes_vt_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
 		m_soc(*this, "soc"),
 		m_io0(*this, "IO0"),
 		m_io1(*this, "IO1"),
-		m_screen(*this, "screen"),
-		m_ppu(*this, "ppu"),
-		m_apu(*this, "apu"),
 		m_cartsel(*this, "CARTSEL"),
 		m_exin0(*this, "EXTRAIN0"),
 		m_exin1(*this, "EXTRAIN1"),
 		m_exin2(*this, "EXTRAIN2"),
 		m_exin3(*this, "EXTRAIN3"),
-		m_vt_external_space(*this, "vt_ext_space"),
 		m_prgrom(*this, "mainrom"),
-		m_initial_e000_bank(0xff),
-		m_ntram(nullptr),
-		m_chrram(nullptr)
+		m_initial_e000_bank(0xff)
+	//	m_ntram(nullptr),
+	//	m_chrram(nullptr)
 	{ }
 
 	void nes_vt_base(machine_config& config);
@@ -120,20 +115,11 @@ public:
 	void nes_vt_4k_ram(machine_config& config);
 	void nes_vt_4k_ram_16mb(machine_config& config);
 
-
 	void nes_vt_4k_ram_pal(machine_config& config);
 
-	/* OneBus read callbacks for getting sprite and tile data during rendering */
-	DECLARE_READ8_MEMBER(spr_r);
-	DECLARE_READ8_MEMBER(chr_r);
-
-	/* Misc PPU */
-	DECLARE_WRITE8_MEMBER(vt_dma_w);
-	DECLARE_WRITE8_MEMBER(vt_fixed_dma_w);
-
 	// TODO: give these better register names so it's clearer what is remapped
-	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
-	void set_410x_scramble(uint8_t reg0, uint8_t reg1);
+//	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
+//	void set_410x_scramble(uint8_t reg0, uint8_t reg1);
 
 protected:
 	virtual void machine_start() override;
@@ -147,7 +133,6 @@ protected:
 
 	void nes_vt_map(address_map& map);
 
-	required_device<cpu_device> m_maincpu;
 	required_device<nes_vt_soc_device> m_soc;
 
 	optional_ioport m_io0;
@@ -155,36 +140,18 @@ protected:
 	uint8_t m_latch0;
 	uint8_t m_latch1;
 
-	required_device<screen_device> m_screen;
-	required_device<ppu_vt03_device> m_ppu;
-	required_device<nesapu_device> m_apu;
-
-	/* APU handling */
-	DECLARE_READ8_MEMBER(psg1_4014_r);
-	DECLARE_READ8_MEMBER(psg1_4015_r);
-	DECLARE_WRITE8_MEMBER(psg1_4015_w);
-	DECLARE_WRITE8_MEMBER(psg1_4017_w);
-
-	/* VT03 extension handling */
-	DECLARE_WRITE8_MEMBER(vt03_410x_w);
-	DECLARE_READ8_MEMBER(vt03_410x_r);
-
 	/* Misc */
 	uint32_t m_ahigh; // external banking bits
-	void update_banks();
 	uint8_t m_4242;
 	uint8_t m_411c;
 	uint8_t m_411d;
 	uint8_t m_413x[8]; // CY only?
 
-	uint8_t m_8000_scramble[8];
-	uint8_t m_410x_scramble[2];
 
 	void scrambled_410x_w(uint16_t offset, uint8_t data);
 	void scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(vt03_8000_mapper_w);
-	DECLARE_WRITE8_MEMBER(vt03_4034_w);
+	DECLARE_WRITE8_MEMBER(vt03_8000_mapper_w) { }
 
 	optional_ioport m_cartsel;
 	optional_ioport m_exin0;
@@ -192,15 +159,11 @@ protected:
 	optional_ioport m_exin2;
 	optional_ioport m_exin3;
 
-	required_device<address_map_bank_device> m_vt_external_space;
 	required_region_ptr<uint8_t> m_prgrom;
 
 	void nes_vt_4k_ram_map(address_map& map);
 
-	/* Misc */
-	DECLARE_READ8_MEMBER(rs232flags_region_r);
-
-	uint8_t m_initial_e000_bank;
+		uint8_t m_initial_e000_bank;
 
 	void vt_external_space_map_32mbyte(address_map& map);
 	void vt_external_space_map_16mbyte(address_map& map);
@@ -213,61 +176,15 @@ protected:
 	DECLARE_READ8_MEMBER(vt_rom_r);
 	DECLARE_WRITE8_MEMBER(vtspace_w);
 
-	DECLARE_READ8_MEMBER(external_space_read) { int bank = (offset & 0x6000) >> 13; int address = (m_bankaddr[bank] * 0x2000) + (offset&0x1fff); m_real_access_address = offset + 0x8000; return m_vt_external_space->read8(address); };
-	DECLARE_WRITE8_MEMBER(external_space_write) { int bank = (offset & 0x6000) >> 13; int address = (m_bankaddr[bank] * 0x2000) + (offset&0x1fff); m_real_access_address = offset + 0x8000; m_vt_external_space->write8(address, data); };
-
 private:
 	/* APU handling */
-	DECLARE_WRITE_LINE_MEMBER(apu_irq);
-	DECLARE_READ8_MEMBER(apu_read_mem);
 
 	/* Extra IO */
-	DECLARE_WRITE8_MEMBER(extra_io_control_w);
-	virtual DECLARE_READ8_MEMBER(extrain_01_r);
-	virtual DECLARE_READ8_MEMBER(extrain_23_r);
-	virtual DECLARE_WRITE8_MEMBER(extraout_01_w);
-	virtual DECLARE_WRITE8_MEMBER(extraout_23_w);
-
-
-	DECLARE_WRITE8_MEMBER(chr_w);
-
-	void prg_map(address_map& map);
-
-	/* expansion nametable - todo, see if we can refactor NES code to be reusable without having to add full NES bus etc. */
-	std::unique_ptr<uint8_t[]> m_ntram;
-	std::unique_ptr<uint8_t[]> m_chrram;
-
-	DECLARE_READ8_MEMBER(nt_r);
-	DECLARE_WRITE8_MEMBER(nt_w);
-
-	void scanline_irq(int scanline, int vblank, int blanked);
-	void hblank_irq(int scanline, int vblank, int blanked);
-	void video_irq(bool hblank, int scanline, int vblank, int blanked);
-
-	uint8_t m_410x[0xc];
-
-	uint8_t m_vdma_ctrl;
-
-	int m_timer_irq_enabled;
-	int m_timer_running;
-	int m_timer_val;
-
-	uint8_t m_8000_addr_latch;
-
-	/* banking etc. */
-	uint32_t get_banks(uint8_t bnk);
-
-	int calculate_real_video_address(int addr, int extended, int readtype);
-
-	uint16_t m_real_access_address;
-
-
-	int m_bankaddr[4];
-
-
-	uint16_t decode_nt_addr(uint16_t addr);
-	void do_dma(uint8_t data, bool has_ntsc_bug);
-
+//	DECLARE_WRITE8_MEMBER(extra_io_control_w);
+//	virtual DECLARE_READ8_MEMBER(extrain_01_r);
+//	virtual DECLARE_READ8_MEMBER(extrain_23_r);
+//	virtual DECLARE_WRITE8_MEMBER(extraout_01_w);
+//	virtual DECLARE_WRITE8_MEMBER(extraout_23_w);
 };
 
 class nes_vt_swap_op_d5_d6_state : public nes_vt_state
@@ -735,83 +652,6 @@ WRITE8_MEMBER(nes_vt_cy_lexibook_state::in0_w)
 }
 
 
-uint32_t nes_vt_state::get_banks(uint8_t bnk)
-{
-	switch (m_410x[0xb] & 0x07)
-	{
-	case 0: return ((m_410x[0x0] & 0xF0) << 4) + ((m_410x[0xa] & 0xC0) | (bnk & 0x3F)); // makes bank 0xff at 0xe000 map to 0x07e000 by default for vectors at 0x007fffx
-	case 1: return ((m_410x[0x0] & 0xF0) << 4) + ((m_410x[0xa] & 0xE0) | (bnk & 0x1F));
-	case 2: return ((m_410x[0x0] & 0xF0) << 4) + ((m_410x[0xa] & 0xF0) | (bnk & 0x0F));
-	case 3: return ((m_410x[0x0] & 0xF0) << 4) + ((m_410x[0xa] & 0xF8) | (bnk & 0x07));
-	case 4: return ((m_410x[0x0] & 0xF0) << 4) + ((m_410x[0xa] & 0xFC) | (bnk & 0x03));
-	case 5: return ((m_410x[0x0] & 0xF0) << 4) + ((m_410x[0xa] & 0xFE) | (bnk & 0x01));
-	case 6: return ((m_410x[0x0] & 0xF0) << 4) + (m_410x[0xa]);
-	case 7: return ((m_410x[0x0] & 0xF0) << 4) + bnk;
-	}
-
-	return 0;
-}
-
-// 8000 needs to bank in 60000  ( bank 0x30 )
-void nes_vt_state::update_banks()
-{
-	//uint32_t amod = m_ahigh >> 13;
-
-	uint8_t bank;
-
-	// 8000-9fff
-	if ((m_410x[0xb] & 0x40) != 0 || (m_410x[0x5] & 0x40) == 0)
-	{
-		if ((m_410x[0x5] & 0x40) == 0)
-			bank = m_410x[0x7];
-		else
-			bank = m_410x[0x9];
-	}
-	else
-		bank = 0xfe;
-
-	m_bankaddr[0] = ((/*amod |*/ get_banks(bank)) );
-
-	// a000-bfff
-	bank = m_410x[0x8];
-	m_bankaddr[1] = ((/*amod |*/ get_banks(bank)) );
-
-	// c000-dfff
-	if ((m_410x[0xb] & 0x40) != 0 || (m_410x[0x5] & 0x40) != 0)
-	{
-		if ((m_410x[0x5] & 0x40) == 0)
-			bank = m_410x[0x9];
-		else
-			bank = m_410x[0x7];
-	}
-	else
-		bank = 0xfe;
-
-	m_bankaddr[2] = ((/*amod |*/ get_banks(bank)) );
-
-	// e000 - ffff
-	bank = m_initial_e000_bank;
-	m_bankaddr[3] = ((/*amod |*/ get_banks(bank)) );
-}
-
-uint16_t nes_vt_state::decode_nt_addr(uint16_t addr)
-{
-	bool vert_mirror = !(m_410x[0x6] & 0x01);
-	int a11 = (addr >> 11) & 0x01;
-	int a10 = (addr >> 10) & 0x01;
-	uint16_t base = (addr & 0x3FF);
-	return ((vert_mirror ? a10 : a11) << 10) | base;
-}
-
-WRITE8_MEMBER(nes_vt_state::vt03_410x_w)
-{
-	scrambled_410x_w(offset, data);
-}
-
-READ8_MEMBER(nes_vt_state::vt03_410x_r)
-{
-	return m_410x[offset];
-}
 
 // ablping polls this (also writes here) what is it? 4-bit DAC? PCM? (inputs only start responding once it finishes writing data on startup but takes longer than a sample should)
 // (this is the extended IO port on VT)
@@ -826,97 +666,6 @@ WRITE8_MEMBER(nes_vt_ablping_state::ablping_410f_w)
 	popmessage("ablping_410f_w %02x", data);
 };
 
-// Source: https://wiki.nesdev.com/w/index.php/NES_2.0_submappers/Proposals#NES_2.0_Mapper_256
-
-void nes_vt_state::scrambled_410x_w(uint16_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-	case 0x0:
-		m_410x[0x0] = data;
-		update_banks();
-		break;
-
-	case 0x1:
-		// latch timer value
-		m_410x[0x1] = data;
-		m_timer_running = 0;
-		break;
-
-	case 0x2:
-		//logerror("vt03_4102_w %02x\n", data);
-		// load latched value and start counting
-		m_410x[0x2] = data; // value doesn't matter?
-		m_timer_val = m_410x[0x1];
-		m_timer_running = 1;
-		break;
-
-	case 0x3:
-		//logerror("vt03_4103_w %02x\n", data);
-		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-		// disable timer irq
-		m_410x[0x3] = data; // value doesn't matter?
-		m_timer_irq_enabled = 0;
-		break;
-
-	case 0x4:
-		//logerror("vt03_4104_w %02x\n", data);
-		// enable timer irq
-		m_410x[0x4] = data; // value doesn't matter?
-		m_timer_irq_enabled = 1;
-		break;
-
-	case 0x5:
-		logerror("vt03_4105_w %02x\n", data);
-		m_410x[0x5] = data;
-		update_banks();
-		break;
-
-	case 0x6:
-		m_410x[0x6] = data;
-		break;
-
-	case 0x7:
-		m_410x[m_410x_scramble[0]] = data;
-		update_banks();
-		break;
-
-	case 0x8:
-		m_410x[m_410x_scramble[1]] = data;
-		update_banks();
-		break;
-
-	case 0x9:
-		logerror("vt03_4109_w %02x\n", data);
-		m_410x[0x9] = data;
-		update_banks();
-		break;
-
-	case 0xa:
-		logerror("vt03_410aw %02x\n", data);
-		m_410x[0xa] = data;
-		update_banks();
-		break;
-
-	case 0xb:
-		/*
-
-		D7 TSYNEN - Timer clock select 0:AD12, 1:HSYNC
-		D6 Prg Bank 0 Reg 2 enable / disable  0:Disable 1:Enable
-		D5 RS232 enable / disable  0:Disable 1:Enable
-		D4 Bus output control  0: normal  1: tristate
-		D3 6000-7fff and 8000-ffff control - 0 will not active XRWB, 1 will activate
-		D2-D0 - program bank 0 selector
-
-		*/
-
-		logerror("vt03_410b_w %02x\n", data);
-		m_410x[0xb] = data;
-		update_banks();
-		break;
-	}
-}
-
 WRITE8_MEMBER(nes_vt_cy_state::vt03_41bx_w)
 {
 	logerror("vt03_41bx_w %02x %02x\n", offset, data);
@@ -926,14 +675,14 @@ WRITE8_MEMBER(nes_vt_dg_state::vt03_411c_w)
 {
 	logerror("vt03_411c_w  %02x\n", data);
 	m_411c = data;
-	update_banks();
+	// TODO update_banks();
 }
 
 WRITE8_MEMBER(nes_vt_cy_state::vt03_411c_w)
 {
 	logerror("vt03_411c_w  %02x\n", data);
 	m_411c = data;
-	update_banks();
+	// TODO  update_banks();
 }
 
 WRITE8_MEMBER(nes_vt_cy_state::vt03_412c_extbank_w)
@@ -961,7 +710,7 @@ WRITE8_MEMBER(nes_vt_hh_state::vtfp_411d_w)
 	// controls chram access and mapper emulation modes in later models
 	logerror("vtfp_411d_w  %02x\n", data);
 	m_411d = data;
-	update_banks();
+	// TODO update_banks();
 }
 
 WRITE8_MEMBER(nes_vt_dg_state::vtfa_412c_extbank_w)
@@ -1067,181 +816,35 @@ READ8_MEMBER(nes_vt_hh_state::vthh_414a_r)
 }
 
 
-READ8_MEMBER(nes_vt_state::spr_r)
-{
-	if (m_4242 & 0x1 || m_411d & 0x04)
-	{
-		return m_chrram[offset];
-	}
-	else
-	{
-		int realaddr = calculate_real_video_address(offset, 0, 1);
-
-		return m_vt_external_space->read8(realaddr);
-	}
-}
-
-READ8_MEMBER(nes_vt_state::chr_r)
-{
-	if (m_4242 & 0x1 || m_411d & 0x04)
-	{
-		return m_chrram[offset];
-	}
-	else
-	{
-		int realaddr = calculate_real_video_address(offset, 1, 0);
-		return m_vt_external_space->read8(realaddr);
-	}
-}
-
-
-WRITE8_MEMBER(nes_vt_state::chr_w)
-{
-	if (m_4242 & 0x1 || m_411d & 0x04)
-	{
-		logerror("vram write %04x %02x\n", offset, data);
-		m_chrram[offset] = data;
-	}
-}
 
 WRITE8_MEMBER(nes_vt_hh_state::vtfp_411e_w)
 {
+	/* TODO:
 	logerror("411e_w %02x\n", data);
 	if (data == 0x05)
 		dynamic_cast<m6502_vtscr&>(*m_maincpu).set_next_scramble(true);
 	else if (data == 0x00)
 		dynamic_cast<m6502_vtscr&>(*m_maincpu).set_next_scramble(false);
+	*/
 }
 
 WRITE8_MEMBER(nes_vt_hh_state::vtfp_4a00_w)
 {
+	/* TODO:
 	logerror("4a00_w %02x\n", data);
 	//if(data == 0x80)
 	//  dynamic_cast<m6502_vtscr&>(*m_maincpu).set_scramble(false);
+	*/	
 }
 
-
-void nes_vt_state::scanline_irq(int scanline, int vblank, int blanked)
-{
-	video_irq(false, scanline, vblank, blanked);
-}
-
-void nes_vt_state::hblank_irq(int scanline, int vblank, int blanked)
-{
-	video_irq(true, scanline, vblank, blanked);
-}
-
-void nes_vt_state::video_irq(bool hblank, int scanline, int vblank, int blanked)
-{
-	//TSYNEN
-	if (((m_410x[0xb] >> 7) & 0x01) == hblank)
-	{
-		int irqstate = 0;
-
-		//logerror("scanline_irq %d\n", scanline);
-
-		if (m_timer_running && scanline < 0xe0)
-		{
-			m_timer_val--;
-
-			if (m_timer_val < 0)
-			{
-				if (m_timer_irq_enabled && !blanked)
-				{
-					logerror("scanline_irq %d\n", scanline);
-					irqstate = 1;
-				}
-			}
-		}
-
-		if (irqstate)
-			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-		//else
-		//  m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	}
-}
-
-/* todo, handle custom VT nametable stuff here */
-READ8_MEMBER(nes_vt_state::nt_r)
-{
-	return m_ntram[decode_nt_addr(offset)];
-}
-
-WRITE8_MEMBER(nes_vt_state::nt_w)
-{
-	//logerror("nt wr %04x %02x", offset, data);
-	m_ntram[decode_nt_addr(offset)] = data;
-}
 
 void nes_vt_state::machine_start()
 {
-	save_item(NAME(m_410x));
-	save_item(NAME(m_413x));
-
-	save_item(NAME(m_411c));
-	save_item(NAME(m_411d));
-	save_item(NAME(m_4242));
-
-	save_item(NAME(m_8000_addr_latch));
-
-	save_item(NAME(m_timer_irq_enabled));
-	save_item(NAME(m_timer_running));
-	save_item(NAME(m_timer_val));
-	save_item(NAME(m_vdma_ctrl));
-
-	m_ntram = std::make_unique<uint8_t[]>(0x2000);
-	save_pointer(NAME(m_ntram), 0x2000);
-
-	m_chrram = std::make_unique<uint8_t[]>(0x2000);
-	save_pointer(NAME(m_chrram), 0x2000);
-
-	m_ppu->set_scanline_callback(*this, FUNC(nes_vt_state::scanline_irq));
-	m_ppu->set_hblank_callback(*this, FUNC(nes_vt_state::hblank_irq));
-
-	//m_ppu->set_hblank_callback(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::hblank_irq)));
-	//m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_r)), write8_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_w)));
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(*this, FUNC(nes_vt_state::nt_r)), write8_delegate(*this, FUNC(nes_vt_state::nt_w)));
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(*this, FUNC(nes_vt_state::chr_r)), write8_delegate(*this, FUNC(nes_vt_state::chr_w)));
 }
 
 void nes_vt_state::machine_reset()
 {
-	// what are the actual defaults?
-	m_410x[0x0] = 0x00;
-	m_410x[0x1] = 0x00;
-	m_410x[0x2] = 0x00;
-	m_410x[0x3] = 0x00;
-	m_410x[0x4] = 0x00;
-	m_410x[0x5] = 0x00;
-	m_410x[0x6] = 0x00;
-	m_410x[0x7] = 0x00;
-	m_410x[0x8] = 0x01;
-	m_410x[0x9] = 0x02;
-	m_410x[0xa] = 0x00;
-	m_410x[0xb] = 0x00;
-	m_411c = 0x00;
-	m_411d = 0x00;
-	m_4242 = 0x00;
 
-	m_timer_irq_enabled = 0;
-	m_timer_running = 0;
-	m_timer_val = 0;
-	m_vdma_ctrl = 0;
-
-	update_banks();
-
-	// 'no scramble' configuration
-	m_8000_scramble[0x0] = 0x6;
-	m_8000_scramble[0x1] = 0x7;
-	m_8000_scramble[0x2] = 0x2;
-	m_8000_scramble[0x3] = 0x3;
-	m_8000_scramble[0x4] = 0x4;
-	m_8000_scramble[0x5] = 0x5;
-	m_8000_scramble[0x6] = 0x7;
-	m_8000_scramble[0x7] = 0x8;
-
-	m_410x_scramble[0x0] = 0x7;
-	m_410x_scramble[0x1] = 0x8;
 }
 
 void nes_vt_dg_fapocket_state::machine_reset()
@@ -1253,554 +856,6 @@ void nes_vt_dg_fapocket_state::machine_reset()
 		m_ahigh = (m_cartsel->read() == 0x01) ? (1 << 25) : 0x0;
 	else
 		m_ahigh = 0;
-}
-
-int nes_vt_state::calculate_real_video_address(int addr, int extended, int readtype)
-{
-	// might be a VT09 only feature (alt 4bpp mode?)
-	int alt_order = m_ppu->get_201x_reg(0x0) & 0x40;
-
-	if (readtype == 0)
-	{
-		if (m_ppu->get_201x_reg(0x0) & 0x10)
-		{
-			extended = 1;
-		}
-		else
-		{
-			extended = 0;
-		}
-	}
-	else if (readtype == 1)
-	{
-		if (m_ppu->get_201x_reg(0x0) & 0x08)
-		{
-			extended = 1;
-		}
-		else
-		{
-			extended = 0;
-		}
-	}
-
-	/*
-	Calculating TVA17 - TVA10
-
-	--------------------------------------------------------------------------------------------
-	| COMR7        | AD[12:10] | TVA17 | TVA16 | TVA15 | TVA14 | TVA13 | TVA12 | TVA11 | TVA10 |
-	| (4105, 0x80) | (2006)    |       |       |       |       |       |       |       |       |
-	--------------------------------------------------------------------------------------------
-	| 0/1/C/D                  | RV47  | RV46  | RV45  | RV44  | RV43  | RV42  | RV41  | AD10  | ** RV40 is never used
-	| 2/3/E/F                  | RV57  | RV56  | RV55  | RV54  | RV53  | RV52  | RV51  | AD10  | ** RV50 is never used
-	| 4/8                      | RV07  | RV06  | RV05  | RV04  | RV03  | RV02  | RV01  | RV00  |
-	| 5/9                      | RV17  | RV16  | RV15  | RV14  | RV13  | RV12  | RV11  | RV10  |
-	| 6/A                      | RV27  | RV26  | RV25  | RV24  | RV23  | RV22  | RV21  | RV20  |
-	| 7/B                      | RV37  | RV36  | RV35  | RV34  | RV33  | RV32  | RV31  | RV30  |
-	--------------------------------------------------------------------------------------------
-
-	m_r2012 = rv0x
-	m_r2013 = rv1x
-	m_r2014 = rv2x
-	m_r2015 = rv3x
-	m_r2016 = rv4x
-	m_r2017 = rv5x
-
-	*/
-	int finaladdr = 0;
-
-	int sel = (addr & 0x1c00) | ((m_410x[0x5] & 0x80) ? 0x2000 : 0x000);
-
-	int vbank_tva17_tva10 = 0x00;
-
-	switch ((sel >> 10) & 0xf)
-	{
-	case 0x0:
-	case 0x1:
-	case 0xc:
-	case 0xd:
-		vbank_tva17_tva10 = (m_ppu->get_201x_reg(0x6) & 0xfe) | ((addr & 0x0400) ? 1 : 0);
-		break;
-
-	case 0x2:
-	case 0x3:
-	case 0xe:
-	case 0xf:
-		vbank_tva17_tva10 = (m_ppu->get_201x_reg(0x7) & 0xfe) | ((addr & 0x0400) ? 1 : 0);
-		break;
-
-	case 0x4:
-	case 0x8:
-		vbank_tva17_tva10 = m_ppu->get_201x_reg(0x2);
-		break;
-
-	case 0x5:
-	case 0x9:
-		vbank_tva17_tva10 = m_ppu->get_201x_reg(0x3);
-		break;
-
-	case 0x6:
-	case 0xa:
-		vbank_tva17_tva10 = m_ppu->get_201x_reg(0x4);
-		break;
-
-	case 0x7:
-	case 0xb:
-		vbank_tva17_tva10 = m_ppu->get_201x_reg(0x5);
-		break;
-
-	}
-
-	/*
-	Calculating VA17 - VA10 (requires TVA17-TVA10 to have been calculated)
-
-	------------------------------------------------------------------------------
-	|  VB0S[2:0] |   VA[17:10]                                                   |
-	| 201a & 0x7 |  VA17 |  VA16 |  VA15 |  VA14 |  VA13 |  VA12 |  VA11 |  VA10 |
-	|-----------------------------------------------------------------------------
-	| 0x0        | TVA17 | TVA16 | TVA15 | TVA14 | TVA13 | TVA12 | TVA11 | TVA10 |
-	| 0x1        |  TV67 | TVA16 | TVA15 | TVA14 | TVA13 | TVA12 | TVA11 | TVA10 |
-	| 0x2        |  RV67 |  RV66 | TVA15 | TVA14 | TVA13 | TVA12 | TVA11 | TVA10 |
-	| 0x3        | INVALID ***************************************************** |
-	| 0x4        |  RV67 |  RV66 |  RV65 | TVA14 | TVA13 | TVA12 | TVA11 | TVA10 |
-	| 0x5        |  RV67 |  RV66 |  RV65 |  RV64 | TVA13 | TVA12 | TVA11 | TVA10 |
-	| 0x6        |  RV67 |  RV66 |  RV65 |  RV64 |  RV63 | TVA12 | TVA11 | TVA10 |
-	| 0x7        | INVALID ***************************************************** |
-	------------------------------------------------------------------------------
-
-	RV67- RV63 = 0x201a & 0xf8
-
-	*/
-
-	int va17_va10 = 0;
-
-	int swit = m_ppu->get_201x_reg(0xa);
-
-	switch (swit & 0x07)
-	{
-	case 0x0: va17_va10 = vbank_tva17_tva10; break;
-	case 0x1: va17_va10 = (vbank_tva17_tva10 & 0x7f) | (m_ppu->get_201x_reg(0xa) & 0x80); break;
-	case 0x2: va17_va10 = (vbank_tva17_tva10 & 0x3f) | (m_ppu->get_201x_reg(0xa) & 0xc0); break;
-	case 0x3: return -1;
-	case 0x4: va17_va10 = (vbank_tva17_tva10 & 0x1f) | (m_ppu->get_201x_reg(0xa) & 0xe0); break;
-	case 0x5: va17_va10 = (vbank_tva17_tva10 & 0x0f) | (m_ppu->get_201x_reg(0xa) & 0xf0); break;
-	case 0x6: va17_va10 = (vbank_tva17_tva10 & 0x07) | (m_ppu->get_201x_reg(0xa) & 0xf8); break;
-	case 0x7: return -1;
-	}
-
-	int va34 = m_ppu->get_va34();
-
-	if (!extended)
-	{
-		int is4bpp = 0;
-		if (readtype == 0) is4bpp = m_ppu->get_201x_reg(0x0) & 0x02;
-		else if (readtype == 1) is4bpp = m_ppu->get_201x_reg(0x0) & 0x04;
-
-		int va20_va18 = (m_ppu->get_201x_reg(0x8) & 0x70) >> 4;
-
-		finaladdr = ((m_410x[0x0] & 0x0F) << 21) | (va20_va18 << 18) | (va17_va10 << 10) | (addr & 0x03ff);
-
-		if (is4bpp)
-		{
-			if (!alt_order)
-			{
-				finaladdr = ((finaladdr & ~0xf) << 1) | (va34 << 4) | (finaladdr & 0xf);
-			}
-			else
-			{
-				finaladdr = (finaladdr << 1) | va34;
-			}
-		}
-	}
-	else
-	{
-		int eva2_eva0 = 0x00;
-		int is4bpp = 0;
-
-		switch (readtype)
-		{
-		case 0: // background display
-			is4bpp = m_ppu->get_201x_reg(0x0) & 0x02;
-
-			eva2_eva0 |= m_ppu->get_m_read_bg4_bg3();
-
-			if (m_ppu->get_201x_reg(0x1) & 0x02)
-			{
-				if (m_410x[0x6] & 0x1) eva2_eva0 |= 0x4;
-			}
-			else
-			{
-				if (m_ppu->get_201x_reg(0x8) & 0x08) eva2_eva0 |= 0x4;
-			}
-			break;
-
-		case 1: // sprite display
-			is4bpp = m_ppu->get_201x_reg(0x0) & 0x04; // 16 colors or 16-pixel wide (both adjust the read)
-
-			eva2_eva0 |= m_ppu->get_speva2_speva0();
-
-			break;
-
-		case 2: // CPU R/W access
-			// todo
-			break;
-		}
-
-		finaladdr = ((m_410x[0x0] & 0x0f) << 21) | (va17_va10 << 13) | (eva2_eva0 << 10) | (addr & 0x03ff);
-
-		if (is4bpp)
-		{
-			if (!alt_order)
-			{
-				finaladdr = ((finaladdr & ~0xf) << 1) | (va34 << 4) | (finaladdr & 0xf);
-			}
-			else
-			{
-				finaladdr = (finaladdr << 1) | va34;
-			}
-
-		}
-	}
-	return /*m_ahigh |*/ finaladdr;
-}
-
-/*
-   nes_vt_state::vt03_8000_mapper_w notes
-
-     used for MMC3/other mapper compatibility
-     some consoles have scrambled registers for crude copy protection
-
-	is this always there with VT based games? it maps where mappers would be on a NES cartridge
-	but then seems to be able to alter internal state of extended PPU registers, which is awkward
-*/
-
-void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data)
-{
-	offset &= 0x7fff;
-
-	uint16_t addr = m_real_access_address; // we need the actual write address, not the translated one, to keep bittboy happy
-	if ((m_411d & 0x01) && (m_411d & 0x03))
-	{
-		//CNROM compat
-		logerror("%s: vtxx_cnrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
-		m_ppu->set_201x_reg(0x6, data * 8);
-		m_ppu->set_201x_reg(0x7, data * 8 + 2);
-		m_ppu->set_201x_reg(0x2, data * 8 + 4);
-		m_ppu->set_201x_reg(0x3, data * 8 + 5);
-		m_ppu->set_201x_reg(0x4, data * 8 + 6);
-		m_ppu->set_201x_reg(0x5, data * 8 + 7);
-
-	}
-	else if (m_411d & 0x01)
-	{
-		//MMC1 compat, TODO
-		logerror("%s: vtxx_mmc1_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
-
-	}
-	else if (m_411d & 0x02)
-	{
-		//UNROM compat
-		logerror("%s: vtxx_unrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
-
-		m_410x[0x7] = ((data & 0x0F) << 1);
-		m_410x[0x8] = ((data & 0x0F) << 1) + 1;
-		update_banks();
-	}
-	else
-	{
-		//logerror("%s: vtxx_mmc3_8000_w real address: (%04x) translated address: (%04x) %02x\n",  machine().describe_context(), addr, offset+0x8000, data );
-
-		//MMC3 compat
-		if ((addr < 0xA000) && !(addr & 0x01))
-		{
-			logerror("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (banking)\n",  machine().describe_context(), addr, offset + 0x8000, data);
-			// Bank select
-			m_8000_addr_latch = data & 0x07;
-			// Bank config
-			m_410x[0x05] = data & ~(1 << 5);
-			update_banks();
-		}
-		else if ((addr < 0xA000) && (addr & 0x01))
-		{
-			logerror("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (other scrambled stuff)\n",  machine().describe_context(), addr, offset + 0x8000, data);
-
-			switch (m_410x[0x05] & 0x07)
-			{
-			case 0x00:
-				m_ppu->set_201x_reg(m_8000_scramble[0], data);
-				break;
-
-			case 0x01:
-				m_ppu->set_201x_reg(m_8000_scramble[1], data);
-				break;
-
-			case 0x02: // hand?
-				m_ppu->set_201x_reg(m_8000_scramble[2], data);
-				break;
-
-			case 0x03: // dog?
-				m_ppu->set_201x_reg(m_8000_scramble[3], data);
-				break;
-
-			case 0x04: // ball thrown
-				m_ppu->set_201x_reg(m_8000_scramble[4], data);
-				break;
-
-			case 0x05: // ball thrown
-				m_ppu->set_201x_reg(m_8000_scramble[5], data);
-				break;
-			case 0x06:
-				m_410x[m_8000_scramble[6]] = data;
-				//m_410x[0x9] = data;
-				update_banks();
-				break;
-
-			case 0x07:
-				m_410x[m_8000_scramble[7]] = data;
-				update_banks();
-				break;
-			}
-		}
-		else if ((addr >= 0xA000) && (addr < 0xC000) && !(addr & 0x01))
-		{
-			// Mirroring
-			m_410x[0x6] &= 0xFE;
-			m_410x[0x6] |= data & 0x01;
-		}
-		else if ((addr >= 0xA000) && (addr < 0xC000) && (addr & 0x01))
-		{
-			// PRG RAM control, ignore
-		}
-		else if ((addr >= 0xC000) && (addr < 0xE000) && !(addr & 0x01))
-		{
-			// IRQ latch
-			vt03_410x_w(space, 1, data);
-		}
-		else if ((addr >= 0xC000) && (addr < 0xE000) && (addr & 0x01))
-		{
-			// IRQ reload
-			vt03_410x_w(space, 2, data);
-		}
-		else if ((addr >= 0xE000) && !(addr & 0x01))
-		{
-			// IRQ disable
-			vt03_410x_w(space, 3, data);
-		}
-		else if ((addr >= 0xE000) && (addr & 0x01))
-		{
-			// IRQ enable
-			vt03_410x_w(space, 4, data);
-		}
-		else
-		{
-
-		}
-	}
-}
-
-// MMC3 compatibility mode
-
-void nes_vt_state::set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7)
-{
-	m_8000_scramble[0] = reg0; // TODO: name the regs
-	m_8000_scramble[1] = reg1;
-	m_8000_scramble[2] = reg2;
-	m_8000_scramble[3] = reg3;
-	m_8000_scramble[4] = reg4;
-	m_8000_scramble[5] = reg5;
-	m_8000_scramble[6] = reg6;
-	m_8000_scramble[7] = reg7;
-}
-
-void nes_vt_state::set_410x_scramble(uint8_t reg0, uint8_t reg1)
-{
-	m_410x_scramble[0] = reg0; // TODO: name the regs
-	m_410x_scramble[1] = reg1;
-}
-
-WRITE8_MEMBER(nes_vt_state::vt03_8000_mapper_w)
-{
-	scrambled_8000_w(space, offset, data);
-	//logerror("%s: vt03_8000_mapper_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
-}
-
-/* APU plumbing, this is because we have a plain M6502 core in the VT03, otherwise this is handled in the core */
-
-READ8_MEMBER(nes_vt_state::psg1_4014_r)
-{
-	//return m_apu->read(0x14);
-	return 0x00;
-}
-
-READ8_MEMBER(nes_vt_state::psg1_4015_r)
-{
-	return m_apu->read(0x15);
-}
-
-WRITE8_MEMBER(nes_vt_state::psg1_4015_w)
-{
-	m_apu->write(0x15, data);
-}
-
-WRITE8_MEMBER(nes_vt_state::psg1_4017_w)
-{
-	m_apu->write(0x17, data);
-}
-
-// early units (VT03?) have a DMA bug in NTSC mode
-WRITE8_MEMBER(nes_vt_state::vt_dma_w)
-{
-	do_dma(data, true);
-}
-
-// later units (VT09?) don't appear to have the NTSC DMA bug? (or something else is incorrectly compensating for it in our emulation)
-WRITE8_MEMBER(nes_vt_state::vt_fixed_dma_w)
-{
-	do_dma(data, false);
-}
-
-
-void nes_vt_state::do_dma(uint8_t data, bool has_ntsc_bug)
-{
-	// only NTSC systems have 'broken' DMA which requires the DMA addresses to be shifted by 1, PAL systems work as expected
-	if (m_ppu->get_is_pal())
-		has_ntsc_bug = false;
-
-	uint8_t dma_mode = m_vdma_ctrl & 0x01;
-	uint8_t dma_len = (m_vdma_ctrl >> 1) & 0x07;
-	uint8_t src_nib_74 = (m_vdma_ctrl >> 4) & 0x0F;
-
-	int length = 256;
-	switch (dma_len)
-	{
-	case 0x0: length = 256; break;
-	case 0x4: length = 16; break;
-	case 0x5: length = 32; break;
-	case 0x6: length = 64; break;
-	case 0x7: length = 128; break;
-	}
-
-	uint16_t src_addr = (data << 8) | (src_nib_74 << 4);
-	logerror("vthh dma start ctrl=%02x addr=%04x\n", m_vdma_ctrl, src_addr);
-
-	if (dma_mode == 1)
-	{
-		logerror("vdma dest %04x\n", m_ppu->get_vram_dest());
-	}
-
-	if (has_ntsc_bug && (dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F00) && !(m_ppu->get_201x_reg(0x1) & 0x80))
-	{
-		length -= 1;
-		src_addr += 1;
-	}
-	else if ((dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F01) && !(m_ppu->get_201x_reg(0x1) & 0x80))
-	{
-		// Legacy mode for DGUN-2573 compat
-		m_ppu->set_vram_dest(0x3F00);
-		m_ppu->set_palette_mode(PAL_MODE_VT0x);
-	}
-
-	for (int i = 0; i < length; i++)
-	{
-		uint8_t spriteData = m_maincpu->space(AS_PROGRAM).read_byte(src_addr + i);
-		if (dma_mode)
-		{
-			m_maincpu->space(AS_PROGRAM).write_byte(0x2007, spriteData);
-		}
-		else
-		{
-			m_maincpu->space(AS_PROGRAM).write_byte(0x2004, spriteData);
-		}
-		//if(((src_addr + i) & 0xFF) == length && (i != 0)) break;
-	}
-
-	// should last (length * 4 - 1) CPU cycles.
-	//((device_t*)m_maincpu)->execute().adjust_icount(-(length * 4 - 1));
-}
-
-
-WRITE8_MEMBER(nes_vt_state::vt03_4034_w)
-{
-	logerror("vt03_4034_w %02x\n", data);
-	m_vdma_ctrl = data;
-}
-
-WRITE8_MEMBER(nes_vt_state::extra_io_control_w)
-{
-	/*
-	410d Extra I/O control
-
-	0x01 Extra I/O port 0 mode (1 = output, 0 = input)
-	0x02 Extra I/O port 0 enable (1 = enable, 0 = disable)
-	0x04 Extra I/O port 1 mode (1 = output, 0 = input)
-	0x08 Extra I/O port 1 enable (1 = enable, 0 = disable)
-	0x10 Extra I/O port 2 mode (1 = output, 0 = input)
-	0x20 Extra I/O port 2 enable (1 = enable, 0 = disable)
-	0x40 Extra I/O port 3 mode (1 = output, 0 = input)
-	0x80 Extra I/O port 3 enable (1 = enable, 0 = disable)
-	*/
-
-	logerror("%s: extra_io_control_w %02x\n", machine().describe_context(), data);
-}
-
-READ8_MEMBER(nes_vt_state::extrain_01_r)
-{
-	// TODO: check status of 410d port to make sure we only read from enabled ports
-	uint8_t in0 = 0x00, in1 = 0x00;
-	if (m_exin0)
-		in0 = m_exin0->read() & 0x0f;
-	if (m_exin1)
-		in1 = m_exin1->read() & 0x0f;
-
-	return in0 | (in1<<4);
-}
-
-READ8_MEMBER(nes_vt_state::extrain_23_r)
-{
-	// TODO: check status of 410d port to make sure we only read from enabled ports
-	uint8_t in2 = 0x00, in3 = 0x00;
-	if (m_exin2)
-		in2 = m_exin2->read() & 0x0f;
-	if (m_exin3)
-		in3 = m_exin3->read() & 0x0f;
-
-	return in2 | (in3<<4);
-}
-
-WRITE8_MEMBER(nes_vt_state::extraout_01_w)
-{
-	// TODO: use callbacks for this as output can be hooked up to anything
-	logerror("%s: extraout_01_w %02x\n", machine().describe_context(), data);
-}
-
-WRITE8_MEMBER(nes_vt_state::extraout_23_w)
-{
-	// TODO: use callbacks for this as output can be hooked up to anything
-	logerror("%s: extraout_23_w %02x\n", machine().describe_context(), data);
-}
-
-READ8_MEMBER(nes_vt_state::rs232flags_region_r)
-{
-	/*
-	0x4119 RS232 Flags + Region
-
-	0x01 - RX bit 8
-	0x02 - RERFF (error status)
-	0x04 - unused
-	0x08 - XPORN (PAL = 1 NTSC = 0)
-	0x10 - XF5OR6 (50hz = 1 60hz = 0)
-	0x20 - RINGF (receive status)
-	0x40 - TIFLAG (completed sending data status)
-	0x80 - RIFLAG (completed receiving data status)
-	*/
-	uint8_t ret = 0x00;
-
-	// Palette DMA is buggy on NTSC systems (at least for regular VT03)
-	// so the palette DMA writes will change based on the reading of these flags
-
-	ret |= m_ppu->get_is_pal() ? 0x08 : 0x00;
-	ret |= m_ppu->get_is_50hz() ? 0x10 : 0x00;
-
-	return ret;
 }
 
 void nes_vt_ablpinb_state::machine_start()
@@ -1890,35 +945,6 @@ WRITE8_MEMBER(nes_vt_sudoku_state::in0_w)
 
 void nes_vt_state::nes_vt_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram();
-	// ddrdismx relies on the mirroring
-	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                      /* standard PPU registers */
-	map(0x2010, 0x201f).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));   /* extra VT PPU registers */
-
-	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
-	map(0x4014, 0x4014).r(FUNC(nes_vt_state::psg1_4014_r)).w(FUNC(nes_vt_state::vt_dma_w));
-	map(0x4015, 0x4015).rw(FUNC(nes_vt_state::psg1_4015_r), FUNC(nes_vt_state::psg1_4015_w)); /* PSG status / first control register */
-	map(0x4016, 0x4016).rw(FUNC(nes_vt_state::in0_r), FUNC(nes_vt_state::in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt_state::in1_r)).w(FUNC(nes_vt_state::psg1_4017_w));
-
-	map(0x4034, 0x4034).w(FUNC(nes_vt_state::vt03_4034_w));
-
-	map(0x4100, 0x410b).r(FUNC(nes_vt_state::vt03_410x_r)).w(FUNC(nes_vt_state::vt03_410x_w));
-	// 0x410c unused
-	map(0x410d, 0x410d).w(FUNC(nes_vt_state::extra_io_control_w));
-	map(0x410e, 0x410e).rw(FUNC(nes_vt_state::extrain_01_r), FUNC(nes_vt_state::extraout_01_w));
-	map(0x410f, 0x410f).rw(FUNC(nes_vt_state::extrain_23_r), FUNC(nes_vt_state::extraout_23_w));
-	// 0x4114 RS232 timer (low)
-	// 0x4115 RS232 timer (high)
-	// 0x4116 unused
-	// 0x4117 unused
-	// 0x4118 unused
-	map(0x4119, 0x4119).r(FUNC(nes_vt_state::rs232flags_region_r));
-	// 0x411a RS232 TX data
-	// 0x411b RS232 RX data
-
-	map(0x8000, 0xffff).rw(FUNC(nes_vt_state::external_space_read), FUNC(nes_vt_state::external_space_write));
-	map(0x6000, 0x7fff).ram();
 }
 
 /* Some later VT models have more RAM */
@@ -1954,12 +980,13 @@ void nes_vt_cy_state::nes_vt_bt_map(address_map &map)
 
 void nes_vt_hh_state::nes_vt_hh_map(address_map &map)
 {
+	/*
 	map(0x0000, 0x1fff).mask(0x0fff).ram();
-	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                      /* standard PPU registers */
-	map(0x2010, 0x201f).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));   /* extra VT PPU registers */
+	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                
+	map(0x2010, 0x201f).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));   
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
-	map(0x4015, 0x4015).rw(FUNC(nes_vt_hh_state::psg1_4015_r), FUNC(nes_vt_hh_state::psg1_4015_w)); /* PSG status / first control register */
+	map(0x4015, 0x4015).rw(FUNC(nes_vt_hh_state::psg1_4015_r), FUNC(nes_vt_hh_state::psg1_4015_w));
 	map(0x4016, 0x4016).rw(FUNC(nes_vt_hh_state::in0_r), FUNC(nes_vt_hh_state::in0_w));
 	map(0x4017, 0x4017).r(FUNC(nes_vt_hh_state::in1_r)).w(FUNC(nes_vt_hh_state::psg1_4017_w));
 
@@ -1975,12 +1002,13 @@ void nes_vt_hh_state::nes_vt_hh_map(address_map &map)
 	map(0x411d, 0x411d).w(FUNC(nes_vt_hh_state::vtfp_411d_w));
 
 	map(0x6000, 0x7fff).ram();
+	*/
 }
 
 void nes_vt_hh_state::nes_vt_hh_baddma_map(address_map &map)
 {
 	nes_vt_hh_map(map);
-	map(0x4014, 0x4014).w(FUNC(nes_vt_hh_state::vt_dma_w));
+	// TODO map(0x4014, 0x4014).w(FUNC(nes_vt_hh_state::vt_dma_w));
 }
 
 
@@ -2004,12 +1032,13 @@ void nes_vt_hh_state::nes_vt_fp_map(address_map &map)
 
 void nes_vt_dg_state::nes_vt_dg_map(address_map &map)
 {
+	/*
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                      /* standard PPU registers */
-	map(0x2010, 0x201f).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));   /* extra VT PPU registers */
+	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                     
+	map(0x2010, 0x201f).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended)); 
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
-	map(0x4015, 0x4015).rw(FUNC(nes_vt_dg_state::psg1_4015_r), FUNC(nes_vt_dg_state::psg1_4015_w)); /* PSG status / first control register */
+	map(0x4015, 0x4015).rw(FUNC(nes_vt_dg_state::psg1_4015_r), FUNC(nes_vt_dg_state::psg1_4015_w)); 
 	map(0x4016, 0x4016).rw(FUNC(nes_vt_dg_state::in0_r), FUNC(nes_vt_dg_state::in0_w));
 	map(0x4017, 0x4017).r(FUNC(nes_vt_dg_state::in1_r)).w(FUNC(nes_vt_dg_state::psg1_4017_w));
 
@@ -2022,12 +1051,13 @@ void nes_vt_dg_state::nes_vt_dg_map(address_map &map)
 	map(0x4034, 0x4034).w(FUNC(nes_vt_dg_state::vt03_4034_w));
 	map(0x4014, 0x4014).r(FUNC(nes_vt_dg_state::psg1_4014_r)).w(FUNC(nes_vt_dg_state::vt_fixed_dma_w));
 	map(0x6000, 0x7fff).ram();
+	*/
 }
 
 void nes_vt_dg_state::nes_vt_dg_baddma_map(address_map& map)
 {
 	nes_vt_dg_map(map);
-	map(0x4014, 0x4014).w(FUNC(nes_vt_hh_state::vt_dma_w));
+	// TODO map(0x4014, 0x4014).w(FUNC(nes_vt_hh_state::vt_dma_w));
 }
 
 void nes_vt_dg_state::nes_vt_fa_map(address_map &map)
@@ -2039,15 +1069,7 @@ void nes_vt_dg_state::nes_vt_fa_map(address_map &map)
 }
 
 
-WRITE_LINE_MEMBER(nes_vt_state::apu_irq)
-{
-//  set_input_line(N2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-READ8_MEMBER(nes_vt_state::apu_read_mem)
-{
-	return 0x00;//mintf->program->read_byte(offset);
-}
+#if 0
 
 /* not strictly needed, but helps us see where things are in ROM to aid with figuring out banking schemes*/
 static const gfx_layout helper_layout =
@@ -2076,10 +1098,11 @@ static GFXDECODE_START( vt03_gfx_helper )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_layout,  0x0, 2  )
 	GFXDECODE_ENTRY( "mainrom", 0, helper2_layout,  0x0, 2  )
 GFXDECODE_END
+#endif
 
 uint32_t nes_vt_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-	return m_ppu->screen_update(screen, bitmap, cliprect);
+	return 0;// m_ppu->screen_update(screen, bitmap, cliprect);
 }
 
 void nes_vt_state::nes_vt_base(machine_config &config)
@@ -2088,241 +1111,319 @@ void nes_vt_state::nes_vt_base(machine_config &config)
 	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_32mbyte);
 
-	M6502_VTSCR(config, m_maincpu, NTSC_APU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_map);
+//	M6502_VTSCR(config, m_maincpu, NTSC_APU_CLOCK);
+//	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60.0988);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) *
-							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
-	m_screen->set_size(32*8, 262);
-	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(nes_vt_state::screen_update));
+//	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//	m_screen->set_refresh_hz(60.0988);
+//	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) *
+//							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
+//	m_screen->set_size(32*8, 262);
+//	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+//	m_screen->set_screen_update(FUNC(nes_vt_state::screen_update));
 
-	GFXDECODE(config, "gfxdecode", "ppu", vt03_gfx_helper);
+//	GFXDECODE(config, "gfxdecode", "ppu", vt03_gfx_helper);
 
-	PPU_VT03(config, m_ppu, N2A03_NTSC_XTAL);
-	m_ppu->set_cpu_tag(m_maincpu);
-	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_ppu->read_bg().set(FUNC(nes_vt_state::chr_r));
-	m_ppu->read_sp().set(FUNC(nes_vt_state::spr_r));
-	m_ppu->set_screen(m_screen);
+//	PPU_VT03(config, m_ppu, N2A03_NTSC_XTAL);
+//	m_ppu->set_cpu_tag(m_maincpu);
+//	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+//	m_ppu->read_bg().set(FUNC(nes_vt_state::chr_r));
+//	m_ppu->read_sp().set(FUNC(nes_vt_state::spr_r));
+//	m_ppu->set_screen(m_screen);
 
-	ADDRESS_MAP_BANK(config, m_vt_external_space); 
-	m_vt_external_space->set_options(ENDIANNESS_NATIVE, 8, 25, 0x2000000);
+//	ADDRESS_MAP_BANK(config, m_vt_external_space); 
+//	m_vt_external_space->set_options(ENDIANNESS_NATIVE, 8, 25, 0x2000000);
 //	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_32mbyte); // no default map, set according to the ROM size and other things so mirroring works
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
+//	SPEAKER(config, "mono").front_center();
 
 	/* this should actually be a custom *almost* doubled up APU, however requires more thought
 	   than just using 2 APUs as registers in the 2nd one affect the PCM channel mode but the
 	   DMA control still comes from the 1st, but in the new mode, sound always outputs via the
 	   2nd.  Probably need to split the APU into interface and sound gen logic. */
-	NES_APU(config, m_apu, NTSC_APU_CLOCK);
-	m_apu->irq().set(FUNC(nes_vt_state::apu_irq));
-	m_apu->mem_read().set(FUNC(nes_vt_state::apu_read_mem));
-	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
+//	NES_APU(config, m_apu, NTSC_APU_CLOCK);
+	//m_apu->irq().set(FUNC(nes_vt_state::apu_irq));
+	//m_apu->mem_read().set(FUNC(nes_vt_state::apu_read_mem));
+//	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void nes_vt_state::nes_vt_base_pal(machine_config &config)
 {
+	
 	nes_vt_base(config);
-
+	/*
 	m_maincpu->set_clock(PALC_APU_CLOCK);
 
 	PPU_VT03PAL(config.replace(), m_ppu, N2A03_PAL_XTAL);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_ppu->read_bg().set(FUNC(nes_vt_state::chr_r));
-	m_ppu->read_sp().set(FUNC(nes_vt_state::spr_r));
+//	m_ppu->read_bg().set(FUNC(nes_vt_state::chr_r));
+//	m_ppu->read_sp().set(FUNC(nes_vt_state::spr_r));
 	m_ppu->set_screen(m_screen);
 
-	/* video hardware */
 	m_screen->set_refresh_hz(50.0070);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66 / (PALC_APU_CLOCK.dvalue() / 1000000)) *
 		(ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL - ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC + 1 + 2)));
 	m_screen->set_size(32 * 8, 312);
 	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
+	*/
 }
 
 
 
 void nes_vt_sudoku_state::nes_vt_sudoku_512kb(machine_config &config)
 {
+
 	nes_vt_base(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_sudoku_state::vt_external_space_map_512kbyte);
+	*/
 }
 
 void nes_vt_vg_1mb_majgnc_state::nes_vt_vg_1mb_majgnc(machine_config &config)
 {
 	nes_vt_base(config);
+	/*
+
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
 	m_vt_external_space->set_map(&nes_vt_vg_1mb_majgnc_state::vt_external_space_map_1mbyte);
+	*/
 }
 
 void nes_vt_state::nes_vt(machine_config &config)
 {
+
 	nes_vt_base(config);
+	/*
+	*/
 }
 
 
 void nes_vt_state::nes_vt_512kb(machine_config& config)
 {
+
 	nes_vt(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_512kbyte);
+	*/
 }
 
 void nes_vt_state::nes_vt_1mb(machine_config& config)
 {
+
 	nes_vt(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_1mbyte);
+	*/
 }
 
 void nes_vt_state::nes_vt_2mb(machine_config& config)
 {
 	nes_vt(config);
-	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_2mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_2mbyte);
 }
 
 void nes_vt_state::nes_vt_4mb(machine_config& config)
 {
+
 	nes_vt(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_2mbyte);
+	*/
 }
 
 void nes_vt_state::nes_vt_8mb(machine_config& config)
 {
+
 	nes_vt(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_8mbyte);
+	*/
 }
 
 void nes_vt_state::nes_vt_16mb(machine_config& config)
 {
+
 	nes_vt(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_16mbyte);
+	*/
 }
 
 void nes_vt_state::nes_vt_32mb(machine_config& config)
 {
+
 	nes_vt(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_32mbyte);
+	*/
 }
 
 
 void nes_vt_state::nes_vt_pal(machine_config &config)
 {
+
 	nes_vt_base_pal(config);
+	/*
+	*/
 }
 
 void nes_vt_state::nes_vt_pal_2mb(machine_config& config)
 {
+
 	nes_vt_pal(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_2mbyte);
+	*/
 }
 
 void nes_vt_state::nes_vt_pal_4mb(machine_config& config)
 {
+
 	nes_vt_pal(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_4mbyte);
+	*/
 }
 
 void nes_vt_state::nes_vt_pal_8mb(machine_config& config)
 {
+
 	nes_vt_pal(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_8mbyte);
+	*/
 }
 
 void nes_vt_waixing_state::machine_reset()
 {
+
 	nes_vt_state::machine_reset();
+	/*
 	m_ppu->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4); // reasonable
+	*/
 }
 
 void nes_vt_waixing_alt_state::machine_reset()
 {
+
 	nes_vt_waixing_state::machine_reset();
-	set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
+	/*
+	// TODO set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
+	*/
 }
 
 void nes_vt_hum_state::machine_reset()
 {
 	nes_vt_state::machine_reset();
 
+	/*
 	m_ppu->set_201x_descramble(0x7, 0x6, 0x5, 0x4, 0x2, 0x3);
-	set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
+	// TODO set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
+	*/
 }
 
 void nes_vt_pjoy_state::machine_reset()
 {
 	nes_vt_state::machine_reset();
 
+	/*
 	m_ppu->set_201x_descramble(0x2, 0x3, 0x4, 0x5, 0x6, 0x7);
-	set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x8, 0x7);
-	set_410x_scramble(0x8, 0x7);
+	// TODO set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x8, 0x7);
+	// TODO set_410x_scramble(0x8, 0x7);
+	*/
 }
 
 void nes_vt_sp69_state::machine_reset()
 {
 	nes_vt_state::machine_reset();
 
+	/*
 	m_ppu->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
-	set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
+	// TODO set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
+	*/
 }
 
 void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
 {
+
 	nes_vt(config);
+	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::nes_vt_ablping_map);
 	m_vt_external_space->set_map(&nes_vt_ablping_state::vt_external_space_map_2mbyte);
+	*/
 }
 
 void nes_vt_state::nes_vt_4k_ram(machine_config &config)
 {
+
 	nes_vt(config);
+	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_4k_ram_map);
+	*/
 }
 
 void nes_vt_state::nes_vt_4k_ram_16mb(machine_config &config)
 {
+
 	nes_vt(config);
+	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_4k_ram_map);
 	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_16mbyte);
+	*/
 }
 
 void nes_vt_state::nes_vt_4k_ram_pal(machine_config &config)
 {
+
 	nes_vt_base_pal(config);
+	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_4k_ram_map);
+	*/
 }
 
 void nes_vt_cy_state::nes_vt_cy(machine_config &config)
 {
+
 	nes_vt_4k_ram(config);
+	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::nes_vt_cy_map);
+	*/
 }
 
 void nes_vt_cy_state::nes_vt_cy_bigger(machine_config &config)
 {
+
 	nes_vt_cy(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_cy_state::vt_external_space_map_32mbyte); // must be some banking of this kind of VT can address over 32mb
+	*/
 }
 
 void nes_vt_cy_state::nes_vt_bt(machine_config &config)
 {
+
 	nes_vt_4k_ram(config);
+	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::nes_vt_bt_map);
+	*/
 }
 
 void nes_vt_cy_state::nes_vt_bt_2x16mb(machine_config& config)
 {
+
 	nes_vt_bt(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_cy_state::vt_external_space_map_bitboy_2x16mbyte);
+	*/
 }
 
 void nes_vt_dg_state::nes_vt_dg(machine_config &config)
 {
+
 	nes_vt_4k_ram(config);
+	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_dg_map);
 
 	m_screen->set_refresh_hz(50.0070);
@@ -2330,55 +1431,77 @@ void nes_vt_dg_state::nes_vt_dg(machine_config &config)
 							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
 	m_screen->set_size(32*8, 312);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	*/
 }
 
 void nes_vt_dg_state::nes_vt_dg_1mb(machine_config& config)
 {
+
 	nes_vt_dg(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_dg_state::vt_external_space_map_1mbyte);
+	*/
 }
 
 void nes_vt_dg_state::nes_vt_dg_baddma_16mb(machine_config& config)
 {
+
 	nes_vt_dg(config);
+	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_dg_baddma_map);
 	m_vt_external_space->set_map(&nes_vt_dg_state::vt_external_space_map_16mbyte);
+	*/
 }
 
 void nes_vt_hh_state::nes_vt_vg(machine_config &config)
 {
+
 	nes_vt_dg(config);
+	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_map);
 
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
+	*/
 }
 
 void nes_vt_hh_state::nes_vt_vg_8mb(machine_config& config)
 {
+
 	nes_vt_vg(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_8mbyte);
+	*/
 }
 
 void nes_vt_hh_state::nes_vt_vg_4mb(machine_config& config)
 {
+
 	nes_vt_vg(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_4mbyte);
+	*/
 }
 
 void nes_vt_hh_state::nes_vt_vg_16mb(machine_config& config)
 {
+
 	nes_vt_vg(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_16mbyte);
+	*/
 }
 
 void nes_vt_hh_state::nes_vt_vg_1mb_majkon(machine_config &config)
 {
+
 	nes_vt_dg(config);
+	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_baddma_map);
 
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
 
 	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_1mbyte);
+	*/
 
 }
 
@@ -2386,28 +1509,36 @@ void nes_vt_hh_state::nes_vt_vg_1mb_majkon(machine_config &config)
 // New mystery handheld architecture, VTxx derived
 void nes_vt_hh_state::nes_vt_hh(machine_config &config)
 {
+
 	nes_vt_4k_ram(config);
+	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_map);
 	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB);
 
-	/* video hardware */
 	m_screen->set_refresh_hz(50.0070);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
 							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
 	m_screen->set_size(32*8, 312);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	*/
 }
 
 void nes_vt_hh_state::nes_vt_hh_8mb(machine_config& config)
 {
+
 	nes_vt_hh(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_8mbyte);
+	*/
 }
 
 void nes_vt_hh_state::nes_vt_hh_4mb(machine_config& config)
 {
+
 	nes_vt_hh(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_4mbyte);
+	*/
 }
 
 static INPUT_PORTS_START( nes_vt )
@@ -2449,94 +1580,131 @@ INPUT_PORTS_END
 
 void nes_vt_hh_state::nes_vt_fp(machine_config &config)
 {
+
 	nes_vt_4k_ram(config);
+	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_fp_map);
 
 	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB12);
+	*/
 }
 
 void nes_vt_hh_state::nes_vt_fp_4x16mb(machine_config& config)
 {
+
 	nes_vt_fp(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_fp_2x32mbyte);
+	*/
 }
 
 void nes_vt_hh_state::nes_vt_fp_32mb(machine_config& config)
 {
+
 	nes_vt_fp(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_32mbyte);
+	*/
 }
 
 void nes_vt_hh_state::nes_vt_fp_bigger(machine_config& config)
 {
+
 	nes_vt_fp(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_32mbyte); // must be some kind of banking, or this VT can address > 32Mbyte
+	*/
 }
 
 void nes_vt_hh_state::nes_vt_fp_16mb(machine_config& config)
 {
+
 	nes_vt_fp(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_16mbyte);
+	*/
 }
 
 void nes_vt_hh_state::nes_vt_fp_pal(machine_config &config)
 {
+
 	nes_vt_4k_ram_pal(config);
+	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_fp_map);
 
 	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB12);
+	*/
 }
 
 void nes_vt_hh_state::nes_vt_fp_pal_32mb(machine_config& config)
 {
+
 	nes_vt_fp_pal(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_32mbyte);
+	*/
 }
 
 
 void nes_vt_dg_state::nes_vt_fa(machine_config &config)
 {
+
 	nes_vt_4k_ram(config);
+	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_fa_map);
+	*/
 }
 
 void nes_vt_dg_state::nes_vt_fa_4x16mb(machine_config& config)
 {
+
 	nes_vt_fa(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_dg_state::vt_external_space_map_fapocket_4x16mbyte);
+	*/
 }
 
 
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009(machine_config &config)
 {
-	nes_vt(config);
 
+	nes_vt(config);
+	/*
 	M6502_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::nes_vt_map);
 
 	//m_ppu->set_palette_mode(PAL_MODE_NEW_VG); // gives better title screens, but worse ingame, must be able to switch
+	*/
 }
 
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_4mb(machine_config& config)
 {
+
 	nes_vt_vh2009(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_swap_op_d5_d6_state::vt_external_space_map_4mbyte);
+	*/
 }
 
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_8mb(machine_config& config)
 {
+
 	nes_vt_vh2009(config);
+	/*
 	m_vt_external_space->set_map(&nes_vt_swap_op_d5_d6_state::vt_external_space_map_8mbyte);
+	*/
 }
 
 
 void nes_vt_swap_op_d5_d6_state::nes_vt_senwld_512kb(machine_config &config)
 {
+
 	nes_vt_vh2009(config);
-		
+	/*		
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
 
 	m_vt_external_space->set_map(&nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte);
+	*/
 }
 
 static INPUT_PORTS_START( nes_vt_fp )
