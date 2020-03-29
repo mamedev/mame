@@ -53,6 +53,7 @@ Year + Game             Main CPU  Sound CPU  Sound                         Video
 #include "cpu/z80/z80.h"
 #include "sound/3526intf.h"
 #include "sound/dac.h"
+#include "sound/sn76496.h"
 #include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
@@ -387,8 +388,8 @@ void fantland_state::wheelrun_sound_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
 
-	map(0xb000, 0xb000).nopw();    // on a car crash / hit
-	map(0xc000, 0xc000).nopw();    // ""
+	map(0xb000, 0xb000).w("sn1", FUNC(sn76489a_device::write));
+	map(0xc000, 0xc000).w("sn2", FUNC(sn76489a_device::write));
 
 	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read));    // during NMI
 }
@@ -984,10 +985,10 @@ void borntofi_state::borntofi(machine_config &config)
 void fantland_state::wheelrun(machine_config &config)
 {
 	/* basic machine hardware */
-	V20(config, m_maincpu, XTAL(18'000'000)/2);     // D701080C-8 (V20)
+	V20(config, m_maincpu, XTAL(18'000'000)/3);     // D701080C-8 (V20)
 	m_maincpu->set_addrmap(AS_PROGRAM, &fantland_state::wheelrun_map);
 
-	Z80(config, m_audiocpu, XTAL(18'000'000)/2);    // Z8400BB1 (Z80B)
+	Z80(config, m_audiocpu, XTAL(14'000'000)/4);    // Z8400BB1 (Z80B)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fantland_state::wheelrun_sound_map);
 	// IRQ by YM3526, NMI when soundlatch is written
 
@@ -1012,6 +1013,10 @@ void fantland_state::wheelrun(machine_config &config)
 	ym3526_device &ymsnd(YM3526(config, "ymsnd", XTAL(14'000'000)/4));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
+
+	SN76489A(config, "sn1", XTAL(14'000'000)/4).add_route(ALL_OUTPUTS, "speaker", 0.75);
+
+	SN76489A(config, "sn2", XTAL(14'000'000)/4).add_route(ALL_OUTPUTS, "speaker", 0.75);
 }
 
 
