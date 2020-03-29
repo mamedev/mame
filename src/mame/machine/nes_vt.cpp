@@ -17,7 +17,7 @@ nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, const char* 
 	m_screen(*this, "screen"),
 	m_ppu(*this, "ppu"),
 	m_apu(*this, "apu"),
-	m_program_space_config("program", ENDIANNESS_LITTLE, 8, 25, 0, address_map_constructor(FUNC(nes_vt_soc_device::program_map), this))
+	m_space_config("program", ENDIANNESS_LITTLE, 8, 25, 0, address_map_constructor(FUNC(nes_vt_soc_device::program_map), this))
 {
 }
 
@@ -25,15 +25,35 @@ void nes_vt_soc_device::device_start()
 {
 }
 
+READ8_MEMBER(nes_vt_soc_device::external_space_read)
+{
+	address_space& spc = this->space(AS_PROGRAM);
+	int bank = (offset & 0x6000) >> 13;
+	int address = (m_bankaddr[bank] * 0x2000) + (offset & 0x1fff);
+	m_real_access_address = offset + 0x8000;
+	return spc.read_byte(address);
+}
+
+WRITE8_MEMBER(nes_vt_soc_device::external_space_write)
+{
+	address_space& spc = this->space(AS_PROGRAM);
+	int bank = (offset & 0x6000) >> 13;
+	int address = (m_bankaddr[bank] * 0x2000) + (offset&0x1fff);
+	m_real_access_address = offset + 0x8000;
+	spc.write_byte(address, data);
+};
+
 void nes_vt_soc_device::nes_vt_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-/*
+
 	// ddrdismx relies on the mirroring
 	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                      // standard PPU registers
 	map(0x2010, 0x201f).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));  //  extra VT PPU registers
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
+
+	/*
 	map(0x4014, 0x4014).r(FUNC(nes_vt_state::psg1_4014_r)).w(FUNC(nes_vt_state::vt_dma_w));
 	map(0x4015, 0x4015).rw(FUNC(nes_vt_state::psg1_4015_r), FUNC(nes_vt_state::psg1_4015_w)); // PSG status / first control register
 	map(0x4016, 0x4016).rw(FUNC(nes_vt_state::in0_r), FUNC(nes_vt_state::in0_w));
@@ -54,10 +74,10 @@ void nes_vt_soc_device::nes_vt_map(address_map &map)
 	map(0x4119, 0x4119).r(FUNC(nes_vt_state::rs232flags_region_r));
 	// 0x411a RS232 TX data
 	// 0x411b RS232 RX data
-
-	map(0x8000, 0xffff).rw(FUNC(nes_vt_state::external_space_read), FUNC(nes_vt_state::external_space_write));
-	map(0x6000, 0x7fff).ram();
 	*/
+
+	map(0x8000, 0xffff).rw(FUNC(nes_vt_soc_device::external_space_read), FUNC(nes_vt_soc_device::external_space_write));
+	map(0x6000, 0x7fff).ram();
 }
 
 
@@ -149,6 +169,6 @@ uint32_t nes_vt_soc_device::screen_update(screen_device& screen, bitmap_rgb32& b
 device_memory_interface::space_config_vector nes_vt_soc_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_space_config)
+		std::make_pair(AS_PROGRAM, &m_space_config)
 	};
 }

@@ -38,10 +38,17 @@ protected:
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
 private:
-	const address_space_config m_program_space_config;
+
+	address_space_config        m_space_config;
 
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
 	DECLARE_READ8_MEMBER(apu_read_mem);
+
+	DECLARE_READ8_MEMBER(external_space_read);
+	DECLARE_WRITE8_MEMBER(external_space_write);
+
+	int m_bankaddr[4];
+	uint16_t m_real_access_address;
 
 };
 
