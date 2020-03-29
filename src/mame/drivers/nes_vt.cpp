@@ -37,7 +37,7 @@
                  same chipset used in Mogis M320, but uses more advanced feature set.
 
   (more)
-
+  
 
 
   todo (VT03):
@@ -91,23 +91,34 @@ public:
 		m_exin1(*this, "EXTRAIN1"),
 		m_exin2(*this, "EXTRAIN2"),
 		m_exin3(*this, "EXTRAIN3"),
-		m_prg(*this, "prg"),
+		m_vt_external_space(*this, "vt_ext_space"),
+		m_prgrom(*this, "mainrom"),
 		m_initial_e000_bank(0xff),
 		m_ntram(nullptr),
-		m_chrram(nullptr),
-		m_prgbank0(*this, "prg_bank0"),
-		m_prgbank1(*this, "prg_bank1"),
-		m_prgbank2(*this, "prg_bank2"),
-		m_prgbank3(*this, "prg_bank3"),
-		m_prgrom(*this, "mainrom")
+		m_chrram(nullptr)
 	{ }
 
 	void nes_vt_base(machine_config& config);
 	void nes_vt_base_pal(machine_config& config);
 
+	void nes_vt_pal(machine_config& config);
+	void nes_vt_pal_2mb(machine_config& config);
+	void nes_vt_pal_4mb(machine_config& config);
+	void nes_vt_pal_8mb(machine_config& config);
+
 	void nes_vt(machine_config& config);
+	void nes_vt_512kb(machine_config& config);
+	void nes_vt_1mb(machine_config& config);
+	void nes_vt_2mb(machine_config& config);
+	void nes_vt_4mb(machine_config& config);
+	void nes_vt_8mb(machine_config& config);
+	void nes_vt_16mb(machine_config& config);
+	void nes_vt_32mb(machine_config& config);
 
 	void nes_vt_4k_ram(machine_config& config);
+	void nes_vt_4k_ram_16mb(machine_config& config);
+
+
 	void nes_vt_4k_ram_pal(machine_config& config);
 
 	/* OneBus read callbacks for getting sprite and tile data during rendering */
@@ -155,7 +166,7 @@ protected:
 	DECLARE_READ8_MEMBER(vt03_410x_r);
 
 	/* Misc */
-	uint32_t m_ahigh;
+	uint32_t m_ahigh; // external banking bits
 	void update_banks();
 	uint8_t m_4242;
 	uint8_t m_411c;
@@ -168,7 +179,7 @@ protected:
 	void scrambled_410x_w(uint16_t offset, uint8_t data);
 	void scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(vt03_8000_w);
+	DECLARE_WRITE8_MEMBER(vt03_8000_mapper_w);
 	DECLARE_WRITE8_MEMBER(vt03_4034_w);
 
 	optional_ioport m_cartsel;
@@ -177,7 +188,8 @@ protected:
 	optional_ioport m_exin2;
 	optional_ioport m_exin3;
 
-	required_device<address_map_bank_device> m_prg;
+	required_device<address_map_bank_device> m_vt_external_space;
+	required_region_ptr<uint8_t> m_prgrom;
 
 	void nes_vt_4k_ram_map(address_map& map);
 
@@ -185,6 +197,21 @@ protected:
 	DECLARE_READ8_MEMBER(rs232flags_region_r);
 
 	uint8_t m_initial_e000_bank;
+
+	void vt_external_space_map_32mbyte(address_map& map);
+	void vt_external_space_map_16mbyte(address_map& map);
+	void vt_external_space_map_8mbyte(address_map& map);
+	void vt_external_space_map_4mbyte(address_map& map);
+	void vt_external_space_map_2mbyte(address_map& map);
+	void vt_external_space_map_1mbyte(address_map& map);
+	void vt_external_space_map_512kbyte(address_map& map);
+
+	DECLARE_READ8_MEMBER(vt_rom_r);
+	DECLARE_WRITE8_MEMBER(vtspace_w);
+
+	DECLARE_READ8_MEMBER(external_space_read) { int bank = (offset & 0x6000) >> 13; int address = (m_bankaddr[bank] * 0x2000) + (offset&0x1fff); m_real_access_address = offset + 0x8000; return m_vt_external_space->read8(address); };
+	DECLARE_WRITE8_MEMBER(external_space_write) { int bank = (offset & 0x6000) >> 13; int address = (m_bankaddr[bank] * 0x2000) + (offset&0x1fff); m_real_access_address = offset + 0x8000; m_vt_external_space->write8(address, data); };
+
 private:
 	/* APU handling */
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
@@ -224,20 +251,19 @@ private:
 	uint8_t m_8000_addr_latch;
 
 	/* banking etc. */
-	int m_romsize;
-	int m_numbanks;
 	uint32_t get_banks(uint8_t bnk);
 
 	int calculate_real_video_address(int addr, int extended, int readtype);
 
-	required_memory_bank m_prgbank0;
-	required_memory_bank m_prgbank1;
-	required_memory_bank m_prgbank2;
-	required_memory_bank m_prgbank3;
-	required_region_ptr<uint8_t> m_prgrom;
+	uint16_t m_real_access_address;
+
+
+	int m_bankaddr[4];
+
 
 	uint16_t decode_nt_addr(uint16_t addr);
 	void do_dma(uint8_t data, bool has_ntsc_bug);
+
 };
 
 class nes_vt_swap_op_d5_d6_state : public nes_vt_state
@@ -248,9 +274,13 @@ public:
 	{ }
 
 	void nes_vt_vh2009(machine_config& config);
-	void nes_vt_senwld(machine_config& config);
+	void nes_vt_vh2009_4mb(machine_config& config);
+	void nes_vt_vh2009_8mb(machine_config& config);
+
+	void nes_vt_senwld_512kb(machine_config& config);
 
 protected:
+	void vt_external_space_map_senwld_512kbyte(address_map& map);
 
 private:
 };
@@ -328,7 +358,7 @@ public:
 		nes_vt_sp69_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_ablping(machine_config& config);
+	void nes_vt_2mb_ablping(machine_config& config);
 
 private:
 	void nes_vt_ablping_map(address_map& map);
@@ -345,7 +375,14 @@ public:
 	{ }
 
 	void nes_vt_cy(machine_config& config);
+
+	void nes_vt_cy_bigger(machine_config& config);
+
+
 	void nes_vt_bt(machine_config& config);
+	void nes_vt_bt_2x16mb(machine_config& config);
+
+	void vt_external_space_map_bitboy_2x16mbyte(address_map& map);
 
 private:
 	void nes_vt_cy_map(address_map& map);
@@ -354,7 +391,7 @@ private:
 	DECLARE_WRITE8_MEMBER(vt03_41bx_w);
 	DECLARE_READ8_MEMBER(vt03_41bx_r);
 	DECLARE_WRITE8_MEMBER(vt03_411c_w);
-	DECLARE_WRITE8_MEMBER(vt03_412c_w);
+	DECLARE_WRITE8_MEMBER(vt03_412c_extbank_w);
 
 	DECLARE_WRITE8_MEMBER(vt03_48ax_w);
 	DECLARE_READ8_MEMBER(vt03_48ax_r);
@@ -363,6 +400,8 @@ private:
 	DECLARE_READ8_MEMBER(vt03_413x_r);
 	DECLARE_READ8_MEMBER(vt03_414f_r);
 	DECLARE_READ8_MEMBER(vt03_415c_r);
+
+	DECLARE_READ8_MEMBER(vt_rom_banked_r);
 };
 
 class nes_vt_cy_lexibook_state : public nes_vt_cy_state
@@ -395,19 +434,43 @@ public:
 	{ }
 
 	void nes_vt_dg(machine_config& config);
+	void nes_vt_dg_baddma_16mb(machine_config& config);
+	void nes_vt_dg_1mb(machine_config& config);
+
 	void nes_vt_fa(machine_config& config);
+	void nes_vt_fa_4x16mb(machine_config& config);
 
 protected:
 	DECLARE_WRITE8_MEMBER(vtfp_4242_w);
 
 private:
+	READ8_MEMBER(vt_rom_banked_r);
+	void vt_external_space_map_fapocket_4x16mbyte(address_map& map);
+
 	void nes_vt_dg_map(address_map& map);
+	void nes_vt_dg_baddma_map(address_map& map);
 	void nes_vt_fa_map(address_map& map);
 
 	DECLARE_READ8_MEMBER(vtfa_412c_r);
-	DECLARE_WRITE8_MEMBER(vtfa_412c_w);
+	DECLARE_WRITE8_MEMBER(vtfa_412c_extbank_w);
 	DECLARE_WRITE8_MEMBER(vt03_411c_w);
 };
+
+class nes_vt_dg_fapocket_state : public nes_vt_dg_state
+{
+public:
+	nes_vt_dg_fapocket_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_dg_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+};
+
+
+
 
 class nes_vt_hh_state : public nes_vt_dg_state
 {
@@ -417,19 +480,36 @@ public:
 	{ }
 
 	void nes_vt_hh(machine_config& config);
+	void nes_vt_hh_4mb(machine_config& config);
+	void nes_vt_hh_8mb(machine_config& config);
+
 	void nes_vt_vg(machine_config& config);
-	void nes_vt_vg_baddma(machine_config& config);
+	void nes_vt_vg_4mb(machine_config& config);
+	void nes_vt_vg_8mb(machine_config& config);
+	void nes_vt_vg_16mb(machine_config& config);
+
+
+	void nes_vt_vg_1mb_majkon(machine_config& config);
 	void nes_vt_fp(machine_config& config);
+	void nes_vt_fp_16mb(machine_config& config);
+	void nes_vt_fp_32mb(machine_config& config);
+	void nes_vt_fp_bigger(machine_config& config);
+	void nes_vt_fp_4x16mb(machine_config& config);
+
 	void nes_vt_fp_pal(machine_config& config);
+	void nes_vt_fp_pal_32mb(machine_config& config);
 
 private:
+	DECLARE_READ8_MEMBER(vt_rom_banked_r);
+	void vt_external_space_map_fp_2x32mbyte(address_map& map);
+
 	void nes_vt_hh_map(address_map& map);
 	void nes_vt_hh_baddma_map(address_map& map);
 	void nes_vt_fp_map(address_map& map);
 
 	DECLARE_WRITE8_MEMBER(vtfp_411e_w);
 	DECLARE_WRITE8_MEMBER(vtfp_4a00_w);
-	DECLARE_WRITE8_MEMBER(vtfp_412c_w);
+	DECLARE_WRITE8_MEMBER(vtfp_412c_extbank_w);
 	DECLARE_READ8_MEMBER(vtfp_412d_r);
 	DECLARE_READ8_MEMBER(vtfp_4119_r);
 
@@ -472,7 +552,7 @@ public:
 
 	void init_sudoku();
 
-	void nes_vt_sudoku(machine_config& config);
+	void nes_vt_sudoku_512kb(machine_config& config);
 
 protected:
 	//virtual void machine_start() override;
@@ -484,19 +564,105 @@ private:
 	virtual DECLARE_WRITE8_MEMBER(in0_w) override;
 };
 
-class nes_vt_majgnc_state : public nes_vt_state
+class nes_vt_vg_1mb_majgnc_state : public nes_vt_state
 {
 public:
-	nes_vt_majgnc_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt_vg_1mb_majgnc_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_majgnc(machine_config& config);
+	void nes_vt_vg_1mb_majgnc(machine_config& config);
 
 protected:
 
 private:
 };
+
+READ8_MEMBER(nes_vt_state::vt_rom_r)
+{
+	return m_prgrom[offset];
+}
+
+WRITE8_MEMBER(nes_vt_state::vtspace_w)
+{
+	logerror("%s: vtspace_w %08x : %02x", machine().describe_context(), offset, data);
+}
+
+// VTxx can address 25-bit address space (32MB of ROM) so use maps with mirroring in depending on ROM size
+void nes_vt_state::vt_external_space_map_32mbyte(address_map &map)
+{
+	map(0x0000000, 0x1ffffff).rw(FUNC(nes_vt_state::vt_rom_r), FUNC(nes_vt_state::vt03_8000_mapper_w));
+}
+
+void nes_vt_state::vt_external_space_map_16mbyte(address_map &map)
+{
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).rw(FUNC(nes_vt_state::vt_rom_r), FUNC(nes_vt_state::vt03_8000_mapper_w));
+}
+
+void nes_vt_state::vt_external_space_map_8mbyte(address_map &map)
+{
+	map(0x0000000, 0x07fffff).mirror(0x1800000).rw(FUNC(nes_vt_state::vt_rom_r), FUNC(nes_vt_state::vt03_8000_mapper_w));
+}
+
+void nes_vt_state::vt_external_space_map_4mbyte(address_map &map)
+{
+	map(0x0000000, 0x03fffff).mirror(0x1c00000).rw(FUNC(nes_vt_state::vt_rom_r), FUNC(nes_vt_state::vt03_8000_mapper_w));
+}
+
+void nes_vt_state::vt_external_space_map_2mbyte(address_map &map)
+{
+	map(0x0000000, 0x01fffff).mirror(0x1e00000).rw(FUNC(nes_vt_state::vt_rom_r), FUNC(nes_vt_state::vt03_8000_mapper_w));
+}
+
+void nes_vt_state::vt_external_space_map_1mbyte(address_map &map)
+{
+	map(0x0000000, 0x00fffff).mirror(0x1f00000).rw(FUNC(nes_vt_state::vt_rom_r), FUNC(nes_vt_state::vt03_8000_mapper_w));
+}
+
+void nes_vt_state::vt_external_space_map_512kbyte(address_map &map)
+{
+	map(0x0000000, 0x007ffff).mirror(0x1f80000).rw(FUNC(nes_vt_state::vt_rom_r), FUNC(nes_vt_state::vt03_8000_mapper_w));
+}
+
+// Win Lose Draw has RAM as well as ROM
+void nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte(address_map &map)
+{
+	map(0x0000000, 0x007ffff).rw(FUNC(nes_vt_swap_op_d5_d6_state::vt_rom_r), FUNC(nes_vt_swap_op_d5_d6_state::vtspace_w));
+	map(0x0100000, 0x010ffff).ram();
+	map(0x0180000, 0x01fffff).rw(FUNC(nes_vt_swap_op_d5_d6_state::vt_rom_r), FUNC(nes_vt_swap_op_d5_d6_state::vtspace_w));
+}
+
+// bitboy is 2 16Mbyte banks
+READ8_MEMBER(nes_vt_cy_state::vt_rom_banked_r)
+{
+	return m_prgrom[m_ahigh | offset];
+}
+
+void nes_vt_cy_state::vt_external_space_map_bitboy_2x16mbyte(address_map &map)
+{
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).rw(FUNC(nes_vt_cy_state::vt_rom_banked_r), FUNC(nes_vt_cy_state::vt03_8000_mapper_w));
+}
+
+// fapocket is 4 16Mbyte banks
+READ8_MEMBER(nes_vt_dg_state::vt_rom_banked_r)
+{
+	return m_prgrom[m_ahigh | offset];
+}
+
+void nes_vt_dg_state::vt_external_space_map_fapocket_4x16mbyte(address_map &map)
+{
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).rw(FUNC(nes_vt_dg_state::vt_rom_banked_r), FUNC(nes_vt_dg_state::vt03_8000_mapper_w));
+}
+
+READ8_MEMBER(nes_vt_hh_state::vt_rom_banked_r)
+{
+	return m_prgrom[m_ahigh | offset];
+}
+
+void nes_vt_hh_state::vt_external_space_map_fp_2x32mbyte(address_map &map)
+{
+	map(0x0000000, 0x1ffffff).rw(FUNC(nes_vt_hh_state::vt_rom_banked_r), FUNC(nes_vt_hh_state::vt03_8000_mapper_w));
+}
 
 /* Standard I/O handlers (NES Controller clone) */
 
@@ -585,7 +751,7 @@ uint32_t nes_vt_state::get_banks(uint8_t bnk)
 // 8000 needs to bank in 60000  ( bank 0x30 )
 void nes_vt_state::update_banks()
 {
-	uint32_t amod = m_ahigh >> 13;
+	//uint32_t amod = m_ahigh >> 13;
 
 	uint8_t bank;
 
@@ -600,11 +766,11 @@ void nes_vt_state::update_banks()
 	else
 		bank = 0xfe;
 
-	m_prgbank0->set_entry((amod | get_banks(bank)) & (m_numbanks - 1));
+	m_bankaddr[0] = ((/*amod |*/ get_banks(bank)) );
 
 	// a000-bfff
 	bank = m_410x[0x8];
-	m_prgbank1->set_entry((amod | get_banks(bank)) & (m_numbanks - 1));
+	m_bankaddr[1] = ((/*amod |*/ get_banks(bank)) );
 
 	// c000-dfff
 	if ((m_410x[0xb] & 0x40) != 0 || (m_410x[0x5] & 0x40) != 0)
@@ -617,11 +783,11 @@ void nes_vt_state::update_banks()
 	else
 		bank = 0xfe;
 
-	m_prgbank2->set_entry((amod | get_banks(bank)) & (m_numbanks - 1));
+	m_bankaddr[2] = ((/*amod |*/ get_banks(bank)) );
 
 	// e000 - ffff
 	bank = m_initial_e000_bank;
-	m_prgbank3->set_entry((amod | get_banks(bank)) & (m_numbanks - 1));
+	m_bankaddr[3] = ((/*amod |*/ get_banks(bank)) );
 }
 
 uint16_t nes_vt_state::decode_nt_addr(uint16_t addr)
@@ -766,18 +932,18 @@ WRITE8_MEMBER(nes_vt_cy_state::vt03_411c_w)
 	update_banks();
 }
 
-WRITE8_MEMBER(nes_vt_cy_state::vt03_412c_w)
+WRITE8_MEMBER(nes_vt_cy_state::vt03_412c_extbank_w)
 {
-	logerror("vt03_412c_w %02x\n", data);
+	// bittboy (ok), mc_pg150 (not working)
+	logerror("%s: vt03_412c_extbank_w %02x\n", machine().describe_context(),  data);
 	m_ahigh = (data & 0x04) ? (1 << 24) : 0x0;
-	update_banks();
 }
 
-WRITE8_MEMBER(nes_vt_hh_state::vtfp_412c_w)
+WRITE8_MEMBER(nes_vt_hh_state::vtfp_412c_extbank_w)
 {
-	logerror("vtfp_412c_w %02x\n", data);
+	// fcpocket
+	logerror("%s: vtfp_412c_extbank_w %02x\n", machine().describe_context(), data);
 	m_ahigh = (data & 0x01) ? (1 << 25) : 0x0;
-	update_banks();
 }
 
 WRITE8_MEMBER(nes_vt_dg_state::vtfp_4242_w)
@@ -788,20 +954,19 @@ WRITE8_MEMBER(nes_vt_dg_state::vtfp_4242_w)
 
 WRITE8_MEMBER(nes_vt_hh_state::vtfp_411d_w)
 {
+	// controls chram access and mapper emulation modes in later models
 	logerror("vtfp_411d_w  %02x\n", data);
 	m_411d = data;
 	update_banks();
 }
 
-WRITE8_MEMBER(nes_vt_dg_state::vtfa_412c_w)
+WRITE8_MEMBER(nes_vt_dg_state::vtfa_412c_extbank_w)
 {
-	logerror("vtfa_412c_w %02x\n", data);
+	// fapocket (ok?) (also uses bank from config switch for fake cartridge slot)
+	logerror("%s: vtfa_412c_extbank_w %02x\n", machine().describe_context(), data);
 	m_ahigh = 0;
 	m_ahigh |= (data & 0x01) ? (1 << 25) : 0x0;
 	m_ahigh |= (data & 0x02) ? (1 << 24) : 0x0;
-
-	//m_ahigh |= (m_cartsel->read() == 0x01) ? (1 << 25) : 0x0;
-	update_banks();
 }
 
 READ8_MEMBER(nes_vt_dg_state::vtfa_412c_r)
@@ -907,7 +1072,8 @@ READ8_MEMBER(nes_vt_state::spr_r)
 	else
 	{
 		int realaddr = calculate_real_video_address(offset, 0, 1);
-		return m_prgrom[realaddr & (m_romsize - 1)];
+
+		return m_vt_external_space->read8(realaddr);
 	}
 }
 
@@ -920,7 +1086,7 @@ READ8_MEMBER(nes_vt_state::chr_r)
 	else
 	{
 		int realaddr = calculate_real_video_address(offset, 1, 0);
-		return m_prgrom[realaddr & (m_romsize - 1)];
+		return m_vt_external_space->read8(realaddr);
 	}
 }
 
@@ -932,8 +1098,6 @@ WRITE8_MEMBER(nes_vt_state::chr_w)
 		logerror("vram write %04x %02x\n", offset, data);
 		m_chrram[offset] = data;
 	}
-	/*int realaddr = calculate_real_video_address(offset, 1, 0);
-	return m_prgrom[realaddr &  (m_romsize-1)];*/
 }
 
 WRITE8_MEMBER(nes_vt_hh_state::vtfp_411e_w)
@@ -1007,16 +1171,6 @@ WRITE8_MEMBER(nes_vt_state::nt_w)
 
 void nes_vt_state::machine_start()
 {
-	m_romsize = memregion("mainrom")->bytes();
-	m_numbanks = m_romsize / 0x2000;
-
-	m_prg->set_bank(0);
-
-	m_prgbank0->configure_entries(0, m_numbanks, &m_prgrom[0x00000], 0x2000);
-	m_prgbank1->configure_entries(0, m_numbanks, &m_prgrom[0x00000], 0x2000);
-	m_prgbank2->configure_entries(0, m_numbanks, &m_prgrom[0x00000], 0x2000);
-	m_prgbank3->configure_entries(0, m_numbanks, &m_prgrom[0x00000], 0x2000);
-
 	save_item(NAME(m_410x));
 	save_item(NAME(m_413x));
 
@@ -1065,11 +1219,6 @@ void nes_vt_state::machine_reset()
 	m_411d = 0x00;
 	m_4242 = 0x00;
 
-	if (m_cartsel)
-		m_ahigh = (m_cartsel->read() == 0x01) ? (1 << 25) : 0x0;
-	else
-		m_ahigh = 0;
-
 	m_timer_irq_enabled = 0;
 	m_timer_running = 0;
 	m_timer_val = 0;
@@ -1089,6 +1238,17 @@ void nes_vt_state::machine_reset()
 
 	m_410x_scramble[0x0] = 0x7;
 	m_410x_scramble[0x1] = 0x8;
+}
+
+void nes_vt_dg_fapocket_state::machine_reset()
+{
+	nes_vt_state::machine_reset();
+
+	// fapocket needs this, fcpocket instead reads the switch in software?
+	if (m_cartsel)
+		m_ahigh = (m_cartsel->read() == 0x01) ? (1 << 25) : 0x0;
+	else
+		m_ahigh = 0;
 }
 
 int nes_vt_state::calculate_real_video_address(int addr, int extended, int readtype)
@@ -1296,23 +1456,28 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 
 		}
 	}
-	return m_ahigh | finaladdr;
+	return /*m_ahigh |*/ finaladdr;
 }
 
 /*
-   nes_vt_state::vt03_8000_w notes
+   nes_vt_state::vt03_8000_mapper_w notes
 
      used for MMC3/other mapper compatibility
      some consoles have scrambled registers for crude copy protection
+
+	is this always there with VT based games? it maps where mappers would be on a NES cartridge
+	but then seems to be able to alter internal state of extended PPU registers, which is awkward
 */
 
 void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data)
 {
-	uint16_t addr = offset + 0x8000;
+	offset &= 0x7fff;
+
+	uint16_t addr = m_real_access_address; // we need the actual write address, not the translated one, to keep bittboy happy
 	if ((m_411d & 0x01) && (m_411d & 0x03))
 	{
 		//CNROM compat
-		logerror("vtxx_cnrom_8000_w (%04x) %02x\n", offset + 0x8000, data);
+		logerror("%s: vtxx_cnrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
 		m_ppu->set_201x_reg(0x6, data * 8);
 		m_ppu->set_201x_reg(0x7, data * 8 + 2);
 		m_ppu->set_201x_reg(0x2, data * 8 + 4);
@@ -1324,13 +1489,13 @@ void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8
 	else if (m_411d & 0x01)
 	{
 		//MMC1 compat, TODO
-		logerror("vtxx_mmc1_8000_w (%04x) %02x\n", offset + 0x8000, data);
+		logerror("%s: vtxx_mmc1_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
 
 	}
 	else if (m_411d & 0x02)
 	{
 		//UNROM compat
-		logerror("vtxx_unrom_8000_w (%04x) %02x\n", offset + 0x8000, data);
+		logerror("%s: vtxx_unrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
 
 		m_410x[0x7] = ((data & 0x0F) << 1);
 		m_410x[0x8] = ((data & 0x0F) << 1) + 1;
@@ -1338,12 +1503,12 @@ void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8
 	}
 	else
 	{
-		//logerror("vtxx_mmc3_8000_w (%04x) %02x\n", offset+0x8000, data );
+		//logerror("%s: vtxx_mmc3_8000_w real address: (%04x) translated address: (%04x) %02x\n",  machine().describe_context(), addr, offset+0x8000, data );
 
 		//MMC3 compat
 		if ((addr < 0xA000) && !(addr & 0x01))
 		{
-			logerror("scrambled_8000_w (%04x) %02x (banking)\n", offset + 0x8000, data);
+			logerror("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (banking)\n",  machine().describe_context(), addr, offset + 0x8000, data);
 			// Bank select
 			m_8000_addr_latch = data & 0x07;
 			// Bank config
@@ -1352,7 +1517,7 @@ void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8
 		}
 		else if ((addr < 0xA000) && (addr & 0x01))
 		{
-			logerror("scrambled_8000_w (%04x) %02x (other scrambled stuff)\n", offset + 0x8000, data);
+			logerror("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (other scrambled stuff)\n",  machine().describe_context(), addr, offset + 0x8000, data);
 
 			switch (m_410x[0x05] & 0x07)
 			{
@@ -1448,10 +1613,10 @@ void nes_vt_state::set_410x_scramble(uint8_t reg0, uint8_t reg1)
 	m_410x_scramble[1] = reg1;
 }
 
-WRITE8_MEMBER(nes_vt_state::vt03_8000_w)
+WRITE8_MEMBER(nes_vt_state::vt03_8000_mapper_w)
 {
 	scrambled_8000_w(space, offset, data);
-	//logerror("%s: vt03_8000_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
+	//logerror("%s: vt03_8000_mapper_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
 }
 
 /* APU plumbing, this is because we have a plain M6502 core in the VT03, otherwise this is handled in the core */
@@ -1748,8 +1913,7 @@ void nes_vt_state::nes_vt_map(address_map &map)
 	// 0x411a RS232 TX data
 	// 0x411b RS232 RX data
 
-	map(0x8000, 0xffff).m(m_prg, FUNC(address_map_bank_device::amap8));
-	map(0x8000, 0xffff).w(FUNC(nes_vt_state::vt03_8000_w));
+	map(0x8000, 0xffff).rw(FUNC(nes_vt_state::external_space_read), FUNC(nes_vt_state::external_space_write));
 	map(0x6000, 0x7fff).ram();
 }
 
@@ -1780,7 +1944,7 @@ void nes_vt_cy_state::nes_vt_cy_map(address_map &map)
 void nes_vt_cy_state::nes_vt_bt_map(address_map &map)
 {
 	nes_vt_4k_ram_map(map);
-	map(0x412c, 0x412c).w(FUNC(nes_vt_cy_state::vt03_412c_w));
+	map(0x412c, 0x412c).w(FUNC(nes_vt_cy_state::vt03_412c_extbank_w));
 }
 
 
@@ -1797,8 +1961,7 @@ void nes_vt_hh_state::nes_vt_hh_map(address_map &map)
 
 	map(0x4100, 0x410b).r(FUNC(nes_vt_hh_state::vt03_410x_r)).w(FUNC(nes_vt_hh_state::vt03_410x_w));
 
-	map(0x8000, 0xffff).m(m_prg, FUNC(address_map_bank_device::amap8));
-	map(0x8000, 0xffff).w(FUNC(nes_vt_hh_state::vt03_8000_w));
+	map(0x8000, 0xffff).rw(FUNC(nes_vt_hh_state::external_space_read), FUNC(nes_vt_hh_state::external_space_write));
 
 	map(0x4034, 0x4034).w(FUNC(nes_vt_hh_state::vt03_4034_w));
 	map(0x4014, 0x4014).r(FUNC(nes_vt_hh_state::psg1_4014_r)).w(FUNC(nes_vt_hh_state::vt_fixed_dma_w));
@@ -1828,7 +1991,7 @@ void nes_vt_hh_state::nes_vt_fp_map(address_map &map)
 	nes_vt_hh_map(map);
 	map(0x411e, 0x411e).w(FUNC(nes_vt_hh_state::vtfp_411e_w));
 	map(0x4a00, 0x4a00).w(FUNC(nes_vt_hh_state::vtfp_4a00_w));
-	map(0x412c, 0x412c).w(FUNC(nes_vt_hh_state::vtfp_412c_w));
+	map(0x412c, 0x412c).w(FUNC(nes_vt_hh_state::vtfp_412c_extbank_w));
 	map(0x412d, 0x412d).r(FUNC(nes_vt_hh_state::vtfp_412d_r));
 	map(0x4242, 0x4242).w(FUNC(nes_vt_hh_state::vtfp_4242_w));
 	map(0x4119, 0x4119).r(FUNC(nes_vt_hh_state::vtfp_4119_r));
@@ -1850,31 +2013,26 @@ void nes_vt_dg_state::nes_vt_dg_map(address_map &map)
 
 	map(0x411c, 0x411c).w(FUNC(nes_vt_dg_state::vt03_411c_w));
 
-	map(0x8000, 0xffff).m(m_prg, FUNC(address_map_bank_device::amap8));
-	map(0x8000, 0xffff).w(FUNC(nes_vt_dg_state::vt03_8000_w));
+	map(0x8000, 0xffff).rw(FUNC(nes_vt_dg_state::external_space_read), FUNC(nes_vt_dg_state::external_space_write));
 
 	map(0x4034, 0x4034).w(FUNC(nes_vt_dg_state::vt03_4034_w));
 	map(0x4014, 0x4014).r(FUNC(nes_vt_dg_state::psg1_4014_r)).w(FUNC(nes_vt_dg_state::vt_fixed_dma_w));
 	map(0x6000, 0x7fff).ram();
 }
 
+void nes_vt_dg_state::nes_vt_dg_baddma_map(address_map& map)
+{
+	nes_vt_dg_map(map);
+	map(0x4014, 0x4014).w(FUNC(nes_vt_hh_state::vt_dma_w));
+}
 
 void nes_vt_dg_state::nes_vt_fa_map(address_map &map)
 {
 	nes_vt_dg_map(map);
 
-	map(0x412c, 0x412c).r(FUNC(nes_vt_dg_state::vtfa_412c_r)).w(FUNC(nes_vt_dg_state::vtfa_412c_w));
+	map(0x412c, 0x412c).r(FUNC(nes_vt_dg_state::vtfa_412c_r)).w(FUNC(nes_vt_dg_state::vtfa_412c_extbank_w));
 	map(0x4242, 0x4242).w(FUNC(nes_vt_dg_state::vtfp_4242_w));
 }
-
-void nes_vt_state::prg_map(address_map &map)
-{
-	map(0x0000, 0x1fff).bankr("prg_bank0");
-	map(0x2000, 0x3fff).bankr("prg_bank1");
-	map(0x4000, 0x5fff).bankr("prg_bank2");
-	map(0x6000, 0x7fff).bankr("prg_bank3");
-}
-
 
 
 WRITE_LINE_MEMBER(nes_vt_state::apu_irq)
@@ -1942,7 +2100,9 @@ void nes_vt_state::nes_vt_base(machine_config &config)
 	m_ppu->read_bg().set(FUNC(nes_vt_state::chr_r));
 	m_ppu->read_sp().set(FUNC(nes_vt_state::spr_r));
 
-	ADDRESS_MAP_BANK(config, "prg").set_map(&nes_vt_state::prg_map).set_options(ENDIANNESS_LITTLE, 8, 15, 0x8000);
+	ADDRESS_MAP_BANK(config, m_vt_external_space); 
+	m_vt_external_space->set_options(ENDIANNESS_NATIVE, 8, 25, 0x2000000);
+//	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_32mbyte); // no default map, set according to the ROM size and other things so mirroring works
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1979,15 +2139,17 @@ void nes_vt_state::nes_vt_base_pal(machine_config &config)
 
 
 
-void nes_vt_sudoku_state::nes_vt_sudoku(machine_config &config)
+void nes_vt_sudoku_state::nes_vt_sudoku_512kb(machine_config &config)
 {
 	nes_vt_base(config);
+	m_vt_external_space->set_map(&nes_vt_sudoku_state::vt_external_space_map_512kbyte);
 }
 
-void nes_vt_majgnc_state::nes_vt_majgnc(machine_config &config)
+void nes_vt_vg_1mb_majgnc_state::nes_vt_vg_1mb_majgnc(machine_config &config)
 {
 	nes_vt_base(config);
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
+	m_vt_external_space->set_map(&nes_vt_vg_1mb_majgnc_state::vt_external_space_map_1mbyte);
 }
 
 void nes_vt_state::nes_vt(machine_config &config)
@@ -1995,10 +2157,76 @@ void nes_vt_state::nes_vt(machine_config &config)
 	nes_vt_base(config);
 }
 
+
+void nes_vt_state::nes_vt_512kb(machine_config& config)
+{
+	nes_vt(config);
+	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_512kbyte);
+}
+
+void nes_vt_state::nes_vt_1mb(machine_config& config)
+{
+	nes_vt(config);
+	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_1mbyte);
+}
+
+void nes_vt_state::nes_vt_2mb(machine_config& config)
+{
+	nes_vt(config);
+	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_2mbyte);
+}
+
+void nes_vt_state::nes_vt_4mb(machine_config& config)
+{
+	nes_vt(config);
+	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_2mbyte);
+}
+
+void nes_vt_state::nes_vt_8mb(machine_config& config)
+{
+	nes_vt(config);
+	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_8mbyte);
+}
+
+void nes_vt_state::nes_vt_16mb(machine_config& config)
+{
+	nes_vt(config);
+	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_16mbyte);
+}
+
+void nes_vt_state::nes_vt_32mb(machine_config& config)
+{
+	nes_vt(config);
+	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_32mbyte);
+}
+
+
+void nes_vt_state::nes_vt_pal(machine_config &config)
+{
+	nes_vt_base_pal(config);
+}
+
+void nes_vt_state::nes_vt_pal_2mb(machine_config& config)
+{
+	nes_vt_pal(config);
+	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_2mbyte);
+}
+
+void nes_vt_state::nes_vt_pal_4mb(machine_config& config)
+{
+	nes_vt_pal(config);
+	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_4mbyte);
+}
+
+void nes_vt_state::nes_vt_pal_8mb(machine_config& config)
+{
+	nes_vt_pal(config);
+	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_8mbyte);
+}
+
 void nes_vt_waixing_state::machine_reset()
 {
 	nes_vt_state::machine_reset();
-
 	m_ppu->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4); // reasonable
 }
 
@@ -2033,16 +2261,24 @@ void nes_vt_sp69_state::machine_reset()
 	set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
 }
 
-void nes_vt_ablping_state::nes_vt_ablping(machine_config &config)
+void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
 {
 	nes_vt(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::nes_vt_ablping_map);
+	m_vt_external_space->set_map(&nes_vt_ablping_state::vt_external_space_map_2mbyte);
 }
 
 void nes_vt_state::nes_vt_4k_ram(machine_config &config)
 {
 	nes_vt(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_4k_ram_map);
+}
+
+void nes_vt_state::nes_vt_4k_ram_16mb(machine_config &config)
+{
+	nes_vt(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_4k_ram_map);
+	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_16mbyte);
 }
 
 void nes_vt_state::nes_vt_4k_ram_pal(machine_config &config)
@@ -2057,10 +2293,22 @@ void nes_vt_cy_state::nes_vt_cy(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::nes_vt_cy_map);
 }
 
+void nes_vt_cy_state::nes_vt_cy_bigger(machine_config &config)
+{
+	nes_vt_cy(config);
+	m_vt_external_space->set_map(&nes_vt_cy_state::vt_external_space_map_32mbyte); // must be some banking of this kind of VT can address over 32mb
+}
+
 void nes_vt_cy_state::nes_vt_bt(machine_config &config)
 {
 	nes_vt_4k_ram(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::nes_vt_bt_map);
+}
+
+void nes_vt_cy_state::nes_vt_bt_2x16mb(machine_config& config)
+{
+	nes_vt_bt(config);
+	m_vt_external_space->set_map(&nes_vt_cy_state::vt_external_space_map_bitboy_2x16mbyte);
 }
 
 void nes_vt_dg_state::nes_vt_dg(machine_config &config)
@@ -2075,6 +2323,19 @@ void nes_vt_dg_state::nes_vt_dg(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 }
 
+void nes_vt_dg_state::nes_vt_dg_1mb(machine_config& config)
+{
+	nes_vt_dg(config);
+	m_vt_external_space->set_map(&nes_vt_dg_state::vt_external_space_map_1mbyte);
+}
+
+void nes_vt_dg_state::nes_vt_dg_baddma_16mb(machine_config& config)
+{
+	nes_vt_dg(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_dg_baddma_map);
+	m_vt_external_space->set_map(&nes_vt_dg_state::vt_external_space_map_16mbyte);
+}
+
 void nes_vt_hh_state::nes_vt_vg(machine_config &config)
 {
 	nes_vt_dg(config);
@@ -2083,12 +2344,33 @@ void nes_vt_hh_state::nes_vt_vg(machine_config &config)
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
 }
 
-void nes_vt_hh_state::nes_vt_vg_baddma(machine_config &config)
+void nes_vt_hh_state::nes_vt_vg_8mb(machine_config& config)
+{
+	nes_vt_vg(config);
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_8mbyte);
+}
+
+void nes_vt_hh_state::nes_vt_vg_4mb(machine_config& config)
+{
+	nes_vt_vg(config);
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_4mbyte);
+}
+
+void nes_vt_hh_state::nes_vt_vg_16mb(machine_config& config)
+{
+	nes_vt_vg(config);
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_16mbyte);
+}
+
+void nes_vt_hh_state::nes_vt_vg_1mb_majkon(machine_config &config)
 {
 	nes_vt_dg(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_baddma_map);
 
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
+
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_1mbyte);
+
 }
 
 
@@ -2105,6 +2387,18 @@ void nes_vt_hh_state::nes_vt_hh(machine_config &config)
 							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
 	m_screen->set_size(32*8, 312);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+}
+
+void nes_vt_hh_state::nes_vt_hh_8mb(machine_config& config)
+{
+	nes_vt_hh(config);
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_8mbyte);
+}
+
+void nes_vt_hh_state::nes_vt_hh_4mb(machine_config& config)
+{
+	nes_vt_hh(config);
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_4mbyte);
 }
 
 static INPUT_PORTS_START( nes_vt )
@@ -2152,6 +2446,30 @@ void nes_vt_hh_state::nes_vt_fp(machine_config &config)
 	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB12);
 }
 
+void nes_vt_hh_state::nes_vt_fp_4x16mb(machine_config& config)
+{
+	nes_vt_fp(config);
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_fp_2x32mbyte);
+}
+
+void nes_vt_hh_state::nes_vt_fp_32mb(machine_config& config)
+{
+	nes_vt_fp(config);
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_32mbyte);
+}
+
+void nes_vt_hh_state::nes_vt_fp_bigger(machine_config& config)
+{
+	nes_vt_fp(config);
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_32mbyte); // must be some kind of banking, or this VT can address > 32Mbyte
+}
+
+void nes_vt_hh_state::nes_vt_fp_16mb(machine_config& config)
+{
+	nes_vt_fp(config);
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_16mbyte);
+}
+
 void nes_vt_hh_state::nes_vt_fp_pal(machine_config &config)
 {
 	nes_vt_4k_ram_pal(config);
@@ -2160,10 +2478,23 @@ void nes_vt_hh_state::nes_vt_fp_pal(machine_config &config)
 	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB12);
 }
 
+void nes_vt_hh_state::nes_vt_fp_pal_32mb(machine_config& config)
+{
+	nes_vt_fp_pal(config);
+	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_32mbyte);
+}
+
+
 void nes_vt_dg_state::nes_vt_fa(machine_config &config)
 {
 	nes_vt_4k_ram(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_fa_map);
+}
+
+void nes_vt_dg_state::nes_vt_fa_4x16mb(machine_config& config)
+{
+	nes_vt_fa(config);
+	m_vt_external_space->set_map(&nes_vt_dg_state::vt_external_space_map_fapocket_4x16mbyte);
 }
 
 
@@ -2177,11 +2508,26 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009(machine_config &config)
 	//m_ppu->set_palette_mode(PAL_MODE_NEW_VG); // gives better title screens, but worse ingame, must be able to switch
 }
 
-void nes_vt_swap_op_d5_d6_state::nes_vt_senwld(machine_config &config)
+void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_4mb(machine_config& config)
 {
 	nes_vt_vh2009(config);
+	m_vt_external_space->set_map(&nes_vt_swap_op_d5_d6_state::vt_external_space_map_4mbyte);
+}
 
+void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_8mb(machine_config& config)
+{
+	nes_vt_vh2009(config);
+	m_vt_external_space->set_map(&nes_vt_swap_op_d5_d6_state::vt_external_space_map_8mbyte);
+}
+
+
+void nes_vt_swap_op_d5_d6_state::nes_vt_senwld_512kb(machine_config &config)
+{
+	nes_vt_vh2009(config);
+		
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
+
+	m_vt_external_space->set_map(&nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte);
 }
 
 static INPUT_PORTS_START( nes_vt_fp )
@@ -2393,8 +2739,9 @@ ROM_START( mc_dgear )
 ROM_END
 
 ROM_START( dgun2500 )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "dgun2500.bin", 0x00000, 0x2000000, CRC(a2f963f3) SHA1(e29ed20ccdcf25b5640a607b3d2c9e6a4944e172) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "dgun2500.bin", 0x00000, 0x1000000, CRC(a2f963f3) SHA1(e29ed20ccdcf25b5640a607b3d2c9e6a4944e172) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(0x1000000)
 ROM_END
 
 ROM_START( dgun2561 )
@@ -2427,8 +2774,8 @@ ROM_START( lxcmcy )
 ROM_END
 
 ROM_START( lxcmcysw )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "jl2365swr-1.u2", 0x00000, 0x2000000, CRC(60ece391) SHA1(655de6b36ba596d873de2839522b948ccf45e006) )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "jl2365swr-1.u2", 0x2000000, 0x2000000, CRC(60ece391) SHA1(655de6b36ba596d873de2839522b948ccf45e006) )
 	ROM_CONTINUE(0x0000000, 0x2000000)
 ROM_END
 
@@ -2456,7 +2803,7 @@ ROM_START( red5mam )
 ROM_END
 
 ROM_START( cybar120 )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "m2500p-vt09-epson,20091222ver05,_30r-sx1067-01_pcb,_12r0cob128m_12001-3d05_fw.bin", 0x00000, 0x1000000, CRC(f7138980) SHA1(de31264ee3a5a5c77a86733b2e2d6845fee91ea5) )
 ROM_END
 
@@ -2543,8 +2890,9 @@ ROM_START( mc_7x6ss )
 ROM_END
 
 ROM_START( mc_8x6ss )
-	ROM_REGION( 0x200000, "mainrom", 0 ) // odd size rom, does it need stripping?
-	ROM_LOAD( "888888-in-1, 8 bit slim station, newpxp-dvt22-a pcb.bin", 0x00000, 0x100ce1, CRC(47149d0b) SHA1(5a8733886b550e3235dd90fb415b5a602e967f91) )
+	ROM_REGION( 0x100000, "mainrom", 0 ) // odd size rom, does it need stripping?
+	ROM_LOAD( "888888-in-1, 8 bit slim station, newpxp-dvt22-a pcb.bin", 0x00000, 0x100000, CRC(47149d0b) SHA1(5a8733886b550e3235dd90fb415b5a602e967f91) )
+	ROM_IGNORE(0xce1)
 ROM_END
 
 // PXP2 8Bit Slim Station
@@ -2632,12 +2980,12 @@ ROM_START( ddrstraw )
 ROM_END
 
 ROM_START( majkon )
-	ROM_REGION( 0x200000, "mainrom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "mainrom", ROMREGION_ERASEFF )
 	ROM_LOAD( "konamicollectorsseries.bin", 0x00000, 0x100000, CRC(47505e51) SHA1(3bfb05d7cfa2bb4c115335f0383fa4aa59db0b28) )
 ROM_END
 
 ROM_START( majgnc )
-	ROM_REGION( 0x200000, "mainrom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "mainrom", ROMREGION_ERASEFF )
 	ROM_LOAD( "majescogoldennuggetcasino_st29w800at_002000d7.bin", 0x00000, 0x100000, CRC(1a156a9d) SHA1(08be4079dd68c9cf05bb92e11a3da4f092d7cfea) )
 ROM_END
 
@@ -2756,14 +3104,16 @@ ROM_START( ppgc200g )
 	ROM_LOAD( "m29dw641.u2", 0x00000, 0x800000, CRC(b16dc677) SHA1(c1984fde4caf9345d41d127db946d1c21ec43ae0) )
 ROM_END
 
-ROM_START( fcpocket )
-	ROM_REGION( 0x8000000, "mainrom", 0 )
-	ROM_LOAD( "s29gl01gp.bin", 0x00000, 0x8000000, CRC(8703b18a) SHA1(07943443294e80ca93f83181c8bdbf950b87c52f) )
-ROM_END
+
 
 ROM_START( mog_m320 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "w25q64fv.bin", 0x00000, 0x800000, CRC(3c5e1b36) SHA1(4bcbf35ebf2b1714ccde5de758a89a6a39528f89) )
+ROM_END
+
+ROM_START( fcpocket )
+	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl01gp.bin", 0x00000, 0x8000000, CRC(8703b18a) SHA1(07943443294e80ca93f83181c8bdbf950b87c52f) ) // 2nd half = 0x00 (so 64MByte of content)
 ROM_END
 
 ROM_START( fapocket )
@@ -2777,7 +3127,7 @@ ROM_START( zdog )
 ROM_END
 
 ROM_START( otrail )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_REGION( 0x100000, "mainrom", 0 )
 	ROM_LOAD( "g25q80cw.bin", 0x00000, 0x100000, CRC(b20a03ba) SHA1(c4ca8e590b07baaebed747537bc8f92e44bdd219) ) // dumped as QD25Q80C
 
 	ROM_REGION( 0x200, "seeprom", 0 )
@@ -2788,63 +3138,63 @@ ROM_END
 
 
 // earlier version of vdogdemo
-CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
+CONS( 200?, vdogdeme,  0,  0,  nes_vt_1mb,    nes_vt, nes_vt_state, empty_init, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
 
 // this is glitchy even in other emulators, might just be entirely unfinished, it selects banks but they don't contain the required gfx?
-CONS( 200?, vdogdemo,  0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT", "V-Dog (prototype)", MACHINE_NOT_WORKING )
+CONS( 200?, vdogdemo,  0,  0,  nes_vt_512kb,    nes_vt, nes_vt_state, empty_init, "VRT", "V-Dog (prototype)", MACHINE_NOT_WORKING )
 
 // Bundled as "VT03 Demo" on the V.R. Technology VT SDK
-CONS( 200?, pinkjelly, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT / Simmer Technology Co., Ltd.", "VRT VT SDK 'Pink Jelly' (VT03 Demo)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, pinkjelly, 0,  0,  nes_vt_2mb,    nes_vt, nes_vt_state, empty_init, "VRT / Simmer Technology Co., Ltd.", "VRT VT SDK 'Pink Jelly' (VT03 Demo)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Bundled as "C-Compiler Demo Program 2" on the V.R. Technology VT SDK
-CONS( 200?, vtpinball, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT / OJ-Jungle", "VRT VT SDK 'Pinball' (C-Compiler Demo Program 2)", MACHINE_NOT_WORKING )
+CONS( 200?, vtpinball, 0,  0,  nes_vt_512kb,    nes_vt, nes_vt_state, empty_init, "VRT / OJ-Jungle", "VRT VT SDK 'Pinball' (C-Compiler Demo Program 2)", MACHINE_NOT_WORKING )
 
 // Bundled as "Sound Generator FMDemo" on the V.R. Technology VT SDK
-CONS( 200?, vtsndtest, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'VT03 Sound Test' (Sound Generator FMDemo)", MACHINE_IMPERFECT_CONTROLS )
+CONS( 200?, vtsndtest, 0,  0,  nes_vt_512kb,    nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'VT03 Sound Test' (Sound Generator FMDemo)", MACHINE_IMPERFECT_CONTROLS )
 
 // Bundled as "Demo for VT03 Pic32" on the V.R. Technology VT SDK
-CONS( 200?, vtboxing,     0,  0,  nes_vt, nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'Boxing' (Demo for VT03 Pic32)", MACHINE_NOT_WORKING )
+CONS( 200?, vtboxing,     0,  0,  nes_vt_512kb, nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'Boxing' (Demo for VT03 Pic32)", MACHINE_NOT_WORKING )
 
 // Menu system clearly started off as 'vtpinball'  Many elements seem similar to Family Pinball for the Famicom.
 // 050329 (29th March 2005) date on PCB
-CONS( 2005, ablpinb, 0,  0,  nes_vt_base_pal,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ablpinb, 0,  0,  nes_vt_pal_2mb,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 
 // Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo.  Box says "Plug and Play Sudoku"
 // Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right
-CONS( 200?, papsudok,     0,  0,  nes_vt_sudoku, sudoku, nes_vt_sudoku_state, init_sudoku, "<unknown>", "Plug and Play Sudoku (VT based?)", MACHINE_NOT_WORKING )
+CONS( 200?, papsudok,     0,  0,  nes_vt_sudoku_512kb, sudoku, nes_vt_sudoku_state, init_sudoku, "<unknown>", "Plug and Play Sudoku (VT based?)", MACHINE_NOT_WORKING )
 
 
 // should be VT03 based
 // for testing 'Shark', 'Octopus', 'Harbor', and 'Earth Fighter' use the extended colour modes, other games just seem to use standard NES modes
-CONS( 200?, mc_dgear,  0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 75-in-1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_dgear,  0,  0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 75-in-1", MACHINE_IMPERFECT_GRAPHICS )
 
 
 // all software in this runs in the VT03 enhanced mode, it also includes an actual licensed VT03 port of Frogger.
 // all games work OK except Frogger which has serious graphical issues
-CONS( 2006, vgtablet,  0, 0,  nes_vt_vg,        nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products (licensed by Konami)", "VG Pocket Tablet (VG-4000)", MACHINE_NOT_WORKING ) // raster timing is broken for Frogger
+CONS( 2006, vgtablet,  0, 0,  nes_vt_vg_4mb,        nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products (licensed by Konami)", "VG Pocket Tablet (VG-4000)", MACHINE_NOT_WORKING ) // raster timing is broken for Frogger
 // There is a 2004 Majesco Frogger "TV game" that appears to contain the same version of Frogger as above but with no other games, so probably fits here.
-CONS( 2004, majkon,    0, 0,  nes_vt_vg_baddma, nes_vt, nes_vt_hh_state, empty_init, "Majesco (licensed from Konami)", "Konami Collector's Series Arcade Advanced", MACHINE_NOT_WORKING ) // raster timing is broken for Frogger, palette issues
+CONS( 2004, majkon,    0, 0,  nes_vt_vg_1mb_majkon, nes_vt, nes_vt_hh_state, empty_init, "Majesco (licensed from Konami)", "Konami Collector's Series Arcade Advanced", MACHINE_NOT_WORKING ) // raster timing is broken for Frogger, palette issues
 
-CONS( 200?, majgnc,    0, 0,  nes_vt_majgnc, majgnc, nes_vt_majgnc_state,  empty_init, "Majesco", "Golden Nugget Casino", MACHINE_NOT_WORKING )
+CONS( 200?, majgnc,    0, 0,  nes_vt_vg_1mb_majgnc, majgnc, nes_vt_vg_1mb_majgnc_state,  empty_init, "Majesco", "Golden Nugget Casino", MACHINE_NOT_WORKING )
 
 // small black unit, dpad on left, 4 buttons (A,B,X,Y) on right, Start/Reset/Select in middle, unit text "Sudoku Plug & Play TV Game"
-CONS( 200?, sudopptv,  0, 0,  nes_vt,        nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_NOT_WORKING )
+CONS( 200?, sudopptv,  0, 0,  nes_vt_512kb,        nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_NOT_WORKING )
 
-CONS( 200?, megapad,   0, 0,  nes_vt,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
+CONS( 200?, megapad,   0, 0,  nes_vt_2mb,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
 
 // 060303 date code on PCB
-CONS( 2006, ablmini,   0, 0,  nes_vt_base_pal, nes_vt, nes_vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, ablmini,   0, 0,  nes_vt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
 
  // needs PCM samples, Y button is not mapped (not used by any of the games?)
-CONS( 200?, timetp36,  0, 0,  nes_vt_base_pal,        timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, timetp36,  0, 0,  nes_vt_pal_4mb, timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // this is VT09 based
 // it boots, most games correct, but palette issues in some games still (usually they appear greyscale)
 // and colors overall a bit off
-CONS( 2009, cybar120,  0,  0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "Defender", "Defender M2500P 120-in-1", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, vgpocket,  0,  0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products", "VG Pocket (VG-2000)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, vgpmini,   0,  0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products", "VG Pocket Mini (VG-1500)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, cybar120,  0,  0,  nes_vt_vg_16mb, nes_vt, nes_vt_hh_state, empty_init, "Defender", "Defender M2500P 120-in-1", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vgpocket,  0,  0,  nes_vt_vg_4mb, nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products", "VG Pocket (VG-2000)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, vgpmini,   0,  0,  nes_vt_vg_4mb, nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products", "VG Pocket Mini (VG-1500)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
 // VG Pocket Max (VG-2500) (blue case, 75 games)
 // VG Pocket Max (VG-3000) (white case, 75 games) (does the game selection differ, or only the case?)
 // VG Pocket Caplet is likely SunPlus hardware instead. (has common SunPlus games)
@@ -2852,21 +3202,22 @@ CONS( 200?, vgpmini,   0,  0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "
 // Runs fine, non-sport 121 in 1 games perfect, but minor graphical issues in
 // sport games, also no sound in menu or sport games due to missing PCM
 // emulation
-CONS( 200?, dgun2500,  0,  0,  nes_vt_dg, nes_vt, nes_vt_dg_state, empty_init, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+CONS( 200?, dgun2500,  0,  0,  nes_vt_dg_baddma_16mb, nes_vt, nes_vt_dg_state, empty_init, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
 // don't even get to menu. very enhanced chipset, VT368/9?
-CONS( 2012, dgun2561,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
-CONS( 2016, dgun2593,  0,  0,  nes_vt_fp, nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING )
+CONS( 2012, dgun2561,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 2016, dgun2593,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 
-CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmc250,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmc250,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
 // GB-NO13-Main-VT389-2 on PCBs
-CONS( 2016, rtvgc300,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
-CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
+CONS( 2016, rtvgc300,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
+
 
 /* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
 
@@ -2890,120 +3241,120 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empt
 */
 
 // intial code isn't valid? scrambled?
-CONS( 201?, red5mam,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING )
+CONS( 201?, red5mam,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 
 
 // boots, same platform with scrambled opcodes as FC pocket
 // palette issues in some games because they actually use the old VT style palette
 // but no way to switch?
 // some menu gfx broken, probably because this is a bad dump
-CONS( 2015, dgun2573,  0,  0,  nes_vt_fp, nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "My Arcade Gamer V Portable Gaming System (DGUN-2573)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2015, dgun2573,  0,  0,  nes_vt_fp_32mb, nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "My Arcade Gamer V Portable Gaming System (DGUN-2573)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 201?, denv150,   0,  0,  nes_vt_fp, nes_vt, nes_vt_hh_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, denv150,   0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
-CONS( 200?, polmega,   0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
-CONS( 200?, silv35,    0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_NOT_WORKING )
+CONS( 200?, polmega,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
+CONS( 200?, silv35,    0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_NOT_WORKING )
 // die is marked as VH2009, as above, but no scrambled opcodes here
-CONS( 201?, techni4,   0,  0,  nes_vt_base_pal,      nes_vt, nes_vt_state,        empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, techni4,   0,  0,  nes_vt_pal_2mb,      nes_vt, nes_vt_state,        empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )
 
 
 // same encryption as above, but seems like newer hardware (or the above aren't using most of the features)
-CONS( 200?, lpgm240,    0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
+CONS( 200?, lpgm240,    0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
 
 // this has 'Shark' and 'Octopus' etc. like mc_dgear but uses scrambled bank registers
-CONS( 200?, mc_sp69,   0,  0,  nes_vt,    nes_vt, nes_vt_sp69_state, empty_init, "<unknown>", "Sports Game 69 in 1", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND)
+CONS( 200?, mc_sp69,   0,  0,  nes_vt_4mb,    nes_vt, nes_vt_sp69_state, empty_init, "<unknown>", "Sports Game 69 in 1", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND)
 
 // this game was also sold by dreamGEAR and several others companies, each time with a different name and different case, although the dumped version was from ABL, and it hasn't been confirmed that the ROMs are identical for the other units
 // Super Ping Pong appears on the title screen, but not the box / product art which simply has "Ping Pong Plug & Play TV Game" on front/back/bottom/manual, and "Table Tennis Plug & Play TV Game" on left/right sides.  Product code is PP1100
 // PCB has PP1100-MB 061110 on it, possible date YYMMDD code? (pinball is 050329, guitar fever is 070516, air blaster 050423, kickboxing 061011 etc.)
-CONS( 2006, ablping,   0,        0,  nes_vt_ablping, nes_vt, nes_vt_ablping_state, empty_init, "Advance Bright Ltd", "Ping Pong / Table Tennis / Super Ping Pong (PP1100, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ablping,   0,        0,  nes_vt_2mb_ablping, nes_vt, nes_vt_ablping_state, empty_init, "Advance Bright Ltd", "Ping Pong / Table Tennis / Super Ping Pong (PP1100, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Hummer systems, scrambled bank register
-CONS( 200?, mc_sam60,  0,  0,  nes_vt,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "Samuri (60 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, zdog,      0,  0,  nes_vt,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "ZDog (44 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, mc_sam60,  0,  0,  nes_vt_2mb,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "Samuri (60 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, zdog,      0,  0,  nes_vt_4mb,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "ZDog (44 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
 
 // very plain menus
-CONS( 200?, pjoyn50,    0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "PowerJoy Navigator 50 in 1", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, pjoys30,    0,        0,  nes_vt,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 30 in 1", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, pjoys60,    0,        0,  nes_vt,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 60 in 1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, pjoyn50,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "PowerJoy Navigator 50 in 1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, pjoys30,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 30 in 1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, pjoys60,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 60 in 1", MACHINE_IMPERFECT_GRAPHICS )
 // has a non-enhanced version of 'Octopus' as game 30
-CONS( 200?, sarc110,    0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Super Arcade 110 (set 1)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, sarc110a,   sarc110,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Super Arcade 110 (set 2)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, sarc110,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Super Arcade 110 (set 1)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, sarc110a,   sarc110,  0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Super Arcade 110 (set 2)", MACHINE_IMPERFECT_GRAPHICS )
 // both offer chinese or english menus
-CONS( 200?, mc_110cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "CoolBoy", "110 in 1 CoolBaby (CoolBoy RS-1S)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, mc_138cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "CoolBoy", "138 in 1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_110cb,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy", "110 in 1 CoolBaby (CoolBoy RS-1S)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_138cb,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy", "138 in 1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)", MACHINE_IMPERFECT_GRAPHICS )
 
 // doesn't boot, bad dump
-CONS( 201?, cbrs8,      0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "CoolBoy", "CoolBoy RS-8 168 in 1", MACHINE_NOT_WORKING )
+CONS( 201?, cbrs8,      0,        0,  nes_vt_16mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy", "CoolBoy RS-8 168 in 1", MACHINE_NOT_WORKING )
 
-CONS( 201?, rfcp168,    0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>",   "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"  (doesn't boot, ends up in weeds after jumping to bank with no code, dump not verified)
+CONS( 201?, rfcp168,    0,        0,  nes_vt_16mb,    nes_vt, nes_vt_state, empty_init, "<unknown>",   "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"  (doesn't boot, ends up in weeds after jumping to bank with no code, dump not verified)
 
-CONS( 200?, gprnrs1,    0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Game Prince RS-1", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, gprnrs16,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, gprnrs1,    0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Game Prince RS-1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, gprnrs16,   0,        0,  nes_vt_32mb,   nes_vt, nes_vt_state, empty_init, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )
 
 // Notes about the DDR games:
 // * Missing PCM sounds (unsupported in NES VT APU code right now)
 // * Console has stereo output (dual RCA connectors).
-CONS( 2006, ddrdismx,   0,        0,  nes_vt, nes_vt_ddr, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows (c)2001 Disney onscreen, but that's recycled art from the Playstation release, actual release was 2006
-CONS( 2006, ddrstraw,   0,        0,  nes_vt, nes_vt_ddr, nes_vt_state, empty_init, "Majesco (licensed from Konami)",         "Dance Dance Revolution Strawberry Shortcake", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ddrdismx,   0,        0,  nes_vt_2mb, nes_vt_ddr, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows (c)2001 Disney onscreen, but that's recycled art from the Playstation release, actual release was 2006
+CONS( 2006, ddrstraw,   0,        0,  nes_vt_2mb, nes_vt_ddr, nes_vt_state, empty_init, "Majesco (licensed from Konami)",         "Dance Dance Revolution Strawberry Shortcake", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 
 // unsorted, these were all in nes.xml listed as ONE BUS systems
-CONS( 200?, mc_dg101,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_IMPERFECT_GRAPHICS ) // dreamGear, but no enhanced games?
-CONS( 200?, mc_aa2,     0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 Arcade Action II (AT-103)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, mc_105te,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "2011 Super HiK 105 in 1 Turbo Edition", MACHINE_NOT_WORKING )
-CONS( 200?, mc_8x6cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "CoolBoy",   "888888 in 1 (Coolboy AEF-390)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, mc_9x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "999999 in 1 (PXP2 Slim Station)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, mc_9x6sa,   mc_9x6ss, 0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "999999 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, mc_7x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "777777 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, mc_8x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "888888 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2004, mc_dcat8,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_dg101,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_IMPERFECT_GRAPHICS ) // dreamGear, but no enhanced games?
+CONS( 200?, mc_aa2,     0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 Arcade Action II (AT-103)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_105te,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "2011 Super HiK 105 in 1 Turbo Edition", MACHINE_NOT_WORKING )
+CONS( 200?, mc_8x6cb,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy",   "888888 in 1 (Coolboy AEF-390)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, mc_9x6ss,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "999999 in 1 (PXP2 Slim Station)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_9x6sa,   mc_9x6ss, 0,  nes_vt_2mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "999999 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_7x6ss,   0,        0,  nes_vt_1mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "777777 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_8x6ss,   0,        0,  nes_vt_1mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "888888 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, mc_dcat8,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Runs well, minor GFX issues in intro
-CONS( 2017, sy889,      0,        0,  nes_vt_hh, nes_vt, nes_vt_hh_state, empty_init, "SY Corp",   "SY-889 300 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2016, sy888b,     0,        0,  nes_vt_hh, nes_vt, nes_vt_hh_state, empty_init, "SY Corp",   "SY-888B 288 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2017, sy889,      0,        0,  nes_vt_hh_8mb, nes_vt, nes_vt_hh_state, empty_init, "SY Corp",   "SY-889 300 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2016, sy888b,     0,        0,  nes_vt_hh_4mb, nes_vt, nes_vt_hh_state, empty_init, "SY Corp",   "SY-888B 288 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
 
 
 // Same hardware as SY-889
-CONS( 201?, mc_cb280,   0,        0,  nes_vt_hh, nes_vt, nes_vt_hh_state, empty_init, "CoolBoy",   "Coolboy RS-18 (280 in 1)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, mc_cb280,   0,        0,  nes_vt_hh_4mb, nes_vt, nes_vt_hh_state, empty_init, "CoolBoy",   "Coolboy RS-18 (280 in 1)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Runs well, only issues in SMB3 which crashes
-CONS( 2017, bittboy,    0,        0,  nes_vt_bt, nes_vt, nes_vt_cy_state, empty_init, "BittBoy",   "BittBoy Mini FC 300 in 1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2017, bittboy,    0,        0,  nes_vt_bt_2x16mb, nes_vt, nes_vt_cy_state, empty_init, "BittBoy",   "BittBoy Mini FC 300 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (2x 16mbyte banks)
 // Runs well, all games seem to work
-CONS( 201?, mc_89in1,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "89 in 1 Mini Game Console (060-92023011V1.0)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, mc_89in1,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "89 in 1 Mini Game Console (060-92023011V1.0)", MACHINE_IMPERFECT_GRAPHICS )
 // Broken GFX, investigate
-CONS( 201?, mc_pg150,   0,        0,  nes_vt_bt, nes_vt, nes_vt_cy_state, empty_init, "<unknown>", "Pocket Games 150 in 1", MACHINE_NOT_WORKING )
+CONS( 201?, mc_pg150,   0,        0,  nes_vt_bt_2x16mb, nes_vt, nes_vt_cy_state, empty_init, "<unknown>", "Pocket Games 150 in 1", MACHINE_NOT_WORKING ) // has external banking
 // No title screen, but press start and menu and games run fine. Makes odd
 // memory accesses which probably explain broken title screen
-CONS( 201?, mc_hh210,   0,        0,  nes_vt_4k_ram, nes_vt, nes_vt_state, empty_init, "<unknown>", "Handheld 210 in 1", MACHINE_NOT_WORKING )
+CONS( 201?, mc_hh210,   0,        0,  nes_vt_4k_ram_16mb, nes_vt, nes_vt_state, empty_init, "<unknown>", "Handheld 210 in 1", MACHINE_NOT_WORKING )
 // First half of games don't work, probably bad dump
-CONS( 201?, dvnimbus,   0,        0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "<unknown>", "DVTech Nimbus 176 in 1", MACHINE_NOT_WORKING )
+CONS( 201?, dvnimbus,   0,        0,  nes_vt_vg_16mb, nes_vt, nes_vt_hh_state, empty_init, "<unknown>", "DVTech Nimbus 176 in 1", MACHINE_NOT_WORKING )
 // Works fine, VT02 based
-CONS( 201?, mc_tv200,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Thumbs Up", "200 in 1 Retro TV Game", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, mc_tv200,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "Thumbs Up", "200 in 1 Retro TV Game", MACHINE_IMPERFECT_GRAPHICS )
  // probably another Thumbs Up product? cursor doesn't work unless nes_vt_hh machine is used? possibly newer than VT02 as it runs from an SPI ROM, might just not use enhanced features.  Some minor game name changes to above (eg Smackdown just becomes Wrestling)
-CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt_hh, nes_vt, nes_vt_hh_state, empty_init, "<unknown>", "200 in 1 Retro Arcade", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt_hh_8mb, nes_vt, nes_vt_hh_state, empty_init, "<unknown>", "200 in 1 Retro Arcade", MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2015, rminitv,     0,        0,  nes_vt_fp_pal, nes_vt, nes_vt_hh_state, empty_init, "Orb Gaming", "Retro 'Mini TV' Console 300-in-1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2015, rminitv,     0,        0,  nes_vt_fp_pal_32mb, nes_vt, nes_vt_hh_state, empty_init, "Orb Gaming", "Retro 'Mini TV' Console 300-in-1", MACHINE_IMPERFECT_GRAPHICS ) // single 32Mbyte bank!
 
 // available in a number of colours, with various brands, but likely all the same.
 // This was a red coloured pad, contains various unlicensed bootleg reskinned NES game eg Blob Buster is a hack of Dig Dug 2 and there are also hacks of Xevious, Donkey Kong Jr, Donkey Kong 3 and many others.
-CONS( 201?, ppgc200g,   0, 0,  nes_vt, nes_vt, nes_vt_state, empty_init, "<unknown>", "Plug & Play Game Controller with 200 Games (Supreme 200)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, ppgc200g,   0,         0,  nes_vt_8mb, nes_vt, nes_vt_state, empty_init, "<unknown>", "Plug & Play Game Controller with 200 Games (Supreme 200)", MACHINE_IMPERFECT_GRAPHICS )
 
 // New platform with scrambled opcodes, same as DGUN-2561. Runs fine with minor GFX and sound issues in menu
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
-CONS( 2016, fcpocket,   0,        0,  nes_vt_fp, nes_vt_fp, nes_vt_hh_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2016, fcpocket,   0,        0,  nes_vt_fp_4x16mb, nes_vt_fp, nes_vt_hh_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (2x 32mbyte banks)
 // Probably VT09 or similar
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a ROM high address bit
 // (which can also be overriden by GPIO)
-CONS( 2017, fapocket,   0,        0,  nes_vt_fa, nes_vt_fa, nes_vt_dg_state, empty_init, "<unknown>",   "Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2017, fapocket,   0,        0,  nes_vt_fa_4x16mb, nes_vt_fa, nes_vt_dg_fapocket_state, empty_init, "<unknown>",   "Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (4x 16mbyte banks)
 
 // Plays intro music but then crashes. same hardware as SY-88x but uses more features
-CONS( 2016, mog_m320,   0,        0,  nes_vt_hh, nes_vt, nes_vt_hh_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
+CONS( 2016, mog_m320,   0,        0,  nes_vt_hh_8mb, nes_vt, nes_vt_hh_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
 
-CONS( 2017, otrail,     0,        0,  nes_vt_dg, nes_vt, nes_vt_dg_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2017, otrail,     0,        0,  nes_vt_dg_1mb, nes_vt, nes_vt_dg_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2005, senwld,   0,          0,  nes_vt_senwld,    nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Win, Lose or Draw (Senario)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // needs RAM in banked space, Alpha display emulating, Touchpad emulating etc.
+CONS( 2005, senwld,   0,          0,  nes_vt_senwld_512kb,    nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Win, Lose or Draw (Senario)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // needs RAM in banked space, Alpha display emulating, Touchpad emulating etc.
 
