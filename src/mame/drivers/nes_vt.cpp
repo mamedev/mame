@@ -2106,6 +2106,7 @@ void nes_vt_state::nes_vt_base(machine_config &config)
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_ppu->read_bg().set(FUNC(nes_vt_state::chr_r));
 	m_ppu->read_sp().set(FUNC(nes_vt_state::spr_r));
+	m_ppu->set_screen(m_screen);
 
 	ADDRESS_MAP_BANK(config, m_vt_external_space); 
 	m_vt_external_space->set_options(ENDIANNESS_NATIVE, 8, 25, 0x2000000);
@@ -2135,6 +2136,7 @@ void nes_vt_state::nes_vt_base_pal(machine_config &config)
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_ppu->read_bg().set(FUNC(nes_vt_state::chr_r));
 	m_ppu->read_sp().set(FUNC(nes_vt_state::spr_r));
+	m_ppu->set_screen(m_screen);
 
 	/* video hardware */
 	m_screen->set_refresh_hz(50.0070);
