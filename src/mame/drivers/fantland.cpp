@@ -38,11 +38,6 @@ Year + Game             Main CPU  Sound CPU  Sound                         Video
 - Verify sound. Also speech is a bit garbled / low volume (rom 15)
 - Trackball controls don't work well
 
-[wheelrun]
-
-- On a car hit / crash the game tries to produce sound through ports b000 & c000,
-  probably connected to the EP1210. This is not emulated.
-
 ***************************************************************************************/
 
 #include "emu.h"
