@@ -71,7 +71,7 @@ Language:
 |        | 80-084140(US)     | Spider-Man & Friends - Secret Missions (AKA Professor V's Secret Missions with diff label)|
 |        | 80-084143(UK)     | Spider-Man & Friends - Secret Missions                                                    |
 |   XX   | 80-084144(GE)     | Spider-Man & Freunde - Geheime Missionen                                                  |
-|        | 80-084145(FR)     | Spider-Man and ses amis - Missions Secretes                                               |
+|   XX   | 80-084145(FR)     | Spider-Man and ses amis - Missions Secrètes                                               |
 |        | 80-084147(SP)     | Spider-Man y Amigos: Misiones Secretas (no # on label)                                    |
 +========+===================+===========================================================================================+
 |   XX   | 80-084160(US)     | Disney's Little Einsteins: The Glass Slipper Ball (Rev. 2?)                               |
@@ -85,7 +85,8 @@ Language:
 |        | 80-084182(NL)     | Mickey Mouse Clubhouse                                                                    |
 |        | 80-084183(UK)     | Mickey Mouse Clubhouse                                                                    |
 |   XX   | 80-084184(GE)     | Micky Maus Wunderhaus                                                                     |
-|        | 80-084185(FR)     | La Maison de Mickey                                                                       |
+|        | 80-084185(FR)     | La Maison de Mickey (ever released?)                                                      |
+|   XX   | 80-084185-005(FR) | La Maison de Mickey                                                                       |
 |        | 80-084186(PT)     | A Casa do Mickey Mouse (84196 on cart)                                                    |
 |   XX   | 80-084187(SP)     | La Casa de Mickey Mouse                                                                   |
 +========+===================+===========================================================================================+
@@ -104,7 +105,7 @@ Language:
 |   XX   | 80-084262(NL)     | Mijn Puppy!                                                                               |
 |        | 80-084263(UK)     | My Pet Puppy                                                                              |
 |   XX   | 80-084264(GE)     | Mein erster Hund                                                                          |
-|        | 80-084265(FR)     | Mon Youtou Tout Fou!                                                                      |
+|   XX   | 80-084265(FR)     | Mon Toutou tout fou!                                                                      |
 |        | 80-084267(SP)     | Dakota y su Mascota                                                                       |
 +========+===================+===========================================================================================+
 |        | 80-084280(US)     | Wild Waves                                                                                |
@@ -576,6 +577,19 @@ Language:
 		</part>
 	</software>
 
+	<software name="mickeychmfr005" cloneof="mickeychm" supported="no">
+		<description>Disney La Maison de Mickey (France, Rev. 005)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="084185-005(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084185-005 - LaMaisonDeMickey (MOTION) (FR).bin" size="8388608" crc="7d77f657" sha1="90cea293ebd539ac22baa343a1efb771d91ffe4d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mickeychms" cloneof="mickeychm" supported="no">
 		<description>Disney La Casa de Mickey Mouse (Spain)</description>
 		<year>2009</year>
@@ -673,6 +687,19 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="C84264.u1" size="8388608" crc="ca98e437" sha1="8c4964a671c6c3d3c8bd5859b14143b901d54021" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mypuppymf" cloneof="mypuppymnl" supported="no">
+		<description>Mon Youtou tout fou! (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084265(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084265 - MonToutouToutFou (MOTION) (FR).bin" size="8388608" crc="d4bf54aa" sha1="2a411d6bf8c46e67ed29c308ede2b0c740a9d083" />
 			</dataarea>
 		</part>
 	</software>
@@ -886,6 +913,19 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="C84144.u1" size="8388608" crc="93d129ef" sha1="8e67e2ad36104c34b6fd944e25bbfbf0313a1d7c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidermnmf" cloneof="spidermnmg" supported="no">
+		<description>Marvel Spider-Man and ses amis - Missions Secrètes (France)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084145(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="084145 - SpidermanMissionsSecretes (MOTION) (FR).bin" size="8388608" crc="e5bf01a9" sha1="0216559867626205a8c00c6d64cf64eb239be641" />
 			</dataarea>
 		</part>
 	</software>
