@@ -13163,8 +13163,8 @@ clips onto the player's ear.
 		</part>
 	</software>
 	
-	<software name="vpool">
-		<description>Viewpoint 64 (Prototype)</description>
+	<software name="vpointp">
+		<description>Viewpoint 2064 (Prototype)</description>
 		<year>1999</year>
 		<publisher>Sammy</publisher>
 		<part name="cart" interface="n64_cart">
