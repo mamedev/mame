@@ -8142,6 +8142,44 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="cnflcteu">
+		<description>Conflict Europe</description>
+		<year>1989</year>
+		<publisher>Mirrorsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="conflict europe.img" size="737280" crc="12c1aa37" sha1="5be457fd17739b64d6ab6d7892ebfe302ee835e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="camelot">
+		<description>Conquest of Camelot - The Search for the Grail</description>
+		<year>1988</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="1.001.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="conquest of camelot disk 1.img" size="737280" crc="dac688c5" sha1="8ea08590af7a8f1db5c9c14aaf6191f141410311"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="conquest of camelot disk 2.img" size="737280" crc="88b65db5" sha1="c32bfd802776df4986ae7335ab7182af899de969"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="conquest of camelot disk 3.img" size="737280" crc="1b3a6edb" sha1="1ca7bae05d0c4eb602f64cc4c76939561f56c2be"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="conquest of camelot disk 4.img" size="737280" crc="0425a6aa" sha1="6a5b771e52508035a869bfde3076ee70d15a1899"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crimewav">
 		<description>Crime Wave</description>
 		<year>1990</year>
@@ -8858,6 +8896,22 @@ has been replaced with an all-zero block. -->
 			<feature name="part_id" value="Data Disk"/>
 			<dataarea name="flop" size = "368640">
 				<rom name="Hardball II [Accolade] [1989] [5.25] [Data].img" size="368640" crc="4add75f6" sha1="bc58b7c0dfda0fe94d0f84f75b0a8fa8c1ec46b9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harpoon">
+		<description>Harpoon</description>
+		<year>1989</year>
+		<publisher>Three-Sixty</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="harpoon disk 1.img" size="737280" crc="ca8f8d95" sha1="4c1637d7e10ce85ecc9f67a8540acecbe8a4db2d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="harpoon disk 2.img" size="737280" crc="9770fd0e" sha1="1dc0cc6d859eefd664c237969774e9949fd48705"/>
 			</dataarea>
 		</part>
 	</software>
