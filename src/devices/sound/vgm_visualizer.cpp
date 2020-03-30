@@ -17,6 +17,8 @@
 
 #include <cmath>
 
+constexpr int vgmviz_device::SCREEN_HEIGHT;
+
 constexpr float lerp(float a, float b, float f)
 {
 	return (b - a) * f + a;
