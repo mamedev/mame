@@ -232,10 +232,9 @@ public:
 	void nes_vt_2mb_ablping(machine_config& config);
 
 private:
-	void nes_vt_ablping_map(address_map& map);
 
-	DECLARE_READ8_MEMBER(ablping_410f_r);
-	DECLARE_WRITE8_MEMBER(ablping_410f_w);
+	DECLARE_READ8_MEMBER(ablping_extraio_r);
+	DECLARE_WRITE8_MEMBER(ablping_extraio_w);
 };
 
 class nes_vt_cy_state : public nes_vt_state
@@ -649,15 +648,15 @@ WRITE8_MEMBER(nes_vt_cy_lexibook_state::in0_w)
 
 // ablping polls this (also writes here) what is it? 4-bit DAC? PCM? (inputs only start responding once it finishes writing data on startup but takes longer than a sample should)
 // (this is the extended IO port on VT)
-READ8_MEMBER(nes_vt_ablping_state::ablping_410f_r)
+READ8_MEMBER(nes_vt_ablping_state::ablping_extraio_r)
 {
 	// needs to change at least
-	return machine().rand();//0x00;
+	return machine().rand()&0xf;
 };
 
-WRITE8_MEMBER(nes_vt_ablping_state::ablping_410f_w)
+WRITE8_MEMBER(nes_vt_ablping_state::ablping_extraio_w)
 {
-	popmessage("ablping_410f_w %02x", data);
+	popmessage("ablping_extraio_w %02x", data);
 };
 
 WRITE8_MEMBER(nes_vt_cy_state::vt03_41bx_w)
@@ -948,11 +947,7 @@ void nes_vt_state::nes_vt_4k_ram_map(address_map &map)
 	map(0x0800, 0x0fff).ram();
 }
 
-void nes_vt_ablping_state::nes_vt_ablping_map(address_map &map)
-{
-	nes_vt_map(map);
-	map(0x410f, 0x410f).rw(FUNC(nes_vt_ablping_state::ablping_410f_r), FUNC(nes_vt_ablping_state::ablping_410f_w));
-}
+
 
 void nes_vt_cy_state::nes_vt_cy_map(address_map &map)
 {
@@ -1105,6 +1100,9 @@ void nes_vt_state::configure_soc(nes_vt_soc_device* soc)
 	soc->extra_read_2_callback().set(FUNC(nes_vt_state::extrain_2_r));
 	soc->extra_read_3_callback().set(FUNC(nes_vt_state::extrain_3_r));
 }
+
+
+
 
 void nes_vt_state::nes_vt_base(machine_config &config)
 {
@@ -1274,9 +1272,12 @@ void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
 	nes_vt_2mb(config);
 	m_soc->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
-	/*
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::nes_vt_ablping_map);
-	*/
+
+	m_soc->extra_read_2_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));
+	m_soc->extra_read_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));
+	m_soc->extra_write_2_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_w));
+	m_soc->extra_write_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_w));
+
 }
 
 void nes_vt_state::nes_vt_4k_ram(machine_config &config)
