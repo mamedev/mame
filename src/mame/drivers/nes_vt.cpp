@@ -929,11 +929,11 @@ void nes_vt_cy_state::nes_vt_cy_map(address_map &map)
 {
 	nes_vt_4k_ram_map(map);
 	map(0x41b0, 0x41bf).r(FUNC(nes_vt_cy_state::vt03_41bx_r)).w(FUNC(nes_vt_cy_state::vt03_41bx_w));
-	map(0x48a0, 0x48af).r(FUNC(nes_vt_cy_state::vt03_48ax_r)).w(FUNC(nes_vt_cy_state::vt03_48ax_w));
 	map(0x4130, 0x4136).r(FUNC(nes_vt_cy_state::vt03_413x_r)).w(FUNC(nes_vt_cy_state::vt03_413x_w));
-	map(0x414F, 0x414F).r(FUNC(nes_vt_cy_state::vt03_414f_r));
-	map(0x415C, 0x415C).r(FUNC(nes_vt_cy_state::vt03_415c_r));
+	map(0x414f, 0x414f).r(FUNC(nes_vt_cy_state::vt03_414f_r));
+	map(0x415c, 0x415c).r(FUNC(nes_vt_cy_state::vt03_415c_r));
 
+	map(0x48a0, 0x48af).r(FUNC(nes_vt_cy_state::vt03_48ax_r)).w(FUNC(nes_vt_cy_state::vt03_48ax_w));
 }
 
 void nes_vt_cy_state::nes_vt_bt_map(address_map &map)
@@ -986,12 +986,17 @@ READ8_MEMBER(nes_vt_hh_state::vtfp_4119_r)
 void nes_vt_hh_state::nes_vt_fp_map(address_map &map)
 {
 	nes_vt_hh_map(map);
+
+	map(0x4119, 0x4119).r(FUNC(nes_vt_hh_state::vtfp_4119_r));
 	map(0x411e, 0x411e).w(FUNC(nes_vt_hh_state::vtfp_411e_w));
-	map(0x4a00, 0x4a00).w(FUNC(nes_vt_hh_state::vtfp_4a00_w));
+
 	map(0x412c, 0x412c).w(FUNC(nes_vt_hh_state::vtfp_412c_extbank_w));
 	map(0x412d, 0x412d).r(FUNC(nes_vt_hh_state::vtfp_412d_r));
+
 	map(0x4242, 0x4242).w(FUNC(nes_vt_hh_state::vtfp_4242_w));
-	map(0x4119, 0x4119).r(FUNC(nes_vt_hh_state::vtfp_4119_r));
+
+	map(0x4a00, 0x4a00).w(FUNC(nes_vt_hh_state::vtfp_4a00_w));
+
 }
 
 

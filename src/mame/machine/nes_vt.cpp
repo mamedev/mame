@@ -56,7 +56,10 @@
 #include "nes_vt.h"
 
 DEFINE_DEVICE_TYPE(NES_VT_SOC, nes_vt_soc_device, "nes_vt_soc", "VTxx series System on a Chip")
-DEFINE_DEVICE_TYPE(NES_VT_SOC_SCRAMBLE, nes_vt_soc_scramble_device, "nes_vt_soc", "VTxx series System on a Chip (with Opcode scrambling)")
+DEFINE_DEVICE_TYPE(NES_VT_SOC_SCRAMBLE, nes_vt_soc_scramble_device, "nes_vt_soc_scram", "VTxx series System on a Chip (with Opcode scrambling)")
+DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM, nes_vt_soc_4kram_device, "nes_vt_soc_4k", "VTxx series System on a Chip (with 4KByte RAM)")
+DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM_CY, nes_vt_soc_4kram_cy_device, "nes_vt_soc_4k_cy", "VTxx series System on a Chip (with 4KByte RAM) (CY)")
+DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM_BT, nes_vt_soc_4kram_bt_device, "nes_vt_soc_4k_bt", "VTxx series System on a Chip (with 4KByte RAM) (BT)")
 
 void nes_vt_soc_device::program_map(address_map &map)
 {
@@ -111,6 +114,26 @@ nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, const char* 
 
 nes_vt_soc_scramble_device::nes_vt_soc_scramble_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	nes_vt_soc_device(mconfig, NES_VT_SOC_SCRAMBLE, tag, owner, clock)
+{
+}
+
+nes_vt_soc_4kram_device::nes_vt_soc_4kram_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt_soc_4kram_device(mconfig, NES_VT_SOC_4KRAM, tag, owner, clock)
+{
+}
+
+nes_vt_soc_4kram_device::nes_vt_soc_4kram_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt_soc_device(mconfig, type, tag, owner, clock)
+{
+}
+
+nes_vt_soc_4kram_cy_device::nes_vt_soc_4kram_cy_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt_soc_4kram_device(mconfig, NES_VT_SOC_4KRAM_CY, tag, owner, clock)
+{
+}
+
+nes_vt_soc_4kram_bt_device::nes_vt_soc_4kram_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt_soc_4kram_device(mconfig, NES_VT_SOC_4KRAM_BT, tag, owner, clock)
 {
 }
 
@@ -1091,6 +1114,18 @@ READ8_MEMBER(nes_vt_soc_device::apu_read_mem)
 	return 0x00;//mintf->program->read_byte(offset);
 }
 
+uint32_t nes_vt_soc_device::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+{
+	return m_ppu->screen_update(screen, bitmap, cliprect);
+}
+
+
+device_memory_interface::space_config_vector nes_vt_soc_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_space_config)
+	};
+}
 
 void nes_vt_soc_device::device_add_mconfig(machine_config &config)
 {
@@ -1133,15 +1168,17 @@ void nes_vt_soc_scramble_device::device_add_mconfig(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_scramble_device::nes_vt_map);
 }
 
-uint32_t nes_vt_soc_device::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+void nes_vt_soc_4kram_device::device_add_mconfig(machine_config& config)
 {
-	return m_ppu->screen_update(screen, bitmap, cliprect);
+	nes_vt_soc_device::device_add_mconfig(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_4kram_device::nes_vt_map);
+}
+
+void nes_vt_soc_4kram_device::nes_vt_4k_ram_map(address_map &map)
+{
+	nes_vt_soc_device::nes_vt_map(map);
+	map(0x0800, 0x0fff).ram();
 }
 
 
-device_memory_interface::space_config_vector nes_vt_soc_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_space_config)
-	};
-}
+

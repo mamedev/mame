@@ -171,8 +171,39 @@ protected:
 	virtual void device_add_mconfig(machine_config& config) override;
 };
 
+class nes_vt_soc_4kram_device : public nes_vt_soc_device
+{
+public:
+	nes_vt_soc_4kram_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	nes_vt_soc_4kram_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+
+	virtual void device_add_mconfig(machine_config& config) override;
+
+	void nes_vt_4k_ram_map(address_map& map);
+};
+
+class nes_vt_soc_4kram_cy_device : public nes_vt_soc_4kram_device
+{
+public:
+	nes_vt_soc_4kram_cy_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+};
+
+class nes_vt_soc_4kram_bt_device : public nes_vt_soc_4kram_device
+{
+public:
+	nes_vt_soc_4kram_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+};
 
 DECLARE_DEVICE_TYPE(NES_VT_SOC, nes_vt_soc_device)
 DECLARE_DEVICE_TYPE(NES_VT_SOC_SCRAMBLE, nes_vt_soc_scramble_device)
+DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM, nes_vt_soc_4kram_device)
+DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_CY, nes_vt_soc_4kram_cy_device)
+DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_BT, nes_vt_soc_4kram_bt_device)
 
 #endif // MAME_MACHINE_NES_VT_H
