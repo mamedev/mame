@@ -124,11 +124,10 @@ private:
 	/* APU handling */
 
 	/* Extra IO */
-	DECLARE_READ8_MEMBER(extrain_0_r) { return m_exin0->read(); }
-	DECLARE_READ8_MEMBER(extrain_1_r) { return m_exin1->read(); }
-	DECLARE_READ8_MEMBER(extrain_2_r) { return m_exin2->read(); }
-	DECLARE_READ8_MEMBER(extrain_3_r) { return m_exin3->read(); }
-
+	DECLARE_READ8_MEMBER(extrain_0_r);
+	DECLARE_READ8_MEMBER(extrain_1_r);
+	DECLARE_READ8_MEMBER(extrain_2_r);
+	DECLARE_READ8_MEMBER(extrain_3_r);
 };
 
 class nes_vt_swap_op_d5_d6_state : public nes_vt_state
@@ -527,6 +526,50 @@ READ8_MEMBER(nes_vt_hh_state::vt_rom_banked_r)
 void nes_vt_hh_state::vt_external_space_map_fp_2x32mbyte(address_map &map)
 {
 	map(0x0000000, 0x1ffffff).rw(FUNC(nes_vt_hh_state::vt_rom_banked_r), FUNC(nes_vt_hh_state::vt03_8000_mapper_w));
+}
+
+READ8_MEMBER(nes_vt_state::extrain_0_r)
+{
+	if (m_exin0)
+		return m_exin0->read();
+	else
+	{
+		logerror("%s: extrain_0_r (not hooked up)\n", machine().describe_context());
+	}
+	return 0x00;	
+}
+
+READ8_MEMBER(nes_vt_state::extrain_1_r)
+{
+	if (m_exin1)
+		return m_exin1->read();
+	else
+	{
+		logerror("%s: extrain_1_r (not hooked up)\n", machine().describe_context());
+	}
+	return 0x00;	
+}
+
+READ8_MEMBER(nes_vt_state::extrain_2_r)
+{
+	if (m_exin2)
+		return m_exin2->read();
+	else
+	{
+		logerror("%s: extrain_2_r (not hooked up)\n", machine().describe_context());
+	}
+	return 0x00;	
+}
+
+READ8_MEMBER(nes_vt_state::extrain_3_r)
+{
+	if (m_exin3)
+		return m_exin3->read();
+	else
+	{
+		logerror("%s: extrain_3_r (not hooked up)\n", machine().describe_context());
+	}
+	return 0x00;	
 }
 
 /* Standard I/O handlers (NES Controller clone) */
