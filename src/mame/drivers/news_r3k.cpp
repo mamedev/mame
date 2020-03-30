@@ -7,8 +7,6 @@
  * Sources:
  *
  * TODO
- *   - interrupts
- *   - scsi
  *   - sound
  *   - mouse
  */
@@ -27,6 +25,7 @@
 #include "machine/upd765.h"
 #include "machine/dmac_0448.h"
 #include "machine/news_kbd.h"
+#include "machine/cxd1185.h"
 
 // video
 #include "screen.h"
@@ -63,6 +62,7 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_lcd(*this, "lcd")
 		, m_kbd(*this, "kbd")
+		, m_scsi(*this, "scsi:7:cxd1185")
 		, m_serial(*this, "serial%u", 0U)
 		, m_scsibus(*this, "scsi")
 		, m_vram(*this, "vram")
@@ -89,15 +89,39 @@ public:
 protected:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
+	void inten_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 inten_r() { return m_inten; }
+	u16 intst_r() { return m_intst; }
+	void intclr_w(offs_t offset, u16 data, u16 mem_mask);
+
+	enum irq_number : unsigned
+	{
+		EXT3  = 0,
+		EXT1  = 1,
+		SLOT3 = 2,
+		SLOT1 = 3,
+		DMA   = 4,
+		LANCE = 5,
+		SCC   = 6,
+		BEEP  = 7,
+		CBSY  = 8,
+		CFLT  = 9,
+		MOUSE = 10,
+		KBD   = 11,
+		TIMER = 12,
+		BERR  = 13,
+		ABORT = 14,
+		PERR  = 15,
+	};
+	template <irq_number Number> void irq_w(int state);
+	void int_check();
+
+	u32 bus_error();
+	void itimer_w(u8 data);
+	void itimer(void *ptr, s32 param);
 	void kbd_irq(int state);
+	u8 debug_r() { return m_debug; }
 	void debug_w(u8 data);
-
-	template <unsigned Group, unsigned Number> void irq(int state);
-
-	// TODO: raise/lower existing interrupts
-	void inten_w(offs_t offset, u8 data) { m_inten[offset] = data; }
-	u8 inten_r(offs_t offset) { return m_inten[offset]; }
-	u8 intst_r(offs_t offset) { return m_intst[offset]; }
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -112,6 +136,7 @@ protected:
 
 	required_device<screen_device> m_lcd;
 	required_device<news_hle_kbd_device> m_kbd;
+	required_device<cxd1185_device> m_scsi;
 
 	required_device_array<rs232_port_device, 2> m_serial;
 	required_device<nscsi_bus_device> m_scsibus;
@@ -120,11 +145,16 @@ protected:
 	output_finder<4> m_led;
 
 	std::unique_ptr<u16[]> m_net_ram;
-	u8 m_kbd_status;
 
-	u8 m_inten[2];
-	u8 m_intst[2];
-	bool m_irq_out[2];
+	emu_timer *m_itimer;
+
+	u16 m_inten;
+	u16 m_intst;
+	u8 m_kbd_status;
+	u8 m_debug;
+
+	static unsigned const NUM_INT = 4;
+	bool m_int_state[NUM_INT];
 };
 
 FLOPPY_FORMATS_MEMBER(news_r3k_state::floppy_formats)
@@ -136,6 +166,11 @@ void news_r3k_state::machine_start()
 	m_led.resolve();
 
 	m_net_ram = std::make_unique<u16[]>(8192);
+
+	m_itimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r3k_state::itimer), this));
+
+	for (bool &int_state : m_int_state)
+		int_state = false;
 
 	m_kbd_status = 0;
 }
@@ -151,10 +186,18 @@ void news_r3k_state::init_common()
 
 	// HACK: hardwire the rate until fdc is better understood
 	m_fdc->set_rate(500000);
+
+	// HACK: signal floppy density?
+	m_scsi->port_w(0x02);
 }
 
 void news_r3k_state::cpu_map(address_map &map)
 {
+	// prevent netbsd detecting invalid devices
+	map(0x18c30000, 0x18c30003).r(FUNC(news_r3k_state::bus_error));
+	map(0x18ff0000, 0x18ff0003).r(FUNC(news_r3k_state::bus_error));
+	map(0x18fe0000, 0x18fe0003).r(FUNC(news_r3k_state::bus_error));
+
 	// FIXME: silence a lot of unhandled graphics addresses
 	map(0x187702b0, 0x187702b3).nopw().umask32(0xffff);
 	map(0x187c0000, 0x187c0003).nopw(); // palette?
@@ -169,12 +212,12 @@ void news_r3k_state::cpu_map(address_map &map)
 
 	//map(0x1fc40004, 0x1fc40004).w().umask32(0xff); ??
 
-	map(0x1fc80000, 0x1fc80007).nopr();
 	map(0x1fc80000, 0x1fc80001).rw(FUNC(news_r3k_state::inten_r), FUNC(news_r3k_state::inten_w));
 	map(0x1fc80002, 0x1fc80003).r(FUNC(news_r3k_state::intst_r));
-	//map(0x1fc80004, 0x1fc80005); // intclr
-	//map(0x1fc80006, 0x1fc80006); // itimer
-	map(0x1fcc0003, 0x1fcc0003).w(FUNC(news_r3k_state::debug_w));
+	map(0x1fc80004, 0x1fc80005).w(FUNC(news_r3k_state::intclr_w));
+	map(0x1fc80006, 0x1fc80006).w(FUNC(news_r3k_state::itimer_w));
+
+	map(0x1fcc0003, 0x1fcc0003).rw(FUNC(news_r3k_state::debug_r), FUNC(news_r3k_state::debug_w));
 
 	map(0x1fd00000, 0x1fd00000).r(m_kbd, FUNC(news_hle_kbd_device::data_r));
 	map(0x1fd00001, 0x1fd00001).lr8([this]() { return m_kbd_status; }, "kbd_status_r");
@@ -182,7 +225,7 @@ void news_r3k_state::cpu_map(address_map &map)
 	map(0x1fd40000, 0x1fd40003).noprw().umask32(0xffff); // FIXME: ignore buzzer for now
 
 	map(0x1fe00000, 0x1fe0000f).m(m_dma, FUNC(dmac_0448_device::map));
-	//map(0x1fe00100, 0x1fe00100); // scsi
+	map(0x1fe00100, 0x1fe0010f).m(m_scsi, FUNC(cxd1185_device::map));
 	map(0x1fe00200, 0x1fe00203).m(m_fdc, FUNC(upd72067_device::map));
 	//map(0x1fe00300, 0x1fe00307); // sound
 
@@ -249,42 +292,80 @@ u32 news_r3k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 	return 0;
 }
 
-template <unsigned Group, unsigned Number> void news_r3k_state::irq(int state)
+void news_r3k_state::inten_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	LOG("irq group %d number %d state %d\n", Group, Number, state);
+	COMBINE_DATA(&m_inten);
+
+	int_check();
+}
+
+template <news_r3k_state::irq_number Number> void news_r3k_state::irq_w(int state)
+{
+	LOG("irq number %d state %d\n",  Number, state);
 
 	if (state)
-		m_intst[Group] |= (1U << Number);
+		m_intst |= 1U << Number;
 	else
-		m_intst[Group] &= ~(1U << Number);
+		m_intst &= ~(1U << Number);
 
-	u8 const irq_out = m_intst[Group] & m_inten[Group];
-	if (Group == 1)
+	int_check();
+}
+
+void news_r3k_state::intclr_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	m_intst &= ~(data & mem_mask);
+
+	int_check();
+}
+
+void news_r3k_state::int_check()
+{
+	// TODO: assume 44422222 11100000
+	static int const int_line[] = { INPUT_LINE_IRQ0, INPUT_LINE_IRQ1, INPUT_LINE_IRQ2, INPUT_LINE_IRQ4 };
+	static u16 const int_mask[] = { 0x001f, 0x00e0, 0x1f00, 0xe000 };
+
+	for (unsigned i = 0; i < NUM_INT; i++)
 	{
-		bool const irq0_out = irq_out & 0x1f;
-		bool const irq1_out = irq_out & 0xe0;
+		bool const int_state = m_intst & m_inten & int_mask[i];
 
-		if (irq0_out != m_irq_out[0])
+		if (m_int_state[i] != int_state)
 		{
-			m_irq_out[0] = irq0_out;
-			m_cpu->set_input_line(INPUT_LINE_IRQ0, irq0_out);
-		}
-
-		if (irq1_out != m_irq_out[1])
-		{
-			m_irq_out[1] = irq1_out;
-			m_cpu->set_input_line(INPUT_LINE_IRQ1, irq1_out);
+			m_int_state[i] = int_state;
+			m_cpu->set_input_line(int_line[i], int_state);
 		}
 	}
 }
 
+u32 news_r3k_state::bus_error()
+{
+	irq_w<BERR>(ASSERT_LINE);
+
+	return 0;
+}
+
+void news_r3k_state::itimer_w(u8 data)
+{
+	LOG("itimer_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	// TODO: assume 0xff stops the timer
+	u8 const ticks = data + 1;
+
+	m_itimer->adjust(attotime::from_ticks(ticks, 800), 0, attotime::from_ticks(ticks, 800));
+}
+
+void news_r3k_state::itimer(void *ptr, s32 param)
+{
+	irq_w<TIMER>(ASSERT_LINE);
+}
+
 void news_r3k_state::kbd_irq(int state)
 {
-	// TODO: relay irq to cpu
 	if (state)
 		m_kbd_status |= 2;
 	else
 		m_kbd_status &= ~2;
+
+	irq_w<KBD>(state);
 }
 
 void news_r3k_state::debug_w(u8 data)
@@ -294,6 +375,8 @@ void news_r3k_state::debug_w(u8 data)
 	for (unsigned i = 0; i < 4; i++)
 		if (BIT(data, i + 4))
 			m_led[i] = BIT(data, i);
+
+	m_debug = data;
 }
 
 static void news_scsi_devices(device_slot_interface &device)
@@ -315,7 +398,7 @@ void news_r3k_state::common(machine_config &config)
 
 	DMAC_0448(config, m_dma, 0);
 	m_dma->set_bus(m_cpu, 0);
-	m_dma->out_int_cb().set(&news_r3k_state::irq<1, 4>, "irq");
+	m_dma->out_int_cb().set(FUNC(news_r3k_state::irq_w<DMA>));
 	// TODO: channel 0 scsi
 	m_dma->dma_r_cb<1>().set(m_fdc, FUNC(upd72067_device::dma_r));
 	m_dma->dma_w_cb<1>().set(m_fdc, FUNC(upd72067_device::dma_w));
@@ -325,7 +408,7 @@ void news_r3k_state::common(machine_config &config)
 	M48T02(config, m_rtc);
 
 	SCC85C30(config, m_scc, 4.9152_MHz_XTAL);
-	//m_scc->out_int_callback().set(FUNC(rx3230_state::irq_w<INT_SCC>)).invert();
+	m_scc->out_int_callback().set(FUNC(news_r3k_state::irq_w<SCC>));
 
 	// scc channel A
 	RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
@@ -344,7 +427,7 @@ void news_r3k_state::common(machine_config &config)
 	m_scc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 
 	AM7990(config, m_net);
-	//m_net->intr_out().set(FUNC(news_r3k_state::irq_w<INT_NET>));
+	m_net->intr_out().set(FUNC(news_r3k_state::irq_w<LANCE>));
 	m_net->dma_in().set([this](offs_t offset) { return m_net_ram[offset >> 1]; });
 	m_net->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset >> 1]); });
 
@@ -363,6 +446,24 @@ void news_r3k_state::common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", news_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", news_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", news_scsi_devices, "cdrom");
+
+	// scsi host adapter
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("cxd1185", CXD1185).clock(16_MHz_XTAL).machine_config(
+		[this](device_t *device)
+		{
+			cxd1185_device &adapter = downcast<cxd1185_device &>(*device);
+
+			adapter.irq_out_cb().set(m_dma, FUNC(dmac_0448_device::irq<0>));
+			adapter.drq_out_cb().set(m_dma, FUNC(dmac_0448_device::drq<0>));
+			adapter.port_out_cb().set(
+				[this](u8 data)
+				{
+					LOG("floppy %s\n", BIT(data, 0) ? "mount" : "eject");
+				});
+
+			subdevice<dmac_0448_device>(":dma")->dma_r_cb<0>().set(adapter, FUNC(cxd1185_device::dma_r));
+			subdevice<dmac_0448_device>(":dma")->dma_w_cb<0>().set(adapter, FUNC(cxd1185_device::dma_w));
+		});
 
 	/*
 	 * FIXME: the screen is supposed to be an 1120x780 monochrome (black/white)
@@ -385,7 +486,7 @@ void news_r3k_state::nws3260(machine_config &config)
 ROM_START(nws3260)
 	ROM_REGION32_BE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "nws3260", "NWS-3260 v2.0A")
-	ROMX_LOAD("nws3260.bin", 0x00000, 0x20000, CRC(61222991) SHA1(076fab0ad0682cd7dacc7094e42efe8558cbaaa1), ROM_BIOS(0))
+	ROMX_LOAD("mpu-16__ver.2.0a__1990_sony.ic64", 0x00000, 0x20000, CRC(61222991) SHA1(076fab0ad0682cd7dacc7094e42efe8558cbaaa1), ROM_BIOS(0))
 
 	/*
 	 * This is probably a 4-bit device: only the low 4 bits in each location
