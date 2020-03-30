@@ -71,7 +71,7 @@ const pic16_disassembler::instruction pic16_disassembler::instructions[] {
 	{ 0x3580, 0x3f80, [](P) -> u32 { util::stream_format(stream, "lslf %s",      d->freg(opcode)); return 1; } },
 	{ 0x3600, 0x3f80, [](P) -> u32 { util::stream_format(stream, "lsrf %s, w",   d->freg(opcode)); return 1; } },
 	{ 0x3680, 0x3f80, [](P) -> u32 { util::stream_format(stream, "lsrf %s",      d->freg(opcode)); return 1; } },
-	{ 0x0180, 0x3f80, [](P) -> u32 { util::stream_format(stream, "clrf %s, w",   d->freg(opcode)); return 1; } },
+	{ 0x0180, 0x3f80, [](P) -> u32 { util::stream_format(stream, "clrf %s",      d->freg(opcode)); return 1; } },
 	{ 0x0100, 0x3ffc, [](P) -> u32 { util::stream_format(stream, "clrw"                      ); return 1; } },
 	{ 0x0900, 0x3f80, [](P) -> u32 { util::stream_format(stream, "comf %s, w",   d->freg(opcode)); return 1; } },
 	{ 0x0980, 0x3f80, [](P) -> u32 { util::stream_format(stream, "comf %s",      d->freg(opcode)); return 1; } },

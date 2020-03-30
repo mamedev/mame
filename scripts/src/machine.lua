@@ -4268,3 +4268,15 @@ if (MACHINES["I3002"]~=null) then
 		MAME_DIR .. "src/devices/machine/i3002.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/cxd1185.h,MACHINES["CXD1185"] = true
+---------------------------------------------------
+
+if (MACHINES["CXD1185"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/cxd1185.cpp",
+		MAME_DIR .. "src/devices/machine/cxd1185.h",
+	}
+end

@@ -383,8 +383,8 @@ license:CC0
 		<disk state="1"><color red="0.25" green="0.22" blue="0.22" /></disk>
 	</element>
 	<element name="but_dw" defstate="0">
-		<disk state="0"><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<disk state="1"><color red="0.66" green="0.65" blue="0.65" /></disk>
+		<disk state="0"><color red="0.74" green="0.73" blue="0.72" /></disk>
+		<disk state="1"><color red="0.59" green="0.58" blue="0.58" /></disk>
 	</element>
 
 	<element name="switch" defstate="2">

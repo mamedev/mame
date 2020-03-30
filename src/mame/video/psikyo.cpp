@@ -76,11 +76,23 @@ Offset:
 template<int Layer>
 TILE_GET_INFO_MEMBER(psikyo_state::get_tile_info)
 {
-	u16 code = ((u16 *)m_vram[Layer].target())[BYTE_XOR_BE(tile_index)];
+	u16 code = m_vram[Layer][tile_index & 0xfff];
 	tileinfo.set(1,
 			(code & 0x1fff) + 0x2000 * m_tilemap_bank[Layer],
 			((code >> 13) & 7) + (Layer * 0x40),
 			0);
+}
+
+template<int Layer>
+TILEMAP_MAPPER_MEMBER(psikyo_state::tile_scan)
+{
+	switch (m_tmapsize[Layer])
+	{
+	case 0:  return (col & 0x3f) | ((row & 0x3f) << 6) | ((col & 0xc0) << 6) | ((row & 0x40) << 8);
+	case 1:  return (col & 0x7f) | ((row & 0x1f) << 7) | ((col & 0x80) << 5) | ((row & 0x60) << 8);
+	case 2:  return (col & 0xff) | ((row & 0x0f) << 8) | ((row & 0x70) << 8);
+	default: return (col & 0x1f) | ((row & 0x7f) << 5) | ((col & 0xe0) << 7);
+	}
 }
 
 void psikyo_state::switch_bgbanks(u8 tmap, u8 bank)
@@ -88,11 +100,9 @@ void psikyo_state::switch_bgbanks(u8 tmap, u8 bank)
 	if (bank != m_tilemap_bank[tmap])
 	{
 		m_tilemap_bank[tmap] = bank;
-		for (int size = 0; size < 4; size++)
-			m_tilemap[tmap][size]->mark_all_dirty();
+		m_tilemap[tmap]->mark_all_dirty();
 	}
 }
-
 
 VIDEO_START_MEMBER(psikyo_state,psikyo)
 {
@@ -101,18 +111,18 @@ VIDEO_START_MEMBER(psikyo_state,psikyo)
 	/* The Hardware is Capable of Changing the Dimensions of the Tilemaps, its safer to create
 	   the various sized tilemaps now as opposed to later */
 
-	for (int size = 0; size < 4; size++)
-	{
-		m_tilemap[0][size] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(psikyo_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 0x20 << size, 0x80 >> size);
-		m_tilemap[1][size] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(psikyo_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 0x20 << size, 0x80 >> size);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(psikyo_state::get_tile_info<0>)), tilemap_mapper_delegate(*this, FUNC(psikyo_state::tile_scan<0>)), 16, 16, 256, 128);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(psikyo_state::get_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(psikyo_state::tile_scan<1>)), 16, 16, 256, 128);
 
-		for (int layer = 0; layer < 2; layer++)
-		{
-			m_tilemap[layer][size]->set_scroll_rows(1);
-			m_tilemap[layer][size]->set_scroll_cols(1);
-		}
+	for (int layer = 0; layer < 2; layer++)
+	{
+		m_tilemap[layer]->set_scroll_rows(1);
+		m_tilemap[layer]->set_scroll_cols(1);
 	}
+
 	save_item(NAME(m_old_linescroll));
+	save_item(NAME(m_old_tmapsize));
+	save_item(NAME(m_tmapsize));
 	save_item(NAME(m_sprite_ctrl));
 }
 
@@ -176,8 +186,6 @@ void psikyo_state::get_sprites()
 	m_sprite_ctrl = m_spriteram->buffer()[0x1ffe / 4] & 0xffff;
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	const u16 *spritelist = (u16 *)(m_spriteram->buffer() + 0x1800 / 4);
-	const u8 *TILES = m_spritelut->base();    // Sprites LUT
-	u32 const TILES_LEN = m_spritelut->bytes();
 
 	u16 const width = m_screen->width();
 	u16 const height = m_screen->height();
@@ -248,10 +256,8 @@ void psikyo_state::get_sprites()
 		{
 			for (int dx = xstart; dx != xend; dx += xinc)
 			{
-				u32 const addr = (code * 2) & (TILES_LEN - 1);
-
 				m_sprite_ptr_pre->gfx = 0;
-				m_sprite_ptr_pre->code = TILES[addr+1] * 256 + TILES[addr];
+				m_sprite_ptr_pre->code = m_spritelut[code & m_spritelut.mask()];
 				m_sprite_ptr_pre->color = attr >> 8;
 				m_sprite_ptr_pre->flipx = flipx;
 				m_sprite_ptr_pre->flipy = flipy;
@@ -287,8 +293,6 @@ void psikyo_state::get_sprites_bootleg()
 	m_sprite_ctrl = m_spriteram->buffer()[0x1ffe / 4] & 0xffff;
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	const u16 *spritelist = (u16 *)(m_spriteram->buffer() + 0x1800 / 4);
-	const u8 *TILES = m_spritelut->base();    // Sprites LUT
-	u32 const TILES_LEN = m_spritelut->bytes();
 
 	u16 const width = m_screen->width();
 	u16 const height = m_screen->height();
@@ -341,7 +345,6 @@ void psikyo_state::get_sprites_bootleg()
 		zoomx = 32 - zoomx;
 		zoomy = 32 - zoomy;
 
-
 		if (flip_screen())
 		{
 			x = width  - x - (nx * zoomx) / 2;
@@ -360,10 +363,8 @@ void psikyo_state::get_sprites_bootleg()
 		{
 			for (int dx = xstart; dx != xend; dx += xinc)
 			{
-				u32 const addr = (code * 2) & (TILES_LEN-1);
-
 				m_sprite_ptr_pre->gfx = 0;
-				m_sprite_ptr_pre->code = TILES[addr+1] * 256 + TILES[addr];
+				m_sprite_ptr_pre->code = m_spritelut[code & m_spritelut.mask()];
 				m_sprite_ptr_pre->color = attr >> 8;
 				m_sprite_ptr_pre->flipx = flipx;
 				m_sprite_ptr_pre->flipy = flipy;
@@ -388,7 +389,7 @@ void psikyo_state::get_sprites_bootleg()
 	}
 }
 
-void psikyo_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void psikyo_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	struct sprite_t *sprite_ptr = m_sprite_ptr_pre;
 	u32 transmask = 0;
@@ -427,22 +428,13 @@ void psikyo_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, con
 
 ***************************************************************************/
 
-u16 psikyo_state::tilemap_width(u8 size)
+u32 psikyo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return (0x80 * 16) >> size;
-}
-
-u32 psikyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	u16 bgpen = 0;
+	u32 bgpen = 0;
 	int i, layers_ctrl = -1;
-
-	u32 tmsize[2];
 
 	u32 scrollx[2]{ m_vregs[0x406 / 4], m_vregs[0x40e / 4] }, scrolly[2]{ m_vregs[0x402 / 4], m_vregs[0x40a / 4] };
 	u32 layer_ctrl[2]{ m_vregs[0x412 / 4], m_vregs[0x416 / 4] };
-
-	tilemap_t *tmptilemap[2];
 
 	flip_screen_set(~m_in_dsw->read() & 0x00010000);       // hardwired to a DSW bit
 
@@ -456,7 +448,7 @@ u32 psikyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	        6- 7: tilemap size
 	        8   : per-line rowscroll
 	        9   : per-tile rowscroll
-	       10   : tilebank (btlkroad/gunbird/s1945jn only)
+	       10   : tilebank (btlkroad/gunbird/s1945n only)
 	       11-15: ? */
 
 /*
@@ -483,37 +475,31 @@ u32 psikyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			switch_bgbanks(layer, (layer_ctrl[layer] & 0x400) >> 10);
 		}
 
-		switch ((layer_ctrl[layer] & 0x00c0) >> 6)
+		u32 new_size = ((layer_ctrl[layer] & 0x00c0) >> 6);
+		if (m_old_tmapsize[layer] != new_size)
 		{
-		case 0:  tmsize[layer] = 1;    break;
-		case 1:  tmsize[layer] = 2;    break;
-		case 2:  tmsize[layer] = 3;    break;
-		default: tmsize[layer] = 0;    break;
+			m_tmapsize[layer] = new_size;
+			m_tilemap[layer]->mark_mapping_dirty();
 		}
 
-		tmptilemap[layer] = m_tilemap[layer][tmsize[layer]];
-
-		tmptilemap[layer]->enable(~layer_ctrl[layer] & 1);
+		m_tilemap[layer]->enable(~layer_ctrl[layer] & 1);
 
 		/* Layers scrolling */
-		tmptilemap[layer]->set_scrolly(0, scrolly[layer]);
+		m_tilemap[layer]->set_scrolly(0, scrolly[layer]);
 		if (layer_ctrl[layer] & 0x0300) /* per-line rowscroll */
 		{
 			int tile_rowscroll = (layer_ctrl[layer] & 0x0200) >> 7; /* per-tile rowscroll */
 			assert(tile_rowscroll == 0 || tile_rowscroll == 4);
 			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
-				for (int i = 0; i < 4; i++)
-				{
-					m_tilemap[layer][i]->set_scroll_rows(tilemap_width(i));
-				}
+				m_tilemap[layer]->set_scroll_rows(0x800);
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
 			for (i = 0; i < 256; i++)   /* 256 screen lines */
 			{
 				int x0 = ((u16 *)m_vregs.target())[BYTE_XOR_BE((layer * 0x200)/2 + (i >> tile_rowscroll))];
-				tmptilemap[layer]->set_scrollx(
-				(i + scrolly[layer]) % (tilemap_width(tmsize[layer])),
+				m_tilemap[layer]->set_scrollx(
+				(i + scrolly[layer]) & 0x7ff,
 				scrollx[layer] + x0 );
 			}
 		}
@@ -521,22 +507,19 @@ u32 psikyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 		{
 			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
-				for (int i = 0; i < 4; i++)
-				{
-					m_tilemap[layer][i]->set_scroll_rows(1);
-				}
+				m_tilemap[layer]->set_scroll_rows(1);
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
-			tmptilemap[layer]->set_scrollx(0, scrollx[layer]);
+			m_tilemap[layer]->set_scrollx(0, scrollx[layer]);
 		}
-		tmptilemap[layer]->set_transparent_pen((layer_ctrl[layer] & 8 ? 0 : 15));
+		m_tilemap[layer]->set_transparent_pen((layer_ctrl[layer] & 8 ? 0 : 15));
 	}
 
 	// TODO : is this correct?
 	if (layers_ctrl & 1)
-		bgpen = ((layer_ctrl[0] & 8) ? 0x800 : 0x80f);
+		bgpen = m_palette->pen(((layer_ctrl[0] & 8) ? 0x800 : 0x80f));
 	else if (layers_ctrl & 2)
-		bgpen = ((layer_ctrl[1] & 8) ? 0xc00 : 0xc0f);
+		bgpen = m_palette->pen(((layer_ctrl[1] & 8) ? 0xc00 : 0xc0f));
 	else
 		bgpen = m_palette->black_pen(); // TODO
 
@@ -545,10 +528,10 @@ u32 psikyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	screen.priority().fill(0, cliprect);
 
 	if (layers_ctrl & 1)
-		tmptilemap[0]->draw(screen, bitmap, cliprect, layer_ctrl[0] & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, layer_ctrl[0] & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
 
 	if (layers_ctrl & 2)
-		tmptilemap[1]->draw(screen, bitmap, cliprect, layer_ctrl[1] & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, layer_ctrl[1] & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
 
 	if (layers_ctrl & 4)
 		draw_sprites(screen, bitmap, cliprect);
@@ -564,17 +547,13 @@ u32 psikyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 */
 
-u32 psikyo_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 psikyo_state::screen_update_bootleg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	u16 bgpen = 0;
+	u32 bgpen = 0;
 	int i, layers_ctrl = -1;
-
-	u32 tmsize[2];
 
 	u32 scrollx[2]{ m_vregs[0x406 / 4], m_vregs[0x40e / 4] }, scrolly[2]{ m_vregs[0x402 / 4], m_vregs[0x40a / 4] };
 	u32 layer_ctrl[2]{ m_vregs[0x412 / 4], m_vregs[0x416 / 4] };
-
-	tilemap_t *tmptilemap[2];
 
 	flip_screen_set(~m_in_dsw->read() & 0x00010000);       // hardwired to a DSW bit
 
@@ -588,7 +567,7 @@ u32 psikyo_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bit
 	        6- 7: tilemap size
 	        8   : per-line rowscroll
 	        9   : per-tile rowscroll
-	       10   : tilebank (btlkroad/gunbird/s1945jn only)
+	       10   : tilebank (btlkroad/gunbird/s1945n only)
 	       11-15: ? */
 
 /*
@@ -615,20 +594,17 @@ u32 psikyo_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bit
 			switch_bgbanks(layer, (layer_ctrl[layer] & 0x400) >> 10);
 		}
 
-		switch ((layer_ctrl[layer] & 0x00c0) >> 6)
+		u32 new_size = ((layer_ctrl[layer] & 0x00c0) >> 6);
+		if (m_old_tmapsize[layer] != new_size)
 		{
-		case 0:  tmsize[layer] = 1;    break;
-		case 1:  tmsize[layer] = 2;    break;
-		case 2:  tmsize[layer] = 3;    break;
-		default: tmsize[layer] = 0;    break;
+			m_tmapsize[layer] = new_size;
+			m_tilemap[layer]->mark_mapping_dirty();
 		}
 
-		tmptilemap[layer] = m_tilemap[layer][tmsize[layer]];
-
-		tmptilemap[layer]->enable(~layer_ctrl[layer] & 1);
+		m_tilemap[layer]->enable(~layer_ctrl[layer] & 1);
 
 		/* Layers scrolling */
-		tmptilemap[layer]->set_scrolly(0, scrolly[layer]);
+		m_tilemap[layer]->set_scrolly(0, scrolly[layer]);
 
 		if (layer_ctrl[layer] & 0x0300) /* per-line rowscroll */
 		{
@@ -636,40 +612,34 @@ u32 psikyo_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bit
 			assert(tile_rowscroll == 0 || tile_rowscroll == 4);
 			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
-				for (int i = 0; i < 4; i++)
-				{
-					m_tilemap[layer][i]->set_scroll_rows(tilemap_width(i));
-				}
+				m_tilemap[layer]->set_scroll_rows(0x800);
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
 			for (i = 0; i < 256; i++)   /* 256 screen lines */
 			{
 				int x0 = ((u16 *)m_vregs.target())[BYTE_XOR_BE((layer * 0x200)/2 + (i >> tile_rowscroll))];
-				tmptilemap[layer]->set_scrollx(
-				(i + scrolly[layer]) % (tilemap_width(tmsize[layer])),
-				scrollx[layer] + x0 );
+				m_tilemap[layer]->set_scrollx(
+				(i + scrolly[layer]) & 0x7ff,
+				scrollx[layer] + x0);
 			}
 		}
 		else
 		{
 			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
-				for (int i = 0; i < 4; i++)
-				{
-					m_tilemap[layer][i]->set_scroll_rows(1);
-				}
+				m_tilemap[layer]->set_scroll_rows(1);
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
-			tmptilemap[layer]->set_scrollx(0, scrollx[layer]);
+			m_tilemap[layer]->set_scrollx(0, scrollx[layer]);
 		}
-		tmptilemap[layer]->set_transparent_pen((layer_ctrl[layer] & 8 ? 0 : 15));
+		m_tilemap[layer]->set_transparent_pen((layer_ctrl[layer] & 8 ? 0 : 15));
 	}
 
 	// TODO : is this correct?
 	if (layers_ctrl & 1)
-		bgpen = ((layer_ctrl[0] & 8) ? 0x800 : 0x80f);
+		bgpen = m_palette->pen(((layer_ctrl[0] & 8) ? 0x800 : 0x80f));
 	else if (layers_ctrl & 2)
-		bgpen = ((layer_ctrl[1] & 8) ? 0xc00 : 0xc0f);
+		bgpen = m_palette->pen(((layer_ctrl[1] & 8) ? 0xc00 : 0xc0f));
 	else
 		bgpen = m_palette->black_pen(); // TODO
 
@@ -678,10 +648,10 @@ u32 psikyo_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bit
 	screen.priority().fill(0, cliprect);
 
 	if (layers_ctrl & 1)
-		tmptilemap[0]->draw(screen, bitmap, cliprect, layer_ctrl[0] & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, layer_ctrl[0] & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
 
 	if (layers_ctrl & 2)
-		tmptilemap[1]->draw(screen, bitmap, cliprect, layer_ctrl[1] & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, layer_ctrl[1] & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
 
 	if (layers_ctrl & 4)
 		draw_sprites(screen, bitmap, cliprect);
