@@ -117,6 +117,8 @@ protected:
 
 	DECLARE_READ8_MEMBER(vt_rom_r);
 	DECLARE_WRITE8_MEMBER(vtspace_w);
+	
+	void configure_soc(nes_vt_soc_device* soc);
 
 private:
 	/* APU handling */
@@ -1041,22 +1043,24 @@ static GFXDECODE_START( vt03_gfx_helper )
 	GFXDECODE_ENTRY( "mainrom", 0, helper2_layout,  0x0, 2  )
 GFXDECODE_END
 
+void nes_vt_state::configure_soc(nes_vt_soc_device* soc)
+{
+	soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_32mbyte);
+	soc->read_0_callback().set(FUNC(nes_vt_state::in0_r));
+	soc->read_1_callback().set(FUNC(nes_vt_state::in1_r));
+	soc->write_0_callback().set(FUNC(nes_vt_state::in0_w));
+
+	soc->extra_read_0_callback().set(FUNC(nes_vt_state::extrain_0_r));
+	soc->extra_read_1_callback().set(FUNC(nes_vt_state::extrain_1_r));
+	soc->extra_read_2_callback().set(FUNC(nes_vt_state::extrain_2_r));
+	soc->extra_read_3_callback().set(FUNC(nes_vt_state::extrain_3_r));
+}
+
 void nes_vt_state::nes_vt_base(machine_config &config)
 {
 	/* basic machine hardware */
 	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_32mbyte);
-	m_soc->read_0_callback().set(FUNC(nes_vt_state::in0_r));
-	m_soc->read_1_callback().set(FUNC(nes_vt_state::in1_r));
-	m_soc->write_0_callback().set(FUNC(nes_vt_state::in0_w));
-
-	m_soc->extra_read_0_callback().set(FUNC(nes_vt_state::extrain_0_r));
-	m_soc->extra_read_1_callback().set(FUNC(nes_vt_state::extrain_1_r));
-	m_soc->extra_read_2_callback().set(FUNC(nes_vt_state::extrain_2_r));
-	m_soc->extra_read_3_callback().set(FUNC(nes_vt_state::extrain_3_r));
-
-//	M6502_VTSCR(config, m_maincpu, NTSC_APU_CLOCK);
-//	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_map);
+	configure_soc(m_soc);
 
 	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
 }
@@ -1495,10 +1499,11 @@ void nes_vt_dg_state::nes_vt_fa_4x16mb(machine_config& config)
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009(machine_config &config)
 {
 	nes_vt(config);
-	/*
-	M6502_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::nes_vt_map);
+	
+	NES_VT_SOC_SCRAMBLE(config.replace(), m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
 
+	/* TODO
 	//m_ppu->set_palette_mode(PAL_MODE_NEW_VG); // gives better title screens, but worse ingame, must be able to switch
 	*/
 }

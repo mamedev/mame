@@ -148,15 +148,18 @@ private:
 	devcb_read8 m_extra_read_3_callback;
 };
 
-/*
-class nes_vt_soc_scramble_device : public nes_vt_soc
+
+class nes_vt_soc_scramble_device : public nes_vt_soc_device
 {
 public:
-	nes_vt_soc_scramble_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_vt_soc_scramble_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
-}
-*/
+protected:
+	virtual void device_add_mconfig(machine_config& config) override;
+};
+
 
 DECLARE_DEVICE_TYPE(NES_VT_SOC, nes_vt_soc_device)
+DECLARE_DEVICE_TYPE(NES_VT_SOC_SCRAMBLE, nes_vt_soc_scramble_device)
 
 #endif // MAME_MACHINE_NES_VT_H

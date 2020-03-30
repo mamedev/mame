@@ -56,6 +56,7 @@
 #include "nes_vt.h"
 
 DEFINE_DEVICE_TYPE(NES_VT_SOC, nes_vt_soc_device, "nes_vt_soc", "VTxx series System on a Chip")
+DEFINE_DEVICE_TYPE(NES_VT_SOC_SCRAMBLE, nes_vt_soc_scramble_device, "nes_vt_soc", "VTxx series System on a Chip (with Opcode scrambling)")
 
 void nes_vt_soc_device::program_map(address_map &map)
 {
@@ -91,6 +92,10 @@ nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, const char* 
 {
 }
 
+nes_vt_soc_scramble_device::nes_vt_soc_scramble_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt_soc_device(mconfig, NES_VT_SOC_SCRAMBLE, tag, owner, clock)
+{
+}
 
 
 void nes_vt_soc_device::device_start()
@@ -1114,6 +1119,14 @@ void nes_vt_soc_device::device_add_mconfig(machine_config &config)
 	m_apu->irq().set(FUNC(nes_vt_soc_device::apu_irq));
 	m_apu->mem_read().set(FUNC(nes_vt_soc_device::apu_read_mem));
 	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void nes_vt_soc_scramble_device::device_add_mconfig(machine_config& config)
+{
+	nes_vt_soc_device::device_add_mconfig(config);
+
+	M6502_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_scramble_device::nes_vt_map);
 }
 
 uint32_t nes_vt_soc_device::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
