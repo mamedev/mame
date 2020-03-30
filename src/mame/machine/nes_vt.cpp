@@ -1,6 +1,57 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+/***************************************************************************
+
+  The 'VT' series are SoC solutions that implement enhanced NES hardware
+  there are several generations of these chips each adding additional
+  functionality.
+
+  This list is incomplete
+
+  VT01 - plain famiclone?
+  VT02 - banking scheme to access 32MB, Dual APU with PCM support
+  VT03 - above + 4bpp sprite / bg modes, enhanced palette
+
+  VT08 - ?
+
+  VT09 - alt 4bpp modes?
+
+  VT16 - ?
+  VT18 - ?
+
+    VT33 (?) - used in FC Pocket, dgun2573
+        Adds scrambled opcodes (XORed with 0xA1) and RGB444 palette mode,
+        and more advanced PCM modes (CPU and video working, sound NYI)
+
+    VT368 (?) - used in DGUN2561, lxcmcy
+        Various enhancements not yet emulated. Different banking, possibly an ALU,
+        larger palette space
+
+    VT36x (?) - used in SY889
+        Uses SQI rather than parallel flash
+        Vaguely OneBus compatible but some registers different ($411C in particular)
+        Uses RGB format for palettes
+        Credit to NewRisingSun2 for much of the reverse engineering
+                 same chipset used in Mogis M320, but uses more advanced feature set.
+
+  (more)
+  
+
+
+  todo (VT03):
+
+  APU refactoring to allow for mostly doubled up functionality + PCM channel
+  *more*
+
+  todo (newer VTxx):
+
+  new PCM audio in FC Pocket and DGUN-2573
+    add support for VT368 (?) in DGUN-2561 and lxcmcy
+    add support for the VT369 (?) featurs used by the MOGIS M320
+
+**************************************************************************/
+
 #include "emu.h"
 #include "nes_vt.h"
 
@@ -23,7 +74,15 @@ nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, const char* 
 	m_space_config("program", ENDIANNESS_LITTLE, 8, 25, 0, address_map_constructor(FUNC(nes_vt_soc_device::program_map), this)),
 	m_write_0_callback(*this),
 	m_read_0_callback(*this),
-	m_read_1_callback(*this)
+	m_read_1_callback(*this),
+	m_extra_write_0_callback(*this),
+	m_extra_write_1_callback(*this),
+	m_extra_write_2_callback(*this),
+	m_extra_write_3_callback(*this),
+	m_extra_read_0_callback(*this),
+	m_extra_read_1_callback(*this),
+	m_extra_read_2_callback(*this),
+	m_extra_read_3_callback(*this)
 {
 }
 
@@ -60,6 +119,18 @@ void nes_vt_soc_device::device_start()
 	m_write_0_callback.resolve_safe();
 	m_read_0_callback.resolve_safe(0xff);
 	m_read_1_callback.resolve_safe(0xff);
+
+	m_extra_write_0_callback.resolve_safe();
+	m_extra_write_1_callback.resolve_safe();
+	m_extra_write_2_callback.resolve_safe();
+	m_extra_write_3_callback.resolve_safe();
+
+	m_extra_read_0_callback.resolve_safe(0xff);
+	m_extra_read_1_callback.resolve_safe(0xff);
+	m_extra_read_2_callback.resolve_safe(0xff);
+	m_extra_read_3_callback.resolve_safe(0xff);
+
+
 }
 
 void nes_vt_soc_device::device_reset()
@@ -879,11 +950,9 @@ READ8_MEMBER(nes_vt_soc_device::extrain_01_r)
 {
 	// TODO: check status of 410d port to make sure we only read from enabled ports
 	uint8_t in0 = 0x00, in1 = 0x00;
-// TODO
-//	if (m_exin0)
-//		in0 = m_exin0->read() & 0x0f;
-//	if (m_exin1)
-//		in1 = m_exin1->read() & 0x0f;
+
+	in0 = m_extra_read_0_callback() & 0x0f;
+	in1 = m_extra_read_1_callback() & 0x0f;
 
 	return in0 | (in1<<4);
 }
@@ -892,11 +961,9 @@ READ8_MEMBER(nes_vt_soc_device::extrain_23_r)
 {
 	// TODO: check status of 410d port to make sure we only read from enabled ports
 	uint8_t in2 = 0x00, in3 = 0x00;
-// TODO
-//	if (m_exin2)
-//		in2 = m_exin2->read() & 0x0f;
-//	if (m_exin3)
-//		in3 = m_exin3->read() & 0x0f;
+
+	in2 = m_extra_read_2_callback() & 0x0f;
+	in3 = m_extra_read_3_callback() & 0x0f;
 
 	return in2 | (in3<<4);
 }

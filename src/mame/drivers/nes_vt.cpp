@@ -2,56 +2,9 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
-  nes_vt.c
+  nes_vt.cpp
 
-  The 'VT' series are SoC solutions that implement enhanced NES hardware
-  there are several generations of these chips each adding additional
-  functionality.
-
-  This list is incomplete
-
-  VT01 - plain famiclone?
-  VT02 - banking scheme to access 32MB, Dual APU with PCM support
-  VT03 - above + 4bpp sprite / bg modes, enhanced palette
-
-  VT08 - ?
-
-  VT09 - alt 4bpp modes?
-
-  VT16 - ?
-  VT18 - ?
-
-    VT33 (?) - used in FC Pocket, dgun2573
-        Adds scrambled opcodes (XORed with 0xA1) and RGB444 palette mode,
-        and more advanced PCM modes (CPU and video working, sound NYI)
-
-    VT368 (?) - used in DGUN2561, lxcmcy
-        Various enhancements not yet emulated. Different banking, possibly an ALU,
-        larger palette space
-
-    VT36x (?) - used in SY889
-        Uses SQI rather than parallel flash
-        Vaguely OneBus compatible but some registers different ($411C in particular)
-        Uses RGB format for palettes
-        Credit to NewRisingSun2 for much of the reverse engineering
-                 same chipset used in Mogis M320, but uses more advanced feature set.
-
-  (more)
-  
-
-
-  todo (VT03):
-
-  APU refactoring to allow for mostly doubled up functionality + PCM channel
-  *more*
-
-  todo (newer VTxx):
-
-  new PCM audio in FC Pocket and DGUN-2573
-    add support for VT368 (?) in DGUN-2561 and lxcmcy
-    add support for the VT369 (?) featurs used by the MOGIS M320
-
-  todo (general)
+  TODO
 
   Add more Famiclone roms here, there should be plenty more dumps of VTxx
   based systems floating about.
@@ -89,10 +42,7 @@ public:
 		m_exin1(*this, "EXTRAIN1"),
 		m_exin2(*this, "EXTRAIN2"),
 		m_exin3(*this, "EXTRAIN3"),
-		m_prgrom(*this, "mainrom"),
-		m_initial_e000_bank(0xff)
-	//	m_ntram(nullptr),
-	//	m_chrram(nullptr)
+		m_prgrom(*this, "mainrom")
 	{ }
 
 	void nes_vt_base(machine_config& config);
@@ -157,8 +107,6 @@ protected:
 
 	void nes_vt_4k_ram_map(address_map& map);
 
-		uint8_t m_initial_e000_bank;
-
 	void vt_external_space_map_32mbyte(address_map& map);
 	void vt_external_space_map_16mbyte(address_map& map);
 	void vt_external_space_map_8mbyte(address_map& map);
@@ -174,11 +122,11 @@ private:
 	/* APU handling */
 
 	/* Extra IO */
-//	DECLARE_WRITE8_MEMBER(extra_io_control_w);
-//	virtual DECLARE_READ8_MEMBER(extrain_01_r);
-//	virtual DECLARE_READ8_MEMBER(extrain_23_r);
-//	virtual DECLARE_WRITE8_MEMBER(extraout_01_w);
-//	virtual DECLARE_WRITE8_MEMBER(extraout_23_w);
+	DECLARE_READ8_MEMBER(extrain_0_r) { return m_exin0->read(); }
+	DECLARE_READ8_MEMBER(extrain_1_r) { return m_exin1->read(); }
+	DECLARE_READ8_MEMBER(extrain_2_r) { return m_exin2->read(); }
+	DECLARE_READ8_MEMBER(extrain_3_r) { return m_exin3->read(); }
+
 };
 
 class nes_vt_swap_op_d5_d6_state : public nes_vt_state
@@ -1102,42 +1050,15 @@ void nes_vt_state::nes_vt_base(machine_config &config)
 	m_soc->read_1_callback().set(FUNC(nes_vt_state::in1_r));
 	m_soc->write_0_callback().set(FUNC(nes_vt_state::in0_w));
 
+	m_soc->extra_read_0_callback().set(FUNC(nes_vt_state::extrain_0_r));
+	m_soc->extra_read_1_callback().set(FUNC(nes_vt_state::extrain_1_r));
+	m_soc->extra_read_2_callback().set(FUNC(nes_vt_state::extrain_2_r));
+	m_soc->extra_read_3_callback().set(FUNC(nes_vt_state::extrain_3_r));
 
 //	M6502_VTSCR(config, m_maincpu, NTSC_APU_CLOCK);
 //	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_map);
 
-//	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//	m_screen->set_refresh_hz(60.0988);
-//	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) *
-//							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
-//	m_screen->set_size(32*8, 262);
-//	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
-//	m_screen->set_screen_update(FUNC(nes_vt_state::screen_update));
-
 	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
-
-//	PPU_VT03(config, m_ppu, N2A03_NTSC_XTAL);
-//	m_ppu->set_cpu_tag(m_maincpu);
-//	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-//	m_ppu->read_bg().set(FUNC(nes_vt_state::chr_r));
-//	m_ppu->read_sp().set(FUNC(nes_vt_state::spr_r));
-//	m_ppu->set_screen(m_screen);
-
-//	ADDRESS_MAP_BANK(config, m_vt_external_space); 
-//	m_vt_external_space->set_options(ENDIANNESS_NATIVE, 8, 25, 0x2000000);
-//	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_32mbyte); // no default map, set according to the ROM size and other things so mirroring works
-
-	/* sound hardware */
-//	SPEAKER(config, "mono").front_center();
-
-	/* this should actually be a custom *almost* doubled up APU, however requires more thought
-	   than just using 2 APUs as registers in the 2nd one affect the PCM channel mode but the
-	   DMA control still comes from the 1st, but in the new mode, sound always outputs via the
-	   2nd.  Probably need to split the APU into interface and sound gen logic. */
-//	NES_APU(config, m_apu, NTSC_APU_CLOCK);
-	//m_apu->irq().set(FUNC(nes_vt_state::apu_irq));
-	//m_apu->mem_read().set(FUNC(nes_vt_state::apu_read_mem));
-//	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void nes_vt_state::nes_vt_base_pal(machine_config &config)

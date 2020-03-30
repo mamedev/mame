@@ -22,9 +22,21 @@ public:
 
 	DECLARE_WRITE8_MEMBER(vt03_8000_mapper_w);
 
+	// 8-bit ports
 	auto write_0_callback() { return m_write_0_callback.bind(); }
 	auto read_0_callback() { return m_read_0_callback.bind(); }
 	auto read_1_callback() { return m_read_1_callback.bind(); }
+
+	// 4-bit ports
+	auto extra_read_0_callback() { return m_extra_read_0_callback.bind(); }
+	auto extra_read_1_callback() { return m_extra_read_1_callback.bind(); }
+	auto extra_read_2_callback() { return m_extra_read_2_callback.bind(); }
+	auto extra_read_3_callback() { return m_extra_read_3_callback.bind(); }
+
+	auto extra_write_0_callback() { return m_extra_write_0_callback.bind(); }
+	auto extra_write_1_callback() { return m_extra_write_1_callback.bind(); }
+	auto extra_write_2_callback() { return m_extra_write_2_callback.bind(); }
+	auto extra_write_3_callback() { return m_extra_write_3_callback.bind(); }
 
 protected:
 	virtual void device_start() override;
@@ -122,6 +134,17 @@ private:
 	devcb_write8 m_write_0_callback;
 	devcb_read8 m_read_0_callback;
 	devcb_read8 m_read_1_callback;
+
+	devcb_write8 m_extra_write_0_callback;
+	devcb_write8 m_extra_write_1_callback;
+	devcb_write8 m_extra_write_2_callback;
+	devcb_write8 m_extra_write_3_callback;
+
+	devcb_read8 m_extra_read_0_callback;
+	devcb_read8 m_extra_read_1_callback;
+	devcb_read8 m_extra_read_2_callback;
+	devcb_read8 m_extra_read_3_callback;
+
 
 };
 
