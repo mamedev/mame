@@ -156,8 +156,11 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
+	void nes_vt_pjoy_4mb(machine_config& config);
+
+
 protected:
-	virtual void machine_reset() override;
+//	virtual void machine_reset() override;
 };
 
 class nes_vt_waixing_state : public nes_vt_state
@@ -1177,7 +1180,7 @@ void nes_vt_state::nes_vt_2mb(machine_config& config)
 void nes_vt_state::nes_vt_4mb(machine_config& config)
 {
 	nes_vt(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_2mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_4mbyte);
 }
 
 void nes_vt_state::nes_vt_8mb(machine_config& config)
@@ -1248,15 +1251,17 @@ void nes_vt_hum_state::machine_reset()
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
 }
 
-void nes_vt_pjoy_state::machine_reset()
+
+void nes_vt_pjoy_state::nes_vt_pjoy_4mb(machine_config &config)
 {
-	nes_vt_state::machine_reset();
+	nes_vt_4mb(config);
 	m_soc->set_201x_descramble(0x2, 0x3, 0x4, 0x5, 0x6, 0x7);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x8, 0x7);
-	/*
-	// TODO set_410x_scramble(0x8, 0x7);
-	*/
+	m_soc->set_410x_scramble(0x8, 0x7);
 }
+
+
+
 
 void nes_vt_sp69_state::machine_reset()
 {
@@ -2322,8 +2327,8 @@ CONS( 200?, zdog,      0,  0,  nes_vt_4mb,    nes_vt, nes_vt_hum_state, empty_in
 
 // very plain menus
 CONS( 200?, pjoyn50,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "PowerJoy Navigator 50 in 1", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, pjoys30,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 30 in 1", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, pjoys60,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 60 in 1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, pjoys30,    0,        0,  nes_vt_pjoy_4mb,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 30 in 1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, pjoys60,    0,        0,  nes_vt_pjoy_4mb,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 60 in 1", MACHINE_IMPERFECT_GRAPHICS )
 // has a non-enhanced version of 'Octopus' as game 30
 CONS( 200?, sarc110,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Super Arcade 110 (set 1)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, sarc110a,   sarc110,  0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Super Arcade 110 (set 2)", MACHINE_IMPERFECT_GRAPHICS )

@@ -49,6 +49,7 @@ public:
 	};
 
 	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
+	void set_410x_scramble(uint8_t reg0, uint8_t reg1);
 
 protected:
 	nes_vt_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -83,7 +84,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(nt_w);
 	int calculate_real_video_address(int addr, int extended, int readtype);
 	void scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data);
-	void set_410x_scramble(uint8_t reg0, uint8_t reg1);
 	DECLARE_READ8_MEMBER(psg1_4014_r);
 	DECLARE_READ8_MEMBER(psg1_4015_r);
 	DECLARE_WRITE8_MEMBER(psg1_4015_w);
