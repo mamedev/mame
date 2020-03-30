@@ -20,14 +20,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/n2a03.h"
-#include "machine/bankdev.h"
-#include "video/ppu2c0x_vt.h"
 #include "machine/nes_vt.h"
-#include "machine/m6502_vtscr.h"
-#include "machine/m6502_swap_op_d5_d6.h"
-#include "screen.h"
-#include "speaker.h"
 
 class nes_vt_state : public driver_device
 {
@@ -145,8 +138,6 @@ public:
 
 protected:
 	void vt_external_space_map_senwld_512kbyte(address_map& map);
-
-private:
 };
 
 class nes_vt_pjoy_state : public nes_vt_state
@@ -157,10 +148,6 @@ public:
 	{ }
 
 	void nes_vt_pjoy_4mb(machine_config& config);
-
-
-protected:
-//	virtual void machine_reset() override;
 };
 
 class nes_vt_waixing_state : public nes_vt_state
@@ -172,8 +159,6 @@ public:
 
 	void nes_vt_waixing_512kb(machine_config& config);
 	void nes_vt_waixing_2mb(machine_config& config);
-
-protected:
 };
 
 class nes_vt_waixing_alt_state : public nes_vt_waixing_state
@@ -184,8 +169,6 @@ public:
 	{ }
 
 	void nes_vt_waixing_alt_pal_8mb(machine_config& config);
-
-protected:
 };
 
 
@@ -195,8 +178,6 @@ public:
 	nes_vt_timetp36_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag)
 	{ }
-
-protected:
 };
 
 class nes_vt_hum_state : public nes_vt_state
@@ -205,9 +186,9 @@ public:
 	nes_vt_hum_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag)
 	{ }
-
-protected:
-	virtual void machine_reset() override;
+	
+	void nes_vt_hummer_2mb(machine_config& config);
+	void nes_vt_hummer_4mb(machine_config& config);
 };
 
 class nes_vt_sp69_state : public nes_vt_state
@@ -218,8 +199,6 @@ public:
 	{ }
 
 	void nes_vt_4mb_sp69(machine_config& config);
-
-protected:
 };
 
 class nes_vt_ablping_state : public nes_vt_state
@@ -232,7 +211,6 @@ public:
 	void nes_vt_2mb_ablping(machine_config& config);
 
 private:
-
 	DECLARE_READ8_MEMBER(ablping_extraio_r);
 	DECLARE_WRITE8_MEMBER(ablping_extraio_w);
 };
@@ -335,8 +313,6 @@ public:
 
 protected:
 	virtual void machine_reset() override;
-
-private:
 };
 
 
@@ -1135,11 +1111,8 @@ void nes_vt_state::nes_vt_base_pal(machine_config &config)
 	*/
 }
 
-
-
 void nes_vt_sudoku_state::nes_vt_sudoku_512kb(machine_config &config)
 {
-
 	nes_vt_base(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sudoku_state::vt_external_space_map_512kbyte);
 }
@@ -1155,7 +1128,6 @@ void nes_vt_state::nes_vt(machine_config &config)
 {
 	nes_vt_base(config);
 }
-
 
 void nes_vt_state::nes_vt_512kb(machine_config& config)
 {
@@ -1243,13 +1215,18 @@ void nes_vt_waixing_alt_state::nes_vt_waixing_alt_pal_8mb(machine_config &config
 }
 
 
-void nes_vt_hum_state::machine_reset()
+void nes_vt_hum_state::nes_vt_hummer_2mb(machine_config& config)
 {
-	nes_vt_state::machine_reset();
+	nes_vt_2mb(config);
 	m_soc->set_201x_descramble(0x7, 0x6, 0x5, 0x4, 0x2, 0x3);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
 }
 
+void nes_vt_hum_state::nes_vt_hummer_4mb(machine_config& config)
+{
+	nes_vt_hummer_2mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hum_state::vt_external_space_map_4mbyte);
+}
 
 void nes_vt_pjoy_state::nes_vt_pjoy_4mb(machine_config &config)
 {
@@ -1290,7 +1267,6 @@ void nes_vt_state::nes_vt_4k_ram(machine_config &config)
 
 void nes_vt_state::nes_vt_4k_ram_16mb(machine_config &config)
 {
-
 	nes_vt(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_16mbyte);
 
@@ -1301,7 +1277,6 @@ void nes_vt_state::nes_vt_4k_ram_16mb(machine_config &config)
 
 void nes_vt_state::nes_vt_4k_ram_pal(machine_config &config)
 {
-
 	nes_vt_base_pal(config);
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_4k_ram_map);
@@ -1310,7 +1285,6 @@ void nes_vt_state::nes_vt_4k_ram_pal(machine_config &config)
 
 void nes_vt_cy_state::nes_vt_cy(machine_config &config)
 {
-
 	nes_vt_4k_ram(config);
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::nes_vt_cy_map);
@@ -1319,14 +1293,12 @@ void nes_vt_cy_state::nes_vt_cy(machine_config &config)
 
 void nes_vt_cy_state::nes_vt_cy_bigger(machine_config &config)
 {
-
 	nes_vt_cy(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::vt_external_space_map_32mbyte); // must be some banking of this kind of VT can address over 32mb
 }
 
 void nes_vt_cy_state::nes_vt_bt(machine_config &config)
 {
-
 	nes_vt_4k_ram(config);
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::nes_vt_bt_map);
@@ -1335,14 +1307,12 @@ void nes_vt_cy_state::nes_vt_bt(machine_config &config)
 
 void nes_vt_cy_state::nes_vt_bt_2x16mb(machine_config& config)
 {
-
 	nes_vt_bt(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::vt_external_space_map_bitboy_2x16mbyte);
 }
 
 void nes_vt_dg_state::nes_vt_dg(machine_config &config)
 {
-
 	nes_vt_4k_ram(config);
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_dg_map);
@@ -1372,7 +1342,6 @@ void nes_vt_dg_state::nes_vt_dg_baddma_16mb(machine_config& config)
 
 void nes_vt_hh_state::nes_vt_vg(machine_config &config)
 {
-
 	nes_vt_dg(config);
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_map);
@@ -1431,7 +1400,6 @@ void nes_vt_hh_state::nes_vt_hh(machine_config &config)
 
 void nes_vt_hh_state::nes_vt_hh_8mb(machine_config& config)
 {
-
 	nes_vt_hh(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_8mbyte);
 }
@@ -2324,8 +2292,8 @@ CONS( 200?, mc_sp69,   0,  0,  nes_vt_4mb_sp69,    nes_vt, nes_vt_sp69_state, em
 CONS( 2006, ablping,   0,        0,  nes_vt_2mb_ablping, nes_vt, nes_vt_ablping_state, empty_init, "Advance Bright Ltd", "Ping Pong / Table Tennis / Super Ping Pong (PP1100, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Hummer systems, scrambled bank register
-CONS( 200?, mc_sam60,  0,  0,  nes_vt_2mb,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "Samuri (60 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, zdog,      0,  0,  nes_vt_4mb,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "ZDog (44 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, mc_sam60,  0,  0,  nes_vt_hummer_2mb,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "Samuri (60 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, zdog,      0,  0,  nes_vt_hummer_4mb,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "ZDog (44 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
 
 // very plain menus
 CONS( 200?, pjoyn50,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "PowerJoy Navigator 50 in 1", MACHINE_IMPERFECT_GRAPHICS )
