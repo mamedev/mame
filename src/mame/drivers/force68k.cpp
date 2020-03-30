@@ -584,7 +584,7 @@ void force68k_state::fccpu1(machine_config &config)
 
 	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
 	PIT68230(config, m_pit, XTAL(16'000'000) / 2);
-	m_pit->pa_out_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pit->pa_out_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pit->h2_out_callback().set(m_centronics, FUNC(centronics_device::write_strobe));
 
 	// Centronics

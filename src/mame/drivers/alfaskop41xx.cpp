@@ -105,7 +105,7 @@ private:
 	required_device<mc6844_device> m_tia_dma;
 
 	/* Interrupt handling */
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(irq_w);
+	template <unsigned N> void irq_w(int state);
 	uint8_t m_irq;
 	uint8_t m_imsk;
 
@@ -275,7 +275,7 @@ static INPUT_PORTS_START( alfaskop4101 )
 INPUT_PORTS_END
 
 /* Interrupt handling - vector address modifyer, irq prioritizer and irq mask */
-template <unsigned N> WRITE_LINE_MEMBER( alfaskop4110_state::irq_w )
+template <unsigned N> void alfaskop4110_state::irq_w(int state)
 {
 	m_irq = (m_irq & ~(1 << N)) | ((state ? 1 : 0) << N);
 	LOGIRQ("4110 IRQ %d: %d ==> %02x\n", N, state, m_irq);

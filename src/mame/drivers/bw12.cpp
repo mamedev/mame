@@ -550,7 +550,7 @@ void bw12_state::common(machine_config &config)
 
 	PIA6821(config, m_pia, 0);
 	m_pia->readpa_handler().set(FUNC(bw12_state::pia_pa_r));
-	m_pia->writepb_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pia->writepb_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pia->ca2_handler().set(CENTRONICS_TAG, FUNC(centronics_device::write_strobe));
 	m_pia->cb2_handler().set(FUNC(bw12_state::pia_cb2_w));
 	m_pia->irqa_handler().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);

@@ -71,13 +71,13 @@ Regular game cartridges
 | They also say 'V.Link compatible' on the back though not all are V.Motion compatible                                        |
 +========+===================+================================================================================================+
 |        | 80-090000(US)     | Up (need pic)                                                                                  |
-|        | 80-090000-001(US) | Up                                                                                             |
-|   XX   | 80-090003-003(UK) | Up                                                                                             |
+|        | 80-090000-001(US) | Up (Rev. 001)                                                                                  |
+|   XX   | 80-090003-003(UK) | Up (Rev. 003)                                                                                  |
 |        | 80-090004(GE)     | Oben                                                                                           |
-|   XX   | 80-090004-004(GE) | Oben                                                                                           |
-|        | 80-090005(FR)     | Là-Haut                                                                                        |
-|   XX   | 80-090005-005(FR) | Là-Haut                                                                                        |
-|   XX   | 80-090007-022(SP) | Up                                                                                             |
+|   XX   | 80-090004-004(GE) | Oben (Rev. 004)                                                                                |
+|        | 80-090005(FR)     | Là-Haut (ever released?)                                                                       |
+|   XX   | 80-090005-005(FR) | Là-Haut (Rev. 005)                                                                             |
+|   XX   | 80-090007-022(SP) | Up (Rev. 022)                                                                                  |
 +========+===================+================================================================================================+
 |        | 80-090020(US)     | Handy Manny                                                                                    |
 |        | 80-090023(UK)     | Handy Manny                                                                                    |
@@ -132,9 +132,9 @@ Regular game cartridges
 |  Oldest Smartidges start here                                                                                               |
 |                                                                                                                             |
 +========+===================+================================================================================================+
-|   XX   | 80-092000(US)     | Alphabet Park Adventure (Red Haired Girl Version)                                              |
-|   XX   | 80-092000(US)     | Alphabet Park Adventure (Red Haired Girl Version, ALT)                                         |
-|   XX   | 80-092000-101(US) | Alphabet Park Adventure (Blond Haired Girl Version)                                            |
+|   XX   | 80-092000(US)     | Alphabet Park Adventure (red haired girl version)                                              |
+|   XX   | 80-092000(US)     | Alphabet Park Adventure (red haired girl version, ALT)                                         |
+|   XX   | 80-092000-101(US) | Alphabet Park Adventure (Rev. 101, blond haired girl version)                                  |
 |        |          (IT)     | Avventura nel parco dell'alfabeto                                                              |
 |   XX   | 80-092002(NL)     | Alfabet Pretpark                                                                               |
 |        | 80-092003(UK)     | Alphabet Park Adventure (Red Haired Girl Version)                                              |
@@ -160,17 +160,17 @@ Regular game cartridges
 |   XX   | 80-092060(US)     | Winnie The Pooh: The Honey Hunt                                                                |
 |   XX   | 80-092061(IT)     | Winnie the Pooh e la caccia al miele                                                           |
 |        | 80-092062(NL)     | Winnie de Poeh - De wonderwereld van Poeh                                                      |
-|   XX   | 80-092062-123(NL) | Winnie de Poeh - De wonderwereld van Poeh (cart labeled as "My Friends Tigger and Pooh", 52-092062(NL) on back label)
+|   XX   | 80-092062-123(NL) | Winnie de Poeh - De wonderwereld van Poeh (Rev. 123, labeled as "My Friends Tigger and Pooh", 52-092062(NL) on back label)
 |        | 80-092063(UK)     | Winnie The Pooh: The Honey Hunt                                                                |
 |   XX   | 80-092064(GE)     | Pooh - Die Honigjagd                                                                           |
 |        | 80-092064(GE)     | Pooh - Die Honigjagd (ALT-no# on label)                                                        |
 |        | 80-092064(GE)     | My Friends Tigger and Pooh - Die Honigjagd                                                     |
-|   XX   | 80-092064-104(GE) | My Friends Tigger and Pooh - Die Honigjagd                                                     |
+|   XX   | 80-092064-104(GE) | My Friends Tigger and Pooh - Die Honigjagd (Rev. 104)                                          |
 |   XX   | 80-092065(FR)     | Winnie l'Ourson - La Chasse au miel de Winnie                                                  |
-|   XX   | 80-092065-105(FR) | Winnie l'Ourson - La Chasse au miel de Winnie (ALT)                                            |
+|   XX   | 80-092065-105(FR) | Winnie l'Ourson - La Chasse au miel de Winnie (Rev. 105                                        |
 |        | 80-092066(PT)     | Winnie the Pooh - Em Busca Do Mel (92076 on cart)                                              |
 |   XX   | 80-092067(SP)     | Winnie the Pooh - En Busca de la Miel (no # on label, 92067 on PCB)                            |
-|   XX   | 80-092067-122(SP) | My Friends Tigger and Pooh - En Busca de la Miel (092067-1 on PCB)                             |
+|   XX   | 80-092067-122(SP) | My Friends Tigger and Pooh - En Busca de la Miel (Rev. 122, 092067-1 on PCB)                   |
 |   XX   | 80-092073(DK)     | Peter Plys - Honningjagten                                                                     |
 |   XX   | 80-092074(SE)     | Nalle Puh - Honungsjakten                                                                      |
 |        |          (NO)     | Winnie the Pooh - Honningjakten                                                                |
@@ -225,31 +225,32 @@ Regular game cartridges
 |        |          (CN)     | 美人鱼梦幻之旅                                                                                   |
 +========+===================+================================================================================================+
 |        | 80-092140(US)     | Spider-Man & Friends - Secret Missions                                                         |
-|   XX   | 80-092140-101(US) | Spider-Man & Friends - Secret Missions (ALT)                                                   |
+|   XX   | 80-092140-101(US) | Spider-Man & Friends - Secret Missions (Rev. 101)                                              |
 |   XX   | 80-092141(IT)     | Spider-Man & Friends - Missioni Segrete                                                        |
 |        | 80-092142(NL)     | Spider-Man en Vrienden! - Geheime Missies (white Webs)                                         |
-|        | 80-092142-123(NL) | Spider-Man en Vrienden! - Geheime Missies (Yellow webs)                                        |
+|        | 80-092142-123(NL) | Spider-Man en Vrienden! - Geheime Missies (Rev. 123, Yellow webs)                              |
 |        | 80-092143(UK)     | Spider-Man & Friends - Secret Missions (no # on front label)                                   |
-|        | 80-092143-103(UK) | Spider-Man & Friends - Secret Missions (ALT)                                                   |
+|        | 80-092143-103(UK) | Spider-Man & Friends - Secret Missions (Rev. 103)                                              |
 |   XX   | 80-092144(GE)     | Spider-Man & Freunde - Geheime Missionen                                                       |
 |   XX   | 80-092145(FR)     | Spider-Man & ses amis - Missions Secrètes (white webs)                                         |
-|        | 80-092145-105(FR) | Spider-Man & ses amis - Missions Secrètes (yellow webs)                                        |
+|   XX   | 80-092145-105(FR) | Spider-Man & ses amis - Missions Secrètes (Rev. 105, yellow webs)                              |
+|   XX   | 80-092145-305(FR) | Spider-Man & ses amis - Missions Secrètes (Rev. 305)                                           |
 |        | 80-092146(PT)     | Spider-man & Amigos - Missoes Secretas                                                         |
 |   XX   | 80-092147(SP)     | Spider-Man y Amigos - Misiones Secretas (white webs, 2005)                                     |
-|        | 80-092147-122(SP) | Spider-Man y Amigos - Misiones Secretas (yellow webs, 2007)                                    |
-|   XX   | 80-092147-222(SP) | Spider-Man y Amigos - Misiones Secretas (yellow webs, 2008)                                    |
+|        | 80-092147-122(SP) | Spider-Man y Amigos - Misiones Secretas (Rev. 122, yellow webs, 2007)                          |
+|   XX   | 80-092147-222(SP) | Spider-Man y Amigos - Misiones Secretas (Rev. 222, yellow webs, 2008)                          |
 +========+===================+================================================================================================+
 |   XX   | 80-092160(US)     | Scooby-Doo! - Funland Frenzy                                                                   |
-|        | 80-092160-101(US) | Scooby-Doo! - Funland Frenzy (ALT)                                                             |
-|   XX   | 80-092160-301(US) | Scooby-Doo! - Funland Frenzy (ALT 2)                                                           |
+|        | 80-092160-101(US) | Scooby-Doo! - Funland Frenzy (Rev. 101)                                                        |
+|   XX   | 80-092160-301(US) | Scooby-Doo! - Funland Frenzy (Rev. 301)                                                        |
 |   XX   | 80-092161(IT)     | Scooby-Doo! - Avventura a Funland                                                              |
 |   XX   | 80-092162(NL)     | Scooby-Doo! - Griezelen in het pretpark (52-92162(NL) on back label)                           |
 |   XX   | 80-092163(UK)     | Scooby-Doo! - Funland Frenzy                                                                   |
-|        | 80-092163-103(UK) | Scooby-Doo! - Funland Frenzy                                                                   |
-|        | 80-092163-293(UK) | Scooby-Doo! - Funland Frenzy (Yellow, only Scooby on label might be motion version)            |
+|        | 80-092163-103(UK) | Scooby-Doo! - Funland Frenzy (Rev. 103)                                                        |
+|        | 80-092163-293(UK) | Scooby-Doo! - Funland Frenzy (Rev. 293, Yellow, only Scooby on label might be motion version)  |
 |   XX   | 80-092164(GE)     | Scooby-Doo! - Im Lernpark                                                                      |
 |   XX   | 80-092165(FR)     | Scooby-Doo! - Panique à Funland (same ROM on purple and translucent blue carts)                |
-|   XX   | 80-092165-105(FR) | Scooby-Doo! - Panique à Funland                                                                |
+|   XX   | 80-092165-105(FR) | Scooby-Doo! - Panique à Funland (Rev. 105)                                                     |
 |   XX   | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (translucent blue cart)                                     |
 |   XX   | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (purple, # on back label)                                   |
 |   XX   | 80-092173(DK)     | Scooby-Doo! - Sjov i forlystelsesparken                                                        |
@@ -289,20 +290,20 @@ Regular game cartridges
 |   XX   | 80-092240(US)     | Cinderella - Cinderella's Magic Wishes                                                         |
 |   XX   | 80-092241(IT)     | Cenerentola - I desideri magici di Cenerentola (cart says 52-92251 Ita)                        |
 |   XX   | 80-092242(NL)     | Assepoester - De wonderwereld van Assepoester (2005, 52-092242(NL) on back label)              |
-|        | 80-092242-123(NL) | Assepoester - De wonderwereld van Assepoester (2007)                                           |
+|        | 80-092242-123(NL) | Assepoester - De wonderwereld van Assepoester (Rev. 123, 2007)                                 |
 |   XX   | 80-092243(UK)     | Cinderella - Cinderella's Magic Wishes                                                         |
-|        | 80-092243-103(UK) | Cinderella - Cinderella's Magic Wishes (2007)                                                  |
-|        | 80-092243-203(UK) | Cinderella - Cinderella's Magic Wishes (2008)                                                  |
+|        | 80-092243-103(UK) | Cinderella - Cinderella's Magic Wishes (Rev. 103, 2007)                                        |
+|        | 80-092243-203(UK) | Cinderella - Cinderella's Magic Wishes (Rev. 203, 2008)                                        |
 |   XX   | 80-092244(GE)     | Cinderella - Lernen im Märchenland (2005)                                                      |
-|   XX   | 80-092244-104(GE) | Cinderella - Lernen im Märchenland (2007)                                                      |
-|   XX   | 80-092244-204(GE) | Cinderella - Lernen im Märchenland (2008) (52-092244-205(GER) on back label)                   |
+|   XX   | 80-092244-104(GE) | Cinderella - Lernen im Märchenland (Rev. 104, 2007)                                            |
+|   XX   | 80-092244-204(GE) | Cinderella - Lernen im Märchenland (Rev. 204, 2008) (52-092244-205(GER) on back label)         |
 |   XX   | 80-092245(FR)     | Cendrillon - Le rêve enchanté de Cendrillon                                                    |
-|   XX   | 80-092245-105(FR) | Cendrillon - Le rêve enchanté de Cendrillon                                                    |
-|   XX   | 80-092245-205(FR) | Cendrillon - Le rêve enchanté de Cendrillon                                                    |
+|   XX   | 80-092245-105(FR) | Cendrillon - Le rêve enchanté de Cendrillon (Rev. 105)                                         |
+|   XX   | 80-092245-205(FR) | Cendrillon - Le rêve enchanté de Cendrillon (Rev. 205)                                         |
 |        | 80-092246(PT)     | Cinderela - Os Sonhos Magicos da Cinderela (Cart#92256)                                        |
 |   XX   | 80-092247(SP)     | La Cenicienta - Los sueños mágicos de Cenicienta (non motion#, but V.Motion in spanish catalog)|
-|   XX   | 80-092247-122(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (white/light pink cart label background)      |
-|   XX   | 80-092247-222(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (no # on front label, 52-092247-222(SP) on back label, non motion#, but V.Motion in Spanish catalog)
+|   XX   | 80-092247-122(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (Rev. 122, white/light pink cart label background)
+|   XX   | 80-092247-222(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (Rev. 222, no # on front label, 52-092247-222(SP) on back label, non motion#, but V.Motion in Spanish catalog)
 |   XX   | 80-092253(DK)     | Cinderella - Askepots magiske ønsker                                                           |
 |   XX   | 80-092254(SE)     | Cinderella - Askungens magiska önskningar                                                      |
 |        | 80-092255(NO)     | Cinderella - Askepotts magiske ønsker                                                          |
@@ -315,27 +316,27 @@ Regular game cartridges
 |   XX   | 80-092267(SP)     | Mundo Elmo - Grandes descubrimientos de Elmo (52-92267(SP) on back label)                      |
 +========+===================+================================================================================================+
 |   XX   | 80-092280(US)     | Dora The Explorer - Dora's Fit-it Adventure                                                    |
-|        | 80-092280-101(US) | Dora The Explorer - Dora's Fit-it Adventure (alt)                                              |
-|   XX   | 80-092280-201(US) | Dora The Explorer - Dora's Fit-it Adventure (alt 2)                                            |
+|        | 80-092280-101(US) | Dora The Explorer - Dora's Fit-it Adventure (Rev. 101)                                         |
+|   XX   | 80-092280-201(US) | Dora The Explorer - Dora's Fit-it Adventure (Rev. 201)                                         |
 |        | 80-092282(NL)     | Dora - Doras Reparatie Avontuur!                                                               |
 |   XX   | 80-092283(UK)     | Dora The Explorer - Dora's Fit-it Adventure (same ROM as "80-092280(US)"                       |
-|   XX   | 80-092283-103(UK) | Dora The Explorer - Dora's Fit-it Adventure (alt)                                              |
+|   XX   | 80-092283-103(UK) | Dora The Explorer - Dora's Fit-it Adventure (Rev. 103)                                         |
 |        | 80-092284(GE)     | Dora - Doras Reparatur-Abenteuer                                                               |
-|   XX   | 80-092284-104(GE) | Dora - Doras Reparatur-Abenteuer                                                               |
+|   XX   | 80-092284-104(GE) | Dora - Doras Reparatur-Abenteuer (Rev. 104)                                                    |
 |   XX   | 80-092285(FR)     | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano                                   |
-|   XX   | 80-092285-105(FR) | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano                                   |
+|   XX   | 80-092285-105(FR) | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano  (Rev. 105)                       |
 |        | 80-092285-1?5(FR) | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano (NTSC French-Canadian)            |
 |        | 80-092286(PT)     | Dora - em busca das pecas perdidas (cart# 92296)                                               |
-|        | 80-092287-122(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora                                         |
-|   XX   | 80-092287-222(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora (purple, no # on front label, 52-092287-222(SP) on back label)
+|        | 80-092287-122(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora (Rev. 122)                              |
+|   XX   | 80-092287-222(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora (Rev. 222, purple, no # on front label, 52-092287-222(SP) on back label)
 +========+===================+================================================================================================+
 |   XX   | 80-092300(US)     | Bob the Builder - Bob's Busy Day                                                               |
 |   XX   | 80-092303(UK)     | Bob the Builder - Bob's Busy Day                                                               |
-|        | 80-092303-103(UK) | Bob the Builder - Bob's Busy Day (Yellow Label)                                                |
+|        | 80-092303-103(UK) | Bob the Builder - Bob's Busy Day (Rev. 103, yellow label)                                      |
 |   XX   | 80-092304(GE)     | Bob der Baumeister - Bobs Spannender Arbeitstag                                                |
-|   XX   | 80-092304-104(GE) | Bob der Baumeister - Bobs Spannender Arbeitstag (52-092304-104(GER) on back label)             |
+|   XX   | 80-092304-104(GE) | Bob der Baumeister - Bobs Spannender Arbeitstag (Rev. 104, 52-092304-104(GER) on back label)   |
 |        | 80-092305(FR)     | Bob le Bricoleur: Les P'tits Chantiers de Bob                                                  |
-|        | 80-092305-105(FR) | Bob le Bricoleur: Les P'tits Chantiers de Bob (ALT)                                            |
+|        | 80-092305-105(FR) | Bob le Bricoleur: Les P'tits Chantiers de Bob (Rev. 105, ever released?)                       |
 |        | 80-092306(PT)     | Bob o Construtor - Um dia Atarefado (92316 on cart)                                            |
 |   XX   | 80-092307(SP)     | Bob y sus Amigos - Un día de trabajo                                                           |
 |   XX   | 80-092313(DK)     | Byggemand Bob - Bobs travle dag                                                                |
@@ -347,14 +348,14 @@ Regular game cartridges
 |        | 80-092323(UK)     | The Wiggles - It's Wiggle Time!                                                                |
 +========+===================+================================================================================================+
 |   XX   | 80-092340(US)     | Thomas The Tank - Engines Working Together                                                     |
-|        | 80-092340-101(US) | Thomas The Tank - Engines Working Together (ALT)                                               |
-|        | 80-092342(NL)     | Thomas de Stoomlocomotief' - Locomotieven Werken Somen  (need pic, even the manual has -123 on cover)
-|        | 80-092342-123(NL) | Thomas de Stoomlocomotief' - Locomotieven Werken Somen                                         |
+|        | 80-092340-101(US) | Thomas The Tank - Engines Working Together (Rev. 101)                                          |
+|        | 80-092342(NL)     | Thomas de Stoomlocomotief' - Locomotieven Werken Somen (need pic, even the manual has -123 on cover)
+|        | 80-092342-123(NL) | Thomas de Stoomlocomotief' - Locomotieven Werken Somen (Rev. 123)                              |
 |   XX   | 80-092343(UK)     | Thomas and Friends: Engines Working Together                                                   |
-|        | 80-092343-103(UK) | Thomas and Friends: Engines Working Together (ALT)                                             |
-|        | 80-092343-203(UK) | Thomas and Friends: Engines Working Together (ALT)                                             |
+|        | 80-092343-103(UK) | Thomas and Friends: Engines Working Together (Rev. 103)                                        |
+|        | 80-092343-203(UK) | Thomas and Friends: Engines Working Together (Rev. 203)                                        |
 |   XX   | 80-092344(GE)     | Thomas and Seine Freunde - Freunde Halten Zusammen                                             |
-|   XX   | 80-092344-104(GE) | Thomas and Seine Freunde - Freunde Halten Zusammen                                             |
+|   XX   | 80-092344-104(GE) | Thomas and Seine Freunde - Freunde Halten Zusammen (Rev. 104)                                  |
 |   XX   | 80-092345(FR)     | Thomas et ses Amis - Les locomotives s'entraident                                              |
 |        | 80-092347(SP)     | Thomas and Friends - Juego de Aprendizaje                                                      |
 |        |          (DK)     | Thomas and Friends - Togene arbejder sammen                                                    |
@@ -363,11 +364,11 @@ Regular game cartridges
 |        |          (FI)     | Thomas and Friends                                                                             |
 +========+===================+================================================================================================+
 |   XX   | 80-092360(US)     | Zayzoo - My Alien Classmate                                                                    |
-|   XX   | 80-092360-101(US) | Zayzoo: An Earth Adventure                                                                     |
+|   XX   | 80-092360-101(US) | Zayzoo: An Earth Adventure (Rev. 101)                                                          |
 |        | 80-092362(NL)     | Zayzoo - Mijn Buitenaardse Vriendje                                                            |
 |        | 80-092363(UK)     | Zayzoo - My Alien Classmate (yes, duped#)                                                      |
 |        | 80-092363(UK)     | Zayzoo: An Earth Adventure (saw it, can't find pic again)                                      |
-|   XX   | 80-092363-103(UK) | Zayzoo: An Earth Adventure                                                                     |
+|   XX   | 80-092363-103(UK) | Zayzoo: An Earth Adventure (Rev. 103)                                                          |
 |   XX   | 80-092364(GE)     | Zayzoos Lernall                                                                                |
 |   XX   | 80-092365(FR)     | Zézou - Notre Ami Venu d'Ailleurs                                                              |
 |   XX   | 80-092367(SP)     | Zayzoo - Mi Amiga del Espacio (52-92367(SP) on back label)                                     |
@@ -430,18 +431,18 @@ Regular game cartridges
 +========+===================+================================================================================================+
 |   XX   | 80-092540(US)     | Noddy - Detective for a Day                                                                    |
 |   XX   | 80-092543(UK)     | Noddy - Detective for a Day                                                                    |
-|        | 80-092543-103(UK) | Noddy - Detective for a Day (ALT)                                                              |
+|        | 80-092543-103(UK) | Noddy - Detective for a Day (Rev. 103)                                                         |
 |        | 80-092544(GE)     | Noddy - Detektiv fuer einen Tag (need pic to confirm, manual cover says -104)                  |
-|   XX   | 80-092544-104(GE) | Noddy - Detektiv fuer einen Tag (ALT)                                                          |
+|   XX   | 80-092544-104(GE) | Noddy - Detektiv fuer einen Tag (Rev. 104)                                                     |
 |   XX   | 80-092545(FR)     | Oui-Oui - Détective d'un Jour                                                                  |
-|   XX   | 80-092545-105(FR) | Oui-Oui - Détective d'un Jour (ALT)                                                            |
+|   XX   | 80-092545-105(FR) | Oui-Oui - Détective d'un Jour (Rev. 105)                                                       |
 |   XX   | 80-092556(PT)     | Noddy - Detective por um dia (092556(Port) on cart)                                            |
 +========+===================+================================================================================================+
 |        | 80-092560(US)     | 101 Dalmations (one pic on german site with USA code)                                          |
 |        | 80-092564(GE)     | 101 Dalmatiner (EAN on german site with USA pic... wtf)                                        |
 +========+===================+================================================================================================+
 |        | 80-092580(US)     | Backyardigans - Viking Voyage                                                                  |
-|        | 80-092580-201(US) | Backyardigans - Viking Voyage (ALT)                                                            |
+|        | 80-092580-201(US) | Backyardigans - Viking Voyage (Rev. 201)                                                       |
 |        | 80-092583(UK)     | Backyardigans - Viking Voyage                                                                  |
 |   XX   | 80-092585(FR)     | Les Melodilous - Les explorateurs vikings                                                      |
 +========+===================+================================================================================================+
@@ -465,13 +466,13 @@ Regular game cartridges
 |        |          (CN)     | 超人 - 超级英雄                                                                                  |
 +========+===================+================================================================================================+
 |   XX   | 80-092660(US)     | Cars - Rev It Up In Radiator Springs                                                           |
-|   XX   | 80-092660-201(US) | Cars - Rev It Up In Radiator Springs (ALT)                                                     |
+|   XX   | 80-092660-201(US) | Cars - Rev It Up In Radiator Springs (Rev. 201)                                                |
 |        |          (IT)     | Cars - Motori Ruggenti (gpz06755)                                                              |
 |        | 80-092662(NL)     | Cars - Spektakel in Radiator Springs                                                           |
 |   XX   | 80-092663(UK)     | Cars - Rev It Up In Radiator Springs                                                           |
 |   XX   | 80-092664(GE)     | Cars - Vollgas in Radiator Springs                                                             |
 |   XX   | 80-092665(FR)     | Cars - Quatre Roues                                                                            |
-|   XX   | 80-092665-105(FR) | Cars - Quatre Roues                                                                            |
+|   XX   | 80-092665-105(FR) | Cars - Quatre Roues (Rev. 105)                                                                 |
 |        | 80-092666(PT)     | Carros - Aventura em Radiator Springs (92676 on cart)                                          |
 |   XX   | 80-092667(SP)     | Cars - Acelera el Motor en Radiador Springs                                                    |
 |   XX   | 80-092673(DK)     | Biler - Ræs i Kølerkildekøbing                                                                 |
@@ -498,7 +499,7 @@ Regular game cartridges
 |        | 80-092842(NL)     | Wall-E                                                                                         |
 |        | 80-092843(UK)     | Wall-E                                                                                         |
 |   XX   | 80-092844(GE)     | Wall-E                                                                                         |
-|        | 80-092845(FR)     | Wall-E                                                                                         |
+|   XX   | 80-092845(FR)     | Wall-E                                                                                         |
 |   XX   | 80-092847(SP)     | Wall-E (52-092847 on back label)                                                               |
 |        |          (DK)     | Wall-E                                                                                         |
 |   XX   | 80-092854(SE)     | Wall-E                                                                                         |
@@ -511,7 +512,8 @@ Regular game cartridges
 |   XX   | 80-092862(NL)     | Shrek de Derde - Arthurs Schooldag Avontuur                                                    |
 |   XX   | 80-092863(UK)     | Shrek the Third: Arthur's School Day Adventure                                                 |
 |   XX   | 80-092864(GE)     | Shrek der Dritte - Ein Spannender Schultag                                                     |
-|   XX   | 80-092865(FR)     | Shrek Le Troisieme - L'aventure d'Arthur                                                       |
+|   XX   | 80-092865(FR)     | Shrek Le Troisième - L'aventure d'Arthur                                                       |
+|   XX   | 80-092865-105(FR) | Shrek Le Troisième - L'aventure d'Arthur (Rev. 105)                                            |
 |        | 80-092867(SP)     | Shrek Tercero - En Busca de Arturo                                                             |
 +========+===================+================================================================================================+
 |        | 80-092880(US)     | Ratatouille - Remy's New Recipes                                                               |
@@ -519,7 +521,7 @@ Regular game cartridges
 |   XX   | 80-092882(NL)     | Ratatouille - Remy's Nieuwe Recepten (52-092882(NL) on back label)                             |
 |        | 80-092883(UK)     | Ratatouille - Remy's New Recipes                                                               |
 |   XX   | 80-092884(GE)     | Ratatouille - Remys neue Rezepte                                                               |
-|        | 80-092884-104(GE) | Ratatouille - Remys neue Rezepte (ALT)                                                         |
+|        | 80-092884-104(GE) | Ratatouille - Remys neue Rezepte (Rev. 104)                                                    |
 |   XX   | 80-092885(FR)     | Ratatouille - Les nouvelles recettes de Rémy                                                   |
 |   XX   | 80-092887(SP)     | Ratatouille - Las recetas del Remy (52-092887(SP) on back label)                               |
 +========+===================+================================================================================================+
@@ -3306,7 +3308,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<!-- No inputs -->
 	<software name="shrek3f" cloneof="shrek3" supported="no">
-		<description>DreamWorks Shrek Le Troisieme - L'aventure d'Arthur (France)</description>
+		<description>DreamWorks Shrek Le Troisième - L'aventure d'Arthur (France)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092865(FR)" />
@@ -3316,6 +3318,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" />
 			<dataarea name="rom" size="8388608">
 				<rom name="092865 - Shrek Le Troisieme (FR).bin" size="8388608" crc="7cc9922c" sha1="c45ce64db0c5580ce8339ab114b849955e58fed4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="shrek3fr105" cloneof="shrek3" supported="no">
+		<description>DreamWorks Shrek Le Troisième - L'aventure d'Arthur (France, Rev. 105)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092865-105(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092865-105 - Shrek Le Troisieme (FR).bin" size="8388608" crc="a1380b79" sha1="311d1658e921a99cd3126a1ef0c2d8baa8a84d70" />
 			</dataarea>
 		</part>
 	</software>
@@ -3562,6 +3580,38 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92145.u1" size="8388608" crc="906b0ab6" sha1="da5435366a439afd70ff210c0e655839f66fbef3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="spidermisfr105" cloneof="spidermisr101" supported="no">
+		<description>Marvel Spider-Man &amp; ses amis - Missions secrètes (France, Rev. 105)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092145-105(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092145-105 - Spiderman Missions Secretes (FR).bin" size="8388608" crc="81bcdabd" sha1="ab284a43d44e7745d1e9ced6794a5a13bff3b09f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="spidermisfr305" cloneof="spidermisr101" supported="no">
+		<description>Marvel Spider-Man &amp; ses amis - Missions secrètes (France, Rev. 305)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092145-305(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092145-305 - Spiderman Missions Secretes (FR).bin" size="8388608" crc="922a7274" sha1="a954a9e9aab93fa6bbcd12fb3651fa9937986400" />
 			</dataarea>
 		</part>
 	</software>
@@ -4005,6 +4055,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92844-3.u1" size="8388608" crc="f4be4391" sha1="5e43c9dd4759218578d1a8364540db8bc6bc6416" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="wallef" cloneof="walleg" supported="no">
+		<description>Disney/Pixar Wall-E (France)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092845(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092845 - Wall E (FR).bin" size="8388608" crc="b5122dfc" sha1="6b62641082104fa8bde2a40c8969d3b036dcc58e" />
 			</dataarea>
 		</part>
 	</software>

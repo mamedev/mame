@@ -81,7 +81,7 @@ public:
 
 	DECLARE_READ16_MEMBER(video_703a_palettebank_r);
 	DECLARE_WRITE16_MEMBER(video_703a_palettebank_w);
-	
+
 	void update_raster_split_position();
 	DECLARE_WRITE16_MEMBER(split_irq_xpos_w);
 	DECLARE_WRITE16_MEMBER(split_irq_ypos_w);
@@ -125,7 +125,7 @@ public:
 
 	DECLARE_READ16_MEMBER(video_7051_r);
 	DECLARE_READ16_MEMBER(video_70e0_r);
-	
+
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 
 	virtual void device_add_mconfig(machine_config& config) override;

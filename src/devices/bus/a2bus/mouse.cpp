@@ -294,7 +294,7 @@ WRITE8_MEMBER(a2bus_mouse_device::mcu_port_b_w)
 
 WRITE8_MEMBER(a2bus_mouse_device::mcu_port_c_w)
 {
-	m_pia->write_portb(data << 4);
+	m_pia->portb_w(data << 4);
 }
 
 template <unsigned AXIS, u8 DIR, u8 CLK> void a2bus_mouse_device::update_axis()

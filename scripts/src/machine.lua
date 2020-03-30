@@ -1445,6 +1445,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/icm7170.h,MACHINES["ICM7170"] = true
+---------------------------------------------------
+
+if (MACHINES["ICM7170"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/icm7170.cpp",
+		MAME_DIR .. "src/devices/machine/icm7170.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/idectrl.h,MACHINES["IDECTRL"] = true
 --@src/devices/machine/vt83c461.h,MACHINES["IDECTRL"] = true
 ---------------------------------------------------
@@ -3096,6 +3108,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/upd7001.h,MACHINES["UPD7001"] = true
+---------------------------------------------------
+
+if (MACHINES["UPD7001"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/upd7001.cpp",
+		MAME_DIR .. "src/devices/machine/upd7001.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/upd7002.h,MACHINES["UPD7002"] = true
 ---------------------------------------------------
 
@@ -4254,5 +4278,17 @@ if (MACHINES["S_SMP"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/s_smp.cpp",
 		MAME_DIR .. "src/devices/machine/s_smp.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/cxd1185.h,MACHINES["CXD1185"] = true
+---------------------------------------------------
+
+if (MACHINES["CXD1185"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/cxd1185.cpp",
+		MAME_DIR .. "src/devices/machine/cxd1185.h",
 	}
 end

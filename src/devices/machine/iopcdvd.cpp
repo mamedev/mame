@@ -55,7 +55,7 @@ void iop_cdvd_device::device_reset()
 	m_channel[1].m_status |= CDVD_STATUS_IDLE;
 }
 
-READ8_MEMBER(iop_cdvd_device::read)
+uint8_t iop_cdvd_device::read(offs_t offset)
 {
 	uint8_t ret = 0;
 	switch (offset)
@@ -117,7 +117,7 @@ uint8_t iop_cdvd_device::data_fifo_pop()
 	return ret;
 }
 
-WRITE8_MEMBER(iop_cdvd_device::write)
+void iop_cdvd_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

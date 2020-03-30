@@ -12,8 +12,8 @@
 #include "i8x9x.h"
 #include "i8x9xd.h"
 
-i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
-	mcs96_device(mconfig, type, tag, owner, clock, 8, address_map_constructor(FUNC(i8x9x_device::internal_regs), this)),
+i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int data_width) :
+	mcs96_device(mconfig, type, tag, owner, clock, data_width, address_map_constructor(FUNC(i8x9x_device::internal_regs), this)),
 	m_ach_cb(*this),
 	m_hso_cb(*this),
 	m_serial_tx_cb(*this),
@@ -21,6 +21,7 @@ i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, cons
 	m_out_p1_cb(*this), m_in_p1_cb(*this),
 	m_out_p2_cb(*this), m_in_p2_cb(*this),
 	base_timer2(0), ad_done(0), hsi_mode(0), hso_command(0), ad_command(0), hso_time(0), ad_result(0), pwm_control(0),
+	port1(0), port2(0),
 	ios0(0), ios1(0), ioc0(0), ioc1(0), sbuf(0), sp_con(0), sp_stat(0), serial_send_buf(0), serial_send_timer(0)
 {
 	for (auto &hso : hso_info)
@@ -46,9 +47,9 @@ void i8x9x_device::device_resolve_objects()
 	m_serial_tx_cb.resolve_safe();
 	m_in_p0_cb.resolve_safe(0);
 	m_out_p1_cb.resolve_safe();
-	m_in_p1_cb.resolve_safe(0);
+	m_in_p1_cb.resolve_safe(0xff);
 	m_out_p2_cb.resolve_safe();
-	m_in_p2_cb.resolve_safe(0);
+	m_in_p2_cb.resolve_safe(0xc2);
 }
 
 void i8x9x_device::device_start()
@@ -67,6 +68,9 @@ void i8x9x_device::device_start()
 	state_add(I8X9X_SP_CON,      "SP_CON",      sp_con).mask(0x1f);
 	state_add(I8X9X_SP_STAT,     "SP_STAT",     sp_stat).mask(0xe0);
 	state_add(I8X9X_BAUD_RATE,   "BAUD_RATE",   baud_reg);
+	if (i8x9x_has_p1())
+		state_add<u8>(I8X9X_PORT1, "PORT1",     [this]() -> u8 { return port1; }, [this](u8 data) { port1_w(data); });
+	state_add<u8>(I8X9X_PORT2,   "PORT2",       [this]() -> u8 { return port2; }, [this](u8 data) { port2_w(data); }).mask(i8x9x_p2_mask());
 	state_add(I8X9X_IOC0,        "IOC0",        ioc0).mask(0xfd);
 	state_add(I8X9X_IOC1,        "IOC1",        ioc1);
 	state_add(I8X9X_IOS0,        "IOS0",        ios0);
@@ -89,6 +93,8 @@ void i8x9x_device::device_start()
 	save_item(NAME(ad_command));
 	save_item(NAME(hso_time));
 	save_item(NAME(ad_result));
+	save_item(NAME(port1));
+	save_item(NAME(port2));
 	save_item(NAME(pwm_control));
 	save_item(NAME(ios0));
 	save_item(NAME(ios1));
@@ -112,6 +118,8 @@ void i8x9x_device::device_reset()
 	hso_command = 0;
 	hso_time = 0;
 	timer2_reset(total_cycles());
+	port1 = 0xff;
+	port2 = 0xc1 & i8x9x_p2_mask(); // P2.5 is cleared
 	ios0 = ios1 = 0x00;
 	ioc0 &= 0xaa;
 	ioc1 = (ioc1 & 0xae) | 0x01;
@@ -122,6 +130,8 @@ void i8x9x_device::device_reset()
 	sp_stat &= 0x80;
 	serial_send_timer = 0;
 	brh = false;
+	m_out_p1_cb(0xff);
+	m_out_p2_cb(0xc1);
 	m_hso_cb(0);
 }
 
@@ -144,7 +154,9 @@ void i8x9x_device::commit_hso_cam()
 void i8x9x_device::ad_start(u64 current_time)
 {
 	ad_result = 8 | (ad_command & 7);
-	if (m_ach_cb[ad_command & 7].isnull())
+	if (!BIT(i8x9x_p0_mask(), ad_command & 7))
+		logerror("Analog input on ACH%d does not exist on this device\n", ad_command & 7);
+	else if (m_ach_cb[ad_command & 7].isnull())
 		logerror("Analog input on ACH%d not configured\n", ad_command & 7);
 	else
 		ad_result |= m_ach_cb[ad_command & 7]() << 6;
@@ -286,29 +298,40 @@ u8 i8x9x_device::port0_r()
 		last = m_in_p0_cb();
 		logerror("read p0 %02x\n", last);
 	}
-	return m_in_p0_cb();
+	return m_in_p0_cb() & i8x9x_p0_mask();
 }
 
 void i8x9x_device::port1_w(u8 data)
 {
-	logerror("io port 1 %02x (%04x)\n", data, PPC);
+	if (!i8x9x_has_p1())
+	{
+		logerror("%s: Write %02x to nonexistent port 1\n", machine().describe_context(), data);
+		return;
+	}
+
+	port1 = data;
 	m_out_p1_cb(data);
 }
 
 u8 i8x9x_device::port1_r()
 {
-	return m_in_p1_cb();
+	if (!i8x9x_has_p1())
+		return 0xff;
+
+	return m_in_p1_cb() & port1;
 }
 
 void i8x9x_device::port2_w(u8 data)
 {
-	logerror("io port 2 %02x (%04x)\n", data, PPC);
+	data &= 0xe1 & i8x9x_p2_mask();
+	port2 = data;
 	m_out_p2_cb(data);
 }
 
 u8 i8x9x_device::port2_r()
 {
-	return m_in_p2_cb();
+	// P2.0 and P2.5 are for output only (but can be read back despite what Intel claims?)
+	return (m_in_p2_cb() | 0x21 | ~i8x9x_p2_mask()) & (port2 | 0x1e);
 }
 
 void i8x9x_device::sp_con_w(u8 data)
@@ -491,17 +514,29 @@ void i8x9x_device::internal_update(u64 current_time)
 	recompute_bcount(event_time);
 }
 
-c8095_device::c8095_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	i8x9x_device(mconfig, C8095, tag, owner, clock)
+c8095_90_device::c8095_90_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	i8x9x_device(mconfig, C8095_90, tag, owner, clock, 16)
+{
+}
+
+n8097bh_device::n8097bh_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	i8x9x_device(mconfig, N8097BH, tag, owner, clock, 16)
 {
 }
 
 p8098_device::p8098_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	i8x9x_device(mconfig, P8098, tag, owner, clock)
+	i8x9x_device(mconfig, P8098, tag, owner, clock, 8)
 {
 }
 
-DEFINE_DEVICE_TYPE(C8095, c8095_device, "c8095", "Intel C8095")
+p8798_device::p8798_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	i8x9x_device(mconfig, P8798, tag, owner, clock, 8)
+{
+}
+
+DEFINE_DEVICE_TYPE(C8095_90, c8095_90_device, "c8095_90", "Intel C8095-90")
+DEFINE_DEVICE_TYPE(N8097BH, n8097bh_device, "n8097bh", "Intel N8097BH")
 DEFINE_DEVICE_TYPE(P8098, p8098_device, "p8098", "Intel P8098")
+DEFINE_DEVICE_TYPE(P8798, p8798_device, "p8798", "Intel P8798")
 
 #include "cpu/mcs96/i8x9x.hxx"

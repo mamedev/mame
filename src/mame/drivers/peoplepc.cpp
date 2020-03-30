@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-   
-/********************************************************************************************* 
+
+/*********************************************************************************************
 The keyboard has a sticker that proclaims it was made by Fujitsu Limited.
 
 [ASC] [ESC] [F1 ] [F2 ] [F3 ] [F4 ] [F5 ] [F6 ] [F7 ] [F8 ] [F9 ] [F10] [F11] [F11] [PRN]
@@ -9,7 +9,7 @@ The keyboard has a sticker that proclaims it was made by Fujitsu Limited.
 [ TAB ]  [ Q ] [ W ] [ E ] [ R ] [ T ] [ Z ] [ U ] [ I ] [ O ] [ P ] [ Ü ] [+ *]  [ DEL ]   [ 4 ] [ 5 ] [ 5 ] [ - ] [HOM]
 [SHIFTLOCK] [ A ] [ S ] [ D ] [ F ] [ G ] [ H ] [ J ] [ K ] [ L ] [ Ö ] [ Ä ] [# '] [RET]   [ 1 ] [ 2 ] [ 3 ] [RET] [UP ]
 [SHIFT] [2 3]  [ Y ] [ X ] [ C ] [ V ] [ B ] [ N ] [ M ] [, ;] [. :] [- _] [ Ü ]    [URN]   [    0    ] [ . ] [URN] [DWN]
-[ CTRL  ] [                    SPACE                     ]                       
+[ CTRL  ] [                    SPACE                     ]
 
 * The ASC key top left has a red LED, "Depressing the ASCII key, [...], switches off the LED indicator. This key acts as a
   toggle between the ASCII character set, and your country's standard (NATIONAL) character set. You would use this feature if
@@ -19,10 +19,10 @@ The keyboard has a sticker that proclaims it was made by Fujitsu Limited.
 * BKS is the full word BACKSPACE
 * the C to the right of BKS has a red keycap, it deletes the complete line
 * the five direction keys are all marked with arrows, HOME being diagonally to the top left
-* SHIFTLOCK also has an LED indicator, and is released by pressing one of the SHIFT keys 
+* SHIFTLOCK also has an LED indicator, and is released by pressing one of the SHIFT keys
 
 **********************************************************************************************/
-   
+
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "imagedev/floppy.h"

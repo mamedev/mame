@@ -23,6 +23,8 @@ ppu_sh6578_device::ppu_sh6578_device(const machine_config& mconfig, device_type 
 {
 	m_paletteram_in_ppuspace = false;
 	m_line_write_increment_large = 32;
+	m_videoram_addr_mask = 0xffff;
+	m_global_refresh_mask = 0xffff;
 }
 
 ppu_sh6578_device::ppu_sh6578_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
@@ -85,6 +87,11 @@ void ppu_sh6578_device::scanline_increment_fine_ycounter()
 	}
 }
 
+void ppu_sh6578_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap)
+{
+	uint8_t palval = m_palette_ram[(pixel_data | color << 2)] & 0x3f;
+	bitmap.pix32(m_scanline, sprite_xpos + pixel) = this->pen(palval);
+}
 
 void ppu_sh6578_device::read_tile_plane_data(int address, int color)
 {
@@ -134,10 +141,11 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 			}
 			else
 			{
-				pen = back_pen;
+				uint8_t palval = m_palette_ram[0x0] & 0x3f;
+				pen = this->pen(palval);
 			}
 
-			*dest = pen;		
+			*dest = pen;
 
 			// priority marking
 			if (!trans)
@@ -245,45 +253,36 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 	}
 }
 
+void ppu_sh6578_device::read_sprite_plane_data(int address)
+{
+	m_planebuf[0] = readbyte((address + 0) & 0x3fff);
+	m_planebuf[1] = readbyte((address + 8) & 0x3fff);
+}
+
+
+int ppu_sh6578_device::apply_sprite_pattern_page(int index1, int size)
+{
+	index1 += (((m_colsel_pntstart >> 2) & 0x3) * 0x1000);
+	return index1;
+}
+
+/*
 void ppu_sh6578_device::draw_sprites(uint8_t* line_priority)
 {
-
 }
+*/
 
-void ppu_sh6578_device::write(offs_t offset, uint8_t data)
+void ppu_sh6578_device::write_extended(offs_t offset, uint8_t data)
 {
-	if (offset < 0x8)
-	{
-		ppu2c0x_device::write(offset, data);
-	}
-	else if (offset == 0x8)
-	{
-		LOGMASKED(LOG_PPU_EXTRA, "%s: ppu_sh6578_device::write : Color Select & PNT Start Address : %02x\n", machine().describe_context(), data);
-		m_colsel_pntstart = data;
-	}
-	else
-	{
-		LOGMASKED(LOG_PPU_EXTRA, "%s: ppu_sh6578_device::write : unhandled offset %02x : %02x\n", machine().describe_context(), offset, data);
-	}
+	LOGMASKED(LOG_PPU_EXTRA, "%s: ppu_sh6578_device::write : Color Select & PNT Start Address : %02x\n", machine().describe_context(), data);
+	m_colsel_pntstart = data;
 }
 
 
-uint8_t ppu_sh6578_device::read(offs_t offset)
+uint8_t ppu_sh6578_device::read_extended(offs_t offset)
 {
-	if (offset < 0x8)
-	{
-		return ppu2c0x_device::read(offset);
-	}
-	else if (offset == 0x8)
-	{
-		LOGMASKED(LOG_PPU_EXTRA, "%s: ppu_sh6578_device::read : Color Select & PNT Start Address\n", machine().describe_context());
-		return m_colsel_pntstart;
-	}
-	else
-	{
-		LOGMASKED(LOG_PPU_EXTRA, "%s: ppu_sh6578_device::read : unhandled offset %02x\n", machine().describe_context(), offset);
-		return 0x00;
-	}
+	LOGMASKED(LOG_PPU_EXTRA, "%s: ppu_sh6578_device::read : Color Select & PNT Start Address\n", machine().describe_context());
+	return m_colsel_pntstart;
 }
 
 void ppu_sh6578_device::palette_write(offs_t offset, uint8_t data)

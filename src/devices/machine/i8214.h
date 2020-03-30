@@ -35,12 +35,12 @@ public:
 	auto int_wr_callback() { return m_write_int.bind(); }
 	auto enlg_wr_callback() { return m_write_enlg.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( sgs_w );
-	DECLARE_WRITE_LINE_MEMBER( etlg_w );
-	DECLARE_WRITE_LINE_MEMBER( inte_w );
+	void sgs_w(int state);
+	void etlg_w(int state);
+	void inte_w(int state);
 
 	uint8_t a_r();
-	DECLARE_READ8_MEMBER(vector_r);
+	uint8_t vector_r();
 	void b_w(uint8_t data);
 	void b_sgs_w(uint8_t data);
 	void r_w(int line, int state);

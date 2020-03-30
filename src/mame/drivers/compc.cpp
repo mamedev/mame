@@ -98,7 +98,7 @@ READ8_MEMBER(compc_state::pio_r)
 	switch (offset)
 	{
 		case 0:
-			data = m_keyboard->read(space, 0);
+			data = m_keyboard->read();
 			break;
 		case 1:
 			data = m_portb;
@@ -146,7 +146,7 @@ READ8_MEMBER(compc_state::pioiii_r)
 	switch (offset)
 	{
 		case 0:
-			data = m_keyboard->read(space, 0);
+			data = m_keyboard->read();
 			break;
 		case 1:
 			data = m_portb;

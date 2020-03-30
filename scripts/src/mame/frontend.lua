@@ -176,3 +176,11 @@ files {
 }
 
 pchsource(MAME_DIR .. "src/frontend/mame/audit.cpp")
+
+dependency {
+	{ MAME_DIR .. "src/frontend/mame/ui/about.cpp", GEN_DIR .. "emu/copying.ipp" },
+}
+
+custombuildtask {
+	{ MAME_DIR .. "COPYING", GEN_DIR .. "emu/copying.ipp", { MAME_DIR .. "scripts/build/file2lines.py" }, { "@echo Converting COPYING...", PYTHON .. " $(1) $(<) $(@) copying_text" } },
+}

@@ -97,7 +97,7 @@ READ8_MEMBER( c64_buscard_device::ppi_pa_r )
 
 	if (!m_te)
 	{
-		data = m_ieee1->read(space, 0);
+		data = m_ieee1->read();
 	}
 
 	if (m_dipsw)
@@ -110,7 +110,7 @@ READ8_MEMBER( c64_buscard_device::ppi_pa_r )
 
 WRITE8_MEMBER( c64_buscard_device::ppi_pa_w )
 {
-	m_ieee1->write(space, 0, data);
+	m_ieee1->write(data);
 
 	m_centronics->write_data0(BIT(data, 0));
 	m_centronics->write_data1(BIT(data, 1));

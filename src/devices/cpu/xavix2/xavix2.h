@@ -108,8 +108,8 @@ protected:
 		if(r & 0x80000000)
 			f |= F_N;
 		m_hr[4] = (m_hr[4] & ~F_MASK) | f;
-		return r;		
-	}		
+		return r;
+	}
 
 	inline u32 do_lsl(u32 v1, u32 shift) {
 		if(!shift) {

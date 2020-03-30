@@ -57,7 +57,7 @@ hp_1mb5_device::hp_1mb5_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-READ8_MEMBER(hp_1mb5_device::cpu_r)
+uint8_t hp_1mb5_device::cpu_r(offs_t offset)
 {
 	uint8_t res = 0;
 
@@ -87,7 +87,7 @@ READ8_MEMBER(hp_1mb5_device::cpu_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp_1mb5_device::cpu_w)
+void hp_1mb5_device::cpu_w(offs_t offset, uint8_t data)
 {
 	LOG("WR %u=%02x\n" , offset , data);
 
@@ -108,7 +108,7 @@ WRITE8_MEMBER(hp_1mb5_device::cpu_w)
 	}
 }
 
-READ8_MEMBER(hp_1mb5_device::uc_r)
+uint8_t hp_1mb5_device::uc_r(offs_t offset)
 {
 	uint8_t res = 0;
 
@@ -136,7 +136,7 @@ READ8_MEMBER(hp_1mb5_device::uc_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp_1mb5_device::uc_w)
+void hp_1mb5_device::uc_w(offs_t offset, uint8_t data)
 {
 	//LOG("WRU %u=%02x SR=%02x\n" , offset , data , m_sr);
 

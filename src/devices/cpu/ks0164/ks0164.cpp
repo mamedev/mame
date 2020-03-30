@@ -138,8 +138,8 @@ u16 ks0164_cpu_device::snz(u16 r)
 	if(r & 0x8000)
 		f |= F_N;
 	m_r[R_PSW] = (m_r[R_PSW] & ~F_MASK) | f;
-	return r;		
-}		
+	return r;
+}
 
 void ks0164_cpu_device::do_alu(u16 opcode, u16 v2)
 {
@@ -384,7 +384,7 @@ void ks0164_cpu_device::execute_run()
 			case 0: {
 				// Push all registers
 				// 1100 .... .... .001
-				
+
 				m_program->write_word(m_r[R_SP] - 2, m_r[0]);
 				m_program->write_word(m_r[R_SP] - 4, m_r[1]);
 				m_program->write_word(m_r[R_SP] - 6, m_r[2]);
@@ -403,7 +403,12 @@ void ks0164_cpu_device::execute_run()
 			case 2: {
 				// Bit set in register
 				// 1110 .rrr bbbb .001
-				m_r[(opcode >> 8) & 7] |= 1 << ((opcode >> 4) & 0xf);
+				if(m_r[(opcode >> 8) & 7] & (1 << ((opcode >> 4) & 0xf)))
+					m_r[R_PSW] &= ~F_Z;
+				else {
+					m_r[R_PSW] |=  F_Z;
+					m_r[(opcode >> 8) & 7] |= 1 << ((opcode >> 4) & 0xf);
+				}
 				break;
 			}
 
@@ -470,7 +475,7 @@ void ks0164_cpu_device::execute_run()
 			case 0: {
 				// Push all registers
 				// 1100 .... .... .011
-				
+
 				m_r[0] = m_program->read_word(m_r[R_SP] + 6);
 				m_r[1] = m_program->read_word(m_r[R_SP] + 4);
 				m_r[2] = m_program->read_word(m_r[R_SP] + 2);
@@ -557,7 +562,11 @@ void ks0164_cpu_device::execute_run()
 			case 2: {
 				// Bit clear in register
 				// 1110 .rrr bbbb .001
-				m_r[(opcode >> 8) & 7] &= ~(1 << ((opcode >> 4) & 0xf));
+				if(m_r[(opcode >> 8) & 7] & (1 << ((opcode >> 4) & 0xf))) {
+					m_r[(opcode >> 8) & 7] &= ~(1 << ((opcode >> 4) & 0xf));
+					m_r[R_PSW] &= ~F_Z;
+				} else
+					m_r[R_PSW] |=  F_Z;
 				break;
 			}
 
@@ -568,7 +577,7 @@ void ks0164_cpu_device::execute_run()
 				m_r[R_PC] += 2;
 
 				m_r[r] --;
-				if(m_r[r] != 0xffff)
+				if(m_r[r] != 0)
 					m_r[R_PC] = a;
 				break;
 			}
@@ -732,7 +741,7 @@ void ks0164_cpu_device::execute_run()
 		default:
 			unk(opcode);
 			break;
-		}			
+		}
 
 		m_r[R_ZERO] = 0;
 	}

@@ -15,6 +15,7 @@ DECLARE_DEVICE_TYPE(M6805R3, m6805r3_device)
 //DECLARE_DEVICE_TYPE(M6805S3, m6805s3_device) // A/D, SPI, multiple timers
 DECLARE_DEVICE_TYPE(M6805U2, m6805u2_device)
 DECLARE_DEVICE_TYPE(M6805U3, m6805u3_device)
+DECLARE_DEVICE_TYPE(HD6805S1, hd6805s1_device)
 DECLARE_DEVICE_TYPE(HD6805U1, hd6805u1_device)
 
 DECLARE_DEVICE_TYPE(M68705P3, m68705p3_device)
@@ -372,6 +373,12 @@ public:
 	m6805u3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
+};
+
+class hd6805s1_device : public m6805_mrom_device
+{
+public:
+	hd6805s1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 };
 
 class hd6805u1_device : public m6805_mrom_device

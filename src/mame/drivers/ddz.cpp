@@ -145,8 +145,34 @@ ROM_START( ddz )
 	ROM_LOAD("ddz.003.rom",  0x800000, 0x400000, CRC(61c9b5c9) SHA1(0438417398403456a1c49408881797a94aa86f49) )
 ROM_END
 
-
-ROM_START( crzclass ) // PCB marked MAH-JONG
+/* "Zhaoji Fengdou" PCB
+     ______________________________________________________________
+    |                             _________  ____________________  |
+  __|                            HD74HC245P |ROM1 H28F320BDJ-TTL80 |
+ |__           RAM3 ________      _________ |____________________| |
+ |__ M         K4S641632K-UC60   HD74HC245P   ____________________ |
+ |__ A             |________|     _________  |ROM2 H28F320BDJ-TTL80|
+ |__ H                           HD74HC245P  |____________________||
+ |__ -                    XTAL    _________   ____________________ |
+ |__ J       ___________  14.    HD74HC245P  |ROM3 H28F320BDJ-TTL80|
+ |__ O      |VRenderZero| 318     ________   |____________________||
+ |__ N      |MagicEyes  | MHz     HD74HC00P   ____________________ |
+ |__ G      |EISC       |         ________   |ROM4 - EMPTY        ||
+ |__        |___________|        |Unknown|   |____________________||
+    |                                                              |
+    |  RAM1 ________  RAM2 ________    _________   _____           |
+    | K4S641632K-UC60 K4S641632K-UC60 | Unknown|  |Unkn|           |
+    |      |________|     |________|  |        |  |____|      LED  |
+    | ________                        |________|               o   |
+  __| ULN2003AN                                         __         |
+ |                                                      | |        |
+ |__                                        ULN2003AN-> | |  ____  |
+ |                                                      |_|  |K1|  |
+ |__                                                         |__|  |
+    |       _____       ___     JAMMA               _____   Switch |
+    |______|     |_|_| |   |_|_|_|_|_|_|_|_|_|_|_|_|     |_________|
+*/
+ROM_START( crzclass )
 	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x1000000, "enc_data", ROMREGION_ERASEFF )
@@ -168,6 +194,5 @@ void ddz_state::init_ddz()
 	}
 }
 
-GAME( 200?, ddz,      0,        ddz,  ddz,  ddz_state, init_ddz,    ROT0, "IGS?",                "Dou Di Zhu", MACHINE_IS_SKELETON )
-GAME( 200?, crzclass, 0,        ddz,  ddz,  ddz_state, init_ddz,    ROT0, "TJF",                 "Zhaoji Fengdou", MACHINE_IS_SKELETON ) // 'Crazy Class'
-
+GAME( 200?, ddz,      0, ddz, ddz, ddz_state, init_ddz, ROT0, "IGS?", "Dou Di Zhu",     MACHINE_IS_SKELETON )
+GAME( 200?, crzclass, 0, ddz, ddz, ddz_state, init_ddz, ROT0, "TJF",  "Zhaoji Fengdou", MACHINE_IS_SKELETON ) // 'Crazy Class'

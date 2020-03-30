@@ -121,7 +121,8 @@ tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, 
 	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal),
 	m_port_in_cb(*this),
 	m_port_out_cb(*this),
-	m_info_flags(info_flags)
+	m_info_flags(info_flags),
+	m_divider(2)
 {
 }
 

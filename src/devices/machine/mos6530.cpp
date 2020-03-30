@@ -194,7 +194,7 @@ void mos6530_device::device_timer(emu_timer &timer, device_timer_id id, int para
     mos6530_w - master I/O write access
 -------------------------------------------------*/
 
-WRITE8_MEMBER( mos6530_device::write )
+void mos6530_device::write(offs_t offset, uint8_t data)
 {
 	/* if A2 == 1, we are writing to the timer */
 	if (offset & 0x04)
@@ -258,7 +258,7 @@ WRITE8_MEMBER( mos6530_device::write )
     mos6530_r - master I/O read access
 -------------------------------------------------*/
 
-READ8_MEMBER( mos6530_device::read )
+uint8_t mos6530_device::read(offs_t offset)
 {
 	uint8_t val;
 

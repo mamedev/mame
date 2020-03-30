@@ -279,7 +279,7 @@ INTERRUPT_GEN_MEMBER(kron180_state::interrupt)
 
 WRITE_LINE_MEMBER(kron180_state::keyb_interrupt)
 {
-	if(state && (m_kbd_data = m_keyboard->read(machine().dummy_space(), 0)))
+	if(state && (m_kbd_data = m_keyboard->read()))
 	{
 		LOGKBD("%s(%02x)\n", FUNCNAME, m_kbd_data);
 		m_maincpu->set_input_line(2, ASSERT_LINE);

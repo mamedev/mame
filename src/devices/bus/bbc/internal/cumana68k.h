@@ -2,7 +2,7 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    Cumana 68008 2nd processor
+    Cumana 68008 Upgrade Board
 
     http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Cumana_680082ndProcessor.html
 
@@ -17,10 +17,10 @@
 #include "machine/6821pia.h"
 #include "machine/input_merger.h"
 #include "machine/mc146818.h"
+#include "machine/nscsi_cb.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "formats/os9_dsk.h"
-#include "bus/scsi/scsi.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -51,6 +51,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	DECLARE_WRITE_LINE_MEMBER(irq6502_w) override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(reset68008_w);
 	DECLARE_WRITE_LINE_MEMBER(rtc_ce_w);
@@ -62,17 +64,21 @@ private:
 	required_device<mc146818_device> m_rtc;
 	required_device<wd2797_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
-	required_device<scsi_port_device> m_sasibus;
-	required_device<output_latch_device> m_sasi_data_out;
-	required_device<input_buffer_device> m_sasi_data_in;
+	required_device<nscsi_callback_device> m_sasi;
 
 	void cumana68k_mem(address_map &map);
 
 	void fsel_w(offs_t offset, uint8_t data);
 
+	uint8_t sasi_r();
+	void sasi_w(uint8_t data);
+
 	int m_masknmi;
 
-	void mc146818_set();
+	uint8_t rtc_r();
+	void rtc_w(uint8_t data);
+	void mc146818_set(int as, int ds, int rw);
+	uint8_t m_mc146818_data;
 	int m_mc146818_as;
 	int m_mc146818_ds;
 	int m_mc146818_rw;

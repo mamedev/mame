@@ -204,7 +204,7 @@ void cdc721_state::io_map(address_map &map)
 	map(0x20, 0x27).rw("kbduart", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x30, 0x33).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x47).rw("comuart", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
-	map(0x50, 0x50).w("ledlatch", FUNC(output_latch_device::bus_w));
+	map(0x50, 0x50).w("ledlatch", FUNC(output_latch_device::write));
 	map(0x70, 0x70).w(FUNC(cdc721_state::block_select_w));
 	map(0x80, 0x87).rw("pauart", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x90, 0x97).rw("pbuart", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));

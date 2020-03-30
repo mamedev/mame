@@ -114,7 +114,7 @@ void cdp1879_device::update_rtc()
 	set_clock_register(RTC_MONTH, bcd_to_integer(m_regs[R_CNT_MONTH]));
 }
 
-READ8_MEMBER(cdp1879_device::read)
+uint8_t cdp1879_device::read(offs_t offset)
 {
 	if (offset == R_CTL_IRQSTATUS && !machine().side_effects_disabled())
 	{
@@ -128,7 +128,7 @@ READ8_MEMBER(cdp1879_device::read)
 	return m_regs[offset];
 }
 
-WRITE8_MEMBER(cdp1879_device::write)
+void cdp1879_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

@@ -242,7 +242,7 @@ WRITE8_MEMBER( dragon_alpha_state::pia2_pa_w )
 			m_ay8912->data_w(m_pia_2->b_output());
 			break;
 		case 0x02:      /* Read from selected port */
-			m_pia_2->write_portb(m_ay8912->data_r());
+			m_pia_2->portb_w(m_ay8912->data_r());
 			break;
 		case 0x03:      /* Select port to write to */
 			m_ay8912->address_w(m_pia_2->b_output());

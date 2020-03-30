@@ -4,7 +4,7 @@
 
     Atmel 8-bit AVR simulator
 
-	Opcode implementations
+    Opcode implementations
 
 ***************************************************************************/
 

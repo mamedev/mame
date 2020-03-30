@@ -195,6 +195,7 @@ CRUCLK*  51||52  DBIN
 #include "spchsyn.h"
 #include "memex.h"
 #include "horizon.h"
+#include "forti.h"
 
 #define LOG_WARN        (1U<<1)   // Warnings
 #define LOG_CONFIG      (1U<<2)   // Configuration
@@ -495,6 +496,7 @@ void ti99_peribox_slot_standard(device_slot_interface &device)
 	device.option_add("ccdcc",    TI99_CCDCC);
 	device.option_add("ccfdc",    TI99_CCFDC);
 	device.option_add("ddcc1",    TI99_DDCC1);
+	device.option_add("forti",    TI99_FORTI);
 }
 
 void peribox_device::device_add_mconfig(machine_config &config)
@@ -537,6 +539,7 @@ void ti99_peribox_slot_evpc(device_slot_interface &device)
 	device.option_add("ccdcc",    TI99_CCDCC);
 	device.option_add("ccfdc",    TI99_CCFDC);
 	device.option_add("ddcc1",    TI99_DDCC1);
+	device.option_add("forti",    TI99_FORTI);
 }
 
 void peribox_ev_device::device_add_mconfig(machine_config &config)
@@ -589,6 +592,7 @@ void ti99_peribox_slot_geneve(device_slot_interface &device)
 	device.option_add("ccdcc",    TI99_CCDCC);
 	device.option_add("ccfdc",    TI99_CCFDC);
 	device.option_add("ddcc1",    TI99_DDCC1);
+	device.option_add("forti",    TI99_FORTI);
 }
 
 void peribox_gen_device::device_add_mconfig(machine_config &config)
@@ -643,6 +647,7 @@ void ti99_peribox_slot_sgcpu(device_slot_interface &device)
 	device.option_add("ccdcc",    TI99_CCDCC);
 	device.option_add("ccfdc",    TI99_CCFDC);
 	device.option_add("ddcc1",    TI99_DDCC1);
+	device.option_add("forti",    TI99_FORTI);
 }
 
 void peribox_sg_device::device_add_mconfig(machine_config &config)

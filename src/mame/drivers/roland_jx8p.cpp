@@ -13,10 +13,11 @@
 //#include "bus/midi/midi.h"
 #include "cpu/m6800/m6801.h"
 //#include "cpu/upd7500/upd7500.h"
+#include "machine/mb63h149.h"
 #include "machine/nvram.h"
 //#include "machine/pg800.h"
-//#include "machine/rescap.h"
-//#include "machine/upd7001.h"
+#include "machine/rescap.h"
+#include "machine/upd7001.h"
 
 class roland_jx8p_state : public driver_device
 {
@@ -29,13 +30,13 @@ public:
 	}
 
 	void jx8p(machine_config &config);
+	void jx8po(machine_config &config);
 	void jx10(machine_config &config);
+	void mks70(machine_config &config);
 
 private:
 	u8 switches_r(offs_t offset);
 	void leds_w(u8 data);
-	u8 gate_array_r(offs_t offset);
-	void gate_array_w(offs_t offset, u8 data);
 
 	void jx8p_assigner_map(address_map &map);
 	void superjx_assigner_map(address_map &map);
@@ -54,15 +55,6 @@ void roland_jx8p_state::leds_w(u8 data)
 {
 }
 
-u8 roland_jx8p_state::gate_array_r(offs_t offset)
-{
-	return 0;
-}
-
-void roland_jx8p_state::gate_array_w(offs_t offset, u8 data)
-{
-}
-
 void roland_jx8p_state::jx8p_assigner_map(address_map &map)
 {
 	map(0x0000, 0x001f).m(m_assignercpu, FUNC(hd6303r_cpu_device::m6801_io));
@@ -70,7 +62,7 @@ void roland_jx8p_state::jx8p_assigner_map(address_map &map)
 	map(0x2000, 0x3fff).rw("cartslot", FUNC(generic_slot_device::read_ram), FUNC(generic_slot_device::write_ram));
 	map(0x4000, 0x4007).mirror(0x1ff8).r(FUNC(roland_jx8p_state::switches_r));
 	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(roland_jx8p_state::leds_w));
-	map(0x8000, 0x87ff).mirror(0x1800).rw(FUNC(roland_jx8p_state::gate_array_r), FUNC(roland_jx8p_state::gate_array_w));
+	map(0x8000, 0x87ff).mirror(0x1800).rw("keyscan", FUNC(mb63h149_device::read), FUNC(mb63h149_device::write));
 	map(0xa000, 0xa7ff).mirror(0x1800).ram().share("nvram");
 	map(0xc000, 0xffff).rom().region("assigner", 0);
 }
@@ -79,7 +71,7 @@ void roland_jx8p_state::superjx_assigner_map(address_map &map)
 {
 	map(0x0000, 0x001f).m(m_assignercpu, FUNC(hd6303r_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram(); // internal RAM
-	map(0x1000, 0x17ff).mirror(0x800).rw(FUNC(roland_jx8p_state::gate_array_r), FUNC(roland_jx8p_state::gate_array_w));
+	map(0x1000, 0x17ff).mirror(0x800).rw("keyscan", FUNC(mb63h149_device::read), FUNC(mb63h149_device::write));
 	map(0x2000, 0x3fff).rw("cartslot", FUNC(generic_slot_device::read_ram), FUNC(generic_slot_device::write_ram));
 	map(0x4000, 0x4007).mirror(0xff8).r(FUNC(roland_jx8p_state::switches_r));
 	map(0x5000, 0x5000).mirror(0xfff).w(FUNC(roland_jx8p_state::leds_w));
@@ -321,33 +313,66 @@ void roland_jx8p_state::jx8p(machine_config &config)
 {
 	HD6303R(config, m_assignercpu, 16_MHz_XTAL / 2); // HD63B03RP
 	m_assignercpu->set_addrmap(AS_PROGRAM, &roland_jx8p_state::jx8p_assigner_map);
+	m_assignercpu->in_p1_cb().set("adc", FUNC(upd7001_device::eoc_so_r)).bit(0);
+	m_assignercpu->out_p1_cb().set("adc", FUNC(upd7001_device::sck_w)).bit(1);
+	m_assignercpu->out_p1_cb().append("adc", FUNC(upd7001_device::si_w)).bit(2);
+	m_assignercpu->out_p1_cb().append("adc", FUNC(upd7001_device::cs_w)).bit(3);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5517APL + battery
 
+	mb63h149_device &keyscan(MB63H149(config, "keyscan", 16_MHz_XTAL));
+	keyscan.int_callback().set_inputline(m_assignercpu, HD6301_IRQ_LINE);
+
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, nullptr, "jx8p_cart");
 
-	//UPD7001(config, "adc", RES_K(27), CAP_P(47));
+	upd7001_device &adc(UPD7001(config, "adc", RES_K(27), CAP_P(47)));
+	adc.dl_w(1);
 
 	//UPD7537(config, "displaycpu", 400_kHz_XTAL);
 
 	JX8P_SYNTH(config, "synth", 16_MHz_XTAL / 2);
 }
 
+void roland_jx8p_state::jx8po(machine_config &config)
+{
+	jx8p(config);
+
+	MB63H130(config.replace(), "keyscan", 16_MHz_XTAL); // no INT
+}
+
 void roland_jx8p_state::jx10(machine_config &config)
 {
 	HD6303R(config, m_assignercpu, 16_MHz_XTAL / 2); // HD63B03RP
 	m_assignercpu->set_addrmap(AS_PROGRAM, &roland_jx8p_state::superjx_assigner_map);
+	m_assignercpu->in_p1_cb().set("adc", FUNC(upd7001_device::eoc_so_r)).bit(0);
+	m_assignercpu->out_p1_cb().set("adc", FUNC(upd7001_device::sck_w)).bit(1);
+	m_assignercpu->out_p1_cb().append("adc", FUNC(upd7001_device::si_w)).bit(2);
+	m_assignercpu->out_p1_cb().append("adc", FUNC(upd7001_device::cs_w)).bit(3);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5564PL-20 + battery
 
+	mb63h149_device &keyscan(MB63H149(config, "keyscan", 16_MHz_XTAL));
+	keyscan.int_callback().set_inputline(m_assignercpu, HD6301_IRQ_LINE);
+
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, nullptr, "jx8p_cart");
 
-	//UPD7001(config, "adc", RES_K(27), CAP_P(47));
+	upd7001_device &adc(UPD7001(config, "adc", RES_K(27), CAP_P(47)));
+	adc.dl_w(1);
 
 	//UPD7538A(config, "displaycpu", 600_kHz_XTAL);
 
 	SUPERJX_SYNTH(config, "lower", 16_MHz_XTAL / 2);
 	SUPERJX_SYNTH(config, "upper", 16_MHz_XTAL / 2);
+}
+
+void roland_jx8p_state::mks70(machine_config &config)
+{
+	jx10(config);
+
+	m_assignercpu->in_p1_cb().set_constant(0x01);
+	m_assignercpu->out_p1_cb().set_nop();
+
+	config.device_remove("adc");
 }
 
 ROM_START(jx8p)
@@ -414,7 +439,7 @@ ROM_START(mks70)
 	ROM_LOAD("c-v103.ic1", 0x0000, 0x4000, CRC(4808729c) SHA1(0adcfa405d6f5be7c4c32ffa5b2e224c66e72f74))
 ROM_END
 
-SYST(1985, jx8p,  0,    0, jx8p, jx8p,  roland_jx8p_state, empty_init, "Roland", "JX-8P Polyphonic Synthesizer (Ver. 3.x)", MACHINE_IS_SKELETON)
-SYST(1985, jx8po, jx8p, 0, jx8p, jx8p,  roland_jx8p_state, empty_init, "Roland", "JX-8P Polyphonic Synthesizer (Ver. 2.x)", MACHINE_IS_SKELETON)
-SYST(1986, jx10,  0,    0, jx10, jx10,  roland_jx8p_state, empty_init, "Roland", "JX-10 Super JX Polyphonic Synthesizer", MACHINE_IS_SKELETON)
-SYST(1987, mks70, jx10, 0, jx10, mks70, roland_jx8p_state, empty_init, "Roland", "MKS-70 Super JX Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1985, jx8p,  0,    0, jx8p,  jx8p,  roland_jx8p_state, empty_init, "Roland", "JX-8P Polyphonic Synthesizer (Ver. 3.x)", MACHINE_IS_SKELETON)
+SYST(1985, jx8po, jx8p, 0, jx8po, jx8p,  roland_jx8p_state, empty_init, "Roland", "JX-8P Polyphonic Synthesizer (Ver. 2.x)", MACHINE_IS_SKELETON)
+SYST(1986, jx10,  0,    0, jx10,  jx10,  roland_jx8p_state, empty_init, "Roland", "JX-10 Super JX Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1987, mks70, jx10, 0, mks70, mks70, roland_jx8p_state, empty_init, "Roland", "MKS-70 Super JX Polyphonic Synthesizer", MACHINE_IS_SKELETON)

@@ -339,7 +339,7 @@ READ8_MEMBER(tandy1000_state::tandy1000_pio_r)
 	case 0:
 		if (m_tandy_ppi_ack)
 		{
-			m_tandy_ppi_porta = m_keyboard->read(space, 0);
+			m_tandy_ppi_porta = m_keyboard->read();
 			m_tandy_ppi_ack = 0;
 		}
 		data = m_tandy_ppi_porta;
@@ -359,7 +359,7 @@ READ8_MEMBER(tandy1000_state::tandy1000_pio_r)
 
 WRITE8_MEMBER( tandy1000_state::nmi_vram_bank_w )
 {
-	m_mb->nmi_enable_w(space, 0, data & 0x80);
+	m_mb->nmi_enable_w(data & 0x80);
 	vram_bank_w(space, 0, data & 0x1e);
 	m_video->disable_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -453,8 +453,8 @@ void isbc_state::isbc286(machine_config &config)
 	pit.out_handler<2>().set(FUNC(isbc_state::isbc286_tmr2_w));
 
 	i8255_device &ppi(I8255A(config, "ppi"));
-	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
-	ppi.in_pb_callback().set(m_cent_status_in, FUNC(input_buffer_device::bus_r));
+	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
+	ppi.in_pb_callback().set(m_cent_status_in, FUNC(input_buffer_device::read));
 	ppi.out_pc_callback().set(FUNC(isbc_state::ppi_c_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");

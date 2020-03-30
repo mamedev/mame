@@ -47,12 +47,13 @@ public:
 
 
 	void init_crc();
-	void init_wiwi18();
 	void init_tvsprt10();
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	void decrypt_ac_ff(uint16_t* ROM, int size);
 
 	void switch_bank(uint32_t bank);
 
@@ -162,7 +163,20 @@ private:
 	required_device<i2cmem_device> m_i2cmem;
 };
 
+class spg2xx_game_albkickb_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_albkickb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
 
+	void ablkickb(machine_config &config);
+
+	void init_ablkickb();
+
+private:
+	DECLARE_READ16_MEMBER(portb_r);
+};
 
 class spg2xx_game_dreamlss_state : public spg2xx_game_state
 {

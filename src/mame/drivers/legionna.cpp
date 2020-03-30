@@ -956,7 +956,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( cupsoc )
-	// p3 and p4 inputs are routed thru two 10-pins on lower-left of PCB 
+	// p3 and p4 inputs are routed thru two 10-pins on lower-left of PCB
 	// TODO: dip-conditional with coin slots
 	// SEIBU_COIN_INPUTS override
 	PORT_START("COIN")
@@ -1450,11 +1450,11 @@ void legionna_state::cupsoc(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(42*8, 36*8);
-	// TODO: real PCB is a bit more complex, 
+	// TODO: real PCB is a bit more complex,
 	// it's really 320x256 in-game but with 8px border color on top/bottom.
 	// Border color is also not pure black but a very dark grey,
 	// can be seen when throw-in on bottom line occurs.
-	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1); 
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(legionna_state::screen_update_grainbow));
 	screen.set_palette(m_palette);
 

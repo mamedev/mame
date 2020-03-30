@@ -154,7 +154,7 @@ void ecb_grip21_device::grip_io(address_map &map)
 	map(0x50, 0x50).w(MC6845_TAG, FUNC(mc6845_device::address_w));
 	map(0x52, 0x52).w(MC6845_TAG, FUNC(mc6845_device::register_w));
 	map(0x53, 0x53).r(MC6845_TAG, FUNC(mc6845_device::register_r));
-	map(0x60, 0x60).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x60, 0x60).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x70, 0x73).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 //  map(0x80, 0x80).w(FUNC(ecb_grip21_device::bl2out_w));
 //  map(0x90, 0x90).w(FUNC(ecb_grip21_device::gr2out_w));

@@ -45,8 +45,8 @@ public:
 	u16 m_pf_control_0[8];
 	u16 m_pf_control_1[8];
 
-	void deco_bac06_pf_draw(screen_device &screen,bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,u16 penmask, u16 pencondition,u16 colprimask, u16 colpricondition, u8 pri = 0, u8 primask = 0xff);
-	void deco_bac06_pf_draw_bootleg(screen_device &screen,bitmap_ind16 &bitmap,const rectangle &cliprect,int flags, int mode, int type, u8 pri = 0, u8 primask = 0xff);
+	void deco_bac06_pf_draw(screen_device &screen,bitmap_ind16 &bitmap,const rectangle &cliprect,u32 flags,u16 penmask, u16 pencondition,u16 colprimask, u16 colpricondition, u8 pri = 0, u8 primask = 0xff);
+	void deco_bac06_pf_draw_bootleg(screen_device &screen,bitmap_ind16 &bitmap,const rectangle &cliprect,u32 flags, int mode, int type, u8 pri = 0, u8 primask = 0xff);
 
 
 	/* I wonder if pf_control_0 is really registers, or a selection of pins.
@@ -114,12 +114,6 @@ protected:
 	u8 m_gfxregion16x16;
 	int m_wide;
 
-	u8 m_bppmult_8x8;
-	u8 m_bppmask_8x8;
-
-	u8 m_bppmult_16x16;
-	u8 m_bppmask_16x16;
-
 	void custom_tilemap_draw(bitmap_ind16 &bitmap,
 							bitmap_ind8 &primap,
 							const rectangle &cliprect,
@@ -128,9 +122,8 @@ protected:
 							const u16 *colscroll_ptr,
 							const u16 *control0,
 							const u16 *control1,
-							int flags,
+							u32 flags,
 							u16 penmask, u16 pencondition,u16 colprimask, u16 colpricondition,
-							u8 bppmult, u8 bppmask,
 							u8 pri = 0, u8 pmask = 0xff);
 
 private:

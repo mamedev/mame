@@ -45,6 +45,10 @@ public:
 	auto in_porte() { return m_port_in_cb[4].bind(); }
 	auto out_porte() { return m_port_out_cb[4].bind(); }
 
+	// clock divider mask option
+	void set_divide_by_2() { m_divider = 2; }
+	void set_divide_by_4() { m_divider = 4; }
+
 	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { if (!machine().side_effects_disabled()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; };
 	DECLARE_WRITE8_MEMBER(tms7000_unmapped_rf_w) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag(), m_pc, offset + 0x80, data); };
 
@@ -80,8 +84,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; } // internal /2 divider
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); } // internal /2 divider
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + m_divider - 1) / 2; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * m_divider); }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 5; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 49; }
 	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
@@ -106,7 +110,8 @@ protected:
 	devcb_read8::array<5> m_port_in_cb;
 	devcb_write8::array<5> m_port_out_cb;
 
-	uint32_t m_info_flags;
+	const uint32_t m_info_flags;
+	unsigned m_divider;
 
 	address_space *m_program;
 	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;

@@ -36,8 +36,8 @@ public:
 		KER = 0x6   //!< Reset Keyboard Error
 	};
 
-	DECLARE_READ8_MEMBER ( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 
 	auto update_cb() { return m_display.bind(); } /* Set the writer used to update a display digit */
 

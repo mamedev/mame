@@ -9,7 +9,7 @@ license:CC0
 
 	<!-- 52-250704 - Mobigo 2 Game Cartridge (Internal Game) (ger) is a dummy cartridge to enable the game in the BIOS -->
 
-	<software name="ben10" supported="no">
+	<software name="ben10g" supported="no">
 		<description>Ben 10 - UltimateAlien - Mine der Gedanken (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -21,7 +21,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cars2" supported="no">
+	<software name="cars2g" supported="no">
 		<description>Cars 2 (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -33,7 +33,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="carstoon" supported="no">
+	<software name="carstoong" supported="no">
 		<description>Cars Toon - Hooks unglaubliche Geschichten (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -45,7 +45,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="chugg" supported="no">
+	<software name="chuggg" supported="no">
 		<description>Chuggington (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -57,7 +57,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="docmcger" supported="no">
+	<software name="docmcg" supported="no">
 		<description>Doc McStuffins - Spielzeugarztin (Germany)</description>
 		<year>2013</year>
 		<publisher>VTech</publisher>
@@ -69,7 +69,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="penmad" supported="no">
+	<software name="penmadg" supported="no">
 		<description>Die Pinguine aus Madagascar - Operation Krone (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -81,7 +81,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dzugger" supported="no">
+	<software name="dzuggerg" supported="no">
 		<description>Dino-Zug - Erforsche die Welt (Germany)</description>
 		<year>2014</year>
 		<publisher>VTech</publisher>
@@ -93,7 +93,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dprinces" supported="no">
+	<software name="dprincesg" supported="no">
 		<description>Disney Princess (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -105,7 +105,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dora" supported="no">
+	<software name="dorag" supported="no">
 		<description>Dora - Tag des Zwillings (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -117,7 +117,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="fishrek" supported="no">
+	<software name="fishrekg" supported="no">
 		<description>Für immer Shrek (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -129,7 +129,19 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="jakenim" supported="no">
+	<software name="hkittyg" supported="no">
+		<description>Hello Kitty - Hello Kitty feiert Geburtstag! (Germany)</description>
+		<year>2012</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-252404(GE)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-252404 - Hello Kitty - Hello Kitty feiert Geburtstag (GER).bin" size="0x1000000" crc="f47d475b" sha1="ba84cf8f919881856a8a367bc9dea2b04486ba50"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jakenimg" supported="no">
 		<description>Jake und die Nimmerland Piraten (Germany)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
@@ -141,7 +153,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kfpand2" supported="no">
+	<software name="kfpand2g" supported="no">
 		<description>Kung Fu Panda 2 (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -164,7 +176,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mmwunder" supported="no">
+	<software name="mickeyg" cloneof="mickey" supported="no"> <!-- By now, cloneof "mickey" -->
 		<description>Micky Maus - Wunderhaus (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -176,7 +188,19 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="planeger" supported="no">
+	<software name="minnieg" supported="no">
+		<description>Disney Minnie (Germany)</description>
+		<year>2013</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-252904(GE)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-252904 - Minnie (GER).bin" size="0x1000000" crc="fef9a9a5" sha1="a3d2afda48defc8520129453e4a3475907746761"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planesg" supported="no">
 		<description>Planes (Germany)</description>
 		<year>2013</year>
 		<publisher>VTech</publisher>
@@ -188,7 +212,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="rapunzel" supported="no">
+	<software name="rapunzelg" supported="no">
 		<description>Rapunzel - Neu verföhnt (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -200,7 +224,19 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sofiager" supported="no">
+	<software name="scoobymt" supported="no">
+		<description>Scooby-Doo! - Mystery Town (UK)</description>
+		<year>2011</year> <!-- s11 -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-251603(UK)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251603 - Scooby-Doo - Mystery Town (UK).bin" size="0x1000000" crc="dcc4a1ee" sha1="678e4c83bb120db028ffdd170f4bcfb3aa9d5229"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sofiag" supported="no">
 		<description>Sofia die Erste (Germany)</description>
 		<year>2013</year>
 		<publisher>VTech</publisher>
@@ -212,7 +248,43 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="teamumiz" supported="no">
+	<software name="spongebg" supported="no">
+		<description>Spongebob Schwammkopf - Rette das Geheimrezept (Germany)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-251504(GE)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251504 - Spongebob Schwammkopf - Rette das Geheimrezept (GER).bin" size="0x1000000" crc="19efae9e" sha1="5c3eeb04cdec48cb92c5410ceef57e4b60adeeee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sherosq" supported="no">
+		<description>Marvel Super Hero Squad - Sport Heroes (UK)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-250403(UK)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250403 - Super Hero Squad - Sports Heroes (UK).bin" size="0x1000000" crc="e5060f03" sha1="886dccb473f3a196ed1f475f04663e73aff9aedc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sherosqg" cloneof="sherosq" supported="no">
+		<description>Marvel Super Hero Squad - Super Sportler (Germany)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-250404(GE)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250404 - Super Hero Squad - Super Sportler (GER).bin" size="0x1000000" crc="a7c43ee7" sha1="a2a27bbfac9d75509d61828e380d46c287812ecd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teamumizg" supported="no">
 		<description>Team Umizoomi - Die große Umiauto Rettung (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -224,7 +296,19 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tstory3" supported="no">
+	<software name="thomasg" supported="no">
+		<description>Thomas &amp; seine Freunde - Wirklich Nützliche Loks (Germany)</description>
+		<year>2012</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-252704(GE)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-252704 - Thomas and seine Freunde - Wirklich nutzliche Loks (GER).bin" size="0x1000000" crc="6dc05813" sha1="5777a22bf9359b2ff3b52c9b9a822bc5a09e2cc8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tstory3g" supported="no">
 		<description>Toy Story 3 (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -247,7 +331,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tbellger" supported="no">
+	<software name="tbellg" supported="no">
 		<description>Tinkerbell - Tal der Feen (Germany)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -270,7 +354,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="uspidger" supported="no">
+	<software name="uspidg" supported="no">
 		<description>Ultimate Spider-Man (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -283,9 +367,9 @@ license:CC0
 	</software>
 
 
-	<!-- this is from a special large scale Kiosk unit, which should also have a unique BIOS.  
-             Maybe move into driver as a hardcodd cart once BIOS is dumped rather than having it here? -->
-	<software name="kiosk" supported="no">
+	<!-- this is from a special large scale Kiosk unit, which should also have a unique BIOS.
+	         Maybe move into driver as a hardcodd cart once BIOS is dumped rather than having it here? -->
+	<software name="kioskg" supported="no">
 		<description>Mobigo Kiosk (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>

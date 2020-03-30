@@ -422,7 +422,7 @@ void ds1386_device::nvram_write(emu_file &file)
 	file.write(&m_ram[0], m_ram_size);
 }
 
-WRITE8_MEMBER( ds1386_device::data_w )
+void ds1386_device::data_w(offs_t offset, uint8_t data)
 {
 	if (offset >= m_ram_size)
 		return;
@@ -582,7 +582,7 @@ WRITE8_MEMBER( ds1386_device::data_w )
 	}
 }
 
-READ8_MEMBER( ds1386_device::data_r )
+uint8_t ds1386_device::data_r(offs_t offset)
 {
 	if (offset >= m_ram_size)
 		return 0;

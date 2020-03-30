@@ -266,7 +266,7 @@ READ8_MEMBER( comx35_state::io_r )
 
 	if (offset == 3)
 	{
-		data = m_kbe->read(space, 0);
+		data = m_kbe->read();
 	}
 
 	return data;

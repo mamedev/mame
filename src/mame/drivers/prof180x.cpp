@@ -182,7 +182,7 @@ void prof180x_state::prof180x_io(address_map &map)
 	map(0x00d8, 0x00d8).mirror(0xff00).w("syslatch", FUNC(ls259_device::write_nibble_d0));
 	map(0x00d9, 0x00d9).select(0xff00).r(FUNC(prof180x_state::status_r));
 	map(0x00da, 0x00da).mirror(0xff00).rw(FDC9268_TAG, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
-	map(0x00db, 0x00db).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x00db, 0x00db).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x00dc, 0x00dd).mirror(0xff00).m(FDC9268_TAG, FUNC(upd765a_device::map));
 }
 

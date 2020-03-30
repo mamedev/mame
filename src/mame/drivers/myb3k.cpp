@@ -948,7 +948,7 @@ void myb3k_state::myb3k(machine_config &config)
 
 	/* Parallel port */
 	I8255A(config, m_ppi8255);
-	m_ppi8255->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ppi8255->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_ppi8255->in_pb_callback().set(FUNC(myb3k_state::ppi_portb_r));
 	m_ppi8255->out_pc_callback().set(FUNC(myb3k_state::ppi_portc_w));
 

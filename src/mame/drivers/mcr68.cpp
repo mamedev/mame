@@ -78,7 +78,7 @@ WRITE16_MEMBER(mcr68_state::xenophobe_control_w)
 {
 	COMBINE_DATA(&m_control_word);
 /*  m_sounds_good->reset_write(~m_control_word & 0x0020);*/
-	m_sounds_good->write(space, offset, ((m_control_word & 0x000f) << 1) | ((m_control_word & 0x0010) >> 4));
+	m_sounds_good->write(((m_control_word & 0x000f) << 1) | ((m_control_word & 0x0010) >> 4));
 }
 
 
@@ -93,7 +93,7 @@ WRITE16_MEMBER(mcr68_state::blasted_control_w)
 {
 	COMBINE_DATA(&m_control_word);
 /*  m_sounds_good->reset_write(~m_control_word & 0x0020);*/
-	m_sounds_good->write(space, offset, (m_control_word >> 8) & 0x1f);
+	m_sounds_good->write((m_control_word >> 8) & 0x1f);
 }
 
 
@@ -109,14 +109,14 @@ READ16_MEMBER(mcr68_state::spyhunt2_port_0_r)
 	int result = ioport("IN0")->read();
 	int analog = m_adc->read();
 
-	return result | ((m_sounds_good->read(space, 0) & 1) << 5) | (analog << 8);
+	return result | ((m_sounds_good->read() & 1) << 5) | (analog << 8);
 }
 
 
 READ16_MEMBER(mcr68_state::spyhunt2_port_1_r)
 {
 	int result = ioport("IN1")->read();
-	return result | ((m_turbo_cheap_squeak->read(space, 0) & 1) << 7);
+	return result | ((m_turbo_cheap_squeak->read() & 1) << 7);
 }
 
 
@@ -125,10 +125,10 @@ WRITE16_MEMBER(mcr68_state::spyhunt2_control_w)
 	COMBINE_DATA(&m_control_word);
 
 /*  m_turbo_cheap_squeak->reset_write(~m_control_word & 0x0080);*/
-	m_turbo_cheap_squeak->write(space, offset, (m_control_word >> 8) & 0x001f);
+	m_turbo_cheap_squeak->write((m_control_word >> 8) & 0x001f);
 
 	m_sounds_good->reset_write(~m_control_word & 0x2000);
-	m_sounds_good->write(space, offset, (m_control_word >> 8) & 0x001f);
+	m_sounds_good->write((m_control_word >> 8) & 0x001f);
 
 	m_adc->write((m_control_word >> 3) & 0x0f);
 }

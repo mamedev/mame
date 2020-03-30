@@ -190,9 +190,9 @@ void vt52_state::vert_count_w(u8 data)
 void vt52_state::uart_xd_w(u8 data)
 {
 	if (BIT(m_data_sw->read(), 2))
-		m_uart->set_transmit_data(data | 0x80);
+		m_uart->transmit(data | 0x80);
 	else
-		m_uart->set_transmit_data(data & 0x7f);
+		m_uart->transmit(data & 0x7f);
 }
 
 void vt52_state::gated_serial_output(bool state)

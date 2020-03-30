@@ -217,7 +217,7 @@ const ks0164_disassembler::instruction ks0164_disassembler::instructions[] {
 
 	{ 0xf004, 0xf8ff, [](P) -> u32 { util::stream_format(stream, "dbra %s, %04x", regs[(opcode >> 8) & 7], opcodes.r16(pc+2)); return 4; } },
 	{ 0xf00d, 0xf8ff, [](P) -> u32 { util::stream_format(stream, "cmpbeq %s, %04x, %04x", regs[(opcode >> 8) & 7], opcodes.r16(pc+2), opcodes.r16(pc+4)); return 6; } },
-	
+
 
 	{ 0x0000, 0x0000, [](P) -> u32 { util::stream_format(stream, "?%04x",   opcode); return 2; } },
 };

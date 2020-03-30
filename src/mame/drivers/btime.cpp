@@ -1678,6 +1678,27 @@ ROM_START( lnc )
 	ROM_LOAD( "sb-4c",        0x0020, 0x0020, CRC(a29b4204) SHA1(7f15cae5c4aaa29638fb45029782dafd2b3d1484) )    /* RAS/CAS logic - not used */
 ROM_END
 
+// DE-0106C-0 with CPU-7 + GGM-02 DE-0X87C-1
+ROM_START( protenn )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // all 2732s
+	ROM_LOAD( "w5-t.1a",        0xa000, 0x1000, CRC(d75d708b) SHA1(6262b3e6e5ff94596606a184383833935aa7025f) )
+	ROM_LOAD( "w4-t.2a",        0xb000, 0x1000, CRC(9131ed87) SHA1(af2276a82e024bf00c6db02deb7f06ade89dd386) )
+	ROM_LOAD( "w3-t.4a",        0xc000, 0x1000, CRC(01dc0e71) SHA1(a359468fb9dab9cfadcf8ec22a4d7ce9341f4324) )
+	ROM_LOAD( "w2-t.6a",        0xd000, 0x1000, CRC(6253acec) SHA1(24aaac1cdea1c60f8ff05dff6c17ba3a0e732187) )
+	ROM_LOAD( "w1-t.8a",        0xe000, 0x1000, CRC(6faf561c) SHA1(7fd5430af4b3f255e2c01e9b092b960ebdca8d13) )
+	ROM_LOAD( "w0-t.9a",        0xf000, 0x1000, CRC(baa330ae) SHA1(b10c66d9a03b036d95926d0c0fe441bb7ca4015d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "w6-t.1b",      0xf000, 0x1000, CRC(a6bcc2d1) SHA1(383cd170417256467dfce94939d6afa66518c6d2) ) // 2732
+
+	ROM_REGION( 0x6000, "gfx1", ROMREGION_ERASE00 )
+	// dynamically allocated
+
+	ROM_REGION( 0x0040, "proms", 0 ) // both 82S123s
+	ROM_LOAD( "8.8a",    0x0000, 0x0020, CRC(6a0006ac) SHA1(72265bc472fb7610af190130560ef507244ce41c) )   // palette
+	ROM_LOAD( "7.10j",   0x0020, 0x0020, CRC(27b004e3) SHA1(4b9960b99130281a3b07f44816001e5eabf7a6fc) )   // RAS/CAS logic - not used
+ROM_END
+
 /*This one doesn't have the (c) deco and the "pro" word at the title screen so I'm assuming it's a bootleg.*/
 ROM_START( protennb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2085,7 +2106,8 @@ GAME( 1982, btimem,   btime,   btime,    btime,    btime_state, init_btime,    R
 GAME( 1982, cookrace, btime,   cookrace, cookrace, btime_state, init_cookrace, ROT270, "bootleg",                              "Cook Race",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1981, tisland,  0,       tisland,  btime,    btime_state, init_tisland,  ROT270, "Data East Corporation",                "Treasure Island",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, lnc,      0,       lnc,      lnc,      btime_state, init_lnc,      ROT270, "Data East Corporation",                "Lock'n'Chase",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1982, protennb, 0,       disco,    disco,    btime_state, init_protennb, ROT270, "bootleg",                              "Tennis (bootleg of Pro Tennis)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, protenn,  0,       disco,    disco,    btime_state, init_protennb, ROT270, "Data East Corporation",                "Pro Tennis (Japan)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, protennb, protenn, disco,    disco,    btime_state, init_protennb, ROT270, "bootleg",                              "Tennis (bootleg of Pro Tennis)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, wtennis,  0,       wtennis,  wtennis,  btime_state, init_wtennis,  ROT270, "bootleg",                              "World Tennis",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mmonkey,  0,       mmonkey,  mmonkey,  btime_state, init_lnc,      ROT270, "Technos Japan / Roller Tron",          "Minky Monkey",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mmonkeyj, mmonkey, mmonkey,  mmonkey,  btime_state, init_lnc,      ROT270, "Technos Japan / Roller Tron",          "Minky Monkey (Japan)",           MACHINE_SUPPORTS_SAVE )

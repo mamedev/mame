@@ -22,6 +22,7 @@ public:
 	void base(machine_config &config);
 	void oigas(machine_config &config);
 	void pbillrd(machine_config &config);
+	void pbillrdbl(machine_config &config);
 	void gigas(machine_config &config);
 	void gigasm(machine_config &config);
 	void pbillrdm(machine_config &config);
@@ -30,6 +31,7 @@ public:
 
 	void init_gigas();
 	void init_gigasb();
+	void init_pbillrdbl();
 	void init_pbillrds();
 
 private:
@@ -95,4 +97,5 @@ private:
 	void omega_io_map(address_map &map);
 	void omega_map(address_map &map);
 	void pbillrd_map(address_map &map);
+	void pbillrdbl_map(address_map &map);
 };

@@ -98,7 +98,7 @@ void ks0164_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void ks0164_device::mpuin_set(bool control, u8 data)
 {
-	//	logerror("mpu push %s %02x\n", control ? "ctrl" : "data", data);
+	//  logerror("mpu push %s %02x\n", control ? "ctrl" : "data", data);
 	m_mpu_in = data;
 	if(control)
 		m_mpu_status |= MPUS_RX_CTRL;
@@ -122,7 +122,7 @@ void ks0164_device::mpu401_ctrl_w(u8 data)
 
 u8 ks0164_device::mpu401_data_r()
 {
-	//	logerror("mpu pop %02x\n", m_mpu_out);
+	//  logerror("mpu pop %02x\n", m_mpu_out);
 	return m_mpu_out;
 }
 
@@ -139,7 +139,7 @@ u8 ks0164_device::mpu401_status_r()
 
 	std::string cc = machine().describe_context();
 	if(pc != cc || pr != res) {
-		//		logerror("status read %02x (%s)\n", res, cc);
+		//      logerror("status read %02x (%s)\n", res, cc);
 		pc = cc;
 		pr = res;
 	}
@@ -148,7 +148,7 @@ u8 ks0164_device::mpu401_status_r()
 
 u8 ks0164_device::mpu401_istatus_r()
 {
-	//	logerror("mpu istatus read %02x (%04x)\n", m_mpu_status, m_cpu->pc());
+	//  logerror("mpu istatus read %02x (%04x)\n", m_mpu_status, m_cpu->pc());
 	return m_mpu_status;
 }
 
@@ -156,14 +156,14 @@ void ks0164_device::mpu401_istatus_w(u8 data)
 {
 	m_mpu_status = (m_mpu_status & ~(MPUS_RX_INT|MPUS_TX_INT)) | (data & (MPUS_RX_INT|MPUS_TX_INT));
 	m_cpu->set_input_line(11, (m_mpu_status & (MPUS_RX_INT|MPUS_RX_FULL)) == (MPUS_RX_INT|MPUS_RX_FULL) ? ASSERT_LINE : CLEAR_LINE);
-	//	logerror("mpu status write %02x (%04x)\n", m_mpu_status, m_cpu->pc());
+	//  logerror("mpu status write %02x (%04x)\n", m_mpu_status, m_cpu->pc());
 }
 
 u8 ks0164_device::mpu401_r()
 {
 	m_mpu_status &= ~MPUS_RX_FULL;
 	m_cpu->set_input_line(11, CLEAR_LINE);
-	//	logerror("mpu_r %02x (%04x)\n", m_mpu_in, m_cpu->pc());
+	//  logerror("mpu_r %02x (%04x)\n", m_mpu_in, m_cpu->pc());
 	return m_mpu_in;
 }
 
@@ -171,7 +171,7 @@ void ks0164_device::mpu401_w(u8 data)
 {
 	m_mpu_out = data;
 	m_mpu_status |= MPUS_TX_FULL;
-	//	logerror("mpu_w %02x (%04x)\n", m_mpu_out, m_cpu->pc());
+	//  logerror("mpu_w %02x (%04x)\n", m_mpu_out, m_cpu->pc());
 }
 
 u16 ks0164_device::vec_r(offs_t offset, u16 mem_mask)
@@ -234,7 +234,7 @@ u16 ks0164_device::voice_r(offs_t offset)
 void ks0164_device::voice_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_sregs[m_voice_select & 0x1f][offset]);
-	if(m_cpu->pc() < 0x5f94 || m_cpu->pc() > 0x5fc0)
+	if(1 || m_cpu->pc() < 0x5f94 || m_cpu->pc() > 0x5fc0)
 		logerror("voice %02x.%02x = %04x (%04x)\n", m_voice_select & 0x1f, offset, m_sregs[m_voice_select & 0x1f][offset], m_cpu->pc());
 }
 
@@ -254,7 +254,7 @@ void ks0164_device::irqen_76_w(u8 data)
 		m_cpu->set_input_line(14, CLEAR_LINE);
 	}
 
-	//	logerror("irqen_76 = %02x (%04x)\n", m_irqen_76, m_cpu->pc());
+	//  logerror("irqen_76 = %02x (%04x)\n", m_irqen_76, m_cpu->pc());
 }
 
 u8 ks0164_device::irqen_77_r()

@@ -37,6 +37,7 @@ public:
 	template <typename T> void set_porty_tag(T &&tag) { m_porty.set_tag(std::forward<T>(tag)); }
 	auto cf_cb() { return m_cf_cb.bind(); }
 	auto sf_cb() { return m_sf_cb.bind(); }
+	auto open_bus_cb() { return m_open_bus_cb.bind(); }
 
 	void x_add(s16 data);
 	void y_add(s16 data);
@@ -46,17 +47,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ul_w);
 	DECLARE_WRITE_LINE_MEMBER(resetx_w);
 	DECLARE_WRITE_LINE_MEMBER(resety_w);
-	DECLARE_READ8_MEMBER(reset_x_r);
-	DECLARE_WRITE8_MEMBER(reset_x_w);
-	DECLARE_READ8_MEMBER(reset_y_r);
-	DECLARE_WRITE8_MEMBER(reset_y_w);
-	DECLARE_READ8_MEMBER(reset_xy_r);
-	DECLARE_WRITE8_MEMBER(reset_xy_w);
+	u8 reset_x_r();
+	void reset_x_w(u8 data);
+	u8 reset_y_r();
+	void reset_y_w(u8 data);
+	u8 reset_xy_r();
+	void reset_xy_w(u8 data);
 
-	DECLARE_READ8_MEMBER(d_r);
-	DECLARE_READ8_MEMBER(read_x);
-	DECLARE_READ8_MEMBER(read_y);
-	DECLARE_READ8_MEMBER(read_xy);
+	u8 d_r();
+	u8 read_x(offs_t offset);
+	u8 read_y(offs_t offset);
+	u8 read_xy(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER(left_w);
 	DECLARE_WRITE_LINE_MEMBER(right_w);
@@ -99,6 +100,7 @@ private:
 	bool m_cf;
 	devcb_write_line m_cf_cb;
 	devcb_write_line m_sf_cb;
+	devcb_read8 m_open_bus_cb;
 };
 
 DECLARE_DEVICE_TYPE(UPD4701A, upd4701_device)

@@ -39,14 +39,14 @@ private:
 
 	void prog_map(address_map &map);
 	void data_map(address_map &map);
-	
+
 	uint16_t lights_changed;
 
 	DECLARE_READ8_MEMBER(gigatron_random)
 	{
 		return machine().rand() & 0xff;
 	}
-	
+
 	DECLARE_WRITE8_MEMBER(blinkenlights);
 
 	required_device<gigatron_cpu_device> m_maincpu;

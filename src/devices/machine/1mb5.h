@@ -26,12 +26,12 @@ public:
 	auto int_handler() { return m_int_handler.bind(); }
 
 	// CPU access
-	DECLARE_READ8_MEMBER(cpu_r);
-	DECLARE_WRITE8_MEMBER(cpu_w);
+	uint8_t cpu_r(offs_t offset);
+	void cpu_w(offs_t offset, uint8_t data);
 
 	// uC access
-	DECLARE_READ8_MEMBER(uc_r);
-	DECLARE_WRITE8_MEMBER(uc_w);
+	uint8_t uc_r(offs_t offset);
+	void uc_w(offs_t offset, uint8_t data);
 
 	// Signals to CPU
 	DECLARE_READ_LINE_MEMBER(irl_r);

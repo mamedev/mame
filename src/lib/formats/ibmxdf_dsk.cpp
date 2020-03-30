@@ -10,23 +10,23 @@
     - http://www.os2museum.com/wp/the-xdf-diskette-format/
     - https://fdutils.linux.lu/Fdutils.html#SEC47 and xdfcopy.c
 
-	Mapping XDF disk image to physical sectors on a 3.5" disk:
+    Mapping XDF disk image to physical sectors on a 3.5" disk:
 
-	First track uses standard 512-byte sectors:
-	- lbn 0 (boot sector) = 0.129 (head.sector)
-	- lbn 1-11 (FAT) = 0.130-0.139, then 1.129
-	- lbn 12-19 (aux FS) = 0.1-0.8
-	- lbn 20-22 = padding, not written to disk
-	- lbn 23-36 (root directory) = 1.130-1.143
-	- lbn 37-41 = padding, not written to disk
-	- lbn 42-45 (start of data area) = 1.144-1.147
+    First track uses standard 512-byte sectors:
+    - lbn 0 (boot sector) = 0.129 (head.sector)
+    - lbn 1-11 (FAT) = 0.130-0.139, then 1.129
+    - lbn 12-19 (aux FS) = 0.1-0.8
+    - lbn 20-22 = padding, not written to disk
+    - lbn 23-36 (root directory) = 1.130-1.143
+    - lbn 37-41 = padding, not written to disk
+    - lbn 42-45 (start of data area) = 1.144-1.147
 
-	All other tracks use mixed size sectors, sequenced like so:
-	0.131, 0.132, 1.134, 0.130, 1.130, 0.134, 1.132, 1.131
+    All other tracks use mixed size sectors, sequenced like so:
+    0.131, 0.132, 1.134, 0.130, 1.130, 0.134, 1.132, 1.131
 
-	To do:
-	- 5.25 HD and 3.5 ED formats
-	- replace magic numbers
+    To do:
+    - 5.25 HD and 3.5 ED formats
+    - replace magic numbers
 
 *********************************************************************/
 

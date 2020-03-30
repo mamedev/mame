@@ -1704,7 +1704,7 @@ READ16_MEMBER(lisa_state::lisa_IO_r)
 			switch ((offset & 0x0600) >> 9)
 			{
 			case 0: /* serial ports control */
-				answer = m_scc->reg_r(space, offset&7);
+				answer = m_scc->reg_r(offset&7);
 				break;
 
 			case 2: /* parallel port */
@@ -1828,7 +1828,7 @@ WRITE16_MEMBER(lisa_state::lisa_IO_w)
 			switch ((offset & 0x0600) >> 9)
 			{
 			case 0: /* serial ports control */
-				m_scc->reg_w(space, offset&7, data);
+				m_scc->reg_w(offset&7, data);
 				break;
 
 			case 2: /* paralel port */

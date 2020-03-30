@@ -34,22 +34,11 @@
 #define OC      m_output_compare.w.l
 #define OCH     m_output_compare.w.h
 #define OCD     m_output_compare.d
+#define OC2     m_output_compare2.w.l
+#define OC2H    m_output_compare2.w.h
+#define OC2D    m_output_compare2.d
 #define TOH     m_timer_over.w.l
 #define TOD     m_timer_over.d
-
-#define MODIFIED_tcsr { \
-	m_irq2 = (m_tcsr&(m_tcsr<<3))&(TCSR_ICF|TCSR_OCF|TCSR_TOF); \
-}
-
-#define SET_TIMER_EVENT {                   \
-	m_timer_next = (OCD - CTD < TOD - CTD) ? OCD : TOD;   \
-}
-
-/* when change freerunningcounter or outputcapture */
-#define MODIFIED_counters {                     \
-	OCH = (OC >= CT) ? CTH : CTH+1;             \
-	SET_TIMER_EVENT;                            \
-}
 
 // serial I/O
 
@@ -103,6 +92,12 @@ enum
 #define TCSR_TOF  0x20
 #define TCSR_OCF  0x40
 #define TCSR_ICF  0x80
+
+#define TCSR2_OE1   0x01
+#define TCSR2_OE2   0x02
+#define TCSR2_OLVL2 0x04
+#define TCSR2_EOCI2 0x08
+#define TCSR2_OCF2  0x20
 
 /* Note: don't use 0 cycles here for invalid opcodes so that we don't */
 /* hang in an infinite loop if we hit one */
@@ -269,7 +264,7 @@ void hd6301x_cpu_device::hd6301x_io(address_map &map)
 	map(0x000c, 0x000c).rw(FUNC(hd6301x_cpu_device::ocrl_r), FUNC(hd6301x_cpu_device::ocrl_w));
 	map(0x000d, 0x000d).r(FUNC(hd6301x_cpu_device::icrh_r));
 	map(0x000e, 0x000e).r(FUNC(hd6301x_cpu_device::icrl_r));
-	//map(0x000f, 0x000f).rw(FUNC(hd6301x_cpu_device::tcsr2_r), FUNC(hd6301x_cpu_device::tcsr2_w));
+	map(0x000f, 0x000f).rw(FUNC(hd6301x_cpu_device::tcsr2_r), FUNC(hd6301x_cpu_device::tcsr2_w));
 	map(0x0010, 0x0010).rw(FUNC(hd6301x_cpu_device::sci_rmcr_r), FUNC(hd6301x_cpu_device::sci_rmcr_w));
 	map(0x0011, 0x0011).rw(FUNC(hd6301x_cpu_device::sci_trcsr_r), FUNC(hd6301x_cpu_device::sci_trcsr_w));
 	map(0x0012, 0x0012).r(FUNC(hd6301x_cpu_device::sci_rdr_r));
@@ -279,8 +274,8 @@ void hd6301x_cpu_device::hd6301x_io(address_map &map)
 	map(0x0016, 0x0016).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::p6_ddr_w));
 	map(0x0017, 0x0017).rw(FUNC(hd6301x_cpu_device::p6_data_r), FUNC(hd6301x_cpu_device::p6_data_w));
 	map(0x0018, 0x0018).rw(FUNC(hd6301x_cpu_device::p7_data_r), FUNC(hd6301x_cpu_device::p7_data_w)); // TODO: external except in single-chip mode
-	//map(0x0019, 0x0019).rw(FUNC(hd6301x_cpu_device::ocr2h_r), FUNC(hd6301x_cpu_device::ocr2h_w));
-	//map(0x001a, 0x001a).rw(FUNC(hd6301x_cpu_device::ocr2l_r), FUNC(hd6301x_cpu_device::ocr2l_w));
+	map(0x0019, 0x0019).rw(FUNC(hd6301x_cpu_device::ocr2h_r), FUNC(hd6301x_cpu_device::ocr2h_w));
+	map(0x001a, 0x001a).rw(FUNC(hd6301x_cpu_device::ocr2l_r), FUNC(hd6301x_cpu_device::ocr2l_w));
 	//map(0x001b, 0x001b).rw(FUNC(hd6301x_cpu_device::tcsr3_r), FUNC(hd6301x_cpu_device::tcsr3_w));
 	//map(0x001c, 0x001c).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::tconr_w));
 	//map(0x001d, 0x001d).rw(FUNC(hd6301x_cpu_device::t2cnt_r), FUNC(hd6301x_cpu_device::t2cnt_w));
@@ -422,6 +417,69 @@ void m6801_cpu_device::m6800_check_irq2()
 	}
 }
 
+void hd6301x_cpu_device::m6800_check_irq2()
+{
+	if ((m_tcsr & (TCSR_EICI|TCSR_ICF)) == (TCSR_EICI|TCSR_ICF))
+	{
+		TAKE_ICI;
+		standard_irq_callback(M6801_TIN_LINE);
+	}
+	else if ((m_tcsr & (TCSR_EOCI|TCSR_OCF)) == (TCSR_EOCI|TCSR_OCF) ||
+				(m_tcsr2 & (TCSR2_EOCI2|TCSR2_OCF2)) == (TCSR2_EOCI2|TCSR2_OCF2))
+	{
+		TAKE_OCI;
+	}
+	else if ((m_tcsr & (TCSR_ETOI|TCSR_TOF)) == (TCSR_ETOI|TCSR_TOF))
+	{
+		TAKE_TOI;
+	}
+	else if (((m_trcsr & (M6801_TRCSR_RIE|M6801_TRCSR_RDRF)) == (M6801_TRCSR_RIE|M6801_TRCSR_RDRF)) ||
+				((m_trcsr & (M6801_TRCSR_RIE|M6801_TRCSR_ORFE)) == (M6801_TRCSR_RIE|M6801_TRCSR_ORFE)) ||
+				((m_trcsr & (M6801_TRCSR_TIE|M6801_TRCSR_TDRE)) == (M6801_TRCSR_TIE|M6801_TRCSR_TDRE)))
+	{
+		LOG("SCI interrupt\n");
+		TAKE_SCI;
+	}
+}
+
+void m6801_cpu_device::modified_tcsr()
+{
+	m_irq2 = (m_tcsr&(m_tcsr<<3))&(TCSR_ICF|TCSR_OCF|TCSR_TOF);
+}
+
+void hd6301x_cpu_device::modified_tcsr()
+{
+	m6801_cpu_device::modified_tcsr();
+	if ((m_tcsr2 & TCSR2_EOCI2) && (m_tcsr2 & TCSR2_OCF2))
+		m_irq2 |= TCSR_OCF;
+}
+
+void m6801_cpu_device::set_timer_event()
+{
+	m_timer_next = (OCD - CTD < TOD - CTD) ? OCD : TOD;
+}
+
+void hd6301x_cpu_device::set_timer_event()
+{
+	m6801_cpu_device::set_timer_event();
+	if (OC2D - CTD < m_timer_next)
+		m_timer_next = OC2D;
+}
+
+/* when change freerunningcounter or outputcapture */
+void m6801_cpu_device::modified_counters()
+{
+	OCH = (OC >= CT) ? CTH : CTH+1;
+	set_timer_event();
+}
+
+void hd6301x_cpu_device::modified_counters()
+{
+	OCH = (OC >= CT) ? CTH : CTH+1;
+	OC2H = (OC2 >= CT) ? CTH : CTH+1;
+	set_timer_event();
+}
+
 /* check OCI or TOI */
 void m6801_cpu_device::check_timer_event()
 {
@@ -431,11 +489,7 @@ void m6801_cpu_device::check_timer_event()
 		OCH++;  // next IRQ point
 		m_tcsr |= TCSR_OCF;
 		m_pending_tcsr |= TCSR_OCF;
-		MODIFIED_tcsr;
-		if((m_tcsr & TCSR_EOCI) && m_wai_state & M6800_SLP)
-			m_wai_state &= ~M6800_SLP;
-		if ( !(m_cc & 0x10) && (m_tcsr & TCSR_EOCI))
-			TAKE_OCI;
+		modified_tcsr();
 
 		// if output on P21 is enabled, let's do it
 		if (m_port_ddr[1] & 2)
@@ -455,14 +509,78 @@ void m6801_cpu_device::check_timer_event()
 #endif
 		m_tcsr |= TCSR_TOF;
 		m_pending_tcsr |= TCSR_TOF;
-		MODIFIED_tcsr;
-		if((m_tcsr & TCSR_ETOI) && m_wai_state & M6800_SLP)
+		modified_tcsr();
+	}
+
+	if (m_irq2 & (TCSR_OCF | TCSR_TOF))
+	{
+		if (m_wai_state & M6800_SLP)
 			m_wai_state &= ~M6800_SLP;
-		if ( !(m_cc & 0x10) && (m_tcsr & TCSR_ETOI))
-			TAKE_TOI;
+		if (!(m_cc & 0x10))
+			m6800_check_irq2();
 	}
 	/* set next event */
-	SET_TIMER_EVENT;
+	set_timer_event();
+}
+
+void hd6301x_cpu_device::check_timer_event()
+{
+	/* OCI */
+	if (CTD >= OCD)
+	{
+		OCH++;  // next IRQ point
+		m_tcsr |= TCSR_OCF;
+		m_pending_tcsr |= TCSR_OCF;
+		modified_tcsr();
+
+		// if output on P21 is enabled, let's do it
+		if (m_tcsr2 & TCSR2_OE1)
+		{
+			m_port_data[1] &= ~2;
+			m_port_data[1] |= (m_tcsr & TCSR_OLVL) << 1;
+			m_port2_written = true;
+			write_port2();
+		}
+	}
+	if (CTD >= OC2D)
+	{
+		OC2H++;  // next IRQ point
+		m_tcsr2 |= TCSR2_OCF2;
+		m_pending_tcsr2 |= TCSR2_OCF2;
+		modified_tcsr();
+
+		// if output on P25 is enabled, let's do it
+		if (m_tcsr2 & TCSR2_OE2)
+		{
+			if (m_tcsr2 & TCSR2_OLVL2)
+				m_port_data[1] |= 0x20;
+			else
+				m_port_data[1] &= ~0x20;
+			m_port2_written = true;
+			write_port2();
+		}
+	}
+	/* TOI */
+	if (CTD >= TOD)
+	{
+		TOH++;  // next IRQ point
+#if 0
+		CLEANUP_COUNTERS();
+#endif
+		m_tcsr |= TCSR_TOF;
+		m_pending_tcsr |= TCSR_TOF;
+		modified_tcsr();
+	}
+
+	if (m_irq2 & (TCSR_OCF | TCSR_TOF))
+	{
+		if (m_wai_state & M6800_SLP)
+			m_wai_state &= ~M6800_SLP;
+		if (!(m_cc & 0x10))
+			m6800_check_irq2();
+	}
+	/* set next event */
+	set_timer_event();
 }
 
 void m6801_cpu_device::increment_counter(int amount)
@@ -486,9 +604,15 @@ void m6801_cpu_device::CLEANUP_COUNTERS()
 	OCH -= CTH;
 	TOH -= CTH;
 	CTH = 0;
-	SET_TIMER_EVENT;
+	set_timer_event();
 	if (CTD >= m_timer_next)
 		check_timer_event();
+}
+
+void hd6301x_cpu_device::CLEANUP_COUNTERS()
+{
+	OC2H -= CTH;
+	m6801_cpu_device::CLEANUP_COUNTERS();
 }
 
 void m6801_cpu_device::set_rmcr(uint8_t data)
@@ -772,7 +896,7 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 			m_tcsr |= TCSR_ICF;
 			m_pending_tcsr |= TCSR_ICF;
 			m_input_capture = CT;
-			MODIFIED_tcsr;
+			modified_tcsr();
 		}
 		break;
 
@@ -864,6 +988,9 @@ void hd6301x_cpu_device::device_start()
 
 	save_item(NAME(m_portx_ddr));
 	save_item(NAME(m_portx_data));
+	save_item(NAME(m_tcsr2));
+	save_item(NAME(m_pending_tcsr2));
+	save_item(NAME(m_output_compare2.d));
 }
 
 void m6801_cpu_device::device_reset()
@@ -912,6 +1039,10 @@ void hd6301x_cpu_device::device_reset()
 
 	m_portx_ddr[0] = 0x00;
 	m_portx_ddr[1] = 0x00;
+
+	m_tcsr2 = 0x00;
+	m_pending_tcsr2 = 0x00;
+	OC2D = 0xffff;
 }
 
 
@@ -930,6 +1061,7 @@ void m6801_cpu_device::write_port2()
 	if (m_trcsr & M6801_TRCSR_TE)
 	{
 		data = (data & 0xef) | (m_tx << 4);
+		ddr |= 0x10;
 	}
 
 	data &= 0x1f;
@@ -942,11 +1074,17 @@ void hd6301x_cpu_device::write_port2()
 	if (!m_port2_written) return;
 
 	uint8_t ddr = m_port_ddr[1];
+	if (m_tcsr2 & TCSR2_OE1)
+		ddr |= 0x02;
+	if (m_tcsr2 & TCSR2_OE2)
+		ddr |= 0x20;
+
 	uint8_t data = (m_port_data[1] & ddr) | (ddr ^ 0xff);
 
 	if (m_trcsr & M6801_TRCSR_TE)
 	{
 		data = (data & 0xef) | (m_tx << 4);
+		ddr |= 0x10;
 	}
 
 	m_out_port_func[1](0, data, ddr);
@@ -1235,7 +1373,7 @@ void m6801_cpu_device::tcsr_w(uint8_t data)
 
 	m_tcsr = data;
 	m_pending_tcsr &= m_tcsr;
-	MODIFIED_tcsr;
+	modified_tcsr();
 	if( !(m_cc & 0x10) )
 		m6800_check_irq2();
 }
@@ -1245,7 +1383,7 @@ uint8_t m6801_cpu_device::ch_r()
 	if(!(m_pending_tcsr&TCSR_TOF) && !machine().side_effects_disabled())
 	{
 		m_tcsr &= ~TCSR_TOF;
-		MODIFIED_tcsr;
+		modified_tcsr();
 	}
 	return m_counter.b.h;
 }
@@ -1266,7 +1404,7 @@ void m6801_cpu_device::ch_w(uint8_t data)
 	m_latch09 = data & 0xff;    /* 6301 only */
 	CT  = 0xfff8;
 	TOH = CTH;
-	MODIFIED_counters;
+	modified_counters();
 }
 
 void m6801_cpu_device::cl_w(uint8_t data)
@@ -1275,7 +1413,7 @@ void m6801_cpu_device::cl_w(uint8_t data)
 
 	CT = (m_latch09 << 8) | (data & 0xff);
 	TOH = CTH;
-	MODIFIED_counters;
+	modified_counters();
 }
 
 uint8_t m6801_cpu_device::ocrh_r()
@@ -1283,7 +1421,7 @@ uint8_t m6801_cpu_device::ocrh_r()
 	if(!(m_pending_tcsr&TCSR_OCF) && !machine().side_effects_disabled())
 	{
 		m_tcsr &= ~TCSR_OCF;
-		MODIFIED_tcsr;
+		modified_tcsr();
 	}
 	return m_output_compare.b.h;
 }
@@ -1293,7 +1431,7 @@ uint8_t m6801_cpu_device::ocrl_r()
 	if(!(m_pending_tcsr&TCSR_OCF) && !machine().side_effects_disabled())
 	{
 		m_tcsr &= ~TCSR_OCF;
-		MODIFIED_tcsr;
+		modified_tcsr();
 	}
 	return m_output_compare.b.l;
 }
@@ -1305,7 +1443,7 @@ void m6801_cpu_device::ocrh_w(uint8_t data)
 	if( m_output_compare.b.h != data)
 	{
 		m_output_compare.b.h = data;
-		MODIFIED_counters;
+		modified_counters();
 	}
 }
 
@@ -1316,7 +1454,7 @@ void m6801_cpu_device::ocrl_w(uint8_t data)
 	if( m_output_compare.b.l != data)
 	{
 		m_output_compare.b.l = data;
-		MODIFIED_counters;
+		modified_counters();
 	}
 }
 
@@ -1325,7 +1463,7 @@ uint8_t m6801_cpu_device::icrh_r()
 	if(!(m_pending_tcsr&TCSR_ICF) && !machine().side_effects_disabled())
 	{
 		m_tcsr &= ~TCSR_ICF;
-		MODIFIED_tcsr;
+		modified_tcsr();
 	}
 	return (m_input_capture >> 0) & 0xff;
 }
@@ -1333,6 +1471,70 @@ uint8_t m6801_cpu_device::icrh_r()
 uint8_t m6801_cpu_device::icrl_r()
 {
 	return (m_input_capture >> 8) & 0xff;
+}
+
+uint8_t hd6301x_cpu_device::tcsr2_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_pending_tcsr &= ~(TCSR_ICF | TCSR_OCF);
+		m_pending_tcsr2 = 0;
+	}
+	return m_tcsr2 | (m_tcsr & (TCSR_ICF | TCSR_OCF)) | 0x10;
+}
+
+void hd6301x_cpu_device::tcsr2_w(uint8_t data)
+{
+	LOGTIMER("Timer Control and Status Register 2: %02x\n", data);
+
+	data &= TCSR2_OE1 | TCSR2_OE2 | TCSR2_OLVL2 | TCSR2_EOCI2;
+	m_tcsr2 = data | (m_tcsr2 & TCSR2_OCF2);
+	m_pending_tcsr2 &= m_tcsr2;
+	modified_tcsr();
+	if( !(m_cc & 0x10) )
+		m6800_check_irq2();
+}
+
+uint8_t hd6301x_cpu_device::ocr2h_r()
+{
+	if(!(m_pending_tcsr2&TCSR2_OCF2) && !machine().side_effects_disabled())
+	{
+		m_tcsr2 &= ~TCSR2_OCF2;
+		modified_tcsr();
+	}
+	return m_output_compare2.b.h;
+}
+
+uint8_t hd6301x_cpu_device::ocr2l_r()
+{
+	if(!(m_pending_tcsr2&TCSR2_OCF2) && !machine().side_effects_disabled())
+	{
+		m_tcsr2 &= ~TCSR2_OCF2;
+		modified_tcsr();
+	}
+	return m_output_compare2.b.l;
+}
+
+void hd6301x_cpu_device::ocr2h_w(uint8_t data)
+{
+	LOGTIMER("Output Compare High Register 2: %02x\n", data);
+
+	if( m_output_compare2.b.h != data)
+	{
+		m_output_compare2.b.h = data;
+		modified_counters();
+	}
+}
+
+void hd6301x_cpu_device::ocr2l_w(uint8_t data)
+{
+	LOGTIMER("Output Compare Low Register 2: %02x\n", data);
+
+	if( m_output_compare2.b.l != data)
+	{
+		m_output_compare2.b.l = data;
+		modified_counters();
+	}
 }
 
 

@@ -73,9 +73,9 @@ public:
 
 private:
 	virtual void machine_start() override;
-	DECLARE_READ8_MEMBER(ins8154_b1_port_a_r);
-	DECLARE_WRITE8_MEMBER(ins8154_b1_port_a_w);
-	DECLARE_WRITE8_MEMBER(acrnsys1_led_segment_w);
+	uint8_t ins8154_b1_port_a_r();
+	void ins8154_b1_port_a_w(uint8_t data);
+	void acrnsys1_led_segment_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	void acrnsys1_map(address_map &map);
@@ -107,7 +107,7 @@ void acrnsys1_state::machine_start()
     KEYBOARD HANDLING
 ***************************************************************************/
 // bit 7 is cassin
-READ8_MEMBER( acrnsys1_state::ins8154_b1_port_a_r )
+uint8_t acrnsys1_state::ins8154_b1_port_a_r()
 {
 	uint8_t data = 0x7f, i, key_line = m_ttl74145->read();
 
@@ -126,7 +126,7 @@ READ8_MEMBER( acrnsys1_state::ins8154_b1_port_a_r )
 }
 
 // bit 6 is cassout
-WRITE8_MEMBER( acrnsys1_state::ins8154_b1_port_a_w )
+void  acrnsys1_state::ins8154_b1_port_a_w(uint8_t data)
 {
 	m_digit = data & 0x47;
 	m_ttl74145->write(m_digit & 7);
@@ -167,7 +167,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::kansas_r)
     LED DISPLAY
 ***************************************************************************/
 
-WRITE8_MEMBER( acrnsys1_state::acrnsys1_led_segment_w )
+void  acrnsys1_state::acrnsys1_led_segment_w(uint8_t data)
 {
 	uint16_t const key_line = m_ttl74145->read();
 

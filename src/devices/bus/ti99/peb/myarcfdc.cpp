@@ -4,21 +4,19 @@
     Myarc Floppy Disk Controller (DDCC-1)
     Double Density, Double-sided
     May be used with a 1770 or 1772 controller
-    
+
     EPROM 2764A (8Kx8) in two banks (2x 4000-4fff)
     SRAM HM6116 (2Kx8) (5000-57ff)
-    
+
     DIP switches (SW1) set the head step rate. For the 1770 controller, closed
     switches mean 20ms, open switches mean 6ms. For the 1772 controller, closed
     means 2ms, open means 6 ms. There is an alternative ROM for the 1772 which
     allows for slower step rates (6ms-12ms).
-        
+
     Another switch is included (SW2) labeled "Turbo" on schematics, but which
     is not present on all boards. It may require a different ROM.
-    
-    Known issue: On error, the drive may continue spinning.
-    
-    Michael Zapf 
+
+    Michael Zapf
     March 2020
 
 *******************************************************************************/
@@ -63,13 +61,13 @@ myarc_fdc_device::myarc_fdc_device(const machine_config &mconfig, const char *ta
 	  m_wd1770(*this, WD1770_TAG),
 	  m_wd1772(*this, WD1772_TAG),
 	  m_drivelatch(*this, LATCH_TAG),
-   	  m_buffer_ram(*this, BUFFER_TAG),
-   	  m_pal(*this, PAL_TAG),
-   	  m_dsrrom(nullptr),
-  	  m_banksel(false),
-  	  m_cardsel(false),
-  	  m_selected_drive(0),
-  	  m_address(0)
+	  m_buffer_ram(*this, BUFFER_TAG),
+	  m_pal(*this, PAL_TAG),
+	  m_dsrrom(nullptr),
+	  m_banksel(false),
+	  m_cardsel(false),
+	  m_selected_drive(0),
+	  m_address(0)
 	  { }
 
 SETADDRESS_DBIN_MEMBER( myarc_fdc_device::setaddress_dbin )
@@ -84,7 +82,7 @@ bool myarc_fdc_device::card_selected()
 	return m_cardsel;
 }
 /*
-	Provides the current address to the PAL.	
+    Provides the current address to the PAL.
 */
 uint16_t myarc_fdc_device::get_address()
 {
@@ -92,7 +90,7 @@ uint16_t myarc_fdc_device::get_address()
 }
 
 /*
-	Debugger access.
+    Debugger access.
 */
 void myarc_fdc_device::debug_read(offs_t offset, uint8_t* value)
 {
@@ -102,7 +100,7 @@ void myarc_fdc_device::debug_read(offs_t offset, uint8_t* value)
 	{
 		*value = m_buffer_ram->pointer()[m_address & 0x07ff];
 	}
-	
+
 	if (m_pal->romen())
 	{
 		// EPROM selected
@@ -113,7 +111,7 @@ void myarc_fdc_device::debug_read(offs_t offset, uint8_t* value)
 }
 
 /*
-	Debugger access.
+    Debugger access.
 */
 void myarc_fdc_device::debug_write(offs_t offset, uint8_t data)
 {
@@ -127,7 +125,7 @@ void myarc_fdc_device::debug_write(offs_t offset, uint8_t data)
 }
 
 /*
-	Read access to the RAM, EPROM, and controller chip.
+    Read access to the RAM, EPROM, and controller chip.
 */
 READ8Z_MEMBER(myarc_fdc_device::readz)
 {
@@ -136,38 +134,38 @@ READ8Z_MEMBER(myarc_fdc_device::readz)
 		debug_read(offset, value);
 		return;
 	}
-	
+
 	if (m_pal->ramsel())
 	{
 		// SRAM selected
 		*value = m_buffer_ram->pointer()[m_address & 0x07ff];
 		LOGMASKED(LOG_RAM, "Read RAM: %04x -> %02x\n", m_address & 0xffff, *value);
 	}
-	
+
 	if (m_pal->romen())
 	{
 		// EPROM selected
 		uint16_t base = m_banksel? 0x1000 : 0;
 		uint8_t* rom = &m_dsrrom[base | (m_address & 0x0fff)];
 		*value = *rom;
-		
+
 		if (WORD_ALIGNED(m_address))
 		{
-			uint16_t val = (*rom << 8) | (*(rom+1)); 
+			uint16_t val = (*rom << 8) | (*(rom+1));
 			LOGMASKED(LOG_EPROM, "Read DSR: %04x (page %d)-> %04x\n", m_address & 0xffff, base>>12, val);
-		}		
+		}
 	}
-	
+
 	if (m_pal->fdcsel())
 	{
 		// WDC selected
 		*value = m_wdc->read((m_address >> 1)&0x03);
-		LOGMASKED(LOG_CONTR, "Read FDC: %04x -> %02x\n", m_address & 0xffff, *value);		
+		LOGMASKED(LOG_CONTR, "Read FDC: %04x -> %02x\n", m_address & 0xffff, *value);
 	}
 }
 
 /*
-	Write access to RAM and the controller chip.
+    Write access to RAM and the controller chip.
 */
 void myarc_fdc_device::write(offs_t offset, uint8_t data)
 {
@@ -176,14 +174,14 @@ void myarc_fdc_device::write(offs_t offset, uint8_t data)
 		debug_write(offset, data);
 		return;
 	}
-	
+
 	if (m_pal->ramsel())
 	{
 		// SRAM selected
 		LOGMASKED(LOG_RAM, "Write RAM: %04x <- %02x\n", m_address & 0xffff, data);
 		m_buffer_ram->pointer()[m_address & 0x07ff] = data;
 	}
-	
+
 	if (m_pal->fdcsel())
 	{
 		// WDC selected
@@ -193,7 +191,7 @@ void myarc_fdc_device::write(offs_t offset, uint8_t data)
 }
 
 /*
-	CRU read access to the LS251 multiplexer.
+    CRU read access to the LS251 multiplexer.
 */
 READ8Z_MEMBER( myarc_fdc_device::crureadz )
 {
@@ -227,7 +225,7 @@ READ8Z_MEMBER( myarc_fdc_device::crureadz )
 }
 
 /*
-	CRU write access to the LS259 latch.
+    CRU write access to the LS259 latch.
 */
 void myarc_fdc_device::cruwrite(offs_t offset, uint8_t data)
 {
@@ -243,7 +241,7 @@ void myarc_fdc_device::cruwrite(offs_t offset, uint8_t data)
 }
 
 /*
-	Callbacks from the WDC chip
+    Callbacks from the WDC chip
 */
 WRITE_LINE_MEMBER( myarc_fdc_device::fdc_irq_w )
 {
@@ -255,8 +253,19 @@ WRITE_LINE_MEMBER( myarc_fdc_device::fdc_drq_w )
 	LOGMASKED(LOG_DRQ, "DRQ callback = %d\n", state);
 }
 
+WRITE_LINE_MEMBER( myarc_fdc_device::fdc_mon_w )
+{
+	LOGMASKED(LOG_DRIVE, "MON callback = %d\n", state);
+	// All MON lines are connected
+	// Do not start the motors when no drive is selected. However, motors
+	// can always be stopped.
+	if (m_selected_drive != 0 || state==1)
+		for (int i=0; i < 3; i++)
+			if (m_floppy[i] != nullptr) m_floppy[i]->mon_w(state);
+}
+
 /*
-	Callbacks from the 74LS259 latch
+    Callbacks from the 74LS259 latch
 */
 WRITE_LINE_MEMBER( myarc_fdc_device::den_w )
 {
@@ -277,7 +286,7 @@ WRITE_LINE_MEMBER( myarc_fdc_device::sidsel_w )
 	{
 		LOGMASKED(LOG_DRIVE, "Set side = %d on DSK%d\n", state, m_selected_drive);
 		m_floppy[m_selected_drive-1]->ss_w(state);
-	}	
+	}
 }
 
 // Selects the EPROM bank, and also controls the DDEN line
@@ -291,13 +300,13 @@ WRITE_LINE_MEMBER( myarc_fdc_device::bankdden_w )
 WRITE_LINE_MEMBER( myarc_fdc_device::drivesel_w )
 {
 	int driveno = 0;
-	
-	// We do not know what happens when two drives are selected 
+
+	// We do not know what happens when two drives are selected
 	if (m_drivelatch->q7_r() != 0) driveno = 4;
 	if (m_drivelatch->q6_r() != 0) driveno = 3;
 	if (m_drivelatch->q5_r() != 0) driveno = 2;
 	if (m_drivelatch->q4_r() != 0) driveno = 1;
-	
+
 	if (state == CLEAR_LINE)
 	{
 		// Only when no bit is set, unselect all drives.
@@ -321,7 +330,6 @@ WRITE_LINE_MEMBER( myarc_fdc_device::drivesel_w )
 		}
 	}
 }
-
 
 void myarc_fdc_device::device_start()
 {
@@ -397,15 +405,20 @@ ROM_END
 
 void myarc_fdc_device::device_add_mconfig(machine_config& config)
 {
-	// Cards appeared with one of those controllers	
+	// Cards appeared with one of those controllers
 	WD1770(config, m_wd1770, 8_MHz_XTAL);
 	WD1772(config, m_wd1772, 8_MHz_XTAL);
 
 	m_wd1770->intrq_wr_callback().set(FUNC(myarc_fdc_device::fdc_irq_w));
 	m_wd1770->drq_wr_callback().set(FUNC(myarc_fdc_device::fdc_drq_w));
+	m_wd1770->mon_wr_callback().set(FUNC(myarc_fdc_device::fdc_mon_w));
+	m_wd1770->set_disable_motor_control(true);
+
 	m_wd1772->intrq_wr_callback().set(FUNC(myarc_fdc_device::fdc_irq_w));
 	m_wd1772->drq_wr_callback().set(FUNC(myarc_fdc_device::fdc_drq_w));
-	
+	m_wd1772->mon_wr_callback().set(FUNC(myarc_fdc_device::fdc_mon_w));
+	m_wd1772->set_disable_motor_control(true);
+
 	LS259(config, m_drivelatch); // U10
 	m_drivelatch->q_out_cb<0>().set(FUNC(myarc_fdc_device::den_w));
 	m_drivelatch->q_out_cb<1>().set(FUNC(myarc_fdc_device::wdreset_w));
@@ -415,13 +428,13 @@ void myarc_fdc_device::device_add_mconfig(machine_config& config)
 	m_drivelatch->q_out_cb<5>().set(FUNC(myarc_fdc_device::drivesel_w));
 	m_drivelatch->q_out_cb<6>().set(FUNC(myarc_fdc_device::drivesel_w));
 	m_drivelatch->q_out_cb<7>().set(FUNC(myarc_fdc_device::drivesel_w));
-	
+
 	// SRAM 6114 2Kx8
-	RAM(config, BUFFER_TAG).set_default_size("2k").set_default_value(0);	
-	
+	RAM(config, BUFFER_TAG).set_default_size("2k").set_default_value(0);
+
 	// PAL circuit
 	DDCC1_PAL(config, PAL_TAG, 0);
-	
+
 	// Floppy drives
 	FLOPPY_CONNECTOR(config, "0", ccfdc_floppies, "525dd", myarc_fdc_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "1", ccfdc_floppies, "525dd", myarc_fdc_device::floppy_formats).enable_sound(true);
@@ -440,8 +453,8 @@ const tiny_rom_entry *myarc_fdc_device::device_rom_region() const
 }
 
 // ========================================================================
-//    PAL circuit on the DDCC-1 board  
-// ======================================================================== 
+//    PAL circuit on the DDCC-1 board
+// ========================================================================
 
 ddcc1_pal_device::ddcc1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:  device_t(mconfig, DDCC1_PAL, tag, owner, clock),
@@ -462,7 +475,7 @@ bool ddcc1_pal_device::romen()
 bool ddcc1_pal_device::fdcsel()
 {
 	// The memory mapping of the DDCC-1 differs from the usual scheme, using
-	// addresses 5F01, 5F03, 5F05, 5F07 
+	// addresses 5F01, 5F03, 5F05, 5F07
 	return (((m_board->get_address() & 0xff01)==0x5f01) && (m_board->card_selected()));
 }
 

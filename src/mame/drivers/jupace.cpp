@@ -804,7 +804,7 @@ void ace_state::ace(machine_config &config)
 	m_z80pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_z80pio->in_pa_callback().set(FUNC(ace_state::pio_pa_r));
 	m_z80pio->out_pa_callback().set(FUNC(ace_state::pio_pa_w));
-	m_z80pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_z80pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 

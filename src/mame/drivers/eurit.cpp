@@ -63,7 +63,8 @@ void eurit_state::eurit30(machine_config &config)
 	m_maincpu->p4_out_cb().set(FUNC(eurit_state::p4_w));
 	m_maincpu->p6_out_cb().set(FUNC(eurit_state::p6_w));
 
-	AM79C30A(config, "dsc", 12'288'000);
+	am79c30a_device &dsc(AM79C30A(config, "dsc", 12'288'000));
+	dsc.int_callback().set_inputline(m_maincpu, M37710_LINE_IRQ0);
 }
 
 

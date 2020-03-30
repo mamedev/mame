@@ -168,7 +168,7 @@ swtpc8212_device::swtpc8212_device(const machine_config &mconfig, const char *ta
 {
 }
 
-WRITE8_MEMBER(swtpc8212_device::latch_w)
+void swtpc8212_device::latch_w(uint8_t data)
 {
 	// Bits 0 to 3 control outputs that are intended to control and tape
 	// 'read' and 'punch' operations. These are strobes, about 10usec, and
@@ -206,7 +206,7 @@ WRITE8_MEMBER(swtpc8212_device::latch_w)
 }
 
 
-READ8_MEMBER(swtpc8212_device::pia0_pa_r)
+uint8_t swtpc8212_device::pia0_pa_r()
 {
 	// PA0 controls the 'duplex' mode, the echoing back of characters, and
 	// appears to connect to a switch on the outer casing.
@@ -221,7 +221,7 @@ READ8_MEMBER(swtpc8212_device::pia0_pa_r)
 	return (m_keypad_data << 4) | config;
 }
 
-READ8_MEMBER(swtpc8212_device::pia0_pb_r)
+uint8_t swtpc8212_device::pia0_pb_r()
 {
 	return m_keyboard_data;
 }
@@ -256,7 +256,7 @@ INPUT_CHANGED_MEMBER(swtpc8212_device::keypad_changed)
 	}
 }
 
-WRITE_LINE_MEMBER(swtpc8212_device::pia0_ca2_w)
+void swtpc8212_device::pia0_ca2_w(int state)
 {
 	if (state == 0)
 	{
@@ -265,19 +265,19 @@ WRITE_LINE_MEMBER(swtpc8212_device::pia0_ca2_w)
 	}
 }
 
-WRITE8_MEMBER(swtpc8212_device::pia1_pa_w)
+void swtpc8212_device::pia1_pa_w(uint8_t data)
 {
 	// External parallel printer data output.
 	m_printer_data = data;
 }
 
-READ_LINE_MEMBER(swtpc8212_device::pia1_ca1_r)
+int swtpc8212_device::pia1_ca1_r()
 {
 	// External parallel printer busy input.
 	return 0;
 }
 
-WRITE_LINE_MEMBER(swtpc8212_device::pia1_ca2_w)
+void swtpc8212_device::pia1_ca2_w(int state)
 {
 	// External parallel printer data ready.
 
@@ -339,42 +339,42 @@ void swtpc8212_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	}
 }
 
-WRITE_LINE_MEMBER(swtpc8212_device::rs232_conn_dcd_w)
+void swtpc8212_device::rs232_conn_dcd_w(int state)
 {
 	m_uart->dcd_w(state);
 }
 
-WRITE_LINE_MEMBER(swtpc8212_device::rs232_conn_dsr_w)
+void swtpc8212_device::rs232_conn_dsr_w(int state)
 {
 	m_uart->dsr_w(state);
 }
 
-WRITE_LINE_MEMBER(swtpc8212_device::rs232_conn_ri_w)
+void swtpc8212_device::rs232_conn_ri_w(int state)
 {
 	m_uart->ri_w(state);
 }
 
-WRITE_LINE_MEMBER(swtpc8212_device::rs232_conn_cts_w)
+void swtpc8212_device::rs232_conn_cts_w(int state)
 {
 	m_uart->cts_w(state);
 }
 
-WRITE_LINE_MEMBER(swtpc8212_device::rs232_conn_rxd_w)
+void swtpc8212_device::rs232_conn_rxd_w(int state)
 {
 	m_uart->rx_w(state);
 }
 
-WRITE_LINE_MEMBER(swtpc8212_device::write_txd)
+void swtpc8212_device::write_txd(int state)
 {
 	m_rs232_conn_txd_handler(state);
 }
 
-WRITE_LINE_MEMBER(swtpc8212_device::write_dtr)
+void swtpc8212_device::write_dtr(int state)
 {
 	m_rs232_conn_dtr_handler(state);
 }
 
-WRITE_LINE_MEMBER(swtpc8212_device::write_rts)
+void swtpc8212_device::write_rts(int state)
 {
 	m_rs232_conn_rts_handler(state);
 }

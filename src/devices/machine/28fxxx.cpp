@@ -118,7 +118,7 @@ void base_28fxxx_device::erase()
 	memset(m_data.get(), 0xff, m_size);
 }
 
-READ8_MEMBER(base_28fxxx_device::read)
+u8 base_28fxxx_device::read(address_space &space, offs_t offset, u8 mem_mask)
 {
 	switch (m_state)
 	{
@@ -146,7 +146,7 @@ READ8_MEMBER(base_28fxxx_device::read)
 	}
 }
 
-WRITE8_MEMBER(base_28fxxx_device::write)
+void base_28fxxx_device::write(offs_t offset, u8 data)
 {
 	// writes are ignored unless Vpp is asserted
 	if (!m_program_power)

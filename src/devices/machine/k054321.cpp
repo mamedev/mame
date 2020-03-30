@@ -91,13 +91,13 @@ void k054321_device::device_add_mconfig(machine_config &config)
 		GENERIC_LATCH_8(config, m_soundlatch[i]);
 }
 
-WRITE8_MEMBER(k054321_device::volume_reset_w)
+void k054321_device::volume_reset_w(u8 data)
 {
 	m_volume = 0;
 	propagate_volume();
 }
 
-WRITE8_MEMBER(k054321_device::volume_up_w)
+void k054321_device::volume_up_w(u8 data)
 {
 	// assume that max volume is 64
 	if (data && m_volume < 64)
@@ -107,18 +107,18 @@ WRITE8_MEMBER(k054321_device::volume_up_w)
 	}
 }
 
-READ8_MEMBER(k054321_device::busy_r)
+u8 k054321_device::busy_r()
 {
 	return 0; // bit0 = 1 means busy
 }
 
-WRITE8_MEMBER(k054321_device::active_w)
+void k054321_device::active_w(u8 data)
 {
 	m_active = data;
 	propagate_volume();
 }
 
-WRITE8_MEMBER(k054321_device::dummy_w)
+void k054321_device::dummy_w(u8 data)
 {
 	if(data != 0x4a)
 		logerror("unexpected dummy_w %02x\n", data);

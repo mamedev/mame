@@ -32,7 +32,7 @@
 
 
 /***************************************************************************
-	CONSTANTS
+    CONSTANTS
 ***************************************************************************/
 
 /* default monochromatic colortable */
@@ -123,6 +123,8 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, internal_map),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_scanline(0),  // reset the scanline count
+	m_videoram_addr_mask(0x3fff),
+	m_global_refresh_mask(0x7fff),
 	m_line_write_increment_large(32),
 	m_paletteram_in_ppuspace(false),
 	m_tile_page(0),
@@ -426,14 +428,14 @@ void ppu2c0x_device::init_palette(bool indirect)
 
 		switch (color_emphasis)
 		{
-			case 0: r_mod = 1.0;  g_mod = 1.0;  b_mod = 1.0;  break;
-			case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
-			case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
-			case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
-			case 4: r_mod = .741; g_mod = .987; b_mod = 1.0;  break;
-			case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
-			case 6: r_mod = 1.02; g_mod = .98;  b_mod = .653; break;
-			case 7: r_mod = .75;  g_mod = .75;  b_mod = .75;  break;
+		    case 0: r_mod = 1.0;  g_mod = 1.0;  b_mod = 1.0;  break;
+		    case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
+		    case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
+		    case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
+		    case 4: r_mod = .741; g_mod = .987; b_mod = 1.0;  break;
+		    case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
+		    case 6: r_mod = 1.02; g_mod = .98;  b_mod = .653; break;
+		    case 7: r_mod = .75;  g_mod = .75;  b_mod = .75;  break;
 		}
 		*/
 
@@ -803,6 +805,65 @@ void ppu2c0x_device::read_extra_sprite_bits(int sprite_index)
 	// needed for some clones
 }
 
+bool ppu2c0x_device::is_spritepixel_opaque(int pixel_data, int color)
+{
+	if (pixel_data)
+		return true;
+	else
+		return false;
+}
+
+void ppu2c0x_device::draw_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, uint8_t* line_priority)
+{
+	if (is_spritepixel_opaque(pixel_data, color))
+	{
+		/* has the background (or another sprite) already been drawn here? */
+		if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
+		{
+			if (!line_priority[sprite_xpos + pixel])
+			{
+				/* no, draw */
+				draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data, bitmap);
+			}
+			/* indicate that a sprite was drawn at this location, even if it's not seen */
+			line_priority[sprite_xpos + pixel] |= 0x01;
+		}
+	}
+
+	/* set the "sprite 0 hit" flag if appropriate */
+	if (sprite_index == 0 && (pixel_data & 0x03) && ((sprite_xpos + pixel) < 255) && (line_priority[sprite_xpos + pixel] & 0x02))
+		m_regs[PPU_STATUS] |= PPU_STATUS_SPRITE0_HIT;
+}
+
+void ppu2c0x_device::draw_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, uint8_t* line_priority)
+{
+	if (is_spritepixel_opaque(pixel_data, color))
+	{
+		if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
+		{
+			/* has another sprite been drawn here? */
+			if (!(line_priority[sprite_xpos + pixel] & 0x01))
+			{
+				/* no, draw */
+				draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data, bitmap);
+				line_priority[sprite_xpos + pixel] |= 0x01;
+			}
+		}
+	}
+
+	/* set the "sprite 0 hit" flag if appropriate */
+	if (sprite_index == 0 && (pixel_data & 0x03) && ((sprite_xpos + pixel) < 255) && (line_priority[sprite_xpos + pixel] & 0x02))
+		m_regs[PPU_STATUS] |= PPU_STATUS_SPRITE0_HIT;
+}
+
+int ppu2c0x_device::apply_sprite_pattern_page(int index1, int size)
+{
+	if (size == 8)
+		index1 += ((m_sprite_page == 0) ? 0 : 0x1000);
+
+	return index1;
+}
+
 void ppu2c0x_device::draw_sprites(uint8_t* line_priority)
 {
 	bitmap_rgb32& bitmap = *m_bitmap;
@@ -881,8 +942,8 @@ void ppu2c0x_device::draw_sprites(uint8_t* line_priority)
 		}
 
 		index1 = tile * 16;
-		if (size == 8)
-			index1 += ((m_sprite_page == 0) ? 0 : 0x1000);
+
+		index1 = apply_sprite_pattern_page(index1, size);
 
 		read_sprite_plane_data(index1 + sprite_line);
 
@@ -913,24 +974,7 @@ void ppu2c0x_device::draw_sprites(uint8_t* line_priority)
 				/* is this pixel non-transparent? */
 				if (sprite_xpos + pixel >= first_pixel)
 				{
-					if (pixel_data)
-					{
-						/* has the background (or another sprite) already been drawn here? */
-						if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
-						{
-							if (!line_priority[sprite_xpos + pixel])
-							{
-								/* no, draw */
-								draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data, bitmap);
-							}
-							/* indicate that a sprite was drawn at this location, even if it's not seen */
-							line_priority[sprite_xpos + pixel] |= 0x01;
-						}
-					}
-
-					/* set the "sprite 0 hit" flag if appropriate */
-					if (sprite_index == 0 && (pixel_data & 0x03) && ((sprite_xpos + pixel) < 255) && (line_priority[sprite_xpos + pixel] & 0x02))
-						m_regs[PPU_STATUS] |= PPU_STATUS_SPRITE0_HIT;
+					draw_sprite_pixel_low(bitmap, pixel_data, pixel, sprite_xpos, color, sprite_index, line_priority);
 				}
 			}
 		}
@@ -945,23 +989,7 @@ void ppu2c0x_device::draw_sprites(uint8_t* line_priority)
 				/* is this pixel non-transparent? */
 				if (sprite_xpos + pixel >= first_pixel)
 				{
-					if (pixel_data)
-					{
-						if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
-						{
-							/* has another sprite been drawn here? */
-							if (!(line_priority[sprite_xpos + pixel] & 0x01))
-							{
-								/* no, draw */
-								draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data, bitmap);
-								line_priority[sprite_xpos + pixel] |= 0x01;
-							}
-						}
-					}
-
-					/* set the "sprite 0 hit" flag if appropriate */
-					if (sprite_index == 0 && (pixel_data & 0x03) && ((sprite_xpos + pixel) < 255) && (line_priority[sprite_xpos + pixel] & 0x02))
-						m_regs[PPU_STATUS] |= PPU_STATUS_SPRITE0_HIT;
+					draw_sprite_pixel_high(bitmap, pixel_data, pixel, sprite_xpos, color, sprite_index, line_priority);
 				}
 			}
 		}
@@ -1292,7 +1320,7 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 		else
 		{
 			/* first write */
-			m_refresh_latch &= 0x7fe0;
+			m_refresh_latch &= (0xffe0 & m_global_refresh_mask);
 			m_refresh_latch |= (data & 0xf8) >> 3;
 
 			m_x_fine = data & 7;
@@ -1306,7 +1334,7 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 		if (m_toggle)
 		{
 			/* second write */
-			m_refresh_latch &= 0x7f00;
+			m_refresh_latch &= (0xff00 & m_global_refresh_mask);
 			m_refresh_latch |= data;
 			m_refresh_data = m_refresh_latch;
 
@@ -1317,7 +1345,7 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 		{
 			/* first write */
 			m_refresh_latch &= 0x00ff;
-			m_refresh_latch |= (data & 0x3f) << 8;
+			m_refresh_latch |= (data & (m_videoram_addr_mask >>8) ) << 8;
 			//logerror("vram addr write 1: %02x, %04x (scanline: %d)\n", data, m_refresh_latch, m_scanline);
 		}
 
@@ -1326,7 +1354,7 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 
 	case PPU_DATA: /* 7 */
 	{
-		int tempAddr = m_videomem_addr & 0x3fff;
+		int tempAddr = m_videomem_addr & m_videoram_addr_mask;
 
 		if (!m_latch.isnull())
 			m_latch(tempAddr);

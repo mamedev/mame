@@ -372,7 +372,7 @@ rgb_t williams2_state::calc_col(uint16_t lo, uint16_t hi)
 {
 	/*
 	 *  frgb contains channel output voltages created with this netlist file:
-	 *  	src/lib/netlist/examples/turkey_shoot.cpp
+	 *      src/lib/netlist/examples/turkey_shoot.cpp
 	 *  Instructions to create the table are found in turkey_shoot.cpp
 	 *
 	 *  Reference videos: https://www.youtube.com/watch?v=R5OeC6Wc_yI

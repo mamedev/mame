@@ -330,10 +330,10 @@ void k3_state::scrolly_w(u16 data)
 void k3_state::k3_soundbanks_w(u16 data)
 {
 	/*
-		---- ---- ---x ---- Unknown
-		---- ---- ---- -x-- OKI1 Bank
-		---- ---- ---- --x- OKI0 Bank
-		---- ---- ---- ---x VRAM access flip-flop
+	    ---- ---- ---x ---- Unknown
+	    ---- ---- ---- -x-- OKI1 Bank
+	    ---- ---- ---- --x- OKI0 Bank
+	    ---- ---- ---- ---x VRAM access flip-flop
 	*/
 	vram_buffer(BIT(data, 0)); // rising edge
 	m_oki[1]->set_rom_bank(BIT(data, 2));
@@ -497,9 +497,9 @@ static INPUT_PORTS_START( k3old )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_1C ) )	// 5C_1C in newer versions
-	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_1C ) )	// 4C_1C in newer versions
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )	// 1C_3C in newer versions
+	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_1C ) )    // 5C_1C in newer versions
+	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_1C ) )    // 4C_1C in newer versions
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )    // 1C_3C in newer versions
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x0018, 0x0008, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:4,5")
@@ -513,8 +513,8 @@ static INPUT_PORTS_START( k3old )
 	PORT_DIPSETTING(      0x0020, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
 	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW1:8" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW2:1" )	// In newer 1945K-III sets this is Demo_Sounds - Demo Sounds always OFF here!
-	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )	// In newer 1945K-III sets this is Allow_Continue - Always Continue
+	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW2:1" )   // In newer 1945K-III sets this is Demo_Sounds - Demo Sounds always OFF here!
+	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )   // In newer 1945K-III sets this is Allow_Continue - Always Continue
 	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW2:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW2:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW2:5" )
@@ -565,11 +565,11 @@ static INPUT_PORTS_START( solite )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Hardest ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW1:6" )	// In 1945K-III sets 6&7 are Lives
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW1:7" )	// In 1945K-III sets 6&7 are Lives
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW1:6" )   // In 1945K-III sets 6&7 are Lives
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW1:7" )   // In 1945K-III sets 6&7 are Lives
 	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW1:8" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW2:1" )	// In newer 1945K-III sets this is Demo_Sounds - Demo Sounds always ON here!
-	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )	// In newer 1945K-III sets this is Allow_Continue - Always Continue
+	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW2:1" )   // In newer 1945K-III sets this is Demo_Sounds - Demo Sounds always ON here!
+	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )   // In newer 1945K-III sets this is Allow_Continue - Always Continue
 	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW2:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW2:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW2:5" )
@@ -698,8 +698,8 @@ void k3_state::k3(machine_config &config)
 
 ROM_START( 1945kiii )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-//	ROM_LOAD16_BYTE( "prg-1.u51", 0x00001, 0x40000, CRC(c4bbae5d) SHA1(a326fad902150c6b64c39618dda2c58baf12ae98) )
-//	ROM_LOAD16_BYTE( "prg-2.u52", 0x00000, 0x40000, CRC(092abf2e) SHA1(be42c54c3051d4efe76858e4bc85dfadc2d0cc1a) )
+//  ROM_LOAD16_BYTE( "prg-1.u51", 0x00001, 0x40000, CRC(c4bbae5d) SHA1(a326fad902150c6b64c39618dda2c58baf12ae98) )
+//  ROM_LOAD16_BYTE( "prg-2.u52", 0x00000, 0x40000, CRC(092abf2e) SHA1(be42c54c3051d4efe76858e4bc85dfadc2d0cc1a) )
 	ROM_LOAD16_BYTE( "prg-1.u51", 0x00001, 0x80000, CRC(6b345f27) SHA1(60867fa0e2ea7ebdd4b8046315ee0c83e5cf0d74) ) /* identical halves */
 	ROM_LOAD16_BYTE( "prg-2.u52", 0x00000, 0x80000, CRC(ce09b98c) SHA1(a06bb712b9cf2249cc535de4055b14a21c68e0c5) ) /* identical halves */
 
@@ -719,8 +719,8 @@ ROM_END
 
 ROM_START( 1945kiiin )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-//	ROM_LOAD16_BYTE( "u34", 0x00001, 0x40000, CRC(234a55a5) SHA1(df0464793531251ac64cee54e474314e5e5f05ab) )
-//	ROM_LOAD16_BYTE( "u35", 0x00000, 0x40000, CRC(1e6e23a5) SHA1(c0e3f8b34be77ff34f6dfbe1f966ca05db285e76) )
+//  ROM_LOAD16_BYTE( "u34", 0x00001, 0x40000, CRC(234a55a5) SHA1(df0464793531251ac64cee54e474314e5e5f05ab) )
+//  ROM_LOAD16_BYTE( "u35", 0x00000, 0x40000, CRC(1e6e23a5) SHA1(c0e3f8b34be77ff34f6dfbe1f966ca05db285e76) )
 	ROM_LOAD16_BYTE( "u34", 0x00001, 0x80000, CRC(d0cf4f03) SHA1(3455927221afae5103c02b12c1b855f416c47e91) ) /* 27C040 ROM had no label - identical halves */
 	ROM_LOAD16_BYTE( "u35", 0x00000, 0x80000, CRC(056c64ed) SHA1(b0eddad9c950676b94316d3aeb32f3ed4b9ade0f) ) /* 27C040 ROM had no label - identical halves */
 
@@ -750,8 +750,8 @@ ROM_END
 
 ROM_START( 1945kiiio )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-//	ROM_LOAD16_BYTE( "3.u34", 0x00001, 0x40000, CRC(bcfb8b84) SHA1(7126463231cfaf4d6baf4d2efba88079c6c4c399) )
-//	ROM_LOAD16_BYTE( "4.u35", 0x00000, 0x40000, CRC(ec1234a5) SHA1(36cf7a48236acd75365eefbba81024c343bb0124) )
+//  ROM_LOAD16_BYTE( "3.u34", 0x00001, 0x40000, CRC(bcfb8b84) SHA1(7126463231cfaf4d6baf4d2efba88079c6c4c399) )
+//  ROM_LOAD16_BYTE( "4.u35", 0x00000, 0x40000, CRC(ec1234a5) SHA1(36cf7a48236acd75365eefbba81024c343bb0124) )
 	ROM_LOAD16_BYTE( "3.u34", 0x00001, 0x80000, CRC(5515baa0) SHA1(6fd4c9b7cc27035d6baaafa73f5f5930bfde62a4) ) /* 0x40000 to 0x7FFFF 0x00 padded */
 	ROM_LOAD16_BYTE( "4.u35", 0x00000, 0x80000, CRC(fd177664) SHA1(0ea1854be8d88577129546a56d13bcdc4739ae52) ) /* 0x40000 to 0x7FFFF 0x00 padded */
 

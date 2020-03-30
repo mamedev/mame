@@ -32,7 +32,7 @@ VTech V.Smile Baby cartridges
 |        | 80-099002(NL)     | Dierenhuis                                                                 |
 |        | 80-099003(UK)     | Learn and Discover Home (white background on title) (pack-in)              |
 |   XX   | 80-099004(GE)     | Meine kleinen Tierfreunde (Explore and Learn Home on label)                |
-|        | 80-099005(FR)     | La Maison des animaux                                                      |
+|   XX   | 80-099005(FR)     | La Maison des animaux                                                      |
 |   NA   | 80-099014(SE)     | Lär och upptäck (no-ROM cartridge)                                         |
 +========+===================+============================================================================+
 |   XX   | 80-099020(US)     | Pooh's Hundred Acre Wood Adventure                                         |
@@ -46,12 +46,12 @@ VTech V.Smile Baby cartridges
 |        | 80-099040(US)     | Baby Einstein - World of Discoveries                                       |
 |        | 80-099040(US)     | Baby Einstein - World of Discoveries (no # on front label)                 |
 |        | 80-099043(UK)     | Baby Einstein - World of Discoveries                                       |
-|        | 80-099045(FR)     | Baby Einstein - Un Monde de découvertes                                    |
+|   XX   | 80-099045(FR)     | Baby Einstein - Un monde de découvertes                                    |
 +========+===================+============================================================================+
 |        | 80-099060(US)     | A Day On The Farm                                                          |
 |        | 80-099063(UK)     | A Day On The Farm                                                          |
 |   XX   | 80-099064(GE)     | Mein erster Bauernhof                                                      |
-|        | 80-099065(FR)     | Un jour à la ferme                                                         |
+|   XX   | 80-099065(FR)     | Un jour à la ferme                                                         |
 |   XX   | 80-099067(SP)     | Un Día en la Granja                                                        |
 +========+===================+============================================================================+
 |        | 80-099080(US)     | <Unknown>                                                                  |
@@ -86,6 +86,20 @@ VTech V.Smile Baby cartridges
 
 <softwarelist name="vsmileb_cart" description="VTech V.Smile Baby cartridges">
 
+
+	<software name="babyeninf" supported="no">
+		<description>Baby Einstein - Un monde de découvertes (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099045(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u4" value="U4" />
+			<dataarea name="rom" size="8388608">
+				<rom name="099045 - Baby Einstein (BABY) (FR).bin" size="8388608" crc="d0690ae6" sha1="bde281db67b477798974983a505bed7497e25763" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dayfarmg" supported="no">
 		<description>Mein erster Bauernhof (Germany)</description>
 		<year>200?</year>
@@ -97,6 +111,19 @@ VTech V.Smile Baby cartridges
 			<feature name="u4" value="U4" /> <!-- ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="27-08788-000.u4" size="8388608" crc="581e16f9" sha1="330b309644db9f017d275b9df0ffe7530ed5bcef" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dayfarmf" cloneof="dayfarmg" supported="no">
+		<description>Un jour à la ferme (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099065(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u4" value="U4" />
+			<dataarea name="rom" size="8388608">
+				<rom name="099065 - Un Jour A La Ferme (BABY) (FR).bin" size="8388608" crc="a2777808" sha1="bbd2ae83d7ff43caa1e1d74b050d6130a0cd5e6f" />
 			</dataarea>
 		</part>
 	</software>
@@ -116,7 +143,8 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="mktierf" supported="no">
+	<!-- "Learn and Discover Home" -->
+	<software name="learndhg" supported="no">
 		<description>Meine kleinen Tierfreunde (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -127,6 +155,20 @@ VTech V.Smile Baby cartridges
 			<feature name="u4" value="U4" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="99004.u4" size="8388608" crc="7b48544b" sha1="a736ef1313762c493a366990406c3a7393457b6e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- "Learn and Discover Home" -->
+	<software name="learndhf" cloneof="learndhg" supported="no">
+		<description>La Maison Des Animaux (France)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099005(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u4" value="U4" />
+			<dataarea name="rom" size="8388608">
+				<rom name="099005 - La Maison Des Animaux (BABY) (FR).bin" size="8388608" crc="4ab4d311" sha1="584a5b359010636286de626a51c71c0c5bdcb864" />
 			</dataarea>
 		</part>
 	</software>

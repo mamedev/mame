@@ -327,7 +327,7 @@ void pp_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x07).rw(m_pvtc, FUNC(scn2672_device::read), FUNC(scn2672_device::write));
 	map(0x08, 0x09).mirror(2).rw("pkdi", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0x0d, 0x0d).mirror(2).r(m_pvtc, FUNC(scn2672_device::buffer_r)).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x0d, 0x0d).mirror(2).r(m_pvtc, FUNC(scn2672_device::buffer_r)).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x10, 0x13).mirror(4).rw("fdc", FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	map(0x18, 0x18).mirror(2).rw(FUNC(pp_state::stat_r), FUNC(pp_state::co_w));
 	map(0x1c, 0x1c).mirror(2).w(m_pvtc, FUNC(scn2672_device::buffer_w));

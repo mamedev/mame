@@ -9,7 +9,38 @@ license:CC0
 
 <softwarelist name="specpls3_flop" description="Sinclair ZX Spectrum +3 disk images">
 
-	<!-- SPS / CAPS Releases -->
+<!--
+    SPS / CAPS Releases
+
+    Known missing IPF dumps:
+        3585    LED Storm: Lazer Enhanced Destruction
+        3607    Rock Star Ate My Hamster
+        3625    Tiger Road
+-->
+
+	<software name="qoscrup">
+		<!-- SPS (CAPS) release 3529 -->
+		<description>A Question of Scruples - The Computer Edition</description>
+		<year>1987</year>
+		<publisher>Leisure Genius</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3529 - question of scruples, a - the computer edition (europe).ipf" size="236460" crc="34d8887c" sha1="2e402eb208ce6695930a8d7e042c4b1f0f7e6944" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qos">
+		<!-- SPS (CAPS) release 3601 -->
+		<description>A Question of Sport</description>
+		<year>1989</year>
+		<publisher>Elite Systems</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3601 - question of sport, a (europe).ipf" size="236460" crc="8402bbeb" sha1="0f47e7c7326ad484f2222579c6395e29031a0115" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="aforce">
 		<!-- SPS (CAPS) release 3500 -->
@@ -91,18 +122,6 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3554 - bloodwych (europe).ipf" size="236460" crc="cb66aed6" sha1="b7bab317718a478e48a689a8ebd125a498504ebe" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="boggit">
-		<!-- SPS (CAPS) release 3555 -->
-		<description>The Boggit - Bored Too</description>
-		<year>1986</year>
-		<publisher>CRL Group</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="236460">
-				<rom name="3555 - boggit, the - bored too (europe).ipf" size="236460" crc="c9dc8d41" sha1="ae1aff98a4e60bf6272c8955a224a7b0e890c40e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -236,18 +255,6 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="260585">
 				<rom name="3563 - dark fusion (europe).ipf" size="260585" crc="9495182c" sha1="bb94b445a9909ba39f21119dcc43dbd1497aed20" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="deep">
-		<!-- SPS (CAPS) release 3506 -->
-		<description>The Deep</description>
-		<year>1988</year>
-		<publisher>U.S. Gold</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="266891">
-				<rom name="3506 - deep, the (europe).ipf" size="266891" crc="e4844d2b" sha1="95dee7ccae5613c9b04efdbde5e2bc6c69a1e735" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -512,7 +519,7 @@ license:CC0
 		<publisher>U.S. Gold</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="259471">
-				<rom name="ghouls'n'ghosts.ipf" size="259471" crc="5f056018" sha1="1d84d01a5d349843bcd4743bfb23c7a82ad9704c" offset="0" />
+				<rom name="3512 - ghouls 'n' ghosts (europe).ipf" size="259471" crc="5f056018" sha1="1d84d01a5d349843bcd4743bfb23c7a82ad9704c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -541,18 +548,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="herolanc">
-		<!-- SPS (CAPS) release 3513 -->
-		<description>Heroes of the Lance</description>
-		<year>1988</year>
-		<publisher>U.S. Gold</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="237465">
-				<rom name="3513 - heroes of the lance (europe).ipf" size="237465" crc="d25d5414" sha1="2caf612f85dc9b790102df5f6a76d90c3408c8db" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="heroqst">
 		<!-- SPS (CAPS) release 3514 -->
 		<description>Hero Quest</description>
@@ -561,6 +556,18 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="239805">
 				<rom name="3514 - heroquest (europe).ipf" size="239805" crc="fc8bb800" sha1="96538aa2fd28b7ae66916590479b0596afcc495c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="herolanc">
+		<!-- SPS (CAPS) release 3513 -->
+		<description>Heroes of the Lance</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="237465">
+				<rom name="3513 - heroes of the lance (europe).ipf" size="237465" crc="d25d5414" sha1="2caf612f85dc9b790102df5f6a76d90c3408c8db" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -637,29 +644,17 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lmohican">
-		<!-- SPS (CAPS) release 3584 -->
-		<description>The Last Mohican</description>
-		<year>1987</year>
-		<publisher>CRL Group</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="236460">
-				<rom name="3584 - last mohican, the (europe).ipf" size="236460" crc="ed3f624d" sha1="222b93b8e83987c8e5b83f4eb68dee8227bffc64" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lightcor">
-		<!-- SPS (CAPS) release 3517 -->
-		<description>The Light Corridor</description>
-		<year>1991</year>
-		<publisher>Infogrames</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="125316">
-				<rom name="3517 - light corridor, the (europe).ipf" size="125316" crc="ef3b80cd" sha1="568f29ba7d1a498432737543af07ba57c4adb26c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+<!--    <software name="ledstorm">-->
+		<!-- SPS (CAPS) release 3585 -->
+<!--        <description>LED Storm Rally 2011</description>
+        <year>1988</year>
+        <publisher>Go!</publisher>
+        <part name="flop1" interface="floppy_3">
+            <dataarea name="flop" size="266892">
+                <rom name="3585 - led storm - lazer enhanced destruction (europe).ipf" size="266892" crc="a861168e" sha1="" offset="0" />
+            </dataarea>
+        </part>
+    </software>-->
 
 	<software name="lmidnght">
 		<!-- SPS (CAPS) release 3518 -->
@@ -794,18 +789,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ninjawar">
-		<!-- SPS (CAPS) release 3522 -->
-		<description>The Ninja Warriors</description>
-		<year>1990</year>
-		<publisher>Virgin Games</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="241110">
-				<rom name="3522 - ninja warriors, the (europe).ipf" size="241110" crc="4eb0abeb" sha1="e1ef8de2788953c9399515796ee1309ea33ccd3f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="northstr">
 		<!-- SPS (CAPS) release 3592 -->
 		<description>North Star</description>
@@ -891,18 +874,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pawn">
-		<!-- SPS (CAPS) release 3525 -->
-		<description>The Pawn</description>
-		<year>1987</year>
-		<publisher>Rainbird Software</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="236460">
-				<rom name="3525 - pawn, the (europe).ipf" size="236460" crc="468012a2" sha1="1402a94935992789fdbffa1aa07140d56eeba435" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pipmania">
 		<!-- SPS (CAPS) release 3597 -->
 		<description>Pipe Mania</description>
@@ -960,30 +931,6 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3599 - pro tennis tour (europe).ipf" size="236460" crc="e1e4448b" sha1="b8abc334bf1604934e293c133fdbe3946e744975" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="qoscrup">
-		<!-- SPS (CAPS) release 3529 -->
-		<description>A Question of Scruples - The Computer Edition</description>
-		<year>1987</year>
-		<publisher>Leisure Genius</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="236460">
-				<rom name="3529 - question of scruples, a - the computer edition (europe).ipf" size="236460" crc="34d8887c" sha1="2e402eb208ce6695930a8d7e042c4b1f0f7e6944" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="qos">
-		<!-- SPS (CAPS) release 3601 -->
-		<description>A Question of Sport</description>
-		<year>1989</year>
-		<publisher>Elite Systems</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="236460">
-				<rom name="3601 - question of sport, a (europe).ipf" size="236460" crc="8402bbeb" sha1="0f47e7c7326ad484f2222579c6395e29031a0115" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1059,6 +1006,18 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+<!--    <software name="rockhams">-->
+		<!-- SPS (CAPS) release 3607 -->
+<!--        <description>Rock Star Ate My Hamster</description>
+        <year>1989</year>
+        <publisher>Code Masters</publisher>
+        <part name="flop1" interface="floppy_3">
+            <dataarea name="flop" size="234180">
+                <rom name="3607 - rock star ate my hamster (europe).ipf" size="234180" crc="7cbd3549" sha1="" offset="0" />
+            </dataarea>
+        </part>
+    </software>-->
 
 	<software name="rthunder">
 		<!-- SPS (CAPS) release 3608 -->
@@ -1206,18 +1165,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="spywholm">
-		<!-- SPS (CAPS) release 3615 -->
-		<description>The Spy Who Loved Me</description>
-		<year>1990</year>
-		<publisher>Domark</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="234180">
-				<rom name="3615 - spy who loved me, the (europe).ipf" size="234180" crc="6d638747" sha1="30763ad2f43935d7b63fdec20e62858357742b77" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="stalingr">
 		<!-- SPS (CAPS) release 3535 -->
 		<description>Stalingrad</description>
@@ -1286,18 +1233,6 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="236460">
 				<rom name="3618 - subbuteo - the computer game (europe).ipf" size="236460" crc="2bc39232" sha1="b4933dd0e5420e1f8c977192cef1dc09dcc0ec81" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sunxword">
-		<!-- SPS (CAPS) release 3619 -->
-		<description>The Sun Computer Crosswords Volume 1</description>
-		<year>1988</year>
-		<publisher>Akom</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="236460">
-				<rom name="3619 - sun computer crosswords volume 1, the (europe).ipf" size="236460" crc="e87a9910" sha1="5c3c7cc4c1d3ae851a1631bfb5a25ec324b33783" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1386,6 +1321,103 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="boggit">
+		<!-- SPS (CAPS) release 3555 -->
+		<description>The Boggit - Bored Too</description>
+		<year>1986</year>
+		<publisher>CRL Group</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3555 - boggit, the - bored too (europe).ipf" size="236460" crc="c9dc8d41" sha1="ae1aff98a4e60bf6272c8955a224a7b0e890c40e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deep">
+		<!-- SPS (CAPS) release 3506 -->
+		<description>The Deep</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="266891">
+				<rom name="3506 - deep, the (europe).ipf" size="266891" crc="e4844d2b" sha1="95dee7ccae5613c9b04efdbde5e2bc6c69a1e735" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lmohican">
+		<!-- SPS (CAPS) release 3584 -->
+		<description>The Last Mohican</description>
+		<year>1987</year>
+		<publisher>CRL Group</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3584 - last mohican, the (europe).ipf" size="236460" crc="ed3f624d" sha1="222b93b8e83987c8e5b83f4eb68dee8227bffc64" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lightcor">
+		<!-- SPS (CAPS) release 3517 -->
+		<description>The Light Corridor</description>
+		<year>1991</year>
+		<publisher>Infogrames</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="125316">
+				<rom name="3517 - light corridor, the (europe).ipf" size="125316" crc="ef3b80cd" sha1="568f29ba7d1a498432737543af07ba57c4adb26c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninjawar">
+		<!-- SPS (CAPS) release 3522 -->
+		<description>The Ninja Warriors</description>
+		<year>1990</year>
+		<publisher>Virgin Games</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="241110">
+				<rom name="3522 - ninja warriors, the (europe).ipf" size="241110" crc="4eb0abeb" sha1="e1ef8de2788953c9399515796ee1309ea33ccd3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pawn">
+		<!-- SPS (CAPS) release 3525 -->
+		<description>The Pawn</description>
+		<year>1987</year>
+		<publisher>Rainbird Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3525 - pawn, the (europe).ipf" size="236460" crc="468012a2" sha1="1402a94935992789fdbffa1aa07140d56eeba435" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spywholm">
+		<!-- SPS (CAPS) release 3615 -->
+		<description>The Spy Who Loved Me</description>
+		<year>1990</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3615 - spy who loved me, the (europe).ipf" size="234180" crc="6d638747" sha1="30763ad2f43935d7b63fdec20e62858357742b77" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="sunxword">
+		<!-- SPS (CAPS) release 3619 -->
+		<description>The Sun Computer Crosswords Volume 1</description>
+		<year>1988</year>
+		<publisher>Akom</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3619 - sun computer crosswords volume 1, the (europe).ipf" size="236460" crc="e87a9910" sha1="5c3c7cc4c1d3ae851a1631bfb5a25ec324b33783" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tblade">
 		<!-- SPS (CAPS) release 3623 -->
 		<description>Thunder Blade</description>
@@ -1409,6 +1441,18 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+<!--    <software name="tigeroad">-->
+		<!-- SPS (CAPS) release 3625 -->
+<!--        <description>Tiger Road</description>
+        <year>1988</year>
+        <publisher>Go!</publisher>
+        <part name="flop1" interface="floppy_3">
+            <dataarea name="flop" size="266892">
+                <rom name="3625 - tiger road (europe).ipf" size="266892" crc="f47981e2" sha1="" offset="0" />
+            </dataarea>
+        </part>
+    </software>-->
 
 	<software name="totrecal">
 		<!-- SPS (CAPS) release 3542 -->
@@ -12147,6 +12191,7 @@ license:CC0
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="ledstorm">
+	<!-- May be the same edition as the IPF -->
 		<description>LED Storm Rally 2011</description>
 		<year>1988</year>
 		<publisher>Go!</publisher>
@@ -20593,6 +20638,7 @@ license:CC0
 	</software>
 
 	<software name="tigeroad">
+	<!-- May be the same edition as the IPF -->
 		<description>Tiger Road</description>
 		<year>1988</year>
 		<publisher>Go!</publisher>

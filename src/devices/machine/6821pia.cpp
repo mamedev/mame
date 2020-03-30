@@ -841,10 +841,10 @@ void pia6821_device::set_a_input(uint8_t data)
 
 
 //-------------------------------------------------
-//  write_porta
+//  porta_w
 //-------------------------------------------------
 
-void pia6821_device::write_porta(uint8_t data)
+void pia6821_device::porta_w(uint8_t data)
 {
 	set_a_input(data);
 }
@@ -959,13 +959,13 @@ bool pia6821_device::ca2_output_z()
 
 
 //-------------------------------------------------
-//  write_portb
+//  portb_w
 //-------------------------------------------------
 
-void pia6821_device::write_portb(uint8_t data)
+void pia6821_device::portb_w(uint8_t data)
 {
 	if (!m_in_b_handler.isnull())
-		throw emu_fatalerror("pia6821_device::write_portb() called when in_b_func implemented");
+		throw emu_fatalerror("pia6821_device::portb_w() called when in_b_func implemented");
 
 	LOG("Set PIA input port B = %02X\n", data);
 
@@ -983,9 +983,9 @@ void pia6821_device::write_portb_line(int line, bool state)
 	const uint8_t mask = 1 << line;
 
 	if (state)
-		write_portb(m_in_b | mask);
+		portb_w(m_in_b | mask);
 	else
-		write_portb(m_in_b & ~mask);
+		portb_w(m_in_b & ~mask);
 }
 
 

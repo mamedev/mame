@@ -326,7 +326,7 @@ void asteroid_state::asteroid_map(address_map &map)
 	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r));    /* IN1 */
 	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r)).nopw();   /* DSW1 */
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
-	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::bus_w));
+	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::write));
 	map(0x3400, 0x3400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3600, 0x3600).w(FUNC(asteroid_state::asteroid_explode_w));
 	map(0x3a00, 0x3a00).w(FUNC(asteroid_state::asteroid_thump_w));
@@ -371,7 +371,7 @@ void asteroid_state::llander_map(address_map &map)
 	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r));   /* DSW1 */
 	map(0x2c00, 0x2c00).portr("THRUST");
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
-	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::bus_w));
+	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::write));
 	map(0x3400, 0x3400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3c00, 0x3c00).w(FUNC(asteroid_state::llander_sounds_w));
 	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::llander_snd_reset_w));
