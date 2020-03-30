@@ -217,15 +217,16 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
+	void nes_vt_4mb_sp69(machine_config& config);
+
 protected:
-	virtual void machine_reset() override;
 };
 
-class nes_vt_ablping_state : public nes_vt_sp69_state
+class nes_vt_ablping_state : public nes_vt_state
 {
 public:
 	nes_vt_ablping_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_sp69_state(mconfig, type, tag)
+		nes_vt_state(mconfig, type, tag)
 	{ }
 
 	void nes_vt_2mb_ablping(machine_config& config);
@@ -1261,19 +1262,18 @@ void nes_vt_pjoy_state::nes_vt_pjoy_4mb(machine_config &config)
 }
 
 
-
-
-void nes_vt_sp69_state::machine_reset()
+void nes_vt_sp69_state::nes_vt_4mb_sp69(machine_config& config)
 {
-	nes_vt_state::machine_reset();
+	nes_vt_4mb(config);
 	m_soc->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
 }
 
 void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
 {
-	nes_vt(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_2mbyte);
+	nes_vt_2mb(config);
+	m_soc->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
+	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::nes_vt_ablping_map);
 	*/
@@ -2314,7 +2314,8 @@ CONS( 201?, techni4,   0,  0,  nes_vt_pal_2mb,      nes_vt, nes_vt_state,       
 CONS( 200?, lpgm240,    0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
 
 // this has 'Shark' and 'Octopus' etc. like mc_dgear but uses scrambled bank registers
-CONS( 200?, mc_sp69,   0,  0,  nes_vt_4mb,    nes_vt, nes_vt_sp69_state, empty_init, "<unknown>", "Sports Game 69 in 1", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND)
+// This was also often found in cart form with SunPlus / Famiclone hybrid systems to boost the game count, eg. the WiWi (ROM verified to match)
+CONS( 200?, mc_sp69,   0,  0,  nes_vt_4mb_sp69,    nes_vt, nes_vt_sp69_state, empty_init, "<unknown>", "Sports Game 69 in 1", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND)
 
 // this game was also sold by dreamGEAR and several others companies, each time with a different name and different case, although the dumped version was from ABL, and it hasn't been confirmed that the ROMs are identical for the other units
 // Super Ping Pong appears on the title screen, but not the box / product art which simply has "Ping Pong Plug & Play TV Game" on front/back/bottom/manual, and "Table Tennis Plug & Play TV Game" on left/right sides.  Product code is PP1100
