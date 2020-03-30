@@ -21,6 +21,8 @@ public:
 	void program_map(address_map &map);
 protected:
 	virtual void device_start() override;
+	virtual void device_reset() override;
+
 	virtual space_config_vector memory_space_config() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
@@ -31,11 +33,66 @@ protected:
 
 	void nes_vt_map(address_map& map);
 
-	/* OneBus read callbacks for getting sprite and tile data during rendering */
+
+	uint32_t get_banks(uint8_t bnk);
+	void update_banks();
+	uint16_t decode_nt_addr(uint16_t addr);
+	DECLARE_WRITE8_MEMBER(vt03_410x_w);
+	DECLARE_READ8_MEMBER(vt03_410x_r);
+	void scrambled_410x_w(uint16_t offset, uint8_t data);
 	DECLARE_READ8_MEMBER(spr_r);
 	DECLARE_READ8_MEMBER(chr_r);
+	DECLARE_WRITE8_MEMBER(chr_w);
+	void scanline_irq(int scanline, int vblank, int blanked);
+	void hblank_irq(int scanline, int vblank, int blanked);
+	void video_irq(bool hblank, int scanline, int vblank, int blanked);
+	DECLARE_READ8_MEMBER(nt_r);
+	DECLARE_WRITE8_MEMBER(nt_w);
+	int calculate_real_video_address(int addr, int extended, int readtype);
+	void scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data);
+	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
+	void set_410x_scramble(uint8_t reg0, uint8_t reg1);
+	DECLARE_WRITE8_MEMBER(vt03_8000_mapper_w);
+	DECLARE_READ8_MEMBER(psg1_4014_r);
+	DECLARE_READ8_MEMBER(psg1_4015_r);
+	DECLARE_WRITE8_MEMBER(psg1_4015_w);
+	DECLARE_WRITE8_MEMBER(psg1_4017_w);
+	DECLARE_WRITE8_MEMBER(vt_dma_w);
+	DECLARE_WRITE8_MEMBER(vt_fixed_dma_w);
+	void do_dma(uint8_t data, bool has_ntsc_bug);
+	DECLARE_WRITE8_MEMBER(vt03_4034_w);
+	DECLARE_WRITE8_MEMBER(extra_io_control_w);
+	DECLARE_READ8_MEMBER(extrain_01_r);
+	DECLARE_READ8_MEMBER(extrain_23_r);
+	DECLARE_WRITE8_MEMBER(extraout_01_w);
+	DECLARE_WRITE8_MEMBER(extraout_23_w);
+	DECLARE_READ8_MEMBER(rs232flags_region_r);
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
+
+	uint8_t m_410x[0xc];
+
+	uint8_t m_vdma_ctrl;
+	int m_timer_irq_enabled;
+	int m_timer_running;
+	int m_timer_val;
+
+	uint8_t m_8000_scramble[8];
+	uint8_t m_410x_scramble[2];
+
+	uint8_t m_8000_addr_latch;
+	
+	
+
+	uint8_t m_4242;
+	uint8_t m_411c;
+	uint8_t m_411d;
+	uint8_t m_413x[8]; // CY only?
+
+	uint8_t m_initial_e000_bank;
+	/* expansion nametable - todo, see if we can refactor NES code to be reusable without having to add full NES bus etc. */
+	std::unique_ptr<uint8_t[]> m_ntram;
+	std::unique_ptr<uint8_t[]> m_chrram;
 
 private:
 
