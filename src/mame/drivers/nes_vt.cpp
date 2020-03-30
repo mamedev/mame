@@ -68,7 +68,7 @@ public:
 	void nes_vt_4k_ram_pal(machine_config& config);
 
 	// TODO: give these better register names so it's clearer what is remapped
-//	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
+//	voidm_soc->set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
 //	void set_410x_scramble(uint8_t reg0, uint8_t reg1);
 
 protected:
@@ -167,8 +167,10 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
+	void nes_vt_waixing_512kb(machine_config& config);
+	void nes_vt_waixing_2mb(machine_config& config);
+
 protected:
-	virtual void machine_reset() override;
 };
 
 class nes_vt_waixing_alt_state : public nes_vt_waixing_state
@@ -178,8 +180,9 @@ public:
 		nes_vt_waixing_state(mconfig, type, tag)
 	{ }
 
+	void nes_vt_waixing_alt_pal_8mb(machine_config& config);
+
 protected:
-	virtual void machine_reset() override;
 };
 
 
@@ -1218,39 +1221,39 @@ void nes_vt_state::nes_vt_pal_8mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_8mbyte);
 }
 
-void nes_vt_waixing_state::machine_reset()
+void nes_vt_waixing_state::nes_vt_waixing_512kb(machine_config &config)
 {
-	nes_vt_state::machine_reset();
-	/*
-	// TODO m_ppu->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4); // reasonable
-	*/
+	nes_vt_512kb(config);
+	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
 }
 
-void nes_vt_waixing_alt_state::machine_reset()
+void nes_vt_waixing_state::nes_vt_waixing_2mb(machine_config &config)
 {
-	nes_vt_waixing_state::machine_reset();
-	/*
-	// TODO set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
-	*/
+	nes_vt_2mb(config);
+	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
 }
+
+void nes_vt_waixing_alt_state::nes_vt_waixing_alt_pal_8mb(machine_config &config)
+{
+	nes_vt_pal_8mb(config); // TODO make PAL
+	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
+	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
+}
+
 
 void nes_vt_hum_state::machine_reset()
 {
 	nes_vt_state::machine_reset();
-
-	/*
-	m_ppu->set_201x_descramble(0x7, 0x6, 0x5, 0x4, 0x2, 0x3);
-	// TODO set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
-	*/
+	m_soc->set_201x_descramble(0x7, 0x6, 0x5, 0x4, 0x2, 0x3);
+	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
 }
 
 void nes_vt_pjoy_state::machine_reset()
 {
 	nes_vt_state::machine_reset();
-
+	m_soc->set_201x_descramble(0x2, 0x3, 0x4, 0x5, 0x6, 0x7);
+	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x8, 0x7);
 	/*
-	m_ppu->set_201x_descramble(0x2, 0x3, 0x4, 0x5, 0x6, 0x7);
-	// TODO set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x8, 0x7);
 	// TODO set_410x_scramble(0x8, 0x7);
 	*/
 }
@@ -1258,19 +1261,16 @@ void nes_vt_pjoy_state::machine_reset()
 void nes_vt_sp69_state::machine_reset()
 {
 	nes_vt_state::machine_reset();
-
-	/*
-	m_ppu->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
-	// TODO set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
-	*/
+	m_soc->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
+	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
 }
 
 void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
 {
 	nes_vt(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_2mbyte);
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::nes_vt_ablping_map);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_2mbyte);
 	*/
 }
 
@@ -2224,12 +2224,12 @@ CONS( 2004, majkon,    0, 0,  nes_vt_vg_1mb_majkon, nes_vt, nes_vt_hh_state, emp
 CONS( 200?, majgnc,    0, 0,  nes_vt_vg_1mb_majgnc, majgnc, nes_vt_vg_1mb_majgnc_state,  empty_init, "Majesco", "Golden Nugget Casino", MACHINE_NOT_WORKING )
 
 // small black unit, dpad on left, 4 buttons (A,B,X,Y) on right, Start/Reset/Select in middle, unit text "Sudoku Plug & Play TV Game"
-CONS( 200?, sudopptv,  0, 0,  nes_vt_512kb,        nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_NOT_WORKING )
+CONS( 200?, sudopptv,  0, 0,  nes_vt_waixing_512kb,        nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_NOT_WORKING )
 
-CONS( 200?, megapad,   0, 0,  nes_vt_2mb,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
+CONS( 200?, megapad,   0, 0,  nes_vt_waixing_2mb,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
 
 // 060303 date code on PCB
-CONS( 2006, ablmini,   0, 0,  nes_vt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, ablmini,   0, 0,  nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
 
  // needs PCM samples, Y button is not mapped (not used by any of the games?)
 CONS( 200?, timetp36,  0, 0,  nes_vt_pal_4mb, timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

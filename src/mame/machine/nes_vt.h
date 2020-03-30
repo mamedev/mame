@@ -38,6 +38,18 @@ public:
 	auto extra_write_2_callback() { return m_extra_write_2_callback.bind(); }
 	auto extra_write_3_callback() { return m_extra_write_3_callback.bind(); }
 
+	void set_201x_descramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5)
+	{
+		m_2012_2017_descramble[0] = reg0; // TOOD: name regs
+		m_2012_2017_descramble[1] = reg1;
+		m_2012_2017_descramble[2] = reg2;
+		m_2012_2017_descramble[3] = reg3;
+		m_2012_2017_descramble[4] = reg4;
+		m_2012_2017_descramble[5] = reg5;
+	};
+
+	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
+
 protected:
 	nes_vt_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -71,7 +83,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(nt_w);
 	int calculate_real_video_address(int addr, int extended, int readtype);
 	void scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data);
-	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
 	void set_410x_scramble(uint8_t reg0, uint8_t reg1);
 	DECLARE_READ8_MEMBER(psg1_4014_r);
 	DECLARE_READ8_MEMBER(psg1_4015_r);
@@ -146,6 +157,8 @@ private:
 	devcb_read8 m_extra_read_1_callback;
 	devcb_read8 m_extra_read_2_callback;
 	devcb_read8 m_extra_read_3_callback;
+
+	uint8_t m_2012_2017_descramble[0x6]; // passed to PPU in reset
 };
 
 

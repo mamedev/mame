@@ -85,6 +85,23 @@ nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, device_type 
 	m_extra_read_2_callback(*this),
 	m_extra_read_3_callback(*this)
 {
+	// 'no scramble' configuration
+	for (int i = 0; i < 6; i++)
+		m_2012_2017_descramble[i] = 2 + i;
+
+	// 'no scramble' configuration
+	m_8000_scramble[0x0] = 0x6;
+	m_8000_scramble[0x1] = 0x7;
+	m_8000_scramble[0x2] = 0x2;
+	m_8000_scramble[0x3] = 0x3;
+	m_8000_scramble[0x4] = 0x4;
+	m_8000_scramble[0x5] = 0x5;
+	m_8000_scramble[0x6] = 0x7;
+	m_8000_scramble[0x7] = 0x8;
+
+	// 'no scramble' configuration
+	m_410x_scramble[0x0] = 0x7;
+	m_410x_scramble[0x1] = 0x8;
 }
 
 nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
@@ -141,8 +158,6 @@ void nes_vt_soc_device::device_start()
 	m_extra_read_1_callback.resolve_safe(0xff);
 	m_extra_read_2_callback.resolve_safe(0xff);
 	m_extra_read_3_callback.resolve_safe(0xff);
-
-
 }
 
 void nes_vt_soc_device::device_reset()
@@ -171,18 +186,7 @@ void nes_vt_soc_device::device_reset()
 
 	update_banks();
 
-	// 'no scramble' configuration
-	m_8000_scramble[0x0] = 0x6;
-	m_8000_scramble[0x1] = 0x7;
-	m_8000_scramble[0x2] = 0x2;
-	m_8000_scramble[0x3] = 0x3;
-	m_8000_scramble[0x4] = 0x4;
-	m_8000_scramble[0x5] = 0x5;
-	m_8000_scramble[0x6] = 0x7;
-	m_8000_scramble[0x7] = 0x8;
-
-	m_410x_scramble[0x0] = 0x7;
-	m_410x_scramble[0x1] = 0x8;
+	m_ppu->set_201x_descramble(m_2012_2017_descramble[0], m_2012_2017_descramble[1], m_2012_2017_descramble[2], m_2012_2017_descramble[3], m_2012_2017_descramble[4], m_2012_2017_descramble[5]);
 }
 
 uint32_t nes_vt_soc_device::get_banks(uint8_t bnk)
