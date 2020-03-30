@@ -129,8 +129,6 @@ protected:
 	virtual DECLARE_READ8_MEMBER(in1_r);
 	virtual DECLARE_WRITE8_MEMBER(in0_w);
 
-	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
-
 	void nes_vt_map(address_map& map);
 
 	required_device<nes_vt_soc_device> m_soc;
@@ -147,11 +145,7 @@ protected:
 	uint8_t m_411d;
 	uint8_t m_413x[8]; // CY only?
 
-
-	void scrambled_410x_w(uint16_t offset, uint8_t data);
-	void scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data);
-
-	DECLARE_WRITE8_MEMBER(vt03_8000_mapper_w) { }
+	DECLARE_WRITE8_MEMBER(vt03_8000_mapper_w) { m_soc->vt03_8000_mapper_w(space, offset, data); }
 
 	optional_ioport m_cartsel;
 	optional_ioport m_exin0;
@@ -1099,11 +1093,6 @@ static GFXDECODE_START( vt03_gfx_helper )
 	GFXDECODE_ENTRY( "mainrom", 0, helper2_layout,  0x0, 2  )
 GFXDECODE_END
 #endif
-
-uint32_t nes_vt_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
-{
-	return 0;// m_ppu->screen_update(screen, bitmap, cliprect);
-}
 
 void nes_vt_state::nes_vt_base(machine_config &config)
 {

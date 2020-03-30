@@ -19,6 +19,9 @@ public:
 	nes_vt_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void program_map(address_map &map);
+
+	DECLARE_WRITE8_MEMBER(vt03_8000_mapper_w);
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -52,7 +55,6 @@ protected:
 	void scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data);
 	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
 	void set_410x_scramble(uint8_t reg0, uint8_t reg1);
-	DECLARE_WRITE8_MEMBER(vt03_8000_mapper_w);
 	DECLARE_READ8_MEMBER(psg1_4014_r);
 	DECLARE_READ8_MEMBER(psg1_4015_r);
 	DECLARE_WRITE8_MEMBER(psg1_4015_w);
@@ -61,6 +63,12 @@ protected:
 	DECLARE_WRITE8_MEMBER(vt_fixed_dma_w);
 	void do_dma(uint8_t data, bool has_ntsc_bug);
 	DECLARE_WRITE8_MEMBER(vt03_4034_w);
+
+
+	DECLARE_READ8_MEMBER(in0_r);
+	DECLARE_READ8_MEMBER(in1_r);
+	DECLARE_WRITE8_MEMBER(in0_w);
+
 	DECLARE_WRITE8_MEMBER(extra_io_control_w);
 	DECLARE_READ8_MEMBER(extrain_01_r);
 	DECLARE_READ8_MEMBER(extrain_23_r);

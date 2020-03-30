@@ -835,6 +835,23 @@ WRITE8_MEMBER(nes_vt_soc_device::vt03_4034_w)
 	m_vdma_ctrl = data;
 }
 
+READ8_MEMBER(nes_vt_soc_device::in0_r)
+{
+	// TODO
+	return 0x00;
+}
+
+READ8_MEMBER(nes_vt_soc_device::in1_r)
+{
+	// TODO
+	return 0x00;
+}
+
+WRITE8_MEMBER(nes_vt_soc_device::in0_w)
+{
+
+}
+
 WRITE8_MEMBER(nes_vt_soc_device::extra_io_control_w)
 {
 	/*
@@ -945,7 +962,7 @@ void nes_vt_soc_device::nes_vt_map(address_map &map)
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
 
-	/*
+	
 	map(0x4014, 0x4014).r(FUNC(nes_vt_soc_device::psg1_4014_r)).w(FUNC(nes_vt_soc_device::vt_dma_w));
 	map(0x4015, 0x4015).rw(FUNC(nes_vt_soc_device::psg1_4015_r), FUNC(nes_vt_soc_device::psg1_4015_w)); // PSG status / first control register
 	map(0x4016, 0x4016).rw(FUNC(nes_vt_soc_device::in0_r), FUNC(nes_vt_soc_device::in0_w));
@@ -966,7 +983,7 @@ void nes_vt_soc_device::nes_vt_map(address_map &map)
 	map(0x4119, 0x4119).r(FUNC(nes_vt_soc_device::rs232flags_region_r));
 	// 0x411a RS232 TX data
 	// 0x411b RS232 RX data
-	*/
+	
 
 	map(0x8000, 0xffff).rw(FUNC(nes_vt_soc_device::external_space_read), FUNC(nes_vt_soc_device::external_space_write));
 	map(0x6000, 0x7fff).ram();
@@ -1022,7 +1039,7 @@ void nes_vt_soc_device::device_add_mconfig(machine_config &config)
 
 uint32_t nes_vt_soc_device::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-	return 0;// m_ppu->screen_update(screen, bitmap, cliprect);
+	return m_ppu->screen_update(screen, bitmap, cliprect);
 }
 
 
