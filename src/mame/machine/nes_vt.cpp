@@ -61,8 +61,8 @@ void nes_vt_soc_device::program_map(address_map &map)
 {
 }
 
-nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
-	device_t(mconfig, NES_VT_SOC, tag, owner, clock),
+nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
 	m_screen(*this, "screen"),
@@ -85,6 +85,13 @@ nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, const char* 
 	m_extra_read_3_callback(*this)
 {
 }
+
+nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt_soc_device(mconfig, NES_VT_SOC, tag, owner, clock)
+{
+}
+
+
 
 void nes_vt_soc_device::device_start()
 {

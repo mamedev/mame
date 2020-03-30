@@ -39,6 +39,8 @@ public:
 	auto extra_write_3_callback() { return m_extra_write_3_callback.bind(); }
 
 protected:
+	nes_vt_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -144,9 +146,16 @@ private:
 	devcb_read8 m_extra_read_1_callback;
 	devcb_read8 m_extra_read_2_callback;
 	devcb_read8 m_extra_read_3_callback;
-
-
 };
+
+/*
+class nes_vt_soc_scramble_device : public nes_vt_soc
+{
+public:
+	nes_vt_soc_scramble_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+}
+*/
 
 DECLARE_DEVICE_TYPE(NES_VT_SOC, nes_vt_soc_device)
 

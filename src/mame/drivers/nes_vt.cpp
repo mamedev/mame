@@ -1089,27 +1089,19 @@ void nes_vt_sudoku_state::nes_vt_sudoku_512kb(machine_config &config)
 {
 
 	nes_vt_base(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_sudoku_state::vt_external_space_map_512kbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sudoku_state::vt_external_space_map_512kbyte);
 }
 
 void nes_vt_vg_1mb_majgnc_state::nes_vt_vg_1mb_majgnc(machine_config &config)
 {
 	nes_vt_base(config);
-	/*
-
-	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
-	m_vt_external_space->set_map(&nes_vt_vg_1mb_majgnc_state::vt_external_space_map_1mbyte);
-	*/
+	// TODO m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_vg_1mb_majgnc_state::vt_external_space_map_1mbyte);
 }
 
 void nes_vt_state::nes_vt(machine_config &config)
 {
-
 	nes_vt_base(config);
-	/*
-	*/
 }
 
 
@@ -1117,18 +1109,13 @@ void nes_vt_state::nes_vt_512kb(machine_config& config)
 {
 
 	nes_vt(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_512kbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_512kbyte);
 }
 
 void nes_vt_state::nes_vt_1mb(machine_config& config)
 {
-
 	nes_vt(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_1mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_1mbyte);
 }
 
 void nes_vt_state::nes_vt_2mb(machine_config& config)
@@ -1139,88 +1126,61 @@ void nes_vt_state::nes_vt_2mb(machine_config& config)
 
 void nes_vt_state::nes_vt_4mb(machine_config& config)
 {
-
 	nes_vt(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_2mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_2mbyte);
 }
 
 void nes_vt_state::nes_vt_8mb(machine_config& config)
 {
-
 	nes_vt(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_8mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_8mbyte);
 }
 
 void nes_vt_state::nes_vt_16mb(machine_config& config)
 {
-
 	nes_vt(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_16mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_16mbyte);
 }
 
 void nes_vt_state::nes_vt_32mb(machine_config& config)
 {
-
 	nes_vt(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_32mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_32mbyte);
 }
-
 
 void nes_vt_state::nes_vt_pal(machine_config &config)
 {
-
 	nes_vt_base_pal(config);
-	/*
-	*/
 }
 
 void nes_vt_state::nes_vt_pal_2mb(machine_config& config)
 {
-
 	nes_vt_pal(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_2mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_2mbyte);
 }
 
 void nes_vt_state::nes_vt_pal_4mb(machine_config& config)
 {
-
 	nes_vt_pal(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_4mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_4mbyte);
 }
 
 void nes_vt_state::nes_vt_pal_8mb(machine_config& config)
 {
-
 	nes_vt_pal(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_8mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_8mbyte);
 }
 
 void nes_vt_waixing_state::machine_reset()
 {
-
 	nes_vt_state::machine_reset();
 	/*
-	m_ppu->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4); // reasonable
+	// TODO m_ppu->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4); // reasonable
 	*/
 }
 
 void nes_vt_waixing_alt_state::machine_reset()
 {
-
 	nes_vt_waixing_state::machine_reset();
 	/*
 	// TODO set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
@@ -1260,17 +1220,15 @@ void nes_vt_sp69_state::machine_reset()
 
 void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
 {
-
 	nes_vt(config);
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::nes_vt_ablping_map);
-	m_vt_external_space->set_map(&nes_vt_ablping_state::vt_external_space_map_2mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_2mbyte);
 	*/
 }
 
 void nes_vt_state::nes_vt_4k_ram(machine_config &config)
 {
-
 	nes_vt(config);
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_4k_ram_map);
@@ -1281,9 +1239,10 @@ void nes_vt_state::nes_vt_4k_ram_16mb(machine_config &config)
 {
 
 	nes_vt(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_16mbyte);
+
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_4k_ram_map);
-	m_vt_external_space->set_map(&nes_vt_state::vt_external_space_map_16mbyte);
 	*/
 }
 
@@ -1309,9 +1268,7 @@ void nes_vt_cy_state::nes_vt_cy_bigger(machine_config &config)
 {
 
 	nes_vt_cy(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_cy_state::vt_external_space_map_32mbyte); // must be some banking of this kind of VT can address over 32mb
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::vt_external_space_map_32mbyte); // must be some banking of this kind of VT can address over 32mb
 }
 
 void nes_vt_cy_state::nes_vt_bt(machine_config &config)
@@ -1327,9 +1284,7 @@ void nes_vt_cy_state::nes_vt_bt_2x16mb(machine_config& config)
 {
 
 	nes_vt_bt(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_cy_state::vt_external_space_map_bitboy_2x16mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::vt_external_space_map_bitboy_2x16mbyte);
 }
 
 void nes_vt_dg_state::nes_vt_dg(machine_config &config)
@@ -1349,20 +1304,16 @@ void nes_vt_dg_state::nes_vt_dg(machine_config &config)
 
 void nes_vt_dg_state::nes_vt_dg_1mb(machine_config& config)
 {
-
 	nes_vt_dg(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_dg_state::vt_external_space_map_1mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::vt_external_space_map_1mbyte);
 }
 
 void nes_vt_dg_state::nes_vt_dg_baddma_16mb(machine_config& config)
 {
-
 	nes_vt_dg(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::vt_external_space_map_16mbyte);
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_dg_baddma_map);
-	m_vt_external_space->set_map(&nes_vt_dg_state::vt_external_space_map_16mbyte);
 	*/
 }
 
@@ -1379,50 +1330,39 @@ void nes_vt_hh_state::nes_vt_vg(machine_config &config)
 
 void nes_vt_hh_state::nes_vt_vg_8mb(machine_config& config)
 {
-
 	nes_vt_vg(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_8mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_8mbyte);
 }
 
 void nes_vt_hh_state::nes_vt_vg_4mb(machine_config& config)
 {
-
 	nes_vt_vg(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_4mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_4mbyte);
 }
 
 void nes_vt_hh_state::nes_vt_vg_16mb(machine_config& config)
 {
-
 	nes_vt_vg(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_16mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_16mbyte);
 }
 
 void nes_vt_hh_state::nes_vt_vg_1mb_majkon(machine_config &config)
 {
-
 	nes_vt_dg(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_1mbyte);
+
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_baddma_map);
 
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
 
-	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_1mbyte);
 	*/
-
 }
 
 
 // New mystery handheld architecture, VTxx derived
 void nes_vt_hh_state::nes_vt_hh(machine_config &config)
 {
-
 	nes_vt_4k_ram(config);
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_map);
@@ -1440,18 +1380,13 @@ void nes_vt_hh_state::nes_vt_hh_8mb(machine_config& config)
 {
 
 	nes_vt_hh(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_8mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_8mbyte);
 }
 
 void nes_vt_hh_state::nes_vt_hh_4mb(machine_config& config)
 {
-
 	nes_vt_hh(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_4mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_4mbyte);
 }
 
 static INPUT_PORTS_START( nes_vt )
@@ -1493,7 +1428,6 @@ INPUT_PORTS_END
 
 void nes_vt_hh_state::nes_vt_fp(machine_config &config)
 {
-
 	nes_vt_4k_ram(config);
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_fp_map);
@@ -1504,43 +1438,30 @@ void nes_vt_hh_state::nes_vt_fp(machine_config &config)
 
 void nes_vt_hh_state::nes_vt_fp_4x16mb(machine_config& config)
 {
-
 	nes_vt_fp(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_fp_2x32mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_fp_2x32mbyte);
 }
 
 void nes_vt_hh_state::nes_vt_fp_32mb(machine_config& config)
 {
-
 	nes_vt_fp(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_32mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_32mbyte);
 }
 
 void nes_vt_hh_state::nes_vt_fp_bigger(machine_config& config)
 {
-
 	nes_vt_fp(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_32mbyte); // must be some kind of banking, or this VT can address > 32Mbyte
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_32mbyte); // must be some kind of banking, or this VT can address > 32Mbyte
 }
 
 void nes_vt_hh_state::nes_vt_fp_16mb(machine_config& config)
 {
-
 	nes_vt_fp(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_16mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_16mbyte);
 }
 
 void nes_vt_hh_state::nes_vt_fp_pal(machine_config &config)
 {
-
 	nes_vt_4k_ram_pal(config);
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_fp_map);
@@ -1551,17 +1472,13 @@ void nes_vt_hh_state::nes_vt_fp_pal(machine_config &config)
 
 void nes_vt_hh_state::nes_vt_fp_pal_32mb(machine_config& config)
 {
-
 	nes_vt_fp_pal(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_hh_state::vt_external_space_map_32mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_32mbyte);
 }
 
 
 void nes_vt_dg_state::nes_vt_fa(machine_config &config)
 {
-
 	nes_vt_4k_ram(config);
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_fa_map);
@@ -1570,17 +1487,13 @@ void nes_vt_dg_state::nes_vt_fa(machine_config &config)
 
 void nes_vt_dg_state::nes_vt_fa_4x16mb(machine_config& config)
 {
-
 	nes_vt_fa(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_dg_state::vt_external_space_map_fapocket_4x16mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::vt_external_space_map_fapocket_4x16mbyte);
 }
 
 
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009(machine_config &config)
 {
-
 	nes_vt(config);
 	/*
 	M6502_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
@@ -1592,20 +1505,14 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009(machine_config &config)
 
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_4mb(machine_config& config)
 {
-
 	nes_vt_vh2009(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_swap_op_d5_d6_state::vt_external_space_map_4mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_4mbyte);
 }
 
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_8mb(machine_config& config)
 {
-
 	nes_vt_vh2009(config);
-	/*
-	m_vt_external_space->set_map(&nes_vt_swap_op_d5_d6_state::vt_external_space_map_8mbyte);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_8mbyte);
 }
 
 
@@ -1613,10 +1520,10 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_senwld_512kb(machine_config &config)
 {
 
 	nes_vt_vh2009(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte);
+
 	/*		
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
-
-	m_vt_external_space->set_map(&nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte);
 	*/
 }
 
