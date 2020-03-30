@@ -11,6 +11,11 @@ u32 pic16_disassembler::opcode_alignment() const
 	return 1;
 }
 
+char pic16_disassembler::fw(u16 opcode)
+{
+	return opcode & 0x80 ? 'f' : 'w';
+}
+
 std::string pic16_disassembler::freg(u16 opcode) const
 {
 	return util::string_format("f_%02x", opcode & 0x7f);
@@ -18,30 +23,51 @@ std::string pic16_disassembler::freg(u16 opcode) const
 
 std::string pic16_disassembler::imm8(u16 opcode)
 {
-	return util::string_format("%02x", opcode & 0xff);
+	if((opcode & 0xff) < 10)
+		return util::string_format("%d", opcode & 0xff);
+	else
+		return util::string_format("'h'%02x", opcode & 0xff);
 }
 
 std::string pic16_disassembler::imm7(u16 opcode)
 {
-	return util::string_format("%02x", opcode & 0x7f);
+	if((opcode & 0x7f) < 10)
+		return util::string_format("%d", opcode & 0x7f);
+	else
+		return util::string_format("'h'%02x", opcode & 0x7f);
 }
 
 std::string pic16_disassembler::imm6(u16 opcode)
 {
-	return util::string_format("%02x", opcode & 0x3f);
+	if((opcode & 0x3f) < 10)
+		return util::string_format("%d", opcode & 0x3f);
+	else
+		return util::string_format("'h'%02x", opcode & 0x3f);
 }
 
 std::string pic16_disassembler::imm6s(u16 opcode)
 {
-	if(opcode & 0x20)
-		return util::string_format("-%02x", (-opcode) & 0x1f);
-	else
-		return util::string_format("%02x", opcode & 0x1f);
+	if(opcode & 0x20) {
+		u16 a = (-opcode) & 0x1f;
+		if(a < 10)
+			return util::string_format("-%d", a);
+		else
+			return util::string_format("-%02x", a);
+	} else {
+		u16 a = opcode & 0x1f;
+		if(a < 10)
+			return util::string_format("%d", a);
+		else
+			return util::string_format("'h'%02x", a);
+	}
 }
 
 std::string pic16_disassembler::imm5(u16 opcode)
 {
-	return util::string_format("%02x", opcode & 0x1f);
+	if((opcode & 0x1f) < 10)
+		return util::string_format("%d", opcode & 0x1f);
+	else
+		return util::string_format("%02x", opcode & 0x1f);
 }
 
 std::string pic16_disassembler::rel9(u16 opcode, u16 pc)
@@ -59,48 +85,29 @@ std::string pic16_disassembler::abs11(u16 opcode, u16 pc) const
 
 #define P std::ostream &stream, const pic16_disassembler *d, u16 opcode, u16 pc
 const pic16_disassembler::instruction pic16_disassembler::instructions[] {
-	{ 0x0700, 0x3f80, [](P) -> u32 { util::stream_format(stream, "addwf %s, w",  d->freg(opcode)); return 1; } },
-	{ 0x0780, 0x3f80, [](P) -> u32 { util::stream_format(stream, "addwf %s",     d->freg(opcode)); return 1; } },
-	{ 0x3d00, 0x3f80, [](P) -> u32 { util::stream_format(stream, "addwfc %s, w", d->freg(opcode)); return 1; } },
-	{ 0x3d80, 0x3f80, [](P) -> u32 { util::stream_format(stream, "addwfc %s",    d->freg(opcode)); return 1; } },
-	{ 0x0500, 0x3f80, [](P) -> u32 { util::stream_format(stream, "andwf %s, w",  d->freg(opcode)); return 1; } },
-	{ 0x0580, 0x3f80, [](P) -> u32 { util::stream_format(stream, "andwf %s",     d->freg(opcode)); return 1; } },
-	{ 0x3700, 0x3f80, [](P) -> u32 { util::stream_format(stream, "asrf %s, w",   d->freg(opcode)); return 1; } },
-	{ 0x3780, 0x3f80, [](P) -> u32 { util::stream_format(stream, "asrf %s",      d->freg(opcode)); return 1; } },
-	{ 0x3500, 0x3f80, [](P) -> u32 { util::stream_format(stream, "lslf %s, w",   d->freg(opcode)); return 1; } },
-	{ 0x3580, 0x3f80, [](P) -> u32 { util::stream_format(stream, "lslf %s",      d->freg(opcode)); return 1; } },
-	{ 0x3600, 0x3f80, [](P) -> u32 { util::stream_format(stream, "lsrf %s, w",   d->freg(opcode)); return 1; } },
-	{ 0x3680, 0x3f80, [](P) -> u32 { util::stream_format(stream, "lsrf %s",      d->freg(opcode)); return 1; } },
-	{ 0x0180, 0x3f80, [](P) -> u32 { util::stream_format(stream, "clrf %s",      d->freg(opcode)); return 1; } },
-	{ 0x0100, 0x3ffc, [](P) -> u32 { util::stream_format(stream, "clrw"                      ); return 1; } },
-	{ 0x0900, 0x3f80, [](P) -> u32 { util::stream_format(stream, "comf %s, w",   d->freg(opcode)); return 1; } },
-	{ 0x0980, 0x3f80, [](P) -> u32 { util::stream_format(stream, "comf %s",      d->freg(opcode)); return 1; } },
-	{ 0x0300, 0x3f80, [](P) -> u32 { util::stream_format(stream, "decf %s, w",   d->freg(opcode)); return 1; } },
-	{ 0x0380, 0x3f80, [](P) -> u32 { util::stream_format(stream, "decf %s",      d->freg(opcode)); return 1; } },
-	{ 0x0a00, 0x3f80, [](P) -> u32 { util::stream_format(stream, "incf %s, w",   d->freg(opcode)); return 1; } },
-	{ 0x0a80, 0x3f80, [](P) -> u32 { util::stream_format(stream, "incf %s",      d->freg(opcode)); return 1; } },
-	{ 0x0400, 0x3f80, [](P) -> u32 { util::stream_format(stream, "iorwf %s, w",  d->freg(opcode)); return 1; } },
-	{ 0x0480, 0x3f80, [](P) -> u32 { util::stream_format(stream, "iorwf %s",     d->freg(opcode)); return 1; } },
-	{ 0x0800, 0x3f80, [](P) -> u32 { util::stream_format(stream, "movf %s, w",   d->freg(opcode)); return 1; } },
-	{ 0x0880, 0x3f80, [](P) -> u32 { util::stream_format(stream, "movf %s",      d->freg(opcode)); return 1; } },
-	{ 0x0080, 0x3f80, [](P) -> u32 { util::stream_format(stream, "movwf %s",     d->freg(opcode)); return 1; } },
-	{ 0x0d00, 0x3f80, [](P) -> u32 { util::stream_format(stream, "rlf %s, w",    d->freg(opcode)); return 1; } },
-	{ 0x0d80, 0x3f80, [](P) -> u32 { util::stream_format(stream, "rlf %s",       d->freg(opcode)); return 1; } },
-	{ 0x0c00, 0x3f80, [](P) -> u32 { util::stream_format(stream, "rrf %s, w",    d->freg(opcode)); return 1; } },
-	{ 0x0c80, 0x3f80, [](P) -> u32 { util::stream_format(stream, "rrf %s",       d->freg(opcode)); return 1; } },
-	{ 0x0200, 0x3f80, [](P) -> u32 { util::stream_format(stream, "subwf %s, w",  d->freg(opcode)); return 1; } },
-	{ 0x0280, 0x3f80, [](P) -> u32 { util::stream_format(stream, "subwf %s",     d->freg(opcode)); return 1; } },
-	{ 0x3b00, 0x3f80, [](P) -> u32 { util::stream_format(stream, "subwfb %s, w", d->freg(opcode)); return 1; } },
-	{ 0x3b80, 0x3f80, [](P) -> u32 { util::stream_format(stream, "subwfb %s",    d->freg(opcode)); return 1; } },
-	{ 0x0e00, 0x3f80, [](P) -> u32 { util::stream_format(stream, "swapf %s, w",  d->freg(opcode)); return 1; } },
-	{ 0x0e80, 0x3f80, [](P) -> u32 { util::stream_format(stream, "swapf %s",     d->freg(opcode)); return 1; } },
-	{ 0x0600, 0x3f80, [](P) -> u32 { util::stream_format(stream, "xorwf %s, w",  d->freg(opcode)); return 1; } },
-	{ 0x0680, 0x3f80, [](P) -> u32 { util::stream_format(stream, "xorwf %s",     d->freg(opcode)); return 1; } },
+	{ 0x0700, 0x3f00, [](P) -> u32 { util::stream_format(stream, "addwf %s, %c",  d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x3d00, 0x3f00, [](P) -> u32 { util::stream_format(stream, "addwfc %s, %c", d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x0500, 0x3f00, [](P) -> u32 { util::stream_format(stream, "andwf %s, %c",  d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x3700, 0x3f00, [](P) -> u32 { util::stream_format(stream, "asrf %s, %c",   d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x3500, 0x3f00, [](P) -> u32 { util::stream_format(stream, "lslf %s, %c",   d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x3600, 0x3f00, [](P) -> u32 { util::stream_format(stream, "lsrf %s, %c",   d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x0180, 0x3f80, [](P) -> u32 { util::stream_format(stream, "clrf %s",       d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x0100, 0x3ffc, [](P) -> u32 { util::stream_format(stream, "clrw"                                      ); return 1; } },
+	{ 0x0900, 0x3f00, [](P) -> u32 { util::stream_format(stream, "comf %s, %c",   d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x0300, 0x3f00, [](P) -> u32 { util::stream_format(stream, "decf %s, %c",   d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x0a00, 0x3f00, [](P) -> u32 { util::stream_format(stream, "incf %s, %c",   d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x0400, 0x3f00, [](P) -> u32 { util::stream_format(stream, "iorwf %s, %c",  d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x0800, 0x3f00, [](P) -> u32 { util::stream_format(stream, "movf %s, %c",   d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x0080, 0x3f80, [](P) -> u32 { util::stream_format(stream, "movwf %s",      d->freg(opcode)            ); return 1; } },
+	{ 0x0d00, 0x3f00, [](P) -> u32 { util::stream_format(stream, "rlf %s, %c",    d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x0c00, 0x3f00, [](P) -> u32 { util::stream_format(stream, "rrf %s, %c",    d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x0200, 0x3f00, [](P) -> u32 { util::stream_format(stream, "subwf %s, %c",  d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x3b00, 0x3f00, [](P) -> u32 { util::stream_format(stream, "subwfb %s, %c", d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x0e00, 0x3f00, [](P) -> u32 { util::stream_format(stream, "swapf %s, %c",  d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x0600, 0x3f00, [](P) -> u32 { util::stream_format(stream, "xorwf %s, %c",  d->freg(opcode), fw(opcode)); return 1; } },
 
-	{ 0x0b00, 0x3f80, [](P) -> u32 { util::stream_format(stream, "decfsz %s, w", d->freg(opcode)); return 1; } },
-	{ 0x0b80, 0x3f80, [](P) -> u32 { util::stream_format(stream, "decfsz %s",    d->freg(opcode)); return 1; } },
-	{ 0x0f00, 0x3f80, [](P) -> u32 { util::stream_format(stream, "incfsz %s, w", d->freg(opcode)); return 1; } },
-	{ 0x0f80, 0x3f80, [](P) -> u32 { util::stream_format(stream, "incfsz %s",    d->freg(opcode)); return 1; } },
+	{ 0x0b00, 0x3f00, [](P) -> u32 { util::stream_format(stream, "decfsz %s, %c", d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x0f00, 0x3f00, [](P) -> u32 { util::stream_format(stream, "incfsz %s, %c", d->freg(opcode), fw(opcode)); return 1; } },
 
 	{ 0x1000, 0x3c00, [](P) -> u32 { util::stream_format(stream, "bcf %d, %s",   (opcode >> 7) & 7, d->freg(opcode)); return 1; } },
 	{ 0x1400, 0x3c00, [](P) -> u32 { util::stream_format(stream, "bsf %d, %s",   (opcode >> 7) & 7, d->freg(opcode)); return 1; } },

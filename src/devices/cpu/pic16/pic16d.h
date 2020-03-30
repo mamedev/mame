@@ -27,6 +27,7 @@ private:
 	static const instruction instructions[];
 
 	std::string freg(u16 opcode) const;
+	static char fw(u16 opcode);
 	static std::string imm8(u16 opcode);
 	static std::string imm7(u16 opcode);
 	static std::string imm6(u16 opcode);
