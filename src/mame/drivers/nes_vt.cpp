@@ -1063,7 +1063,7 @@ void nes_vt_dg_state::nes_vt_fa_map(address_map &map)
 }
 
 
-#if 0
+
 
 /* not strictly needed, but helps us see where things are in ROM to aid with figuring out banking schemes*/
 static const gfx_layout helper_layout =
@@ -1092,7 +1092,6 @@ static GFXDECODE_START( vt03_gfx_helper )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_layout,  0x0, 2  )
 	GFXDECODE_ENTRY( "mainrom", 0, helper2_layout,  0x0, 2  )
 GFXDECODE_END
-#endif
 
 void nes_vt_state::nes_vt_base(machine_config &config)
 {
@@ -1115,7 +1114,7 @@ void nes_vt_state::nes_vt_base(machine_config &config)
 //	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 //	m_screen->set_screen_update(FUNC(nes_vt_state::screen_update));
 
-//	GFXDECODE(config, "gfxdecode", "ppu", vt03_gfx_helper);
+	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
 
 //	PPU_VT03(config, m_ppu, N2A03_NTSC_XTAL);
 //	m_ppu->set_cpu_tag(m_maincpu);
