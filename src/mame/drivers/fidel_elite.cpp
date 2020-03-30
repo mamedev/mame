@@ -46,7 +46,7 @@ it doesn't have the 8255 PPI, but has more RAM(7*TMM2016P). Some were released a
 3.6MHz instead of 4MHz, perhaps due to hardware instability? Opening module PC16 was
 included by default, this module is the same as CB16 but at different form factor.
 
-Elite Avant Garde (models 6081,6088,6089) is on the same hardware as EAS.
+Elite Avant Garde (models 6081,6088,6089) is on similar hardware as EAS.
 
 Fidelity Elite Private Line were EAS/EAG conversions released by Fidelity Deutschland.
 The "Elite Privat" was probably for the local market and the "Private Line" for export.
@@ -503,12 +503,12 @@ void eag_state::eag2100(machine_config &config)
 
 ROM_START( feasbu )
 	ROM_REGION( 0x10000, "mainmap", 0 )
-	ROM_LOAD("eli_bu.6", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) ) // ST M27C64A, unknown label
+	ROM_LOAD("mh_6", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) ) // ST M27C64A
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
 	ROM_CONTINUE( 0x9800, 0x0800 )
-	ROM_LOAD("101-1052a02.5", 0xc000, 0x2000, CRC(859d69f1) SHA1(a8b057683369e2387f22fc7e916b6f3c75d44b21) ) // Mostek MK36C63N-5
-	ROM_LOAD("101-1052a01.4", 0xe000, 0x2000, CRC(571a33a7) SHA1(43b110cf0918caf16643178f401e58b2dc73894f) ) // Mostek MK36C63N-5
+	ROM_LOAD("101-1052a02", 0xc000, 0x2000, CRC(859d69f1) SHA1(a8b057683369e2387f22fc7e916b6f3c75d44b21) ) // Mostek MK36C63N-5
+	ROM_LOAD("101-1052a01", 0xe000, 0x2000, CRC(571a33a7) SHA1(43b110cf0918caf16643178f401e58b2dc73894f) ) // Mostek MK36C63N-5
 
 	// speech ROM
 	ROM_DEFAULT_BIOS("en")
@@ -533,15 +533,15 @@ ROM_END
 
 ROM_START( feasgla )
 	ROM_REGION( 0x10000, "mainmap", 0 )
-	ROM_LOAD("4,0_8.6", 0x8000, 0x0800, CRC(32784e2d) SHA1(dae060a5c49cc1993a78db293cd80464adfd892d) )
+	ROM_LOAD("4,0_8_6", 0x8000, 0x0800, CRC(32784e2d) SHA1(dae060a5c49cc1993a78db293cd80464adfd892d) )
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
 	ROM_CONTINUE( 0x9800, 0x0800 )
-	ROM_LOAD("c.5", 0xc000, 0x0800, CRC(ddb80412) SHA1(b1d9435d9a71b8eb241a2169bfbaa0499f510769) )
+	ROM_LOAD("c_5", 0xc000, 0x0800, CRC(ddb80412) SHA1(b1d9435d9a71b8eb241a2169bfbaa0499f510769) )
 	ROM_CONTINUE( 0xd000, 0x0800 )
 	ROM_CONTINUE( 0xc800, 0x0800 )
 	ROM_CONTINUE( 0xd800, 0x0800 )
-	ROM_LOAD("4,0_e.4", 0xe000, 0x0800, CRC(62a5305a) SHA1(a361bd9a54b903d7b0fbacabe55ea5ccbbc1dc51) )
+	ROM_LOAD("4,0_e_4", 0xe000, 0x0800, CRC(62a5305a) SHA1(a361bd9a54b903d7b0fbacabe55ea5ccbbc1dc51) )
 	ROM_CONTINUE( 0xf000, 0x0800 )
 	ROM_CONTINUE( 0xe800, 0x0800 )
 	ROM_CONTINUE( 0xf800, 0x0800 )
@@ -569,15 +569,15 @@ ROM_END
 
 ROM_START( feasglaa )
 	ROM_REGION( 0x10000, "mainmap", 0 )
-	ROM_LOAD("eli_gla.6", 0x8000, 0x0800, CRC(2fdddb4f) SHA1(6da0a328a45462f285ae6a0756f97c5a43148f97) )
+	ROM_LOAD("p6", 0x8000, 0x0800, CRC(2fdddb4f) SHA1(6da0a328a45462f285ae6a0756f97c5a43148f97) )
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
 	ROM_CONTINUE( 0x9800, 0x0800 )
-	ROM_LOAD("eli_gla.5", 0xc000, 0x0800, CRC(f094e625) SHA1(fef84c6a3da504aac15988ec9af94417e5fedfbd) )
+	ROM_LOAD("p5", 0xc000, 0x0800, CRC(f094e625) SHA1(fef84c6a3da504aac15988ec9af94417e5fedfbd) )
 	ROM_CONTINUE( 0xd000, 0x0800 )
 	ROM_CONTINUE( 0xc800, 0x0800 )
 	ROM_CONTINUE( 0xd800, 0x0800 )
-	ROM_LOAD("eli_gla.4", 0xe000, 0x0800, CRC(5f6845d1) SHA1(684eb16faf36a49560e5a73b55fd0022dc090e35) )
+	ROM_LOAD("p4", 0xe000, 0x0800, CRC(5f6845d1) SHA1(684eb16faf36a49560e5a73b55fd0022dc090e35) )
 	ROM_CONTINUE( 0xf000, 0x0800 )
 	ROM_CONTINUE( 0xe800, 0x0800 )
 	ROM_CONTINUE( 0xf800, 0x0800 )

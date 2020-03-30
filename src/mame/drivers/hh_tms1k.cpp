@@ -72,7 +72,7 @@
  @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
- *MP3260   TMS1000   1979, Electroplay Quickfire
+ @MP3260   TMS1000   1979, Electroplay Quickfire
  @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  @MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
@@ -223,6 +223,7 @@
 #include "mmerlin.lh" // clickable
 #include "monkeysee.lh"
 #include "phpball.lh"
+#include "qfire.lh" // clickable
 #include "quizwizc.lh"
 #include "raisedvl.lh"
 #include "simon.lh" // clickable
@@ -2282,7 +2283,7 @@ ROM_START( quizwizc )
 	ROM_LOAD( "m32001", 0x0000, 0x0400, CRC(053657eb) SHA1(38c84f7416f79aa679f434a3d35df54cd9aa528a) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
+	ROM_LOAD( "tms1000_common4_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_quizwizc_output.pla", 0, 365, CRC(475b7053) SHA1(8f61bf736eb41d7029a6b165cc0a184ba0a70a2a) )
 ROM_END
@@ -3140,6 +3141,122 @@ ROM_START( eleciq )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_eleciq_output.pla", 0, 365, CRC(b8e04232) SHA1(22eed6d9b1fb1e5c9974ea3df16cda71a39aad57) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Electroplay Quickfire
+  * TMS1000NLL MP3260 (die label same)
+  * 2 7seg LEDs, 5 lamps, 3 lightsensors, lightgun
+
+  To play it in MAME, either use the clickable artwork with -mouse, or set
+  button 1 to "Z or X or C" and each lightsensor to one of those keys.
+  Although the game seems mostly playable without having to use the gun trigger
+
+***************************************************************************/
+
+class qfire_state : public hh_tms1k_state
+{
+public:
+	qfire_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+	void qfire(machine_config &config);
+};
+
+// handlers
+
+WRITE16_MEMBER(qfire_state::write_r)
+{
+	// R1,R2,R5: input mux
+	m_inp_mux = (data >> 1 & 3) | (data >> 3 & 4);
+
+	// R3,R4,R6-R8: leds (direct)
+	m_display->write_row(2, (data >> 3 & 3) | (data >> 4 & 0x1c));
+	m_display->update();
+
+	// R9: speaker out
+	m_speaker->level_w(data >> 9 & 1);
+}
+
+WRITE16_MEMBER(qfire_state::write_o)
+{
+	// O0: 1st digit "1"
+	// O1-O7: 2nd digit segments
+	m_display->write_row(0, (data & 1) ? 6 : 0);
+	m_display->write_row(1, data >> 1 & 0x7f);
+	m_display->update();
+}
+
+READ8_MEMBER(qfire_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(3);
+}
+
+// config
+
+static INPUT_PORTS_START( qfire )
+	PORT_START("IN.0") // R1
+	PORT_CONFNAME( 0x0f, 0x00, "Game" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x08, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+	PORT_CONFSETTING(    0x02, "4" )
+	PORT_CONFSETTING(    0x01, "5" )
+	PORT_CONFSETTING(    0x06, "6" )
+
+	PORT_START("IN.1") // R2
+	PORT_CONFNAME( 0x07, 0x04, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x04, "A" )
+	PORT_CONFSETTING(    0x02, "B" )
+	PORT_CONFSETTING(    0x01, "C" )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Lightsensor 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Lightsensor 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Lightsensor 3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // lightgun trigger, also turns on lightgun lamp
+INPUT_PORTS_END
+
+void qfire_state::qfire(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=39K, C=47pF
+	m_maincpu->k().set(FUNC(qfire_state::read_k));
+	m_maincpu->r().set(FUNC(qfire_state::write_r));
+	m_maincpu->o().set(FUNC(qfire_state::write_o));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(3, 7);
+	m_display->set_segmask(3, 0x7f);
+	config.set_default_layout(layout_qfire);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( qfire )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3260", 0x0000, 0x0400, CRC(f6e28376) SHA1(6129584c55a1629b458694cdc97edccb77ab00ba) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_qfire_output.pla", 0, 365, CRC(8f7668a9) SHA1(c8faeff0f88bfea8f032ce5bc583f049e8930c11) )
 ROM_END
 
 
@@ -7006,7 +7123,7 @@ ROM_START( simon )
 	ROM_LOAD( "tms1000.u1", 0x0000, 0x0400, CRC(9961719d) SHA1(35dddb018a8a2b31f377ab49c1f0cb76951b81c0) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_simon_micro.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
+	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
 	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
 	ROM_LOAD( "tms1000_simon_output.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
 ROM_END
@@ -7016,7 +7133,7 @@ ROM_START( simonf )
 	ROM_LOAD( "mp3300", 0x0000, 0x0400, CRC(b9fcf93a) SHA1(45960e4242a08495f2a99fc5d44728eabd93cd9f) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_simon_micro.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
+	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
 	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
 	ROM_LOAD( "tms1000_simon_output.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
 ROM_END
@@ -7369,7 +7486,7 @@ ROM_START( bigtrak )
 	ROM_LOAD( "mp3301a", 0x0000, 0x0400, CRC(1351bcdd) SHA1(68865389c25b541c09a742be61f8fb6488134d4e) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
+	ROM_LOAD( "tms1000_common4_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_bigtrak_output.pla", 0, 365, CRC(63be45f6) SHA1(918e38a223152db883c1a6f7acf56e87d7074734) )
 ROM_END
@@ -12305,6 +12422,8 @@ CONS( 1979, cmsport,    0,         0, cmsport,   cmsport,   cmsport_state,   emp
 CONS( 1979, cnfball,    0,         0, cnfball,   cnfball,   cnfball_state,   empty_init, "Conic", "Electronic Football (Conic, TMS1000 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, cnfball2,   0,         0, cnfball2,  cnfball2,  cnfball2_state,  empty_init, "Conic", "Electronic Football II (Conic)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, eleciq,     0,         0, eleciq,    eleciq,    eleciq_state,    empty_init, "Conic", "Electronic I.Q.", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1979, qfire,      0,         0, qfire,     qfire,     qfire_state,     empty_init, "Electroplay", "Quickfire", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, esoccer,    0,         0, esoccer,   esoccer,   esoccer_state,   empty_init, "Entex", "Electronic Soccer (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, ebball,     0,         0, ebball,    ebball,    ebball_state,    empty_init, "Entex", "Electronic Baseball (Entex)", MACHINE_SUPPORTS_SAVE )
