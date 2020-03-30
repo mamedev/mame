@@ -17,7 +17,6 @@
 
 #include <cmath>
 
-
 constexpr float lerp(float a, float b, float f)
 {
 	return (b - a) * f + a;
@@ -32,6 +31,16 @@ constexpr float lerp(float a, float b, float f)
 DEFINE_DEVICE_TYPE(VGMVIZ, vgmviz_device, "vgmviz", "VGM Visualizer")
 
 
+
+/*static*/ const bool vgmviz_device::NEEDS_FFT[VIZ_COUNT] =
+{
+	false,	// VIZ_WAVEFORM
+	true,	// VIZ_WATERFALL
+	true,	// VIZ_RAWSPEC
+	true,	// VIZ_BARSPEC4
+	true,	// VIZ_BARSPEC8
+	true	// VIZ_BARSPEC16
+};
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -147,23 +156,17 @@ void vgmviz_device::apply_fft()
 void vgmviz_device::apply_waterfall()
 {
 	int total_bars = FFT_LENGTH / 2;
-	int bar_step = total_bars / 256;
 	WDL_FFT_COMPLEX* bins[2] = { (WDL_FFT_COMPLEX*)m_fft_buf[0], (WDL_FFT_COMPLEX*)m_fft_buf[1] };
-	int bar_index = 0;
-	for (int bar = 0; bar < 256; bar++, bar_index += bar_step)
+	for (int bar = 0; bar < std::min<int>(total_bars, SCREEN_HEIGHT); bar++)
 	{
-		if (bar_index < 2)
+		if (bar < 2)
 		{
 			continue;
 		}
-		float val = 0.0f;
-		for (int i = 0; i < bar_step; i++)
-		{
-			int permuted = WDL_fft_permute(FFT_LENGTH / 2, (bar * bar_step) + i);
-			val = std::max<WDL_FFT_REAL>(bins[0][permuted].re + bins[1][permuted].re, val);
-		}
+		int permuted = WDL_fft_permute(FFT_LENGTH / 2, bar);
+		float val = bins[0][permuted].re + bins[1][permuted].re;
 		int level = int(logf(val * 32768.0f) * 31.0f);
-		m_waterfall_buf[m_waterfall_length % (FFT_LENGTH / 2 + 16)][255 - bar] = (level < 0) ? 0 : (level > 255 ? 255 : level);
+		m_waterfall_buf[m_waterfall_length % SCREEN_WIDTH][total_bars - bar] = (level < 0) ? 0 : (level > 255 ? 255 : level);
 	}
 	m_waterfall_length++;
 }
@@ -242,28 +245,31 @@ void vgmviz_device::device_reset()
 	memset(m_curr_peaks, 0, sizeof(float) * 2);
 
 	m_waterfall_length = 0;
-	for (int i = 0; i < 1024; i++)
+	for (int i = 0; i < SCREEN_WIDTH; i++)
 	{
 		memset(m_waterfall_buf[i], 0, sizeof(int) * 256);
 	}
 
-	m_spec_mode = SPEC_RAW;
+	m_viz_mode = VIZ_WAVEFORM;
+
+	m_history_length = 0;
 }
 
 
 //-------------------------------------------------
-//  cycle_spectrogram - cycle the spectrogram mode
-//  among the valid spectrogram modes.
+//  cycle_spectrogram - cycle the visualization
+//  mode among the valid modes.
 //-------------------------------------------------
 
-void vgmviz_device::cycle_spectrogram()
+void vgmviz_device::cycle_viz_mode()
 {
-	m_spec_mode = (spec_mode)((int)m_spec_mode + 1);
-	if (m_spec_mode == SPEC_COUNT)
+	m_viz_mode = (viz_mode)((int)m_viz_mode + 1);
+	if (m_viz_mode == VIZ_COUNT)
 	{
-		m_spec_mode = SPEC_RAW;
+		m_viz_mode = VIZ_WAVEFORM;
 	}
 }
+
 
 //-------------------------------------------------
 //  sound_stream_update - update the outgoing
@@ -291,26 +297,67 @@ void vgmviz_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		for (int i = 0; i < m_outputs; i++)
 		{
-			m_audio_buf[m_audio_fill_index][i][m_audio_count[m_audio_fill_index]] = (outputs[i][pos] + 32768.0f) / 65336.0f;
+			const float sample = (float)(int16_t)outputs[i][pos] / 65336.0f;
+			m_audio_buf[m_audio_fill_index][i][m_audio_count[m_audio_fill_index]] = sample + 0.5f;
 		}
 
-		m_audio_count[m_audio_fill_index]++;
-		if (m_audio_count[m_audio_fill_index] >= FFT_LENGTH)
+		switch (m_viz_mode)
 		{
-			apply_window(m_audio_fill_index);
-			apply_fft();
-			apply_waterfall();
-
-			m_audio_fill_index = 1 - m_audio_fill_index;
-			if (m_audio_frames_available < 2)
-			{
-				m_audio_frames_available++;
-			}
-			m_audio_count[m_audio_fill_index] = 0;
+		default:
+			update_waveform(outputs);
+			break;
+		case VIZ_WATERFALL:
+		case VIZ_RAWSPEC:
+		case VIZ_BARSPEC4:
+		case VIZ_BARSPEC8:
+		case VIZ_BARSPEC16:
+			update_fft(outputs);
+			break;
 		}
 	}
 }
 
+
+//-------------------------------------------------
+//  update_waveform - perform a wave-style update
+//-------------------------------------------------
+
+void vgmviz_device::update_waveform(stream_sample_t **outputs)
+{
+	m_history_length++;
+	m_audio_count[m_audio_fill_index]++;
+	if (m_audio_count[m_audio_fill_index] >= FFT_LENGTH)
+	{
+		m_audio_fill_index = 1 - m_audio_fill_index;
+		if (m_audio_frames_available < 2)
+		{
+			m_audio_frames_available++;
+		}
+		m_audio_count[m_audio_fill_index] = 0;
+	}
+}
+
+//-------------------------------------------------
+//  update_fft - keep the FFT up-to-date
+//-------------------------------------------------
+
+void vgmviz_device::update_fft(stream_sample_t **outputs)
+{
+	m_audio_count[m_audio_fill_index]++;
+	if (m_audio_count[m_audio_fill_index] >= FFT_LENGTH)
+	{
+		apply_window(m_audio_fill_index);
+		apply_fft();
+		apply_waterfall();
+
+		m_audio_fill_index = 1 - m_audio_fill_index;
+		if (m_audio_frames_available < 2)
+		{
+			m_audio_frames_available++;
+		}
+		m_audio_count[m_audio_fill_index] = 0;
+	}
+}
 
 //-------------------------------------------------
 //  init_palette - initialize the palette
@@ -422,8 +469,8 @@ void vgmviz_device::device_add_mconfig(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(FFT_LENGTH / 2 + 16, 768);
-	m_screen->set_visarea(0, FFT_LENGTH / 2 + 15, 0, 767);
+	m_screen->set_size(SCREEN_WIDTH, SCREEN_HEIGHT);
+	m_screen->set_visarea(0, SCREEN_WIDTH-1, 0, SCREEN_HEIGHT-1);
 	m_screen->set_screen_update(FUNC(vgmviz_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(vgmviz_device::init_palette), 512 + FFT_LENGTH / 2 + 1);
@@ -438,11 +485,33 @@ uint32_t vgmviz_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 {
 	bitmap.fill(0, cliprect);
 
+	switch (m_viz_mode)
+	{
+	default:
+		draw_waveform(bitmap);
+		break;
+	case VIZ_WATERFALL:
+		draw_waterfall(bitmap);
+		break;
+	case VIZ_RAWSPEC:
+	case VIZ_BARSPEC4:
+	case VIZ_BARSPEC8:
+	case VIZ_BARSPEC16:
+		draw_spectrogram(bitmap);
+		break;
+	}
+	return 0;
+}
+
+void vgmviz_device::draw_spectrogram(bitmap_rgb32 &bitmap)
+{
+	const pen_t *pal = m_palette->pens();
+	const int black_idx = (512 + FFT_LENGTH / 2);
+
+	/*
 	find_levels();
 
-	const pen_t *pal = m_palette->pens();
 	int chan_x = 0;
-	const int black_idx = (512 + FFT_LENGTH / 2);
 	for (int chan = 0; chan < 2; chan++)
 	{
 		int level = int(m_curr_levels[chan] * 255.0f);
@@ -460,27 +529,28 @@ uint32_t vgmviz_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		chan_x += 8;
 		m_curr_peaks[chan] *= 0.99f;
 	}
+	*/
 
 	int bar_size = 1;
-	switch (m_spec_mode)
+	switch (m_viz_mode)
 	{
 	default:
 		bar_size = 1;
 		break;
-	case SPEC_BAR4:
+	case VIZ_BARSPEC4:
 		bar_size = 4;
 		break;
-	case SPEC_BAR8:
+	case VIZ_BARSPEC8:
 		bar_size = 8;
 		break;
-	case SPEC_BAR16:
+	case VIZ_BARSPEC16:
 		bar_size = 16;
 		break;
 	}
 
 	int total_bars = FFT_LENGTH / 2;
 	WDL_FFT_COMPLEX *bins[2] = { (WDL_FFT_COMPLEX *)m_fft_buf[0], (WDL_FFT_COMPLEX *)m_fft_buf[1] };
-	for (int bar = 0; bar < total_bars; bar += bar_size)
+	for (int bar = 0; bar < total_bars && bar < SCREEN_WIDTH; bar += bar_size)
 	{
 		if (bar < 2)
 		{
@@ -492,37 +562,96 @@ uint32_t vgmviz_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			int permuted = WDL_fft_permute(FFT_LENGTH/2, bar + sub_bar);
 			max_val = std::max<float>((bins[0][permuted].re + bins[1][permuted].re) * 0.5f, max_val);
 		}
-		int level = int(logf(max_val * 32768.0f) * 63.0f);
-		for (int y = 0; y < 512; y++)
+		int level = int(logf(max_val * 32768.0f) * 96.0f);
+		for (int y = 0; y < SCREEN_HEIGHT; y++)
 		{
-			int bar_y = 511 - y;
-			uint32_t *line = &bitmap.pix32(y + 256);
+			int bar_y = SCREEN_HEIGHT - y;
+			uint32_t *line = &bitmap.pix32(y);
 			bool lit = bar_y <= level;
 			const int x_limit = bar_size == 1 ? 1 : bar_size - 1;
 			for (int x = 0; x < x_limit; x++)
 			{
-				line[(bar - 2) + x + 16] = pal[lit ? (256 + bar) : black_idx];
+				line[(bar - 2) + x] = pal[lit ? (256 + bar) : black_idx];
 			}
 		}
 	}
+}
 
-	const int width = FFT_LENGTH / 2 + 16;
-	for (int y = 0; y < 256; y++)
+void vgmviz_device::draw_waterfall(bitmap_rgb32 &bitmap)
+{
+	const pen_t *pal = m_palette->pens();
+	float tex_height = ((float)FFT_LENGTH / 2) - 1.0f;
+	for (int y = 0; y < SCREEN_HEIGHT; y++)
 	{
+		const float v0 = (float)y / SCREEN_HEIGHT;
+		const float v1 = (float)(y + 1) / SCREEN_HEIGHT;
+		const float v0h = v0 * tex_height;
+		const float v1h = v1 * tex_height;
+		const int v0_index = (int)v0h;
+		const int v1_index = (int)v1h;
+		const float interp = v0h - (float)v0_index;
 		uint32_t* line = &bitmap.pix32(y);
-		for (int x = 0; x < width; x++)
+		for (int x = 0; x < SCREEN_WIDTH; x++)
 		{
-			if (m_waterfall_length < width)
+			if (m_waterfall_length < SCREEN_WIDTH)
 			{
-				const int sample = m_waterfall_buf[x][y];
+				const float s0 = m_waterfall_buf[x][v0_index];
+				const float s1 = m_waterfall_buf[x][v1_index];
+				const int sample = (int)std::round(lerp(s0, s1, interp));
 				*line++ = pal[256 + FFT_LENGTH / 2 + sample];
 			}
 			else
 			{
-				const int sample = m_waterfall_buf[((m_waterfall_length - width) + x) % width][y];
+				const int x_index = ((m_waterfall_length - SCREEN_WIDTH) + x) % SCREEN_WIDTH;
+				const float s0 = m_waterfall_buf[x_index][v0_index];
+				const float s1 = m_waterfall_buf[x_index][v1_index];
+				const int sample = (int)std::round(lerp(s0, s1, interp));
 				*line++ = pal[256 + FFT_LENGTH / 2 + sample];
 			}
 		}
 	}
-	return 0;
+}
+
+void vgmviz_device::draw_waveform(bitmap_rgb32 &bitmap)
+{
+	static const uint32_t MED_GRAY = 0xff7f7f7f;
+	static const uint32_t WHITE = 0xffffffff;
+	static const uint32_t LEFT_COLOR = 0xffbf0000;
+	static const uint32_t RIGHT_COLOR = 0xff00bf00;
+	static const int CHANNEL_HEIGHT = (SCREEN_HEIGHT / 2) - 1;
+	static const int CHANNEL_CENTER = CHANNEL_HEIGHT / 2;
+
+	if (m_audio_frames_available == 0)
+		return;
+
+	for (int x = 0; x < SCREEN_WIDTH; x++)
+	{
+		bitmap.pix32(CHANNEL_CENTER, x) = MED_GRAY;
+		bitmap.pix32(CHANNEL_HEIGHT + 1 + CHANNEL_CENTER, x) = MED_GRAY;
+
+		const float raw_l = m_audio_buf[1 - m_audio_fill_index][0][((int)m_history_length + 1 + x) % FFT_LENGTH];
+		const int sample_l = (int)((raw_l - 0.5f) * (CHANNEL_HEIGHT - 1));
+		const int dy_l = (sample_l == 0) ? 0 : ((sample_l < 0) ? -1 : 1);
+		const int endy_l = CHANNEL_CENTER;
+		int y = endy_l - sample_l;
+		do
+		{
+			bitmap.pix32(y, x) = LEFT_COLOR;
+			y += dy_l;
+		} while(y != endy_l);
+
+		const float raw_r = m_audio_buf[1 - m_audio_fill_index][1][((int)m_history_length + 1 + x) % FFT_LENGTH];
+		const int sample_r = (int)((raw_r - 0.5f) * (CHANNEL_HEIGHT - 1));
+		const int dy_r = (sample_r == 0) ? 0 : ((sample_r < 0) ? -1 : 1);
+		const int endy_r = CHANNEL_HEIGHT + 1 + CHANNEL_CENTER;
+		y = endy_r - sample_r;
+		do
+		{
+			bitmap.pix32(y, x) = RIGHT_COLOR;
+			y += dy_r;
+		} while(y != endy_r);
+
+		bitmap.pix32(CHANNEL_HEIGHT, x) = WHITE;
+		bitmap.pix32(CHANNEL_HEIGHT + 1, x) = WHITE;
+	}
 }
