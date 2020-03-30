@@ -64,7 +64,8 @@ std::pair<u16, char const *> const m68hc705c8a_syms[] = {
 	{ 0x0014, "ICRH"   }, { 0x0015, "ICRL"  }, { 0x0016, "OCRH"  }, { 0x0017, "OCRL"  },
 	{ 0x0018, "TRH"    }, { 0x0019, "TRL"   }, { 0x001a, "ATRH"  }, { 0x001b, "ATRL"  },
 	{ 0x001c, "PROG"   },
-	{ 0x001d, "COPRST" }, { 0x001e, "COPCR" } };
+	{ 0x001d, "COPRST" }, { 0x001e, "COPCR" },
+	{ 0x1fdf, "OPTION" } };
 
 std::pair<u16, char const *> const m68hc705j1a_syms[] = {
 	{ 0x0000, "PORTA"  }, { 0x0001, "PORTB" },
@@ -908,12 +909,12 @@ void m68hc705c8a_device::c8a_map(address_map &map)
 	map(0x001d, 0x001d).w(FUNC(m68hc705c8a_device::coprst_w));
 	map(0x001e, 0x001e).rw(FUNC(m68hc705c8a_device::copcr_r), FUNC(m68hc705c8a_device::copcr_w));
 	// 0x001f unused
-	map(0x0020, 0x004f).rom();                                 // user PROM FIXME: banked with RAM
+	map(0x0020, 0x004f).rw(FUNC(m68hc705c8a_device::ram0_r), FUNC(m68hc705c8a_device::ram0_w)); // PROM/RAM
 	map(0x0050, 0x00ff).ram();                                 // RAM/stack
-	map(0x0100, 0x015f).rom();                                 // user PROM FIXME: banked with RAM
+	map(0x0100, 0x015f).rw(FUNC(m68hc705c8a_device::ram1_r), FUNC(m68hc705c8a_device::ram1_w)); // PROM/RAM
 	map(0x0160, 0x1eff).rom();                                 // user PROM
 	map(0x1f00, 0x1fde).rom().region("bootstrap", 0x0000);  // bootloader
-	// 0x1fdf option register FIXME: controls banking
+	map(0x1fdf, 0x1fdf).lw8(NAME([this] (u8 data) { m_option = data; }));
 	map(0x1fe0, 0x1fef).rom().region("bootstrap", 0x00e0);  // boot ROM vectors
 	map(0x1ff0, 0x1ff0).w(FUNC(m68hc705c8a_device::copr_w));
 	map(0x1ff0, 0x1fff).rom();                                 // user vectors
@@ -929,6 +930,7 @@ m68hc705c8a_device::m68hc705c8a_device(machine_config const &mconfig, char const
 			M68HC705C8A,
 			13,
 			address_map_constructor(FUNC(m68hc705c8a_device::c8a_map), this))
+	, m_rom(*this, DEVICE_SELF, 0x2000)
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }
@@ -948,6 +950,14 @@ void m68hc705c8a_device::device_start()
 	add_timer_state();
 	add_pcop_state();
 	add_ncop_state();
+
+	state_add(M68HC705C8A_OPTION, "OPTION", m_option).mask(0xff);
+
+	save_item(NAME(m_ram));
+	save_item(NAME(m_option));
+
+	// clear RAM
+	std::fill(std::begin(m_ram), std::end(m_ram), 0x00);
 }
 
 void m68hc705c8a_device::device_reset()
@@ -957,12 +967,44 @@ void m68hc705c8a_device::device_reset()
 	// latch MOR registers on reset
 	set_port_interrupt(std::array<u8, PORT_COUNT>{{ 0x00, u8(rdmem(0xfff0)), 0x00, 0x00 }});
 	set_ncope(BIT(rdmem(0xfff1), 0));
+
+	// RAM disabled, IRQ negative edge and level sensitive
+	m_option = 0x02;
 }
 
 
 std::unique_ptr<util::disasm_interface> m68hc705c8a_device::create_disassembler()
 {
 	return std::make_unique<m68hc05_disassembler>(m68hc705c8a_syms);
+}
+
+
+READ8_MEMBER(m68hc705c8a_device::ram0_r)
+{
+	if (BIT(m_option, 7))
+		return offset >= 0x10 ? m_ram[offset - 0x10] : 0x00; // 20-2f reserved
+	else
+		return m_rom[0x20 + offset];
+}
+
+WRITE8_MEMBER(m68hc705c8a_device::ram0_w)
+{
+	if (BIT(m_option, 7) && offset >= 0x10)
+		m_ram[offset - 0x10] = data;
+}
+
+READ8_MEMBER(m68hc705c8a_device::ram1_r)
+{
+	if (BIT(m_option, 6))
+		return m_ram[0x20 + offset];
+	else
+		return m_rom[0x100 + offset];
+}
+
+WRITE8_MEMBER(m68hc705c8a_device::ram1_w)
+{
+	if (BIT(m_option, 6))
+		m_ram[0x20 + offset] = data;
 }
 
 
