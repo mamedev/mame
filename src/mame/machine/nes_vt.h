@@ -22,6 +22,10 @@ public:
 
 	DECLARE_WRITE8_MEMBER(vt03_8000_mapper_w);
 
+	auto write_0_callback() { return m_write_0_callback.bind(); }
+	auto read_0_callback() { return m_read_0_callback.bind(); }
+	auto read_1_callback() { return m_read_1_callback.bind(); }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -114,6 +118,10 @@ private:
 
 	int m_bankaddr[4];
 	uint16_t m_real_access_address;
+
+	devcb_write8 m_write_0_callback;
+	devcb_read8 m_read_0_callback;
+	devcb_read8 m_read_1_callback;
 
 };
 

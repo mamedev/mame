@@ -1099,6 +1099,10 @@ void nes_vt_state::nes_vt_base(machine_config &config)
 	/* basic machine hardware */
 	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_32mbyte);
+	m_soc->read_0_callback().set(FUNC(nes_vt_state::in0_r));
+	m_soc->read_1_callback().set(FUNC(nes_vt_state::in1_r));
+	m_soc->write_0_callback().set(FUNC(nes_vt_state::in0_w));
+
 
 //	M6502_VTSCR(config, m_maincpu, NTSC_APU_CLOCK);
 //	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_map);

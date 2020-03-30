@@ -20,7 +20,10 @@ nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, const char* 
 	m_initial_e000_bank(0xff),
 	m_ntram(nullptr),
 	m_chrram(nullptr),
-	m_space_config("program", ENDIANNESS_LITTLE, 8, 25, 0, address_map_constructor(FUNC(nes_vt_soc_device::program_map), this))
+	m_space_config("program", ENDIANNESS_LITTLE, 8, 25, 0, address_map_constructor(FUNC(nes_vt_soc_device::program_map), this)),
+	m_write_0_callback(*this),
+	m_read_0_callback(*this),
+	m_read_1_callback(*this)
 {
 }
 
@@ -53,6 +56,10 @@ void nes_vt_soc_device::device_start()
 	//m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_r)), write8_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_w)));
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(*this, FUNC(nes_vt_soc_device::nt_r)), write8_delegate(*this, FUNC(nes_vt_soc_device::nt_w)));
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(*this, FUNC(nes_vt_soc_device::chr_r)), write8_delegate(*this, FUNC(nes_vt_soc_device::chr_w)));
+
+	m_write_0_callback.resolve_safe();
+	m_read_0_callback.resolve_safe(0xff);
+	m_read_1_callback.resolve_safe(0xff);
 }
 
 void nes_vt_soc_device::device_reset()
@@ -837,19 +844,17 @@ WRITE8_MEMBER(nes_vt_soc_device::vt03_4034_w)
 
 READ8_MEMBER(nes_vt_soc_device::in0_r)
 {
-	// TODO
-	return 0x00;
+	return m_read_0_callback();
 }
 
 READ8_MEMBER(nes_vt_soc_device::in1_r)
 {
-	// TODO
-	return 0x00;
+	return m_read_1_callback();
 }
 
 WRITE8_MEMBER(nes_vt_soc_device::in0_w)
 {
-
+	m_write_0_callback(offset, data);
 }
 
 WRITE8_MEMBER(nes_vt_soc_device::extra_io_control_w)
