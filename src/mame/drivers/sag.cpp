@@ -26,8 +26,8 @@ but Entex didn't release it. Their next console was the Adventure Vision.
 
 MAME external artwork is recommended for the per-game VFD overlays. For internal
 artwork, remember that the orientation can be rotated in the video options.
-By default, the "home" side is at the bottom. This is the orientation for the
-pack-in game Space Invader 2. But this makes Pinball and Baseball 4 upside-down.
+By default, the "visitor" side is at the bottom. This is how most of the games
+are played, Space Invader 2 is an exception.
 
 TODO:
 - add softwarelist? impractical with different MCUs, and no CPU inside console
@@ -37,6 +37,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/hmcs40/hmcs40.h"
+#include "cpu/tms1000/tms1400.h"
 #include "video/pwm.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
@@ -97,6 +98,24 @@ private:
 	DECLARE_READ16_MEMBER(read_d);
 };
 
+class tms1k_state : public base_state
+{
+public:
+	tms1k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		base_state(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+	{ }
+
+	void sag(machine_config &config);
+
+private:
+	required_device<tms1k_base_device> m_maincpu;
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
 
 
 /******************************************************************************
@@ -128,7 +147,7 @@ u8 base_state::read_inputs()
 }
 
 
-// HD38800 type
+// cartridge type 1: HD38800
 
 WRITE8_MEMBER(hmcs40_state::write_r)
 {
@@ -155,42 +174,70 @@ READ16_MEMBER(hmcs40_state::read_d)
 }
 
 
+// cartridge type 2: TMS1670
+
+WRITE16_MEMBER(tms1k_state::write_r)
+{
+	// R0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// R1-R12: vfd grid (0 and 7 unused)
+	// R13,R14: vfd plate 3,2
+	m_grid = bitswap<14>(data,7,8,9,10,11,12,0,1,2,3,4,5,6,0) & 0x3f7e;
+	m_plate = (m_plate & 0xff0) | bitswap<2>(data,13,14) << 2;
+	update_display();
+}
+
+WRITE16_MEMBER(tms1k_state::write_o)
+{
+	// O0-O7: vfd plate 4-11
+	m_plate = (m_plate & 0xf) | data << 4;
+	update_display();
+}
+
+READ8_MEMBER(tms1k_state::read_k)
+{
+	// K1-K4: multiplexed inputs
+	return read_inputs();
+}
+
+
 
 /******************************************************************************
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( sag ) // P1 = Home (right side), P2 = Visitor (left side)
+static INPUT_PORTS_START( sag ) // P1 = Visitor (left side), P2 = Home (right side)
 	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Button 6")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Button 6")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Button 7")
-
-	PORT_START("IN.1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button 5")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Button 5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Button 6")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Button 6")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button 7")
 
+	PORT_START("IN.1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Button 5")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button 5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Button 7")
+
 	PORT_START("IN.2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Button 4")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Button 2")
 	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x00) // demo
 
 	PORT_START("IN.3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("P1 Button 3")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("P1 Button 1")
 	PORT_CONFNAME( 0x04, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x04, "2" )
 
 	PORT_START("IN.4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Button 2")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Button 4")
 	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x01) // 1 player
 
 	PORT_START("IN.5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("P1 Button 1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("P1 Button 3")
 	PORT_CONFNAME( 0x04, 0x04, "Game" )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
@@ -234,6 +281,17 @@ void hmcs40_state::sag(machine_config &config)
 	shared(config);
 }
 
+void tms1k_state::sag(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1670(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(tms1k_state::read_k));
+	m_maincpu->r().set(FUNC(tms1k_state::write_r));
+	m_maincpu->o().set(FUNC(tms1k_state::write_o));
+
+	shared(config);
+}
+
 
 
 /******************************************************************************
@@ -258,6 +316,16 @@ ROM_START( sag_pb )
 	ROM_CONTINUE( 0x1e80, 0x0100 )
 ROM_END
 
+ROM_START( sag_fb4 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ftba_mp7573", 0x0000, 0x1000, CRC(b17dd9e3) SHA1(9c9e7a56643233ef2adff7b68a6df19e6ca176c2) ) // die label TMS1400, MP7573
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_sag_fb4_output.pla", 0, 557, CRC(f15dc6a1) SHA1(ee11a64037895ac566e902b6b590ff62a7f703b0) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -270,3 +338,5 @@ ROM_END
 CONS( 1981, sag_si2,  0,      0, sag,    sag,   hmcs40_state, empty_init, "Entex", "Select-A-Game Machine: Space Invader 2", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING ) // suspect bad dump
 CONS( 1981, sag_bb4,  0,      0, sag,    sag,   hmcs40_state, empty_init, "Entex", "Select-A-Game Machine: Baseball 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, sag_pb,   0,      0, sag,    sag,   hmcs40_state, empty_init, "Entex", "Select-A-Game Machine: Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+
+CONS( 1981, sag_fb4,  0,      0, sag,    sag,   tms1k_state,  empty_init, "Entex", "Select-A-Game Machine: Football 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
