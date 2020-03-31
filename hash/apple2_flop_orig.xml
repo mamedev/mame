@@ -11260,7 +11260,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="braingme">
+	<software name="braingme">
 		<description>The Brain Game</description>
 		<year>1984</year>
 		<publisher>The Millenium Group</publisher>
@@ -11275,7 +11275,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="cntdsht">
+	<software name="cntdsht">
 		<description>Countdown to Shutdown</description>
 		<year>1985</year>
 		<publisher>Activision</publisher>
@@ -11290,7 +11290,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="brdtale2">
+	<software name="brdtale2">
 		<description>The Bard's Tale II: The Destiny Knight</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
@@ -11339,7 +11339,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="jelwayqb">
+	<software name="jelwayqb">
 		<description>John Elway's Quarterback</description>
 		<year>1987</year>
 		<publisher>Leland Corporation</publisher>
@@ -11354,7 +11354,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="kavekark">
+	<software name="kavekark">
 		<description>Kaves of Karkhan</description>
 		<year>1981</year>
 		<publisher>Level-10</publisher>
@@ -11369,7 +11369,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="triad">
+	<software name="triad">
 		<description>Triad (Version 1.0)</description>
 		<year>1983</year>
 		<publisher>Adventure International</publisher>
@@ -11384,7 +11384,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="rescfrac">
+	<software name="rescfrac">
 		<description>Rescue on Fractalus</description>
 		<year>1985</year>
 		<publisher>Lucasfilm</publisher>
