@@ -124,7 +124,6 @@ protected:
 	uint8_t m_4242;
 	uint8_t m_411c;
 	uint8_t m_411d;
-	uint8_t m_413x[8]; // CY only?
 
 	uint8_t m_initial_e000_bank;
 	/* expansion nametable - todo, see if we can refactor NES code to be reusable without having to add full NES bus etc. */
@@ -190,6 +189,25 @@ public:
 	nes_vt_soc_4kram_cy_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
+	virtual void device_add_mconfig(machine_config& config) override;
+	void device_start() override;
+
+	void nes_vt_cy_map(address_map& map);
+
+	DECLARE_READ8_MEMBER(vt03_41bx_r);
+	DECLARE_WRITE8_MEMBER(vt03_41bx_w);
+
+	DECLARE_READ8_MEMBER(vt03_413x_r);
+	DECLARE_WRITE8_MEMBER(vt03_413x_w);
+
+ 	DECLARE_READ8_MEMBER(vt03_414f_r);
+	
+	DECLARE_READ8_MEMBER(vt03_415c_r);
+
+	DECLARE_WRITE8_MEMBER(vt03_48ax_w);
+	DECLARE_READ8_MEMBER(vt03_48ax_r);
+
+	uint8_t m_413x[8]; // CY only?
 };
 
 class nes_vt_soc_4kram_bt_device : public nes_vt_soc_4kram_device
@@ -198,6 +216,11 @@ public:
 	nes_vt_soc_4kram_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
+	virtual void device_add_mconfig(machine_config& config) override;
+
+	void nes_vt_bt_map(address_map& map);
+
+	DECLARE_WRITE8_MEMBER(vt03_412c_extbank_w);
 };
 
 DECLARE_DEVICE_TYPE(NES_VT_SOC, nes_vt_soc_device)

@@ -86,7 +86,6 @@ protected:
 	uint8_t m_4242;
 	uint8_t m_411c;
 	uint8_t m_411d;
-	uint8_t m_413x[8]; // CY only?
 
 	DECLARE_WRITE8_MEMBER(vt03_8000_mapper_w) { m_soc->vt03_8000_mapper_w(space, offset, data); }
 
@@ -236,18 +235,6 @@ private:
 	void nes_vt_cy_map(address_map& map);
 	void nes_vt_bt_map(address_map& map);
 
-	DECLARE_WRITE8_MEMBER(vt03_41bx_w);
-	DECLARE_READ8_MEMBER(vt03_41bx_r);
-	DECLARE_WRITE8_MEMBER(vt03_411c_w);
-	DECLARE_WRITE8_MEMBER(vt03_412c_extbank_w);
-
-	DECLARE_WRITE8_MEMBER(vt03_48ax_w);
-	DECLARE_READ8_MEMBER(vt03_48ax_r);
-
-	DECLARE_WRITE8_MEMBER(vt03_413x_w);
-	DECLARE_READ8_MEMBER(vt03_413x_r);
-	DECLARE_READ8_MEMBER(vt03_414f_r);
-	DECLARE_READ8_MEMBER(vt03_415c_r);
 
 	DECLARE_READ8_MEMBER(vt_rom_banked_r);
 };
@@ -635,10 +622,6 @@ WRITE8_MEMBER(nes_vt_ablping_state::ablping_extraio_w)
 	popmessage("ablping_extraio_w %02x", data);
 };
 
-WRITE8_MEMBER(nes_vt_cy_state::vt03_41bx_w)
-{
-	logerror("vt03_41bx_w %02x %02x\n", offset, data);
-}
 
 WRITE8_MEMBER(nes_vt_dg_state::vt03_411c_w)
 {
@@ -647,19 +630,8 @@ WRITE8_MEMBER(nes_vt_dg_state::vt03_411c_w)
 	// TODO update_banks();
 }
 
-WRITE8_MEMBER(nes_vt_cy_state::vt03_411c_w)
-{
-	logerror("vt03_411c_w  %02x\n", data);
-	m_411c = data;
-	// TODO  update_banks();
-}
 
-WRITE8_MEMBER(nes_vt_cy_state::vt03_412c_extbank_w)
-{
-	// bittboy (ok), mc_pg150 (not working)
-	logerror("%s: vt03_412c_extbank_w %02x\n", machine().describe_context(),  data);
-	m_ahigh = (data & 0x04) ? (1 << 24) : 0x0;
-}
+
 
 WRITE8_MEMBER(nes_vt_hh_state::vtfp_412c_extbank_w)
 {
@@ -707,77 +679,9 @@ READ8_MEMBER(nes_vt_hh_state::vtfp_412d_r)
 		return 0;
 }
 
-READ8_MEMBER(nes_vt_cy_state::vt03_41bx_r)
-{
-	switch (offset)
-	{
-	case 0x07:
-		return 0x04;
-	default:
-		return 0x00;
-	}
-}
-
-WRITE8_MEMBER(nes_vt_cy_state::vt03_48ax_w)
-{
-	logerror("vt03_48ax_w %02x %02x\n", offset, data);
-}
-
-READ8_MEMBER(nes_vt_cy_state::vt03_48ax_r)
-{
-	switch (offset)
-	{
-	case 0x04:
-		return 0x01;
-	case 0x05:
-		return 0x01;
-	default:
-		return 0x00;
-	}
-}
-
-WRITE8_MEMBER(nes_vt_cy_state::vt03_413x_w)
-{
-	logerror("vt03_413x_w %02x %02x\n", offset, data);
-	// VT168 style ALU ??
-	m_413x[offset] = data;
-	if (offset == 0x5)
-	{
-		uint32_t res = uint32_t((m_413x[5] << 8) | m_413x[4]) * uint32_t((m_413x[1] << 8) | m_413x[0]);
-		m_413x[0] = res & 0xFF;
-		m_413x[1] = (res >> 8) & 0xFF;
-		m_413x[2] = (res >> 16) & 0xFF;
-		m_413x[3] = (res >> 24) & 0xFF;
-		m_413x[6] = 0x00;
-
-	}
-	else if (offset == 0x6)
-	{
-		/*uint32_t res = uint32_t((m_413x[5] << 8) | m_413x[4]) * uint32_t((m_413x[1] << 8) | m_413x[0]);
-		m_413x[0] = res & 0xFF;
-		m_413x[1] = (res >> 8) & 0xFF;
-		m_413x[2] = (res >> 16) & 0xFF;
-		m_413x[3] = (res >> 24) & 0xFF;*/
-		m_413x[6] = 0x00;
-	}
-}
 
 
-READ8_MEMBER(nes_vt_cy_state::vt03_413x_r)
-{
-	logerror("vt03_413x_r %02x\n", offset);
-	return m_413x[offset];
-}
 
-READ8_MEMBER(nes_vt_cy_state::vt03_414f_r)
-{
-	return 0xff;
-}
-
-READ8_MEMBER(nes_vt_cy_state::vt03_415c_r)
-{
-	return 0xff;
-}
 
 READ8_MEMBER(nes_vt_hh_state::vthh_414a_r)
 {
@@ -925,22 +829,6 @@ void nes_vt_state::nes_vt_4k_ram_map(address_map &map)
 
 
 
-void nes_vt_cy_state::nes_vt_cy_map(address_map &map)
-{
-	nes_vt_4k_ram_map(map);
-	map(0x41b0, 0x41bf).r(FUNC(nes_vt_cy_state::vt03_41bx_r)).w(FUNC(nes_vt_cy_state::vt03_41bx_w));
-	map(0x4130, 0x4136).r(FUNC(nes_vt_cy_state::vt03_413x_r)).w(FUNC(nes_vt_cy_state::vt03_413x_w));
-	map(0x414f, 0x414f).r(FUNC(nes_vt_cy_state::vt03_414f_r));
-	map(0x415c, 0x415c).r(FUNC(nes_vt_cy_state::vt03_415c_r));
-
-	map(0x48a0, 0x48af).r(FUNC(nes_vt_cy_state::vt03_48ax_r)).w(FUNC(nes_vt_cy_state::vt03_48ax_w));
-}
-
-void nes_vt_cy_state::nes_vt_bt_map(address_map &map)
-{
-	nes_vt_4k_ram_map(map);
-	map(0x412c, 0x412c).w(FUNC(nes_vt_cy_state::vt03_412c_extbank_w));
-}
 
 
 void nes_vt_hh_state::nes_vt_hh_map(address_map &map)
