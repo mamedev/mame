@@ -2116,7 +2116,15 @@ ROM_END
 //  80286 Desktop
 //**************************************************************************
 
-// Uses the same case as the Schneider EuroXT, a compact desktop with room for a single floppy drive and an AT IDE harddisk (Seagate ST-142A, ST-157A)
+// Samsung Deskmaster 286-12, Microfive motherboard - Chipset: Chips F82C451C, F82C235-12 286 SCAT - CPU: Intel 80286-12, FPU socket provided
+// RAM: 6xSIMM40 - BIOS: Phoenix ROM BIOS PLUS 3.10 02M, Chips and Technologies VGA 411 BIOS v211 (one 27C512 EPROM) - Keyboard-BIOS: Intel P8942AN - ISA16: 1
+// OSC: 14.31818, 24.000000MHz, 24.000000MHz, 25.175000MHz, 40.000000MHz - on board: FDD, IDE, beeper, keyboard, mouse, ser, par - VGA Video RAM: 8x41C464J-10 (256K)
+ROM_START( samdm286 )
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_LOAD( "samsung-deskmaster-28612-rom.bin", 0x10000, 0x10000, CRC(785d3196) SHA1(214a933d8fa86bfdb633fb5e8595a18a58cdba7d))
+ROM_END
+
+// Schneider EuroAT - Uses the same case as the Schneider EuroXT, a compact desktop with room for a single floppy drive and an AT IDE harddisk (Seagate ST-142A, ST-157A)
 // Mainboard: Baugr.Nr. 51513 with internal EGA, 52591 EGA components omitted (see: EURO VGA)
 // Chipset: 2xHeadland GC102-PC, HT101A/B1A4924, Schneider BIGJIM 30773, WD37C65BJM, Siemens SAB 16C450-N
 // EGA chipset (mainboard 51513): G2 GC201-PC, 64K RAM - Main RAM: 1MB
@@ -5110,6 +5118,7 @@ COMP( 198?, o286foxii, ibm5170, 0,       atturbo,   0,     at_state,     init_at
 COMP( 1987, m290,      ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Olivetti",    "M290", MACHINE_NOT_WORKING )
 COMP( 1991, pcd204,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Philips",     "PCD204 (PCD200 series)", MACHINE_NOT_WORKING )
 COMP( 1990, profpc33,  ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Profex", "PC 33", MACHINE_NOT_WORKING )
+COMP( 199?, samdm286,  ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Samsung", "Deskmaster 286-12", MACHINE_NOT_WORKING )
 COMP( 198?, v286c,     ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Victor", "V286C", MACHINE_NOT_WORKING )
 COMP( 1981, wpc250,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Wang Laboratories, Inc.", "PC-250/16", MACHINE_NOT_WORKING )
 COMP( 1990, n8810m30,  ibm5170, 0,       neat,      0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M30", MACHINE_NOT_WORKING )

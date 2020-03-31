@@ -2745,6 +2745,7 @@ dvbslan                         // Datavan Book-Size LAN station (386sx)
 euroat                          // Schneider Euro AT
 pg750                           // Siemens PG 750
 pg750eisa                       // Siemens PG 750 486 EISA
+samdm286                        // Samsung Deskmaster 286-12
 
 
 @source:atari_s1.cpp
