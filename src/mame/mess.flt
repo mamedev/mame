@@ -776,6 +776,7 @@ rx78.cpp
 rz1.cpp
 rzone.cpp
 sacstate.cpp
+sag.cpp
 sage2.cpp
 saitek_chesstrv.cpp
 saitek_corona.cpp

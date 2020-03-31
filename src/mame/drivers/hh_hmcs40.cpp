@@ -20,9 +20,9 @@
  @04      HD38800A  1980, Gakken Heiankyo Alien
  @25      HD38800A  1981, Coleco Alien Attack
  @27      HD38800A  1981, Bandai Packri Monster
- @31      HD38800A  1981, Entex Select-a-Game cartridge: Space Invader 2
- @37      HD38800A  1981, Entex Select-a-Game cartridge: Baseball 4
- @38      HD38800A  1981, Entex Select-a-Game cartridge: Pinball
+  31      HD38800A  1981, Entex Select-A-Game cartridge: Space Invader 2 -> sag.cpp
+  37      HD38800A  1981, Entex Select-A-Game cartridge: Baseball 4      -> "
+  38      HD38800A  1981, Entex Select-A-Game cartridge: Pinball         -> "
  *41      HD38800A  1982, Gakken Puck Monster
  *51      HD38800A  1981, Actronics(Hanzawa) Twinvader (larger white version)
  @70      HD38800A  1982, Coleco Galaxian
@@ -97,7 +97,6 @@
 
 // internal artwork (complete)
 #include "pairmtch.lh"
-#include "sag.lh"
 
 // internal artwork (bezel overlay)
 #include "bambball.lh"
@@ -2433,161 +2432,6 @@ ROM_END
 
 /***************************************************************************
 
-  Entex Select-A-Game (HMCS40 MCU cartridges)
-  * see gamelist for cartridge info
-  * cyan/red VFD display Futaba DM-16Z + cyan VFD 9-digit panel Futaba 9-ST-11A 1F
-
-  The console is the peripheral, the heart of the system is the cartridge.
-  Cartridges with a HMCS40 MCU are implemented in this driver.
-
-  MAME external artwork is recommended, needed for per-game VFD overlays.
-
-***************************************************************************/
-
-class sag_state : public hh_hmcs40_state
-{
-public:
-	sag_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_hmcs40_state(mconfig, type, tag)
-	{ }
-
-	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_READ16_MEMBER(input_r);
-	void sag(machine_config &config);
-};
-
-// handlers
-
-void sag_state::update_display()
-{
-	// grid 0-7 are the 'pixels'
-	m_display->matrix_partial(0, 8, m_grid, m_plate, false);
-
-	// grid 8-11 are 7segs
-	u8 seg = bitswap<8>(m_plate,3,4,5,6,7,8,9,10);
-	m_display->matrix_partial(8, 4, m_grid >> 8, seg);
-}
-
-WRITE8_MEMBER(sag_state::plate_w)
-{
-	// R0x-R3x: vfd plate
-	int shift = offset * 4;
-	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	update_display();
-}
-
-WRITE16_MEMBER(sag_state::grid_w)
-{
-	// D0: speaker out
-	m_speaker->level_w(data & 1);
-
-	// D2-D7: input mux
-	m_inp_mux = data >> 2 & 0x3f;
-
-	// D1-D12: vfd grid
-	m_grid = data >> 1 & 0xfff;
-	update_display();
-}
-
-READ16_MEMBER(sag_state::input_r)
-{
-	// D13-D15: multiplexed inputs
-	return read_inputs(6) << 13;
-}
-
-// config
-
-static INPUT_PORTS_START( sag )
-	PORT_START("IN.0") // D2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("P1 Button 1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 3")
-	PORT_CONFNAME( 0x04, 0x04, "Game" )
-	PORT_CONFSETTING(    0x04, "1" )
-	PORT_CONFSETTING(    0x00, "2" )
-
-	PORT_START("IN.1") // D3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Button 2")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 4")
-	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x01) // 1 player
-
-	PORT_START("IN.2") // D4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("P1 Button 3")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 1")
-	PORT_CONFNAME( 0x04, 0x00, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(    0x00, "1" )
-	PORT_CONFSETTING(    0x04, "2" )
-
-	PORT_START("IN.3") // D5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Button 4")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 2")
-	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x00) // demo
-
-	PORT_START("IN.4") // D6
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button 5")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Button 5")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button 7")
-
-	PORT_START("IN.5") // D7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Button 6")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Button 6")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Button 7")
-
-	PORT_START("FAKE") // shared D3/D5
-	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Players ) )
-	PORT_CONFSETTING(    0x00, "Demo" )
-	PORT_CONFSETTING(    0x01, "1" )
-	PORT_CONFSETTING(    0x02, "2" )
-INPUT_PORTS_END
-
-void sag_state::sag(machine_config &config)
-{
-	/* basic machine hardware */
-	HD38800(config, m_maincpu, 450000); // approximation
-	m_maincpu->write_r<0>().set(FUNC(sag_state::plate_w));
-	m_maincpu->write_r<1>().set(FUNC(sag_state::plate_w));
-	m_maincpu->write_r<2>().set(FUNC(sag_state::plate_w));
-	m_maincpu->write_r<3>().set(FUNC(sag_state::plate_w));
-	m_maincpu->write_d().set(FUNC(sag_state::grid_w));
-	m_maincpu->read_d().set(FUNC(sag_state::input_r));
-
-	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(8+4, 14);
-	m_display->set_segmask(0xf00, 0x7f);
-	config.set_default_layout(layout_sag);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( sag_si2 )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "inv2_hd38800a31", 0x0000, 0x1000, BAD_DUMP CRC(29c8c100) SHA1(41cd413065659c6d7d5b2408de2ca6d51c49629a) )
-	ROM_CONTINUE(                0x1e80, 0x0100 )
-ROM_END
-
-ROM_START( sag_bb4 )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "b-b5_hd38800a37", 0x0000, 0x1000, CRC(64852bd5) SHA1(fb1c24ca43934ceb6fc35ac7c35b71e6e843dbc5) )
-	ROM_CONTINUE(                0x1e80, 0x0100 )
-ROM_END
-
-ROM_START( sag_pb )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "pinb_hd38800a38", 0x0000, 0x1000, CRC(6e53a56b) SHA1(13f057eab2e4cfbb3ef1247a041abff15ae727c9) )
-	ROM_CONTINUE(                0x1e80, 0x0100 )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
   Entex Galaxian 2 (manufactured in Japan)
   * PCB labels ENTEX GALAXIAN PB-118/116/097 80-210137/135/114
   * Hitachi QFP HD38820A13 MCU
@@ -4312,9 +4156,6 @@ CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  cpacman_state,  empty_in
 CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  cpacman_state,  empty_init, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, cmspacmn_state, empty_init, "Coleco", "Ms. Pac-Man (Coleco)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, sag_si2,   0,        0, sag,      sag,      sag_state,      empty_init, "Entex", "Select-A-Game: Space Invader 2", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING ) // suspect bad dump
-CONS( 1981, sag_bb4,   0,        0, sag,      sag,      sag_state,      empty_init, "Entex", "Select-A-Game: Baseball 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, sag_pb,    0,        0, sag,      sag,      sag_state,      empty_init, "Entex", "Select-A-Game: Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, egalaxn2_state, empty_init, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, epacman2,  0,        0, epacman2, epacman2, epacman2_state, empty_init, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, epacman2r, epacman2, 0, epacman2, epacman2, epacman2_state, empty_init, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )

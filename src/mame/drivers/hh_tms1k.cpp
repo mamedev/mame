@@ -8,6 +8,7 @@
   part of a series is (or will be) in its own driver, see:
   - eva: Chrysler EVA-11 (and EVA-24)
   - microvsn: Milton Bradley MicroVision
+  - sag: Entex Select-A-Game Machine
 
   (contd.) hh_tms1k child drivers:
   - tispellb: TI Spelling B series gen. 1
@@ -124,7 +125,7 @@
  @MP7351   TMS1400   1982, Parker Brothers Master Merlin
  @MP7551   TMS1670   1980, Entex Color Football 4 (6009)
  @MPF553   TMS1670   1980, Gakken/Entex Jackpot: Gin Rummy & Black Jack (6008) (note: assume F to be a misprint)
- *MP7573   TMS1670?  1981, Entex Select-a-Game cartridge: Football 4 (? note: 40-pin, VFD-capable)
+  MP7573   TMS1670   1981, Entex Select-A-Game cartridge: Football 4 -> sag.cpp
  *M95041   ?         1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
 
   inconsistent:

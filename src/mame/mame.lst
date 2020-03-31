@@ -15726,9 +15726,6 @@ mwcbaseb                        // Mattel
 packmon                         // Bandai
 pairmtch                        // Bandai
 pbqbert                         // Parker Brothers
-sag_si2                         // Entex
-sag_bb4                         // Entex
-sag_pb                          // Entex
 tmtron                          // Tomy
 vinvader                        // VTech
 zackman                         // Bandai
@@ -35037,6 +35034,11 @@ sacstate                        //
 @source:safarir.cpp
 safarir                         // (c) 1980 Shin Nihon Kikaku (SNK) + Taito license
 safarirj                        // (c) 1979 Shin Nihon Kikaku (SNK)
+
+@source:sag.cpp
+sag_si2
+sag_bb4
+sag_pb
 
 @source:sage2.cpp
 sage2                           //
