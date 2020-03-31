@@ -2742,6 +2742,11 @@ edmv035f                        // Edom MV035F motherboard (486)
 td4ipaio                        // TD-4IP-UMC-AIO motherboard (486)
 dvbslan                         // Datavan Book-Size LAN station (386sx)
 486igb21                        // 486IG-B-2-1 motherboard (486)
+euroat                          // Schneider Euro AT
+pg750                           // Siemens PG 750
+pg750eisa                       // Siemens PG 750 486 EISA
+samdm286                        // Samsung Deskmaster 286-12
+zdz248                          // Zenith Z-248
 
 
 @source:atari_s1.cpp
