@@ -170,6 +170,7 @@ public:
 	void olyport40(machine_config &config);
 	void micral45(machine_config &config);
 	void euroat(machine_config &config);
+	void pg750(machine_config &config);
 
 	void init_at();
 	void init_atpci();
@@ -947,6 +948,40 @@ void at_state::euroat(machine_config &config)
 	subdevice<isa16_slot_device>("isa2")->set_option_machine_config("fdc", cfg_single_1440K); // From pictures but also with a 3.5" as second floppy
 
 	m_ram->set_default_size("640K");
+}
+
+// Siemens PG 750
+void at_state::pg750(machine_config &config)
+{
+	i386_device &maincpu(I386(config, m_maincpu, 12'000'000));
+	maincpu.set_addrmap(AS_PROGRAM, &at_state::at32_map);
+	maincpu.set_addrmap(AS_IO, &at_state::at32_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	AT_MB(config, m_mb, 0).at_softlists(config);
+
+	config.set_maximum_quantum(attotime::from_hz(60));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	
+	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc")); // TODO: move this into the cs8221
+	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w)); // this is in :mb
+	rtc.set_century_index(0x32);
+	
+	// on-board devices
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc", true).set_option_machine_config("fdc", cfg_dual_1440K); // FIXME: deteremine ISA bus clock
+	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
+	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "lpt", true);
+	// ISA cards
+	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "ega", false);
+	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, "hdc", false);
+	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
+	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	
+	/* internal ram */
+	RAM(config, m_ram).set_default_size("3712K");
 }
 
 //**************************************************************************
@@ -3512,6 +3547,25 @@ ROM_START( walk386dx )
 	ROM_LOAD( "cthj02_03_76.bin", 0x0000, 0x2000, NO_DUMP )
 ROM_END
 
+// Siemens PG 750 - Luggable programmer ("Programmiergerät") for the Siemens S5 automation systems, a 486 EISA version exists as well
+// Chipset: CHIPS P82C302, P82C301C, P82C206, four more "CHIPS" ICs
+// ISA16: 7
+// on board: V24/Mouse, V24/Modem, Printer
+ROM_START( pg750 )
+    ROM_REGION32_LE( 0x20000, "bios", 0 )
+	// 0: Phoenix 80386 ROM BIOS PLUS Version 1.10 14 / SIEMENS PG-750
+	// Time-of-day clock stopped
+	// EGA/TIGA Graphics System "Highgraph II"
+	ROM_DEFAULT_BIOS("v402")
+	ROM_SYSTEM_BIOS(0, "v40", "v40")
+	ROMX_LOAD( "pg750_4.0_386_l.bin", 0x10000, 0x8000, CRC(1e6dcd40) SHA1(2def9f729f43652a7b8b32a42e4c073f580d39ce), ROM_SKIP(1)|ROM_BIOS(0) )
+	ROMX_LOAD( "pg750_4.0_386_h.bin", 0x10001, 0x8000, CRC(389c20dd) SHA1(eb0e86ba88ac9742868689b2aac9911ed7acac74), ROM_SKIP(1)|ROM_BIOS(0) )
+	// 1: Phoenix 80386 ROM BIOS PLUS Version 1.10 17 / SIEMENS PG-750/730
+	// Time-of-day clock stopped
+	ROM_SYSTEM_BIOS(1, "v402", "v402")
+	ROMX_LOAD( "pg750_4.02_386_l.bin", 0x10000, 0x8000, CRC(208aac51) SHA1(49d50b7ade8f56bda203375a9b138adf2cb5e500), ROM_SKIP(1)|ROM_BIOS(1) )
+	ROMX_LOAD( "pg750_4.02_386_h.bin", 0x10001, 0x8000, CRC(c6e14fb6) SHA1(dad6ab5c5a18341ec0dce53fe712b8367340506b), ROM_SKIP(1)|ROM_BIOS(1) )
+ROM_END
 
 //**************************************************************************
 //  80486 BIOS
@@ -4944,6 +4998,13 @@ ROM_START( bluenote )
 	ROM_LOAD( "7500d_rev26_121593.bin", 0x00000, 0x20000, CRC(d564f855) SHA1(181e4097c3b4ca2e8e79f1732d4aef9edd5b4586))
 ROM_END
 
+// Siemens PG-750 486 EISA
+// blank screen, beeps
+ROM_START( pg750eisa )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_LOAD( "pg_pg750_486_eisa.bin", 0x10000, 0x10000, CRC(2e6149a9) SHA1(9fcf29a6169efa1359c7c3eff09326dd3e4001dc))
+ROM_END
+
 
 /***************************************************************************
 
@@ -5139,6 +5200,7 @@ COMP( 199?, qdu386dx,  ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 199?, fic4386vchd,ibm5170,0,       at486,     0,     at_state,     init_at,        "First International Computer", "4386-VC-HD", MACHINE_NOT_WORKING )
 COMP( 198?, hot304,    ibm5170, 0,       at386,     0,     at_state,     init_at,        "Shuttle Computer International", "HOT-304", MACHINE_NOT_WORKING )
 COMP( 198?, hot307h,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Shuttle Computer International", "HOT-307H", MACHINE_NOT_WORKING )
+COMP( 199?, pg750,     ibm5170, 0,       pg750,     0,     at_state,     init_at,        "Siemens", "PG 750", MACHINE_NOT_WORKING )
 COMP( 199?, sy019hi,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Soyo", "SY-019H and SY-019I", MACHINE_NOT_WORKING )
 COMP( 199?, uni386w,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "UNICHIP", "386W 367C REV 1.0", MACHINE_NOT_WORKING )
 COMP( 1988, ataripc5,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Atari", "PC5", MACHINE_NOT_WORKING )
@@ -5254,4 +5316,5 @@ COMP( 1995, pcd4nl,    ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 1993, pcd4nd,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4ND", MACHINE_NOT_WORKING )
 COMP( 1993, lion3500,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "Lion",        "3500", MACHINE_NOT_WORKING )
 COMP( 199?, pcd4x,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4H, PCD-4M", MACHINE_NOT_WORKING )
+COMP( 199?, pg750eisa, ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens", "PG-750 486 EISA", MACHINE_NOT_WORKING )
 //COMP( 1988, nws286,    ibm5170,  0,      ews286,    0,     at_state,     at,        "Nokia Data",  "Nokia Data WS286", MACHINE_NOT_WORKING )
