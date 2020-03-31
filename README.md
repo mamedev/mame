@@ -2,6 +2,13 @@
 
 Before sending bug reports to the upstream bug tracker, make sure the bugs are reproducible in the latest standalone release.
 
+Libretro MAME core build status:
+
+| OS/Compiler           | Status        |
+| --------------------- |:-------------:|
+| Linux GCC / OSX Clang | [![Build Status](https://travis-ci.org/libretro/mame.svg?branch=master)](https://travis-ci.org/libretro/mame) |
+
+
 --------
 
 # **MAME** #
