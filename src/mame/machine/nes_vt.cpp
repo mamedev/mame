@@ -60,6 +60,10 @@ DEFINE_DEVICE_TYPE(NES_VT_SOC_SCRAMBLE, nes_vt_soc_scramble_device, "nes_vt_soc_
 DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM, nes_vt_soc_4kram_device, "nes_vt_soc_4k", "VTxx series System on a Chip (with 4KByte RAM)")
 DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM_CY, nes_vt_soc_4kram_cy_device, "nes_vt_soc_4k_cy", "VTxx series System on a Chip (with 4KByte RAM) (CY)")
 DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM_BT, nes_vt_soc_4kram_bt_device, "nes_vt_soc_4k_bt", "VTxx series System on a Chip (with 4KByte RAM) (BT)")
+DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM_HH, nes_vt_soc_4kram_hh_device, "nes_vt_soc_4k_hh", "VTxx series System on a Chip (with 4KByte RAM) (HH)")
+DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM_FP, nes_vt_soc_4kram_fp_device, "nes_vt_soc_4k_fp", "VTxx series System on a Chip (with 4KByte RAM) (FP)")
+DEFINE_DEVICE_TYPE(NES_VT_SOC_8KRAM_DG, nes_vt_soc_8kram_dg_device, "nes_vt_soc_8k_dg", "VTxx series System on a Chip (with 8KByte RAM) (DG)")
+DEFINE_DEVICE_TYPE(NES_VT_SOC_8KRAM_FA, nes_vt_soc_8kram_fa_device, "nes_vt_soc_8k_dg", "VTxx series System on a Chip (with 8KByte RAM) (FA)")
 
 void nes_vt_soc_device::program_map(address_map &map)
 {
@@ -123,7 +127,10 @@ nes_vt_soc_4kram_device::nes_vt_soc_4kram_device(const machine_config& mconfig, 
 }
 
 nes_vt_soc_4kram_device::nes_vt_soc_4kram_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
-	nes_vt_soc_device(mconfig, type, tag, owner, clock)
+	nes_vt_soc_device(mconfig, type, tag, owner, clock),
+	m_upper_write_412c_callback(*this),
+	m_upper_read_412c_callback(*this),
+	m_upper_read_412d_callback(*this)
 {
 }
 
@@ -137,6 +144,38 @@ nes_vt_soc_4kram_bt_device::nes_vt_soc_4kram_bt_device(const machine_config& mco
 {
 }
 
+
+nes_vt_soc_4kram_hh_device::nes_vt_soc_4kram_hh_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt_soc_4kram_device(mconfig, type, tag, owner, clock)
+{
+}
+
+nes_vt_soc_4kram_hh_device::nes_vt_soc_4kram_hh_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt_soc_4kram_hh_device(mconfig, NES_VT_SOC_4KRAM_HH, tag, owner, clock)
+{
+}
+
+
+nes_vt_soc_4kram_fp_device::nes_vt_soc_4kram_fp_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt_soc_4kram_hh_device(mconfig, NES_VT_SOC_4KRAM_FP, tag, owner, clock)
+{
+}
+
+
+nes_vt_soc_8kram_dg_device::nes_vt_soc_8kram_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt_soc_4kram_device(mconfig, type, tag, owner, clock)
+{
+}
+
+nes_vt_soc_8kram_dg_device::nes_vt_soc_8kram_dg_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt_soc_8kram_dg_device(mconfig, NES_VT_SOC_8KRAM_DG, tag, owner, clock)
+{
+}
+
+nes_vt_soc_8kram_fa_device::nes_vt_soc_8kram_fa_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt_soc_8kram_dg_device(mconfig, NES_VT_SOC_8KRAM_FA, tag, owner, clock)
+{
+}
 
 void nes_vt_soc_device::device_start()
 {
@@ -1128,7 +1167,7 @@ device_memory_interface::space_config_vector nes_vt_soc_device::memory_space_con
 
 void nes_vt_soc_device::device_add_mconfig(machine_config &config)
 {
-	M6502_VTSCR(config, m_maincpu, NTSC_APU_CLOCK);
+	M6502(config, m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_device::nes_vt_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1159,7 +1198,9 @@ void nes_vt_soc_device::device_add_mconfig(machine_config &config)
 	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+/***********************************************************************************************************************************************************/
 /* 'Scramble' specifics */
+/***********************************************************************************************************************************************************/
 
 void nes_vt_soc_scramble_device::device_add_mconfig(machine_config& config)
 {
@@ -1169,7 +1210,9 @@ void nes_vt_soc_scramble_device::device_add_mconfig(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_scramble_device::nes_vt_map);
 }
 
+/***********************************************************************************************************************************************************/
 /* '4K' specifics */
+/***********************************************************************************************************************************************************/
 
 void nes_vt_soc_4kram_device::device_add_mconfig(machine_config& config)
 {
@@ -1177,10 +1220,23 @@ void nes_vt_soc_4kram_device::device_add_mconfig(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_4kram_device::nes_vt_map);
 }
 
+void nes_vt_soc_4kram_device::device_start()
+{
+	nes_vt_soc_device::device_start();
+
+	m_upper_write_412c_callback.resolve_safe();
+	m_upper_read_412c_callback.resolve_safe(0xff);
+	m_upper_read_412d_callback.resolve_safe(0xff);
+}
+
 void nes_vt_soc_4kram_device::nes_vt_4k_ram_map(address_map &map)
 {
 	nes_vt_soc_device::nes_vt_map(map);
 	map(0x0800, 0x0fff).ram();
+
+//	map(0x412c, 0x412c).rw(FUNC(nes_vt_soc_4kram_device::vtfp_412c_r, FUNC(nes_vt_soc_4kram_device::vtfp_412c_extbank_w)); // GPIO
+//	map(0x412d, 0x412d).r(FUNC(nes_vt_soc_4kram_device::vtfp_412d_r)); // GPIO
+
 }
 
 /***********************************************************************************************************************************************************/
@@ -1306,13 +1362,191 @@ void nes_vt_soc_4kram_bt_device::nes_vt_bt_map(address_map &map)
 
 WRITE8_MEMBER(nes_vt_soc_4kram_bt_device::vt03_412c_extbank_w)
 {
-	// TODO BANKING!!
-
-	// bittboy (ok), mc_pg150 (not working)
-//	logerror("%s: vt03_412c_extbank_w %02x\n", machine().describe_context(),  data);
-//	m_ahigh = (data & 0x04) ? (1 << 24) : 0x0;
+	m_upper_write_412c_callback(data);
 }
 
 
+/***********************************************************************************************************************************************************/
+/* 'HH' specifics  (base = '4K') */
+/***********************************************************************************************************************************************************/
 
+void nes_vt_soc_4kram_hh_device::device_add_mconfig(machine_config& config)
+{
+	nes_vt_soc_device::device_add_mconfig(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_4kram_hh_device::nes_vt_hh_map);
+}
+
+WRITE8_MEMBER(nes_vt_soc_4kram_hh_device::vtfp_411d_w)
+{
+	// controls chram access and mapper emulation modes in later models
+	logerror("vtfp_411d_w  %02x\n", data);
+	m_411d = data;
+	update_banks();
+}
+
+READ8_MEMBER(nes_vt_soc_4kram_hh_device::vthh_414a_r)
+{
+	return 0x80;
+}
+
+void nes_vt_soc_4kram_hh_device::nes_vt_hh_map(address_map &map)
+{
+	nes_vt_soc_device::nes_vt_map(map);
+
+	map(0x0000, 0x1fff).mask(0x0fff).ram();
+
+	map(0x414a, 0x414a).r(FUNC(nes_vt_soc_4kram_hh_device::vthh_414a_r));
+	map(0x411d, 0x411d).w(FUNC(nes_vt_soc_4kram_hh_device::vtfp_411d_w));
+}
+
+/***********************************************************************************************************************************************************/
+/* 'FP' specifics (base = 'HH') */
+/***********************************************************************************************************************************************************/
+
+void nes_vt_soc_4kram_fp_device::device_add_mconfig(machine_config& config)
+{
+	nes_vt_soc_device::device_add_mconfig(config);
+
+	M6502_VTSCR(config.replace(), m_maincpu, NTSC_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_4kram_fp_device::nes_vt_hh_map);
+}
+
+
+READ8_MEMBER(nes_vt_soc_4kram_fp_device::vtfp_4119_r)
+{
+	// would be PAL/NTSC etc. in base system, maybe different here?
+	return 0x00;
+}
+
+WRITE8_MEMBER(nes_vt_soc_4kram_fp_device::vtfp_411e_w)
+{
+	logerror("411e_w %02x\n", data);
+	if (data == 0x05)
+		dynamic_cast<m6502_vtscr&>(*m_maincpu).set_next_scramble(true);
+	else if (data == 0x00)
+		dynamic_cast<m6502_vtscr&>(*m_maincpu).set_next_scramble(false);
+}
+
+WRITE8_MEMBER(nes_vt_soc_4kram_fp_device::vtfp_4a00_w)
+{
+	logerror("4a00_w %02x\n", data);
+	//if(data == 0x80)
+	//  dynamic_cast<m6502_vtscr&>(*m_maincpu).set_scramble(false);
+}
+
+
+WRITE8_MEMBER(nes_vt_soc_4kram_fp_device::vtfp_412c_extbank_w)
+{
+	m_upper_write_412c_callback(data);
+
+	// TODO:
+	// fcpocket
+	//logerror("%s: vtfp_412c_extbank_w %02x\n", machine().describe_context(), data);
+	//m_ahigh = (data & 0x01) ? (1 << 25) : 0x0;
+}
+
+READ8_MEMBER(nes_vt_soc_4kram_fp_device::vtfp_412d_r)
+{
+	// TODO:
+//	if (m_cartsel)
+//		return m_cartsel->read();
+//	else
+//		return 0;
+
+	return m_upper_read_412d_callback();
+}
+
+WRITE8_MEMBER(nes_vt_soc_4kram_fp_device::vtfp_4242_w)
+{
+	logerror("vtfp_4242_w %02x\n", data);
+	m_4242 = data;
+}
+
+void nes_vt_soc_4kram_fp_device::nes_vt_fp_map(address_map &map)
+{
+	nes_vt_soc_4kram_hh_device::nes_vt_hh_map(map);
+
+	map(0x4119, 0x4119).r(FUNC(nes_vt_soc_4kram_fp_device::vtfp_4119_r));
+	map(0x411e, 0x411e).w(FUNC(nes_vt_soc_4kram_fp_device::vtfp_411e_w));
+
+	map(0x412c, 0x412c).w(FUNC(nes_vt_soc_4kram_fp_device::vtfp_412c_extbank_w)); // GPIO
+	map(0x412d, 0x412d).r(FUNC(nes_vt_soc_4kram_fp_device::vtfp_412d_r)); // GPIO
+
+	map(0x4242, 0x4242).w(FUNC(nes_vt_soc_4kram_fp_device::vtfp_4242_w));
+
+	map(0x4a00, 0x4a00).w(FUNC(nes_vt_soc_4kram_fp_device::vtfp_4a00_w));	
+}
+
+/***********************************************************************************************************************************************************/
+/* 'DG' specifics  (base = '4K') */
+/***********************************************************************************************************************************************************/
+
+void nes_vt_soc_8kram_dg_device::device_add_mconfig(machine_config& config)
+{
+	nes_vt_soc_device::device_add_mconfig(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_8kram_dg_device::nes_vt_dg_map);
+}
+
+WRITE8_MEMBER(nes_vt_soc_8kram_dg_device::vt03_411c_w)
+{
+	logerror("vt03_411c_w  %02x\n", data);
+	m_411c = data;
+	update_banks();
+}
+
+void nes_vt_soc_8kram_dg_device::nes_vt_dg_map(address_map &map)
+{
+	nes_vt_soc_device::nes_vt_map(map);
+
+	map(0x0000, 0x1fff).ram();
+	map(0x411c, 0x411c).w(FUNC(nes_vt_soc_8kram_dg_device::vt03_411c_w));
+}
+
+/***********************************************************************************************************************************************************/
+/* 'FA' specifics (base = 'DG') */
+/***********************************************************************************************************************************************************/
+
+void nes_vt_soc_8kram_fa_device::device_add_mconfig(machine_config& config)
+{
+	nes_vt_soc_device::device_add_mconfig(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_8kram_fa_device::nes_vt_fa_map);
+}
+
+READ8_MEMBER(nes_vt_soc_8kram_fa_device::vtfa_412c_r)
+{
+	return m_upper_read_412c_callback();
+
+//	if (m_cartsel)
+//		return m_cartsel->read();
+//	else
+//		return 0;
+
+	return 0;
+}
+
+WRITE8_MEMBER(nes_vt_soc_8kram_fa_device::vtfa_412c_extbank_w)
+{
+	m_upper_write_412c_callback(data);
+
+	// TODO
+	// fapocket (ok?) (also uses bank from config switch for fake cartridge slot)
+//	logerror("%s: vtfa_412c_extbank_w %02x\n", machine().describe_context(), data);
+//	m_ahigh = 0;
+//	m_ahigh |= (data & 0x01) ? (1 << 25) : 0x0;
+//	m_ahigh |= (data & 0x02) ? (1 << 24) : 0x0;
+}
+
+WRITE8_MEMBER(nes_vt_soc_8kram_fa_device::vtfp_4242_w)
+{
+	logerror("vtfp_4242_w %02x\n", data);
+	m_4242 = data;
+}
+
+void nes_vt_soc_8kram_fa_device::nes_vt_fa_map(address_map &map)
+{
+	nes_vt_soc_8kram_dg_device::nes_vt_dg_map(map);
+
+	map(0x412c, 0x412c).r(FUNC(nes_vt_soc_8kram_fa_device::vtfa_412c_r)).w(FUNC(nes_vt_soc_8kram_fa_device::vtfa_412c_extbank_w));
+	map(0x4242, 0x4242).w(FUNC(nes_vt_soc_8kram_fa_device::vtfp_4242_w));
+}
 

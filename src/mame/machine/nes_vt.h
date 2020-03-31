@@ -130,15 +130,16 @@ protected:
 	std::unique_ptr<uint8_t[]> m_ntram;
 	std::unique_ptr<uint8_t[]> m_chrram;
 
-private:
-
-	address_space_config        m_space_config;
-
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
 	DECLARE_READ8_MEMBER(apu_read_mem);
 
 	DECLARE_READ8_MEMBER(external_space_read);
 	DECLARE_WRITE8_MEMBER(external_space_write);
+
+private:
+
+	address_space_config        m_space_config;
+
 
 	int m_bankaddr[4];
 	uint16_t m_real_access_address;
@@ -175,12 +176,24 @@ class nes_vt_soc_4kram_device : public nes_vt_soc_device
 public:
 	nes_vt_soc_4kram_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
+	auto upper_read_412c_callback() { return m_upper_read_412c_callback.bind(); }
+	auto upper_read_412d_callback() { return m_upper_read_412d_callback.bind(); }
+
+	auto upper_write_412c_callback() { return m_upper_write_412c_callback.bind(); }
+
+
 protected:
 	nes_vt_soc_4kram_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	void device_start() override;
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
 	void nes_vt_4k_ram_map(address_map& map);
+
+	devcb_write8 m_upper_write_412c_callback;
+
+	devcb_read8 m_upper_read_412c_callback;
+	devcb_read8 m_upper_read_412d_callback;
 };
 
 class nes_vt_soc_4kram_cy_device : public nes_vt_soc_4kram_device
@@ -223,10 +236,82 @@ protected:
 	DECLARE_WRITE8_MEMBER(vt03_412c_extbank_w);
 };
 
+class nes_vt_soc_4kram_hh_device : public nes_vt_soc_4kram_device
+{
+public:
+	nes_vt_soc_4kram_hh_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	nes_vt_soc_4kram_hh_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+
+	virtual void device_add_mconfig(machine_config& config) override;
+
+	void nes_vt_hh_map(address_map& map);
+
+	DECLARE_READ8_MEMBER(vthh_414a_r);
+	DECLARE_WRITE8_MEMBER(vtfp_411d_w);
+
+};
+
+class nes_vt_soc_4kram_fp_device : public nes_vt_soc_4kram_hh_device
+{
+public:
+	nes_vt_soc_4kram_fp_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+
+	virtual void device_add_mconfig(machine_config& config) override;
+
+	void nes_vt_fp_map(address_map& map);
+
+	DECLARE_READ8_MEMBER(vtfp_4119_r);
+	DECLARE_WRITE8_MEMBER(vtfp_411e_w);
+	DECLARE_WRITE8_MEMBER(vtfp_412c_extbank_w);
+	DECLARE_READ8_MEMBER(vtfp_412d_r);
+	DECLARE_WRITE8_MEMBER(vtfp_4242_w);
+	DECLARE_WRITE8_MEMBER(vtfp_4a00_w);
+};
+
+class nes_vt_soc_8kram_dg_device : public nes_vt_soc_4kram_device
+{
+public:
+	nes_vt_soc_8kram_dg_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	nes_vt_soc_8kram_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+
+	virtual void device_add_mconfig(machine_config& config) override;
+
+	void nes_vt_dg_map(address_map& map);
+
+	DECLARE_WRITE8_MEMBER(vt03_411c_w);
+};
+
+class nes_vt_soc_8kram_fa_device : public nes_vt_soc_8kram_dg_device
+{
+public:
+	nes_vt_soc_8kram_fa_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+
+	virtual void device_add_mconfig(machine_config& config) override;
+
+	void nes_vt_fa_map(address_map& map);
+
+	DECLARE_READ8_MEMBER(vtfa_412c_r);
+	DECLARE_WRITE8_MEMBER(vtfa_412c_extbank_w);
+	DECLARE_WRITE8_MEMBER(vtfp_4242_w);
+};
+
+
 DECLARE_DEVICE_TYPE(NES_VT_SOC, nes_vt_soc_device)
 DECLARE_DEVICE_TYPE(NES_VT_SOC_SCRAMBLE, nes_vt_soc_scramble_device)
 DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM, nes_vt_soc_4kram_device)
 DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_CY, nes_vt_soc_4kram_cy_device)
 DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_BT, nes_vt_soc_4kram_bt_device)
+DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_HH, nes_vt_soc_4kram_hh_device)
+DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_FP, nes_vt_soc_4kram_fp_device)
+DECLARE_DEVICE_TYPE(NES_VT_SOC_8KRAM_DG, nes_vt_soc_8kram_dg_device)
+DECLARE_DEVICE_TYPE(NES_VT_SOC_8KRAM_FA, nes_vt_soc_8kram_fa_device)
 
 #endif // MAME_MACHINE_NES_VT_H
