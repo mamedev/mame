@@ -1713,6 +1713,12 @@ ROM_START( neat )
 	ROM_SYSTEM_BIOS(8, "amic21", "AMI C 21.1") /* (Motherboard Manufacturer: Unknown.) (Neat 286 Bios, 82c21x Chipset ) (BIOS release date:: 30-04-1989) */
 	ROMX_LOAD( "amic21-2.bin",  0x10001, 0x8000, CRC(8ffe7752) SHA1(68215f07a170ee7bdcb3e52b370d470af1741f7e),ROM_SKIP(1) | ROM_BIOS(8) )
 	ROMX_LOAD( "amic21-1.bin",  0x10000, 0x8000, CRC(a76497f6) SHA1(91b47d86967426945b2916cb40e76a8da2d31d54),ROM_SKIP(1) | ROM_BIOS(8) )
+	// 9: BIOS-String: - AGC N286 - CPU: AMD N80L286-16/S, FPU socket provided - RAM: 36xTMC64C1024-80N (18pin), 36x16pin sockets provided as an alternative (2xBank 0, 2xBank 1), 4xSIPP30 (2xBank 0/2 and 2xBank 1/3)
+	// Chipset: Chips P82C212B-12, P82C206 H, P82C211-12 C, P82C215-12 - OSC: 20.000, 32.000MHz, 24.0000MHz, 32.768KHz, 14.31818 - BIOS: AMI 286 BIOS PLUS CO.NO.1190
+	// Keyboard-BIOS: AMI KEYBOARD BIOS PLUS CO.NO. 1190 - ISA8: 2, ISA16: 6
+	ROM_SYSTEM_BIOS(9, "n286", "N286")// stops after initialising the graphics card
+	ROMX_LOAD( "286-chips-ami1190-even_32k.bin", 0x10000, 0x8000, CRC(db941036) SHA1(994cced82b5fb5f8833c718b4226a7e9620b56df),ROM_SKIP(1) | ROM_BIOS(9) )
+	ROMX_LOAD( "286-chips-ami1190-odd_32k.bin", 0x10001, 0x8000, CRC(71cfc2d1) SHA1(8b8cf81161aec3e2c7f653e5d3a6b4e9627663c6),ROM_SKIP(1) | ROM_BIOS(9) )
 ROM_END
 
 
@@ -1956,22 +1962,29 @@ ROM_START( ht12a )
 	ROM_SYSTEM_BIOS(1, "head_ph_2", "Headland/Phoenix #2") // Phoenix BIOS A286 Version 1.01 - BIOS ID JLI01101 - IT9109 - Reference ID 01 - (BIOS release date:: 19-04-1990)
 	ROMX_LOAD( "286-headland-iqs-lo_32k.bin", 0x10000, 0x8000, CRC(60424e9d) SHA1(aa813bf48939fe7fcbbfec3133e702bfdff6234e), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD( "286-headland-iqs-hi_32k.bin", 0x10001, 0x8000, CRC(e56212e0) SHA1(2441845d632d19adc0592e094beb5ec1fbe074f6), ROM_SKIP(1) | ROM_BIOS(1) )
-	// 2: BIOS-String: DH12-1164-083090-K0 - CPU/FPU: N80L286-16/S, P80C287-10 - ISA8: 2, ISA16: 6
-	ROM_SYSTEM_BIOS(2, "head12a01", "Headland HT12/A #1")
-	ROMX_LOAD( "2hlm002l.bin", 0x10000, 0x8000, CRC(345b9ea1) SHA1(868cc309e433e0dcc9f3aa147263017b7f822461), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD( "2hlm002h.bin", 0x10001, 0x8000, CRC(35eed8b8) SHA1(119f2676aef038301c3e0bcdb999da6fd740e6a5), ROM_SKIP(1) | ROM_BIOS(2) )
-	// 3: MBL M21 - BIOS-String: DH12-1211-061390-K0 / HT-12 286 BIOS - Chipset: Headland HT12/A
-	ROM_SYSTEM_BIOS(3, "ami121", "AMI HT 12.1") /* (BIOS release date:: 13-06-1990) */
-	ROMX_LOAD( "ami2od86.bin", 0x10001, 0x8000, CRC(04a2cec4) SHA1(564d37a8b2c0f4d0e23cd1e280a09d47c9945da8),ROM_SKIP(1) | ROM_BIOS(3) )
-	ROMX_LOAD( "ami2ev86.bin", 0x10000, 0x8000, CRC(55deb5c2) SHA1(19ce1a7cc985b5895c585e39211475de2e3b0dd1),ROM_SKIP(1) | ROM_BIOS(3) )
-	// 4: SPEC 286 rev 4a - BIOS-String: DH12-1120-061390-K0
-	ROM_SYSTEM_BIOS(4, "ami122", "AMI HT 12.2") /* (BIOS release date:: 13-06-1990) */
-	ROMX_LOAD( "ami2ev89.bin", 0x10000, 0x8000, CRC(705d36e0) SHA1(0c9cfb71ced4587f109b9b6dfc2a9c92302fdb99),ROM_SKIP(1) | ROM_BIOS(4) )
-	ROMX_LOAD( "ami2od89.bin", 0x10001, 0x8000, CRC(7c81bbe8) SHA1(a2c7eca586f6e2e76b9101191e080a1f1cb8b833),ROM_SKIP(1) | ROM_BIOS(4) )
-	// 5: BIOS-String: DH12-1112-061390-K0
-	ROM_SYSTEM_BIOS(5, "ami123", "AMI HT 12.3") /*(Motherboard Manufacturer: Aquarius Systems USA Inc.) (BIOS release date:: 13-06-1990)*/
-	ROMX_LOAD( "ht12h.bin", 0x10001, 0x8000, CRC(db8b471e) SHA1(7b5fa1c131061fa7719247db3e282f6d30226778),ROM_SKIP(1) | ROM_BIOS(5) )
-	ROMX_LOAD( "ht12l.bin", 0x10000, 0x8000, CRC(74fd178a) SHA1(97c8283e574abbed962b701f3e8091fb82823b80),ROM_SKIP(1) | ROM_BIOS(5) )
+	// BIOS-String: Quadtel HT12 286 BIOS Versio 3.05.03
+	// 2: Same board as #1, CPU: AMD N80L286-16S, FPU socket provided, Chipset: Headland HT12 - OSC: 14.31818, 8.000, 32.000MHZ, unpopulated: ASYN BUS CLK
+	// RAM: 8xHYB514256B-60 (8x20pin, alternativelx 4x18pin), Parity (2x16pin, 2x18pin) empty, 4xSIMM30 (Bank0 SIMM, Bank1 SIMM) - BIOS: Quadtel BIOS Software 286 253893
+	// Keyboard-BIOS: Quadtel BIOS Software KEY 316018 (undumped) - JP7: NO ASYN CLK, JP4: CMOS RAM CLEAR, JP3: COLOR - JP: 80287CLK=ASYN CLK
+	ROM_SYSTEM_BIOS(2, "quadtel", "Quadtel")
+	ROMX_LOAD( "bios-lo.bin", 0x10000, 0x8000, CRC(433d8044) SHA1(3435d51fad97247b4bcfdb2f3fdb358d99b0e6ea), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "bios-hi.bin", 0x10001, 0x8000, CRC(fe124da4) SHA1(b3e4e598cf1f5cada1b101d0c6434770017de3c6), ROM_SKIP(1) | ROM_BIOS(2) )
+	// 3: BIOS-String: DH12-1164-083090-K0 - CPU/FPU: N80L286-16/S, P80C287-10 - ISA8: 2, ISA16: 6
+	ROM_SYSTEM_BIOS(3, "head12a01", "Headland HT12/A #1")
+	ROMX_LOAD( "2hlm002l.bin", 0x10000, 0x8000, CRC(345b9ea1) SHA1(868cc309e433e0dcc9f3aa147263017b7f822461), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "2hlm002h.bin", 0x10001, 0x8000, CRC(35eed8b8) SHA1(119f2676aef038301c3e0bcdb999da6fd740e6a5), ROM_SKIP(1) | ROM_BIOS(3) )
+	// 4: MBL M21 - BIOS-String: DH12-1211-061390-K0 / HT-12 286 BIOS - Chipset: Headland HT12/A
+	ROM_SYSTEM_BIOS(4, "ami121", "AMI HT 12.1") /* (BIOS release date:: 13-06-1990) */
+	ROMX_LOAD( "ami2od86.bin", 0x10001, 0x8000, CRC(04a2cec4) SHA1(564d37a8b2c0f4d0e23cd1e280a09d47c9945da8),ROM_SKIP(1) | ROM_BIOS(4) )
+	ROMX_LOAD( "ami2ev86.bin", 0x10000, 0x8000, CRC(55deb5c2) SHA1(19ce1a7cc985b5895c585e39211475de2e3b0dd1),ROM_SKIP(1) | ROM_BIOS(4) )
+	// 5: SPEC 286 rev 4a - BIOS-String: DH12-1120-061390-K0
+	ROM_SYSTEM_BIOS(5, "ami122", "AMI HT 12.2") /* (BIOS release date:: 13-06-1990) */
+	ROMX_LOAD( "ami2ev89.bin", 0x10000, 0x8000, CRC(705d36e0) SHA1(0c9cfb71ced4587f109b9b6dfc2a9c92302fdb99),ROM_SKIP(1) | ROM_BIOS(5) )
+	ROMX_LOAD( "ami2od89.bin", 0x10001, 0x8000, CRC(7c81bbe8) SHA1(a2c7eca586f6e2e76b9101191e080a1f1cb8b833),ROM_SKIP(1) | ROM_BIOS(5) )
+	// 6: BIOS-String: DH12-1112-061390-K0
+	ROM_SYSTEM_BIOS(6, "ami123", "AMI HT 12.3") /*(Motherboard Manufacturer: Aquarius Systems USA Inc.) (BIOS release date:: 13-06-1990)*/
+	ROMX_LOAD( "ht12h.bin", 0x10001, 0x8000, CRC(db8b471e) SHA1(7b5fa1c131061fa7719247db3e282f6d30226778),ROM_SKIP(1) | ROM_BIOS(6) )
+	ROMX_LOAD( "ht12l.bin", 0x10000, 0x8000, CRC(74fd178a) SHA1(97c8283e574abbed962b701f3e8091fb82823b80),ROM_SKIP(1) | ROM_BIOS(6) )
 ROM_END
 
 
@@ -2115,6 +2128,15 @@ ROM_END
 //**************************************************************************
 //  80286 Desktop
 //**************************************************************************
+
+// Zenith Z-248 - Motherboard: 85-3379-01 CPU BOARD 113087 - CPU: AMD N80L286-12/C, FPU socket provided - Chipset: Zymos Poach 1 and 2
+// RAM: 6xSIMM30 - OSC: 24.000MHz, 16.000MHz, 14.31818MHz - ISA8: 2, ISA16: 5 - on board diagnostic LEDs: red: CPU D101, ROM D102, RAM D103, INT D104, DSK D105, RDY D106, green: DCOK D107
+// Cards in system documented: DTC 5280 CRA MFM HD controller, Graphics card HEATH P/N150-307-3 L1A2334/Chips P82C434A (undumped), Logitech mouse/hand scanner controller, GW302 Parallel Printer Card, Chips P82C605 Dual Serial Printer Card
+// "+++ ERROR: Fatal Slushware RAM Error +++" / "--- Fatal Error: Cannot Continue! ---" (cf. olyport40)
+ROM_START( zdz248 ) // use CGA
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_LOAD( "zenith_z-248.bin", 0x10000, 0x10000, CRC(e2042dd9) SHA1(bd51cc74b0b7bd42c449bc4b5702274f766e8ea5))
+ROM_END
 
 // Samsung Deskmaster 286-12, Microfive motherboard - Chipset: Chips F82C451C, F82C235-12 286 SCAT - CPU: Intel 80286-12, FPU socket provided
 // RAM: 6xSIMM40 - BIOS: Phoenix ROM BIOS PLUS 3.10 02M, Chips and Technologies VGA 411 BIOS v211 (one 27C512 EPROM) - Keyboard-BIOS: Intel P8942AN - ISA16: 1
@@ -5121,6 +5143,7 @@ COMP( 1990, profpc33,  ibm5170, 0,       atturbo,   0,     at_state,     init_at
 COMP( 199?, samdm286,  ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Samsung", "Deskmaster 286-12", MACHINE_NOT_WORKING )
 COMP( 198?, v286c,     ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Victor", "V286C", MACHINE_NOT_WORKING )
 COMP( 1981, wpc250,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Wang Laboratories, Inc.", "PC-250/16", MACHINE_NOT_WORKING )
+COMP( 198?, zdz248,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Zenith Data Systems", "Z-248", MACHINE_NOT_WORKING )
 COMP( 1990, n8810m30,  ibm5170, 0,       neat,      0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M30", MACHINE_NOT_WORKING )
 COMP( 198?, elt286b,   ibm5170, 0,       neat,      0,     at_state,     init_at,        "Chaintech", "ELT-286B-160B(E)", MACHINE_NOT_WORKING )
 COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at,        "Kaypro",      "286i", MACHINE_NOT_WORKING )
