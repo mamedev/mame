@@ -72,7 +72,7 @@ DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM_FP, nes_vt_soc_4kram_fp_device, "nes_vt_soc_
 DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM_FP_PAL, nes_vt_soc_4kram_fp_pal_device, "nes_vt_soc_4k_fp_pal", "VTxx series System on a Chip (with 4KByte RAM) (FP) (PAL)")
 
 DEFINE_DEVICE_TYPE(NES_VT_SOC_8KRAM_DG, nes_vt_soc_8kram_dg_device, "nes_vt_soc_8k_dg", "VTxx series System on a Chip (with 8KByte RAM) (DG)")
-DEFINE_DEVICE_TYPE(NES_VT_SOC_8KRAM_FA, nes_vt_soc_8kram_fa_device, "nes_vt_soc_8k_dg", "VTxx series System on a Chip (with 8KByte RAM) (FA)")
+DEFINE_DEVICE_TYPE(NES_VT_SOC_8KRAM_FA, nes_vt_soc_8kram_fa_device, "nes_vt_soc_8k_fa", "VTxx series System on a Chip (with 8KByte RAM) (FA)")
 
 void nes_vt_soc_device::program_map(address_map &map)
 {
