@@ -34558,6 +34558,9 @@ ds2                             //
 oz750                           // 199? Sharp Wizard OZ-750
 rex6000                         //
 
+@source:rfslots8085.cpp
+unkrfslt                        //
+
 @source:rgum.cpp
 rgum                            //
 
