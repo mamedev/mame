@@ -1156,7 +1156,7 @@ void tmp95c061_device::execute_set_input(int input, int level)
 }
 
 
-READ8_MEMBER( tmp95c061_device::internal_r )
+uint8_t tmp95c061_device::internal_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -1180,7 +1180,7 @@ void tmp95c061_device::update_porta()
 	m_porta_write(0, ((fc & m_reg[TMP95C061_PAFC]) | (m_reg[TMP95C061_PA] & ~m_reg[TMP95C061_PAFC])) & m_reg[TMP95C061_PACR], 0xff);
 }
 
-WRITE8_MEMBER( tmp95c061_device::internal_w )
+void tmp95c061_device::internal_w(offs_t offset, uint8_t data)
 {
 	switch ( offset )
 	{
@@ -2012,7 +2012,7 @@ void tmp95c063_device::device_reset()
 	m_prefetch_clear = true;
 }
 
-READ8_MEMBER( tmp95c063_device::internal_r )
+uint8_t tmp95c063_device::internal_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -2032,7 +2032,7 @@ READ8_MEMBER( tmp95c063_device::internal_r )
 }
 
 
-WRITE8_MEMBER( tmp95c063_device::internal_w )
+void tmp95c063_device::internal_w(offs_t offset, uint8_t data)
 {
 	switch ( offset )
 	{

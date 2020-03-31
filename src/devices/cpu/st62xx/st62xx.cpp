@@ -252,7 +252,7 @@ void st6228_device::update_port_mode(uint8_t index, uint8_t changed)
 	}
 }
 
-WRITE8_MEMBER(st6228_device::regs_w)
+void st6228_device::regs_w(offs_t offset, uint8_t data)
 {
 	offset += 0x80;
 
@@ -365,7 +365,7 @@ WRITE8_MEMBER(st6228_device::regs_w)
 	}
 }
 
-READ8_MEMBER(st6228_device::regs_r)
+uint8_t st6228_device::regs_r(offs_t offset)
 {
 	uint8_t ret = 0;
 	offset += 0x80;

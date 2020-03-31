@@ -77,11 +77,11 @@ public:
 
 	auto pt_in_cb() { return m_pt_in_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER(pa_w);
-	DECLARE_WRITE8_MEMBER(pb_w);
-	DECLARE_WRITE8_MEMBER(pc_w);
-	DECLARE_WRITE8_MEMBER(pd_w);
-	DECLARE_WRITE8_MEMBER(pf_w);
+	void pa_w(uint8_t data, uint8_t mem_mask = ~0);
+	void pb_w(uint8_t data, uint8_t mem_mask = ~0);
+	void pc_w(uint8_t data, uint8_t mem_mask = ~0);
+	void pd_w(uint8_t data, uint8_t mem_mask = ~0);
+	void pf_w(uint8_t data, uint8_t mem_mask = ~0);
 
 protected:
 	void upd_internal_128_ram_map(address_map &map);

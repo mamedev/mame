@@ -1384,14 +1384,14 @@ std::unique_ptr<util::disasm_interface> cop400_cpu_device::create_disassembler()
 		return std::make_unique<cop410_disassembler>();
 }
 
-READ8_MEMBER( cop400_cpu_device::microbus_rd )
+uint8_t cop400_cpu_device::microbus_rd()
 {
 	if (LOG_MICROBUS) logerror("%s %s MICROBUS RD %02x\n", machine().time().as_string(), machine().describe_context(), Q);
 
 	return Q;
 }
 
-WRITE8_MEMBER( cop400_cpu_device::microbus_wr )
+void cop400_cpu_device::microbus_wr(uint8_t data)
 {
 	if (LOG_MICROBUS) logerror("%s %s MICROBUS WR %02x\n", machine().time().as_string(), machine().describe_context(), data);
 

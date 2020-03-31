@@ -562,27 +562,27 @@ std::unique_ptr<util::disasm_interface> upd78c05_device::create_disassembler()
 	return std::make_unique<upd78c05_disassembler>();
 }
 
-WRITE8_MEMBER(upd7810_device::pa_w)
+void upd7810_device::pa_w(uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_pa_in);
 }
 
-WRITE8_MEMBER(upd7810_device::pb_w)
+void upd7810_device::pb_w(uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_pb_in);
 }
 
-WRITE8_MEMBER(upd7810_device::pc_w)
+void upd7810_device::pc_w(uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_pc_in);
 }
 
-WRITE8_MEMBER(upd7810_device::pd_w)
+void upd7810_device::pd_w(uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_pd_in);
 }
 
-WRITE8_MEMBER(upd7810_device::pf_w)
+void upd7810_device::pf_w(uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_pf_in);
 }
