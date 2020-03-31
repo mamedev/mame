@@ -9,6 +9,7 @@
 #include "emu.h"
 //#include "bus/midi/midi.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/mb62h195.h"
 #include "machine/mb63h149.h"
 #include "machine/nvram.h"
 #include "machine/rescap.h"
@@ -116,6 +117,13 @@ void alphajuno_state::ajuno1(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5517APL + battery
 
+	mb62h195_device &io(MB62H195(config, "io"));
+	io.lc_callback().set(m_lcdc, FUNC(hd44780_device::write));
+	io.sout_callback().set("adc", FUNC(upd7001_device::si_w));
+	io.sck_callback().set("adc", FUNC(upd7001_device::sck_w));
+	io.sin_callback().set("adc", FUNC(upd7001_device::so_r));
+	io.adc_callback().set("adc", FUNC(upd7001_device::cs_w));
+
 	//MB87123(config, "dco", 12_MHz_XTAL);
 
 	UPD7001(config, "adc", RES_K(27), CAP_P(47));
@@ -153,6 +161,9 @@ void alphajuno_state::mks50(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &alphajuno_state::mks50_ext_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5564PL-20 + battery
+
+	mb62h195_device &io(MB62H195(config, "io"));
+	io.lc_callback().set(m_lcdc, FUNC(hd44780_device::write));
 
 	//MB87123(config, "dco", 12_MHz_XTAL);
 
