@@ -129,7 +129,7 @@ void cxd1185_device::reset_chip()
 	m_int_req[0] = 0;
 	m_int_req[1] = 0;
 	m_sel_time = 0;
-	m_rst_time = SCSI_RST_HOLD;
+	m_rst_time = 0;
 	m_scsi_id = 0;
 	m_int_auth[0] = 0;
 	m_int_auth[1] = 0;
@@ -299,12 +299,12 @@ void cxd1185_device::command_w(u8 data)
 
 	case 0x40: LOGMASKED(LOG_CMD, "reselect\n"); break;
 	case 0x41:
-		LOGMASKED(LOG_CMD, "select without atn\n");
+		LOGMASKED(LOG_CMD, "select target %d without atn\n", (m_scsi_id & TID) >> 5);
 		m_status |= INIT;
 		m_state = ARB_BUS_FREE;
 		break;
 	case 0x42:
-		LOGMASKED(LOG_CMD, "select with atn\n");
+		LOGMASKED(LOG_CMD, "select target %d with atn\n", (m_scsi_id & TID) >> 5);
 		m_status |= INIT;
 		m_state = ARB_BUS_FREE;
 		break;
@@ -531,8 +531,8 @@ int cxd1185_device::state_step()
 		if ((scsi_bus->ctrl_r() & S_SEL) || (scsi_bus->data_r() & ~((oid - 1) | oid)))
 		{
 			LOGMASKED(LOG_STATE, "arbitration: lost\n");
-			m_int_req[0] |= ARBF;
 			m_status &= ~INIT;
+			m_int_req[0] |= ARBF;
 
 			m_state = COMPLETE;
 
@@ -578,8 +578,11 @@ int cxd1185_device::state_step()
 		else
 		{
 			LOGMASKED(LOG_STATE, "selection: timed out\n");
+			m_status &= ~INIT;
 			m_int_req[0] |= STO;
 			m_state = COMPLETE;
+
+			scsi_bus->ctrl_w(scsi_refid, 0, S_ATN | S_SEL);
 		}
 		break;
 	case SEL_COMPLETE:
@@ -670,7 +673,11 @@ int cxd1185_device::state_step()
 			scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
 		}
 		else
+		{
 			delay = -1;
+			if (m_command & DMA)
+				set_drq(true);
+		}
 		break;
 	case XFR_OUT_NEXT:
 		if (!(scsi_bus->ctrl_r() & S_REQ))
@@ -706,11 +713,11 @@ int cxd1185_device::state_step()
 
 	case BUS_RESET:
 		LOGMASKED(LOG_STATE, "bus reset: asserted\n");
-		m_int_req[1] |= SRST;
 		m_status &= ~(INIT | TARG);
+		m_int_req[1] |= SRST;
 
 		m_state = BUS_RESET_DONE;
-		delay = m_rst_time;
+		delay = (m_mode & TMSL) ? m_rst_time : SCSI_RST_HOLD;
 
 		// clear data and assert RST
 		scsi_bus->data_w(scsi_refid, 0);
@@ -718,6 +725,8 @@ int cxd1185_device::state_step()
 		break;
 	case BUS_RESET_DONE:
 		LOGMASKED(LOG_STATE, "bus reset: complete\n");
+		if (m_mode & TMSL)
+			m_int_req[0] |= STO;
 		m_state = COMPLETE;
 
 		// clear RST
@@ -750,8 +759,8 @@ void cxd1185_device::scsi_ctrl_changed()
 
 	if (ctrl & S_RST)
 	{
-		m_int_req[1] |= SRST;
 		m_status &= ~(INIT | TARG);
+		m_int_req[1] |= SRST;
 
 		// clear data and ctrl
 		scsi_bus->data_w(scsi_refid, 0);
