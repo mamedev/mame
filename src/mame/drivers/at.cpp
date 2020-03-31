@@ -3926,14 +3926,21 @@ ROM_START( pcd4x )
 	// D756, was used in PCD-4Lsx, contains Cirrus Logic VGA ROM
 	ROM_SYSTEM_BIOS(0, "d756v320r316", "D756 BIOS V3.20 R3.16")
 	ROMX_LOAD( "fts_biosupdated756noflashbiosepromv320_320316_149.bin", 0x00000, 0x20000, CRC(2ab60725) SHA1(333b64424c08ecbbaf47110c99ad0335da211489), ROM_BIOS(0) )
-	// D674, was used in PCD-4M, PCD-4Msx, PCD-4RSXA/4RA
-	// LSI HT342-B-07 or Headland HT342-BUIB and another LSI chip
+	// D674, was used in PCD-4M, PCD-4Msx, PCD-4RSXA/4RA - this is a CPU card that is plugged into an ISA backplane; OSC: 14.31818
+	// Chipset: LSI HT342-B-07, LSI HT321-D, Intel B6842-V31 AWARD(c)SNI UPI V4.3, IS9412BL PC87311AVF US4823312 - CPU: 486sx soldered onto the mainboard, but a socket for a 486DX is present - RAM: SIMM30x8
+	// the CPU card can accept 16 bit "piggyback" modules, e.g. an ET4000 graphics card or a MFM harddisk controller to save ISA slots
+	// on board: IDE, Floppy, beeper, keyboard connector, parallel, 2xserial, RTC DS12887, connectors for NMI and keylock, 4 DIP switches labelled DX2, Upgrade, 25, color
+	// jumper X7: skip on/off, jumper x6: drv l/h
 	ROM_SYSTEM_BIOS(1, "d674v320r316", "D674 BIOS V3.20 R3.16")
 	ROMX_LOAD( "fts_biosupdated674noflashbiosepromv320_320316_144.bin", 0x00000, 0x20000, CRC(1293d27c) SHA1(22f36c4a5a0912011ed54ff917244f412208ffc0), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2, "d674v320r304", "D674 BIOS V3.20 R3.04")
+	ROMX_LOAD( "d674_27c1024_3.20.bin", 0x00000, 0x20000, CRC(dfdad89e) SHA1(6cb78d8b5c8822dc84970ba912bc66a5e7cd2fb4), ROM_BIOS(2) )
 	// D802, was used in PCD-4HVL
-	ROM_SYSTEM_BIOS(2, "d802v320r316", "D802 BIOS V3.20 R3.34.802")
-	// PCD-4NL, contains C&T VGA BIOS
-	ROMX_LOAD( "fts_biosupdated802noflashbiosepromv320_320334_152.bin", 0x00000, 0x20000, CRC(fb1cd3d2) SHA1(98043c6f0299e1c56e5f266ea5f117ae456447ff), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(3, "d802v320r316", "D802 BIOS V3.20 R3.34.802")
+	ROMX_LOAD( "fts_biosupdated802noflashbiosepromv320_320334_152.bin", 0x00000, 0x20000, CRC(fb1cd3d2) SHA1(98043c6f0299e1c56e5f266ea5f117ae456447ff), ROM_BIOS(3) )
+	// D620
+	ROM_SYSTEM_BIOS(4, "d620", "D620")
+	ROMX_LOAD( "w26361-d620-z4-01-5_award_v3.10_r2.02.bin", 0x00000, 0x20000, CRC(2708cc2a) SHA1(a399c938ffeba4cb28a22e54235f3f9c5e2892f6), ROM_BIOS(4) )
 ROM_END
 
 
