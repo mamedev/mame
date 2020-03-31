@@ -18,6 +18,9 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 11, 0)
+#define horizontalAdvance width
+#endif
 
 MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 	WindowQt(machine, nullptr)

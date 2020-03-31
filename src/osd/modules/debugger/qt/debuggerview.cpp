@@ -10,6 +10,9 @@
 
 #include "modules/lib/osdobj_common.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 11, 0)
+#define horizontalAdvance width
+#endif
 
 DebuggerView::DebuggerView(const debug_view_type& type,
 							running_machine* machine,
