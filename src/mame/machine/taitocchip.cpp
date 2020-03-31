@@ -217,7 +217,7 @@ void taito_cchip_device::cchip_map(address_map &map)
 
 void taito_cchip_device::device_add_mconfig(machine_config &config)
 {
-	upd7811_device &upd(UPD7811(config, m_upd7811, DERIVED_CLOCK(1, 1)));
+	upd78c11_device &upd(UPD78C11(config, m_upd7811, DERIVED_CLOCK(1, 1)));
 	upd.set_addrmap(AS_PROGRAM, &taito_cchip_device::cchip_map);
 	upd.pa_in_cb().set([this] { return m_in_pa_cb(); });
 	upd.pb_in_cb().set([this] { return m_in_pb_cb(); });
