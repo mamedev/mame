@@ -296,6 +296,8 @@ private:
 	void nes_vt_dg_baddma_map(address_map& map);
 	void nes_vt_fa_map(address_map& map);
 
+	DECLARE_READ8_MEMBER(fapocket_412c_r);
+	DECLARE_WRITE8_MEMBER(fapocket_412c_w);
 
 };
 
@@ -827,7 +829,7 @@ void nes_vt_sudoku_state::nes_vt_sudoku_512kb(machine_config &config)
 void nes_vt_vg_1mb_majgnc_state::nes_vt_vg_1mb_majgnc(machine_config &config)
 {
 	nes_vt_base(config);
-	// TODO m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
+	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_vg_1mb_majgnc_state::vt_external_space_map_1mbyte);
 }
 
@@ -1083,11 +1085,10 @@ void nes_vt_hh_state::nes_vt_vg(machine_config &config)
 	NES_VT_SOC_8KRAM_DG(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
-	/*
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_map);
+	
+	//m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_map);
 
-	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
-	*/
+	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
 }
 
 void nes_vt_hh_state::nes_vt_vg_8mb(machine_config& config)
@@ -1112,13 +1113,10 @@ void nes_vt_hh_state::nes_vt_vg_1mb_majkon(machine_config &config)
 {
 	nes_vt_dg(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_1mbyte);
+	
+	//m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_baddma_map);
 
-	/*
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_baddma_map);
-
-	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
-
-	*/
+	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
 }
 
 
@@ -1130,9 +1128,10 @@ void nes_vt_hh_state::nes_vt_hh(machine_config &config)
 	NES_VT_SOC_4KRAM_HH(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
+	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
+
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_map);
-	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB);
 
 	m_screen->set_refresh_hz(50.0070);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
@@ -1194,11 +1193,11 @@ INPUT_PORTS_END
 void nes_vt_hh_state::nes_vt_fp(machine_config &config)
 {
 	nes_vt_4k_ram(config);
-	/*
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_fp_map);
 
-	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB12);
-	*/
+	NES_VT_SOC_4KRAM_FP(config.replace(), m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
+
+	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB12);
 }
 
 void nes_vt_hh_state::nes_vt_fp_4x16mb(machine_config& config)
@@ -1227,12 +1226,9 @@ void nes_vt_hh_state::nes_vt_fp_16mb(machine_config& config)
 
 void nes_vt_hh_state::nes_vt_fp_pal(machine_config &config)
 {
-	nes_vt_4k_ram_pal(config);
-	/*
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_fp_map);
+	nes_vt_fp(config);
 
-	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB12);
-	*/
+	// set to PAL
 }
 
 void nes_vt_hh_state::nes_vt_fp_pal_32mb(machine_config& config)
@@ -1242,18 +1238,39 @@ void nes_vt_hh_state::nes_vt_fp_pal_32mb(machine_config& config)
 }
 
 
-void nes_vt_dg_state::nes_vt_fa(machine_config &config)
+void nes_vt_dg_state::nes_vt_fa(machine_config& config)
 {
 	nes_vt_4k_ram(config);
-	/*
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_fa_map);
-	*/
+
+	NES_VT_SOC_8KRAM_FA(config.replace(), m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
 }
 
-void nes_vt_dg_state::nes_vt_fa_4x16mb(machine_config& config)
+
+READ8_MEMBER(nes_vt_dg_state::fapocket_412c_r)
+{
+	if (m_cartsel)
+		return m_cartsel->read();
+	else
+		return 0;
+}
+
+WRITE8_MEMBER(nes_vt_dg_state::fapocket_412c_w)
+{
+	// fapocket (ok?) (also uses bank from config switch for fake cartridge slot)
+	logerror("%s: vtfa_412c_extbank_w %02x\n", machine().describe_context(), data);
+	m_ahigh = 0;
+	m_ahigh |= (data & 0x01) ? (1 << 25) : 0x0;
+	m_ahigh |= (data & 0x02) ? (1 << 24) : 0x0;
+}
+
+void nes_vt_dg_state::nes_vt_fa_4x16mb(machine_config& config) // fapocket
 {
 	nes_vt_fa(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::vt_external_space_map_fapocket_4x16mbyte);
+
+	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412c_callback().set(FUNC(nes_vt_dg_state::fapocket_412c_r));
+	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt_dg_state::fapocket_412c_w));
 }
 
 
@@ -1264,9 +1281,7 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009(machine_config &config)
 	NES_VT_SOC_SCRAMBLE(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
-	/* TODO
-	//m_ppu->set_palette_mode(PAL_MODE_NEW_VG); // gives better title screens, but worse ingame, must be able to switch
-	*/
+	//m_soc->set_default_palette_mode(PAL_MODE_NEW_VG); // gives better title screens, but worse ingame, must be able to switch
 }
 
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_4mb(machine_config& config)
@@ -1284,13 +1299,9 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_8mb(machine_config& config)
 
 void nes_vt_swap_op_d5_d6_state::nes_vt_senwld_512kb(machine_config &config)
 {
-
 	nes_vt_vh2009(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte);
-
-	/*		
-	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
-	*/
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte);	
+	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
 }
 
 static INPUT_PORTS_START( nes_vt_fp )

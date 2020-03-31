@@ -51,6 +51,9 @@ public:
 	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
 	void set_410x_scramble(uint8_t reg0, uint8_t reg1);
 
+	void set_default_palette_mode(vtxx_pal_mode pmode) { m_default_palette_mode = pmode; }
+
+
 protected:
 	nes_vt_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -66,7 +69,6 @@ protected:
 	required_device<nesapu_device> m_apu;
 
 	void nes_vt_map(address_map& map);
-
 
 	uint32_t get_banks(uint8_t bnk);
 	void update_banks();
@@ -92,8 +94,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(vt_fixed_dma_w);
 	void do_dma(uint8_t data, bool has_ntsc_bug);
 	DECLARE_WRITE8_MEMBER(vt03_4034_w);
-
-
+	
 	DECLARE_READ8_MEMBER(in0_r);
 	DECLARE_READ8_MEMBER(in1_r);
 	DECLARE_WRITE8_MEMBER(in0_w);
@@ -119,8 +120,6 @@ protected:
 
 	uint8_t m_8000_addr_latch;
 	
-	
-
 	uint8_t m_4242;
 	uint8_t m_411c;
 	uint8_t m_411d;
@@ -140,7 +139,6 @@ private:
 
 	address_space_config        m_space_config;
 
-
 	int m_bankaddr[4];
 	uint16_t m_real_access_address;
 
@@ -159,6 +157,8 @@ private:
 	devcb_read8 m_extra_read_3_callback;
 
 	uint8_t m_2012_2017_descramble[0x6]; // passed to PPU in reset
+	vtxx_pal_mode m_default_palette_mode;
+	bool m_force_baddma;
 };
 
 

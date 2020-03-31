@@ -109,6 +109,9 @@ nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, device_type 
 	// 'no scramble' configuration
 	m_410x_scramble[0x0] = 0x7;
 	m_410x_scramble[0x1] = 0x8;
+
+	m_default_palette_mode = PAL_MODE_VT0x;
+	m_force_baddma = false;
 }
 
 nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
@@ -248,6 +251,8 @@ void nes_vt_soc_device::device_reset()
 	update_banks();
 
 	m_ppu->set_201x_descramble(m_2012_2017_descramble[0], m_2012_2017_descramble[1], m_2012_2017_descramble[2], m_2012_2017_descramble[3], m_2012_2017_descramble[4], m_2012_2017_descramble[5]);
+	m_ppu->set_palette_mode(m_default_palette_mode);
+
 }
 
 uint32_t nes_vt_soc_device::get_banks(uint8_t bnk)
@@ -1515,25 +1520,12 @@ void nes_vt_soc_8kram_fa_device::device_add_mconfig(machine_config& config)
 READ8_MEMBER(nes_vt_soc_8kram_fa_device::vtfa_412c_r)
 {
 	return m_upper_read_412c_callback();
-
-//	if (m_cartsel)
-//		return m_cartsel->read();
-//	else
-//		return 0;
-
-	return 0;
 }
 
 WRITE8_MEMBER(nes_vt_soc_8kram_fa_device::vtfa_412c_extbank_w)
 {
 	m_upper_write_412c_callback(data);
 
-	// TODO
-	// fapocket (ok?) (also uses bank from config switch for fake cartridge slot)
-//	logerror("%s: vtfa_412c_extbank_w %02x\n", machine().describe_context(), data);
-//	m_ahigh = 0;
-//	m_ahigh |= (data & 0x01) ? (1 << 25) : 0x0;
-//	m_ahigh |= (data & 0x02) ? (1 << 24) : 0x0;
 }
 
 WRITE8_MEMBER(nes_vt_soc_8kram_fa_device::vtfp_4242_w)
