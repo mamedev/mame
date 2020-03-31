@@ -95,15 +95,10 @@ public:
 		m_soc(*this, "soc")
 	{ }
 
-	void nes_vt_base(machine_config& config);
-	void nes_vt_base_pal(machine_config& config);
-
-	void nes_vt_pal(machine_config& config);
 	void nes_vt_pal_2mb(machine_config& config);
 	void nes_vt_pal_4mb(machine_config& config);
 	void nes_vt_pal_8mb(machine_config& config);
 
-	void nes_vt(machine_config& config);
 	void nes_vt_512kb(machine_config& config);
 	void nes_vt_1mb(machine_config& config);
 	void nes_vt_2mb(machine_config& config);
@@ -346,10 +341,10 @@ private:
 	DECLARE_READ8_MEMBER(vt_rom_banked_r);
 	void vt_external_space_map_fp_2x32mbyte(address_map& map);
 
-	void nes_vt_hh_baddma_map(address_map& map);
 	void nes_vt_fp_map(address_map& map);
 
-
+	DECLARE_READ8_MEMBER(fcpocket_412d_r);
+	DECLARE_WRITE8_MEMBER(fcpocket_412c_w);
 };
 
 class nes_vt_ablpinb_state : public nes_vt_state
@@ -722,28 +717,6 @@ WRITE8_MEMBER(nes_vt_sudoku_state::in0_w)
 {
 }
 
-void nes_vt_base_state::nes_vt_map(address_map &map)
-{
-}
-
-
-
-void nes_vt_hh_state::nes_vt_hh_baddma_map(address_map &map)
-{
-	//nes_vt_hh_map(map);
-	// TODO map(0x4014, 0x4014).w(FUNC(nes_vt_hh_state::vt_dma_w));
-}
-
-
-
-
-void nes_vt_dg_state::nes_vt_dg_baddma_map(address_map& map)
-{
-	//nes_vt_dg_map(map);
-	// TODO map(0x4014, 0x4014).w(FUNC(nes_vt_hh_state::vt_dma_w));
-}
-
-
 
 /* not strictly needed, but helps us see where things are in ROM to aid with figuring out banking schemes*/
 static const gfx_layout helper_layout =
@@ -788,147 +761,124 @@ void nes_vt_base_state::configure_soc(nes_vt_soc_device* soc)
 
 
 
-
-void nes_vt_state::nes_vt_base(machine_config &config)
-{
-	/* basic machine hardware */
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
-}
-
-void nes_vt_state::nes_vt_base_pal(machine_config &config)
-{
-	
-	nes_vt_base(config);
-	/*
-	m_maincpu->set_clock(PALC_APU_CLOCK);
-
-	PPU_VT03PAL(config.replace(), m_ppu, N2A03_PAL_XTAL);
-	m_ppu->set_cpu_tag(m_maincpu);
-	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-//	m_ppu->read_bg().set(FUNC(nes_vt_base_state::chr_r));
-//	m_ppu->read_sp().set(FUNC(nes_vt_base_state::spr_r));
-	m_ppu->set_screen(m_screen);
-
-	m_screen->set_refresh_hz(50.0070);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66 / (PALC_APU_CLOCK.dvalue() / 1000000)) *
-		(ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL - ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC + 1 + 2)));
-	m_screen->set_size(32 * 8, 312);
-	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
-	*/
-}
-
 void nes_vt_sudoku_state::nes_vt_sudoku_512kb(machine_config &config)
 {
-	nes_vt_base(config);
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sudoku_state::vt_external_space_map_512kbyte);
 }
 
 void nes_vt_vg_1mb_majgnc_state::nes_vt_vg_1mb_majgnc(machine_config &config)
 {
-	nes_vt_base(config);
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_vg_1mb_majgnc_state::vt_external_space_map_1mbyte);
 }
 
-void nes_vt_state::nes_vt(machine_config &config)
-{
-	nes_vt_base(config);
-}
-
 void nes_vt_state::nes_vt_512kb(machine_config& config)
 {
-
-	nes_vt(config);
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_512kbyte);
 }
 
 void nes_vt_state::nes_vt_1mb(machine_config& config)
 {
-	nes_vt(config);
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_1mbyte);
 }
 
 void nes_vt_state::nes_vt_2mb(machine_config& config)
 {
-	nes_vt(config);
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_2mbyte);
 }
 
 void nes_vt_state::nes_vt_4mb(machine_config& config)
 {
-	nes_vt(config);
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_4mbyte);
 }
 
 void nes_vt_state::nes_vt_8mb(machine_config& config)
 {
-	nes_vt(config);
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_8mbyte);
 }
 
 void nes_vt_state::nes_vt_16mb(machine_config& config)
 {
-	nes_vt(config);
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_16mbyte);
 }
 
 void nes_vt_state::nes_vt_32mb(machine_config& config)
 {
-	nes_vt(config);
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_32mbyte);
-}
-
-void nes_vt_state::nes_vt_pal(machine_config &config)
-{
-	nes_vt_base_pal(config);
 }
 
 void nes_vt_state::nes_vt_pal_2mb(machine_config& config)
 {
-	nes_vt_pal(config);
+	NES_VT_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_2mbyte);
 }
 
 void nes_vt_state::nes_vt_pal_4mb(machine_config& config)
 {
-	nes_vt_pal(config);
+	NES_VT_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_4mbyte);
 }
 
 void nes_vt_state::nes_vt_pal_8mb(machine_config& config)
 {
-	nes_vt_pal(config);
+	NES_VT_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_8mbyte);
 }
 
 void nes_vt_waixing_state::nes_vt_waixing_512kb(machine_config &config)
 {
-	nes_vt_512kb(config);
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_state::vt_external_space_map_512kbyte);
 	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
 }
 
 void nes_vt_waixing_state::nes_vt_waixing_2mb(machine_config &config)
 {
-	nes_vt_2mb(config);
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_state::vt_external_space_map_2mbyte);
 	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
 }
 
 void nes_vt_waixing_alt_state::nes_vt_waixing_alt_pal_8mb(machine_config &config)
 {
-	nes_vt_pal_8mb(config); // TODO make PAL
+	NES_VT_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	configure_soc(m_soc);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_alt_state::vt_external_space_map_8mbyte);
 	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
 	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
 }
 
-
 void nes_vt_hum_state::nes_vt_hummer_2mb(machine_config& config)
 {
-	nes_vt_2mb(config);
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_2mbyte);
 	m_soc->set_201x_descramble(0x7, 0x6, 0x5, 0x4, 0x2, 0x3);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
+	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
 }
 
 void nes_vt_hum_state::nes_vt_hummer_4mb(machine_config& config)
@@ -939,23 +889,32 @@ void nes_vt_hum_state::nes_vt_hummer_4mb(machine_config& config)
 
 void nes_vt_pjoy_state::nes_vt_pjoy_4mb(machine_config &config)
 {
-	nes_vt_4mb(config);
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_4mbyte);
 	m_soc->set_201x_descramble(0x2, 0x3, 0x4, 0x5, 0x6, 0x7);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x8, 0x7);
 	m_soc->set_410x_scramble(0x8, 0x7);
+	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
 }
 
 
 void nes_vt_sp69_state::nes_vt_4mb_sp69(machine_config& config)
 {
-	nes_vt_4mb(config);
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_4mbyte);
 	m_soc->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
+	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
 }
 
 void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
 {
-	nes_vt_2mb(config);
+	NES_VT_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	configure_soc(m_soc);
+
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_2mbyte);
 	m_soc->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
 
@@ -963,6 +922,8 @@ void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
 	m_soc->extra_read_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));
 	m_soc->extra_write_2_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_w));
 	m_soc->extra_write_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_w));
+
+	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
 }
 
 READ8_MEMBER(nes_vt_base_state::upper_412c_r)
@@ -1073,9 +1034,7 @@ void nes_vt_dg_state::nes_vt_dg_baddma_16mb(machine_config& config)
 {
 	nes_vt_dg(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::vt_external_space_map_16mbyte);
-	/*
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_dg_baddma_map);
-	*/
+
 }
 
 void nes_vt_hh_state::nes_vt_vg(machine_config &config)
@@ -1085,10 +1044,8 @@ void nes_vt_hh_state::nes_vt_vg(machine_config &config)
 	NES_VT_SOC_8KRAM_DG(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
-	
-	//m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_map);
-
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
+	m_soc->force_bad_dma();
 }
 
 void nes_vt_hh_state::nes_vt_vg_8mb(machine_config& config)
@@ -1114,8 +1071,6 @@ void nes_vt_hh_state::nes_vt_vg_1mb_majkon(machine_config &config)
 	nes_vt_dg(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_1mbyte);
 	
-	//m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_baddma_map);
-
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
 }
 
@@ -1129,6 +1084,7 @@ void nes_vt_hh_state::nes_vt_hh(machine_config &config)
 	configure_soc(m_soc);
 
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
+	m_soc->force_bad_dma();
 
 	/*
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_map);
@@ -1198,12 +1154,31 @@ void nes_vt_hh_state::nes_vt_fp(machine_config &config)
 	configure_soc(m_soc);
 
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB12);
+	m_soc->force_bad_dma();
+}
+
+READ8_MEMBER(nes_vt_hh_state::fcpocket_412d_r)
+{
+	if (m_cartsel)
+		return m_cartsel->read();
+	else
+		return 0;
+}
+
+WRITE8_MEMBER(nes_vt_hh_state::fcpocket_412c_w)
+{
+	// fcpocket
+	logerror("%s: vtfp_412c_extbank_w %02x\n", machine().describe_context(), data);
+	m_ahigh = (data & 0x01) ? (1 << 25) : 0x0;
 }
 
 void nes_vt_hh_state::nes_vt_fp_4x16mb(machine_config& config)
 {
 	nes_vt_fp(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_fp_2x32mbyte);
+
+	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt_hh_state::fcpocket_412c_w));
+	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt_hh_state::fcpocket_412d_r));
 }
 
 void nes_vt_hh_state::nes_vt_fp_32mb(machine_config& config)
@@ -1276,7 +1251,8 @@ void nes_vt_dg_state::nes_vt_fa_4x16mb(machine_config& config) // fapocket
 
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009(machine_config &config)
 {
-	nes_vt(config);
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
 	
 	NES_VT_SOC_SCRAMBLE(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
@@ -2018,11 +1994,6 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_stat
 CONS( 201?, red5mam,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 
 
-// boots, same platform with scrambled opcodes as FC pocket
-// palette issues in some games because they actually use the old VT style palette
-// but no way to switch?
-// some menu gfx broken, probably because this is a bad dump
-CONS( 2015, dgun2573,  0,  0,  nes_vt_fp_32mb, nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "My Arcade Gamer V Portable Gaming System (DGUN-2573)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 201?, denv150,   0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
@@ -2088,13 +2059,6 @@ CONS( 200?, mc_8x6ss,   0,        0,  nes_vt_1mb,    nes_vt, nes_vt_state, empty
 CONS( 2004, mc_dcat8,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_IMPERFECT_GRAPHICS )
 
-// Runs well, minor GFX issues in intro
-CONS( 2017, sy889,      0,        0,  nes_vt_hh_8mb, nes_vt, nes_vt_hh_state, empty_init, "SY Corp",   "SY-889 300 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2016, sy888b,     0,        0,  nes_vt_hh_4mb, nes_vt, nes_vt_hh_state, empty_init, "SY Corp",   "SY-888B 288 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
-
-
-// Same hardware as SY-889
-CONS( 201?, mc_cb280,   0,        0,  nes_vt_hh_4mb, nes_vt, nes_vt_hh_state, empty_init, "CoolBoy",   "Coolboy RS-18 (280 in 1)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Runs well, only issues in SMB3 which crashes
 CONS( 2017, bittboy,    0,        0,  nes_vt_bt_2x16mb, nes_vt, nes_vt_cy_state, empty_init, "BittBoy",   "BittBoy Mini FC 300 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (2x 16mbyte banks)
@@ -2112,24 +2076,42 @@ CONS( 201?, mc_tv200,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty
  // probably another Thumbs Up product? cursor doesn't work unless nes_vt_hh machine is used? possibly newer than VT02 as it runs from an SPI ROM, might just not use enhanced features.  Some minor game name changes to above (eg Smackdown just becomes Wrestling)
 CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt_hh_8mb, nes_vt, nes_vt_hh_state, empty_init, "<unknown>", "200 in 1 Retro Arcade", MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2015, rminitv,     0,        0,  nes_vt_fp_pal_32mb, nes_vt, nes_vt_hh_state, empty_init, "Orb Gaming", "Retro 'Mini TV' Console 300-in-1", MACHINE_IMPERFECT_GRAPHICS ) // single 32Mbyte bank!
 
 // available in a number of colours, with various brands, but likely all the same.
 // This was a red coloured pad, contains various unlicensed bootleg reskinned NES game eg Blob Buster is a hack of Dig Dug 2 and there are also hacks of Xevious, Donkey Kong Jr, Donkey Kong 3 and many others.
 CONS( 201?, ppgc200g,   0,         0,  nes_vt_8mb, nes_vt, nes_vt_state, empty_init, "<unknown>", "Plug & Play Game Controller with 200 Games (Supreme 200)", MACHINE_IMPERFECT_GRAPHICS )
 
-// New platform with scrambled opcodes, same as DGUN-2561. Runs fine with minor GFX and sound issues in menu
-// Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
-CONS( 2016, fcpocket,   0,        0,  nes_vt_fp_4x16mb, nes_vt_fp, nes_vt_hh_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (2x 32mbyte banks)
+
 // Probably VT09 or similar
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a ROM high address bit
 // (which can also be overriden by GPIO)
 CONS( 2017, fapocket,   0,        0,  nes_vt_fa_4x16mb, nes_vt_fa, nes_vt_dg_fapocket_state, empty_init, "<unknown>",   "Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (4x 16mbyte banks)
 
-// Plays intro music but then crashes. same hardware as SY-88x but uses more features
-CONS( 2016, mog_m320,   0,        0,  nes_vt_hh_8mb, nes_vt, nes_vt_hh_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
 
 CONS( 2017, otrail,     0,        0,  nes_vt_dg_1mb, nes_vt, nes_vt_dg_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2005, senwld,   0,          0,  nes_vt_senwld_512kb,    nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Win, Lose or Draw (Senario)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // needs RAM in banked space, Alpha display emulating, Touchpad emulating etc.
+
+
+
+// Runs well, minor GFX issues in intro
+CONS( 2017, sy889,      0,        0,  nes_vt_hh_8mb, nes_vt, nes_vt_hh_state, empty_init, "SY Corp",   "SY-889 300 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2016, sy888b,     0,        0,  nes_vt_hh_4mb, nes_vt, nes_vt_hh_state, empty_init, "SY Corp",   "SY-888B 288 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
+
+// Same hardware as SY-889
+CONS( 201?, mc_cb280,   0,        0,  nes_vt_hh_4mb, nes_vt, nes_vt_hh_state, empty_init, "CoolBoy",   "Coolboy RS-18 (280 in 1)", MACHINE_IMPERFECT_GRAPHICS )
+
+// Plays intro music but then crashes. same hardware as SY-88x but uses more features
+CONS( 2016, mog_m320,   0,        0,  nes_vt_hh_8mb, nes_vt, nes_vt_hh_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
+
+
+// similar menus to above, but with opcode scrambling
+// palette issues in some games because they actually use the old VT style palette
+// but no way to switch?
+// some menu gfx broken, probably because this is a bad dump
+CONS( 2015, dgun2573,  0,  0,  nes_vt_fp_32mb,     nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "My Arcade Gamer V Portable Gaming System (DGUN-2573)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2015, rminitv,   0,  0,  nes_vt_fp_pal_32mb, nes_vt, nes_vt_hh_state, empty_init, "Orb Gaming", "Retro 'Mini TV' Console 300-in-1", MACHINE_IMPERFECT_GRAPHICS ) // single 32Mbyte bank!
+// New platform with scrambled opcodes, same as DGUN-2561. Runs fine with minor GFX and sound issues in menu
+// Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
+CONS( 2016, fcpocket,  0,  0,  nes_vt_fp_4x16mb,   nes_vt_fp, nes_vt_hh_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (2x 32mbyte banks)
 

@@ -50,9 +50,9 @@ public:
 
 	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
 	void set_410x_scramble(uint8_t reg0, uint8_t reg1);
+	void force_bad_dma() { m_force_baddma = true; };
 
 	void set_default_palette_mode(vtxx_pal_mode pmode) { m_default_palette_mode = pmode; }
-
 
 protected:
 	nes_vt_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -135,6 +135,8 @@ protected:
 	DECLARE_READ8_MEMBER(external_space_read);
 	DECLARE_WRITE8_MEMBER(external_space_write);
 
+	void do_pal_timings_and_ppu_replacement(machine_config& config);
+
 private:
 
 	address_space_config        m_space_config;
@@ -161,6 +163,14 @@ private:
 	bool m_force_baddma;
 };
 
+class nes_vt_soc_pal_device : public nes_vt_soc_device
+{
+public:
+	nes_vt_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config& config) override;
+};
 
 class nes_vt_soc_scramble_device : public nes_vt_soc_device
 {
@@ -305,6 +315,8 @@ protected:
 
 
 DECLARE_DEVICE_TYPE(NES_VT_SOC, nes_vt_soc_device)
+DECLARE_DEVICE_TYPE(NES_VT_SOC_PAL, nes_vt_soc_pal_device)
+
 DECLARE_DEVICE_TYPE(NES_VT_SOC_SCRAMBLE, nes_vt_soc_scramble_device)
 DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM, nes_vt_soc_4kram_device)
 DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_CY, nes_vt_soc_4kram_cy_device)
