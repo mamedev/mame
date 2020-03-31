@@ -3162,7 +3162,7 @@ void metro_state::batlbubl(machine_config &config)
 
 void metro_state::metro_upd7810_sound(machine_config &config)
 {
-	upd7810_device &upd(UPD7810(config, m_audiocpu, 24_MHz_XTAL/2));
+	upd78c10_device &upd(UPD78C10(config, m_audiocpu, 24_MHz_XTAL/2));
 	upd.rxd_func().set(FUNC(metro_state::rxd_r));
 	upd.set_addrmap(AS_PROGRAM, &metro_state::upd7810_map);
 	upd.pa_in_cb().set(FUNC(metro_state::upd7810_porta_r));
@@ -3173,7 +3173,7 @@ void metro_state::metro_upd7810_sound(machine_config &config)
 
 void metro_state::daitorid_upd7810_sound(machine_config &config)
 {
-	upd7810_device &upd(UPD7810(config, m_audiocpu, 12_MHz_XTAL));
+	upd78c10_device &upd(UPD78C10(config, m_audiocpu, 12_MHz_XTAL));
 	upd.rxd_func().set(FUNC(metro_state::rxd_r));
 	upd.set_addrmap(AS_PROGRAM, &metro_state::upd7810_map);
 	upd.pa_in_cb().set(FUNC(metro_state::upd7810_porta_r));

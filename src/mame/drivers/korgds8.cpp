@@ -204,7 +204,7 @@ void korg_ds8_state::palette_init_ds8(palette_device &palette)
 
 void korg_ds8_state::ds8(machine_config &config)
 {
-	UPD7810(config, m_maincpu, 12_MHz_XTAL); // µPD78C10CW
+	UPD78C10(config, m_maincpu, 12_MHz_XTAL); // µPD78C10CW
 	m_maincpu->set_addrmap(AS_PROGRAM, &korg_ds8_state::mem_map);
 	m_maincpu->pa_in_cb().set(FUNC(korg_ds8_state::kbd_sw_r));
 	m_maincpu->pb_out_cb().set(FUNC(korg_ds8_state::scan_w));

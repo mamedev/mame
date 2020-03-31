@@ -382,6 +382,7 @@ STOP            01001000  10111011          12  stop
 
 
 DEFINE_DEVICE_TYPE(UPD7810,  upd7810_device,  "upd7810",  "NEC uPD7810")
+DEFINE_DEVICE_TYPE(UPD78C10, upd78c10_device, "upd78c10", "NEC uPD78C10")
 DEFINE_DEVICE_TYPE(UPD7807,  upd7807_device,  "upd7807",  "NEC uPD7807")
 DEFINE_DEVICE_TYPE(UPD7801,  upd7801_device,  "upd7801",  "NEC uPD7801")
 DEFINE_DEVICE_TYPE(UPD78C05, upd78c05_device, "upd78c05", "NEC uPD78C05")
@@ -447,6 +448,16 @@ void upd7810_device::configure_ops()
 
 upd7810_device::upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upd7810_device(mconfig, UPD7810, tag, owner, clock, address_map_constructor(FUNC(upd7810_device::upd_internal_256_ram_map), this))
+{
+}
+
+upd78c10_device::upd78c10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map)
+	: upd7810_device(mconfig, type, tag, owner, clock, internal_map)
+{
+}
+
+upd78c10_device::upd78c10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upd78c10_device(mconfig, UPD78C10, tag, owner, clock, address_map_constructor(FUNC(upd78c10_device::upd_internal_256_ram_map), this))
 {
 }
 
