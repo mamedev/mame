@@ -20,7 +20,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/nes_vt.h"
+#include "machine/nes_vt_soc.h"
 
 class nes_vt_base_state : public driver_device
 {
@@ -1146,16 +1146,6 @@ static INPUT_PORTS_START( nes_vt_ddr )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void nes_vt_hh_state::nes_vt_fp(machine_config &config)
-{
-	nes_vt_4k_ram(config);
-
-	NES_VT_SOC_4KRAM_FP(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB12);
-	m_soc->force_bad_dma();
-}
 
 READ8_MEMBER(nes_vt_hh_state::fcpocket_412d_r)
 {
@@ -1171,6 +1161,19 @@ WRITE8_MEMBER(nes_vt_hh_state::fcpocket_412c_w)
 	logerror("%s: vtfp_412c_extbank_w %02x\n", machine().describe_context(), data);
 	m_ahigh = (data & 0x01) ? (1 << 25) : 0x0;
 }
+
+void nes_vt_hh_state::nes_vt_fp(machine_config &config)
+{
+	nes_vt_4k_ram(config);
+
+	NES_VT_SOC_4KRAM_FP(config.replace(), m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
+
+	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB12);
+	m_soc->force_bad_dma();
+}
+
+
 
 void nes_vt_hh_state::nes_vt_fp_4x16mb(machine_config& config)
 {
@@ -1208,7 +1211,14 @@ void nes_vt_hh_state::nes_vt_fp_pal(machine_config &config)
 
 void nes_vt_hh_state::nes_vt_fp_pal_32mb(machine_config& config)
 {
-	nes_vt_fp_pal(config);
+	nes_vt_4k_ram(config);
+
+	NES_VT_SOC_4KRAM_FP_PAL(config.replace(), m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
+
+	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB12);
+	m_soc->force_bad_dma();
+
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_32mbyte);
 }
 
@@ -1744,30 +1754,11 @@ ROM_START( sudopptv )
 	ROM_LOAD( "sudokupnptvgame_29lv400tc_000422b9.bin", 0x00000, 0x80000, CRC(722cc36d) SHA1(1f6d1f57478cf175a36722b39c52eded4b669f81) )
 ROM_END
 
-
 ROM_START( ablping )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "abl_pingpong.bin", 0x00000, 0x200000, CRC(b31de1fb) SHA1(94e8afb2315ba1fa0892191c8e1832391e401c70) )
 ROM_END
 
-
-
-#if 0
-ROM_START( mc_15kin1 )
-	ROM_REGION( 0x200000, "mainrom", 0 )
-	ROM_LOAD( "15000in1.bin", 0x00000, 0x200000, CRC(29a8cb96) SHA1(c4b31964fbfc5ee97d4a4c7e4d418ea5d84a568d) )
-ROM_END
-
-ROM_START( mc_18kin1 )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "18000in1.bin", 0x00000, 0x400000, CRC(23c0c325) SHA1(4ad53b5e5a8e65571fd39760278cdf7a6371da47) )
-ROM_END
-
-ROM_START( gx121in1 )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "gx121in1.bin", 0x00000, 0x400000, CRC(0282d975) SHA1(9ead7505b99a60834724a5818ee120e03c8bf975) )
-ROM_END
-#endif
 ROM_START( dgun2573 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "dgun2573.bin", 0x00000, 0x2000000, BAD_DUMP CRC(cde71a53) SHA1(d0d4c1965876291861781ecde46b1142b062f1f3) )

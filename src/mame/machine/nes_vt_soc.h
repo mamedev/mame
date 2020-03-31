@@ -269,6 +269,7 @@ public:
 	nes_vt_soc_4kram_fp_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
+	nes_vt_soc_4kram_fp_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
@@ -281,6 +282,16 @@ protected:
 	DECLARE_WRITE8_MEMBER(vtfp_4242_w);
 	DECLARE_WRITE8_MEMBER(vtfp_4a00_w);
 };
+
+class nes_vt_soc_4kram_fp_pal_device : public nes_vt_soc_4kram_fp_device
+{
+public:
+	nes_vt_soc_4kram_fp_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config& config) override;
+};
+
 
 class nes_vt_soc_8kram_dg_device : public nes_vt_soc_4kram_device
 {
@@ -322,7 +333,10 @@ DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM, nes_vt_soc_4kram_device)
 DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_CY, nes_vt_soc_4kram_cy_device)
 DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_BT, nes_vt_soc_4kram_bt_device)
 DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_HH, nes_vt_soc_4kram_hh_device)
+
 DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_FP, nes_vt_soc_4kram_fp_device)
+DECLARE_DEVICE_TYPE(NES_VT_SOC_4KRAM_FP_PAL, nes_vt_soc_4kram_fp_pal_device)
+
 DECLARE_DEVICE_TYPE(NES_VT_SOC_8KRAM_DG, nes_vt_soc_8kram_dg_device)
 DECLARE_DEVICE_TYPE(NES_VT_SOC_8KRAM_FA, nes_vt_soc_8kram_fa_device)
 

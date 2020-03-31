@@ -53,17 +53,24 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "nes_vt.h"
+#include "nes_vt_soc.h"
+
+// TODO: identify what kind of SoCs each of these are (some are probably meant to be the same chip, just with subsets of the features added at the moment, especially the CY/BT/HH ones)
+// also work out if some of these features (eg. opcode scrambling) should be done with external callbacks, sometimes the die was the same (VH2009) but encryption not always present (pin control or external feature?)
 
 DEFINE_DEVICE_TYPE(NES_VT_SOC, nes_vt_soc_device, "nes_vt_soc", "VTxx series System on a Chip (NTSC)")
 DEFINE_DEVICE_TYPE(NES_VT_SOC_PAL, nes_vt_soc_pal_device, "nes_vt_soc_pal", "VTxx series System on a Chip (PAL)")
 
-DEFINE_DEVICE_TYPE(NES_VT_SOC_SCRAMBLE, nes_vt_soc_scramble_device, "nes_vt_soc_scram", "VTxx series System on a Chip (with Opcode scrambling)")
+DEFINE_DEVICE_TYPE(NES_VT_SOC_SCRAMBLE, nes_vt_soc_scramble_device, "nes_vt_soc_scram", "VTxx series System on a Chip (with simple Opcode scrambling)")
+
 DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM, nes_vt_soc_4kram_device, "nes_vt_soc_4k", "VTxx series System on a Chip (with 4KByte RAM)")
 DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM_CY, nes_vt_soc_4kram_cy_device, "nes_vt_soc_4k_cy", "VTxx series System on a Chip (with 4KByte RAM) (CY)")
 DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM_BT, nes_vt_soc_4kram_bt_device, "nes_vt_soc_4k_bt", "VTxx series System on a Chip (with 4KByte RAM) (BT)")
 DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM_HH, nes_vt_soc_4kram_hh_device, "nes_vt_soc_4k_hh", "VTxx series System on a Chip (with 4KByte RAM) (HH)")
-DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM_FP, nes_vt_soc_4kram_fp_device, "nes_vt_soc_4k_fp", "VTxx series System on a Chip (with 4KByte RAM) (FP)")
+
+DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM_FP, nes_vt_soc_4kram_fp_device, "nes_vt_soc_4k_fp", "VTxx series System on a Chip (with 4KByte RAM) (FP) (NTSC)")
+DEFINE_DEVICE_TYPE(NES_VT_SOC_4KRAM_FP_PAL, nes_vt_soc_4kram_fp_pal_device, "nes_vt_soc_4k_fp_pal", "VTxx series System on a Chip (with 4KByte RAM) (FP) (PAL)")
+
 DEFINE_DEVICE_TYPE(NES_VT_SOC_8KRAM_DG, nes_vt_soc_8kram_dg_device, "nes_vt_soc_8k_dg", "VTxx series System on a Chip (with 8KByte RAM) (DG)")
 DEFINE_DEVICE_TYPE(NES_VT_SOC_8KRAM_FA, nes_vt_soc_8kram_fa_device, "nes_vt_soc_8k_dg", "VTxx series System on a Chip (with 8KByte RAM) (FA)")
 
@@ -168,10 +175,19 @@ nes_vt_soc_4kram_hh_device::nes_vt_soc_4kram_hh_device(const machine_config& mco
 
 
 nes_vt_soc_4kram_fp_device::nes_vt_soc_4kram_fp_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
-	nes_vt_soc_4kram_hh_device(mconfig, NES_VT_SOC_4KRAM_FP, tag, owner, clock)
+	nes_vt_soc_4kram_fp_device(mconfig, NES_VT_SOC_4KRAM_FP, tag, owner, clock)
 {
 }
 
+nes_vt_soc_4kram_fp_device::nes_vt_soc_4kram_fp_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt_soc_4kram_hh_device(mconfig, type, tag, owner, clock)
+{
+}
+
+nes_vt_soc_4kram_fp_pal_device::nes_vt_soc_4kram_fp_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt_soc_4kram_fp_device(mconfig, NES_VT_SOC_4KRAM_FP_PAL, tag, owner, clock)
+{
+}
 
 nes_vt_soc_8kram_dg_device::nes_vt_soc_8kram_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
 	nes_vt_soc_4kram_device(mconfig, type, tag, owner, clock)
@@ -1501,6 +1517,12 @@ void nes_vt_soc_4kram_fp_device::nes_vt_fp_map(address_map &map)
 	map(0x4242, 0x4242).w(FUNC(nes_vt_soc_4kram_fp_device::vtfp_4242_w));
 
 	map(0x4a00, 0x4a00).w(FUNC(nes_vt_soc_4kram_fp_device::vtfp_4a00_w));	
+}
+
+void nes_vt_soc_4kram_fp_pal_device::device_add_mconfig(machine_config& config)
+{
+	nes_vt_soc_4kram_fp_device::device_add_mconfig(config);
+	do_pal_timings_and_ppu_replacement(config);
 }
 
 /***********************************************************************************************************************************************************/
