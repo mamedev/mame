@@ -8,6 +8,12 @@ Libretro MAME core build status:
 | --------------------- |:-------------:|
 | Linux GCC / OSX Clang | [![Build Status](https://travis-ci.org/libretro/mame.svg?branch=master)](https://travis-ci.org/libretro/mame) |
 
+To build libretro MAME core from source you need to use `Makefile.libretro` make
+file:
+
+```
+make -f Makefile.libretro
+```
 
 --------
 
