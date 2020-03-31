@@ -169,6 +169,7 @@ public:
 	void ews286(machine_config &config);
 	void olyport40(machine_config &config);
 	void micral45(machine_config &config);
+	void euroat(machine_config &config);
 
 	void init_at();
 	void init_atpci();
@@ -186,6 +187,8 @@ protected:
 
 	static void cfg_single_360K(device_t *device);
 	static void cfg_single_1200K(device_t *device);
+	static void cfg_single_1440K(device_t *device);
+	static void cfg_dual_1440K(device_t *device);
 	void at16_io(address_map &map);
 	void at16_map(address_map &map);
 	void at16l_map(address_map &map);
@@ -473,6 +476,18 @@ void at_state::cfg_single_360K(device_t *device)
 {
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("525dd");
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option(nullptr);
+}
+
+void at_state::cfg_single_1440K(device_t *device)
+{
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35hd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option(nullptr);
+}
+
+void at_state::cfg_dual_1440K(device_t *device)
+{
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35hd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("35hd");
 }
 
 static void pci_devices(device_slot_interface &device)
@@ -922,6 +937,16 @@ void at_state::micral45(machine_config &config)
 	atturbo(config);
 	m_maincpu->set_clock(12'000'000);
 	subdevice<isa16_slot_device>("isa1")->set_default_option("ega");
+}
+
+void at_state::euroat(machine_config &config)
+{
+	ibm5170(config);
+	m_maincpu->set_clock(24_MHz_XTAL / 2); // Bus speed can be set up to CPU speed
+
+	subdevice<isa16_slot_device>("isa2")->set_option_machine_config("fdc", cfg_single_1440K); // From pictures but also with a 3.5" as second floppy
+
+	m_ram->set_default_size("640K");
 }
 
 //**************************************************************************
@@ -2055,6 +2080,31 @@ ROM_END
 //**************************************************************************
 //  80286 Desktop
 //**************************************************************************
+
+// Uses the same case as the Schneider EuroXT, a compact desktop with room for a single floppy drive and an AT IDE harddisk (Seagate ST-142A, ST-157A)
+// Mainboard: Baugr.Nr. 51513 with internal EGA, 52591 EGA components omitted (see: EURO VGA)
+// Chipset: 2xHeadland GC102-PC, HT101A/B1A4924, Schneider BIGJIM 30773, WD37C65BJM, Siemens SAB 16C450-N
+// EGA chipset (mainboard 51513): G2 GC201-PC, 64K RAM - Main RAM: 1MB
+// CPU: Siemens SAB 80286-12, Keyboard-BIOS: Schneider ROM BIOS 1985, 1989 Phoenix 
+// Connectors: Keyboard, Printer, Serial, Floppy (can use the same external floppy disk drives as the EuroXT), EGA monitor
+// OSC: 34.0000, 19.2000MHz, 24.0000, 16.000MHz
+// BUS: proprietary connectors, ISA riser (ISA8x1, ISA16x1), BIOS can set CPU and BUS speed up to 12MHz
+// Proprietary EURO VGA card: 256KB RAM, ATI 18800-1 chipset
+// blank screen, beeps 1-2-4
+ROM_START( euroat )
+	ROM_REGION16_LE( 0x20000, "bios", 0 )
+	ROM_SYSTEM_BIOS( 0, "v201", "V2.01" )
+	ROMX_LOAD( "euro_at_v201a_l.bin", 0x10000, 0x8000, CRC(0f8a2688) SHA1(95db9010b1c0465f878e5036bcf242ddf0a3be6a), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "euro_at_v201a_h.bin", 0x10001, 0x8000, CRC(75b6771b) SHA1(3aa0921914ea6e24249ce3f995fdcb341124d7e9), ROM_SKIP(1) | ROM_BIOS(0) )
+	// EGA ROM dump missing
+	
+	ROM_SYSTEM_BIOS( 1, "v203", "V2.03" )
+	ROMX_LOAD( "80286at_bioslow_schneider_ag_id50444_v2.03.bin", 0x10000, 0x8000, CRC(de356110) SHA1(6bed59a756afa0b6181187d202b325e35afadd55), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "80286at_bioshigh_schneider_ag_id50445_v2.03.bin", 0x10001, 0x8000, CRC(c4c9c840) SHA1(09deaa659191075b6ccc58403979d61bdf990dcd), ROM_SKIP(1) | ROM_BIOS(1) )
+	
+	ROM_REGION( 0x10000, "vga", 0 )
+	ROM_LOAD( "euro-vga_52255_bios_v1.02_row.bin", 0x00000, 0x10000, CRC(71d42e58) SHA1(be64990325f52128e102dfc3ed87d2d831183ddc))
+ROM_END
 
 // Victor V286C - a VGA version exists as well
 // CPU: AMD 802L86-10/S  - one ISA16 extended to ISA8: 1, ISA16: 3 on a riser card - Keyboard-BIOS: AT-KB M5L8042
@@ -5004,6 +5054,7 @@ COMP( 198?, olyport40, ibm5170, 0,       olyport40, 0,     at_state,     init_at
 COMP( 1987, n8810m15,  ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M15", MACHINE_NOT_WORKING )
 COMP( 1990, n8810m16c, ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 CGA version", MACHINE_NOT_WORKING )
 COMP( 1986, n8810m55,  ibm5170, 0,       n8810m55,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M55", MACHINE_NOT_WORKING )
+COMP( 1989, euroat,    ibm5170, 0,       euroat,    0,     at_state,     init_at,        "Schneider Rundfunkwerke AG", "Euro AT", MACHINE_NOT_WORKING )
 COMP( 199?, alaleolx,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Alaris RYC", "LEOPARD LX", MACHINE_NOT_WORKING )
 COMP( 199?, anch386s,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "ANIX",        "CH-386S-16/20/25G", MACHINE_NOT_WORKING )
 COMP( 1993, cxsxd,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "CX Technology", "CX SXD", MACHINE_NOT_WORKING )
