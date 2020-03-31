@@ -193,10 +193,7 @@ void news_r3k_state::init_common()
 
 void news_r3k_state::cpu_map(address_map &map)
 {
-	// prevent netbsd detecting invalid devices
-	map(0x18c30000, 0x18c30003).r(FUNC(news_r3k_state::bus_error));
-	map(0x18ff0000, 0x18ff0003).r(FUNC(news_r3k_state::bus_error));
-	map(0x18fe0000, 0x18fe0003).r(FUNC(news_r3k_state::bus_error));
+	map(0x08000000, 0x080fffff).ram().share("vram");
 
 	// FIXME: silence a lot of unhandled graphics addresses
 	map(0x187702b0, 0x187702b3).nopw().umask32(0xffff);
@@ -206,17 +203,23 @@ void news_r3k_state::cpu_map(address_map &map)
 	map(0x18fc0000, 0x18fc0003).nopw(); // palette?
 	map(0x18fe0000, 0x18fe0003).nopw(); // lcdc?
 
-	map(0x08000000, 0x080fffff).ram().share("vram");
+	// respond to absent hardware probes
+	// 0x18500000 lcdc?
+	map(0x18600000, 0x186fffff).r(FUNC(news_r3k_state::bus_error)); // ??
+	map(0x18780000, 0x18780003).r(FUNC(news_r3k_state::bus_error)); // nwb-225
+	map(0x18c30000, 0x18c30003).r(FUNC(news_r3k_state::bus_error)); // second lance
+	map(0x18c40000, 0x18c40003).r(FUNC(news_r3k_state::bus_error)); // second scc
+	map(0x18c40004, 0x18c40007).r(FUNC(news_r3k_state::bus_error)); // third scc
+	map(0x18c70000, 0x18c70003).r(FUNC(news_r3k_state::bus_error)); // third lance
+	map(0x18e00000, 0x18e00003).r(FUNC(news_r3k_state::bus_error)); // nwb-252/nwb-253 crt
+	map(0x18ff0000, 0x18ff0003).r(FUNC(news_r3k_state::bus_error)); // nwb-252/nwb-253 ctrl
 
 	map(0x1fc00000, 0x1fc1ffff).rom().region("eprom", 0);
-
 	//map(0x1fc40004, 0x1fc40004).w().umask32(0xff); ??
-
 	map(0x1fc80000, 0x1fc80001).rw(FUNC(news_r3k_state::inten_r), FUNC(news_r3k_state::inten_w));
 	map(0x1fc80002, 0x1fc80003).r(FUNC(news_r3k_state::intst_r));
 	map(0x1fc80004, 0x1fc80005).w(FUNC(news_r3k_state::intclr_w));
 	map(0x1fc80006, 0x1fc80006).w(FUNC(news_r3k_state::itimer_w));
-
 	map(0x1fcc0003, 0x1fcc0003).rw(FUNC(news_r3k_state::debug_r), FUNC(news_r3k_state::debug_w));
 
 	map(0x1fd00000, 0x1fd00000).r(m_kbd, FUNC(news_hle_kbd_device::data_r));
@@ -227,16 +230,15 @@ void news_r3k_state::cpu_map(address_map &map)
 	map(0x1fe00000, 0x1fe0000f).m(m_dma, FUNC(dmac_0448_device::map));
 	map(0x1fe00100, 0x1fe0010f).m(m_scsi, FUNC(cxd1185_device::map));
 	map(0x1fe00200, 0x1fe00203).m(m_fdc, FUNC(upd72067_device::map));
+	map(0x1fe00300, 0x1fe00300).lr8([this]() { return 0xff; }, "sound_r"); // HACK: disable sound
 	//map(0x1fe00300, 0x1fe00307); // sound
-
 	map(0x1fe40000, 0x1fe40003).portr("SW2");
 	map(0x1fe80000, 0x1fe800ff).rom().region("idrom", 0).mirror(0x0003ff00);
-
 	map(0x1fec0000, 0x1fec0003).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
 
 	map(0x1ff40000, 0x1ff407ff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write));
+	map(0x1ff50000, 0x1ff50003).r(FUNC(news_r3k_state::bus_error)); // lfbm?
 	map(0x1ff80000, 0x1ff80003).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w));
-
 	map(0x1ffc0000, 0x1ffc3fff).lrw16(
 		[this](offs_t offset) { return m_net_ram[offset]; }, "net_ram_r",
 		[this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset]); }, "net_ram_w");
@@ -445,7 +447,7 @@ void news_r3k_state::common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:3", news_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:4", news_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", news_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", news_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsi:6", news_scsi_devices, nullptr);
 
 	// scsi host adapter
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("cxd1185", CXD1185).clock(16_MHz_XTAL).machine_config(
@@ -470,8 +472,9 @@ void news_r3k_state::common(machine_config &config)
 	 * LCD, with an HD64646FS LCD controller. The boot prom is happy if we just
 	 * ignore the LCDC and pretend the screen is 1024 pixels wide.
 	 */
+	// apparently 1024x768?
 	SCREEN(config, m_lcd, SCREEN_TYPE_LCD);
-	m_lcd->set_raw(47923200, 1024, 0, 1023, 780, 0, 779);
+	m_lcd->set_raw(47185920, 1024, 0, 1024, 768, 0, 768);
 	m_lcd->set_screen_update(FUNC(news_r3k_state::screen_update));
 
 	NEWS_HLE_KBD(config, m_kbd);
