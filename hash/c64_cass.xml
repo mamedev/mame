@@ -7058,6 +7058,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="summrck">
+		<description>Summer Camp</description>
+		<year>1990</year>
+		<publisher>Kixx</publisher>
+
+		<part name="summrcka" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="507164">
+				<rom name="summrcka.tap" size="507164" crc="2c8bc3d7" sha1="c2f8468308b202c6b60c2beed1edf38f5a46dbff"/>
+			</dataarea>
+		</part>
+
+		<part name="summrckb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="515968">
+				<rom name="summrckb.tap" size="515968" crc="e913833d" sha1="d4ad033192e4788d28574d5c45c2afde81d75121"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sumgames">
 		<description>Summer Games</description>
 		<year>1984</year>
