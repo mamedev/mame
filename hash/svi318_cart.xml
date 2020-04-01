@@ -40,14 +40,14 @@ Armoured Assault SD233C // Was available on Cartridge and/or Tape
 
 	<!-- According to the SVI Official Catalog this was released as a tape only. -->
 	<software name="mentor">
-	    <description>Music Mentor</description>
-	    <year>1983</year>
-	    <publisher>Spectravideo</publisher>
-	    <part name="cart" interface="svi318_cart">
-	        <dataarea name="rom" size="32768">
-	            <rom name="music mentor.rom" size="32768" crc="ba0c3d3c" sha1="0ebb91dcc99c0c361d8855387079bc62a41d05d8"/>
-	        </dataarea>
-	    </part>
+		<description>Music Mentor</description>
+		<year>1983</year>
+		<publisher>Spectravideo</publisher>
+		<part name="cart" interface="svi318_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="music mentor.rom" size="32768" crc="ba0c3d3c" sha1="0ebb91dcc99c0c361d8855387079bc62a41d05d8"/>
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="secalpha">
