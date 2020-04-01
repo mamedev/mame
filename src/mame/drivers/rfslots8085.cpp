@@ -114,6 +114,7 @@ void rfslots8085_state::unkrfslt(machine_config &config)
 	AY8910(config, "ay1", 6_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.50); // divider unknown
 }
 
+// May be "Limon y Baby 100"
 ROM_START(unkrfslt)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("m1-31_b_1704.ic32", 0x0000, 0x4000, CRC(a74a85b7) SHA1(f562495a6b97f34165cc9fd5c750664701cac21f))
@@ -123,4 +124,5 @@ ROM_START(unkrfslt)
 	ROM_IGNORE(                  0x3000 ) // 0xff filled and it's outside of the 8035's global address mask (fff)
 ROM_END
 
-GAME( 198?, unkrfslt, 0, unkrfslt, unkrfslt, rfslots8085_state, empty_init, ROT0, "Recreativos Franco", "unknown Recreativos Franco slot machine", MACHINE_IS_SKELETON_MECHANICAL )
+// Date "25-05-87" engraved on the PCB
+GAME( 1987?, unkrfslt, 0, unkrfslt, unkrfslt, rfslots8085_state, empty_init, ROT0, "Recreativos Franco", "unknown Recreativos Franco slot machine", MACHINE_IS_SKELETON_MECHANICAL )
