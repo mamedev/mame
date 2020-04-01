@@ -681,7 +681,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<!-- No inputs -->
 	<software name="redhoodf" cloneof="redhoodg" supported="no">
-		<description>Les adventures du Petit Chaperon Rouge (France)</description>
+		<description>Les aventures du Petit Chaperon Rouge (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092025(FR)" />
@@ -2361,7 +2361,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 	<!-- UNSP: illegal ALU optype 07 at 2a0001 -->
 	<software name="mickymagf" cloneof="mickymag" supported="no">
-		<description>Disney Mickey - Meickey à la Recherche De Pluto (France)</description>
+		<description>Disney Mickey - Mickey à la Recherche De Pluto (France)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092085(FR)" />
