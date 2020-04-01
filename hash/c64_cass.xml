@@ -7342,6 +7342,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>1989</year>
+		<publisher>Mastertronic Plus</publisher>
+
+		<part name="tetrisa" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="444689">
+				<rom name="tetrisa.tap" size="444689" crc="13bc6c8d" sha1="7c1fac70c035aa6d782a690f779302243aabd03a"/>
+			</dataarea>
+		</part>
+
+		<part name="tetrisb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="444689">
+				<rom name="tetrisb.tap" size="444689" crc="79de6451" sha1="abf51ce18a4cf38e4248952580c4385f8b3bd2a6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thomas">
 		<description>Thomas the Tank Engine &amp; Friends</description>
 		<year>1990</year>
