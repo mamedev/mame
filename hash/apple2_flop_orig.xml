@@ -11940,4 +11940,75 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="hobgrev">
+		<description>Hobgoblin's Revenge</description>
+		<year>1987</year>
+		<publisher>Unpublished or self-published</publisher>
+		<info name="release" value="2020-04-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program"/>
+			<dataarea name="flop" size="234722">
+				<rom name="hobgoblin's revenge side a - program.woz" size="234722" crc="4b3b4a0d" sha1="c0c57f24c55c9850ca7abfbcb4f9dd4792fe53e0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Source code"/>
+			<dataarea name="flop" size="234722">
+				<rom name="hobgoblin's revenge side b - source code.woz" size="234722" crc="783acdb9" sha1="f56f464768716c662bc90d3b31f9ddf20f379369"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="typhstl">
+		<description>Typhoon of Steel (Version 1.0)</description>
+		<year>1988</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2020-04-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234760">
+			<feature name="part_id" value="Asia disk"/>
+				<rom name="typhoon of steel - asia.woz" size="234760" crc="64f4fae2" sha1="2162afa7fc92e029ea45de9547cb9ec2244d7a2a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Europe disk"/>
+			<dataarea name="flop" size="234762">
+				<rom name="typhoon of steel - europe.woz" size="234762" crc="6c8b2f21" sha1="62212483a0845f019ce6526020614fdea2adec16"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Pacific disk"/>
+			<dataarea name="flop" size="234763">
+				<rom name="typhoon of steel - pacific.woz" size="234763" crc="f4f9ccc8" sha1="40fe14d68b358802dc32459b95ac6cb81a4a6728"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Scenarios disk"/>
+			<dataarea name="flop" size="234765">
+				<rom name="typhoon of steel - scenarios.woz" size="234765" crc="711b5ff8" sha1="6b505829f62dd39a3e558bdeaf655f796d41ec5b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alnmunch">
+		<description>Alien Munchies</description>
+		<year>1983</year>
+		<publisher>Gentry Software</publisher>
+		<info name="release" value="2020-04-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234769">
+				<rom name="alien munchies.woz" size="234769" crc="3b6311d4" sha1="a6f4d4a568c8ec5ec10eace1482f284483d19b62"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
