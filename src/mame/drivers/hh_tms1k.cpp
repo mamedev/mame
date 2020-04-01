@@ -11572,7 +11572,7 @@ INPUT_PORTS_END
 void ditto_state::ditto(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1730(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
+	TMS1700(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
 	m_maincpu->k().set_ioport("IN.0");
 	m_maincpu->r().set(FUNC(ditto_state::write_r));
 	m_maincpu->o().set(FUNC(ditto_state::write_o));
