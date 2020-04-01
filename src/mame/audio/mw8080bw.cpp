@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "audio/mw8080bw.h"
+#include "audio/nl_gunfight.h"
 
 #include "includes/mw8080bw.h"
 #include "speaker.h"
@@ -714,9 +715,17 @@ void seawolf_audio_device::device_start()
 
 gunfight_audio_device::gunfight_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, GUNFIGHT_AUDIO, tag, owner, clock),
-	m_samples(*this, "samples%u", 1U)
+	m_left_shot(*this, "sound_nl:left_shot"),
+	m_right_shot(*this, "sound_nl:right_shot"),
+	m_left_hit(*this, "sound_nl:left_hit"),
+	m_right_hit(*this, "sound_nl:right_hit")
 {
 }
+
+WRITE_LINE_MEMBER(gunfight_audio_device::left_shot_w)   { m_left_shot->write_line(state);  }
+WRITE_LINE_MEMBER(gunfight_audio_device::right_shot_w)  { m_right_shot->write_line(state);  }
+WRITE_LINE_MEMBER(gunfight_audio_device::left_hit_w)    { m_left_hit->write_line(state);  }
+WRITE_LINE_MEMBER(gunfight_audio_device::right_hit_w)   { m_right_hit->write_line(state);  }
 
 void gunfight_audio_device::write(u8 data)
 {
@@ -727,46 +736,52 @@ void gunfight_audio_device::write(u8 data)
 	// the 74175 latches and inverts the top 4 bits
 	switch ((~data >> 4) & 0x0f)
 	{
-	case 0x00:
-		break;
 	case 0x01: // LEFT SHOOT sound (left speaker)
-		m_samples[0]->start(0, 0);
+		this->left_shot_w(1);
 		break;
 	case 0x02: // RIGHT SHOOT sound (right speaker)
-		m_samples[1]->start(0, 0);
+		this->right_shot_w(1);
 		break;
 	case 0x03: // LEFT HIT sound (left speaker)
-		m_samples[0]->start(0, 1);
+		this->left_hit_w(1);
 		break;
-	case 0x04: // enable RIGHT HIT sound (right speaker)
-		m_samples[1]->start(0, 1);
+	case 0x04: // RIGHT HIT sound (right speaker)
+		this->right_hit_w(1);
 		break;
-	default:
-		logerror("%s: Unknown sh port write %02x\n", machine().describe_context(), data);
+	default:   // any other value will turn off the sound switches
+		this->left_shot_w(0);
+		this->right_shot_w(0);
+		this->left_hit_w(0);
+		this->right_hit_w(0);
 		break;
 	}
 }
 
 void gunfight_audio_device::device_add_mconfig(machine_config &config)
 {
-	static char const *const sample_names[] = {
-			"*gunfight",
-			"gunshot",
-			"killed",
-			nullptr };
-
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	SAMPLES(config, m_samples[0]);
-	m_samples[0]->set_channels(1);
-	m_samples[0]->set_samples_names(sample_names);
-	m_samples[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	netlist_mame_sound_device &nl_sound =
+		NETLIST_SOUND(config, "sound_nl", 48000)
+			.set_source(NETLIST_NAME(gunfight));
+	nl_sound.add_route(0, "lspeaker", 0.5);
+	nl_sound.add_route(1, "rspeaker", 0.5);
 
-	SAMPLES(config, m_samples[1]);
-	m_samples[1]->set_channels(1);
-	m_samples[1]->set_samples_names(sample_names);
-	m_samples[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:left_shot",  "I_LEFT_SHOT.IN",  0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:right_shot", "I_RIGHT_SHOT.IN",  0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:left_hit",   "I_LEFT_HIT.IN",  0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:right_hit",  "I_RIGHT_HIT.IN",  0);
+
+	// Multipliers set so that the highest output spikes of
+	// +/- 3 volts at mid potentiometer settings give safe
+	// non-clipping sample values of +/- 30,000. This would
+	// lead to clipping if all the potentiometers were set to max,
+	// but that's unlikely to happen, since the potentiometers are
+	// currently fixed and even on the real machine were service
+	// adjustments only.
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUT_L").set_mult_offset(30000.0 / 3.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout1", 1, "OUT_R").set_mult_offset(30000.0 / 3.0, 0.0);
 }
 
 void gunfight_audio_device::device_start()

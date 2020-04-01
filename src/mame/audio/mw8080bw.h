@@ -14,6 +14,7 @@
 #include "sound/discrete.h"
 #include "sound/samples.h"
 #include "sound/sn76477.h"
+#include "machine/netlist.h"
 
 
 class midway_tone_generator_device_base : public device_t
@@ -52,13 +53,20 @@ public:
 	gunfight_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	void write(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(left_shot_w);
+	DECLARE_WRITE_LINE_MEMBER(right_shot_w);
+	DECLARE_WRITE_LINE_MEMBER(left_hit_w);
+	DECLARE_WRITE_LINE_MEMBER(right_hit_w);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 private:
-	required_device_array<samples_device, 2> m_samples;
+	required_device<netlist_mame_logic_input_device> m_left_shot;
+	required_device<netlist_mame_logic_input_device> m_right_shot;
+	required_device<netlist_mame_logic_input_device> m_left_hit;
+	required_device<netlist_mame_logic_input_device> m_right_hit;
 };
 
 
