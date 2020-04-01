@@ -84,7 +84,7 @@ private:
 	DECLARE_WRITE8_MEMBER(patmult_w);
 	DECLARE_WRITE8_MEMBER(vpat_w);
 	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	void vram_w(offs_t offset, uint16_t data);
 	DECLARE_READ8_MEMBER(vom_r);
 	DECLARE_WRITE8_MEMBER(vom_w);
 	DECLARE_READ8_MEMBER(nvr_store_r);
@@ -208,8 +208,8 @@ UPD7220_DISPLAY_PIXELS_MEMBER( vt240_state::hgdc_draw )
 
 	if(!BIT(m_reg0, 7))
 	{
-		vram_w(generic_space(), address >> 1, 0);
-		vram_w(generic_space(), (0x20000 + address) >> 1, 0);
+		vram_w(address >> 1, 0);
+		vram_w((0x20000 + address) >> 1, 0);
 	}
 
 	gfx1 = m_video_ram[(address & 0x7fff) >> 1];
@@ -386,7 +386,7 @@ READ16_MEMBER(vt240_state::vram_r)
 	return 0;
 }
 
-WRITE16_MEMBER(vt240_state::vram_w)
+void vt240_state::vram_w(offs_t offset, uint16_t data)
 {
 	uint8_t *video_ram = (uint8_t *)(&m_video_ram[0]);
 	offset <<= 1;

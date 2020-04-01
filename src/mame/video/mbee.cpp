@@ -50,7 +50,7 @@ WRITE_LINE_MEMBER( mbee_state::crtc_vs )
 {
 	m_b7_vs = state;
 	if ((m_io_config->read() & 0xc0) == 0) // VS selected in config menu
-		m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
+		m_pio->port_b_write(pio_port_b_r());
 }
 
 /***********************************************************
