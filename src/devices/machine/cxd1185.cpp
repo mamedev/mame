@@ -768,8 +768,14 @@ void cxd1185_device::scsi_ctrl_changed()
 	}
 	else if ((m_status & (TARG | INIT)) == INIT)
 	{
+		if ((ctrl & S_SEL) && !(m_scsi_ctrl_state & S_BSY) && (ctrl & S_BSY))
+		{
+			LOGMASKED(LOG_SCSI, "target selected\n");
 
-		if ((m_scsi_ctrl_state & S_BSY) && !(ctrl & S_BSY))
+			// truncate selection delay
+			m_state_timer->adjust(attotime::zero);
+		}
+		else if ((m_scsi_ctrl_state & S_BSY) && !(ctrl & S_BSY))
 		{
 			LOGMASKED(LOG_SCSI, "target disconnected\n");
 
