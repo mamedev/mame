@@ -183,6 +183,9 @@ files{
 	MAME_DIR .. "src/mame/audio/nl_kidniki.cpp",
 	MAME_DIR .. "src/mame/audio/nl_kidniki.h",
 
+	MAME_DIR .. "src/mame/audio/nl_gunfight.cpp",
+	MAME_DIR .. "src/mame/audio/nl_gunfight.h",
+
 	MAME_DIR .. "src/mame/audio/cheekyms.cpp",
 	MAME_DIR .. "src/mame/audio/cheekyms.h",
 	MAME_DIR .. "src/mame/audio/nl_cheekyms.cpp",
