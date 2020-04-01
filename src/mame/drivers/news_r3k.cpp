@@ -230,7 +230,7 @@ void news_r3k_state::cpu_map(address_map &map)
 	map(0x1fe00000, 0x1fe0000f).m(m_dma, FUNC(dmac_0448_device::map));
 	map(0x1fe00100, 0x1fe0010f).m(m_scsi, FUNC(cxd1185_device::map));
 	map(0x1fe00200, 0x1fe00203).m(m_fdc, FUNC(upd72067_device::map));
-	map(0x1fe00300, 0x1fe00300).lr8([this]() { return 0xff; }, "sound_r"); // HACK: disable sound
+	map(0x1fe00300, 0x1fe00300).lr8([]() { return 0xff; }, "sound_r"); // HACK: disable sound
 	//map(0x1fe00300, 0x1fe00307); // sound
 	map(0x1fe40000, 0x1fe40003).portr("SW2");
 	map(0x1fe80000, 0x1fe800ff).rom().region("idrom", 0).mirror(0x0003ff00);
@@ -429,7 +429,7 @@ void news_r3k_state::common(machine_config &config)
 	m_scc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 
 	AM7990(config, m_net);
-	m_net->intr_out().set(FUNC(news_r3k_state::irq_w<LANCE>));
+	m_net->intr_out().set(FUNC(news_r3k_state::irq_w<LANCE>)).invert();
 	m_net->dma_in().set([this](offs_t offset) { return m_net_ram[offset >> 1]; });
 	m_net->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset >> 1]); });
 
