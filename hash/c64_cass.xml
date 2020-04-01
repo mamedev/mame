@@ -1010,6 +1010,19 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="bdash4h">
+		<description>Boulder Dash 4</description>
+		<year>1989</year>
+		<publisher>Hi Tec Software</publisher>
+
+		<part name="bdashck" interface="cbm_cass">
+			<feature name="part_id" value="Boulder Dash Construction Kit"/>
+			<dataarea name="cass" size="250098">
+				<rom name="bdashck.tap" size="250098" crc="a1748639" sha1="6a76ba69fdf0709ce330c2c47ceb7677fdd45bb9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bombjack">
 		<description>Bomb Jack</description>
 		<year>1988</year>
