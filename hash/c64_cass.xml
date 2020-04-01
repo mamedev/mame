@@ -4002,6 +4002,19 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="kettle">
+		<description>Kettle</description>
+		<year>1986</year>
+		<publisher>Alligata</publisher>
+
+		<part name="kettlea" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="329346">
+				<rom name="kettlea.tap" size="329346" crc="1ac910df" sha1="6f99c98d6c67ab1fd0678db4d26cb30bb4db7b55"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kgbsspy">
 		<description>KGB Superspy</description>
 		<year>19??</year>
