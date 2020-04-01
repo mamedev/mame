@@ -1,5 +1,5 @@
 // license:CC0
-// copyright-holders:Colin Douglas Howell, Vas Crabb
+// copyright-holders:Colin Douglas Howell
 #ifndef MAME_AUDIO_NL_GUNFIGHT_H
 #define MAME_AUDIO_NL_GUNFIGHT_H
 

@@ -1,5 +1,5 @@
 // license:CC0
-// copyright-holders:Colin Douglas Howell, Vas Crabb
+// copyright-holders:Colin Douglas Howell
 
 #include "netlist/devices/net_lib.h"
 
