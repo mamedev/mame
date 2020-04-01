@@ -5953,6 +5953,19 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="robocod">
+		<description>James Pond 2: RoboCod</description>
+		<year>1992</year>
+		<publisher>Kixx</publisher>
+
+		<part name="robocoda" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="763681">
+				<rom name="robocoda.tap" size="763681" crc="9c3a5a87" sha1="1f47600332f3140c3956f7907e0707e38d3f617c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="robocop">
 		<description>Robocop</description>
 		<year>1988</year>
