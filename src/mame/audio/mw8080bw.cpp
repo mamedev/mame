@@ -722,11 +722,6 @@ gunfight_audio_device::gunfight_audio_device(machine_config const &mconfig, char
 {
 }
 
-WRITE_LINE_MEMBER(gunfight_audio_device::left_shot_w)   { m_left_shot->write_line(state);  }
-WRITE_LINE_MEMBER(gunfight_audio_device::right_shot_w)  { m_right_shot->write_line(state);  }
-WRITE_LINE_MEMBER(gunfight_audio_device::left_hit_w)    { m_left_hit->write_line(state);  }
-WRITE_LINE_MEMBER(gunfight_audio_device::right_hit_w)   { m_right_hit->write_line(state);  }
-
 void gunfight_audio_device::write(u8 data)
 {
 	// D0 and D1 are just tied to 1k resistors
@@ -737,22 +732,22 @@ void gunfight_audio_device::write(u8 data)
 	switch ((~data >> 4) & 0x0f)
 	{
 	case 0x01: // LEFT SHOOT sound (left speaker)
-		this->left_shot_w(1);
+		m_left_shot->write_line(1);
 		break;
 	case 0x02: // RIGHT SHOOT sound (right speaker)
-		this->right_shot_w(1);
+		m_right_shot->write_line(1);
 		break;
 	case 0x03: // LEFT HIT sound (left speaker)
-		this->left_hit_w(1);
+		m_left_hit->write_line(1);
 		break;
 	case 0x04: // RIGHT HIT sound (right speaker)
-		this->right_hit_w(1);
+		m_right_hit->write_line(1);
 		break;
 	default:   // any other value will turn off the sound switches
-		this->left_shot_w(0);
-		this->right_shot_w(0);
-		this->left_hit_w(0);
-		this->right_hit_w(0);
+		m_left_shot->write_line(0);
+		m_right_shot->write_line(0);
+		m_left_hit->write_line(0);
+		m_right_hit->write_line(0);
 		break;
 	}
 }

@@ -53,10 +53,6 @@ public:
 	gunfight_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	void write(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(left_shot_w);
-	DECLARE_WRITE_LINE_MEMBER(right_shot_w);
-	DECLARE_WRITE_LINE_MEMBER(left_hit_w);
-	DECLARE_WRITE_LINE_MEMBER(right_hit_w);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
