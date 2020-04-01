@@ -2897,6 +2897,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="greedmn">
+		<description>The Greed Monster</description>
+		<year>1990</year>
+		<publisher>Hi Tec Software</publisher>
+
+		<part name="greedmna" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="827446">
+				<rom name="greedmna.tap" size="827446" crc="d75a92ce" sha1="5178771a761c53d95769edbcc257fe2acf4c9a55"/>
+			</dataarea>
+		</part>
+
+		<part name="greedmnb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="830302">
+				<rom name="greedmnb.tap" size="830302" crc="489e9390" sha1="61503e8fbaea297824729cc24023819fba8d77ca"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gribblys">
 		<description>Gribbly's Day Out</description>
 		<year>1985</year>
