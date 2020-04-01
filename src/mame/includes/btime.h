@@ -141,6 +141,7 @@ public:
 	void mmonkey(machine_config &config);
 	void bnj(machine_config &config);
 	void cookrace(machine_config &config);
+	void protenn(machine_config &config);
 	void wtennis(machine_config &config);
 	void sdtennis(machine_config &config);
 	void tisland(machine_config &config);
@@ -154,6 +155,7 @@ public:
 	void disco_map(address_map &map);
 	void lnc_map(address_map &map);
 	void mmonkey_map(address_map &map);
+	void protenn_map(address_map &map);
 	void tisland_map(address_map &map);
 	void zoar_map(address_map &map);
 };
