@@ -11903,4 +11903,41 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="cindslpr">
+		<description>Who Stole Cinderella's Slipper? (Version 2.0)</description>
+		<year>1984</year>
+		<publisher>Book Lures</publisher>
+		<info name="release" value="2020-03-31"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234822">
+				<rom name="who stole cinderella's slipper.woz" size="234822" crc="aa512cc9" sha1="fe2aa70dd8e52543749829ba2df59b392fe62612"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minesttn">
+		<description>Mines of Titan</description>
+		<year>1989</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2020-03-31"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Game"/>
+			<dataarea name="flop" size="241424">
+				<rom name="mines of titan side a - game.woz" size="241424" crc="0cfb001a" sha1="dcbfd265cf708516c9c414205bcbff7e38d80dce"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Player"/>
+			<dataarea name="flop" size="234768">
+				<rom name="mines of titan side b - player.woz" size="234768" crc="dbed7159" sha1="11b6138935f563c205a4d34d05f67af008aedb3a"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
