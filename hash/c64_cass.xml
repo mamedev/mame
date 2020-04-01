@@ -6650,7 +6650,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 	<software name="spyvspy">
 		<description>Spy vs Spy</description>
-		<year>19??</year>
+		<year>1989</year>
 		<publisher>HiTEC Software</publisher>
 
 		<part name="cass1" interface="cbm_cass">
@@ -6662,7 +6662,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 	<software name="spyvspy2">
 		<description>Spy vs Spy II: The Island Caper</description>
-		<year>19??</year>
+		<year>1989</year>
 		<publisher>HiTEC Software</publisher>
 
 		<part name="cass1" interface="cbm_cass">
@@ -6674,7 +6674,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 	<software name="spyvspy3">
 		<description>Spy vs Spy III: Arctic Antics</description>
-		<year>19??</year>
+		<year>1989</year>
 		<publisher>HiTEC Software</publisher>
 
 		<part name="cass1" interface="cbm_cass">
