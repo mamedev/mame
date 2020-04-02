@@ -4901,7 +4901,7 @@ READ8_MEMBER(blitz_state::cpubank_decrypt_r)
 
 WRITE8_MEMBER(blitz_state::mcu_command_w)
 {
-	m_mcu->pa_w(space, 0, data);
+	m_mcu->pa_w(data);
 	if (BIT(m_portc_data, 0))
 	{
 		m_mcu->set_input_line(M6805_IRQ_LINE, ASSERT_LINE);

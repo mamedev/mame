@@ -181,7 +181,7 @@ READ8_MEMBER(segag80r_state::g80r_opcode_r)
 	return op;
 }
 
-offs_t segag80r_state::decrypt_offset(address_space &space, offs_t offset)
+offs_t segag80r_state::decrypt_offset(offs_t offset)
 {
 	if (m_scrambled_write_pc == 0xffff)
 		return offset;
@@ -195,14 +195,14 @@ offs_t segag80r_state::decrypt_offset(address_space &space, offs_t offset)
 
 WRITE8_MEMBER(segag80r_state::mainram_w)
 {
-	m_mainram[decrypt_offset(space, offset)] = data;
+	m_mainram[decrypt_offset(offset)] = data;
 }
 
-WRITE8_MEMBER(segag80r_state::vidram_w){ segag80r_videoram_w(space, decrypt_offset(space, offset), data); }
-WRITE8_MEMBER(segag80r_state::monsterb_vidram_w){ monsterb_videoram_w(space, decrypt_offset(space, offset), data); }
-WRITE8_MEMBER(segag80r_state::pignewt_vidram_w){ pignewt_videoram_w(space, decrypt_offset(space, offset), data); }
-WRITE8_MEMBER(segag80r_state::sindbadm_vidram_w){ sindbadm_videoram_w(space, decrypt_offset(space, offset), data); }
-WRITE8_MEMBER(segag80r_state::usb_ram_w){ m_usbsnd->ram_w(space, decrypt_offset(m_maincpu->space(AS_PROGRAM), offset), data); }
+WRITE8_MEMBER(segag80r_state::vidram_w){ segag80r_videoram_w(space, decrypt_offset(offset), data); }
+WRITE8_MEMBER(segag80r_state::monsterb_vidram_w){ monsterb_videoram_w(space, decrypt_offset(offset), data); }
+WRITE8_MEMBER(segag80r_state::pignewt_vidram_w){ pignewt_videoram_w(space, decrypt_offset(offset), data); }
+WRITE8_MEMBER(segag80r_state::sindbadm_vidram_w){ sindbadm_videoram_w(space, decrypt_offset(offset), data); }
+WRITE8_MEMBER(segag80r_state::usb_ram_w){ m_usbsnd->ram_w(space, decrypt_offset(offset), data); }
 
 
 

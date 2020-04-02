@@ -65,7 +65,7 @@ public:
 
 	bool m_bios_disable;
 
-	DECLARE_WRITE8_MEMBER(gb_io_w);
+	void gb_io_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE8_MEMBER(gb_io2_w);
 	DECLARE_WRITE8_MEMBER(sgb_io_w);
 	DECLARE_READ8_MEMBER(gb_ie_r);

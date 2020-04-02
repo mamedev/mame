@@ -302,7 +302,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 		}
 	}
 
-	m_mcu->pa_w(space, 0, (BIT(mem_mask, 0) && !BIT(data, 0)) ? m_latch : 0xff);
+	m_mcu->pa_w((BIT(mem_mask, 0) && !BIT(data, 0)) ? m_latch : 0xff);
 
 	if (BIT(mem_mask, 1) && !BIT(data, 1) && BIT(m_port_b_out, 1))
 	{

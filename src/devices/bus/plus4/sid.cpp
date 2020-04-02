@@ -122,7 +122,7 @@ uint8_t plus4_sid_cartridge_device::plus4_cd_r(offs_t offset, uint8_t data, int 
 	}
 	else if (offset >= 0xfd80 && offset < 0xfd90)
 	{
-		data = m_joy->joy_r(machine().dummy_space(), 0);
+		data = m_joy->read_joy();
 	}
 
 	return data;

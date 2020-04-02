@@ -213,7 +213,7 @@ READ8_MEMBER(pipeline_state::protection_r)
 
 TIMER_CALLBACK_MEMBER(pipeline_state::protection_deferred_w)
 {
-	m_mcu->pa_w(m_mcu->space(AS_PROGRAM), 0, param);
+	m_mcu->pa_w(param);
 }
 
 WRITE8_MEMBER(pipeline_state::protection_w)

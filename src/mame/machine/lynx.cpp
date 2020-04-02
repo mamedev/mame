@@ -1877,7 +1877,7 @@ READ8_MEMBER(lynx_state::lynx_memory_config_r)
 	return m_memory_config;
 }
 
-WRITE8_MEMBER(lynx_state::lynx_memory_config_w)
+void lynx_state::lynx_memory_config_w(uint8_t data)
 {
 	/* bit 7: hispeed, uses page mode accesses (4 instead of 5 cycles )
 	 * when these are safe in the cpu */
@@ -1891,7 +1891,7 @@ WRITE8_MEMBER(lynx_state::lynx_memory_config_w)
 
 void lynx_state::machine_reset()
 {
-	lynx_memory_config_w(m_maincpu->space(AS_PROGRAM), 0, 0);
+	lynx_memory_config_w(0);
 
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	m_maincpu->set_input_line(M65SC02_IRQ_LINE, CLEAR_LINE);
@@ -1926,7 +1926,7 @@ void lynx_state::machine_reset()
 
 void lynx_state::lynx_postload()
 {
-	lynx_memory_config_w(m_maincpu->space(AS_PROGRAM), 0, m_memory_config);
+	lynx_memory_config_w(m_memory_config);
 }
 
 void lynx_state::machine_start()

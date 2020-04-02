@@ -231,7 +231,7 @@ WRITE8_MEMBER(a2bus_mouse_device::pia_out_a)
 
 WRITE8_MEMBER(a2bus_mouse_device::pia_out_b)
 {
-	m_mcu->pc_w(space, 0, 0xf0 | ((data >> 4) & 0x0f));
+	m_mcu->pc_w(0xf0 | ((data >> 4) & 0x0f));
 
 	m_rom_bank = (data & 0xe) << 7;
 }

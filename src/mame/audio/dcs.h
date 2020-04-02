@@ -75,7 +75,7 @@ public:
 	DECLARE_READ16_MEMBER( input_latch_r );
 	DECLARE_READ32_MEMBER( input_latch32_r );
 	TIMER_CALLBACK_MEMBER( latch_delayed_w );
-	DECLARE_WRITE16_MEMBER( output_latch_w );
+	void output_latch_w(uint16_t data);
 	DECLARE_WRITE32_MEMBER( output_latch32_w );
 	void delayed_ack_w();
 	TIMER_CALLBACK_MEMBER( delayed_ack_w_callback );

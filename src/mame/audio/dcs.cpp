@@ -1610,7 +1610,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::latch_delayed_w )
 }
 
 
-WRITE16_MEMBER( dcs_audio_device::output_latch_w )
+void dcs_audio_device::output_latch_w(uint16_t data)
 {
 	m_pre_output_data = data;
 	if (LOG_DCS_IO)
@@ -2212,7 +2212,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback2 )
 		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback2),this), param);
 		return;
 	}
-	output_latch_w(m_cpu->space(AS_PROGRAM), 0, 0x000a, 0xffff);
+	output_latch_w(0x000a);
 }
 
 
@@ -2224,7 +2224,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback1 )
 		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback1),this), param);
 		return;
 	}
-	output_latch_w(m_cpu->space(AS_PROGRAM), 0, param, 0xffff);
+	output_latch_w(param);
 
 	/* chain to the next word we need to write back */
 	machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback2),this));
@@ -2364,7 +2364,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::s2_ack_callback )
 		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s2_ack_callback),this), param);
 		return;
 	}
-	output_latch_w(space, 0, param, 0xffff);
+	output_latch_w(param);
 	output_control_w(space, 0, (m_output_control & ~0xff00) | 0x0300, 0xffff);
 }
 
