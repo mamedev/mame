@@ -665,30 +665,11 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static const gfx_layout tilelayout_8bpp =
-{
-	16,16,
-	4096,
-	8,
-	{ 0x100000*8+8, 0x100000*8, 0x40000*8+8, 0x40000*8, 0xc0000*8+8, 0xc0000*8, 8, 0 },
-	{ STEP8(16*8*2,1), STEP8(0,1) },
-	{ STEP16(0,8*2) },
-	64*8
-};
-
 static GFXDECODE_START( gfx_cninja )
 	GFXDECODE_ENTRY( "chars",    0, charlayout,   0, 32 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "tiles1",   0, tilelayout,   0, 32 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "tiles2",   0, tilelayout, 512, 64 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "sprites1", 0, tilelayout, 768, 32 )  /* Sprites 16x16 */
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_robocop2 )
-	GFXDECODE_ENTRY( "chars",    0, charlayout,        0, 32 )  /* Characters 8x8 */
-	GFXDECODE_ENTRY( "tiles1",   0, tilelayout,        0, 32 )  /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "tiles2",   0, tilelayout,      512, 64 )  /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "sprites1", 0, tilelayout,      768, 32 )  /* Sprites 16x16 */
-	GFXDECODE_ENTRY( "tiles2",   0, tilelayout_8bpp, 512,  1 )  /* Tiles 16x16 */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_mutantf )
@@ -1112,7 +1093,7 @@ void cninja_state::robocop2(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(cninja_state,robocop2)
 	MCFG_MACHINE_RESET_OVERRIDE(cninja_state,robocop2)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_robocop2);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cninja);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
