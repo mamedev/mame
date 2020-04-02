@@ -17,12 +17,9 @@ env:
   - SUBTARGET=tiny   MAME=mametiny64
 script:
   - if [ $TRAVIS_OS_NAME == 'linux' ]; then
-    if [ $CC == 'clang' ]; then
-    make -j2 -f Makefile.libretro OPTIMIZE=0;
-    else make -j4 -f Makefile.libretro OPTIMIZE=0;
-    fi
+    make -j4 -f Makefile.libretro OPTIMIZE=0 PTR64=1;
     elif [ $TRAVIS_OS_NAME == 'osx' ]; then
-    make -j2 -f Makefile.libretro OPTIMIZE=0;
+    make -j4 -f Makefile.libretro OPTIMIZE=0;
     fi
 sudo: required
 before_install:
