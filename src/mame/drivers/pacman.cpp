@@ -727,7 +727,7 @@ READ8_MEMBER(pacman_state::bigbucks_question_r)
 WRITE_LINE_MEMBER(pacman_state::s2650_interrupt)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03); // S2650
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(pacman_state::porky_banking_w)
@@ -3773,6 +3773,7 @@ void pacman_state::s2650games(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &pacman_state::s2650games_map);
 	maincpu.set_addrmap(AS_DATA, &pacman_state::s2650games_dataport);
 	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank)).invert();
+	maincpu.intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
 	m_mainlatch->q_out_cb<0>().set_nop();
 	m_mainlatch->q_out_cb<1>().set_nop();
