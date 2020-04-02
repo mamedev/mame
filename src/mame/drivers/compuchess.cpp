@@ -368,18 +368,20 @@ void cmpchess_state::mk1(machine_config &config)
 	cmpchess(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(2000000); // JS&A version measured 2.18MHz on average
-	subdevice<f3853_device>("smi")->set_clock(2000000);
+	m_maincpu->set_clock(2200000); // JS&A version measured 2.18MHz on average
+	subdevice<f3853_device>("smi")->set_clock(2200000);
 
 	config.set_default_layout(layout_novag_mk1);
 }
 
 void cmpchess_state::cnc(machine_config &config)
 {
-	mk1(config);
+	cmpchess(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_IO, &cmpchess_state::cnc_io);
+	m_maincpu->set_clock(2000000); // LC circuit, measured 2MHz
+	subdevice<f3853_device>("smi")->set_clock(2000000);
 
 	config.set_default_layout(layout_cncchess);
 
