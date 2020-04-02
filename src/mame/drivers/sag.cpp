@@ -62,17 +62,17 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	// devices
-	required_device<pwm_display_device> m_display;
-	required_device<speaker_sound_device> m_speaker;
-	required_ioport_array<6> m_inputs;
-
 	void update_display();
 	u8 input_r();
 	void speaker_w(int state);
 
 	u16 m_grid = 0;
 	u16 m_plate = 0;
+
+private:
+	required_device<pwm_display_device> m_display;
+	required_device<speaker_sound_device> m_speaker;
+	required_ioport_array<6> m_inputs;
 };
 
 void base_state::machine_start()
