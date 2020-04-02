@@ -435,7 +435,7 @@ void atari_cage_device::update_control_lines()
 	if ((m_control & 2) && m_cage_to_cpu_ready)
 		reason |= CAGE_IRQ_REASON_DATA_READY;
 
-	m_irqhandler(machine().dummy_space(), 0, reason);
+	m_irqhandler(0, reason);
 	/* set the IOF input lines */
 	val = m_cpu->state_int(TMS3203X_IOF);
 	val &= ~0x88;

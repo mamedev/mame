@@ -186,7 +186,7 @@ uint32_t gic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		for(uint8_t cx=0;cx<GIC_LEFT_W;cx++){
 			draw_char_left(XSTART+(cx*GIC_CHAR_W),
 							YSTART+(cy*GIC_CHAR_H),
-							m_ram(machine().dummy_space(), current, 0xff),
+							m_ram(current),
 							m_bitmap);
 			current++;
 		}
@@ -199,7 +199,7 @@ uint32_t gic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	for(uint8_t cy=0;cy<GIC_RIGHT_H;cy++){
 		for(uint8_t cx=0;cx<GIC_RIGHT_W;cx++){
 			//complex case
-			uint8_t data = m_ram(machine().dummy_space(), current++, 0xff);
+			uint8_t data = m_ram(current++);
 
 			size_t currX   = (XSTART+           (cx*(3+GIC_CHAR_W)));
 			size_t currUP  = (YSTART+           (cy*(2*GIC_CHAR_H)));
@@ -295,7 +295,7 @@ void gic_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 	//lo for 1824(228*8)
 	//hi for 1824(228*8)
 
-	uint8_t audioByte = m_ram(machine().dummy_space(), GIC_AUDIO_BYTE, 0xff)*2;
+	uint8_t audioByte = m_ram(GIC_AUDIO_BYTE)*2;
 
 	if(!audioByte){
 		for(size_t i = 0; i < samples; i++)
