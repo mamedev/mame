@@ -17,6 +17,7 @@ public:
 	template <unsigned N> auto input_callback() { return m_in[N].bind(); }
 	template <unsigned N> auto output_callback() { return m_out[N].bind(); }
 
+	DECLARE_WRITE_LINE_MEMBER( reset );
 	void write(uint8_t data);
 	uint8_t read();
 
@@ -34,6 +35,7 @@ private:
 	devcb_read8::array<4> m_in;
 	devcb_write8::array<2> m_out;
 
+	int32_t m_lastresetstate;
 	int32_t m_lastcoins;
 	int32_t m_lastbuttons;
 	int32_t m_credits;

@@ -57,6 +57,12 @@ TIMER_CALLBACK_MEMBER( namco_54xx_device::latch_callback )
 	m_latched_cmd = param;
 }
 
+WRITE_LINE_MEMBER( namco_54xx_device::reset )
+{
+	// The incoming signal is active low
+	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
+}
+
 uint8_t namco_54xx_device::K_r()
 {
 	return m_latched_cmd >> 4;

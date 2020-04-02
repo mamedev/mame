@@ -50,7 +50,9 @@
     these values to mode 7 when running.
 
     Unknowns:
-        SO is connected to IOSEL on Pole Position
+    The Atari schematic for Pole Position lists pin 5 (SO) connected to IOSEL.
+    This seems to be a misprint, and it likely goes to to pin 3 (reset) like
+    the other Namco custom chips.
 
 ***************************************************************************/
 
@@ -61,6 +63,12 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
+
+WRITE_LINE_MEMBER( namco_53xx_device::reset )
+{
+	// The incoming signal is active low
+	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
+}
 
 uint8_t namco_53xx_device::K_r()
 {

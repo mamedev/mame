@@ -1605,6 +1605,9 @@ void bosco_state::bosco(machine_config &config)
 	misclatch.q_out_cb<2>().set(FUNC(galaga_state::nmion_w));
 	misclatch.q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
 	misclatch.q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
+	misclatch.q_out_cb<3>().append("50xx_1", FUNC(namco_50xx_device::reset));
+	misclatch.q_out_cb<3>().append("51xx", FUNC(namco_51xx_device::reset));
+	misclatch.q_out_cb<3>().append("54xx", FUNC(namco_54xx_device::reset));
 
 	NAMCO_50XX(config, "50xx_1", MASTER_CLOCK/6/2); /* 1.536 MHz */
 	NAMCO_50XX(config, "50xx_2", MASTER_CLOCK/6/2); /* 1.536 MHz */
@@ -1648,8 +1651,8 @@ void bosco_state::bosco(machine_config &config)
 	LS259(config, m_videolatch); // 1B on video board
 	m_videolatch->q_out_cb<0>().set(FUNC(galaga_state::flip_screen_w)).invert();
 	// Q4-Q5 to 05XX for starfield blink
-	//m_videolatch->q_out_cb<7>().set("50xx_2", FUNC(namco_50xx_device::reset_w));
-	//m_videolatch->q_out_cb<7>().append("52xx", FUNC(namco_52xx_device, reset_w));
+	m_videolatch->q_out_cb<7>().set("50xx_2", FUNC(namco_50xx_device::reset));
+	m_videolatch->q_out_cb<7>().append("52xx", FUNC(namco_52xx_device::reset));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
@@ -1700,6 +1703,8 @@ void galaga_state::galaga(machine_config &config)
 	misclatch.q_out_cb<2>().set(FUNC(galaga_state::nmion_w));
 	misclatch.q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
 	misclatch.q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
+	misclatch.q_out_cb<3>().append("51xx", FUNC(namco_51xx_device::reset));
+	misclatch.q_out_cb<3>().append("54xx", FUNC(namco_54xx_device::reset));
 
 	namco_51xx_device &n51xx(NAMCO_51XX(config, "51xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
 	n51xx.set_screen_tag(m_screen);
@@ -1761,8 +1766,10 @@ void galaga_state::galagab(machine_config &config)
 
 	/* basic machine hardware */
 
-	config.device_remove("54xx");
 	config.device_remove("06xx");
+	config.device_remove("54xx");
+	ls259_device* misclatch = reinterpret_cast<ls259_device*>(config.device("misclatch"));
+	misclatch->q_out_cb<3>().set_nop();  // 54xx reset line
 
 	/* FIXME: bootlegs should not have any Namco custom chip. However, this workaround is needed atm */
 	namco_06xx_device &n06xx(NAMCO_06XX(config, "06xx", MASTER_CLOCK/6/64));
@@ -1804,6 +1811,9 @@ void xevious_state::xevious(machine_config &config)
 	misclatch.q_out_cb<2>().set(FUNC(galaga_state::nmion_w));
 	misclatch.q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
 	misclatch.q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
+	misclatch.q_out_cb<3>().append("50xx", FUNC(namco_50xx_device::reset));
+	misclatch.q_out_cb<3>().append("51xx", FUNC(namco_51xx_device::reset));
+	misclatch.q_out_cb<3>().append("54xx", FUNC(namco_54xx_device::reset));
 
 	NAMCO_50XX(config, "50xx", MASTER_CLOCK/6/2);   /* 1.536 MHz */
 
@@ -1864,6 +1874,8 @@ void battles_state::battles(machine_config &config)
 	config.device_remove("50xx");
 	config.device_remove("54xx");
 	config.device_remove("06xx");
+	ls259_device* misclatch = reinterpret_cast<ls259_device*>(config.device("misclatch"));
+	misclatch->q_out_cb<3>().set_nop();  // 54xx reset line
 
 	/* FIXME: bootlegs should not have any Namco custom chip. However, this workaround is needed atm */
 	namco_06xx_device &n06xx(NAMCO_06XX(config, "06xx", MASTER_CLOCK/6/64));
@@ -1905,6 +1917,8 @@ void digdug_state::digdug(machine_config &config)
 	misclatch.q_out_cb<2>().set(FUNC(galaga_state::nmion_w));
 	misclatch.q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
 	misclatch.q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
+	misclatch.q_out_cb<3>().append("51xx", FUNC(namco_51xx_device::reset));
+	misclatch.q_out_cb<3>().append("53xx", FUNC(namco_53xx_device::reset));
 	// Q5-Q7 also used (see below)
 
 	namco_51xx_device &n51xx(NAMCO_51XX(config, "51xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */

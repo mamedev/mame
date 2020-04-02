@@ -293,12 +293,6 @@ READ8_MEMBER(polepos_state::ready_r)
 	return ret;
 }
 
-
-WRITE_LINE_MEMBER(polepos_state::iosel_w)
-{
-//          polepos_mcu_enable_w(offset,data);
-}
-
 WRITE_LINE_MEMBER(polepos_state::gasel_w)
 {
 	m_adc_input = state;
@@ -910,7 +904,10 @@ void polepos_state::polepos(machine_config &config)
 
 	LS259(config, m_latch); // at 8E on polepos
 	m_latch->q_out_cb<0>().set_inputline(m_maincpu, 0, CLEAR_LINE).invert();
-	m_latch->q_out_cb<1>().set(FUNC(polepos_state::iosel_w));
+	m_latch->q_out_cb<1>().set("51xx", FUNC(namco_51xx_device::reset));
+	m_latch->q_out_cb<1>().set("52xx", FUNC(namco_52xx_device::reset));
+	m_latch->q_out_cb<1>().set("53xx", FUNC(namco_53xx_device::reset));
+	m_latch->q_out_cb<1>().set("54xx", FUNC(namco_54xx_device::reset));
 	m_latch->q_out_cb<2>().set(m_namco_sound, FUNC(namco_device::sound_enable_w));
 	m_latch->q_out_cb<2>().set("polepos", FUNC(polepos_sound_device::clson_w));
 	m_latch->q_out_cb<3>().set(FUNC(polepos_state::gasel_w));
@@ -1019,7 +1016,6 @@ void polepos_state::topracern(machine_config &config)
 
 	LS259(config, m_latch);
 	m_latch->q_out_cb<0>().set_inputline(m_maincpu, 0, CLEAR_LINE).invert();
-	m_latch->q_out_cb<1>().set(FUNC(polepos_state::iosel_w));
 	m_latch->q_out_cb<2>().set(m_namco_sound, FUNC(namco_device::sound_enable_w));
 	m_latch->q_out_cb<2>().set("polepos", FUNC(polepos_sound_device::clson_w));
 	m_latch->q_out_cb<3>().set(FUNC(polepos_state::gasel_w));

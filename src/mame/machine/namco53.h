@@ -17,6 +17,7 @@ public:
 	auto k_port_callback() { return m_k.bind(); }
 	auto p_port_callback() { return m_p.bind(); }
 
+	DECLARE_WRITE_LINE_MEMBER( reset );
 	DECLARE_WRITE_LINE_MEMBER(read_request);
 	uint8_t read();
 

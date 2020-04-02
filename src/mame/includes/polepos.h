@@ -92,7 +92,6 @@ private:
 	DECLARE_READ16_MEMBER(polepos2_ic25_r);
 	uint8_t analog_r();
 	DECLARE_READ8_MEMBER(ready_r);
-	DECLARE_WRITE_LINE_MEMBER(iosel_w);
 	DECLARE_WRITE_LINE_MEMBER(gasel_w);
 	DECLARE_WRITE_LINE_MEMBER(sb0_w);
 	DECLARE_WRITE_LINE_MEMBER(chacl_w);

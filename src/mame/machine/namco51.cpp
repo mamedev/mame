@@ -68,6 +68,19 @@
 #define READ_PORT(num)           m_in[num](0)
 #define WRITE_PORT(num, data)    m_out[num](0, data)
 
+WRITE_LINE_MEMBER( namco_51xx_device::reset )
+{
+	// This should just reset m_cpu, but that's not used yet.
+	if (m_lastresetstate != state) {
+		// Reset is edge-triggered, active low.
+		if ( state == CLEAR_LINE) {
+			device_reset();
+		}
+		m_lastresetstate = state;
+	}
+}
+
+
 void namco_51xx_device::write(uint8_t data)
 {
 	data &= 0x07;
@@ -335,6 +348,7 @@ namco_51xx_device::namco_51xx_device(const machine_config &mconfig, const char *
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_in(*this)
 	, m_out(*this)
+	, m_lastresetstate(0)
 	, m_lastcoins(0)
 	, m_lastbuttons(0)
 	, m_mode(0)
@@ -355,6 +369,7 @@ void namco_51xx_device::device_start()
 	/* resolve our write callbacks */
 	m_out.resolve_all_safe();
 
+	save_item(NAME(m_lastresetstate));
 	save_item(NAME(m_lastcoins));
 	save_item(NAME(m_lastbuttons));
 	save_item(NAME(m_credits));

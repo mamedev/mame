@@ -135,6 +135,12 @@ Flags: 80=high score, 40=first bonus, 20=interval bonus, 10=?
 #include "emu.h"
 #include "namco50.h"
 
+WRITE_LINE_MEMBER( namco_50xx_device::reset )
+{
+	// The incoming signal is active low
+	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
+}
+
 TIMER_CALLBACK_MEMBER( namco_50xx_device::latch_callback )
 {
 	m_latched_cmd = param;
