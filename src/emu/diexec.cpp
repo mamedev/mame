@@ -620,33 +620,6 @@ void device_execute_interface::pulse_input_line(int irqline, const attotime &dur
 }
 
 
-//-------------------------------------------------
-//  pulse_input_line_and_vector - "pulse" an
-//  input line by asserting it and then clearing it
-//  later, specifying a vector
-//-------------------------------------------------
-
-void device_execute_interface::pulse_input_line_and_vector(int irqline, int vector, const attotime &duration)
-{
-	// treat instantaneous pulses as ASSERT+CLEAR
-	if (duration == attotime::zero)
-	{
-		if (irqline != INPUT_LINE_RESET && !input_edge_triggered(irqline))
-			throw emu_fatalerror("device '%s': zero-width pulse is not allowed for input line %d\n", device().tag(), irqline);
-
-		set_input_line_and_vector(irqline, ASSERT_LINE, vector);
-		set_input_line_and_vector(irqline, CLEAR_LINE, vector);
-	}
-	else
-	{
-		set_input_line_and_vector(irqline, ASSERT_LINE, vector);
-
-		attotime target_time = local_time() + duration;
-		m_scheduler->timer_set(target_time - m_scheduler->time(), timer_expired_delegate(FUNC(device_execute_interface::irq_pulse_clear), this), irqline);
-	}
-}
-
-
 
 //**************************************************************************
 //  DEVICE INPUT
