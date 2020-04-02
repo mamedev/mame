@@ -77,7 +77,6 @@ keeping track of it in a variable in the driver.
 void dragon_alpha_state::device_start(void)
 {
 	dragon_state::device_start();
-	save_item(NAME(m_just_reset));
 }
 
 
@@ -89,7 +88,6 @@ void dragon_alpha_state::device_start(void)
 void dragon_alpha_state::device_reset(void)
 {
 	dragon_state::device_reset();
-	m_just_reset = 1;
 }
 
 
@@ -317,19 +315,16 @@ WRITE8_MEMBER( dragon_alpha_state::psg_porta_write )
 
 	floppy_image_device *floppy = nullptr;
 
-	if (BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) floppy = m_floppy1->get_device();
-	if (BIT(data, 2)) floppy = m_floppy2->get_device();
-	if (BIT(data, 3)) floppy = m_floppy3->get_device();
+	for (int n = 0; n < 4; n++)
+		if (BIT(data, n))
+			floppy = m_floppy[n]->get_device();
 
 	m_fdc->set_floppy(floppy);
 
 	// todo: turning the motor on with bit 4 isn't giving the drive enough
 	// time to spin up, how does it work in hardware?
-	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
-	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);
-	if (m_floppy2->get_device()) m_floppy2->get_device()->mon_w(0);
-	if (m_floppy3->get_device()) m_floppy3->get_device()->mon_w(0);
+	for (auto &f : m_floppy)
+		if (f->get_device()) f->get_device()->mon_w(0);
 
 	m_fdc->dden_w(BIT(data, 5));
 }
@@ -347,15 +342,8 @@ WRITE_LINE_MEMBER( dragon_alpha_state::fdc_intrq_w )
 {
 	if (state)
 	{
-		if (m_just_reset)
-		{
-			m_just_reset = 0;
-		}
-		else
-		{
-			if (m_pia_2->ca2_output_z())
-				m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		}
+		if (m_pia_2->ca2_output_z())
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	else
 	{

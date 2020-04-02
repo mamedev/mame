@@ -44,10 +44,7 @@ public:
 		m_pia_2(*this, PIA2_TAG),
 		m_ay8912(*this, AY8912_TAG),
 		m_fdc(*this, WD2797_TAG),
-		m_floppy0(*this, WD2797_TAG ":0"),
-		m_floppy1(*this, WD2797_TAG ":1"),
-		m_floppy2(*this, WD2797_TAG ":2"),
-		m_floppy3(*this, WD2797_TAG ":3")
+		m_floppy(*this, WD2797_TAG ":%u", 0U)
 	{
 	}
 
@@ -84,12 +81,7 @@ private:
 	required_device<pia6821_device> m_pia_2;
 	required_device<ay8912_device> m_ay8912;
 	required_device<wd2797_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-
-	uint8_t m_just_reset;
+	required_device_array<floppy_connector, 4> m_floppy;
 
 	/* modem */
 	uint8_t modem_r(offs_t offset);
