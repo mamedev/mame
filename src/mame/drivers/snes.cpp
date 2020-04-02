@@ -98,7 +98,7 @@ private:
 	// input related
 	SNESCTRL_ONSCREEN_CB(onscreen_cb);
 	SNESCTRL_GUNLATCH_CB(gun_latch_cb);
-	virtual DECLARE_WRITE8_MEMBER(io_read) override;
+	virtual void io_read() override;
 	virtual uint8_t oldjoy1_read(int latched) override;
 	virtual uint8_t oldjoy2_read(int latched) override;
 	virtual void write_joy_latch(uint8_t data) override;
@@ -1101,7 +1101,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE8_MEMBER(snes_console_state::io_read)
+void snes_console_state::io_read()
 {
 	// is automatic reading on? if so, read 16bits from oldjoy1/2
 	if (SNES_CPU_REG(NMITIMEN) & 1)

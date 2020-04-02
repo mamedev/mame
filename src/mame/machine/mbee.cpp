@@ -56,7 +56,7 @@ WRITE8_MEMBER( mbee_state::pio_port_b_w )
 	m_speaker->level_w(BIT(data, 6));
 }
 
-READ8_MEMBER( mbee_state::pio_port_b_r )
+uint8_t mbee_state::pio_port_b_r()
 {
 	uint8_t data = 0;
 
@@ -185,7 +185,7 @@ TIMER_CALLBACK_MEMBER( mbee_state::timer_newkb )
 		m_b2 = 1; // set irq
 
 	if (m_b2)
-		m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
+		m_pio->port_b_write(pio_port_b_r());
 
 	timer_set(attotime::from_hz(50), TIMER_MBEE_NEWKB);
 }
@@ -252,7 +252,7 @@ WRITE_LINE_MEMBER( mbee_state::rtc_irq_w )
 	m_b7_rtc = (state) ? 0 : 1; // inverted by IC15 (pins 8,9,10)
 
 	if ((m_io_config->read() & 0xc0) == 0x40) // RTC selected in config menu
-		m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
+		m_pio->port_b_write(pio_port_b_r());
 }
 
 

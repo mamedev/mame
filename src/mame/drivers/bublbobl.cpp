@@ -843,8 +843,8 @@ MACHINE_START_MEMBER(bublbobl_state,tokio)
 MACHINE_RESET_MEMBER(bublbobl_state,tokio)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
-	tokio_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
-	tokio_videoctrl_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // TODO: does /RESET clear this the same as above? probably yes, needs tracing...
+	tokio_bankswitch_w(0x00); // force a bankswitch write of all zeroes, as /RESET clears the latch
+	tokio_videoctrl_w(0x00); // TODO: does /RESET clear this the same as above? probably yes, needs tracing...
 }
 
 void bublbobl_state::tokio(machine_config &config)
@@ -943,7 +943,7 @@ MACHINE_START_MEMBER(bublbobl_state,bublbobl)
 MACHINE_RESET_MEMBER(bublbobl_state,bublbobl)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
-	bublbobl_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
+	bublbobl_bankswitch_w(0x00); // force a bankswitch write of all zeroes, as /RESET clears the latch
 
 	m_ddr1 = 0;
 	m_ddr2 = 0;
@@ -1026,7 +1026,7 @@ MACHINE_START_MEMBER(bublbobl_state,boblbobl)
 MACHINE_RESET_MEMBER(bublbobl_state,boblbobl)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
-	bublbobl_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xff); // force a bankswitch write of all zeroes, as /RESET clears the latch
+	bublbobl_bankswitch_w(0x00); // force a bankswitch write of all zeroes, as /RESET clears the latch
 
 	m_ic43_a = 0;
 	m_ic43_b = 0;
@@ -1061,7 +1061,7 @@ MACHINE_START_MEMBER(bub68705_state, bub68705)
 MACHINE_RESET_MEMBER(bub68705_state, bub68705)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
-	bublbobl_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xff); // force a bankswitch write of all zeroes, as /RESET clears the latch
+	bublbobl_bankswitch_w(0x00); // force a bankswitch write of all zeroes, as /RESET clears the latch
 
 	m_address = 0;
 	m_latch = 0;

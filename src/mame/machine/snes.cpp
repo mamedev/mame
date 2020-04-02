@@ -114,7 +114,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_reset_hdma)
 
 TIMER_CALLBACK_MEMBER(snes_state::snes_update_io)
 {
-	io_read(m_maincpu->space(AS_PROGRAM),0,0,0);
+	io_read();
 	SNES_CPU_REG(HVBJOY) &= 0xfe;       /* Clear busy bit */
 
 	m_io_timer->adjust(attotime::never);
@@ -928,7 +928,7 @@ WRITE8_MEMBER(snes_state::snes_w_bank2)
 
 *************************************/
 
-WRITE8_MEMBER(snes_state::io_read)
+void snes_state::io_read()
 {
 	static const char *const portnames[2][2] =
 	{

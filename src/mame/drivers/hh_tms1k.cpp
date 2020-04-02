@@ -12238,7 +12238,7 @@ public:
 	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	uint8_t read_k();
 	void xl25(machine_config &config);
 
 protected:
@@ -12256,7 +12256,7 @@ void xl25_state::machine_reset()
 void xl25_state::update_halt()
 {
 	// O5+K4 go to HALT pin (used when pressing store/recall button)
-	bool halt = !((m_o & 0x20) || (read_k(machine().dummy_space(), 0) & 4));
+	bool halt = !((m_o & 0x20) || (read_k() & 4));
 	m_maincpu->set_input_line(INPUT_LINE_HALT, halt ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -12286,7 +12286,7 @@ WRITE16_MEMBER(xl25_state::write_o)
 	update_halt();
 }
 
-READ8_MEMBER(xl25_state::read_k)
+uint8_t xl25_state::read_k()
 {
 	// K: multiplexed inputs
 	// K4 also goes to MCU halt

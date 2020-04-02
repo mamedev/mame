@@ -503,7 +503,7 @@ void eag_state::eag2100(machine_config &config)
 
 ROM_START( feasbu )
 	ROM_REGION( 0x10000, "mainmap", 0 )
-	ROM_LOAD("mh_6", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) ) // ST M27C64A
+	ROM_LOAD("hm_6", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) ) // ST M27C64A
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
 	ROM_CONTINUE( 0x9800, 0x0800 )

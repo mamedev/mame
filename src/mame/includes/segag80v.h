@@ -95,7 +95,7 @@ private:
 	uint32_t screen_update_segag80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline bool adjust_xy(int rawx, int rawy, int *outx, int *outy);
 	void sega_generate_vector_list();
-	offs_t decrypt_offset(address_space &space, offs_t offset);
+	offs_t decrypt_offset(offs_t offset);
 	inline uint8_t demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2, uint8_t d1d0);
 
 	void main_map(address_map &map);

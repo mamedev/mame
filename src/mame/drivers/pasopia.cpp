@@ -72,7 +72,7 @@ private:
 	DECLARE_WRITE8_MEMBER(vram_addr_hi_w);
 	DECLARE_WRITE8_MEMBER(screen_mode_w);
 	DECLARE_READ8_MEMBER(rombank_r);
-	DECLARE_READ8_MEMBER(keyb_r);
+	uint8_t keyb_r();
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -112,7 +112,7 @@ private:
 // needed to scan the keyboard, as the pio emulation doesn't do it.
 TIMER_CALLBACK_MEMBER( pasopia_state::pio_timer )
 {
-	m_pio->port_b_write(keyb_r(generic_space(),0,0xff));
+	m_pio->port_b_write(keyb_r());
 }
 
 MC6845_UPDATE_ROW( pasopia_state::crtc_update_row )
@@ -268,7 +268,7 @@ READ8_MEMBER( pasopia_state::rombank_r )
 	return (m_ram_bank) ? 4 : 0;
 }
 
-READ8_MEMBER( pasopia_state::keyb_r )
+uint8_t pasopia_state::keyb_r()
 {
 	u8 data = 0xff;
 	for (u8 i = 0; i < 3; i++)

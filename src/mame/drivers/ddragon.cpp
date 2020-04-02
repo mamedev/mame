@@ -233,7 +233,7 @@ WRITE8_MEMBER(darktowr_state::darktowr_mcu_bank_w)
 	if (offset == 0x1400 || offset == 0)
 	{
 		uint8_t const value(bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
-		m_mcu->pb_w(space, 0, value);
+		m_mcu->pb_w(value);
 		logerror("MCU PORT 1 -> %04x (from %04x)\n", value, data);
 	}
 }

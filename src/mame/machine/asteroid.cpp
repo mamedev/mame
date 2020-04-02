@@ -133,7 +133,7 @@ void asteroid_state::machine_reset()
 {
 	m_dvg->reset_w();
 	if (m_earom.found())
-		earom_control_w(machine().dummy_space(), 0, 0);
+		earom_control_w(0);
 
 	/* reset RAM banks if present */
 	if (m_ram1.target() != nullptr)

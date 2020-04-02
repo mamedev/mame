@@ -163,7 +163,7 @@ READ8_MEMBER( abc806_state::sti_r )
 //  sto_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::sto_w )
+void abc806_state::sto_w(uint8_t data)
 {
 	int level = BIT(data, 7);
 

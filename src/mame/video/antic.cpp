@@ -2043,16 +2043,16 @@ TIMER_CALLBACK_MEMBER( antic_device::scanline_render )
 			if( m_w.dmactl & DMA_MISSILE )
 			{
 				m_steal_cycles += 1;
-				m_gtia->write(space, 0x11, RDPMGFXD(space, 3*256));
+				m_gtia->write(0x11, RDPMGFXD(space, 3*256));
 			}
 			/* transport player data to GTIA ? */
 			if( m_w.dmactl & DMA_PLAYER )
 			{
 				m_steal_cycles += 4;
-				m_gtia->write(space, 0x0d, RDPMGFXD(space, 4*256));
-				m_gtia->write(space, 0x0e, RDPMGFXD(space, 5*256));
-				m_gtia->write(space, 0x0f, RDPMGFXD(space, 6*256));
-				m_gtia->write(space, 0x10, RDPMGFXD(space, 7*256));
+				m_gtia->write(0x0d, RDPMGFXD(space, 4*256));
+				m_gtia->write(0x0e, RDPMGFXD(space, 5*256));
+				m_gtia->write(0x0f, RDPMGFXD(space, 6*256));
+				m_gtia->write(0x10, RDPMGFXD(space, 7*256));
 			}
 		}
 		else
@@ -2062,17 +2062,17 @@ TIMER_CALLBACK_MEMBER( antic_device::scanline_render )
 			{
 				if( (m_scanline & 1) == 0 )      /* even line ? */
 					m_steal_cycles += 1;
-				m_gtia->write(space, 0x11, RDPMGFXS(space, 3*128));
+				m_gtia->write(0x11, RDPMGFXS(space, 3*128));
 			}
 			/* transport player data to GTIA ? */
 			if( m_w.dmactl & DMA_PLAYER )
 			{
 				if( (m_scanline & 1) == 0 )      /* even line ? */
 					m_steal_cycles += 4;
-				m_gtia->write(space, 0x0d, RDPMGFXS(space, 4*128));
-				m_gtia->write(space, 0x0e, RDPMGFXS(space, 5*128));
-				m_gtia->write(space, 0x0f, RDPMGFXS(space, 6*128));
-				m_gtia->write(space, 0x10, RDPMGFXS(space, 7*128));
+				m_gtia->write(0x0d, RDPMGFXS(space, 4*128));
+				m_gtia->write(0x0e, RDPMGFXS(space, 5*128));
+				m_gtia->write(0x0f, RDPMGFXS(space, 6*128));
+				m_gtia->write(0x10, RDPMGFXS(space, 7*128));
 			}
 		}
 	}

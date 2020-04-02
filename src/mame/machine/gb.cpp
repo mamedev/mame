@@ -143,8 +143,8 @@ void gb_state::gb_init_regs()
 	SIODATA = 0x00;
 	SIOCONT = 0x7E;
 
-	gb_io_w(m_maincpu->space(AS_PROGRAM), 0x05, 0x00);       /* TIMECNT */
-	gb_io_w(m_maincpu->space(AS_PROGRAM), 0x06, 0x00);       /* TIMEMOD */
+	gb_io_w(0x05, 0x00);       /* TIMECNT */
+	gb_io_w(0x06, 0x00);       /* TIMEMOD */
 }
 
 
@@ -223,7 +223,7 @@ MACHINE_RESET_MEMBER(gb_state,sgb)
 }
 
 
-WRITE8_MEMBER(gb_state::gb_io_w)
+void gb_state::gb_io_w(offs_t offset, uint8_t data)
 {
 	static const uint8_t timer_shifts[4] = {10, 4, 6, 8};
 
@@ -462,7 +462,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 			return;
 		default:
 			/* we didn't handle the write, so pass it to the GB handler */
-			gb_io_w(space, offset, data);
+			gb_io_w(offset, data);
 			return;
 	}
 
@@ -605,7 +605,7 @@ WRITE8_MEMBER(gb_state::gb_timer_callback)
 
 WRITE8_MEMBER(gb_state::gbc_io_w)
 {
-	gb_io_w(space, offset, data);
+	gb_io_w(offset, data);
 
 	// On CGB the internal serial transfer clock is selectable
 	if (offset == 0x02)

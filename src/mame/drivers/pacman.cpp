@@ -390,7 +390,7 @@ MACHINE_RESET_MEMBER(pacman_state,mschamp)
 
 MACHINE_RESET_MEMBER(pacman_state,superabc)
 {
-	superabc_bank_w(m_maincpu->space(AS_PROGRAM), 0, 0);
+	superabc_bank_w(0);
 }
 
 MACHINE_RESET_MEMBER(pacman_state,maketrax)
@@ -844,7 +844,7 @@ READ8_MEMBER(pacman_state::rocktrv2_question_r)
   The two PROMs on the main board at 7F and 4A are also replaced with PROMs from the kit
 */
 
-WRITE8_MEMBER(pacman_state::superabc_bank_w)
+void pacman_state::superabc_bank_w(uint8_t data)
 {
 	// d4-d6: bank
 	int bank = data >> 4 & 7;

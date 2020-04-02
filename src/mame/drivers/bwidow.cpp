@@ -373,7 +373,7 @@ WRITE8_MEMBER(bwidow_state::earom_write)
 	m_earom->set_data(data);
 }
 
-WRITE8_MEMBER(bwidow_state::earom_control_w)
+void bwidow_state::earom_control_w(uint8_t data)
 {
 	// CK = DB0, C1 = /DB2, C2 = DB1, CS1 = DB3, /CS2 = GND
 	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 2), BIT(data, 1));
@@ -382,7 +382,7 @@ WRITE8_MEMBER(bwidow_state::earom_control_w)
 
 void bwidow_state::machine_reset()
 {
-	earom_control_w(machine().dummy_space(), 0, 0);
+	earom_control_w(0);
 }
 
 

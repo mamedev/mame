@@ -12,10 +12,10 @@
 WRITE8_MEMBER( super80_state::pio_port_a_w )
 {
 	m_keylatch = data;
-	m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff)); // refresh kbd int
+	m_pio->port_b_write(pio_port_b_r()); // refresh kbd int
 }
 
-READ8_MEMBER( super80_state::pio_port_b_r )
+uint8_t super80_state::pio_port_b_r()
 {
 	uint8_t data = 0xff;
 
@@ -60,7 +60,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_k )
 		m_key_pressed--;
 	else
 	if (!m_key_pressed)
-		m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
+		m_pio->port_b_write(pio_port_b_r());
 }
 
 /* cassette load circuit

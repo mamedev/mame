@@ -75,7 +75,7 @@ apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_c
     Punch a tape character
 */
 
-WRITE8_MEMBER(apexc_tape_puncher_image_device::write)
+void apexc_tape_puncher_image_device::write(uint8_t data)
 {
 	if (exists())
 	{
