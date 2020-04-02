@@ -68,7 +68,8 @@ protected:
 	required_ioport_array<6> m_inputs;
 
 	void update_display();
-	u8 read_inputs();
+	u8 input_r();
+	void speaker_w(int state);
 
 	u16 m_grid = 0;
 	u16 m_plate = 0;
@@ -122,7 +123,7 @@ private:
     I/O
 ******************************************************************************/
 
-// shared
+// main unit
 
 void base_state::update_display()
 {
@@ -134,7 +135,7 @@ void base_state::update_display()
 	m_display->matrix_partial(8, 6, m_grid >> 8, seg);
 }
 
-u8 base_state::read_inputs()
+u8 base_state::input_r()
 {
 	u8 data = 0;
 
@@ -144,6 +145,11 @@ u8 base_state::read_inputs()
 			data |= m_inputs[i]->read();
 
 	return data;
+}
+
+void base_state::speaker_w(int state)
+{
+	m_speaker->level_w(state);
 }
 
 
@@ -160,7 +166,7 @@ WRITE8_MEMBER(hmcs40_state::write_r)
 WRITE16_MEMBER(hmcs40_state::write_d)
 {
 	// D0: speaker out
-	m_speaker->level_w(data & 1);
+	speaker_w(data & 1);
 
 	// D1-D12: vfd grid (10 and 11 unused)
 	m_grid = bitswap<14>(data,9,10,0,0,11,12,1,2,3,4,5,6,7,8) & 0x33ff;
@@ -170,7 +176,7 @@ WRITE16_MEMBER(hmcs40_state::write_d)
 READ16_MEMBER(hmcs40_state::read_d)
 {
 	// D13-D15: multiplexed inputs
-	return read_inputs() << 13;
+	return input_r() << 13;
 }
 
 
@@ -179,7 +185,7 @@ READ16_MEMBER(hmcs40_state::read_d)
 WRITE16_MEMBER(tms1k_state::write_r)
 {
 	// R0: speaker out
-	m_speaker->level_w(data & 1);
+	speaker_w(data & 1);
 
 	// R1-R12: vfd grid (0 and 7 unused)
 	// R13,R14: vfd plate 3,2
@@ -198,7 +204,7 @@ WRITE16_MEMBER(tms1k_state::write_o)
 READ8_MEMBER(tms1k_state::read_k)
 {
 	// K1-K4: multiplexed inputs
-	return read_inputs();
+	return input_r();
 }
 
 
@@ -298,25 +304,25 @@ void tms1k_state::sag(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( sag_si2 )
+ROM_START( sag_sinv2 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "inv2_hd38800a31", 0x0000, 0x1000, BAD_DUMP CRC(29c8c100) SHA1(41cd413065659c6d7d5b2408de2ca6d51c49629a) )
 	ROM_CONTINUE( 0x1e80, 0x0100 )
 ROM_END
 
-ROM_START( sag_bb4 )
+ROM_START( sag_baseb4 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "b-b5_hd38800a37", 0x0000, 0x1000, CRC(64852bd5) SHA1(fb1c24ca43934ceb6fc35ac7c35b71e6e843dbc5) )
 	ROM_CONTINUE( 0x1e80, 0x0100 )
 ROM_END
 
-ROM_START( sag_pb )
+ROM_START( sag_pinb )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "pinb_hd38800a38", 0x0000, 0x1000, CRC(6e53a56b) SHA1(13f057eab2e4cfbb3ef1247a041abff15ae727c9) )
 	ROM_CONTINUE( 0x1e80, 0x0100 )
 ROM_END
 
-ROM_START( sag_fb4 )
+ROM_START( sag_footb4 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ftba_mp7573", 0x0000, 0x1000, CRC(b17dd9e3) SHA1(9c9e7a56643233ef2adff7b68a6df19e6ca176c2) ) // die label TMS1400, MP7573
 
@@ -334,9 +340,9 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE INPUT  CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, sag_si2,  0,      0, sag,    sag,   hmcs40_state, empty_init, "Entex", "Select-A-Game Machine: Space Invader 2", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING ) // suspect bad dump
-CONS( 1981, sag_bb4,  0,      0, sag,    sag,   hmcs40_state, empty_init, "Entex", "Select-A-Game Machine: Baseball 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, sag_pb,   0,      0, sag,    sag,   hmcs40_state, empty_init, "Entex", "Select-A-Game Machine: Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+//    YEAR  NAME        PARENT CMP MACHINE INPUT  CLASS         INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1981, sag_sinv2,  0,      0, sag,    sag,   hmcs40_state, empty_init, "Entex", "Select-A-Game Machine: Space Invader 2", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING ) // suspect bad dump
+CONS( 1981, sag_baseb4, 0,      0, sag,    sag,   hmcs40_state, empty_init, "Entex", "Select-A-Game Machine: Baseball 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, sag_pinb,   0,      0, sag,    sag,   hmcs40_state, empty_init, "Entex", "Select-A-Game Machine: Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1981, sag_fb4,  0,      0, sag,    sag,   tms1k_state,  empty_init, "Entex", "Select-A-Game Machine: Football 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, sag_footb4, 0,      0, sag,    sag,   tms1k_state,  empty_init, "Entex", "Select-A-Game Machine: Football 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

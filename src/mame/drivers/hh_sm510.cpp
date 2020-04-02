@@ -293,7 +293,7 @@ WRITE8_MEMBER(hh_sm510_state::input_w)
 	update_k_line();
 }
 
-uint8_t hh_sm510_state::input_r()
+u8 hh_sm510_state::input_r()
 {
 	return read_inputs(m_inp_lines, m_inp_fixed);
 }

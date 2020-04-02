@@ -55,7 +55,7 @@ protected:
 	virtual void update_k_line();
 	virtual DECLARE_WRITE16_MEMBER(sm510_lcd_segment_w);
 	virtual DECLARE_WRITE16_MEMBER(sm500_lcd_segment_w);
-	virtual uint8_t input_r();
+	virtual u8 input_r();
 	virtual DECLARE_WRITE8_MEMBER(input_w);
 	virtual DECLARE_WRITE8_MEMBER(piezo_r1_w);
 	virtual DECLARE_WRITE8_MEMBER(piezo_r2_w);

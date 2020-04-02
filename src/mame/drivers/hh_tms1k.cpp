@@ -12238,7 +12238,7 @@ public:
 	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
-	uint8_t read_k();
+	u8 read_k();
 	void xl25(machine_config &config);
 
 protected:
@@ -12286,7 +12286,7 @@ WRITE16_MEMBER(xl25_state::write_o)
 	update_halt();
 }
 
-uint8_t xl25_state::read_k()
+u8 xl25_state::read_k()
 {
 	// K: multiplexed inputs
 	// K4 also goes to MCU halt
