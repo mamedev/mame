@@ -325,15 +325,16 @@ std::string machine_info::game_info_string() const
 					count++;
 		}
 
+		int n = (clock >= 1000000) ? (clock / 1000000) : (clock / 1000);
+		int d = (clock >= 1000000) ? (clock % 1000000) : (clock % 1000);
+		while (d != 0 && (d % 10) == 0)
+			d /= 10;
+
 		// if more than one, prepend a #x in front of the CPU name
 		// display clock in kHz or MHz
 		util::stream_format(buf,
-				(count > 1) ? "%1$d" UTF8_MULTIPLY "%2$s %3$d.%4$0*5$d%6$s\n" : "%2$s %3$d.%4$0*5$d%6$s\n",
-				count,
-				name,
-				(clock >= 1000000) ? (clock / 1000000) : (clock / 1000),
-				(clock >= 1000000) ? (clock % 1000000) : (clock % 1000),
-				(clock >= 1000000) ? 6 : 3,
+				(count > 1) ? "%1$d" UTF8_MULTIPLY "%2$s %3$d.%4$d" UTF8_NBSP "%5$s\n" : "%2$s %3$d.%4$d" UTF8_NBSP "%5$s\n",
+				count, name, n, d,
 				(clock >= 1000000) ? _("MHz") : _("kHz"));
 	}
 
@@ -360,18 +361,19 @@ std::string machine_info::game_info_string() const
 					count++;
 		}
 
-		// if more than one, prepend a #x in front of the CPU name
-		// display clock in kHz or MHz
 		int clock = sound.device().clock();
+		int n = (clock >= 1000000) ? (clock / 1000000) : (clock / 1000);
+		int d = (clock >= 1000000) ? (clock % 1000000) : (clock % 1000);
+		while (d != 0 && (d % 10) == 0)
+			d /= 10;
+
+		// if more than one, prepend a #x in front of the sound chip name
+		// display clock in kHz or MHz
 		util::stream_format(buf,
 				(count > 1)
-					? ((clock != 0) ? "%1$d" UTF8_MULTIPLY "%2$s %3$d.%4$0*5$d%6$s\n" : "%1$d" UTF8_MULTIPLY "%2$s\n")
-					: ((clock != 0) ? "%2$s %3$d.%4$0*5$d%6$s\n" : "%2$s\n"),
-				count,
-				sound.device().name(),
-				(clock >= 1000000) ? (clock / 1000000) : (clock / 1000),
-				(clock >= 1000000) ? (clock % 1000000) : (clock % 1000),
-				(clock >= 1000000) ? 6 : 3,
+					? ((clock != 0) ? "%1$d" UTF8_MULTIPLY "%2$s %3$d.%4$d" UTF8_NBSP "%5$s\n" : "%1$d" UTF8_MULTIPLY "%2$s\n")
+					: ((clock != 0) ? "%2$s %3$d.%4$d" UTF8_NBSP "%5$s\n" : "%2$s\n"),
+				count, sound.device().name(), n, d,
 				(clock >= 1000000) ? _("MHz") : _("kHz"));
 	}
 
@@ -390,11 +392,16 @@ std::string machine_info::game_info_string() const
 				detail = _("Vector");
 			else
 			{
+				double f = screen.frame_period().as_hz();
+				int n = int(f), d = int(f * 1000000.0) % 1000000;
+				while (d != 0 && (d % 10) == 0)
+					d /= 10;
+
 				const rectangle &visarea = screen.visible_area();
-				detail = string_format("%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz",
+				detail = string_format("%d " UTF8_MULTIPLY " %d (%s) %d.%d" UTF8_NBSP "Hz",
 						visarea.width(), visarea.height(),
 						(screen.orientation() & ORIENTATION_SWAP_XY) ? "V" : "H",
-						screen.frame_period().as_hz());
+						n, d);
 			}
 
 			util::stream_format(buf,

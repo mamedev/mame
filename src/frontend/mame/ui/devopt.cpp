@@ -69,16 +69,16 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 						count++;
 			}
 
+			int n = (clock >= 1000000) ? (clock / 1000000) : (clock / 1000);
+			int d = (clock >= 1000000) ? (clock % 1000000) : (clock % 1000);
+			while (d != 0 && (d % 10) == 0)
+				d /= 10;
+
 			// if more than one, prepend a #x in front of the CPU name and display clock in kHz or MHz
-			util::stream_format(
-					str,
-					(count > 1)
-						? ((clock >= 1000000) ? _("  %1$d\xC3\x97%2$s %3$d.%4$06d\xC2\xA0MHz\n") : _("  %1$d\xC3\x97%2$s %5$d.%6$03d\xC2\xA0kHz\n"))
-						: ((clock >= 1000000) ? _("  %2$s %3$d.%4$06d\xC2\xA0MHz\n") : _("  %2$s %5$d.%6$03d\xC2\xA0kHz\n")),
-					count,
-					name,
-					clock / 1000000, clock % 1000000,
-					clock / 1000, clock % 1000);
+			util::stream_format(str,
+					(count > 1) ? "  %1$d" UTF8_MULTIPLY "%2$s %3$d.%4$d" UTF8_NBSP "%5$s\n" : "  %2$s %3$d.%4$d" UTF8_NBSP "%5$s\n",
+					count, name, n, d,
+					(clock >= 1000000) ? _("MHz") : _("kHz"));
 		}
 	}
 
@@ -90,22 +90,23 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 		for (screen_device &screen : scriter)
 		{
 			if (screen.screen_type() == SCREEN_TYPE_VECTOR)
-			{
 				util::stream_format(str, _("  Screen '%1$s': Vector\n"), screen.tag());
-			}
 			else
 			{
-				const rectangle &visarea = screen.visible_area();
+				double f = screen.frame_period().as_hz();
+				int n = int(f), d = int(f * 1000000.0) % 1000000;
+				while (d != 0 && (d % 10) == 0)
+					d /= 10;
 
-				util::stream_format(
-						str,
+				const rectangle &visarea = screen.visible_area();
+				util::stream_format(str,
 						(screen.orientation() & ORIENTATION_SWAP_XY)
-							? _("  Screen '%1$s': %2$d \xC3\x97 %3$d (V) %4$f\xC2\xA0Hz\n")
-							: _("  Screen '%1$s': %2$d \xC3\x97 %3$d (H) %4$f\xC2\xA0Hz\n"),
+							? _("  Screen '%1$s': %2$d \xC3\x97 %3$d (V) %4$d.%5$d\xC2\xA0Hz\n")
+							: _("  Screen '%1$s': %2$d \xC3\x97 %3$d (H) %4$d.%5$d\xC2\xA0Hz\n"),
 						screen.tag(),
 						visarea.width(),
 						visarea.height(),
-						screen.frame_period().as_hz());
+						n, d);
 			}
 		}
 	}
@@ -129,17 +130,20 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 					if (soundtags.insert(scan.device().tag()).second)
 						count++;
 			}
-			// if more than one, prepend a #x in front of the name and display clock in kHz or MHz
+
 			int const clock = sound.device().clock();
-			util::stream_format(
-					str,
+			int n = (clock >= 1000000) ? (clock / 1000000) : (clock / 1000);
+			int d = (clock >= 1000000) ? (clock % 1000000) : (clock % 1000);
+			while (d != 0 && (d % 10) == 0)
+				d /= 10;
+
+			// if more than one, prepend a #x in front of the name and display clock in kHz or MHz
+			util::stream_format(str,
 					(count > 1)
-						? ((clock >= 1000000) ? _("  %1$d\xC3\x97%2$s %3$d.%4$06d\xC2\xA0MHz\n") : clock ? _("  %1$d\xC3\x97%2$s %5$d.%6$03d\xC2\xA0kHz\n") : _("  %1$d\xC3\x97%2$s\n"))
-						: ((clock >= 1000000) ? _("  %2$s %3$d.%4$06d\xC2\xA0MHz\n") : clock ? _("  %2$s %5$d.%6$03d\xC2\xA0kHz\n") : _("  %2$s\n")),
-					count,
-					sound.device().name(),
-					clock / 1000000, clock % 1000000,
-					clock / 1000, clock % 1000);
+						? ((clock != 0) ? "  %1$d" UTF8_MULTIPLY "%2$s %3$d.%4$d" UTF8_NBSP "%5$s\n" : "  %1$d" UTF8_MULTIPLY "%2$s\n")
+						: ((clock != 0) ? "  %2$s %3$d.%4$d" UTF8_NBSP "%5$s\n" : "  %2$s\n"),
+					count, sound.device().name(), n, d,
+					(clock >= 1000000) ? _("MHz") : _("kHz"));
 		}
 	}
 
