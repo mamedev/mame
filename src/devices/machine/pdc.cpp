@@ -339,10 +339,6 @@ void pdc_device::device_start()
 	save_item(NAME(reg_p21));
 	save_item(NAME(reg_p38));
 	save_item(NAME(fdd_68k_dma_address));
-
-	/* Resolve callbacks */
-	m_m68k_r_cb.resolve_safe(0);
-	m_m68k_w_cb.resolve_safe();
 }
 
 //-------------------------------------------------
