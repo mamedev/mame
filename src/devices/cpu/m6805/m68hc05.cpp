@@ -654,7 +654,7 @@ void m68hc05_device::burn_cycles(unsigned count)
 
 	// run non-programmable COP
 	m_ncop_cnt += count;
-	if ((u32(1) << 17) <= m_ncop_cnt)
+	if (m_ncope && ((u32(1) << 17) <= m_ncop_cnt))
 	{
 		pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		LOGCOP("NCOP reset\n");
