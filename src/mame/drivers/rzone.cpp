@@ -69,7 +69,7 @@ private:
 
 	DECLARE_WRITE8_MEMBER(t1_write_r);
 	DECLARE_WRITE8_MEMBER(t1_write_s);
-	virtual DECLARE_READ8_MEMBER(input_r) override;
+	virtual uint8_t input_r() override;
 
 	void t2_update_audio();
 	DECLARE_WRITE8_MEMBER(t2_write_r);
@@ -173,7 +173,7 @@ WRITE8_MEMBER(rzone_state::t1_write_s)
 	sclock_w(data >> 1 & 1);
 }
 
-READ8_MEMBER(rzone_state::input_r)
+uint8_t rzone_state::input_r()
 {
 	// K1: SDATA
 	return sdata_r();

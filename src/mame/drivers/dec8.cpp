@@ -250,7 +250,7 @@ WRITE8_MEMBER(dec8_state::dec8_bank_w)
 }
 
 /* Used by Ghostbusters, Meikyuu Hunter G & Gondomania */
-WRITE8_MEMBER(dec8_state::ghostb_bank_w)
+void dec8_state::ghostb_bank_w(uint8_t data)
 {
 	/* Bit 0: SECCLR - acknowledge interrupt from I8751
 	   Bit 1: NMI enable/disable
@@ -1874,7 +1874,7 @@ void dec8_state::machine_reset()
 
 	// reset clears LS273 latch, which disables NMI
 	if (m_nmigate.found())
-		ghostb_bank_w(machine().dummy_space(), 0, 0);
+		ghostb_bank_w(0);
 }
 
 

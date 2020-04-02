@@ -35,7 +35,7 @@ public:
 	auto write_callback() { return m_write_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	void write(offs_t offset, uint8_t data);
 
 	uint16_t *get_color_lookup() { return m_color_lookup; }
 	void set_color_lookup(int i, uint16_t data) { m_color_lookup[i] = data; }

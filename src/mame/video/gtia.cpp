@@ -252,7 +252,7 @@ void gtia_device::device_reset()
 
 	/* reset the GTIA read/write/helper registers */
 	for (int i = 0; i < 32; i++)
-		write(machine().dummy_space(), i, 0);
+		write(i, 0);
 
 	if (is_ntsc())
 		m_r.pal = 0xff;
@@ -509,7 +509,7 @@ void gtia_device::recalc_m3()
 
 
 
-WRITE8_MEMBER( gtia_device::write )
+void gtia_device::write(offs_t offset, uint8_t data)
 {
 	/* used for mixing hue/lum of different colors */
 //  static uint8_t lumpm0=0,lumpm1=0,lumpm2=0,lumpm3=0,lumpm4=0;

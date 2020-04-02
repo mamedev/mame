@@ -136,7 +136,7 @@ private:
 	DECLARE_WRITE8_MEMBER(dec8_i8751_w);
 	DECLARE_WRITE8_MEMBER(csilver_i8751_w);
 	DECLARE_WRITE8_MEMBER(dec8_bank_w);
-	DECLARE_WRITE8_MEMBER(ghostb_bank_w);
+	void ghostb_bank_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(csilver_control_w);
 	DECLARE_WRITE8_MEMBER(dec8_sound_w);
 	DECLARE_WRITE8_MEMBER(csilver_adpcm_data_w);

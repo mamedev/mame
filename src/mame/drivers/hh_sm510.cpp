@@ -279,7 +279,7 @@ u8 hh_sm510_state::read_inputs(int columns, int fixed)
 void hh_sm510_state::update_k_line()
 {
 	// this is necessary because the MCU can wake up on K input activity
-	m_maincpu->set_input_line(SM510_INPUT_LINE_K, input_r(machine().dummy_space(), 0, 0xff) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(SM510_INPUT_LINE_K, input_r() ? ASSERT_LINE : CLEAR_LINE);
 }
 
 INPUT_CHANGED_MEMBER(hh_sm510_state::input_changed)
@@ -293,7 +293,7 @@ WRITE8_MEMBER(hh_sm510_state::input_w)
 	update_k_line();
 }
 
-READ8_MEMBER(hh_sm510_state::input_r)
+uint8_t hh_sm510_state::input_r()
 {
 	return read_inputs(m_inp_lines, m_inp_fixed);
 }

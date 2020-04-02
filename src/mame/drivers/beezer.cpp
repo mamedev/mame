@@ -92,7 +92,7 @@ public:
 	DECLARE_READ8_MEMBER(via_system_pb_r);
 	DECLARE_WRITE8_MEMBER(via_system_pa_w);
 	DECLARE_WRITE8_MEMBER(via_system_pb_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	void bankswitch_w(uint8_t data);
 
 	void beezer(machine_config &config);
 	void banked_map(address_map &map);
@@ -445,7 +445,7 @@ WRITE8_MEMBER( beezer_state::via_system_pb_w )
 	m_pbus = data;
 }
 
-WRITE8_MEMBER( beezer_state::bankswitch_w )
+void beezer_state::bankswitch_w(uint8_t data)
 {
 	m_x = BIT(data, 3);
 	m_y = BIT(data, 4);
@@ -483,7 +483,7 @@ void beezer_state::machine_reset()
 	m_pbus = 0xff;
 
 	// initialize memory banks
-	bankswitch_w(machine().dummy_space(), 0, 0);
+	bankswitch_w(0);
 
 	// start timer
 	m_dac_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL(4'000'000) / 4) / 16));

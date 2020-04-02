@@ -457,7 +457,7 @@ MACHINE_RESET_MEMBER(centiped_state,centiped)
 	m_prg_bank = 0;
 
 	if (m_earom.found())
-		earom_control_w(machine().dummy_space(), 0, 0);
+		earom_control_w(0);
 }
 
 
@@ -663,7 +663,7 @@ WRITE8_MEMBER(centiped_state::earom_write)
 	m_earom->set_data(data);
 }
 
-WRITE8_MEMBER(centiped_state::earom_control_w)
+void centiped_state::earom_control_w(uint8_t data)
 {
 	// CK = DB0, C1 = /DB1, C2 = DB2, CS1 = DB3, /CS2 = GND
 	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 1), BIT(data, 2));

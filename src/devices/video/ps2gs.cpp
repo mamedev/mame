@@ -433,7 +433,7 @@ void ps2_gs_device::write_packed(const uint8_t reg, const uint64_t hi, const uin
 	switch (reg)
 	{
 		case 0x0e:
-			regs_w(machine().dummy_space(), (uint32_t)hi, lo, ~0ULL);
+			regs_w((uint32_t)hi, lo);
 			break;
 		default:
 			logerror("%s: write_packed: Unknown register %02x = %08x%08x%08x%08x\n", machine().describe_context(), reg, (uint32_t)(hi >> 32), (uint32_t)hi, (uint32_t)(lo >> 32), (uint32_t)lo);
@@ -441,7 +441,7 @@ void ps2_gs_device::write_packed(const uint8_t reg, const uint64_t hi, const uin
 	}
 }
 
-WRITE64_MEMBER(ps2_gs_device::regs_w)
+void ps2_gs_device::regs_w(offs_t offset, uint64_t data)
 {
 	static char const *const dir_strs[4] = {
 		"Host->Local", "Local->Host", "Local->Local", "None"
