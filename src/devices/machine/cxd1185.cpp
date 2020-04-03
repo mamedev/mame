@@ -9,7 +9,6 @@
  *
  * TODO:
  *  - target mode
- *  - pio mode testing
  *  - cq/aq variants
  *  - synchronous mode
  */
@@ -595,7 +594,7 @@ int cxd1185_device::state_step()
 		break;
 
 	case XFR_INFO:
-		LOGMASKED(LOG_STATE, "transfer: count %d waiting for REQ\n", m_count);
+		LOGMASKED(LOG_STATE, "transfer: count %d waiting for REQ\n", (m_command & TRBE) ? m_count : 1);
 		if (scsi_bus->ctrl_r() & S_REQ)
 			m_state = scsi_bus->ctrl_r() & S_INP ? XFR_IN : XFR_OUT;
 		break;
@@ -625,10 +624,12 @@ int cxd1185_device::state_step()
 	case XFR_IN_NEXT:
 		if (!(scsi_bus->ctrl_r() & S_REQ))
 		{
-			LOGMASKED(LOG_STATE, "transfer in: count %d\n", m_count);
-			if (!m_count)
+			LOGMASKED(LOG_STATE, "transfer in: count %d\n", (m_command & TRBE) ? m_count : 0);
+			if (!(m_command & TRBE) || !m_count)
 			{
-				m_status |= TRBZ;
+				if (m_command & TRBE)
+					m_status |= TRBZ;
+
 				m_state = XFR_IN_DRAIN;
 			}
 			else
@@ -641,24 +642,23 @@ int cxd1185_device::state_step()
 		break;
 	case XFR_IN_REQ:
 		if (scsi_bus->ctrl_r() & S_REQ)
-			m_state = XFR_IN;
+		{
+			// check if target changed phase
+			if (m_int_req[1] & PHC)
+			{
+				if (m_command & DMA)
+					set_drq(false);
+
+				m_state = XFR_INFO_DONE;
+			}
+			else
+				m_state = XFR_IN;
+		}
 		break;
 	case XFR_IN_DRAIN:
-		// TODO: not sure whether commands complete before fifo is empty
-#if 0
-		if (!m_fifo.empty())
-		{
-			delay = -1;
-			if (m_command & DMA)
-				set_drq(true);
-		}
-		else
-			m_state = XFR_INFO_DONE;
-#else
 		if (!m_fifo.empty() && (m_command & DMA))
 			set_drq(true);
 		m_state = XFR_INFO_DONE;
-#endif
 		break;
 	case XFR_OUT:
 		if (!m_fifo.empty() || (m_command & CMD) == (CMD_XFR_PAD & CMD))
@@ -682,7 +682,7 @@ int cxd1185_device::state_step()
 	case XFR_OUT_NEXT:
 		if (!(scsi_bus->ctrl_r() & S_REQ))
 		{
-			LOGMASKED(LOG_STATE, "transfer out: data accepted\n");
+			LOGMASKED(LOG_STATE, "transfer out: data ACK\n");
 			if (m_command & TRBE)
 			{
 				if (!--m_count)
@@ -702,9 +702,20 @@ int cxd1185_device::state_step()
 		}
 		break;
 	case XFR_OUT_REQ:
-		LOGMASKED(LOG_STATE, "transfer out: waiting for REQ\n");
+		LOGMASKED(LOG_STATE, "transfer out: count %d waiting for REQ\n", m_count);
 		if (scsi_bus->ctrl_r() & S_REQ)
-			m_state = XFR_OUT;
+		{
+			// check if target changed phase
+			if (m_int_req[1] & PHC)
+			{
+				if (m_command & DMA)
+					set_drq(false);
+
+				m_state = XFR_INFO_DONE;
+			}
+			else
+				m_state = XFR_OUT;
+		}
 		break;
 	case XFR_INFO_DONE:
 		LOGMASKED(LOG_STATE, "transfer: complete\n");
