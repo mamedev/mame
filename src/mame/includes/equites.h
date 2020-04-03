@@ -119,6 +119,7 @@ public:
 	void unpack_block(const char *region, int offset, int size);
 	void unpack_region(const char *region);
 	void equites(machine_config &config);
+	void bngotime(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -135,7 +136,6 @@ class gekisou_state : public equites_state
 public:
 	using equites_state::equites_state;
 	DECLARE_READ_LINE_MEMBER(gekisou_unknown_bit_r);
-	void bngotime(machine_config &config);
 	void gekisou(machine_config &config);
 
 protected:
