@@ -6451,7 +6451,7 @@ more investigation needed...
 
 	<software name="asterix">
 		<description>Astérix (Euro)</description>
-		<year>1996</year>
+		<year>1993</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="SNSP-XE-FAH, SNSP-XE-NOE" />
 		<part name="cart" interface="snes_cart">
