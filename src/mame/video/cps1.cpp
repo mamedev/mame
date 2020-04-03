@@ -1241,6 +1241,18 @@ static const struct gfx_range mapper_RCM63B_table[] =
 	{ 0 }
 };
 
+#define mapper_gulunpa   { 0x8000, 0, 0, 0 }, mapper_gulunpa_table
+static const struct gfx_range mapper_gulunpa_table[] =
+{
+	/* type                              start   end     bank */
+	// TODO: guesswork
+	{ GFXTYPE_SCROLL1,                   0x0000, 0x7fff, 0 },
+	{ GFXTYPE_SCROLL3,                   0x4000, 0x5fff, 0 },
+	{ GFXTYPE_SCROLL2,                   0x2000, 0x3fff, 0 },
+	{ GFXTYPE_SPRITES,                   0x6000, 0x7fff, 0 },
+	{ 0 }
+};
+
 
 #define mapper_PKB10B   { 0x8000, 0, 0, 0 }, mapper_PKB10B_table
 static const struct gfx_range mapper_PKB10B_table[] =
@@ -1646,7 +1658,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"pang3b",      CPS_B_21_DEF, mapper_pang3 },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */   // should use one of these three CP1B1F,CP1B8K,CP1B9K
 	{"pang3b2",     CPS_B_21_DEF, mapper_pang3 },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */   // should use one of these three CP1B1F,CP1B8K,CP1B9K
 	{"ganbare",     CPS_B_21_DEF, mapper_sfzch },   // wrong, this set uses GBPR2, dumped but equations still not added
-
+	{"gulunpa",     CPS_B_21_DEF, mapper_gulunpa }, // wrong
+	
 	/* CPS Changer */
 
 	{"sfach",       CPS_B_21_DEF, mapper_sfzch },   // wrong, this set uses an unknown PAL, still not dumped
