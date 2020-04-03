@@ -1208,7 +1208,7 @@ void gekisou_state::gekisou(machine_config &config)
 
 void gekisou_state::bngotime(machine_config &config)
 {
-	gekisou(config);
+	equites(config);
 
 	// TODO: emulate different sound board with Z80 + AY8910
 	m_audiocpu->set_disable();
@@ -1954,8 +1954,8 @@ ROM_START( hvoltage )
 ROM_END
 
 /*
-Unknown bingo game
-(c)1986 CLS?
+Bingo Time
+(c)1986 CLS
 
 68K55-2
 CPU:MC68000P8
@@ -1978,7 +1978,7 @@ ROM_START( bngotime )
 	ROM_LOAD( "11.sub", 0x00000, 0x2000, CRC(9b063c07) SHA1(c9fe7fe10bd204cb82066db7b576072df7787046) )
 
 	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
-	ROM_LOAD( "alpha-8505_44801c57.bin", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "alpha-8505_44801c57.bin", 0x0000, 0x2000, CRC(1f5a1405) SHA1(23f2e23db402f88037a5cbdab2935ec1b9a05298) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "9.d5",  0x00000, 0x1000, CRC(3c356e82) SHA1(55a58f1335206a0996caf8967b4ee962d2373db4) )
@@ -2053,7 +2053,7 @@ GAME( 1984, bullfgtr,  0,        equites,  bullfgtr, equites_state,  init_equite
 GAME( 1984, bullfgtrs, bullfgtr, equites,  bullfgtr, equites_state,  init_equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, kouyakyu,  0,        equites,  kouyakyu, equites_state,  init_equites,  ROT0,  "Alpha Denshi Co.", "The Koukou Yakyuu", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gekisou,   0,        gekisou,  gekisou,  gekisou_state,  init_equites,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bngotime,  0,        bngotime, gekisou,  gekisou_state,  init_equites,  ROT90, "CLS", "Bingo Time", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 8505 MCU isn't dumped
+GAME( 1986, bngotime,  0,        bngotime, gekisou,  gekisou_state,  init_equites,  ROT90, "CLS", "Bingo Time", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // needs emulation of the sound board
 
 // Splendor Blast Hardware
 GAME( 1985, splndrbt,  0,        splndrbt, splndrbt, splndrbt_state, init_splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
