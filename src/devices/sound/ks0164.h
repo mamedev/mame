@@ -3,8 +3,8 @@
 
 // Samsung KS0164 wavetable chip
 
-#ifndef DEVICES_SOUND_KS0164_H
-#define DEVICES_SOUND_KS0164_H
+#ifndef MAME_SOUND_KS0164_H
+#define MAME_SOUND_KS0164_H
 
 #pragma once
 

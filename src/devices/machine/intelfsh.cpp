@@ -739,15 +739,15 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 				logerror("Invalid flash mode byte %x\n", data & 0xff);
 			else
 			{
-			m_status = 0x80;
-			m_flash_mode = FM_READSTATUS;
+				m_status = 0x80;
+				m_flash_mode = FM_READSTATUS;
 			}
 			break;
 		case 0x20:  // block erase
 			if (m_type == FLASH_SST_49LF020)
 				logerror("Unknown flash mode byte %x\n", data & 0xff);
 			else
-			m_flash_mode = FM_CLEARPART1;
+				m_flash_mode = FM_CLEARPART1;
 			break;
 		case 0x60:  // set master lock
 			m_flash_mode = FM_SETMASTER;
@@ -923,7 +923,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 				memset(&m_data[0x3C000], 0xff, 0x04000);
 			}
 			else
-			memset(&m_data[0], 0xff, m_size);
+				memset(&m_data[0], 0xff, m_size);
 
 			m_status = 1 << 3;
 			m_flash_mode = FM_ERASEAMD4;
