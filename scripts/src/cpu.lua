@@ -198,23 +198,6 @@ if (CPUS["AMIS2000"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
--- Alpha 8201
---@src/devices/cpu/alph8201/alph8201.h,CPUS["ALPHA8201"] = true
---------------------------------------------------
-
-if (CPUS["ALPHA8201"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/cpu/alph8201/alph8201.cpp",
-		MAME_DIR .. "src/devices/cpu/alph8201/alph8201.h",
-	}
-end
-
-if (CPUS["ALPHA8201"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/alph8201/8201dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/alph8201/8201dasm.h")
-end
-
---------------------------------------------------
 -- Analog Devices ADSP21xx series
 --@src/devices/cpu/adsp2100/adsp2100.h,CPUS["ADSP21XX"] = true
 --------------------------------------------------

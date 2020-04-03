@@ -79,7 +79,6 @@ CPUS["MC68HC11"] = true
 CPUS["ADSP21062"] = true
 CPUS["DSP56156"] = true
 CPUS["RSP"] = true
-CPUS["ALPHA8201"] = true
 CPUS["COP400"] = true
 CPUS["TLCS90"] = true
 CPUS["TLCS870"] = true

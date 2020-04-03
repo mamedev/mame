@@ -1522,7 +1522,7 @@ ROM_START( kouyakyu )
 	ROM_LOAD( "epr-6698.bin", 0x0a000, 0x2000, CRC(7adfd1ff) SHA1(b543dd6734a681a187dabf602bea390de663039c) )
 
 	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
-	ROM_LOAD( "alpha-8303_44801b42.bin", 0x0000, 0x2000, BAD_DUMP CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) ) // 8304 is not dumped yet, using 8303 instead
+	ROM_LOAD( "alpha-8505_44801c57.bin", 0x0000, 0x2000, BAD_DUMP CRC(1f5a1405) SHA1(23f2e23db402f88037a5cbdab2935ec1b9a05298) ) // 8304 is not dumped yet, using 8505 instead
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "epr-6710.bin", 0x00000, 0x1000, CRC(accda190) SHA1(265d2fd92574d65e7890e48d5f305bf903a67bc8) )

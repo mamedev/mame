@@ -16,7 +16,6 @@ using util::BIT;
 
 #include "cpu/8x300/8x300dasm.h"
 #include "cpu/adsp2100/2100dasm.h"
-#include "cpu/alph8201/8201dasm.h"
 #include "cpu/alpha/alphad.h"
 #include "cpu/alto2/alto2dsm.h"
 #include "cpu/am29000/am29dasm.h"
@@ -332,7 +331,6 @@ static const dasm_table_entry dasm_table[] =
 	{ "alpha_nt",        le,  0, []() -> util::disasm_interface * { return new alpha_disassembler(alpha_disassembler::TYPE_NT); } },
 	{ "alpha_unix",      le,  0, []() -> util::disasm_interface * { return new alpha_disassembler(alpha_disassembler::TYPE_UNIX); } },
 	{ "alpha_vms",       le,  0, []() -> util::disasm_interface * { return new alpha_disassembler(alpha_disassembler::TYPE_VMS); } },
-	{ "alpha8201",       le,  0, []() -> util::disasm_interface * { return new alpha8201_disassembler; } },
 	{ "alto2",           be, -2, []() -> util::disasm_interface * { return new alto2_disassembler; } },
 	{ "am29000",         be,  0, []() -> util::disasm_interface * { return new am29000_disassembler; } },
 	{ "amis2000",        le,  0, []() -> util::disasm_interface * { return new amis2000_disassembler; } },
