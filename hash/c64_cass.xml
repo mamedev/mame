@@ -1014,8 +1014,9 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Boulder Dash 4</description>
 		<year>1989</year>
 		<publisher>Hi Tec Software</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="bdashck" interface="cbm_cass">
+		<part name="cass" interface="cbm_cass">
 			<feature name="part_id" value="Boulder Dash Construction Kit"/>
 			<dataarea name="cass" size="250098">
 				<rom name="bdashck.tap" size="250098" crc="a1748639" sha1="6a76ba69fdf0709ce330c2c47ceb7677fdd45bb9"/>
@@ -2901,15 +2902,16 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>The Greed Monster</description>
 		<year>1990</year>
 		<publisher>Hi Tec Software</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="greedmna" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="827446">
 				<rom name="greedmna.tap" size="827446" crc="d75a92ce" sha1="5178771a761c53d95769edbcc257fe2acf4c9a55"/>
 			</dataarea>
 		</part>
 
-		<part name="greedmnb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="830302">
 				<rom name="greedmnb.tap" size="830302" crc="489e9390" sha1="61503e8fbaea297824729cc24023819fba8d77ca"/>
@@ -3019,15 +3021,16 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Hacker II</description>
 		<year>1989</year>
 		<publisher>Mastertronic</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="hacker2a" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="384234">
 				<rom name="hacker2a.tap" size="384234" crc="9c9c5aed" sha1="a499a909d48578ad7b0df5b16a97c4f2930dbaad"/>
 			</dataarea>
 		</part>
 
-		<part name="hacker2b" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="384234">
 				<rom name="hacker2b.tap" size="384234" crc="7c16e324" sha1="80e830dfb92916441ccfbd2c6e01e278bfa37c65"/>
@@ -4026,8 +4029,9 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Kettle</description>
 		<year>1986</year>
 		<publisher>Alligata</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="kettlea" interface="cbm_cass">
+		<part name="cass" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="329346">
 				<rom name="kettlea.tap" size="329346" crc="1ac910df" sha1="6f99c98d6c67ab1fd0678db4d26cb30bb4db7b55"/>
@@ -5986,12 +5990,13 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="robocod">
+	<software name="robocodk">
 		<description>James Pond 2: RoboCod</description>
 		<year>1992</year>
 		<publisher>Kixx</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="robocoda" interface="cbm_cass">
+		<part name="cass" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="763681">
 				<rom name="robocoda.tap" size="763681" crc="9c3a5a87" sha1="1f47600332f3140c3956f7907e0707e38d3f617c"/>
@@ -7082,15 +7087,16 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Summer Camp</description>
 		<year>1990</year>
 		<publisher>Kixx</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="summrcka" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="507164">
 				<rom name="summrcka.tap" size="507164" crc="2c8bc3d7" sha1="c2f8468308b202c6b60c2beed1edf38f5a46dbff"/>
 			</dataarea>
 		</part>
 
-		<part name="summrckb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="515968">
 				<rom name="summrckb.tap" size="515968" crc="e913833d" sha1="d4ad033192e4788d28574d5c45c2afde81d75121"/>
@@ -7366,15 +7372,16 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Tetris</description>
 		<year>1989</year>
 		<publisher>Mastertronic Plus</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="tetrisa" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="444689">
 				<rom name="tetrisa.tap" size="444689" crc="13bc6c8d" sha1="7c1fac70c035aa6d782a690f779302243aabd03a"/>
 			</dataarea>
 		</part>
 
-		<part name="tetrisb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="444689">
 				<rom name="tetrisb.tap" size="444689" crc="79de6451" sha1="abf51ce18a4cf38e4248952580c4385f8b3bd2a6"/>
