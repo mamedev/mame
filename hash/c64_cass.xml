@@ -10,22 +10,23 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 <softwarelist name="c64_cass" description="Commodore 64 cassettes">
 
-	<software name="10cohit2">
+	<software name="10hits2">
 		<description>10 Computer Hits 2</description>
 		<year>1986</year>
-		<publisher>Beau Jolly</publisher>
+		<publisher>Beau-Jolly</publisher>
+		<!-- Dumped by The Ultimate Tape Archive V1.0 -->
 
 		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Tape A"/>
-			<dataarea name="cass" size="1756359">
-				<rom name="10_Computer_Hits_2_Tape_A.tap" size="1756359" crc="a72d0c19" sha1="6cab4ab2a3f491d13670089a9b250249cd3079ed"/>
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="1762760">
+				<rom name="10hits2a.tap" size="1762760" crc="362781a0" sha1="35556185604bef3b91d49367adee9eba11e4975a"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Tape B"/>
-			<dataarea name="cass" size="1767233">
-				<rom name="10_Computer_Hits_2_Tape_B.tap" size="1767233" crc="a4171a8f" sha1="22e60c455e7f764db3b4f632dd49e81f8f5b53f9"/>
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="1773633">
+				<rom name="10hits2b.tap" size="1773633" crc="a8ece050" sha1="71e252d2b3c620796d1234877e68a9418f01bd89"/>
 			</dataarea>
 		</part>
 	</software>
