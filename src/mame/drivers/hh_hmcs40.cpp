@@ -63,7 +63,7 @@
   A75     HD44801  1982, Alpha 8201 protection MCU -> machine/alpha8201.*
   B35     HD44801  1983, Alpha 8302 protection MCU (see 8201)
   B42     HD44801  1983, Alpha 8303 protection MCU (see 8201)
- *C57     HD44801  1985, Alpha 8505 protection MCU (see 8201)
+  C57     HD44801  1985, Alpha 8505 protection MCU (see 8201)
  *C89     HD44801  1986, CXG Computachess IV
 
  *A14     HD44840  1982, CXG Advanced Portachess

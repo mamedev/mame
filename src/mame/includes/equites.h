@@ -32,7 +32,6 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram_2(*this, "spriteram_2"),
-		m_mcuram(*this, "mcuram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_audio8155(*this, "audio8155"),
@@ -41,7 +40,6 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_alpha_8201(*this, "alpha_8201"),
-		m_fakemcu(*this, "mcu"),
 		m_msm(*this, "msm"),
 		m_dac_1(*this, "dac1"),
 		m_dac_2(*this, "dac2"),
@@ -54,7 +52,6 @@ public:
 	std::unique_ptr<uint8_t[]> m_fg_videoram;    // 8bits
 	required_shared_ptr<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_spriteram_2;
-	optional_shared_ptr<uint8_t> m_mcuram;
 
 	/* video-related */
 	tilemap_t *m_fg_tilemap;
@@ -84,7 +81,6 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_device<alpha_8201_device> m_alpha_8201;
-	optional_device<cpu_device> m_fakemcu;
 	required_device<msm5232_device> m_msm;
 	required_device<dac_byte_interface> m_dac_1;
 	required_device<dac_byte_interface> m_dac_2;
@@ -99,10 +95,6 @@ public:
 	DECLARE_WRITE8_MEMBER(equites_8155_portc_w);
 	DECLARE_READ16_MEMBER(equites_spriteram_kludge_r);
 	DECLARE_WRITE8_MEMBER(mainlatch_w);
-	DECLARE_READ8_MEMBER(mcu_ram_r);
-	DECLARE_WRITE8_MEMBER(mcu_ram_w);
-	DECLARE_WRITE_LINE_MEMBER(mcu_start_w);
-	DECLARE_WRITE_LINE_MEMBER(mcu_switch_w);
 	DECLARE_READ8_MEMBER(equites_fg_videoram_r);
 	DECLARE_WRITE8_MEMBER(equites_fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(equites_bg_videoram_w);
@@ -134,7 +126,6 @@ protected:
 	void common_sound(machine_config &config);
 	void equites_map(address_map &map);
 	void equites_common_map(address_map &map);
-	void mcu_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);
 };
@@ -163,7 +154,6 @@ public:
 	using equites_state::equites_state;
 	void init_splndrbt();
 	void splndrbt(machine_config &config);
-	void hvoltage(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
