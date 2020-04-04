@@ -7555,7 +7555,7 @@ static int display_view_find_menu(int* pal_indices, int count, int* pal_index)
 
 		++row;
 
-		if (count > MAXIMUM_PAGE_ITEMS)
+		if (total_pages > 1)
 		{
 			mvaddstr(row, 0, "n - Next page");
 
@@ -7588,11 +7588,14 @@ static int display_view_find_menu(int* pal_indices, int count, int* pal_index)
 				break;
 			case 'n':
 			case 'N':
-				start_index += MAXIMUM_PAGE_ITEMS;
-
-				if (start_index > count)
+				if (total_pages > 1)
 				{
-					start_index = 0;
+					start_index += MAXIMUM_PAGE_ITEMS;
+
+					if (start_index >= count)
+					{
+						start_index = 0;
+					}
 				}
 				break;
 		}
