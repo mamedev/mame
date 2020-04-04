@@ -1568,6 +1568,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/sound/s_dsp.h,SOUNDS["S_DSP"] = true
+---------------------------------------------------
+
+if (SOUNDS["S_DSP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/s_dsp.cpp",
+		MAME_DIR .. "src/devices/sound/s_dsp.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/sound/ks0164.h,SOUNDS["KS0164"] = true
 ---------------------------------------------------
 

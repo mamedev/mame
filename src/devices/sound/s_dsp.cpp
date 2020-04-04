@@ -2,9 +2,9 @@
 // copyright-holders:R. Belmont, Brad Martin
 /***************************************************************************
 
-  snes_snd.cpp
+  s_dsp.cpp
 
-  File to handle the sound emulation of the Nintendo Super NES.
+  File to handle the S-DSP emulation used in Nintendo Super NES.
 
   By R. Belmont, adapted from OpenSPC 0.3.99 by Brad Martin with permission.
   Thanks to Brad and also to Charles Bilyu? of SNeESe.
@@ -28,7 +28,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/snes_snd.h"
+#include "s_dsp.h"
 
 /***************************************************************************
  CONSTANTS AND MACROS
@@ -135,72 +135,42 @@ static const int ENVCNT[0x20]
 	};
 
 
-/* Make reading the ADSR code easier */
-#define SL( v )         (m_dsp_regs[((v) << 4) + 6] >> 5)         /* Returns SUSTAIN level        */
-#define SR( v )         (m_dsp_regs[((v) << 4) + 6] & 0x1f)       /* Returns SUSTAIN rate         */
-
-/* Handle endianness */
-#define LEtoME16( x ) little_endianize_int16(x)
-#define MEtoLE16( x ) little_endianize_int16(x)
-
-ALLOW_SAVE_TYPE(snes_sound_device::env_state_t32);
+ALLOW_SAVE_TYPE(s_dsp_device::env_state_t32);
 
 
-DEFINE_DEVICE_TYPE(SNES_SOUND, snes_sound_device, "snes_sound", "SNES Custom DSP (SPC700)")
+DEFINE_DEVICE_TYPE(S_DSP, s_dsp_device, "s_dsp", "Nintendo/Sony S-DSP")
 
-snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SNES_SOUND, tag, owner, clock)
+
+s_dsp_device::s_dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, S_DSP, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16)
 {
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void snes_sound_device::device_start()
+void s_dsp_device::device_start()
 {
+	m_data = &space(0);
+	// Find our direct access
+	m_cache = m_data->cache<0, 0, ENDIANNESS_LITTLE>();
+
 	m_channel = machine().sound().stream_alloc(*this, 0, 2, clock() / 64);
 
-	m_ram = make_unique_clear<u8[]>(SNES_SPCRAM_SIZE);
-
-	/* put IPL image at the top of RAM */
-	memcpy(m_ipl_region, machine().root_device().memregion("sound_ipl")->base(), 64);
-
-	m_tick_timer = timer_alloc(TIMER_TICK_ID);
-
 	state_register();
-	save_pointer(NAME(m_ram), SNES_SPCRAM_SIZE);
 }
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void snes_sound_device::device_reset()
+void s_dsp_device::device_reset()
 {
-	int i;
-	/* default to ROM visible */
-	m_ram[0xf1] = 0x80;
-
-	/* Sort out the ports */
-	for (i = 0; i < 4; i++)
-	{
-		m_port_in[i] = 0;
-		m_port_out[i] = 0;
-	}
-
-	for (i = 0; i < 3; i++)
-	{
-		m_timer_enabled[i] = false;
-		m_TnDIV[i] = 256;
-		m_counter[i] = 0;
-		m_subcounter[i] = 0;
-	}
-
-	attotime period = attotime::from_ticks(32, clock());
-	m_tick_timer->adjust(period, 0, period);
-
 	dsp_reset();
 }
 
@@ -209,41 +179,19 @@ void snes_sound_device::device_reset()
 //  changes
 //-------------------------------------------------
 
-void snes_sound_device::device_clock_changed()
+void s_dsp_device::device_clock_changed()
 {
 	m_channel->set_sample_rate(clock() / 64);
-	attotime period = attotime::from_ticks(32, clock());
-	m_tick_timer->adjust(period, 0, period);
 }
 
-inline void snes_sound_device::update_timer_tick(u8 which)
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector s_dsp_device::memory_space_config() const
 {
-	if (m_timer_enabled[which] == false)
-		return;
-
-	m_subcounter[which]++;
-
-	// if timer channel is 0 or 1 we update at 64000/8
-	if (m_subcounter[which] >= 8 || which == 2)
-	{
-		m_subcounter[which] = 0;
-		m_counter[which]++;
-		if (m_counter[which] >= m_TnDIV[which] ) // minus =
-		{
-			m_counter[which] = 0;
-			m_ram[0xfd + which]++;
-			m_ram[0xfd + which] &= 0x0f;
-		}
-	}
-}
-
-void snes_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	if (id != TIMER_TICK_ID)
-		throw emu_fatalerror("Unknown id in snes_sound_device::device_timer");
-
-	for (int ch = 0; ch < 3; ch++)
-		update_timer_tick(ch);
+	return space_config_vector{ std::make_pair(0, &m_data_config) };
 }
 
 
@@ -258,7 +206,7 @@ void snes_sound_device::device_timer(emu_timer &timer, device_timer_id id, int p
  Reset emulated DSP
 -------------------------------------------------*/
 
-void snes_sound_device::dsp_reset()
+void s_dsp_device::dsp_reset()
 {
 #ifdef MAME_DEBUG
 	logerror("dsp_reset\n");
@@ -295,19 +243,18 @@ void snes_sound_device::dsp_reset()
  to mix audio into
 -------------------------------------------------*/
 
-void snes_sound_device::dsp_update( s16 *sound_ptr )
+void s_dsp_device::dsp_update( s16 *sound_ptr )
 {
 	int V;
 
 	int envx;
 	int m;
-	src_dir_type * sd;
 	int v;
 	int vl;
 	voice_state_type * vp;
 	int vr;
 
-	sd = (src_dir_type *) &m_ram[(int) m_dsp_regs[0x5d] << 8];
+	const u16 sd = m_dsp_regs[0x5d];
 
 	/* Check for reset */
 	if (m_dsp_regs[0x6c] & 0x80)
@@ -355,9 +302,11 @@ void snes_sound_device::dsp_update( s16 *sound_ptr )
 			/* Voice was keyed on */
 			m_keys       |= m;
 			m_keyed_on   |= m;
+#ifdef DBG_KEY
 			vl          = m_dsp_regs[(v << 4) + 4];
-			vp->samp_id = *( u32 * )&sd[vl];
-			vp->mem_ptr = LEtoME16(sd[vl].vptr);
+#endif
+			vp->samp_id = (vptr(sd, V) << 16) | lptr(sd, V);
+			vp->mem_ptr = vptr(sd, V);
 
 #ifdef DBG_KEY
 			logerror("Keying on voice %d, samp=0x%04X (0x%02X)\n", v, vp->mem_ptr, vl);
@@ -409,7 +358,7 @@ void snes_sound_device::dsp_update( s16 *sound_ptr )
 			continue;
 		}
 
-		vp->pitch = LEtoME16(*((u16 *)&m_dsp_regs[V + 2])) & 0x3fff;
+		vp->pitch = pitch(V);
 
 #ifndef NO_PMOD
 		/* Pitch mod uses OUTX from last voice for this one.  Luckily we haven't
@@ -445,7 +394,7 @@ void snes_sound_device::dsp_update( s16 *sound_ptr )
 						m_dsp_regs[0x7c] |= m;
 						if (vp->end & 2)
 						{
-							vp->mem_ptr = LEtoME16(sd[m_dsp_regs[V + 4]].lptr);
+							vp->mem_ptr = lptr(sd, V);
 
 #ifdef DBG_BRR
 							logerror("BRR looping to 0x%04X\n", vp->mem_ptr);
@@ -472,7 +421,7 @@ void snes_sound_device::dsp_update( s16 *sound_ptr )
 					}
 
 					vp->header_cnt = 8;
-					vl = (u8)m_ram[vp->mem_ptr++];
+					vl = (u8)read_byte(vp->mem_ptr++);
 					vp->range  = vl >> 4;
 					vp->end    = vl & 3;
 					vp->filter = (vl & 12) >> 2;
@@ -485,13 +434,13 @@ void snes_sound_device::dsp_update( s16 *sound_ptr )
 				if (vp->half == 0)
 				{
 					vp->half = 1;
-					outx     = ((s8)m_ram[vp->mem_ptr]) >> 4;
+					outx     = ((s8)read_byte(vp->mem_ptr)) >> 4;
 				}
 				else
 				{
 					vp->half = 0;
 					/* Funkiness to get 4-bit signed to carry through */
-					outx   = (s8)(m_ram[vp->mem_ptr++] << 4);
+					outx   = (s8)(read_byte(vp->mem_ptr++) << 4);
 					outx >>= 4;
 					vp->header_cnt--;
 				}
@@ -644,8 +593,8 @@ void snes_sound_device::dsp_update( s16 *sound_ptr )
 #endif
 
 	int echo_base = ((m_dsp_regs[0x6d] << 8) + m_echo_ptr) & 0xffff;
-	m_fir_lbuf[m_fir_ptr] = (s16)LEtoME16(*(u16 *)&m_ram[echo_base]);
-	m_fir_rbuf[m_fir_ptr] = (s16)LEtoME16(*(u16 *)&m_ram[echo_base + sizeof(s16)]);
+	m_fir_lbuf[m_fir_ptr] = (s16)read_word(echo_base);
+	m_fir_rbuf[m_fir_ptr] = (s16)read_word(echo_base + sizeof(s16));
 
 	/* Now, evaluate the FIR filter, and add the results into the final output. */
 	vl = m_fir_lbuf[m_fir_ptr] * (s8)m_dsp_regs[0x7f];
@@ -709,8 +658,8 @@ void snes_sound_device::dsp_update( s16 *sound_ptr )
 		logerror("Echo: Writing %04X,%04X at location %04X\n", (u16)echol, (u16)echor, echo_base);
 #endif
 
-		*(u16 *)&m_ram[echo_base]               = MEtoLE16((u16)echol);
-		*(u16 *)&m_ram[echo_base + sizeof(s16)] = MEtoLE16((u16)echor);
+		write_word(echo_base, (u16)echol);
+		write_word(echo_base + sizeof(s16), (u16)echor);
 	}
 
 	m_echo_ptr += 2 * sizeof(s16);
@@ -766,7 +715,7 @@ void snes_sound_device::dsp_update( s16 *sound_ptr )
  to process envelope for.
 -------------------------------------------------*/
 
-int snes_sound_device::advance_envelope( int v )
+int s_dsp_device::advance_envelope( int v )
 {
 	int t;
 
@@ -1010,11 +959,11 @@ int snes_sound_device::advance_envelope( int v )
 }
 
 /*-------------------------------------------------
-    spc700_set_volume - sets SPC700 volume level
+    set_volume - sets S-DSP volume level
     for both speakers, used for fade in/out effects
 -------------------------------------------------*/
 
-void snes_sound_device::set_volume(int volume)
+void s_dsp_device::set_volume(int volume)
 {
 	m_channel->set_output_gain(0, volume / 100.0);
 	m_channel->set_output_gain(1, volume / 100.0);
@@ -1025,183 +974,56 @@ void snes_sound_device::set_volume(int volume)
          I/O for DSP
  ***************************/
 
-u8 snes_sound_device::dsp_io_r(offs_t offset)
+u8 s_dsp_device::dsp_io_r(offs_t offset)
 {
 	m_channel->update();
 
 #ifdef NO_ENVX
-	if (8 == (m_ram[0xf2] & 0x0f))
-		m_dsp_regs[m_ram[0xf2]] = 0;
+	if (!machine().side_effects_disabled())
+		if (8 == (m_dsp_addr & 0x0f))
+			m_dsp_regs[m_dsp_addr] = 0;
 #endif
 
 	/* All reads simply return the contents of the addressed register. */
-	return m_dsp_regs[offset & 0x7f];
+	if (offset & 1)
+		return m_dsp_regs[m_dsp_addr & 0x7f];
+
+	return m_dsp_addr;
 }
 
-void snes_sound_device::dsp_io_w(offs_t offset, u8 data)
+void s_dsp_device::dsp_io_w(offs_t offset, u8 data)
 {
 	m_channel->update();
 
-	if (offset == 0x7c)
+	if (offset & 1)
 	{
-		/* Writes to register 0x7c (ENDX) clear ALL bits no matter which value is written */
-		m_dsp_regs[offset] = 0;
-	}
-	else
-	{
-		/* All other writes store the value in the addressed register as expected. */
-		m_dsp_regs[offset] = data;
-	}
-}
-
-/***************************
-       I/O for SPC700
- ***************************/
-
-u8 snes_sound_device::spc_io_r(offs_t offset)
-{
-	switch (offset) /* Offset is from 0x00f0 */
-	{
-		case 0x0: //FIXME: Super Bomberman PBW reads from there, is it really write-only?
-			return 0;
-		case 0x1:
-			return 0; //Super Kick Boxing reads port 1 and wants it to be zero.
-		case 0x2:       /* Register address */
-			return m_ram[0xf2];
-		case 0x3:       /* Register data */
-			return dsp_io_r(m_ram[0xf2]);
-		case 0x4:       /* Port 0 */
-		case 0x5:       /* Port 1 */
-		case 0x6:       /* Port 2 */
-		case 0x7:       /* Port 3 */
-			// osd_printf_debug("%s SPC: rd %02x @ %d\n", machine().describe_context(), m_port_in[offset - 4], offset - 4);
-			return m_port_in[offset - 4];
-		case 0x8: //normal RAM, can be read even if the ram disabled flag ($f0 bit 1) is active
-		case 0x9:
-			return m_ram[0xf0 + offset];
-		case 0xa:       /* Timer 0 */
-		case 0xb:       /* Timer 1 */
-		case 0xc:       /* Timer 2 */
-			break;
-		case 0xd:       /* Counter 0 */
-		case 0xe:       /* Counter 1 */
-		case 0xf:       /* Counter 2 */
+		if (!(m_dsp_addr & 0x80))
 		{
-			u8 value = m_ram[0xf0 + offset] & 0x0f;
-			m_ram[0xf0 + offset] = 0;
-			return value;
+			offset = m_dsp_addr & 0x7f;
+			if (offset == 0x7c)
+			{
+				/* Writes to register 0x7c (ENDX) clear ALL bits no matter which value is written */
+				m_dsp_regs[offset & 0x7f] = 0;
+			}
+			else
+			{
+				/* All other writes store the value in the addressed register as expected. */
+				m_dsp_regs[offset & 0x7f] = data;
+			}
 		}
 	}
-
-	return 0;
+	else
+		m_dsp_addr = data;
 }
-
-void snes_sound_device::spc_io_w(offs_t offset, u8 data)
-{
-	switch (offset) /* Offset is from 0x00f0 */
-	{
-		case 0x0:
-			logerror("Warning: write to SOUND TEST register with data %02x!\n", data);
-			break;
-		case 0x1:       /* Control */
-			for (int i = 0; i < 3; i++)
-			{
-				if (BIT(data, i) && m_timer_enabled[i] == false)
-				{
-					m_subcounter[i] = 0;
-					m_counter[i] = 0;
-					m_ram[0xfd + i] = 0;
-				}
-
-				m_timer_enabled[i] = BIT(data, i);
-				//m_timer[i]->enable(m_timer_enabled[i]);
-			}
-
-			if (BIT(data, 4))
-			{
-				m_port_in[0] = 0;
-				m_port_in[1] = 0;
-			}
-
-			if (BIT(data, 5))
-			{
-				m_port_in[2] = 0;
-				m_port_in[3] = 0;
-			}
-
-			/* bit 7 = IPL ROM enable */
-			break;
-		case 0x2:       /* Register address */
-			break;
-		case 0x3:       /* Register data - 0x80-0xff is a read-only mirror of 0x00-0x7f */
-			if (!(m_ram[0xf2] & 0x80))
-				dsp_io_w(m_ram[0xf2] & 0x7f, data);
-			break;
-		case 0x4:       /* Port 0 */
-		case 0x5:       /* Port 1 */
-		case 0x6:       /* Port 2 */
-		case 0x7:       /* Port 3 */
-			// osd_printf_debug("%s SPC: %02x to APU @ %d\n", machine().describe_context(), data, offset & 3);
-			m_port_out[offset - 4] = data;
-			// Unneeded, we already run at perfect_interleave
-			// machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
-			break;
-		case 0xa:       /* Timer 0 */
-		case 0xb:       /* Timer 1 */
-		case 0xc:       /* Timer 2 */
-			// if 0 then TnDiv is divided by 256, otherwise it's divided by 1 to 255
-			if (data == 0)
-				m_TnDIV[offset - 0xa] = 256;
-			else
-				m_TnDIV[offset - 0xa] = data;
-			break;
-		case 0xd:       /* Counter 0 */
-		case 0xe:       /* Counter 1 */
-		case 0xf:       /* Counter 2 */
-			return;
-	}
-
-	m_ram[0xf0 + offset] = data;
-}
-
-u8 snes_sound_device::spc_ram_r(offs_t offset)
-{
-	/* IPL ROM enabled */
-	if (offset >= 0xffc0 && m_ram[0xf1] & 0x80)
-		return m_ipl_region[offset & 0x3f];
-
-	return m_ram[offset];
-}
-
-void snes_sound_device::spc_ram_w(offs_t offset, u8 data)
-{
-	m_ram[offset] = data;
-}
-
-
-u8 snes_sound_device::spc_port_out(offs_t offset)
-{
-	assert(offset < 4);
-
-	return m_port_out[offset];
-}
-
-void snes_sound_device::spc_port_in(offs_t offset, u8 data)
-{
-	assert(offset < 4);
-
-	m_port_in[offset] = data;
-}
-
 
 /*****************************************************************************
     DEVICE INTERFACE
 *****************************************************************************/
 
-void snes_sound_device::state_register()
+void s_dsp_device::state_register()
 {
+	save_item(NAME(m_dsp_addr));
 	save_item(NAME(m_dsp_regs));
-	save_item(NAME(m_ipl_region));
 
 	save_item(NAME(m_keyed_on));
 	save_item(NAME(m_keys));
@@ -1215,14 +1037,6 @@ void snes_sound_device::state_register()
 	save_item(NAME(m_fir_ptr));
 	save_item(NAME(m_echo_ptr));
 #endif
-
-	save_item(NAME(m_timer_enabled));
-	save_item(NAME(m_subcounter));
-	save_item(NAME(m_counter));
-	save_item(NAME(m_port_in));
-	save_item(NAME(m_port_out));
-
-	save_item(NAME(m_TnDIV));
 
 	for (int v = 0; v < 8; v++)
 	{
@@ -1250,7 +1064,7 @@ void snes_sound_device::state_register()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void snes_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void s_dsp_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	s16 mix[2];
 

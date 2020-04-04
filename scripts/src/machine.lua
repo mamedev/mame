@@ -4271,6 +4271,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/s_smp.h,MACHINES["S_SMP"] = true
+---------------------------------------------------
+
+if (MACHINES["S_SMP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/s_smp.cpp",
+		MAME_DIR .. "src/devices/machine/s_smp.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/cxd1185.h,MACHINES["CXD1185"] = true
 ---------------------------------------------------
 
