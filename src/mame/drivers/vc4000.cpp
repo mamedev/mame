@@ -534,6 +534,7 @@ void vc4000_state::vc4000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vc4000_state::vc4000_mem);
 	m_maincpu->sense_handler().set(FUNC(vc4000_state::vc4000_vsync_r));
 	m_maincpu->set_periodic_int(FUNC(vc4000_state::vc4000_video_line), attotime::from_hz(312*53));  // GOLF needs this exact value
+	m_maincpu->intack_handler().set([]() { return 0x03; });
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

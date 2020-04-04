@@ -157,7 +157,7 @@ WRITE8_MEMBER(qixmcu_state::coin_w)
 	logerror("qixmcu_state, coin_w = %02X\n", data);
 	/* this is a callback called by pia6821_device::write(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_w() */
-	m_mcu->pa_w(space, 0, data, mem_mask);
+	m_mcu->pa_w(data);
 }
 
 

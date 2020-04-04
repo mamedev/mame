@@ -275,6 +275,10 @@ marioe                          // (c) 1983 Nintendo of America
 marioj                          // (c) 1983 Nintendo
 masao                           // bootleg
 
+@source:mw8080bw.cpp
+gunfight                        // 597 [1975] Dave Nutting Associates / Midway 
+gunfighto                       // 597 [1975] Dave Nutting Associates / Midway 
+
 @source:palestra.cpp
 palestra
 

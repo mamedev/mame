@@ -809,8 +809,8 @@ void vic20_state::vic20(machine_config &config, const char* softlist_filter)
 	m_vic->set_addrmap(0, &vic20_state::vic_videoram_map);
 	m_vic->set_addrmap(1, &vic20_state::vic_colorram_map);
 
-	m_vic->potx_rd_callback().set(m_joy, FUNC(vcs_control_port_device::pot_x_r));
-	m_vic->poty_rd_callback().set(m_joy, FUNC(vcs_control_port_device::pot_y_r));
+	m_vic->potx_rd_callback().set(m_joy, FUNC(vcs_control_port_device::read_pot_x));
+	m_vic->poty_rd_callback().set(m_joy, FUNC(vcs_control_port_device::read_pot_y));
 	m_vic->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	PET_DATASSETTE_PORT(config, m_cassette, 0);

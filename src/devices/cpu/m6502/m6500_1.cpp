@@ -103,7 +103,7 @@ m6500_1_device::m6500_1_device(machine_config const &mconfig, char const *tag, d
 }
 
 
-WRITE8_MEMBER(m6500_1_device::pa_w)
+void m6500_1_device::pa_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m6500_1_device::set_port_in<0>), this), unsigned(data));
 }

@@ -14,8 +14,11 @@
 //#include "bus/midi/midi.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i8251.h"
+#include "machine/mb62h195.h"
 #include "machine/mb63h149.h"
 #include "machine/nvram.h"
+#include "machine/rescap.h"
+#include "machine/upd7001.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
@@ -26,6 +29,7 @@ public:
 	roland_s10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_io(*this, "io")
 		, m_usart(*this, "usart")
 		, m_lcdc(*this, "lcdc")
 	{
@@ -52,6 +56,7 @@ protected:
 	void palette_init(palette_device &palette);
 
 	required_device<mcs51_cpu_device> m_maincpu;
+	required_device<mb62h195_device> m_io;
 	required_device<i8251_device> m_usart;
 	required_device<hd44780_device> m_lcdc;
 };
@@ -165,7 +170,7 @@ void roland_s10_state::s10_ext_map(address_map &map)
 {
 	mks100_ext_map(map);
 	map(0x5000, 0x57ff).mirror(0x800).rw("keyscan", FUNC(mb63h149_device::read), FUNC(mb63h149_device::write));
-	//map(0xb000, 0xb0ff).mirror(0xf00).rw(FUNC(roland_s10_state::upd7001_r), FUNC(mb63h149_device::upd7001_w));
+	//map(0xb000, 0xb000).mirror(0xfff).rw(FUNC(roland_s10_state::upd7001_r), FUNC(mb63h149_device::upd7001_w));
 }
 
 void roland_s220_state::s220_ext_map(address_map &map)
@@ -203,6 +208,13 @@ void roland_s10_state::s10(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_s10_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &roland_s10_state::s10_ext_map);
 
+	MB62H195(config, m_io);
+	m_io->lc_callback().set(m_lcdc, FUNC(hd44780_device::write));
+	m_io->sout_callback().set("adc", FUNC(upd7001_device::si_w));
+	m_io->sck_callback().set("adc", FUNC(upd7001_device::sck_w));
+	m_io->sin_callback().set("adc", FUNC(upd7001_device::so_r));
+	m_io->adc_callback().set("adc", FUNC(upd7001_device::cs_w));
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5564PL-20 + battery
 
 	I8251(config, m_usart, 6.5_MHz_XTAL / 2); // MB89251A
@@ -228,7 +240,7 @@ void roland_s10_state::s10(machine_config &config)
 	m_lcdc->set_pixel_update_cb(FUNC(roland_s10_state::lcd_pixel_update));
 	m_lcdc->set_busy_factor(0.005);
 
-	//UPD7001(config, "adc", RES_K(27), CAP_P(47));
+	UPD7001(config, "adc", RES_K(27), CAP_P(47));
 
 	//RF5C36(config, "wave", 26.88_MHz_XTAL);
 }
@@ -238,8 +250,13 @@ void roland_s10_state::mks100(machine_config &config)
 	s10(config);
 	m_maincpu->set_addrmap(AS_IO, &roland_s10_state::mks100_ext_map);
 
+	m_io->sout_callback().set_nop();
+	m_io->sck_callback().set_nop();
+	m_io->sin_callback().set_constant(1);
+	m_io->adc_callback().set_nop();
+
 	config.device_remove("keyscan");
-	//config.device_remove("adc");
+	config.device_remove("adc");
 }
 
 void roland_s220_state::s220(machine_config &config)
@@ -247,8 +264,13 @@ void roland_s220_state::s220(machine_config &config)
 	s10(config);
 	m_maincpu->set_addrmap(AS_IO, &roland_s220_state::s220_ext_map);
 
+	m_io->sout_callback().set_nop();
+	m_io->sck_callback().set_nop();
+	m_io->sin_callback().set_constant(1);
+	m_io->adc_callback().set_nop();
+
 	config.device_remove("keyscan");
-	//config.device_remove("adc");
+	config.device_remove("adc");
 
 	// LCD unit: LDS7A1681A
 	subdevice<screen_device>("screen")->set_size(6*16, 8*2);

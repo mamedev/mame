@@ -18,6 +18,9 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 11, 0)
+#define horizontalAdvance width
+#endif
 
 MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 	WindowQt(machine, nullptr)
@@ -334,7 +337,7 @@ void DebuggerMemView::mousePressEvent(QMouseEvent* event)
 	if (leftClick || rightClick)
 	{
 		QFontMetrics actualFont = fontMetrics();
-		const double fontWidth = actualFont.width(QString(100, '_')) / 100.;
+		const double fontWidth = actualFont.horizontalAdvance(QString(100, '_')) / 100.;
 		const int fontHeight = std::max(1, actualFont.lineSpacing());
 
 		debug_view_xy topLeft = view()->visible_position();

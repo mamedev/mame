@@ -408,7 +408,7 @@ protected:
 	void snes_init_ram();
 
 	// input related
-	virtual DECLARE_WRITE8_MEMBER(io_read);
+	virtual void io_read();
 	virtual uint8_t oldjoy1_read(int latched);
 	virtual uint8_t oldjoy2_read(int latched);
 

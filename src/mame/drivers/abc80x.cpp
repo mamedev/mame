@@ -981,7 +981,7 @@ void abc806_state::machine_reset()
 
 	// clear STO lines
 	for (int i = 0; i < 8; i++) {
-		sto_w(m_maincpu->space(AS_PROGRAM), 0, i);
+		sto_w(i);
 	}
 }
 

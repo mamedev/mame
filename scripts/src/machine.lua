@@ -3108,6 +3108,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/upd7001.h,MACHINES["UPD7001"] = true
+---------------------------------------------------
+
+if (MACHINES["UPD7001"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/upd7001.cpp",
+		MAME_DIR .. "src/devices/machine/upd7001.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/upd7002.h,MACHINES["UPD7002"] = true
 ---------------------------------------------------
 
@@ -4254,5 +4266,17 @@ if (MACHINES["I3002"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/i3002.cpp",
 		MAME_DIR .. "src/devices/machine/i3002.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/cxd1185.h,MACHINES["CXD1185"] = true
+---------------------------------------------------
+
+if (MACHINES["CXD1185"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/cxd1185.cpp",
+		MAME_DIR .. "src/devices/machine/cxd1185.h",
 	}
 end

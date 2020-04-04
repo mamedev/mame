@@ -91,9 +91,9 @@ public:
 
 
 	void common_sreset(int state);
-	DECLARE_WRITE8_MEMBER(bublbobl_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(tokio_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(tokio_videoctrl_w);
+	void bublbobl_bankswitch_w(uint8_t data);
+	void tokio_bankswitch_w(uint8_t data);
+	void tokio_videoctrl_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(bublbobl_nmitrigger_w);
 	DECLARE_READ8_MEMBER(tokiob_mcu_r);
 	DECLARE_WRITE8_MEMBER(bublbobl_soundcpu_reset_w);

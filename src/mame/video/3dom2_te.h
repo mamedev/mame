@@ -32,8 +32,8 @@ public:
 	auto listend_int_handler() { return m_listend_int_handler.bind(); }
 	auto winclip_int_handler() { return m_winclip_int_handler.bind(); }
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(offs_t offset);
+	void write(offs_t offset, uint32_t data);
 
 	uint32_t *tram_ptr() const { return &m_tram[0]; }
 
@@ -48,7 +48,6 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:

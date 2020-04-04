@@ -389,7 +389,7 @@ void rz1_state::rz1(machine_config &config)
 
 ROM_START( rz1 )
 	ROM_REGION(0x1000, "maincpu", 0)
-	ROM_LOAD("upd7811.bin", 0x0000, 0x1000, CRC(597ac04a) SHA1(96451a764296eaa22aaad3cba121226dcba865f4))
+	ROM_LOAD("upd7811g-120.bin", 0x0000, 0x1000, CRC(597ac04a) SHA1(96451a764296eaa22aaad3cba121226dcba865f4))
 
 	ROM_REGION(0x4000, "program", 0)
 	ROM_LOAD("program.bin", 0x0000, 0x4000, CRC(b44b2652) SHA1(b77f8daece9adb177b6ce1ef518fc3238b8c0a9c))

@@ -753,132 +753,138 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- not original, has WinImage header -->
 	<software name="gem30">
 		<description>GEM Desktop 3.0</description>
 		<year>19??</year>
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="system master.img" size="368640" crc="2ebdb5fe" sha1="e2190f07fb6d4f36ca3c9fc5524ac5ab7440855c"/>
+				<rom name="system master.img" size="368640" crc="2ebdb5fe" sha1="e2190f07fb6d4f36ca3c9fc5524ac5ab7440855c" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="screen 1.img" size="368640" crc="f4d618b0" sha1="02fedd94df50f57c281b9a931ef72fc8dbeacc5c"/>
+				<rom name="screen 1.img" size="368640" crc="f4d618b0" sha1="02fedd94df50f57c281b9a931ef72fc8dbeacc5c" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="screen 2.img" size="368640" crc="031bd65f" sha1="87fcc18b8e99d727b71854a6f27cfcc7f4d6e569"/>
+				<rom name="screen 2.img" size="368640" crc="031bd65f" sha1="87fcc18b8e99d727b71854a6f27cfcc7f4d6e569" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="printer 1.img" size="368640" crc="7f6a1247" sha1="200cd4002d6f2285a2762566bfd2f69a3ca70550"/>
+				<rom name="printer 1.img" size="368640" crc="7f6a1247" sha1="200cd4002d6f2285a2762566bfd2f69a3ca70550" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="printer 2.img" size="368640" crc="1afc7a36" sha1="967103595523c7cdae923d5ff7bd1da802f6da9c"/>
+				<rom name="printer 2.img" size="368640" crc="1afc7a36" sha1="967103595523c7cdae923d5ff7bd1da802f6da9c" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="printer 3.img" size="368640" crc="c704dcbd" sha1="f6a8fdd8cd2de0b30a0b96481daf4125a4ce0528"/>
+				<rom name="printer 3.img" size="368640" crc="c704dcbd" sha1="f6a8fdd8cd2de0b30a0b96481daf4125a4ce0528" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- not original, has WinImage header -->
 	<software name="gem301d">
 		<description>GEM Desktop 3.01d</description>
 		<year>19??</year>
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="system master.img" size="368640" crc="af28959d" sha1="b0a2319cba8f2423969926e6ac2053209c689396"/>
+				<rom name="system master.img" size="368640" crc="af28959d" sha1="b0a2319cba8f2423969926e6ac2053209c689396" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="screen 1.img" size="368640" crc="098a85ec" sha1="1ed066692563afb6be4d1cbc0902f7eacc1378f3"/>
+				<rom name="screen 1.img" size="368640" crc="098a85ec" sha1="1ed066692563afb6be4d1cbc0902f7eacc1378f3" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="screen 2.img" size="368640" crc="253b84e9" sha1="18ac60d22055438dffbbfa8f9d1801bd650e571a"/>
+				<rom name="screen 2.img" size="368640" crc="253b84e9" sha1="18ac60d22055438dffbbfa8f9d1801bd650e571a" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="printer 1.img" size="368640" crc="934b3426" sha1="da3caa8122fc2a9e538b3c57c4d00c609f351cd1"/>
+				<rom name="printer 1.img" size="368640" crc="934b3426" sha1="da3caa8122fc2a9e538b3c57c4d00c609f351cd1" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="printer 2.img" size="368640" crc="f1882987" sha1="3a92fa60408f8881fdcf582f8b4e981c12eaa5fe"/>
+				<rom name="printer 2.img" size="368640" crc="f1882987" sha1="3a92fa60408f8881fdcf582f8b4e981c12eaa5fe" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="printer 3.img" size="368640" crc="19d6957a" sha1="9ad00be79187e767643952404e7e9502e1d109e7"/>
+				<rom name="printer 3.img" size="368640" crc="19d6957a" sha1="9ad00be79187e767643952404e7e9502e1d109e7" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- not original, has WinImage header -->
 	<software name="gempaint">
 		<description>GEM Paint</description>
 		<year>19??</year>
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk1.img" size="368640" crc="8d7af99e" sha1="1622b1bd5cfc777625d92129b5cb2c2176d4b624"/>
+				<rom name="disk1.img" size="368640" crc="8d7af99e" sha1="1622b1bd5cfc777625d92129b5cb2c2176d4b624"  status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
+	
+	<!-- not original, has WinImage header -->
 	<software name="1stword">
 		<description>1st Word Plus 2.0</description>
 		<year>19??</year>
 		<publisher>GST Computer Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk1.img" size="368640" crc="705c06b4" sha1="1ec20a62ce21f48349e18026dd1f3de015c94cb4"/>
+				<rom name="disk1.img" size="368640" crc="705c06b4" sha1="1ec20a62ce21f48349e18026dd1f3de015c94cb4"  status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk2.img" size="368640" crc="a3a926a1" sha1="8c08c47394685abfffdd5af731256b96fb8dace7"/>
+				<rom name="disk2.img" size="368640" crc="a3a926a1" sha1="8c08c47394685abfffdd5af731256b96fb8dace7"  status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- not original, has WinImage header -->
 	<software name="geos20">
 		<description>GeoWorks Ensemble 2.0</description>
 		<year>1993</year>
 		<publisher>GeoWorks</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk1.img" size="1474560" crc="4935d991" sha1="752f39f19d5a26307eb9c07339763c95447f8616"/>
+				<rom name="disk1.img" size="1474560" crc="4935d991" sha1="752f39f19d5a26307eb9c07339763c95447f8616"  status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk2.img" size="1474560" crc="e72b697b" sha1="353b0e9979ef94181e3e1745a6a7e3f097092dfd"/>
+				<rom name="disk2.img" size="1474560" crc="e72b697b" sha1="353b0e9979ef94181e3e1745a6a7e3f097092dfd"  status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk3.img" size="1474560" crc="b15e719a" sha1="a5838a09c018875db116986e3074a9c403544c75"/>
+				<rom name="disk3.img" size="1474560" crc="b15e719a" sha1="a5838a09c018875db116986e3074a9c403544c75"  status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk4.img" size="1474560" crc="49856628" sha1="25b1b3477a7bd31423b6e3901a1d4c1c1069467b"/>
+				<rom name="disk4.img" size="1474560" crc="49856628" sha1="25b1b3477a7bd31423b6e3901a1d4c1c1069467b"  status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk5.img" size="1474560" crc="370f711c" sha1="b7ef83e7f99a563f39c04c0190a9d8ac1f5193d0"/>
+				<rom name="disk5.img" size="1474560" crc="370f711c" sha1="b7ef83e7f99a563f39c04c0190a9d8ac1f5193d0"  status="baddump"/>
 			</dataarea>
 		</part>
 	</software>

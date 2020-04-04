@@ -858,8 +858,8 @@ static INPUT_PORTS_START( cps1_4players )
 INPUT_PORTS_END
 
 /* CPS1 games with 2 players and 6 buttons each */
-static INPUT_PORTS_START( cps1_6b)
-	PORT_INCLUDE( cps1_3b)
+static INPUT_PORTS_START( cps1_6b )
+	PORT_INCLUDE( cps1_3b )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Jab Punch") PORT_PLAYER(1)
@@ -2956,6 +2956,90 @@ static INPUT_PORTS_START( pang3b )
 	PORT_DIPUNUSED( 0x40, 0x40 )
 	PORT_DIPUNUSED( 0x80, 0x80 )
 INPUT_PORTS_END
+
+// Note: if you have service mode stuck then start button doesn't get recognized on title screen.
+static INPUT_PORTS_START( gulunpa )
+	PORT_INCLUDE( cps1_2b )
+	
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW(A):1,2,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x18, 0x18, "Coin slots" ) PORT_DIPLOCATION("SW(A):4,5")
+	PORT_DIPSETTING(    0x18, "1, Common" )
+	PORT_DIPSETTING(    0x00, "2, Common" )
+	PORT_DIPSETTING(    0x10, "2, Common (duplicate 1)" )
+	PORT_DIPSETTING(    0x08, "2, Common (duplicate 2)" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW(A):6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW(A):7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW(A):8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW(B):1,2,3")
+	PORT_DIPSETTING(    0x07, "1 Easiest" )
+	PORT_DIPSETTING(    0x06, "2 Very Easy" )
+	PORT_DIPSETTING(    0x05, "3 Easy" )
+	PORT_DIPSETTING(    0x04, "4 Medium" )
+	PORT_DIPSETTING(    0x03, "5 Medium Hard" )
+	PORT_DIPSETTING(    0x02, "6 Hard" )
+	PORT_DIPSETTING(    0x01, "7 Very Hard" )
+	PORT_DIPSETTING(    0x00, "8 Hardest" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW(B):4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW(B):5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// flipping this on any screen causes scroll1 layer left edge to be filled with tile 0x0014
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW(B):6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW(B):7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW(B):8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
+	PORT_START("DSWC")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW(C):1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW(C):2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW(C):3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Freeze" ) PORT_DIPLOCATION("SW(C):4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW(C):5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW(C):6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW(C):7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Game Mode")	PORT_DIPLOCATION("SW(C):8")
+	PORT_DIPSETTING(    0x80, "Game" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
+INPUT_PORTS_END
+
 
 /* Needs further checking */
 static INPUT_PORTS_START( megaman )
@@ -13084,6 +13168,28 @@ ROM_START( pokonyan )
 	*/
 ROM_END
 
+ROM_START( gulunpa )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "26",           0x00000, 0x020000, CRC(f30ffa29) SHA1(9e70daf4229485dc5700b074dba55839c7357351) )
+    ROM_LOAD16_BYTE( "30",           0x00001, 0x020000, CRC(5d35f737) SHA1(47b6bfa6eaa512684e12c23162243d1a21cb1a7a) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "9",            0x00000, 0x08000, CRC(15afd06f) SHA1(1a4ff3e11e55266e7c93743b6564c226eaaba142) )
+	ROM_CONTINUE(             0x10000, 0x08000 )
+
+	ROM_REGION( 0x200000, "gfx", ROMREGION_ERASE00 )
+	// bit 1 always high on even bytes?
+	ROM_LOAD64_WORD( "1",            0x000000, 0x080000, BAD_DUMP CRC(3cf0546b) SHA1(1071b3c83425774cfaea7c61b1d85fd4fa8b6dbb) )
+	ROM_LOAD64_WORD( "2",            0x000002, 0x080000, CRC(ad033bce) SHA1(b37b1d341e61502aa4213b049b14974fab8a0445) )
+	ROM_LOAD64_WORD( "3",            0x000004, 0x080000, CRC(36c3951a) SHA1(74edaca2c78dd6a304ea702091a9f0b7f6036e41) )
+	ROM_LOAD64_WORD( "4",            0x000006, 0x080000, CRC(ff0cb826) SHA1(fec7833652e6789e886a1ec7b4680a608ddbbe20) )
+//	ROM_COPY( "gfx", 0x000000, 0x200000, 0x200000 )
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF ) /* Samples */
+	ROM_LOAD( "18",          0x00000, 0x20000, CRC(9997a34f) SHA1(8e107d6413836c48fc57e4a9b89ae99a9e381e8b) )
+	ROM_LOAD( "19",          0x20000, 0x20000, CRC(e95270ac) SHA1(dc684abfa1ea276a00ec541ab8f3f9f131375faa) )
+ROM_END
+
 /* Home 'CPS Changer' Unit - For MESS */
 
 /* B-Board 91635B-2 */
@@ -13742,6 +13848,7 @@ GAME( 1993, slammastu,   slammast, qsound,     slammast, cps_state, init_slammas
 GAME( 1993, mbomberj,    slammast, qsound,     slammast, cps_state, init_slammast, ROT0,   "Capcom", "Muscle Bomber: The Body Explosion (Japan 930713)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, mbombrd,     0,        qsound,     slammast, cps_state, init_slammast, ROT0,   "Capcom", "Muscle Bomber Duo: Ultimate Team Battle (World 931206)", MACHINE_SUPPORTS_SAVE )    // "ETC"
 GAME( 1993, mbombrdj,    mbombrd,  qsound,     slammast, cps_state, init_slammast, ROT0,   "Capcom", "Muscle Bomber Duo: Heat Up Warriors (Japan 931206)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gulunpa,     0,        cps1_10MHz, gulunpa,  cps_state, init_cps1,     ROT0,   "Capcom", "Gulun.Pa! (Japan 931220 L)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // has bad gfx rom, assume Capcom from logo in gfx bank, unknown board origin
 GAME( 1994, pnickj,      0,        cps1_12MHz, pnickj,   cps_state, init_cps1,     ROT0,   "Capcom", "Pnickies (Japan 940608)", MACHINE_SUPPORTS_SAVE ) // Puyo Puyo puzzlegame concept licensed from Compile, this game is by Capcom
 GAME( 1995, qtono2j,     0,        cps1_12MHz, qtono2j,  cps_state, init_cps1,     ROT0,   "Capcom", "Quiz Tonosama no Yabou 2: Zenkoku-ban (Japan 950123)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, megaman,     0,        cps1_12MHz, megaman,  cps_state, init_cps1,     ROT0,   "Capcom", "Mega Man: The Power Battle (CPS1, USA 951006)", MACHINE_SUPPORTS_SAVE )

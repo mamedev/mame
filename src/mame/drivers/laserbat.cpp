@@ -409,7 +409,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(laserbat_state_base::laserbat_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x0a); // S2650
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 void laserbat_state_base::init_laserbat()
@@ -470,6 +470,7 @@ void laserbat_state_base::laserbat_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &laserbat_state_base::laserbat_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(laserbat_state_base::laserbat_interrupt));
 	m_maincpu->sense_handler().set(m_screen, FUNC(screen_device::vblank));
+	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x0a; });
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

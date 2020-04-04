@@ -15,7 +15,7 @@
         SCSI: MB89352
         LCD: LC7981
         Quad-UART: TE7774
-        Panel controller CPU: NEC uPD7810 @ 12 MHz
+        Panel controller CPU: NEC uPD78C10AGQ @ 12 MHz
         Sound DSP: L7A1045-L6048
             DSP's wavedata bus is 16 bits wide and has 24 address bits
 
@@ -215,7 +215,7 @@ void mpc3000_state::mpc3000(machine_config &config)
 	hiledlatch.q_out_cb<6>().set_output("led14").invert(); // 16 Levels
 	hiledlatch.q_out_cb<7>().set_output("led15").invert(); // After
 
-	UPD7810(config, m_subcpu, 12_MHz_XTAL);
+	UPD78C10(config, m_subcpu, 12_MHz_XTAL);
 	m_subcpu->set_addrmap(AS_PROGRAM, &mpc3000_state::mpc3000_sub_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));

@@ -308,8 +308,8 @@ WRITE_LINE_MEMBER(polepos_sound_device::clson_w)
 {
 	if (!state)
 	{
-		polepos_engine_sound_lsb_w(machine().dummy_space(), 0, 0);
-		polepos_engine_sound_msb_w(machine().dummy_space(), 0, 0);
+		polepos_engine_sound_lsb_w(0);
+		polepos_engine_sound_msb_w(0);
 	}
 }
 
@@ -317,7 +317,7 @@ WRITE_LINE_MEMBER(polepos_sound_device::clson_w)
 /************************************/
 /* Write LSB of engine sound        */
 /************************************/
-WRITE8_MEMBER(polepos_sound_device::polepos_engine_sound_lsb_w)
+void polepos_sound_device::polepos_engine_sound_lsb_w(uint8_t data)
 {
 	/* Update stream first so all samples at old frequency are updated. */
 	m_stream->update();
@@ -328,7 +328,7 @@ WRITE8_MEMBER(polepos_sound_device::polepos_engine_sound_lsb_w)
 /************************************/
 /* Write MSB of engine sound        */
 /************************************/
-WRITE8_MEMBER(polepos_sound_device::polepos_engine_sound_msb_w)
+void polepos_sound_device::polepos_engine_sound_msb_w(uint8_t data)
 {
 	m_stream->update();
 	m_sample_msb = data & 63;

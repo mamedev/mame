@@ -1544,16 +1544,16 @@ class _5a22_device : public g65816_device
 public:
 	_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( wrmpya_w );
-	DECLARE_WRITE8_MEMBER( wrmpyb_w );
-	DECLARE_WRITE8_MEMBER( wrdivl_w );
-	DECLARE_WRITE8_MEMBER( wrdivh_w );
-	DECLARE_WRITE8_MEMBER( wrdvdd_w );
-	DECLARE_WRITE8_MEMBER( memsel_w );
-	DECLARE_READ8_MEMBER( rddivl_r );
-	DECLARE_READ8_MEMBER( rddivh_r );
-	DECLARE_READ8_MEMBER( rdmpyl_r );
-	DECLARE_READ8_MEMBER( rdmpyh_r );
+	void wrmpya_w(uint8_t data);
+	void wrmpyb_w(uint8_t data);
+	void wrdivl_w(uint8_t data);
+	void wrdivh_w(uint8_t data);
+	void wrdvdd_w(uint8_t data);
+	void memsel_w(uint8_t data);
+	uint8_t rddivl_r();
+	uint8_t rddivh_r();
+	uint8_t rdmpyl_r();
+	uint8_t rdmpyh_r();
 
 	void set_5a22_map();
 

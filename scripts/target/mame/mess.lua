@@ -79,7 +79,6 @@ CPUS["MC68HC11"] = true
 CPUS["ADSP21062"] = true
 CPUS["DSP56156"] = true
 CPUS["RSP"] = true
-CPUS["ALPHA8201"] = true
 CPUS["COP400"] = true
 CPUS["TLCS90"] = true
 CPUS["TLCS900"] = true
@@ -672,6 +671,7 @@ MACHINES["TUBE"] = true
 MACHINES["UPD1990A"] = true
 --MACHINES["UPD4992"] = true
 MACHINES["UPD4701"] = true
+MACHINES["UPD7001"] = true
 MACHINES["UPD7002"] = true
 --MACHINES["UPD7004"] = true
 MACHINES["UPD71071"] = true
@@ -747,6 +747,7 @@ MACHINES["I82357"] = true
 MACHINES["XC1700E"] = true
 MACHINES["EDLC"] = true
 MACHINES["WTL3132"] = true
+MACHINES["CXD1185"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -2248,6 +2249,7 @@ files {
 	MAME_DIR .. "src/mame/includes/advision.h",
 	MAME_DIR .. "src/mame/machine/advision.cpp",
 	MAME_DIR .. "src/mame/video/advision.cpp",
+	MAME_DIR .. "src/mame/drivers/sag.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "epoch")
@@ -2971,6 +2973,8 @@ files {
 	MAME_DIR .. "src/mame/machine/nes.cpp",
 	MAME_DIR .. "src/mame/video/nes.cpp",
 	MAME_DIR .. "src/mame/drivers/nes_vt.cpp",
+	MAME_DIR .. "src/mame/machine/nes_vt_soc.cpp",
+	MAME_DIR .. "src/mame/machine/nes_vt_soc.h",
 	MAME_DIR .. "src/mame/drivers/nes_sh6578.cpp",
 	MAME_DIR .. "src/mame/drivers/nes_clone.cpp",
 	MAME_DIR .. "src/mame/drivers/pokemini.cpp",
@@ -3283,6 +3287,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/roland_tr707.cpp",
 	MAME_DIR .. "src/mame/audio/jx8p_synth.cpp",
 	MAME_DIR .. "src/mame/audio/jx8p_synth.h",
+	MAME_DIR .. "src/mame/machine/mb62h195.cpp",
+	MAME_DIR .. "src/mame/machine/mb62h195.h",
 	MAME_DIR .. "src/mame/machine/mb63h149.cpp",
 	MAME_DIR .. "src/mame/machine/mb63h149.h",
 	MAME_DIR .. "src/mame/machine/pg200.cpp",

@@ -87,7 +87,7 @@ private:
 	DECLARE_WRITE8_MEMBER(pasopia7_io_w);
 	DECLARE_READ8_MEMBER(pasopia7_fdc_r);
 	DECLARE_WRITE8_MEMBER(pasopia7_fdc_w);
-	DECLARE_READ8_MEMBER(keyb_r);
+	uint8_t keyb_r();
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(crtc_portb_r);
 	DECLARE_WRITE8_MEMBER(screen_mode_w);
@@ -167,7 +167,7 @@ private:
 // needed to scan the keyboard, as the pio emulation doesn't do it.
 TIMER_CALLBACK_MEMBER( pasopia7_state::pio_timer )
 {
-	m_pio->port_b_write(keyb_r(generic_space(),0,0xff));
+	m_pio->port_b_write(keyb_r());
 }
 
 VIDEO_START_MEMBER(pasopia7_state,pasopia7)
@@ -789,7 +789,7 @@ static GFXDECODE_START( gfx_pasopia7 )
 	GFXDECODE_ENTRY( "kanji",  0x00000, p7_chars_16x16,  0, 0x10 )
 GFXDECODE_END
 
-READ8_MEMBER( pasopia7_state::keyb_r )
+uint8_t pasopia7_state::keyb_r()
 {
 	u8 data = 0xff;
 	for (u8 j=0; j<3; j++)

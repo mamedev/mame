@@ -393,7 +393,7 @@ enum vgmplay_inputs : uint8_t
 	VGMPLAY_PLAY,
 	VGMPLAY_RESTART,
 	VGMPLAY_LOOP,
-	VGMPLAY_SPEC,
+	VGMPLAY_VIZ,
 };
 
 class vgmplay_state : public driver_device
@@ -2758,6 +2758,8 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 			device.set_unscaled_clock(c & ~0xc0000000);
 			if (device.unscaled_clock() != 0)
 				dynamic_cast<device_sound_interface *>(&device)->set_output_gain(ALL_OUTPUTS, chip_volume);
+			else
+				dynamic_cast<device_sound_interface *>(&device)->set_output_gain(ALL_OUTPUTS, 0);
 
 			return (c & 0x80000000) != 0;
 		});
@@ -3155,8 +3157,8 @@ INPUT_CHANGED_MEMBER(vgmplay_state::key_pressed)
 	case VGMPLAY_LOOP:
 		m_vgmplay->toggle_loop();
 		break;
-	case VGMPLAY_SPEC:
-		m_mixer->cycle_spectrogram();
+	case VGMPLAY_VIZ:
+		m_mixer->cycle_viz_mode();
 		break;
 	}
 }
@@ -3168,7 +3170,7 @@ static INPUT_PORTS_START( vgmplay )
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PLAY)        PORT_NAME("Play")
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RESTART)     PORT_NAME("Restart")
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_LOOP)        PORT_NAME("Loop")
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_SPEC)        PORT_NAME("Spectrogram Mode")
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_VIZ)         PORT_NAME("Visualization Mode")
 INPUT_PORTS_END
 
 void vgmplay_state::file_map(address_map &map)

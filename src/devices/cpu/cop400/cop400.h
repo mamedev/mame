@@ -113,8 +113,8 @@ public:
 	void set_cko(cop400_cko_bond cko) { m_cko = cko; }
 	void set_microbus(bool has_microbus) { m_has_microbus = has_microbus; }
 
-	DECLARE_READ8_MEMBER( microbus_rd );
-	DECLARE_WRITE8_MEMBER( microbus_wr );
+	uint8_t microbus_rd();
+	void microbus_wr(uint8_t data);
 
 	void data_128b(address_map &map);
 	void data_32b(address_map &map);

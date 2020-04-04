@@ -171,7 +171,7 @@ protected:
 
 	template <std::size_t N> void set_port_open_drain(bool value);
 	template <std::size_t N> void set_port_mask(u8 mask);
-	template <std::size_t N> DECLARE_WRITE8_MEMBER(port_input_w) { m_port_input[N] = data & ~m_port_mask[N]; }
+	template <std::size_t N> void port_input_w(uint8_t data) { m_port_input[N] = data & ~m_port_mask[N]; }
 	template <std::size_t N> DECLARE_READ8_MEMBER(port_r);
 	template <std::size_t N> DECLARE_WRITE8_MEMBER(port_latch_w);
 	template <std::size_t N> DECLARE_WRITE8_MEMBER(port_ddr_w);
@@ -283,9 +283,9 @@ private:
 class m68705p_device : public m68705_device
 {
 public:
-	DECLARE_WRITE8_MEMBER(pa_w) { port_input_w<0>(space, offset, data, mem_mask); }
-	DECLARE_WRITE8_MEMBER(pb_w) { port_input_w<1>(space, offset, data, mem_mask); }
-	DECLARE_WRITE8_MEMBER(pc_w) { port_input_w<2>(space, offset, data, mem_mask); }
+	void pa_w(u8 data) { port_input_w<0>(data); }
+	void pb_w(u8 data) { port_input_w<1>(data); }
+	void pc_w(u8 data) { port_input_w<2>(data); }
 
 protected:
 	virtual void internal_map(address_map &map) override;
@@ -300,10 +300,10 @@ protected:
 class m68705u_device : public m68705_device
 {
 public:
-	DECLARE_WRITE8_MEMBER(pa_w) { port_input_w<0>(space, offset, data, mem_mask); }
-	DECLARE_WRITE8_MEMBER(pb_w) { port_input_w<1>(space, offset, data, mem_mask); }
-	DECLARE_WRITE8_MEMBER(pc_w) { port_input_w<2>(space, offset, data, mem_mask); }
-	DECLARE_WRITE8_MEMBER(pd_w) { port_input_w<3>(space, offset, data, mem_mask); } // TODO: PD6 is also /INT2
+	void pa_w(u8 data) { port_input_w<0>(data); }
+	void pb_w(u8 data) { port_input_w<1>(data); }
+	void pc_w(u8 data) { port_input_w<2>(data); }
+	void pd_w(u8 data) { port_input_w<3>(data); } // TODO: PD6 is also /INT2
 
 protected:
 	virtual void internal_map(address_map &map) override;

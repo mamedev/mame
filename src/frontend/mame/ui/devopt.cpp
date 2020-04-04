@@ -57,7 +57,7 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 				continue;
 
 			// get cpu specific clock that takes internal multiplier/dividers into account
-			int clock = exec.device().clock();
+			u32 clock = exec.device().clock();
 
 			// count how many identical CPUs we have
 			int count = 1;
@@ -69,16 +69,23 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 						count++;
 			}
 
-			// if more than one, prepend a #x in front of the CPU name and display clock in kHz or MHz
-			util::stream_format(
-					str,
+			std::string hz(std::to_string(clock));
+			int d = (clock >= 1'000'000'000) ? 9 : (clock >= 1'000'000) ? 6 : (clock >= 1000) ? 3 : 0;
+			if (d > 0)
+			{
+				size_t dpos = hz.length() - d;
+				hz.insert(dpos, ".");
+				size_t last = hz.find_last_not_of('0');
+				hz = hz.substr(0, last + (last != dpos ? 1 : 0));
+			}
+
+			// if more than one, prepend a #x in front of the CPU name and display clock
+			util::stream_format(str,
 					(count > 1)
-						? ((clock >= 1000000) ? _("  %1$d\xC3\x97%2$s %3$d.%4$06d\xC2\xA0MHz\n") : _("  %1$d\xC3\x97%2$s %5$d.%6$03d\xC2\xA0kHz\n"))
-						: ((clock >= 1000000) ? _("  %2$s %3$d.%4$06d\xC2\xA0MHz\n") : _("  %2$s %5$d.%6$03d\xC2\xA0kHz\n")),
-					count,
-					name,
-					clock / 1000000, clock % 1000000,
-					clock / 1000, clock % 1000);
+						? ((clock != 0) ? "  %1$d" UTF8_MULTIPLY "%2$s %3$s" UTF8_NBSP "%4$s\n" : "  %1$d" UTF8_MULTIPLY "%2$s\n")
+						: ((clock != 0) ? "  %2$s %3$s" UTF8_NBSP "%4$s\n" : "  %2$s\n"),
+					count, name, hz,
+					(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz"));
 		}
 	}
 
@@ -95,17 +102,21 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 			}
 			else
 			{
-				const rectangle &visarea = screen.visible_area();
+				std::string hz(std::to_string(float(screen.frame_period().as_hz())));
+				size_t last = hz.find_last_not_of('0');
+				size_t dpos = hz.find_last_of('.');
+				hz = hz.substr(0, last + (last != dpos ? 1 : 0));
 
+				const rectangle &visarea = screen.visible_area();
 				util::stream_format(
 						str,
 						(screen.orientation() & ORIENTATION_SWAP_XY)
-							? _("  Screen '%1$s': %2$d \xC3\x97 %3$d (V) %4$f\xC2\xA0Hz\n")
-							: _("  Screen '%1$s': %2$d \xC3\x97 %3$d (H) %4$f\xC2\xA0Hz\n"),
+							? _("  Screen '%1$s': %2$d \xC3\x97 %3$d (V) %4$s\xC2\xA0Hz\n")
+							: _("  Screen '%1$s': %2$d \xC3\x97 %3$d (H) %4$s\xC2\xA0Hz\n"),
 						screen.tag(),
 						visarea.width(),
 						visarea.height(),
-						screen.frame_period().as_hz());
+						hz);
 			}
 		}
 	}
@@ -129,17 +140,25 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 					if (soundtags.insert(scan.device().tag()).second)
 						count++;
 			}
-			// if more than one, prepend a #x in front of the name and display clock in kHz or MHz
-			int const clock = sound.device().clock();
-			util::stream_format(
-					str,
+
+			const u32 clock = sound.device().clock();
+			std::string hz(std::to_string(clock));
+			int d = (clock >= 1'000'000'000) ? 9 : (clock >= 1'000'000) ? 6 : (clock >= 1000) ? 3 : 0;
+			if (d > 0)
+			{
+				size_t dpos = hz.length() - d;
+				hz.insert(dpos, ".");
+				size_t last = hz.find_last_not_of('0');
+				hz = hz.substr(0, last + (last != dpos ? 1 : 0));
+			}
+
+			// if more than one, prepend a #x in front of the name and display clock
+			util::stream_format(str,
 					(count > 1)
-						? ((clock >= 1000000) ? _("  %1$d\xC3\x97%2$s %3$d.%4$06d\xC2\xA0MHz\n") : clock ? _("  %1$d\xC3\x97%2$s %5$d.%6$03d\xC2\xA0kHz\n") : _("  %1$d\xC3\x97%2$s\n"))
-						: ((clock >= 1000000) ? _("  %2$s %3$d.%4$06d\xC2\xA0MHz\n") : clock ? _("  %2$s %5$d.%6$03d\xC2\xA0kHz\n") : _("  %2$s\n")),
-					count,
-					sound.device().name(),
-					clock / 1000000, clock % 1000000,
-					clock / 1000, clock % 1000);
+						? ((clock != 0) ? "  %1$d" UTF8_MULTIPLY "%2$s %3$s" UTF8_NBSP "%4$s\n" : "  %1$d" UTF8_MULTIPLY "%2$s\n")
+						: ((clock != 0) ? "  %2$s %3$s" UTF8_NBSP "%4$s\n" : "  %2$s\n"),
+					count, sound.device().name(), hz,
+					(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz"));
 		}
 	}
 

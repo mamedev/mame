@@ -2742,6 +2742,11 @@ edmv035f                        // Edom MV035F motherboard (486)
 td4ipaio                        // TD-4IP-UMC-AIO motherboard (486)
 dvbslan                         // Datavan Book-Size LAN station (386sx)
 486igb21                        // 486IG-B-2-1 motherboard (486)
+euroat                          // Schneider Euro AT
+pg750                           // Siemens PG 750
+pg750eisa                       // Siemens PG 750 486 EISA
+samdm286                        // Samsung Deskmaster 286-12
+zdz248                          // Zenith Z-248
 
 
 @source:atari_s1.cpp
@@ -9420,6 +9425,7 @@ discof                          // (c) 1982
 lnc                             // (c) 1981
 mmonkey                         // (c) 1982 Technos Japan + Roller Tron
 mmonkeyj                        // (c) 1982 Technos Japan + Roller Tron
+protenn                         // (c) 1982
 protennb                        // bootleg
 sdtennis                        // (c) 1983
 tisland                         // (c) 1982
@@ -10665,6 +10671,7 @@ forgottnuaa                     // 7/1988 (c) 1988 (USA)
 ganbare                         // 11/04/2000 (c) 2000 (Japan)
 ghouls                          // 12/1988 (c) 1988 (World)
 ghoulsu                         // 12/1988 (c) 1988 (USA)
+gulunpa							//
 knights                         // 27/11/1991 (c) 1991 (World)
 knightsb2                       // bootleg
 knightsj                        // 27/11/1991 (c) 1991 (Japan)
@@ -13477,10 +13484,10 @@ fex68km4                        //
 @source:fidel_elite.cpp
 feasbu                          //
 feasgla                         //
+feasglaa                        //
 feag                            //
 feag2100                        //
 feag2100a                       //
-fepriv                          //
 fpres                           //
 fpresbu                         //
 
@@ -13671,6 +13678,7 @@ gigasm2                         // (c) 1986 Sega
 gigasm2b                        // (c) 1986 bootleg
 oigas                           // (c) 1986 bootleg
 pbillrd                         // (c) 1987 Nihon System
+pbillrdbl                       // (c) 1987 bootleg
 pbillrds                        // (c) 1987 Nihon System (Sega license?)
 pbillrdsa                       // (c) 1987 Nihon System (Sega license?)
 
@@ -14699,6 +14707,7 @@ gijoea                          // GX069 (c) 1991 (Asia)
 gijoeea                         // GX069 (c) 1991 (World)
 gijoej                          // GX069 (c) 1991 (Japan)
 gijoeu                          // GX069 (c) 1991 (US)
+gijoeua                         // GX069 (c) 1991 (US)
 
 @source:gimix.cpp
 gimix                           //
@@ -15724,9 +15733,6 @@ mwcbaseb                        // Mattel
 packmon                         // Bandai
 pairmtch                        // Bandai
 pbqbert                         // Parker Brothers
-sag_si2                         // Entex
-sag_bb4                         // Entex
-sag_pb                          // Entex
 tmtron                          // Tomy
 vinvader                        // VTech
 zackman                         // Bandai
@@ -15934,6 +15940,7 @@ merlin                          // Parker Bros
 mmerlin                         // Parker Bros
 monkeysee                       // Tandy Radio Shack
 phpball                         // Tomy
+qfire                           // Electroplay
 quizwizc                        // Coleco
 raisedvl                        // Entex
 simon                           // Milton Bradley
@@ -30328,6 +30335,7 @@ mrdrilrg                        // 2001.03 Mr. Driller G (DRG1 Ver.A)
 mrdrilrga                       // 2001.03 Mr. Driller G ALT (DRG1 Ver.A)
 mrdrlr2a                        // 2000.?? Mr Driller 2 (DR22 Ver.A)
 nflclsfb                        // 2003.?? NFL Classic Football
+pacmball                        // 2003.?? Pacman Ball
 panikuru                        // 2002.03 Panicuru Panekuru
 ptblank3                        // 2000.12 Point Blank 3 (GNN2 Ver.A)
 sekaikh                         // 2004.04 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)
@@ -33182,6 +33190,7 @@ ddp3                            // (c) 2002 DoDonPachi Dai-Ou-Jou / DoDonPachi I
 ddpdoj                          //
 ddpdoja                         //
 ddpdojb                         //
+ddpdojp                         //
 ddpdojblk                       //
 ddpdojblka                      //
 ddpdojblkbl                     //
@@ -34553,6 +34562,9 @@ ds2                             //
 oz750                           // 199? Sharp Wizard OZ-750
 rex6000                         //
 
+@source:rfslots8085.cpp
+unkrfslt                        //
+
 @source:rgum.cpp
 rgum                            //
 
@@ -34581,6 +34593,7 @@ rmhaihib                        // (c) 1985 Alba
 rmhaijin                        // (c) 1986 Alba
 rmhaisei                        // (c) 1986 Visco
 themj                           // (c) 1987 Visco
+themj2                          // (c) 1987 Visco
 
 @source:rmnimbus.cpp
 nimbus                          // RM Nimbus 186
@@ -35029,6 +35042,12 @@ sacstate                        //
 @source:safarir.cpp
 safarir                         // (c) 1980 Shin Nihon Kikaku (SNK) + Taito license
 safarirj                        // (c) 1979 Shin Nihon Kikaku (SNK)
+
+@source:sag.cpp
+sag_baseb4
+sag_footb4
+sag_pinb
+sag_sinv2
 
 @source:sage2.cpp
 sage2                           //
@@ -36961,6 +36980,7 @@ tdfever2                        // A6006 'TD'?(c) 1988
 tdfever2b                       // bootleg
 tdfeverj                        // A6006 'TD' (c) 1987
 tnk3                            // A5001      (c) 1985
+tnk3b                           // bootleg
 tnk3j                           // A5001      (c) 1985
 vangrd2                         // A2005      (c) 1984
 victroad                        // A6002      (c) 1986
@@ -40950,6 +40970,7 @@ sprk_103                        //
 startrp                         //
 startrp2                        //
 strikext                        //
+strikext_100                    //
 strknew                         //
 strxt_fr                        //
 strxt_gr                        //

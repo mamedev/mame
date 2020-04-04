@@ -2772,7 +2772,7 @@ updateirq:
     ppc4xx_spu_r - serial port read handler
 -------------------------------------------------*/
 
-READ8_MEMBER( ppc4xx_device::ppc4xx_spu_r )
+uint8_t ppc4xx_device::ppc4xx_spu_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
@@ -2798,7 +2798,7 @@ READ8_MEMBER( ppc4xx_device::ppc4xx_spu_r )
     ppc4xx_spu_w - serial port write handler
 -------------------------------------------------*/
 
-WRITE8_MEMBER( ppc4xx_device::ppc4xx_spu_w )
+void ppc4xx_device::ppc4xx_spu_w(offs_t offset, uint8_t data)
 {
 	uint8_t oldstate, newstate;
 

@@ -2154,7 +2154,7 @@ void avr8_device::change_spsr(uint8_t data)
 
 /*****************************************************************************/
 
-WRITE8_MEMBER(avr8_device::regs_w)
+void avr8_device::regs_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -2755,7 +2755,7 @@ WRITE8_MEMBER(avr8_device::regs_w)
 	}
 }
 
-READ8_MEMBER(avr8_device::regs_r)
+uint8_t avr8_device::regs_r(offs_t offset)
 {
 	switch (offset)
 	{

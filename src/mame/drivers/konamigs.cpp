@@ -114,7 +114,7 @@ protected:
 
 	// Q2SD GPU
 	DECLARE_READ16_MEMBER(gpu_r);
-	DECLARE_WRITE16_MEMBER(gpu_w);
+	void gpu_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_READ16_MEMBER(vram_r);
 	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
@@ -332,7 +332,7 @@ READ16_MEMBER(gsan_state::gpu_r)
 	return m_gpuregs[offset];
 }
 
-WRITE16_MEMBER(gsan_state::gpu_w)
+void gsan_state::gpu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	u16 prevval = m_gpuregs[offset];
 	COMBINE_DATA(&m_gpuregs[offset]);
@@ -688,7 +688,7 @@ void gsan_state::do_render(bool vbkem)
 			m_uymax = m_gpuregs[0x8e / 2] = m_vram[listoffs++];
 			break;
 		case 0x16: // WPR
-			gpu_w(machine().dummy_space(), m_vram[listoffs] & 0x3ff, m_vram[listoffs + 1]);
+			gpu_w(m_vram[listoffs] & 0x3ff, m_vram[listoffs + 1]);
 			listoffs += 2;
 			break;
 		case 0x17: // SCLIP

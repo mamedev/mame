@@ -33,7 +33,7 @@ WRITE8_MEMBER(changela_state::mcu_w)
 {
 	m_mcu_in = data;
 	if (!BIT(m_port_c_out, 2))
-		m_mcu->pa_w(space, 0, data);
+		m_mcu->pa_w(data);
 }
 
 
@@ -54,7 +54,7 @@ WRITE8_MEMBER(changela_state::changela_68705_port_c_w)
 
 	/* PC2 is connected to the /OE input of the LS374 */
 	if (BIT(data, 2))
-		m_mcu->pa_w(space, 0, BIT(data, 2) ? 0xff : m_mcu_in);
+		m_mcu->pa_w(BIT(data, 2) ? 0xff : m_mcu_in);
 
 	m_port_c_out = data;
 }
@@ -135,7 +135,7 @@ READ8_MEMBER(changela_state::changela_2d_r)
 
 WRITE_LINE_MEMBER(changela_state::mcu_pc_0_w)
 {
-	m_mcu->pc_w(machine().dummy_space(), 0, 0xfe | state);
+	m_mcu->pc_w(0xfe | state);
 }
 
 WRITE_LINE_MEMBER(changela_state::collision_reset_0_w)

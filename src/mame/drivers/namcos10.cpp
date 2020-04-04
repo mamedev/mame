@@ -37,6 +37,7 @@ Mr Driller 2 (DR21 Ver.A)                                        (C) Namco, 2000
 Mr Driller 2 (DR22 Ver.A)                                        (C) Namco, 2000
 Mr Driller G (DRG1 Ver.A)                                        (C) Namco, 2001
 NFL Classic Football (NCF3 Ver.A)                                (C) Namco, 2003
+Pacman Ball (PMB2 Ver.A)                                         (C) Namco, 2003
 Panicuru Panekuru (PPA1 Ver.A)                                   (C) Namco, 2001
 *Photo Battle                                                    (C) Namco, 2001
 Point Blank 3 (GNN2 Ver. A)                                      (C) Namco, 2000
@@ -277,6 +278,7 @@ Kono Tako                                           10021 Ver.A   KC034A   8E, 8
 Kotoba no Puzzle Mojipittan                         KPM1  Ver.A   KC012A   8E, 8D, 7E           N/A
 Mr Driller G                                        DRG1  Ver.A   KC007A   8E, 8D, 7E           N/A
 NFL Classic Football                                NCF3  Ver.A   KC027A   8E, 8D, 7E, 7D       N/A
+Pacman Ball                                         PMB2  Ver.A   KC026A   8E, 8D               N/A
 Panicuru Panekuru                                   PPA1  Ver.A   KC017A   8E, 8D, 7E           N/A
 Point Blank 3                                       GNN2  Ver.A   KC002A   8E, 8D               N/A           see note 3
 Sekai Kaseki Hakken                                 SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
@@ -1304,6 +1306,15 @@ ROM_START( gegemdb )
 	ROM_LOAD( "nvram.bin", 0x0000, 0x8000, CRC(c0c87c71) SHA1(263f7f3df772644bcf973413d3fac9ae305fda6c) )
 ROM_END
 
+ROM_START( pacmball )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "k9f2808u0c.8e",  0x0000000, 0x1080000, CRC(7b6f814d) SHA1(728167866d9350150b5fd9ebcf8fe7280efedb91) )
+	ROM_LOAD( "k9f2808u0c.8d",  0x1080000, 0x1080000, CRC(f79d7199) SHA1(4ef9b758ee778e12f7fef717e063597299fb8219) )
+ROM_END
+
 GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10, namcos10_state, init_gunbalna, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
@@ -1320,6 +1331,7 @@ GAME( 2002, panikuru,  0,        namcos10_memn, namcos10, namcos10_state, init_p
 GAME( 2002, gamshara,  0,        ns10_gamshara, namcos10, namcos10_state, init_gamshara, ROT0, "Mitchell", "Gamshara (World, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Ver. 20020912A ETC
 GAME( 2002, gamsharaj, gamshara, ns10_gamshara, namcos10, namcos10_state, init_gamshara, ROT0, "Mitchell", "Gamshara (Japan, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb, namcos10, namcos10_state, init_nflclsfb, ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, pacmball,  0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, konotako,  0,        ns10_konotako, namcos10, namcos10_state, init_konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2004, sekaikh,   0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2004, taiko6,    0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

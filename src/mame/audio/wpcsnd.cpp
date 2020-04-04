@@ -65,7 +65,7 @@ uint8_t wpcsnd_device::ctrl_r()
 uint8_t wpcsnd_device::data_r()
 {
 	m_reply_available = false;
-	m_reply_cb(m_cpu->space(AS_PROGRAM),0);
+	m_reply_cb(0);
 	return m_reply;
 }
 
@@ -156,7 +156,7 @@ WRITE8_MEMBER(wpcsnd_device::latch_w)
 {
 	m_reply_available = true;
 	m_reply = data;
-	m_reply_cb(space,1);
+	m_reply_cb(1);
 }
 
 WRITE8_MEMBER(wpcsnd_device::volume_w)

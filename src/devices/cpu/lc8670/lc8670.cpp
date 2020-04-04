@@ -906,17 +906,17 @@ void lc8670_cpu_device::timer1_tick()
 //  internal map handlers
 //**************************************************************************
 
-READ8_MEMBER(lc8670_cpu_device::mram_r)
+uint8_t lc8670_cpu_device::mram_r(offs_t offset)
 {
 	return m_mram[BIT(REG_PSW,1)*0x100 + offset];
 }
 
-WRITE8_MEMBER(lc8670_cpu_device::mram_w)
+void lc8670_cpu_device::mram_w(offs_t offset, uint8_t data)
 {
 	m_mram[BIT(REG_PSW,1)*0x100 + offset] = data;
 }
 
-READ8_MEMBER(lc8670_cpu_device::xram_r)
+uint8_t lc8670_cpu_device::xram_r(offs_t offset)
 {
 	if (!(REG_VCCR & 0x40) || machine().side_effects_disabled())  // XRAM access enabled
 	{
@@ -939,7 +939,7 @@ READ8_MEMBER(lc8670_cpu_device::xram_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(lc8670_cpu_device::xram_w)
+void lc8670_cpu_device::xram_w(offs_t offset, uint8_t data)
 {
 	if (!(REG_VCCR & 0x40) || machine().side_effects_disabled())  // XRAM access enabled
 	{
@@ -960,7 +960,7 @@ WRITE8_MEMBER(lc8670_cpu_device::xram_w)
 	}
 }
 
-READ8_MEMBER(lc8670_cpu_device::regs_r)
+uint8_t lc8670_cpu_device::regs_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -999,7 +999,7 @@ READ8_MEMBER(lc8670_cpu_device::regs_r)
 	return m_sfr[offset];
 }
 
-WRITE8_MEMBER(lc8670_cpu_device::regs_w)
+void lc8670_cpu_device::regs_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{

@@ -226,7 +226,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
 
 INTERRUPT_GEN_MEMBER(cvs_state::cvs_main_cpu_interrupt)
 {
-	device.execute().pulse_input_line_and_vector(0, 0x03, device.execute().minimum_quantum_time());
+	m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
 
 	cvs_scroll_stars();
 }
@@ -973,6 +973,7 @@ void cvs_state::cvs(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(cvs_state::cvs_main_cpu_interrupt));
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->flag_handler().set(FUNC(cvs_state::write_s2650_flag));
+	m_maincpu->intack_handler().set_constant(0x03);
 
 	S2650(config, m_audiocpu, XTAL(14'318'181)/16);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cvs_state::cvs_dac_cpu_map);

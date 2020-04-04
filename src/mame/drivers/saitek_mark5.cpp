@@ -112,7 +112,7 @@ private:
 	DECLARE_WRITE8_MEMBER(lcd_data_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(reset_irq_w);
+	void reset_irq_w(u8 data);
 	DECLARE_READ8_MEMBER(reset_irq_r);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(cb_rom_r);
@@ -152,7 +152,7 @@ void mark5_state::machine_start()
 
 void mark5_state::machine_reset()
 {
-	reset_irq_w(machine().dummy_space(), 0, 0);
+	reset_irq_w(0);
 }
 
 
@@ -210,7 +210,7 @@ TIMER_CALLBACK_MEMBER(mark5_state::interrupt)
 	write_lcd(m_lcd_lcd ^ 1);
 }
 
-WRITE8_MEMBER(mark5_state::reset_irq_w)
+void mark5_state::reset_irq_w(u8 data)
 {
 	// MC14020 R
 	m_irqtimer->adjust(attotime::from_hz((19.6608_MHz_XTAL / 10 / 0x1000) * 2));
@@ -220,7 +220,7 @@ WRITE8_MEMBER(mark5_state::reset_irq_w)
 READ8_MEMBER(mark5_state::reset_irq_r)
 {
 	if (!machine().side_effects_disabled())
-		reset_irq_w(space, offset, 0);
+		reset_irq_w(0);
 
 	return 0xff;
 }

@@ -27,8 +27,6 @@ ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type
 	m_read_bg(*this),
 	m_read_sp(*this)
 {
-	for (int i = 0; i < 6; i++)
-		m_2012_2017_descramble[i] = 2 + i;
 }
 
 ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :

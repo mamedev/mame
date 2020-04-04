@@ -23,8 +23,8 @@ protected:
 
 public:
 	DECLARE_WRITE_LINE_MEMBER(clson_w);
-	DECLARE_WRITE8_MEMBER(polepos_engine_sound_lsb_w);
-	DECLARE_WRITE8_MEMBER(polepos_engine_sound_msb_w);
+	void polepos_engine_sound_lsb_w(uint8_t data);
+	void polepos_engine_sound_msb_w(uint8_t data);
 
 private:
 	struct filter2_context

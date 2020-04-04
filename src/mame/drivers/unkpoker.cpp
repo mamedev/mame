@@ -16,7 +16,7 @@ Two 2112 Rams
 Two 5101 Rams (Low Power Versions, one connected to Battery)
 
 Four position DIP Switch - DIP 1 changes on screen text from
-normal to high lighted as seen pics. Other DIPS unknown.
+normal to highlighted as seen in pics. Other DIPs unknown.
 
 Sound?
 
@@ -25,7 +25,8 @@ Date of manufacture unknown. Latest date codes on logic chips is 1980.
 Chaneman 3/20/2019
 
 
-TODO: everything
+TODO: stuck if it isn't immediately coined up at boot.
+      Game can be tested by keeping COIN1 (5 by default) pressed at boot.
 
 *******************************************************************************************/
 
@@ -76,7 +77,7 @@ uint32_t unkpoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				uint8_t chr = m_videoram[x + ma] & 0x7f;
 				uint8_t gfx = m_chargen[(chr << 3) | ra];
 
-				/* Display a scanline of a character */
+				// Display a scanline of a character
 				*p++ = BIT(gfx, 7);
 				*p++ = BIT(gfx, 6);
 				*p++ = BIT(gfx, 5);
@@ -93,23 +94,43 @@ uint32_t unkpoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-void unkpoker_state::mem_map(address_map &map) {
+void unkpoker_state::mem_map(address_map &map)
+{
 	map(0x0000,0x0fff).rom();
 	map(0x1000,0x1fff).ram();
-	map(0x8000,0x83ff).ram().share("videoram");
+	map(0x8000,0x83ff).ram().share(m_videoram);
 }
 
-void unkpoker_state::io_map(address_map &map) {
-	map(0x01,0x01).portr("IN");
-	map(0x02,0x02).portr("DSW");
+void unkpoker_state::io_map(address_map &map)
+{
+	map(0x01,0x01).portr("IN1"); // writes here
+	map(0x02,0x02).portr("DSW"); // writes here, seems sound related
+	map(0x04,0x04).portr("IN2");
 }
 
 
 static INPUT_PORTS_START( unkpoker )
-	PORT_START("IN")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // does something
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_BET ) PORT_NAME("Ante")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("DSW")
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // does something
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+
+	PORT_START("DSW") // seem to change coinage, but DSW:1 should do something different (see notes on top of the driver)
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW:3")

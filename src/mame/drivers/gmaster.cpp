@@ -6,7 +6,7 @@
 
 #include "emu.h"
 
-#include "cpu/upd7810/upd7810.h"
+#include "cpu/upd7810/upd7811.h"
 #include "sound/spkrdev.h"
 
 #include "bus/generic/slot.h"
@@ -241,7 +241,7 @@ WRITE8_MEMBER(gmaster_state::gmaster_portf_w)
 
 void gmaster_state::gmaster_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();
+	//map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).rw(FUNC(gmaster_state::gmaster_io_r), FUNC(gmaster_state::gmaster_io_w));
 	//map(0x8000, 0xfeff)      // mapped by the cartslot
 }
@@ -329,7 +329,7 @@ void gmaster_state::machine_start()
 
 void gmaster_state::gmaster(machine_config &config)
 {
-	upd7810_device &upd(UPD7810(config, m_maincpu, 12_MHz_XTAL/2/*?*/)); // µPD78C11 in the unit
+	upd78c11_device &upd(UPD78C11(config, m_maincpu, 12_MHz_XTAL/2/*?*/)); // µPD78C11 in the unit
 	upd.set_addrmap(AS_PROGRAM, &gmaster_state::gmaster_mem);
 	upd.pa_in_cb().set_ioport("JOY");
 	upd.pb_in_cb().set(FUNC(gmaster_state::gmaster_portb_r));
@@ -362,7 +362,7 @@ void gmaster_state::gmaster(machine_config &config)
 
 
 ROM_START(gmaster)
-	ROM_REGION(0x10000,"maincpu", 0)
+	ROM_REGION(0x1000,"maincpu", 0)
 	ROM_LOAD("d78c11agf_e19.u1", 0x0000, 0x1000, CRC(05cc45e5) SHA1(05d73638dea9657ccc2791c0202d9074a4782c1e) )
 ROM_END
 

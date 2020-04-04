@@ -476,10 +476,10 @@ offs_t upd78k3_disassembler::dasm_09xx(std::ostream &stream, u8 op2, offs_t pc, 
 	else if ((op2 & 0xfe) == 0xf0)
 	{
 		util::stream_format(stream, "%-8s", "MOV");
-		if (!BIT(op2, 4))
+		if (!BIT(op2, 0))
 			stream << "A,";
 		format_abs16(stream, opcodes.r16(pc + 2));
-		if (BIT(op2, 4))
+		if (BIT(op2, 0))
 			stream << ",A";
 		return 4 | SUPPORTED;
 	}

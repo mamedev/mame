@@ -111,7 +111,7 @@ private:
 
 	DECLARE_READ8_MEMBER(z80_semaphore_assert_r);
 	DECLARE_WRITE8_MEMBER(bootleg_mcu_port1_w);
-	DECLARE_WRITE8_MEMBER(mcu_port2_w);
+	void mcu_port2_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(mcu_port3_w);
 	DECLARE_READ8_MEMBER(mcu_port3_r);
 	DECLARE_READ8_MEMBER(bootleg_mcu_port3_r);

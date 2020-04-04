@@ -120,8 +120,7 @@ void shanghai_state::shangha2_map(address_map &map)
 
 void shanghai_state::shanghai_portmap(address_map &map)
 {
-	map(0x00, 0x01).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
-	map(0x02, 0x03).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x00, 0x03).rw("hd63484", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 	map(0x20, 0x23).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
 	map(0x40, 0x41).portr("P1");
 	map(0x44, 0x45).portr("P2");
@@ -135,8 +134,7 @@ void shanghai_state::shangha2_portmap(address_map &map)
 	map(0x00, 0x01).portr("P1");
 	map(0x10, 0x11).portr("P2");
 	map(0x20, 0x21).portr("SYSTEM");
-	map(0x30, 0x31).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
-	map(0x32, 0x33).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x30, 0x33).rw("hd63484", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 	map(0x40, 0x43).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
 	map(0x50, 0x50).w(FUNC(shanghai_state::shanghai_coin_w));
 }
@@ -144,8 +142,7 @@ void shanghai_state::shangha2_portmap(address_map &map)
 void shanghai_state::kothello_map(address_map &map)
 {
 	map(0x00000, 0x07fff).ram();
-	map(0x08010, 0x08011).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
-	map(0x08012, 0x08013).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x08010, 0x08013).rw("hd63484", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 	map(0x09010, 0x09011).portr("P1");
 	map(0x09012, 0x09013).portr("P2");
 	map(0x09014, 0x09015).portr("SYSTEM");
