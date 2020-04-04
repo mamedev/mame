@@ -1637,14 +1637,16 @@ void bosco_state::bosco(machine_config &config)
 	n06xx_0.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx_0.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 	n06xx_0.read_callback<2>().set("50xx_1", FUNC(namco_50xx_device::read));
-	n06xx_0.read_request_callback<2>().set("50xx_1", FUNC(namco_50xx_device::read_request));
+	n06xx_0.chip_select_callback<2>().set("50xx_1", FUNC(namco_50xx_device::chip_select));
+	n06xx_0.rw_callback<2>().set("50xx_1", FUNC(namco_50xx_device::rw));
 	n06xx_0.write_callback<2>().set("50xx_1", FUNC(namco_50xx_device::write));
 	n06xx_0.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
 
 	namco_06xx_device &n06xx_1(NAMCO_06XX(config, "06xx_1", MASTER_CLOCK/6/64));
 	n06xx_1.set_maincpu(m_subcpu);
 	n06xx_1.read_callback<0>().set("50xx_2", FUNC(namco_50xx_device::read));
-	n06xx_1.read_request_callback<0>().set("50xx_2", FUNC(namco_50xx_device::read_request));
+	n06xx_1.chip_select_callback<0>().set("50xx_2", FUNC(namco_50xx_device::chip_select));
+	n06xx_1.rw_callback<2>().set("50xx_2", FUNC(namco_50xx_device::rw));
 	n06xx_1.write_callback<0>().set("50xx_2", FUNC(namco_50xx_device::write));
 	n06xx_1.write_callback<1>().set("52xx", FUNC(namco_52xx_device::write));
 
@@ -1834,8 +1836,9 @@ void xevious_state::xevious(machine_config &config)
 	n06xx.set_maincpu(m_maincpu);
 	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
+	n06xx.chip_select_callback<2>().set("50xx", FUNC(namco_50xx_device::chip_select));
+	n06xx.rw_callback<2>().set("50xx", FUNC(namco_50xx_device::rw));
 	n06xx.read_callback<2>().set("50xx", FUNC(namco_50xx_device::read));
-	n06xx.read_request_callback<2>().set("50xx", FUNC(namco_50xx_device::read_request));
 	n06xx.write_callback<2>().set("50xx", FUNC(namco_50xx_device::write));
 	n06xx.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
 
@@ -1944,8 +1947,8 @@ void digdug_state::digdug(machine_config &config)
 	n06xx.set_maincpu(m_maincpu);
 	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
+	n06xx.chip_select_callback<1>().set("53xx", FUNC(namco_53xx_device::chip_select));
 	n06xx.read_callback<1>().set("53xx", FUNC(namco_53xx_device::read));
-	n06xx.read_request_callback<1>().set("53xx", FUNC(namco_53xx_device::read_request));
 
 	LS259(config, m_videolatch); // 5R
 	m_videolatch->parallel_out_cb().set(FUNC(digdug_state::bg_select_w)).mask(0x33);
