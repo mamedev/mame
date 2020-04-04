@@ -312,6 +312,27 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="alice">
+		<description>Alice in Videoland</description>
+		<year>1984</year>
+		<publisher>Audiogenic Software</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="510694">
+				<rom name="alicea.tap" size="510694" crc="cbf9ee38" sha1="6061be82148c2d5c6c30b8316ca41f8a70da4352"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="334160">
+				<rom name="aliceb.tap" size="334160" crc="33728578" sha1="09cfe61a693a9a454e8d18f316010d6e5b824784"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alleykat">
 		<description>Alleykat</description>
 		<year>1986</year>
@@ -1609,6 +1630,27 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="collaps">
+		<description>Collapse</description>
+		<year>1985</year>
+		<publisher>Silver Range</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="533661">
+				<rom name="collapsa.tap" size="533661" crc="b87ccba8" sha1="dc513a87121cb2cc653044e14e8d4a476fb4bfcf"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="533458">
+				<rom name="collapsb.tap" size="533458" crc="50c6665c" sha1="b7aa2d8b08454514e3b68d282fc1ee2f4ee7fd66"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="comblynx">
 		<description>Combat Lynx</description>
 		<year>19??</year>
@@ -2705,6 +2747,19 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="gemini">
+		<description>Gemini Wing</description>
+		<year>1990</year>
+		<publisher>Mastertronic Plus</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="483502">
+				<rom name="geminia.tap" size="483502" crc="4486a5ec" sha1="e410f1ba26197f6bbc44c461ba169a5d84af2726"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="getrdyrd">
 		<description>Get Ready to Read with BJ Bear</description>
 		<year>1984</year>
@@ -2870,6 +2925,27 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="904712">
 				<rom name="Grand_Prix_Simulator_a1.tap" size="904712" crc="c6e48e7f" sha1="2a2cd34a466c2d884bae4940b6bb7fe5ef82a30f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grandms">
+		<description>Grandmaster Chess</description>
+		<year>1986</year>
+		<publisher>Audiogenic Software</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="479942">
+				<rom name="grandmsa.tap" size="479942" crc="bb1e3edc" sha1="f35835579544c8b58b3c01cfa402a653c8b3b2e4"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="410344">
+				<rom name="grandmsb.tap" size="410344" crc="002b9b44" sha1="6f2356a96d4433ae9847564d0350d973390a35b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3100,6 +3176,19 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="505908">
 				<rom name="Harvey_Headbanger_a1.tap" size="505908" crc="18a0e01e" sha1="3cf6fe8cf88cb667e76719a1e2ebd990056d64de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="headovrh">
+		<description>Head Over Heels</description>
+		<year>1987</year>
+		<publisher>The Hit Squad</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="671518">
+				<rom name="headovhb.tap" size="671518" crc="0fa1d871" sha1="673c375205cc2cd052ccdf52f99f482f26f59038"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4433,6 +4522,27 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="mstrchs">
+		<description>Master Chess</description>
+		<year>1986</year>
+		<publisher>Mastertronic</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="391752">
+				<rom name="mstrchsa.tap" size="391752" crc="42fd4547" sha1="caabae9d2957866f3861e650753edb24da216e9b"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="395320">
+				<rom name="mstrchsb.tap" size="395320" crc="ccf02674" sha1="f97584ee6a87da30e79e57c9dec39a888637f683"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="matchpnt">
 		<description>Match Point (set 1)</description>
 		<year>1984</year>
@@ -4499,6 +4609,32 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="446106">
 				<rom name="Micro_Ball.tap" size="446106" crc="9d925150" sha1="cc918584963589c142605ff85985014c1a262a4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rhythm">
+		<description>Micro Rhythm</description>
+		<year>1986</year>
+		<publisher>Silver Range</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="614063">
+				<rom name="rhythma.tap" size="614063" crc="1e2e9fb3" sha1="6c773ae1c38cf38508467025e5538d77c3f57e0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midnghth">
+		<description>Midnight Resistance</description>
+		<year>1990</year>
+		<publisher>The Hit Squad</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="726358">
+				<rom name="mdnghtha.tap" size="726358" crc="af57f127" sha1="9719f7d03f9956cfef8bada30d6ddd2850b45751"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5476,6 +5612,27 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="pulsewr">
+		<description>Pulse Warrior</description>
+		<year>1988</year>
+		<publisher>Mastertronic</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="351478">
+				<rom name="pulsewra.tap" size="351478" crc="ca177733" sha1="3b6fdaf9c34882e111efbf2301dc00df202c8246"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="351478">
+				<rom name="pulsewrb.tap" size="351478" crc="bdd439e3" sha1="ca4b3fa5b0ce4f9c2fe69d313fbea3774855dbc9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="punchy">
 		<description>Punchy</description>
 		<year>1983</year>
@@ -5775,6 +5932,27 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="642762">
 				<rom name="Rambo-_First_Blood_Part_II.tap" size="642762" crc="93462399" sha1="dbd106a71c21cd18d11ba140a59407417c353175"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="realm">
+		<description>Realm</description>
+		<year>1987</year>
+		<publisher>Silver Range</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="268118">
+				<rom name="realma.tap" size="268118" crc="f90a5aa9" sha1="6f8bb642b03f3cad305c215a587923b047ed5ee2"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="268118">
+				<rom name="realmb.tap" size="268118" crc="f90a5aa9" sha1="6f8bb642b03f3cad305c215a587923b047ed5ee2"/>
 			</dataarea>
 		</part>
 	</software>
