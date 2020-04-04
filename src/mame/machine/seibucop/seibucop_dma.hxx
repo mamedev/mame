@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Olivier Galibert, Angelo Salese, David Haywood, Tomasz Slanina
 
 // ALL games use this - tilemap DMA (RAM -> private buffer)
 void raiden2cop_device::dma_tilemap_buffer()
@@ -184,5 +186,3 @@ void raiden2cop_device::dma_zsorting(uint16_t data)
 	for(int i=0; i<data; i++)
 		m_host_space->write_word(cop_sort_lookup + 2*i, entries[i].val);
 }
-
-
