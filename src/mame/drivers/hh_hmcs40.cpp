@@ -63,6 +63,7 @@
   A75     HD44801  1982, Alpha 8201 protection MCU -> machine/alpha8201.*
   B35     HD44801  1983, Alpha 8302 protection MCU (see 8201)
   B42     HD44801  1983, Alpha 8303 protection MCU (see 8201)
+ *B43     HD44801  1983, Alpha 8304 protection MCU (see 8201)
   C57     HD44801  1985, Alpha 8505 protection MCU (see 8201)
  *C89     HD44801  1986, CXG Computachess IV
 
@@ -78,6 +79,9 @@
     Or it could be a race condition: irq happening too late/early.
   - epacman2 booting the game in demo mode, pacman should go straight to the
     upper-left power pill: mcu cycle/interrupt timing related
+  - kevtris's HMCS40 ROM dumps are incomplete, missing MCU factory test code from
+    the 2nd half of the ROM, none of the games access it though and it's impossible
+    to execute unless the chip is in testmode.
   - Though very uncommon when compared to games with LED/lamp display, some
     games may manipulate VFD plate brightness by strobing it longer/shorter,
     eg. cgalaxn when a ship explodes.
