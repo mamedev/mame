@@ -662,7 +662,6 @@ void device_execute_interface::device_input::start(device_execute_interface &exe
 void device_execute_interface::device_input::reset()
 {
 	m_curvector = m_stored_vector = m_execute->default_irq_vector(m_linenum);
-	m_qindex = 0;
 }
 
 
