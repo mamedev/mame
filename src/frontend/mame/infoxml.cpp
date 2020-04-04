@@ -1265,6 +1265,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 	for (auto &port : portlist)
 	{
 		int ctrl_type = CTRL_DIGITAL_BUTTONS;
+		int last_ctrl_type = CTRL_DIGITAL_BUTTONS;
 											
 		bool ctrl_analog = false;
 		for (ioport_field &field : port.second->fields())
