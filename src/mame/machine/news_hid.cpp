@@ -17,7 +17,7 @@
  */
 
 #include "emu.h"
-#include "news_kbd.h"
+#include "news_hid.h"
 
 #include "machine/keyboard.ipp"
 

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_MACHINE_NEWS_KBD_H
-#define MAME_MACHINE_NEWS_KBD_H
+#ifndef MAME_MACHINE_NEWS_HID_H
+#define MAME_MACHINE_NEWS_HID_H
 
 #pragma once
 
@@ -63,4 +63,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NEWS_HID_HLE, news_hid_hle_device)
 
-#endif // MAME_MACHINE_NEWS_KBD_H
+#endif // MAME_MACHINE_NEWS_HID_H
