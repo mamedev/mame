@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles,Paul Priest
 /***************************************************************************
 
-    info.cpp
+	info.cpp
 
-    Dumps the MAME internal data as an XML file.
+	Dumps the MAME internal data as an XML file.
 
 ***************************************************************************/
 
@@ -45,42 +45,42 @@ namespace
 	class device_type_compare
 	{
 	public:
-		bool operator()(const std::add_pointer_t<device_type> &lhs, const std::add_pointer_t<device_type> &rhs) const;
+		bool operator()(const std::add_pointer_t<device_type>& lhs, const std::add_pointer_t<device_type>& rhs) const;
 	};
 
 	typedef std::set<std::add_pointer_t<device_type>, device_type_compare> device_type_set;
 
-	std::string normalize_string(const char *string);
+	std::string normalize_string(const char* string);
 
 	// internal helper
-	void output_header(std::ostream &out, bool dtd);
-	void output_footer(std::ostream &out);
+	void output_header(std::ostream& out, bool dtd);
+	void output_footer(std::ostream& out);
 
-	void output_one(std::ostream &out, driver_enumerator &drivlist, const game_driver &driver, device_type_set *devtypes);
-	void output_sampleof(std::ostream &out, device_t &device);
-	void output_bios(std::ostream &out, device_t const &device);
-	void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_driver *driver, device_t &device);
-	void output_device_refs(std::ostream &out, device_t &root);
-	void output_sample(std::ostream &out, device_t &device);
-	void output_chips(std::ostream &out, device_t &device, const char *root_tag);
-	void output_display(std::ostream &out, device_t &device, machine_flags::type const *flags, const char *root_tag);
-	void output_sound(std::ostream &out, device_t &device);
-	void output_ioport_condition(std::ostream &out, const ioport_condition &condition, unsigned indent);
-	void output_input(std::ostream &out, const ioport_list &portlist);
-	void output_switches(std::ostream &out, const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *loctag, const char *innertag);
-	void output_ports(std::ostream &out, const ioport_list &portlist);
-	void output_adjusters(std::ostream &out, const ioport_list &portlist);
-	void output_driver(std::ostream &out, game_driver const &driver, device_t::feature_type unemulated, device_t::feature_type imperfect);
-	void output_features(std::ostream &out, device_type type, device_t::feature_type unemulated, device_t::feature_type imperfect);
-	void output_images(std::ostream &out, device_t &device, const char *root_tag);
-	void output_slots(std::ostream &out, machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes);
-	void output_software_lists(std::ostream &out, device_t &root, const char *root_tag);
-	void output_ramoptions(std::ostream &out, device_t &root);
+	void output_one(std::ostream& out, driver_enumerator& drivlist, const game_driver& driver, device_type_set* devtypes);
+	void output_sampleof(std::ostream& out, device_t& device);
+	void output_bios(std::ostream& out, device_t const& device);
+	void output_rom(std::ostream& out, driver_enumerator* drivlist, const game_driver* driver, device_t& device);
+	void output_device_refs(std::ostream& out, device_t& root);
+	void output_sample(std::ostream& out, device_t& device);
+	void output_chips(std::ostream& out, device_t& device, const char* root_tag);
+	void output_display(std::ostream& out, device_t& device, machine_flags::type const* flags, const char* root_tag);
+	void output_sound(std::ostream& out, device_t& device);
+	void output_ioport_condition(std::ostream& out, const ioport_condition& condition, unsigned indent);
+	void output_input(std::ostream& out, const ioport_list& portlist);
+	void output_switches(std::ostream& out, const ioport_list& portlist, const char* root_tag, int type, const char* outertag, const char* loctag, const char* innertag);
+	void output_ports(std::ostream& out, const ioport_list& portlist);
+	void output_adjusters(std::ostream& out, const ioport_list& portlist);
+	void output_driver(std::ostream& out, game_driver const& driver, device_t::feature_type unemulated, device_t::feature_type imperfect);
+	void output_features(std::ostream& out, device_type type, device_t::feature_type unemulated, device_t::feature_type imperfect);
+	void output_images(std::ostream& out, device_t& device, const char* root_tag);
+	void output_slots(std::ostream& out, machine_config& config, device_t& device, const char* root_tag, device_type_set* devtypes);
+	void output_software_lists(std::ostream& out, device_t& root, const char* root_tag);
+	void output_ramoptions(std::ostream& out, device_t& root);
 
-	void output_one_device(std::ostream &out, machine_config &config, device_t &device, const char *devtag);
-	void output_devices(std::ostream &out, emu_options &lookup_options, device_type_set const *filter);
+	void output_one_device(std::ostream& out, machine_config& config, device_t& device, const char* devtag);
+	void output_devices(std::ostream& out, emu_options& lookup_options, device_type_set const* filter);
 
-	const char *get_merge_name(driver_enumerator &drivlist, const game_driver &driver, util::hash_collection const &romhashes);
+	const char* get_merge_name(driver_enumerator& drivlist, const game_driver& driver, util::hash_collection const& romhashes);
 };
 
 
@@ -257,7 +257,7 @@ static const char s_dtd_string[] =
 //  info_xml_creator - constructor
 //-------------------------------------------------
 
-info_xml_creator::info_xml_creator(emu_options const &options, bool dtd)
+info_xml_creator::info_xml_creator(emu_options const& options, bool dtd)
 	: m_dtd(dtd)
 {
 }
@@ -268,7 +268,7 @@ info_xml_creator::info_xml_creator(emu_options const &options, bool dtd)
 //  known machines matching a pattern
 //-------------------------------------------------
 
-void info_xml_creator::output(std::ostream &out, const std::vector<std::string> &patterns)
+void info_xml_creator::output(std::ostream& out, const std::vector<std::string>& patterns)
 {
 	if (patterns.empty())
 	{
@@ -280,11 +280,11 @@ void info_xml_creator::output(std::ostream &out, const std::vector<std::string> 
 		// patterns specified - we have to filter output
 		std::vector<bool> matched(patterns.size(), false);
 		size_t exact_matches = 0;
-		const auto filter = [&patterns, &matched, &exact_matches](const char *shortname, bool &done) -> bool
+		const auto filter = [&patterns, &matched, &exact_matches](const char* shortname, bool& done) -> bool
 		{
 			bool result = false;
 			auto it = matched.begin();
-			for (const std::string &pat : patterns)
+			for (const std::string& pat : patterns)
 			{
 				if (!core_strwildcmp(pat.c_str(), shortname))
 				{
@@ -327,7 +327,7 @@ void info_xml_creator::output(std::ostream &out, const std::vector<std::string> 
 //  known (and filtered) machines
 //-------------------------------------------------
 
-void info_xml_creator::output(std::ostream &out, const std::function<bool(const char *shortname, bool &done)> &filter, bool include_devices)
+void info_xml_creator::output(std::ostream& out, const std::function<bool(const char* shortname, bool& done)>& filter, bool include_devices)
 {
 	struct prepared_info
 	{
@@ -341,7 +341,7 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 	bool filter_done = false;
 	bool header_outputted = false;
 
-	auto output_header_if_necessary = [this, &header_outputted](std::ostream &out)
+	auto output_header_if_necessary = [this, &header_outputted](std::ostream& out)
 	{
 		if (!header_outputted)
 		{
@@ -372,16 +372,16 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 			}
 			else if (!filter || filter(drivlist.driver().name, filter_done))
 			{
-				const game_driver &driver(drivlist.driver());
+				const game_driver& driver(drivlist.driver());
 				std::future<prepared_info> future_pi = std::async(std::launch::async, [&drivlist, &driver, &devfilter]
-				{
-					prepared_info result;
-					std::ostringstream stream;
+					{
+						prepared_info result;
+						std::ostringstream stream;
 
-					output_one(stream, drivlist, driver, devfilter ? &result.m_dev_set : nullptr);
-					result.m_xml_snippet = stream.str();
-					return result;
-				});
+						output_one(stream, drivlist, driver, devfilter ? &result.m_dev_set : nullptr);
+						result.m_xml_snippet = stream.str();
+						return result;
+					});
 				queue.push(std::move(future_pi));
 			}
 		}
@@ -400,7 +400,7 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 			// merge devices into devfilter, if appropriate
 			if (devfilter)
 			{
-				for (const auto &x : pi.m_dev_set)
+				for (const auto& x : pi.m_dev_set)
 					devfilter->insert(x);
 			}
 		}
@@ -438,55 +438,55 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 namespace
 {
 
-//-------------------------------------------------
-//  normalize_string
-//-------------------------------------------------
+	//-------------------------------------------------
+	//  normalize_string
+	//-------------------------------------------------
 
-std::string normalize_string(const char *string)
-{
-	std::ostringstream stream;
-
-	if (string != nullptr)
+	std::string normalize_string(const char* string)
 	{
-		while (*string)
+		std::ostringstream stream;
+
+		if (string != nullptr)
 		{
-			switch (*string)
+			while (*string)
 			{
-			case '\"': stream << "&quot;"; break;
-			case '&': stream << "&amp;"; break;
-			case '<': stream << "&lt;"; break;
-			case '>': stream << "&gt;"; break;
-			default:
-				stream << *string;
-				break;
+				switch (*string)
+				{
+				case '\"': stream << "&quot;"; break;
+				case '&': stream << "&amp;"; break;
+				case '<': stream << "&lt;"; break;
+				case '>': stream << "&gt;"; break;
+				default:
+					stream << *string;
+					break;
+				}
+				++string;
 			}
-			++string;
 		}
+		return stream.str();
 	}
-	return stream.str();
-}
 
 
-//-------------------------------------------------
-//  output_header - print the XML DTD and open
-//  the root element
-//-------------------------------------------------
+	//-------------------------------------------------
+	//  output_header - print the XML DTD and open
+	//  the root element
+	//-------------------------------------------------
 
-void output_header(std::ostream &out, bool dtd)
-{
-	if (dtd)
+	void output_header(std::ostream& out, bool dtd)
 	{
-		// output the DTD
-		out << "<?xml version=\"1.0\"?>\n";
-		std::string dtd(s_dtd_string);
-		strreplace(dtd, "__XML_ROOT__", XML_ROOT);
-		strreplace(dtd, "__XML_TOP__", XML_TOP);
+		if (dtd)
+		{
+			// output the DTD
+			out << "<?xml version=\"1.0\"?>\n";
+			std::string dtd(s_dtd_string);
+			strreplace(dtd, "__XML_ROOT__", XML_ROOT);
+			strreplace(dtd, "__XML_TOP__", XML_TOP);
 
-		out << dtd << "\n\n";
-	}
+			out << dtd << "\n\n";
+		}
 
-	// top-level tag
-	out << util::string_format("<%s build=\"%s\" debug=\""
+		// top-level tag
+		out << util::string_format("<%s build=\"%s\" debug=\""
 #ifdef MAME_DEBUG
 			"yes"
 #else
@@ -496,1101 +496,1556 @@ void output_header(std::ostream &out, bool dtd)
 			XML_ROOT,
 			normalize_string(emulator_info::get_build_version()),
 			CONFIG_VERSION);
-}
-
-
-//-------------------------------------------------
-//  output_header - close the root element
-//-------------------------------------------------
-
-void output_footer(std::ostream &out)
-{
-	// close the top level tag
-	out << util::string_format("</%s>\n", XML_ROOT);
-}
-
-
-//-------------------------------------------------
-//  output_one - print the XML information
-//  for one particular machine driver
-//-------------------------------------------------
-
-void output_one(std::ostream &out, driver_enumerator &drivlist, const game_driver &driver, device_type_set *devtypes)
-{
-	machine_config config(driver, drivlist.options());
-	device_iterator iter(config.root_device());
-
-	// allocate input ports and build overall emulation status
-	ioport_list portlist;
-	std::string errors;
-	device_t::feature_type overall_unemulated(driver.type.unemulated_features());
-	device_t::feature_type overall_imperfect(driver.type.imperfect_features());
-	for (device_t &device : iter)
-	{
-		portlist.append(device, errors);
-		overall_unemulated |= device.type().unemulated_features();
-		overall_imperfect |= device.type().imperfect_features();
-
-		if (devtypes && device.owner())
-			devtypes->insert(&device.type());
 	}
 
-	// renumber player numbers for controller ports
-	int player_offset = 0;
-	// but treat keyboard count separately from players' number
-	int kbd_offset = 0;
-	for (device_t &device : iter)
+
+	//-------------------------------------------------
+	//  output_header - close the root element
+	//-------------------------------------------------
+
+	void output_footer(std::ostream& out)
 	{
-		int nplayers = 0;
-		bool new_kbd = false;
-		for (auto &port : portlist)
-			if (&port.second->device() == &device)
-				for (ioport_field &field : port.second->fields())
-					if (field.type() >= IPT_START && field.type() < IPT_ANALOG_LAST)
-					{
-						if (field.type() == IPT_KEYBOARD)
+		// close the top level tag
+		out << util::string_format("</%s>\n", XML_ROOT);
+	}
+
+
+	//-------------------------------------------------
+	//  output_one - print the XML information
+	//  for one particular machine driver
+	//-------------------------------------------------
+
+	void output_one(std::ostream& out, driver_enumerator& drivlist, const game_driver& driver, device_type_set* devtypes)
+	{
+		machine_config config(driver, drivlist.options());
+		device_iterator iter(config.root_device());
+
+		// allocate input ports and build overall emulation status
+		ioport_list portlist;
+		std::string errors;
+		device_t::feature_type overall_unemulated(driver.type.unemulated_features());
+		device_t::feature_type overall_imperfect(driver.type.imperfect_features());
+		for (device_t& device : iter)
+		{
+			portlist.append(device, errors);
+			overall_unemulated |= device.type().unemulated_features();
+			overall_imperfect |= device.type().imperfect_features();
+
+			if (devtypes && device.owner())
+				devtypes->insert(&device.type());
+		}
+
+		// renumber player numbers for controller ports
+		int player_offset = 0;
+		// but treat keyboard count separately from players' number
+		int kbd_offset = 0;
+		for (device_t& device : iter)
+		{
+			int nplayers = 0;
+			bool new_kbd = false;
+			for (auto& port : portlist)
+				if (&port.second->device() == &device)
+					for (ioport_field& field : port.second->fields())
+						if (field.type() >= IPT_START && field.type() < IPT_ANALOG_LAST)
 						{
-							if (!new_kbd)
-								new_kbd = true;
-							field.set_player(field.player() + kbd_offset);
+							if (field.type() == IPT_KEYBOARD)
+							{
+								if (!new_kbd)
+									new_kbd = true;
+								field.set_player(field.player() + kbd_offset);
+							}
+							else
+							{
+								nplayers = std::max(nplayers, field.player() + 1);
+								field.set_player(field.player() + player_offset);
+							}
 						}
-						else
-						{
-							nplayers = std::max(nplayers, field.player() + 1);
-							field.set_player(field.player() + player_offset);
-						}
-					}
-		player_offset += nplayers;
-		if (new_kbd) kbd_offset++;
-	}
+			player_offset += nplayers;
+			if (new_kbd) kbd_offset++;
+		}
 
-	// print the header and the machine name
-	out << util::string_format("\t<%s name=\"%s\"", XML_TOP, normalize_string(driver.name));
+		// print the header and the machine name
+		out << util::string_format("\t<%s name=\"%s\"", XML_TOP, normalize_string(driver.name));
 
-	// strip away any path information from the source_file and output it
-	const char *start = strrchr(driver.type.source(), '/');
-	if (!start)
-		start = strrchr(driver.type.source(), '\\');
-	start = start ? (start + 1) : driver.type.source();
-	out << util::string_format(" sourcefile=\"%s\"", normalize_string(start));
+		// strip away any path information from the source_file and output it
+		const char* start = strrchr(driver.type.source(), '/');
+		if (!start)
+			start = strrchr(driver.type.source(), '\\');
+		start = start ? (start + 1) : driver.type.source();
+		out << util::string_format(" sourcefile=\"%s\"", normalize_string(start));
 
-	// append bios and runnable flags
-	if (driver.flags & machine_flags::IS_BIOS_ROOT)
-		out << " isbios=\"yes\"";
-	if (driver.flags & machine_flags::MECHANICAL)
-		out << " ismechanical=\"yes\"";
+		// append bios and runnable flags
+		if (driver.flags & machine_flags::IS_BIOS_ROOT)
+			out << " isbios=\"yes\"";
+		if (driver.flags & machine_flags::MECHANICAL)
+			out << " ismechanical=\"yes\"";
 
-	// display clone information
-	int clone_of = drivlist.find(driver.parent);
-	if (clone_of != -1 && !(drivlist.driver(clone_of).flags & machine_flags::IS_BIOS_ROOT))
-		out << util::string_format(" cloneof=\"%s\"", normalize_string(drivlist.driver(clone_of).name));
-	if (clone_of != -1)
-		out << util::string_format(" romof=\"%s\"", normalize_string(drivlist.driver(clone_of).name));
+		// display clone information
+		int clone_of = drivlist.find(driver.parent);
+		if (clone_of != -1 && !(drivlist.driver(clone_of).flags & machine_flags::IS_BIOS_ROOT))
+			out << util::string_format(" cloneof=\"%s\"", normalize_string(drivlist.driver(clone_of).name));
+		if (clone_of != -1)
+			out << util::string_format(" romof=\"%s\"", normalize_string(drivlist.driver(clone_of).name));
 
-	// display sample information and close the game tag
-	output_sampleof(out, config.root_device());
-	out << ">\n";
+		// display sample information and close the game tag
+		output_sampleof(out, config.root_device());
+		out << ">\n";
 
-	// output game description
-	if (driver.type.fullname() != nullptr)
-		out << util::string_format("\t\t<description>%s</description>\n", normalize_string(driver.type.fullname()));
+		// output game description
+		if (driver.type.fullname() != nullptr)
+			out << util::string_format("\t\t<description>%s</description>\n", normalize_string(driver.type.fullname()));
 
-	// print the year only if is a number or another allowed character (? or +)
-	if (driver.year != nullptr && strspn(driver.year, "0123456789?+") == strlen(driver.year))
-		out << util::string_format("\t\t<year>%s</year>\n", normalize_string(driver.year));
+		// print the year only if is a number or another allowed character (? or +)
+		if (driver.year != nullptr && strspn(driver.year, "0123456789?+") == strlen(driver.year))
+			out << util::string_format("\t\t<year>%s</year>\n", normalize_string(driver.year));
 
-	// print the manufacturer information
-	if (driver.manufacturer != nullptr)
-		out << util::string_format("\t\t<manufacturer>%s</manufacturer>\n", normalize_string(driver.manufacturer));
+		// print the manufacturer information
+		if (driver.manufacturer != nullptr)
+			out << util::string_format("\t\t<manufacturer>%s</manufacturer>\n", normalize_string(driver.manufacturer));
 
-	// now print various additional information
-	output_bios(out, config.root_device());
-	output_rom(out, &drivlist, &driver, config.root_device());
-	output_device_refs(out, config.root_device());
-	output_sample(out, config.root_device());
-	output_chips(out, config.root_device(), "");
-	output_display(out, config.root_device(), &driver.flags, "");
-	output_sound(out, config.root_device());
-	output_input(out, portlist);
-	output_switches(out, portlist, "", IPT_DIPSWITCH, "dipswitch", "diplocation", "dipvalue");
-	output_switches(out, portlist, "", IPT_CONFIG, "configuration", "conflocation", "confsetting");
-	output_ports(out, portlist);
-	output_adjusters(out, portlist);
-	output_driver(out, driver, overall_unemulated, overall_imperfect);
-	output_features(out, driver.type, overall_unemulated, overall_imperfect);
-	output_images(out, config.root_device(), "");
-	output_slots(out, config, config.root_device(), "", devtypes);
-	output_software_lists(out, config.root_device(), "");
-	output_ramoptions(out, config.root_device());
-
-	// close the topmost tag
-	out << util::string_format("\t</%s>\n", XML_TOP);
-}
-
-
-//-------------------------------------------------
-//  output_one_device - print the XML info for
-//  a single device
-//-------------------------------------------------
-
-void output_one_device(std::ostream &out, machine_config &config, device_t &device, const char *devtag)
-{
-	bool has_speaker = false, has_input = false;
-	// check if the device adds speakers to the system
-	sound_interface_iterator snditer(device);
-	if (snditer.first() != nullptr)
-		has_speaker = true;
-
-	// generate input list and build overall emulation status
-	ioport_list portlist;
-	std::string errors;
-	device_t::feature_type overall_unemulated(device.type().unemulated_features());
-	device_t::feature_type overall_imperfect(device.type().imperfect_features());
-	for (device_t &dev : device_iterator(device))
-	{
-		portlist.append(dev, errors);
-		overall_unemulated |= dev.type().unemulated_features();
-		overall_imperfect |= dev.type().imperfect_features();
-	}
-
-	// check if the device adds player inputs (other than dsw and configs) to the system
-	for (auto &port : portlist)
-		for (ioport_field const &field : port.second->fields())
-			if (field.type() >= IPT_START1 && field.type() < IPT_UI_FIRST)
-			{
-				has_input = true;
-				break;
-			}
-
-	// start to output info
-	out << util::string_format("\t<%s name=\"%s\"", XML_TOP, normalize_string(device.shortname()));
-	std::string src(device.source());
-	strreplace(src,"../", "");
-	out << util::string_format(" sourcefile=\"%s\" isdevice=\"yes\" runnable=\"no\"", normalize_string(src.c_str()));
-	output_sampleof(out, device);
-	out << ">\n" << util::string_format("\t\t<description>%s</description>\n", normalize_string(device.name()));
-
-	output_bios(out, device);
-	output_rom(out, nullptr, nullptr, device);
-	output_device_refs(out, device);
-
-	if (device.type().type() != typeid(samples_device)) // ignore samples_device itself
-		output_sample(out, device);
-
-	output_chips(out, device, devtag);
-	output_display(out, device, nullptr, devtag);
-	if (has_speaker)
-		output_sound(out, device);
-	if (has_input)
+		// now print various additional information
+		output_bios(out, config.root_device());
+		output_rom(out, &drivlist, &driver, config.root_device());
+		output_device_refs(out, config.root_device());
+		output_sample(out, config.root_device());
+		output_chips(out, config.root_device(), "");
+		output_display(out, config.root_device(), &driver.flags, "");
+		output_sound(out, config.root_device());
 		output_input(out, portlist);
-	output_switches(out, portlist, devtag, IPT_DIPSWITCH, "dipswitch", "diplocation", "dipvalue");
-	output_switches(out, portlist, devtag, IPT_CONFIG, "configuration", "conflocation", "confsetting");
-	output_adjusters(out, portlist);
-	output_features(out, device.type(), overall_unemulated, overall_imperfect);
-	output_images(out, device, devtag);
-	output_slots(out, config, device, devtag, nullptr);
-	output_software_lists(out, device, devtag);
-	out << util::string_format("\t</%s>\n", XML_TOP);
-}
+		output_switches(out, portlist, "", IPT_DIPSWITCH, "dipswitch", "diplocation", "dipvalue");
+		output_switches(out, portlist, "", IPT_CONFIG, "configuration", "conflocation", "confsetting");
+		output_ports(out, portlist);
+		output_adjusters(out, portlist);
+		output_driver(out, driver, overall_unemulated, overall_imperfect);
+		output_features(out, driver.type, overall_unemulated, overall_imperfect);
+		output_images(out, config.root_device(), "");
+		output_slots(out, config, config.root_device(), "", devtypes);
+		output_software_lists(out, config.root_device(), "");
+		output_ramoptions(out, config.root_device());
+
+		// close the topmost tag
+		out << util::string_format("\t</%s>\n", XML_TOP);
+	}
 
 
-//-------------------------------------------------
-//  output_devices - print the XML info for
-//  registered device types
-//-------------------------------------------------
+	//-------------------------------------------------
+	//  output_one_device - print the XML info for
+	//  a single device
+	//-------------------------------------------------
 
-void output_devices(std::ostream &out, emu_options &lookup_options, device_type_set const *filter)
-{
-	// get config for empty machine
-	machine_config config(GAME_NAME(___empty), lookup_options);
+	void output_one_device(std::ostream& out, machine_config& config, device_t& device, const char* devtag)
+	{
+		bool has_speaker = false, has_input = false;
+		// check if the device adds speakers to the system
+		sound_interface_iterator snditer(device);
+		if (snditer.first() != nullptr)
+			has_speaker = true;
 
-	auto const action = [&config, &out] (device_type type)
-			{
-				// add it at the root of the machine config
-				device_t *dev;
+		// generate input list and build overall emulation status
+		ioport_list portlist;
+		std::string errors;
+		device_t::feature_type overall_unemulated(device.type().unemulated_features());
+		device_t::feature_type overall_imperfect(device.type().imperfect_features());
+		for (device_t& dev : device_iterator(device))
+		{
+			portlist.append(dev, errors);
+			overall_unemulated |= dev.type().unemulated_features();
+			overall_imperfect |= dev.type().imperfect_features();
+		}
+
+		// check if the device adds player inputs (other than dsw and configs) to the system
+		for (auto& port : portlist)
+			for (ioport_field const& field : port.second->fields())
+				if (field.type() >= IPT_START1 && field.type() < IPT_UI_FIRST)
 				{
-					machine_config::token const tok(config.begin_configuration(config.root_device()));
-					dev = config.device_add("_tmp", type, 0);
+					has_input = true;
+					break;
 				}
 
-				// notify this device and all its subdevices that they are now configured
-				for (device_t &device : device_iterator(*dev))
-					if (!device.configured())
-						device.config_complete();
+		// start to output info
+		out << util::string_format("\t<%s name=\"%s\"", XML_TOP, normalize_string(device.shortname()));
+		std::string src(device.source());
+		strreplace(src, "../", "");
+		out << util::string_format(" sourcefile=\"%s\" isdevice=\"yes\" runnable=\"no\"", normalize_string(src.c_str()));
+		output_sampleof(out, device);
+		out << ">\n" << util::string_format("\t\t<description>%s</description>\n", normalize_string(device.name()));
 
-				// print details and remove it
-				output_one_device(out, config, *dev, dev->tag());
+		output_bios(out, device);
+		output_rom(out, nullptr, nullptr, device);
+		output_device_refs(out, device);
+
+		if (device.type().type() != typeid(samples_device)) // ignore samples_device itself
+			output_sample(out, device);
+
+		output_chips(out, device, devtag);
+		output_display(out, device, nullptr, devtag);
+		if (has_speaker)
+			output_sound(out, device);
+		if (has_input)
+			output_input(out, portlist);
+		output_switches(out, portlist, devtag, IPT_DIPSWITCH, "dipswitch", "diplocation", "dipvalue");
+		output_switches(out, portlist, devtag, IPT_CONFIG, "configuration", "conflocation", "confsetting");
+		output_adjusters(out, portlist);
+		output_features(out, device.type(), overall_unemulated, overall_imperfect);
+		output_images(out, device, devtag);
+		output_slots(out, config, device, devtag, nullptr);
+		output_software_lists(out, device, devtag);
+		out << util::string_format("\t</%s>\n", XML_TOP);
+	}
+
+
+	//-------------------------------------------------
+	//  output_devices - print the XML info for
+	//  registered device types
+	//-------------------------------------------------
+
+	void output_devices(std::ostream& out, emu_options& lookup_options, device_type_set const* filter)
+	{
+		// get config for empty machine
+		machine_config config(GAME_NAME(___empty), lookup_options);
+
+		auto const action = [&config, &out](device_type type)
+		{
+			// add it at the root of the machine config
+			device_t* dev;
+			{
 				machine_config::token const tok(config.begin_configuration(config.root_device()));
-				config.device_remove("_tmp");
-			};
+				dev = config.device_add("_tmp", type, 0);
+			}
 
-	// run through devices
-	if (filter)
-	{
-		for (std::add_pointer_t<device_type> type : *filter) action(*type);
-	}
-	else
-	{
-		for (device_type type : registered_device_types) action(type);
-	}
-}
+			// notify this device and all its subdevices that they are now configured
+			for (device_t& device : device_iterator(*dev))
+				if (!device.configured())
+					device.config_complete();
 
+			// print details and remove it
+			output_one_device(out, config, *dev, dev->tag());
+			machine_config::token const tok(config.begin_configuration(config.root_device()));
+			config.device_remove("_tmp");
+		};
 
-//------------------------------------------------
-//  output_device_refs - when a machine uses a
-//  subdevice, print a reference
-//-------------------------------------------------
-
-void output_device_refs(std::ostream &out, device_t &root)
-{
-	for (device_t &device : device_iterator(root))
-		if (&device != &root)
-			out << util::string_format("\t\t<device_ref name=\"%s\"/>\n", normalize_string(device.shortname()));
-}
-
-
-//------------------------------------------------
-//  output_sampleof - print the 'sampleof'
-//  attribute, if appropriate
-//-------------------------------------------------
-
-void output_sampleof(std::ostream &out, device_t &device)
-{
-	// iterate over sample devices
-	for (samples_device &samples : samples_device_iterator(device))
-	{
-		samples_iterator sampiter(samples);
-		if (sampiter.altbasename() != nullptr)
+		// run through devices
+		if (filter)
 		{
-			out << util::string_format(" sampleof=\"%s\"", normalize_string(sampiter.altbasename()));
-
-			// must stop here, as there can only be one attribute of the same name
-			return;
+			for (std::add_pointer_t<device_type> type : *filter) action(*type);
+		}
+		else
+		{
+			for (device_type type : registered_device_types) action(type);
 		}
 	}
-}
 
 
-//-------------------------------------------------
-//  output_bios - print BIOS sets for a device
-//-------------------------------------------------
+	//------------------------------------------------
+	//  output_device_refs - when a machine uses a
+	//  subdevice, print a reference
+	//-------------------------------------------------
 
-void output_bios(std::ostream &out, device_t const &device)
-{
-	// first determine the default BIOS name
-	char const *defaultname(nullptr);
-	for (tiny_rom_entry const *rom = device.rom_region(); rom && !ROMENTRY_ISEND(rom); ++rom)
+	void output_device_refs(std::ostream& out, device_t& root)
 	{
-		if (ROMENTRY_ISDEFAULT_BIOS(rom))
-			defaultname = rom->name;
+		for (device_t& device : device_iterator(root))
+			if (&device != &root)
+				out << util::string_format("\t\t<device_ref name=\"%s\"/>\n", normalize_string(device.shortname()));
 	}
 
-	// iterate over ROM entries and look for BIOSes
-	for (romload::system_bios const &bios : romload::entries(device.rom_region()).get_system_bioses())
+
+	//------------------------------------------------
+	//  output_sampleof - print the 'sampleof'
+	//  attribute, if appropriate
+	//-------------------------------------------------
+
+	void output_sampleof(std::ostream& out, device_t& device)
 	{
-		// output extracted name and descriptions'
-		out << "\t\t<biosset";
-		out << util::string_format(" name=\"%s\"", normalize_string(bios.get_name()));
-		out << util::string_format(" description=\"%s\"", normalize_string(bios.get_description()));
-		if (defaultname && !std::strcmp(defaultname, bios.get_name()))
-			out << " default=\"yes\"";
-		out << "/>\n";
-	}
-}
-
-
-//-------------------------------------------------
-//  output_rom - print the roms section of
-//  the XML output
-//-------------------------------------------------
-
-void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_driver *driver, device_t &device)
-{
-	enum class type { BIOS, NORMAL, DISK };
-	std::map<u32, char const *> biosnames;
-	bool bios_scanned(false);
-	auto const get_biosname =
-			[&biosnames, &bios_scanned] (tiny_rom_entry const *rom) -> char const *
+		// iterate over sample devices
+		for (samples_device& samples : samples_device_iterator(device))
+		{
+			samples_iterator sampiter(samples);
+			if (sampiter.altbasename() != nullptr)
 			{
-				u32 const biosflags(ROM_GETBIOSFLAGS(rom));
-				std::map<u32, char const *>::const_iterator const found(biosnames.find(biosflags));
-				if (biosnames.end() != found)
-					return found->second;
+				out << util::string_format(" sampleof=\"%s\"", normalize_string(sampiter.altbasename()));
 
-				char const *result(nullptr);
-				if (!bios_scanned)
+				// must stop here, as there can only be one attribute of the same name
+				return;
+			}
+		}
+	}
+
+
+	//-------------------------------------------------
+	//  output_bios - print BIOS sets for a device
+	//-------------------------------------------------
+
+	void output_bios(std::ostream& out, device_t const& device)
+	{
+		// first determine the default BIOS name
+		char const* defaultname(nullptr);
+		for (tiny_rom_entry const* rom = device.rom_region(); rom && !ROMENTRY_ISEND(rom); ++rom)
+		{
+			if (ROMENTRY_ISDEFAULT_BIOS(rom))
+				defaultname = rom->name;
+		}
+
+		// iterate over ROM entries and look for BIOSes
+		for (romload::system_bios const& bios : romload::entries(device.rom_region()).get_system_bioses())
+		{
+			// output extracted name and descriptions'
+			out << "\t\t<biosset";
+			out << util::string_format(" name=\"%s\"", normalize_string(bios.get_name()));
+			out << util::string_format(" description=\"%s\"", normalize_string(bios.get_description()));
+			if (defaultname && !std::strcmp(defaultname, bios.get_name()))
+				out << " default=\"yes\"";
+			out << "/>\n";
+		}
+	}
+
+
+	//-------------------------------------------------
+	//  output_rom - print the roms section of
+	//  the XML output
+	//-------------------------------------------------
+
+	void output_rom(std::ostream& out, driver_enumerator* drivlist, const game_driver* driver, device_t& device)
+	{
+		enum class type { BIOS, NORMAL, DISK };
+		std::map<u32, char const*> biosnames;
+		bool bios_scanned(false);
+		auto const get_biosname =
+			[&biosnames, &bios_scanned](tiny_rom_entry const* rom) -> char const*
+		{
+			u32 const biosflags(ROM_GETBIOSFLAGS(rom));
+			std::map<u32, char const*>::const_iterator const found(biosnames.find(biosflags));
+			if (biosnames.end() != found)
+				return found->second;
+
+			char const* result(nullptr);
+			if (!bios_scanned)
+			{
+				for (++rom; !ROMENTRY_ISEND(rom); ++rom)
 				{
-					for (++rom; !ROMENTRY_ISEND(rom); ++rom)
+					if (ROMENTRY_ISSYSTEM_BIOS(rom))
 					{
-						if (ROMENTRY_ISSYSTEM_BIOS(rom))
-						{
-							u32 const biosno(ROM_GETBIOSFLAGS(rom));
-							biosnames.emplace(biosno, rom->name);
-							if (biosflags == biosno)
-								result = rom->name;
-						}
+						u32 const biosno(ROM_GETBIOSFLAGS(rom));
+						biosnames.emplace(biosno, rom->name);
+						if (biosflags == biosno)
+							result = rom->name;
 					}
-					bios_scanned = true;
 				}
-				return result;
-			};
-	auto const rom_file_size = // FIXME: need a common way to do this without the cost of allocating rom_entry
-			[] (tiny_rom_entry const *romp) -> u32
-			{
-				u32 maxlength = 0;
+				bios_scanned = true;
+			}
+			return result;
+		};
+		auto const rom_file_size = // FIXME: need a common way to do this without the cost of allocating rom_entry
+			[](tiny_rom_entry const* romp) -> u32
+		{
+			u32 maxlength = 0;
 
-				// loop until we run out of reloads
-				do
+			// loop until we run out of reloads
+			do
+			{
+				// loop until we run out of continues/ignores */
+				u32 curlength(ROM_GETLENGTH(romp++));
+				while (ROMENTRY_ISCONTINUE(romp) || ROMENTRY_ISIGNORE(romp))
+					curlength += ROM_GETLENGTH(romp++);
+
+				// track the maximum length
+				maxlength = (std::max)(maxlength, curlength);
+			} while (ROMENTRY_ISRELOAD(romp));
+
+			return maxlength;
+		};
+
+		// iterate over 3 different ROM "types": BIOS, ROMs, DISKs
+		bool const do_merge_name = drivlist && dynamic_cast<driver_device*>(&device);
+		for (type pass : { type::BIOS, type::NORMAL, type::DISK })
+		{
+			tiny_rom_entry const* region(nullptr);
+			for (tiny_rom_entry const* rom = device.rom_region(); rom && !ROMENTRY_ISEND(rom); ++rom)
+			{
+				if (ROMENTRY_ISREGION(rom))
+					region = rom;
+				else if (ROMENTRY_ISSYSTEM_BIOS(rom))
+					biosnames.emplace(ROM_GETBIOSFLAGS(rom), rom->name);
+
+				if (!ROMENTRY_ISFILE(rom))
+					continue;
+
+				// only list disks on the disk pass
+				bool const is_disk = ROMREGION_ISDISKDATA(region);
+				if ((type::DISK == pass) != is_disk)
+					continue;
+
+				// BIOS ROMs only apply to bioses
+				// FIXME: disk images associated with a system BIOS will never be listed
+				u32 const biosno(ROM_GETBIOSFLAGS(rom));
+				if ((type::BIOS == pass) != bool(biosno))
+					continue;
+				char const* const bios_name((!is_disk && biosno) ? get_biosname(rom) : nullptr);
+
+				// if we have a valid ROM and we are a clone, see if we can find the parent ROM
+				util::hash_collection const hashes(rom->hashdata);
+				char const* const merge_name((do_merge_name && !hashes.flag(util::hash_collection::FLAG_NO_DUMP)) ? get_merge_name(*drivlist, *driver, hashes) : nullptr);
+
+				// opening tag
+				if (is_disk)
+					out << "\t\t<disk";
+				else
+					out << "\t\t<rom";
+
+				// add name, merge, bios, and size tags */
+				char const* const name(rom->name);
+				if (name && name[0])
+					out << util::string_format(" name=\"%s\"", normalize_string(name));
+				if (merge_name)
+					out << util::string_format(" merge=\"%s\"", normalize_string(merge_name));
+				if (bios_name)
+					out << util::string_format(" bios=\"%s\"", normalize_string(bios_name));
+				if (!is_disk)
+					out << util::string_format(" size=\"%u\"", rom_file_size(rom));
+
+				// dump checksum information only if there is a known dump
+				if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
+					out << ' ' << hashes.attribute_string(); // iterate over hash function types and print m_output their values
+				else
+					out << " status=\"nodump\"";
+
+				// append a region name
+				out << util::string_format(" region=\"%s\"", region->name);
+
+				if (!is_disk)
 				{
-					// loop until we run out of continues/ignores */
-					u32 curlength(ROM_GETLENGTH(romp++));
-					while (ROMENTRY_ISCONTINUE(romp) || ROMENTRY_ISIGNORE(romp))
-						curlength += ROM_GETLENGTH(romp++);
-
-					// track the maximum length
-					maxlength = (std::max)(maxlength, curlength);
+					// for non-disk entries, print offset
+					out << util::string_format(" offset=\"%x\"", ROM_GETOFFSET(rom));
 				}
-				while (ROMENTRY_ISRELOAD(romp));
+				else
+				{
+					// for disk entries, add the disk index
+					out << util::string_format(" index=\"%x\" writable=\"%s\"", DISK_GETINDEX(rom), DISK_ISREADONLY(rom) ? "no" : "yes");
+				}
 
-				return maxlength;
-			};
+				// add optional flag
+				if (ROM_ISOPTIONAL(rom))
+					out << " optional=\"yes\"";
 
-	// iterate over 3 different ROM "types": BIOS, ROMs, DISKs
-	bool const do_merge_name = drivlist && dynamic_cast<driver_device *>(&device);
-	for (type pass : { type::BIOS, type::NORMAL, type::DISK })
-	{
-		tiny_rom_entry const *region(nullptr);
-		for (tiny_rom_entry const *rom = device.rom_region(); rom && !ROMENTRY_ISEND(rom); ++rom)
-		{
-			if (ROMENTRY_ISREGION(rom))
-				region = rom;
-			else if (ROMENTRY_ISSYSTEM_BIOS(rom))
-				biosnames.emplace(ROM_GETBIOSFLAGS(rom), rom->name);
-
-			if (!ROMENTRY_ISFILE(rom))
-				continue;
-
-			// only list disks on the disk pass
-			bool const is_disk = ROMREGION_ISDISKDATA(region);
-			if ((type::DISK == pass) != is_disk)
-				continue;
-
-			// BIOS ROMs only apply to bioses
-			// FIXME: disk images associated with a system BIOS will never be listed
-			u32 const biosno(ROM_GETBIOSFLAGS(rom));
-			if ((type::BIOS == pass) != bool(biosno))
-				continue;
-			char const *const bios_name((!is_disk && biosno) ? get_biosname(rom) : nullptr);
-
-			// if we have a valid ROM and we are a clone, see if we can find the parent ROM
-			util::hash_collection const hashes(rom->hashdata);
-			char const *const merge_name((do_merge_name && !hashes.flag(util::hash_collection::FLAG_NO_DUMP)) ? get_merge_name(*drivlist, *driver, hashes) : nullptr);
-
-			// opening tag
-			if (is_disk)
-				out << "\t\t<disk";
-			else
-				out << "\t\t<rom";
-
-			// add name, merge, bios, and size tags */
-			char const *const name(rom->name);
-			if (name && name[0])
-				out << util::string_format(" name=\"%s\"", normalize_string(name));
-			if (merge_name)
-				out << util::string_format(" merge=\"%s\"", normalize_string(merge_name));
-			if (bios_name)
-				out << util::string_format(" bios=\"%s\"", normalize_string(bios_name));
-			if (!is_disk)
-				out << util::string_format(" size=\"%u\"", rom_file_size(rom));
-
-			// dump checksum information only if there is a known dump
-			if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
-				out << ' ' << hashes.attribute_string(); // iterate over hash function types and print m_output their values
-			else
-				out << " status=\"nodump\"";
-
-			// append a region name
-			out << util::string_format(" region=\"%s\"", region->name);
-
-			if (!is_disk)
-			{
-				// for non-disk entries, print offset
-				out << util::string_format(" offset=\"%x\"", ROM_GETOFFSET(rom));
+				out << "/>\n";
 			}
-			else
+			bios_scanned = true;
+		}
+	}
+
+
+	//-------------------------------------------------
+	//  output_sample - print a list of all
+	//  samples referenced by a game_driver
+	//-------------------------------------------------
+
+	void output_sample(std::ostream& out, device_t& device)
+	{
+		// iterate over sample devices
+		for (samples_device& samples : samples_device_iterator(device))
+		{
+			samples_iterator iter(samples);
+			std::unordered_set<std::string> already_printed;
+			for (const char* samplename = iter.first(); samplename != nullptr; samplename = iter.next())
 			{
-				// for disk entries, add the disk index
-				out << util::string_format(" index=\"%x\" writable=\"%s\"", DISK_GETINDEX(rom), DISK_ISREADONLY(rom) ? "no" : "yes");
+				// filter out duplicates
+				if (!already_printed.insert(samplename).second)
+					continue;
+
+				// output the sample name
+				out << util::string_format("\t\t<sample name=\"%s\"/>\n", normalize_string(samplename));
 			}
-
-			// add optional flag
-			if (ROM_ISOPTIONAL(rom))
-				out << " optional=\"yes\"";
-
-			out << "/>\n";
-		}
-		bios_scanned = true;
-	}
-}
-
-
-//-------------------------------------------------
-//  output_sample - print a list of all
-//  samples referenced by a game_driver
-//-------------------------------------------------
-
-void output_sample(std::ostream &out, device_t &device)
-{
-	// iterate over sample devices
-	for (samples_device &samples : samples_device_iterator(device))
-	{
-		samples_iterator iter(samples);
-		std::unordered_set<std::string> already_printed;
-		for (const char *samplename = iter.first(); samplename != nullptr; samplename = iter.next())
-		{
-			// filter out duplicates
-			if (!already_printed.insert(samplename).second)
-				continue;
-
-			// output the sample name
-			out << util::string_format("\t\t<sample name=\"%s\"/>\n", normalize_string(samplename));
-		}
-	}
-}
-
-
-/*-------------------------------------------------
-    output_chips - print a list of CPU and
-    sound chips used by a game
--------------------------------------------------*/
-
-void output_chips(std::ostream &out, device_t &device, const char *root_tag)
-{
-	// iterate over executable devices
-	for (device_execute_interface &exec : execute_interface_iterator(device))
-	{
-		if (strcmp(exec.device().tag(), device.tag()))
-		{
-			std::string newtag(exec.device().tag()), oldtag(":");
-			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
-
-			out << "\t\t<chip";
-			out << " type=\"cpu\"";
-			out << util::string_format(" tag=\"%s\"", normalize_string(newtag.c_str()));
-			out << util::string_format(" name=\"%s\"", normalize_string(exec.device().name()));
-			out << util::string_format(" clock=\"%d\"", exec.device().clock());
-			out << "/>\n";
 		}
 	}
 
-	// iterate over sound devices
-	for (device_sound_interface &sound : sound_interface_iterator(device))
+
+	/*-------------------------------------------------
+		output_chips - print a list of CPU and
+		sound chips used by a game
+	-------------------------------------------------*/
+
+	void output_chips(std::ostream& out, device_t& device, const char* root_tag)
 	{
-		if (strcmp(sound.device().tag(), device.tag()) != 0 && sound.issound())
+		// iterate over executable devices
+		for (device_execute_interface& exec : execute_interface_iterator(device))
 		{
-			std::string newtag(sound.device().tag()), oldtag(":");
-			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
-
-			out << "\t\t<chip";
-			out << " type=\"audio\"";
-			out << util::string_format(" tag=\"%s\"", normalize_string(newtag.c_str()));
-			out << util::string_format(" name=\"%s\"", normalize_string(sound.device().name()));
-			if (sound.device().clock() != 0)
-				out << util::string_format(" clock=\"%d\"", sound.device().clock());
-			out << "/>\n";
-		}
-	}
-}
-
-
-//-------------------------------------------------
-//  output_display - print a list of all the
-//  displays
-//-------------------------------------------------
-
-void output_display(std::ostream &out, device_t &device, machine_flags::type const *flags, const char *root_tag)
-{
-	// iterate over screens
-	for (const screen_device &screendev : screen_device_iterator(device))
-	{
-		if (strcmp(screendev.tag(), device.tag()))
-		{
-			std::string newtag(screendev.tag()), oldtag(":");
-			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
-
-			out << util::string_format("\t\t<display tag=\"%s\"", normalize_string(newtag.c_str()));
-
-			switch (screendev.screen_type())
+			if (strcmp(exec.device().tag(), device.tag()))
 			{
+				std::string newtag(exec.device().tag()), oldtag(":");
+				newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
+
+				out << "\t\t<chip";
+				out << " type=\"cpu\"";
+				out << util::string_format(" tag=\"%s\"", normalize_string(newtag.c_str()));
+				out << util::string_format(" name=\"%s\"", normalize_string(exec.device().name()));
+				out << util::string_format(" clock=\"%d\"", exec.device().clock());
+				out << "/>\n";
+			}
+		}
+
+		// iterate over sound devices
+		for (device_sound_interface& sound : sound_interface_iterator(device))
+		{
+			if (strcmp(sound.device().tag(), device.tag()) != 0 && sound.issound())
+			{
+				std::string newtag(sound.device().tag()), oldtag(":");
+				newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
+
+				out << "\t\t<chip";
+				out << " type=\"audio\"";
+				out << util::string_format(" tag=\"%s\"", normalize_string(newtag.c_str()));
+				out << util::string_format(" name=\"%s\"", normalize_string(sound.device().name()));
+				if (sound.device().clock() != 0)
+					out << util::string_format(" clock=\"%d\"", sound.device().clock());
+				out << "/>\n";
+			}
+		}
+	}
+
+
+	//-------------------------------------------------
+	//  output_display - print a list of all the
+	//  displays
+	//-------------------------------------------------
+
+	void output_display(std::ostream& out, device_t& device, machine_flags::type const* flags, const char* root_tag)
+	{
+		// iterate over screens
+		for (const screen_device& screendev : screen_device_iterator(device))
+		{
+			if (strcmp(screendev.tag(), device.tag()))
+			{
+				std::string newtag(screendev.tag()), oldtag(":");
+				newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
+
+				out << util::string_format("\t\t<display tag=\"%s\"", normalize_string(newtag.c_str()));
+
+				switch (screendev.screen_type())
+				{
 				case SCREEN_TYPE_RASTER:    out << " type=\"raster\"";  break;
 				case SCREEN_TYPE_VECTOR:    out << " type=\"vector\"";  break;
 				case SCREEN_TYPE_LCD:       out << " type=\"lcd\"";     break;
 				case SCREEN_TYPE_SVG:       out << " type=\"svg\"";     break;
 				default:                    out << " type=\"unknown\""; break;
+				}
+
+				// output the orientation as a string
+				switch (screendev.orientation())
+				{
+				case ORIENTATION_FLIP_X:
+					out << " rotate=\"0\" flipx=\"yes\"";
+					break;
+				case ORIENTATION_FLIP_Y:
+					out << " rotate=\"180\" flipx=\"yes\"";
+					break;
+				case ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
+					out << " rotate=\"180\"";
+					break;
+				case ORIENTATION_SWAP_XY:
+					out << " rotate=\"90\" flipx=\"yes\"";
+					break;
+				case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X:
+					out << " rotate=\"90\"";
+					break;
+				case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y:
+					out << " rotate=\"270\"";
+					break;
+				case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
+					out << " rotate=\"270\" flipx=\"yes\"";
+					break;
+				default:
+					out << " rotate=\"0\"";
+					break;
+				}
+
+				// output width and height only for games that are not vector
+				if (screendev.screen_type() != SCREEN_TYPE_VECTOR)
+				{
+					const rectangle& visarea = screendev.visible_area();
+					out << util::string_format(" width=\"%d\"", visarea.width());
+					out << util::string_format(" height=\"%d\"", visarea.height());
+				}
+
+				// output refresh rate
+				out << util::string_format(" refresh=\"%f\"", ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds()));
+
+				// output raw video parameters only for games that are not vector
+				// and had raw parameters specified
+				if (screendev.screen_type() != SCREEN_TYPE_VECTOR && !screendev.oldstyle_vblank_supplied())
+				{
+					int pixclock = screendev.width() * screendev.height() * ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds());
+
+					out << util::string_format(" pixclock=\"%d\"", pixclock);
+					out << util::string_format(" htotal=\"%d\"", screendev.width());
+					out << util::string_format(" hbend=\"%d\"", screendev.visible_area().min_x);
+					out << util::string_format(" hbstart=\"%d\"", screendev.visible_area().max_x + 1);
+					out << util::string_format(" vtotal=\"%d\"", screendev.height());
+					out << util::string_format(" vbend=\"%d\"", screendev.visible_area().min_y);
+					out << util::string_format(" vbstart=\"%d\"", screendev.visible_area().max_y + 1);
+				}
+				out << " />\n";
 			}
-
-			// output the orientation as a string
-			switch (screendev.orientation())
-			{
-			case ORIENTATION_FLIP_X:
-				out << " rotate=\"0\" flipx=\"yes\"";
-				break;
-			case ORIENTATION_FLIP_Y:
-				out << " rotate=\"180\" flipx=\"yes\"";
-				break;
-			case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-				out << " rotate=\"180\"";
-				break;
-			case ORIENTATION_SWAP_XY:
-				out << " rotate=\"90\" flipx=\"yes\"";
-				break;
-			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X:
-				out << " rotate=\"90\"";
-				break;
-			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_Y:
-				out << " rotate=\"270\"";
-				break;
-			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-				out << " rotate=\"270\" flipx=\"yes\"";
-				break;
-			default:
-				out << " rotate=\"0\"";
-				break;
-			}
-
-			// output width and height only for games that are not vector
-			if (screendev.screen_type() != SCREEN_TYPE_VECTOR)
-			{
-				const rectangle &visarea = screendev.visible_area();
-				out << util::string_format(" width=\"%d\"", visarea.width());
-				out << util::string_format(" height=\"%d\"", visarea.height());
-			}
-
-			// output refresh rate
-			out << util::string_format(" refresh=\"%f\"", ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds()));
-
-			// output raw video parameters only for games that are not vector
-			// and had raw parameters specified
-			if (screendev.screen_type() != SCREEN_TYPE_VECTOR && !screendev.oldstyle_vblank_supplied())
-			{
-				int pixclock = screendev.width() * screendev.height() * ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds());
-
-				out << util::string_format(" pixclock=\"%d\"", pixclock);
-				out << util::string_format(" htotal=\"%d\"", screendev.width());
-				out << util::string_format(" hbend=\"%d\"", screendev.visible_area().min_x);
-				out << util::string_format(" hbstart=\"%d\"", screendev.visible_area().max_x+1);
-				out << util::string_format(" vtotal=\"%d\"", screendev.height());
-				out << util::string_format(" vbend=\"%d\"", screendev.visible_area().min_y);
-				out << util::string_format(" vbstart=\"%d\"", screendev.visible_area().max_y+1);
-			}
-			out << " />\n";
 		}
 	}
-}
 
 
-//-------------------------------------------------
-//  output_sound - print a list of all the
-//  speakers
-//------------------------------------------------
+	//-------------------------------------------------
+	//  output_sound - print a list of all the
+	//  speakers
+	//------------------------------------------------
 
-void output_sound(std::ostream &out, device_t &device)
-{
-	speaker_device_iterator spkiter(device);
-	int speakers = spkiter.count();
-
-	// if we have no sound, zero m_output the speaker count
-	sound_interface_iterator snditer(device);
-	if (snditer.first() == nullptr)
-		speakers = 0;
-
-	out << util::string_format("\t\t<sound channels=\"%d\"/>\n", speakers);
-}
-
-
-//-------------------------------------------------
-//  output_ioport_condition - print condition
-//  required to use I/O port field/setting
-//-------------------------------------------------
-
-void output_ioport_condition(std::ostream &out, const ioport_condition &condition, unsigned indent)
-{
-	for (unsigned i = 0; indent > i; ++i)
-		out << '\t';
-
-	char const *rel(nullptr);
-	switch (condition.condition())
+	void output_sound(std::ostream& out, device_t& device)
 	{
-	case ioport_condition::ALWAYS:          throw false;
-	case ioport_condition::EQUALS:          rel = "eq"; break;
-	case ioport_condition::NOTEQUALS:       rel = "ne"; break;
-	case ioport_condition::GREATERTHAN:     rel = "gt"; break;
-	case ioport_condition::NOTGREATERTHAN:  rel = "le"; break;
-	case ioport_condition::LESSTHAN:        rel = "lt"; break;
-	case ioport_condition::NOTLESSTHAN:     rel = "ge"; break;
+		speaker_device_iterator spkiter(device);
+		int speakers = spkiter.count();
+
+		// if we have no sound, zero m_output the speaker count
+		sound_interface_iterator snditer(device);
+		if (snditer.first() == nullptr)
+			speakers = 0;
+
+		out << util::string_format("\t\t<sound channels=\"%d\"/>\n", speakers);
 	}
 
-	out << util::string_format("<condition tag=\"%s\" mask=\"%u\" relation=\"%s\" value=\"%u\"/>\n", normalize_string(condition.tag()), condition.mask(), rel, condition.value());
-}
 
-//-------------------------------------------------
-//  output_input - print a summary of a game's
-//  input
-//-------------------------------------------------
+	//-------------------------------------------------
+	//  output_ioport_condition - print condition
+	//  required to use I/O port field/setting
+	//-------------------------------------------------
 
-void output_input(std::ostream &out, const ioport_list &portlist)
-{
-	// enumerated list of control types
-	// NOTE: the order is chosen so that 'spare' button inputs are assigned to the
-	// most-likely-correct input device when info is output (you can think of it as
-	// a sort of likelihood order of having buttons)
-	enum
+	void output_ioport_condition(std::ostream& out, const ioport_condition& condition, unsigned indent)
 	{
-		CTRL_DIGITAL_BUTTONS,
-		CTRL_DIGITAL_JOYSTICK,
-		CTRL_ANALOG_JOYSTICK,
-		CTRL_ANALOG_LIGHTGUN,
-		CTRL_ANALOG_DIAL,
-		CTRL_ANALOG_POSITIONAL,
-		CTRL_ANALOG_TRACKBALL,
-		CTRL_ANALOG_MOUSE,
-		CTRL_ANALOG_PADDLE,
-		CTRL_ANALOG_PEDAL,
-		CTRL_DIGITAL_KEYPAD,
-		CTRL_DIGITAL_KEYBOARD,
-		CTRL_DIGITAL_MAHJONG,
-		CTRL_DIGITAL_HANAFUDA,
-		CTRL_DIGITAL_GAMBLING,
-		CTRL_COUNT
-	};
+		for (unsigned i = 0; indent > i; ++i)
+			out << '\t';
 
-	enum
-	{
-		CTRL_P1,
-		CTRL_P2,
-		CTRL_P3,
-		CTRL_P4,
-		CTRL_P5,
-		CTRL_P6,
-		CTRL_P7,
-		CTRL_P8,
-		CTRL_P9,
-		CTRL_P10,
-		CTRL_PCOUNT
-	};
-
-	// directions
-	const uint8_t DIR_UP = 0x01;
-	const uint8_t DIR_DOWN = 0x02;
-	const uint8_t DIR_LEFT = 0x04;
-	const uint8_t DIR_RIGHT = 0x08;
-
-	// initialize the list of control types
-	struct
-	{
-		const char *    type;           // general type of input
-		int             player;         // player which the input belongs to
-		int             nbuttons;       // total number of buttons
-		int             reqbuttons;     // total number of non-optional buttons
-		int             maxbuttons;     // max index of buttons (using IPT_BUTTONn) [probably to be removed soonish]
-		int             ways;           // directions for joystick
-		bool            analog;         // is analog input?
-		uint8_t           helper[3];      // for dual joysticks [possibly to be removed soonish]
-		int32_t           min;            // analog minimum value
-		int32_t           max;            // analog maximum value
-		int32_t           sensitivity;    // default analog sensitivity
-		int32_t           keydelta;       // default analog keydelta
-		bool            reverse;        // default analog reverse setting
-	} control_info[CTRL_COUNT * CTRL_PCOUNT];
-
-	memset(&control_info, 0, sizeof(control_info));
-
-	// tracking info as we iterate
-	int nplayer = 0;
-	int ncoin = 0;
-	bool service = false;
-	bool tilt = false;
-
-	// iterate over the ports
-	for (auto &port : portlist)
-	{
-		int ctrl_type = CTRL_DIGITAL_BUTTONS;
-		bool ctrl_analog = false;
-		for (ioport_field &field : port.second->fields())
+		char const* rel(nullptr);
+		switch (condition.condition())
 		{
-			// track the highest player number
-			if (nplayer < field.player() + 1)
-				nplayer = field.player() + 1;
+		case ioport_condition::ALWAYS:          throw false;
+		case ioport_condition::EQUALS:          rel = "eq"; break;
+		case ioport_condition::NOTEQUALS:       rel = "ne"; break;
+		case ioport_condition::GREATERTHAN:     rel = "gt"; break;
+		case ioport_condition::NOTGREATERTHAN:  rel = "le"; break;
+		case ioport_condition::LESSTHAN:        rel = "lt"; break;
+		case ioport_condition::NOTLESSTHAN:     rel = "ge"; break;
+		}
 
-			// switch off of the type
-			switch (field.type())
+		out << util::string_format("<condition tag=\"%s\" mask=\"%u\" relation=\"%s\" value=\"%u\"/>\n", normalize_string(condition.tag()), condition.mask(), rel, condition.value());
+	}
+
+	//-------------------------------------------------
+	//  output_input - print a summary of a game's
+	//  input
+	//-------------------------------------------------
+
+	void output_input(std::ostream& out, const ioport_list& portlist)
+	{
+		// enumerated list of control types
+		// NOTE: the order is chosen so that 'spare' button inputs are assigned to the
+		// most-likely-correct input device when info is output (you can think of it as
+		// a sort of likelihood order of having buttons)
+		enum
+		{
+			CTRL_DIGITAL_BUTTONS,
+			CTRL_DIGITAL_JOYSTICK,
+			CTRL_ANALOG_JOYSTICK,
+			CTRL_ANALOG_LIGHTGUN,
+			CTRL_ANALOG_DIAL,
+			CTRL_ANALOG_POSITIONAL,
+			CTRL_ANALOG_TRACKBALL,
+			CTRL_ANALOG_MOUSE,
+			CTRL_ANALOG_PADDLE,
+			CTRL_ANALOG_PEDAL,
+			CTRL_DIGITAL_KEYPAD,
+			CTRL_DIGITAL_KEYBOARD,
+			CTRL_DIGITAL_MAHJONG,
+			CTRL_DIGITAL_HANAFUDA,
+			CTRL_DIGITAL_GAMBLING,
+			CTRL_DIGITAL_COIN,
+			CTRL_DIGITAL_SERVICE,
+			CTRL_COUNT
+		};
+
+		enum
+		{
+			CTRL_P1,
+			CTRL_P2,
+			CTRL_P3,
+			CTRL_P4,
+			CTRL_P5,
+			CTRL_P6,
+			CTRL_P7,
+			CTRL_P8,
+			CTRL_P9,
+			CTRL_P10,
+			CTRL_PCOUNT
+		};
+
+		// directions
+		const uint8_t DIR_UP = 0x01;
+		const uint8_t DIR_DOWN = 0x02;
+		const uint8_t DIR_LEFT = 0x04;
+		const uint8_t DIR_RIGHT = 0x08;
+
+		// TODO: Can we intelligently gauge max btn counts for devices? interpro.cpp seems to max us out with 145.
+		const int arraysize = 200;
+
+		// initialize the list of control types
+		struct
+		{
+			const char* type;           // general type of input
+			int             player;         // player which the input belongs to
+			int             nbuttons;       // total number of buttons
+			int             reqbuttons;     // total number of non-optional buttons
+			int             maxbuttons;     // max index of buttons (using IPT_BUTTONn) [probably to be removed soonish]
+			int             ways;           // directions for joystick
+			bool            analog;         // is analog input?
+			uint8_t           helper[3];      // for dual joysticks [possibly to be removed soonish]
+			int32_t           min;            // analog minimum value
+			int32_t           max;            // analog maximum value
+			int32_t           sensitivity;    // default analog sensitivity
+			int32_t           keydelta;       // default analog keydelta
+			bool            reverse;        // default analog reverse setting
+
+			const char* tag;
+			int32_t defvalue;
+			int32_t mask;
+
+			int32_t mask_x;
+			int32_t mask_y;
+			int32_t mask_z;
+			int32_t mask_up;
+			int32_t mask_down;
+			int32_t mask_left;
+			int32_t mask_right;
+
+			int32_t defvalue_x;
+			int32_t defvalue_y;
+			int32_t defvalue_z;
+			int32_t defvalue_left;
+			int32_t defvalue_right;
+			int32_t defvalue_up;
+			int32_t defvalue_down;
+
+			const char* tag_x;
+			const char* tag_y;
+			const char* tag_z;			
+			const char* tag_left;
+			const char* tag_right;
+			const char* tag_up;
+			const char* tag_down;
+
+			const char* name;
+			const char* name_x;
+			const char* name_y;
+			const char* name_z;
+			const char* name_up;
+			const char* name_down;
+			const char* name_left;
+			const char* name_right;
+
+			const char* button_tags[arraysize];
+			const char* button_names[arraysize];
+			int32_t button_masks[arraysize];
+			int32_t button_defvalues[arraysize];
+			bool button_requires[arraysize];
+			int32_t button_indexes[arraysize];
+			int32_t button_index = 0;
+
+		} control_info[CTRL_COUNT * CTRL_PCOUNT];
+
+		memset(&control_info, 0, sizeof(control_info));
+
+		// tracking info as we iterate
+		int nplayer = 0;
+		int ncoin = 0;
+		bool service = false;
+		bool tilt = false;
+
+		// iterate over the ports
+		for (auto& port : portlist)
+		{			
+			int ctrl_type = CTRL_DIGITAL_BUTTONS;
+			int last_ctrl_type = CTRL_DIGITAL_BUTTONS;
+
+			bool ctrl_analog = false;
+
+			for (ioport_field& field : port.second->fields())
 			{
-			// map joysticks
-			case IPT_JOYSTICK_UP:
-				ctrl_type = CTRL_DIGITAL_JOYSTICK;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
-				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[0] |= DIR_UP;
-				break;
-			case IPT_JOYSTICK_DOWN:
-				ctrl_type = CTRL_DIGITAL_JOYSTICK;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
-				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[0] |= DIR_DOWN;
-				break;
-			case IPT_JOYSTICK_LEFT:
-				ctrl_type = CTRL_DIGITAL_JOYSTICK;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
-				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[0] |= DIR_LEFT;
-				break;
-			case IPT_JOYSTICK_RIGHT:
-				ctrl_type = CTRL_DIGITAL_JOYSTICK;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
-				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[0] |= DIR_RIGHT;
-				break;
-
-			case IPT_JOYSTICKLEFT_UP:
-				ctrl_type = CTRL_DIGITAL_JOYSTICK;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
-				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[1] |= DIR_UP;
-				break;
-			case IPT_JOYSTICKLEFT_DOWN:
-				ctrl_type = CTRL_DIGITAL_JOYSTICK;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
-				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[1] |= DIR_DOWN;
-				break;
-			case IPT_JOYSTICKLEFT_LEFT:
-				ctrl_type = CTRL_DIGITAL_JOYSTICK;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
-				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[1] |= DIR_LEFT;
-				break;
-			case IPT_JOYSTICKLEFT_RIGHT:
-				ctrl_type = CTRL_DIGITAL_JOYSTICK;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
-				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[1] |= DIR_RIGHT;
-				break;
-
-			case IPT_JOYSTICKRIGHT_UP:
-				ctrl_type = CTRL_DIGITAL_JOYSTICK;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
-				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[2] |= DIR_UP;
-				break;
-			case IPT_JOYSTICKRIGHT_DOWN:
-				ctrl_type = CTRL_DIGITAL_JOYSTICK;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
-				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[2] |= DIR_DOWN;
-				break;
-			case IPT_JOYSTICKRIGHT_LEFT:
-				ctrl_type = CTRL_DIGITAL_JOYSTICK;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
-				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[2] |= DIR_LEFT;
-				break;
-			case IPT_JOYSTICKRIGHT_RIGHT:
-				ctrl_type = CTRL_DIGITAL_JOYSTICK;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
-				control_info[field.player() * CTRL_COUNT + ctrl_type].helper[2] |= DIR_RIGHT;
-				break;
-
-			// map analog inputs
-			case IPT_AD_STICK_X:
-			case IPT_AD_STICK_Y:
-			case IPT_AD_STICK_Z:
-				ctrl_analog = true;
-				ctrl_type = CTRL_ANALOG_JOYSTICK;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "stick";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
-				break;
-
-			case IPT_PADDLE:
-			case IPT_PADDLE_V:
-				ctrl_analog = true;
-				ctrl_type = CTRL_ANALOG_PADDLE;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "paddle";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
-				break;
-
-			case IPT_PEDAL:
-			case IPT_PEDAL2:
-			case IPT_PEDAL3:
-				ctrl_analog = true;
-				ctrl_type = CTRL_ANALOG_PEDAL;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "pedal";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
-				break;
-
-			case IPT_LIGHTGUN_X:
-			case IPT_LIGHTGUN_Y:
-				ctrl_analog = true;
-				ctrl_type = CTRL_ANALOG_LIGHTGUN;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "lightgun";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
-				break;
-
-			case IPT_POSITIONAL:
-			case IPT_POSITIONAL_V:
-				ctrl_analog = true;
-				ctrl_type = CTRL_ANALOG_POSITIONAL;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "positional";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
-				break;
-
-			case IPT_DIAL:
-			case IPT_DIAL_V:
-				ctrl_analog = true;
-				ctrl_type = CTRL_ANALOG_DIAL;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "dial";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
-				break;
-
-			case IPT_TRACKBALL_X:
-			case IPT_TRACKBALL_Y:
-				ctrl_analog = true;
-				ctrl_type = CTRL_ANALOG_TRACKBALL;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "trackball";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
-				break;
-
-			case IPT_MOUSE_X:
-			case IPT_MOUSE_Y:
-				ctrl_analog = true;
-				ctrl_type = CTRL_ANALOG_MOUSE;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "mouse";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
-				break;
-
-			// map buttons
-			case IPT_BUTTON1:
-			case IPT_BUTTON2:
-			case IPT_BUTTON3:
-			case IPT_BUTTON4:
-			case IPT_BUTTON5:
-			case IPT_BUTTON6:
-			case IPT_BUTTON7:
-			case IPT_BUTTON8:
-			case IPT_BUTTON9:
-			case IPT_BUTTON10:
-			case IPT_BUTTON11:
-			case IPT_BUTTON12:
-			case IPT_BUTTON13:
-			case IPT_BUTTON14:
-			case IPT_BUTTON15:
-			case IPT_BUTTON16:
-				ctrl_analog = false;
-				if (control_info[field.player() * CTRL_COUNT + ctrl_type].type == nullptr)
+				// track the highest player number
+				if (nplayer < field.player() + 1)
+					nplayer = field.player() + 1;
+				
+				// switch off of the type
+				switch (field.type())
 				{
-					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "only_buttons";
+					// map joysticks
+				case IPT_JOYSTICK_UP:
+					ctrl_type = CTRL_DIGITAL_JOYSTICK;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].helper[0] |= DIR_UP;
+					
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_up = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_up = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_up = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_up = field.specific_name();
+					break;
+				case IPT_JOYSTICK_DOWN:
+					ctrl_type = CTRL_DIGITAL_JOYSTICK;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].helper[0] |= DIR_DOWN;
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_down = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_down = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_down = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_down = field.specific_name();
+					break;
+				case IPT_JOYSTICK_LEFT:
+					ctrl_type = CTRL_DIGITAL_JOYSTICK;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].helper[0] |= DIR_LEFT;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_left = port.second->tag();
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_left = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_left = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_left = field.specific_name();
+					break;
+				case IPT_JOYSTICK_RIGHT:
+					ctrl_type = CTRL_DIGITAL_JOYSTICK;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].helper[0] |= DIR_RIGHT;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_right = port.second->tag();
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_right = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_right = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_right = field.specific_name();
+					break;
+
+				case IPT_JOYSTICKLEFT_UP:
+					ctrl_type = CTRL_DIGITAL_JOYSTICK;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].helper[1] |= DIR_UP;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_up = port.second->tag();
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_up = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_up = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_up = field.specific_name();
+					break;
+
+				case IPT_JOYSTICKLEFT_DOWN:
+					ctrl_type = CTRL_DIGITAL_JOYSTICK;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].helper[1] |= DIR_DOWN;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_down = port.second->tag();
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_down = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_down = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_down = field.specific_name();
+					break;
+
+				case IPT_JOYSTICKLEFT_LEFT:
+					ctrl_type = CTRL_DIGITAL_JOYSTICK;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].helper[1] |= DIR_LEFT;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_left = port.second->tag();
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_left = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_left = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_left = field.specific_name();
+					break;
+
+				case IPT_JOYSTICKLEFT_RIGHT:
+					ctrl_type = CTRL_DIGITAL_JOYSTICK;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].helper[1] |= DIR_RIGHT;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_right = port.second->tag();
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_right = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_right = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_right = field.specific_name();
+					break;
+
+				case IPT_JOYSTICKRIGHT_UP:
+					ctrl_type = CTRL_DIGITAL_JOYSTICK;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].helper[2] |= DIR_UP;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_up = port.second->tag();
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_up = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_up = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_up = field.specific_name();
+					break;
+
+				case IPT_JOYSTICKRIGHT_DOWN:
+					ctrl_type = CTRL_DIGITAL_JOYSTICK;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].helper[2] |= DIR_DOWN;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_down = port.second->tag();
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_down = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_down = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_down = field.specific_name();
+					break;
+
+				case IPT_JOYSTICKRIGHT_LEFT:
+					ctrl_type = CTRL_DIGITAL_JOYSTICK;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].helper[2] |= DIR_LEFT;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_left = port.second->tag();
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_left = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_left = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_left = field.specific_name();
+					break;
+
+				case IPT_JOYSTICKRIGHT_RIGHT:
+					ctrl_type = CTRL_DIGITAL_JOYSTICK;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "joy";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].ways = field.way();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].helper[2] |= DIR_RIGHT;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag_right = port.second->tag();
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask_right = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_right = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name_right = field.specific_name();
+					break;
+
+					// map analog inputs
+				case IPT_AD_STICK_X:
+				case IPT_AD_STICK_Y:
+				case IPT_AD_STICK_Z:
+					ctrl_analog = true;
+					ctrl_type = CTRL_ANALOG_JOYSTICK;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "stick";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
+					
+					if (field.type() == IPT_AD_STICK_X) {
+						control_info[field.player() * CTRL_COUNT + ctrl_type].tag_x = port.second->tag();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_x = field.defvalue();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].mask_x = field.mask();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].name_x = field.specific_name();
+					}
+					else if (field.type() == IPT_AD_STICK_Y) {
+						control_info[field.player() * CTRL_COUNT + ctrl_type].tag_y = port.second->tag();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_y = field.defvalue();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].mask_y = field.mask();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].name_y = field.specific_name();
+					}
+					else {
+						control_info[field.player() * CTRL_COUNT + ctrl_type].tag_z = port.second->tag();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_z = field.defvalue();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].mask_z = field.mask();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].name_z = field.specific_name();
+					}
+					break;
+
+				case IPT_PADDLE:
+				case IPT_PADDLE_V:
+					ctrl_analog = true;
+					ctrl_type = CTRL_ANALOG_PADDLE;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "paddle";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name = field.specific_name();
+					break;
+
+				case IPT_PEDAL:
+				case IPT_PEDAL2:
+				case IPT_PEDAL3:
+					ctrl_analog = true;
+					ctrl_type = CTRL_ANALOG_PEDAL;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "pedal";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name = field.specific_name();
+					break;
+
+				case IPT_LIGHTGUN_X:
+				case IPT_LIGHTGUN_Y:
+					ctrl_analog = true;
+					ctrl_type = CTRL_ANALOG_LIGHTGUN;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "lightgun";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
+
+					if (field.type() == IPT_LIGHTGUN_X) {
+						control_info[field.player() * CTRL_COUNT + ctrl_type].tag_x = port.second->tag();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_x = field.defvalue();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].mask_x = field.mask();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].name_x = field.specific_name();
+					}
+					else {
+						control_info[field.player() * CTRL_COUNT + ctrl_type].tag_y = port.second->tag();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_y = field.defvalue();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].mask_y = field.mask();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].name_y = field.specific_name();
+					}
+					break;
+
+				case IPT_POSITIONAL:
+				case IPT_POSITIONAL_V:
+					ctrl_analog = true;
+					ctrl_type = CTRL_ANALOG_POSITIONAL;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "positional";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name = field.specific_name();
+					break;
+
+				case IPT_DIAL:
+				case IPT_DIAL_V:
+					ctrl_analog = true;
+					ctrl_type = CTRL_ANALOG_DIAL;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "dial";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name = field.specific_name();
+					break;
+
+				case IPT_TRACKBALL_X:
+				case IPT_TRACKBALL_Y:
+					ctrl_analog = true;
+					ctrl_type = CTRL_ANALOG_TRACKBALL;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "trackball";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
+
+					if (field.type() == IPT_TRACKBALL_X) {
+						control_info[field.player() * CTRL_COUNT + ctrl_type].tag_x = port.second->tag();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_x = field.defvalue();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].mask_x = field.mask();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].name_x = field.specific_name();
+					}
+					else {
+						control_info[field.player() * CTRL_COUNT + ctrl_type].tag_y = port.second->tag();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_y = field.defvalue();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].mask_y = field.mask();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].name_y = field.specific_name();
+					}
+					break;
+
+				case IPT_MOUSE_X:
+				case IPT_MOUSE_Y:
+					ctrl_analog = true;
+					ctrl_type = CTRL_ANALOG_MOUSE;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "mouse";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = true;
+
+					if (field.type() == IPT_MOUSE_X) {
+						control_info[field.player() * CTRL_COUNT + ctrl_type].tag_x = port.second->tag();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_x = field.defvalue();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].mask_x = field.mask();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].name_x = field.specific_name();
+					}
+					else {
+						control_info[field.player() * CTRL_COUNT + ctrl_type].tag_y = port.second->tag();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue_y = field.defvalue();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].mask_y = field.mask();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].name_y = field.specific_name();
+					}
+					break;
+
+					// map buttons
+				case IPT_BUTTON1:
+				case IPT_BUTTON2:
+				case IPT_BUTTON3:
+				case IPT_BUTTON4:
+				case IPT_BUTTON5:
+				case IPT_BUTTON6:
+				case IPT_BUTTON7:
+				case IPT_BUTTON8:
+				case IPT_BUTTON9:
+				case IPT_BUTTON10:
+				case IPT_BUTTON11:
+				case IPT_BUTTON12:
+				case IPT_BUTTON13:
+				case IPT_BUTTON14:
+				case IPT_BUTTON15:
+				case IPT_BUTTON16:
+					ctrl_analog = false;
+					if (control_info[field.player() * CTRL_COUNT + ctrl_type].type == nullptr)
+					{
+						control_info[field.player() * CTRL_COUNT + ctrl_type].type = "only_buttons";
+						control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+						control_info[field.player() * CTRL_COUNT + ctrl_type].analog = false;
+					}
+					control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons = std::max(control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons, field.type() - IPT_BUTTON1 + 1);
+					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
+					
+					if (!field.optional())
+						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
+					
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_tags[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_names[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.specific_name();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_masks[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_defvalues[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_requires[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = !field.optional();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_indexes[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.type() - IPT_BUTTON1 + 1;
+					
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_index++;
+					break;
+
+					// track maximum coin index
+				case IPT_COIN1:
+				case IPT_COIN2:
+				case IPT_COIN3:
+				case IPT_COIN4:
+				case IPT_COIN5:
+				case IPT_COIN6:
+				case IPT_COIN7:
+				case IPT_COIN8:
+				case IPT_COIN9:
+				case IPT_COIN10:
+				case IPT_COIN11:
+				case IPT_COIN12:
+					ncoin = std::max(ncoin, field.type() - IPT_COIN1 + 1);
+
+					ctrl_type = CTRL_DIGITAL_COIN;
+					control_info[(field.type() - IPT_COIN1 + 1) * CTRL_COUNT + ctrl_type].type = "coin";
+					control_info[(field.type() - IPT_COIN1 + 1) * CTRL_COUNT + ctrl_type].player = (field.type() - IPT_COIN1 + 1);
+					control_info[(field.type() - IPT_COIN1 + 1) * CTRL_COUNT + ctrl_type].analog = false;
+					control_info[(field.type() - IPT_COIN1 + 1) * CTRL_COUNT + ctrl_type].tag = port.second->tag();
+					control_info[(field.type() - IPT_COIN1 + 1) * CTRL_COUNT + ctrl_type].mask = field.mask();
+					control_info[(field.type() - IPT_COIN1 + 1) * CTRL_COUNT + ctrl_type].defvalue = field.defvalue();
+					control_info[(field.type() - IPT_COIN1 + 1) * CTRL_COUNT + ctrl_type].name = field.specific_name();
+					break;
+
+					// track presence of keypads and keyboards
+				case IPT_KEYPAD:
+					ctrl_type = CTRL_DIGITAL_KEYPAD;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "keypad";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
+					if (!field.optional())
+						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_tags[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_names[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.specific_name();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_masks[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_defvalues[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_requires[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = !field.optional();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_index++;
+					break;
+
+				case IPT_KEYBOARD:
+					ctrl_type = CTRL_DIGITAL_KEYBOARD;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "keyboard";
+					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
+					if (!field.optional())
+						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
+
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_tags[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_names[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.specific_name();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_masks[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_defvalues[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_requires[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = !field.optional();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].button_index++;
+					break;
+
+					// additional types
+				case IPT_SERVICE:
+					service = true;
+
+					ctrl_type = CTRL_DIGITAL_SERVICE;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "service";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].analog = false;
+					control_info[field.player() * CTRL_COUNT + ctrl_type].tag = port.second->tag();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].mask = field.mask();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].defvalue = field.defvalue();
+					control_info[field.player() * CTRL_COUNT + ctrl_type].name = field.specific_name();
+					break;
+
+				case IPT_TILT:
+					tilt = true;
+					break;
+
+				default:
+					if (field.type() > IPT_MAHJONG_FIRST && field.type() < IPT_MAHJONG_LAST)
+					{
+						ctrl_type = CTRL_DIGITAL_MAHJONG;
+						control_info[field.player() * CTRL_COUNT + ctrl_type].type = "mahjong";
+						control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+						control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
+						if (!field.optional())
+							control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
+
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_tags[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = port.second->tag();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_names[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.specific_name();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_masks[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.mask();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_defvalues[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.defvalue();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_requires[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = !field.optional();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_index++;
+
+					}
+					else if (field.type() > IPT_HANAFUDA_FIRST && field.type() < IPT_HANAFUDA_LAST)
+					{
+						ctrl_type = CTRL_DIGITAL_HANAFUDA;
+						control_info[field.player() * CTRL_COUNT + ctrl_type].type = "hanafuda";
+						control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+						control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
+						if (!field.optional())
+							control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
+
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_tags[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = port.second->tag();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_names[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.specific_name();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_masks[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.mask();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_defvalues[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.defvalue();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_requires[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = !field.optional();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_index++;
+
+					}
+					else if (field.type() > IPT_GAMBLING_FIRST && field.type() < IPT_GAMBLING_LAST)
+					{
+						ctrl_type = CTRL_DIGITAL_GAMBLING;
+						control_info[field.player() * CTRL_COUNT + ctrl_type].type = "gambling";
+						control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
+						control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
+						if (!field.optional())
+							control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
+
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_tags[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = port.second->tag();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_names[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.specific_name();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_masks[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.mask();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_defvalues[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = field.defvalue();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_requires[control_info[field.player() * CTRL_COUNT + ctrl_type].button_index] = !field.optional();
+						control_info[field.player() * CTRL_COUNT + ctrl_type].button_index++;
+					}
+					break;
 				}
-				control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons = std::max(control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons, field.type() - IPT_BUTTON1 + 1);
-				control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-				if (!field.optional())
-					control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
-				break;
 
-			// track maximum coin index
-			case IPT_COIN1:
-			case IPT_COIN2:
-			case IPT_COIN3:
-			case IPT_COIN4:
-			case IPT_COIN5:
-			case IPT_COIN6:
-			case IPT_COIN7:
-			case IPT_COIN8:
-			case IPT_COIN9:
-			case IPT_COIN10:
-			case IPT_COIN11:
-			case IPT_COIN12:
-				ncoin = std::max(ncoin, field.type() - IPT_COIN1 + 1);
-				break;
-
-			// track presence of keypads and keyboards
-			case IPT_KEYPAD:
-				ctrl_type = CTRL_DIGITAL_KEYPAD;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "keypad";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-				if (!field.optional())
-					control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
-				break;
-
-			case IPT_KEYBOARD:
-				ctrl_type = CTRL_DIGITAL_KEYBOARD;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "keyboard";
-				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-				control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-				if (!field.optional())
-					control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
-				break;
-
-			// additional types
-			case IPT_SERVICE:
-				service = true;
-				break;
-
-			case IPT_TILT:
-				tilt = true;
-				break;
-
-			default:
-				if (field.type() > IPT_MAHJONG_FIRST && field.type() < IPT_MAHJONG_LAST)
+				if (ctrl_analog)
 				{
-					ctrl_type = CTRL_DIGITAL_MAHJONG;
-					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "mahjong";
-					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-					if (!field.optional())
-						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
+					// get the analog stats
+					if (field.minval() != 0)
+						control_info[field.player() * CTRL_COUNT + ctrl_type].min = field.minval();
+					if (field.maxval() != 0)
+						control_info[field.player() * CTRL_COUNT + ctrl_type].max = field.maxval();
+					if (field.sensitivity() != 0)
+						control_info[field.player() * CTRL_COUNT + ctrl_type].sensitivity = field.sensitivity();
+					if (field.delta() != 0)
+						control_info[field.player() * CTRL_COUNT + ctrl_type].keydelta = field.delta();
+					if (field.analog_reverse() != 0)
+						control_info[field.player() * CTRL_COUNT + ctrl_type].reverse = true;
 				}
-				else if (field.type() > IPT_HANAFUDA_FIRST && field.type() < IPT_HANAFUDA_LAST)
-				{
-					ctrl_type = CTRL_DIGITAL_HANAFUDA;
-					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "hanafuda";
-					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-					if (!field.optional())
-						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
-				}
-				else if (field.type() > IPT_GAMBLING_FIRST && field.type() < IPT_GAMBLING_LAST)
-				{
-					ctrl_type = CTRL_DIGITAL_GAMBLING;
-					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "gambling";
-					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
-					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-					if (!field.optional())
-						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
-				}
-				break;
-			}
 
-			if (ctrl_analog)
-			{
-				// get the analog stats
-				if (field.minval() != 0)
-					control_info[field.player() * CTRL_COUNT + ctrl_type].min = field.minval();
-				if (field.maxval() != 0)
-					control_info[field.player() * CTRL_COUNT + ctrl_type].max = field.maxval();
-				if (field.sensitivity() != 0)
-					control_info[field.player() * CTRL_COUNT + ctrl_type].sensitivity = field.sensitivity();
-				if (field.delta() != 0)
-					control_info[field.player() * CTRL_COUNT + ctrl_type].keydelta = field.delta();
-				if (field.analog_reverse() != 0)
-					control_info[field.player() * CTRL_COUNT + ctrl_type].reverse = true;
+				if (ctrl_type == CTRL_DIGITAL_COIN || ctrl_type == CTRL_DIGITAL_SERVICE)
+					ctrl_type = last_ctrl_type;
+				else
+					last_ctrl_type = ctrl_type;
+
 			}
 		}
-	}
 
-	// Clean-up those entries, if any, where buttons were defined in a separate port than the actual controller they belong to.
-	// This is quite often the case, especially for arcades where controls can be easily mapped to separate input ports on PCB.
-	// If such situation would only happen for joystick, it would be possible to work it around by initializing differently
-	// ctrl_type above, but it is quite common among analog inputs as well (for instance, this is the tipical situation
-	// for lightguns) and therefore we really need this separate loop.
-	for (int i = 0; i < CTRL_PCOUNT; i++)
-	{
-		bool fix_done = false;
-		for (int j = 1; j < CTRL_COUNT; j++)
-			if (control_info[i * CTRL_COUNT].type != nullptr && control_info[i * CTRL_COUNT + j].type != nullptr && !fix_done)
-			{
-				control_info[i * CTRL_COUNT + j].nbuttons += control_info[i * CTRL_COUNT].nbuttons;
-				control_info[i * CTRL_COUNT + j].reqbuttons += control_info[i * CTRL_COUNT].reqbuttons;
-				control_info[i * CTRL_COUNT + j].maxbuttons = std::max(control_info[i * CTRL_COUNT + j].maxbuttons, control_info[i * CTRL_COUNT].maxbuttons);
 
-				memset(&control_info[i * CTRL_COUNT], 0, sizeof(control_info[0]));
-				fix_done = true;
-			}
-	}
 
-	// Output the input info
-	// First basic info
-	out << "\t\t<input";
-	out << util::string_format(" players=\"%d\"", nplayer);
-	if (ncoin != 0)
-		out << util::string_format(" coins=\"%d\"", ncoin);
-	if (service)
-		out << util::string_format(" service=\"yes\"");
-	if (tilt)
-		out << util::string_format(" tilt=\"yes\"");
-	out << ">\n";
-
-	// Then controller specific ones
-	for (auto & elem : control_info)
-		if (elem.type != nullptr)
+		// Clean-up those entries, if any, where buttons were defined in a separate port than the actual controller they belong to.
+		// This is quite often the case, especially for arcades where controls can be easily mapped to separate input ports on PCB.
+		// If such situation would only happen for joystick, it would be possible to work around it by initializing differently the
+		// ctrl_type above, but it is quite common among analog inputs as well (for instance, this is the typical situation
+		// for lightguns) and therefore we really need this separate loop.
+		for (int i = 0; i < CTRL_PCOUNT; i++)
 		{
-			//printf("type %s - player %d - buttons %d\n", elem.type, elem.player, elem.nbuttons);
-			if (elem.analog)
-			{
-				out << util::string_format("\t\t\t<control type=\"%s\"", normalize_string(elem.type));
-				if (nplayer > 1)
-					out << util::string_format(" player=\"%d\"", elem.player);
-				if (elem.nbuttons > 0)
+			bool fix_done = false;
+			for (int j = 1; j < CTRL_COUNT; j++)
+				if (control_info[i * CTRL_COUNT].type != nullptr && control_info[i * CTRL_COUNT + j].type != nullptr && !fix_done)
 				{
-					out << util::string_format(" buttons=\"%d\"", strcmp(elem.type, "stick") ? elem.nbuttons : elem.maxbuttons);
-					if (elem.reqbuttons < elem.nbuttons)
-						out << util::string_format(" reqbuttons=\"%d\"", elem.reqbuttons);
-				}
-				if (elem.min != 0 || elem.max != 0)
-					out << util::string_format(" minimum=\"%d\" maximum=\"%d\"", elem.min, elem.max);
-				if (elem.sensitivity != 0)
-					out << util::string_format(" sensitivity=\"%d\"", elem.sensitivity);
-				if (elem.keydelta != 0)
-					out << util::string_format(" keydelta=\"%d\"", elem.keydelta);
-				if (elem.reverse)
-					out << " reverse=\"yes\"";
+					control_info[i * CTRL_COUNT + j].nbuttons += control_info[i * CTRL_COUNT].nbuttons;
+					control_info[i * CTRL_COUNT + j].reqbuttons += control_info[i * CTRL_COUNT].reqbuttons;
+					control_info[i * CTRL_COUNT + j].maxbuttons = std::max(control_info[i * CTRL_COUNT + j].maxbuttons, control_info[i * CTRL_COUNT].maxbuttons);
 
-				out << "/>\n";
-			}
-			else
-			{
-				if (elem.helper[1] == 0 && elem.helper[2] != 0) { elem.helper[1] = elem.helper[2]; elem.helper[2] = 0; }
-				if (elem.helper[0] == 0 && elem.helper[1] != 0) { elem.helper[0] = elem.helper[1]; elem.helper[1] = 0; }
-				if (elem.helper[1] == 0 && elem.helper[2] != 0) { elem.helper[1] = elem.helper[2]; elem.helper[2] = 0; }
-				const char *joys = (elem.helper[2] != 0) ? "triple" : (elem.helper[1] != 0) ? "double" : "";
-				out << util::string_format("\t\t\t<control type=\"%s%s\"", joys, normalize_string(elem.type));
-				if (nplayer > 1)
-					out << util::string_format(" player=\"%d\"", elem.player);
-				if (elem.nbuttons > 0)
-				{
-					out << util::string_format(" buttons=\"%d\"", strcmp(elem.type, "joy") ? elem.nbuttons : elem.maxbuttons);
-					if (elem.reqbuttons < elem.nbuttons)
-						out << util::string_format(" reqbuttons=\"%d\"", elem.reqbuttons);
-				}
-				for (int lp = 0; lp < 3 && elem.helper[lp] != 0; lp++)
-				{
-					const char *plural = (lp==2) ? "3" : (lp==1) ? "2" : "";
-					const char *ways;
-					std::string helper;
-					switch (elem.helper[lp] & (DIR_UP | DIR_DOWN | DIR_LEFT | DIR_RIGHT))
+					for (size_t k = 0; k < control_info[i * CTRL_COUNT].button_index; k++)
 					{
+						size_t inc = k + control_info[i * CTRL_COUNT + j].button_index;
+
+						control_info[i * CTRL_COUNT + j].button_masks[inc] = control_info[i * CTRL_COUNT].button_masks[k];
+						control_info[i * CTRL_COUNT + j].button_defvalues[inc] = control_info[i * CTRL_COUNT].button_defvalues[k];
+						control_info[i * CTRL_COUNT + j].button_names[inc] = control_info[i * CTRL_COUNT].button_names[k];
+						control_info[i * CTRL_COUNT + j].button_tags[inc] = control_info[i * CTRL_COUNT].button_tags[k];
+						control_info[i * CTRL_COUNT + j].button_requires[inc] = control_info[i * CTRL_COUNT].button_requires[k];
+						control_info[i * CTRL_COUNT + j].button_indexes[inc] = control_info[i * CTRL_COUNT].button_indexes[k];
+					}
+					control_info[i * CTRL_COUNT + j].button_index += control_info[i * CTRL_COUNT].button_index;
+		
+					memset(&control_info[i * CTRL_COUNT], 0, sizeof(control_info[0]));
+					fix_done = true;
+				}
+		}
+
+		// Output the input info
+		// First basic info
+		out << "\t\t<input";
+		out << util::string_format(" players=\"%d\"", nplayer);
+		if (ncoin != 0)
+			out << util::string_format(" coins=\"%d\"", ncoin);
+		if (service)
+			out << util::string_format(" service=\"yes\"");
+		if (tilt)
+			out << util::string_format(" tilt=\"yes\"");
+
+
+		out << ">\n";
+
+		// Then controller specific ones
+		for (auto& elem : control_info)
+
+			if (elem.type != nullptr)
+			{
+
+				if (elem.analog)
+				{
+					out << util::string_format("\t\t\t<control type=\"%s\"", normalize_string(elem.type));
+
+					if (nplayer > 1 && normalize_string(elem.type).compare("service") != 0)
+						out << util::string_format(" player=\"%d\"", elem.player);
+					if (elem.nbuttons > 0)
+					{
+						out << util::string_format(" buttons=\"%d\"", strcmp(elem.type, "stick") ? elem.nbuttons : elem.maxbuttons);
+						if (elem.reqbuttons < elem.nbuttons)
+							out << util::string_format(" reqbuttons=\"%d\"", elem.reqbuttons);
+					}
+					
+					bool manytags = false;
+
+					if (elem.tag_x != nullptr) {
+						std::string newtag(elem.tag_x), oldtag(":");
+						newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+						out << util::string_format(" tag_x=\"%s\"", newtag);
+						manytags = true;
+					}
+					if (elem.tag_y != nullptr) {
+						std::string newtag(elem.tag_y), oldtag(":");
+						newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+						out << util::string_format(" tag_y=\"%s\"", newtag);
+						manytags = true;
+					}
+					if (elem.tag_z != nullptr) {
+						std::string newtag(elem.tag_z), oldtag(":");
+						newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+						out << util::string_format(" tag_z=\"%s\"", newtag);
+						manytags = true;
+					}
+					if (elem.tag_up != nullptr) {
+						std::string newtag(elem.tag_up), oldtag(":");
+						newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+						out << util::string_format(" tag_up=\"%s\"", newtag);
+						manytags = true;
+					}
+					if (elem.tag_down != nullptr) {
+						std::string newtag(elem.tag_down), oldtag(":");
+						newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+						out << util::string_format(" tag_down=\"%s\"", newtag);
+						manytags = true;
+					}
+					if (elem.tag_left != nullptr) {
+						std::string newtag(elem.tag_left), oldtag(":");
+						newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+						out << util::string_format(" tag_left=\"%s\"", newtag);
+						manytags = true;
+					}
+					if (elem.tag_right != nullptr) {
+						std::string newtag(elem.tag_right), oldtag(":");
+						newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+						out << util::string_format(" tag_right=\"%s\"", newtag);
+						manytags = true;
+					}
+					if (!manytags) {
+						if (elem.tag != nullptr) {
+
+							std::string newtag(elem.tag), oldtag(":");
+							newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+							out << util::string_format(" tag=\"%s\"", newtag);
+						}
+					}
+					// Useful for debug:
+					//if (!manytags && elem.tag == nullptr && elem.tag_button == nullptr) {
+					//	out << util::string_format(" tag=\"TAG_NOT_FOUND\"");
+					//}
+
+					bool manynames = false;
+
+					if (elem.name_up != nullptr) {
+						out << util::string_format(" name_up=\"%s\"", normalize_string(elem.name_up));
+						manynames = true;
+					}
+					if (elem.name_down != nullptr) {
+						out << util::string_format(" name_down=\"%s\"", normalize_string(elem.name_down));
+						manynames = true;
+					}
+					if (elem.name_left != nullptr) {
+						out << util::string_format(" name_left=\"%s\"", normalize_string(elem.name_left));
+						manynames = true;
+					}
+					if (elem.name_x != nullptr) {
+						out << util::string_format(" name_x=\"%s\"", normalize_string(elem.name_x));
+						manynames = true;
+					}
+					if (elem.name_y != nullptr) {
+						out << util::string_format(" name_y=\"%s\"", normalize_string(elem.name_y));
+						manynames = true;
+					}
+					if (elem.name_z != nullptr) {
+						out << util::string_format(" name_z=\"%s\"", normalize_string(elem.name_z));
+						manynames = true;
+					}
+					if (!manynames && elem.name != nullptr)
+						out << util::string_format(" name=\"%s\"", normalize_string(elem.name));
+
+
+					bool manymasks = false;
+
+					if (elem.mask_up > 0) {
+						out << util::string_format(" mask_up=\"%d\"", elem.mask_up);
+						out << util::string_format(" value_up=\"%d\"", elem.defvalue_up);
+						manymasks = true;
+					}
+					if (elem.mask_left > 0) {
+						out << util::string_format(" mask_left=\"%d\"", elem.mask_left);
+						out << util::string_format(" value_left=\"%d\"", elem.defvalue_left);
+						manymasks = true;
+					}
+					if (elem.mask_right > 0) {
+						out << util::string_format(" mask_right=\"%d\"", elem.mask_right);
+						out << util::string_format(" value_right=\"%d\"", elem.defvalue_right);
+						manymasks = true;
+					}
+					if (elem.mask_down > 0) {
+						out << util::string_format(" mask_down=\"%d\"", elem.mask_down);
+						out << util::string_format(" value_down=\"%d\"", elem.defvalue_down);
+						manymasks = true;
+					}
+					if (elem.mask_x > 0) {
+						out << util::string_format(" mask_x=\"%d\"", elem.mask_x);
+						out << util::string_format(" value_x=\"%d\"", elem.defvalue_x);
+						manymasks = true;
+					}
+					if (elem.mask_y > 0) {
+						out << util::string_format(" mask_y=\"%d\"", elem.mask_y);
+						out << util::string_format(" value_y=\"%d\"", elem.defvalue_y);
+						manymasks = true;
+					}
+					if (elem.mask_z > 0) {
+						out << util::string_format(" mask_z=\"%d\"", elem.mask_z);
+						out << util::string_format(" value_z=\"%d\"", elem.defvalue_z);
+						manymasks = true;
+					}
+					if (!manymasks && elem.mask != 0) {
+						out << util::string_format(" mask=\"%d\"", elem.mask);
+						out << util::string_format(" value=\"%d\"", elem.defvalue);
+					}
+
+					if (elem.min != 0 || elem.max != 0)
+						out << util::string_format(" minimum=\"%d\" maximum=\"%d\"", elem.min, elem.max);
+					if (elem.sensitivity != 0)
+						out << util::string_format(" sensitivity=\"%d\"", elem.sensitivity);
+					if (elem.keydelta != 0)
+						out << util::string_format(" keydelta=\"%d\"", elem.keydelta);
+					if (elem.reverse)
+						out << " reverse=\"yes\"";
+
+					if (elem.button_index == 0) {
+						out << "/>\n";
+					}
+					else {
+						out << ">\n";
+						
+						for (size_t i = 0; i < elem.button_index; i++)
+						{
+							out << "\t\t\t\t<button";
+
+							if (elem.button_indexes[i] != 0)
+								out << util::string_format(" number=\"%d\"", elem.button_indexes[i]);
+
+							if (elem.button_names[i] != nullptr)
+								out << util::string_format(" name=\"%d\"", elem.button_names[i]);
+
+							if (!elem.button_requires[i]) {
+								out << util::string_format(" optional=\"%d\"", "yes");
+							}
+
+							if (elem.button_tags[i] == nullptr) {
+								out << util::string_format(" tag=\"%d\"", "TAG_NOT_FOUND");
+							}
+							else {
+								std::string newtag(elem.button_tags[i]), oldtag(":");
+								newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+								out << util::string_format(" tag=\"%d\"", newtag);
+							}
+
+							out << util::string_format(" mask=\"%d\"", elem.button_masks[i]);
+							out << util::string_format(" value=\"%d\"", elem.button_defvalues[i]);
+							out << "/>\n";
+						}
+						
+						out << "\t\t\t</control>\n";
+					}
+					
+				}
+				else
+				{
+					if (elem.helper[1] == 0 && elem.helper[2] != 0) { elem.helper[1] = elem.helper[2]; elem.helper[2] = 0; }
+					if (elem.helper[0] == 0 && elem.helper[1] != 0) { elem.helper[0] = elem.helper[1]; elem.helper[1] = 0; }
+					if (elem.helper[1] == 0 && elem.helper[2] != 0) { elem.helper[1] = elem.helper[2]; elem.helper[2] = 0; }
+					const char* joys = (elem.helper[2] != 0) ? "triple" : (elem.helper[1] != 0) ? "double" : "";
+					out << util::string_format("\t\t\t<control type=\"%s%s\"", joys, normalize_string(elem.type));
+
+
+					if (nplayer > 1 && normalize_string(elem.type).compare("service") != 0)
+						out << util::string_format(" player=\"%d\"", elem.player);
+					if (elem.nbuttons > 0)
+					{
+						out << util::string_format(" buttons=\"%d\"", strcmp(elem.type, "joy") ? elem.nbuttons : elem.maxbuttons);
+						if (elem.reqbuttons < elem.nbuttons)
+							out << util::string_format(" reqbuttons=\"%d\"", elem.reqbuttons);
+					}
+					for (int lp = 0; lp < 3 && elem.helper[lp] != 0; lp++)
+					{
+						const char* plural = (lp == 2) ? "3" : (lp == 1) ? "2" : "";
+						const char* ways;
+						std::string helper;
+						switch (elem.helper[lp] & (DIR_UP | DIR_DOWN | DIR_LEFT | DIR_RIGHT))
+						{
 						case DIR_UP | DIR_DOWN | DIR_LEFT | DIR_RIGHT:
 							helper = string_format("%d", (elem.ways == 0) ? 8 : elem.ways);
 							ways = helper.c_str();
@@ -1616,418 +2071,591 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 						default:
 							ways = "strange2";
 							break;
+						}
+						out << util::string_format(" ways%s=\"%s\"", plural, ways);
 					}
-					out << util::string_format(" ways%s=\"%s\"", plural, ways);
-				}
-				out << "/>\n";
-			}
-		}
+					
+					
+					bool manytags = false;
 
-	out << "\t\t</input>\n";
-}
+					if (elem.tag_x != nullptr) {
+						std::string newtag(elem.tag_x), oldtag(":");
+						newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+						out << util::string_format(" tag_x=\"%s\"", newtag);
+						manytags = true;
+					}
+					if (elem.tag_y != nullptr) {
+						std::string newtag(elem.tag_y), oldtag(":");
+						newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+						out << util::string_format(" tag_y=\"%s\"", newtag);
+						manytags = true;
+					}
+					if (elem.tag_z != nullptr) {
+						std::string newtag(elem.tag_z), oldtag(":");
+						newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+						out << util::string_format(" tag_z=\"%s\"", newtag);
+						manytags = true;
+					}
+					if (elem.tag_up != nullptr) {
+						std::string newtag(elem.tag_up), oldtag(":");
+						newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+						out << util::string_format(" tag_up=\"%s\"", newtag);
+						manytags = true;
+					}
+					if (elem.tag_down != nullptr) {
+						std::string newtag(elem.tag_down), oldtag(":");
+						newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+						out << util::string_format(" tag_down=\"%s\"", newtag);
+						manytags = true;
+					}
+					if (elem.tag_left != nullptr) {
+						std::string newtag(elem.tag_left), oldtag(":");
+						newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+						out << util::string_format(" tag_left=\"%s\"", newtag);
+						manytags = true;
+					}
+					if (elem.tag_right != nullptr) {
+						std::string newtag(elem.tag_right), oldtag(":");
+						newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+						out << util::string_format(" tag_right=\"%s\"", newtag);
+						manytags = true;
+					}
+					if (!manytags) {
+						if (elem.tag != nullptr) {
+
+							std::string newtag(elem.tag), oldtag(":");
+							newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+							out << util::string_format(" tag=\"%s\"", newtag);
+						}
+					}
+					// Useful for debug:
+					//if (!manytags && elem.mask != 0) {
+					//	out << util::string_format(" tag=\"TAG_NOT_FOUND\"");
+					//}
+
+					bool manynames = false;
+
+					if (elem.name_up != nullptr) {
+						out << util::string_format(" name_up=\"%s\"", normalize_string(elem.name_up));
+						manynames = true;
+					}
+					if (elem.name_down != nullptr) {
+						out << util::string_format(" name_down=\"%s\"", normalize_string(elem.name_down));
+						manynames = true;
+					}
+					if (elem.name_left != nullptr) {
+						out << util::string_format(" name_left=\"%s\"", normalize_string(elem.name_left));
+						manynames = true;
+					}
+					if (elem.name_x != nullptr) {
+						out << util::string_format(" name_x=\"%s\"", normalize_string(elem.name_x));
+						manynames = true;
+					}
+					if (elem.name_y != nullptr) {
+						out << util::string_format(" name_y=\"%s\"", normalize_string(elem.name_y));
+						manynames = true;
+					}
+					if (elem.name_z != nullptr) {
+						out << util::string_format(" name_z=\"%s\"", normalize_string(elem.name_z));
+						manynames = true;
+					}
+					if (!manynames && elem.name != nullptr)
+						out << util::string_format(" name=\"%s\"", normalize_string(elem.name));
 
 
-//-------------------------------------------------
-//  output_switches - print the configurations or
-//  DIP switch settings
-//-------------------------------------------------
+					bool manymasks = false;
 
-void output_switches(std::ostream &out, const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *loctag, const char *innertag)
-{
-	// iterate looking for DIP switches
-	for (auto &port : portlist)
-		for (ioport_field const &field : port.second->fields())
-			if (field.type() == type)
-			{
-				std::string newtag(port.second->tag()), oldtag(":");
-				newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
-
-				// output the switch name information
-				std::string const normalized_field_name(normalize_string(field.name()));
-				std::string const normalized_newtag(normalize_string(newtag.c_str()));
-				out << util::string_format("\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.c_str(), normalized_newtag.c_str(), field.mask());
-				if (!field.condition().none())
-					output_ioport_condition(out, field.condition(), 3);
-
-				// loop over locations
-				for (ioport_diplocation const &diploc : field.diplocations())
-				{
-					out << util::string_format("\t\t\t<%s name=\"%s\" number=\"%u\"", loctag, normalize_string(diploc.name()), diploc.number());
-					if (diploc.inverted())
-						out << " inverted=\"yes\"";
-					out << "/>\n";
-				}
-
-				// loop over settings
-				for (ioport_setting const &setting : field.settings())
-				{
-					out << util::string_format("\t\t\t<%s name=\"%s\" value=\"%u\"", innertag, normalize_string(setting.name()), setting.value());
-					if (setting.value() == field.defvalue())
-						out << " default=\"yes\"";
-					if (setting.condition().none())
-					{
+					if (elem.mask_up > 0) {
+						out << util::string_format(" mask_up=\"%d\"", elem.mask_up);
+						out << util::string_format(" value_up=\"%d\"", elem.defvalue_up);
+						manymasks = true;
+					}
+					if (elem.mask_left > 0) {
+						out << util::string_format(" mask_left=\"%d\"", elem.mask_left);
+						out << util::string_format(" value_left=\"%d\"", elem.defvalue_left);
+						manymasks = true;
+					}
+					if (elem.mask_right > 0) {
+						out << util::string_format(" mask_right=\"%d\"", elem.mask_right);
+						out << util::string_format(" value_right=\"%d\"", elem.defvalue_right);
+						manymasks = true;
+					}
+					if (elem.mask_down > 0) {
+						out << util::string_format(" mask_down=\"%d\"", elem.mask_down);
+						out << util::string_format(" value_down=\"%d\"", elem.defvalue_down);
+						manymasks = true;
+					}
+					if (elem.mask_x > 0) {
+						out << util::string_format(" mask_x=\"%d\"", elem.mask_x);
+						out << util::string_format(" value_x=\"%d\"", elem.defvalue_x);
+						manymasks = true;
+					}
+					if (elem.mask_y > 0) {
+						out << util::string_format(" mask_y=\"%d\"", elem.mask_y);
+						out << util::string_format(" value_y=\"%d\"", elem.defvalue_y);
+						manymasks = true;
+					}
+					if (elem.mask_z > 0) {
+						out << util::string_format(" mask_z=\"%d\"", elem.mask_z);
+						out << util::string_format(" value_z=\"%d\"", elem.defvalue_z);
+						manymasks = true;
+					}
+					if (!manymasks && elem.mask != 0) {
+						out << util::string_format(" mask=\"%d\"", elem.mask);
+						out << util::string_format(" value=\"%d\"", elem.defvalue);
+					}
+					
+					if (elem.button_index == 0) {
 						out << "/>\n";
 					}
-					else
-					{
+					else {
 						out << ">\n";
-						output_ioport_condition(out, setting.condition(), 4);
-						out << util::string_format("\t\t\t</%s>\n", innertag);
+						
+						for (size_t i = 0; i < elem.button_index; i++)
+						{
+							out << "\t\t\t\t<button";
+
+							if (elem.button_indexes[i] != 0)
+								out << util::string_format(" number=\"%d\"", elem.button_indexes[i]);
+
+							if (elem.button_names[i] != nullptr)
+								out << util::string_format(" name=\"%d\"", elem.button_names[i]);
+
+							if (!elem.button_requires[i]) {
+								out << util::string_format(" optional=\"%d\"", "yes");
+							}
+
+							if (elem.button_tags[i] == nullptr) {
+								out << util::string_format(" tag=\"%d\"", "TAG_NOT_FOUND");
+							}
+							else {
+								std::string newtag(elem.button_tags[i]), oldtag(":");
+								newtag = newtag.substr(newtag.find(oldtag) + oldtag.length());
+								out << util::string_format(" tag=\"%d\"", newtag);
+							}
+
+							out << util::string_format(" mask=\"%d\"", elem.button_masks[i]);
+							out << util::string_format(" value=\"%d\"", elem.button_defvalues[i]);
+							out << "/>\n";
+						}
+
+						out << "\t\t\t</control>\n";
 					}
 				}
-
-				// terminate the switch entry
-				out << util::string_format("\t\t</%s>\n", outertag);
 			}
-}
 
-//-------------------------------------------------
-//  output_ports - print the structure of input
-//  ports in the driver
-//-------------------------------------------------
-void output_ports(std::ostream &out, const ioport_list &portlist)
-{
-	// cycle through ports
-	for (auto &port : portlist)
-	{
-		out << util::string_format("\t\t<port tag=\"%s\">\n", normalize_string(port.second->tag()));
-		for (ioport_field const &field : port.second->fields())
-		{
-			if (field.is_analog())
-				out << util::string_format("\t\t\t<analog mask=\"%u\"/>\n", field.mask());
-		}
-		out << util::string_format("\t\t</port>\n");
+		out << "\t\t</input>\n";
 	}
 
-}
 
-//-------------------------------------------------
-//  output_adjusters - print the Analog
-//  Adjusters for a game
-//-------------------------------------------------
+	//-------------------------------------------------
+	//  output_switches - print the configurations or
+	//  DIP switch settings
+	//-------------------------------------------------
 
-void output_adjusters(std::ostream &out, const ioport_list &portlist)
-{
-	// iterate looking for Adjusters
-	for (auto &port : portlist)
-		for (ioport_field const &field : port.second->fields())
-			if (field.type() == IPT_ADJUSTER)
-			{
-				out << util::string_format("\t\t<adjuster name=\"%s\" default=\"%d\"/>\n", normalize_string(field.name()), field.defvalue());
-			}
-}
-
-
-//-------------------------------------------------
-//  output_driver - print driver status
-//-------------------------------------------------
-
-void output_driver(std::ostream &out, game_driver const &driver, device_t::feature_type unemulated, device_t::feature_type imperfect)
-{
-	out << "\t\t<driver";
-
-	/*
-	The status entry is an hint for frontend authors to select working
-	and not working games without the need to know all the other status
-	entries.  Games marked as status=good are perfectly emulated, games
-	marked as status=imperfect are emulated with only some minor issues,
-	games marked as status=preliminary don't work or have major
-	emulation problems.
-	*/
-
-	u32 const flags = driver.flags;
-	bool const machine_preliminary(flags & (machine_flags::NOT_WORKING | machine_flags::MECHANICAL));
-	bool const unemulated_preliminary(unemulated & (device_t::feature::PALETTE | device_t::feature::GRAPHICS | device_t::feature::SOUND | device_t::feature::KEYBOARD));
-	bool const imperfect_preliminary((unemulated | imperfect) & device_t::feature::PROTECTION);
-
-	if (machine_preliminary || unemulated_preliminary || imperfect_preliminary)
-		out << " status=\"preliminary\"";
-	else if (imperfect)
-		out << " status=\"imperfect\"";
-	else
-		out << " status=\"good\"";
-
-	if (flags & machine_flags::NOT_WORKING)
-		out << " emulation=\"preliminary\"";
-	else
-		out << " emulation=\"good\"";
-
-	if (flags & machine_flags::NO_COCKTAIL)
-		out << " cocktail=\"preliminary\"";
-
-	if (flags & machine_flags::SUPPORTS_SAVE)
-		out << " savestate=\"supported\"";
-	else
-		out << " savestate=\"unsupported\"";
-
-	out << "/>\n";
-}
-
-
-//-------------------------------------------------
-//  output_features - print emulation features of
-//
-//-------------------------------------------------
-
-void output_features(std::ostream &out, device_type type, device_t::feature_type unemulated, device_t::feature_type imperfect)
-{
-	static constexpr std::pair<device_t::feature_type, char const *> features[] = {
-			{ device_t::feature::PROTECTION,    "protection"    },
-			{ device_t::feature::TIMING,        "timing"        },
-			{ device_t::feature::GRAPHICS,      "graphics"      },
-			{ device_t::feature::PALETTE,       "palette"       },
-			{ device_t::feature::SOUND,         "sound"         },
-			{ device_t::feature::CAPTURE,       "capture"       },
-			{ device_t::feature::CAMERA,        "camera"        },
-			{ device_t::feature::MICROPHONE,    "microphone"    },
-			{ device_t::feature::CONTROLS,      "controls"      },
-			{ device_t::feature::KEYBOARD,      "keyboard"      },
-			{ device_t::feature::MOUSE,         "mouse"         },
-			{ device_t::feature::MEDIA,         "media"         },
-			{ device_t::feature::DISK,          "disk"          },
-			{ device_t::feature::PRINTER,       "printer"       },
-			{ device_t::feature::TAPE,          "tape"          },
-			{ device_t::feature::PUNCH,         "punch"         },
-			{ device_t::feature::DRUM,          "drum"          },
-			{ device_t::feature::ROM,           "rom"           },
-			{ device_t::feature::COMMS,         "comms"         },
-			{ device_t::feature::LAN,           "lan"           },
-			{ device_t::feature::WAN,           "wan"           } };
-
-	device_t::feature_type const flags(type.unemulated_features() | type.imperfect_features() | unemulated | imperfect);
-	for (auto const &feature : features)
+	void output_switches(std::ostream& out, const ioport_list& portlist, const char* root_tag, int type, const char* outertag, const char* loctag, const char* innertag)
 	{
-		if (flags & feature.first)
-		{
-			out << util::string_format("\t\t<feature type=\"%s\"", feature.second);
-			if (type.unemulated_features() & feature.first)
-			{
-				out << " status=\"unemulated\"";
-			}
-			else
-			{
-				if (type.imperfect_features() & feature.first)
-					out << " status=\"imperfect\"";
-				if (unemulated & feature.first)
-					out << " overall=\"unemulated\"";
-				else if ((~type.imperfect_features() & imperfect) & feature.first)
-					out << " overall=\"imperfect\"";
-			}
-			out << "/>\n";
-		}
+		// iterate looking for DIP switches
+		for (auto& port : portlist)
+			for (ioport_field const& field : port.second->fields())
+				if (field.type() == type)
+				{
+					std::string newtag(port.second->tag()), oldtag(":");
+					newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
+
+					// output the switch name information
+					std::string const normalized_field_name(normalize_string(field.name()));
+					std::string const normalized_newtag(normalize_string(newtag.c_str()));
+					out << util::string_format("\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.c_str(), normalized_newtag.c_str(), field.mask());
+					if (!field.condition().none())
+						output_ioport_condition(out, field.condition(), 3);
+
+					// loop over locations
+					for (ioport_diplocation const& diploc : field.diplocations())
+					{
+						out << util::string_format("\t\t\t<%s name=\"%s\" number=\"%u\"", loctag, normalize_string(diploc.name()), diploc.number());
+						if (diploc.inverted())
+							out << " inverted=\"yes\"";
+						out << "/>\n";
+					}
+
+					// loop over settings
+					for (ioport_setting const& setting : field.settings())
+					{
+						out << util::string_format("\t\t\t<%s name=\"%s\" value=\"%u\"", innertag, normalize_string(setting.name()), setting.value());
+						if (setting.value() == field.defvalue())
+							out << " default=\"yes\"";
+						if (setting.condition().none())
+						{
+							out << "/>\n";
+						}
+						else
+						{
+							out << ">\n";
+							output_ioport_condition(out, setting.condition(), 4);
+							out << util::string_format("\t\t\t</%s>\n", innertag);
+						}
+					}
+
+					// terminate the switch entry
+					out << util::string_format("\t\t</%s>\n", outertag);
+				}
 	}
-}
 
-
-//-------------------------------------------------
-//  output_images - prints m_output all info on
-//  image devices
-//-------------------------------------------------
-
-void output_images(std::ostream &out, device_t &device, const char *root_tag)
-{
-	for (const device_image_interface &imagedev : image_interface_iterator(device))
+	//-------------------------------------------------
+	//  output_ports - print the structure of input
+	//  ports in the driver
+	//-------------------------------------------------
+	void output_ports(std::ostream& out, const ioport_list& portlist)
 	{
-		if (strcmp(imagedev.device().tag(), device.tag()))
+		// cycle through ports
+		for (auto& port : portlist)
 		{
-			bool loadable = imagedev.user_loadable();
-			std::string newtag(imagedev.device().tag()), oldtag(":");
-			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
+			//out << util::string_format("\t\t<port tag=\"%s\">\n", normalize_string(port.second->tag()));
+			out << util::string_format("\t\t<port tag=\"%s\"", normalize_string(port.second->tag()));
 
-			// print m_output device type
-			out << util::string_format("\t\t<device type=\"%s\"", normalize_string(imagedev.image_type_name()));
+			//out << util::string_format(" defvalue=\"%d\"", port.second->defvalue);
+			//out << util::string_format(" mask=\"%d\"", port.second->mask);
 
-			// does this device have a tag?
-			if (imagedev.device().tag())
-				out << util::string_format(" tag=\"%s\"", normalize_string(newtag.c_str()));
-
-			// is this device available as media switch?
-			if (!loadable)
-				out << " fixed_image=\"1\"";
-
-			// is this device mandatory?
-			if (imagedev.must_be_loaded())
-				out << " mandatory=\"1\"";
-
-			if (imagedev.image_interface() && imagedev.image_interface()[0])
-				out << util::string_format(" interface=\"%s\"", normalize_string(imagedev.image_interface()));
-
-			// close the XML tag
 			out << ">\n";
 
-			if (loadable)
+			for (ioport_field const& field : port.second->fields())
 			{
-				char const *const name = imagedev.instance_name().c_str();
-				char const *const shortname = imagedev.brief_instance_name().c_str();
-
-				out << "\t\t\t<instance";
-				out << util::string_format(" name=\"%s\"", normalize_string(name));
-				out << util::string_format(" briefname=\"%s\"", normalize_string(shortname));
-				out << "/>\n";
-
-				char const *extensions(imagedev.file_extensions());
-				while (extensions)
-				{
-					char const *end(extensions);
-					while (*end && (',' != *end))
-						++end;
-					out << util::string_format("\t\t\t<extension name=\"%s\"/>\n", normalize_string(std::string(extensions, end).c_str()));
-					extensions = *end ? (end + 1) : nullptr;
-				}
+				if (field.is_analog())
+					out << util::string_format("\t\t\t<analog mask=\"%u\"/>\n", field.mask());
 			}
-			out << "\t\t</device>\n";
+			out << util::string_format("\t\t</port>\n");
 		}
+
 	}
-}
 
+	//-------------------------------------------------
+	//  output_adjusters - print the Analog
+	//  Adjusters for a game
+	//-------------------------------------------------
 
-//-------------------------------------------------
-//  output_slots - prints all info about slots
-//-------------------------------------------------
-
-void output_slots(std::ostream &out, machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes)
-{
-	for (device_slot_interface &slot : slot_interface_iterator(device))
+	void output_adjusters(std::ostream& out, const ioport_list& portlist)
 	{
-		// shall we list fixed slots as non-configurable?
-		bool const listed(!slot.fixed() && strcmp(slot.device().tag(), device.tag()));
-
-		if (devtypes || listed)
-		{
-			machine_config::token const tok(config.begin_configuration(slot.device()));
-			std::string newtag(slot.device().tag()), oldtag(":");
-			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
-
-			// print m_output device type
-			if (listed)
-				out << util::string_format("\t\t<slot name=\"%s\">\n", normalize_string(newtag.c_str()));
-
-			for (auto &option : slot.option_list())
-			{
-				if (devtypes || (listed && option.second->selectable()))
+		// iterate looking for Adjusters
+		for (auto& port : portlist)
+			for (ioport_field const& field : port.second->fields())
+				if (field.type() == IPT_ADJUSTER)
 				{
-					device_t *const dev = config.device_add("_dummy", option.second->devtype(), option.second->clock());
-					if (!dev->configured())
-						dev->config_complete();
-
-					if (devtypes)
-						for (device_t &subdevice : device_iterator(*dev)) devtypes->insert(&subdevice.type());
-
-					if (listed && option.second->selectable())
-					{
-						out << util::string_format("\t\t\t<slotoption name=\"%s\"", normalize_string(option.second->name()));
-						out << util::string_format(" devname=\"%s\"", normalize_string(dev->shortname()));
-						if (slot.default_option() != nullptr && strcmp(slot.default_option(), option.second->name())==0)
-							out << " default=\"yes\"";
-						out << "/>\n";
-					}
-
-					config.device_remove("_dummy");
+					out << util::string_format("\t\t<adjuster name=\"%s\" default=\"%d\"/>\n", normalize_string(field.name()), field.defvalue());
 				}
-			}
-
-			if (listed)
-				out << "\t\t</slot>\n";
-		}
 	}
-}
 
 
-//-------------------------------------------------
-//  output_software_lists - print the information
-//  for all known software lists for this system
-//-------------------------------------------------
+	//-------------------------------------------------
+	//  output_driver - print driver status
+	//-------------------------------------------------
 
-void output_software_lists(std::ostream &out, device_t &root, const char *root_tag)
-{
-	for (const software_list_device &swlist : software_list_device_iterator(root))
+	void output_driver(std::ostream& out, game_driver const& driver, device_t::feature_type unemulated, device_t::feature_type imperfect)
 	{
-		if (&static_cast<const device_t &>(swlist) == &root)
-		{
-			assert(swlist.list_name().empty());
-			continue;
-		}
+		out << "\t\t<driver";
 
-		std::string newtag(swlist.tag()), oldtag(":");
-		newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
-		out << util::string_format("\t\t<softwarelist tag=\"%s\" name=\"%s\" status=\"%s\"", normalize_string(newtag.c_str()), normalize_string(swlist.list_name().c_str()), swlist.is_original() ? "original" : "compatible");
+		/*
+		The status entry is an hint for frontend authors to select working
+		and not working games without the need to know all the other status
+		entries.  Games marked as status=good are perfectly emulated, games
+		marked as status=imperfect are emulated with only some minor issues,
+		games marked as status=preliminary don't work or have major
+		emulation problems.
+		*/
 
-		if (swlist.filter())
-			out << util::string_format(" filter=\"%s\"", normalize_string(swlist.filter()));
+		u32 const flags = driver.flags;
+		bool const machine_preliminary(flags & (machine_flags::NOT_WORKING | machine_flags::MECHANICAL));
+		bool const unemulated_preliminary(unemulated & (device_t::feature::PALETTE | device_t::feature::GRAPHICS | device_t::feature::SOUND | device_t::feature::KEYBOARD));
+		bool const imperfect_preliminary((unemulated | imperfect) & device_t::feature::PROTECTION);
+
+		if (machine_preliminary || unemulated_preliminary || imperfect_preliminary)
+			out << " status=\"preliminary\"";
+		else if (imperfect)
+			out << " status=\"imperfect\"";
+		else
+			out << " status=\"good\"";
+
+		if (flags & machine_flags::NOT_WORKING)
+			out << " emulation=\"preliminary\"";
+		else
+			out << " emulation=\"good\"";
+
+		if (flags & machine_flags::NO_COCKTAIL)
+			out << " cocktail=\"preliminary\"";
+
+		if (flags & machine_flags::SUPPORTS_SAVE)
+			out << " savestate=\"supported\"";
+		else
+			out << " savestate=\"unsupported\"";
+
 		out << "/>\n";
 	}
-}
 
 
+	//-------------------------------------------------
+	//  output_features - print emulation features of
+	//
+	//-------------------------------------------------
 
-//-------------------------------------------------
-//  output_ramoptions - prints m_output all RAM
-//  options for this system
-//-------------------------------------------------
-
-void output_ramoptions(std::ostream &out, device_t &root)
-{
-	for (const ram_device &ram : ram_device_iterator(root, 1))
+	void output_features(std::ostream& out, device_type type, device_t::feature_type unemulated, device_t::feature_type imperfect)
 	{
-		if (!std::strcmp(ram.tag(), ":" RAM_TAG))
+		static constexpr std::pair<device_t::feature_type, char const*> features[] = {
+				{ device_t::feature::PROTECTION,    "protection"    },
+				{ device_t::feature::TIMING,        "timing"        },
+				{ device_t::feature::GRAPHICS,      "graphics"      },
+				{ device_t::feature::PALETTE,       "palette"       },
+				{ device_t::feature::SOUND,         "sound"         },
+				{ device_t::feature::CAPTURE,       "capture"       },
+				{ device_t::feature::CAMERA,        "camera"        },
+				{ device_t::feature::MICROPHONE,    "microphone"    },
+				{ device_t::feature::CONTROLS,      "controls"      },
+				{ device_t::feature::KEYBOARD,      "keyboard"      },
+				{ device_t::feature::MOUSE,         "mouse"         },
+				{ device_t::feature::MEDIA,         "media"         },
+				{ device_t::feature::DISK,          "disk"          },
+				{ device_t::feature::PRINTER,       "printer"       },
+				{ device_t::feature::TAPE,          "tape"          },
+				{ device_t::feature::PUNCH,         "punch"         },
+				{ device_t::feature::DRUM,          "drum"          },
+				{ device_t::feature::ROM,           "rom"           },
+				{ device_t::feature::COMMS,         "comms"         },
+				{ device_t::feature::LAN,           "lan"           },
+				{ device_t::feature::WAN,           "wan"           } };
+
+		device_t::feature_type const flags(type.unemulated_features() | type.imperfect_features() | unemulated | imperfect);
+		for (auto const& feature : features)
 		{
-			uint32_t const defsize(ram.default_size());
-			bool havedefault(false);
-			for (ram_device::extra_option const &option : ram.extra_options())
+			if (flags & feature.first)
 			{
-				if (defsize == option.second)
+				out << util::string_format("\t\t<feature type=\"%s\"", feature.second);
+				if (type.unemulated_features() & feature.first)
 				{
-					assert(!havedefault);
-					havedefault = true;
-					out << util::string_format("\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", normalize_string(option.first.c_str()), option.second);
+					out << " status=\"unemulated\"";
 				}
 				else
 				{
-					out << util::string_format("\t\t<ramoption name=\"%s\">%u</ramoption>\n", normalize_string(option.first.c_str()), option.second);
+					if (type.imperfect_features() & feature.first)
+						out << " status=\"imperfect\"";
+					if (unemulated & feature.first)
+						out << " overall=\"unemulated\"";
+					else if ((~type.imperfect_features() & imperfect) & feature.first)
+						out << " overall=\"imperfect\"";
+				}
+				out << "/>\n";
+			}
+		}
+	}
+
+
+	//-------------------------------------------------
+	//  output_images - prints m_output all info on
+	//  image devices
+	//-------------------------------------------------
+
+	void output_images(std::ostream& out, device_t& device, const char* root_tag)
+	{
+		for (const device_image_interface& imagedev : image_interface_iterator(device))
+		{
+			if (strcmp(imagedev.device().tag(), device.tag()))
+			{
+				bool loadable = imagedev.user_loadable();
+				std::string newtag(imagedev.device().tag()), oldtag(":");
+				newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
+
+				// print m_output device type
+				out << util::string_format("\t\t<device type=\"%s\"", normalize_string(imagedev.image_type_name()));
+
+				// does this device have a tag?
+				if (imagedev.device().tag())
+					out << util::string_format(" tag=\"%s\"", normalize_string(newtag.c_str()));
+
+				// is this device available as media switch?
+				if (!loadable)
+					out << " fixed_image=\"1\"";
+
+				// is this device mandatory?
+				if (imagedev.must_be_loaded())
+					out << " mandatory=\"1\"";
+
+				if (imagedev.image_interface() && imagedev.image_interface()[0])
+					out << util::string_format(" interface=\"%s\"", normalize_string(imagedev.image_interface()));
+
+				// close the XML tag
+				out << ">\n";
+
+				if (loadable)
+				{
+					char const* const name = imagedev.instance_name().c_str();
+					char const* const shortname = imagedev.brief_instance_name().c_str();
+
+					out << "\t\t\t<instance";
+					out << util::string_format(" name=\"%s\"", normalize_string(name));
+					out << util::string_format(" briefname=\"%s\"", normalize_string(shortname));
+					out << "/>\n";
+
+					char const* extensions(imagedev.file_extensions());
+					while (extensions)
+					{
+						char const* end(extensions);
+						while (*end && (',' != *end))
+							++end;
+						out << util::string_format("\t\t\t<extension name=\"%s\"/>\n", normalize_string(std::string(extensions, end).c_str()));
+						extensions = *end ? (end + 1) : nullptr;
+					}
+				}
+				out << "\t\t</device>\n";
+			}
+		}
+	}
+
+
+	//-------------------------------------------------
+	//  output_slots - prints all info about slots
+	//-------------------------------------------------
+
+	void output_slots(std::ostream& out, machine_config& config, device_t& device, const char* root_tag, device_type_set* devtypes)
+	{
+		for (device_slot_interface& slot : slot_interface_iterator(device))
+		{
+			// shall we list fixed slots as non-configurable?
+			bool const listed(!slot.fixed() && strcmp(slot.device().tag(), device.tag()));
+
+			if (devtypes || listed)
+			{
+				machine_config::token const tok(config.begin_configuration(slot.device()));
+				std::string newtag(slot.device().tag()), oldtag(":");
+				newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
+
+				// print m_output device type
+				if (listed)
+					out << util::string_format("\t\t<slot name=\"%s\">\n", normalize_string(newtag.c_str()));
+
+				for (auto& option : slot.option_list())
+				{
+					if (devtypes || (listed && option.second->selectable()))
+					{
+						device_t* const dev = config.device_add("_dummy", option.second->devtype(), option.second->clock());
+						if (!dev->configured())
+							dev->config_complete();
+
+						if (devtypes)
+							for (device_t& subdevice : device_iterator(*dev)) devtypes->insert(&subdevice.type());
+
+						if (listed && option.second->selectable())
+						{
+							out << util::string_format("\t\t\t<slotoption name=\"%s\"", normalize_string(option.second->name()));
+							out << util::string_format(" devname=\"%s\"", normalize_string(dev->shortname()));
+							if (slot.default_option() != nullptr && strcmp(slot.default_option(), option.second->name()) == 0)
+								out << " default=\"yes\"";
+							out << "/>\n";
+						}
+
+						config.device_remove("_dummy");
+					}
+				}
+
+				if (listed)
+					out << "\t\t</slot>\n";
+			}
+		}
+	}
+
+
+	//-------------------------------------------------
+	//  output_software_lists - print the information
+	//  for all known software lists for this system
+	//-------------------------------------------------
+
+	void output_software_lists(std::ostream& out, device_t& root, const char* root_tag)
+	{
+		for (const software_list_device& swlist : software_list_device_iterator(root))
+		{
+			if (&static_cast<const device_t&>(swlist) == &root)
+			{
+				assert(swlist.list_name().empty());
+				continue;
+			}
+
+			std::string newtag(swlist.tag()), oldtag(":");
+			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
+			out << util::string_format("\t\t<softwarelist tag=\"%s\" name=\"%s\" status=\"%s\"", normalize_string(newtag.c_str()), normalize_string(swlist.list_name().c_str()), swlist.is_original() ? "original" : "compatible");
+
+			if (swlist.filter())
+				out << util::string_format(" filter=\"%s\"", normalize_string(swlist.filter()));
+			out << "/>\n";
+		}
+	}
+
+
+
+	//-------------------------------------------------
+	//  output_ramoptions - prints m_output all RAM
+	//  options for this system
+	//-------------------------------------------------
+
+	void output_ramoptions(std::ostream& out, device_t& root)
+	{
+		for (const ram_device& ram : ram_device_iterator(root, 1))
+		{
+			if (!std::strcmp(ram.tag(), ":" RAM_TAG))
+			{
+				uint32_t const defsize(ram.default_size());
+				bool havedefault(false);
+				for (ram_device::extra_option const& option : ram.extra_options())
+				{
+					if (defsize == option.second)
+					{
+						assert(!havedefault);
+						havedefault = true;
+						out << util::string_format("\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", normalize_string(option.first.c_str()), option.second);
+					}
+					else
+					{
+						out << util::string_format("\t\t<ramoption name=\"%s\">%u</ramoption>\n", normalize_string(option.first.c_str()), option.second);
+					}
+				}
+				if (!havedefault)
+					out << util::string_format("\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", ram.default_size_string(), defsize);
+				break;
+			}
+		}
+	}
+
+
+	//-------------------------------------------------
+	//  get_merge_name - get the rom name from a
+	//  parent set
+	//-------------------------------------------------
+
+	const char* get_merge_name(driver_enumerator& drivlist, const game_driver& driver, util::hash_collection const& romhashes)
+	{
+		// walk the parent chain
+		for (int clone_of = drivlist.find(driver.parent); 0 <= clone_of; clone_of = drivlist.find(drivlist.driver(clone_of).parent))
+		{
+			// look in the parent's ROMs
+			for (romload::region const& pregion : romload::entries(drivlist.driver(clone_of).rom).get_regions())
+			{
+				for (romload::file const& prom : pregion.get_files())
+				{
+					// stop when we find a match
+					util::hash_collection const phashes(prom.get_hashdata());
+					if (!phashes.flag(util::hash_collection::FLAG_NO_DUMP) && (romhashes == phashes))
+						return prom.get_name();
 				}
 			}
-			if (!havedefault)
-				out << util::string_format("\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", ram.default_size_string(), defsize);
-			break;
 		}
+
+		return nullptr;
 	}
-}
 
 
-//-------------------------------------------------
-//  get_merge_name - get the rom name from a
-//  parent set
-//-------------------------------------------------
+	//-------------------------------------------------
+	//  device_type_compare::operator()
+	//-------------------------------------------------
 
-const char *get_merge_name(driver_enumerator &drivlist, const game_driver &driver, util::hash_collection const &romhashes)
-{
-	// walk the parent chain
-	for (int clone_of = drivlist.find(driver.parent); 0 <= clone_of; clone_of = drivlist.find(drivlist.driver(clone_of).parent))
+	bool device_type_compare::operator()(const std::add_pointer_t<device_type>& lhs, const std::add_pointer_t<device_type>& rhs) const
 	{
-		// look in the parent's ROMs
-		for (romload::region const &pregion : romload::entries(drivlist.driver(clone_of).rom).get_regions())
-		{
-			for (romload::file const &prom : pregion.get_files())
-			{
-				// stop when we find a match
-				util::hash_collection const phashes(prom.get_hashdata());
-				if (!phashes.flag(util::hash_collection::FLAG_NO_DUMP) && (romhashes == phashes))
-					return prom.get_name();
-			}
-		}
+		return strcmp(lhs->shortname(), rhs->shortname()) < 0;
 	}
-
-	return nullptr;
-}
-
-
-//-------------------------------------------------
-//  device_type_compare::operator()
-//-------------------------------------------------
-
-bool device_type_compare::operator()(const std::add_pointer_t<device_type> &lhs, const std::add_pointer_t<device_type> &rhs) const
-{
-	return strcmp(lhs->shortname(), rhs->shortname()) < 0;
-}
 
 }
