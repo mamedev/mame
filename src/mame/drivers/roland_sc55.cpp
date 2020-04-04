@@ -75,7 +75,7 @@ void sc55_state::sc55(machine_config &config)
 
 ROM_START( sc55 )
 	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "roland_r15199778_6435328a97f.ic30", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD( "roland_r15199778_6435328a97f.ic30", 0x0000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x40000, "progrom", 0 ) // additional H8/532 code and patch data - revisions match main CPU revisions
 	ROM_LOAD( "roland_r15209363.ic23", 0x000000, 0x040000, CRC(2dc58549) SHA1(9c17f85e784dc1549ac1f98d457b353393331f6b) )
