@@ -317,7 +317,7 @@ READ_LINE_MEMBER(polepos_state::auto_start_r)
 	return m_auto_start_mask;
 }
 
-WRITE8_MEMBER(polepos_state::out_0)
+WRITE8_MEMBER(polepos_state::out)
 {
 // no start lamps in pole position
 //  output().set_led_value(1,data & 1);
@@ -326,9 +326,9 @@ WRITE8_MEMBER(polepos_state::out_0)
 	machine().bookkeeping().coin_counter_w(0,~data & 8);
 }
 
-WRITE8_MEMBER(polepos_state::out_1)
+WRITE_LINE_MEMBER(polepos_state::lockout)
 {
-	machine().bookkeeping().coin_lockout_global_w(data & 1);
+	machine().bookkeeping().coin_lockout_global_w(state);
 }
 
 READ8_MEMBER(polepos_state::namco_52xx_rom_r)
@@ -860,13 +860,13 @@ void polepos_state::polepos(machine_config &config)
 	m_subcpu2->set_addrmap(AS_PROGRAM, &polepos_state::z8002_map_2);
 
 	namco_51xx_device &n51xx(NAMCO_51XX(config, "51xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
-	n51xx.set_screen_tag(m_screen);
-	n51xx.input_callback<0>().set_ioport("IN0").mask(0x0f);
-	n51xx.input_callback<1>().set_ioport("IN0").rshift(4);
-	n51xx.input_callback<2>().set_ioport("DSWB").mask(0x0f);
-	n51xx.input_callback<3>().set_ioport("DSWB").rshift(4);
-	n51xx.output_callback<0>().set(FUNC(polepos_state::out_0));
-	n51xx.output_callback<1>().set(FUNC(polepos_state::out_1));
+	//n51xx.set_screen_tag(m_screen);
+	n51xx.input_callback<0>().set_ioport("DSWB").mask(0x0f);
+	n51xx.input_callback<1>().set_ioport("DSWB").rshift(4);
+	n51xx.input_callback<2>().set_ioport("IN0").mask(0x0f);
+	n51xx.input_callback<3>().set_ioport("IN0").rshift(4);
+	n51xx.output_callback().set(FUNC(polepos_state::out));
+	n51xx.lockout_callback().set(FUNC(polepos_state::lockout));
 
 	namco_52xx_device &n52xx(NAMCO_52XX(config, "52xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
 	n52xx.set_discrete("discrete");
@@ -887,6 +887,8 @@ void polepos_state::polepos(machine_config &config)
 
 	namco_06xx_device &n06xx(NAMCO_06XX(config, "06xx", MASTER_CLOCK/8/64));
 	n06xx.set_maincpu(m_maincpu);
+	n06xx.chip_select_callback<0>().set("51xx", FUNC(namco_51xx_device::chip_select));
+	n06xx.rw_callback<0>().set("51xx", FUNC(namco_51xx_device::rw));
 	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 	n06xx.read_callback<1>().set("53xx", FUNC(namco_53xx_device::read));
@@ -924,6 +926,7 @@ void polepos_state::polepos(machine_config &config)
 	m_screen->set_raw(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16);
 	m_screen->set_screen_update(FUNC(polepos_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set("51xx", FUNC(namco_51xx_device::vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_polepos);
 	PALETTE(config, m_palette, FUNC(polepos_state::polepos_palette), 0x0f00, 128);
@@ -998,11 +1001,12 @@ void polepos_state::topracern(machine_config &config)
 	// TODO, remove these devices too, this bootleg doesn't have them, but the emulation doesn't boot without them.
 	// doesn't exist on the bootleg, but required for now or the game only boots in test mode!  they probably simulate some of the logic
 	namco_51xx_device &n51xx(NAMCO_51XX(config, "51xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
-	n51xx.set_screen_tag(m_screen);
-	n51xx.input_callback<1>().set_ioport("IN0").rshift(4);
+	n51xx.input_callback<3>().set_ioport("IN0").rshift(4);
 
 	namco_06xx_device &n06xx(NAMCO_06XX(config, "06xx", MASTER_CLOCK/8/64));
 	n06xx.set_maincpu(m_maincpu);
+	n06xx.chip_select_callback<0>().set("51xx", FUNC(namco_51xx_device::chip_select));
+	n06xx.rw_callback<0>().set("51xx", FUNC(namco_51xx_device::rw));
 	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 
@@ -1032,6 +1036,7 @@ void polepos_state::topracern(machine_config &config)
 	m_screen->set_raw(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16);
 	m_screen->set_screen_update(FUNC(polepos_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set("51xx", FUNC(namco_51xx_device::vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_polepos);
 	PALETTE(config, m_palette, FUNC(polepos_state::polepos_palette), 0x0f00, 128);

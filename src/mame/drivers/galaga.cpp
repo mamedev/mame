@@ -759,7 +759,7 @@ WRITE_LINE_MEMBER(galaga_state::nmion_w)
 	m_sub2_nmi_mask = !state;
 }
 
-WRITE8_MEMBER(galaga_state::out_0)
+WRITE8_MEMBER(galaga_state::out)
 {
 	m_leds[1] = BIT(data, 0);
 	m_leds[0] = BIT(data, 1);
@@ -767,9 +767,9 @@ WRITE8_MEMBER(galaga_state::out_0)
 	machine().bookkeeping().coin_counter_w(0,~data & 8);
 }
 
-WRITE8_MEMBER(galaga_state::out_1)
+WRITE_LINE_MEMBER(galaga_state::lockout)
 {
-	machine().bookkeeping().coin_lockout_global_w(data & 1);
+	machine().bookkeeping().coin_lockout_global_w(state);
 }
 
 READ8_MEMBER(galaga_state::namco_52xx_rom_r)
@@ -976,29 +976,25 @@ void galaga_state::dzigzag_mem4(address_map &map)
 
 
 static INPUT_PORTS_START( bosco )
-	PORT_START("IN0L")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-
-	PORT_START("IN0H")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-
-	PORT_START("IN1L")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START("IN1H")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SWB:1,2")
@@ -1081,29 +1077,25 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( galaga )
-	PORT_START("IN0L")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-
-	PORT_START("IN0H")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-
-	PORT_START("IN1L")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 
-	PORT_START("IN1H")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SWB:1,2")
@@ -1178,44 +1170,38 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( gatsbee )
 	PORT_INCLUDE( galaga )
 
-	PORT_MODIFY("IN1L")
+	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-
-	PORT_MODIFY("IN1H")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_COCKTAIL
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( xevious )
-	PORT_START("IN0L")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-
-	PORT_START("IN0H")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-
-	PORT_START("IN1L")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START("IN1H")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SWA:1,2")
@@ -1314,29 +1300,25 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( digdug )
-	PORT_START("IN0L")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-
-	PORT_START("IN0H")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-
-	PORT_START("IN1L")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 
-	PORT_START("IN1H")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SWA:1,2,3")
@@ -1613,13 +1595,12 @@ void bosco_state::bosco(machine_config &config)
 	NAMCO_50XX(config, "50xx_2", MASTER_CLOCK/6/2); /* 1.536 MHz */
 
 	namco_51xx_device &n51xx(NAMCO_51XX(config, "51xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
-	n51xx.set_screen_tag(m_screen);
-	n51xx.input_callback<0>().set_ioport("IN0L");
-	n51xx.input_callback<1>().set_ioport("IN0H");
-	n51xx.input_callback<2>().set_ioport("IN1L");
-	n51xx.input_callback<3>().set_ioport("IN1H");
-	n51xx.output_callback<0>().set(FUNC(galaga_state::out_0));
-	n51xx.output_callback<1>().set(FUNC(galaga_state::out_1));
+	n51xx.input_callback<0>().set_ioport("IN0").mask(0x0f);
+	n51xx.input_callback<1>().set_ioport("IN0").rshift(4);
+	n51xx.input_callback<2>().set_ioport("IN1").mask(0x0f);
+	n51xx.input_callback<3>().set_ioport("IN1").rshift(4);
+	n51xx.output_callback().set(FUNC(galaga_state::out));
+	n51xx.lockout_callback().set(FUNC(galaga_state::lockout));
 
 	namco_52xx_device &n52xx(NAMCO_52XX(config, "52xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
 	n52xx.set_discrete("discrete");
@@ -1634,6 +1615,8 @@ void bosco_state::bosco(machine_config &config)
 
 	namco_06xx_device &n06xx_0(NAMCO_06XX(config, "06xx_0", MASTER_CLOCK/6/64));
 	n06xx_0.set_maincpu(m_maincpu);
+	n06xx_0.chip_select_callback<0>().set("51xx", FUNC(namco_51xx_device::chip_select));
+	n06xx_0.rw_callback<0>().set("51xx", FUNC(namco_51xx_device::rw));
 	n06xx_0.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx_0.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 	n06xx_0.read_callback<2>().set("50xx_1", FUNC(namco_50xx_device::read));
@@ -1666,6 +1649,7 @@ void bosco_state::bosco(machine_config &config)
 	m_screen->set_screen_update(FUNC(bosco_state::screen_update_bosco));
 	m_screen->screen_vblank().set(FUNC(bosco_state::screen_vblank_bosco));
 	m_screen->screen_vblank().append(FUNC(galaga_state::vblank_irq));
+	m_screen->screen_vblank().append("51xx", FUNC(namco_51xx_device::vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bosco);
@@ -1709,13 +1693,12 @@ void galaga_state::galaga(machine_config &config)
 	misclatch.q_out_cb<3>().append("54xx", FUNC(namco_54xx_device::reset));
 
 	namco_51xx_device &n51xx(NAMCO_51XX(config, "51xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
-	n51xx.set_screen_tag(m_screen);
-	n51xx.input_callback<0>().set_ioport("IN0L");
-	n51xx.input_callback<1>().set_ioport("IN0H");
-	n51xx.input_callback<2>().set_ioport("IN1L");
-	n51xx.input_callback<3>().set_ioport("IN1H");
-	n51xx.output_callback<0>().set(FUNC(galaga_state::out_0));
-	n51xx.output_callback<1>().set(FUNC(galaga_state::out_1));
+	n51xx.input_callback<0>().set_ioport("IN0").mask(0x0f);
+	n51xx.input_callback<1>().set_ioport("IN0").rshift(4);
+	n51xx.input_callback<2>().set_ioport("IN1").mask(0x0f);
+	n51xx.input_callback<3>().set_ioport("IN1").rshift(4);
+	n51xx.output_callback().set(FUNC(galaga_state::out));
+	n51xx.lockout_callback().set(FUNC(galaga_state::lockout));
 
 	namco_54xx_device &n54xx(NAMCO_54XX(config, "54xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
 	n54xx.set_discrete("discrete");
@@ -1723,6 +1706,8 @@ void galaga_state::galaga(machine_config &config)
 
 	namco_06xx_device &n06xx(NAMCO_06XX(config, "06xx", MASTER_CLOCK/6/64));
 	n06xx.set_maincpu(m_maincpu);
+	n06xx.chip_select_callback<0>().set("51xx", FUNC(namco_51xx_device::chip_select));
+	n06xx.rw_callback<0>().set("51xx", FUNC(namco_51xx_device::rw));
 	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 	n06xx.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
@@ -1741,6 +1726,7 @@ void galaga_state::galaga(machine_config &config)
 	m_screen->set_screen_update(FUNC(galaga_state::screen_update_galaga));
 	m_screen->screen_vblank().set(FUNC(galaga_state::screen_vblank_galaga));
 	m_screen->screen_vblank().append(FUNC(galaga_state::vblank_irq));
+	m_screen->screen_vblank().append("51xx", FUNC(namco_51xx_device::vblank));
 	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaga);
@@ -1820,13 +1806,12 @@ void xevious_state::xevious(machine_config &config)
 	NAMCO_50XX(config, "50xx", MASTER_CLOCK/6/2);   /* 1.536 MHz */
 
 	namco_51xx_device &n51xx(NAMCO_51XX(config, "51xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
-	n51xx.set_screen_tag(m_screen);
-	n51xx.input_callback<0>().set_ioport("IN0L");
-	n51xx.input_callback<1>().set_ioport("IN0H");
-	n51xx.input_callback<2>().set_ioport("IN1L");
-	n51xx.input_callback<3>().set_ioport("IN1H");
-	n51xx.output_callback<0>().set(FUNC(galaga_state::out_0));
-	n51xx.output_callback<1>().set(FUNC(galaga_state::out_1));
+	n51xx.input_callback<0>().set_ioport("IN0").mask(0x0f);
+	n51xx.input_callback<1>().set_ioport("IN0").rshift(4);
+	n51xx.input_callback<2>().set_ioport("IN1").mask(0x0f);
+	n51xx.input_callback<3>().set_ioport("IN1").rshift(4);
+	n51xx.output_callback().set(FUNC(galaga_state::out));
+	n51xx.lockout_callback().set(FUNC(galaga_state::lockout));
 
 	namco_54xx_device &n54xx(NAMCO_54XX(config, "54xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
 	n54xx.set_discrete("discrete");
@@ -1834,6 +1819,8 @@ void xevious_state::xevious(machine_config &config)
 
 	namco_06xx_device &n06xx(NAMCO_06XX(config, "06xx", MASTER_CLOCK/6/64));
 	n06xx.set_maincpu(m_maincpu);
+	n06xx.chip_select_callback<0>().set("51xx", FUNC(namco_51xx_device::chip_select));
+	n06xx.rw_callback<0>().set("51xx", FUNC(namco_51xx_device::rw));
 	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 	n06xx.chip_select_callback<2>().set("50xx", FUNC(namco_50xx_device::chip_select));
@@ -1852,6 +1839,7 @@ void xevious_state::xevious(machine_config &config)
 	m_screen->set_screen_update(FUNC(xevious_state::screen_update_xevious));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(galaga_state::vblank_irq));
+	m_screen->screen_vblank().append("51xx", FUNC(namco_51xx_device::vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xevious);
 	PALETTE(config, m_palette, FUNC(xevious_state::xevious_palette), 128*4 + 64*8 + 64*2, 128+1);
@@ -1925,13 +1913,12 @@ void digdug_state::digdug(machine_config &config)
 	// Q5-Q7 also used (see below)
 
 	namco_51xx_device &n51xx(NAMCO_51XX(config, "51xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
-	n51xx.set_screen_tag(m_screen);
-	n51xx.input_callback<0>().set_ioport("IN0L");
-	n51xx.input_callback<1>().set_ioport("IN0H");
-	n51xx.input_callback<2>().set_ioport("IN1L");
-	n51xx.input_callback<3>().set_ioport("IN1H");
-	n51xx.output_callback<0>().set(FUNC(galaga_state::out_0));
-	n51xx.output_callback<1>().set(FUNC(galaga_state::out_1));
+	n51xx.input_callback<0>().set_ioport("IN0").mask(0x0f);
+	n51xx.input_callback<1>().set_ioport("IN0").rshift(4);
+	n51xx.input_callback<2>().set_ioport("IN1").mask(0x0f);
+	n51xx.input_callback<3>().set_ioport("IN1").rshift(4);
+	n51xx.output_callback().set(FUNC(galaga_state::out));
+	n51xx.lockout_callback().set(FUNC(galaga_state::lockout));
 
 	namco_53xx_device &n53xx(NAMCO_53XX(config, "53xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
 	n53xx.k_port_callback().set("misclatch", FUNC(ls259_device::q7_r)).lshift(3); // MOD 2 = K3
@@ -1945,6 +1932,8 @@ void digdug_state::digdug(machine_config &config)
 
 	namco_06xx_device &n06xx(NAMCO_06XX(config, "06xx", MASTER_CLOCK/6/64));
 	n06xx.set_maincpu(m_maincpu);
+	n06xx.chip_select_callback<0>().set("51xx", FUNC(namco_51xx_device::chip_select));
+	n06xx.rw_callback<0>().set("51xx", FUNC(namco_51xx_device::rw));
 	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 	n06xx.chip_select_callback<1>().set("53xx", FUNC(namco_53xx_device::chip_select));
@@ -1968,6 +1957,7 @@ void digdug_state::digdug(machine_config &config)
 	m_screen->set_screen_update(FUNC(digdug_state::screen_update_digdug));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(galaga_state::vblank_irq));
+	m_screen->screen_vblank().append("51xx", FUNC(namco_51xx_device::vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_digdug);
 	PALETTE(config, m_palette, FUNC(digdug_state::digdug_palette), 16*2 + 64*4 + 64*4, 32);
