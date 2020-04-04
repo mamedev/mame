@@ -82,15 +82,16 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>3D Pinball</description>
 		<year>1989</year>
 		<publisher>Mastertronic Plus</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="3dpinbla" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="192466">
 				<rom name="3dpinbla.tap" size="192466" crc="fa7d00d8" sha1="9e547ac4ee11b6b6f034f4cac5c31079c23373b3"/>
 			</dataarea>
 		</part>
 
-		<part name="3dpinblb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="192466">
 				<rom name="3dpinblb.tap" size="192466" crc="f91f841d" sha1="2ed915985ef8192df097b420b17dfbe87ed358bb"/>
@@ -102,15 +103,16 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>American 3D Pool</description>
 		<year>1991</year>
 		<publisher>Zeppelin Games</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="a3dpoola" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="861564">
 				<rom name="a3dpoola.tap" size="861564" crc="3381e127" sha1="a3cca3ad5638f9e2e08b223cfd2526f72fdeb063"/>
 			</dataarea>
 		</part>
 
-		<part name="a3dpoolb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="867657">
 				<rom name="a3dpoolb.tap" size="867657" crc="acc6f5fe" sha1="f21761d9d86e1bc98ea081a7405193e1eae6e30e"/>
@@ -386,15 +388,16 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Angle Ball</description>
 		<year>1987</year>
 		<publisher>Mastertronic Added Dimension</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="anglebla" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="267415">
 				<rom name="anglebla.tap" size="267415" crc="8a71c7cf" sha1="f60d649fd0087ae4692947750c56733159bffd2a"/>
 			</dataarea>
 		</part>
 
-		<part name="angleblb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="267414">
 				<rom name="angleblb.tap" size="267414" crc="8c58c3c3" sha1="f4db67b46dec798230fea7291445c1cbddf74c0d"/>
@@ -612,15 +615,16 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Ball Crazy</description>
 		<year>1987</year>
 		<publisher>Mastertronic Added Dimension</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="ballcrza" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="531341">
 				<rom name="ballcrza.tap" size="531341" crc="e0b0dfce" sha1="d97966c12248724d0334c8ccfb03bfb877d92d03"/>
 			</dataarea>
 		</part>
 
-		<part name="ballcrzb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="528497">
 				<rom name="ballcrzb.tap" size="528497" crc="ddb141fb" sha1="d8e3ebaee70fcaa1b81d2ab02111bb7d0e033a4d"/>
@@ -1665,22 +1669,23 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="circus">
+	<software name="circusp">
 		<description>Continental Circus</description>
 		<year>1991</year>
 		<publisher>Mastertronic Plus</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="circusa" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="569886">
-				<rom name="circusa.tap" size="569886" crc="d0f36a0b" sha1="bd09c14234c8c89fc391631f0fc949a7fd8a7922"/>
+				<rom name="circuspa.tap" size="569886" crc="d0f36a0b" sha1="bd09c14234c8c89fc391631f0fc949a7fd8a7922"/>
 			</dataarea>
 		</part>
 
-		<part name="circusb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="569886">
-				<rom name="circusb.tap" size="569886" crc="df7f4101" sha1="b07a48a3283936058f6e3147d41f34f3001ba650"/>
+				<rom name="circuspb.tap" size="569886" crc="df7f4101" sha1="b07a48a3283936058f6e3147d41f34f3001ba650"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2244,15 +2249,16 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Feud</description>
 		<year>1987</year>
 		<publisher>Bulldog Software</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="feuda" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="611910">
 				<rom name="feuda.tap" size="611910" crc="9ac57691" sha1="ff53d728123469ce40c8c1553cb03912aa897e60"/>
 			</dataarea>
 		</part>
 
-		<part name="feudb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="611910">
 				<rom name="feudb.tap" size="611910" crc="0cbe87c1" sha1="b06e65952e8d2c8ee0b8cb227134136ba53b62b3"/>
@@ -4942,15 +4948,16 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>One Man and His Droid</description>
 		<year>1985</year>
 		<publisher>199 Range</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="omahda" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="611660">
 				<rom name="omahda.tap" size="611660" crc="6da4096b" sha1="263e452ba8e5f69411a873ba8ce1907f2610d24f"/>
 			</dataarea>
 		</part>
 
-		<part name="omahdb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="598097">
 				<rom name="omahdb.tap" size="598097" crc="30661926" sha1="60d822dc311a72b197483b79b29ea9daab4366de"/>
@@ -6004,19 +6011,20 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="robocop">
+	<software name="robocoph">
 		<description>Robocop</description>
 		<year>1988</year>
 		<publisher>The Hit Squad</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="robocopa" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="1510854">
 				<rom name="robocopa.tap" size="1510854" crc="66624f2c" sha1="e8d137e6a345c0e3cafd1bf56eb7215a7a6dc597"/>
 			</dataarea>
 		</part>
 
-		<part name="robocopb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="1510854">
 				<rom name="robocopb.tap" size="1510854" crc="a018d08f" sha1="b4730e17a2566994c017dcfe893968375c30d3ec"/>
@@ -6072,15 +6080,16 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Rockford / Back to Reality</description>
 		<year>1987</year>
 		<publisher>Mastertronic Added Dimension</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="breality" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Back to Reality"/>
 			<dataarea name="cass" size="570317">
 				<rom name="breality.tap" size="570317" crc="2f561e28" sha1="ed091ed18ac721772d567d2a6e24cef44a3a3b7a"/>
 			</dataarea>
 		</part>
 
-		<part name="rockford" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Rockford"/>
 			<dataarea name="cass" size="333295">
 				<rom name="rockford.tap" size="333295" crc="ec352a42" sha1="b74140b6c605c914f5d983eabff74b38167c1777"/>
