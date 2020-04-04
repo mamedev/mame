@@ -196,6 +196,13 @@ TEST_CASE("ToBits", "")
 	REQUIRE(UINT64_C(0x123456789abcdef0) == bx::doubleToBits(bx::bitsToDouble(UINT32_C(0x123456789abcdef0) ) ) );
 }
 
+TEST_CASE("lerp", "")
+{
+	REQUIRE(1389.0f == bx::lerp(1389.0f, 1453.0f, 0.0f) );
+	REQUIRE(1453.0f == bx::lerp(1389.0f, 1453.0f, 1.0f) );
+	REQUIRE(0.5f == bx::lerp(0.0f, 1.0f, 0.5f) );
+}
+
 void mtxCheck(const float* _a, const float* _b)
 {
 	if (!bx::equal(_a, _b, 16, 0.01f) )
