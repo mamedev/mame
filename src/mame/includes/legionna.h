@@ -8,7 +8,7 @@
 #include "sound/okim6295.h"
 #include "audio/seibu.h"
 #include "machine/gen_latch.h"
-#include "machine/seibucop/seibucop.h"
+#include "machine/seibucop.h"
 #include "video/seibu_crtc.h"
 #include "emupal.h"
 #include "tilemap.h"

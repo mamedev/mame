@@ -7,14 +7,10 @@
 
 ***************************************************************************/
 
-#ifndef RAIDEN2COP_H
-#define RAIDEN2COP_H
+#ifndef MAME_MACHINE_SEIBUCOP_H
+#define MAME_MACHINE_SEIBUCOP_H
 
-#define LOG_Commands    0
-#define LOG_Phytagoras  0
-#define LOG_Division    0
-#define LOG_Move0205    0
-#define LOG_Move0905    0
+#pragma once
 
 
 class raiden2cop_device : public device_t
@@ -271,4 +267,4 @@ private:
 
 DECLARE_DEVICE_TYPE(RAIDEN2COP, raiden2cop_device)
 
-#endif  /* RAIDEN2COP_H */
+#endif // MAME_MACHINE_SEIBUCOP_H
