@@ -222,7 +222,7 @@ public:
 	TIMER_CALLBACK_MEMBER(stars_blink_callback);
 	TIMER_CALLBACK_MEMBER(stars_scroll_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(galaxold_interrupt_timer);
-	IRQ_CALLBACK_MEMBER(hunchbkg_irq_callback);
+	uint8_t hunchbkg_intack();
 
 	void state_save_register();
 	void video_start_common();
