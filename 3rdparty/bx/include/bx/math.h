@@ -249,6 +249,10 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float fract(float _a);
 
+	/// Returns result of negated multiply-sub operation -(_a * _b - _c).
+	///
+	BX_CONSTEXPR_FUNC float nms(float _a, float _b, float _c);
+
 	/// Returns result of multipla and add (_a * _b + _c).
 	///
 	BX_CONSTEXPR_FUNC float mad(float _a, float _b, float _c);

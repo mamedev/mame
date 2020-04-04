@@ -124,7 +124,11 @@ namespace bx
 
 	inline BX_CONSTEXPR_FUNC float lerp(float _a, float _b, float _t)
 	{
-		return _a + (_b - _a) * _t;
+		// Reference(s):
+		// - Linear interpolation past, present and future
+		//   https://web.archive.org/web/20200404165201/https://fgiesen.wordpress.com/2012/08/15/linear-interpolation-past-present-and-future/
+		//
+		return mad(_t, _b, nms(_t, _a, _a) );
 	}
 
 	inline BX_CONSTEXPR_FUNC float invLerp(float _a, float _b, float _value)
@@ -275,6 +279,11 @@ namespace bx
 	inline BX_CONSTEXPR_FUNC float fract(float _a)
 	{
 		return _a - trunc(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float nms(float _a, float _b, float _c)
+	{
+		return _c - _a * _b;
 	}
 
 	inline BX_CONSTEXPR_FUNC float mad(float _a, float _b, float _c)
