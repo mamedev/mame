@@ -2,11 +2,13 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
- * Sony NEWS keyboard (high-level emulation).
+ * Sony NEWS keyboard and mouse (high-level emulation).
  *
  * Sources:
  *
- *   https://github.com/NetBSD/src/blob/trunk/sys/dev/news/newskeymap.c
+ *   - https://github.com/tmk/tmk_keyboard/tree/master/converter/news_usb
+ *   - https://github.com/NetBSD/src/blob/trunk/sys/dev/news/newskeymap.c
+ *   - https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/dev/ms_hb.c
  *
  * TODO:
  *   - other languages (esp. Japanese)
@@ -22,73 +24,157 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(NEWS_HLE_KBD, news_hle_kbd_device, "news_kbd_hle", "Sony NEWS Keyboard (HLE)")
+DEFINE_DEVICE_TYPE(NEWS_HID_HLE, news_hid_hle_device, "news_hid_hle", "Sony NEWS Keyboard and Mouse (HLE)")
 
-news_hle_kbd_device::news_hle_kbd_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, NEWS_HLE_KBD, tag, owner, clock)
+news_hid_hle_device::news_hid_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, NEWS_HID_HLE, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this, "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7")
+	, m_mouse_x_axis(*this, "mouse_x_axis")
+	, m_mouse_y_axis(*this, "mouse_y_axis")
+	, m_mouse_buttons(*this, "mouse_buttons")
 	, m_irq_out_cb(*this)
 {
 }
 
-void news_hle_kbd_device::device_start()
+void news_hid_hle_device::map(address_map &map)
 {
-	m_irq_out_cb.resolve_safe();
+	map(0x0, 0x0).r(FUNC(news_hid_hle_device::data_r<KEYBOARD>));
+	map(0x1, 0x1).r(FUNC(news_hid_hle_device::status_r<KEYBOARD>));
+	map(0x2, 0x2).w(FUNC(news_hid_hle_device::reset_w<KEYBOARD>));
+	map(0x3, 0x3).w(FUNC(news_hid_hle_device::init_w<KEYBOARD>));
+	map(0x4, 0x4).r(FUNC(news_hid_hle_device::data_r<MOUSE>));
+	map(0x5, 0x5).r(FUNC(news_hid_hle_device::status_r<MOUSE>));
+	map(0x6, 0x6).w(FUNC(news_hid_hle_device::reset_w<MOUSE>));
+	map(0x7, 0x7).w(FUNC(news_hid_hle_device::init_w<MOUSE>));
 }
 
-void news_hle_kbd_device::device_reset()
+void news_hid_hle_device::device_start()
 {
-	m_fifo.clear();
-	out_irq(false);
+	m_irq_out_cb.resolve_all_safe();
+
+	//save_item(NAME(m_fifo));
+	save_item(NAME(m_irq_out_state));
+
+	save_item(NAME(m_mouse_x));
+	save_item(NAME(m_mouse_y));
+	save_item(NAME(m_mouse_b));
+	save_item(NAME(m_mouse_enable));
+}
+
+void news_hid_hle_device::device_reset()
+{
+	m_fifo[KEYBOARD].clear();
+	m_fifo[MOUSE].clear();
+
+	out_irq<KEYBOARD>(false);
+	out_irq<MOUSE>(false);
+
+	m_mouse_enable = false;
 
 	reset_key_state();
 	start_processing(attotime::from_hz(1'200));
 }
 
-void news_hle_kbd_device::key_make(u8 row, u8 column)
+void news_hid_hle_device::key_make(u8 row, u8 column)
 {
 	LOG("key_make row %d col %d\n", row, column);
 
 	push_key((row << 4) | column);
 }
 
-void news_hle_kbd_device::key_break(u8 row, u8 column)
+void news_hid_hle_device::key_break(u8 row, u8 column)
 {
 	LOG("key_break row %d col %d\n", row, column);
 
 	push_key(0x80 | (row << 4) | column);
 }
 
-void news_hle_kbd_device::push_key(u8 code)
+void news_hid_hle_device::push_key(u8 code)
 {
-	m_fifo.enqueue(code);
+	m_fifo[KEYBOARD].enqueue(code);
 
-	out_irq(true);
+	out_irq<KEYBOARD>(true);
 }
 
-void news_hle_kbd_device::out_irq(bool state)
+// HACK: abuse the keyboard row scanner to sample the mouse too
+void news_hid_hle_device::scan_complete()
 {
-	if (m_irq_out_state != state)
+	if (!m_mouse_enable)
+		return;
+
+	// read mouse state
+	s16 const x = m_mouse_x_axis->read();
+	s16 const y = m_mouse_y_axis->read();
+	u8 const b = m_mouse_buttons->read();
+
+	// compute delta
+	s8 const dx = x - m_mouse_x;
+	s8 const dy = y - m_mouse_y;
+	u8 const db = b ^ m_mouse_b;
+
+	// report if fifo has room and position or buttons changed
+	if ((m_fifo[MOUSE].queue_length() < 6) && (dx || dy || db))
 	{
-		m_irq_out_state = state;
-		m_irq_out_cb(state);
+		LOG("mouse dx %d dy %d db %d\n", dx, dy, db);
+
+		// compute sign
+		u8 const sx = (dx < 0) ? 0x08 : 0x00;
+		u8 const sy = (dy < 0) ? 0x10 : 0x00;
+
+		// transmit data
+		m_fifo[MOUSE].enqueue(0x80 | sy | sx | b);
+		m_fifo[MOUSE].enqueue(dx & 0x7f);
+		m_fifo[MOUSE].enqueue(dy & 0x7f);
+
+		// update mouse state
+		m_mouse_x = x;
+		m_mouse_y = y;
+		m_mouse_b = b;
+
+		out_irq<MOUSE>(true);
 	}
 }
 
-u8 news_hle_kbd_device::data_r()
+template <news_hid_hle_device::news_hid_device Device> void news_hid_hle_device::out_irq(bool state)
 {
-	if (m_fifo.empty())
+	if (m_irq_out_state[Device] != state)
+	{
+		m_irq_out_state[Device] = state;
+		m_irq_out_cb[Device](state);
+	}
+}
+
+template <news_hid_hle_device::news_hid_device Device> u8 news_hid_hle_device::data_r()
+{
+	if (m_fifo[Device].empty())
 		return 0;
 
-	u8 const data = m_fifo.dequeue();
+	u8 const data = m_fifo[Device].dequeue();
 
-	if (m_fifo.empty())
-		out_irq(false);
+	if (m_fifo[Device].empty())
+		out_irq<Device>(false);
 
 	return data;
 }
 
-INPUT_PORTS_START(news_hle_kbd_device)
+template <news_hid_hle_device::news_hid_device Device> void news_hid_hle_device::reset_w(u8 data)
+{
+	LOG("reset_w<%d> 0x%02x\n", Device, data);
+	m_fifo[Device].clear();
+
+	out_irq<Device>(false);
+}
+
+template <news_hid_hle_device::news_hid_device Device> void news_hid_hle_device::init_w(u8 data)
+{
+	LOG("init_w<%d> 0x%02x\n", Device, data);
+
+	// HACK: prevent unexpected mouse activity from crashing NEWS-OS
+	if (Device == MOUSE)
+		m_mouse_enable = bool(data);
+}
+
+INPUT_PORTS_START(news_hid_hle_device)
 	PORT_START("ROW0")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1")           PORT_CODE(KEYCODE_F1)         PORT_CHAR(UCHAR_MAMEKEY(F1))
@@ -232,9 +318,21 @@ INPUT_PORTS_START(news_hle_kbd_device)
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("mouse_x_axis")
+	PORT_BIT(0xffff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(100)
+
+	PORT_START("mouse_y_axis")
+	PORT_BIT(0xffff, 0, IPT_MOUSE_Y) PORT_SENSITIVITY(100)
+
+	PORT_START("mouse_buttons")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Left Button")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Right Button")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Middle Button")
+	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-ioport_constructor news_hle_kbd_device::device_input_ports() const
+ioport_constructor news_hid_hle_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME(news_hle_kbd_device);
+	return INPUT_PORTS_NAME(news_hid_hle_device);
 }

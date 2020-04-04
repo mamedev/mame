@@ -8,7 +8,6 @@
  *
  * TODO
  *   - sound
- *   - mouse
  */
 
 #include "emu.h"
@@ -61,7 +60,7 @@ public:
 		, m_net(*this, "net")
 		, m_fdc(*this, "fdc")
 		, m_lcd(*this, "lcd")
-		, m_kbd(*this, "kbd")
+		, m_hid(*this, "hid")
 		, m_scsi(*this, "scsi:7:cxd1185")
 		, m_serial(*this, "serial%u", 0U)
 		, m_scsibus(*this, "scsi")
@@ -119,7 +118,6 @@ protected:
 	u32 bus_error();
 	void itimer_w(u8 data);
 	void itimer(void *ptr, s32 param);
-	void kbd_irq(int state);
 	u8 debug_r() { return m_debug; }
 	void debug_w(u8 data);
 
@@ -135,7 +133,7 @@ protected:
 	required_device<upd72067_device> m_fdc;
 
 	required_device<screen_device> m_lcd;
-	required_device<news_hle_kbd_device> m_kbd;
+	required_device<news_hid_hle_device> m_hid;
 	required_device<cxd1185_device> m_scsi;
 
 	required_device_array<rs232_port_device, 2> m_serial;
@@ -150,7 +148,6 @@ protected:
 
 	u16 m_inten;
 	u16 m_intst;
-	u8 m_kbd_status;
 	u8 m_debug;
 
 	static unsigned const NUM_INT = 4;
@@ -171,8 +168,6 @@ void news_r3k_state::machine_start()
 
 	for (bool &int_state : m_int_state)
 		int_state = false;
-
-	m_kbd_status = 0;
 }
 
 void news_r3k_state::machine_reset()
@@ -207,24 +202,28 @@ void news_r3k_state::cpu_map(address_map &map)
 	// 0x18500000 lcdc?
 	map(0x18600000, 0x186fffff).r(FUNC(news_r3k_state::bus_error)); // ??
 	map(0x18780000, 0x18780003).r(FUNC(news_r3k_state::bus_error)); // nwb-225
-	map(0x18c30000, 0x18c30003).r(FUNC(news_r3k_state::bus_error)); // second lance
+	map(0x18c30000, 0x18c30003).r(FUNC(news_r3k_state::bus_error)); // second lance (ram at 18c20000, id at 18c38000)
 	map(0x18c40000, 0x18c40003).r(FUNC(news_r3k_state::bus_error)); // second scc
 	map(0x18c40004, 0x18c40007).r(FUNC(news_r3k_state::bus_error)); // third scc
-	map(0x18c70000, 0x18c70003).r(FUNC(news_r3k_state::bus_error)); // third lance
+	//map(0x18c40100, 0x18c40118); // scc #1-#4 port/status
+	map(0x18c70000, 0x18c70003).r(FUNC(news_r3k_state::bus_error)); // third lance (ram at 18c60000, id at 18c78000)
 	map(0x18e00000, 0x18e00003).r(FUNC(news_r3k_state::bus_error)); // nwb-252/nwb-253 crt
 	map(0x18ff0000, 0x18ff0003).r(FUNC(news_r3k_state::bus_error)); // nwb-252/nwb-253 ctrl
 
 	map(0x1fc00000, 0x1fc1ffff).rom().region("eprom", 0);
 	//map(0x1fc40004, 0x1fc40004).w().umask32(0xff); ??
+	// 1fc40007 // powreb?
 	map(0x1fc80000, 0x1fc80001).rw(FUNC(news_r3k_state::inten_r), FUNC(news_r3k_state::inten_w));
 	map(0x1fc80002, 0x1fc80003).r(FUNC(news_r3k_state::intst_r));
 	map(0x1fc80004, 0x1fc80005).w(FUNC(news_r3k_state::intclr_w));
 	map(0x1fc80006, 0x1fc80006).w(FUNC(news_r3k_state::itimer_w));
-	map(0x1fcc0003, 0x1fcc0003).rw(FUNC(news_r3k_state::debug_r), FUNC(news_r3k_state::debug_w));
 
-	map(0x1fd00000, 0x1fd00000).r(m_kbd, FUNC(news_hle_kbd_device::data_r));
-	map(0x1fd00001, 0x1fd00001).lr8([this]() { return m_kbd_status; }, "kbd_status_r");
-	map(0x1fd00002, 0x1fd00002).lw8([this](u8 data) { m_kbd->reset(); }, "kbd_reset_w");
+	// 1fcc0000 // cstrobe?
+	// 1fcc0002 // sccstatus0?
+	map(0x1fcc0003, 0x1fcc0003).rw(FUNC(news_r3k_state::debug_r), FUNC(news_r3k_state::debug_w));
+	// 1fcc0007 // sccvect?
+
+	map(0x1fd00000, 0x1fd00007).m(m_hid, FUNC(news_hid_hle_device::map));
 	map(0x1fd40000, 0x1fd40003).noprw().umask32(0xffff); // FIXME: ignore buzzer for now
 
 	map(0x1fe00000, 0x1fe0000f).m(m_dma, FUNC(dmac_0448_device::map));
@@ -360,16 +359,6 @@ void news_r3k_state::itimer(void *ptr, s32 param)
 	irq_w<TIMER>(ASSERT_LINE);
 }
 
-void news_r3k_state::kbd_irq(int state)
-{
-	if (state)
-		m_kbd_status |= 2;
-	else
-		m_kbd_status &= ~2;
-
-	irq_w<KBD>(state);
-}
-
 void news_r3k_state::debug_w(u8 data)
 {
 	LOG("debug_w 0x%02x (%s)\n", data, machine().describe_context());
@@ -477,8 +466,9 @@ void news_r3k_state::common(machine_config &config)
 	m_lcd->set_raw(47185920, 1024, 0, 1024, 768, 0, 768);
 	m_lcd->set_screen_update(FUNC(news_r3k_state::screen_update));
 
-	NEWS_HLE_KBD(config, m_kbd);
-	m_kbd->irq_out().set(*this, FUNC(news_r3k_state::kbd_irq));
+	NEWS_HID_HLE(config, m_hid);
+	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(FUNC(news_r3k_state::irq_w<KBD>));
+	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(FUNC(news_r3k_state::irq_w<MOUSE>));
 }
 
 void news_r3k_state::nws3260(machine_config &config)
