@@ -57,6 +57,7 @@ using util::BIT;
 #include "cpu/h8/h8hd.h"
 #include "cpu/h8/h8s2000d.h"
 #include "cpu/h8/h8s2600d.h"
+#include "cpu/h8500/h8500dasm.h"
 #include "cpu/hcd62121/hcd62121d.h"
 #include "cpu/hd61700/hd61700d.h"
 #include "cpu/hmcs40/hmcs40d.h"
@@ -385,6 +386,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "h8h",             be,  0, []() -> util::disasm_interface * { return new h8h_disassembler; } },
 	{ "h8s2000",         be,  0, []() -> util::disasm_interface * { return new h8s2000_disassembler; } },
 	{ "h8s2600",         be,  0, []() -> util::disasm_interface * { return new h8s2600_disassembler; } },
+	{ "h8500",           be,  0, []() -> util::disasm_interface * { return new h8500_disassembler; } },
 	{ "hc11",            be,  0, []() -> util::disasm_interface * { return new hc11_disassembler; } },
 	{ "hcd62121",        le,  0, []() -> util::disasm_interface * { return new hcd62121_disassembler; } },
 	{ "hd61700",         le, -1, []() -> util::disasm_interface * { return new hd61700_disassembler; } },

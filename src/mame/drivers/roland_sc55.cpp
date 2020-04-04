@@ -38,7 +38,7 @@
 
 #include "emu.h"
 #include "machine/ram.h"
-#include "cpu/mcs96/i8x9x.h"
+#include "cpu/h8500/h8532.h"
 
 static INPUT_PORTS_START( sc55 )
 INPUT_PORTS_END
@@ -51,7 +51,7 @@ public:
 	void sc55(machine_config &config);
 
 private:
-	required_device<i8x9x_device> m_maincpu;
+	required_device<h8532_device> m_maincpu;
 
 	void sc55_map(address_map &map);
 };
@@ -64,23 +64,26 @@ sc55_state::sc55_state(const machine_config &mconfig, device_type type, const ch
 
 void sc55_state::sc55_map(address_map &map)
 {
-	map(0x1000, 0x3fff).rom().region("maincpu", 0x1000);
+	map(0x40000, 0x7ffff).rom().region("progrom", 0);
 }
 
 void sc55_state::sc55(machine_config &config)
 {
-	P8098(config, m_maincpu, XTAL(20'000'000));    // probably not?
+	HD6435328(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc55_state::sc55_map);
 }
 
 ROM_START( sc55 )
-	ROM_REGION( 0x40000, "maincpu", 0 ) // additional H8/532 code and patch data - revisions match main CPU revisions
+	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "roland_r15199778_6435328a97f.ic30", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x40000, "progrom", 0 ) // additional H8/532 code and patch data - revisions match main CPU revisions
 	ROM_LOAD( "roland_r15209363.ic23", 0x000000, 0x040000, CRC(2dc58549) SHA1(9c17f85e784dc1549ac1f98d457b353393331f6b) )
 
-	ROM_REGION( 0x300000, "la", 0 )
+	ROM_REGION( 0x300000, "waverom", 0 )
 	ROM_LOAD( "roland-gss.a_r15209276.ic28", 0x000000, 0x100000, CRC(1ac774d3) SHA1(8cc3c0d7ec0993df81d4ca1970e01a4b0d8d3775) )
 	ROM_LOAD( "roland-gss.b_r15209277.ic27", 0x100000, 0x100000, CRC(8dcc592a) SHA1(80e6eb130c18c09955551563f78906163c55cc11) )
 	ROM_LOAD( "roland-gss.c_r15209281.ic26", 0x200000, 0x100000, CRC(e21ebc04) SHA1(7454b817778179806f3f9d1985b3a2ef67ace76f) )
 ROM_END
 
-CONS( 1991, sc55, 0, 0, sc55, sc55, sc55_state, empty_init, "Roland", "Sound Canvas SC-55", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST( 1991, sc55, 0, 0, sc55, sc55, sc55_state, empty_init, "Roland", "Sound Canvas SC-55", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

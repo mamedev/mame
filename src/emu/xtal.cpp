@@ -127,6 +127,7 @@ const double XTAL::known_xtals[] = {
 	  6'880'000, /* 6.88_MHz_XTAL          Barcrest MPU4 */
 	  6'900'000, /* 6.9_MHz_XTAL           BBN BitGraph CPU */
 	  7'000'000, /* 7_MHz_XTAL             Jaleco Mega System PCBs */
+	  7'056'000, /* 7.056_MHz_XTAL         Alesis QS FXCHIP */
 	  7'159'090, /* 7.15909_MHz_XTAL       Blood Bros (2x NTSC subcarrier) */
 	  7'200'000, /* 7.2_MHz_XTAL           Image Fight bootleg I80C031 MCU */
 	  7'372'800, /* 7.3728_MHz_XTAL        - */

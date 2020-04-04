@@ -684,6 +684,31 @@ if (CPUS["H8"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- Hitachi H8/500 series
+--@src/devices/cpu/h8500/h8500.h,CPUS["H8500"] = true
+--------------------------------------------------
+
+if (CPUS["H8500"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/h8500/h8500.cpp",
+		MAME_DIR .. "src/devices/cpu/h8500/h8500.h",
+		MAME_DIR .. "src/devices/cpu/h8500/h8510.cpp",
+		MAME_DIR .. "src/devices/cpu/h8500/h8510.h",
+		MAME_DIR .. "src/devices/cpu/h8500/h8520.cpp",
+		MAME_DIR .. "src/devices/cpu/h8500/h8520.h",
+		MAME_DIR .. "src/devices/cpu/h8500/h8532.cpp",
+		MAME_DIR .. "src/devices/cpu/h8500/h8532.h",
+		MAME_DIR .. "src/devices/cpu/h8500/h8534.cpp",
+		MAME_DIR .. "src/devices/cpu/h8500/h8534.h",
+	}
+end
+
+if (CPUS["H8500"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/h8500/h8500dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/h8500/h8500dasm.h")
+end
+
+--------------------------------------------------
 -- Hitachi HCD62121
 --@src/devices/cpu/hcd62121/hcd62121.h,CPUS["HCD62121"] = true
 --------------------------------------------------
