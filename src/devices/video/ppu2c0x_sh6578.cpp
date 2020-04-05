@@ -7,10 +7,9 @@
 #include "emu.h"
 #include "video/ppu2c0x_sh6578.h"
 
-#define LOG_PPU_EXTRA       (1U << 0)
+#define LOG_PPU_EXTRA       (1U << 1)
 
 //#define VERBOSE             (LOG_PPU_EXTRA)
-#define VERBOSE             (0)
 
 #include "logmacro.h"
 

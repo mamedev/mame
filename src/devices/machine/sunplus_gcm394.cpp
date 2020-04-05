@@ -10,12 +10,11 @@
 #include "sunplus_gcm394.h"
 
 
-
-#define LOG_GCM394_SPI            (1U << 4)
-#define LOG_GCM394_IO             (1U << 3)
-#define LOG_GCM394_SYSDMA         (1U << 2)
-#define LOG_GCM394                (1U << 1)
-#define LOG_GCM394_UNMAPPED       (1U << 0)
+#define LOG_GCM394_SPI            (1U << 5)
+#define LOG_GCM394_IO             (1U << 4)
+#define LOG_GCM394_SYSDMA         (1U << 3)
+#define LOG_GCM394                (1U << 2)
+#define LOG_GCM394_UNMAPPED       (1U << 1)
 
 #define VERBOSE             (LOG_GCM394 | LOG_GCM394_UNMAPPED | LOG_GCM394_SYSDMA)
 #include "logmacro.h"
@@ -124,7 +123,7 @@ READ16_MEMBER(sunplus_gcm394_base_device::system_dma_status_r)
 	// bit 0 = channel 0 ready
 	// bit 1 = channel 1 ready
 
-	return 0x00FF;
+	return 0x00ff;
 }
 
 void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int channel)
