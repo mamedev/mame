@@ -34656,6 +34656,9 @@ r8                              //
 r8m                             //
 r8mk2                           //
 
+@source:roland_ra30.cpp
+ra30                            //
+
 @source:roland_s10.cpp
 mks100                          //
 s10                             //
