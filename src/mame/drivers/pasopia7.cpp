@@ -66,6 +66,7 @@ public:
 		, m_keyboard(*this, "KEY.%d", 0)
 		, m_cass(*this, "cassette")
 		, m_speaker(*this, "speaker")
+		, m_font_rom(*this, "font")
 	{ }
 
 	void p7_base(machine_config &config);
@@ -107,7 +108,7 @@ private:
 	TIMER_CALLBACK_MEMBER(pio_timer);
 	DECLARE_VIDEO_START(pasopia7);
 	void p7_lcd_palette(palette_device &palette) const;
-	uint32_t screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	MC6845_UPDATE_ROW(update_row);
 
 	void pasopia7_io(address_map &map);
 	void pasopia7_mem(address_map &map);
@@ -118,9 +119,7 @@ private:
 	uint8_t m_mio_sel;
 	std::unique_ptr<uint8_t[]> m_p7_pal;
 	uint8_t m_bank_reg;
-	uint16_t m_cursor_addr;
 	uint8_t m_cursor_blink;
-	uint8_t m_cursor_raster;
 	uint8_t m_plane_reg;
 	uint8_t m_attr_data;
 	uint8_t m_attr_wrap;
@@ -136,7 +135,6 @@ private:
 	uint32_t m_kanji_index;
 	uint8_t m_pac2_bank_select;
 	uint8_t m_screen_type;
-	int m_addr_latch;
 	void pasopia_nmi_trap();
 	uint8_t m_mux_data;
 	u8 m_porta_2;
@@ -144,9 +142,9 @@ private:
 	emu_timer *m_pio_timer;
 	virtual void machine_reset() override;
 	void fdc_irq(bool state);
-	void draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width);
-	void draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width);
-	void draw_mixed_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width);
+	void draw_cg4_line(bitmap_rgb32 &bitmap,int y,int yi,int width,int count);
+	void draw_tv_line(bitmap_rgb32 &bitmap,int y,int yi,int width,int count,int cursor_x);
+	void draw_mixed_line(bitmap_rgb32 &bitmap,int y,int yi,int width,int count,int cursor_x);
 
 	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -164,6 +162,7 @@ private:
 	required_ioport_array<12> m_keyboard;
 	required_device<cassette_image_device> m_cass;
 	required_device<speaker_sound_device> m_speaker;
+	required_region_ptr<uint8_t> m_font_rom;
 };
 
 #define VDP_CLOCK 14.318181_MHz_XTAL / 16
@@ -188,188 +187,109 @@ VIDEO_START_MEMBER(pasopia7_state,pasopia7)
 	m_p7_pal = std::make_unique<uint8_t[]>(0x10);
 }
 
-void pasopia7_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
+void pasopia7_state::draw_cg4_line(bitmap_rgb32 &bitmap,int y,int yi,int width,int count)
 {
-	int x,y,xi,yi;
-	int count;
-
-	for(yi=0;yi<8;yi++)
+	for(int x=0;x<8*width;x+=8)
 	{
-		count = yi;
-		for(y=0;y<200;y+=8)
+		for(int xi=0;xi<8;xi++)
 		{
-			for(x=0;x<8*width;x+=8)
-			{
-				for(xi=0;xi<8;xi++)
-				{
-					int pen_b,pen_r,pen_g,color;
+			int pen_b,pen_r,pen_g,color;
 
-					pen_b = (m_vram[count+0x0000]>>(7-xi)) & 1;
-					pen_r = (m_vram[count+0x4000]>>(7-xi)) & 1;
-					pen_g = 0;//(p7_vram[count+0x8000]>>(7-xi)) & 1;
+			pen_b = (m_vram[count+yi+0x0000]>>(7-xi)) & 1;
+			pen_r = (m_vram[count+yi+0x4000]>>(7-xi)) & 1;
+			pen_g = 0;//(m_vram[count+yi+0x8000]>>(7-xi)) & 1;
 
-					color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
+			color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
 
-					bitmap.pix16(y+yi, x+xi) = m_palette->pen(color);
-				}
-				count+=8;
-			}
+			bitmap.pix32(y, x+xi) = m_palette->pen(color);
 		}
+		count+=8;
 	}
 }
 
-void pasopia7_state::draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
+void pasopia7_state::draw_tv_line(bitmap_rgb32 &bitmap,int y,int yi,int width,int count,int cursor_x)
 {
-	uint8_t *gfx_data = memregion("font")->base();
-	int x,y,xi,yi;
-	int count;
-
-	count = 0x0000;
-
-	for(y=0;y<25;y++)
+	for(int x=0;x<width;x++)
 	{
-		for(x=0;x<width;x++)
+		int tile = m_vram[count+0x8000];
+		int attr = m_vram[count+0xc000];
+		int color = attr & 7;
+
+		for(int xi=0;xi<8;xi++)
 		{
-			int tile = m_vram[count+0x8000];
-			int attr = m_vram[count+0xc000];
+			int pen = ((m_font_rom[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
+
+			bitmap.pix32(y, x*8+xi) = m_palette->pen(pen);
+		}
+
+		// draw cursor
+		if(cursor_x == x)
+		{
+			for(int xc=0;xc<8;xc++)
+			{
+				bitmap.pix32(y, x*8+xc) = m_palette->pen(7);
+			}
+		}
+		count+=8;
+	}
+}
+
+void pasopia7_state::draw_mixed_line(bitmap_rgb32 &bitmap,int y,int yi,int width,int count,int cursor_x)
+{
+	for(int x=0;x<width;x++)
+	{
+		int tile = m_vram[count+0x8000];
+		int attr = m_vram[count+0xc000+yi];
+
+		if(attr & 0x80)
+		{
+			for(int xi=0;xi<8;xi++)
+			{
+				int pen,pen_b,pen_r,pen_g;
+
+				pen_b = (m_vram[count+yi+0x0000]>>(7-xi)) & 1;
+				pen_r = (m_vram[count+yi+0x4000]>>(7-xi)) & 1;
+				pen_g = (m_vram[count+yi+0x8000]>>(7-xi)) & 1;
+
+				pen =  pen_g<<2 | pen_r<<1 | pen_b<<0;
+
+				bitmap.pix32(y, x*8+xi) = m_palette->pen(pen);
+			}
+		}
+		else
+		{
 			int color = attr & 7;
 
-			for(yi=0;yi<8;yi++)
+			for(int xi=0;xi<8;xi++)
 			{
-				for(xi=0;xi<8;xi++)
-				{
-					int pen;
-					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
+				int pen = ((m_font_rom[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
 
-					bitmap.pix16(y*8+yi, x*8+xi) = m_palette->pen(pen);
-				}
+				bitmap.pix32(y, x*8+xi) = m_palette->pen(pen);
 			}
-
-			// draw cursor
-			if(m_cursor_addr*8 == count)
-			{
-				int xc,yc,cursor_on;
-
-				cursor_on = 0;
-				switch(m_cursor_raster & 0x60)
-				{
-					case 0x00: cursor_on = 1; break; //always on
-					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(m_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(m_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
-				}
-
-				if(cursor_on)
-				{
-					for(yc=0;yc<(8-(m_cursor_raster & 7));yc++)
-					{
-						for(xc=0;xc<8;xc++)
-						{
-							bitmap.pix16(y*8-yc+7, x*8+xc) = m_palette->pen(7);
-						}
-					}
-				}
-			}
-			count+=8;
 		}
-	}
-}
 
-void pasopia7_state::draw_mixed_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
-{
-	uint8_t *gfx_data = memregion("font")->base();
-	int x,y,xi,yi;
-	int count;
-
-	count = 0x0000;
-
-	for(y=0;y<25;y++)
-	{
-		for(x=0;x<width;x++)
+		// draw cursor
+		if(cursor_x == x)
 		{
-			int tile = m_vram[count+0x8000];
-
-			for(yi=0;yi<8;yi++)
+			for(int xc=0;xc<8;xc++)
 			{
-				int attr = m_vram[count+0xc000+yi];
-
-				if(attr & 0x80)
-				{
-					for(xi=0;xi<8;xi++)
-					{
-						int pen,pen_b,pen_r,pen_g;
-
-						pen_b = (m_vram[count+yi+0x0000]>>(7-xi)) & 1;
-						pen_r = (m_vram[count+yi+0x4000]>>(7-xi)) & 1;
-						pen_g = (m_vram[count+yi+0x8000]>>(7-xi)) & 1;
-
-						pen =  pen_g<<2 | pen_r<<1 | pen_b<<0;
-
-						bitmap.pix16(y*8+yi, x*8+xi) = m_palette->pen(pen);
-					}
-				}
-				else
-				{
-					int color = attr & 7;
-
-					for(xi=0;xi<8;xi++)
-					{
-						int pen;
-						pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
-
-						bitmap.pix16(y*8+yi, x*8+xi) = m_palette->pen(pen);
-					}
-				}
+				bitmap.pix32(y, x*8+xc) = m_palette->pen(7);
 			}
-
-			// draw cursor
-			if(m_cursor_addr*8 == count)
-			{
-				int xc,yc,cursor_on;
-
-				cursor_on = 0;
-				switch(m_cursor_raster & 0x60)
-				{
-					case 0x00: cursor_on = 1; break; //always on
-					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(m_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(m_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
-				}
-
-				if(cursor_on)
-				{
-					for(yc=0;yc<(8-(m_cursor_raster & 7));yc++)
-					{
-						for(xc=0;xc<8;xc++)
-						{
-							bitmap.pix16(y*8-yc+7, x*8+xc) = m_palette->pen(7);
-						}
-					}
-				}
-			}
-
-			count+=8;
 		}
+
+		count+=8;
 	}
 }
 
-uint32_t pasopia7_state::screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+MC6845_UPDATE_ROW(pasopia7_state::update_row)
 {
-	int width;
-
-	bitmap.fill(m_palette->pen(0), cliprect);
-
-	width = m_x_width ? 80 : 40;
-
 	if(m_gfx_mode)
-		draw_mixed_screen(bitmap,cliprect,width);
+		draw_mixed_line(bitmap,y,ra,x_count,ma*8,cursor_x);
 	else
 	{
-		draw_cg4_screen(bitmap,cliprect,width);
-		draw_tv_screen(bitmap,cliprect,width);
+		draw_cg4_line(bitmap,y,ra,x_count,ma*8);
+		draw_tv_line(bitmap,y,ra,x_count,ma*8,cursor_x);
 	}
-
-	return 0;
 }
 
 uint8_t pasopia7_state::vram_r(offs_t offset)
@@ -544,19 +464,10 @@ void pasopia7_state::pasopia7_6845_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0)
 	{
-		m_addr_latch = data;
 		m_crtc->address_w(data);
 	}
 	else
 	{
-		/* FIXME: this should be inside the MC6845 core! */
-		if(m_addr_latch == 0x0a)
-			m_cursor_raster = data;
-		if(m_addr_latch == 0x0e)
-			m_cursor_addr = ((data<<8) & 0x3f00) | (m_cursor_addr & 0xff);
-		else if(m_addr_latch == 0x0f)
-			m_cursor_addr = (m_cursor_addr & 0x3f00) | (data & 0xff);
-
 		m_crtc->register_w(data);
 
 		/* double pump the pixel clock if we are in 640 x 200 mode */
@@ -1027,8 +938,7 @@ void pasopia7_state::p7_raster(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 32-1);
-	m_screen->set_palette(m_palette);
-	m_screen->set_screen_update(FUNC(pasopia7_state::screen_update_pasopia7));
+	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 
@@ -1039,6 +949,7 @@ void pasopia7_state::p7_raster(machine_config &config)
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(pasopia7_state::update_row));
 }
 
 
@@ -1050,8 +961,7 @@ void pasopia7_state::p7_lcd(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 200-1);
-	m_screen->set_screen_update(FUNC(pasopia7_state::screen_update_pasopia7));
-	m_screen->set_palette(m_palette);
+	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 
@@ -1062,6 +972,7 @@ void pasopia7_state::p7_lcd(machine_config &config)
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(pasopia7_state::update_row));
 }
 
 /* ROM definition */
