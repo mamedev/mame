@@ -61,6 +61,7 @@ public:
 	void blkheart(machine_config &config);
 	void manybloc(machine_config &config);
 	void acrobatm(machine_config &config);
+	void sabotenb(machine_config &config);
 	void strahl(machine_config &config);
 	void tdragon3h(machine_config &config);
 	void hachamf_prot(machine_config &config);
@@ -153,6 +154,7 @@ protected:
 	void mustang_scroll_w(u16 data);
 	void raphero_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template<unsigned Layer> void scroll_w(offs_t offset, u8 data);
+	void sabotenb_scroll_w(offs_t offset, u8 data);
 	void vandyke_scroll_w(offs_t offset, u16 data);
 	void vandykeb_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void manybloc_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -216,6 +218,7 @@ protected:
 	void oki2_map(address_map &map);
 	void raphero_map(address_map &map);
 	void raphero_sound_mem_map(address_map &map);
+	void sabotenb_map(address_map &map);
 	void ssmissin_map(address_map &map);
 	void ssmissin_sound_map(address_map &map);
 	void strahl_map(address_map &map);
