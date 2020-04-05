@@ -183,6 +183,11 @@ void nmk16_state::mustang_scroll_w(u16 data)
 	m_bg_tilemap[0]->set_scrollx(0,m_mustang_bg_xscroll - m_videoshift);
 }
 
+void nmk16_state::bjtwin_scroll_w(offs_t offset, u8 data)
+{
+	m_bg_tilemap[0]->set_scrolly(0,-data);
+}
+
 void nmk16_state::vandyke_scroll_w(offs_t offset, u16 data)
 {
 	m_vscroll[offset] = data;
