@@ -8916,6 +8916,22 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="harpoonbs2">
+		<description>Harpoon Battleset 2 - North Atlantic Convoys</description>
+		<year>1989</year>
+		<publisher>Three-Sixty</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="harpoon battleset 2 - north atlantic convoys disk 1.img" size="737280" crc="e090779c" sha1="372e03722c4651c8c480fad1ebb3f4146773201a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="harpoon battleset 2 - north atlantic convoys disk 2.img" size="737280" crc="5c0d3f87" sha1="302824289f15df9f6d329768d560d4ad1912daea"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="herolanc">
 		<description>Heroes of the Lance</description>
 		<year>1991</year>
@@ -9451,6 +9467,27 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Leather Goddesses of Phobos [1988] [5.25] [1 of 1].img" size="368640" crc="8e586c8d" sha1="865cf5dc0de66b0ef06e7bd710eee8a6b0351154"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsl2">
+		<description>Leisure Suit Larry Goes Looking for Love (In Several Wrong Places)</description>
+		<year>1988</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="leisure suit larry 2 (disk 1).img" size="737280" crc="d852af42" sha1="1feab542687a6984072faabd228976d6953238c1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="leisure suit larry 2 (disk 2).img" size="737280" crc="09153a59" sha1="a57ef10d7b5c6ffa393b0b296a7907c51728652a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="leisure suit larry 2 (disk 3).img" size="737280" crc="0a3b07f8" sha1="2a3732988e2265d3f352fa5f25330fb6602ab59d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11614,6 +11651,38 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] Skweek D2.2 [5.25].img" size="368640" crc="29fb059e" sha1="c93d3411ec866b6c489bfad5b7825c89d79b6f90"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tswtwgp3" support="partial">
+		<description>The Software Toolworks Game Pack 3</description>
+		<year>1993</year>
+		<publisher>The Software Toolworks</publisher>
+		<info name="version" value="3.0.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="the software toolworks game pack 3 disk 1.img" size="737280" crc="a1476386" sha1="77f22c2b2ab60f738c6ff5858f57192b14ef68ff"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="the software toolworks game pack 3 disk 2.img" size="737280" crc="b0df3792" sha1="f9e13f0bd983837951fb4d76af609ea71e03767d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="the software toolworks game pack 3 disk 3.img" size="737280" crc="64c72675" sha1="47c1df916942faff008f2dc318868dbb14e03181"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="the software toolworks game pack 3 disk 4.img" size="737280" crc="47a52e1e" sha1="cc2f84d861161918720f980a7e5af2a52ea7c515"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="the software toolworks game pack 3 disk 5.img" size="737280" crc="f4b8294b" sha1="5585df51c001e0c0181ab5d92e09b4130cd3fbef"/>
 			</dataarea>
 		</part>
 	</software>
