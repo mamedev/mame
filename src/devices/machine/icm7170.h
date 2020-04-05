@@ -60,6 +60,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_rtc_interface overrides
@@ -76,6 +77,7 @@ private:
 	devcb_write_line m_out_irq_cb;
 
 	uint8_t m_regs[0x20];
+	uint8_t m_irq_mask, m_irq_status;
 
 	emu_timer *m_timer;
 };

@@ -77,7 +77,7 @@ public:
 		m_gfxsubcpu(*this, "gfxsubcpu"),
 		m_datacpu(*this, "datacpu"),
 		m_iocpu(*this, "iocpu"),
-		m_mainram(*this, "extram"),
+		m_mainram(*this, "mainram"),
 		m_extram(*this, "extram"),
 		m_vram(*this, "vram"),
 		m_rtc(*this, "rtc")
@@ -141,7 +141,7 @@ void wxstar4k_state::cpubd_main(address_map &map)
 	// FDF000 - cause IRQ 6 on graphics card
 	// FDF004 - cause IRQ 6 on graphics card 2 (not used)
 	// FDF008 - reset watchdog
-	// FDFFC0-FDFFE2 - ICM7170 RTC, registers every 2 bytes
+	map(0xfdffc0, 0xfdffe3).rw(m_rtc, FUNC(icm7170_device::read), FUNC(icm7170_device::write)).umask16(0x00ff);
 	map(0xfe0000, 0xffffff).rom().region("maincpu", 0);
 }
 
