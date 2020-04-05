@@ -8985,12 +8985,29 @@ has been replaced with an all-zero block. -->
 		<!-- Dumped via Kryoflux -->
 		<description>Indiana Jones and the Last Crusade - The Action Game (Kixx release)</description>
 		<year>1989</year>
-		<publisher>U.S. Gold</publisher>
+		<publisher>Lucasfilm - U.S. Gold</publisher>
 		<info name="developer" value="LucasFilm Games" />
 		<part name="flop1" interface="floppy_3_5">
 			<!-- Copy-protected key disk -->
 			<dataarea name="flop" size = "2157701">
 				<rom name="Indiana Jones And The Last Crusade - The Action Game (Kixx release) [US Gold] [1989] [3.5DD] [Disk 1 of 1].mfm" size="2157701" crc="6f298760" sha1="36b0d48fd1a2e881a59971da2734d65feb2497c2"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="indycrus_525" cloneof="indycrus">
+		<description>Indiana Jones and the Last Crusade - The Action Game (5.25")</description>
+		<year>1989</year>
+		<publisher>Lucasfilm - U.S. Gold</publisher>
+		<info name="developer" value="Lucasfilm Games" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Indiana Jones And The Last Crusade - The Action Game [US Gold] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="249fb996" sha1="e1f79bad887c9567b515d00c7e7be62cda088eab"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Indiana Jones And The Last Crusade - The Action Game [US Gold] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="f235cc28" sha1="0b372361c7ea4a20f9159d4f42dc791440ce0b3e"/>
 			</dataarea>
 		</part>
 	</software>
