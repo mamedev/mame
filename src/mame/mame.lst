@@ -19020,7 +19020,8 @@ medlanes                        // [1977?]
 lb186                           // Ampro Little Board/186
 
 @source:lbeach.cpp
-lbeach                          // (c) 1979 Olympia / Seletron
+lbeach
+speedrs
 
 @source:lbpc.cpp
 lbpc                            // Ampro Little Board/PC
