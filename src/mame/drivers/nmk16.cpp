@@ -1286,15 +1286,9 @@ void nmk16_state::bjtwin_map(address_map &map)
 	map(0x084020, 0x08402f).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x094001, 0x094001).w(FUNC(nmk16_state::tilebank_w));
-	map(0x094002, 0x094003).nopw();    /* IRQ enable? */
+	map(0x094003, 0x094003).w(FUNC(nmk16_state::bjtwin_scroll_w));    // sabotenb specific?
 	map(0x09c000, 0x09cfff).mirror(0x1000).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
 	map(0x0f0000, 0x0fffff).ram().share("mainram");
-}
-
-void nmk16_state::sabotenb_map(address_map &map)
-{
-	bjtwin_map(map);
-	map(0x094003, 0x094003).w(FUNC(nmk16_state::sabotenb_scroll_w));    // sabotenb specific?
 }
 
 static INPUT_PORTS_START( vandyke )
@@ -4915,12 +4909,6 @@ void nmk16_state::bjtwin(machine_config &config)
 	nmk112.set_rom1_tag("oki2");
 }
 
-void nmk16_state::sabotenb(machine_config &config)
-{
-	bjtwin(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::sabotenb_map);
-}
-
 
 TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::manybloc_scanline)
 {
@@ -8502,9 +8490,9 @@ GAME( 1994, raphero,    arcadian, raphero,      raphero,      nmk16_state, init_
 GAME( 1994, rapheroa,   arcadian, raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK (Media Trading license)",  "Rapid Hero (Media Trading)", 0 ) // ^^ - note that all ROM sets have Media Trading(aka Media Shoji) in the tile graphics, but this is the only set that shows it on the titlescreen
 
 /* both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate */
-GAME( 1992, sabotenb,   0,        sabotenb,     sabotenb,     nmk16_state, init_nmk,             ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", MACHINE_NO_COCKTAIL )
-GAME( 1992, sabotenba,  sabotenb, sabotenb,     sabotenb,     nmk16_state, init_nmk,             ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", MACHINE_NO_COCKTAIL )
-GAME( 1992, cactus,     sabotenb, sabotenb,     sabotenb,     nmk16_state, init_nmk,             ROT0,   "bootleg",                      "Cactus (bootleg of Saboten Bombers)", MACHINE_NO_COCKTAIL ) // PCB marked 'Cactus', no title screen
+GAME( 1992, sabotenb,   0,        bjtwin,       sabotenb,     nmk16_state, init_nmk,             ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", MACHINE_NO_COCKTAIL )
+GAME( 1992, sabotenba,  sabotenb, bjtwin,       sabotenb,     nmk16_state, init_nmk,             ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", MACHINE_NO_COCKTAIL )
+GAME( 1992, cactus,     sabotenb, bjtwin,       sabotenb,     nmk16_state, init_nmk,             ROT0,   "bootleg",                      "Cactus (bootleg of Saboten Bombers)", MACHINE_NO_COCKTAIL ) // PCB marked 'Cactus', no title screen
 
 GAME( 1993, bjtwin,     0,        bjtwin,       bjtwin,       nmk16_state, init_bjtwin,          ROT270, "NMK",                          "Bombjack Twin (set 1)", MACHINE_NO_COCKTAIL )
 GAME( 1993, bjtwina,    bjtwin,   bjtwin,       bjtwin,       nmk16_state, init_bjtwin,          ROT270, "NMK",                          "Bombjack Twin (set 2)", MACHINE_NO_COCKTAIL )
