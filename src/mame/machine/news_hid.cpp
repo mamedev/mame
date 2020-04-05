@@ -149,12 +149,17 @@ template <news_hid_hle_device::news_hid_device Device> u8 news_hid_hle_device::d
 	if (m_fifo[Device].empty())
 		return 0;
 
-	u8 const data = m_fifo[Device].dequeue();
+	if (!machine().side_effects_disabled())
+	{
+		u8 const data = m_fifo[Device].dequeue();
 
-	if (m_fifo[Device].empty())
-		out_irq<Device>(false);
+		if (m_fifo[Device].empty())
+			out_irq<Device>(false);
 
-	return data;
+		return data;
+	}
+	else
+		return m_fifo[Device].peek();
 }
 
 template <news_hid_hle_device::news_hid_device Device> void news_hid_hle_device::reset_w(u8 data)
