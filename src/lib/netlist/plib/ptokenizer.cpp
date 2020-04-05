@@ -157,7 +157,7 @@ namespace plib {
 				bool benter(false);
 				bool bexit(false);
 				pstring file;
-				unsigned lineno;
+				unsigned lineno(0);
 
 				ret = get_token_internal();
 				if (!ret.is_type(token_type::NUMBER))
@@ -251,7 +251,8 @@ namespace plib {
 					token_t(id->second, tokstr)
 				:   token_t(token_type::IDENTIFIER, tokstr);
 		}
-		else if (c == m_string)
+
+		if (c == m_string)
 		{
 			pstring tokstr = "";
 			c = getc();

@@ -13,12 +13,12 @@
 #include "pstring.h"
 #include "ptypes.h"
 
+#include <algorithm>
 #include <cstddef>      // for std::max_align_t (usually long long)
 #include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include <algorithm>
 
 #if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
 #include <malloc.h>

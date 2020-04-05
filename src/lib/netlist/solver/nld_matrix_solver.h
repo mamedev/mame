@@ -201,7 +201,7 @@ namespace solver
 		}
 
 		// return number of floating point operations for solve
-		std::size_t ops() { return m_ops; }
+		std::size_t ops() const { return m_ops; }
 
 	protected:
 		template <typename T>
@@ -263,7 +263,6 @@ namespace solver
 
 		void set_pointers();
 
-	private:
 		analog_net_t *get_connected_net(terminal_t *term);
 
 	};

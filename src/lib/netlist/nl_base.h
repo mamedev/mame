@@ -28,9 +28,9 @@
 #include "nl_errstr.h"
 #include "nltypes.h"
 
+#include <initializer_list>
 #include <unordered_map>
 #include <vector>
-#include <initializer_list>
 
 //============================================================
 //  MACROS / New Syntax
@@ -428,18 +428,18 @@ namespace netlist
 				store().insert({obj, aname});
 			}
 
-			static const T &get(const C *obj) noexcept
+			static const T *get(const C *obj) noexcept
 			{
 				try
 				{
 					auto ret(store().find(obj));
 					nl_assert(ret != store().end());
-					return ret->second;
+					return &ret->second;
 				}
 				catch (...)
 				{
 					nl_assert_always(true, "exception in property_store_t.get()");
-					return *static_cast<T *>(nullptr);
+					return static_cast<T *>(nullptr);
 				}
 			}
 
@@ -488,7 +488,7 @@ namespace netlist
 
 			const pstring &name() const noexcept
 			{
-				return props::get(this);
+				return *props::get(this);
 			}
 
 		protected:
@@ -637,7 +637,7 @@ namespace netlist
 
 			state_var_sig m_Q;
 	#else
-			void set_copied_input(netlist_sig_t val) noexcept { plib::unused_var(val); }
+			void set_copied_input(netlist_sig_t val) const noexcept { plib::unused_var(val); }
 	#endif
 
 			void set_delegate(const nldelegate &delegate) noexcept { m_delegate = delegate; }
@@ -1414,9 +1414,9 @@ namespace netlist
 		inline std::vector<C *> get_device_list() const
 		{
 			std::vector<C *> tmp;
-			for (auto &d : m_devices)
+			for (const auto &d : m_devices)
 			{
-				auto dev = dynamic_cast<C *>(d.second.get());
+				auto * const dev = dynamic_cast<C *>(d.second.get());
 				if (dev != nullptr)
 					tmp.push_back(dev);
 			}
@@ -1464,7 +1464,7 @@ namespace netlist
 
 		core_device_t *find_device(const pstring &name) const
 		{
-			for (auto & d : m_devices)
+			for (const auto & d : m_devices)
 				if (d.first == name)
 					return d.second.get();
 			return nullptr;
@@ -1738,7 +1738,7 @@ namespace netlist
 		{
 			passert_always_msg(names.size() == N, "initializer_list size mismatch");
 			std::size_t i = 0;
-			for (auto &n : names)
+			for (const auto &n : names)
 				this->emplace(i++, dev, pstring(n), std::forward<Args>(args)...);
 		}
 
@@ -2129,7 +2129,7 @@ namespace netlist
 				}
 
 				m_time = top->exec_time();
-				const auto obj(top->object());
+				auto *const obj(top->object());
 				m_queue.pop();
 				if (obj != nullptr)
 					obj->template update_devs<KEEP_STATS>();

@@ -198,7 +198,7 @@ namespace plib
 		{
 			for (auto &s : m_collection)
 			{
-				auto source(dynamic_cast<S *>(s.get()));
+				auto *source(dynamic_cast<S *>(s.get()));
 				if (source)
 				{
 					auto strm = source->stream(name);
@@ -214,7 +214,7 @@ namespace plib
 		{
 			for (auto &s : m_collection)
 			{
-				auto source(dynamic_cast<S *>(s.get()));
+				auto *source(dynamic_cast<S *>(s.get()));
 				if (source)
 				{
 					if (lambda(source))

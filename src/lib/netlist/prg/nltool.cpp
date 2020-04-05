@@ -212,10 +212,10 @@ public:
 	{
 		// read the netlist ...
 
-		for (auto & d : defines)
+		for (const auto & d : defines)
 			setup().add_define(d);
 
-		for (auto & r : roms)
+		for (const auto & r : roms)
 			setup().register_source(plib::make_unique<netlist_data_folder_t>(r));
 
 #if 0
@@ -236,7 +236,7 @@ public:
 		setup().add_include(plib::make_unique<a>("netlist/devices/net_lib.h",""));
 #endif
 #endif
-		for (auto & i : includes)
+		for (const auto & i : includes)
 			setup().add_include(plib::make_unique<netlist_data_folder_t>(i));
 
 		setup().register_source(plib::make_unique<netlist::source_file_t>(filename));
@@ -329,7 +329,7 @@ struct input_t
 		m_param = setup.find_param(pstring(buf.data()), true);
 	}
 
-	void setparam()
+	void setparam() const
 	{
 		switch (m_param->param_type())
 		{

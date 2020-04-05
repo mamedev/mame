@@ -612,7 +612,7 @@ int nlwav_app::execute()
 		return 0;
 	}
 
-	for (auto &oi: opt_args())
+	for (const auto &oi: opt_args())
 	{
 		plib::unique_ptr<std::istream> fin;
 		if (oi == "-")

@@ -69,7 +69,7 @@ namespace solver
 
 		m_terms.clear();
 
-		for (auto & net : nets)
+		for (const auto & net : nets)
 		{
 			m_terms.emplace_back(net);
 			m_rails_temp.emplace_back();

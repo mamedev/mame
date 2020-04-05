@@ -203,7 +203,6 @@ namespace analog
 		nl_fptype m_V; // internal voltage source
 		state_var<unsigned> m_state_on;
 
-	private:
 	};
 
 	// -----------------------------------------------------------------------------
