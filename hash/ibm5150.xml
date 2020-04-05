@@ -11655,7 +11655,7 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="tswtwgp3" support="partial">
+	<software name="tswtwgp3" supported="partial">
 		<description>The Software Toolworks Game Pack 3</description>
 		<year>1993</year>
 		<publisher>The Software Toolworks</publisher>
