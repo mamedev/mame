@@ -11058,7 +11058,7 @@ license:CC0
 	</software>
 
 	<software name="inca2">
-		<description>Inca 2: Wiracocha (French/German/English)</description>
+		<description>Inca 2: Wiracocha (Europe)</description>
 		<year>1993</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Coktel Vision" />
@@ -12017,7 +12017,7 @@ license:CC0
 
 	<software name="monkey2k" cloneof="monkey2">
 		<description>Monkey Island 2: LeChuck's Revenge (3.5", Kixx re-release)</description>
-		<year>1991</year>
+		<year>1994</year>
 		<publisher>Kixx</publisher>
 		<info name="developer" value="LucasArts" />
 		<part name="flop1" interface="floppy_3_5">
@@ -12698,13 +12698,46 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="sq1">
+		<description>Space Quest I: Roger Wilco in the Sarien Encounter (VGA release)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="2.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest - Roger Wilco in the Sarien Encounter (VGA release) [Sierra] [1991] [3.5HD] [Startup Disk].img" size="1474560" crc="efed75ac" sha1="3eada329df25893cd6995d46daa0431081b3a88a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest - Roger Wilco in the Sarien Encounter (VGA release) [Sierra] [1991] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="7c42ebdc" sha1="74dcb59e3a228c984de17186fbcb895cc492d790"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest - Roger Wilco in the Sarien Encounter (VGA release) [Sierra] [1991] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="baed11fe" sha1="512ecab212d9a28a7684fd69cff42d0ded06fbb5"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest - Roger Wilco in the Sarien Encounter (VGA release) [Sierra] [1991] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="712d3413" sha1="e5a36f53f809c51177e243b132eea3ef9cc32954"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest - Roger Wilco in the Sarien Encounter (VGA release) [Sierra] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="94183b42" sha1="bd73a7787d8cc56490229af23637c741a19d3d56"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="sq5">
 		<description>Space Quest V: The Next Mutation (3.5", v1.04)</description>
 		<year>1993</year>
-		<publisher>Sierra</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<info name="version" value="1.04" />
-		<info name="developer" value="Sierra" />
+		<info name="developer" value="Sierra On-Line" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Space Quest V - The Next Mutation (USA, Europe) (v1.04) (Disk 1).img" size="1474560" crc="482d85e8" sha1="b2ceda676dfef8f6351ec1f56cb02cdd994ae2d3"/>
