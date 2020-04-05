@@ -56,6 +56,7 @@ SOUNDS["BEEP"] = true
 SOUNDS["VOLT_REG"] = true
 SOUNDS["SPEAKER"] = true
 SOUNDS["DIGITALKER"] = true
+SOUNDS["SN76477"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -96,6 +97,7 @@ MACHINES["CXD1095"] = true
 --MACHINES["68681"] = true
 --MACHINES["BANKDEV"] = true
 MACHINES["F3853"] = true
+MACHINES["MB14241"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -183,6 +185,12 @@ files{
 	MAME_DIR .. "src/mame/audio/nl_kidniki.cpp",
 	MAME_DIR .. "src/mame/audio/nl_kidniki.h",
 
+  MAME_DIR .. "src/mame/machine/mw8080bw.cpp",
+  MAME_DIR .. "src/mame/drivers/mw8080bw.cpp",
+  MAME_DIR .. "src/mame/includes/mw8080bw.h",
+  MAME_DIR .. "src/mame/audio/mw8080bw.h",
+  MAME_DIR .. "src/mame/audio/mw8080bw.cpp",
+  MAME_DIR .. "src/mame/video/mw8080bw.cpp",
 	MAME_DIR .. "src/mame/audio/nl_gunfight.cpp",
 	MAME_DIR .. "src/mame/audio/nl_gunfight.h",
 
