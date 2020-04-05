@@ -34688,6 +34688,10 @@ tr606                           // Roland
 tr707                           //
 tr727                           //
 
+@source:roland_u20.cpp
+u20                             //
+u220                            //
+
 @source:rollerg.cpp
 rollerg                         // GX999 (c) 1991 (US)
 rollergj                        // GX999 (c) 1991 (Japan)

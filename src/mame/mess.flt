@@ -773,6 +773,7 @@ roland_sc88.cpp
 roland_tb303.cpp
 roland_tr606.cpp
 roland_tr707.cpp
+roland_u20.cpp
 rt1715.cpp
 rvoice.cpp
 rx78.cpp
