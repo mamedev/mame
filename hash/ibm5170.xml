@@ -11331,6 +11331,27 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="jp">
+		<description>Jurassic Park</description>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="4016975">
+				<rom name="jurassic park disk1.mfm" size="4016975" crc="23f5a6fa" sha1="00bd7b7ea646dd7df262537f40c4670af0ce6ff5" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="jurassic park disk2.img" size="1474560" crc="d4feae61" sha1="7de49b18bf2eb3f7b7315b7d0b7267d49ecfc702"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="jurassic park disk3.img" size="1474560" crc="50f4b8d2" sha1="e9c8f71eb40bf4b1792e513689083353fb5df026"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kickoff3">
 		<description>Kick Off 3: European Challenge</description>
 		<year>1994</year>
@@ -12227,6 +12248,37 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Paganitzu (USA) (v1.02).img" size="1474560" crc="7efa4aa3" sha1="7520c44be7451ff07065471b905f93f60d507234"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pepperit">
+		<description>Pepper's Adventures in Time</description>
+		<year>1993</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pepper's adventures in time disk 1.img" size="1474560" crc="2f5d4ce0" sha1="28d6649eefe4f1c10f8bd4a9b66473337690aaa8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "4220474">
+				<rom name="pepper's adventures in time disk 2.mfm" size="4220474" crc="fd28b20e" sha1="b971bbc45a47d895c8e90778159a3eab07c82fe9" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pepper's adventures in time disk 3.img" size="1474560" crc="860af405" sha1="e1584bf8b5d9a38376af9ff1becd08bc93a13468"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pepper's adventures in time disk 4.img" size="1474560" crc="bfda5eb0" sha1="435c8c6f7ea681882a12518a6d035db216bb77f4"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pepper's adventures in time disk 5.img" size="1474560" crc="706df2ef" sha1="6ed1b94049579aaa9bb00ccf3c56071c4406a8dc"/>
 			</dataarea>
 		</part>
 	</software>
