@@ -84,7 +84,7 @@ void h8500_disassembler::format_reg(std::ostream &stream, u8 n, bool w)
 	switch (n)
 	{
 	case 6:
-		stream << "SP";
+		stream << "FP";
 		break;
 
 	case 7:

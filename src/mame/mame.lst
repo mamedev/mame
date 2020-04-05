@@ -34669,6 +34669,9 @@ w30                             //
 @source:roland_sc55.cpp
 sc55                            // 1991 Sound Canvas SC-55
 
+@source:roland_sc88.cpp
+sc88vl                          //
+
 @source:roland_tb303.cpp
 tb303                           // Roland
 
