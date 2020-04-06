@@ -294,6 +294,7 @@ static void print_pal20ra10_product_terms(const pal_data* pal, const jed_data* j
 static void print_pal20x4_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_pal20x8_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_pal20x10_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_gal20v8_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_palce22v10_pal22v10_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_82s153_pls153_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_ck2605_product_terms(const pal_data* pal, const jed_data* jed);
@@ -358,6 +359,7 @@ static void config_pal20ra10_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20x4_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20x8_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20x10_pins(const pal_data* pal, const jed_data* jed);
+static void config_gal20v8_pins(const pal_data* pal, const jed_data* jed);
 static void config_palce22v10_pal22v10_pins(const pal_data* pal, const jed_data* jed);
 static void config_82s153_pls153_pins(const pal_data* pal, const jed_data* jed);
 static void config_ck2605_pins(const pal_data* pal, const jed_data* jed);
@@ -396,6 +398,10 @@ static void config_82s100_pls100_pins(const pal_data* pal, const jed_data* jed);
 
 
 static int is_gal16v8_product_term_enabled(const pal_data* pal, const jed_data* jed, uint16_t fuserow);
+
+
+
+static int is_gal20v8_product_term_enabled(const pal_data* pal, const jed_data* jed, uint16_t fuserow);
 
 
 
@@ -670,6 +676,16 @@ static pin_fuse_rows pal20x10pinfuserows[] = {
 	{21, NO_OUTPUT_ENABLE_FUSE_ROW, 320, 440},   /* Registered Output */
 	{22, NO_OUTPUT_ENABLE_FUSE_ROW, 160, 280},   /* Registered Output */
 	{23, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 120}};    /* Registered Output */
+
+static pin_fuse_rows gal20v8pinfuserows[] = {
+	{15, 0, 0, 0},
+	{16, 0, 0, 0},
+	{17, 0, 0, 0},
+	{18, 0, 0, 0},
+	{19, 0, 0, 0},
+	{20, 0, 0, 0},
+	{21, 0, 0, 0},
+	{22, 0, 0, 0}};
 
 static pin_fuse_rows palce22v10_pal22v10pinfuserows[] = {
 	{14, 5368, 5412, 5720},
@@ -1474,6 +1490,28 @@ static pin_fuse_columns pal20x10pinfusecolumns[] = {
 	{23, 3, 2}
 };
 
+static pin_fuse_columns gal20v8pinfusecolumns[] = {
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0},
+	{0, 0, 0}};
+
 static pin_fuse_columns palce22v10_pal22v10pinfusecolumns[] = {
 	{1, 1, 0},
 	{2, 5, 4},
@@ -2209,8 +2247,14 @@ static pal_data paldata[] = {
 		config_pal20x10_pins,
 		nullptr,
 		nullptr},
-	/*{"GAL20V8A", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
-	{"GAL22V10", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
+	{"GAL20V8", 2706,
+		gal20v8pinfuserows, ARRAY_LENGTH(gal20v8pinfuserows),
+		gal20v8pinfusecolumns, ARRAY_LENGTH(gal20v8pinfusecolumns),
+		print_gal20v8_product_terms,
+		config_gal20v8_pins,
+		is_gal20v8_product_term_enabled,
+		nullptr},
+	/*{"GAL22V10", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
 	{"PAL22V10", 5828,
 		palce22v10_pal22v10pinfuserows, ARRAY_LENGTH(palce22v10_pal22v10pinfuserows),
 		palce22v10_pal22v10pinfusecolumns, ARRAY_LENGTH(palce22v10_pal22v10pinfusecolumns),
@@ -3760,6 +3804,18 @@ static void print_pal20x8_product_terms(const pal_data* pal, const jed_data* jed
 static void print_pal20x10_product_terms(const pal_data* pal, const jed_data* jed)
 {
 	print_pal20xxx_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_gal20v8_product_terms - prints the product
+    terms for a GAL20V8
+-------------------------------------------------*/
+
+static void print_gal20v8_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
 }
 
 
@@ -5969,7 +6025,7 @@ static void config_pal20x4_pins(const pal_data* pal, const jed_data* jed)
 }
 
 /*-------------------------------------------------
-    config_pal20x10_pins - configures the pins for
+    config_pal20x8_pins - configures the pins for
     a PAL20X8
 -------------------------------------------------*/
 
@@ -6016,6 +6072,282 @@ static void config_pal20x10_pins(const pal_data* pal, const jed_data* jed)
 
 	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_gal20v8_pins - configures the pins for
+    a GAL20V8
+-------------------------------------------------*/
+
+static void config_gal20v8_pins(const pal_data* pal, const jed_data* jed)
+{
+	typedef struct _output_logic_macrocell output_logic_macrocell;
+	struct _output_logic_macrocell
+	{
+		uint16_t pin;
+		uint16_t xor_fuse;
+		uint16_t ac1_fuse;
+	};
+
+	static output_logic_macrocell macrocells[] = {
+		{15, 2567, 2639},
+		{16, 2566, 2638},
+		{17, 2565, 2637},
+		{18, 2564, 2636},
+		{19, 2563, 2635},
+		{20, 2562, 2634},
+		{21, 2561, 2633},
+		{22, 2560, 2632}};
+	static pin_fuse_rows pinfuserows_registered[] = {
+		{15, NO_OUTPUT_ENABLE_FUSE_ROW, 2240, 2520},
+		{16, NO_OUTPUT_ENABLE_FUSE_ROW, 1920, 2200},
+		{17, NO_OUTPUT_ENABLE_FUSE_ROW, 1600, 1880},
+		{18, NO_OUTPUT_ENABLE_FUSE_ROW, 1280, 1560},
+		{19, NO_OUTPUT_ENABLE_FUSE_ROW, 960,  1240},
+		{20, NO_OUTPUT_ENABLE_FUSE_ROW, 640,  920},
+		{21, NO_OUTPUT_ENABLE_FUSE_ROW, 320,  600},
+		{22, NO_OUTPUT_ENABLE_FUSE_ROW, 0,    280}};
+	static pin_fuse_rows pinfuserows_combinatorial[] = {
+		{15, 2240, 2280, 2520},
+		{16, 1920, 1960, 2200},
+		{17, 1600, 1640, 1880},
+		{18, 1280, 1320, 1560},
+		{19, 960,  1000, 1240},
+		{20, 640,  680,  920},
+		{21, 320,  360,  600},
+		{22, 0,    40,   280}};
+	static pin_fuse_columns pinfusecolumns_registered[] = {
+		{2,  1,  0},
+		{3,  5,  4},
+		{4,  9,  8},
+		{5,  13, 12},
+		{6,  17, 16},
+		{7,  21, 20},
+		{8,  25, 24},
+		{9,  29, 28},
+		{10, 33, 32},
+		{11, 37, 36},
+		{14, 39, 40},
+		{15, 35, 34},
+		{16, 31, 30},
+		{17, 27, 26},
+		{18, 23, 22},
+		{19, 19, 18},
+		{20, 15, 14},
+		{21, 11, 10},
+		{22, 7,  6},
+		{23, 3,  2}};
+	static pin_fuse_columns pinfusecolumns_combinatorialcomplex[] = {
+		{1,  3,  2},
+		{2,  1,  0},
+		{3,  5,  4},
+		{4,  9,  8},
+		{5,  13, 12},
+		{6,  17, 16},
+		{7,  21, 20},
+		{8,  25, 24},
+		{9,  29, 28},
+		{10, 33, 32},
+		{11, 37, 36},
+		{13, 39, 38},
+		{14, 35, 34},
+		{16, 31, 30},
+		{17, 27, 26},
+		{18, 23, 22},
+		{19, 19, 18},
+		{20, 15, 14},
+		{21, 11, 10},
+		{23, 7, 6}};
+	static pin_fuse_columns pinfusecolumns_combinatorialsimple[] = {
+		{1,  3,  2},
+		{2,  1,  0},
+		{3,  5,  4},
+		{4,  9,  8},
+		{5,  13, 12},
+		{6,  17, 16},
+		{7,  21, 20},
+		{8,  25, 24},
+		{9,  29, 28},
+		{10, 33, 32},
+		{11, 37, 36},
+		{13, 39, 38},
+		{14, 35, 34},
+		{15, 31, 30},
+		{16, 27, 26},
+		{17, 23, 22},
+		{20, 19, 18},
+		{21, 15, 14},
+		{22, 11, 10},
+		{23, 7,  6}};
+	static uint16_t input_pins_registered[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
+	static uint16_t input_pins_combinatorialcomplex[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 16, 17, 18, 19, 20, 21, 23};
+	static uint16_t input_pins_combinatorialsimple[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 20, 21, 22, 23};
+	pin_output_config output_pins[ARRAY_LENGTH(macrocells)];
+	uint16_t index, output_pin_count;
+
+	output_pin_count = 0;
+
+	/* SYN Fuse: 0 - registered, 1 - combinatorial */
+
+	if (jed_get_fuse(jed, 2704))
+	{
+		/* Combinatorial */
+		/* AC0 Fuse: 0 - simple mode, 1 - complex mode */
+
+		if (jed_get_fuse(jed, 2705))
+		{
+			/* Complex Mode */
+
+			set_input_pins(input_pins_combinatorialcomplex, ARRAY_LENGTH(input_pins_combinatorialcomplex));
+
+			memcpy(gal20v8pinfuserows, pinfuserows_combinatorial, sizeof(pinfuserows_combinatorial));
+			memcpy(gal20v8pinfusecolumns, pinfusecolumns_combinatorialcomplex, sizeof(pinfusecolumns_combinatorialcomplex));
+
+			for (index = 0; index < ARRAY_LENGTH(macrocells); ++index)
+			{
+				if (is_gal20v8_product_term_enabled(pal, jed, pal->pinfuserows[index].fuserowoutputenable) &&
+					does_output_enable_fuse_row_allow_output(pal, jed, pal->pinfuserows[index].fuserowoutputenable))
+				{
+					output_pins[output_pin_count].pin = macrocells[index].pin;
+					output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL;
+
+					if (jed_get_fuse(jed, macrocells[index].xor_fuse))
+					{
+						output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+					}
+					else
+					{
+						output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+					}
+
+					if (output_pins[output_pin_count].pin != 15 &&
+						output_pins[output_pin_count].pin != 22)
+					{
+						output_pins[output_pin_count].flags |= OUTPUT_FEEDBACK_OUTPUT;
+					}
+					else
+					{
+						output_pins[output_pin_count].flags |= OUTPUT_FEEDBACK_NONE;
+					}
+
+					++output_pin_count;
+				}
+			}
+		}
+		else
+		{
+			/* Simple Mode */
+
+			set_input_pins(input_pins_combinatorialsimple, ARRAY_LENGTH(input_pins_combinatorialsimple));
+
+			memcpy(gal20v8pinfuserows, pinfuserows_registered, sizeof(pinfuserows_registered));
+			memcpy(gal20v8pinfusecolumns, pinfusecolumns_combinatorialsimple, sizeof(pinfusecolumns_combinatorialsimple));
+
+			for (index = 0; index < ARRAY_LENGTH(macrocells); ++index)
+			{
+				if (jed_get_fuse(jed, macrocells[index].ac1_fuse))
+				{
+					/* Pin is for input only */
+
+					if (macrocells[index].pin == 18 || macrocells[index].pin == 19)
+					{
+						fprintf(stderr, "Pin %d cannot be configured as an input pin.\n",
+								macrocells[index].pin);
+					}
+				}
+				else
+				{
+					output_pins[output_pin_count].pin = macrocells[index].pin;
+					output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL;
+
+					if (jed_get_fuse(jed, macrocells[index].xor_fuse))
+					{
+						output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+					}
+					else
+					{
+						output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+					}
+
+					if (output_pins[output_pin_count].pin != 18 &&
+						output_pins[output_pin_count].pin != 19)
+					{
+						output_pins[output_pin_count].flags |= OUTPUT_FEEDBACK_OUTPUT;
+					}
+					else
+					{
+						output_pins[output_pin_count].flags |= OUTPUT_FEEDBACK_NONE;
+					}
+
+					++output_pin_count;
+				}
+			}
+		}
+	}
+	else
+	{
+		/* Registered */
+
+		set_input_pins(input_pins_registered, ARRAY_LENGTH(input_pins_registered));
+
+		memcpy(gal20v8pinfusecolumns, pinfusecolumns_registered, sizeof(pinfusecolumns_registered));
+
+		for (index = 0; index < ARRAY_LENGTH(macrocells); ++index)
+		{
+			if (jed_get_fuse(jed, macrocells[index].ac1_fuse))
+			{
+				/* combinatorial pin */
+
+				gal20v8pinfuserows[index].fuserowoutputenable = pinfuserows_combinatorial[index].fuserowoutputenable;
+				gal20v8pinfuserows[index].fuserowtermstart = pinfuserows_combinatorial[index].fuserowtermstart;
+				gal20v8pinfuserows[index].fuserowtermend = pinfuserows_combinatorial[index].fuserowtermend;
+
+				if (is_gal20v8_product_term_enabled(pal, jed, pal->pinfuserows[index].fuserowoutputenable) &&
+					does_output_enable_fuse_row_allow_output(pal, jed, pal->pinfuserows[index].fuserowoutputenable))
+				{
+					output_pins[output_pin_count].pin = macrocells[index].pin;
+					output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+
+					if (jed_get_fuse(jed, macrocells[index].xor_fuse))
+					{
+						output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+					}
+					else
+					{
+						output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+					}
+
+					++output_pin_count;
+				}
+			}
+			else
+			{
+				/* registered pin */
+
+				gal20v8pinfuserows[index].fuserowoutputenable = pinfuserows_registered[index].fuserowoutputenable;
+				gal20v8pinfuserows[index].fuserowtermstart = pinfuserows_registered[index].fuserowtermstart;
+				gal20v8pinfuserows[index].fuserowtermend = pinfuserows_registered[index].fuserowtermend;
+
+				output_pins[output_pin_count].pin = macrocells[index].pin;
+				output_pins[output_pin_count].flags = OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
+
+				if (jed_get_fuse(jed, macrocells[index].xor_fuse))
+				{
+					output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+				}
+				else
+				{
+					output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+				}
+
+				++output_pin_count;
+			}
+		}
+	}
+
+	set_output_pins(output_pins, output_pin_count);
 }
 
 
@@ -7291,6 +7623,29 @@ static int is_gal16v8_product_term_enabled(const pal_data* pal, const jed_data* 
 	fuse_ptd = (fuserow / calc_fuse_column_count(pal)) + 2128;
 
 	if (fuse_ptd > 2191)
+	{
+		fprintf(stderr, "Fuse row %d is illegal!\n", fuserow);
+
+		return 0;
+	}
+
+	return jed_get_fuse(jed, fuse_ptd);
+}
+
+
+
+/*-------------------------------------------------
+    is_gal20v8_product_term_enabled - determines if
+    a fuse row in a GAL20V8 is enabled
+-------------------------------------------------*/
+
+static int is_gal20v8_product_term_enabled(const pal_data* pal, const jed_data* jed, uint16_t fuserow)
+{
+	uint16_t fuse_ptd;
+
+	fuse_ptd = (fuserow / calc_fuse_column_count(pal)) + 2640;
+
+	if (fuse_ptd > 2703)
 	{
 		fprintf(stderr, "Fuse row %d is illegal!\n", fuserow);
 
