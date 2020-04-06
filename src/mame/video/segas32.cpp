@@ -8,7 +8,16 @@
           rendering.
 
         - In radr, NBG1 should be opaque on select screen, and NBG3 should be
-          opaque while driving. How is this controlled?
+          opaque while driving. This is controlled by register $31ff8e 
+	  (respectively $200 and $800), likewise darkedge sets $800 on the first 
+	  attract fight (which has ugly black pens which should be white according 
+	  to the ref)
+
+	- titlef NBG0 and NBG2 layers are currently hidden during gameplay, it 
+	  sets $31ff02 with either $7be0 and $2960 (and $31ff8e is $c00).
+	  Is it possible that somewhere in the registers there may be a 
+	  Saturn-esque sprite window effect enable to draw the boxing ring 
+	  over NBG0;
 
         - In radr, they use $1A0 as the X center for zooming; however, this
           contradicts the theory that bit 9 is a sign bit. For now, the code
@@ -19,8 +28,7 @@
           in this case, the rowselect lookups should be done in reverse order,
           but this results in an incorrect display. For now, we assume there is
           a bug in the procedure and implement it so that it looks correct.
-
-
+	
     Information extracted from below, and from Modeler:
 
     Tile format:
@@ -48,8 +56,15 @@
                    ---- ---- ---- --1- : 1= X+Y flip for NBG1
                    ---- ---- ---- ---0 : 1= X+Y flip for NBG0
          $31FF02 : x--- ---- --x- ---- : Bitmap layer enable (?)
+	           -x-- ---- ---- ---- : 1= NBG3 page wrapping disable (clipping enable according to code?)
+		   --x- ---- ---- ---- : 1= NBG2 page wrapping disable
                    ---1 ---- ---- ---- : 1= NBG1 page wrapping disable
                    ---- 0--- ---- ---- : 1= NBG0 page wrapping disable
+		   ---- -x-- ---- ---- : 1= bitmap layer clipping mode (1=outside)
+		   ---- --x- ---- ---- : 1= NBG3 clipping mode (1=outside)
+		   ---- ---x ---- ---- : 1= NBG2 clipping mode (1=outside)
+		   ---- ---- x--- ---- : 1= NBG1 clipping mode (1=outside)
+		   ---- ---- -x-- ---- : 1= NBG0 clipping mode (1=outside)
                    ---- ---- --b- ---- : 1= Bitmap layer disable
                    ---- ---- ---t ---- : 1= Text layer disable
                    ---- ---- ---- 3--- : 1= NBG3 layer disable
@@ -1256,8 +1271,6 @@ void segas32_state::update_background(struct segas32_state::layer_info *layer, c
 			color = m_videoram[0x1ff5e/2] & 0x1e00;
 
 		/* if the color doesn't match, fill */
-		// TODO: understand how Title Fight calculates priority for back layer
-		// (Gonna assume it does alpha/additive mix for depth effect)
 		if (dst[cliprect.min_x] != color)
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 				dst[x] = color;
