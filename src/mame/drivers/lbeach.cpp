@@ -5,23 +5,27 @@
 Seletron / Olympia Long Beach
 Olympia probably took care of distribution, PCB and game by Seletron
 
-PCB was broken, and there are no known references.
-16MHz XTAL, M6800 @ 500kHz
-2x 5101 sram 256x4bit (256 byte) battery backed
-4x 4045 sram 1kx4 (2K byte)
+Hardware notes:
+- 16MHz XTAL, MC6800P @ 500kHz
+- 2x 5101 sram 256x4bit (256 byte) battery backed
+- 4x 4045 sram 1kx4 (2K byte)
 
-6800 hits many illegal opcodes (0x02), though it's harmless.
-Maybe they meant to inserts nops (0x01) to remove debug stuff
-or to make room for future additions?
+6800 hits many illegal opcodes (0x02), though it's harmless. Maybe they meant
+to inserts nops (0x01) to remove debug stuff or to make room for future additions?
 
-Speed Race is on the same hardware, no mention of Olympia, but it is
-listed online on Olympia game lists. It is a reimagination of Taito's
-Speed Race, not a bootleg.
+Speed Race is on the same hardware, no mention of Olympia, but it is listed
+online on Olympia game lists. It is a reimagination of Taito's Speed Race,
+not a bootleg.
+
+Speed Race PCB where this dump came from had an incorrect CPU in place (MC68B09)
+maybe from a wrong repair. PCB label: Seletron, 10-50058. Less ROM data than lbeach.
 
 TODO:
 - discrete sound
 - unknown writes (most of it is sound)
 - improve colors, lbeach is monochrome but what about speedrs?
+- right side of screen should be cropped? but speedrs sprite collision check
+  wouldn't work then
 - some unknown romlabels (see "x")
 - lbeach 93448.h4 rom is a bad dump? it misses animation frames compared to
   speedrs, but when compared to enemy cars, it looks ok
@@ -57,9 +61,11 @@ public:
 		m_sprite_code(*this, "sprite_code"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_inputs(*this, "IN.%u", 0)
+		m_palette(*this, "palette")
 	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(col_bg_r) { return m_collision_bg_car; }
+	DECLARE_CUSTOM_INPUT_MEMBER(col_fg_r) { return m_collision_fg_car; }
 
 	void lbeach(machine_config &config);
 
@@ -77,7 +83,6 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_ioport_array<3> m_inputs;
 
 	int m_collision_bg_car = 0;
 	int m_collision_fg_car = 0;
@@ -91,8 +96,6 @@ private:
 
 	DECLARE_WRITE8_MEMBER(bg_vram_w);
 	DECLARE_WRITE8_MEMBER(fg_vram_w);
-	DECLARE_READ8_MEMBER(in1_r);
-	DECLARE_READ8_MEMBER(in2_r);
 
 	void init_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -200,11 +203,6 @@ u32 lbeach_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 }
 
 
-
-/******************************************************************************
-    I/O
-******************************************************************************/
-
 WRITE8_MEMBER(lbeach_state::bg_vram_w)
 {
 	m_bg_vram[offset] = data;
@@ -217,22 +215,6 @@ WRITE8_MEMBER(lbeach_state::fg_vram_w)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(lbeach_state::in1_r)
-{
-	// d7: steering wheel active
-	// d6: steering wheel direction
-	return bitswap<8>(m_inputs[1]->read(),6,7,5,4,3,2,1,0);
-}
-
-READ8_MEMBER(lbeach_state::in2_r)
-{
-	// d6 and d7 are for collision detection
-	u8 d6 = m_collision_bg_car ? 0x80 : 0;
-	u8 d7 = m_collision_fg_car ? 0x40 : 0;
-
-	return (m_inputs[2]->read() & 0x3f) | d6 | d7;
-}
-
 
 
 /******************************************************************************
@@ -243,10 +225,10 @@ void lbeach_state::main_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram().share("nvram");
 	map(0x4000, 0x41ff).ram().w(FUNC(lbeach_state::bg_vram_w)).share("bg_vram");
-	map(0x4000, 0x4000).r(FUNC(lbeach_state::in1_r));
+	map(0x4000, 0x4000).portr("IN.0");
 	map(0x4200, 0x43ff).ram();
 	map(0x4400, 0x47ff).ram().w(FUNC(lbeach_state::fg_vram_w)).share("fg_vram");
-	map(0x8000, 0x8000).r(FUNC(lbeach_state::in2_r));
+	map(0x8000, 0x8000).portr("IN.1");
 	map(0x8000, 0x8000).writeonly().share("scroll_y");
 	map(0x8001, 0x8001).writeonly().share("sprite_x");
 	map(0x8002, 0x8002).writeonly().share("sprite_code");
@@ -254,7 +236,7 @@ void lbeach_state::main_map(address_map &map)
 //  map(0x8004, 0x8004).nopw(); // ?
 //  map(0x8005, 0x8005).nopw(); // ?
 	map(0x8007, 0x8007).nopw(); // probably watchdog
-	map(0xa000, 0xa000).portr("IN.0");
+	map(0xa000, 0xa000).portr("IN.2");
 //  map(0xa003, 0xa003).nopr(); // ? tests d7 at game over
 	map(0xc000, 0xcfff).rom();
 	map(0xf000, 0xffff).rom();
@@ -268,6 +250,31 @@ void lbeach_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( lbeach )
 	PORT_START("IN.0")
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
+	PORT_BIT( 0x40, 0x40, IPT_CUSTOM ) PORT_CONDITION("STEER", 0x02, EQUALS, 0x00) // steering wheel direction
+	PORT_BIT( 0x80, 0x80, IPT_CUSTOM ) PORT_CONDITION("STEER", 0x01, EQUALS, 0x00) // steering wheel active
+
+	PORT_START("IN.1")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) ) // dupe
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x0c, 0x04, "Refueling Point" )
+	PORT_DIPSETTING(    0x00, "200 km" )
+	PORT_DIPSETTING(    0x04, "250 km" )
+	PORT_DIPSETTING(    0x08, "300 km" )
+	PORT_DIPSETTING(    0x0c, "350 km" )
+	PORT_DIPNAME( 0x30, 0x20, "Fuel Drop Rate" )
+	PORT_DIPSETTING(    0x30, "1" ) // slow
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x10, "3" )
+	PORT_DIPSETTING(    0x00, "4" ) // fast
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(lbeach_state, col_fg_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(lbeach_state, col_bg_r)
+
+	PORT_START("IN.2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gas Pedal")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shifter 1st Gear")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shifter 2nd Gear")
@@ -277,49 +284,29 @@ static INPUT_PORTS_START( lbeach )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Coin Counter") // called CC in testmode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("IN.1")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
-	PORT_BIT(0xc0, 0x40, IPT_PADDLE ) PORT_INVERT PORT_MINMAX(0x00,0x80) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_CENTERDELTA(1)
-
-	PORT_START("IN.2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) ) // dupe
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0c, 0x00, "Refueling Point" )
-	PORT_DIPSETTING(    0x00, "200 km" )
-	PORT_DIPSETTING(    0x04, "250 km" )
-	PORT_DIPSETTING(    0x08, "300 km" )
-	PORT_DIPSETTING(    0x0c, "350 km" )
-	PORT_DIPNAME( 0x30, 0x10, "Fuel Drop Rate" )
-	PORT_DIPSETTING(    0x30, "1" ) // slow
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x10, "3" )
-	PORT_DIPSETTING(    0x00, "4" ) // fast
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM )
+	PORT_START("STEER")
+	PORT_BIT( 0x03, 0x01, IPT_PADDLE ) PORT_MINMAX(0x00,0x02) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_CENTERDELTA(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( speedrs )
 	PORT_INCLUDE( lbeach )
 
-	PORT_MODIFY("IN.0")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Shifter") PORT_TOGGLE
-	PORT_BIT( 0x7c, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_MODIFY("IN.2")
-	PORT_DIPNAME( 0x0c, 0x00, "Refueling Point" )
+	PORT_MODIFY("IN.1")
+	PORT_DIPNAME( 0x0c, 0x04, "Refueling Point" )
 	PORT_DIPSETTING(    0x00, "1500" )
 	PORT_DIPSETTING(    0x04, "2000" )
 	PORT_DIPSETTING(    0x08, "2500" )
 	PORT_DIPSETTING(    0x0c, "3000" )
+
+	PORT_MODIFY("IN.2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Shifter") PORT_TOGGLE
+	PORT_BIT( 0x7c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
 
 /******************************************************************************
-    GFX Decodes
+    GFX Layouts
 ******************************************************************************/
 
 static const gfx_layout layout_16x8 =
