@@ -146,7 +146,41 @@
     reference
     - arabfgt : https://www.youtube.com/watch?v=98QivDAGz3I
     - darkedge : https://www.youtube.com/watch?v=riO1yb95z7s
+	
+====
+back layer setups (register $31ff5e):
+alien3:   $0200
+arabfgt:  $8000-$81ff -- depending on the scene
+arescue:  $0200
+as1:      (untested)
+brival:   $8000
+darkedge: $0200
+dbzvrvs:  $0200
+f1en:     $0000
+f1lap:    $0000
+ga2:      $0200
+harddunk: $8200
+holo:     $0200
+jpark:    $0200
+kokoroj:  (untested)
+kokoroj2: $8000 --
+          $8000-$81fc (in steps of 4) -- on introduction/initials scenes
+orunners: $0200
+radm:     $0200
+radr:     $8200 -- gameplay
+          $0200 -- title screen
+scross:   $0200
+slipstrm: $0000
+sonic:    $0000 -- on sega logo/title screen
+          $0200 -- everything else
+spidman:  $0200
+svf:      $0201 -- on attract
+          $0200 -- on gameplay
+titlef:   $8200
+
 */
+
+
 
 #include "emu.h"
 #include "includes/segas32.h"
@@ -1205,7 +1239,7 @@ void segas32_state::update_background(struct segas32_state::layer_info *layer, c
 {
 	bitmap_ind16 &bitmap = *layer->bitmap;
 	int x, y;
-
+	
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint16_t *dst = &bitmap.pix16(y);
@@ -1213,11 +1247,17 @@ void segas32_state::update_background(struct segas32_state::layer_info *layer, c
 
 		/* determine the color */
 		if (m_videoram[0x1ff5e/2] & 0x8000)
-			color = (m_videoram[0x1ff5e/2] & 0x1fff) + y;
+		{
+			// line color select (bank wraps at 511, confirmed by arabfgt and kokoroj2)
+			int yoffset = (m_videoram[0x1ff5e/2] + y) & 0x1ff;
+			color = (m_videoram[0x1ff5e/2] & 0x1e00) + yoffset;
+		}
 		else
 			color = m_videoram[0x1ff5e/2] & 0x1e00;
 
 		/* if the color doesn't match, fill */
+		// TODO: understand how Title Fight calculates priority for back layer
+		// (Gonna assume it does alpha/additive mix for depth effect)
 		if (dst[cliprect.min_x] != color)
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 				dst[x] = color;
