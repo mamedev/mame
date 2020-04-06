@@ -5234,7 +5234,7 @@ ROM_END
 
 /***********************************************************************/
 
-ROM_START( victroad )
+ROM_START( victroad ) // A6002UP03-02 PCB
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "p1.p4", 0x0000, 0x10000,  CRC(e334acef) SHA1(f6d8da554276abbe5579c92eea46591a92623f6e) )
 
@@ -5244,10 +5244,14 @@ ROM_START( victroad )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "p3.k7", 0x00000, 0x10000, CRC(bac745f6) SHA1(c118d94aff16cbf1b85615ff5a93292f6e98c149) )
 
-	ROM_REGION( 0x0c00, "proms", 0 )
-	ROM_LOAD( "mb7122e.1k", 0x000, 0x400, CRC(491ab831) SHA1(2801d68d8a7fddaca5c48f09d421fc48ff53d244) )
-	ROM_LOAD( "mb7122e.2l", 0x400, 0x400, CRC(8feca424) SHA1(c3d666f4b4b914199b24ded02f9a1b643bf90d26) )
-	ROM_LOAD( "mb7122e.1l", 0x800, 0x400, CRC(220076ca) SHA1(a353c770c0ffb1105fb93c97977597ad2fda8ac8) )
+	ROM_REGION( 0xc00, "proms", 0 )
+	ROM_LOAD( "c1_mb7122e.1k", 0x000, 0x400, CRC(491ab831) SHA1(2801d68d8a7fddaca5c48f09d421fc48ff53d244) )
+	ROM_LOAD( "c2_mb7122e.2l", 0x400, 0x400, CRC(8feca424) SHA1(c3d666f4b4b914199b24ded02f9a1b643bf90d26) )
+	ROM_LOAD( "c3_mb7122e.1l", 0x800, 0x400, CRC(220076ca) SHA1(a353c770c0ffb1105fb93c97977597ad2fda8ac8) )
+
+	ROM_REGION( 0x2000, "rjproms", 0 ) // for rotary joystick decoding, same for both players 
+	ROM_LOAD( "1_mb7134e.1d",  0x0000, 0x1000, CRC(5ab67bfc) SHA1(62a62a7e4573d1233b50ddd163c4e3d9bdefaddd) )
+	ROM_LOAD( "1_mb7134e.2d",  0x1000, 0x1000, CRC(5ab67bfc) SHA1(62a62a7e4573d1233b50ddd163c4e3d9bdefaddd) )
 
 	ROM_REGION( 0x4000, "tx_tiles", 0 )
 	ROM_LOAD( "p7.b3", 0x0000, 0x4000,  CRC(2b6ed95b) SHA1(dddf3aa21776778153572a20d29d47928a7116d8) )
@@ -5279,7 +5283,7 @@ ROM_START( victroad )
 	ROM_LOAD( "a5004-1.d6", 0x000, 0x104, CRC(311e5ae6) SHA1(8a3799e1611ac4086dda2755c5ad44c0dc16ff5b) )
 	ROM_LOAD( "a5004-4.s8", 0x200, 0x104, CRC(fad4c493) SHA1(0aacc2d25434173366ba95eaac848812ea9f40c5) )
 	ROM_LOAD( "a6002-3.p2", 0x400, 0x104, CRC(036b1a16) SHA1(c688071c452066e5d4addf09212eb76d3078ec45) )
-	ROM_LOAD( "pal20l8",    0x600, 0x144, NO_DUMP ) // protected
+	ROM_LOAD( "a6002-2.r5", 0x600, 0x144, NO_DUMP ) // PAL20L8ACNS, protected
 ROM_END
 
 ROM_START( dogosoke )
