@@ -117,15 +117,12 @@ protected:
 	optional_ioport_array<2> m_dsw_io;
 	optional_ioport_array<3> m_in_io;
 
-	int m_sprclk;
-	int m_sprlimit;
 	int m_tilerambank;
 	int m_sprdma_base;
 	int mask[4*2];
 	std::unique_ptr<u16[]> m_spriteram_old;
 	std::unique_ptr<u16[]> m_spriteram_old2;
 	int m_bgbank;
-	int m_videoshift;
 	int m_bioship_background_bank;
 	tilemap_t *m_bg_tilemap[2];
 	tilemap_t *m_tx_tilemap;

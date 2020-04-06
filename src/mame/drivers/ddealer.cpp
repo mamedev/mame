@@ -205,6 +205,7 @@ TILE_GET_INFO_MEMBER(ddealer_state::get_back_tile_info)
 void ddealer_state::video_start()
 {
 	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ddealer_state::get_back_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_back_tilemap->set_scrolldx(64,64);
 }
 
 void ddealer_state::draw_video_layer(uint16_t* vreg_base, uint16_t* top, uint16_t* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy)
@@ -292,7 +293,6 @@ void ddealer_state::draw_video_layer(uint16_t* vreg_base, uint16_t* top, uint16_
 
 uint32_t ddealer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_back_tilemap->set_scrollx(0, -64);
 	m_back_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* the fg tilemap handling is a little hacky right now,
@@ -586,33 +586,9 @@ static INPUT_PORTS_START( ddealer )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-static const gfx_layout tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			16*32+0*4, 16*32+1*4, 16*32+2*4, 16*32+3*4, 16*32+4*4, 16*32+5*4, 16*32+6*4, 16*32+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	32*32
-};
-
 static GFXDECODE_START( gfx_ddealer )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x000, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x100, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x000, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 )
 GFXDECODE_END
 
 void ddealer_state::machine_start()
