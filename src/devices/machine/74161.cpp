@@ -28,8 +28,9 @@ ttl7416x_device::ttl7416x_device(const machine_config &mconfig, device_type type
 	, m_cep(0)
 	, m_pclock(0)
 	, m_p(0)
+	, m_cetpre(0)
+	, m_ceppre(0)
 	, m_out(0)
-	, m_tc(0)
 	, m_synchronous_reset(synchronous_reset)
 	, m_limit(limit)
 {
@@ -64,7 +65,6 @@ void ttl7416x_device::device_start()
 	save_item(NAME(m_pclock));
 	save_item(NAME(m_p));
 	save_item(NAME(m_out));
-	save_item(NAME(m_tc));
 
 	m_output_func.resolve_safe();
 	m_tc_func.resolve_safe();
@@ -79,15 +79,12 @@ void ttl7416x_device::init()
 {
 	m_clear = 0;
 	m_pe = 1;
-	m_cet = 0;
-	m_cep = 0;
+	m_cet = m_cetpre;
+	m_cep = m_ceppre;
 	m_pclock = 0;
 	m_p = 0;
 
 	m_out = 0;
-	m_tc = 0;
-
-	m_tc = 0;
 }
 
 void ttl7416x_device::tick()
@@ -99,7 +96,7 @@ void ttl7416x_device::tick()
 	}
 
 	uint8_t last_out = m_out;
-	uint8_t last_tc = m_tc;
+	uint8_t last_tc = tc_r();
 
 	if (m_pe)
 	{
@@ -118,20 +115,30 @@ void ttl7416x_device::tick()
 		m_output_func(m_out);
 	}
 
-	if (m_tc != last_tc)
+	if (tc_r() != last_tc)
 	{
-		m_tc_func(m_tc);
+		m_tc_func(tc_r());
 	}
 }
 
+/*
+    State machine:
+    limit 16: 0->1->2->...->e->f(tc)->0
+    limit 10: 0->1->2->...->9(tc)->0
+              10->11->4(no tc)
+              12->13->4(no tc)
+              14->15->0(no tc)
+*/
 void ttl7416x_device::increment()
 {
-	m_out = (m_out + 1) % (m_limit + 1);
+	m_out++;
 
-	if (m_out == m_limit)
-		m_tc = 1;
-	else
-		m_tc = 0;
+	if (m_limit == 10)
+	{
+		if (m_out == 12 || m_out == 14) m_out = 4;
+		if (m_out == 10) m_out = 0;
+	}
+	m_out &= 0x0f;
 }
 
 WRITE_LINE_MEMBER( ttl7416x_device::clear_w )
@@ -201,7 +208,11 @@ READ_LINE_MEMBER( ttl7416x_device::output_r )
 	return m_out;
 }
 
+/*
+    TC is an asynchronous signal, depending on the current states of CET, CEP,
+    and the counter value.
+*/
 READ_LINE_MEMBER( ttl7416x_device::tc_r )
 {
-	return m_tc;
+	return ((m_cet==1) && (m_cep==1) && (m_out==m_limit-1))? 1:0;
 }
