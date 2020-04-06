@@ -72,6 +72,9 @@ pci_device::pci_device(const machine_config &mconfig, device_type type, const ch
 	revision = 0x00;
 	pclass = 0xffffff;
 	subsystem_id = 0xffffffff;
+	expansion_rom = nullptr;
+	expansion_rom_size = 0;
+	expansion_rom_base = 0;
 	is_multifunction_device = false;
 	intr_pin = 0x0;
 	intr_line = 0xff;
@@ -101,10 +104,6 @@ void pci_device::device_start()
 
 	bank_count = 0;
 	bank_reg_count = 0;
-
-	expansion_rom = nullptr;
-	expansion_rom_size = 0;
-	expansion_rom_base = 0;
 
 	for (int i = 0; i < ARRAY_LENGTH(bank_infos); i++) {
 		save_item(NAME(bank_infos[i].adr), i);
