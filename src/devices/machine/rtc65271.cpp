@@ -450,18 +450,24 @@ void rtc65271_device::field_interrupts()
 {
 	if (m_regs[reg_C] & m_regs[reg_B] & (reg_C_PF | reg_C_AF | reg_C_UF))
 	{
+		m_int_pending = true;
 		m_regs[reg_C] |= reg_C_IRQF;
 		if (!m_interrupt_cb.isnull())
 			m_interrupt_cb(1);
 	}
 	else
 	{
+		m_int_pending = false;
 		m_regs[reg_C] &= ~reg_C_IRQF;
 		if (!m_interrupt_cb.isnull())
 			m_interrupt_cb(0);
 	}
 }
 
+READ_LINE_MEMBER(rtc65271_device::intrq_r)
+{
+	return (m_int_pending)? ASSERT_LINE : CLEAR_LINE;
+}
 
 /*
     Update SQW output state each half-period and assert periodic interrupt each
@@ -656,6 +662,7 @@ rtc65271_device::rtc65271_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, RTC65271, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_interrupt_cb(*this)
+	, m_int_pending(false)
 {
 }
 
@@ -674,4 +681,5 @@ void rtc65271_device::device_start()
 	save_item(NAME(m_xram));
 	save_item(NAME(m_cur_xram_page));
 	save_item(NAME(m_SQW_internal_state));
+	save_item(NAME(m_int_pending));
 }
