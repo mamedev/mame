@@ -41602,7 +41602,7 @@ xexexa                          // GX067 (c) 1991 (Asia)
 xexexj                          // GX067 (c) 1991 (Japan)
 
 @source:xmen.cpp
-xmen                            // GX065 (c) 1992 (US)
+xmen                            // GX065 (c) 1992 (World)
 xmen2pa                         // GX065 (c) 1992 (Asia)
 xmen2pe                         // GX065 (c) 1992 (World)
 xmen2pj                         // GX065 (c) 1992 (Japan)
@@ -41611,9 +41611,10 @@ xmen6p                          // GX065 (c) 1992 (World)
 xmen6pu                         // GX065 (c) 1992 (US)
 xmena                           // GX065 (c) 1992 (Asia)
 xmenaa                          // GX065 (c) 1992 (Asia)
-xmene                           // GX065 (c) 1992 (World)
 xmenj                           // GX065 (c) 1992 (Japan)
 xmenja                          // GX065 (c) 1992 (Japan)
+xmenu                           // GX065 (c) 1992 (US)
+xmenua                          // GX065 (c) 1992 (US)
 
 @source:xor100.cpp
 xor100                          //
