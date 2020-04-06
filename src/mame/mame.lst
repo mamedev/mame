@@ -22267,6 +22267,9 @@ spitboss                        // (c) 1988 Merit
 scrpiond                        //
 scrpionda                       //
 
+@source:meritsdx.cpp
+scrpndx                        //
+
 @source:meritum.cpp
 meritum1                        //
 meritum2                        //
