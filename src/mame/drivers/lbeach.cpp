@@ -24,14 +24,16 @@ TODO:
 - discrete sound
 - unknown writes (most of it is sound)
 - improve colors, lbeach is monochrome but what about speedrs?
-- right side of screen should be cropped? but speedrs sprite collision check
-  wouldn't work then
+- is steering wheel analog? eg. with pulses to d7
 - some unknown romlabels (see "x")
 - lbeach 93448.h4 rom is a bad dump? it misses animation frames compared to
   speedrs, but when compared to enemy cars, it looks ok
 - speedrs has nvram? high scores are not saved
 - sprite x position is wrong, but moving it to the left will break speedrs
   (it does a sprite collision check at boot)
+- right side of screen should not be rendered? but speedrs sprite collision
+  check wouldn't work then. Video recording(pcb to monitor, not cabinet)
+  of lbeach shows right side is cropped - it is handled in the .lay file
 
 ***************************************************************************/
 
@@ -177,7 +179,7 @@ u32 lbeach_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	int sprite_y = 160;
 
 	m_colmap_car.fill(0, cliprect);
-	m_gfxdecode->gfx(2)->transpen(m_colmap_car,cliprect, sprite_code, 0, 0, 0, sprite_x, sprite_y, 0);
+	m_gfxdecode->gfx(2)->transpen(m_colmap_car, cliprect, sprite_code, 0, 0, 0, sprite_x, sprite_y, 0);
 	bitmap_ind16 &fg_bitmap = m_fg_tilemap->pixmap();
 
 	m_collision_bg_car = 0;
@@ -196,8 +198,8 @@ u32 lbeach_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// draw player car
-	m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, sprite_code, 0, 0, 0, sprite_x, sprite_y, 0);
-	m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, sprite_code | 0x10, 0, 0, 0, sprite_x, sprite_y + 16, 0);
+	m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, sprite_code, 0, 0, 0, sprite_x, sprite_y, 0);
+	m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, sprite_code | 0x10, 0, 0, 0, sprite_x, sprite_y + 16, 0);
 
 	return 0;
 }

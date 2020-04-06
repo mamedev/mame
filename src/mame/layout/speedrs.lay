@@ -51,19 +51,29 @@ license:CC0
 		</disk>
 	</element>
 
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+
 	<view name="Shifter-R">
+		<bounds left="0" right="640" top="0" bottom="480" />
 		<screen index="0">
-			<bounds x="0" y="0" width="640" height="480" />
+			<bounds x="0" y="0" width="738.46" height="480" />
 		</screen>
+		<bezel element="black">
+			<bounds x="640" y="0" width="100" height="480" />
+		</bezel>
 		<bezel element="shifter" inputtag="IN.2" inputmask="0x02">
 			<bounds x="606" y="414" width="32" height="64" />
 			<color alpha="0.6" />
 		</bezel>
 	</view>
 	<view name="Shifter-L">
+		<bounds left="0" right="640" top="0" bottom="480" />
 		<screen index="0">
-			<bounds x="0" y="0" width="640" height="480" />
+			<bounds x="0" y="0" width="738.46" height="480" />
 		</screen>
+		<bezel element="black">
+			<bounds x="640" y="0" width="100" height="480" />
+		</bezel>
 		<bezel element="shifter" inputtag="IN.2" inputmask="0x02">
 			<bounds x="2" y="414" width="32" height="64" />
 			<color alpha="0.6" />
