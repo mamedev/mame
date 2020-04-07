@@ -645,7 +645,7 @@ void at_state::at486(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &at_state::at32_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-		AT_MB(config, m_mb, 0).at_softlists(config);
+	AT_MB(config, m_mb, 0).at_softlists(config);
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 

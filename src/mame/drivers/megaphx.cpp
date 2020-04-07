@@ -438,7 +438,7 @@ ROM_START( megaphx )
 
 	ROM_REGION( 0x100000, "pic", 0 )
 	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430,  CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) )
-	ROM_FILL(0x2c, 1, 0x01) // patch timer length or its too slow (pic issue?)
+	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (pic issue?)
 
 	ROM_REGION( 0x1000, "pals", 0 ) // protected
 	ROM_LOAD( "p31_u31_palce16v8h-25.jed", 0x000, 0xbd4, BAD_DUMP CRC(05ef04b7) SHA1(330dd81a832b6675fb0473868c26fe9bec2da854) )
@@ -469,7 +469,7 @@ ROM_START( hamboy )
 
 	ROM_REGION( 0x100000, "pic", 0 )
 	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430, CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) )
-	ROM_FILL(0x2c, 1, 0x01) // patch timer length or its too slow (pic issue?)
+	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (pic issue?)
 ROM_END
 
 GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Mega Phoenix", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
