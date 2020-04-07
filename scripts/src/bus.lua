@@ -1690,6 +1690,25 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/pasopia/pac2.h,BUSES["PASOPIA"] = true
+---------------------------------------------------
+
+if (BUSES["PASOPIA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/pasopia/pac2.cpp",
+		MAME_DIR .. "src/devices/bus/pasopia/pac2.h",
+		MAME_DIR .. "src/devices/bus/pasopia/pac2exp.cpp",
+		MAME_DIR .. "src/devices/bus/pasopia/pac2exp.h",
+		MAME_DIR .. "src/devices/bus/pasopia/rampac2.cpp",
+		MAME_DIR .. "src/devices/bus/pasopia/rampac2.h",
+		MAME_DIR .. "src/devices/bus/pasopia/rompac2.cpp",
+		MAME_DIR .. "src/devices/bus/pasopia/rompac2.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/pc_joy/pc_joy.h,BUSES["PC_JOY"] = true
 ---------------------------------------------------
 

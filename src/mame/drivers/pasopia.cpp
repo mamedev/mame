@@ -25,6 +25,7 @@
 #include "emu.h"
 #include "includes/pasopia.h"
 
+#include "bus/pasopia/pac2.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
@@ -168,8 +169,8 @@ void pasopia_state::pasopia_io(address_map &map)
 	map(0x08, 0x0b).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x10).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x11, 0x11).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-//  0x18 - 0x1b pac2
-//  0x1c - 0x1f something
+	map(0x18, 0x1b).rw("dtfcst", FUNC(pasopia_pac2_slot_device::read), FUNC(pasopia_pac2_slot_device::write));
+	map(0x1c, 0x1f).rw("dtfunt", FUNC(pasopia_pac2_slot_device::read), FUNC(pasopia_pac2_slot_device::write));
 	map(0x20, 0x23).rw(m_ppi2, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x28, 0x2b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x30, 0x33).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
@@ -375,6 +376,9 @@ void pasopia_state::pasopia(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	PASOPIA_PAC2(config, "dtfcst", pac2_default_devices, nullptr); // "Data File Cassette"
+	PASOPIA_PAC2(config, "dtfunt", pac2_default_devices, nullptr); // "Data File Unit"
 
 	SOFTWARE_LIST(config, "cass_list").set_original("pasopia_cass");
 }

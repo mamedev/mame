@@ -30,6 +30,7 @@
 #include "emu.h"
 #include "includes/pasopia.h"
 
+#include "bus/pasopia/pac2.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/i8255.h"
@@ -65,6 +66,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_keyboard(*this, "KEY.%d", 0)
 		, m_cass(*this, "cassette")
+		, m_pac2(*this, "pac2")
 		, m_speaker(*this, "speaker")
 		, m_font_rom(*this, "font")
 	{ }
@@ -83,8 +85,6 @@ private:
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
 	void memory_ctrl_w(uint8_t data);
-	void pac2_w(offs_t offset, uint8_t data);
-	uint8_t pac2_r(offs_t offset);
 	void ram_bank_w(offs_t offset, uint8_t data);
 	void pasopia7_6845_w(offs_t offset, uint8_t data);
 	uint8_t io_r(offs_t offset);
@@ -131,9 +131,6 @@ private:
 	uint8_t m_nmi_enable_reg;
 	uint8_t m_nmi_trap;
 	uint8_t m_nmi_reset;
-	uint16_t m_pac2_index[2];
-	uint32_t m_kanji_index;
-	uint8_t m_pac2_bank_select;
 	uint8_t m_screen_type;
 	void pasopia_nmi_trap();
 	uint8_t m_mux_data;
@@ -161,6 +158,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_ioport_array<12> m_keyboard;
 	required_device<cassette_image_device> m_cass;
+	required_device<pasopia_pac2_slot_device> m_pac2;
 	required_device<speaker_sound_device> m_speaker;
 	required_region_ptr<uint8_t> m_font_rom;
 };
@@ -378,82 +376,6 @@ void pasopia7_state::memory_ctrl_w(uint8_t data)
 //  printf("%02x\n",m_vram_sel);
 }
 
-
-void pasopia7_state::pac2_w(offs_t offset, uint8_t data)
-{
-	/*
-	select register:
-	4 = ram1;
-	3 = ram2;
-	2 = kanji ROM;
-	1 = joy;
-	anything else is nop
-	*/
-
-	if(m_pac2_bank_select == 3 || m_pac2_bank_select == 4)
-	{
-		switch(offset)
-		{
-			case 0: m_pac2_index[(m_pac2_bank_select-3) & 1] = (m_pac2_index[(m_pac2_bank_select-3) & 1] & 0x7f00) | (data & 0xff); break;
-			case 1: m_pac2_index[(m_pac2_bank_select-3) & 1] = (m_pac2_index[(m_pac2_bank_select-3) & 1] & 0xff) | ((data & 0x7f) << 8); break;
-			case 2: // PAC2 RAM write
-			{
-				uint8_t *pac2_ram;
-
-				pac2_ram = memregion(((m_pac2_bank_select-3) & 1) ? "rampac2" : "rampac1")->base();
-
-				pac2_ram[m_pac2_index[(m_pac2_bank_select-3) & 1]] = data;
-			}
-		}
-	}
-	else if(m_pac2_bank_select == 2) // kanji ROM
-	{
-		switch(offset)
-		{
-			case 0: m_kanji_index = (m_kanji_index & 0x1ff00) | ((data & 0xff) << 0); break;
-			case 1: m_kanji_index = (m_kanji_index & 0x100ff) | ((data & 0xff) << 8); break;
-			case 2: m_kanji_index = (m_kanji_index & 0x0ffff) | ((data & 0x01) << 16); break;
-		}
-	}
-
-	if(offset == 3)
-	{
-		if(data & 0x80)
-		{
-			// ...
-		}
-		else
-			m_pac2_bank_select = data & 7;
-	}
-}
-
-uint8_t pasopia7_state::pac2_r(offs_t offset)
-{
-	if(offset == 2)
-	{
-		if(m_pac2_bank_select == 3 || m_pac2_bank_select == 4)
-		{
-			uint8_t *pac2_ram;
-
-			pac2_ram = memregion(((m_pac2_bank_select-3) & 1) ? "rampac2" : "rampac1")->base();
-
-			return pac2_ram[m_pac2_index[(m_pac2_bank_select-3) & 1]];
-		}
-		else if(m_pac2_bank_select == 2)
-		{
-			uint8_t *kanji_rom = memregion("kanji")->base();
-
-			return kanji_rom[m_kanji_index];
-		}
-		else
-		{
-			//printf("RAMPAC bank_select = %02x\n",m_pac2_bank_select);
-		}
-	}
-
-	return 0xff;
-}
-
 /* writes always occurs to the RAM banks, even if the ROMs are selected. */
 void pasopia7_state::ram_bank_w(offs_t offset, uint8_t data)
 {
@@ -544,7 +466,7 @@ uint8_t pasopia7_state::io_r(offs_t offset)
 		return m_crtc->register_r();
 	else
 	if(io_port >= 0x18 && io_port <= 0x1b)
-		return pac2_r(io_port & 3);
+		return m_pac2->read(io_port & 3);
 	else
 	if(io_port >= 0x20 && io_port <= 0x23)
 	{
@@ -593,7 +515,7 @@ void pasopia7_state::io_w(offs_t offset, uint8_t data)
 		pasopia7_6845_w(io_port-0x10, data);
 	else
 	if(io_port >= 0x18 && io_port <= 0x1b)
-		pac2_w(io_port & 3, data);
+		m_pac2->write(io_port & 3, data);
 	else
 	if(io_port >= 0x20 && io_port <= 0x23)
 	{
@@ -679,20 +601,8 @@ static const gfx_layout p7_chars_8x8 =
 	8*8
 };
 
-static const gfx_layout p7_chars_16x16 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	16*16
-};
-
 static GFXDECODE_START( gfx_pasopia7 )
 	GFXDECODE_ENTRY( "font",   0x00000, p7_chars_8x8,    0, 0x10 )
-	GFXDECODE_ENTRY( "kanji",  0x00000, p7_chars_16x16,  0, 0x10 )
 GFXDECODE_END
 
 uint8_t pasopia7_state::keyb_r()
@@ -928,6 +838,8 @@ void pasopia7_state::p7_base(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	PASOPIA_PAC2(config, m_pac2, pac2_default_devices, nullptr);
 }
 
 void pasopia7_state::p7_raster(machine_config &config)
@@ -985,15 +897,6 @@ ROM_START( pasopia7 )
 
 	ROM_REGION( 0x800, "font", ROMREGION_ERASEFF )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(a91c45a9) SHA1(a472adf791b9bac3dfa6437662e1a9e94a88b412))
-
-	ROM_REGION( 0x20000, "kanji", ROMREGION_ERASEFF )
-	ROM_LOAD( "kanji.rom", 0x0000, 0x20000, CRC(6109e308) SHA1(5c21cf1f241ef1fa0b41009ea41e81771729785f))
-
-	ROM_REGION( 0x8000, "rampac1", ROMREGION_ERASEFF )
-//  ROM_LOAD( "rampac1.bin", 0x0000, 0x8000, CRC(0e4f09bd) SHA1(4088906d57e4f6085a75b249a6139a0e2eb531a1) )
-
-	ROM_REGION( 0x8000, "rampac2", ROMREGION_ERASEFF )
-//  ROM_LOAD( "rampac2.bin", 0x0000, 0x8000, CRC(0e4f09bd) SHA1(4088906d57e4f6085a75b249a6139a0e2eb531a1) )
 ROM_END
 
 /* using an identical ROMset from now, but the screen type is different */
@@ -1006,15 +909,6 @@ ROM_START( pasopia7lcd )
 
 	ROM_REGION( 0x800, "font", ROMREGION_ERASEFF )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(a91c45a9) SHA1(a472adf791b9bac3dfa6437662e1a9e94a88b412))
-
-	ROM_REGION( 0x20000, "kanji", ROMREGION_ERASEFF )
-	ROM_LOAD( "kanji.rom", 0x0000, 0x20000, CRC(6109e308) SHA1(5c21cf1f241ef1fa0b41009ea41e81771729785f))
-
-	ROM_REGION( 0x8000, "rampac1", ROMREGION_ERASEFF )
-//  ROM_LOAD( "rampac1.bin", 0x0000, 0x8000, CRC(0e4f09bd) SHA1(4088906d57e4f6085a75b249a6139a0e2eb531a1) )
-
-	ROM_REGION( 0x8000, "rampac2", ROMREGION_ERASEFF )
-//  ROM_LOAD( "rampac2.bin", 0x0000, 0x8000, CRC(0e4f09bd) SHA1(4088906d57e4f6085a75b249a6139a0e2eb531a1) )
 ROM_END
 
 

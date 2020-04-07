@@ -853,6 +853,7 @@ BUSES["NSCSI"] = true
 BUSES["NUBUS"] = true
 BUSES["O2"] = true
 BUSES["ORICEXT"] = true
+BUSES["PASOPIA"] = true
 BUSES["PC1512"] = true
 BUSES["PCE"] = true
 BUSES["PC_JOY"] = true
