@@ -34,7 +34,7 @@
 #include "bus/isa/aga.h"
 #include "bus/isa/fdc.h"
 #include "machine/genpc.h"
-#include "machine/nvram.h"
+#include "machine/m3002.h"
 #include "machine/pckeybrd.h"
 #include "machine/ram.h"
 
@@ -50,6 +50,7 @@ public:
 		m_mb(*this, "mb"),
 		m_keyboard(*this, "pc_keyboard"),
 		m_ram(*this, RAM_TAG),
+		m_rtc(*this, "rtc"),
 		m_jim_state(0),
 		m_port61(0)
 	{ }
@@ -65,6 +66,7 @@ private:
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<pc_keyboard_device> m_keyboard;
 	required_device<ram_device> m_ram;
+	required_device<m3002_device> m_rtc;
 
 	DECLARE_WRITE8_MEMBER( europc_pio_w );
 	DECLARE_READ8_MEMBER( europc_pio_r );
@@ -73,26 +75,11 @@ private:
 	DECLARE_READ8_MEMBER ( europc_jim_r );
 	DECLARE_READ8_MEMBER ( europc_jim2_r );
 
-	DECLARE_READ8_MEMBER( europc_rtc_r );
-	DECLARE_WRITE8_MEMBER( europc_rtc_w );
-
-	void europc_rtc_set_time();
-
 	uint8_t m_jim_data[16];
 	uint8_t m_jim_state;
 	isa8_aga_device::mode_t m_jim_mode;
 	int m_port61; // bit 0,1 must be 0 for startup; reset?
-	uint8_t m_rtc_data[0x10];
-	int m_rtc_reg;
-	int m_rtc_state;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	emu_timer* m_rtc_timer;
-
-	enum
-	{
-		TIMER_RTC
-	};
 	void europc_io(address_map &map);
 	void europc_map(address_map &map);
 };
@@ -208,7 +195,7 @@ WRITE8_MEMBER( europc_pc_state::europc_jim_w )
 		}
 		break;
 	case 0xa:
-		europc_rtc_w(space, 0, data);
+		m_rtc->write(data);
 		return;
 	}
 	logerror("jim write %.2x %.2x\n", offset, data);
@@ -222,7 +209,7 @@ READ8_MEMBER( europc_pc_state::europc_jim_r )
 	{
 	case 4: case 5: case 6: case 7: data = m_jim_data[offset]; break;
 	case 0: case 1: case 2: case 3: data = 0; break;
-	case 0xa: return europc_rtc_r(space, 0);
+	case 0xa: return m_rtc->read();
 	}
 	return data;
 }
@@ -271,99 +258,6 @@ READ8_MEMBER( europc_pc_state::europc_jim2_r )
    reg 0f: 01 status ok, when not 01 written
 */
 
-void europc_pc_state::europc_rtc_set_time()
-{
-	system_time systime;
-
-	/* get the current date/time from the core */
-	machine().current_datetime(systime);
-
-	m_rtc_data[0] = dec_2_bcd(systime.utc_time.second);
-	m_rtc_data[1] = dec_2_bcd(systime.utc_time.minute);
-	m_rtc_data[2] = dec_2_bcd(systime.utc_time.hour);
-
-	m_rtc_data[3] = dec_2_bcd(systime.utc_time.mday);
-	m_rtc_data[4] = dec_2_bcd(systime.utc_time.month + 1);
-	m_rtc_data[5] = dec_2_bcd(systime.utc_time.year % 100);
-}
-
-void europc_pc_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	int month, year;
-
-	switch(id)
-	{
-		case TIMER_RTC:
-			m_rtc_data[0]=bcd_adjust(m_rtc_data[0]+1);
-			if (m_rtc_data[0]>=0x60)
-			{
-				m_rtc_data[0]=0;
-				m_rtc_data[1]=bcd_adjust(m_rtc_data[1]+1);
-				if (m_rtc_data[1]>=0x60)
-				{
-					m_rtc_data[1]=0;
-					m_rtc_data[2]=bcd_adjust(m_rtc_data[2]+1);
-					if (m_rtc_data[2]>=0x24)
-					{
-						m_rtc_data[2]=0;
-						m_rtc_data[3]=bcd_adjust(m_rtc_data[3]+1);
-						month=bcd_2_dec(m_rtc_data[4]);
-						year=bcd_2_dec(m_rtc_data[5])+2000; // save for julian_days_in_month_calculation
-						if (m_rtc_data[3]> gregorian_days_in_month(month, year))
-						{
-							m_rtc_data[3]=1;
-							m_rtc_data[4]=bcd_adjust(m_rtc_data[4]+1);
-							if (m_rtc_data[4]>0x12)
-							{
-								m_rtc_data[4]=1;
-								m_rtc_data[5]=bcd_adjust(m_rtc_data[5]+1)&0xff;
-							}
-						}
-					}
-				}
-			}
-			break;
-	}
-}
-
-READ8_MEMBER( europc_pc_state::europc_rtc_r )
-{
-	int data=0;
-	switch (m_rtc_state)
-	{
-	case 1:
-		data=(m_rtc_data[m_rtc_reg]&0xf0)>>4;
-		m_rtc_state++;
-		break;
-	case 2:
-		data=m_rtc_data[m_rtc_reg]&0xf;
-		m_rtc_state=0;
-//      logerror("rtc read %x %.2x\n",m_rtc_reg, m_rtc_data[m_rtc_reg]);
-		break;
-	}
-	return data;
-}
-
-WRITE8_MEMBER( europc_pc_state::europc_rtc_w )
-{
-	switch (m_rtc_state)
-	{
-	case 0:
-		m_rtc_reg=data;
-		m_rtc_state=1;
-		break;
-	case 1:
-		m_rtc_data[m_rtc_reg]=(m_rtc_data[m_rtc_reg]&~0xf0)|((data&0xf)<<4);
-		m_rtc_state++;
-		break;
-	case 2:
-		m_rtc_data[m_rtc_reg]=(m_rtc_data[m_rtc_reg]&~0xf)|(data&0xf);
-		m_rtc_state=0;
-//      logerror("rtc written %x %.2x\n",m_rtc_reg, m_rtc_data[m_rtc_reg]);
-		break;
-	}
-}
-
 void europc_pc_state::init_europc()
 {
 	uint8_t *rom = &memregion("bios")->base()[0];
@@ -380,17 +274,6 @@ void europc_pc_state::init_europc()
 			a += rom[i];
 		rom[0xffff] = 256 - a;
 	}
-
-	memset(&m_rtc_data,0,sizeof(m_rtc_data));
-	m_rtc_reg = 0;
-	m_rtc_state = 0;
-	m_rtc_data[0xf]=1;
-
-	m_rtc_timer = timer_alloc();
-	m_rtc_timer->adjust(attotime::zero, 0, attotime(1,0));
-	//  europc_rtc_set_time();
-
-	subdevice<nvram_device>("nvram")->set_base(m_rtc_data, sizeof(m_rtc_data));
 }
 
 WRITE8_MEMBER( europc_pc_state::europc_pio_w )
@@ -591,7 +474,7 @@ void europc_pc_state::europc(machine_config &config)
 	PC_KEYB(config, m_keyboard);
 	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);;
+	M3002(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* internal ram */
 	// Machine came with 512K standard, 640K via expansion card, but BIOS offers 256K as well
