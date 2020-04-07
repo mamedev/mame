@@ -11528,7 +11528,7 @@ ROM_START( wof )
 	ROM_REGION( 0x0200, "dboardplds", 0 )
 	ROM_LOAD( "d7l1.7l",      0x0000, 0x0117, CRC(27b7410d) SHA1(06d0cba0226850f100ff1f539bd7d5db0f90c730) )
 	ROM_LOAD( "d8l1.8l",      0x0000, 0x0117, CRC(539fc7da) SHA1(cad5c91629c6247e49ccbbcbfe6b08229eafae07) )
-	ROM_LOAD( "d9k1.9k",      0x0000, 0x0117, NO_DUMP )                                     // pal verification required
+	ROM_LOAD( "d9k1.9k",      0x0000, 0x0117, CRC(6c35c805) SHA1(641b9003b8e7fc969d0cd679f98e413ed2abe474) )
 	ROM_LOAD( "d10f1.10f",    0x0000, 0x0117, CRC(6619c494) SHA1(3aef656c07182a2186f810f30e0d854dd5bd8d18) )
 ROM_END
 
@@ -11576,7 +11576,7 @@ ROM_START( wofr1 )
 	ROM_REGION( 0x0200, "dboardplds", 0 )
 	ROM_LOAD( "d7l1.7l",      0x0000, 0x0117, CRC(27b7410d) SHA1(06d0cba0226850f100ff1f539bd7d5db0f90c730) )
 	ROM_LOAD( "d8l1.8l",      0x0000, 0x0117, CRC(539fc7da) SHA1(cad5c91629c6247e49ccbbcbfe6b08229eafae07) )
-	ROM_LOAD( "d9k1.9k",      0x0000, 0x0117, NO_DUMP )                                     // pal verification required
+	ROM_LOAD( "d9k1.9k",      0x0000, 0x0117, CRC(6c35c805) SHA1(641b9003b8e7fc969d0cd679f98e413ed2abe474) )
 	ROM_LOAD( "d10f1.10f",    0x0000, 0x0117, CRC(6619c494) SHA1(3aef656c07182a2186f810f30e0d854dd5bd8d18) )
 ROM_END
 
@@ -11623,7 +11623,7 @@ ROM_START( wofu )
 	ROM_REGION( 0x0200, "dboardplds", 0 )
 	ROM_LOAD( "d7l1.7l",      0x0000, 0x0117, CRC(27b7410d) SHA1(06d0cba0226850f100ff1f539bd7d5db0f90c730) )
 	ROM_LOAD( "d8l1.8l",      0x0000, 0x0117, CRC(539fc7da) SHA1(cad5c91629c6247e49ccbbcbfe6b08229eafae07) )
-	ROM_LOAD( "d9k1.9k",      0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "d9k1.9k",      0x0000, 0x0117, CRC(6c35c805) SHA1(641b9003b8e7fc969d0cd679f98e413ed2abe474) )
 	ROM_LOAD( "d10f1.10f",    0x0000, 0x0117, CRC(6619c494) SHA1(3aef656c07182a2186f810f30e0d854dd5bd8d18) )
 ROM_END
 
@@ -11672,7 +11672,7 @@ ROM_START( wofa )
 	ROM_REGION( 0x0200, "dboardplds", 0 )
 	ROM_LOAD( "d7l1.7l",      0x0000, 0x0117, CRC(27b7410d) SHA1(06d0cba0226850f100ff1f539bd7d5db0f90c730) )
 	ROM_LOAD( "d8l1.8l",      0x0000, 0x0117, CRC(539fc7da) SHA1(cad5c91629c6247e49ccbbcbfe6b08229eafae07) )
-	ROM_LOAD( "d9k1.9k",      0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "d9k1.9k",      0x0000, 0x0117, CRC(6c35c805) SHA1(641b9003b8e7fc969d0cd679f98e413ed2abe474) )
 	ROM_LOAD( "d10f1.10f",    0x0000, 0x0117, CRC(6619c494) SHA1(3aef656c07182a2186f810f30e0d854dd5bd8d18) )
 ROM_END
 
@@ -11719,7 +11719,7 @@ ROM_START( wofj )
 	ROM_REGION( 0x0200, "dboardplds", 0 )
 	ROM_LOAD( "d7l1.7l",      0x0000, 0x0117, CRC(27b7410d) SHA1(06d0cba0226850f100ff1f539bd7d5db0f90c730) )
 	ROM_LOAD( "d8l1.8l",      0x0000, 0x0117, CRC(539fc7da) SHA1(cad5c91629c6247e49ccbbcbfe6b08229eafae07) )
-	ROM_LOAD( "d9k1.9k",      0x0000, 0x0117, NO_DUMP )                                     // pal verification required
+	ROM_LOAD( "d9k1.9k",      0x0000, 0x0117, CRC(6c35c805) SHA1(641b9003b8e7fc969d0cd679f98e413ed2abe474) )
 	ROM_LOAD( "d10f1.10f",    0x0000, 0x0117, CRC(6619c494) SHA1(3aef656c07182a2186f810f30e0d854dd5bd8d18) )
 ROM_END
 
@@ -13285,7 +13285,7 @@ ROM_START( wofch )
 	ROM_REGION( 0x0200, "dboardplds", 0 )
 	ROM_LOAD( "d7l1.7l",      0x0000, 0x0117, CRC(27b7410d) SHA1(06d0cba0226850f100ff1f539bd7d5db0f90c730) )
 	ROM_LOAD( "d8l1.8l",      0x0000, 0x0117, CRC(539fc7da) SHA1(cad5c91629c6247e49ccbbcbfe6b08229eafae07) )
-	ROM_LOAD( "d9k1.9k",      0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "d9k1.9k",      0x0000, 0x0117, CRC(6c35c805) SHA1(641b9003b8e7fc969d0cd679f98e413ed2abe474) )
 	ROM_LOAD( "d10f1.10f",    0x0000, 0x0117, CRC(6619c494) SHA1(3aef656c07182a2186f810f30e0d854dd5bd8d18) )
 ROM_END
 
