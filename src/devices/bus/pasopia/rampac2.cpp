@@ -122,7 +122,7 @@ void pasopia_rampac2_device::nvram_default()
 
 u8 pasopia_rampac2_device::pac2_read(offs_t offset)
 {
-	return m_ram[m_ram_index];
+	return m_ram[m_ram_index & (m_ram_size - 1)];
 }
 
 
