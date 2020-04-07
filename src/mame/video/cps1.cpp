@@ -1160,12 +1160,22 @@ static const struct gfx_range mapper_CD63B_table[] =
 #define mapper_PS63B    { 0x8000, 0x8000, 0, 0 }, mapper_PS63B_table
 static const struct gfx_range mapper_PS63B_table[] =
 {
-	/* type                              start   end     bank */
-	{ GFXTYPE_SCROLL1,                   0x0000, 0x0fff, 0 },
-	{ GFXTYPE_SPRITES,                   0x1000, 0x7fff, 0 },
+	// /* type                              start   end     bank */
+	// { GFXTYPE_SCROLL1,                   0x0000, 0x0fff, 0 },
+	// { GFXTYPE_SPRITES,                   0x1000, 0x7fff, 0 },
 
-	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0xdbff, 1 },
-	{ GFXTYPE_SCROLL3,                   0xdc00, 0xffff, 1 },
+	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0xdbff, 1 },
+	// { GFXTYPE_SCROLL3,                   0xdc00, 0xffff, 1 },
+	// { 0 }
+	
+	// verified from PAL dump:
+	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
+	// bank1 = pin 17 (ROMs 5,7) & pin 16 (ROMs 6,8)
+	// pins 12,13,14,15 are always enabled
+	
+	/* type                                                                  start    end      bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x07fff, 0 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x08000, 0x0ffff, 1 },
 	{ 0 }
 };
 
