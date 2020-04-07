@@ -1960,4 +1960,4 @@ GAME( 1981, hustlerb6,  hustler,  hustlerb6,  hustler,    scobra_state,  empty_i
 
 GAME( 1982, mimonkey,   0,        mimonkey,   mimonkey,   scobra_state,  init_mimonkey, ROT90,  "Universal Video Games",              "Mighty Monkey", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mimonsco,   mimonkey, mimonkey,   mimonsco,   scobra_state,  init_mimonsco, ROT90,  "bootleg",                            "Mighty Monkey (bootleg on Super Cobra hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mimonkeyug, mimonkey, mimonkeyug, mimonkeyug, scobra_state,  init_mimonsco, ROT90,  "bootleg (U.Games)",                  "Mighty Monkey (U.Games bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mimonkeyug, mimonkey, mimonkeyug, mimonkeyug, scobra_state,  init_mimonsco, ROT90,  "bootleg (U.Games)",                  "Mighty Monkey (U.Games bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // missing discrete sound components emulation
