@@ -13585,7 +13585,8 @@ void cps_state::init_slammast()
 void cps_state::init_pang3b()
 {
 	/* Pang 3 is the only non-QSound game to have an EEPROM. */
-	/* It is mapped in the CPS-B address range so probably is on the C-board. */
+	/* It is mapped in the CPS-B address range and is on the B-board. */
+	/* The Mach215 security chip outputs 2 control signals (pins 4, 6) which switch the eeprom in/out serial data lines onto the main 68k data bus when required */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_port(0x80017a, 0x80017b, "EEPROMIN", "EEPROMOUT");
 
 	init_cps1();
@@ -13593,6 +13594,12 @@ void cps_state::init_pang3b()
 
 void cps_state::init_pang3()
 {
+	// an AMD or Lattice Mach215 pld chip performs the decryption (and controls eeprom).
+	// it needs to be "kicked" (by reading port 80017a) every vblank else it seems to stop decrypting code.
+	// encryption is switched on/off by pin 37.
+	// encrypted code range is controlled by PAL CP1B9K which sets pin 37 such that: 00000-7ffff unencrypted, >=80000 encrypted.
+	// the mach215 responds to R/W 800174-80017B enabled by pin 36, range set by PAL CP1B8K.
+	
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	int A, src, dst;
 
