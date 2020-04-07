@@ -227,7 +227,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 
 	includedirs {
 		MAME_DIR .. "src/osd/windows",
-		MAME_DIR .. "src/lib/winpcap",
 	}
 
 	files {

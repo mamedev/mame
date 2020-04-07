@@ -193,7 +193,7 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc0_tile_info)
 	int tile = data >> 14;
 	int color = (m_sc0_vram[tile_index*2+1] & 0x1f)+0;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -205,7 +205,7 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc1_tile_info)
 	int tile = data >> 14;
 	int color = (m_sc1_vram[tile_index*2+1] & 0x1f)+0x10;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -217,7 +217,7 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc2_tile_info)
 	int tile = data >> 14;
 	int color = (m_sc2_vram[tile_index*2+1] & 0x1f)+0x20;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -229,7 +229,7 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc3_tile_info)
 	int tile = data >> 14;
 	int color = (m_sc3_vram[tile_index*2+1] & 0x1f)+0x30;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);

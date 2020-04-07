@@ -7,7 +7,6 @@
     http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Solidisk_EFS.html
 
     TODO:
-    - add Winchester slot
     - unknown how 16K RAM is paged as SWR (adverts claim it was unreliable)
 
 **********************************************************************/
@@ -25,7 +24,7 @@ DEFINE_DEVICE_TYPE(ELECTRON_STLEFS, electron_stlefs_device, "electron_stlefs", "
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( stlefs )
+//  FLOPPY_FORMATS( stlefs )
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER(electron_stlefs_device::floppy_formats)
@@ -52,6 +51,11 @@ void electron_stlefs_device::device_add_mconfig(machine_config &config)
 	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(electron_cartslot_device::nmi_w));
 	FLOPPY_CONNECTOR(config, m_floppy0, stlefs_floppies, "525qd", electron_stlefs_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, stlefs_floppies, nullptr, electron_stlefs_device::floppy_formats).enable_sound(true);
+
+	/* winchester */
+	BBC_1MHZBUS_SLOT(config, m_1mhzbus, DERIVED_CLOCK(1, 16), bbc_1mhzbus_devices, nullptr);
+	m_1mhzbus->irq_handler().set(DEVICE_SELF_OWNER, FUNC(electron_cartslot_device::irq_w));
+	m_1mhzbus->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(electron_cartslot_device::nmi_w));
 }
 
 //**************************************************************************
@@ -65,6 +69,7 @@ void electron_stlefs_device::device_add_mconfig(machine_config &config)
 electron_stlefs_device::electron_stlefs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ELECTRON_STLEFS, tag, owner, clock)
 	, device_electron_cart_interface(mconfig, *this)
+	, m_1mhzbus(*this, "1mhzbus")
 	, m_fdc(*this, "fdc")
 	, m_floppy0(*this, "fdc:0")
 	, m_floppy1(*this, "fdc:1")
@@ -98,6 +103,7 @@ uint8_t electron_stlefs_device::read(offs_t offset, int infc, int infd, int romq
 			data = m_fdc->read(offset & 0x03);
 			break;
 		}
+		data &= m_1mhzbus->fred_r(offset & 0xff);
 	}
 	else if (oe)
 	{
@@ -129,6 +135,7 @@ void electron_stlefs_device::write(offs_t offset, uint8_t data, int infc, int in
 		//case 0xcb:
 			//m_page_register = data;
 		}
+		m_1mhzbus->fred_w(offset & 0xff, data);
 	}
 }
 
@@ -154,5 +161,5 @@ void electron_stlefs_device::wd1770_control_w(uint8_t data)
 	m_fdc->dden_w(BIT(data, 3));
 
 	// bit 5: reset
-	if (!BIT(data, 5)) m_fdc->soft_reset();
+	m_fdc->mr_w(BIT(data, 5));
 }

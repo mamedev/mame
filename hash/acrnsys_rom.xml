@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Acorn System - ROM images -->
+Acorn System - ROM images
+-->
 
 <softwarelist name="acrnsys_rom" description="Acorn System ROM images">
 

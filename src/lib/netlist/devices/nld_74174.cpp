@@ -17,10 +17,10 @@ namespace devices
 	{
 		NETLIB_CONSTRUCTOR(74174)
 		, m_CLK(*this, "CLK", NETLIB_DELEGATE(74174, sub))
-		, m_Q(*this, {{"Q1", "Q2", "Q3", "Q4", "Q5", "Q6"}})
+		, m_Q(*this, {"Q1", "Q2", "Q3", "Q4", "Q5", "Q6"})
 		, m_clrq(*this, "m_clr", 0)
 		, m_data(*this, "m_data", 0)
-		, m_D(*this, {{"D1", "D2", "D3", "D4", "D5", "D6"}})
+		, m_D(*this, {"D1", "D2", "D3", "D4", "D5", "D6"})
 		, m_CLRQ(*this, "CLRQ")
 		, m_power_pins(*this)
 		{

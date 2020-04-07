@@ -8,7 +8,16 @@
           rendering.
 
         - In radr, NBG1 should be opaque on select screen, and NBG3 should be
-          opaque while driving. How is this controlled?
+          opaque while driving. This is controlled by register $31ff8e 
+	  (respectively $200 and $800), likewise darkedge sets $800 on the first 
+	  attract fight (which has ugly black pens which should be white according 
+	  to the ref)
+
+	- titlef NBG0 and NBG2 layers are currently hidden during gameplay, it 
+	  sets $31ff02 with either $7be0 and $2960 (and $31ff8e is $c00).
+	  Is it possible that somewhere in the registers there may be a 
+	  Saturn-esque sprite window effect enable to draw the boxing ring 
+	  over NBG0;
 
         - In radr, they use $1A0 as the X center for zooming; however, this
           contradicts the theory that bit 9 is a sign bit. For now, the code
@@ -19,8 +28,7 @@
           in this case, the rowselect lookups should be done in reverse order,
           but this results in an incorrect display. For now, we assume there is
           a bug in the procedure and implement it so that it looks correct.
-
-
+	
     Information extracted from below, and from Modeler:
 
     Tile format:
@@ -48,8 +56,15 @@
                    ---- ---- ---- --1- : 1= X+Y flip for NBG1
                    ---- ---- ---- ---0 : 1= X+Y flip for NBG0
          $31FF02 : x--- ---- --x- ---- : Bitmap layer enable (?)
+	           -x-- ---- ---- ---- : 1= NBG3 page wrapping disable (clipping enable according to code?)
+		   --x- ---- ---- ---- : 1= NBG2 page wrapping disable
                    ---1 ---- ---- ---- : 1= NBG1 page wrapping disable
                    ---- 0--- ---- ---- : 1= NBG0 page wrapping disable
+		   ---- -x-- ---- ---- : 1= bitmap layer clipping mode (1=outside)
+		   ---- --x- ---- ---- : 1= NBG3 clipping mode (1=outside)
+		   ---- ---x ---- ---- : 1= NBG2 clipping mode (1=outside)
+		   ---- ---- x--- ---- : 1= NBG1 clipping mode (1=outside)
+		   ---- ---- -x-- ---- : 1= NBG0 clipping mode (1=outside)
                    ---- ---- --b- ---- : 1= Bitmap layer disable
                    ---- ---- ---t ---- : 1= Text layer disable
                    ---- ---- ---- 3--- : 1= NBG3 layer disable
@@ -146,7 +161,41 @@
     reference
     - arabfgt : https://www.youtube.com/watch?v=98QivDAGz3I
     - darkedge : https://www.youtube.com/watch?v=riO1yb95z7s
+	
+====
+back layer setups (register $31ff5e):
+alien3:   $0200
+arabfgt:  $8000-$81ff -- depending on the scene
+arescue:  $0200
+as1:      (untested)
+brival:   $8000
+darkedge: $0200
+dbzvrvs:  $0200
+f1en:     $0000
+f1lap:    $0000
+ga2:      $0200
+harddunk: $8200
+holo:     $0200
+jpark:    $0200
+kokoroj:  (untested)
+kokoroj2: $8000 --
+          $8000-$81fc (in steps of 4) -- on introduction/initials scenes
+orunners: $0200
+radm:     $0200
+radr:     $8200 -- gameplay
+          $0200 -- title screen
+scross:   $0200
+slipstrm: $0000
+sonic:    $0000 -- on sega logo/title screen
+          $0200 -- everything else
+spidman:  $0200
+svf:      $0201 -- on attract
+          $0200 -- on gameplay
+titlef:   $8200
+
 */
+
+
 
 #include "emu.h"
 #include "includes/segas32.h"
@@ -471,7 +520,7 @@ TILE_GET_INFO_MEMBER(segas32_state::get_tile_info)
 {
 	struct segas32_state::cache_entry *entry = (struct segas32_state::cache_entry *)tilemap.user_data();
 	uint16_t data = m_videoram[((entry->page & 0x7f) << 9) | tile_index];
-	SET_TILE_INFO_MEMBER(0, (entry->bank << 13) | (data & 0x1fff), (data >> 4) & 0x1ff, (data >> 14) & 3);
+	tileinfo.set(0, (entry->bank << 13) | (data & 0x1fff), (data >> 4) & 0x1ff, (data >> 14) & 3);
 }
 
 
@@ -1205,7 +1254,7 @@ void segas32_state::update_background(struct segas32_state::layer_info *layer, c
 {
 	bitmap_ind16 &bitmap = *layer->bitmap;
 	int x, y;
-
+	
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint16_t *dst = &bitmap.pix16(y);
@@ -1213,7 +1262,11 @@ void segas32_state::update_background(struct segas32_state::layer_info *layer, c
 
 		/* determine the color */
 		if (m_videoram[0x1ff5e/2] & 0x8000)
-			color = (m_videoram[0x1ff5e/2] & 0x1fff) + y;
+		{
+			// line color select (bank wraps at 511, confirmed by arabfgt and kokoroj2)
+			int yoffset = (m_videoram[0x1ff5e/2] + y) & 0x1ff;
+			color = (m_videoram[0x1ff5e/2] & 0x1e00) + yoffset;
+		}
 		else
 			color = m_videoram[0x1ff5e/2] & 0x1e00;
 

@@ -97,23 +97,23 @@ uint32_t sed1520_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-READ8_MEMBER(sed1520_device::read)
+uint8_t sed1520_device::read(offs_t offset)
 {
 	if (offset & 0x01)
-		return data_read(space, 0);
+		return data_read();
 	else
-		return status_read(space, 0);
+		return status_read();
 }
 
-WRITE8_MEMBER(sed1520_device::write)
+void sed1520_device::write(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01)
-		data_write(space, 0, data);
+		data_write(data);
 	else
-		control_write(space, 0, data);
+		control_write(data);
 }
 
-WRITE8_MEMBER(sed1520_device::control_write)
+void sed1520_device::control_write(uint8_t data)
 {
 	if((data & 0xfe) == 0xae)            // display on/off
 		m_lcd_on = data & 0x01;
@@ -148,19 +148,19 @@ WRITE8_MEMBER(sed1520_device::control_write)
 		logerror("%s: invalid SED1520 command: %x\n", tag(), data);
 }
 
-READ8_MEMBER(sed1520_device::status_read)
+uint8_t sed1520_device::status_read()
 {
 	uint8_t data = (m_busy << 7) | (m_adc << 6) | (m_lcd_on << 5);
 	return data;
 }
 
-WRITE8_MEMBER(sed1520_device::data_write)
+void sed1520_device::data_write(uint8_t data)
 {
 	m_vram[(m_page * 80 + m_column) % sizeof(m_vram)] = data;
 	m_column = (m_column + 1) % 80;
 }
 
-READ8_MEMBER(sed1520_device::data_read)
+uint8_t sed1520_device::data_read()
 {
 	uint8_t data = m_vram[(m_page * 80 + m_column) % sizeof(m_vram)];
 	if (!m_modify_write)

@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Dragon 64 FLEX floppy disks -->
+Dragon 64 FLEX floppy disks
 
-<!-- Loading Instructions:
+    Loading Instructions:
 
       Load a FLEX system disk using:
         BOOT

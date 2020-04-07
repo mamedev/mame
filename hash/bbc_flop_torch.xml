@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Acorn BBC Micro - Torch Z80/68000 Co-Processor discs -->
+Acorn BBC Micro - Torch Co-Processor discs
+-->
 
-<softwarelist name="bbc_flop_torch" description="Torch Z80/68000 Co-Processor discs">
+<softwarelist name="bbc_flop_torch" description="Torch Co-Processor discs">
 
 	<!-- Z80 -->
 
@@ -69,7 +72,7 @@
 		<info name="usage" value="Requires Torch Z80 co-processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="hard_disc_utils_41.dsd" size="409600" crc="bab06207" sha1="24cc5b74b481794cdd3e67ea746cbd57927c1201" offset="0"/>
+				<rom name="hard_disc_utils_41.dsd" size="409600" crc="bab06207" sha1="24cc5b74b481794cdd3e67ea746cbd57927c1201"/>
 			</dataarea>
 		</part>
 	</software>
@@ -204,85 +207,85 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Unix Initalisation"/>
 			<dataarea name="flop" size="333396">
-				<rom name="BAS20-1.IMD" size="333396" crc="b09d3400" sha1="e7831a199b5e4baec74d1478f2e5ad4998cbf3df" offset="0"/>
+				<rom name="bas20-1.imd" size="333396" crc="b09d3400" sha1="e7831a199b5e4baec74d1478f2e5ad4998cbf3df"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Unix loader &amp; Kernel"/>
 			<dataarea name="flop" size="200219">
-				<rom name="BAS20-2.IMD" size="200219" crc="2d55e4b5" sha1="63a8e1eb8289b822298805f2fe4f8d702563fc81" offset="0"/>
+				<rom name="bas20-2.imd" size="200219" crc="2d55e4b5" sha1="63a8e1eb8289b822298805f2fe4f8d702563fc81"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="/etc/* /unix"/>
 			<dataarea name="flop" size="340717">
-				<rom name="BAS20-3.IMD" size="340717" crc="5b249e1d" sha1="4f7a14e9e25e5a3aaff84f3c64d2cf23344e9ded" offset="0"/>
+				<rom name="bas20-3.imd" size="340717" crc="5b249e1d" sha1="4f7a14e9e25e5a3aaff84f3c64d2cf23344e9ded"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="/bin/[a-d]*"/>
 			<dataarea name="flop" size="386615">
-				<rom name="BAS20-4.IMD" size="386615" crc="6ff61822" sha1="189667d997a1ad733e74d0b3885e48bad0d76b00" offset="0"/>
+				<rom name="bas20-4.imd" size="386615" crc="6ff61822" sha1="189667d997a1ad733e74d0b3885e48bad0d76b00"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="/bin/[e-o]*"/>
 			<dataarea name="flop" size="382535">
-				<rom name="BAS20-5.IMD" size="382535" crc="e3305576" sha1="fb716186cf09fce7628a627f01220412bd527e94" offset="0"/>
+				<rom name="bas20-5.imd" size="382535" crc="e3305576" sha1="fb716186cf09fce7628a627f01220412bd527e94"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="/bin/[p-w]*"/>
 			<dataarea name="flop" size="388910">
-				<rom name="BAS20-6.IMD" size="388910" crc="b18f6a66" sha1="5243721e9338c9e84f3da64d1d3bb74c6e581e23" offset="0"/>
+				<rom name="bas20-6.imd" size="388910" crc="b18f6a66" sha1="5243721e9338c9e84f3da64d1d3bb74c6e581e23"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
 			<feature name="part_id" value="/usr/bin/[a-f]*"/>
 			<dataarea name="flop" size="395799">
-				<rom name="BAS20-7.IMD" size="395799" crc="f74e8ec7" sha1="c2c02ca28cabefdc5ec61325059bae4a7b80bd99" offset="0"/>
+				<rom name="bas20-7.imd" size="395799" crc="f74e8ec7" sha1="c2c02ca28cabefdc5ec61325059bae4a7b80bd99"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
 			<feature name="part_id" value="/usr/bin/[g-r]*"/>
 			<dataarea name="flop" size="374889">
-				<rom name="BAS20-8.IMD" size="374889" crc="182d2323" sha1="09148a84b065ba962ae7c76b89eaddcffbe6093a" offset="0"/>
+				<rom name="bas20-8.imd" size="374889" crc="182d2323" sha1="09148a84b065ba962ae7c76b89eaddcffbe6093a"/>
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_5_25">
 			<feature name="part_id" value="/usr/bin/[s-u]*"/>
 			<dataarea name="flop" size="387129">
-				<rom name="BAS20-9.IMD" size="387129" crc="73440288" sha1="572d7d37e6f914182c8afd534a5a15175ac32cbe" offset="0"/>
+				<rom name="bas20-9.imd" size="387129" crc="73440288" sha1="572d7d37e6f914182c8afd534a5a15175ac32cbe"/>
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_5_25">
 			<feature name="part_id" value="/usr/bin/[v-x]*"/>
 			<dataarea name="flop" size="160689">
-				<rom name="BAS20-10.IMD" size="160689" crc="4880eb0a" sha1="4a136825a3890c204eb7b498d5182bd1ecf398eb" offset="0"/>
+				<rom name="bas20-10.imd" size="160689" crc="4880eb0a" sha1="4a136825a3890c204eb7b498d5182bd1ecf398eb"/>
 			</dataarea>
 		</part>
 		<part name="flop11" interface="floppy_5_25">
 			<feature name="part_id" value="/usr/lib/* /documentation/* /lid/makekey /usr/spool/at/lastimedone"/>
 			<dataarea name="flop" size="213783">
-				<rom name="BAS20-11.IMD" size="213783" crc="d80cb4d1" sha1="d53ad176492ec6e2dcff2358dcfec70280ca5f6a" offset="0"/>
+				<rom name="bas20-11.imd" size="213783" crc="d80cb4d1" sha1="d53ad176492ec6e2dcff2358dcfec70280ca5f6a"/>
 			</dataarea>
 		</part>
 		<part name="flop12" interface="floppy_5_25">
 			<feature name="part_id" value="/usr/games/[a-l]* /usr/games/mastermind"/>
 			<dataarea name="flop" size="402964">
-				<rom name="BAS20-12.IMD" size="402964" crc="f2b2d328" sha1="1cf763acb55871e22b59dab135c3bd63d809d468" offset="0"/>
+				<rom name="bas20-12.imd" size="402964" crc="f2b2d328" sha1="1cf763acb55871e22b59dab135c3bd63d809d468"/>
 			</dataarea>
 		</part>
 		<part name="flop13" interface="floppy_5_25">
 			<feature name="part_id" value="/usr/games/moo /usr/games/[n-w]* /usr/games/lib/* /usr/games/lib/quiz/*"/>
 			<dataarea name="flop" size="369593">
-				<rom name="BAS20-13.IMD" size="369593" crc="9ef9be16" sha1="86f32c47b63c034e5f4a066df7f38bbfd611e6b8" offset="0"/>
+				<rom name="bas20-13.imd" size="369593" crc="9ef9be16" sha1="86f32c47b63c034e5f4a066df7f38bbfd611e6b8"/>
 			</dataarea>
 		</part>
 		<part name="flop14" interface="floppy_5_25">
 			<feature name="part_id" value="UUCP"/>
 			<dataarea name="flop" size="332803">
-				<rom name="BAS20-14.IMD" size="332803" crc="5b8c2543" sha1="e6d9fedca68bc44356501b0b6c4186ba213622f4" offset="0"/>
+				<rom name="bas20-14.imd" size="332803" crc="5b8c2543" sha1="e6d9fedca68bc44356501b0b6c4186ba213622f4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -297,43 +300,43 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="/bin/*"/>
 			<dataarea name="flop" size="390763">
-				<rom name="PROG20-1.IMD" size="390763" crc="01d69dfa" sha1="a7baad99085cdcf656ca81f0dcc383a428967d36" offset="0"/>
+				<rom name="prog20-1.imd" size="390763" crc="01d69dfa" sha1="a7baad99085cdcf656ca81f0dcc383a428967d36"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="/usr/bin/ assorted"/>
 			<dataarea name="flop" size="392743">
-				<rom name="PROG20-2.IMD" size="392743" crc="bd812c05" sha1="78dedc903ea6d456d328a7a49f4ce1b2158592ea" offset="0"/>
+				<rom name="prog20-2.imd" size="392743" crc="bd812c05" sha1="78dedc903ea6d456d328a7a49f4ce1b2158592ea"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="/usr/bin/ sact sccsdiff sdiff val /usr/bin/ vc what prs /usr/lib/* /usr/lib/lex/*"/>
 			<dataarea name="flop" size="295908">
-				<rom name="PROG20-3.IMD" size="295908" crc="6f996745" sha1="9e182c732a202bb69ff9d63ce8b5c48a0c47098c" offset="0"/>
+				<rom name="prog20-3.imd" size="295908" crc="6f996745" sha1="9e182c732a202bb69ff9d63ce8b5c48a0c47098c"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="/usr/include/* /usr/include/sys[a-p]*"/>
 			<dataarea name="flop" size="95432">
-				<rom name="PROG20-4.IMD" size="95432" crc="17238b2c" sha1="d7452ced792e791b3281e0bd7a70a89c2d965a15" offset="0"/>
+				<rom name="prog20-4.imd" size="95432" crc="17238b2c" sha1="d7452ced792e791b3281e0bd7a70a89c2d965a15"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="/usr/include/sys/[r-v]* /usr/lib/cref/* /user/lib/help/*"/>
 			<dataarea name="flop" size="104122">
-				<rom name="PROG20-5.IMD" size="104122" crc="a8aa6260" sha1="f28f584a4546b8f22267ec9caaf6bf4d656ea343" offset="0"/>
+				<rom name="prog20-5.imd" size="104122" crc="a8aa6260" sha1="f28f584a4546b8f22267ec9caaf6bf4d656ea343"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="/lib/c* /lib/libPW.a libc.a libm.a"/>
 			<dataarea name="flop" size="388934">
-				<rom name="PROG20-6.IMD" size="388934" crc="b327cd84" sha1="c4fd0c4d74c95ded265001402a8865d7974ba4b6" offset="0"/>
+				<rom name="prog20-6.imd" size="388934" crc="b327cd84" sha1="c4fd0c4d74c95ded265001402a8865d7974ba4b6"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
 			<feature name="part_id" value="/lib/libcurses.a libl.a liby.a /lib/yaccpar mcrt0.o"/>
 			<dataarea name="flop" size="60766">
-				<rom name="PROG20-7.IMD" size="60766" crc="acf51b62" sha1="a21116a228c1f845b798f6a57612439dee719079" offset="0"/>
+				<rom name="prog20-7.imd" size="60766" crc="acf51b62" sha1="a21116a228c1f845b798f6a57612439dee719079"/>
 			</dataarea>
 		</part>
 	</software>
@@ -348,19 +351,19 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="/bin/* /usr/bin/[3-r]*"/>
 			<dataarea name="flop" size="366553">
-				<rom name="TEXT20-1.IMD" size="366553" crc="dbafe230" sha1="848e55b5c69e36efda390b0a781339cf259931d8" offset="0"/>
+				<rom name="text20-1.imd" size="366553" crc="dbafe230" sha1="848e55b5c69e36efda390b0a781339cf259931d8"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="/usr/bin/[s-u] /usr/lib/suftab w2006 sq2006 /usr/lib/font/* /usr/lib/term/*"/>
 			<dataarea name="flop" size="353277">
-				<rom name="TEXT20-2.IMD" size="353277" crc="9c8dce99" sha1="8eedaef409bf9ddceabae275b64d9d3c6b62dad6" offset="0"/>
+				<rom name="text20-2.imd" size="353277" crc="9c8dce99" sha1="8eedaef409bf9ddceabae275b64d9d3c6b62dad6"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="/usr/lib/t* /usr/lib/macro/* /usr/lib/spell/*"/>
 			<dataarea name="flop" size="380021">
-				<rom name="TEXT20-3.IMD" size="380021" crc="02265d47" sha1="b6e255aaace5ae06acf42f704e3eb11f7e95a95a" offset="0"/>
+				<rom name="text20-3.imd" size="380021" crc="02265d47" sha1="b6e255aaace5ae06acf42f704e3eb11f7e95a95a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -375,19 +378,76 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Initialisation Disc"/>
 			<dataarea name="flop" size="342341">
-				<rom name="UNIXUP-1.IMD" size="342341" crc="2e8c14bd" sha1="781a19ab0bc960d9c4f8e642227b8842b53d935a" offset="0"/>
+				<rom name="unixup-1.imd" size="342341" crc="2e8c14bd" sha1="781a19ab0bc960d9c4f8e642227b8842b53d935a"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Single User Kernels"/>
 			<dataarea name="flop" size="345587">
-				<rom name="UNIXUP-2.IMD" size="345587" crc="8a8873c2" sha1="16070f950c9bd7d6dbb35a11be1830c6fc455162" offset="0"/>
+				<rom name="unixup-2.imd" size="345587" crc="8a8873c2" sha1="16070f950c9bd7d6dbb35a11be1830c6fc455162"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="New Utilities"/>
 			<dataarea name="flop" size="167338">
-				<rom name="UNIXUP-3.IMD" size="167338" crc="c29c5607" sha1="b644743b15cf42b7a9aed6dca8f4f7e7eeb7b5ca" offset="0"/>
+				<rom name="unixup-3.imd" size="167338" crc="c29c5607" sha1="b644743b15cf42b7a9aed6dca8f4f7e7eeb7b5ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Graduate -->
+
+	<software name="gdfs" supported="no">
+		<description>Graduate DFS</description>
+		<year>1984</year>
+		<publisher>Torch Computers</publisher>
+		<info name="format" value="DOS" />
+		<info name="usage" value="Requires Torch Graduate" />
+		<sharedfeat name="compatibility" value="8088"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="torch_gdfs.img" size="184320" crc="bccbb0d0" sha1="37641275fdd3cf4965d5b9cd45211b5346a29b19"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gmsdos" supported="no">
+		<description>Graduate MS-DOS 2.11</description>
+		<year>1984</year>
+		<publisher>Torch Computers</publisher>
+		<info name="format" value="DOS" />
+		<info name="usage" value="Requires Torch Graduate" />
+		<sharedfeat name="compatibility" value="8088"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="torch_msdos2_11.img" size="368640" crc="bffa91c7" sha1="04ea2a5d840e45d6df2f051a98f61180cf92c1a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xchange" supported="no">
+		<description>Psion Xchange 1.24</description>
+		<year>1984</year>
+		<publisher>Psion</publisher>
+		<info name="format" value="DOS" />
+		<info name="usage" value="Requires Torch Graduate" />
+		<sharedfeat name="compatibility" value="8088"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Master Source"/>
+			<dataarea name="flop" size="368640">
+				<rom name="torch_xchange_source.img" size="368640" crc="12c5ab25" sha1="be2082890a9a3dab423b8f0ee618c46c8859484f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Tutorial"/>
+			<dataarea name="flop" size="368640">
+				<rom name="torch_xchange_tutorial.img" size="368640" crc="95784ddc" sha1="9544eb13ccd86eb2f7c2da0735cf5a8c12836a82"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities"/>
+			<dataarea name="flop" size="368640">
+				<rom name="torch_xchange_utilities.img" size="368640" crc="46c17495" sha1="8b4a9b1c83959641e514eadf2a262d0c3e736560"/>
 			</dataarea>
 		</part>
 	</software>

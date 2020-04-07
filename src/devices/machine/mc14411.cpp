@@ -244,7 +244,7 @@ void mc14411_device::device_timer(emu_timer &timer, device_timer_id id, int32_t 
 //       divider at run time affects wave forms
 //--------------------------------------------------------
 
-WRITE8_MEMBER(mc14411_device::rate_select_w)
+void mc14411_device::rate_select_w(uint8_t data)
 {
 	LOGSETUP("%s %02x\n", FUNCNAME, data);
 
@@ -260,7 +260,7 @@ WRITE8_MEMBER(mc14411_device::rate_select_w)
 //  rsa_w - set RSA input line
 //------------------------------------------------
 
-WRITE_LINE_MEMBER(mc14411_device::rsa_w)
+void mc14411_device::rsa_w(int state)
 {
 	LOGSETUP("%s %02x\n", FUNCNAME, state);
 
@@ -276,7 +276,7 @@ WRITE_LINE_MEMBER(mc14411_device::rsa_w)
 //  rsb_w - set RSB input line
 //------------------------------------------------
 
-WRITE_LINE_MEMBER(mc14411_device::rsb_w)
+void mc14411_device::rsb_w(int state)
 {
 	LOGSETUP("%s %02x\n", FUNCNAME, state);
 
@@ -292,7 +292,7 @@ WRITE_LINE_MEMBER(mc14411_device::rsb_w)
 //  reset_w - software controlled reset
 //------------------------------------------------
 
-WRITE_LINE_MEMBER(mc14411_device::reset_w)
+void mc14411_device::reset_w(int state)
 {
 	LOGSETUP("%s %02x\n", FUNCNAME, state);
 

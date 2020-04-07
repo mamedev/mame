@@ -298,7 +298,7 @@ void upd1771c_device::device_reset()
 
 
 
-READ8_MEMBER( upd1771c_device::read )
+uint8_t upd1771c_device::read()
 {
 	return 0x80; // TODO
 }
@@ -365,7 +365,7 @@ Byte8: 0b???VVVVV  Low Freq1 volume
 Byte9: 0b???VVVVV  Low Freq2 volume
 */
 
-WRITE8_MEMBER( upd1771c_device::write )
+void upd1771c_device::write(uint8_t data)
 {
 	LOG("upd1771_w: received byte 0x%02x\n", data);
 
@@ -455,7 +455,7 @@ WRITE8_MEMBER( upd1771c_device::write )
 }
 
 
-WRITE_LINE_MEMBER( upd1771c_device::pcm_write )
+void upd1771c_device::pcm_write(int state)
 {
 	//RESET upon HIGH
 	if (state != m_pc3)

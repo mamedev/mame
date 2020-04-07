@@ -250,7 +250,7 @@ WRITE8_MEMBER(dec8_state::dec8_bank_w)
 }
 
 /* Used by Ghostbusters, Meikyuu Hunter G & Gondomania */
-WRITE8_MEMBER(dec8_state::ghostb_bank_w)
+void dec8_state::ghostb_bank_w(uint8_t data)
 {
 	/* Bit 0: SECCLR - acknowledge interrupt from I8751
 	   Bit 1: NMI enable/disable
@@ -303,7 +303,7 @@ WRITE_LINE_MEMBER(dec8_state::csilver_adpcm_int)
 	if (m_toggle)
 		m_audiocpu->set_input_line(m6502_device::IRQ_LINE, HOLD_LINE);
 
-	m_msm->write_data(m_msm5205next >> 4);
+	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 }
 
@@ -1874,7 +1874,7 @@ void dec8_state::machine_reset()
 
 	// reset clears LS273 latch, which disables NMI
 	if (m_nmigate.found())
-		ghostb_bank_w(machine().dummy_space(), 0, 0);
+		ghostb_bank_w(0);
 }
 
 
@@ -3536,95 +3536,193 @@ ROM_END
 
 ROM_START( cobracom )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "el11-5.bin",  0x08000, 0x08000, CRC(af0a8b05) SHA1(096e4e7f2785a20bfaec14277413ce4e20e90214) )
-	ROM_LOAD( "el12-4.bin",  0x10000, 0x10000, CRC(7a44ef38) SHA1(d7dc277dce08f9d073290e100be4a7ca2e2b82cb) )
-	ROM_LOAD( "el13.bin",    0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+	ROM_LOAD( "el11-5.5j", 0x08000, 0x08000, CRC(af0a8b05) SHA1(096e4e7f2785a20bfaec14277413ce4e20e90214) )
+	ROM_LOAD( "el12-4.7j", 0x10000, 0x10000, CRC(7a44ef38) SHA1(d7dc277dce08f9d073290e100be4a7ca2e2b82cb) )
+	ROM_LOAD( "el13.9j",   0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "el10-4.bin",  0x8000,  0x8000,  CRC(edfad118) SHA1(10de8805472346fead62460a3fdc09ae26a4e0d5) )
+	ROM_LOAD( "el10-4.1f", 0x8000, 0x8000, CRC(edfad118) SHA1(10de8805472346fead62460a3fdc09ae26a4e0d5) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
-	ROM_LOAD( "el14.bin",    0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
+	ROM_LOAD( "el14.14j", 0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
-	ROM_LOAD( "el00-4.bin",  0x00000, 0x10000, CRC(122da2a8) SHA1(ce72f16abf7e5449c7d044d4b827e8735c3be0ff) )
-	ROM_LOAD( "el01-4.bin",  0x20000, 0x10000, CRC(27bf705b) SHA1(196c35aaf3816d3eef4c2af6d146a90a48365d33) )
-	ROM_LOAD( "el02-4.bin",  0x40000, 0x10000, CRC(c86fede6) SHA1(97584fa19591651fcfb39d1b2b6306165e93554c) )
-	ROM_LOAD( "el03-4.bin",  0x60000, 0x10000, CRC(1d8a855b) SHA1(429261c200dddc62a330be8aea150b2037133188) )
+	ROM_LOAD( "el00-4.2a", 0x00000, 0x10000, CRC(122da2a8) SHA1(ce72f16abf7e5449c7d044d4b827e8735c3be0ff) )
+	ROM_LOAD( "el01-4.3a", 0x20000, 0x10000, CRC(27bf705b) SHA1(196c35aaf3816d3eef4c2af6d146a90a48365d33) )
+	ROM_LOAD( "el02-4.5a", 0x40000, 0x10000, CRC(c86fede6) SHA1(97584fa19591651fcfb39d1b2b6306165e93554c) )
+	ROM_LOAD( "el03-4.6a", 0x60000, 0x10000, CRC(1d8a855b) SHA1(429261c200dddc62a330be8aea150b2037133188) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles 1 */
-	ROM_LOAD( "el05.bin",    0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
-	ROM_LOAD( "el06.bin",    0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
-	ROM_LOAD( "el04.bin",    0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
-	ROM_LOAD( "el07.bin",    0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
+	ROM_LOAD( "el05.15a", 0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
+	ROM_LOAD( "el06.16a", 0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
+	ROM_LOAD( "el04.13a", 0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
+	ROM_LOAD( "el07.18a", 0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
 
 	ROM_REGION( 0x80000, "gfx4", 0 )    /* tiles 2 */
-	ROM_LOAD( "el08.bin",    0x00000, 0x08000, CRC(cb0dcf4c) SHA1(e14853f83ee9ba5cbf2eb1e085fee4e65af3cc25) )
-	ROM_CONTINUE(            0x40000, 0x08000 )
-	ROM_LOAD( "el09.bin",    0x20000, 0x08000, CRC(1fae5be7) SHA1(be6e090b0b82648b385d9b6d11775f3ff40f0af3) )
-	ROM_CONTINUE(            0x60000, 0x08000 )
+	ROM_LOAD( "el08.7d", 0x00000, 0x08000, CRC(cb0dcf4c) SHA1(e14853f83ee9ba5cbf2eb1e085fee4e65af3cc25) )
+	ROM_CONTINUE(        0x40000, 0x08000 )
+	ROM_LOAD( "el09.9d", 0x20000, 0x08000, CRC(1fae5be7) SHA1(be6e090b0b82648b385d9b6d11775f3ff40f0af3) )
+	ROM_CONTINUE(        0x60000, 0x08000 )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "eh15.12f", 0x0000, 0x0200, CRC(279e540c) SHA1(9e5e707da9f7c403c63d77fa378f22da9906d4e5) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "pt-0.16h", 0x0000, 0x0117, CRC(add5074f) SHA1(352d984ba4d50c437ee9e5d8e8d00b0da6b3b8f3) )
 ROM_END
 
 ROM_START( cobracoma )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "el11-4.bin",  0x08000, 0x08000, CRC(6dca6734) SHA1(1d165845680df2f1febd2b7d2f3163d68523496e) )
-	ROM_LOAD( "el12-4.bin",  0x10000, 0x10000, CRC(7a44ef38) SHA1(d7dc277dce08f9d073290e100be4a7ca2e2b82cb) )
-	ROM_LOAD( "el13.bin",    0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+	ROM_LOAD( "el11-4.5j", 0x08000, 0x08000, CRC(6dca6734) SHA1(1d165845680df2f1febd2b7d2f3163d68523496e) )
+	ROM_LOAD( "el12-4.7j", 0x10000, 0x10000, CRC(7a44ef38) SHA1(d7dc277dce08f9d073290e100be4a7ca2e2b82cb) )
+	ROM_LOAD( "el13.9j",   0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "el10-4.bin",  0x8000,  0x8000,  CRC(edfad118) SHA1(10de8805472346fead62460a3fdc09ae26a4e0d5) )
+	ROM_LOAD( "el10-4.1f", 0x8000, 0x8000, CRC(edfad118) SHA1(10de8805472346fead62460a3fdc09ae26a4e0d5) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
-	ROM_LOAD( "el14.bin",    0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
+	ROM_LOAD( "el14.14j", 0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
-	ROM_LOAD( "el00-4.bin",  0x00000, 0x10000, CRC(122da2a8) SHA1(ce72f16abf7e5449c7d044d4b827e8735c3be0ff) )
-	ROM_LOAD( "el01-4.bin",  0x20000, 0x10000, CRC(27bf705b) SHA1(196c35aaf3816d3eef4c2af6d146a90a48365d33) )
-	ROM_LOAD( "el02-4.bin",  0x40000, 0x10000, CRC(c86fede6) SHA1(97584fa19591651fcfb39d1b2b6306165e93554c) )
-	ROM_LOAD( "el03-4.bin",  0x60000, 0x10000, CRC(1d8a855b) SHA1(429261c200dddc62a330be8aea150b2037133188) )
+	ROM_LOAD( "el00-4.2a", 0x00000, 0x10000, CRC(122da2a8) SHA1(ce72f16abf7e5449c7d044d4b827e8735c3be0ff) )
+	ROM_LOAD( "el01-4.3a", 0x20000, 0x10000, CRC(27bf705b) SHA1(196c35aaf3816d3eef4c2af6d146a90a48365d33) )
+	ROM_LOAD( "el02-4.5a", 0x40000, 0x10000, CRC(c86fede6) SHA1(97584fa19591651fcfb39d1b2b6306165e93554c) )
+	ROM_LOAD( "el03-4.6a", 0x60000, 0x10000, CRC(1d8a855b) SHA1(429261c200dddc62a330be8aea150b2037133188) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles 1 */
-	ROM_LOAD( "el05.bin",    0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
-	ROM_LOAD( "el06.bin",    0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
-	ROM_LOAD( "el04.bin",    0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
-	ROM_LOAD( "el07.bin",    0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
+	ROM_LOAD( "el05.15a", 0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
+	ROM_LOAD( "el06.16a", 0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
+	ROM_LOAD( "el04.13a", 0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
+	ROM_LOAD( "el07.18a", 0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
 
 	ROM_REGION( 0x80000, "gfx4", 0 )    /* tiles 2 */
-	ROM_LOAD( "el08.bin",    0x00000, 0x08000, CRC(cb0dcf4c) SHA1(e14853f83ee9ba5cbf2eb1e085fee4e65af3cc25) )
-	ROM_CONTINUE(            0x40000, 0x08000 )
-	ROM_LOAD( "el09.bin",    0x20000, 0x08000, CRC(1fae5be7) SHA1(be6e090b0b82648b385d9b6d11775f3ff40f0af3) )
-	ROM_CONTINUE(            0x60000, 0x08000 )
+	ROM_LOAD( "el08.7d", 0x00000, 0x08000, CRC(cb0dcf4c) SHA1(e14853f83ee9ba5cbf2eb1e085fee4e65af3cc25) )
+	ROM_CONTINUE(        0x40000, 0x08000 )
+	ROM_LOAD( "el09.9d", 0x20000, 0x08000, CRC(1fae5be7) SHA1(be6e090b0b82648b385d9b6d11775f3ff40f0af3) )
+	ROM_CONTINUE(        0x60000, 0x08000 )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "eh15.12f", 0x0000, 0x0200, CRC(279e540c) SHA1(9e5e707da9f7c403c63d77fa378f22da9906d4e5) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "pt-0.16h", 0x0000, 0x0117, CRC(add5074f) SHA1(352d984ba4d50c437ee9e5d8e8d00b0da6b3b8f3) )
+ROM_END
+
+ROM_START( cobracomb )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "el11.5j", 0x08000, 0x08000, CRC(c6a102e3) SHA1(51d9781d13a8a98c9bbdf34fa79ebfd8a152567e) ) /* "zero" revision - IE: Original version */
+	ROM_LOAD( "el12.7j", 0x10000, 0x10000, CRC(72b2dab4) SHA1(ff84a04cfe920a0d8105fbbd1f44ee86822cf0d3) ) /* "zero" revision - IE: Original version */
+	ROM_LOAD( "el13.9j", 0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "el10.1f", 0x8000, 0x8000, CRC(62ca5e89) SHA1(b04acaccc58846e0d277868a873a440b7f8071b0) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
+	ROM_LOAD( "el14.14j", 0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_LOAD( "el00.2a", 0x00000, 0x10000, CRC(d96b6797) SHA1(01c4a9f2bebb13cba14636690cd5356db73f045e) )
+	ROM_LOAD( "el01.3a", 0x20000, 0x10000, CRC(3fef9c02) SHA1(e4b731faf6a2f4e5fed8ba9bd07e0f203981ffec) )
+	ROM_LOAD( "el02.5a", 0x40000, 0x10000, CRC(bfae6c34) SHA1(9503a120e11e9466cd9a2931fd44a631d72ca5f0) )
+	ROM_LOAD( "el03.6a", 0x60000, 0x10000, CRC(d56790f8) SHA1(1cc7cb9f7102158de14a737e9317a54f01790ba8) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles 1 */
+	ROM_LOAD( "el05.15a", 0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
+	ROM_LOAD( "el06.16a", 0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
+	ROM_LOAD( "el04.13a", 0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
+	ROM_LOAD( "el07.18a", 0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
+
+	ROM_REGION( 0x80000, "gfx4", 0 )    /* tiles 2 */
+	ROM_LOAD( "el08.7d", 0x00000, 0x08000, CRC(cb0dcf4c) SHA1(e14853f83ee9ba5cbf2eb1e085fee4e65af3cc25) )
+	ROM_CONTINUE(        0x40000, 0x08000 )
+	ROM_LOAD( "el09.9d", 0x20000, 0x08000, CRC(1fae5be7) SHA1(be6e090b0b82648b385d9b6d11775f3ff40f0af3) )
+	ROM_CONTINUE(        0x60000, 0x08000 )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "eh15.12f", 0x0000, 0x0200, CRC(279e540c) SHA1(9e5e707da9f7c403c63d77fa378f22da9906d4e5) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "pt-0.16h", 0x0000, 0x0117, CRC(add5074f) SHA1(352d984ba4d50c437ee9e5d8e8d00b0da6b3b8f3) )
 ROM_END
 
 ROM_START( cobracomj )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "eh-11.rom",    0x08000, 0x08000, CRC(868637e1) SHA1(8b1e3e045e341bb94b1f6c7d89198b22e6c19de7) )
-	ROM_LOAD( "eh-12.rom",    0x10000, 0x10000, CRC(7c878a83) SHA1(9b2a3083c6dae69626fdab16d97517d30eaa1859) )
-	ROM_LOAD( "el13.bin",     0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+	ROM_LOAD( "eh11.5j", 0x08000, 0x08000, CRC(868637e1) SHA1(8b1e3e045e341bb94b1f6c7d89198b22e6c19de7) )
+	ROM_LOAD( "eh12.7j", 0x10000, 0x10000, CRC(7c878a83) SHA1(9b2a3083c6dae69626fdab16d97517d30eaa1859) )
+	ROM_LOAD( "el13.9j", 0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "eh-10.rom",    0x8000,  0x8000,  CRC(62ca5e89) SHA1(b04acaccc58846e0d277868a873a440b7f8071b0) )
+	ROM_LOAD( "eh10.1f", 0x8000, 0x8000, CRC(62ca5e89) SHA1(b04acaccc58846e0d277868a873a440b7f8071b0) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
-	ROM_LOAD( "el14.bin",    0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
+	ROM_LOAD( "eh14.14j", 0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
-	ROM_LOAD( "eh-00.rom",    0x00000, 0x10000, CRC(d96b6797) SHA1(01c4a9f2bebb13cba14636690cd5356db73f045e) )
-	ROM_LOAD( "eh-01.rom",    0x20000, 0x10000, CRC(3fef9c02) SHA1(e4b731faf6a2f4e5fed8ba9bd07e0f203981ffec) )
-	ROM_LOAD( "eh-02.rom",    0x40000, 0x10000, CRC(bfae6c34) SHA1(9503a120e11e9466cd9a2931fd44a631d72ca5f0) )
-	ROM_LOAD( "eh-03.rom",    0x60000, 0x10000, CRC(d56790f8) SHA1(1cc7cb9f7102158de14a737e9317a54f01790ba8) )
+	ROM_LOAD( "eh00.2a", 0x00000, 0x10000, CRC(d96b6797) SHA1(01c4a9f2bebb13cba14636690cd5356db73f045e) )
+	ROM_LOAD( "eh01.3a", 0x20000, 0x10000, CRC(3fef9c02) SHA1(e4b731faf6a2f4e5fed8ba9bd07e0f203981ffec) )
+	ROM_LOAD( "eh02.5a", 0x40000, 0x10000, CRC(bfae6c34) SHA1(9503a120e11e9466cd9a2931fd44a631d72ca5f0) )
+	ROM_LOAD( "eh03.6a", 0x60000, 0x10000, CRC(d56790f8) SHA1(1cc7cb9f7102158de14a737e9317a54f01790ba8) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles 1 */
-	ROM_LOAD( "el05.bin",    0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
-	ROM_LOAD( "el06.bin",    0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
-	ROM_LOAD( "el04.bin",    0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
-	ROM_LOAD( "el07.bin",    0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
+	ROM_LOAD( "eh05.15a", 0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
+	ROM_LOAD( "eh06.16a", 0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
+	ROM_LOAD( "eh04.13a", 0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
+	ROM_LOAD( "eh07.18a", 0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
 
 	ROM_REGION( 0x80000, "gfx4", 0 )    /* tiles 2 */
-	ROM_LOAD( "el08.bin",    0x00000, 0x08000, CRC(cb0dcf4c) SHA1(e14853f83ee9ba5cbf2eb1e085fee4e65af3cc25) )
-	ROM_CONTINUE(            0x40000, 0x08000 )
-	ROM_LOAD( "el09.bin",    0x20000, 0x08000, CRC(1fae5be7) SHA1(be6e090b0b82648b385d9b6d11775f3ff40f0af3) )
-	ROM_CONTINUE(            0x60000, 0x08000 )
+	ROM_LOAD( "eh08.7d", 0x00000, 0x08000, CRC(cb0dcf4c) SHA1(e14853f83ee9ba5cbf2eb1e085fee4e65af3cc25) )
+	ROM_CONTINUE(        0x40000, 0x08000 )
+	ROM_LOAD( "eh09.9d", 0x20000, 0x08000, CRC(1fae5be7) SHA1(be6e090b0b82648b385d9b6d11775f3ff40f0af3) )
+	ROM_CONTINUE(        0x60000, 0x08000 )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "eh15.12f", 0x0000, 0x0200, CRC(279e540c) SHA1(9e5e707da9f7c403c63d77fa378f22da9906d4e5) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "pt-0.16h", 0x0000, 0x0117, CRC(add5074f) SHA1(352d984ba4d50c437ee9e5d8e8d00b0da6b3b8f3) )
+ROM_END
+
+// bootleg of the Japanese release manufactured in Italy. Contents are the same but for PROMs and PAL
+// main PCB is marked: "LC" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
+// main PCB is marked: "LS" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
+ROM_START( cobracomjb )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "cobra4.bin", 0x08000, 0x08000, CRC(868637e1) SHA1(8b1e3e045e341bb94b1f6c7d89198b22e6c19de7) )
+	ROM_LOAD( "cobra3.bin", 0x10000, 0x10000, CRC(7c878a83) SHA1(9b2a3083c6dae69626fdab16d97517d30eaa1859) )
+	ROM_LOAD( "cobra2.bin", 0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "cobra5.bin", 0x8000, 0x8000, CRC(62ca5e89) SHA1(b04acaccc58846e0d277868a873a440b7f8071b0) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )    // characters
+	ROM_LOAD( "cobra1.bin", 0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    // sprites
+	ROM_LOAD( "cob17.bin", 0x00000, 0x10000, CRC(d96b6797) SHA1(01c4a9f2bebb13cba14636690cd5356db73f045e) )
+	ROM_LOAD( "cob16.bin", 0x20000, 0x10000, CRC(3fef9c02) SHA1(e4b731faf6a2f4e5fed8ba9bd07e0f203981ffec) )
+	ROM_LOAD( "cob15.bin", 0x40000, 0x10000, CRC(bfae6c34) SHA1(9503a120e11e9466cd9a2931fd44a631d72ca5f0) )
+	ROM_LOAD( "cob14.bin", 0x60000, 0x10000, CRC(d56790f8) SHA1(1cc7cb9f7102158de14a737e9317a54f01790ba8) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )    // tiles 1
+	ROM_LOAD( "cob13.bin", 0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
+	ROM_LOAD( "cob12.bin", 0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
+	ROM_LOAD( "cob11.bin", 0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
+	ROM_LOAD( "cob10.bin", 0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
+
+	ROM_REGION( 0x80000, "gfx4", 0 )    // tiles 2
+	ROM_LOAD( "cobra6.bin", 0x00000, 0x08000, CRC(c991298f) SHA1(3f79773a8def6b79b77c2ca6b8e8dbde5bdcd127) )
+	ROM_LOAD( "cobra8.bin", 0x20000, 0x08000, CRC(6bcc5982) SHA1(5bafa9a7a115d2b67f4fd582dc79f7e2848e5010) )
+	ROM_LOAD( "cobra7.bin", 0x40000, 0x08000, CRC(f5e267e5) SHA1(4abda964b8ebceeaba7717d4df23a85862934490) )
+	ROM_LOAD( "cobra9.bin", 0x60000, 0x08000, CRC(c90443b5) SHA1(2ede9a05e54a662c1b08672921a0390d8ce128a7) )
+
+	ROM_REGION( 0x0500, "proms", 0 )
+	ROM_LOAD( "63s481n.3",   0x0000, 0x0200, CRC(279e540c) SHA1(9e5e707da9f7c403c63d77fa378f22da9906d4e5) )
+	ROM_LOAD( "am27s21pc.1", 0x0200, 0x0100, CRC(9f6aa3e5) SHA1(518247d4581eee3a078269fcf0c86d182cf622cd) )
+	ROM_LOAD( "am27s21pc.2", 0x0300, 0x0100, CRC(af46d1ee) SHA1(281bcc61d9d67b007c1399e228ec6baf6ab5d4ff) )
+	ROM_LOAD( "am27s21pc.3", 0x0400, 0x0100, CRC(1e4189e8) SHA1(ce62b19005f565b734d8db3ee49d7c070ed53ad6) )
+
+	ROM_REGION( 0x0104, "plds", 0 )
+	ROM_LOAD( "pal16l8a-2cn.bin", 0x0000, 0x0104, CRC(3ef8cf68) SHA1(9410a139fb10628bc612d198f5c9f04b2b34f52f) )
 ROM_END
 
 /******************************************************************************/
@@ -3680,4 +3778,6 @@ GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, dec8_state, init_dec8,   
 // was used in the US as evidenced by boards with the EL romset bearing AAMA seal stickers (American Amusement Machine Association)
 GAME( 1988, cobracom,   0,        cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, cobracoma,  cobracom, cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomb,  cobracom, cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (World/US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, cobracomj,  cobracom, cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomjb, cobracom, cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "bootleg",               "Cobra-Command (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )

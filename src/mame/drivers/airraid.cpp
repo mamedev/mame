@@ -187,10 +187,9 @@ private:
 
 	required_device<airraid_video_device> m_airraid_video;
 
-	DECLARE_READ8_MEMBER(cshooter_coin_r);
-	DECLARE_WRITE8_MEMBER(cshooter_c500_w);
-	DECLARE_WRITE8_MEMBER(cshooter_c700_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
+	void cshooter_c500_w(uint8_t data);
+	void cshooter_c700_w(uint8_t data);
+	void bank_w(uint8_t data);
 	DECLARE_MACHINE_RESET(cshooter);
 	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
 
@@ -220,15 +219,15 @@ MACHINE_RESET_MEMBER(airraid_state,cshooter)
 {
 }
 
-WRITE8_MEMBER(airraid_state::cshooter_c500_w)
+void airraid_state::cshooter_c500_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(airraid_state::cshooter_c700_w)
+void airraid_state::cshooter_c700_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(airraid_state::bank_w)
+void airraid_state::bank_w(uint8_t data)
 {
 	// format of this address is TTBB tbfs
 

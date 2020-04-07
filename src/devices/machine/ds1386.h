@@ -85,8 +85,8 @@ public:
 	auto intb() { return m_intb_cb.bind(); }
 	auto sqw() { return m_sqw_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_READ8_MEMBER( data_r );
+	void data_w(offs_t offset, uint8_t data);
+	uint8_t data_r(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( oe_w );

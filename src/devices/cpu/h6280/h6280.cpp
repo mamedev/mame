@@ -2510,7 +2510,7 @@ void h6280_device::set_irq_line(int irqline, int state)
 //  REGISTER HANDLING
 //**************************************************************************
 
-READ8_MEMBER( h6280_device::irq_status_r )
+uint8_t h6280_device::irq_status_r(offs_t offset)
 {
 	int status;
 
@@ -2534,7 +2534,7 @@ READ8_MEMBER( h6280_device::irq_status_r )
 	}
 }
 
-WRITE8_MEMBER( h6280_device::irq_status_w )
+void h6280_device::irq_status_w(offs_t offset, uint8_t data)
 {
 	m_io_buffer = data;
 	switch (offset & 3)
@@ -2554,13 +2554,13 @@ WRITE8_MEMBER( h6280_device::irq_status_w )
 	}
 }
 
-READ8_MEMBER( h6280_device::timer_r )
+uint8_t h6280_device::timer_r()
 {
 	/* only returns countdown */
 	return ((m_timer_value >> 10) & 0x7F) | (m_io_buffer & 0x80);
 }
 
-WRITE8_MEMBER( h6280_device::timer_w )
+void h6280_device::timer_w(offs_t offset, uint8_t data)
 {
 	m_io_buffer = data;
 	switch (offset & 1)
@@ -2581,7 +2581,7 @@ WRITE8_MEMBER( h6280_device::timer_w )
 	}
 }
 
-READ8_MEMBER( h6280_device::port_r )
+uint8_t h6280_device::port_r()
 {
 	if (!m_port_in_cb.isnull())
 		return m_port_in_cb();
@@ -2589,22 +2589,22 @@ READ8_MEMBER( h6280_device::port_r )
 		return m_io_buffer;
 }
 
-WRITE8_MEMBER( h6280_device::port_w )
+void h6280_device::port_w(uint8_t data)
 {
 	m_io_buffer = data;
 
 	m_port_out_cb(data);
 }
 
-READ8_MEMBER( h6280_device::io_buffer_r )
+uint8_t h6280_device::io_buffer_r()
 {
 	return m_io_buffer;
 }
 
-WRITE8_MEMBER( h6280_device::psg_w )
+void h6280_device::psg_w(offs_t offset, uint8_t data)
 {
 	m_io_buffer = data;
-	m_psg->c6280_w(space,offset,data,mem_mask);
+	m_psg->c6280_w(offset, data);
 }
 
 bool h6280_device::memory_translate(int spacenum, int intention, offs_t &address)

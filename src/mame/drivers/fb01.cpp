@@ -30,7 +30,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_upd71051(*this, "upd71051")
-		, m_midi_thru(*this, "mdthru")
 		, m_ym2164_irq(CLEAR_LINE)
 		, m_upd71051_txrdy(CLEAR_LINE)
 		, m_upd71051_rxrdy(CLEAR_LINE)
@@ -44,8 +43,6 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
-	DECLARE_WRITE_LINE_MEMBER(midi_in);
 	DECLARE_WRITE_LINE_MEMBER(ym2164_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(upd71051_txrdy_w);
 	DECLARE_WRITE_LINE_MEMBER(upd71051_rxrdy_w);
@@ -60,7 +57,6 @@ private:
 
 	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_upd71051;
-	required_device<midi_port_device> m_midi_thru;
 	int m_ym2164_irq;
 	int m_upd71051_txrdy;
 	int m_upd71051_rxrdy;
@@ -118,20 +114,6 @@ void fb01_state::machine_reset()
 {
 	m_upd71051->write_cts(0);
 	m_upd71051->write_rxd(ASSERT_LINE);
-}
-
-
-WRITE_LINE_MEMBER(fb01_state::write_usart_clock)
-{
-	m_upd71051->write_txc(state);
-	m_upd71051->write_rxc(state);
-}
-
-
-WRITE_LINE_MEMBER(fb01_state::midi_in)
-{
-	m_midi_thru->write_txd(state);
-	m_upd71051->write_rxd(state);
 }
 
 
@@ -208,9 +190,12 @@ void fb01_state::fb01(machine_config &config)
 	m_upd71051->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 
 	clock_device &usart_clock(CLOCK(config, "usart_clock", XTAL(4'000'000) / 8)); // 500KHz
-	usart_clock.signal_handler().set(FUNC(fb01_state::write_usart_clock));
+	usart_clock.signal_handler().set(m_upd71051, FUNC(i8251_device::write_txc));
+	usart_clock.signal_handler().append(m_upd71051, FUNC(i8251_device::write_rxc));
 
-	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(fb01_state::midi_in));
+	midi_port_device &mdin(MIDI_PORT(config, "mdin", midiin_slot, "midiin"));
+	mdin.rxd_handler().set("mdthru", FUNC(midi_port_device::write_txd));
+	mdin.rxd_handler().append(m_upd71051, FUNC(i8251_device::write_rxd));
 
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
@@ -218,7 +203,7 @@ void fb01_state::fb01(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	ym2151_device &ym2164(YM2151(config, "ym2164", XTAL(4'000'000)));
+	ym2164_device &ym2164(YM2164(config, "ym2164", XTAL(4'000'000)));
 	ym2164.irq_handler().set(FUNC(fb01_state::ym2164_irq_w));
 	ym2164.add_route(0, "lspeaker", 1.00);
 	ym2164.add_route(1, "rspeaker", 1.00);
@@ -236,5 +221,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT        COMPANY   FULLNAME  FLAGS
-CONS( 1986, fb01, 0,      0,      fb01,    fb01,  fb01_state, empty_init, "Yamaha", "FB-01",  MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT        COMPANY   FULLNAME                     FLAGS
+CONS( 1986, fb01, 0,      0,      fb01,    fb01,  fb01_state, empty_init, "Yamaha", "FB-01 FM Sound Generator",  MACHINE_SUPPORTS_SAVE )

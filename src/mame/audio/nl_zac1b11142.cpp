@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:CC0
 // copyright-holders:Vas Crabb, Couriersud
 
 #include "netlist/devices/net_lib.h"

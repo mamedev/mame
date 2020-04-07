@@ -1,10 +1,14 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+
+Mini Flipper cabinet, used by Tecfri versions of Pinball Action
+based on Speed Ball layout, which used a similar cabinet
+-->
 <mamelayout version="2">
 
-<!-- Mini Flipper cabinet, used by Tecfri versions of Pinball Action -->
-<!-- based on Speed Ball layout, which used a similar cabinet -->
 
-<!-- define elements -->
+	<!-- define elements -->
 
 	<element name="static_black">
 		<rect>
@@ -57,7 +61,7 @@
 		</screen>
 
 
-<!-- player 1 score -->
+		<!-- player 1 score -->
 
 		<bezel element="static_red">
 			<bounds left="4" top="-23" right="86" bottom="-5" />
@@ -93,7 +97,7 @@
 		</bezel>
 
 
-<!-- credit -->
+		<!-- credit -->
 
 		<bezel element="static_red">
 			<bounds left="104" top="-23" right="136" bottom="-5" />
@@ -114,8 +118,8 @@
 		</bezel>
 
 
-<!-- ball -->
-<!-- note: digit14 (before credit) and digit17 (before ball) are left unused -->
+		<!-- ball -->
+		<!-- note: digit14 (before credit) and digit17 (before ball) are left unused -->
 
 		<bezel element="static_red">
 			<bounds left="139" top="-23" right="161" bottom="-5" />
@@ -133,7 +137,7 @@
 		</bezel>
 
 
-<!-- bonus -->
+		<!-- bonus -->
 
 		<bezel element="static_red">
 			<bounds left="164" top="-23" right="196" bottom="-5" />
@@ -154,7 +158,7 @@
 		</bezel>
 
 
-<!-- player 2 score -->
+		<!-- player 2 score -->
 
 		<bezel element="static_red">
 			<bounds left="214" top="-23" right="296" bottom="-5" />

@@ -160,6 +160,7 @@ Notes:
 
 void v1050_state::set_interrupt(int line, int state)
 {
+	line ^= 7;
 	if (state)
 	{
 		m_int_state |= (1 << line);
@@ -492,8 +493,8 @@ void v1050_state::v1050_io(address_map &map)
 	map(0xb0, 0xb0).rw(FUNC(v1050_state::dint_clr_r), FUNC(v1050_state::dint_clr_w));
 	map(0xc0, 0xc0).w(FUNC(v1050_state::v1050_i8214_w));
 	map(0xd0, 0xd0).w(FUNC(v1050_state::bank_w));
-	map(0xe0, 0xe0).w(FUNC(v1050_state::sasi_data_w)).r(m_sasi_data_in, FUNC(input_buffer_device::bus_r));
-	map(0xe1, 0xe1).r(m_sasi_ctrl_in, FUNC(input_buffer_device::bus_r)).w(FUNC(v1050_state::sasi_ctrl_w));
+	map(0xe0, 0xe0).w(FUNC(v1050_state::sasi_data_w)).r(m_sasi_data_in, FUNC(input_buffer_device::read));
+	map(0xe1, 0xe1).r(m_sasi_ctrl_in, FUNC(input_buffer_device::read)).w(FUNC(v1050_state::sasi_ctrl_w));
 }
 
 void v1050_state::v1050_crt_mem(address_map &map)
@@ -1058,7 +1059,7 @@ void v1050_state::v1050(machine_config &config)
 	i8255_device &ppi_misc(I8255A(config, I8255A_MISC_TAG));
 	ppi_misc.in_pc_callback().set(FUNC(v1050_state::misc_ppi_pc_r));
 	ppi_misc.out_pa_callback().set(FUNC(v1050_state::misc_ppi_pa_w));
-	ppi_misc.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi_misc.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ppi_misc.out_pc_callback().set(FUNC(v1050_state::misc_ppi_pc_w));
 
 	i8255_device &ppi_rtc(I8255A(config, I8255A_RTC_TAG));

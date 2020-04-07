@@ -57,14 +57,15 @@ DIMM controller registers
 
 28          16bit  dddd---c ------ba
                     a - 0->1 NAOMI reset
-                    b - 1 seems disable DIMM RAM access, followed by write 01010101 to bank 10 offset 000110 or 000190 (some MMIO?)
+                    b - 1 activates sdram command "load mode register", followed by write 01010101 to bank 10 offset 000110 or 000190 depending on cas latency
+					    address bits 12-3 correspond to bits A9-A0 in the sdram chip address bus when sending the command
                     c - unk, set to 1 in VxWorks, 0 in 1.02
                     d - unk, checked for == 1 in 1.02
 
 2A           8bit  possible DES decryption area size 8 MSB bits (16MB units number)
                    VxWorks firmwares set this to ((DIMMsize >> 24) - 1), 1.02 set it to FF
 
-2C          32bit  SDRAM config
+2C          32bit  DIMM SDRAM config
 30          32bit  DES key low
 34          32bit  DES key high
 
@@ -512,8 +513,19 @@ WRITE32_MEMBER(idegdrom_device::ide_cs1_w)
 
 // The board
 
+static INPUT_PORTS_START(gdrom_board_ioports)
+	PORT_START("DEBUG ONLY")
+	PORT_CONFNAME(0x01, 0x00, "Full emulation")
+	PORT_CONFSETTING(0x01, "Enabled")
+	PORT_CONFSETTING(0x00, "Disabled")
+	PORT_CONFNAME(0x02, 0x02, "Initialized")
+	PORT_CONFSETTING(0x02, "Yes")
+	PORT_CONFSETTING(0x00, "No")
+INPUT_PORTS_END
+
 naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: naomi_board(mconfig, NAOMI_GDROM_BOARD, tag, owner, clock),
+	work_mode(0),
 	m_maincpu(*this, "dimmcpu"),
 	m_securitycpu(*this, "pic"),
 	m_i2c0(*this, "i2c_0"),
@@ -521,6 +533,7 @@ naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *
 	m_eeprom(*this, "eeprom"),
 	m_315_6154(*this, "pci:00.0"),
 	m_idegdrom(*this, "pci:01.0"),
+	m_debug_dipswitches(*this, "DEBUG ONLY"),
 	picdata(*this, finder_base::DUMMY_TAG),
 	dimm_command(0xffff),
 	dimm_offsetl(0xffff),
@@ -576,7 +589,7 @@ void naomi_gdrom_board::pci_map(address_map &map)
 	map(0x00000020, 0x00000023).rw(t, FUNC(naomi_gdrom_board::sh4_parameterh_r), FUNC(naomi_gdrom_board::sh4_parameterh_w));
 	map(0x00000024, 0x00000027).rw(t, FUNC(naomi_gdrom_board::sh4_status_r), FUNC(naomi_gdrom_board::sh4_status_w));
 	map(0x00000028, 0x0000002b).rw(t, FUNC(naomi_gdrom_board::sh4_control_r), FUNC(naomi_gdrom_board::sh4_control_w));
-	map(0x0000002c, 0x0000002f).lr32([]() { return 0x0c; }, "Constant 0x0c"); // 0x0a or 0x0e possible too
+	map(0x0000002c, 0x0000002f).rw(t, FUNC(naomi_gdrom_board::sh4_sdramconfig_r), FUNC(naomi_gdrom_board::sh4_sdramconfig_w));
 	map(0x00000030, 0x00000033).rw(t, FUNC(naomi_gdrom_board::sh4_des_keyl_r), FUNC(naomi_gdrom_board::sh4_des_keyl_w));
 	map(0x00000034, 0x00000037).rw(t, FUNC(naomi_gdrom_board::sh4_des_keyh_r), FUNC(naomi_gdrom_board::sh4_des_keyh_w));
 	map(0x70000000, 0x70ffffff).ram().share("sh4sdram");
@@ -715,9 +728,14 @@ WRITE32_MEMBER(naomi_gdrom_board::sh4_control_w)
 
 	dimm_control = data;
 	if (dimm_control & 2)
+	{
 		m_315_6154->memory()->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
+		logerror("Activated 'load mode register' command mode\n");
+	}
 	else
+	{
 		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data);
+	}
 	if (((old & 1) == 0) && ((dimm_control & 1) == 1))
 		set_reset_out();
 }
@@ -725,6 +743,17 @@ WRITE32_MEMBER(naomi_gdrom_board::sh4_control_w)
 READ32_MEMBER(naomi_gdrom_board::sh4_control_r)
 {
 	return dimm_control;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_sdramconfig_w)
+{
+	dimm_sdramconfig = data;
+	logerror("Detected sdram dimm module size: %d megabytes\n", 4 * (1 << ((data >> 1) & 7)));
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_sdramconfig_r)
+{
+	return dimm_sdramconfig;
 }
 
 WRITE32_MEMBER(naomi_gdrom_board::sh4_des_keyl_w)
@@ -872,16 +901,6 @@ void naomi_gdrom_board::device_start()
 	uint64_t key;
 	uint8_t netpic = 0;
 
-
-	logerror("Work mode is %d\n", work_mode);
-	if (work_mode != 0)
-	{
-		dimm_command = 0;
-		dimm_offsetl = 0;
-		dimm_parameterl = 0;
-		dimm_parameterh = 0;
-	}
-
 	if(picdata) {
 		if(picdata.length() >= 0x4000) {
 			printf("Real PIC binary found\n");
@@ -907,7 +926,7 @@ void naomi_gdrom_board::device_start()
 			memcpy(name, picdata+33, 7);
 			memcpy(name+7, picdata+25, 7);
 
-			key =((uint64_t(picdata[0x31]) << 56) |
+			key = ((uint64_t(picdata[0x31]) << 56) |
 					(uint64_t(picdata[0x32]) << 48) |
 					(uint64_t(picdata[0x33]) << 40) |
 					(uint64_t(picdata[0x34]) << 32) |
@@ -977,10 +996,7 @@ void naomi_gdrom_board::device_start()
 			uint32_t file_rounded_size = (file_size + 2047) & -2048;
 			for (dimm_data_size = 4096; dimm_data_size < file_rounded_size; dimm_data_size <<= 1);
 			dimm_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
-			if (work_mode == 0)
-				dimm_des_data = dimm_data;
-			else
-				dimm_des_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
+			dimm_des_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
 			if (dimm_data_size != file_rounded_size)
 				memset(dimm_data + file_rounded_size, 0, dimm_data_size - file_rounded_size);
 
@@ -1020,11 +1036,43 @@ void naomi_gdrom_board::device_start()
 
 void naomi_gdrom_board::device_reset()
 {
+	int dips = m_debug_dipswitches->read();
+
 	naomi_board::device_reset();
 
-	dimm_cur_address = 0;
+	if (dips & 1)
+	{
+		if (dips & 2)
+			work_mode = 1; // real emulation, dimm ram contains valid game data
+		else
+			work_mode = 2; // real emulation, dimm ram not initialized
+	}
+	else
+		work_mode = 0; // default cartridge-like mode
+	logerror("Work mode is %d\n", work_mode);
 	if (work_mode != 0)
+	{
+		dimm_command = 0;
+		dimm_offsetl = 0;
+		dimm_parameterl = 0;
+		dimm_parameterh = 0;
 		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data);
+		if (work_mode == 2) // invalidate dimm memory contents by setting the first 2048 bytes to 0
+			memset(dimm_des_data, 0, 2048);
+	}
+	else
+	{
+		m_maincpu->set_disable();
+		m_securitycpu->set_disable();
+		m_315_6154->memory()->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
+	}
+
+	dimm_cur_address = 0;
+}
+
+ioport_constructor naomi_gdrom_board::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(gdrom_board_ioports);
 }
 
 void naomi_gdrom_board::board_setup_address(uint32_t address, bool is_dma)
@@ -1064,7 +1112,6 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &naomi_gdrom_board::sh4_map);
 	m_maincpu->set_addrmap(AS_IO, &naomi_gdrom_board::sh4_io_map);
 
-
 	PCI_ROOT(config, "pci", 0);
 	SEGA315_6154(config, m_315_6154, 0);
 	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &naomi_gdrom_board::pci_map);
@@ -1080,11 +1127,6 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	m_i2c1->set_e0(1);
 	m_i2c1->set_wc(1);
 	EEPROM_93C46_8BIT(config, m_eeprom, 0);
-	if (work_mode == 0)
-	{
-		m_maincpu->set_disable();
-		m_securitycpu->set_disable();
-	}
 }
 
 // DIMM firmwares:

@@ -1,6 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="pi_storyreader_cart" description="Publications International Ltd. Story Reader cartridges">
+
+	<!-- carts have either one or two globs in them -->
 
 	<software name="srbamltpetp3" supported="no">
 		<description>Disney's Bambi / Lady and the Tramp / Peter Pan</description>
@@ -8,7 +13,8 @@
 		<publisher>Publications International Ltd. / Disney</publisher>
 		<part name="cart" interface="pi_storyreader_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="storyreaderv1_bambiladyandthetramppeterpan.bin" size="0x200000" crc="68e5c946" sha1="34cce52e203223e6d306a8a568094ea543968ca2" />
+				<rom name="storyreaderv1_bambiladyandthetramppeterpan.1.bin" offset="0x000000" size="0x100000" crc="954b3315" sha1="37d104bb67cd02a5a86c3653adc2df955bb11f11" />
+				<rom name="storyreaderv1_bambiladyandthetramppeterpan.2.bin" offset="0x100000" size="0x100000" crc="ebba94f6" sha1="b9bca7225e174eea19f95a7bd84a0226bff327f8" />
 			</dataarea>
 		</part>
 	</software>
@@ -20,7 +26,8 @@
 		<info name="serial" value="30473" />
 		<part name="cart" interface="pi_storyreader_cart">
 			<dataarea name="rom" size="0x400000">
-				<rom name="storyreaderv1_barneycaresbestmannersshowletsworktogether.bin" size="0x400000" crc="89e6df6a" sha1="f5d598c7f695f4f7e09060c05e58ba14bf8f805c" />
+				<rom name="storyreaderv1_barneycaresbestmannersshowletsworktogether.1.bin" offset="0x000000" size="0x200000" crc="5fffe4ec" sha1="b4bc4a19bd1df16d41c134fca902f3e7c729d26a" />
+				<rom name="storyreaderv1_barneycaresbestmannersshowletsworktogether.2.bin" offset="0x200000" size="0x100000" crc="2a80e6e7" sha1="fcd9903c6a55101ab64ab0d1f74ba2dfb62bcd37" />
 			</dataarea>
 		</part>
 	</software>
@@ -44,7 +51,8 @@
 		<info name="serial" value="62823" />
 		<part name="cart" interface="pi_storyreader_cart">
 			<dataarea name="rom" size="0x400000">
-				<rom name="storyreaderv1_carsincrediblesmonstersinc.bin" size="0x400000" crc="88ba4b2b" sha1="f30d95476d120b1fca1b8fc9004baf7951f7cb67" />
+				<rom name="storyreaderv1_carsincrediblesmonstersinc.1.bin" offset="0x000000" size="0x200000" crc="c12a2cd9" sha1="35032bd6b494cf082f1227b8c24bd0297aff53a6" />
+				<rom name="storyreaderv1_carsincrediblesmonstersinc.2.bin" offset="0x200000" size="0x100000" crc="5251f391" sha1="857e41f0bde573a0a9a2ff218e5019f2fefae4ce" />
 			</dataarea>
 		</part>
 	</software>
@@ -68,7 +76,8 @@
 		<info name="serial" value="33618" />
 		<part name="cart" interface="pi_storyreader_cart">
 			<dataarea name="rom" size="0x400000">
-				<rom name="storyreaderv1_dorasgardenadventuregingerbreadboydorasartadventure.bin" size="0x400000" crc="891472a9" sha1="cdc78012a41283032fabe4977e37b330be50d320" />
+				<rom name="storyreaderv1_dorasgardenadventuregingerbreadboydorasartadventure.1.bin" offset="0x000000" size="0x200000" crc="8840f754" sha1="1d0270db79dc0a92fcce494cc14dcad9cb7194a4" />
+				<rom name="storyreaderv1_dorasgardenadventuregingerbreadboydorasartadventure.2.bin" offset="0x200000" size="0x100000" crc="29bb4c9b" sha1="b82cce833dcafc2e17952d79e09a875636c7e7bb" />
 			</dataarea>
 		</part>
 	</software>
@@ -126,7 +135,8 @@
 		<info name="serial" value="06238" />
 		<part name="cart" interface="pi_storyreader_cart">
 			<dataarea name="rom" size="0x400000">
-				<rom name="storyreaderv1_peterrabbitjemimapuddleducktomkitten.bin" size="0x400000" crc="1eb175a8" sha1="1ead97956e5d2866dbfe9878ff48522fac8818f9" />
+				<rom name="storyreaderv1_peterrabbitjemimapuddleducktomkitten.1.bin" offset="0x000000" size="0x200000" crc="e8859dd3" sha1="69304c73a8d4fd9fe6cd4fc37209372e294c0ad8" />
+				<rom name="storyreaderv1_peterrabbitjemimapuddleducktomkitten.2.bin" offset="0x200000" size="0x100000" crc="64d50d09" sha1="c842df62fe0767768da1a314f47c091737a12738" />
 			</dataarea>
 		</part>
 	</software>
@@ -137,7 +147,8 @@
 		<publisher>Publications International Ltd. / Disney</publisher>
 		<part name="cart" interface="pi_storyreader_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="storyreaderv1_pinocchiotoystory2junglebook.bin" size="0x200000" crc="3530ac76" sha1="4722dac345f754ea72d1de082f8f9f401a0b1975" />
+				<rom name="storyreaderv1_pinocchiotoystory2junglebook.1.bin" offset="0x000000" size="0x100000" crc="d5529c3a" sha1="af4ca3595169852dad1ddbb68506b830197c4069" />
+				<rom name="storyreaderv1_pinocchiotoystory2junglebook.2.bin" offset="0x100000" size="0x100000" crc="ec7cb5f1" sha1="70a51e2cb905e261cabc7429bcddb59f2276c1bf" />
 			</dataarea>
 		</part>
 	</software>
@@ -173,7 +184,8 @@
 		<info name="serial" value="67224" />
 		<part name="cart" interface="pi_storyreader_cart">
 			<dataarea name="rom" size="0x400000">
-				<rom name="storyreaderv1_jasminemulanpocahontas.bin" size="0x400000" crc="d0c4b8d9" sha1="affe7f6f13be2e391a430fd602b0069f095bd2fa" />
+				<rom name="storyreaderv1_jasminemulanpocahontas.1.bin" offset="0x000000" size="0x200000" crc="dad388cb" sha1="d92a6e66a38cf21ee41a644ae0849c959dcd7847" />
+				<rom name="storyreaderv1_jasminemulanpocahontas.2.bin" offset="0x200000" size="0x100000" crc="d8f3bb4f" sha1="6980bae41faac9e3d0412ab88cf72ad817e0b7e8" />
 			</dataarea>
 		</part>
 	</software>
@@ -184,7 +196,8 @@
 		<publisher>Publications International Ltd. / Disney</publisher>
 		<part name="cart" interface="pi_storyreader_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="storyreaderv1_littlemermaidsnowwhitebeautyandthebeast.bin" size="0x200000" crc="3c1623da" sha1="a7b6b7a251aa6d53b47f599ea57663aa096f5206" />
+				<rom name="storyreaderv1_littlemermaidsnowwhitebeautyandthebeast.1.bin" offset="0x000000" size="0x100000" crc="dd96327b" sha1="fd9213696760b049fadf8e0157cd0692e0c6fb95" />
+				<rom name="storyreaderv1_littlemermaidsnowwhitebeautyandthebeast.2.bin" offset="0x100000" size="0x100000" crc="628c816d" sha1="fd2b13189ee3ecc8f9a335fffcd9f50b5b98cac9" />
 			</dataarea>
 		</part>
 	</software>
@@ -208,7 +221,8 @@
 		<info name="serial" value="30481" />
 		<part name="cart" interface="pi_storyreader_cart">
 			<dataarea name="rom" size="0x400000">
-				<rom name="storyreaderv1_elmoscolorfuladventuregroverstaysupverylatemelovecookies.bin" size="0x400000" crc="54bc8b1f" sha1="f11d90fd2ff032b6a93e50d61e471005fe0c8710" />
+				<rom name="storyreaderv1_elmoscolorfuladventuregroverstaysupverylatemelovecookies.1.bin" offset="0x000000" size="0x200000" crc="31cc421a" sha1="751aa570612782577249685765ccf7fe608e0cb6" />
+				<rom name="storyreaderv1_elmoscolorfuladventuregroverstaysupverylatemelovecookies.2.bin" offset="0x200000" size="0x100000" crc="73eaba54" sha1="2726b6711a6a2d8f2eaead5f9f1ef556ba8e3892" />
 			</dataarea>
 		</part>
 	</software>
@@ -232,7 +246,8 @@
 		<info name="serial" value="30376" />
 		<part name="cart" interface="pi_storyreader_cart">
 			<dataarea name="rom" size="0x400000">
-				<rom name="storyreaderv1_grandprizewinnerdorasgardenadventurebluesperfectpicnicspot.bin" size="0x400000" crc="1ea36f2f" sha1="bb63e6988b629f531fca081d3f5c611a8ba3cca0" />
+				<rom name="storyreaderv1_grandprizewinnerdorasgardenadventurebluesperfectpicnicspot.1.bin" offset="0x000000" size="0x200000" crc="a2c1648d" sha1="4dedde521cc8862fd93b441df330f92968eadd19" />
+				<rom name="storyreaderv1_grandprizewinnerdorasgardenadventurebluesperfectpicnicspot.2.bin" offset="0x200000" size="0x100000" crc="f59b9ba9" sha1="545c6db2fa4ba2ab1269a7788d1f2f5c4037bf6e" />
 			</dataarea>
 		</part>
 	</software>
@@ -244,7 +259,8 @@
 		<info name="serial" value="84009" />
 		<part name="cart" interface="pi_storyreader_cart">
 			<dataarea name="rom" size="0x400000">
-				<rom name="storyreaderv1_cheerupcrankythebigracecarnivalcapers.bin" size="0x400000" crc="4ddcadbc" sha1="78e8ee67da04111c17039bbbcbfc665ec2729372" />
+				<rom name="storyreaderv1_cheerupcrankythebigracecarnivalcapers.1.bin" offset="0x000000" size="0x200000" crc="9d58dc21" sha1="2f77e9b850749a1e0975edfdee1eb6ff0c8dc66d" />
+				<rom name="storyreaderv1_cheerupcrankythebigracecarnivalcapers.2.bin" offset="0x200000" size="0x100000" crc="2bd1adaf" sha1="21082583d720a3c432a32080f0eed3e5da47ae4e" />
 			</dataarea>
 		</part>
 	</software>
@@ -256,6 +272,97 @@
 		<part name="cart" interface="pi_storyreader_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="storyreaderv1_toystory2.bin" size="0x100000" crc="496fe7b5" sha1="4a66e1e7ec0fdcfe578d60437fcbaaa19f7ac2d3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srscooby" supported="no">
+		<description>Scooby Doo - Miniature Golf Mystery / Museum Mystery / Haunted Theater</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd.</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="srscooby.1.bin" offset="0x000000" size="0x200000" crc="13b5a30a" sha1="294c9a7c2afa81fc038feaf2f89a36f8b2c9b0c6" />
+				<rom name="srscooby.2.bin" offset="0x200000" size="0x100000" crc="e8b9214e" sha1="7ca6b5ca2726904990f5987397a768926117fa09" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- German carts -->
+
+	<software name="carsger" supported="no">
+		<description>Cars (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="cars (ger).bin" size="0x100000" crc="42716336" sha1="b8d05a6608fefaaa6cca8ed6c8e8d661ea72157e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dasdsch" supported="no">
+		<description>Das Dschungelbuch (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="das dschungel-buch (ger).bin" size="0x100000" crc="cceac135" sha1="ec7c03cb0b64e47e4e70bd535e903a1e94f37778" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="koniglow" supported="no">
+		<description>Der König der Löwen (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="der konig der lowen (ger).bin" size="0x100000" crc="e75e2e61" sha1="173734475d1300a8b8e0d8cd1d97e62560881771" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nemoger" supported="no">
+		<description>Findet Nemo (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="findet nemo (ger).bin" size="0x100000" crc="619898b3" sha1="4472782e816006626d45055d54e9b0d773561826" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppanger" supported="no">
+		<description>Peter Pan (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="peter pan (ger).bin" size="0x100000" crc="8a86cfdd" sha1="0ff16eb6aeaf8f755432acfe6dfcebecb28e7d27" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puuhtag" supported="no">
+		<description>Winnie Puuh - Ein stürmischer Tag (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="winnie puuh - ein sturmischer tag (ger).bin" size="0x100000" crc="d39bc8a0" sha1="745d946dc744d9fe1fba68425e6af8758945e0b7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puuhhung" supported="no">
+		<description>Winnie Puuh hat keinen Hunger (Germany)</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd. / Disney</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="winnie puuh hat keinen hunger (ger).bin" size="0x100000" crc="be1c90f1" sha1="08f2972bd69764952ae02f9cd0ba993fdc582705" />
 			</dataarea>
 		</part>
 	</software>

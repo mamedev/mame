@@ -192,7 +192,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_inttimer)
 {
 	// a pulse is sent via a capacitor (similar to what one finds at a reset pin)
 	if (m_t_c > 0x80)
-		m_maincpu->pulse_input_line_and_vector(INPUT_LINE_IRQ0, 0xbf, 2 * m_maincpu->minimum_quantum_time());
+		m_maincpu->pulse_input_line(INPUT_LINE_IRQ0, 2 * m_maincpu->minimum_quantum_time());
 	else
 		m_t_c++;
 }
@@ -220,6 +220,8 @@ void zac_2_state::zac_2(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &zac_2_state::zac_2_data);
 	m_maincpu->sense_handler().set(FUNC(zac_2_state::serial_r));
 	m_maincpu->flag_handler().set(FUNC(zac_2_state::serial_w));
+	m_maincpu->intack_handler().set_constant(0xbf);
+
 	NVRAM(config, "ram", nvram_device::DEFAULT_ALL_0);
 
 	TIMER(config, "zac_2_inttimer").configure_periodic(FUNC(zac_2_state::zac_2_inttimer), attotime::from_hz(200));

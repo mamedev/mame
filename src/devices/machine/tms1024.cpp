@@ -67,13 +67,13 @@ void tms1024_device::device_start()
 //  handlers
 //-------------------------------------------------
 
-WRITE8_MEMBER(tms1024_device::write_h)
+void tms1024_device::write_h(u8 data)
 {
 	// H1,2,3,4: data for outputs A,B,C,D
 	m_h = data & 0xf;
 }
 
-READ8_MEMBER(tms1024_device::read_h)
+u8 tms1024_device::read_h()
 {
 	if (!m_ms)
 	{
@@ -87,13 +87,13 @@ READ8_MEMBER(tms1024_device::read_h)
 	return m_h;
 }
 
-WRITE8_MEMBER(tms1024_device::write_s)
+void tms1024_device::write_s(uint8_t data)
 {
 	// S0,1,2: select port
 	m_s = data & 7;
 }
 
-WRITE_LINE_MEMBER(tms1024_device::write_std)
+void tms1024_device::write_std(int state)
 {
 	state = (state) ? 1 : 0;
 
@@ -114,7 +114,7 @@ WRITE_LINE_MEMBER(tms1024_device::write_std)
 	m_std = state;
 }
 
-WRITE_LINE_MEMBER(tms1024_device::write_ms)
+void tms1024_device::write_ms(int state)
 {
 	// 0: multiplexer(read) mode, 1: latch(write) mode
 	m_ms = (state) ? 1 : 0;

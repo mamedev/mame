@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
 
  WARNING: The entries in this software list will need a BIG cleanup once we
  fix our Satellaview emulation
@@ -20,7 +21,7 @@
  In the end, we shall only keep the proper dumps, possibly patching the header on load, if necessary with
  a ROM_LOAD overlay in the rom definitions...
 
- -->
+-->
 
 <softwarelist name="snes_bspack" description="Nintendo SNES Satellaview Memory Packs">
 

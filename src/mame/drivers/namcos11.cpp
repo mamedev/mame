@@ -238,7 +238,8 @@ Notes:
       The 2nd revision CPU board (GP-13 COH-110) uses 2x 32MBit RAMs instead of
       the 4x D482445LGW-A70 RAMs and the 2 main SONY IC's are updated revisions,
       though the functionality of them is identical. The 2 types of CPU boards can be
-      used with any System 11 motherboard, and any System 11 game.
+      used with any System 11 motherboard, and any System 11 game except Tekken which
+      requires the Revision 1 CPU board otherwise there are big graphical glitches
 
 Gun Board (Used only with Point Blank 2 so far)
 ---------

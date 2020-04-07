@@ -43,9 +43,9 @@ STA-0001B   P1-105A     96? Meosis Magic                            Sammy
 STA-0001B   ?           97  Joryuu Syougi Kyoushitsu (3)            Visco
 STA-0001B   VISCO-JJ1   97  Koi Koi Shimasho 2                      Visco
 STA-0001B   P1-112A     97  Mahjong Hyper Reaction 2                Sammy
-STA-0001B   ?           97  Monster Slider                          Visco / Datt
-STA-0001    ?           97  Super Real Mahjong P7                   Seta
-STA-0001B   ?           98  Gourmet Battle Quiz Ryorioh CooKing     Visco
+STA-0001B   STS-0001    97  Monster Slider                          Visco / Datt
+STA-0001    dedicated   97  Super Real Mahjong P7                   Seta
+STA-0001B   VISCO-JJ1   98  Gourmet Battle Quiz Ryorioh CooKing     Visco
 STA-0001B   P1-112C     98  Pachinko Sexy Reaction                  Sammy
 STA-0001B   B1-001A     99  Pachinko Sexy Reaction 2                Sammy
 STA-0001B   P1-112C     99  Change Air Blade                        Visco
@@ -260,7 +260,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::interrupt)
 	}
 }
 
-WRITE_LINE_MEMBER(ssv_state::gdfs_adc_int_w)
+WRITE_LINE_MEMBER(gdfs_state::adc_int_w)
 {
 	if (state)
 	{
@@ -452,12 +452,12 @@ void ssv_state::drifto94_map(address_map &map)
                      Mobil Suit Gundam Final Shooting
 ***************************************************************************/
 
-READ16_MEMBER(ssv_state::gdfs_eeprom_r)
+READ16_MEMBER(gdfs_state::eeprom_r)
 {
 	return m_adc->data_r() | (m_eeprom->do_read() << 8);
 }
 
-WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
+WRITE16_MEMBER(gdfs_state::eeprom_w)
 {
 	if (data & ~0x7b00)
 		logerror("%s - Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
@@ -482,18 +482,18 @@ WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
 }
 
 
-void ssv_state::gdfs_map(address_map &map)
+void gdfs_state::gdfs_map(address_map &map)
 {
 	ssv_map(map, 0xc00000);
-	map(0x400000, 0x41ffff).ram().w(FUNC(ssv_state::gdfs_tmapram_w)).share("gdfs_tmapram");
+	map(0x400000, 0x41ffff).ram().w(FUNC(gdfs_state::tmapram_w)).share("gdfs_tmapram");
 	map(0x420000, 0x43ffff).ram();
 	map(0x440000, 0x44003f).ram().share("gdfs_tmapscroll");
-	map(0x500000, 0x500001).w(FUNC(ssv_state::gdfs_eeprom_w));
-	map(0x540000, 0x540001).r(FUNC(ssv_state::gdfs_eeprom_r));
+	map(0x500000, 0x500001).w(FUNC(gdfs_state::eeprom_w));
+	map(0x540000, 0x540001).r(FUNC(gdfs_state::eeprom_r));
 	map(0x600000, 0x600fff).ram();
-	map(0x800000, 0x87ffff).rw(m_gdfs_st0020, FUNC(st0020_device::sprram_r), FUNC(st0020_device::sprram_w));
-	map(0x8c0000, 0x8c00ff).rw(m_gdfs_st0020, FUNC(st0020_device::regs_r), FUNC(st0020_device::regs_w));
-	map(0x900000, 0x9fffff).rw(m_gdfs_st0020, FUNC(st0020_device::gfxram_r), FUNC(st0020_device::gfxram_w));
+	map(0x800000, 0x87ffff).rw(m_st0020, FUNC(st0020_device::sprram_r), FUNC(st0020_device::sprram_w));
+	map(0x8c0000, 0x8c00ff).rw(m_st0020, FUNC(st0020_device::regs_r), FUNC(st0020_device::regs_w));
+	map(0x900000, 0x9fffff).rw(m_st0020, FUNC(st0020_device::gfxram_r), FUNC(st0020_device::gfxram_w));
 }
 
 
@@ -736,47 +736,44 @@ void ssv_state::survarts_map(address_map &map)
 ***************************************************************************/
 
 
-READ16_MEMBER(ssv_state::sxyreact_ballswitch_r)
+READ16_MEMBER(sxyreact_state::ballswitch_r)
 {
-	return m_io_service.read_safe(0);
+	return m_io_service->read();
 }
 
-READ16_MEMBER(ssv_state::sxyreact_dial_r)
+uint8_t sxyreact_state::dial_r()
 {
-	return ((m_sxyreact_serial >> 1) & 0x80);
+	return m_sxyreact_adc->eoc_so_r() ? 0x80 : 0;
 }
 
-
-WRITE16_MEMBER(ssv_state::sxyreact_dial_w)
+void sxyreact_state::dial_w(uint8_t data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		if (data & 0x20)
-			m_sxyreact_serial = m_io_paddle.read_safe(0) & 0xff;
-
-		if ( (m_sxyreact_dial & 0x40) && !(data & 0x40) )   // $40 -> $00
-			m_sxyreact_serial <<= 1;                        // shift 1 bit
-
-		m_sxyreact_dial = data;
-	}
+	m_sxyreact_adc->cs_w(BIT(data, 5));
+	m_sxyreact_adc->sck_w(BIT(data, 6));
 }
 
-WRITE16_MEMBER(ssv_state::sxyreact_motor_w)
+WRITE16_MEMBER(sxyreact_state::motor_w)
 {
 //  popmessage("%04X",data);   // 8 = motor on; 0 = motor off
 }
 
-void ssv_state::sxyreact_map(address_map &map)
+void ssv_state::cairblad_map(address_map &map)
 {
 	ssv_map(map, 0xe00000);
 //  map(0x020000, 0x03ffff).rw(FUNC(ssv_state::mainram_r), FUNC(ssv_state::mainram_w));             // sxyreac2 reads / writes here, why?
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  map(0x210002, 0x210003).nopw();                                      // ? 1 at the start
 	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));                            // Inverted lockout lines
-	map(0x500002, 0x500003).r(FUNC(ssv_state::sxyreact_ballswitch_r));                         // ?
-	map(0x500004, 0x500005).rw(FUNC(ssv_state::sxyreact_dial_r), FUNC(ssv_state::sxyreact_motor_w));        // Dial Value (serial)
-	map(0x520000, 0x520001).w(FUNC(ssv_state::sxyreact_dial_w));                              // Dial Value (advance 1 bit)
 	map(0x580000, 0x58ffff).ram().share("nvram");   // NVRAM
+}
+
+void sxyreact_state::sxyreact_map(address_map &map)
+{
+	cairblad_map(map);
+	map(0x500002, 0x500003).r(FUNC(sxyreact_state::ballswitch_r));                         // ?
+	map(0x500004, 0x500004).r(FUNC(sxyreact_state::dial_r));                               // Dial Value (serial)
+	map(0x500004, 0x500005).w(FUNC(sxyreact_state::motor_w));
+	map(0x520000, 0x520000).w(FUNC(sxyreact_state::dial_w));                              // Dial Value (advance 1 bit)
 }
 
 
@@ -870,12 +867,12 @@ void ssv_state::jsk_v810_mem(address_map &map)
   Eagle Shot Golf
 ***************************************************************************/
 
-WRITE8_MEMBER(ssv_state::eaglshot_gfxrom_bank_w)
+void eaglshot_state::gfxrom_bank_w(uint8_t data)
 {
 	membank("gfxrom")->set_entry(data < 6 ? data : 6);
 }
 
-WRITE8_MEMBER(ssv_state::eaglshot_trackball_w)
+void eaglshot_state::trackball_w(uint8_t data)
 {
 	// All these get toggled during trackball reads; the precise arrangement is uncertain
 	m_upd4701->cs_w(!BIT(data, 6));
@@ -887,28 +884,28 @@ WRITE8_MEMBER(ssv_state::eaglshot_trackball_w)
 
 
 
-READ16_MEMBER(ssv_state::eaglshot_gfxram_r)
+uint16_t eaglshot_state::gfxram_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_eaglshot_gfxram[offset + (m_scroll[0x76/2] & 0xf) * 0x40000/2];
+	return m_gfxram[offset + (m_scroll[0x76/2] & 0xf) * 0x40000/2];
 }
 
-WRITE16_MEMBER(ssv_state::eaglshot_gfxram_w)
+void eaglshot_state::gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset += (m_scroll[0x76/2] & 0xf) * 0x40000/2;
-	COMBINE_DATA(&m_eaglshot_gfxram[offset]);
+	COMBINE_DATA(&m_gfxram[offset]);
 	m_gfxdecode->gfx(0)->mark_dirty(offset / (16*8/2));
 }
 
 
-void ssv_state::eaglshot_map(address_map &map)
+void eaglshot_state::eaglshot_map(address_map &map)
 {
 	ssv_map(map, 0xf00000);
-	map(0x180000, 0x1bffff).rw(FUNC(ssv_state::eaglshot_gfxram_r), FUNC(ssv_state::eaglshot_gfxram_w));
+	map(0x180000, 0x1bffff).rw(FUNC(eaglshot_state::gfxram_r), FUNC(eaglshot_state::gfxram_w));
 	map(0x210000, 0x210001).nopr(); // .r("watchdog", FUNC(watchdog_timer_device::reset16_r));                 // Watchdog
 //  map(0x210002, 0x210003).nopw();                                      // ? 0,4 at the start
-	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));                            // Inverted lockout lines
-	map(0x800000, 0x800000).w(FUNC(ssv_state::eaglshot_gfxrom_bank_w));
-	map(0x900000, 0x900000).w(FUNC(ssv_state::eaglshot_trackball_w));
+	map(0x21000e, 0x21000f).w(FUNC(eaglshot_state::lockout_inv_w));                            // Inverted lockout lines
+	map(0x800000, 0x800000).w(FUNC(eaglshot_state::gfxrom_bank_w));
+	map(0x900000, 0x900000).w(FUNC(eaglshot_state::trackball_w));
 	map(0xa00000, 0xbfffff).bankr("gfxrom");
 	map(0xc00000, 0xc007ff).ram().share("nvram");   // NVRAM
 	map(0xd00000, 0xd00000).r(m_upd4701, FUNC(upd4701_device::d_r));
@@ -2539,14 +2536,12 @@ void ssv_state::init_ssv_tilescram()
 // srmp4
 //  ((uint16_t *)memregion("maincpu")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 
-void ssv_state::init_sexy()
+void sxyreact_state::init_sexy()
 {
 	init_ssv_tilescram();
-	save_item(NAME(m_sxyreact_serial));
-	save_item(NAME(m_sxyreact_dial));
 }
 
-void ssv_state::init_eaglshot()
+void eaglshot_state::init_eaglshot()
 {
 	init_ssv_tilescram();
 	membank("gfxrom")->configure_entries(0, 6+1, memregion("gfxdata")->base(), 0x200000);
@@ -2632,12 +2627,12 @@ void ssv_state::drifto94(machine_config &config)
 	m_screen->set_visarea(0, (0xcd-0x25)*2-1, 0, (0x101-0x13)-1);
 }
 
-void ssv_state::gdfs(machine_config &config)
+void gdfs_state::gdfs(machine_config &config)
 {
 	ssv(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::gdfs_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gdfs_state::gdfs_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
@@ -2646,18 +2641,16 @@ void ssv_state::gdfs(machine_config &config)
 	m_adc->in_callback<1>().set_ioport("GUNY1");
 	m_adc->in_callback<2>().set_ioport("GUNX2");
 	m_adc->in_callback<3>().set_ioport("GUNY2");
-	m_adc->eoc_callback().set(FUNC(ssv_state::gdfs_adc_int_w));
+	m_adc->eoc_callback().set(FUNC(gdfs_state::adc_int_w));
 
 	/* video hardware */
 	m_screen->set_visarea(0, (0xd5-0x2c)*2-1, 0, (0x102-0x12)-1);
-	m_screen->set_screen_update(FUNC(ssv_state::screen_update_gdfs));
+	m_screen->set_screen_update(FUNC(gdfs_state::screen_update));
 
-	ST0020_SPRITES(config, m_gdfs_st0020, 0);
-	m_gdfs_st0020->set_palette(m_palette);
+	ST0020_SPRITES(config, m_st0020, 0);
+	m_st0020->set_palette(m_palette);
 
 	m_gfxdecode->set_info(gfx_gdfs);
-
-	MCFG_VIDEO_START_OVERRIDE(ssv_state,gdfs)
 }
 
 void ssv_state::hypreact(machine_config &config)
@@ -2827,12 +2820,12 @@ void ssv_state::dynagear(machine_config &config)
 	m_screen->set_visarea(0, (0xd4-0x2c)*2-1, 0, (0x102 - 0x12)-1);
 }
 
-void ssv_state::eaglshot(machine_config &config)
+void eaglshot_state::eaglshot(machine_config &config)
 {
 	ssv(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::eaglshot_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &eaglshot_state::eaglshot_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2844,38 +2837,44 @@ void ssv_state::eaglshot(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_visarea(0, (0xca - 0x2a)*2-1, 0, (0xf6 - 0x16)-1);
-	m_screen->set_screen_update(FUNC(ssv_state::screen_update_eaglshot));
+	m_screen->set_screen_update(FUNC(eaglshot_state::screen_update));
 
 	m_gfxdecode->set_info(gfx_eaglshot);
-
-	MCFG_VIDEO_START_OVERRIDE(ssv_state,eaglshot)
 }
 
-void ssv_state::sxyreact(machine_config &config)
+void sxyreact_state::sxyreact(machine_config &config)
 {
 	ssv(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::sxyreact_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sxyreact_state::sxyreact_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
+
+	UPD7001(config, m_sxyreact_adc, 1'500'000); // FIXME: runs too fast because CPU doesn't wait long enough
+	m_sxyreact_adc->a0_callback().set_ioport("PADDLE");
+	m_sxyreact_adc->dl_w(1);
+	m_sxyreact_adc->si_w(0);
 
 	/* video hardware */
 	m_screen->set_visarea(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1);
 }
 
-void ssv_state::sxyreac2(machine_config &config)
+void sxyreact_state::sxyreac2(machine_config &config)
 {
 	ssv(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::sxyreact_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sxyreact_state::sxyreact_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
+
+	UPD7001(config, m_sxyreact_adc, 1'500'000); // FIXME: runs too fast because CPU doesn't wait long enough
+	m_sxyreact_adc->a0_callback().set_ioport("PADDLE");
 
 	/* video hardware */
 	m_screen->set_visarea(0, (0xcb - 0x23)*2-1, 0, (0xfe - 0x0e)-1);
@@ -2886,7 +2885,7 @@ void ssv_state::cairblad(machine_config &config)
 	ssv(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::sxyreact_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::cairblad_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -3763,6 +3762,10 @@ ROM_START( ryorioh )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
 	ROM_LOAD16_BYTE( "ryorioh.snd", 0x000000, 0x200000, CRC(7bd38b76) SHA1(d8490b4af839ef0802b8b2a47277fcd4091e4d37) )
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "gal16v8b.u25", 0x000, 0x117, CRC(9f9066be) SHA1(5640418e0235b409262aa5f20407e2d44722073d) )
+	ROM_LOAD( "gal16v8b.u36", 0x200, 0x117, CRC(971d6f4d) SHA1(35d9adf8cb2ea6097b670b189077d9850d33baf0) )
 ROM_END
 
 
@@ -4297,6 +4300,9 @@ ROM_START( sxyreac2 )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
 	ROM_COPY( "ensoniq.1", 0x000000,    0x200000, 0x200000 )
+
+	ROM_REGION( 0x200, "plds", 0 )
+	ROM_LOAD( "gal16v8d.ac1709g00.u34", 0x000, 0x117, CRC(65c4db12) SHA1(4931775ab5bcb9716db5a8e71e50b202d09c468b) )
 ROM_END
 
 
@@ -4843,14 +4849,14 @@ GAME( 1993,  survartsj, survarts, survarts, survarts, ssv_state, init_ssv,      
 
 GAME( 1994,  drifto94,  0,        drifto94, drifto94, ssv_state, init_ssv,           ROT0,   "Visco",              "Drift Out '94 - The Hard Order (Japan)",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994,  eaglshot,  0,        eaglshot, eaglshot, ssv_state, init_eaglshot,      ROT0,   "Sammy",              "Eagle Shot Golf (US)",                                                   MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994,  eaglshotj, eaglshot, eaglshot, eaglshot, ssv_state, init_eaglshot,      ROT0,   "Sammy",              "Eagle Shot Golf (Japan, bootleg?)",                                      MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // from a bootleg ROM board with no proper Seta / Sammy markings, possibly original ROM tho?
+GAME( 1994,  eaglshot,  0,        eaglshot, eaglshot, eaglshot_state, init_eaglshot, ROT0,   "Sammy",              "Eagle Shot Golf (US)",                                                   MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994,  eaglshotj, eaglshot, eaglshot, eaglshot, eaglshot_state, init_eaglshot, ROT0,   "Sammy",              "Eagle Shot Golf (Japan, bootleg?)",                                      MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // from a bootleg ROM board with no proper Seta / Sammy markings, possibly original ROM tho?
 
 GAME( 1995,  hypreact,  0,        hypreact, hypreact, ssv_state, init_ssv,           ROT0,   "Sammy",              "Mahjong Hyper Reaction (Japan)",                                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994,  twineag2,  0,        twineag2, twineag2, ssv_state, init_ssv_irq1,      ROT270, "Seta",               "Twin Eagle II - The Rescue Mission",                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995,  gdfs,      0,        gdfs,     gdfs,     ssv_state, init_ssv,           ROT0,   "Banpresto",          "Mobile Suit Gundam Final Shooting (Japan)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // title screen spells the title "Mobil" but standardized spelling is "Mobile" it also lists the company name as "Banprest" instead of "Banpresto"
+GAME( 1995,  gdfs,      0,        gdfs,     gdfs,     gdfs_state, init_ssv,          ROT0,   "Banpresto",          "Mobile Suit Gundam Final Shooting (Japan)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // title screen spells the title "Mobil" but standardized spelling is "Mobile" it also lists the company name as "Banprest" instead of "Banpresto"
 
 // Ultra X Weapon: "developed by Seta" in ending screen
 GAME( 1995,  ultrax,    0,        ultrax,   ultrax,   ssv_state, init_ssv_irq1,      ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-01-30 13:27:15 on startup
@@ -4875,9 +4881,9 @@ GAME( 1997,  srmp7,     0,        srmp7,    srmp7,    ssv_state, init_ssv,      
 
 GAME( 1998,  ryorioh,   0,        ryorioh,  ryorioh,  ssv_state, init_ssv,           ROT0,   "Visco",              "Gourmet Battle Quiz Ryohrioh CooKing (Japan)",                           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998,  sxyreact,  0,        sxyreact, sxyreact, ssv_state, init_sexy,          ROT0,   "Sammy",              "Pachinko Sexy Reaction (Japan)",                                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  sxyreact,  0,        sxyreact, sxyreact, sxyreact_state, init_sexy,     ROT0,   "Sammy",              "Pachinko Sexy Reaction (Japan)",                                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999,  sxyreac2,  0,        sxyreac2, sxyreact, ssv_state, init_sexy,          ROT0,   "Sammy",              "Pachinko Sexy Reaction 2 (Japan)",                                       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1999,  sxyreac2,  0,        sxyreac2, sxyreact, sxyreact_state, init_sexy,     ROT0,   "Sammy",              "Pachinko Sexy Reaction 2 (Japan)",                                       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1999,  cairblad,  0,        cairblad, cairblad, ssv_state, init_ssv_tilescram, ROT270, "Sammy",              "Change Air Blade (Japan)",                                               MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 

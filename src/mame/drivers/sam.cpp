@@ -545,6 +545,11 @@ ROM_END
 /*-------------------------------------------------------------------
 / Spider-Man
 /-------------------------------------------------------------------*/
+ROM_START(sman_102ef)
+	ROM_LOAD_BOOT_EPROM
+	ROM_REGION( 0x2000000, "flash", ROMREGION_ERASEFF )
+	ROM_LOAD( "sman_102af.bin", 0x0000, 0xfbb834, CRC(1e77651c) SHA1(fbce7dbe4ce70cd8bd1c01279a774f410f5aaeff))
+ROM_END
 ROM_START(sman_130ef)
 	ROM_LOAD_BOOT_EPROM
 	ROM_REGION( 0x2000000, "flash", ROMREGION_ERASEFF )
@@ -1179,6 +1184,7 @@ GAME( 2006, skc_090      ,skc_105,  sam, sam, sam_state, empty_init, ROT0, "Ster
 GAME( 2006, skc_103      ,skc_105,  sam, sam, sam_state, empty_init, ROT0, "Stern", "Simpsons Kooky Carnival (Redemption) v1.03",            MACHINE_FLAGS)
 // Missing version 1.04  May 12, 2006
 GAME( 2006, skc_105      ,0,        sam, sam, sam_state, empty_init, ROT0, "Stern", "Simpsons Kooky Carnival (Redemption) v1.05",            MACHINE_FLAGS)
+GAME( 2007, sman_102ef   ,sman_240, sam, sam, sam_state, empty_init, ROT0, "Stern", "Spider-Man v1.02 (English,French)",                     MACHINE_FLAGS)
 GAME( 2007, sman_130ef   ,sman_240, sam, sam, sam_state, empty_init, ROT0, "Stern", "Spider-Man v1.30 (English,French)",                     MACHINE_FLAGS)
 GAME( 2007, sman_130ei   ,sman_240, sam, sam, sam_state, empty_init, ROT0, "Stern", "Spider-Man v1.30 (English,Italian)",                    MACHINE_FLAGS)
 GAME( 2007, sman_130es   ,sman_240, sam, sam, sam_state, empty_init, ROT0, "Stern", "Spider-Man v1.30 (English,Spanish)",                    MACHINE_FLAGS)

@@ -785,6 +785,7 @@ void lua_engine::initialize()
  * emu.keypost(keys) - post keys to natural keyboard
  * emu.wait(len) - wait for len within coroutine
  * emu.lang_translate(str) - get translation for str if available
+ * emu.subst_env(str) - substitute environment variables with values for str
  *
  * emu.register_prestart(callback) - register callback before reset
  * emu.register_start(callback) - register callback after reset
@@ -879,6 +880,11 @@ void lua_engine::initialize()
 		});
 	emu["lang_translate"] = &lang_translate;
 	emu["pid"] = &osd_getpid;
+	emu["subst_env"] = [](const std::string &str) {
+			std::string result;
+			osd_subst_env(result, str);
+			return result;
+		};
 
 
 /*  emu_file library
@@ -1273,6 +1279,8 @@ void lua_engine::initialize()
  * machine:soft_reset() - soft reset emulation
  * machine:save(filename) - save state to filename
  * machine:load(filename) - load state from filename
+ * machine:buffer_save() - return save state buffer as binary string
+ * machine:buffer_load(str) - load state from binary string buffer. returns true on success, otherwise nil
  * machine:popmessage(str) - print str as popup
  * machine:popmessage() - clear displayed popup message
  * machine:logerror(str) - print str to log
@@ -1305,6 +1313,31 @@ void lua_engine::initialize()
 	machine_type.set("soft_reset", &running_machine::schedule_soft_reset);
 	machine_type.set("save", &running_machine::schedule_save);
 	machine_type.set("load", &running_machine::schedule_load);
+	machine_type.set("buffer_save", [](running_machine &m, sol::this_state s) {
+			lua_State *L = s;
+			luaL_Buffer buff;
+			int size = ram_state::get_size(m.save());
+			u8 *ptr = (u8 *)luaL_buffinitsize(L, &buff, size);
+			save_error error = m.save().write_buffer(ptr, size);
+			if (error == STATERR_NONE)
+			{
+				luaL_pushresultsize(&buff, size);
+				return sol::make_reference(L, sol::stack_reference(L, -1));
+			}
+			luaL_error(L, "State save error.");
+			return sol::make_reference(L, nullptr);
+		});
+	machine_type.set("buffer_load", [](running_machine &m, sol::this_state s, std::string str) {
+			lua_State *L = s;
+			save_error error = m.save().read_buffer((u8 *)str.data(), str.size());
+			if (error == STATERR_NONE)
+				return true;
+			else
+			{
+				luaL_error(L,"State load error.");
+				return false;
+			}
+		});
 	machine_type.set("system", &running_machine::system);
 	machine_type.set("video", &running_machine::video);
 	machine_type.set("sound", &running_machine::sound);
@@ -1498,7 +1531,7 @@ void lua_engine::initialize()
  * #log - entry count
  */
 
- 	sol().registry().new_usertype<wrap_textbuf>("text_buffer", "new", sol::no_constructor,
+	sol().registry().new_usertype<wrap_textbuf>("text_buffer", "new", sol::no_constructor,
 			"__metatable", [](){},
 			"__newindex", [](){},
 			"__index", [](wrap_textbuf &buf, int index) { return text_buffer_get_seqnum_line(buf.textbuf, index - 1); },

@@ -292,7 +292,7 @@ offs_t i8244_device::fix_register_mirrors( offs_t offset )
 }
 
 
-READ8_MEMBER(i8244_device::read)
+uint8_t i8244_device::read(offs_t offset)
 {
 	uint8_t data;
 
@@ -342,7 +342,7 @@ READ8_MEMBER(i8244_device::read)
 }
 
 
-WRITE8_MEMBER(i8244_device::write)
+void i8244_device::write(offs_t offset, uint8_t data)
 {
 	offset = fix_register_mirrors( offset );
 
@@ -367,7 +367,7 @@ WRITE8_MEMBER(i8244_device::write)
 }
 
 
-READ_LINE_MEMBER(i8244_device::vblank)
+int i8244_device::vblank()
 {
 	if ( screen().vpos() > m_start_vpos && screen().vpos() < m_start_vblank )
 	{
@@ -377,7 +377,7 @@ READ_LINE_MEMBER(i8244_device::vblank)
 }
 
 
-READ_LINE_MEMBER(i8244_device::hblank)
+int i8244_device::hblank()
 {
 	int hpos = screen().hpos();
 	int vpos = screen().vpos();

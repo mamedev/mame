@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
 There appear to exist some undumped N64 protos
 
   - Air Boardin' USA
@@ -17,38 +18,34 @@ Canceled games (possibly never got to the proto stage)
   - Freak Boy
   - Ikazuchi No Go Toku
   - X-Men Mutant Academy
--->
 
-<!--  
-	Undumped
 
-	007: Goldeneye (demo)                      DIS-NUS-NGEE-USA
-	1080° Snowboarding (demo)                  DIS-NUS-NTEE-USA
-	40 Winks (NTSC)                            Piko Interactive
-	40 Winks (PAL)                             Piko Interactive
-	ArtSend                                    http://www.nesworld.com/n64-acclaimartsend.php
-	Banjo Kazooie (demo)                       DIS-NUS-NBKE-USA
-	Banjo Tooie (demo)                         DIS-NUS-NB7E-USA
-	Castlevania (Asia)                         NUS-ND3E-ASM
-	Diddy Kong Racing (demo)                   DIS-NUS-NDYE-USA
-	Legend of Zelda: Ocarina of Time (demo)    DIS-NUS-CZLE-USA
-	Mario Kart 64 (demo)                       DIS-NUS-NKTE-USA
-	Mario Party 2 (demo)                       DIS-NUS-NMWE-USA
-	Mario Party 3 (demo)                       DIS-NUS-NMVE-USA
-	Nintendo 64 Test Cartridge                 http://www.nesworld.com/n64demo-game.php?gamegeneral=n64test&gameid=31
-	Ogre Battle 64 - Person of Lordly Caliber  Japan, rev 0
-	Perfect Dark (demo)                        DIS-NUS-NPDE-USA
-	Pokemon Stadium (demo)                     DIS-NUS-NP0E-USA
-	Pokemon Stadium 2 (demo)                   DIS-NUS-NP3E-USA
-	Star Wars Racer: Episode 1 (demo)          DIS-NUS-NEPE-USA
-	Star Wars Rogue Squadron (demo)            DIS-NUS-NRSE-USA
-	Starfox 64 (demo)                          DIS-NUS-NFXE-USA
-	Super Mario 64 (demo)                      DIS-NUS-NSME-USA
-	Turok 2: Seeds of Evil (demo)              NUS-NTYE-USA
+    Undumped
 
--->
+    007: Goldeneye (demo)                      DIS-NUS-NGEE-USA
+    1080° Snowboarding (demo)                  DIS-NUS-NTEE-USA
+    40 Winks (NTSC)                            Piko Interactive
+    40 Winks (PAL)                             Piko Interactive
+    ArtSend                                    http://www.nesworld.com/n64-acclaimartsend.php
+    Banjo Kazooie (demo)                       DIS-NUS-NBKE-USA
+    Banjo Tooie (demo)                         DIS-NUS-NB7E-USA
+    Castlevania (Asia)                         NUS-ND3E-ASM
+    Diddy Kong Racing (demo)                   DIS-NUS-NDYE-USA
+    Legend of Zelda: Ocarina of Time (demo)    DIS-NUS-CZLE-USA
+    Mario Kart 64 (demo)                       DIS-NUS-NKTE-USA
+    Mario Party 2 (demo)                       DIS-NUS-NMWE-USA
+    Mario Party 3 (demo)                       DIS-NUS-NMVE-USA
+    Nintendo 64 Test Cartridge                 http://www.nesworld.com/n64demo-game.php?gamegeneral=n64test&gameid=31
+    Ogre Battle 64 - Person of Lordly Caliber  Japan, rev 0
+    Perfect Dark (demo)                        DIS-NUS-NPDE-USA
+    Pokemon Stadium (demo)                     DIS-NUS-NP0E-USA
+    Pokemon Stadium 2 (demo)                   DIS-NUS-NP3E-USA
+    Star Wars Racer: Episode 1 (demo)          DIS-NUS-NEPE-USA
+    Star Wars Rogue Squadron (demo)            DIS-NUS-NRSE-USA
+    Starfox 64 (demo)                          DIS-NUS-NFXE-USA
+    Super Mario 64 (demo)                      DIS-NUS-NSME-USA
+    Turok 2: Seeds of Evil (demo)              NUS-NTYE-USA
 
-<!--
 
 Info on N64 chip labels (from The Cart Scan Repository)
 
@@ -3204,12 +3201,12 @@ This cart features a RTC, currently unemulated
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-16F32SB-01" />
 			<feature name="u1" value="U1 [17805]" />
-			<feature name="u2" value="U2 [EPM7128SQC100-10]" /> 
+			<feature name="u2" value="U2 [EPM7128SQC100-10]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="u4" value="U4 N64_EEPROM [BU9850]" />
 			<feature name="u5" value="U5" /> <!-- unknown -->
 			<feature name="u6" value="U6 [LV2416]" />
-			<feature name="u7" value="U7 [LH52V246AD]" /> 
+			<feature name="u7" value="U7 [LH52V246AD]" />
 			<feature name="u8" value="U8 32M FLASH MEMORY [LH28F032SUTD-10]" />
 			<feature name="u9" value="U9 32M FLASH MEMORY [LH28F032SUTD-10]" />
 			<feature name="u10" value="U10 32M FLASH MEMORY [LH28F032SUTD-10]" />
@@ -12710,9 +12707,9 @@ clips onto the player's ear.
 		<info name="alt_title" value="Turok - Rage Wars (cart)"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb_model" value="NUS-01A-02" />
-			<feature name="u1" value="U1 [NUS-NRWD-0]" /> 
+			<feature name="u1" value="U1 [NUS-NRWD-0]" />
 			<feature name="u2" value="U2 [empty]" />
-			<feature name="u3" value="U3 [CIC-NUS-7101A]" /> 
+			<feature name="u3" value="U3 [CIC-NUS-7101A]" />
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="8388608">
@@ -13162,6 +13159,17 @@ clips onto the player's ear.
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="4194304">
 				<rom name="nus-nvce-0.u1" size="4194304" crc="3cd894c4" sha1="9f57ec795e3c62d88ea823a5866a7b1012b731db" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="vpointp">
+		<description>Viewpoint 2064 (Prototype)</description>
+		<year>1999</year>
+		<publisher>Sammy</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="Viewpoint2064.z64" size="16777216" crc="93a630cb" sha1="defacaf6dbd22962ec0184849ed4a4c53a147454" />
 			</dataarea>
 		</part>
 	</software>

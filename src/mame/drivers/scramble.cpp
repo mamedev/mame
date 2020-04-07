@@ -1538,6 +1538,7 @@ void scramble_state::hunchbks(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &scramble_state::hunchbks_map);
 	maincpu.set_addrmap(AS_IO, &scramble_state::hunchbks_readport);
 	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank));
+	maincpu.intack_handler().set_constant(0x03);
 	maincpu.set_vblank_int("screen", FUNC(scramble_state::hunchbks_vh_interrupt));
 
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));

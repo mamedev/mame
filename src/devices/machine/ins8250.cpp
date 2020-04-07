@@ -385,8 +385,9 @@ void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 			  This register can be written, but if you write a 1 bit into any of
 			  bits 3 - 0, you could cause an interrupt if the appropriate IER bit
 			  is set.
+			  Bits 7 - 4 are read-only.
 			 */
-			m_regs.msr = data;
+			m_regs.msr = (m_regs.msr & 0xf0) | (data & 0x0f);
 
 			if ( m_regs.msr & 0x0f )
 				trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
@@ -530,27 +531,24 @@ void ns16550_device::tra_complete()
 
 void ins8250_uart_device::rcv_complete()
 {
+	// According to datasheet (and HP82939 self-test) the received character is always
+	// extracted and stored in RBR even in case of overrun
+	receive_register_extract();
 	if(m_regs.lsr & INS8250_LSR_DR)
 	{
 		m_regs.lsr |= INS8250_LSR_OE; //overrun
+	}
+	m_regs.lsr |= INS8250_LSR_DR;
+
+	if (is_receive_framing_error())
+		m_regs.lsr |= INS8250_LSR_FE;
+	if (is_receive_parity_error())
+		m_regs.lsr |= INS8250_LSR_PE;
+	if ((m_regs.lsr & (INS8250_LSR_BI | INS8250_LSR_PE | INS8250_LSR_FE | INS8250_LSR_OE)) != 0)
 		trigger_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
-		receive_register_reset();
-	}
-	else
-	{
-		m_regs.lsr |= INS8250_LSR_DR;
-		receive_register_extract();
 
-		if (is_receive_framing_error())
-			m_regs.lsr |= INS8250_LSR_FE;
-		if (is_receive_parity_error())
-			m_regs.lsr |= INS8250_LSR_PE;
-		if ((m_regs.lsr & (INS8250_LSR_BI | INS8250_LSR_PE | INS8250_LSR_FE)) != 0)
-			trigger_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
-
-		m_regs.rbr = get_received_char();
-		trigger_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
-	}
+	m_regs.rbr = get_received_char();
+	trigger_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
 }
 
 void ins8250_uart_device::tra_complete()

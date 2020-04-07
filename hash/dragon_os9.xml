@@ -1,15 +1,17 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Dragon 64 OS-9 floppy disks -->
+Dragon 64 OS-9 floppy disks
 
-<!-- Loading Instructions:
+    Loading Instructions:
 
       Load OS-9 Level 1 using:
         BOOT
--->
 
-<!-- This list was compiled from the archive at http://archive.worldofdragon.org/archive/index.php?dir=Disks/Dragon/OS-9/ as of 26/03/2017. -->
+This list was compiled from the archive at http://archive.worldofdragon.org/archive/index.php?dir=Disks/Dragon/OS-9/ as of 26/03/2017.
+-->
 
 <softwarelist name="dragon_os9" description="Dragon OS-9 diskettes">
 

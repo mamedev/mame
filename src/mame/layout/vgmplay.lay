@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 	<!--
 	Activity LEDs:
@@ -215,9 +218,7 @@
 		<cpanel element="act_label_ga20"><bounds x="49" y="22.2" width="10" height="1.6" /></cpanel>
 	</group>
 
-	<view name="Internal Layout">
-		<bounds left="0" right="60" top="0" bottom="55" />
-
+	<group name="lights">
 		<cpanel element="static_black2"><bounds x="0"  y="4" width="11" height="5" /></cpanel>
 		<cpanel element="static_black2"><bounds x="12" y="4" width="11" height="5" /></cpanel>
 		<cpanel element="static_black2"><bounds x="24" y="4" width="11" height="5" /></cpanel>
@@ -237,5 +238,14 @@
 		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0010"><bounds x="48" y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
 
 		<group ref="activity"><bounds x="0" y="21" width="60" height="34" /></group>
+	</group>
+
+	<view name="Full View">
+		<group ref="lights"><bounds x="0" y="0" width="60" height="55" /></group>
+		<screen index="0"><bounds x="60" y="0" width="60" height="55" /></screen>
+	</view>
+
+	<view name="Lights + Controls">
+		<group ref="lights"><bounds x="0" y="0" width="60" height="55" /></group>
 	</view>
 </mamelayout>

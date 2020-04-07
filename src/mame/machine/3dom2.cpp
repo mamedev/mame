@@ -213,6 +213,7 @@ m2_bda_device::m2_bda_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, M2_BDA, tag, owner, clock),
 	m_cpu1(*this, finder_base::DUMMY_TAG),
 	m_cpu2(*this, finder_base::DUMMY_TAG),
+	m_cde(*this, finder_base::DUMMY_TAG),
 	m_videores_in(*this),
 	m_memctl(*this, "memctl"),
 	m_powerbus(*this, "powerbus"),
@@ -471,21 +472,14 @@ void m2_bda_device::configure_ppc_address_map(address_space &space)
 	space.install_readwrite_handler(POWERBUS_BASE,  POWERBUS_BASE + DEVICE_MASK,read32_delegate(*m_powerbus, FUNC(m2_powerbus_device::read)),    write32_delegate(*m_powerbus, FUNC(m2_powerbus_device::write)),    0xffffffffffffffffULL);
 	space.install_readwrite_handler(MEMCTL_BASE,    MEMCTL_BASE + DEVICE_MASK,  read32_delegate(*m_memctl,   FUNC(m2_memctl_device::read)),      write32_delegate(*m_memctl,   FUNC(m2_memctl_device::write)),      0xffffffffffffffffULL);
 	space.install_readwrite_handler(VDU_BASE,       VDU_BASE + DEVICE_MASK,     read32_delegate(*m_vdu,      FUNC(m2_vdu_device::read)),         write32_delegate(*m_vdu,      FUNC(m2_vdu_device::write)),         0xffffffffffffffffULL);
-	space.install_readwrite_handler(TE_BASE,        TE_BASE + DEVICE_MASK,      read32_delegate(*m_te,       FUNC(m2_te_device::read)),          write32_delegate(*m_te,       FUNC(m2_te_device::write)),          0xffffffffffffffffULL);
+	space.install_readwrite_handler(TE_BASE,        TE_BASE + DEVICE_MASK,      read32sm_delegate(*m_te,       FUNC(m2_te_device::read)),          write32sm_delegate(*m_te,       FUNC(m2_te_device::write)),          0xffffffffffffffffULL);
 	space.install_readwrite_handler(DSP_BASE,       DSP_BASE + DEVICE_MASK,     read32_delegate(*m_dspp,     FUNC(dspp_device::read)),           write32_delegate(*m_dspp,     FUNC(dspp_device::write)),           0xffffffffffffffffULL);
 	space.install_readwrite_handler(CTRLPORT_BASE,  CTRLPORT_BASE + DEVICE_MASK,read32_delegate(*m_ctrlport, FUNC(m2_ctrlport_device::read)),    write32_delegate(*m_ctrlport, FUNC(m2_ctrlport_device::write)),    0xffffffffffffffffULL);
 	space.install_readwrite_handler(MPEG_BASE,      MPEG_BASE + DEVICE_MASK,    read32_delegate(*m_mpeg,     FUNC(m2_mpeg_device::read)),        write32_delegate(*m_mpeg,     FUNC(m2_mpeg_device::write)),        0xffffffffffffffffULL);
 
 	space.install_readwrite_handler(CPUID_BASE,     CPUID_BASE + DEVICE_MASK,   read32_delegate(*this,       FUNC(m2_bda_device::cpu_id_r)),     write32_delegate(*this,       FUNC(m2_bda_device::cpu_id_w)),      0xffffffffffffffffULL);
 
-
-	// Find and install the CDE
-	m2_cde_device *cde = downcast<m2_cde_device *>(machine().device("cde"));
-
-	if (!cde)
-		throw emu_fatalerror("BDA: Could not find the CDE device!");
-
-	space.install_readwrite_handler(SLOT4_BASE, SLOT4_BASE + SLOT_MASK, read32_delegate(*cde, FUNC(m2_cde_device::read)), write32_delegate(*cde, FUNC(m2_cde_device::write)), 0xffffffffffffffffULL);
+	space.install_readwrite_handler(SLOT4_BASE, SLOT4_BASE + SLOT_MASK, read32_delegate(*m_cde, FUNC(m2_cde_device::read)), write32_delegate(*m_cde, FUNC(m2_cde_device::write)), 0xffffffffffffffffULL);
 }
 
 
@@ -1497,6 +1491,7 @@ WRITE32_MEMBER( m2_ctrlport_device::write )
 m2_cde_device::m2_cde_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, M2_CDE, tag, owner, clock),
 	m_cpu1(*this, finder_base::DUMMY_TAG),
+	m_bda(*this, finder_base::DUMMY_TAG),
 	m_int_handler(*this),
 	m_sdbg_out_handler(*this)
 {
@@ -1509,13 +1504,6 @@ m2_cde_device::m2_cde_device(const machine_config &mconfig, const char *tag, dev
 
 void m2_cde_device::device_start()
 {
-	// Find our friend the BDA
-	m_bda = downcast<m2_bda_device *>(machine().device("bda"));
-	assert(m_bda != nullptr);
-
-	if (m_bda == nullptr)
-		throw device_missing_dependencies();
-
 	// Resolve callbacks
 	m_int_handler.resolve_safe();
 	m_sdbg_out_handler.resolve_safe();

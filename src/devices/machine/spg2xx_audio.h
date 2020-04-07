@@ -322,6 +322,13 @@ protected:
 		AUDIO_EQ_GAIN32_MASK            = 0x7f7f
 	};
 
+	struct adpcm36_state
+	{
+		uint16_t m_remaining;
+		uint16_t m_header;
+		int16_t m_prevsamp[2];
+	};
+
 	static const device_timer_id TIMER_BEAT = 3;
 	static const device_timer_id TIMER_IRQ = 4;
 
@@ -338,7 +345,8 @@ protected:
 	bool advance_channel(const uint32_t channel);
 	bool fetch_sample(const uint32_t channel);
 	void loop_channel(const uint32_t channel);
-
+	uint16_t decode_adpcm36_nybble(const uint32_t channel, const uint8_t data);
+	void read_adpcm36_header(const uint32_t channel);
 
 	bool m_debug_samples;
 	bool m_debug_rates;
@@ -362,6 +370,7 @@ protected:
 
 	sound_stream *m_stream;
 	oki_adpcm_state m_adpcm[16];
+	adpcm36_state m_adpcm36_state[16];
 
 	static const uint32_t s_rampdown_frame_counts[8];
 	static const uint32_t s_envclk_frame_counts[16];

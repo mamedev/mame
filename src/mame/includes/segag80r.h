@@ -174,7 +174,7 @@ private:
 	void draw_background_spaceod(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background_page_scroll(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background_full_scroll(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	offs_t decrypt_offset(address_space &space, offs_t offset);
+	offs_t decrypt_offset(offs_t offset);
 	inline uint8_t demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2, uint8_t d1d0);
 	void monsterb_expand_gfx(const char *region);
 

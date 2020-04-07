@@ -736,8 +736,8 @@ void tiki100_state::tiki100(machine_config &config)
 
 	Z80PIO(config, m_pio, 8_MHz_XTAL / 4);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_pio->in_pa_callback().set("cent_data_in", FUNC(input_buffer_device::bus_r));
-	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->in_pa_callback().set("cent_data_in", FUNC(input_buffer_device::read));
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pio->in_pb_callback().set(FUNC(tiki100_state::pio_pb_r));
 	m_pio->out_pb_callback().set(FUNC(tiki100_state::pio_pb_w));
 

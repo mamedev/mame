@@ -70,7 +70,7 @@ void ef9369_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER( ef9369_device::data_r )
+uint8_t ef9369_device::data_r()
 {
 	if (m_address & 1)
 		return m_m[m_address >> 1] << 4 | m_cc[m_address >> 1];
@@ -78,7 +78,7 @@ READ8_MEMBER( ef9369_device::data_r )
 		return m_cb[m_address >> 1] << 4 | m_ca[m_address >> 1];
 }
 
-WRITE8_MEMBER( ef9369_device::data_w )
+void ef9369_device::data_w(uint8_t data)
 {
 	const int entry = m_address >> 1;
 
@@ -102,7 +102,7 @@ WRITE8_MEMBER( ef9369_device::data_w )
 	m_address &= 0x1f;
 }
 
-WRITE8_MEMBER( ef9369_device::address_w )
+void ef9369_device::address_w(uint8_t data)
 {
 	m_address = data & 0x1f;    // 5-bit
 }

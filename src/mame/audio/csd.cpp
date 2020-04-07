@@ -129,7 +129,7 @@ u8 midway_cheap_squeak_deluxe_device::stat_r()
 
 void midway_cheap_squeak_deluxe_device::sr_w(u8 data)
 {
-	m_pia->write_portb(data & 0x0f);
+	m_pia->portb_w(data & 0x0f);
 }
 
 //-------------------------------------------------

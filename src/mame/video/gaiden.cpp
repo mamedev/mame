@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_bg_tile_info)
 {
 	uint16_t *videoram1 = &m_videoram[2][0x0800];
 	uint16_t *videoram2 = m_videoram[2];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			videoram1[tile_index] & 0x0fff,
 			(videoram2[tile_index] & 0xf0) >> 4,
 			0);
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info)
 {
 	uint16_t *videoram1 = &m_videoram[1][0x0800];
 	uint16_t *videoram2 = m_videoram[1];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			videoram1[tile_index] & 0x0fff,
 			(videoram2[tile_index] & 0xf0) >> 4,
 			0);
@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info_raiga)
 	if ((videoram2[tile_index] & 0x08))
 		colour += 0x10;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			videoram1[tile_index] & 0x0fff,
 			colour,
 			0);
@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_tx_tile_info)
 {
 	uint16_t *videoram1 = &m_videoram[0][0x0400];
 	uint16_t *videoram2 = m_videoram[0];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			videoram1[tile_index] & 0x07ff,
 			(videoram2[tile_index] & 0xf0) >> 4,
 			0);

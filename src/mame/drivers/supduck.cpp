@@ -175,7 +175,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_text_tile_info) // same as tigeroad.c
 	int color = attr & 0x0f;
 	int flags = (attr & 0x10) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
@@ -191,7 +191,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
 		flags |=(data & 0x1000) ? TILE_FLIPY : 0;
 
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(supduck_state::get_back_tile_info)
@@ -207,7 +207,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_back_tile_info)
 	int flags = (data & 0x2000) ? TILE_FLIPX : 0;
 		flags |=(data & 0x1000) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(2, code, color, flags);
+	tileinfo.set(2, code, color, flags);
 }
 
 

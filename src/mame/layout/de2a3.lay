@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
-<!-- de2a3.lay -->
+<!--
+license:CC0
+copyright-holders:Barry Rodewald
 
-<!-- Data East Alphanumeric Display Type 3 -->
-<!-- 2013-06-15: Initial version.  [Barry Rodewald] -->
+Data East Alphanumeric Display Type 3
+-->
 
 <mamelayout version="2">
 

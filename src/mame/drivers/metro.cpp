@@ -301,19 +301,24 @@ WRITE_LINE_MEMBER(metro_state::puzzlet_vblank_irq)
 
 READ_LINE_MEMBER(metro_state::rxd_r)
 {
-	uint8_t data = m_soundlatch->read();
+	uint8_t data = m_sound_data;
 
-	m_soundlatch->write(data >> 1);
+	// TODO: shift on SCK falling edges
+	m_sound_data >>= 1;
 
 	return data & 1;
 
 }
 
-WRITE8_MEMBER(metro_state::soundlatch_w)
+WRITE8_MEMBER(metro_state::sound_data_w)
 {
-	m_soundlatch->write(data & 0xff);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(metro_state::sound_data_sync), this), data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // seen rxd_r
-	m_maincpu->spin_until_interrupt();
+}
+
+TIMER_CALLBACK_MEMBER(metro_state::sound_data_sync)
+{
+	m_sound_data = param;
 	m_busy_sndcpu = 1;
 }
 
@@ -357,7 +362,7 @@ WRITE8_MEMBER(metro_state::upd7810_portb_w)
 	   6
 	   5 !clock YM2413 I/O
 	   4 !clock MSM6295 I/O
-	   3
+	   3 !enable read from 6295
 	   2 !enable write to YM2413/6295
 	   1 select YM2413 register or data port
 	   0
@@ -386,6 +391,13 @@ WRITE8_MEMBER(metro_state::upd7810_portb_w)
 		/* write */
 		if (!BIT(data, 4))
 			m_oki->write(m_porta);
+	}
+
+	if (BIT(m_portb, 3) && !BIT(data, 3))   /* clock 1->0 */
+	{
+		/* read */
+		if (!BIT(data, 4))
+			m_porta = m_oki->read();
 	}
 
 	m_portb = data;
@@ -650,7 +662,7 @@ void metro_state::msgogo_map(address_map &map)
 }
 
 /***************************************************************************
-                                Daitoride
+                       Daitoride and Puzzli (revision B)
 ***************************************************************************/
 
 void metro_state::daitorid_map(address_map &map)
@@ -659,7 +671,7 @@ void metro_state::daitorid_map(address_map &map)
 	map(0x400000, 0x47ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
 	map(0x4788a3, 0x4788a3).rw(FUNC(metro_state::irq_cause_r), FUNC(metro_state::irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0x4788a4, 0x4788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x4788a9, 0x4788a9).w(FUNC(metro_state::soundlatch_w));                       // To Sound CPU
+	map(0x4788a9, 0x4788a9).w(FUNC(metro_state::sound_data_w));                       // To Sound CPU
 	map(0x800000, 0x80ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 	map(0xc00000, 0xc00001).portr("IN0");
 	map(0xc00001, 0xc00001).w(FUNC(metro_state::soundstatus_w));  // To Sound CPU
@@ -681,7 +693,7 @@ void metro_state::dharma_map(address_map &map)
 	map(0x800000, 0x87ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
 	map(0x8788a3, 0x8788a3).rw(FUNC(metro_state::irq_cause_r), FUNC(metro_state::irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0x8788a4, 0x8788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x8788a9, 0x8788a9).w(FUNC(metro_state::soundlatch_w));                       // To Sound CPU
+	map(0x8788a9, 0x8788a9).w(FUNC(metro_state::sound_data_w));                       // To Sound CPU
 	map(0xc00000, 0xc00001).portr("IN0");
 	map(0xc00001, 0xc00001).w(FUNC(metro_state::soundstatus_w));  // To Sound CPU
 	map(0xc00002, 0xc00003).portr("IN1");                                //
@@ -708,7 +720,7 @@ void metro_state::karatour_map(address_map &map)
 	map(0x800000, 0x87ffff).m(m_vdp, FUNC(imagetek_i4100_device::map));
 	map(0x8788a3, 0x8788a3).rw(FUNC(metro_state::irq_cause_r), FUNC(metro_state::irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0x8788a4, 0x8788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x8788a9, 0x8788a9).w(FUNC(metro_state::soundlatch_w));                       // To Sound CPU
+	map(0x8788a9, 0x8788a9).w(FUNC(metro_state::sound_data_w));                       // To Sound CPU
 	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 }
 
@@ -726,7 +738,7 @@ void metro_state::kokushi_map(address_map &map)
 	map(0x800000, 0x87ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
 	map(0x8788a3, 0x8788a3).rw(FUNC(metro_state::irq_cause_r), FUNC(metro_state::irq_cause_w)); // IRQ Cause /  IRQ Acknowledge
 	map(0x8788a4, 0x8788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x8788a9, 0x8788a9).w(FUNC(metro_state::soundlatch_w));                       // To Sound CPU
+	map(0x8788a9, 0x8788a9).w(FUNC(metro_state::sound_data_w));                       // To Sound CPU
 	map(0xc00000, 0xc00001).portr("IN0");
 	map(0xc00001, 0xc00001).w(FUNC(metro_state::soundstatus_w));  // To Sound CPU
 	map(0xc00002, 0xc00003).portr("IN1");                                // Inputs
@@ -746,7 +758,7 @@ void metro_state::lastfort_map(address_map &map)
 	map(0x800000, 0x87ffff).m(m_vdp, FUNC(imagetek_i4100_device::map));
 	map(0x8788a3, 0x8788a3).rw(FUNC(metro_state::irq_cause_r), FUNC(metro_state::irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0x8788a4, 0x8788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x8788a9, 0x8788a9).w(FUNC(metro_state::soundlatch_w));                       // To Sound CPU
+	map(0x8788a9, 0x8788a9).w(FUNC(metro_state::sound_data_w));                       // To Sound CPU
 	map(0xc00001, 0xc00001).rw(FUNC(metro_state::soundstatus_r), FUNC(metro_state::soundstatus_w)); // From / To Sound CPU
 	map(0xc00003, 0xc00003).w(FUNC(metro_state::coin_lockout_1word_w));               // Coin Lockout
 	map(0xc00004, 0xc00005).portr("IN0");                                // Inputs
@@ -773,7 +785,7 @@ void metro_state::lastforg_map(address_map &map)
 	map(0x880000, 0x8fffff).m(m_vdp, FUNC(imagetek_i4100_device::map));
 	map(0x8f88a3, 0x8f88a3).rw(FUNC(metro_state::irq_cause_r), FUNC(metro_state::irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0x8f88a4, 0x8f88a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x8f88a9, 0x8f88a9).w(FUNC(metro_state::soundlatch_w));                       // To Sound CPU
+	map(0x8f88a9, 0x8f88a9).w(FUNC(metro_state::sound_data_w));                       // To Sound CPU
 	map(0xc00000, 0xc0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 }
 
@@ -967,7 +979,7 @@ void metro_state::pangpoms_map(address_map &map)
 	map(0x400000, 0x47ffff).m(m_vdp, FUNC(imagetek_i4100_device::map));
 	map(0x4788a3, 0x4788a3).rw(FUNC(metro_state::irq_cause_r), FUNC(metro_state::irq_cause_w));  // IRQ Cause / IRQ Acknowledge
 	map(0x4788a4, 0x4788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x4788a9, 0x4788a9).w(FUNC(metro_state::soundlatch_w));                       // To Sound CPU
+	map(0x4788a9, 0x4788a9).w(FUNC(metro_state::sound_data_w));                       // To Sound CPU
 	map(0x800001, 0x800001).rw(FUNC(metro_state::soundstatus_r), FUNC(metro_state::soundstatus_w));  // From / To Sound CPU
 	map(0x800002, 0x800003).nopr();
 	map(0x800003, 0x800003).w(FUNC(metro_state::coin_lockout_1word_w));    // Coin Lockout
@@ -998,7 +1010,7 @@ void metro_state::poitto_map(address_map &map)
 	map(0xc00000, 0xc7ffff).m(m_vdp, FUNC(imagetek_i4100_device::map));
 	map(0xc788a3, 0xc788a3).rw(FUNC(metro_state::irq_cause_r), FUNC(metro_state::irq_cause_w));  // IRQ Cause / IRQ Acknowledge
 	map(0xc788a4, 0xc788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0xc788a9, 0xc788a9).w(FUNC(metro_state::soundlatch_w));                       // To Sound CPU
+	map(0xc788a9, 0xc788a9).w(FUNC(metro_state::sound_data_w));                       // To Sound CPU
 }
 
 
@@ -1021,13 +1033,13 @@ void metro_state::skyalert_map(address_map &map)
 	map(0x800000, 0x87ffff).m(m_vdp, FUNC(imagetek_i4100_device::map));
 	map(0x8788a3, 0x8788a3).rw(FUNC(metro_state::irq_cause_r), FUNC(metro_state::irq_cause_w));  // IRQ Cause / IRQ Acknowledge
 	map(0x8788a4, 0x8788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0x8788a9, 0x8788a9).w(FUNC(metro_state::soundlatch_w));                       // To Sound CPU
+	map(0x8788a9, 0x8788a9).w(FUNC(metro_state::sound_data_w));                       // To Sound CPU
 	map(0xc00000, 0xc0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
 }
 
 
 /***************************************************************************
-                                Pururun
+                        Pururun and Puzzli (revision A)
 ***************************************************************************/
 
 void metro_state::pururun_map(address_map &map)
@@ -1043,7 +1055,7 @@ void metro_state::pururun_map(address_map &map)
 	map(0xc00000, 0xc7ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
 	map(0xc788a3, 0xc788a3).rw(FUNC(metro_state::irq_cause_r), FUNC(metro_state::irq_cause_w));  // IRQ Cause / IRQ Acknowledge
 	map(0xc788a4, 0xc788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0xc788a9, 0xc788a9).w(FUNC(metro_state::soundlatch_w));                       // To Sound CPU
+	map(0xc788a9, 0xc788a9).w(FUNC(metro_state::sound_data_w));                       // To Sound CPU
 }
 
 
@@ -1064,7 +1076,7 @@ void metro_state::toride2g_map(address_map &map)
 	map(0xc00000, 0xc7ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
 	map(0xc788a3, 0xc788a3).rw(FUNC(metro_state::irq_cause_r), FUNC(metro_state::irq_cause_w)); // IRQ Cause / IRQ Acknowledge
 	map(0xc788a4, 0xc788a5).writeonly().share("irq_enable");                // IRQ Enable
-	map(0xc788a9, 0xc788a9).w(FUNC(metro_state::soundlatch_w));                       // To Sound CPU
+	map(0xc788a9, 0xc788a9).w(FUNC(metro_state::sound_data_w));                       // To Sound CPU
 }
 
 
@@ -2994,6 +3006,7 @@ void metro_state::machine_start()
 	save_item(NAME(m_blitter_bit));
 	save_item(NAME(m_irq_line));
 	save_item(NAME(m_requested_int));
+	save_item(NAME(m_sound_data));
 	save_item(NAME(m_soundstatus));
 	save_item(NAME(m_porta));
 	save_item(NAME(m_portb));
@@ -3149,7 +3162,7 @@ void metro_state::batlbubl(machine_config &config)
 
 void metro_state::metro_upd7810_sound(machine_config &config)
 {
-	upd7810_device &upd(UPD7810(config, m_audiocpu, 24_MHz_XTAL/2));
+	upd78c10_device &upd(UPD78C10(config, m_audiocpu, 24_MHz_XTAL/2));
 	upd.rxd_func().set(FUNC(metro_state::rxd_r));
 	upd.set_addrmap(AS_PROGRAM, &metro_state::upd7810_map);
 	upd.pa_in_cb().set(FUNC(metro_state::upd7810_porta_r));
@@ -3160,7 +3173,7 @@ void metro_state::metro_upd7810_sound(machine_config &config)
 
 void metro_state::daitorid_upd7810_sound(machine_config &config)
 {
-	upd7810_device &upd(UPD7810(config, m_audiocpu, 12_MHz_XTAL));
+	upd78c10_device &upd(UPD78C10(config, m_audiocpu, 12_MHz_XTAL));
 	upd.rxd_func().set(FUNC(metro_state::rxd_r));
 	upd.set_addrmap(AS_PROGRAM, &metro_state::upd7810_map);
 	upd.pa_in_cb().set(FUNC(metro_state::upd7810_porta_r));
@@ -3187,8 +3200,6 @@ void metro_state::daitorid(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, UPD7810_INTF2);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
@@ -3208,6 +3219,13 @@ void metro_state::puzzli(machine_config &config)
 	m_screen->screen_vblank().set_nop();
 }
 
+void metro_state::puzzlia(machine_config &config)
+{
+	puzzli(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::pururun_map);
+}
+
 void metro_state::dharma(machine_config &config)
 {
 	/* basic machine hardware */
@@ -3224,8 +3242,6 @@ void metro_state::dharma(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
 
 	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH); // sample rate =  M6295 clock / 132
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
@@ -3251,8 +3267,6 @@ void metro_state::karatour(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-
 	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH); // was /128.. so pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
@@ -3276,8 +3290,6 @@ void metro_state::sankokushi(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
 
 	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH); // was /128.. so pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
@@ -3304,8 +3316,6 @@ void metro_state::lastfort(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-
 	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_LOW); // sample rate =  M6295 clock / 165
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
@@ -3328,8 +3338,6 @@ void metro_state::lastforg(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
 
 	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH); // was /128.. so pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
@@ -3455,8 +3463,6 @@ void metro_state::pangpoms(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-
 	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH); // was /128.. so pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
@@ -3481,8 +3487,6 @@ void metro_state::poitto(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-
 	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH); // was /128.. so pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
@@ -3506,8 +3510,6 @@ void metro_state::pururun(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));  /* Confirmed match to reference video */
 	ymsnd.irq_handler().set_inputline(m_audiocpu, UPD7810_INTF2);
@@ -3534,8 +3536,6 @@ void metro_state::skyalert(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-
 	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_LOW); // sample rate =  M6295 clock / 165
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
@@ -3560,8 +3560,6 @@ void metro_state::toride2g(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
 
 	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
@@ -5162,6 +5160,23 @@ ROM_START( puzzli )
 	ROM_LOAD( "pz_jb7.3g", 0x000000, 0x040000, CRC(b3aab610) SHA1(9bcf1f98e19a7e26b22e152313dfbd43c882f008) )
 ROM_END
 
+ROM_START( puzzlia )
+	ROM_REGION( 0x80000, "maincpu", 0 )        // 68000 Code
+	ROM_LOAD16_BYTE( "pz-ja-5.20e", 0x000000, 0x020000, CRC(4e162574) SHA1(808de335064d6483cfaf8548ba0b1b8769828ca8) )
+	ROM_LOAD16_BYTE( "pz-ja-6.20c", 0x000001, 0x020000, CRC(19210626) SHA1(d0d20dbe65cbe255f66526db6fc75d8c37d2a842) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )       // NEC78C10 Code
+	ROM_LOAD( "pz-ja-8.3i", 0x000000, 0x020000, CRC(fd492a57) SHA1(43699a4607d586827b771180fcd6581988173bed) )
+
+	ROM_REGION( 0x200000, "vdp2", 0 )   // Gfx + Data (Addressable by CPU & Blitter)
+	ROM_LOAD64_WORD( "pz-ja-2.14i", 0x000000, 0x080000, CRC(0c0997d4) SHA1(922d8553ef505f65238e5cc77b45861a80022d75) )
+	ROM_LOAD64_WORD( "pz-ja-4.18i", 0x000002, 0x080000, CRC(576bc5c2) SHA1(08c10e0a3356ee1f79b78eff92395d8b18e43485) )
+	ROM_LOAD64_WORD( "pz-ja-1.12i", 0x000004, 0x080000, CRC(29f01eb3) SHA1(1a56f0b8efb599ae4f3cd0a4f0b6a6152ea6b117) )
+	ROM_LOAD64_WORD( "pz-ja-3.16i", 0x000006, 0x080000, CRC(6753e282) SHA1(49d092543db34f2cb54697897790df12ca3eda74) )
+
+	ROM_REGION( 0x040000, "oki", 0 )    // Samples
+	ROM_LOAD( "pz-ja-7.3g", 0x000000, 0x040000, CRC(de285717) SHA1(040f999a640337716baa1c09ab0740f2d2ca09d2) )
+ROM_END
 
 /***************************************************************************
 
@@ -5692,7 +5707,8 @@ GAME( 1994, toride2j,  toride2g, toride2g,  toride2g,   metro_state, init_metro,
 GAME( 1994, gunmast,   0,        pururun,   gunmast,    metro_state, init_metro,    ROT0,   "Metro",                                           "Gun Master", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, daitorid,  0,        daitorid,  daitorid,   metro_state, init_metro,    ROT0,   "Metro",                                           "Daitoride", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, pururun,   0,        pururun,   pururun,    metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Pururun", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, puzzli,    0,        puzzli,    puzzli,     metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Puzzli",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, puzzli,    0,        puzzli,    puzzli,     metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Puzzli (revision B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, puzzlia,   puzzli,   puzzlia,   puzzli,     metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Puzzli (revision A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, 3kokushi,  0,        sankokushi,sankokushi, metro_state, init_karatour, ROT0,   "Mitchell",                                        "Sankokushi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // ? with additional gfx data scramble (probably MTR5260 based)

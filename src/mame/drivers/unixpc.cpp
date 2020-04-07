@@ -330,15 +330,15 @@ void unixpc_state::unixpc_mem(address_map &map)
 	map(0x470000, 0x470001).r(FUNC(unixpc_state::line_printer_r));
 	map(0x480000, 0x480001).w(FUNC(unixpc_state::rtc_w));
 	map(0x490000, 0x490001).select(0x7000).w(FUNC(unixpc_state::tcr_w));
-	map(0x4a0000, 0x4a0000).w("mreg", FUNC(output_latch_device::bus_w));
+	map(0x4a0000, 0x4a0000).w("mreg", FUNC(output_latch_device::write));
 	map(0x4d0000, 0x4d7fff).w(FUNC(unixpc_state::diskdma_ptr_w));
 	map(0x4e0001, 0x4e0001).w(FUNC(unixpc_state::disk_control_w)).cswidth(16);
-	map(0x4f0001, 0x4f0001).w("printlatch", FUNC(output_latch_device::bus_w));
+	map(0x4f0001, 0x4f0001).w("printlatch", FUNC(output_latch_device::write));
 	map(0xe00000, 0xe0000f).rw(m_hdc, FUNC(wd1010_device::read), FUNC(wd1010_device::write)).umask16(0x00ff);
 	map(0xe10000, 0xe10007).rw(m_wd2797, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write)).umask16(0x00ff);
 	map(0xe30000, 0xe30001).r(FUNC(unixpc_state::rtc_r));
 	map(0xe40000, 0xe40001).select(0x7000).w(FUNC(unixpc_state::gcr_w));
-	map(0xe50000, 0xe50007).rw("mpsc", FUNC(upd7201_new_device::cd_ba_r), FUNC(upd7201_new_device::cd_ba_w)).umask16(0x00ff);
+	map(0xe50000, 0xe50007).rw("mpsc", FUNC(upd7201_device::cd_ba_r), FUNC(upd7201_device::cd_ba_w)).umask16(0x00ff);
 	map(0xe70000, 0xe70003).rw("kbc", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 	map(0x800000, 0x803fff).mirror(0x7fc000).rom().region("bootrom", 0);
 }
@@ -420,7 +420,7 @@ void unixpc_state::unixpc(machine_config &config)
 	m_hdc->out_intrq_callback().set(FUNC(unixpc_state::wd1010_intrq_w));
 	HARDDISK(config, m_hdr0, 0);
 
-	upd7201_new_device &mpsc(UPD7201_NEW(config, "mpsc", 19.6608_MHz_XTAL / 8));
+	upd7201_device &mpsc(UPD7201(config, "mpsc", 19.6608_MHz_XTAL / 8));
 	mpsc.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	mpsc.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	mpsc.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -433,9 +433,9 @@ void unixpc_state::unixpc(machine_config &config)
 	//TC8250(config, "rtc", 32.768_kHz_XTAL);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set("mpsc", FUNC(upd7201_new_device::rxa_w));
-	rs232.dsr_handler().set("mpsc", FUNC(upd7201_new_device::dcda_w));
-	rs232.cts_handler().set("mpsc", FUNC(upd7201_new_device::ctsa_w));
+	rs232.rxd_handler().set("mpsc", FUNC(upd7201_device::rxa_w));
+	rs232.dsr_handler().set("mpsc", FUNC(upd7201_device::dcda_w));
+	rs232.cts_handler().set("mpsc", FUNC(upd7201_device::ctsa_w));
 
 	centronics_device &printer(CENTRONICS(config, "printer", centronics_devices, nullptr));
 	output_latch_device &printlatch(OUTPUT_LATCH(config, "printlatch"));

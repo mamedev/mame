@@ -75,13 +75,13 @@ protected:
 	virtual void update_audio_squelch() { set_audio_squelch((m_i8049_port1 & 0x40) || !(m_pia.portb & 0x01), (m_i8049_port1 & 0x40) || !(m_pia.portb & 0x02)); }
 
 	// internal read/write handlers
-	DECLARE_READ8_MEMBER( i8049_pia_r );
-	DECLARE_WRITE8_MEMBER( i8049_pia_w );
-	DECLARE_READ8_MEMBER( i8049_bus_r );
-	DECLARE_WRITE8_MEMBER( i8049_port1_w );
-	DECLARE_WRITE8_MEMBER( i8049_port2_w );
-	DECLARE_READ_LINE_MEMBER( i8049_t0_r );
-	DECLARE_READ_LINE_MEMBER( i8049_t1_r );
+	uint8_t i8049_pia_r(offs_t offset);
+	void i8049_pia_w(offs_t offset, uint8_t data);
+	uint8_t i8049_bus_r();
+	void i8049_port1_w(uint8_t data);
+	void i8049_port2_w(uint8_t data);
+	int i8049_t0_r();
+	int i8049_t1_r();
 
 	// pioneer PIA subclass
 	class pioneer_pia
@@ -176,10 +176,10 @@ protected:
 
 private:
 	// internal read/write handlers
-	DECLARE_READ8_MEMBER( i8748_data_r );
-	DECLARE_READ8_MEMBER( i8748_port2_r );
-	DECLARE_WRITE8_MEMBER( i8748_port2_w );
-	DECLARE_READ_LINE_MEMBER( i8748_t0_r );
+	uint8_t i8748_data_r();
+	uint8_t i8748_port2_r();
+	void i8748_port2_w(uint8_t data);
+	int i8748_t0_r();
 
 	void simutrek_portmap(address_map &map);
 

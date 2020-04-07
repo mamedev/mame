@@ -16,7 +16,7 @@
 #pragma once
 
 #include "isa.h"
-#include "machine/pc_fdc.h"
+#include "machine/upd765.h"
 #include "imagedev/floppy.h"
 
 /***************************************************************************
@@ -61,7 +61,8 @@ protected:
 
 	void set_interrupt(enum line_state line_state);
 
-	required_device<pc_fdc_interface> m_fdc;
+	required_device<upd765a_device> m_fdc;
+	optional_device_array<floppy_connector, 2> m_floppy;
 	required_ioport m_iobase;
 	required_ioport m_biosopts;
 
@@ -73,6 +74,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
+	void fd_moten_w(uint8_t data);
+	void fd_rate_w(uint8_t data);
+	void fd_extra_w(uint8_t data);
+	uint8_t fd_disk_chg_r();
+
+	void fdc_map(address_map &map);
 
 	uint16_t jumper;
 
@@ -104,6 +112,8 @@ private:
 	uint32_t alternate_track_address[2];
 
 	emu_timer *m_timer;
+
+	uint8_t m_moten;
 
 	bool m_installed;
 

@@ -137,7 +137,7 @@ protected:
 	required_shared_ptr<uint64_t> m_mainram;
 	required_device<sgi_mc_device> m_mem_ctrl;
 	required_device<wd33c93b_device> m_scsi_ctrl;
-	required_device<seeq8003_device> m_edlc;
+	required_device<seeq80c03_device> m_edlc;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<hal2_device> m_hal2;
 	required_device<hpc3_device> m_hpc3;
@@ -357,13 +357,6 @@ void ip24_state::ip24_base(machine_config &config)
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO0, &ip24_state::pio0_map);
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO1, &ip24_state::pio1_map);
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO2, &ip24_state::pio2_map);
-	m_hpc3->enet_rd_cb().set(m_edlc, FUNC(seeq8003_device::read));
-	m_hpc3->enet_wr_cb().set(m_edlc, FUNC(seeq8003_device::write));
-	m_hpc3->enet_rxrd_cb().set(m_edlc, FUNC(seeq8003_device::fifo_r));
-	m_hpc3->enet_txwr_cb().set(m_edlc, FUNC(seeq8003_device::fifo_w));
-	m_hpc3->enet_d8_rd_cb().set(m_edlc, FUNC(seeq8003_device::rxeof_r));
-	m_hpc3->enet_d8_wr_cb().set(m_edlc, FUNC(seeq8003_device::txeof_w));
-	m_hpc3->enet_reset_cb().set(m_edlc, FUNC(seeq8003_device::reset_w));
 	m_hpc3->enet_intr_out_cb().set(m_ioc2, FUNC(ioc2_device::enet_int_w));
 	m_hpc3->hd_rd_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::indir_r));
 	m_hpc3->hd_wr_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::indir_w));
@@ -379,12 +372,10 @@ void ip24_state::ip24_base(machine_config &config)
 	//m_hpc3->eeprom_pre_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::pre_write));
 	m_hpc3->dma_complete_int_cb().set(m_ioc2, FUNC(ioc2_device::hpc_dma_done_w));
 
-	SEEQ8003(config, m_edlc);
+	SEEQ80C03(config, m_edlc);
 	m_edlc->out_int_cb().set(m_hpc3, FUNC(hpc3_device::enet_intr_in_w));
 	m_edlc->out_rxrdy_cb().set(m_hpc3, FUNC(hpc3_device::enet_rxrdy_w));
-	m_edlc->out_txrdy_cb().set(m_hpc3, FUNC(hpc3_device::enet_txrdy_w));
-	//m_edlc->out_rxdc_cb().set(m_hpc3, FUNC(hpc3_device::enet_rxdc_w));
-	//m_edlc->out_txret_cb().set(m_hpc3, FUNC(hpc3_device::enet_txret_w));
+	m_hpc3->set_enet(m_edlc);
 
 	SGI_HAL2(config, m_hal2);
 	EEPROM_93C56_16BIT(config, m_eeprom);
@@ -413,9 +404,7 @@ void ip24_state::indy_5015(machine_config &config)
 {
 	ip24(config);
 
-	R4000(config, m_maincpu, 50000000*3);
-	//m_maincpu->set_icache_size(32768);
-	//m_maincpu->set_dcache_size(32768);
+	R5000(config, m_maincpu, 50000000*3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
 }
 
@@ -424,8 +413,6 @@ void ip24_state::indy_4613(machine_config &config)
 	ip24(config);
 
 	R4600(config, m_maincpu, 33333333*4);
-	//m_maincpu->set_icache_size(16384);
-	//m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
 }
 
@@ -434,8 +421,6 @@ void ip24_state::indy_4610(machine_config &config)
 	ip24(config);
 
 	R4600(config, m_maincpu, 33333333*3);
-	//m_maincpu->set_icache_size(16384);
-	//m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
 }
 
@@ -449,8 +434,6 @@ void ip22_state::wd33c93_2(device_t *device)
 void ip22_state::indigo2_4415(machine_config &config)
 {
 	R4400(config, m_maincpu, 50000000*3);
-	//m_maincpu->set_icache_size(32768);
-	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
 	ip24_base(config);
@@ -517,7 +500,7 @@ void ip22_state::indigo2_4415(machine_config &config)
  * 0d <- 00 High Const BRG = (CLK / (2 x Desired Rate x BR Clock period)) - 2
  * 0e <- 01 Mics: BRG enable
  * 03 <- c1 Receiver: as above + Receiver enable
- * 05 <- ea Transmitter: as above + Transmitetr enable
+ * 05 <- ea Transmitter: as above + Transmitter enable
  * 00 <- 10 Reset External/status IE
 */
 
@@ -547,5 +530,5 @@ ROM_END
 //    YEAR  NAME          PARENT     COMPAT  MACHINE       INPUT CLASS       INIT        COMPANY                 FULLNAME                   FLAGS
 COMP( 1993, indy_4610,    0,         0,      indy_4610,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 100MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_NODEVICE_MICROPHONE )
 COMP( 1993, indy_4613,    indy_4610, 0,      indy_4613,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 133MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_NODEVICE_MICROPHONE )
-COMP( 1996, indy_5015,    indy_4610, 0,      indy_5015,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R5000, 150MHz)",    MACHINE_NOT_WORKING )
+COMP( 1996, indy_5015,    indy_4610, 0,      indy_5015,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R5000, 150MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_NODEVICE_MICROPHONE )
 COMP( 1993, indigo2_4415, 0,         0,      indigo2_4415, ip24, ip22_state, empty_init, "Silicon Graphics Inc", "Indigo2 (R4400, 150MHz)", MACHINE_NOT_WORKING )

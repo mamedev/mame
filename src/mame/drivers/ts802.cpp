@@ -28,7 +28,7 @@
 #include "machine/terminal.h"
 #include "machine/z80dma.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 
 class ts802_state : public driver_device
@@ -94,7 +94,7 @@ void ts802_state::ts802_io(address_map &map)
 	map(0x0e, 0x0e).r(FUNC(ts802_state::port0e_r));
 	map(0x0f, 0x0f).r(FUNC(ts802_state::port0f_r));
 	// 10: Z80 DMA
-	map(0x10, 0x13).rw("dma", FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x10, 0x13).rw("dma", FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	// 14-17: WD 1793
 	map(0x14, 0x17).rw("fdc", FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	// 18: floppy misc.

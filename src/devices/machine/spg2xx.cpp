@@ -14,8 +14,9 @@
 #include "emu.h"
 #include "spg2xx.h"
 
-DEFINE_DEVICE_TYPE(SPG24X, spg24x_device, "spg24x", "SPG240-series System-on-a-Chip")
-DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-Chip")
+DEFINE_DEVICE_TYPE(SPG24X,     spg24x_device,     "spg24x", "SPG240-series System-on-a-Chip") // 256 sprites
+DEFINE_DEVICE_TYPE(SPG2XX_128, spg2xx_128_device, "spg2xx_128", "SPG2xx-series System-on-a-Chip (128 sprites)") // exact SPG part number unknown
+DEFINE_DEVICE_TYPE(SPG28X,     spg28x_device,     "spg28x", "SPG280-series System-on-a-Chip") // 64 sprites
 
 
 spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t sprite_limit, address_map_constructor internal) :
@@ -26,7 +27,6 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, co
 	m_spg_sysdma(*this, "spgsysdma"),
 	m_spg_video(*this, "spgvideo"),
 	m_sprite_limit(sprite_limit),
-	m_rowscrolloffset(15),
 	m_porta_out(*this),
 	m_portb_out(*this),
 	m_portc_out(*this),
@@ -39,6 +39,7 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, co
 	m_i2c_w(*this),
 	m_i2c_r(*this),
 	m_uart_tx(*this),
+	m_spi_tx(*this),
 	m_chip_sel(*this),
 	m_screen(*this, finder_base::DUMMY_TAG)
 {
@@ -49,8 +50,19 @@ spg24x_device::spg24x_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+spg24x_device::spg24x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t sprite_limit, address_map_constructor internal) :
+	spg2xx_device(mconfig, type, tag, owner, clock, sprite_limit, internal)
+{
+}
+
+
+spg2xx_128_device::spg2xx_128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	spg24x_device(mconfig, SPG2XX_128, tag, owner, clock, 128, address_map_constructor(FUNC(spg2xx_128_device::internal_map), this))
+{
+}
+
 spg28x_device::spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	spg2xx_device(mconfig, SPG28X, tag, owner, clock, 64, address_map_constructor(FUNC(spg28x_device::internal_map), this))
+	spg24x_device(mconfig, SPG28X, tag, owner, clock, 64, address_map_constructor(FUNC(spg28x_device::internal_map), this))
 {
 }
 
@@ -85,6 +97,7 @@ void spg2xx_device::device_start()
 	m_i2c_w.resolve_safe();
 	m_i2c_r.resolve_safe(0);
 	m_uart_tx.resolve_safe();
+	m_spi_tx.resolve_safe();
 	m_chip_sel.resolve_safe();
 
 	save_item(NAME(m_sprite_limit));
@@ -170,7 +183,8 @@ void spg2xx_device::configure_spg_io(spg2xx_io_device* io)
 	io->adc_in<1>().set(FUNC(spg2xx_device::adc_r<1>));
 	io->i2c_w().set(FUNC(spg2xx_device::eepromx_w));
 	io->i2c_r().set(FUNC(spg2xx_device::eepromx_r));
-	io->uart_tx().set(FUNC(spg2xx_device::tx_w));
+	io->uart_tx().set(FUNC(spg2xx_device::uart_tx_w));
+	io->spi_tx().set(FUNC(spg2xx_device::spi_tx_w));
 	io->chip_select().set(FUNC(spg2xx_device::cs_w));
 	io->pal_read_callback().set(FUNC(spg2xx_device::get_pal_ntsc));
 	io->write_timer_irq_callback().set(FUNC(spg2xx_device::timerirq_w));
@@ -200,31 +214,7 @@ void spg24x_device::device_add_mconfig(machine_config &config)
 
 	SPG24X_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
 	m_spg_video->sprlimit_read_callback().set(FUNC(spg24x_device::get_sprlimit));
-	m_spg_video->rowscrolloffset_read_callback().set(FUNC(spg24x_device::get_rowscrolloffset));
 	m_spg_video->write_video_irq_callback().set(FUNC(spg24x_device::videoirq_w));
-
-	configure_spg_io(m_spg_io);
-
-}
-
-void spg28x_device::device_add_mconfig(machine_config &config)
-{
-	SPG2XX_AUDIO(config, m_spg_audio, DERIVED_CLOCK(1, 1));
-	m_spg_audio->write_irq_callback().set(FUNC(spg28x_device::audioirq_w));
-	m_spg_audio->channel_irq_callback().set(FUNC(spg28x_device::audiochirq_w));
-	m_spg_audio->space_read_callback().set(FUNC(spg28x_device::space_r));
-
-	m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
-	m_spg_audio->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
-
-	SPG28X_IO(config, m_spg_io, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
-
-	SPG2XX_SYSDMA(config, m_spg_sysdma, DERIVED_CLOCK(1, 1), DEVICE_SELF);
-
-	SPG24X_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
-	m_spg_video->sprlimit_read_callback().set(FUNC(spg28x_device::get_sprlimit));
-	m_spg_video->rowscrolloffset_read_callback().set(FUNC(spg28x_device::get_rowscrolloffset));
-	m_spg_video->write_video_irq_callback().set(FUNC(spg28x_device::videoirq_w));
 
 	configure_spg_io(m_spg_io);
 }

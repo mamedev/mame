@@ -203,13 +203,13 @@ INPUT_PORTS_END
 TILE_GET_INFO_MEMBER(clpoker_state::get_bg_tile_info)
 {
 	u16 tileno = (m_videoram[tile_index] << 8) | m_videoram[tile_index + 0x0800];
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	tileinfo.set(0, tileno, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(clpoker_state::get_fg_tile_info)
 {
 	u16 tileno = (m_videoram[tile_index + 0x1000] << 8) | m_videoram[tile_index + 0x1800];
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	tileinfo.set(0, tileno, 0, 0);
 }
 
 WRITE8_MEMBER(clpoker_state::videoram_w)

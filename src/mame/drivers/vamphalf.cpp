@@ -78,14 +78,14 @@ public:
 	vamphalf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_wram(*this,"wram")
-		, m_wram32(*this,"wram32")
-		, m_okibank(*this,"okibank")
+		, m_wram(*this,  "wram")
+		, m_wram32(*this, "wram32")
+		, m_okibank(*this, "okibank")
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
 		, m_eeprom(*this, "eeprom")
 		, m_gfxdecode(*this, "gfxdecode")
-		, m_tiles(*this,"tiles", 0U)
+		, m_tiles(*this, "tiles", 0U)
 		, m_okiregion(*this, "oki%u", 1)
 		, m_photosensors(*this, "PHOTO_SENSORS")
 		, m_has_extra_gfx(false)
@@ -115,6 +115,7 @@ public:
 	void init_coolminii();
 	void init_mrdig();
 	void init_jmpbreak();
+	void init_jmpbreaka();
 	void init_poosho();
 	void init_newxpang();
 	void init_worldadv();
@@ -199,6 +200,7 @@ private:
 	DECLARE_READ16_MEMBER(dquizgo2_speedup_r);
 	DECLARE_READ32_MEMBER(aoh_speedup_r);
 	DECLARE_READ16_MEMBER(jmpbreak_speedup_r);
+	DECLARE_READ16_MEMBER(jmpbreaka_speedup_r);
 	DECLARE_READ16_MEMBER(poosho_speedup_r);
 	DECLARE_READ16_MEMBER(newxpang_speedup_r);
 	DECLARE_READ16_MEMBER(worldadv_speedup_r);
@@ -1656,6 +1658,24 @@ ROM_START( jmpbreak ) /* Released February 1999 */
 
 	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(1b6e3671) SHA1(bd601460387b56c989785ae03d5bb3c6cdb30a50) )
+ROM_END
+
+ROM_START( jmpbreaka ) // PCB has a New Impeuropex sticker, so sold in the Italian market. There also an hand-written IMP 28.04.99
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "2.rom1", 0x00000, 0x80000, CRC(553af133) SHA1(e2ae803e8f58426417093cc4b3784dee858f41ef) )
+	ROM_LOAD( "3.rom2", 0x80000, 0x80000, CRC(bd0a5eed) SHA1(9aaf83e4dcd4d02fb9b1c3156264c013a6873972) )
+
+	ROM_REGION( 0x800000, "gfx", 0 ) // these were not dumped for this set
+	ROM_LOAD32_WORD( "roml00.bin", 0x000000, 0x200000, BAD_DUMP CRC(4b99190a) SHA1(30af068f7d9f9f349db5696c19ab53ac33304271) )
+	ROM_LOAD32_WORD( "romu00.bin", 0x000002, 0x200000, BAD_DUMP CRC(e93762f8) SHA1(cc589b59e3ab7aa7092e96a1ff8a9de8a499b257) )
+	ROM_LOAD32_WORD( "roml01.bin", 0x400000, 0x200000, BAD_DUMP CRC(6796a104) SHA1(3f7352cd37f78c1b01f7df45344ee7800db110f9) )
+	ROM_LOAD32_WORD( "romu01.bin", 0x400002, 0x200000, BAD_DUMP CRC(0cc907c8) SHA1(86029eca0870f3b7dd4f1ee8093ccb09077cc00b) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )
+	ROM_LOAD( "1.vrom1", 0x00000, 0x40000, CRC(1b6e3671) SHA1(bd601460387b56c989785ae03d5bb3c6cdb30a50) )
+
+	ROM_REGION( 0x2dd, "plds", 0 )
+	ROM_LOAD( "palce22v10h.gal1", 0x000, 0x2dd, CRC(0ff86470) SHA1(0cc2bd2958c71d0bb58081a8f88327b09e92e2ea) )
 ROM_END
 
 ROM_START( poosho ) /* Released November 1999 - Updated sequel to Jumping Break for Korean market */
@@ -3169,6 +3189,19 @@ READ16_MEMBER(vamphalf_state::jmpbreak_speedup_r)
 	return m_wram[0x906f4 / 2];
 }
 
+READ16_MEMBER(vamphalf_state::jmpbreaka_speedup_r)
+{
+	if (m_maincpu->pc() == 0x909ac)
+	{
+		if (irq_active())
+			m_maincpu->spin_until_interrupt();
+		else
+			m_maincpu->eat_cycles(50);
+	}
+
+	return m_wram[0xe1dfc / 2];
+}
+
 READ16_MEMBER(vamphalf_state::poosho_speedup_r)
 {
 	if (m_maincpu->pc() == 0xa8c78)
@@ -3487,6 +3520,14 @@ void vamphalf_state::init_jmpbreak()
 	m_palshift = 0;
 }
 
+void vamphalf_state::init_jmpbreaka()
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00e1dfc, 0x00e1dfd, read16_delegate(*this, FUNC(vamphalf_state::jmpbreaka_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16smo_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
+
+	m_palshift = 0;
+}
+
 void vamphalf_state::init_mrdig()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0768, 0x0e0769, read16_delegate(*this, FUNC(vamphalf_state::mrdig_speedup_r)));
@@ -3532,7 +3573,8 @@ void vamphalf_state::init_boonggab()
 GAME( 1999, coolmini,   0,        coolmini,  common,   vamphalf_state,      init_coolmini,  ROT0,   "SemiCom",                       "Cool Minigame Collection", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, coolminii,  coolmini, coolmini,  common,   vamphalf_state,      init_coolminii, ROT0,   "SemiCom",                       "Cool Minigame Collection (Italy)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, jmpbreak,   0,        jmpbreak,  common,   vamphalf_state,      init_jmpbreak,  ROT0,   "F2 System",                     "Jumping Break" , MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jmpbreak,   0,        jmpbreak,  common,   vamphalf_state,      init_jmpbreak,  ROT0,   "F2 System",                     "Jumping Break (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jmpbreaka,  jmpbreak, jmpbreak,  common,   vamphalf_state,      init_jmpbreaka, ROT0,   "F2 System",                     "Jumping Break (set 2)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1999, poosho,     0,        jmpbreak,  common,   vamphalf_state,      init_poosho,    ROT0,   "F2 System",                     "Poosho Poosho" , MACHINE_SUPPORTS_SAVE )
 

@@ -455,7 +455,7 @@ TILE_GET_INFO_MEMBER(bionicc_state::get_tx_tile_info)
 	int attr = m_txvideoram[tile_index + 0x400];
 	int code = m_txvideoram[tile_index] & 0xff;
 
-	SET_TILE_INFO_MEMBER(0, ((attr & 0xc0) << 2) | code, attr & 0x3f, 0);
+	tileinfo.set(0, ((attr & 0xc0) << 2) | code, attr & 0x3f, 0);
 }
 
 TILE_GET_INFO_MEMBER(bionicc_state::get_fg_tile_info)
@@ -483,7 +483,7 @@ TILE_GET_INFO_MEMBER(bionicc_state::get_fg_tile_info)
 		flag = TILE_FLIPXY((attr & 0xc0) >> 6);
 	}
 
-	SET_TILE_INFO_MEMBER(2, ((attr & 0x07) << 8) | code, (attr & 0x18) >> 3, flag);
+	tileinfo.set(2, ((attr & 0x07) << 8) | code, (attr & 0x18) >> 3, flag);
 }
 
 TILE_GET_INFO_MEMBER(bionicc_state::get_bg_tile_info)
@@ -497,7 +497,7 @@ TILE_GET_INFO_MEMBER(bionicc_state::get_bg_tile_info)
 	int code = m_bgvideoram[2 * tile_index] & 0xff;
 	int flag = TILE_FLIPXY((attr & 0xc0) >> 6);
 
-	SET_TILE_INFO_MEMBER(1, ((attr & 0x07) << 8) | code, (attr & 0x38) >> 3, flag);
+	tileinfo.set(1, ((attr & 0x07) << 8) | code, (attr & 0x38) >> 3, flag);
 }
 
 

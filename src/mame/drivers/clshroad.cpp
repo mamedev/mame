@@ -23,6 +23,13 @@ TODO:
   text layer is not correctly emulated, fixed by initializing VRAM to 0xf0? (that layer seems unused by this game);
 - firebatl: bad sprite colors;
 - firebatl: remove ROM patch;
+- firebatl: reads $6000-$6002 and $6100 at POST, and in the range $6100-$61ff before every start
+  of gameplay/after player dies.
+  Currently 0-filled in ROM loading:
+  - $6100 is actually OR-ed with the coinage work RAM buffer setting at $8022;
+  - $6124 is shifted right once at PC=0x5df and stored to $82e6, which is later checked at PC=0x187 and must
+    be $01 otherwise game goes into an infinite loop after dying (without ROM patch);
+  - (more ...)
 
 ***************************************************************************/
 
@@ -181,6 +188,8 @@ static INPUT_PORTS_START( firebatl )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW1")
+	// TODO: unconventional default/structure, may or may not be modified by contents of $6000-$7fff
+	// read at $8304
 	PORT_DIPNAME( 0x7f, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2,3,4,5,6,7")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
@@ -189,7 +198,7 @@ static INPUT_PORTS_START( firebatl )
 	PORT_DIPSETTING(    0x0f, "5" )
 	PORT_DIPSETTING(    0x1f, "6" )
 	PORT_DIPSETTING(    0x3f, "7" )
-	PORT_DIPSETTING(    0x7f, "Infinite Lives" )
+	PORT_DIPSETTING(    0x7f, "255" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
 
 	PORT_START("DSW2")
@@ -557,17 +566,13 @@ ROM_END
 
 void clshroad_state::init_firebatl()
 {
-	// applying HACK to fix the game
-	// without this the death sequence never ends so the game is unplayable after you
-	// die once, it would be nice to avoid the hack however
+	// cfr. notes at top
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	ROM[0x05C6] = 0xc3;
-	ROM[0x05C7] = 0x8d;
-	ROM[0x05C8] = 0x23;
+	ROM[0x6124] = 0x02;
 }
 
-GAME( 1984, firebatl,  0,        firebatl, firebatl, clshroad_state, init_firebatl, ROT90, "Woodplace Inc. (Taito license)",             "Fire Battle",                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, firebatl,  0,        firebatl, firebatl, clshroad_state, init_firebatl, ROT90, "Woodplace Inc. (Taito license)",             "Fire Battle",                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, clshroad,  0,        clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Woodplace Inc.",                             "Clash-Road",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1986, clshroads, clshroad, clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Woodplace Inc. (Status Game Corp. license)", "Clash-Road (Status license)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1986, clshroadd, clshroad, clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Woodplace Inc. (Data East license)",         "Clash-Road (Data East license)", MACHINE_SUPPORTS_SAVE )

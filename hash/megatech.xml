@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
     This list should be kept up to date with any changes made
     to drivers/megatech.c
 

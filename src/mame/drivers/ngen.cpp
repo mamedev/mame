@@ -75,7 +75,7 @@
 #include "machine/pit8253.h"
 #include "machine/wd2010.h"
 #include "machine/wd_fdc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "video/mc6845.h"
 #include "screen.h"
 
@@ -978,13 +978,13 @@ void ngen_state::ngen(machine_config &config)
 	rs232a.rxd_handler().set(m_iouart, FUNC(upd7201_device::rxa_w));
 	rs232a.cts_handler().set(m_iouart, FUNC(upd7201_device::ctsa_w));
 	rs232a.dcd_handler().set(m_iouart, FUNC(upd7201_device::dcda_w));
-	rs232a.ri_handler().set(m_iouart, FUNC(upd7201_device::ria_w));
+	rs232a.ri_handler().set(m_iouart, FUNC(upd7201_device::synca_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, "rs232_b", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_iouart, FUNC(upd7201_device::rxb_w));
 	rs232b.cts_handler().set(m_iouart, FUNC(upd7201_device::ctsb_w));
 	rs232b.dcd_handler().set(m_iouart, FUNC(upd7201_device::dcdb_w));
-	rs232b.ri_handler().set(m_iouart, FUNC(upd7201_device::rib_w));
+	rs232b.ri_handler().set(m_iouart, FUNC(upd7201_device::syncb_w));
 
 	// TODO: SCN2652 MPCC (not implemented), used for RS-422 cluster communications?
 
@@ -1091,13 +1091,13 @@ void ngen386_state::ngen386(machine_config &config)
 	rs232a.rxd_handler().set(m_iouart, FUNC(upd7201_device::rxa_w));
 	rs232a.cts_handler().set(m_iouart, FUNC(upd7201_device::ctsa_w));
 	rs232a.dcd_handler().set(m_iouart, FUNC(upd7201_device::dcda_w));
-	rs232a.ri_handler().set(m_iouart, FUNC(upd7201_device::ria_w));
+	rs232a.ri_handler().set(m_iouart, FUNC(upd7201_device::synca_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, "rs232_b", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_iouart, FUNC(upd7201_device::rxb_w));
 	rs232b.cts_handler().set(m_iouart, FUNC(upd7201_device::ctsb_w));
 	rs232b.dcd_handler().set(m_iouart, FUNC(upd7201_device::dcdb_w));
-	rs232b.ri_handler().set(m_iouart, FUNC(upd7201_device::rib_w));
+	rs232b.ri_handler().set(m_iouart, FUNC(upd7201_device::syncb_w));
 
 	// TODO: SCN2652 MPCC (not implemented), used for RS-422 cluster communications?
 

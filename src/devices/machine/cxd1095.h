@@ -65,8 +65,8 @@ public:
 	auto out_porte_cb() { return out_port_cb<4>(); }
 
 	// memory handlers
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides

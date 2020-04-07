@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(gsword_state_base::get_bg_tile_info)
 	int color = ((code & 0x3c0) >> 6) + 16 * m_charpalbank;
 	int flags = m_flipscreen ? (TILE_FLIPX | TILE_FLIPY) : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 void gsword_state_base::video_start()

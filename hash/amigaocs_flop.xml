@@ -1,13 +1,14 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- General purpose software list for Amiga software with a MINIMUM requirement of the OCS chipset (A500 / A1000)
+    General purpose software list for Amiga software with a MINIMUM requirement of the OCS chipset (A500 / A1000)
     This is the original Amiga chipset, not all games are 100% forward compatible, but that will be marked later
     Some games benefit from, or require RAM expansions, this will also be marked later.
 
     Anything requiring a minimum of the ECS or AGA chipsets has been moved to separate lists
--->
-<!--
+
     Most images for the initial import are from SPS / CAPS collections
 
     todo (SPS):
@@ -30,9 +31,8 @@
     - add Utilities (separate lists?)
     - add list to document various Amiga viruses (maybe, if I'm feeling perverted)
 
--->
 
-<!-- Virus Warning
+    Virus Warning
 
     The following original discs were mastered with viruses on them
     ref: http://eab.abime.net/showthread.php?t=65171
@@ -146,6 +146,24 @@
 			<feature name="part_id" value="Disk 3 (Super Cars)" />
 			<dataarea name="flop" size="996934">
 				<rom name="(sps1523)supercars.ipf" size="996934" crc="3bcbd970" sha1="1cc0da02c0fd17fcc4b0484b11bc784ecd0e3a7d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="16bitkomix" supported="no">
+		<description>16 Bit Komix (Euro)</description>
+		<year>1991</year>
+		<publisher>Codemasters</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 (Treasure Island Dizzy, Pro Tennis Simulator, Mig-29)" />
+			<dataarea name="flop" size="2150251">
+				<rom name="komix1.mfm" size="2150251" crc="62b63967" sha1="d35c830e6e2ca75b1aa51116f55ff3a269350923"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 (BMX Simulator)" />
+			<dataarea name="flop" size="2150243">
+				<rom name="komix2.mfm" size="2150243" crc="f2802691" sha1="944e39e2c3e325590f038cd4d778fa19c419f0ab"/>
 			</dataarea>
 		</part>
 	</software>

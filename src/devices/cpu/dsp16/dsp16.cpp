@@ -363,7 +363,7 @@ void dsp16_device_base::device_reset()
 		m_ose_cb(m_ose_out = 1U);
 
 	// PIO reset outputs
-	m_pdb_w_cb(machine().dummy_space(), m_psel_out, 0xffffU, 0x0000U);
+	m_pdb_w_cb(m_psel_out, 0xffffU, 0x0000U);
 	if (!m_pids_out)
 	{
 		LOGPIO("DSP16: de-asserting PIDS for reset\n");
@@ -1537,7 +1537,7 @@ inline void dsp16_device_base::pio_step()
 		if (!--m_pio_pids_cnt)
 		{
 			if (!m_pio_r_cb.isnull())
-				m_pio_pdx_in = m_pio_r_cb(machine().dummy_space(), m_psel_out, 0xffffU);
+				m_pio_pdx_in = m_pio_r_cb(m_psel_out, 0xffffU);
 			m_pids_cb(m_pids_out = 1U);
 			LOGPIO("DSP16: PIO read active edge PSEL = %u, PDX = %04X (PC = %04X)\n", m_psel_out, m_pio_pdx_in, m_st_pcbase);
 		}
@@ -1555,9 +1555,9 @@ inline void dsp16_device_base::pio_step()
 		{
 			LOGPIO("DSP16: PIO write active edge PSEL = %u, PDX = %04X (PC = %04X)\n", m_psel_out, m_pio_pdx_out, m_st_pcbase);
 			m_pods_cb(1U);
-			m_pio_w_cb(machine().dummy_space(), m_psel_out, m_pio_pdx_out, 0xffffU);
+			m_pio_w_cb(m_psel_out, m_pio_pdx_out, 0xffffU);
 			m_pods_out = 1U;
-			m_pdb_w_cb(machine().dummy_space(), m_psel_out, 0xffffU, 0x0000U);
+			m_pdb_w_cb(m_psel_out, 0xffffU, 0x0000U);
 		}
 	}
 	else
@@ -2003,7 +2003,7 @@ void dsp16_device_base::pio_pioc_write(u16 value)
 		if (!m_pods_out)
 		{
 			m_pods_cb(m_pods_out = 1U); // actually high-impedance
-			m_pdb_w_cb(machine().dummy_space(), m_psel_out, 0xffffU, 0x0000U);
+			m_pdb_w_cb(m_psel_out, 0xffffU, 0x0000U);
 		}
 	}
 }
@@ -2066,7 +2066,7 @@ void dsp16_device_base::pio_pdx_write(u16 sel, u16 value)
 		{
 			assert(m_pods_out);
 			m_pods_cb(m_pods_out = 0U);
-			m_pdb_w_cb(machine().dummy_space(), sel, value, 0xffffU);
+			m_pdb_w_cb(sel, value, 0xffffU);
 		}
 		m_pio_pods_cnt = pio_strobe() + 1; // decremented this cycle
 	}

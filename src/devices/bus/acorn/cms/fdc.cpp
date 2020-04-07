@@ -24,7 +24,8 @@ DEFINE_DEVICE_TYPE(CMS_FDC, cms_fdc_device, "cms_fdc", "CMS Floppy Disc Controll
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER(cms_fdc_device::floppy_formats )
-	FLOPPY_ACORN_SSD_FORMAT
+	FLOPPY_ACORN_SSD_FORMAT,
+	FLOPPY_ACORN_DSD_FORMAT
 FLOPPY_FORMATS_END
 
 static void cms_floppies(device_slot_interface &device)
@@ -39,14 +40,9 @@ static void cms_floppies(device_slot_interface &device)
 void cms_fdc_device::device_add_mconfig(machine_config &config)
 {
 	WD1770(config, m_fdc, 8_MHz_XTAL);
-	//m_fdc->intrq_wr_callback().set(FUNC(cms_fdc_device::bus_irq_w));
-	//m_fdc->drq_wr_callback().set(FUNC(cms_fdc_device::bus_nmi_w));
-	FLOPPY_CONNECTOR(config, m_floppy[0], cms_floppies, "35dd", floppy_formats);
-	m_floppy[0]->enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[1], cms_floppies, "35dd", floppy_formats);
-	m_floppy[1]->enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[2], cms_floppies, nullptr, floppy_formats);
-	m_floppy[2]->enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], cms_floppies, "35dd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], cms_floppies, "35dd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], cms_floppies, nullptr, floppy_formats).enable_sound(true);
 }
 
 
@@ -90,14 +86,13 @@ READ8_MEMBER(cms_fdc_device::wd1770_state_r)
 
 	data |= m_fdc->intrq_r() << 6;
 	data |= m_fdc->drq_r() << 7;
-	logerror("floppy state %02x\n", data);
+
 	return data;
 }
 
 WRITE8_MEMBER(cms_fdc_device::wd1770_control_w)
 {
 	floppy_image_device *floppy = nullptr;
-	logerror("floppy control %02x\n", data);
 
 	// bit 0, 1, 2: drive select
 	if (BIT(data, 0)) floppy = m_floppy[0]->get_device();
@@ -111,14 +106,4 @@ WRITE8_MEMBER(cms_fdc_device::wd1770_control_w)
 
 	// bit 7: density ??
 	m_fdc->dden_w(BIT(data, 7));
-}
-
-WRITE_LINE_MEMBER(cms_fdc_device::bus_nmi_w)
-{
-	m_bus->nmi_w(state);
-}
-
-WRITE_LINE_MEMBER(cms_fdc_device::bus_irq_w)
-{
-	m_bus->irq_w(state);
 }

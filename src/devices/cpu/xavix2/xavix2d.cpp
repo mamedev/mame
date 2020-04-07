@@ -86,6 +86,15 @@ std::string xavix2_disassembler::val14sa()
 		return util::string_format("%04x", r);
 }
 
+std::string xavix2_disassembler::val11s()
+{
+	u16 r = (m_opcode >> 8) & 0x7ff;
+	if(r & 0x400)
+		return util::string_format("-%03x", 0x800 - r);
+	else
+		return util::string_format("%03x", r);
+}
+
 std::string xavix2_disassembler::val11u()
 {
 	return util::string_format("%03x", (m_opcode >> 8) & 0x7ff);
@@ -214,9 +223,9 @@ offs_t xavix2_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	case 0x1c: case 0x1d: util::stream_format(stream, "(%s%s).w = %s", r2(), off19s(), r1()); break;
 	case 0x1e: case 0x1f: util::stream_format(stream, "(%s%s).l = %s", r2(), off19s(), r1()); break;
 
-	case 0x20: case 0x21: util::stream_format(stream, "%s += %s", r1(), val14s()); break;
+	case 0x20: case 0x21: util::stream_format(stream, "%s = %s + %s", r1(), r2(), val11s()); break;
 	case 0x22: case 0x23: util::stream_format(stream, "%s = %s", r1(), val14h()); break;
-	case 0x24: case 0x25: util::stream_format(stream, "%s -= %s", r1(), val14s()); break;
+	case 0x24: case 0x25: util::stream_format(stream, "%s = %s - %s", r1(), r2(), val11s()); break;
 	case 0x26: case 0x27: util::stream_format(stream, "cmp %s, %s", r1(), val14s()); break;
 	case 0x28:            util::stream_format(stream, "bra %s", rel16()); break;
 	case 0x29:            util::stream_format(stream, "bsr %s", rel16()); flags = STEP_OVER; break;
@@ -311,17 +320,17 @@ offs_t xavix2_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		// cc-cf
 
 	case 0xd0:            util::stream_format(stream, "bvs %s", rel8()); break;
-	case 0xd1:            util::stream_format(stream, "bleu %s", rel8()); break;
+	case 0xd1:            util::stream_format(stream, "bltu %s", rel8()); break;
 	case 0xd2:            util::stream_format(stream, "beq %s", rel8()); break;
-	case 0xd3:            util::stream_format(stream, "bltu %s", rel8()); break;
+	case 0xd3:            util::stream_format(stream, "bleu %s", rel8()); break;
 	case 0xd4:            util::stream_format(stream, "bmi %s", rel8()); break;
 	case 0xd5:            util::stream_format(stream, "bra %s", rel8()); break;
 	case 0xd6:            util::stream_format(stream, "blts %s", rel8()); break;
 	case 0xd7:            util::stream_format(stream, "bles %s", rel8()); break;
 	case 0xd8:            util::stream_format(stream, "bvc %s", rel8()); break;
-	case 0xd9:            util::stream_format(stream, "bgtu %s", rel8()); break;
+	case 0xd9:            util::stream_format(stream, "bgeu %s", rel8()); break;
 	case 0xda:            util::stream_format(stream, "bne %s", rel8()); break;
-	case 0xdb:            util::stream_format(stream, "bgeu %s", rel8()); break;
+	case 0xdb:            util::stream_format(stream, "bgtu %s", rel8()); break;
 	case 0xdc:            util::stream_format(stream, "bpl %s", rel8()); break;
 	case 0xdd:            util::stream_format(stream, "bnv %s", rel8()); break;
 	case 0xde:            util::stream_format(stream, "bges %s", rel8()); break;
@@ -331,7 +340,16 @@ offs_t xavix2_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	case 0xe1:            util::stream_format(stream, "rti1"); flags = STEP_OUT; break;
 	case 0xe2:            util::stream_format(stream, "rti2"); flags = STEP_OUT; break;
 	case 0xe3:            util::stream_format(stream, "rti3"); flags = STEP_OUT; break;
-		// e4-fb
+		// e4-ef
+
+	case 0xf0:            util::stream_format(stream, "stc"); break;
+	case 0xf1:            util::stream_format(stream, "clc"); break;
+	case 0xf2:            util::stream_format(stream, "stz"); break;
+	case 0xf3:            util::stream_format(stream, "clz"); break;
+	case 0xf4:            util::stream_format(stream, "stn"); break;
+	case 0xf5:            util::stream_format(stream, "cln"); break;
+	case 0xf6:            util::stream_format(stream, "stv"); break;
+	case 0xf7:            util::stream_format(stream, "clv"); break;
 	case 0xf8:            util::stream_format(stream, "di"); break;
 	case 0xf9:            util::stream_format(stream, "ei"); break;
 		// fa-fb
@@ -339,7 +357,7 @@ offs_t xavix2_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		// fd
 	case 0xfe:            util::stream_format(stream, "wait"); break;
 		// ff
-	default:	          util::stream_format(stream, "?%02x", m_opcode >> 24);
+	default:              util::stream_format(stream, "?%02x", m_opcode >> 24);
 	}
 
 	return nb | flags | SUPPORTED;

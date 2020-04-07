@@ -398,7 +398,7 @@ namespace netlist
 		// get family
 		const logic_family_desc_t *family_from_model(const pstring &model);
 
-		void register_dynamic_log_devices();
+		void register_dynamic_log_devices(const std::vector<pstring> &loglist);
 		void resolve_inputs();
 
 		plib::psource_t::stream_ptr get_data_stream(const pstring &name);

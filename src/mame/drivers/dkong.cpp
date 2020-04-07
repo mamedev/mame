@@ -454,7 +454,7 @@ WRITE8_MEMBER(dkong_state::memory_write_byte)
 WRITE_LINE_MEMBER(dkong_state::s2650_interrupt)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03); // Z80
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 /*************************************
@@ -876,7 +876,7 @@ void dkong_state::dkong3_map(address_map &map)
 void dkong_state::dkong3_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(m_z80dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));  /* dma controller */
+	map(0x00, 0x00).rw(m_z80dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));  /* dma controller */
 }
 
 /* Epos conversions */
@@ -1869,6 +1869,7 @@ void dkong_state::s2650(machine_config &config)
 	s2650.set_addrmap(AS_DATA, &dkong_state::s2650_data_map);
 	s2650.sense_handler().set("screen", FUNC(screen_device::vblank));
 	s2650.flag_handler().set(FUNC(dkong_state::s2650_fo_w));
+	s2650.intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
 	m_screen->screen_vblank().set(FUNC(dkong_state::s2650_interrupt));
 

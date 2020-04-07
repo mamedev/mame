@@ -143,12 +143,12 @@ void tiamc1_state::tiamc1_palette(palette_device &palette)
 
 TILE_GET_INFO_MEMBER(tiamc1_state::get_bg1_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index], 0, 0);
+	tileinfo.set(0, m_tileram[tile_index], 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(tiamc1_state::get_bg2_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index + 1024], 0, 0);
+	tileinfo.set(0, m_tileram[tile_index + 1024], 0, 0);
 }
 
 void tiamc1_state::video_start()

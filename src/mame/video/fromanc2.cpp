@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_tile_info)
 	int tile  = (m_videoram[VRAM][Layer][tile_index] & 0x3fff) | (m_gfxbank[VRAM][Layer] << 14);
 	int color = (m_videoram[VRAM][Layer][tile_index] & 0xc000) >> 14;
 
-	SET_TILE_INFO_MEMBER(Layer, tile, color, 0);
+	tileinfo.set(Layer, tile, color, 0);
 }
 
 template<int VRAM, int Layer>
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_tile_info)
 {
 	int tile = m_videoram[VRAM][Layer][tile_index] | (m_gfxbank[VRAM][Layer] << 16);
 
-	SET_TILE_INFO_MEMBER(Layer, tile, 0, 0);
+	tileinfo.set(Layer, tile, 0, 0);
 }
 
 

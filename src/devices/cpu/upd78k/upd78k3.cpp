@@ -12,7 +12,8 @@
 #include "upd78k3.h"
 #include "upd78k3d.h"
 
-// device type definition
+// device type definitions
+DEFINE_DEVICE_TYPE(UPD78310, upd78310_device, "upd78310", "NEC uPD78310")
 DEFINE_DEVICE_TYPE(UPD78312, upd78312_device, "upd78312", "NEC uPD78312")
 
 //**************************************************************************
@@ -30,6 +31,7 @@ upd78k3_device::upd78k3_device(const machine_config &mconfig, device_type type, 
 	, m_sfr_config("SFR", ENDIANNESS_LITTLE, 16, 8, 0, sfr_map)
 	, m_program_space(nullptr)
 	, m_program_cache(nullptr)
+	, m_iram(*this, "iram")
 	, m_iram_cache(nullptr)
 	, m_sfr_space(nullptr)
 	, m_pc(0)
@@ -48,6 +50,32 @@ upd78k3_device::upd78k3_device(const machine_config &mconfig, device_type type, 
 void upd78k3_device::iram_map(address_map &map)
 {
 	map(0x00, 0xff).ram().share("iram");
+}
+
+
+//-------------------------------------------------
+//  iram_byte_r - read one byte from IRAM
+//-------------------------------------------------
+
+u8 upd78k3_device::iram_byte_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return (m_iram[offset >> 1] & 0xff00) >> 8;
+	else
+		return m_iram[offset >> 1] & 0x00ff;
+}
+
+
+//-------------------------------------------------
+//  iram_byte_w - write one byte to IRAM
+//-------------------------------------------------
+
+void upd78k3_device::iram_byte_w(offs_t offset, u8 data)
+{
+	if (BIT(offset, 0))
+		m_iram[offset >> 1] = (m_iram[offset >> 1] & 0x00ff) | u16(data) << 8;
+	else
+		m_iram[offset >> 1] = (m_iram[offset >> 1] & 0xff00) | data;
 }
 
 
@@ -121,42 +149,41 @@ void upd78k3_device::device_start()
 		[this](u8 data) { m_psw = (m_psw & 0x8fff) | u16(data) << 12; }
 	).mask(7).noshow();
 	state_add(UPD78K3_SP, "SP", m_sp);
-	void *iram = memshare("iram")->ptr();
 	for (int n = 0; n < 4; n++)
 		state_add<u16>(UPD78K3_RP0 + n, string_format("RP%d", n).c_str(),
-			[this, iram, n]() { return static_cast<u16 *>(iram)[register_base() >> 1 | n]; },
-			[this, iram, n](u16 data) { static_cast<u16 *>(iram)[register_base() >> 1 | n] = data; }
+			[this, n]() { return m_iram[register_base() >> 1 | n]; },
+			[this, n](u16 data) { m_iram[register_base() >> 1 | n] = data; }
 		).formatstr("%9s");
 	for (int n = 0; n < 2; n++)
 		state_add<u16>(UPD78K3_AX + n, std::array<const char *, 2>{{"AX", "BC"}}[n],
-			[this, iram, n]() { return static_cast<u16 *>(iram)[register_base() >> 1 | (m_psw & 0x0020) >> 4 | n]; },
-			[this, iram, n](u16 data) { static_cast<u16 *>(iram)[register_base() >> 1 | (m_psw & 0x0020) >> 4 | n] = data; }
+			[this, n]() { return m_iram[register_base() >> 1 | (m_psw & 0x0020) >> 4 | n]; },
+			[this, n](u16 data) { m_iram[register_base() >> 1 | (m_psw & 0x0020) >> 4 | n] = data; }
 		).noshow();
 	for (int n = 0; n < 4; n++)
 	{
 		state_add<u16>(UPD78K3_VP + n, std::array<const char *, 4>{{"VP", "UP", "DE", "HL"}}[n],
-			[this, iram, n]() { return static_cast<u16 *>(iram)[register_base() >> 1 | 0x04 | n]; },
-			[this, iram, n](u16 data) { static_cast<u16 *>(iram)[register_base() >> 1 | 0x04 | n] = data; }
+			[this, n]() { return m_iram[register_base() >> 1 | 0x04 | n]; },
+			[this, n](u16 data) { m_iram[register_base() >> 1 | 0x04 | n] = data; }
 		);
 		state_add<u16>(UPD78K3_RP4 + n, string_format("RP%d", 4 + n).c_str(),
-			[this, iram, n]() { return static_cast<u16 *>(iram)[register_base() >> 1 | 0x04 | n]; },
-			[this, iram, n](u16 data) { static_cast<u16 *>(iram)[register_base() >> 1 | 0x04 | n] = data; }
+			[this, n]() { return m_iram[register_base() >> 1 | 0x04 | n]; },
+			[this, n](u16 data) { m_iram[register_base() >> 1 | 0x04 | n] = data; }
 		).noshow();
 	}
 	for (int n = 0; n < 16; n++)
 		state_add<u8>(UPD78K3_R0 + n, string_format("R%d", n).c_str(),
-			[this, iram, n]() { return static_cast<u8 *>(iram)[BYTE_XOR_LE(register_base() | n)]; },
-			[this, iram, n](u8 data) { static_cast<u8 *>(iram)[BYTE_XOR_LE(register_base() | n)] = data; }
+			[this, n]() { return iram_byte_r(register_base() | n); },
+			[this, n](u8 data) { iram_byte_w(register_base() | n, data); }
 		).noshow();
 	for (int n = 0; n < 4; n++)
 		state_add<u8>(UPD78K3_X + n, std::array<const char *, 4>{{"X", "A", "C", "B"}}[n],
-			[this, iram, n]() { return static_cast<u8 *>(iram)[BYTE_XOR_LE(register_base() | (m_psw & 0x0020) >> 3 | n)]; },
-			[this, iram, n](u8 data) { static_cast<u8 *>(iram)[BYTE_XOR_LE(register_base() | (m_psw & 0x0020) >> 3 | n)] = data; }
+			[this, n]() { return iram_byte_r(register_base() | (m_psw & 0x0020) >> 3 | n); },
+			[this, n](u8 data) { iram_byte_w(register_base() | (m_psw & 0x0020) >> 3 | n, data); }
 		).noshow();
 	for (int n = 0; n < 8; n++)
 		state_add<u8>(UPD78K3_VPL + n, std::array<const char *, 8>{{"VPL", "VPH", "UPL", "UPH", "E", "D", "L", "H"}}[n],
-			[this, iram, n]() { return static_cast<u8 *>(iram)[BYTE_XOR_LE(register_base() | 0x08 | n)]; },
-			[this, iram, n](u8 data) { static_cast<u8 *>(iram)[BYTE_XOR_LE(register_base() | 0x08 | n)] = data; }
+			[this, n]() { return iram_byte_r(register_base() | 0x08 | n); },
+			[this, n](u8 data) { iram_byte_w(register_base() | 0x08 | n, data); }
 		).noshow();
 
 	// save state
@@ -214,39 +241,21 @@ void upd78k3_device::state_string_export(const device_state_entry &entry, std::s
 				BIT(m_psw, 0) ? 'C' : '.');
 		break;
 
-#if 0 // doesn't compile because value() is protected
 	case UPD78K3_RP0:
-		str = string_format("%04X %s", entry.value(), BIT(m_psw, 5) ? "    " : "(AX)");
+		str = string_format("%04X %s", m_iram[register_base() >> 1], BIT(m_psw, 5) ? "    " : "(AX)");
 		break;
 
 	case UPD78K3_RP1:
-		str = string_format("%04X %s", entry.value(), BIT(m_psw, 5) ? "    " : "(BC)");
+		str = string_format("%04X %s", m_iram[register_base() >> 1 | 1], BIT(m_psw, 5) ? "    " : "(BC)");
 		break;
 
 	case UPD78K3_RP2:
-		str = string_format("%04X %s", entry.value(), BIT(m_psw, 5) ? "(AX)" : "    ");
+		str = string_format("%04X %s", m_iram[register_base() >> 1 | 2], BIT(m_psw, 5) ? "(AX)" : "    ");
 		break;
 
 	case UPD78K3_RP3:
-		str = string_format("%04X %s", entry.value(), BIT(m_psw, 5) ? "(BC)" : "    ");
+		str = string_format("%04X %s", m_iram[register_base() >> 1 | 3], BIT(m_psw, 5) ? "(BC)" : "    ");
 		break;
-#else // nasty and inefficient workaround
-	case UPD78K3_RP0:
-		str = string_format("%04X %s", const_cast<upd78k3_device &>(*this).state_int(UPD78K3_RP0), BIT(m_psw, 5) ? "    " : "(AX)");
-		break;
-
-	case UPD78K3_RP1:
-		str = string_format("%04X %s", const_cast<upd78k3_device &>(*this).state_int(UPD78K3_RP1), BIT(m_psw, 5) ? "    " : "(BC)");
-		break;
-
-	case UPD78K3_RP2:
-		str = string_format("%04X %s", const_cast<upd78k3_device &>(*this).state_int(UPD78K3_RP2), BIT(m_psw, 5) ? "(AX)" : "    ");
-		break;
-
-	case UPD78K3_RP3:
-		str = string_format("%04X %s", const_cast<upd78k3_device &>(*this).state_int(UPD78K3_RP3), BIT(m_psw, 5) ? "(BC)" : "    ");
-		break;
-#endif
 	}
 }
 
@@ -260,9 +269,23 @@ void upd78k3_device::state_string_export(const device_state_entry &entry, std::s
 //-------------------------------------------------
 
 upd78312_device::upd78312_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: upd78k3_device(mconfig, UPD78312, tag, owner, clock,
-						address_map_constructor(FUNC(upd78312_device::mem_map), this),
+	: upd78312_device(mconfig, UPD78312, tag, owner, clock, address_map_constructor(FUNC(upd78312_device::mem_map), this))
+{
+}
+
+upd78312_device::upd78312_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map)
+	: upd78k3_device(mconfig, type, tag, owner, clock, map,
 						address_map_constructor(FUNC(upd78312_device::sfr_map), this))
+{
+}
+
+
+//-------------------------------------------------
+//  upd78310_device - constructor
+//-------------------------------------------------
+
+upd78310_device::upd78310_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: upd78312_device(mconfig, UPD78310, tag, owner, clock, address_map_constructor())
 {
 }
 
@@ -285,6 +308,7 @@ std::unique_ptr<util::disasm_interface> upd78312_device::create_disassembler()
 void upd78312_device::mem_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region(DEVICE_SELF, 0); // 8K mask ROM
+	map(0xfe00, 0xfeff).rw(FUNC(upd78312_device::iram_byte_r), FUNC(upd78312_device::iram_byte_w));
 }
 
 

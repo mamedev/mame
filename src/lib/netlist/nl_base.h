@@ -28,6 +28,7 @@
 #include "nl_errstr.h"
 #include "nltypes.h"
 
+#include <initializer_list>
 #include <unordered_map>
 #include <vector>
 
@@ -86,7 +87,7 @@ class NETLIB_NAME(name) : public device_t
 /// \brief Used to define the destructor of a netlist device.
 /// The use of a destructor for netlist device should normally not be necessary.
 
-#define NETLIB_DESTRUCTOR(name) public: virtual ~NETLIB_NAME(name)() noexcept
+#define NETLIB_DESTRUCTOR(name) public: virtual ~NETLIB_NAME(name)() noexcept override
 
 /// \brief Define an extended constructor and add further parameters to it.
 /// The macro allows to add further parameters to a device constructor. This is
@@ -427,18 +428,18 @@ namespace netlist
 				store().insert({obj, aname});
 			}
 
-			static const T &get(const C *obj) noexcept
+			static const T *get(const C *obj) noexcept
 			{
 				try
 				{
 					auto ret(store().find(obj));
 					nl_assert(ret != store().end());
-					return ret->second;
+					return &ret->second;
 				}
 				catch (...)
 				{
 					nl_assert_always(true, "exception in property_store_t.get()");
-					return *static_cast<T *>(nullptr);
+					return static_cast<T *>(nullptr);
 				}
 			}
 
@@ -487,7 +488,7 @@ namespace netlist
 
 			const pstring &name() const noexcept
 			{
-				return props::get(this);
+				return *props::get(this);
 			}
 
 		protected:
@@ -636,7 +637,7 @@ namespace netlist
 
 			state_var_sig m_Q;
 	#else
-			void set_copied_input(netlist_sig_t val) noexcept { plib::unused_var(val); }
+			void set_copied_input(netlist_sig_t val) const noexcept { plib::unused_var(val); }
 	#endif
 
 			void set_delegate(const nldelegate &delegate) noexcept { m_delegate = delegate; }
@@ -1413,9 +1414,9 @@ namespace netlist
 		inline std::vector<C *> get_device_list() const
 		{
 			std::vector<C *> tmp;
-			for (auto &d : m_devices)
+			for (const auto &d : m_devices)
 			{
-				auto dev = dynamic_cast<C *>(d.second.get());
+				auto * const dev = dynamic_cast<C *>(d.second.get());
 				if (dev != nullptr)
 					tmp.push_back(dev);
 			}
@@ -1463,7 +1464,7 @@ namespace netlist
 
 		core_device_t *find_device(const pstring &name) const
 		{
-			for (auto & d : m_devices)
+			for (const auto & d : m_devices)
 				if (d.first == name)
 					return d.second.get();
 			return nullptr;
@@ -1732,16 +1733,29 @@ namespace netlist
 	class object_array_t : public plib::uninitialised_array_t<C, N>
 	{
 	public:
-		struct init
-		{
-			std::array<const char *, N> p;
-		};
 		template<typename... Args>
-		object_array_t(core_device_t &dev, init names, Args&&... args)
+		object_array_t(core_device_t &dev, const std::initializer_list<const char *> &names, Args&&... args)
+		{
+			passert_always_msg(names.size() == N, "initializer_list size mismatch");
+			std::size_t i = 0;
+			for (const auto &n : names)
+				this->emplace(i++, dev, pstring(n), std::forward<Args>(args)...);
+		}
+
+		template<typename... Args>
+		object_array_t(core_device_t &dev, const pstring &fmt, Args&&... args)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, pstring(names.p[i]), std::forward<Args>(args)...);
+				this->emplace(i, dev, plib::pfmt(fmt)(i), std::forward<Args>(args)...);
 		}
+
+		template<typename... Args>
+		object_array_t(core_device_t &dev, std::size_t offset, const pstring &fmt, Args&&... args)
+		{
+			for (std::size_t i = 0; i<N; i++)
+				this->emplace(i, dev, plib::pfmt(fmt)(i+offset), std::forward<Args>(args)...);
+		}
+
 	};
 
 	// -----------------------------------------------------------------------------
@@ -2115,7 +2129,7 @@ namespace netlist
 				}
 
 				m_time = top->exec_time();
-				const auto obj(top->object());
+				auto *const obj(top->object());
 				m_queue.pop();
 				if (obj != nullptr)
 					obj->template update_devs<KEEP_STATS>();

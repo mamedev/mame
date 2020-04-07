@@ -8,7 +8,7 @@
         0x30000000 - 0x30017fff     ROM (3x32k)
         0x30800000 - 0x30800000     Mouse Buttons (1)
         0x31000000 - 0x31000001     Mouse Quadrature (2)
-        0x31800000 - 0x31800001		DIP Switches
+        0x31800000 - 0x31800001     DIP Switches
         0x32000000 - 0x3200000f     DUART0 (serial console on channel B at 19200 baud 8N1, channel A set to 600 baud 8N1 (mouse?))
         0x32800000 - 0x3280000f     DUART1 (printer/modem?)
         0x33000000 - 0x330007ff     SRAM (2k)
@@ -25,7 +25,7 @@
         0x3f000000 - 0x3f000001     Stack Limit (2)
 
     TODO:
-    	Most everything
+        Most everything
 
     Interrupts:
         M68K:
@@ -45,11 +45,11 @@
 
 #include <vector>
 
-#define LOG_RTC				(1 << 0)
-#define LOG_INVALID_SEGMENT	(1 << 1)
-#define LOG_OTHER			(1 << 2)
+#define LOG_RTC             (1 << 0)
+#define LOG_INVALID_SEGMENT (1 << 1)
+#define LOG_OTHER           (1 << 2)
 
-#define VERBOSE		(LOG_OTHER)
+#define VERBOSE     (0)
 
 #include "logmacro.h"
 
@@ -59,6 +59,7 @@ public:
 	iris3000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_storagercpu(*this, "storager"),
 		m_mainram(*this, "mainram"),
 		m_duarta(*this, "duart68681a"),
 		m_duartb(*this, "duart68681b"),
@@ -129,8 +130,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
 
 	void mem_map(address_map &map);
+	void storager_map(address_map& map);
 
 	required_device<m68020_device> m_maincpu;
+	required_device<m68000_device> m_storagercpu;
 	required_shared_ptr<uint32_t> m_mainram;
 	required_device<mc68681_device> m_duarta;
 	required_device<mc68681_device> m_duartb;
@@ -153,48 +156,48 @@ private:
 		MOUSE_BUTTON_RIGHT      = 0x01,
 		MOUSE_BUTTON_MIDDLE     = 0x02,
 		MOUSE_BUTTON_LEFT       = 0x04,
-		BOARD_REV1      		= 0x60,	/* Board revision - #1 */
-		BOARD_REV2      		= 0x50,	/* Board revision - #2 */
+		BOARD_REV1              = 0x60, /* Board revision - #1 */
+		BOARD_REV2              = 0x50, /* Board revision - #2 */
 
-		MOUSE_XFIRE     = 0x01,	/* X Quadrature Fired, active low */
-		MOUSE_XCHANGE   = 0x02,	/* MOUSE_XCHANGE ? x-- : x++ */
-		MOUSE_YFIRE     = 0x04,	/* Y Quadrature Fired, active low */
-		MOUSE_YCHANGE   = 0x08,	/* MOUSE_YCHANGE ? y-- : y++ */
+		MOUSE_XFIRE     = 0x01, /* X Quadrature Fired, active low */
+		MOUSE_XCHANGE   = 0x02, /* MOUSE_XCHANGE ? x-- : x++ */
+		MOUSE_YFIRE     = 0x04, /* Y Quadrature Fired, active low */
+		MOUSE_YCHANGE   = 0x08, /* MOUSE_YCHANGE ? y-- : y++ */
 
-		PAR_UR      = 0x01,	/* Check parity on user-mode reads */
-		PAR_UW      = 0x02,	/* Check parity on user-mode writes */
-		PAR_KR      = 0x04,	/* Check parity on kernel-mode reads */
-		PAR_KW      = 0x08,	/* Check parity on kernel-mode writes */
-		PAR_DIS0    = 0x10,	/* Disable access to DUART0 and LEDs */
-		PAR_DIS1    = 0x20,	/* Disable access to DUART1 */
-		PAR_MBR     = 0x40,	/* Check parity on multibus reads */
-		PAR_MBW     = 0x80,	/* Check parity on multibus writes */
+		PAR_UR      = 0x01, /* Check parity on user-mode reads */
+		PAR_UW      = 0x02, /* Check parity on user-mode writes */
+		PAR_KR      = 0x04, /* Check parity on kernel-mode reads */
+		PAR_KW      = 0x08, /* Check parity on kernel-mode writes */
+		PAR_DIS0    = 0x10, /* Disable access to DUART0 and LEDs */
+		PAR_DIS1    = 0x20, /* Disable access to DUART1 */
+		PAR_MBR     = 0x40, /* Check parity on multibus reads */
+		PAR_MBW     = 0x80, /* Check parity on multibus writes */
 
-		MBP_DCACC   = 0x01,	/* Display controller access (I/O page 4) */
-		MBP_UCACC   = 0x02,	/* Update controller access (I/O page 3) */
-		MBP_GFACC   = 0x04,	/* Allow GF access (I/O page 1) */
-		MBP_DMACC   = 0x08,	/* Allow GL2 DMA access (0x8nnnnn - x0bnnnnn) */
-		MBP_LIOACC  = 0x10,	/* Allow lower I/O access (0x0nnnnn - 0x7nnnnn) */
-		MBP_HIOACC  = 0x20,	/* Allow upper I/O access (0x8nnnnn - 0xfnnnnn) */
-		MBP_LMACC   = 0x40,	/* Allow lower memory access (0x0nnnnn - 0x7nnnnn) */
-		MBP_HMACC   = 0x80,	/* Allow upper memory access (0x8nnnnn - 0xfnnnnn) */
+		MBP_DCACC   = 0x01, /* Display controller access (I/O page 4) */
+		MBP_UCACC   = 0x02, /* Update controller access (I/O page 3) */
+		MBP_GFACC   = 0x04, /* Allow GF access (I/O page 1) */
+		MBP_DMACC   = 0x08, /* Allow GL2 DMA access (0x8nnnnn - x0bnnnnn) */
+		MBP_LIOACC  = 0x10, /* Allow lower I/O access (0x0nnnnn - 0x7nnnnn) */
+		MBP_HIOACC  = 0x20, /* Allow upper I/O access (0x8nnnnn - 0xfnnnnn) */
+		MBP_LMACC   = 0x40, /* Allow lower memory access (0x0nnnnn - 0x7nnnnn) */
+		MBP_HMACC   = 0x80, /* Allow upper memory access (0x8nnnnn - 0xfnnnnn) */
 
-		STATUS_DIAG0		= 0,
-		STATUS_DIAG1		= 1,
-		STATUS_DIAG2		= 2,
-		STATUS_DIAG3		= 3,
-		STATUS_ENABEXT		= 4,
-		STATUS_ENABINT		= 5,
-		STATUS_BINIT		= 6,
-		STATUS_NOTBOOT		= 7,
-		STATUS_USERFPA		= 8,
-		STATUS_USERGE		= 9,
-		STATUS_SLAVE		= 10,
-		STATUS_ENABCBRQ		= 11,
-		STATUS_NOTGEMASTER	= 12,
-		STATUS_GENBAD		= 13,
-		STATUS_ENABWDOG		= 14,
-		STATUS_QUICK_TOUT	= 15
+		STATUS_DIAG0        = 0,
+		STATUS_DIAG1        = 1,
+		STATUS_DIAG2        = 2,
+		STATUS_DIAG3        = 3,
+		STATUS_ENABEXT      = 4,
+		STATUS_ENABINT      = 5,
+		STATUS_BINIT        = 6,
+		STATUS_NOTBOOT      = 7,
+		STATUS_USERFPA      = 8,
+		STATUS_USERGE       = 9,
+		STATUS_SLAVE        = 10,
+		STATUS_ENABCBRQ     = 11,
+		STATUS_NOTGEMASTER  = 12,
+		STATUS_GENBAD       = 13,
+		STATUS_ENABWDOG     = 14,
+		STATUS_QUICK_TOUT   = 15
 	};
 
 	std::vector<uint8_t> m_file_data;
@@ -581,6 +584,11 @@ void iris3000_state::mem_map(address_map &map)
 	map(0x00000000, 0xffffffff).rw(FUNC(iris3000_state::mmu_r), FUNC(iris3000_state::mmu_w));
 }
 
+void iris3000_state::storager_map(address_map& map)
+{
+	map(0x00000000, 0x0000ffff).rom().region("storagercpu", 0);
+}
+
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
@@ -609,6 +617,9 @@ void iris3000_state::iris3130(machine_config &config)
 	/* basic machine hardware */
 	M68020(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &iris3000_state::mem_map);
+
+	M68000(config, m_storagercpu, 10000000);
+	m_storagercpu->set_addrmap(AS_PROGRAM, &iris3000_state::storager_map);
 
 	ADDRESS_MAP_BANK(config, "text_data").set_map(&iris3000_state::text_data_map).set_options(ENDIANNESS_BIG, 32, 32);
 	ADDRESS_MAP_BANK(config, "stack").set_map(&iris3000_state::stack_map).set_options(ENDIANNESS_BIG, 32, 32);
@@ -694,6 +705,10 @@ ROM_START( iris3130 )
 	ROM_LOAD( "sgi-ip2-u91.nolabel.od",    0x00000, 0x8000, CRC(32e1f6b5) SHA1(2bd928c3fe2e364b9a38189158e9bad0e5271a59) )
 	ROM_LOAD( "sgi-ip2-u92.nolabel.od",    0x08000, 0x8000, CRC(13dbfdb3) SHA1(3361fb62f7a8c429653700bccfc3e937f7508182) )
 	ROM_LOAD( "sgi-ip2-u93.ip2.2-008.od",  0x10000, 0x8000, CRC(bf967590) SHA1(1aac48e4f5531a25c5482f64de5cd3c7a9931f11) )
+
+	ROM_REGION16_BE(0x10000, "storagercpu", 0)
+	ROM_LOAD16_BYTE( "5808423a.bin", 0x0000, 0x8000, CRC(161e6a90) SHA1(d4dcbf630a83e4c5994d8331ac85d81130400e33) )
+	ROM_LOAD16_BYTE( "5808523a.bin", 0x0001, 0x8000, CRC(4c99e4b8) SHA1(899855e54c4520816ad43eb19b972b45783ccb6b) )
 ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME           FLAGS

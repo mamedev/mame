@@ -48,9 +48,9 @@ public:
 	// configuration
 	template <typename... T> void set_color_update_callback(T &&... args) { m_color_update_cb.set(std::forward<T>(args)...); }
 
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_WRITE8_MEMBER(data_w);
-	DECLARE_WRITE8_MEMBER(address_w);
+	uint8_t data_r();
+	void data_w(uint8_t data);
+	void address_w(uint8_t data);
 
 	static constexpr int NUMCOLORS = 16;
 

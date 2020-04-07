@@ -92,6 +92,7 @@ nl_convert_base_t::nl_convert_base_t()
 		{ "VS", {"1", "2"} },
 		{ "TTL_INPUT", {"Q", "VCC", "GND"} },
 		{ "DIODE", {"A", "K"} },
+		{ "POT", {"1", "2", "3"} },
 	};
 }
 
@@ -110,7 +111,12 @@ void nl_convert_base_t::add_pin_alias(const pstring &devname, const pstring &nam
 
 void nl_convert_base_t::add_ext_alias(const pstring &alias)
 {
-	m_ext_alias.push_back(alias);
+	m_ext_alias.emplace_back(alias, alias);
+}
+
+void nl_convert_base_t::add_ext_alias(const pstring &alias, const pstring &net)
+{
+	m_ext_alias.emplace_back(alias, net);
 }
 
 void nl_convert_base_t::add_device(plib::unique_ptr<dev_t> dev)
@@ -179,7 +185,7 @@ void nl_convert_base_t::add_term(const pstring &netname, const pstring &devname,
 
 void nl_convert_base_t::add_device_extra_s(const pstring &devname, const pstring &extra)
 {
-	auto dev = get_device(devname);
+	auto *dev = get_device(devname);
 	if (dev == nullptr)
 		out("// ERROR: Device {} not found\n", devname);
 	else
@@ -224,9 +230,9 @@ void nl_convert_base_t::dump_nl()
 
 	for (auto & alias : m_ext_alias)
 	{
-		net_t *net = m_nets[alias].get();
+		net_t *net = m_nets[alias.second].get();
 		// use the first terminal ...
-		out("ALIAS({}, {})\n", alias, net->terminals()[0]);
+		out("ALIAS({}, {})\n", alias.first, net->terminals()[0]);
 		// if the aliased net only has this one terminal connected ==> don't dump
 		if (net->terminals().size() == 1)
 			net->set_no_export();
@@ -254,7 +260,7 @@ void nl_convert_base_t::dump_nl()
 		else
 			out("{}({})\n", m_devs[j]->type(),
 					m_devs[j]->name());
-		for (auto &e : m_devs[j]->extra())
+		for (const auto &e : m_devs[j]->extra())
 			out("{}\n", e);
 
 	}
@@ -281,7 +287,7 @@ void nl_convert_base_t::dump_nl()
 
 pstring nl_convert_base_t::get_nl_val(double val) const
 {
-	for (auto &e : m_units)
+	for (const auto &e : m_units)
 	{
 		if (e.m_mult <= plib::abs(val))
 		{
@@ -299,7 +305,7 @@ pstring nl_convert_base_t::get_nl_val(double val) const
 
 double nl_convert_base_t::get_sp_unit(const pstring &unit) const
 {
-	for (auto &e : m_units)
+	for (const auto &e : m_units)
 	{
 		if (e.m_unit == unit)
 			return e.m_mult;
@@ -389,6 +395,8 @@ void nl_convert_spice_t::convert(const pstring &contents)
 	}
 
 	out("NETLIST_START(dummy)\n");
+	add_term("0", "GND");
+	add_term("GND", "GND"); // For Kicad
 
 	convert_block(nl);
 	dump_nl();
@@ -621,10 +629,8 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				break;
 			case 'D':
 				add_device("DIODE", tt[0], m_subckt + tt[3]);
-				// Spice D Anode Kathode model
-				// Kicad outputs K first and D as second net
-				add_term(tt[1], tt[0], is_kicad() ? 1 : 0);
-				add_term(tt[2], tt[0], is_kicad() ? 0 : 1);
+				add_term(tt[1], tt[0], 0);
+				add_term(tt[2], tt[0], 1);
 				break;
 			case 'U':
 			case 'X':
@@ -636,11 +642,12 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				pstring xname = plib::replace_all(tt[0], pstring("."), pstring("_"));
 				// Extract parameters of form X=Y
 				std::vector<pstring> nets;
-				std::vector<pstring> params;
+				std::unordered_map<pstring, pstring> params;
 				for (std::size_t i=1; i < tt.size(); i++)
 				{
-					if (tt[i].find('=') != pstring::npos)
-						params.push_back(tt[i]);
+					auto p = tt[i].find('=');
+					if (p != pstring::npos)
+						params.emplace(tt[i].substr(0,p), tt[i].substr(p+1));
 					else
 					{
 						nets.push_back(tt[i]);
@@ -652,30 +659,56 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					tname = "TTL_" + modname + "_DIP";
 				else if (plib::startsWith(modname, "4"))
 					tname = "CD" + modname + "_DIP";
-				else if (modname == "ANALOG_INPUT" && params.size()== 1 && params[0].substr(0,2) == "V=")
+				else if (modname == "ANALOG_INPUT" && params.size()== 1 && params.begin()->first == "V")
 				{
 					auto yname=pstring("I_") + tt[0].substr(1);
-					val = get_sp_val(params[0].substr(2));
+					val = get_sp_val(params["V"]);
 					add_device(modname, yname, val);
 					add_term(nets[0], yname + ".Q");
 					break;
 				}
-				else if (modname == "TTL_INPUT" && params.size()== 1 && params[0].substr(0,2) == "L=")
+				else if (modname == "TTL_INPUT" && params.size()== 1 && params.begin()->first == "L")
 				{
 					auto yname=pstring("I_") + tt[0].substr(1);
-					val = get_sp_val(params[0].substr(2));
+					val = get_sp_val(params["L"]);
 					add_device(modname, yname, val);
 					add_term(nets[0], yname, 0);
 					add_term(nets[1], yname, 1);
 					add_term(nets[2], yname, 2);
 					break;
 				}
+				else if (modname == "ALIAS" && nets.size() == 2 && params.empty())
+				{
+					auto yname=tt[0].substr(1);
+					add_ext_alias(yname, nets[0]);
+					break;
+				}
+				else if (modname == "RPOT" && nets.size() == 4 && !params.empty())
+				{
+					auto yname=tt[0];
+					auto R = params.find("R");
+					auto V = params.find("V");
+					if (R != params.end())
+					{
+						add_device("POT", yname, get_sp_val(R->second));
+						add_term(nets[0], yname, 0);
+						add_term(nets[1], yname, 1);
+						add_term(nets[2], yname, 2);
+						if (V != params.end())
+							add_device_extra(yname, "PARAM({}, {})", yname + ".DIAL", get_sp_val(V->second));
+					}
+					else
+						out("// IGNORED {}: {}\n", tt[0], line);
+					break;
+				}
+				else
+					tname = modname + "_DIP";
 
 				add_device(tname, xname);
-				for (std::size_t i=0; i < nets.size(); i++)
+				for (std::size_t i=0; i < nets.size() - 1; i++)
 				{
 					// FIXME:
-					pstring term = plib::pfmt("X{1}.{2}")(xname)(i+1);
+					pstring term = plib::pfmt("{1}.{2}")(xname)(i+1);
 					add_term(nets[i], term);
 				}
 				break;

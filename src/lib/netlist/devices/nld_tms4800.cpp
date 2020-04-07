@@ -16,11 +16,11 @@ namespace netlist
 	NETLIB_OBJECT(TMS4800)
 	{
 		NETLIB_CONSTRUCTOR(TMS4800)
-		, m_A(*this, {{ "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10" }})
+		, m_A(*this, { "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10" })
 		, m_AR(*this, "AR")
 		, m_OE1(*this, "OE1")
 		, m_OE2(*this, "OE2")
-		, m_D(*this, {{ "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7" }})
+		, m_D(*this, { "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7" })
 		, m_last_data(*this, "m_last_data", 1)
 		, m_ROM(*this, "ROM")
 		, m_supply(*this)

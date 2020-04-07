@@ -13,7 +13,7 @@
 #include "includes/galaxold.h"
 
 
-IRQ_CALLBACK_MEMBER(galaxold_state::hunchbkg_irq_callback)
+uint8_t galaxold_state::hunchbkg_intack()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0x03;
@@ -162,7 +162,7 @@ void galaxold_state::init_4in1()
 
 INTERRUPT_GEN_MEMBER(galaxold_state::hunchbks_vh_interrupt)
 {
-	device.execute().pulse_input_line_and_vector(0, 0x03, device.execute().minimum_quantum_time());
+	m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
 }
 
 void galaxold_state::init_bullsdrtg()

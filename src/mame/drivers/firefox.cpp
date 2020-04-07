@@ -235,7 +235,7 @@ WRITE8_MEMBER(firefox_state::firefox_disc_data_w)
 
 TILE_GET_INFO_MEMBER(firefox_state::bgtile_get_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index], 0, 0);
+	tileinfo.set(0, m_tileram[tile_index], 0, 0);
 }
 
 
@@ -377,8 +377,8 @@ WRITE8_MEMBER(firefox_state::riot_porta_w)
 
 WRITE8_MEMBER(firefox_state::nvram_w)
 {
-	m_nvram_1c->write(space, offset, data >> 4);
-	m_nvram_1d->write(space, offset, data & 0xf);
+	m_nvram_1c->write(offset, data >> 4);
+	m_nvram_1d->write(offset, data & 0xf);
 }
 
 READ8_MEMBER(firefox_state::nvram_r)

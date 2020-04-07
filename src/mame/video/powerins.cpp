@@ -99,7 +99,7 @@ Offset:
 TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_0)
 {
 	uint16_t code = m_vram[0][tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code & 0x07ff) | (m_tile_bank << 11),
 			((code & 0xf000) >> 12) | ((code & 0x0800) >> 7),
 			0);
@@ -130,7 +130,7 @@ Offset:
 TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_1)
 {
 	uint16_t code = m_vram[1][tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code & 0x0fff,
 			(code & 0xf000) >> 12,
 			0);

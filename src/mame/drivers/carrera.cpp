@@ -70,7 +70,7 @@ public:
 	void carrera(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(unknown_r);
+	uint8_t unknown_r();
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void prg_map(address_map &map);
@@ -282,7 +282,7 @@ uint32_t carrera_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-READ8_MEMBER(carrera_state::unknown_r)
+uint8_t carrera_state::unknown_r()
 {
 	return machine().rand();
 }
@@ -373,7 +373,7 @@ ROM_START( bsebman )
 	ROM_LOAD( "ic5", 0x40000, 0x10000, CRC(21635791) SHA1(514078694269582c33fb7dddd6171089f9e21ee2) )
 
 	ROM_REGION( 0x20, "proms", 0 )
-	ROM_LOAD( "82s123.ic39", 0x00, 0x20, BAD_DUMP CRC(af16359f) SHA1(1ff5c9d7807e52be09c0ded56fb68a47e41b3fcf) ) // BPROM had broken legs, not dumped for now, probably same as carrera
+	ROM_LOAD( "am27s19.ic39", 0x00, 0x20, CRC(af16359f) SHA1(1ff5c9d7807e52be09c0ded56fb68a47e41b3fcf) )
 ROM_END
 
 GAME( 19??, carrera, 0,       carrera, carrera, carrera_state, empty_init, ROT0, "BS Electronics", "Carrera (Version 6.7)",   MACHINE_SUPPORTS_SAVE )

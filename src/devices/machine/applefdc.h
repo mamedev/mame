@@ -62,12 +62,8 @@ public:
 	void set_config(const applefdc_interface *intrf) { m_interface = intrf; }
 
 	// read/write handlers
-	virtual uint8_t read(uint8_t offset);
-	virtual void write(uint8_t offset, uint8_t data);
-
-	// read/write handlers overloads
-	DECLARE_READ8_MEMBER( bus_r ) { return read(uint8_t(offset)); }
-	DECLARE_WRITE8_MEMBER( bus_w ) { write(uint8_t(offset), data); }
+	virtual uint8_t read(offs_t offset);
+	virtual void write(offs_t offset, uint8_t data);
 
 	// accessor
 	uint8_t get_lines();

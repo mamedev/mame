@@ -122,9 +122,9 @@ namespace netlist
 namespace plib {
 
 	template<>
-	inline void state_manager_t::save_item(const void *owner, netlist::netlist_time &nlt, const pstring &stname)
+	inline void state_manager_t::save_item(const void *owner, netlist::netlist_time &state, const pstring &stname)
 	{
-		save_state_ptr(owner, stname, datatype_t(sizeof(netlist::netlist_time::internal_type), true, false), 1, nlt.get_internaltype_ptr());
+		save_state_ptr(owner, stname, datatype_t(sizeof(netlist::netlist_time::internal_type), true, false), 1, state.get_internaltype_ptr());
 	}
 } // namespace plib
 

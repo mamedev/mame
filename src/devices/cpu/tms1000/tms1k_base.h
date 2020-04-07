@@ -207,6 +207,7 @@ protected:
 	optional_device<pla_device> m_mpla;
 	optional_device<pla_device> m_ipla;
 	optional_device<pla_device> m_opla;
+	optional_memory_region m_opla_b; // binary dump of output PLA, in place of PLA file
 	optional_device<pla_device> m_spla;
 
 	u8 m_pc;        // 6 or 7-bit program counter

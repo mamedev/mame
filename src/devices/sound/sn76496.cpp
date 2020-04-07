@@ -305,6 +305,7 @@ void sn76496_base_device::stereo_w(u8 data)
 
 void sn76496_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	m_ready_state = true;
 	m_ready_handler(ASSERT_LINE);
 }
 
@@ -363,6 +364,7 @@ void sn76496_base_device::write(u8 data)
 			break;
 	}
 
+	m_ready_state = false;
 	m_ready_handler(CLEAR_LINE);
 	m_ready_timer->adjust(attotime::from_hz(clock()/(4*m_clock_divider)));
 }

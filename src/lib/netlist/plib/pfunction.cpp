@@ -54,6 +54,10 @@ namespace plib {
 				{ rc.m_cmd = SIN; stk -= 0; }
 			else if (cmd == "cos")
 				{ rc.m_cmd = COS; stk -= 0; }
+			else if (cmd == "max")
+				{ rc.m_cmd = MAX; stk -= 1; }
+			else if (cmd == "min")
+				{ rc.m_cmd = MIN; stk -= 1; }
 			else if (cmd == "trunc")
 				{ rc.m_cmd = TRUNC; stk -= 0; }
 			else if (cmd == "rand")
@@ -279,6 +283,8 @@ namespace plib {
 				OP(POW,  1, plib::pow(ST2, ST1))
 				OP(SIN,  0, plib::sin(ST2))
 				OP(COS,  0, plib::cos(ST2))
+				OP(MAX,  1, std::max(ST2, ST1))
+				OP(MIN,  1, std::min(ST2, ST1))
 				OP(TRUNC,  0, plib::trunc(ST2))
 				case RAND:
 					stack[ptr++] = lfsr_random<NT>(m_lfsr);

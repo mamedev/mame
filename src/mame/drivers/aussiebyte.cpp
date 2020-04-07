@@ -60,7 +60,7 @@ void aussiebyte_state::aussiebyte_io(address_map &map)
 	map(0x08, 0x0b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).noprw(); // winchester interface
 	map(0x10, 0x13).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write));
-	map(0x14, 0x14).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x14, 0x14).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x15, 0x15).w(FUNC(aussiebyte_state::port15_w)); // boot rom disable
 	map(0x16, 0x16).w(FUNC(aussiebyte_state::port16_w)); // fdd select
 	map(0x17, 0x17).w(FUNC(aussiebyte_state::port17_w)); // DMA mux
@@ -550,8 +550,8 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 
 	Z80PIO(config, m_pio1, 16_MHz_XTAL / 4);
 	m_pio1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_pio1->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
-	m_pio1->in_pb_callback().set("cent_data_in", FUNC(input_buffer_device::bus_r));
+	m_pio1->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
+	m_pio1->in_pb_callback().set("cent_data_in", FUNC(input_buffer_device::read));
 	m_pio1->out_ardy_callback().set(m_centronics, FUNC(centronics_device::write_strobe)).invert();
 
 	Z80PIO(config, m_pio2, 16_MHz_XTAL / 4);
@@ -592,6 +592,8 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 
 	/* quickload */
 	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(aussiebyte_state::quickload_cb));
+
+	SOFTWARE_LIST(config, "flop_list").set_original("aussiebyte");
 }
 
 

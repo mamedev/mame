@@ -1,10 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods
-/*****************************************************************************
- *
- * includes/advision.h
- *
- ****************************************************************************/
+// copyright-holders:Dan Boris
+
 #ifndef MAME_INCLUDES_ADVISION_H
 #define MAME_INCLUDES_ADVISION_H
 

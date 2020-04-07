@@ -118,6 +118,8 @@ ssssSSSS pppccccc
 
 s = size (height)
 S = size (width)
+p = priority
+c = colour palette
 
 offs +3
 -------- --------
@@ -237,7 +239,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 				if (!m_sprite_bitmap.valid())
 				{
-					colour = m_col_cb(x);
+					colour = m_col_cb(x, y & 0x8000);
 				}
 				else
 				{
@@ -247,7 +249,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 
 				if (!m_pri_cb.isnull())
-					pri = m_pri_cb(x);
+					pri = m_pri_cb(x, y & 0x8000);
 				else
 					pri = 0;
 
@@ -409,7 +411,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 
 			if (!m_pri_cb.isnull())
-				pri = m_pri_cb(spriteram[offs+2]&0x00ff);
+				pri = m_pri_cb(spriteram[offs+2]&0x00ff, false);
 			else
 				pri = 0;
 

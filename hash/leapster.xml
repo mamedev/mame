@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
 Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but not dumped yet:
 
 |  PART-NO    |LAN| GAME TITLE                                                | CARTRIDGE-TYPE |
@@ -123,9 +124,9 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 | 500-14320-A |ENG| Cars 2                                                    | LEAPSTER       |
 | 500-14492-A |ENG| The Disney-Pixar Collection                               | LEAPSTER       |
 
--->
 
-<!-- Entries are ordered by title of the parent, clones are list after the parent, Leapster L-Max in an own section at the end -->
+Entries are ordered by title of the parent, clones are list after the parent, Leapster L-Max in an own section at the end
+-->
 
 <softwarelist name="leapster" description="LeapFrog Leapster cartridges">
 

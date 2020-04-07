@@ -231,7 +231,7 @@ GFXDECODE_END
 TILE_GET_INFO_MEMBER(dynadice_state::get_tile_info)
 {
 	int code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(1, code, 0, 0);
+	tileinfo.set(1, code, 0, 0);
 }
 
 void dynadice_state::video_start()

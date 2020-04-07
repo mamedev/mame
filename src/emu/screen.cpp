@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    screen.c
+    screen.cpp
 
     Core MAME screen device.
 
@@ -1726,6 +1726,7 @@ void screen_device::create_composited_bitmap()
 					*dst++ = src[x >> 15];
 				}
 			}
+			break;
 		}
 
 		case BITMAP_FORMAT_RGB32:
@@ -1794,7 +1795,8 @@ bool screen_device::update_quads()
 
 void screen_device::update_burnin()
 {
-// TODO: other than being unnecessary (we should use our rand function first off), this is a simplification of how analog signals really works!
+// TODO: other than being unnecessary, this is a simplification of how analog signals really works!
+// It's important not to use machine().rand() here, it can cause machine().rand() used in emulation to desync.
 #undef rand
 	if (!m_burnin.valid())
 		return;
@@ -1912,17 +1914,14 @@ void screen_device::finalize_burnin()
 
 	// compute the name and create the file
 	emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	osd_file::error filerr = file.open(machine().basename(), PATH_SEPARATOR "burnin-", this->tag()+1, ".png") ;
+	osd_file::error filerr = file.open(util::string_format("%s" PATH_SEPARATOR "burnin-%s.png", machine().basename(), tag() + 1));
 	if (filerr == osd_file::error::NONE)
 	{
 		png_info pnginfo;
-		char text[256];
 
 		// add two text entries describing the image
-		sprintf(text,"%s %s", emulator_info::get_appname(), emulator_info::get_build_version());
-		pnginfo.add_text("Software", text);
-		sprintf(text, "%s %s", machine().system().manufacturer, machine().system().type.fullname());
-		pnginfo.add_text("System", text);
+		pnginfo.add_text("Software", util::string_format("%s %s", emulator_info::get_appname(), emulator_info::get_build_version()).c_str());
+		pnginfo.add_text("System", util::string_format("%s %s", machine().system().manufacturer, machine().system().type.fullname()).c_str());
 
 		// now do the actual work
 		png_write_bitmap(file, &pnginfo, finalmap, 0, nullptr);

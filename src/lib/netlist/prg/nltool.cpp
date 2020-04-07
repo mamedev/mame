@@ -212,10 +212,10 @@ public:
 	{
 		// read the netlist ...
 
-		for (auto & d : defines)
+		for (const auto & d : defines)
 			setup().add_define(d);
 
-		for (auto & r : roms)
+		for (const auto & r : roms)
 			setup().register_source(plib::make_unique<netlist_data_folder_t>(r));
 
 #if 0
@@ -236,25 +236,15 @@ public:
 		setup().add_include(plib::make_unique<a>("netlist/devices/net_lib.h",""));
 #endif
 #endif
-		for (auto & i : includes)
+		for (const auto & i : includes)
 			setup().add_include(plib::make_unique<netlist_data_folder_t>(i));
 
 		setup().register_source(plib::make_unique<netlist::source_file_t>(filename));
 		setup().include(name);
-		create_dynamic_logs(logs);
+		setup().register_dynamic_log_devices(logs);
 
 		// start devices
 		setup().prepare_to_run();
-	}
-
-	void create_dynamic_logs(const std::vector<pstring> &logs)
-	{
-		log().debug("Creating dynamic logs ...\n");
-		for (auto & log : logs)
-		{
-			pstring name = "log_" + log;
-			setup().register_link(name + ".I", log);
-		}
 	}
 
 	std::vector<char> save_state()
@@ -339,7 +329,7 @@ struct input_t
 		m_param = setup.find_param(pstring(buf.data()), true);
 	}
 
-	void setparam()
+	void setparam() const
 	{
 		switch (m_param->param_type())
 		{
@@ -434,13 +424,10 @@ void tool_app_t::run()
 
 	netlist::netlist_time_ext nlstart = nt.exec().time();
 	{
-		auto t_guard(t.guard());
-
 		pout("runnning ...\n");
-
 		unsigned pos = 0;
-
 		netlist::netlist_time_ext nlt = nlstart;
+		auto t_guard(t.guard());
 
 		while (pos < inps.size()
 				&& inps[pos].m_time < ttr
@@ -460,7 +447,6 @@ void tool_app_t::run()
 					ttr.as_double(), nlt.as_double());
 			ttr = nlt;
 		}
-
 	}
 
 	if (opt_savestate.was_specified())

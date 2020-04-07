@@ -52,6 +52,7 @@
 #include "machine/cxd1095.h"
 #include "machine/eepromser.h"
 #include "machine/mb8421.h"
+#include "machine/z80sio.h"
 #include "sound/beep.h"
 #include "speaker.h"
 
@@ -138,7 +139,7 @@ static const z80_daisy_config maincpu_daisy_chain[] =
 
 void pve500_state::maincpu_io(address_map &map)
 {
-	map(0x00, 0x03).mirror(0xff00).rw("external_sio", FUNC(z80sio0_device::cd_ba_r), FUNC(z80sio0_device::cd_ba_w));
+	map(0x00, 0x03).mirror(0xff00).rw("external_sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x08, 0x0B).mirror(0xff00).rw("external_ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
@@ -375,7 +376,7 @@ void pve500_state::pve500(machine_config &config)
 	z80ctc_device& ctc(Z80CTC(config, "external_ctc", 12_MHz_XTAL / 2));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	z80sio0_device& sio(Z80SIO0(config, "external_sio", 12_MHz_XTAL / 2));
+	z80sio_device& sio(Z80SIO(config, "external_sio", 12_MHz_XTAL / 2)); // TMPZ84C40AP-8
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	sio.out_txda_callback().set("player2", FUNC(rs232_port_device::write_txd));
 	sio.out_txdb_callback().set("edl_inout", FUNC(rs232_port_device::write_txd));
@@ -417,10 +418,10 @@ void pve500_state::pve500(machine_config &config)
 	player1.rxd_handler().set(m_maincpu, FUNC(tmpz84c015_device::rxb_w));
 
 	rs232_port_device &player2(RS232_PORT(config, "player2", default_rs232_devices, nullptr));
-	player2.rxd_handler().set("external_sio", FUNC(z80dart_device::rxa_w));
+	player2.rxd_handler().set("external_sio", FUNC(z80sio_device::rxa_w));
 
 	rs232_port_device &edl_inout(RS232_PORT(config, "edl_inout", default_rs232_devices, nullptr));
-	edl_inout.rxd_handler().set("external_sio", FUNC(z80dart_device::rxb_w));
+	edl_inout.rxd_handler().set("external_sio", FUNC(z80sio_device::rxb_w));
 
 	rs232_port_device &switcher(RS232_PORT(config, "switcher", default_rs232_devices, nullptr));
 	switcher.rxd_handler().set(m_subcpu, FUNC(tmpz84c015_device::rxa_w));

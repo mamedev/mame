@@ -5,7 +5,6 @@
   ISA 8 bit IBM PC Music Feature Card
 
   TODO:
-   - YM-2164
    - MIDI
    - IRQ/base address selection
 
@@ -396,7 +395,7 @@ void isa8_ibm_mfc_device::device_add_mconfig(machine_config &config)
 	clock_device &usart_clock(CLOCK(config, "usart_clock", XTAL(4'000'000) / 8)); // 500KHz
 	usart_clock.signal_handler().set(FUNC(isa8_ibm_mfc_device::write_usart_clock));
 
-	PIT8253(config, m_d8253, 0);
+	PIT8253(config, m_d8253);
 	m_d8253->set_clk<0>(XTAL(4'000'000) / 8);
 	m_d8253->out_handler<0>().set(FUNC(isa8_ibm_mfc_device::d8253_out0));
 	m_d8253->set_clk<1>(0);
@@ -406,7 +405,7 @@ void isa8_ibm_mfc_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "ymleft").front_left();
 	SPEAKER(config, "ymright").front_right();
-	YM2151(config, m_ym2151, XTAL(4'000'000));
+	YM2164(config, m_ym2151, XTAL(4'000'000));
 	m_ym2151->irq_handler().set(FUNC(isa8_ibm_mfc_device::ibm_mfc_ym_irq));
 	m_ym2151->add_route(0, "ymleft", 1.00);
 	m_ym2151->add_route(1, "ymright", 1.00);

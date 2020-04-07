@@ -1183,14 +1183,14 @@ READ8_MEMBER(mz2500_state::rp5c15_8_r)
 {
 	uint8_t rtc_index = (m_maincpu->state_int(Z80_B));
 
-	return m_rtc->read(space, rtc_index);
+	return m_rtc->read(rtc_index);
 }
 
 WRITE8_MEMBER(mz2500_state::rp5c15_8_w)
 {
 	uint8_t rtc_index = (m_maincpu->state_int(Z80_B));
 
-	m_rtc->write(space, rtc_index, data);
+	m_rtc->write(rtc_index, data);
 }
 
 

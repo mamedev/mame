@@ -565,9 +565,7 @@ void seibuspi_state::combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &clip
 	{
 		int rx = sx;
 		if (rowscroll)
-		{
-			rx += rowscroll[(y + sy) & yscroll_mask];
-		}
+			rx += rowscroll[(y + 19) & yscroll_mask]; // adder value probably not hardcoded but came from CRTC
 
 		u32 *dest = &bitmap.pix32(y);
 		const u16 *src = &pen_bitmap.pix16((y + sy) & yscroll_mask);
@@ -665,7 +663,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_text_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(2, tile, color, 0);
+	tileinfo.set(2, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(seibuspi_state::get_back_tile_info)
@@ -677,7 +675,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_back_tile_info)
 	tile &= 0x1fff;
 	tile |= m_back_layer_d14;
 
-	SET_TILE_INFO_MEMBER(1, tile, color, 0);
+	tileinfo.set(1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(seibuspi_state::get_midl_tile_info)
@@ -690,7 +688,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_midl_tile_info)
 	tile |= 0x2000;
 	tile |= m_midl_layer_d14;
 
-	SET_TILE_INFO_MEMBER(1, tile, color + 16, 0);
+	tileinfo.set(1, tile, color + 16, 0);
 }
 
 TILE_GET_INFO_MEMBER(seibuspi_state::get_fore_tile_info)
@@ -704,7 +702,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_fore_tile_info)
 	tile |= m_fore_layer_d13;
 	tile |= m_fore_layer_d14;
 
-	SET_TILE_INFO_MEMBER(1, tile, color + 8, 0);
+	tileinfo.set(1, tile, color + 8, 0);
 }
 
 

@@ -429,7 +429,7 @@
 #define LOG_MAPPER    (1U<<16)
 
 // Minimum log should be warnings
-#define VERBOSE ( LOG_GENERAL | LOG_SETTING | LOG_WARN )
+#define VERBOSE ( LOG_GENERAL | LOG_WARN )
 
 #include "genboard.h"
 #include "logmacro.h"
@@ -527,7 +527,7 @@ WRITE8_MEMBER( geneve_gate_array_device::cru_ctrl_write )
 		m_cartridge7_writable = (data!=0);
 		break;
 	case 15:
-		LOGMASKED(LOG_SETTING, "Extra wait states %s\n", (data==0)? "enabled" : "disabled");
+		LOGMASKED(LOG_CRU, "Extra wait states %s\n", (data==0)? "enabled" : "disabled");
 		m_enable_extra_waitstates = (data==0);
 		break;
 	default:

@@ -215,7 +215,7 @@ WRITE_LINE_MEMBER(kungfur_state::adpcm_int)
 	u8 *ROM = m_adpcm_region[N]->base();
 	u8 data = ROM[m_adpcm_pos[N] & (m_adpcm_region[N]->bytes() - 1)];
 
-	m_adpcm[N]->write_data(m_adpcm_sel[N] ? data & 0xf : data >> 4 & 0xf);
+	m_adpcm[N]->data_w(m_adpcm_sel[N] ? data & 0xf : data >> 4 & 0xf);
 	m_adpcm_pos[N] += m_adpcm_sel[N];
 	m_adpcm_sel[N] ^= 1;
 }

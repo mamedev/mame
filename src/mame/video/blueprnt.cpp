@@ -108,7 +108,7 @@ TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
 	tileinfo.category = (attr & 0x80) ? 1 : 0;
 	if (bank) code += m_gfx_bank * 0x100;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 

@@ -128,12 +128,12 @@ private:
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1, m_bgvideoram[tile_index] + m_bg_bank * 0x100, 0, 0);
+	tileinfo.set(1, m_bgvideoram[tile_index] + m_bg_bank * 0x100, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_fg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_fgvideoram[tile_index], 0, 0);
+	tileinfo.set(0, m_fgvideoram[tile_index], 0, 0);
 }
 
 void dacholer_state::video_start()
@@ -594,7 +594,7 @@ WRITE_LINE_MEMBER(dacholer_state::adpcm_int)
 {
 	if (m_snd_interrupt_enable == 1 || (m_snd_interrupt_enable == 0 && m_msm_toggle == 1))
 	{
-		m_msm->write_data(m_msm_data >> 4);
+		m_msm->data_w(m_msm_data >> 4);
 		m_msm_data <<= 4;
 		m_msm_toggle ^= 1;
 		if (m_msm_toggle == 0)

@@ -537,8 +537,8 @@ void seawolf2_state::port_map_discrete(address_map &map)
 	map(0x19, 0x19).w(FUNC(astrocde_state::expand_register_w));
 	map(0x40, 0x40).mirror(0x18).w(FUNC(seawolf2_state::sound_1_w));
 	map(0x41, 0x41).mirror(0x18).w(FUNC(seawolf2_state::sound_2_w));
-	map(0x42, 0x42).mirror(0x18).w("lamplatch2", FUNC(output_latch_device::bus_w));
-	map(0x43, 0x43).mirror(0x18).w("lamplatch1", FUNC(output_latch_device::bus_w));
+	map(0x42, 0x42).mirror(0x18).w("lamplatch2", FUNC(output_latch_device::write));
+	map(0x43, 0x43).mirror(0x18).w("lamplatch1", FUNC(output_latch_device::write));
 }
 
 
@@ -1318,7 +1318,7 @@ void astrocde_state::spacezap(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &astrocde_state::port_map_mono_pattern);
 
 	m_astrocade_sound1->so_cb<0>().set("watchdog", FUNC(watchdog_timer_device::reset_w));
-	m_astrocade_sound1->so_cb<3>().set("outlatch", FUNC(output_latch_device::bus_w));
+	m_astrocade_sound1->so_cb<3>().set("outlatch", FUNC(output_latch_device::write));
 
 	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch", 0)); // MC14174B on game board at U16
 	outlatch.bit_handler<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
@@ -1457,8 +1457,8 @@ void astrocde_state::profpac(machine_config &config)
 	lamplatch.bit_handler<5>().set_output("lamp4");   // right lamp B
 	lamplatch.bit_handler<6>().set_output("lamp5");   // right lamp C
 
-	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::bus_w));
-	m_astrocade_sound1->so_cb<5>().set("lamplatch", FUNC(output_latch_device::bus_w));
+	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::write));
+	m_astrocade_sound1->so_cb<5>().set("lamplatch", FUNC(output_latch_device::write));
 }
 
 void demndrgn_state::demndrgn(machine_config &config)
@@ -1477,7 +1477,7 @@ void demndrgn_state::demndrgn(machine_config &config)
 	outlatch.bit_handler<3>().set_output("led1");
 	outlatch.bit_handler<4>().set(FUNC(demndrgn_state::input_select_w));
 
-	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::bus_w));
+	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::write));
 	m_astrocade_sound1->pot_cb<0>().set_ioport("FIREX");
 	m_astrocade_sound1->pot_cb<1>().set_ioport("FIREY");
 }

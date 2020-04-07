@@ -241,7 +241,7 @@ namespace plib {
 		template <typename T>
 		T *getopt_type() const
 		{
-			for (auto & optbase : m_opts )
+			for (const auto & optbase : m_opts )
 			{
 				if (auto opt = dynamic_cast<T *>(optbase))
 					return opt;

@@ -109,12 +109,12 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_READ8_MEMBER(input1_r);
-	DECLARE_READ8_MEMBER(input2_r);
-	DECLARE_WRITE8_MEMBER(control_w);
+	u8 input1_r();
+	u8 input2_r();
+	void control_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER(shift_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(shift_data_w);
+	void shift_clock_w(int state);
+	void shift_data_w(int state);
 
 	u8 m_select;
 	u8 m_led_data;
@@ -151,7 +151,7 @@ void prodigy_state::update_display()
 	m_display->matrix(1 << m_select, m_led_data);
 }
 
-WRITE_LINE_MEMBER(prodigy_state::shift_clock_w)
+void prodigy_state::shift_clock_w(int state)
 {
 	// shift 8-bit led/digit data on rising edge
 	if (state && !m_shift_clock)
@@ -163,12 +163,12 @@ WRITE_LINE_MEMBER(prodigy_state::shift_clock_w)
 	m_shift_clock = state;
 }
 
-WRITE_LINE_MEMBER(prodigy_state::shift_data_w)
+void prodigy_state::shift_data_w(int state)
 {
 	m_shift_data = state;
 }
 
-READ8_MEMBER(prodigy_state::input1_r)
+u8 prodigy_state::input1_r()
 {
 	u8 data = 0;
 
@@ -184,7 +184,7 @@ READ8_MEMBER(prodigy_state::input1_r)
 	return ~data;
 }
 
-READ8_MEMBER(prodigy_state::input2_r)
+u8 prodigy_state::input2_r()
 {
 	u8 data = 0;
 
@@ -197,7 +197,7 @@ READ8_MEMBER(prodigy_state::input2_r)
 	return ~data;
 }
 
-WRITE8_MEMBER(prodigy_state::control_w)
+void prodigy_state::control_w(u8 data)
 {
 	// PB0-PB3: 74145
 	m_select = data & 0xf;

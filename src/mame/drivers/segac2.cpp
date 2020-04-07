@@ -27,6 +27,7 @@
     1991  Twin Squash                Sega              317-0193         C2
     1991  Waku Waku Sonic Patrol Car Sega              317-0140         C2
     1992  Ribbit!                    Sega              317-0178         C2
+    1992  Ribbit! (Japan)            Sega              317-0178         C2
     1992  Puyo Puyo                  Sega / Compile    317-0203         C2     171-5992A
     1992  Tant-R (Japan)             Sega              317-0211         C2
     1992  Tant-R (Korea)             Sega              ?                C2
@@ -109,11 +110,15 @@ public:
 		, m_upd7759(*this, "upd")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_io(*this, "io")
 	{
 	}
 
 	void segac2(machine_config &config);
 	void segac(machine_config &config);
+
+	void segac2_tfrceacjpb(machine_config &config);
+	void segac2_ribbit(machine_config &config);
 
 	void init_c2boot();
 	void init_bloxeedc();
@@ -197,6 +202,7 @@ private:
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<sega_315_5296_device> m_io;
 
 	int prot_func_dummy(int in);
 	int prot_func_columns(int in);
@@ -1076,6 +1082,7 @@ static INPUT_PORTS_START( anpanman )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( ribbit )
 	PORT_INCLUDE( systemc_generic )
 
@@ -1100,6 +1107,41 @@ static INPUT_PORTS_START( ribbit )
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x0c, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	//"SW2:7" unused
+	//"SW2:8" unused
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( ribbitj )
+	PORT_INCLUDE( systemc_generic )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 1 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 1 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "Credits to Start" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4") /* Lives are different */
+	PORT_DIPSETTING(    0x04, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
@@ -1560,15 +1602,15 @@ void segac2_state::segac(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
 
-	sega_315_5296_device &io(SEGA_315_5296(config, "io", XL2_CLOCK/6)); // clock divider guessed
-	io.in_pa_callback().set_ioport("P1");
-	io.in_pb_callback().set_ioport("P2");
-	io.in_pc_callback().set(FUNC(segac2_state::io_portc_r));
-	io.out_pd_callback().set(FUNC(segac2_state::io_portd_w));
-	io.in_pe_callback().set_ioport("SERVICE");
-	io.in_pf_callback().set_ioport("COINAGE");
-	io.in_pg_callback().set_ioport("DSW");
-	io.out_ph_callback().set(FUNC(segac2_state::io_porth_w));
+	SEGA_315_5296(config, m_io, XL2_CLOCK/6); // clock divider guessed
+	m_io->in_pa_callback().set_ioport("P1");
+	m_io->in_pb_callback().set_ioport("P2");
+	m_io->in_pc_callback().set(FUNC(segac2_state::io_portc_r));
+	m_io->out_pd_callback().set(FUNC(segac2_state::io_portd_w));
+	m_io->in_pe_callback().set_ioport("SERVICE");
+	m_io->in_pf_callback().set_ioport("COINAGE");
+	m_io->in_pg_callback().set_ioport("DSW");
+	m_io->out_ph_callback().set(FUNC(segac2_state::io_porth_w));
 
 	/* video hardware */
 	SEGA315_5313(config, m_vdp, XL2_CLOCK, m_maincpu);
@@ -1616,6 +1658,20 @@ void segac2_state::segac2(machine_config &config)
 	UPD7759(config, m_upd7759, XL1_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+void segac2_state::segac2_tfrceacjpb(machine_config& config)
+{
+	segac2(config);
+	m_io->set_ddr_override(0xf); // game erroneously writes 0x58 to DDR
+}
+
+void segac2_state::segac2_ribbit(machine_config& config)
+{
+	segac2(config);
+
+	// Ribbit does random measure of UPD7759 sample #A playback time and reset to round 1 if it's not in expected range (see routine @1D8D2)
+	// current UPD code is too fast, add slight delay
+	m_upd7759->set_start_delay(250);
+}
 
 
 /******************************************************************************
@@ -1719,21 +1775,31 @@ ROM_END
 
 ROM_START( borench ) /* Borench  (c)1990 Sega */
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ic32.bin", 0x000000, 0x040000, CRC(2c54457d) SHA1(adf3ea5393d2633ec6215e64f0cd89ad4567e765) ) // Need to verify proper label
-	ROM_LOAD16_BYTE( "ic31.bin", 0x000001, 0x040000, CRC(b46445fc) SHA1(24e85ef5abbc5376a854b13ed90f08f0c30d7f25) ) // Need to verify proper label
+	ROM_LOAD16_BYTE( "ic32.bin", 0x000000, 0x040000, CRC(2c54457d) SHA1(adf3ea5393d2633ec6215e64f0cd89ad4567e765) ) // Need to verify proper label - EPR-13589?
+	ROM_LOAD16_BYTE( "ic31.bin", 0x000001, 0x040000, CRC(b46445fc) SHA1(24e85ef5abbc5376a854b13ed90f08f0c30d7f25) ) // Need to verify proper label - EPR-13588?
 
 	ROM_REGION( 0x020000, "upd", 0 )
-	ROM_LOAD( "13587.ic4", 0x000000, 0x020000, CRC(62b85e56) SHA1(822ab733c87938bb70a9e32cc5dd36bbf6f21d11) )
+	ROM_LOAD( "epr-13587.ic4", 0x000000, 0x020000, CRC(62b85e56) SHA1(822ab733c87938bb70a9e32cc5dd36bbf6f21d11) )
 ROM_END
 
 
 ROM_START( borencha ) /* Borench  (c)1990 Sega */
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "13591.ic32", 0x000000, 0x040000, CRC(7851078b) SHA1(122934f0414a29b4b363acad01ee4db369259e72) )
-	ROM_LOAD16_BYTE( "13590.ic31", 0x000001, 0x040000, CRC(01bc6fe6) SHA1(b241b09852f52f712e3ddc6660ec3eb436b1302c) )
+	ROM_LOAD16_BYTE( "epr-13591.ic32", 0x000000, 0x040000, CRC(7851078b) SHA1(122934f0414a29b4b363acad01ee4db369259e72) )
+	ROM_LOAD16_BYTE( "epr-13590.ic31", 0x000001, 0x040000, CRC(01bc6fe6) SHA1(b241b09852f52f712e3ddc6660ec3eb436b1302c) )
 
 	ROM_REGION( 0x020000, "upd", 0 )
-	ROM_LOAD( "13587.ic4", 0x000000, 0x020000, CRC(62b85e56) SHA1(822ab733c87938bb70a9e32cc5dd36bbf6f21d11) )
+	ROM_LOAD( "epr-13587.ic4", 0x000000, 0x020000, CRC(62b85e56) SHA1(822ab733c87938bb70a9e32cc5dd36bbf6f21d11) )
+ROM_END
+
+
+ROM_START( borenchj ) /* Borench  (c)1990 Sega */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "epr-13586.ic32", 0x000000, 0x040000, CRC(62d7f8e8) SHA1(a2b11584c79ead70e6b8cab0b076df9bbf114803) )
+	ROM_LOAD16_BYTE( "epr-13585.ic31", 0x000001, 0x040000, CRC(087b9704) SHA1(1e974d1e40ea28e8f5e721ccf78a2ffc76f4d17d) )
+
+	ROM_REGION( 0x020000, "upd", 0 )
+	ROM_LOAD( "epr-13587.ic4", 0x000000, 0x020000, CRC(62b85e56) SHA1(822ab733c87938bb70a9e32cc5dd36bbf6f21d11) )
 ROM_END
 
 
@@ -1761,6 +1827,22 @@ ROM_START( tfrceacj ) /* Thunder Force AC (Japan)  (c)1990 Technosoft / Sega - 8
 	ROM_REGION( 0x040000, "upd", 0 )
 	ROM_LOAD( "epr-13655.ic4", 0x000000, 0x040000, CRC(e09961f6) SHA1(e109b5f41502b765d191f22e3bbcff97d6defaa1) )
 ROM_END
+
+/* This set has significantly different code addresses to both the Genesis Thunder Force III and the arcade Thunder Force AC, and seems to sit somewhere between them
+   Some sources indicate it's a hack, but it might be a hack of an otherwise unsupported set, with the protection removed, for bootleggers to sell at a profit.
+   This specific dump was sourced from a PCB sold in Canada */
+ROM_START( tfrceacjpb ) // protection chip simply marked T-FORCE (not used outside of startup init?)
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "ic32_t.f.ac_075f.ic32", 0x000000, 0x040000, CRC(2167dd93) SHA1(0e5b8eb87e07e6e5cecf096e6b62e15ff7406bba) )
+	ROM_LOAD16_BYTE( "ic31_t.f.ac_0d26.id31", 0x000001, 0x040000, CRC(ebf02bba) SHA1(effdc60837063ba04b7b4517e57a240b29a199e1) )
+	/* 0x080000 - 0x100000 Empty */
+	ROM_LOAD16_BYTE( "ic34_t.f.ac_549d.ic34", 0x100000, 0x040000, CRC(902ad2ec) SHA1(58db20ca5888110e97f80e7df9dac1b8e9817562) )
+	ROM_LOAD16_BYTE( "ic33_t.f.ac_d131.ic33", 0x100001, 0x040000, CRC(b162219d) SHA1(ad022307019b4a70cb532e1101cb5ed8d31f10e2) )
+
+	ROM_REGION( 0x040000, "upd", ROMREGION_ERASE00 )
+	// empty socket (not used)
+ROM_END
+
 
 
 ROM_START( tfrceacb ) /* Thunder Force AC (Bootleg)  (c)1990 Technosoft / Sega */
@@ -1855,8 +1937,8 @@ ROM_END
 
 ROM_START( ribbitj ) /* Ribbit  (c)1991 Sega */
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "epr-13833.ic32", 0x000000, 0x040000, CRC(21f222e2) SHA1(1e4b640833d3ec428bd50d89dc93a670a17a4451) ) // sldh - odd, Sega was very good about using different labels
-	ROM_LOAD16_BYTE( "epr-13832.ic31", 0x000001, 0x040000, CRC(1c4b291a) SHA1(61b2e7721aefb97bbd38b3ca9275d7f345f3d0a6) ) // sldh - odd, Sega was very good about using different labels
+	ROM_LOAD16_BYTE( "epr-13836.ic32", 0x000000, 0x040000, CRC(21f222e2) SHA1(1e4b640833d3ec428bd50d89dc93a670a17a4451) )
+	ROM_LOAD16_BYTE( "epr-13835.ic31", 0x000001, 0x040000, CRC(1c4b291a) SHA1(61b2e7721aefb97bbd38b3ca9275d7f345f3d0a6) )
 	ROM_COPY( "maincpu", 0x000000, 0x080000, 0x080000 )
 	ROM_LOAD16_BYTE( "epr-13838.ic34", 0x100000, 0x080000, CRC(a5d62ac3) SHA1(8d83a7bc4017e125ef4231278f766b2368d5fc1f) )
 	ROM_LOAD16_BYTE( "epr-13837.ic33", 0x100001, 0x080000, CRC(434de159) SHA1(cf2973131cabf2bc0ebb2bfe9f804ad3d7d0a733) )
@@ -1901,6 +1983,19 @@ ROM_START( tantrbl ) /* Tant-R (Puzzle & Action) (Bootleg)  (c)1992 Sega */
 	ROM_REGION( 0x040000, "upd", 0 )
 	ROM_LOAD( "pa_e03.bin", 0x000000, 0x020000, CRC(72918c58) SHA1(cb42363b163727a887a0b762519c72dcdf0a6460) )
 	ROM_LOAD( "pa_e02.bin", 0x020000, 0x020000, CRC(4e85b2a3) SHA1(3f92fb931d315c5a2d6c54b3204718574928cb7b) )
+ROM_END
+
+
+ROM_START( tantrbl4 ) // extremely similar to tantrbl, but in this one the card dispenser related text hasn't been removed
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "a.bin", 0x000000, 0x080000, CRC(25cafec2) SHA1(872ce10c080c8bddc2eaf1a48be7b43eeae32f28) )
+	ROM_LOAD16_BYTE( "b.bin", 0x000001, 0x080000, CRC(8cf5ffd5) SHA1(21bcde46d3e075a93725292a344c3d9784ae5178) )
+	ROM_LOAD16_BYTE( "d.bin", 0x100000, 0x080000, CRC(17b80202) SHA1(f47bf2aa0c5972647438619b8453c7dede5c422f) )
+	ROM_LOAD16_BYTE( "c.bin", 0x100001, 0x080000, CRC(36a88bd4) SHA1(cc7f6a947d1b79bb86957c43035b53d6d2bcfa28) )
+
+	ROM_REGION( 0x040000, "upd", 0 )
+	ROM_LOAD( "2.bin", 0x000000, 0x020000, CRC(72918c58) SHA1(cb42363b163727a887a0b762519c72dcdf0a6460) )
+	ROM_LOAD( "1.bin", 0x020000, 0x020000, CRC(4e85b2a3) SHA1(3f92fb931d315c5a2d6c54b3204718574928cb7b) )
 ROM_END
 
 
@@ -2563,12 +2658,14 @@ GAME( 1990, column2j,  columns2, segac,  columns2,        segac2_state,    init_
 GAME( 1990, tfrceac,   0,        segac2, tfrceac,         segac2_state,    init_tfrceac,  ROT0,   "Technosoft / Sega", "Thunder Force AC", 0 )
 GAME( 1990, tfrceacj,  tfrceac,  segac2, tfrceac,         segac2_state,    init_tfrceac,  ROT0,   "Technosoft / Sega", "Thunder Force AC (Japan)", 0 )
 GAME( 1990, tfrceacb,  tfrceac,  segac2, tfrceac,         segac2_state,    init_tfrceacb, ROT0,   "bootleg", "Thunder Force AC (bootleg)", 0 )
+GAME( 1990, tfrceacjpb,tfrceac,  segac2_tfrceacjpb, tfrceac,         segac2_state,    init_tfrceac,  ROT0,   "Technosoft / Sega", "Thunder Force AC (Japan, prototype, bootleg)", 0 )
 
 GAME( 1990, borench,   0,        segac2, borench,         segac2_state,    init_borench,  ROT0,   "Sega", "Borench (set 1)", 0 )
 GAME( 1990, borencha,  borench,  segac2, borench,         segac2_state,    init_borench,  ROT0,   "Sega", "Borench (set 2)", 0 )
+GAME( 1990, borenchj,  borench,  segac2, borench,         segac2_state,    init_borench,  ROT0,   "Sega", "Borench (Japan)", 0 )
 
-GAME( 1991, ribbit,    0,        segac2, ribbit,          segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit!", 0 )
-GAME( 1991, ribbitj,   ribbit,   segac2, ribbit,          segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit! (Japan)", 0 )
+GAME( 1991, ribbit,    0,        segac2_ribbit, ribbit,          segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit!", 0 )
+GAME( 1991, ribbitj,   ribbit,   segac2_ribbit, ribbitj,         segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit! (Japan)", 0 )
 
 GAME( 1991, twinsqua,  0,        segac2, twinsqua,        segac2_state,    init_twinsqua, ROT0,   "Sega", "Twin Squash", 0 )
 
@@ -2582,6 +2679,7 @@ GAME( 1992, puyoja,    puyo,     segac2, puyo,            segac2_state,    init_
 GAME( 1992, tantr,     0,        segac2, ichir,           segac2_state,    init_tantr,    ROT0,   "Sega", "Puzzle & Action: Tant-R (Japan)", 0 )
 GAME( 1993, tantrkor,  tantr,    segac2, ichir,           segac2_state,    init_tantrkor, ROT0,   "Sega", "Puzzle & Action: Tant-R (Korea)", 0 )
 GAME( 1992, tantrbl,   tantr,    segac2, ichir,           segac2_state,    init_c2boot,   ROT0,   "bootleg", "Puzzle & Action: Tant-R (Japan) (bootleg set 1)", 0 )
+GAME( 1992, tantrbl4,  tantr,    segac2, ichir,           segac2_state,    init_c2boot,   ROT0,   "bootleg", "Puzzle & Action: Tant-R (Japan) (bootleg set 4)", 0 )
 GAME( 1994, tantrbl2,  tantr,    segac,  ichir,           segac2_state,    init_tantr,    ROT0,   "bootleg", "Puzzle & Action: Tant-R (Japan) (bootleg set 2)", 0 ) // Common bootleg in Europe, C board, no samples
 GAME( 1994, tantrbl3,  tantr,    segac,  ichir,           segac2_state,    init_tantr,    ROT0,   "bootleg", "Puzzle & Action: Tant-R (Japan) (bootleg set 3)", 0 ) // Common bootleg in Europe, C board, no samples
 

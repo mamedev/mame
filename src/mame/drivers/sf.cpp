@@ -148,7 +148,7 @@ WRITE8_MEMBER(sf_state::msm_w)
 {
 	m_msm[Chip]->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
-	m_msm[Chip]->write_data(data);
+	m_msm[Chip]->data_w(data);
 	m_msm[Chip]->vclk_w(1);
 	m_msm[Chip]->vclk_w(0);
 }

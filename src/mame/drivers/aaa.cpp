@@ -11,7 +11,7 @@ Skeleton driver for Ann Arbor Ambassador terminal.
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/input_merger.h"
-#include "machine/mc2661.h"
+#include "machine/scn_pci.h"
 #include "machine/nvram.h"
 #include "screen.h"
 
@@ -43,7 +43,7 @@ private:
 	void io_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	required_device_array<mc2661_device, 2> m_usart;
+	required_device_array<scn2651_device, 2> m_usart;
 	required_device<screen_device> m_screen;
 	optional_ioport_array<16> m_key_row;
 	required_region_ptr<u8> m_font;
@@ -244,7 +244,7 @@ void aaa_state::aaa(machine_config &config)
 	input_merger_device &usartint(INPUT_MERGER_ANY_HIGH(config, "usartint")); // open collector
 	usartint.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MC2661(config, m_usart[0], 5.0688_MHz_XTAL); // 16F on I/O board
+	SCN2651(config, m_usart[0], 5.0688_MHz_XTAL); // 16F on I/O board
 	m_usart[0]->txrdy_handler().set("usartint", FUNC(input_merger_device::in_w<0>));
 	m_usart[0]->rxrdy_handler().set("usartint", FUNC(input_merger_device::in_w<1>));
 	m_usart[0]->txemt_dschg_handler().set("usartint", FUNC(input_merger_device::in_w<2>));
@@ -252,7 +252,7 @@ void aaa_state::aaa(machine_config &config)
 	m_usart[0]->rts_handler().set("printer", FUNC(rs232_port_device::write_rts));
 	m_usart[0]->dtr_handler().set("printer", FUNC(rs232_port_device::write_dtr));
 
-	MC2661(config, m_usart[1], 5.0688_MHz_XTAL); // 18F on I/O board
+	SCN2651(config, m_usart[1], 5.0688_MHz_XTAL); // 18F on I/O board
 	m_usart[1]->txrdy_handler().set("usartint", FUNC(input_merger_device::in_w<3>));
 	m_usart[1]->rxrdy_handler().set("usartint", FUNC(input_merger_device::in_w<4>));
 	m_usart[1]->txemt_dschg_handler().set("usartint", FUNC(input_merger_device::in_w<5>));
@@ -265,14 +265,14 @@ void aaa_state::aaa(machine_config &config)
 	m_screen->set_screen_update(FUNC(aaa_state::screen_update));
 
 	rs232_port_device &computer(RS232_PORT(config, "computer", default_rs232_devices, nullptr));
-	computer.rxd_handler().set(m_usart[1], FUNC(mc2661_device::rx_w));
-	computer.cts_handler().set(m_usart[1], FUNC(mc2661_device::cts_w));
-	computer.dsr_handler().set(m_usart[1], FUNC(mc2661_device::dsr_w));
+	computer.rxd_handler().set(m_usart[1], FUNC(scn2651_device::rxd_w));
+	computer.cts_handler().set(m_usart[1], FUNC(scn2651_device::cts_w));
+	computer.dsr_handler().set(m_usart[1], FUNC(scn2651_device::dsr_w));
 
 	rs232_port_device &printer(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
-	printer.rxd_handler().set(m_usart[0], FUNC(mc2661_device::rx_w));
-	printer.cts_handler().set(m_usart[0], FUNC(mc2661_device::cts_w));
-	printer.dsr_handler().set(m_usart[0], FUNC(mc2661_device::dsr_w));
+	printer.rxd_handler().set(m_usart[0], FUNC(scn2651_device::rxd_w));
+	printer.cts_handler().set(m_usart[0], FUNC(scn2651_device::cts_w));
+	printer.dsr_handler().set(m_usart[0], FUNC(scn2651_device::dsr_w));
 }
 
 /**************************************************************************************************************

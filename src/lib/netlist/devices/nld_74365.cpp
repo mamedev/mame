@@ -26,8 +26,8 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(74365)
 		, m_G1Q(*this, "G1Q")
 		, m_G2Q(*this, "G2Q")
-		, m_A(*this, {{ "A1", "A2", "A3", "A4", "A5", "A6" }})
-		, m_Y(*this, {{ "Y1", "Y2", "Y3", "Y4", "Y5", "Y6" }})
+		, m_A(*this, { "A1", "A2", "A3", "A4", "A5", "A6" })
+		, m_Y(*this, { "Y1", "Y2", "Y3", "Y4", "Y5", "Y6" })
 		, m_power_pins(*this)
 		{
 		}

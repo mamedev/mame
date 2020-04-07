@@ -57,7 +57,7 @@ template<unsigned Layer>
 TILE_GET_INFO_MEMBER(esd16_state::get_tile_info)
 {
 	const u16 code = m_vram[Layer][tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			m_tilemap_color[Layer],
 			0);
@@ -67,7 +67,7 @@ template<unsigned Layer>
 TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_16x16)
 {
 	const u16 code = m_vram[Layer][tile_index];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code,
 			m_tilemap_color[Layer],
 			0);

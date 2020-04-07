@@ -31,8 +31,8 @@ public:
 
 	// I/O operations
 //  void io_map(address_map &map);
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi_r );
 
@@ -177,20 +177,20 @@ private:
 
 	void smpc_regs(address_map &map);
 
-	DECLARE_WRITE8_MEMBER( ireg_w );
-	DECLARE_WRITE8_MEMBER( command_register_w );
-	DECLARE_READ8_MEMBER( oreg_r );
-	DECLARE_READ8_MEMBER( status_register_r );
-	DECLARE_WRITE8_MEMBER( status_flag_w );
-	DECLARE_READ8_MEMBER( status_flag_r );
-	DECLARE_READ8_MEMBER( pdr1_r );
-	DECLARE_READ8_MEMBER( pdr2_r );
-	DECLARE_WRITE8_MEMBER( pdr1_w );
-	DECLARE_WRITE8_MEMBER( pdr2_w );
-	DECLARE_WRITE8_MEMBER( ddr1_w );
-	DECLARE_WRITE8_MEMBER( ddr2_w );
-	DECLARE_WRITE8_MEMBER( iosel_w );
-	DECLARE_WRITE8_MEMBER( exle_w );
+	void ireg_w(offs_t offset, uint8_t data);
+	void command_register_w(uint8_t data);
+	uint8_t oreg_r(offs_t offset);
+	uint8_t status_register_r();
+	void status_flag_w(uint8_t data);
+	uint8_t status_flag_r();
+	uint8_t pdr1_r();
+	uint8_t pdr2_r();
+	void pdr1_w(uint8_t data);
+	void pdr2_w(uint8_t data);
+	void ddr1_w(uint8_t data);
+	void ddr2_w(uint8_t data);
+	void iosel_w(uint8_t data);
+	void exle_w(uint8_t data);
 };
 
 

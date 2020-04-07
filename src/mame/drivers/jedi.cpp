@@ -225,8 +225,8 @@ READ8_MEMBER(jedi_state::novram_data_r)
 
 WRITE8_MEMBER(jedi_state::novram_data_w)
 {
-	m_novram[0]->write(space, offset, data & 0x0f);
-	m_novram[1]->write(space, offset, data >> 4);
+	m_novram[0]->write(offset, data & 0x0f);
+	m_novram[1]->write(offset, data >> 4);
 }
 
 

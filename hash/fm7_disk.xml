@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
-<!-- FM-7 floppy disk images -->
-<!-- Multi-image games are untested -->
-
 <!--
+license:CC0
+
+FM-7 floppy disk images
+Multi-image games are untested
+
 
 Titles, serial #s, publishers and release dates taken from:
   - Oh!FM-7 ( http://retropc.net/fm-7/ )

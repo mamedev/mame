@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 	<element name="surround"><rect><color red="0.05" green="0.0" blue="0.0" /></rect></element>
 	<element name="beige"><rect><color red="0.93" green="0.92" blue="0.8" /></rect></element>

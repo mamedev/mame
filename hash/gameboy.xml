@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
 
   To investigate:
   - Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GBC version?
@@ -9,10 +9,6 @@
   Undumped pirate carts:
   - GOWIN carts (see below the list of known games)
 
--->
-
-
-<!--
 
  Info on the PCB codes, based on Tauwasser's notes and research
 

@@ -1,9 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- The majority of this list was sourced from The Ultimate Tape Archive V1.0 released 11th December 2018. -->
-<!-- Some others are based on c64tapes.org dumps -->
-<!-- Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/index.htm -->
+The majority of this list was sourced from The Ultimate Tape Archive V1.0 released 11th December 2018.
+Some others are based on c64tapes.org dumps
+Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/index.htm
+-->
 
 <softwarelist name="c64_cass" description="Commodore 64 cassettes">
 
@@ -79,15 +82,16 @@
 		<description>3D Pinball</description>
 		<year>1989</year>
 		<publisher>Mastertronic Plus</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="3dpinbla" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="192466">
 				<rom name="3dpinbla.tap" size="192466" crc="fa7d00d8" sha1="9e547ac4ee11b6b6f034f4cac5c31079c23373b3"/>
 			</dataarea>
 		</part>
 
-		<part name="3dpinblb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="192466">
 				<rom name="3dpinblb.tap" size="192466" crc="f91f841d" sha1="2ed915985ef8192df097b420b17dfbe87ed358bb"/>
@@ -99,15 +103,16 @@
 		<description>American 3D Pool</description>
 		<year>1991</year>
 		<publisher>Zeppelin Games</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="a3dpoola" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="861564">
 				<rom name="a3dpoola.tap" size="861564" crc="3381e127" sha1="a3cca3ad5638f9e2e08b223cfd2526f72fdeb063"/>
 			</dataarea>
 		</part>
 
-		<part name="a3dpoolb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="867657">
 				<rom name="a3dpoolb.tap" size="867657" crc="acc6f5fe" sha1="f21761d9d86e1bc98ea081a7405193e1eae6e30e"/>
@@ -307,6 +312,27 @@
 		</part>
 	</software>
 
+	<software name="alice">
+		<description>Alice in Videoland</description>
+		<year>1984</year>
+		<publisher>Audiogenic Software</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="510694">
+				<rom name="alicea.tap" size="510694" crc="cbf9ee38" sha1="6061be82148c2d5c6c30b8316ca41f8a70da4352"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="334160">
+				<rom name="aliceb.tap" size="334160" crc="33728578" sha1="09cfe61a693a9a454e8d18f316010d6e5b824784"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alleykat">
 		<description>Alleykat</description>
 		<year>1986</year>
@@ -383,15 +409,16 @@
 		<description>Angle Ball</description>
 		<year>1987</year>
 		<publisher>Mastertronic Added Dimension</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="anglebla" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="267415">
 				<rom name="anglebla.tap" size="267415" crc="8a71c7cf" sha1="f60d649fd0087ae4692947750c56733159bffd2a"/>
 			</dataarea>
 		</part>
 
-		<part name="angleblb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="267414">
 				<rom name="angleblb.tap" size="267414" crc="8c58c3c3" sha1="f4db67b46dec798230fea7291445c1cbddf74c0d"/>
@@ -609,15 +636,16 @@
 		<description>Ball Crazy</description>
 		<year>1987</year>
 		<publisher>Mastertronic Added Dimension</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="ballcrza" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="531341">
 				<rom name="ballcrza.tap" size="531341" crc="e0b0dfce" sha1="d97966c12248724d0334c8ccfb03bfb877d92d03"/>
 			</dataarea>
 		</part>
 
-		<part name="ballcrzb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="528497">
 				<rom name="ballcrzb.tap" size="528497" crc="ddb141fb" sha1="d8e3ebaee70fcaa1b81d2ab02111bb7d0e033a4d"/>
@@ -1003,6 +1031,20 @@
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="563306">
 				<rom name="BMX_Trials_a1.tap" size="563306" crc="ed544e3b" sha1="f4e364c61f2c3465e2936543961ff0da3d843012"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdash4h">
+		<description>Boulder Dash 4</description>
+		<year>1989</year>
+		<publisher>Hi Tec Software</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass" interface="cbm_cass">
+			<feature name="part_id" value="Boulder Dash Construction Kit"/>
+			<dataarea name="cass" size="250098">
+				<rom name="bdashck.tap" size="250098" crc="a1748639" sha1="6a76ba69fdf0709ce330c2c47ceb7677fdd45bb9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1588,6 +1630,27 @@
 		</part>
 	</software>
 
+	<software name="collaps">
+		<description>Collapse</description>
+		<year>1985</year>
+		<publisher>Silver Range</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="533661">
+				<rom name="collapsa.tap" size="533661" crc="b87ccba8" sha1="dc513a87121cb2cc653044e14e8d4a476fb4bfcf"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="533458">
+				<rom name="collapsb.tap" size="533458" crc="50c6665c" sha1="b7aa2d8b08454514e3b68d282fc1ee2f4ee7fd66"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="comblynx">
 		<description>Combat Lynx</description>
 		<year>19??</year>
@@ -1648,22 +1711,23 @@
 		</part>
 	</software>
 
-	<software name="circus">
+	<software name="circusp">
 		<description>Continental Circus</description>
 		<year>1991</year>
 		<publisher>Mastertronic Plus</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="circusa" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="569886">
-				<rom name="circusa.tap" size="569886" crc="d0f36a0b" sha1="bd09c14234c8c89fc391631f0fc949a7fd8a7922"/>
+				<rom name="circuspa.tap" size="569886" crc="d0f36a0b" sha1="bd09c14234c8c89fc391631f0fc949a7fd8a7922"/>
 			</dataarea>
 		</part>
 
-		<part name="circusb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="569886">
-				<rom name="circusb.tap" size="569886" crc="df7f4101" sha1="b07a48a3283936058f6e3147d41f34f3001ba650"/>
+				<rom name="circuspb.tap" size="569886" crc="df7f4101" sha1="b07a48a3283936058f6e3147d41f34f3001ba650"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2227,15 +2291,16 @@
 		<description>Feud</description>
 		<year>1987</year>
 		<publisher>Bulldog Software</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="feuda" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="611910">
 				<rom name="feuda.tap" size="611910" crc="9ac57691" sha1="ff53d728123469ce40c8c1553cb03912aa897e60"/>
 			</dataarea>
 		</part>
 
-		<part name="feudb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="611910">
 				<rom name="feudb.tap" size="611910" crc="0cbe87c1" sha1="b06e65952e8d2c8ee0b8cb227134136ba53b62b3"/>
@@ -2682,6 +2747,19 @@
 		</part>
 	</software>
 
+	<software name="gemini">
+		<description>Gemini Wing</description>
+		<year>1990</year>
+		<publisher>Mastertronic Plus</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="483502">
+				<rom name="geminia.tap" size="483502" crc="4486a5ec" sha1="e410f1ba26197f6bbc44c461ba169a5d84af2726"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="getrdyrd">
 		<description>Get Ready to Read with BJ Bear</description>
 		<year>1984</year>
@@ -2851,6 +2929,27 @@
 		</part>
 	</software>
 
+	<software name="grandms">
+		<description>Grandmaster Chess</description>
+		<year>1986</year>
+		<publisher>Audiogenic Software</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="479942">
+				<rom name="grandmsa.tap" size="479942" crc="bb1e3edc" sha1="f35835579544c8b58b3c01cfa402a653c8b3b2e4"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="410344">
+				<rom name="grandmsb.tap" size="410344" crc="002b9b44" sha1="6f2356a96d4433ae9847564d0350d973390a35b5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="graphed">
 		<description>Graphic Editor</description>
 		<year>19??</year>
@@ -2877,6 +2976,27 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="535584">
 				<rom name="Graphics_Editor.tap" size="535584" crc="b2cae4b9" sha1="448d4edccf481ac231cb44ae302573cab02ae80f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="greedmn">
+		<description>The Greed Monster</description>
+		<year>1990</year>
+		<publisher>Hi Tec Software</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="827446">
+				<rom name="greedmna.tap" size="827446" crc="d75a92ce" sha1="5178771a761c53d95769edbcc257fe2acf4c9a55"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="830302">
+				<rom name="greedmnb.tap" size="830302" crc="489e9390" sha1="61503e8fbaea297824729cc24023819fba8d77ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2979,6 +3099,27 @@
 		</part>
 	</software>
 
+	<software name="hacker2">
+		<description>Hacker II</description>
+		<year>1989</year>
+		<publisher>Mastertronic</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="384234">
+				<rom name="hacker2a.tap" size="384234" crc="9c9c5aed" sha1="a499a909d48578ad7b0df5b16a97c4f2930dbaad"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="384234">
+				<rom name="hacker2b.tap" size="384234" crc="7c16e324" sha1="80e830dfb92916441ccfbd2c6e01e278bfa37c65"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hate">
 		<description>H.A.T.E: Hostile All Terrain Encounter</description>
 		<year>1989</year>
@@ -3035,6 +3176,19 @@
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="505908">
 				<rom name="Harvey_Headbanger_a1.tap" size="505908" crc="18a0e01e" sha1="3cf6fe8cf88cb667e76719a1e2ebd990056d64de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="headovrh">
+		<description>Head Over Heels</description>
+		<year>1987</year>
+		<publisher>The Hit Squad</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="671518">
+				<rom name="headovhb.tap" size="671518" crc="0fa1d871" sha1="673c375205cc2cd052ccdf52f99f482f26f59038"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3966,6 +4120,20 @@
 		</part>
 	</software>
 
+	<software name="kettle">
+		<description>Kettle</description>
+		<year>1986</year>
+		<publisher>Alligata</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="329346">
+				<rom name="kettlea.tap" size="329346" crc="1ac910df" sha1="6f99c98d6c67ab1fd0678db4d26cb30bb4db7b55"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kgbsspy">
 		<description>KGB Superspy</description>
 		<year>19??</year>
@@ -4354,6 +4522,27 @@
 		</part>
 	</software>
 
+	<software name="mstrchs">
+		<description>Master Chess</description>
+		<year>1986</year>
+		<publisher>Mastertronic</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="391752">
+				<rom name="mstrchsa.tap" size="391752" crc="42fd4547" sha1="caabae9d2957866f3861e650753edb24da216e9b"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="395320">
+				<rom name="mstrchsb.tap" size="395320" crc="ccf02674" sha1="f97584ee6a87da30e79e57c9dec39a888637f683"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="matchpnt">
 		<description>Match Point (set 1)</description>
 		<year>1984</year>
@@ -4420,6 +4609,32 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="446106">
 				<rom name="Micro_Ball.tap" size="446106" crc="9d925150" sha1="cc918584963589c142605ff85985014c1a262a4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rhythm">
+		<description>Micro Rhythm</description>
+		<year>1986</year>
+		<publisher>Silver Range</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="614063">
+				<rom name="rhythma.tap" size="614063" crc="1e2e9fb3" sha1="6c773ae1c38cf38508467025e5538d77c3f57e0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midnghth">
+		<description>Midnight Resistance</description>
+		<year>1990</year>
+		<publisher>The Hit Squad</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="726358">
+				<rom name="mdnghtha.tap" size="726358" crc="af57f127" sha1="9719f7d03f9956cfef8bada30d6ddd2850b45751"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4869,15 +5084,16 @@
 		<description>One Man and His Droid</description>
 		<year>1985</year>
 		<publisher>199 Range</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="omahda" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="611660">
 				<rom name="omahda.tap" size="611660" crc="6da4096b" sha1="263e452ba8e5f69411a873ba8ce1907f2610d24f"/>
 			</dataarea>
 		</part>
 
-		<part name="omahdb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="598097">
 				<rom name="omahdb.tap" size="598097" crc="30661926" sha1="60d822dc311a72b197483b79b29ea9daab4366de"/>
@@ -5396,6 +5612,27 @@
 		</part>
 	</software>
 
+	<software name="pulsewr">
+		<description>Pulse Warrior</description>
+		<year>1988</year>
+		<publisher>Mastertronic</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="351478">
+				<rom name="pulsewra.tap" size="351478" crc="ca177733" sha1="3b6fdaf9c34882e111efbf2301dc00df202c8246"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="351478">
+				<rom name="pulsewrb.tap" size="351478" crc="bdd439e3" sha1="ca4b3fa5b0ce4f9c2fe69d313fbea3774855dbc9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="punchy">
 		<description>Punchy</description>
 		<year>1983</year>
@@ -5699,6 +5936,27 @@
 		</part>
 	</software>
 
+	<software name="realm">
+		<description>Realm</description>
+		<year>1987</year>
+		<publisher>Silver Range</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="268118">
+				<rom name="realma.tap" size="268118" crc="f90a5aa9" sha1="6f8bb642b03f3cad305c215a587923b047ed5ee2"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="268118">
+				<rom name="realmb.tap" size="268118" crc="f90a5aa9" sha1="6f8bb642b03f3cad305c215a587923b047ed5ee2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="realmimp">
 		<description>Realm of Impossibility</description>
 		<year>1984</year>
@@ -5917,19 +6175,34 @@
 		</part>
 	</software>
 
-	<software name="robocop">
+	<software name="robocodk">
+		<description>James Pond 2: RoboCod</description>
+		<year>1992</year>
+		<publisher>Kixx</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="763681">
+				<rom name="robocoda.tap" size="763681" crc="9c3a5a87" sha1="1f47600332f3140c3956f7907e0707e38d3f617c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robocoph">
 		<description>Robocop</description>
 		<year>1988</year>
 		<publisher>The Hit Squad</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="robocopa" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="1510854">
 				<rom name="robocopa.tap" size="1510854" crc="66624f2c" sha1="e8d137e6a345c0e3cafd1bf56eb7215a7a6dc597"/>
 			</dataarea>
 		</part>
 
-		<part name="robocopb" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="1510854">
 				<rom name="robocopb.tap" size="1510854" crc="a018d08f" sha1="b4730e17a2566994c017dcfe893968375c30d3ec"/>
@@ -5985,15 +6258,16 @@
 		<description>Rockford / Back to Reality</description>
 		<year>1987</year>
 		<publisher>Mastertronic Added Dimension</publisher>
+		<!-- Dumped by @c64tapes -->
 
-		<part name="breality" interface="cbm_cass">
+		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Back to Reality"/>
 			<dataarea name="cass" size="570317">
 				<rom name="breality.tap" size="570317" crc="2f561e28" sha1="ed091ed18ac721772d567d2a6e24cef44a3a3b7a"/>
 			</dataarea>
 		</part>
 
-		<part name="rockford" interface="cbm_cass">
+		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Rockford"/>
 			<dataarea name="cass" size="333295">
 				<rom name="rockford.tap" size="333295" crc="ec352a42" sha1="b74140b6c605c914f5d983eabff74b38167c1777"/>
@@ -6588,7 +6862,7 @@
 
 	<software name="spyvspy">
 		<description>Spy vs Spy</description>
-		<year>19??</year>
+		<year>1989</year>
 		<publisher>HiTEC Software</publisher>
 
 		<part name="cass1" interface="cbm_cass">
@@ -6600,7 +6874,7 @@
 
 	<software name="spyvspy2">
 		<description>Spy vs Spy II: The Island Caper</description>
-		<year>19??</year>
+		<year>1989</year>
 		<publisher>HiTEC Software</publisher>
 
 		<part name="cass1" interface="cbm_cass">
@@ -6612,7 +6886,7 @@
 
 	<software name="spyvspy3">
 		<description>Spy vs Spy III: Arctic Antics</description>
-		<year>19??</year>
+		<year>1989</year>
 		<publisher>HiTEC Software</publisher>
 
 		<part name="cass1" interface="cbm_cass">
@@ -6996,6 +7270,27 @@
 		</part>
 	</software>
 
+	<software name="summrck">
+		<description>Summer Camp</description>
+		<year>1990</year>
+		<publisher>Kixx</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="507164">
+				<rom name="summrcka.tap" size="507164" crc="2c8bc3d7" sha1="c2f8468308b202c6b60c2beed1edf38f5a46dbff"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="515968">
+				<rom name="summrckb.tap" size="515968" crc="e913833d" sha1="d4ad033192e4788d28574d5c45c2afde81d75121"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sumgames">
 		<description>Summer Games</description>
 		<year>1984</year>
@@ -7256,6 +7551,27 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="300979">
 				<rom name="Test_Master.tap" size="300979" crc="c63385b6" sha1="469d1c2b888dc7d7c183834fe237c10c67987fc6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>1989</year>
+		<publisher>Mastertronic Plus</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="444689">
+				<rom name="tetrisa.tap" size="444689" crc="13bc6c8d" sha1="7c1fac70c035aa6d782a690f779302243aabd03a"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="444689">
+				<rom name="tetrisb.tap" size="444689" crc="79de6451" sha1="abf51ce18a4cf38e4248952580c4385f8b3bd2a6"/>
 			</dataarea>
 		</part>
 	</software>

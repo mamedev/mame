@@ -96,6 +96,7 @@ tharrier test mode:
 1)  Press player 2 buttons 1+2 during reset.  "Are you ready?" will appear
 2)  Press player 1 buttons in this sequence:
     2,1,2,2,1,1,↓,↓
+Note: this doesn't currently work, the message never appears (most likely an error in the protection simulation).
 
 tdragon and hachamf test mode:
 
@@ -106,6 +107,8 @@ mustang and blkheart test mode:
 
 1)  Press player 2 buttons 1+2 during reset.  "Ready?" will appear
 2)  Press player 1 button 1 14 (!) times
+Note: blkheart has a buggy service mode, apparently they shifted the ASCII gfx bank at $3xx but
+      forgot to update the routines so it treats the VRAM as if ASCII bank is at $0xx (cfr. the move.w imm,Ax).
 
 gunnail test mode:
 
@@ -118,9 +121,8 @@ bjtwin test mode:
 2)  Press player 1 buttons in this sequence:
     2,2,2, 1,1,1, 2,2,2, 1,1,1
     The release date of this program will appear.
-
-Some code has to be patched out for this to work (see below). The program
-remaps button 2 and 3 to button 1, so you can't enter the above sequence.
+Note: Some code has to be patched out for this to work (cfr. init_bjtwin fn).
+The program remaps button 2 and 3 to button 1, so you can't enter the above sequence.
 
 ---
 
@@ -1284,7 +1286,7 @@ void nmk16_state::bjtwin_map(address_map &map)
 	map(0x084020, 0x08402f).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x094001, 0x094001).w(FUNC(nmk16_state::tilebank_w));
-	map(0x094002, 0x094003).nopw();    /* IRQ enable? */
+	map(0x094003, 0x094003).w(FUNC(nmk16_state::bjtwin_scroll_w));    // sabotenb specific?
 	map(0x09c000, 0x09cfff).mirror(0x1000).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
 	map(0x0f0000, 0x0fffff).ram().share("mainram");
 }

@@ -80,7 +80,7 @@ TILE_GET_INFO_MEMBER(ddribble_state::get_fg_tile_info)
 {
 	uint8_t attr = m_fg_videoram[tile_index];
 	int num = m_fg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + ((m_charbank[0] & 2) << 10);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			num,
 			0,
 			TILE_FLIPYX((attr & 0x30) >> 4));
@@ -90,7 +90,7 @@ TILE_GET_INFO_MEMBER(ddribble_state::get_bg_tile_info)
 {
 	uint8_t attr = m_bg_videoram[tile_index];
 	int num = m_bg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + (m_charbank[1] << 11);
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			num,
 			0,
 			TILE_FLIPYX((attr & 0x30) >> 4));

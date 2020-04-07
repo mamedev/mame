@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(kickgoal_state::get_kickgoal_fg_tile_info)
 	u16 const tileno = m_fgram[tile_index * 2] & 0x0fff;
 	u16 const color  = m_fgram[tile_index * 2 + 1] & 0x000f;
 
-	SET_TILE_INFO_MEMBER(BIT(tile_index, 5) ? 3 : 0, tileno + m_fg_base, color + 0x00, 0); // similar 8x8 gfx behavior as CPS1
+	tileinfo.set(BIT(tile_index, 5) ? 3 : 0, tileno + m_fg_base, color + 0x00, 0); // similar 8x8 gfx behavior as CPS1
 }
 
 TILE_GET_INFO_MEMBER(kickgoal_state::get_actionhw_fg_tile_info)
@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(kickgoal_state::get_actionhw_fg_tile_info)
 	u16 const tileno = m_fgram[tile_index * 2] & 0x0fff;
 	u16 const color  = m_fgram[tile_index * 2 + 1] & 0x000f;
 
-	SET_TILE_INFO_MEMBER(0, tileno + m_fg_base, color + 0x00, 0);
+	tileinfo.set(0, tileno + m_fg_base, color + 0x00, 0);
 }
 
 /* BG */
@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(kickgoal_state::get_bg_tile_info)
 	bool const flipx = m_bgram[tile_index * 2 + 1] & 0x0020;
 	bool const flipy = m_bgram[tile_index * 2 + 1] & 0x0040;
 
-	SET_TILE_INFO_MEMBER(1, tileno + m_bg_base, color + 0x10, (flipx ? TILE_FLIPX : 0) | (flipy ? TILE_FLIPY : 0));
+	tileinfo.set(1, tileno + m_bg_base, color + 0x10, (flipx ? TILE_FLIPX : 0) | (flipy ? TILE_FLIPY : 0));
 }
 
 /* BG 2 */
@@ -60,7 +60,7 @@ TILE_GET_INFO_MEMBER(kickgoal_state::get_bg2_tile_info)
 	bool const flipx = m_bg2ram[tile_index * 2 + 1] & 0x0020;
 	bool const flipy = m_bg2ram[tile_index * 2 + 1] & 0x0040;
 
-	SET_TILE_INFO_MEMBER(m_bg2_region, tileno + m_bg2_base, color + 0x20, (flipx ? TILE_FLIPX : 0) | (flipy ? TILE_FLIPY : 0));
+	tileinfo.set(m_bg2_region, tileno + m_bg2_base, color + 0x20, (flipx ? TILE_FLIPX : 0) | (flipy ? TILE_FLIPY : 0));
 }
 
 

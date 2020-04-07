@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(trucocl_state::get_bg_tile_info)
 	code |= ( bank & 2 ) << 8;
 	code += ( bank & 4 ) << 6;
 
-	SET_TILE_INFO_MEMBER(gfxsel,code,colour,0);
+	tileinfo.set(gfxsel,code,colour,0);
 }
 
 void trucocl_state::video_start()

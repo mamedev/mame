@@ -87,8 +87,8 @@ public:
 	auto timer_irq_callback() { return m_tirq_out_cb.bind(); }
 	auto port_irq_callback() { return m_pirq_out_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER (write);
-	DECLARE_READ8_MEMBER (read);
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
 
 	// TODO: remove these methods and replace it with a call to methods below in force68k.cpp
 	void h1_set(uint8_t state) { if (state) m_psr |= 1; else m_psr &= ~1; }

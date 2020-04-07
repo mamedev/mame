@@ -271,7 +271,7 @@ WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
 {
 	int data;
 
-	if(state && (data = m_keyboard->read(machine().dummy_space(), 0)))
+	if(state && (data = m_keyboard->read()))
 	{
 		uint8_t   parity = 0;
 		int     i;

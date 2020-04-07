@@ -1,18 +1,20 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Electron Tapes -->
+Electron Tapes
 
-<!-- I believe all the Cassette images here are original, so some require the manuals for additional copy protection -->
+I believe all the Cassette images here are original, so some require the manuals for additional copy protection
 
-<!-- Loading Instructions:
+    Loading Instructions:
 
       To load the software use CHAIN"" or *RUN.
 
       To start/stop the tape you must use the MAME menus, so you'll have to turn full keyboard mode off with Scroll Lock, then navigate the menus, turning Scroll Lock back on when you're finished.
--->
 
-<!-- This list was compiled from the archive at http://www.stairwaytohell.com/. Additional titles will be added as they are made available at http://stardot.org.uk/ forum. -->
+This list was compiled from the archive at http://www.stairwaytohell.com/. Additional titles will be added as they are made available at http://stardot.org.uk/ forum.
+-->
 
 <softwarelist name="electron_cass" description="Acorn Electron cassettes">
 

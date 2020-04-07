@@ -201,7 +201,7 @@ READ8_MEMBER(segag80v_state::g80v_opcode_r)
 	return op;
 }
 
-offs_t segag80v_state::decrypt_offset(address_space &space, offs_t offset)
+offs_t segag80v_state::decrypt_offset(offs_t offset)
 {
 	if (m_scrambled_write_pc == 0xffff)
 		return offset;
@@ -215,13 +215,13 @@ offs_t segag80v_state::decrypt_offset(address_space &space, offs_t offset)
 
 WRITE8_MEMBER(segag80v_state::mainram_w)
 {
-	m_mainram[decrypt_offset(space, offset)] = data;
+	m_mainram[decrypt_offset(offset)] = data;
 }
 
-WRITE8_MEMBER(segag80v_state::usb_ram_w){ m_usb->ram_w(space, decrypt_offset(m_maincpu->space(AS_PROGRAM), offset), data); }
+WRITE8_MEMBER(segag80v_state::usb_ram_w){ m_usb->ram_w(space, decrypt_offset(offset), data); }
 WRITE8_MEMBER(segag80v_state::vectorram_w)
 {
-	m_vectorram[decrypt_offset(space, offset)] = data;
+	m_vectorram[decrypt_offset(offset)] = data;
 }
 
 

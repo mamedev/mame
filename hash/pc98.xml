@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="pc98" description="NEC PC-9801 disk images">
 <!--
 
@@ -27389,8 +27392,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="mjfant2s">
-		<description>Mahjong Gensoukyoku II - Mahjong Fantasia - The 2nd Stage</description>
+	<!-- boot OK -->
+	<software name="mjfant2s" supported="yes">
+		<description>Mahjong Gensoukyoku II - Mahjong Fantasia - The 2nd Stage (v1.02b)</description>
 		<year>1993</year>
 		<publisher>アクティブ (Active)</publisher>
 		<info name="alt_title" value="麻雀幻想曲２" />
@@ -27421,7 +27425,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="mjhtry2">
+	<!-- boot OK, sound may output a fixed tone and hang during gameplay (happened after declaring riichi) -->
+	<software name="mjhtry2" supported="partial">
 		<description>Mahjong Hou Tei Rao Yui II</description>
 		<year>1996</year>
 		<publisher>クィーンソフト (Queensoft)</publisher>
@@ -27441,12 +27446,14 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="mjkyojs2">
+	<!-- boot OK -->
+	<software name="mjkyojs2" supported="yes">
 		<description>Mahjong Kyo Jidai Special II - Bouken Hen</description>
 		<year>1990</year>
 		<publisher>マイクロネット (Micronet)</publisher>
 		<info name="alt_title" value="麻雀狂時代スペシャル２ 冒険篇" />
 		<info name="release" value="199004xx" />
+		<info name="usage" value="Only pc9801_26 is fully compatible for sound." />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
@@ -27493,7 +27500,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="mjsaikou">
+	<!-- cannot detect sound card -->
+	<software name="mjsaikou" supported="partial">
 		<description>Mahjong Saikou</description>
 		<year>1991</year>
 		<publisher>コスモス・コンピュータ (Cosmos Computer)</publisher>
@@ -41367,7 +41375,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="tamuramj">
+	<!-- boot OK -->
+	<software name="tamuramj" supported="yes">
 		<description>Tamura Mitsuaki no Mahjong Seminar</description>
 		<year>1991</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
@@ -48319,6 +48328,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<!-- unsupported ".fix" format -->
 	<software name="aigo3" supported="no">
 		<description>AI Go 3</description>
 		<year>1990</year>
@@ -48576,6 +48586,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<!-- unsupported ".fix" format -->
 	<!-- This probably requires 3.5" floppy emulation -->
 	<software name="beastlr2" supported="no">
 		<description>Beast Lord II</description>
@@ -49887,6 +49898,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<!-- unsupported ".fix" format -->
 	<software name="golemstr" supported="no">
 		<description>The Golem Master</description>
 		<year>1993</year>
@@ -50185,6 +50197,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<!-- unsupported ".fix" format -->
 	<software name="hypermj" supported="no">
 		<description>Hyper Mahjong Mangan Zenseki</description>
 		<year>1993</year>
@@ -50307,6 +50320,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<!-- unsupported ".fix" format -->
 	<software name="jlwave" supported="no">
 		<description>J. League Hyper Soccer - Wave no Arashi</description>
 		<year>1993</year>
@@ -51592,12 +51606,14 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="mjgokutn" supported="no">
+	<!-- boot OK, cannot detect sound card -->
+	<software name="mjgokutn" supported="partial">
 		<description>Mahjong Gokuu Tenjiku</description>
 		<year>1995</year>
 		<publisher>シャノアール (Chat Noir)</publisher>
 		<info name="alt_title" value="麻雀悟空 天竺" />
 		<info name="release" value="19950630" />
+		<info name="usage" value="From DOS run INSTALL.EXE. Requires ~530K of conventional memory." />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="mahjong goku tenjiku.hdm" size="1261568" crc="d5c68a5a" sha1="d38c2590d4d07a3d9156733ff1ab97424eb649b0" offset="0" />
@@ -51625,9 +51641,10 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="mjtaikai" supported="no">
+	<!-- boot OK, cannot detect sound card -->
+	<software name="mjtaikai" supported="partial">
 		<description>Mahjong Taikai</description>
-		<year>1985</year>
+		<year>1987</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="alt_title" value="麻雀大会" />
 		<part name="flop1" interface="floppy_5_25">
@@ -52041,6 +52058,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<!-- unsupported ".fix" format -->
 	<!-- This probably requires 3.5" floppy emulation -->
 	<software name="cessna" supported="no">
 		<description>Nihon Juudan Cessna Flight</description>
@@ -52093,7 +52111,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="okumanc">
+	<!-- unsupported ".fix" format -->
+	<software name="okumanc" supported="no">
 		<description>Okuman Chouja</description>
 		<year>1988</year>
 		<publisher>コスモス・コンピュータ (Cosmos Computer)</publisher>
@@ -53368,6 +53387,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<!-- unsupported ".fix" format -->
 	<software name="solitaira" cloneof="solitair" supported="no">
 		<description>Solitaire Royale (Alt Format)</description>
 		<year>1988</year>
@@ -53462,6 +53482,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<!-- unsupported ".fix" format -->
 	<software name="starcomm" supported="no">
 		<description>Star Command</description>
 		<year>1989</year>
@@ -54030,6 +54051,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<!-- unsupported ".fix" format -->
 	<software name="vermilna" cloneof="vermiln" supported="no">
 		<description>Vermilion (Alt Format)</description>
 		<year>1990</year>
@@ -67394,7 +67416,8 @@ doujin?!?
 		</part>
 	</software>
 
-	<software name="zettmj">
+	<!-- boot OK, sound may hang -->
+	<software name="zettmj" supported="partial">
 		<description>Zettai Mahjong</description>
 		<year>1994?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -67407,7 +67430,8 @@ doujin?!?
 		</part>
 	</software>
 
-	<software name="zettmjeg">
+	<!-- boot OK -->
+	<software name="zettmjeg" supported="yes">
 		<description>Zettai Mahjong EG</description>
 		<year>1995?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -67420,7 +67444,8 @@ doujin?!?
 		</part>
 	</software>
 
-	<software name="zettmj2">
+	<!-- boot OK -->
+	<software name="zettmj2" supported="yes">
 		<description>Zettai Mahjong II EG - Renaissance no Houkago</description>
 		<year>1996?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -67446,7 +67471,8 @@ doujin?!?
 		</part>
 	</software>
 
-	<software name="zettmj2d">
+	<!-- boot OK -->
+	<software name="zettmj2d" supported="yes">
 		<description>Zettai Mahjong II' EG</description>
 		<year>1996?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -67862,7 +67888,8 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-	<software name="ateam">
+	<!-- boot OK -->
+	<software name="ateam" supported="yes">
 		<description>Usajong Fight! A Team</description>
 		<year>1995</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -67939,12 +67966,13 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
+	<!-- "Presented by Splush Wave" then black screen -->
 	<software name="datsumj" supported="no">
 		<description>Datsui Mahjong Margarita</description>
-		<year>19??</year>
-		<publisher>&lt;doujin&gt;</publisher>
+		<year>199?</year>
+		<publisher>Splush Wave (Doujin)</publisher>
 		<info name="alt_title" value="脱衣麻雀マルガリータ" />
+		<info name="usage" value="From DOS, run MA.BAT" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="margarita.fdi" size="1265664" crc="2d77f72a" sha1="d0788b24bd6e32ea74b6edefd59bddb6795b3d64" offset="0" />
@@ -67952,10 +67980,11 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-	<software name="msato">
+	<!-- boot OK, how to create an user disk? -->
+	<software name="msato" supported="partial">
 		<description>Mahjong Satokara (?)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>シャノアール (Chat Noir)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="disk_sys.fdi" size="1261568" crc="d184f9c4" sha1="82e3ee4ca75b6cf486c4a639c70e8ebd7bec7e6a" offset="0" />

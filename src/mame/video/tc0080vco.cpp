@@ -327,7 +327,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg0_tile_info)
 
 	tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			TILE_FLIPYX((m_bg0_ram_1[tile_index] & 0x00c0) >> 6));
@@ -342,7 +342,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg1_tile_info)
 
 	tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			TILE_FLIPYX((m_bg1_ram_1[tile_index] & 0x00c0) >> 6));
@@ -369,7 +369,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_tx_tile_info)
 		tileinfo.category = 0;
 	}
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile,
 			0,
 			0);

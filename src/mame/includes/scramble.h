@@ -35,7 +35,7 @@ public:
 	optional_device<tmsprom_device>  m_tmsprom;
 	optional_shared_ptr<uint8_t> m_soundram;
 	optional_device<digitalker_device> m_digitalker;
-	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	optional_ioport m_dial;
 

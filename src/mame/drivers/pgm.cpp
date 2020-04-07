@@ -4611,7 +4611,7 @@ ROM_START( ddp3 )
 	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
 
 	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(8cbff066) SHA1(eef1cd566bc70ebf45f047e56026803d5c1dac43) ) //bitmap-1
+	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(17731c9d) SHA1(0e0aa0ec01035323985ac8e08228a0fd6edf6689) ) //bitmap-1
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // same as standard PGM bios
@@ -4638,7 +4638,7 @@ ROM_START( ddpdoj )
 	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
 
 	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(8cbff066) SHA1(eef1cd566bc70ebf45f047e56026803d5c1dac43) ) //bitmap-1
+	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(17731c9d) SHA1(0e0aa0ec01035323985ac8e08228a0fd6edf6689) ) //bitmap-1
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // same as standard PGM bios
@@ -4666,7 +4666,7 @@ ROM_START( ddpdoja )
 	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
 
 	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(8cbff066) SHA1(eef1cd566bc70ebf45f047e56026803d5c1dac43) ) //bitmap-1
+	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(17731c9d) SHA1(0e0aa0ec01035323985ac8e08228a0fd6edf6689) ) //bitmap-1
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // same as standard PGM bios
@@ -4693,7 +4693,7 @@ ROM_START( ddpdojb )
 	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
 
 	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(8cbff066) SHA1(eef1cd566bc70ebf45f047e56026803d5c1dac43) ) //bitmap-1
+	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(17731c9d) SHA1(0e0aa0ec01035323985ac8e08228a0fd6edf6689) ) //bitmap-1
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // same as standard PGM bios
@@ -4702,6 +4702,36 @@ ROM_START( ddpdojb )
 	ROM_REGION( 0x20000, "sram", 0 ) /* default settings */
 	ROM_LOAD( "ddp3_defaults.nv",  0x0000000, 0x020000, CRC(571e96c0) SHA1(348940c77ca348213331b85b9b1d3aabb96a528a) )
 ROM_END
+
+ROM_START( ddpdojp )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "pgmbios.u20.27c210",    0x00000, 0x020000, CRC(1d2a7c15) SHA1(025a9f2bb64887699bf7ccab0f2ccfc55c3ad75c) )
+	ROM_LOAD16_WORD_SWAP( "ca008.cod_prom.u13.27c322",  0x100000, 0x400000, CRC(2ba7fa3b) SHA1(c4c5425a2455cb95555d94bbf8afc83cf0b140e8) )
+
+	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
+	ROM_LOAD( "fnt_cg.0_cgrom0.u8.27c322",   0x180000, 0x0400000, CRC(1805e198) SHA1(23db96eddfb47dfef9dcfab52ae2582ad3c0fc90) )
+	ROM_LOAD( "fnt_cg.1_cgrom1.u10.27c322",  0x580000, 0x0400000, CRC(f06ce99c) SHA1(24482e2bb2485855e300b6b3e07962d4f0a6ab83) )
+
+	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "sp_cg.0_imcs0.u11.27c322",  0x0000000, 0x0400000, CRC(c66bdd8e) SHA1(dde26821a3ef8ad5c3c29e11c55f8f6953c085dd) )
+	ROM_LOAD( "sp_cg.1_imcs1.u13.27c322",  0x0400000, 0x0400000, CRC(d30eac89) SHA1(78b18ff71136df0ffadb87fc53b60943dd62bcdd) )
+	ROM_LOAD( "sp_cg.2_imcs2.u15.27c322",  0x0800000, 0x0400000, CRC(f31b010e) SHA1(1987e9cd2abcf57be990853fbd305474e58da5b8) )
+	ROM_LOAD( "sp_cg.3_imcs3.u17.27c322",  0x0c00000, 0x0400000, CRC(01ec23f5) SHA1(ff22642f914b0f8911a221df1e9073bdc9434660) )
+
+	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "sp_mp.0_bitcs0.u5.27c322",  0x0000000, 0x0400000, CRC(e30494a4) SHA1(12d216252a916be4fd8d77b89497cee9b04861e5) )
+	ROM_LOAD( "sp_mp.1_bitcs1.u6.27c322",  0x0400000, 0x0400000, CRC(0239daec) SHA1(506c4d8a4bfa988d81565c47f742f1b06175915e) )
+
+	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // same as standard PGM bios
+	ROM_LOAD( "sndmask.rom_mcs1.u3.27c322",  0x400000, 0x400000, CRC(5a0dbd76) SHA1(06ab202f6bd5ebfb35b9d8cc7a8fb83ec8840659) )
+
+	ROM_REGION( 0x20000, "sram", 0 ) /* default settings */
+	ROM_LOAD( "ddp3_defaults.nv",  0x0000000, 0x020000, CRC(571e96c0) SHA1(348940c77ca348213331b85b9b1d3aabb96a528a) )
+ROM_END
+
+
 
 /* this expects Magic values in NVRAM to boot */
 ROM_START( ddpdojblk )
@@ -4721,7 +4751,7 @@ ROM_START( ddpdojblk )
 	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
 
 	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(8cbff066) SHA1(eef1cd566bc70ebf45f047e56026803d5c1dac43) ) //bitmap-1
+	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(17731c9d) SHA1(0e0aa0ec01035323985ac8e08228a0fd6edf6689) ) //bitmap-1
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // same as standard PGM bios
@@ -4748,7 +4778,7 @@ ROM_START( ddpdojblka )
 	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
 
 	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(8cbff066) SHA1(eef1cd566bc70ebf45f047e56026803d5c1dac43) ) //bitmap-1
+	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(17731c9d) SHA1(0e0aa0ec01035323985ac8e08228a0fd6edf6689) ) //bitmap-1
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // same as standard PGM bios
@@ -4776,7 +4806,7 @@ ROM_START( ddpdojblkbl )
 	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
 
 	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(8cbff066) SHA1(eef1cd566bc70ebf45f047e56026803d5c1dac43) ) //bitmap-1
+	ROM_LOAD( "b04401w064_corrupt.u1",  0x0000000, 0x0800000, CRC(8cbff066) SHA1(eef1cd566bc70ebf45f047e56026803d5c1dac43) ) //bitmap-1 - bootlegs were based off a corrupt dump of the ROM
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	PGM_AUDIO_BIOS
@@ -4945,10 +4975,10 @@ GAME( 2002, ddp3,       0,           pgm_arm_type1_cave,     ddp3,      pgm_arm_
 GAME( 2002, ddpdoj,     ddp3,        pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05.Master Ver, 68k Label V101)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // is there a v101 without the . after 05?
 GAME( 2002, ddpdoja,    ddp3,        pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05.Master Ver, 68k Label V100)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, ddpdojb,    ddp3,        pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05 Master Ver)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ddpdojp,    ddp3,        pgm,                    ddp3,      pgm_state,           init_pgm,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05 Master Ver, location test)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected, but still has strings related to the protection ASIC
 GAME( 2002, ddpdojblk,  ddp3,        pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou Black Label (Japan, 2002.10.07.Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07.Black Ver" (new)
 GAME( 2002, ddpdojblka, ddp3,        pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou Black Label (Japan, 2002.10.07 Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
 GAME( 2012, ddpdojblkbl,ddp3,        pgm_arm_type1,          pgm,       pgm_arm_type1_state, init_kovsh,    ROT270, "bootleg",            "DoDonPachi Dai-Ou-Jou Black Label (Japan, 2002.10.07 Black Ver., bootleg Knights of Valour Super Heroes conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // the extra . in the revision has been added by bootlegger
-
 
 // the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.
 // the only difference between 'ket' and 'ket1' is the ROM fill at 0x1443bc-0x1c88cd, on ket1 it seems to be randomized / garbage data, on ket it's all 0xff, both have been seen on more than one PCB.

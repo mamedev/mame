@@ -284,7 +284,7 @@ WRITE_LINE_MEMBER(vt100_keyboard_device::signal_line_w)
 
 		if (dav)
 		{
-			u8 data = m_uart->get_received_data();
+			u8 data = m_uart->receive();
 			m_online_led = BIT(data, 5) ? 1 : 0;
 			m_local_led = BIT(data, 5) ? 0 : 1;
 			m_locked_led = BIT(data, 4) ? 0 : 1;
@@ -331,7 +331,7 @@ WRITE8_MEMBER(vt100_keyboard_device::key_scan_w)
 		{
 			if (data != 0xff)
 				LOG("Keycode pressed: %02X\n", (data >> 1) & 0x7f);
-			m_uart->set_transmit_data((data >> 1) & 0x7f);
+			m_uart->transmit((data >> 1) & 0x7f);
 		}
 	}
 

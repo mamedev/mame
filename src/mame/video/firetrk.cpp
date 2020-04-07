@@ -121,7 +121,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::firetrk_get_tile_info1)
 	if (m_flash)
 		color = color | 0x04;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 
@@ -136,7 +136,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::superbug_get_tile_info1)
 	if (m_flash)
 		color = color | 0x04;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::montecar_get_tile_info1)
 	if (m_flash)
 		color = color | 0x04;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 
@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::firetrk_get_tile_info2)
 	if ((code & 0x3c) == 0x0c)
 		color = 2;   /* palette 0, 2 */
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	tileinfo.set(2, code, color, 0);
 }
 
 
@@ -180,7 +180,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::superbug_get_tile_info2)
 	if ((code & 0x38) == 0x00)
 		color = 2;   /* palette 0, 2 */
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	tileinfo.set(2, code, color, 0);
 }
 
 
@@ -202,7 +202,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::montecar_get_tile_info2)
 	if ((code & 0x30) == 0x30)
 		color = 0;   /* palette 0, 0 */
 
-	SET_TILE_INFO_MEMBER(2, code & 0x3f, color, 0);
+	tileinfo.set(2, code & 0x3f, color, 0);
 }
 
 

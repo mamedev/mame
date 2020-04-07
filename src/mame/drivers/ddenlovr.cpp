@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Luca Elia
-/***************************************************************************
+/**********************************************************************************************************************
 
 Some Dynax/Nakanihon games using the third version of their blitter
 
@@ -103,6 +103,9 @@ TODO:
 
 - mjflove: Transparency problems in title screen, staff roll and gal display (the background is not visible)
 
+- mjflove: 1st level sports a slot-like gal rotation that is hidden in 2nd with a solid green color.
+  Most likely a bug, related to above?
+
 - implement palette RAM enable in most games. Done for seljan2 (in a convoluted way).
 
 Notes:
@@ -110,7 +113,7 @@ Notes:
 - daimyojn: In Test->Option, press "N Ron Ron N" to access more options
 - kotbinyo: To access service mode, during boot press start+button+right (start+d+e in keyboard mode)
 
-***************************************************************************/
+**********************************************************************************************************************/
 
 #include "emu.h"
 #include "includes/dynax.h"
@@ -156,10 +159,13 @@ The drawing operation is verified (quiz365) to modify ddenlovr_blit_y.
 ***************************************************************************/
 
 enum { BLIT_NEXT = 0, BLIT_LINE, BLIT_COPY, BLIT_SKIP, BLIT_CHANGE_NUM, BLIT_CHANGE_PEN, BLIT_UNKNOWN, BLIT_STOP };
-//                                          0          1                2                   3               4               5                   6                   7
-static const int ddenlovr_commands[8]   = { BLIT_NEXT, BLIT_LINE,       BLIT_COPY,          BLIT_SKIP,      BLIT_UNKNOWN,   BLIT_CHANGE_NUM,    BLIT_CHANGE_PEN,    BLIT_STOP   };
-static const int hanakanz_commands[8]   = { BLIT_NEXT, BLIT_CHANGE_PEN, BLIT_CHANGE_NUM,    BLIT_UNKNOWN,   BLIT_SKIP,      BLIT_COPY,          BLIT_LINE,          BLIT_STOP   };
-static const int mjflove_commands[8]    = { BLIT_STOP, BLIT_CHANGE_PEN, BLIT_CHANGE_NUM,    BLIT_UNKNOWN,   BLIT_SKIP,      BLIT_COPY,          BLIT_LINE,          BLIT_NEXT   };
+
+static const int ddenlovr_commands[8]   = { BLIT_NEXT,    BLIT_LINE,       BLIT_COPY,       BLIT_SKIP,
+											BLIT_UNKNOWN, BLIT_CHANGE_NUM, BLIT_CHANGE_PEN, BLIT_STOP   };
+static const int hanakanz_commands[8]   = { BLIT_NEXT,    BLIT_CHANGE_PEN, BLIT_CHANGE_NUM, BLIT_UNKNOWN,
+											BLIT_SKIP,    BLIT_COPY,       BLIT_LINE,       BLIT_STOP   };
+static const int mjflove_commands[8]    = { BLIT_STOP,    BLIT_CHANGE_PEN, BLIT_CHANGE_NUM, BLIT_UNKNOWN,
+											BLIT_SKIP,    BLIT_COPY,       BLIT_LINE,       BLIT_NEXT   };
 
 class ddenlovr_state : public dynax_state
 {
@@ -268,6 +274,7 @@ private:
 	DECLARE_READ16_MEMBER(ddenlovr_gfxrom_r);
 	DECLARE_WRITE_LINE_MEMBER(ddenlovr_coincounter_0_w);
 	DECLARE_WRITE_LINE_MEMBER(ddenlovr_coincounter_1_w);
+	DECLARE_WRITE8_MEMBER(rongrong_coincounter_w);
 	DECLARE_WRITE8_MEMBER(rongrong_palette_w);
 	DECLARE_WRITE8_MEMBER(ddenlovr_palette_base_w);
 	DECLARE_WRITE8_MEMBER(ddenlovr_palette_base2_w);
@@ -2277,6 +2284,16 @@ WRITE8_MEMBER(ddenlovr_state::rongrong_select_w)
 	membank("bank2")->set_entry(((data & 0xe0) >> 5));
 }
 
+WRITE8_MEMBER(ddenlovr_state::rongrong_coincounter_w)
+{
+	// input_sel goes 0x03 -> 0x0c before writing here
+	if (m_input_sel == 0x0c)
+	{
+		machine().bookkeeping().coin_counter_w(0, (~data) & 0x01);
+		machine().bookkeeping().coin_counter_w(1, (~data) & 0x04);
+	}
+	// TODO: POST values
+}
 
 void ddenlovr_state::quizchq_map(address_map &map)
 {
@@ -2295,6 +2312,7 @@ void ddenlovr_state::quizchq_portmap(address_map &map)
 	map(0x03, 0x03).r(FUNC(ddenlovr_state::rongrong_gfxrom_r));
 
 	map(0x20, 0x20).w(FUNC(ddenlovr_state::ddenlovr_select2_w));
+	map(0x21, 0x21).w(FUNC(ddenlovr_state::rongrong_coincounter_w));
 	map(0x22, 0x23).r(FUNC(ddenlovr_state::rongrong_input2_r));
 
 	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -2346,6 +2364,7 @@ void ddenlovr_state::rongrong_portmap(address_map &map)
 	map(0x98, 0x98).r(FUNC(ddenlovr_state::unk_r));                                 // ? must be 78 on startup
 
 	map(0xa0, 0xa0).w(FUNC(ddenlovr_state::ddenlovr_select2_w));
+	map(0xa1, 0xa1).w(FUNC(ddenlovr_state::rongrong_coincounter_w));
 	map(0xa2, 0xa3).r(FUNC(ddenlovr_state::rongrong_input2_r));
 	map(0xc2, 0xc2).nopw();                                    // enables palette RAM at f000, and protection device at f705/f706/f601
 }
@@ -4827,7 +4846,7 @@ static INPUT_PORTS_START( htengoku )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE3 )   // data clear
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  // note
@@ -4863,7 +4882,7 @@ static INPUT_PORTS_START( htengoku )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")  /* IN12 - DSW2 */
-	PORT_DIPNAME( 0x07, 0x05, "Payout Rate" )
+	PORT_DIPNAME( 0x07, 0x07, "Payout Rate" )
 	PORT_DIPSETTING(    0x00, "Lowest" )
 	PORT_DIPSETTING(    0x01, "Lower" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Low ) )
@@ -5122,7 +5141,7 @@ static INPUT_PORTS_START( rongrong )
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
-//  PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x00, "3 (duplicate)" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -8212,14 +8231,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hparadis )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")    /* IN1 - Player 2 */
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -8236,85 +8255,95 @@ static INPUT_PORTS_START( hparadis )
 
 	/* keyb 1 */
 	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // I
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Kan
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1   )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // I
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // Kan
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // J
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Reach
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // BET
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // J
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // Reach
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // BET
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // K
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Chi
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Ron
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // K
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // Chi
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // Ron
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // L
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // PON
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // L
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // PON
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Flip Flop
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "b"
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "s"
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // "t"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // "w"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // Flip Flop
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // "b"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // "s"
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	/* keyb 2 */
 	PORT_START("KEY5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // I
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Kan
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2   )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // I
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // Kan
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // J
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Reach
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // BET
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)    // J
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // Reach
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // BET
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // K
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Chi
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Ron
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // K
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // Chi
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)  // Ron
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // L
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // PON
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_PLAYER(2) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // L
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)   // PON
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("KEY9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Flip Flop
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "b"
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "s"
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40) // "t"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40) // "w"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40) // Flip Flop
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40) // "b"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40) // "s"
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
@@ -8334,7 +8363,7 @@ static INPUT_PORTS_START( hparadis )
 	PORT_DIPSETTING(    0x60, "Hanafuda" )
 	PORT_DIPSETTING(    0x40, "Mahjong" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Joystick ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( Joystick ) )
+	PORT_DIPSETTING(    0x00, "Joystick (duplicate)" )
 	PORT_DIPNAME( 0x80, 0x80, "First Chance" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
@@ -9321,7 +9350,6 @@ static INPUT_PORTS_START( dtoyoken )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( daimyojn )
-
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -9613,6 +9641,8 @@ MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
 	m_romdata[1] = 0;
 
 	memset(m_palram, 0, ARRAY_LENGTH(m_palram));
+
+	m_blitter_irq_handler(1);
 }
 
 MACHINE_START_MEMBER(ddenlovr_state,rongrong)
@@ -9705,7 +9735,7 @@ void ddenlovr_state::ddenlovr(machine_config &config)
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<1>().set(FUNC(ddenlovr_state::ddenlovr_blitter_irq_ack_w));
 	m_mainlatch->q_out_cb<4>().set(FUNC(ddenlovr_state::ddenlovr_coincounter_0_w));
-	m_mainlatch->q_out_cb<5>().set(FUNC(ddenlovr_state::ddenlovr_coincounter_1_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(ddenlovr_state::ddenlovr_coincounter_1_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,ddenlovr)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -9829,7 +9859,6 @@ void ddenlovr_state::quizchq(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::quizchq_portmap);
 	maincpu.in_pa_callback().set(FUNC(ddenlovr_state::rongrong_input_r));
 	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::rongrong_select_w));
-	// bit 5 of 0x1b (SIO CTSB?) = blitter busy
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,rongrong)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -9848,6 +9877,7 @@ void ddenlovr_state::quizchq(machine_config &config)
 
 	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg0));
 	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg1));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::ctsb_w));
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
 
@@ -10682,7 +10712,7 @@ void ddenlovr_state::daimyojn(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(0x200);
 
-	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz); // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10694,7 +10724,6 @@ void ddenlovr_state::daimyojn(machine_config &config)
 	/* devices */
 	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(FUNC(ddenlovr_state::hanakanz_rtc_irq));
 }
-
 
 
 /***************************************************************************
@@ -12826,6 +12855,8 @@ ROM_START( momotaro )
 	ROM_RELOAD(             0x10000, 0x80000 )
 
 	ROM_REGION( 0x400000, "blitter", 0 )    /* blitter data */
+	// no table at top, half size or encrypted?
+	// should be similar to daimyojn format, the initial POST screen/test mode draws properly if using roms from that.
 	ROM_LOAD( "t0273.7b", 0x000000, 0x200000, BAD_DUMP CRC(5ae90ae2) SHA1(975bae930d848987405dc3dd59de138b1f98b358) )   // FIXED BITS (xxxxx1xxxxxxxxx1)
 	ROM_LOAD( "t0274.8b", 0x200000, 0x200000, BAD_DUMP CRC(78209778) SHA1(4054972e12115049322bb43381ff50a354c3cadf) )   // FIXED BITS (xxxxx1xxxxxxxxx1)
 
@@ -12991,31 +13022,31 @@ ROM_START( htengoku )
 	ROM_LOAD( "6510.11b", 0x280000, 0x20000, CRC(0fdd6edf) SHA1(c6870ab538987110337e6e154cba98391c68fb98) )
 ROM_END
 
-GAME( 1992, htengoku,  0,        htengoku,  htengoku, ddenlovr_state, empty_init,    ROT180, "Dynax",                                     "Hanafuda Hana Tengoku (Japan)",                                   0)
+GAME( 1992, htengoku,  0,        htengoku,  htengoku, ddenlovr_state, empty_init,    ROT180, "Dynax",                                     "Hanafuda Hana Tengoku [BET] (Japan)",                                   0)
 GAME( 1992, mmpanic,   0,        mmpanic,   mmpanic,  ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Monkey Mole Panic (USA)",                                         MACHINE_NO_COCKTAIL  )
-GAME( 1993, mjmyorn2,  0,        mjmyornt,  mjmyorn2, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient Part 2 - Exotic Dream",             MACHINE_NO_COCKTAIL  )
-GAME( 1992, mjmyornt,  mjmyorn2, mjmyornt,  mjmyornt, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient",                                   MACHINE_NO_COCKTAIL  )
+GAME( 1993, mjmyorn2,  0,        mjmyornt,  mjmyorn2, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient Part 2 ~ Exotic Dream ~ [BET] (Japan, v1.00)",             MACHINE_NO_COCKTAIL  ) // no copyright warning, assume Japan from game strings
+GAME( 1992, mjmyornt,  mjmyorn2, mjmyornt,  mjmyornt, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient [BET] (Japan, v1.00)",                     MACHINE_NO_COCKTAIL  ) // no copyright warning, assume Japan from game strings
 GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (USA, Canada, Mexico / Japan, set 1)",    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // scrolling, priority?
 GAME( 1993, funkyfiga, funkyfig, funkyfig,  funkyfig, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (USA, Canada, Mexico / Japan, set 2)",    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // ""
-GAME( 1993, quizchq,   0,        quizchq,   quizchq,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Quiz Channel Question (Ver 1.00) (Japan)",                        MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1993, quizchql,  quizchq,  quizchq,   quizchq,  ddenlovr_state, empty_init,    ROT0, "Nakanihon (Laxan license)",                   "Quiz Channel Question (Ver 1.23) (Taiwan?)",                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1993, animaljr,  0,        mmpanic,   animaljr, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Exciting Animal Land Jr. (USA)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, quizchq,   0,        quizchq,   quizchq,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Quiz Channel Question (Japan, Ver 1.00)",                        MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, quizchql,  quizchq,  quizchq,   quizchq,  ddenlovr_state, empty_init,    ROT0, "Nakanihon (Laxan license)",                   "Quiz Channel Question (Taiwan?, Ver 1.23)",                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, animaljr,  0,        mmpanic,   animaljr, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Exciting Animal Land Jr. (USA, Canada, Mexico)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
 GAME( 1993, animaljrs, animaljr, mmpanic,   animaljr, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Animalandia Jr. (Spanish)",                                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
 GAME( 1993, animaljrj, animaljr, mmpanic,   animaljr, ddenlovr_state, empty_init,    ROT0, "Nakanihon / East Technology (Taito license)", "Waiwai Animal Land Jr. (Japan)",                                  MACHINE_NO_COCKTAIL  )
-GAME( 1994, mjmyster,  0,        mjmyster,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 1)",                            MACHINE_NO_COCKTAIL  )
-GAME( 1994, mjmywrld,  mjmyster, mjmywrld,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 2)",                            MACHINE_NO_COCKTAIL  )
-GAME( 1994, hginga,    0,        hginga,    hginga,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Ginga",                                             MACHINE_NO_COCKTAIL  )
-GAME( 1994, mjmyuniv,  0,        mjmyuniv,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Universe (Japan, D85)",                    MACHINE_NO_COCKTAIL  )
+GAME( 1994, mjmyster,  0,        mjmyster,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World [BET] (Japan, set 1)",                            MACHINE_NO_COCKTAIL  )
+GAME( 1994, mjmywrld,  mjmyster, mjmywrld,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World [BET] (Japan, set 2)",                            MACHINE_NO_COCKTAIL  )
+GAME( 1994, hginga,    0,        hginga,    hginga,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Ginga [BET] (Japan)",                               MACHINE_NO_COCKTAIL  )
+GAME( 1994, mjmyuniv,  0,        mjmyuniv,  mjmyster, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Universe [BET] (Japan, D85)",              MACHINE_NO_COCKTAIL  )
 GAME( 1994, quiz365,   0,        quiz365,   quiz365,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                                MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, quiz365t,  quiz365,  quiz365,   quiz365,  ddenlovr_state, empty_init,    ROT0, "Nakanihon / Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, rongrong,  0,        rongrong,  rongrong, ddenlovr_state, init_rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Europe)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
 GAME( 1994, rongrongj, rongrong, rongrong,  rongrong, ddenlovr_state, init_rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Japan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
 GAME( 1994, rongrongg, rongrong, rongrong,  rongrong, ddenlovr_state, init_rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Germany)",                                 MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
 GAME( 1994, hparadis,  0,        hparadis,  hparadis, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Super Hana Paradise (Japan)",                                     MACHINE_NO_COCKTAIL  )
-GAME( 1995, hgokou,    0,        hgokou,    hgokou,   ddenlovr_state, empty_init,    ROT0, "Dynax (Alba license)",                        "Hanafuda Hana Gokou (Japan)",                                     MACHINE_NO_COCKTAIL  )
-GAME( 1995, hgokbang,  hgokou,   hgokbang,  hgokou,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Gokou Bangaihen (Japan)",                           MACHINE_NO_COCKTAIL  )
-GAME( 1995, mjdchuka,  0,        mjchuuka,  mjchuuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken (China, D111)",                        MACHINE_NO_COCKTAIL  )
-GAME( 1995, mjschuka,  0,        mjschuka,  mjschuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Super Dai Chuuka Ken (Japan, D115)",                      MACHINE_NO_COCKTAIL  )
+GAME( 1995, hgokou,    0,        hgokou,    hgokou,   ddenlovr_state, empty_init,    ROT0, "Dynax (Alba license)",                        "Hanafuda Hana Gokou [BET] (Japan)",                                     MACHINE_NO_COCKTAIL  )
+GAME( 1995, hgokbang,  hgokou,   hgokbang,  hgokou,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Gokou Bangaihen [BET] (Japan)",                           MACHINE_NO_COCKTAIL  )
+GAME( 1995, mjdchuka,  0,        mjchuuka,  mjchuuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken [BET] (China, D111)",                        MACHINE_NO_COCKTAIL  )
+GAME( 1995, mjschuka,  0,        mjschuka,  mjschuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Super Dai Chuuka Ken [BET] (Japan, D115)",                      MACHINE_NO_COCKTAIL  )
 GAME( 1995, nettoqc,   0,        nettoqc,   nettoqc,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Nettoh Quiz Champion (Japan)",                                    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
 GAME( 1995, ultrchmp,  nettoqc,  ultrchmp,  ultrchmp, ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Se Gye Hweng Dan Ultra Champion (Korea)",                         MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
 GAME( 1995, ultrchmph, nettoqc,  ultrchmp,  ultrchmp, ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Cheng Ba Shi Jie - Chao Shi Kong Guan Jun (Taiwan)",              MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
@@ -13027,15 +13058,15 @@ GAME( 1996, hanakanz,  0,        hanakanz,  hanakanz, ddenlovr_state, empty_init
 GAME( 1997, kotbinyo,  hanakanz, kotbinyo,  kotbinyo, ddenlovr_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo (Korea)",                                             MACHINE_NO_COCKTAIL  )
 GAME( 1997, kotbinsp,  0,        kotbinsp,  kotbinsp, ddenlovr_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo Special (Korea)",                                     MACHINE_NO_COCKTAIL  )
 GAME( 1996, akamaru,   0,        akamaru,   akamaru,  ddenlovr_state, empty_init,    ROT0, "Dynax (Nakanihon license)",                   "Panel & Variety Akamaru Q Jousyou Dont-R",                        MACHINE_NO_COCKTAIL  )
-GAME( 1996, janshinp,  0,        janshinp,  janshinp, ddenlovr_state, empty_init,    ROT0, "Dynax / Sigma",                               "Mahjong Janshin Plus (Japan)",                                    MACHINE_NO_COCKTAIL  )
-GAME( 1996, dtoyoken,  0,        dtoyoken,  dtoyoken, ddenlovr_state, empty_init,    ROT0, "Dynax / Sigma",                               "Mahjong Dai Touyouken (Japan)",                                   MACHINE_NO_COCKTAIL  )
-GAME( 1996, sryudens,  0,        sryudens,  sryudens, ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Mahjong Seiryu Densetsu (Japan, NM502)",                          MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, seljan2,   0,        seljan2,   seljan2,  ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Return Of Sel Jan II (Japan, NM557)",                             MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, janshinp,  0,        janshinp,  janshinp, ddenlovr_state, empty_init,    ROT0, "Dynax / Sigma",                               "Mahjong Janshin Plus [BET] (Japan)",                                    MACHINE_NO_COCKTAIL  )
+GAME( 1996, dtoyoken,  0,        dtoyoken,  dtoyoken, ddenlovr_state, empty_init,    ROT0, "Dynax / Sigma",                               "Mahjong Dai Touyouken [BET] (Japan)",                                   MACHINE_NO_COCKTAIL  )
+GAME( 1996, sryudens,  0,        sryudens,  sryudens, ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Mahjong Seiryu Densetsu [BET] (Japan, NM502)",                          MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, seljan2,   0,        seljan2,   seljan2,  ddenlovr_state, empty_init,    ROT0, "Dynax / Face",                                "Return Of Sel Jan II [BET] (Japan, NM557)",                             MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, mjflove,   0,        mjflove,   mjflove,  ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Mahjong Fantasic Love (Japan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, hkagerou,  0,        hkagerou,  hkagerou, ddenlovr_state, empty_init,    ROT0, "Nakanihon / Dynax",                           "Hana Kagerou [BET] (Japan)",                                      MACHINE_NO_COCKTAIL  )
-GAME( 1998, mjchuuka,  0,        mjchuuka,  mjchuuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Chuukanejyo (China)",                                     MACHINE_NO_COCKTAIL  )
-GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, ddenlovr_state, empty_init,    ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan)",                                   MACHINE_NO_COCKTAIL  )
-GAME( 1999, jongtei,   0,        jongtei,   jongtei,  ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Jong-Tei (Japan, NM532-01)",                              MACHINE_NO_COCKTAIL  )
-GAME( 2000, mjgnight,  0,        mjgnight,  mjgnight, ddenlovr_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night (Japan, TSM003-01)",                       MACHINE_NO_COCKTAIL  )
-GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, ddenlovr_state, empty_init,    ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin (Japan, T017-PB-00)",                           MACHINE_NO_COCKTAIL  )
-GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, ddenlovr_state, init_momotaro, ROT0, "Techno-Top",                                  "Mahjong Momotarou (Japan)",                                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1998, mjchuuka,  0,        mjchuuka,  mjchuuka, ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Chuukanejyo [BET] (China)",                                     MACHINE_NO_COCKTAIL  )
+GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, ddenlovr_state, empty_init,    ROT0, "Nihon System",                                "Mahjong Reach Ippatsu [BET] (Japan)",                                   MACHINE_NO_COCKTAIL  )
+GAME( 1999, jongtei,   0,        jongtei,   jongtei,  ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Jong-Tei [BET] (Japan, NM532-01)",                              MACHINE_NO_COCKTAIL  )
+GAME( 2000, mjgnight,  0,        mjgnight,  mjgnight, ddenlovr_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night [BET] (Japan, TSM003-01)",                       MACHINE_NO_COCKTAIL  )
+GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, ddenlovr_state, empty_init,    ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin [BET] (Japan, T017-PB-00)",                           MACHINE_NO_COCKTAIL  )
+GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, ddenlovr_state, init_momotaro, ROT0, "Techno-Top",                                  "Mahjong Momotarou [BET] (Japan, T027-RB-01)",                             MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

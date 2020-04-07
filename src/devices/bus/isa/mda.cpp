@@ -482,7 +482,7 @@ WRITE8_MEMBER( isa8_mda_device::io_write )
 			mode_control_w(space, offset, data);
 			break;
 		case 0x0c: case 0x0d:  case 0x0e:
-			m_lpt->write(space, offset - 0x0c, data);
+			m_lpt->write(offset - 0x0c, data);
 			break;
 	}
 }
@@ -503,7 +503,7 @@ READ8_MEMBER( isa8_mda_device::io_read )
 			break;
 		/* LPT ports */
 		case 0x0c: case 0x0d:  case 0x0e:
-			data = m_lpt->read(space, offset - 0x0c);
+			data = m_lpt->read(offset - 0x0c);
 			break;
 	}
 	return data;
@@ -701,7 +701,7 @@ WRITE8_MEMBER( isa8_hercules_device::io_write )
 		mode_control_w(space, offset, data);
 		break;
 	case 0x0c: case 0x0d:  case 0x0e:
-		m_lpt->write(space, offset - 12, data);
+		m_lpt->write(offset - 12, data);
 		break;
 	case 0x0f:
 		m_configuration_switch = data;
@@ -746,7 +746,7 @@ READ8_MEMBER( isa8_hercules_device::io_read )
 		break;
 	/* LPT ports */
 	case 0xc: case 0xd:  case 0xe:
-		data = m_lpt->read(space, offset - 0x0c);
+		data = m_lpt->read(offset - 0x0c);
 		break;
 	}
 	return data;

@@ -16,7 +16,6 @@
 #include "bus/abckb/abc800kb.h"
 #include "machine/e0516.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
 #include "machine/z80sio.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -307,7 +306,7 @@ public:
 	DECLARE_READ8_MEMBER( cli_r );
 	DECLARE_WRITE8_MEMBER( sso_w );
 	DECLARE_READ8_MEMBER( sti_r );
-	DECLARE_WRITE8_MEMBER( sto_w );
+	void sto_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( keydtr_w );
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );

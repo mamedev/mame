@@ -48,20 +48,20 @@ public:
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_colorram(*this, "colorram"),
-		m_videoram(*this, "videoram")
+		m_videoram(*this, "videoram"),
+		m_key(*this, "KEY%u", 0)
 	{ }
 
 	void init_rmhaihai();
 	void rmhaihai(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_READ8_MEMBER(samples_r);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_WRITE8_MEMBER(adpcm_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	uint8_t keyboard_r();
+	void keyboard_w(uint8_t data);
+	void ctrl_w(uint8_t data);
+	void adpcm_w(uint8_t data);
 
 	virtual void video_start() override;
 
@@ -79,9 +79,11 @@ protected:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
 
+	required_ioport_array<2> m_key;
+
 	tilemap_t *m_bg_tilemap;
-	int m_keyboard_cmd;
-	int m_gfxbank;
+	uint8_t m_keyboard_cmd;
+	uint8_t m_gfxbank;
 };
 
 
@@ -96,26 +98,34 @@ public:
 class themj_state : public rmhaihai_state
 {
 public:
-	using rmhaihai_state::rmhaihai_state;
+	themj_state(const machine_config &mconfig, device_type type, const char *tag) :
+		rmhaihai_state(mconfig, type, tag),
+		m_cpubank(*this, "cpubank%u", 1)
+	{ }
+
 	void themj(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
+	required_memory_bank_array<2> m_cpubank;
+
 	void themj_io_map(address_map &map);
 	void themj_map(address_map &map);
-	DECLARE_WRITE8_MEMBER(themj_rombank_w);
+	void themj_rombank_w(uint8_t data);
 };
 
 
 
-WRITE8_MEMBER(rmhaihai_state::videoram_w)
+void rmhaihai_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(rmhaihai_state::colorram_w)
+void rmhaihai_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -127,7 +137,7 @@ TILE_GET_INFO_MEMBER(rmhaihai_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + (m_gfxbank << 12) + ((attr & 0x07) << 8) + ((attr & 0x80) << 4);
 	int color = (m_gfxbank << 5) + (attr >> 3);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void rmhaihai_state::video_start()
@@ -148,34 +158,30 @@ uint32_t rmhaihai_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 
 // TODO: this device is shared with Speed Attack
-READ8_MEMBER(rmhaihai_state::keyboard_r)
+uint8_t rmhaihai_state::keyboard_r()
 {
-	static const char *const keynames[] = { "KEY0", "KEY1" };
-
 	logerror("%04x: keyboard_r\n",m_maincpu->pc());
 	switch(m_maincpu->pc())
 	{
-		/* read keyboard */
+		// read keyboard
 		case 0x0280:
 		case 0x0aba:    // rmhaihai, rmhaisei
 		case 0x0b2a:    // rmhaihib
 		case 0x0ab4:    // rmhaijin
 		case 0x0aea:    // themj
 		{
-			int i;
-
-			for (i = 0; i < 31; i++)
+			for (int i = 0; i < 31; i++)
 			{
-				if (ioport(keynames[i/16])->read() & (1 << (i & 15))) return i+1;
+				if (m_key[i/16]->read() & (1 << (i & 15))) return i+1;
 			}
-			if (ioport("KEY1")->read() & 0x8000) return 0x80;   // coin
+			if (m_key[1]->read() & 0x8000) return 0x80;   // coin
 			return 0;
 		}
 		case 0x02aa:
 		case 0x5c7b:    // rmhaihai, rmhaisei, rmhaijin
 		case 0x5950:    // rmhaihib
 		case 0x5bf3:    // themj, but the test is NOPed out!
-			return 0xcc;    /* keyboard_cmd = 0xcb */
+			return 0xcc;    // keyboard_cmd = 0xcb
 
 
 		case 0x13a: // additional checks done by rmhaijin
@@ -196,29 +202,24 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 			return 0;
 	}
 
-	/* there are many more reads whose function is unknown, returning 0 seems fine */
+	// there are many more reads whose function is unknown, returning 0 seems fine
 	return 0;
 }
 
-WRITE8_MEMBER(rmhaihai_state::keyboard_w)
+void rmhaihai_state::keyboard_w(uint8_t data)
 {
-logerror("%04x: keyboard_w %02x\n",m_maincpu->pc(),data);
+	logerror("%04x: keyboard_w %02x\n",m_maincpu->pc(),data);
 	m_keyboard_cmd = data;
 }
 
-READ8_MEMBER(rmhaihai_state::samples_r)
+void rmhaihai_state::adpcm_w(uint8_t data)
 {
-	return memregion("adpcm")->base()[offset];
-}
-
-WRITE8_MEMBER(rmhaihai_state::adpcm_w)
-{
-	m_msm->write_data(data);        // bit0..3
+	m_msm->data_w(data);             // bit0..3
 	m_msm->reset_w(BIT(data, 5));   // bit 5
 	m_msm->vclk_w(BIT(data, 4));    // bit4
 }
 
-WRITE8_MEMBER(rmhaihai_state::ctrl_w)
+void rmhaihai_state::ctrl_w(uint8_t data)
 {
 	flip_screen_set(data & 0x01);
 
@@ -229,26 +230,26 @@ WRITE8_MEMBER(rmhaihai_state::ctrl_w)
 
 	// (data & 0x10) is medal in service mode
 
-	m_gfxbank = (data & 0x40) >> 6; /* rmhaisei only */
+	m_gfxbank = (data & 0x40) >> 6; // rmhaisei only
 }
 
-WRITE8_MEMBER(themj_state::themj_rombank_w)
+void themj_state::themj_rombank_w(uint8_t data)
 {
 	logerror("banksw %d\n", data & 0x03);
-	membank("bank1")->set_entry(data & 0x03);
-	membank("bank2")->set_entry(data & 0x03);
+	m_cpubank[0]->set_entry(data & 0x03);
+	m_cpubank[1]->set_entry(data & 0x03);
 }
 
 void themj_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
-	membank("bank2")->configure_entries(0, 4, memregion("maincpu")->base() + 0x12000, 0x4000);
+	m_cpubank[0]->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_cpubank[1]->configure_entries(0, 4, memregion("maincpu")->base() + 0x12000, 0x4000);
 }
 
 void themj_state::machine_reset()
 {
-	membank("bank1")->set_entry(0);
-	membank("bank2")->set_entry(0);
+	m_cpubank[0]->set_entry(0);
+	m_cpubank[1]->set_entry(0);
 }
 
 
@@ -257,17 +258,17 @@ void rmhaihai_state::rmhaihai_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 	map(0xa000, 0xa7ff).ram().share("nvram");
-	map(0xa800, 0xafff).ram().w(FUNC(rmhaihai_state::colorram_w)).share("colorram");
-	map(0xb000, 0xb7ff).ram().w(FUNC(rmhaihai_state::videoram_w)).share("videoram");
+	map(0xa800, 0xafff).ram().w(FUNC(rmhaihai_state::colorram_w)).share(m_colorram);
+	map(0xb000, 0xb7ff).ram().w(FUNC(rmhaihai_state::videoram_w)).share(m_videoram);
 	map(0xb83c, 0xb83c).nopw();    // ??
 	map(0xbc00, 0xbc00).nopw();    // ??
 	map(0xc000, 0xdfff).rom();
-	map(0xe000, 0xffff).rom();         /* rmhaisei only */
+	map(0xe000, 0xffff).rom();         // rmhaisei only
 }
 
 void rmhaihai_state::rmhaihai_io_map(address_map &map)
 {
-	map(0x0000, 0x7fff).r(FUNC(rmhaihai_state::samples_r));
+	map(0x0000, 0x7fff).rom().region("adpcm", 0);
 	map(0x8000, 0x8000).r(FUNC(rmhaihai_state::keyboard_r)).nopw();    // ??
 	map(0x8001, 0x8001).nopr().w(FUNC(rmhaihai_state::keyboard_w));    // ??
 	map(0x8020, 0x8020).r("aysnd", FUNC(ay8910_device::data_r));
@@ -282,17 +283,17 @@ void rmhaihai_state::rmhaihai_io_map(address_map &map)
 void themj_state::themj_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).bankr("bank1");
+	map(0x8000, 0x9fff).bankr(m_cpubank[0]);
 	map(0xa000, 0xa7ff).ram();
-	map(0xa800, 0xafff).ram().w(FUNC(themj_state::colorram_w)).share("colorram");
-	map(0xb000, 0xb7ff).ram().w(FUNC(themj_state::videoram_w)).share("videoram");
-	map(0xc000, 0xdfff).bankr("bank2");
+	map(0xa800, 0xafff).ram().w(FUNC(themj_state::colorram_w)).share(m_colorram);
+	map(0xb000, 0xb7ff).ram().w(FUNC(themj_state::videoram_w)).share(m_videoram);
+	map(0xc000, 0xdfff).bankr(m_cpubank[1]);
 	map(0xe000, 0xffff).rom();
 }
 
 void themj_state::themj_io_map(address_map &map)
 {
-	map(0x0000, 0x7fff).r(FUNC(themj_state::samples_r));
+	map(0x0000, 0x7fff).rom().region("adpcm", 0);
 	map(0x8000, 0x8000).r(FUNC(themj_state::keyboard_r)).nopw();    // ??
 	map(0x8001, 0x8001).nopr().w(FUNC(themj_state::keyboard_w));    // ??
 	map(0x8020, 0x8020).r("aysnd", FUNC(ay8910_device::data_r));
@@ -382,7 +383,7 @@ static INPUT_PORTS_START( mjctrl )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rmhaihai )
-	PORT_START("DSW2")  /* dsw2 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -396,7 +397,7 @@ static INPUT_PORTS_START( rmhaihai )
 	PORT_DIPSETTING(    0xfa, "7" )
 	PORT_DIPSETTING(    0xfc, "8 (Difficult)" )
 
-	PORT_START("DSW1")  /* dsw1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -423,7 +424,7 @@ static INPUT_PORTS_START( rmhaihai )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rmhaihib )
-	PORT_START("DSW2")  /* dsw2 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -448,7 +449,7 @@ static INPUT_PORTS_START( rmhaihib )
 	PORT_DIPSETTING(    0x20, "30%" )
 	PORT_DIPSETTING(    0x00, "20%" )
 
-	PORT_START("DSW1")  /* dsw1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Bet Max" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -476,9 +477,9 @@ static INPUT_PORTS_START( rmhaihib )
 
 //  PORT_START("EXTRA") // 11
 //  PORT_BIT(    0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_3)
-//  PORT_BIT(     0x02, IP_ACTIVE_LOW, IPT_SERVICE4 ) /* RAM clear */
+//  PORT_BIT(     0x02, IP_ACTIVE_LOW, IPT_SERVICE4 ) // RAM clear
 //  PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-//  PORT_BIT(     0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) /* Analyzer */
+//  PORT_BIT(     0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) // Analyzer
 //  PORT_BIT(     0xF0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -506,15 +507,15 @@ GFXDECODE_END
 
 void rmhaihai_state::rmhaihai(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 20000000/4);     /* 5 MHz ??? */
+	// basic machine hardware
+	Z80(config, m_maincpu, 20000000/4);     // 5 MHz ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &rmhaihai_state::rmhaihai_map);
 	m_maincpu->set_addrmap(AS_IO, &rmhaihai_state::rmhaihai_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(rmhaihai_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -526,7 +527,7 @@ void rmhaihai_state::rmhaihai(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_rmhaihai);
 	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 0x100);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 20000000/16));
@@ -543,7 +544,7 @@ void rmhaisei_state::rmhaisei(machine_config &config)
 {
 	rmhaihai(config);
 
-	/* video hardware */
+	// video hardware
 	m_gfxdecode->set_info(gfx_themj);
 	subdevice<palette_device>("palette")->set_entries(0x200);
 }
@@ -552,13 +553,13 @@ void themj_state::themj(machine_config &config)
 {
 	rmhaihai(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &themj_state::themj_map);
 	m_maincpu->set_addrmap(AS_IO, &themj_state::themj_io_map);
 
 	config.device_remove("nvram");
 
-	/* video hardware */
+	// video hardware
 	m_gfxdecode->set_info(gfx_themj);
 	subdevice<palette_device>("palette")->set_entries(0x200);
 }
@@ -587,14 +588,14 @@ ROM_START( rmhaihai )
 	ROM_LOAD( "s1-7.5a",      0x0c000, 0x4000, CRC(be59e742) SHA1(19d253f72f760f6350f76b313cf8aca7e3f90e8d) )
 	ROM_LOAD( "s0-12.11a",    0x10000, 0x4000, CRC(e4229389) SHA1(b14d7855b66fe03c1485cb735cb20f59f19f248f) )
 	ROM_LOAD( "s1-11.10a",    0x14000, 0x4000, CRC(029ef909) SHA1(fd867b8e1ccd5b88f18409ff17939ec8420c6131) )
-	/* 0x18000-0x1ffff empty space filled by the init function */
+	// 0x18000-0x1ffff empty space filled by the init function
 
 	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "s2.13b",       0x0000, 0x0100, CRC(911d32a5) SHA1(36f2b62009918862c13f3eda05a21403b4d9607f) )
 	ROM_LOAD( "s1.13a",       0x0100, 0x0100, CRC(e9be978a) SHA1(50c7ca7a7496cb6fe5e8ce0db693ccb82dbbb8c6) )
 	ROM_LOAD( "s3.13c",       0x0200, 0x0100, CRC(609775a6) SHA1(70a787aec0852e106216a4ca9891d36aef60b189) )
 
-	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples, read directly by the main CPU */
+	ROM_REGION( 0x8000, "adpcm", 0 )    // ADPCM samples, read directly by the main CPU
 	ROM_LOAD( "s0-1.5g",      0x00000, 0x8000, CRC(65e55b7e) SHA1(3852fb3b37eccdcddff05d8ef4a742fcb8b63473) )
 ROM_END
 
@@ -614,14 +615,14 @@ ROM_START( rmhaihai2 )
 	ROM_LOAD( "s1-7.5a",      0x0c000, 0x4000, CRC(be59e742) SHA1(19d253f72f760f6350f76b313cf8aca7e3f90e8d) )
 	ROM_LOAD( "s0-12.11a",    0x10000, 0x4000, CRC(e4229389) SHA1(b14d7855b66fe03c1485cb735cb20f59f19f248f) )
 	ROM_LOAD( "s1-11.10a",    0x14000, 0x4000, CRC(029ef909) SHA1(fd867b8e1ccd5b88f18409ff17939ec8420c6131) )
-	/* 0x18000-0x1ffff empty space filled by the init function */
+	// 0x18000-0x1ffff empty space filled by the init function
 
 	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "s2.13b",       0x0000, 0x0100, CRC(911d32a5) SHA1(36f2b62009918862c13f3eda05a21403b4d9607f) )
 	ROM_LOAD( "s1.13a",       0x0100, 0x0100, CRC(e9be978a) SHA1(50c7ca7a7496cb6fe5e8ce0db693ccb82dbbb8c6) )
 	ROM_LOAD( "s3.13c",       0x0200, 0x0100, CRC(609775a6) SHA1(70a787aec0852e106216a4ca9891d36aef60b189) )
 
-	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples, read directly by the main CPU */
+	ROM_REGION( 0x8000, "adpcm", 0 )    // ADPCM samples, read directly by the main CPU
 	ROM_LOAD( "s0-1.5g",      0x00000, 0x8000, CRC(65e55b7e) SHA1(3852fb3b37eccdcddff05d8ef4a742fcb8b63473) )
 ROM_END
 
@@ -641,14 +642,14 @@ ROM_START( rmhaihib )
 	ROM_LOAD( "s1-7.5a",      0x0c000, 0x4000, CRC(be59e742) SHA1(19d253f72f760f6350f76b313cf8aca7e3f90e8d) )
 	ROM_LOAD( "s0-12.11a",    0x10000, 0x4000, CRC(e4229389) SHA1(b14d7855b66fe03c1485cb735cb20f59f19f248f) )
 	ROM_LOAD( "s1-11.10a",    0x14000, 0x4000, CRC(029ef909) SHA1(fd867b8e1ccd5b88f18409ff17939ec8420c6131) )
-	/* 0x18000-0x1ffff empty space filled by the init function */
+	// 0x18000-0x1ffff empty space filled by the init function
 
 	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "s2.13b",       0x0000, 0x0100, CRC(911d32a5) SHA1(36f2b62009918862c13f3eda05a21403b4d9607f) )
 	ROM_LOAD( "s1.13a",       0x0100, 0x0100, CRC(e9be978a) SHA1(50c7ca7a7496cb6fe5e8ce0db693ccb82dbbb8c6) )
 	ROM_LOAD( "s3.13c",       0x0200, 0x0100, CRC(609775a6) SHA1(70a787aec0852e106216a4ca9891d36aef60b189) )
 
-	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples, read directly by the main CPU */
+	ROM_REGION( 0x8000, "adpcm", 0 )    // ADPCM samples, read directly by the main CPU
 	ROM_LOAD( "s0-1.5g",      0x00000, 0x8000, CRC(65e55b7e) SHA1(3852fb3b37eccdcddff05d8ef4a742fcb8b63473) )
 ROM_END
 
@@ -668,14 +669,14 @@ ROM_START( rmhaijin )
 	ROM_LOAD( "s-2-7.5a",     0x0c000, 0x4000, CRC(e92658bd) SHA1(db4b55bb10c38357729bb0f59a9ff66f4b81a220) )
 	ROM_LOAD( "s-1-12.11a",   0x10000, 0x4000, CRC(7502a191) SHA1(e3543a2cf78d4046a580d972f68a4f10aa066144) )
 	ROM_LOAD( "s-2-11.10a",   0x14000, 0x4000, CRC(9ebbc607) SHA1(8ab707f2a197772bae94e9129eb3f40d408c88bf) )
-	/* 0x18000-0x1ffff empty space filled by the init function */
+	// 0x18000-0x1ffff empty space filled by the init function
 
 	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "s5.13b",       0x0000, 0x0100, CRC(153aa7bf) SHA1(945db334e27be431a34670b2d94de639f67038d1) )
 	ROM_LOAD( "s4.13a",       0x0100, 0x0100, CRC(5d643e6e) SHA1(df34be9d4cb0129069c2ed40c916c84674b62bb3) )
 	ROM_LOAD( "s6.13c",       0x0200, 0x0100, CRC(fd6ff344) SHA1(cd00985f8bbff1ab5a149a00320d861ac8655bf8) )
 
-	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples, read directly by the main CPU */
+	ROM_REGION( 0x8000, "adpcm", 0 )    // ADPCM samples, read directly by the main CPU
 	ROM_LOAD( "s-0-1.5g",     0x00000, 0x8000, CRC(65e55b7e) SHA1(3852fb3b37eccdcddff05d8ef4a742fcb8b63473) )
 ROM_END
 
@@ -696,51 +697,77 @@ ROM_START( rmhaisei )
 	ROM_LOAD( "sei-1.a5",     0x18000, 0x8000, CRC(fe6555f8) SHA1(b3201f465f9e897ec5805512e3ff488ef77f2f25) )
 	ROM_LOAD( "sei-6.a11",    0x20000, 0x8000, CRC(86f1b462) SHA1(ccabbdca44840de5f9b8f6af24117e545b8f1ef7) )
 	ROM_LOAD( "sei-5.a9",     0x28000, 0x8000, CRC(8bf780bc) SHA1(5ef72ee3f45f1cdde06131797faf26a9776f6a13) )
-	/* 0x30000-0x3ffff empty space filled by the init function */
+	// 0x30000-0x3ffff empty space filled by the init function
 
 	ROM_REGION( 0x0600, "proms", 0 )
 	ROM_LOAD( "2.bpr",        0x0000, 0x0200, CRC(9ad2afcd) SHA1(6cd4cd5f693ee882a98598e8f86ee2baf3b105bf) )
 	ROM_LOAD( "1.bpr",        0x0200, 0x0200, CRC(9b036f82) SHA1(4b14084e5a6674e69bd4bbc3a483c277bfc73808) )
 	ROM_LOAD( "3.bpr",        0x0400, 0x0200, CRC(0fa1a50a) SHA1(9e8a2c9554a61bfdacb434f8c22c1085b1c93aa1) )
 
-	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples, read directly by the main CPU */
+	ROM_REGION( 0x8000, "adpcm", 0 )    // ADPCM samples, read directly by the main CPU
 	ROM_LOAD( "sei-7.h5",     0x00000, 0x8000, CRC(3e412c1a) SHA1(bc5e324ea26b8dd1e37c4e8b0d7ba712c1222bc7) )
 ROM_END
 
 ROM_START( themj )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* CPU */
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "t7.bin",       0x00000,  0x02000, CRC(a58563c3) SHA1(53faeb66606214eb97ef8ff9affe68705e18a0b3) )
 	ROM_CONTINUE(             0x06000,  0x02000 )
 	ROM_LOAD( "t8.bin",       0x04000,  0x02000, CRC(bdf29475) SHA1(6296561da9c3a299d69bba8a98362c40b677ea9a) )
 	ROM_CONTINUE(             0x02000,  0x02000 )
 	ROM_LOAD( "t9.bin",       0x0e000,  0x02000, CRC(d5537d03) SHA1(ba27e83fcc9b6962373e2f723fc681481ec76864) )
-	ROM_LOAD( "no1.bin",      0x10000,  0x10000, CRC(a67dd977) SHA1(835648c5df51053c883d90d7309e53232b945ceb) ) /* banked */
+	ROM_LOAD( "no1.bin",      0x10000,  0x10000, CRC(a67dd977) SHA1(835648c5df51053c883d90d7309e53232b945ceb) ) // banked
 
-	ROM_REGION( 0x40000, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "t3.bin",       0x00000,  0x8000, CRC(f0735c62) SHA1(5ff0da7fc72512797ec59ee57467fa81abcfdb8b) )
 	ROM_LOAD( "t4.bin",       0x08000,  0x8000, CRC(952227fa) SHA1(7c2b5fe18bbaa482d93ab99a8f886838b596df8d) )
 	ROM_LOAD( "t5.bin",       0x10000,  0x8000, CRC(3deea9b4) SHA1(e445b545a8d293f6a5724e6c484cb1062c631bcc) )
 	ROM_LOAD( "t6.bin",       0x18000,  0x8000, CRC(47717958) SHA1(b25a9bd72bf5aa024ce2631440bb2ad762544e54) )
 	ROM_LOAD( "t1.bin",       0x20000,  0x8000, CRC(9b9a458e) SHA1(91146bd3ed7ed016c90ae5c3e3510d0d8d216ba5) )
 	ROM_LOAD( "t2.bin",       0x28000,  0x8000, CRC(4702375f) SHA1(9e824007e3e26ad6fb2ccbbcf35aa7cfdf5c469e) )
-	/* 0x30000-0x3ffff empty space filled by the init function */
+	// 0x30000-0x3ffff empty space filled by the init function
 
 	ROM_REGION( 0x0600, "proms", 0 )
 	ROM_LOAD( "5.bin",        0x0000,  0x0200, CRC(062fb055) SHA1(20a6d236e3ab1df8c471cccca31ec05442595c82) )
 	ROM_LOAD( "4.bin",        0x0200,  0x0200, CRC(9f81a6d7) SHA1(2735815c0c922d0c81559d792fcaa39bd9615536) )
 	ROM_LOAD( "6.bin",        0x0400,  0x0200, CRC(61373ec7) SHA1(73861914aae29e3996f9991f324c358a29c46969) )
 
-	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples, read directly by the main CPU */
+	ROM_REGION( 0x8000, "adpcm", 0 )    // ADPCM samples, read directly by the main CPU
 	ROM_LOAD( "t0.bin",       0x00000,  0x8000, CRC(3e412c1a) SHA1(bc5e324ea26b8dd1e37c4e8b0d7ba712c1222bc7) )
 ROM_END
 
+ROM_START( themj2 ) // SS-01A main PCB + SUBBOARD2 sub PCB. All ROMs on main PCB but no1.rom1
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "7.11g",     0x00000,  0x02000, CRC(2e8cdd78) SHA1(3136b7c79422d86c14560b370dc25c99b453156d) ) // 27128
+	ROM_CONTINUE(          0x06000,  0x02000 )
+	ROM_LOAD( "8.8g",      0x04000,  0x02000, CRC(15da6103) SHA1(681aa0df820dd010f90146c3c58a5b37cea93431) ) // 27128
+	ROM_CONTINUE(          0x02000,  0x02000 )
+	ROM_LOAD( "t9.6g",     0x0e000,  0x02000, CRC(d5537d03) SHA1(ba27e83fcc9b6962373e2f723fc681481ec76864) ) // 2764
+	ROM_LOAD( "no1.rom1",  0x10000,  0x10000, CRC(a67dd977) SHA1(835648c5df51053c883d90d7309e53232b945ceb) ) // 27512, banked
+
+	ROM_REGION( 0x40000, "gfx1", 0 ) // all 27256s
+	ROM_LOAD( "3.8a",       0x00000,  0x8000, CRC(f0735c62) SHA1(5ff0da7fc72512797ec59ee57467fa81abcfdb8b) )
+	ROM_LOAD( "4.7a",       0x08000,  0x8000, CRC(952227fa) SHA1(7c2b5fe18bbaa482d93ab99a8f886838b596df8d) )
+	ROM_LOAD( "5.6a",       0x10000,  0x8000, CRC(3deea9b4) SHA1(e445b545a8d293f6a5724e6c484cb1062c631bcc) )
+	ROM_LOAD( "6.5a",       0x18000,  0x8000, CRC(47717958) SHA1(b25a9bd72bf5aa024ce2631440bb2ad762544e54) )
+	ROM_LOAD( "1.11a",      0x20000,  0x8000, CRC(9b9a458e) SHA1(91146bd3ed7ed016c90ae5c3e3510d0d8d216ba5) )
+	ROM_LOAD( "2.12a",      0x28000,  0x8000, CRC(4702375f) SHA1(9e824007e3e26ad6fb2ccbbcf35aa7cfdf5c469e) )
+	// 0x30000-0x3ffff empty space filled by the init function
+
+	ROM_REGION( 0x0600, "proms", 0 ) // all 82S131s
+	ROM_LOAD( "s2.13b",        0x0000,  0x0200, CRC(062fb055) SHA1(20a6d236e3ab1df8c471cccca31ec05442595c82) )
+	ROM_LOAD( "s1.13a",        0x0200,  0x0200, CRC(9f81a6d7) SHA1(2735815c0c922d0c81559d792fcaa39bd9615536) )
+	ROM_LOAD( "s3.13c",        0x0400,  0x0200, CRC(61373ec7) SHA1(73861914aae29e3996f9991f324c358a29c46969) )
+
+	ROM_REGION( 0x8000, "adpcm", 0 )    // ADPCM samples, read directly by the main CPU
+	ROM_LOAD( "t0.bin",       0x00000,  0x8000, CRC(3e412c1a) SHA1(bc5e324ea26b8dd1e37c4e8b0d7ba712c1222bc7) ) // 27256
+ROM_END
 
 void rmhaihai_state::init_rmhaihai()
 {
 	int size = memregion("gfx1")->bytes() / 2;
 	uint8_t *rom = memregion("gfx1")->base() + size;
 
-	/* unpack the high bit of gfx */
+	// unpack the high bit of gfx
 	for (int b = size - 0x4000; b >= 0; b -= 0x4000)
 	{
 		if (b) memcpy(rom + b, rom + b/2, 0x2000);
@@ -758,4 +785,5 @@ GAME( 1985, rmhaihai2, rmhaihai, rmhaihai, rmhaihai, rmhaihai_state, init_rmhaih
 GAME( 1985, rmhaihib,  rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rmhaijin,  0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai Jinji Idou Hen (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rmhaisei,  0,        rmhaisei, rmhaihai, rmhaisei_state, init_rmhaihai, ROT0, "Visco", "Real Mahjong Haihai Seichouhen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, themj,     0,        themj,    rmhaihai, themj_state,    init_rmhaihai, ROT0, "Visco", "The Mah-jong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, themj,     0,        themj,    rmhaihai, themj_state,    init_rmhaihai, ROT0, "Visco", "The Mah-jong (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, themj2,    themj,    themj,    rmhaihai, themj_state,    init_rmhaihai, ROT0, "Visco", "The Mah-jong (Japan, set 2)", MACHINE_SUPPORTS_SAVE )

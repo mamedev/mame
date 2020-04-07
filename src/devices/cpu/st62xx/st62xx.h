@@ -108,8 +108,8 @@ protected:
 	void update_port_mode(uint8_t index, uint8_t changed);
 	void set_port_output_bit(uint8_t index, uint8_t bit, uint8_t state);
 
-	DECLARE_WRITE8_MEMBER(regs_w);
-	DECLARE_READ8_MEMBER(regs_r);
+	void regs_w(offs_t offset, uint8_t data);
+	uint8_t regs_r(offs_t offset);
 
 	enum
 	{

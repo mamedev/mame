@@ -109,7 +109,7 @@ void pc_fdc_family_device::device_reset()
 
 // Bit 4-7 control the drive motors
 
-WRITE8_MEMBER( pc_fdc_family_device::dor_w )
+void pc_fdc_family_device::dor_w(uint8_t data)
 {
 	LOG("dor = %02x\n", data);
 	uint8_t pdor = dor;
@@ -131,17 +131,17 @@ WRITE8_MEMBER( pc_fdc_family_device::dor_w )
 		fdc->reset();
 }
 
-READ8_MEMBER( pc_fdc_family_device::dor_r )
+uint8_t pc_fdc_family_device::dor_r()
 {
 	return dor;
 }
 
-READ8_MEMBER( pc_fdc_family_device::dir_r )
+uint8_t pc_fdc_family_device::dir_r()
 {
 	return do_dir_r();
 }
 
-WRITE8_MEMBER( pc_fdc_family_device::ccr_w )
+void pc_fdc_family_device::ccr_w(uint8_t data)
 {
 	static const int rates[4] = { 500000, 300000, 250000, 1000000 };
 	LOG("ccr = %02x\n", data);
@@ -155,19 +155,19 @@ uint8_t pc_fdc_family_device::do_dir_r()
 	return 0x00;
 }
 
-WRITE8_MEMBER( pc_fdc_xt_device::dor_fifo_w)
+void pc_fdc_xt_device::dor_fifo_w(uint8_t data)
 {
 	fdc->fifo_w(data);
-	dor_w(space, 0, data, mem_mask);
+	dor_w(data);
 }
 
-WRITE_LINE_MEMBER( pc_fdc_family_device::irq_w )
+void pc_fdc_family_device::irq_w(int state)
 {
 	fdc_irq = state;
 	check_irq();
 }
 
-WRITE_LINE_MEMBER( pc_fdc_family_device::drq_w )
+void pc_fdc_family_device::drq_w(int state)
 {
 	fdc_drq = state;
 	check_drq();

@@ -121,7 +121,7 @@ void turbo_state::buckrog_palette(palette_device &palette) const
 TILE_GET_INFO_MEMBER(turbo_state::get_fg_tile_info)
 {
 	int code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, code >> 2, 0);
+	tileinfo.set(0, code, code >> 2, 0);
 }
 
 

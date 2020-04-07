@@ -118,6 +118,7 @@ void tc0091lvc_device::banked_map(address_map &map)
 tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TC0091LVC, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfxinfo, "palette")
+	, m_irq_enable(0)
 	, m_bankdev(*this, "bankdev_%u", 0U)
 	, m_vram(*this, "vram")
 	, m_bitmap_ram(*this, "bitmap_ram")
@@ -134,7 +135,7 @@ TILE_GET_INFO_MEMBER(tc0091lvc_device::get_tile_info)
 			| ((m_vregs[(attr & 0xc) >> 2]) << 10);
 //          | (state->m_horshoes_gfxbank << 12);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			(attr & 0xf0) >> 4,
 			0);
@@ -146,7 +147,7 @@ TILE_GET_INFO_MEMBER(tc0091lvc_device::get_tx_tile_info)
 	const u16 code = m_vram[0xa000 + (2 * tile_index)]
 			| ((attr & 0x07) << 8);
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code,
 			(attr & 0xf0) >> 4,
 			0);

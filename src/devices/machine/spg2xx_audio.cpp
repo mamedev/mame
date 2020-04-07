@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:Ryan Holtz,Jonathan Gevaryahu
 /*****************************************************************************
 
     SunPlus SPG2xx-series SoC peripheral emulation (Audio)
@@ -98,11 +98,14 @@ void spg2xx_audio_device::device_start()
 	save_item(NAME(m_channel_debug));
 	save_item(NAME(m_audio_curr_beat_base_count));
 
-
 	for (int i = 0; i < 16; i++)
 	{
 		save_item(NAME(m_adpcm[i].m_signal), i);
 		save_item(NAME(m_adpcm[i].m_step), i);
+		save_item(NAME(m_adpcm36_state[i].m_header), i);
+		save_item(NAME(m_adpcm36_state[i].m_prevsamp), i);
+
+		memset(m_adpcm36_state + i, 0, sizeof(adpcm36_state));
 
 		m_channel_irq[i] = timer_alloc(TIMER_IRQ + i);
 		m_channel_irq[i]->adjust(attotime::never);
@@ -495,6 +498,11 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 					m_adpcm[channel_bit].reset();
 					m_sample_shift[channel_bit] = 0;
 					m_sample_count[channel_bit] = 0;
+
+					if (get_adpcm36_bit(channel_bit))
+					{
+						memset(m_adpcm36_state + channel_bit, 0, sizeof(adpcm36_state));
+					}
 				}
 			}
 			else
@@ -1027,7 +1035,7 @@ bool spg2xx_audio_device::advance_channel(const uint32_t channel)
 		if (!playing)
 			break;
 
-		if (get_adpcm_bit(channel))
+		if (get_adpcm_bit(channel) || get_adpcm36_bit(channel))
 		{
 			// ADPCM mode
 			m_sample_shift[channel] += 4;
@@ -1035,6 +1043,10 @@ bool spg2xx_audio_device::advance_channel(const uint32_t channel)
 			{
 				m_sample_shift[channel] = 0;
 				m_sample_addr[channel]++;
+				if (get_adpcm36_bit(channel))
+				{
+					m_adpcm36_state[channel].m_remaining--;
+				}
 			}
 		}
 		else if (get_16bit_bit(channel))
@@ -1062,6 +1074,40 @@ uint16_t spg2xx_audio_device::read_space(offs_t offset)
 	return m_space_read_cb(offset);
 }
 
+uint16_t spg2xx_audio_device::decode_adpcm36_nybble(const uint32_t channel, const uint8_t data)
+{
+	/*static const int8_t s_filter_coef[16][2] =
+	{
+	    { 0, 0 },
+	    { 60, 0 },
+	    { 115,-52 },
+	    { 98,-55 },
+	    { 122,-60 },
+	    { 122,-60 },
+	    { 122,-60 },
+	    { 122,-60 },
+	    { 0, 0 },
+	    { 60, 0 },
+	    { 115,-52 },
+	    { 98,-55 },
+	    { 122,-60 },
+	    { 122,-60 },
+	    { 122,-60 },
+	    { 122,-60 },
+	};*/
+
+	adpcm36_state &state = m_adpcm36_state[channel];
+	int32_t shift = state.m_header & 0xf;
+	int16_t filter = (state.m_header & 0x3f0) >> 4;
+	int16_t f0 = filter | ((filter & 0x20) ? ~0x3f : 0); // sign extend
+	int32_t f1 = 0;
+	int16_t sdata = data << 12;
+	sdata = (sdata >> shift) + (((state.m_prevsamp[0] * f0) + (state.m_prevsamp[1] * f1) + 32) >> 12);
+	state.m_prevsamp[1] = state.m_prevsamp[0];
+	state.m_prevsamp[0] = sdata;
+	return (uint16_t)sdata ^ 0x8000;
+}
+
 bool spg2xx_audio_device::fetch_sample(const uint32_t channel)
 {
 	const uint32_t channel_mask = channel << 4;
@@ -1069,6 +1115,14 @@ bool spg2xx_audio_device::fetch_sample(const uint32_t channel)
 
 	const uint32_t wave_data_reg = channel_mask | AUDIO_WAVE_DATA;
 	const uint16_t tone_mode = get_tone_mode(channel);
+
+	if (get_adpcm36_bit(channel) && tone_mode != 0 && m_adpcm36_state[channel].m_remaining == 0)
+	{
+		m_adpcm36_state[channel].m_header = read_space(m_sample_addr[channel]);
+		m_adpcm36_state[channel].m_remaining = 8;
+		m_sample_addr[channel]++;
+	}
+
 	uint16_t raw_sample = tone_mode ? read_space(m_sample_addr[channel]) : m_audio_regs[wave_data_reg];
 
 #if SPG_LOG_ADPCM36
@@ -1093,7 +1147,7 @@ bool spg2xx_audio_device::fetch_sample(const uint32_t channel)
 	}
 #endif
 
-	if (get_adpcm_bit(channel))
+	if (get_adpcm_bit(channel) || get_adpcm36_bit(channel))
 	{
 		// ADPCM mode
 		if (tone_mode != 0 && raw_sample == 0xffff)
@@ -1118,7 +1172,10 @@ bool spg2xx_audio_device::fetch_sample(const uint32_t channel)
 			m_audio_regs[wave_data_reg] = raw_sample;
 			m_audio_regs[wave_data_reg] >>= m_sample_shift[channel];
 			const uint8_t adpcm_sample = (uint8_t)(m_audio_regs[wave_data_reg] & 0x000f);
-			m_audio_regs[wave_data_reg] = (uint16_t)(m_adpcm[channel].clock(adpcm_sample) << 4) ^ 0x8000;
+			if (get_adpcm36_bit(channel))
+				m_audio_regs[wave_data_reg] = decode_adpcm36_nybble(channel, adpcm_sample);
+			else
+				m_audio_regs[wave_data_reg] = (uint16_t)(m_adpcm[channel].clock(adpcm_sample) << 4) ^ 0x8000;
 		}
 		m_sample_count[channel]++;
 	}
@@ -1434,5 +1491,4 @@ void sunplus_gcm394_audio_device::device_start()
 	for (int i = 0; i < 2; i++)
 		for (int j = 0; j < 0x20; j++)
 			m_control[i][j] = 0x0000;
-
 }

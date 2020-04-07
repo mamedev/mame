@@ -405,7 +405,7 @@ inline void homedata_state::mrokumei_info0( tile_data &tileinfo, int tile_index,
 	int code  = m_videoram[addr + 1] + ((attr & 0x03) << 8) + (gfxbank << 10);
 	int color = (attr >> 2) + (gfxbank << 6);
 
-	SET_TILE_INFO_MEMBER(0, code, color, m_flipscreen );
+	tileinfo.set(0, code, color, m_flipscreen );
 }
 inline void homedata_state::mrokumei_info1( tile_data &tileinfo, int tile_index, int page, int gfxbank )
 {
@@ -414,7 +414,7 @@ inline void homedata_state::mrokumei_info1( tile_data &tileinfo, int tile_index,
 	int code  = m_videoram[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
 	int color = (attr >> 3) + ((gfxbank & 3) << 6);
 
-	SET_TILE_INFO_MEMBER(1, code, color, m_flipscreen );
+	tileinfo.set(1, code, color, m_flipscreen );
 }
 
 TILE_GET_INFO_MEMBER(homedata_state::mrokumei_get_info0_0)
@@ -448,7 +448,7 @@ inline void homedata_state::reikaids_info( tile_data &tileinfo, int tile_index, 
 
 	if (attr & 0x80) flags ^= TILE_FLIPX;
 
-	SET_TILE_INFO_MEMBER(layer, code, color, flags );
+	tileinfo.set(layer, code, color, flags );
 }
 
 	/* reikaids_gfx_bank[0]:
@@ -507,7 +507,7 @@ inline void homedata_state::pteacher_info( tile_data &tileinfo, int tile_index, 
 	int code  = m_videoram[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
 	int color = (attr >> 3) + ((gfxbank & 1) << 5);
 
-	SET_TILE_INFO_MEMBER(layer, code, color, m_flipscreen);
+	tileinfo.set(layer, code, color, m_flipscreen);
 }
 
 TILE_GET_INFO_MEMBER(homedata_state::pteacher_get_info0_0)
@@ -538,7 +538,7 @@ inline void homedata_state::lemnangl_info( tile_data &tileinfo, int tile_index, 
 	int code  = m_videoram[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
 	int color = 16 * (attr >> 3) + gfxbank;
 
-	SET_TILE_INFO_MEMBER(2 * layer + gfxset, code, color, m_flipscreen);
+	tileinfo.set(2 * layer + gfxset, code, color, m_flipscreen);
 }
 
 TILE_GET_INFO_MEMBER(homedata_state::lemnangl_get_info0_0)
@@ -570,7 +570,7 @@ inline void homedata_state::mirderby_info0( tile_data &tileinfo, int tile_index,
 	int code  = m_videoram[addr + 1] + ((attr & 0x03) << 8) + 0x400;// + (gfxbank << 10);
 	int color = (attr >> 2) + (gfxbank << 6);
 
-	SET_TILE_INFO_MEMBER(0, code, color, m_flipscreen );
+	tileinfo.set(0, code, color, m_flipscreen );
 }
 inline void homedata_state::mirderby_info1( tile_data &tileinfo, int tile_index, int page, int gfxbank )
 {
@@ -579,7 +579,7 @@ inline void homedata_state::mirderby_info1( tile_data &tileinfo, int tile_index,
 	int code  = m_videoram[addr + 1] + ((attr & 0x07) << 8) + 0x400;//(gfxbank << 11);
 	int color = (attr >> 3) + ((gfxbank & 3) << 6);
 
-	SET_TILE_INFO_MEMBER(1, code, color, m_flipscreen );
+	tileinfo.set(1, code, color, m_flipscreen );
 }
 
 TILE_GET_INFO_MEMBER(homedata_state::mirderby_get_info0_0)

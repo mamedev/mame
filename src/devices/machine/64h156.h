@@ -82,8 +82,8 @@ public:
 	auto sync_callback() { return m_write_sync.bind(); }
 	auto byte_callback() { return m_write_byte.bind(); }
 
-	DECLARE_READ8_MEMBER( yb_r );
-	DECLARE_WRITE8_MEMBER( yb_w );
+	uint8_t yb_r();
+	void yb_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( test_w );
 	DECLARE_WRITE_LINE_MEMBER( accl_w );

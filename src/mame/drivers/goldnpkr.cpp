@@ -1495,7 +1495,7 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::get_bg_tile_info)
 	int bank = (attr & 0x02) >> 1;  /* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2; /* bits 2-3-4-5 for color */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(goldnpkr_state::wcrdxtnd_get_bg_tile_info)
@@ -1513,7 +1513,7 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::wcrdxtnd_get_bg_tile_info)
 	int bank = (attr & 0x03) + ((attr & 0xc0) >> 4);    /* bits 0, 1, 6 & 7 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2; /* bits 2-3-4-5 for color */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(goldnpkr_state::super21p_get_bg_tile_info)
@@ -1531,7 +1531,7 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::super21p_get_bg_tile_info)
 	int bank = (attr & 0x03);       // bits 0-1, switch the gfx banks
 	int color = (attr & 0x70) >> 3; // bits 4-5-6 for color, shifted x2 to match the color groups used.
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 
 /*
   Color codes GFX bank 0 (chars)
@@ -4901,7 +4901,7 @@ READ8_MEMBER(blitz_state::cpubank_decrypt_r)
 
 WRITE8_MEMBER(blitz_state::mcu_command_w)
 {
-	m_mcu->pa_w(space, 0, data);
+	m_mcu->pa_w(data);
 	if (BIT(m_portc_data, 0))
 	{
 		m_mcu->set_input_line(M6805_IRQ_LINE, ASSERT_LINE);

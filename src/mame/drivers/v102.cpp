@@ -46,7 +46,7 @@ private:
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<upd7201_new_device> m_mpsc;
+	required_device<upd7201_device> m_mpsc;
 	required_region_ptr<u8> m_chargen;
 
 	bool m_hs_state;
@@ -85,7 +85,7 @@ void v102_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x3f).rw("vpac", FUNC(crt9007_device::read), FUNC(crt9007_device::write));
-	map(0x40, 0x43).rw("mpsc", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w));
+	map(0x40, 0x43).rw("mpsc", FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w));
 	map(0x60, 0x61).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x80, 0x83).w("pit", FUNC(pit8253_device::write));
 	map(0xa0, 0xa3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -125,7 +125,7 @@ void v102_state::v102(machine_config &config)
 
 	EEPROM_2804(config, "eeprom");
 
-	UPD7201_NEW(config, m_mpsc, 18.575_MHz_XTAL / 5); // divider not verified
+	UPD7201(config, m_mpsc, 18.575_MHz_XTAL / 5); // divider not verified
 	m_mpsc->out_int_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_mpsc->out_txda_callback().set("keyboard", FUNC(v102_keyboard_device::write_rxd));
 	m_mpsc->out_txdb_callback().set("aux", FUNC(rs232_port_device::write_txd));
@@ -146,13 +146,13 @@ void v102_state::v102(machine_config &config)
 	pit.set_clk<2>(18.575_MHz_XTAL / 6);
 	pit.out_handler<0>().set("usart", FUNC(i8251_device::write_txc));
 	pit.out_handler<1>().set("usart", FUNC(i8251_device::write_rxc));
-	pit.out_handler<2>().set(m_mpsc, FUNC(upd7201_new_device::txcb_w));
-	pit.out_handler<2>().append(m_mpsc, FUNC(upd7201_new_device::rxcb_w));
+	pit.out_handler<2>().set(m_mpsc, FUNC(upd7201_device::txcb_w));
+	pit.out_handler<2>().append(m_mpsc, FUNC(upd7201_device::rxcb_w));
 
 	I8255(config, "ppi");
 
 	v102_keyboard_device &keyboard(V102_KEYBOARD(config, "keyboard"));
-	keyboard.txd_callback().set(m_mpsc, FUNC(upd7201_new_device::rxa_w));
+	keyboard.txd_callback().set(m_mpsc, FUNC(upd7201_device::rxa_w));
 
 	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	modem.rxd_handler().set("usart", FUNC(i8251_device::write_rxd));
@@ -160,8 +160,8 @@ void v102_state::v102(machine_config &config)
 	modem.dcd_handler().set("usart", FUNC(i8251_device::write_dsr));
 
 	rs232_port_device &aux(RS232_PORT(config, "aux", default_rs232_devices, nullptr));
-	aux.rxd_handler().set(m_mpsc, FUNC(upd7201_new_device::rxb_w));
-	aux.dcd_handler().set(m_mpsc, FUNC(upd7201_new_device::dcdb_w)); // DTR (printer busy)
+	aux.rxd_handler().set(m_mpsc, FUNC(upd7201_device::rxb_w));
+	aux.dcd_handler().set(m_mpsc, FUNC(upd7201_device::dcdb_w)); // DTR (printer busy)
 }
 
 

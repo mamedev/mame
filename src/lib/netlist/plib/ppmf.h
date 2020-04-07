@@ -130,7 +130,7 @@ namespace plib {
 			mfp mfpo(mftp);
 			//return mfpo.update_after_bind<FunctionType>(object);
 			generic_function rfunc(nullptr);
-			auto robject = reinterpret_cast<generic_class *>(object);
+			auto *robject = reinterpret_cast<generic_class *>(object);
 			mfpo.convert_to_generic(rfunc, robject);
 			func = reinterpret_cast<FunctionType>(rfunc);
 			object = reinterpret_cast<ObjectType *>(robject);
@@ -144,7 +144,7 @@ namespace plib {
 			{
 				// apply the "this" delta to the object first
 				// NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
-				auto o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
+				auto *o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 
 				// if the low bit of the vtable index is clear, then it is just a raw function pointer
 				if (!(m_function & 1))

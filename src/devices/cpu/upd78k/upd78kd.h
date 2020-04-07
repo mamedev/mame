@@ -19,6 +19,7 @@ protected:
 	void format_imm16(std::ostream &stream, u16 d);
 	void format_ix_disp8(std::ostream &stream, const char *r, u8 d);
 	void format_ix_disp16(std::ostream &stream, const char *r, u16 d);
+	void format_ix_base16(std::ostream &stream, const char *r, u16 d);
 	void format_abs16(std::ostream &stream, u16 addr);
 	void format_jdisp8(std::ostream &stream, offs_t pc, u8 disp);
 	void format_sfr(std::ostream &stream, u8 addr);

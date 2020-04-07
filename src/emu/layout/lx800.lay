@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
-<!-- Initial version.  [Dirk Best] -->
+<!--
+license:CC0
+copyright-holders:Dirk Best
+-->
 <mamelayout version="2">
 	<element name="background">
 		<rect>

@@ -125,6 +125,7 @@ protected:
 	virtual void rombank_mem_map(address_map &map);
 	virtual void unmap_optroms(address_space &space);
 
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
@@ -164,8 +165,9 @@ protected:
 
 	bool m_global_int_en;
 	uint16_t m_int_serv;
-	unsigned m_top_pending;
 	uint16_t m_int_acked;
+	unsigned m_top_acked;
+	unsigned m_top_pending;
 	uint16_t m_int_en;
 	uint8_t m_halt_lines;
 
@@ -192,6 +194,8 @@ protected:
 
 	void irq_w(unsigned n_irq , bool state);
 	void irq_en_w(unsigned n_irq , bool state);
+	void release_irq(unsigned n_irq);
+	static unsigned get_top_irq(uint16_t irqs);
 	void update_int_bits();
 	void update_irl();
 };
@@ -217,6 +221,7 @@ void hp80_base_state::hp80_base(machine_config &config)
 	HP_CAPRICORN(config, m_cpu, CPU_CLOCK);
 	m_cpu->set_addrmap(AS_PROGRAM, &hp80_base_state::cpu_mem_map);
 	m_cpu->set_irq_acknowledge_callback(FUNC(hp80_base_state::irq_callback));
+	config.set_perfect_quantum(m_cpu);
 
 	ADDRESS_MAP_BANK(config, "rombank").set_map(&hp80_base_state::rombank_mem_map).set_options(ENDIANNESS_LITTLE, 8, 21, HP80_OPTROM_SIZE);
 
@@ -274,11 +279,28 @@ void hp80_base_state::unmap_optroms(address_space &space)
 {
 }
 
+void hp80_base_state::machine_start()
+{
+	save_item(NAME(m_global_int_en));
+	save_item(NAME(m_int_serv));
+	save_item(NAME(m_int_acked));
+	save_item(NAME(m_top_acked));
+	save_item(NAME(m_top_pending));
+	save_item(NAME(m_int_en));
+	save_item(NAME(m_halt_lines));
+	save_pointer(NAME(m_kb_state) , 3);
+	save_item(NAME(m_kb_enable));
+	save_item(NAME(m_kb_pressed));
+	save_item(NAME(m_kb_flipped));
+	save_item(NAME(m_kb_keycode));
+}
+
 void hp80_base_state::machine_reset()
 {
 	m_int_serv = 0;
-	m_top_pending = NO_IRQ;
 	m_int_acked = 0;
+	m_top_acked = NO_IRQ;
+	m_top_pending = NO_IRQ;
 	m_int_en = 0;
 	m_global_int_en = false;
 	m_kb_state[ 0 ] = 0;
@@ -336,8 +358,9 @@ static const uint8_t vector_table[] = {
 
 IRQ_CALLBACK_MEMBER(hp80_base_state::irq_callback)
 {
-	LOG_IRQ("IRQ ACK %u\n" , m_top_pending);
+	LOG_IRQ("IRQ ACK %u %u\n" , m_top_pending , m_top_acked);
 	BIT_SET(m_int_acked , m_top_pending);
+	m_top_acked = m_top_pending;
 	if (m_top_pending > IRQ_IOP0_BIT && m_top_pending < IRQ_BIT_COUNT) {
 		// Interrupts are disabled in all I/O translators of higher priority than
 		// the one being serviced
@@ -351,12 +374,14 @@ IRQ_CALLBACK_MEMBER(hp80_base_state::irq_callback)
 
 WRITE8_MEMBER(hp80_base_state::ginten_w)
 {
+	LOG_IRQ("GINTEN\n");
 	m_global_int_en = true;
 	update_irl();
 }
 
 WRITE8_MEMBER(hp80_base_state::gintdis_w)
 {
+	LOG_IRQ("GINTDIS\n");
 	m_global_int_en = false;
 	update_irl();
 }
@@ -406,6 +431,7 @@ WRITE8_MEMBER(hp80_base_state::keycod_w)
 	if (data == 1) {
 		irq_w(IRQ_KEYBOARD_BIT , false);
 		m_kb_enable = true;
+		release_irq(IRQ_KEYBOARD_BIT);
 	} else {
 		LOG("Funny write to keycod=%02x\n" , data);
 	}
@@ -461,9 +487,10 @@ WRITE8_MEMBER(hp80_base_state::clksts_w)
 		}
 		if (BIT(data , 5)) {
 			// Clear timer irq
-			irq_w(IRQ_TIMER0_BIT + m_timer_idx , false);
+			unsigned irq_n = IRQ_TIMER0_BIT + m_timer_idx;
+			irq_w(irq_n , false);
+			release_irq(irq_n);
 		}
-		update_int_bits();
 	}
 }
 
@@ -499,8 +526,11 @@ WRITE8_MEMBER(hp80_base_state::rselec_w)
 
 READ8_MEMBER(hp80_base_state::intrsc_r)
 {
-	if (m_top_pending >= IRQ_IOP0_BIT && m_top_pending < IRQ_BIT_COUNT && BIT(m_int_acked , m_top_pending)) {
-		return (uint8_t)m_io_slots[ m_top_pending - IRQ_IOP0_BIT ]->get_base_addr();
+	if (m_top_acked >= IRQ_IOP0_BIT && m_top_acked < IRQ_BIT_COUNT) {
+		LOG_IRQ("INTRSC %u\n" , m_top_acked);
+		// Clear interrupt request in the slot being serviced
+		m_io_slots[ m_top_acked - IRQ_IOP0_BIT ]->clear_service();
+		return (uint8_t)m_io_slots[ m_top_acked - IRQ_IOP0_BIT ]->get_base_addr();
 	} else {
 		// Probably..
 		return 0xff;
@@ -509,16 +539,15 @@ READ8_MEMBER(hp80_base_state::intrsc_r)
 
 WRITE8_MEMBER(hp80_base_state::intrsc_w)
 {
-	if (m_top_pending >= IRQ_IOP0_BIT && m_top_pending < IRQ_BIT_COUNT && BIT(m_int_acked , m_top_pending)) {
-		// Clear interrupt request in the slot being serviced
-		m_io_slots[ m_top_pending - IRQ_IOP0_BIT ]->clear_service();
-	}
+	LOG_IRQ("INTRSC W %u %03x %03x %03x\n" , m_top_acked , m_int_serv , m_int_en , m_int_acked);
 	for (auto& iop: m_io_slots) {
 		iop->inten();
 	}
 	for (unsigned i = IRQ_IOP0_BIT; i < (IRQ_IOP0_BIT + IOP_COUNT); i++) {
 		irq_en_w(i , true);
 	}
+	m_int_acked &= ~(((1U << IOP_COUNT) - 1) << IRQ_IOP0_BIT);
+	update_int_bits();
 }
 
 // Outer index: key position [0..79] = r * 8 + c
@@ -780,35 +809,44 @@ WRITE8_MEMBER(hp80_base_state::halt_w)
 
 void hp80_base_state::irq_w(unsigned n_irq , bool state)
 {
-	if (state && !BIT(m_int_serv , n_irq)) {
-		// Set service request
-		BIT_SET(m_int_serv , n_irq);
-		BIT_CLR(m_int_acked , n_irq);
-	} else if (!state && BIT(m_int_serv , n_irq)) {
-		// Clear service request
-		BIT_CLR(m_int_serv , n_irq);
-		BIT_CLR(m_int_acked , n_irq);
-	}
+	LOG_IRQ("IRQ_W %u %d\n" , n_irq , state);
+	COPY_BIT(state , m_int_serv , n_irq);
 	update_int_bits();
 }
 
 void hp80_base_state::irq_en_w(unsigned n_irq , bool state)
 {
+	LOG_IRQ("IRQ_EN_W %u %d\n" , n_irq , state);
 	COPY_BIT(state , m_int_en , n_irq);
 	update_int_bits();
 }
 
+void hp80_base_state::release_irq(unsigned n_irq)
+{
+	if (BIT(m_int_acked , n_irq)) {
+		BIT_CLR(m_int_acked , n_irq);
+		update_int_bits();
+	}
+}
+
+unsigned hp80_base_state::get_top_irq(uint16_t irqs)
+{
+	unsigned top;
+	for (top = 0; top < IRQ_BIT_COUNT && !BIT(irqs , 0); top++ , irqs >>= 1) {
+	}
+	return top;
+}
+
 void hp80_base_state::update_int_bits()
 {
-	uint16_t irqs = m_int_en & m_int_serv;
-	for (m_top_pending = 0; m_top_pending < IRQ_BIT_COUNT && !BIT(irqs , m_top_pending); m_top_pending++) {
-	}
+	m_top_pending = get_top_irq(m_int_en & m_int_serv);
+	m_top_acked = get_top_irq(m_int_acked);
 	update_irl();
 }
 
 void hp80_base_state::update_irl()
 {
-	m_cpu->set_input_line(0 , m_global_int_en && m_top_pending < IRQ_BIT_COUNT && !BIT(m_int_acked , m_top_pending));
+	m_cpu->set_input_line(0 , m_global_int_en && m_top_pending < m_top_acked);
 }
 
 // ************
@@ -955,6 +993,7 @@ hp85_state::hp85_state(const machine_config &mconfig, device_type type, const ch
 
 void hp85_state::machine_start()
 {
+	hp80_base_state::machine_start();
 	m_screen->register_screen_bitmap(m_bitmap);
 	m_video_mem.resize(VIDEO_MEM_SIZE);
 }
@@ -1654,6 +1693,8 @@ void hp86_state::hp86(machine_config &config)
 
 void hp86_state::machine_start()
 {
+	hp80_base_state::machine_start();
+
 	m_run_light.resolve();
 
 	m_screen->register_screen_bitmap(m_bitmap);

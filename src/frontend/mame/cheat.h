@@ -88,7 +88,7 @@ public:
 	cheat_parameter(
 			cheat_manager &manager,
 			symbol_table &symbols,
-			char const *filename,
+			std::string const &filename,
 			util::xml::data_node const &paramnode);
 
 	// queries
@@ -153,7 +153,7 @@ public:
 	cheat_script(
 			cheat_manager &manager,
 			symbol_table &symbols,
-			char const *filename,
+			std::string const &filename,
 			util::xml::data_node const &scriptnode);
 
 	// getters
@@ -172,7 +172,7 @@ private:
 		script_entry(
 				cheat_manager &manager,
 				symbol_table &symbols,
-				char const *filename,
+				std::string const &filename,
 				util::xml::data_node const &entrynode,
 				bool isaction);
 
@@ -189,7 +189,7 @@ private:
 			output_argument(
 					cheat_manager &manager,
 					symbol_table &symbols,
-					char const *filename,
+					std::string const &filename,
 					util::xml::data_node const &argnode);
 
 			// getters
@@ -206,7 +206,7 @@ private:
 		};
 
 		// internal helpers
-		void validate_format(char const *filename, int line);
+		void validate_format(std::string const &filename, int line);
 
 		// internal state
 		parsed_expression                               m_condition;    // condition under which this is executed
@@ -233,7 +233,7 @@ class cheat_entry
 {
 public:
 	// construction/destruction
-	cheat_entry(cheat_manager &manager, symbol_table &globaltable, const char *filename, util::xml::data_node const &cheatnode);
+	cheat_entry(cheat_manager &manager, symbol_table &globaltable, std::string const &filename, util::xml::data_node const &cheatnode);
 	~cheat_entry();
 
 	// getters
@@ -319,7 +319,7 @@ public:
 
 	// actions
 	void reload();
-	bool save_all(const char *filename);
+	bool save_all(std::string const &filename);
 	void render_text(mame_ui_manager &mui, render_container &container);
 
 	// output helpers
@@ -333,7 +333,7 @@ public:
 private:
 	// internal helpers
 	void frame_update();
-	void load_cheats(char const *filename);
+	void load_cheats(std::string const &filename);
 
 	// internal state
 	running_machine &                           m_machine;      // reference to our machine

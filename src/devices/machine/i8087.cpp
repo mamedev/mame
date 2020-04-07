@@ -4474,6 +4474,7 @@ void i8087_device::build_opcode_table_d9()
 				case 0xcf: ptr = &i8087_device::fxch_sti;  break;
 
 				case 0xd0: ptr = &i8087_device::fnop;      break;
+				case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf: ptr = &i8087_device::fstp_sti;     break;
 				case 0xe0: ptr = &i8087_device::fchs;      break;
 				case 0xe1: ptr = &i8087_device::fabs;      break;
 				case 0xe4: ptr = &i8087_device::ftst;      break;

@@ -58,11 +58,11 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(acefruit_colorram_w);
-	DECLARE_WRITE8_MEMBER(acefruit_coin_w);
-	DECLARE_WRITE8_MEMBER(acefruit_sound_w);
-	DECLARE_WRITE8_MEMBER(acefruit_lamp_w);
-	DECLARE_WRITE8_MEMBER(acefruit_solenoid_w);
+	void acefruit_colorram_w(offs_t offset, uint8_t data);
+	void acefruit_coin_w(uint8_t data);
+	void acefruit_sound_w(uint8_t data);
+	void acefruit_lamp_w(offs_t offset, uint8_t data);
+	void acefruit_solenoid_w(uint8_t data);
 
 	void acefruit_palette(palette_device &palette) const;
 	uint32_t screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -230,7 +230,7 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 }
 
 template <int Mask>
-READ_LINE_MEMBER(acefruit_state::sidewndr_payout_r)
+int acefruit_state::sidewndr_payout_r()
 {
 	switch (Mask)
 	{
@@ -245,7 +245,7 @@ READ_LINE_MEMBER(acefruit_state::sidewndr_payout_r)
 }
 
 template <int Mask>
-READ_LINE_MEMBER(acefruit_state::starspnr_coinage_r)
+int acefruit_state::starspnr_coinage_r()
 {
 	switch (Mask)
 	{
@@ -264,7 +264,7 @@ READ_LINE_MEMBER(acefruit_state::starspnr_coinage_r)
 }
 
 template <int Mask>
-READ_LINE_MEMBER(acefruit_state::starspnr_payout_r)
+int acefruit_state::starspnr_payout_r()
 {
 	switch (Mask)
 	{
@@ -280,28 +280,28 @@ READ_LINE_MEMBER(acefruit_state::starspnr_payout_r)
 	}
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_colorram_w)
+void acefruit_state::acefruit_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[ offset ] = data & 0xf;
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_coin_w)
+void acefruit_state::acefruit_coin_w(uint8_t data)
 {
 	/* TODO: ? */
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_sound_w)
+void acefruit_state::acefruit_sound_w(uint8_t data)
 {
 	/* TODO: ? */
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_lamp_w)
+void acefruit_state::acefruit_lamp_w(offs_t offset, uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_lamps[(offset << 3) | i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_solenoid_w)
+void acefruit_state::acefruit_solenoid_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 		m_solenoids[i] = BIT(data, i);

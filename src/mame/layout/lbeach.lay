@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 	<element name="overlay">
 		<rect>
@@ -24,12 +27,18 @@
 		</rect>
 	</element>
 
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+
 	<view name="Color Overlay">
+		<bounds left="0" right="640" top="0" bottom="480" />
 		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
+			<bounds x="0" y="0" width="738.46" height="480" />
 		</screen>
+		<bezel element="black">
+			<bounds x="640" y="0" width="100" height="480" />
+		</bezel>
 		<overlay element="overlay">
-			<bounds left="0" top="0" right="4" bottom="3" />
+			<bounds x="0" y="0" width="738.46" height="480" />
 		</overlay>
 	</view>
 </mamelayout>

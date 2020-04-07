@@ -28,13 +28,13 @@ namespace netlist
 		const std::vector<std::pair<pstring, pstring>> power_syms = { {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
 
 		bool f = false;
-		for (auto & pwr_sym : power_syms)
+		for (const auto & pwr_sym : power_syms)
 		{
 			pstring devname = inout_proxied->device().name();
 
-			auto tp_ct(anetlist.setup().find_terminal(devname + "." + pwr_sym.first,
+			auto *tp_ct(anetlist.setup().find_terminal(devname + "." + pwr_sym.first,
 					/*detail::terminal_type::INPUT,*/ false));
-			auto tp_cn(anetlist.setup().find_terminal(devname + "." + pwr_sym.second,
+			auto *tp_cn(anetlist.setup().find_terminal(devname + "." + pwr_sym.second,
 				/*detail::terminal_type::INPUT,*/ false));
 			if (tp_ct && tp_cn)
 			{
@@ -43,8 +43,8 @@ namespace netlist
 				if (tp_cn && !tp_cn->is_analog())
 					throw nl_exception(plib::pfmt("Not an analog terminal: {1}")(tp_cn->name()));
 
-				auto tp_t = static_cast<analog_t* >(tp_ct);
-				auto tn_t = static_cast<analog_t *>(tp_cn);
+				auto *tp_t = static_cast<analog_t* >(tp_ct);
+				auto *tn_t = static_cast<analog_t *>(tp_cn);
 				if (f && (tp_t != nullptr && tn_t != nullptr))
 					log().warning(MI_MULTIPLE_POWER_TERMINALS_ON_DEVICE(inout_proxied->device().name(),
 						m_tp->name(), m_tn->name(),

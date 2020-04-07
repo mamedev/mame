@@ -195,7 +195,7 @@ TILE_GET_INFO_MEMBER(travrusa_state::get_tile_info)
 
 	tileinfo.group = ((attr & 0x0f) == 0x0f) ? 1 : 0;   /* tunnels */
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[2 * tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x0f,
 			flags);

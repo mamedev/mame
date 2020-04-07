@@ -127,7 +127,7 @@ void awacs_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 //  read - read from the chip's registers and internal RAM
 //-------------------------------------------------
 
-READ8_MEMBER( awacs_device::read )
+uint8_t awacs_device::read(offs_t offset)
 {
 	return m_regs[offset];
 }
@@ -136,7 +136,7 @@ READ8_MEMBER( awacs_device::read )
 //  write - write to the chip's registers and internal RAM
 //-------------------------------------------------
 
-WRITE8_MEMBER( awacs_device::write )
+void awacs_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

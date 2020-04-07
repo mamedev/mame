@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 
-<!-- NOTE: highlight should be a bit star-shaped, not doable in MAME internal layout -->
+	<!-- NOTE: highlight should be a bit star-shaped, not doable in MAME internal layout -->
 
 	<element name="highlight_explosion">
 	<rect><color red="1.0" green="1.0" blue="1.0" /></rect>

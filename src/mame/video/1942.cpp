@@ -28,29 +28,27 @@
 
 void _1942_state::create_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("palproms")->base();
 
 	for (int i = 0; i < 256; i++)
 	{
-		int bit0, bit1, bit2, bit3;
-
 		// red component
-		bit0 = (color_prom[i + 0 * 256] >> 0) & 0x01;
-		bit1 = (color_prom[i + 0 * 256] >> 1) & 0x01;
-		bit2 = (color_prom[i + 0 * 256] >> 2) & 0x01;
-		bit3 = (color_prom[i + 0 * 256] >> 3) & 0x01;
+		int bit0 = BIT(color_prom[i + 0 * 256], 0);
+		int bit1 = BIT(color_prom[i + 0 * 256], 1);
+		int bit2 = BIT(color_prom[i + 0 * 256], 2);
+		int bit3 = BIT(color_prom[i + 0 * 256], 3);
 		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 		// green component
-		bit0 = (color_prom[i + 1 * 256] >> 0) & 0x01;
-		bit1 = (color_prom[i + 1 * 256] >> 1) & 0x01;
-		bit2 = (color_prom[i + 1 * 256] >> 2) & 0x01;
-		bit3 = (color_prom[i + 1 * 256] >> 3) & 0x01;
+		bit0 = BIT(color_prom[i + 1 * 256], 0);
+		bit1 = BIT(color_prom[i + 1 * 256], 1);
+		bit2 = BIT(color_prom[i + 1 * 256], 2);
+		bit3 = BIT(color_prom[i + 1 * 256], 3);
 		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 		// blue component
-		bit0 = (color_prom[i + 2 * 256] >> 0) & 0x01;
-		bit1 = (color_prom[i + 2 * 256] >> 1) & 0x01;
-		bit2 = (color_prom[i + 2 * 256] >> 2) & 0x01;
-		bit3 = (color_prom[i + 2 * 256] >> 3) & 0x01;
+		bit0 = BIT(color_prom[i + 2 * 256], 0);
+		bit1 = BIT(color_prom[i + 2 * 256], 1);
+		bit2 = BIT(color_prom[i + 2 * 256], 2);
+		bit3 = BIT(color_prom[i + 2 * 256], 3);
 		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
@@ -61,31 +59,28 @@ void _1942_state::_1942_palette(palette_device &palette) const
 {
 	create_palette(palette);
 
-	const uint8_t *color_prom = memregion("proms")->base();
-	color_prom += 3 * 256;
-	// color_prom now points to the beginning of the lookup table
-
-
 	/* characters use palette entries 128-143 */
 	int colorbase = 0;
+	const uint8_t *charlut_prom = memregion("charprom")->base();
 	for (int i = 0; i < 64 * 4; i++)
-		palette.set_pen_indirect(colorbase + i, 0x80 | *color_prom++);
+		palette.set_pen_indirect(colorbase + i, 0x80 | charlut_prom[i]);
 
 	// background tiles use palette entries 0-63 in four banks
 	colorbase += 64 * 4;
+	const uint8_t *tilelut_prom = memregion("tileprom")->base();
 	for (int i = 0; i < 32 * 8; i++)
 	{
-		palette.set_pen_indirect(colorbase + 0 * 32 * 8 + i, 0x00 | *color_prom);
-		palette.set_pen_indirect(colorbase + 1 * 32 * 8 + i, 0x10 | *color_prom);
-		palette.set_pen_indirect(colorbase + 2 * 32 * 8 + i, 0x20 | *color_prom);
-		palette.set_pen_indirect(colorbase + 3 * 32 * 8 + i, 0x30 | *color_prom);
-		color_prom++;
+		palette.set_pen_indirect(colorbase + 0 * 32 * 8 + i, 0x00 | tilelut_prom[i]);
+		palette.set_pen_indirect(colorbase + 1 * 32 * 8 + i, 0x10 | tilelut_prom[i]);
+		palette.set_pen_indirect(colorbase + 2 * 32 * 8 + i, 0x20 | tilelut_prom[i]);
+		palette.set_pen_indirect(colorbase + 3 * 32 * 8 + i, 0x30 | tilelut_prom[i]);
 	}
 
 	// sprites use palette entries 64-79
 	colorbase += 4 * 32 * 8;
+	const uint8_t *sprlut_prom = memregion("sprprom")->base();
 	for (int i = 0; i < 16 * 16; i++)
-		palette.set_pen_indirect(colorbase + i, 0x40 | *color_prom++);
+		palette.set_pen_indirect(colorbase + i, 0x40 | sprlut_prom[i]);
 }
 
 void _1942p_state::_1942p_palette(palette_device &palette) const
@@ -108,11 +103,9 @@ void _1942p_state::_1942p_palette(palette_device &palette) const
 
 TILE_GET_INFO_MEMBER(_1942_state::get_fg_tile_info)
 {
-	int code, color;
-
-	code = m_fg_videoram[tile_index];
-	color = m_fg_videoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(0,
+	int code = m_fg_videoram[tile_index];
+	int color = m_fg_videoram[tile_index + 0x400];
+	tileinfo.set(0,
 			code + ((color & 0x80) << 1),
 			color & 0x3f,
 			0);
@@ -120,13 +113,11 @@ TILE_GET_INFO_MEMBER(_1942_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(_1942_state::get_bg_tile_info)
 {
-	int code, color;
-
 	tile_index = (tile_index & 0x0f) | ((tile_index & 0x01f0) << 1);
 
-	code = m_bg_videoram[tile_index];
-	color = m_bg_videoram[tile_index + 0x10];
-	SET_TILE_INFO_MEMBER(1,
+	int code = m_bg_videoram[tile_index];
+	int color = m_bg_videoram[tile_index + 0x10];
+	tileinfo.set(1,
 			code + ((color & 0x80) << 1),
 			(color & 0x1f) + (0x20 * m_palette_bank),
 			TILE_FLIPYX((color & 0x60) >> 5));
@@ -212,43 +203,91 @@ WRITE8_MEMBER(_1942_state::_1942_c804_w)
 
 void _1942_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
+	// Sprites 0 to 15 are drawn on all scanlines.
+	// Sprites 16 to 23 are drawn on scanlines 16 to 127.
+	// Sprites 24 to 31 are drawn on scanlines 128 to 239.
+	//
+	// The reason for this is ostensibly so that the back half of the sprite list can
+	// be used to selectively mask sprites along the midpoint of the screen.
+	//
+	// Moreover, the H counter runs from 128 to 511 for a total of 384 horizontal
+	// clocks per scanline. With an effective 6MHz pixel clock, this produces a
+	// horizontal scan rate of exactly 15.625kHz, a standard scan rate for games
+	// of this era.
+	//
+	// Sprites are drawn by MAME in reverse order, as the actual hardware only
+	// permits a transparent pixel to be overwritten by an opaque pixel, and does
+	// not support opaque-opaque overwriting - i.e., the first sprite to draw wins
+	// control over its horizontal range. If MAME drew in forward order, it would
+	// instead produce a last-sprite-wins behavior.
 
-	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int i, code, col, sx, sy, dir;
-
-		code = (m_spriteram[offs] & 0x7f) + 4 * (m_spriteram[offs + 1] & 0x20)
-				+ 2 * (m_spriteram[offs] & 0x80);
-		col = m_spriteram[offs + 1] & 0x0f;
-		sx = m_spriteram[offs + 3] - 0x10 * (m_spriteram[offs + 1] & 0x10);
-		sy = m_spriteram[offs + 2];
-		dir = 1;
-
-		if (flip_screen())
+		const rectangle cliprecty(cliprect.min_x, cliprect.max_x, y, y);
+		uint8_t objdata[4];
+		uint8_t v = flip_screen() ? ~(y - 1) : y - 1;
+		for (int h = 496; h >= 128; h -= 16)
 		{
-			sx = 240 - sx;
-			sy = 240 - sy;
-			dir = -1;
+			const bool objcnt4 = BIT(h, 8) != BIT(~h, 7);
+			const bool objcnt3 = (BIT(v, 7) && objcnt4) != BIT(~h, 7);
+			uint8_t obj_idx = (h >> 4) & 7;
+			obj_idx |= objcnt3 ? 0x08 : 0x00;
+			obj_idx |= objcnt4 ? 0x10 : 0x00;
+			obj_idx <<= 2;
+			for (int i = 0; i < 4; i++)
+				objdata[i] = m_spriteram[obj_idx | i];
+
+			int code = (objdata[0] & 0x7f) + ((objdata[1] & 0x20) << 2) + ((objdata[0] & 0x80) << 1);
+			int col = objdata[1] & 0x0f;
+			int sx = objdata[3] - 0x10 * (objdata[1] & 0x10);
+			int sy = objdata[2];
+			int dir = 1;
+
+			uint8_t valpha = (uint8_t)sy;
+			uint8_t v2c = (uint8_t)(~v) + (flip_screen() ? 0x01 : 0xff);
+			uint8_t lvbeta = v2c + valpha;
+			uint8_t vbeta = ~lvbeta;
+			bool vleq = vbeta <= ((~valpha) & 0xff);
+			bool vinlen = true;
+			uint8_t vlen = objdata[1] >> 6;
+			switch (vlen & 3)
+			{
+			case 0:
+				vinlen = BIT(lvbeta, 7) && BIT(lvbeta, 6) && BIT(lvbeta, 5) && BIT(lvbeta, 4);
+				break;
+			case 1:
+				vinlen = BIT(lvbeta, 7) && BIT(lvbeta, 6) && BIT(lvbeta, 5);
+				break;
+			case 2:
+				vinlen = BIT(lvbeta, 7) && BIT(lvbeta, 6);
+				break;
+			case 3:
+				vinlen = true;
+				break;
+			}
+			bool vinzone = !(vleq && vinlen);
+
+			if (flip_screen())
+			{
+				sx = 240 - sx;
+				sy = 240 - sy;
+				dir = -1;
+			}
+
+			/* handle double / quadruple height */
+			int i = (objdata[1] & 0xc0) >> 6;
+			if (i == 2)
+				i = 3;
+
+			if (!vinzone)
+			{
+				do
+				{
+					m_gfxdecode->gfx(2)->transpen(bitmap, cliprecty, code + i, col, flip_screen(), flip_screen(), sx, sy + 16 * i * dir, 15);
+				} while (i-- > 0);
+			}
 		}
-
-		/* handle double / quadruple height */
-		i = (m_spriteram[offs + 1] & 0xc0) >> 6;
-		if (i == 2)
-			i = 3;
-
-		do
-		{
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
-					code + i,col,
-					flip_screen(),flip_screen(),
-					sx,sy + 16 * i * dir,15);
-
-			i--;
-		} while (i >= 0);
 	}
-
-
 }
 
 uint32_t _1942_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -267,7 +306,6 @@ void _1942p_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int code = (m_spriteram[offs] & 0x7f) + 4 * (m_spriteram[offs + 3] & 0x20)
 					+ 2 * (m_spriteram[offs] & 0x80);
 		int col = m_spriteram[offs + 3] & 0x0f;
-
 
 		int sx = m_spriteram[offs + 2] - 0x10 * (m_spriteram[offs + 3] & 0x10);
 		int sy = m_spriteram[offs + 1];
@@ -293,10 +331,7 @@ void _1942p_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 		do
 		{
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
-					code + i,col,
-					flip_screen(),flip_screen(),
-					sx,sy + 16 * i * dir,15);
+			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code + i, col, flip_screen(), flip_screen(), sx, sy + 16 * i * dir, 15);
 
 			i--;
 		} while (i >= 0);

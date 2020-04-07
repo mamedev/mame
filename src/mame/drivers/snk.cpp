@@ -2258,6 +2258,27 @@ static INPUT_PORTS_START( tnk3 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( tnk3b )
+	PORT_INCLUDE( tnk3 )
+
+	// no rotary joystick in this version. Player fires in the direction he's facing.
+	// this is accomplished by hooking the joystick input to the rotary input, plus
+	// of course the code is patched to handle that.
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x21, 0x01, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x42, 0x02, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x84, 0x04, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x18, 0x08, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x21, 0x01, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x42, 0x02, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x84, 0x04, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x18, 0x08, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( athena )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
@@ -4522,7 +4543,41 @@ ROM_END
 
 ROM_START( tnk3j )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "p1.4e",  0x0000, 0x4000, CRC(03aca147) SHA1(9ce4cfdfbd22f10e13c8e474dc2e5aa3bfd57e0b) )
+	ROM_LOAD( "p1.4e",        0x0000, 0x4000, CRC(03aca147) SHA1(9ce4cfdfbd22f10e13c8e474dc2e5aa3bfd57e0b) )
+	ROM_LOAD( "tnk3-p2.bin",  0x4000, 0x4000, CRC(0ae0a483) SHA1(6a1ba86da4fd75bfb00855db04eac2727ec4159e) )
+	ROM_LOAD( "tnk3-p3.bin",  0x8000, 0x4000, CRC(d16dd4db) SHA1(dcbc61251c13e11ce3cdd7a5ad200cd2d2758cab) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "tnk3-p4.bin",  0x0000, 0x4000, CRC(01b45a90) SHA1(85ba3b157cd6463c92ed831bb48d38f3a16f9537) )
+	ROM_LOAD( "tnk3-p5.bin",  0x4000, 0x4000, CRC(60db6667) SHA1(9c4bb99473c6d9b8ac9086b7364b6278b70757f6) )
+	ROM_LOAD( "tnk3-p6.bin",  0x8000, 0x4000, CRC(4761fde7) SHA1(dadf60e33f5dd8108478ca480bcef6b2624cfca8) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "tnk3-p10.bin",  0x0000, 0x4000, CRC(7bf0a517) SHA1(0197feeaf511ac59f3df8195ec57e947fb08e995) )
+	ROM_LOAD( "tnk3-p11.bin",  0x4000, 0x4000, CRC(0569ce27) SHA1(7aa73f57ad97445ce5729f05cd8d24973886dbf5) )
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "7122.2",  0x000, 0x400, CRC(34c06bc6) SHA1(bb68e96a8fcc754840420952dab961e03bf6acdd) )
+	ROM_LOAD( "7122.1",  0x400, 0x400, CRC(6d0ac66a) SHA1(e792218ec43dd10473dc020afed8527cf43ea0d0) )
+	ROM_LOAD( "7122.0",  0x800, 0x400, CRC(4662b4c8) SHA1(391c2b8a17ce2e092b46a17fc4170dc1e3bde426) )
+
+	ROM_REGION( 0x4000, "tx_tiles", 0 )
+	ROM_LOAD( "p14.1e", 0x0000, 0x2000, CRC(6bd575ca) SHA1(446bb929fa19a7ff8b92731f71ab3e3252899f07) )
+	ROM_RELOAD(         0x2000, 0x2000 )
+
+	ROM_REGION( 0x8000, "bg_tiles", 0 )
+	ROM_LOAD( "tnk3-p12.bin", 0x0000, 0x4000, CRC(ff495a16) SHA1(e6b97a63efe58018260ff34f0ea4edc81718cb14) )
+	ROM_LOAD( "tnk3-p13.bin", 0x4000, 0x4000, CRC(f8344843) SHA1(c741dc84b48f830f6d4eaa4476f5c2a391153acc) )
+
+	ROM_REGION( 0x0c000, "sp16_tiles", 0 )
+	ROM_LOAD( "tnk3-p7.bin", 0x00000, 0x4000, CRC(06b92c88) SHA1(b39c2cc4a58937d89f9b0c9093b9742509db64a3) )
+	ROM_LOAD( "tnk3-p8.bin", 0x04000, 0x4000, CRC(63d0e2eb) SHA1(96182639bb620d9692a4c8266130769c44dd29f8) )
+	ROM_LOAD( "tnk3-p9.bin", 0x08000, 0x4000, CRC(872e3fac) SHA1(98e7e9315fe7ccc51151c67dc60a362a1c2d8372) )
+ROM_END
+
+ROM_START( tnk3b ) // Korean bootleg, hacked to use standard joysticks. Only the first program ROM differs
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tnk3-p1a.bin", 0x0000, 0x4000, CRC(26c45b82) SHA1(5ba944e9508a935f77e1555c6920b0bc638b6423) )
 	ROM_LOAD( "tnk3-p2.bin",  0x4000, 0x4000, CRC(0ae0a483) SHA1(6a1ba86da4fd75bfb00855db04eac2727ec4159e) )
 	ROM_LOAD( "tnk3-p3.bin",  0x8000, 0x4000, CRC(d16dd4db) SHA1(dcbc61251c13e11ce3cdd7a5ad200cd2d2758cab) )
 
@@ -4632,10 +4687,10 @@ ROM_START( sathena )
 	ROM_LOAD( "0.128", 0x0000, 0x4000, CRC(42dbe029) SHA1(9aa311860693bd3e73f2b72ca4b171cb95f069ee) )
 	ROM_LOAD( "5.256", 0x4000, 0x8000, CRC(596f1c8a) SHA1(8f1400c77473c845e57a14fa479cf4f7ac66a909) )
 
-	ROM_REGION( 0x0c00, "proms", 0 ) // not dumped from this set
-	ROM_LOAD( "up02_c2.rom", 0x000, 0x400, CRC(294279ae) SHA1(b3db5617b83845a6c1abca8f71fa4598758a2a56) BAD_DUMP )
-	ROM_LOAD( "up02_b1.rom", 0x400, 0x400, CRC(d25c9099) SHA1(f3933075cce1255affc61dfefd9559b6e15ed29c) BAD_DUMP )
-	ROM_LOAD( "up02_c1.rom", 0x800, 0x400, CRC(a4a4e7dc) SHA1(aa694c2d44dcabc6cfd46307c55c3759eff57236) BAD_DUMP )
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "up02_c2.rom", 0x000, 0x400, CRC(294279ae) SHA1(b3db5617b83845a6c1abca8f71fa4598758a2a56) )
+	ROM_LOAD( "up02_b1.rom", 0x400, 0x400, CRC(d25c9099) SHA1(f3933075cce1255affc61dfefd9559b6e15ed29c) )
+	ROM_LOAD( "up02_c1.rom", 0x800, 0x400, CRC(a4a4e7dc) SHA1(aa694c2d44dcabc6cfd46307c55c3759eff57236) )
 
 	ROM_REGION( 0x4000, "tx_tiles", 0 )
 	ROM_LOAD( "11.128", 0x0000, 0x4000, CRC(18b4bcca) SHA1(2476aa6c8d55e117d840202a97fe2a65e252ad7f) )
@@ -5179,7 +5234,7 @@ ROM_END
 
 /***********************************************************************/
 
-ROM_START( victroad )
+ROM_START( victroad ) // A6002UP03-02 PCB
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "p1.p4", 0x0000, 0x10000,  CRC(e334acef) SHA1(f6d8da554276abbe5579c92eea46591a92623f6e) )
 
@@ -5189,10 +5244,14 @@ ROM_START( victroad )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "p3.k7", 0x00000, 0x10000, CRC(bac745f6) SHA1(c118d94aff16cbf1b85615ff5a93292f6e98c149) )
 
-	ROM_REGION( 0x0c00, "proms", 0 )
-	ROM_LOAD( "mb7122e.1k", 0x000, 0x400, CRC(491ab831) SHA1(2801d68d8a7fddaca5c48f09d421fc48ff53d244) )
-	ROM_LOAD( "mb7122e.2l", 0x400, 0x400, CRC(8feca424) SHA1(c3d666f4b4b914199b24ded02f9a1b643bf90d26) )
-	ROM_LOAD( "mb7122e.1l", 0x800, 0x400, CRC(220076ca) SHA1(a353c770c0ffb1105fb93c97977597ad2fda8ac8) )
+	ROM_REGION( 0xc00, "proms", 0 )
+	ROM_LOAD( "c1_mb7122e.1k", 0x000, 0x400, CRC(491ab831) SHA1(2801d68d8a7fddaca5c48f09d421fc48ff53d244) )
+	ROM_LOAD( "c2_mb7122e.2l", 0x400, 0x400, CRC(8feca424) SHA1(c3d666f4b4b914199b24ded02f9a1b643bf90d26) )
+	ROM_LOAD( "c3_mb7122e.1l", 0x800, 0x400, CRC(220076ca) SHA1(a353c770c0ffb1105fb93c97977597ad2fda8ac8) )
+
+	ROM_REGION( 0x2000, "rjproms", 0 ) // for rotary joystick decoding, same for both players 
+	ROM_LOAD( "1_mb7134e.1d",  0x0000, 0x1000, CRC(5ab67bfc) SHA1(62a62a7e4573d1233b50ddd163c4e3d9bdefaddd) )
+	ROM_LOAD( "1_mb7134e.2d",  0x1000, 0x1000, CRC(5ab67bfc) SHA1(62a62a7e4573d1233b50ddd163c4e3d9bdefaddd) )
 
 	ROM_REGION( 0x4000, "tx_tiles", 0 )
 	ROM_LOAD( "p7.b3", 0x0000, 0x4000,  CRC(2b6ed95b) SHA1(dddf3aa21776778153572a20d29d47928a7116d8) )
@@ -5224,7 +5283,7 @@ ROM_START( victroad )
 	ROM_LOAD( "a5004-1.d6", 0x000, 0x104, CRC(311e5ae6) SHA1(8a3799e1611ac4086dda2755c5ad44c0dc16ff5b) )
 	ROM_LOAD( "a5004-4.s8", 0x200, 0x104, CRC(fad4c493) SHA1(0aacc2d25434173366ba95eaac848812ea9f40c5) )
 	ROM_LOAD( "a6002-3.p2", 0x400, 0x104, CRC(036b1a16) SHA1(c688071c452066e5d4addf09212eb76d3078ec45) )
-	ROM_LOAD( "pal20l8",    0x600, 0x144, NO_DUMP ) // protected
+	ROM_LOAD( "a6002-2.r5", 0x600, 0x144, NO_DUMP ) // PAL20L8ACNS, protected
 ROM_END
 
 ROM_START( dogosoke )
@@ -6365,6 +6424,7 @@ GAME( 1985, alphamis,  aso,      aso,       alphamis,  snk_state, empty_init, RO
 GAME( 1985, arian,     aso,      aso,       alphamis,  snk_state, empty_init, ROT270, "SNK",     "Arian Mission", 0 )
 GAME( 1985, tnk3,      0,        tnk3,      tnk3,      snk_state, empty_init, ROT270, "SNK",     "T.N.K III (US)", 0 )
 GAME( 1985, tnk3j,     tnk3,     tnk3,      tnk3,      snk_state, empty_init, ROT270, "SNK",     "T.A.N.K (Japan)", 0 )
+GAME( 1985, tnk3b,     tnk3,     tnk3,      tnk3b,     snk_state, empty_init, ROT270, "SNK",     "T.A.N.K (bootleg, 8-way joystick)", 0 )
 GAME( 1986, athena,    0,        athena,    athena,    snk_state, empty_init, ROT0,   "SNK",     "Athena", 0 )
 GAME( 1986, athenab,   athena,   athena,    athena,    snk_state, empty_init, ROT0,   "SNK",     "Athena (bootleg)", 0 ) // is this really a bootleg?
 GAME( 1987, sathena,   athena,   athena,    athena,    snk_state, empty_init, ROT0,   "bootleg", "Super Athena (bootleg)", 0 )

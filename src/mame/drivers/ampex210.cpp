@@ -12,7 +12,7 @@
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "video/scn2674.h"
 #include "screen.h"
 
@@ -27,12 +27,21 @@ public:
 	{ }
 
 	void ampex210p(machine_config &config);
-	void ampex230(machine_config &config);
+	void ampex230p(machine_config &config);
 
 private:
 	void common_video(machine_config &config);
 
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
+
+	u8 keyboard_r();
+	u8 keyboard_reset_r();
+	u8 keyboard_extra_r();
+	void flags1_w(u8 data);
+	void flags2_w(u8 data);
+	void flags3_w(u8 data);
+	u8 modem_r();
+	void modem_w(u8 data);
 
 	void ampex210_mem(address_map &map);
 	void ampex230_mem(address_map &map);
@@ -50,11 +59,49 @@ SCN2672_DRAW_CHARACTER_MEMBER(ampex210_state::draw_character)
 {
 }
 
+u8 ampex210_state::keyboard_r()
+{
+	return 0xff;
+}
+
+u8 ampex210_state::keyboard_reset_r()
+{
+	// data ignored
+	return 0xff;
+}
+
+u8 ampex210_state::keyboard_extra_r()
+{
+	return 0;
+}
+
+void ampex210_state::flags1_w(u8 data)
+{
+}
+
+void ampex210_state::flags2_w(u8 data)
+{
+}
+
+void ampex210_state::flags3_w(u8 data)
+{
+}
+
+u8 ampex210_state::modem_r()
+{
+	return 0;
+}
+
+void ampex210_state::modem_w(u8 data)
+{
+}
+
 void ampex210_state::ampex210_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0x87ff).ram().share("nvram");
 	map(0x8800, 0x9fff).ram();
+	map(0xc000, 0xc000).r(FUNC(ampex210_state::modem_r));
 }
 
 void ampex210_state::ampex230_mem(address_map &map)
@@ -70,10 +117,15 @@ void ampex210_state::ampex210_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x07).rw("pvtc", FUNC(scn2672_device::read), FUNC(scn2672_device::write));
 	map(0x44, 0x47).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0x80, 0x80).nopw();
+	map(0x80, 0x80).w(FUNC(ampex210_state::modem_w));
 	map(0xc0, 0xc0).w("pvtc", FUNC(scn2672_device::buffer_w));
 	map(0xc1, 0xc1).r("pvtc", FUNC(scn2672_device::buffer_r));
-	map(0xc7, 0xc7).nopw();
+	map(0xc2, 0xc2).r(FUNC(ampex210_state::keyboard_r));
+	map(0xc3, 0xc3).r(FUNC(ampex210_state::keyboard_reset_r));
+	map(0xc4, 0xc4).w(FUNC(ampex210_state::flags1_w));
+	map(0xc5, 0xc5).w(FUNC(ampex210_state::flags2_w));
+	map(0xc6, 0xc6).r(FUNC(ampex210_state::keyboard_extra_r));
+	map(0xc7, 0xc7).w(FUNC(ampex210_state::flags3_w));
 }
 
 void ampex210_state::ampex230_io(address_map &map)
@@ -83,6 +135,12 @@ void ampex210_state::ampex230_io(address_map &map)
 	map(0x11, 0x11).r("pvtc", FUNC(scn2672_device::buffer_r));
 	map(0x12, 0x12).w("pvtc", FUNC(scn2672_device::attr_buffer_w));
 	map(0x13, 0x13).r("pvtc", FUNC(scn2672_device::attr_buffer_r));
+	map(0x15, 0x15).r(FUNC(ampex210_state::keyboard_extra_r));
+	map(0x16, 0x16).r(FUNC(ampex210_state::keyboard_r));
+	map(0x17, 0x17).r(FUNC(ampex210_state::keyboard_reset_r));
+	map(0x20, 0x20).w(FUNC(ampex210_state::flags1_w));
+	map(0x21, 0x21).w(FUNC(ampex210_state::flags3_w));
+	map(0x22, 0x22).w(FUNC(ampex210_state::flags2_w));
 	map(0x30, 0x33).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x40, 0x43).rw("dart", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 }
@@ -127,7 +185,7 @@ void ampex210_state::ampex210p(machine_config &config)
 	screen.set_screen_update("pvtc", FUNC(scn2672_device::screen_update));
 }
 
-void ampex210_state::ampex230(machine_config &config)
+void ampex210_state::ampex230p(machine_config &config)
 {
 	Z80(config, m_maincpu, 3.6864_MHz_XTAL); // Z80ACPU; clock uncertain
 	m_maincpu->set_addrmap(AS_PROGRAM, &ampex210_state::ampex230_mem);
@@ -172,7 +230,7 @@ ROM_START(ampex210p) // Z80 (+6551,MC2672,3515260-01, 3 xtals, speaker) // 8k ra
 	ROM_LOAD("35-526-01.u3", 0x0000, 0x1000, CRC(4659bcd2) SHA1(554574f55ed875baba0a6133648c44df763cc5c4))
 ROM_END
 
-ROM_START(ampex230)
+ROM_START(ampex230p) // EPROMs stickered "© 1989 AMPEX CORP."
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("230_u11.bin", 0x0000, 0x8000, CRC(c8f93719) SHA1(81019b42245ca60c7de3ee5d3194c4d22fd38a8d))
 
@@ -180,5 +238,5 @@ ROM_START(ampex230)
 	ROM_LOAD("230_u2.bin", 0x0000, 0x2000, CRC(7143b773) SHA1(616d3c0c1a1f7a00bf16857324043955ab842994))
 ROM_END
 
-COMP(1989, ampex210p, 0, 0, ampex210p, ampex210p, ampex210_state, empty_init, "Ampex", "210+", MACHINE_IS_SKELETON)
-COMP(1989, ampex230,  0, 0, ampex230,  ampex210p, ampex210_state, empty_init, "Ampex", "230", MACHINE_IS_SKELETON)
+COMP(1988, ampex210p, 0, 0, ampex210p, ampex210p, ampex210_state, empty_init, "Ampex", "Ampex 210 plus Terminal (v3.0)", MACHINE_IS_SKELETON)
+COMP(1988, ampex230p, 0, 0, ampex230p, ampex210p, ampex210_state, empty_init, "Ampex", "Ampex 230 plus Terminal (v4.0)", MACHINE_IS_SKELETON)

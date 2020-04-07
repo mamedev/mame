@@ -582,7 +582,7 @@ WRITE8_MEMBER( segas18_state::lghost_gun_recoil_w )
 READ16_MEMBER( segas18_state::wwally_custom_io_r )
 {
 	if (offset >= 0x3000/2 && offset < 0x3018/2)
-		return m_upd4701[(offset & 0x0018/2) >> 2]->read_xy(space, offset & 0x0006/2);
+		return m_upd4701[(offset & 0x0018/2) >> 2]->read_xy(offset & 0x0006/2);
 
 	return m_mapper->open_bus_r();
 }
@@ -591,7 +591,7 @@ READ16_MEMBER( segas18_state::wwally_custom_io_r )
 WRITE16_MEMBER( segas18_state::wwally_custom_io_w )
 {
 	if (offset >= 0x3000/2 && offset < 0x3018/2)
-		m_upd4701[(offset & 0x0018/2) >> 2]->reset_xy_r(space, 0);
+		m_upd4701[(offset & 0x0018/2) >> 2]->reset_xy_r();
 }
 
 
@@ -1140,14 +1140,17 @@ static INPUT_PORTS_START( mwalk )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 ) // individual mode
+	// individual coin chute setting changes around the default behaviour
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x20)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) // individual mode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x20)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x00)
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "2 Credits to Start" ) PORT_DIPLOCATION("SW2:1")
@@ -1156,19 +1159,19 @@ static INPUT_PORTS_START( mwalk )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x08, 0x00, "Player Vitality" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Player Vitality" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x10, 0x00, "Play Mode" ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, "Play Mode" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, "2 Players" )
 	PORT_DIPSETTING(    0x00, "3 Players" )
-	PORT_DIPNAME( 0x20, 0x00, "Coin Chute" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Coin Chute" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "Common" )
 	PORT_DIPSETTING(    0x00, "Individual" )
-	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
@@ -1178,19 +1181,20 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mwalka )
 	PORT_INCLUDE( mwalk )
 
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x20)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x20)
+
 	PORT_MODIFY("DSW")
-	//"SW2:1" not divert from "mwalk"
-	//"SW2:2" not divert from "mwalk"
-	//"SW2:3" not divert from "mwalk"
-	//"SW2:4" not divert from "mwalk"
+	// inverts the meaning of these two dips, to follow suit with the US 3P cabinet
 	PORT_DIPNAME( 0x10, 0x10, "Play Mode" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, "2 Players" )
 	PORT_DIPSETTING(    0x10, "3 Players" )
 	PORT_DIPNAME( 0x20, 0x20, "Coin Chute" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, "Common" )
 	PORT_DIPSETTING(    0x20, "Individual" )
-	//"SW2:7" not divert from "mwalk"
-	//"SW2:8" not divert from "mwalk"
 INPUT_PORTS_END
 
 

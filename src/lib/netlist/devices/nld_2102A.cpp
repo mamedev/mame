@@ -19,7 +19,7 @@ namespace netlist
 	NETLIB_OBJECT(2102A)
 	{
 		NETLIB_CONSTRUCTOR(2102A)
-		, m_A(*this, {{"A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9" }})
+		, m_A(*this, {"A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9" })
 		, m_CEQ(*this, "CEQ")
 		, m_RWQ(*this, "RWQ")
 		, m_DI(*this, "DI")

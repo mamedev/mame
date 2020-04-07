@@ -292,7 +292,7 @@ int wd1010_device::get_lbasector()
 //  INTERFACE
 //**************************************************************************
 
-WRITE_LINE_MEMBER( wd1010_device::drdy_w )
+void wd1010_device::drdy_w(int state)
 {
 	if (state)
 		m_status |= STATUS_RDY;
@@ -300,12 +300,12 @@ WRITE_LINE_MEMBER( wd1010_device::drdy_w )
 		m_status &= ~STATUS_RDY;
 }
 
-WRITE_LINE_MEMBER( wd1010_device::brdy_w )
+void wd1010_device::brdy_w(int state)
 {
 	m_brdy = state;
 }
 
-READ8_MEMBER( wd1010_device::read )
+uint8_t wd1010_device::read(offs_t offset)
 {
 	// if the controller is busy all reads return the status register
 	if (m_status & STATUS_BSY)
@@ -358,7 +358,7 @@ READ8_MEMBER( wd1010_device::read )
 	return 0xff;
 }
 
-WRITE8_MEMBER( wd1010_device::write )
+void wd1010_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x07)
 	{

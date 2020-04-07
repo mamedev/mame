@@ -203,7 +203,7 @@ WRITE8_MEMBER(k28_state::mcu_p2_w)
 	m_vfd->data_w(data & 1);
 
 	// d0-d3: VSM data, input mux and SC-01 phoneme lower nibble
-	m_tms6100->add_w(space, 0, data);
+	m_tms6100->add_w(data);
 	m_inp_mux = (m_inp_mux & ~0xf) | (~data & 0xf);
 	m_phoneme = (m_phoneme & ~0xf) | (data & 0xf);
 }

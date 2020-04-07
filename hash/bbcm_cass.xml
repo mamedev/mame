@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Acorn BBC Master Tapes -->
+Acorn BBC Master Tapes
 
-<!-- I believe all the Cassette images here are original, so some may require the manuals for additional copy protection. -->
+I believe all the Cassette images here are original, so some may require the manuals for additional copy protection.
 
-<!-- Loading Instructions:
+    Loading Instructions:
 
       If the system has a disk drive (which the BBC Master does by default in MESS) you must type *TAPE, then use the relevant command to load the software, usually CHAIN"" or *RUN, though some earlier titles from Micro Power require *LOAD.
 

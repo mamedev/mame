@@ -331,8 +331,8 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 				xpos = 320-xpos-width;
 				flipx = !flipx;
 			}
-			if( xpos>cliprect.max_x ) xpos -= 65536;
-			if( ypos>cliprect.max_y ) ypos -= 65536;
+			if( xpos>=320 ) xpos -= 65536;
+			if( ypos>=256 ) ypos -= 65536;
 
 			/* slow slow slow, but it's ok for now */
 			for( y=0; y<height; y++, pen_data += width/4 )
@@ -390,7 +390,7 @@ TILE_GET_INFO_MEMBER(twin16_state::fix_tile_info)
 	if (attr&0x2000) flags|=TILE_FLIPX;
 	if (attr&0x4000) flags|=TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 void twin16_state::tile_get_info(tile_data &tileinfo, uint16_t data, int color_base)
@@ -403,7 +403,7 @@ void twin16_state::tile_get_info(tile_data &tileinfo, uint16_t data, int color_b
 	int color = color_base + (data >> 13);
 	int flags = 0;
 	if (m_video_register & TWIN16_TILE_FLIPY) flags |= TILE_FLIPY;
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 	tileinfo.category = BIT(data, 15);
 }
 
@@ -419,7 +419,7 @@ void fround_state::tile_get_info(tile_data &tileinfo, uint16_t data, int color_b
 	int color = color_base | (data >> 13);
 	int flags = 0;
 	if (m_video_register & TWIN16_TILE_FLIPY) flags |= TILE_FLIPY;
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 	tileinfo.category = BIT(data, 15);
 }
 

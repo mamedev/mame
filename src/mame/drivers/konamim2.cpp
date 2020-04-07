@@ -1124,7 +1124,7 @@ void konamim2_state::konamim2(machine_config &config)
 	m_ppc2->set_addrmap(AS_PROGRAM, &konamim2_state::m2_map);
 
 	// M2 hardware
-	M2_BDA(config, m_bda, M2_CLOCK, m_ppc1, m_ppc2);
+	M2_BDA(config, m_bda, M2_CLOCK, m_ppc1, m_ppc2, m_cde);
 	m_bda->set_ram_size(m2_bda_device::RAM_8MB, m2_bda_device::RAM_8MB);
 	m_bda->subdevice<m2_powerbus_device>("powerbus")->int_handler().set(FUNC(konamim2_state::ppc1_int));
 	m_bda->subdevice<m2_memctl_device>("memctl")->gpio_out_handler<3>().set(FUNC(konamim2_state::ppc2_int)).invert();
@@ -1133,7 +1133,7 @@ void konamim2_state::konamim2(machine_config &config)
 	m_bda->ldac_handler().set(FUNC(konamim2_state::ldac_out));
 	m_bda->rdac_handler().set(FUNC(konamim2_state::rdac_out));
 
-	M2_CDE(config, m_cde, M2_CLOCK, m_ppc1);
+	M2_CDE(config, m_cde, M2_CLOCK, m_ppc1, m_bda);
 	m_cde->int_handler().set(":bda:powerbus", FUNC(m2_powerbus_device::int_line<BDAINT_EXTD4_LINE>));
 	m_cde->set_syscfg(SYSCONFIG_ARCADE);
 	m_cde->sdbg_out().set(FUNC(konamim2_state::cde_sdbg_out));

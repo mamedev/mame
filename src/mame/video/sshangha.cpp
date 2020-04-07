@@ -54,21 +54,20 @@ uint32_t sshangha_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	// TODO: fully verify draw order / priorities
 
 	/* the tilemap 4bpp + 4bpp = 8bpp mixing actually seems external to the tilemap, note video_control is not part of the tilemap chip */
-	if (combine_tilemaps) {
-		m_tilegen->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 0, 1);
-	}
-	else {
+	if (combine_tilemaps)
+		m_tilegen->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 0);
+	else
 		m_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
-	}
+
 	//                                                          pri,   primask,palbase,palmask
-	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x000, 0x000,  0x000,  0x0ff); // low+high pri spr1 (definitely needs to be below low pri spr2 - game tiles & definitely needs to be below tilemap1 - lightning on win screen in traditional mode)
-	m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x200, 0x200,  0x100,  0x0ff); // low pri spr2  (definitely needs to be below tilemap1 - 2nd level failure screen etc.)
+	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x000, 0x000,  0x200,  0x0ff); // low+high pri spr1 (definitely needs to be below low pri spr2 - game tiles & definitely needs to be below tilemap1 - lightning on win screen in traditional mode)
+	m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x200, 0x200,  0x000,  0x0ff); // low pri spr2  (definitely needs to be below tilemap1 - 2nd level failure screen etc.)
 
 	if (!combine_tilemaps)
 		m_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 
 	//                                                          pri,   primask,palbase,palmask
-	m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x000, 0x200,  0x100,  0x0ff); // high pri spr2 (definitely needs to be above tilemap1 - title logo)
+	m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x000, 0x200,  0x000,  0x0ff); // high pri spr2 (definitely needs to be above tilemap1 - title logo)
 
 	return 0;
 }

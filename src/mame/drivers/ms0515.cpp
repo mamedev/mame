@@ -88,7 +88,7 @@ private:
 	uint32_t screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
-	DECLARE_WRITE16_MEMBER(ms0515_bank_w);
+	void ms0515_bank_w(uint16_t data);
 
 	DECLARE_READ16_MEMBER(ms0515_halt_r);
 	DECLARE_WRITE16_MEMBER(ms0515_halt_w);
@@ -189,11 +189,11 @@ void ms0515_state::ms0515_mem(address_map &map)
  * 13   parallel port ... signal
  * 14-15 unused
  */
-WRITE16_MEMBER(ms0515_state::ms0515_bank_w)
+void ms0515_state::ms0515_bank_w(uint16_t data)
 {
 	uint8_t *ram = m_ram->pointer();
 
-	LOGBANK("Bank <- %04x & %04x (vblank %d timer %d)\n", data, mem_mask, BIT(data, 8), BIT(data, 9));
+	LOGBANK("Bank <- %04x (vblank %d timer %d)\n", data, BIT(data, 8), BIT(data, 9));
 
 	if (BIT(data ^ m_bankreg, 8)) irq2_w(BIT(data, 8) ? ASSERT_LINE : CLEAR_LINE);
 
@@ -355,7 +355,7 @@ WRITE_LINE_MEMBER(ms0515_state::pit8253_out2_changed)
 void ms0515_state::machine_reset()
 {
 	uint8_t *ram = m_ram->pointer();
-	ms0515_bank_w(machine().dummy_space(), 0, 0);
+	ms0515_bank_w(0);
 
 	m_video_ram = ram + 0000000 + 0340000;
 	m_blink = 0;

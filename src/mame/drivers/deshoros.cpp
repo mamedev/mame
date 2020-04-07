@@ -61,7 +61,7 @@ private:
 	DECLARE_READ8_MEMBER(display_ready_r);
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_WRITE8_MEMBER(out_w);
-	DECLARE_WRITE8_MEMBER(bank_select_w);
+	void bank_select_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(sound_w);
 
 	void main_map(address_map &map);
@@ -149,7 +149,7 @@ WRITE8_MEMBER(destiny_state::out_w)
 	// other bits: N/C?
 }
 
-WRITE8_MEMBER(destiny_state::bank_select_w)
+void destiny_state::bank_select_w(uint8_t data)
 {
 	// d0-d2 and d4: bank (but only up to 4 banks supported)
 	membank("bank1")->set_base(memregion("answers")->base() + 0x6000 * (data & 3));
@@ -263,7 +263,7 @@ void destiny_state::machine_start()
 
 void destiny_state::machine_reset()
 {
-	bank_select_w(m_maincpu->space(AS_PROGRAM), 0, 0);
+	bank_select_w(0);
 }
 
 void destiny_state::destiny(machine_config &config)

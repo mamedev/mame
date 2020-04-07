@@ -293,7 +293,7 @@
 #include "dpoker.lh"
 
 
-WRITE8_MEMBER(mcr_state::mcr_control_port_w)
+void mcr_state::mcr_control_port_w(uint8_t data)
 {
 	/*
 	    Bit layout is as follows:
@@ -320,7 +320,7 @@ WRITE8_MEMBER(mcr_state::mcr_control_port_w)
  *
  *************************************/
 
-READ8_MEMBER(mcr_state::solarfox_ip0_r)
+uint8_t mcr_state::solarfox_ip0_r()
 {
 	/* This is a kludge; according to the wiring diagram, the player 2 */
 	/* controls are hooked up as documented below. If you go into test */
@@ -334,7 +334,7 @@ READ8_MEMBER(mcr_state::solarfox_ip0_r)
 }
 
 
-READ8_MEMBER(mcr_state::solarfox_ip1_r)
+uint8_t mcr_state::solarfox_ip1_r()
 {
 	/*  same deal as above */
 	if (m_mcr_cocktail_flip)
@@ -351,7 +351,7 @@ READ8_MEMBER(mcr_state::solarfox_ip1_r)
  *
  *************************************/
 
-READ8_MEMBER(mcr_state::kick_ip1_r)
+uint8_t mcr_state::kick_ip1_r()
 {
 	return (ioport("DIAL2")->read() << 4) & 0xf0;
 }
@@ -396,7 +396,7 @@ INPUT_CHANGED_MEMBER(mcr_dpoker_state::coin_in_hit)
 	}
 }
 
-READ8_MEMBER(mcr_dpoker_state::ip0_r)
+uint8_t mcr_dpoker_state::ip0_r()
 {
 	// d0: Coin-in Hit
 	// d1: Coin-in Release
@@ -411,7 +411,7 @@ READ8_MEMBER(mcr_dpoker_state::ip0_r)
 }
 
 
-WRITE8_MEMBER(mcr_dpoker_state::lamps1_w)
+void mcr_dpoker_state::lamps1_w(uint8_t data)
 {
 	// cpanel button lamps (white)
 	m_lamps[0] = BIT(data, 0); // hold 1
@@ -424,7 +424,7 @@ WRITE8_MEMBER(mcr_dpoker_state::lamps1_w)
 	m_lamps[7] = BIT(data, 3); // stand
 }
 
-WRITE8_MEMBER(mcr_dpoker_state::lamps2_w)
+void mcr_dpoker_state::lamps2_w(uint8_t data)
 {
 	// d5: button lamp: service or change
 	m_lamps[8] = BIT(data, 5);
@@ -436,7 +436,7 @@ WRITE8_MEMBER(mcr_dpoker_state::lamps2_w)
 	// d6, d7: unused?
 }
 
-WRITE8_MEMBER(mcr_dpoker_state::output_w)
+void mcr_dpoker_state::output_w(uint8_t data)
 {
 	// d0: ? coin return
 	// d1: ? divertor (active low)
@@ -452,7 +452,7 @@ WRITE8_MEMBER(mcr_dpoker_state::output_w)
 	m_output = data;
 }
 
-WRITE8_MEMBER(mcr_dpoker_state::meters_w)
+void mcr_dpoker_state::meters_w(uint8_t data)
 {
 	// meters?
 }
@@ -465,13 +465,13 @@ WRITE8_MEMBER(mcr_dpoker_state::meters_w)
  *
  *************************************/
 
-WRITE8_MEMBER(mcr_state::wacko_op4_w)
+void mcr_state::wacko_op4_w(uint8_t data)
 {
 	m_input_mux = data & 1;
 }
 
 
-READ8_MEMBER(mcr_state::wacko_ip1_r)
+uint8_t mcr_state::wacko_ip1_r()
 {
 	if (!m_input_mux)
 		return ioport("ssio:IP1")->read();
@@ -480,7 +480,7 @@ READ8_MEMBER(mcr_state::wacko_ip1_r)
 }
 
 
-READ8_MEMBER(mcr_state::wacko_ip2_r)
+uint8_t mcr_state::wacko_ip2_r()
 {
 	if (!m_input_mux)
 		return ioport("ssio:IP2")->read();
@@ -496,14 +496,14 @@ READ8_MEMBER(mcr_state::wacko_ip2_r)
  *
  *************************************/
 
-READ8_MEMBER(mcr_state::kroozr_ip1_r)
+uint8_t mcr_state::kroozr_ip1_r()
 {
 	int dial = ioport("DIAL")->read();
 	return ((dial & 0x80) >> 1) | ((dial & 0x70) >> 4);
 }
 
 
-WRITE8_MEMBER(mcr_state::kroozr_op4_w)
+void mcr_state::kroozr_op4_w(uint8_t data)
 {
 	/*
 	    bit 2 = ship control
@@ -520,7 +520,7 @@ WRITE8_MEMBER(mcr_state::kroozr_op4_w)
  *
  *************************************/
 
-WRITE8_MEMBER(mcr_state::journey_op4_w)
+void mcr_state::journey_op4_w(uint8_t data)
 {
 	/* if we're not playing the sample yet, start it */
 	if (!m_samples->playing(0))
@@ -538,7 +538,7 @@ WRITE8_MEMBER(mcr_state::journey_op4_w)
  *
  *************************************/
 
-WRITE8_MEMBER(mcr_state::twotiger_op4_w)
+void mcr_state::twotiger_op4_w(uint8_t data)
 {
 	for (int i = 0; i < 2; i++)
 	{
@@ -562,7 +562,7 @@ WRITE8_MEMBER(mcr_state::twotiger_op4_w)
  *
  *************************************/
 
-WRITE8_MEMBER(mcr_state::dotron_op4_w)
+void mcr_state::dotron_op4_w(uint8_t data)
 {
 	/*
 	    Flasher Control:
@@ -621,7 +621,7 @@ WRITE8_MEMBER(mcr_state::dotron_op4_w)
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
-	m_squawk_n_talk->sound_select(machine().dummy_space(), offset, data & 0x0f);
+	m_squawk_n_talk->sound_select(data & 0x0f);
 	m_squawk_n_talk->sound_int(BIT(data, 4));
 }
 
@@ -633,7 +633,7 @@ WRITE8_MEMBER(mcr_state::dotron_op4_w)
  *
  *************************************/
 
-READ8_MEMBER(mcr_nflfoot_state::ip2_r)
+uint8_t mcr_nflfoot_state::ip2_r()
 {
 	/* bit 7 = J3-2 on IPU board = TXDA on SIO */
 	uint8_t val = m_ipu_sio_txda << 7;
@@ -641,7 +641,7 @@ READ8_MEMBER(mcr_nflfoot_state::ip2_r)
 }
 
 
-WRITE8_MEMBER(mcr_nflfoot_state::op4_w)
+void mcr_nflfoot_state::op4_w(uint8_t data)
 {
 	/* bit 7 = J3-7 on IPU board = /RXDA on SIO */
 	m_ipu_sio->rxa_w(!((data >> 7) & 1));
@@ -651,7 +651,7 @@ WRITE8_MEMBER(mcr_nflfoot_state::op4_w)
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
-	m_squawk_n_talk->sound_select(machine().dummy_space(), offset, data & 0x0f);
+	m_squawk_n_talk->sound_select(data & 0x0f);
 	m_squawk_n_talk->sound_int(BIT(data, 4));
 }
 
@@ -663,25 +663,25 @@ WRITE8_MEMBER(mcr_nflfoot_state::op4_w)
  *
  *************************************/
 
-READ8_MEMBER(mcr_state::demoderb_ip1_r)
+uint8_t mcr_state::demoderb_ip1_r()
 {
 	return ioport("ssio:IP1")->read() |
 		(ioport(m_input_mux ? "ssio:IP1.ALT2" : "ssio:IP1.ALT1")->read() << 2);
 }
 
 
-READ8_MEMBER(mcr_state::demoderb_ip2_r)
+uint8_t mcr_state::demoderb_ip2_r()
 {
 	return ioport("ssio:IP2")->read() |
 		(ioport(m_input_mux ? "ssio:IP2.ALT2" : "ssio:IP2.ALT1")->read() << 2);
 }
 
 
-WRITE8_MEMBER(mcr_state::demoderb_op4_w)
+void mcr_state::demoderb_op4_w(uint8_t data)
 {
 	if (data & 0x40) m_input_mux = 1;
 	if (data & 0x80) m_input_mux = 0;
-	m_turbo_cheap_squeak->write(space, offset, data);
+	m_turbo_cheap_squeak->write(data);
 }
 
 
@@ -796,7 +796,7 @@ void mcr_nflfoot_state::ipu_91695_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x03).mirror(0xe0).rw(m_ipu_pio0, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x04, 0x07).mirror(0xe0).rw(m_ipu_sio, FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
+	map(0x04, 0x07).mirror(0xe0).rw(m_ipu_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x08, 0x0b).mirror(0xe0).rw(m_ipu_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).mirror(0xe0).rw(m_ipu_pio1, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x10, 0x13).mirror(0xe0).w(FUNC(mcr_nflfoot_state::ipu_laserdisk_w));
@@ -1891,7 +1891,7 @@ void mcr_nflfoot_state::mcr_91490_ipu(machine_config &config)
 	Z80PIO(config, m_ipu_pio1, 7372800/2);
 	m_ipu_pio1->out_int_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
 
-	Z80SIO0(config, m_ipu_sio, 7372800/2);
+	Z80SIO(config, m_ipu_sio, 7372800/2); // Z8440BB1
 	m_ipu_sio->out_int_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
 	m_ipu_sio->out_txda_callback().set(FUNC(mcr_nflfoot_state::sio_txda_w));
 	m_ipu_sio->out_txdb_callback().set(FUNC(mcr_nflfoot_state::sio_txdb_w));
@@ -2908,10 +2908,10 @@ void mcr_dpoker_state::init_dpoker()
 	m_maincpu->space(AS_IO).install_read_port(0x28, 0x28, "P28");
 	m_maincpu->space(AS_IO).install_read_port(0x2c, 0x2c, "P2C");
 
-	m_maincpu->space(AS_IO).install_write_handler(0x2c, 0x2c, write8_delegate(*this, FUNC(mcr_dpoker_state::lamps1_w)));
-	m_maincpu->space(AS_IO).install_write_handler(0x30, 0x30, write8_delegate(*this, FUNC(mcr_dpoker_state::lamps2_w)));
-	m_maincpu->space(AS_IO).install_write_handler(0x34, 0x34, write8_delegate(*this, FUNC(mcr_dpoker_state::output_w)));
-	m_maincpu->space(AS_IO).install_write_handler(0x3f, 0x3f, write8_delegate(*this, FUNC(mcr_dpoker_state::meters_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x2c, 0x2c, write8smo_delegate(*this, FUNC(mcr_dpoker_state::lamps1_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x30, 0x30, write8smo_delegate(*this, FUNC(mcr_dpoker_state::lamps2_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x34, 0x34, write8smo_delegate(*this, FUNC(mcr_dpoker_state::output_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x3f, 0x3f, write8smo_delegate(*this, FUNC(mcr_dpoker_state::meters_w)));
 
 	m_coin_status = 0;
 	m_output = 0;
@@ -2942,7 +2942,7 @@ void mcr_state::init_twotiger()
 	mcr_init(90010, 91399, 90913);
 
 	m_ssio->set_custom_output(4, 0xff, *this, FUNC(mcr_state::twotiger_op4_w));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe800, 0xefff, 0, 0x1000, 0, read8_delegate(*this, FUNC(mcr_state::twotiger_videoram_r)), write8_delegate(*this, FUNC(mcr_state::twotiger_videoram_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe800, 0xefff, 0, 0x1000, 0, read8sm_delegate(*this, FUNC(mcr_state::twotiger_videoram_r)), write8sm_delegate(*this, FUNC(mcr_state::twotiger_videoram_w)));
 }
 
 

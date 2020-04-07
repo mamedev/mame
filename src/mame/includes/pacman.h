@@ -154,7 +154,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(jrpacman_spritebank_w);
 	DECLARE_WRITE8_MEMBER(jrpacman_scroll_w);
 	DECLARE_WRITE_LINE_MEMBER(jrpacman_bgpriority_w);
-	DECLARE_WRITE8_MEMBER(superabc_bank_w);
+	void superabc_bank_w(uint8_t data);
 
 public:
 	void init_maketrax();

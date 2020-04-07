@@ -1274,6 +1274,15 @@ VOL             - Volume pot              / These are on a small daughterboard t
 CN3             - 10 pin Speaker output & Extension serial connector
 3V_BATT         - Panasonic ML2020 3 Volt Coin Battery
 
+Sega 837-14624R
+later PCB revision from Sega, mostly same as above, notable differences:
+ROMEO           - SEGA 315-6434
+315-6232        - SEGA 315-6232A
+315-6258        - SEGA 315-6258A
+315-6267        - SEGA 315-6318A
+SH4             - Hitachi HD6417091T
+BIOS.IC48       - Amic A29L004A 4MBit flash ROM (TSOP40) labeled FPR-24363
+
 CN3 Pinout
 Pin     Function    I/O    Pin   Function  I/O
 ----------------------------------------------
@@ -3555,12 +3564,20 @@ Region byte encoding is as follows:
    First half is BIOS, second half is game settings and is blanked/reprogrammed by the BIOS if game cartridge exchange was detected
    area 0x1A000-0x1BFFF is write protected and contain 12 bytes of unit-specific unique information (probably serial number, manufacture date, etc),
    2 dumps included for reference
+   fpr-24363.ic48 - BOOT ROM from Sega 837-14624R PCB, in comparison with Sammy's BOOT contain minor code change to keep video output disabled during Sammy logo display routine.
+                    Only last 128KB of whole 512KB ROM actually used (2 high address pins tied to Vcc).
 */
 #define AW_BIOS \
 	ROM_REGION64_LE( 0x200000, "awflash", 0) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "Atomiswave BIOS" ) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "Sammy BIOS" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios0.ic23", 0x000000, 0x020000, CRC(719b2b0b) SHA1(b4c1a26bc8906d5275eb28c701dff2b9365bcdfa) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios1.ic23", 0x000000, 0x020000, CRC(d3e80a9f) SHA1(33024f9d51c04884c2b44ce146f340e7a857b959) )
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios1.ic23", 0x000000, 0x020000, CRC(d3e80a9f) SHA1(33024f9d51c04884c2b44ce146f340e7a857b959) ) \
+	ROM_SYSTEM_BIOS( 1, "bios1", "Sega BIOS" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "fpr-24363.ic48", 0x000000, 0x020000, CRC(82a105f0) SHA1(5128fe2ddcced77332bdcab691c09958051fa564) ) \
+	ROM_CONTINUE( 0x000000, 0x020000 ) \
+	ROM_CONTINUE( 0x000000, 0x020000 ) \
+	ROM_CONTINUE( 0x000000, 0x020000 )
+
 /* default EEPROM values, same works for all games */
 #define NAOMI_DEFAULT_EEPROM \
 	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
@@ -4455,7 +4472,7 @@ ROM_START( f355p )
 
 	ROM_LOAD("rom1.ic1s",   0x0800000, 0x0800000, BAD_DUMP CRC(ba0ee343) SHA1(d8d8bbfd330c9b9c7fe5974cb2f5f9d6a4ef1477) ) // file: 7ACD 7D37 right sums: 803F 81A7
 	ROM_LOAD("rom2.ic2s",   0x1000000, 0x0800000, CRC(adf8fa95) SHA1(d91ca2a8b45d744c5a6b84099b12c553acc2a83c) )
-	ROM_LOAD("rom3.ic3s",   0x1800000, 0x0800000, BAD_DUMP CRC(90fc7b08) SHA1(ac9b49239f731a9ebfdf998c6d2253dea2f5741c) ) // file: BF7E 589C right sums: BF70 579C 
+	ROM_LOAD("rom3.ic3s",   0x1800000, 0x0800000, BAD_DUMP CRC(90fc7b08) SHA1(ac9b49239f731a9ebfdf998c6d2253dea2f5741c) ) // file: BF7E 589C right sums: BF70 579C
 	ROM_LOAD("rom4.ic4s",   0x2000000, 0x0800000, CRC(9c18fe61) SHA1(acc0447e3aec6233d7211afe9578236e275330c7) )
 	ROM_LOAD("rom5.ic5s",   0x2800000, 0x0800000, CRC(ed3a6c95) SHA1(8545231342ebbf436551b73e17c91b59f53f47c1) )
 	ROM_LOAD("rom6.ic6s",   0x3000000, 0x0800000, CRC(a52d4b49) SHA1(9317da85a80d7a0bb8f9af19163724193088f3ab) )
@@ -9482,7 +9499,7 @@ ROM_START( ngdup23a )
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0023a", 0, SHA1(cfd49a1f56e4ddd198f2237a87d412d48c1251e1) )
+	DISK_IMAGE_READONLY( "gds-0023a", 0, SHA1(3a306c90ff2ecb9858578a96429097295cc3e284) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF) // uses the vf4 pic
 	//PIC16C622A (317-0314-COM)

@@ -27,14 +27,14 @@ DEFINE_DEVICE_TYPE(ELECTRON_PLUS3, electron_plus3_device, "electron_plus3", "Aco
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( plus3 )
+//  FLOPPY_FORMATS( plus3 )
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER(electron_plus3_device::floppy_formats)
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_ACORN_ADFS_OLD_FORMAT
-FLOPPY_FORMATS_END0
+FLOPPY_FORMATS_END
 
 void electron_floppies(device_slot_interface &device)
 {
@@ -42,6 +42,10 @@ void electron_floppies(device_slot_interface &device)
 	device.option_add("525qd",   FLOPPY_525_QD);
 }
 
+
+//-------------------------------------------------
+//  ROM( plus3 )
+//-------------------------------------------------
 
 ROM_START( plus3 )
 	// Bank 4 Disc
@@ -188,5 +192,5 @@ void electron_plus3_device::wd1770_status_w(uint8_t data)
 	m_fdc->dden_w(BIT(data, 3));
 
 	// bit 5: reset
-	if (!BIT(data, 5)) m_fdc->soft_reset();
+	m_fdc->mr_w(BIT(data, 5));
 }

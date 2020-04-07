@@ -146,7 +146,7 @@ READ8_MEMBER(jack_state::striv_question_r)
 }
 
 
-WRITE8_MEMBER(jack_state::joinem_control_w)
+void jack_state::joinem_control_w(uint8_t data)
 {
 	// d0: related to test mode?
 	// d1: unused?
@@ -904,7 +904,7 @@ MACHINE_START_MEMBER(jack_state,joinem)
 
 MACHINE_RESET_MEMBER(jack_state,joinem)
 {
-	joinem_control_w(m_maincpu->space(AS_PROGRAM), 0, 0, 0xff);
+	joinem_control_w(0);
 }
 
 

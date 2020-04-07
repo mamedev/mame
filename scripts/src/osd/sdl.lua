@@ -239,21 +239,16 @@ end
 
 BASE_TARGETOS       = "unix"
 SDLOS_TARGETOS      = "unix"
-SDL_NETWORK         = ""
 if _OPTIONS["targetos"]=="linux" then
-	SDL_NETWORK         = "taptun"
 elseif _OPTIONS["targetos"]=="openbsd" then
 elseif _OPTIONS["targetos"]=="netbsd" then
-	SDL_NETWORK         = "pcap"
 elseif _OPTIONS["targetos"]=="haiku" then
 elseif _OPTIONS["targetos"]=="asmjs" then
 elseif _OPTIONS["targetos"]=="windows" then
 	BASE_TARGETOS       = "win32"
 	SDLOS_TARGETOS      = "win32"
-	SDL_NETWORK         = "pcap"
 elseif _OPTIONS["targetos"]=="macosx" then
 	SDLOS_TARGETOS      = "macosx"
-	SDL_NETWORK         = "pcap"
 end
 
 if _OPTIONS["with-bundled-sdl2"]~=nil then

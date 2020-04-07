@@ -227,7 +227,7 @@ void ettrivia_state::get_tile_info(tile_data &tileinfo, int tile_index, uint8_t 
 
 	code += m_gfx_bank * 0x100;
 
-	SET_TILE_INFO_MEMBER(gfx_code,code,color,0);
+	tileinfo.set(gfx_code,code,color,0);
 }
 
 TILE_GET_INFO_MEMBER(ettrivia_state::get_tile_info_bg)

@@ -91,7 +91,7 @@ private:
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<i8089_device> m_dmac;
 	required_device_array<pic8259_device, 3> m_pic;
-	required_device<i8274_new_device> m_uart8274;
+	required_device<i8274_device> m_uart8274;
 	required_device<fd1797_device> m_fdc;
 	required_device<ram_device> m_ram;
 	required_device<acs8600_ics_device> m_ics;
@@ -702,7 +702,7 @@ void altos8600_state::dmac_io(address_map &map)
 	map(0x0038, 0x003f).w(FUNC(altos8600_state::cattn_w));
 	map(0x0040, 0x0047).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0040, 0x0047).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write)).umask16(0xff00);
-	map(0x0048, 0x004f).rw(m_uart8274, FUNC(i8274_new_device::cd_ba_r), FUNC(i8274_new_device::cd_ba_w)).umask16(0x00ff);
+	map(0x0048, 0x004f).rw(m_uart8274, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
 	map(0x0048, 0x004f).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 	map(0x0050, 0x0057).rw(FUNC(altos8600_state::romport_r), FUNC(altos8600_state::romport_w));
 	map(0x0058, 0x005f).rw(m_pic[0], FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
@@ -754,7 +754,7 @@ void altos8600_state::altos8600(machine_config &config)
 
 	RAM(config, RAM_TAG).set_default_size("1M");//.set_extra_options("512K");
 
-	I8274_NEW(config, m_uart8274, 16_MHz_XTAL/4);
+	I8274(config, m_uart8274, 16_MHz_XTAL/4);
 	m_uart8274->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	m_uart8274->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	m_uart8274->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -764,33 +764,33 @@ void altos8600_state::altos8600(machine_config &config)
 	m_uart8274->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir7_w));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
-	rs232a.rxd_handler().set(m_uart8274, FUNC(i8274_new_device::rxa_w));
-	rs232a.dcd_handler().set(m_uart8274, FUNC(i8274_new_device::dcda_w));
-	rs232a.cts_handler().set(m_uart8274, FUNC(i8274_new_device::ctsa_w));
+	rs232a.rxd_handler().set(m_uart8274, FUNC(i8274_device::rxa_w));
+	rs232a.dcd_handler().set(m_uart8274, FUNC(i8274_device::dcda_w));
+	rs232a.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
-	rs232b.rxd_handler().set(m_uart8274, FUNC(i8274_new_device::rxb_w));
-	rs232b.dcd_handler().set(m_uart8274, FUNC(i8274_new_device::dcdb_w));
-	rs232b.cts_handler().set(m_uart8274, FUNC(i8274_new_device::ctsb_w));
+	rs232b.rxd_handler().set(m_uart8274, FUNC(i8274_device::rxb_w));
+	rs232b.dcd_handler().set(m_uart8274, FUNC(i8274_device::dcdb_w));
+	rs232b.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsb_w));
 
 	I8255A(config, "ppi", 0);
 
 	pit8253_device &pit(PIT8253(config, "pit", 0));
 	pit.set_clk<0>(1228800);
-	pit.out_handler<0>().set(m_uart8274, FUNC(i8274_new_device::rxca_w));
-	pit.out_handler<0>().append(m_uart8274, FUNC(i8274_new_device::txca_w));
+	pit.out_handler<0>().set(m_uart8274, FUNC(i8274_device::rxca_w));
+	pit.out_handler<0>().append(m_uart8274, FUNC(i8274_device::txca_w));
 	pit.set_clk<1>(1228800);
-	pit.out_handler<1>().set(m_uart8274, FUNC(i8274_new_device::rxtxcb_w));
+	pit.out_handler<1>().set(m_uart8274, FUNC(i8274_device::rxtxcb_w));
 	pit.set_clk<2>(1228800);
 	pit.out_handler<1>().set(m_pic[0], FUNC(pic8259_device::ir1_w));
 
 	FD1797(config, m_fdc, 2000000);
 	m_fdc->intrq_wr_callback().set(m_pic[1], FUNC(pic8259_device::ir1_w));
 	m_fdc->drq_wr_callback().set(FUNC(altos8600_state::fddrq_w));
-	FLOPPY_CONNECTOR(config, "fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fd1797:1", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fd1797:3", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fd1797:1", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fd1797:3", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	ACS8600_ICS(config, m_ics, 0);
 	m_ics->set_host_space(m_dmac, AS_PROGRAM); // TODO: fixme
@@ -798,6 +798,8 @@ void altos8600_state::altos8600(machine_config &config)
 	m_ics->irq2_callback().set(m_pic[0], FUNC(pic8259_device::ir6_w));
 
 	HARDDISK(config, "hdd", 0);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("altos8600");
 }
 
 ROM_START(altos8600)

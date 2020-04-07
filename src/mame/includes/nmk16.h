@@ -153,6 +153,7 @@ protected:
 	void mustang_scroll_w(u16 data);
 	void raphero_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template<unsigned Layer> void scroll_w(offs_t offset, u8 data);
+	void bjtwin_scroll_w(offs_t offset, u8 data);
 	void vandyke_scroll_w(offs_t offset, u16 data);
 	void vandykeb_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void manybloc_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);

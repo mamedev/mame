@@ -655,7 +655,7 @@ void mbee_state::mbee(machine_config &config)
 
 	Z80PIO(config, m_pio, 12_MHz_XTAL / 6);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pio->out_ardy_callback().set(FUNC(mbee_state::pio_ardy));
 	m_pio->in_pb_callback().set(FUNC(mbee_state::pio_port_b_r));
 	m_pio->out_pb_callback().set(FUNC(mbee_state::pio_port_b_w));
@@ -714,7 +714,7 @@ void mbee_state::mbeeic(machine_config &config)
 
 	Z80PIO(config, m_pio, 13.5_MHz_XTAL / 4);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pio->out_ardy_callback().set(FUNC(mbee_state::pio_ardy));
 	m_pio->in_pb_callback().set(FUNC(mbee_state::pio_port_b_r));
 	m_pio->out_pb_callback().set(FUNC(mbee_state::pio_port_b_w));

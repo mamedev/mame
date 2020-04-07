@@ -209,7 +209,7 @@ TILE_GET_INFO_MEMBER(bking_state::get_tile_info)
 	if (code1 & 4) flags |= TILE_FLIPX;
 	if (code1 & 8) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(0, code0 + 256 * code1, m_palette_bank, flags);
+	tileinfo.set(0, code0 + 256 * code1, m_palette_bank, flags);
 }
 
 

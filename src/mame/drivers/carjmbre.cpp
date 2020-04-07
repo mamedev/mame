@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(carjmbre_state::get_tile_info)
 {
 	int attr = m_videoram[tile_index | 0x400];
 	int code = (m_videoram[tile_index] & 0xff) | (attr << 1 & 0x100);
-	SET_TILE_INFO_MEMBER(0, code, attr & 0xf, 0);
+	tileinfo.set(0, code, attr & 0xf, 0);
 }
 
 void carjmbre_state::video_start()

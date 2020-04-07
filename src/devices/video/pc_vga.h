@@ -34,8 +34,8 @@ public:
 	virtual WRITE8_MEMBER(port_03d0_w);
 	virtual READ8_MEMBER(mem_r);
 	virtual WRITE8_MEMBER(mem_w);
-	virtual READ8_MEMBER(mem_linear_r);
-	virtual WRITE8_MEMBER(mem_linear_w);
+	virtual uint8_t mem_linear_r(offs_t offset);
+	virtual void mem_linear_w(offs_t offset,uint8_t data);
 	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb);
 
 	void set_offset(uint16_t val) { vga.crtc.offset = val; }

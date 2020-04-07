@@ -633,8 +633,8 @@ public:
 	auto portb_read()  { return m_portb_read.bind(); }
 	auto portb_write() { return m_portb_write.bind(); }
 
-	DECLARE_READ8_MEMBER( internal_r );
-	DECLARE_WRITE8_MEMBER( internal_w );
+	uint8_t internal_r(offs_t offset);
+	void internal_w(offs_t offset, uint8_t data);
 
 	void tmp95c061_mem16(address_map &map);
 	void tmp95c061_mem8(address_map &map);
@@ -699,8 +699,8 @@ public:
 	// construction/destruction
 	tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( internal_r );
-	DECLARE_WRITE8_MEMBER( internal_w );
+	uint8_t internal_r(offs_t offset);
+	void internal_w(offs_t offset, uint8_t data);
 
 	// configuration helpers
 	auto port1_read()  { return m_port1_read.bind(); }

@@ -192,7 +192,7 @@ INPUT_PORTS_END
 
 void sdk85_state::scanlines_w(u8 data)
 {
-	m_digit = data;
+	m_digit = data & 7;
 }
 
 void sdk85_state::digit_w(u8 data)

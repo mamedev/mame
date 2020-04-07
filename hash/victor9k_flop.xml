@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="victor9k_flop" description="Victor 9000 / ACT Sirius 1 diskettes">
 
 	<software name="audiokit">

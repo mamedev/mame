@@ -57,6 +57,8 @@ public:
 	auto ready_wr_callback() { return ready_cb.bind(); }
 	auto enmf_rd_callback() { return enmf_cb.bind(); }
 
+	auto mon_wr_callback() { return mon_cb.bind(); }
+
 	void soft_reset();
 
 	DECLARE_WRITE_LINE_MEMBER(dden_w);
@@ -102,6 +104,7 @@ protected:
 	bool side_control;
 	bool side_compare;
 	bool head_control;
+	int hld_timeout;
 	bool motor_control;
 	bool ready_hooked;
 	int clock_ratio;
@@ -294,6 +297,7 @@ private:
 
 	devcb_write_line intrq_cb, drq_cb, hld_cb, enp_cb, sso_cb, ready_cb;
 	devcb_read_line enmf_cb;
+	devcb_write_line mon_cb;
 
 	uint8_t format_last_byte;
 	int format_last_byte_count;

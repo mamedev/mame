@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(taitojc_state::taitojc_tile_info)
 	uint32_t val = m_tile_ram[tile_index];
 	int color = (val >> 22) & 0xff;
 	int tile = (val >> 2) & 0x7f;
-	SET_TILE_INFO_MEMBER(m_gfx_index, tile, color, 0);
+	tileinfo.set(m_gfx_index, tile, color, 0);
 }
 
 READ32_MEMBER(taitojc_state::taitojc_palette_r)

@@ -18,21 +18,22 @@ outputs:
 
 The memory address is only 8 bits, devices larger than this have multiple slave addresses.
 The top five address bits are set at manufacture time, two values are standard.
-Up to 4096 bytes can be addressed.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "machine/i2cmem.h"
 
-#define STATE_IDLE ( 0 )
-#define STATE_DEVSEL ( 1 )
-#define STATE_BYTEADDR ( 2 )
-#define STATE_DATAIN ( 3 )
-#define STATE_DATAOUT ( 4 )
+constexpr int STATE_IDLE(0);
+constexpr int STATE_DEVSEL(1);
+constexpr int STATE_ADDRESSHIGH(2);
+constexpr int STATE_ADDRESSLOW(3);
+constexpr int STATE_DATAIN(4);
+constexpr int STATE_DATAOUT(5);
+constexpr int STATE_RESET(6);
 
-#define DEVSEL_RW ( 1 )
-#define DEVSEL_ADDRESS ( 0xfe )
+constexpr int DEVSEL_RW(1);
+constexpr int DEVSEL_ADDRESS(0xfe);
 
 //**************************************************************************
 //  DEBUGGING
@@ -62,6 +63,7 @@ DEFINE_DEVICE_TYPE(I2CMEM,     i2cmem_device,     "i2cmem", "I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_X2404P, i2c_x2404p_device, "x2404p", "X2404P I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C01,  i2c_24c01_device,  "24c01",  "24C01 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C02,  i2c_24c02_device,  "24c02",  "24C02 I2C Memory")
+DEFINE_DEVICE_TYPE(I2C_24C04,  i2c_24c04_device,  "24c04",  "24C04 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C08,  i2c_24c08_device,  "24c08",  "24C08 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C16,  i2c_24c16_device,  "24c16",  "24C16 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C16A, i2c_24c16a_device, "24c16a", "24C16A I2C Memory")
@@ -98,10 +100,11 @@ i2cmem_device::i2cmem_device(
 	m_sdar(1),
 	m_state(STATE_IDLE),
 	m_shift(0),
+	m_devsel(0),
+	m_addresshigh(0),
 	m_byteaddr(0),
 	m_page_offset(0),
-	m_page_written_size(0),
-	m_in_write(false)
+	m_page_written_size(0)
 {
 	// these memories work off the I2C clock only
 	assert(!clock);
@@ -124,6 +127,11 @@ i2c_24c01_device::i2c_24c01_device(const machine_config &mconfig, const char *ta
 
 i2c_24c02_device::i2c_24c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	i2cmem_device(mconfig, I2C_24C02, tag, owner, clock, 4, 0x100)
+{
+}
+
+i2c_24c04_device::i2c_24c04_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	i2cmem_device(mconfig, I2C_24C04, tag, owner, clock, 8, 0x200)
 {
 }
 
@@ -167,8 +175,9 @@ void i2cmem_device::device_start()
 	save_item( NAME(m_bits) );
 	save_item( NAME(m_shift) );
 	save_item( NAME(m_devsel) );
+	if (!skip_addresshigh())
+		save_item( NAME(m_addresshigh) );
 	save_item( NAME(m_byteaddr) );
-	save_item( NAME(m_in_write) );
 	save_item( NAME(m_page_offset) );
 	save_item( NAME(m_page_written_size) );
 	save_pointer( &m_data[0], "m_data", m_data_size );
@@ -176,16 +185,6 @@ void i2cmem_device::device_start()
 	{
 		save_item( NAME(m_page) );
 	}
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void i2cmem_device::device_reset()
-{
-	m_in_write = false;
 }
 
 
@@ -287,13 +286,12 @@ WRITE_LINE_MEMBER( i2cmem_device::write_sda )
 		{
 			if( m_sdaw )
 			{
-				if( m_in_write )
+				if( m_state == STATE_DATAIN && m_page_size > 0 )
 				{
 					int base = data_offset();
 					int root = base & ~( m_page_size - 1);
 					for( int i=0; i < m_page_written_size; i++)
 						m_data[root | ((base + i) & (m_page_size - 1))] = m_page[i];
-					m_in_write = false;
 					verboselog( this, 1, "data[ %04x to %04x ] = %x bytes\n", base, root | ((base + m_page_written_size - 1) & (m_page_size - 1)), m_page_written_size );
 				}
 				verboselog( this, 1, "stop\n" );
@@ -321,7 +319,8 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 		switch( m_state )
 		{
 		case STATE_DEVSEL:
-		case STATE_BYTEADDR:
+		case STATE_ADDRESSHIGH:
+		case STATE_ADDRESSLOW:
 		case STATE_DATAIN:
 			if( m_bits < 8 )
 			{
@@ -340,7 +339,15 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 					case STATE_DEVSEL:
 						m_devsel = m_shift;
 
-						if( !select_device() )
+						if( m_devsel == 0 )
+						{
+							// TODO: Atmel datasheets document 2-wire software reset, but doesn't mention it will lower sda only that it will release it.
+							// ltv_naru however requires it to be lowered, but we don't currently know the manufacturer of the chip used.
+							verboselog( this, 1, "software reset\n" );
+							m_state = STATE_RESET;
+							m_sdar = 0;
+						}
+						else if( !select_device() )
 						{
 							verboselog( this, 1, "devsel %02x: not this device\n", m_devsel );
 							m_state = STATE_IDLE;
@@ -348,7 +355,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 						else if( ( m_devsel & DEVSEL_RW ) == 0 )
 						{
 							verboselog( this, 1, "devsel %02x: write\n", m_devsel );
-							m_state = STATE_BYTEADDR;
+							m_state = skip_addresshigh() ? STATE_ADDRESSLOW : STATE_ADDRESSHIGH;
 						}
 						else
 						{
@@ -357,12 +364,20 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 						}
 						break;
 
-					case STATE_BYTEADDR:
-						m_byteaddr = m_shift;
+					case STATE_ADDRESSHIGH:
+						m_addresshigh = m_shift;
+
+						verboselog(this, 1, "addresshigh %02x\n", m_addresshigh);
+
+						m_state = STATE_ADDRESSLOW;
+						break;
+
+					case STATE_ADDRESSLOW:
+						m_byteaddr = m_shift | (skip_addresshigh() ? (m_devsel & DEVSEL_ADDRESS) << 7 : m_addresshigh << 8);
 						m_page_offset = 0;
 						m_page_written_size = 0;
 
-						verboselog( this, 1, "byteaddr %02x\n", m_byteaddr );
+						verboselog( this, 1, "addresslow %02x (byteaddr %04x)\n", m_shift, m_byteaddr );
 
 						m_state = STATE_DATAIN;
 						break;
@@ -375,7 +390,6 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 						}
 						else if( m_page_size > 0 )
 						{
-							m_in_write = true;
 							m_page[ m_page_offset ] = m_shift;
 							verboselog( this, 1, "page[ %04x ] <- %02x\n", m_page_offset, m_page[ m_page_offset ] );
 
@@ -441,9 +455,8 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 				{
 					if( m_sdaw )
 					{
-						verboselog( this, 1, "sleep\n" );
+						verboselog( this, 1, "nack\n" );
 						m_state = STATE_IDLE;
-						m_sdar = 0;
 					}
 
 					m_bits++;
@@ -459,6 +472,15 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 						m_bits = 0;
 					}
 				}
+			}
+			break;
+
+		case STATE_RESET:
+			if( m_scl )
+			{
+				verboselog(this, 1, "software reset ack\n");
+				m_state = STATE_IDLE;
+				m_sdar = 1;
 			}
 			break;
 		}
@@ -499,7 +521,7 @@ int i2cmem_device::address_mask()
 int i2cmem_device::select_device()
 {
 	int device = ( m_slave_address & 0xf0 ) | ( m_e2 << 3 ) | ( m_e1 << 2 ) | ( m_e0 << 1 );
-	int mask = DEVSEL_ADDRESS & ~( address_mask() >> 7 );
+	int mask = DEVSEL_ADDRESS & ~( skip_addresshigh() ? address_mask() >> 7 : 0 );
 
 	if( ( m_devsel & mask ) == ( device & mask ) )
 	{
@@ -511,5 +533,5 @@ int i2cmem_device::select_device()
 
 int i2cmem_device::data_offset()
 {
-	return ( ( ( m_devsel << 7 ) & 0xff00 ) | ( m_byteaddr & 0xff ) ) & address_mask();
+	return m_byteaddr & address_mask();
 }

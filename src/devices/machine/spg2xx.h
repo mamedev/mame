@@ -44,7 +44,6 @@ class spg2xx_device : public unsp_device, public device_mixer_interface
 {
 public:
 	void set_pal(bool pal) { m_pal_flag = pal ? 1 : 0; }
-	void set_rowscroll_offset(int offset) { m_rowscrolloffset = offset; }
 
 	auto porta_out() { return m_porta_out.bind(); }
 	auto portb_out() { return m_portb_out.bind(); }
@@ -62,6 +61,7 @@ public:
 	auto i2c_r() { return m_i2c_r.bind(); }
 
 	auto uart_tx() { return m_uart_tx.bind(); }
+	auto spi_tx() { return m_spi_tx.bind(); }
 
 	auto chip_select() { return m_chip_sel.bind(); }
 
@@ -72,6 +72,7 @@ public:
 
 	void extint_w(int channel, bool state) { m_spg_io->extint_w(channel, state); }
 	void uart_rx(uint8_t data) { m_spg_io->uart_rx(data); }
+	void spi_rx(int state) { m_spg_io->spi_rx(state); }
 
 	DECLARE_WRITE_LINE_MEMBER(vblank) { m_spg_video->vblank(state); }
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_spg_video->screen_update(screen, bitmap, cliprect); }
@@ -98,10 +99,8 @@ protected:
 
 	// TODO: these are fixed values, put them in relevant devices?
 	uint16_t m_sprite_limit;
-	uint16_t m_rowscrolloffset; // auto racing in 'zone60' minigames needs this to be 15, the JAKKS games (Star Wars Revenge of the sith - Gunship Battle, Wheel of Fortune, Namco Ms. Pac-Man 5-in-1 Pole Position) need it to be 0, where does it come from?
 	uint16_t m_pal_flag;
 	DECLARE_READ16_MEMBER(get_sprlimit) { return m_sprite_limit; }
-	DECLARE_READ16_MEMBER(get_rowscrolloffset) { return m_rowscrolloffset; }
 	DECLARE_READ16_MEMBER(get_pal_ntsc) { return m_pal_flag; }
 
 	devcb_write16 m_porta_out;
@@ -120,6 +119,7 @@ protected:
 	devcb_read8 m_i2c_r;
 
 	devcb_write8 m_uart_tx;
+	devcb_write_line m_spi_tx;
 
 	devcb_write8 m_chip_sel;
 
@@ -144,7 +144,8 @@ protected:
 	DECLARE_WRITE8_MEMBER(eepromx_w) { m_i2c_w(offset, data, mem_mask); }
 	DECLARE_READ8_MEMBER(eepromx_r) { return m_i2c_r(); };
 
-	DECLARE_WRITE8_MEMBER(tx_w) { m_uart_tx(offset, data, mem_mask); }
+	DECLARE_WRITE8_MEMBER(uart_tx_w) { m_uart_tx(offset, data, mem_mask); }
+	DECLARE_WRITE_LINE_MEMBER(spi_tx_w) { m_spi_tx(state); }
 	DECLARE_WRITE8_MEMBER(cs_w) { m_chip_sel(offset, data, mem_mask); }
 };
 
@@ -158,13 +159,28 @@ public:
 		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
 
+	spg24x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t sprite_limit, address_map_constructor internal);
+
 	spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
 };
 
-class spg28x_device : public spg2xx_device
+class spg2xx_128_device : public spg24x_device
+{
+public:
+	template <typename T>
+	spg2xx_128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
+		: spg2xx_128_device(mconfig, tag, owner, clock)
+	{
+		m_screen.set_tag(std::forward<T>(screen_tag));
+	}
+
+	spg2xx_128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class spg28x_device : public spg24x_device
 {
 public:
 	template <typename T>
@@ -176,10 +192,9 @@ public:
 
 	spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-
 };
 
+DECLARE_DEVICE_TYPE(SPG2XX_128, spg2xx_128_device)
 DECLARE_DEVICE_TYPE(SPG24X, spg24x_device)
 DECLARE_DEVICE_TYPE(SPG28X, spg28x_device)
 

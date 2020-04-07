@@ -169,6 +169,8 @@ public:
 	void ews286(machine_config &config);
 	void olyport40(machine_config &config);
 	void micral45(machine_config &config);
+	void euroat(machine_config &config);
+	void pg750(machine_config &config);
 
 	void init_at();
 	void init_atpci();
@@ -186,6 +188,8 @@ protected:
 
 	static void cfg_single_360K(device_t *device);
 	static void cfg_single_1200K(device_t *device);
+	static void cfg_single_1440K(device_t *device);
+	static void cfg_dual_1440K(device_t *device);
 	void at16_io(address_map &map);
 	void at16_map(address_map &map);
 	void at16l_map(address_map &map);
@@ -475,6 +479,18 @@ void at_state::cfg_single_360K(device_t *device)
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option(nullptr);
 }
 
+void at_state::cfg_single_1440K(device_t *device)
+{
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35hd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option(nullptr);
+}
+
+void at_state::cfg_dual_1440K(device_t *device)
+{
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35hd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("35hd");
+}
+
 static void pci_devices(device_slot_interface &device)
 {
 	device.option_add_internal("vt82c505", VT82C505);
@@ -629,7 +645,7 @@ void at_state::at486(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &at_state::at32_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-		AT_MB(config, m_mb, 0).at_softlists(config);
+	AT_MB(config, m_mb, 0).at_softlists(config);
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
@@ -922,6 +938,50 @@ void at_state::micral45(machine_config &config)
 	atturbo(config);
 	m_maincpu->set_clock(12'000'000);
 	subdevice<isa16_slot_device>("isa1")->set_default_option("ega");
+}
+
+void at_state::euroat(machine_config &config)
+{
+	ibm5170(config);
+	m_maincpu->set_clock(24_MHz_XTAL / 2); // Bus speed can be set up to CPU speed
+
+	subdevice<isa16_slot_device>("isa2")->set_option_machine_config("fdc", cfg_single_1440K); // From pictures but also with a 3.5" as second floppy
+
+	m_ram->set_default_size("640K");
+}
+
+// Siemens PG 750
+void at_state::pg750(machine_config &config)
+{
+	i386_device &maincpu(I386(config, m_maincpu, 12'000'000));
+	maincpu.set_addrmap(AS_PROGRAM, &at_state::at32_map);
+	maincpu.set_addrmap(AS_IO, &at_state::at32_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	AT_MB(config, m_mb, 0).at_softlists(config);
+
+	config.set_maximum_quantum(attotime::from_hz(60));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	
+	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc")); // TODO: move this into the cs8221
+	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w)); // this is in :mb
+	rtc.set_century_index(0x32);
+	
+	// on-board devices
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc", true).set_option_machine_config("fdc", cfg_dual_1440K); // FIXME: deteremine ISA bus clock
+	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
+	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "lpt", true);
+	// ISA cards
+	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "ega", false);
+	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, "hdc", false);
+	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
+	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	
+	/* internal ram */
+	RAM(config, m_ram).set_default_size("3712K");
 }
 
 //**************************************************************************
@@ -1653,6 +1713,12 @@ ROM_START( neat )
 	ROM_SYSTEM_BIOS(8, "amic21", "AMI C 21.1") /* (Motherboard Manufacturer: Unknown.) (Neat 286 Bios, 82c21x Chipset ) (BIOS release date:: 30-04-1989) */
 	ROMX_LOAD( "amic21-2.bin",  0x10001, 0x8000, CRC(8ffe7752) SHA1(68215f07a170ee7bdcb3e52b370d470af1741f7e),ROM_SKIP(1) | ROM_BIOS(8) )
 	ROMX_LOAD( "amic21-1.bin",  0x10000, 0x8000, CRC(a76497f6) SHA1(91b47d86967426945b2916cb40e76a8da2d31d54),ROM_SKIP(1) | ROM_BIOS(8) )
+	// 9: BIOS-String: - AGC N286 - CPU: AMD N80L286-16/S, FPU socket provided - RAM: 36xTMC64C1024-80N (18pin), 36x16pin sockets provided as an alternative (2xBank 0, 2xBank 1), 4xSIPP30 (2xBank 0/2 and 2xBank 1/3)
+	// Chipset: Chips P82C212B-12, P82C206 H, P82C211-12 C, P82C215-12 - OSC: 20.000, 32.000MHz, 24.0000MHz, 32.768KHz, 14.31818 - BIOS: AMI 286 BIOS PLUS CO.NO.1190
+	// Keyboard-BIOS: AMI KEYBOARD BIOS PLUS CO.NO. 1190 - ISA8: 2, ISA16: 6
+	ROM_SYSTEM_BIOS(9, "n286", "N286")// stops after initialising the graphics card
+	ROMX_LOAD( "286-chips-ami1190-even_32k.bin", 0x10000, 0x8000, CRC(db941036) SHA1(994cced82b5fb5f8833c718b4226a7e9620b56df),ROM_SKIP(1) | ROM_BIOS(9) )
+	ROMX_LOAD( "286-chips-ami1190-odd_32k.bin", 0x10001, 0x8000, CRC(71cfc2d1) SHA1(8b8cf81161aec3e2c7f653e5d3a6b4e9627663c6),ROM_SKIP(1) | ROM_BIOS(9) )
 ROM_END
 
 
@@ -1896,22 +1962,29 @@ ROM_START( ht12a )
 	ROM_SYSTEM_BIOS(1, "head_ph_2", "Headland/Phoenix #2") // Phoenix BIOS A286 Version 1.01 - BIOS ID JLI01101 - IT9109 - Reference ID 01 - (BIOS release date:: 19-04-1990)
 	ROMX_LOAD( "286-headland-iqs-lo_32k.bin", 0x10000, 0x8000, CRC(60424e9d) SHA1(aa813bf48939fe7fcbbfec3133e702bfdff6234e), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD( "286-headland-iqs-hi_32k.bin", 0x10001, 0x8000, CRC(e56212e0) SHA1(2441845d632d19adc0592e094beb5ec1fbe074f6), ROM_SKIP(1) | ROM_BIOS(1) )
-	// 2: BIOS-String: DH12-1164-083090-K0 - CPU/FPU: N80L286-16/S, P80C287-10 - ISA8: 2, ISA16: 6
-	ROM_SYSTEM_BIOS(2, "head12a01", "Headland HT12/A #1")
-	ROMX_LOAD( "2hlm002l.bin", 0x10000, 0x8000, CRC(345b9ea1) SHA1(868cc309e433e0dcc9f3aa147263017b7f822461), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD( "2hlm002h.bin", 0x10001, 0x8000, CRC(35eed8b8) SHA1(119f2676aef038301c3e0bcdb999da6fd740e6a5), ROM_SKIP(1) | ROM_BIOS(2) )
-	// 3: MBL M21 - BIOS-String: DH12-1211-061390-K0 / HT-12 286 BIOS - Chipset: Headland HT12/A
-	ROM_SYSTEM_BIOS(3, "ami121", "AMI HT 12.1") /* (BIOS release date:: 13-06-1990) */
-	ROMX_LOAD( "ami2od86.bin", 0x10001, 0x8000, CRC(04a2cec4) SHA1(564d37a8b2c0f4d0e23cd1e280a09d47c9945da8),ROM_SKIP(1) | ROM_BIOS(3) )
-	ROMX_LOAD( "ami2ev86.bin", 0x10000, 0x8000, CRC(55deb5c2) SHA1(19ce1a7cc985b5895c585e39211475de2e3b0dd1),ROM_SKIP(1) | ROM_BIOS(3) )
-	// 4: SPEC 286 rev 4a - BIOS-String: DH12-1120-061390-K0
-	ROM_SYSTEM_BIOS(4, "ami122", "AMI HT 12.2") /* (BIOS release date:: 13-06-1990) */
-	ROMX_LOAD( "ami2ev89.bin", 0x10000, 0x8000, CRC(705d36e0) SHA1(0c9cfb71ced4587f109b9b6dfc2a9c92302fdb99),ROM_SKIP(1) | ROM_BIOS(4) )
-	ROMX_LOAD( "ami2od89.bin", 0x10001, 0x8000, CRC(7c81bbe8) SHA1(a2c7eca586f6e2e76b9101191e080a1f1cb8b833),ROM_SKIP(1) | ROM_BIOS(4) )
-	// 5: BIOS-String: DH12-1112-061390-K0
-	ROM_SYSTEM_BIOS(5, "ami123", "AMI HT 12.3") /*(Motherboard Manufacturer: Aquarius Systems USA Inc.) (BIOS release date:: 13-06-1990)*/
-	ROMX_LOAD( "ht12h.bin", 0x10001, 0x8000, CRC(db8b471e) SHA1(7b5fa1c131061fa7719247db3e282f6d30226778),ROM_SKIP(1) | ROM_BIOS(5) )
-	ROMX_LOAD( "ht12l.bin", 0x10000, 0x8000, CRC(74fd178a) SHA1(97c8283e574abbed962b701f3e8091fb82823b80),ROM_SKIP(1) | ROM_BIOS(5) )
+	// BIOS-String: Quadtel HT12 286 BIOS Versio 3.05.03
+	// 2: Same board as #1, CPU: AMD N80L286-16S, FPU socket provided, Chipset: Headland HT12 - OSC: 14.31818, 8.000, 32.000MHZ, unpopulated: ASYN BUS CLK
+	// RAM: 8xHYB514256B-60 (8x20pin, alternativelx 4x18pin), Parity (2x16pin, 2x18pin) empty, 4xSIMM30 (Bank0 SIMM, Bank1 SIMM) - BIOS: Quadtel BIOS Software 286 253893
+	// Keyboard-BIOS: Quadtel BIOS Software KEY 316018 (undumped) - JP7: NO ASYN CLK, JP4: CMOS RAM CLEAR, JP3: COLOR - JP: 80287CLK=ASYN CLK
+	ROM_SYSTEM_BIOS(2, "quadtel", "Quadtel")
+	ROMX_LOAD( "bios-lo.bin", 0x10000, 0x8000, CRC(433d8044) SHA1(3435d51fad97247b4bcfdb2f3fdb358d99b0e6ea), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "bios-hi.bin", 0x10001, 0x8000, CRC(fe124da4) SHA1(b3e4e598cf1f5cada1b101d0c6434770017de3c6), ROM_SKIP(1) | ROM_BIOS(2) )
+	// 3: BIOS-String: DH12-1164-083090-K0 - CPU/FPU: N80L286-16/S, P80C287-10 - ISA8: 2, ISA16: 6
+	ROM_SYSTEM_BIOS(3, "head12a01", "Headland HT12/A #1")
+	ROMX_LOAD( "2hlm002l.bin", 0x10000, 0x8000, CRC(345b9ea1) SHA1(868cc309e433e0dcc9f3aa147263017b7f822461), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "2hlm002h.bin", 0x10001, 0x8000, CRC(35eed8b8) SHA1(119f2676aef038301c3e0bcdb999da6fd740e6a5), ROM_SKIP(1) | ROM_BIOS(3) )
+	// 4: MBL M21 - BIOS-String: DH12-1211-061390-K0 / HT-12 286 BIOS - Chipset: Headland HT12/A
+	ROM_SYSTEM_BIOS(4, "ami121", "AMI HT 12.1") /* (BIOS release date:: 13-06-1990) */
+	ROMX_LOAD( "ami2od86.bin", 0x10001, 0x8000, CRC(04a2cec4) SHA1(564d37a8b2c0f4d0e23cd1e280a09d47c9945da8),ROM_SKIP(1) | ROM_BIOS(4) )
+	ROMX_LOAD( "ami2ev86.bin", 0x10000, 0x8000, CRC(55deb5c2) SHA1(19ce1a7cc985b5895c585e39211475de2e3b0dd1),ROM_SKIP(1) | ROM_BIOS(4) )
+	// 5: SPEC 286 rev 4a - BIOS-String: DH12-1120-061390-K0
+	ROM_SYSTEM_BIOS(5, "ami122", "AMI HT 12.2") /* (BIOS release date:: 13-06-1990) */
+	ROMX_LOAD( "ami2ev89.bin", 0x10000, 0x8000, CRC(705d36e0) SHA1(0c9cfb71ced4587f109b9b6dfc2a9c92302fdb99),ROM_SKIP(1) | ROM_BIOS(5) )
+	ROMX_LOAD( "ami2od89.bin", 0x10001, 0x8000, CRC(7c81bbe8) SHA1(a2c7eca586f6e2e76b9101191e080a1f1cb8b833),ROM_SKIP(1) | ROM_BIOS(5) )
+	// 6: BIOS-String: DH12-1112-061390-K0
+	ROM_SYSTEM_BIOS(6, "ami123", "AMI HT 12.3") /*(Motherboard Manufacturer: Aquarius Systems USA Inc.) (BIOS release date:: 13-06-1990)*/
+	ROMX_LOAD( "ht12h.bin", 0x10001, 0x8000, CRC(db8b471e) SHA1(7b5fa1c131061fa7719247db3e282f6d30226778),ROM_SKIP(1) | ROM_BIOS(6) )
+	ROMX_LOAD( "ht12l.bin", 0x10000, 0x8000, CRC(74fd178a) SHA1(97c8283e574abbed962b701f3e8091fb82823b80),ROM_SKIP(1) | ROM_BIOS(6) )
 ROM_END
 
 
@@ -2056,6 +2129,48 @@ ROM_END
 //  80286 Desktop
 //**************************************************************************
 
+// Zenith Z-248 - Motherboard: 85-3379-01 CPU BOARD 113087 - CPU: AMD N80L286-12/C, FPU socket provided - Chipset: Zymos Poach 1 and 2
+// RAM: 6xSIMM30 - OSC: 24.000MHz, 16.000MHz, 14.31818MHz - ISA8: 2, ISA16: 5 - on board diagnostic LEDs: red: CPU D101, ROM D102, RAM D103, INT D104, DSK D105, RDY D106, green: DCOK D107
+// Cards in system documented: DTC 5280 CRA MFM HD controller, Graphics card HEATH P/N150-307-3 L1A2334/Chips P82C434A (undumped), Logitech mouse/hand scanner controller, GW302 Parallel Printer Card, Chips P82C605 Dual Serial Printer Card
+// "+++ ERROR: Fatal Slushware RAM Error +++" / "--- Fatal Error: Cannot Continue! ---" (cf. olyport40)
+ROM_START( zdz248 ) // use CGA
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_LOAD( "zenith_z-248.bin", 0x10000, 0x10000, CRC(e2042dd9) SHA1(bd51cc74b0b7bd42c449bc4b5702274f766e8ea5))
+ROM_END
+
+// Samsung Deskmaster 286-12, Microfive motherboard - Chipset: Chips F82C451C, F82C235-12 286 SCAT - CPU: Intel 80286-12, FPU socket provided
+// RAM: 6xSIMM40 - BIOS: Phoenix ROM BIOS PLUS 3.10 02M, Chips and Technologies VGA 411 BIOS v211 (one 27C512 EPROM) - Keyboard-BIOS: Intel P8942AN - ISA16: 1
+// OSC: 14.31818, 24.000000MHz, 24.000000MHz, 25.175000MHz, 40.000000MHz - on board: FDD, IDE, beeper, keyboard, mouse, ser, par - VGA Video RAM: 8x41C464J-10 (256K)
+ROM_START( samdm286 )
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_LOAD( "samsung-deskmaster-28612-rom.bin", 0x10000, 0x10000, CRC(785d3196) SHA1(214a933d8fa86bfdb633fb5e8595a18a58cdba7d))
+ROM_END
+
+// Schneider EuroAT - Uses the same case as the Schneider EuroXT, a compact desktop with room for a single floppy drive and an AT IDE harddisk (Seagate ST-142A, ST-157A)
+// Mainboard: Baugr.Nr. 51513 with internal EGA, 52591 EGA components omitted (see: EURO VGA)
+// Chipset: 2xHeadland GC102-PC, HT101A/B1A4924, Schneider BIGJIM 30773, WD37C65BJM, Siemens SAB 16C450-N
+// EGA chipset (mainboard 51513): G2 GC201-PC, 64K RAM - Main RAM: 1MB
+// CPU: Siemens SAB 80286-12, Keyboard-BIOS: Schneider ROM BIOS 1985, 1989 Phoenix 
+// Connectors: Keyboard, Printer, Serial, Floppy (can use the same external floppy disk drives as the EuroXT), EGA monitor
+// OSC: 34.0000, 19.2000MHz, 24.0000, 16.000MHz
+// BUS: proprietary connectors, ISA riser (ISA8x1, ISA16x1), BIOS can set CPU and BUS speed up to 12MHz
+// Proprietary EURO VGA card: 256KB RAM, ATI 18800-1 chipset
+// blank screen, beeps 1-2-4
+ROM_START( euroat )
+	ROM_REGION16_LE( 0x20000, "bios", 0 )
+	ROM_SYSTEM_BIOS( 0, "v201", "V2.01" )
+	ROMX_LOAD( "euro_at_v201a_l.bin", 0x10000, 0x8000, CRC(0f8a2688) SHA1(95db9010b1c0465f878e5036bcf242ddf0a3be6a), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "euro_at_v201a_h.bin", 0x10001, 0x8000, CRC(75b6771b) SHA1(3aa0921914ea6e24249ce3f995fdcb341124d7e9), ROM_SKIP(1) | ROM_BIOS(0) )
+	// EGA ROM dump missing
+	
+	ROM_SYSTEM_BIOS( 1, "v203", "V2.03" )
+	ROMX_LOAD( "80286at_bioslow_schneider_ag_id50444_v2.03.bin", 0x10000, 0x8000, CRC(de356110) SHA1(6bed59a756afa0b6181187d202b325e35afadd55), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "80286at_bioshigh_schneider_ag_id50445_v2.03.bin", 0x10001, 0x8000, CRC(c4c9c840) SHA1(09deaa659191075b6ccc58403979d61bdf990dcd), ROM_SKIP(1) | ROM_BIOS(1) )
+	
+	ROM_REGION( 0x10000, "vga", 0 )
+	ROM_LOAD( "euro-vga_52255_bios_v1.02_row.bin", 0x00000, 0x10000, CRC(71d42e58) SHA1(be64990325f52128e102dfc3ed87d2d831183ddc))
+ROM_END
+
 // Victor V286C - a VGA version exists as well
 // CPU: AMD 802L86-10/S  - one ISA16 extended to ISA8: 1, ISA16: 3 on a riser card - Keyboard-BIOS: AT-KB M5L8042
 // Chipset: Kyocera AT-S.C.1 VER.A 9771A 89432EAI, Kyocera EAST-2A 9850 8938EAI, MB621103 M AT-1A 8944 Z67, MB622436 MAT-2E 8943 W02
@@ -2067,7 +2182,7 @@ ROM_START( v286c )
 	ROM_REGION16_LE(0x20000, "bios", 0)
 	ROM_LOAD16_BYTE( "system-bios_kyocera_a2-2_lo.bin", 0x18000, 0x4000, CRC(160c4759) SHA1(937c1bb9483efeba895e038b7132e0e7e5a9aaa4) )
 	ROM_LOAD16_BYTE( "system-bios_kyocera_a2-2_hi.bin", 0x18001, 0x4000, CRC(cfe0cbef) SHA1(2610d727d13fa67c7bd9b3545d7846e880c3da37) )
-	
+
 	ROM_REGION(0x4000, "pega", 0)
 	ROM_LOAD( "ega-bios_paradise_video-1.bin", 0x0000, 0x4000, CRC(2db77b0b) SHA1(d31ddbbde5be0b0603e9f569c3f924e0afc7c8e4) )
 ROM_END
@@ -3462,6 +3577,25 @@ ROM_START( walk386dx )
 	ROM_LOAD( "cthj02_03_76.bin", 0x0000, 0x2000, NO_DUMP )
 ROM_END
 
+// Siemens PG 750 - Luggable programmer ("Programmiergerät") for the Siemens S5 automation systems, a 486 EISA version exists as well
+// Chipset: CHIPS P82C302, P82C301C, P82C206, four more "CHIPS" ICs
+// ISA16: 7
+// on board: V24/Mouse, V24/Modem, Printer
+ROM_START( pg750 )
+    ROM_REGION32_LE( 0x20000, "bios", 0 )
+	// 0: Phoenix 80386 ROM BIOS PLUS Version 1.10 14 / SIEMENS PG-750
+	// Time-of-day clock stopped
+	// EGA/TIGA Graphics System "Highgraph II"
+	ROM_DEFAULT_BIOS("v402")
+	ROM_SYSTEM_BIOS(0, "v40", "v40")
+	ROMX_LOAD( "pg750_4.0_386_l.bin", 0x10000, 0x8000, CRC(1e6dcd40) SHA1(2def9f729f43652a7b8b32a42e4c073f580d39ce), ROM_SKIP(1)|ROM_BIOS(0) )
+	ROMX_LOAD( "pg750_4.0_386_h.bin", 0x10001, 0x8000, CRC(389c20dd) SHA1(eb0e86ba88ac9742868689b2aac9911ed7acac74), ROM_SKIP(1)|ROM_BIOS(0) )
+	// 1: Phoenix 80386 ROM BIOS PLUS Version 1.10 17 / SIEMENS PG-750/730
+	// Time-of-day clock stopped
+	ROM_SYSTEM_BIOS(1, "v402", "v402")
+	ROMX_LOAD( "pg750_4.02_386_l.bin", 0x10000, 0x8000, CRC(208aac51) SHA1(49d50b7ade8f56bda203375a9b138adf2cb5e500), ROM_SKIP(1)|ROM_BIOS(1) )
+	ROMX_LOAD( "pg750_4.02_386_h.bin", 0x10001, 0x8000, CRC(c6e14fb6) SHA1(dad6ab5c5a18341ec0dce53fe712b8367340506b), ROM_SKIP(1)|ROM_BIOS(1) )
+ROM_END
 
 //**************************************************************************
 //  80486 BIOS
@@ -3876,14 +4010,21 @@ ROM_START( pcd4x )
 	// D756, was used in PCD-4Lsx, contains Cirrus Logic VGA ROM
 	ROM_SYSTEM_BIOS(0, "d756v320r316", "D756 BIOS V3.20 R3.16")
 	ROMX_LOAD( "fts_biosupdated756noflashbiosepromv320_320316_149.bin", 0x00000, 0x20000, CRC(2ab60725) SHA1(333b64424c08ecbbaf47110c99ad0335da211489), ROM_BIOS(0) )
-	// D674, was used in PCD-4M, PCD-4Msx, PCD-4RSXA/4RA
-	// LSI HT342-B-07 or Headland HT342-BUIB and another LSI chip
+	// D674, was used in PCD-4M, PCD-4Msx, PCD-4RSXA/4RA - this is a CPU card that is plugged into an ISA backplane; OSC: 14.31818
+	// Chipset: LSI HT342-B-07, LSI HT321-D, Intel B6842-V31 AWARD(c)SNI UPI V4.3, IS9412BL PC87311AVF US4823312 - CPU: 486sx soldered onto the mainboard, but a socket for a 486DX is present - RAM: SIMM30x8
+	// the CPU card can accept 16 bit "piggyback" modules, e.g. an ET4000 graphics card or a MFM harddisk controller to save ISA slots
+	// on board: IDE, Floppy, beeper, keyboard connector, parallel, 2xserial, RTC DS12887, connectors for NMI and keylock, 4 DIP switches labelled DX2, Upgrade, 25, color
+	// jumper X7: skip on/off, jumper x6: drv l/h
 	ROM_SYSTEM_BIOS(1, "d674v320r316", "D674 BIOS V3.20 R3.16")
 	ROMX_LOAD( "fts_biosupdated674noflashbiosepromv320_320316_144.bin", 0x00000, 0x20000, CRC(1293d27c) SHA1(22f36c4a5a0912011ed54ff917244f412208ffc0), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2, "d674v320r304", "D674 BIOS V3.20 R3.04")
+	ROMX_LOAD( "d674_27c1024_3.20.bin", 0x00000, 0x20000, CRC(dfdad89e) SHA1(6cb78d8b5c8822dc84970ba912bc66a5e7cd2fb4), ROM_BIOS(2) )
 	// D802, was used in PCD-4HVL
-	ROM_SYSTEM_BIOS(2, "d802v320r316", "D802 BIOS V3.20 R3.34.802")
-	// PCD-4NL, contains C&T VGA BIOS
-	ROMX_LOAD( "fts_biosupdated802noflashbiosepromv320_320334_152.bin", 0x00000, 0x20000, CRC(fb1cd3d2) SHA1(98043c6f0299e1c56e5f266ea5f117ae456447ff), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(3, "d802v320r316", "D802 BIOS V3.20 R3.34.802")
+	ROMX_LOAD( "fts_biosupdated802noflashbiosepromv320_320334_152.bin", 0x00000, 0x20000, CRC(fb1cd3d2) SHA1(98043c6f0299e1c56e5f266ea5f117ae456447ff), ROM_BIOS(3) )
+	// D620
+	ROM_SYSTEM_BIOS(4, "d620", "D620")
+	ROMX_LOAD( "w26361-d620-z4-01-5_award_v3.10_r2.02.bin", 0x00000, 0x20000, CRC(2708cc2a) SHA1(a399c938ffeba4cb28a22e54235f3f9c5e2892f6), ROM_BIOS(4) )
 ROM_END
 
 
@@ -4887,6 +5028,13 @@ ROM_START( bluenote )
 	ROM_LOAD( "7500d_rev26_121593.bin", 0x00000, 0x20000, CRC(d564f855) SHA1(181e4097c3b4ca2e8e79f1732d4aef9edd5b4586))
 ROM_END
 
+// Siemens PG-750 486 EISA
+// blank screen, beeps
+ROM_START( pg750eisa )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_LOAD( "pg_pg750_486_eisa.bin", 0x10000, 0x10000, CRC(2e6149a9) SHA1(9fcf29a6169efa1359c7c3eff09326dd3e4001dc))
+ROM_END
+
 
 /***************************************************************************
 
@@ -4992,8 +5140,10 @@ COMP( 198?, o286foxii, ibm5170, 0,       atturbo,   0,     at_state,     init_at
 COMP( 1987, m290,      ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Olivetti",    "M290", MACHINE_NOT_WORKING )
 COMP( 1991, pcd204,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Philips",     "PCD204 (PCD200 series)", MACHINE_NOT_WORKING )
 COMP( 1990, profpc33,  ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Profex", "PC 33", MACHINE_NOT_WORKING )
+COMP( 199?, samdm286,  ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Samsung", "Deskmaster 286-12", MACHINE_NOT_WORKING )
 COMP( 198?, v286c,     ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Victor", "V286C", MACHINE_NOT_WORKING )
 COMP( 1981, wpc250,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Wang Laboratories, Inc.", "PC-250/16", MACHINE_NOT_WORKING )
+COMP( 198?, zdz248,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Zenith Data Systems", "Z-248", MACHINE_NOT_WORKING )
 COMP( 1990, n8810m30,  ibm5170, 0,       neat,      0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M30", MACHINE_NOT_WORKING )
 COMP( 198?, elt286b,   ibm5170, 0,       neat,      0,     at_state,     init_at,        "Chaintech", "ELT-286B-160B(E)", MACHINE_NOT_WORKING )
 COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at,        "Kaypro",      "286i", MACHINE_NOT_WORKING )
@@ -5004,6 +5154,7 @@ COMP( 198?, olyport40, ibm5170, 0,       olyport40, 0,     at_state,     init_at
 COMP( 1987, n8810m15,  ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M15", MACHINE_NOT_WORKING )
 COMP( 1990, n8810m16c, ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 CGA version", MACHINE_NOT_WORKING )
 COMP( 1986, n8810m55,  ibm5170, 0,       n8810m55,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M55", MACHINE_NOT_WORKING )
+COMP( 1989, euroat,    ibm5170, 0,       euroat,    0,     at_state,     init_at,        "Schneider Rundfunkwerke AG", "Euro AT", MACHINE_NOT_WORKING )
 COMP( 199?, alaleolx,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Alaris RYC", "LEOPARD LX", MACHINE_NOT_WORKING )
 COMP( 199?, anch386s,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "ANIX",        "CH-386S-16/20/25G", MACHINE_NOT_WORKING )
 COMP( 1993, cxsxd,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "CX Technology", "CX SXD", MACHINE_NOT_WORKING )
@@ -5081,6 +5232,7 @@ COMP( 199?, qdu386dx,  ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 199?, fic4386vchd,ibm5170,0,       at486,     0,     at_state,     init_at,        "First International Computer", "4386-VC-HD", MACHINE_NOT_WORKING )
 COMP( 198?, hot304,    ibm5170, 0,       at386,     0,     at_state,     init_at,        "Shuttle Computer International", "HOT-304", MACHINE_NOT_WORKING )
 COMP( 198?, hot307h,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Shuttle Computer International", "HOT-307H", MACHINE_NOT_WORKING )
+COMP( 199?, pg750,     ibm5170, 0,       pg750,     0,     at_state,     init_at,        "Siemens", "PG 750", MACHINE_NOT_WORKING )
 COMP( 199?, sy019hi,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Soyo", "SY-019H and SY-019I", MACHINE_NOT_WORKING )
 COMP( 199?, uni386w,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "UNICHIP", "386W 367C REV 1.0", MACHINE_NOT_WORKING )
 COMP( 1988, ataripc5,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Atari", "PC5", MACHINE_NOT_WORKING )
@@ -5196,4 +5348,5 @@ COMP( 1995, pcd4nl,    ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 1993, pcd4nd,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4ND", MACHINE_NOT_WORKING )
 COMP( 1993, lion3500,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "Lion",        "3500", MACHINE_NOT_WORKING )
 COMP( 199?, pcd4x,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4H, PCD-4M", MACHINE_NOT_WORKING )
+COMP( 199?, pg750eisa, ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens", "PG-750 486 EISA", MACHINE_NOT_WORKING )
 //COMP( 1988, nws286,    ibm5170,  0,      ews286,    0,     at_state,     at,        "Nokia Data",  "Nokia Data WS286", MACHINE_NOT_WORKING )

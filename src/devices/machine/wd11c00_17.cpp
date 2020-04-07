@@ -238,7 +238,7 @@ void wd11c00_17_device::device_reset()
 //  io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wd11c00_17_device::io_r )
+uint8_t wd11c00_17_device::io_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -271,7 +271,7 @@ READ8_MEMBER( wd11c00_17_device::io_r )
 //  io_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wd11c00_17_device::io_w )
+void wd11c00_17_device::io_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -304,7 +304,7 @@ WRITE8_MEMBER( wd11c00_17_device::io_w )
 //  dack3_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(wd11c00_17_device::dack3_w)
+void wd11c00_17_device::dack3_w(int state)
 {
 }
 
@@ -333,7 +333,7 @@ void wd11c00_17_device::dack_w(uint8_t data)
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( wd11c00_17_device::read )
+uint8_t wd11c00_17_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -358,7 +358,7 @@ READ8_MEMBER( wd11c00_17_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wd11c00_17_device::write )
+void wd11c00_17_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -385,7 +385,7 @@ WRITE8_MEMBER( wd11c00_17_device::write )
 //  ireq_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wd11c00_17_device::ireq_w )
+void wd11c00_17_device::ireq_w(int state)
 {
 	LOG("%s WD11C00-17 IREQ %u\n", machine().describe_context(), state);
 
@@ -414,7 +414,7 @@ WRITE_LINE_MEMBER( wd11c00_17_device::ireq_w )
 //  io_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wd11c00_17_device::io_w )
+void wd11c00_17_device::io_w(int state)
 {
 	LOG("%s WD11C00-17 I/O %u\n", machine().describe_context(), state);
 
@@ -426,7 +426,7 @@ WRITE_LINE_MEMBER( wd11c00_17_device::io_w )
 //  cd_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wd11c00_17_device::cd_w )
+void wd11c00_17_device::cd_w(int state)
 {
 	LOG("%s WD11C00-17 C/D %u\n", machine().describe_context(), state);
 
@@ -438,7 +438,7 @@ WRITE_LINE_MEMBER( wd11c00_17_device::cd_w )
 //  clct_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wd11c00_17_device::clct_w )
+void wd11c00_17_device::clct_w(int state)
 {
 	LOG("%s WD11C00-17 CLCT %u\n", machine().describe_context(), state);
 
@@ -454,7 +454,7 @@ WRITE_LINE_MEMBER( wd11c00_17_device::clct_w )
 //  mode_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wd11c00_17_device::mode_w )
+void wd11c00_17_device::mode_w(int state)
 {
 	LOG("%s WD11C00-17 MODE %u\n", machine().describe_context(), state);
 
@@ -467,7 +467,7 @@ WRITE_LINE_MEMBER( wd11c00_17_device::mode_w )
 //  busy_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( wd11c00_17_device::busy_r )
+int wd11c00_17_device::busy_r()
 {
 	return (m_status & STATUS_BUSY) ? 0 : 1;
 }
@@ -477,7 +477,7 @@ READ_LINE_MEMBER( wd11c00_17_device::busy_r )
 //  ecc_not_0_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( wd11c00_17_device::ecc_not_0_r )
+int wd11c00_17_device::ecc_not_0_r()
 {
 	return m_ecc_not_0;
 }

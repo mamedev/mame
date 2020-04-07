@@ -16,21 +16,21 @@ TILE_GET_INFO_MEMBER(f1gp_state::get_fg_tile_info)
 {
 	int code = m_fgvideoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code & 0x7fff, 0, (code & 0x8000) ? TILE_FLIPY : 0);
+	tileinfo.set(0, code & 0x7fff, 0, (code & 0x8000) ? TILE_FLIPY : 0);
 }
 
 TILE_GET_INFO_MEMBER(f1gp_state::get_roz_tile_info)
 {
 	int code = m_rozvideoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(3, code & 0x7ff, code >> 12, 0);
+	tileinfo.set(3, code & 0x7ff, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(f1gp2_state::get_roz_tile_info)
 {
 	int code = m_rozvideoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(2, (code & 0x7ff) + (m_roz_bank << 11), code >> 12, 0);
+	tileinfo.set(2, (code & 0x7ff) + (m_roz_bank << 11), code >> 12, 0);
 }
 
 

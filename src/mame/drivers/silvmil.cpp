@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(silvmil_state::get_bg_tile_info)
 	int color = (data >> 12) & 0x0f;
 	int bank = m_tilebank[(data & 0xc00) >> 10] * 0x400;
 
-	SET_TILE_INFO_MEMBER(1, tile + bank, color + 0x20, 0);
+	tileinfo.set(1, tile + bank, color + 0x20, 0);
 }
 
 TILE_GET_INFO_MEMBER(silvmil_state::get_fg_tile_info)
@@ -158,7 +158,7 @@ TILE_GET_INFO_MEMBER(silvmil_state::get_fg_tile_info)
 	int color = (data >> 12) & 0x0f;
 	int bank = m_tilebank[(data & 0xc00) >> 10] * 0x400;
 
-	SET_TILE_INFO_MEMBER(1, tile + bank, color + 0x10, 0);
+	tileinfo.set(1, tile + bank, color + 0x10, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(silvmil_state::scan_rows)

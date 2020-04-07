@@ -25,8 +25,8 @@ class ra17xx_device : public device_t
 public:
 	ra17xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER ( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	uint8_t io_r(offs_t offset);
+	void io_w(address_space &space, offs_t offset, uint8_t data);
 
 	auto iord_cb() { return m_iord.bind(); }
 	auto iowr_cb() { return m_iowr.bind(); }

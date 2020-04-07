@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- Thanks to http://z80ne.com for info! -->
+<!--
+license:CC0
+
+Thanks to http://z80ne.com for info!
+-->
 <softwarelist name="z80ne_flop" description="Nuova Elettronica Z80NE floppies">
 
 	<software name="basic55k">

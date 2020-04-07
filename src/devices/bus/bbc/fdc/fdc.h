@@ -33,9 +33,13 @@ public:
 		slot_options(*this);
 		set_default_option(default_option);
 		set_fixed(false);
+		set_insert_rom(true);
 	}
 
 	bbc_fdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+
+	void set_insert_rom(bool insert_rom) { m_insert_rom = insert_rom; }
+	bool insert_rom() { return m_insert_rom; }
 
 	// callbacks
 	auto intrq_wr_callback() { return m_intrq_cb.bind(); }
@@ -56,6 +60,8 @@ protected:
 private:
 	devcb_write_line m_intrq_cb;
 	devcb_write_line m_drq_cb;
+
+	bool m_insert_rom;
 };
 
 

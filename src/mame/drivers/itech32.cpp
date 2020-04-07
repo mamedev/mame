@@ -29,6 +29,7 @@
         * volume controls do not work in the Golden Tee games
         * Driver's Edge accesses many uninitialized RAM locations;
             requires hack to make steering in attract mode work
+        * available PIC dumps aren't hooked up
 
     NOTE: The Japanese World Class Bowling v1.3 set reads the trackball
           at a 45 degree offset from standard orientation. This is NOT a
@@ -2427,6 +2428,9 @@ ROM_START( wcbowl140 )  /* Version 1.40 Tournament (PCB P/N 1083 Rev 2) */
 	ROM_LOAD( "wcbsnd_u88_4.01.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* actually labeled as "WCBSND(U88)4.01" but may be labeled v4.0 */
 	ROM_CONTINUE(                    0x08000, 0x08000 )
 
+	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C54
+	ROM_LOAD( "itbwl-3 1997 it,inc.1996", 0x0000, 0x1fff, CRC(1461cbe0) SHA1(97cc1f985d9c8bbe3fd829681883b6c4ae15c5bd) ) // not hooked up
+
 	ROM_REGION( 0x880000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "wcb_grom0_0_s.grm0_0", 0x000000, 0x080000, CRC(6fcb4246) SHA1(91fb5d18ea9494b08251d1e611c80414df3aad66) )
 	ROM_LOAD32_BYTE( "wcb_grom0_1_s.grm0_1", 0x000001, 0x080000, CRC(2ae31f45) SHA1(85218aa9a7ca7c6870427ffbd08b78255813ff90) )
@@ -2462,6 +2466,9 @@ ROM_START( wcbowl130 )  /* Version 1.30 Tournament (PCB P/N 1083 Rev 2) */
 	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "wcbsnd_u88_4.01.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* actually labeled as "WCBSND(U88)4.01" but may be labeled v4.0 */
 	ROM_CONTINUE(                    0x08000, 0x08000 )
+
+	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C54
+	ROM_LOAD( "itbwl-3 1997 it,inc.1996", 0x0000, 0x1fff, CRC(1461cbe0) SHA1(97cc1f985d9c8bbe3fd829681883b6c4ae15c5bd) ) // not hooked up
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "wcb_grom0_0_s.grm0_0", 0x000000, 0x080000, CRC(6fcb4246) SHA1(91fb5d18ea9494b08251d1e611c80414df3aad66) )
@@ -2499,6 +2506,9 @@ ROM_START( wcbowl ) /* Version 1.66 (PCB P/N 1083 Rev 2) */
 	ROM_LOAD( "wcbsnd_u88_4.01.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* actually labeled as "WCBSND(U88)4.01" but may be labeled v4.0 */
 	ROM_CONTINUE(                    0x08000, 0x08000 )
 
+	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C54
+	ROM_LOAD( "itbwl-3 1997 it,inc.1996", 0x0000, 0x1fff, CRC(1461cbe0) SHA1(97cc1f985d9c8bbe3fd829681883b6c4ae15c5bd) ) // not hooked up
+
 	ROM_REGION( 0x880000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "wcb_grom0_0_s.grm0_0", 0x000000, 0x080000, CRC(6fcb4246) SHA1(91fb5d18ea9494b08251d1e611c80414df3aad66) )
 	ROM_LOAD32_BYTE( "wcb_grom0_1_s.grm0_1", 0x000001, 0x080000, CRC(2ae31f45) SHA1(85218aa9a7ca7c6870427ffbd08b78255813ff90) )
@@ -2530,6 +2540,9 @@ ROM_START( wcbowl165 )  /* Version 1.65 (PCB P/N 1083 Rev 2) */
 	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "wcbsnd_u88_4.01.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* actually labeled as "WCBSND(U88)4.01" but may be labeled v4.0 */
 	ROM_CONTINUE(                    0x08000, 0x08000 )
+
+	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C54
+	ROM_LOAD( "itbwl-3 1997 it,inc.1996", 0x0000, 0x1fff, CRC(1461cbe0) SHA1(97cc1f985d9c8bbe3fd829681883b6c4ae15c5bd) ) // not hooked up
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "wcb_grom0_0_s.grm0_0", 0x000000, 0x080000, CRC(6fcb4246) SHA1(91fb5d18ea9494b08251d1e611c80414df3aad66) )
@@ -2563,6 +2576,9 @@ ROM_START( wcbowl161 )  /* Version 1.61 (PCB P/N 1083 Rev 2) */
 	ROM_LOAD( "wcbsnd_u88_v4.0.u88", 0x10000, 0x18000, CRC(194a51d7) SHA1(c67b042008ff2a2713562d3789e5bc3a312fae17) ) /* Version 4.0, may be labeled "WCBSND U88 V4.0T" */
 	ROM_CONTINUE(                    0x08000, 0x08000 )
 
+	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C54
+	ROM_LOAD( "itbwl-3 1997 it,inc.1996", 0x0000, 0x1fff, CRC(1461cbe0) SHA1(97cc1f985d9c8bbe3fd829681883b6c4ae15c5bd) ) // not hooked up
+
 	ROM_REGION( 0x880000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "wcb_grom0_0_s.grm0_0", 0x000000, 0x080000, CRC(6fcb4246) SHA1(91fb5d18ea9494b08251d1e611c80414df3aad66) )
 	ROM_LOAD32_BYTE( "wcb_grom0_1_s.grm0_1", 0x000001, 0x080000, CRC(2ae31f45) SHA1(85218aa9a7ca7c6870427ffbd08b78255813ff90) )
@@ -2594,6 +2610,9 @@ ROM_START( wcbowl16 )   /* Version 1.6 (PCB P/N 1083 Rev 2), This is the first s
 	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "wcbsnd_u88_v3.0n.u88", 0x10000, 0x18000, CRC(45c4f659) SHA1(cfd140b9947654f677409a0fb4fa0c7b65992f95) ) /* Version 3.0N */
 	ROM_CONTINUE(                     0x08000, 0x08000 )
+
+	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C54
+	ROM_LOAD( "itbwl-3 1997 it,inc.1996", 0x0000, 0x1fff, CRC(1461cbe0) SHA1(97cc1f985d9c8bbe3fd829681883b6c4ae15c5bd) ) // not hooked up
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "wcb_grom0_0_s.grm0_0", 0x000000, 0x080000, CRC(6fcb4246) SHA1(91fb5d18ea9494b08251d1e611c80414df3aad66) )
@@ -3718,6 +3737,9 @@ ROM_START( gt97s121 ) /* Version 1.21S for the 3 tier type PCB with short ROM bo
 	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gtg3_nr_u23_v2.2.u23", 0x10000, 0x18000, CRC(04effd73) SHA1(4277031655f8de851eba0e4134ba619a12f5dd4a) ) /* actually labeled "GTG3 NR(U23) V2.2" */
 	ROM_CONTINUE(                     0x08000, 0x08000 )
+
+	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C54
+	ROM_LOAD( "itgfm-3 1997 it, inc", 0x0000, 0x1fff, CRC(2527dffc) SHA1(e7e1d9f2f813c5770cb0a340e68b700fc5c39991) ) // not hooked up
 
 	ROM_REGION( 0x600000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "gt97_grom0_0.grm0_0", 0x000000, 0x80000, CRC(81784aaf) SHA1(9544ed2087ca5f71c747e3b782513614937a51ed) )

@@ -68,7 +68,7 @@ WRITE16_MEMBER(tigeroad_state::tigeroad_soundcmd_w)
 WRITE8_MEMBER(tigeroad_state::msm5205_w)
 {
 	m_msm->reset_w(BIT(data, 7));
-	m_msm->write_data(data);
+	m_msm->data_w(data);
 	m_msm->vclk_w(1);
 	m_msm->vclk_w(0);
 }

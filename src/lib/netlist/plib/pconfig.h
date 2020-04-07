@@ -81,9 +81,10 @@
 #define PALIGNAS_CACHELINE()    PALIGNAS(PALIGN_CACHELINE)
 #define PALIGNAS_VECTOROPT()    PALIGNAS(PALIGN_VECTOROPT)
 
-// Breaks mame build on windows due to -Wattribute
+// FIXME: Breaks mame build on windows due to -Wattribute
+//        also triggers -Wattribute on ARM
 // FIXME: no error on cross-compile - need further checks
-#if defined(_WIN32) && defined(__GNUC__)
+#if defined(__GNUC__) && (defined(_WIN32) || defined(__arm__) || defined(__ARMEL__))
 #define PALIGNAS(x)
 #else
 #define PALIGNAS(x) alignas(x)

@@ -171,7 +171,7 @@ TILE_GET_INFO_MEMBER(pturn_state::get_tile_info)
 
 	tileno=tile_lookup[tileno>>4]|(tileno&0xf)|(m_fgbank<<8);
 
-	SET_TILE_INFO_MEMBER(0,tileno,m_fgpalette,0);
+	tileinfo.set(0,tileno,m_fgpalette,0);
 }
 
 
@@ -184,7 +184,7 @@ TILE_GET_INFO_MEMBER(pturn_state::get_bg_tile_info)
 	{
 		palno=25;
 	}
-	SET_TILE_INFO_MEMBER(1,tileno+m_bgbank*256,palno,0);
+	tileinfo.set(1,tileno+m_bgbank*256,palno,0);
 }
 
 void pturn_state::video_start()

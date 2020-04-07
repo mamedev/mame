@@ -160,7 +160,7 @@ WRITE8_MEMBER(milton_state::control_w)
 
 	// d5: SP0250 data present
 	if (~m_control & data & 0x20)
-		m_speech->write(space, 0, m_data);
+		m_speech->write(m_data);
 
 	// d1: TMC0430 M
 	// d3: TMC0430 MO

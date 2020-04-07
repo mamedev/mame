@@ -491,10 +491,10 @@ void mm1_state::mm1(machine_config &config)
 	m_mpsc->out_txdrqa_callback().set(FUNC(mm1_state::drq1_w));
 
 	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
-	m_rs232a->cts_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
+	m_rs232a->cts_handler().set(m_mpsc, FUNC(upd7201_device::rxa_w));
 	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
 	RS232_PORT(config, m_rs232c, default_rs232_devices, nullptr);
-	m_rs232c->cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
+	m_rs232c->cts_handler().set(m_mpsc, FUNC(upd7201_device::ctsb_w));
 
 	mm1_keyboard_device &kb(MM1_KEYBOARD(config, KB_TAG, 2500)); // actual KBCLK is 6.144_MHz_XTAL/2/16
 	kb.kbst_wr_callback().set(m_iop, FUNC(i8212_device::stb_w));

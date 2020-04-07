@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="neocd" description="SNK NeoGeo CD CD-ROMs">
 
 	<!-- Most of the images listed are converted from an old TOSEC set and should probably be replaced with TruRip dumps once we can import CCD files -->

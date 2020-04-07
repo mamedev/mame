@@ -559,8 +559,7 @@ void taitob_c_state::realpunc_map(address_map &map)
 	map(0x18c000, 0x18c001).w(FUNC(taitob_c_state::realpunc_output_w));
 	map(0x200000, 0x27ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x280000, 0x281fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x300000, 0x300001).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
-	map(0x300002, 0x300003).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x300000, 0x300003).rw("hd63484", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 //  map(0x320000, 0x320001).nop(); // ?
 	map(0x320002, 0x320003).nopr();
 	map(0x320002, 0x320002).w("tc0140syt", FUNC(tc0140syt_device::master_comm_w));

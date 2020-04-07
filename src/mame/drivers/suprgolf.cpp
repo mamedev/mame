@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
 	int code = m_videoram[tile_index*2]+256*(m_videoram[tile_index*2+1]);
 	int color = m_videoram[tile_index*2+0x800] & 0x7f;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		code,
 		color,
 		0);
@@ -466,12 +466,12 @@ WRITE_LINE_MEMBER(suprgolf_state::adpcm_int)
 	m_toggle ^= 1;
 	if(m_toggle)
 	{
-		m_msm->write_data((m_msm5205next & 0xf0) >> 4);
+		m_msm->data_w((m_msm5205next & 0xf0) >> 4);
 		if(m_msm_nmi_mask) { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 	}
 	else
 	{
-		m_msm->write_data((m_msm5205next & 0x0f) >> 0);
+		m_msm->data_w((m_msm5205next & 0x0f) >> 0);
 	}
 }
 

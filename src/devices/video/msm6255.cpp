@@ -136,7 +136,7 @@ device_memory_interface::space_config_vector msm6255_device::memory_space_config
 //  ir_r -
 //-------------------------------------------------
 
-READ8_MEMBER( msm6255_device::ir_r )
+uint8_t msm6255_device::ir_r()
 {
 	return m_ir;
 }
@@ -146,7 +146,7 @@ READ8_MEMBER( msm6255_device::ir_r )
 //  ir_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( msm6255_device::ir_w )
+void msm6255_device::ir_w(uint8_t data)
 {
 	m_ir = data & 0x0f;
 }
@@ -156,7 +156,7 @@ WRITE8_MEMBER( msm6255_device::ir_w )
 //  dr_r -
 //-------------------------------------------------
 
-READ8_MEMBER( msm6255_device::dr_r )
+uint8_t msm6255_device::dr_r()
 {
 	uint8_t data = 0;
 
@@ -205,7 +205,7 @@ READ8_MEMBER( msm6255_device::dr_r )
 //  dr_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( msm6255_device::dr_w )
+void msm6255_device::dr_w(uint8_t data)
 {
 	switch (m_ir)
 	{

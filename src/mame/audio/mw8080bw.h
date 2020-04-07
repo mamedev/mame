@@ -14,6 +14,7 @@
 #include "sound/discrete.h"
 #include "sound/samples.h"
 #include "sound/sn76477.h"
+#include "machine/netlist.h"
 
 
 class midway_tone_generator_device_base : public device_t
@@ -58,7 +59,10 @@ protected:
 	virtual void device_start() override;
 
 private:
-	required_device_array<samples_device, 2> m_samples;
+	required_device<netlist_mame_logic_input_device> m_left_shot;
+	required_device<netlist_mame_logic_input_device> m_right_shot;
+	required_device<netlist_mame_logic_input_device> m_left_hit;
+	required_device<netlist_mame_logic_input_device> m_right_hit;
 };
 
 

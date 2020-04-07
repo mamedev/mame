@@ -40,18 +40,20 @@ public:
 	void rad_crik(machine_config &config);
 	void non_spg_base(machine_config &config);
 	void abltenni(machine_config &config);
+	void comil(machine_config &config);
 	void tvsprt10(machine_config &config);
 	void guitarfv(machine_config &config);
 	void tmntmutm(machine_config &config);
 
 
 	void init_crc();
-	void init_wiwi18();
 	void init_tvsprt10();
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	void decrypt_ac_ff(uint16_t* ROM, int size);
 
 	void switch_bank(uint32_t bank);
 
@@ -105,19 +107,97 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
+class spg2xx_game_comil_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_comil_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_porta_data(0),
+		m_extra_in(*this, "EXTRA%u", 0U)
+	{ }
+
+	void comil(machine_config &config);
+
+private:
+	DECLARE_READ16_MEMBER(porta_r);
+	DECLARE_WRITE16_MEMBER(porta_w) override;
+	DECLARE_READ16_MEMBER(portb_r);
+	uint16_t m_porta_data;
+	required_ioport_array<8> m_extra_in;
+};
+
+class spg2xx_game_swclone_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_swclone_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_porta_data(0),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+	void swclone(machine_config &config);
+	void init_swclone();
+
+private:
+	DECLARE_READ16_MEMBER(porta_r);
+	DECLARE_WRITE16_MEMBER(porta_w) override;
+	uint16_t m_porta_data;
+
+	required_device<i2cmem_device> m_i2cmem;
+};
+
+class spg2xx_game_tmntmutm_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_tmntmutm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+	void tmntmutm(machine_config &config);
+
+private:
+	DECLARE_READ16_MEMBER(guny_r);
+	DECLARE_READ16_MEMBER(gunx_r);
+
+	required_device<i2cmem_device> m_i2cmem;
+};
+
+class spg2xx_game_albkickb_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_albkickb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void ablkickb(machine_config &config);
+
+	void init_ablkickb();
+
+private:
+	DECLARE_READ16_MEMBER(portb_r);
+};
+
 class spg2xx_game_dreamlss_state : public spg2xx_game_state
 {
 public:
 	spg2xx_game_dreamlss_state(const machine_config &mconfig, device_type type, const char *tag) :
 		spg2xx_game_state(mconfig, type, tag),
+		m_porta_data(0),
+		m_portb_data(0),
 		m_i2cmem(*this, "i2cmem")
 	{ }
 
 	void dreamlss(machine_config &config);
 
 private:
+	uint16_t m_porta_data;
+	uint16_t m_portb_data;
+
+	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
 	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
 
 	required_device<i2cmem_device> m_i2cmem;
 };

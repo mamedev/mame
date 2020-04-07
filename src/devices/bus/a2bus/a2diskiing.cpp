@@ -117,7 +117,8 @@ a2bus_diskiing13_device::a2bus_diskiing13_device(const machine_config &mconfig, 
 }
 
 a2bus_applesurance_device::a2bus_applesurance_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	diskiing_device(mconfig, A2BUS_APPLESURANCE, tag, owner, clock)
+	diskiing_device(mconfig, A2BUS_APPLESURANCE, tag, owner, clock),
+	m_c800_bank(1)
 {
 }
 
@@ -170,5 +171,21 @@ uint8_t a2bus_applesurance_device::read_cnxx(uint8_t offset)
 
 uint8_t a2bus_applesurance_device::read_c800(uint16_t offset)
 {
+	if (offset == 0x7ff)
+	{
+		m_c800_bank = 1;
+	}
+
+	if (!m_c800_bank)
+	{
+		return m_rom[offset];
+	}
+
 	return m_rom[offset+0x800];
+}
+
+void a2bus_applesurance_device::device_reset()
+{
+	m_c800_bank = 1;
+	diskiing_device::device_reset();
 }

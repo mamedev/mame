@@ -67,6 +67,8 @@ The MM V prototype was the program that Ed Schroeder participated with as "Rebel
 1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
 http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
 
+MM VI (Saitek, 1994) is on different hardware, H8 CPU.
+
 
 TODO:
 - need to emulate TurboKit properly, also for mm5p (it's not as simple as a CPU
@@ -468,16 +470,6 @@ void mephisto_state::mm2(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( rebel5 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("rebel5_v2.rom", 0x8000, 0x8000, CRC(17232752) SHA1(3cd6893c0071f3dc02785bf99f1950eed81eba39) )
-ROM_END
-
-ROM_START( rebel5a )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("rebell_5.12.86", 0x8000, 0x8000, CRC(8d02e1ef) SHA1(9972c75936613bd68cfd3fe62bd222e90e8b1083) )
-ROM_END
-
 ROM_START( mm2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("400", 0x8000, 0x8000, CRC(e8c1f431) SHA1(c32dfa66eefbf3e539438d2fe6e6916f78a128be) ) // HN27C256G-20
@@ -506,6 +498,7 @@ ROM_START( mm2d )
 	ROM_LOAD("mm2_v1_2.bin", 0xc000, 0x4000, CRC(01143cc1) SHA1(f78474b410dbecb209aa23ef81e9f894e8b54942) )
 ROM_END
 
+
 ROM_START( bup )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("bup_v2_1.bin", 0x8000, 0x4000, CRC(e1e9625a) SHA1(8a757e28b7afca2a092f8ff419087e06b07b743e) )
@@ -517,6 +510,18 @@ ROM_START( bupa )
 	ROM_LOAD("bup_v1_1.bin", 0x8000, 0x4000, CRC(e1e9625a) SHA1(8a757e28b7afca2a092f8ff419087e06b07b743e) )
 	ROM_LOAD("bup_v1_2.bin", 0xc000, 0x4000, CRC(708338ea) SHA1(d617c4aa2161865a22b4b0646ba793f8a1fda863) )
 ROM_END
+
+
+ROM_START( rebel5 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rebel5_v2.rom", 0x8000, 0x8000, CRC(17232752) SHA1(3cd6893c0071f3dc02785bf99f1950eed81eba39) )
+ROM_END
+
+ROM_START( rebel5a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rebell_5.12.86", 0x8000, 0x8000, CRC(8d02e1ef) SHA1(9972c75936613bd68cfd3fe62bd222e90e8b1083) )
+ROM_END
+
 
 ROM_START( mm4 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -537,6 +542,7 @@ ROM_START( mm4tk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("mm4tk.rom", 0x8000, 0x8000, CRC(51cb36a4) SHA1(9e184b4e85bb721e794b88d8657ae8d2ff5a24af) )
 ROM_END
+
 
 ROM_START( mm5 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -570,7 +576,7 @@ CONS( 1984, mm2d,    mm2,    0,      mm2,      mephisto, mephisto_state, empty_i
 CONS( 1985, bup,     0,      0,      bup,      bup,      mephisto_state, empty_init, "Hegener + Glaser", "Mephisto Blitz- und Problemloesungs-Modul (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, bupa,    bup,    0,      bup,      bup,      mephisto_state, empty_init, "Hegener + Glaser", "Mephisto Blitz- und Problemloesungs-Modul (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1986, rebel5,  0,      0,      rebel5,   mephisto, mephisto_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, rebel5,  0,      0,      rebel5,   mephisto, mephisto_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka MM III
 CONS( 1986, rebel5a, rebel5, 0,      rebel5,   mephisto, mephisto_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1987, mm4,     0,      0,      mm4,      mephisto, mephisto_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v7.10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

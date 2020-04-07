@@ -60,7 +60,6 @@
           (Addendum - all known issues seem to be correct - see Sprite Priority Notes below).
         * There may be some kind of fullscreen palette effect (controlled by bit 3 in priority
           word - used at end of each level, and on final boss).
-        * A shadow effect (used in level 1) is not implemented.
         * ACE Chip aren't fully emulated.
 
     Sprite Priority Notes:
@@ -92,7 +91,6 @@
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "screen.h"
 #include "speaker.h"
 
 #define MAIN_XTAL XTAL(28'000'000)
@@ -118,7 +116,6 @@ WRITE16_MEMBER( boogwing_state::boogwing_protection_region_0_104_w )
 WRITE16_MEMBER( boogwing_state::priority_w )
 {
 	COMBINE_DATA(&m_priority);
-	m_deco_ace->set_palette_effect_max((m_priority & 0x8) ? 0x6ff : 0xfff);
 }
 
 
@@ -290,7 +287,7 @@ static const gfx_layout tile_16x16_layout =
 
 
 static GFXDECODE_START( gfx_boogwing )
-	GFXDECODE_ENTRY( "tiles1",   0, tile_8x8_layout,            0, 16 ) /* Tiles (8x8) */
+	GFXDECODE_ENTRY( "tiles1",   0, tile_8x8_layout,        0x800, 16 ) /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "tiles2",   0, tile_16x16_layout_5bpp, 0x100, 16 ) /* Tiles (16x16) */
 	GFXDECODE_ENTRY( "tiles3",   0, tile_16x16_layout,      0x300, 32 ) /* Tiles (16x16) */
 	GFXDECODE_ENTRY( "sprites1", 0, tile_16x16_layout,      0x500, 32 ) /* Sprites (16x16) */
@@ -339,9 +336,9 @@ void boogwing_state::boogwing(machine_config &config)
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MAIN_XTAL / 4, 442, 0, 320, 274, 8, 248); // same as robocop2(cninja.cpp)? verify this from real pcb.
-	screen.set_screen_update(FUNC(boogwing_state::screen_update_boogwing));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_XTAL / 4, 442, 0, 320, 274, 8, 248); // same as robocop2(cninja.cpp)? verify this from real pcb.
+	m_screen->set_screen_update(FUNC(boogwing_state::screen_update_boogwing));
 
 	GFXDECODE(config, "gfxdecode", m_deco_ace, gfx_boogwing);
 
@@ -353,8 +350,6 @@ void boogwing_state::boogwing(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x1f);  // pf2 has 5bpp graphics
 	m_deco_tilegen[0]->set_pf1_col_bank(0);
 	m_deco_tilegen[0]->set_pf2_col_bank(0);   // pf2 is non default
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -368,8 +363,6 @@ void boogwing_state::boogwing(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0);
 	m_deco_tilegen[1]->set_pf2_col_bank(16);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);

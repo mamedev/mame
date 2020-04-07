@@ -41,13 +41,13 @@ public:
 	auto data() { return m_data_cb.bind(); }
 	auto romclk() { return m_romclk_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER( ctl_w );
-	DECLARE_READ8_MEMBER( ctl_r );
-	DECLARE_WRITE_LINE_MEMBER( pdc_w );
+	void ctl_w(uint8_t data);
+	uint8_t ctl_r();
+	void pdc_w(int state);
 
-	// this is only used by cvs.c
+	// this is only used by cvs.cpp
 	// it is not related at all to the speech generation and conflicts with the new ROM controller interface.
-	DECLARE_READ_LINE_MEMBER( romclk_hack_r );
+	int romclk_hack_r();
 
 protected:
 	tms5110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant);
@@ -238,7 +238,7 @@ class m58817_device : public tms5110_device
 public:
 	m58817_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( status_r );
+	uint8_t status_r();
 };
 
 
@@ -273,13 +273,13 @@ public:
 	auto pdc() { return m_pdc_cb.bind(); }
 	auto ctl() { return m_ctl_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( m0_w );
-	DECLARE_READ_LINE_MEMBER( data_r );
+	void m0_w(int state);
+	int data_r();
 
 	/* offset is rom # */
-	DECLARE_WRITE8_MEMBER( rom_csq_w );
-	DECLARE_WRITE8_MEMBER( bit_w );
-	DECLARE_WRITE_LINE_MEMBER( enable_w );
+	void rom_csq_w(offs_t offset, uint8_t data);
+	void bit_w(uint8_t data);
+	void enable_w(int state);
 
 protected:
 	// device-level overrides

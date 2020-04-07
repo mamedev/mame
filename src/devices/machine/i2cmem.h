@@ -59,7 +59,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -70,6 +69,7 @@ protected:
 	int address_mask();
 	int select_device();
 	int data_offset();
+	bool skip_addresshigh() const { return m_data_size <= 0x800; }
 
 	optional_memory_region m_region;
 
@@ -89,11 +89,11 @@ protected:
 	int m_bits;
 	int m_shift;
 	int m_devsel;
+	int m_addresshigh;
 	int m_byteaddr;
 	std::vector<uint8_t> m_page;
 	int m_page_offset;
 	int m_page_written_size;
-	bool m_in_write;
 };
 
 #define DECLARE_I2C_DEVICE(name) \
@@ -106,6 +106,7 @@ protected:
 DECLARE_I2C_DEVICE(x2404p)
 DECLARE_I2C_DEVICE(24c01)
 DECLARE_I2C_DEVICE(24c02)
+DECLARE_I2C_DEVICE(24c04)
 DECLARE_I2C_DEVICE(24c08)
 DECLARE_I2C_DEVICE(24c16);
 DECLARE_I2C_DEVICE(24c16a);
@@ -116,6 +117,7 @@ DECLARE_DEVICE_TYPE(I2CMEM,     i2cmem_device)
 DECLARE_DEVICE_TYPE(I2C_X2404P, i2c_x2404p_device)
 DECLARE_DEVICE_TYPE(I2C_24C01,  i2c_24c01_device)
 DECLARE_DEVICE_TYPE(I2C_24C02,  i2c_24c02_device)
+DECLARE_DEVICE_TYPE(I2C_24C04,  i2c_24c04_device)
 DECLARE_DEVICE_TYPE(I2C_24C08,  i2c_24c08_device)
 DECLARE_DEVICE_TYPE(I2C_24C16,  i2c_24c16_device)
 DECLARE_DEVICE_TYPE(I2C_24C16A, i2c_24c16a_device)

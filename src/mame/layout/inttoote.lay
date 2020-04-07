@@ -1,5 +1,9 @@
 <?xml version="1.0" ?>
-<!-- International Toote -->
+<!--
+license:CC0
+
+International Toote
+-->
 <mamelayout version="2">
 
   <element name="keyboard_outer">

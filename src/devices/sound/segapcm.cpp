@@ -146,14 +146,14 @@ void segapcm_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 }
 
 
-WRITE8_MEMBER( segapcm_device::sega_pcm_w )
+void segapcm_device::write(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 	m_ram[offset & 0x07ff] = data;
 }
 
 
-READ8_MEMBER( segapcm_device::sega_pcm_r )
+uint8_t segapcm_device::read(offs_t offset)
 {
 	m_stream->update();
 	return m_ram[offset & 0x07ff];

@@ -21,7 +21,7 @@
 TILE_GET_INFO_MEMBER(srumbler_state::get_fg_tile_info)
 {
 	uint8_t attr = m_foregroundram[2*tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_foregroundram[2*tile_index + 1] + ((attr & 0x03) << 8),
 			(attr & 0x3c) >> 2,
 			(attr & 0x40) ? TILE_FORCE_LAYER0 : 0);
@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(srumbler_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(srumbler_state::get_bg_tile_info)
 {
 	uint8_t attr = m_backgroundram[2*tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_backgroundram[2*tile_index + 1] + ((attr & 0x07) << 8),
 			(attr & 0xe0) >> 5,
 			((attr & 0x08) ? TILE_FLIPY : 0));

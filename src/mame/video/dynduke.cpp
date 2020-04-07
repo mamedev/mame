@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_bg_tile_info)
 
 	tile=tile&0xfff;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile+m_back_bankbase,
 			color,
 			0);
@@ -45,7 +45,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_fg_tile_info)
 
 	tile=tile&0xfff;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile+m_fore_bankbase,
 			color,
 			0);
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_tx_tile_info)
 
 	tile = (tile & 0xff) | ((tile & 0xc000) >> 6);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);

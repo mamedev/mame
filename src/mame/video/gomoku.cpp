@@ -20,7 +20,7 @@
 
 ******************************************************************************/
 
-void gomoku_state::gomoku_palette(palette_device &palette) const
+void gomoku_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -63,35 +63,30 @@ TILE_GET_INFO_MEMBER(gomoku_state::get_fg_tile_info)
 	int color = (attr& 0x0f);
 	int flipyx = (attr & 0xc0) >> 6;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			color,
 			TILE_FLIPYX(flipyx));
 }
 
-WRITE8_MEMBER(gomoku_state::gomoku_videoram_w)
+void gomoku_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gomoku_state::gomoku_colorram_w)
+void gomoku_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gomoku_state::gomoku_bgram_w)
-{
-	m_bgram[offset] = data;
-}
-
-WRITE_LINE_MEMBER(gomoku_state::flipscreen_w)
+void gomoku_state::flipscreen_w(int state)
 {
 	m_flipscreen = state ? 0 : 1;
 }
 
-WRITE_LINE_MEMBER(gomoku_state::bg_dispsw_w)
+void gomoku_state::bg_dispsw_w(int state)
 {
 	m_bg_dispsw = state ? 0 : 1;
 }
@@ -105,30 +100,23 @@ WRITE_LINE_MEMBER(gomoku_state::bg_dispsw_w)
 
 void gomoku_state::video_start()
 {
-	uint8_t *GOMOKU_BG_X = memregion( "user1" )->base();
-	uint8_t *GOMOKU_BG_Y = memregion( "user2" )->base();
-	uint8_t *GOMOKU_BG_D = memregion( "user3" )->base();
-	int x, y;
-	int bgdata;
-	int color;
-
 	m_screen->register_screen_bitmap(m_bg_bitmap);
 
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gomoku_state::get_fg_tile_info)),TILEMAP_SCAN_ROWS,8,8,32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 
-	/* make background bitmap */
+	// make background bitmap
 	m_bg_bitmap.fill(0x20);
 
 	// board
-	for (y = 0; y < 256; y++)
+	for (int y = 0; y < 256; y++)
 	{
-		for (x = 0; x < 256; x++)
+		for (int x = 0; x < 256; x++)
 		{
-			bgdata = GOMOKU_BG_D[ GOMOKU_BG_X[x] + (GOMOKU_BG_Y[y] << 4) ];
+			int bgdata = m_bg_d[m_bg_x[x] + (m_bg_y[y] << 4)];
 
-			color = 0x20;                       // outside frame (black)
+			int color = 0x20;                       // outside frame (black)
 
 			if (bgdata & 0x01) color = 0x21;    // board (brown)
 			if (bgdata & 0x02) color = 0x20;    // frame line (while)
@@ -136,6 +124,9 @@ void gomoku_state::video_start()
 			m_bg_bitmap.pix16((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
 		}
 	}
+
+	save_item(NAME(m_flipscreen)); // set but never used?
+	save_item(NAME(m_bg_dispsw));
 }
 
 
@@ -145,32 +136,25 @@ void gomoku_state::video_start()
 
 ******************************************************************************/
 
-uint32_t gomoku_state::screen_update_gomoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gomoku_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *GOMOKU_BG_X = memregion( "user1" )->base();
-	uint8_t *GOMOKU_BG_Y = memregion( "user2" )->base();
-	uint8_t *GOMOKU_BG_D = memregion( "user3" )->base();
-	int x, y;
-	int bgram;
-	int bgoffs;
-	int bgdata;
 	int color;
 
-	/* draw background layer */
+	// draw background layer
 	if (m_bg_dispsw)
 	{
-		/* copy bg bitmap */
+		// copy bg bitmap
 		copybitmap(bitmap, m_bg_bitmap, 0, 0, 0, 0, cliprect);
 
 		// stone
-		for (y = 0; y < 256; y++)
+		for (int y = 0; y < 256; y++)
 		{
-			for (x = 0; x < 256; x++)
+			for (int x = 0; x < 256; x++)
 			{
-				bgoffs = ((((255 - x - 2) / 14) | (((255 - y - 10) / 14) << 4)) & 0xff);
+				int bgoffs = ((((255 - x - 2) / 14) | (((255 - y - 10) / 14) << 4)) & 0xff);
 
-				bgdata = GOMOKU_BG_D[ GOMOKU_BG_X[x] + (GOMOKU_BG_Y[y] << 4) ];
-				bgram = m_bgram[bgoffs];
+				int bgdata = m_bg_d[m_bg_x[x] + (m_bg_y[y] << 4) ];
+				int bgram = m_bgram[bgoffs];
 
 				if (bgdata & 0x04)
 				{
@@ -191,20 +175,20 @@ uint32_t gomoku_state::screen_update_gomoku(screen_device &screen, bitmap_ind16 
 		}
 
 		// cursor
-		for (y = 0; y < 256; y++)
+		for (int y = 0; y < 256; y++)
 		{
-			for (x = 0; x < 256; x++)
+			for (int x = 0; x < 256; x++)
 			{
-				bgoffs = ((((255 - x - 2) / 14) | (((255 - y - 10) / 14) << 4)) & 0xff);
+				int bgoffs = ((((255 - x - 2) / 14) | (((255 - y - 10) / 14) << 4)) & 0xff);
 
-				bgdata = GOMOKU_BG_D[ GOMOKU_BG_X[x] + (GOMOKU_BG_Y[y] << 4) ];
-				bgram = m_bgram[bgoffs];
+				int bgdata = m_bg_d[m_bg_x[x] + (m_bg_y[y] << 4) ];
+				int bgram = m_bgram[bgoffs];
 
 				if (bgdata & 0x08)
 				{
 					if (bgram & 0x04)
 					{
-							color = 0x2f;   // cursor (black)
+						color = 0x2f;   // cursor (black)
 					}
 					else if (bgram & 0x08)
 					{

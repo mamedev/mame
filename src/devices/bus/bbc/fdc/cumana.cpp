@@ -22,14 +22,14 @@ DEFINE_DEVICE_TYPE(BBC_CUMANA2, bbc_cumana2_device, "bbc_cumana2", "Cumana QFS I
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( cumana )
+//  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER( bbc_cumanafdc_device::floppy_formats )
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_FSD_FORMAT
-FLOPPY_FORMATS_END0
+FLOPPY_FORMATS_END
 
 static void bbc_floppies_525(device_slot_interface &device)
 {
@@ -39,6 +39,10 @@ static void bbc_floppies_525(device_slot_interface &device)
 	device.option_add("525dd",   FLOPPY_525_DD);
 	device.option_add("525qd",   FLOPPY_525_QD);
 }
+
+//-------------------------------------------------
+//  ROM( cumana )
+//-------------------------------------------------
 
 ROM_START( cumana1 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
@@ -192,7 +196,7 @@ void bbc_cumanafdc_device::write(offs_t offset, uint8_t data)
 			m_fdc->dden_w(BIT(data, 2));
 		}
 		// bit 3: reset
-		if (BIT(data, 3)) m_fdc->soft_reset();
+		m_fdc->mr_w(!BIT(data, 3));
 
 		// bit 4: interrupt enable
 		m_fdc_ie = BIT(data, 4);

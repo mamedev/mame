@@ -52,8 +52,6 @@ public:
 protected:
 	// handlers
 	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(mcu_switch_w);
-	DECLARE_WRITE_LINE_MEMBER(mcu_start_w);
 	DECLARE_READ8_MEMBER(champbja_protection_r);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);

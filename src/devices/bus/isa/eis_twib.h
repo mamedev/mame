@@ -27,7 +27,7 @@ protected:
 	virtual void device_reset() override;
 
 	// devices
-	required_device<i8274_new_device> m_uart8274;
+	required_device<i8274_device> m_uart8274;
 	required_device<sdlc_logger_device> m_sdlclogger;
 
 	// optional information overrides

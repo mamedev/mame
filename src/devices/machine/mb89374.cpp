@@ -269,7 +269,7 @@ void mb89374_device::execute_run()
 //  read - handler for register reading
 //-------------------------------------------------
 
-READ8_MEMBER(mb89374_device::read)
+uint8_t mb89374_device::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 	switch (offset & 0x1f)
@@ -306,7 +306,7 @@ READ8_MEMBER(mb89374_device::read)
 //  write - handler for register writing
 //-------------------------------------------------
 
-WRITE8_MEMBER(mb89374_device::write)
+void mb89374_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x1f)
 	{
@@ -365,7 +365,7 @@ WRITE8_MEMBER(mb89374_device::write)
 //  pi0_w - handler for RxCI#/PI0
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(mb89374_device::pi0_w)
+void mb89374_device::pi0_w(int state)
 {
 	m_pi[0] = state;
 }
@@ -375,7 +375,7 @@ WRITE_LINE_MEMBER(mb89374_device::pi0_w)
 //  pi1_w - handler for TxCI#/PI1
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(mb89374_device::pi1_w)
+void mb89374_device::pi1_w(int state)
 {
 	m_pi[1] = state;
 }
@@ -385,7 +385,7 @@ WRITE_LINE_MEMBER(mb89374_device::pi1_w)
 //  pi2_w - handler for TxDACK#/PI2
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(mb89374_device::pi2_w)
+void mb89374_device::pi2_w(int state)
 {
 	m_pi[2] = state;
 }
@@ -395,7 +395,7 @@ WRITE_LINE_MEMBER(mb89374_device::pi2_w)
 //  pi3_w - handler for RxDACK#/PI3
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(mb89374_device::pi3_w)
+void mb89374_device::pi3_w(int state)
 {
 	m_pi[3] = state;
 }
@@ -405,7 +405,7 @@ WRITE_LINE_MEMBER(mb89374_device::pi3_w)
 //  ci_w - handler for TxLAST#/CI#
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(mb89374_device::ci_w)
+void mb89374_device::ci_w(int state)
 {
 	m_ci = state;
 	if (m_ci == 1 && m_pi[2] == 0)
@@ -420,7 +420,7 @@ WRITE_LINE_MEMBER(mb89374_device::ci_w)
 //  read - handler for dma reading (rx buffer)
 //-------------------------------------------------
 
-READ8_MEMBER(mb89374_device::dma_r)
+uint8_t mb89374_device::dma_r()
 {
 	uint8_t data = rxRead();
 	if (m_rx_offset == m_rx_length)
@@ -433,7 +433,7 @@ READ8_MEMBER(mb89374_device::dma_r)
 //  write - handler for dma writing (tx buffer)
 //-------------------------------------------------
 
-WRITE8_MEMBER(mb89374_device::dma_w)
+void mb89374_device::dma_w(uint8_t data)
 {
 	txWrite(data);
 }

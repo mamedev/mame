@@ -46,8 +46,8 @@ public:
 	auto ios_cb() { return m_ios_cb.bind(); }
 
 	// bus-compatible interface
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	te7750_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

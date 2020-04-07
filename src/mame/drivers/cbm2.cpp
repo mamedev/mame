@@ -1785,7 +1785,7 @@ READ8_MEMBER( cbm2_state::cia_pa_r )
 	uint8_t data = 0;
 
 	// IEEE-488
-	data |= m_ieee1->read(space, 0);
+	data |= m_ieee1->read();
 
 	// user port
 	data &= m_user->d1_r();
@@ -1815,7 +1815,7 @@ WRITE8_MEMBER( cbm2_state::cia_pa_w )
 	*/
 
 	// IEEE-488
-	m_ieee1->write(space, 0, data);
+	m_ieee1->write(data);
 
 	// user port
 	m_user->d1_w(data);

@@ -36,7 +36,7 @@
 #include "machine/ram.h"
 #include "machine/victor9k_kb.h"
 #include "machine/victor9k_fdc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "sound/hc55516.h"
 #include "video/mc6845.h"
 #include "emupal.h"
@@ -131,8 +131,6 @@ private:
 
 	DECLARE_WRITE8_MEMBER( via2_pa_w );
 	DECLARE_WRITE8_MEMBER( via2_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( write_ria );
-	DECLARE_WRITE_LINE_MEMBER( write_rib );
 	DECLARE_WRITE_LINE_MEMBER( via2_irq_w );
 
 	DECLARE_WRITE8_MEMBER( via3_pb_w );
@@ -518,20 +516,6 @@ WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
 }
 
 
-WRITE_LINE_MEMBER( victor9k_state::write_ria )
-{
-	m_upd7201->ria_w(state);
-	m_via2->write_pa2(state);
-}
-
-
-WRITE_LINE_MEMBER( victor9k_state::write_rib )
-{
-	m_upd7201->rib_w(state);
-	m_via2->write_pa4(state);
-}
-
-
 /*
     bit    description
 
@@ -769,18 +753,18 @@ void victor9k_state::victor9k(machine_config &config)
 	m_centronics->select_handler().set(M6522_1_TAG, FUNC(via6522_device::write_pb7));
 
 	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
-	m_rs232a->rxd_handler().set(UPD7201_TAG, FUNC(z80dart_device::rxa_w));
-	m_rs232a->dcd_handler().set(UPD7201_TAG, FUNC(z80dart_device::dcda_w));
-	m_rs232a->ri_handler().set(FUNC(victor9k_state::write_ria));
-	m_rs232a->cts_handler().set(UPD7201_TAG, FUNC(z80dart_device::ctsa_w));
-	m_rs232a->dsr_handler().set(M6522_2_TAG, FUNC(via6522_device::write_pa3));
+	m_rs232a->rxd_handler().set(m_upd7201, FUNC(upd7201_device::rxa_w));
+	m_rs232a->dcd_handler().set(m_upd7201, FUNC(upd7201_device::dcda_w));
+	m_rs232a->ri_handler().set(m_via2, FUNC(via6522_device::write_pa2));
+	m_rs232a->cts_handler().set(m_upd7201, FUNC(upd7201_device::ctsa_w));
+	m_rs232a->dsr_handler().set(m_via2, FUNC(via6522_device::write_pa3));
 
 	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
-	m_rs232b->rxd_handler().set(UPD7201_TAG, FUNC(z80dart_device::rxb_w));
-	m_rs232b->dcd_handler().set(UPD7201_TAG, FUNC(z80dart_device::dcdb_w));
-	m_rs232b->ri_handler().set(FUNC(victor9k_state::write_ria));
-	m_rs232b->cts_handler().set(UPD7201_TAG, FUNC(z80dart_device::ctsb_w));
-	m_rs232b->dsr_handler().set(M6522_2_TAG, FUNC(via6522_device::write_pa5));
+	m_rs232b->rxd_handler().set(m_upd7201, FUNC(upd7201_device::rxb_w));
+	m_rs232b->dcd_handler().set(m_upd7201, FUNC(upd7201_device::dcdb_w));
+	m_rs232b->ri_handler().set(m_via2, FUNC(via6522_device::write_pa4));
+	m_rs232b->cts_handler().set(m_upd7201, FUNC(upd7201_device::ctsb_w));
+	m_rs232b->dsr_handler().set(m_via2, FUNC(via6522_device::write_pa5));
 
 	VICTOR9K_KEYBOARD(config, m_kb, 0);
 	m_kb->kbrdy_handler().set(FUNC(victor9k_state::kbrdy_w));

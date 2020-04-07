@@ -6,10 +6,10 @@
 #include "includes/spg2xx.h"
 
 
-class spg2xx_game_mysprtch_state : public spg2xx_game_state
+class spg2xx_game_mysprt_plus_state : public spg2xx_game_state
 {
 public:
-	spg2xx_game_mysprtch_state(const machine_config& mconfig, device_type type, const char* tag) :
+	spg2xx_game_mysprt_plus_state(const machine_config& mconfig, device_type type, const char* tag) :
 		spg2xx_game_state(mconfig, type, tag),
 		m_romregion(*this, "maincpu")
 	{ }
@@ -23,6 +23,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_post_load() override;
 
 	void mem_map_mysprtch(address_map& map);
 
@@ -39,11 +40,11 @@ private:
 	required_region_ptr<uint16_t> m_romregion;
 };
 
-class spg2xx_game_mysprtch24_state : public spg2xx_game_mysprtch_state
+class spg2xx_game_mysprt_orig_state : public spg2xx_game_mysprt_plus_state
 {
 public:
-	spg2xx_game_mysprtch24_state(const machine_config& mconfig, device_type type, const char* tag) :
-		spg2xx_game_mysprtch_state(mconfig, type, tag)
+	spg2xx_game_mysprt_orig_state(const machine_config& mconfig, device_type type, const char* tag) :
+		spg2xx_game_mysprt_plus_state(mconfig, type, tag)
 	{ }
 
 protected:
@@ -53,20 +54,25 @@ protected:
 private:
 };
 
+void spg2xx_game_mysprt_plus_state::device_post_load()
+{
+	// load state can change the bank, so we must invalide cache
+	m_maincpu->invalidate_cache();
+}
 
 
-READ16_MEMBER(spg2xx_game_mysprtch_state::mysprtch_rom_r)
+READ16_MEMBER(spg2xx_game_mysprt_plus_state::mysprtch_rom_r)
 {
 	// due to granularity of rom bank this manual method is safer
 	return m_romregion[(offset + (m_mysprtch_rombase * 0x200000)) & (m_romsize-1)];
 }
 
-void spg2xx_game_mysprtch_state::mem_map_mysprtch(address_map &map)
+void spg2xx_game_mysprt_plus_state::mem_map_mysprtch(address_map &map)
 {
-	map(0x000000, 0x3fffff).r(FUNC(spg2xx_game_mysprtch_state::mysprtch_rom_r));
+	map(0x000000, 0x3fffff).r(FUNC(spg2xx_game_mysprt_plus_state::mysprtch_rom_r));
 }
 
-void spg2xx_game_mysprtch_state::machine_start()
+void spg2xx_game_mysprt_plus_state::machine_start()
 {
 	spg2xx_game_state::machine_start();
 
@@ -77,7 +83,7 @@ void spg2xx_game_mysprtch_state::machine_start()
 	save_item(NAME(m_bank_enabled));
 }
 
-void spg2xx_game_mysprtch_state::machine_reset()
+void spg2xx_game_mysprt_plus_state::machine_reset()
 {
 	spg2xx_game_state::machine_reset();
 
@@ -89,7 +95,7 @@ void spg2xx_game_mysprtch_state::machine_reset()
 	m_maincpu->reset();
 }
 
-void spg2xx_game_mysprtch24_state::machine_reset()
+void spg2xx_game_mysprt_orig_state::machine_reset()
 {
 	spg2xx_game_state::machine_reset();
 
@@ -237,11 +243,89 @@ static INPUT_PORTS_START( mgt20in1 ) // this seems to expect rotated controls by
 INPUT_PORTS_END
 
 
-WRITE16_MEMBER(spg2xx_game_mysprtch_state::porta_w)
+WRITE16_MEMBER(spg2xx_game_mysprt_orig_state::porta_w)
 {
-	logerror("%s: porta_w %04x\n", machine().describe_context(), data);
+	// this seems like nice clean logic, based on writes and how the port direction is set,
+	// mysprtch and mysptqvc work fine with this logic, but mysprtcp is more problematic, especially in test mode, see other function
 
-	// this is rather ugly guesswork based on use and testmode
+	logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+		(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+		(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+		(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+		(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+		(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+		(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+		(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+		(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+		(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+		(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+		(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+		(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+		(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+		(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+	int oldrombank = m_mysprtch_rombase;
+
+	if (mem_mask & 0x0400)
+	{
+		if (data & 0x0400)
+			m_mysprtch_rombase |= 1;
+		else
+			m_mysprtch_rombase &= ~1;
+	}
+
+	if (mem_mask & 0x0800)
+	{
+		if (data & 0x0800)
+			m_mysprtch_rombase |= 2;
+		else
+			m_mysprtch_rombase &= ~2;
+	}
+
+	if (mem_mask & 0x0200)
+	{
+		if (data & 0x0200)
+			m_mysprtch_rombase &= ~4; // inverted
+		else
+			m_mysprtch_rombase |= 4;
+	}
+
+	if (oldrombank != m_mysprtch_rombase)
+		m_maincpu->invalidate_cache();
+
+	m_prev_porta = data;
+}
+
+
+
+
+WRITE16_MEMBER(spg2xx_game_mysprt_plus_state::porta_w)
+{
+	// this is very ugly guesswork based on use and testmode
+	// what is even more problematic here is that mysprtcp has mem_mask as 0x0000, ie all ports are set to INPUT mode?! so we can't use mem_mask to
+	// see if a port is active.  Using mem_mask works fine for the other sets, as port direction gets set as expected by the spg2xx_io core
+
+	logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+		(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+		(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+		(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+		(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+		(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+		(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+		(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+		(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+		(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+		(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+		(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+		(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+		(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+		(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+	int oldrombank = m_mysprtch_rombase;
 
 	if ((m_prev_porta & 0x00ff) != (data & 0x00ff))
 	{
@@ -275,53 +359,29 @@ WRITE16_MEMBER(spg2xx_game_mysprtch_state::porta_w)
 		m_mysprtch_rombase = bank;
 	}
 
-	m_prev_porta = data;
-}
-
-WRITE16_MEMBER(spg2xx_game_mysprtch24_state::porta_w)
-{
-	logerror("%s: porta_w %04x\n", machine().describe_context(), data);
-
-	// this is rather ugly guesswork based on use and testmode
-	// the game writes 0x0000 to the ports during startup, which would cause an incorrect bank
-	// but this value can't just be ignored when we want to bank there
-	// so only bank if running from RAM
-
-	// probably should be the same logic for both games, as the test mode on this one proves
-	// that the logic in spg2xx_game_mysprtch_state::porta_w is incorrect
-
-	if (m_maincpu->pc() < 0x4000)
-	{
-		int bank = 0;
-		bank |= (data & 0x0400) ? 1 : 0;
-		bank |= (data & 0x0800) ? 2 : 0;
-		bank |= (data & 0x0200) ? 0 : 4; // inverted
-
-		m_mysprtch_rombase = bank;
-	}
+	if (oldrombank != m_mysprtch_rombase)
+		m_maincpu->invalidate_cache();
 
 	m_prev_porta = data;
 }
 
 
-void spg2xx_game_mysprtch_state::mysprtch(machine_config& config)
+void spg2xx_game_mysprt_plus_state::mysprtch(machine_config& config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
-	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_mysprtch_state::mem_map_mysprtch);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_mysprt_plus_state::mem_map_mysprtch);
 	m_maincpu->set_force_no_drc(true); // uses JVS opcode, not implemented in recompiler
 
 	spg2xx_base(config);
 
-	m_maincpu->porta_in().set(FUNC(spg2xx_game_mysprtch_state::base_porta_r));
-	m_maincpu->portb_in().set(FUNC(spg2xx_game_mysprtch_state::base_portb_r));
-	m_maincpu->portc_in().set(FUNC(spg2xx_game_mysprtch_state::base_portc_r));
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_mysprt_plus_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_mysprt_plus_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_mysprt_plus_state::base_portc_r));
 
-	m_maincpu->porta_out().set(FUNC(spg2xx_game_mysprtch_state::porta_w));
-
-	m_maincpu->set_rowscroll_offset(8); // for Tennis
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_mysprt_plus_state::porta_w));
 }
 
-void spg2xx_game_mysprtch_state::mgt20in1(machine_config& config)
+void spg2xx_game_mysprt_plus_state::mgt20in1(machine_config& config)
 {
 	mysprtch(config);
 
@@ -329,25 +389,17 @@ void spg2xx_game_mysprtch_state::mgt20in1(machine_config& config)
 	m_screen->set_refresh_hz(50);
 }
 
-void spg2xx_game_mysprtch_state::init_mysprtcp()
+void spg2xx_game_mysprt_plus_state::init_mysprtcp()
 {
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 
-	for (int i = 0; i < size / 2; i++)
-	{
-		ROM[i] = bitswap<16>(ROM[i], 15, 13, 14, 12,
-									 7,  6,  5,  4,
-									 11, 10, 9,  8,
-									 3,  1,  2,  0);
-
-		ROM[i] = ROM[i] ^ 0xfafa;
-	}
+	decrypt_ac_ff(ROM, size);
 }
 
 
 
-void spg2xx_game_mysprtch_state::init_mgt20in1()
+void spg2xx_game_mysprt_plus_state::init_mgt20in1()
 {
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -382,31 +434,32 @@ void spg2xx_game_mysprtch_state::init_mgt20in1()
 	}
 }
 
+ROM_START( mysprtch )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 ) // SOP64 M6MLT947, has two /CE lines so internally this '24MByte / 192Mbit' chip is likely 2 ROM dies in a single package
+	ROM_LOAD16_WORD_SWAP( "senariomysportschallengesop64h.bin", 0x0000000, 0x1000000, CRC(3714df21) SHA1(f725dad48b9dfeba188879a6fd28652a7330d3e5) )
+	ROM_LOAD16_WORD_SWAP( "senariomysportschallengesop64l.bin", 0x1000000, 0x0800000, CRC(0f71099f) SHA1(6e4b9ce329edbb6f0b962cb5669e04c6bd209596) )
+ROM_END
+
+ROM_START( mysptqvc )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "qvcmysportschallenge.bin", 0x0000000, 0x2000000, CRC(04783adc) SHA1(a173145ec307fc12f231d3e3f6efa60f8c2f0c89) ) // last 8MB is unused
+ROM_END
 
 ROM_START( mysprtcp )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "mysportschallengeplus.bin", 0x0000, 0x2000000, CRC(6911d19c) SHA1(c71bc38595e5505434395b6d59320caabfc7bce3) )
 ROM_END
 
-ROM_START( mysptqvc )
-	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "qvcmysportschallenge.bin", 0x0000000, 0x2000000, CRC(04783adc) SHA1(a173145ec307fc12f231d3e3f6efa60f8c2f0c89) )
-ROM_END
-
-
-
-
 ROM_START( mgt20in1 )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "m29gl128.u2", 0x000000, 0x1000000, CRC(41d594e3) SHA1(351890455bed28bcaf173d8fd9a4cc997c404d94) )
 ROM_END
 
-// Unit with Blue surround to power button. Box shows 'Wireless Sports Plus' but title screen shots "My Sports Challenge Plus"  Appears to be V-Tac developed as it has the common V-Tac test mode.
-CONS( 200?, mysprtcp,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprtch_state,  init_mysprtcp, "Senario / V-Tac Technology Co Ltd.",  "My Sports Challenge Plus / Wireless Sports Plus",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
-// from a QVC licensed unit with a different physical shape etc. uses a 32MByte rom with only 24MByte used, the regular units use an unusual 24MByte ROM, content might be the same, not yet verified.
-CONS( 200?, mysptqvc,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprtch24_state,  init_mysprtcp, "Senario / V-Tac Technology Co Ltd. (QVC license)",  "My Sports Challenge (6-in-1 version, QVC license)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
-
+// Original release, with 24MB ROM package, Unit has Black surround to power button
+CONS( 200?, mysprtch,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprt_orig_state, init_mysprtcp, "Senario / V-Tac Technology Co Ltd.",                "My Sports Challenge (5-in-1 version)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// from a QVC licensed unit with a different physical shape etc. uses a 32MByte rom with only 24MByte used
+CONS( 200?, mysptqvc,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprt_orig_state, init_mysprtcp, "Senario / V-Tac Technology Co Ltd. (QVC license)",  "My Sports Challenge (6-in-1 version, QVC license)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// Unit is same shape as regular (non-QVC release) but with Blue surround to power button. Box shows 'Wireless Sports Plus' but title screen shots "My Sports Challenge Plus"  Appears to be V-Tac developed as it has the common V-Tac test mode.
+CONS( 200?, mysprtcp,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprt_plus_state, init_mysprtcp, "Senario / V-Tac Technology Co Ltd.",                "My Sports Challenge Plus / Wireless Sports Plus",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // 2009 date on PCB, not actually in German, so maybe sold under different brands?
-CONS( 2009, mgt20in1,  0, 0, mgt20in1, mgt20in1, spg2xx_game_mysprtch_state,  init_mgt20in1, "MGT",                                 "MGT 20-in-1 TV-Spielekonsole (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, mgt20in1,  0, 0, mgt20in1, mgt20in1, spg2xx_game_mysprt_plus_state, init_mgt20in1, "MGT",                                               "MGT 20-in-1 TV-Spielekonsole (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

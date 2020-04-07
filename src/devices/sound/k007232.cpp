@@ -98,7 +98,7 @@ uint32_t k007232_device::get_start_address(int channel)
 /*    Konami PCM write register                 */
 /************************************************/
 
-WRITE8_MEMBER(k007232_device::write)
+void k007232_device::write(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 
@@ -147,7 +147,7 @@ WRITE8_MEMBER(k007232_device::write)
 /*    Konami PCM read register                  */
 /************************************************/
 
-READ8_MEMBER(k007232_device::read)
+uint8_t k007232_device::read(offs_t offset)
 {
 	if (offset == 5 || offset == 11)
 	{

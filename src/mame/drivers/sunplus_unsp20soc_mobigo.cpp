@@ -130,6 +130,15 @@ ROM_START( mobigo )
 	ROM_LOAD16_WORD_SWAP("mobigo.bin", 0x0000, 0x800000, CRC(49479bad) SHA1(4ee82c7ba13072cf25a34893cf6272f2da5d8928) )
 ROM_END
 
+ROM_START( mobigos )
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("mobigospanish.bin", 0x0000, 0x200000, CRC(462b4f9d) SHA1(1541152f1a359bc18de4d4f3d5038a954c9a3ad4))
+ROM_END
+
+
 ROM_START( mobigo2 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // doesn't have GPnandnand header in NAND, so bootstrap is likely custom
@@ -138,5 +147,6 @@ ROM_START( mobigo2 )
 	ROM_LOAD( "mobigo2_bios_ger.bin", 0x00000, 0x8400000, CRC(d5ab613d) SHA1(6fb104057dc3484fa958e2cb20c5dd0c19589f75) ) // SPANSION S34ML01G100TF100
 ROM_END
 
-CONS( 200?, mobigo,  0, 0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo", MACHINE_IS_SKELETON )
-CONS( 200?, mobigo2, 0, 0, mobigo2,  mobigo, mobigo2_state, nand_init840, "VTech", "MobiGo 2 (Germany)", MACHINE_IS_SKELETON )
+CONS( 200?, mobigo,  0,      0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo", MACHINE_IS_SKELETON )
+CONS( 200?, mobigos, mobigo, 0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo (Spain)", MACHINE_IS_SKELETON )
+CONS( 200?, mobigo2, 0,      0, mobigo2,  mobigo, mobigo2_state, nand_init840, "VTech", "MobiGo 2 (Germany)", MACHINE_IS_SKELETON )

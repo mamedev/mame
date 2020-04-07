@@ -417,7 +417,7 @@ READ8_MEMBER( europc_pc_state::europc_pio_r )
 	switch (offset)
 	{
 	case 0:
-		data = m_keyboard->read(space, 0);
+		data = m_keyboard->read();
 		break;
 	case 1:
 		data = m_port61;

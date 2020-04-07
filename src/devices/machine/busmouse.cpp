@@ -175,17 +175,17 @@ void bus_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	}
 }
 
-READ8_MEMBER(bus_mouse_device::ppi_a_r)
+uint8_t bus_mouse_device::ppi_a_r()
 {
 	return m_pa;
 }
 
-READ8_MEMBER(bus_mouse_device::ppi_c_r)
+uint8_t bus_mouse_device::ppi_c_r()
 {
 	return irq ? irq_line : 0;
 }
 
-WRITE8_MEMBER(bus_mouse_device::ppi_c_w)
+void bus_mouse_device::ppi_c_w(uint8_t data)
 {
 	irq_disabled = BIT(data, 4);
 

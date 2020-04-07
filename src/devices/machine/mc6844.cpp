@@ -30,7 +30,7 @@
 
   Source: https://en.wikipedia.org/wiki/File:Motorola_Microcomputer_Components_1978_pg13.jpg
 
-  CREDITS & Prior Work: 
+  CREDITS & Prior Work:
   The base code was ripped out of swtpc09.cpp and deviceified but similar code is also to be found
   in exidy440.cpp so copyrigt is probably shared among the authors there: Robert Justice, 68bit and
   Aaron Giles.
@@ -86,8 +86,8 @@ mc6844_device::mc6844_device(const machine_config &mconfig, const char *tag, dev
 	, m_out_drq2_cb(*this)
 	, m_in_memr_cb(*this)
 	, m_out_memw_cb(*this)
-	, m_in_ior_cb{ { *this },{ *this },{ *this },{ *this } }
-	, m_out_iow_cb{ { *this },{ *this },{ *this },{ *this } }
+	, m_in_ior_cb(*this)
+	, m_out_iow_cb(*this)
 	, m_state(STATE_S0)
 	, m_icount(0)
 {
@@ -105,11 +105,8 @@ void mc6844_device::device_resolve_objects()
 	m_in_memr_cb.resolve_safe(0);
 	m_out_memw_cb.resolve_safe();
 
-	for(auto &cb : m_in_ior_cb)
-			cb.resolve_safe(0);
-	for(auto &cb : m_out_iow_cb)
-			cb.resolve_safe();
-
+	m_in_ior_cb.resolve_all_safe(0);
+	m_out_iow_cb.resolve_all_safe();
 }
 
 //-------------------------------------------------
@@ -120,7 +117,7 @@ void mc6844_device::device_start()
 {
 	// set our instruction counter
 	set_icountptr(m_icount);
-	
+
 	save_item(NAME(m_m6844_priority));
 	save_item(NAME(m_m6844_interrupt));
 	save_item(NAME(m_m6844_chain));

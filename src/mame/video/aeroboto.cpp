@@ -26,7 +26,7 @@
 TILE_GET_INFO_MEMBER(aeroboto_state::get_tile_info)
 {
 	uint8_t code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code + (m_charbank << 8),
 			m_tilecolor[code],
 			(m_tilecolor[code] >= 0x33) ? 0 : TILE_FORCE_LAYER0);

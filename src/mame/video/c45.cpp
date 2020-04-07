@@ -263,5 +263,5 @@ TILE_GET_INFO_MEMBER( namco_c45_road_device::get_road_info )
 	uint16_t data = m_tmapram[tile_index];
 	int tile = data & 0x3ff;
 	int color = data >> 10;
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }

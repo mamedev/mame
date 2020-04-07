@@ -64,6 +64,13 @@ void upd78k_family_disassembler::format_ix_disp16(std::ostream &stream, const ch
 	}
 }
 
+void upd78k_family_disassembler::format_ix_base16(std::ostream &stream, const char *r, u16 d)
+{
+	if (d >= 0xa000)
+		stream << "0";
+	util::stream_format(stream, "%04XH[%s]", d, r);
+}
+
 void upd78k_family_disassembler::format_abs16(std::ostream &stream, u16 addr)
 {
 	if (addr < 0xa000)

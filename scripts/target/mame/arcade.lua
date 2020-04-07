@@ -71,6 +71,7 @@ CPUS["E1"] = true
 CPUS["I860"] = true
 CPUS["I960"] = true
 CPUS["H8"] = true
+CPUS["H8500"] = true
 CPUS["V810"] = true
 CPUS["M37710"] = true
 CPUS["POWERPC"] = true
@@ -79,7 +80,6 @@ CPUS["MC68HC11"] = true
 CPUS["ADSP21062"] = true
 CPUS["DSP56156"] = true
 CPUS["RSP"] = true
-CPUS["ALPHA8201"] = true
 CPUS["COP400"] = true
 CPUS["TLCS90"] = true
 CPUS["TLCS870"] = true
@@ -139,6 +139,7 @@ CPUS["HPC"] = true
 --CPUS["CR16B"] = true
 CPUS["FR"] = true
 CPUS["UPD78K"] = true
+CPUS["KS0164"] = true
 
 --------------------------------------------------
 -- specify available sound cores
@@ -279,6 +280,8 @@ SOUNDS["MM5837"] = true
 --SOUNDS["DAVE"] = true
 SOUNDS["LC7535"] = true
 --SOUNDS["UPD934G"] = true
+SOUNDS["S_DSP"] = true
+SOUNDS["KS0164"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -288,6 +291,7 @@ VIDEOS["SEGA315_5124"] = true
 VIDEOS["SEGA315_5313"] = true
 --VIDEOS["AM8052"] = true
 VIDEOS["BUFSPRITE"] = true
+VIDEOS["BT45X"] = true
 --VIDEOS["CDP1861"] = true
 --VIDEOS["CDP1862"] = true
 VIDEOS["CESBLIT"] = true
@@ -523,7 +527,6 @@ MACHINES["MB89371"] = true
 MACHINES["MB89374"] = true
 --MACHINES["MC14411"] = true
 MACHINES["MC146818"] = true
-MACHINES["MC2661"] = true
 MACHINES["MC6843"] = true
 MACHINES["MC6846"] = true
 MACHINES["MC6852"] = true
@@ -594,12 +597,14 @@ MACHINES["RSTBUF"] = true
 MACHINES["RTC4543"] = true
 MACHINES["RTC65271"] = true
 MACHINES["RTC9701"] = true
+MACHINES["S_SMP"] = true
 MACHINES["S2636"] = true
 MACHINES["S3520CF"] = true
 MACHINES["S3C24XX"] = true
 --MACHINES["S3C44B0"] = true
 MACHINES["SATURN"] = true
 MACHINES["SCC68070"] = true
+MACHINES["SCN_PCI"] = true
 MACHINES["SCSI"] = true
 MACHINES["SCUDSP"] = true
 MACHINES["SDA2006"] = true
@@ -634,6 +639,7 @@ MACHINES["TMS9902"] = true
 MACHINES["UPD1990A"] = true
 MACHINES["UPD4992"] = true
 MACHINES["UPD4701"] = true
+MACHINES["UPD7001"] = true
 MACHINES["UPD7002"] = true
 MACHINES["UPD7004"] = true
 MACHINES["UPD71071"] = true
@@ -649,7 +655,6 @@ MACHINES["X2212"] = true
 MACHINES["X76F041"] = true
 MACHINES["X76F100"] = true
 MACHINES["Z80CTC"] = true
-MACHINES["Z80DART"] = true
 MACHINES["Z80SIO"] = true
 MACHINES["Z80SCC"] = true
 MACHINES["Z80DMA"] = true
@@ -808,6 +813,7 @@ FORMATS["NASLITE_DSK"] = true
 FORMATS["UPD765_DSK"] = true
 FORMATS["PC_DSK"] = true
 FORMATS["BASICDSK"] = true
+FORMATS["IBMXDF_DSK"] = true
 
 --------------------------------------------------
 -- this is the list of driver libraries that
@@ -2673,6 +2679,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/merit3xx.cpp",
 	MAME_DIR .. "src/mame/drivers/meritm.cpp",
 	MAME_DIR .. "src/mame/drivers/merits.cpp",
+	MAME_DIR .. "src/mame/drivers/meritsdx.cpp",
 	MAME_DIR .. "src/mame/drivers/mtouchxl.cpp",
 	MAME_DIR .. "src/mame/drivers/pubtimed.cpp",
 	MAME_DIR .. "src/mame/machine/at.h",
@@ -2711,6 +2718,8 @@ files {
 	MAME_DIR .. "src/mame/machine/mw8080bw.cpp",
 	MAME_DIR .. "src/mame/audio/mw8080bw.cpp",
 	MAME_DIR .. "src/mame/audio/mw8080bw.h",
+	MAME_DIR .. "src/mame/audio/nl_gunfight.cpp",
+	MAME_DIR .. "src/mame/audio/nl_gunfight.h",
 	MAME_DIR .. "src/mame/video/mw8080bw.cpp",
 	MAME_DIR .. "src/mame/drivers/rotaryf.cpp",
 }
@@ -3094,8 +3103,6 @@ files {
 	MAME_DIR .. "src/mame/video/n8080.cpp",
 	MAME_DIR .. "src/mame/drivers/nss.cpp",
 	MAME_DIR .. "src/mame/machine/snes.cpp",
-	MAME_DIR .. "src/mame/audio/snes_snd.cpp",
-	MAME_DIR .. "src/mame/audio/snes_snd.h",
 	MAME_DIR .. "src/mame/drivers/playch10.cpp",
 	MAME_DIR .. "src/mame/includes/playch10.h",
 	MAME_DIR .. "src/mame/machine/playch10.cpp",
@@ -3629,10 +3636,10 @@ files {
 	MAME_DIR .. "src/mame/video/raiden2.cpp",
 	MAME_DIR .. "src/mame/machine/r2crypt.cpp",
 	MAME_DIR .. "src/mame/machine/r2crypt.h",
-	MAME_DIR .. "src/mame/machine/seibucop/seibucop.cpp",
-	MAME_DIR .. "src/mame/machine/seibucop/seibucop_dma.hxx",
-	MAME_DIR .. "src/mame/machine/seibucop/seibucop_cmd.hxx",
-	MAME_DIR .. "src/mame/machine/seibucop/seibucop.h",
+	MAME_DIR .. "src/mame/machine/seibucop.cpp",
+	MAME_DIR .. "src/mame/machine/seibucop_dma.hxx",
+	MAME_DIR .. "src/mame/machine/seibucop_cmd.hxx",
+	MAME_DIR .. "src/mame/machine/seibucop.h",
 	MAME_DIR .. "src/mame/drivers/r2dx_v33.cpp",
 	MAME_DIR .. "src/mame/drivers/seibuspi.cpp",
 	MAME_DIR .. "src/mame/includes/seibuspi.h",
@@ -4927,14 +4934,16 @@ files {
 	MAME_DIR .. "src/mame/drivers/rbmk.cpp",
 	MAME_DIR .. "src/mame/drivers/rcorsair.cpp",
 	MAME_DIR .. "src/mame/drivers/re900.cpp",
+	MAME_DIR .. "src/mame/drivers/rfslots8085.cpp",
 	MAME_DIR .. "src/mame/drivers/rgum.cpp",
 	MAME_DIR .. "src/mame/drivers/roul.cpp",
 	MAME_DIR .. "src/mame/drivers/rulechan.cpp",
 	MAME_DIR .. "src/mame/drivers/savquest.cpp",
 	MAME_DIR .. "src/mame/drivers/sanremo.cpp",
 	MAME_DIR .. "src/mame/drivers/sanremmg.cpp",
-	MAME_DIR .. "src/mame/drivers/sealy.cpp",
 	MAME_DIR .. "src/mame/drivers/scm_500.cpp",
+	MAME_DIR .. "src/mame/drivers/sealy.cpp",
+	MAME_DIR .. "src/mame/drivers/sealy_fr.cpp",
 	MAME_DIR .. "src/mame/drivers/sfbonus.cpp",
 	MAME_DIR .. "src/mame/drivers/shangkid.cpp",
 	MAME_DIR .. "src/mame/includes/shangkid.h",
@@ -4973,6 +4982,7 @@ files {
 	MAME_DIR .. "src/mame/video/thedeep.cpp",
 	MAME_DIR .. "src/mame/drivers/tickee.cpp",
 	MAME_DIR .. "src/mame/drivers/tmspoker.cpp",
+	MAME_DIR .. "src/mame/drivers/triviaquiz.cpp",
 	MAME_DIR .. "src/mame/drivers/truco.cpp",
 	MAME_DIR .. "src/mame/includes/truco.h",
 	MAME_DIR .. "src/mame/video/truco.cpp",
@@ -5010,8 +5020,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/wms.cpp",
 	MAME_DIR .. "src/mame/drivers/xtom3d.cpp",
 	MAME_DIR .. "src/mame/drivers/xyonix.cpp",
-	MAME_DIR .. "src/mame/includes/xyonix.h",
-	MAME_DIR .. "src/mame/video/xyonix.cpp",
 	MAME_DIR .. "src/mame/drivers/yuvomz80.cpp",
 }
 end

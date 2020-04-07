@@ -2141,6 +2141,14 @@ static INPUT_PORTS_START( cmasterg )
 	/* Test Mode For Disp. Of Doll not checked */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cmasterh )
+	PORT_INCLUDE( cmasterb )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Enable stats menu" ) PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( cmast91 )
 	PORT_START("IN0")
@@ -11365,13 +11373,13 @@ ROM_START( chryangl )
 	ROM_LOAD( "8.u6",  0x0000, 0x10000, CRC(331961e4) SHA1(50c7e0e983aed1f199f238442bb8fafce1849f84) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
-	ROM_LOAD( "7.e1",  0x00000,  0x10000, CRC(f8e523ba) SHA1(bfbe1803f0f3c3426a4cc252257c8a4dd83a70ac) )
-	ROM_LOAD( "6.e2",  0x10000,  0x10000, CRC(0d3b322a) SHA1(64b6bd387a78f51f83002c67d857b157a4651279) )
-	ROM_LOAD( "5.e3",  0x20000,  0x10000, CRC(da87dbeb) SHA1(3656b569d08540171003820ec86944d2a7a55b3b) )
+	ROM_LOAD( "7.e1",  0x00000,  0x10000, CRC(f8e523ba) SHA1(bfbe1803f0f3c3426a4cc252257c8a4dd83a70ac) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "6.e2",  0x10000,  0x10000, CRC(0d3b322a) SHA1(64b6bd387a78f51f83002c67d857b157a4651279) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "5.e3",  0x20000,  0x10000, CRC(da87dbeb) SHA1(3656b569d08540171003820ec86944d2a7a55b3b) ) // 1ST AND 2ND HALF IDENTICAL
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "1.f3",  0x0000,  0x2000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
-	ROM_LOAD( "2.f2",  0x2000,  0x2000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )
+	ROM_LOAD( "1.f3",  0x0000,  0x2000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "2.f2",  0x2000,  0x2000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_LOAD( "3.h3",  0x4000,  0x2000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
 	ROM_LOAD( "4.h2",  0x6000,  0x2000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
 
@@ -11384,6 +11392,32 @@ ROM_START( chryangl )
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129a.e9", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( chryanglb ) // PCB tyoe: CK88 / CM99 LONG BLUE BOARD
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ca5-main-27c512.bin",  0x0000, 0x10000, CRC(55a78b9f) SHA1(d262ecb0628401a7a39dfe5ffeaac908b86f67b2) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "rom5-27c256.bin",  0x00000,  0x08000, CRC(7b687bc5) SHA1(c6be9c62dec3887ab5279f852f0c84b87acd2e95) )
+	ROM_LOAD( "rom6-27c256.bin",  0x08000,  0x08000, CRC(e9997f3d) SHA1(db7fa59b2023bfe5b78f7e98db326bcb518aa2a8) )
+	ROM_LOAD( "rom7-27c256.bin",  0x10000,  0x08000, CRC(9ad8e541) SHA1(e28b6ba68c5c51c7eed6aea0d3fa7019b34356a5) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "rom4-27c128.bin.001",  0x0000,  0x2000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "rom3-27c128.bin.001",  0x2000,  0x2000, CRC(e455694e) SHA1(335815baa8912d4195ae790bbd8ec3e16f9ec916) )
+	ROM_LOAD( "rom2-27c128.bin.001",  0x4000,  0x2000, CRC(4015b2b3) SHA1(806bff41fc388f25cacd78f4d396c8b8e2ed6d67) )
+	ROM_LOAD( "rom1-27c128.bin.001",  0x6000,  0x2000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	// nothing
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "c15-u79-bprom-82s129.bin", 0x0000, 0x0100, CRC(6144d7fc) SHA1(4563ea31864d8732e3a4b0270449a0a79db334a2) )
+	ROM_LOAD( "c16-u84-bprom-82s129.bin", 0x0100, 0x0100, CRC(0893e05d) SHA1(fabd58d498f5efdddae4c7142915cb7b092d6804) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "9-e,-bprom-82s129.bin", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
 ROM_START( tonypok )
@@ -13998,8 +14032,8 @@ ROM_START( nfb96 )
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x20000, "graphics", 0 )
-	ROM_LOAD( "fbseh.bin",  0x00000, 0x10000, CRC(2fc10ce7) SHA1(a2418cfbe7ed217848ace8ea06587bcaa6b2c8f2) )
-	ROM_LOAD( "fbsel.bin",  0x10000, 0x10000, CRC(fb9d679a) SHA1(a4f6246bdbbf2e25f702006b30a62bc7873137de) )
+	ROM_LOAD( "fb96seh b995",  0x00000, 0x10000, CRC(12042a0a) SHA1(4bc5f87f4b92f303fef100bf16e3d7b27670b793) )
+	ROM_LOAD( "fb96sel 246a",  0x10000, 0x10000, CRC(d611f10b) SHA1(425cad584e85f21de214bf978555a7811b13aa35) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
@@ -14212,6 +14246,407 @@ ROM_START( nfb96d )
 
 	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
 	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
+ROM_END
+
+ROM_START( nfb96e )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "3.61a - 7282.bin", 0x00000, 0x1000, CRC(84d820a5) SHA1(3d8279fce6821f1b5aeb80faff7a4e8bd44d826a) ) // v3.61a, C1 Sub-PCB
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x1000)
+	ROM_CONTINUE(0x9000, 0x1000)
+	ROM_CONTINUE(0xa000, 0x1000)
+	ROM_CONTINUE(0xb000, 0x1000)
+	ROM_CONTINUE(0xc000, 0x1000)
+	ROM_CONTINUE(0xd000, 0x1000)
+	ROM_CONTINUE(0xe000, 0x1000)
+	ROM_CONTINUE(0xf000, 0x1000)
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "graphics", 0 )
+	ROM_LOAD( "fbseh.bin",  0x00000, 0x10000, CRC(2fc10ce7) SHA1(a2418cfbe7ed217848ace8ea06587bcaa6b2c8f2) )
+	ROM_LOAD( "fbsel.bin",  0x10000, 0x10000, CRC(fb9d679a) SHA1(a4f6246bdbbf2e25f702006b30a62bc7873137de) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF ) // samples
+	// none?
+ROM_END
+
+ROM_START( nfb96f )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "version 99-3.61a main.bin", 0x00000, 0x1000, CRC(901e990e) SHA1(33050fa34ab9173b251d4f672969e506490da690) ) // v3.61a,DK Sub-PCB
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "graphics", 0 )
+	ROM_LOAD( "fbseh.bin",  0x00000, 0x10000, CRC(2fc10ce7) SHA1(a2418cfbe7ed217848ace8ea06587bcaa6b2c8f2) )
+	ROM_LOAD( "fbsel.bin",  0x10000, 0x10000, CRC(fb9d679a) SHA1(a4f6246bdbbf2e25f702006b30a62bc7873137de) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF ) // samples
+	// none?
+ROM_END
+
+ROM_START( nfb96g )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "version 98-3.61.bin", 0x00000, 0x1000, CRC(8c5118ed) SHA1(09aa4441973be325b362d7ac893cdb08a63923c8) ) // v3.61,DK Sub-PCB
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "graphics", 0 )
+	ROM_LOAD( "high x5 x bet 27c512.bin",  0x00000, 0x10000, CRC(b5dca416) SHA1(a6e0be8048b7568757d077320020c033ad76987c) )
+	ROM_LOAD( "low x5 x bet 27c512.bin",   0x10000, 0x10000, CRC(fd5ff1c4) SHA1(23609e7dc0763e5b82795d9c98b6606e0b25722f) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF ) // samples
+	// none?
+ROM_END
+
+ROM_START( nfb96h )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "27c512 u12 3.60 main.bin", 0x00000, 0x1000, CRC(84eef6fe) SHA1(da88d460da571eea1851dc9fed9036a6666e30a7) ) // v3.60,DK Sub-PCB
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "graphics", 0 )
+	ROM_LOAD( "high x5 x bet 27c512.bin",  0x00000, 0x10000, CRC(b5dca416) SHA1(a6e0be8048b7568757d077320020c033ad76987c) )
+	ROM_LOAD( "low x5 x bet 27c512.bin",   0x10000, 0x10000, CRC(fd5ff1c4) SHA1(23609e7dc0763e5b82795d9c98b6606e0b25722f) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF ) // samples
+	// none?
+ROM_END
+
+ROM_START( nfb96i )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "fbse353.bin", 0x00000, 0x1000, CRC(65415a9f) SHA1(ab946858e3390da785263ce819cf04008b74b73b) ) // v3.53, D Sub-PCB
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x1000)
+	ROM_CONTINUE(0x9000, 0x1000)
+	ROM_CONTINUE(0xa000, 0x1000)
+	ROM_CONTINUE(0xb000, 0x1000)
+	ROM_CONTINUE(0xc000, 0x1000)
+	ROM_CONTINUE(0xd000, 0x1000)
+	ROM_CONTINUE(0xe000, 0x1000)
+	ROM_CONTINUE(0xf000, 0x1000)
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "graphics", 0 )
+	ROM_LOAD( "fb96seh.bin",  0x00000, 0x10000, CRC(12042a0a) SHA1(4bc5f87f4b92f303fef100bf16e3d7b27670b793) )
+	ROM_LOAD( "fb96sel.bin",  0x10000, 0x10000, CRC(d611f10b) SHA1(425cad584e85f21de214bf978555a7811b13aa35) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF ) // samples
+	// none?
+ROM_END
+
+ROM_START( nfb96j )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "fb96340 3686.bin", 0x00000, 0x1000, CRC(48db8e5e) SHA1(31db8f690b1fa24a9d778d94754fca02f308f236) ) // v3.40, D Sub-PCB
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x1000)
+	ROM_CONTINUE(0x9000, 0x1000)
+	ROM_CONTINUE(0xa000, 0x1000)
+	ROM_CONTINUE(0xb000, 0x1000)
+	ROM_CONTINUE(0xc000, 0x1000)
+	ROM_CONTINUE(0xd000, 0x1000)
+	ROM_CONTINUE(0xe000, 0x1000)
+	ROM_CONTINUE(0xf000, 0x1000)
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "graphics", 0 )
+	ROM_LOAD( "fb96seh.bin",  0x00000, 0x10000, CRC(12042a0a) SHA1(4bc5f87f4b92f303fef100bf16e3d7b27670b793) )
+	ROM_LOAD( "fb96sel.bin",  0x10000, 0x10000, CRC(d611f10b) SHA1(425cad584e85f21de214bf978555a7811b13aa35) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF ) // samples
+	// none?
+ROM_END
+
+ROM_START( nfb96k )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "main 27c512.bin", 0x00000, 0x1000, CRC(2a701f3a) SHA1(8cb920d561c44309a24a2260aef867fa94613ee5) ) // v97-3.3c, D Sub-PCB
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "graphics", 0 )
+	ROM_LOAD( "high x5 x bet 27c512.bin",  0x00000, 0x10000, CRC(b5dca416) SHA1(a6e0be8048b7568757d077320020c033ad76987c) )
+	ROM_LOAD( "low x5 x bet 27c512.bin",   0x10000, 0x10000, CRC(fd5ff1c4) SHA1(23609e7dc0763e5b82795d9c98b6606e0b25722f) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF ) // samples
+	// none?
+ROM_END
+
+ROM_START( nfb96l )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "version 97-3.1c.bin", 0x00000, 0x1000, CRC(05b00414) SHA1(4d7c21a3251369edfa0f5db2ec213f7f7554526f) ) // v97-3.1c, B Sub-PCB
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	// no girls
+
+	ROM_REGION( 0x20000, "graphics", 0 )
+	ROM_LOAD( "high.bin",  0x00000, 0x10000, CRC(fee708a7) SHA1(40ca3a236954d5549f9ad768541487752402fb5e) )
+	ROM_LOAD( "low.bin",   0x10000, 0x10000, CRC(b00e1a8c) SHA1(d191e7721059045a90129a8e14817c44f48fb5e6) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
+ROM_END
+
+ROM_START( nfb96m )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "27c512 v3.1a.bin", 0x00000, 0x1000, CRC(579b94f7) SHA1(4fa58c182604a9e6d7ca654de709c355a43a47aa) ) // v3.1, A Sub-PCB
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	// no girls
+
+	ROM_REGION( 0x20000, "graphics", 0 )
+	ROM_LOAD( "high.bin",  0x00000, 0x10000, CRC(fee708a7) SHA1(40ca3a236954d5549f9ad768541487752402fb5e) )
+	ROM_LOAD( "low.bin",   0x10000, 0x10000, CRC(b00e1a8c) SHA1(d191e7721059045a90129a8e14817c44f48fb5e6) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
 ROM_END
 
 ROM_START( nfb96txt )
@@ -14654,6 +15089,124 @@ ROM_START( nc96i )
 	ROM_REGION( 0x200, "proms", 0 ) // palette, not dumped for this set
 	ROM_LOAD( "82s129a.u84", 0x0000, 0x0100, BAD_DUMP CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
 	ROM_LOAD( "82s129a.u79", 0x0100, 0x0100, BAD_DUMP CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+ROM_END
+
+ROM_START( nc96j )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "chse361.bin", 0x00000, 0x1000, CRC(0b28366c) SHA1(560da2dfb1895e1481399d62a35d8a106a0b8e0a) ) // v3.61, DK Sub-PCB
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+
+	ROM_REGION( 0x20000, "graphics", 0 )
+	ROM_LOAD( "chseh e9e3",  0x00000, 0x10000, CRC(fb90df1d) SHA1(84ec1f40a014a0043b3c3c999428dd274caba1b8) )
+	ROM_LOAD( "chsel 0e11",  0x10000, 0x10000, CRC(e0166f3e) SHA1(27e180fe6e03f48771b540e34415eee54951788f) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "82s129a.u84", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "82s129a.u79", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF ) // samples
+	// none?
+ROM_END
+
+ROM_START( nc96k )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "chse351 d085", 0x00000, 0x1000, CRC(cd3cc627) SHA1(9de09107a7096b9429da51c7a59e68b58fc51585) ) // v3.51, D Sub-PCB
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+
+	ROM_REGION( 0x20000, "graphics", 0 )
+	ROM_LOAD( "chseh e9e3",  0x00000, 0x10000, CRC(fb90df1d) SHA1(84ec1f40a014a0043b3c3c999428dd274caba1b8) )
+	ROM_LOAD( "chsel 0e11",  0x10000, 0x10000, CRC(e0166f3e) SHA1(27e180fe6e03f48771b540e34415eee54951788f) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "82s129a.u84", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "82s129a.u79", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF ) // samples
+	// none?
+ROM_END
+
+ROM_START( nc96l )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "cherry 96 v 3.00.bin", 0x00000, 0x1000, CRC(5bf0659d) SHA1(fdbe4b6b11bc21c603318a01e9ad9c3d9e79959d) ) // v3.0, A Sub-PCB
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+	ROM_FILL(0x00, 0x01, 0xf6) // TODO: only byte that doesn't decrypt correctly. Why?
+
+	ROM_REGION( 0x20000, "graphics", 0 )
+	ROM_LOAD( "high.bin", 0x00000, 0x10000, CRC(a3901324) SHA1(2bdfe3fb05202af32d0d845a499d44a79e963d89) )
+	ROM_LOAD( "low.bin",  0x10000, 0x10000, CRC(482931a3) SHA1(0307a7f7428974f3b9563ab4b56528a31c355cdd) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "g13 - u84.bin", 0x0000, 0x0100, CRC(6a01caca) SHA1(9b3e9eebb9fcc8770f7e92f0f1c0434516ee613d) )
+	ROM_LOAD( "g14 - u79.bin", 0x0100, 0x0100, CRC(5899c1d5) SHA1(c335b99bb58da3a11005a8952a15d9f43bdff157) )
 ROM_END
 
 ROM_START( nc96txt )
@@ -18505,7 +19058,8 @@ GAME(  1994, chryangla, ncb3,     chryangla,ncb3,     cb3_state,      init_chrya
 GAME(  1991, eldoradd,  0,        eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado",                                   MACHINE_NOT_WORKING) // everything
 
 // looks like a hack of Cherry Bonus 3
-GAME(  1994, chryangl,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
+GAME(  1994, chryangl,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (set 1)",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
+GAME(  1994, chryanglb, ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg",           "Cherry Angel (set 2)",                                MACHINE_NOT_WORKING ) // ANGEL TL+YF 1.00 string, decrypted but hangs when betting
 
 
 // cherry master hardware has a rather different mem map, but is basically the same
@@ -18531,7 +19085,7 @@ GAMEL( 1991, cmasterd,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,
 GAMEL( 1991, cmastere,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 6)",           0,                 layout_cmasterb )
 GAMEL( 1991, cmasterf,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 7)",           0,                 layout_cmasterb )
 GAMEL( 1991, cmasterg,  cmaster,  cm,       cmasterg, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 8, V4-B-)",    0,                 layout_cmasterb )
-GAMEL( 1991, cmasterh,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.10)",                  0,                 layout_cmasterb )
+GAMEL( 1991, cmasterh,  cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.10)",                  0,                 layout_cmasterb )
 GAMEL( 199?, super7,    cmaster,  cm,       cmaster,  cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb )
 GAME ( 199?, wcat3a,    wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
 
@@ -18629,9 +19183,18 @@ GAME(  1998, match98,   0,        amcoe1a,  match98,   cmaster_state,  init_matc
 /* There is known to be a special IOWA version running on the Texas C2 hardware with roms FB96P IA, FB96L IA & FB96H IA with a (c) 2000 Amcoe */
 GAMEL( 1996, nfb96,     0,        amcoe2,   nfb96,     cmaster_state,  init_nfb96_c1,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.63, C1 PCB)",          0,                 layout_nfb96 ) /* ver. 02-3.63 C1 Sub-PCB */
 GAMEL( 1996, nfb96a,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_c1,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.62, C1 PCB)",          0,                 layout_nfb96 ) /* ver. 00-3.62 C1 Sub-PCB */
+GAMEL( 1996, nfb96e,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_c1,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.61a, C1 PCB)",         0,                 layout_nfb96 ) /* ver. 00-3.61a C1 Sub-PCB */
 GAMEL( 1996, nfb96b,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_d,    ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.54, D PCB)",           0,                 layout_nfb96 ) /* ver. 00-3.54 D Sub-PCB */
 GAMEL( 1996, nfb96c,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_dk,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.62, DK PCB)",          0,                 layout_nfb96 ) /* ver. 00-3.62 DK Sub-PCB */
-GAMEL( 1996, nfb96d,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_a,    ROT0, "Amcoe",   "New Fruit Bonus '96 (v3.1, A PCB)",                            0,                 layout_nfb96 ) /* ver. 00-3.1  A  Sub-PCB */
+GAMEL( 1996, nfb96f,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_dk,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.61a, DK PCB)",         0,                 layout_nfb96 ) /* ver. 00-3.61a DK Sub-PCB */
+GAMEL( 1996, nfb96g,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_dk,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.61, DK PCB)",          0,                 layout_nfb96 ) /* ver. 00-3.61 DK Sub-PCB */
+GAMEL( 1996, nfb96h,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_dk,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.60, DK PCB)",          0,                 layout_nfb96 ) /* ver. 00-3.60 DK Sub-PCB */
+GAMEL( 1996, nfb96d,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_a,    ROT0, "Amcoe",   "New Fruit Bonus '96 (v3.1, A PCB, set 1)",                     0,                 layout_nfb96 ) /* ver. 00-3.1  A  Sub-PCB */
+GAMEL( 1996, nfb96i,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_d,    ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.53, D PCB)",           0,                 layout_nfb96 ) /* ver. 00-3.53  D  Sub-PCB */
+GAMEL( 1996, nfb96j,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_d,    ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.40, D PCB)",           0,                 layout_nfb96 ) /* ver. 00-3.40  D  Sub-PCB */
+GAMEL( 1996, nfb96k,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_d,    ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v97-3.3c, D PCB)",        0,                 layout_nfb96 ) /* ver. 97-3.3c  D  Sub-PCB */
+GAMEL( 1996, nfb96l,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_b,    ROT0, "Amcoe",   "New Fruit Bonus '96 (v97-3.1c, B PCB)",                        0,                 layout_nfb96 ) /* ver. 97-3.1c  B  Sub-PCB */
+GAMEL( 1996, nfb96m,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_a,    ROT0, "Amcoe",   "New Fruit Bonus '96 (v3.1, A PCB, set 2)",                     0,                 layout_nfb96 ) /* ver. 00-3.1  A  Sub-PCB */
 GAMEL( 2000, nfb96txt,  nfb96,    amcoe2,   nfb96tx,   cmaster_state,  init_nfb96_c2,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v1.22 Texas XT, C2 PCB)", 0,                 layout_nfb96 ) /* ver. tf1.22axt C2 Sub-PCB */
 
 GAMEL( 1996, nc96,      0,        amcoe2,   nfb96,     cmaster_state,  init_nfb96_c1,   ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.63, C1 PCB)",               0,                 layout_nfb96 ) /* C1 Sub-PCB */
@@ -18644,6 +19207,9 @@ GAMEL( 1996, nc96f,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb9
 GAMEL( 1996, nc96g,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_b,    ROT0, "Amcoe",   "New Cherry '96 (v3.1, B PCB)",                                 0,                 layout_nfb96 ) /* B  Sub-PCB */
 GAMEL( 1996, nc96h,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_g,    ROT0, "Amcoe",   "New Cherry '96 (v3.1C, G PCB)",                                0,                 layout_nfb96 ) /* G  Sub-PCB */
 GAMEL( 1996, nc96i,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_c1_2, ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.55, C1 PCB)",               0,                 layout_nfb96 ) /* C1 Sub-PCB */
+GAMEL( 1996, nc96j,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_dk,   ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.61, DK PCB)",               0,                 layout_nfb96 ) /* DK Sub-PCB */
+GAMEL( 1996, nc96k,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_d,    ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.51, D PCB)",                0,                 layout_nfb96 ) /* D  Sub-PCB */
+GAMEL( 1996, nc96l,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_a,    ROT0, "Amcoe",   "New Cherry '96 (v3.0, A PCB)",                                 0,                 layout_nfb96 ) /* A  Sub-PCB */
 GAMEL( 2000, nc96txt,   nc96,     amcoe2,   nfb96tx,   cmaster_state,  init_nfb96_c2,   ROT0, "Amcoe",   "New Cherry '96 Special Edition (v1.32 Texas XT, C2 PCB)",      0,                 layout_nfb96tx ) /* ver. tc1.32axt C2 Sub-PCB */
 
 GAME(  2009, fb2010,    0,        amcoe2,   fb2010,    cmaster_state,  init_fb2010,     ROT0, "Amcoe",   "Fruit Bonus 2010",                                             0 )

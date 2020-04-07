@@ -1241,6 +1241,18 @@ static const struct gfx_range mapper_RCM63B_table[] =
 	{ 0 }
 };
 
+#define mapper_gulunpa   { 0x8000, 0, 0, 0 }, mapper_gulunpa_table
+static const struct gfx_range mapper_gulunpa_table[] =
+{
+	/* type                              start   end     bank */
+	// TODO: guesswork
+	{ GFXTYPE_SCROLL1,                   0x0000, 0x7fff, 0 },
+	{ GFXTYPE_SCROLL3,                   0x4000, 0x5fff, 0 },
+	{ GFXTYPE_SCROLL2,                   0x2000, 0x3fff, 0 },
+	{ GFXTYPE_SPRITES,                   0x6000, 0x7fff, 0 },
+	{ 0 }
+};
+
 
 #define mapper_PKB10B   { 0x8000, 0, 0, 0 }, mapper_PKB10B_table
 static const struct gfx_range mapper_PKB10B_table[] =
@@ -1644,8 +1656,10 @@ static const struct CPS1config cps1_config_table[]=
 	{"pang3r1",     CPS_B_21_DEF, mapper_pang3 },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */   // should use one of these three CP1B1F,CP1B8K,CP1B9K
 	{"pang3j",      CPS_B_21_DEF, mapper_pang3 },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */   // should use one of these three CP1B1F,CP1B8K,CP1B9K
 	{"pang3b",      CPS_B_21_DEF, mapper_pang3 },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */   // should use one of these three CP1B1F,CP1B8K,CP1B9K
+	{"pang3b2",     CPS_B_21_DEF, mapper_pang3 },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */   // should use one of these three CP1B1F,CP1B8K,CP1B9K
 	{"ganbare",     CPS_B_21_DEF, mapper_sfzch },   // wrong, this set uses GBPR2, dumped but equations still not added
-
+	{"gulunpa",     CPS_B_21_DEF, mapper_gulunpa }, // wrong
+	
 	/* CPS Changer */
 
 	{"sfach",       CPS_B_21_DEF, mapper_sfzch },   // wrong, this set uses an unknown PAL, still not dumped
@@ -2193,14 +2207,14 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile0_info)
 	     should alternate between the left and right side of the 16x16 tiles */
 	gfxset = (tile_index & 0x20) >> 5;
 
-	SET_TILE_INFO_MEMBER(gfxset,
+	tileinfo.set(gfxset,
 			code,
 			(attr & 0x1f) + 0x20,
 			TILE_FLIPYX((attr & 0x60) >> 5));
 	tileinfo.group = (attr & 0x0180) >> 7;
 
 	// for out of range tiles, switch to fully transparent data
-	// (but still call SET_TILE_INFO_MEMBER, otherwise problems might occur on boot e.g. unsquad)
+	// (but still call tileinfo.set, otherwise problems might occur on boot e.g. unsquad)
 	if (code == -1)
 		tileinfo.pen_data = m_empty_tile;
 }
@@ -2212,7 +2226,7 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile1_info)
 
 	code = gfxrom_bank_mapper(GFXTYPE_SCROLL2, code);
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code,
 			(attr & 0x1f) + 0x40,
 			TILE_FLIPYX((attr & 0x60) >> 5));
@@ -2230,14 +2244,14 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile2_info)
 
 	code = gfxrom_bank_mapper(GFXTYPE_SCROLL3, code);
 
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			code,
 			(attr & 0x1f) + 0x60,
 			TILE_FLIPYX((attr & 0x60) >> 5));
 	tileinfo.group = (attr & 0x0180) >> 7;
 
 	// for out of range tiles, switch to fully transparent data
-	// (but still call SET_TILE_INFO_MEMBER, otherwise problems might occur on boot e.g. unsquad)
+	// (but still call tileinfo.set, otherwise problems might occur on boot e.g. unsquad)
 	if (code == -1)
 		tileinfo.pen_data = m_empty_tile;
 }
@@ -3101,8 +3115,8 @@ uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitm
 	}
 	else
 	{
-		// CPS2 apparently always force the background to black. Several games would
-		// should a blue screen during boot if we used the same code as CPS1.
+		// CPS2 apparently always forces the background to black. Several games would
+		// show a blue screen during boot if we used the same code as CPS1.
 		// Maybe Capcom changed the background handling due to the problems that
 		// it caused on several monitors (because the background extended into the
 		// blanking area instead of going black, causing the monitor to clip).

@@ -52,6 +52,7 @@ public:
 	{ }
 
 	void captcommb2(machine_config &config);
+	void knightsb(machine_config &config);
 	void sf2b(machine_config &config);
 	void sf2mdt(machine_config &config);
 
@@ -394,6 +395,13 @@ void cps1bl_5205_state::captcommb2(machine_config &config)
 	m_msm_2->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+void cps1bl_5205_state::knightsb(machine_config &config)
+{
+	captcommb2(config);
+	m_msm_1->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_msm_2->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
 void cps1bl_5205_state::sf2b(machine_config &config)
 {
 	sf2mdt(config);
@@ -594,8 +602,7 @@ void cps1bl_5205_state::init_knightsb()
 {
 	m_maincpu->space(AS_PROGRAM).unmap_write(0x980000, 0x980023);
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x980000, 0x980025, write16_delegate(*this, FUNC(cps1bl_5205_state::knightsb_layer_w)));
-	m_msm_1->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.5);
-	m_msm_2->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.5);
+
 	init_mtwinsb();
 }
 
@@ -1240,8 +1247,8 @@ ROM_END
 
 GAME( 1991,  captcommb2,  captcomm, captcommb2,  captcommb2,  captcommb2_state,   init_captcommb2,  ROT0,  "bootleg",  "Captain Commando (bootleg with 2xMSM5205)",  MACHINE_SUPPORTS_SAVE )  // 911014 ETC
 
-GAME( 1991,  knightsb,    knights,  captcommb2,  knights,     captcommb2_state,   init_knightsb,    ROT0,  "bootleg",  "Knights of the Round (bootleg with 2xMSM5205, set 1)",  MACHINE_SUPPORTS_SAVE )  // 911127 ETC
-GAME( 1991,  knightsb3,   knights,  captcommb2,  knights,     captcommb2_state,   init_knightsb,    ROT0,  "bootleg",  "Knights of the Round (bootleg with 2xMSM5205, set 2)",  MACHINE_SUPPORTS_SAVE )  // 911127 ETC
+GAME( 1991,  knightsb,    knights,  knightsb,    knights,     captcommb2_state,   init_knightsb,    ROT0,  "bootleg",  "Knights of the Round (bootleg with 2xMSM5205, set 1)",  MACHINE_SUPPORTS_SAVE )  // 911127 ETC
+GAME( 1991,  knightsb3,   knights,  knightsb,    knights,     captcommb2_state,   init_knightsb,    ROT0,  "bootleg",  "Knights of the Round (bootleg with 2xMSM5205, set 2)",  MACHINE_SUPPORTS_SAVE )  // 911127 ETC
 
 GAME( 1992,  sf2b,        sf2,      sf2b,        sf2mdt,      cps1bl_5205_state,  init_sf2b,        ROT0,  "bootleg (Playmark)",  "Street Fighter II: The World Warrior (bootleg, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )  // 910204 ETC
 GAME( 1992,  sf2b2,       sf2,      sf2b,        sf2mdt,      cps1bl_5205_state,  init_sf2mdtb,     ROT0,  "bootleg", "Street Fighter II: The World Warrior (bootleg, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )              // 910204 ETC

@@ -618,7 +618,7 @@ WRITE8_MEMBER( luxor_55_10828_device::ctrl_w )
 	m_wait_enable = BIT(data, 6);
 
 	// FDC master reset
-	if (!BIT(data, 7)) m_fdc->soft_reset();
+	m_fdc->mr_w(BIT(data, 7));
 }
 
 

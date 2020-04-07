@@ -56,25 +56,25 @@ public:
 	auto xi_callback() { return m_read_xi.bind(); }
 	auto xo_callback() { return m_write_xo.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( rcv_w );
+	void rcv_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( sens_w );
-	DECLARE_WRITE_LINE_MEMBER( xi7_w );
+	void sens_w(int state);
+	void xi7_w(int state);
 
 	uint8_t get_vector();
 
 	virtual void io_map(address_map &map);
 
-	DECLARE_READ8_MEMBER( rb_r );
-	DECLARE_READ8_MEMBER( xi_r );
-	DECLARE_READ8_MEMBER( rst_r );
-	DECLARE_READ8_MEMBER( sta_r );
-	DECLARE_WRITE8_MEMBER( cmd_w );
-	DECLARE_WRITE8_MEMBER( rr_w );
-	DECLARE_WRITE8_MEMBER( tb_w );
-	DECLARE_WRITE8_MEMBER( xo_w );
-	DECLARE_WRITE8_MEMBER( mr_w );
-	DECLARE_WRITE8_MEMBER( tmr_w );
+	uint8_t rb_r();
+	uint8_t xi_r();
+	uint8_t rst_r();
+	uint8_t sta_r();
+	void cmd_w(uint8_t data);
+	void rr_w(uint8_t data);
+	void tb_w(uint8_t data);
+	void xo_w(uint8_t data);
+	void mr_w(uint8_t data);
+	void tmr_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

@@ -61,8 +61,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(read);
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
 
 private:
 	void state_save_register();

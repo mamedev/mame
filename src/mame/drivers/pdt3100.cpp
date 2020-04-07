@@ -4,12 +4,12 @@
 
     Skeleton driver for Symbol PDT 3100 handheld computer.
 
-	Parts side
+    Parts side
 MCU NEC V25 D70320GJ-8
 3 x Flash Intel N28F010
 Xtal R160SHAA7
 SRAM Hitachi 658512ALFP-8
-	LCD side
+    LCD side
 CMOS Pseudo Static RAM Toshiba TC518128CFTL-80
 Display controller? STI 13130-018
 Real-Time Clock plus RAM with Serial Interface MC68HC68T1

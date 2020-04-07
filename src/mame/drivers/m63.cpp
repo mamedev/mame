@@ -323,14 +323,14 @@ TILE_GET_INFO_MEMBER(m63_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] | ((attr & 0x30) << 4);
 	int color = (attr & 0x0f) + (m_pal_bank << 4);
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(m63_state::get_fg_tile_info)
 {
 	int code = m_videoram2[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, m_fg_flag);
+	tileinfo.set(0, code, 0, m_fg_flag);
 }
 
 VIDEO_START_MEMBER(m63_state,m63)

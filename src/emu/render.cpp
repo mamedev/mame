@@ -1360,7 +1360,7 @@ render_primitive_list &render_target::get_primitives()
 		render_primitive *prim = list.alloc(render_primitive::QUAD);
 		set_render_bounds_xy(prim->bounds, 0.0f, 0.0f, (float)m_width, (float)m_height);
 		prim->full_bounds = prim->bounds;
-		set_render_color(&prim->color, 1.0f, 1.0f, 1.0f, 1.0f);
+		set_render_color(&prim->color, 1.0f, 0.1f, 0.1f, 0.1f);
 		prim->texture.base = nullptr;
 		prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 		list.append(*prim);
@@ -1533,13 +1533,13 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 	bool have_artwork  = false;
 
 	// if there's an explicit file, load that first
-	const char *basename = m_manager.machine().basename();
+	const std::string &basename = m_manager.machine().basename();
 	if (layoutfile)
-		have_artwork |= load_layout_file(basename, *layoutfile);
+		have_artwork |= load_layout_file(basename.c_str(), *layoutfile);
 
 	// if we're only loading this file, we know our final result
 	if (!singlefile)
-		load_additional_layout_files(basename, have_artwork);
+		load_additional_layout_files(basename.c_str(), have_artwork);
 }
 
 void render_target::load_layout_files(util::xml::data_node const &rootnode, bool singlefile)
@@ -1547,12 +1547,12 @@ void render_target::load_layout_files(util::xml::data_node const &rootnode, bool
 	bool have_artwork  = false;
 
 	// if there's an explicit file, load that first
-	const char *basename = m_manager.machine().basename();
-	have_artwork |= load_layout_file(m_manager.machine().root_device(), basename, rootnode);
+	const std::string &basename = m_manager.machine().basename();
+	have_artwork |= load_layout_file(m_manager.machine().root_device(), basename.c_str(), rootnode);
 
 	// if we're only loading this file, we know our final result
 	if (!singlefile)
-		load_additional_layout_files(basename, have_artwork);
+		load_additional_layout_files(basename.c_str(), have_artwork);
 }
 
 void render_target::load_additional_layout_files(const char *basename, bool have_artwork)

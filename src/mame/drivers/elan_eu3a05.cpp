@@ -93,6 +93,119 @@
 
 */
 
+/*
+
+Buzztime Trivia notes from Tahg (addresses based on base ROM, not cartridges)
+
+300 Cursor Left
+301 Cursor Top
+302 Cursor Right
+303 Cursor Bottom
+
+3E5 Sent Command
+3E6 Watchdog Counter
+3E9 Active Player
+3EA Sent Player Id/Incoming Byte
+3EB Sent Player Button/Loop Counter
+
+0-A Name
+E-F Score
+44x Player 1 Data
+...
+4Fx Player 12 Data
+
+509 Cursor index
+515 Name on Enter name screen
+
+These read a byte, (aaabbbcc) MSB first on IO 5041. In general:
+Set 5043 bit 0 high.
+Repeat 8 times
+  Wait for 5041 bit 0 to go high
+  Read 5041 bit 1
+Set 5043 bit 0 low
+
+6B29  ReadCommandA  Exit on c=2 or c=1,b=7,a=7  Watchdog resets counters and reads port again
+6BE8  ReadCommandB  Exit on c=2 or c=1,b=7,a=7  Watchdog exits with b=FF if 3E7 nonzero
+6CB4  ReadCommandC  Exit on c=2                 Watchdog exits with b=FF
+
+  Address         Publics by Value
+
+ 00000000:00000000       byte_0
+ 00000000:0000050A       index
+ 00000000:00006011       LoadTileSet
+ 00000000:0000605B       LoadPalette
+ 00000000:00006090       SetTileBase
+ 00000000:000060D7       DisableSprites
+ 00000000:000060F0       SetSpriteBase
+ 00000000:0000648F       Play0
+ 00000000:00006494       Play1
+ 00000000:00006499       Play2
+ 00000000:0000649E       Play3
+ 00000000:000064A3       Play4
+ 00000000:000064A8       Play5
+ 00000000:000064AD       Play6
+ 00000000:000064B2       Play7
+ 00000000:000064B7       Play8
+ 00000000:000064BC       Play9
+ 00000000:000064C1       PlayA
+ 00000000:000064C6       PlayB
+ 00000000:000064CB       DisableSoundCh0
+ 00000000:000064EA       DisableSoundCh1
+ 00000000:00006509       DisableSoundCh2
+ 00000000:00006528       DisableSoundCh3
+ 00000000:00006547       DisableSoundCh4
+ 00000000:00006566       DisableSoundCh5
+ 00000000:00006585       DisableSoundChAll
+ 00000000:000065AC       WaitForVBIAndSetSpriteBase
+ 00000000:000065B5       WaitForVBIAndSetTileBase
+ 00000000:000065BE       WaitForVBIAndLoadTileSet
+ 00000000:000065C7       JJLoadTileSet
+ 00000000:00006933       DrawBackground
+ 00000000:00006B29       ReadCommandA
+ 00000000:00006BE8       ReadCommandB
+ 00000000:00006CB4       ReadCommandC
+ 00000000:00006D66       DrawText
+ 00000000:00007E80       WaitXTimesForInput
+ 00000000:000099B4       NameScreenLoop
+ 00000000:00009EB0       NameScreenSetChar
+ 00000000:00009F43       NameScreenDeleteChar
+ 00000000:00009FC8       NameScreenCalcCharacter
+ 00000000:0000A02F       NameScreenCalculateCursor
+ 00000000:0000A051       NameScreenUpdateCursor
+ 00000000:0000A112       SelectPlayersLoop
+ 00000000:0000A290       SelectPlayer
+ 00000000:0000A31E       CreatePlayer
+ 00000000:0000A769       ReadAAndWaitForSelect
+ 00000000:0000A821       DrawRoundTitles
+ 00000000:0000AD8A       ReadAAndSetPlayer
+ 00000000:0000ADDF       ReadAAndCheckPlayer
+ 00000000:0000AF1F       ShowQuestion
+ 00000000:0000AF65       ShowChoices
+ 00000000:0000AFC5       ShowHint1
+ 00000000:0000B004       ShowHint2
+ 00000000:0000B033       ShowHint3
+ 00000000:0000B061       ShowAnswer
+ 00000000:0000B0BF       ShowReason
+ 00000000:0000B1C0       ShowScore
+ 00000000:0000C848       MenuUpdate
+ 00000000:0000D10D       WinScreen
+ 00000000:0000D1F1       DoFireworks
+ 00000000:0000E9AE       JLoadTileSet
+ 00000000:0000E9B6       JLoadPalette
+ 00000000:0000E9C2       JSetTileBase
+ 00000000:0000E9C8       JSetSpriteBase
+ 00000000:0000E9CE       JDisableSprites
+ 00000000:0000E9D4       SetGamePage
+ 00000000:0000E9DF       MemoryTest
+ 00000000:0000EA36       SRAMTest
+ 00000000:0000EBA9       nullsub_1
+ 00000000:0000EBAA       WaitForVBI
+ 00000000:0000EBCA       RomTest
+ 00000000:0000EC24       WaitForTimer
+ 00000000:0000ECE9       nullsub_2
+
+*/
+
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 //#include "cpu/m6502/m65c02.h"
@@ -129,7 +242,11 @@ public:
 	void airblsjs(machine_config& config);
 
 	void elan_sudoku(machine_config &config);
+	void elan_sudoku_pal(machine_config &config);
+	void elan_pvmilfin(machine_config &config);
 
+	void init_sudelan();
+	void init_sudelan3();
 
 protected:
 	// driver_device overrides
@@ -661,6 +778,22 @@ void elan_eu3a05_state::elan_sudoku(machine_config& config)
 	m_sys->set_alt_timer(); // for Carl Edwards'
 }
 
+void elan_eu3a05_state::elan_sudoku_pal(machine_config& config)
+{
+	elan_sudoku(config);
+	m_sys->set_pal(); // TODO: also set PAL clocks
+	m_screen->set_refresh_hz(50);
+}
+
+void elan_eu3a05_state::elan_pvmilfin(machine_config& config)
+{
+	elan_eu3a05(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a05_state::elan_sudoku_map);
+	m_vid->set_is_pvmilfin();
+	m_sys->set_alt_timer();
+	m_sys->set_pal(); // TODO: also set PAL clocks
+	m_screen->set_refresh_hz(50);
+}
 
 void elan_eu3a05_state::airblsjs(machine_config& config)
 {
@@ -668,6 +801,9 @@ void elan_eu3a05_state::airblsjs(machine_config& config)
 	m_screen->set_refresh_hz(50);
 	m_sys->set_pal(); // TODO: also set PAL clocks
 }
+
+
+
 
 ROM_START( rad_tetr )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
@@ -690,13 +826,21 @@ ROM_START( airblsjs )
 	ROM_LOAD( "airblsjs.bin", 0x000000, 0x400000, BAD_DUMP CRC(d10a6a84) SHA1(fa65f06e7da229006ddaffb245eef2cc4f90a66d) ) // ROM probably ok, but needs verification pass
 ROM_END
 
-ROM_START( sudoelan )
+ROM_START( sudelan3 )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "sudoku.bin", 0x00000, 0x100000, CRC(c2596173) SHA1(cc74932648b577b735151014e8c04ed778e11704) )
 	ROM_RELOAD(0x100000,0x100000)
 	ROM_RELOAD(0x200000,0x100000)
 	ROM_RELOAD(0x300000,0x100000)
 ROM_END
+
+ROM_START( sudelan )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "klaussudoku.bin", 0x00000, 0x200000, CRC(afd2b06a) SHA1(21db956fb40b2e3d61fc2bac89000cf7f61fe99e) )
+	ROM_RELOAD(0x200000,0x200000)
+ROM_END
+
+
 
 ROM_START( carlecfg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
@@ -706,6 +850,13 @@ ROM_START( carlecfg )
 	ROM_RELOAD(0x300000,0x100000)
 ROM_END
 
+ROM_START( pvmilfin )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "fwwtbam.bin", 0x000000, 0x200000, CRC(2cfef9ab) SHA1(b64f55e36b59790a310ae33154774ac613b5d49f) )
+	ROM_RELOAD(0x200000,0x200000)
+ROM_END
+
+
 
 ROM_START( buzztime )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
@@ -714,6 +865,24 @@ ROM_START( buzztime )
 	ROM_LOAD( "buzztimeunit.bin", 0x000000, 0x200000, CRC(8ba3569c) SHA1(3e704338a53daed63da90aba0db4f6adb5bccd21) )
 ROM_END
 
+
+void elan_eu3a05_state::init_sudelan3()
+{
+	// skip infinite loop (why is this needed? does it think we've soft shutdown?)
+	uint8_t* ROM = memregion("maincpu")->base();
+	ROM[0x0fcc] = 0xea;
+	ROM[0x0fcd] = 0xea;
+	ROM[0x0fce] = 0xea;
+}
+
+void elan_eu3a05_state::init_sudelan()
+{
+	// avoid jump to infinite loop (why is this needed? does it think we've soft shutdown?)
+	uint8_t* ROM = memregion("maincpu")->base();
+	ROM[0xd0f] = 0xea;
+	ROM[0xd10] = 0xea;
+	ROM[0xd11] = 0xea;
+}
 
 CONS( 2004, rad_sinv, 0, 0, elan_eu3a05, rad_sinv, elan_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
 
@@ -726,6 +895,11 @@ CONS( 2004, buzztime, 0, 0, elan_buzztime, sudoku, elan_eu3a05_buzztime_state, e
 
 // Below are probably not EU3A05 but use similar modes (possibly EU3A13?)
 
-CONS( 2006, sudoelan, 0,        0, elan_sudoku,  sudoku,   elan_eu3a05_state, empty_init,  "Senario / All in 1 Products Ltd",  "Ultimate Sudoku TV Edition 3-in-1", MACHINE_NOT_WORKING )
+CONS( 2006, sudelan3, 0,        0, elan_sudoku,      sudoku,   elan_eu3a05_state, init_sudelan3,  "All in 1 Products Ltd / Senario",  "Ultimate Sudoku TV Edition 3-in-1 (All in 1 / Senario)", MACHINE_NOT_WORKING )
+// Senario also distributed this version in the US without the '3 in 1' text on the box, ROM has not been verified to match
+CONS( 2005, sudelan, 0,         0, elan_sudoku_pal,  sudoku,   elan_eu3a05_state, init_sudelan,  "All in 1 Products Ltd / Play Vision",  "Carol Vorderman's Sudoku Plug & Play TV Game (All in 1 / Play Vision)", MACHINE_NOT_WORKING )
 
 CONS( 200?, carlecfg, 0,        0, elan_sudoku,  carlecfg,   elan_eu3a05_state, empty_init,  "Excalibur Electronics Inc",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
+
+// see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game)
+CONS( 2006, pvmilfin, 0,        0, elan_pvmilfin,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", "Haluatko miljon\xc3\xa4\xc3\xa4riksi? (Finland)", MACHINE_NOT_WORKING )

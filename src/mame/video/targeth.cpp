@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(targeth_state::get_tile_info)
 	int data2 = m_videoram[(Layer * 0x2000/2) + (tile_index << 1) + 1];
 	int code = data & 0x3fff;
 
-	SET_TILE_INFO_MEMBER(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
+	tileinfo.set(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
 }
 
 /***************************************************************************

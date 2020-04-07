@@ -808,7 +808,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16a_tile_info )
 	int code = ((data >> 1) & 0x1000) | (data & 0xfff);
 	int color = (data >> 5) & 0x7f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 	tileinfo.category = (data >> 12) & 1;
 }
 
@@ -820,7 +820,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16a_text_info )
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 	tileinfo.category = (data >> 11) & 1;
 }
 
@@ -1022,7 +1022,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_tile_info )
 
 	code = info->bank[code / info->banksize] * info->banksize + code % info->banksize;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
@@ -1035,7 +1035,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_text_info )
 	int color = (data >> 9) & 0x07;
 	int code = data & 0x1ff;
 
-	SET_TILE_INFO_MEMBER(0, bank * info->banksize + code, color, 0);
+	tileinfo.set(0, bank * info->banksize + code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
@@ -1049,7 +1049,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_alt_tile_info )
 
 	code = info->bank[code / info->banksize] * info->banksize + code % info->banksize;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
@@ -1062,7 +1062,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_alt_text_info )
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
 
-	SET_TILE_INFO_MEMBER(0, bank * info->banksize + code, color, 0);
+	tileinfo.set(0, bank * info->banksize + code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 

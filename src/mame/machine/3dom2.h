@@ -119,12 +119,13 @@ public:
 		RAM_16MB    = 16
 	};
 
-	template <typename T, typename U>
-	m2_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu1_tag, U &&cpu2_tag)
+	template <typename T, typename U, typename V>
+	m2_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu1_tag, U &&cpu2_tag, V &&cde_tag)
 		: m2_bda_device(mconfig, tag, owner, clock)
 	{
 		m_cpu1.set_tag(std::forward<T>(cpu1_tag));
 		m_cpu2.set_tag(std::forward<U>(cpu2_tag));
+		m_cde.set_tag(std::forward<V>(cde_tag));
 	}
 	m2_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -211,6 +212,7 @@ private:
 public: // TODO: THIS SHOULD NOT BE PUBLIC
 	required_device<ppc_device> m_cpu1;
 	required_device<ppc_device> m_cpu2;
+	required_device<m2_cde_device> m_cde;
 	devcb_read_line m_videores_in;
 
 	// Sub-devices
@@ -505,11 +507,12 @@ private:
 class m2_cde_device : public device_t
 {
 public:
-	template <typename T>
-	m2_cde_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu1_tag)
+	template <typename T, typename U>
+	m2_cde_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu1_tag, U &&bda_tag)
 		: m2_cde_device(mconfig, tag, owner, clock)
 	{
 		m_cpu1.set_tag(std::forward<T>(cpu1_tag));
+		m_bda.set_tag(std::forward<U>(bda_tag));
 	}
 	m2_cde_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -701,7 +704,7 @@ private:
 	}
 
 	required_device<ppc_device> m_cpu1;
-	m2_bda_device       *m_bda; // todo
+	required_device<m2_bda_device> m_bda;
 
 	devcb_write_line    m_int_handler;
 	devcb_write32       m_sdbg_out_handler;

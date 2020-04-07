@@ -122,7 +122,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i80130_device> m_osp;
 	required_device<i8255_device> m_modem;
-	optional_device<i8274_new_device> m_uart8274;
+	optional_device<i8274_device> m_uart8274;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 
@@ -320,7 +320,7 @@ void gridcomp_state::grid1121_map(address_map &map)
 	map(0x90000, 0x97fff).unmaprw(); // ?? ROM slot
 	map(0x9ff00, 0x9ff0f).unmaprw(); // .r(FUNC(gridcomp_state::grid_9ff0_r)); // ?? ROM?
 	map(0xc0000, 0xcffff).unmaprw(); // ?? ROM slot -- signature expected: 0x4554, 0x5048
-	map(0xdfe00, 0xdfe1f).unmaprw(); // .rw("uart8274", FUNC(i8274_new_device::ba_cd_r), FUNC(i8274_new_device::ba_cd_w)).umask16(0x00ff);
+	map(0xdfe00, 0xdfe1f).unmaprw(); // .rw("uart8274", FUNC(i8274_device::ba_cd_r), FUNC(i8274_device::ba_cd_w)).umask16(0x00ff);
 	map(0xdfe40, 0xdfe4f).unmaprw(); // ?? diagnostic 8274
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
@@ -406,7 +406,7 @@ void gridcomp_state::grid1101(machine_config &config)
 	ieee.ren_callback().set("hpib", FUNC(tms9914_device::ren_w));
 	IEEE488_SLOT(config, "ieee_rem", 0, remote488_devices, nullptr);
 
-	I8274_NEW(config, m_uart8274, XTAL(4'032'000));
+	I8274(config, m_uart8274, XTAL(4'032'000));
 
 	I8255(config, "modem", 0);
 

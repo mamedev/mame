@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(flstory_state::get_tile_info)
 	int flags = TILE_FLIPYX((attr & 0x18) >> 3);
 	tileinfo.category = (attr & 0x20) >> 5;
 	tileinfo.group = (attr & 0x20) >> 5;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			attr & 0x0f,
 			flags);
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(flstory_state::victnine_get_tile_info)
 	int tile_number = ((attr & 0x38) << 5) + code;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			attr & 0x07,
 			flags);
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(flstory_state::get_rumba_tile_info)
 
 	tileinfo.category = (attr & 0x20) >> 5;
 	tileinfo.group = (attr & 0x20) >> 5;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			col,
 			0);
