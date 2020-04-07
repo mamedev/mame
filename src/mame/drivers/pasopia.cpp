@@ -13,7 +13,6 @@
       completely different tho)
     - screen resolution switching
     - Centronics printer interface
-    - RS-232C serial interface
     - FDC and other I/O expansions
     - fix keyboard
     - colours
@@ -26,6 +25,7 @@
 #include "includes/pasopia.h"
 
 #include "bus/pasopia/pac2.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
@@ -56,6 +56,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_io_keyboard(*this, "KEY.%d", 0)
 		, m_cass(*this, "cassette")
+		, m_rs232(*this, "rs232")
 		, m_speaker(*this, "speaker")
 	{ }
 
@@ -74,6 +75,7 @@ private:
 	u8 portb_1_r();
 	u8 portb_2_r();
 	void porta_2_w(u8 data);
+	void portc_2_w(u8 data);
 	void vram_addr_hi_w(u8 data);
 	void screen_mode_w(u8 data);
 	u8 rombank_r();
@@ -111,6 +113,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_ioport_array<12> m_io_keyboard;
 	required_device<cassette_image_device> m_cass;
+	required_device<rs232_port_device> m_rs232;
 	required_device<speaker_sound_device> m_speaker;
 };
 
@@ -233,7 +236,12 @@ u8 pasopia_state::portb_1_r()
 
 u8 pasopia_state::portb_2_r()
 {
-	return (m_cass->input() > +0.04) ? 0x20 : 0;
+	u8 result = (m_cass->input() > +0.04) ? 0x20 : 0;
+	result |= m_rs232->dcd_r() << 3;
+	result |= m_rs232->dsr_r() << 2;
+	result |= m_rs232->cts_r() << 1;
+	result |= m_rs232->rxd_r() << 0;
+	return result;
 }
 
 void pasopia_state::porta_2_w(u8 data)
@@ -245,6 +253,13 @@ void pasopia_state::porta_2_w(u8 data)
 	{
 		m_cass->change_state(BIT(data, 5) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 	}
+}
+
+void pasopia_state::portc_2_w(u8 data)
+{
+	m_rs232->write_dtr(BIT(data, 6));
+	m_rs232->write_rts(BIT(data, 5));
+	m_rs232->write_txd(BIT(data, 4));
 }
 
 WRITE_LINE_MEMBER( pasopia_state::speaker_w )
@@ -356,9 +371,10 @@ void pasopia_state::pasopia(machine_config &config)
 	m_ppi1->out_pc_callback().set(FUNC(pasopia_state::vram_addr_hi_w));
 
 	I8255A(config, m_ppi2);
-	m_ppi2->in_pc_callback().set(FUNC(pasopia_state::rombank_r));
 	m_ppi2->out_pa_callback().set(FUNC(pasopia_state::porta_2_w));
 	m_ppi2->in_pb_callback().set(FUNC(pasopia_state::portb_2_r));
+	m_ppi2->in_pc_callback().set(FUNC(pasopia_state::rombank_r));
+	m_ppi2->out_pc_callback().set(FUNC(pasopia_state::portc_2_w));
 
 	Z80CTC(config, m_ctc, 15.9744_MHz_XTAL / 4);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -379,6 +395,8 @@ void pasopia_state::pasopia(machine_config &config)
 
 	PASOPIA_PAC2(config, "dtfcst", pac2_default_devices, nullptr); // "Data File Cassette"
 	PASOPIA_PAC2(config, "dtfunt", pac2_default_devices, nullptr); // "Data File Unit"
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	SOFTWARE_LIST(config, "cass_list").set_original("pasopia_cass");
 }
