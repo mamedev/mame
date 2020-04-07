@@ -167,7 +167,7 @@ void tc8566af_device::map(address_map &map)
 constexpr int upd765_family_device::rates[4];
 
 upd765_family_device::upd765_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	pc_fdc_interface(mconfig, type, tag, owner, clock),
+	device_t(mconfig, type, tag, owner, clock),
 	ready_connected(true),
 	ready_polled(true),
 	select_connected(true),
