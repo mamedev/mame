@@ -515,7 +515,7 @@ void europc_pc_state::europc_io(address_map &map)
 	map(0x02e0, 0x02e0).r(FUNC(europc_pc_state::europc_jim2_r));
 }
 
-class europc_fdc_device : public isa8_fdc_xt_device
+class europc_fdc_device : public isa8_fdc_device
 {
 public:
 	europc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -531,7 +531,7 @@ private:
 DEFINE_DEVICE_TYPE(EUROPC_FDC, europc_fdc_device, "europc_fdc", "EURO PC FDC hookup")
 
 europc_fdc_device::europc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: isa8_fdc_xt_device(mconfig, EUROPC_FDC, tag, owner, clock)
+	: isa8_fdc_device(mconfig, EUROPC_FDC, tag, owner, clock)
 {
 }
 
@@ -544,8 +544,8 @@ static void pc_dd_floppies(device_slot_interface &device)
 void europc_fdc_device::device_add_mconfig(machine_config &config)
 {
 	WD37C65C(config, m_fdc, 16_MHz_XTAL);
-	m_fdc->intrq_wr_callback().set(FUNC(europc_fdc_device::fdc_irq_w));
-	m_fdc->drq_wr_callback().set(FUNC(europc_fdc_device::fdc_drq_w));
+	m_fdc->intrq_wr_callback().set(FUNC(europc_fdc_device::irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(europc_fdc_device::drq_w));
 	// single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_dd_floppies, "35dd", isa8_fdc_device::floppy_formats).set_fixed(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, nullptr, isa8_fdc_device::floppy_formats);
@@ -556,18 +556,13 @@ void europc_fdc_device::device_start()
 	set_isa_device();
 	m_isa->install_device(0x03f0, 0x03f7, *this, &europc_fdc_device::map);
 	m_isa->set_dma_channel(2, this, true);
-
-	isa8_upd765_fdc_device::device_start();
 }
 
 void europc_fdc_device::map(address_map &map)
 {
-	// FIXME: the FDC has its own DOR
-	map(0x0, 0x0).r(m_fdc, FUNC(wd37c65c_device::msr_r)).w(FUNC(europc_fdc_device::dor_w));
-	map(0x1, 0x1).r(m_fdc, FUNC(wd37c65c_device::fifo_r)).w(FUNC(europc_fdc_device::dor_fifo_w));
-	map(0x2, 0x2).w(FUNC(europc_fdc_device::dor_w));
-	map(0x3, 0x3).w(FUNC(europc_fdc_device::dor_w));
-	map(0x4, 0x5).m(m_fdc, FUNC(wd37c65c_device::map));
+	map(2, 2).w(m_fdc, FUNC(wd37c65c_device::dor_w));
+	map(4, 5).m(m_fdc, FUNC(wd37c65c_device::map));
+	// TODO: DCR also decoded by JIM/BIGJIM
 }
 
 static void europc_fdc(device_slot_interface &device)
