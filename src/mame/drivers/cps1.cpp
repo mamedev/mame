@@ -12924,6 +12924,46 @@ ROM_START( pang3b2 )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 ROM_END
 
+/* An interesting single board bootleg which is an almost exact replica of the official Pang3 A/B board circuitry condensed onto a single pcb.
+   All component refs match the official 89626A short 10MHz A board and 94916-10 pang3 exclusive B board.
+   Uses pin compatible clone CPS-A/B chips which are marked 27C634 and 27C633 respectively, the clone B is a CPS-B-17.
+   They appear to be 3.3v chips as the common bootlegger trick of stepping down the supply voltage with power diodes is used.
+   Main code has been hacked to use the CPS-B-17 rather than official CPS-B-21 config.
+   All PALs confirmed to match official A/B board PALs.
+   Uses same encryption and mach215 security pld as official.
+*/
+ROM_START( pang3b3 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "u11l1_17.bin", 0x00000, 0x80000, CRC(dd3b95c0) SHA1(f5cc414f92e6ee805957ca00512ad112586bc4ff) )
+	ROM_LOAD16_WORD_SWAP( "u10l1_16.bin", 0x80000, 0x80000, CRC(1be9a483) SHA1(6cff1dd15ca163237bc82fb4a3e1d469d35e7be8) )  // == pa3e_16.10l
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD64_WORD( "pa3-01m.2c", 0x000000, 0x100000, CRC(068a152c) SHA1(fa491874068924c39bcc7de93dfda3b27f5d9613) )
+	ROM_CONTINUE(                  0x000004, 0x100000 )
+	ROM_LOAD64_WORD( "pa3-07m.2f", 0x000002, 0x100000, CRC(3a4a619d) SHA1(cfe68e24632b53fb6cd6d03b2166d6b5ba28b778) )
+	ROM_CONTINUE(                  0x000006, 0x100000 )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "u11f1.bin",  0x00000, 0x08000, CRC(278d786c) SHA1(bf226adf766b7d24a60e20d19d586c9fafe0973d) )  // == pa3_11.11f with empty space cut to fit into a 27c512
+	ROM_IGNORE( 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "pa3_05.10d",  0x00000, 0x20000, CRC(73a10d5d) SHA1(999465e4fbc35a34746d2db61ad49f61403d5af7) )
+	ROM_LOAD( "pa3_06.11d",  0x20000, 0x20000, CRC(affa4f82) SHA1(27b9292bbc121cf585f53297a79fe8f0d0a729ae) )
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "cp1b1f.1f",    0x0000, 0x0117, CRC(3979b8e3) SHA1(07c9819d68b4d93bc37b96bd15d689ce54fe034e) )
+	ROM_LOAD( "cp1b8k.8k",    0x0000, 0x0117, CRC(8a52ea7a) SHA1(47a59abc54a83292cfd6faa2d293c8f948c7ea03) )
+	ROM_LOAD( "cp1b9k.9k",    0x0000, 0x0117, CRC(a754bdc3) SHA1(9267b24cbddee4858b219468cc92f9df8f5fd0ef) )
+ROM_END
+
 /* B-Board 91635B-2 */
 /* Note that this USA set seems to be the only one where GFX are stored into EPROMs instead of the usual mask ROMs. */
 ROM_START( megaman )
@@ -13864,6 +13904,7 @@ GAME( 1995, pang3r1,     pang3,    pang3,      pang3,    cps_state,   init_pang3
 GAME( 1995, pang3j,      pang3,    pang3,      pang3,    cps_state,   init_pang3,    ROT0,   "Mitchell", "Pang! 3: Kaitou Tachi no Karei na Gogo (Japan 950511)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, pang3b,      pang3,    pang3,      pang3b,   cps_state,   init_pang3b,   ROT0,   "bootleg",  "Pang! 3 (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )    // 950511 - based on Euro version
 GAME( 1995, pang3b2,     pang3,    pang3,      pang3,    cps_state,   init_pang3,    ROT0,   "bootleg",  "Pang! 3 (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )    // 950601 - based on Euro version
+GAME( 1995, pang3b3,     pang3,    pang3,      pang3,    cps_state,   init_pang3,    ROT0,   "bootleg",  "Pang! 3 (bootleg, set 3)", MACHINE_SUPPORTS_SAVE )    // 950511 - based on Euro version, hacked to use cps-b-17
 
 /* Home 'CPS Changer' Unit */
 
