@@ -101,8 +101,8 @@ The "rc" feature is used to indicate the source of the clock signal
 		<publisher>Milton Bradley</publisher>
 		<info name="serial" value="MP3481" />
 		<part name="cart" interface="microvision_cart">
-			<feature name="pla" value="1" />  <!-- correct? -->
-			<feature name="pcb" value="4952-79 REV-B" />  <!-- correct? -->
+			<feature name="pla" value="1" />
+			<feature name="pcb" value="4952-79 REV-B" /> <!-- correct? -->
 			<feature name="paddle" value="yes" />
 			<dataarea name="rom" size="2048">
 				<rom name="connect4t.bin" size="2048" crc="6a4cf60b" sha1="e93d848784205ab49234ad26718e04d267b776ed"/>

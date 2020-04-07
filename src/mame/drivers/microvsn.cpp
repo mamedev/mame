@@ -72,6 +72,7 @@ private:
 	DECLARE_READ8_MEMBER(tms1100_read_k);
 	DECLARE_WRITE16_MEMBER(tms1100_write_o);
 	DECLARE_WRITE16_MEMBER(tms1100_write_r);
+	u32 tms1100_decode_micro(offs_t offset);
 
 	// enums
 	enum cpu_type
@@ -100,7 +101,6 @@ private:
 	cpu_type    m_cpu_type;
 	pcb_type    m_pcb_type;
 	rc_type     m_rc_type;
-
 
 	required_device<dac_byte_interface> m_dac;
 	required_device<i8021_device> m_i8021;
@@ -185,35 +185,6 @@ void microvision_state::machine_reset()
 	m_t1 = 0;
 
 	m_paddle_timer->adjust(attotime::never);
-
-	switch (m_cpu_type)
-	{
-		case CPU_TYPE_I8021:
-			m_i8021->resume(SUSPEND_REASON_DISABLE);
-			m_tms1100->suspend(SUSPEND_REASON_DISABLE, 0);
-			break;
-
-		case CPU_TYPE_TMS1100:
-			m_i8021->suspend(SUSPEND_REASON_DISABLE, 0);
-			m_tms1100->resume(SUSPEND_REASON_DISABLE);
-
-			switch (m_rc_type)
-			{
-				case RC_TYPE_100PF_21_0K:
-					m_tms1100->set_clock(550000);
-					break;
-
-				case RC_TYPE_100PF_23_2K:
-				case RC_TYPE_UNKNOWN:   // Default to most occurring setting
-					m_tms1100->set_clock(500000);
-					break;
-
-				case RC_TYPE_100PF_39_4K:
-					m_tms1100->set_clock(300000);
-					break;
-			}
-			break;
-	}
 }
 
 
@@ -484,33 +455,62 @@ WRITE16_MEMBER( microvision_state::tms1100_write_r )
 }
 
 
-static const u16 microvision_output_pla_0[0x20] =
+static const u16 microvision_output_pla[2][0x20] =
 {
-	/* O output PLA configuration currently unknown */
-	0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E,
-	0x01, 0x09, 0x05, 0x0D, 0x03, 0x0B, 0x07, 0x0F,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	// default TMS1100 O output PLA
+	// verified for: blckbstr, pinball
+	{
+		0x00, 0x08, 0x04, 0x0c, 0x02, 0x0a, 0x06, 0x0e,
+		0x01, 0x09, 0x05, 0x0d, 0x03, 0x0b, 0x07, 0x0f,
+		0x00, 0x08, 0x04, 0x0c, 0x02, 0x0a, 0x06, 0x0e,
+		0x01, 0x09, 0x05, 0x0d, 0x03, 0x0b, 0x07, 0x0f
+	},
+
+	// reversed bit order
+	// verified for: bowling, vegasslt
+	{
+		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+	}
 };
 
-
-static const u16 microvision_output_pla_1[0x20] =
+u32 microvision_state::tms1100_decode_micro(offs_t offset)
 {
-	/* O output PLA configuration currently unknown */
-	/* Reversed bit order */
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-	0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
+	// default TMS1100 microinstructions PLA - this should work for all games
+	// verified for: blckbstr, bowling, pinball, vegasslt
+	static const u16 micro[0x80] =
+	{
+		0x1402, 0x0c30, 0xd002, 0x2404, 0x8019, 0x8038, 0x0416, 0x0415,
+		0x0104, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x1100, 0x0000,
+		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+		0x000a, 0x0404, 0x0408, 0x8004, 0xa019, 0xa038, 0x2004, 0x2000,
+		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+		0x1580, 0x1580, 0x1580, 0x1580, 0x0c34, 0x0834, 0x0434, 0x1400,
+		0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108,
+		0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108,
+		0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080,
+		0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080,
+		0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068,
+		0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068,
+		0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136,
+		0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0134
+	};
 
+	if (offset >= 0x80 || micro[offset] == 0)
+		return 0x8fa3;
+	else
+		return micro[offset];
+}
 
 DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 {
 	uint8_t *rom1 = memregion("maincpu1")->base();
 	uint8_t *rom2 = memregion("maincpu2")->base();
 	uint32_t file_size = m_cart->common_get_size("rom");
-	m_pla = 0;
 
 	if ( file_size != 1024 && file_size != 2048 )
 	{
@@ -518,7 +518,12 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 		return image_init_result::FAIL;
 	}
 
-	/* Read cartridge */
+	// Set default settings
+	m_pcb_type = microvision_state::PCB_TYPE_UNKNOWN;
+	m_rc_type = microvision_state::RC_TYPE_UNKNOWN;
+	m_pla = 0;
+
+	// Read cartridge
 	if (!image.loaded_through_softlist())
 	{
 		if (image.fread(rom1, file_size) != file_size)
@@ -538,11 +543,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 		if (pla)
 			m_pla = 1;
 
-		m_tms1100->set_output_pla(m_pla ? microvision_output_pla_1 : microvision_output_pla_0);
-
-		// Set default setting for PCB type and RC type
-		m_pcb_type = microvision_state::PCB_TYPE_UNKNOWN;
-		m_rc_type = microvision_state::RC_TYPE_UNKNOWN;
+		m_tms1100->set_output_pla(microvision_output_pla[m_pla]);
 
 		// Detect settings for PCB type
 		const char *pcb = image.get_feature("pcb");
@@ -594,17 +595,34 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 	// Based on file size select cpu:
 	// - 1024 -> I8021
 	// - 2048 -> TI TMS1100
-
 	switch (file_size)
 	{
 		case 1024:
 			m_cpu_type = microvision_state::CPU_TYPE_I8021;
+			m_i8021->set_clock(2000000);
 			break;
 
 		case 2048:
 			m_cpu_type = microvision_state::CPU_TYPE_TMS1100;
+
+			switch (m_rc_type)
+			{
+				case RC_TYPE_100PF_21_0K:
+					m_tms1100->set_clock(550000);
+					break;
+
+				case RC_TYPE_100PF_23_2K:
+				case RC_TYPE_UNKNOWN: // Default to most occurring setting
+					m_tms1100->set_clock(500000);
+					break;
+
+				case RC_TYPE_100PF_39_4K:
+					m_tms1100->set_clock(300000);
+					break;
+			}
 			break;
 	}
+
 	return image_init_result::PASS;
 }
 
@@ -635,20 +653,19 @@ INPUT_PORTS_END
 
 void microvision_state::microvision(machine_config &config)
 {
-	I8021(config, m_i8021, 2000000);    // approximately
+	I8021(config, m_i8021, 0);
 	m_i8021->bus_out_cb().set(FUNC(microvision_state::i8021_p0_write));
 	m_i8021->p1_out_cb().set(FUNC(microvision_state::i8021_p1_write));
 	m_i8021->p2_out_cb().set(FUNC(microvision_state::i8021_p2_write));
 	m_i8021->t1_in_cb().set(FUNC(microvision_state::i8021_t1_read));
 	m_i8021->bus_in_cb().set(FUNC(microvision_state::i8021_bus_read));
 
-	TMS1100(config, m_tms1100, 500000);   // most games seem to be running at approximately this speed
-	m_tms1100->set_output_pla(microvision_output_pla_0);
+	TMS1100(config, m_tms1100, 0);
+	m_tms1100->set_output_pla(microvision_output_pla[0]);
+	m_tms1100->set_decode_micro().set(FUNC(microvision_state::tms1100_decode_micro));
 	m_tms1100->k().set(FUNC(microvision_state::tms1100_read_k));
 	m_tms1100->o().set(FUNC(microvision_state::tms1100_write_o));
 	m_tms1100->r().set(FUNC(microvision_state::tms1100_write_r));
-
-	config.set_maximum_quantum(attotime::from_hz(60));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
@@ -680,9 +697,7 @@ void microvision_state::microvision(machine_config &config)
 ROM_START( microvsn )
 	ROM_REGION( 0x800, "maincpu1", ROMREGION_ERASE00 )
 	ROM_REGION( 0x800, "maincpu2", ROMREGION_ERASE00 )
-	ROM_REGION( 867, "maincpu2:mpla", 0 )
-	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // verified for: pinball, blockbuster, bowling
-
+	ROM_REGION( 867, "maincpu2:mpla", ROMREGION_ERASE00 )
 	ROM_REGION( 365, "maincpu2:opla", ROMREGION_ERASE00 )
 ROM_END
 
