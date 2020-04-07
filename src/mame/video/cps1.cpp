@@ -1265,15 +1265,33 @@ static const struct gfx_range mapper_PKB10B_table[] =
 };
 
 
-#define mapper_pang3    { 0x8000, 0x8000, 0, 0 }, mapper_pang3_table
-static const struct gfx_range mapper_pang3_table[] =
-{
-	/* type                              start   end     bank */
-	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x0000, 0x7fff, 0 },
+// #define mapper_pang3    { 0x8000, 0x8000, 0, 0 }, mapper_pang3_table
+// static const struct gfx_range mapper_pang3_table[] =
+// {
+	// /* type                              start   end     bank */
+	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x0000, 0x7fff, 0 },
 
-	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0x9fff, 1 },
-	{ GFXTYPE_SCROLL1,                   0xa000, 0xbfff, 1 },
-	{ GFXTYPE_SCROLL3,                   0xc000, 0xffff, 1 },
+	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0x9fff, 1 },
+	// { GFXTYPE_SCROLL1,                   0xa000, 0xbfff, 1 },
+	// { GFXTYPE_SCROLL3,                   0xc000, 0xffff, 1 },
+	// { 0 }
+// };
+
+
+#define mapper_CP1B1F    { 0x10000, 0, 0, 0 }, mapper_CP1B1F_table
+static const struct gfx_range mapper_CP1B1F_table[] =
+{
+	// verified from PAL dump:
+	// bank0 = pin 16 (ROMs 1,7 /ce)
+	//       = pin 15 (ROMs 1,7 /oe)
+	//       = pin 13 (ROMs 1,7 a19)
+	// Unlike other games which switch between 2 pairs of roms to form the full 64-bit gfx bus,
+	//  this unique B board stores the 2x 32-bit halves in the same rom pair and switches between them with the a19 line.
+	// An a20 line is available on pin 14 for 32MBit roms but is unused (this would be bank1 if used).
+	// pins 17,18,19 are rom /ce lines to other 3 pairs of unpopulated roms.
+
+	/* type                                                                  start   end     bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x0000, 0xffff, 0 },
 	{ 0 }
 };
 
@@ -1652,12 +1670,12 @@ static const struct CPS1config cps1_config_table[]=
 	{"megamana",    CPS_B_21_DEF, mapper_RCM63B },
 	{"rockmanj",    CPS_B_21_DEF, mapper_RCM63B },
 	{"pnickj",      CPS_B_21_DEF, mapper_PKB10B },
-	{"pang3",       CPS_B_21_DEF, mapper_pang3 },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */   // should use one of these three CP1B1F,CP1B8K,CP1B9KA
-	{"pang3r1",     CPS_B_21_DEF, mapper_pang3 },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */   // should use one of these three CP1B1F,CP1B8K,CP1B9K
-	{"pang3j",      CPS_B_21_DEF, mapper_pang3 },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */   // should use one of these three CP1B1F,CP1B8K,CP1B9K
-	{"pang3b",      CPS_B_21_DEF, mapper_pang3 },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */   // should use one of these three CP1B1F,CP1B8K,CP1B9K
-	{"pang3b2",     CPS_B_21_DEF, mapper_pang3 },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */   // should use one of these three CP1B1F,CP1B8K,CP1B9K
-	{"pang3b3",     CPS_B_17,     mapper_pang3 },
+	{"pang3",       CPS_B_21_DEF, mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
+	{"pang3r1",     CPS_B_21_DEF, mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
+	{"pang3j",      CPS_B_21_DEF, mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
+	{"pang3b",      CPS_B_21_DEF, mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
+	{"pang3b2",     CPS_B_21_DEF, mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
+	{"pang3b3",     CPS_B_17,     mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"ganbare",     CPS_B_21_DEF, mapper_sfzch },   // wrong, this set uses GBPR2, dumped but equations still not added
 	{"gulunpa",     CPS_B_21_DEF, mapper_gulunpa }, // wrong
 	
