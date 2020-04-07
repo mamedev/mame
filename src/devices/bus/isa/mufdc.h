@@ -57,7 +57,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
-	required_device<pc_fdc_interface> m_fdc;
+	required_device<mcs3201_device> m_fdc;
 	required_ioport m_config;
 };
 

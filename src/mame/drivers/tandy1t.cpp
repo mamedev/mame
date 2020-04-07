@@ -40,7 +40,6 @@ Tandy 1000 (80386) variations:
 #include "machine/genpc.h"
 #include "machine/pckeybrd.h"
 #include "machine/nvram.h"
-#include "machine/pc_fdc.h"
 #include "machine/bankdev.h"
 #include "video/pc_t1t.h"
 #include "sound/sn76496.h"
