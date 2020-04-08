@@ -83,6 +83,7 @@ private:
 	uint8_t m_port_b_data;
 	uint8_t m_status;
 	uint8_t m_clr_status;
+	uint8_t m_voice;
 
 	DECLARE_READ8_MEMBER(disk_iobank_r);
 	DECLARE_WRITE8_MEMBER(disk_iobank_w);
@@ -296,6 +297,13 @@ WRITE8_MEMBER(pcxt_state::disk_iobank_w)
 			bank = 3;
 	}
 
+	if (!(data & 0xf0))
+	{
+		int bit = (data >> 1) - 2;
+		m_voice &= ~(1 << bit);
+		m_voice |= BIT(data, 0) << bit;
+	}
+
 	m_bank->set_bank(bank);
 
 	m_lastvalue = data;
@@ -383,6 +391,7 @@ void pcxt_state::filetto_io(address_map &map)
 	map(0x0201, 0x0201).portr("COIN"); //game port
 	map(0x0310, 0x0311).rw(FUNC(pcxt_state::disk_iobank_r), FUNC(pcxt_state::disk_iobank_w)); //Prototyping card
 	map(0x0312, 0x0312).portr("IN0"); //Prototyping card,read only
+	map(0x0313, 0x0313).lw8(NAME([this](u8 data) { logerror("play voice %x\n", m_voice); }));
 	map(0x03f2, 0x03f2).w(FUNC(pcxt_state::fdc_dor_w));
 	map(0x03f4, 0x03f4).r(FUNC(pcxt_state::fdc765_status_r)); //765 Floppy Disk Controller (FDC) Status
 	map(0x03f5, 0x03f5).rw(FUNC(pcxt_state::fdc765_data_r), FUNC(pcxt_state::fdc765_data_w));//FDC Data
@@ -487,6 +496,7 @@ INPUT_PORTS_END
 void pcxt_state::machine_reset()
 {
 	m_lastvalue = -1;
+	m_voice = 0;
 }
 
 static void filetto_isa8_cards(device_slot_interface &device)
