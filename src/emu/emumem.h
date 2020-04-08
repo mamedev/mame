@@ -542,6 +542,8 @@ template<int Width, int AddrShift, int Endian> class handler_entry_read : public
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
+	static constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? make_bitmask<u32>(Width + AddrShift) : 0;
+
 	struct mapping {
 		handler_entry_read<Width, AddrShift, Endian> *original;
 		handler_entry_read<Width, AddrShift, Endian> *patched;
@@ -603,6 +605,8 @@ template<int Width, int AddrShift, int Endian> class handler_entry_write : publi
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
+	static constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? make_bitmask<u32>(Width + AddrShift) : 0;
+
 	struct mapping {
 		handler_entry_write<Width, AddrShift, Endian> *original;
 		handler_entry_write<Width, AddrShift, Endian> *patched;
@@ -617,6 +621,8 @@ public:
 	virtual void lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_write<Width, AddrShift, Endian> *&handler) const;
 
 	inline void populate(offs_t start, offs_t end, offs_t mirror, handler_entry_write<Width, AddrShift, Endian> *handler) {
+		start &= ~NATIVE_MASK;
+		end |= ~NATIVE_MASK;
 		if(mirror)
 			populate_mirror(start, end, start, end, mirror, handler);
 		else
@@ -627,6 +633,9 @@ public:
 	virtual void populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_write<Width, AddrShift, Endian> *handler);
 
 	inline void populate_mismatched(offs_t start, offs_t end, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor) {
+		start &= ~NATIVE_MASK;
+		end |= ~NATIVE_MASK;
+
 		std::vector<mapping> mappings;
 		if(mirror)
 			populate_mismatched_mirror(start, end, start, end, mirror, descriptor, mappings);
@@ -693,7 +702,7 @@ template<int Width, int AddrShift, int Endian, int TargetWidth, bool Aligned, ty
 	constexpr u32 NATIVE_BYTES = 1 << Width;
 	constexpr u32 NATIVE_BITS = 8 * NATIVE_BYTES;
 	constexpr u32 NATIVE_STEP = AddrShift >= 0 ? NATIVE_BYTES << iabs(AddrShift) : NATIVE_BYTES >> iabs(AddrShift);
-	constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? (1 << (Width + AddrShift)) - 1 : 0;
+	constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? make_bitmask<u32>(Width + AddrShift) : 0;
 
 	// equal to native size and aligned; simple pass-through to the native reader
 	if (NATIVE_BYTES == TARGET_BYTES && (Aligned || (address & NATIVE_MASK) == 0))

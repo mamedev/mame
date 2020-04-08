@@ -37,13 +37,12 @@ template<> u8 mask_to_ukey<u64>(u64 mask)
 
 template<int Width, int AddrShift, int Endian> memory_units_descriptor<Width, AddrShift, Endian>::memory_units_descriptor(u8 access_width, u8 access_endian, handler_entry *handler, offs_t addrstart, offs_t addrend, offs_t mask, typename emu::detail::handler_entry_size<Width>::uX unitmask, int cswidth) : m_handler(handler), m_access_width(access_width), m_access_endian(access_endian)
 {
-	constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? make_bitmask<u32>(Width + AddrShift) : 0;
 	u32 bits_per_access = 8 << access_width;
+	constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? make_bitmask<u32>(Width + AddrShift) : 0;
 
 	// Compute the real base addresses
 	m_addrstart = addrstart & ~NATIVE_MASK;
 	m_addrend = addrend & ~NATIVE_MASK;
-
 
 	// Compute the masks and the keys
 	std::array<uX, 4> umasks;

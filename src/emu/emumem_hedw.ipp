@@ -41,8 +41,10 @@ template<int HighBits, int Width, int AddrShift, int Endian> void handler_entry_
 		offs_t entry = (cur >> LowBits) & BITMASK;
 		if(m_dispatch[entry]->is_dispatch())
 			m_dispatch[entry]->dump_map(map);
-		else
+		else {
+			fprintf(stderr, "add range %08x %08x\n", m_ranges[entry].start, m_ranges[entry].end);
 			map.emplace_back(memory_entry{ m_ranges[entry].start, m_ranges[entry].end, m_dispatch[entry] });
+		}
 		cur = map.back().end + 1;
 	} while(cur && !((cur ^ base) & UPMASK));
 }
