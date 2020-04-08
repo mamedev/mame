@@ -10860,16 +10860,7 @@ ROM_END
 */
 
 #define SF2CEMS6_PLD_DEVICES \
-	/* 8x TIBPAL16L8-25CN (OTP) */ \
-	ROM_LOAD( "ms6_pal16l8.u173",  0x000, 0x104, NO_DUMP ) \
-	ROM_LOAD( "ms6_pal16l8.u176",  0x000, 0x104, NO_DUMP ) \
-	ROM_LOAD( "ms6_pal16l8.u177",  0x000, 0x104, NO_DUMP ) \
-	ROM_LOAD( "ms6_pal16l8.u178",  0x000, 0x104, NO_DUMP ) \
-	ROM_LOAD( "ms6_pal16l8.u183",  0x000, 0x104, NO_DUMP ) \
-	ROM_LOAD( "ms6_pal16l8.u198",  0x000, 0x104, NO_DUMP ) \
-	ROM_LOAD( "ms6_pal16l8.u218",  0x000, 0x104, NO_DUMP ) \
-	ROM_LOAD( "ms6_pal16l8.u231",  0x000, 0x104, NO_DUMP ) \
-	/* 8x PALCE16V8H-25PC/4 */ \
+	/* 16x PALCE16V8H-25PC/4 or TIBPAL16L8-25CN (OTP) */ \
 	ROM_LOAD( "ms6_gal16v8.u6",    0x000, 0x117, NO_DUMP ) \
 	ROM_LOAD( "ms6_gal16v8.u95",   0x000, 0x117, NO_DUMP ) \
 	ROM_LOAD( "ms6_gal16v8.u96",   0x000, 0x117, NO_DUMP ) \
@@ -10877,6 +10868,14 @@ ROM_END
 	ROM_LOAD( "ms6_gal16v8.u125",  0x000, 0x117, NO_DUMP ) \
 	ROM_LOAD( "ms6_gal16v8.u139",  0x000, 0x117, NO_DUMP ) \
 	ROM_LOAD( "ms6_gal16v8.u151",  0x000, 0x117, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal16v8.u173",  0x000, 0x117, CRC(32dec205) SHA1(aaf1579b00f30b5bec86e89db8c7f0c3ad7a790d) )  /* unprotected */ \
+	ROM_LOAD( "ms6_gal16v8.u176",  0x200, 0x117, CRC(deb37f27) SHA1(776d5185eece102d6e340ab5c2f7ddc4483ccda5) )  /* unprotected */ \
+	ROM_LOAD( "ms6_pal16l8.u177",  0x000, 0x117, NO_DUMP ) \
+	ROM_LOAD( "ms6_pal16l8.u178",  0x000, 0x117, NO_DUMP ) \
+	ROM_LOAD( "ms6_pal16l8.u183",  0x000, 0x117, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal16v8.u198",  0x400, 0x117, CRC(cd1246fe) SHA1(b6d311f3c8dd6b411059eb60b22b33483b59bff8) )  /* unprotected */ \
+	ROM_LOAD( "ms6_pal16l8.u218",  0x000, 0x117, NO_DUMP ) \
+	ROM_LOAD( "ms6_pal16l8.u231",  0x000, 0x117, NO_DUMP ) \
 	ROM_LOAD( "ms6_gal16v8.u245",  0x000, 0x117, NO_DUMP ) \
 	/* 14x PALCE20V8H-25PC/4 */ \
 	ROM_LOAD( "ms6_gal20v8.u15",   0x000, 0x157, NO_DUMP ) \
@@ -10885,17 +10884,17 @@ ROM_END
 	ROM_LOAD( "ms6_gal20v8.u21",   0x000, 0x157, NO_DUMP ) \
 	ROM_LOAD( "ms6_gal20v8.u39",   0x000, 0x157, NO_DUMP ) \
 	ROM_LOAD( "ms6_gal20v8.u40",   0x000, 0x157, NO_DUMP ) \
-	ROM_LOAD( "ms6_gal20v8.u104",  0x000, 0x157, CRC(67b56d29) SHA1(261ae6e968100d5a9c1ee68ea684bb2b1eef3cf8) )  /* unprotected */ \
+	ROM_LOAD( "ms6_gal20v8.u104",  0x600, 0x157, CRC(67b56d29) SHA1(261ae6e968100d5a9c1ee68ea684bb2b1eef3cf8) )  /* unprotected */ \
 	ROM_LOAD( "ms6_gal20v8.u131",  0x000, 0x157, NO_DUMP ) \
 	ROM_LOAD( "ms6_gal20v8.u135",  0x000, 0x157, NO_DUMP ) \
 	ROM_LOAD( "ms6_gal20v8.u140",  0x000, 0x157, NO_DUMP ) \
 	ROM_LOAD( "ms6_gal20v8.u232",  0x000, 0x157, NO_DUMP ) \
 	ROM_LOAD( "ms6_gal20v8.u233",  0x000, 0x157, NO_DUMP ) \
-	ROM_LOAD( "ms6_gal20v8.u234",  0x200, 0x157, CRC(2c16b7c6) SHA1(f73ad0253a861d5306a09b1f97dfce622b19cdcf) )  /* unprotected */ \
+	ROM_LOAD( "ms6_gal20v8.u234",  0x800, 0x157, CRC(2c16b7c6) SHA1(f73ad0253a861d5306a09b1f97dfce622b19cdcf) )  /* unprotected */ \
 	ROM_LOAD( "ms6_gal20v8.u235",  0x000, 0x157, NO_DUMP ) \
 	/* 2x PALCE22V10H-25PC/4 */ \
-	ROM_LOAD( "ms6_gal22v10.u50",  0x400, 0x2e5, CRC(dc665408) SHA1(a7161a03add24a01d547189e9bfaf11474bbe878) )  /* unprotected */ \
-	ROM_LOAD( "ms6_gal22v10.u134", 0x800, 0x2e5, CRC(b66848bb) SHA1(edef02bc7fc0195f56cf815c1b862bee095951c8) )  /* unprotected */
+	ROM_LOAD( "ms6_gal22v10.u50",  0xa00, 0x2e5, CRC(dc665408) SHA1(a7161a03add24a01d547189e9bfaf11474bbe878) )  /* unprotected */ \
+	ROM_LOAD( "ms6_gal22v10.u134", 0xe00, 0x2e5, CRC(b66848bb) SHA1(edef02bc7fc0195f56cf815c1b862bee095951c8) )  /* unprotected */
 
 ROM_START( sf2cems6a )  /* 920313 USA (this set matches "sf2ceuab4" in FBA) */
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68k code */
@@ -10932,7 +10931,7 @@ ROM_START( sf2cems6a )  /* 920313 USA (this set matches "sf2ceuab4" in FBA) */
 	ROM_REGION( 0x10000, "user1", 0 ) /* unknown, priority? */
 	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )  // == loads other bootleg sets
 
-	ROM_REGION( 0x0c00, "plds", 0 ) /* pld devices */
+	ROM_REGION( 0x1200, "plds", 0 ) /* pld devices */
 	SF2CEMS6_PLD_DEVICES
 ROM_END
 
@@ -10979,7 +10978,7 @@ ROM_START( sf2cems6b )  /* 920322 USA */
 	ROM_REGION( 0x10000, "user1", 0 ) /* unknown, priority? */
 	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
 
-	ROM_REGION( 0x0c00, "plds", 0 ) /* pld devices */
+	ROM_REGION( 0x1200, "plds", 0 ) /* pld devices */
 	SF2CEMS6_PLD_DEVICES
 ROM_END
 
@@ -11026,7 +11025,7 @@ ROM_START( sf2cems6c )  /* 920322 USA */
 	ROM_REGION( 0x10000, "user1", 0 ) /* unknown, priority? */
 	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
 
-	ROM_REGION( 0x0c00, "plds", 0 ) /* pld devices */
+	ROM_REGION( 0x1200, "plds", 0 ) /* pld devices */
 	SF2CEMS6_PLD_DEVICES
 ROM_END
 
