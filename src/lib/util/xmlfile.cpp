@@ -68,6 +68,9 @@ static void expat_element_end(void *data, const XML_Char *name);
     XML FILE OBJECTS
 ***************************************************************************/
 
+file::file() { }
+file::~file() { }
+
 
 /*-------------------------------------------------
     create - create a new, empty XML file
