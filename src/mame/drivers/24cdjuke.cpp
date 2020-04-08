@@ -55,7 +55,6 @@ http://www.tilt.it/deb/i-midcoin.html
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "24cdjuke.lh"
 
 class midcoin24cdjuke_state : public driver_device
 {
@@ -292,7 +291,7 @@ void midcoin24cdjuke_state::midcoin24cdjuke(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &midcoin24cdjuke_state::midcoin24cdjuke_io);
 	m_maincpu->set_periodic_int(FUNC(midcoin24cdjuke_state::irq0_line_hold), attotime::from_hz(500));
 
-	config.set_default_layout(layout_24cdjuke);
+	config.set_default_layout("24cdjuke");
 
 	i8255_device &ic11(I8255A(config, "ic11"));
 	ic11.in_pa_callback().set_ioport("MD1");

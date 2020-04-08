@@ -25,7 +25,7 @@ ToDo:
 #include "sound/s14001a.h"
 #include "speaker.h"
 
-#include "st_mp200.lh"
+
 
 #define S14001_CLOCK                (25e5)
 
@@ -589,7 +589,7 @@ void st_mp200_state::st_mp200(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	config.set_default_layout(layout_st_mp200);
+	config.set_default_layout("st_mp200");
 
 	/* Sound */
 	genpin_audio(config);

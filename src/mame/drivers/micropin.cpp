@@ -31,7 +31,6 @@ ToDo:
 #include "sound/beep.h"
 #include "speaker.h"
 
-#include "micropin.lh"
 
 
 class micropin_state : public genpin_class
@@ -308,7 +307,7 @@ void micropin_state::micropin(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	config.set_default_layout(layout_micropin);
+	config.set_default_layout("micropin");
 
 	/* Sound */
 	genpin_audio(config);

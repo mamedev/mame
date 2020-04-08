@@ -16,7 +16,6 @@
 #include "machine/steppers.h" // stepper motor
 #include "machine/meters.h"
 #include "video/awpvid.h" // drawing reels
-#include "ecoinf2.lh"
 
 class ecoinf2_state : public driver_device
 {
@@ -504,7 +503,7 @@ void ecoinf2_state::ecoinf2_oxo(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinf2_state::oxo_memmap);
 	m_maincpu->set_addrmap(AS_IO, &ecoinf2_state::oxo_portmap);
 
-	config.set_default_layout(layout_ecoinf2);
+	config.set_default_layout("ecoinf2");
 
 	i8255_device &ic10_lamp(I8255(config, "ic10_lamp"));
 	ic10_lamp.out_pa_callback().set(FUNC(ecoinf2_state::ppi8255_ic10_write_a_strobedat0));

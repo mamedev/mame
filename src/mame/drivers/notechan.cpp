@@ -291,7 +291,6 @@
 #include "sound/okim6295.h"
 #include "speaker.h"
 
-#include "notechan.lh"
 
 
 #define MASTER_CLOCK     XTAL(8'448'000)
@@ -540,4 +539,4 @@ ROM_END
 *********************************************/
 
 //     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT   COMPANY      FULLNAME       FLAGS                 LAYOUT
-GAMEL( 1995, notechan, 0,      notechan, notechan, notechan_state, empty_init, ROT0, "Banpresto", "Note Chance", MACHINE_NOT_WORKING,  layout_notechan )
+GAMEL( 1995, notechan, 0,      notechan, notechan, notechan_state, empty_init, ROT0, "Banpresto", "Note Chance", MACHINE_NOT_WORKING,  "notechan" )

@@ -30,7 +30,6 @@ ToDo:
 #include "sound/sn76477.h"
 #include "speaker.h"
 
-#include "gp_1.lh"
 
 class gp_1_state : public genpin_class
 {
@@ -446,7 +445,7 @@ void gp_1_state::gp_1(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	config.set_default_layout(layout_gp_1);
+	config.set_default_layout("gp_1");
 
 	/* Sound */
 	genpin_audio(config);

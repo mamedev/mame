@@ -70,10 +70,6 @@ is completely different, based on a 68000.
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "mephisto_1.lh" // clickable
-#include "mephisto_esb2.lh" // clickable
-#include "mephisto_3.lh" // clickable
 
 
 namespace {
@@ -435,7 +431,7 @@ void brikett_state::mephisto(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_mephisto_1);
+	config.set_default_layout("mephisto_1");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -467,7 +463,7 @@ void brikett_state::mephisto2e(machine_config &config)
 	m_board->set_delay(attotime::from_msec(250));
 
 	m_display->set_size(4+8, 8);
-	config.set_default_layout(layout_mephisto_esb2);
+	config.set_default_layout("mephisto_esb2");
 }
 
 void brikett_state::mephisto3(machine_config &config)
@@ -479,7 +475,7 @@ void brikett_state::mephisto3(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto3_map);
 	m_maincpu->q_cb().set(FUNC(brikett_state::q_w));
 
-	config.set_default_layout(layout_mephisto_3);
+	config.set_default_layout("mephisto_3");
 }
 
 

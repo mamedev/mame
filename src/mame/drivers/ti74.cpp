@@ -79,8 +79,8 @@
 #include "screen.h"
 #include "softlist.h"
 
-#include "ti74.lh"
-#include "ti95.lh"
+
+
 
 
 class ti74_state : public driver_device
@@ -538,7 +538,7 @@ void ti74_state::ti74(machine_config &config)
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	screen.set_palette("palette");
 
-	config.set_default_layout(layout_ti74);
+	config.set_default_layout("ti74");
 
 	PALETTE(config, "palette", FUNC(ti74_state::ti74_palette), 3);
 
@@ -572,7 +572,7 @@ void ti74_state::ti95(machine_config &config)
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	screen.set_palette("palette");
 
-	config.set_default_layout(layout_ti95);
+	config.set_default_layout("ti95");
 
 	PALETTE(config, "palette", FUNC(ti74_state::ti74_palette), 3);
 

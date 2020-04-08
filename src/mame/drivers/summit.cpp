@@ -29,7 +29,7 @@
 #include "tilemap.h"
 #include "speaker.h"
 
-#include "summit.lh"
+
 
 
 //**************************************************************************
@@ -409,7 +409,7 @@ void summit_state::summit(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	config.set_default_layout(layout_summit);
+	config.set_default_layout("summit");
 }
 
 

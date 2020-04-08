@@ -69,11 +69,6 @@ TODO:
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "novag_const.lh" // clickable
-#include "novag_constq.lh" // clickable
-#include "novag_ssensor4.lh" // clickable
-#include "novag_supercon.lh" // clickable
 
 
 namespace {
@@ -345,7 +340,7 @@ void const_state::nconst(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(3, 8);
-	config.set_default_layout(layout_novag_const);
+	config.set_default_layout("novag_const");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -362,7 +357,7 @@ void const_state::ssensor4(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	config.set_default_layout(layout_novag_ssensor4);
+	config.set_default_layout("novag_ssensor4");
 }
 
 void const_state::nconst36(machine_config &config)
@@ -413,7 +408,7 @@ void const_state::nconstq(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(17200)); // same as nconst
 	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(const_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	config.set_default_layout(layout_novag_constq);
+	config.set_default_layout("novag_constq");
 
 	/* sound hardware */
 	BEEP(config.replace(), m_beeper, 8_MHz_XTAL/4 / 0x800); // ~976Hz
@@ -432,7 +427,7 @@ void const_state::sconst(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	config.set_default_layout(layout_novag_supercon);
+	config.set_default_layout("novag_supercon");
 }
 
 

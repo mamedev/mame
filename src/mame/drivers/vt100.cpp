@@ -52,7 +52,7 @@
 #include "video/vtvideo.h"
 #include "screen.h"
 
-#include "vt100.lh"
+
 
 
 class vt100_state : public driver_device
@@ -329,7 +329,7 @@ void vt100_state::vt100(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "vt100_video:palette", gfx_vt100);
 //  PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	config.set_default_layout(layout_vt100);
+	config.set_default_layout("vt100");
 
 	VT100_VIDEO(config, m_crtc, XTAL(24'073'400));
 	m_crtc->set_screen("screen");

@@ -239,9 +239,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-// color overlays, bbonk does not have an overlay
-#include "lazercmd.lh"
-#include "medlanes.lh"
 
 #define MASTER_CLOCK XTAL(8'000'000)
 
@@ -810,6 +807,6 @@ void lazercmd_state::init_lazercmd()
 
 
 
-GAMEL( 1976, lazercmd, 0, lazercmd, lazercmd, lazercmd_state, init_lazercmd, ROT0, "Meadows Games, Inc.", "Lazer Command", MACHINE_SUPPORTS_SAVE, layout_lazercmd )
-GAMEL( 1977, medlanes, 0, medlanes, medlanes, lazercmd_state, init_lazercmd, ROT0, "Meadows Games, Inc.", "Meadows Lanes", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_medlanes )
+GAMEL( 1976, lazercmd, 0, lazercmd, lazercmd, lazercmd_state, init_lazercmd, ROT0, "Meadows Games, Inc.", "Lazer Command", MACHINE_SUPPORTS_SAVE, "lazercmd" )
+GAMEL( 1977, medlanes, 0, medlanes, medlanes, lazercmd_state, init_lazercmd, ROT0, "Meadows Games, Inc.", "Meadows Lanes", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "medlanes" )
 GAME(  1976, bbonk,    0, bbonk,    bbonk,    lazercmd_state, init_lazercmd, ROT0, "Meadows Games, Inc.", "Bigfoot Bonkers", MACHINE_SUPPORTS_SAVE )

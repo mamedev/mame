@@ -36,7 +36,6 @@
 
 #include "debugger.h"
 
-#include "apollo_dsp.lh"
 
 
 #define TERMINAL_TAG "terminal"
@@ -1077,7 +1076,7 @@ void apollo_state::dsp3500(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("8M").set_extra_options("4M,8M,16M,32M");
 
 	/* terminal hardware */
-	config.set_default_layout(layout_apollo_dsp);
+	config.set_default_layout("apollo_dsp");
 }
 
 void apollo_state::dn3500_19i(machine_config &config)
@@ -1128,7 +1127,7 @@ void apollo_state::dsp3000(machine_config &config)
 	config.device_remove( APOLLO_SIO2_TAG );
 
 	/* terminal hardware */
-	config.set_default_layout(layout_apollo_dsp);
+	config.set_default_layout("apollo_dsp");
 }
 
 void apollo_state::dn3000_19i(machine_config &config)
@@ -1172,7 +1171,7 @@ void apollo_state::dsp5500(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("8M").set_extra_options("4M,8M,16M,32M");
 
 	/* terminal hardware */
-	config.set_default_layout(layout_apollo_dsp);
+	config.set_default_layout("apollo_dsp");
 }
 
 void apollo_state::dn5500_19i(machine_config &config)

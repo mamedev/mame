@@ -67,8 +67,6 @@ mae(forward), migi(right), ushiro(back), hidari(left)
 
 #include "speaker.h"
 
-// internal artwork
-#include "kungfur.lh"
 
 
 namespace {
@@ -339,4 +337,4 @@ ROM_END
 ******************************************************************************/
 
 /*     YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        MONITOR  COMPANY, FULLNAME, FLAGS */
-GAMEL( 1987, kungfur, 0,      kungfur, kungfur, kungfur_state, empty_init, ROT0,    "Namco", "Kung-Fu Roushi", MACHINE_SUPPORTS_SAVE, layout_kungfur )
+GAMEL( 1987, kungfur, 0,      kungfur, kungfur, kungfur_state, empty_init, ROT0,    "Namco", "Kung-Fu Roushi", MACHINE_SUPPORTS_SAVE, "kungfur" )

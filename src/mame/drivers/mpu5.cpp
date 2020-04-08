@@ -141,7 +141,6 @@ Switches   Aux-RS232   Aux Port   Alpha      Vend-Bus
 
 #include "speaker.h"
 
-#include "mpu5.lh"
 
 
 READ8_MEMBER(mpu5_state::asic_r8)
@@ -454,7 +453,7 @@ void mpu5_state::mpu5(machine_config &config)
 
 	SEC(config, m_sec);
 
-	config.set_default_layout(layout_mpu5);
+	config.set_default_layout("mpu5");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

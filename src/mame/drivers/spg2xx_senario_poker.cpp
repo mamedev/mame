@@ -11,7 +11,7 @@ improve controller hookup / simulation and remove PC-based hacks!
 #include "emu.h"
 #include "includes/spg2xx.h"
 
-#include "sentx6p.lh"
+
 
 
 class sentx6p_state : public spg2xx_game_state
@@ -679,7 +679,7 @@ void sentx6p_state::sentx6p(machine_config &config)
 
 	m_maincpu->uart_tx().set(FUNC(sentx6p_state::sentx_tx_w));
 
-	config.set_default_layout(layout_sentx6p);
+	config.set_default_layout("sentx6p");
 }
 
 ROM_START( sentx6p )

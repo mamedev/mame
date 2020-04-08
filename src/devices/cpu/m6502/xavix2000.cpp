@@ -123,4 +123,4 @@ void xavix2000_device::state_string_export(const device_state_entry &entry, std:
 }
 
 
-#include "cpu/m6502/xavix2000.hxx"
+#include "emu/cpu/m6502/xavix2000.hxx"

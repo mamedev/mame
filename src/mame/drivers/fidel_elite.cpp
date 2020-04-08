@@ -75,12 +75,6 @@ uninteresting to emulate as separate drivers.
 #include "softlist.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_eag.lh" // clickable
-#include "fidel_eas.lh" // clickable
-#include "fidel_pc.lh" // clickable
-
-
 namespace {
 
 // note: sub-class of fidel_clockdiv_state (see mame/machine/fidel_clockdiv.*)
@@ -434,7 +428,7 @@ void elite_state::pc(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_fidel_pc);
+	config.set_default_layout("fidel_pc");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -467,7 +461,7 @@ void elite_state::eas(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	config.set_default_layout(layout_fidel_eas);
+	config.set_default_layout("fidel_eas");
 }
 
 void eag_state::eag(machine_config &config)
@@ -484,7 +478,7 @@ void eag_state::eag(machine_config &config)
 
 	/* video hardware */
 	m_display->set_segmask(0x1ef, 0x7f);
-	config.set_default_layout(layout_fidel_eag);
+	config.set_default_layout("fidel_eag");
 }
 
 void eag_state::eag2100(machine_config &config)

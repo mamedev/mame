@@ -105,8 +105,6 @@
 #include "video/segaic24.h"
 #include "speaker.h"
 
-#include "model1io2.lh"
-#include "segabill.lh"
 
 /* Timers - these count down at 25 MHz and pull IRQ2 when they hit 0 */
 READ32_MEMBER(model2_state::timers_r)
@@ -2674,7 +2672,7 @@ void model2o_state::vcop(machine_config &config)
 	ioboard.set_lightgun_p2x_tag("P2_X");
 	ioboard.set_lightgun_p2y_tag("P2_Y");
 
-	config.set_default_layout(layout_model1io2);
+	config.set_default_layout("model1io2");
 }
 
 /* 2A-CRX */
@@ -2720,7 +2718,7 @@ void model2a_state::model2a(machine_config &config)
 
 	SEGA_BILLBOARD(config, m_billboard, 0);
 
-	config.set_default_layout(layout_segabill);
+	config.set_default_layout("segabill");
 }
 
 void model2a_state::manxtt(machine_config &config)
@@ -2845,7 +2843,7 @@ void model2b_state::model2b(machine_config &config)
 
 	SEGA_BILLBOARD(config, m_billboard, 0);
 
-	config.set_default_layout(layout_segabill);
+	config.set_default_layout("segabill");
 }
 
 void model2b_state::model2b_5881(machine_config &config)

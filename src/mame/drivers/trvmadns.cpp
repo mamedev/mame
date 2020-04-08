@@ -85,7 +85,7 @@ Roms: row d-e sex a1       - type 27128
 #include "speaker.h"
 #include "tilemap.h"
 
-#include "trvmadns.lh"
+
 
 
 //**************************************************************************
@@ -352,7 +352,7 @@ void trvmadns_state::trvmadns(machine_config &config)
 	ay.port_b_read_callback().set_constant(0xff);
 	ay.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	config.set_default_layout(layout_trvmadns);
+	config.set_default_layout("trvmadns");
 }
 
 

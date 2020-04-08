@@ -60,8 +60,6 @@ If control Q4 is set, printer data can be read from I0.
 #include "softlist.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_sc12.lh" // clickable
 
 
 namespace {
@@ -227,7 +225,7 @@ void sc12_state::sc12(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(2, 9);
-	config.set_default_layout(layout_fidel_sc12);
+	config.set_default_layout("fidel_sc12");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

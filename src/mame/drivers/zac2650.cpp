@@ -20,7 +20,7 @@
 #include "cpu/s2650/s2650.h"
 #include "speaker.h"
 
-#include "tinv2650.lh"
+
 
 
 /***********************************************************************************************/
@@ -307,6 +307,6 @@ ROM_START( dodgem )
 ROM_END
 
 
-GAMEL( 1979?, tinv2650, 0,        tinvader, tinvader, zac2650_state, empty_init, ROT270, "Zaccaria / Zelco", "The Invaders", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_tinv2650 )
+GAMEL( 1979?, tinv2650, 0,        tinvader, tinvader, zac2650_state, empty_init, ROT270, "Zaccaria / Zelco", "The Invaders", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "tinv2650" )
 GAME(  1979?, sia2650,  tinv2650, tinvader, sinvader, zac2650_state, empty_init, ROT270, "bootleg (Sidam)",  "Super Invader Attack (bootleg of The Invaders)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 1980?
 GAME(  1979,  dodgem,   0,        tinvader, dodgem,   zac2650_state, empty_init, ROT0,   "Zaccaria",         "Dodgem", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

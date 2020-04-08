@@ -71,8 +71,6 @@ Overall, the hardware has similarities with Wacky Gator, see wacky_gator.cpp.
 
 #include "speaker.h"
 
-// internal artwork
-#include "cgang.lh" // clickable
 
 
 namespace {
@@ -820,7 +818,7 @@ void cgang_state::cgang(machine_config &config)
 	m_spot->output_x().set(FUNC(cgang_state::output_spot_w));
 	m_spot->set_bri_levels(0.0576, 0.144, 0.36, 0.9); // dimmed lights
 
-	config.set_default_layout(layout_cgang);
+	config.set_default_layout("cgang");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

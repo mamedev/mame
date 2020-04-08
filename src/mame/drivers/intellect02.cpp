@@ -48,8 +48,6 @@ keypad legend:
 #include "softlist.h"
 #include "speaker.h"
 
-// internal artwork
-#include "intellect02.lh" // clickable
 
 
 namespace {
@@ -230,7 +228,7 @@ void intel02_state::intel02(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(6, 7);
 	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_intellect02);
+	config.set_default_layout("intellect02");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

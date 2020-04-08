@@ -17,7 +17,6 @@
 #include "emu.h"
 #include "cpu/m37710/m37710.h"
 #include "machine/roc10937.h"
-#include "globalfr.lh"
 
 /******************************************************************************/
 
@@ -74,7 +73,7 @@ void globalfr_state::globalfr(machine_config &config)
 	M37702S1(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &globalfr_state::globalfr_map);
 	S16LF01(config, m_vfd);
-	config.set_default_layout(layout_globalfr);
+	config.set_default_layout("globalfr");
 }
 
 /******************************************************************************/

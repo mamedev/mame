@@ -23,7 +23,7 @@
 #include "video/deco16ic.h"
 #include "video/decospr.h"
 #include "emupal.h"
-#include "rendlay.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -378,7 +378,7 @@ void backfire_state::backfire(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_backfire);
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	SCREEN(config, m_lscreen, SCREEN_TYPE_RASTER);
 	m_lscreen->set_refresh_hz(60);

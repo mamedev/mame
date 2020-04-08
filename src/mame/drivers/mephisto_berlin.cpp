@@ -22,8 +22,6 @@ Undocumented buttons:
 #include "machine/mmboard.h"
 #include "video/mmdisplay2.h"
 
-// internal artwork
-#include "mephisto_berlin.lh"
 
 
 class berlin_state : public driver_device
@@ -137,7 +135,7 @@ void berlin_state::berlin(machine_config &config)
 
 	MEPHISTO_BUTTONS_BOARD(config, m_board);
 	MEPHISTO_DISPLAY_MODULE2(config, "display");
-	config.set_default_layout(layout_mephisto_berlin);
+	config.set_default_layout("mephisto_berlin");
 }
 
 void berlin_state::berlinp(machine_config &config)

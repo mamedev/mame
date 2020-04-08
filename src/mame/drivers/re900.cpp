@@ -80,7 +80,7 @@
 
 #include "speaker.h"
 
-#include "re900.lh"
+
 
 
 #define MAIN_CLOCK      XTAL(11'059'200)
@@ -466,5 +466,5 @@ void re900_state::init_re900()
 *************************/
 
 //     YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        ROT    COMPANY                     FULLNAME            FLAGS                  LAYOUT
-GAMEL( 1993, re900, 0,      re900,   re900, re900_state, init_re900, ROT90, "Entretenimientos GEMINIS", "Ruleta RE-900",    MACHINE_SUPPORTS_SAVE, layout_re900 )
+GAMEL( 1993, re900, 0,      re900,   re900, re900_state, init_re900, ROT90, "Entretenimientos GEMINIS", "Ruleta RE-900",    MACHINE_SUPPORTS_SAVE, "re900" )
 GAME(  1994, bs94,  0,      bs94,    bs94,  re900_state, empty_init, ROT0,  "Entretenimientos GEMINIS", "Buena Suerte '94", MACHINE_SUPPORTS_SAVE )

@@ -42,7 +42,6 @@ Test Paste:
 #include "machine/6821pia.h"
 #include "speaker.h"
 
-#include "mkit09.lh"
 
 
 class mkit09_state : public driver_device
@@ -278,7 +277,7 @@ void mkit09_state::mkit09(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mkit09_state::mkit09_mem);
 
 	/* video hardware */
-	config.set_default_layout(layout_mkit09);
+	config.set_default_layout("mkit09");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -304,7 +303,7 @@ void mkit09a_state::mkit09a(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mkit09a_state::mkit09a_mem);
 
 	/* video hardware */
-	config.set_default_layout(layout_mkit09);
+	config.set_default_layout("mkit09");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

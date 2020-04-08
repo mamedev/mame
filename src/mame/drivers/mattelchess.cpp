@@ -17,8 +17,6 @@ Hardware notes:
 #include "video/hlcd0515.h"
 #include "screen.h"
 
-// internal artwork
-#include "mchess.lh" // clickable
 
 
 namespace {
@@ -211,7 +209,7 @@ void mchess_state::mchess(machine_config &config)
 	screen.set_size(977, 1080);
 	screen.set_visarea_full();
 
-	config.set_default_layout(layout_mchess);
+	config.set_default_layout("mchess");
 }
 
 

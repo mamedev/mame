@@ -250,7 +250,6 @@ FS 0 to F
 #include "sound/wave.h"
 #include "speaker.h"
 #include "bus/rs232/rs232.h"
-#include "mekd4.lh"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "video/pwm.h"
@@ -997,7 +996,7 @@ void mekd4_state::mekd4(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
 	m_display->set_segmask(0xff, 0x7f);
 
-	config.set_default_layout(layout_mekd4);
+	config.set_default_layout("mekd4");
 
 	SPEAKER(config, "mono").front_center();
 

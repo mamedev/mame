@@ -30,7 +30,6 @@ Then press W to save. To load, press L. If it says r at the end, it indicates a 
 
 #include "speaker.h"
 
-#include "pro80.lh"
 
 
 class pro80_state : public driver_device
@@ -181,7 +180,7 @@ void pro80_state::pro80(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pro80_state::pro80_io);
 
 	/* video hardware */
-	config.set_default_layout(layout_pro80);
+	config.set_default_layout("pro80");
 
 	Z80PIO(config, "pio", XTAL(4'000'000) / 2);
 

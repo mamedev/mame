@@ -26,7 +26,7 @@
 #include "machine/input_merger.h"
 #include "speaker.h"
 
-#include "tranz330.lh"
+
 
 
 void tranz330_state::tranz330_mem(address_map &map)
@@ -179,7 +179,7 @@ void tranz330_state::tranz330(machine_config &config)
 
 	// video
 	MIC10937(config, VFD_TAG).set_port_value(0);
-	config.set_default_layout(layout_tranz330);
+	config.set_default_layout("tranz330");
 
 	// sound
 	SPEAKER(config, "mono").front_center();

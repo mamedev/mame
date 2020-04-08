@@ -143,7 +143,6 @@ PL1 = Compact Flash Slot
 #include "video/awpvid.h"
 #include "speaker.h"
 
-#include "bfm_sc5.lh"
 
 
 
@@ -352,7 +351,7 @@ void bfm_sc5_state::bfm_sc5(machine_config &config)
 
 	BFM_BDA(config, m_vfd0, 60, 0);
 
-	config.set_default_layout(layout_bfm_sc5);
+	config.set_default_layout("bfm_sc5");
 
 	YMZ280B(config, m_ymz, 16000000); // ?? Mhz
 	m_ymz->add_route(ALL_OUTPUTS, "mono", 1.0);

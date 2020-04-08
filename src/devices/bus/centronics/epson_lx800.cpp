@@ -17,7 +17,7 @@
 #include "emu.h"
 #include "epson_lx800.h"
 #include "speaker.h"
-#include "lx800.lh"
+
 
 
 
@@ -83,7 +83,7 @@ void epson_lx800_device::device_add_mconfig(machine_config &config)
 	upd.an4_func().set(FUNC(epson_lx800_device::an4_r));
 	upd.an5_func().set(FUNC(epson_lx800_device::an5_r));
 
-	config.set_default_layout(layout_lx800);
+	config.set_default_layout("lx800");
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();

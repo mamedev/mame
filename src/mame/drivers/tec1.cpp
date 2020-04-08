@@ -79,7 +79,7 @@ JMON ToDo:
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-#include "tec1.lh"
+
 
 
 class tec1_state : public driver_device
@@ -435,7 +435,7 @@ void tec1_state::tec1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tec1_state::tec1_io);
 
 	/* video hardware */
-	config.set_default_layout(layout_tec1);
+	config.set_default_layout("tec1");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -450,7 +450,7 @@ void tec1_state::tecjmon(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tec1_state::tecjmon_io);
 
 	/* video hardware */
-	config.set_default_layout(layout_tec1);
+	config.set_default_layout("tec1");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

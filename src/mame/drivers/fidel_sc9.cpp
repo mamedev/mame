@@ -46,9 +46,6 @@ IRQ and write strobe are unused. Maximum known size is 16KB.
 #include "softlist.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_playmatic.lh" // clickable
-#include "fidel_sc9.lh" // clickable
 
 
 namespace {
@@ -273,7 +270,7 @@ void sc9_state::sc9d(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
-	config.set_default_layout(layout_fidel_sc9);
+	config.set_default_layout("fidel_sc9");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -302,7 +299,7 @@ void sc9_state::playmatic(machine_config &config)
 	m_maincpu->set_clock(1500000 * 2); // advertised as double the speed of SC9
 	m_board->set_type(sensorboard_device::MAGNETS);
 
-	config.set_default_layout(layout_fidel_playmatic);
+	config.set_default_layout("fidel_playmatic");
 }
 
 

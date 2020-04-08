@@ -198,7 +198,6 @@
 #include "video/v9938.h"
 #include "speaker.h"
 
-#include "kas89.lh"
 
 
 #define MASTER_CLOCK        XTAL(21'477'272)
@@ -872,4 +871,4 @@ void kas89_state::init_kas89()
 **************************************/
 
 //     YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        ROT    COMPANY       FULLNAME      FLAGS                    LAYOUT
-GAMEL( 1989, kas89, 0,      kas89,   kas89, kas89_state, init_kas89, ROT90, "SFC S.R.L.", "Kasino '89", MACHINE_IMPERFECT_SOUND, layout_kas89 )
+GAMEL( 1989, kas89, 0,      kas89,   kas89, kas89_state, init_kas89, ROT90, "SFC S.R.L.", "Kasino '89", MACHINE_IMPERFECT_SOUND, "kas89" )

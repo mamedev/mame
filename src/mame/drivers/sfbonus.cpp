@@ -282,7 +282,7 @@ MH86171 Color Palette RAMDAC
 #include "speaker.h"
 #include "tilemap.h"
 
-#include "pirpok2.lh"
+
 
 
 class sfbonus_state : public driver_device
@@ -5989,11 +5989,11 @@ GAME( 2003, sfbonusv1,   sfbonus,  sfbonus, amcoe1_reels3, sfbonus_state, init_s
 GAME( 2003, sfbonuso,    sfbonus,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfbonus,         ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.7)", MACHINE_SUPPORTS_SAVE )
 GAME( 2003, sfbonuso2,   sfbonus,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfbonus,         ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.6)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL( 2004, parrot3,    0,        sfbonus, amcoe1_poker,  sfbonus_state, init_parrot3v,        ROT0,  "Amcoe", "Parrot Poker III (Version 2.6E Dual)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
-GAMEL( 2004, parrot3b1,  parrot3,  sfbonus, amcoe2_poker,  sfbonus_state, init_pirpok2,         ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 1)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
-GAMEL( 2004, parrot3d1,  parrot3,  sfbonus, amcoe1_poker,  sfbonus_state, init_parrot3d,        ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 2)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
-GAMEL( 2004, parrot3v1,  parrot3,  sfbonus, amcoe1_poker,  sfbonus_state, init_parrot3v2,       ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R Dual)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
-GAMEL( 2003, parrot3o,   parrot3,  sfbonus, amcoe2_poker,  sfbonus_state, init_pirpok2,         ROT0,  "Amcoe", "Parrot Poker III (Version 2.4)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
+GAMEL( 2004, parrot3,    0,        sfbonus, amcoe1_poker,  sfbonus_state, init_parrot3v,        ROT0,  "Amcoe", "Parrot Poker III (Version 2.6E Dual)", MACHINE_SUPPORTS_SAVE, "pirpok2")
+GAMEL( 2004, parrot3b1,  parrot3,  sfbonus, amcoe2_poker,  sfbonus_state, init_pirpok2,         ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 1)", MACHINE_SUPPORTS_SAVE, "pirpok2")
+GAMEL( 2004, parrot3d1,  parrot3,  sfbonus, amcoe1_poker,  sfbonus_state, init_parrot3d,        ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 2)", MACHINE_SUPPORTS_SAVE, "pirpok2")
+GAMEL( 2004, parrot3v1,  parrot3,  sfbonus, amcoe1_poker,  sfbonus_state, init_parrot3v2,       ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R Dual)", MACHINE_SUPPORTS_SAVE, "pirpok2")
+GAMEL( 2003, parrot3o,   parrot3,  sfbonus, amcoe2_poker,  sfbonus_state, init_pirpok2,         ROT0,  "Amcoe", "Parrot Poker III (Version 2.4)", MACHINE_SUPPORTS_SAVE, "pirpok2")
 
 GAME( 2000, hldspin1,    0,        sfbonus, amcoe2_reels3, sfbonus_state, init_hldspin1,        ROT0,  "Amcoe", "Hold & Spin I (Version 2.7T, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, hldspin1dt,  hldspin1, sfbonus, amcoe1_reels3, sfbonus_state, init_hldspin1d,       ROT0,  "Amcoe", "Hold & Spin I (Version 2.7T, set 2)", MACHINE_SUPPORTS_SAVE )
@@ -6049,11 +6049,11 @@ GAME( 2004, robadv2v3,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_r
 GAME( 2004, robadv2o,    robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv,          ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.5SH)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, robadv2o2,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv,          ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.5)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL( 2003, pirpok2,    0,        sfbonus, amcoe1_poker,  sfbonus_state, init_pirpok2v2,       ROT0,  "Amcoe", "Pirate Poker II (Version 2.4E Dual)", MACHINE_SUPPORTS_SAVE, layout_pirpok2 )
-GAMEL( 2003, pirpok2b1,  pirpok2,  sfbonus, amcoe2_poker,  sfbonus_state, init_pirpok2,         ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 1)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
-GAMEL( 2003, pirpok2d1,  pirpok2,  sfbonus, amcoe1_poker,  sfbonus_state, init_pirpok2d,        ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 2)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
-GAMEL( 2003, pirpok2v1,  pirpok2,  sfbonus, amcoe1_poker,  sfbonus_state, init_pirpok2v,        ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R Dual)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
-GAMEL( 2003, pirpok2o,   pirpok2,  sfbonus, amcoe2_poker,  sfbonus_state, init_pirpok2,         ROT0,  "Amcoe", "Pirate Poker II (Version 2.0)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
+GAMEL( 2003, pirpok2,    0,        sfbonus, amcoe1_poker,  sfbonus_state, init_pirpok2v2,       ROT0,  "Amcoe", "Pirate Poker II (Version 2.4E Dual)", MACHINE_SUPPORTS_SAVE, "pirpok2" )
+GAMEL( 2003, pirpok2b1,  pirpok2,  sfbonus, amcoe2_poker,  sfbonus_state, init_pirpok2,         ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 1)", MACHINE_SUPPORTS_SAVE, "pirpok2")
+GAMEL( 2003, pirpok2d1,  pirpok2,  sfbonus, amcoe1_poker,  sfbonus_state, init_pirpok2d,        ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 2)", MACHINE_SUPPORTS_SAVE, "pirpok2")
+GAMEL( 2003, pirpok2v1,  pirpok2,  sfbonus, amcoe1_poker,  sfbonus_state, init_pirpok2v,        ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R Dual)", MACHINE_SUPPORTS_SAVE, "pirpok2")
+GAMEL( 2003, pirpok2o,   pirpok2,  sfbonus, amcoe2_poker,  sfbonus_state, init_pirpok2,         ROT0,  "Amcoe", "Pirate Poker II (Version 2.0)", MACHINE_SUPPORTS_SAVE, "pirpok2")
 
 GAME( 2003, anibonus,    0,        sfbonus, amcoe1_reels3, sfbonus_state, init_anibonusv3,      ROT0,  "Amcoe", "Animal Bonus (Version 1.8E Dual)", MACHINE_SUPPORTS_SAVE )
 GAME( 2003, anibonusv1,  anibonus, sfbonus, amcoe1_reels3, sfbonus_state, init_anibonusv,       ROT0,  "Amcoe", "Animal Bonus (Version 1.8R Dual)", MACHINE_SUPPORTS_SAVE )

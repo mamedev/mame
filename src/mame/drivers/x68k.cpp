@@ -135,7 +135,7 @@
 #include "formats/dim_dsk.h"
 #include "formats/xdf_dsk.h"
 
-#include "x68000.lh"
+
 
 #define LOG_FDC (1 << 1)
 #define LOG_SYS (1 << 2)
@@ -1667,7 +1667,7 @@ void x68k_state::x68000_base(machine_config &config)
 	PALETTE(config, m_gfxpalette).set_format(2, &x68k_state::GGGGGRRRRRBBBBBI, 256);
 	PALETTE(config, m_pcgpalette).set_format(2, &x68k_state::GGGGGRRRRRBBBBBI, 256);
 
-	config.set_default_layout(layout_x68000);
+	config.set_default_layout("x68000");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

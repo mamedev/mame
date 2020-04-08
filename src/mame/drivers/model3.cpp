@@ -742,7 +742,6 @@ JP4/5/6/7 - Jumpers to configure ROMs
 #include "machine/m3comm.h"
 #include "speaker.h"
 
-#include "segabill.lh"
 
 void model3_state::update_irq_state()
 {
@@ -5959,7 +5958,7 @@ void model3_state::add_base_devices(machine_config &config)
 
 	SEGA_BILLBOARD(config, m_billboard, 0);
 
-	config.set_default_layout(layout_segabill);
+	config.set_default_layout("segabill");
 }
 
 void model3_state::add_scsi_devices(machine_config &config)

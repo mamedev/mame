@@ -398,4 +398,4 @@ void mcs96_device::set_nz16(uint16_t v)
 		PSW |= F_N;
 }
 
-#include "cpu/mcs96/mcs96.hxx"
+#include "emu/cpu/mcs96/mcs96.hxx"

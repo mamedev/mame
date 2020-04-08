@@ -46,10 +46,6 @@ Designer Mach IV Master 2325 (model 6129) overview:
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_desdis.lh" // clickable
-#include "fidel_desdis_68kg.lh" // clickable
-#include "fidel_desdis_68kr.lh" // clickable
 
 
 namespace {
@@ -308,7 +304,7 @@ void desdis_state::fdes2100d(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(2+4, 9);
 	m_display->set_segmask(0x3c, 0x7f);
-	config.set_default_layout(layout_fidel_desdis);
+	config.set_default_layout("fidel_desdis");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -338,7 +334,7 @@ void desmas_state::fdes2265(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_usec(6)); // active for 6us
 	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(desmas_state::irq_off<M68K_IRQ_4>), irq_period);
 
-	config.set_default_layout(layout_fidel_desdis_68kr);
+	config.set_default_layout("fidel_desdis_68kr");
 }
 
 void desmas_state::fdes2325(machine_config &config)
@@ -349,7 +345,7 @@ void desmas_state::fdes2325(machine_config &config)
 	M68EC020(config.replace(), m_maincpu, 20_MHz_XTAL); // MC68EC020RP25
 	m_maincpu->set_addrmap(AS_PROGRAM, &desmas_state::fdes2325_map);
 
-	config.set_default_layout(layout_fidel_desdis_68kg);
+	config.set_default_layout("fidel_desdis_68kg");
 }
 
 

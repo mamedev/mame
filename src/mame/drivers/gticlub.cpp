@@ -241,7 +241,7 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 #include "video/k001604.h"
 
 #include "emupal.h"
-#include "rendlay.h"
+
 #include "speaker.h"
 
 
@@ -1492,5 +1492,5 @@ GAME( 1997, thunderhu,  thunderh, thunderh, thunderh, gticlub_state, init_gticlu
 GAME( 1997, slrasslt,   0,        slrasslt, slrasslt, gticlub_state, init_gticlub,  ROT0, "Konami", "Solar Assault (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Based on Revised code
 GAME( 1997, slrassltj,  slrasslt, slrasslt, slrasslt, gticlub_state, init_gticlub,  ROT0, "Konami", "Solar Assault Revised (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, slrassltj1, slrasslt, slrasslt, slrasslt, gticlub_state, init_gticlub,  ROT0, "Konami", "Solar Assault (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAMEL(1997, hangplt,    0,        hangplt,  hangplt,  gticlub_state, init_hangplt,  ROT0, "Konami", "Hang Pilot (ver JAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND, layout_dualhovu )
-GAMEL(1997, hangpltu,   hangplt,  hangplt,  hangplt,  gticlub_state, init_hangpltu, ROT0, "Konami", "Hang Pilot (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND, layout_dualhovu )
+GAMEL(1997, hangplt,    0,        hangplt,  hangplt,  gticlub_state, init_hangplt,  ROT0, "Konami", "Hang Pilot (ver JAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND, "dualhovu" )
+GAMEL(1997, hangpltu,   hangplt,  hangplt,  hangplt,  gticlub_state, init_hangpltu, ROT0, "Konami", "Hang Pilot (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND, "dualhovu" )

@@ -19,7 +19,6 @@
 #include "emupal.h"
 #include "screen.h"
 
-#include "pc1500.lh"
 
 
 class pc1500_state : public driver_device
@@ -287,7 +286,7 @@ void pc1500_state::pc1500(machine_config &config)
 	screen.set_visarea(0, 156-1, 0, 7-1);
 	screen.set_palette("palette");
 
-	config.set_default_layout(layout_pc1500);
+	config.set_default_layout("pc1500");
 	PALETTE(config, "palette", FUNC(pc1500_state::pc1500_palette), 2);
 
 	lh5810_device &ioports(LH5810(config, "lh5810"));

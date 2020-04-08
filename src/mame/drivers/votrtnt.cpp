@@ -37,7 +37,7 @@
 #include "sound/votrax.h"
 #include "speaker.h"
 
-#include "votrtnt.lh"
+
 
 
 class votrtnt_state : public driver_device
@@ -144,7 +144,7 @@ void votrtnt_state::votrtnt(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &votrtnt_state::_6802_mem);
 
 	/* video hardware */
-	//config.set_default_layout(layout_votrtnt);
+	//config.set_default_layout("votrtnt");
 
 	/* serial hardware */
 	acia6850_device &acia(ACIA6850(config, "acia"));

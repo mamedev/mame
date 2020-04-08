@@ -46,22 +46,6 @@ private:
 } } // namesapce emu::detail
 
 
-/// \brief Internal layout description
-///
-/// Holds the compressed and decompressed data size, compression method,
-/// and a reference to the compressed layout data.  Note that copying
-/// the structure will not copy the referenced data.
-struct internal_layout
-{
-	enum class compression { NONE, ZLIB };
-
-	size_t decompressed_size;
-	size_t compressed_size;
-	compression compression_type;
-	u8 const *data;
-};
-
-
 // ======================> machine_config
 
 // machine configuration definition
@@ -120,11 +104,11 @@ public:
 	/// layout.  The order of devices is implementation-dependent.
 	/// \param [in] op The visitor.  It must provide a function call
 	//    operator that can be invoked with two arguments: a reference
-	//    to a #device_t and a const reference to an #internal_layout.
+	//    to a #device_t and the layout name (const char *).
 	template <typename T> void apply_default_layouts(T &&op) const
 	{
-		for (std::pair<char const *, internal_layout const *> const &lay : m_default_layouts)
-			op(*device(lay.first), *lay.second);
+		for (std::pair<char const *, const char *> const &lay : m_default_layouts)
+			op(*device(lay.first), lay.second);
 	}
 
 	/// \brief Get a device replacement helper
@@ -141,12 +125,8 @@ public:
 	/// system can have its own internal layout.  Tags in the layout
 	/// will be resolved relative to the device.  Replaces previously
 	/// set layout if any.
-	/// \param [in] layout Reference to the internal layout description
-	///   structure.  Neither the description structure nor the
-	///   compressed data is copied.  It is the caller's responsibility
-	///   to ensure both remain valid until layouts and views are
-	///   instantiated.
-	void set_default_layout(internal_layout const &layout);
+	/// \param [in] layout Name of the internal layout.
+	void set_default_layout(const char *layout_name);
 
 	/// \brief Set maximum scheduling quantum
 	///
@@ -228,7 +208,7 @@ public:
 
 private:
 	class current_device_stack;
-	typedef std::map<char const *, internal_layout const *, bool (*)(char const *, char const *)> default_layout_map;
+	typedef std::map<char const *, const char *, bool (*)(char const *, char const *)> default_layout_map;
 	typedef std::map<char const *, attotime, bool (*)(char const *, char const *)> maximum_quantum_map;
 
 	// internal helpers

@@ -56,7 +56,6 @@
 #include "sound/beep.h"
 #include "speaker.h"
 
-#include "pve500.lh"
 
 #define IO_EXPANDER_PORTA 0
 #define IO_EXPANDER_PORTB 1
@@ -445,7 +444,7 @@ void pve500_state::pve500(machine_config &config)
 	mb8421.intr_callback().set(FUNC(pve500_state::mb8421_intr));
 
 	/* video hardware */
-	config.set_default_layout(layout_pve500);
+	config.set_default_layout("pve500");
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();

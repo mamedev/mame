@@ -52,9 +52,6 @@
 #include "includes/mpf1.h"
 #include "speaker.h"
 
-#include "mpf1.lh"
-#include "mpf1b.lh"
-#include "mpf1p.lh"
 
 /* Address Maps */
 
@@ -380,7 +377,7 @@ void mpf1_state::mpf1(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 
 	/* video hardware */
-	config.set_default_layout(layout_mpf1);
+	config.set_default_layout("mpf1");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -414,7 +411,7 @@ void mpf1_state::mpf1b(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 
 	/* video hardware */
-	config.set_default_layout(layout_mpf1b);
+	config.set_default_layout("mpf1b");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -435,7 +432,7 @@ void mpf1_state::mpf1p(machine_config &config)
 	m_maincpu->set_daisy_config(mpf1_daisy_chain);
 
 	/* video hardware */
-	config.set_default_layout(layout_mpf1p);
+	config.set_default_layout("mpf1p");
 
 	/* devices */
 	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, 2500000));

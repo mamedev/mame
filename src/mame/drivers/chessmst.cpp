@@ -24,8 +24,6 @@
 
 #include "speaker.h"
 
-#include "chessmst.lh"
-#include "chessmstdm.lh"
 
 
 class chessmst_state : public driver_device
@@ -303,7 +301,7 @@ void chessmst_state::chessmst(machine_config &config)
 	m_pio[1]->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
 	m_pio[1]->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
-	config.set_default_layout(layout_chessmst);
+	config.set_default_layout("chessmst");
 
 	SENSORBOARD(config, m_board);
 	m_board->set_type(sensorboard_device::MAGNETS);
@@ -332,7 +330,7 @@ void chessmst_state::chessmsta(machine_config &config)
 	m_pio[1]->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
 	m_pio[1]->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
-	config.set_default_layout(layout_chessmst);
+	config.set_default_layout("chessmst");
 
 	SENSORBOARD(config, m_board);
 	m_board->set_type(sensorboard_device::MAGNETS);
@@ -362,7 +360,7 @@ void chessmst_state::chessmstdm(machine_config &config)
 	m_pio[1]->in_pa_callback().set(FUNC(chessmst_state::pio2_port_a_r));
 	m_pio[1]->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
-	config.set_default_layout(layout_chessmstdm);
+	config.set_default_layout("chessmstdm");
 
 	SENSORBOARD(config, m_board);
 	m_board->set_type(sensorboard_device::MAGNETS);

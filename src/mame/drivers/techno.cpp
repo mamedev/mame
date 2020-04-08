@@ -17,7 +17,7 @@ ToDo:
 #include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/m68000/m68000.h"
-#include "techno.lh"
+
 
 
 class techno_state : public driver_device
@@ -308,7 +308,7 @@ void techno_state::techno(machine_config &config)
 	//cpu2.set_addrmap(AS_PROGRAM, &techno_state::techno_sub_map);
 
 	/* Video */
-	config.set_default_layout(layout_techno);
+	config.set_default_layout("techno");
 }
 
 ROM_START(xforce)

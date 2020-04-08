@@ -31,7 +31,6 @@ and an unpopulated position for a YM2413 or UM3567
 #include "speaker.h"
 #include "tilemap.h"
 
-#include "fts2in1.lh"
 
 
 
@@ -483,4 +482,4 @@ ROM_START( fts2in1 )
 	ROM_LOAD16_BYTE( "u30.bin", 0x00001, 0x20000, CRC(d572bddc) SHA1(06499aeb47085a02af9eb4987ed987f9a3a397f7) )
 ROM_END
 
-GAMEL( 1993, fts2in1, 0, funtech, funtech, fun_tech_corp_state, empty_init, ROT0, "Fun Tech Corporation", "Super Two In One", MACHINE_SUPPORTS_SAVE, layout_fts2in1 )
+GAMEL( 1993, fts2in1, 0, funtech, funtech, fun_tech_corp_state, empty_init, ROT0, "Fun Tech Corporation", "Super Two In One", MACHINE_SUPPORTS_SAVE, "fts2in1" )

@@ -28,7 +28,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "cardline.lh"
 
 
 #define MASTER_CLOCK XTAL(12'000'000)
@@ -358,7 +357,7 @@ void cardline_state::cardline(machine_config &config)
 	crtc.out_hsync_callback().set(FUNC(cardline_state::hsync_changed));
 	crtc.out_vsync_callback().set(FUNC(cardline_state::vsync_changed));
 
-	config.set_default_layout(layout_cardline);
+	config.set_default_layout("cardline");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

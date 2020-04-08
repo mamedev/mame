@@ -60,9 +60,9 @@ stepstag:
 #include "screen.h"
 #include "speaker.h"
 
-#include "vjdash.lh"
-#include "rocknms.lh"
-#include "stepstag.lh"
+
+
+
 
 
 /***************************************************************************
@@ -1864,7 +1864,7 @@ void tetrisp2_state::rocknms(machine_config &config)
 	m_rocknms_sub_sprite->set_color_base(0);
 	m_rocknms_sub_sprite->set_color_entries(16);
 
-	config.set_default_layout(layout_rocknms);
+	config.set_default_layout("rocknms");
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_orientation(ROT0);
@@ -1968,7 +1968,7 @@ void stepstag_state::stepstag(machine_config &config)
 	m_vj_sprite_r->set_color_base(0);
 	m_vj_sprite_r->set_color_entries(0x80);
 
-	config.set_default_layout(layout_stepstag);
+	config.set_default_layout("stepstag");
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -2060,7 +2060,7 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 	m_vj_sprite_r->set_color_base(0);
 	m_vj_sprite_r->set_color_entries(0x80);
 
-	config.set_default_layout(layout_vjdash);
+	config.set_default_layout("vjdash");
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();

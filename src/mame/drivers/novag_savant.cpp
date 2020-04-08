@@ -38,8 +38,6 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
-// internal artwork
-#include "novag_savant.lh" // clickable
 
 
 namespace {
@@ -387,7 +385,7 @@ void savant_state::savant(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 24+27);
-	config.set_default_layout(layout_novag_savant);
+	config.set_default_layout("novag_savant");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

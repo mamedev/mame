@@ -53,8 +53,6 @@ LCD module
 #include "video/hd61603.h"
 #include "speaker.h"
 
-// internal artwork
-#include "cxg_sphinx40.lh" // clickable
 
 
 namespace {
@@ -298,7 +296,7 @@ void sphinx40_state::sphinx40(machine_config &config)
 	m_lcd->write_segs().set(FUNC(sphinx40_state::lcd_seg_w));
 
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
-	config.set_default_layout(layout_cxg_sphinx40);
+	config.set_default_layout("cxg_sphinx40");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

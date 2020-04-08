@@ -20,8 +20,6 @@
 #include "sound/ym2151.h"
 #include "speaker.h"
 
-#include "de2.lh"
-#include "de2a3.lh"
 
 
 // To start Secret Service, hold I, O and Left ALT while pressing Start.
@@ -558,7 +556,7 @@ void de_2_state::de_type1(machine_config &config)
 	decocpu.lamp_write_callback().set(FUNC(de_2_state::lamps_w));
 
 	/* Video */
-	config.set_default_layout(layout_de2);
+	config.set_default_layout("de2");
 
 	genpin_audio(config);
 	de_bg_audio(config);
@@ -576,7 +574,7 @@ void de_2_state::de_type2(machine_config &config)
 	decocpu.lamp_write_callback().set(FUNC(de_2_state::lamps_w));
 
 	/* Video */
-	config.set_default_layout(layout_de2);
+	config.set_default_layout("de2");
 
 	genpin_audio(config);
 	de_bg_audio(config);
@@ -589,7 +587,7 @@ void de_2_state::de_type2_alpha3(machine_config &config)
 	subdevice<decocpu_type2_device>("decocpu")->display_write_callback().set(FUNC(de_2_state::type2alpha3_display_w));
 
 	/* Video */
-	config.set_default_layout(layout_de2a3);
+	config.set_default_layout("de2a3");
 }
 
 void de_2_state::de_type3(machine_config &config)
@@ -604,7 +602,7 @@ void de_2_state::de_type3(machine_config &config)
 	decocpu.lamp_write_callback().set(FUNC(de_2_state::lamps_w));
 
 	/* Video */
-	config.set_default_layout(layout_de2a3);
+	config.set_default_layout("de2a3");
 
 	genpin_audio(config);
 	de_bg_audio(config);

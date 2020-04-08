@@ -27,7 +27,7 @@ sound system appears to be the same as 'spartanxtec.cpp'
 #include "speaker.h"
 #include "tilemap.h"
 
-#include "spyhunttec.lh"
+
 
 class spyhuntertec_state : public driver_device
 {
@@ -922,5 +922,5 @@ void spyhuntertec_state::init_spyhuntertec()
 ***************************************************************************/
 
 //    YEAR  NAME       PARENT   MACHINE       INPUT         STATE               INIT               ROT    COMPANY                                              FULLNAME                                                             FLAGS                                        LAYOUT
-GAMEL(1985, spyhuntsp, spyhunt, spyhuntertec, spyhuntertec, spyhuntertec_state, init_spyhuntertec, ROT90, "Recreativos Franco S.A. (Bally Midway license)",    "Spy Hunter (Spain, Recreativos Franco S.A., Bally Midway license)", MACHINE_SUPPORTS_SAVE,                       layout_spyhunttec )
-GAMEL(1985, spyhuntpr, spyhunt, spyhuntertec, spyhuntertec, spyhuntertec_state, init_spyhuntertec, ROT90, "bootleg (Recreativos Franco S.A. license, Tecfri)", "Spy Hunter (Spain, Recreativos Franco S.A., Tecfri PCB)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_spyhunttec )
+GAMEL(1985, spyhuntsp, spyhunt, spyhuntertec, spyhuntertec, spyhuntertec_state, init_spyhuntertec, ROT90, "Recreativos Franco S.A. (Bally Midway license)",    "Spy Hunter (Spain, Recreativos Franco S.A., Bally Midway license)", MACHINE_SUPPORTS_SAVE,                       "spyhunttec" )
+GAMEL(1985, spyhuntpr, spyhunt, spyhuntertec, spyhuntertec, spyhuntertec_state, init_spyhuntertec, ROT90, "bootleg (Recreativos Franco S.A. license, Tecfri)", "Spy Hunter (Spain, Recreativos Franco S.A., Tecfri PCB)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, "spyhunttec" )

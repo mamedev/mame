@@ -26,8 +26,6 @@ ROM labeled 007-7027-00.
 #include "machine/f3853.h"
 #include "video/pwm.h"
 
-// internal artwork
-#include "aci_boris.lh" // clickable
 
 
 namespace {
@@ -218,7 +216,7 @@ void boris_state::boris(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(8, 16);
 	m_display->set_segmask(0xff, 0xffff);
 	m_display->set_bri_levels(0.05);
-	config.set_default_layout(layout_aci_boris);
+	config.set_default_layout("aci_boris");
 }
 
 

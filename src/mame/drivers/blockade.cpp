@@ -21,7 +21,6 @@
 #include "speaker.h"
 #include "tilemap.h"
 
-#include "blockade.lh"
 
 
 //**************************************************************************
@@ -571,9 +570,9 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT        ROTATION  COMPANY    FULLNAME                  FLAGS                                            LAYOUT
-GAMEL(1976, blockade,  0,        blockade, blockade,  blockade_state, empty_init, ROT0,     "Gremlin", "Blockade",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
-GAMEL(1976, comotion,  0,        blockade, comotion,  blockade_state, empty_init, ROT0,     "Gremlin", "CoMOTION",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
+GAMEL(1976, blockade,  0,        blockade, blockade,  blockade_state, empty_init, ROT0,     "Gremlin", "Blockade",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "blockade" )
+GAMEL(1976, comotion,  0,        blockade, comotion,  blockade_state, empty_init, ROT0,     "Gremlin", "CoMOTION",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "blockade" )
 GAME( 1978, blasto,    0,        blockade, blasto,    blockade_state, empty_init, ROT0,     "Gremlin", "Blasto",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // b/w, no overlay
-GAMEL(1977, hustle,    0,        blockade, hustle,    blockade_state, empty_init, ROT0,     "Gremlin", "Hustle",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
+GAMEL(1977, hustle,    0,        blockade, hustle,    blockade_state, empty_init, ROT0,     "Gremlin", "Hustle",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "blockade" )
 GAME( 1977, mineswpr,  0,        blockade, mineswpr,  blockade_state, empty_init, ROT0,     "Amutech", "Minesweeper",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1977, mineswpr4, mineswpr, blockade, mineswpr4, blockade_state, empty_init, ROT0,     "Amutech", "Minesweeper (4-Player)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

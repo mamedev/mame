@@ -13,7 +13,6 @@
 #include "sound/discrete.h"
 #include "speaker.h"
 
-#include "superbug.lh"
 
 static constexpr XTAL MASTER_CLOCK = 12.096_MHz_XTAL;
 
@@ -998,6 +997,6 @@ ROM_START( montecar )
 ROM_END
 
 
-GAMEL( 1977, superbug, 0, superbug, superbug, firetrk_state, empty_init, ROT270, "Atari (Kee Games)", "Super Bug", 0, layout_superbug )
+GAMEL( 1977, superbug, 0, superbug, superbug, firetrk_state, empty_init, ROT270, "Atari (Kee Games)", "Super Bug", 0, "superbug" )
 GAME(  1978, firetrk,  0, firetrk,  firetrk,  firetrk_state, empty_init, ROT270, "Atari", "Fire Truck / Smokey Joe", 0 )
 GAME(  1979, montecar, 0, montecar, montecar, firetrk_state, empty_init, ROT270, "Atari", "Monte Carlo", 0 )

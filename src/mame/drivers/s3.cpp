@@ -47,7 +47,7 @@ ToDo:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "s3.lh"
+
 
 
 class s3_state : public genpin_class
@@ -444,7 +444,7 @@ void s3_state::s3(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(s3_state, s3)
 
 	/* Video */
-	config.set_default_layout(layout_s3);
+	config.set_default_layout("s3");
 
 	/* Sound */
 	genpin_audio(config);

@@ -31,14 +31,11 @@
 
 #include "emu.h"
 #include "includes/hh_sm510.h"
-
 #include "cpu/sm510/sm510.h"
 #include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
 
-// internal artwork
-#include "rzone.lh"
 
 class rzone_state : public hh_sm510_state
 {
@@ -261,7 +258,7 @@ void rzone_state::rzbatfor(machine_config &config)
 	screen.set_visarea_full();
 
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
-	config.set_default_layout(layout_rzone);
+	config.set_default_layout("rzone");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -285,7 +282,7 @@ void rzone_state::rztoshden(machine_config &config)
 	screen.set_visarea_full();
 
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
-	config.set_default_layout(layout_rzone);
+	config.set_default_layout("rzone");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -309,7 +306,7 @@ void rzone_state::rzindy500(machine_config &config)
 	screen.set_visarea_full();
 
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
-	config.set_default_layout(layout_rzone);
+	config.set_default_layout("rzone");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -34,4 +34,4 @@ void i8xc196_device::do_exec_partial()
 {
 }
 
-#include "cpu/mcs96/i8xc196.hxx"
+#include "emu/cpu/mcs96/i8xc196.hxx"

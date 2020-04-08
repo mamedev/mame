@@ -82,7 +82,6 @@ TODO
 #include "machine/timer.h"
 #include "speaker.h"
 
-#include "mekd2.lh"
 
 #define XTAL_MEKD2 1228800
 
@@ -374,7 +373,7 @@ void mekd2_state::mekd2(machine_config &config)
 	M6800(config, m_maincpu, XTAL_MEKD2 / 2);        /* 614.4 kHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mekd2_state::mekd2_mem);
 
-	config.set_default_layout(layout_mekd2);
+	config.set_default_layout("mekd2");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

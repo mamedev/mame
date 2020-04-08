@@ -53,8 +53,6 @@
 #include "speaker.h"
 #include "screen.h"
 
-#include "newbrain.lh"
-#include "newbraina.lh"
 
 
 
@@ -861,7 +859,7 @@ void newbrain_state::newbrain(machine_config &config)
 void newbrain_state::newbrain_ad(machine_config &config)
 {
 	newbrain(config);
-	config.set_default_layout(layout_newbrain);
+	config.set_default_layout("newbrain");
 }
 
 
@@ -872,7 +870,7 @@ void newbrain_state::newbrain_ad(machine_config &config)
 void newbrain_state::newbrain_a(machine_config &config)
 {
 	newbrain(config);
-	config.set_default_layout(layout_newbraina);
+	config.set_default_layout("newbraina");
 }
 
 
@@ -883,7 +881,7 @@ void newbrain_state::newbrain_a(machine_config &config)
 void newbrain_state::newbrain_md(machine_config &config)
 {
 	newbrain(config);
-	config.set_default_layout(layout_newbrain);
+	config.set_default_layout("newbrain");
 }
 
 

@@ -71,8 +71,8 @@
 
 #include "speaker.h"
 
-#include "tm990189.lh"
-#include "tm990189v.lh"
+
+
 
 
 #define TMS9901_0_TAG "tms9901_usr"
@@ -848,7 +848,7 @@ void tm990189_state::tm990_189(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(tm990189_state, tm990_189 )
 
 	/* Video hardware */
-	config.set_default_layout(layout_tm990189);
+	config.set_default_layout("tm990189");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -912,7 +912,7 @@ void tm990189_state::tm990_189_v(machine_config &config)
 	vdp.set_vram_size(0x4000);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	config.set_default_layout(layout_tm990189v);
+	config.set_default_layout("tm990189v");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

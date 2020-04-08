@@ -42,7 +42,7 @@
 #include "sound/sn76477.h"
 #include "speaker.h"
 
-#include "spectra.lh"
+
 
 
 class spectra_state : public genpin_class
@@ -248,7 +248,7 @@ void spectra_state::spectra(machine_config &config)
 	TIMER(config, "outtimer").configure_periodic(FUNC(spectra_state::outtimer), attotime::from_hz(1200));
 
 	/* Video */
-	config.set_default_layout(layout_spectra);
+	config.set_default_layout("spectra");
 
 	/* Sound */
 	genpin_audio(config);

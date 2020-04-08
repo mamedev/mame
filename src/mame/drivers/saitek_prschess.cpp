@@ -31,9 +31,6 @@ TODO:
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "saitek_prschess.lh" // clickable
-
 
 namespace {
 
@@ -198,7 +195,7 @@ void prschess_state::prschess(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8+1, 16);
-	config.set_default_layout(layout_saitek_prschess);
+	config.set_default_layout("saitek_prschess");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

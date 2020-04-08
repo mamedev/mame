@@ -77,7 +77,7 @@ ToDo:
 #include "machine/terminal.h"
 #include "speaker.h"
 
-#include "ravens.lh"
+
 
 
 class ravens_state : public driver_device
@@ -347,7 +347,7 @@ void ravens_state::ravens(machine_config &config)
 	m_maincpu->flag_handler().set(FUNC(ravens_state::cass_w));
 
 	/* video hardware */
-	config.set_default_layout(layout_ravens);
+	config.set_default_layout("ravens");
 
 	/* quickload */
 	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(ravens_state::quickload_cb));

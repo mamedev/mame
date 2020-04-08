@@ -27,7 +27,6 @@ Others: When starting the game, hold down X, then release and hit Z, otherwise
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-#include "play_1.lh"
 
 
 class play_1_state : public genpin_class
@@ -485,7 +484,7 @@ void play_1_state::play_1(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	config.set_default_layout(layout_play_1);
+	config.set_default_layout("play_1");
 
 	clock_device &xpoint(CLOCK(config, "xpoint", 100)); // crossing-point detector
 	xpoint.signal_handler().set(FUNC(play_1_state::clock_w));

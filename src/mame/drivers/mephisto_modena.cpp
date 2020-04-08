@@ -20,7 +20,6 @@ Hold Pawn + Knight buttons at boot for test mode.
 
 #include "speaker.h"
 
-#include "mephisto_modena.lh"
 
 
 class mephisto_modena_state : public driver_device
@@ -172,7 +171,7 @@ void mephisto_modena_state::modena(machine_config &config)
 
 	MEPHISTO_BUTTONS_BOARD(config, m_board);
 	m_board->set_disable_leds(true);
-	config.set_default_layout(layout_mephisto_modena);
+	config.set_default_layout("mephisto_modena");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

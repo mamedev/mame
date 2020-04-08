@@ -46,9 +46,6 @@ TODO:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-// internal artwork
-#include "mephisto_amsterdam.lh"
-#include "mephisto_glasgow.lh"
 
 
 class glasgow_state : public driver_device
@@ -296,7 +293,7 @@ void glasgow_state::glasgow(machine_config &config)
 	m_board->set_delay(attotime::from_msec(200));
 
 	/* video hardware */
-	config.set_default_layout(layout_mephisto_glasgow);
+	config.set_default_layout("mephisto_glasgow");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -311,7 +308,7 @@ void amsterd_state::amsterd(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &amsterd_state::amsterd_mem);
 
-	config.set_default_layout(layout_mephisto_amsterdam);
+	config.set_default_layout("mephisto_amsterdam");
 }
 
 void amsterd_state::dallas32(machine_config &config)

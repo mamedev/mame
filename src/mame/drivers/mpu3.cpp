@@ -113,48 +113,6 @@ TODO: - Distinguish door switches using manual
 #include "machine/roc10937.h"
 #include "machine/meters.h"
 
-#include "mpu3.lh"
-
-// MFME2MAME layouts:
-#include "m3acech.lh"
-#include "m3autort.lh"
-#include "m3biggam.lh"
-#include "m3bigsht.lh"
-#include "m3blkhle.lh"
-#include "m3cabreta.lh"
-#include "m3chase.lh"
-#include "m3circle.lh"
-#include "m3cskill.lh"
-#include "m3cunlim.lh"
-#include "m3fortun.lh"
-#include "m3gcrown.lh"
-#include "m3gmine.lh"
-#include "m3lineup.lh"
-#include "m3loony.lh"
-#include "m3nnice.lh"
-#include "m3oddson.lh"
-#include "m3online.lh"
-#include "m3oxo.lh"
-#include "m3ratrce.lh"
-#include "m3razdaza.lh"
-#include "m3replay.lh"
-#include "m3rockpl.lh"
-#include "m3rollem.lh"
-#include "m3rxchng.lh"
-#include "m3sexcu.lh"
-#include "m3slight.lh"
-#include "m3snaphp.lh"
-#include "m3spoof.lh"
-#include "m3supadr.lh"
-#include "m3supnud.lh"
-#include "m3supspo.lh"
-#include "m3supwin.lh"
-#include "m3sweep.lh"
-#include "m3tfair.lh"
-#include "m3toplin.lh"
-#include "m3winagnb.lh"
-#include "m3winstr.lh"
-#include "m3xchngg.lh"
 
 
 #ifdef MAME_DEBUG
@@ -885,7 +843,7 @@ void mpu3_state::mpu3base(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x HM4334 or HMI6514 or MB8414 + 2.4V battery
 
-	config.set_default_layout(layout_mpu3);
+	config.set_default_layout("mpu3");
 }
 
 
@@ -1603,94 +1561,94 @@ ROM_END
 
 GAME(  198?, m3tst,      0,          mpu3base, mpu3, mpu3_state, empty_init,    ROT0, "Barcrest","MPU3 Unit Test (Program 5) (Barcrest) (MPU3)",GAME_FLAGS )
 
-GAMEL( 198?, m3autort,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Autoroute (Barcrest) (MPU3)", GAME_FLAGS, layout_m3autort )
+GAMEL( 198?, m3autort,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Autoroute (Barcrest) (MPU3)", GAME_FLAGS, "m3autort" )
 GAME(  198?, m3big20j,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Big 20 Joker (Barcrest) (MPU3)",GAME_FLAGS )
-GAMEL( 198?, m3biggam,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","The Big Game (Barcrest) (MPU3)", GAME_FLAGS, layout_m3biggam )
-GAMEL( 198?, m3bigsht,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Big Shot (Barcrest) (MPU3)", GAME_FLAGS, layout_m3bigsht )
-GAMEL( 198?, m3blkhle,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Black Hole (Barcrest) (MPU3)", GAME_FLAGS, layout_m3blkhle )
-GAMEL( 198?, m3cabret,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Cabaret (Barcrest) (MPU3, set 1)", GAME_FLAGS, layout_m3cabreta )
-GAMEL( 198?, m3cabreta,  m3cabret,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Cabaret (Barcrest) (MPU3, set 2)", GAME_FLAGS, layout_m3cabreta )
-GAMEL( 198?, m3cunlim,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Chances Unlimited (Barcrest) (MPU3)", GAME_FLAGS, layout_m3cunlim )
-GAMEL( 198?, m3cskill,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Circle Skill (Barcrest) (MPU3)", GAME_FLAGS, layout_m3cskill )
+GAMEL( 198?, m3biggam,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","The Big Game (Barcrest) (MPU3)", GAME_FLAGS, "m3biggam" )
+GAMEL( 198?, m3bigsht,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Big Shot (Barcrest) (MPU3)", GAME_FLAGS, "m3bigsht" )
+GAMEL( 198?, m3blkhle,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Black Hole (Barcrest) (MPU3)", GAME_FLAGS, "m3blkhle" )
+GAMEL( 198?, m3cabret,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Cabaret (Barcrest) (MPU3, set 1)", GAME_FLAGS, "m3cabreta" )
+GAMEL( 198?, m3cabreta,  m3cabret,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Cabaret (Barcrest) (MPU3, set 2)", GAME_FLAGS, "m3cabreta" )
+GAMEL( 198?, m3cunlim,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Chances Unlimited (Barcrest) (MPU3)", GAME_FLAGS, "m3cunlim" )
+GAMEL( 198?, m3cskill,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Circle Skill (Barcrest) (MPU3)", GAME_FLAGS, "m3cskill" )
 GAME(  198?, m3cjoker,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Crazy Joker (Barcrest) (MPU3)",GAME_FLAGS )
-GAMEL( 198?, m3xchngg,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Exchanges Galore (Barcrest) (MPU3)", GAME_FLAGS, layout_m3xchngg )
+GAMEL( 198?, m3xchngg,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Exchanges Galore (Barcrest) (MPU3)", GAME_FLAGS, "m3xchngg" )
 GAME(  198?, m3xchngu,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Exchanges Unlimited (Barcrest) (MPU3, set 1)",GAME_FLAGS )
 GAME(  198?, m3xchngua,  m3xchngu,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Exchanges Unlimited (Barcrest) (MPU3, set 2)",GAME_FLAGS )
-GAMEL( 198?, m3fortun,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Fortune Numbers (Barcrest) (MPU3, set 1)", GAME_FLAGS, layout_m3fortun )
-GAMEL( 198?, m3fortuna,  m3fortun,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Fortune Numbers (Barcrest) (MPU3, set 2)", GAME_FLAGS, layout_m3fortun )
-GAMEL( 198?, m3fortund,  m3fortun,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Fortune Numbers (Barcrest) [Dutch] (MPU3)", GAME_FLAGS, layout_m3fortun )
+GAMEL( 198?, m3fortun,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Fortune Numbers (Barcrest) (MPU3, set 1)", GAME_FLAGS, "m3fortun" )
+GAMEL( 198?, m3fortuna,  m3fortun,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Fortune Numbers (Barcrest) (MPU3, set 2)", GAME_FLAGS, "m3fortun" )
+GAMEL( 198?, m3fortund,  m3fortun,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Fortune Numbers (Barcrest) [Dutch] (MPU3)", GAME_FLAGS, "m3fortun" )
 GAME(  198?, m3gaward,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Golden Award (Barcrest) (MPU3)",GAME_FLAGS )
 GAME(  198?, m3hprvpr,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Hyper Viper (Barcrest) (MPU3)",GAME_FLAGS )
 GAME(  198?, m3snappy,   m3hprvpr,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Snappy Viper (Barcrest) (MPU3)",GAME_FLAGS )
-GAMEL( 198?, m3replay,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Instant Replay (Barcrest) (MPU3)", GAME_FLAGS, layout_m3replay )
-GAMEL( 198?, m3lineup,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Line Up (Barcrest) (MPU3)", GAME_FLAGS, layout_m3lineup )
+GAMEL( 198?, m3replay,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Instant Replay (Barcrest) (MPU3)", GAME_FLAGS, "m3replay" )
+GAMEL( 198?, m3lineup,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Line Up (Barcrest) (MPU3)", GAME_FLAGS, "m3lineup" )
 GAME(  198?, m3llotto,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Lucky Lotto (Barcrest) (MPU3)",GAME_FLAGS )
 GAME(  198?, m3lstrik,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Lucky Strike Club (Barcrest) (MPU3, set 1)",GAME_FLAGS )
 GAME(  198?, m3lstrika,  m3lstrik,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Lucky Strike Club (Barcrest) (MPU3, set 2)",GAME_FLAGS )
 GAME(  198?, m3magrp,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Magic Replay (Barcrest) (MPU3)",GAME_FLAGS )
-GAMEL( 198?, m3nnice,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Naughty But Nice (Barcrest) (MPU3)", GAME_FLAGS, layout_m3nnice )
+GAMEL( 198?, m3nnice,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Naughty But Nice (Barcrest) (MPU3)", GAME_FLAGS, "m3nnice" )
 GAME(  198?, m3nudge,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Nudges Unlimited (Barcrest) (MPU3)",GAME_FLAGS )
-GAMEL( 198?, m3oddson,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Odds On (Barcrest) (MPU3)", GAME_FLAGS, layout_m3oddson )
+GAMEL( 198?, m3oddson,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Odds On (Barcrest) (MPU3)", GAME_FLAGS, "m3oddson" )
 GAME(  198?, m3optunl,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Options Unlimited (Barcrest) (MPU3)",GAME_FLAGS )
-GAMEL( 198?, m3razdaz,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Razzle Dazzle (Barcrest) (MPU3, set 1)", GAME_FLAGS, layout_m3razdaza )
-GAMEL( 198?, m3razdaza,  m3razdaz,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Razzle Dazzle (Barcrest) (MPU3, set 2)", GAME_FLAGS, layout_m3razdaza )
-GAMEL( 198?, m3razdazd,  m3razdaz,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Razzle Dazzle (Barcrest) [Dutch] (MPU3)", GAME_FLAGS, layout_m3razdaza )
+GAMEL( 198?, m3razdaz,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Razzle Dazzle (Barcrest) (MPU3, set 1)", GAME_FLAGS, "m3razdaza" )
+GAMEL( 198?, m3razdaza,  m3razdaz,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Razzle Dazzle (Barcrest) (MPU3, set 2)", GAME_FLAGS, "m3razdaza" )
+GAMEL( 198?, m3razdazd,  m3razdaz,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Razzle Dazzle (Barcrest) [Dutch] (MPU3)", GAME_FLAGS, "m3razdaza" )
 GAME(  198?, m3rolla,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Rollamatic 5-Line Special (Barcrest) (MPU3)", GAME_FLAGS ) // or 5-Line Special Rollamatic on the glass, using the title from the ROM
-GAMEL( 198?, m3rxchng,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Royal Exchange Club (Barcrest) (MPU3)", GAME_FLAGS, layout_m3rxchng )
-GAMEL( 198?, m3circle,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Special Circle Club (Barcrest) (MPU3, set 1)", GAME_FLAGS, layout_m3circle )
-GAMEL( 198?, m3circlea,  m3circle,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Special Circle Club (Barcrest) (MPU3, set 2)", GAME_FLAGS, layout_m3circle )
-GAMEL( 198?, m3circleb,  m3circle,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Special Circle Club (Barcrest) (MPU3, set 3)", GAME_FLAGS, layout_m3circle )
-GAMEL( 198?, m3slight,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Strike A Light (Barcrest) (MPU3)", GAME_FLAGS, layout_m3slight )
-GAMEL( 198?, m3supadr,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Super Adders & Ladders (Barcrest) (MPU3)", GAME_FLAGS, layout_m3supadr )
+GAMEL( 198?, m3rxchng,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Royal Exchange Club (Barcrest) (MPU3)", GAME_FLAGS, "m3rxchng" )
+GAMEL( 198?, m3circle,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Special Circle Club (Barcrest) (MPU3, set 1)", GAME_FLAGS, "m3circle" )
+GAMEL( 198?, m3circlea,  m3circle,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Special Circle Club (Barcrest) (MPU3, set 2)", GAME_FLAGS, "m3circle" )
+GAMEL( 198?, m3circleb,  m3circle,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Special Circle Club (Barcrest) (MPU3, set 3)", GAME_FLAGS, "m3circle" )
+GAMEL( 198?, m3slight,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Strike A Light (Barcrest) (MPU3)", GAME_FLAGS, "m3slight" )
+GAMEL( 198?, m3supadr,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Super Adders & Ladders (Barcrest) (MPU3)", GAME_FLAGS, "m3supadr" )
 GAME(  198?, m3sdeal,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Super Deal (Barcrest) (MPU3)",GAME_FLAGS )
-GAMEL( 198?, m3sexcu,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Super Exchanges Unlimited (Barcrest) (MPU3)", GAME_FLAGS, layout_m3sexcu )
+GAMEL( 198?, m3sexcu,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Super Exchanges Unlimited (Barcrest) (MPU3)", GAME_FLAGS, "m3sexcu" )
 GAME(  198?, m3suplin,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Super Line Up (Barcrest) (MPU3, set 1)",GAME_FLAGS )
 GAME(  198?, m3suplina,  m3suplin,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Super Line Up (Barcrest) (MPU3, set 2)",GAME_FLAGS )
-GAMEL( 198?, m3supnud,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Super Nudges Unlimited (Barcrest) (MPU3)", GAME_FLAGS, layout_m3supnud )
+GAMEL( 198?, m3supnud,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Super Nudges Unlimited (Barcrest) (MPU3)", GAME_FLAGS, "m3supnud" )
 GAME(  198?, m3supser,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Super Series (Barcrest) (MPU3)",GAME_FLAGS )
-GAMEL( 198?, m3sweep,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Sweep Stake Club (Barcrest) (MPU3, set 1)", GAME_FLAGS, layout_m3sweep )
-GAMEL( 198?, m3sweepa,   m3sweep,    mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Sweep Stake Club (Barcrest) (MPU3, set 2)", GAME_FLAGS, layout_m3sweep )
+GAMEL( 198?, m3sweep,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Sweep Stake Club (Barcrest) (MPU3, set 1)", GAME_FLAGS, "m3sweep" )
+GAMEL( 198?, m3sweepa,   m3sweep,    mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Sweep Stake Club (Barcrest) (MPU3, set 2)", GAME_FLAGS, "m3sweep" )
 GAME(  198?, m3topsht,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Top Shot (Barcrest) (MPU3)",GAME_FLAGS )
 GAME(  198?, m3winstra,  m3winstr,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Winstrike (Barcrest) (MPU3)",GAME_FLAGS )
 
 /* Bwb */
 
-GAMEL( 198?, m3acech,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Ace Chase (Bwb) (MPU3)", GAME_FLAGS, layout_m3acech )
+GAMEL( 198?, m3acech,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Ace Chase (Bwb) (MPU3)", GAME_FLAGS, "m3acech" )
 GAME(  198?, m3bankr,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Banker (Bwb) (MPU3)",GAME_FLAGS )
-GAMEL( 198?, m3chase,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Chase It (Bwb) (MPU3)", GAME_FLAGS, layout_m3chase )
-GAMEL( 198?, m3gmine,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Gold Mine (Bwb) (MPU3)", GAME_FLAGS, layout_m3gmine )
-GAMEL( 198?, m3ratrce,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Rat Race (Bwb) (MPU3)", GAME_FLAGS, layout_m3ratrce )
+GAMEL( 198?, m3chase,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Chase It (Bwb) (MPU3)", GAME_FLAGS, "m3chase" )
+GAMEL( 198?, m3gmine,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Gold Mine (Bwb) (MPU3)", GAME_FLAGS, "m3gmine" )
+GAMEL( 198?, m3ratrce,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Rat Race (Bwb) (MPU3)", GAME_FLAGS, "m3ratrce" )
 GAME(  198?, m3supasw,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Supaswop (Bwb) (MPU3)",GAME_FLAGS )
-GAMEL( 198?, m3supwin,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Super Win (Bwb) (MPU3, set 1)", GAME_FLAGS, layout_m3supwin )
-GAMEL( 198?, m3supwina,  m3supwin,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Super Win (Bwb) (MPU3, set 2)", GAME_FLAGS, layout_m3supwin )
-GAMEL( 198?, m3winagn,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Win-A-Gain (Bwb) (MPU3, set 1)", GAME_FLAGS, layout_m3winagnb )
-GAMEL( 198?, m3winagna,  m3winagn,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Win-A-Gain (Bwb) (MPU3, set 2)", GAME_FLAGS, layout_m3winagnb )
-GAMEL( 198?, m3winagnb,  m3winagn,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Win-A-Gain (Bwb) (MPU3, set 3)", GAME_FLAGS, layout_m3winagnb )
-GAMEL( 198?, m3winstr,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Winstrike (Bwb) (MPU3)", GAME_FLAGS, layout_m3winstr )
+GAMEL( 198?, m3supwin,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Super Win (Bwb) (MPU3, set 1)", GAME_FLAGS, "m3supwin" )
+GAMEL( 198?, m3supwina,  m3supwin,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Super Win (Bwb) (MPU3, set 2)", GAME_FLAGS, "m3supwin" )
+GAMEL( 198?, m3winagn,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Win-A-Gain (Bwb) (MPU3, set 1)", GAME_FLAGS, "m3winagnb" )
+GAMEL( 198?, m3winagna,  m3winagn,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Win-A-Gain (Bwb) (MPU3, set 2)", GAME_FLAGS, "m3winagnb" )
+GAMEL( 198?, m3winagnb,  m3winagn,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Win-A-Gain (Bwb) (MPU3, set 3)", GAME_FLAGS, "m3winagnb" )
+GAMEL( 198?, m3winstr,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Bwb","Winstrike (Bwb) (MPU3)", GAME_FLAGS, "m3winstr" )
 
 /* Pcp */
 
 GAME(  198?, m3cdash,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Cash Dash (Pcp) (MPU3)",GAME_FLAGS )
-GAMEL( 198?, m3loony,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Loonybin (Pcp) (MPU3)", GAME_FLAGS, layout_m3loony )
-GAMEL( 198?, m3online,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","On Line (Pcp) (MPU3)", GAME_FLAGS, layout_m3online )
-GAMEL( 198?, m3rockpl,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Rock Pile (Pcp) (MPU3)", GAME_FLAGS, layout_m3rockpl )
-GAMEL( 198?, m3rollem,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Roll 'Em (Pcp) (MPU3)", GAME_FLAGS, layout_m3rollem )
-GAMEL( 198?, m3snaphp,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Snap Happy (Pcp) (MPU3)", GAME_FLAGS, layout_m3snaphp )
-GAMEL( 198?, m3spoof,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Spoof (Pcp) (MPU3, set 1)", GAME_FLAGS, layout_m3spoof )
-GAMEL( 198?, m3spoofa,   m3spoof,    mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Spoof (Pcp) (MPU3, set 2)", GAME_FLAGS, layout_m3spoof )
-GAMEL( 198?, m3supspo,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Super Spoof (Pcp) (MPU3, set 1)", GAME_FLAGS, layout_m3supspo )
-GAMEL( 198?, m3supspoa,  m3supspo,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Super Spoof (Pcp) (MPU3, set 2)", GAME_FLAGS, layout_m3supspo )
-GAMEL( 198?, m3toplin,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Top Line (Pcp) (MPU3)", GAME_FLAGS, layout_m3toplin )
+GAMEL( 198?, m3loony,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Loonybin (Pcp) (MPU3)", GAME_FLAGS, "m3loony" )
+GAMEL( 198?, m3online,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","On Line (Pcp) (MPU3)", GAME_FLAGS, "m3online" )
+GAMEL( 198?, m3rockpl,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Rock Pile (Pcp) (MPU3)", GAME_FLAGS, "m3rockpl" )
+GAMEL( 198?, m3rollem,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Roll 'Em (Pcp) (MPU3)", GAME_FLAGS, "m3rollem" )
+GAMEL( 198?, m3snaphp,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Snap Happy (Pcp) (MPU3)", GAME_FLAGS, "m3snaphp" )
+GAMEL( 198?, m3spoof,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Spoof (Pcp) (MPU3, set 1)", GAME_FLAGS, "m3spoof" )
+GAMEL( 198?, m3spoofa,   m3spoof,    mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Spoof (Pcp) (MPU3, set 2)", GAME_FLAGS, "m3spoof" )
+GAMEL( 198?, m3supspo,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Super Spoof (Pcp) (MPU3, set 1)", GAME_FLAGS, "m3supspo" )
+GAMEL( 198?, m3supspoa,  m3supspo,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Super Spoof (Pcp) (MPU3, set 2)", GAME_FLAGS, "m3supspo" )
+GAMEL( 198?, m3toplin,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Top Line (Pcp) (MPU3)", GAME_FLAGS, "m3toplin" )
 GAME(  198?, m3wigwam,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Pcp","Wig Wam (Pcp) (MPU3)",GAME_FLAGS )
 
 /* Mdm */
 
-GAMEL( 198?, m3gcrown,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Mdm","Golden Crowns (Mdm) (MPU3)", GAME_FLAGS, layout_m3gcrown )
-GAMEL( 198?, m3tfair,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Mdm","Tuppenny Fair (Mdm) (MPU3)", GAME_FLAGS, layout_m3tfair )
+GAMEL( 198?, m3gcrown,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Mdm","Golden Crowns (Mdm) (MPU3)", GAME_FLAGS, "m3gcrown" )
+GAMEL( 198?, m3tfair,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Mdm","Tuppenny Fair (Mdm) (MPU3)", GAME_FLAGS, "m3tfair" )
 GAME(  198?, m3wacky,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Mdm","Wacky Racer (Mdm) (MPU3)",GAME_FLAGS )
 
 /* VFS */
-GAMEL( 198?, m3oxo,      0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "VFS","Noughts 'n' Crosses (VFS) (MPU3)", GAME_FLAGS, layout_m3oxo )
+GAMEL( 198?, m3oxo,      0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "VFS","Noughts 'n' Crosses (VFS) (MPU3)", GAME_FLAGS, "m3oxo" )
 GAME(  198?, m3mremon,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "VFS","More Money (VFS) (MPU3)",GAME_FLAGS )
 
 /* Others */

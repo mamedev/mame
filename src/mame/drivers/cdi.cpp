@@ -41,8 +41,6 @@ TODO:
 
 #include "cdrom.h"
 
-#include "cdi.lh"
-
 // TODO: NTSC system clock is 30.2098 MHz; additional 4.9152 MHz XTAL provided for UART
 #define CLOCK_A 30_MHz_XTAL
 
@@ -569,7 +567,7 @@ void cdi_state::cdimono1_base(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x100);
 
-	config.set_default_layout(layout_cdi);
+	config.set_default_layout("cdi");
 
 	// IMS66490 CDIC input clocks are 22.5792 MHz and 19.3536 MHz
 	// DSP input clock is 7.5264 MHz
@@ -624,7 +622,7 @@ void cdi_state::cdimono2(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x100);
 
-	config.set_default_layout(layout_cdi);
+	config.set_default_layout("cdi");
 
 	M68HC05C8(config, m_servo, 4_MHz_XTAL);
 	M68HC05C8(config, m_slave, 4_MHz_XTAL);
@@ -675,7 +673,7 @@ void cdi_state::cdi910(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x100);
 
-	config.set_default_layout(layout_cdi);
+	config.set_default_layout("cdi");
 
 	M68HC05C8(config, m_servo, 4_MHz_XTAL);
 	M68HC05C8(config, m_slave, 4_MHz_XTAL);

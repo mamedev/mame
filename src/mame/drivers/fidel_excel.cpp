@@ -141,12 +141,6 @@ Designer 2100 (model 6103): exactly same, but running at 5MHz
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_des.lh" // clickable
-#include "fidel_ex.lh" // clickable
-#include "fidel_exb.lh" // clickable
-#include "fidel_exd.lh" // clickable
-#include "fidel_exv.lh" // clickable
 
 
 namespace {
@@ -411,7 +405,7 @@ void excel_state::fexcel(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(2+4, 8);
 	m_display->set_segmask(0x3c, 0x7f);
-	config.set_default_layout(layout_fidel_ex);
+	config.set_default_layout("fidel_ex");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -434,7 +428,7 @@ void excel_state::fexcelb(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcelb_map);
-	config.set_default_layout(layout_fidel_exb);
+	config.set_default_layout("fidel_exb");
 }
 
 void excel_state::fexcelp(machine_config &config)
@@ -462,7 +456,7 @@ void excel_state::fdes2100(machine_config &config)
 	M65C02(config.replace(), m_maincpu, 5_MHz_XTAL); // WDC 65C02
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcelb_map);
 
-	config.set_default_layout(layout_fidel_des);
+	config.set_default_layout("fidel_des");
 }
 
 void excel_state::fdes2000(machine_config &config)
@@ -477,7 +471,7 @@ void excel_state::fdes2000(machine_config &config)
 void excel_state::fexcelv(machine_config &config)
 {
 	fexcelb(config);
-	config.set_default_layout(layout_fidel_exv);
+	config.set_default_layout("fidel_exv");
 
 	/* sound hardware */
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
@@ -488,7 +482,7 @@ void excel_state::fexcelv(machine_config &config)
 void excel_state::fexceld(machine_config &config)
 {
 	fexcelb(config);
-	config.set_default_layout(layout_fidel_exd);
+	config.set_default_layout("fidel_exd");
 }
 
 

@@ -604,4 +604,4 @@ void m6502_mcu_device::add_event(uint64_t &event_time, uint64_t new_event)
 }
 
 
-#include "cpu/m6502/m6502.hxx"
+#include "emu/cpu/m6502/m6502.hxx"

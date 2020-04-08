@@ -93,7 +93,7 @@ void tms57002_device::decode_cat1(u32 opcode, unsigned short *op, cstate *cs)
 		break;
 
 #define CDEC1
-#include "cpu/tms57002/tms57002.hxx"
+#include "emu/cpu/tms57002/tms57002.hxx"
 #undef CDEC1
 
 	default:
@@ -111,7 +111,7 @@ void tms57002_device::decode_cat2_pre(u32 opcode, unsigned short *op, cstate *cs
 		break;
 
 #define CDEC2A
-#include "cpu/tms57002/tms57002.hxx"
+#include "emu/cpu/tms57002/tms57002.hxx"
 #undef CDEC2A
 
 	default:
@@ -129,7 +129,7 @@ void tms57002_device::decode_cat2_post(u32 opcode, unsigned short *op, cstate *c
 		break;
 
 #define CDEC2B
-#include "cpu/tms57002/tms57002.hxx"
+#include "emu/cpu/tms57002/tms57002.hxx"
 #undef CDEC2B
 
 	default:
@@ -147,7 +147,7 @@ void tms57002_device::decode_cat3(u32 opcode, unsigned short *op, cstate *cs)
 		break;
 
 #define CDEC3
-#include "cpu/tms57002/tms57002.hxx"
+#include "emu/cpu/tms57002/tms57002.hxx"
 #undef CDEC3
 
 	default:

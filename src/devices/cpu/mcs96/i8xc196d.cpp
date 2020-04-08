@@ -15,4 +15,4 @@ i8xc196_disassembler::i8xc196_disassembler() : mcs96_disassembler(disasm_entries
 {
 }
 
-#include "cpu/mcs96/i8xc196d.hxx"
+#include "emu/cpu/mcs96/i8xc196d.hxx"

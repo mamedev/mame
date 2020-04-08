@@ -39,7 +39,6 @@ Other known international versions:
 #include "softlist.h"
 #include "speaker.h"
 
-#include "gl3000s.lh"
 
 
 class pc2000_state : public driver_device
@@ -961,7 +960,7 @@ void gl3000s_state::gl3000s(machine_config &config)
 	m_screen->set_visarea(0, 120-1, 0, 24-1);
 	m_screen->set_screen_update(FUNC(gl3000s_state::screen_update));
 
-	config.set_default_layout(layout_gl3000s);
+	config.set_default_layout("gl3000s");
 	config.device_remove("gfxdecode");
 
 	SOFTWARE_LIST(config, "gl2000_cart").set_compatible("gl2000");

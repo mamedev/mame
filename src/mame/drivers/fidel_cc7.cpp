@@ -50,9 +50,6 @@ D0-D3: keypad row
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_bcc.lh" // clickable
-#include "fidel_bkc.lh" // clickable
 
 
 namespace {
@@ -231,13 +228,13 @@ void bcc_state::bkc(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(6, 8);
 	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_fidel_bkc);
+	config.set_default_layout("fidel_bkc");
 }
 
 void bcc_state::bcc(machine_config &config)
 {
 	bkc(config);
-	config.set_default_layout(layout_fidel_bcc);
+	config.set_default_layout("fidel_bcc");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

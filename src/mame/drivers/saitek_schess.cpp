@@ -42,10 +42,6 @@ Expansion modules: (* denotes not dumped)
 #include "bus/generic/carts.h"
 #include "speaker.h"
 
-// internal artwork
-#include "saitek_schess.lh" // clickable
-
-
 namespace {
 
 class schess_state : public driver_device
@@ -223,7 +219,7 @@ void schess_state::schess(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8+2, 8);
-	config.set_default_layout(layout_saitek_schess);
+	config.set_default_layout("saitek_schess");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

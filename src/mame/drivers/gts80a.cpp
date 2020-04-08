@@ -19,8 +19,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "gts80a.lh"
-#include "gts80a_caveman.lh"
 
 class gts80a_state : public genpin_class
 {
@@ -356,7 +354,7 @@ void gts80a_state::gts80a(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // must be 1
 
 	/* Video */
-	config.set_default_layout(layout_gts80a);
+	config.set_default_layout("gts80a");
 
 	/* Devices */
 	riot6532_device &riot1(RIOT6532(config, "riot1", XTAL(3'579'545)/4));
@@ -480,7 +478,7 @@ void caveman_state::caveman(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(16);
 
-	config.set_default_layout(layout_gts80a_caveman);
+	config.set_default_layout("gts80a_caveman");
 }
 
 static INPUT_PORTS_START( caveman )

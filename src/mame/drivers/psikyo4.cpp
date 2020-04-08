@@ -132,7 +132,6 @@ ROMs -
 #include "emu.h"
 #include "includes/psikyo4.h"
 
-#include "rendlay.h"
 #include "speaker.h"
 
 
@@ -617,7 +616,7 @@ void psikyo4_state::ps4big(machine_config &config)
 	PALETTE(config, m_palette[0]).set_entries((0x2000/4) + 1); /* palette + clear colour */
 	PALETTE(config, m_palette[1]).set_entries((0x2000/4) + 1);
 
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	SCREEN(config, m_lscreen, SCREEN_TYPE_RASTER);
 	m_lscreen->set_refresh_hz(60);

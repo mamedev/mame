@@ -20,7 +20,6 @@
 #include "cpu/i86/i86.h"
 #include "speaker.h"
 
-#include "gts80b.lh"
 
 
 class gts80b_state : public genpin_class
@@ -401,7 +400,7 @@ void gts80b_state::gts80b(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // must be 1
 
 	/* Video */
-	config.set_default_layout(layout_gts80b);
+	config.set_default_layout("gts80b");
 
 	/* Devices */
 	riot6532_device &riot1(RIOT6532(config, "riot1", XTAL(3'579'545)/4));

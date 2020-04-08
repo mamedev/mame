@@ -16,7 +16,7 @@
 #include "cpu/ucom4/ucom4.h"
 #include "machine/timer.h"
 
-#include "tr606.lh"
+
 
 
 class tr606_state : public driver_device
@@ -92,7 +92,7 @@ void tr606_state::tr606(machine_config &config)
 	TIMER(config, "tp3_clear").configure_periodic(FUNC(tr606_state::tp3_clear), TP3_PERIOD);
 
 	/* video hardware */
-	config.set_default_layout(layout_tr606);
+	config.set_default_layout("tr606");
 
 	/* sound hardware */
 	// discrete...

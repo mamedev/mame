@@ -60,7 +60,6 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "hp3478a.lh"
 
 #define CPU_CLOCK       XTAL(5'856'000)
 
@@ -705,7 +704,7 @@ void hp3478a_state::hp3478a(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_ticks(3*5*(1<<19),CPU_CLOCK));
 
 	// video
-	config.set_default_layout(layout_hp3478a);
+	config.set_default_layout("hp3478a");
 }
 
 /******************************************************************************

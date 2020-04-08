@@ -54,7 +54,6 @@
 #include "video/pwm.h"
 #include "speaker.h"
 
-#include "mirage.lh"
 
 class enmirage_state : public driver_device
 {
@@ -186,7 +185,7 @@ void enmirage_state::mirage(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(2, 8);
 	m_display->set_segmask(0x3, 0xff);
-	config.set_default_layout(layout_mirage);
+	config.set_default_layout("mirage");
 
 	acia6850_device &acia6850(ACIA6850(config, "acia6850", 0));
 	acia6850.irq_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);

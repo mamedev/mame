@@ -201,8 +201,6 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
-#include "crmaze2p.lh"
-#include "crmaze4p.lh"
 
 
 class mpu4vid_state : public mpu4_state
@@ -3624,24 +3622,24 @@ GAME(  199?, v4bios,     0,        mod2,       mpu4,     mpu4_state,    empty_in
 
 #define GAME_FLAGS MACHINE_NOT_WORKING
 
-GAMEL( 1993, v4cmaze,    v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","The Crystal Maze (v1.3) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
-GAMEL( 1993, v4cmazedat, v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","The Crystal Maze (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9D
-GAMEL( 1993, v4cmazea,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmazea,   ROT0, "Barcrest","The Crystal Maze (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9 (actually newer than the 1.1 set then??)
-GAMEL( 1993, v4cmazeb,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.2) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
-GAMEL( 1993, v4cmazec,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.3 alt) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
-GAMEL( 1993, v4cmazed,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.1) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.6
+GAMEL( 1993, v4cmaze,    v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","The Crystal Maze (v1.3) (MPU4 Video)",GAME_FLAGS,"crmaze2p" )//SWP 0.9
+GAMEL( 1993, v4cmazedat, v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","The Crystal Maze (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS,"crmaze2p" )//SWP 0.9D
+GAMEL( 1993, v4cmazea,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmazea,   ROT0, "Barcrest","The Crystal Maze (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,"crmaze2p" )//SWP 0.9 (actually newer than the 1.1 set then??)
+GAMEL( 1993, v4cmazeb,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.2) (MPU4 Video)",GAME_FLAGS,"crmaze2p" )//SWP 0.9
+GAMEL( 1993, v4cmazec,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.3 alt) (MPU4 Video)",GAME_FLAGS,"crmaze2p" )//SWP 0.9
+GAMEL( 1993, v4cmazed,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze (v1.1) (MPU4 Video)",GAME_FLAGS,"crmaze2p" )//SWP 0.6
 
-GAMEL( 1993, v4cmaze2,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0
-GAMEL( 1993, v4cmaze2d,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0D
-GAMEL( 1993, v4cmaze2a,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2a,  ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0 /* unprotected? proto? */
-GAMEL( 1993, v4cmaze2b,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.0) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0
-GAMEL( 1993, v4cmaze2c,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// bad rom?
+GAMEL( 1993, v4cmaze2,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2) (MPU4 Video)",GAME_FLAGS,"crmaze4p" )//SWP 1.0
+GAMEL( 1993, v4cmaze2d,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak) (MPU4 Video)",GAME_FLAGS,"crmaze4p" )//SWP 1.0D
+GAMEL( 1993, v4cmaze2a,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2a,  ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,"crmaze4p" )//SWP 1.0 /* unprotected? proto? */
+GAMEL( 1993, v4cmaze2b,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.0) (MPU4 Video)",GAME_FLAGS,"crmaze4p" )//SWP 1.0
+GAMEL( 1993, v4cmaze2c,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze2,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v?.?) (MPU4 Video)",GAME_FLAGS,"crmaze4p" )// bad rom?
 
-GAMEL( 1994, v4cmaze3,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze3,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
-GAMEL( 1994, v4cmaze3d,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze3,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7D
-GAMEL( 1994, v4cmaze3a,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze3a,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v1.2, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
-GAMEL( 1994, v4cmaze3b,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.8) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
-GAMEL( 1994, v4cmaze3c,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// missing one program rom
+GAMEL( 1994, v4cmaze3,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze3,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9) (MPU4 Video)",GAME_FLAGS,"crmaze4p" )//SWP 0.7
+GAMEL( 1994, v4cmaze3d,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze3,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9, Datapak) (MPU4 Video)",GAME_FLAGS,"crmaze4p" )//SWP 0.7D
+GAMEL( 1994, v4cmaze3a,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze3a,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v1.2, AMLD) (MPU4 Video)",GAME_FLAGS,"crmaze4p" )//SWP 0.7
+GAMEL( 1994, v4cmaze3b,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.8) (MPU4 Video)",GAME_FLAGS,"crmaze4p" )//SWP 0.7
+GAMEL( 1994, v4cmaze3c,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_v4cmazeb,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v?.?) (MPU4 Video)",GAME_FLAGS,"crmaze4p" )// missing one program rom
 
 GAME(  199?, v4turnov,   v4bios,   mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
 

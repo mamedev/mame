@@ -44,8 +44,8 @@
 
 #include "softlist_dev.h"
 
-#include "sitcom.lh"
-#include "sitcomtmr.lh"
+
+
 
 #include <cmath>
 
@@ -374,14 +374,14 @@ void sitcom_state::sitcom(machine_config &config)
 	rs232.rxd_handler().set(FUNC(sitcom_state::update_rxd));
 
 	SOFTWARE_LIST(config, "bitb_list").set_original("sitcom");
-	config.set_default_layout(layout_sitcom);
+	config.set_default_layout("sitcom");
 }
 
 void sitcom_timer_state::sitcomtmr(machine_config &config)
 {
 	sitcom(config);
 	DL1414T(config, m_ds2, u32(0)).update().set(FUNC(sitcom_timer_state::update_ds<2>)); // remote display
-	config.set_default_layout(layout_sitcomtmr);
+	config.set_default_layout("sitcomtmr");
 }
 
 

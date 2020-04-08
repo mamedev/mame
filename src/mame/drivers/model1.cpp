@@ -599,8 +599,6 @@ Notes:
 #include "machine/model1io2.h"
 #include "speaker.h"
 
-#include "vr.lh"
-#include "model1io2.lh"
 
 // On the real system, another 315-5338A is acting as slave
 // and writes the data to the dual port RAM. This isn't
@@ -1832,7 +1830,7 @@ void model1_state::wingwar(machine_config &config)
 	ioboard.output_callback().set(FUNC(model1_state::wingwar_outputs_w));
 	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
-	config.set_default_layout(layout_model1io2);
+	config.set_default_layout("model1io2");
 
 	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
 }
@@ -1848,7 +1846,7 @@ void model1_state::wingwar360(machine_config &config)
 	ioboard.output_callback().set(FUNC(model1_state::wingwar360_outputs_w));
 	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
-	config.set_default_layout(layout_model1io2);
+	config.set_default_layout("model1io2");
 }
 
 void model1_state::polhemus_map(address_map &map)
@@ -1875,7 +1873,7 @@ void model1_state::netmerc(machine_config &config)
 	ioboard.output_callback().set(FUNC(model1_state::netmerc_outputs_w));
 	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
-	config.set_default_layout(layout_model1io2);
+	config.set_default_layout("model1io2");
 }
 
 
@@ -1885,7 +1883,7 @@ void model1_state::netmerc(machine_config &config)
 
 //    YEAR  NAME        PARENT   MACHINE     INPUT       CLASS         INIT        ROTATION  COMPANY  FULLNAME              FLAGS
 GAME( 1993, vf,         0,       vf,         vf,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Fighter",           MACHINE_NOT_WORKING )
-GAMEL(1992, vr,         0,       vr,         vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Racing",            0, layout_vr )
+GAMEL(1992, vr,         0,       vr,         vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Racing",            0, "vr" )
 GAME( 1993, vformula,   vr,      vformula,   vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Formula",           MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, swa,        0,       swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (US)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
 GAME( 1993, swaj,       swa,     swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )

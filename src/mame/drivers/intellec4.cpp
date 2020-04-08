@@ -48,8 +48,6 @@
 #include "cpu/mcs40/mcs40.h"
 #include "machine/bankdev.h"
 
-#include "intlc44.lh"
-#include "intlc440.lh"
 
 
 namespace {
@@ -1157,7 +1155,7 @@ void mod4_state::mod4(machine_config &config)
 
 	m_bus->test_out_cb().set(FUNC(mod4_state::bus_test));
 
-	config.set_default_layout(layout_intlc44);
+	config.set_default_layout("intlc44");
 }
 
 
@@ -1387,7 +1385,7 @@ void mod40_state::mod40(machine_config &config)
 	m_bus->stop_out_cb().set(FUNC(mod40_state::bus_stop));
 	m_bus->test_out_cb().set(FUNC(mod40_state::bus_test));
 
-	config.set_default_layout(layout_intlc440);
+	config.set_default_layout("intlc440");
 }
 
 

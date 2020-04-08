@@ -46,7 +46,6 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#include "hp9845b.lh"
 
 #include "machine/hp9845_printer.h"
 
@@ -3745,7 +3744,7 @@ void hp9845b_state::hp9845b(machine_config &config)
 	PALETTE(config, m_palette).set_entries(4);
 	TIMER(config, "scantimer").configure_scanline(FUNC(hp9845b_state::scanline_timer), "screen", 0, 1);
 
-	config.set_default_layout(layout_hp9845b);
+	config.set_default_layout("hp9845b");
 
 	SOFTWARE_LIST(config, "optrom_list").set_original("hp9845b_rom");
 }

@@ -27,7 +27,7 @@
 #include "sound/ym2413.h"
 #include "speaker.h"
 
-#include "wackygtr.lh"
+
 
 
 class wackygtr_state : public driver_device
@@ -291,7 +291,7 @@ void wackygtr_state::wackygtr(machine_config &config)
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(wackygtr_state::nmi_timer), attotime::from_hz(100)); // FIXME
 
 	/* Video */
-	config.set_default_layout(layout_wackygtr);
+	config.set_default_layout("wackygtr");
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();

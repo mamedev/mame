@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "m740d.h"
-#include "cpu/m6502/m740d.hxx"
+#include "emu/cpu/m6502/m740d.hxx"
 
 m740_disassembler::m740_disassembler(config *_conf) : m6502_base_disassembler(disasm_entries), conf(_conf)
 {

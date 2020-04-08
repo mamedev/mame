@@ -110,9 +110,6 @@ Substitutes:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-// internal artwork
-#include "talkingbb.lh"
-
 
 namespace {
 
@@ -326,7 +323,7 @@ void talkingbb_state::talkingbb(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 3);
-	config.set_default_layout(layout_talkingbb);
+	config.set_default_layout("talkingbb");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -29,8 +29,6 @@ This engine was also used in the newer Mephisto Modena.
 #include "video/lc7582.h"
 #include "speaker.h"
 
-// internal artwork
-#include "cxg_dominator.lh" // clickable
 
 
 namespace {
@@ -218,7 +216,7 @@ void dominator_state::dominator(machine_config &config)
 	m_lcd->write_segs().set(FUNC(dominator_state::lcd_s_w));
 
 	PWM_DISPLAY(config, m_display).set_size(8+1, 8);
-	config.set_default_layout(layout_cxg_dominator);
+	config.set_default_layout("cxg_dominator");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

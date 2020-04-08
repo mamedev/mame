@@ -770,7 +770,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "lucky74.lh"
 
 
 #define MASTER_CLOCK        XTAL(12'000'000)      /* confirmed */
@@ -1740,7 +1739,7 @@ ROM_END
 **********************************************/
 
 //     YEAR  NAME      PARENT   MACHINE  INPUT     STATS          INIT        ROT   COMPANY            FULLNAME                    FLAGS                LAYOUT
-GAMEL( 1988, lucky74,  0,       lucky74, lucky74,  lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 1)", 0,                   layout_lucky74 )
-GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74a, lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 3)", 0,                   layout_lucky74 )
-GAMEL( 1988, lucky74b, lucky74, lucky74, lucky74,  lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)", MACHINE_NOT_WORKING, layout_lucky74 )
+GAMEL( 1988, lucky74,  0,       lucky74, lucky74,  lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 1)", 0,                   "lucky74" )
+GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74a, lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 3)", 0,                   "lucky74" )
+GAMEL( 1988, lucky74b, lucky74, lucky74, lucky74,  lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)", MACHINE_NOT_WORKING, "lucky74" )
 GAME(  1989, excitbj,  0,       lucky74, excitbj,  lucky74_state, empty_init, ROT0, "Sega",           "Exciting Black Jack",       MACHINE_NOT_WORKING )

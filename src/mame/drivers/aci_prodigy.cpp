@@ -72,8 +72,6 @@ The keypad is connected to the 12 pin KPDCN connector left to right KP1:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-// internal artwork
-#include "aci_prodigy.lh" // clickable
 
 
 namespace {
@@ -280,7 +278,7 @@ void prodigy_state::prodigy(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(6, 8);
 	m_display->set_segmask(0xf, 0xff);
-	config.set_default_layout(layout_aci_prodigy);
+	config.set_default_layout("aci_prodigy");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

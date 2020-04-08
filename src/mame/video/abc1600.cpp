@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "includes/abc1600.h"
-#include "abc1600.lh"
+
 #include "render.h"
 
 //#define VERBOSE 1
@@ -198,7 +198,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( abc1600_mover_device::crtc_update )
 
 void abc1600_mover_device::device_add_mconfig(machine_config &config)
 {
-	config.set_default_layout(layout_abc1600);
+	config.set_default_layout("abc1600");
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_screen_update(FUNC(abc1600_mover_device::screen_update));

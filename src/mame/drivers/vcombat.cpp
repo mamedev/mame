@@ -90,7 +90,7 @@ TODO :  This is a partially working driver.  Most of the memory maps for
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
 #include "video/tlc34076.h"
-#include "rendlay.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -590,7 +590,7 @@ void vcombat_state::vcombat(machine_config &config)
 	/* Disabled for now as it can't handle multiple screens */
 //  MC6845(config, m_crtc, 6000000 / 16);
 //  m_crtc->set_screen("screen");
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208);

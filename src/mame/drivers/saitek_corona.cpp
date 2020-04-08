@@ -12,19 +12,14 @@ different compared to Stratos/Turbo King.
 
 #include "emu.h"
 #include "includes/saitek_stratos.h"
-
 #include "cpu/m6502/m65c02.h"
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-
 #include "softlist.h"
 #include "speaker.h"
-
-// internal artwork
-#include "saitek_corona.lh" // clickable
 
 
 namespace {
@@ -284,7 +279,7 @@ void corona_state::corona(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(3+8, 8);
-	config.set_default_layout(layout_saitek_corona);
+	config.set_default_layout("saitek_corona");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

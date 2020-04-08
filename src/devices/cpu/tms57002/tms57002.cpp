@@ -881,7 +881,7 @@ void tms57002_device::execute_run()
 				goto inst;
 
 #define CINTRPSWITCH
-#include "cpu/tms57002/tms57002.hxx"
+#include "emu/cpu/tms57002/tms57002.hxx"
 #undef CINTRPSWITCH
 
 			default:

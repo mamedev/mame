@@ -58,7 +58,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "ml20.lh"
 
 class ml20_state : public driver_device
 {
@@ -275,7 +274,7 @@ void ml20_state::ml20(machine_config &config)
 	m_lcdc->set_lcd_size(2, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(ml20_state::lcd_pixel_update));
 
-	config.set_default_layout(layout_ml20);
+	config.set_default_layout("ml20");
 
 	// sound
 	SPEAKER(config, "mono").front_center();

@@ -100,10 +100,10 @@
 #include "speaker.h"
 
 /* Layout */
-#include "z80ne.lh"
-#include "z80net.lh"
-#include "z80netb.lh"
-#include "z80netf.lh"
+
+
+
+
 
 
 /******************************************************************************
@@ -440,7 +440,7 @@ void z80ne_state::z80ne(machine_config &config)
 	m_cassette2->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette2->set_interface("z80ne_cass");
 
-	config.set_default_layout(layout_z80ne);
+	config.set_default_layout("z80ne");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("32K");
@@ -482,7 +482,7 @@ void z80net_state::z80net(machine_config &config)
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
-	config.set_default_layout(layout_z80net);
+	config.set_default_layout("z80net");
 
 	/* internal ram */
 	m_ram->set_default_size("32K").set_extra_options("1K");
@@ -526,7 +526,7 @@ void z80netb_state::z80netb(machine_config &config)
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
-	config.set_default_layout(layout_z80netb);
+	config.set_default_layout("z80netb");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("32K").set_extra_options("1K");
@@ -576,7 +576,7 @@ void z80netf_state::z80netf(machine_config &config)
 	FLOPPY_CONNECTOR(config, "wd1771:2", z80ne_floppies, nullptr,   z80ne_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "wd1771:3", z80ne_floppies, nullptr,   z80ne_state::floppy_formats);
 
-	config.set_default_layout(layout_z80netf);
+	config.set_default_layout("z80netf");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("56K");

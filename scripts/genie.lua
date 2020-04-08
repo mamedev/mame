@@ -67,11 +67,6 @@ function findfunction(x)
 	end
 end
 
-function layoutbuildtask(_folder, _name)
-	return { MAME_DIR .. "src/".._folder.."/".. _name ..".lay" ,    GEN_DIR .. _folder .. "/".._name..".lh",
-		{  MAME_DIR .. "scripts/build/complay.py" }, {"@echo Compressing src/".._folder.."/".._name..".lay...",    PYTHON .. " $(1) $(<) $(@) layout_".._name }};
-end
-
 function precompiledheaders()
 	if _OPTIONS["precompile"]==nil or (_OPTIONS["precompile"]~=nil and _OPTIONS["precompile"]=="1") then
 		configuration { "not xcode4" }

@@ -92,4 +92,4 @@ void m4510_device::mi_4510::write(uint16_t adr, uint8_t val)
 	program->write_byte(base->map(adr), val);
 }
 
-#include "cpu/m6502/m4510.hxx"
+#include "emu/cpu/m6502/m4510.hxx"

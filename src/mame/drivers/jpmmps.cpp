@@ -39,98 +39,6 @@
 #include "machine/meters.h"
 #include "speaker.h"
 
-#include "jpmmps.lh"
-
-// MFME2MAME layouts:
-#include "j2adnote.lh"
-#include "j2always.lh"
-#include "j2bankch.lh"
-#include "j2bigbnk.lh"
-#include "j2bigbox.lh"
-#include "j2blustr.lh"
-#include "j2cashbn.lh"
-#include "j2cashrl.lh"
-#include "j2cashro.lh"
-#include "j2cashrv.lh"
-#include "j2cashtk.lh"
-#include "j2coinsh.lh"
-#include "j2coppot.lh"
-#include "j2cprndx.lh"
-#include "j2criscr.lh"
-#include "j2crown.lh"
-#include "j2cshalm.lh"
-#include "j2cshcrd.lh"
-#include "j2cshfil.lh"
-#include "j2cshnud.lh"
-#include "j2cshsmh.lh"
-#include "j2cvault.lh"
-#include "j2droplt.lh"
-#include "j2ewn.lh"
-#include "j2ews.lh"
-#include "j2exec.lh"
-#include "j2fasttk.lh"
-#include "j2fiveal.lh"
-#include "j2fiveln.lh"
-#include "j2fqueen.lh"
-#include "j2frucnx.lh"
-#include "j2fullhs.lh"
-#include "j2fws.lh"
-#include "j2ghostb.lh"
-#include "j2gldchy.lh"
-#include "j2goldbr.lh"
-#include "j2hilocl.lh"
-#include "j2hinote.lh"
-#include "j2hiroll.lh"
-#include "j2hitmon.lh"
-#include "j2hotpot.lh"
-#include "j2hotsht.lh"
-#include "j2hypnot.lh"
-#include "j2jackbr.lh"
-#include "j2kingcl.lh"
-#include "j2litean.lh"
-#include "j2litnot.lh"
-#include "j2lovshd.lh"
-#include "j2lovsht.lh"
-#include "j2luckar.lh"
-#include "j2lucky2.lh"
-#include "j2maxima.lh"
-#include "j2missis.lh"
-#include "j2monblt.lh"
-#include "j2mongam.lh"
-#include "j2montrp.lh"
-#include "j2nolimt.lh"
-#include "j2notesh.lh"
-#include "j2nudbnz.lh"
-#include "j2nudfev.lh"
-#include "j2nudmon.lh"
-#include "j2nudshf.lh"
-#include "j2paypkt.lh"
-#include "j2penny.lh"
-#include "j2plsmnd.lh"
-#include "j2plsnud.lh"
-#include "j2pndrsh.lh"
-#include "j2rdclb.lh"
-#include "j2reelbn.lh"
-#include "j2reelbo.lh"
-#include "j2reelcz.lh"
-#include "j2reelmc.lh"
-#include "j2reelmo.lh"
-#include "j2silvcl.lh"
-#include "j2silvsh.lh"
-#include "j2sldgld.lh"
-#include "j2slvrgh.lh"
-#include "j2spcrsv.lh"
-#include "j2sstrea.lh"
-#include "j2stahed.lh"
-#include "j2supfrc.lh"
-#include "j2suprsh.lh"
-#include "j2supsft.lh"
-#include "j2supstp.lh"
-#include "j2suptrk.lh"
-#include "j2swbank.lh"
-#include "j2take2.lh"
-#include "j2trail.lh"
-#include "j2tstplt.lh"
 
 #define UART_IC5 "tms9902_ic5"
 #define UART_IC10 "tms9902_ic10"
@@ -289,7 +197,7 @@ void jpmmps_state::jpmmps(machine_config &config)
 
 	METERS(config, m_meters, 0).set_number(9); // TODO: meters.cpp sets a max of 8
 
-	config.set_default_layout(layout_jpmmps);
+	config.set_default_layout("jpmmps");
 }
 
 
@@ -2128,153 +2036,153 @@ ROM_END
 
 
 
-GAMEL( 198?, j2adnote,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 1)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2adnote )
-GAMEL( 198?, j2adnotea, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 2)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2adnote )
-GAMEL( 198?, j2adnoteb, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 3)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2adnote )
-GAMEL( 198?, j2adnotec, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 4)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2adnote )
-GAMEL( 198?, j2adnoted, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 5)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2adnote )
-GAMEL( 198?, j2adnotee, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 6)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2adnote )
-GAMEL( 198?, j2adnotef, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 7)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2adnote )
-GAMEL( 198?, j2adnoteg, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 8)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2adnote )
-GAMEL( 198?, j2adnoteh, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 9)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2adnote )
-GAMEL( 198?, j2adnotei, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 10)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2adnote )
-GAMEL( 198?, j2bankch,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Bank Chase (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2bankch )
+GAMEL( 198?, j2adnote,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 1)", MACHINE_IS_SKELETON_MECHANICAL, "j2adnote" )
+GAMEL( 198?, j2adnotea, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 2)", MACHINE_IS_SKELETON_MECHANICAL, "j2adnote" )
+GAMEL( 198?, j2adnoteb, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 3)", MACHINE_IS_SKELETON_MECHANICAL, "j2adnote" )
+GAMEL( 198?, j2adnotec, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 4)", MACHINE_IS_SKELETON_MECHANICAL, "j2adnote" )
+GAMEL( 198?, j2adnoted, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 5)", MACHINE_IS_SKELETON_MECHANICAL, "j2adnote" )
+GAMEL( 198?, j2adnotee, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 6)", MACHINE_IS_SKELETON_MECHANICAL, "j2adnote" )
+GAMEL( 198?, j2adnotef, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 7)", MACHINE_IS_SKELETON_MECHANICAL, "j2adnote" )
+GAMEL( 198?, j2adnoteg, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 8)", MACHINE_IS_SKELETON_MECHANICAL, "j2adnote" )
+GAMEL( 198?, j2adnoteh, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 9)", MACHINE_IS_SKELETON_MECHANICAL, "j2adnote" )
+GAMEL( 198?, j2adnotei, j2adnote, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Add A Note (JPM) (MPS, set 10)", MACHINE_IS_SKELETON_MECHANICAL, "j2adnote" )
+GAMEL( 198?, j2bankch,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Bank Chase (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2bankch" )
 GAME(  198?, j2bankrd,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Bank Raid (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2bigbnk,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Big Banker (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2bigbnk )
-GAMEL( 198?, j2bigbox,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Big Box (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2bigbox )
+GAMEL( 198?, j2bigbnk,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Big Banker (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2bigbnk" )
+GAMEL( 198?, j2bigbox,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Big Box (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2bigbox" )
 GAME(  198?, j2bigbuk,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Big Buck$ (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2bigdl,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Big Deal (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2blkchy,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Black Cherry (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2cashbn,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Cash Bonus Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2cashbn )
+GAMEL( 198?, j2cashbn,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Cash Bonus Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2cashbn" )
 GAME(  198?, j2cashfl,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Cash Falls (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2cashrl,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Cash Reels (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2cashrl )
-GAMEL( 198?, j2cashrv,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Cash Reserve (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2cashrv )
-GAMEL( 198?, j2cashro,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Cash Rolls (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2cashro )
-GAMEL( 198?, j2cashtk,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Cash Track (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2cashtk )
+GAMEL( 198?, j2cashrl,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Cash Reels (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2cashrl" )
+GAMEL( 198?, j2cashrv,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Cash Reserve (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2cashrv" )
+GAMEL( 198?, j2cashro,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Cash Rolls (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2cashro" )
+GAMEL( 198?, j2cashtk,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Cash Track (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2cashtk" )
 GAME(  198?, j2cashtd,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Cash Track Deluxe (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2coppot,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Copper Pot (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2coppot )
+GAMEL( 198?, j2coppot,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Copper Pot (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2coppot" )
 GAME(  198?, j2coprun,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Copper Run (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2cprndx,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Copper Run Deluxe (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2cprndx )
+GAMEL( 198?, j2cprndx,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Copper Run Deluxe (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2cprndx" )
 GAME(  198?, j2crkbnk,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Crack The Bank (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2droplt,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Drop The Lot (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2droplt )
+GAMEL( 198?, j2droplt,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Drop The Lot (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2droplt" )
 GAME(  198?, j2dropld,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Drop The Lot Deluxe (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2ewn,     0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Each Way Nudger (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2ewn )
-GAMEL( 198?, j2ews,     0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Each Way Shuffle (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2ews )
-GAMEL( 198?, j2exec,    0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Executive Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2exec )
-GAMEL( 198?, j2fasttk,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Fast Trak (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2fasttk )
-GAMEL( 198?, j2fqueen,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Find The Queen (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2fqueen )
-GAMEL( 198?, j2fiveal,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Five Alive (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2fiveal )
-GAMEL( 198?, j2fiveln,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Five Liner (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2fiveln )
-GAMEL( 198?, j2fws,     0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Five Way Shuffle (set 1) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2fws )
-GAMEL( 198?, j2fwsa,    j2fws,    jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Five Way Shuffle (set 2) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2fws )
+GAMEL( 198?, j2ewn,     0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Each Way Nudger (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2ewn" )
+GAMEL( 198?, j2ews,     0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Each Way Shuffle (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2ews" )
+GAMEL( 198?, j2exec,    0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Executive Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2exec" )
+GAMEL( 198?, j2fasttk,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Fast Trak (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2fasttk" )
+GAMEL( 198?, j2fqueen,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Find The Queen (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2fqueen" )
+GAMEL( 198?, j2fiveal,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Five Alive (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2fiveal" )
+GAMEL( 198?, j2fiveln,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Five Liner (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2fiveln" )
+GAMEL( 198?, j2fws,     0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Five Way Shuffle (set 1) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2fws" )
+GAMEL( 198?, j2fwsa,    j2fws,    jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Five Way Shuffle (set 2) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2fws" )
 GAME(  198?, j2frmtch,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Fruit Match (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2fullhs,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Full House Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2fullhs )
-GAMEL( 198?, j2ghostb,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Ghostbuster (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2ghostb )
+GAMEL( 198?, j2fullhs,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Full House Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2fullhs" )
+GAMEL( 198?, j2ghostb,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Ghostbuster (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2ghostb" )
 GAME(  198?, j2goldrn,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Gold Run (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2goldbr,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Golden Bars (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2goldbr )
-GAMEL( 198?, j2gldchy,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Golden Cherry (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2gldchy )
+GAMEL( 198?, j2goldbr,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Golden Bars (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2goldbr" )
+GAMEL( 198?, j2gldchy,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Golden Cherry (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2gldchy" )
 GAME(  198?, j2gldwin,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Golden Win (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2hinote,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Hi Note (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2hinote )
-GAMEL( 198?, j2hiroll,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Hi Roller (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2hiroll )
-GAMEL( 198?, j2hotpot,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Hot Pot (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2hotpot )
+GAMEL( 198?, j2hinote,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Hi Note (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2hinote" )
+GAMEL( 198?, j2hiroll,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Hi Roller (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2hiroll" )
+GAMEL( 198?, j2hotpot,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Hot Pot (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2hotpot" )
 GAME(  198?, j2hotptd,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Hot Pot Deluxe (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2hotsht,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Hot Shot Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2hotsht )
-GAMEL( 198?, j2hypnot,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Hypernote (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2hypnot )
-GAMEL( 198?, j2jackbr,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Jackpot Bars (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2jackbr )
+GAMEL( 198?, j2hotsht,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Hot Shot Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2hotsht" )
+GAMEL( 198?, j2hypnot,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Hypernote (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2hypnot" )
+GAMEL( 198?, j2jackbr,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Jackpot Bars (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2jackbr" )
 GAME(  198?, j2jackdc,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Jackpot Dice (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2jokers,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Jokers (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2kingcl,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","King Of Clubs (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2kingcl )
-GAMEL( 198?, j2litean,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Lite A Nudge (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2litean )
-GAMEL( 198?, j2lovsht,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Loot Shoot (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2lovsht )
-GAMEL( 198?, j2lovshd,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Loot Shoot Deluxe (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2lovshd )
-GAMEL( 198?, j2luckar,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Lucky Arrows (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2luckar )
-GAMEL( 198?, j2lucky2,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Lucky 2s (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2lucky2 )
-GAMEL( 198?, j2monblt,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Money Belt (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2monblt )
-GAMEL( 198?, j2mongam,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Money Game (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2mongam )
+GAMEL( 198?, j2kingcl,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","King Of Clubs (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2kingcl" )
+GAMEL( 198?, j2litean,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Lite A Nudge (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2litean" )
+GAMEL( 198?, j2lovsht,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Loot Shoot (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2lovsht" )
+GAMEL( 198?, j2lovshd,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Loot Shoot Deluxe (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2lovshd" )
+GAMEL( 198?, j2luckar,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Lucky Arrows (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2luckar" )
+GAMEL( 198?, j2lucky2,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Lucky 2s (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2lucky2" )
+GAMEL( 198?, j2monblt,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Money Belt (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2monblt" )
+GAMEL( 198?, j2mongam,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Money Game (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2mongam" )
 GAME(  198?, j2mongmd,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Money Game Deluxe (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2multwn,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Multi Win (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2notexc,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Note Exchange (set 1) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2notexca, j2notexc, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Note Exchange (set 2) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2notexcb, j2notexc, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Note Exchange (set 3) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2notesh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Note Shoot (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2notesh )
-GAMEL( 198?, j2nudbnz,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Nudge Bonanza Deluxe (set 1) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2nudbnz )
+GAMEL( 198?, j2notesh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Note Shoot (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2notesh" )
+GAMEL( 198?, j2nudbnz,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Nudge Bonanza Deluxe (set 1) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2nudbnz" )
 GAME(  198?, j2nudbnza, j2nudbnz, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Nudge Bonanza Deluxe (set 2) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2nuddup,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Nudge Double Up (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2nuddud,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Nudge Double Up Deluxe (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2nudup3,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Nudge Double Up MkIII (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2nudshf,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Nudge Shuffler (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2nudshf )
+GAMEL( 198?, j2nudshf,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Nudge Shuffler (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2nudshf" )
 GAME(  198?, j2plsmon,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Plus Money (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2plsmnd,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Plus Money Deluxe (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2plsmnd )
-GAMEL( 198?, j2plsnud,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Plus Nudge (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2plsnud )
+GAMEL( 198?, j2plsmnd,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Plus Money Deluxe (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2plsmnd" )
+GAMEL( 198?, j2plsnud,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Plus Nudge (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2plsnud" )
 GAME(  198?, j2potlck,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Pot Luck (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2pndrsh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Pound Rush (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2pndrsh )
+GAMEL( 198?, j2pndrsh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Pound Rush (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2pndrsh" )
 GAME(  198?, j2pyramd,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Pyramid (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2reelbn,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Bingo Club (set 1) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2reelbn )
-GAMEL( 198?, j2reelbna, j2reelbn, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Bingo Club (set 2) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2reelbn )
-GAMEL( 198?, j2reelbo,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Bonus (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2reelbo )
+GAMEL( 198?, j2reelbn,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Bingo Club (set 1) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2reelbn" )
+GAMEL( 198?, j2reelbna, j2reelbn, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Bingo Club (set 2) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2reelbn" )
+GAMEL( 198?, j2reelbo,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Bonus (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2reelbo" )
 GAME(  198?, j2reelmg,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Magic (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2reelmgd, j2reelmg, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Magic (JPM) [Dutch] (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2reelmc,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Magic Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2reelmc )
-GAMEL( 198?, j2reelmo,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Money (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2reelmo )
+GAMEL( 198?, j2reelmc,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Magic Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2reelmc" )
+GAMEL( 198?, j2reelmo,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Money (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2reelmo" )
 GAME(  198?, j2rotnot,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Rota Note (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2roulcl,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Roulette Club (JPM) [Mps] (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2rdclb,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Royal Deal Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2rdclb )
-GAMEL( 198?, j2slvrgh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Silver Ghost (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2slvrgh )
-GAMEL( 198?, j2sldgld,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Solid Gold (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2sldgld )
-GAMEL( 198?, j2spcrsv,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Special Reserve (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2spcrsv )
-GAMEL( 198?, j2stahed,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Streets Ahead (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2stahed )
+GAMEL( 198?, j2rdclb,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Royal Deal Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2rdclb" )
+GAMEL( 198?, j2slvrgh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Silver Ghost (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2slvrgh" )
+GAMEL( 198?, j2sldgld,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Solid Gold (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2sldgld" )
+GAMEL( 198?, j2spcrsv,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Special Reserve (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2spcrsv" )
+GAMEL( 198?, j2stahed,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Streets Ahead (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2stahed" )
 GAME(  198?, j2supfrt,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Supa Fruit (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2supfrc,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Supa Fruit Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2supfrc )
-GAMEL( 1987, j2supsft,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Supashifta (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2supsft )
-GAMEL( 198?, j2supstp,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Supa Steppa (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2supstp )
-GAMEL( 198?, j2suptrk,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Supa Track (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2suptrk )
+GAMEL( 198?, j2supfrc,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Supa Fruit Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2supfrc" )
+GAMEL( 1987, j2supsft,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Supashifta (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2supsft" )
+GAMEL( 198?, j2supstp,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Supa Steppa (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2supstp" )
+GAMEL( 198?, j2suptrk,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Supa Track (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2suptrk" )
 GAME(  198?, j2suprft,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Super Fruit (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2supln,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Super Line (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2suppot,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Super Pots (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2suprl,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Super Reel (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2suprsh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Supershot (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2suprsh )
+GAMEL( 198?, j2suprsh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Supershot (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2suprsh" )
 GAME(  198?, j2supstr,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Superstars (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2swbank,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Switch Back (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2swbank )
-GAMEL( 198?, j2take2,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Take 2 (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2take2 )
+GAMEL( 198?, j2swbank,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Switch Back (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2swbank" )
+GAMEL( 198?, j2take2,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Take 2 (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2take2" )
 GAME(  198?, j2topsht,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Top Shot (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2westrn,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Western (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 
 
-GAMEL( 198?, j2blustr,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Blue Streak (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2blustr )
-GAMEL( 198?, j2cshalm,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Cash Alarm (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2cshalm )
-GAMEL( 198?, j2cshcrd,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Cash Cards (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2cshcrd )
-GAMEL( 198?, j2cshfil,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Cash-Filla (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2cshfil )
-GAMEL( 198?, j2cshsmh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Cash Smash (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2cshsmh )
-GAMEL( 198?, j2criscr,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Criss Cross Jackpot (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2criscr )
-GAMEL( 198?, j2frucnx,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Fruit Connexion (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2frucnx )
-GAMEL( 198?, j2hitmon,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Hit Money (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2hitmon )
-GAMEL( 198?, j2penny,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","In For A Penny In For A Pound (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2penny )
-GAMEL( 198?, j2maxima,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Maxima (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2maxima )
-GAMEL( 198?, j2montrp,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Money Trapper (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2montrp )
-GAMEL( 198?, j2nudmon,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Nudge Money (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2nudmon )
-GAMEL( 198?, j2paypkt,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Pay Packet (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2paypkt )
-GAMEL( 198?, j2silvcl,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Silver Classic (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2silvcl )
-GAMEL( 198?, j2silvsh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Silver Shot (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2silvsh )
-GAMEL( 198?, j2sstrea,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Supa Streak (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2sstrea )
-GAMEL( 198?, j2tstplt,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Test Pilot (set 1) (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2tstplt )
-GAMEL( 198?, j2tstplta, j2tstplt, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Test Pilot (set 2) (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2tstplt )
+GAMEL( 198?, j2blustr,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Blue Streak (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2blustr" )
+GAMEL( 198?, j2cshalm,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Cash Alarm (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2cshalm" )
+GAMEL( 198?, j2cshcrd,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Cash Cards (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2cshcrd" )
+GAMEL( 198?, j2cshfil,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Cash-Filla (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2cshfil" )
+GAMEL( 198?, j2cshsmh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Cash Smash (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2cshsmh" )
+GAMEL( 198?, j2criscr,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Criss Cross Jackpot (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2criscr" )
+GAMEL( 198?, j2frucnx,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Fruit Connexion (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2frucnx" )
+GAMEL( 198?, j2hitmon,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Hit Money (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2hitmon" )
+GAMEL( 198?, j2penny,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","In For A Penny In For A Pound (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2penny" )
+GAMEL( 198?, j2maxima,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Maxima (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2maxima" )
+GAMEL( 198?, j2montrp,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Money Trapper (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2montrp" )
+GAMEL( 198?, j2nudmon,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Nudge Money (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2nudmon" )
+GAMEL( 198?, j2paypkt,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Pay Packet (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2paypkt" )
+GAMEL( 198?, j2silvcl,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Silver Classic (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2silvcl" )
+GAMEL( 198?, j2silvsh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Silver Shot (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2silvsh" )
+GAMEL( 198?, j2sstrea,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Supa Streak (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2sstrea" )
+GAMEL( 198?, j2tstplt,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Test Pilot (set 1) (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2tstplt" )
+GAMEL( 198?, j2tstplta, j2tstplt, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Test Pilot (set 2) (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2tstplt" )
 
 GAME(  198?, j2bonanz,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Eurocoin","Bonanza (Eurocoin) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2supchy,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Eurocoin","Super Cherry (Eurocoin) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAMEL( 198?, j2hilocl,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Crystal","Hi Lo Climber Club (Crystal) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2hilocl )
-GAMEL( 198?, j2litnot,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Crystal","Lite A Note Club (Crystal) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2litnot )
-GAMEL( 198?, j2missis,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Crystal","Mississippi Gambler Club (Crystal) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2missis )
+GAMEL( 198?, j2hilocl,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Crystal","Hi Lo Climber Club (Crystal) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2hilocl" )
+GAMEL( 198?, j2litnot,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Crystal","Lite A Note Club (Crystal) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2litnot" )
+GAMEL( 198?, j2missis,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Crystal","Mississippi Gambler Club (Crystal) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2missis" )
 
-GAMEL( 198?, j2always,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Bwb","Always Eight (Bwb) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2always )
-GAMEL( 198?, j2coinsh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Bwb","Coin Shoot (Bwb) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2coinsh )
-GAMEL( 198?, j2nudfev,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Bwb","Nudge Fever (Bwb) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2nudfev )
-GAMEL( 198?, j2trail,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Bwb","Trailblazer (Bwb) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2trail )
+GAMEL( 198?, j2always,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Bwb","Always Eight (Bwb) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2always" )
+GAMEL( 198?, j2coinsh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Bwb","Coin Shoot (Bwb) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2coinsh" )
+GAMEL( 198?, j2nudfev,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Bwb","Nudge Fever (Bwb) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2nudfev" )
+GAMEL( 198?, j2trail,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Bwb","Trailblazer (Bwb) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2trail" )
 GAME(  198?, j2wag,     0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Bwb","Win-A-Gain (Bwb) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAMEL( 198?, j2cshnud,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Mdm","Cash Nudger (Mdm) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2cshnud )
+GAMEL( 198?, j2cshnud,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Mdm","Cash Nudger (Mdm) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2cshnud" )
 GAME(  198?, j2fivepn,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Mdm","Fivepenny Nudger (Mdm) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2nolimt,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Mdm","No Limit Nudge (Mdm) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2nolimt )
+GAMEL( 198?, j2nolimt,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Mdm","No Limit Nudge (Mdm) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2nolimt" )
 
 GAME(  198?, j2strk10,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Ace?","Strike Ten (Ace) (MPS)", MACHINE_IS_SKELETON_MECHANICAL ) // there was another (68k based) game in this set, which makes me wonder if this one is by Ace at all
 
@@ -2283,7 +2191,7 @@ GAME(  198?, j2strk10,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0
 
 GAME(  198?, j2bkroll,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Bank Roll (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2bodym,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Body Match (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2cvault,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Cash Vault (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2cvault )
+GAMEL( 198?, j2cvault,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Cash Vault (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2cvault" )
 GAME(  198?, j2cashab,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Cashablanca (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2cashry,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Cashino Royale (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2casino,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Casino Classic (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
@@ -2296,7 +2204,7 @@ GAME(  198?, j2tst,     0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0
 GAME(  198?, j2nudnud,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Nudge Nudge (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2pinac,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Pinnacle (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2pinclb,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Pinnacle Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2reelcz,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Crazy (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2reelcz )
+GAMEL( 198?, j2reelcz,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Crazy (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2reelcz" )
 GAME(  198?, j2reeldc,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Deal Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2topcd,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Bwb","Top Card (Bwb) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2xxx,     0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Bwb","Triple X (Bwb) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
@@ -2309,7 +2217,7 @@ GAME(  198?, j2nsw12,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0
 
 GAME(  198?, j2club77,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "<unknown>","Club 77 (Unk) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2contnd,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Mdm","Continuous Nudger (Mdm) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2crown,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "<unknown>","Crown Dealer (Unk) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2crown )
+GAMEL( 198?, j2crown,   0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "<unknown>","Crown Dealer (Unk) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, "j2crown" )
 GAME(  198?, j2hirola,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "<unknown>","Hi Roll (Unk) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2monmin,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "<unknown>","Money Mine (Unk) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2notspn,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "<unknown>","Note Spinner (Unk) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )

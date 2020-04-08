@@ -157,8 +157,6 @@ IFP: Impact Printer - also compatible with C64 apparently.
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_vsc.lh" // clickable
 
 
 namespace {
@@ -448,7 +446,7 @@ void vsc_state::vsc(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8, 16);
 	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_fidel_vsc);
+	config.set_default_layout("fidel_vsc");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -221,7 +221,6 @@ DIP locations verified for:
 #include "video/mc6845.h"
 #include "speaker.h"
 
-#include "stocker.lh"
 
 
 
@@ -2479,7 +2478,7 @@ GAME( 1984, snakepit2, snakepit, balsente, sentetst, balsente_state, init_snakep
 GAME( 1984, snakjack,  0,        balsente, snakjack, balsente_state, init_snakjack,  ROT0, "Bally/Sente",  "Snacks'n Jaxson", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 006-8025-01-0B Rev B */
-GAMEL(1984, stocker,   0,        balsente, stocker,  balsente_state, init_stocker,   ROT0, "Bally/Sente",  "Stocker (3/19/85)", MACHINE_SUPPORTS_SAVE, layout_stocker ) // date from ROM chips
+GAMEL(1984, stocker,   0,        balsente, stocker,  balsente_state, init_stocker,   ROT0, "Bally/Sente",  "Stocker (3/19/85)", MACHINE_SUPPORTS_SAVE, "stocker" ) // date from ROM chips
 GAME( 1985, gimeabrk,  0,        balsente, gimeabrk, balsente_state, init_gimeabrk,  ROT0, "Bally/Sente",  "Gimme A Break (7/7/85)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, minigolf,  0,        balsente, minigolf, balsente_state, init_minigolf,  ROT0, "Bally/Sente",  "Mini Golf (11/25/85)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, minigolf2, minigolf, balsente, minigolf2,balsente_state, init_minigolf2, ROT0, "Bally/Sente",  "Mini Golf (10/8/85)", MACHINE_SUPPORTS_SAVE )

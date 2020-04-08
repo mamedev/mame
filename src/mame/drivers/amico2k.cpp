@@ -33,7 +33,6 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/i8255.h"
-#include "amico2k.lh"
 
 
 class amico2k_state : public driver_device
@@ -222,7 +221,7 @@ void amico2k_state::amico2k(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &amico2k_state::amico2k_mem);
 
 	/* video hardware */
-	config.set_default_layout(layout_amico2k);
+	config.set_default_layout("amico2k");
 
 	i8255_device &ppi(I8255(config, "i8255"));
 	ppi.in_pa_callback().set(FUNC(amico2k_state::ppi_pa_r));

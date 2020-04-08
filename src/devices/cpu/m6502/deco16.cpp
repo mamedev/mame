@@ -55,4 +55,4 @@ device_memory_interface::space_config_vector deco16_device::memory_space_config(
 		};
 }
 
-#include "cpu/m6502/deco16.hxx"
+#include "emu/cpu/m6502/deco16.hxx"

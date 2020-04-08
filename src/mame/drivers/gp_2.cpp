@@ -40,7 +40,6 @@ ToDo:
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
-#include "gp_2.lh"
 
 class gp_2_state : public genpin_class
 {
@@ -593,7 +592,7 @@ void gp_2_state::gp_2(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	config.set_default_layout(layout_gp_2);
+	config.set_default_layout("gp_2");
 
 	/* Sound */
 	genpin_audio(config);

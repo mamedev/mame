@@ -299,11 +299,10 @@ Notes & Todo:
 #include "machine/rp5h01.h"
 #include "machine/nvram.h"
 
-#include "rendlay.h"
+
 #include "screen.h"
 #include "speaker.h"
 
-#include "playch10.lh"
 
 
 /******************************************************************************/
@@ -671,7 +670,7 @@ void playch10_state::playch10(machine_config &config)
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_playch10);
 	PALETTE(config, "palette", FUNC(playch10_state::playch10_palette), 256);
-	config.set_default_layout(layout_playch10);
+	config.set_default_layout("playch10");
 
 	screen_device &bottom(SCREEN(config, "bottom", SCREEN_TYPE_RASTER));
 	bottom.set_refresh_hz(60);

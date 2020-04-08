@@ -22,7 +22,6 @@
 #include "sound/ay8910.h"
 #include "speaker.h"
 
-#include "marywu.lh"
 
 class marywu_state : public driver_device
 {
@@ -201,7 +200,7 @@ void marywu_state::marywu(machine_config &config)
 	kbdc.out_disp_callback().set(FUNC(marywu_state::display_7seg_data_w));
 
 	/* Video */
-	config.set_default_layout(layout_marywu);
+	config.set_default_layout("marywu");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

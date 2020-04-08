@@ -266,8 +266,8 @@ TODO: - Distinguish door switches using manual
 
 #include "speaker.h"
 
-#include "mpu4.lh"
-#include "mpu4ext.lh"
+
+
 
 
 /*
@@ -3081,7 +3081,7 @@ void mpu4_state::mpu4base(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	config.set_default_layout(layout_mpu4);
+	config.set_default_layout("mpu4");
 }
 
 

@@ -35,7 +35,7 @@ store new data and increment the address.
 
 #include "emu.h"
 #include "includes/vcs80.h"
-#include "vcs80.lh"
+
 
 /* Read/Write Handlers */
 
@@ -225,7 +225,7 @@ void vcs80_state::vcs80(machine_config &config)
 	TIMER(config, "keyboard").configure_periodic(FUNC(vcs80_state::vcs80_keyboard_tick), attotime::from_hz(1000));
 
 	/* video hardware */
-	config.set_default_layout(layout_vcs80);
+	config.set_default_layout("vcs80");
 
 	/* devices */
 	Z80PIO(config, m_pio, XTAL(5'000'000)/2);

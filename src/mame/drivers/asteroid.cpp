@@ -256,7 +256,6 @@ NOTE: Previous program versions, for the second line would only show 4 digits.  
 #include "video/vector.h"
 #include "screen.h"
 
-#include "astdelux.lh"
 
 #define MASTER_CLOCK (XTAL(12'096'000))
 #define CLOCK_3KHZ   (MASTER_CLOCK / 4096)
@@ -1196,9 +1195,9 @@ GAME( 1979, meteorts,  asteroid, asteroid, asteroid,  asteroid_state, empty_init
 GAME( 1979, meteorho,  asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "bootleg (Hoei)",        "Meteor (bootleg of Asteroids)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1979, hyperspc,  asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "bootleg (Rumiano)",     "Hyperspace (bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1980, astdelux,  0,        astdelux, astdelux,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids Deluxe (rev 3)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
-GAMEL(1980, astdelux2, astdelux, astdelux, astdelux,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids Deluxe (rev 2)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
-GAMEL(1980, astdelux1, astdelux, astdelux, astdelux,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids Deluxe (rev 1)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
+GAMEL(1980, astdelux,  0,        astdelux, astdelux,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids Deluxe (rev 3)", MACHINE_SUPPORTS_SAVE, "astdelux" )
+GAMEL(1980, astdelux2, astdelux, astdelux, astdelux,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids Deluxe (rev 2)", MACHINE_SUPPORTS_SAVE, "astdelux" )
+GAMEL(1980, astdelux1, astdelux, astdelux, astdelux,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids Deluxe (rev 1)", MACHINE_SUPPORTS_SAVE, "astdelux" )
 
 GAME( 1979, llander,   0,        llander,  llander,   asteroid_state, empty_init,     ROT0, "Atari",   "Lunar Lander (rev 2)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1979, llander1,  llander,  llander,  llander1,  asteroid_state, empty_init,     ROT0, "Atari",   "Lunar Lander (rev 1)",     MACHINE_SUPPORTS_SAVE )

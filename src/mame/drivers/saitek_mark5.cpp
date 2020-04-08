@@ -53,13 +53,8 @@ TODO:
 #include "sound/volt_reg.h"
 #include "video/hlcd0538.h"
 #include "video/pwm.h"
-
 #include "screen.h"
 #include "speaker.h"
-
-// internal artwork
-#include "saitek_mark5.lh" // clickable
-#include "saitek_mark6.lh" // clickable
 
 
 namespace {
@@ -435,7 +430,7 @@ void mark5_state::mark5(machine_config &config)
 	screen.set_size(942, 1080);
 	screen.set_visarea_full();
 
-	config.set_default_layout(layout_saitek_mark5);
+	config.set_default_layout("saitek_mark5");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -456,7 +451,7 @@ void mark5_state::mark6(machine_config &config)
 
 	PWM_DISPLAY(config, m_display[3]).set_size(8, 8);
 	m_display[3]->set_bri_levels(0.001);
-	config.set_default_layout(layout_saitek_mark6);
+	config.set_default_layout("saitek_mark6");
 }
 
 

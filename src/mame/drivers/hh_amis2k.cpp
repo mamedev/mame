@@ -19,10 +19,7 @@
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-// internal artwork
-#include "wildfire.lh"
 
-//#include "hh_amis2k_test.lh" // common test-layout - use external artwork
 
 
 class hh_amis2k_state : public driver_device
@@ -246,7 +243,7 @@ void wildfire_state::wildfire(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(12, 8);
 	m_display->set_segmask(7, 0x7f);
 	m_display->set_bri_levels(0.01, 0.1); // bumpers are dimmed
-	config.set_default_layout(layout_wildfire);
+	config.set_default_layout("wildfire");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

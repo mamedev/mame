@@ -169,11 +169,11 @@ device_execute_interface *machine_config::perfect_quantum_device() const
 //  device
 //-------------------------------------------------
 
-void machine_config::set_default_layout(internal_layout const &layout)
+void machine_config::set_default_layout(const char *layout_name)
 {
-	std::pair<default_layout_map::iterator, bool> const ins(m_default_layouts.emplace(current_device().tag(), &layout));
+	std::pair<default_layout_map::iterator, bool> const ins(m_default_layouts.emplace(current_device().tag(), layout_name));
 	if (!ins.second)
-		ins.first->second = &layout;
+		ins.first->second = layout_name;
 }
 
 

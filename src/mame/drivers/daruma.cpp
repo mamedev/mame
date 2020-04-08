@@ -19,7 +19,6 @@
 #include "cpu/mcs51/mcs51.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
-//TODO: #include "ds348.lh"
 
 class daruma_state : public driver_device
 {
@@ -131,7 +130,7 @@ void daruma_state::daruma(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 1.00);
 
 /*  TODO:
-    config.set_default_layout(layout_daruma);
+    config.set_default_layout("daruma");
 
     Motors: MTA011
     http://pdf.datasheetcatalog.com/datasheet/Shindengen/mXstzvq.pdf

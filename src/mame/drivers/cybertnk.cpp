@@ -175,7 +175,6 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 #include "machine/gen_latch.h"
 #include "sound/8950intf.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
@@ -836,7 +835,7 @@ void cybertnk_state::cybertnk(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60000)); //arbitrary value, needed to get the communication to work
 
 	/* video hardware */
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);

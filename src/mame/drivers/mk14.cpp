@@ -40,7 +40,6 @@ TODO:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "mk14.lh"
 
 
 class mk14_state : public driver_device
@@ -213,7 +212,7 @@ void mk14_state::mk14(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mk14_state::mem_map);
 
 	/* video hardware */
-	config.set_default_layout(layout_mk14);
+	config.set_default_layout("mk14");
 
 	// sound
 	SPEAKER(config, "speaker").front_center();

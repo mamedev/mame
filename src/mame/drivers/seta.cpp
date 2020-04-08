@@ -1430,9 +1430,9 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "screen.h"
 #include "speaker.h"
 
-#include "inttoote.lh"
-#include "jockeyc.lh"
-#include "setaroul.lh"
+
+
+
 
 #include <algorithm>
 
@@ -8601,7 +8601,7 @@ void setaroul_state::setaroul(machine_config &config)
 	m_x1->add_route(1, "rspeaker", 1.0);
 
 	// layout
-	config.set_default_layout(layout_setaroul);
+	config.set_default_layout("setaroul");
 }
 
 
@@ -9853,7 +9853,7 @@ void jockeyc_state::jockeyc(machine_config &config)
 	m_x1->add_route(1, "rspeaker", 1.0);
 
 	// layout
-	config.set_default_layout(layout_jockeyc);
+	config.set_default_layout("jockeyc");
 }
 
 
@@ -9884,7 +9884,7 @@ void jockeyc_state::inttoote(machine_config &config)
 	ACIA6850(config, "acia2", 0);
 
 	// layout
-	config.set_default_layout(layout_inttoote);
+	config.set_default_layout("inttoote");
 }
 
 

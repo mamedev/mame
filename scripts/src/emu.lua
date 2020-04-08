@@ -24,8 +24,7 @@ includedirs {
 	MAME_DIR .. "src/lib",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
-	GEN_DIR  .. "emu",
-	GEN_DIR  .. "emu/layout",
+	GEN_DIR,
 }
 
 includedirs {
@@ -160,6 +159,8 @@ files {
 	MAME_DIR .. "src/emu/ioport.cpp",
 	MAME_DIR .. "src/emu/ioport.h",
 	MAME_DIR .. "src/emu/inpttype.ipp",
+	MAME_DIR .. "src/emu/intfs.cpp",
+	MAME_DIR .. "src/emu/intfs.h",
 	MAME_DIR .. "src/emu/logmacro.h",
 	MAME_DIR .. "src/emu/machine.cpp",
 	MAME_DIR .. "src/emu/machine.h",
@@ -257,10 +258,11 @@ files {
 	MAME_DIR .. "src/emu/video/rgbsse.h",
 	MAME_DIR .. "src/emu/video/rgbvmx.cpp",
 	MAME_DIR .. "src/emu/video/rgbvmx.h",
+	GEN_DIR  .. "emu/fslayout.cpp",
 }
 
 pchsource(MAME_DIR .. "src/emu/main.cpp")
--- 3 files do not inlcude emu.h
+-- 3 files do not include emu.h
 nopch(MAME_DIR .. "src/emu/emualloc.cpp")
 nopch(MAME_DIR .. "src/emu/attotime.cpp")
 nopch(MAME_DIR .. "src/emu/debug/textbuf.cpp")
@@ -271,15 +273,6 @@ dependency {
 	--------------------------------------------------
 	{ MAME_DIR .. "src/emu/rendfont.cpp", GEN_DIR .. "emu/uismall.fh" },
 	{ MAME_DIR .. "src/emu/rendfont.cpp", GEN_DIR .. "emu/ui/uicmd14.fh" },
-	-------------------------------------------------
-	-- core layouts
-	--------------------------------------------------
-	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/dualhovu.lh" },
-	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/dualhsxs.lh" },
-	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/dualhuov.lh" },
-	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/triphsxs.lh" },
-	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/quadhsxs.lh" },
-	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/noscreens.lh" },
 }
 
 custombuildtask {
@@ -288,13 +281,10 @@ custombuildtask {
 
 custombuildtask {
 	{ MAME_DIR .. "src/frontend/mame/ui/uicmd14.png", GEN_DIR .. "emu/ui/uicmd14.fh", { MAME_DIR.. "scripts/build/png2bdc.py",  MAME_DIR .. "scripts/build/file2str.py" }, { "@echo Converting uicmd14.png...", PYTHON .. " $(1) $(<) temp_cmd.bdc", PYTHON .. " $(2) temp_cmd.bdc $(@) font_uicmd14 uint8_t" } },
+}
 
-	layoutbuildtask("emu/layout", "dualhovu"),
-	layoutbuildtask("emu/layout", "dualhsxs"),
-	layoutbuildtask("emu/layout", "dualhuov"),
-	layoutbuildtask("emu/layout", "triphsxs"),
-	layoutbuildtask("emu/layout", "quadhsxs"),
-	layoutbuildtask("emu/layout", "noscreens"),
+custombuildtask {
+	{ MAME_DIR .. "src/emu/layout/noscreens.lay", GEN_DIR .. "emu/fslayout.cpp", MAME_DIR.. "scripts/build/makefs.py", { "@echo Embedding layouts...", PYTHON .. " " .. MAME_DIR .. "scripts/build/makefs.py layouts " ..  GEN_DIR .. "emu/fslayout.cpp " .. MAME_DIR .. "src/emu/layout " .. MAME_DIR .. "src/mame/layout" } },
 }
 
 project ("precompile")

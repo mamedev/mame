@@ -63,7 +63,6 @@
 #include "sound/ay8910.h"
 #include "speaker.h"
 
-#include "grchamp.lh"
 
 
 /*************************************
@@ -948,6 +947,6 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1981, grchamp,        0, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
-GAMEL( 1981, grchampa, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp ) // uses different ports. Bad dump?
-GAMEL( 1981, grchampb, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
+GAMEL( 1981, grchamp,        0, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, "grchamp" )
+GAMEL( 1981, grchampa, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, "grchamp" ) // uses different ports. Bad dump?
+GAMEL( 1981, grchampb, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, "grchamp" )

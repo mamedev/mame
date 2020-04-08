@@ -322,7 +322,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "fortecrd.lh"
 
 
 #define MASTER_CLOCK    XTAL(12'000'000)
@@ -790,5 +789,5 @@ void fortecar_state::init_fortecar()
 ***********************************/
 
 //     YEAR  NAME      PARENT    MACHINE   INPUT     CLASS           INIT           ROT   COMPANY       FULLNAME                         FLAGS                LAYOUT
-GAMEL( 1994, fortecrd, 0,        fortecar, fortecar, fortecar_state, init_fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 110, Spanish)", 0,                   layout_fortecrd )
-GAMEL( 1994, fortecar, fortecrd, fortecar, fortecar, fortecar_state, init_fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 103, English)", MACHINE_NOT_WORKING, layout_fortecrd )
+GAMEL( 1994, fortecrd, 0,        fortecar, fortecar, fortecar_state, init_fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 110, Spanish)", 0,                   "fortecrd" )
+GAMEL( 1994, fortecar, fortecrd, fortecar, fortecar, fortecar_state, init_fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 103, English)", MACHINE_NOT_WORKING, "fortecrd" )

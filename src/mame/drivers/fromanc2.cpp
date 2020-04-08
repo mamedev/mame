@@ -24,7 +24,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
-#include "rendlay.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -526,7 +526,7 @@ void fromanc2_state::fromanc2(machine_config &config)
 	PALETTE(config, m_lpalette).set_format(palette_device::GRBx_555, 2048);
 	PALETTE(config, m_rpalette).set_format(palette_device::GRBx_555, 2048);
 
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
@@ -584,7 +584,7 @@ void fromanc2_state::fromancr(machine_config &config)
 	PALETTE(config, m_lpalette).set_format(palette_device::xGRB_555, 2048);
 	PALETTE(config, m_rpalette).set_format(palette_device::xGRB_555, 2048);
 
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
@@ -643,7 +643,7 @@ void fromanc2_state::fromanc4(machine_config &config)
 	PALETTE(config, m_lpalette).set_format(palette_device::xRGB_555, 2048);
 	PALETTE(config, m_rpalette).set_format(palette_device::xRGB_555, 2048);
 
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);

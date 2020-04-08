@@ -40,7 +40,8 @@
 #include "emuopts.h"
 #include "render.h"
 #include "rendfont.h"
-#include "rendlay.h"
+#include "intfs.h"
+
 #include "rendutil.h"
 #include "config.h"
 #include "drivenum.h"
@@ -53,6 +54,11 @@
 #include <functional>
 
 
+//**************************************************************************
+//  Internal layout filesystem
+//**************************************************************************
+
+extern intfs::root_entry root_layouts;
 
 //**************************************************************************
 //  CONSTANTS
@@ -880,7 +886,7 @@ render_container::user_settings::user_settings()
 //  render_target - constructor
 //-------------------------------------------------
 
-render_target::render_target(render_manager &manager, const internal_layout *layoutfile, u32 flags)
+render_target::render_target(render_manager &manager, const char *layoutfile, u32 flags)
 	: render_target(manager, layoutfile, flags, CONSTRUCTOR_IMPL)
 {
 }
@@ -1528,14 +1534,14 @@ void render_target::update_layer_config()
 //  given render target
 //-------------------------------------------------
 
-void render_target::load_layout_files(const internal_layout *layoutfile, bool singlefile)
+void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 {
 	bool have_artwork  = false;
 
 	// if there's an explicit file, load that first
 	const std::string &basename = m_manager.machine().basename();
 	if (layoutfile)
-		have_artwork |= load_layout_file(basename.c_str(), *layoutfile);
+		have_artwork |= load_layout_file(basename.c_str(), layoutfile);
 
 	// if we're only loading this file, we know our final result
 	if (!singlefile)
@@ -1583,9 +1589,9 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 
 		// if a default view has been specified, use that as a fallback
 		if (system.default_layout != nullptr)
-			have_default |= load_layout_file(nullptr, *system.default_layout);
+			have_default |= load_layout_file(nullptr, system.default_layout);
 		m_manager.machine().config().apply_default_layouts(
-				[this, &have_default] (device_t &dev, internal_layout const &layout)
+				[this, &have_default] (device_t &dev, const char *layout)
 				{ have_default |= load_layout_file(nullptr, layout, &dev); });
 
 		// try to load another file based on the parent driver name
@@ -1671,7 +1677,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 	{
 		if (!view_by_index(0))
 		{
-			load_layout_file(nullptr, layout_noscreens);
+			load_layout_file(nullptr, "noscreens");
 			if (m_filelist.empty())
 				throw emu_fatalerror("Couldn't parse default layout??");
 		}
@@ -1973,55 +1979,16 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 //  and append it to our list
 //-------------------------------------------------
 
-bool render_target::load_layout_file(const char *dirname, const internal_layout &layout_data, device_t *device)
+bool render_target::load_layout_file(const char *dirname, const char *layout_data, device_t *device)
 {
-	// +1 to ensure data is terminated for XML parser
-	auto tempout = make_unique_clear<u8 []>(layout_data.decompressed_size + 1);
-
-	z_stream stream;
-	int zerr;
-
-	// initialize the stream
-	memset(&stream, 0, sizeof(stream));
-	stream.next_out = tempout.get();
-	stream.avail_out = layout_data.decompressed_size;
-
-	zerr = inflateInit(&stream);
-	if (zerr != Z_OK)
-	{
-		fatalerror("could not inflateInit");
+	auto file = intfs::get_file(root_layouts, std::string(layout_data) + ".lay");
+	if (!file.first)
 		return false;
-	}
 
-	// decompress this chunk
-	stream.next_in = (unsigned char *)layout_data.data;
-	stream.avail_in = layout_data.compressed_size;
-	zerr = inflate(&stream, Z_NO_FLUSH);
-
-	// stop at the end of the stream
-	if (zerr == Z_STREAM_END)
-	{
-		// OK
-	}
-	else if (zerr != Z_OK)
-	{
-		fatalerror("decompression error\n");
-		return false;
-	}
-
-	// clean up
-	zerr = inflateEnd(&stream);
-	if (zerr != Z_OK)
-	{
-		fatalerror("inflateEnd error\n");
-		return false;
-	}
-
-	util::xml::file::ptr rootnode(util::xml::file::string_read(reinterpret_cast<char const *>(tempout.get()), nullptr));
-	tempout.reset();
+	util::xml::file::ptr rootnode(util::xml::file::string_read(reinterpret_cast<char const *>(file.first.get()), nullptr));
 
 	// if we didn't get a properly-formatted XML file, record a warning and exit
-	if (!load_layout_file(device ? *device : m_manager.machine().root_device(), dirname, *rootnode))
+	if (!rootnode || !load_layout_file(device ? *device : m_manager.machine().root_device(), dirname, *rootnode))
 	{
 		osd_printf_warning("Improperly formatted XML string, ignoring\n");
 		return false;
@@ -3002,7 +2969,7 @@ float render_manager::max_update_rate() const
 //  target_alloc - allocate a new target
 //-------------------------------------------------
 
-render_target *render_manager::target_alloc(const internal_layout *layoutfile, u32 flags)
+render_target *render_manager::target_alloc(const char *layoutfile, u32 flags)
 {
 	return &m_targetlist.append(*global_alloc(render_target(*this, layoutfile, flags)));
 }

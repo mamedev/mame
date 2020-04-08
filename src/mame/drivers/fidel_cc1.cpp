@@ -46,9 +46,6 @@ offered as an upgrade to CC1, or CC3.
 #include "machine/timer.h"
 #include "video/pwm.h"
 
-// internal artwork
-#include "fidel_cc1.lh" // clickable
-#include "fidel_cc3.lh" // clickable
 
 
 namespace {
@@ -238,13 +235,13 @@ void cc1_state::cc1(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(6, 7);
 	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_fidel_cc1);
+	config.set_default_layout("fidel_cc1");
 }
 
 void cc1_state::cc3(machine_config &config)
 {
 	cc1(config);
-	config.set_default_layout(layout_fidel_cc3);
+	config.set_default_layout("fidel_cc3");
 }
 
 

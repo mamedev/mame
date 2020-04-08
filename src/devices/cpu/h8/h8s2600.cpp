@@ -14,4 +14,4 @@ std::unique_ptr<util::disasm_interface> h8s2600_device::create_disassembler()
 	return std::make_unique<h8s2600_disassembler>();
 }
 
-#include "cpu/h8/h8s2600.hxx"
+#include "emu/cpu/h8/h8s2600.hxx"

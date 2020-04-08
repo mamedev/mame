@@ -39,7 +39,7 @@ Also seem to be running on the same/similar hardware:
 #include "screen.h"
 #include "speaker.h"
 
-#include "segajw.lh"
+
 
 class segajw_state : public driver_device
 {
@@ -446,4 +446,4 @@ ROM_START( segajw )
 ROM_END
 
 
-GAMEL( 1991, segajw, 0, segajw,  segajw, segajw_state, empty_init, ROT0, "Sega", "Joker's Wild (Rev. B)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_segajw )
+GAMEL( 1991, segajw, 0, segajw,  segajw, segajw_state, empty_init, ROT0, "Sega", "Joker's Wild (Rev. B)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, "segajw" )

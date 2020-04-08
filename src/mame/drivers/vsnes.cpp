@@ -143,7 +143,7 @@ Changes:
 
 #include "cpu/m6502/n2a03.h"
 #include "cpu/z80/z80.h"
-#include "rendlay.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -1804,7 +1804,7 @@ void vsnes_state::vsdual(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsdual)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsdual)
 
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
 	screen1.set_refresh_hz(60);

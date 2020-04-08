@@ -61,7 +61,6 @@ TODO:
 #include "emu.h"
 #include "includes/kim1.h"
 #include "speaker.h"
-#include "kim1.lh"
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -249,7 +248,7 @@ void kim1_state::kim1(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	// video hardware
-	config.set_default_layout(layout_kim1);
+	config.set_default_layout("kim1");
 
 	SPEAKER(config, "mono").front_center();
 

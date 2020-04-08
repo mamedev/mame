@@ -66,7 +66,7 @@ ToDo:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "s7.lh"
+
 
 
 class s7_state : public genpin_class
@@ -442,7 +442,7 @@ void s7_state::s7(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(s7_state, s7)
 
 	/* Video */
-	config.set_default_layout(layout_s7);
+	config.set_default_layout("s7");
 
 	/* Sound */
 	genpin_audio(config);

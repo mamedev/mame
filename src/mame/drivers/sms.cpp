@@ -249,7 +249,7 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "softlist.h"
 #include "speaker.h"
 
-#include "sms1.lh"
+
 
 
 #define MASTER_CLOCK_GG     32215905.0
@@ -617,7 +617,7 @@ void sms1_state::sms1_ntsc(machine_config &config)
 
 	m_main_scr->screen_vblank().set(FUNC(sms1_state::sscope_vblank));
 
-	config.set_default_layout(layout_sms1);
+	config.set_default_layout("sms1");
 
 	SEGA315_5124(config, m_vdp, XTAL(10'738'635));
 	m_vdp->set_screen(m_main_scr);
@@ -708,7 +708,7 @@ void sms1_state::sms1_pal(machine_config &config)
 
 	m_main_scr->screen_vblank().set(FUNC(sms1_state::sscope_vblank));
 
-	config.set_default_layout(layout_sms1);
+	config.set_default_layout("sms1");
 
 	SEGA315_5124(config, m_vdp, MASTER_CLOCK_PAL/5);
 	m_vdp->set_screen(m_main_scr);
@@ -777,7 +777,7 @@ void sms1_state::sms1_paln(machine_config &config)
 
 	m_main_scr->screen_vblank().set(FUNC(sms1_state::sscope_vblank));
 
-	config.set_default_layout(layout_sms1);
+	config.set_default_layout("sms1");
 
 	SEGA315_5124(config, m_vdp, MASTER_CLOCK_PALN);
 	m_vdp->set_screen(m_main_scr);
@@ -848,7 +848,7 @@ void sms1_state::sms1_br(machine_config &config)
 
 	m_main_scr->screen_vblank().set(FUNC(sms1_state::sscope_vblank));
 
-	config.set_default_layout(layout_sms1);
+	config.set_default_layout("sms1");
 
 	SEGA315_5124(config, m_vdp, MASTER_CLOCK_PALM);
 	m_vdp->set_screen(m_main_scr);

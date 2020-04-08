@@ -15,7 +15,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "mindset.lh"
 
 // Missing:
 // - Correct video timings
@@ -1313,7 +1312,7 @@ static void mindset_modules(device_slot_interface &device)
 void mindset_state::mindset(machine_config &config)
 {
 	config.set_perfect_quantum(m_syscpu);
-	config.set_default_layout(layout_mindset);
+	config.set_default_layout("mindset");
 
 	I80186(config, m_maincpu, 12_MHz_XTAL); // Divides internally by 2 to produce a clkout of 6MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &mindset_state::maincpu_mem);

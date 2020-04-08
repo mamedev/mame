@@ -48,7 +48,6 @@
 #include "imagedev/bitbngr.h"
 #include "speaker.h"
 #include "sound/beep.h"
-#include "hp9825.lh"
 #include "softlist.h"
 
 // Debugging
@@ -684,7 +683,7 @@ void hp9825_state::hp9825_base(machine_config &config)
 		HP9825_OPTROM(config , finder);
 	}
 
-	config.set_default_layout(layout_hp9825);
+	config.set_default_layout("hp9825");
 }
 
 #define IOP_MASK(x) BIT_MASK<ioport_value>((x))

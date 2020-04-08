@@ -236,8 +236,6 @@ Todo:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "polepos.lh"
-#include "topracer.lh"
 
 
 #define MASTER_CLOCK    XTAL(24'576'000)
@@ -927,7 +925,7 @@ void polepos_state::polepos(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_polepos);
 	PALETTE(config, m_palette, FUNC(polepos_state::polepos_palette), 0x0f00, 128);
 
-	config.set_default_layout(layout_polepos);
+	config.set_default_layout("polepos");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1036,7 +1034,7 @@ void polepos_state::topracern(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_polepos);
 	PALETTE(config, m_palette, FUNC(polepos_state::polepos_palette), 0x0f00, 128);
 
-	config.set_default_layout(layout_topracer);
+	config.set_default_layout("topracer");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

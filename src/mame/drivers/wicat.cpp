@@ -36,7 +36,7 @@ Wicat - various systems.
 #include "emupal.h"
 #include "screen.h"
 
-#include "wicat.lh"
+
 
 class wicat_state : public driver_device
 {
@@ -838,7 +838,7 @@ void wicat_state::wicat(machine_config &config)
 	m_crtc->vrtc_wr_callback().set(FUNC(wicat_state::crtc_irq_w));
 	m_crtc->set_screen("screen");
 
-	config.set_default_layout(layout_wicat);
+	config.set_default_layout("wicat");
 
 	/* Winchester Disk Controller (WD1000 + FD1795) */
 	n8x300_cpu_device &wd1kcpu(N8X300(config, "wd1kcpu", 8_MHz_XTAL));

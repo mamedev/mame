@@ -130,7 +130,6 @@ TODO:  - The UPD7810 core is missing analog port emulation
 #include "emu.h"
 #include "epson_ex800.h"
 #include "speaker.h"
-#include "ex800.lh"
 
 
 
@@ -227,7 +226,7 @@ void epson_ex800_device::device_add_mconfig(machine_config &config)
 	upd.pc_in_cb().set(FUNC(epson_ex800_device::portc_r));
 	upd.pc_out_cb().set(FUNC(epson_ex800_device::portc_w));
 
-	config.set_default_layout(layout_ex800);
+	config.set_default_layout("ex800");
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();

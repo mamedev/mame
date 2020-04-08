@@ -19,10 +19,10 @@
 #include "sound/dac.h"
 #include "sound/ym2151.h"
 #include "sound/volt_reg.h"
-#include "rendlay.h"
+
 #include "speaker.h"
 
-#include "tceptor2.lh"
+
 
 
 /*******************************************************************/
@@ -495,4 +495,4 @@ ROM_END
 
 //     YEAR  NAME      PARENT   MACHINE  INPUT     CLASS          INIT        MONITOR  COMPANY  FULLNAME                 FLAGS )
 GAME(  1986, tceptor,  0,       tceptor, tceptor,  tceptor_state, empty_init, ROT0,    "Namco", "Thunder Ceptor",        0)
-GAMEL( 1986, tceptor2, tceptor, tceptor, tceptor2, tceptor_state, empty_init, ROT0,    "Namco", "3-D Thunder Ceptor II", 0, layout_tceptor2)
+GAMEL( 1986, tceptor2, tceptor, tceptor, tceptor2, tceptor_state, empty_init, ROT0,    "Namco", "3-D Thunder Ceptor II", 0, "tceptor2")

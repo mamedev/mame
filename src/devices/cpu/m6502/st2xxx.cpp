@@ -806,4 +806,4 @@ void st2xxx_device::bdiv_w(u8 data)
 	m_bdiv = data;
 }
 
-#include "cpu/m6502/st2xxx.hxx"
+#include "emu/cpu/m6502/st2xxx.hxx"

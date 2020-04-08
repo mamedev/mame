@@ -29,7 +29,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "accomm.lh"
 
 /* Interrupts */
 #define INT_HIGH_TONE       0x40
@@ -832,7 +831,7 @@ void accomm_state::accomm(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(accomm_state::accomm_palette), 16);
 
-	config.set_default_layout(layout_accomm);
+	config.set_default_layout("accomm");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("1M");

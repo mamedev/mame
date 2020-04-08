@@ -43,7 +43,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "cosmicos.lh"
 
 
 enum
@@ -526,7 +525,7 @@ void cosmicos_state::cosmicos(machine_config &config)
 	m_maincpu->sc_cb().set(FUNC(cosmicos_state::sc_w));
 
 	/* video hardware */
-	config.set_default_layout(layout_cosmicos);
+	config.set_default_layout("cosmicos");
 	DM9368(config, m_led, 0);
 	TIMER(config, "digit").configure_periodic(FUNC(cosmicos_state::digit_tick), attotime::from_hz(100));
 	TIMER(config, "interrupt").configure_periodic(FUNC(cosmicos_state::int_tick), attotime::from_hz(1000));

@@ -21,8 +21,6 @@ Hardware notes:
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_sc8.lh" // clickable
 
 
 namespace {
@@ -169,7 +167,7 @@ void scc_state::scc(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
-	config.set_default_layout(layout_fidel_sc8);
+	config.set_default_layout("fidel_sc8");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

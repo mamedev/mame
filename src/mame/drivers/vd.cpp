@@ -23,7 +23,7 @@
 #include "sound/ay8910.h"
 #include "speaker.h"
 
-#include "vd.lh"
+
 
 class vd_state : public genpin_class
 {
@@ -207,7 +207,7 @@ void vd_state::vd(machine_config &config)
 	ay2.port_b_read_callback().set_ioport("DSW3");
 
 	/* Video */
-	config.set_default_layout(layout_vd);
+	config.set_default_layout("vd");
 }
 
 /*-------------------------------------------------------------------

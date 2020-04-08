@@ -15,7 +15,6 @@
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "4004clk.lh"
 
 
 class nixieclock_state : public driver_device
@@ -146,7 +145,7 @@ void nixieclock_state::_4004clk(machine_config &config)
 	cpu.set_ram_ports_map(&nixieclock_state::_4004clk_mp);
 
 	/* video hardware */
-	config.set_default_layout(layout_4004clk);
+	config.set_default_layout("4004clk");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

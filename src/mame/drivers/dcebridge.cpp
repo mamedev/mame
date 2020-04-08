@@ -5,7 +5,6 @@
 
 #include "bus/rs232/rs232.h"
 
-#include "dcebridge.lh"
 
 
 namespace {
@@ -104,7 +103,7 @@ void dcebridge_state::dcebridge(machine_config &config)
 	m_ports[1]->cts_handler().set(FUNC(dcebridge_state::cts<1>));
 	m_ports[1]->cts_handler().append_output("cts_b");
 
-	config.set_default_layout(layout_dcebridge);
+	config.set_default_layout("dcebridge");
 }
 
 

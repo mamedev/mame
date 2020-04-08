@@ -363,7 +363,7 @@ BUT, at least on the revision C 1872 CPU pcb, they are both tied directly to VCC
 
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-//#include "votrpss.lh"
+//
 
 /* Components */
 #include "machine/i8251.h"
@@ -547,7 +547,7 @@ void votrpss_state::votrpss(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(votrpss_state::irq_ack));
 
 	/* video hardware */
-	//config.set_default_layout(layout_votrpss);
+	//config.set_default_layout("votrpss");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

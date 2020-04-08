@@ -42,7 +42,6 @@ Segment data is sent to each 14seg digit by first writing half of the data to po
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-#include "minicom.lh"
 
 class minicom_state : public driver_device
 {
@@ -232,7 +231,7 @@ void minicom_state::minicom(machine_config &config)
 
 	/* video hardware */
 	/* fluorescent 14-segment display forming a row of 20 characters */
-	config.set_default_layout(layout_minicom);
+	config.set_default_layout("minicom");
 
 	/* TODO: Map the keyboard rows/cols inputs (43-key, 4-row keyboard) */
 

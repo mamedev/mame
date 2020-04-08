@@ -62,7 +62,6 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#include "guab.lh"
 
 
 //**************************************************************************
@@ -559,7 +558,7 @@ void guab_state::guab(machine_config &config)
 
 	SOFTWARE_LIST(config, "floppy_list").set_original("guab");
 
-	config.set_default_layout(layout_guab);
+	config.set_default_layout("guab");
 }
 
 

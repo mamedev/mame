@@ -29,7 +29,7 @@ ToDo:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "s8a.lh"
+
 
 
 class s8a_state : public genpin_class
@@ -298,7 +298,7 @@ void s8a_state::s8a(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(s8a_state, s8a)
 
 	/* Video */
-	config.set_default_layout(layout_s8a);
+	config.set_default_layout("s8a");
 
 	/* Sound */
 	genpin_audio(config);

@@ -560,7 +560,7 @@ void m6809_base_device::execute_one()
 {
 	switch(pop_state())
 	{
-#include "cpu/m6809/m6809.hxx"
+#include "emu/cpu/m6809/m6809.hxx"
 	}
 }
 

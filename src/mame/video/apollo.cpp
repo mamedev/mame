@@ -20,11 +20,11 @@
 #include "includes/apollo.h"
 
 #include "emupal.h"
-#include "rendlay.h"
+
 #include "screen.h"
 
-#include "apollo.lh"
-#include "apollo_15i.lh"
+
+
 
 
 /***************************************************************************
@@ -1715,7 +1715,7 @@ void apollo_graphics_15i::register_vblank_callback()
 
 void apollo_graphics_15i::device_add_mconfig(machine_config &config)
 {
-	config.set_default_layout(layout_apollo_15i);
+	config.set_default_layout("apollo_15i");
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(68000000, 1346, 0, 1024, 841, 0, 800);
@@ -1888,7 +1888,7 @@ void apollo_graphics_15i::device_reset()
 
 void apollo_graphics_19i::device_add_mconfig(machine_config &config)
 {
-	config.set_default_layout(layout_apollo);
+	config.set_default_layout("apollo");
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);

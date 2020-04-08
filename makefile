@@ -1662,10 +1662,9 @@ clean: genieclean
 	-@rm -rf $(BUILDDIR)
 	-@rm -rf 3rdparty/bgfx/.build
 
-GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET_FULL)/ $(GENDIR)/mame/drivers/ $(GENDIR)/mame/machine/
+GEN_FOLDERS := $(GENDIR)/$(TARGET)/$(SUBTARGET_FULL)/ $(GENDIR)/mame/drivers/ $(GENDIR)/mame/machine/
 
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
-LAYOUTS=$(wildcard $(SRC)/$(TARGET)/layout/*.lay)
 
 ifneq (,$(wildcard src/osd/$(OSD)/$(OSD).mak))
 include src/osd/$(OSD)/$(OSD).mak
@@ -1685,7 +1684,6 @@ generate: \
 		$(GEN_FOLDERS) \
 		$(GENDIR)/version.cpp \
 		$(patsubst %.po,%.mo,$(call rwildcard, language/, *.po)) \
-		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
 		$(GENDIR)/mame/machine/mulcd.hxx \
 		$(GENDIR)/includes/SDL2
 
@@ -1718,10 +1716,6 @@ $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
 	@echo const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))"; >> $@
 endif
 
-
-$(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/complay.py | $(GEN_FOLDERS)
-	@echo Compressing $<...
-	$(SILENT)$(PYTHON) scripts/build/complay.py $< $@ layout_$(basename $(notdir $<))
 
 $(GENDIR)/mame/machine/mulcd.hxx: $(SRC)/mame/machine/mulcd.ppm scripts/build/file2str.py
 	@echo Converting $<...
@@ -1818,8 +1812,6 @@ endif
 CPPCHECK_PARAMS += -I3rdparty/bgfx/include
 CPPCHECK_PARAMS += -I3rdparty/bx/include
 CPPCHECK_PARAMS += -I$(BUILDDIR)/generated/emu
-CPPCHECK_PARAMS += -I$(BUILDDIR)/generated/emu/layout
-CPPCHECK_PARAMS += -I$(BUILDDIR)/generated/mame/layout
 CPPCHECK_PARAMS += -DX64_WINDOWS_ABI
 CPPCHECK_PARAMS += -DPTR64=1
 CPPCHECK_PARAMS += -DMAME_DEBUG

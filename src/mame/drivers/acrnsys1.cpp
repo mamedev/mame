@@ -54,7 +54,6 @@ Note that left-most digit is not wired up, and therefore will always be blank.
 #include "imagedev/cassette.h"
 #include "speaker.h"
 
-#include "acrnsys1.lh"
 
 
 class acrnsys1_state : public driver_device
@@ -269,7 +268,7 @@ void acrnsys1_state::acrnsys1(machine_config &config)
 	M6502(config, m_maincpu, 1.008_MHz_XTAL);  /* 1.008 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &acrnsys1_state::acrnsys1_map);
 
-	config.set_default_layout(layout_acrnsys1);
+	config.set_default_layout("acrnsys1");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

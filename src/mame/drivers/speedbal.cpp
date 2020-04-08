@@ -37,7 +37,7 @@ Interrupt frequency on audio CPU is not a periodical signal, but there are a lot
 #include "screen.h"
 #include "speaker.h"
 
-#include "speedbal.lh"
+
 
 
 void speedbal_state::machine_start()
@@ -412,6 +412,6 @@ void speedbal_state::init_musicbal()
 
 
 
-GAMEL( 1987, speedbal,         0, speedbal, speedbal, speedbal_state, init_speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball (set 1)", MACHINE_SUPPORTS_SAVE, layout_speedbal )
-GAMEL( 1987, speedbala, speedbal, speedbal, speedbal, speedbal_state, init_speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball (set 2)", MACHINE_SUPPORTS_SAVE, layout_speedbal )
-GAMEL( 1988, musicbal,         0, speedbal, musicbal, speedbal_state, init_musicbal, ROT270, "Tecfri / Desystem S.A.", "Music Ball", MACHINE_SUPPORTS_SAVE, layout_speedbal )
+GAMEL( 1987, speedbal,         0, speedbal, speedbal, speedbal_state, init_speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball (set 1)", MACHINE_SUPPORTS_SAVE, "speedbal" )
+GAMEL( 1987, speedbala, speedbal, speedbal, speedbal, speedbal_state, init_speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball (set 2)", MACHINE_SUPPORTS_SAVE, "speedbal" )
+GAMEL( 1988, musicbal,         0, speedbal, musicbal, speedbal_state, init_musicbal, ROT270, "Tecfri / Desystem S.A.", "Music Ball", MACHINE_SUPPORTS_SAVE, "speedbal" )

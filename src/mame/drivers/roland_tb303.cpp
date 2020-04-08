@@ -17,7 +17,7 @@
 #include "video/pwm.h"
 #include "machine/timer.h"
 
-#include "tb303.lh"
+
 
 
 class tb303_state : public driver_device
@@ -309,7 +309,7 @@ void tb303_state::tb303(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 4);
-	config.set_default_layout(layout_tb303);
+	config.set_default_layout("tb303");
 
 	/* sound hardware */
 	// discrete...

@@ -33,9 +33,6 @@ Checker Challenger 4 (ACR) is on the same PCB, twice less RAM and the beeper gon
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_acr.lh" // clickable
-#include "fidel_cc10.lh" // clickable
 
 
 namespace {
@@ -308,7 +305,7 @@ void ccx_state::acr(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(6, 8);
 	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_fidel_acr);
+	config.set_default_layout("fidel_acr");
 }
 
 void ccx_state::ccx(machine_config &config)
@@ -318,7 +315,7 @@ void ccx_state::ccx(machine_config &config)
 	/* basic machine hardware */
 	m_mainmap->set_addrmap(AS_PROGRAM, &ccx_state::ccx_map);
 
-	config.set_default_layout(layout_fidel_cc10);
+	config.set_default_layout("fidel_cc10");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

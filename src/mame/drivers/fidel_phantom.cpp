@@ -36,8 +36,6 @@ TODO:
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_phantom.lh" // clickable
 
 
 namespace {
@@ -402,7 +400,7 @@ void phantom_state::fphantom(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(2+4, 9);
 	m_display->set_segmask(0x3c, 0x7f);
 
-	config.set_default_layout(layout_fidel_phantom);
+	config.set_default_layout("fidel_phantom");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

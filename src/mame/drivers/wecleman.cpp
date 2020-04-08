@@ -281,7 +281,7 @@ TODO:
 #include "sound/ym2151.h"
 #include "speaker.h"
 
-#include "wecleman.lh"
+
 
 
 /***************************************************************************
@@ -1754,11 +1754,11 @@ void wecleman_state::init_hotchase()
                                 Game driver(s)
 ***************************************************************************/
 
-GAMEL( 1986, wecleman,  0,        wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.01)", 0, layout_wecleman )
-GAMEL( 1986, weclemana, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.00)", 0, layout_wecleman )
-GAMEL( 1988, weclemanb, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "hack",   "WEC Le Mans 24 (v2.00, hack)", 0, layout_wecleman ) // small section of code inserted, year changed to 1988
-GAMEL( 1986, weclemanc, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v1.26)", 0, layout_wecleman )
+GAMEL( 1986, wecleman,  0,        wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.01)", 0, "wecleman" )
+GAMEL( 1986, weclemana, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.00)", 0, "wecleman" )
+GAMEL( 1988, weclemanb, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "hack",   "WEC Le Mans 24 (v2.00, hack)", 0, "wecleman" ) // small section of code inserted, year changed to 1988
+GAMEL( 1986, weclemanc, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v1.26)", 0, "wecleman" )
 // a version 1.21 is known to exist too, see https://www.youtube.com/watch?v=4l8vYJi1OeU
 
-GAMEL( 1988, hotchase,  0,        hotchase, hotchase, wecleman_state, init_hotchase, ROT0, "Konami", "Hot Chase (set 1)", 0, layout_wecleman )
-GAMEL( 1988, hotchasea, hotchase, hotchase, hotchase, wecleman_state, init_hotchase, ROT0, "Konami", "Hot Chase (set 2)", 0, layout_wecleman )
+GAMEL( 1988, hotchase,  0,        hotchase, hotchase, wecleman_state, init_hotchase, ROT0, "Konami", "Hot Chase (set 1)", 0, "wecleman" )
+GAMEL( 1988, hotchasea, hotchase, hotchase, hotchase, wecleman_state, init_hotchase, ROT0, "Konami", "Hot Chase (set 2)", 0, "wecleman" )

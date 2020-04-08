@@ -37,8 +37,7 @@ function devicesProject(_target, _subtarget)
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		GEN_DIR  .. "emu",
-		GEN_DIR  .. "emu/layout",
+		GEN_DIR,
 		ext_includedir("asio"),
 		ext_includedir("expat"),
 		ext_includedir("flac"),
@@ -71,7 +70,7 @@ if #disasm_files > 0 then
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		GEN_DIR  .. "emu",
+		GEN_DIR,
 		ext_includedir("asio"),
 		ext_includedir("expat"),
 	}

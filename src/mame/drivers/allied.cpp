@@ -49,7 +49,6 @@ ToDo:
 #include "machine/mos6530.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
-#include "allied.lh"
 
 class allied_state : public genpin_class
 {
@@ -629,7 +628,7 @@ void allied_state::allied(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &allied_state::allied_map);
 
 	/* Video */
-	config.set_default_layout(layout_allied);
+	config.set_default_layout("allied");
 
 	/* Sound */
 	genpin_audio(config);

@@ -51,8 +51,8 @@
 
 #include "coreutil.h"
 
-#include "segabill.lh"
-#include "segabillv.lh"
+
+
 
 #define FIRST_SPEEDUP_SLOT  (2)         // in case we remove/alter the BIOS speedups later
 
@@ -1065,7 +1065,7 @@ void stv_state::stv(machine_config &config)
 
 	SEGA_BILLBOARD(config, m_billboard, 0);
 
-	config.set_default_layout(layout_segabill);
+	config.set_default_layout("segabill");
 }
 
 void stv_state::stv_5881(machine_config &config)
@@ -1150,7 +1150,7 @@ void stv_state::batmanfr(machine_config &config)
 void stv_state::shienryu(machine_config &config)
 {
 	stv(config);
-	config.set_default_layout(layout_segabillv);
+	config.set_default_layout("segabillv");
 }
 
 #define STV_CARTSLOT_ADD(_tag, _load) \

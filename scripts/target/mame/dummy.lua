@@ -28,7 +28,7 @@ function createProjects_mame_dummy(_target, _subtarget)
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		GEN_DIR  .. "mess/layout",
+		GEN_DIR,
 	}
 
 files{

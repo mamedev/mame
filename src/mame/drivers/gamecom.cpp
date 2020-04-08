@@ -37,7 +37,6 @@ Game Status:
 #include "softlist.h"
 #include "speaker.h"
 
-#include "gamecom.lh"
 
 
 void gamecom_state::gamecom_mem_map(address_map &map)
@@ -277,7 +276,7 @@ void gamecom_state::gamecom(machine_config &config)
 	m_screen->set_visarea_full();
 	m_screen->set_palette("palette");
 
-	config.set_default_layout(layout_gamecom);
+	config.set_default_layout("gamecom");
 	PALETTE(config, "palette", FUNC(gamecom_state::gamecom_palette), 5);
 
 	/* sound hardware */

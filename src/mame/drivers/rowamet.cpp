@@ -31,7 +31,7 @@ ToDO:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "rowamet.lh"
+
 
 
 class rowamet_state : public driver_device
@@ -235,7 +235,7 @@ void rowamet_state::rowamet(machine_config &config)
 	TIMER(config, "timer_a").configure_periodic(FUNC(rowamet_state::timer_a), attotime::from_hz(200));
 
 	/* Video */
-	config.set_default_layout(layout_rowamet);
+	config.set_default_layout("rowamet");
 
 	/* Sound */
 	SPEAKER(config, "speaker").front_center();

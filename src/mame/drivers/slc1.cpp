@@ -55,7 +55,7 @@ Pasting doesn't work, but if it did...
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-#include "slc1.lh"
+
 
 
 namespace {
@@ -279,7 +279,7 @@ void slc1_state::slc1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &slc1_state::io_map);
 
 	/* video hardware */
-	config.set_default_layout(layout_slc1);
+	config.set_default_layout("slc1");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

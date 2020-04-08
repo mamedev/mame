@@ -46,7 +46,7 @@ ToDo:
 #include "sound/sn76496.h"
 #include "speaker.h"
 
-#include "wico.lh"
+
 
 
 class wico_state : public genpin_class
@@ -454,7 +454,7 @@ void wico_state::wico(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	config.set_default_layout(layout_wico);
+	config.set_default_layout("wico");
 
 	/* Sound */
 	genpin_audio(config);

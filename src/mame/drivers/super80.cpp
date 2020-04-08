@@ -223,7 +223,7 @@ ToDo:
 #include "softlist.h"
 #include "speaker.h"
 
-#include "super80.lh"
+
 
 
 #define MASTER_CLOCK    (12_MHz_XTAL)
@@ -729,7 +729,7 @@ void super80_state::super80(machine_config &config)
 	PALETTE(config, m_palette, FUNC(super80_state::super80m_palette), 32);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_super80);
 
-	config.set_default_layout(layout_super80);
+	config.set_default_layout("super80");
 	MCFG_VIDEO_START_OVERRIDE(super80_state,super80)
 
 	/* sound hardware */
@@ -835,7 +835,7 @@ void super80_state::super80v(machine_config &config)
 	m_crtc->set_char_width(SUPER80V_DOTS);
 	m_crtc->set_update_row_callback(FUNC(super80_state::crtc_update_row));
 
-	config.set_default_layout(layout_super80);
+	config.set_default_layout("super80");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

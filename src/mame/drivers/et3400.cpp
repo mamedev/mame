@@ -31,7 +31,6 @@ ETA-3400 Memory I/O Accessory
 #include "imagedev/cassette.h"
 #include "speaker.h"
 
-#include "et3400.lh"
 
 
 class et3400_state : public driver_device
@@ -225,7 +224,7 @@ void et3400_state::et3400(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &et3400_state::mem_map);
 
 	/* video hardware */
-	config.set_default_layout(layout_et3400);
+	config.set_default_layout("et3400");
 
 	// Devices
 	PIA6821(config, m_pia, 0);

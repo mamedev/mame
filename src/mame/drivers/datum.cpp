@@ -55,7 +55,6 @@ Z1000G
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "bus/rs232/rs232.h"
-#include "datum.lh"
 
 
 class datum_state : public driver_device
@@ -195,7 +194,7 @@ void datum_state::datum(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &datum_state::datum_mem);
 
 	/* video hardware */
-	config.set_default_layout(layout_datum);
+	config.set_default_layout("datum");
 
 	/* Devices */
 	PIA6821(config, m_pia1, 0); // keyboard & display

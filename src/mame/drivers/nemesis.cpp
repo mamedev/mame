@@ -121,7 +121,6 @@ initials
 #include "sound/k051649.h"
 #include "speaker.h"
 
-#include "konamigt.lh"
 
 
 WRITE_LINE_MEMBER(nemesis_state::nemesis_vblank_irq)
@@ -2637,7 +2636,7 @@ ROM_END
 
 GAME(  1985, nemesis,   0,         nemesis,    nemesis,  nemesis_state, empty_init, ROT0,   "Konami", "Nemesis (ROM version)",          MACHINE_SUPPORTS_SAVE )
 GAME(  1985, nemesisuk, nemesis,   nemesis,    nemesuk,  nemesis_state, empty_init, ROT0,   "Konami", "Nemesis (World?, ROM version)",  MACHINE_SUPPORTS_SAVE )
-GAMEL( 1985, konamigt,  0,         konamigt,   konamigt, nemesis_state, empty_init, ROT0,   "Konami", "Konami GT",                      MACHINE_SUPPORTS_SAVE, layout_konamigt )
+GAMEL( 1985, konamigt,  0,         konamigt,   konamigt, nemesis_state, empty_init, ROT0,   "Konami", "Konami GT",                      MACHINE_SUPPORTS_SAVE, "konamigt" )
 GAME(  1985, rf2,       konamigt,  rf2_gx400,  rf2,      nemesis_state, empty_init, ROT0,   "Konami", "Konami RF2 - Red Fighter",       MACHINE_SUPPORTS_SAVE )
 GAME(  1985, twinbee,   0,         gx400,      twinbee,  nemesis_state, empty_init, ROT90,  "Konami", "TwinBee (ROM version)",          MACHINE_SUPPORTS_SAVE )
 GAME(  1985, gradius,   nemesis,   gx400,      gradius,  nemesis_state, empty_init, ROT0,   "Konami", "Gradius (Japan, ROM version)",   MACHINE_SUPPORTS_SAVE )

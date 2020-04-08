@@ -102,7 +102,6 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "machine/segacrpt_device.h"
 #include "screen.h"
 #include "speaker.h"
-#include "pbactiont.lh"
 
 
 WRITE8_MEMBER(pbaction_state::pbaction_sh_command_w)
@@ -709,4 +708,4 @@ GAME( 1985, pbaction,  0,        pbaction,  pbaction, pbaction_state, empty_init
 GAME( 1985, pbaction2, pbaction, pbactionx, pbaction, pbaction_state, init_pbaction2, ROT90, "Tehkan",                  "Pinball Action (set 2, encrypted)", MACHINE_SUPPORTS_SAVE ) // likely bootleg due to extra protection on top of usual
 GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE ) // possible bootleg due to oversized ROMs
 GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE ) // original?
-GAMEL(1985, pbactiont, pbaction, pbactiont, pbaction, pbaction_tecfri_state, empty_init,     ROT90, "Tehkan (Tecfri license)", "Pinball Action (Tecfri license)",   MACHINE_SUPPORTS_SAVE, layout_pbactiont )
+GAMEL(1985, pbactiont, pbaction, pbactiont, pbaction, pbaction_tecfri_state, empty_init,     ROT90, "Tehkan (Tecfri license)", "Pinball Action (Tecfri license)",   MACHINE_SUPPORTS_SAVE, "pbactiont" )

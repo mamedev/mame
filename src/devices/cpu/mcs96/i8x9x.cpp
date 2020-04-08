@@ -539,4 +539,4 @@ DEFINE_DEVICE_TYPE(N8097BH, n8097bh_device, "n8097bh", "Intel N8097BH")
 DEFINE_DEVICE_TYPE(P8098, p8098_device, "p8098", "Intel P8098")
 DEFINE_DEVICE_TYPE(P8798, p8798_device, "p8798", "Intel P8798")
 
-#include "cpu/mcs96/i8x9x.hxx"
+#include "emu/cpu/mcs96/i8x9x.hxx"

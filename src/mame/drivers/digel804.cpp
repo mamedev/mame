@@ -38,7 +38,6 @@
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-#include "digel804.lh"
 
 
 // port 40 read reads eprom socket pins 11-13, 15-19 (i.e. eprom pin D0 to pin D7)
@@ -642,7 +641,7 @@ void digel804_state::digel804(machine_config &config)
 	ROC10937(config, m_vfd); // RIGHT_TO_LEFT
 
 	/* video hardware */
-	config.set_default_layout(layout_digel804);
+	config.set_default_layout("digel804");
 
 	MM74C923(config, m_kb, 0);
 	m_kb->da_wr_callback().set(FUNC(digel804_state::da_w));

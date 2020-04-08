@@ -20,7 +20,6 @@ game details unknown
 #include "screen.h"
 #include "speaker.h"
 
-#include "piggypas.lh"
 
 
 class piggypas_state : public driver_device
@@ -214,7 +213,7 @@ void piggypas_state::piggypas(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_entries(2);
-	config.set_default_layout(layout_piggypas);
+	config.set_default_layout("piggypas");
 
 	hd44780_device &hd44780(HD44780(config, "hd44780"));
 	hd44780.set_lcd_size(1, 16);

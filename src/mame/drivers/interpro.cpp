@@ -232,7 +232,6 @@
 
 #include "debugger.h"
 
-#include "interpro.lh"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -839,7 +838,7 @@ void interpro_state::interpro(machine_config &config)
 	// i/o gate array
 
 	// system layout
-	config.set_default_layout(layout_interpro);
+	config.set_default_layout("interpro");
 
 	// software lists
 	SOFTWARE_LIST(config, m_softlist).set_original("interpro");

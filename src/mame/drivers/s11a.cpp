@@ -27,7 +27,7 @@ Note: To start a game, certain switches need to be activated.  You must first pr
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "s11a.lh"
+
 
 
 void s11a_state::s11a_main_map(address_map &map)
@@ -181,7 +181,7 @@ void s11a_state::s11a(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(s11a_state, s11a)
 
 	/* Video */
-	config.set_default_layout(layout_s11a);
+	config.set_default_layout("s11a");
 
 	/* Sound */
 	genpin_audio(config);

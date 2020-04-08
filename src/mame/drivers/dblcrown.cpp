@@ -55,7 +55,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "dblcrown.lh"
 #define DEBUG_VRAM
 
 class dblcrown_state : public driver_device
@@ -659,4 +658,4 @@ ROM_END
 
 
 /*     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT    COMPANY                FULLNAME                FLAGS                    LAYOUT  */
-GAMEL( 1997, dblcrown, 0,      dblcrown, dblcrown, dblcrown_state, empty_init, ROT0, "Cadence Technology",  "Double Crown (v1.0.3)", MACHINE_IMPERFECT_GRAPHICS, layout_dblcrown ) // 1997 DYNA copyright in tile GFX
+GAMEL( 1997, dblcrown, 0,      dblcrown, dblcrown, dblcrown_state, empty_init, ROT0, "Cadence Technology",  "Double Crown (v1.0.3)", MACHINE_IMPERFECT_GRAPHICS, "dblcrown" ) // 1997 DYNA copyright in tile GFX

@@ -53,9 +53,7 @@ Official test program from pages 4 to 8 of the operator's manual:
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
 #include "speaker.h"
-
 #include "formats/h8_cas.h"
-#include "h8.lh"
 
 
 class h8_state : public driver_device
@@ -329,7 +327,7 @@ void h8_state::h8(machine_config &config)
 	m_maincpu->out_inte_func().set(FUNC(h8_state::h8_inte_callback));
 
 	/* video hardware */
-	config.set_default_layout(layout_h8);
+	config.set_default_layout("h8");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

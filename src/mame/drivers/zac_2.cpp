@@ -12,7 +12,7 @@
 #include "machine/genpin.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/timer.h"
-#include "zac_2.lh"
+
 
 class zac_2_state : public driver_device
 {
@@ -228,7 +228,7 @@ void zac_2_state::zac_2(machine_config &config)
 	TIMER(config, "zac_2_outtimer").configure_periodic(FUNC(zac_2_state::zac_2_outtimer), attotime::from_hz(187500));
 
 	/* Video */
-	config.set_default_layout(layout_zac_2);
+	config.set_default_layout("zac_2");
 }
 
 /*--------------------------------

@@ -61,7 +61,6 @@ Added Dip locations according to manual.
 
 #include "cpu/m6502/m6502.h"
 
-#include "copsnrob.lh"
 
 
 /*************************************
@@ -315,4 +314,4 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1976, copsnrob, 0, copsnrob, copsnrob, copsnrob_state, empty_init, ROT0, "Atari", "Cops'n Robbers", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_copsnrob )
+GAMEL( 1976, copsnrob, 0, copsnrob, copsnrob, copsnrob_state, empty_init, ROT0, "Atari", "Cops'n Robbers", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "copsnrob" )

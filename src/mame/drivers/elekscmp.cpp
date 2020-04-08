@@ -27,7 +27,6 @@ ToDo:
 #include "imagedev/cassette.h"
 #include "machine/timer.h"
 #include "speaker.h"
-#include "elekscmp.lh"
 
 
 class elekscmp_state : public driver_device
@@ -202,7 +201,7 @@ void elekscmp_state::elekscmp(machine_config &config)
 	m_maincpu->s_in().set(FUNC(elekscmp_state::cass_r));
 
 	/* video hardware */
-	config.set_default_layout(layout_elekscmp);
+	config.set_default_layout("elekscmp");
 
 	SPEAKER(config, "mono").front_center();
 	CASSETTE(config, m_cass);

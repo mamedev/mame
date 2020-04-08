@@ -63,9 +63,6 @@
 #include "machine/tms6100.h"
 #include "speaker.h"
 
-// internal artwork
-#include "spellb.lh"
-
 
 class tispellb_state : public hh_tms1k_state
 {
@@ -358,7 +355,7 @@ void tispellb_state::rev1(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(16, 16);
 	m_display->set_segmask(0xff, 0x3fff);
-	config.set_default_layout(layout_spellb);
+	config.set_default_layout("spellb");
 
 	/* no sound! */
 }
@@ -380,7 +377,7 @@ void tispellb_state::rev2(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(16, 16);
 	m_display->set_segmask(0xff, 0x3fff);
-	config.set_default_layout(layout_spellb);
+	config.set_default_layout("spellb");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

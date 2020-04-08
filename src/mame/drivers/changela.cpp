@@ -19,7 +19,6 @@ Tomasz Slanina
 #include "sound/ay8910.h"
 #include "speaker.h"
 
-#include "changela.lh"
 
 
 READ8_MEMBER(changela_state::mcu_r)
@@ -495,4 +494,4 @@ ROM_START( changela )
 	ROM_LOAD( "cl88",   0x0000, 0x0020, CRC(da4d6625) SHA1(2d9a268973518252eb36f479ab650af8c16c885c) ) /* math train state machine */
 ROM_END
 
-GAMEL( 1983, changela, 0, changela, changela, changela_state, empty_init, ROT180, "Taito Corporation", "Change Lanes", MACHINE_SUPPORTS_SAVE, layout_changela )
+GAMEL( 1983, changela, 0, changela, changela, changela_state, empty_init, ROT180, "Taito Corporation", "Change Lanes", MACHINE_SUPPORTS_SAVE, "changela" )

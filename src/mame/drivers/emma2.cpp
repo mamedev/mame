@@ -52,7 +52,6 @@ To Do:
 #include "machine/6821pia.h"
 #include "imagedev/cassette.h"
 #include "speaker.h"
-#include "emma2.lh"
 
 
 class emma2_state : public driver_device
@@ -197,7 +196,7 @@ void emma2_state::emma2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &emma2_state::mem_map);
 
 	/* video hardware */
-	config.set_default_layout(layout_emma2);
+	config.set_default_layout("emma2");
 
 	/* Devices */
 	VIA6522(config, m_via, 1'000'000);  // #2 from cpu

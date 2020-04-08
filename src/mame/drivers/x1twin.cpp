@@ -18,7 +18,7 @@
 #include "includes/x1.h"
 #include "includes/pce.h"
 
-#include "rendlay.h"
+
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -450,7 +450,7 @@ void x1twin_state::x1twin(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(x1twin_state::pce_interrupt), "pce_screen", 0, 1);
 	#endif
 
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

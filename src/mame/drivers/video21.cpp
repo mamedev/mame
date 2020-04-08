@@ -30,7 +30,7 @@ When booted, press Key out (mapped to W by default) to get it going.
 #include "emupal.h"
 #include "speaker.h"
 
-#include "video21.lh"
+
 
 class video21_state : public driver_device
 {
@@ -298,4 +298,4 @@ ROM_START( video21 )
 	ROM_LOAD_NIB_LOW ( "43", 0x0000, 0x0400, CRC(0ecb0aab) SHA1(7f3f1b93a5d38828ae3e97e5f8ef1a6a96dc798b) )
 ROM_END
 
-GAMEL(1980?, video21, 0, video21, video21, video21_state, empty_init, ROT0, "Video Games GmbH", "Video 21", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_video21)
+GAMEL(1980?, video21, 0, video21, video21, video21_state, empty_init, ROT0, "Video Games GmbH", "Video 21", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "video21")

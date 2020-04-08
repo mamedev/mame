@@ -31,7 +31,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "savia84.lh"
+
 
 
 class savia84_state : public driver_device
@@ -189,7 +189,7 @@ void savia84_state::savia84(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &savia84_state::io_map);
 
 	/* video hardware */
-	config.set_default_layout(layout_savia84);
+	config.set_default_layout("savia84");
 
 	/* Devices */
 	I8255(config, m_ppi8255);

@@ -66,7 +66,7 @@ TODO:
 #include "machine/i8255.h"
 #include "video/dl1416.h"
 
-#include "whousetc.lh"
+
 
 namespace {
 
@@ -197,7 +197,7 @@ void whouse_testcons_state::whousetc(machine_config &config)
 	DL1416B(config, m_dsp[3], u32(0));
 	m_dsp[3]->update().set(FUNC(whouse_testcons_state::update_dsp<3>));
 
-	config.set_default_layout(layout_whousetc);
+	config.set_default_layout("whousetc");
 }
 
 

@@ -35,7 +35,7 @@
 #include "sound/upd934g.h"
 #include "speaker.h"
 
-#include "rz1.lh"
+
 
 
 //**************************************************************************
@@ -371,7 +371,7 @@ void rz1_state::rz1(machine_config &config)
 	m_hd44780->set_lcd_size(1, 16);
 	m_hd44780->set_pixel_update_cb(FUNC(rz1_state::lcd_pixel_update));
 
-	config.set_default_layout(layout_rz1);
+	config.set_default_layout("rz1");
 
 	SPEAKER(config, "speaker").front_center();
 	UPD934G(config, m_pg[0], 1333000);

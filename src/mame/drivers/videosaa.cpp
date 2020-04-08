@@ -47,8 +47,6 @@
 #include "speaker.h"
 #include "tilemap.h"
 
-#include "videosaa.lh"
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -429,7 +427,7 @@ void videosaa_state::videosaa(machine_config &config)
 	UPD7759(config, m_adpcm);
 	m_adpcm->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	config.set_default_layout(layout_videosaa);
+	config.set_default_layout("videosaa");
 }
 
 

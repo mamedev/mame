@@ -66,7 +66,6 @@
 
 #include "screen.h"
 #include "softlist_dev.h"
-#include "hp9k_3xx.lh"
 
 #define MAINCPU_TAG "maincpu"
 #define PTM6840_TAG "ptm"
@@ -331,7 +330,7 @@ void hp9k3xx_state::hp9k300(machine_config &config)
 	ptm.irq_callback().set_inputline("maincpu", M68K_IRQ_6);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("hp9k3xx_flop");
-	config.set_default_layout(layout_hp9k_3xx);
+	config.set_default_layout("hp9k_3xx");
 }
 
 void hp9k3xx_state::hp9k310(machine_config &config)

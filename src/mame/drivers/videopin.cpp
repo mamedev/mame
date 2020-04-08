@@ -25,7 +25,7 @@ solarwar
 #include "sound/discrete.h"
 #include "speaker.h"
 
-#include "videopin.lh"
+
 
 
 void videopin_state::update_plunger()
@@ -464,5 +464,5 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1979, videopin, 0, videopin, videopin, videopin_state, empty_init, ROT270, "Atari", "Video Pinball", MACHINE_SUPPORTS_SAVE, layout_videopin )
-GAMEL( 1979, solarwar, 0, videopin, solarwar, videopin_state, empty_init, ROT270, "Atari", "Solar War", MACHINE_SUPPORTS_SAVE, layout_videopin )
+GAMEL( 1979, videopin, 0, videopin, videopin, videopin_state, empty_init, ROT270, "Atari", "Video Pinball", MACHINE_SUPPORTS_SAVE, "videopin" )
+GAMEL( 1979, solarwar, 0, videopin, solarwar, videopin_state, empty_init, ROT270, "Atari", "Solar War", MACHINE_SUPPORTS_SAVE, "videopin" )

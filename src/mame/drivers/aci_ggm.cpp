@@ -60,8 +60,6 @@ TODO:
 #include "speaker.h"
 #include "softlist.h"
 
-// internal artwork
-#include "aci_ggm.lh" // clickable
 
 
 namespace {
@@ -441,7 +439,7 @@ void ggm_state::ggm(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(8, 16);
 	m_display->set_segmask(0xff, 0x3fff);
 	m_display->set_bri_levels(0.05);
-	config.set_default_layout(layout_aci_ggm);
+	config.set_default_layout("aci_ggm");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -53,7 +53,6 @@ ToDo:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "atari_s1.lh"
 
 
 #define MASTER_CLK XTAL(4'000'000) / 4
@@ -468,7 +467,7 @@ void atari_s1_state::atari_s1(machine_config &config)
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* Video */
-	config.set_default_layout(layout_atari_s1);
+	config.set_default_layout("atari_s1");
 
 	TIMER(config, "nmi").configure_periodic(FUNC(atari_s1_state::nmi), attotime::from_hz(NMI_INT));
 	TIMER(config, "timer_s").configure_periodic(FUNC(atari_s1_state::timer_s), attotime::from_hz(AUDIO_CLK));

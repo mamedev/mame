@@ -96,7 +96,7 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 #include "sound/ymf271.h"
 #include "machine/jalcrpt.h"
 
-#include "rendlay.h"
+
 #include "speaker.h"
 #include "tilemap.h"
 
@@ -818,7 +818,7 @@ void bnstars_state::bnstars(machine_config &config)
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);
 
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);

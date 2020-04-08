@@ -58,7 +58,6 @@
 #include "bus/hp80_io/hp80_io.h"
 #include "bus/hp80_io/82937.h"
 #include "imagedev/bitbngr.h"
-#include "hp86b.lh"
 
 // Debugging
 #include "logmacro.h"
@@ -1681,7 +1680,7 @@ void hp86_state::hp86(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(hp86_state::vblank_w));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	config.set_default_layout(layout_hp86b);
+	config.set_default_layout("hp86b");
 
 	TIMER(config, m_vm_timer).configure_generic(FUNC(hp86_state::vm_timer));
 	TIMER(config, m_rulite_timer).configure_generic(FUNC(hp86_state::rulite_timer));

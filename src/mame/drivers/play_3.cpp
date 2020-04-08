@@ -52,7 +52,6 @@ The manual is not that clear, there's a lot we don't know, this *seems* to work.
 #include "sound/ay8910.h"
 #include "speaker.h"
 
-#include "play_3.lh"
 
 
 
@@ -490,7 +489,7 @@ void play_3_state::play_3(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	config.set_default_layout(layout_play_3);
+	config.set_default_layout("play_3");
 
 	// Devices
 	clock_device &xpoint(CLOCK(config, "xpoint", 60)); // crossing-point detector

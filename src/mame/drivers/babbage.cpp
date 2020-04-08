@@ -28,7 +28,6 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80daisy.h"
-#include "babbage.lh"
 
 #define MAIN_CLOCK 25e5
 
@@ -239,7 +238,7 @@ void babbage_state::babbage(machine_config &config)
 	m_maincpu->set_daisy_config(babbage_daisy_chain);
 
 	/* video hardware */
-	config.set_default_layout(layout_babbage);
+	config.set_default_layout("babbage");
 
 	/* Devices */
 	Z80CTC(config, m_ctc, MAIN_CLOCK);

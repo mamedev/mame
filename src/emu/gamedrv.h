@@ -134,7 +134,7 @@ public:
 	driver_init_wrapper         driver_init;        // DRIVER_INIT callback
 	const tiny_rom_entry *      rom;                // pointer to list of ROMs for the game
 	const char *                compatible_with;
-	const internal_layout *     default_layout;     // default internally defined layout
+	const char *                default_layout;     // default internally defined layout
 	machine_flags::type         flags;              // orientation and other flags; see defines above
 	char                        name[MAX_DRIVER_NAME_CHARS + 1]; // short name of the game
 };
@@ -197,7 +197,7 @@ extern game_driver const GAME_NAME(NAME)                                \
 	[] (device_t &owner) { downcast<CLASS &>(owner).INIT(); },          \
 	ROM_NAME(NAME),                                                     \
 	nullptr,                                                            \
-	&LAYOUT,                                                            \
+	LAYOUT,                                                             \
 	machine_flags::type(u32((MONITOR) | (FLAGS) | MACHINE_TYPE_ARCADE)),\
 	#NAME                                                               \
 };

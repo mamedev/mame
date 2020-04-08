@@ -43,7 +43,6 @@ Notes:
 #include "sound/cdp1863.h"
 #include "speaker.h"
 
-#include "play_2.lh"
 
 
 class play_2_state : public genpin_class
@@ -371,7 +370,7 @@ void play_2_state::play_2(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	config.set_default_layout(layout_play_2);
+	config.set_default_layout("play_2");
 
 	CLOCK(config, "xpoint", 60).signal_handler().set(FUNC(play_2_state::clock2_w)); // crossing-point detector
 

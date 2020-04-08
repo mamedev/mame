@@ -41,13 +41,8 @@ TODO:
 #include "video/pwm.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-
 #include "softlist.h"
 #include "speaker.h"
-
-// internal artwork
-#include "saitek_sstar28k.lh" // clickable
-#include "saitek_tstar432.lh" // clickable
 
 
 namespace {
@@ -201,7 +196,7 @@ void star_state::sstar28k(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 3);
-	config.set_default_layout(layout_saitek_sstar28k);
+	config.set_default_layout("saitek_sstar28k");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -220,7 +215,7 @@ void star_state::tstar432(machine_config &config)
 	const attotime irq_period = attotime::from_hz(4_MHz_XTAL / 0x4000); // 4020 Q14
 	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), irq_period);
 
-	config.set_default_layout(layout_saitek_tstar432);
+	config.set_default_layout("saitek_tstar432");
 
 	/* extension rom */
 	GENERIC_CARTSLOT(config, "extrom", generic_plain_slot, "saitek_kso");

@@ -332,22 +332,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-// Button panel and lamps
-#include "aristmk4.lh" // AU 90cr with gamble
-#include "arimk4nz.lh" // NZ 45cr with double up
-#include "3bagflnz.lh" // NZ 45cr without gamble
-#include "3bagflvt.lh" // AU 90cr without gamble
-#include "arcwins.lh"  // US 25cr with gamble
-#include "cgold2.lh"   // US 25cr without gamble
-#include "eforest.lh"  // US 45cr with gamble
-#include "fhunter.lh"  // US 45cr without gamble
-#include "fvrpitch.lh" // AU 25cr without gamble
-#include "goldenc.lh"  // NZ 90cr with double up
-#include "kgbird.lh"   // NZ 25cr with double up
-#include "topgear.lh"  // NZ 5 line without gamble
-#include "gldnpkr.lh"  // Video poker
-#include "gunnrose.lh" // Video poker
-#include "wildone.lh"  // Video poker
 
 uint8_t crtc_cursor_index = 0;
 uint8_t crtc_reg = 0;
@@ -2524,31 +2508,31 @@ ROM_START( 86lions )
 	//  ROM_LOAD( "prom.x", 0x00, 0x20, NO_DUMP )
 ROM_END
 
-GAMEL( 1985, 86lions,  0,        _86lions,       aristmk4, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "86 Lions", MACHINE_NOT_WORKING, layout_topgear )
-GAMEL( 1996, eforest,  0,        aristmk4,       eforest,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",         0, layout_eforest  ) // 92.778%
-GAMEL( 1995, eforesta, eforest,  aristmk4,       aristmk4, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",          0, layout_aristmk4 ) // 10c, $1 = 10 credits, 90.483%
-GAMEL( 1996, eforestb, eforest,  aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Enchanted Forest (3VXFC5343, New Zealand)", 0, layout_arimk4nz ) // 5c, $2 = 40 credits, 88.43%
-GAMEL( 1996, 3bagflvt, 0,        aristmk4,       3bagflvt, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "3 Bags Full (5VXFC790, Victoria)",          0, layout_3bagflvt ) // 5c, $1 = 20 credits, 90.018%
-GAMEL( 1996, 3bagflnz, 3bagflvt, aristmk4,       3bagflnz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "3 Bags Full (3VXFC5345, New Zealand)",      0, layout_3bagflnz ) // 5c, $2 = 40 credits, 88.22%
-GAMEL( 1996, kgbird,   0,        aristmk4,       kgbird,   aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 5c)",    0, layout_kgbird   ) // 5c, $2 = 40 credits, 87.98%
-GAMEL( 1996, kgbirda,  kgbird,   aristmk4,       kgbird,   aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 10c)",   0, layout_kgbird   ) // 10c, $2 = 20 credits, 91.97%
-GAMEL( 1996, blkrhino, 0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Black Rhino (3VXFC5344, New Zealand)",      0, layout_arimk4nz ) // 5c, $2 = 40 credits, 91.96%
-GAMEL( 1996, topgear,  0,        aristmk4,       topgear,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Top Gear (4VXFC969, New Zealand)",          0, layout_topgear  ) // 10c, 10c = 1 credit, 87.471%
-GAMEL( 1996, wtigernz, 0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "White Tiger (3VXFC5342, New Zealand)",      0, layout_arimk4nz ) // 5c, $2 = 40 credits, 91.99%
-GAMEL( 1998, phantomp, 0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Phantom Pays (4VXFC5431, New Zealand)",     0, layout_arimk4nz ) // 5c, $2 = 40 credits, 91.95%
-GAMEL( 1998, ffortune, 0,        aristmk4,       goldenc,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Fantasy Fortune (1VXFC5460, New Zealand)",  0, layout_goldenc  ) // 5c, $2 = 40 credits, 87.90%
-GAMEL( 1998, swtht2nz, 0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Sweethearts II (1VXFC5461, New Zealand)",   0, layout_arimk4nz ) // 5c, $2 = 40 credits, 87.13%
-GAMEL( 1996, goldenc,  0,        aristmk4,       goldenc,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Golden Canaries (1VXFC5462, New Zealand)",  0, layout_goldenc  ) // 2c, $2 = 100 credits, 87.30%
-GAMEL( 1999, autmoon,  0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Autumn Moon (1VXFC5488, New Zealand)",      0, layout_arimk4nz ) // 5c, $2 = 40 credits, 87.27%
-GAMEL( 2000, coralr2,  0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Coral Riches II (1VXFC5472, New Zealand)",  0, layout_arimk4nz ) // 2c, $2 = 100 credits, 87.13%
-GAMEL( 1995, cgold2,   0,        aristmk4,       cgold2,   aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Caribbean Gold II (3XF5182H04, USA)",       0, layout_cgold2   ) // 92.858%
-GAMEL( 1996, fhunter,  0,        aristmk4,       fhunter,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I01, USA)",          0, layout_fhunter  ) // 90.018%
-GAMEL( 1996, fhuntera, fhunter,  aristmk4,       fhunter,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I02, USA)",          0, layout_fhunter  ) // 92.047%
-GAMEL( 1996, arcwins,  0,        aristmk4,       arcwins,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Arctic Wins (4XF5227H03, USA)",             0, layout_arcwins  ) // 90.361%
-GAMEL( 1997, wildone,  0,        aristmk4_poker, wildone,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Wild One (4VXEC5357, New Zealand)",         0, layout_wildone  ) // 20c, $2 = 10 credits, video poker, 88.00%
-GAMEL( 1993, gunnrose, 0,        aristmk4_poker, gunnrose, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Guns and Roses (C606191SMP, NSW)",          MACHINE_WRONG_COLORS, layout_gunnrose ) // 20c, $1 = 5 credits
-GAMEL( 1986, gldnpkr,  0,        aristmk4_poker, gldnpkr,  aristmk4_state, init_aristmk4, ROT0, "Ainsworth Nominees P.L.", "Golden Poker (8VXEC037, New Zealand)", 0, layout_gldnpkr ) // 20c, 20c = 1 credit, video poker
-GAMEL( 1986, gtroppo,  0,        aristmk4,       topgear,  aristmk4_state, init_aristmk4, ROT0, "Ainsworth Nominees P.L.", "Gone Troppo (1VXEC542, New Zealand)",  0, layout_topgear ) // 20c, 20c = 1 credit, 87.138%
-GAMEL( 1986, clkwise,  0,        aristmk4,       topgear,  aristmk4_state, init_aristmk4, ROT0, "Ainsworth Nominees P.L.", "Clockwise (1VXEC534, New Zealand)",    MACHINE_NOT_WORKING, layout_topgear )
-GAMEL( 1986, cgold,    0,        aristmk4,       topgear,  aristmk4_state, init_aristmk4, ROT0, "Ainsworth Nominees P.L.", "Caribbean Gold (3VXEC449, USA)",       0, layout_topgear ) // 25c, 25c = 1 credit
-GAMEL( 1986, fvrpitch, 0,        aristmk4,       fvrpitch, aristmk4_state, init_aristmk4, ROT0, "Ainsworth Nominees P.L.", "Fever Pitch (2VXEC534, NSW)",  0, layout_fvrpitch ) // 5c, $1 = 20 credits, 90.360%
+GAMEL( 1985, 86lions,  0,        _86lions,       aristmk4, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "86 Lions", MACHINE_NOT_WORKING, "topgear" )
+GAMEL( 1996, eforest,  0,        aristmk4,       eforest,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",         0, "eforest"  ) // 92.778%
+GAMEL( 1995, eforesta, eforest,  aristmk4,       aristmk4, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",          0, "aristmk4" ) // 10c, $1 = 10 credits, 90.483%
+GAMEL( 1996, eforestb, eforest,  aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Enchanted Forest (3VXFC5343, New Zealand)", 0, "arimk4nz" ) // 5c, $2 = 40 credits, 88.43%
+GAMEL( 1996, 3bagflvt, 0,        aristmk4,       3bagflvt, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "3 Bags Full (5VXFC790, Victoria)",          0, "3bagflvt" ) // 5c, $1 = 20 credits, 90.018%
+GAMEL( 1996, 3bagflnz, 3bagflvt, aristmk4,       3bagflnz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "3 Bags Full (3VXFC5345, New Zealand)",      0, "3bagflnz" ) // 5c, $2 = 40 credits, 88.22%
+GAMEL( 1996, kgbird,   0,        aristmk4,       kgbird,   aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 5c)",    0, "kgbird"   ) // 5c, $2 = 40 credits, 87.98%
+GAMEL( 1996, kgbirda,  kgbird,   aristmk4,       kgbird,   aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 10c)",   0, "kgbird"   ) // 10c, $2 = 20 credits, 91.97%
+GAMEL( 1996, blkrhino, 0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Black Rhino (3VXFC5344, New Zealand)",      0, "arimk4nz" ) // 5c, $2 = 40 credits, 91.96%
+GAMEL( 1996, topgear,  0,        aristmk4,       topgear,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Top Gear (4VXFC969, New Zealand)",          0, "topgear"  ) // 10c, 10c = 1 credit, 87.471%
+GAMEL( 1996, wtigernz, 0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "White Tiger (3VXFC5342, New Zealand)",      0, "arimk4nz" ) // 5c, $2 = 40 credits, 91.99%
+GAMEL( 1998, phantomp, 0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Phantom Pays (4VXFC5431, New Zealand)",     0, "arimk4nz" ) // 5c, $2 = 40 credits, 91.95%
+GAMEL( 1998, ffortune, 0,        aristmk4,       goldenc,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Fantasy Fortune (1VXFC5460, New Zealand)",  0, "goldenc"  ) // 5c, $2 = 40 credits, 87.90%
+GAMEL( 1998, swtht2nz, 0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Sweethearts II (1VXFC5461, New Zealand)",   0, "arimk4nz" ) // 5c, $2 = 40 credits, 87.13%
+GAMEL( 1996, goldenc,  0,        aristmk4,       goldenc,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Golden Canaries (1VXFC5462, New Zealand)",  0, "goldenc"  ) // 2c, $2 = 100 credits, 87.30%
+GAMEL( 1999, autmoon,  0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Autumn Moon (1VXFC5488, New Zealand)",      0, "arimk4nz" ) // 5c, $2 = 40 credits, 87.27%
+GAMEL( 2000, coralr2,  0,        aristmk4,       arimk4nz, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Coral Riches II (1VXFC5472, New Zealand)",  0, "arimk4nz" ) // 2c, $2 = 100 credits, 87.13%
+GAMEL( 1995, cgold2,   0,        aristmk4,       cgold2,   aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Caribbean Gold II (3XF5182H04, USA)",       0, "cgold2"   ) // 92.858%
+GAMEL( 1996, fhunter,  0,        aristmk4,       fhunter,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I01, USA)",          0, "fhunter"  ) // 90.018%
+GAMEL( 1996, fhuntera, fhunter,  aristmk4,       fhunter,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I02, USA)",          0, "fhunter"  ) // 92.047%
+GAMEL( 1996, arcwins,  0,        aristmk4,       arcwins,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Arctic Wins (4XF5227H03, USA)",             0, "arcwins"  ) // 90.361%
+GAMEL( 1997, wildone,  0,        aristmk4_poker, wildone,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Wild One (4VXEC5357, New Zealand)",         0, "wildone"  ) // 20c, $2 = 10 credits, video poker, 88.00%
+GAMEL( 1993, gunnrose, 0,        aristmk4_poker, gunnrose, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Guns and Roses (C606191SMP, NSW)",          MACHINE_WRONG_COLORS, "gunnrose" ) // 20c, $1 = 5 credits
+GAMEL( 1986, gldnpkr,  0,        aristmk4_poker, gldnpkr,  aristmk4_state, init_aristmk4, ROT0, "Ainsworth Nominees P.L.", "Golden Poker (8VXEC037, New Zealand)", 0, "gldnpkr" ) // 20c, 20c = 1 credit, video poker
+GAMEL( 1986, gtroppo,  0,        aristmk4,       topgear,  aristmk4_state, init_aristmk4, ROT0, "Ainsworth Nominees P.L.", "Gone Troppo (1VXEC542, New Zealand)",  0, "topgear" ) // 20c, 20c = 1 credit, 87.138%
+GAMEL( 1986, clkwise,  0,        aristmk4,       topgear,  aristmk4_state, init_aristmk4, ROT0, "Ainsworth Nominees P.L.", "Clockwise (1VXEC534, New Zealand)",    MACHINE_NOT_WORKING, "topgear" )
+GAMEL( 1986, cgold,    0,        aristmk4,       topgear,  aristmk4_state, init_aristmk4, ROT0, "Ainsworth Nominees P.L.", "Caribbean Gold (3VXEC449, USA)",       0, "topgear" ) // 25c, 25c = 1 credit
+GAMEL( 1986, fvrpitch, 0,        aristmk4,       fvrpitch, aristmk4_state, init_aristmk4, ROT0, "Ainsworth Nominees P.L.", "Fever Pitch (2VXEC534, NSW)",  0, "fvrpitch" ) // 5c, $1 = 20 credits, 90.360%

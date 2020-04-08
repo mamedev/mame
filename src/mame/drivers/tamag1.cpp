@@ -15,7 +15,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "tama.lh"
+
 
 
 class tamag1_state : public driver_device
@@ -150,7 +150,7 @@ void tamag1_state::tama(machine_config &config)
 	screen.set_visarea(0, 32-1, 0, 16-1);
 	screen.set_screen_update("maincpu", FUNC(e0c6s46_device::screen_update));
 	screen.set_palette("palette");
-	config.set_default_layout(layout_tama);
+	config.set_default_layout("tama");
 
 	PALETTE(config, "palette", FUNC(tamag1_state::tama_palette), 2);
 

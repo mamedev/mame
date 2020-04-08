@@ -29,9 +29,6 @@ TODO:
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "regence.lh" // clickable
-
 
 namespace {
 
@@ -191,7 +188,7 @@ void regence_state::regence(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
-	config.set_default_layout(layout_regence);
+	config.set_default_layout("regence");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -221,4 +221,4 @@ void m6508_device::mi_6508::write(uint16_t adr, uint8_t val)
 }
 
 
-#include "cpu/m6502/m6510.hxx"
+#include "emu/cpu/m6502/m6510.hxx"

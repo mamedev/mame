@@ -42,7 +42,6 @@
 #include "formats/dmv_dsk.h"
 #include "imagedev/snapquik.h"
 
-#include "dmv.lh"
 
 class dmv_state : public driver_device
 {
@@ -816,7 +815,7 @@ void dmv_state::dmv(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_dmv);
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
-	config.set_default_layout(layout_dmv);
+	config.set_default_layout("dmv");
 
 	// devices
 	UPD7220(config, m_hgdc, XTAL(5'000'000)/2); // unk clock

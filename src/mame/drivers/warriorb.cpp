@@ -154,7 +154,7 @@ Colscroll effects?
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
 
-#include "rendlay.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -419,7 +419,7 @@ void warriorb_state::darius2d(machine_config &config)
 	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_warriorb);
 	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_warriorb);
 
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
@@ -495,7 +495,7 @@ void warriorb_state::warriorb(machine_config &config)
 	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_warriorb);
 	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_warriorb);
 
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);

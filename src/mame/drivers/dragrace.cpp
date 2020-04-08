@@ -14,7 +14,6 @@
 #include "sound/discrete.h"
 #include "speaker.h"
 
-#include "dragrace.lh"
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::dragrace_frame_callback)
@@ -349,4 +348,4 @@ ROM_START( dragrace )
 ROM_END
 
 
-GAMEL( 1977, dragrace, 0, dragrace, dragrace, dragrace_state, empty_init, 0, "Atari (Kee Games)", "Drag Race", MACHINE_SUPPORTS_SAVE, layout_dragrace )
+GAMEL( 1977, dragrace, 0, dragrace, dragrace, dragrace_state, empty_init, 0, "Atari (Kee Games)", "Drag Race", MACHINE_SUPPORTS_SAVE, "dragrace" )

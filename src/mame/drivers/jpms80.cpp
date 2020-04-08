@@ -30,21 +30,6 @@ System80 is based on the SRU platform, but with more outputs and finally a separ
 #include "machine/tms9902.h"
 #include "speaker.h"
 
-#include "jpms80.lh"
-
-// MFME2MAME layouts:
-#include "j80bac.lh"
-#include "j80bounc.lh"
-#include "j80frogh.lh"
-#include "j80golds.lh"
-#include "j80hotln.lh"
-#include "j80myspn.lh"
-#include "j80nudg2.lh"
-#include "j80rr.lh"
-#include "j80supst.lh"
-#include "j80supbk.lh"
-#include "j80topsp.lh"
-#include "j80wsprt2.lh"
 
 
 class jpms80_state : public driver_device
@@ -356,24 +341,24 @@ ROM_END
 
 
 
-GAMEL( 198?, j80bac,    0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Bank A Coin (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80bac )
-GAMEL( 198?, j80bounc,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Bouncer (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80bounc )
-GAMEL( 198?, j80frogh,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Frog Hop (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80frogh )
+GAMEL( 198?, j80bac,    0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Bank A Coin (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, "j80bac" )
+GAMEL( 198?, j80bounc,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Bouncer (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, "j80bounc" )
+GAMEL( 198?, j80frogh,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Frog Hop (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, "j80frogh" )
 GAME(  198?, j80fruit,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Fruit Snappa (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j80golds,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Golden Steppa (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80golds )
-GAMEL( 198?, j80hotln,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Hot Lines (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80hotln )
-GAMEL( 198?, j80myspn,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Mystery Spin (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80myspn )
-GAMEL( 198?, j80nudg2,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Nudge Double Up MkII (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80nudg2 )
-GAMEL( 198?, j80rr,     0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Road Runner (JPM) (SYSTEM80, set 1)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80rr ) // was also in a set named 'Route 66' with identical roms, but text in ROM indicates name is Road Runner, maybe a reskin?
-GAMEL( 198?, j80rra,    j80rr,    jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Road Runner (JPM) (SYSTEM80, set 2)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80rr )
-GAMEL( 198?, j80supst,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Supa Steppa (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80supst )
-GAMEL( 198?, j80supbk,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Superbank (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80supbk )
-GAMEL( 198?, j80topsp,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Top Sprint (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80topsp )
+GAMEL( 198?, j80golds,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Golden Steppa (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, "j80golds" )
+GAMEL( 198?, j80hotln,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Hot Lines (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, "j80hotln" )
+GAMEL( 198?, j80myspn,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Mystery Spin (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, "j80myspn" )
+GAMEL( 198?, j80nudg2,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Nudge Double Up MkII (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, "j80nudg2" )
+GAMEL( 198?, j80rr,     0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Road Runner (JPM) (SYSTEM80, set 1)", MACHINE_IS_SKELETON_MECHANICAL, "j80rr" ) // was also in a set named 'Route 66' with identical roms, but text in ROM indicates name is Road Runner, maybe a reskin?
+GAMEL( 198?, j80rra,    j80rr,    jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Road Runner (JPM) (SYSTEM80, set 2)", MACHINE_IS_SKELETON_MECHANICAL, "j80rr" )
+GAMEL( 198?, j80supst,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Supa Steppa (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, "j80supst" )
+GAMEL( 198?, j80supbk,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Superbank (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, "j80supbk" )
+GAMEL( 198?, j80topsp,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Top Sprint (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, "j80topsp" )
 GAME(  198?, j80topup,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Top Up (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j80tumbl,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Tumble (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j80wsprt,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Winsprint (JPM) (V4, 5x20p) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80wsprt2 )
-GAMEL( 198?, j80wsprt3, j80wsprt, jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Winsprint (JPM) (V3, 50p, 5 credits) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80wsprt2 )
-GAMEL( 198?, j80wsprt2, j80wsprt, jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Winsprint (JPM) (V2, 10x10p) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80wsprt2 )
+GAMEL( 198?, j80wsprt,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Winsprint (JPM) (V4, 5x20p) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, "j80wsprt2" )
+GAMEL( 198?, j80wsprt3, j80wsprt, jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Winsprint (JPM) (V3, 50p, 5 credits) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, "j80wsprt2" )
+GAMEL( 198?, j80wsprt2, j80wsprt, jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Winsprint (JPM) (V2, 10x10p) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, "j80wsprt2" )
 
 GAME(  198?, j80blbnk,  0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "PCP", "Blankity Bank (PCP) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL )
 

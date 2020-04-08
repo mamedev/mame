@@ -23,7 +23,7 @@ ToDo:
 #include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/scmp/scmp.h"
-#include "zac_proto.lh"
+
 
 class zac_proto_state : public genpin_class
 {
@@ -250,7 +250,7 @@ void zac_proto_state::zac_proto(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	config.set_default_layout(layout_zac_proto);
+	config.set_default_layout("zac_proto");
 
 	/* Sound */
 	genpin_audio(config);

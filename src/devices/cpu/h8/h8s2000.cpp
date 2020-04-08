@@ -15,4 +15,4 @@ std::unique_ptr<util::disasm_interface> h8s2000_device::create_disassembler()
 	return std::make_unique<h8s2000_disassembler>();
 }
 
-#include "cpu/h8/h8s2000.hxx"
+#include "emu/cpu/h8/h8s2000.hxx"

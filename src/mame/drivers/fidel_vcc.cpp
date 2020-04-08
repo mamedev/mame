@@ -107,8 +107,6 @@ determination and give you a language option on power up or something.
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_vcc.lh" // clickable
 
 
 namespace {
@@ -343,7 +341,7 @@ void vcc_state::vcc(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_fidel_vcc);
+	config.set_default_layout("fidel_vcc");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

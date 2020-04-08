@@ -24,8 +24,6 @@ and GROM clocked by 3.12MHz/8=390kHz.
 #include "sound/sp0250.h"
 #include "speaker.h"
 
-// internal artwork
-#include "milton.lh" // clickable
 
 class milton_filter_device;
 
@@ -275,7 +273,7 @@ void milton_state::milton(machine_config &config)
 	gromclock.signal_handler().set(m_grom[0], FUNC(tmc0430_device::gclock_in));
 	gromclock.signal_handler().append(m_grom[1], FUNC(tmc0430_device::gclock_in));
 
-	config.set_default_layout(layout_milton);
+	config.set_default_layout("milton");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

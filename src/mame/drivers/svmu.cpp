@@ -22,7 +22,7 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#include "svmu.lh"
+
 
 
 #define     PIXEL_SIZE          7
@@ -331,7 +331,7 @@ void svmu_state::svmu(machine_config &config)
 	screen.set_screen_update("maincpu", FUNC(lc8670_cpu_device::screen_update));
 	screen.set_palette("palette");
 
-	config.set_default_layout(layout_svmu);
+	config.set_default_layout("svmu");
 	PALETTE(config, "palette", FUNC(svmu_state::svmu_palette), 2);
 
 	/* sound hardware */

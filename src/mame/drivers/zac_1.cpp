@@ -34,7 +34,7 @@ ToDo:
 #include "machine/genpin.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/timer.h"
-#include "zac_1.lh"
+
 
 class zac_1_state : public genpin_class
 {
@@ -273,7 +273,7 @@ void zac_1_state::zac_1(machine_config &config)
 	TIMER(config, "zac_1_outtimer").configure_periodic(FUNC(zac_1_state::zac_1_outtimer), attotime::from_hz(187500));
 
 	/* Video */
-	config.set_default_layout(layout_zac_1);
+	config.set_default_layout("zac_1");
 
 	/* Sound */
 	genpin_audio(config);

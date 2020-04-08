@@ -33,7 +33,7 @@ ToDo:
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"
-#include "sdk86.lh"
+
 
 #define I8251_TAG       "i8251"
 #define RS232_TAG       "rs232"
@@ -152,7 +152,7 @@ void sdk86_state::sdk86(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sdk86_state::sdk86_io);
 
 	/* video hardware */
-	config.set_default_layout(layout_sdk86);
+	config.set_default_layout("sdk86");
 
 	/* Devices */
 	i8251_device &i8251(I8251(config, I8251_TAG, 0));
