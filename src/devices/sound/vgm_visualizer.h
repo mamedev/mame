@@ -50,16 +50,31 @@ public:
 	void toggle_normalize();
 
 protected:
+	enum spec_viz_mode : int
+	{
+		SPEC_VIZ_BAR,
+		SPEC_VIZ_PILLAR,
+		SPEC_VIZ_TOP
+	};
+
 	enum viz_mode : int
 	{
 		VIZ_WAVEFORM,
 		VIZ_WATERFALL,
+
 		VIZ_SPEC_START,
-		VIZ_RAWSPEC = VIZ_SPEC_START,
-		VIZ_BARSPEC4,
-		VIZ_BARSPEC8,
-		VIZ_BARSPEC16,
-		VIZ_SPEC_END = VIZ_BARSPEC16,
+		VIZ_RAW_SPEC = VIZ_SPEC_START,
+		VIZ_TOP_SPEC,
+		VIZ_BAR_SPEC4,
+		VIZ_PILLAR_SPEC4,
+		VIZ_TOP_SPEC4,
+		VIZ_BAR_SPEC8,
+		VIZ_PILLAR_SPEC8,
+		VIZ_TOP_SPEC8,
+		VIZ_BAR_SPEC16,
+		VIZ_PILLAR_SPEC16,
+		VIZ_TOP_SPEC16,
+		VIZ_SPEC_END = VIZ_TOP_SPEC16,
 
 		VIZ_COUNT
 	};
@@ -86,7 +101,7 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_waveform(bitmap_rgb32 &bitmap);
 	void draw_waterfall(bitmap_rgb32 &bitmap);
-	void draw_spectrogram(bitmap_rgb32 &bitmap);
+	template <int BarSize, int SpecMode> void draw_spectrogram(bitmap_rgb32 &bitmap);
 
 	void fill_window();
 	void apply_window(uint32_t buf_index);
@@ -113,6 +128,9 @@ protected:
 	float m_curr_peaks[2];
 
 	float m_window[FFT_LENGTH];
+
+	bitmap_rgb32 m_bitmap;
+	bool m_clear_pending;
 
 	viz_mode m_viz_mode;
 
