@@ -5,26 +5,26 @@
 *
 * Schneider Rundfunkwerke AG Euro PC and Euro PC II driver
 *
-* Manuals and BIOS files: ftp://ftp.cpcszene.de/pub/Computer/Schneider_PC/EuroPC_XT/
+* Manuals and BIOS files: ftp://ftp.cpcszene.de/pub/Computer/Schneider_PC/EuroPC_XT/ (down), mirror at https://lanowski.de/mirrors/
 *
 * Euro PC: Computer and floppy drive integrated into the keyboard, 8088, 512K RAM, there was an upgrade card for the ISA slot that took it to 640K, single ISA slot
            FD360 external 360K 5.25" DS DD floppy, FD720 external 720K 3,5" DS DD floppy, HD-20 external harddisk, internal graphics card is CGA or Hercules, 64KB VRAM
 * Euro PC II: like Euro PC, socket for 8087, 768K RAM on board, driver on Schneider DOS disk allowed the portion over 640K to be used as extended memory or ramdisk.
-* Euro XT: conventional desktop, specs like Euro PC II, two ISA slots on a riser card, 102 key seperate keyboard, internal XT-IDE 20MB harddisk, connector for FD360 and FD720 was retained
+* Euro XT: conventional desktop, specs like Euro PC II, two ISA slots on a riser card, 102 key seperate keyboard, internal XTA (XT-IDE) 20MB harddisk, connector for FD360 and FD720 was retained
 *
-* Only BIOS versions >2.06 are supported so far because of changes in the memory management, according to https://www.forum64.de/index.php?thread/43066-schneider-euro-pc-i-ii-xt-welche-bios-version-habt-ihr/
-* Versions 2.04 and 2.05 only show a single dash on the top left of the screen.
+* https://www.forum64.de/index.php?thread/43066-schneider-euro-pc-i-ii-xt-welche-bios-version-habt-ihr/ claims Versions BIOS >=2.06 have a change in memory management.
+* Versions 2.04 and 2.05 only show a single dash on the top left of the screen, set slot 1 to from AGA to CGA or Hercules to get them to display.
 *
 * To get rid of the BIOS error messages when you first start the system, enter the BIOS with Ctrl-Alt-Esc, match the RAM size to your settings in MAME, set the CPU speed to 9.54MHz
-* and the graphics adapter to Color/Graphics 80, internal graphics off
+* and the graphics adapter to Color/Graphics 80 or Special Adapter, internal graphics off
 *
-* To-Do: * An external 20MB harddisk (Schneider HD20) can be added to the PC and PC II. This is a XT IDE drive. The BIOSs contain their own copy of the WD XT IDE BIOS that can be activated from the BIOS setup menu.
+* To-Do: * An external 20MB harddisk (Schneider HD20) can be added to the PC and PC II. This is a XTA (8-bit IDE) drive. The BIOSs contain their own copy of the WD XT IDE BIOS that can be activated from the BIOS setup menu.
 *          (load debug, then g=f000:a000 to enter formatter routine)
 *        * emulate internal graphics, but AGA is not quite the correct choice for the standard graphics adapter (it's a Commodore standard), as the Schneiders are only capable of switching between Hercules and CGA modes.
 *        * The PC 2 and XT have 768K of memory that can be configured from the BIOS setup as 640K, 640K+128K EMS and 512K+256K EMS. The EMS options are not visible in our emulation and loading the EMS driver fails.
 *          See http://forum.classic-computing.de/index.php?page=Thread&threadID=8380 for screenshots.
 *        * use correct AT style keyboard for XT
-*        * make BIOS versions v2.04 and v2.05 work
+*
 *
 *****************************************************************************************************/
 
