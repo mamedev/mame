@@ -622,7 +622,7 @@ public:
 
 	inline void populate(offs_t start, offs_t end, offs_t mirror, handler_entry_write<Width, AddrShift, Endian> *handler) {
 		start &= ~NATIVE_MASK;
-		end |= ~NATIVE_MASK;
+		end |= NATIVE_MASK;
 		if(mirror)
 			populate_mirror(start, end, start, end, mirror, handler);
 		else
@@ -634,7 +634,7 @@ public:
 
 	inline void populate_mismatched(offs_t start, offs_t end, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor) {
 		start &= ~NATIVE_MASK;
-		end |= ~NATIVE_MASK;
+		end |= NATIVE_MASK;
 
 		std::vector<mapping> mappings;
 		if(mirror)
