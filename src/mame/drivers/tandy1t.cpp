@@ -34,7 +34,12 @@ Tandy 1000 (80286) variations:
 1000RLX-HD          1024MB RAM          10.0/5.0 MHz    v02.00.00
 
 Tandy 1000 (80386) variations:
-1000RSX/1000RSX-HD  1M-9M RAM           25.0/8.0 MHz    v01.10.00 */
+1000RSX/1000RSX-HD  1M-9M RAM           25.0/8.0 MHz    v01.10.00 
+
+According to http://nerdlypleasures.blogspot.com/2014/04/the-original-8-bit-ide-interface.html 
+the 286 based Tandy 1000 TL/2, TL/3, RLX, RLX-B and the 8086 based Tandy 1000RL & RL-HD
+used XTA (8-bit IDE) harddisks.
+*/
 
 #include "emu.h"
 #include "machine/genpc.h"
