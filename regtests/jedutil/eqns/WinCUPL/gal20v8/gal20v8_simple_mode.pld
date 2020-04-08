@@ -1,0 +1,105 @@
+Name     GAL20V8 Simple Mode Test ;
+PartNo   00 ;
+Date     4/6/2020 ;
+Revision 01 ;
+Designer MAME ;
+Company  MAME ;
+Assembly None ;
+Location  ;
+Device   G20V8A ;
+
+/* Simple Mode Test */
+
+/* Input Pins */
+PIN 1   = [I1] ; 
+PIN 2   = [I2] ; 
+PIN 3   = [I3] ; 
+PIN 4   = [I4] ; 
+PIN 5   = [I5] ; 
+PIN 6   = [I6] ; 
+PIN 7   = [I7] ; 
+PIN 8   = [I8] ; 
+PIN 9   = [I9] ; 
+PIN 10  = [I10] ; 
+PIN 11  = [I11] ; 
+PIN 13  = [I13] ; 
+PIN 14  = [I14] ; 
+PIN 23  = [I23] ; 
+
+/* Output Pins */
+PINNODE 15  = [O15] ; 
+PINNODE 16  = [O16] ; 
+PINNODE 17  = [O17] ; 
+PINNODE 18  = [O18] ; 
+PINNODE 19  = [O19] ; 
+PINNODE 20  = [O20] ; 
+PINNODE 21  = [O21] ; 
+PINNODE 22  = [O22] ; 
+
+/* Logic Equations */
+
+O15 = I1 & !I2 #
+      I3 #
+      I4 & !I5 & I6 & I7 & !I8 & I9 #
+      !I10 & !I11 #
+      I13 #
+      I14 #
+      I23;
+O15.oe = !I23;
+
+O16 = I1 & I2 & I3 & I4 & I5 #
+      I6 & I7 & I8 & I9 & I10 #
+      I13 #
+      I14 & !O21 #
+      I23 #
+      !I5 & O17 & O18 #
+      !I2;
+
+O17 = !I7 & O21 #
+      I8 #
+      !I3 #
+      !I1 & !I2 & I3 #
+      !I4 & !I5 #
+      !I6 & !I7 & !I8 & !I9 & !I10 #
+      !O18;
+
+!O18 = I1 #
+       I3 #
+       I5 #
+       I7 #
+       I9 #
+       I11 #
+       I13;
+
+O19 = !I13 #
+      !I11 #
+      !I9 #
+      !I7 #
+      !I5 #
+      !I3 #
+      !I1;
+
+O20 = I6 #
+      I13 & O19 #
+      I1 & !I7 #
+      O18 #
+      I9 & !I13 #
+      I14 & !O17 #
+      !O16;
+
+!O21 = !I1 & I2 #
+       !I3 #
+       !I4 & I5 & !I6 & !I7 & I8 & !I9 #
+       I10 & I11 #
+       !I13 #
+       !I14 #
+       !I23;
+O21.oe = !I23;
+
+O22 = !I8 & I23 #
+      !O19 & I23 #
+      !O18 #
+      O17 #
+      O16 #
+      !I2 & I8 & I14 #
+      !I2 & !I4 & !I6 & !I8 & !I10 & !I14;
