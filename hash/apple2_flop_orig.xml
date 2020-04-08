@@ -12011,4 +12011,78 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="crscali">
+		<description>Crosscountry California</description>
+		<year>1991</year>
+		<publisher>Didatech Software</publisher>
+		<info name="release" value="2020-04-07"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234807">
+				<rom name="crosscountry california side a.woz" size="234807" crc="56f59507" sha1="c45ec9fa8e79dbc183a9f12561b1941b2cf64fcc"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234807">
+				<rom name="crosscountry california side b.woz" size="234807" crc="2a468b66" sha1="afa5652b8d9fd78739ee9ab6832a4198fdab2393"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrlncstl">
+		<description>Merlin's Castle</description>
+		<year>1983</year>
+		<publisher>General Masters</publisher>
+		<info name="release" value="2020-04-07"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234784">
+				<rom name="merlin's castle.woz" size="234784" crc="cc70b746" sha1="27dc19d8bee980679ec46257fd7ce836a0ce13ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kmpfgp10">
+		<description>Kampfgruppe (Version 1.0)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2020-04-07"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Game disk"/>
+			<dataarea name="flop" size="234782">
+				<rom name="kampfgruppe side a - game disk.woz" size="234782" crc="cade1355" sha1="191f53083835e2fe77b50d293391fcf85130ed66"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Historical scenarios"/>
+			<dataarea name="flop" size="234793">
+				<rom name="kampfgruppe side b - historical senarios.woz" size="234793" crc="43f3a85e" sha1="c045af7378e7dff9a3dac97e26e82543df3da566"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metinspc">
+		<description>Meteoroids in Space</description>
+		<year>1981</year>
+		<publisher>Quality Software</publisher>
+		<info name="release" value="2020-04-08"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+	
+    	<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="48405">
+				<rom name="meteoroids in space.woz" size="48405" crc="7beb3c05" sha1="61cdb1028a091a7bd85ac636f1f29087b57b4426"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
