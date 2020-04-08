@@ -1129,6 +1129,9 @@ static const struct gfx_range mapper_Q522B_table[] =
 };
 
 
+// TK263B, CD63B, PS63B (wof, dino, punisher) are equivalent, can be swapped on real pcb without issue
+// MB63B (slammast) can substitute any of the above but NOT vice-versa
+
 #define mapper_TK263B   { 0x8000, 0x8000, 0, 0 }, mapper_TK263B_table
 static const struct gfx_range mapper_TK263B_table[] =
 {
@@ -1147,14 +1150,6 @@ static const struct gfx_range mapper_TK263B_table[] =
 #define mapper_CD63B    { 0x8000, 0x8000, 0, 0 }, mapper_CD63B_table
 static const struct gfx_range mapper_CD63B_table[] =
 {
-	// /* type                              start   end     bank */
-	// { GFXTYPE_SCROLL1,                   0x0000, 0x0fff, 0 },
-	// { GFXTYPE_SPRITES,                   0x1000, 0x7fff, 0 },
-
-	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0xdfff, 1 },
-	// { GFXTYPE_SCROLL3,                   0xe000, 0xffff, 1 },
-	// { 0 }
-	
 	// verified from PAL dump:
 	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
 	// bank1 = pin 17 (ROMs 5,7) & pin 16 (ROMs 6,8)
@@ -1170,14 +1165,6 @@ static const struct gfx_range mapper_CD63B_table[] =
 #define mapper_PS63B    { 0x8000, 0x8000, 0, 0 }, mapper_PS63B_table
 static const struct gfx_range mapper_PS63B_table[] =
 {
-	// /* type                              start   end     bank */
-	// { GFXTYPE_SCROLL1,                   0x0000, 0x0fff, 0 },
-	// { GFXTYPE_SPRITES,                   0x1000, 0x7fff, 0 },
-
-	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0xdbff, 1 },
-	// { GFXTYPE_SCROLL3,                   0xdc00, 0xffff, 1 },
-	// { 0 }
-	
 	// verified from PAL dump:
 	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
 	// bank1 = pin 17 (ROMs 5,7) & pin 16 (ROMs 6,8)
@@ -1193,16 +1180,6 @@ static const struct gfx_range mapper_PS63B_table[] =
 #define mapper_MB63B    { 0x8000, 0x8000, 0x8000, 0 }, mapper_MB63B_table
 static const struct gfx_range mapper_MB63B_table[] =
 {
-	// /* type                              start    end      bank */
-	// { GFXTYPE_SCROLL1,                   0x00000, 0x00fff, 0 },
-	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x01000, 0x07fff, 0 },
-
-	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x08000, 0x0ffff, 1 },
-
-	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x10000, 0x167ff, 2 },
-	// { GFXTYPE_SCROLL3,                   0x16800, 0x17fff, 2 },
-	// { 0 }
-	
 	// verified from PAL dump:
 	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
 	// bank1 = pin 17 (ROMs 5,7) & pin 16 (ROMs 6,8)
@@ -1295,19 +1272,6 @@ static const struct gfx_range mapper_PKB10B_table[] =
 	{ GFXTYPE_SCROLL3,                   0x6000, 0x7fff, 0 },
 	{ 0 }
 };
-
-
-// #define mapper_pang3    { 0x8000, 0x8000, 0, 0 }, mapper_pang3_table
-// static const struct gfx_range mapper_pang3_table[] =
-// {
-	// /* type                              start   end     bank */
-	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x0000, 0x7fff, 0 },
-
-	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0x9fff, 1 },
-	// { GFXTYPE_SCROLL1,                   0xa000, 0xbfff, 1 },
-	// { GFXTYPE_SCROLL3,                   0xc000, 0xffff, 1 },
-	// { 0 }
-// };
 
 
 #define mapper_CP1B1F    { 0x10000, 0, 0, 0 }, mapper_CP1B1F_table
