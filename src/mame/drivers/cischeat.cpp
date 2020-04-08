@@ -2399,6 +2399,73 @@ ROM_START( bigrun )
 	ROM_LOAD( "br8951b.23",  0x000000, 0x010000, CRC(b9474fec) SHA1(f1f0eab014e8f52572484b83f56189e0ff6f2b0d) ) // 000xxxxxxxxxxxxx
 ROM_END
 
+ROM_START( bigrunu )
+	ROM_REGION( 0x80000, "cpu1", 0 )
+	ROM_LOAD16_BYTE( "br8950b.1",  0x000000, 0x040000, CRC(748d1525) SHA1(1e7d8d8bae07d4b81ca46640ffcbd501b5504008) )
+	ROM_LOAD16_BYTE( "br8950b.2",  0x000001, 0x040000, CRC(4164a542) SHA1(d889388784a9ecc502071ab7ccf05e8574d25cf1) )
+
+	ROM_REGION( 0x40000, "cpu2", 0 )
+	ROM_LOAD16_BYTE( "br8952a.19", 0x000000, 0x020000, CRC(fcf6b70c) SHA1(34f7ca29241925251a043c63062596d1c220b730) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "br8952a.20", 0x000001, 0x020000, CRC(c43d367b) SHA1(86242ba03cd172e95bf42eac369fb3acf42c7c45) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x40000, "cpu3", 0 )
+	ROM_LOAD16_BYTE( "br8952a.9",  0x000000, 0x020000, CRC(f803f0d9) SHA1(6d2e90e74bb15cd443d901ad0fc827117432daa6) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "br8952a.10", 0x000001, 0x020000, CRC(8c0df287) SHA1(3a2e689e2d841e2089b18267a8462f1acc40ae99) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_LOAD16_BYTE( "br8953c.2", 0x000000, 0x020000, CRC(b690d8d9) SHA1(317c0b4e9bef30c84daf16765af66f5a6f9d1c54) )
+	ROM_LOAD16_BYTE( "br8953c.1", 0x000001, 0x020000, CRC(79fc7bc0) SHA1(edb6cf626f93417cdc9525627d85a0ca9bcd1b1c) )
+
+	ROM_REGION16_BE( 0x40000, "user1", 0 )  // second halves of program ROMs
+	ROM_LOAD16_BYTE( "br8950b.3",   0x000000, 0x020000, CRC(864cebf7) SHA1(4e63106cd5832901688dfce2e450f536a6927c81) )
+	ROM_LOAD16_BYTE( "br8950b.4",   0x000001, 0x020000, CRC(702c2a6e) SHA1(cf3327919e24b7206d404b008cb00117e4308f94) )
+
+	ROM_REGION( 0x040000, "scroll0", 0 )
+	ROM_LOAD( "br8950b.5",  0x000000, 0x020000, CRC(0530764e) SHA1(0a89eab2ce9bd5df574a46bb6ea884c33407f122) )
+	ROM_LOAD( "br8950b.6",  0x020000, 0x020000, CRC(cf40ecfa) SHA1(96e1bfb7a33603a1eaaeb31386bba947fc005060) )
+
+	ROM_REGION( 0x040000, "scroll1", 0 )
+	ROM_LOAD( "br8950b.7",  0x000000, 0x020000, CRC(bd5fd061) SHA1(e5e0afb0a3a1d5f7a27bd04b724c48ea65872233) )
+	ROM_LOAD( "br8950b.8",  0x020000, 0x020000, CRC(7d66f418) SHA1(f6564ac9d65d40af17f5dd422c435aeb6a385256) )
+
+	ROM_REGION( 0x020000, "scroll2", 0 )
+	ROM_LOAD( "br8950b.9",  0x000000, 0x020000, CRC(be0864c4) SHA1(e0f1c0f09b30a731f0e062b1acb1b3a3a772a5cc) )
+
+	ROM_REGION( 0x280000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "mr88004a.t41",  0x000000, 0x080000, CRC(c781d8c5) SHA1(52b23842a20443b51490d701dca72fb0a3118033) )
+	ROM_LOAD16_BYTE( "mr88004d.t43",  0x000001, 0x080000, CRC(e4041208) SHA1(f5bd21b42f627b01bca2324082aecee7852a37e6) )
+	ROM_LOAD16_BYTE( "mr88004b.t42",  0x100000, 0x080000, CRC(2df2e7b9) SHA1(5772e0dc2f842077ea70a558b55ec5ceea693f00) )
+	ROM_LOAD16_BYTE( "mr88004e.t44",  0x100001, 0x080000, CRC(7af7fbf6) SHA1(5b8e2d3bb0c9f29f2c96f68c6d4c7fbf63e640c9) )
+	ROM_LOAD16_BYTE( "mb88004c.t48",  0x200000, 0x040000, CRC(02e2931d) SHA1(754b38929a2dd10d39634fb9cf737e3175a8b1ec) )
+	ROM_LOAD16_BYTE( "mb88004f.t49",  0x200001, 0x040000, CRC(4f012dab) SHA1(35f756b1c7b41f2e81ccbefb2075608a5d663152) )
+
+	ROM_REGION( 0x100000, "road0", 0 )
+	ROM_LOAD( "mr88004g.t45",  0x000000, 0x080000, CRC(bb397bae) SHA1(c67d33bde6e8de2ea7581faadb96acd977adc13c) )
+	ROM_LOAD( "mb88004h.t46",  0x080000, 0x080000, CRC(6b31a1ba) SHA1(71a956f0f51a63bddedfef0febdc95108ed42226) )
+
+	ROM_REGION( 0x100000, "road1", 0 )
+	ROM_LOAD( "mr88004g.t45",  0x000000, 0x080000, CRC(bb397bae) SHA1(c67d33bde6e8de2ea7581faadb96acd977adc13c) )
+	ROM_LOAD( "mb88004h.t46",  0x080000, 0x080000, CRC(6b31a1ba) SHA1(71a956f0f51a63bddedfef0febdc95108ed42226) )
+
+	// t50 & t51: 40000-5ffff = 60000-7ffff
+	ROM_REGION( 0x80000, "oki1", 0 )
+	ROM_LOAD( "mb88004l.t50", 0x000000, 0x020000, CRC(6b11fb10) SHA1(eb6e9614bb50b8fc332ada61882da484d34d727f) )
+	ROM_CONTINUE(             0x040000, 0x020000             )
+	ROM_CONTINUE(             0x020000, 0x020000             )
+	ROM_CONTINUE(             0x060000, 0x020000             )
+
+	ROM_REGION( 0x80000, "oki2", 0 )
+	ROM_LOAD( "mb88004m.t51", 0x000000, 0x020000, CRC(ee52f04d) SHA1(fc45bd1d3a7552433e40846c358573c6988127c3) )
+	ROM_CONTINUE(             0x040000, 0x020000             )
+	ROM_CONTINUE(             0x020000, 0x020000             )
+	ROM_CONTINUE(             0x060000, 0x020000             )
+
+	ROM_REGION( 0x20000, "user2", 0 )       /* ? Unused ROMs ? */
+	ROM_LOAD( "br8951b.21",  0x000000, 0x020000, CRC(59b9c26b) SHA1(09fea3b77b045d9c1ed62bf53efa8b5242a33a10) ) // x00xxxxxxxxxxxxx, mask=0001e0
+	ROM_LOAD( "br8951b.22",  0x000000, 0x020000, CRC(c112a803) SHA1(224a2ed690b78caef266958a93524211ff4a8e70) ) // x00xxxxxxxxxxxxx
+	ROM_LOAD( "br8951b.23",  0x000000, 0x010000, CRC(b9474fec) SHA1(f1f0eab014e8f52572484b83f56189e0ff6f2b0d) ) // 000xxxxxxxxxxxxx
+ROM_END
+
 void cischeat_state::init_bigrun()
 {
 	cischeat_untangle_sprites("sprites");   // Untangle sprites
@@ -3733,15 +3800,16 @@ void captflag_state::init_captflag()
 
 ***************************************************************************/
 
-GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_NODEVICE_LAN, layout_cischeat ) // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
-GAMEL( 1990, cischeat,  0,        cischeat, cischeat, cischeat_state, init_cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
-GAMEL( 1992, f1gpstar,  0,        f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 4.0)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAMEL( 1991, f1gpstar3, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 3.0)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAMEL( 1991, f1gpstar2, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 2.0)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAME(  1992, armchmp2,  0,        armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.7)",       MACHINE_IMPERFECT_GRAPHICS )
-GAME(  1992, armchmp2o2,armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.6)",       MACHINE_IMPERFECT_GRAPHICS )
-GAME(  1992, armchmp2o, armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 1.7)",       MACHINE_IMPERFECT_GRAPHICS )
-GAME(  1992, wildplt,   0,        wildplt,  wildplt,  wildplt_state,  init_f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
-GAMEL( 1993, f1gpstr2,  0,        f1gpstr2, f1gpstr2, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAME(  1993, captflag,  0,        captflag, captflag, captflag_state, init_captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )
-GAME(  1994, scudhamm,  0,        scudhamm, scudhamm, cischeat_state, empty_init,    ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )
+GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version, Europe?)", MACHINE_NODEVICE_LAN, layout_cischeat ) // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
+GAMEL( 1989, bigrunu,   bigrun,   bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version, US?)",     MACHINE_NODEVICE_LAN, layout_cischeat )
+GAMEL( 1990, cischeat,  0,        cischeat, cischeat, cischeat_state, init_cischeat, ROT0,   "Jaleco", "Cisco Heat",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
+GAMEL( 1992, f1gpstar,  0,        f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 4.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAMEL( 1991, f1gpstar3, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 3.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAMEL( 1991, f1gpstar2, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 2.0)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAME(  1992, armchmp2,  0,        armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.7)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1992, armchmp2o2,armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.6)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1992, armchmp2o, armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 1.7)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1992, wildplt,   0,        wildplt,  wildplt,  wildplt_state,  init_f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
+GAMEL( 1993, f1gpstr2,  0,        f1gpstr2, f1gpstr2, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAME(  1993, captflag,  0,        captflag, captflag, captflag_state, init_captflag, ROT270, "Jaleco", "Captain Flag (Japan)",                   MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1994, scudhamm,  0,        scudhamm, scudhamm, cischeat_state, empty_init,    ROT270, "Jaleco", "Scud Hammer",                            MACHINE_IMPERFECT_GRAPHICS )
