@@ -1065,6 +1065,10 @@ ROM_START( ibm5162 ) //MB p/n 62x1168 - IBM 5162, 6 Mhz, zero wait state RAM
 	ROM_LOAD( "59x7594.82s147an.u90", 0x0020, 0x0200, NO_DUMP) /* S N82S147AN 8629 // VCT 59X7594 */
 ROM_END
 
+
+// According to http://nerdlypleasures.blogspot.com/2014/04/the-original-8-bit-ide-interface.html
+// the IBM PS/1 Model 2011 use a customised version of the XTA (8-bit IDE) harddisk interface
+
 ROM_START( ibmps1es )
 	ROM_REGION16_LE(0x40000, "bios", 0)
 	ROM_LOAD16_BYTE( "ibm_1057757_24-05-90.bin", 0x00000, 0x20000, CRC(c8f81ea4) SHA1(925ed0e98f9f2997cb86554ef384bcfaf2a4ecbe))

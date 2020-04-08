@@ -25,7 +25,7 @@ RAM: 640K
 Bus: 3x ISA
 Video: On board: MDA/CGA/Hercules/Plantronics
 Mass storage: 1x Floppy 5.25" 360K and (PC10) another 360K or (PC20) 3.5" harddisk
-On board ports: Floppy, XT-IDE Harddisk, Mouse, serial, parallel, RTC, Speaker
+On board ports: Floppy, XTA(8-bit IDE) Harddisk, Mouse, serial, parallel, RTC, Speaker
 Options: 8087 FPU
 ***************************************************************************/
 
