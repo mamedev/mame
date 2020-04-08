@@ -1860,7 +1860,7 @@ void dec0_automat_state::automat(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec0_automat_state::automat_s_map);
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
+	MCFG_VIDEO_START_OVERRIDE(dec0_automat_state,dec0_nodma)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
@@ -1936,7 +1936,7 @@ void dec0_automat_state::secretab(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec0_automat_state::secretab_s_map);
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
+	MCFG_VIDEO_START_OVERRIDE(dec0_automat_state,slyspy)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
@@ -1954,6 +1954,7 @@ void dec0_automat_state::secretab(machine_config &config)
 	DECO_BAC06(config, m_tilegen[1], 0);
 	m_tilegen[1]->set_gfx_region_wide(0, 1, 0);
 	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+	m_tilegen[1]->set_tile_callback(FUNC(dec0_automat_state::baddudes_tile_cb));
 
 	DECO_BAC06(config, m_tilegen[2], 0);
 	m_tilegen[2]->set_gfx_region_wide(0, 2, 0);
@@ -2035,7 +2036,7 @@ void dec0_state::bandit(machine_config &config)
 	mcu.port_out_cb<3>().set(FUNC(dec0_state::dec0_mcu_port3_w));
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(dec0_state::screen_update_bandit));
+	m_screen->set_screen_update(FUNC(dec0_state::screen_update_hbarrel));
 	m_spritegen->set_colpri_callback(FUNC(dec0_state::bandit_colpri_cb));
 }
 
@@ -2051,6 +2052,11 @@ void dec0_state::baddudes(machine_config &config)
 	mcu.port_out_cb<3>().set(FUNC(dec0_state::dec0_mcu_port3_w));
 
 	/* video hardware */
+	MCFG_VIDEO_START_OVERRIDE(dec0_state,baddudes)
+
+	m_tilegen[1]->set_tile_callback(FUNC(dec0_state::baddudes_tile_cb));
+	m_tilegen[2]->set_tile_callback(FUNC(dec0_state::baddudes_tile_cb));
+
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_baddudes));
 }
 
@@ -2059,6 +2065,11 @@ void dec0_state::drgninjab(machine_config &config)
 	dec0(config);
 
 	/* video hardware */
+	MCFG_VIDEO_START_OVERRIDE(dec0_state,baddudes)
+
+	m_tilegen[1]->set_tile_callback(FUNC(dec0_state::baddudes_tile_cb));
+	m_tilegen[2]->set_tile_callback(FUNC(dec0_state::baddudes_tile_cb));
+
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_baddudes));
 }
 
@@ -2129,7 +2140,7 @@ void dec0_state::hippodrm(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(300));   /* Interleave between H6280 & 68000 */
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(dec0_state::screen_update_hippodrm));
+	m_screen->set_screen_update(FUNC(dec0_state::screen_update_robocop));
 	m_screen->screen_vblank().set_inputline(m_subcpu, 1); /* VBL */
 }
 
@@ -2145,7 +2156,7 @@ void dec0_state::ffantasybl(machine_config &config)
 //  config.set_maximum_quantum(attotime::from_hz(300));   /* Interleave between H6280 & 68000 */
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(dec0_state::screen_update_hippodrm));
+	m_screen->set_screen_update(FUNC(dec0_state::screen_update_robocop));
 }
 
 MACHINE_RESET_MEMBER(dec0_state,slyspy)
@@ -2175,6 +2186,10 @@ void dec0_state::slyspy(machine_config &config)
 	ADDRESS_MAP_BANK(config, "sndprotect").set_map(&dec0_state::slyspy_sound_protection_map).set_options(ENDIANNESS_LITTLE, 8, 21, 0x80000);
 
 	/* video hardware */
+	MCFG_VIDEO_START_OVERRIDE(dec0_state,slyspy)
+
+	m_tilegen[1]->set_tile_callback(FUNC(dec0_state::baddudes_tile_cb));
+
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_slyspy));
 
 	MCFG_MACHINE_RESET_OVERRIDE(dec0_state,slyspy)
@@ -2194,7 +2209,7 @@ void dec0_state::midres(machine_config &config)
 	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(dec0_state::screen_update_midres));
+	m_screen->set_screen_update(FUNC(dec0_state::screen_update_robocop));
 	m_spritegen->set_colpri_callback(FUNC(dec0_state::midres_colpri_cb));
 
 	m_gfxdecode->set_info(gfx_midres);
