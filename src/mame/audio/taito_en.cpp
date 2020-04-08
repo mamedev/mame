@@ -68,7 +68,6 @@ void taito_en_device::device_reset()
 
 	/* reset CPU to catch any banking of startup vectors */
 	m_audiocpu->reset();
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

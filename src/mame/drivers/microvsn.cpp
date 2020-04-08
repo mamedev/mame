@@ -16,12 +16,14 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/tms1000/tms1100.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+
 #include "emupal.h"
 #include "softlist.h"
 #include "screen.h"
@@ -39,8 +41,8 @@ public:
 	microvision_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_dac( *this, "dac" ),
-		m_i8021( *this, "maincpu1" ),
-		m_tms1100( *this, "maincpu2" ),
+		m_i8021( *this, "i8021_cpu" ),
+		m_tms1100( *this, "tms1100_cpu" ),
 		m_cart(*this, "cartslot")
 	{ }
 
@@ -103,8 +105,8 @@ private:
 	rc_type     m_rc_type;
 
 	required_device<dac_byte_interface> m_dac;
-	required_device<i8021_device> m_i8021;
-	required_device<tms1100_cpu_device> m_tms1100;
+	optional_device<i8021_device> m_i8021;
+	optional_device<tms1100_cpu_device> m_tms1100;
 	required_device<generic_slot_device> m_cart;
 
 	// Timers
@@ -508,8 +510,8 @@ u32 microvision_state::tms1100_decode_micro(offs_t offset)
 
 DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 {
-	uint8_t *rom1 = memregion("maincpu1")->base();
-	uint8_t *rom2 = memregion("maincpu2")->base();
+	uint8_t *rom1 = memregion("i8021_cpu")->base();
+	uint8_t *rom2 = memregion("tms1100_cpu")->base();
 	uint32_t file_size = m_cart->common_get_size("rom");
 
 	if ( file_size != 1024 && file_size != 2048 )
@@ -589,7 +591,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 		}
 	}
 
-	// Mirror rom data to maincpu2 region
+	// Mirror rom data to tms1100_cpu region
 	memcpy(rom2, rom1, file_size);
 
 	// Based on file size select cpu:
@@ -653,6 +655,7 @@ INPUT_PORTS_END
 
 void microvision_state::microvision(machine_config &config)
 {
+	/* basic machine hardware */
 	I8021(config, m_i8021, 0);
 	m_i8021->bus_out_cb().set(FUNC(microvision_state::i8021_p0_write));
 	m_i8021->p1_out_cb().set(FUNC(microvision_state::i8021_p1_write));
@@ -667,6 +670,7 @@ void microvision_state::microvision(machine_config &config)
 	m_tms1100->o().set(FUNC(microvision_state::tms1100_write_o));
 	m_tms1100->r().set(FUNC(microvision_state::tms1100_write_r));
 
+	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(0);
@@ -685,20 +689,21 @@ void microvision_state::microvision(machine_config &config)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "microvision_cart"));
-	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(microvision_state::cart_load));
+	/* cartridge */
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "microvision_cart");
+	m_cart->set_must_be_loaded(true);
+	m_cart->set_device_load(FUNC(microvision_state::cart_load));
 
-	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("microvision");
 }
 
 
 ROM_START( microvsn )
-	ROM_REGION( 0x800, "maincpu1", ROMREGION_ERASE00 )
-	ROM_REGION( 0x800, "maincpu2", ROMREGION_ERASE00 )
-	ROM_REGION( 867, "maincpu2:mpla", ROMREGION_ERASE00 )
-	ROM_REGION( 365, "maincpu2:opla", ROMREGION_ERASE00 )
+	// nothing here yet, ROM is on the cartridge
+	ROM_REGION( 0x800, "i8021_cpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800, "tms1100_cpu", ROMREGION_ERASE00 )
+	ROM_REGION( 867, "tms1100_cpu:mpla", ROMREGION_ERASE00 )
+	ROM_REGION( 365, "tms1100_cpu:opla", ROMREGION_ERASE00 )
 ROM_END
 
 

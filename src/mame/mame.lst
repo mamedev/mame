@@ -35061,10 +35061,7 @@ safarir                         // (c) 1980 Shin Nihon Kikaku (SNK) + Taito lice
 safarirj                        // (c) 1979 Shin Nihon Kikaku (SNK)
 
 @source:sag.cpp
-sag_baseb4
-sag_footb4
-sag_pinb
-sag_sinv2
+sag
 
 @source:sage2.cpp
 sage2                           //
