@@ -57,6 +57,7 @@ static char option_nobuffer[50];
 static char option_saves[50];
 static char option_buttons_profiles[50];
 static char option_mame_paths[50];
+static char option_mame_4way[50];
 
 static char option_res[50];
 
@@ -68,7 +69,7 @@ retro_log_printf_t log_cb;
 
 static bool draw_this_frame;
 
-//FIXME: re-add way to handle 16/32 bit 
+//FIXME: re-add way to handle 16/32 bit
 #ifdef M16B
 uint16_t videoBuffer[4096*3072];
 #define LOG_PIXEL_BYTES 1
@@ -157,6 +158,7 @@ void retro_set_environment(retro_environment_t cb)
    sprintf(option_res,"%s_%s",core,"altres");
    sprintf(option_buttons_profiles, "%s_%s", core, "buttons_profiles");
    sprintf(option_mame_paths, "%s_%s", core, "mame_paths_enable");
+   sprintf(option_mame_4way, "%s_%s", core, "mame_4way_enable");
 
    static const struct retro_variable vars[] = {
     { option_read_config, "Read configuration; disabled|enabled" },
@@ -179,6 +181,8 @@ void retro_set_environment(retro_environment_t cb)
     { option_cli, "Boot from CLI; disabled|enabled" },
     { option_res, "Resolution; 640x480|640x360|800x600|800x450|960x720|960x540|1024x768|1024x576|1280x960|1280x720|1600x1200|1600x900|1440x1080|1920x1080|1920x1440|2560x1440|2880x2160|3840x2160" },
     { option_mame_paths, "MAME INI Paths; disabled|enabled" },
+
+    { option_mame_4way, "MAME Joystick 4-way simulation; disabled|4way|strict|qbert"},
     { NULL, NULL },
    };
 
@@ -316,7 +320,7 @@ video_changed=true;
          alternate_renderer = true;
 	video_changed=true;
 	NEWGAME_FROM_OSD=1;
-		
+
    }
 
    var.key   = option_osd;
@@ -414,7 +418,7 @@ video_changed=true;
       if (!strcmp(var.value, "enabled"))
          write_config_enable = true;
    }
-   
+
    var.key   = option_mame_paths;
    var.value = NULL;
 
@@ -424,6 +428,23 @@ video_changed=true;
          mame_paths_enable = true;
       if (!strcmp(var.value, "disabled"))
          mame_paths_enable = false;
+   }
+
+   var.key   = option_mame_4way;
+   var.value = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+      log_cb(RETRO_LOG_INFO, "Joystick map: %s\n", var.value);
+      mame_4way_enable = true;
+      if (!strcmp(var.value, "disabled"))
+         mame_paths_enable = false;
+      if (!strcmp(var.value, "4way"))
+         sprintf(mame_4way_map, "%s", "s8.4s8.44s8.4445");
+      if (!strcmp(var.value, "strict"))
+         sprintf(mame_4way_map, "%s", "ss8.sss8.4sss8.44s5.4445");
+      if (!strcmp(var.value, "qbert"))
+         sprintf(mame_4way_map, "%s", "4444s8888.444408888.444458888.444555888.ss5.222555666.222256666.222206666.222206666");
    }
 
    struct retro_input_descriptor desc[] = {
@@ -565,7 +586,7 @@ void retro_init (void)
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY, &save_dir) && save_dir)
    {
-      /* If save directory is defined use it, 
+      /* If save directory is defined use it,
        * otherwise use system directory. */
       retro_save_directory = *save_dir ? save_dir : retro_system_directory;
 
@@ -573,7 +594,7 @@ void retro_init (void)
    else
    {
       /* make retro_save_directory the same,
-       * in case RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY 
+       * in case RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY
        * is not implemented by the frontend. */
       retro_save_directory=retro_system_directory;
    }
