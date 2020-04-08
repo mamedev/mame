@@ -157,6 +157,9 @@ void powerins_state::video_start()
 	save_item(NAME(m_tile_bank));
 	save_pointer(NAME(m_spritebuffer[0]), 0x1000/2);
 	save_pointer(NAME(m_spritebuffer[1]), 0x1000/2);
+	 // fixed offset
+	m_tilemap[0]->set_scrolldx(32,32);
+	m_tilemap[1]->set_scrolldx(32,32);
 }
 
 
@@ -231,10 +234,8 @@ uint32_t powerins_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	int scrollx = (m_vctrl_0[2/2]&0xff) | ((m_vctrl_0[0/2]&0xff)<<8);
 	int scrolly = (m_vctrl_0[6/2]&0xff) | ((m_vctrl_0[4/2]&0xff)<<8);
 
-	m_tilemap[0]->set_scrollx(0, scrollx - 0x20);
-	m_tilemap[0]->set_scrolly(0, scrolly );
-
-	m_tilemap[1]->set_scrollx(0, -0x20); // fixed offset
+	m_tilemap[0]->set_scrollx(0, scrollx);
+	m_tilemap[0]->set_scrolly(0, scrolly);
 
 #ifdef MAME_DEBUG
 if (machine().input().code_pressed(KEYCODE_Z))

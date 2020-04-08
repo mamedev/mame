@@ -383,7 +383,7 @@ void nmk16_state::scroll_w(offs_t offset, u8 data)
 
 			}
 		}
-		m_bg_tilemap[Layer]->set_scrollx(0,((m_scroll[Layer][0] << 8) | m_scroll[Layer][1]) - m_videoshift);
+		m_bg_tilemap[Layer]->set_scrollx(0,(m_scroll[Layer][0] << 8) | m_scroll[Layer][1]);
 	}
 }
 
