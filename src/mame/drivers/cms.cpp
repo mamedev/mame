@@ -167,7 +167,7 @@ void cms_state::cms6502(machine_config &config)
 	VIA6522(config, m_via, 1_MHz_XTAL);
 	m_via->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
-	M3002(config, "rtc", 32768);
+	M3002(config, "rtc", 32.768_kHz_XTAL);
 
 	/* 7 Slot Backplane */
 	ACORN_BUS(config, m_bus, 0);

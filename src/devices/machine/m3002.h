@@ -46,6 +46,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(irq_r) { return m_irq_active ? 0 : 1; }
 
 protected:
+	m3002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
@@ -95,7 +97,17 @@ private:
 	emu_timer *m_second_timer;
 };
 
-// device type declaration
+// ======================> m3000_device
+
+class m3000_device : public m3002_device
+{
+public:
+	// device type constructor
+	m3000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+// device type declarations
 DECLARE_DEVICE_TYPE(M3002, m3002_device)
+DECLARE_DEVICE_TYPE(M3000, m3000_device)
 
 #endif // MAME_MACHINE_M3002_H

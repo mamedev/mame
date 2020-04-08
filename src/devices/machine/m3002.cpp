@@ -7,13 +7,14 @@
     TODO:
     - Pulse output (256 Hz, second, minute, hour)
     - Test mode
+    - Emulate M 3000 differences (if any meaningful ones exist)
 
 **********************************************************************/
 
 #include "emu.h"
 #include "m3002.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 //**************************************************************************
@@ -21,6 +22,7 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(M3002, m3002_device, "m3002", "EM M 3002 Real Time Clock")
+DEFINE_DEVICE_TYPE(M3000, m3000_device, "m3000", "EM M 3000 Real Time Clock")
 
 //**************************************************************************
 //  DEVICE CONSTRUCTION AND INITIALIZATION
@@ -32,8 +34,8 @@ ALLOW_SAVE_TYPE(m3002_device::mux_state);
 //  m3002_device - constructor
 //-------------------------------------------------
 
-m3002_device::m3002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, M3002, tag, owner, clock)
+m3002_device::m3002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, device_rtc_interface(mconfig, *this)
 	, m_irq_callback(*this)
@@ -44,6 +46,21 @@ m3002_device::m3002_device(const machine_config &mconfig, const char *tag, devic
 	, m_second_timer(nullptr)
 {
 	std::fill_n(&m_ram[0], 0x10, 0);
+}
+
+m3002_device::m3002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: m3002_device(mconfig, M3002, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  m3000_device - constructor
+//-------------------------------------------------
+
+m3000_device::m3000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: m3002_device(mconfig, M3000, tag, owner, clock)
+{
 }
 
 
