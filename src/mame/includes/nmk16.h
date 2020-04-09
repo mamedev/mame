@@ -62,6 +62,7 @@ public:
 	void manybloc(machine_config &config);
 	void acrobatm(machine_config &config);
 	void strahl(machine_config &config);
+	void strahljbl(machine_config &config);
 	void tdragon3h(machine_config &config);
 	void hachamf_prot(machine_config &config);
 	void macross(machine_config &config);
@@ -217,6 +218,7 @@ protected:
 	void ssmissin_map(address_map &map);
 	void ssmissin_sound_map(address_map &map);
 	void strahl_map(address_map &map);
+	void strahljbl_map(address_map &map);
 	void tdragon2_map(address_map &map);
 	void tdragon3h_map(address_map &map);
 	void tdragon_map(address_map &map);
