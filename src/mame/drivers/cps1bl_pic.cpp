@@ -991,6 +991,71 @@ ROM_START( dinopic3 )
 	ROM_LOAD( "6_palce16v8.bin", 0xc00, 0x117, CRC(9ae375ba) SHA1(6f227c2a5b1170a41e6419f12d1e1f98edc6f8e5) )  // dinopic2
 ROM_END
 
+/*
+    Jurassic 99 (Cadillacs and Dinosaurs bootleg)
+    pcb marking: H11F6
+	
+	  __________________________________________
+	  |TDA2003(V)  U6295  ROM 30MHz   6116      |
+	  | 93C46   EM78P447AP            6116      |
+	==                                6116      |
+	==       6116                     6116      |
+	==       6116       P2                      |
+	==                       P3       A1020A    |
+	==         (T)                        P8    |
+	==       62256               P6     6116    |
+	==       62256                      6116    |
+	==       ROM1            P4  P8             |
+	==       ROM2            P5  P8   GFXROM1   |
+	==                    62256  P8             |
+	  # 68K  P1   24MHz   62256  P8	  GFXROM2   |
+	  |_________________________________________|
+	
+	V = volume pot
+    # = player 3 connector	
+	T = test mode button
+	U6295 = oki M6295 clone
+*/
+ROM_START( jurassic99 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "210204_rom2.bin",  0x000000, 0x100000, CRC(3f713043) SHA1(90e81c651772e895a56146c986c64ff8c35826ac) )
+	ROM_LOAD16_WORD_SWAP( "210105a_rom1.bin", 0x100000, 0x100000, CRC(e6294edf) SHA1(4f9515e2e060dad165f6cb513baee2568c82c1be) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )  // TODO: dump, use dinopic3 for now
+	ROM_LOAD64_WORD("tb416-02_27c160.bin", 0x000000, 0x80000, CRC(bfd01d21) SHA1(945f2764b0ca7f9e1569a591363c70207e8efbd0) )
+	ROM_CONTINUE( 0x200000, 0x80000 )
+	ROM_CONTINUE( 0x000004, 0x80000 )
+	ROM_CONTINUE( 0x200004, 0x80000 )
+	ROM_LOAD64_WORD("tb415-01_27c160.bin", 0x000002, 0x80000, CRC(ef508ec5) SHA1(ebb521b51d7269b4a9b441bd44b6d5320a72aaaa) )
+	ROM_CONTINUE( 0x200002, 0x80000 )
+	ROM_CONTINUE( 0x000006, 0x80000 )
+	ROM_CONTINUE( 0x200006, 0x80000 )
+
+	// EMC EM78P447AP, secured?
+	//ROM_REGION( 0x2000, "audiocpu", 0 )
+	//ROM_LOAD( "pic_t1.bin", 0x0000, 0x1007, NO_DUMP )
+
+	ROM_REGION( 0x80000, "oki", 0 )  // TODO: dump, use dinopic3 for now
+	ROM_LOAD( "ti-i_27c040.bin", 0x000000, 0x80000, CRC(7d921309) SHA1(d51e60e904d302c2516b734189e141aa171b2b82) )
+
+	/* pld devices:
+	U25    ATF20V8B-15PC  1?
+	U66    ATF16V8B-15PC  2
+	U100   ATF16V8B-15PC  3
+	U118   ATF20V8B-15PC  4?  socketed, secured
+	U146   ATF20V8B-15PC  5
+	U160   ATF16V8B-15PC  6
+	U97G   ATF16V8B-15PC  8
+	U96G   ATF16V8B-15PC  8
+	U98G   ATF16V8B-15PC  8
+	U99G   ATF16V8B-15PC  8
+	U134G  ATF16V8B-15PC  8?
+	U124   Actel A1020A   84-pin PLCC
+	
+	the number is hand-written on chip, ? = hard to read or rubbed off, 8's are the same?, no #7?
+	*/
+ROM_END
+
 
 // ************************************************************************* PUNIPIC, PUNIPIC2, PUNIPIC3
 
@@ -1329,9 +1394,10 @@ ROM_END
 
 // ************************************************************************* DRIVER MACROS
 
-GAME( 1993,  dinopic,   dino,      dinopic,   dino,      cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 1)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
-GAME( 1993,  dinopic2,  dino,      dinopic,   dino,      cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // 930201 ETC
-GAME( 1993,  dinopic3,  dino,      dinopic,   dino,      cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 3)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
+GAME( 1993,  dinopic,    dino,     dinopic,   dino,      cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 1)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
+GAME( 1993,  dinopic2,   dino,     dinopic,   dino,      cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // 930201 ETC
+GAME( 1993,  dinopic3,   dino,     dinopic,   dino,      cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 3)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
+GAME( 1993,  jurassic99, dino,     dinopic,   dino,      cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Jurassic 99 (Cadillacs and Dinosaurs bootleg with EM78P447AP)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // ?
 
 GAME( 1993,  punipic,   punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
 GAME( 1993,  punipic2,  punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
