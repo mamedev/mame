@@ -55,7 +55,19 @@ private:
 bool osd_font_osx::open(std::string const &font_path, std::string const &name, int &height)
 {
 	osd_printf_verbose("osd_font_osx::open: name=\"%s\"\n", name);
-	CFStringRef const font_name(CFStringCreateWithCString(nullptr, name.c_str(), kCFStringEncodingUTF8));
+
+	CFStringRef font_name;
+	if (!strcmp(name.c_str(), "default"))
+	{
+		// Arial Unicode MS comes with Mac OS X 10.5 and later and is the only Mac default font with
+		// the Unicode characters used by the vgmplay and aristmk5 layouts.
+		font_name = CFStringCreateWithCString(nullptr, "Arial Unicode MS", kCFStringEncodingUTF8);
+	}
+	else
+	{
+		font_name = CFStringCreateWithCString(nullptr, name.c_str(), kCFStringEncodingUTF8);
+	}
+
 	if (!font_name)
 	{
 		osd_printf_verbose("osd_font_osx::open: failed to create CFString from font name (invalid UTF-8?)\n");
@@ -141,9 +153,16 @@ bool osd_font_osx::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_
 		osd_printf_verbose("osd_font_osd::get_bitmap: failed to get glyph for U+%04X\n", unsigned(chnum));
 
 	// try to get glyph metrics
+	#if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_11
+	CGRect const bounds(CTFontGetBoundingRectsForGlyphs(m_font, kCTFontOrientationHorizontal, &glyph, nullptr, count));
+	CGSize advance(CGSizeZero);
+	CTFontGetAdvancesForGlyphs(m_font, kCTFontOrientationHorizontal, &glyph, &advance, count);
+	#else
 	CGRect const bounds(CTFontGetBoundingRectsForGlyphs(m_font, kCTFontHorizontalOrientation, &glyph, nullptr, count));
 	CGSize advance(CGSizeZero);
 	CTFontGetAdvancesForGlyphs(m_font, kCTFontHorizontalOrientation, &glyph, &advance, count);
+	#endif
+
 
 	// CGNullRect can indicate failure, but it's also a valid rectangle for spaces in some fonts (e.g. Hiragino family)
 	if (CGRectEqualToRect(bounds, CGRectNull) && CGSizeEqualToSize(advance, CGSizeZero))
@@ -171,7 +190,12 @@ bool osd_font_osx::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_
 		CGContextSetRGBFillColor(context_ref, 1.0, 1.0, 1.0, 1.0);
 		CGContextSetFont(context_ref, font_ref);
 		CGContextSetFontSize(context_ref, POINT_SIZE);
+		#if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_9
+		CGPoint pos = CGPointMake(0, 0);
+		CTFontDrawGlyphs(m_font, &glyph, &pos, 1, context_ref);
+		#else
 		CGContextShowGlyphs(context_ref, &glyph, count);
+		#endif
 		CGFontRelease(font_ref);
 		CGContextRelease(context_ref);
 	}
