@@ -153,7 +153,7 @@ bool osd_font_osx::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_
 		osd_printf_verbose("osd_font_osd::get_bitmap: failed to get glyph for U+%04X\n", unsigned(chnum));
 
 	// try to get glyph metrics
-	#if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_11
+	#if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 101100
 	CGRect const bounds(CTFontGetBoundingRectsForGlyphs(m_font, kCTFontOrientationHorizontal, &glyph, nullptr, count));
 	CGSize advance(CGSizeZero);
 	CTFontGetAdvancesForGlyphs(m_font, kCTFontOrientationHorizontal, &glyph, &advance, count);
@@ -190,7 +190,7 @@ bool osd_font_osx::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_
 		CGContextSetRGBFillColor(context_ref, 1.0, 1.0, 1.0, 1.0);
 		CGContextSetFont(context_ref, font_ref);
 		CGContextSetFontSize(context_ref, POINT_SIZE);
-		#if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_9
+		#if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 1090
 		CGPoint pos = CGPointMake(0, 0);
 		CTFontDrawGlyphs(m_font, &glyph, &pos, 1, context_ref);
 		#else
