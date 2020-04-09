@@ -562,6 +562,8 @@ void sorcerer_state::sorcerera(machine_config &config)
 	m_fdc4->drq_wr_callback().set(FUNC(sorcerer_state::intrq4_w));
 	FLOPPY_CONNECTOR(config, "fdc4:0", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc4:1", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc4:2", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc4:3", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	//SOFTWARE_LIST(config, "flop_list").set_original("sorcerer_flop");   // no suitable software yet
 
 	// internal ram
@@ -589,6 +591,8 @@ void sorcerer_state::sorcererb(machine_config &config)
 	m_fdc3->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
 	FLOPPY_CONNECTOR(config, "fdc3:0", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc3:1", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc3:2", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc3:3", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	//SOFTWARE_LIST(config, "flop_list").set_original("sorcerer_flop");   // no suitable software yet
 
 	config.device_remove("cartslot");
