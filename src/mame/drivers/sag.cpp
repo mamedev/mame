@@ -103,40 +103,8 @@ void sag_state::machine_start()
 
 
 /******************************************************************************
-    I/O
+    Cartridge Init
 ******************************************************************************/
-
-// main unit
-
-void sag_state::update_display()
-{
-	// grid 0-7 are the 'pixels'
-	m_display->matrix_partial(0, 8, m_grid, m_plate, false);
-
-	// grid 8-13 are 7segs
-	u8 seg = bitswap<7>(m_plate,4,5,6,7,8,9,10);
-	m_display->matrix_partial(8, 6, m_grid >> 8, seg);
-}
-
-u8 sag_state::input_r()
-{
-	u8 data = 0;
-
-	// grid 1-6 double as input mux
-	for (int i = 0; i < 6; i++)
-		if (BIT(m_grid, i + 1))
-			data |= m_inputs[i]->read();
-
-	return data;
-}
-
-void sag_state::speaker_w(int state)
-{
-	m_speaker->level_w(state);
-}
-
-
-// cartridge loading
 
 DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 {
@@ -151,6 +119,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
+	// detect MCU on file size
 	if (size == 0x1000)
 	{
 		// TMS1670 MCU
@@ -197,6 +166,41 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 	}
 
 	return image_init_result::PASS;
+}
+
+
+
+/******************************************************************************
+    I/O
+******************************************************************************/
+
+// main unit
+
+void sag_state::update_display()
+{
+	// grid 0-7 are the 'pixels'
+	m_display->matrix_partial(0, 8, m_grid, m_plate, false);
+
+	// grid 8-13 are 7segs
+	u8 seg = bitswap<7>(m_plate,4,5,6,7,8,9,10);
+	m_display->matrix_partial(8, 6, m_grid >> 8, seg);
+}
+
+u8 sag_state::input_r()
+{
+	u8 data = 0;
+
+	// grid 1-6 double as input mux
+	for (int i = 0; i < 6; i++)
+		if (BIT(m_grid, i + 1))
+			data |= m_inputs[i]->read();
+
+	return data;
+}
+
+void sag_state::speaker_w(int state)
+{
+	m_speaker->level_w(state);
 }
 
 

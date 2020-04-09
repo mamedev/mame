@@ -88,7 +88,7 @@
  @MP3415   TMS1100   1978, Coleco Electronic Quarterback
  @MP3435   TMS1100   1979, Coleco Zodiac
  @MP3438A  TMS1100   1979, Kenner Star Wars Electronic Battle Command
-  MP3450A  TMS1100   1979, MicroVision cartridge: Blockbuster
+  MP3450A  TMS1100   1979, MicroVision cartridge: Block Buster
   MP3454   TMS1100   1979, MicroVision cartridge: Star Trek Phaser Strike
   MP3455   TMS1100   1980, MicroVision cartridge: Pinball
   MP3457   TMS1100   1979, MicroVision cartridge: Mindbuster

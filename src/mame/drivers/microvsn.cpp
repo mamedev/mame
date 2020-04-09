@@ -1,17 +1,28 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
+// thanks-to:Kevin Horton, Sean Riddle
 /***************************************************************************
 
-    Milton Bradley MicroVision
+Milton Bradley MicroVision, handheld game console
 
-    To Do:
-    * Add support for the paddle control
-    * Finish support for i8021 based cartridges
+Hardware notes:
+- SCUS0488(Hughes HLCD0488) LCD, 16*16 screen
+- piezo, 12 buttons under membrane + analog dial
+- no CPU on console, it is on the cartridge
+
+12 games were released, all of them have a TMS1100 MCU, with the exception
+of Connect Four which has a TMS1100 version and I8021 version.
 
 Since the microcontrollers were on the cartridges it was possible to have
 different clocks on different games.
 The Connect Four I8021 game is clocked at around 2MHz. The TMS1100 versions
 of the games were clocked at around 500KHz, 550KHz, or 300KHz.
+
+Each game came with a screen- and keypad overlay, MAME artwork is recommended.
+
+TODO:
+- Add support for the paddle control
+- Finish support for i8021 based cartridges
 
 ****************************************************************************/
 
@@ -76,34 +87,6 @@ private:
 	DECLARE_WRITE16_MEMBER(tms1100_write_r);
 	u32 tms1100_decode_micro(offs_t offset);
 
-	// enums
-	enum cpu_type
-	{
-		CPU_TYPE_I8021,
-		CPU_TYPE_TMS1100
-	};
-
-	enum pcb_type
-	{
-		PCB_TYPE_4952_REV_A,
-		PCB_TYPE_4952_9_REV_B,
-		PCB_TYPE_4971_REV_C,
-		PCB_TYPE_7924952D02,
-		PCB_TYPE_UNKNOWN
-	};
-
-	enum rc_type
-	{
-		RC_TYPE_100PF_21_0K,
-		RC_TYPE_100PF_23_2K,
-		RC_TYPE_100PF_39_4K,
-		RC_TYPE_UNKNOWN
-	};
-
-	cpu_type    m_cpu_type;
-	pcb_type    m_pcb_type;
-	rc_type     m_rc_type;
-
 	required_device<dac_byte_interface> m_dac;
 	optional_device<i8021_device> m_i8021;
 	optional_device<tms1100_cpu_device> m_tms1100;
@@ -124,7 +107,8 @@ private:
 	// generic variables
 	void    update_lcd();
 	void    lcd_write(uint8_t control, uint8_t data);
-	bool    m_pla;
+	int m_pla;
+	bool m_paddle;
 
 	uint8_t   m_lcd_latch[8];
 	uint8_t   m_lcd_holding_latch[8];
@@ -510,119 +494,49 @@ u32 microvision_state::tms1100_decode_micro(offs_t offset)
 
 DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 {
-	uint8_t *rom1 = memregion("i8021_cpu")->base();
-	uint8_t *rom2 = memregion("tms1100_cpu")->base();
-	uint32_t file_size = m_cart->common_get_size("rom");
+	u32 size = m_cart->common_get_size("rom");
 
-	if ( file_size != 1024 && file_size != 2048 )
+	if (size != 0x400 && size != 0x800)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size");
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM file size");
 		return image_init_result::FAIL;
 	}
 
-	// Set default settings
-	m_pcb_type = microvision_state::PCB_TYPE_UNKNOWN;
-	m_rc_type = microvision_state::RC_TYPE_UNKNOWN;
-	m_pla = 0;
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	// Read cartridge
-	if (!image.loaded_through_softlist())
+	// set default settings
+	u32 clock = (size == 0x400) ? 2000000 : 500000;
+	m_pla = 0;
+	m_paddle = false;
+
+	if (image.loaded_through_softlist())
 	{
-		if (image.fread(rom1, file_size) != file_size)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return image_init_result::FAIL;
-		}
+		// MCU clock
+		u32 sclock = strtoul(image.get_feature("clock"), nullptr, 0);
+		if (sclock != 0)
+			clock = sclock;
+
+		// output PLA type (TMS1100 only)
+		m_pla = strtoul(image.get_feature("pla"), nullptr, 0) ? 1 : 0;
+
+		// PCB has paddle circuit
+		m_paddle = bool(strtoul(image.get_feature("paddle"), nullptr, 0) ? 1 : 0);
+	}
+
+	// detect MCU on file size
+	if (size == 0x400)
+	{
+		// I8021 MCU
+		memcpy(memregion("i8021_cpu")->base(), m_cart->get_rom_base(), size);
+		m_i8021->set_clock(clock);
 	}
 	else
 	{
-		// Copy rom contents
-		memcpy(rom1, image.get_software_region("rom"), file_size);
-
-		// Get PLA type
-		const char *pla = image.get_feature("pla");
-
-		if (pla)
-			m_pla = 1;
-
+		// TMS1100 MCU
+		memcpy(memregion("tms1100_cpu")->base(), m_cart->get_rom_base(), size);
+		m_tms1100->set_clock(clock);
 		m_tms1100->set_output_pla(microvision_output_pla[m_pla]);
-
-		// Detect settings for PCB type
-		const char *pcb = image.get_feature("pcb");
-
-		if (pcb)
-		{
-			static const struct { const char *pcb_name; microvision_state::pcb_type pcbtype; } pcb_types[] =
-				{
-					{ "4952 REV-A", microvision_state::PCB_TYPE_4952_REV_A },
-					{ "4952-79 REV-B", microvision_state::PCB_TYPE_4952_9_REV_B },
-					{ "4971-REV-C", microvision_state::PCB_TYPE_4971_REV_C },
-					{ "7924952D02", microvision_state::PCB_TYPE_7924952D02 }
-				};
-
-			for (int i = 0; i < ARRAY_LENGTH(pcb_types) && m_pcb_type == microvision_state::PCB_TYPE_UNKNOWN; i++)
-			{
-				if (!core_stricmp(pcb, pcb_types[i].pcb_name))
-				{
-					m_pcb_type = pcb_types[i].pcbtype;
-				}
-			}
-		}
-
-		// Detect settings for RC types
-		const char *rc = image.get_feature("rc");
-
-		if (rc)
-		{
-			static const struct { const char *rc_name; microvision_state::rc_type rctype; } rc_types[] =
-				{
-					{ "100pf/21.0K", microvision_state::RC_TYPE_100PF_21_0K },
-					{ "100pf/23.2K", microvision_state::RC_TYPE_100PF_23_2K },
-					{ "100pf/39.4K", microvision_state::RC_TYPE_100PF_39_4K }
-				};
-
-			for (int i = 0; i < ARRAY_LENGTH(rc_types) && m_rc_type == microvision_state::RC_TYPE_UNKNOWN; i++)
-			{
-				if (!core_stricmp(rc, rc_types[i].rc_name))
-				{
-					m_rc_type = rc_types[i].rctype;
-				}
-			}
-		}
-	}
-
-	// Mirror rom data to tms1100_cpu region
-	memcpy(rom2, rom1, file_size);
-
-	// Based on file size select cpu:
-	// - 1024 -> I8021
-	// - 2048 -> TI TMS1100
-	switch (file_size)
-	{
-		case 1024:
-			m_cpu_type = microvision_state::CPU_TYPE_I8021;
-			m_i8021->set_clock(2000000);
-			break;
-
-		case 2048:
-			m_cpu_type = microvision_state::CPU_TYPE_TMS1100;
-
-			switch (m_rc_type)
-			{
-				case RC_TYPE_100PF_21_0K:
-					m_tms1100->set_clock(550000);
-					break;
-
-				case RC_TYPE_100PF_23_2K:
-				case RC_TYPE_UNKNOWN: // Default to most occurring setting
-					m_tms1100->set_clock(500000);
-					break;
-
-				case RC_TYPE_100PF_39_4K:
-					m_tms1100->set_clock(300000);
-					break;
-			}
-			break;
 	}
 
 	return image_init_result::PASS;
@@ -700,11 +614,11 @@ void microvision_state::microvision(machine_config &config)
 
 ROM_START( microvsn )
 	// nothing here yet, ROM is on the cartridge
-	ROM_REGION( 0x800, "i8021_cpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400, "i8021_cpu", ROMREGION_ERASE00 )
 	ROM_REGION( 0x800, "tms1100_cpu", ROMREGION_ERASE00 )
 	ROM_REGION( 867, "tms1100_cpu:mpla", ROMREGION_ERASE00 )
 	ROM_REGION( 365, "tms1100_cpu:opla", ROMREGION_ERASE00 )
 ROM_END
 
 
-CONS( 1979, microvsn, 0, 0, microvision, microvision, microvision_state, empty_init, "Milton Bradley", "MicroVision", MACHINE_NOT_WORKING )
+CONS( 1979, microvsn, 0, 0, microvision, microvision, microvision_state, empty_init, "Milton Bradley", "MicroVision", MACHINE_NOT_WORKING | MACHINE_REQUIRES_ARTWORK )
