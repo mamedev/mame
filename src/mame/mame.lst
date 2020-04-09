@@ -2747,6 +2747,7 @@ pg750                           // Siemens PG 750
 pg750eisa                       // Siemens PG 750 486 EISA
 samdm286                        // Samsung Deskmaster 286-12
 zdz248                          // Zenith Z-248
+ncr3433                         // NCR Class 3433
 
 
 @source:atari_s1.cpp
