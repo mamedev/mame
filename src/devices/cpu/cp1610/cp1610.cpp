@@ -105,8 +105,8 @@ void cp1610_cpu_device::cp1610_hlt()
  ***************************************************/
 void cp1610_cpu_device::cp1610_eis()
 {
-	m_mask_interrupts = 1;
-	m_intr_enabled = 1;
+	m_mask_interrupts = true;
+	m_intr_enabled = true;
 	m_icount -= 4;
 }
 
@@ -116,8 +116,8 @@ void cp1610_cpu_device::cp1610_eis()
  ***************************************************/
 void cp1610_cpu_device::cp1610_dis()
 {
-	m_mask_interrupts = 1;
-	m_intr_enabled = 0;
+	m_mask_interrupts = true;
+	m_intr_enabled = false;
 	m_icount -= 4;
 }
 
@@ -128,7 +128,7 @@ void cp1610_cpu_device::cp1610_dis()
 void cp1610_cpu_device::cp1610_tci()
 {
 	/* TBD */
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	m_icount -= 4;
 }
 
@@ -138,7 +138,7 @@ void cp1610_cpu_device::cp1610_tci()
  ***************************************************/
 void cp1610_cpu_device::cp1610_clrc()
 {
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	m_flags &= ~C;
 	m_icount -= 4;
 }
@@ -149,7 +149,7 @@ void cp1610_cpu_device::cp1610_clrc()
  ***************************************************/
 void cp1610_cpu_device::cp1610_setc()
 {
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	m_flags |= C;
 	m_icount -= 6;
 }
@@ -267,7 +267,7 @@ void cp1610_cpu_device::cp1610_rswd(int n)
 void cp1610_cpu_device::cp1610_swap(int r)
 {
 	uint8_t temp;
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	CLR_SZ;
 	temp = m_r[r] >> 8;
 	m_r[r] = (m_r[r] << 8) | temp;
@@ -287,7 +287,7 @@ void cp1610_cpu_device::cp1610_dswap(int r)
 {
 	/* This instruction was not officially supported by GI */
 	uint16_t temp;
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	CLR_SZ;
 	temp = m_r[r] & 0xff;
 	m_r[r] = (temp << 8) | temp;
@@ -305,7 +305,7 @@ void cp1610_cpu_device::cp1610_dswap(int r)
  ***************************************************/
 void cp1610_cpu_device::cp1610_sll_1(int r)
 {
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	CLR_SZ;
 	m_r[r] <<= 1;
 	SET_SZ(m_r[r]);
@@ -318,7 +318,7 @@ void cp1610_cpu_device::cp1610_sll_1(int r)
  ***************************************************/
 void cp1610_cpu_device::cp1610_sll_2(int r)
 {
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	CLR_SZ;
 	m_r[r] <<= 2;
 	SET_SZ(m_r[r]);
@@ -332,7 +332,7 @@ void cp1610_cpu_device::cp1610_sll_2(int r)
 void cp1610_cpu_device::cp1610_rlc_1(int r)
 {
 	uint16_t offset = 0;
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	if (m_flags & C)
 		offset = 1;
 	CLR_SZC;
@@ -350,7 +350,7 @@ void cp1610_cpu_device::cp1610_rlc_1(int r)
 void cp1610_cpu_device::cp1610_rlc_2(int r)
 {
 	uint16_t offset = 0;
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	switch(m_flags & (C | OV))
 	{
 		case 0:
@@ -384,7 +384,7 @@ void cp1610_cpu_device::cp1610_rlc_2(int r)
  ***************************************************/
 void cp1610_cpu_device::cp1610_sllc_1(int r)
 {
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	CLR_SZC;
 	if (m_r[r] & 0x8000)
 		m_flags |= C;
@@ -399,7 +399,7 @@ void cp1610_cpu_device::cp1610_sllc_1(int r)
  ***************************************************/
 void cp1610_cpu_device::cp1610_sllc_2(int r)
 {
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	CLR_SZOC;
 	if (m_r[r] & 0x8000)
 		m_flags |= C;
@@ -416,7 +416,7 @@ void cp1610_cpu_device::cp1610_sllc_2(int r)
  ***************************************************/
 void cp1610_cpu_device::cp1610_slr_1(int r)
 {
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	CLR_SZ;
 	m_r[r] >>= 1;
 	SET_SZ(m_r[r]);
@@ -433,7 +433,7 @@ void cp1610_cpu_device::cp1610_slr_1(int r)
  ***************************************************/
 void cp1610_cpu_device::cp1610_slr_2(int r)
 {
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	CLR_SZ;
 	m_r[r] >>= 2;
 	SET_SZ(m_r[r]);
@@ -450,7 +450,7 @@ void cp1610_cpu_device::cp1610_slr_2(int r)
  ***************************************************/
 void cp1610_cpu_device::cp1610_sar_1(int r)
 {
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	CLR_SZ;
 	m_r[r] = (uint16_t)(((int16_t)(m_r[r])) >> 1);
 	SET_SZ(m_r[r]);
@@ -467,7 +467,7 @@ void cp1610_cpu_device::cp1610_sar_1(int r)
  ***************************************************/
 void cp1610_cpu_device::cp1610_sar_2(int r)
 {
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	CLR_SZ;
 	m_r[r] = (uint16_t)(((int16_t)(m_r[r])) >> 2);
 	SET_SZ(m_r[r]);
@@ -485,7 +485,7 @@ void cp1610_cpu_device::cp1610_sar_2(int r)
 void cp1610_cpu_device::cp1610_rrc_1(int r)
 {
 	uint16_t offset = 0;
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	if (m_flags & C)
 		offset = 0x8000;
 	CLR_SZC;
@@ -508,7 +508,7 @@ void cp1610_cpu_device::cp1610_rrc_1(int r)
 void cp1610_cpu_device::cp1610_rrc_2(int r)
 {
 	uint16_t offset = 0;
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	if (m_flags & C)
 		offset |= 0x4000;
 	if (m_flags & OV)
@@ -534,7 +534,7 @@ void cp1610_cpu_device::cp1610_rrc_2(int r)
  ***************************************************/
 void cp1610_cpu_device::cp1610_sarc_1(int r)
 {
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	CLR_SZC;
 	if (m_r[r] & 1)
 		m_flags |= C;
@@ -553,7 +553,7 @@ void cp1610_cpu_device::cp1610_sarc_1(int r)
  ***************************************************/
 void cp1610_cpu_device::cp1610_sarc_2(int r)
 {
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	CLR_SZOC;
 	if (m_r[r] & 1)
 		m_flags |= C;
@@ -1011,7 +1011,7 @@ void cp1610_cpu_device::cp1610_besc(int dir)
 void cp1610_cpu_device::cp1610_mvo(int s)
 {
 	uint16_t addr;
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	addr = cp1610_readop(m_r[7]);
 	m_r[7]++;
 	cp1610_writemem16(addr,m_r[s]);
@@ -1024,7 +1024,7 @@ void cp1610_cpu_device::cp1610_mvo(int s)
  ***************************************************/
 void cp1610_cpu_device::cp1610_mvoat(int s, int m)
 {
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	cp1610_writemem16(m_r[m],m_r[s]);
 	m_icount -= 9;
 }
@@ -1035,7 +1035,7 @@ void cp1610_cpu_device::cp1610_mvoat(int s, int m)
  ***************************************************/
 void cp1610_cpu_device::cp1610_mvoat_i(int s, int m)
 {
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	cp1610_writemem16(m_r[m],m_r[s]);
 	m_r[m]++;
 	m_icount -= 9;
@@ -1047,7 +1047,7 @@ void cp1610_cpu_device::cp1610_mvoat_i(int s, int m)
  ***************************************************/
 void cp1610_cpu_device::cp1610_mvoi(int s)
 {
-	m_mask_interrupts = 1;
+	m_mask_interrupts = true;
 	cp1610_writemem16(m_r[7],m_r[s]);
 	m_r[7]++;
 	m_icount -= 9;
@@ -2001,7 +2001,7 @@ void cp1610_cpu_device::cp1610_do_sdbd()
 	/* Even though SDBD is uninterruptable, we don't need to set the mask bit,
 	 * because we already treat the SDBD prefixed instructions as uninterruptable
 	 */
-	//m_mask_interrupts = 1;
+	//m_mask_interrupts = true;
 
 	sdbdtype = cp1610_readop(m_r[7]);
 	dest = sdbdtype & 0x07;
@@ -2124,7 +2124,7 @@ void cp1610_cpu_device::execute_run()
 	{
 		debugger_instruction_hook(m_r[7]);
 
-		m_mask_interrupts = 0;
+		m_mask_interrupts = false;
 
 		opcode = cp1610_readop(m_r[7]);
 		m_r[7]++;
@@ -3295,29 +3295,29 @@ void cp1610_cpu_device::execute_run()
 		case 0x3ff: /* 1 111 111 111 */ cp1610_xori(7); break;
 		}
 
-		if (m_mask_interrupts == 0)
+		if (!m_mask_interrupts)
 		{
-			if (m_intr_pending == 1)
+			if (m_intr_pending)
 			{
 				/* PSHR R7 */
 				cp1610_writemem16(m_r[6],m_r[7]);
 				m_r[6]++;
 				m_icount -= 9;
-				m_intr_pending = 0;
+				m_intr_pending = false;
 				m_r[7] = standard_irq_callback(CP1610_INT_INTR);
 			}
-			if ((m_intrm_pending == 1) && (m_intr_enabled))
+			if (m_intrm_pending && m_intr_enabled)
 			{
 				/* PSHR R7 */
 				cp1610_writemem16(m_r[6],m_r[7]);
 				m_r[6]++;
 				m_icount -= 9;
-				m_intrm_pending = 0;
+				m_intrm_pending = false;
 				m_r[7] = standard_irq_callback(CP1610_INT_INTRM);
 			}
-			if (m_reset_pending == 1)
+			if (m_reset_pending)
 			{
-				m_reset_pending = 0;
+				m_reset_pending = false;
 				m_r[7] = standard_irq_callback(CP1610_RESET);
 			}
 		}
@@ -3329,10 +3329,10 @@ void cp1610_cpu_device::execute_run()
 void cp1610_cpu_device::device_start()
 {
 	m_read_bext.resolve_safe(0);
-	m_intr_enabled = 0;
-	m_reset_pending = 0;
-	m_intr_pending = 0;
-	m_intrm_pending = 0;
+	m_intr_enabled = false;
+	m_reset_pending = false;
+	m_intr_pending = false;
+	m_intrm_pending = false;
 	m_flags = 0;
 	memset(m_r, 0x00, sizeof(m_r));
 
@@ -3369,7 +3369,7 @@ void cp1610_cpu_device::device_start()
 void cp1610_cpu_device::device_reset()
 {
 	/* This is how we set the reset vector */
-	pulse_input_line(CP1610_RESET, attotime::zero);
+	m_reset_pending = true;
 }
 
 void cp1610_cpu_device::execute_set_input(int irqline, int state)
@@ -3382,12 +3382,12 @@ void cp1610_cpu_device::execute_set_input(int irqline, int state)
 			break;
 		case CP1610_RESET:
 			if (state == ASSERT_LINE)
-				m_reset_pending = 1;
+				m_reset_pending = true;
 			m_reset_state = state;
 			break;
 		case CP1610_INT_INTR:
 			if (state == ASSERT_LINE)
-				m_intr_pending = 1;
+				m_intr_pending = true;
 			m_intr_state = state;
 			break;
 	}
