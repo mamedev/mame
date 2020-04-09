@@ -24,6 +24,7 @@ Year + Game                     PCB        CPU    Sound         Custom          
 98  Mj Man Guan Caishen         NO-0192-1  68000  M6295         IGS017 IGS025 IGS029  Battery
 99  Tarzan (V107)               NO-0228?   Z180   M6295         IGS031 IGS025 IGS029  Battery
 99  Tarzan (V109C)              NO-0248-1  Z180   M6295         IGS031 IGS025         Battery
+9?  Happy Skill (V611)          NO-0281    Z180   M6295 (K668)  IGS031 IGS025         Battery
 00? Super Tarzan (V100I)        NO-0230-1  Z180   M6295         IGS031 IGS025         Battery
 ??  Super Poker / Formosa       NO-0187    Z180   M6295 YM2413  IGS017 IGS025         Battery
 -------------------------------------------------------------------------------------------------------------
@@ -501,6 +502,7 @@ public:
 	void init_tarzana();
 	void init_lhzb2a();
 	void init_mgdha();
+	void init_happyskl();
 
 protected:
 	virtual void video_start() override;
@@ -1011,6 +1013,43 @@ void igs017_state::init_starzan()
 	mgcs_flip_sprites();
 }
 
+
+void igs017_state::init_happyskl()
+{
+	u8 *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x40000; i++)
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x0280) != 0x00080) x ^= 0x20;
+		if ((i & 0x02a0) == 0x00280) x ^= 0x20;
+		if ((i & 0x0280) != 0x00080) x ^= 0x40;
+		if ((i & 0x01a0) != 0x00080) x ^= 0x80;
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < 0x40000; i++) // adapted from starzan, seems ok
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x000a0) != 0x00000) x ^= 0x20;
+		if ((i & 0x001a0) == 0x00000) x ^= 0x20;
+		if ((i & 0x00060) != 0x00040) x ^= 0x40;
+		if ((i & 0x00260) == 0x00240) x ^= 0x40;
+		if ((i & 0x00020) == 0x00020) x ^= 0x80;
+		if ((i & 0x00260) == 0x00040) x ^= 0x80;
+
+		rom[i] = x;
+	}
+
+	tarzan_decrypt_tiles(); // seems ok
+}
 
 // sdmg2
 
@@ -4602,6 +4641,32 @@ ROM_START( starzan )
 	ROM_LOAD( "palce22v10h_tar97_u20.u20",   0x2dd, 0x2dd, NO_DUMP )
 ROM_END
 
+
+// IGS PCB NO-0281
+// Main CPU is a Zilog Z180 clocked @16MHz (XTAL and EXTAL pins directly tied to a 16MHz crystal)
+// OKI MSM6295 (actually a rebadged one marked 'K668 0003') clocked @1MHz, pin 7 is HIGH
+// A QFP208 custom ASIC marked 'IGS 031'
+// A PLCC68 custom IC marked 'IGS025 A9B2201 9931'
+// A Ni-MH 3.6V battery as seen in other IGS hardware
+ROM_START( happyskl )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "v611.u8", 0x00000, 0x40000, CRC(1fb3da98) SHA1(60674af9f5c53298b8ef856f1986c905b9bd7b96) )
+
+	ROM_REGION( 0x480000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "happyskill_cg.u2",     0x00000, 0x080000, CRC(297a1893) SHA1(9be9e2cdaba1615ea376f3fb7087bf990e68b3b4) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	ROM_LOAD( "igs_a2701_cg_v100.u3", 0x80000, 0x400000, CRC(f3756a51) SHA1(8dd4677584f309cec4b068be9f9370a7a172a031) ) // FIXED BITS (xxxxxxx0xxxxxxxx) - 1xxxxxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "happyskill_text.u11", 0x00000, 0x80000, CRC(c6f51041) SHA1(81a9a03e92c1c67f299113dec9e05ba77395ea31) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE )
+	ROM_LOAD( "igs_s2702_sp_v100.u8", 0x00000, 0x80000, CRC(0ec9b1b5) SHA1(b8c7e068ddf6777a184339e6796be33e442a3df4) )
+
+	ROM_REGION( 0x2dd * 2, "plds", 0 )
+	ROM_LOAD( "atf22v10c.u10",   0x000, 0x2dd, NO_DUMP )
+	ROM_LOAD( "peel22cv10a.u20", 0x2dd, 0x2dd, NO_DUMP )
+ROM_END
+
 /***************************************************************************
 
 Super Poker (v100xD03) / Formosa
@@ -4650,6 +4715,7 @@ GAME( 1999,  tarzanc,  0,        iqblocka, iqblocka, igs017_state, init_tarzan, 
 GAME( 1999,  tarzan,   tarzanc,  iqblocka, iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 2)",      MACHINE_NOT_WORKING )
 GAME( 1999,  tarzana,  tarzanc,  iqblocka, iqblocka, igs017_state, init_tarzana,  ROT0, "IGS",                      "Tarzan (V107)",                               MACHINE_NOT_WORKING )
 GAME( 2000?, starzan,  0,        starzan,  iqblocka, igs017_state, init_starzan,  ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                 MACHINE_NOT_WORKING )
+GAME( 2001?, happyskl, 0,        starzan,  iqblocka, igs017_state, init_happyskl, ROT0, "IGS",                      "Happy Skill (Italy, V611IT)",                 MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet
 
 // Parent spk306us in driver spoker.cpp. Move this set to that driver?
 GAME( ????,  spkrform, spk306us, spkrform, spkrform, igs017_state, init_spkrform, ROT0, "IGS",                      "Super Poker (v100xD03) / Formosa",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

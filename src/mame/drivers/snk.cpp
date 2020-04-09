@@ -195,7 +195,6 @@ Notes:
       1.xD    - Fujitsu MB7134 Bi-polar PROM
       1,2,3   - Fujitsu MB7122 Bi-Polar PROM
       A6003*  - PALs
-      YM3526  - Yamaha YM3526
       4559    - NEC uPC4559 Dual Operational Amplifier
       YM3014  - Yamaha YM3014 DAC
       YM3526  - Yamaha YM3526 FM Operator Type-L (OPL) Sound Chip. Clock 4.000MHz [8/2]
@@ -5624,7 +5623,7 @@ ROM_START( victroad )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "p3.7k", 0x00000, 0x10000, CRC(bac745f6) SHA1(c118d94aff16cbf1b85615ff5a93292f6e98c149) )
 
-	ROM_REGION( 0x0c00, "proms", 0 ) // top 3 are MB7122 or 82S137 or 63S441
+	ROM_REGION( 0x0c00, "proms", 0 ) // MB7122 or 82S137 or 63S441
 	ROM_LOAD( "c1.1k", 0x000,  0x400,  CRC(491ab831) SHA1(2801d68d8a7fddaca5c48f09d421fc48ff53d244) ) // red
 	ROM_LOAD( "c2.2l", 0x400,  0x400,  CRC(8feca424) SHA1(c3d666f4b4b914199b24ded02f9a1b643bf90d26) ) // green
 	ROM_LOAD( "c3.1l", 0x800,  0x400,  CRC(220076ca) SHA1(a353c770c0ffb1105fb93c97977597ad2fda8ac8) ) // blue
@@ -5676,7 +5675,7 @@ ROM_START( dogosoke )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "p3.7k",  0x00000, 0x10000, CRC(173fa571) SHA1(fb9c783e5377fa86f70afee6804c8ee9061b27fd) )
 
-	ROM_REGION( 0x0c00, "proms", 0 ) // top 3 are MB7122 or 82S137 or 63S441
+	ROM_REGION( 0x0c00, "proms", 0 ) // MB7122 or 82S137 or 63S441
 	ROM_LOAD( "c1.1k",  0x000,  0x400,  CRC(10a2ce2b) SHA1(8de93250b81fbabb012c96454ef3a888b2783ab5) ) // red
 	ROM_LOAD( "c2.2l",  0x400,  0x400,  CRC(99dc9792) SHA1(dcdcea2bad524776e17eaeb70dd4882283f1b125) ) // green
 	ROM_LOAD( "c3.1l",  0x800,  0x400,  CRC(e7213160) SHA1(bc762a346e1639c8a9636fe85c18d68a08c1b586) ) // blue
@@ -6116,7 +6115,7 @@ ROM_START( gwar )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "3.7g",  0x00000, 0x10000, CRC(eb544ab9) SHA1(433af63feb4c4ef0e3bd383f2f9bc19e436fb103) )
 
-	ROM_REGION( 0x0c00, "proms", 0 ) // top 3 are MB7122 or 82S137 or 63S441
+	ROM_REGION( 0x0c00, "proms", 0 ) // MB7122 or 82S137 or 63S441
 	ROM_LOAD( "3.9w",    0x0000, 0x0400, CRC(090236a3) SHA1(40d066e34291492c6baf8c120657e3d547274b59) ) // red
 	ROM_LOAD( "2.9v",    0x0400, 0x0400, CRC(9147de69) SHA1(e4b3b546e429c195e82f97322e2a295882e38a58) ) // green
 	ROM_LOAD( "1.9u",    0x0800, 0x0400, CRC(7f9c839e) SHA1(2fa60fa335f76891d961c9bd0066fa7f82f76779) ) // blue
@@ -6164,7 +6163,7 @@ ROM_START( gwarj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "3.7g",  0x00000, 0x10000, CRC(eb544ab9) SHA1(433af63feb4c4ef0e3bd383f2f9bc19e436fb103) )
 
-	ROM_REGION( 0x0c00, "proms", 0 ) // top 3 are MB7122 or 82S137 or 63S441
+	ROM_REGION( 0x0c00, "proms", 0 ) // MB7122 or 82S137 or 63S441
 	ROM_LOAD( "3.9w",    0x0000, 0x0400, CRC(090236a3) SHA1(40d066e34291492c6baf8c120657e3d547274b59) ) // red
 	ROM_LOAD( "2.9v",    0x0400, 0x0400, CRC(9147de69) SHA1(e4b3b546e429c195e82f97322e2a295882e38a58) ) // green
 	ROM_LOAD( "1.9u",    0x0800, 0x0400, CRC(7f9c839e) SHA1(2fa60fa335f76891d961c9bd0066fa7f82f76779) ) // blue
@@ -6222,7 +6221,7 @@ ROM_START( gwara )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "gv2.7k", 0x00000, 0x10000, CRC(896682dd) SHA1(dc2125c2378a01291197b2798a5eef6459cf5b99) )
 
-	ROM_REGION( 0x1400, "proms", 0 ) // top 5 are MB7122 or 82S137 or 63S441
+	ROM_REGION( 0x1400, "proms", 0 ) // MB7122 or 82S137 or 63S441
 	ROM_LOAD( "1.1k",        0x0000, 0x0400, CRC(090236a3) SHA1(40d066e34291492c6baf8c120657e3d547274b59) ) // red
 	ROM_LOAD( "3.2l",        0x0400, 0x0400, CRC(9147de69) SHA1(e4b3b546e429c195e82f97322e2a295882e38a58) ) // green
 	ROM_LOAD( "2.1l",        0x0800, 0x0400, CRC(7f9c839e) SHA1(2fa60fa335f76891d961c9bd0066fa7f82f76779) ) // blue
@@ -6273,7 +6272,7 @@ ROM_START( gwarab )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "gv2.7k", 0x00000, 0x10000, CRC(896682dd) SHA1(dc2125c2378a01291197b2798a5eef6459cf5b99) )
 
-	ROM_REGION( 0x1400, "proms", 0 ) // top 5 are MB7122 or 82S137 or 63S441
+	ROM_REGION( 0x1400, "proms", 0 ) // MB7122 or 82S137 or 63S441
 	ROM_LOAD( "1.1k",        0x0000, 0x0400, CRC(090236a3) SHA1(40d066e34291492c6baf8c120657e3d547274b59) ) // red
 	ROM_LOAD( "3.2l",        0x0400, 0x0400, CRC(9147de69) SHA1(e4b3b546e429c195e82f97322e2a295882e38a58) ) // green
 	ROM_LOAD( "2.1l",        0x0800, 0x0400, CRC(7f9c839e) SHA1(2fa60fa335f76891d961c9bd0066fa7f82f76779) ) // blue
