@@ -4,9 +4,9 @@
 
  Quake Arcade Tournament
 
- This is unknown PC hardware, only the HDD is dumped.  The HDD is stickered 'Release Beta 2'
+ Only the HDD is dumped.  The HDD is stickered 'Release Beta 2'
 
- I've also seen CDs of this for sale, so maybe there should be a CD too, for the music?
+ We've also seen CDs of this for sale, so maybe there should be a CD too, for the music?
 
 TODO:
 can't be emulated without proper mb bios
@@ -29,33 +29,48 @@ Byte/Sector 512
 Sectors/Hunk    8
 Logical size    2,1163,248,864
 
-
 The "backup" directory on hard disk was created by the dumper.
 
+ -- Hardware info found on the following web pages:
+http://web.archive.org/web/20070810060806/http://www.wave-report.com/archives/1998/98170702.htm
+http://www.thedodgegarage.com/3dfx/q3d_quicksilver.htm
+http://quakearcadetournament.blogspot.com/
+http://web.archive.org/web/20001001045148/http://www.quantum3d.com:80/press%20releases/4-20-98.html
+https://www.quaddicted.com/webarchive/www.quaddicted.com/quake-nostalgia/quake-arcade-tournament-edition/
 
- -- Hardware info found in the following press release:
-http://www.wave-report.com/archives/1998/98170702.htm
+Quantum3D Heavy Metal HM233G (part of Quantum3D's Quicksilver family)
+- NLX form factor system that is based on the Intel 440LX chipset
+- Intel NX440LX motherboard
+    - Intel 82440LX AGPset
+    - SMC FDC37C677 I/O
+    - Yamaha OPL3-SA3 (YMF715) Audio codec (16-bit per sample 3D audio)
+    - Intel Pro 10/100 PCI Ethernet NIC
+    - (Optional) Cirrus CL-GD5465 AGP Graphics Controller
+    - Intel/Phoenix BIOS
+- Intel Pentium II 233 233MHz CPU processor with 512KB of L2 cache
+- (1) 32MB 66 MHz SDRAM 168-pin DIMM
+- Microsoft Windows 95 OSR2.5
+- shock-mounted 3.1GB Ultra DMA-33 EIDE hard drive
+- 12-24x CD-ROM drive
+- 1.44 MB floppy drive
+- Quantum3D Obsidian2 90-4440 AGP AGPTV Voodoo2-based realtime 3D graphics accelerator
+      (a professional version of the Quantum3D Obsidian2 S-12 AGPTV)
+- Companion PCI 2D/VGA: Quantum3D Ventana MGV-PCI (Alliance Semiconductor ProMotion AT25)
+      or Quantum3D Ventana "MGV Rush" (custom Quantum3D Ventana 50 Voodoo Rush with 3D-disabled
+      2D-only BIOS and no TV-out, only using the Alliance Semiconductor ProMotion AT25)
+- Quantum3D GCI-2 (Game Control Interface II) - designed to interface coin-op and
+      industrial input/output control devices to a PC. Fits in either PCI or ISA bus slot for
+      mechanical attachment only. Communications between the GCI and the PC are via a standard
+      RS-232 serial interface, using a 14-byte packet protocol. Power is provided by a 4-pin
+      Molex style disk driver power connector.
 
-QUANTUM3D'S HEAVY METAL SYSTEM - HM233G
-NLX form factor system that is based on the Intel 440LX chipset
-233MHz Intel Pentium II processor with 512KB of L2 cache
-32MB of SDRAM
-Microsoft Windows 95 OSR2.5
-shock-mounted 3.1GB Ultra DMA-33 hard drive
-12-24x CD-ROM drive
-1.44 MB floppy drive
-16-bit per sample 3D audio
-PCI-based 2D/VGA
-built-in 10/100 Ethernet
-Obsidian2 90-4440 AGP Voodoo2-based realtime 3D graphics accelerator
-Quantum3D's GCI (Game Control Interface) - a unique, low-cost subsystem
-    designed to interface coin-op and industrial input/output control devices to a PC
+Dongle: Rainbow Technologies parallel-port security dongle (at least 1024 bytes)
 
 ===============================================================================
 TODO:
-    * Add BIOS dump (custom 440LX motherboard or standard?)
+    * Add BIOS dump (standard NX440LX motherboard)
     * Hook up PC hardware
-    * Hook up the GCI (details? ROMs?)
+    * Hook up the Quantum3D GCI-2 (details? ROMs?)
     * What's the dongle do?
 ===============================================================================
 */
