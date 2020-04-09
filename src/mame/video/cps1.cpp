@@ -222,6 +222,11 @@ You can set the suicide CPS-B-21 chips to their default layer register and prior
 if you pull pins 45 and 46 high (floating the pins seems to work, too). The default is the same
 values as Street Fighter 2 CE/Turbo.
 
+The Pang! 3 B-board (94916-10) is unique to that game, presumably designed by Mitchell rather than Capcom.
+It uses a Mach215 pld security chip to encrypt main code and is the only non-qsound game to use an eeprom instead of dip switches.
+It is designed to allow operation with either a standard or CPS1.5/qsound A-board, in the latter case the full standard sound hardware (z80, ym, oki, audio amp etc.) can be populated on the B-board itself,
+(although to date, no example of the B-board with sound h/w populated has been found, perhaps it was never used?)
+Exact-copy bootleg B-boards exist and are quite common, bizarrely the bootleggers often crudely cut off the front/unused analog audio section of the pcb!
 
 
 CPS-A Registers
