@@ -763,6 +763,7 @@ roland_d50.cpp
 roland_jv80.cpp
 roland_jx3p.cpp
 roland_jx8p.cpp
+roland_mc50.cpp
 roland_mt32.cpp
 roland_r8.cpp
 roland_ra30.cpp

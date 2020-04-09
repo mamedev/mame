@@ -34655,6 +34655,11 @@ jx8p                            //
 jx8po                           //
 mks70                           //
 
+@source:roland_mc50.cpp
+mc300                           //
+mc50                            //
+mc50mk2                         //
+
 @source:roland_mt32.cpp
 cm32l                           //
 mt32                            //
