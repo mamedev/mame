@@ -6,7 +6,8 @@ license:CC0
 
 <!--
 
-All known games are dumped, see below for list (chronological order)
+All known games are dumped, see below for list in chronological order.
+But, 1st revisions of Block Buster and Bowling (I8021 MCU) are not yet dumped.
 One more game "Barrage" was announced but not released.
 
 4952 - Block Buster
@@ -20,11 +21,12 @@ One more game "Barrage" was announced but not released.
 4064 - Sea Duel
 4176 - Alien Raiders (aka Space Blitz or Blitz in Europe)
 4177 - Cosmic Hunter
-4241 - Super Block Buster
+4241 - Super Blockbuster
 
 The "clock" feature is used to indicate MCU clock frequency
 The "pla" feature is for TMS1100 output PLA type
 The "paddle" feature is used to indicate whether there is paddle circuitry on the PCB
+The "overlay" feature indicates screen/keypad overlay
 -->
 
 <softwarelist name="microvision" description="Milton Bradley MicroVision cartridges">
@@ -39,6 +41,7 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K -->
 			<feature name="pla" value="1" />
 			<feature name="paddle" value="1" />
+			<feature name="overlay" value="10" />
 			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU -->
 				<rom name="m34009-n1" size="0x800" crc="b1632712" sha1="515040a3bf6386590c025e12a9512c98efdd7e1e"/>
 			</dataarea>
@@ -55,6 +58,7 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K -->
 			<feature name="pla" value="0" />
 			<feature name="paddle" value="1" />
+			<feature name="overlay" value="8" />
 			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU -->
 				<rom name="mp3479-n1nll_4063" size="0x800" crc="40e3327a" sha1="c1b52a081c7fe6a51c5cfe41a4d446f1f8cfe24e"/>
 			</dataarea>
@@ -71,6 +75,7 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K -->
 			<feature name="pla" value="0" />
 			<feature name="paddle" value="1" />
+			<feature name="overlay" value="1" />
 			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU, die label 1100B, MP3450A -->
 				<rom name="mp3450a" size="0x800" crc="fd18ea6d" sha1="30203278d7f2b0817e59bdf7e451be2d64a90f5a"/>
 			</dataarea>
@@ -87,6 +92,7 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K -->
 			<feature name="pla" value="1" />
 			<feature name="paddle" value="0" />
+			<feature name="overlay" value="3" />
 			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU, die label 1100E, MP3475 -->
 				<rom name="mp3475nll_4972" size="0x800" crc="460ac30e" sha1="93ffb75b82d1f48f451e0e1158d5a8d1cd465fe5"/>
 			</dataarea>
@@ -94,21 +100,6 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 	</software>
 
 	<software name="connect4">
-		<description>Connect Four (8021 version)</description>
-		<year>1979</year>
-		<publisher>Milton Bradley</publisher>
-		<info name="pcb" value="4971-REV-C" />
-		<info name="serial" value="4971" />
-		<part name="cart" interface="microvision_cart">
-			<feature name="clock" value="2000000" /> <!-- LC -->
-			<feature name="paddle" value="1" />
-			<dataarea name="rom" size="0x400"> <!-- I8021 MCU -->
-				<rom name="4971" size="0x400" crc="bdd8660b" sha1="971f9117dc809f7b9796134208b47ea34990ae71"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="connect4t" cloneof="connect4">
 		<description>Connect Four (TMS1100 version)</description>
 		<year>1979</year>
 		<publisher>Milton Bradley</publisher>
@@ -118,8 +109,25 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 			<feature name="clock" value="500000" /> <!-- correct? -->
 			<feature name="pla" value="1" />
 			<feature name="paddle" value="1" />
+			<feature name="overlay" value="2" />
 			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU -->
 				<rom name="mp3481" size="0x800" crc="6a4cf60b" sha1="e93d848784205ab49234ad26718e04d267b776ed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="connect4o" cloneof="connect4">
+		<description>Connect Four (8021 version)</description>
+		<year>1979</year>
+		<publisher>Milton Bradley</publisher>
+		<info name="pcb" value="4971-REV-C" />
+		<info name="serial" value="4971" />
+		<part name="cart" interface="microvision_cart">
+			<feature name="clock" value="2000000" /> <!-- LC circuit -->
+			<feature name="paddle" value="1" />
+			<feature name="overlay" value="2" />
+			<dataarea name="rom" size="0x400"> <!-- I8021 MCU -->
+				<rom name="4971" size="0x400" crc="bdd8660b" sha1="971f9117dc809f7b9796134208b47ea34990ae71"/>
 			</dataarea>
 		</part>
 	</software>
@@ -134,6 +142,7 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K -->
 			<feature name="pla" value="1" />
 			<feature name="paddle" value="0" />
+			<feature name="overlay" value="11" />
 			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU -->
 				<rom name="m34017-n1" size="0x800" crc="d8ba1377" sha1="a8dabd296aefc46849db2b7d2d8e0de7c77b5b38"/>
 			</dataarea>
@@ -150,6 +159,7 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 			<feature name="clock" value="550000" /> <!-- RC = 100pf/21.0K -->
 			<feature name="pla" value="0" />
 			<feature name="paddle" value="0" />
+			<feature name="overlay" value="7" />
 			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU -->
 				<rom name="mp3457nll_4976" size="0x800" crc="d5dc1f7d" sha1="9e53bd7e9b718ced3bffbdd50cf9ea1547183ea3"/>
 			</dataarea>
@@ -166,6 +176,7 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 			<feature name="clock" value="550000" /> <!-- RC = 100pf/21.0K -->
 			<feature name="pla" value="0" />
 			<feature name="paddle" value="0" />
+			<feature name="overlay" value="4" />
 			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU -->
 				<rom name="mp3454" size="0x800" crc="c7768d04" sha1="e477d49fc835649164cff5ed158ee31dcf244efc"/>
 			</dataarea>
@@ -182,6 +193,7 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 			<feature name="clock" value="550000" /> <!-- RC = 100pf/21.0K -->
 			<feature name="pla" value="0" />
 			<feature name="paddle" value="1" />
+			<feature name="overlay" value="5" />
 			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU, die label 1100E, MP3455 -->
 				<rom name="mp3455nll_4974" size="0x800" crc="906544ea" sha1="7ba8460369e1bb0708b0ef076342774059fd03d2"/>
 			</dataarea>
@@ -198,6 +210,7 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 			<feature name="clock" value="300000" /> <!-- RC = 100pf/39.4K -->
 			<feature name="pla" value="1" />
 			<feature name="paddle" value="0" />
+			<feature name="overlay" value="9" />
 			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU -->
 				<rom name="mp3496-n1_4064" size="0x800" crc="77a8f71b" sha1="1f95ecf3b1ec6a17db92e1ae903be269aa0b47d8"/>
 			</dataarea>
@@ -205,7 +218,7 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 	</software>
 
 	<software name="sprblock">
-		<description>Super Block Buster</description>
+		<description>Super Blockbuster</description>
 		<year>1982</year>
 		<publisher>Milton Bradley</publisher>
 		<info name="pcb" value="7924952D02" />
@@ -214,6 +227,7 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K -->
 			<feature name="pla" value="1" />
 			<feature name="paddle" value="1" />
+			<feature name="overlay" value="12" />
 			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU -->
 				<rom name="m34047-n2ll_4241" size="0x800" crc="796660e3" sha1="1b758369849cc7dea3918774244f747895607377"/>
 			</dataarea>
@@ -230,6 +244,7 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K -->
 			<feature name="pla" value="1" />
 			<feature name="paddle" value="0" />
+			<feature name="overlay" value="6" />
 			<dataarea name="rom" size="0x800"> <!-- TMS1100 MCU, die label 1100E, MP3474 -->
 				<rom name="mp3474nll_4975" size="0x800" crc="4500c1d9" sha1="d49522dbe265e71b86488b5533d01bc9050811c9"/>
 			</dataarea>
@@ -244,7 +259,6 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 		<year>2014</year>
 		<publisher>Paul Robson</publisher>
 		<part name="cart" interface="microvision_cart">
-			<feature name="clock" value="500000" />
 			<dataarea name="rom" size="0x800">
 				<rom name="bomber.bin" size="0x800" crc="badbd0f8" sha1="3c31c24b58b1d6ac1c7313b690ec796cc5010cb7"/>
 			</dataarea>
@@ -256,7 +270,6 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 		<year>2013</year>
 		<publisher>Paul Robson</publisher>
 		<part name="cart" interface="microvision_cart">
-			<feature name="clock" value="500000" />
 			<dataarea name="rom" size="0x800">
 				<rom name="demo.bin" size="0x800" crc="54f1b288" sha1="9fcd930dff5f09979d3ed1278a928330b7000068"/>
 			</dataarea>
@@ -268,7 +281,6 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 		<year>2014</year>
 		<publisher>Paul Robson</publisher>
 		<part name="cart" interface="microvision_cart">
-			<feature name="clock" value="500000" />
 			<dataarea name="rom" size="0x800">
 				<rom name="invaders.bin" size="0x800" crc="d520ff6e" sha1="c979d7004fc205ee050045f13e2d6f2c31e2083e"/>
 			</dataarea>

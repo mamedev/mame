@@ -7,11 +7,11 @@ Milton Bradley MicroVision, handheld game console
 
 Hardware notes:
 - SCUS0488(Hughes HLCD0488) LCD, 16*16 screen
-- piezo, 12 buttons under membrane + analog dial
+- piezo, 12 buttons under membrane + analog paddle(MB calls it the Control Knob)
 - no CPU on console, it is on the cartridge
 
-12 games were released, all of them have a TMS1100 MCU, with the exception
-of Connect Four which has a TMS1100 version and I8021 version.
+12 games were released, all of them have a TMS1100 MCU. The first couple of
+games had an I8021 MCU at first, but Milton Bradley switched to TMS1100.
 
 Since the microcontrollers were on the cartridges it was possible to have
 different clocks on different games.
@@ -107,8 +107,9 @@ private:
 	// generic variables
 	void    update_lcd();
 	void    lcd_write(uint8_t control, uint8_t data);
-	int m_pla;
-	bool m_paddle;
+	u8 m_pla_auto;
+	u8 m_overlay_auto;
+	bool m_paddle_auto;
 
 	uint8_t   m_lcd_latch[8];
 	uint8_t   m_lcd_holding_latch[8];
@@ -152,7 +153,6 @@ void microvision_state::machine_start()
 	save_item(NAME(m_lcd_latch_index));
 	save_item(NAME(m_lcd));
 	save_item(NAME(m_lcd_control_old));
-	save_item(NAME(m_pla));
 	save_item(NAME(m_lcd_holding_latch));
 }
 
@@ -507,21 +507,19 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 
 	// set default settings
 	u32 clock = (size == 0x400) ? 2000000 : 500000;
-	m_pla = 0;
-	m_paddle = false;
+	m_pla_auto = 0;
+	m_overlay_auto = 0;
+	m_paddle_auto = false;
 
 	if (image.loaded_through_softlist())
 	{
-		// MCU clock
 		u32 sclock = strtoul(image.get_feature("clock"), nullptr, 0);
 		if (sclock != 0)
 			clock = sclock;
 
-		// output PLA type (TMS1100 only)
-		m_pla = strtoul(image.get_feature("pla"), nullptr, 0) ? 1 : 0;
-
-		// PCB has paddle circuit
-		m_paddle = bool(strtoul(image.get_feature("paddle"), nullptr, 0) ? 1 : 0);
+		m_overlay_auto = strtoul(image.get_feature("overlay"), nullptr, 0);
+		m_pla_auto = strtoul(image.get_feature("pla"), nullptr, 0) ? 1 : 0;
+		m_paddle_auto = bool(strtoul(image.get_feature("paddle"), nullptr, 0) ? 1 : 0);
 	}
 
 	// detect MCU on file size
@@ -536,7 +534,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 		// TMS1100 MCU
 		memcpy(memregion("tms1100_cpu")->base(), m_cart->get_rom_base(), size);
 		m_tms1100->set_clock(clock);
-		m_tms1100->set_output_pla(microvision_output_pla[m_pla]);
+		m_tms1100->set_output_pla(microvision_output_pla[m_pla_auto]);
 	}
 
 	return image_init_result::PASS;
