@@ -390,7 +390,7 @@ offs_t h8500_disassembler::dasm_misc(std::ostream &stream, offs_t pc, u8 ea, con
 		}
 		util::stream_format(stream, "%-9s", BIT(op, 3) ? "JSR" : "JMP");
 		format_ea(stream, op, disp);
-		return (eabytes + 2) | (BIT(op, 3) ? STEP_OVER : 0) | SUPPORTED;
+		return (eabytes + 1) | (BIT(op, 3) ? STEP_OVER : 0) | SUPPORTED;
 	}
 	else if (ea == 0x11 && op >= 0xc0 && m_expanded)
 	{
