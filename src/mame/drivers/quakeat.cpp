@@ -41,28 +41,34 @@ https://www.quaddicted.com/webarchive/www.quaddicted.com/quake-nostalgia/quake-a
 Quantum3D Heavy Metal HM233G (part of Quantum3D's Quicksilver family)
 - NLX form factor system that is based on the Intel 440LX chipset
 - Intel NX440LX motherboard
-    - Intel 82440LX AGPset
+    - Intel 82440LX AGPset (82443LX Northbridge / 82371AB PIIX4 PCI-ISA Southbridge)
     - SMC FDC37C677 I/O
     - Yamaha OPL3-SA3 (YMF715) Audio codec (16-bit per sample 3D audio)
     - Intel Pro 10/100 PCI Ethernet NIC
     - (Optional) Cirrus CL-GD5465 AGP Graphics Controller
     - Intel/Phoenix BIOS
 - Intel Pentium II 233 233MHz CPU processor with 512KB of L2 cache
-- (1) 32MB 66 MHz SDRAM 168-pin DIMM
+- (1) 32MB PC66 66 MHz SDRAM 168-pin DIMM
 - Microsoft Windows 95 OSR2.5
 - shock-mounted 3.1GB Ultra DMA-33 EIDE hard drive
 - 12-24x CD-ROM drive
 - 1.44 MB floppy drive
 - Quantum3D Obsidian2 90-4440 AGP AGPTV Voodoo2-based realtime 3D graphics accelerator
       (a professional version of the Quantum3D Obsidian2 S-12 AGPTV)
-- Companion PCI 2D/VGA: Quantum3D Ventana MGV-PCI (Alliance Semiconductor ProMotion AT25)
+- Companion PCI 2D/VGA: Quantum3D Ventana MGV-PCI (Alliance Semiconductor ProMotion aT25)
       or Quantum3D Ventana "MGV Rush" (custom Quantum3D Ventana 50 Voodoo Rush with 3D-disabled
-      2D-only BIOS and no TV-out, only using the Alliance Semiconductor ProMotion AT25)
-- Quantum3D GCI-2 (Game Control Interface II) - designed to interface coin-op and
+      2D-only BIOS and no TV-out, only using the Alliance Semiconductor ProMotion aT25)
+- Quantum3D GCI-2 (Game Control Interface II) I/O board - designed to interface coin-op and
       industrial input/output control devices to a PC. Fits in either PCI or ISA bus slot for
       mechanical attachment only. Communications between the GCI and the PC are via a standard
       RS-232 serial interface, using a 14-byte packet protocol. Power is provided by a 4-pin
       Molex style disk driver power connector.
+
+Note: Quantum3D Quicksilver QS233G configuration seem very similar to the HM233G, with the only
+    exceptions being that the Quantum3D Obsidian2 90-4440 is replaced with the earlier Quantum3D
+    Obsidian 100SB-4440V Voodoo Graphics realtime 3D graphics accelerator with 2D Alliance
+    Semiconductor ProMotion aT25 MGV 2000 daughter card, and the Quantum3D GCI-2 might be replaced
+    with an earlier Quantum3D GCI.
 
 Dongle: Rainbow Technologies parallel-port security dongle (at least 1024 bytes)
 
