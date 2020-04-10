@@ -3399,10 +3399,10 @@ void cp1610_cpu_device::execute_set_input(int irqline, int state)
 cp1610_cpu_device::cp1610_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, CP1610, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
-	, m_read_bext(*this)
-	, m_read_iab(*this)
 	, m_intr_state(0)
 	, m_intrm_state(0)
+	, m_read_bext(*this)
+	, m_read_iab(*this)
 {
 }
 
