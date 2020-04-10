@@ -270,7 +270,7 @@ void rpunch_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
  *
  *************************************/
 
-uint32_t rpunch_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 rpunch_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 	m_background[0]->draw(screen, bitmap, cliprect, 0,1);

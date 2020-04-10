@@ -82,7 +82,7 @@ private:
 	DECLARE_VIDEO_START(rpunch);
 	DECLARE_VIDEO_START(svolley);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(crtc_interrupt_gen);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
