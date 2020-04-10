@@ -32354,6 +32354,7 @@ nms9100                         // Philips NMS 9100 series
 to16                            // Thomson TO16
 alphatp10                       // Triumph-Adler Alphatronic P10
 alphatp50                       // Triumph-Adler Alphatronic P50
+olivpc1                         // Olivetti Prodest PC 1
 
 @source:pc100.cpp
 pc100                           //

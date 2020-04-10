@@ -27,6 +27,7 @@ Driver file for IBM PC, IBM PC XT, and related machines.
 #include "cpu/i86/i86.h"
 #include "cpu/i86/i186.h"
 #include "cpu/nec/nec.h"
+#include "cpu/nec/v5x.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
@@ -70,6 +71,7 @@ public:
 	void juko16(machine_config &config);
 	void alphatp50(machine_config &config);
 	void mbc16lt(machine_config &config);
+	void olivpc1(machine_config &config);
 
 	void init_bondwell();
 
@@ -1845,6 +1847,32 @@ ROM_START( alphatp50 )
 	ROMX_LOAD("pc50ii_odd_104_16.4.87.bin", 0x8001, 0x4000, CRC(a628a056) SHA1(0ea6b1bcb8fe9cdf85a570df5fb169abfd5cbbe8), ROM_SKIP(1))
 ROM_END
 
+/*************************************************** Olivetti Prodest PC 1 ***
+
+*****************************************************************************/
+
+void pc_state::olivpc1(machine_config &config)
+{
+	pccga(config);
+
+	v40_device &maincpu(V40(config.replace(), "maincpu", 8000000));
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+
+	subdevice<isa8_slot_device>("isa2")->set_option_machine_config("fdc_xt", cfg_single_720K);
+	subdevice<isa8_slot_device>("isa3")->set_default_option(nullptr);
+	subdevice<isa8_slot_device>("isa5")->set_default_option("hdc");
+	subdevice<ram_device>(RAM_TAG)->set_default_size("512K");
+}
+
+ROM_START( olivpc1 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("pc1_bios_1_21.bin", 0xc000, 0x4000, CRC(3c44cdbf) SHA1(46e6c8531ad1fe81cf4457f1edb7554a0eaed7e8))
+	
+	ROM_REGION(0x2000, "gfx1", 0)
+	ROM_LOAD("xu4600_pc1_prodest_font101.bin", 0x0000, 0x2000, CRC(5c21981e) SHA1(d0db791079ece9c9e50bb7f38b5b11024ba7ec99))
+ROM_END
 
 /********************************************************** Sanyo MBC-16LT ***
 Form factor: Laptop
@@ -1910,6 +1938,7 @@ COMP( 198?, mpx16,          ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 1985, ncrpc4i,        ibm5150, 0,      ncrpc4i,        pccga,    pc_state, empty_init,    "NCR",                             "PC4i",                  MACHINE_NOT_WORKING )
 COMP( 198?, nixpc01,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Nixdorf Computer AG",             "8810/25 CPC - PC01",    MACHINE_NOT_WORKING )
 COMP( 198?, olivm15,        ibm5150, 0,      m15,            pccga,    pc_state, empty_init,    "Olivetti",                        "M15",                   0 )
+COMP( 1987, olivpc1,        ibm5150, 0,      olivpc1,        pccga,    pc_state, empty_init,    "Olivetti",                        "Prodest PC 1",          MACHINE_NOT_WORKING )
 COMP( 198?, nms9100,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Philips",                         "NMS 9100",              MACHINE_NOT_WORKING )
 COMP( 1989, ssam88s,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Samsung",                         "Samtron 88S",           MACHINE_NOT_WORKING )
 COMP( 1988, sx16,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "SX-16",                 MACHINE_NOT_WORKING )
