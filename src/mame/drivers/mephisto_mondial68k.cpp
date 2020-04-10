@@ -20,7 +20,7 @@ Hardware:
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "video/pwm.h"
+#include "video/pcf2100.h"
 #include "speaker.h"
 
 // internal artwork
@@ -35,7 +35,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_dac(*this, "dac")
 		, m_board(*this, "board")
-		, m_display(*this, "display")
+		, m_lcd(*this, "lcd")
 		, m_inputs(*this, "IN.%u", 0)
 		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "led%u", 0U)
@@ -49,6 +49,7 @@ protected:
 
 	void mondial68k_mem(address_map &map);
 
+	DECLARE_WRITE32_MEMBER(lcd_s_w);
 	DECLARE_WRITE8_MEMBER(lcd_dlen_w);
 	DECLARE_WRITE8_MEMBER(lcd_clb_w);
 	DECLARE_WRITE8_MEMBER(lcd_data_w);
@@ -61,14 +62,13 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<sensorboard_device> m_board;
-	required_device<pwm_display_device> m_display;
+	required_device<pcf2112_device> m_lcd;
 	required_ioport_array<4> m_inputs;
-	output_finder<8> m_digits;
+	output_finder<4> m_digits;
 	output_finder<16> m_leds;
 
 	uint8_t m_input_mux;
 	uint8_t m_board_mux;
-	uint8_t m_lcd_shift;
 	uint8_t m_dac_data;
 };
 
@@ -80,7 +80,6 @@ void mondial68k_state::machine_start()
 
 	save_item(NAME(m_input_mux));
 	save_item(NAME(m_board_mux));
-	save_item(NAME(m_lcd_shift));
 	save_item(NAME(m_dac_data));
 }
 
@@ -88,7 +87,6 @@ void mondial68k_state::machine_reset()
 {
 	m_input_mux = 0;
 	m_board_mux = 0;
-	m_lcd_shift = 0;
 	m_dac_data = 0;
 }
 
@@ -104,27 +102,29 @@ TIMER_DEVICE_CALLBACK_MEMBER(mondial68k_state::refresh_leds)
 		m_leds[0 + i] = 0;
 }
 
-WRITE8_MEMBER( mondial68k_state::lcd_clb_w )
+WRITE32_MEMBER(mondial68k_state::lcd_s_w)
 {
-	if (BIT(data, 0))
-		m_lcd_shift++;
+	// output LCD digits (note: last digit DP segment is unused)
+	for (int i=0; i<4; i++)
+		m_digits[i] = bitswap<8>((data & 0x7fffffff) >> (8 * i), 7,4,5,0,1,2,3,6);
 }
 
-WRITE8_MEMBER( mondial68k_state::lcd_dlen_w )
+WRITE8_MEMBER(mondial68k_state::lcd_clb_w)
 {
-	m_lcd_shift = 0;
+	m_lcd->clb_w(data & 1);
 }
 
-WRITE8_MEMBER( mondial68k_state::lcd_data_w )
+WRITE8_MEMBER(mondial68k_state::lcd_dlen_w)
 {
-	if (m_lcd_shift > 0 && m_lcd_shift < 0x21)
-	{
-		m_display->write_element((m_lcd_shift - 1) / 8, (m_lcd_shift - 1) % 8, BIT(data, 0));
-		m_display->update();
-	}
+	m_lcd->dlen_w(data & 1);
 }
 
-WRITE8_MEMBER( mondial68k_state::speaker_w )
+WRITE8_MEMBER(mondial68k_state::lcd_data_w)
+{
+	m_lcd->data_w(data & 1);
+}
+
+WRITE8_MEMBER(mondial68k_state::speaker_w)
 {
 	m_dac_data ^= 1;
 	m_dac->write(m_dac_data);
@@ -172,14 +172,15 @@ READ8_MEMBER(mondial68k_state::inputs_r)
 void mondial68k_state::mondial68k_mem(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
-	map(0x800000, 0x800001).r(FUNC(mondial68k_state::inputs_r));
-	map(0x820000, 0x820001).w(FUNC(mondial68k_state::lcd_clb_w));
-	map(0x820002, 0x820003).w(FUNC(mondial68k_state::lcd_data_w));
-	map(0x820004, 0x820005).w(FUNC(mondial68k_state::lcd_dlen_w));
+	map(0x800000, 0x800000).r(FUNC(mondial68k_state::inputs_r));
+	map(0x820000, 0x82000f).nopr();
+	map(0x820000, 0x820000).w(FUNC(mondial68k_state::lcd_clb_w));
+	map(0x820002, 0x820002).w(FUNC(mondial68k_state::lcd_data_w));
+	map(0x820004, 0x820004).w(FUNC(mondial68k_state::lcd_dlen_w));
 	map(0x82000c, 0x82000d).nopw();
-	map(0x82000e, 0x82000f).w(FUNC(mondial68k_state::speaker_w));
-	map(0x840000, 0x840001).w(FUNC(mondial68k_state::input_mux_w));
-	map(0x860000, 0x860001).w(FUNC(mondial68k_state::board_mux_w));
+	map(0x82000e, 0x82000e).w(FUNC(mondial68k_state::speaker_w));
+	map(0x840000, 0x840000).w(FUNC(mondial68k_state::input_mux_w));
+	map(0x860000, 0x860000).w(FUNC(mondial68k_state::board_mux_w));
 	map(0xc00000, 0xc03fff).ram();
 }
 
@@ -233,10 +234,8 @@ void mondial68k_state::mondial68k(machine_config &config)
 	m_board->set_delay(attotime::from_msec(100));
 
 	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(4, 8);
-	m_display->set_segmask(0xf, 0xff);
-	m_display->set_segmask(0x8, 0x7f); // last digit: DP segment unused
-	m_display->output_digit().set([this](offs_t offset, u8 data) { m_digits[offset] = bitswap<8>(data, 7,4,5,0,1,2,3,6); });
+	PCF2112(config, m_lcd, 50); // frequency guessed
+	m_lcd->write_segs().set(FUNC(mondial68k_state::lcd_s_w));
 	config.set_default_layout(layout_mephisto_mondial68k);
 
 	/* sound hardware */

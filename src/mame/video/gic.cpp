@@ -45,9 +45,9 @@
 
    for a total of (12*20*16) = 3840 RAM reads (3 clocks per read at 1.79MHz)
 
-   Then it relingishes control to the CPU by raising BUSREQ.
+   Then it relinquishes control to the CPU by raising BUSREQ.
 
-   Cloking in more detail: (in 1.79MHz clocks)
+   Clocking in more detail: (in 1.79MHz clocks)
    boot:
     busy:1  5360 clocks
     busy:0 22116 clocks
@@ -257,9 +257,9 @@ void gic_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 	stream_sample_t *buffer = outputs[0];
 
 	//Audio is basic and badly implemented (doubt that was the intent)
-	//The datasheet list the 3 different frequencies the GIC can generate: 500,1000 and 2000Hz
+	//The datasheet lists the 3 different frequencies the GIC can generate: 500,1000 and 2000Hz
 	//but it is clear (for an audio guy at least) that the resulting spectrum
-	//is not a pure square wav. In fact, the counter is reset on vertical sync!
+	//is not a pure square wave. In fact, the counter is reset on vertical sync!
 	//http://twitter.com/plgDavid/status/527269086016077825
 	//...thus creating a buzzing sound.
 

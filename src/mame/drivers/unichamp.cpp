@@ -12,7 +12,7 @@
  *  (http://worstconsole.blogspot.ca/2012/12/the-worstconsoleever.html)
  *  Note a spare dead GIC has been given to Lord Nightmare and should be sent for decap!
  *
- *  The Unisonc Champion is the only known GI "Gimini Mid-Range 8950 Programmable Game Set"
+ *  The Unisonic Champion is the only known GI "Gimini Mid-Range 8950 Programmable Game Set"
  *  to ever reach the market, and only in limited quantities (aprox 500 units ever built)
  *
  *  Architecture:
