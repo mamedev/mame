@@ -63,8 +63,6 @@ private:
 
 	/* callback called when interrupt pin state changes (may be nullptr) */
 	devcb_write_line    m_interrupt_cb;
-
-	bool m_int_pending;
 };
 
 // device type definition
