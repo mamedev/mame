@@ -553,7 +553,7 @@ offs_t h8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const h8
 		return 1 | STEP_OUT | SUPPORTED;
 
 	case 0x0e: case 0x1e:
-		util::stream_format(stream, "%-9s", "JSR");
+		util::stream_format(stream, "%-9s", "BSR");
 		if (BIT(op, 4))
 			format_bdisp(stream, s16(opcodes.r16(pc + 1)), pc + 3);
 		else
@@ -566,7 +566,7 @@ offs_t h8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const h8
 		return 1 | SUPPORTED;
 
 	case 0x10: case 0x18:
-		util::stream_format(stream, "%-9s@H'%04X", BIT(op, 4) ? "JSR" : "JMP", opcodes.r16(pc + 1));
+		util::stream_format(stream, "%-9s@H'%04X", BIT(op, 3) ? "JSR" : "JMP", opcodes.r16(pc + 1));
 		return 3 | (BIT(op, 3) ? STEP_OVER : 0) | SUPPORTED;
 
 	case 0x12:
