@@ -24,8 +24,8 @@ Year + Game                     PCB        CPU    Sound         Custom          
 98  Mj Man Guan Caishen         NO-0192-1  68000  M6295         IGS017 IGS025 IGS029  Battery
 99  Tarzan (V107)               NO-0228?   Z180   M6295         IGS031 IGS025 IGS029  Battery
 99  Tarzan (V109C)              NO-0248-1  Z180   M6295         IGS031 IGS025         Battery
-9?  Happy Skill (V611)          NO-0281    Z180   M6295 (K668)  IGS031 IGS025         Battery
 00? Super Tarzan (V100I)        NO-0230-1  Z180   M6295         IGS031 IGS025         Battery
+01? Happy Skill (V611)          NO-0281    Z180   M6295 (K668)  IGS031 IGS025         Battery
 ??  Super Poker / Formosa       NO-0187    Z180   M6295 YM2413  IGS017 IGS025         Battery
 -------------------------------------------------------------------------------------------------------------
                                                                                     * not present in one set
@@ -891,46 +891,34 @@ void igs017_state::tarzan_decrypt_tiles()
 	}
 }
 
-// decryption is incomplete, the first part of code doesn't seem right.
+// decryption should be good
 void igs017_state::tarzan_decrypt_program_rom()
 {
-	u16 *ROM = (u16 *)memregion("maincpu")->base();
-	int size = 0x40000;
+	u8 *rom = memregion("maincpu")->base();
 
-	for(int i=0; i<size/2; i++)
+	for (int i = 0; i < 0x40000; i++)
 	{
-		u16 x = ROM[i];
+		u8 x = rom[i];
 
-		if ((i & 0x10c0) == 0x0000)
-			x ^= 0x0001;
-
-		if ((i & 0x0010) == 0x0010 || (i & 0x0130) == 0x0020)
-			x ^= 0x0404;
-
-		if ((i & 0x00d0) != 0x0010)
-			x ^= 0x1010;
-
-		if (((i & 0x0008) == 0x0008)^((i & 0x10c0) == 0x0000))
-			x ^= 0x0100;
-
-		ROM[i] = x;
-	}
-}
-// by iq_132
-void igs017_state::tarzana_decrypt_program_rom()
-{
-	u8 *ROM = memregion("maincpu")->base();
-	int size = 0x80000;
-
-	for (int i = 0; i < size; i++)
-	{
-		u8 x = 0;
 		if ((i & 0x00011) == 0x00011) x ^= 0x01;
 		if ((i & 0x02180) == 0x00000) x ^= 0x01;
-		if ((i & 0x001a0) != 0x00020) x ^= 0x20;
-		if ((i & 0x00260) != 0x00200) x ^= 0x40;
-		if ((i & 0x00060) != 0x00000 && (i & 0x00260) != 0x00240)   x ^= 0x80;
-		ROM[i] ^= x;
+		if ((i & 0x001a0) != 0x00020) x ^= 0x04;
+		if ((i & 0x00080) != 0x00080) x ^= 0x10;
+		if ((i & 0x000e0) == 0x000c0) x ^= 0x10;
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < 0x40000; i++) 
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if (((i & 0x00020) == 0x00020) || ((i & 0x000260) == 0x00040)) x ^= 0x04;
+		if ((i & 0x001a0) != 0x00020) x ^= 0x10;
+
+		rom[i] = x;
 	}
 }
 
@@ -938,6 +926,38 @@ void igs017_state::init_tarzan()
 {
 	tarzan_decrypt_program_rom();
 	tarzan_decrypt_tiles();
+}
+
+void igs017_state::tarzana_decrypt_program_rom()
+{
+	u8 *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x40000; i++)
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x00080) != 0x00080) x ^= 0x20;
+		if ((i & 0x000e0) == 0x000c0) x ^= 0x20;
+		if ((i & 0x00280) != 0x00080) x ^= 0x40;
+		if ((i & 0x001a0) != 0x00020) x ^= 0x80;
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < 0x40000; i++) // by iq132 
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x001a0) != 0x00020) x ^= 0x20;
+		if ((i & 0x00260) != 0x00200) x ^= 0x40;
+		if ((i & 0x00060) != 0x00000 && (i & 0x00260) != 0x00240)   x ^= 0x80;
+
+		rom[i] = x;
+	}
 }
 
 void igs017_state::init_tarzana()
@@ -4711,9 +4731,9 @@ GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, init_mgcs,   
 GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, init_lhzb2,    ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (set 1)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, init_lhzb2a,   ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (VS221M)",          0 )
 GAME( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, init_slqz2,    ROT0, "IGS",                      "Mahjong Shuang Long Qiang Zhu 2 (VS203J)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1999,  tarzanc,  0,        iqblocka, iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 1)",      MACHINE_NOT_WORKING )
-GAME( 1999,  tarzan,   tarzanc,  iqblocka, iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 2)",      MACHINE_NOT_WORKING )
-GAME( 1999,  tarzana,  tarzanc,  iqblocka, iqblocka, igs017_state, init_tarzana,  ROT0, "IGS",                      "Tarzan (V107)",                               MACHINE_NOT_WORKING )
+GAME( 1999,  tarzanc,  0,        starzan,  iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 1)",      MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet
+GAME( 1999,  tarzan,   tarzanc,  starzan,  iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 2)",      MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet
+GAME( 1999,  tarzana,  tarzanc,  starzan,  iqblocka, igs017_state, init_tarzana,  ROT0, "IGS",                      "Tarzan (V107)",                               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // IGS029 needs to be emulated
 GAME( 2000?, starzan,  0,        starzan,  iqblocka, igs017_state, init_starzan,  ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                 MACHINE_NOT_WORKING )
 GAME( 2001?, happyskl, 0,        starzan,  iqblocka, igs017_state, init_happyskl, ROT0, "IGS",                      "Happy Skill (Italy, V611IT)",                 MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet
 
