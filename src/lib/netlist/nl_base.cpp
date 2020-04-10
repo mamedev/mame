@@ -227,7 +227,7 @@ namespace netlist
 		"#define IND_U(ind) ((ind) * 1e-6)   \n"
 		"#define IND_N(ind) ((ind) * 1e-9)   \n"
 		"#define IND_P(ind) ((ind) * 1e-12)  \n";
-		setup().add_include(plib::make_unique<a>("netlist/devices/net_lib.h", content));
+		setup().add_include<a>("netlist/devices/net_lib.h", content);
 		NETLIST_NAME(base)(*m_setup);
 	}
 

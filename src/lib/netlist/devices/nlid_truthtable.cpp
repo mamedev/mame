@@ -245,7 +245,7 @@ namespace devices
 		: truthtable_base_element_t(name, classname, def_param, sourcefile)
 		{ }
 
-		unique_pool_ptr<device_t> Create(nlmempool &pool, netlist_state_t &anetlist, const pstring &name) override
+		unique_pool_ptr<device_t> make_device(nlmempool &pool, netlist_state_t &anetlist, const pstring &name) override
 		{
 			using tt_type = nld_truthtable_t<m_NI, m_NO>;
 

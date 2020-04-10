@@ -973,7 +973,7 @@ void setup_t::register_dynamic_log_devices(const std::vector<pstring> &loglist)
 	for (const pstring &ll : loglist)
 	{
 		pstring name = "log_" + ll;
-		auto nc = factory().factory_by_name("LOG")->Create(m_nlstate.pool(), m_nlstate, name);
+		auto nc = factory().factory_by_name("LOG")->make_device(m_nlstate.pool(), m_nlstate, name);
 		register_link(name + ".I", ll);
 		log().debug("    dynamic link {1}: <{2}>\n",ll, name);
 		m_nlstate.register_device(nc->name(), std::move(nc));
@@ -1217,7 +1217,7 @@ void setup_t::prepare_to_run()
 		if ( factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				|| factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			m_nlstate.register_device(e.first, e.second->Create(nlstate().pool(), m_nlstate, e.first));
+			m_nlstate.register_device(e.first, e.second->make_device(nlstate().pool(), m_nlstate, e.first));
 		}
 	}
 
@@ -1239,7 +1239,7 @@ void setup_t::prepare_to_run()
 		if ( !factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				&& !factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			auto dev = e.second->Create(m_nlstate.pool(), m_nlstate, e.first);
+			auto dev = e.second->make_device(m_nlstate.pool(), m_nlstate, e.first);
 			m_nlstate.register_device(dev->name(), std::move(dev));
 		}
 	}
