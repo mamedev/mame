@@ -67,7 +67,6 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -82,15 +81,17 @@ private:
 
 	void unichamp_palette(palette_device &palette) const;
 
-	DECLARE_READ8_MEMBER(bext_r);
+	uint8_t bext_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER(unichamp_gicram_r);
-	DECLARE_WRITE8_MEMBER(unichamp_gicram_w);
+	uint8_t gicram_r(offs_t offset);
+	void gicram_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ16_MEMBER(unichamp_trapl_r);
-	DECLARE_WRITE16_MEMBER(unichamp_trapl_w);
+	uint16_t trapl_r(offs_t offset);
+	void trapl_w(offs_t offset, uint16_t data);
 
-	DECLARE_READ16_MEMBER(read_ff);
+	uint16_t read_ff();
+
+	uint16_t iab_r();
 
 	uint32_t screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -118,8 +119,8 @@ void unichamp_state::unichamp_palette(palette_device &palette) const
 void unichamp_state::unichamp_mem(address_map &map)
 {
 	map.global_mask(0x1FFF); //B13/B14/B15 are grounded!
-	map(0x0000, 0x00FF).rw(FUNC(unichamp_state::unichamp_gicram_r), FUNC(unichamp_state::unichamp_gicram_w)).umask16(0x00ff);
-	map(0x0100, 0x07FF).rw(FUNC(unichamp_state::unichamp_trapl_r), FUNC(unichamp_state::unichamp_trapl_w));
+	map(0x0000, 0x00FF).rw(FUNC(unichamp_state::gicram_r), FUNC(unichamp_state::gicram_w)).umask16(0x00ff);
+	map(0x0100, 0x07FF).rw(FUNC(unichamp_state::trapl_r), FUNC(unichamp_state::trapl_w));
 	map(0x0800, 0x0FFF).rom().region("maincpu", 0);   // Carts and EXE ROM, 10-bits wide
 }
 
@@ -143,7 +144,7 @@ void unichamp_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-READ8_MEMBER(unichamp_state::bext_r)
+uint8_t unichamp_state::bext_r(offs_t offset)
 {
 	//The BEXT instruction pushes a user-defined nibble out on the four EBCA pins (EBCA0 to EBCA3)
 	//and reads the ECBI input pin for HIGH or LOW signal to know whether or not to branch
@@ -168,7 +169,7 @@ void unichamp_state::init_unichamp()
 {
 }
 
-READ16_MEMBER(unichamp_state::read_ff)
+uint16_t unichamp_state::read_ff()
 {
 	return 0xffff;
 }
@@ -189,11 +190,13 @@ void unichamp_state::machine_start()
 					read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
 	} else
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x17ff,
-					read16_delegate(*this, FUNC(unichamp_state::read_ff)));
+					read16smo_delegate(*this, FUNC(unichamp_state::read_ff)));
+
+	memset(m_ram, 0, sizeof(m_ram));
 }
 
 /* Set Reset and INTR/INTRM Vector */
-void unichamp_state::machine_reset()
+uint16_t unichamp_state::iab_r()
 {
 	/*
 	the intv driver did not explain this but from the CP1600 manual:
@@ -207,14 +210,8 @@ void unichamp_state::machine_reset()
 	//The cart ROMS are self mapped to 0x1000
 	//upon boot the EXEC ROM puts 0x0800 on the bus for the CPU to use as first INT vector
 
-	m_maincpu->set_input_line_vector(CP1610_RESET,     0x0800); // CP1610
-	m_maincpu->set_input_line_vector(CP1610_INT_INTRM, 0x0804); // CP1610 - not used anyway
-	m_maincpu->set_input_line_vector(CP1610_INT_INTR,  0x0804); // CP1610 - not used anyway
-
 	/* Set initial PC */
-	m_maincpu->set_state_int(cp1610_cpu_device::CP1610_R7, 0x0800);
-
-	memset(m_ram, 0, sizeof(m_ram));
+	return 0x0800;
 }
 
 uint32_t unichamp_state::screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -222,23 +219,23 @@ uint32_t unichamp_state::screen_update_unichamp(screen_device &screen, bitmap_in
 	return m_gic->screen_update(screen, bitmap, cliprect);
 }
 
-READ8_MEMBER( unichamp_state::unichamp_gicram_r )
+uint8_t unichamp_state::gicram_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER( unichamp_state::unichamp_gicram_w )
+void unichamp_state::gicram_w(offs_t offset, uint8_t data)
 {
 	m_ram[offset] = data;
 }
 
-READ16_MEMBER( unichamp_state::unichamp_trapl_r )
+uint16_t unichamp_state::trapl_r(offs_t offset)
 {
 	logerror("trapl_r(%x)\n",offset);
 	return (int)0;
 }
 
-WRITE16_MEMBER( unichamp_state::unichamp_trapl_w )
+void unichamp_state::trapl_w(offs_t offset, uint16_t data)
 {
 	logerror("trapl_w(%x) = %x\n",offset,data);
 }
@@ -254,6 +251,7 @@ void unichamp_state::unichamp(machine_config &config)
 	CP1610(config, m_maincpu, (7752.0/29868.0)*XTAL(3'579'545)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &unichamp_state::unichamp_mem);
 	m_maincpu->bext().set(FUNC(unichamp_state::bext_r));
+	m_maincpu->iab().set(FUNC(unichamp_state::iab_r));
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
@@ -271,7 +269,7 @@ void unichamp_state::unichamp(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	GIC(config, m_gic, XTAL(3'579'545));
 	m_gic->set_screen("screen");
-	m_gic->ram_callback().set(FUNC(unichamp_state::unichamp_gicram_r));
+	m_gic->ram_callback().set(FUNC(unichamp_state::gicram_r));
 	m_gic->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	/* cartridge */
