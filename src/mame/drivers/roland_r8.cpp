@@ -8,6 +8,8 @@
 
 #include "emu.h"
 #include "cpu/upd78k/upd78k2.h"
+#include "sound/rolandpcm.h"
+#include "speaker.h"
 
 class roland_r8_state : public driver_device
 {
@@ -15,6 +17,7 @@ public:
 	roland_r8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_pcm(*this, "pcm")
 	{
 	}
 
@@ -25,6 +28,7 @@ private:
 	void mem_map(address_map &map);
 
 	required_device<upd78k2_device> m_maincpu;
+	required_device<mb87419_mb87420_device> m_pcm;
 };
 
 
@@ -42,12 +46,30 @@ void roland_r8_state::r8(machine_config &config)
 {
 	UPD78210(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_r8_state::mem_map);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	MB87419_MB87420(config, m_pcm, 33.8688_MHz_XTAL);
+	//m_pcm->int_callback().set_inputline(m_maincpu, upd78k2_device::INTP1_LINE);
+	m_pcm->set_device_rom_tag("wavedata");
+	m_pcm->add_route(0, "lspeaker", 1.0);
+	m_pcm->add_route(1, "rspeaker", 1.0);
 }
 
 void roland_r8_state::r8mk2(machine_config &config)
 {
 	UPD78213(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_r8_state::mem_map);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	MB87419_MB87420(config, m_pcm, 33.8688_MHz_XTAL);
+	//m_pcm->int_callback().set_inputline(m_maincpu, upd78k2_device::INTP1_LINE);
+	m_pcm->set_device_rom_tag("wavedata");
+	m_pcm->add_route(0, "lspeaker", 1.0);
+	m_pcm->add_route(1, "rspeaker", 1.0);
 }
 
 
@@ -55,24 +77,28 @@ ROM_START(r8)
 	ROM_REGION(0x20000, "maincpu", 0)
 	ROM_LOAD("roland r-8_2.02_27c010.bin", 0x00000, 0x20000, CRC(45d0f64f) SHA1(55f0831db74cbdeae20cd7f1ff28af27dafba9b9))
 
-	ROM_REGION(0x100000, "wavedata", 0)
-	ROM_LOAD("mn234000rle.ic30", 0x000000, 0x080000, NO_DUMP)
-	ROM_LOAD("mn234000rlf.ic31", 0x080000, 0x080000, NO_DUMP)
+	ROM_REGION(0x100000, "wavedata", ROMREGION_ERASE00)
+	ROM_LOAD("r15179929-mn234000rle.ic30", 0x000000, 0x080000, NO_DUMP)
+	ROM_LOAD("r15179930-mn234000rlf.ic31", 0x080000, 0x080000, NO_DUMP)
 ROM_END
 
 ROM_START(r8m)
 	ROM_REGION(0x20000, "maincpu", 0)
 	ROM_LOAD("rolandr8mv104.bin", 0x00000, 0x20000, CRC(5e95e2f6) SHA1(b4e1a8f15f72a9db9aa8fd41ee3c3ebd10460587))
+
+	ROM_REGION(0x100000, "wavedata", ROMREGION_ERASE00) // same ROMs as R-8 assumed
+	ROM_LOAD("r15179929-mn234000rle.bin", 0x000000, 0x080000, NO_DUMP)
+	ROM_LOAD("r15179930-mn234000rlf.bin", 0x080000, 0x080000, NO_DUMP)
 ROM_END
 
 ROM_START(r8mk2)
 	ROM_REGION(0x20000, "maincpu", 0)
 	ROM_LOAD("roland r8 mkii eprom v1.0.3.bin", 0x00000, 0x20000, CRC(128a9a0c) SHA1(94bd8c76efe270754219f2899f31b62fc4f9060d))
 
-	ROM_REGION(0x180000, "wavedata", 0)
-	ROM_LOAD("upd27c8001eacz-025.ic30", 0x000000, 0x080000, NO_DUMP)
-	ROM_LOAD("upd27c8001eacz-026.ic31", 0x080000, 0x080000, NO_DUMP)
-	ROM_LOAD("upd27c8001eacz-027.ic82", 0x100000, 0x080000, NO_DUMP)
+	ROM_REGION(0x200000, "wavedata", ROMREGION_ERASE00)
+	ROM_LOAD("r15209440-upd27c8001eacz-025.ic30", 0x000000, 0x080000, NO_DUMP)
+	ROM_LOAD("r15209441-upd27c8001eacz-026.ic31", 0x080000, 0x080000, NO_DUMP)
+	ROM_LOAD("r15209442-upd27c8001eacz-027.ic82", 0x100000, 0x080000, NO_DUMP)
 ROM_END
 
 

@@ -114,7 +114,7 @@ Parts:
 | CN4                          | unpopulated                            |
 | CN5                          | PCM Card Slot                          |
 | X1                           | Crystal 12MHz                          |
-| X2                           | Crystal 32.768KHz                      |
+| X2                           | Crystal 32.768MHz                      |
 |-----------------------------------------------------------------------|
 
 
@@ -282,7 +282,7 @@ protected:
 
 private:
 	required_device<i8x9x_device> cpu;
-	required_device<rolandpcm_device> pcm;
+	required_device<mb87419_mb87420_device> pcm;
 	required_device<msm6222b_device> lcd;
 	required_device<timer_device> midi_timer;
 	required_device<ram_device> some_ram;
@@ -553,7 +553,8 @@ void cm32p_state::cm32p(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ROLANDPCM(config, pcm, 16.384_MHz_XTAL);
+	MB87419_MB87420(config, pcm, 32.768_MHz_XTAL);
+	//pcm->int_callback().set_inputline(cpu, i8x9x_device::EXTINT_LINE);
 	pcm->add_route(0, "lspeaker", 1.0);
 	pcm->add_route(1, "rspeaker", 1.0);
 
@@ -604,4 +605,4 @@ ROM_START( cm32p )
 	ROM_REGION( 0x400000, "pcm", ROMREGION_ERASEFF )    // ROMs after descrambling
 ROM_END
 
-CONS( 1989, cm32p, 0, 0, cm32p, cm32p, cm32p_state, init_cm32p, "Roland", "CM-32P", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST( 1989, cm32p, 0, 0, cm32p, cm32p, cm32p_state, init_cm32p, "Roland", "CM-32P", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
