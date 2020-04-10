@@ -909,7 +909,7 @@ void igs017_state::tarzan_decrypt_program_rom()
 		m_decrypted_opcodes[i] = x;
 	}
 
-	for (int i = 0; i < 0x40000; i++) 
+	for (int i = 0; i < 0x40000; i++)
 	{
 		u8 x = rom[i];
 
@@ -946,7 +946,7 @@ void igs017_state::tarzana_decrypt_program_rom()
 		m_decrypted_opcodes[i] = x;
 	}
 
-	for (int i = 0; i < 0x40000; i++) // by iq132 
+	for (int i = 0; i < 0x40000; i++) // by iq132
 	{
 		u8 x = rom[i];
 
@@ -4731,11 +4731,11 @@ GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, init_mgcs,   
 GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, init_lhzb2,    ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (set 1)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, init_lhzb2a,   ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (VS221M)",          0 )
 GAME( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, init_slqz2,    ROT0, "IGS",                      "Mahjong Shuang Long Qiang Zhu 2 (VS203J)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1999,  tarzanc,  0,        starzan,  iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 1)",      MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet
-GAME( 1999,  tarzan,   tarzanc,  starzan,  iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 2)",      MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet
-GAME( 1999,  tarzana,  tarzanc,  starzan,  iqblocka, igs017_state, init_tarzana,  ROT0, "IGS",                      "Tarzan (V107)",                               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // IGS029 needs to be emulated
+GAME( 1999,  tarzanc,  0,        starzan,  iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 1)",      MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet, sprites' decryption missing
+GAME( 1999,  tarzan,   tarzanc,  starzan,  iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 2)",      MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet, sprites' decryption missing
+GAME( 1999,  tarzana,  tarzanc,  starzan,  iqblocka, igs017_state, init_tarzana,  ROT0, "IGS",                      "Tarzan (V107)",                               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // IGS029 needs to be emulated, sprites' decryption missing
 GAME( 2000?, starzan,  0,        starzan,  iqblocka, igs017_state, init_starzan,  ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                 MACHINE_NOT_WORKING )
-GAME( 2001?, happyskl, 0,        starzan,  iqblocka, igs017_state, init_happyskl, ROT0, "IGS",                      "Happy Skill (Italy, V611IT)",                 MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet
+GAME( 2001?, happyskl, 0,        starzan,  iqblocka, igs017_state, init_happyskl, ROT0, "IGS",                      "Happy Skill (Italy, V611IT)",                 MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet, sprites' decryption missing
 
 // Parent spk306us in driver spoker.cpp. Move this set to that driver?
 GAME( ????,  spkrform, spk306us, spkrform, spkrform, igs017_state, init_spkrform, ROT0, "IGS",                      "Super Poker (v100xD03) / Formosa",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
