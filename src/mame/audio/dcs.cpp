@@ -1479,8 +1479,8 @@ int dcs_audio_device::control_r()
 
 void dcs_audio_device::reset_w(int state)
 {
-	/* going high halts the CPU */
-	if (state)
+	/* going low halts the CPU */
+	if (!state)
 	{
 		//      logerror("%s: DCS reset = %d\n", machine().describe_context(), state);
 
@@ -1489,7 +1489,7 @@ void dcs_audio_device::reset_w(int state)
 		m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
-	/* going low resets and reactivates the CPU */
+	/* going high resets and reactivates the CPU */
 	else
 		m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
