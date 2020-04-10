@@ -10,6 +10,10 @@ import os.path
 import re
 import sys
 import zlib
+import vlayout
+
+validators = {}
+validators['.lay'] = vlayout.validate
 
 
 if len(sys.argv) < 4:
@@ -53,7 +57,13 @@ for fileid in range(3, len(sys.argv)):
             base[0].append((d, b))
             lookup[os.path.join(root, d)] = b
         for f in files:
-            data = open(os.path.join(root, f), 'rb').read()
+            data = None
+            fpath = os.path.join(root, f)
+            ext = os.path.splitext(f)[1]
+            if ext in validators:
+                data = validators[ext](fpath)
+            else:
+                data = open(fpath, 'rb').read()
             base[1].append((f, len(blobs)))
             blobs.append(zlib.compress(data, 9))
             blobusize.append(len(data))

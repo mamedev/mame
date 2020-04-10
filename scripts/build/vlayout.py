@@ -9,7 +9,6 @@ import re
 import sys
 import xml.sax
 import xml.sax.saxutils
-import zlib
 
 
 # workaround for version incompatibility
@@ -86,10 +85,6 @@ class Minifyer(object):
                 self.incomplete_tag = False
             self.output(xml.sax.saxutils.escape(self.element_content))
             self.element_content = ''
-
-
-class XmlError(Exception):
-    pass
 
 
 class LayoutChecker(Minifyer):
@@ -589,84 +584,52 @@ class LayoutChecker(Minifyer):
         super(LayoutChecker, self).endElement(name)
 
 
-def compressLayout(src, dst, comp):
-    state = [0, 0]
-    def write(block):
-        for ch in bytearray(block):
-            if 0 == state[0]:
-                dst('\t')
-            elif 0 == (state[0] % 32):
-                dst(',\n\t')
-            else:
-                dst(', ')
-            state[0] += 1
-            dst('%3u' % (ch))
-
+def validate(src):
     def output(text):
-        block = text.encode('UTF-8')
-        state[1] += len(block)
-        write(comp.compress(block))
+        output.result += text
+
+    output.result = ""
 
     error_handler = ErrorHandler()
-    content_handler = LayoutChecker(output)
     parser = xml.sax.make_parser()
     parser.setErrorHandler(error_handler)
+    content_handler = LayoutChecker(output)
     parser.setContentHandler(content_handler)
     try:
         parser.parse(src)
-        write(comp.flush())
-        dst('\n')
+
     except xml.sax.SAXException as exception:
-        print('fatal error: %s' % (exception))
-        raise XmlError('Fatal error parsing XML')
-    if (content_handler.errors > 0) or (error_handler.errors > 0) or (error_handler.warnings > 0):
-        raise XmlError('Error(s) and/or warning(s) parsing XML')
+        print('fatal error parsing XML: %s' % (exception))
+        sys.exit(1)
 
-    return state[1], state[0]
+    if error_handler.errors != 0 or content_handler.errors != 0:
+        sys.exit(1)
 
-
-class BlackHole(object):
-    def write(self, *args):
-        pass
-    def close(self):
-        pass
-
+    return output.result.encode('UTF-8')
 
 if __name__ == '__main__':
-    if (len(sys.argv) > 4) or (len(sys.argv) < 2):
+    if len(sys.argv) <= 1:
         print('Usage:')
-        print('  complay <source.lay> [<output.h> [<varname>]]')
-        sys.exit(0 if len(sys.argv) <= 1 else 1)
+        print('  vlayout.py <file.lay> [file.lay...]')
+        sys.exit(0)
 
-    srcfile = sys.argv[1]
-    dstfile = sys.argv[2] if len(sys.argv) >= 3 else None
-    if len(sys.argv) >= 4:
-        varname = sys.argv[3]
-    else:
-        varname = os.path.basename(srcfile)
-        base, ext = os.path.splitext(varname)
-        if ext.lower() == '.lay':
-            varname = base
-        varname = 'layout_' + re.sub('[^0-9A-Za-z_]', '_', varname)
+    def drop(text):
+        pass
 
-    comp_type = 'internal_layout::compression::ZLIB'
-    try:
-        dst = open(dstfile,'w') if dstfile is not None else BlackHole()
-        dst.write('static const unsigned char %s_data[] = {\n' % (varname))
-        byte_count, comp_size = compressLayout(srcfile, lambda x: dst.write(x), zlib.compressobj())
-        dst.write('};\n\n')
-        dst.write('const internal_layout %s = {\n' % (varname))
-        dst.write('\t%d, sizeof(%s_data), %s, %s_data\n' % (byte_count, varname, comp_type, varname))
-        dst.write('};\n')
-        dst.close()
-    except XmlError:
-        dst.close()
-        if dstfile is not None:
-            os.remove(dstfile)
-        sys.exit(2)
-    except IOError:
-        sys.stderr.write("Unable to open output file '%s'\n" % dstfile)
-        dst.close()
-        if dstfile is not None:
-            os.remove(dstfile)
-        sys.exit(3)
+    error_handler = ErrorHandler()
+    parser = xml.sax.make_parser()
+    parser.setErrorHandler(error_handler)
+    errors = 0
+    for arg in range(1, len(sys.argv)):
+        content_handler = LayoutChecker(drop)
+        parser.setContentHandler(content_handler)
+        try:
+            parser.parse(sys.argv[arg])
+
+        except xml.sax.SAXException as exception:
+            errors += 1
+            print('fatal error parsing XML: %s' % (exception))
+
+        errors += content_handler.errors
+
+    sys.exit(0 if (errors + error_handler.errors) == 0 else 1)

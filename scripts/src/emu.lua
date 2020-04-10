@@ -37,7 +37,10 @@ includedirs {
 	ext_includedir("pugixml"),
 }
 
+-- Put the generated files at the start so that if they take time to
+-- generate it is done in parallel with the other ones
 files {
+	GEN_DIR  .. "emu/fslayout.cpp",
 	MAME_DIR .. "src/emu/emu.h",
 	MAME_DIR .. "src/emu/emufwd.h",
 	MAME_DIR .. "src/emu/main.h",
@@ -258,7 +261,6 @@ files {
 	MAME_DIR .. "src/emu/video/rgbsse.h",
 	MAME_DIR .. "src/emu/video/rgbvmx.cpp",
 	MAME_DIR .. "src/emu/video/rgbvmx.h",
-	GEN_DIR  .. "emu/fslayout.cpp",
 }
 
 pchsource(MAME_DIR .. "src/emu/main.cpp")
