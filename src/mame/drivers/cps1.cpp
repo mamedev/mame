@@ -2410,7 +2410,7 @@ static INPUT_PORTS_START( cworld2j )
 INPUT_PORTS_END
 
 /* Needs further checking */
-static INPUT_PORTS_START( wof )
+INPUT_PORTS_START( wof )
 	PORT_INCLUDE( cps1_3players )
 
 	PORT_MODIFY("IN0")

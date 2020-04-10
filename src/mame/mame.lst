@@ -10851,6 +10851,7 @@ punipic2                        // bootleg
 punipic3                        // bootleg
 slampic                         // bootleg
 slampic2                        // bootleg
+wofpic                          // bootleg
 
 @source:cps2.cpp
 1944                            // 20/06/2000 (c) 2000 Eighting/Raizing (USA)
