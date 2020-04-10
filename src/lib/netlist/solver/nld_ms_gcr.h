@@ -228,8 +228,10 @@ namespace solver
 	template <typename FT, int SIZE>
 	unsigned matrix_solver_GCR_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
 	{
-		// populate matrix
+		//  clear matrix
 		mat.set_scalar(plib::constants<FT>::zero());
+
+		// populate matrix
 		this->fill_matrix_and_rhs();
 
 		// now solve it

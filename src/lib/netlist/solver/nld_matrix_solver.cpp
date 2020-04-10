@@ -368,11 +368,9 @@ namespace solver
 		for (std::size_t k = 0; k < iN; k++)
 		{
 			auto count = m_terms[k].count();
-
 			for (std::size_t i = 0; i < count; i++)
 			{
 				m_terms[k].terms()[i]->set_ptrs(&m_gtn[k][i], &m_gonn[k][i], &m_Idrn[k][i]);
-				//m_connected_net_Vn[k][i] = m_terms[k].terms()[i]->connected_terminal()->net().Q_Analog_state_ptr();
 				m_connected_net_Vn[k][i] = get_connected_net(m_terms[k].terms()[i])->Q_Analog_state_ptr();
 			}
 		}
