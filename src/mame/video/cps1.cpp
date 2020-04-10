@@ -686,6 +686,26 @@ static const struct gfx_range mapper_TK22B_table[] =
 };
 
 
+#define mapper_TK24B1    { 0x8000, 0x8000, 0, 0 }, mapper_TK24B1_table
+static const struct gfx_range mapper_TK24B1_table[] =
+{
+	// verified from PAL dump:
+	// bank 0 = pin 16 (ROMs 1,3,5,7)
+	// bank 1 = pin 19 (ROMs 2,4,6,8)
+	// pins 12,14 duplicate bank 0 allowing to populate the 8-bit ROM sockets
+	// instead of the 16-bit ones:
+	// pin 12 = sprites 0000-3fff
+	// pin 14 = scroll1 6000-7fff, sprites 4000-5fff
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x5fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x6000, 0x7fff, 0 },
+	{ GFXTYPE_SCROLL2, 0x4000, 0x7fff, 1 },
+	{ GFXTYPE_SCROLL3, 0x0000, 0x3fff, 1 },
+	{ 0 }
+};
+
+
 #define mapper_WL24B    { 0x8000, 0x8000, 0, 0 }, mapper_WL24B_table
 static const struct gfx_range mapper_WL24B_table[] =
 {
@@ -1458,7 +1478,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"strideruc",   CPS_B_17,     mapper_ST24M1 },  // wrong?
 	{"striderj",    CPS_B_01,     mapper_ST22B },   // equivalent to ST24M1
 	{"striderjr",   CPS_B_21_DEF, mapper_ST24M1 },  // wrong, this set uses STH63B, still not dumped
-	{"dynwar",      CPS_B_02,     mapper_TK22B },   // wrong, this set uses TK24B1, dumped but equations still not added
+	{"dynwar",      CPS_B_02,     mapper_TK24B1 },
 	{"dynwara",     CPS_B_02,     mapper_TK22B },
 	{"dynwarj",     CPS_B_02,     mapper_TK22B },
 	{"dynwarjr",    CPS_B_21_DEF, mapper_TK22B },   // wrong, this set uses TK163B, still not dumped
