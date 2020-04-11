@@ -17,8 +17,6 @@
 #ifndef MAME_EMU_VIDEO_H
 #define MAME_EMU_VIDEO_H
 
-#include "aviio.h"
-
 
 //**************************************************************************
 //  CONSTANTS
@@ -91,13 +89,9 @@ public:
 
 	// movies
 	void begin_recording(const char *name, movie_format format);
-	void begin_recording_mng(const char *name, uint32_t index, screen_device *screen);
-	void begin_recording_avi(const char *name, uint32_t index, screen_device *screen);
-	void end_recording(movie_format format);
-	void end_recording_mng(uint32_t index);
-	void end_recording_avi(uint32_t index);
+	void end_recording();
+	void end_recording(movie_format dummy) { end_recording(); }
 	void add_sound_to_recording(const s16 *sound, int numsamples);
-	void add_sound_to_avi_recording(const s16 *sound, int numsamples, uint32_t index);
 
 	void set_timecode_enabled(bool value) { m_timecode_enabled = value; }
 	bool get_timecode_enabled() { return m_timecode_enabled; }
@@ -108,6 +102,34 @@ public:
 	void add_to_total_time(attotime time) { m_timecode_total += time; }
 	std::string &timecode_text(std::string &str);
 	std::string &timecode_total_text(std::string &str);
+
+	// movie recording abstract interface
+	class movie_recording
+	{
+	public:
+		typedef std::unique_ptr<movie_recording> ptr;
+
+		// ctor/dtor
+		movie_recording(screen_device *screen);
+		movie_recording(const movie_recording &) = delete;
+		movie_recording(movie_recording &&) = delete;
+		virtual ~movie_recording() { };
+
+		// accessors
+		screen_device *screen()					{ return m_screen; }
+		attotime frame_period()					{ return m_frame_period; }
+		void set_next_frame_time(attotime time) { m_next_frame_time = time; }
+		attotime next_frame_time() const		{ return m_next_frame_time; }
+
+		// virtuals
+		virtual bool append_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries) = 0;
+		virtual bool add_sound_to_recording(const s16 *sound, int numsamples) = 0;
+
+	private:
+		screen_device *	m_screen;
+		attotime		m_frame_period;			// time of frame period
+		attotime		m_next_frame_time;      // time of next frame
+	};
 
 private:
 	// internal helpers
@@ -131,6 +153,9 @@ private:
 	// snapshot/movie helpers
 	void create_snapshot_bitmap(screen_device *screen);
 	void record_frame();
+
+	// movies
+	void begin_recording_screen(const std::string &filename, uint32_t index, screen_device *screen, movie_format format);
 
 	// internal state
 	running_machine &   m_machine;                  // reference to our machine
@@ -180,38 +205,8 @@ private:
 	s32                 m_snap_width;               // width of snapshots (0 == auto)
 	s32                 m_snap_height;              // height of snapshots (0 == auto)
 
-	// movie recording - MNG
-	class mng_info_t
-	{
-	public:
-		mng_info_t()
-			: m_mng_frame_period(attotime::zero)
-			, m_mng_next_frame_time(attotime::zero)
-			, m_mng_frame(0) { }
-
-		std::unique_ptr<emu_file> m_mng_file;              // handle to the open movie file
-		attotime            m_mng_frame_period;         // period of a single movie frame
-		attotime            m_mng_next_frame_time;      // time of next frame
-		u32                 m_mng_frame;                // current movie frame number
-	};
-	std::vector<mng_info_t> m_mngs;
-
-	// movie recording - AVI
-	class avi_info_t
-	{
-	public:
-		avi_info_t()
-			: m_avi_file(nullptr)
-			, m_avi_frame_period(attotime::zero)
-			, m_avi_next_frame_time(attotime::zero)
-			, m_avi_frame(0) { }
-
-		avi_file::ptr       m_avi_file;                 // handle to the open movie file
-		attotime            m_avi_frame_period;         // period of a single movie frame
-		attotime            m_avi_next_frame_time;      // time of next frame
-		u32                 m_avi_frame;                // current movie frame number
-	};
-	std::vector<avi_info_t> m_avis;
+	// movie recordings
+	std::vector<movie_recording::ptr> m_movie_recordings;
 
 	static const bool   s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS];
 
