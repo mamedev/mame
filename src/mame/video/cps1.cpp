@@ -888,6 +888,9 @@ static const struct gfx_range mapper_O224B_table[] =
 };
 
 
+// MS24B and MS22B are equivalent, but since we could dump both PALs we are
+// documenting both.
+
 #define mapper_MS24B    { 0x8000, 0, 0, 0 }, mapper_MS24B_table
 static const struct gfx_range mapper_MS24B_table[] =
 {
@@ -904,6 +907,23 @@ static const struct gfx_range mapper_MS24B_table[] =
 	{ GFXTYPE_SCROLL1, 0x4000, 0x4fff, 0 },
 	{ GFXTYPE_SCROLL2, 0x5000, 0x6fff, 0 },
 	{ GFXTYPE_SCROLL3, 0x7000, 0x7fff, 0 },
+	{ 0 }
+};
+
+#define mapper_MS22B    { 0x4000, 0x4000, 0, 0 }, mapper_MS22B_table
+static const struct gfx_range mapper_MS22B_table[] =
+{
+	// verified from PAL dump:
+	// bank 0 = pin 19 (ROMs 1,5, 9,13,17,24,32,38)
+	// bank 1 = pin 16 (ROMs 2,6,10,14,18,25,33,39)
+	// pin 12 and pin 14 are never enabled
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x3fff, 0 },
+	
+	{ GFXTYPE_SCROLL1, 0x4000, 0x4fff, 1 },
+	{ GFXTYPE_SCROLL2, 0x5000, 0x6fff, 1 },
+	{ GFXTYPE_SCROLL3, 0x7000, 0x7fff, 1 },
 	{ 0 }
 };
 
@@ -1569,16 +1589,16 @@ static const struct CPS1config cps1_config_table[]=
 	{"ffightua",    CPS_B_01,     mapper_S224B },
 	{"ffightub",    CPS_B_03,     mapper_S224B },   // had 04 handwritten on the CPS_B chip, but clearly isn't.
 	{"ffightuc",    CPS_B_05,     mapper_S224B },
-	{"ffightj",     CPS_B_04,     mapper_S222B },
-	{"ffightj1",    CPS_B_01,     mapper_S222B },
-	{"ffightj2",    CPS_B_02,     mapper_S222B },
-	{"ffightj3",    CPS_B_03,     mapper_S222B },
-	{"ffightj4",    CPS_B_05,     mapper_S222B },
+	{"ffightj",     CPS_B_04,     mapper_S222B },   // equivalent to S224B
+	{"ffightj1",    CPS_B_01,     mapper_S222B },   // equivalent to S224B
+	{"ffightj2",    CPS_B_02,     mapper_S222B },   // equivalent to S224B
+	{"ffightj3",    CPS_B_03,     mapper_S222B },   // equivalent to S224B
+	{"ffightj4",    CPS_B_05,     mapper_S222B },   // equivalent to S224B
 	{"ffightjh",    CPS_B_01,     mapper_S224B },   // wrong, ffightjh hack doesn't even use the S222B PAL, since replaced with a GAL.
 	{"1941",        CPS_B_05,     mapper_YI24B },
 	{"1941r1",      CPS_B_05,     mapper_YI24B },
 	{"1941u",       CPS_B_05,     mapper_YI24B },
-	{"1941j",       CPS_B_05,     mapper_YI22B },
+	{"1941j",       CPS_B_05,     mapper_YI22B },   // equivalent to YI24B
 	{"unsquad",     CPS_B_11,     mapper_AR24B },
 	{"area88",      CPS_B_11,     mapper_AR22B },   // equivalent to AR24B
 	{"area88r",     CPS_B_21_DEF, mapper_AR22B },   // wrong, this set uses ARA63B, still not dumped
@@ -1589,7 +1609,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"msword",      CPS_B_13,     mapper_MS24B },
 	{"mswordr1",    CPS_B_13,     mapper_MS24B },
 	{"mswordu",     CPS_B_13,     mapper_MS24B },
-	{"mswordj",     CPS_B_13,     mapper_MS24B },   // wrong, this set uses MS22B, dumped but equations still not added
+	{"mswordj",     CPS_B_13,     mapper_MS22B },   // equivalent to MS24B
 	{"mtwins",      CPS_B_14,     mapper_CK24B },
 	{"chikij",      CPS_B_14,     mapper_CK24B },   // wrong, this set uses CK22B, dumped but equations still not added
 	{"nemo",        CPS_B_15,     mapper_NM24B },
