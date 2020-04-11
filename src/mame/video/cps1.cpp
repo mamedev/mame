@@ -724,6 +724,9 @@ static const struct gfx_range mapper_WL24B_table[] =
 };
 
 
+// S222B and S224B are equivalent, but since we have dumps of both PALs we will
+// document both.
+
 #define mapper_S224B    { 0x8000, 0, 0, 0 }, mapper_S224B_table
 static const struct gfx_range mapper_S224B_table[] =
 {
@@ -745,6 +748,27 @@ static const struct gfx_range mapper_S224B_table[] =
 	{ GFXTYPE_SCROLL1, 0x4400, 0x4bff, 0 },
 	{ GFXTYPE_SCROLL3, 0x4c00, 0x5fff, 0 },
 	{ GFXTYPE_SCROLL2, 0x6000, 0x7fff, 0 },
+	{ 0 }
+};
+
+#define mapper_S222B    { 0x4000, 0x4000, 0, 0 }, mapper_S222B_table
+static const struct gfx_range mapper_S222B_table[] =
+{
+	// verified from PAL dump:
+	// bank 0 = pin 19 (ROMs 1,5, 9,13,17,24,32,38)
+	// bank 1 = pin 16 (ROMs 2,6,10,14,18,25,33,39)
+	// pin 18 gives an alternate single bank mapping identical to S224B pin 16,
+	// however, the only b-board that seems to use pin 18 as an output is the unique forgottn 88621B-2,
+	// todo: confirm if pin 18 is connected to anything on ffightj1-4 88622B-2/3 and 89625B-1 b-boards.
+	//       confirm which b-board ffightj uses, could it be 88621B-2?
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x3fff, 0 },
+
+	{ GFXTYPE_SPRITES, 0x4000, 0x43ff, 1 },
+	{ GFXTYPE_SCROLL1, 0x4400, 0x4bff, 1 },
+	{ GFXTYPE_SCROLL3, 0x4c00, 0x5fff, 1 },
+	{ GFXTYPE_SCROLL2, 0x6000, 0x7fff, 1 },
 	{ 0 }
 };
 
@@ -1526,11 +1550,11 @@ static const struct CPS1config cps1_config_table[]=
 	{"ffightua",    CPS_B_01,     mapper_S224B },
 	{"ffightub",    CPS_B_03,     mapper_S224B },   // had 04 handwritten on the CPS_B chip, but clearly isn't.
 	{"ffightuc",    CPS_B_05,     mapper_S224B },
-	{"ffightj",     CPS_B_04,     mapper_S224B },   // wrong, this set uses S222B
-	{"ffightj1",    CPS_B_01,     mapper_S224B },   // wrong, this set uses S222B
-	{"ffightj2",    CPS_B_02,     mapper_S224B },   // wrong, this set uses S222B
-	{"ffightj3",    CPS_B_03,     mapper_S224B },   // wrong, this set uses S222B
-	{"ffightj4",    CPS_B_05,     mapper_S224B },   // wrong, this set uses S222B
+	{"ffightj",     CPS_B_04,     mapper_S222B },
+	{"ffightj1",    CPS_B_01,     mapper_S222B },
+	{"ffightj2",    CPS_B_02,     mapper_S222B },
+	{"ffightj3",    CPS_B_03,     mapper_S222B },
+	{"ffightj4",    CPS_B_05,     mapper_S222B },
 	{"ffightjh",    CPS_B_01,     mapper_S224B },   // wrong, ffightjh hack doesn't even use the S222B PAL, since replaced with a GAL.
 	{"1941",        CPS_B_05,     mapper_YI24B },
 	{"1941r1",      CPS_B_05,     mapper_YI24B },
