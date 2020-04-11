@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "video/poly.h"
 #include "bitmap.h"
-#include "machine/pic8259.h"
 #include "includes/xbox_nv2a.h"
 #include <bitset>
 
@@ -3016,17 +3015,30 @@ void nv2a_renderer::compute_size_rendertarget(uint32_t chanel, uint32_t subchann
 	size_depthbuffer = pitch_depthbuffer*(limits_rendertarget.bottom() + 1);
 }
 
-int nv2a_renderer::geforce_exec_method(address_space &space, uint32_t chanel, uint32_t subchannel, uint32_t method, uint32_t address, int &countlen)
+int nv2a_renderer::execute_method(address_space &space, uint32_t chanel, uint32_t subchannel, uint32_t method, uint32_t address, int &countlen)
 {
-	uint32_t maddress;
 	uint32_t data;
 
-	maddress = method << 2;
 	data = space.read_dword(address);
-	channel[chanel][subchannel].object.method[method] = data;
+	channel[chanel][subchannel].object.method[method / 4] = data;
 #ifdef LOG_NV2A
-	//printf("A:%08X MTHD:%08X D:%08X\n\r",address,maddress,data);
+	//printf("A:%08X CH=%02d SCH=%02d MTHD:%08X D:%08X\n\r",address,chanel,subchannel,maddress,data);
 #endif
+	if (channel[chanel][subchannel].object.objclass == 0x97)
+		return execute_method_3d(space, chanel, subchannel, method, address, data, countlen);
+	if (channel[chanel][subchannel].object.objclass == 0x39) // 0180
+		return execute_method_m2mf(space, chanel, subchannel, method, address, data, countlen);
+	if (channel[chanel][subchannel].object.objclass == 0x62) // 0184 0188
+		return execute_method_surf2d(space, chanel, subchannel, method, address, data, countlen);
+	if (channel[chanel][subchannel].object.objclass == 0x9f) // 019c 02fc
+		return execute_method_blit(space, chanel, subchannel, method, address, data, countlen);
+	return 0;
+}
+
+int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint32_t subchannel, uint32_t maddress, uint32_t address, uint32_t data, int &countlen)
+{
+	if ((chanel != 0) || (subchannel != 0))
+		return 0;
 	if (maddress == 0x17fc) {
 #if 0 // useful while debugging to see what coordinates have been used
 		static int debugvc = 0;
@@ -3210,7 +3222,7 @@ int nv2a_renderer::geforce_exec_method(address_space &space, uint32_t chanel, ui
 			assemble_primitive(&persistvertexattr, 1, render_spans_callback);
 	}
 	if ((maddress >= 0x1720) && (maddress < 0x1760)) {
-		int bit = method - 0x1720 / 4;
+		int bit = maddress / 4 - 0x1720 / 4;
 
 		if (data & 0x80000000)
 			vertexbuffer_address[bit] = (data & 0x0fffffff) + dma_offset[7];
@@ -3218,7 +3230,7 @@ int nv2a_renderer::geforce_exec_method(address_space &space, uint32_t chanel, ui
 			vertexbuffer_address[bit] = (data & 0x0fffffff) + dma_offset[6];
 	}
 	if ((maddress >= 0x1760) && (maddress < 0x17A0)) {
-		int bit = method - 0x1760 / 4;
+		int bit = maddress / 4 - 0x1760 / 4;
 
 		vertexbuffer_stride[bit] = (data >> 8) & 255;
 		vertexbuffer_kind[bit] = (NV2A_VTXBUF_TYPE)(data & 15);
@@ -3268,11 +3280,32 @@ int nv2a_renderer::geforce_exec_method(address_space &space, uint32_t chanel, ui
 	if (maddress == 0x0180) {
 		geforce_read_dma_object(data, dma_offset[0], dma_size[0]);
 	}
+	if (maddress == 0x0184) {
+		geforce_read_dma_object(data, dma_offset[1], dma_size[1]);
+	}
+	if (maddress == 0x0188) {
+		geforce_read_dma_object(data, dma_offset[2], dma_size[2]);
+	}
+	if (maddress == 0x0190) {
+		geforce_read_dma_object(data, dma_offset[3], dma_size[3]);
+	}
+	if (maddress == 0x0194) {
+		geforce_read_dma_object(data, dma_offset[4], dma_size[4]);
+	}
+	if (maddress == 0x0198) {
+		geforce_read_dma_object(data, dma_offset[5], dma_size[5]);
+	}
 	if (maddress == 0x019c) {
 		geforce_read_dma_object(data, dma_offset[6], dma_size[6]);
 	}
 	if (maddress == 0x01a0) {
 		geforce_read_dma_object(data, dma_offset[7], dma_size[7]);
+	}
+	if (maddress == 0x01a4) {
+		geforce_read_dma_object(data, dma_offset[8], dma_size[8]);
+	}
+	if (maddress == 0x01a8) {
+		geforce_read_dma_object(data, dma_offset[9], dma_size[9]);
 	}
 	if (maddress == 0x1d70) {
 		// with 1d70 write the value at offest [1d6c] inside dma object [1a4]
@@ -3879,6 +3912,46 @@ int nv2a_renderer::geforce_exec_method(address_space &space, uint32_t chanel, ui
 		combiner.stage[n].mapout_rgb_scale = (data >> 16) & 3;
 		//combiner.=(data >> 27) & 7;
 		countlen--;
+	}
+	return 0;
+}
+
+int nv2a_renderer::execute_method_m2mf(address_space &space, uint32_t chanel, uint32_t subchannel, uint32_t method, uint32_t address, uint32_t data, int &countlen)
+{
+	if (method == 0x0180) {
+#ifdef LOG_NV2A
+		machine().logerror("m2mf method 0180 notify\n");
+#endif
+	}
+	return 0;
+}
+
+int nv2a_renderer::execute_method_surf2d(address_space &space, uint32_t chanel, uint32_t subchannel, uint32_t method, uint32_t address, uint32_t data, int &countlen)
+{
+	if (method == 0x0184) {
+#ifdef LOG_NV2A
+		machine().logerror("surf2d method 0184 source\n");
+#endif
+	}
+	if (method == 0x0188) {
+#ifdef LOG_NV2A
+		machine().logerror("surf2d method 0188 destination\n");
+#endif
+	}
+	return 0;
+}
+
+int nv2a_renderer::execute_method_blit(address_space &space, uint32_t chanel, uint32_t subchannel, uint32_t method, uint32_t address, uint32_t data, int &countlen)
+{
+	if (method == 0x019c) {
+#ifdef LOG_NV2A
+		machine().logerror("blit method 019c surf\n");
+#endif
+	}
+	if (method == 0x02fc) {
+#ifdef LOG_NV2A
+		machine().logerror("blit method 02fc op\n");
+#endif
 	}
 	return 0;
 }
@@ -4607,7 +4680,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 					ret = 0;
 					while (count > 0) {
 						countlen = 1;
-						ret=geforce_exec_method(*space, chanel, subch, method >> 2, *dmaget, countlen);
+						ret = execute_method(*space, chanel, subch, method, *dmaget, countlen);
 						count--;
 						method += 4;
 						*dmaget += 4;
@@ -4635,7 +4708,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 	#endif
 					while (count > 0) {
 						countlen = count;
-						ret=geforce_exec_method(*space, chanel, subch, method >> 2, *dmaget, countlen);
+						ret = execute_method(*space, chanel, subch, method, *dmaget, countlen);
 						*dmaget += 4 * (count - countlen);
 						count = countlen;
 					}
@@ -4656,7 +4729,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 	#endif
 					while (count > 0) {
 						countlen = count;
-						ret=geforce_exec_method(*space, chanel, subch, method >> 2, *dmaget, countlen);
+						ret = execute_method(*space, chanel, subch, method, *dmaget, countlen);
 						*dmaget += 4 * (count - countlen);
 						count = countlen;
 					}
