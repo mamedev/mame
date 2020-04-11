@@ -53,37 +53,27 @@ public:
 		: fcrash_state(mconfig, type, tag)
 	{ }
 
-	void dinopic(machine_config &config);
 	void punipic(machine_config &config);
 	void slampic(machine_config &config);
-	void slampic2(machine_config &config);
 
 	void init_dinopic();
 	void init_punipic();
 	void init_punipic3();
 	void init_slampic();
-	void init_slampic2();
-	void init_jurassic99();
-
+	
+protected:
+	DECLARE_WRITE16_MEMBER(dinopic_layer_w);
+	
 private:
-	DECLARE_MACHINE_START(dinopic);
 	DECLARE_MACHINE_START(punipic);
 	DECLARE_MACHINE_START(slampic);
-	DECLARE_MACHINE_START(slampic2);
 
-	DECLARE_WRITE16_MEMBER(dinopic_layer_w);
-	DECLARE_WRITE16_MEMBER(dinopic_layer2_w);
 	DECLARE_WRITE16_MEMBER(punipic_layer_w);
 	DECLARE_WRITE16_MEMBER(slampic_layer_w);
 	DECLARE_WRITE16_MEMBER(slampic_layer2_w);
-	DECLARE_READ16_MEMBER(slampic2_cps_a_r);
-	DECLARE_WRITE16_MEMBER(slampic2_sound_w);
-	DECLARE_WRITE16_MEMBER(slampic2_sound2_w);
 
-	void dinopic_map(address_map &map);
 	void punipic_map(address_map &map);
 	void slampic_map(address_map &map);
-	void slampic2_map(address_map &map);
 };
 
 class slampic2_state : public cps1bl_pic_state
@@ -92,8 +82,16 @@ public:
 	slampic2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cps1bl_pic_state(mconfig, type, tag)
 	{ }
+	
+	void slampic2(machine_config &config);
+	void init_slampic2();
 
 private:
+	DECLARE_MACHINE_START(slampic2);
+	DECLARE_READ16_MEMBER(slampic2_cps_a_r);
+	DECLARE_WRITE16_MEMBER(slampic2_sound_w);
+	DECLARE_WRITE16_MEMBER(slampic2_sound2_w);
+	void slampic2_map(address_map &map);
 	void bootleg_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 };
 
@@ -103,8 +101,14 @@ public:
 	dinopic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cps1bl_pic_state(mconfig, type, tag)
 	{ }
+	
+	void dinopic(machine_config &config);
+	void init_jurassic99();
 
 private:
+	DECLARE_WRITE16_MEMBER(dinopic_layer2_w);
+	DECLARE_MACHINE_START(dinopic);
+	void dinopic_map(address_map &map);
 	void bootleg_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 };
 
@@ -137,7 +141,7 @@ WRITE16_MEMBER(cps1bl_pic_state::dinopic_layer_w)
 	}
 }
 
-WRITE16_MEMBER(cps1bl_pic_state::dinopic_layer2_w)
+WRITE16_MEMBER(dinopic_state::dinopic_layer2_w)
 {
 	m_cps_a_regs[0x06 / 2] = data;
 }
@@ -225,7 +229,7 @@ WRITE16_MEMBER(cps1bl_pic_state::slampic_layer2_w)
 	}
 }
 
-READ16_MEMBER(cps1bl_pic_state::slampic2_cps_a_r)
+READ16_MEMBER(slampic2_state::slampic2_cps_a_r)
 {
 	// checks bit 0 of 800132
 	// no sound codes are sent unless this returns true, ready signal from the sound PIC?
@@ -236,28 +240,28 @@ READ16_MEMBER(cps1bl_pic_state::slampic2_cps_a_r)
 	return 0;
 }
 
-WRITE16_MEMBER(cps1bl_pic_state::slampic2_sound_w)
+WRITE16_MEMBER(slampic2_state::slampic2_sound_w)
 {
 	//logerror("Sound command: %04x\n", data);
 }
 
-WRITE16_MEMBER(cps1bl_pic_state::slampic2_sound2_w)
+WRITE16_MEMBER(slampic2_state::slampic2_sound2_w)
 {
 	//logerror("Sound2 command: %04x\n", data);
 }
 
 
-void cps1bl_pic_state::dinopic(machine_config &config)
+void dinopic_state::dinopic(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cps1bl_pic_state::dinopic_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cps1bl_pic_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps1bl_pic_state::cpu_space_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dinopic_state::dinopic_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dinopic_state::cps1_interrupt));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &dinopic_state::cpu_space_map);
 
 	//PIC16C57(config, m_audiocpu, 3750000).set_disable(); /* no valid dumps .. */
 
-	MCFG_MACHINE_START_OVERRIDE(cps1bl_pic_state, dinopic)
+	MCFG_MACHINE_START_OVERRIDE(dinopic_state, dinopic)
 
 	EEPROM_93C46_8BIT(config, "eeprom");
 
@@ -267,8 +271,8 @@ void cps1bl_pic_state::dinopic(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
-	m_screen->set_screen_update(FUNC(cps1bl_pic_state::screen_update_fcrash));
-	m_screen->screen_vblank().set(FUNC(cps1bl_pic_state::screen_vblank_cps1));
+	m_screen->set_screen_update(FUNC(dinopic_state::screen_update_fcrash));
+	m_screen->screen_vblank().set(FUNC(dinopic_state::screen_vblank_cps1));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -350,22 +354,22 @@ void cps1bl_pic_state::slampic(machine_config &config)
 	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
-void cps1bl_pic_state::slampic2(machine_config &config)
+void slampic2_state::slampic2(machine_config &config)
 {
 	M68000(config, m_maincpu, 10000000);  // measured
-	m_maincpu->set_addrmap(AS_PROGRAM, &cps1bl_pic_state::slampic2_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cps1bl_pic_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps1bl_pic_state::cpu_space_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &slampic2_state::slampic2_map);
+	m_maincpu->set_vblank_int("screen", FUNC(slampic2_state::cps1_interrupt));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &slampic2_state::cpu_space_map);
 
 	PIC16C57(config, m_audiocpu, 4000000);  // measured
 	//m_audiocpu->set_disable();
 
-	MCFG_MACHINE_START_OVERRIDE(cps1bl_pic_state, slampic2)
+	MCFG_MACHINE_START_OVERRIDE(slampic2_state, slampic2)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
-	m_screen->set_screen_update(FUNC(cps1bl_pic_state::screen_update_fcrash));
-	//m_screen->screen_vblank().set(FUNC(cps1bl_pic_state::screen_vblank_cps1));
+	m_screen->set_screen_update(FUNC(slampic2_state::screen_update_fcrash));
+	//m_screen->screen_vblank().set(FUNC(slampic2_state::screen_vblank_cps1));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -375,27 +379,27 @@ void cps1bl_pic_state::slampic2(machine_config &config)
 	//GENERIC_LATCH_8(config, m_soundlatch);
 	//GENERIC_LATCH_8(config, m_soundlatch2);
 	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_LOW);  // measured & pin 7 verified
-	//m_oki->set_addrmap(0, &cps1bl_pic_state::slampic2_oki_map);
+	//m_oki->set_addrmap(0, &slampic2_state::slampic2_oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 
-void cps1bl_pic_state::dinopic_map(address_map &map)
+void dinopic_state::dinopic_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
 	map(0x800000, 0x800007).portr("IN1");            /* Player input ports */
-	map(0x800006, 0x800007).w(FUNC(cps1bl_pic_state::cps1_soundlatch_w));    /* Sound command */
-	map(0x800018, 0x80001f).r(FUNC(cps1bl_pic_state::cps1_dsw_r));            /* System input ports / Dip Switches */
-	map(0x800030, 0x800037).w(FUNC(cps1bl_pic_state::cps1_coinctrl_w));
-	map(0x800100, 0x80013f).w(FUNC(cps1bl_pic_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
-	map(0x800140, 0x80017f).rw(FUNC(cps1bl_pic_state::cps1_cps_b_r), FUNC(cps1bl_pic_state::cps1_cps_b_w)).share("cps_b_regs");
-	map(0x800222, 0x800223).w(FUNC(cps1bl_pic_state::dinopic_layer2_w));
+	map(0x800006, 0x800007).w(FUNC(dinopic_state::cps1_soundlatch_w));    /* Sound command */
+	map(0x800018, 0x80001f).r(FUNC(dinopic_state::cps1_dsw_r));            /* System input ports / Dip Switches */
+	map(0x800030, 0x800037).w(FUNC(dinopic_state::cps1_coinctrl_w));
+	map(0x800100, 0x80013f).w(FUNC(dinopic_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
+	map(0x800140, 0x80017f).rw(FUNC(dinopic_state::cps1_cps_b_r), FUNC(dinopic_state::cps1_cps_b_w)).share("cps_b_regs");
+	map(0x800222, 0x800223).w(FUNC(dinopic_state::dinopic_layer2_w));
 	map(0x880000, 0x880001).nopw(); // always 0
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps1bl_pic_state::cps1_gfxram_w)).share("gfxram");
-	map(0x980000, 0x98000b).w(FUNC(cps1bl_pic_state::dinopic_layer_w));
+	map(0x900000, 0x92ffff).ram().w(FUNC(dinopic_state::cps1_gfxram_w)).share("gfxram");
+	map(0x980000, 0x98000b).w(FUNC(dinopic_state::dinopic_layer_w));
 	map(0xf18000, 0xf19fff).ram();
 	map(0xf1c000, 0xf1c001).portr("IN2");            /* Player 3 controls (later games) */
-	map(0xf1c004, 0xf1c005).w(FUNC(cps1bl_pic_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
+	map(0xf1c004, 0xf1c005).w(FUNC(dinopic_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
@@ -440,19 +444,19 @@ void cps1bl_pic_state::slampic_map(address_map &map)
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
-void cps1bl_pic_state::slampic2_map(address_map &map)
+void slampic2_state::slampic2_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
 	map(0x800000, 0x800001).portr("IN1");
 	map(0x800002, 0x800003).portr("IN2"); // player 3 + 4 inputs
-	map(0x800018, 0x80001f).r(FUNC(cps1bl_pic_state::cps1_dsw_r));
+	map(0x800018, 0x80001f).r(FUNC(slampic2_state::cps1_dsw_r));
 	map(0x800030, 0x800031).nopw();  // coin ctrl
-	map(0x800100, 0x80013f).ram().r(FUNC(cps1bl_pic_state::slampic2_cps_a_r)).share("cps_a_regs");
+	map(0x800100, 0x80013f).ram().r(FUNC(slampic2_state::slampic2_cps_a_r)).share("cps_a_regs");
 	map(0x800140, 0x80017f).ram().share("cps_b_regs");
-	map(0x800180, 0x800181).w(FUNC(cps1bl_pic_state::slampic2_sound_w));   // sound
-	map(0x800188, 0x800189).w(FUNC(cps1bl_pic_state::slampic2_sound2_w));  // sound
+	map(0x800180, 0x800181).w(FUNC(slampic2_state::slampic2_sound_w));   // sound
+	map(0x800188, 0x800189).w(FUNC(slampic2_state::slampic2_sound2_w));  // sound
 	map(0x8ffff8, 0x8fffff).nopw();  // ?
-	map(0x900000, 0x92ffff).ram().mirror(0x6c0000).w(FUNC(cps1bl_pic_state::cps1_gfxram_w)).share("gfxram");
+	map(0x900000, 0x92ffff).ram().mirror(0x6c0000).w(FUNC(slampic2_state::cps1_gfxram_w)).share("gfxram");
 	//  0x930000, 0x933fff  spriteram mirror?
 	//  0xf00000, 0xf3ffff  workram
 	//  0xfc0000, 0xfeffff  gfxram
@@ -476,7 +480,7 @@ void cps1bl_pic_state::slampic2_map(address_map &map)
 }
 
 
-MACHINE_START_MEMBER(cps1bl_pic_state, dinopic)
+MACHINE_START_MEMBER(dinopic_state, dinopic)
 {
 	m_layer_enable_reg = 0x0a;
 	m_layer_mask_reg[0] = 0x0c;
@@ -520,7 +524,7 @@ MACHINE_START_MEMBER(cps1bl_pic_state, slampic)
 	m_sprite_x_offset = 2;
 }
 
-MACHINE_START_MEMBER(cps1bl_pic_state, slampic2)
+MACHINE_START_MEMBER(slampic2_state, slampic2)
 {
 	m_layer_enable_reg = 0x16;
 	m_layer_mask_reg[1] = 0x02;
@@ -564,7 +568,7 @@ void cps1bl_pic_state::init_punipic3()
 	init_dinopic();
 }
 
-void cps1bl_pic_state::init_slampic2()
+void slampic2_state::init_slampic2()
 {
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x930000, 0x933fff, m_bootleg_sprite_ram.get());
@@ -576,7 +580,7 @@ void cps1bl_pic_state::init_slampic2()
 	init_cps1();
 }
 
-void cps1bl_pic_state::init_jurassic99()
+void dinopic_state::init_jurassic99()
 {
 	/* patch a bootlegger bug:
 	   a bootlegger hack overwrites the title screen scroll 1 text colour with a palette entry of 0800,
