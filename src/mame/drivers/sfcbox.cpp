@@ -155,12 +155,10 @@ private:
 	DECLARE_WRITE8_MEMBER( snes_map_1_w );
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_READ8_MEMBER(spc_ram_100_r);
-	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
 	void sfcbox_io(address_map &map);
 	void sfcbox_map(address_map &map);
 	void snes_map(address_map &map);
-	void spc_mem(address_map &map);
+	void spc_map(address_map &map);
 };
 
 uint32_t sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
@@ -172,25 +170,13 @@ uint32_t sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 void sfcbox_state::snes_map(address_map &map)
 {
 	map(0x000000, 0x7dffff).rw(FUNC(sfcbox_state::snes_r_bank1), FUNC(sfcbox_state::snes_w_bank1));
-	map(0x7e0000, 0x7fffff).ram();                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
+	map(0x7e0000, 0x7fffff).ram().share("wram");                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
 	map(0x800000, 0xffffff).rw(FUNC(sfcbox_state::snes_r_bank2), FUNC(sfcbox_state::snes_w_bank2));    /* Mirror and ROM */
 }
 
-READ8_MEMBER(sfcbox_state::spc_ram_100_r)
+void sfcbox_state::spc_map(address_map &map)
 {
-	return m_spc700->spc_ram_r(offset + 0x100);
-}
-
-WRITE8_MEMBER(sfcbox_state::spc_ram_100_w)
-{
-	m_spc700->spc_ram_w(offset + 0x100, data);
-}
-
-void sfcbox_state::spc_mem(address_map &map)
-{
-	map(0x0000, 0x00ef).rw(m_spc700, FUNC(snes_sound_device::spc_ram_r), FUNC(snes_sound_device::spc_ram_w)); /* lower 32k ram */
-	map(0x00f0, 0x00ff).rw(m_spc700, FUNC(snes_sound_device::spc_io_r), FUNC(snes_sound_device::spc_io_w));   /* spc io */
-	map(0x0100, 0xffff).rw(FUNC(sfcbox_state::spc_ram_100_r), FUNC(sfcbox_state::spc_ram_100_w));
+	map(0x0000, 0xffff).ram().share("aram");
 }
 
 void sfcbox_state::sfcbox_map(address_map &map)
@@ -463,8 +449,10 @@ void sfcbox_state::sfcbox(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sfcbox_state::snes_map);
 
 	// runs at 24.576 MHz / 12 = 2.048 MHz
-	SPC700(config, m_soundcpu, XTAL(24'576'000) / 12);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &sfcbox_state::spc_mem);
+	S_SMP(config, m_soundcpu, XTAL(24'576'000) / 12);
+	m_soundcpu->set_addrmap(AS_DATA, &sfcbox_state::spc_map);
+	m_soundcpu->dsp_io_read_callback().set(m_s_dsp, FUNC(s_dsp_device::dsp_io_r));
+	m_soundcpu->dsp_io_write_callback().set(m_s_dsp, FUNC(s_dsp_device::dsp_io_w));
 
 	config.set_perfect_quantum(m_maincpu);
 
@@ -479,9 +467,11 @@ void sfcbox_state::sfcbox(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	SNES_SOUND(config, m_spc700, XTAL(24'576'000) / 12);
-	m_spc700->add_route(0, "lspeaker", 1.00);
-	m_spc700->add_route(1, "rspeaker", 1.00);
+
+	S_DSP(config, m_s_dsp, XTAL(24'576'000) / 12);
+	m_s_dsp->set_addrmap(0, &sfcbox_state::spc_map);
+	m_s_dsp->add_route(0, "lspeaker", 1.00);
+	m_s_dsp->add_route(1, "rspeaker", 1.00);
 
 	/* video hardware */
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
@@ -516,8 +506,6 @@ void sfcbox_state::sfcbox(machine_config &config)
 
 #define SFCBOX_BIOS \
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) \
-	ROM_REGION( 0x100, "sound_ipl", 0 ) \
-	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) \
 	ROM_REGION( 0x10000, "krom", 0 ) \
 	ROM_LOAD( "krom1.ic1", 0x00000, 0x10000, CRC(c9010002) SHA1(f4c74086a83b728b1c1af3a021a60efa80eff5a4) ) \
 	ROM_REGION( 0x100000, "user3", 0 ) \

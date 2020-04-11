@@ -2259,6 +2259,7 @@ void dec8_state::oscar(machine_config &config)
 	DECO_BAC06(config, m_tilegen[0], 0);
 	m_tilegen[0]->set_gfx_region_wide(2, 2, 0);
 	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	m_tilegen[0]->set_tile_callback(FUNC(dec8_state::oscar_tile_cb));
 
 	DECO_MXC06(config, m_spritegen_mxc, 0);
 

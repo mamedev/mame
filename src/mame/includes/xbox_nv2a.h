@@ -372,6 +372,17 @@ public:
 		BACK = 0x0405,
 		FRONT_AND_BACK = 0x0408
 	};
+	enum class COMMAND {
+		CALL = 7,
+		JUMP = 6,
+		NON_INCREASING = 5,
+		OLD_JUMP = 4,
+		LONG_NON_INCREASING = 3,
+		RETURN = 2,
+		SLI_CONDITIONAL = 1,
+		INCREASING = 0,
+		INVALID = -1
+	};
 
 	struct nv2avertex_t : public vertex_t
 	{
@@ -464,7 +475,7 @@ public:
 	void render_color(int32_t scanline, const extent_t &extent, const nvidia_object_data &extradata, int threadid);
 	void render_register_combiners(int32_t scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid);
 
-	int geforce_commandkind(uint32_t word);
+	COMMAND geforce_commandkind(uint32_t word);
 	uint32_t geforce_object_offset(uint32_t handle);
 	void geforce_read_dma_object(uint32_t handle, uint32_t &offset, uint32_t &size);
 	void geforce_assign_object(address_space &space, uint32_t chanel, uint32_t subchannel, uint32_t address);
@@ -526,7 +537,7 @@ public:
 	struct {
 		uint32_t regs[0x80 / 4];
 		struct {
-			uint32_t objhandle;
+			uint32_t offset;
 			uint32_t objclass;
 			uint32_t method[0x2000 / 4];
 			// int execute_method(address_space & space, uint32_t method, uint32_t address, int &countlen); // for the future
@@ -537,8 +548,8 @@ public:
 	uint32_t pmc[0x1000 / 4];
 	uint32_t pgraph[0x2000 / 4];
 	uint32_t ramin[0x100000 / 4];
-	uint32_t dma_offset[2];
-	uint32_t dma_size[2];
+	uint32_t dma_offset[10];
+	uint32_t dma_size[10];
 	uint8_t *basemempointer;
 	uint8_t *topmempointer;
 	std::function<void(int state)> irq_callback;

@@ -142,6 +142,9 @@ void pc8477a_device::map(address_map &map)
 
 void wd37c65c_device::map(address_map &map)
 {
+	// NOTE: this map only covers registers defined by CS.
+	// LDOR and LDCR must be mapped separately, since their addresses are
+	// defined only by external decoding circuits. LDIR (optional) is also separate.
 	map(0x0, 0x0).r(FUNC(wd37c65c_device::msr_r));
 	map(0x1, 0x1).rw(FUNC(wd37c65c_device::fifo_r), FUNC(wd37c65c_device::fifo_w));
 }
@@ -167,7 +170,7 @@ void tc8566af_device::map(address_map &map)
 constexpr int upd765_family_device::rates[4];
 
 upd765_family_device::upd765_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	pc_fdc_interface(mconfig, type, tag, owner, clock),
+	device_t(mconfig, type, tag, owner, clock),
 	ready_connected(true),
 	ready_polled(true),
 	select_connected(true),

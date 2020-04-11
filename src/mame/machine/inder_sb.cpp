@@ -191,4 +191,6 @@ void inder_sb_device::device_start()
 
 void inder_sb_device::device_reset()
 {
+	m_soundsent = 0;
+	m_soundback = 0;
 }

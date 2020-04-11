@@ -14,7 +14,8 @@
     - holding CL+INFO+BOOK on boot load the test mode
 
     TODO:
-    - split driver into several files? need to make PCF2112T device
+    - split driver into several files?
+	- use PCF2112T device (it has 2 of them)
     - why are megaiv/smondial2 beeps noisy?
     - add Monte Carlo IV (non-LE)
     - add MM 1000 module

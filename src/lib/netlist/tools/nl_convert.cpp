@@ -185,7 +185,7 @@ void nl_convert_base_t::add_term(const pstring &netname, const pstring &devname,
 
 void nl_convert_base_t::add_device_extra_s(const pstring &devname, const pstring &extra)
 {
-	auto dev = get_device(devname);
+	auto *dev = get_device(devname);
 	if (dev == nullptr)
 		out("// ERROR: Device {} not found\n", devname);
 	else
@@ -260,7 +260,7 @@ void nl_convert_base_t::dump_nl()
 		else
 			out("{}({})\n", m_devs[j]->type(),
 					m_devs[j]->name());
-		for (auto &e : m_devs[j]->extra())
+		for (const auto &e : m_devs[j]->extra())
 			out("{}\n", e);
 
 	}
@@ -287,7 +287,7 @@ void nl_convert_base_t::dump_nl()
 
 pstring nl_convert_base_t::get_nl_val(double val) const
 {
-	for (auto &e : m_units)
+	for (const auto &e : m_units)
 	{
 		if (e.m_mult <= plib::abs(val))
 		{
@@ -305,7 +305,7 @@ pstring nl_convert_base_t::get_nl_val(double val) const
 
 double nl_convert_base_t::get_sp_unit(const pstring &unit) const
 {
-	for (auto &e : m_units)
+	for (const auto &e : m_units)
 	{
 		if (e.m_unit == unit)
 			return e.m_mult;

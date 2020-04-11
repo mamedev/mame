@@ -7,8 +7,8 @@
  * Sources:
  *
  * TODO
+ *   - graphics
  *   - sound
- *   - mouse
  */
 
 #include "emu.h"
@@ -24,7 +24,7 @@
 #include "machine/am79c90.h"
 #include "machine/upd765.h"
 #include "machine/dmac_0448.h"
-#include "machine/news_kbd.h"
+#include "machine/news_hid.h"
 #include "machine/cxd1185.h"
 
 // video
@@ -61,7 +61,7 @@ public:
 		, m_net(*this, "net")
 		, m_fdc(*this, "fdc")
 		, m_lcd(*this, "lcd")
-		, m_kbd(*this, "kbd")
+		, m_hid(*this, "hid")
 		, m_scsi(*this, "scsi:7:cxd1185")
 		, m_serial(*this, "serial%u", 0U)
 		, m_scsibus(*this, "scsi")
@@ -119,7 +119,6 @@ protected:
 	u32 bus_error();
 	void itimer_w(u8 data);
 	void itimer(void *ptr, s32 param);
-	void kbd_irq(int state);
 	u8 debug_r() { return m_debug; }
 	void debug_w(u8 data);
 
@@ -135,7 +134,7 @@ protected:
 	required_device<upd72067_device> m_fdc;
 
 	required_device<screen_device> m_lcd;
-	required_device<news_hle_kbd_device> m_kbd;
+	required_device<news_hid_hle_device> m_hid;
 	required_device<cxd1185_device> m_scsi;
 
 	required_device_array<rs232_port_device, 2> m_serial;
@@ -150,7 +149,6 @@ protected:
 
 	u16 m_inten;
 	u16 m_intst;
-	u8 m_kbd_status;
 	u8 m_debug;
 
 	static unsigned const NUM_INT = 4;
@@ -171,8 +169,6 @@ void news_r3k_state::machine_start()
 
 	for (bool &int_state : m_int_state)
 		int_state = false;
-
-	m_kbd_status = 0;
 }
 
 void news_r3k_state::machine_reset()
@@ -207,25 +203,29 @@ void news_r3k_state::cpu_map(address_map &map)
 	// 0x18500000 lcdc?
 	map(0x18600000, 0x186fffff).r(FUNC(news_r3k_state::bus_error)); // ??
 	map(0x18780000, 0x18780003).r(FUNC(news_r3k_state::bus_error)); // nwb-225
-	map(0x18c30000, 0x18c30003).r(FUNC(news_r3k_state::bus_error)); // second lance
+	map(0x18c30000, 0x18c30003).r(FUNC(news_r3k_state::bus_error)); // second lance (ram at 18c20000, id at 18c38000)
 	map(0x18c40000, 0x18c40003).r(FUNC(news_r3k_state::bus_error)); // second scc
 	map(0x18c40004, 0x18c40007).r(FUNC(news_r3k_state::bus_error)); // third scc
-	map(0x18c70000, 0x18c70003).r(FUNC(news_r3k_state::bus_error)); // third lance
+	//map(0x18c40100, 0x18c40118); // scc #1-#4 port/status
+	map(0x18c70000, 0x18c70003).r(FUNC(news_r3k_state::bus_error)); // third lance (ram at 18c60000, id at 18c78000)
 	map(0x18e00000, 0x18e00003).r(FUNC(news_r3k_state::bus_error)); // nwb-252/nwb-253 crt
 	map(0x18ff0000, 0x18ff0003).r(FUNC(news_r3k_state::bus_error)); // nwb-252/nwb-253 ctrl
 
 	map(0x1fc00000, 0x1fc1ffff).rom().region("eprom", 0);
 	//map(0x1fc40004, 0x1fc40004).w().umask32(0xff); ??
+	// 1fc40007 // powreb?
 	map(0x1fc80000, 0x1fc80001).rw(FUNC(news_r3k_state::inten_r), FUNC(news_r3k_state::inten_w));
 	map(0x1fc80002, 0x1fc80003).r(FUNC(news_r3k_state::intst_r));
 	map(0x1fc80004, 0x1fc80005).w(FUNC(news_r3k_state::intclr_w));
 	map(0x1fc80006, 0x1fc80006).w(FUNC(news_r3k_state::itimer_w));
-	map(0x1fcc0003, 0x1fcc0003).rw(FUNC(news_r3k_state::debug_r), FUNC(news_r3k_state::debug_w));
 
-	map(0x1fd00000, 0x1fd00000).r(m_kbd, FUNC(news_hle_kbd_device::data_r));
-	map(0x1fd00001, 0x1fd00001).lr8([this]() { return m_kbd_status; }, "kbd_status_r");
-	map(0x1fd00002, 0x1fd00002).lw8([this](u8 data) { m_kbd->reset(); }, "kbd_reset_w");
-	map(0x1fd40000, 0x1fd40003).noprw().umask32(0xffff); // FIXME: ignore buzzer for now
+	// 1fcc0000 // cstrobe?
+	// 1fcc0002 // sccstatus0?
+	map(0x1fcc0003, 0x1fcc0003).rw(FUNC(news_r3k_state::debug_r), FUNC(news_r3k_state::debug_w));
+	// 1fcc0007 // sccvect?
+
+	map(0x1fd00000, 0x1fd00007).m(m_hid, FUNC(news_hid_hle_device::map));
+	map(0x1fd40000, 0x1fd40003).noprw(); // FIXME: ignore buzzer for now
 
 	map(0x1fe00000, 0x1fe0000f).m(m_dma, FUNC(dmac_0448_device::map));
 	map(0x1fe00100, 0x1fe0010f).m(m_scsi, FUNC(cxd1185_device::map));
@@ -233,6 +233,7 @@ void news_r3k_state::cpu_map(address_map &map)
 	map(0x1fe00300, 0x1fe00300).lr8([]() { return 0xff; }, "sound_r"); // HACK: disable sound
 	//map(0x1fe00300, 0x1fe00307); // sound
 	map(0x1fe40000, 0x1fe40003).portr("SW2");
+	//map(0x1fe70000, 0x1fe9ffff).ram(); // ??
 	map(0x1fe80000, 0x1fe800ff).rom().region("idrom", 0).mirror(0x0003ff00);
 	map(0x1fec0000, 0x1fec0003).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
 
@@ -340,7 +341,8 @@ void news_r3k_state::int_check()
 
 u32 news_r3k_state::bus_error()
 {
-	irq_w<BERR>(ASSERT_LINE);
+	if (!machine().side_effects_disabled())
+		irq_w<BERR>(ASSERT_LINE);
 
 	return 0;
 }
@@ -360,18 +362,26 @@ void news_r3k_state::itimer(void *ptr, s32 param)
 	irq_w<TIMER>(ASSERT_LINE);
 }
 
-void news_r3k_state::kbd_irq(int state)
-{
-	if (state)
-		m_kbd_status |= 2;
-	else
-		m_kbd_status &= ~2;
-
-	irq_w<KBD>(state);
-}
-
 void news_r3k_state::debug_w(u8 data)
 {
+	/*
+	 * The low four bits of this register control the diagnostic LEDs labelled 1-4
+	 * with bit 0 correspondig to LED #1, and a 0 value enabling the LED. A non-
+	 * exhaustive list of diagnostic codes produced by the PROM follows:
+	 *
+	 *  4321  Stage
+	 *  ...x  EPROM checksum
+	 *  ..x.  NVRAM test (byte)
+	 *  ..xx  NVRAM test (word)
+	 *  .x..  NVRAM test (dword)
+	 *  .x.x  read dip-switch SW2
+	 *  .xx.  write test 0x1fe70000-1fe9ffff?
+	 *  .xxx  address decode
+	 *  x...  NVRAM test (dword)
+	 *  x..x  RAM sizing
+	 *  x.x.  inventory/boot
+	 *
+	 */
 	LOG("debug_w 0x%02x (%s)\n", data, machine().describe_context());
 
 	for (unsigned i = 0; i < 4; i++)
@@ -393,15 +403,15 @@ void news_r3k_state::common(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &news_r3k_state::cpu_map);
 	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
 
-	// 12 SIMM slots
-	// 30pin 4Mbyte SIMMs with parity?
+	// 3 banks of 4x30-pin SIMMs with parity, first bank is soldered
 	RAM(config, m_ram);
 	m_ram->set_default_size("16M");
+	// TODO: confirm each bank supports 4x1M or 4x4M
+	m_ram->set_extra_options("4M,8M,12M,20M,24M,32M,36M,48M");
 
 	DMAC_0448(config, m_dma, 0);
 	m_dma->set_bus(m_cpu, 0);
 	m_dma->out_int_cb().set(FUNC(news_r3k_state::irq_w<DMA>));
-	// TODO: channel 0 scsi
 	m_dma->dma_r_cb<1>().set(m_fdc, FUNC(upd72067_device::dma_r));
 	m_dma->dma_w_cb<1>().set(m_fdc, FUNC(upd72067_device::dma_w));
 	// TODO: channel 2 audio
@@ -433,7 +443,6 @@ void news_r3k_state::common(machine_config &config)
 	m_net->dma_in().set([this](offs_t offset) { return m_net_ram[offset >> 1]; });
 	m_net->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset >> 1]); });
 
-	// μPD72067, clock?
 	UPD72067(config, m_fdc, 16_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set(m_dma, FUNC(dmac_0448_device::irq<1>));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(dmac_0448_device::drq<1>));
@@ -441,6 +450,7 @@ void news_r3k_state::common(machine_config &config)
 
 	// scsi bus and devices
 	NSCSI_BUS(config, m_scsibus);
+	// inquiry content for hard disk is "HITACHI DK312C          CS01"
 	NSCSI_CONNECTOR(config, "scsi:0", news_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", news_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", news_scsi_devices, nullptr);
@@ -470,15 +480,17 @@ void news_r3k_state::common(machine_config &config)
 	/*
 	 * FIXME: the screen is supposed to be an 1120x780 monochrome (black/white)
 	 * LCD, with an HD64646FS LCD controller. The boot prom is happy if we just
-	 * ignore the LCDC and pretend the screen is 1024 pixels wide.
+	 * ignore the LCDC and pretend the screen is 1024 pixels wide. NEWS-OS
+	 * should detect LCD-MONO 1120x780 1 plane; X server changes mode but probe
+	 * and mode change method isn't understood yet.
 	 */
-	// apparently 1024x768?
 	SCREEN(config, m_lcd, SCREEN_TYPE_LCD);
 	m_lcd->set_raw(47185920, 1024, 0, 1024, 768, 0, 768);
 	m_lcd->set_screen_update(FUNC(news_r3k_state::screen_update));
 
-	NEWS_HLE_KBD(config, m_kbd);
-	m_kbd->irq_out().set(*this, FUNC(news_r3k_state::kbd_irq));
+	NEWS_HID_HLE(config, m_hid);
+	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(FUNC(news_r3k_state::irq_w<KBD>));
+	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(FUNC(news_r3k_state::irq_w<MOUSE>));
 }
 
 void news_r3k_state::nws3260(machine_config &config)
@@ -508,4 +520,4 @@ ROM_START(nws3260)
 ROM_END
 
 /*   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS           INIT         COMPANY  FULLNAME    FLAGS */
-COMP(1991, nws3260, 0,      0,      nws3260, nws3260, news_r3k_state, init_common, "Sony",  "NWS-3260", MACHINE_IS_SKELETON)
+COMP(1991, nws3260, 0,      0,      nws3260, nws3260, news_r3k_state, init_common, "Sony",  "NWS-3260", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

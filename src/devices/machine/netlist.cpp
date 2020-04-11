@@ -629,7 +629,7 @@ netlist::setup_t &netlist_mame_device::setup()
 
 void netlist_mame_device::register_memregion_source(netlist::nlparse_t &setup, device_t &dev, const char *name)
 {
-	setup.register_source(plib::make_unique<netlist_source_memregion_t>(dev, pstring(name)));
+	setup.register_source<netlist_source_memregion_t>(dev, pstring(name));
 }
 
 void netlist_mame_analog_input_device::write(const double val)
@@ -1095,7 +1095,7 @@ void netlist_mame_device::common_dev_start(netlist::netlist_state_t *lnetlist) c
 
 	/* add default data provider for roms - if not in validity check*/
 	//if (has_running_machine())
-		lsetup.register_source(plib::make_unique<netlist_data_memregions_t>(*this));
+		lsetup.register_source<netlist_data_memregions_t>(*this);
 
 	m_setup_func(lsetup);
 
@@ -1324,7 +1324,7 @@ void netlist_mame_cpu_device::device_start()
 
 void netlist_mame_cpu_device::nl_register_devices(netlist::setup_t &lsetup) const
 {
-	lsetup.factory().register_device<nld_analog_callback>( "NETDEV_CALLBACK", "nld_analog_callback", "-");
+	lsetup.factory().register_device<nld_analog_callback>( "NETDEV_CALLBACK", "nld_analog_callback", "-", __FILE__);
 }
 
 uint64_t netlist_mame_cpu_device::execute_clocks_to_cycles(uint64_t clocks) const noexcept
@@ -1477,8 +1477,8 @@ void netlist_mame_sound_device::device_start()
 
 void netlist_mame_sound_device::nl_register_devices(netlist::setup_t &lsetup) const
 {
-	lsetup.factory().register_device<nld_sound_out>("NETDEV_SOUND_OUT", "nld_sound_out", "+CHAN");
-	lsetup.factory().register_device<nld_sound_in>("NETDEV_SOUND_IN", "nld_sound_in", "-");
+	lsetup.factory().register_device<nld_sound_out>("NETDEV_SOUND_OUT", "nld_sound_out", "+CHAN", __FILE__);
+	lsetup.factory().register_device<nld_sound_in>("NETDEV_SOUND_IN", "nld_sound_in", "-", __FILE__);
 }
 
 void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)

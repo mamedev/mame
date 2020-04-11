@@ -81,6 +81,7 @@ lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char
 	, m_IF(0)
 	, m_enable(0)
 	, m_has_halt_bug(false)
+	, m_dma_cycles_to_burn(0)
 	, m_entering_halt(false)
 	, m_timer_func(*this)
 	, m_incdec16_func(*this)
@@ -137,7 +138,6 @@ inline void lr35902_cpu_device::mem_write_word( uint16_t addr, uint16_t data )
 
 void lr35902_cpu_device::device_start()
 {
-	m_device = this;
 	m_program = &space(AS_PROGRAM);
 
 	// resolve callbacks

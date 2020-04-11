@@ -13,7 +13,7 @@
 #include "includes/galaxold.h"
 
 
-IRQ_CALLBACK_MEMBER(galaxold_state::hunchbkg_irq_callback)
+uint8_t galaxold_state::hunchbkg_intack()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0x03;

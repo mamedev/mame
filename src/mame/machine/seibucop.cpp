@@ -109,6 +109,12 @@
 // use Z to dump out table info
 //#define TABLE_DUMPER
 
+#define LOG_Commands    0
+#define LOG_Phytagoras  0
+#define LOG_Division    0
+#define LOG_Move0205    0
+#define LOG_Move0905    0
+
 #include "seibucop_dma.hxx"
 #include "seibucop_cmd.hxx"
 

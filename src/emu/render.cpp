@@ -1360,7 +1360,7 @@ render_primitive_list &render_target::get_primitives()
 		render_primitive *prim = list.alloc(render_primitive::QUAD);
 		set_render_bounds_xy(prim->bounds, 0.0f, 0.0f, (float)m_width, (float)m_height);
 		prim->full_bounds = prim->bounds;
-		set_render_color(&prim->color, 1.0f, 1.0f, 1.0f, 1.0f);
+		set_render_color(&prim->color, 1.0f, 0.1f, 0.1f, 0.1f);
 		prim->texture.base = nullptr;
 		prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 		list.append(*prim);

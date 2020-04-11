@@ -64,7 +64,8 @@ void hlcd0515_device::device_start()
 
 	// timer
 	m_lcd_timer = timer_alloc();
-	m_lcd_timer->adjust(attotime::from_hz(clock() / 2), 0, attotime::from_hz(clock() / 2));
+	attotime period = attotime::from_hz(clock() / 2);
+	m_lcd_timer->adjust(period, 0, period);
 
 	// zerofill
 	m_cs = 0;
@@ -98,7 +99,7 @@ void hlcd0515_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  device_timer - handle timer events
 //-------------------------------------------------
 
 void hlcd0515_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

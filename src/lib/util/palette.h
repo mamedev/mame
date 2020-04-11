@@ -191,7 +191,7 @@ public:
 private:
 	// construction/destruction
 	palette_t(uint32_t numcolors, uint32_t numgroups = 1);
-	~palette_t() = default;
+	~palette_t();
 
 	// internal helpers
 	rgb_t adjust_palette_entry(rgb_t entry, float brightness, float contrast, const uint8_t *gamma_map);

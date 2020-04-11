@@ -227,7 +227,7 @@ namespace netlist
 		"#define IND_U(ind) ((ind) * 1e-6)   \n"
 		"#define IND_N(ind) ((ind) * 1e-9)   \n"
 		"#define IND_P(ind) ((ind) * 1e-12)  \n";
-		setup().add_include(plib::make_unique<a>("netlist/devices/net_lib.h", content));
+		setup().add_include<a>("netlist/devices/net_lib.h", content);
 		NETLIST_NAME(base)(*m_setup);
 	}
 
@@ -243,7 +243,7 @@ namespace netlist
 
 	detail::net_t *netlist_state_t::find_net(const pstring &name) const
 	{
-		for (auto & net : m_nets)
+		for (const auto & net : m_nets)
 			if (net->name() == name)
 				return net.get();
 
@@ -452,8 +452,8 @@ namespace netlist
 
 			for (auto & j : index)
 			{
-				auto entry = m_state.m_devices[j].second.get();
-				auto stats = entry->m_stats.get();
+				auto *entry = m_state.m_devices[j].second.get();
+				auto *stats = entry->m_stats.get();
 				log().verbose("Device {1:20} : {2:12} {3:12} {4:15} {5:12}", entry->name(),
 						stats->m_stat_call_count(), stats->m_stat_total_time.count(),
 						stats->m_stat_total_time.total(), stats->m_stat_inc_active());
@@ -504,8 +504,8 @@ namespace netlist
 			auto trigger = total_count * 200 / 1000000; // 200 ppm
 			for (auto &entry : m_state.m_devices)
 			{
-				auto ep = entry.second.get();
-				auto stats = ep->m_stats.get();
+				auto *ep = entry.second.get();
+				auto *stats = ep->m_stats.get();
 				// Factor of 3 offers best performace increase
 				if (stats->m_stat_inc_active() > 3 * stats->m_stat_total_time.count()
 					&& stats->m_stat_inc_active() > trigger)
@@ -522,7 +522,7 @@ namespace netlist
 	core_device_t *netlist_state_t::get_single_device(const pstring &classname, bool (*cc)(core_device_t *)) const
 	{
 		core_device_t *ret = nullptr;
-		for (auto &d : m_devices)
+		for (const auto &d : m_devices)
 		{
 			if (cc(d.second.get()))
 			{

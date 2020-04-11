@@ -245,15 +245,14 @@ OP_HANDLER( aba )
 OP_HANDLER( bra )
 {
 	uint8_t t;
-	IMMBYTE(t);
-	PC+=SIGNED(t);
+	BRANCH(1);
 }
 
 /* $21 BRN relative ----- */
-static uint8_t m6800_brn_t; // hack around GCC 4.6 error because we need the side effects of IMMBYTE
 OP_HANDLER( brn )
 {
-	IMMBYTE(m6800_brn_t);
+	uint8_t t;
+	BRANCH(0);
 }
 
 /* $22 BHI relative ----- */

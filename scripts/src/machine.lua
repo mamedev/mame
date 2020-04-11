@@ -525,6 +525,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/74543.h,MACHINES["TTL74543"] = true
+---------------------------------------------------
+
+if (MACHINES["TTL74543"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/74543.cpp",
+		MAME_DIR .. "src/devices/machine/74543.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/7474.h,MACHINES["TTL7474"] = true
 ---------------------------------------------------
 
@@ -1746,6 +1758,18 @@ if (MACHINES["LINFLASH"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/linflash.cpp",
 		MAME_DIR .. "src/devices/machine/linflash.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/m3002.h,MACHINES["M3002"] = true
+---------------------------------------------------
+
+if (MACHINES["M3002"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/m3002.cpp",
+		MAME_DIR .. "src/devices/machine/m3002.h",
 	}
 end
 
@@ -4266,6 +4290,18 @@ if (MACHINES["I3002"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/i3002.cpp",
 		MAME_DIR .. "src/devices/machine/i3002.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/s_smp.h,MACHINES["S_SMP"] = true
+---------------------------------------------------
+
+if (MACHINES["S_SMP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/s_smp.cpp",
+		MAME_DIR .. "src/devices/machine/s_smp.h",
 	}
 end
 

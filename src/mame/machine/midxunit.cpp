@@ -85,7 +85,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_unknown_w)
 	int offs = offset / 0x40000;
 
 	if (offs == 1 && ACCESSING_BITS_0_7)
-		m_dcs->reset_w(data & 2);
+		m_dcs->reset_w(~data & 2);
 
 	if (ACCESSING_BITS_0_7 && offset % 0x40000 == 0)
 		LOGMASKED(LOG_UNKNOWN, "%s: midxunit_unknown_w @ %d = %02X\n", machine().describe_context(), offs, data & 0xff);
@@ -264,8 +264,8 @@ void midxunit_state::machine_start()
 void midxunit_state::machine_reset()
 {
 	/* reset sound */
-	m_dcs->reset_w(1);
 	m_dcs->reset_w(0);
+	m_dcs->reset_w(1);
 
 	/* reset I/O shuffling */
 	for (int i = 0; i < 16; i++)

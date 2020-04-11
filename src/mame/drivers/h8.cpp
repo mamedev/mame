@@ -54,6 +54,7 @@ Official test program from pages 4 to 8 of the operator's manual:
 #include "sound/beep.h"
 #include "speaker.h"
 
+#include "formats/h8_cas.h"
 #include "h8.lh"
 
 
@@ -343,6 +344,7 @@ void h8_state::h8(machine_config &config)
 	cassette_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
 	CASSETTE(config, m_cass);
+	m_cass->set_formats(h8_cassette_formats);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cass->set_interface("h8_cass");

@@ -480,8 +480,8 @@ void seattle_state::machine_reset()
 	/* reset either the DCS2 board or the CAGE board */
 	if (m_dcs != nullptr)
 	{
-		m_dcs->reset_w(1);
 		m_dcs->reset_w(0);
+		m_dcs->reset_w(1);
 	}
 	else if (m_cage != nullptr)
 	{

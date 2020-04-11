@@ -16,7 +16,16 @@
 class i8x9x_device : public mcs96_device {
 public:
 	enum {
+		EXTINT_LINE = 0,
+		HSI0_LINE,
+		HSI1_LINE,
+		HSI2_LINE,
+		HSI3_LINE
+	};
+
+	enum {
 		I8X9X_HSI_MODE = MCS96_LAST_REG + 1,
+		I8X9X_HSI_STATUS,
 		I8X9X_HSO_TIME,
 		I8X9X_HSO_COMMAND,
 		I8X9X_AD_COMMAND,
@@ -64,6 +73,9 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual uint32_t execute_input_lines() const noexcept override { return 5; }
+	virtual void execute_set_input(int linenum, int state) override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -132,11 +144,12 @@ private:
 	hso_cam_entry hso_cam_hold;
 
 	u64 base_timer2, ad_done;
-	u8 hsi_mode, hso_command, ad_command;
+	u8 hsi_mode, hsi_status, hso_command, ad_command;
 	u16 hso_time, ad_result;
 	u8 pwm_control;
 	u8 port1, port2;
 	u8 ios0, ios1, ioc0, ioc1;
+	bool extint;
 	u8 sbuf, sp_con, sp_stat;
 	u8 serial_send_buf;
 	u64 serial_send_timer;
@@ -146,6 +159,7 @@ private:
 	u16 timer_value(int timer, u64 current_time) const;
 	u64 timer_time_until(int timer, u64 current_time, u16 timer_value) const;
 	void timer2_reset(u64 current_time);
+	void set_hsi_state(int pin, bool state);
 	void commit_hso_cam();
 	void trigger_cam(int id, u64 current_time);
 	void set_hso(u8 mask, bool state);

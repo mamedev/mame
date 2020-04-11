@@ -212,11 +212,11 @@ public:
 	{
 		// read the netlist ...
 
-		for (auto & d : defines)
+		for (const auto & d : defines)
 			setup().add_define(d);
 
-		for (auto & r : roms)
-			setup().register_source(plib::make_unique<netlist_data_folder_t>(r));
+		for (const auto & r : roms)
+			setup().register_source<netlist_data_folder_t>(r);
 
 #if 0
 		using a = plib::psource_str_t<plib::psource_t>;
@@ -236,10 +236,10 @@ public:
 		setup().add_include(plib::make_unique<a>("netlist/devices/net_lib.h",""));
 #endif
 #endif
-		for (auto & i : includes)
-			setup().add_include(plib::make_unique<netlist_data_folder_t>(i));
+		for (const auto & i : includes)
+			setup().add_include<netlist_data_folder_t>(i);
 
-		setup().register_source(plib::make_unique<netlist::source_file_t>(filename));
+		setup().register_source<netlist::source_file_t>(filename);
 		setup().include(name);
 		setup().register_dynamic_log_devices(logs);
 
@@ -329,7 +329,7 @@ struct input_t
 		m_param = setup.find_param(pstring(buf.data()), true);
 	}
 
-	void setparam()
+	void setparam() const
 	{
 		switch (m_param->param_type())
 		{
@@ -720,7 +720,7 @@ void tool_app_t::create_header()
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
 
-	nt.setup().register_source(plib::make_unique<netlist::source_proc_t>("dummy", &netlist_dummy));
+	nt.setup().register_source<netlist::source_proc_t>("dummy", &netlist_dummy);
 	nt.setup().include("dummy");
 
 	pout("// license:GPL-2.0+\n");
@@ -761,7 +761,7 @@ void tool_app_t::create_docheader()
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
 
-	nt.setup().register_source(plib::make_unique<netlist::source_proc_t>("dummy", &netlist_dummy));
+	nt.setup().register_source<netlist::source_proc_t>("dummy", &netlist_dummy);
 	nt.setup().include("dummy");
 
 	std::vector<pstring> devs;
@@ -885,7 +885,7 @@ void tool_app_t::listdevices()
 
 	netlist::factory::list_t &list = nt.setup().factory();
 
-	nt.setup().register_source(plib::make_unique<netlist::source_proc_t>("dummy", &netlist_dummy));
+	nt.setup().register_source<netlist::source_proc_t>("dummy", &netlist_dummy);
 	nt.setup().include("dummy");
 	nt.setup().prepare_to_run();
 
@@ -896,7 +896,7 @@ void tool_app_t::listdevices()
 		pstring out = plib::pfmt("{1:-20} {2}(<id>")(f->classname())(f->name());
 
 		f->macro_actions(nt.setup(), f->name() + "_lc");
-		auto d = f->Create(nt.pool(), nt, f->name() + "_lc");
+		auto d = f->make_device(nt.pool(), nt, f->name() + "_lc");
 		// get the list of terminals ...
 
 		std::vector<pstring> terms(nt.setup().get_terminals_for_device_name(d->name()));

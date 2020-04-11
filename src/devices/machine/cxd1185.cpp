@@ -168,10 +168,15 @@ u8 cxd1185_device::scsi_data_r()
 
 	if (!m_pio_data_mode)
 	{
-		data = m_fifo.dequeue();
+		if (!machine().side_effects_disabled())
+		{
+			data = m_fifo.dequeue();
 
-		if (m_state != IDLE && !m_state_timer->enabled())
-			m_state_timer->adjust(attotime::zero);
+			if (m_state != IDLE && !m_state_timer->enabled())
+				m_state_timer->adjust(attotime::zero);
+		}
+		else
+			data = m_fifo.peek();
 	}
 	else
 		data = scsi_bus->data_r();
@@ -185,10 +190,13 @@ template <unsigned Register> u8 cxd1185_device::int_req_r()
 {
 	u8 const data = m_int_req[Register];
 
-	LOGMASKED(LOG_REG, "int_req_r<%d> 0x%02x\n", Register, data);
+	if (!machine().side_effects_disabled())
+	{
+		LOGMASKED(LOG_REG, "int_req_r<%d> 0x%02x\n", Register, data);
 
-	m_int_req[Register] = 0;
-	int_check();
+		m_int_req[Register] = 0;
+		int_check();
+	}
 
 	return data;
 }

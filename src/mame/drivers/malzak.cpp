@@ -29,6 +29,8 @@
   - implement sprite-playfield collisions;
   - sprite-playfield colors are dubious at best;
   - Tiles may be flipped for playfield in final stage;
+  - Ranking table doesn't sort properly when player gets a better score than 
+    the ones listed, CPU core bug?
   - improve gfx layers superimposing, honor PAL timings;
   - sound (2x SN76477)
   - sprite->sprite collisions aren't quite perfect

@@ -127,6 +127,7 @@ const double XTAL::known_xtals[] = {
 	  6'880'000, /* 6.88_MHz_XTAL          Barcrest MPU4 */
 	  6'900'000, /* 6.9_MHz_XTAL           BBN BitGraph CPU */
 	  7'000'000, /* 7_MHz_XTAL             Jaleco Mega System PCBs */
+	  7'056'000, /* 7.056_MHz_XTAL         Alesis QS FXCHIP (LCM of 44.1 kHz and 48 kHz) */
 	  7'159'090, /* 7.15909_MHz_XTAL       Blood Bros (2x NTSC subcarrier) */
 	  7'200'000, /* 7.2_MHz_XTAL           Image Fight bootleg I80C031 MCU */
 	  7'372'800, /* 7.3728_MHz_XTAL        - */
@@ -303,6 +304,7 @@ const double XTAL::known_xtals[] = {
 	 22'464'000, /* 22.464_MHz_XTAL        CIT-101 132-column display clock */
 	 22'656'000, /* 22.656_MHz_XTAL        Super Pinball Action (~1440x NTSC line rate) */
 	 22'896'000, /* 22.896_MHz_XTAL        DEC VT220 132-column display clock */
+	 23'200'000, /* 23.2_MHz_XTAL          Roland JV-80 & JV-880 PCM clock */
 	 23'814'000, /* 23.814_MHz_XTAL        TeleVideo TVI-912, 920 & 950 */
 	 23'961'600, /* 23.9616_MHz_XTAL       Osborne 4 (Vixen) */
 	 24'000'000, /* 24_MHz_XTAL            Mario, 80's Data East games, 80's Konami games */

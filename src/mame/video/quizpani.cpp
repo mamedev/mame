@@ -74,14 +74,16 @@ void quizpani_state::video_start()
 
 	save_item(NAME(m_bgbank));
 	save_item(NAME(m_txtbank));
+	m_bg_tilemap->set_scrolldx(64,64);
+	m_txt_tilemap->set_scrolldx(64,64);
 }
 
 uint32_t quizpani_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->set_scrollx(0, m_scrollreg[0] - 64);
-	m_bg_tilemap->set_scrolly(0, m_scrollreg[1] + 16);
-	m_txt_tilemap->set_scrollx(0, m_scrollreg[2] - 64);
-	m_txt_tilemap->set_scrolly(0, m_scrollreg[3] + 16);
+	m_bg_tilemap->set_scrollx(0, m_scrollreg[0]);
+	m_bg_tilemap->set_scrolly(0, m_scrollreg[1]);
+	m_txt_tilemap->set_scrollx(0, m_scrollreg[2]);
+	m_txt_tilemap->set_scrolly(0, m_scrollreg[3]);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_txt_tilemap->draw(screen, bitmap, cliprect, 0,0);

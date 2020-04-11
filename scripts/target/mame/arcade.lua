@@ -71,6 +71,7 @@ CPUS["E1"] = true
 CPUS["I860"] = true
 CPUS["I960"] = true
 CPUS["H8"] = true
+CPUS["H8500"] = true
 CPUS["V810"] = true
 CPUS["M37710"] = true
 CPUS["POWERPC"] = true
@@ -279,6 +280,7 @@ SOUNDS["MM5837"] = true
 --SOUNDS["DAVE"] = true
 SOUNDS["LC7535"] = true
 --SOUNDS["UPD934G"] = true
+SOUNDS["S_DSP"] = true
 SOUNDS["KS0164"] = true
 
 --------------------------------------------------
@@ -340,6 +342,7 @@ VIDEOS["MC6845"] = true
 --VIDEOS["MSM6255"] = true
 --VIDEOS["MOS6566"] = true
 VIDEOS["PC_VGA"] = true
+--VIDEOS["PCF2100"] = true
 VIDEOS["POLY"] = true
 VIDEOS["PSX"] = true
 VIDEOS["RAMDAC"] = true
@@ -512,6 +515,7 @@ MACHINES["LDVP931"] = true
 MACHINES["LINFLASH"] = true
 MACHINES["LPCI"] = true
 --MACHINES["LSI53C810"] = true
+--MACHINES["M3002"] = true
 --MACHINES["M68307"] = true
 --MACHINES["M68340"] = true
 MACHINES["M6M80011AP"] = true
@@ -595,6 +599,7 @@ MACHINES["RSTBUF"] = true
 MACHINES["RTC4543"] = true
 MACHINES["RTC65271"] = true
 MACHINES["RTC9701"] = true
+MACHINES["S_SMP"] = true
 MACHINES["S2636"] = true
 MACHINES["S3520CF"] = true
 MACHINES["S3C24XX"] = true
@@ -2676,6 +2681,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/merit3xx.cpp",
 	MAME_DIR .. "src/mame/drivers/meritm.cpp",
 	MAME_DIR .. "src/mame/drivers/merits.cpp",
+	MAME_DIR .. "src/mame/drivers/meritsdx.cpp",
 	MAME_DIR .. "src/mame/drivers/mtouchxl.cpp",
 	MAME_DIR .. "src/mame/drivers/pubtimed.cpp",
 	MAME_DIR .. "src/mame/machine/at.h",
@@ -3099,8 +3105,6 @@ files {
 	MAME_DIR .. "src/mame/video/n8080.cpp",
 	MAME_DIR .. "src/mame/drivers/nss.cpp",
 	MAME_DIR .. "src/mame/machine/snes.cpp",
-	MAME_DIR .. "src/mame/audio/snes_snd.cpp",
-	MAME_DIR .. "src/mame/audio/snes_snd.h",
 	MAME_DIR .. "src/mame/drivers/playch10.cpp",
 	MAME_DIR .. "src/mame/includes/playch10.h",
 	MAME_DIR .. "src/mame/machine/playch10.cpp",
@@ -3634,10 +3638,10 @@ files {
 	MAME_DIR .. "src/mame/video/raiden2.cpp",
 	MAME_DIR .. "src/mame/machine/r2crypt.cpp",
 	MAME_DIR .. "src/mame/machine/r2crypt.h",
-	MAME_DIR .. "src/mame/machine/seibucop/seibucop.cpp",
-	MAME_DIR .. "src/mame/machine/seibucop/seibucop_dma.hxx",
-	MAME_DIR .. "src/mame/machine/seibucop/seibucop_cmd.hxx",
-	MAME_DIR .. "src/mame/machine/seibucop/seibucop.h",
+	MAME_DIR .. "src/mame/machine/seibucop.cpp",
+	MAME_DIR .. "src/mame/machine/seibucop_dma.hxx",
+	MAME_DIR .. "src/mame/machine/seibucop_cmd.hxx",
+	MAME_DIR .. "src/mame/machine/seibucop.h",
 	MAME_DIR .. "src/mame/drivers/r2dx_v33.cpp",
 	MAME_DIR .. "src/mame/drivers/seibuspi.cpp",
 	MAME_DIR .. "src/mame/includes/seibuspi.h",

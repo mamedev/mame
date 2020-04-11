@@ -11058,7 +11058,7 @@ license:CC0
 	</software>
 
 	<software name="inca2">
-		<description>Inca 2: Wiracocha (French/German/English)</description>
+		<description>Inca 2: Wiracocha (Europe)</description>
 		<year>1993</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Coktel Vision" />
@@ -11327,6 +11327,27 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Jill of the Jungle - The Complete Trilogy (USA) (5.25'').img" size="1228800" crc="323b0332" sha1="dd3dc2df11745e4858dfee1025f42d98e6970b4e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jp">
+		<description>Jurassic Park</description>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="4016975">
+				<rom name="jurassic park disk1.mfm" size="4016975" crc="23f5a6fa" sha1="00bd7b7ea646dd7df262537f40c4670af0ce6ff5" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="jurassic park disk2.img" size="1474560" crc="d4feae61" sha1="7de49b18bf2eb3f7b7315b7d0b7267d49ecfc702"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="jurassic park disk3.img" size="1474560" crc="50f4b8d2" sha1="e9c8f71eb40bf4b1792e513689083353fb5df026"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12017,7 +12038,7 @@ license:CC0
 
 	<software name="monkey2k" cloneof="monkey2">
 		<description>Monkey Island 2: LeChuck's Revenge (3.5", Kixx re-release)</description>
-		<year>1991</year>
+		<year>1994</year>
 		<publisher>Kixx</publisher>
 		<info name="developer" value="LucasArts" />
 		<part name="flop1" interface="floppy_3_5">
@@ -12227,6 +12248,37 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Paganitzu (USA) (v1.02).img" size="1474560" crc="7efa4aa3" sha1="7520c44be7451ff07065471b905f93f60d507234"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pepperit">
+		<description>Pepper's Adventures in Time</description>
+		<year>1993</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pepper's adventures in time disk 1.img" size="1474560" crc="2f5d4ce0" sha1="28d6649eefe4f1c10f8bd4a9b66473337690aaa8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "4220474">
+				<rom name="pepper's adventures in time disk 2.mfm" size="4220474" crc="fd28b20e" sha1="b971bbc45a47d895c8e90778159a3eab07c82fe9" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pepper's adventures in time disk 3.img" size="1474560" crc="860af405" sha1="e1584bf8b5d9a38376af9ff1becd08bc93a13468"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pepper's adventures in time disk 4.img" size="1474560" crc="bfda5eb0" sha1="435c8c6f7ea681882a12518a6d035db216bb77f4"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pepper's adventures in time disk 5.img" size="1474560" crc="706df2ef" sha1="6ed1b94049579aaa9bb00ccf3c56071c4406a8dc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12698,13 +12750,46 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="sq1">
+		<description>Space Quest I: Roger Wilco in the Sarien Encounter (VGA release)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="2.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest - Roger Wilco in the Sarien Encounter (VGA release) [Sierra] [1991] [3.5HD] [Startup Disk].img" size="1474560" crc="efed75ac" sha1="3eada329df25893cd6995d46daa0431081b3a88a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest - Roger Wilco in the Sarien Encounter (VGA release) [Sierra] [1991] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="7c42ebdc" sha1="74dcb59e3a228c984de17186fbcb895cc492d790"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest - Roger Wilco in the Sarien Encounter (VGA release) [Sierra] [1991] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="baed11fe" sha1="512ecab212d9a28a7684fd69cff42d0ded06fbb5"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest - Roger Wilco in the Sarien Encounter (VGA release) [Sierra] [1991] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="712d3413" sha1="e5a36f53f809c51177e243b132eea3ef9cc32954"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest - Roger Wilco in the Sarien Encounter (VGA release) [Sierra] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="94183b42" sha1="bd73a7787d8cc56490229af23637c741a19d3d56"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="sq5">
 		<description>Space Quest V: The Next Mutation (3.5", v1.04)</description>
 		<year>1993</year>
-		<publisher>Sierra</publisher>
+		<publisher>Sierra On-Line</publisher>
 		<info name="version" value="1.04" />
-		<info name="developer" value="Sierra" />
+		<info name="developer" value="Sierra On-Line" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Space Quest V - The Next Mutation (USA, Europe) (v1.04) (Disk 1).img" size="1474560" crc="482d85e8" sha1="b2ceda676dfef8f6351ec1f56cb02cdd994ae2d3"/>

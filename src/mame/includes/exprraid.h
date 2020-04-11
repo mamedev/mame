@@ -75,7 +75,6 @@ private:
 	DECLARE_WRITE8_MEMBER(exprraid_scrollx_w);
 	DECLARE_WRITE8_MEMBER(exprraid_scrolly_w);
 
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 

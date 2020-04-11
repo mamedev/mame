@@ -2747,6 +2747,7 @@ pg750                           // Siemens PG 750
 pg750eisa                       // Siemens PG 750 486 EISA
 samdm286                        // Samsung Deskmaster 286-12
 zdz248                          // Zenith Z-248
+ncr3433                         // NCR Class 3433
 
 
 @source:atari_s1.cpp
@@ -10295,6 +10296,7 @@ armchmp2                        // (c) 1992 Jaleco
 armchmp2o                       // (c) 1992 Jaleco
 armchmp2o2                      // (c) 1992 Jaleco
 bigrun                          // (c) 1989 Jaleco
+bigrunu                         // (c) 1989 Jaleco
 captflag                        // (c) 1993 Jaleco
 cischeat                        // (c) 1990 Jaleco
 f1gpstar                        // (c) 1992 Jaleco
@@ -10671,7 +10673,7 @@ forgottnuaa                     // 7/1988 (c) 1988 (USA)
 ganbare                         // 11/04/2000 (c) 2000 (Japan)
 ghouls                          // 12/1988 (c) 1988 (World)
 ghoulsu                         // 12/1988 (c) 1988 (USA)
-gulunpa							//
+gulunpa                         //
 knights                         // 27/11/1991 (c) 1991 (World)
 knightsb2                       // bootleg
 knightsj                        // 27/11/1991 (c) 1991 (Japan)
@@ -10705,6 +10707,7 @@ nemor1                          // 09/11/1990 (c) 1990 (World)
 pang3                           // 01/06/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site
 pang3b                          // bootleg
 pang3b2                         // bootleg
+pang3b3                         // bootleg
 pang3j                          // 11/05/1995 (c) 1995 Mitchell (Japan) not listed on Capcom's site
 pang3r1                         // 11/05/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site
 pnickj                          // 08/06/1994 (c) 1994 Compile + Capcom license (Japan) not listed on Capcom's site
@@ -10848,6 +10851,7 @@ punipic2                        // bootleg
 punipic3                        // bootleg
 slampic                         // bootleg
 slampic2                        // bootleg
+wofpic                          // bootleg
 
 @source:cps2.cpp
 1944                            // 20/06/2000 (c) 2000 Eighting/Raizing (USA)
@@ -13402,6 +13406,7 @@ cawingbl                        // bootleg
 fcrash                          // bootleg of Final Fight
 ffightbl                        // bootleg
 ffightbla                       // bootleg
+ffightblb                       // bootleg
 kodb                            // bootleg
 mtwinsb                         // bootleg
 sf2m1                           // hack
@@ -16392,6 +16397,7 @@ xymg                            // (c) 1996
 
 @source:igs017.cpp
 genius6                         // (c) 1998?
+happyskl                        // (c) 2001?
 iqblocka                        // (c) 1996
 iqblockf                        // (c) 1996
 lhzb2                           // (c) 1998
@@ -19020,7 +19026,8 @@ medlanes                        // [1977?]
 lb186                           // Ampro Little Board/186
 
 @source:lbeach.cpp
-lbeach                          // (c) 1979 Olympia / Seletron
+lbeach
+speedrs
 
 @source:lbpc.cpp
 lbpc                            // Ampro Little Board/PC
@@ -22265,6 +22272,9 @@ spitboss                        // (c) 1988 Merit
 @source:merits.cpp
 scrpiond                        //
 scrpionda                       //
+
+@source:meritsdx.cpp
+scrpndx                        //
 
 @source:meritum.cpp
 meritum1                        //
@@ -31723,9 +31733,10 @@ spec2k                          // (c) 2000 Yonatech
 spec2kh                         // (c) 2000 Yonatech
 ssmissin                        // (c) 1992 Comad
 stagger1                        // (c) 1998
-strahl                           // UPL-91074 (c) 1992 UPL (World)
-strahlj                          // UPL-91074 (c) 1992 UPL (Japan)
-strahlja                         // UPL-91074 (c) 1992 UPL (Japan)
+strahl                          // UPL-91074 (c) 1992 UPL (World)
+strahlj                         // UPL-91074 (c) 1992 UPL (Japan)
+strahlja                        // UPL-91074 (c) 1992 UPL (Japan)
+strahljbl                       // bootleg
 tdragon                         // (c) 1991 NMK / Tecmo
 tdragon1                        // (c) 1991 NMK / Tecmo
 tdragon2                        // UPL-93091 (c) 1993 NMK
@@ -34636,6 +34647,9 @@ d50                             //
 d50o                            //
 d550                            //
 
+@source:roland_jv80.cpp
+jv880                           //
+
 @source:roland_jx3p.cpp
 gr700                           //
 jx3p                            //
@@ -34647,6 +34661,11 @@ jx8p                            //
 jx8po                           //
 mks70                           //
 
+@source:roland_mc50.cpp
+mc300                           //
+mc50                            //
+mc50mk2                         //
+
 @source:roland_mt32.cpp
 cm32l                           //
 mt32                            //
@@ -34655,6 +34674,9 @@ mt32                            //
 r8                              //
 r8m                             //
 r8mk2                           //
+
+@source:roland_ra30.cpp
+ra30                            //
 
 @source:roland_s10.cpp
 mks100                          //
@@ -34669,6 +34691,9 @@ w30                             //
 @source:roland_sc55.cpp
 sc55                            // 1991 Sound Canvas SC-55
 
+@source:roland_sc88.cpp
+sc88vl                          //
+
 @source:roland_tb303.cpp
 tb303                           // Roland
 
@@ -34678,6 +34703,10 @@ tr606                           // Roland
 @source:roland_tr707.cpp
 tr707                           //
 tr727                           //
+
+@source:roland_u20.cpp
+u20                             //
+u220                            //
 
 @source:rollerg.cpp
 rollerg                         // GX999 (c) 1991 (US)
@@ -35044,10 +35073,7 @@ safarir                         // (c) 1980 Shin Nihon Kikaku (SNK) + Taito lice
 safarirj                        // (c) 1979 Shin Nihon Kikaku (SNK)
 
 @source:sag.cpp
-sag_baseb4
-sag_footb4
-sag_pinb
-sag_sinv2
+sag
 
 @source:sage2.cpp
 sage2                           //
@@ -35397,6 +35423,7 @@ hustlerb5                       // bootleg
 hustlerb6                       // bootleg
 hustlerd                        // GX343 (c) 1981 Konami + Dynamo Games license
 mimonkey                        // (c) 1982 Universal Video Games (US Copyright Office info - http://cocatalog.loc.gov)
+mimonkeyug                      // (c) 1983 bootleg
 mimonsco                        // (c) 1982 bootleg
 minefld                         // (c) 1983 Stern
 minefldfe                       // bootleg
@@ -41587,7 +41614,7 @@ xexexa                          // GX067 (c) 1991 (Asia)
 xexexj                          // GX067 (c) 1991 (Japan)
 
 @source:xmen.cpp
-xmen                            // GX065 (c) 1992 (US)
+xmen                            // GX065 (c) 1992 (World)
 xmen2pa                         // GX065 (c) 1992 (Asia)
 xmen2pe                         // GX065 (c) 1992 (World)
 xmen2pj                         // GX065 (c) 1992 (Japan)
@@ -41596,9 +41623,10 @@ xmen6p                          // GX065 (c) 1992 (World)
 xmen6pu                         // GX065 (c) 1992 (US)
 xmena                           // GX065 (c) 1992 (Asia)
 xmenaa                          // GX065 (c) 1992 (Asia)
-xmene                           // GX065 (c) 1992 (World)
 xmenj                           // GX065 (c) 1992 (Japan)
 xmenja                          // GX065 (c) 1992 (Japan)
+xmenu                           // GX065 (c) 1992 (US)
+xmenua                          // GX065 (c) 1992 (US)
 
 @source:xor100.cpp
 xor100                          //

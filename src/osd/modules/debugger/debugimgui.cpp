@@ -116,7 +116,7 @@ public:
 	{
 	}
 
-	virtual ~debug_imgui() = default;
+	virtual ~debug_imgui() { }
 
 	virtual int init(const osd_options &options) override { return 0; }
 	virtual void exit() override {};

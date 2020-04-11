@@ -747,6 +747,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pcf2100.h,VIDEOS["PCF2100"] = true
+--------------------------------------------------
+
+if (VIDEOS["PCF2100"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pcf2100.cpp",
+		MAME_DIR .. "src/devices/video/pcf2100.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/polylgcy.h,VIDEOS["POLY"] = true
 --------------------------------------------------
 

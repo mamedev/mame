@@ -234,9 +234,7 @@ INTERRUPT_GEN_MEMBER(cvs_state::cvs_main_cpu_interrupt)
 
 WRITE_LINE_MEMBER(cvs_state::cvs_slave_cpu_interrupt)
 {
-	m_audiocpu->set_input_line_vector(0, 0x03); // S2650
-	//m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-	m_audiocpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -977,13 +975,14 @@ void cvs_state::cvs(machine_config &config)
 
 	S2650(config, m_audiocpu, XTAL(14'318'181)/16);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cvs_state::cvs_dac_cpu_map);
+	m_audiocpu->intack_handler().set([this] { m_audiocpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 	/* doesn't look like it is used at all */
-	//MCFG_S2650_SENSE_INPUT(READLINE(*this, cvs_state, cvs_393hz_clock_r))
+	//m_audiocpu->sense_handler().set(FUNC(cvs_state::cvs_393hz_clock_r));
 
 	S2650(config, m_speechcpu, XTAL(14'318'181)/16);
 	m_speechcpu->set_addrmap(AS_PROGRAM, &cvs_state::cvs_speech_cpu_map);
 	/* romclk is much more probable, 393 Hz results in timing issues */
-	//MCFG_S2650_SENSE_INPUT(READLINE(*this, cvs_state, cvs_393hz_clock_r))
+	//m_speechcpu->sense_handler().set(FUNC(cvs_state::cvs_393hz_clock_r));
 	m_speechcpu->sense_handler().set("tms", FUNC(tms5110_device::romclk_hack_r));
 
 	/* video hardware */

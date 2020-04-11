@@ -71,6 +71,7 @@ CPUS["E1"] = true
 CPUS["I860"] = true
 CPUS["I960"] = true
 CPUS["H8"] = true
+CPUS["H8500"] = true
 CPUS["V810"] = true
 CPUS["M37710"] = true
 CPUS["POWERPC"] = true
@@ -302,6 +303,7 @@ SOUNDS["IOPSPU"] = true
 SOUNDS["SWP00"] = true
 SOUNDS["SWP20"] = true
 SOUNDS["SWP30"] = true
+SOUNDS["S_DSP"] = true
 SOUNDS["ROLANDPCM"] = true
 
 --------------------------------------------------
@@ -369,6 +371,7 @@ VIDEOS["MSM6255"] = true
 VIDEOS["MOS6566"] = true
 VIDEOS["PC_VGA"] = true
 VIDEOS["PCD8544"] = true
+VIDEOS["PCF2100"] = true
 --VIDEOS["POLY"] = true
 VIDEOS["PSX"] = true
 VIDEOS["RAMDAC"] = true
@@ -534,6 +537,7 @@ MACHINES["LH5810"] = true
 MACHINES["LINFLASH"] = true
 MACHINES["LPCI"] = true
 MACHINES["LSI53C810"] = true
+MACHINES["M3002"] = true
 MACHINES["M68307"] = true
 MACHINES["M68340"] = true
 MACHINES["M6M80011AP"] = true
@@ -617,6 +621,7 @@ MACHINES["RSTBUF"] = true
 MACHINES["RTC4543"] = true
 MACHINES["RTC65271"] = true
 MACHINES["RTC9701"] = true
+MACHINES["S_SMP"] = true
 --MACHINES["S2636"] = true
 MACHINES["S3520CF"] = true
 MACHINES["S3C24XX"] = true
@@ -666,6 +671,7 @@ MACHINES["TTL74175"] = true
 MACHINES["TTL74181"] = true
 MACHINES["TTL74259"] = true
 MACHINES["TTL74381"] = true
+MACHINES["TTL74543"] = true
 MACHINES["TTL7474"] = true
 MACHINES["TUBE"] = true
 MACHINES["UPD1990A"] = true
@@ -850,6 +856,7 @@ BUSES["NSCSI"] = true
 BUSES["NUBUS"] = true
 BUSES["O2"] = true
 BUSES["ORICEXT"] = true
+BUSES["PASOPIA"] = true
 BUSES["PC1512"] = true
 BUSES["PCE"] = true
 BUSES["PC_JOY"] = true
@@ -985,6 +992,7 @@ FORMATS["FMTOWNS_DSK"] = true
 FORMATS["FSD_DSK"] = true
 FORMATS["G64_DSK"] = true
 FORMATS["GTP_CAS"] = true
+FORMATS["H8_CAS"] = true
 FORMATS["HECTOR_MINIDISC"] = true
 FORMATS["HECT_DSK"] = true
 FORMATS["HECT_TAP"] = true
@@ -1419,8 +1427,6 @@ files {
 	MAME_DIR .. "src/mame/machine/kabuki.h",
 	MAME_DIR .. "src/mame/video/pk8000.cpp",
 	MAME_DIR .. "src/mame/machine/snes.cpp",
-	MAME_DIR .. "src/mame/audio/snes_snd.cpp",
-	MAME_DIR .. "src/mame/audio/snes_snd.h",
 	MAME_DIR .. "src/mame/machine/n64.cpp",
 	MAME_DIR .. "src/mame/video/n64.cpp",
 	MAME_DIR .. "src/mame/video/n64types.h",
@@ -2943,8 +2949,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/news_r3k.cpp",
 	MAME_DIR .. "src/mame/machine/dmac_0448.cpp",
 	MAME_DIR .. "src/mame/machine/dmac_0448.h",
-	MAME_DIR .. "src/mame/machine/news_kbd.cpp",
-	MAME_DIR .. "src/mame/machine/news_kbd.h",
+	MAME_DIR .. "src/mame/machine/news_hid.cpp",
+	MAME_DIR .. "src/mame/machine/news_hid.h",
 }
 
 createMESSProjects(_target, _subtarget, "next")
@@ -3275,16 +3281,21 @@ files {
 	MAME_DIR .. "src/mame/drivers/roland_cm32p.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_d10.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_d50.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_jv80.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_jx3p.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_jx8p.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_mc50.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_mt32.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_r8.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_ra30.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_s10.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_s50.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_sc55.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_sc88.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tb303.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tr606.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tr707.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_u20.cpp",
 	MAME_DIR .. "src/mame/audio/jx8p_synth.cpp",
 	MAME_DIR .. "src/mame/audio/jx8p_synth.h",
 	MAME_DIR .. "src/mame/machine/mb62h195.cpp",

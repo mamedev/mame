@@ -2,33 +2,53 @@
 // copyright-holders:Zsolt Vasvari
 /***************************************************************************
 
- Route 16/Stratovox memory map (preliminary)
+Driver by Zsolt Vasvari
 
- driver by Zsolt Vasvari
+Notes
+-----
 
- Notes: Route 16 and Stratovox use identical hardware with the following
-        exceptions: Stratovox has a DAC for voice.
-        Route 16 has the added ability to turn off each bitplane individually.
-        This looks like an afterthought, as one of the same bits that control
-        the palette selection is doubly utilized as the bitmap enable bit.
+Route 16:
+        - Route 16 doesn't have the SN76477 chip. There is space on the PCB
+          but it is not populated.
 
- Space Echo:
-        when all astronauts are taken the game over tune ends with 5 bad notes,
-        this appears to be a bug in the ROM from a changed instruction at 2EB3.
+        - Has the added ability to turn off each bitplane individually.
+          This looks like an afterthought, as one of the same bits that control
+          the palette selection is doubly utilized as the bitmap enable bit.
 
-        service mode shows a garbled screen as most of the code for it has been
-        replaced by other routines, however the sound tests still work. it's
-        possible that the service switch isn't connected on the real hardware.
+        - New code to better emulate the protection in Route 16 was added in 0.194,
+          but it turned out to harbour a bug (see MT 07310). Therefore the previous
+          patches have been restored, and the protection routine has been nullified
+          but is still there in case someone wants to revisit it.
 
-        the game hangs if it doesn't pass the startup test, a best guess is implemented
-        rather than patching out the test. code for the same test is in stratvox but
-        isn't called, speakres has a very similar test but doesn't care about the result.
+Stratovox:
+        - Has almost *electrically* identical hardware to Route 16 with the exception
+          that it is physically different (2 PCB-set connected with flat cables) and
+          Stratovox has the SN76477 chip and uses a DAC for voice. There are 3 volume
+          pots on the PCB. One for music, one for speech and a master volume.
 
-        interrupts per frame for cpu1 is a best guess based on how stratvox uses the DAC,
-        writing up to 195 times per frame with each byte from the ROM written 4 times.
-        spacecho writes one byte per interrupt so 195/4 or 48 is used. a lower number
-        increases the chance of a sound interrupting itself, which for most sounds
-        is buggy and causes the game to freeze until the first sound completes.
+Space Echo:
+        - When all astronauts are taken the game over tune ends with 5 bad notes,
+          this appears to be a bug in the ROM from a changed instruction at 2EB3.
+
+        - Service mode shows a garbled screen as most of the code for it has been
+          replaced by other routines, however the sound tests still work. it's
+          possible that the service switch isn't connected on the real hardware.
+
+        - The game hangs if it doesn't pass the startup test, a best guess is implemented
+          rather than patching out the test. code for the same test is in stratvox but
+          isn't called, speakres has a very similar test but doesn't care about the result.
+
+        - Interrupts per frame for cpu1 is a best guess based on how stratvox uses the DAC,
+          writing up to 195 times per frame with each byte from the ROM written 4 times.
+          spacecho writes one byte per interrupt so 195/4 or 48 is used. a lower number
+          increases the chance of a sound interrupting itself, which for most sounds
+          is buggy and causes the game to freeze until the first sound completes.
+
+vscompmj:
+        - Stuck notes (constant tone) in-game after the mahjong tiles are laid down.
+
+
+Route 16/Stratovox memory map (preliminary)
 
  CPU1
 
@@ -67,10 +87,70 @@
 
  2800      DAC output (Stratovox only)
 
-New code to better emulate the protection was added in 0.194, but it turned
-out to harbour a bug (see MT 07310). Therefore the previous patches have been
-restored, and the protection routine has been nullified (but still there in
-case someone wants to revisit it).
+***************************************************************************
+
+Route 16 PCB Hardware Info by Guru
+
+TVX-2 (TVX-3 also seen)
+SUN ELECTRONICS CORPORATION
+|------------------------------------|-----------|
+| Z80             54  55  56  57  58 |59 SKT     |
+|                                    |         X |
+|                                    | MB8841  X | <--- Sub board on top containing 4 logic
+|                                    |         X |      chips and an MB8841 microcontroller
+| 10MHz                              |         X |
+|                                    |         X |
+|  ^SN76477      MB7052.61           |---------X-|
+|#VRS  AY-3-8910                               X |
+|VOL                                           X |
+|  MB3713        MB7052.59                       |
+|1                                               |
+|8                                             X |
+|W                    MB8114                   X |
+|A    DSW                                      X |
+|Y                    MB8114                   X |
+|   %555 %555                                  X |
+|#VR2 %555 %555                                X |
+|#VR1                                          X |
+|#VR0   Z80        60  61  62  63              X |
+|------------------------------------------------|
+Notes:
+      X         - Texas Instruments TMS4116 16k x1-bit DRAM (total 16 chips)
+      MB8114    - Fujitsu MB8114 1k x4-bit SRAM, compatible with 2114
+      MB7052    - Fujitsu MB7052 256b x4-bit BiPolar PROM (compatible with 82S129)
+      AY-3-8910 - General Instrument AY-3-8910 Programmable Sound Generator (PSG). Clock 1.25MHz [10/8]
+      Z80       - Clock 2.5MHz [10/4] (both)
+      ^         - SN76477 not populated on Route 16 PCB
+      %         - These 4x 555 Timer ICs are not populated on Route 16 PCB
+      #         - These 4x Volume pots are not populated on Route 16 PCB
+      MB3713    - Fujitsu MB3713 5.7W Mono Power AMP
+      DSW       - 8-position DIP Switch
+      54...63   - 2716 EPROM
+      SKT       - 24-pin Socket for daughterboard connection
+      MB8841    - Fujitsu MB8841 4-bit microcontroller containing 2k x8-bit mask ROM and 128b x4-bit static RAM
+
+18-WAY PCB Edge Connector Pinout
+----------------+----------------
+    PARTS SIDE  |  SOLDER SIDE
+----------------+----------------
+       +5V | 1A | 1B | -5V
+       +5V | 2A | 2B | -5V
+ PL2 Right | 3A | 3B | PL1 Right
+  PL2 Left | 4A | 4B | PL1 Left
+    PL2 Up | 5A | 5B | PL1 Up
+  PL2 Down | 6A | 6B | PL1 Down
+PL2 Button | 7A | 7B | PL1 Button
+           | 8A | 8B |
+ PL2 Start | 9A | 9B | Test
+ PL1 Start |10A | 10B| Coin
+           |11A | 11B|
+     Green |12A | 12B| Coin Counter
+       Red |13A | 13B|
+      Blue |14A | 14B|
+      Sync |15A | 15B| Speaker +
+       GND |16A | 16B| Speaker -
+       GND |17A | 17B| +12V
+       GND |18A | 18B| +12V
 
 ***************************************************************************/
 
@@ -459,27 +539,23 @@ void route16_state::cpu1_io_map(address_map &map)
 
 static INPUT_PORTS_START( route16 )
 	PORT_START("DSW")       /* DSW 1 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )           PORT_DIPLOCATION("DSW:!1")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) // Doesn't seem to be referenced
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) // Doesn't seem to be referenced
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_HIGH, "DSW:!2" )  // Manual says unused
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_HIGH, "DSW:!3" )  // Manual says unused
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )         PORT_DIPLOCATION("DSW:!4,!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )  // same as 0x00
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-//  PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) ) // Same as 0x08
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )  // same as 0x10
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )         PORT_DIPLOCATION("DSW:!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )     PORT_DIPLOCATION("DSW:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )     PORT_DIPLOCATION("DSW:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -505,29 +581,41 @@ static INPUT_PORTS_START( route16 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( route16a )
+	PORT_INCLUDE( route16 )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )         PORT_DIPLOCATION("DSW:!4,!5")
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )  // Same as 0x08
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( stratvox )
 	PORT_START("DSW")       /* IN0 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )           PORT_DIPLOCATION("DSW:!1")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPNAME( 0x02, 0x00, "Replenish Astronauts" )
+	PORT_DIPNAME( 0x02, 0x00, "Replenish Astronauts" )     PORT_DIPLOCATION("DSW:!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0c, 0x00, "2 Attackers At Wave" )
+	PORT_DIPNAME( 0x0c, 0x00, "2 Attackers At Wave" )      PORT_DIPLOCATION("DSW:!3,!4")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x0c, "5" )
-	PORT_DIPNAME( 0x10, 0x00, "Astronauts Kidnapped" )
+	PORT_DIPNAME( 0x10, 0x00, "Astronauts Kidnapped" )     PORT_DIPLOCATION("DSW:!5")
 	PORT_DIPSETTING(    0x00, "Less Often" )
 	PORT_DIPSETTING(    0x10, "More Often" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )         PORT_DIPLOCATION("DSW:!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )     PORT_DIPLOCATION("DSW:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Demo Voices" )
+	PORT_DIPNAME( 0x80, 0x00, "Demo Voices" )              PORT_DIPLOCATION("DSW:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -553,26 +641,26 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( speakres )
 	PORT_START("DSW")       /* IN0 */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )           PORT_DIPLOCATION("DSW:!1,!2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x00, "2 Attackers At Wave" )
+	PORT_DIPNAME( 0x0c, 0x00, "2 Attackers At Wave" )      PORT_DIPLOCATION("DSW:!3,!4")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x0c, "5" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Bonus_Life ) )      PORT_DIPLOCATION("DSW:!5")
 	PORT_DIPSETTING(    0x00, "5000" )
 	PORT_DIPSETTING(    0x10, "8000" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )         PORT_DIPLOCATION("DSW:!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )     PORT_DIPLOCATION("DSW:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Demo Voices" )
+	PORT_DIPNAME( 0x80, 0x00, "Demo Voices" )              PORT_DIPLOCATION("DSW:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -598,27 +686,27 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( spacecho )
 	PORT_START("DSW")       /* IN0 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )           PORT_DIPLOCATION("DSW:!1")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPNAME( 0x02, 0x00, "Replenish Astronauts" )
+	PORT_DIPNAME( 0x02, 0x00, "Replenish Astronauts" )     PORT_DIPLOCATION("DSW:!2")
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0c, 0x00, "2 Attackers At Wave" )
+	PORT_DIPNAME( 0x0c, 0x00, "2 Attackers At Wave" )      PORT_DIPLOCATION("DSW:!3,!4")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x0c, "5" )
-	PORT_DIPNAME( 0x10, 0x00, "Astronauts Kidnapped" )
+	PORT_DIPNAME( 0x10, 0x00, "Astronauts Kidnapped" )     PORT_DIPLOCATION("DSW:!5")
 	PORT_DIPSETTING(    0x00, "Less Often" )
 	PORT_DIPSETTING(    0x10, "More Often" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )         PORT_DIPLOCATION("DSW:!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )     PORT_DIPLOCATION("DSW:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Demo Voices" )
+	PORT_DIPNAME( 0x80, 0x00, "Demo Voices" )              PORT_DIPLOCATION("DSW:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -644,11 +732,29 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jongpute )
 	PORT_START("DSW")       /* IN0 */
-	PORT_DIPNAME( 0x0c, 0x08, "Timer Decrement Speed" )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW:!1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW:!2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x08, "Timer Decrement Speed" )   PORT_DIPLOCATION("DSW:!3,!4")
 	PORT_DIPSETTING(    0x00, "Very Fast" )
 	PORT_DIPSETTING(    0x04, "Fast" )
 	PORT_DIPSETTING(    0x08, "Normal" )
 	PORT_DIPSETTING(    0x0c, "Slow" )
+	PORT_DIPNAME( 0x10, 0x0, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW:!5")
+	PORT_DIPSETTING(    0x0, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW:!6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW:!7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW:!8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_A )
@@ -742,12 +848,12 @@ INPUT_PORTS_END
 void route16_state::route16(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_cpu1, 2500000);  /* 10MHz / 4 = 2.5MHz */
+	Z80(config, m_cpu1, 10_MHz_XTAL / 4); // verified on PCB
 	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::route16_cpu1_map);
 	m_cpu1->set_addrmap(AS_IO, &route16_state::cpu1_io_map);
 	m_cpu1->set_vblank_int("screen", FUNC(route16_state::irq0_line_hold));
 
-	Z80(config, m_cpu2, 2500000);  /* 10MHz / 4 = 2.5MHz */
+	Z80(config, m_cpu2, 10_MHz_XTAL / 4); // verified on PCB
 	m_cpu2->set_addrmap(AS_PROGRAM, &route16_state::route16_cpu2_map);
 
 	/* video hardware */
@@ -762,7 +868,7 @@ void route16_state::route16(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	AY8910(config, "ay8910", 10000000/8).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	AY8910(config, "ay8910", 10_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.5);  // verified on PCB
 }
 
 
@@ -787,7 +893,7 @@ void route16_state::stratvox(machine_config &config)
 	m_screen->set_screen_update(FUNC(route16_state::screen_update_jongpute));
 
 	/* sound hardware */
-	subdevice<ay8910_device>("ay8910")->port_a_write_callback().set(FUNC(route16_state::stratvox_sn76477_w));  /* SN76477 commands (not used in Route 16?) */
+	subdevice<ay8910_device>("ay8910")->port_a_write_callback().set(FUNC(route16_state::stratvox_sn76477_w));  // SN76477 commands (SN76477 not populated on Route 16 PCB)
 
 	SN76477(config, m_sn);
 	m_sn->set_noise_params(RES_K(47), RES_K(150), CAP_U(0.001));
@@ -1224,10 +1330,10 @@ ROM_END
  *************************************/
 
 GAME( 1981, route16,  0,        route16,  route16,  route16_state, init_route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16a, route16,  route16,  route16,  route16_state, init_route16a, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16c, route16,  route16,  route16,  route16_state, init_route16c, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
-GAME( 1981, route16bl,route16,  route16,  route16,  route16_state, empty_init,    ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, routex,   route16,  routex,   route16,  route16_state, empty_init,    ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16a, route16,  route16,  route16a, route16_state, init_route16a, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16c, route16,  route16,  route16a, route16_state, init_route16c, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
+GAME( 1981, route16bl,route16,  route16,  route16a, route16_state, empty_init,    ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, routex,   route16,  routex,   route16a, route16_state, empty_init,    ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1980, speakres, 0,        speakres, speakres, route16_state, empty_init,    ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, speakresb,speakres, speakres, speakres, route16_state, empty_init,    ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )

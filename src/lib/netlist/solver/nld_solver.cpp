@@ -284,7 +284,7 @@ namespace devices
 			if (n.isRailNet())
 				return true;
 			// if it's already processed - no need to continue
-			for (auto & grp : groups)
+			for (const auto & grp : groups)
 				if (plib::container::contains(grp, &n))
 					return true;
 			return false;
