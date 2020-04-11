@@ -508,20 +508,18 @@ namespace solver
 
 				// FIXME: gonn, gtn and Idr - which float types should they have?
 
-				for (std::size_t i = 0; i < railstart; i++)
-					*tcr_r[i]       += static_cast<FT>(go[i]);
-
 				auto gtot_t = std::accumulate(gt, gt + term_count, plib::constants<FT>::zero());
 
 				// update diagonal element ...
-				*tcr_r[railstart] += static_cast<FT>(gtot_t); //mat.A[mat.diag[k]] += gtot_t;
+				*tcr_r[railstart] = static_cast<FT>(gtot_t); //mat.A[mat.diag[k]] += gtot_t;
 
-				auto RHS_t = std::accumulate(Idr, Idr + term_count, plib::constants<FT>::zero());
+				for (std::size_t i = 0; i < railstart; i++)
+					*tcr_r[i]       += static_cast<FT>(go[i]);
+
+				auto RHS_t(std::accumulate(Idr, Idr + term_count, plib::constants<FT>::zero()));
 
 				for (std::size_t i = railstart; i < term_count; i++)
-				{
 					RHS_t +=  (- go[i]) * *cnV[i];
-				}
 
 				m_RHS[k] = static_cast<FT>(RHS_t);
 			}
