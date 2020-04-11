@@ -1148,8 +1148,8 @@ static const struct gfx_range mapper_KD22B_table[] =
 	{ GFXTYPE_SPRITES, 0x8000, 0x8fff, 2 },
 	{ GFXTYPE_SCROLL2, 0x9000, 0xbfff, 2 },
 
-	{ GFXTYPE_SCROLL1, 0xc000, 0xcfff, 3 },
-	{ GFXTYPE_SCROLL3, 0xd000, 0xffff, 3 },
+	{ GFXTYPE_SCROLL1, 0xc000, 0xd7ff, 3 },
+	{ GFXTYPE_SCROLL3, 0xd800, 0xffff, 3 },
 	{ 0 }
 };
 
