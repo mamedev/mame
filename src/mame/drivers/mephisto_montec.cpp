@@ -15,7 +15,6 @@
 
     TODO:
     - split driver into several files?
-	- use PCF2112T device (it has 2 of them)
     - why are megaiv/smondial2 beeps noisy?
     - add Monte Carlo IV (non-LE)
     - add MM 1000 module
@@ -24,6 +23,9 @@
 
 
 #include "emu.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/m6502/m65c02.h"
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
@@ -31,12 +33,11 @@
 #include "sound/beep.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pcf2100.h"
+
 #include "screen.h"
 #include "speaker.h"
 #include "softlist.h"
-
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 #include "mephisto_montec.lh"
 #include "mephisto_megaiv.lh"
@@ -51,6 +52,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_board(*this, "board")
+		, m_lcd(*this, "lcd%u", 0)
 		, m_dac(*this, "dac")
 		, m_beeper(*this, "beeper")
 		, m_keys(*this, "KEY.%u", 0)
@@ -78,6 +80,7 @@ private:
 	DECLARE_WRITE8_MEMBER(montec_ldc_cs0_w);
 	DECLARE_WRITE8_MEMBER(montec_ldc_cs1_w);
 	DECLARE_WRITE8_MEMBER(montec_lcd_clk_w);
+	template<int N> DECLARE_WRITE32_MEMBER(montec_lcd_s_w);
 
 	DECLARE_READ8_MEMBER(megaiv_input_r);
 	DECLARE_WRITE8_MEMBER(megaiv_led_w);
@@ -102,24 +105,16 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
+	optional_device_array<pcf2112_device, 2> m_lcd;
 	optional_device<dac_bit_interface> m_dac;
 	optional_device<beep_device> m_beeper;
 	optional_ioport_array<2> m_keys;
 	output_finder<8> m_digits;
 	output_finder<16> m_low_leds, m_high_leds;
 
-	uint8_t m_lcd_mux;
 	uint8_t m_input_mux;
 	uint8_t m_leds_mux;
 	uint8_t m_smondial_board_mux;
-
-	struct display_t
-	{
-		uint8_t pos;
-		int8_t  shift;
-		uint8_t data;
-		uint8_t bit;
-	} m_display;
 };
 
 
@@ -129,27 +124,16 @@ void mephisto_montec_state::machine_start()
 	m_low_leds.resolve();
 	m_high_leds.resolve();
 
-	save_item(NAME(m_lcd_mux));
 	save_item(NAME(m_input_mux));
 	save_item(NAME(m_leds_mux));
 	save_item(NAME(m_smondial_board_mux));
-	save_item(NAME(m_display.pos));
-	save_item(NAME(m_display.shift));
-	save_item(NAME(m_display.data));
-	save_item(NAME(m_display.bit));
 }
 
 void mephisto_montec_state::machine_reset()
 {
-	m_lcd_mux = 0x00;
 	m_input_mux = 0x00;
 	m_leds_mux = 0x00;
 	m_smondial_board_mux = 0xff;
-
-	m_display.pos = 0;
-	m_display.shift = 0;
-	m_display.data = 0;
-	m_display.bit = 0;
 }
 
 WRITE8_MEMBER(mephisto_montec_state::montec_led_w)
@@ -160,54 +144,33 @@ WRITE8_MEMBER(mephisto_montec_state::montec_led_w)
 				m_high_leds[(i << 2) | j] = BIT(~data, 4 + j);
 }
 
+template<int N>
+WRITE32_MEMBER(mephisto_montec_state::montec_lcd_s_w)
+{
+	for (int i=0; i<4; i++)
+		m_digits[i + N*4] = bitswap<8>(data >> (8 * i), 7,4,5,0,1,2,3,6);
+}
 
 WRITE8_MEMBER(mephisto_montec_state::montec_lcd_data_w)
 {
-	m_display.bit = BIT(data, 7);
+	m_lcd[0]->data_w(BIT(data, 7));
+	m_lcd[1]->data_w(BIT(data, 7));
 }
 
 WRITE8_MEMBER(mephisto_montec_state::montec_ldc_cs0_w)
 {
-	if (data)
-		m_lcd_mux |= 0x01;
-	else
-		m_lcd_mux &= ~0x01;
-
-	m_display.pos = 0;
-	m_display.shift = -1;
-	m_display.data = 0;
+	m_lcd[0]->dlen_w(BIT(data, 7));
 }
 
 WRITE8_MEMBER(mephisto_montec_state::montec_ldc_cs1_w)
 {
-	if (data)
-		m_lcd_mux |= 0x02;
-	else
-		m_lcd_mux &= ~0x02;
-
-	m_display.pos = 0;
-	m_display.shift = -1;
-	m_display.data = 0;
+	m_lcd[1]->dlen_w(BIT(data, 7));
 }
 
 WRITE8_MEMBER(mephisto_montec_state::montec_lcd_clk_w)
 {
-	if (data)
-	{
-		m_display.data <<= 1;
-		m_display.data |= m_display.bit;
-		m_display.shift++;
-	}
-
-	if (m_display.shift == 8)
-	{
-		if (m_lcd_mux & 0x01)   m_digits[0 + m_display.pos] = bitswap<8>(m_display.data, 0,3,2,7,6,5,4,1);
-		if (m_lcd_mux & 0x02)   m_digits[4 + m_display.pos] = bitswap<8>(m_display.data, 0,3,2,7,6,5,4,1);
-
-		m_display.shift = 0;
-		m_display.pos = (m_display.pos + 1) & 3;
-		m_display.data = 0;
-	}
+	m_lcd[0]->clb_w(BIT(data, 7));
+	m_lcd[1]->clb_w(BIT(data, 7));
 }
 
 
@@ -527,6 +490,11 @@ void mephisto_montec_state::montec(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_assert), attotime::from_hz(XTAL(8'000'000) / (1 << 14)));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	PCF2112(config, m_lcd[0], 50); // frequency guessed
+	m_lcd[0]->write_segs().set(FUNC(mephisto_montec_state::montec_lcd_s_w<0>));
+	PCF2112(config, m_lcd[1], 50); // "
+	m_lcd[1]->write_segs().set(FUNC(mephisto_montec_state::montec_lcd_s_w<1>));
 
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
