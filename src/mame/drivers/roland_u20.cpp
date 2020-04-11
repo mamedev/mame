@@ -52,7 +52,7 @@ void roland_u20_state::u20(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	MB87419_MB87420(config, m_pcm, 32.768_MHz_XTAL);
-	//m_pcm->int_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
+	m_pcm->int_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
 	m_pcm->set_device_rom_tag("waverom");
 	m_pcm->add_route(0, "lspeaker", 1.0);
 	m_pcm->add_route(1, "rspeaker", 1.0);
@@ -63,7 +63,7 @@ void roland_u20_state::u220(machine_config &config)
 	u20(config);
 
 	//config.device_remove("keyscan");
-	//m_pcm->int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
+	m_pcm->int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
 }
 
 ROM_START(u20)

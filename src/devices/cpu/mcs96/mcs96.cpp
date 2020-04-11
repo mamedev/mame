@@ -89,11 +89,6 @@ uint32_t mcs96_device::execute_max_cycles() const noexcept
 	return 33;
 }
 
-uint32_t mcs96_device::execute_input_lines() const noexcept
-{
-	return 1;
-}
-
 void mcs96_device::recompute_bcount(uint64_t event_time)
 {
 	if(!event_time || event_time >= total_cycles() + icount) {
@@ -149,19 +144,6 @@ void mcs96_device::execute_run()
 			internal_update(total_cycles() + icount - bcount);
 		//      if(inst_substate)
 		//          do_exec_partial();
-	}
-}
-
-void mcs96_device::execute_set_input(int inputnum, int state)
-{
-	switch(inputnum) {
-	case EXINT_LINE:
-		if(state)
-			pending_irq |= 0x80;
-		else
-			pending_irq &= 0x7f;
-		check_irq();
-		break;
 	}
 }
 

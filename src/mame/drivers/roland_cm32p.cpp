@@ -554,7 +554,7 @@ void cm32p_state::cm32p(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	MB87419_MB87420(config, pcm, 32.768_MHz_XTAL);
-	//pcm->int_callback().set_inputline(cpu, i8x9x_device::EXTINT_LINE);
+	pcm->int_callback().set_inputline(cpu, i8x9x_device::EXTINT_LINE);
 	pcm->add_route(0, "lspeaker", 1.0);
 	pcm->add_route(1, "rspeaker", 1.0);
 
