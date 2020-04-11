@@ -347,6 +347,43 @@ void fcrash_state::fcrash(machine_config &config)
 	m_msm_2->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+void fcrash_state::ffightblb(machine_config &config)
+{
+		/* basic machine hardware */
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::fcrash_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
+
+	Z80(config, m_audiocpu, 24000000/6); /* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::ffightblb_sound_map);
+
+	MCFG_MACHINE_START_OVERRIDE(fcrash_state, ffightblb)
+	MCFG_MACHINE_RESET_OVERRIDE(fcrash_state, fcrash)
+
+	/* video hardware */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
+	m_screen->set_screen_update(FUNC(fcrash_state::screen_update_fcrash));
+	m_screen->screen_vblank().set(FUNC(fcrash_state::screen_vblank_cps1));
+	m_screen->set_palette(m_palette);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(4096);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+
+	OKIM6295(config, m_oki, 1000000 , okim6295_device::PIN7_HIGH);
+	m_oki->set_addrmap(0, &fcrash_state::ffightblb_oki_map);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.30);
+}
+
 void fcrash_state::cawingbl(machine_config &config)
 {
 	fcrash(config);
@@ -693,6 +730,20 @@ void fcrash_state::sgyxz_sound_map(address_map &map)
 	map(0xf00a, 0xf00a).r(m_soundlatch2, FUNC(generic_latch_8_device::read)); /* Sound timer fade */
 }
 
+void fcrash_state::ffightblb_sound_map(address_map &map) // TODO: verify
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).lw8(NAME([this] (u8 data) { m_okibank->set_entry(data & 0x03); }));
+	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
+
+void fcrash_state::ffightblb_oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr(m_okibank);
+}
 
 MACHINE_START_MEMBER(fcrash_state,fcrash)
 {
@@ -857,6 +908,22 @@ void fcrash_state::init_wofabl()
 	init_cps1();
 }
 
+MACHINE_START_MEMBER(fcrash_state,ffightblb) // TODO: adjust the following
+{
+	m_layer_enable_reg = 0x20;
+	m_layer_mask_reg[0] = 0x26;
+	m_layer_mask_reg[1] = 0x30;
+	m_layer_mask_reg[2] = 0x28;
+	m_layer_mask_reg[3] = 0x32;
+	m_layer_scroll1x_offset = 0x00;
+	m_layer_scroll2x_offset = 0x10;
+	m_layer_scroll3x_offset = 0x00;
+	m_sprite_base = 0x50c8;
+	m_sprite_list_end_marker = 0x8000;
+	m_sprite_x_offset = 0;
+
+	m_okibank->configure_entries(0, 4, memregion("oki")->base() + 0x20000, 0x20000);
+}
 
 #define CPS1_COINAGE_1 \
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) \
@@ -1541,6 +1608,56 @@ ROM_START( ffightbla )
 	ROM_COPY( "gfx", 0x000000, 0x000000, 0x8000 )   /* stars */
 ROM_END
 
+// the following bootleg is very peculiar: the program ROMs are identical to those of ffightbl but is uses smaller ROMs for patching
+// there is a full set of GFX ROMs matching ffightbl, additional ROMs matching 0x100000-0x1fffff of ffightbla and some smaller ROMs for overlaying
+// for now the loading is the full set, overlayed by the 0x100000-0x1fffff, overlayed by the smalle ROMs. Should be checked though
+// the sound system comprises a Z80 with bare bones sound code and a single OKI-M6295
+ROM_START( ffightblb )
+	ROM_REGION( 0x10000, "patch", 0 )
+	ROM_LOAD16_BYTE( "pgm0h.4",  0x00000, 0x08000, CRC(b800c1be) SHA1(dc5c748e49c751c155d970d8a7e6c0fb20767d04) ) // these seem to patch some addresses (see below)
+	ROM_LOAD16_BYTE( "pgm0l.3",  0x00001, 0x08000, CRC(a39f50d2) SHA1(a7b822f92a8eb412855bfb87a3083aa9082542ae) ) // they are empty after 0x5000 (interleaved)
+
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "soonhwa_f-fightpgm.8h",  0x00000, 0x80000, CRC(f8ccf27e) SHA1(08ff445d946da81e7dc0cc021f686b5968fa34ab) )
+	ROM_LOAD16_BYTE( "soonhwa_f-fightpgm.8l",  0x00001, 0x80000, CRC(d96c76b2) SHA1(3f9ca4625491cab07cf4a1bf001f1325dc3652a3) )
+	ROM_COPY( "patch", 0x00000, 0x002000, 0x1000 )
+	ROM_COPY( "patch", 0x01000, 0x016000, 0x1000 )
+	ROM_COPY( "patch", 0x02000, 0x01f000, 0x1000 )
+	ROM_COPY( "patch", 0x03000, 0x05e000, 0x1000 )
+	ROM_COPY( "patch", 0x04000, 0x078000, 0x1000 )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "sro.1",   0x00000, 0x8000, CRC(2b1c4c16) SHA1(8da39809df20a3fe4371573596285ea3297996e3) )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROM_LOAD32_BYTE( "soonhwa_f-fight03.0r03",  0x000000, 0x80000, CRC(2126bec0) SHA1(c523e7e52c18177e2e967091a6acb231d52a3525) )
+	ROM_IGNORE(0x80000) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD32_BYTE( "soonhwa_f-fight02.0r02",  0x000001, 0x80000, CRC(fe326d39) SHA1(10e1e9b26a3ed2277f2016d040ce5b205a62096d) )
+	ROM_IGNORE(0x80000) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD32_BYTE( "soonhwa_f-fight01.0r01",  0x000002, 0x80000, CRC(09c47cae) SHA1(995546a72667fa25d7b3fd29643217acb6ff4fd5) )
+	ROM_IGNORE(0x80000) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD32_BYTE( "soonhwa_f-fight00.0r00",  0x000003, 0x80000, CRC(4b4390de) SHA1(30b38842116fc45c0d284f3b72c67fef33215ad7) )
+	ROM_IGNORE(0x80000) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD32_WORD_SWAP( "soonhwa_f-fight.9",  0x100000, 0x40000, CRC(11a7c515) SHA1(b4f32e1627fb2af15ec6a3d7cfd88ea6fa9ad15a) ) // here starts the first overlay of GFX ROMs
+	ROM_IGNORE(0x40000) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD32_WORD_SWAP( "soonhwa_f-fight.8",  0x100002, 0x40000, CRC(f1e18158) SHA1(2a4195002be4bcb1eda84fd876666f58c837e58e) )
+	ROM_IGNORE(0x40000) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD32_WORD_SWAP( "soonhwa_f-fight.11", 0x180000, 0x40000, CRC(52879243) SHA1(97fb84376334abb0cb0590e7b4d49adeeb17373d) )
+	ROM_IGNORE(0x40000) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD32_WORD_SWAP( "soonhwa_f-fight.10", 0x180002, 0x40000, CRC(7cce0ff5) SHA1(0048ddf8ac26b0cbd4b017634d308f0d6b631abc) )
+	ROM_IGNORE(0x40000) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD32_BYTE( "cr.00",                   0x100000, 0x10000, CRC(e6bbd39b) SHA1(7c7c9fad7608f231172f011dd930399e6b72e57a) ) // here starts the second overlay of GFX ROMs
+	ROM_LOAD32_BYTE( "cr.01",                   0x100001, 0x10000, CRC(6c794ef4) SHA1(e7835ac5c52153ca333be154cd16f2162e936364) )
+	ROM_LOAD32_BYTE( "cr.02",                   0x100002, 0x10000, CRC(4d1d389d) SHA1(12c65c2f8027d4944f25d89d98a440be5422cb98) )
+	ROM_LOAD32_BYTE( "cr.03",                   0x100003, 0x10000, CRC(5282be3c) SHA1(ff32a501ee2d3f7476ff814aea302b1d780c35b7) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "gfx", 0x000000, 0x000000, 0x8000 )   /* stars */
+
+	ROM_REGION( 0xa0000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "vco.2",              0x00000, 0x20000, CRC(de0f0ef5) SHA1(18cb33f7990d7715d11d61e6db446ce935e799eb) )
+	ROM_LOAD( "soonhwa_f-fight.14", 0x20000, 0x80000, CRC(319fbc2f) SHA1(263fc6b59cef6d110da35b36dde250a2e326dcbe) )
+ROM_END
 
 // ************************************************************************* KODB
 
@@ -1872,6 +1989,7 @@ GAME( 1990, cawingb2,   cawing,  cawingbl,  cawingbl,  fcrash_state,  init_cawin
 GAME( 1990, fcrash,     ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg (Playmark)",  "Final Crash (bootleg of Final Fight)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ffightbl,   ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ffightbla,  ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg on Final Crash PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // same as Final Crash without the modified graphics
+GAME( 1990, ffightblb,  ffight,  ffightblb, fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg with single OKI)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // missing BGM, GFX glitches
 
 GAME( 1991, kodb,       kod,     kodb,      kodb,      fcrash_state,  init_kodb,      ROT0,    "bootleg (Playmark)",  "The King of Dragons (bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 910731  "ETC"
 
