@@ -908,7 +908,7 @@ void fcrash_state::init_wofabl()
 	init_cps1();
 }
 
-MACHINE_START_MEMBER(fcrash_state,ffightblb) // TODO: adjust the following
+MACHINE_START_MEMBER(fcrash_state,ffightblb)
 {
 	m_layer_enable_reg = 0x20;
 	m_layer_mask_reg[0] = 0x26;
@@ -916,11 +916,11 @@ MACHINE_START_MEMBER(fcrash_state,ffightblb) // TODO: adjust the following
 	m_layer_mask_reg[2] = 0x28;
 	m_layer_mask_reg[3] = 0x32;
 	m_layer_scroll1x_offset = 0x00;
-	m_layer_scroll2x_offset = 0x10;
-	m_layer_scroll3x_offset = 0x00;
-	m_sprite_base = 0x50c8;
+	m_layer_scroll2x_offset = 0x08;
+	m_layer_scroll3x_offset = 0x04;
+	m_sprite_base = 0x5008; // check this
 	m_sprite_list_end_marker = 0x8000;
-	m_sprite_x_offset = 0;
+	m_sprite_x_offset = -0x38;
 
 	m_okibank->configure_entries(0, 4, memregion("oki")->base() + 0x20000, 0x20000);
 }
@@ -1989,7 +1989,7 @@ GAME( 1990, cawingb2,   cawing,  cawingbl,  cawingbl,  fcrash_state,  init_cawin
 GAME( 1990, fcrash,     ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg (Playmark)",  "Final Crash (bootleg of Final Fight)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ffightbl,   ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ffightbla,  ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg on Final Crash PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // same as Final Crash without the modified graphics
-GAME( 1990, ffightblb,  ffight,  ffightblb, fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg with single OKI)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // missing BGM, GFX glitches
+GAME( 1990, ffightblb,  ffight,  ffightblb, fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg (Soon Hwa)",  "Final Fight (bootleg with single OKI)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // priority glitches
 
 GAME( 1991, kodb,       kod,     kodb,      kodb,      fcrash_state,  init_kodb,      ROT0,    "bootleg (Playmark)",  "The King of Dragons (bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 910731  "ETC"
 
