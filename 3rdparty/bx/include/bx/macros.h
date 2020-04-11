@@ -3,10 +3,12 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
+#ifndef BX_H_HEADER_GUARD
+#	error "Do not include macros.h directly #include <bx/bx.h> instead."
+#endif // BX_H_HEADER_GUARD
+
 #ifndef BX_MACROS_H_HEADER_GUARD
 #define BX_MACROS_H_HEADER_GUARD
-
-#include "bx.h"
 
 ///
 #if BX_COMPILER_MSVC

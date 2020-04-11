@@ -16,19 +16,13 @@ namespace bx
 	char(&CountOfRequireArrayArgumentT(const Ty(&)[Num]))[Num];
 
 	template<bool>
-	inline constexpr bool isEnabled()
+	BX_FORCE_INLINE constexpr bool isEnabled()
 	{
 		return true;
 	}
 
-	template<class Ty>
-	inline constexpr bool isTriviallyCopyable()
-	{
-		return __is_trivially_copyable(Ty);
-	}
-
 	template<>
-	inline constexpr bool isEnabled<false>()
+	BX_FORCE_INLINE constexpr bool isEnabled<false>()
 	{
 		return false;
 	}
@@ -36,6 +30,12 @@ namespace bx
 	inline constexpr bool ignoreC4127(bool _x)
 	{
 		return _x;
+	}
+
+	template<class Ty>
+	inline constexpr bool isTriviallyCopyable()
+	{
+		return __is_trivially_copyable(Ty);
 	}
 
 	template<typename Ty>
