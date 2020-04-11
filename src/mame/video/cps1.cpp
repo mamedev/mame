@@ -808,7 +808,7 @@ static const struct gfx_range mapper_YI22B_table[] =
 
 	/* type            start   end     bank */
 	{ GFXTYPE_SPRITES, 0x0000, 0x1fff, 0 },
-	{ GFXTYPE_SCROLL3, 0x2000, 0x3fff, 1 },
+	{ GFXTYPE_SCROLL3, 0x2000, 0x3fff, 0 },
 
 	{ GFXTYPE_SCROLL1, 0x4000, 0x47ff, 1 },
 	{ GFXTYPE_SCROLL2, 0x4800, 0x7fff, 1 },
@@ -928,6 +928,9 @@ static const struct gfx_range mapper_MS22B_table[] =
 };
 
 
+// CK24B and CK22B are equivalent, but since we could dump both PALs we are
+// documenting both.
+
 #define mapper_CK24B    { 0x8000, 0, 0, 0 }, mapper_CK24B_table
 static const struct gfx_range mapper_CK24B_table[] =
 {
@@ -936,6 +939,25 @@ static const struct gfx_range mapper_CK24B_table[] =
 	{ GFXTYPE_SCROLL1, 0x3000, 0x3fff, 0 },
 	{ GFXTYPE_SCROLL2, 0x4000, 0x6fff, 0 },
 	{ GFXTYPE_SCROLL3, 0x7000, 0x7fff, 0 },
+	{ 0 }
+};
+
+#define mapper_CK22B    { 0x4000, 0x4000, 0, 0 }, mapper_CK22B_table
+static const struct gfx_range mapper_CK22B_table[] =
+{
+	// verified from PAL dump:
+	// bank 0 = pin 19 (ROMs 1,5, 9,13,17,24,32,38)
+	// bank 1 = pin 16 (ROMs 2,6,10,14,18,25,33,39)
+	// pin 12 and pin 14 are never enabled
+	// pin 18 gives an alternate single bank mapping identical to CK24B pin 16,
+	// todo: confirm what pin 18 connects to on 89625B-1 b-board.
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x2fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x3000, 0x3fff, 0 },
+	
+	{ GFXTYPE_SCROLL2, 0x4000, 0x6fff, 1 },
+	{ GFXTYPE_SCROLL3, 0x7000, 0x7fff, 1 },
 	{ 0 }
 };
 
@@ -1611,7 +1633,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"mswordu",     CPS_B_13,     mapper_MS24B },
 	{"mswordj",     CPS_B_13,     mapper_MS22B },   // equivalent to MS24B
 	{"mtwins",      CPS_B_14,     mapper_CK24B },
-	{"chikij",      CPS_B_14,     mapper_CK24B },   // wrong, this set uses CK22B, dumped but equations still not added
+	{"chikij",      CPS_B_14,     mapper_CK22B },   // equivalent to CK24B
 	{"nemo",        CPS_B_15,     mapper_NM24B },
 	{"nemor1",      CPS_B_15,     mapper_NM24B },
 	{"nemoj",       CPS_B_15,     mapper_NM24B },   // wrong, this set uses NM22B, still not dumped
