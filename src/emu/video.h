@@ -17,6 +17,8 @@
 #ifndef MAME_EMU_VIDEO_H
 #define MAME_EMU_VIDEO_H
 
+#include "recording.h"
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -38,13 +40,6 @@ class video_manager
 	friend class screen_device;
 
 public:
-	// movie format options
-	enum movie_format
-	{
-		MF_MNG,
-		MF_AVI
-	};
-
 	// construction/destruction
 	video_manager(running_machine &machine);
 
@@ -67,9 +62,7 @@ public:
 
 	// misc
 	void toggle_throttle();
-	void toggle_record_movie(movie_format format);
-	void toggle_record_mng() { toggle_record_movie(MF_MNG); }
-	void toggle_record_avi() { toggle_record_movie(MF_AVI); }
+	void toggle_record_movie(movie_recording::format format);
 	osd_file::error open_next(emu_file &file, const char *extension, uint32_t index = 0);
 	void compute_snapshot_size(s32 &width, s32 &height);
 	void pixels(u32 *buffer);
@@ -88,9 +81,8 @@ public:
 	void save_input_timecode();
 
 	// movies
-	void begin_recording(const char *name, movie_format format);
+	void begin_recording(const char *name, movie_recording::format format);
 	void end_recording();
-	void end_recording(movie_format dummy) { end_recording(); }
 	void add_sound_to_recording(const s16 *sound, int numsamples);
 
 	void set_timecode_enabled(bool value) { m_timecode_enabled = value; }
@@ -102,34 +94,6 @@ public:
 	void add_to_total_time(attotime time) { m_timecode_total += time; }
 	std::string &timecode_text(std::string &str);
 	std::string &timecode_total_text(std::string &str);
-
-	// movie recording abstract interface
-	class movie_recording
-	{
-	public:
-		typedef std::unique_ptr<movie_recording> ptr;
-
-		// ctor/dtor
-		movie_recording(screen_device *screen);
-		movie_recording(const movie_recording &) = delete;
-		movie_recording(movie_recording &&) = delete;
-		virtual ~movie_recording() { };
-
-		// accessors
-		screen_device *screen()					{ return m_screen; }
-		attotime frame_period()					{ return m_frame_period; }
-		void set_next_frame_time(attotime time) { m_next_frame_time = time; }
-		attotime next_frame_time() const		{ return m_next_frame_time; }
-
-		// virtuals
-		virtual bool append_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries) = 0;
-		virtual bool add_sound_to_recording(const s16 *sound, int numsamples) = 0;
-
-	private:
-		screen_device *	m_screen;
-		attotime		m_frame_period;			// time of frame period
-		attotime		m_next_frame_time;      // time of next frame
-	};
 
 private:
 	// internal helpers
@@ -155,7 +119,7 @@ private:
 	void record_frame();
 
 	// movies
-	void begin_recording_screen(const std::string &filename, uint32_t index, screen_device *screen, movie_format format);
+	void begin_recording_screen(const std::string &filename, uint32_t index, screen_device *screen, movie_recording::format format);
 
 	// internal state
 	running_machine &   m_machine;                  // reference to our machine

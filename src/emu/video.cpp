@@ -16,7 +16,6 @@
 #include "rendersw.hxx"
 #include "output.h"
 
-#include "aviio.h"
 #include "png.h"
 #include "xmlfile.h"
 
@@ -52,137 +51,6 @@ const bool video_manager::s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
 	{ false, true , true , true , true , true , true , true , true , true , true , true  }
 };
 
-
-
-//**************************************************************************
-//  MOVIE FORMATS
-//**************************************************************************
-
-video_manager::movie_recording::movie_recording(screen_device *screen)
-	: m_screen(screen)
-{
-	m_frame_period = m_screen ? m_screen->frame_period() : attotime::from_hz(screen_device::DEFAULT_FRAME_RATE);
-}
-
-namespace
-{
-	class avi_movie_recording : public video_manager::movie_recording
-	{
-	public:
-		avi_movie_recording(screen_device *screen)
-			: video_manager::movie_recording(screen)
-		{
-		}
-
-		bool initialize(running_machine &machine, std::unique_ptr<emu_file> &&file, int32_t width, int32_t height)
-		{
-			// we only use the file we're passed to get the full path
-			std::string fullpath = file->fullpath();
-			file.reset();
-
-			// reset the state
-			m_avi_frame = 0;
-
-			// build up information about this new movie
-			avi_file::movie_info info;
-			info.video_format = 0;
-			info.video_timescale = 1000 * frame_period().as_hz();
-			info.video_sampletime = 1000;
-			info.video_numsamples = 0;
-			info.video_width = width;
-			info.video_height = height;
-			info.video_depth = 24;
-
-			info.audio_format = 0;
-			info.audio_timescale = machine.sample_rate();
-			info.audio_sampletime = 1;
-			info.audio_numsamples = 0;
-			info.audio_channels = 2;
-			info.audio_samplebits = 16;
-			info.audio_samplerate = machine.sample_rate();
-
-			// create the file
-			avi_file::error avierr = avi_file::create(fullpath, info, m_avi_file);
-			if (avierr != avi_file::error::NONE)
-				osd_printf_error("Error creating AVI: %s\n", avi_file::error_string(avierr));
-			return avierr == avi_file::error::NONE;
-		}
-
-		virtual bool append_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries) override
-		{
-			avi_file::error avierr = m_avi_file->append_video_frame(bitmap);
-			return avierr == avi_file::error::NONE;
-		}
-
-		virtual bool add_sound_to_recording(const s16 *sound, int numsamples) override
-		{
-			g_profiler.start(PROFILER_MOVIE_REC);
-
-			// write the next frame
-			avi_file::error avierr = m_avi_file->append_sound_samples(0, sound + 0, numsamples, 1);
-			if (avierr == avi_file::error::NONE)
-				avierr = m_avi_file->append_sound_samples(1, sound + 1, numsamples, 1);
-
-			g_profiler.stop();
-			return avierr == avi_file::error::NONE;
-		}
-
-	private:
-		avi_file::ptr       m_avi_file;                 // handle to the open movie file
-		u32                 m_avi_frame;                // current movie frame number
-	};
-
-	class mng_movie_recording : public video_manager::movie_recording
-	{
-	public:
-		mng_movie_recording(screen_device *screen, std::map<std::string, std::string> &&info_fields)
-			: video_manager::movie_recording(screen)
-			, m_info_fields(std::move(info_fields))
-		{
-		}
-
-		~mng_movie_recording()
-		{
-			if (m_mng_file)
-				mng_capture_stop(*m_mng_file);
-		}
-
-		bool initialize(std::unique_ptr<emu_file> &&file, bitmap_t &snap_bitmap)
-		{
-			m_mng_file = std::move(file);
-			png_error pngerr = mng_capture_start(*m_mng_file, snap_bitmap, frame_period().as_hz());
-			if (pngerr != PNGERR_NONE)
-				osd_printf_error("Error capturing MNG, png_error=%d\n", pngerr);
-			return pngerr == PNGERR_NONE;
-		}
-
-		virtual bool append_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries) override
-		{
-			// set up the text fields in the movie info
-			png_info pnginfo;
-			if (m_mng_frame == 0)
-			{
-				for (auto &ent : m_info_fields)
-					pnginfo.add_text(ent.first.c_str(), ent.second.c_str());
-			}
-
-			png_error error = mng_capture_frame(*m_mng_file, pnginfo, bitmap, palette_entries, palette);
-			m_mng_frame++;
-			return error == png_error::PNGERR_NONE;
-		}
-
-		virtual bool add_sound_to_recording(const s16 *sound, int numsamples) override
-		{
-			// not supported; do nothing
-			return true;
-		}
-
-	private:
-		std::unique_ptr<emu_file>			m_mng_file;           // handle to the open movie file
-		u32									m_mng_frame;          // current movie frame number
-		std::map<std::string, std::string>	m_info_fields;
-	};
-};
 
 
 //**************************************************************************
@@ -549,22 +417,10 @@ std::string &video_manager::timecode_total_text(std::string &str)
 //	movie for a specific screen
 //-------------------------------------------------
 
-void video_manager::begin_recording_screen(const std::string &filename, uint32_t index, screen_device *screen, movie_format format)
+void video_manager::begin_recording_screen(const std::string &filename, uint32_t index, screen_device *screen, movie_recording::format format)
 {
 	// determine the file extension
-	const char *extension;
-	switch (format)
-	{
-	case MF_AVI:
-		extension = "avi";
-		break;
-	case MF_MNG:
-		extension = "mng";
-		break;
-	default:
-		osd_printf_error("Unknown movie format: %d\n", format);
-		return;
-	}
+	const char *extension = movie_recording::format_file_extension(format);
 
 	// create the emu_file
 	bool is_absolute_path = !filename.empty() && osd_is_absolute_path(filename);
@@ -582,40 +438,12 @@ void video_manager::begin_recording_screen(const std::string &filename, uint32_t
 		return;
 	}
 
-	// we have a file; now initialize the movie
-	std::unique_ptr<movie_recording> recording;
-	switch (format)
-	{
-	case MF_AVI:
-		{
-			auto avi_recording = std::make_unique<avi_movie_recording>(screen);
-			if (!avi_recording->initialize(machine(), std::move(movie_file), m_snap_bitmap.width(), m_snap_bitmap.height()))
-				return;
-			recording = std::move(avi_recording);
-		}
-		break;
+	// we have a file; try to create the recording
+	std::unique_ptr<movie_recording> recording = movie_recording::create(machine(), screen, format, std::move(movie_file), m_snap_bitmap);
 
-	case MF_MNG:
-		{
-			std::map<std::string, std::string> info_fields;
-			info_fields["Software"] = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
-			info_fields["System"] = std::string(machine().system().manufacturer).append(" ").append(machine().system().type.fullname());
-
-			auto mng_recording = std::make_unique<mng_movie_recording>(screen, std::move(info_fields));
-			if (!mng_recording->initialize(std::move(movie_file), m_snap_bitmap))
-				return;
-			recording = std::move(mng_recording);
-		}
-		break;
-
-	default:
-		// should not get here
-		throw false;
-	}
-
-	// recording created; set the current time and push it onto the list
-	recording->set_next_frame_time(machine().time());
-	m_movie_recordings.push_back(std::move(recording));
+	// if successful push it onto the list
+	if (recording)
+		m_movie_recordings.push_back(std::move(recording));
 }
 
 
@@ -623,7 +451,7 @@ void video_manager::begin_recording_screen(const std::string &filename, uint32_t
 //  begin_recording - begin recording of a movie
 //-------------------------------------------------
 
-void video_manager::begin_recording(const char *name, movie_format format)
+void video_manager::begin_recording(const char *name, movie_recording::format format)
 {
 	// create a snapshot bitmap so we know what the target size is
 	screen_device_iterator iterator = screen_device_iterator(machine().root_device());
@@ -733,7 +561,6 @@ bool video_manager::is_recording() const
 {
 	return !m_movie_recordings.empty();
 }
-
 
 //-------------------------------------------------
 //  effective_autoframeskip - return the effective
@@ -1458,8 +1285,6 @@ void video_manager::record_frame()
 	if (error)
 		end_recording();
 	g_profiler.stop();
-
-	g_profiler.stop();
 }
 
 //-------------------------------------------------
@@ -1476,17 +1301,17 @@ void video_manager::toggle_throttle()
 //  toggle_record_movie
 //-------------------------------------------------
 
-void video_manager::toggle_record_movie(movie_format format)
+void video_manager::toggle_record_movie(movie_recording::format format)
 {
 	if (!is_recording())
 	{
 		begin_recording(nullptr, format);
-		machine().popmessage("REC START (%s)", format == MF_MNG ? "MNG" : "AVI");
+		machine().popmessage("REC START (%s)", format == movie_recording::format::MNG ? "MNG" : "AVI");
 	}
 	else
 	{
 		end_recording();
-		machine().popmessage("REC STOP (%s)", format == MF_MNG ? "MNG" : "AVI");
+		machine().popmessage("REC STOP");
 	}
 }
 

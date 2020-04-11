@@ -2129,16 +2129,16 @@ void lua_engine::initialize()
 			std::string fn = filename;
 			strreplace(fn, "/", PATH_SEPARATOR);
 			strreplace(fn, "%g", machine().basename());
-			vm.begin_recording(fn.c_str(), video_manager::MF_AVI);
+			vm.begin_recording(fn.c_str(), movie_recording::format::AVI);
 		},
-		[](video_manager &vm) { vm.begin_recording(nullptr, video_manager::MF_AVI); }));
+		[](video_manager &vm) { vm.begin_recording(nullptr, movie_recording::format::AVI); }));
 	video_type.set("end_recording", [this](video_manager &vm) {
 			if(!vm.is_recording())
 			{
 				machine().logerror("[luaengine] No active recording to stop\n");
 				return;
 			}
-			vm.end_recording(video_manager::MF_AVI);
+			vm.end_recording();
 		});
 	video_type.set("snapshot", &video_manager::save_active_screen_snapshots);
 	video_type.set("is_recording", &video_manager::is_recording);
