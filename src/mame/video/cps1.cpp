@@ -1108,8 +1108,8 @@ static const struct gfx_range mapper_S9263B_table[] =
 };
 
 
-// VA22B, VA24B and VA63B are equivalent, but since we could dump both PALs we are
-// documenting both.
+// VA22B, VA24B and VA63B are equivalent, but since we could dump all PALs we are
+// documenting all.
 
 #define mapper_VA22B    { 0x4000, 0x4000, 0, 0 }, mapper_VA22B_table
 static const struct gfx_range mapper_VA22B_table[] =
@@ -1283,6 +1283,25 @@ static const struct gfx_range mapper_RCM63B_table[] =
 	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x18000, 0x1ffff, 3 },
 	{ 0 }
 };
+
+
+#define mapper_GBPR2    { 0x8000, 0x8000, 0, 0 }, mapper_GBPR2_table
+static const struct gfx_range mapper_GBPR2_table[] =
+{
+	// verified from PAL dump:
+	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
+	// bank1 = pin 17 (ROMs 5,7) & pin 16 (ROMs 6,8)
+	// pins 12,13,14,15 are never enabled
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x3fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x4000, 0x7fff, 0 },
+
+	{ GFXTYPE_SCROLL2, 0x8000, 0xbfff, 1 },
+	{ GFXTYPE_SCROLL3, 0xc000, 0xffff, 1 },
+	{ 0 }
+};
+
 
 #define mapper_gulunpa   { 0x8000, 0, 0, 0 }, mapper_gulunpa_table
 static const struct gfx_range mapper_gulunpa_table[] =
@@ -1709,7 +1728,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"pang3b",      CPS_B_21_DEF, mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"pang3b2",     CPS_B_21_DEF, mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"pang3b3",     CPS_B_17,     mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
-	{"ganbare",     CPS_B_21_DEF, mapper_sfzch },   // wrong, this set uses GBPR2, dumped but equations still not added
+	{"ganbare",     CPS_B_21_DEF, mapper_GBPR2 },
 	{"gulunpa",     CPS_B_21_DEF, mapper_gulunpa }, // wrong
 	
 	/* CPS Changer */
