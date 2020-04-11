@@ -15,17 +15,12 @@ namespace bx
 	template<typename Ty, size_t Num>
 	char(&CountOfRequireArrayArgumentT(const Ty(&)[Num]))[Num];
 
-	template<bool>
-	BX_FORCE_INLINE constexpr bool isEnabled()
+	template<bool B>
+	struct isEnabled
 	{
-		return true;
-	}
-
-	template<>
-	BX_FORCE_INLINE constexpr bool isEnabled<false>()
-	{
-		return false;
-	}
+		// Template for avoiding MSVC: C4127: conditional expression is constant
+		static constexpr bool value = B;
+	};
 
 	inline constexpr bool ignoreC4127(bool _x)
 	{

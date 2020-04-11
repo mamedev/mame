@@ -23,16 +23,12 @@
 #define BX_IGNORE_C4127(_x) bx::ignoreC4127(!!(_x) )
 
 ///
-#define BX_ENABLED(_x) bx::isEnabled<!!(_x)>()
+#define BX_ENABLED(_x) (bx::isEnabled<!!(_x)>::value)
 
 namespace bx
 {
 	constexpr int32_t kExitSuccess = 0;
 	constexpr int32_t kExitFailure = 1;
-
-	/// Template for avoiding MSVC: C4127: conditional expression is constant
-	template<bool>
-	constexpr bool isEnabled();
 
 	///
 	template<class Ty>
