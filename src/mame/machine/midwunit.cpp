@@ -75,7 +75,7 @@ WRITE16_MEMBER(midwunit_state::midwunit_io_w)
 			LOGMASKED(LOG_IO, "%s: Control W @ %05X = %04X\n", machine().describe_context(), offset, data);
 
 			/* bit 4 reset sound CPU */
-			m_dcs->reset_w(newword & 0x10);
+			m_dcs->reset_w(~newword & 0x10);
 
 			/* bit 5 (active low) reset security chip */
 			if (m_midway_serial_pic) m_midway_serial_pic->reset_w(newword & 0x20);
@@ -316,8 +316,8 @@ void midwunit_state::init_rmpgwt()
 void midwunit_state::machine_reset()
 {
 	/* reset sound */
-	m_dcs->reset_w(1);
 	m_dcs->reset_w(0);
+	m_dcs->reset_w(1);
 
 	/* reset I/O shuffling */
 	for (int i = 0; i < 16; i++)
