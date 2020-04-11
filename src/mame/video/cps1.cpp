@@ -1193,6 +1193,29 @@ static const struct gfx_range mapper_KR63B_table[] =
 	{ 0 }
 };
 
+#define mapper_KR22B    { 0x4000, 0x4000, 0x4000, 0x4000 }, mapper_KR22B_table
+static const struct gfx_range mapper_KR22B_table[] =
+{
+	// verified from PAL dump:
+	// bank 0 = pin 19 (ROMs 1,5, 9,13,17,24,32,38)
+	// bank 1 = pin 16 (ROMs 2,6,10,14,18,25,33,39)
+	// bank 2 = pin 14 (ROMs 3,7,11,15,19,21,26,28)
+	// bank 3 = pin 12 (ROMS 4,8,12,16,20,22,27,29)
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x0000, 0x3fff, 0 },
+
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x4000, 0x7fff, 1 },
+
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0x87ff, 2 },
+	{ GFXTYPE_SCROLL1,                   0x8800, 0x97ff, 2 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x9800, 0xbfff, 2 },
+
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0xc000, 0xcfff, 3 },
+	{ GFXTYPE_SCROLL3,                   0xd000, 0xffff, 3 },
+	{ 0 }
+};
+
 
 #define mapper_S9263B   { 0x8000, 0x8000, 0x8000, 0 }, mapper_S9263B_table
 static const struct gfx_range mapper_S9263B_table[] =
@@ -1716,7 +1739,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"kodr2",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodu",        CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodj",        CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
-	{"kodja",       CPS_B_21_BT2, mapper_KD22B,  0x36, 0, 0x34 },   // equivalent to KD29B
+	{"kodja",       CPS_B_21_BT2, mapper_KD22B,  0x36, 0, 0x34 },
 	{"kodb",        CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },   /* bootleg, doesn't use multiply protection */
 	{"captcomm",    CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"captcommr1",  CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
@@ -1728,7 +1751,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"knights",     CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsu",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsj",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
-	{"knightsja",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },   // wrong, this set uses KR22B, still not dumped
+	{"knightsja",   CPS_B_21_BT4, mapper_KR22B,  0x36, 0, 0x34 },
 	{"knightsb2",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },   // wrong, knightsb bootleg doesn't use the KR63B PAL
 	//{"knightsb",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },   // wrong, knightsb bootleg doesn't use the KR63B PAL
 	{"knightsb3",   CPS_B_21_BT4, mapper_KR63B },

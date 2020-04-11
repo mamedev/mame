@@ -9236,7 +9236,7 @@ ROM_START( knightsja )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "kr22b.1a",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "kr22b.1a",     0x0000, 0x0117, CRC(f15b2c0f) SHA1(07113a14a60b5ba232451bc73e36f7e6a7fee572) )
 	ROM_LOAD( "lwio.12e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
