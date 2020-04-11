@@ -52613,6 +52613,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="rayman">
+		<description>Rayman (early prototype)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="rayman (early prototype).sfc" size="1048576" crc="366d9177" sha1="cc97835e5789e6b708cadf6d7213ac0bae5716e9" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="realm">
 		<description>Realm (Euro)</description>
 		<year>1996</year>
@@ -55812,6 +55824,30 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sports illustrated championship football &amp; baseball (usa) (beta).sfc" size="2097152" crc="ed9aa0e1" sha1="0871060a91f939010283ec230750f378d1e7d8ad" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spotgo">
+		<description>Spot Goes to Hollywood (prototype 19950805)</description>
+		<year>1995</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spot goes to hollywood (prototype 19950805).sfc" size="2097152" crc="2fa40bf4" sha1="232bf12780458d0793b48a3a17839dc30d0718ca" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spotgop2" cloneof="spotgo">
+		<description>Spot Goes to Hollywood (prototype 19950307)</description>
+		<year>1995</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spot goes to hollywood (prototype 19950307).sfc" size="2097152" crc="fe751be3" sha1="f93c786202a85d9e42a888d561a1aef7f3015bfa" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
