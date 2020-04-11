@@ -1063,6 +1063,12 @@ ROM_END
     pcb marking: H11F6
 	uses a pin compatible EMC EM78P447AP instead of usual PIC 16c57, secured unfortunately so no dump
 	
+	Confirmed clocks (measured):
+     xtals: 30MHz, 24MHz
+     68k  = 12MHz
+     em78 = 3.75MHz
+     oki  = 1MHz     pin 7 high
+	
 	  __________________________________________
 	  |TDA2003(V)  U6295  ROM 30MHz   6116      |
 	  | 93C46   EM78P447AP            6116      |
@@ -1083,6 +1089,7 @@ ROM_END
     # = player 3 connector	
 	T = test mode button
 	U6295 = oki M6295 clone
+	68K = MC68HC000FN16 PLCC68
 */
 ROM_START( jurassic99 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
