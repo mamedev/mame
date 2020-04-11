@@ -1108,7 +1108,7 @@ static const struct gfx_range mapper_S9263B_table[] =
 };
 
 
-// VA22B and VA63B are equivalent, but since we could dump both PALs we are
+// VA22B, VA24B and VA63B are equivalent, but since we could dump both PALs we are
 // documenting both.
 
 #define mapper_VA22B    { 0x4000, 0x4000, 0, 0 }, mapper_VA22B_table
@@ -1131,6 +1131,20 @@ static const struct gfx_range mapper_VA63B_table[] =
 	// verified from PAL dump (PAL # uncertain):
 	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
 	// pins 12,13,14,15,16,17 are never enabled
+
+	/* type                                                                  start    end      bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x07fff, 0 },
+	{ 0 }
+};
+
+#define mapper_VA24B    { 0x8000, 0, 0, 0 }, mapper_VA24B_table
+static const struct gfx_range mapper_VA24B_table[] =
+{
+	// verified from PAL dump:
+	// bank 0 = pin 16 (ROMs 1,3,5,7)
+	// pins 12,14 allow to populate the 8-bit ROM sockets instead of the 16-bit ones:
+	// pin 12 (ROMs 10,12,14,16,20,22,24,26) = sprites/scroll1/scroll2/scroll3 0000-3fff
+	// pin 14 (ROMs 11,13,15,17,21,23,25,27) = sprites/scroll1/scroll2/scroll3 4000-7fff  
 
 	/* type                                                                  start    end      bank */
 	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x07fff, 0 },
@@ -1642,9 +1656,9 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2cems6b",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2cems6c",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2re",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
-	{"varth",       CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */  // wrong, this set uses VA24B, dumped but equations still not added
+	{"varth",       CPS_B_04,     mapper_VA24B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthb",      CPS_B_04,     mapper_VA63B, 0, 0, 0, 0x0F },
-	{"varthr1",     CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */  // wrong, this set uses VA24B, dumped but equations still not added
+	{"varthr1",     CPS_B_04,     mapper_VA24B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthu",      CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthj",      CPS_B_21_BT5, mapper_VA22B },   /* CPSB test has been patched out (72=0001) register is also written to, possibly leftover from development */
 	{"varthjr",     CPS_B_21_BT5, mapper_VA63B },   /* CPSB test has been patched out (72=0001) register is also written to, possibly leftover from development */
