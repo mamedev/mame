@@ -758,9 +758,7 @@ static const struct gfx_range mapper_S222B_table[] =
 	// bank 0 = pin 19 (ROMs 1,5, 9,13,17,24,32,38)
 	// bank 1 = pin 16 (ROMs 2,6,10,14,18,25,33,39)
 	// pin 18 gives an alternate single bank mapping identical to S224B pin 16,
-	// however, the only b-board that seems to use pin 18 as an output is the unique forgottn 88621B-2,
-	// todo: confirm if pin 18 is connected to anything on ffightj1-4 88622B-2/3 and 89625B-1 b-boards.
-	//       confirm which b-board ffightj uses, could it be 88621B-2?
+	// todo: confirm what pin 18 connects to on 88622B-2/3 and 89625B-1 b-boards.
 
 	/* type            start   end     bank */
 	{ GFXTYPE_SPRITES, 0x0000, 0x3fff, 0 },
@@ -772,6 +770,9 @@ static const struct gfx_range mapper_S222B_table[] =
 	{ 0 }
 };
 
+
+// YI22B and YI24B are equivalent, but since we have dumps of both PALs we will
+// document both.
 
 #define mapper_YI24B    { 0x8000, 0, 0, 0 }, mapper_YI24B_table
 static const struct gfx_range mapper_YI24B_table[] =
@@ -793,6 +794,24 @@ static const struct gfx_range mapper_YI24B_table[] =
 	{ GFXTYPE_SCROLL3, 0x2000, 0x3fff, 0 },
 	{ GFXTYPE_SCROLL1, 0x4000, 0x47ff, 0 },
 	{ GFXTYPE_SCROLL2, 0x4800, 0x7fff, 0 },
+	{ 0 }
+};
+
+#define mapper_YI22B    { 0x4000, 0x4000, 0, 0 }, mapper_YI22B_table
+static const struct gfx_range mapper_YI22B_table[] =
+{
+	// verified from PAL dump:
+	// bank 0 = pin 19 (ROMs 1,5, 9,13,17,24,32,38)
+	// bank 1 = pin 16 (ROMs 2,6,10,14,18,25,33,39)
+	// pin 18 gives an alternate single bank mapping identical to YI24B pin 16,
+	// todo: confirm what pin 18 connects to on 89625B-1 b-board.
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x1fff, 0 },
+	{ GFXTYPE_SCROLL3, 0x2000, 0x3fff, 1 },
+
+	{ GFXTYPE_SCROLL1, 0x4000, 0x47ff, 1 },
+	{ GFXTYPE_SCROLL2, 0x4800, 0x7fff, 1 },
 	{ 0 }
 };
 
@@ -1559,7 +1578,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"1941",        CPS_B_05,     mapper_YI24B },
 	{"1941r1",      CPS_B_05,     mapper_YI24B },
 	{"1941u",       CPS_B_05,     mapper_YI24B },
-	{"1941j",       CPS_B_05,     mapper_YI24B },   // wrong, this set uses YI22B, dumped but equations still not added
+	{"1941j",       CPS_B_05,     mapper_YI22B },
 	{"unsquad",     CPS_B_11,     mapper_AR24B },
 	{"area88",      CPS_B_11,     mapper_AR22B },   // equivalent to AR24B
 	{"area88r",     CPS_B_21_DEF, mapper_AR22B },   // wrong, this set uses ARA63B, still not dumped
