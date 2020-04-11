@@ -232,10 +232,8 @@ Interrupts:
 #include "emu.h"
 #include "includes/qix.h"
 
-#include "rendlay.h"
 #include "machine/nvram.h"
 
-#include "elecyoyo.lh"
 
 
 
@@ -1440,8 +1438,8 @@ GAME( 1981, qixo,      qix,      qix,     qix,      qix_state,     empty_init,  
 GAME( 1981, qix2,      qix,      qix,     qix,      qix_state,     empty_init,   ROT270, "Taito America Corporation", "Qix II (Tournament)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, sdungeon,  0,        mcu,     sdungeon, qixmcu_state,  empty_init,   ROT270, "Taito America Corporation", "Space Dungeon", MACHINE_SUPPORTS_SAVE ) // actually released July 1982
 GAME( 1981, sdungeona, sdungeon, mcu,     sdungeon, qixmcu_state,  empty_init,   ROT270, "Taito America Corporation", "Space Dungeon (larger roms)", MACHINE_SUPPORTS_SAVE ) // same as above but uses larger ROMs
-GAMEL(1982, elecyoyo,  0,        mcu,     elecyoyo, qixmcu_state,  empty_init,   ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
-GAMEL(1982, elecyoyo2, elecyoyo, mcu,     elecyoyo, qixmcu_state,  empty_init,   ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
+GAMEL(1982, elecyoyo,  0,        mcu,     elecyoyo, qixmcu_state,  empty_init,   ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", MACHINE_SUPPORTS_SAVE, "elecyoyo" )
+GAMEL(1982, elecyoyo2, elecyoyo, mcu,     elecyoyo, qixmcu_state,  empty_init,   ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", MACHINE_SUPPORTS_SAVE, "elecyoyo" )
 GAME( 1982, kram,      0,        mcu,     kram,     qixmcu_state,  empty_init,   ROT0,   "Taito America Corporation", "Kram (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, kram2,     kram,     mcu,     kram,     qixmcu_state,  empty_init,   ROT0,   "Taito America Corporation", "Kram (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, kram3,     kram,     kram3,   kram,     qix_state,     init_kram3,   ROT0,   "Taito America Corporation", "Kram (encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

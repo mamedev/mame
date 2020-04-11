@@ -10,7 +10,7 @@
 #include "cpu/m6809/m6809.h"
 #include "speaker.h"
 
-#include "s11c.lh"
+
 
 
 void s11c_state::s11c_main_map(address_map &map)
@@ -159,7 +159,7 @@ void s11c_state::s11c(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &s11c_state::s11c_main_map);
 
 	/* Video */
-	config.set_default_layout(layout_s11c);
+	config.set_default_layout("s11c");
 
 	/* Sound */
 	genpin_audio(config);

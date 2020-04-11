@@ -21,7 +21,7 @@ TODO:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "slc1a.lh"
+
 
 
 namespace {
@@ -182,7 +182,7 @@ void slc1_state::slc1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &slc1_state::main_io);
 
 	/* video hardware */
-	config.set_default_layout(layout_slc1a);
+	config.set_default_layout("slc1a");
 
 	/* devices */
 	Z80PIO(config, m_pio, 2500000);

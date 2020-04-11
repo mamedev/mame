@@ -14,5 +14,5 @@
 // Kept separate from tms57002.cpp to avoid the optimizer eating all the memory
 
 #define CINTRP
-#include "cpu/tms57002/tms57002.hxx"
+#include "emu/cpu/tms57002/tms57002.hxx"
 #undef CINTRP

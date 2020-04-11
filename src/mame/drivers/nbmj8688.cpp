@@ -39,11 +39,10 @@ TODO:
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "rendlay.h"
+
 #include "screen.h"
 #include "speaker.h"
 
-#include "nbmj8688.lh"
 
 
 void nbmj8688_state::init_mjcamera()
@@ -2730,7 +2729,7 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 
 	/* video hardware */
 	PALETTE(config, "palette", FUNC(nbmj8688_state::mbmj8688_16bit), 65536);
-	config.set_default_layout(layout_nbmj8688);
+	config.set_default_layout("nbmj8688");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);

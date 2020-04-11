@@ -27,8 +27,6 @@ I/O is similar to supercon
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "novag_cforte.lh" // clickable
 
 
 namespace {
@@ -265,7 +263,7 @@ void cforte_state::cforte(machine_config &config)
 	HLCD0538(config, m_lcd).write_cols().set(FUNC(cforte_state::lcd_output_w));
 	PWM_DISPLAY(config, m_display).set_size(3+13, 8);
 	m_display->set_segmask(0x3ff0, 0xff);
-	config.set_default_layout(layout_novag_cforte);
+	config.set_default_layout("novag_cforte");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

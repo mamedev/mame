@@ -51,8 +51,6 @@ keypad legend:
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "debutm.lh" // clickable
 
 
 namespace {
@@ -244,7 +242,7 @@ void debut_state::debutm(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(2, 9);
 	m_display->set_bri_maximum(0.5);
-	config.set_default_layout(layout_debutm);
+	config.set_default_layout("debutm");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

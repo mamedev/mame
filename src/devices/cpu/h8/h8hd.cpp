@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    h8d.h
+    h8hd.cpp
 
     H8-300H base cpu emulation, disassembler
 
@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "h8hd.h"
-#include "cpu/h8/h8hd.hxx"
+#include "emu/cpu/h8/h8hd.hxx"
 
 h8h_disassembler::h8h_disassembler() : h8_disassembler(disasm_entries, true)
 {

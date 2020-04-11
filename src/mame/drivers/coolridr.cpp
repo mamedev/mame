@@ -288,11 +288,9 @@ to the same bank as defined through A20.
 #include "machine/315_5649.h"
 #include "sound/scsp.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
-#include "aquastge.lh"
 
 
 #define CLIPMAXX_FULL (496-1)
@@ -3274,7 +3272,7 @@ void coolridr_state::coolridr(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::RGB_555);
 
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -3399,4 +3397,4 @@ void coolridr_state::init_aquastge()
 }
 
 GAME(  1995, coolridr, 0, coolridr, coolridr, coolridr_state, init_coolridr, ROT0, "Sega", "Cool Riders", MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN ) // region is set in test mode, this set is for Japan, USA and Export (all regions)
-GAMEL( 1995, aquastge, 0, aquastge, aquastge, coolridr_state, init_aquastge, ROT0, "Sega", "Aqua Stage",  MACHINE_NOT_WORKING, layout_aquastge)
+GAMEL( 1995, aquastge, 0, aquastge, aquastge, coolridr_state, init_aquastge, ROT0, "Sega", "Aqua Stage",  MACHINE_NOT_WORKING, "aquastge")

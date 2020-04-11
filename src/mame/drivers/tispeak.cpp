@@ -412,7 +412,6 @@ Y-1320 : T.I. Dataman
 
 #include "emu.h"
 #include "includes/hh_tms1k.h"
-
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "machine/timer.h"
@@ -422,13 +421,6 @@ Y-1320 : T.I. Dataman
 #include "speaker.h"
 #include "render.h"
 
-// internal artwork
-#include "k28m2.lh"
-#include "snmath.lh"
-#include "snread.lh"
-#include "snspell.lh"
-#include "snspellsp.lh"
-#include "tntell.lh" // keyboard overlay
 
 namespace {
 
@@ -1316,7 +1308,7 @@ void tispeak_state::snmath(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(16, 16);
 	m_display->set_segmask(0x21ff, 0x3fff);
-	config.set_default_layout(layout_snmath);
+	config.set_default_layout("snmath");
 
 	/* sound hardware */
 	TMS6100(config, m_tms6100, MASTER_CLOCK/4);
@@ -1334,7 +1326,7 @@ void tispeak_state::sns_cd2801(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
 
-	config.set_default_layout(layout_snspell);
+	config.set_default_layout("snspell");
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm");
@@ -1348,7 +1340,7 @@ void tispeak_state::snspellit(machine_config &config)
 	sns_cd2801(config);
 
 	/* basic machine hardware */
-	config.set_default_layout(layout_snmath);
+	config.set_default_layout("snmath");
 }
 
 void tispeak_state::sns_tmc0281(machine_config &config)
@@ -1365,7 +1357,7 @@ void tispeak_state::snspellsp(machine_config &config)
 	sns_tmc0281(config);
 
 	/* basic machine hardware */
-	config.set_default_layout(layout_snspellsp);
+	config.set_default_layout("snspellsp");
 }
 
 void tispeak_state::sns_tmc0281d(machine_config &config)
@@ -1385,7 +1377,7 @@ void tispeak_state::snread(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
 
-	config.set_default_layout(layout_snread);
+	config.set_default_layout("snread");
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snread", "vsm");
@@ -1403,7 +1395,7 @@ void tispeak_state::lantutor(machine_config &config)
 	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
 	m_maincpu->r().set(FUNC(tispeak_state::lantutor_write_r));
 
-	config.set_default_layout(layout_snread);
+	config.set_default_layout("snread");
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "lantutor", "vsm,bin");
@@ -1457,7 +1449,7 @@ void tispeak_state::vocaid(machine_config &config)
 	m_maincpu->r().set(FUNC(tispeak_state::snspellc_write_r));
 
 	TIMER(config, "ol_timer").configure_periodic(FUNC(tispeak_state::tntell_get_overlay), attotime::from_msec(50));
-	config.set_default_layout(layout_tntell);
+	config.set_default_layout("tntell");
 
 	/* sound hardware */
 	TMS6100(config, m_tms6100, MASTER_CLOCK/4);
@@ -1487,7 +1479,7 @@ void tispeak_state::k28m2(machine_config &config)
 	m_maincpu->o().set(FUNC(tispeak_state::k28_write_o));
 	m_maincpu->r().set(FUNC(tispeak_state::k28_write_r));
 
-	config.set_default_layout(layout_k28m2);
+	config.set_default_layout("k28m2");
 
 	/* sound hardware */
 	TMS6100(config, m_tms6100, MASTER_CLOCK/4);

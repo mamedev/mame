@@ -44,10 +44,6 @@ TODO:
 #include "screen.h"
 #include "tilemap.h"
 
-#include "lbeach.lh"
-#include "speedrs.lh"
-
-
 namespace {
 
 class lbeach_state : public driver_device
@@ -423,5 +419,5 @@ ROM_END
 ******************************************************************************/
 
 //     YEAR  NAME     PARENT  MACHINE  INPUT    STATE         INIT        COMPANY, FULLNAME, FLAGS
-GAMEL( 1979, lbeach,  0,      lbeach,  lbeach,  lbeach_state, empty_init, ROT0, "Seletron / Olympia", "Long Beach", MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_lbeach )
-GAMEL( 1980, speedrs, 0,      lbeach,  speedrs, lbeach_state, empty_init, ROT0, "Seletron / Olympia", "Speed Race (Seletron / Olympia)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_speedrs )
+GAMEL( 1979, lbeach,  0,      lbeach,  lbeach,  lbeach_state, empty_init, ROT0, "Seletron / Olympia", "Long Beach", MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, "lbeach" )
+GAMEL( 1980, speedrs, 0,      lbeach,  speedrs, lbeach_state, empty_init, ROT0, "Seletron / Olympia", "Speed Race (Seletron / Olympia)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, "speedrs" )

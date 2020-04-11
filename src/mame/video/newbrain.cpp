@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "includes/newbrain.h"
-#include "rendlay.h"
+
 #include "screen.h"
 
 #define LOG 0

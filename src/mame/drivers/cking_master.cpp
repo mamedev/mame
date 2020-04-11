@@ -28,8 +28,6 @@ TODO:
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "ck_master.lh" // clickable
 
 
 namespace {
@@ -236,7 +234,7 @@ void master_state::master(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 2);
-	config.set_default_layout(layout_ck_master);
+	config.set_default_layout("ck_master");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

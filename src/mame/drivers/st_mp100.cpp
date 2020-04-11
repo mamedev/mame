@@ -20,7 +20,7 @@ ToDo:
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
-#include "st_mp100.lh"
+
 
 
 class st_mp100_state : public genpin_class
@@ -718,7 +718,7 @@ void st_mp100_state::st_mp100(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	config.set_default_layout(layout_st_mp100);
+	config.set_default_layout("st_mp100");
 
 	/* Sound */
 	genpin_audio(config);

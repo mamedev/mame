@@ -38,7 +38,6 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#include "px8.lh"
 
 
 /***************************************************************************
@@ -757,7 +756,7 @@ void px8_state::px8(machine_config &config)
 //  sub.set_disable();
 
 	/* video hardware */
-	config.set_default_layout(layout_px8);
+	config.set_default_layout("px8");
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(72);

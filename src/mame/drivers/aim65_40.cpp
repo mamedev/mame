@@ -65,7 +65,6 @@ Unable to locate any manuals so unable to proceed.
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
 #include "bus/rs232/rs232.h"
-#include "aim65_40.lh"
 
 
 //**************************************************************************
@@ -130,7 +129,7 @@ void aim65_40_state::aim65_40(machine_config &config)
 	cpu.set_addrmap(AS_PROGRAM, &aim65_40_state::mem_map);
 
 	/* video hardware */
-	config.set_default_layout(layout_aim65_40);
+	config.set_default_layout("aim65_40");
 
 	/* sound hardware */
 

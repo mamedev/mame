@@ -47,7 +47,6 @@ ToDo:
 #include "screen.h"
 #include "speaker.h"
 
-#include "g627.lh"
 
 
 class g627_state : public genpin_class
@@ -317,7 +316,7 @@ void g627_state::g627(machine_config &config)
 	ASTROCADE_IO(config, "astrocade", 14138000/8).add_route(ALL_OUTPUTS, "mono", 1.0); // 0066-117XX audio chip
 
 	/* Video */
-	config.set_default_layout(layout_g627);
+	config.set_default_layout("g627");
 }
 
 /*-------------------------------------------------------------------

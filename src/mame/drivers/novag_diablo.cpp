@@ -31,9 +31,6 @@ Scorpio 68000 hardware is very similar, but with chessboard buttons and side led
 #include "screen.h"
 #include "speaker.h"
 
-// internal artwork
-#include "novag_diablo68k.lh" // clickable
-#include "novag_scorpio68k.lh" // clickable
 
 
 namespace {
@@ -326,7 +323,7 @@ void diablo_state::diablo68k(machine_config &config)
 	m_lcd->set_pixel_update_cb(FUNC(diablo_state::lcd_pixel_update));
 
 	PWM_DISPLAY(config, m_display).set_size(8, 8+2);
-	config.set_default_layout(layout_novag_diablo68k);
+	config.set_default_layout("novag_diablo68k");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -344,7 +341,7 @@ void diablo_state::scorpio68k(machine_config &config)
 	m_board->set_type(sensorboard_device::BUTTONS);
 	m_board->set_delay(attotime::from_msec(150));
 
-	config.set_default_layout(layout_novag_scorpio68k);
+	config.set_default_layout("novag_scorpio68k");
 }
 
 

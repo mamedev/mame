@@ -113,7 +113,6 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 #include "screen.h"
 #include "speaker.h"
 
-#include "jpmimpct.lh"
 
 /*************************************
  *
@@ -1332,7 +1331,7 @@ void jpmimpct_state::impctawp(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	config.set_default_layout(layout_jpmimpct);
+	config.set_default_layout("jpmimpct");
 
 	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reel[0]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<0>));

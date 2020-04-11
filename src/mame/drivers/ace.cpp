@@ -44,7 +44,6 @@ A1                   2101            2101
 #include "emupal.h"
 #include "screen.h"
 
-#include "ace.lh"
 
 static constexpr XTAL MASTER_CLOCK = 18_MHz_XTAL;
 
@@ -364,4 +363,4 @@ ROM_START( ace )
 ROM_END
 
 
-GAMEL(1976, ace, 0, ace, ace, aceal_state, empty_init, ROT0, "Allied Leisure", "Ace", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND, layout_ace )
+GAMEL(1976, ace, 0, ace, ace, aceal_state, empty_init, ROT0, "Allied Leisure", "Ace", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND, "ace" )

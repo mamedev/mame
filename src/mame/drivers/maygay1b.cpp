@@ -80,7 +80,6 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
-#include "maygay1b.lh"
 
 
 #define M1_MASTER_CLOCK (XTAL(8'000'000))
@@ -786,7 +785,7 @@ void maygay1b_state::maygay_m1(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	config.set_default_layout(layout_maygay1b);
+	config.set_default_layout("maygay1b");
 }
 
 void maygay1b_state::maygay_m1_no_oki(machine_config &config)

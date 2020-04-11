@@ -60,7 +60,7 @@
 #include "cpu/z80/z80.h"
 #include "speaker.h"
 
-#include "depthch.lh"
+
 
 
 #define VICDUAL_MASTER_CLOCK                (XTAL(15'468'480))
@@ -3995,9 +3995,9 @@ ROM_END
  *************************************/
 
 //    YEAR  NAME        PARENT    MACHINE    INPUT      CLASS           INIT        ORIENT. COMPANY, FULLNAME, FLAGS
-GAMEL(1977, depthch,    0,        depthch,   depthch,   vicdual_state,  empty_init, ROT0,   "Gremlin", "Depthcharge", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_depthch )
-GAMEL(1977, depthcho,   depthch,  depthch,   depthch,   vicdual_state,  empty_init, ROT0,   "Gremlin", "Depthcharge (older)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_depthch )
-GAMEL(1977, subhunt,    depthch,  depthch,   depthch,   vicdual_state,  empty_init, ROT0,   "Gremlin (Taito license)", "Sub Hunter (Gremlin / Taito)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_depthch )
+GAMEL(1977, depthch,    0,        depthch,   depthch,   vicdual_state,  empty_init, ROT0,   "Gremlin", "Depthcharge", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "depthch" )
+GAMEL(1977, depthcho,   depthch,  depthch,   depthch,   vicdual_state,  empty_init, ROT0,   "Gremlin", "Depthcharge (older)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "depthch" )
+GAMEL(1977, subhunt,    depthch,  depthch,   depthch,   vicdual_state,  empty_init, ROT0,   "Gremlin (Taito license)", "Sub Hunter (Gremlin / Taito)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "depthch" )
 GAME( 1977, safari,     0,        safari,    safari,    vicdual_state,  empty_init, ROT0,   "Gremlin", "Safari (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1977, safaria,    safari,   safari,    safari,    vicdual_state,  empty_init, ROT0,   "Gremlin", "Safari (set 2, bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // on a bootleg board, but seems a different code revision too
 GAME( 1978, frogs,      0,        frogs,     frogs,     vicdual_state,  empty_init, ROT0,   "Gremlin", "Frogs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

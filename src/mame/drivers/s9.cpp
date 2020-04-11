@@ -40,7 +40,7 @@ ToDo:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "s9.lh"
+
 
 class s9_state : public genpin_class
 {
@@ -331,7 +331,7 @@ void s9_state::s9(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(s9_state, s9)
 
 	/* Video */
-	config.set_default_layout(layout_s9);
+	config.set_default_layout("s9");
 
 	/* Sound */
 	genpin_audio(config);

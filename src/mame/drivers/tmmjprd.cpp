@@ -32,7 +32,7 @@
 #include "machine/timer.h"
 #include "sound/i5000.h"
 #include "emupal.h"
-#include "rendlay.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -772,7 +772,7 @@ void tmmjprd_state::tmmjprd(machine_config &config)
 {
 	tmpdoki(config);
 
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(60);

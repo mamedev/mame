@@ -765,7 +765,7 @@ inline void hd6309_device::execute_one()
 {
 	switch(pop_state())
 	{
-#include "cpu/m6809/hd6309.hxx"
+#include "emu/cpu/m6809/hd6309.hxx"
 	}
 }
 

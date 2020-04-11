@@ -99,7 +99,6 @@ Displaywriter System Manual S544-2023-0 (?) -- mentioned in US patents 4648071 a
 #include "emupal.h"
 #include "screen.h"
 
-#include "ibm6580.lh"
 
 
 #define I8086_TAG       "i8086"
@@ -876,7 +875,7 @@ void ibm6580_state::ibm6580(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set(FUNC(ibm6580_state::vblank_w));
 
-	config.set_default_layout(layout_ibm6580);
+	config.set_default_layout("ibm6580");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 

@@ -49,7 +49,7 @@ ToDo:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "s6a.lh"
+
 
 
 class s6a_state : public genpin_class
@@ -400,7 +400,7 @@ void s6a_state::s6a(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(s6a_state, s6a)
 
 	/* Video */
-	config.set_default_layout(layout_s6a);
+	config.set_default_layout("s6a");
 
 	/* Sound */
 	genpin_audio(config);

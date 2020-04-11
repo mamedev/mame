@@ -24,7 +24,6 @@ ToDo:
 #include "sound/ay8910.h"
 #include "speaker.h"
 
-#include "nsm.lh"
 
 
 class nsm_state : public driver_device
@@ -134,7 +133,7 @@ void nsm_state::nsm(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &nsm_state::nsm_io_map);
 
 	/* Video */
-	config.set_default_layout(layout_nsm);
+	config.set_default_layout("nsm");
 
 	/* Sound */
 	SPEAKER(config, "lspeaker").front_left();

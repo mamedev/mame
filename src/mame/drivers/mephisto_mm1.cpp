@@ -46,9 +46,6 @@ TODO:
 #include "bus/generic/carts.h"
 #include "speaker.h"
 
-// internal artwork
-#include "mephisto_mm1.lh" // clickable
-#include "mephisto_mirage.lh" // clickable
 
 
 namespace {
@@ -386,7 +383,7 @@ void mm1_state::mirage(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4+8, 8);
 	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_mephisto_mirage);
+	config.set_default_layout("mephisto_mirage");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -408,7 +405,7 @@ void mm1_state::mm1(machine_config &config)
 
 	m_board->set_type(sensorboard_device::MAGNETS);
 
-	config.set_default_layout(layout_mephisto_mm1);
+	config.set_default_layout("mephisto_mm1");
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "mephisto_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("mephisto_mm1");

@@ -40,7 +40,6 @@
 #include "sound/sn76496.h"
 #include "speaker.h"
 
-#include "inder.lh"
 
 
 class inder_state : public genpin_class
@@ -1367,7 +1366,7 @@ void inder_state::brvteam(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
-	config.set_default_layout(layout_inder);
+	config.set_default_layout("inder");
 
 	/* Sound */
 	genpin_audio(config);
@@ -1385,7 +1384,7 @@ void inder_state::canasta(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
-	config.set_default_layout(layout_inder);
+	config.set_default_layout("inder");
 
 	/* Sound */
 	genpin_audio(config);
@@ -1407,7 +1406,7 @@ void inder_state::lapbylap(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
-	config.set_default_layout(layout_inder);
+	config.set_default_layout("inder");
 
 	/* Sound */
 	genpin_audio(config);
@@ -1432,7 +1431,7 @@ void inder_state::inder(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
-	config.set_default_layout(layout_inder);
+	config.set_default_layout("inder");
 
 	/* Sound */
 	genpin_audio(config);

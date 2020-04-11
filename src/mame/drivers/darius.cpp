@@ -142,7 +142,6 @@ sounds.
 #include "screen.h"
 #include "speaker.h"
 
-#include "darius.lh"
 
 
 void darius_state::parse_control()   /* assumes Z80 sandwiched between 68Ks */
@@ -712,7 +711,7 @@ void darius_state::darius(machine_config &config)
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_darius);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
-	config.set_default_layout(layout_darius);
+	config.set_default_layout("darius");
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);

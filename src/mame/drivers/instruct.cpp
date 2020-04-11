@@ -49,7 +49,6 @@
 #include "imagedev/snapquik.h"
 #include "speaker.h"
 
-#include "instruct.lh"
 
 
 class instruct_state : public driver_device
@@ -431,7 +430,7 @@ void instruct_state::instruct(machine_config &config)
 	m_maincpu->intack_handler().set([this]() { return BIT(ioport("SW")->read(), 0) ? 0x87 : 0x07; });
 
 	/* video hardware */
-	config.set_default_layout(layout_instruct);
+	config.set_default_layout("instruct");
 
 	/* quickload */
 	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(instruct_state::quickload_cb));

@@ -18,7 +18,6 @@
 #include "includes/elf.h"
 #include "screen.h"
 #include "speaker.h"
-#include "elf2.lh"
 
 #define RUN \
 	BIT(m_special->read(), 0)
@@ -252,7 +251,7 @@ void elf2_state::elf2(machine_config &config)
 	m_maincpu->sc_cb().set(FUNC(elf2_state::sc_w));
 
 	/* video hardware */
-	config.set_default_layout(layout_elf2);
+	config.set_default_layout("elf2");
 
 	CDP1861(config, m_vdc, XTAL(3'579'545)/2).set_screen(SCREEN_TAG);
 	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);

@@ -25,7 +25,7 @@ likewise a 2 screen game
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "emupal.h"
-#include "rendlay.h"
+
 #include "speaker.h"
 
 
@@ -366,7 +366,7 @@ void xmen_state::xmen6p(machine_config &config)
 
 	/* video hardware */
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

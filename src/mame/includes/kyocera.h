@@ -25,7 +25,7 @@
 #include "bus/rs232/rs232.h"
 
 #include "emupal.h"
-#include "rendlay.h"
+
 
 
 #define SCREEN_TAG      "screen"

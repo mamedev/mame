@@ -31,7 +31,6 @@
 
 #include "coreutil.h"
 
-#include "px4.lh"
 
 
 //**************************************************************************
@@ -1500,7 +1499,7 @@ void px4_state::px4(machine_config &config)
 	screen.set_screen_update(FUNC(px4_state::screen_update_px4));
 	screen.set_palette("palette");
 
-	config.set_default_layout(layout_px4);
+	config.set_default_layout("px4");
 
 	PALETTE(config, "palette", FUNC(px4_state::px4_palette), 2);
 

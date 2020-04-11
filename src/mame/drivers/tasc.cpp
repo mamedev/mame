@@ -49,7 +49,7 @@ TODO:
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-#include "tascr30.lh"
+
 
 
 namespace {
@@ -234,7 +234,7 @@ void tasc_state::tasc(machine_config &config)
 
 	TASC_SB30(config, m_smartboard);
 
-	config.set_default_layout(layout_tascr30);
+	config.set_default_layout("tascr30");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

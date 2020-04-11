@@ -27,13 +27,6 @@ INPUT_PORTS_EXTERN( grtecp );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 INPUT_PORTS_EXTERN( mpu4jackpot8per );
 
-#include "m4actbnk.lh"
-#include "m4andybt.lh"
-#include "m4andycp.lh"
-#include "m4andyfh.lh"
-#include "m4andyge.lh"
-#include "m4addr.lh"
-#include "m4tenten.lh"
 
 void mpu4_state::init_m4debug()
 {
@@ -192,7 +185,7 @@ void mpu4_state::init_m4andycp()
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYCP_EXTRA_ROMS \
 	ROM_END \
-	GAMEL( year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4andycp, ROT0, company, title, GAME_FLAGS, layout_m4andycp )
+	GAMEL( year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4andycp, ROT0, company, title, GAME_FLAGS, "m4andycp" )
 
 // "(C)1994  B.W.B."  and  "AC101.0"
 GAME_CUSTOM( 1994, m4andycp,           0,          "ac10.hex",         0x0000, 0x010000, CRC(0e250923) SHA1(9557315cca7a47c307e811d437ff424fe77a2843), "Bwb",      "Andy Capp (Bwb / Barcrest) (MPU4) (AC10)" )
@@ -571,7 +564,7 @@ void mpu4_state::init_m4andyge()
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYGE_EXTRA_ROMS \
 	ROM_END \
-	GAMEL( year, setname, parent, mod4oki_5r, grtecp, mpu4_state, init_m4andyge, ROT0, company, title, GAME_FLAGS, layout_m4andyge )
+	GAMEL( year, setname, parent, mod4oki_5r, grtecp, mpu4_state, init_m4andyge, ROT0, company, title, GAME_FLAGS, "m4andyge" )
 // "(C)1991 BARCREST"  and "AN2 0.3"
 GAME_CUSTOM( 1991, m4andyge,           0,          "an2s.p1",                  0x0000, 0x010000, CRC(65399fa0) SHA1(ecefdf63e7aa477001fa530ed340e90e85252c3c), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (AN2 0.3, set 1)" ) // one of these is probably hacked
 GAME_CUSTOM( 1991, m4andygen2_a,       m4andyge,   "agesc20p",                 0x0000, 0x010000, CRC(94fec0f3) SHA1(7678e01a4e0fcc4136f6d4a668c4d1dd9a8f1246), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (AN2 0.3, set 2)" ) // or has the wrong id strings
@@ -681,7 +674,7 @@ void mpu4_state::init_m4addr()
 		ROM_REGION( 0x10000, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAMEL( year, setname, parent, mod2, mpu4, mpu4_state, init_m4addr, ROT0, company, title, GAME_FLAGS, layout_m4addr )
+	GAMEL( year, setname, parent, mod2, mpu4, mpu4_state, init_m4addr, ROT0, company, title, GAME_FLAGS, "m4addr" )
 // all the adders and ladders sets kill the cpu, end up jumping to the ram area after an RTI/RTS combo? are we saturating the CPU with too many interrupts or is there a bug?
 // also the BWB versioning is.. illogical
 // I think this is a mod2, but because it doesn't boot I haven't moved it to mpu4mod2sw.c yet
@@ -3640,7 +3633,7 @@ void mpu4_state::init_m4tenten()
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TENTEN_EXTRA_ROMS \
 	ROM_END \
-	GAMEL( year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4tenten, ROT0, company, title, GAME_FLAGS, layout_m4tenten )
+	GAMEL( year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4tenten, ROT0, company, title, GAME_FLAGS, "m4tenten" )
 
 // "(C)1991 BARCREST" and "T20 0.2"
 GAME_CUSTOM( 199?, m4tenten,       0,          "t2002s.p1",    0x0000, 0x010000, CRC(6cd9fa10) SHA1(8efe36e3fc5b709fa4363194634686d62b5d6609), "Barcrest","10 X 10 (Barcrest) (MPU4) (T20 0.2)" )
@@ -3761,7 +3754,7 @@ void mpu4_state::init_m4andyfh()
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYFH_EXTRA_ROMS \
 	ROM_END \
-	GAMEL( year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4andyfh, ROT0, company, title, GAME_FLAGS, layout_m4andyfh )
+	GAMEL( year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4andyfh, ROT0, company, title, GAME_FLAGS, "m4andyfh" )
 
 
 // "(C)1991 BARCREST" and "AFH 0.1"
@@ -4715,7 +4708,7 @@ void mpu4_state::init_m4actbnk()
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ACTBNK_EXTRA_ROMS \
 	ROM_END \
-	GAMEL( year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4actbnk, ROT0, company, title, GAME_FLAGS, layout_m4actbnk )
+	GAMEL( year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4actbnk, ROT0, company, title, GAME_FLAGS, "m4actbnk" )
 
 // these require a jackpot key to be inserted
 // "(C)1993 BARCREST" and "ACT 0.7"
@@ -5382,7 +5375,7 @@ void mpu4_state::init_m4andybt()
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYBT_EXTRA_ROMS \
 	ROM_END \
-	GAMEL( year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4andybt, ROT0, company, title, GAME_FLAGS, layout_m4andybt )
+	GAMEL( year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4andybt, ROT0, company, title, GAME_FLAGS, "m4andybt" )
 
 // "(C)1991 BARCREST" and "ABT 1.8"
 GAME_CUSTOM( 199?, m4andybt,       0,          "abt18s.p1",    0x0000, 0x020000, CRC(625263e4) SHA1(23fa0547164cc1f9b7c6cd26e06b0d779bf0329d), "Barcrest","Andy's Big Time Club (Barcrest) (MPU4) (ABT 1.8)" )

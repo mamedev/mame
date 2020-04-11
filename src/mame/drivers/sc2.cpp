@@ -35,7 +35,7 @@ Fidelity CC10 synonyms: RE, LV, RV, PB, ♪, CL, EN
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "sc2.lh"
+
 
 
 namespace {
@@ -215,7 +215,7 @@ void sc2_state::sc2(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_sc2);
+	config.set_default_layout("sc2");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

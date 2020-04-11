@@ -43,7 +43,7 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#include "vidbrain.lh"
+
 
 
 
@@ -404,7 +404,7 @@ void vidbrain_state::vidbrain(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(F3853_TAG, FUNC(f3853_device::int_acknowledge));
 
 	// video hardware
-	config.set_default_layout(layout_vidbrain);
+	config.set_default_layout("vidbrain");
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_screen_update(UV201_TAG, FUNC(uv201_device::screen_update));

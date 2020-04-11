@@ -118,7 +118,6 @@ The ROM support is still TODO.
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "speaker.h"
-#include "mekd3.lh"
 
 // MEK68R2
 #include "machine/terminal.h"
@@ -982,7 +981,7 @@ void mekd3_state::mekd3(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
 	m_display->set_segmask(0xff, 0x7f);
 
-	config.set_default_layout(layout_mekd3);
+	config.set_default_layout("mekd3");
 
 	SPEAKER(config, "mono").front_center();
 

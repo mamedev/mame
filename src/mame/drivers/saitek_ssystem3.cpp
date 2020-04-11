@@ -70,12 +70,8 @@ BTANB:
 #include "sound/volt_reg.h"
 #include "video/md4330b.h"
 #include "video/pwm.h"
-
 #include "screen.h"
 #include "speaker.h"
-
-// internal artwork
-#include "saitek_ssystem3.lh" // clickable
 
 
 namespace {
@@ -318,7 +314,7 @@ void ssystem3_state::ssystem3(machine_config &config)
 	m_display->set_segmask(0xf, 0x7f);
 	m_display->set_bri_levels(0.25);
 
-	config.set_default_layout(layout_saitek_ssystem3);
+	config.set_default_layout("saitek_ssystem3");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

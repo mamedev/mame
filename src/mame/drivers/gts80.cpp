@@ -28,7 +28,6 @@ ToDO:
 #include "machine/genpin.h"
 #include "audio/gottlieb.h"
 #include "speaker.h"
-#include "gts80.lh"
 
 class gts80_state : public genpin_class
 {
@@ -365,7 +364,7 @@ void gts80_state::gts80(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // must be 1
 
 	/* Video */
-	config.set_default_layout(layout_gts80);
+	config.set_default_layout("gts80");
 
 	/* Devices */
 	riot6532_device &riot1(RIOT6532(config, "riot1", XTAL(3'579'545)/4));

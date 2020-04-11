@@ -27,7 +27,6 @@
 #include "speaker.h"
 #include "tilemap.h"
 
-#include "chance32.lh"
 
 
 class chance32_state : public driver_device
@@ -531,4 +530,4 @@ ROM_END
 *************************/
 
 /*     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT   COMPANY                FULLNAME             FLAGS  LAYOUT */
-GAMEL( 19??, chance32, 0,      chance32, chance32, chance32_state, empty_init, ROT0, "PAL System Co, Ltd.", "Chance Thirty Two", 0,     layout_chance32 )
+GAMEL( 19??, chance32, 0,      chance32, chance32, chance32_state, empty_init, ROT0, "PAL System Co, Ltd.", "Chance Thirty Two", 0,     "chance32" )

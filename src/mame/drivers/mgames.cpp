@@ -221,7 +221,6 @@
 #include "screen.h"
 #include "tilemap.h"
 
-#include "mgames.lh"
 
 
 class mgames_state : public driver_device
@@ -690,4 +689,4 @@ ROM_END
 *************************/
 
 /*     YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT        ROT   COMPANY  FULLNAME       FLAGS...                                 LAYOUT  */
-GAMEL( 1981, mgames, 0,      mgames,  mgames, mgames_state, empty_init, ROT0, "Merit", "Match Games", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND, layout_mgames )
+GAMEL( 1981, mgames, 0,      mgames,  mgames, mgames_state, empty_init, ROT0, "Merit", "Match Games", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND, "mgames" )

@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "deco16d.h"
-#include "cpu/m6502/deco16d.hxx"
+#include "emu/cpu/m6502/deco16d.hxx"
 
 deco16_disassembler::deco16_disassembler() : m6502_base_disassembler(disasm_entries)
 {

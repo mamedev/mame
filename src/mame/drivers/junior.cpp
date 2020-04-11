@@ -29,7 +29,6 @@ Test Paste:
 #include "cpu/m6502/m6502.h"
 #include "machine/mos6530n.h"
 #include "machine/timer.h"
-#include "junior.lh"
 
 
 class junior_state : public driver_device
@@ -233,7 +232,7 @@ void junior_state::junior(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(50));
 
 	/* video hardware */
-	config.set_default_layout(layout_junior);
+	config.set_default_layout("junior");
 
 	/* Devices */
 	MOS6532_NEW(config, m_riot, 1_MHz_XTAL);

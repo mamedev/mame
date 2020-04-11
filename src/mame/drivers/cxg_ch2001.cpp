@@ -28,8 +28,6 @@ Hardware notes:
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "cxg_ch2001.lh" // clickable
 
 
 namespace {
@@ -199,7 +197,7 @@ void ch2001_state::ch2001(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
-	config.set_default_layout(layout_cxg_ch2001);
+	config.set_default_layout("cxg_ch2001");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

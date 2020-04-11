@@ -31,8 +31,6 @@ TODO:
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_dsc.lh" // clickable
 
 
 namespace {
@@ -247,7 +245,7 @@ void dsc_state::dsc(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_fidel_dsc);
+	config.set_default_layout("fidel_dsc");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

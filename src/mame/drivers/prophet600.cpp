@@ -55,7 +55,6 @@
 #include "machine/6850acia.h"
 #include "machine/pit8253.h"
 
-#include "prophet600.lh"
 
 #define MAINCPU_TAG "z80"
 #define PIT_TAG     "pit"
@@ -277,7 +276,7 @@ void prophet600_state::prophet600(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &prophet600_state::cpu_map);
 	m_maincpu->set_addrmap(AS_IO, &prophet600_state::io_map);
 
-	config.set_default_layout(layout_prophet600);
+	config.set_default_layout("prophet600");
 
 	pit8253_device &pit8253(PIT8253(config, PIT_TAG, XTAL(8'000'000)/4));
 	pit8253.set_clk<0>(XTAL(8'000'000)/4);

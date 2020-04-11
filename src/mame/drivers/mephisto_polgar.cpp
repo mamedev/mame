@@ -24,10 +24,6 @@ TODO:
 
 #include "speaker.h"
 
-// internal artwork
-#include "mephisto_academy.lh"
-#include "mephisto_milano.lh"
-#include "mephisto_polgar.lh"
 
 
 class mephisto_polgar_state : public driver_device
@@ -318,7 +314,7 @@ void mephisto_polgar_state::polgar(machine_config &config)
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
 	MEPHISTO_DISPLAY_MODULE2(config, "display");
-	config.set_default_layout(layout_mephisto_polgar);
+	config.set_default_layout("mephisto_polgar");
 }
 
 void mephisto_polgar_state::polgar10(machine_config &config)
@@ -350,7 +346,7 @@ void mephisto_risc_state::mrisc(machine_config &config)
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
 	MEPHISTO_DISPLAY_MODULE2(config, "display");
-	config.set_default_layout(layout_mephisto_polgar);
+	config.set_default_layout("mephisto_polgar");
 }
 
 void mephisto_milano_state::milano(machine_config &config)
@@ -360,7 +356,7 @@ void mephisto_milano_state::milano(machine_config &config)
 
 	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board);
 	m_board->set_disable_leds(true);
-	config.set_default_layout(layout_mephisto_milano);
+	config.set_default_layout("mephisto_milano");
 }
 
 void mephisto_academy_state::academy(machine_config &config)
@@ -372,7 +368,7 @@ void mephisto_academy_state::academy(machine_config &config)
 	outlatch.q_out_cb<1>().set(FUNC(mephisto_academy_state::academy_nmi_w));
 	outlatch.q_out_cb<2>().set("display:dac", FUNC(dac_byte_interface::write));
 
-	config.set_default_layout(layout_mephisto_academy);
+	config.set_default_layout("mephisto_academy");
 }
 
 

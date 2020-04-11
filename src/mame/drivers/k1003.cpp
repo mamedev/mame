@@ -43,7 +43,6 @@ The writes to ports 0A, 11 & 13 are continuous.
 
 #include "emu.h"
 #include "cpu/i8008/i8008.h"
-#include "k1003.lh"
 
 
 class k1003_state : public driver_device
@@ -155,7 +154,7 @@ void k1003_state::k1003(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &k1003_state::k1003_io);
 
 	/* video hardware */
-	config.set_default_layout(layout_k1003);
+	config.set_default_layout("k1003");
 }
 
 

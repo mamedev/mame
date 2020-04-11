@@ -30,7 +30,7 @@
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "s11b.lh"
+
 
 
 void s11b_state::s11b_main_map(address_map &map)
@@ -257,7 +257,7 @@ void s11b_state::s11b(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(s11b_state, s11b)
 
 	/* Video */
-	config.set_default_layout(layout_s11b);
+	config.set_default_layout("s11b");
 
 	/* Sound */
 	genpin_audio(config);

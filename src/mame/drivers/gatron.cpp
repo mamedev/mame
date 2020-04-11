@@ -332,9 +332,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "bingo.lh"
-#include "poker41.lh"
-#include "pulltabs.lh"
 
 
 #define MASTER_CLOCK    XTAL(16'000'000)
@@ -637,6 +634,6 @@ ROM_END
 *************************/
 
 /*     YEAR  NAME      PARENT  MACHINE  INPUT     CLASS         INIT        ROT   COMPANY         FULLNAME              FLAGS  LAYOUT   */
-GAMEL( 1983, poker41,  0,      gat,     poker41,  gatron_state, empty_init, ROT0, "Game-A-Tron",  "Four In One Poker",  MACHINE_SUPPORTS_SAVE,     layout_poker41  )
-GAMEL( 1983, pulltabs, 0,      gat,     pulltabs, gatron_state, empty_init, ROT0, "Game-A-Tron",  "Pull Tabs",          MACHINE_SUPPORTS_SAVE,     layout_pulltabs )
-GAMEL( 1983, bingo,    0,      gat,     bingo,    gatron_state, empty_init, ROT0, "Game-A-Tron",  "Bingo",              MACHINE_SUPPORTS_SAVE,     layout_bingo  )
+GAMEL( 1983, poker41,  0,      gat,     poker41,  gatron_state, empty_init, ROT0, "Game-A-Tron",  "Four In One Poker",  MACHINE_SUPPORTS_SAVE,     "poker41"  )
+GAMEL( 1983, pulltabs, 0,      gat,     pulltabs, gatron_state, empty_init, ROT0, "Game-A-Tron",  "Pull Tabs",          MACHINE_SUPPORTS_SAVE,     "pulltabs" )
+GAMEL( 1983, bingo,    0,      gat,     bingo,    gatron_state, empty_init, ROT0, "Game-A-Tron",  "Bingo",              MACHINE_SUPPORTS_SAVE,     "bingo"  )

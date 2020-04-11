@@ -325,7 +325,6 @@ rumbling on a subwoofer in the cabinet.)
 #include "screen.h"
 #include "speaker.h"
 
-#include "ninjaw.lh"
 
 void ninjaw_state::parse_control()   /* assumes Z80 sandwiched between 68Ks */
 {
@@ -730,7 +729,7 @@ void ninjaw_state::ninjaw(machine_config &config)
 	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_ninjaw);
 	GFXDECODE(config, m_gfxdecode[2], m_tc0110pcr[2], gfx_ninjaw);
 
-	config.set_default_layout(layout_ninjaw);
+	config.set_default_layout("ninjaw");
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
@@ -836,7 +835,7 @@ void ninjaw_state::darius2(machine_config &config)
 	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_ninjaw);
 	GFXDECODE(config, m_gfxdecode[2], m_tc0110pcr[2], gfx_ninjaw);
 
-	config.set_default_layout(layout_ninjaw);
+	config.set_default_layout("ninjaw");
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);

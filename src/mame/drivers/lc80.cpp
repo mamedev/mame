@@ -44,7 +44,6 @@
 #include "emu.h"
 #include "includes/lc80.h"
 #include "speaker.h"
-#include "lc80.lh"
 
 /* Memory Maps */
 
@@ -338,7 +337,7 @@ void lc80_state::lc80(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &lc80_state::lc80_io);
 
 	/* video hardware */
-	config.set_default_layout(layout_lc80);
+	config.set_default_layout("lc80");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -375,7 +374,7 @@ void lc80_state::lc80_2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &lc80_state::lc80_io);
 
 	/* video hardware */
-	config.set_default_layout(layout_lc80);
+	config.set_default_layout("lc80");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

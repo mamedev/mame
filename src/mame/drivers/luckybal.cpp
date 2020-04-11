@@ -279,7 +279,6 @@
 #include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
-#include "luckybal.lh"
 
 
 class luckybal_state : public driver_device
@@ -721,9 +720,9 @@ void luckybal_state::init_luckybald()
 **************************************/
 
 //     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT            ROT    COMPANY          FULLNAME                         FLAGS                  LAYOUT
-GAMEL( 1999, luckybal,  0,        luckybal, luckybal, luckybal_state, init_luckybal,  ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 4.01)"      , MACHINE_SUPPORTS_SAVE, layout_luckybal)
-GAMEL( 1996, luckybala, luckybal, luckybal, luckybal, luckybal_state, init_luckybala, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 627)", MACHINE_SUPPORTS_SAVE, layout_luckybal)
-GAMEL( 1996, luckybalb, luckybal, luckybal, luckybal, luckybal_state, init_luckybala, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 626)", MACHINE_SUPPORTS_SAVE, layout_luckybal)
-GAMEL( 1996, luckybalc, luckybal, luckybal, luckybal, luckybal_state, init_luckybala, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 623)", MACHINE_SUPPORTS_SAVE, layout_luckybal)
-GAMEL( 1996, luckybald, luckybal, luckybal, luckybal, luckybal_state, init_luckybald, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 616)", MACHINE_SUPPORTS_SAVE, layout_luckybal)
-GAMEL( 1996, luckybale, luckybal, luckybal, luckybal, luckybal_state, init_luckybal,  ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.01)"      , MACHINE_SUPPORTS_SAVE, layout_luckybal)
+GAMEL( 1999, luckybal,  0,        luckybal, luckybal, luckybal_state, init_luckybal,  ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 4.01)"      , MACHINE_SUPPORTS_SAVE, "luckybal")
+GAMEL( 1996, luckybala, luckybal, luckybal, luckybal, luckybal_state, init_luckybala, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 627)", MACHINE_SUPPORTS_SAVE, "luckybal")
+GAMEL( 1996, luckybalb, luckybal, luckybal, luckybal, luckybal_state, init_luckybala, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 626)", MACHINE_SUPPORTS_SAVE, "luckybal")
+GAMEL( 1996, luckybalc, luckybal, luckybal, luckybal, luckybal_state, init_luckybala, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 623)", MACHINE_SUPPORTS_SAVE, "luckybal")
+GAMEL( 1996, luckybald, luckybal, luckybal, luckybal, luckybal_state, init_luckybald, ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.50 - 616)", MACHINE_SUPPORTS_SAVE, "luckybal")
+GAMEL( 1996, luckybale, luckybal, luckybal, luckybal, luckybal_state, init_luckybal,  ROT0, "Sielcon Games", "Lucky Ball 96 (Ver 3.01)"      , MACHINE_SUPPORTS_SAVE, "luckybal")

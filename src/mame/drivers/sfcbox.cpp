@@ -123,7 +123,7 @@ How does the Super Famicom Box operates
 #include "cpu/z180/z180.h"
 #include "machine/s3520cf.h"
 #include "video/mb90082.h"
-#include "rendlay.h"
+
 #include "speaker.h"
 
 
@@ -475,7 +475,7 @@ void sfcbox_state::sfcbox(machine_config &config)
 
 	/* video hardware */
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	// SNES PPU
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

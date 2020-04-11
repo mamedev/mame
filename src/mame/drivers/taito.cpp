@@ -54,7 +54,7 @@ ToDO:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "taito.lh"
+
 
 
 class taito_state : public genpin_class
@@ -355,7 +355,7 @@ void taito_state::taito(machine_config &config)
 	m_cpu2->set_addrmap(AS_PROGRAM, &taito_state::taito_sub_map);
 
 	/* Video */
-	config.set_default_layout(layout_taito);
+	config.set_default_layout("taito");
 
 	/* Sound */
 	genpin_audio(config);

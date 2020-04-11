@@ -34,7 +34,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cvicny.lh"
 
 class cvicny_state : public driver_device
 {
@@ -142,7 +141,7 @@ void cvicny_state::cvicny(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cvicny_state::cvicny_mem);
 
 	/* video hardware */
-	config.set_default_layout(layout_cvicny);
+	config.set_default_layout("cvicny");
 }
 
 /* ROM definition */

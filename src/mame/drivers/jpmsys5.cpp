@@ -40,7 +40,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "jpmsys5.lh"
 
 
 enum state { IDLE, START, DATA, STOP1, STOP2 };
@@ -855,7 +854,7 @@ void jpmsys5_state::jpmsys5_ym(machine_config &config)
 	ptm.set_external_clocks(0, 0, 0);
 	ptm.o1_callback().set(FUNC(jpmsys5_state::u26_o1_callback));
 	ptm.irq_callback().set(FUNC(jpmsys5_state::ptm_irq));
-	config.set_default_layout(layout_jpmsys5);
+	config.set_default_layout("jpmsys5");
 
 	METERS(config, m_meters, 0).set_number(8);
 }
@@ -911,7 +910,7 @@ void jpmsys5_state::jpmsys5(machine_config &config)
 	ptm.set_external_clocks(0, 0, 0);
 	ptm.o1_callback().set(FUNC(jpmsys5_state::u26_o1_callback));
 	ptm.irq_callback().set(FUNC(jpmsys5_state::ptm_irq));
-	config.set_default_layout(layout_jpmsys5);
+	config.set_default_layout("jpmsys5");
 
 	METERS(config, m_meters, 0).set_number(8);
 }

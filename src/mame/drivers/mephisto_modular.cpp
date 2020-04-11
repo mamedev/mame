@@ -79,10 +79,6 @@ Reminder: unsupported on Almeria and Portorose 1.01, this is not a bug.
 #include "machine/mmboard.h"
 #include "video/mmdisplay2.h"
 
-// internal artwork
-#include "mephisto_alm16.lh" // clickable
-#include "mephisto_alm32.lh" // clickable
-#include "mephisto_gen32.lh" // clickable
 
 
 namespace {
@@ -406,7 +402,7 @@ void mmodular_state::alm16(machine_config &config)
 
 	/* video hardware */
 	MEPHISTO_DISPLAY_MODULE2(config, "display");
-	config.set_default_layout(layout_mephisto_alm16);
+	config.set_default_layout("mephisto_alm16");
 }
 
 void mmodular_state::port16(machine_config &config)
@@ -430,7 +426,7 @@ void mmodular_state::alm32(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmodular_state::alm32_mem);
 	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), attotime::from_hz(750));
 
-	config.set_default_layout(layout_mephisto_alm32);
+	config.set_default_layout("mephisto_alm32");
 }
 
 void mmodular_state::port32(machine_config &config)
@@ -457,7 +453,7 @@ void mmodular_state::gen32(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), irq_period);
 
 	subdevice<hd44780_device>("display:hd44780")->set_busy_factor(0.25); // problem with waitstates
-	config.set_default_layout(layout_mephisto_gen32);
+	config.set_default_layout("mephisto_gen32");
 }
 
 

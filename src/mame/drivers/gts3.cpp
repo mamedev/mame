@@ -34,7 +34,6 @@ ToDo:
 #include "machine/genpin.h"
 #include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"
-#include "gts3.lh"
 
 class gts3_state : public genpin_class
 {
@@ -292,7 +291,7 @@ void gts3_state::gts3(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	config.set_default_layout(layout_gts3);
+	config.set_default_layout("gts3");
 
 	genpin_audio(config);
 

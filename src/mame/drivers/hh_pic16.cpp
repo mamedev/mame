@@ -55,19 +55,6 @@
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-#include "hccbaskb.lh"
-#include "leboom.lh" // clickable
-#include "maniac.lh" // clickable
-#include "melodym.lh" // clickable
-#include "matchme.lh" // clickable
-#include "rockpin.lh"
-#include "tbaskb.lh"
-#include "touchme.lh" // clickable
-#include "ttfball.lh"
-#include "us2pfball.lh"
-
-#include "hh_pic16_test.lh" // common test-layout - use external artwork
-
 
 class hh_pic16_state : public driver_device
 {
@@ -288,7 +275,7 @@ void touchme_state::touchme(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(7, 7);
 	m_display->set_segmask(3, 0x7f);
-	config.set_default_layout(layout_touchme);
+	config.set_default_layout("touchme");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -395,7 +382,7 @@ void pabball_state::pabball(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0x200, 0xff);
-	config.set_default_layout(layout_hh_pic16_test);
+	config.set_default_layout("hh_pic16_test");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -517,7 +504,7 @@ void melodym_state::melodym(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
 	m_display->set_bri_levels(0.9);
-	config.set_default_layout(layout_melodym);
+	config.set_default_layout("melodym");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -619,7 +606,7 @@ void maniac_state::maniac(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(2, 7);
 	m_display->set_segmask(3, 0x7f);
-	config.set_default_layout(layout_maniac);
+	config.set_default_layout("maniac");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -776,7 +763,7 @@ void matchme_state::matchme(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 8);
-	config.set_default_layout(layout_matchme);
+	config.set_default_layout("matchme");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -939,7 +926,7 @@ void leboom_state::leboom(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
-	config.set_default_layout(layout_leboom);
+	config.set_default_layout("leboom");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1057,7 +1044,7 @@ void tbaskb_state::tbaskb(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(6, 7);
 	m_display->set_segmask(0x30, 0x7f);
 	m_display->set_bri_levels(0.01, 0.2); // player led is brighter
-	config.set_default_layout(layout_tbaskb);
+	config.set_default_layout("tbaskb");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1175,7 +1162,7 @@ void rockpin_state::rockpin(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(3+6, 8);
 	m_display->set_segmask(7, 0x7f);
-	config.set_default_layout(layout_rockpin);
+	config.set_default_layout("rockpin");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1296,7 +1283,7 @@ void hccbaskb_state::hccbaskb(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(7, 7);
 	m_display->set_segmask(0x60, 0x7f);
 	m_display->set_bri_levels(0.01, 0.2); // player led is brighter
-	config.set_default_layout(layout_hccbaskb);
+	config.set_default_layout("hccbaskb");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1458,7 +1445,7 @@ void ttfball_state::ttfball(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
 	m_display->set_segmask(0x7f, 0xff);
 	m_display->set_bri_levels(0.003, 0.03); // player led is brighter
-	config.set_default_layout(layout_ttfball);
+	config.set_default_layout("ttfball");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1581,7 +1568,7 @@ void uspbball_state::uspbball(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(6, 16);
 	m_display->set_segmask(7, 0x7f);
-	config.set_default_layout(layout_hh_pic16_test);
+	config.set_default_layout("hh_pic16_test");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1723,7 +1710,7 @@ void us2pfball_state::us2pfball(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
 	m_display->set_segmask(0xff, 0x7f);
-	config.set_default_layout(layout_us2pfball);
+	config.set_default_layout("us2pfball");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

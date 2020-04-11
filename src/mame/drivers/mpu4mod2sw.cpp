@@ -17,11 +17,6 @@
 #include "emu.h"
 #include "includes/mpu4.h"
 
-#include "m4actclb.lh"
-#include "m4actpak.lh"
-#include "m4alladv.lh"
-#include "m4alpha.lh"
-#include "connect4.lh"
 
 INPUT_PORTS_EXTERN( mpu4 );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
@@ -1787,10 +1782,10 @@ GAME(199?, m4sgrabb,  m4sgrab,    mod2, mpu4,            mpu4_state, init_m4defa
 GAME(199?, m4stakeu,  0,          mod2, mpu4,            mpu4_state, init_m4default,     ROT0,   "Barcrest","Stake Up Club (Barcrest) (MPU4) (SU 4.4)",GAME_FLAGS )
 GAME(199?, m4stakeua, m4stakeu,   mod2, mpu4,            mpu4_state, init_m4default,     ROT0,   "Barcrest","Stake Up Club (Barcrest) (MPU4) (SU 4.8)",GAME_FLAGS )
 
-GAMEL(199?, m4actpak, 0,          mod2, mpu4,            mpu4_state, init_m4actpak,      ROT0,   "Barcrest","Action Pack (Barcrest) (MPU4) (AP 0.4)",GAME_FLAGS, layout_m4actpak )
-GAMEL(199?, m4actpaka,m4actpak,   mod2, mpu4,            mpu4_state, init_m4actpak,      ROT0,   "Barcrest","Action Pack (Barcrest) (MPU4) (AP 0.5)",GAME_FLAGS, layout_m4actpak )
+GAMEL(199?, m4actpak, 0,          mod2, mpu4,            mpu4_state, init_m4actpak,      ROT0,   "Barcrest","Action Pack (Barcrest) (MPU4) (AP 0.4)",GAME_FLAGS, "m4actpak" )
+GAMEL(199?, m4actpaka,m4actpak,   mod2, mpu4,            mpu4_state, init_m4actpak,      ROT0,   "Barcrest","Action Pack (Barcrest) (MPU4) (AP 0.5)",GAME_FLAGS, "m4actpak" )
 
-GAMEL(199?, m4alladv, 0,          mod2, mpu4,            mpu4_state, init_m4alladv,      ROT0,   "Barcrest","All Cash Advance (Barcrest) (MPU4) (C2B 6.0)",GAME_FLAGS, layout_m4alladv )
+GAMEL(199?, m4alladv, 0,          mod2, mpu4,            mpu4_state, init_m4alladv,      ROT0,   "Barcrest","All Cash Advance (Barcrest) (MPU4) (C2B 6.0)",GAME_FLAGS, "m4alladv" )
 
 GAME(199?, m4clbdbl,  0,          mod2, mpu4,            mpu4_state, init_m4default,     ROT0,   "Barcrest","Club Double (Barcrest) (MPU4) (CD 1.6)",GAME_FLAGS ) // reel issues
 
@@ -1931,7 +1926,7 @@ GAME(199?, m4tupen,   0,          mod2, mpu4,            mpu4_state, init_m4defa
 
 GAME(199?, m421,      0,          mod2, mpu4,            mpu4_state, init_m4default,     ROT0,   "Barcrest","Twenty One (Barcrest) (MPU4)",GAME_FLAGS ) // reel issues
 
-GAMEL(199?, m4alpha,  0,          mod2, mpu4,            mpu4_state, init_m4alpha,       ROT0,   "Barcrest","Alphabet (Barcrest) [A4B 1.0] (MPU4)",GAME_FLAGS, layout_m4alpha )
+GAMEL(199?, m4alpha,  0,          mod2, mpu4,            mpu4_state, init_m4alpha,       ROT0,   "Barcrest","Alphabet (Barcrest) [A4B 1.0] (MPU4)",GAME_FLAGS, "m4alpha" )
 
 GAME(199?, m4bnknot,  0,          mod2, mpu4,            mpu4_state, init_m4default,     ROT0,   "Barcrest","Bank A Note (Barcrest) [BN 1.0] (MPU4)",GAME_FLAGS )
 
@@ -1995,15 +1990,15 @@ GAME(199?, m4spnwina, m4spnwin,   mod2, mpu4,            mpu4_state, init_m4defa
 
 GAME(199?, m4pick,    0,          mod2, mpu4,            mpu4_state, init_m4default,     ROT0,   "JPM","Pick A Fruit (JPM) (MPU4)",GAME_FLAGS )
 
-GAMEL(1989?, m4conn4, 0,          mod2, connect4,        mpu4_state, init_connect4,      ROT0, "Dolbeck Systems","Connect 4",MACHINE_IMPERFECT_GRAPHICS|MACHINE_REQUIRES_ARTWORK,layout_connect4 )
+GAMEL(1989?, m4conn4, 0,          mod2, connect4,        mpu4_state, init_connect4,      ROT0, "Dolbeck Systems","Connect 4",MACHINE_IMPERFECT_GRAPHICS|MACHINE_REQUIRES_ARTWORK,"connect4" )
 
 GAME(199?, m4ttak,    0,          mod2, mpu4,            mpu4_state, init_m4default,     ROT0,   "<unknown>","Tic Tac Take (unknown) (MPU4)",GAME_FLAGS )
 
 GAME(199?, m4actbnka, m4actbnk,   mod2, mpu4jackpot8tkn, mpu4_state, init_m4default,     ROT0,   "Barcrest","Action Bank (Barcrest) (Mod 2 type, AC3.0) (MPU4)",GAME_FLAGS ) // set jackpot key to 8GBP TOKEN & stake key
 GAME(199?, m4actbnkb, m4actbnk,   mod2, mpu4jackpot8tkn, mpu4_state, init_m4default,     ROT0,   "Barcrest","Action Bank (Barcrest) (Mod 2 type, ACT2.0) (MPU4)",GAME_FLAGS )
 
-GAMEL(199?, m4actclb, 0,          mod2, mpu4,            mpu4_state, init_m4actclb,      ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.9)",GAME_FLAGS, layout_m4actclb ) // set stake to boot
-GAMEL(199?, m4actclba,m4actclb,   mod2, mpu4,            mpu4_state, init_m4actclb,      ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.1)",GAME_FLAGS, layout_m4actclb ) //  ^^
+GAMEL(199?, m4actclb, 0,          mod2, mpu4,            mpu4_state, init_m4actclb,      ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.9)",GAME_FLAGS, "m4actclb" ) // set stake to boot
+GAMEL(199?, m4actclba,m4actclb,   mod2, mpu4,            mpu4_state, init_m4actclb,      ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.1)",GAME_FLAGS, "m4actclb" ) //  ^^
 
 GAME(199?, m4bluemn,  0,          mod2, mpu4,            mpu4_state, init_m4default,     ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.3)",GAME_FLAGS )
 GAME(199?, m4bluemna, m4bluemn,   mod2, mpu4,            mpu4_state, init_m4default,     ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.1)",GAME_FLAGS )

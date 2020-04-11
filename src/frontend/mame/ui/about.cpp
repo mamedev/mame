@@ -19,7 +19,7 @@ namespace ui {
 
 namespace {
 
-#include "copying.ipp"
+#include "emu/copying.ipp"
 
 } // anonymous namespace
 

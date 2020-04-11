@@ -29,7 +29,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "zapcomputer.lh"
+
 
 class zapcomp_state : public driver_device
 {
@@ -163,7 +163,7 @@ void zapcomp_state::zapcomp(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &zapcomp_state::zapcomp_io);
 
 	/* video hardware */
-	config.set_default_layout(layout_zapcomputer);
+	config.set_default_layout("zapcomputer");
 }
 
 ROM_START( zapcomp )

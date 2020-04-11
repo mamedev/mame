@@ -13,7 +13,7 @@
 
 #include "emu.h"
 #include "includes/spdheat.h"
-#include "spdheat.lh"
+
 
 #include "speaker.h"
 #include "cpu/m68000/m68000.h"
@@ -705,7 +705,7 @@ void spdheat_state::spdheat(machine_config &config)
 	PALETTE(config, m_palette1).set_format(palette_device::xBGR_555, 1024);
 	PALETTE(config, m_palette2).set_format(palette_device::xBGR_555, 1024);
 	PALETTE(config, m_palette3).set_format(palette_device::xBGR_555, 1024);
-	config.set_default_layout(layout_spdheat);
+	config.set_default_layout("spdheat");
 
 	screen_device &screen0(SCREEN(config, "screen0", SCREEN_TYPE_RASTER));
 	screen0.set_refresh_hz(60);

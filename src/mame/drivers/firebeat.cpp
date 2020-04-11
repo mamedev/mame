@@ -157,7 +157,6 @@ Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 #include "screen.h"
 #include "speaker.h"
 
-#include "firebeat.lh"
 
 
 struct IBUTTON_SUBKEY
@@ -1731,9 +1730,9 @@ GAME(  2000, ppp,      0,   firebeat,     ppp,  firebeat_state, init_ppp, ROT0, 
 GAME(  2000, ppd,      0,   firebeat,     ppp,  firebeat_state, init_ppd, ROT0,   "Konami",  "ParaParaDancing", MACHINE_NOT_WORKING)
 GAME(  2000, ppp11,    0,   firebeat,     ppp,  firebeat_state, init_ppp, ROT0,   "Konami",  "ParaParaParadise v1.1", MACHINE_NOT_WORKING)
 GAME(  2000, ppp1mp,   ppp, firebeat,     ppp,  firebeat_state, init_ppp, ROT0,   "Konami",  "ParaParaParadise 1st Mix Plus", MACHINE_NOT_WORKING)
-GAMEL( 2000, kbm,      0,   firebeat2,    kbm,  firebeat_state, init_kbm, ROT270, "Konami",  "Keyboardmania", MACHINE_NOT_WORKING, layout_firebeat)
-GAMEL( 2000, kbm2nd,   0,   firebeat2,    kbm,  firebeat_state, init_kbm, ROT270, "Konami",  "Keyboardmania 2nd Mix", MACHINE_NOT_WORKING, layout_firebeat)
-GAMEL( 2001, kbm3rd,   0,   firebeat2,    kbm,  firebeat_state, init_kbm, ROT270, "Konami",  "Keyboardmania 3rd Mix", MACHINE_NOT_WORKING, layout_firebeat)
+GAMEL( 2000, kbm,      0,   firebeat2,    kbm,  firebeat_state, init_kbm, ROT270, "Konami",  "Keyboardmania", MACHINE_NOT_WORKING, "firebeat")
+GAMEL( 2000, kbm2nd,   0,   firebeat2,    kbm,  firebeat_state, init_kbm, ROT270, "Konami",  "Keyboardmania 2nd Mix", MACHINE_NOT_WORKING, "firebeat")
+GAMEL( 2001, kbm3rd,   0,   firebeat2,    kbm,  firebeat_state, init_kbm, ROT270, "Konami",  "Keyboardmania 3rd Mix", MACHINE_NOT_WORKING, "firebeat")
 GAME(  2000, popn4,    0,   firebeat_spu, popn, firebeat_state, init_ppp, ROT0,   "Konami",  "Pop'n Music 4", MACHINE_NOT_WORKING)
 GAME(  2000, popn5,    0,   firebeat_spu, popn, firebeat_state, init_ppp, ROT0,   "Konami",  "Pop'n Music 5", MACHINE_NOT_WORKING)
 GAME(  2001, popn6,    0,   firebeat_spu, popn, firebeat_state, init_ppp, ROT0,   "Konami",  "Pop'n Music 6", MACHINE_NOT_WORKING)

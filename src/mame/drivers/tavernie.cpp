@@ -71,7 +71,7 @@ Z - more scan lines per row (cursor is bigger)
 #include "screen.h"
 #include "speaker.h"
 
-#include "tavernie.lh"
+
 
 class tavernie_state : public driver_device
 {
@@ -377,7 +377,7 @@ void tavernie_state::ivg09(machine_config &config)
 	screen.set_visarea(0, 80*8-1, 0, 25*10-1);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-	config.set_default_layout(layout_tavernie);
+	config.set_default_layout("tavernie");
 
 	/* sound hardware */
 	BEEP(config, m_beep, 950).add_route(ALL_OUTPUTS, "mono", 0.50); // guess

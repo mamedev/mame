@@ -38,10 +38,6 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "mephisto_montec.lh"
-#include "mephisto_megaiv.lh"
-#include "mephisto_mondial2.lh"
-#include "mephisto_smondial2.lh"
 
 
 class mephisto_montec_state : public driver_device
@@ -535,7 +531,7 @@ void mephisto_montec_state::montec(machine_config &config)
 	MEPHISTO_SENSORS_BOARD(config, m_board);
 	m_board->set_delay(attotime::from_msec(300));
 
-	config.set_default_layout(layout_mephisto_montec);
+	config.set_default_layout("mephisto_montec");
 }
 
 void mephisto_montec_state::monteciv(machine_config &config)
@@ -555,7 +551,7 @@ void mephisto_montec_state::megaiv(machine_config &config)
 	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board);
 	m_board->set_delay(attotime::from_msec(250));
 	m_board->set_disable_leds(true);
-	config.set_default_layout(layout_mephisto_megaiv);
+	config.set_default_layout("mephisto_megaiv");
 }
 
 void mephisto_montec_state::mondial2(machine_config &config)
@@ -566,7 +562,7 @@ void mephisto_montec_state::mondial2(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_assert), attotime::from_hz(XTAL(2'000'000) / (1 << 12)));
 
 	TIMER(config, "refresh_leds").configure_periodic(FUNC(mephisto_montec_state::refresh_leds), attotime::from_hz(2));
-	config.set_default_layout(layout_mephisto_mondial2);
+	config.set_default_layout("mephisto_mondial2");
 }
 
 void mephisto_montec_state::mondial(machine_config &config)
@@ -596,7 +592,7 @@ void mephisto_montec_state::smondial2(machine_config &config)
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "smondial2_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("mephisto_smondial2");
 
-	config.set_default_layout(layout_mephisto_smondial2);
+	config.set_default_layout("mephisto_smondial2");
 }
 
 

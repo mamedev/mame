@@ -23,7 +23,6 @@
 #include "speaker.h"
 #include "tilemap.h"
 
-#include "akkaarrh.lh"
 
 
 class akkaarrh_state : public driver_device
@@ -415,7 +414,7 @@ void akkaarrh_state::akkaarrh(machine_config &config)
 	m_screen->set_screen_update(FUNC(akkaarrh_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	config.set_default_layout(layout_akkaarrh);
+	config.set_default_layout("akkaarrh");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -52,8 +52,6 @@ TODO:
 #include "speaker.h"
 #include "softlist.h"
 
-// internal artwork
-#include "ave_arb.lh" // clickable
 
 
 namespace {
@@ -279,7 +277,7 @@ void arb_state::v2(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9+1, 12);
-	config.set_default_layout(layout_ave_arb);
+	config.set_default_layout("ave_arb");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

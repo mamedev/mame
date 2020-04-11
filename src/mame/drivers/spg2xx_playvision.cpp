@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "includes/spg2xx.h"
 
-#include "pvmil.lh"
+
 
 
 class pvmil_state : public spg2xx_game_state
@@ -220,7 +220,7 @@ void pvmil_state::pvmil(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(pvmil_state::portb_w));
 	m_maincpu->portc_out().set(FUNC(pvmil_state::portc_w));
 
-	config.set_default_layout(layout_pvmil);
+	config.set_default_layout("pvmil");
 }
 
 ROM_START( pvmil )

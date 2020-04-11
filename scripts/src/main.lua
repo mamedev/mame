@@ -318,7 +318,6 @@ end
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		GEN_DIR  .. _target .. "/layout",
 		GEN_DIR  .. "resource",
 		ext_includedir("zlib"),
 		ext_includedir("flac"),

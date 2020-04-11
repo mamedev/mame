@@ -125,12 +125,6 @@ but it's not part of the game series.
 #include "screen.h"
 #include "speaker.h"
 
-// internal artwork
-#include "gnw_dualv.lh"
-#include "gnw_dualh.lh"
-
-//#include "hh_sm510_test.lh" // common test-layout - use external artwork
-//#include "hh_sm500_test.lh" // "
 
 
 // machine start/reset
@@ -461,7 +455,7 @@ void hh_sm510_state::sm510_dualh(machine_config &config, u16 leftwidth, u16 left
 	mcfg_svg_screen(config, leftwidth, leftheight, "screen_left");
 	mcfg_svg_screen(config, rightwidth, rightheight, "screen_right");
 
-	config.set_default_layout(layout_gnw_dualh);
+	config.set_default_layout("gnw_dualh");
 }
 
 void hh_sm510_state::dualv_common(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
@@ -470,7 +464,7 @@ void hh_sm510_state::dualv_common(machine_config &config, u16 topwidth, u16 toph
 	mcfg_svg_screen(config, topwidth, topheight, "screen_top");
 	mcfg_svg_screen(config, botwidth, botheight, "screen_bottom");
 
-	config.set_default_layout(layout_gnw_dualv);
+	config.set_default_layout("gnw_dualv");
 }
 
 void hh_sm510_state::sm510_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)

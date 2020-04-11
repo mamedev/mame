@@ -19,7 +19,7 @@
 
 #include "speaker.h"
 
-#include "sym1.lh"
+
 
 
 //**************************************************************************
@@ -333,7 +333,7 @@ void sym1_state::sym1(machine_config &config)
 	M6502(config, m_maincpu, SYM1_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sym1_state::sym1_map);
 
-	config.set_default_layout(layout_sym1);
+	config.set_default_layout("sym1");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

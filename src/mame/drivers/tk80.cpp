@@ -51,7 +51,7 @@ ICS8080
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
-#include "tk80.lh"
+
 
 
 class tk80_state : public driver_device
@@ -325,7 +325,7 @@ void tk80_state::tk80(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tk80_state::tk80_io);
 
 	/* video hardware */
-	config.set_default_layout(layout_tk80);
+	config.set_default_layout("tk80");
 
 	/* Devices */
 	I8255(config, m_ppi);
@@ -351,7 +351,7 @@ void tk80_state::nd80z(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tk80_state::nd80z_io);
 
 	/* video hardware */
-	config.set_default_layout(layout_tk80);
+	config.set_default_layout("tk80");
 
 	/* Devices */
 	I8255(config, m_ppi);
@@ -368,7 +368,7 @@ void tk80_state::tk85(machine_config &config)
 	// TODO: SID and SOD = serial cassette interface
 
 	/* video hardware */
-	config.set_default_layout(layout_tk80);
+	config.set_default_layout("tk80");
 
 	/* Devices */
 	I8255(config, m_ppi);

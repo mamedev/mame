@@ -402,7 +402,6 @@
 #include "video/sda5708.h"
 #include "machine/latch8.h" // IP16
 
-#include "sda5708.lh"
 
 #include "bus/rs232/rs232.h"
 
@@ -627,7 +626,7 @@ void dbox_state::dbox(machine_config &config)
 
 	/* LED Matrix Display */
 	SDA5708(config, m_display, 0);
-	config.set_default_layout(layout_sda5708);
+	config.set_default_layout("sda5708");
 
 	/* IP16 74256 8 bit latch */
 	LATCH8(config, m_ip16_74259);

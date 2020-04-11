@@ -222,7 +222,6 @@ NOTE: 10MHz XTAL verified for Joker Poker, Super Mini-Boy is stated as 12.4725MH
 #include "screen.h"
 #include "speaker.h"
 
-#include "miniboy7.lh"
 
 
 #define MASTER_CLOCK    XTAL(12'472'500)    /* 12.4725 MHz */
@@ -837,7 +836,7 @@ ROM_END
 ***********************************/
 
 //     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROT    COMPANY                     FULLNAME             FLAGS                LAYOUT
-GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_miniboy7 )
-GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_miniboy7 )
+GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, "miniboy7" )
+GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, "miniboy7" )
 GAME(  1984, sminiboy,  0,        miniboy7, sminiboy, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Super Mini-Boy",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME(  1992, bejpoker,  0,        miniboy7, sminiboy, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Bonanza Enterprises' Joker Poker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

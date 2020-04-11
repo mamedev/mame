@@ -23,8 +23,6 @@ as SL90259.
 #include "machine/sensorboard.h"
 #include "video/pwm.h"
 
-// internal artwork
-#include "aci_borisdpl.lh" // clickable
 
 
 namespace {
@@ -208,7 +206,7 @@ void borisdpl_state::borisdpl(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
 	m_display->set_segmask(0xff, 0x7f);
-	config.set_default_layout(layout_aci_borisdpl);
+	config.set_default_layout("aci_borisdpl");
 }
 
 

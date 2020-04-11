@@ -29,7 +29,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "maxaflex.lh"
 
 
 class maxaflex_state : public atari_common_state
@@ -359,7 +358,7 @@ void maxaflex_state::maxaflex(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(maxaflex_state::atari_palette), 256);
-	config.set_default_layout(layout_maxaflex);
+	config.set_default_layout("maxaflex");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

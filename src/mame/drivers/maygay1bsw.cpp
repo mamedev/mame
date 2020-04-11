@@ -23,66 +23,6 @@
 #include "emu.h"
 #include "includes/maygay1b.h"
 
-#include "m1albsqp.lh"
-#include "m1apollo2.lh"
-#include "m1bargnc.lh"
-#include "m1bghou.lh"
-#include "m1bigdel.lh"
-#include "m1calypsa.lh"
-#include "m1casclb.lh"
-#include "m1casroy1.lh"
-#include "m1chain.lh"
-#include "m1cik51o.lh"
-#include "m1clbfvr.lh"
-#include "m1cluecb1.lh"
-#include "m1cluedo4.lh"
-#include "m1cluessf.lh"
-#include "m1coro21n.lh"
-#include "m1cororrk.lh"
-#include "m1dkong91n.lh"
-#include "m1dxmono51o.lh"
-#include "m1eastndl.lh"
-#include "m1eastqv3.lh"
-#include "m1fantfbb.lh"
-#include "m1fightb.lh"
-#include "m1frexplc.lh"
-#include "m1gladg.lh"
-#include "m1grescb.lh"
-#include "m1guvnor.lh"
-#include "m1hotpoth.lh"
-#include "m1htclb.lh"
-#include "m1imclb.lh"
-#include "m1infern.lh"
-#include "m1inwinc.lh"
-#include "m1itjobc.lh"
-#include "m1itskob.lh"
-#include "m1jpmult.lh"
-#include "m1lucknon.lh"
-#include "m1luxorb.lh"
-#include "m1manhat.lh"
-#include "m1monclb.lh"
-#include "m1mongam.lh"
-#include "m1monmon.lh"
-#include "m1monou.lh"
-#include "m1nhp.lh"
-#include "m1nudbnke.lh"
-#include "m1omega.lh"
-#include "m1onbusa.lh"
-#include "m1pinkpc.lh"
-#include "m1przeeb.lh"
-#include "m1retpp.lh"
-#include "m1search.lh"
-#include "m1sptlgtc.lh"
-#include "m1startr.lh"
-#include "m1sudnima.lh"
-#include "m1taknot.lh"
-#include "m1thatlfc.lh"
-#include "m1topstr.lh"
-#include "m1triviax.lh"
-#include "m1trtr.lh"
-#include "m1ttcash.lh"
-#include "m1wldzner.lh"
-#include "m1wotwa.lh"
 
 
 #define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL|MACHINE_CLICKABLE_ARTWORK
@@ -114,8 +54,8 @@ GAME( 199?, m1blkhol, 0, maygay_m1_no_oki, maygay_m1, maygay1b_state, init_m1, R
 ROM_START( m1bargnc )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa2-141", 0x0000, 0x010000, CRC(9dcaaaa9) SHA1(6cd015990036c2e20e4f4a2e19a363e6c565b473) )   m1_bargn_sound ROM_END_M1A_MCU
 ROM_START( m1bargncp )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa2-142", 0x0000, 0x010000, CRC(2972747a) SHA1(6854a3cd9c6a834a24a0d8c763fa2a18c1d26a10) )   m1_bargn_sound ROM_END_M1A_MCU
 
-GAMEL( 1990, m1bargnc,  0,        maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Casino Bar-gain (Maygay) v5.1 (M1A/B)",GAME_FLAGS, layout_m1bargnc)
-GAMEL( 1990, m1bargncp, m1bargnc, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Casino Bar-gain (Maygay) v5.1 (Protocol)(M1A/B)",GAME_FLAGS, layout_m1bargnc)
+GAMEL( 1990, m1bargnc,  0,        maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Casino Bar-gain (Maygay) v5.1 (M1A/B)",GAME_FLAGS, "m1bargnc")
+GAMEL( 1990, m1bargncp, m1bargnc, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Casino Bar-gain (Maygay) v5.1 (Protocol)(M1A/B)",GAME_FLAGS, "m1bargnc")
 
 /*******************************************************************************************************************************************************************************************************
   Bar-gain (this requires a different layout to Casino Bar Gain)
@@ -183,7 +123,7 @@ GAME( 199?, m1alley, 0, maygay_m1_no_oki, maygay_m1, maygay1b_state, init_m1, RO
 	ROM_LOAD( "bdeal.u3", 0x080000, 0x080000, CRC(28f48d4b) SHA1(642c2a2fc4f2faff510cbca2488ab6904bb489f6) )
 ROM_START( m1bigdel ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  ) ROM_LOAD( "bdeal.p1", 0x0000, 0x020000, CRC(3cdebbb8) SHA1(8578441ef269c41fbe3f253055f687e1ccbf4770) ) m1_bigdel_sound ROM_END_M1A_MCU
 
-GAMEL( 2000, m1bigdel, 0, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Big Deal (Maygay) (M1A/B)",GAME_FLAGS,layout_m1bigdel)
+GAMEL( 2000, m1bigdel, 0, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Big Deal (Maygay) (M1A/B)",GAME_FLAGS,"m1bigdel")
 
 /*******************************************************************************************************************************************************************************************************
   Blue Max
@@ -205,9 +145,9 @@ ROM_START( m1casclb )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    
 ROM_START( m1casclbp )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sc1-171.bin", 0x0000, 0x010000, CRC(1d20f2cf) SHA1(f2c9e1aa0c2c8903e293ef5ab3cc4b3d14349e64) ) ROM_END_M1A_MCU //1.2P
 ROM_START( m1casclb1 )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sco-234.bin", 0x0000, 0x010000, CRC(27d11ba5) SHA1(f640a4902213997df0b612e8d1be48ac6d1e0569) ) ROM_END_M1A_MCU //1.1N
 
-GAMEL( 1990, m1casclb,  0,        maygay_m1_no_oki, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Casino Club (Maygay) v1.2 (M1A/B)",GAME_FLAGS, layout_m1casclb)
-GAMEL( 1990, m1casclbp, m1casclb, maygay_m1_no_oki, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Casino Club (Maygay) v1.2 (Protocol) (M1A/B)",GAME_FLAGS, layout_m1casclb)
-GAMEL( 1990, m1casclb1, m1casclb, maygay_m1_no_oki, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Casino Club (Maygay) v1.1 (M1A/B)",GAME_FLAGS, layout_m1casclb)
+GAMEL( 1990, m1casclb,  0,        maygay_m1_no_oki, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Casino Club (Maygay) v1.2 (M1A/B)",GAME_FLAGS, "m1casclb")
+GAMEL( 1990, m1casclbp, m1casclb, maygay_m1_no_oki, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Casino Club (Maygay) v1.2 (Protocol) (M1A/B)",GAME_FLAGS, "m1casclb")
+GAMEL( 1990, m1casclb1, m1casclb, maygay_m1_no_oki, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Casino Club (Maygay) v1.1 (M1A/B)",GAME_FLAGS, "m1casclb")
 
 /*******************************************************************************************************************************************************************************************************
   Casino Gambler Club
@@ -243,7 +183,7 @@ GAME( 199?, m1bankbso, m1bankbs, maygay_m1_no_oki, maygay_m1, maygay1b_state, in
 	ROM_LOAD( "chainreactionsnd.p2", 0x080000, 0x080000, CRC(77690cea) SHA1(10c655ab5ec922c31ab895b91096c89ef8220f99) )
 ROM_START( m1chain )    ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "chainreaction.bin", 0x0000, 0x020000, CRC(0dfa71c7) SHA1(0979dd48000c9c9a03448a0ffdc9395bb131a5dd) ) m1_chain_sound ROM_END_M1A_MCU
 
-GAMEL( 1996, m1chain, 0, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Chain Reaction (Maygay) (M1A/B)",GAME_FLAGS,layout_m1chain)
+GAMEL( 1996, m1chain, 0, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Chain Reaction (Maygay) (M1A/B)",GAME_FLAGS,"m1chain")
 
 /*******************************************************************************************************************************************************************************************************
   Diamonds Are Forever Club
@@ -267,9 +207,9 @@ ROM_START( m1casroy )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    
 ROM_START( m1casroyp )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sc3-070.bin", 0x0000, 0x010000, CRC(8c548d12) SHA1(e86a0fc40f02c85a6139e11cc7824a3d05ba7dca) ) ROM_END_M1A_MCU //1.2p
 ROM_START( m1casroy1 )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sc1-197.bin", 0x0000, 0x010000, CRC(6e227a4a) SHA1(5070e3fa0e77f3e6ffa0915949e6c10ff3287fbf) ) ROM_END_M1A_MCU //1.1
 
-GAMEL( 1990, m1casroy,  0,        maygay_m1_no_oki, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Casino Royale Club (Maygay) v1.2 (M1A/B)",GAME_FLAGS,layout_m1casroy1)
-GAMEL( 1990, m1casroyp, m1casroy, maygay_m1_no_oki, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Casino Royale Club (Maygay) v1.2 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1casroy1)
-GAMEL( 1990, m1casroy1, m1casroy, maygay_m1_no_oki, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Casino Royale Club (Maygay) v1.1 (M1A/B)",GAME_FLAGS,layout_m1casroy1)
+GAMEL( 1990, m1casroy,  0,        maygay_m1_no_oki, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Casino Royale Club (Maygay) v1.2 (M1A/B)",GAME_FLAGS,"m1casroy1")
+GAMEL( 1990, m1casroyp, m1casroy, maygay_m1_no_oki, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Casino Royale Club (Maygay) v1.2 (Protocol) (M1A/B)",GAME_FLAGS,"m1casroy1")
+GAMEL( 1990, m1casroy1, m1casroy, maygay_m1_no_oki, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Casino Royale Club (Maygay) v1.1 (M1A/B)",GAME_FLAGS,"m1casroy1")
 
 /*******************************************************************************************************************************************************************************************************
   Bank Roll
@@ -295,8 +235,8 @@ GAME( 1995, m1bankrl2p, m1bankrl, maygay_m1_no_oki, maygay_m1, maygay1b_state, i
 ROM_START( m1clbfvr )   ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sc001000", 0x0000, 0x020000, CRC(65ecc208) SHA1(2bf54a1e78d2816ec74137c63a3b44710c373baf) )  m1_clbfvr_sound ROM_END_M1A_MCU //1.1n
 ROM_START( m1clbfvrp )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sc001001", 0x0000, 0x020000, CRC(63f81e75) SHA1(db9220265fbe53cc1bec0c448046a031e14ebe13) )  m1_clbfvr_sound ROM_END_M1A_MCU //1.1p
 
-GAMEL( 199?, m1clbfvr,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Club Fever (Maygay) v1.1 (M1A/B)",GAME_FLAGS,layout_m1clbfvr)
-GAMEL( 199?, m1clbfvrp, m1clbfvr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Club Fever (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1clbfvr)
+GAMEL( 199?, m1clbfvr,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Club Fever (Maygay) v1.1 (M1A/B)",GAME_FLAGS,"m1clbfvr")
+GAMEL( 199?, m1clbfvrp, m1clbfvr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Club Fever (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1clbfvr")
 
 /*******************************************************************************************************************************************************************************************************
   Code Red Club
@@ -354,12 +294,12 @@ ROM_START( m1albsq2 )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    
 ROM_START( m1albsq1 )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa4-055", 0x0000, 0x010000, CRC(922a0396) SHA1(0e9949aef572a45c1f2c245c815659c332dfd8f5) ) m1_albsq_sound ROM_END_M1A_MCU //1.1 LNA
 ROM_START( m1albsq1p )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa4-056", 0x0000, 0x010000, CRC(2692dd45) SHA1(7d31d672d0a1ade2d9ed5542b1a83c090a59f4ec) ) m1_albsq_sound ROM_END_M1A_MCU //1.1 LPA Token
 
-GAMEL( 1993, m1albsq,   0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Albert Square (Maygay) v4.1 (M1A/B)",GAME_FLAGS, layout_m1albsqp)
-GAMEL( 1993, m1albsqp,  m1albsq, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Albert Square (Maygay) v4.1 (Protocol) (M1A/B)",GAME_FLAGS, layout_m1albsqp)
-GAMEL( 1993, m1albsq3,  m1albsq, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Albert Square (Maygay) v3.0 (M1A/B)",GAME_FLAGS, layout_m1albsqp)
-GAMEL( 1993, m1albsq2,  m1albsq, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Albert Square (Maygay) v2.2 (M1A/B)",GAME_FLAGS, layout_m1albsqp)
-GAMEL( 1993, m1albsq1,  m1albsq, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Albert Square (Maygay) v1.1 (M1A/B)",GAME_FLAGS, layout_m1albsqp)
-GAMEL( 1993, m1albsq1p, m1albsq, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Albert Square (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS, layout_m1albsqp)
+GAMEL( 1993, m1albsq,   0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Albert Square (Maygay) v4.1 (M1A/B)",GAME_FLAGS, "m1albsqp")
+GAMEL( 1993, m1albsqp,  m1albsq, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Albert Square (Maygay) v4.1 (Protocol) (M1A/B)",GAME_FLAGS, "m1albsqp")
+GAMEL( 1993, m1albsq3,  m1albsq, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Albert Square (Maygay) v3.0 (M1A/B)",GAME_FLAGS, "m1albsqp")
+GAMEL( 1993, m1albsq2,  m1albsq, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Albert Square (Maygay) v2.2 (M1A/B)",GAME_FLAGS, "m1albsqp")
+GAMEL( 1993, m1albsq1,  m1albsq, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Albert Square (Maygay) v1.1 (M1A/B)",GAME_FLAGS, "m1albsqp")
+GAMEL( 1993, m1albsq1p, m1albsq, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Albert Square (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS, "m1albsqp")
 
 /*******************************************************************************************************************************************************************************************************
   Cash Is King
@@ -387,23 +327,23 @@ ROM_START( m1cik11np )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )    
 ROM_START( m1cik21 )    ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa8-188", 0x0000, 0x020000, CRC(9d7eab15) SHA1(101d3f54bf09680c258bdf497e8132f9da7da7d9) )   m1_cik_sound ROM_END_M1A_MCU //2.1
 ROM_START( m1cik21p )   ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa8-189", 0x0000, 0x020000, CRC(cd3f55a9) SHA1(f17595323a2b559d9d2711d23670d5facb449a33) )   m1_cik_sound ROM_END_M1A_MCU //2.1p
 
-GAMEL( 1997, m1cik,     0,     maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v11? (M1A/B)",GAME_FLAGS,layout_m1cik51o)
-GAMEL( 1997, m1cikp,    m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v11? (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cik51o)
-GAMEL( 1997, m1cikh,    m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v11? (Hack?) (M1A/B)",GAME_FLAGS,layout_m1cik51o)
-GAMEL( 1997, m1cik51,   m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v5.1 (M1A/B)",GAME_FLAGS,layout_m1cik51o)
-GAMEL( 1997, m1cik51p,  m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v5.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cik51o)
-GAMEL( 1997, m1cik51o,  m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v5.1 (Older) (M1A/B)",GAME_FLAGS,layout_m1cik51o)
-GAMEL( 1997, m1cik41,   m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v4.1 (M1A/B)",GAME_FLAGS,layout_m1cik51o)
-GAMEL( 1997, m1cik41p,  m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v4.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cik51o)
-GAMEL( 1997, m1cik31,   m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v3.1 (M1A/B)",GAME_FLAGS,layout_m1cik51o)
-GAMEL( 1997, m1cik31p,  m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v3.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cik51o)
-GAMEL( 1997, m1cik21,   m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v2.1 (M1A/B)",GAME_FLAGS,layout_m1cik51o)
-GAMEL( 1997, m1cik21p,  m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v2.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cik51o)
-GAMEL( 1997, m1cik12,   m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v1.2 (M1A/B)",GAME_FLAGS,layout_m1cik51o)
-GAMEL( 1997, m1cik11,   m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v1.1 (M1A/B)",GAME_FLAGS,layout_m1cik51o)
-GAMEL( 1997, m1cik11p,  m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cik51o)
-GAMEL( 1997, m1cik11n,  m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v1.1 (alternate) (M1A/B)",GAME_FLAGS,layout_m1cik51o)
-GAMEL( 1997, m1cik11np, m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v1.1 (alternate,Protocol) (M1A/B)",GAME_FLAGS,layout_m1cik51o)
+GAMEL( 1997, m1cik,     0,     maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v11? (M1A/B)",GAME_FLAGS,"m1cik51o")
+GAMEL( 1997, m1cikp,    m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v11? (Protocol) (M1A/B)",GAME_FLAGS,"m1cik51o")
+GAMEL( 1997, m1cikh,    m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v11? (Hack?) (M1A/B)",GAME_FLAGS,"m1cik51o")
+GAMEL( 1997, m1cik51,   m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v5.1 (M1A/B)",GAME_FLAGS,"m1cik51o")
+GAMEL( 1997, m1cik51p,  m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v5.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1cik51o")
+GAMEL( 1997, m1cik51o,  m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v5.1 (Older) (M1A/B)",GAME_FLAGS,"m1cik51o")
+GAMEL( 1997, m1cik41,   m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v4.1 (M1A/B)",GAME_FLAGS,"m1cik51o")
+GAMEL( 1997, m1cik41p,  m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v4.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1cik51o")
+GAMEL( 1997, m1cik31,   m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v3.1 (M1A/B)",GAME_FLAGS,"m1cik51o")
+GAMEL( 1997, m1cik31p,  m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v3.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1cik51o")
+GAMEL( 1997, m1cik21,   m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v2.1 (M1A/B)",GAME_FLAGS,"m1cik51o")
+GAMEL( 1997, m1cik21p,  m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v2.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1cik51o")
+GAMEL( 1997, m1cik12,   m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v1.2 (M1A/B)",GAME_FLAGS,"m1cik51o")
+GAMEL( 1997, m1cik11,   m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v1.1 (M1A/B)",GAME_FLAGS,"m1cik51o")
+GAMEL( 1997, m1cik11p,  m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1cik51o")
+GAMEL( 1997, m1cik11n,  m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v1.1 (alternate) (M1A/B)",GAME_FLAGS,"m1cik51o")
+GAMEL( 1997, m1cik11np, m1cik, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cash Is King (Maygay) v1.1 (alternate,Protocol) (M1A/B)",GAME_FLAGS,"m1cik51o")
 
 /*******************************************************************************************************************************************************************************************************
   Deluxe Monopoly
@@ -434,26 +374,26 @@ ROM_START( m1dxmono11o )    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 ROM_START( m1dxmono11m )    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa3-007", 0x0000, 0x010000, CRC(303bea68) SHA1(987f015818a1d97299af824c0ab58c9c6f8a2acb) )   m1_dxmono_sound ROM_END_M1A_MCU //sa3007 M 1.1 92
 ROM_START( m1dxmono11mb )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa2-356", 0x0000, 0x010000, CRC(3d4394e9) SHA1(43da2007f1408d45764f0eba8594c800ad7ffc60) )   m1_dxmono_sound ROM_END_M1A_MCU //m1.1 sa2356
 
-GAMEL( 1992, m1dxmono,     0,        maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v5.1 (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmonop,    m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v5.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono12n,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.2 (Newer) (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono31b,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v3.1 (BwB set) (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono31p,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v3.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono31h,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v3.1 (Hack) (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono31h2, m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v3.1 (Alternate Hack) (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono51,   m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v5.1 (Older) (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono12,   m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.2 (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono12p,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.2 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono12a,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.2 (Alternate) (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono21p,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v2.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono11p,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono11,   m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.1 (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono51o,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v5.1 (Older) (M1A/B) (alt?)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono51p,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v5.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono30h,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v3.0 (Hack) (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono11o,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.1 (Older) (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono11m,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.1 (Code M) (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
-GAMEL( 1992, m1dxmono11mb, m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.1 (Code M, Alternate) (M1A/B)",GAME_FLAGS,layout_m1dxmono51o)
+GAMEL( 1992, m1dxmono,     0,        maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v5.1 (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmonop,    m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v5.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono12n,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.2 (Newer) (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono31b,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v3.1 (BwB set) (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono31p,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v3.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono31h,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v3.1 (Hack) (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono31h2, m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v3.1 (Alternate Hack) (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono51,   m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v5.1 (Older) (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono12,   m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.2 (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono12p,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.2 (Protocol) (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono12a,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.2 (Alternate) (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono21p,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v2.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono11p,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono11,   m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.1 (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono51o,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v5.1 (Older) (M1A/B) (alt?)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono51p,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v5.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono30h,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v3.0 (Hack) (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono11o,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.1 (Older) (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono11m,  m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.1 (Code M) (M1A/B)",GAME_FLAGS,"m1dxmono51o")
+GAMEL( 1992, m1dxmono11mb, m1dxmono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.1 (Code M, Alternate) (M1A/B)",GAME_FLAGS,"m1dxmono51o")
 
 /*******************************************************************************************************************************************************************************************************
   Cluedo
@@ -488,30 +428,30 @@ ROM_START( m1cluedobi2p )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 ROM_START( m1cluedob2h )    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "clu5p8", 0x0000, 0x010000, CRC(fb6c6527) SHA1(e42683512c537d653593c67a8d238069ac2f2d0e) )    m1_cluedo_sound ROM_END_M1A_MCU //nbu 2.0 - nop'd copyright string
 ROM_START( m1cluedob1h )    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "clu55", 0x0000, 0x010000, CRC(c852a989) SHA1(ff79e65f80d4230a0e0f9e87a9dcc544a5197a1a) ) m1_cluedo_sound ROM_END_M1A_MCU //nbu 1.0 - nop'd copyright string
 
-GAMEL( 1995, m1cluedo,     0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v6.1 (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1995, m1cluedop,    m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v6.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1995, m1cluedo5,    m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v5.1 (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1995, m1cluedo5p,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v5.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1995, m1cluedoi,    m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v7.2 (Isle of Man) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1995, m1cluedoip,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v7.2 (Isle of Man) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1995, m1cluedon,    m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v1.2 (Newer) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1995, m1cluedonp,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v1.2 (Newer) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1995, m1cluedob2,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB", "Cluedo (Maygay/BwB) v2.1 (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1995, m1cluedob2p,  m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB", "Cluedo (Maygay/BwB) v2.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1995, m1cluedob2h,  m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB", "Cluedo (Maygay/BwB) v2.1 (Hack?) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1995, m1cluedobi2,  m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB", "Cluedo (Maygay/BwB) v2.1 (Isle of Man) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1995, m1cluedobi2p, m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB", "Cluedo (Maygay/BwB) v2.1 (Isle of Man) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1995, m1cluedob1,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB", "Cluedo (Maygay/BwB) v1.1 (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1995, m1cluedob1p,  m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB", "Cluedo (Maygay/BwB) v1.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1995, m1cluedob1h,  m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB", "Cluedo (Maygay/BwB) v1.1 (Hack?) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1993, m1cluedo4,    m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v4.1 (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1993, m1cluedo4p,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v4.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1993, m1cluedo3,    m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v3.1 (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1993, m1cluedo3p,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v3.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1993, m1cluedo3h,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v3.1 (Hack?) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1993, m1cluedo1,    m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v1.1 (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1993, m1cluedo1p,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
-GAMEL( 1993, m1cluedo1h,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v1.1 (Hack?) (M1A/B)",GAME_FLAGS,layout_m1cluedo4)
+GAMEL( 1995, m1cluedo,     0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v6.1 (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1995, m1cluedop,    m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v6.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1995, m1cluedo5,    m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v5.1 (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1995, m1cluedo5p,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v5.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1995, m1cluedoi,    m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v7.2 (Isle of Man) (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1995, m1cluedoip,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v7.2 (Isle of Man) (Protocol) (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1995, m1cluedon,    m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v1.2 (Newer) (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1995, m1cluedonp,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v1.2 (Newer) (Protocol) (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1995, m1cluedob2,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB", "Cluedo (Maygay/BwB) v2.1 (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1995, m1cluedob2p,  m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB", "Cluedo (Maygay/BwB) v2.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1995, m1cluedob2h,  m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB", "Cluedo (Maygay/BwB) v2.1 (Hack?) (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1995, m1cluedobi2,  m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB", "Cluedo (Maygay/BwB) v2.1 (Isle of Man) (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1995, m1cluedobi2p, m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB", "Cluedo (Maygay/BwB) v2.1 (Isle of Man) (Protocol) (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1995, m1cluedob1,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB", "Cluedo (Maygay/BwB) v1.1 (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1995, m1cluedob1p,  m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB", "Cluedo (Maygay/BwB) v1.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1995, m1cluedob1h,  m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB", "Cluedo (Maygay/BwB) v1.1 (Hack?) (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1993, m1cluedo4,    m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v4.1 (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1993, m1cluedo4p,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v4.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1993, m1cluedo3,    m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v3.1 (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1993, m1cluedo3p,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v3.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1993, m1cluedo3h,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v3.1 (Hack?) (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1993, m1cluedo1,    m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v1.1 (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1993, m1cluedo1p,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1cluedo4")
+GAMEL( 1993, m1cluedo1h,   m1cluedo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo (Maygay) v1.1 (Hack?) (M1A/B)",GAME_FLAGS,"m1cluedo4")
 
 /*******************************************************************************************************************************************************************************************************
   (Super) Cluedo Showcase
@@ -543,12 +483,12 @@ ROM_START( m1cluecb2p ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    
 ROM_START( m1cluecb1 )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sc5-433", 0x0000, 0x010000, CRC(27254937) SHA1(b75f4a7e66f625c0db7d658f0427c8c1893a3d10) )   m1_cluecb_sound ROM_END_M1A_MCU //nhq 1.1
 ROM_START( m1cluecb1p ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sc5-434", 0x0000, 0x010000, CRC(6185ea69) SHA1(a20bccb86cfcd929908974500186e9ecf2cdc55b) )   m1_cluecb_sound ROM_END_M1A_MCU //phq 1.1
 
-GAMEL( 1993, m1cluecb,   0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Club (Maygay) v3.1 (M1A/B)",GAME_FLAGS,layout_m1cluecb1)
-GAMEL( 1993, m1cluecbp,  m1cluecb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Club (Maygay) v3.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluecb1)
-GAMEL( 1993, m1cluecb2,  m1cluecb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Club (Maygay) v2.1 (M1A/B)",GAME_FLAGS,layout_m1cluecb1)
-GAMEL( 1993, m1cluecb2p, m1cluecb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Club (Maygay) v2.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluecb1)
-GAMEL( 1993, m1cluecb1,  m1cluecb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Club (Maygay) v1.1 (M1A/B)",GAME_FLAGS,layout_m1cluecb1)
-GAMEL( 1993, m1cluecb1p, m1cluecb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Club (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluecb1)
+GAMEL( 1993, m1cluecb,   0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Club (Maygay) v3.1 (M1A/B)",GAME_FLAGS,"m1cluecb1")
+GAMEL( 1993, m1cluecbp,  m1cluecb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Club (Maygay) v3.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1cluecb1")
+GAMEL( 1993, m1cluecb2,  m1cluecb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Club (Maygay) v2.1 (M1A/B)",GAME_FLAGS,"m1cluecb1")
+GAMEL( 1993, m1cluecb2p, m1cluecb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Club (Maygay) v2.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1cluecb1")
+GAMEL( 1993, m1cluecb1,  m1cluecb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Club (Maygay) v1.1 (M1A/B)",GAME_FLAGS,"m1cluecb1")
+GAMEL( 1993, m1cluecb1p, m1cluecb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Club (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1cluecb1")
 
 /*******************************************************************************************************************************************************************************************************
   Coronation Street
@@ -585,32 +525,32 @@ ROM_START( m1coro30h )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    
 ROM_START( m1coro21v )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa4-529", 0x0000, 0x010000, CRC(ca486f81) SHA1(001669f92d9d548854b3c2c9e9c5b7141c9d2b32) )   m1_coro_sound ROM_END_M1A_MCU //2.1 Multivend
 ROM_START( m1coro21vp ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa4-530", 0x0000, 0x010000, CRC(4ade92e9) SHA1(2d5d18cfab8ff5a5f5790168375548a56b6903b0) )   m1_coro_sound ROM_END_M1A_MCU //2.1 Multivend Protocol
 
-GAMEL( 1996, m1coro,     0,      maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1996, m1corop,    m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1995, m1coro32g,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.2 (Newer, G?) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1995, m1coro32gh, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.2 (Newer, G?) (Hack) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1995, m1coro12g,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB?", "Coronation Street (Maygay) v1.2 (Newer, G?) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1995, m1coro12gp, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.2 (Newer, G?) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1995, m1coro12a,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.2 (Newer, G?) (Alternate) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1995, m1coro10h1, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.0 (Hack 1) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1995, m1coro10h2, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.0 (Hack 2) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1995, m1coro10h3, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.0 (Hack 3) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1993, m1coro81,   m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v8.1 (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1993, m1coro81p,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v8.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1993, m1coro32n,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.2 (Newer) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1993, m1coro32np, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.2 (Newer) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1993, m1coro22n,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.2 (Newer) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1993, m1coro21n,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.1 (Newer) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1993, m1coro21np, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.1 (Newer) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1993, m1coro12n,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.2 (Newer) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1993, m1coro12np, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.2 (Newer) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1993, m1coro11n,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.1 (Newer) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1993, m1coro11np, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.1 (Newer) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1993, m1coro31,   m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.1 (Older) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1993, m1coro31p,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1993, m1coro30h,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.0 (Hack) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1993, m1coro21v,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.1 (Multivend) (M1A/B)",GAME_FLAGS,layout_m1coro21n)
-GAMEL( 1993, m1coro21vp, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.1 (Multivend) (Protocol)(M1A/B)",GAME_FLAGS,layout_m1coro21n)
+GAMEL( 1996, m1coro,     0,      maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1996, m1corop,    m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) (Protocol) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1995, m1coro32g,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.2 (Newer, G?) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1995, m1coro32gh, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.2 (Newer, G?) (Hack) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1995, m1coro12g,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay/BwB?", "Coronation Street (Maygay) v1.2 (Newer, G?) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1995, m1coro12gp, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.2 (Newer, G?) (Protocol) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1995, m1coro12a,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.2 (Newer, G?) (Alternate) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1995, m1coro10h1, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.0 (Hack 1) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1995, m1coro10h2, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.0 (Hack 2) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1995, m1coro10h3, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.0 (Hack 3) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1993, m1coro81,   m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v8.1 (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1993, m1coro81p,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v8.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1993, m1coro32n,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.2 (Newer) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1993, m1coro32np, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.2 (Newer) (Protocol) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1993, m1coro22n,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.2 (Newer) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1993, m1coro21n,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.1 (Newer) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1993, m1coro21np, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.1 (Newer) (Protocol) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1993, m1coro12n,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.2 (Newer) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1993, m1coro12np, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.2 (Newer) (Protocol) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1993, m1coro11n,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.1 (Newer) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1993, m1coro11np, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.1 (Newer) (Protocol) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1993, m1coro31,   m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.1 (Older) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1993, m1coro31p,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1993, m1coro30h,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.0 (Hack) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1993, m1coro21v,  m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.1 (Multivend) (M1A/B)",GAME_FLAGS,"m1coro21n")
+GAMEL( 1993, m1coro21vp, m1coro, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.1 (Multivend) (Protocol)(M1A/B)",GAME_FLAGS,"m1coro21n")
 
 /*******************************************************************************************************************************************************************************************************
   Coronation Street Showcase
@@ -677,31 +617,31 @@ ROM_START( m1cororrk )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    
 ROM_START( m1cororrl )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa5-342", 0x0000, 0x010000, CRC(735e8151) SHA1(25b9f183e03c74fd918c9c540e5ebd0dc0d38fcd) )   m1_cororr_sound ROM_END_M1A_MCU
 ROM_START( m1cororrlp ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa5-343", 0x0000, 0x010000, CRC(9bb61cb7) SHA1(0c42d7db308dac80a4910b2d2327833562e9c887) )   m1_cororr_sound ROM_END_M1A_MCU //protocol
 
-GAMEL( 1995, m1cororr,   0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 1) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrp,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 1) (Protocol) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororra,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 1) (Alternate) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrb,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 2) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrbh, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 2) (Hack) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrb1, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 2) (Alternate) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrbp, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 2) (Protocol) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrc,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 3) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrc1, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 3) (Alternate 1) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrc2, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 3) (Alternate 2) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrd,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 4) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrdp, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 4) (Protocol) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororre,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 5) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrf,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 6) (BW) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrfp, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 6) (BW) (Protocol) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrg,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 7) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrgp, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 7) (Protocol) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrh,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 8) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororri,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 9) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrip, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 9) (Protocol) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrj,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 10) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrjp, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 10) (Protocol) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrk,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 11) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrl,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 12) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
-GAMEL( 1995, m1cororrlp, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 12) (Protocol) (M1A/B)",GAME_FLAGS, layout_m1cororrk)
+GAMEL( 1995, m1cororr,   0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 1) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrp,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 1) (Protocol) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororra,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 1) (Alternate) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrb,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 2) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrbh, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 2) (Hack) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrb1, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 2) (Alternate) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrbp, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 2) (Protocol) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrc,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 3) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrc1, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 3) (Alternate 1) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrc2, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 3) (Alternate 2) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrd,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 4) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrdp, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 4) (Protocol) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororre,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 5) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrf,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 6) (BW) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrfp, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 6) (BW) (Protocol) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrg,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 7) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrgp, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 7) (Protocol) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrh,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 8) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororri,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 9) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrip, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 9) (Protocol) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrj,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 10) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrjp, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 10) (Protocol) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrk,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 11) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrl,  m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 12) (M1A/B)",GAME_FLAGS, "m1cororrk")
+GAMEL( 1995, m1cororrlp, m1cororr, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 12) (Protocol) (M1A/B)",GAME_FLAGS, "m1cororrk")
 
 /*******************************************************************************************************************************************************************************************************
   Cluedo Super Sleuth
@@ -744,38 +684,38 @@ ROM_START( m1cluessrp ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )    
 ROM_START( m1cluesss )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa6-444", 0x0000, 0x020000, CRC(bb257c07) SHA1(eb402538fc11e759e54df814e59d2dd79ac895bc) )   m1_cluess_sound ROM_END_M1A_MCU //ncl41
 ROM_START( m1cluesssp ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa6-445", 0x0000, 0x020000, CRC(eb6482bb) SHA1(f6012913d79a22a69ed41beaf7bc506bae59fbcf) )   m1_cluess_sound ROM_END_M1A_MCU //pcl41
 
-GAMEL( 1996, m1cluess,   0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.3 (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessh,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.3 (Newer) (Hack) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessp,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.3 (Newer) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessa,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.2 (Newer) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessap, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.2 (Newer) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessb,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v7.1 (Older) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessbp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v7.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessc,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v6.1 (Older) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluesscp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v6.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessd,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v5.1 (Older) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessdp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v5.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluesse,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.1 (Older) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessep, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessf,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.1 (Older) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessfp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessg,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v7.1 (15GBP Jackpot) (Older) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessi,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.1 (10GBP Jackpot) (Older) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessj,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.3 (5GBP Jackpot) (Older) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessk,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.2 (Older) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessl,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v4.1 (Older) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluesslp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v4.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessm,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v3.1 (Older) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessmp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v3.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessn,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.1 (10GBP Jackpot) (Older) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluesso,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.1 (Older, alternate) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessop, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.1 (Older, alternate) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessq,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v5.1 (Older, alternate) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessqp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v5.1 (Older, alternate) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessr,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v3.1 (Older, alternate) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluessrp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v3.1 (Older, alternate) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluesss,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v4.1? (Older, alternate) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
-GAMEL( 1996, m1cluesssp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v4.1? (Older, alternate) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1cluessf)
+GAMEL( 1996, m1cluess,   0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.3 (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessh,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.3 (Newer) (Hack) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessp,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.3 (Newer) (Protocol) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessa,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.2 (Newer) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessap, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.2 (Newer) (Protocol) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessb,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v7.1 (Older) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessbp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v7.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessc,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v6.1 (Older) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluesscp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v6.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessd,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v5.1 (Older) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessdp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v5.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluesse,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.1 (Older) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessep, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessf,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.1 (Older) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessfp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessg,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v7.1 (15GBP Jackpot) (Older) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessi,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.1 (10GBP Jackpot) (Older) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessj,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.3 (5GBP Jackpot) (Older) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessk,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.2 (Older) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessl,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v4.1 (Older) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluesslp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v4.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessm,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v3.1 (Older) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessmp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v3.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessn,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v1.1 (10GBP Jackpot) (Older) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluesso,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.1 (Older, alternate) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessop, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v2.1 (Older, alternate) (Protocol) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessq,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v5.1 (Older, alternate) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessqp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v5.1 (Older, alternate) (Protocol) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessr,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v3.1 (Older, alternate) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluessrp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v3.1 (Older, alternate) (Protocol) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluesss,  m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v4.1? (Older, alternate) (M1A/B)",GAME_FLAGS,"m1cluessf")
+GAMEL( 1996, m1cluesssp, m1cluess, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v4.1? (Older, alternate) (Protocol) (M1A/B)",GAME_FLAGS,"m1cluessf")
 
 /*******************************************************************************************************************************************************************************************************
   Donkey Kong
@@ -813,33 +753,33 @@ ROM_START( m1dkong81p )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  ) RO
 ROM_START( m1dkong41 )   ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  ) ROM_LOAD( "sa7-109", 0x0000, 0x020000, CRC(06aec0d7) SHA1(aa1dd411aa43ecf0908cb9db64636de319041159) ) m1_dkong_sound ROM_END_M1A_MCU //4_1
 ROM_START( m1dkong41p )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  ) ROM_LOAD( "sa7-110", 0x0000, 0x020000, CRC(7f2bd92c) SHA1(d0f41d63db4e71ee4a7cc2ea878add0c72b1c7bb) ) m1_dkong_sound ROM_END_M1A_MCU //4_1 Protocol
 
-GAMEL( 1996, m1dkong,     0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.2 (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkongp,    m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.2 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkonga,    m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.2 (Alternate) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong91n,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.1 (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong91np, m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong91na, m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.1 (Alternate) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong81n,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v8.1 (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong81na, m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v8.1 (Alternate) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong81np, m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v8.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong21n,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v2.1 (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong91,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.1 (Older) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong91p,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong91a,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.1 (Older) (Alternate) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong91h1, m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.1 (Older) (Hack 1) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong91h2, m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.1 (Older) (Hack 2) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong81,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v8.1 (Older) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong81p,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v8.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong51,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v5.1 (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong51p,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v5.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong41,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v4.1 (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong41p,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v4.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong31,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v3.1 (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong31p,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v3.1 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong21,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v2.1 (Older) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong21p,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v2.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong11,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v1.1 (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
-GAMEL( 1996, m1dkong11p,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v1.1 (M1A/B) (Protocol?)",GAME_FLAGS,layout_m1dkong91n)
+GAMEL( 1996, m1dkong,     0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.2 (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkongp,    m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.2 (Protocol) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkonga,    m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.2 (Alternate) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong91n,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.1 (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong91np, m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong91na, m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.1 (Alternate) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong81n,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v8.1 (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong81na, m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v8.1 (Alternate) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong81np, m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v8.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong21n,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v2.1 (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong91,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.1 (Older) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong91p,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong91a,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.1 (Older) (Alternate) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong91h1, m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.1 (Older) (Hack 1) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong91h2, m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.1 (Older) (Hack 2) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong81,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v8.1 (Older) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong81p,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v8.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong51,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v5.1 (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong51p,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v5.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong41,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v4.1 (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong41p,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v4.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong31,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v3.1 (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong31p,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v3.1 (Protocol) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong21,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v2.1 (Older) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong21p,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v2.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong11,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v1.1 (M1A/B)",GAME_FLAGS,"m1dkong91n")
+GAMEL( 1996, m1dkong11p,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v1.1 (M1A/B) (Protocol?)",GAME_FLAGS,"m1dkong91n")
 
 /*******************************************************************************************************************************************************************************************************
   Apollo 9
@@ -875,30 +815,30 @@ ROM_START( m1apollo3p ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  ) ROM
 ROM_START( m1apollo2 )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  ) ROM_LOAD( "sa7-478", 0x0000, 0x020000, CRC(b03371a5) SHA1(3c46e170e362ce23033232393fc0763e98e60a1c) ) m1_apollo_sound ROM_END_M1A_MCU //2.1
 ROM_START( m1apollo2p ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  ) ROM_LOAD( "sa7-479", 0x0000, 0x020000, CRC(e0728f19) SHA1(d6c229fa2aed7af46865244d2abd2b2eb8dfc6a5) ) m1_apollo_sound ROM_END_M1A_MCU //2.1 Protocol
 
-GAMEL( 1997, m1apollo,    0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) vA.1 (Newer) (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollop,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) vA.1 (Newer) (Protocol) (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apolloh,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) vA.1 (Newer) (Hack?) (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apolloa,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) vA.1 (Older) (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apolloap,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) vA.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apolloao,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) vA.1 (Older, 15GBP) (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo9,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v9.1 (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo9p,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v9.1 (Protocol) (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo4,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v4.1 (Newer) (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo4p,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v4.1 (Newer) (Protocol) (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo11,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v11? (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo11b, m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v11? (BwB Rebuild) (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo11p, m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v11? (Protocol) (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo8,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v8.1 (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo8p,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v8.1 (Protocol) (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo7,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v7.1 (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo7p,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v7.1 (Protocol) (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo5,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v5.1 (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo5p,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v5.1 (Protocol) (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo4o,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v4.1 (Older, Token)(M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo3,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v3.1 (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo3p,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v3.1 (Protocol) (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo2,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v2.1 (M1A/B)",GAME_FLAGS, layout_m1apollo2)
-GAMEL( 1997, m1apollo2p,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v2.1 (Protocol) (M1A/B)",GAME_FLAGS, layout_m1apollo2)
+GAMEL( 1997, m1apollo,    0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) vA.1 (Newer) (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollop,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) vA.1 (Newer) (Protocol) (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apolloh,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) vA.1 (Newer) (Hack?) (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apolloa,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) vA.1 (Older) (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apolloap,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) vA.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apolloao,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) vA.1 (Older, 15GBP) (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo9,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v9.1 (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo9p,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v9.1 (Protocol) (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo4,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v4.1 (Newer) (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo4p,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v4.1 (Newer) (Protocol) (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo11,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v11? (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo11b, m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v11? (BwB Rebuild) (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo11p, m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v11? (Protocol) (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo8,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v8.1 (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo8p,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v8.1 (Protocol) (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo7,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v7.1 (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo7p,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v7.1 (Protocol) (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo5,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v5.1 (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo5p,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v5.1 (Protocol) (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo4o,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v4.1 (Older, Token)(M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo3,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v3.1 (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo3p,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v3.1 (Protocol) (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo2,   m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v2.1 (M1A/B)",GAME_FLAGS, "m1apollo2")
+GAMEL( 1997, m1apollo2p,  m1apollo, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Apollo 9 (Maygay) v2.1 (Protocol) (M1A/B)",GAME_FLAGS, "m1apollo2")
 
 /*******************************************************************************************************************************************************************************************************
   Eastenders
@@ -951,47 +891,47 @@ ROM_START( m1eastndad ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_
 ROM_START( m1eastndae ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD( "sa5-487", 0x0000, 0x010000, CRC(27cc4abf) SHA1(cea422fd93c550552e471fb3ed7b97cdba83db02) )                                       m1eastnd_sound ROM_END_M1A_MCU
 ROM_START( m1eastndaf ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD( "sa6-274", 0x0000, 0x010000, CRC(ad65b5da) SHA1(53a6ae9c0d70ee7f40f5c51cfc6d8a78ff47fe94) )                                       m1eastnd_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1eastnd,   0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastnda,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndb,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndc,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1eastndl) /* aka sa4-638 */
-GAMEL( 199?, m1eastndd,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastnde,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndf,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndg,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndh,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndi,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1eastndl) /* aka sa5-555 */
-GAMEL( 199?, m1eastndj,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndk,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndl,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndn,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndp,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndq,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndr,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1eastndl) /* bad dump, or rom overlay? */
-GAMEL( 199?, m1eastnds,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 20)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndt,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 21)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndu,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 22)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndv,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 23)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndw,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 24)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndx,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 25)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndy,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 26)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndz,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 27)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastnd0,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 28)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastnd1,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 29)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastnd2,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 30)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastnd3,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 31)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastnd4,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 32)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastnd5,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 33)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastnd6,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 34)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastnd7,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 35)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastnd8,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 36)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastnd9,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 37)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndaa, m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 38)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndab, m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 39)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndac, m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 40)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndad, m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 41)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndae, m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 42)",GAME_FLAGS,layout_m1eastndl)
-GAMEL( 199?, m1eastndaf, m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 43)",GAME_FLAGS,layout_m1eastndl)
+GAMEL( 199?, m1eastnd,   0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastnda,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndb,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndc,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1eastndl") /* aka sa4-638 */
+GAMEL( 199?, m1eastndd,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastnde,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndf,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndg,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndh,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndi,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1eastndl") /* aka sa5-555 */
+GAMEL( 199?, m1eastndj,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndk,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndl,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndn,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndp,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndq,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndr,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1eastndl") /* bad dump, or rom overlay? */
+GAMEL( 199?, m1eastnds,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 20)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndt,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 21)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndu,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 22)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndv,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 23)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndw,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 24)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndx,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 25)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndy,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 26)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndz,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 27)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastnd0,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 28)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastnd1,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 29)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastnd2,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 30)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastnd3,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 31)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastnd4,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 32)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastnd5,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 33)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastnd6,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 34)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastnd7,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 35)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastnd8,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 36)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastnd9,  m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 37)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndaa, m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 38)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndab, m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 39)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndac, m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 40)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndad, m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 41)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndae, m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 42)",GAME_FLAGS,"m1eastndl")
+GAMEL( 199?, m1eastndaf, m1eastnd, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders (Maygay) (M1A/B) (set 43)",GAME_FLAGS,"m1eastndl")
 
 /*******************************************************************************************************************************************************************************************************
   Eastenders - Queen Vic
@@ -1038,41 +978,41 @@ ROM_START( m1eastqv7 )    ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) RO
 ROM_START( m1eastqv8 )    ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("qvic5p8c.bin", 0x0000, 0x010000, CRC(84cd625b) SHA1(f47794b399247adcc80a515445dacf04c2e95018) ) m1_eastqv_sound ROM_END_M1A_MCU
 ROM_START( m1eastqvaa )   ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("qvicv3", 0x0000, 0x010000, CRC(54a483be) SHA1(1956ee40dc0bade4f052b2043b1d1708d1c2c0a5) )       m1_eastqv_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1eastqv,   0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqva,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvb,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvc,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvd,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvf,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvg,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvh,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvi,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvj,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvk,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvl,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvm,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvn,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvo,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvp,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvq,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvr,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvs,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 20)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvt,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 21)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvu,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 22)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvv,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 23)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvw,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 24)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvx,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 25)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvy,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 26)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvz,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 27)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqv0,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 28)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqv1,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 29)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqv2,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 30)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqv3,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 31)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqv5,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 33)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqv6,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 34)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqv7,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 35)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqv8,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 36)",GAME_FLAGS,layout_m1eastqv3)
-GAMEL( 199?, m1eastqvaa, m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 38)",GAME_FLAGS,layout_m1eastqv3)
+GAMEL( 199?, m1eastqv,   0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqva,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvb,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvc,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvd,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvf,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvg,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvh,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvi,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvj,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvk,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvl,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvm,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvn,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvo,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvp,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvq,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvr,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvs,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 20)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvt,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 21)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvu,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 22)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvv,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 23)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvw,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 24)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvx,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 25)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvy,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 26)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvz,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 27)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqv0,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 28)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqv1,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 29)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqv2,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 30)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqv3,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 31)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqv5,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 33)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqv6,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 34)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqv7,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 35)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqv8,  m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 36)",GAME_FLAGS,"m1eastqv3")
+GAMEL( 199?, m1eastqvaa, m1eastqv, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Eastenders - Queen Vic (Maygay) (M1A/B) (set 38)",GAME_FLAGS,"m1eastqv3")
 
 /*******************************************************************************************************************************************************************************************************
   Fight Night
@@ -1107,30 +1047,30 @@ ROM_START( m1fightv )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1fightw )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sk991157", 0x0000, 0x020000, CRC(a238eb60) SHA1(610a08854e05e5b56a3fd300b6e6cfa23b4eec6b) )                m1_fight_sound ROM_END_M1A_MCU
 ROM_START( m1fightx )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sk991158", 0x0000, 0x020000, CRC(4478bcc6) SHA1(7cd2c42f271ae341430a70408512ef609d27a8d9) )                m1_fight_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1fight,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fighta, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightb, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightc, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightd, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fighte, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightg, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fighth, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fighti, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightj, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightk, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightl, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightm, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightn, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fighto, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightp, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightq, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightr, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fights, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 20)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightt, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 21)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightu, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 22)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightv, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 23)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightw, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 24)",GAME_FLAGS,layout_m1fightb)
-GAMEL( 199?, m1fightx, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 25)",GAME_FLAGS,layout_m1fightb)
+GAMEL( 199?, m1fight,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fighta, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightb, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightc, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightd, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fighte, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightg, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fighth, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fighti, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightj, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightk, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightl, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightm, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightn, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fighto, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightp, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightq, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightr, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fights, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 20)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightt, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 21)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightu, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 22)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightv, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 23)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightw, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 24)",GAME_FLAGS,"m1fightb")
+GAMEL( 199?, m1fightx, m1fight, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fight Night (Maygay) (M1A/B) (set 25)",GAME_FLAGS,"m1fightb")
 
 /*******************************************************************************************************************************************************************************************************
   It's A Knockout
@@ -1177,42 +1117,42 @@ ROM_START( m1itsko6 )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1itsko7 )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-136", 0x0000, 0x010000, CRC(207b26f5) SHA1(33e50b9675a92f9264fe2fed808a1b141e039d9a) )     m1_itsko_sound ROM_END_M1A_MCU
 ROM_START( m1itsko8 )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-137", 0x0000, 0x010000, CRC(c893bb13) SHA1(d22171d75ec697a44e8ddb3544d610244f020300) )     m1_itsko_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1itsko,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskoa, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskob, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskoc, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskod, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskoe, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskof, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskog, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskoh, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskoi, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskoj, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskok, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskol, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskom, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskon, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskoo, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskop, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskoq, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskor, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskos, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 20)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskot, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 21)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskou, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 22)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskov, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 23)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskow, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 24)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskox, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 25)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskoy, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 26)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itskoz, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 27)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itsko0, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 28)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itsko1, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 29)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itsko2, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 30)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itsko3, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 31)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itsko4, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 32)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itsko5, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 33)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itsko6, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 34)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itsko7, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 35)",GAME_FLAGS,layout_m1itskob)
-GAMEL( 199?, m1itsko8, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 36)",GAME_FLAGS,layout_m1itskob)
+GAMEL( 199?, m1itsko,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskoa, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskob, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskoc, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskod, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskoe, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskof, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskog, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskoh, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskoi, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskoj, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskok, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskol, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskom, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskon, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskoo, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskop, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskoq, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskor, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskos, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 20)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskot, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 21)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskou, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 22)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskov, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 23)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskow, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 24)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskox, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 25)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskoy, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 26)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itskoz, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 27)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itsko0, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 28)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itsko1, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 29)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itsko2, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 30)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itsko3, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 31)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itsko4, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 32)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itsko5, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 33)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itsko6, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 34)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itsko7, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 35)",GAME_FLAGS,"m1itskob")
+GAMEL( 199?, m1itsko8, m1itsko, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "It's A Knockout (Maygay) (M1A/B) (set 36)",GAME_FLAGS,"m1itskob")
 
 /*******************************************************************************************************************************************************************************************************
   Monopoly
@@ -1259,42 +1199,42 @@ ROM_START( m1mono8 )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
 ROM_START( m1mono9 )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa5-184", 0x0000, 0x010000, CRC(51a8fde3) SHA1(c73441f79b877aaed57791629de9f9b02ff544da) )                                  m1_mono_sound ROM_END_M1A_MCU
 ROM_START( m1monoaa ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa5-185", 0x0000, 0x010000, CRC(b9406005) SHA1(f1b025140ba7579b1eeb497a64c348df5a341d5d) )                                  m1_mono_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1mono,  0,      maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monoa, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monoc, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monod, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monoe, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monof, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monog, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monoh, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monoi, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monok, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monol, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monom, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monon, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monoo, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monop, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monoq, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monor, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monos, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 20)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monot, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 21)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monou, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 22)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monov, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 23)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monow, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 24)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monox, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 25)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monoy, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 26)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monoz, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 27)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1mono0, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 28)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1mono1, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 29)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1mono2, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 30)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1mono3, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 31)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1mono4, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 32)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1mono5, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 33)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1mono6, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 34)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1mono7, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 35)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1mono8, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 36)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1mono9, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 37)",GAME_FLAGS,layout_m1monou)
-GAMEL( 199?, m1monoaa,m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 38)",GAME_FLAGS,layout_m1monou)
+GAMEL( 199?, m1mono,  0,      maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monoa, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monoc, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monod, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monoe, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monof, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monog, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monoh, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monoi, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monok, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monol, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monom, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monon, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monoo, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monop, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monoq, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monor, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monos, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 20)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monot, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 21)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monou, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 22)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monov, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 23)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monow, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 24)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monox, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 25)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monoy, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 26)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monoz, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 27)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1mono0, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 28)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1mono1, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 29)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1mono2, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 30)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1mono3, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 31)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1mono4, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 32)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1mono5, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 33)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1mono6, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 34)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1mono7, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 35)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1mono8, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 36)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1mono9, m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 37)",GAME_FLAGS,"m1monou")
+GAMEL( 199?, m1monoaa,m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 38)",GAME_FLAGS,"m1monou")
 
 /*******************************************************************************************************************************************************************************************************
   Gladiators
@@ -1336,34 +1276,34 @@ ROM_START( m1gladz ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOA
 ROM_START( m1glad0 ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa5-009", 0x0000, 0x010000, CRC(90d4abe9) SHA1(db5992ed2314e36fce2624c414415fdda945b99b) )                       m1_glad_sound ROM_END_M1A_MCU
 ROM_START( m1glad1 ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa5-010", 0x0000, 0x010000, CRC(10425681) SHA1(bfb044a2815d50f10b8fa9eaf371db2a2954e9e2) )                       m1_glad_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1glad,  0,      maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1gladg) // aka sa6-295
-GAMEL( 199?, m1glada, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladb, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladc, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladd, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1glade, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladf, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladg, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladh, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1gladg) // aka sa5-014
-GAMEL( 199?, m1gladj, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladk, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladl, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladm, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladn, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1glado, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladp, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladq, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladr, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1glads, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 20)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladt, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 21)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladu, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 22)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladv, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 23)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladw, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 24)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladx, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 25)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1glady, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 26)",GAME_FLAGS,layout_m1gladg)
-GAMEL( 199?, m1gladz, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 27)",GAME_FLAGS,layout_m1gladg) // arcade
-GAMEL( 199?, m1glad0, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 28)",GAME_FLAGS,layout_m1gladg) // showcase
-GAMEL( 199?, m1glad1, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 29)",GAME_FLAGS,layout_m1gladg) // showcase
+GAMEL( 199?, m1glad,  0,      maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1gladg") // aka sa6-295
+GAMEL( 199?, m1glada, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladb, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladc, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladd, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1glade, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladf, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladg, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladh, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1gladg") // aka sa5-014
+GAMEL( 199?, m1gladj, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladk, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladl, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladm, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladn, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1glado, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladp, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladq, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladr, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1glads, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 20)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladt, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 21)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladu, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 22)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladv, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 23)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladw, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 24)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladx, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 25)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1glady, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 26)",GAME_FLAGS,"m1gladg")
+GAMEL( 199?, m1gladz, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 27)",GAME_FLAGS,"m1gladg") // arcade
+GAMEL( 199?, m1glad0, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 28)",GAME_FLAGS,"m1gladg") // showcase
+GAMEL( 199?, m1glad1, m1glad, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 29)",GAME_FLAGS,"m1gladg") // showcase
 
 /*******************************************************************************************************************************************************************************************************
   Super Pots
@@ -1463,31 +1403,31 @@ ROM_START( m1triviax ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1triviay ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("trivpgame10",      0x0000, 0x010000, CRC(d692a4ee) SHA1(3d3081d02456c994be4fc3f7f4d2e8cc40985c8d) ) m1_trivia_sound ROM_END_M1A_MCU
 ROM_START( m1triviaz ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("trivtest",         0x0000, 0x010000, CRC(c73821df) SHA1(ec32dcfe87905f0f676b65561213afb591ac21a6) ) m1_trivia_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1trivia,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviaa, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviab, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviac, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviad, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviae, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviaf, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviag, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviah, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviai, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviaj, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviak, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1trivial, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1trivian, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviap, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviaq, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviar, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1trivias, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 20)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviat, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 21)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviau, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 22)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviav, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 23)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviaw, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 24)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviax, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 25)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviay, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 26)",GAME_FLAGS,layout_m1triviax)
-GAMEL( 199?, m1triviaz, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 27)",GAME_FLAGS,layout_m1triviax)
+GAMEL( 199?, m1trivia,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviaa, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviab, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviac, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviad, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviae, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviaf, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviag, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviah, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviai, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviaj, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviak, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1trivial, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1trivian, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviap, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviaq, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviar, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1trivias, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 20)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviat, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 21)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviau, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 22)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviav, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 23)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviaw, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 24)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviax, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 25)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviay, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 26)",GAME_FLAGS,"m1triviax")
+GAMEL( 199?, m1triviaz, m1trivia, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Trivial Pursuit (Maygay) (M1A/B) (set 27)",GAME_FLAGS,"m1triviax")
 
 /*******************************************************************************************************************************************************************************************************
   Money Money Money
@@ -1522,30 +1462,30 @@ ROM_START( m1monmonu ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1monmonv ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa9-015",      0x0000, 0x020000, CRC(a20db239) SHA1(437967107c18d647539eeabe17157dfcc9ab64a7) ) m1_monmon_sound ROM_END_M1A_MCU
 ROM_START( m1monmonw ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa9-016",      0x0000, 0x020000, CRC(b1ca896f) SHA1(782ca31e42e8b0c2f2b1b792ec21c859ed3cf7d2) ) m1_monmon_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1monmon,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmona, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmonb, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmonc, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmond, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmone, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmonf, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmong, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmonh, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmoni, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmonj, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmonk, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmonl, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmonm, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmonn, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmono, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmonp, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmonq, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmonr, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmons, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 20)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmont, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 21)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmonu, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 22)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmonv, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 23)",GAME_FLAGS,layout_m1monmon)
-GAMEL( 199?, m1monmonw, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 24)",GAME_FLAGS,layout_m1monmon)
+GAMEL( 199?, m1monmon,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmona, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmonb, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmonc, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmond, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmone, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmonf, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmong, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmonh, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmoni, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmonj, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmonk, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmonl, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmonm, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmonn, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmono, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmonp, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmonq, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmonr, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmons, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 20)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmont, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 21)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmonu, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 22)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmonv, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 23)",GAME_FLAGS,"m1monmon")
+GAMEL( 199?, m1monmonw, m1monmon, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Money Money Money (Maygay) (M1A/B) (set 24)",GAME_FLAGS,"m1monmon")
 
 /*******************************************************************************************************************************************************************************************************
   James Bond
@@ -1620,25 +1560,25 @@ ROM_START( m1pinkpp ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
 ROM_START( m1pinkpq ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa4-615",                   0x0000, 0x010000, CRC(8bc682e3) SHA1(39f2eb7e4e9c36f64b0efe2b347f93638d9b6e09) ) m1_pinkp_sound ROM_END_M1A_MCU
 ROM_START( m1pinkpr ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("ppix6___.281",              0x0000, 0x010000, CRC(386c7d02) SHA1(67a52332a76d82909455174cce5067469654ccd0) ) m1_pinkp_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1pinkp,  0,       maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpa, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpb, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpc, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpd, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpe, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpf, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpg, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkph, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpi, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpj, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpk, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpl, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpm, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpn, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpo, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpp, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpq, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1pinkpc)
-GAMEL( 199?, m1pinkpr, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1pinkpc)
+GAMEL( 199?, m1pinkp,  0,       maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpa, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpb, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpc, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpd, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpe, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpf, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpg, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkph, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpi, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpj, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpk, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpl, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpm, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpn, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpo, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpp, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpq, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1pinkpc")
+GAMEL( 199?, m1pinkpr, m1pinkp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1pinkpc")
 
 /*******************************************************************************************************************************************************************************************************
   Nudge Banker
@@ -1672,29 +1612,29 @@ ROM_START( m1nudbnkt ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1nudbnku ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-175",  0x0000, 0x010000, CRC(e2520af6) SHA1(27a171b480586ac41262e16e365cadb29e8f9017) ) m1_nudbnk_sound ROM_END_M1A_MCU
 ROM_START( m1nudbnkv ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa6-532",  0x0000, 0x010000, CRC(50dbea73) SHA1(ff93858f53b6025b4396f2d7aa4e14dea3445129) ) m1_nudbnk_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1nudbnk,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnka, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnkb, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnkc, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnkd, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnke, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnkf, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnkg, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnkh, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnki, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnkj, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnkk, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnkl, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnkm, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnkn, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnko, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnkp, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnkq, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnkr, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnks, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 20)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnkt, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 21)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnku, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 22)",GAME_FLAGS,layout_m1nudbnke)
-GAMEL( 199?, m1nudbnkv, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 23)",GAME_FLAGS,layout_m1nudbnke)
+GAMEL( 199?, m1nudbnk,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnka, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnkb, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnkc, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnkd, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnke, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnkf, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnkg, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnkh, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnki, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnkj, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnkk, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnkl, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnkm, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnkn, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnko, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnkp, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnkq, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnkr, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnks, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 20)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnkt, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 21)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnku, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 22)",GAME_FLAGS,"m1nudbnke")
+GAMEL( 199?, m1nudbnkv, m1nudbnk, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Nudge Banker (Maygay) (M1A/B) (set 23)",GAME_FLAGS,"m1nudbnke")
 
 /*******************************************************************************************************************************************************************************************************
   Instant Win
@@ -1727,28 +1667,28 @@ ROM_START( m1inwinv ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
 ROM_START( m1inwinw ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa7-655",       0x0000, 0x010000, CRC(0244bdd7) SHA1(1e2a222645063cf9bf22f9b432757f994096a51c) ) m1_inwin_sound ROM_END_M1A_MCU
 ROM_START( m1inwinx ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa7-656",       0x0000, 0x010000, CRC(b6fc6304) SHA1(ca6ecfbd16385db0292997fdc07924e222206c0d) ) m1_inwin_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1inwin,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwina, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwinb, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwinc, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwinf, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwinh, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwini, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwinj, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwink, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwinl, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwinm, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwinn, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwino, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwinp, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwinq, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwinr, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwins, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 20)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwint, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 21)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwinu, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 22)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwinv, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 23)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwinw, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 24)",GAME_FLAGS,layout_m1inwinc)
-GAMEL( 199?, m1inwinx, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 25)",GAME_FLAGS,layout_m1inwinc)
+GAMEL( 199?, m1inwin,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwina, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwinb, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwinc, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwinf, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwinh, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwini, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwinj, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwink, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwinl, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwinm, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwinn, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwino, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwinp, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwinq, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwinr, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwins, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 20)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwint, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 21)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwinu, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 22)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwinv, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 23)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwinw, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 24)",GAME_FLAGS,"m1inwinc")
+GAMEL( 199?, m1inwinx, m1inwin, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Win (Maygay) (M1A/B) (set 25)",GAME_FLAGS,"m1inwinc")
 
 /*******************************************************************************************************************************************************************************************************
   Italian Job
@@ -1779,23 +1719,23 @@ ROM_START( m1itjobp ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
 ROM_START( m1itjobq ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-266",           0x0000, 0x020000, CRC(f23250b4) SHA1(c464bbd3a396fa32bba7c3e16de4c9d12005a4dc) ) m1_itjob_sound ROM_END_M1A_MCU
 ROM_START( m1itjobr ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-267",           0x0000, 0x020000, CRC(a273ae08) SHA1(72876cb81e80e96e75758ce8317a1843947a431a) ) m1_itjob_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1itjob,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobc, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobd, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobe, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobf, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobg, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobh, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobi, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobj, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobk, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobl, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobm, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobn, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobo, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobp, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobq, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1itjobc)
-GAMEL( 199?, m1itjobr, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1itjobc)
+GAMEL( 199?, m1itjob,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1itjobc")
+GAMEL( 199?, m1itjobc, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1itjobc")
+GAMEL( 199?, m1itjobd, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1itjobc")
+GAMEL( 199?, m1itjobe, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1itjobc")
+GAMEL( 199?, m1itjobf, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1itjobc")
+GAMEL( 199?, m1itjobg, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1itjobc")
+GAMEL( 199?, m1itjobh, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1itjobc")
+GAMEL( 199?, m1itjobi, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1itjobc")
+GAMEL( 199?, m1itjobj, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1itjobc")
+GAMEL( 199?, m1itjobk, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1itjobc")
+GAMEL( 199?, m1itjobl, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1itjobc")
+GAMEL( 199?, m1itjobm, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1itjobc")
+GAMEL( 199?, m1itjobn, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1itjobc")
+GAMEL( 199?, m1itjobo, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1itjobc")
+GAMEL( 199?, m1itjobp, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1itjobc")
+GAMEL( 199?, m1itjobq, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1itjobc")
+GAMEL( 199?, m1itjobr, m1itjob, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1itjobc")
 
 /*******************************************************************************************************************************************************************************************************
   Fruit Explosion
@@ -1827,27 +1767,27 @@ ROM_START( m1frexplt ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1frexplu ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-255",                  0x0000, 0x020000, CRC(f36ae17d) SHA1(e7f13281ebe2eb295a0d54a09d01945dfb02d025) ) m1_frexpl_sound ROM_END_M1A_MCU
 ROM_START( m1frexplv ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-257",                  0x0000, 0x020000, CRC(ee2c7f60) SHA1(a66dc8e02d759868d0d723a1ed0082d0f26caa22) ) m1_frexpl_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1frexpl,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexpla, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexplc, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexpld, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexple, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexplg, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexplh, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexpli, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexplj, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexplk, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexpll, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexplm, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexpln, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexplo, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexplp, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexplq, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexplr, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexpls, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 20)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexplt, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 21)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexplu, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 22)",GAME_FLAGS,layout_m1frexplc)
-GAMEL( 199?, m1frexplv, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 23)",GAME_FLAGS,layout_m1frexplc)
+GAMEL( 199?, m1frexpl,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexpla, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexplc, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexpld, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexple, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexplg, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexplh, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexpli, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexplj, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexplk, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexpll, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexplm, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexpln, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexplo, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexplp, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexplq, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexplr, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexpls, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 20)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexplt, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 21)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexplu, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 22)",GAME_FLAGS,"m1frexplc")
+GAMEL( 199?, m1frexplv, m1frexpl, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fruit Explosion (Maygay) (M1A/B) (set 23)",GAME_FLAGS,"m1frexplc")
 
 /*******************************************************************************************************************************************************************************************************
   The Guvnor
@@ -1879,27 +1819,27 @@ ROM_START( m1guvnorr ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1guvnors ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa6-214",      0x0000, 0x010000, CRC(d801f442) SHA1(923e86f2ab0c8d30ad831690d57f257f4a7a49f5) ) m1_guvnor_sound ROM_END_M1A_MCU
 ROM_START( m1guvnort ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa6-215",      0x0000, 0x010000, CRC(bfb4cd16) SHA1(8129b75c7dd236a4053ed9af4af4410a7cd1bd0a) ) m1_guvnor_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1guvnor,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnora, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnorb, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnorc, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnord, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnore, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnorf, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnorg, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnorh, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnori, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnorj, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnork, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnorl, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnorm, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnorn, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnoro, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnorp, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnorq, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnorr, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnors, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 20)",GAME_FLAGS,layout_m1guvnor)
-GAMEL( 199?, m1guvnort, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 21)",GAME_FLAGS,layout_m1guvnor)
+GAMEL( 199?, m1guvnor,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnora, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnorb, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnorc, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnord, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnore, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnorf, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnorg, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnorh, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnori, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnorj, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnork, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnorl, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnorm, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnorn, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnoro, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnorp, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnorq, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnorr, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnors, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 20)",GAME_FLAGS,"m1guvnor")
+GAMEL( 199?, m1guvnort, m1guvnor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Guvnor (Maygay) (M1A/B) (set 21)",GAME_FLAGS,"m1guvnor")
 
 /*******************************************************************************************************************************************************************************************************
   Lucky Numbers
@@ -1930,26 +1870,26 @@ ROM_START( m1lucknoq ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1lucknor ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa6-515", 0x0000, 0x010000, CRC(444ef475) SHA1(86343d0a8e51f196f7ddb3652cbd4fda6c9fabc1) ) m1_luckno_sound ROM_END_M1A_MCU
 ROM_START( m1lucknos ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa6-516", 0x0000, 0x010000, CRC(f0f62aa6) SHA1(b78a3aa39c812fcbbdfddd14da37cfa59dac905f) ) m1_luckno_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1luckno,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknoa, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknob, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknoc, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknod, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknoe, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknof, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknog, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknoh, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknoi, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknoj, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknok, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknol, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknom, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknon, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknoo, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknop, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknoq, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknor, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1lucknon)
-GAMEL( 199?, m1lucknos, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 20)",GAME_FLAGS,layout_m1lucknon)
+GAMEL( 199?, m1luckno,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknoa, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknob, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknoc, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknod, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknoe, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknof, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknog, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknoh, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknoi, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknoj, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknok, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknol, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknom, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknon, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknoo, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknop, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknoq, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknor, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1lucknon")
+GAMEL( 199?, m1lucknos, m1luckno, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Lucky Numbers (Maygay) (M1A/B) (set 20)",GAME_FLAGS,"m1lucknon")
 
 /*******************************************************************************************************************************************************************************************************
   Noel's House Party
@@ -1974,20 +1914,20 @@ ROM_START( m1nhpk ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD
 ROM_START( m1nhpl ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa6-628", 0x0000, 0x010000, CRC(afbc389c) SHA1(d19b7b82e54dd7e846a8f1255d6d8de298f71b31) ) m1_nhp_sound ROM_END_M1A_MCU
 ROM_START( m1nhpm ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa6-629", 0x0000, 0x010000, CRC(4754a57a) SHA1(759b9b527f5bade7abf8079fb61c77690af94e92) ) m1_nhp_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1nhp,  0,     maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1nhp)
-GAMEL( 199?, m1nhpa, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1nhp)
-GAMEL( 199?, m1nhpb, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1nhp)
-GAMEL( 199?, m1nhpc, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1nhp)
-GAMEL( 199?, m1nhpd, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1nhp)
-GAMEL( 199?, m1nhpe, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1nhp)
-GAMEL( 199?, m1nhpf, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1nhp)
-GAMEL( 199?, m1nhpg, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1nhp)
-GAMEL( 199?, m1nhph, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1nhp)
-GAMEL( 199?, m1nhpi, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1nhp)
-GAMEL( 199?, m1nhpj, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1nhp)
-GAMEL( 199?, m1nhpk, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1nhp)
-GAMEL( 199?, m1nhpl, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1nhp)
-GAMEL( 199?, m1nhpm, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1nhp)
+GAMEL( 199?, m1nhp,  0,     maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1nhp")
+GAMEL( 199?, m1nhpa, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1nhp")
+GAMEL( 199?, m1nhpb, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1nhp")
+GAMEL( 199?, m1nhpc, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1nhp")
+GAMEL( 199?, m1nhpd, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1nhp")
+GAMEL( 199?, m1nhpe, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1nhp")
+GAMEL( 199?, m1nhpf, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1nhp")
+GAMEL( 199?, m1nhpg, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1nhp")
+GAMEL( 199?, m1nhph, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1nhp")
+GAMEL( 199?, m1nhpi, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1nhp")
+GAMEL( 199?, m1nhpj, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1nhp")
+GAMEL( 199?, m1nhpk, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1nhp")
+GAMEL( 199?, m1nhpl, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1nhp")
+GAMEL( 199?, m1nhpm, m1nhp, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Noel's House Party (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1nhp")
 
 /*******************************************************************************************************************************************************************************************************
   Fantasy Football
@@ -2009,17 +1949,17 @@ ROM_START( m1fantfbj ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1fantfbk ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa6-329",  0x0000, 0x010000, CRC(eb3316ab) SHA1(79b64e400ec3e104fcfadcfe8f56b47771cf26ad) ) m1_fantfb_sound ROM_END_M1A_MCU
 ROM_START( m1fantfbl ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa6-330",  0x0000, 0x010000, CRC(6ba5ebc3) SHA1(99425719445abc974cba88c1c84b87cba4797ccc) ) m1_fantfb_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1fantfb,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1fantfbb)
-GAMEL( 199?, m1fantfba, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1fantfbb)
-GAMEL( 199?, m1fantfbb, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1fantfbb)
-GAMEL( 199?, m1fantfbc, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1fantfbb)
-GAMEL( 199?, m1fantfbd, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1fantfbb)
-GAMEL( 199?, m1fantfbf, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1fantfbb)
-GAMEL( 199?, m1fantfbg, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1fantfbb)
-GAMEL( 199?, m1fantfbh, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1fantfbb)
-GAMEL( 199?, m1fantfbj, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1fantfbb)
-GAMEL( 199?, m1fantfbk, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1fantfbb)
-GAMEL( 199?, m1fantfbl, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1fantfbb)
+GAMEL( 199?, m1fantfb,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1fantfbb")
+GAMEL( 199?, m1fantfba, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1fantfbb")
+GAMEL( 199?, m1fantfbb, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1fantfbb")
+GAMEL( 199?, m1fantfbc, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1fantfbb")
+GAMEL( 199?, m1fantfbd, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1fantfbb")
+GAMEL( 199?, m1fantfbf, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1fantfbb")
+GAMEL( 199?, m1fantfbg, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1fantfbb")
+GAMEL( 199?, m1fantfbh, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1fantfbb")
+GAMEL( 199?, m1fantfbj, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1fantfbb")
+GAMEL( 199?, m1fantfbk, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1fantfbb")
+GAMEL( 199?, m1fantfbl, m1fantfb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Fantasy Football (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1fantfbb")
 
 /*******************************************************************************************************************************************************************************************************
   Wild Zone
@@ -2050,26 +1990,26 @@ ROM_START( m1wldzneq ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1wldzner ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("wzprg2-1.bin", 0x0000, 0x010000, CRC(35f26690) SHA1(308eac37013cfd84970f04857fc8282efb58e210) ) m1_wldzne_sound ROM_END_M1A_MCU
 ROM_START( m1wldznes ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("wzone10",      0x0000, 0x010000, CRC(001e604b) SHA1(f57015c10c9b7c955397a66251e489770a9620d0) ) m1_wldzne_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1wldzne,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldznea, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldzneb, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldznec, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldzned, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldznee, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldznef, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldzneg, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldzneh, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldznei, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldznej, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldznek, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldznel, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldznem, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldznen, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldzneo, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldznep, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldzneq, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldzner, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1wldzner)
-GAMEL( 199?, m1wldznes, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 20)",GAME_FLAGS,layout_m1wldzner)
+GAMEL( 199?, m1wldzne,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldznea, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldzneb, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldznec, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldzned, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldznee, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldznef, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldzneg, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldzneh, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldznei, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldznej, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldznek, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldznel, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldznem, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldznen, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldzneo, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldznep, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldzneq, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldzner, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1wldzner")
+GAMEL( 199?, m1wldznes, m1wldzne, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 20)",GAME_FLAGS,"m1wldzner")
 
 /*******************************************************************************************************************************************************************************************************
   On The Buses
@@ -2097,23 +2037,23 @@ ROM_START( m1onbusn ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
 ROM_START( m1onbuso ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa9_006",           0x0000, 0x010000, CRC(ce8f403f) SHA1(ec71a0abe659c88c31c66b8f189c34978ee35fa1) ) m1_onbus_sound ROM_END_M1A_MCU
 ROM_START( m1onbusp ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa7_728",           0x0000, 0x010000, CRC(b942cf3a) SHA1(bb1ddcc3d03237fb34caa7891a556afd7cf1823d) ) m1_onbus_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1onbus,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1onbusa)
-GAMEL( 199?, m1onbusa, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1onbusa)
-GAMEL( 199?, m1onbusb, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1onbusa)
-GAMEL( 199?, m1onbusc, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1onbusa)
-GAMEL( 199?, m1onbusd, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1onbusa)
-GAMEL( 199?, m1onbuse, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1onbusa)
-GAMEL( 199?, m1onbusf, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1onbusa)
-GAMEL( 199?, m1onbusg, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1onbusa)
-GAMEL( 199?, m1onbush, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1onbusa)
-GAMEL( 199?, m1onbusi, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1onbusa)
-GAMEL( 199?, m1onbusj, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1onbusa)
-GAMEL( 199?, m1onbusk, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1onbusa)
-GAMEL( 199?, m1onbusl, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1onbusa)
-GAMEL( 199?, m1onbusm, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1onbusa)
-GAMEL( 199?, m1onbusn, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1onbusa)
-GAMEL( 199?, m1onbuso, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1onbusa) // bad?
-GAMEL( 199?, m1onbusp, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1onbusa) // bad?
+GAMEL( 199?, m1onbus,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1onbusa")
+GAMEL( 199?, m1onbusa, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1onbusa")
+GAMEL( 199?, m1onbusb, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1onbusa")
+GAMEL( 199?, m1onbusc, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1onbusa")
+GAMEL( 199?, m1onbusd, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1onbusa")
+GAMEL( 199?, m1onbuse, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1onbusa")
+GAMEL( 199?, m1onbusf, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1onbusa")
+GAMEL( 199?, m1onbusg, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1onbusa")
+GAMEL( 199?, m1onbush, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1onbusa")
+GAMEL( 199?, m1onbusi, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1onbusa")
+GAMEL( 199?, m1onbusj, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1onbusa")
+GAMEL( 199?, m1onbusk, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1onbusa")
+GAMEL( 199?, m1onbusl, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1onbusa")
+GAMEL( 199?, m1onbusm, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1onbusa")
+GAMEL( 199?, m1onbusn, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1onbusa")
+GAMEL( 199?, m1onbuso, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1onbusa") // bad?
+GAMEL( 199?, m1onbusp, m1onbus, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "On The Buses (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1onbusa") // bad?
 
 /*******************************************************************************************************************************************************************************************************
   Monopoly Club
@@ -2138,20 +2078,20 @@ ROM_START( m1monclbk ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1monclbl ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sc8-309", 0x0000, 0x020000, CRC(6f0270e9) SHA1(87c2f653a7297801410120de94618c71cb997efa) ) m1_monclb_sound ROM_END_M1A_MCU
 ROM_START( m1monclbm ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("monclub", 0x0000, 0x020000, CRC(0604d7a4) SHA1(fa475fcfc91f9962280329855730fb00c8f421c3) ) m1_monclb_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1monclb,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1monclb)
-GAMEL( 199?, m1monclba, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1monclb)
-GAMEL( 199?, m1monclbb, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1monclb)
-GAMEL( 199?, m1monclbc, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1monclb)
-GAMEL( 199?, m1monclbd, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1monclb)
-GAMEL( 199?, m1monclbe, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1monclb)
-GAMEL( 199?, m1monclbf, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1monclb)
-GAMEL( 199?, m1monclbg, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1monclb)
-GAMEL( 199?, m1monclbh, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1monclb)
-GAMEL( 199?, m1monclbi, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1monclb)
-GAMEL( 199?, m1monclbj, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1monclb)
-GAMEL( 199?, m1monclbk, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1monclb)
-GAMEL( 199?, m1monclbl, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1monclb)
-GAMEL( 199?, m1monclbm, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1monclb)
+GAMEL( 199?, m1monclb,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1monclb")
+GAMEL( 199?, m1monclba, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1monclb")
+GAMEL( 199?, m1monclbb, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1monclb")
+GAMEL( 199?, m1monclbc, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1monclb")
+GAMEL( 199?, m1monclbd, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1monclb")
+GAMEL( 199?, m1monclbe, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1monclb")
+GAMEL( 199?, m1monclbf, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1monclb")
+GAMEL( 199?, m1monclbg, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1monclb")
+GAMEL( 199?, m1monclbh, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1monclb")
+GAMEL( 199?, m1monclbi, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1monclb")
+GAMEL( 199?, m1monclbj, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1monclb")
+GAMEL( 199?, m1monclbk, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1monclb")
+GAMEL( 199?, m1monclbl, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1monclb")
+GAMEL( 199?, m1monclbm, m1monclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Monopoly Club (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1monclb")
 
 /*******************************************************************************************************************************************************************************************************
   Hot Pots
@@ -2185,29 +2125,29 @@ ROM_START( m1hotpoty ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1hotpotz ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa9-027",          0x0000, 0x010000, CRC(808a6217) SHA1(452139e227131738928cc703176758c1ac8ec9f5) ) m1_hotpot_sound ROM_END_M1A_MCU
 ROM_START( m1hotpot0 ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa9-028",          0x0000, 0x010000, CRC(26a2303b) SHA1(01bf60f7695972cbc416e65a7929532f122841fc) ) m1_hotpot_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1hotpot,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpotd, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpote, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpoth, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpoti, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpotj, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpotk, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpotl, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpotm, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpotn, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpoto, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpotp, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpotq, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpotr, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 19)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpots, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 20)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpott, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 21)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpotu, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 22)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpotv, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 23)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpotw, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 24)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpotx, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 25)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpoty, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 26)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpotz, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 27)",GAME_FLAGS,layout_m1hotpoth)
-GAMEL( 199?, m1hotpot0, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 28)",GAME_FLAGS,layout_m1hotpoth)
+GAMEL( 199?, m1hotpot,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpotd, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpote, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpoth, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpoti, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpotj, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpotk, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpotl, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpotm, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpotn, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpoto, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpotp, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpotq, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpotr, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 19)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpots, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 20)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpott, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 21)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpotu, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 22)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpotv, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 23)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpotw, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 24)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpotx, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 25)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpoty, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 26)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpotz, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 27)",GAME_FLAGS,"m1hotpoth")
+GAMEL( 199?, m1hotpot0, m1hotpot, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hot Pots (Maygay) (M1A/B) (set 28)",GAME_FLAGS,"m1hotpoth")
 
 /*******************************************************************************************************************************************************************************************************
   Great Escape, The
@@ -2236,24 +2176,24 @@ ROM_START( m1gresco ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
 ROM_START( m1grescp ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-275",       0x0000, 0x020000, CRC(9b2c5c78) SHA1(ab16de1da60eb0fd95e18ab0849bcc7ab2413804) ) m1_gresc_sound ROM_END_M1A_MCU
 ROM_START( m1grescq ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("tge.bin",       0x0000, 0x020000, CRC(4c11546b) SHA1(453f9980f5aa02b44a1341ac37f4f101feab05bd) ) m1_gresc_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1gresc,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1gresca, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1grescb, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1grescc, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1grescd, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1gresce, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1grescf, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1grescg, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1gresch, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1gresci, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1grescj, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1gresck, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1grescl, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1grescm, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 14)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1grescn, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 15)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1gresco, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 16)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1grescp, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 17)",GAME_FLAGS,layout_m1grescb)
-GAMEL( 199?, m1grescq, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 18)",GAME_FLAGS,layout_m1grescb)
+GAMEL( 199?, m1gresc,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1gresca, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1grescb, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1grescc, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1grescd, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1gresce, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1grescf, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1grescg, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1gresch, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1gresci, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1grescj, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1gresck, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1grescl, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1grescm, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 14)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1grescn, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 15)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1gresco, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 16)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1grescp, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 17)",GAME_FLAGS,"m1grescb")
+GAMEL( 199?, m1grescq, m1gresc, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Great Escape (Maygay) (M1A/B) (set 18)",GAME_FLAGS,"m1grescb")
 
 /*******************************************************************************************************************************************************************************************************
   Inferno
@@ -2277,19 +2217,19 @@ ROM_START( m1infernj ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1infernk ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa6-351",      0x0000, 0x010000, CRC(1e4125cb) SHA1(e24e7c264d26df71191461acc388b31e73deca21) ) m1_infern_sound ROM_END_M1A_MCU
 ROM_START( m1infernl ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa6-352",      0x0000, 0x010000, CRC(aaf9fb18) SHA1(0e9cde894f1eb601e397dd79c96b05973a805a9e) ) m1_infern_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1infern,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1infern)
-GAMEL( 199?, m1inferna, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1infern)
-GAMEL( 199?, m1infernb, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1infern)
-GAMEL( 199?, m1infernc, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1infern)
-GAMEL( 199?, m1infernd, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1infern)
-GAMEL( 199?, m1inferne, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1infern)
-GAMEL( 199?, m1infernf, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 7)",GAME_FLAGS,layout_m1infern)
-GAMEL( 199?, m1inferng, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 8)",GAME_FLAGS,layout_m1infern)
-GAMEL( 199?, m1infernh, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 9)",GAME_FLAGS,layout_m1infern)
-GAMEL( 199?, m1inferni, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 10)",GAME_FLAGS,layout_m1infern)
-GAMEL( 199?, m1infernj, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 11)",GAME_FLAGS,layout_m1infern)
-GAMEL( 199?, m1infernk, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 12)",GAME_FLAGS,layout_m1infern)
-GAMEL( 199?, m1infernl, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 13)",GAME_FLAGS,layout_m1infern)
+GAMEL( 199?, m1infern,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1infern")
+GAMEL( 199?, m1inferna, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1infern")
+GAMEL( 199?, m1infernb, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1infern")
+GAMEL( 199?, m1infernc, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1infern")
+GAMEL( 199?, m1infernd, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1infern")
+GAMEL( 199?, m1inferne, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1infern")
+GAMEL( 199?, m1infernf, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 7)",GAME_FLAGS,"m1infern")
+GAMEL( 199?, m1inferng, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 8)",GAME_FLAGS,"m1infern")
+GAMEL( 199?, m1infernh, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 9)",GAME_FLAGS,"m1infern")
+GAMEL( 199?, m1inferni, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 10)",GAME_FLAGS,"m1infern")
+GAMEL( 199?, m1infernj, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 11)",GAME_FLAGS,"m1infern")
+GAMEL( 199?, m1infernk, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 12)",GAME_FLAGS,"m1infern")
+GAMEL( 199?, m1infernl, m1infern, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Inferno (Maygay) (M1A/B) (set 13)",GAME_FLAGS,"m1infern")
 
 /*******************************************************************************************************************************************************************************************************
   Jim Davison's Winning Streak
@@ -2447,7 +2387,7 @@ GAME( 199?, m1gold10, 0, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "M
 
 ROM_START( m1manhat ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  ) ROM_LOAD( "skyline.bin", 0x0000, 0x010000, CRC(ea9f3b18) SHA1(14d5c8cff598b43100d1a7c8692528de40c9e58d) ) m1_manhat_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1manhat, 0, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Manhattan Skylines (Maygay) (M1A/B)",GAME_FLAGS,layout_m1manhat)
+GAMEL( 199?, m1manhat, 0, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Manhattan Skylines (Maygay) (M1A/B)",GAME_FLAGS,"m1manhat")
 
 /*******************************************************************************************************************************************************************************************************
   Monopoly (Dutch)
@@ -2496,7 +2436,7 @@ GAME( 199?, m1sprnov, 0, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, R
 	/* missing or different sound system? */
 ROM_START( m1taknot ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  ) ROM_LOAD( "takenote.bin", 0x008000, 0x008000, CRC(1ae63140) SHA1(809d04f43293cafc53d2a2ac697253e14b3b9608) )  m1_taknot_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1taknot, 0, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Take Note (Maygay) (M1A/B)",GAME_FLAGS,layout_m1taknot) // smaller than everything else? bad?
+GAMEL( 199?, m1taknot, 0, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Take Note (Maygay) (M1A/B)",GAME_FLAGS,"m1taknot") // smaller than everything else? bad?
 
 /*******************************************************************************************************************************************************************************************************
   Test Unit
@@ -2521,9 +2461,9 @@ ROM_START( m1calyps )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1calypsa ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa001008",     0x0000, 0x020000, CRC(f97cb079) SHA1(1bb0741bd34e6937c5c4711331f43bc0aaaab852) ) m1_calyps_sound ROM_END_M1A_MCU
 ROM_START( m1calypsb ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa001009",     0x0000, 0x020000, CRC(ff686c04) SHA1(dd935a6acc88e8d9738176c22200c36505b48f18) ) m1_calyps_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1calyps,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Calypso (Maygay) (M1A/B) (set 1)",GAME_FLAGS, layout_m1calypsa)
-GAMEL( 199?, m1calypsa, m1calyps, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Calypso (Maygay) (M1A/B) (set 2)",GAME_FLAGS, layout_m1calypsa)
-GAMEL( 199?, m1calypsb, m1calyps, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Calypso (Maygay) (M1A/B) (set 3)",GAME_FLAGS, layout_m1calypsa)
+GAMEL( 199?, m1calyps,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Calypso (Maygay) (M1A/B) (set 1)",GAME_FLAGS, "m1calypsa")
+GAMEL( 199?, m1calypsa, m1calyps, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Calypso (Maygay) (M1A/B) (set 2)",GAME_FLAGS, "m1calypsa")
+GAMEL( 199?, m1calypsb, m1calyps, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Calypso (Maygay) (M1A/B) (set 3)",GAME_FLAGS, "m1calypsa")
 
 /*******************************************************************************************************************************************************************************************************
   War Of The Worlds
@@ -2537,9 +2477,9 @@ ROM_START( m1wotw )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOA
 ROM_START( m1wotwa ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa8-245",    0x0000, 0x020000, CRC(7bb7d4dc) SHA1(516ebe329396d5c565a34994dece1ea232b1e177) ) m1_wotw_sound ROM_END_M1A_MCU
 ROM_START( m1wotwb ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("15wotwro",   0x0000, 0x020000, CRC(12fd4bbf) SHA1(0936c9299871d3d06050bb25f16a8bfd1757ce48) ) m1_wotw_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1wotw,  0,      maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "War Of The Worlds (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1wotwa)
-GAMEL( 199?, m1wotwa, m1wotw, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "War Of The Worlds (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1wotwa)
-GAMEL( 199?, m1wotwb, m1wotw, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "War Of The Worlds (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1wotwa)
+GAMEL( 199?, m1wotw,  0,      maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "War Of The Worlds (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1wotwa")
+GAMEL( 199?, m1wotwa, m1wotw, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "War Of The Worlds (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1wotwa")
+GAMEL( 199?, m1wotwb, m1wotw, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "War Of The Worlds (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1wotwa")
 
 /*******************************************************************************************************************************************************************************************************
   Prize Eastenders
@@ -2554,10 +2494,10 @@ ROM_START( m1przeea ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
 ROM_START( m1przeeb ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa5-058", 0x0000, 0x010000, CRC(3cc35697) SHA1(adaaafd6ae59497630660ec179212f0dd8dd3741) ) m1_przee_sound ROM_END_M1A_MCU
 ROM_START( m1przeec ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa5-059", 0x0000, 0x010000, CRC(d42bcb71) SHA1(483078ada4dcc9b05d47c1ad6011bffc3a090c47) ) m1_przee_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1przee,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Prize Eastenders (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1przeeb)
-GAMEL( 199?, m1przeea, m1przee, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Prize Eastenders (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1przeeb)
-GAMEL( 199?, m1przeeb, m1przee, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Prize Eastenders (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1przeeb)
-GAMEL( 199?, m1przeec, m1przee, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Prize Eastenders (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1przeeb)
+GAMEL( 199?, m1przee,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Prize Eastenders (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1przeeb")
+GAMEL( 199?, m1przeea, m1przee, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Prize Eastenders (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1przeeb")
+GAMEL( 199?, m1przeeb, m1przee, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Prize Eastenders (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1przeeb")
+GAMEL( 199?, m1przeec, m1przee, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Prize Eastenders (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1przeeb")
 
 /*******************************************************************************************************************************************************************************************************
   Pink Panther Club
@@ -2587,9 +2527,9 @@ ROM_START( m1imclb )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
 ROM_START( m1imclba ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sc6-364",   0x0000, 0x010000, CRC(bbf9092a) SHA1(459a9851c3e2316f57593bd4442a9633ef8d04de) ) m1_imclb_sound ROM_END_M1A_MCU
 ROM_START( m1imclbb ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("imilclub",  0x0000, 0x020000, CRC(fbdf8964) SHA1(f71b8d70b28c0a2d7d96dd05128b7bc13437c97b) ) m1_imclb_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1imclb,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Millionaire Club (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1imclb)
-GAMEL( 199?, m1imclba, m1imclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Millionaire Club (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1imclb)
-GAMEL( 199?, m1imclbb, m1imclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Millionaire Club (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1imclb)
+GAMEL( 199?, m1imclb,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Millionaire Club (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1imclb")
+GAMEL( 199?, m1imclba, m1imclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Millionaire Club (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1imclb")
+GAMEL( 199?, m1imclbb, m1imclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Instant Millionaire Club (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1imclb")
 
 /*******************************************************************************************************************************************************************************************************
   Lottery Millionaire Club
@@ -2681,9 +2621,9 @@ ROM_START( m1mongam )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1mongama ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sc5-114",      0x0000, 0x010000, CRC(63dbb45e) SHA1(3ccb45ae290b5e2d2249a36268a9e690846bf3d9) ) m1_mongam_sound ROM_END_M1A_MCU
 ROM_START( m1mongamb ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sc5-115",      0x0000, 0x010000, CRC(8b3329b8) SHA1(2c89ac10ad82d8425104a74a7bc24aa9c28cbe01) ) m1_mongam_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1mongam,  0,        maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Money Game Club (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1mongam)
-GAMEL( 199?, m1mongama, m1mongam, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Money Game Club (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1mongam)
-GAMEL( 199?, m1mongamb, m1mongam, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Money Game Club (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1mongam)
+GAMEL( 199?, m1mongam,  0,        maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Money Game Club (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1mongam")
+GAMEL( 199?, m1mongama, m1mongam, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Money Game Club (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1mongam")
+GAMEL( 199?, m1mongamb, m1mongam, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Money Game Club (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1mongam")
 
 /*******************************************************************************************************************************************************************************************************
   Monopoly Classic
@@ -2720,11 +2660,11 @@ ROM_START( m1retppb ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
 ROM_START( m1retppc ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa4-044.bin",   0x0000, 0x010000, CRC(9ea30e61) SHA1(1812582ac4f6069354e0f1b5a8f5bd1981cd6e8f) ) m1_retpp_sound ROM_END_M1A_MCU
 ROM_START( m1retppd ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa4-230",       0x0000, 0x010000, CRC(42cd661a) SHA1(b5f5e3e9898155e8696eb97a7cf5e1855e190be1) ) m1_retpp_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1retpp,  0,       maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Return Of The Pink Panther (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1retpp)
-GAMEL( 199?, m1retppa, m1retpp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Return Of The Pink Panther (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1retpp)
-GAMEL( 199?, m1retppb, m1retpp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Return Of The Pink Panther (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1retpp)
-GAMEL( 199?, m1retppc, m1retpp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Return Of The Pink Panther (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1retpp)
-GAMEL( 199?, m1retppd, m1retpp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Return Of The Pink Panther (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1retpp)
+GAMEL( 199?, m1retpp,  0,       maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Return Of The Pink Panther (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1retpp")
+GAMEL( 199?, m1retppa, m1retpp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Return Of The Pink Panther (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1retpp")
+GAMEL( 199?, m1retppb, m1retpp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Return Of The Pink Panther (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1retpp")
+GAMEL( 199?, m1retppc, m1retpp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Return Of The Pink Panther (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1retpp")
+GAMEL( 199?, m1retppd, m1retpp, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Return Of The Pink Panther (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1retpp")
 
 /*******************************************************************************************************************************************************************************************************
   That's Life
@@ -2740,11 +2680,11 @@ ROM_START( m1thatlfb ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1thatlfc ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("thatslifegame",    0x0000, 0x010000, CRC(8dafbe30) SHA1(9a7e8a66b73ddf6564a34363342a8b7290e0dc4f) ) m1_thatlf_sound ROM_END_M1A_MCU
 ROM_START( m1thatlfd ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("thtslf5p",         0x0000, 0x010000, CRC(31507a65) SHA1(607b16cf3fde90f97e22247158f09d859a43c1ae) ) m1_thatlf_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1thatlf,  0,        maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "That's Life (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1thatlfc)
-GAMEL( 199?, m1thatlfa, m1thatlf, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "That's Life (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1thatlfc)
-GAMEL( 199?, m1thatlfb, m1thatlf, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "That's Life (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1thatlfc)
-GAMEL( 199?, m1thatlfc, m1thatlf, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "That's Life (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1thatlfc)
-GAMEL( 199?, m1thatlfd, m1thatlf, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "That's Life (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1thatlfc)
+GAMEL( 199?, m1thatlf,  0,        maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "That's Life (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1thatlfc")
+GAMEL( 199?, m1thatlfa, m1thatlf, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "That's Life (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1thatlfc")
+GAMEL( 199?, m1thatlfb, m1thatlf, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "That's Life (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1thatlfc")
+GAMEL( 199?, m1thatlfc, m1thatlf, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "That's Life (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1thatlfc")
+GAMEL( 199?, m1thatlfd, m1thatlf, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "That's Life (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1thatlfc")
 
 /*******************************************************************************************************************************************************************************************************
   Big Ghoulies
@@ -2763,14 +2703,14 @@ ROM_START( m1bghoue ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
 ROM_START( m1bghouf ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("b_gouli.2_1",   0x0000, 0x020000, CRC(234203f0) SHA1(5d477f70516dd3001587390ac8897328f4df339f) ) m1_bghou_sound ROM_END_M1A_MCU
 ROM_START( m1bghoug ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("bgool_ro.p1",   0x0000, 0x020000, CRC(959751c0) SHA1(7af9ec7f56675ed6ac013a5e0fa79df1ff50271f) ) m1_bghou_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1bghou,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Big Ghoulies (Gemini) (M1A/B) (set 1)",GAME_FLAGS,layout_m1bghou)
-GAMEL( 199?, m1bghoua, m1bghou, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Big Ghoulies (Gemini) (M1A/B) (set 2)",GAME_FLAGS,layout_m1bghou)
-GAMEL( 199?, m1bghoub, m1bghou, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Big Ghoulies (Gemini) (M1A/B) (set 3)",GAME_FLAGS,layout_m1bghou)
-GAMEL( 199?, m1bghouc, m1bghou, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Big Ghoulies (Gemini) (M1A/B) (set 4)",GAME_FLAGS,layout_m1bghou)
-GAMEL( 199?, m1bghoud, m1bghou, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Big Ghoulies (Gemini) (M1A/B) (set 5)",GAME_FLAGS,layout_m1bghou)
-GAMEL( 199?, m1bghoue, m1bghou, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Big Ghoulies (Gemini) (M1A/B) (set 6)",GAME_FLAGS,layout_m1bghou)
-GAMEL( 199?, m1bghouf, m1bghou, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Big Ghoulies (Gemini) (M1A/B) (set 7)",GAME_FLAGS,layout_m1bghou)
-GAMEL( 199?, m1bghoug, m1bghou, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Big Ghoulies (Gemini) (M1A/B) (set 8)",GAME_FLAGS,layout_m1bghou)
+GAMEL( 199?, m1bghou,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Big Ghoulies (Gemini) (M1A/B) (set 1)",GAME_FLAGS,"m1bghou")
+GAMEL( 199?, m1bghoua, m1bghou, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Big Ghoulies (Gemini) (M1A/B) (set 2)",GAME_FLAGS,"m1bghou")
+GAMEL( 199?, m1bghoub, m1bghou, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Big Ghoulies (Gemini) (M1A/B) (set 3)",GAME_FLAGS,"m1bghou")
+GAMEL( 199?, m1bghouc, m1bghou, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Big Ghoulies (Gemini) (M1A/B) (set 4)",GAME_FLAGS,"m1bghou")
+GAMEL( 199?, m1bghoud, m1bghou, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Big Ghoulies (Gemini) (M1A/B) (set 5)",GAME_FLAGS,"m1bghou")
+GAMEL( 199?, m1bghoue, m1bghou, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Big Ghoulies (Gemini) (M1A/B) (set 6)",GAME_FLAGS,"m1bghou")
+GAMEL( 199?, m1bghouf, m1bghou, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Big Ghoulies (Gemini) (M1A/B) (set 7)",GAME_FLAGS,"m1bghou")
+GAMEL( 199?, m1bghoug, m1bghou, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Big Ghoulies (Gemini) (M1A/B) (set 8)",GAME_FLAGS,"m1bghou")
 
 /*******************************************************************************************************************************************************************************************************
   Crazy Cobra
@@ -2830,7 +2770,7 @@ GAME( 199?, m1simpsg, m1simps, maygay_m1, maygay_m1, maygay1b_state, init_m1, RO
 	ROM_LOAD( "trick or treat sound 1.bin", 0x080000, 0x080000, CRC(42ae9bc3) SHA1(c82f3d8ac6004b827913e1940b0d06ed7c1584d0) )
 ROM_START( m1trtrcl ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("ttcb0-2n.p0", 0x0000, 0x020000, CRC(af72431c) SHA1(a6060445527372606bcfab9eb9f0a40882d00520) ) m1_trtrcl_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1trtrcl, 0 ,maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Global", "Trick Or Treat Club (Global) (M1A/B)",GAME_FLAGS,layout_m1trtr)
+GAMEL( 199?, m1trtrcl, 0 ,maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Global", "Trick Or Treat Club (Global) (M1A/B)",GAME_FLAGS,"m1trtr")
 
 /*******************************************************************************************************************************************************************************************************
   Vegetable Crew
@@ -2961,24 +2901,24 @@ ROM_START( m1startrp ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1startrq ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("tk5-5_0x.bin",                     0x0000, 0x010000, CRC(1d32480d) SHA1(670c9d371755c500c29a31a350b3447bd2788c62) ) m1_startr_sound ROM_END_M1A_MCU
 ROM_START( m1startrr ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("tk5_0x.bin",                       0x0000, 0x010000, CRC(20a796f2) SHA1(1d46dbf3693294733595cd601e5be6f16ff685d3) ) m1_startr_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1startr,  0,        maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 1)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startra, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 2)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startrb, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 3)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startrc, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 4)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startrd, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 5)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startre, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 6)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startrf, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 7)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startrg, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 8)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startrh, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 9)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startri, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 10)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startrj, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 11)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startrk, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 12)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startrm, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 14)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startrn, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 15)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startro, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 16)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startrp, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 17)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startrq, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 18)",GAME_FLAGS,layout_m1startr)
-GAMEL( 199?, m1startrr, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 19)",GAME_FLAGS,layout_m1startr)
+GAMEL( 199?, m1startr,  0,        maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 1)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startra, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 2)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startrb, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 3)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startrc, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 4)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startrd, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 5)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startre, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 6)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startrf, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 7)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startrg, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 8)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startrh, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 9)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startri, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 10)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startrj, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 11)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startrk, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 12)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startrm, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 14)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startrn, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 15)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startro, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 16)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startrp, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 17)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startrq, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 18)",GAME_FLAGS,"m1startr")
+GAMEL( 199?, m1startrr, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Mdm", "Star Trekking (Mdm) (M1A/B) (set 19)",GAME_FLAGS,"m1startr")
 
 /*******************************************************************************************************************************************************************************************************
   Tick Tock Cash
@@ -2990,7 +2930,7 @@ GAMEL( 199?, m1startrr, m1startr, maygay_m1_nec, maygay_m1, maygay1b_state, init
 	ROM_LOAD( "ttcsnd.bin", 0x0000, 0x080000, CRC(a191218e) SHA1(d89c33538d1f1804b2f5acac713e760d089fbac0) )
 ROM_START( m1ttcash ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("ttc2-01.bin", 0x0000, 0x010000, CRC(fa3a1d75) SHA1(055aac3bd82892e30efb6f0a359f53045f8d226e) ) m1_ttcash_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1ttcash, 0, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Empire", "Tick Tock Cash (Empire) (M1A/B)",GAME_FLAGS,layout_m1ttcash)
+GAMEL( 199?, m1ttcash, 0, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Empire", "Tick Tock Cash (Empire) (M1A/B)",GAME_FLAGS,"m1ttcash")
 
 /*******************************************************************************************************************************************************************************************************
   Explorer Club
@@ -3028,8 +2968,8 @@ GAME( 199?, m1goldsva, m1goldsv, maygay_m1, maygay_m1, maygay1b_state, init_m1, 
 ROM_START( m1htclb )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("hitensionclubv1-2.rom", 0x0000, 0x010000, CRC(b33fa7a9) SHA1(9aa2b61bac96441a3aa9da254c54636d29a895e2) ) m1_htclb_sound ROM_END_M1A_MCU
 ROM_START( m1htclba ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("hitensio.bin",          0x0000, 0x010000, CRC(b8c8edc9) SHA1(1f989a3a72fb7c7747fc6deeb08e06da429620ee) ) m1_htclb_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1htclb,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hi Tension Club (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1htclb)
-GAMEL( 199?, m1htclba, m1htclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hi Tension Club (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1htclb)
+GAMEL( 199?, m1htclb,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hi Tension Club (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1htclb")
+GAMEL( 199?, m1htclba, m1htclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Hi Tension Club (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1htclb")
 
 /*******************************************************************************************************************************************************************************************************
   Jackpot Multiplier
@@ -3042,8 +2982,8 @@ GAMEL( 199?, m1htclba, m1htclb, maygay_m1, maygay_m1, maygay1b_state, init_m1, R
 ROM_START( m1jpmult )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa0-253.bin", 0x0000, 0x010000, CRC(6f2273cd) SHA1(08cb6414a02a385995e0c4c52a108f76144a12f5) ) m1_jpmult_sound ROM_END_M1A_MCU
 ROM_START( m1jpmulta ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa0-254.bin", 0x0000, 0x010000, CRC(633a2b74) SHA1(5e9aaff1ac900ba6d63642df165e67305247e1fa) ) m1_jpmult_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1jpmult,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Jackpot Multiplier (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1jpmult)
-GAMEL( 199?, m1jpmulta, m1jpmult, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Jackpot Multiplier (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1jpmult)
+GAMEL( 199?, m1jpmult,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Jackpot Multiplier (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1jpmult")
+GAMEL( 199?, m1jpmulta, m1jpmult, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Jackpot Multiplier (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1jpmult")
 
 /*******************************************************************************************************************************************************************************************************
   Living In America
@@ -3125,8 +3065,8 @@ GAME( 199?, m1nudunle, m1nudunl, maygay_m1, maygay_m1, maygay1b_state, init_m1, 
 ROM_START( m1omega )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa4-089.bin", 0x0000, 0x010000, CRC(ada5f2ae) SHA1(190813e17460acd1f43606da08ac50e0e0fe2108) ) m1_omega_sound ROM_END_M1A_MCU
 ROM_START( m1omegaa ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa4-090.bin", 0x0000, 0x010000, CRC(2d330fc6) SHA1(a74a83a3824e6593fed8ebfd341151f56c1f47fa) ) m1_omega_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1omega,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Omega (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1omega)
-GAMEL( 199?, m1omegaa, m1omega, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Omega (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1omega)
+GAMEL( 199?, m1omega,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Omega (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1omega")
+GAMEL( 199?, m1omegaa, m1omega, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Omega (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1omega")
 
 /*******************************************************************************************************************************************************************************************************
   Over The Top
@@ -3184,9 +3124,9 @@ ROM_START( m1search )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1searcha ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sl2p_3",       0x0000, 0x010000, CRC(14c5f609) SHA1(26f41ee6697ac22cb91e092303d1916bd2441514) ) m1_search_sound ROM_END_M1A_MCU
 ROM_START( m1searchb ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sl5p6ac",      0x0000, 0x010000, CRC(f92143fd) SHA1(c0e1645eb4dc247fc4ba1da3a915288ba3ba9798) ) m1_search_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1search,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Search Light (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1search)
-GAMEL( 199?, m1searcha, m1search, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Search Light (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1search)
-GAMEL( 199?, m1searchb, m1search, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Search Light (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1search)
+GAMEL( 199?, m1search,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Search Light (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1search")
+GAMEL( 199?, m1searcha, m1search, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Search Light (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1search")
+GAMEL( 199?, m1searchb, m1search, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Search Light (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1search")
 
 /*******************************************************************************************************************************************************************************************************
   Six Spinner
@@ -3228,12 +3168,12 @@ ROM_START( m1sptlgtc ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1sptlgtd ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("spotbwb.bin",      0x0000, 0x010000, CRC(288a4462) SHA1(8ade1b87d586591a9543a0400f140dd38ae2206a) ) m1_sptlgt_sound ROM_END_M1A_MCU
 ROM_START( m1sptlgte ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("spt05___.1_1",     0x0000, 0x010000, CRC(0e77cdc4) SHA1(7edfc1498768461883e943cf7b50869791a5e0d2) ) m1_sptlgt_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1sptlgt,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Spotlight (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1sptlgtc)
-GAMEL( 199?, m1sptlgta, m1sptlgt, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Spotlight (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1sptlgtc)
-GAMEL( 199?, m1sptlgtb, m1sptlgt, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Spotlight (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1sptlgtc)
-GAMEL( 199?, m1sptlgtc, m1sptlgt, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Spotlight (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1sptlgtc)
-GAMEL( 199?, m1sptlgtd, m1sptlgt, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Spotlight (Maygay) (M1A/B) (set 5)",GAME_FLAGS,layout_m1sptlgtc)
-GAMEL( 199?, m1sptlgte, m1sptlgt, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Spotlight (Maygay) (M1A/B) (set 6)",GAME_FLAGS,layout_m1sptlgtc)
+GAMEL( 199?, m1sptlgt,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Spotlight (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1sptlgtc")
+GAMEL( 199?, m1sptlgta, m1sptlgt, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Spotlight (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1sptlgtc")
+GAMEL( 199?, m1sptlgtb, m1sptlgt, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Spotlight (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1sptlgtc")
+GAMEL( 199?, m1sptlgtc, m1sptlgt, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Spotlight (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1sptlgtc")
+GAMEL( 199?, m1sptlgtd, m1sptlgt, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Spotlight (Maygay) (M1A/B) (set 5)",GAME_FLAGS,"m1sptlgtc")
+GAMEL( 199?, m1sptlgte, m1sptlgt, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Spotlight (Maygay) (M1A/B) (set 6)",GAME_FLAGS,"m1sptlgtc")
 
 /*******************************************************************************************************************************************************************************************************
   Sudden Impact
@@ -3247,10 +3187,10 @@ ROM_START( m1sudnima ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
 ROM_START( m1sudnimb ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("si2p",     0x0000, 0x010000, CRC(0ce156f1) SHA1(8f657a6226e81dd4ef26c4d58ac65c2f9d0951f0) ) m1_sudnim_sound ROM_END_M1A_MCU
 ROM_START( m1sudnimc ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("si5p",     0x0000, 0x010000, CRC(f1893852) SHA1(a942c3918179e03b01a04f3295dd6e0483061c8d) ) m1_sudnim_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1sudnim,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Sudden Impact (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1sudnima)
-GAMEL( 199?, m1sudnima, m1sudnim, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Sudden Impact (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1sudnima)
-GAMEL( 199?, m1sudnimb, m1sudnim, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Sudden Impact (Maygay) (M1A/B) (set 3)",GAME_FLAGS,layout_m1sudnima)
-GAMEL( 199?, m1sudnimc, m1sudnim, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Sudden Impact (Maygay) (M1A/B) (set 4)",GAME_FLAGS,layout_m1sudnima)
+GAMEL( 199?, m1sudnim,  0,        maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Sudden Impact (Maygay) (M1A/B) (set 1)",GAME_FLAGS,"m1sudnima")
+GAMEL( 199?, m1sudnima, m1sudnim, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Sudden Impact (Maygay) (M1A/B) (set 2)",GAME_FLAGS,"m1sudnima")
+GAMEL( 199?, m1sudnimb, m1sudnim, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Sudden Impact (Maygay) (M1A/B) (set 3)",GAME_FLAGS,"m1sudnima")
+GAMEL( 199?, m1sudnimc, m1sudnim, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Sudden Impact (Maygay) (M1A/B) (set 4)",GAME_FLAGS,"m1sudnima")
 
 /*******************************************************************************************************************************************************************************************************
   Top Tenner
@@ -3422,7 +3362,7 @@ GAME( 199?, m1racesc, m1races, maygay_m1, maygay_m1, maygay1b_state, init_m1, RO
 	/* missing or different sound system? */
 ROM_START( m1topstr ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa1-184", 0x0000, 0x010000, CRC(93518981) SHA1(51e5f4e665c7b3cf7d62036e4267216c36726d3f) ) m1_topstr_sound ROM_END_M1A_MCU
 
-GAMEL( 199?, m1topstr, 0, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Top Strike (Maygay - Bwb) (M1A/B)",GAME_FLAGS,layout_m1topstr)
+GAMEL( 199?, m1topstr, 0, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Top Strike (Maygay - Bwb) (M1A/B)",GAME_FLAGS,"m1topstr")
 
 /*******************************************************************************************************************************************************************************************************
   Strike It Rich
@@ -3453,10 +3393,10 @@ ROM_START( m1luxora ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
 ROM_START( m1luxorb ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("lux_pound5",            0x0000, 0x020000, CRC(a5d78869) SHA1(0b76345374554d467c78751083a6b3ce2499f795) ) m1_luxor_sound ROM_END_M1A_MCU
 ROM_START( m1luxorc ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("lux_pound15",       0x0000, 0x020000, CRC(94e8d1c2) SHA1(7a50477cf2d4bb404d2e33dd545c51e62bf4031d) ) m1_luxor_sound ROM_END_M1A_MCU
 
-GAMEL( 1994, m1luxor,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Luxor Casino (Gemini) (M1A/B) (set 1)",GAME_FLAGS,layout_m1luxorb)
-GAMEL( 1994, m1luxora, m1luxor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Luxor Casino (Gemini) (M1A/B) (set 2)",GAME_FLAGS,layout_m1luxorb)
-GAMEL( 1994, m1luxorb, m1luxor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Luxor Casino (Gemini) (M1A/B) (set 3)",GAME_FLAGS,layout_m1luxorb)//3_2
-GAMEL( 1994, m1luxorc, m1luxor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Luxor Casino (Gemini) (M1A/B) (set 4)",GAME_FLAGS,layout_m1luxorb)//2_1
+GAMEL( 1994, m1luxor,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Luxor Casino (Gemini) (M1A/B) (set 1)",GAME_FLAGS,"m1luxorb")
+GAMEL( 1994, m1luxora, m1luxor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Luxor Casino (Gemini) (M1A/B) (set 2)",GAME_FLAGS,"m1luxorb")
+GAMEL( 1994, m1luxorb, m1luxor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Luxor Casino (Gemini) (M1A/B) (set 3)",GAME_FLAGS,"m1luxorb")//3_2
+GAMEL( 1994, m1luxorc, m1luxor, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Gemini", "Luxor Casino (Gemini) (M1A/B) (set 4)",GAME_FLAGS,"m1luxorb")//2_1
 
 /*******************************************************************************************************************************************************************************************************
   Cash Classic

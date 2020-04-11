@@ -128,7 +128,7 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 	upd.co0_func().set(FUNC(epson_lx810l_device::co0_w));
 	upd.co1_func().set("dac", FUNC(dac_bit_interface::write));
 
-//  config.set_default_layout(layout_lx800);
+//  config.set_default_layout("lx800");
 
 	/* video hardware (simulates paper) */
 	screen_device &screen(SCREEN(config, m_screen, SCREEN_TYPE_RASTER));

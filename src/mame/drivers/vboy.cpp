@@ -38,7 +38,7 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#include "vboy.lh"
+
 
 
 #define READ_BGMAP(bgoffs) m_bgmap[(bgoffs) & 0xffff]
@@ -1263,7 +1263,7 @@ void vboy_state::vboy(machine_config &config)
 	TIMER(config, "timer_pad").configure_periodic(FUNC(vboy_state::timer_pad_tick), attotime::from_hz(50.038029f));
 
 	/* video hardware */
-	config.set_default_layout(layout_vboy);
+	config.set_default_layout("vboy");
 	PALETTE(config, m_palette, FUNC(vboy_state::vboy_palette), 4);
 
 	/* Left screen */

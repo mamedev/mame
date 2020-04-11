@@ -100,7 +100,7 @@
 #include "speaker.h"
 #include "tilemap.h"
 
-#include "sanremo.lh"
+
 
 
 #define MASTER_CLOCK    XTAL(18'000'000)
@@ -423,4 +423,4 @@ ROM_END
 *********************************************/
 
 //     YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        ROT   COMPANY           FULLNAME       FLAGS                    LAYOUT
-GAMEL( 1996, number1, 0,      sanremo, number1, sanremo_state, empty_init, ROT0, "San Remo Games", "Number One",  MACHINE_SUPPORTS_SAVE,   layout_sanremo )
+GAMEL( 1996, number1, 0,      sanremo, number1, sanremo_state, empty_init, ROT0, "San Remo Games", "Number One",  MACHINE_SUPPORTS_SAVE,   "sanremo" )

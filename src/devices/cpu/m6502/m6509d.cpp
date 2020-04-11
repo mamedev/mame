@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "m6509d.h"
-#include "cpu/m6502/m6509d.hxx"
+#include "emu/cpu/m6502/m6509d.hxx"
 
 m6509_disassembler::m6509_disassembler() : m6502_base_disassembler(disasm_entries)
 {

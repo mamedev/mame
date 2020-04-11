@@ -87,7 +87,6 @@
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-#include "dolphunk.lh"
 
 
 class dauphin_state : public driver_device
@@ -236,7 +235,7 @@ void dauphin_state::dauphin(machine_config &config)
 	m_maincpu->flag_handler().set([this] (bool state) { m_cassbit = state; });
 
 	/* video hardware */
-	config.set_default_layout(layout_dolphunk);
+	config.set_default_layout("dolphunk");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

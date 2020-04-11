@@ -82,7 +82,6 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
-#include "pasha2.lh"
 
 
 class pasha2_state : public driver_device
@@ -472,4 +471,4 @@ void pasha2_state::init_pasha2()
 	m_mainbank->set_entry(0);
 }
 
-GAMEL( 1998, pasha2, 0, pasha2, pasha2, pasha2_state, init_pasha2, ROT0, "Dong Sung", "Pasha Pasha 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_pasha2 )
+GAMEL( 1998, pasha2, 0, pasha2, pasha2, pasha2_state, init_pasha2, ROT0, "Dong Sung", "Pasha Pasha 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "pasha2" )

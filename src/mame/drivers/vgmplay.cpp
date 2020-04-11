@@ -55,7 +55,7 @@
 #include "audio/wswan.h"
 #include "machine/mega32x.h"
 
-#include "vgmplay.lh"
+
 #include "debugger.h"
 #include "speaker.h"
 
@@ -3471,7 +3471,7 @@ void vgmplay_state::vgmplay(machine_config &config)
 
 	SOFTWARE_LIST(config, "vgm_list").set_original("vgmplay");
 
-	config.set_default_layout(layout_vgmplay);
+	config.set_default_layout("vgmplay");
 
 	SN76489(config, m_sn76489[0], 0);
 	m_sn76489[0]->add_route(0, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);

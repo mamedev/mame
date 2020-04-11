@@ -19,7 +19,6 @@ ToDo:
 #include "softlist.h"
 #include "speaker.h"
 
-#include "aim65.lh"
 
 
 /** R6502 Clock.
@@ -211,7 +210,7 @@ void aim65_state::aim65(machine_config &config)
 	M6502(config, m_maincpu, AIM65_CLOCK); /* 1 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &aim65_state::mem_map);
 
-	config.set_default_layout(layout_aim65);
+	config.set_default_layout("aim65");
 
 	/* alpha-numeric display */
 	DL1416T(config, m_ds[0], u32(0));

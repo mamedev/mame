@@ -356,7 +356,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "softlist.h"
 #include "screen.h"
 
-#include "rainbow.lh" // BEZEL - LAYOUT with LEDs for diag 1-7, keyboard 8-11 and floppy 20-23
+ // BEZEL - LAYOUT with LEDs for diag 1-7, keyboard 8-11 and floppy 20-23
 
 #define RD51_MAX_HEAD 8
 #define RD51_MAX_CYLINDER 1024
@@ -3215,7 +3215,7 @@ void rainbow_base_state::upd7220_map(address_map &map)
 
 void rainbow_base_state::rainbow_base(machine_config &config)
 {
-	config.set_default_layout(layout_rainbow);
+	config.set_default_layout("rainbow");
 
 	/* basic machine hardware */
 	I8088(config, m_i8088, 24.0734_MHz_XTAL / 5); // approximately 4.815 MHz

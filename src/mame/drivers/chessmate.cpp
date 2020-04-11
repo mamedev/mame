@@ -47,10 +47,6 @@ MOS MPS 6332 005 2179
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "chessmate.lh" // clickable
-#include "novag_mk2.lh" // clickable
-#include "novag_mk2a.lh" // clickable
 
 
 namespace {
@@ -278,7 +274,7 @@ void chmate_state::chmate(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4+1, 8);
 	m_display->set_segmask(0xf, 0xff);
-	config.set_default_layout(layout_chessmate);
+	config.set_default_layout("chessmate");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -289,13 +285,13 @@ void chmate_state::chmate(machine_config &config)
 void chmate_state::mk2(machine_config &config)
 {
 	chmate(config);
-	config.set_default_layout(layout_novag_mk2);
+	config.set_default_layout("novag_mk2");
 }
 
 void chmate_state::mk2a(machine_config &config)
 {
 	chmate(config);
-	config.set_default_layout(layout_novag_mk2a);
+	config.set_default_layout("novag_mk2a");
 }
 
 

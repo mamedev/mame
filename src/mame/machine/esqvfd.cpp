@@ -8,8 +8,8 @@
 #include "emu.h"
 #include "esqvfd.h"
 
-#include "esq1by22.lh"
-#include "esq2by40.lh"
+
+
 
 DEFINE_DEVICE_TYPE(ESQ1X22,     esq1x22_device,     "esq1x22",     "Ensoniq 1x22 VFD")
 DEFINE_DEVICE_TYPE(ESQ2X40,     esq2x40_device,     "esq2x40",     "Ensoniq 2x40 VFD")
@@ -171,7 +171,7 @@ void esqvfd_device::update_display()
 
 void esq2x40_device::device_add_mconfig(machine_config &config)
 {
-	config.set_default_layout(layout_esq2by40);
+	config.set_default_layout("esq2by40");
 }
 
 void esq2x40_device::write_char(int data)
@@ -305,7 +305,7 @@ esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, d
 
 void esq1x22_device::device_add_mconfig(machine_config &config)
 {
-	config.set_default_layout(layout_esq1by22);
+	config.set_default_layout("esq1by22");
 }
 
 
@@ -353,7 +353,7 @@ esq1x22_device::esq1x22_device(const machine_config &mconfig, const char *tag, d
 /* SQ-1 display, I think it's really an LCD but we'll deal with it for now */
 void esq2x40_sq1_device::device_add_mconfig(machine_config &config)
 {
-	config.set_default_layout(layout_esq2by40);  // we use the normal 2x40 layout
+	config.set_default_layout("esq2by40");  // we use the normal 2x40 layout
 }
 
 void esq2x40_sq1_device::write_char(int data)

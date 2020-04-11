@@ -44,7 +44,6 @@
 #include "emu.h"
 
 #include "machine/eispc_kb.h"
-#include "epc.lh"
 
 // Devices
 #include "cpu/i86/i86.h"
@@ -782,7 +781,7 @@ static void epc_sd_floppies(device_slot_interface &device)
 
 void epc_state::epc(machine_config &config)
 {
-	config.set_default_layout(layout_epc);
+	config.set_default_layout("epc");
 
 	// CPU
 	I8088(config, m_maincpu, XTAL(14'318'181) / 3.0); // TWE crystal marked X1 verified divided through a 82874

@@ -23,8 +23,6 @@ Hardware:
 #include "video/pcf2100.h"
 #include "speaker.h"
 
-// internal artwork
-#include "mephisto_mondial68k.lh"
 
 
 class mondial68k_state : public driver_device
@@ -236,7 +234,7 @@ void mondial68k_state::mondial68k(machine_config &config)
 	/* video hardware */
 	PCF2112(config, m_lcd, 50); // frequency guessed
 	m_lcd->write_segs().set(FUNC(mondial68k_state::lcd_s_w));
-	config.set_default_layout(layout_mephisto_mondial68k);
+	config.set_default_layout("mephisto_mondial68k");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

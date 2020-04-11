@@ -87,7 +87,6 @@ FS 0 to F
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "render.h"
-#include "mekd5.lh"
 
 #define XTAL_MEKD5 3.579545_MHz_XTAL
 
@@ -468,7 +467,7 @@ void mekd5_state::mekd5(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(6, 7);
 	m_display->set_segmask(0x3f, 0x7f);
 
-	config.set_default_layout(layout_mekd5);
+	config.set_default_layout("mekd5");
 
 	SPEAKER(config, "mono").front_center();
 

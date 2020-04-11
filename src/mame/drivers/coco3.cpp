@@ -18,7 +18,6 @@
 #include "cpu/m6809/hd6309.h"
 #include "formats/coco_cas.h"
 #include "softlist.h"
-#include "coco3.lh"
 
 
 
@@ -293,7 +292,7 @@ void coco3_state::coco3(machine_config &config)
 	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
 
 	// video hardware
-	config.set_default_layout(layout_coco3);
+	config.set_default_layout("coco3");
 
 	GIME_NTSC(config, m_gime, XTAL(28'636'363), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG);
 	m_gime->set_screen(COMPOSITE_SCREEN_TAG);

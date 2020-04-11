@@ -154,7 +154,6 @@
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "jankenmn.lh"
 
 #define MASTER_CLOCK        XTAL(2'500'000)
 
@@ -440,4 +439,4 @@ ROM_END
 *********************************************/
 
 //     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT   COMPANY    FULLNAME                    FLAGS                  LAYOUT
-GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, jankenmn_state, empty_init, ROT0, "Sunwise", "Janken Man Kattara Ageru", MACHINE_SUPPORTS_SAVE, layout_jankenmn )
+GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, jankenmn_state, empty_init, ROT0, "Sunwise", "Janken Man Kattara Ageru", MACHINE_SUPPORTS_SAVE, "jankenmn" )

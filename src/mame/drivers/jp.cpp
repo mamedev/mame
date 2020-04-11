@@ -26,7 +26,6 @@ ToDo:
 #include "sound/msm5205.h"
 #include "speaker.h"
 
-#include "jp.lh"
 
 
 class jp_state : public genpin_class
@@ -371,7 +370,7 @@ void jp_state::jp(machine_config &config)
 	LS259(config, m_latch[9]);
 
 	/* Video */
-	config.set_default_layout(layout_jp);
+	config.set_default_layout("jp");
 
 	/* Sound */
 	genpin_audio(config);

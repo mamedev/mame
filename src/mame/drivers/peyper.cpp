@@ -40,7 +40,6 @@ ToDo:
 #include "sound/ay8910.h"
 #include "speaker.h"
 
-#include "peyper.lh"
 
 class peyper_state : public genpin_class
 {
@@ -610,7 +609,7 @@ void peyper_state::peyper(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	config.set_default_layout(layout_peyper);
+	config.set_default_layout("peyper");
 
 	/* Sound */
 	genpin_audio(config);

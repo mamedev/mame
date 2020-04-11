@@ -35,8 +35,6 @@ the S14001A in the 70s), this time a 65C02 software solution.
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_chesster.lh" // clickable
 
 
 namespace {
@@ -206,7 +204,7 @@ void chesster_state::chesster(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(2, 9);
-	config.set_default_layout(layout_fidel_chesster);
+	config.set_default_layout("fidel_chesster");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -23,7 +23,6 @@ Electro-mechanical bubble hockey games:
 #include "sound/digitalk.h"
 #include "speaker.h"
 
-#include "chexx.lh"
 
 
 #define MAIN_CLOCK XTAL(4'000'000)
@@ -395,7 +394,7 @@ void chexx_state::chexx(machine_config &config)
 	m_via->irq_handler().set(FUNC(chexx_state::via_irq_out));
 
 	// Layout
-	config.set_default_layout(layout_chexx);
+	config.set_default_layout("chexx");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -60,7 +60,6 @@
 
 #include "debugger.h"
 
-#include "jazz.lh"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -323,7 +322,7 @@ void jazz_state::jazz(machine_config &config)
 
 	// TODO: 4 EISA slots
 
-	config.set_default_layout(layout_jazz);
+	config.set_default_layout("jazz");
 
 	// software list
 	SOFTWARE_LIST(config, m_softlist).set_original("jazz");

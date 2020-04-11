@@ -42,7 +42,6 @@
 #include "machine/genpin.h"
 #include "cpu/mcs40/mcs40.h"
 
-#include "flicker.lh"
 
 
 class flicker_state : public genpin_class
@@ -408,7 +407,7 @@ void flicker_state::flicker(machine_config &config)
 	m_maincpu->cm_ram_cb<2>().set(FUNC(flicker_state::cm_ram2_w));
 
 	// video
-	config.set_default_layout(layout_flicker);
+	config.set_default_layout("flicker");
 
 	// sound
 	genpin_audio(config);

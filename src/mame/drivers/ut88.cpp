@@ -27,7 +27,7 @@ Paste facility was tested but doesn't work, so all code remnants removed.
 
 #include "formats/rk_cas.h"
 #include "softlist.h"
-#include "ut88mini.lh"
+
 #include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
@@ -235,7 +235,7 @@ void ut88mini_state::ut88mini(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ut88mini_state::io_map);
 
 	/* video hardware */
-	config.set_default_layout(layout_ut88mini);
+	config.set_default_layout("ut88mini");
 
 	/* Cassette */
 	SPEAKER(config, "speaker").front_center();

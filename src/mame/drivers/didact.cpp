@@ -54,10 +54,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-// Generated artwork includes
-#include "mp68a.lh"
-#include "md6802.lh"
-#include "modulab.lh"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -783,7 +779,7 @@ void modulab_state::modulab(machine_config &config)
 	m6802_cpu_device &maincpu(M6802(config, m_maincpu, XTAL(4'000'000)));
 	maincpu.set_ram_enable(false); // Schematics holds RAM enable low so that the M6802 internal RAM is disabled.
 	maincpu.set_addrmap(AS_PROGRAM, &modulab_state::modulab_map);
-	config.set_default_layout(layout_modulab);
+	config.set_default_layout("modulab");
 
 	/* Devices */
 	MM74C923(config, m_kb, 0);
@@ -808,7 +804,7 @@ void md6802_state::md6802(machine_config &config)
 	m6802_cpu_device &maincpu(M6802(config, m_maincpu, XTAL(4'000'000)));
 	maincpu.set_ram_enable(false);
 	maincpu.set_addrmap(AS_PROGRAM, &md6802_state::md6802_map);
-	config.set_default_layout(layout_md6802);
+	config.set_default_layout("md6802");
 
 	/* Devices */
 	TTL74145(config, m_tb16_74145, 0);
@@ -843,7 +839,7 @@ void mp68a_state::mp68a(machine_config &config)
 	// Trimpot seems broken/stuck at 5K Ohm thu. ROM code 1Ms delay loops suggest 1MHz+
 	M6800(config, m_maincpu, 505000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mp68a_state::mp68a_map);
-	config.set_default_layout(layout_mp68a);
+	config.set_default_layout("mp68a");
 
 	/* Devices */
 	/* PIA #1 0x500-0x503 - used differently by laborations and loaded software */

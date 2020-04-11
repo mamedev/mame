@@ -7,7 +7,7 @@
 #include "emu.h"
 #include "mulcd.h"
 
-#include "../machine/mulcd.hxx"
+#include "mame/machine/mulcd.hxx"
 
 DEFINE_DEVICE_TYPE(MULCD, mulcd_device, "mulcd", "Yamaha MU/VL70/FS1R common LCD")
 

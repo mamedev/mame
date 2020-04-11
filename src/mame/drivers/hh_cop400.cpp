@@ -26,23 +26,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-// internal artwork
-#include "bship82.lh" // clickable
-#include "ctstein.lh" // clickable
-#include "einvaderc.lh"
-#include "funjacks.lh" // clickable
-#include "funrlgl.lh"
-#include "h2hbaskbc.lh"
-#include "h2hhockeyc.lh"
-#include "h2hsoccerc.lh"
-#include "lchicken.lh" // clickable
-#include "lightfgt.lh" // clickable
-#include "mdallas.lh"
-#include "qkracer.lh"
-#include "unkeinv.lh"
-#include "vidchal.lh"
-
-//#include "hh_cop400_test.lh" // common test-layout - use external artwork
 
 
 class hh_cop400_state : public driver_device
@@ -221,7 +204,7 @@ void ctstein_state::ctstein(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
-	config.set_default_layout(layout_ctstein);
+	config.set_default_layout("ctstein");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -369,7 +352,7 @@ void h2hbaskbc_state::h2hbaskbc(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(16, 7);
 	m_display->set_segmask(3, 0x7f);
-	config.set_default_layout(layout_h2hbaskbc);
+	config.set_default_layout("h2hbaskbc");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -379,13 +362,13 @@ void h2hbaskbc_state::h2hbaskbc(machine_config &config)
 void h2hbaskbc_state::h2hhockeyc(machine_config &config)
 {
 	h2hbaskbc(config);
-	config.set_default_layout(layout_h2hhockeyc);
+	config.set_default_layout("h2hhockeyc");
 }
 
 void h2hbaskbc_state::h2hsoccerc(machine_config &config)
 {
 	h2hbaskbc(config);
-	config.set_default_layout(layout_h2hsoccerc);
+	config.set_default_layout("h2hsoccerc");
 }
 
 // roms
@@ -507,7 +490,7 @@ void einvaderc_state::einvaderc(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(7, 0x7f);
-	config.set_default_layout(layout_einvaderc);
+	config.set_default_layout("einvaderc");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -636,7 +619,7 @@ void unkeinv_state::unkeinv(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8+12, 8+8);
-	config.set_default_layout(layout_unkeinv);
+	config.set_default_layout("unkeinv");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -801,7 +784,7 @@ void lchicken_state::lchicken(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(3, 4);
-	config.set_default_layout(layout_lchicken);
+	config.set_default_layout("lchicken");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -922,7 +905,7 @@ void funjacks_state::funjacks(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 2);
-	config.set_default_layout(layout_funjacks);
+	config.set_default_layout("funjacks");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1023,7 +1006,7 @@ void funrlgl_state::funrlgl(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 4);
 	m_display->set_bri_levels(0.01, 0.1); // top led is brighter
-	config.set_default_layout(layout_funrlgl);
+	config.set_default_layout("funrlgl");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1166,7 +1149,7 @@ void mdallas_state::mdallas(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	m_display->set_segmask(0xff, 0xff);
-	config.set_default_layout(layout_mdallas);
+	config.set_default_layout("mdallas");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1391,7 +1374,7 @@ void lightfgt_state::lightfgt(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(5, 5);
-	config.set_default_layout(layout_lightfgt);
+	config.set_default_layout("lightfgt");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1553,7 +1536,7 @@ void bship82_state::bship82(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
-	config.set_default_layout(layout_bship82);
+	config.set_default_layout("bship82");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1692,7 +1675,7 @@ void qkracer_state::qkracer(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0xdf, 0x7f);
 	m_display->set_segmask(0x20, 0x41); // equals sign
-	config.set_default_layout(layout_qkracer);
+	config.set_default_layout("qkracer");
 
 	/* no sound! */
 }
@@ -1791,7 +1774,7 @@ void vidchal_state::vidchal(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(6+1, 8);
 	m_display->set_segmask(0x3f, 0xff);
-	config.set_default_layout(layout_vidchal);
+	config.set_default_layout("vidchal");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

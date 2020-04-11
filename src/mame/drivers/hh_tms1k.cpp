@@ -169,90 +169,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-// internal artwork
-#include "7in1ss.lh"
-#include "alphie.lh"
-#include "amaztron.lh" // clickable
-#include "arcmania.lh" // clickable
-#include "arrball.lh"
-#include "astro.lh"
-#include "bankshot.lh"
-#include "bcheetah.lh"
-#include "bigtrak.lh"
-#include "bship.lh" // clickable
-#include "cmsport.lh"
-#include "cmulti8.lh"
-#include "cnbaskb.lh"
-#include "cnfball.lh"
-#include "cnfball2.lh"
-#include "cnsector.lh" // clickable
-#include "comp4.lh" // clickable
-#include "copycat.lh" // clickable
-#include "copycatm2.lh" // clickable
-#include "dataman.lh"
-#include "ditto.lh" // clickable
-#include "cqback.lh"
-#include "ebball.lh"
-#include "ebball2.lh"
-#include "ebball3.lh"
-#include "ebaskb2.lh"
-#include "efootb4.lh"
-#include "einvader.lh"
-#include "elecbowl.lh"
-#include "elecdet.lh"
-#include "eleciq.lh" // clickable
-#include "esbattle.lh"
-#include "esoccer.lh"
-#include "f2pbball.lh"
-#include "f3in1.lh"
-#include "fxmcr165.lh" // clickable
-#include "gjackpot.lh"
-#include "gpoker.lh"
-#include "h2hbaseb.lh"
-#include "h2hbaskb.lh"
-#include "h2hboxing.lh"
-#include "h2hfootb.lh"
-#include "h2hhockey.lh"
-#include "horseran.lh"
-#include "lostreas.lh" // clickable
-#include "matchnum.lh" // clickable
-#include "mathmagi.lh"
-#include "mathmarv.lh"
-#include "mbdtower.lh" // clickable
-#include "mdndclab.lh" // clickable
-#include "merlin.lh" // clickable
-#include "mmerlin.lh" // clickable
-#include "monkeysee.lh"
-#include "phpball.lh"
-#include "qfire.lh" // clickable
-#include "quizwizc.lh"
-#include "raisedvl.lh"
-#include "simon.lh" // clickable
-#include "speechp.lh"
-#include "splitsec.lh"
-#include "ssimon.lh" // clickable
-#include "ssports4.lh"
-#include "starwbc.lh" // clickable
-#include "stopthief.lh" // clickable
-#include "tandy12.lh" // clickable
-#include "tbreakup.lh"
-#include "tc4.lh"
-#include "tcfball.lh"
-#include "tcfballa.lh"
-#include "ti1250.lh"
-#include "ti1270.lh"
-#include "ti25503.lh"
-#include "ti30.lh"
-#include "timaze.lh"
-#include "tisr16.lh"
-#include "tithermos.lh"
-#include "wizatron.lh"
-#include "xl25.lh" // clickable
-#include "zodiac.lh" // clickable
-
-//#include "hh_tms1k_test.lh" // common test-layout - use external artwork
-
-
 // machine_start/reset
 
 void hh_tms1k_state::machine_start()
@@ -486,7 +402,7 @@ void matchnum_state::matchnum(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_matchnum);
+	config.set_default_layout("matchnum");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -598,7 +514,7 @@ void arrball_state::arrball(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(7, 7);
 	m_display->set_segmask(0x10, 0x7f);
 	m_display->set_segmask(0x20, 0x06); // left digit only segments B and C
-	config.set_default_layout(layout_arrball);
+	config.set_default_layout("arrball");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -765,7 +681,7 @@ void mathmagi_state::mathmagi(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(11, 7);
 	m_display->set_segmask(0xff, 0x7f);
-	config.set_default_layout(layout_mathmagi);
+	config.set_default_layout("mathmagi");
 
 	/* no sound! */
 }
@@ -882,7 +798,7 @@ void bcheetah_state::bcheetah(machine_config &config)
 	m_maincpu->o().set(FUNC(bcheetah_state::write_o));
 
 	/* no visual feedback! */
-	config.set_default_layout(layout_bcheetah);
+	config.set_default_layout("bcheetah");
 
 	/* no sound! */
 }
@@ -1047,7 +963,7 @@ void cmulti8_state::cmulti8(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(21, 8);
 	m_display->set_segmask(0xfffff, 0xff);
-	config.set_default_layout(layout_cmulti8);
+	config.set_default_layout("cmulti8");
 
 	/* no sound! */
 }
@@ -1188,7 +1104,7 @@ void amaztron_state::amaztron(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
 	m_display->set_segmask(0xc, 0x7f);
-	config.set_default_layout(layout_amaztron);
+	config.set_default_layout("amaztron");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1341,7 +1257,7 @@ void zodiac_state::zodiac(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0xff, 0x7f);
-	config.set_default_layout(layout_zodiac);
+	config.set_default_layout("zodiac");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1473,7 +1389,7 @@ void cqback_state::cqback(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
 	m_display->set_segmask(0x1ff, 0xff);
 	m_display->set_bri_levels(0.003, 0.03); // offense leds are brighter
-	config.set_default_layout(layout_cqback);
+	config.set_default_layout("cqback");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1605,7 +1521,7 @@ void h2hfootb_state::h2hfootb(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(9, 9);
 	m_display->set_segmask(0x1ff, 0x7f);
 	m_display->set_bri_levels(0.003, 0.03); // offense leds are brighter
-	config.set_default_layout(layout_h2hfootb);
+	config.set_default_layout("h2hfootb");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1793,7 +1709,7 @@ void h2hbaskb_state::h2hbaskb(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(6+6, 7);
 	m_display->set_segmask(0xc0, 0x7f);
-	config.set_default_layout(layout_h2hbaskb);
+	config.set_default_layout("h2hbaskb");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1804,7 +1720,7 @@ void h2hbaskb_state::h2hbaskb(machine_config &config)
 void h2hbaskb_state::h2hhockey(machine_config &config)
 {
 	h2hbaskb(config);
-	config.set_default_layout(layout_h2hhockey);
+	config.set_default_layout("h2hhockey");
 }
 
 // roms
@@ -1956,7 +1872,7 @@ void h2hbaseb_state::h2hbaseb(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 9);
 	m_display->set_segmask(0x1ff, 0x7f);
-	config.set_default_layout(layout_h2hbaseb);
+	config.set_default_layout("h2hbaseb");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2081,7 +1997,7 @@ void h2hboxing_state::h2hboxing(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(11, 8);
 	m_display->set_segmask(0x600, 0x7f);
-	config.set_default_layout(layout_h2hboxing);
+	config.set_default_layout("h2hboxing");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2263,7 +2179,7 @@ void quizwizc_state::quizwizc(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10+1, 8);
 	m_display->set_segmask(0x3c0, 0x7f);
-	config.set_default_layout(layout_quizwizc);
+	config.set_default_layout("quizwizc");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2451,7 +2367,7 @@ void tc4_state::tc4(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(10, 9);
 	m_display->set_segmask(0x3a0, 0x7f);
 	m_display->set_bri_levels(0.005, 0.05); // offense leds are brighter
-	config.set_default_layout(layout_tc4);
+	config.set_default_layout("tc4");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2581,7 +2497,7 @@ void cnbaskb_state::cnbaskb(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0x180, 0x7f);
 	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
-	config.set_default_layout(layout_cnbaskb);
+	config.set_default_layout("cnbaskb");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2708,7 +2624,7 @@ void cmsport_state::cmsport(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x60, 0x7f);
 	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
-	config.set_default_layout(layout_cmsport);
+	config.set_default_layout("cmsport");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2844,7 +2760,7 @@ void cnfball_state::cnfball(machine_config &config)
 	m_display->set_segmask(0xc3, 0x7f);
 	m_display->set_segmask(0x38, 0xff); // only the middle 3 7segs have DP
 	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
-	config.set_default_layout(layout_cnfball);
+	config.set_default_layout("cnfball");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2975,7 +2891,7 @@ void cnfball2_state::cnfball2(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
 	m_display->set_segmask(0x1ff, 0xff);
-	config.set_default_layout(layout_cnfball2);
+	config.set_default_layout("cnfball2");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3124,7 +3040,7 @@ void eleciq_state::eleciq(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0x180, 0x7f);
-	config.set_default_layout(layout_eleciq);
+	config.set_default_layout("eleciq");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3240,7 +3156,7 @@ void qfire_state::qfire(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(3, 7);
 	m_display->set_segmask(3, 0x7f);
-	config.set_default_layout(layout_qfire);
+	config.set_default_layout("qfire");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3359,7 +3275,7 @@ void esoccer_state::esoccer(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
 	m_display->set_segmask(0x300, 0x7f);
 	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
-	config.set_default_layout(layout_esoccer);
+	config.set_default_layout("esoccer");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3506,7 +3422,7 @@ void ebball_state::ebball(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0x100, 0x7f);
-	config.set_default_layout(layout_ebball);
+	config.set_default_layout("ebball");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3642,7 +3558,7 @@ void ebball2_state::ebball2(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(7, 0x7f);
-	config.set_default_layout(layout_ebball2);
+	config.set_default_layout("ebball2");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3826,7 +3742,7 @@ void ebball3_state::ebball3(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(10+2, 7);
 	m_display->set_segmask(3, 0x7f);
 	m_display->set_segmask(0xc00, 0x22);
-	config.set_default_layout(layout_ebball3);
+	config.set_default_layout("ebball3");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3950,7 +3866,7 @@ void esbattle_state::esbattle(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0x300, 0x7f);
-	config.set_default_layout(layout_esbattle);
+	config.set_default_layout("esbattle");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4073,7 +3989,7 @@ void einvader_state::einvader(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0x380, 0x7f);
 	m_display->set_bri_levels(0.01, 0.1); // ufo/player explosion is brighter
-	config.set_default_layout(layout_einvader);
+	config.set_default_layout("einvader");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4211,7 +4127,7 @@ void efootb4_state::efootb4(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(16, 7);
 	m_display->set_segmask(0xfc00, 0x7f);
-	config.set_default_layout(layout_efootb4);
+	config.set_default_layout("efootb4");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4349,7 +4265,7 @@ void ebaskb2_state::ebaskb2(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
 	m_display->set_segmask(0xf, 0x7f);
 	m_display->set_bri_levels(0.01, 0.1); // ball carrier led is brighter
-	config.set_default_layout(layout_ebaskb2);
+	config.set_default_layout("ebaskb2");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4497,7 +4413,7 @@ void raisedvl_state::raisedvl(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
 	m_display->set_segmask(7, 0x7f);
 	m_display->set_bri_levels(0.01, 0.125); // ball is brighter
-	config.set_default_layout(layout_raisedvl);
+	config.set_default_layout("raisedvl");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4633,7 +4549,7 @@ void f2pbball_state::f2pbball(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1e0, 0x7f);
-	config.set_default_layout(layout_f2pbball);
+	config.set_default_layout("f2pbball");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4779,7 +4695,7 @@ void f3in1_state::f3in1(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0x3c0, 0x7f);
 	m_display->set_bri_levels(0.003, 0.05); // player led is brighter
-	config.set_default_layout(layout_f3in1);
+	config.set_default_layout("f3in1");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4941,7 +4857,7 @@ void gpoker_state::gpoker(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(11, 14);
 	m_display->set_segmask(0x7ff, 0x20ff); // 7seg + bottom-right diagonal
-	config.set_default_layout(layout_gpoker);
+	config.set_default_layout("gpoker");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5067,7 +4983,7 @@ void gjackpot_state::gjackpot(machine_config &config)
 	m_maincpu->r().set(FUNC(gjackpot_state::write_r));
 	m_maincpu->o().set(FUNC(gpoker_state::write_o));
 
-	config.set_default_layout(layout_gjackpot);
+	config.set_default_layout("gjackpot");
 }
 
 // roms
@@ -5616,7 +5532,7 @@ void fxmcr165_state::fxmcr165(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1+1, 7);
 	m_display->set_segmask(1, 0x7f);
-	config.set_default_layout(layout_fxmcr165);
+	config.set_default_layout("fxmcr165");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5756,7 +5672,7 @@ void elecdet_state::elecdet(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(7, 7);
 	m_display->set_segmask(0x7f, 0x7f);
-	config.set_default_layout(layout_elecdet);
+	config.set_default_layout("elecdet");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5901,7 +5817,7 @@ void starwbc_state::starwbc(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0x140, 0x7f);
-	config.set_default_layout(layout_starwbc);
+	config.set_default_layout("starwbc");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6051,7 +5967,7 @@ void astro_state::astro(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0x3ff, 0xff);
-	config.set_default_layout(layout_astro);
+	config.set_default_layout("astro");
 
 	/* no sound! */
 }
@@ -6215,7 +6131,7 @@ void elecbowl_state::elecbowl(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(7, 8);
 	m_display->set_segmask(0xf, 0x7f);
 	m_display->set_segmask(0x10, 0x06); // 1
-	config.set_default_layout(layout_elecbowl);
+	config.set_default_layout("elecbowl");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6385,7 +6301,7 @@ void horseran_state::horseran(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(3+6, 24);
 	m_display->set_segmask(0x3f<<3, 0x7f);
-	config.set_default_layout(layout_horseran);
+	config.set_default_layout("horseran");
 
 	/* no sound! */
 }
@@ -6574,7 +6490,7 @@ void mdndclab_state::mdndclab(machine_config &config)
 	m_maincpu->o().set(FUNC(mdndclab_state::write_o));
 
 	/* no visual feedback! */
-	config.set_default_layout(layout_mdndclab); // playing board
+	config.set_default_layout("mdndclab"); // playing board
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6690,7 +6606,7 @@ void comp4_state::comp4(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 11);
-	config.set_default_layout(layout_comp4);
+	config.set_default_layout("comp4");
 
 	/* no sound! */
 }
@@ -6857,7 +6773,7 @@ void bship_state::bship(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
-	config.set_default_layout(layout_bship);
+	config.set_default_layout("bship");
 
 	/* sound hardware */
 	// TODO
@@ -6973,7 +6889,7 @@ void bshipb_state::bshipb(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
-	config.set_default_layout(layout_bship);
+	config.set_default_layout("bship");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7109,7 +7025,7 @@ void simon_state::simon(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
-	config.set_default_layout(layout_simon);
+	config.set_default_layout("simon");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7276,7 +7192,7 @@ void ssimon_state::ssimon(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
-	config.set_default_layout(layout_ssimon);
+	config.set_default_layout("ssimon");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7470,7 +7386,7 @@ void bigtrak_state::bigtrak(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 2);
-	config.set_default_layout(layout_bigtrak);
+	config.set_default_layout("bigtrak");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7714,7 +7630,7 @@ void mbdtower_state::mbdtower(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(3, 7);
 	m_display->set_segmask(6, 0x7f);
-	config.set_default_layout(layout_mbdtower);
+	config.set_default_layout("mbdtower");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7835,7 +7751,7 @@ void arcmania_state::arcmania(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 9);
-	config.set_default_layout(layout_arcmania);
+	config.set_default_layout("arcmania");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7968,7 +7884,7 @@ void cnsector_state::cnsector(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0x3f, 0xff);
-	config.set_default_layout(layout_cnsector);
+	config.set_default_layout("cnsector");
 
 	/* no sound! */
 }
@@ -8097,7 +8013,7 @@ void merlin_state::merlin(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 11);
-	config.set_default_layout(layout_merlin);
+	config.set_default_layout("merlin");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8176,7 +8092,7 @@ void mmerlin_state::mmerlin(machine_config &config)
 	m_maincpu->r().set(FUNC(mmerlin_state::write_r));
 	m_maincpu->o().set(FUNC(mmerlin_state::write_o));
 
-	config.set_default_layout(layout_mmerlin);
+	config.set_default_layout("mmerlin");
 }
 
 // roms
@@ -8298,7 +8214,7 @@ void stopthief_state::stopthief(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(3, 7);
 	m_display->set_segmask(7, 0x7f);
-	config.set_default_layout(layout_stopthief);
+	config.set_default_layout("stopthief");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8447,7 +8363,7 @@ void bankshot_state::bankshot(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(11, 8);
 	m_display->set_bri_levels(0.01, 0.08); // cue ball is brigher
-	config.set_default_layout(layout_bankshot);
+	config.set_default_layout("bankshot");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8577,7 +8493,7 @@ void splitsec_state::splitsec(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
-	config.set_default_layout(layout_splitsec);
+	config.set_default_layout("splitsec");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8702,7 +8618,7 @@ void lostreas_state::lostreas(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 11);
-	config.set_default_layout(layout_lostreas);
+	config.set_default_layout("lostreas");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8849,7 +8765,7 @@ void alphie_state::alphie(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 5);
-	config.set_default_layout(layout_alphie);
+	config.set_default_layout("alphie");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8972,7 +8888,7 @@ void tcfball_state::tcfball(machine_config &config)
 	m_display->set_segmask(0x77, 0x7f);
 	m_display->set_segmask(0x08, 0xff); // R3 has DP
 	m_display->set_bri_levels(0.003, 0.03); // offense leds are brighter
-	config.set_default_layout(layout_tcfball);
+	config.set_default_layout("tcfball");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9040,7 +8956,7 @@ void tcfballa_state::tcfballa(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_clock(375000); // approximation - RC osc. R=47K, C=50pF
 
-	config.set_default_layout(layout_tcfballa);
+	config.set_default_layout("tcfballa");
 }
 
 // roms
@@ -9215,7 +9131,7 @@ void tandy12_state::tandy12(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 13);
-	config.set_default_layout(layout_tandy12);
+	config.set_default_layout("tandy12");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9336,7 +9252,7 @@ void monkeysee_state::monkeysee(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 2);
-	config.set_default_layout(layout_monkeysee);
+	config.set_default_layout("monkeysee");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9498,7 +9414,7 @@ void speechp_state::speechp(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1ff, 0xff);
-	config.set_default_layout(layout_speechp);
+	config.set_default_layout("speechp");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9733,7 +9649,7 @@ void tisr16_state::tisr16(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(12, 8);
 	m_display->set_segmask(0xfff, 0xff);
-	config.set_default_layout(layout_tisr16);
+	config.set_default_layout("tisr16");
 
 	/* no sound! */
 }
@@ -9897,7 +9813,7 @@ void ti1250_state::ti1250(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0xff, 0xff);
 	m_display->set_segmask(0x100, 0x40); // R8 only has segment G connected
-	config.set_default_layout(layout_ti1250);
+	config.set_default_layout("ti1250");
 
 	/* no sound! */
 }
@@ -9912,7 +9828,7 @@ void ti1250_state::ti1270(machine_config &config)
 	m_maincpu->o().set(FUNC(ti1250_state::write_o));
 	m_maincpu->r().set(FUNC(ti1250_state::write_r));
 
-	config.set_default_layout(layout_ti1270);
+	config.set_default_layout("ti1270");
 }
 
 // roms
@@ -10070,7 +9986,7 @@ void ti25503_state::ti25503(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1ff, 0xff);
-	config.set_default_layout(layout_ti25503);
+	config.set_default_layout("ti25503");
 
 	/* no sound! */
 }
@@ -10342,7 +10258,7 @@ void ti30_state::ti30(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1fe, 0xff);
 	m_display->set_segmask(0x001, 0xe2); // 1st digit only has segments B,F,G,DP
-	config.set_default_layout(layout_ti30);
+	config.set_default_layout("ti30");
 
 	/* no sound! */
 }
@@ -10489,7 +10405,7 @@ void ti1000_state::ti1000(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	m_display->set_segmask(0xff, 0xff);
-	config.set_default_layout(layout_ti1270);
+	config.set_default_layout("ti1270");
 
 	/* no sound! */
 }
@@ -10607,7 +10523,7 @@ void wizatron_state::wizatron(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0x1ff^8, 0x7f);
 	m_display->set_segmask(8, 0x41); // equals sign
-	config.set_default_layout(layout_wizatron);
+	config.set_default_layout("wizatron");
 
 	/* no sound! */
 }
@@ -10823,7 +10739,7 @@ void lilprof78_state::lilprof78(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0x1ff, 0x7f);
-	config.set_default_layout(layout_wizatron);
+	config.set_default_layout("wizatron");
 
 	/* no sound! */
 }
@@ -10954,7 +10870,7 @@ void dataman_state::dataman(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1ff, 0x7f);
-	config.set_default_layout(layout_dataman);
+	config.set_default_layout("dataman");
 
 	/* no sound! */
 }
@@ -11034,7 +10950,7 @@ void mathmarv_state::mathmarv(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->r().set(FUNC(mathmarv_state::write_r));
 
-	config.set_default_layout(layout_mathmarv);
+	config.set_default_layout("mathmarv");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -11130,7 +11046,7 @@ void timaze_state::timaze(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 8);
 	m_display->set_segmask(1, 0x5c);
-	config.set_default_layout(layout_timaze);
+	config.set_default_layout("timaze");
 
 	/* no sound! */
 }
@@ -11287,7 +11203,7 @@ void tithermos_state::tithermos(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
 	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_tithermos);
+	config.set_default_layout("tithermos");
 
 	/* no sound! */
 }
@@ -11404,7 +11320,7 @@ void copycat_state::copycat(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
-	config.set_default_layout(layout_copycat);
+	config.set_default_layout("copycat");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -11494,7 +11410,7 @@ void copycatm2_state::copycatm2(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
-	config.set_default_layout(layout_copycatm2);
+	config.set_default_layout("copycatm2");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -11579,7 +11495,7 @@ void ditto_state::ditto(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
-	config.set_default_layout(layout_ditto);
+	config.set_default_layout("ditto");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -11710,7 +11626,7 @@ void ss7in1_state::ss7in1(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0xf, 0x7f);
 	m_display->set_bri_levels(0.005, 0.05); // player led is brighter
-	config.set_default_layout(layout_7in1ss);
+	config.set_default_layout("7in1ss");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -11915,7 +11831,7 @@ void tbreakup_state::tbreakup(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(2+6+6, 8);
 	m_display->set_segmask(3, 0x7f);
-	config.set_default_layout(layout_tbreakup);
+	config.set_default_layout("tbreakup");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -12046,7 +11962,7 @@ void phpball_state::phpball(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(11, 7);
 	m_display->set_segmask(7, 0x7f);
-	config.set_default_layout(layout_phpball);
+	config.set_default_layout("phpball");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -12187,7 +12103,7 @@ void ssports4_state::ssports4(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(10, 9);
 	m_display->set_segmask(0x303, 0x7f);
 	m_display->set_bri_levels(0.003, 0.03); // offense leds are brighter
-	config.set_default_layout(layout_ssports4);
+	config.set_default_layout("ssports4");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -12367,7 +12283,7 @@ void xl25_state::xl25(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 3);
-	config.set_default_layout(layout_xl25);
+	config.set_default_layout("xl25");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

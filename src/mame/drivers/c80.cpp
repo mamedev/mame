@@ -57,7 +57,6 @@ data of next byte, and so on.
 
 #include "speaker.h"
 
-#include "c80.lh"
 
 
 /* Memory Maps */
@@ -262,7 +261,7 @@ void c80_state::c80(machine_config &config)
 	m_maincpu->set_daisy_config(c80_daisy_chain);
 
 	/* video hardware */
-	config.set_default_layout(layout_c80);
+	config.set_default_layout("c80");
 
 	/* devices */
 	Z80PIO(config, m_pio1, 2500000);

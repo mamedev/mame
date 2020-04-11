@@ -35,9 +35,6 @@ BTANB:
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "conic_cchess2.lh" // clickable
-
 
 namespace {
 
@@ -254,7 +251,7 @@ void cchess2_state::cncchess2(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
-	config.set_default_layout(layout_conic_cchess2);
+	config.set_default_layout("conic_cchess2");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

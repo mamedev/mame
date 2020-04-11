@@ -48,11 +48,11 @@
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "rendlay.h"
 
-#include "tx1.lh"
-#include "buggyboy.lh"
-#include "buggybjr.lh"
+
+
+
+
 
 
 /*************************************
@@ -182,7 +182,7 @@ void tx1_state::tx1(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(tx1_state::tx1_palette), 256);
 
-	config.set_default_layout(layout_triphsxs);
+	config.set_default_layout("triphsxs");
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_raw(TX1_PIXEL_CLOCK, TX1_HTOTAL, TX1_HBEND, TX1_HBSTART, TX1_VTOTAL, TX1_VBEND, TX1_VBSTART);
@@ -225,7 +225,7 @@ void tx1_state::buggyboy(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	config.set_default_layout(layout_triphsxs);
+	config.set_default_layout("triphsxs");
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_raw(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART);
@@ -843,9 +843,9 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1983, tx1,        0,        tx1,      0, tx1_state, empty_init, ROT0, "Tatsumi (Atari/Namco/Taito license)", "TX-1 (World)",        MACHINE_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1983, tx1jb,      tx1,      tx1,      0, tx1_state, empty_init, ROT0, "Tatsumi",                             "TX-1 (Japan rev. B)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1983, tx1jc,      tx1,      tx1,      0, tx1_state, empty_init, ROT0, "Tatsumi",                             "TX-1 (Japan rev. C)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1985, buggyboy,   0,        buggyboy, 0, tx1_state, empty_init, ROT0, "Tatsumi",                             "Buggy Boy/Speed Buggy (cockpit, rev. D)",  0, layout_buggyboy )
-GAMEL( 1986, buggyboyb,  buggyboy, buggyboy, 0, tx1_state, empty_init, ROT0, "Tatsumi",                             "Buggy Boy/Speed Buggy (cockpit, rev. B)",  0, layout_buggyboy )
-GAMEL( 1986, buggyboyjr, buggyboy, buggybjr, 0, tx1_state, empty_init, ROT0, "Tatsumi",                             "Buggy Boy Junior/Speed Buggy (upright)",   0, layout_buggybjr )
+GAMEL( 1983, tx1,        0,        tx1,      0, tx1_state, empty_init, ROT0, "Tatsumi (Atari/Namco/Taito license)", "TX-1 (World)",        MACHINE_IMPERFECT_SOUND, "tx1" )
+GAMEL( 1983, tx1jb,      tx1,      tx1,      0, tx1_state, empty_init, ROT0, "Tatsumi",                             "TX-1 (Japan rev. B)", MACHINE_IMPERFECT_SOUND, "tx1" )
+GAMEL( 1983, tx1jc,      tx1,      tx1,      0, tx1_state, empty_init, ROT0, "Tatsumi",                             "TX-1 (Japan rev. C)", MACHINE_IMPERFECT_SOUND, "tx1" )
+GAMEL( 1985, buggyboy,   0,        buggyboy, 0, tx1_state, empty_init, ROT0, "Tatsumi",                             "Buggy Boy/Speed Buggy (cockpit, rev. D)",  0, "buggyboy" )
+GAMEL( 1986, buggyboyb,  buggyboy, buggyboy, 0, tx1_state, empty_init, ROT0, "Tatsumi",                             "Buggy Boy/Speed Buggy (cockpit, rev. B)",  0, "buggyboy" )
+GAMEL( 1986, buggyboyjr, buggyboy, buggybjr, 0, tx1_state, empty_init, ROT0, "Tatsumi",                             "Buggy Boy Junior/Speed Buggy (upright)",   0, "buggybjr" )

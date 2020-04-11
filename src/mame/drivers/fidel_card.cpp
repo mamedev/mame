@@ -170,10 +170,6 @@ Two card decks exist (red and blue), each has the same set of barcodes.
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_brc.lh" // clickable
-#include "fidel_bv3.lh" // clickable
-#include "fidel_gin.lh" // clickable
 
 
 namespace {
@@ -589,7 +585,7 @@ void card_state::brc_base(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8, 16);
 	m_display->set_segmask(0xff, 0x3fff);
-	config.set_default_layout(layout_fidel_brc);
+	config.set_default_layout("fidel_brc");
 }
 
 void card_state::ubc(machine_config &config)
@@ -616,13 +612,13 @@ void card_state::vbrc(machine_config &config)
 void card_state::bv3(machine_config &config)
 {
 	vbrc(config);
-	config.set_default_layout(layout_fidel_bv3);
+	config.set_default_layout("fidel_bv3");
 }
 
 void card_state::gin(machine_config &config)
 {
 	ubc(config);
-	config.set_default_layout(layout_fidel_gin);
+	config.set_default_layout("fidel_gin");
 }
 
 

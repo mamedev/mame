@@ -34,7 +34,7 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
-#include "saitek_risc2500.lh"
+
 
 
 class risc2500_state : public driver_device
@@ -293,7 +293,7 @@ void risc2500_state::risc2500(machine_config &config)
 	screen.set_screen_update(FUNC(risc2500_state::screen_update));
 	screen.set_palette("palette");
 
-	config.set_default_layout(layout_saitek_risc2500);
+	config.set_default_layout("saitek_risc2500");
 
 	PALETTE(config, "palette", FUNC(risc2500_state::lcd_palette), 3);
 

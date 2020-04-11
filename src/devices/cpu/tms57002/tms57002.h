@@ -206,7 +206,7 @@ private:
 	u32 get_cmem(u8 addr);
 
 #define CINTRPDECL
-#include "../../emu/cpu/tms57002/tms57002.hxx"
+#include "emu/cpu/tms57002/tms57002.hxx"
 #undef CINTRPDECL
 };
 

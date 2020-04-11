@@ -51,7 +51,7 @@ Press 0 to restart.
 #include "machine/i8355.h"
 #include "machine/i8279.h"
 #include "softlist.h"
-#include "sdk85.lh"
+
 
 
 class sdk85_state : public driver_device
@@ -235,7 +235,7 @@ void sdk85_state::sdk85(machine_config &config)
 	I8155(config, m_expramio, 6.144_MHz_XTAL / 2); // Expansion RAM (A17)
 
 	/* video hardware */
-	config.set_default_layout(layout_sdk85);
+	config.set_default_layout("sdk85");
 
 	/* Devices */
 	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);                               // Keyboard/Display Controller (A13)

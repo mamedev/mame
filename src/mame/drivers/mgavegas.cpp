@@ -27,7 +27,6 @@ Ver. 2.2 should exist
 #include "sound/msm5205.h"
 #include "speaker.h"
 
-#include "mgavegas.lh"
 
 
 /****************************
@@ -611,7 +610,7 @@ void mgavegas_state::mgavegas(machine_config &config)
 	FILTER_RC(config, "filter2").add_route(ALL_OUTPUTS, "mono", 2.0);
 
 	/* Video */
-	config.set_default_layout(layout_mgavegas);
+	config.set_default_layout("mgavegas");
 }
 
 

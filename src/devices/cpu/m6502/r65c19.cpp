@@ -287,4 +287,4 @@ void l2800_device::internal_map(address_map &map)
 	map(0x0600, 0xffff).rw(FUNC(l2800_device::expansion_r), FUNC(l2800_device::expansion_w));
 }
 
-#include "cpu/m6502/r65c19.hxx"
+#include "emu/cpu/m6502/r65c19.hxx"

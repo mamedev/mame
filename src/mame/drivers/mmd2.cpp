@@ -96,7 +96,6 @@ ToDo
 #include "machine/i8279.h"
 #include "imagedev/cassette.h"
 #include "speaker.h"
-#include "mmd2.lh"
 
 
 class mmd2_state : public driver_device
@@ -408,7 +407,7 @@ void mmd2_state::mmd2(machine_config &config)
 	m_maincpu->out_inte_func().set(FUNC(mmd2_state::inte_callback));
 
 	/* video hardware */
-	config.set_default_layout(layout_mmd2);
+	config.set_default_layout("mmd2");
 
 	/* Devices */
 	i8279_device &kbdc(I8279(config, "i8279", 400000));             // based on divider

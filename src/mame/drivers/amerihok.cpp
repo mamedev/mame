@@ -22,7 +22,6 @@ Processor is a ROMless MCU from the Z8 family.
 #include "cpu/z8/z8.h"
 #include "sound/okim6376.h"
 #include "speaker.h"
-#include "amerihok.lh"
 
 
 class amerihok_state : public driver_device
@@ -185,4 +184,4 @@ ROM_START( amerihok )
 	ROM_LOAD( "airh-u10", 0x80000, 0x40000, CRC(71ee6421) SHA1(10131fc7c009158308c4a8bb2b037101622c07a1) )
 ROM_END
 
-GAMEL( 199?, amerihok, 0, amerihok, amerihok, amerihok_state, empty_init, ROT0, "Ameri", "Ameri-Hockey", MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_amerihok )
+GAMEL( 199?, amerihok, 0, amerihok, amerihok, amerihok_state, empty_init, ROT0, "Ameri", "Ameri-Hockey", MACHINE_NOT_WORKING | MACHINE_MECHANICAL, "amerihok" )

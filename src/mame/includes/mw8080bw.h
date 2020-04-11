@@ -412,8 +412,4 @@ private:
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) ) \
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
 
-/*----------- defined in drivers/mw8080bw.c -----------*/
-
-extern const internal_layout layout_invaders;
-
 #endif // MAME_INCLUDES_MW8080BW_H

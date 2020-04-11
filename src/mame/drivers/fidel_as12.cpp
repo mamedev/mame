@@ -30,8 +30,6 @@ magnetic chess board sensors. See fidel_sc12.cpp for a more technical descriptio
 #include "softlist.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_as12.lh" // clickable
 
 
 namespace {
@@ -208,7 +206,7 @@ void as12_state::as12(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
-	config.set_default_layout(layout_fidel_as12);
+	config.set_default_layout("fidel_as12");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

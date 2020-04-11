@@ -10,7 +10,6 @@
 #include "softlist.h"
 #include "cpu/patinhofeio/patinhofeio_cpu.h"
 #include "includes/patinhofeio.h"
-#include "patinho.lh"
 
 /*
     driver init function
@@ -284,7 +283,7 @@ void patinho_feio_state::patinho_feio(machine_config &config)
 	/* punched tape */
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "patinho_tape", "bin").set_device_load(FUNC(patinho_feio_state::tape_load));
 
-	config.set_default_layout(layout_patinho);
+	config.set_default_layout("patinho");
 
 	// software lists
 //  SOFTWARE_LIST(config, "tape_list").set_original("patinho");

@@ -330,7 +330,7 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
-#include "sstrangr.lh"
+
 
 
 class sstrangr_state : public driver_device
@@ -686,5 +686,5 @@ ROM_START( sstrangr2 )
 ROM_END
 
 
-GAMEL( 1978, sstrangr,  0,        sstrangr, sstrangr, sstrangr_state, empty_init, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_sstrangr )
+GAMEL( 1978, sstrangr,  0,        sstrangr, sstrangr, sstrangr_state, empty_init, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "sstrangr" )
 GAME(  1979, sstrangr2, sstrangr, sstrngr2, sstrngr2, sstrangr_state, empty_init, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -25,7 +25,6 @@ ToDo:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "hankin.lh"
 
 class hankin_state : public genpin_class
 {
@@ -482,7 +481,7 @@ void hankin_state::hankin(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	config.set_default_layout(layout_hankin);
+	config.set_default_layout("hankin");
 
 	/* Sound */
 	genpin_audio(config);

@@ -38,15 +38,6 @@ JPM style Reel MCU? Certainly reel data seems to be muxed together in a weird wa
 #include "machine/steppers.h"
 #include "speaker.h"
 
-#include "aces1.lh"
-
-// MFME2MAME layouts:
-#include "ac1clbmn.lh"
-#include "ac1gogld.lh"
-#include "ac1pster.lh"
-#include "ac1pstrt.lh"
-#include "ac1primt.lh"
-#include "ac1taklv.lh"
 
 
 
@@ -471,7 +462,7 @@ void aces1_state::aces1(machine_config &config)
 	ic37.in_pb_callback().set(FUNC(aces1_state::ic37_read_b)); // meters, extra lamp select
 	ic37.in_pc_callback().set(FUNC(aces1_state::ic37_read_c)); // reel write, extra lamp strobe
 
-	config.set_default_layout(layout_aces1);
+	config.set_default_layout("aces1");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -860,13 +851,13 @@ void aces1_state::init_aces1()
 {
 }
 
-GAMEL( 199?, ac1clbmn,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Club Money (Ace) (ACESYS1) (set 1)",          MACHINE_IS_SKELETON_MECHANICAL, layout_ac1clbmn )
-GAMEL( 199?, ac1gogld,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Go For Gold (Ace) (ACESYS1) (set 1)",         MACHINE_IS_SKELETON_MECHANICAL, layout_ac1gogld )
+GAMEL( 199?, ac1clbmn,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Club Money (Ace) (ACESYS1) (set 1)",          MACHINE_IS_SKELETON_MECHANICAL, "ac1clbmn" )
+GAMEL( 199?, ac1gogld,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Go For Gold (Ace) (ACESYS1) (set 1)",         MACHINE_IS_SKELETON_MECHANICAL, "ac1gogld" )
 GAME(  199?, ac1hotpf,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Hot Profit (Ace) (ACESYS1)",                  MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 199?, ac1pster,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Pound Sterling (Ace) (ACESYS1)",              MACHINE_IS_SKELETON_MECHANICAL, layout_ac1pster )
-GAMEL( 199?, ac1pstrt,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Pound Stretcher (Pcp) (ACESYS1)",             MACHINE_IS_SKELETON_MECHANICAL, layout_ac1pstrt )
-GAMEL( 199?, ac1primt,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Primetime (Ace) (ACESYS1) (set 1)",           MACHINE_IS_SKELETON_MECHANICAL, layout_ac1primt )
-GAMEL( 199?, ac1taklv,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Take It Or Leave It (Ace) (ACESYS1) (set 1)", MACHINE_IS_SKELETON_MECHANICAL, layout_ac1taklv )
+GAMEL( 199?, ac1pster,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Pound Sterling (Ace) (ACESYS1)",              MACHINE_IS_SKELETON_MECHANICAL, "ac1pster" )
+GAMEL( 199?, ac1pstrt,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Pcp", "Pound Stretcher (Pcp) (ACESYS1)",             MACHINE_IS_SKELETON_MECHANICAL, "ac1pstrt" )
+GAMEL( 199?, ac1primt,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Primetime (Ace) (ACESYS1) (set 1)",           MACHINE_IS_SKELETON_MECHANICAL, "ac1primt" )
+GAMEL( 199?, ac1taklv,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Take It Or Leave It (Ace) (ACESYS1) (set 1)", MACHINE_IS_SKELETON_MECHANICAL, "ac1taklv" )
 GAME(  199?, ac1cshtw,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Cash Towers (Ace) (ACESYS1)",                 MACHINE_IS_SKELETON_MECHANICAL ) // same ROM as above, combined, original machine apparently plays the same, reskinned machine?
 GAME(  199?, ac1bbclb,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Big Break Club (Ace) (ACESYS1) (set 1)",      MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  199?, ac1bbclba, ac1bbclb, aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Big Break Club (Ace) (ACESYS1) (set 2)",      MACHINE_IS_SKELETON_MECHANICAL )

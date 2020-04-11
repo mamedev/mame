@@ -49,8 +49,6 @@ After boot, it copies ROM to RAM, probably to circumvent waitstates on slow ROM.
 #include "machine/mmboard.h"
 #include "video/mmdisplay2.h"
 
-// internal artwork
-#include "mephisto_modular_tm.lh" // clickable
 
 
 namespace {
@@ -214,7 +212,7 @@ void mmtm_state::mmtm_v(machine_config &config)
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
 	MEPHISTO_DISPLAY_MODULE2(config, "display");
-	config.set_default_layout(layout_mephisto_modular_tm);
+	config.set_default_layout("mephisto_modular_tm");
 }
 
 void mmtm_state::mmtm_t(machine_config &config)

@@ -14,7 +14,6 @@
 
 #include "emu.h"
 #include "includes/alesis.h"
-#include "sr16.lh"
 #include "screen.h"
 
 
@@ -462,7 +461,7 @@ void alesis_state::sr16(machine_config &config)
 	screen.set_size(6*8, 9*2);
 	screen.set_visarea_full();
 
-	config.set_default_layout(layout_sr16);
+	config.set_default_layout("sr16");
 
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(alesis_state::sr16_pixel_update));

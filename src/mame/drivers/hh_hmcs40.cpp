@@ -101,18 +101,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-// internal artwork (complete)
-#include "pairmtch.lh"
-
-// internal artwork (bezel overlay)
-#include "bambball.lh"
-#include "gckong.lh"
-#include "mwcbaseb.lh"
-#include "msthawk.lh"
-#include "packmon.lh"
-
-//#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
-
 
 class hh_hmcs40_state : public driver_device
 {
@@ -338,7 +326,7 @@ void bambball_state::bambball(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
-	config.set_default_layout(layout_bambball);
+	config.set_default_layout("bambball");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -736,7 +724,7 @@ void packmon_state::packmon(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 20);
-	config.set_default_layout(layout_packmon);
+	config.set_default_layout("packmon");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1730,7 +1718,7 @@ void pairmtch_state::pairmtch(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(6, 12);
-	config.set_default_layout(layout_pairmtch);
+	config.set_default_layout("pairmtch");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3219,7 +3207,7 @@ void gckong_state::gckong(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(11, 32);
-	config.set_default_layout(layout_gckong);
+	config.set_default_layout("gckong");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3516,7 +3504,7 @@ void mwcbaseb_state::mwcbaseb(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(8, 16);
 	m_display->set_bri_levels(0.001); // cyan elements strobed very briefly?
-	config.set_default_layout(layout_mwcbaseb);
+	config.set_default_layout("mwcbaseb");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3656,7 +3644,7 @@ void msthawk_state::msthawk(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 21);
-	config.set_default_layout(layout_msthawk);
+	config.set_default_layout("msthawk");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -35,7 +35,7 @@ ToDo:
 #include "machine/i8279.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
-#include "selz80.lh"
+
 
 
 class selz80_state : public driver_device
@@ -225,7 +225,7 @@ void selz80_state::selz80(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, selz80 )
 
 	/* video hardware */
-	config.set_default_layout(layout_selz80);
+	config.set_default_layout("selz80");
 
 	/* Devices */
 	CLOCK(config, m_clock, 153600);

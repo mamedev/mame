@@ -79,7 +79,6 @@ ToDo:
 #include "machine/clock.h"
 #include "machine/timer.h"
 #include "speaker.h"
-#include "mmd1.lh"
 
 
 class mmd1_state : public driver_device
@@ -340,7 +339,7 @@ void mmd1_state::mmd1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mmd1_state::io_map);
 
 	/* video hardware */
-	config.set_default_layout(layout_mmd1);
+	config.set_default_layout("mmd1");
 
 	AY51013(config, m_uart);
 	m_uart->read_si_callback().set(FUNC(mmd1_state::si));

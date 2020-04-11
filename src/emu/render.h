@@ -905,7 +905,7 @@ class render_target
 	friend class render_manager;
 
 	// construction/destruction
-	render_target(render_manager &manager, const internal_layout *layoutfile = nullptr, u32 flags = 0);
+	render_target(render_manager &manager, const char *layoutfile, u32 flags = 0);
 	render_target(render_manager &manager, util::xml::data_node const &layout, u32 flags = 0);
 	~render_target();
 
@@ -980,11 +980,11 @@ private:
 	enum constructor_impl_t { CONSTRUCTOR_IMPL };
 	template <typename T> render_target(render_manager &manager, T&& layout, u32 flags, constructor_impl_t);
 	void update_layer_config();
-	void load_layout_files(const internal_layout *layoutfile, bool singlefile);
+	void load_layout_files(const char *layoutfile, bool singlefile);
 	void load_layout_files(util::xml::data_node const &rootnode, bool singlefile);
 	void load_additional_layout_files(const char *basename, bool have_artwork);
+	bool load_layout_file(const char *dirname, const char *filename, device_t *device);
 	bool load_layout_file(const char *dirname, const char *filename);
-	bool load_layout_file(const char *dirname, const internal_layout &layout_data, device_t *device = nullptr);
 	bool load_layout_file(device_t &device, const char *dirname, util::xml::data_node const &rootnode);
 	void add_container_primitives(render_primitive_list &list, const object_transform &root_xform, const object_transform &xform, render_container &container, int blendmode);
 	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode);
@@ -1061,7 +1061,7 @@ public:
 	float max_update_rate() const;
 
 	// targets
-	render_target *target_alloc(const internal_layout *layoutfile = nullptr, u32 flags = 0);
+	render_target *target_alloc(const char *layoutfile = nullptr, u32 flags = 0);
 	render_target *target_alloc(util::xml::data_node const &layout, u32 flags = 0);
 	void target_free(render_target *target);
 	const simple_list<render_target> &targets() const { return m_targetlist; }

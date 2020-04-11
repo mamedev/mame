@@ -98,7 +98,6 @@ Versions known to exist but not dumped:
 #include "speaker.h"
 #include <algorithm>
 
-#include "ppsatan.lh"
 
 
 /***************************************************************************
@@ -2432,7 +2431,7 @@ void cave_state::ppsatan(machine_config &config)
 	PALETTE(config, m_palette[1], palette_device::BLACK).set_format(palette_device::xGRB_555, 0x9000/2);
 	PALETTE(config, m_palette[2], palette_device::BLACK).set_format(palette_device::xGRB_555, 0x9000/2);
 
-	config.set_default_layout(layout_ppsatan);
+	config.set_default_layout("ppsatan");
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,ppsatan)
 

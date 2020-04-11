@@ -24,7 +24,7 @@ ToDo:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "s11.lh"
+
 
 
 void s11_state::s11_main_map(address_map &map)
@@ -389,7 +389,7 @@ void s11_state::s11(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(s11_state, s11)
 
 	/* Video */
-	config.set_default_layout(layout_s11);
+	config.set_default_layout("s11");
 
 	/* Sound */
 	genpin_audio(config);

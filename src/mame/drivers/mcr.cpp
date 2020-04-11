@@ -290,7 +290,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "dpoker.lh"
 
 
 void mcr_state::mcr_control_port_w(uint8_t data)
@@ -3014,7 +3013,7 @@ GAME(  1981, solarfox,  0,        mcr_90009,     solarfox,  mcr_state,         i
 GAME(  1981, kick,      0,        mcr_90009,     kick,      mcr_state,         init_kick,      ORIENTATION_SWAP_XY, "Midway", "Kick (upright)", MACHINE_SUPPORTS_SAVE )
 GAME(  1981, kickman,   kick,     mcr_90009,     kick,      mcr_state,         init_kick,      ORIENTATION_SWAP_XY, "Midway", "Kickman (upright)", MACHINE_SUPPORTS_SAVE )
 GAME(  1981, kickc,     kick,     mcr_90009,     kickc,     mcr_state,         init_kick,      ROT90, "Midway", "Kick (cocktail)", MACHINE_SUPPORTS_SAVE )
-GAMEL( 1985, dpoker,    0,        mcr_90009_dp,  dpoker,    mcr_dpoker_state,  init_dpoker,    ROT0,  "Bally",  "Draw Poker (Bally, 03-20)", MACHINE_SUPPORTS_SAVE, layout_dpoker )
+GAMEL( 1985, dpoker,    0,        mcr_90009_dp,  dpoker,    mcr_dpoker_state,  init_dpoker,    ROT0,  "Bally",  "Draw Poker (Bally, 03-20)", MACHINE_SUPPORTS_SAVE, "dpoker" )
 
 /* 90010 CPU board + 91399 video gen + 90913 sound I/O */
 GAME(  1981, shollow,   0,        mcr_90010,     shollow,   mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 1)", MACHINE_SUPPORTS_SAVE )

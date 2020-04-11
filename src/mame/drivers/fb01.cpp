@@ -20,7 +20,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "fb01.lh"
 
 
 class fb01_state : public driver_device
@@ -176,7 +175,7 @@ void fb01_state::fb01(machine_config &config)
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	screen.set_palette("palette");
 
-	config.set_default_layout(layout_fb01);
+	config.set_default_layout("fb01");
 
 	PALETTE(config, "palette", FUNC(fb01_state::fb01_palette), 2);
 

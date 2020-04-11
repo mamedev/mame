@@ -31,7 +31,6 @@ ToDo:
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#include "atari_s2.lh"
 
 
 class atari_s2_state : public genpin_class
@@ -498,7 +497,7 @@ void atari_s2_state::atari_s2(machine_config &config)
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* Video */
-	config.set_default_layout(layout_atari_s2);
+	config.set_default_layout("atari_s2");
 
 	TIMER(config, "irq").configure_periodic(FUNC(atari_s2_state::irq), attotime::from_hz(XTAL(4'000'000) / 8192));
 	TIMER(config, "timer_s").configure_periodic(FUNC(atari_s2_state::timer_s), attotime::from_hz(150000));

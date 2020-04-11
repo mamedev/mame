@@ -36,10 +36,9 @@
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-#include "rendlay.h"
+
 #include "speaker.h"
 
-#include "barata.lh"
 
 #define CPU_CLOCK       (XTAL(6'000'000))         /* main cpu clock */
 
@@ -317,7 +316,7 @@ void barata_state::barata(machine_config &config)
 	m_maincpu->port_out_cb<2>().set(FUNC(barata_state::port2_w));
 	m_maincpu->port_out_cb<3>().set(FUNC(barata_state::fpga_w));
 
-	config.set_default_layout(layout_barata);
+	config.set_default_layout("barata");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

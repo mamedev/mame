@@ -623,7 +623,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "snookr10.lh"
+
 
 
 #define MASTER_CLOCK    XTAL(16'000'000)
@@ -1217,8 +1217,8 @@ ROM_END
 *************************/
 
 /*     YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT        ROT   COMPANY      FULLNAME                       FLAGS   LAYOUT */
-GAMEL( 1998, snookr10,  0,        snookr10, snookr10,  snookr10_state, empty_init, ROT0, "Sandii'",   "Snooker 10 (Ver 1.11)",       0,      layout_snookr10 )
-GAMEL( 1998, apple10,   0,        apple10,  apple10,   snookr10_state, empty_init, ROT0, "Sandii'",   "Apple 10 (Ver 1.21)",         0,      layout_snookr10 )
-GAMEL( 1997, tenballs,  snookr10, tenballs, tenballs,  snookr10_state, empty_init, ROT0, "<unknown>", "Ten Balls (Ver 1.05)",        0,      layout_snookr10 )
-GAMEL( 1998, crystalc,  0,        crystalc, crystalc,  snookr10_state, empty_init, ROT0, "JCD srl",   "Crystals Colours (Ver 1.02)", 0,      layout_snookr10 )
-GAMEL( 1998, crystalca, crystalc, crystalc, crystalca, snookr10_state, empty_init, ROT0, "JCD srl",   "Crystals Colours (Ver 1.01)", 0,      layout_snookr10 )
+GAMEL( 1998, snookr10,  0,        snookr10, snookr10,  snookr10_state, empty_init, ROT0, "Sandii'",   "Snooker 10 (Ver 1.11)",       0,      "snookr10" )
+GAMEL( 1998, apple10,   0,        apple10,  apple10,   snookr10_state, empty_init, ROT0, "Sandii'",   "Apple 10 (Ver 1.21)",         0,      "snookr10" )
+GAMEL( 1997, tenballs,  snookr10, tenballs, tenballs,  snookr10_state, empty_init, ROT0, "<unknown>", "Ten Balls (Ver 1.05)",        0,      "snookr10" )
+GAMEL( 1998, crystalc,  0,        crystalc, crystalc,  snookr10_state, empty_init, ROT0, "JCD srl",   "Crystals Colours (Ver 1.02)", 0,      "snookr10" )
+GAMEL( 1998, crystalca, crystalc, crystalc, crystalca, snookr10_state, empty_init, ROT0, "JCD srl",   "Crystals Colours (Ver 1.01)", 0,      "snookr10" )

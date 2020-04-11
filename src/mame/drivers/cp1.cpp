@@ -18,7 +18,6 @@
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "speaker.h"
-#include "cp1.lh"
 
 class cp1_state : public driver_device
 {
@@ -286,7 +285,7 @@ void cp1_state::cp1(machine_config &config)
 
 	I8155(config, "i8155_cp3", 0);
 
-	config.set_default_layout(layout_cp1);
+	config.set_default_layout("cp1");
 
 	SPEAKER(config, "mono").front_center();
 

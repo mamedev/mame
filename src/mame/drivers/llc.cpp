@@ -55,7 +55,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "llc1.lh"
 
 
 /* Address maps */
@@ -222,7 +221,7 @@ void llc_state::llc1(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_llc1);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-	config.set_default_layout(layout_llc1);
+	config.set_default_layout("llc1");
 
 	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL(3'000'000)));
 	pio1.in_pa_callback().set(FUNC(llc_state::llc1_port1_a_r));

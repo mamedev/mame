@@ -63,9 +63,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "wldarrow.lh"
-#include "mdrawpkr.lh"
-#include "meybjack.lh"
 
 
 class meyc8080_state : public driver_device
@@ -742,7 +739,7 @@ ROM_END
  *************************************/
 
 //    YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT        ROT   COMPANY              FULLNAME                                     FLAGS                                            LAYOUT
-GAMEL(1982, wldarrow,  0,        meyc8080, wldarrow,  meyc8080_state, empty_init, ROT0, "Meyco Games, Inc.", "Wild Arrow (color, Standard V4.8)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_wldarrow ) // B&W version not dumped yet
-GAMEL(1984, mdrawpkr,  0,        meyc8080, mdrawpkr,  meyc8080_state, empty_init, ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (Standard)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_mdrawpkr ) // year not shown, but it is in mdrawpkra
-GAMEL(1984, mdrawpkra, mdrawpkr, meyc8080, mdrawpkra, meyc8080_state, empty_init, ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (02-11)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_mdrawpkr )
-GAMEL(1983, casbjack,  0,        meyc8080, casbjack,  meyc8080_state, empty_init, ROT0, "Meyco Games, Inc.", "Casino Black Jack (color, Standard 00-05)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_meybjack ) // B&W version not dumped yet
+GAMEL(1982, wldarrow,  0,        meyc8080, wldarrow,  meyc8080_state, empty_init, ROT0, "Meyco Games, Inc.", "Wild Arrow (color, Standard V4.8)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "wldarrow" ) // B&W version not dumped yet
+GAMEL(1984, mdrawpkr,  0,        meyc8080, mdrawpkr,  meyc8080_state, empty_init, ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (Standard)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "mdrawpkr" ) // year not shown, but it is in mdrawpkra
+GAMEL(1984, mdrawpkra, mdrawpkr, meyc8080, mdrawpkra, meyc8080_state, empty_init, ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (02-11)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "mdrawpkr" )
+GAMEL(1983, casbjack,  0,        meyc8080, casbjack,  meyc8080_state, empty_init, ROT0, "Meyco Games, Inc.", "Casino Black Jack (color, Standard 00-05)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "meybjack" ) // B&W version not dumped yet

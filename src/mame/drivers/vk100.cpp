@@ -137,7 +137,7 @@ state machine and sees if the GO bit ever finishes and goes back to 0
 #include "screen.h"
 #include "speaker.h"
 
-#include "vk100.lh"
+
 
 
 // named timer IDs
@@ -1066,7 +1066,7 @@ void vk100_state::vk100(machine_config &config)
 	dbrg.fr_handler().set(m_uart, FUNC(i8251_device::write_rxc));
 	dbrg.ft_handler().set(m_uart, FUNC(i8251_device::write_txc));
 
-	config.set_default_layout(layout_vk100);
+	config.set_default_layout("vk100");
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_speaker, 116).add_route(ALL_OUTPUTS, "mono", 0.25); // 116 hz (page 172 of TM), but duty cycle is wrong here!

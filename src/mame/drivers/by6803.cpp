@@ -27,7 +27,6 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 //#include "audio/midway.h"
-//#include "by6803.lh"
 
 
 class by6803_state : public genpin_class
@@ -388,7 +387,7 @@ void by6803_state::by6803(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	//config.set_default_layout(layout_by6803);
+	//config.set_default_layout("by6803");
 
 	/* Sound */
 	genpin_audio(config);

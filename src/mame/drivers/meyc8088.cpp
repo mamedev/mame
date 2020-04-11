@@ -34,7 +34,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "gldarrow.lh"
 
 
 class meyc8088_state : public driver_device
@@ -417,4 +416,4 @@ ROM_START( gldarrow )
 ROM_END
 
 
-GAMEL( 1984, gldarrow, 0, meyc8088, gldarrow, meyc8088_state, empty_init, ROT0, "Meyco Games, Inc.", "Golden Arrow (Standard G8-03)", MACHINE_SUPPORTS_SAVE, layout_gldarrow )
+GAMEL( 1984, gldarrow, 0, meyc8088, gldarrow, meyc8088_state, empty_init, ROT0, "Meyco Games, Inc.", "Golden Arrow (Standard G8-03)", MACHINE_SUPPORTS_SAVE, "gldarrow" )

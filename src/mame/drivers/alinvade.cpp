@@ -25,7 +25,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "alinvade.lh"
 
 
 class alinvade_state : public driver_device
@@ -245,4 +244,4 @@ ROM_START( alinvade )
 ROM_END
 
 
-GAMEL( 198?, alinvade, 0, alinvade, alinvade, alinvade_state, empty_init, ROT90, "Forbes?", "Alien Invaders", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_alinvade )
+GAMEL( 198?, alinvade, 0, alinvade, alinvade, alinvade_state, empty_init, ROT90, "Forbes?", "Alien Invaders", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, "alinvade" )

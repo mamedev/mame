@@ -15,7 +15,6 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 
-#include "submar.lh"
 
 
 class submar_state : public driver_device
@@ -253,4 +252,4 @@ ROM_START( submar )
 ROM_END
 
 
-GAMEL( 1979, submar, 0, submar, submar, submar_state, empty_init, ROT0, "Midway", "Submarine (Midway)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_submar )
+GAMEL( 1979, submar, 0, submar, submar, submar_state, empty_init, ROT0, "Midway", "Submarine (Midway)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, "submar" )

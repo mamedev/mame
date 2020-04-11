@@ -207,10 +207,6 @@ clicking on the game board.
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_csc.lh" // clickable
-#include "fidel_rsc.lh" // clickable
-#include "fidel_su9.lh" // clickable
 
 
 namespace {
@@ -646,7 +642,7 @@ void csc_state::csc(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_fidel_csc);
+	config.set_default_layout("fidel_csc");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -673,7 +669,7 @@ void csc_state::su9(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::su9_map);
-	config.set_default_layout(layout_fidel_su9);
+	config.set_default_layout("fidel_su9");
 }
 
 void csc_state::rsc(machine_config &config)
@@ -702,7 +698,7 @@ void csc_state::rsc(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
-	config.set_default_layout(layout_fidel_rsc);
+	config.set_default_layout("fidel_rsc");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

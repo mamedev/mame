@@ -13,7 +13,7 @@
 #include "machine/wpc.h"
 #include "speaker.h"
 
-#include "wpc_an.lh"
+
 
 
 #define LOG_WPC (1)
@@ -346,7 +346,7 @@ void wpc_an_state::wpc_an_base(machine_config &config)
 	m_wpc->sound_data_write().set(FUNC(wpc_an_state::wpc_sound_data_w));
 	m_wpc->sound_s11_write().set(FUNC(wpc_an_state::wpc_sound_s11_w));
 
-	config.set_default_layout(layout_wpc_an);
+	config.set_default_layout("wpc_an");
 }
 
 void wpc_an_state::wpc_an(machine_config &config)

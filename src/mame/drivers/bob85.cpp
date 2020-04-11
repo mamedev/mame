@@ -27,7 +27,6 @@ Test Paste:
 #include "machine/timer.h"
 #include "imagedev/cassette.h"
 #include "speaker.h"
-#include "bob85.lh"
 
 
 class bob85_state : public driver_device
@@ -235,7 +234,7 @@ void bob85_state::bob85(machine_config &config)
 	m_maincpu->out_sod_func().set(FUNC(bob85_state::sod_w));
 
 	/* video hardware */
-	config.set_default_layout(layout_bob85);
+	config.set_default_layout("bob85");
 
 	SPEAKER(config, "mono").front_center();
 

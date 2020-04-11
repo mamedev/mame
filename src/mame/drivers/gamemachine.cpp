@@ -67,8 +67,6 @@ Grand Prix:
 #include "machine/netlist.h"
 #include "audio/nl_gamemachine.h"
 
-// internal artwork
-#include "tgm.lh"
 
 namespace {
 
@@ -270,7 +268,7 @@ void tgm_state::tgm(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(12, 8);
 	m_display->set_segmask(0xfff, 0xff);
-	config.set_default_layout(layout_tgm);
+	config.set_default_layout("tgm");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

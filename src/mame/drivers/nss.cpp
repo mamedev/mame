@@ -302,7 +302,6 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 #include "machine/rp5h01.h"
 #include "video/m50458.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "speaker.h"
 
 
@@ -853,7 +852,7 @@ void nss_state::nss(machine_config &config)
 
 	/* video hardware */
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	// SNES PPU
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

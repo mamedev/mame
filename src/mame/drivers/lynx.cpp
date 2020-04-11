@@ -16,7 +16,6 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#include "lynx.lh"
 
 void lynx_state::lynx_mem(address_map &map)
 {
@@ -91,7 +90,7 @@ void lynx_state::lynx(machine_config &config)
 	m_screen->set_screen_update(FUNC(lynx_state::screen_update));
 	m_screen->set_size(160, 102);
 	m_screen->set_visarea(0, 160-1, 0, 102-1);
-	config.set_default_layout(layout_lynx);
+	config.set_default_layout("lynx");
 
 	PALETTE(config, m_palette).set_entries(0x10);
 

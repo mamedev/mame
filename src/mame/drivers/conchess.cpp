@@ -64,9 +64,6 @@ Library modules:
 #include "bus/generic/carts.h"
 #include "speaker.h"
 
-// internal artwork
-#include "conchess.lh" // clickable
-
 
 namespace {
 
@@ -220,7 +217,7 @@ void conchess_state::concstd(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
-	config.set_default_layout(layout_conchess);
+	config.set_default_layout("conchess");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

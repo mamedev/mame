@@ -11,7 +11,7 @@
 #include "sound/spkrdev.h"
 #include "emupal.h"
 #include "screen.h"
-#include "rendlay.h"
+
 #include "speaker.h"
 
 class alto2_state : public driver_device

@@ -20,7 +20,7 @@ Might be some priority glitches
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 
-#include "rendlay.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -450,7 +450,7 @@ void tbowl_state::tbowl(machine_config &config)
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tbowl);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024*2).set_endianness(ENDIANNESS_BIG);
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	TECMO_SPRITE(config, m_sprgen, 0);
 

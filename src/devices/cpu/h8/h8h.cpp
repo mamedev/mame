@@ -16,4 +16,4 @@ std::unique_ptr<util::disasm_interface> h8h_device::create_disassembler()
 	return std::make_unique<h8h_disassembler>();
 }
 
-#include "cpu/h8/h8h.hxx"
+#include "emu/cpu/h8/h8h.hxx"

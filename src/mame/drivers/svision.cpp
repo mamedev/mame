@@ -12,7 +12,7 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#include "svision.lh"
+
 
 
 #define MAKE8_RGB32(red3, green3, blue2) ( ( (red3)<<(16+5)) | ( (green3)<<(8+5)) | ( (blue2)<<(0+6)) )
@@ -496,7 +496,7 @@ MACHINE_RESET_MEMBER(svision_state,tvlink)
 
 void svision_state::svision_base(machine_config &config)
 {
-	config.set_default_layout(layout_svision);
+	config.set_default_layout("svision");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

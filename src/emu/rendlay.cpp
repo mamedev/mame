@@ -13,7 +13,7 @@
 #include "emuopts.h"
 #include "render.h"
 #include "rendfont.h"
-#include "rendlay.h"
+
 #include "rendutil.h"
 #include "vecstream.h"
 #include "xmlfile.h"
@@ -31,27 +31,6 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-
-
-
-/***************************************************************************
-    STANDARD LAYOUTS
-***************************************************************************/
-
-// screenless layouts
-#include "noscreens.lh"
-
-// dual screen layouts
-#include "dualhsxs.lh"
-#include "dualhovu.lh"
-#include "dualhuov.lh"
-
-// triple screen layouts
-#include "triphsxs.lh"
-
-// quad screen layouts
-#include "quadhsxs.lh"
-
 
 namespace {
 

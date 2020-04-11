@@ -245,4 +245,4 @@ void m740_device::set_irq_line(int line, int state)
 //  printf("M740 single IRQ state is %d (MPX %08x, vector %x)\n", irq_state, m_irq_multiplex, m_irq_vector);
 }
 
-#include "cpu/m6502/m740.hxx"
+#include "emu/cpu/m6502/m740.hxx"

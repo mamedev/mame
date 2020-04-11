@@ -75,7 +75,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "avigo.lh"
 
 
 #define AVIGO_LOG 0
@@ -779,7 +778,7 @@ void avigo_state::avigo(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_palette(m_palette);
 
-	config.set_default_layout(layout_avigo);
+	config.set_default_layout("avigo");
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_avigo);
 	PALETTE(config, m_palette, palette_device::MONOCHROME_INVERTED);

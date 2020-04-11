@@ -82,5 +82,5 @@ std::string i8x9x_disassembler::regname16(uint8_t reg, bool is_dest) const
 	return mcs96_disassembler::regname16(reg, is_dest);
 }
 
-#include "cpu/mcs96/i8x9xd.hxx"
+#include "emu/cpu/mcs96/i8x9xd.hxx"
 

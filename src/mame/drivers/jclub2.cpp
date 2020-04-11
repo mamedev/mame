@@ -111,8 +111,6 @@
 #include "speaker.h"
 #include "tilemap.h"
 
-#include "jclub2o.lh"
-#include "jclub2.lh"
 
 namespace {
 
@@ -1175,7 +1173,7 @@ void jclub2o_state::jclub2o(machine_config &config)
 	m_st0020->set_palette(m_palette);
 
 	// layout
-	config.set_default_layout(layout_jclub2o);
+	config.set_default_layout("jclub2o");
 }
 
 
@@ -1211,7 +1209,7 @@ void jclub2_state::jclub2(machine_config &config)
 	m_st0020->set_palette(m_palette);
 
 	// layout
-	config.set_default_layout(layout_jclub2o);
+	config.set_default_layout("jclub2o");
 }
 
 
@@ -1242,7 +1240,7 @@ void darkhors_state::darkhors(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_darkhors);
 
 	// layout
-	config.set_default_layout(layout_jclub2);
+	config.set_default_layout("jclub2");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

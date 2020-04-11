@@ -24,7 +24,7 @@
 
 #include <algorithm>
 
-#include "tecnbras.lh"
+
 
 
 class tecnbras_state : public driver_device
@@ -134,7 +134,7 @@ void tecnbras_state::tecnbras(machine_config &config)
 */
 
 	/* video hardware */
-	config.set_default_layout(layout_tecnbras);
+	config.set_default_layout("tecnbras");
 }
 
 ROM_START( tecnbras )

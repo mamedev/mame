@@ -46,9 +46,6 @@ TODO:
 #include "softlist.h"
 #include "speaker.h"
 
-#include "sag.lh"
-
-
 namespace {
 
 class sag_state : public driver_device
@@ -331,7 +328,7 @@ void sag_state::sag(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8+6, 14);
 	m_display->set_segmask(0x3f00, 0x7f);
-	config.set_default_layout(layout_sag);
+	config.set_default_layout("sag");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

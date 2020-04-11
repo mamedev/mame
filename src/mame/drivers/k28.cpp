@@ -29,9 +29,6 @@ TODO:
 #include "sound/votrax.h"
 #include "speaker.h"
 
-// internal artwork
-#include "k28.lh"
-
 
 namespace {
 
@@ -311,7 +308,7 @@ void k28_state::k28(machine_config &config)
 	MM5445(config, m_vfd).output_cb().set(FUNC(k28_state::vfd_output_w));
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	m_display->set_segmask(0x1ff, 0x3fff);
-	config.set_default_layout(layout_k28);
+	config.set_default_layout("k28");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

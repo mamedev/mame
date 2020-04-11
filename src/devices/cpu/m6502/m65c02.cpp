@@ -30,4 +30,4 @@ std::unique_ptr<util::disasm_interface> m65c02_device::create_disassembler()
 	return std::make_unique<m65c02_disassembler>();
 }
 
-#include "cpu/m6502/m65c02.hxx"
+#include "emu/cpu/m6502/m65c02.hxx"

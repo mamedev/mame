@@ -88,9 +88,6 @@ TODO:
 #include "bus/generic/carts.h"
 #include "speaker.h"
 
-// internal artwork
-#include "mephisto_mm2.lh"
-#include "mephisto_bup.lh"
 
 
 class mephisto_state : public driver_device
@@ -392,7 +389,7 @@ void mephisto_state::rebel5(machine_config &config)
 	m_outlatch->q_out_cb<7>().set(FUNC(mephisto_state::write_led7));
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
-	config.set_default_layout(layout_mephisto_mm2);
+	config.set_default_layout("mephisto_mm2");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -448,7 +445,7 @@ void mephisto_state::bup(machine_config &config)
 
 	m_outlatch->q_out_cb<7>().set(FUNC(mephisto_state::write_led7)).invert();
 
-	config.set_default_layout(layout_mephisto_bup);
+	config.set_default_layout("mephisto_bup");
 }
 
 void mephisto_state::mm2(machine_config &config)
@@ -458,7 +455,7 @@ void mephisto_state::mm2(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::mm2_mem);
 
-	config.set_default_layout(layout_mephisto_mm2);
+	config.set_default_layout("mephisto_mm2");
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "mephisto_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("mephisto_mm2");

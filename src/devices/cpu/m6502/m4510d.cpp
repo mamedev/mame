@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "m4510d.h"
-#include "cpu/m6502/m4510d.hxx"
+#include "emu/cpu/m6502/m4510d.hxx"
 
 m4510_disassembler::m4510_disassembler() : m6502_base_disassembler(disasm_entries)
 {

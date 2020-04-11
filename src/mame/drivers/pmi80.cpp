@@ -36,7 +36,6 @@ Notes:
 #include "imagedev/cassette.h"
 #include "machine/timer.h"
 #include "speaker.h"
-#include "pmi80.lh"
 
 class pmi80_state : public driver_device
 {
@@ -228,7 +227,7 @@ void pmi80_state::pmi80(machine_config &config)
 	TIMER(config, "kansas_r").configure_periodic(FUNC(pmi80_state::kansas_r), attotime::from_hz(40000));
 
 	/* video hardware */
-	config.set_default_layout(layout_pmi80);
+	config.set_default_layout("pmi80");
 }
 
 /* ROM definition */

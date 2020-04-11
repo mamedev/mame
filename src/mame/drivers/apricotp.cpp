@@ -40,7 +40,6 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "apricotp.lh"
 
 
 //**************************************************************************
@@ -579,7 +578,7 @@ void fp_state::fp(machine_config &config)
 	m_soundcpu->set_disable();
 
 	/* video hardware */
-	config.set_default_layout(layout_apricotp);
+	config.set_default_layout("apricotp");
 
 	screen_device &screen_lcd(SCREEN(config, SCREEN_LCD_TAG, SCREEN_TYPE_RASTER));
 	screen_lcd.set_refresh_hz(50);

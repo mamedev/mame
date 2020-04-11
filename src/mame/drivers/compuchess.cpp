@@ -79,10 +79,6 @@ Fairchild 3850PK CPU @ 2MHz (LC circuit), 3853PK
 #include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
-#include "cmpchess.lh" // clickable
-#include "novag_mk1.lh" // clickable
-#include "cncchess.lh" // clickable
 
 
 namespace {
@@ -358,7 +354,7 @@ void cmpchess_state::cmpchess(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 8+1);
 	m_display->set_segmask(0xf, 0xff);
-	config.set_default_layout(layout_cmpchess);
+	config.set_default_layout("cmpchess");
 
 	TIMER(config, "blink_display").configure_periodic(FUNC(cmpchess_state::blink), attotime::from_msec(200)); // approximation
 }
@@ -371,7 +367,7 @@ void cmpchess_state::mk1(machine_config &config)
 	m_maincpu->set_clock(2200000); // JS&A version measured 2.18MHz on average
 	subdevice<f3853_device>("smi")->set_clock(2200000);
 
-	config.set_default_layout(layout_novag_mk1);
+	config.set_default_layout("novag_mk1");
 }
 
 void cmpchess_state::cnc(machine_config &config)
@@ -383,7 +379,7 @@ void cmpchess_state::cnc(machine_config &config)
 	m_maincpu->set_clock(2000000); // LC circuit, measured 2MHz
 	subdevice<f3853_device>("smi")->set_clock(2000000);
 
-	config.set_default_layout(layout_cncchess);
+	config.set_default_layout("cncchess");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

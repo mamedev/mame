@@ -121,7 +121,6 @@ DIP locations verified for:
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -627,7 +626,7 @@ void punchout_state::punchout(machine_config &config)
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_punchout);
 	PALETTE(config, m_palette).set_entries(0x200);
-	config.set_default_layout(layout_dualhovu);
+	config.set_default_layout("dualhovu");
 
 	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
 	top.set_refresh_hz(60);

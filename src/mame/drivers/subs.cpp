@@ -24,7 +24,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
-#include "rendlay.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -187,7 +187,7 @@ void subs_state::subs(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(subs_state::subs_palette), 4);
 
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(57);

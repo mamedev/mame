@@ -31,7 +31,6 @@
 #include "bus/generic/slot.h"
 #include "cpu/m6805/m68705.h"
 
-#include "m68705prg.lh"
 
 
 namespace {
@@ -242,7 +241,7 @@ void m68705prg_state_base::m68705prg(machine_config &config)
 	GENERIC_SOCKET(config, m_mcu_image, generic_plain_slot, "mcu", "bin,rom");
 	m_mcu_image->set_device_load(FUNC(m68705prg_state_base::mcu_load));
 
-	config.set_default_layout(layout_m68705prg);
+	config.set_default_layout("m68705prg");
 }
 
 template<> void p3prg_state::prg(machine_config &config)

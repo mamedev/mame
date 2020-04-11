@@ -14,9 +14,9 @@
 #include "coreutil.h"
 
 #include "osdepend.h"
-#include "uismall.fh"
+#include "emu/uismall.fh"
 
-#include "ui/uicmd14.fh"
+#include "emu/ui/uicmd14.fh"
 #include "ui/cmddata.h"
 
 #include <algorithm>

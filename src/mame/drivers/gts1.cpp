@@ -72,7 +72,6 @@ ToDo:
 #include "machine/r10696.h"
 #include "machine/r10788.h"
 #include "cpu/pps4/pps4.h"
-#include "gts1.lh"
 
 #define VERBOSE    1
 #include "logmacro.h"
@@ -736,7 +735,7 @@ void gts1_state::gts1(machine_config & config)
 	u6.update_cb().set(FUNC(gts1_state::gts1_display_w));
 
 	/* Video */
-	config.set_default_layout(layout_gts1);
+	config.set_default_layout("gts1");
 
 	/* Sound */
 	genpin_audio(config);

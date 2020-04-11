@@ -14,7 +14,6 @@
 #include "sound/ay8910.h"
 #include "speaker.h"
 
-#include "icecold.lh"
 
 
 class icecold_state : public driver_device
@@ -398,7 +397,7 @@ void icecold_state::icecold(machine_config &config)
 	TIMER(config, "motors_timer", 0).configure_periodic(FUNC(icecold_state::icecold_motors_timer), attotime::from_msec(50));
 
 	// video hardware
-	config.set_default_layout(layout_icecold);
+	config.set_default_layout("icecold");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

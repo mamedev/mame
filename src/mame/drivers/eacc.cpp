@@ -49,7 +49,6 @@
 /* Core includes */
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "eacc.lh"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
@@ -252,7 +251,7 @@ void eacc_state::eacc(machine_config &config)
 	m_maincpu->set_ram_enable(false); // FIXME: needs standby support
 	m_maincpu->set_addrmap(AS_PROGRAM, &eacc_state::eacc_mem);
 
-	config.set_default_layout(layout_eacc);
+	config.set_default_layout("eacc");
 
 	PIA6821(config, m_pia, 0);
 	m_pia->readpb_handler().set(FUNC(eacc_state::eacc_keyboard_r));

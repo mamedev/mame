@@ -556,8 +556,6 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#include "irrmaze.lh"
-#include "neogeo.lh"
 
 
 #define LOG_VIDEO_SYSTEM         (0)
@@ -1924,7 +1922,7 @@ void neogeo_base_state::neogeo_base(machine_config &config)
 	m_systemlatch->q_out_cb<7>().set(FUNC(neogeo_base_state::set_palette_bank));
 
 	/* video hardware */
-	config.set_default_layout(layout_neogeo);
+	config.set_default_layout("neogeo");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART);
@@ -2469,7 +2467,7 @@ void mvs_state::irrmaze(machine_config &config)
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge_fixed, "irrmaze", true);
 
-	config.set_default_layout(layout_irrmaze);
+	config.set_default_layout("irrmaze");
 
 	cartslot_fixed(config, "rom");
 }

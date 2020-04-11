@@ -69,7 +69,6 @@ ___________________________________________________________________________
 #include "machine/bfm_comn.h"
 #include "speaker.h"
 
-#include "bfmsys85.lh"
 
 class bfmsys85_state : public driver_device
 {
@@ -430,7 +429,7 @@ void bfmsys85_state::bfmsys85(machine_config &config)
 
 	METERS(config, m_meters, 0).set_number(8);
 
-	config.set_default_layout(layout_bfmsys85);
+	config.set_default_layout("bfmsys85");
 }
 
 // input ports for system85 board /////////////////////////////////////////

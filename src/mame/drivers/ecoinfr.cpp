@@ -42,7 +42,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8251.h"
 #include "machine/timer.h"
-#include "ecoinfr.lh"
 #include "machine/steppers.h" // stepper motor
 #include "video/awpvid.h" // drawing reels
 
@@ -780,7 +779,7 @@ void ecoinfr_state::ecoinfr(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ecoinfr_state::portmap);
 	TIMER(config , "ectimer" , 0).configure_periodic(FUNC(ecoinfr_state::ecoinfr_irq_timer), attotime::from_hz(250));
 
-	config.set_default_layout(layout_ecoinfr);
+	config.set_default_layout("ecoinfr");
 
 	I8251(config, UPD8251_TAG, 0);
 

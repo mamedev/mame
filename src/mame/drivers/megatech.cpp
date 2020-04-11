@@ -78,7 +78,7 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
-#include "rendlay.h"
+
 
 #include "includes/megadriv.h"
 #include "bus/generic/slot.h"
@@ -706,7 +706,7 @@ void mtech_state::megatech(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mtech_state, megatech)
 
-	config.set_default_layout(layout_dualhovu);
+	config.set_default_layout("dualhovu");
 
 	screen_device &screen(*subdevice<screen_device>("megadriv"));
 	screen.set_raw(XTAL(10'738'635)/2,

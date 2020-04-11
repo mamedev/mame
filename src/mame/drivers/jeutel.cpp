@@ -25,7 +25,6 @@ ToDo:
 #include "sound/tms5110.h"
 #include "speaker.h"
 
-#include "jeutel.lh"
 
 
 class jeutel_state : public genpin_class
@@ -212,7 +211,7 @@ void jeutel_state::jeutel(machine_config &config)
 	cpu3.set_addrmap(AS_IO, &jeutel_state::jeutel_cpu3_io);
 
 	/* Video */
-	config.set_default_layout(layout_jeutel);
+	config.set_default_layout("jeutel");
 
 	/* Sound */
 	genpin_audio(config);

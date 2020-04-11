@@ -40,7 +40,7 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#include "wswan.lh"
+
 
 void wswan_state::wswan_mem(address_map &map)
 {
@@ -139,7 +139,7 @@ void wswan_state::wswan(machine_config &config)
 	screen.set_raw(3.072_MHz_XTAL, 256, 0, WSWAN_X_PIXELS, 159, 0, WSWAN_Y_PIXELS);
 	screen.set_palette("palette");
 
-	config.set_default_layout(layout_wswan);
+	config.set_default_layout("wswan");
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 

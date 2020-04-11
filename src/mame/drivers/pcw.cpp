@@ -108,7 +108,6 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#include "pcw.lh"
 
 #define LOG_PRN      (1U <<  1)
 #define LOG_STROBE   (1U <<  2)
@@ -1309,7 +1308,7 @@ void pcw_state::pcw8256(machine_config &config)
 	printer.set_screen_update(FUNC(pcw_state::screen_update_pcw_printer));
 	printer.set_palette(m_ppalette);
 
-	config.set_default_layout(layout_pcw);
+	config.set_default_layout("pcw");
 }
 
 void pcw_state::pcw8512(machine_config &config)
@@ -1327,7 +1326,7 @@ void pcw_state::pcw8512(machine_config &config)
 	printer.set_screen_update(FUNC(pcw_state::screen_update_pcw_printer));
 	printer.set_palette(m_ppalette);
 
-	config.set_default_layout(layout_pcw);
+	config.set_default_layout("pcw");
 
 	/* internal ram */
 	m_ram->set_default_size("512K");

@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #include "emu.h"
 #include "includes/pc8401a.h"
-#include "rendlay.h"
-#include "pc8500.lh"
+
+
 
 /* PC-8401A */
 
@@ -60,7 +60,7 @@ void pc8401a_state::pc8500_lcdc(address_map &map)
 
 void pc8401a_state::pc8401a_video(machine_config &config)
 {
-//  config.set_default_layout(layout_pc8401a);
+//  config.set_default_layout("pc8401a");
 
 	PALETTE(config, "palette", FUNC(pc8401a_state::pc8401a_palette), 2);
 
@@ -79,7 +79,7 @@ void pc8401a_state::pc8401a_video(machine_config &config)
 
 void pc8500_state::pc8500_video(machine_config &config)
 {
-	config.set_default_layout(layout_pc8500);
+	config.set_default_layout("pc8500");
 
 	PALETTE(config, "palette", FUNC(pc8500_state::pc8401a_palette), 2 + 8);
 

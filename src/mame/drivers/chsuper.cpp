@@ -30,7 +30,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "chsuper.lh"
 
 
 class chsuper_state : public driver_device
@@ -552,7 +551,7 @@ void chsuper_state::init_chmpnum()
 *************************/
 
 /*     YEAR  NAME      PARENT    MACHINE  INPUT    CLASS          INIT           ROT   COMPANY         FULLNAME                    FLAGS                    LAYOUT */
-GAMEL( 1999, chsuper3, 0,        chsuper, chsuper, chsuper_state, init_chsuper3, ROT0, "<unknown>",    "Champion Super 3 (V0.35)", MACHINE_IMPERFECT_SOUND, layout_chsuper ) //24/02/99
-GAMEL( 1999, chsuper2, chsuper3, chsuper, chsuper, chsuper_state, init_chsuper2, ROT0, "<unknown>",    "Champion Super 2 (V0.13)", MACHINE_IMPERFECT_SOUND, layout_chsuper ) //26/01/99
+GAMEL( 1999, chsuper3, 0,        chsuper, chsuper, chsuper_state, init_chsuper3, ROT0, "<unknown>",    "Champion Super 3 (V0.35)", MACHINE_IMPERFECT_SOUND, "chsuper" ) //24/02/99
+GAMEL( 1999, chsuper2, chsuper3, chsuper, chsuper, chsuper_state, init_chsuper2, ROT0, "<unknown>",    "Champion Super 2 (V0.13)", MACHINE_IMPERFECT_SOUND, "chsuper" ) //26/01/99
 GAME(  1999, chmpnum,  chsuper3, chsuper, chsuper, chsuper_state, init_chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.74)",  MACHINE_IMPERFECT_SOUND )                 //10/11/99
 GAME(  1999, chmpnuma, chsuper3, chsuper, chsuper, chsuper_state, init_chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.67)",  MACHINE_IMPERFECT_SOUND )                 //21/10/99

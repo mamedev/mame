@@ -45,7 +45,6 @@
 
 #include "formats/ms0515_dsk.h"
 
-#include "ms0515.lh"
 
 
 #define LOG_GENERAL (1U <<  0)
@@ -535,7 +534,7 @@ void ms0515_state::ms0515(machine_config &config)
 	screen.set_screen_update(FUNC(ms0515_state::screen_update_ms0515));
 	screen.screen_vblank().set(FUNC(ms0515_state::screen_vblank));
 	screen.set_palette("palette");
-	config.set_default_layout(layout_ms0515);
+	config.set_default_layout("ms0515");
 
 	PALETTE(config, "palette", FUNC(ms0515_state::ms0515_palette), 16);
 

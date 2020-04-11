@@ -54,19 +54,13 @@ very few bytes difference between revisions. The first Corona is engine version 
 
 #include "emu.h"
 #include "includes/saitek_stratos.h"
-
 #include "cpu/m6502/m65c02.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-
 #include "softlist.h"
 #include "speaker.h"
-
-// internal artwork
-#include "saitek_stratos.lh" // clickable
-#include "saitek_tking.lh" // clickable
 
 
 class stratos_state : public saitek_stratos_state
@@ -504,7 +498,7 @@ void stratos_state::stratos(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(2+4, 8+1);
-	config.set_default_layout(layout_saitek_stratos);
+	config.set_default_layout("saitek_stratos");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -521,7 +515,7 @@ void stratos_state::stratos(machine_config &config)
 void stratos_state::tking(machine_config &config)
 {
 	stratos(config);
-	config.set_default_layout(layout_saitek_tking);
+	config.set_default_layout("saitek_tking");
 }
 
 void stratos_state::tking2(machine_config &config)

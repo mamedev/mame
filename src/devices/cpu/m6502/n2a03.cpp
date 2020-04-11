@@ -84,4 +84,4 @@ void n2a03_device::device_add_mconfig(machine_config &config)
 }
 
 
-#include "cpu/m6502/n2a03.hxx"
+#include "emu/cpu/m6502/n2a03.hxx"

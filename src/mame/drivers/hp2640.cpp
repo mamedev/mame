@@ -67,7 +67,6 @@
 #include "emupal.h"
 #include "speaker.h"
 
-#include "hp2640.lh"
 
 // Debugging
 #define VERBOSE 0
@@ -986,7 +985,7 @@ void hp2645_state::hp2645(machine_config &config)
 	m_screen->set_screen_update(FUNC(hp2645_state::screen_update));
 	TIMER(config, "scantimer").configure_scanline(FUNC(hp2645_state::scanline_timer), "screen", 0, 1);
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
-	config.set_default_layout(layout_hp2640);
+	config.set_default_layout("hp2640");
 
 	// RS232
 	RS232_PORT(config, m_rs232, default_rs232_devices , nullptr);

@@ -43,9 +43,6 @@ hex compare with sexperta, the program differences are minor.
 #include "screen.h"
 #include "speaker.h"
 
-// internal artwork
-#include "novag_sexpert.lh" // clickable
-#include "novag_sforte.lh" // clickable
 
 
 namespace {
@@ -451,7 +448,7 @@ void sexpert_state::sexpert(machine_config &config)
 	m_lcd->set_pixel_update_cb(FUNC(sexpert_state::lcd_pixel_update));
 
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
-	config.set_default_layout(layout_novag_sexpert);
+	config.set_default_layout("novag_sexpert");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -468,7 +465,7 @@ void sforte_state::sforte(machine_config &config)
 	m_irq_on->set_start_delay(m_irq_on->period() - attotime::from_usec(10)); // tlow measured between 8us and 12us (unstable)
 	m_board->set_type(sensorboard_device::BUTTONS);
 
-	config.set_default_layout(layout_novag_sforte);
+	config.set_default_layout("novag_sforte");
 }
 
 

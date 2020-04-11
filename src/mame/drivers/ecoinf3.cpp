@@ -21,7 +21,6 @@
 #include "video/awpvid.h" // drawing reels
 #include "speaker.h"
 
-#include "ecoinf3.lh"
 
 #include <algorithm>
 
@@ -667,7 +666,7 @@ void ecoinf3_state::ecoinf3_pyramid(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinf3_state::pyramid_memmap);
 	m_maincpu->set_addrmap(AS_IO, &ecoinf3_state::pyramid_portmap);
 
-	config.set_default_layout(layout_ecoinf3);
+	config.set_default_layout("ecoinf3");
 
 	SPEAKER(config, "mono").front_center();
 

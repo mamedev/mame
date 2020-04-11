@@ -42,7 +42,6 @@
 
 #include "speaker.h"
 
-#include "beta.lh"
 
 #define SCREEN_TAG      "screen"
 #define M6502_TAG       "m6502"
@@ -352,7 +351,7 @@ void beta_state::beta(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &beta_state::beta_mem);
 
 	/* video hardware */
-	config.set_default_layout(layout_beta);
+	config.set_default_layout("beta");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -115,4 +115,4 @@ void m6509_device::mi_6509::write_9(uint16_t adr, uint8_t val)
 		base->bank_y_w(val);
 }
 
-#include "cpu/m6502/m6509.hxx"
+#include "emu/cpu/m6502/m6509.hxx"

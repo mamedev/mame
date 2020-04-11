@@ -54,8 +54,6 @@
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
 
-#include "bbc.lh"
-#include "bbcm.lh"
 
 /******************************************************************************
 A  = BBC Model A
@@ -954,7 +952,7 @@ void bbc_state::bbca(machine_config &config)
 	m_hd6845->out_hsync_callback().set(FUNC(bbc_state::bbc_hsync_changed));
 	m_hd6845->out_vsync_callback().set(FUNC(bbc_state::bbc_vsync_changed));
 
-	config.set_default_layout(layout_bbc);
+	config.set_default_layout("bbc");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1422,7 +1420,7 @@ void bbcm_state::bbcm(machine_config &config)
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("128K").set_default_value(0xff);
 
-	config.set_default_layout(layout_bbcm);
+	config.set_default_layout("bbcm");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

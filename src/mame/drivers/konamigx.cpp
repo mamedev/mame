@@ -105,7 +105,7 @@
 #include "machine/eepromser.h"
 #include "sound/k054539.h"
 #include "sound/k056800.h"
-#include "rendlay.h"
+
 #include "speaker.h"
 
 
@@ -1813,7 +1813,7 @@ void konamigx_state::gxtype3(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::gx_type3_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(konamigx_state::konamigx_type4_scanline), "screen", 0, 1);
 
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_type3);
 
@@ -1850,7 +1850,7 @@ void konamigx_state::gxtype4(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::gx_type4_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(konamigx_state::konamigx_type4_scanline), "screen", 0, 1);
 
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE);
 	//m_screen->set_size(128*8, 264);
@@ -1882,7 +1882,7 @@ void konamigx_state::gxtype4(machine_config &config)
 void konamigx_state::gxtype4_vsn(machine_config &config)
 {
 	gxtype4(config);
-	config.set_default_layout(layout_dualhsxs);
+	config.set_default_layout("dualhsxs");
 
 	//m_screen->set_size(128*8, 32*8);
 	//m_screen->set_visarea(0, 576-1, 16, 32*8-1-16);

@@ -23,7 +23,7 @@ Press the up-arrow key to confirm data has been entered.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "z80dev.lh"
+
 
 class z80dev_state : public driver_device
 {
@@ -131,7 +131,7 @@ void z80dev_state::z80dev(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &z80dev_state::io_map);
 
 	/* video hardware */
-	config.set_default_layout(layout_z80dev);
+	config.set_default_layout("z80dev");
 }
 
 /* ROM definition */

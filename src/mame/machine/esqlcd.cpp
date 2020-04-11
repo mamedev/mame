@@ -6,7 +6,7 @@
 */
 #include "emu.h"
 #include "esqlcd.h"
-#include "esq2by16.lh"
+
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -164,7 +164,7 @@ static unsigned char const Font5x7[][5] = {
 
 void esq2x16_sq1_device::device_add_mconfig(machine_config &config)
 {
-	config.set_default_layout(layout_esq2by16);
+	config.set_default_layout("esq2by16");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

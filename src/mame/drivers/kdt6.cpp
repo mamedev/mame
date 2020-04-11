@@ -32,7 +32,6 @@
 #include "screen.h"
 #include "speaker.h"
 #include "softlist.h"
-#include "kdt6.lh"
 
 
 //**************************************************************************
@@ -631,7 +630,7 @@ void kdt6_state::psi98(machine_config &config)
 	screen.set_screen_update(FUNC(kdt6_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
-	config.set_default_layout(layout_kdt6);
+	config.set_default_layout("kdt6");
 
 	MC6845(config, m_crtc, XTAL(13'516'800) / 8);
 	m_crtc->set_screen("screen");

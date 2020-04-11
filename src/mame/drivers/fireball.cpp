@@ -22,7 +22,6 @@
 #include "sound/ay8910.h"
 #include "speaker.h"
 
-#include "fireball.lh"
 
 
 /****************************
@@ -513,7 +512,7 @@ void fireball_state::fireball(machine_config &config)
 	AY8912(config, m_ay, AY_CLK).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* Video */
-	config.set_default_layout(layout_fireball);
+	config.set_default_layout("fireball");
 }
 
 

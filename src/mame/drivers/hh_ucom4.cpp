@@ -72,18 +72,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-// internal artwork (complete)
-#include "ctntune.lh" // clickable
-#include "efball.lh"
-#include "grobot9.lh" // clickable
-#include "mcompgin.lh"
-#include "mvbfree.lh"
-#include "tactix.lh" // clickable
-
-// internal artwork (bezel overlay)
-#include "tmtennis.lh"
-
-//#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 class hh_ucom4_state : public driver_device
@@ -1138,7 +1126,7 @@ void tactix_state::tactix(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 4);
-	config.set_default_layout(layout_tactix);
+	config.set_default_layout("tactix");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1279,7 +1267,7 @@ void ctntune_state::ctntune(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 7+2);
 	m_display->set_segmask(1, 0x7f);
-	config.set_default_layout(layout_ctntune);
+	config.set_default_layout("ctntune");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1510,7 +1498,7 @@ void efball_state::efball(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 11);
-	config.set_default_layout(layout_efball);
+	config.set_default_layout("efball");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1964,7 +1952,7 @@ void mcompgin_state::mcompgin(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(8, 24);
 
-	config.set_default_layout(layout_mcompgin);
+	config.set_default_layout("mcompgin");
 
 	/* no sound! */
 }
@@ -2072,7 +2060,7 @@ void mvbfree_state::mvbfree(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(14, 10);
-	config.set_default_layout(layout_mvbfree);
+	config.set_default_layout("mvbfree");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2195,7 +2183,7 @@ void grobot9_state::grobot9(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1, 9);
-	config.set_default_layout(layout_grobot9);
+	config.set_default_layout("grobot9");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2470,7 +2458,7 @@ void tmtennis_state::tmtennis(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(12, 12);
-	config.set_default_layout(layout_tmtennis);
+	config.set_default_layout("tmtennis");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

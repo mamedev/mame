@@ -4,7 +4,7 @@
 #include "machine/megacd.h"
 #include "machine/nvram.h"
 #include "video/315_5313.h"
-#include "megacd.lh"
+
 
 
 #define SEGACD_CLOCK      12500000
@@ -312,7 +312,7 @@ void sega_segacd_device::device_add_mconfig(machine_config &config)
 	TIMER(config, m_irq3_timer).configure_generic(FUNC(sega_segacd_device::irq3_timer_callback));
 	TIMER(config, m_dma_timer).configure_generic(FUNC(sega_segacd_device::dma_timer_callback));
 
-	config.set_default_layout(layout_megacd);
+	config.set_default_layout("megacd");
 
 	RF5C68(config, m_rfsnd, SEGACD_CLOCK); // RF5C164!
 	m_rfsnd->add_route( 0, ":lspeaker", 0.50 );

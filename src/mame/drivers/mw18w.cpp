@@ -20,7 +20,6 @@ To diagnose game, turn on service mode and:
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 
-#include "18w.lh"
 
 
 class mw18w_state : public driver_device
@@ -320,5 +319,5 @@ ROM_START( 18w2 )
 ROM_END
 
 
-GAMEL( 1979, 18w,  0,   mw18w, mw18w, mw18w_state, empty_init, ROT0, "Midway", "18 Wheeler (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_18w )
-GAMEL( 1979, 18w2, 18w, mw18w, mw18w, mw18w_state, empty_init, ROT0, "Midway", "18 Wheeler (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_18w )
+GAMEL( 1979, 18w,  0,   mw18w, mw18w, mw18w_state, empty_init, ROT0, "Midway", "18 Wheeler (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, "18w" )
+GAMEL( 1979, 18w2, 18w, mw18w, mw18w, mw18w_state, empty_init, ROT0, "Midway", "18 Wheeler (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, "18w" )

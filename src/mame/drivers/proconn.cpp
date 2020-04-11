@@ -37,7 +37,6 @@
 
 #include "speaker.h"
 
-#include "proconn.lh"
 
 
 class proconn_state : public driver_device
@@ -326,7 +325,7 @@ void proconn_state::proconn(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 
-	config.set_default_layout(layout_proconn);
+	config.set_default_layout("proconn");
 
 	AY8910(config, m_ay, 1000000); /* ?? Mhz */ // YM2149F on PC92?
 	m_ay->port_b_write_callback().set(FUNC(proconn_state::meter_w));

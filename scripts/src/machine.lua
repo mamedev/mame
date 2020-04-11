@@ -1494,14 +1494,6 @@ if (MACHINES["IE15"]~=null) then
 		MAME_DIR .. "src/devices/machine/ie15_kbd.cpp",
 		MAME_DIR .. "src/devices/machine/ie15_kbd.h",
 	}
-
-	dependency {
-		{ MAME_DIR .. "src/devices/machine/ie15.cpp", GEN_DIR .. "emu/layout/ie15.lh" },
-	}
-
-	custombuildtask {
-		layoutbuildtask("emu/layout", "ie15"),
-	}
 end
 
 ---------------------------------------------------

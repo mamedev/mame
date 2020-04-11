@@ -48,7 +48,6 @@ ToDo:
 #include "sound/ay8910.h"
 #include "speaker.h"
 
-#include "ltd.lh"
 
 
 class ltd_state : public genpin_class
@@ -531,7 +530,7 @@ void ltd_state::ltd3(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	config.set_default_layout(layout_ltd);
+	config.set_default_layout("ltd");
 
 	/* Sound */
 	genpin_audio(config);
@@ -552,7 +551,7 @@ void ltd_state::ltd4(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	config.set_default_layout(layout_ltd);
+	config.set_default_layout("ltd");
 
 	/* Sound */
 	genpin_audio(config);

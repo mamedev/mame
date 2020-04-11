@@ -33,7 +33,6 @@ TODO:
 
 #include "emu.h"
 #include "includes/poly880.h"
-#include "poly880.lh"
 
 
 /* Read/Write Handlers */
@@ -258,7 +257,7 @@ void poly880_state::poly880(machine_config &config)
 	m_maincpu->set_daisy_config(poly880_daisy_chain);
 
 	/* video hardware */
-	config.set_default_layout(layout_poly880);
+	config.set_default_layout("poly880");
 
 	/* devices */
 	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, XTAL(7'372'800)/16));

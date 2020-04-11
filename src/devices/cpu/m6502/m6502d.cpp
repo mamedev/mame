@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "m6502d.h"
-#include "cpu/m6502/m6502d.hxx"
+#include "emu/cpu/m6502/m6502d.hxx"
 
 m6502_base_disassembler::m6502_base_disassembler(const disasm_entry *_table) : table(_table)
 {

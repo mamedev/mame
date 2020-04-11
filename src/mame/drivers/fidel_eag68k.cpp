@@ -170,9 +170,6 @@ B0000x-xxxxxx: see V7, -800000
 #include "softlist.h"
 #include "speaker.h"
 
-// internal artwork
-#include "fidel_ex_68k.lh" // clickable
-#include "fidel_eag_68k.lh" // clickable
 
 
 namespace {
@@ -564,7 +561,7 @@ void excel68k_state::fex68k(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8, 16);
 	m_display->set_segmask(0x55, 0x7f);
-	config.set_default_layout(layout_fidel_ex_68k);
+	config.set_default_layout("fidel_ex_68k");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -621,7 +618,7 @@ void eag_state::eag_base(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	m_display->set_segmask(0x1ef, 0x7f);
-	config.set_default_layout(layout_fidel_eag_68k);
+	config.set_default_layout("fidel_eag_68k");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

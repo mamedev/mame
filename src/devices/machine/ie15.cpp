@@ -16,7 +16,6 @@
 
 #include "emupal.h"
 
-#include "ie15.lh"
 
 
 #define VERBOSE_DBG 1       /* general debug messages */
@@ -667,7 +666,7 @@ void ie15_device::ie15core(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ie15_device::ie15_mem);
 	m_maincpu->set_addrmap(AS_IO, &ie15_device::ie15_io);
 
-	config.set_default_layout(layout_ie15);
+	config.set_default_layout("ie15");
 
 	/* Devices */
 	IE15_KEYBOARD(config, m_keyboard, 0).keyboard_cb().set(FUNC(ie15_device::kbd_put));

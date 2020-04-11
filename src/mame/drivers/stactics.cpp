@@ -44,7 +44,7 @@ Verify Color PROM resistor values (Last 8 colors)
 
 #include "emu.h"
 #include "includes/stactics.h"
-#include "stactics.lh"
+
 
 #include "cpu/i8085/i8085.h"
 
@@ -382,4 +382,4 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1981, stactics, 0, stactics, stactics, stactics_state, empty_init, ORIENTATION_FLIP_X, "Sega", "Space Tactics", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_stactics )
+GAMEL( 1981, stactics, 0, stactics, stactics, stactics_state, empty_init, ORIENTATION_FLIP_X, "Sega", "Space Tactics", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, "stactics" )

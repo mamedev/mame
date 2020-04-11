@@ -34,7 +34,7 @@
 #include "emupal.h"
 #include "screen.h"
 
-#include "unixpc.lh"
+
 
 
 /***************************************************************************
@@ -400,7 +400,7 @@ void unixpc_state::unixpc(machine_config &config)
 	screen.set_palette("palette");
 	// vsync should actually last 17264 pixels
 
-	config.set_default_layout(layout_unixpc);
+	config.set_default_layout("unixpc");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
