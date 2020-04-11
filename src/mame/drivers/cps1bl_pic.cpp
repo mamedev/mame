@@ -1061,6 +1061,7 @@ ROM_END
 /*
     Jurassic 99 (Cadillacs and Dinosaurs bootleg)
     pcb marking: H11F6
+	uses a pin compatible EMC EM78P447AP instead of usual PIC 16c57, secured unfortunately so no dump
 	
 	  __________________________________________
 	  |TDA2003(V)  U6295  ROM 30MHz   6116      |
@@ -1098,12 +1099,12 @@ ROM_START( jurassic99 )
 	ROM_CONTINUE( 0x200002, 0x80000 )
 	ROM_CONTINUE( 0x200006, 0x80000 )
 
-	// EMC EM78P447AP, secured?
-	//ROM_REGION( ?, "audiocpu", 0 )
-	//ROM_LOAD( "u28.bin", 0x0000, ?, NO_DUMP )
+	// EMC EM78P447AP, secured
+	//ROM_REGION( 0x3000, "audiocpu", 0 )
+	//ROM_LOAD( "u28.bin", 0x0000, 0x2020, NO_DUMP )
 
-	ROM_REGION( 0x80000, "oki", 0 )  // TODO: dump, use dinopic3 for now
-	ROM_LOAD( "21003_u27.bin", 0x000000, 0x80000, CRC(7d921309) SHA1(d51e60e904d302c2516b734189e141aa171b2b82) )
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "21003_u27.bin", 0x000000, 0x80000, CRC(7d921309) SHA1(d51e60e904d302c2516b734189e141aa171b2b82) )  // == dinopic, dinopic2, dinopic3
 
 	/* pld devices:
 	U25    ATF20V8B-15PC  1?
@@ -1119,7 +1120,10 @@ ROM_START( jurassic99 )
 	U134G  ATF16V8B-15PC  8?
 	U124   Actel A1020A   84-pin PLCC
 	
-	the number is hand-written on chip, ? = hard to read or rubbed off, 8's are the same?, no #7?
+	3rd column numbers are what's hand-written on each chip
+	? = hard to read or rubbed off
+	seems to be no #7 ?
+	the #8's have alternative 16-pin dip footprints underneath, picture of a very similar pcb shows some ttl chips fitted instead of the pals, can't read what they are unfortunately!
 	*/
 ROM_END
 
