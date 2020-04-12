@@ -4401,22 +4401,19 @@ ROM_START( strideruc )
 	ROM_LOAD( "18.11c",  0x00000, 0x20000, CRC(4386bc80) SHA1(fb2b261995aeacfa13e7ee40b1a973dfb178f015) )
 	ROM_LOAD( "19.12c",  0x20000, 0x20000, CRC(444536d7) SHA1(a14f5de2f6b5b29ae5161dca1f8c08c566301a91) )
 
-	// which of these should we be using?
-	/*
-	ROM_REGION( 0x0200, "aboardplds", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0200, "aboardplds", 0 )
 	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
 	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
 	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
 	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
-	ROM_REGION( 0x0200, "bboardplds", ROMREGION_ERASE00 )
-	ROM_LOAD( "stf29.1a",     0x0000, 0x0117, CRC(043309c5) SHA1(f6b9610c9f896c495041ba56a654776a521c356b) )
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "unknown.1a",   0x0000, 0x0117, NO_DUMP ) // unknown custom pal or gal
 	ROM_LOAD( "iob1.11d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 
-	ROM_REGION( 0x0200, "cboardplds", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0200, "cboardplds", 0 )
 	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
-	*/
 ROM_END
 
 /* B-Board 88622B-3 */
