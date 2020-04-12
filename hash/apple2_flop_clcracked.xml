@@ -36630,4 +36630,24 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="latnhngm">
+		<description>The Latin Hangman (Revision 1004) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Unknown</publisher>
+		<info name="release" value="2020-04-10"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the latin hangman (4am crack) side a.dsk" size="143360" crc="149607b3" sha1="fe4bafbede79e043691e7ea2b29f56a02bdc4f50"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the latin hangman (4am crack) side b.dsk" size="143360" crc="d4c340bf" sha1="4bbaf3a092e4c48408dbd60a1ee3f750d69ceefc"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

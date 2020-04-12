@@ -12085,4 +12085,144 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="latnhngm">
+		<description>The Latin Hangman (Revision 1004)</description>
+		<year>1983</year>
+		<publisher>Unknown</publisher>
+		<info name="release" value="2020-04-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 32K. -->
+		<!-- Game is copyright George Earl, but no apparent publisher -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234766">
+				<rom name="the latin hangman side a.woz" size="234766" crc="0811061d" sha1="801d724fdd4f62c7f4052eb15ca81eeb0142b88a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234766">
+				<rom name="the latin hangman side b.woz" size="234766" crc="1a30bfd6" sha1="ca7b7df68a89a3ab87d34ead7ca2fbb47c38ba15"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="816pnt31">
+		<description>816/Paint (Version 3.1)</description>
+		<year>1987</year>
+		<publisher>Baudville</publisher>
+		<info name="release" value="2020-04-11"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- This is the 5.25-inch disk part of version 3.1. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228110">
+				<rom name="816 paint v3.1.woz" size="228110" crc="5348048a" sha1="b8673692b4f3d4e8d2281dc58c48c2facd28a6f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliens">
+		<description>Aliens</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2020-04-11"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241429">
+				<rom name="aliens.woz" size="241429" crc="2ccbad87" sha1="d254d20ef3095666ada034ea47327ef08375a672"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brdtale3">
+		<description>The Bard's Tale III: The Thief of Fate</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2020-04-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Boot"/>
+			<dataarea name="flop" size="234820">
+				<rom name="the bard's tale iii disk 1a - boot.woz" size="234820" crc="0d92adf1" sha1="afec810cc36929f05d774f581c7a4b94588500b1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Character"/>
+			<dataarea name="flop" size="234825">
+				<rom name="the bard's tale iii disk 1b - character.woz" size="234825" crc="bc266220" sha1="b8db19d79fb182b95697262dece469067ffef65c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Dungeon A"/>
+			<dataarea name="flop" size="234825">
+				<rom name="the bard's tale iii disk 2a - dungeon a.woz" size="234825" crc="2c962b97" sha1="200229e56978e57ac68183fffa4a1012c3ebfc95"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Dungeon B"/>
+			<dataarea name="flop" size="234825">
+				<rom name="the bard's tale iii disk 2b - dungeon b.woz" size="234825" crc="ca6ef3c4" sha1="2c56ca1744e482864a49cf41b6355038d5a7c97e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tplogo11">
+		<description>Terrapin Logo Plus (Version 1.1)</description>
+		<year>1988</year>
+		<publisher>Terrapin</publisher>
+		<info name="release" value="2020-04-11"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Language disk"/>
+			<dataarea name="flop" size="234808">
+				<rom name="terrapin logo plus v1.1 side a - language disk.woz" size="234808" crc="d8850aed" sha1="0a19f16147d5414d280d85ec198a56533c17a311"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Utilities disk"/>
+			<dataarea name="flop" size="234809">
+				<rom name="terrapin logo plus v1.1 side b - utilities disk.woz" size="234809" crc="d5c7efae" sha1="37fc098d799d6b32c5695288731adfb291219694"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abm">
+		<description>ABM</description>
+		<year>1980</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2020-04-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 13-sector drive and a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="abm.woz" size="234776" crc="c6e64a66" sha1="b2145b3c5e7aec31cdb667ef33e67b6046ebf109"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttnklobb">
+		<description>Tink!Tonk! Tonk in the Land of the Buddy-Bots</description>
+		<year>1984</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2020-04-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234814">
+				<rom name="tink!tonk! tonk in the land of buddy-bots.woz" size="234814" crc="0d3a8556" sha1="30b80f93ba4ad2684e09ec52db21c3734ba325e2"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
