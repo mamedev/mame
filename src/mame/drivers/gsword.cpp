@@ -258,9 +258,9 @@ contained within a single page.  The initialisation/self test and mode
 selection, the subroutine for receiving configuration, and an unused
 subroutine for sending a negated program byte to the host are in page 0.
 The subroutines that implement coin handling are in page 1.  There are
-three input handling programs of increasing of increasing complexity
-in page 2 and page 3.  The host selects the input handling program to
-use with the high nybble of the command sent to the microcontroller.
+three input handling and protection programs of increasing of increasing
+complexity in page 2 and page 3.  The host selects the input handling
+program to use with the high nybble of the first command.
 
 The subroutine for receiving configuration from the host is identical to
 the one in the AA-016 MCU besides being shifted to a different address.
@@ -269,12 +269,18 @@ being shifted to a different address.  This MCU does not contain program
 ROM checksum code, so there is no way to verify the integrity of the
 program.
 
-Great Swordsman uses the simplest input handling program which starts at
+After the self test and initialisation complete, the MCU waits for a
+command from the host and checks the high nybble.  If it is 0x6x, the
+program at $200 is used; if it is 0x5x, the program at $23C is used; if
+it is 0x4x, the program at 0x300 is used; any other value will be
+ignored and result in the MCU waiting for another command.  Great
+Swordsman uses the simplest input handling program which starts at
 $200 (beginning of page 2).  This is similar to the input handling
-program in AA-016 with the addition of a call to a protection
-subroutine.  Lack of the protection code in AA-016 causes the game to
-register credits unreliably if AA-016 is used in place of AA-017.  The
-values stored at $29 and $2A are used by the protection code.
+program in the AA-016 MCU with the addition of a call to a protection
+subroutine at $3CA added to the beginning of the main loop.  Lack of the
+protection code in AA-016 causes the game to register credits unreliably
+if AA-016 is used in place of AA-017.  The values stored at $29 and $2A
+are used by the protection code.
 
 The I/O MCU handles rejecting coin pulses that are too long or too short
 and converting coins to credits.  The duration is measured in terms of
@@ -1145,13 +1151,13 @@ ROM_START( gsword2 )
 	// 6000-7fff empty
 
 	ROM_REGION( 0x0400, "mcu1", 0 )    // D8741A-8
-	ROM_LOAD( "aa-013.5a",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) )
+	ROM_LOAD( "aa-013.5a",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) BAD_DUMP )
 
 	ROM_REGION( 0x0400, "mcu2", 0 )    // 8041AH
 	ROM_LOAD( "aa-016.9c",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) )
 
 	ROM_REGION( 0x0400, "mcu3", 0 )    // 8041AH
-	ROM_LOAD( "aa-017.9g",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) )
+	ROM_LOAD( "aa-017.9g",    0x0000, 0x0400, CRC(8672007d) SHA1(7f3e30b5a0332fae987d280ed944ada53f16fc95) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "ac1-10.9n",    0x0000, 0x2000, CRC(517c571b) SHA1(05572a8ea416922da50143936fda9ba038f0b91e) )    // tiles
