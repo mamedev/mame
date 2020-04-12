@@ -556,6 +556,8 @@ void fcrash_state::wofabl(machine_config &config)
 	sgyxz(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::wofabl_map);
+
+	MCFG_MACHINE_START_OVERRIDE(fcrash_state, wofabl)
 }
 
 void fcrash_state::varthb(machine_config &config)
@@ -850,6 +852,11 @@ MACHINE_START_MEMBER(fcrash_state,sgyxz)
 	membank("bank1")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
+MACHINE_START_MEMBER(fcrash_state, wofabl)
+{
+	MACHINE_START_CALL_MEMBER(sgyxz);
+	m_sprite_list_end_marker = 0x8000;
+}
 
 void fcrash_state::init_cawingbl()
 {
