@@ -935,6 +935,12 @@ static const struct gfx_range mapper_MS22B_table[] =
 #define mapper_CK24B    { 0x8000, 0, 0, 0 }, mapper_CK24B_table
 static const struct gfx_range mapper_CK24B_table[] =
 {
+	// verified from PAL dump:
+	// bank 0 = pin 16 (ROMs 1,3,5,7)
+	// pins 12,14 allow to populate the 8-bit ROM sockets instead of the 16-bit ones:
+	// pin 12 (ROMs 10,12,14,16,20,22,24,26) = sprites 0000-2fff, scroll1 3000-3fff
+	// pin 14 (ROMs 11,13,15,17,21,23,25,27) = scroll2 4000-6fff, scroll3 7000-7fff  
+	
 	/* type            start   end     bank */
 	{ GFXTYPE_SPRITES, 0x0000, 0x2fff, 0 },
 	{ GFXTYPE_SCROLL1, 0x3000, 0x3fff, 0 },
@@ -1278,7 +1284,7 @@ static const struct gfx_range mapper_VA24B_table[] =
 	// bank 0 = pin 16 (ROMs 1,3,5,7)
 	// pins 12,14 allow to populate the 8-bit ROM sockets instead of the 16-bit ones:
 	// pin 12 (ROMs 10,12,14,16,20,22,24,26) = sprites/scroll1/scroll2/scroll3 0000-3fff
-	// pin 14 (ROMs 11,13,15,17,21,23,25,27) = sprites/scroll1/scroll2/scroll3 4000-7fff  
+	// pin 14 (ROMs 11,13,15,17,21,23,25,27) = sprites/scroll1/scroll2/scroll3 4000-7fff
 
 	/* type                                                                  start    end      bank */
 	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x07fff, 0 },
