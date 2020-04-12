@@ -7873,7 +7873,7 @@ static int display_view_find_menu(int* pal_indices, int count, int* pal_index)
 	int index;
 	int ch;
 	int row;
-	int result;
+	int result = 1;
 
 	if ((mainwin = initscr()) == nullptr)
 	{
