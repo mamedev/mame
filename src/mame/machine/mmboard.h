@@ -29,10 +29,10 @@ public:
 
 	sensorboard_device *get() { return m_board; }
 
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_READ8_MEMBER(mux_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
+	uint8_t input_r();
+	void led_w(uint8_t data);
+	uint8_t mux_r();
+	void mux_w(uint8_t data);
 
 protected:
 	// device-level overrides
@@ -40,7 +40,7 @@ protected:
 	virtual void device_reset() override;
 
 	void set_config(machine_config &config, sensorboard_device::sb_type board_type);
-	DECLARE_WRITE8_MEMBER(refresh_leds_w);
+	void refresh_leds_w(offs_t offset, uint8_t data);
 	void update_led_pwm() { m_led_pwm->matrix(~m_mux, m_led_data); }
 
 	required_device<sensorboard_device> m_board;

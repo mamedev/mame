@@ -187,7 +187,7 @@ READ8_MEMBER(mephisto_montec_state::montec_input_r)
 	if      (m_input_mux & 0x01)    return m_keys[1]->read();
 	else if (m_input_mux & 0x02)    return m_keys[0]->read();
 
-	return m_board->input_r(space, offset) ^ 0xff;
+	return m_board->input_r() ^ 0xff;
 }
 
 READ8_MEMBER(mephisto_montec_state::montec_nmi_ack_r)
@@ -208,9 +208,9 @@ WRITE8_MEMBER(mephisto_montec_state::montec_beeper_w)
 
 WRITE8_MEMBER(mephisto_montec_state::megaiv_led_w)
 {
-	if (m_leds_mux != m_board->mux_r(space, offset))
+	if (m_leds_mux != m_board->mux_r())
 	{
-		m_leds_mux = m_board->mux_r(space, offset);
+		m_leds_mux = m_board->mux_r();
 		for (int i=0; i<8; i++)
 		{
 			if (!BIT(m_leds_mux, i))
@@ -232,7 +232,7 @@ READ8_MEMBER(mephisto_montec_state::megaiv_input_r)
 	else if (m_input_mux & 0x04)    return BIT(m_keys[0]->read(), 0 + offset) << 7;
 	else if (m_input_mux & 0x08)    return BIT(m_keys[0]->read(), 4 + offset) << 7;
 
-	return BIT(m_board->input_r(space, offset), offset) << 7;
+	return BIT(m_board->input_r(), offset) << 7;
 }
 
 
@@ -282,7 +282,7 @@ WRITE8_MEMBER(mephisto_montec_state::smondial_board_mux_w)
 	else
 		m_smondial_board_mux |= (1 << offset);
 
-	m_board->mux_w(space, offset, m_smondial_board_mux);
+	m_board->mux_w(m_smondial_board_mux);
 
 	for (int i=0; i<8; i++)
 	{
@@ -318,7 +318,7 @@ void mephisto_montec_state::smondial_mem(address_map &map)
 
 WRITE8_MEMBER(mephisto_montec_state::mondial2_input_mux_w)
 {
-	uint8_t leds_data = m_board->mux_r(space, offset);
+	uint8_t leds_data = m_board->mux_r();
 	for (int i=0; i<8; i++)
 	{
 		if (!BIT(leds_data, i))
@@ -350,7 +350,7 @@ READ8_MEMBER(mephisto_montec_state::mondial_input_r)
 	if (m_input_mux & 0x08)
 		data = m_keys[BIT(~m_input_mux, 0)]->read();
 	else
-		data = m_board->input_r(space, 0);
+		data = m_board->input_r();
 
 	return BIT(data, offset) << 7;
 }
@@ -358,7 +358,7 @@ READ8_MEMBER(mephisto_montec_state::mondial_input_r)
 WRITE8_MEMBER(mephisto_montec_state::mondial_input_mux_w)
 {
 	uint8_t leds_data = ~(1 << (data & 0x07));
-	m_board->mux_w(space, offset, leds_data);
+	m_board->mux_w(leds_data);
 
 	for (int i=0; i<8; i++)
 	{
