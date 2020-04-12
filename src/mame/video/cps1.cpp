@@ -1286,6 +1286,7 @@ static const struct gfx_range mapper_VA24B_table[] =
 };
 
 
+/* unverified, no dump */
 #define mapper_Q522B    { 0x8000, 0, 0, 0 }, mapper_Q522B_table
 static const struct gfx_range mapper_Q522B_table[] =
 {
@@ -1450,6 +1451,7 @@ static const struct gfx_range mapper_gulunpa_table[] =
 };
 
 
+/* unverified, no dump */
 #define mapper_PKB10B   { 0x8000, 0, 0, 0 }, mapper_PKB10B_table
 static const struct gfx_range mapper_PKB10B_table[] =
 {
@@ -1815,9 +1817,9 @@ static const struct CPS1config cps1_config_table[]=
 	{"varthu",      CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthj",      CPS_B_21_BT5, mapper_VA22B },   /* CPSB test has been patched out (72=0001) register is also written to, possibly leftover from development */
 	{"varthjr",     CPS_B_21_BT5, mapper_VA63B },   /* CPSB test has been patched out (72=0001) register is also written to, possibly leftover from development */
-	{"cworld2j",    CPS_B_21_BT6, mapper_Q522B,  0x36, 0, 0x34 },   /* (ports 36, 34 probably leftover input code from another game) */
-	{"cworld2ja",   CPS_B_21_DEF, mapper_Q522B }, // patched set, no battery, could be desuicided // wrong, this set uses Q529B, still not dumped
-	{"cworld2jb",   CPS_B_21_BT6, mapper_Q522B,  0x36, 0, 0x34 }, // wrong, this set uses Q563B, still not dumped
+	{"cworld2j",    CPS_B_21_BT6, mapper_Q522B,  0x36, 0, 0x34 },  // Q522B unverified, no dump                       ports 36, 34 probably leftover input code from another game
+	{"cworld2ja",   CPS_B_21_DEF, mapper_Q522B },                  // wrong, this set uses Q529B, still not dumped     patched set, no battery, could be desuicided
+	{"cworld2jb",   CPS_B_21_BT6, mapper_Q522B,  0x36, 0, 0x34 },  // wrong, this set uses Q563B, still not dumped
 	{"wof",         CPS_B_21_QS1, mapper_TK263B },
 	{"wofr1",       CPS_B_21_DEF, mapper_TK263B },
 	{"wofa",        CPS_B_21_DEF, mapper_TK263B },  // patched set coming from a desuicided board?
@@ -1855,7 +1857,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"megaman",     CPS_B_21_DEF, mapper_RCM63B },
 	{"megamana",    CPS_B_21_DEF, mapper_RCM63B },
 	{"rockmanj",    CPS_B_21_DEF, mapper_RCM63B },
-	{"pnickj",      CPS_B_21_DEF, mapper_PKB10B },
+	{"pnickj",      CPS_B_21_DEF, mapper_PKB10B },   // PKB10B unverified, no dump
 	{"pang3",       CPS_B_21_DEF, mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"pang3r1",     CPS_B_21_DEF, mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"pang3j",      CPS_B_21_DEF, mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
