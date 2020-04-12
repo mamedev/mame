@@ -3,6 +3,7 @@
 #ifndef MAME_CPU_V32MZ_V30MZ_H
 #define MAME_CPU_V32MZ_V30MZ_H
 
+#include "cpu/nec/necdasm.h"
 
 struct nec_config
 {
@@ -22,7 +23,7 @@ enum
 
 DECLARE_DEVICE_TYPE(V30MZ, v30mz_cpu_device)
 
-class v30mz_cpu_device : public cpu_device
+class v30mz_cpu_device : public cpu_device, public nec_disassembler::config
 {
 public:
 	// construction/destruction
@@ -49,6 +50,7 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	virtual int get_mode() const override { return 1; };
 
 	void interrupt(int int_num);
 
