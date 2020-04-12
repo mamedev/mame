@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
     hashing.c
@@ -9,12 +9,105 @@
 ***************************************************************************/
 
 #include "hashing.h"
+
 #include <zlib.h>
+
+#include <algorithm>
 #include <iomanip>
 #include <sstream>
 
 
 namespace util {
+
+//**************************************************************************
+//  INLINE FUNCTIONS
+//**************************************************************************
+
+namespace {
+
+//-------------------------------------------------
+//  char_to_hex - return the hex value of a
+//  character
+//-------------------------------------------------
+
+constexpr int char_to_hex(char c)
+{
+	return
+			(c >= '0' && c <= '9') ? (c - '0') :
+			(c >= 'a' && c <= 'f') ? (10 + c - 'a') :
+			(c >= 'A' && c <= 'F') ? (10 + c - 'A') :
+			-1;
+}
+
+
+constexpr uint32_t sha1_rol(uint32_t x, unsigned n)
+{
+	return (x << n) | (x >> (32 - n));
+}
+
+uint32_t sha1_b(uint32_t *data, unsigned i)
+{
+	uint32_t r = data[(i + 13) & 15U];
+	r ^= data[(i + 8) & 15U];
+	r ^= data[(i + 2) & 15U];
+	r ^= data[i & 15U];
+	r = sha1_rol(r, 1);
+	data[i & 15U] = r;
+	return r;
+}
+
+inline void sha1_r0(const uint32_t *data, std::array<uint32_t, 5> &d, unsigned i)
+{
+	d[i % 5] = d[i % 5] + ((d[(i + 3) % 5] & (d[(i + 2) % 5] ^ d[(i + 1) % 5])) ^ d[(i + 1) % 5]) + data[i] + 0x5a827999U + sha1_rol(d[(i + 4) % 5], 5);
+	d[(i + 3) % 5] = sha1_rol(d[(i + 3) % 5], 30);
+}
+
+inline void sha1_r1(uint32_t *data, std::array<uint32_t, 5> &d, unsigned i)
+{
+	d[i % 5] = d[i % 5] + ((d[(i + 3) % 5] & (d[(i + 2) % 5] ^ d[(i + 1) % 5])) ^ d[(i + 1) % 5])+ sha1_b(data, i) + 0x5a827999U + sha1_rol(d[(i + 4) % 5], 5);
+	d[(i + 3) % 5] = sha1_rol(d[(i + 3) % 5], 30);
+}
+
+inline void sha1_r2(uint32_t *data, std::array<uint32_t, 5> &d, unsigned i)
+{
+	d[i % 5] = d[i % 5] + (d[(i + 3) % 5] ^ d[(i + 2) % 5] ^ d[(i + 1) % 5]) + sha1_b(data, i) + 0x6ed9eba1U + sha1_rol(d[(i + 4) % 5], 5);
+	d[(i + 3) % 5] = sha1_rol(d[(i + 3) % 5], 30);
+}
+
+inline void sha1_r3(uint32_t *data, std::array<uint32_t, 5> &d, unsigned i)
+{
+	d[i % 5] = d[i % 5] + (((d[(i + 3) % 5] | d[(i + 2) % 5]) & d[(i + 1) % 5]) | (d[(i + 3) % 5] & d[(i + 2) % 5])) + sha1_b(data, i) + 0x8f1bbcdcU + sha1_rol(d[(i + 4) % 5], 5);
+	d[(i + 3) % 5] = sha1_rol(d[(i + 3) % 5], 30);
+}
+
+inline void sha1_r4(uint32_t *data, std::array<uint32_t, 5> &d, unsigned i)
+{
+	d[i % 5] = d[i % 5] + (d[(i + 3) % 5] ^ d[(i + 2) % 5] ^ d[(i + 1) % 5]) + sha1_b(data, i) + 0xca62c1d6U + sha1_rol(d[(i + 4) % 5], 5);
+	d[(i + 3) % 5] = sha1_rol(d[(i + 3) % 5], 30);
+}
+
+inline void sha1_process(std::array<uint32_t, 5> &st, uint32_t *data)
+{
+	std::array<uint32_t, 5> d = st;
+	unsigned i = 0U;
+	while (i < 16U)
+		sha1_r0(data, d, i++);
+	while (i < 20U)
+		sha1_r1(data, d, i++);
+	while (i < 40U)
+		sha1_r2(data, d, i++);
+	while (i < 60U)
+		sha1_r3(data, d, i++);
+	while (i < 80U)
+		sha1_r4(data, d, i++);
+	for (i = 0U; i < 5U; i++)
+		st[i] += d[i];
+}
+
+} // anonymous namespace
+
+
+
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -23,28 +116,6 @@ const crc16_t crc16_t::null = { 0 };
 const crc32_t crc32_t::null = { 0 };
 const md5_t md5_t::null = { { 0 } };
 const sha1_t sha1_t::null = { { 0 } };
-
-
-
-//**************************************************************************
-//  INLINE FUNCTIONS
-//**************************************************************************
-
-//-------------------------------------------------
-//  char_to_hex - return the hex value of a
-//  character
-//-------------------------------------------------
-
-inline int char_to_hex(char c)
-{
-	if (c >= '0' && c <= '9')
-		return c - '0';
-	if (c >= 'a' && c <= 'f')
-		return 10 + c - 'a';
-	if (c >= 'A' && c <= 'F')
-		return 10 + c - 'A';
-	return -1;
-}
 
 
 
@@ -91,6 +162,80 @@ std::string sha1_t::as_string() const
 		buffer << std::setw(2) << unsigned(elem);
 	return buffer.str();
 }
+
+
+//-------------------------------------------------
+//  reset - prepare to digest a block of data
+//-------------------------------------------------
+
+void sha1_creator::reset()
+{
+	m_cnt = 0U;
+	m_st[0] = 0xc3d2e1f0U;
+	m_st[1] = 0x10325476U;
+	m_st[2] = 0x98badcfeU;
+	m_st[3] = 0xefcdab89U;
+	m_st[4] = 0x67452301U;
+}
+
+
+//-------------------------------------------------
+//  append - digest a block of data
+//-------------------------------------------------
+
+void sha1_creator::append(const void *data, uint32_t length)
+{
+#ifdef LSB_FIRST
+	constexpr unsigned swizzle = 3U;
+#else
+	constexpr unsigned swizzle = 0U;
+#endif
+	uint32_t residual = (uint32_t(m_cnt) >> 3) & 63U;
+	m_cnt += uint64_t(length) << 3;
+	uint32_t offset = 0U;
+	if (length >= (64U - residual))
+	{
+		if (residual)
+		{
+			for (offset = 0U; (offset + residual) < 64U; offset++)
+				reinterpret_cast<uint8_t *>(m_buf)[(offset + residual) ^ swizzle] = reinterpret_cast<const uint8_t *>(data)[offset];
+			sha1_process(m_st, m_buf);
+		}
+		while ((length - offset) >= 64U)
+		{
+			for (residual = 0U; residual < 64U; residual++, offset++)
+				reinterpret_cast<uint8_t *>(m_buf)[residual ^ swizzle] = reinterpret_cast<const uint8_t *>(data)[offset];
+			sha1_process(m_st, m_buf);
+		}
+		residual = 0U;
+	}
+	for ( ; offset < length; residual++, offset++)
+		reinterpret_cast<uint8_t *>(m_buf)[residual ^ swizzle] = reinterpret_cast<const uint8_t *>(data)[offset];
+}
+
+
+//-------------------------------------------------
+//  finish - compute final hash
+//-------------------------------------------------
+
+sha1_t sha1_creator::finish()
+{
+	const unsigned padlen = 64U - (63U & ((unsigned(m_cnt) >> 3) + 8U));
+	uint8_t padbuf[64];
+	padbuf[0] = 0x80;
+	for (unsigned i = 1U; i < padlen; i++)
+		padbuf[i] = 0x00;
+	uint8_t lenbuf[8];
+	for (unsigned i = 0U; i < 8U; i++)
+		lenbuf[i] = uint8_t(m_cnt >> ((7U - i) << 3));
+	append(padbuf, padlen);
+	append(lenbuf, sizeof(lenbuf));
+	sha1_t result;
+	for (unsigned i = 0U; i < 20U; i++)
+		result.m_raw[i] = uint8_t(m_st[4U - (i >> 2)] >> ((3U - (i & 3)) << 3));
+	return result;
+}
+
 
 
 //**************************************************************************
