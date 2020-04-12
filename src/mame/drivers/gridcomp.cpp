@@ -42,7 +42,7 @@
 
     missing dumps:
 
-    - BIOS from models other than 1139 (CCOS and MS-DOS variants)
+    - BIOS from models other than 1139 and late 1101 revision
     - GRiDROM's
     - keyboard MCU
     - external floppy and hard disk (2101, 2102)
@@ -86,7 +86,7 @@
 #define LOG_KEYBOARD  (1U <<  1)
 #define LOG_DEBUG     (1U <<  2)
 
-//#define VERBOSE (LOG_DEBUG)
+#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
@@ -107,6 +107,7 @@ public:
 		, m_uart8274(*this, "uart8274")
 		, m_speaker(*this, "speaker")
 		, m_ram(*this, RAM_TAG)
+		, m_tms9914(*this, "hpib")
 	{ }
 
 	void grid1129(machine_config &config);
@@ -125,6 +126,7 @@ private:
 	optional_device<i8274_device> m_uart8274;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
+	required_device<tms9914_device> m_tms9914;
 
 	DECLARE_MACHINE_START(gridcomp);
 	DECLARE_MACHINE_RESET(gridcomp);
@@ -136,6 +138,9 @@ private:
 	DECLARE_READ16_MEMBER(grid_gpib_r);
 	DECLARE_WRITE16_MEMBER(grid_keyb_w);
 	DECLARE_WRITE16_MEMBER(grid_gpib_w);
+
+	DECLARE_WRITE8_MEMBER(grid_dma_w);
+	DECLARE_READ8_MEMBER(grid_dma_r);
 
 	uint32_t screen_update_110x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_113x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -240,6 +245,17 @@ WRITE16_MEMBER(gridcomp_state::grid_gpib_w)
 	LOG("GPIB %02x <- %02x\n", 0xdff80 + (offset << 1), data);
 }
 
+WRITE8_MEMBER(gridcomp_state::grid_dma_w)
+{
+	m_tms9914->write(7, data);
+}
+
+READ8_MEMBER(gridcomp_state::grid_dma_r)
+{
+	int ret = m_tms9914->read(7);
+	// LOG("DMA %02x == %02x\n", offset, ret);
+	return ret;
+}
 
 uint32_t gridcomp_state::screen_update_generic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int px)
 {
@@ -311,6 +327,7 @@ void gridcomp_state::grid1101_map(address_map &map)
 	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
 	map(0xdffc0, 0xdffcf).rw(FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
+	map(0xe0000, 0xeffff).rw(FUNC(gridcomp_state::grid_dma_r), FUNC(gridcomp_state::grid_dma_w)); // DMA
 	map(0xfc000, 0xfffff).rom().region("user1", 0);
 }
 
@@ -382,7 +399,7 @@ void gridcomp_state::grid1101(machine_config &config)
 	i7220.irq_callback().set(I80130_TAG, FUNC(i80130_device::ir1_w));
 	i7220.drq_callback().set(I80130_TAG, FUNC(i80130_device::ir1_w));
 
-	tms9914_device &hpib(TMS9914(config, "hpib", XTAL(4'000'000)));
+	tms9914_device &hpib(TMS9914(config, m_tms9914, XTAL(4'000'000)));
 	hpib.int_write_cb().set(I80130_TAG, FUNC(i80130_device::ir5_w));
 	hpib.dio_read_cb().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	hpib.dio_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
@@ -404,6 +421,7 @@ void gridcomp_state::grid1101(machine_config &config)
 	ieee.srq_callback().set("hpib", FUNC(tms9914_device::srq_w));
 	ieee.atn_callback().set("hpib", FUNC(tms9914_device::atn_w));
 	ieee.ren_callback().set("hpib", FUNC(tms9914_device::ren_w));
+	IEEE488_SLOT(config, "ieee_grid", 0, grid_ieee488_devices, nullptr);
 	IEEE488_SLOT(config, "ieee_rem", 0, remote488_devices, nullptr);
 
 	I8274(config, m_uart8274, XTAL(4'032'000));
@@ -450,8 +468,7 @@ ROM_START( grid1101 )
 	ROM_REGION16_LE(0x10000, "user1", 0)
 
 	ROM_SYSTEM_BIOS(0, "ccos", "ccos bios")
-	ROMX_LOAD("1101even.bin", 0x0000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(0))
-	ROMX_LOAD("1101odd.bin",  0x0001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("bios1101_0_25.bin", 0x0000, 0x4000, CRC(625388cb) SHA1(4c52c62fa9bc2f9a9a0a1e7f3beddef6809b9eed), ROM_BIOS(0))
 ROM_END
 
 ROM_START( grid1109 )

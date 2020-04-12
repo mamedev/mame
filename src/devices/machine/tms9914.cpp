@@ -77,8 +77,8 @@ constexpr uint8_t  REG_INT0_INT_MASK = 0x3f;    // Mask of actual interrupt bits
 
 // Interrupt status/mask 1
 constexpr unsigned REG_INT1_IFC_BIT = 0;    // IFC received
-constexpr unsigned REG_INT1_MA_BIT = 1;     // My address received
-constexpr unsigned REG_INT1_SRQ_BIT = 2;    // SRQ asserted
+constexpr unsigned REG_INT1_SRQ_BIT = 1;     // My address received
+constexpr unsigned REG_INT1_MA_BIT = 2;    // SRQ asserted
 constexpr unsigned REG_INT1_DCAS_BIT = 3;   // DCAS state active
 constexpr unsigned REG_INT1_APT_BIT = 4;    // Address Pass-Through
 constexpr unsigned REG_INT1_UNC_BIT = 5;    // Unrecognized command
@@ -918,6 +918,9 @@ void tms9914_device::update_fsm()
 			switch (m_c_state) {
 			case FSM_C_CIDS:
 				// sic | rqc -> CADS
+				if (!controller_reset() && m_sic && m_c_state == FSM_C_CIDS) {
+					m_c_state = FSM_C_CADS;
+				}
 				break;
 
 			case FSM_C_CADS:
@@ -991,6 +994,12 @@ void tms9914_device::update_fsm()
 		eoi_signal = eoi_signal || m_c_state == FSM_C_CPWS;
 		set_signal(IEEE_488_EOI , eoi_signal);
 		set_dio(dio_byte);
+		if (get_signal(IEEE_488_SRQ)) {
+			set_int1_bit(REG_INT1_SRQ_BIT);
+		} else {
+			BIT_CLR(m_reg_int1_status , REG_INT1_SRQ_BIT);
+			update_int();
+		}
 	}
 
 	m_no_reflection = false;
