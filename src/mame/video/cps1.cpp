@@ -215,7 +215,7 @@ Ganbare! Marine Kun (Japan 2K0411)                           2000  91634B-2   GB
 @the original number (CPS-B-01) was scratched out and "04" stamped over it.
 *denotes Suicide Battery
 ^c632b chips seen, but all variants of the game read the same c board io ports so the fusemap must be the same, perhaps incorrectly marked?
-#sf2 world 910204: sf2ea is official set on 90629B-2 b-board, sf2en on 89625B-1 b-board most likely an unofficial conversion (see notes in drivers\cps1.cpp)
+#sf2 world 910204: sf2ea is official set on 90629B-2 b-board, sf2en on 89625B-1 b-board is most likely an unofficial conversion (see notes in drivers\cps1.cpp)
 
 The C628/C632 PALs on some C-boards handle the io for games with more than 3 buttons or more than 2 players.
 
@@ -701,6 +701,7 @@ static const struct gfx_range mapper_TK24B1_table[] =
 	/* type            start   end     bank */
 	{ GFXTYPE_SPRITES, 0x0000, 0x5fff, 0 },
 	{ GFXTYPE_SCROLL1, 0x6000, 0x7fff, 0 },
+	
 	{ GFXTYPE_SCROLL2, 0x4000, 0x7fff, 1 },
 	{ GFXTYPE_SCROLL3, 0x0000, 0x3fff, 1 },
 	{ 0 }
@@ -710,7 +711,7 @@ static const struct gfx_range mapper_TK24B1_table[] =
 // WL22B and WL24B are equivalent, but since we have dumps of both PALs we will
 // document both.
 
-#define mapper_WL24B    { 0x8000, 0x8000, 0, 0 }, mapper_WL24B_table
+#define mapper_WL24B    { 0x8000, 0x4000, 0, 0 }, mapper_WL24B_table
 static const struct gfx_range mapper_WL24B_table[] =
 {
 	// verified from PAL dump:
@@ -1251,12 +1252,11 @@ static const struct gfx_range mapper_KR22B_table[] =
 static const struct gfx_range mapper_S9263B_table[] =
 {
 	// verified from PAL dump:
-	// FIXME there is some problem with this dump since pin 14 is never enabled
-	// instead of being the same as pin 15 as expected
 	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
 	// bank1 = pin 17 (ROMs 5,7) & pin 16 (ROMs 6,8)
 	// bank2 = pin 15 (ROMs 10,12) & pin 14 (ROMs 11,13)
-	// pins 12 and 13 are the same as 14 and 15
+	// pins 12,13 are unused, however pin 13 does have logic which
+	// is fed back internally to form the final output for pins 14,15
 
 	/* type            start    end      bank */
 	{ GFXTYPE_SPRITES, 0x00000, 0x07fff, 0 },
@@ -1315,16 +1315,6 @@ static const struct gfx_range mapper_VA24B_table[] =
 };
 
 
-// /* unverified, no dump */
-// #define mapper_Q522B    { 0x8000, 0, 0, 0 }, mapper_Q522B_table
-// static const struct gfx_range mapper_Q522B_table[] =
-// {
-	// /* type                              start   end     bank */
-	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x0000, 0x6fff, 0 },
-	// { GFXTYPE_SCROLL3,                   0x7000, 0x77ff, 0 },
-	// { GFXTYPE_SCROLL1,                   0x7800, 0x7fff, 0 },
-	// { 0 }
-// };
 #define mapper_Q522B    { 0x4000, 0x4000, 0, 0 }, mapper_Q522B_table
 static const struct gfx_range mapper_Q522B_table[] =
 {
@@ -1423,15 +1413,6 @@ static const struct gfx_range mapper_QD22B_table[] =
 };
 
 
-// #define mapper_QAD63B   { 0x8000, 0, 0, 0 }, mapper_QAD63B_table
-// static const struct gfx_range mapper_QAD63B_table[] =
-// {
-	// /* type                              start   end     bank */
-	// { GFXTYPE_SCROLL1,                   0x0000, 0x07ff, 0 },
-	// { GFXTYPE_SCROLL3,                   0x0800, 0x1fff, 0 },
-	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x2000, 0x7fff, 0 },
-	// { 0 }
-// };
 #define mapper_QAD63B    { 0x8000, 0, 0, 0 }, mapper_QAD63B_table
 static const struct gfx_range mapper_QAD63B_table[] =
 {
@@ -1445,17 +1426,6 @@ static const struct gfx_range mapper_QAD63B_table[] =
 };
 
 
-// #define mapper_TN2292   { 0x8000, 0x8000, 0, 0 }, mapper_TN2292_table
-// static const struct gfx_range mapper_TN2292_table[] =
-// {
-	// /* type                              start   end     bank */
-	// { GFXTYPE_SCROLL1,                   0x0000, 0x0fff, 0 },
-	// { GFXTYPE_SCROLL3,                   0x1000, 0x3fff, 0 },
-	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x4000, 0x7fff, 0 },
-
-	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0xffff, 1 },
-	// { 0 }
-// };
 #define mapper_TN2292    { 0x8000, 0x8000, 0x8000, 0 }, mapper_TN2292_table
 static const struct gfx_range mapper_TN2292_table[] =
 {
@@ -1552,6 +1522,7 @@ static const struct gfx_range mapper_CP1B1F_table[] =
 };
 
 
+/* unverified, no dump */
 #define mapper_sfzch    { 0x20000, 0, 0, 0 }, mapper_sfzch_table
 static const struct gfx_range mapper_sfzch_table[] =
 {
@@ -1715,7 +1686,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"daimakair",   CPS_B_21_DEF, mapper_DAM63B },  // equivalent to DM620, also CPS_B_21_DEF is equivalent to CPS_B_01
 	{"strider",     CPS_B_01,     mapper_ST24M1 },
 	{"striderua",   CPS_B_01,     mapper_ST24M1 },  // wrong, this set uses ST24B2, still not dumped
-	{"strideruc",   CPS_B_17,     mapper_ST24M1 },  // wrong?
+	{"strideruc",   CPS_B_17,     mapper_ST24M1 },  // wrong, this set uses a custom pal or gal, not dumped
 	{"striderj",    CPS_B_01,     mapper_ST22B },   // equivalent to ST24M1
 	{"striderjr",   CPS_B_21_DEF, mapper_ST24M1 },  // wrong, this set uses STH63B, still not dumped
 	{"dynwar",      CPS_B_02,     mapper_TK24B1 },
@@ -1725,7 +1696,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"willow",      CPS_B_03,     mapper_WL24B },
 	{"willowu",     CPS_B_03,     mapper_WL24B },
 	{"willowuo",    CPS_B_03,     mapper_WL24B },
-	{"willowj",     CPS_B_03,     mapper_WL22B },
+	{"willowj",     CPS_B_03,     mapper_WL22B },   // equivalent to WL24B
 	{"ffight",      CPS_B_04,     mapper_S224B },
 	{"ffighta",     CPS_B_04,     mapper_S224B },
 	{"ffightu",     CPS_B_04,     mapper_S224B },
@@ -1771,7 +1742,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2ed",       CPS_B_05,     mapper_STF29,  0x36 },
 	{"sf2ee",       CPS_B_18,     mapper_STF29,  0x3c },
 	{"sf2em",       CPS_B_17,     mapper_STF29,  0x36 },
-	{"sf2en",       CPS_B_17,     mapper_STF29,  0x36 },
+	{"sf2en",       CPS_B_17,     mapper_STF29,  0x36 },  // wrong, this set uses a custom gal, not dumped
 	{"sf2ebbl",     CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
 	{"sf2ebbl2",    CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
 	{"sf2ebbl3",    CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
@@ -1829,7 +1800,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"knightsb2",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },   // wrong, knightsb bootleg doesn't use the KR63B PAL
 	//{"knightsb",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },   // wrong, knightsb bootleg doesn't use the KR63B PAL
 	{"knightsb3",   CPS_B_21_BT4, mapper_KR63B },
-	{"pokonyan",    CPS_B_21_DEF, mapper_pokonyan, 0x36 },
+	{"pokonyan",    CPS_B_21_DEF, mapper_pokonyan, 0x36 },   // wrong, this set uses an unknown PAL, still not dumped
 	{"sf2ce",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2ceea",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2ceua",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
