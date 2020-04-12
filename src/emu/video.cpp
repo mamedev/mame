@@ -1261,25 +1261,12 @@ void video_manager::record_frame()
 		// create the bitmap
 		create_snapshot_bitmap(recording->screen());
 
-		// identify the palette
-		bool has_palette = recording->screen() && recording->screen()->has_palette();
-		const rgb_t *palette = has_palette ? recording->screen()->palette().palette()->entry_list_adjusted() : nullptr;
-		int entries = has_palette ? recording->screen()->palette().entries() : 0;
-
 		// and append the frame
-		while (!error && recording->next_frame_time() <= curtime)
+		if (!recording->append_video_frame(m_snap_bitmap, curtime))
 		{
-			// append this bitmap as a single frame
-			if (!recording->append_video_frame(m_snap_bitmap, palette, entries))
-				error = true;
-
-			// advance time
-			recording->set_next_frame_time(recording->next_frame_time() + recording->frame_period());
-		}
-
-		// break out if there has been an error
-		if (error)
+			error = true;
 			break;
+		}
 	}
 
 	if (error)

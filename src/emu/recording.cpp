@@ -25,8 +25,10 @@ namespace
 		}
 
 		bool initialize(running_machine &machine, std::unique_ptr<emu_file> &&file, int32_t width, int32_t height);
-		virtual bool append_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries) override;
 		virtual bool add_sound_to_recording(const s16 *sound, int numsamples) override;
+
+	protected:
+		virtual bool append_single_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries) override;
 
 	private:
 		avi_file::ptr       m_avi_file;                 // handle to the open movie file
@@ -41,8 +43,10 @@ namespace
 		~mng_movie_recording();
 
 		bool initialize(std::unique_ptr<emu_file> &&file, bitmap_t &snap_bitmap);
-		virtual bool append_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries) override;
 		virtual bool add_sound_to_recording(const s16 *sound, int numsamples) override;
+
+	protected:
+		virtual bool append_single_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries) override;
 
 	private:
 		std::unique_ptr<emu_file>			m_mng_file;           // handle to the open movie file
@@ -73,6 +77,31 @@ movie_recording::movie_recording(screen_device *screen)
 
 movie_recording::~movie_recording()
 {
+}
+
+
+//-------------------------------------------------
+//  movie_recording::append_video_frame
+//-------------------------------------------------
+
+bool movie_recording::append_video_frame(bitmap_rgb32 &bitmap, attotime curtime)
+{
+	// identify the palette
+	bool has_palette = screen() && screen()->has_palette();
+	const rgb_t *palette = has_palette ? screen()->palette().palette()->entry_list_adjusted() : nullptr;
+	int palette_entries = has_palette ? screen()->palette().entries() : 0;
+
+	// keep appending frames until we're at curtime
+	while (next_frame_time() <= curtime)
+	{
+		// append this bitmap as a single frame
+		if (!append_single_video_frame(bitmap, palette, palette_entries))
+			return false;
+
+		// advance time
+		set_next_frame_time(next_frame_time() + frame_period());
+	}
+	return true;
 }
 
 
@@ -172,10 +201,10 @@ bool avi_movie_recording::initialize(running_machine &machine, std::unique_ptr<e
 
 
 //-------------------------------------------------
-//  avi_movie_recording::append_video_frame
+//  avi_movie_recording::append_single_video_frame
 //-------------------------------------------------
 
-bool avi_movie_recording::append_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries)
+bool avi_movie_recording::append_single_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries)
 {
 	avi_file::error avierr = m_avi_file->append_video_frame(bitmap);
 	return avierr == avi_file::error::NONE;
@@ -237,10 +266,10 @@ bool mng_movie_recording::initialize(std::unique_ptr<emu_file> &&file, bitmap_t 
 
 
 //-------------------------------------------------
-//  mng_movie_recording::append_video_frame
+//  mng_movie_recording::append_single_video_frame
 //-------------------------------------------------
 
-bool mng_movie_recording::append_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries)
+bool mng_movie_recording::append_single_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries)
 {
 	// set up the text fields in the movie info
 	png_info pnginfo;

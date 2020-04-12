@@ -52,8 +52,10 @@ public:
 	void set_next_frame_time(attotime time)	{ m_next_frame_time = time; }
 	attotime next_frame_time() const		{ return m_next_frame_time; }
 
+	// methods
+	bool append_video_frame(bitmap_rgb32 &bitmap, attotime curtime);
+
 	// virtuals
-	virtual bool append_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries) = 0;
 	virtual bool add_sound_to_recording(const s16 *sound, int numsamples) = 0;
 
 	// statics
@@ -65,6 +67,9 @@ protected:
 	movie_recording(screen_device *screen);
 	movie_recording(const movie_recording &) = delete;
 	movie_recording(movie_recording &&) = delete;
+
+	// virtuals
+	virtual bool append_single_video_frame(bitmap_rgb32 &bitmap, const rgb_t *palette, int palette_entries) = 0;
 
 private:
 	screen_device *	m_screen;				// screen associated with this movie (can be nullptr)
