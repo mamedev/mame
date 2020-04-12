@@ -48,6 +48,7 @@ protected:
 	DECLARE_MACHINE_START(mtwinsb);
 	DECLARE_MACHINE_START(sf2m1);
 	DECLARE_MACHINE_START(sgyxz);
+	DECLARE_MACHINE_START(wofabl);
 
 	DECLARE_WRITE16_MEMBER(fcrash_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(fcrash_snd_bankswitch_w);
