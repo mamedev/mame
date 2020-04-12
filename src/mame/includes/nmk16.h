@@ -62,6 +62,7 @@ public:
 	void manybloc(machine_config &config);
 	void acrobatm(machine_config &config);
 	void strahl(machine_config &config);
+	void strahljbl(machine_config &config);
 	void tdragon3h(machine_config &config);
 	void hachamf_prot(machine_config &config);
 	void macross(machine_config &config);
@@ -117,15 +118,12 @@ protected:
 	optional_ioport_array<2> m_dsw_io;
 	optional_ioport_array<3> m_in_io;
 
-	int m_sprclk;
-	int m_sprlimit;
 	int m_tilerambank;
 	int m_sprdma_base;
 	int mask[4*2];
 	std::unique_ptr<u16[]> m_spriteram_old;
 	std::unique_ptr<u16[]> m_spriteram_old2;
 	int m_bgbank;
-	int m_videoshift;
 	int m_bioship_background_bank;
 	tilemap_t *m_bg_tilemap[2];
 	tilemap_t *m_tx_tilemap;
@@ -220,6 +218,7 @@ protected:
 	void ssmissin_map(address_map &map);
 	void ssmissin_sound_map(address_map &map);
 	void strahl_map(address_map &map);
+	void strahljbl_map(address_map &map);
 	void tdragon2_map(address_map &map);
 	void tdragon3h_map(address_map &map);
 	void tdragon_map(address_map &map);

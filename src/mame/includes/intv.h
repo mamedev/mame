@@ -94,6 +94,7 @@ private:
 	uint16_t m_ram16[0x160];
 	int m_sr1_int_pending;
 	uint8_t m_ram8[256];
+	bool m_maincpu_reset;
 
 	// Keyboard Component
 	DECLARE_WRITE16_MEMBER(intvkbd_dualport16_w);
@@ -105,6 +106,8 @@ private:
 	DECLARE_WRITE8_MEMBER(intvkbd_io_w);
 	DECLARE_READ8_MEMBER(intvkbd_periph_r);
 	DECLARE_WRITE8_MEMBER(intvkbd_periph_w);
+
+	uint16_t iab_r();
 
 	bool m_printer_not_busy;        // printer state
 	bool m_printer_no_paper;        // printer state

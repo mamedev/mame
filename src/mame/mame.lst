@@ -2747,6 +2747,7 @@ pg750                           // Siemens PG 750
 pg750eisa                       // Siemens PG 750 486 EISA
 samdm286                        // Samsung Deskmaster 286-12
 zdz248                          // Zenith Z-248
+ncr3433                         // NCR Class 3433
 
 
 @source:atari_s1.cpp
@@ -10295,6 +10296,7 @@ armchmp2                        // (c) 1992 Jaleco
 armchmp2o                       // (c) 1992 Jaleco
 armchmp2o2                      // (c) 1992 Jaleco
 bigrun                          // (c) 1989 Jaleco
+bigrunu                         // (c) 1989 Jaleco
 captflag                        // (c) 1993 Jaleco
 cischeat                        // (c) 1990 Jaleco
 f1gpstar                        // (c) 1992 Jaleco
@@ -10748,6 +10750,7 @@ sf2ebbl2                        // 14/02/1991 (c) 1991 (World, bootleg)
 sf2ebbl3                        // 14/02/1991 (c) 1991 (World, bootleg)
 sf2ed                           // 18/03/1991 (c) 1991 (World)
 sf2ee                           // 28/02/1991 (c) 1991 (World)
+sf2ef                           // 11/04/1991 (c) 1991 (World)
 sf2em                           // 29/01/1991 (c) 1991 (World)
 sf2en                           // 04/02/1991 (c) 1991 (World, conversion)
 sf2hf                           // 09/12/1992 (c) 1992 (World)
@@ -10850,6 +10853,7 @@ punipic2                        // bootleg
 punipic3                        // bootleg
 slampic                         // bootleg
 slampic2                        // bootleg
+wofpic                          // bootleg
 
 @source:cps2.cpp
 1944                            // 20/06/2000 (c) 2000 Eighting/Raizing (USA)
@@ -13404,6 +13408,7 @@ cawingbl                        // bootleg
 fcrash                          // bootleg of Final Fight
 ffightbl                        // bootleg
 ffightbla                       // bootleg
+ffightblb                       // bootleg
 kodb                            // bootleg
 mtwinsb                         // bootleg
 sf2m1                           // hack
@@ -16394,6 +16399,7 @@ xymg                            // (c) 1996
 
 @source:igs017.cpp
 genius6                         // (c) 1998?
+happyskl                        // (c) 2001?
 iqblocka                        // (c) 1996
 iqblockf                        // (c) 1996
 lhzb2                           // (c) 1998
@@ -22119,17 +22125,19 @@ berl32t8p
 lond32t
 lond32t8
 
+@source:mephisto_mondial.cpp
+mondial                         // 1985 Mephisto Mondial
+mondial2                        // 1987 Mephisto Mondial II
+
 @source:mephisto_mondial68k.cpp
 mondl68k                        // 1988 Mephisto Mondial 68000XL
 
 @source:mephisto_montec.cpp
-mondial                         // 1985 Mephisto Mondial
 smondial                        // 1986 Mephisto Super Mondial (Ver A)
 smondialab                      // 1986 Mephisto Super Mondial (Ver AB)
 smondialb                       // 1986 Mephisto Super Mondial (Ver B)
 montec                          // 1987 Mephisto Monte Carlo
 monteca                         // 1987 Mephisto Monte Carlo
-mondial2                        // 1987 Mephisto Mondial II
 smondial2                       // 1989 Mephisto Super Mondial II
 megaiv                          // 1989 Mephisto Mega IV
 megaiva                         // 1989 Mephisto Mega IV
@@ -31729,9 +31737,10 @@ spec2k                          // (c) 2000 Yonatech
 spec2kh                         // (c) 2000 Yonatech
 ssmissin                        // (c) 1992 Comad
 stagger1                        // (c) 1998
-strahl                           // UPL-91074 (c) 1992 UPL (World)
-strahlj                          // UPL-91074 (c) 1992 UPL (Japan)
-strahlja                         // UPL-91074 (c) 1992 UPL (Japan)
+strahl                          // UPL-91074 (c) 1992 UPL (World)
+strahlj                         // UPL-91074 (c) 1992 UPL (Japan)
+strahlja                        // UPL-91074 (c) 1992 UPL (Japan)
+strahljbl                       // bootleg
 tdragon                         // (c) 1991 NMK / Tecmo
 tdragon1                        // (c) 1991 NMK / Tecmo
 tdragon2                        // UPL-93091 (c) 1993 NMK
@@ -34656,6 +34665,11 @@ jx8p                            //
 jx8po                           //
 mks70                           //
 
+@source:roland_mc50.cpp
+mc300                           //
+mc50                            //
+mc50mk2                         //
+
 @source:roland_mt32.cpp
 cm32l                           //
 mt32                            //
@@ -34721,8 +34735,9 @@ roul                            // (c) 1990
 
 @source:route16.cpp
 jongpute                        // 1981 Alpha Denshi Co.
-route16                         // (c) 1981 Tehkan/Sun + Centuri license
+route16                         // (c) 1981 Sun Electronics
 route16a                        // (c) 1981 Tehkan/Sun + Centuri license
+route16b                        // (c) 1981 Tehkan/Sun + Centuri license
 route16bl                       // bootleg
 route16c                        // (c) 1981 Tehkan/Sun + Centuri license
 routex                          // bootleg
@@ -35063,10 +35078,7 @@ safarir                         // (c) 1980 Shin Nihon Kikaku (SNK) + Taito lice
 safarirj                        // (c) 1979 Shin Nihon Kikaku (SNK)
 
 @source:sag.cpp
-sag_baseb4
-sag_footb4
-sag_pinb
-sag_sinv2
+sag
 
 @source:sage2.cpp
 sage2                           //
@@ -39105,6 +39117,7 @@ crazycop                        // GX878 (c) 1988 (Japan)
 gbusters                        // GX878 (c) 1988
 gbustersa                       // GX878 (c) 1988
 scontra                         // GX775 (c) 1988
+scontraa                        // GX775 (c) 1988
 scontraj                        // GX775 (c) 1988 (Japan)
 thunderx                        // GX873 (c) 1988
 thunderxa                       // GX873 (c) 1988

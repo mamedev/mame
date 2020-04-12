@@ -5,17 +5,21 @@
 
 #pragma once
 
-class rolandpcm_device : public device_t, public device_sound_interface, public device_rom_interface
+class mb87419_mb87420_device : public device_t, public device_sound_interface, public device_rom_interface
 {
 public:
-	rolandpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb87419_mb87420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	auto int_callback() { return m_int_callback.bind(); }
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -49,6 +53,8 @@ private:
 		int16_t smpl_nxt = 0;   // next sample
 	};
 
+	devcb_write_line m_int_callback;
+
 	uint32_t m_clock;                   // clock
 	uint32_t m_rate;                    // sample rate (usually 32000 Hz)
 	sound_stream* m_stream;             // stream handle
@@ -56,6 +62,6 @@ private:
 	uint8_t m_sel_chn;                  // selected channel
 };
 
-DECLARE_DEVICE_TYPE(ROLANDPCM, rolandpcm_device)
+DECLARE_DEVICE_TYPE(MB87419_MB87420, mb87419_mb87420_device)
 
 #endif // MAME_SOUND_ROLANDPCM_H

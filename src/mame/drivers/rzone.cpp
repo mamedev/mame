@@ -22,6 +22,7 @@
   1997: R-Zone DataZone: PDA with a built-in SuperScreen.
 
   TODO:
+  - softwarelist? it's impossible right now due to SVG initialization
   - support for SuperScreen. SVG colors will need to be inverted, or maybe
     with artwork or HLSL?
   - add DataZone, will get its own driver

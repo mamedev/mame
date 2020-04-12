@@ -137,9 +137,12 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	    xx = x position
 	    XX = texture x start
 	    YY = texture y start
-	    aa = same as unk2 on tiles
 	    bb = sometimes set in invaders
 	    AA = same as attr on tiles (colour / priority?)
+
+
+	    aa = same as unk2 on tiles? ( --pp ---- )
+		p = page
 
 	    FF = flags  ( e-dD fFsS )
 	    e = enable
@@ -221,6 +224,9 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		}
 
 		int base = (m_sprite_gfxbase_lo_data | (m_sprite_gfxbase_hi_data << 8)) * 0x100;
+		int page = (unk2 & 0x30) >> 4;
+		
+		base += 0x10000 * page;
 
 		if (doubleX)
 			sizex = sizex * 2;

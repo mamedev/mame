@@ -517,6 +517,7 @@ mephisto_mm2.cpp
 mephisto_modena.cpp
 mephisto_modular.cpp
 mephisto_modular_tm.cpp
+mephisto_mondial.cpp
 mephisto_mondial68k.cpp
 mephisto_montec.cpp
 mephisto_polgar.cpp
@@ -763,6 +764,7 @@ roland_d50.cpp
 roland_jv80.cpp
 roland_jx3p.cpp
 roland_jx8p.cpp
+roland_mc50.cpp
 roland_mt32.cpp
 roland_r8.cpp
 roland_ra30.cpp

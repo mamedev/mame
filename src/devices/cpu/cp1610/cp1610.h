@@ -14,9 +14,7 @@
 
 #pragma once
 
-#define CP1610_INT_NONE     0
 #define CP1610_INT_INTRM    1                   /* Maskable */
-#define CP1610_RESET        INPUT_LINE_RESET    /* Non-Maskable */
 #define CP1610_INT_INTR     INPUT_LINE_NMI      /* Non-Maskable */
 
 class cp1610_cpu_device :  public cpu_device
@@ -33,6 +31,7 @@ public:
 	cp1610_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 	auto bext() { return m_read_bext.bind(); }
+	auto iab() { return m_read_iab.bind(); }
 
 protected:
 	// device-level overrides
@@ -43,7 +42,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 7; }
 	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
-	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == CP1610_RESET || inputnum == CP1610_INT_INTR; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == CP1610_INT_INTR; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -61,19 +60,18 @@ private:
 
 	uint16_t  m_r[8];   /* registers */
 	uint8_t   m_flags;  /* flags */
-	int     m_intr_enabled;
-	uint16_t  m_intr_vector;
-	int     m_reset_state;
+	bool    m_intr_enabled;
 	int     m_intr_state;
 	int     m_intrm_state;
-	int     m_reset_pending;
-	int     m_intr_pending;
-	int     m_intrm_pending;
-	int     m_mask_interrupts;
+	bool    m_reset_pending;
+	bool    m_intr_pending;
+	bool    m_intrm_pending;
+	bool    m_mask_interrupts;
 	address_space *m_program;
 	int m_icount;
 
 	devcb_read8 m_read_bext;
+	devcb_read16 m_read_iab;
 
 	void cp1610_illegal();
 	void cp1610_hlt();

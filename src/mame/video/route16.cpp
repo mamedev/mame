@@ -2,7 +2,7 @@
 // copyright-holders:Zsolt Vasvari
 /***************************************************************************
 
-  route16.c
+  route16.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -24,7 +24,7 @@ void route16_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(route16_state::out0_w)
+void route16_state::out0_w(uint8_t data)
 {
 	m_palette_1 = data & 0x1f;
 
@@ -32,7 +32,7 @@ WRITE8_MEMBER(route16_state::out0_w)
 }
 
 
-WRITE8_MEMBER(route16_state::out1_w)
+void route16_state::out1_w(uint8_t data)
 {
 	m_palette_2 = data & 0x1f;
 
@@ -59,22 +59,18 @@ WRITE8_MEMBER(route16_state::out1_w)
 
 uint32_t route16_state::screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-
 	uint8_t *color_prom1 = &memregion("proms")->base()[0x000];
 	uint8_t *color_prom2 = &memregion("proms")->base()[0x100];
 
-	for (offs = 0; offs < m_videoram1.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram1.bytes(); offs++)
 	{
-		int i;
-
 		uint8_t y = offs >> 6;
 		uint8_t x = offs << 2;
 
 		uint8_t data1 = m_videoram1[offs];
 		uint8_t data2 = m_videoram2[offs];
 
-		for (i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			uint8_t color1 = color_prom1[((m_palette_1 << 6) & 0x80) |
 										(m_palette_1 << 2) |
@@ -111,22 +107,18 @@ uint32_t route16_state::screen_update_route16(screen_device &screen, bitmap_rgb3
 
 uint32_t route16_state::screen_update_jongpute(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-
 	uint8_t *color_prom1 = &memregion("proms")->base()[0x000];
 	uint8_t *color_prom2 = &memregion("proms")->base()[0x100];
 
-	for (offs = 0; offs < m_videoram1.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram1.bytes(); offs++)
 	{
-		int i;
-
 		uint8_t y = offs >> 6;
 		uint8_t x = offs << 2;
 
 		uint8_t data1 = m_videoram1[offs];
 		uint8_t data2 = m_videoram2[offs];
 
-		for (i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			uint8_t color1 = color_prom1[(m_palette_1 << 2) |
 										((data1 >> 3) & 0x02) |

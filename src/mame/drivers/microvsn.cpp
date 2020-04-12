@@ -1,33 +1,47 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, hap
+// thanks-to:Dan Boris, Kevin Horton, Sean Riddle
 /***************************************************************************
 
-    Milton Bradley MicroVision
+Milton Bradley MicroVision, handheld game console
 
-    To Do:
-    * Add support for the paddle control
-    * Finish support for i8021 based cartridges
+Hardware notes:
+- SCUS0488(Hughes HLCD0488) LCD, 16*16 screen
+- piezo, 12 buttons under membrane + analog paddle(MB calls it the Control Knob)
+- no CPU on console, it is on the cartridge
+
+12 games were released, all of them have a TMS1100 MCU. The first couple of
+games had an I8021 MCU at first, but Milton Bradley switched to TMS1100.
 
 Since the microcontrollers were on the cartridges it was possible to have
 different clocks on different games.
 The Connect Four I8021 game is clocked at around 2MHz. The TMS1100 versions
-of the games were clocked at around 500KHz, 550KHz, or 300KHz.
+of the games were clocked at around 500KHz, 550KHz, or 350KHz.
+
+Each game had a screen- and keypad overlay attached to it, MAME external
+artwork is recommended. It's also advised to disable screen filtering,
+eg. with -prescale, or on Windows simply -video gdi.
+
+TODO:
+- Finish support for i8021 based cartridges
 
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/tms1000/tms1100.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/hlcd0488.h"
+#include "video/pwm.h"
+
 #include "emupal.h"
 #include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
-
-#include <algorithm>
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -39,12 +53,20 @@ public:
 	microvision_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_dac( *this, "dac" ),
-		m_i8021( *this, "maincpu1" ),
-		m_tms1100( *this, "maincpu2" ),
-		m_cart(*this, "cartslot")
+		m_i8021( *this, "i8021_cpu" ),
+		m_tms1100( *this, "tms1100_cpu" ),
+		m_lcd(*this, "lcd"),
+		m_lcd_pwm(*this, "lcd_pwm"),
+		m_cart(*this, "cartslot"),
+		m_inputs(*this, "COL%u", 0),
+		m_paddle(*this, "PADDLE"),
+		m_conf(*this, "CONF"),
+		m_overlay_out(*this, "overlay")
 	{ }
 
 	void microvision(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(conf_changed) { apply_settings(); }
 
 protected:
 	static constexpr device_timer_id TIMER_PADDLE = 0;
@@ -54,11 +76,8 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void microvision_palette(palette_device &palette) const;
-
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	// i8021 interface
@@ -72,40 +91,18 @@ private:
 	DECLARE_READ8_MEMBER(tms1100_read_k);
 	DECLARE_WRITE16_MEMBER(tms1100_write_o);
 	DECLARE_WRITE16_MEMBER(tms1100_write_r);
-
-	// enums
-	enum cpu_type
-	{
-		CPU_TYPE_I8021,
-		CPU_TYPE_TMS1100
-	};
-
-	enum pcb_type
-	{
-		PCB_TYPE_4952_REV_A,
-		PCB_TYPE_4952_9_REV_B,
-		PCB_TYPE_4971_REV_C,
-		PCB_TYPE_7924952D02,
-		PCB_TYPE_UNKNOWN
-	};
-
-	enum rc_type
-	{
-		RC_TYPE_100PF_21_0K,
-		RC_TYPE_100PF_23_2K,
-		RC_TYPE_100PF_39_4K,
-		RC_TYPE_UNKNOWN
-	};
-
-	cpu_type    m_cpu_type;
-	pcb_type    m_pcb_type;
-	rc_type     m_rc_type;
-
+	u32 tms1100_decode_micro(offs_t offset);
 
 	required_device<dac_byte_interface> m_dac;
-	required_device<i8021_device> m_i8021;
-	required_device<tms1100_cpu_device> m_tms1100;
+	optional_device<i8021_device> m_i8021;
+	optional_device<tms1100_cpu_device> m_tms1100;
+	required_device<hlcd0488_device> m_lcd;
+	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<generic_slot_device> m_cart;
+	required_ioport_array<3> m_inputs;
+	required_ioport m_paddle;
+	required_ioport m_conf;
+	output_finder<> m_overlay_out;
 
 	// Timers
 	emu_timer *m_paddle_timer;
@@ -120,63 +117,34 @@ private:
 	uint16_t  m_o;
 
 	// generic variables
-	void    update_lcd();
-	void    lcd_write(uint8_t control, uint8_t data);
-	bool    m_pla;
+	DECLARE_WRITE16_MEMBER(lcd_output_w);
 
-	uint8_t   m_lcd_latch[8];
-	uint8_t   m_lcd_holding_latch[8];
-	uint8_t   m_lcd_latch_index;
-	uint8_t   m_lcd[16][16];
-	uint8_t   m_lcd_control_old;
+	void apply_settings(void);
+
+	u8 m_pla_auto;
+	u8 m_overlay_auto;
+	u16 m_button_mask;
+	bool m_paddle_auto;
+	bool m_paddle_on;
 };
-
-
-void microvision_state::microvision_palette(palette_device &palette) const
-{
-	palette.set_pen_color( 15, 0x00, 0x00, 0x00 );
-	palette.set_pen_color( 14, 0x11, 0x11, 0x11 );
-	palette.set_pen_color( 13, 0x22, 0x22, 0x22 );
-	palette.set_pen_color( 12, 0x33, 0x33, 0x33 );
-	palette.set_pen_color( 11, 0x44, 0x44, 0x44 );
-	palette.set_pen_color( 10, 0x55, 0x55, 0x55 );
-	palette.set_pen_color(  9, 0x66, 0x66, 0x66 );
-	palette.set_pen_color(  8, 0x77, 0x77, 0x77 );
-	palette.set_pen_color(  7, 0x88, 0x88, 0x88 );
-	palette.set_pen_color(  6, 0x99, 0x99, 0x99 );
-	palette.set_pen_color(  5, 0xaa, 0xaa, 0xaa );
-	palette.set_pen_color(  4, 0xbb, 0xbb, 0xbb );
-	palette.set_pen_color(  3, 0xcc, 0xcc, 0xcc );
-	palette.set_pen_color(  2, 0xdd, 0xdd, 0xdd );
-	palette.set_pen_color(  1, 0xee, 0xee, 0xee );
-	palette.set_pen_color(  0, 0xff, 0xff, 0xff );
-}
 
 
 void microvision_state::machine_start()
 {
 	m_paddle_timer = timer_alloc(TIMER_PADDLE);
+	m_overlay_out.resolve();
 
 	save_item(NAME(m_p0));
 	save_item(NAME(m_p2));
 	save_item(NAME(m_t1));
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
-	save_item(NAME(m_lcd_latch));
-	save_item(NAME(m_lcd_latch_index));
-	save_item(NAME(m_lcd));
-	save_item(NAME(m_lcd_control_old));
-	save_item(NAME(m_pla));
-	save_item(NAME(m_lcd_holding_latch));
 }
 
 
 void microvision_state::machine_reset()
 {
-	std::fill(std::begin(m_lcd_latch), std::end(m_lcd_latch), 0);
-
-	for (auto &elem : m_lcd)
-		std::fill(std::begin(elem), std::end(elem), 0);
+	apply_settings();
 
 	m_o = 0;
 	m_r = 0;
@@ -185,68 +153,21 @@ void microvision_state::machine_reset()
 	m_t1 = 0;
 
 	m_paddle_timer->adjust(attotime::never);
-
-	switch (m_cpu_type)
-	{
-		case CPU_TYPE_I8021:
-			m_i8021->resume(SUSPEND_REASON_DISABLE);
-			m_tms1100->suspend(SUSPEND_REASON_DISABLE, 0);
-			break;
-
-		case CPU_TYPE_TMS1100:
-			m_i8021->suspend(SUSPEND_REASON_DISABLE, 0);
-			m_tms1100->resume(SUSPEND_REASON_DISABLE);
-
-			switch (m_rc_type)
-			{
-				case RC_TYPE_100PF_21_0K:
-					m_tms1100->set_clock(550000);
-					break;
-
-				case RC_TYPE_100PF_23_2K:
-				case RC_TYPE_UNKNOWN:   // Default to most occurring setting
-					m_tms1100->set_clock(500000);
-					break;
-
-				case RC_TYPE_100PF_39_4K:
-					m_tms1100->set_clock(300000);
-					break;
-			}
-			break;
-	}
 }
 
 
-void microvision_state::update_lcd()
+
+uint32_t microvision_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t row = ( m_lcd_holding_latch[0] << 12 ) | ( m_lcd_holding_latch[1] << 8 ) | ( m_lcd_holding_latch[2] << 4 ) | m_lcd_holding_latch[3];
-	uint16_t col = ( m_lcd_holding_latch[4] << 12 ) | ( m_lcd_holding_latch[5] << 8 ) | ( m_lcd_holding_latch[6] << 4 ) | m_lcd_holding_latch[7];
-
-	LOG( "row = %04x, col = %04x\n", row, col );
-	for ( int i = 0; i < 16; i++ )
+	for (int y = 0; y < 16; y++)
 	{
-		uint16_t temp = row;
-
-		for (auto & elem : m_lcd)
+		for (int x = 0; x < 16; x++)
 		{
-			if ( ( temp & col ) & 0x8000 )
-			{
-				elem[i] = 15;
-			}
-			temp <<= 1;
-		}
-		col <<= 1;
-	}
-}
+			// simulate LCD persistence
+			int p = m_lcd_pwm->read_element_bri(y ^ 15, x ^ 15) * 25000;
+			p = (p > 255) ? 0 : p ^ 255;
 
-
-uint32_t microvision_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	for ( uint8_t i = 0; i < 16; i++ )
-	{
-		for ( uint8_t j = 0; j < 16; j++ )
-		{
-			bitmap.pix16(i,j) = m_lcd [i] [j];
+			bitmap.pix32(y, x) = p << 16 | p << 8 | p;
 		}
 	}
 
@@ -254,65 +175,10 @@ uint32_t microvision_state::screen_update(screen_device &screen, bitmap_ind16 &b
 }
 
 
-WRITE_LINE_MEMBER(microvision_state::screen_vblank)
+
+WRITE16_MEMBER( microvision_state::lcd_output_w )
 {
-	if ( state )
-	{
-		for (auto & elem : m_lcd)
-		{
-			for ( int j= 0; j < 16; j++ )
-			{
-				if ( elem[j] )
-				{
-					elem[j]--;
-				}
-			}
-		}
-		update_lcd();
-	}
-}
-
-
-/*
-control is signals LCD5 LCD4
-  LCD5 = -Data Clk on 0488
-  LCD4 = Latch pulse on 0488
-  LCD3 = Data 0
-  LCD2 = Data 1
-  LCD1 = Data 2
-  LCD0 = Data 3
-data is signals LCD3 LCD2 LCD1 LCD0
-*/
-void microvision_state::lcd_write(uint8_t control, uint8_t data)
-{
-	// Latch pulse, when high, resets the %8 latch address counter
-	if ( control & 0x01 ) {
-		m_lcd_latch_index = 0;
-	}
-
-	// The addressed latches load when -Data Clk is low
-	if ( ! ( control & 0x02 ) ) {
-		m_lcd_latch[ m_lcd_latch_index & 0x07 ] = data & 0x0f;
-	}
-
-	// The latch address counter is incremented on rising edges of -Data Clk
-	if ( ( ! ( m_lcd_control_old & 0x02 ) ) && ( control & 0x02 ) ) {
-		// Check if Latch pule is low
-		if ( ! ( control & 0x01 ) ) {
-			m_lcd_latch_index++;
-		}
-	}
-
-	// A parallel transfer of data from the addressed latches to the holding latches occurs
-	// whenever Latch Pulse is high and -Data Clk is high
-	if ( control == 3 ) {
-		for ( int i = 0; i < 8; i++ ) {
-			m_lcd_holding_latch[i] = m_lcd_latch[i];
-		}
-		update_lcd();
-	}
-
-	m_lcd_control_old = control;
+	m_lcd_pwm->matrix(offset, data);
 }
 
 
@@ -357,7 +223,9 @@ WRITE8_MEMBER( microvision_state::i8021_p1_write )
 {
 	LOG( "p1_write: %02x\n", data );
 
-	lcd_write( data & 0x03, data >> 4 );
+	m_lcd->data_w(data >> 4 & 0xf);
+	m_lcd->latch_pulse_w(BIT(data, 0));
+	m_lcd->data_clk_w(BIT(data, 1));
 }
 
 
@@ -438,19 +306,19 @@ READ8_MEMBER( microvision_state::tms1100_read_k )
 
 	LOG("read_k\n");
 
-	if ( m_r & 0x100 )
+	// multiplexed inputs
+	for (int i = 0; i < 3; i++)
+		if (BIT(m_r, i + 8))
+			data |= m_inputs[i]->read() & (m_button_mask >> (i * 4) & 0xf);
+
+	// K8: paddle capacitor
+	if (m_paddle_on)
 	{
-		data |= ioport("COL0")->read();
+		u8 paddle = m_paddle_timer->enabled() ? 0 : BIT(m_r, 2);
+		return paddle << 3 | data;
 	}
-	if ( m_r & 0x200 )
-	{
-		data |= ioport("COL1")->read();
-	}
-	if ( m_r & 0x400 )
-	{
-		data |= ioport("COL2")->read();
-	}
-	return data;
+	else
+		return data;
 }
 
 
@@ -458,208 +326,224 @@ WRITE16_MEMBER( microvision_state::tms1100_write_o )
 {
 	LOG("write_o: %04x\n", data);
 
-	m_o = data;
-
-	lcd_write( ( m_r >> 6 ) & 0x03, m_o & 0x0f );
+	// O0-O3: LCD data
+	m_lcd->data_w(data & 0xf);
 }
 
 
-/*
-x-- ---- ---- KEY2
--x- ---- ---- KEY1
---x ---- ---- KEY0
---- x--- ---- LCD5
---- -x-- ---- LCD4
---- ---- --x- SPKR0
---- ---- ---x SPKR1
-*/
+
 WRITE16_MEMBER( microvision_state::tms1100_write_r )
 {
 	LOG("write_r: %04x\n", data);
 
-	m_r = data;
+	// R2: charge paddle capacitor
+	if (~m_r & data & 4 && m_paddle_on)
+	{
+		// range is ~360us to ~2663us (measured on 4952-79 REV B PCB)
+		// note that the games don't use the whole range, so there's a deadzone around the edges
+		float step = (2000 - 500) / 255.0; // approximate it
+		m_paddle_timer->adjust(attotime::from_usec(500 + m_paddle->read() * step));
+	}
 
-	m_dac->write((BIT(m_r, 0) << 1) | BIT(m_r, 1));
-	lcd_write( ( m_r >> 6 ) & 0x03, m_o & 0x0f );
+	// R0: speaker lead 2
+	// R1: speaker lead 1 (GND on some carts)
+	m_dac->write((BIT(data, 0) << 1) | BIT(data, 1));
+
+	// R6: LCD latch pulse
+	// R7: LCD data clock
+	m_lcd->latch_pulse_w(BIT(data, 6));
+	m_lcd->data_clk_w(BIT(data, 7));
+
+	// R8-R10: input mux
+	m_r = data;
 }
 
 
-static const u16 microvision_output_pla_0[0x20] =
+static const u16 microvision_output_pla[2][0x20] =
 {
-	/* O output PLA configuration currently unknown */
-	0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E,
-	0x01, 0x09, 0x05, 0x0D, 0x03, 0x0B, 0x07, 0x0F,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	// default TMS1100 O output PLA
+	// verified for: blckbstr, pinball
+	{
+		0x00, 0x08, 0x04, 0x0c, 0x02, 0x0a, 0x06, 0x0e,
+		0x01, 0x09, 0x05, 0x0d, 0x03, 0x0b, 0x07, 0x0f,
+		0x00, 0x08, 0x04, 0x0c, 0x02, 0x0a, 0x06, 0x0e,
+		0x01, 0x09, 0x05, 0x0d, 0x03, 0x0b, 0x07, 0x0f
+	},
+
+	// reversed bit order
+	// verified for: bowling, vegasslt
+	{
+		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+	}
 };
 
-
-static const u16 microvision_output_pla_1[0x20] =
+u32 microvision_state::tms1100_decode_micro(offs_t offset)
 {
-	/* O output PLA configuration currently unknown */
-	/* Reversed bit order */
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-	0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
+	// default TMS1100 microinstructions PLA - this should work for all games
+	// verified for: blckbstr, bowling, pinball, vegasslt
+	static const u16 micro[0x80] =
+	{
+		0x1402, 0x0c30, 0xd002, 0x2404, 0x8019, 0x8038, 0x0416, 0x0415,
+		0x0104, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x1100, 0x0000,
+		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+		0x000a, 0x0404, 0x0408, 0x8004, 0xa019, 0xa038, 0x2004, 0x2000,
+		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+		0x1580, 0x1580, 0x1580, 0x1580, 0x0c34, 0x0834, 0x0434, 0x1400,
+		0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108,
+		0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108,
+		0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080,
+		0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080,
+		0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068,
+		0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068,
+		0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136,
+		0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0134
+	};
 
+	if (offset >= 0x80 || micro[offset] == 0)
+		return 0x8fa3;
+	else
+		return micro[offset];
+}
 
 DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 {
-	uint8_t *rom1 = memregion("maincpu1")->base();
-	uint8_t *rom2 = memregion("maincpu2")->base();
-	uint32_t file_size = m_cart->common_get_size("rom");
-	m_pla = 0;
+	u32 size = m_cart->common_get_size("rom");
 
-	if ( file_size != 1024 && file_size != 2048 )
+	if (size != 0x400 && size != 0x800)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size");
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM file size");
 		return image_init_result::FAIL;
 	}
 
-	/* Read cartridge */
-	if (!image.loaded_through_softlist())
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	// set default settings
+	u32 clock = (size == 0x400) ? 2000000 : 500000;
+	m_pla_auto = 0;
+	m_overlay_auto = 0;
+	m_paddle_auto = false;
+
+	if (image.loaded_through_softlist())
 	{
-		if (image.fread(rom1, file_size) != file_size)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return image_init_result::FAIL;
-		}
+		u32 sclock = strtoul(image.get_feature("clock"), nullptr, 0);
+		if (sclock != 0)
+			clock = sclock;
+
+		m_overlay_auto = strtoul(image.get_feature("overlay"), nullptr, 0);
+		m_pla_auto = strtoul(image.get_feature("pla"), nullptr, 0) ? 1 : 0;
+		m_paddle_auto = bool(strtoul(image.get_feature("paddle"), nullptr, 0) ? 1 : 0);
+	}
+
+	// detect MCU on file size
+	if (size == 0x400)
+	{
+		// I8021 MCU
+		memcpy(memregion("i8021_cpu")->base(), m_cart->get_rom_base(), size);
+		m_i8021->set_clock(clock);
 	}
 	else
 	{
-		// Copy rom contents
-		memcpy(rom1, image.get_software_region("rom"), file_size);
-
-		// Get PLA type
-		const char *pla = image.get_feature("pla");
-
-		if (pla)
-			m_pla = 1;
-
-		m_tms1100->set_output_pla(m_pla ? microvision_output_pla_1 : microvision_output_pla_0);
-
-		// Set default setting for PCB type and RC type
-		m_pcb_type = microvision_state::PCB_TYPE_UNKNOWN;
-		m_rc_type = microvision_state::RC_TYPE_UNKNOWN;
-
-		// Detect settings for PCB type
-		const char *pcb = image.get_feature("pcb");
-
-		if (pcb)
-		{
-			static const struct { const char *pcb_name; microvision_state::pcb_type pcbtype; } pcb_types[] =
-				{
-					{ "4952 REV-A", microvision_state::PCB_TYPE_4952_REV_A },
-					{ "4952-79 REV-B", microvision_state::PCB_TYPE_4952_9_REV_B },
-					{ "4971-REV-C", microvision_state::PCB_TYPE_4971_REV_C },
-					{ "7924952D02", microvision_state::PCB_TYPE_7924952D02 }
-				};
-
-			for (int i = 0; i < ARRAY_LENGTH(pcb_types) && m_pcb_type == microvision_state::PCB_TYPE_UNKNOWN; i++)
-			{
-				if (!core_stricmp(pcb, pcb_types[i].pcb_name))
-				{
-					m_pcb_type = pcb_types[i].pcbtype;
-				}
-			}
-		}
-
-		// Detect settings for RC types
-		const char *rc = image.get_feature("rc");
-
-		if (rc)
-		{
-			static const struct { const char *rc_name; microvision_state::rc_type rctype; } rc_types[] =
-				{
-					{ "100pf/21.0K", microvision_state::RC_TYPE_100PF_21_0K },
-					{ "100pf/23.2K", microvision_state::RC_TYPE_100PF_23_2K },
-					{ "100pf/39.4K", microvision_state::RC_TYPE_100PF_39_4K }
-				};
-
-			for (int i = 0; i < ARRAY_LENGTH(rc_types) && m_rc_type == microvision_state::RC_TYPE_UNKNOWN; i++)
-			{
-				if (!core_stricmp(rc, rc_types[i].rc_name))
-				{
-					m_rc_type = rc_types[i].rctype;
-				}
-			}
-		}
+		// TMS1100 MCU
+		memcpy(memregion("tms1100_cpu")->base(), m_cart->get_rom_base(), size);
+		m_tms1100->set_clock(clock);
 	}
 
-	// Mirror rom data to maincpu2 region
-	memcpy(rom2, rom1, file_size);
-
-	// Based on file size select cpu:
-	// - 1024 -> I8021
-	// - 2048 -> TI TMS1100
-
-	switch (file_size)
-	{
-		case 1024:
-			m_cpu_type = microvision_state::CPU_TYPE_I8021;
-			break;
-
-		case 2048:
-			m_cpu_type = microvision_state::CPU_TYPE_TMS1100;
-			break;
-	}
 	return image_init_result::PASS;
+}
+
+void microvision_state::apply_settings()
+{
+	u8 conf = m_conf->read();
+
+	u8 overlay = (conf & 1) ? m_overlay_auto : 0;
+	m_overlay_out = overlay;
+
+	// overlay physically restricts button panel
+	switch (overlay)
+	{
+		default:
+			m_button_mask = 0xfff;
+	}
+
+	u8 pla = ((conf & 0x18) == 0x10) ? m_pla_auto : (conf >> 3 & 1);
+	m_tms1100->set_output_pla(microvision_output_pla[pla]);
+
+	m_paddle_on = ((conf & 6) == 4) ? m_paddle_auto : bool(conf & 2);
 }
 
 
 static INPUT_PORTS_START( microvision )
 	PORT_START("COL0")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_CODE(KEYCODE_3) PORT_NAME("B01")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CODE(KEYCODE_E) PORT_NAME("B04")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON7)  PORT_CODE(KEYCODE_D) PORT_NAME("B07")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_C) PORT_NAME("B10")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_3)
 
 	PORT_START("COL1")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_CODE(KEYCODE_4) PORT_NAME("B02")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CODE(KEYCODE_R) PORT_NAME("B05")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_F) PORT_NAME("B08")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_V) PORT_NAME("B11")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(KEYCODE_2)
 
 	PORT_START("COL2")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CODE(KEYCODE_5) PORT_NAME("B03")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_T) PORT_NAME("B06")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_G) PORT_NAME("B09")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_B) PORT_NAME("B12")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_1)
 
 	PORT_START("PADDLE")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_PLAYER(1) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0, 255)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0)
+
+	PORT_START("CONF")
+	PORT_CONFNAME( 0x01, 0x01, "Overlay" ) PORT_CHANGED_MEMBER(DEVICE_SELF, microvision_state, conf_changed, 0)
+	PORT_CONFSETTING(    0x00, DEF_STR( None ) )
+	PORT_CONFSETTING(    0x01, "Auto" )
+	PORT_CONFNAME( 0x06, 0x04, "Paddle Hardware" ) PORT_CHANGED_MEMBER(DEVICE_SELF, microvision_state, conf_changed, 0)
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) ) // no circuitry on cartridge PCB
+	PORT_CONFSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_CONFSETTING(    0x04, "Auto" )
+	PORT_CONFNAME( 0x18, 0x10, "TMS1100 PLA" ) PORT_CHANGED_MEMBER(DEVICE_SELF, microvision_state, conf_changed, 0)
+	PORT_CONFSETTING(    0x00, "0" )
+	PORT_CONFSETTING(    0x08, "1" )
+	PORT_CONFSETTING(    0x10, "Auto" )
 INPUT_PORTS_END
 
 
 void microvision_state::microvision(machine_config &config)
 {
-	I8021(config, m_i8021, 2000000);    // approximately
+	/* basic machine hardware */
+	I8021(config, m_i8021, 0);
 	m_i8021->bus_out_cb().set(FUNC(microvision_state::i8021_p0_write));
 	m_i8021->p1_out_cb().set(FUNC(microvision_state::i8021_p1_write));
 	m_i8021->p2_out_cb().set(FUNC(microvision_state::i8021_p2_write));
 	m_i8021->t1_in_cb().set(FUNC(microvision_state::i8021_t1_read));
 	m_i8021->bus_in_cb().set(FUNC(microvision_state::i8021_bus_read));
 
-	TMS1100(config, m_tms1100, 500000);   // most games seem to be running at approximately this speed
-	m_tms1100->set_output_pla(microvision_output_pla_0);
+	TMS1100(config, m_tms1100, 0);
+	m_tms1100->set_output_pla(microvision_output_pla[0]);
+	m_tms1100->set_decode_micro().set(FUNC(microvision_state::tms1100_decode_micro));
 	m_tms1100->k().set(FUNC(microvision_state::tms1100_read_k));
 	m_tms1100->o().set(FUNC(microvision_state::tms1100_write_o));
 	m_tms1100->r().set(FUNC(microvision_state::tms1100_write_r));
 
-	config.set_maximum_quantum(attotime::from_hz(60));
+	/* video hardware */
+	HLCD0488(config, m_lcd);
+	m_lcd->write_cols().set(FUNC(microvision_state::lcd_output_w));
+
+	PWM_DISPLAY(config, m_lcd_pwm).set_size(16, 16);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(0);
 	screen.set_screen_update(FUNC(microvision_state::screen_update));
-	screen.screen_vblank().set(FUNC(microvision_state::screen_vblank));
 	screen.set_size(16, 16);
-	screen.set_visarea(0, 15, 0, 15);
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette", FUNC(microvision_state::microvision_palette), 16);
+	screen.set_visarea_full();
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -668,23 +552,22 @@ void microvision_state::microvision(machine_config &config)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "microvision_cart"));
-	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(microvision_state::cart_load));
+	/* cartridge */
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "microvision_cart");
+	m_cart->set_must_be_loaded(true);
+	m_cart->set_device_load(FUNC(microvision_state::cart_load));
 
-	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("microvision");
 }
 
 
 ROM_START( microvsn )
-	ROM_REGION( 0x800, "maincpu1", ROMREGION_ERASE00 )
-	ROM_REGION( 0x800, "maincpu2", ROMREGION_ERASE00 )
-	ROM_REGION( 867, "maincpu2:mpla", 0 )
-	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // verified for: pinball, blockbuster, bowling
-
-	ROM_REGION( 365, "maincpu2:opla", ROMREGION_ERASE00 )
+	// nothing here yet, ROM is on the cartridge
+	ROM_REGION( 0x400, "i8021_cpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800, "tms1100_cpu", ROMREGION_ERASE00 )
+	ROM_REGION( 867, "tms1100_cpu:mpla", ROMREGION_ERASE00 )
+	ROM_REGION( 365, "tms1100_cpu:opla", ROMREGION_ERASE00 )
 ROM_END
 
 
-CONS( 1979, microvsn, 0, 0, microvision, microvision, microvision_state, empty_init, "Milton Bradley", "MicroVision", MACHINE_NOT_WORKING )
+CONS( 1979, microvsn, 0, 0, microvision, microvision, microvision_state, empty_init, "Milton Bradley", "MicroVision", MACHINE_NOT_WORKING | MACHINE_REQUIRES_ARTWORK )

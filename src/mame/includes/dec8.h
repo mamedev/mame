@@ -203,6 +203,7 @@ private:
 	void srdarwin_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap);
 	void gondo_colpri_cb(u32 &colour, u32 &pri_mask);
 	void cobracom_colpri_cb(u32 &colour, u32 &pri_mask);
+	void oscar_tile_cb(tile_data &tileinfo, u32 &tile, u32 &colour, u32 &flags);
 	DECLARE_WRITE_LINE_MEMBER(csilver_adpcm_int);
 
 	void set_screen_raw_params_data_east(machine_config &config);

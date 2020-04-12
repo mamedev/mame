@@ -1763,6 +1763,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/m3002.h,MACHINES["M3002"] = true
+---------------------------------------------------
+
+if (MACHINES["M3002"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/m3002.cpp",
+		MAME_DIR .. "src/devices/machine/m3002.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/m6m80011ap.h,MACHINES["M6M80011AP"] = true
 ---------------------------------------------------
 

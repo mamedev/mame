@@ -60,10 +60,11 @@ public:
 	void init_punipic();
 	void init_punipic3();
 	void init_slampic();
-	
+	void init_wofpic();
+
 protected:
 	DECLARE_WRITE16_MEMBER(dinopic_layer_w);
-	
+
 private:
 	DECLARE_MACHINE_START(punipic);
 	DECLARE_MACHINE_START(slampic);
@@ -578,6 +579,23 @@ void slampic2_state::init_slampic2()
 	m_maincpu->space(AS_PROGRAM).install_ram(0xf00000, 0xf3ffff, m_bootleg_work_ram.get());
 
 	init_cps1();
+}
+
+void cps1bl_pic_state::init_wofpic()
+{
+	uint32_t gfx_size = memregion( "gfx" )->bytes();
+	uint8_t *rom = memregion( "gfx" )->base();
+	for (int i = 0; i < gfx_size; i += 8)
+	{
+		uint8_t tmp = rom[i + 1];
+		rom[i + 1] = rom[i + 4];
+		rom[i + 4] = tmp;
+		tmp = rom[i + 3];
+		rom[i + 3] = rom[i + 6];
+		rom[i + 6] = tmp;
+	}
+
+	init_dinopic();
 }
 
 void dinopic_state::init_jurassic99()
@@ -1469,6 +1487,30 @@ ROM_START( slampic2 )
 	ROM_LOAD( "2_gal16v8.p1", 0x0000, 0x0117, CRC(a944ff96) SHA1(2871a1c70b91fcd8628e63497afa1275f3a27f93) )
 ROM_END
 
+ROM_START( wofpic )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1.4m", 0x000001, 0x80000, CRC(d2ae67a8) SHA1(cb1a9f8e6999598b9a1a7c449f147a0c5773b154) )
+	ROM_LOAD16_BYTE( "2.4m", 0x000000, 0x80000, CRC(61fd0a01) SHA1(a7b5bdddd7b31645e33314c1d3649e1506cecfea) )
+	ROM_LOAD16_BYTE( "3.1m", 0x100001, 0x20000, CRC(739379be) SHA1(897f61527213902fda04bc28339f1f4278bf5ae9) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "4.1m", 0x100000, 0x20000, CRC(fe5eee87) SHA1(be1230f64c1e59ae3ff3e58593070613966ac79d) ) // 11xxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x400000, "gfx", 0 ) // rearranged in init
+	ROM_LOAD64_WORD( "gfx13.040",  0x000000, 0x80000, CRC(8e8db215) SHA1(cc85e576bf09c3edab9afc1b5fa0a152f4140c06) )
+	ROM_LOAD64_WORD( "gfx15.040",  0x000002, 0x80000, CRC(a5e4f449) SHA1(9956f82818ccc685367b5fe5e4bc8b59b65c31c1) )
+	ROM_LOAD64_WORD( "gfx14.040",  0x000004, 0x80000, CRC(f34a7f9d) SHA1(6d67623c93147a779f07ef103188f3e2cb6d6d6e) )
+	ROM_LOAD64_WORD( "gfx16.040",  0x000006, 0x80000, CRC(49a3dfc7) SHA1(c14ea91745fd72be936b6db9981d12d958326757) )
+	ROM_LOAD64_WORD( "gfx9.040",   0x200000, 0x80000, CRC(f8f33a0e) SHA1(33f172b79499d4a76b53c070c0007bd1604a71bd) )
+	ROM_LOAD64_WORD( "gfx11.040",  0x200002, 0x80000, CRC(13324965) SHA1(979754ebd15a2989f92b5b7fc5bae99eb83c3593) )
+	ROM_LOAD64_WORD( "gfx10.040",  0x200004, 0x80000, CRC(6a060c6c) SHA1(49e4da9373272e5889caa79a86c39ee34087c480) )
+	ROM_LOAD64_WORD( "gfx12.040",  0x200006, 0x80000, CRC(c29f7b70) SHA1(95d22dcd9e2a48ddea7573d0be75225e0aae798f) )
+
+	ROM_REGION( 0x2000, "audiocpu", 0 ) // NO DUMP  -  protected PIC
+	ROM_LOAD( "pic.bin", 0x0000, 0x1007, NO_DUMP )
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "ma12073.4mm", 0x00000, 0x80000,  CRC(ac421276) SHA1(56786c23b0d96e1a2540e7269aa20fd390f98b5b) )
+ROM_END
+
 
 // ************************************************************************* DRIVER MACROS
 
@@ -1477,9 +1519,11 @@ GAME( 1993,  dinopic2,   dino,     dinopic,   dino,      dinopic_state,     init
 GAME( 1993,  dinopic3,   dino,     dinopic,   dino,      dinopic_state,     init_dinopic,    ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 3)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
 GAME( 1993,  jurassic99, dino,     dinopic,   dino,      dinopic_state,     init_jurassic99, ROT0,  "bootleg",  "Jurassic 99 (Cadillacs and Dinosaurs bootleg with EM78P447AP)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ?
 
-GAME( 1993,  punipic,    punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,    ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
-GAME( 1993,  punipic2,   punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,    ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
-GAME( 1993,  punipic3,   punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic3,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
+GAME( 1993,  punipic,    punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
+GAME( 1993,  punipic2,   punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
+GAME( 1993,  punipic3,   punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic3,  ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
 
-GAME( 1993,  slampic,    slammast,  slampic,   slampic,   cps1bl_pic_state,  init_dinopic,    ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
-GAME( 1993,  slampic2,   slammast,  slampic2,  slampic2,  slampic2_state,    init_slampic2,   ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16C57, set 2)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
+GAME( 1993,  slampic,    slammast,  slampic,   slampic,   cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
+GAME( 1993,  slampic2,   slammast,  slampic2,  slampic2,  slampic2_state,    init_slampic2,  ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16C57, set 2)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
+
+GAME( 1992,  wofpic,     wof,       dinopic,   wof,       cps1bl_pic_state,  init_wofpic,    ROT0,  "bootleg",  "Warriors of Fate (bootleg with PIC16C57)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 021002 ETC, needs correct layers enable, etc. Currently only sprites show.

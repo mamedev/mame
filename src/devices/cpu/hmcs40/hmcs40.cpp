@@ -208,7 +208,6 @@ void hmcs40_cpu_device::device_start()
 	m_pcmask = (1 << m_pcwidth) - 1;
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hmcs40_cpu_device::simple_timer_cb), this));
-	reset_prescaler();
 
 	// resolve callbacks
 	m_read_r.resolve_all_safe(m_polarity & 0xf);
@@ -307,6 +306,9 @@ void hmcs40_cpu_device::device_reset()
 	m_ie = 0;
 	m_iri = m_irt = 0;
 	m_if[0] = m_if[1] = m_tf = 1;
+
+	if (!m_halt && m_timer->remaining().is_never())
+		reset_prescaler();
 
 	// clear i/o
 	m_d = m_polarity;

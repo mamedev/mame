@@ -210,44 +210,44 @@ static INPUT_PORTS_START( terracre )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )          PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(      0x0003, "3" )
 	PORT_DIPSETTING(      0x0002, "4" )
 	PORT_DIPSETTING(      0x0001, "5" )
 	PORT_DIPSETTING(      0x0000, "6" )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Bonus_Life ) )     PORT_DIPLOCATION("DSW1:3,4")
 	PORT_DIPSETTING(      0x000c, "20k then every 60k" )    // "20000 60000" in the "test mode"
 	PORT_DIPSETTING(      0x0008, "30k then every 70k" )    // "30000 70000" in the "test mode"
 	PORT_DIPSETTING(      0x0004, "40k then every 80k" )    // "40000 80000" in the "test mode"
 	PORT_DIPSETTING(      0x0000, "50k then every 90k" )    // "50000 90000" in the "test mode"
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )    PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Cabinet ) )        PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Cocktail ) )
-	PORT_DIPUNUSED( 0x0040, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x0080, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coin_A ) )
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "DSW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "DSW1:8" )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coin_A ) )         PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Coin_B ) )         PORT_DIPLOCATION("DSW2:3,4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Difficulty ) )     PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Flip_Screen ) )  // not in the "test mode"
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("DSW2:6") // not in the "test mode"
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Complete Invulnerability (Cheat)")
+	PORT_DIPNAME( 0x4000, 0x4000, "Complete Invulnerability (Cheat)") PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Base Ship Invulnerability (Cheat)")
+	PORT_DIPNAME( 0x8000, 0x8000, "Base Ship Invulnerability (Cheat)") PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -328,46 +328,46 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( horekid )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(      0x0003, "3" )
 	PORT_DIPSETTING(      0x0002, "4" )
 	PORT_DIPSETTING(      0x0001, "5" )
 	PORT_DIPSETTING(      0x0000, "6" )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("DSW1:3,4")
 	PORT_DIPSETTING(      0x000c, "20k then every 60k" )    // "20000 60000" in the "test mode"
 	PORT_DIPSETTING(      0x0008, "50k then every 60k" )    // "50000 60000" in the "test mode"
 	PORT_DIPSETTING(      0x0004, "20k then every 90k" )    // "20000 90000" in the "test mode"
 	PORT_DIPSETTING(      0x0000, "50k then every 90k" )    // "50000 90000" in the "test mode"
-	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(      0x00c0, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("DSW2:3,4")
 	PORT_DIPSETTING(      0x0400, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_2C ) )
-	PORT_DIPUNUSED( 0x1000, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Flip_Screen ) )
+	PORT_DIPUNUSED_DIPLOC( 0x1000, IP_ACTIVE_LOW, "DSW2:5" )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc000, 0xc000, "Debug Mode" )
+	PORT_DIPNAME( 0xc000, 0xc000, "Debug Mode" )                PORT_DIPLOCATION("DSW2:7,8")
 	PORT_DIPSETTING(      0xc000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )       // "Cabinet" Dip Switch must be set to "Upright" too !
-//  PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )      // duplicated setting
-//  PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )      // duplicated setting
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )      // duplicated setting
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )      // duplicated setting
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
@@ -456,11 +456,11 @@ GFXDECODE_END
 
 void terracre_state::ym3526(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8mhz
+	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8MHz verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &terracre_state::terracre_map);
 	m_maincpu->set_vblank_int("screen", FUNC(terracre_state::irq1_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(16'000'000)/4));     // 4.0mhz when compared to sound recordings, should be derived from XTAL(22'000'000)? how?
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(16'000'000)/4));     // 4MHz verified on PCB
 	audiocpu.set_addrmap(AS_PROGRAM, &terracre_state::sound_map);
 	audiocpu.set_addrmap(AS_IO, &terracre_state::sound_3526_io_map);
 	audiocpu.set_periodic_int(FUNC(terracre_state::irq0_line_hold), attotime::from_hz(XTAL(16'000'000)/4/512)); // ?
@@ -483,7 +483,7 @@ void terracre_state::ym3526(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM3526(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	YM3526(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "speaker", 1.0);     // 4MHz verified on PCB
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
@@ -499,7 +499,7 @@ void terracre_state::ym2203(machine_config &config)
 
 	config.device_remove("ymsnd");
 
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(16'000'000)/4));
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(16'000'000)/4));     // 4MHz verified on PCB
 	ym1.add_route(0, "speaker", 0.2);
 	ym1.add_route(1, "speaker", 0.2);
 	ym1.add_route(2, "speaker", 0.2);
@@ -529,160 +529,179 @@ void amazon_state::amazon_1412m2(machine_config &config)
 
 /* newer PCB, manufactured in 1987, basically the same as the Amazon layout above.
  Has 4*32K prg ROMs instead of 8*16K, contents is the same as other terracre sets though.
- top board:    BK-1 (1502), 16MHz XTAL, 68K-8, Nichibutsu 1412M2 XBA (gfx chip?)
+ top board:    BK-1 (1502), 16MHz XTAL, 68K-8, Nichibutsu 1412M2 XBA (protection chip)
  bottom board: BK-2 (1502), 22MHz XTAL, Z80, YM3526 */
 
 ROM_START( terracre )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* 68000 code (main CPU) */
-	ROM_LOAD16_BYTE( "bk1_1.4b",    0x00001, 0x8000, CRC(60932770) SHA1(887be7a44cb7bf30d11274d34896217cc87ae158) )
-	ROM_LOAD16_BYTE( "bk1_3.4d",    0x00000, 0x8000, CRC(cb36240e) SHA1(24696503d9720ced869bb96ec64f336679726668) )
-	ROM_LOAD16_BYTE( "bk1_2.6b",    0x10001, 0x8000, CRC(539352f2) SHA1(b960f75d12ebdcd6781a073a66b8e503a8f55186) )
-	ROM_LOAD16_BYTE( "bk1_4.6d",    0x10000, 0x8000, CRC(19387586) SHA1(76473493d173efde83ded52ad721d2c532f590e2) )
+	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code (main CPU) on BK-1 PCB
+	ROM_LOAD16_BYTE( "1.4b",    0x00001, 0x8000, CRC(60932770) SHA1(887be7a44cb7bf30d11274d34896217cc87ae158) )
+	ROM_LOAD16_BYTE( "3.4d",    0x00000, 0x8000, CRC(cb36240e) SHA1(24696503d9720ced869bb96ec64f336679726668) )
+	ROM_LOAD16_BYTE( "2.6b",    0x10001, 0x8000, CRC(539352f2) SHA1(b960f75d12ebdcd6781a073a66b8e503a8f55186) )
+	ROM_LOAD16_BYTE( "4.6d",    0x10000, 0x8000, CRC(19387586) SHA1(76473493d173efde83ded52ad721d2c532f590e2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )/* Z80 code (sound) */
-	ROM_LOAD( "bk2_11.15b",   0x0000, 0x4000, CRC(604c3b11) SHA1(c01d1ddae40fa8b65dfc72f959942cb9664a548b) )
-	ROM_LOAD( "bk2_12.17b",   0x4000, 0x4000, CRC(affc898d) SHA1(a78f06fa125de16fcdb8f4dc1629eb775aad913a) )
-	ROM_LOAD( "bk2_13.18b",   0x8000, 0x4000, CRC(302dc0ab) SHA1(4db8f12e70f9adf1eb993c6a8af68b5edbf79773) )
+	ROM_REGION( 0x10000, "audiocpu", 0 )// Z80 code (sound) on BK-2 PCB
+	ROM_LOAD( "11.15b",   0x0000, 0x4000, CRC(604c3b11) SHA1(c01d1ddae40fa8b65dfc72f959942cb9664a548b) )
+	ROM_LOAD( "12.17b",   0x4000, 0x4000, CRC(affc898d) SHA1(a78f06fa125de16fcdb8f4dc1629eb775aad913a) )
+	ROM_LOAD( "13.18b",   0x8000, 0x4000, CRC(302dc0ab) SHA1(4db8f12e70f9adf1eb993c6a8af68b5edbf79773) )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )    /* tiles */
-	ROM_LOAD( "bk2_14.16g",   0x00000, 0x2000, CRC(591a3804) SHA1(e1b46f5652e7f9677d75f01c6132975ace4facdd) )
+	ROM_REGION( 0x02000, "gfx1", 0 )    // tiles on BK-2 PCB
+	ROM_LOAD( "14.16g",   0x00000, 0x2000, CRC(591a3804) SHA1(e1b46f5652e7f9677d75f01c6132975ace4facdd) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )    /* background */
-	ROM_LOAD( "bk1_5.15f",   0x00000, 0x8000, CRC(984a597f) SHA1(1f33892f160691c44872b37f0f6cb1493c9f7fb1) )
-	ROM_LOAD( "bk1_6.17f",   0x08000, 0x8000, CRC(30e297ff) SHA1(9843826ae63039d6693c8a0b30af721d70f40056) )
+	ROM_REGION( 0x10000, "gfx2", 0 )    // background on BK-1 PCB
+	ROM_LOAD( "5.15f",   0x00000, 0x8000, CRC(984a597f) SHA1(1f33892f160691c44872b37f0f6cb1493c9f7fb1) )
+	ROM_LOAD( "6.17f",   0x08000, 0x8000, CRC(30e297ff) SHA1(9843826ae63039d6693c8a0b30af721d70f40056) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 )    /* sprites */
-	ROM_LOAD( "bk2_7.6e",    0x00000, 0x4000, CRC(bcf7740b) SHA1(8701862c35eb8fb1ec239253136a3858ebea4d0c) )
-	ROM_LOAD( "bk2_8.7e",    0x04000, 0x4000, CRC(a70b565c) SHA1(153e5f5a9927c294660dd0d636a9f651d4984d6d) )
-	ROM_LOAD( "bk2_9.6g",    0x08000, 0x4000, CRC(4a9ec3e6) SHA1(0a35b82fb49ecf7edafd02744a48490e744c0a00) )
-	ROM_LOAD( "bk2_10.7g",   0x0c000, 0x4000, CRC(450749fc) SHA1(376ab98ab8db56ed45f7d97a221dfd52e389cb5a) )
+	ROM_REGION( 0x10000, "gfx3", 0 )    // sprites on BK-2 PCB
+	ROM_LOAD( "7.6e",    0x00000, 0x4000, CRC(bcf7740b) SHA1(8701862c35eb8fb1ec239253136a3858ebea4d0c) )
+	ROM_LOAD( "8.7e",    0x04000, 0x4000, CRC(a70b565c) SHA1(153e5f5a9927c294660dd0d636a9f651d4984d6d) )
+	ROM_LOAD( "9.6g",    0x08000, 0x4000, CRC(4a9ec3e6) SHA1(0a35b82fb49ecf7edafd02744a48490e744c0a00) )
+	ROM_LOAD( "10.7g",   0x0c000, 0x4000, CRC(450749fc) SHA1(376ab98ab8db56ed45f7d97a221dfd52e389cb5a) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "bk1_3.10f", 0x0000, 0x0100, CRC(ce07c544) SHA1(c3691cb420c88f1887a55e3035b5d017decbc17a) )   /* red component */
-	ROM_LOAD( "bk1_2.11f", 0x0100, 0x0100, CRC(566d323a) SHA1(fe83585a0d9c7f942a5e54620b627a5a17a0fcf4) )   /* green component */
-	ROM_LOAD( "bk1_1.12f", 0x0200, 0x0100, CRC(7ea63946) SHA1(d7b89694a80736c7605b5c83d25d8b706f4504ab) )   /* blue component */
-	ROM_LOAD( "bk2_4.2g",  0x0300, 0x0100, CRC(08609bad) SHA1(e5daee3c3fea6620e3c2b91becd93bc4d3cdf011) )   /* sprite lookup table */
+	ROM_REGION( 0x0400, "proms", 0 ) // all type 82S129
+	ROM_LOAD( "3.10f", 0x0000, 0x0100, CRC(ce07c544) SHA1(c3691cb420c88f1887a55e3035b5d017decbc17a) )  // red component on BK-1 PCB
+	ROM_LOAD( "2.11f", 0x0100, 0x0100, CRC(566d323a) SHA1(fe83585a0d9c7f942a5e54620b627a5a17a0fcf4) )  // green component on BK-1 PCB
+	ROM_LOAD( "1.12f", 0x0200, 0x0100, CRC(7ea63946) SHA1(d7b89694a80736c7605b5c83d25d8b706f4504ab) )  // blue component on BK-1 PCB
+	ROM_LOAD( "4.2g",  0x0300, 0x0100, CRC(08609bad) SHA1(e5daee3c3fea6620e3c2b91becd93bc4d3cdf011) )  // sprite lookup table on BK-2 PCB
 
-	ROM_REGION( 0x0100, "user1", 0 )
-	ROM_LOAD( "bk2_5.4e",  0x0000, 0x0100, CRC(2c43991f) SHA1(312112832bee511b0545524295aa9bc2e756db0f) )   /* sprite palette bank */
+	ROM_REGION( 0x0100, "user1", 0 ) // 82S129
+	ROM_LOAD( "5.4e",  0x0000, 0x0100, CRC(2c43991f) SHA1(312112832bee511b0545524295aa9bc2e756db0f) )  // sprite palette bank on BK-2 PCB
 
-	/* 11e and 12a might be PALs */
+	ROM_REGION( 0x030c, "plds", 0 )
+	ROM_LOAD( "11e", 0x000, 0x104, NO_DUMP ) // PAL16L8 on BK-1 PCB
+	ROM_LOAD( "12a", 0x104, 0x104, NO_DUMP ) // PAL16R4 on BK-1 PCB
+	ROM_LOAD( "12f", 0x208, 0x104, NO_DUMP ) // PAL16R4 on BK-2 PCB
 ROM_END
 
-ROM_START( terracreo ) // older pcb
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* 68000 code (main CPU) */
-	ROM_LOAD16_BYTE( "1a_4b.rom",    0x00001, 0x4000, CRC(76f17479) SHA1(e6be7f78fe7dc9d66feb3ada6ad08d461c66640d) )
-	ROM_LOAD16_BYTE( "1a_4d.rom",    0x00000, 0x4000, CRC(8119f06e) SHA1(314e2d8e75f66862cf6567ac05f417a3a66f1254) )
-	ROM_LOAD16_BYTE( "1a_6b.rom",    0x08001, 0x4000, CRC(ba4b5822) SHA1(0de3ce04e14aa5757936babdec9cd1341d4a06d6) )
-	ROM_LOAD16_BYTE( "1a_6d.rom",    0x08000, 0x4000, CRC(ca4852f6) SHA1(12e968efb890ff4f982c2e04e090ac4339a97fc0) )
-	ROM_LOAD16_BYTE( "1a_7b.rom",    0x10001, 0x4000, CRC(d0771bba) SHA1(ebbc24562d677488a536cb515d761f07cd50425c) )
-	ROM_LOAD16_BYTE( "1a_7d.rom",    0x10000, 0x4000, CRC(029d59d9) SHA1(51053cafd5e7a4a5ba7008c6c6b28c612d935f40) )
-	ROM_LOAD16_BYTE( "1a_9b.rom",    0x18001, 0x4000, CRC(69227b56) SHA1(58c8aa4baa1f5ddfc151f5ed6284a06e87866dd7) )
-	ROM_LOAD16_BYTE( "1a_9d.rom",    0x18000, 0x4000, CRC(5a672942) SHA1(3890f87edb9047f3e4c6f4d4b47b7f9873962148) )
+ROM_START( terracreo ) // older pcb TC-1A & TC-2A and oldest ROM-set with glitches in the music when the ship appears
+	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code (main CPU) on TC-1A PCB
+	ROM_LOAD16_BYTE( "1.4b",    0x00001, 0x4000, CRC(76f17479) SHA1(e6be7f78fe7dc9d66feb3ada6ad08d461c66640d) )
+	ROM_LOAD16_BYTE( "5.4d",    0x00000, 0x4000, CRC(8119f06e) SHA1(314e2d8e75f66862cf6567ac05f417a3a66f1254) )
+	ROM_LOAD16_BYTE( "2.6b",    0x08001, 0x4000, CRC(ba4b5822) SHA1(0de3ce04e14aa5757936babdec9cd1341d4a06d6) )
+	ROM_LOAD16_BYTE( "6.6d",    0x08000, 0x4000, CRC(ca4852f6) SHA1(12e968efb890ff4f982c2e04e090ac4339a97fc0) )
+	ROM_LOAD16_BYTE( "3.7b",    0x10001, 0x4000, CRC(d0771bba) SHA1(ebbc24562d677488a536cb515d761f07cd50425c) )
+	ROM_LOAD16_BYTE( "7.7d",    0x10000, 0x4000, CRC(029d59d9) SHA1(51053cafd5e7a4a5ba7008c6c6b28c612d935f40) )
+	ROM_LOAD16_BYTE( "4.9b",    0x18001, 0x4000, CRC(69227b56) SHA1(58c8aa4baa1f5ddfc151f5ed6284a06e87866dd7) )
+	ROM_LOAD16_BYTE( "8.9d",    0x18000, 0x4000, CRC(5a672942) SHA1(3890f87edb9047f3e4c6f4d4b47b7f9873962148) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )/* Z80 code (sound) */
-	ROM_LOAD( "2a_15b.rom",   0x0000, 0x4000, CRC(604c3b11) SHA1(c01d1ddae40fa8b65dfc72f959942cb9664a548b) )
-	ROM_LOAD( "2a_17b.rom",   0x4000, 0x4000, CRC(affc898d) SHA1(a78f06fa125de16fcdb8f4dc1629eb775aad913a) )
-	ROM_LOAD( "2a_18b.rom",   0x8000, 0x4000, CRC(302dc0ab) SHA1(4db8f12e70f9adf1eb993c6a8af68b5edbf79773) )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code (sound) on TC-2A PCB
+	ROM_LOAD( "11.15b",   0x0000, 0x4000, CRC(604c3b11) SHA1(c01d1ddae40fa8b65dfc72f959942cb9664a548b) )
+	ROM_LOAD( "12.17b",   0x4000, 0x4000, CRC(affc898d) SHA1(a78f06fa125de16fcdb8f4dc1629eb775aad913a) )
+	ROM_LOAD( "13.18b",   0x8000, 0x4000, CRC(302dc0ab) SHA1(4db8f12e70f9adf1eb993c6a8af68b5edbf79773) )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )    /* tiles */
-	ROM_LOAD( "2a_16b.rom",   0x00000, 0x2000, CRC(591a3804) SHA1(e1b46f5652e7f9677d75f01c6132975ace4facdd) )
+	ROM_REGION( 0x02000, "gfx1", 0 )    // tiles on TC-2A PCB
+	ROM_LOAD( "18.16g",   0x00000, 0x2000, CRC(591a3804) SHA1(e1b46f5652e7f9677d75f01c6132975ace4facdd) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )    /* background */
-	ROM_LOAD( "1a_15f.rom",   0x00000, 0x8000, CRC(984a597f) SHA1(1f33892f160691c44872b37f0f6cb1493c9f7fb1) )
-	ROM_LOAD( "1a_17f.rom",   0x08000, 0x8000, CRC(30e297ff) SHA1(9843826ae63039d6693c8a0b30af721d70f40056) )
+	ROM_REGION( 0x10000, "gfx2", 0 )    // background on TC-1A PCB
+	ROM_LOAD( "9.15f",    0x00000, 0x8000, CRC(984a597f) SHA1(1f33892f160691c44872b37f0f6cb1493c9f7fb1) )
+	ROM_LOAD( "10.17f",   0x08000, 0x8000, CRC(30e297ff) SHA1(9843826ae63039d6693c8a0b30af721d70f40056) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 )    /* sprites */
-	ROM_LOAD( "2a_6e.rom",    0x00000, 0x4000, CRC(bcf7740b) SHA1(8701862c35eb8fb1ec239253136a3858ebea4d0c) )
-	ROM_LOAD( "2a_7e.rom",    0x04000, 0x4000, CRC(a70b565c) SHA1(153e5f5a9927c294660dd0d636a9f651d4984d6d) )
-	ROM_LOAD( "2a_6g.rom",    0x08000, 0x4000, CRC(4a9ec3e6) SHA1(0a35b82fb49ecf7edafd02744a48490e744c0a00) )
-	ROM_LOAD( "2a_7g.rom",    0x0c000, 0x4000, CRC(450749fc) SHA1(376ab98ab8db56ed45f7d97a221dfd52e389cb5a) )
+	ROM_REGION( 0x10000, "gfx3", 0 )    // sprites on TC-2A PCB
+	ROM_LOAD( "14.6e",    0x00000, 0x4000, CRC(bcf7740b) SHA1(8701862c35eb8fb1ec239253136a3858ebea4d0c) )
+	ROM_LOAD( "15.7e",    0x04000, 0x4000, CRC(a70b565c) SHA1(153e5f5a9927c294660dd0d636a9f651d4984d6d) )
+	ROM_LOAD( "16.6g",    0x08000, 0x4000, CRC(4a9ec3e6) SHA1(0a35b82fb49ecf7edafd02744a48490e744c0a00) )
+	ROM_LOAD( "17.7g",    0x0c000, 0x4000, CRC(450749fc) SHA1(376ab98ab8db56ed45f7d97a221dfd52e389cb5a) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "tc1a_10f.bin", 0x0000, 0x0100, CRC(ce07c544) SHA1(c3691cb420c88f1887a55e3035b5d017decbc17a) )    /* red component */
-	ROM_LOAD( "tc1a_11f.bin", 0x0100, 0x0100, CRC(566d323a) SHA1(fe83585a0d9c7f942a5e54620b627a5a17a0fcf4) )    /* green component */
-	ROM_LOAD( "tc1a_12f.bin", 0x0200, 0x0100, CRC(7ea63946) SHA1(d7b89694a80736c7605b5c83d25d8b706f4504ab) )    /* blue component */
-	ROM_LOAD( "tc2a_2g.bin",  0x0300, 0x0100, CRC(08609bad) SHA1(e5daee3c3fea6620e3c2b91becd93bc4d3cdf011) )    /* sprite lookup table */
+	ROM_REGION( 0x0400, "proms", 0 ) // all type 82S129
+	ROM_LOAD( "3.10f", 0x0000, 0x0100, CRC(ce07c544) SHA1(c3691cb420c88f1887a55e3035b5d017decbc17a) )  // red component on BK-1 PCB
+	ROM_LOAD( "2.11f", 0x0100, 0x0100, CRC(566d323a) SHA1(fe83585a0d9c7f942a5e54620b627a5a17a0fcf4) )  // green component on BK-1 PCB
+	ROM_LOAD( "1.12f", 0x0200, 0x0100, CRC(7ea63946) SHA1(d7b89694a80736c7605b5c83d25d8b706f4504ab) )  // blue component on BK-1 PCB
+	ROM_LOAD( "4.2g",  0x0300, 0x0100, CRC(08609bad) SHA1(e5daee3c3fea6620e3c2b91becd93bc4d3cdf011) )  // sprite lookup table on BK-2 PCB
 
 	ROM_REGION( 0x0100, "user1", 0 )
-	ROM_LOAD( "tc2a_4e.bin",  0x0000, 0x0100, CRC(2c43991f) SHA1(312112832bee511b0545524295aa9bc2e756db0f) )    /* sprite palette bank */
+	ROM_LOAD( "5.4e",  0x0000, 0x0100, CRC(2c43991f) SHA1(312112832bee511b0545524295aa9bc2e756db0f) )  // sprite palette bank on TC-2A PCB
+
+	ROM_REGION( 0x030c, "plds", 0 )
+	ROM_LOAD( "cp1408.11e", 0x000, 0x104, NO_DUMP ) // PAL16L8 on TC-1A PCB
+	ROM_LOAD( "tc1411.12a", 0x104, 0x104, NO_DUMP ) // PAL16R4 on TC-1A PCB
+	ROM_LOAD( "tc1412.12f", 0x208, 0x104, NO_DUMP ) // PAL16R4 on TC-2A PCB
 ROM_END
 
-ROM_START( terracrea ) // older pcb, the only difference is another sound rom
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* 68000 code (main CPU) */
-	ROM_LOAD16_BYTE( "1a_4b.rom",    0x00001, 0x4000, CRC(76f17479) SHA1(e6be7f78fe7dc9d66feb3ada6ad08d461c66640d) )
-	ROM_LOAD16_BYTE( "1a_4d.rom",    0x00000, 0x4000, CRC(8119f06e) SHA1(314e2d8e75f66862cf6567ac05f417a3a66f1254) )
-	ROM_LOAD16_BYTE( "1a_6b.rom",    0x08001, 0x4000, CRC(ba4b5822) SHA1(0de3ce04e14aa5757936babdec9cd1341d4a06d6) )
-	ROM_LOAD16_BYTE( "1a_6d.rom",    0x08000, 0x4000, CRC(ca4852f6) SHA1(12e968efb890ff4f982c2e04e090ac4339a97fc0) )
-	ROM_LOAD16_BYTE( "1a_7b.rom",    0x10001, 0x4000, CRC(d0771bba) SHA1(ebbc24562d677488a536cb515d761f07cd50425c) )
-	ROM_LOAD16_BYTE( "1a_7d.rom",    0x10000, 0x4000, CRC(029d59d9) SHA1(51053cafd5e7a4a5ba7008c6c6b28c612d935f40) )
-	ROM_LOAD16_BYTE( "1a_9b.rom",    0x18001, 0x4000, CRC(69227b56) SHA1(58c8aa4baa1f5ddfc151f5ed6284a06e87866dd7) )
-	ROM_LOAD16_BYTE( "1a_9d.rom",    0x18000, 0x4000, CRC(5a672942) SHA1(3890f87edb9047f3e4c6f4d4b47b7f9873962148) )
+// probably newest TC-1A/2A board ROM-set for YM3526 version as this fixes a glitch in the music when the ship appears
+ROM_START( terracrea ) // older pcb TC-1A & TC-2A, the only difference is one sound rom
+	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code (main CPU) on TC-1A PCB
+	ROM_LOAD16_BYTE( "1.4b",    0x00001, 0x4000, CRC(76f17479) SHA1(e6be7f78fe7dc9d66feb3ada6ad08d461c66640d) )
+	ROM_LOAD16_BYTE( "5.4d",    0x00000, 0x4000, CRC(8119f06e) SHA1(314e2d8e75f66862cf6567ac05f417a3a66f1254) )
+	ROM_LOAD16_BYTE( "2.6b",    0x08001, 0x4000, CRC(ba4b5822) SHA1(0de3ce04e14aa5757936babdec9cd1341d4a06d6) )
+	ROM_LOAD16_BYTE( "6.6d",    0x08000, 0x4000, CRC(ca4852f6) SHA1(12e968efb890ff4f982c2e04e090ac4339a97fc0) )
+	ROM_LOAD16_BYTE( "3.7b",    0x10001, 0x4000, CRC(d0771bba) SHA1(ebbc24562d677488a536cb515d761f07cd50425c) )
+	ROM_LOAD16_BYTE( "7.7d",    0x10000, 0x4000, CRC(029d59d9) SHA1(51053cafd5e7a4a5ba7008c6c6b28c612d935f40) )
+	ROM_LOAD16_BYTE( "4.9b",    0x18001, 0x4000, CRC(69227b56) SHA1(58c8aa4baa1f5ddfc151f5ed6284a06e87866dd7) )
+	ROM_LOAD16_BYTE( "8.9d",    0x18000, 0x4000, CRC(5a672942) SHA1(3890f87edb9047f3e4c6f4d4b47b7f9873962148) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )/* Z80 code (sound) */
-	ROM_LOAD( "2a_15b.rom",   0x0000, 0x4000, CRC(604c3b11) SHA1(c01d1ddae40fa8b65dfc72f959942cb9664a548b) )
-	ROM_LOAD( "dg.12",        0x4000, 0x4000, CRC(9e9b3808) SHA1(7b6f8d2b75f063aa81711a7c2bf1563cc38eee8b) )
-	ROM_LOAD( "2a_18b.rom",   0x8000, 0x4000, CRC(302dc0ab) SHA1(4db8f12e70f9adf1eb993c6a8af68b5edbf79773) )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code (sound) on TC-2A PCB
+	ROM_LOAD( "11.15b",   0x0000, 0x4000, CRC(604c3b11) SHA1(c01d1ddae40fa8b65dfc72f959942cb9664a548b) )
+	ROM_LOAD( "12.17b",   0x4000, 0x4000, CRC(9e9b3808) SHA1(7b6f8d2b75f063aa81711a7c2bf1563cc38eee8b) )
+	ROM_LOAD( "13.18b",   0x8000, 0x4000, CRC(302dc0ab) SHA1(4db8f12e70f9adf1eb993c6a8af68b5edbf79773) )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )    /* tiles */
-	ROM_LOAD( "2a_16b.rom",   0x00000, 0x2000, CRC(591a3804) SHA1(e1b46f5652e7f9677d75f01c6132975ace4facdd) )
+	ROM_REGION( 0x02000, "gfx1", 0 )    // tiles on TC-2A PCB
+	ROM_LOAD( "18.16g",   0x00000, 0x2000, CRC(591a3804) SHA1(e1b46f5652e7f9677d75f01c6132975ace4facdd) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )    /* background */
-	ROM_LOAD( "1a_15f.rom",   0x00000, 0x8000, CRC(984a597f) SHA1(1f33892f160691c44872b37f0f6cb1493c9f7fb1) )
-	ROM_LOAD( "1a_17f.rom",   0x08000, 0x8000, CRC(30e297ff) SHA1(9843826ae63039d6693c8a0b30af721d70f40056) )
+	ROM_REGION( 0x10000, "gfx2", 0 )    // background on TC-1A PCB
+	ROM_LOAD( "9.15f",    0x00000, 0x8000, CRC(984a597f) SHA1(1f33892f160691c44872b37f0f6cb1493c9f7fb1) )
+	ROM_LOAD( "10.17f",   0x08000, 0x8000, CRC(30e297ff) SHA1(9843826ae63039d6693c8a0b30af721d70f40056) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 )    /* sprites */
-	ROM_LOAD( "2a_6e.rom",    0x00000, 0x4000, CRC(bcf7740b) SHA1(8701862c35eb8fb1ec239253136a3858ebea4d0c) )
-	ROM_LOAD( "2a_7e.rom",    0x04000, 0x4000, CRC(a70b565c) SHA1(153e5f5a9927c294660dd0d636a9f651d4984d6d) )
-	ROM_LOAD( "2a_6g.rom",    0x08000, 0x4000, CRC(4a9ec3e6) SHA1(0a35b82fb49ecf7edafd02744a48490e744c0a00) )
-	ROM_LOAD( "2a_7g.rom",    0x0c000, 0x4000, CRC(450749fc) SHA1(376ab98ab8db56ed45f7d97a221dfd52e389cb5a) )
+	ROM_REGION( 0x10000, "gfx3", 0 )    // sprites on TC-2A PCB
+	ROM_LOAD( "14.6e",    0x00000, 0x4000, CRC(bcf7740b) SHA1(8701862c35eb8fb1ec239253136a3858ebea4d0c) )
+	ROM_LOAD( "15.7e",    0x04000, 0x4000, CRC(a70b565c) SHA1(153e5f5a9927c294660dd0d636a9f651d4984d6d) )
+	ROM_LOAD( "16.6g",    0x08000, 0x4000, CRC(4a9ec3e6) SHA1(0a35b82fb49ecf7edafd02744a48490e744c0a00) )
+	ROM_LOAD( "17.7g",    0x0c000, 0x4000, CRC(450749fc) SHA1(376ab98ab8db56ed45f7d97a221dfd52e389cb5a) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "tc1a_10f.bin", 0x0000, 0x0100, CRC(ce07c544) SHA1(c3691cb420c88f1887a55e3035b5d017decbc17a) )    /* red component */
-	ROM_LOAD( "tc1a_11f.bin", 0x0100, 0x0100, CRC(566d323a) SHA1(fe83585a0d9c7f942a5e54620b627a5a17a0fcf4) )    /* green component */
-	ROM_LOAD( "tc1a_12f.bin", 0x0200, 0x0100, CRC(7ea63946) SHA1(d7b89694a80736c7605b5c83d25d8b706f4504ab) )    /* blue component */
-	ROM_LOAD( "tc2a_2g.bin",  0x0300, 0x0100, CRC(08609bad) SHA1(e5daee3c3fea6620e3c2b91becd93bc4d3cdf011) )    /* sprite lookup table */
+	ROM_REGION( 0x0400, "proms", 0 ) // all type 82S129
+	ROM_LOAD( "3.10f", 0x0000, 0x0100, CRC(ce07c544) SHA1(c3691cb420c88f1887a55e3035b5d017decbc17a) )  // red component on BK-1 PCB
+	ROM_LOAD( "2.11f", 0x0100, 0x0100, CRC(566d323a) SHA1(fe83585a0d9c7f942a5e54620b627a5a17a0fcf4) )  // green component on BK-1 PCB
+	ROM_LOAD( "1.12f", 0x0200, 0x0100, CRC(7ea63946) SHA1(d7b89694a80736c7605b5c83d25d8b706f4504ab) )  // blue component on BK-1 PCB
+	ROM_LOAD( "4.2g",  0x0300, 0x0100, CRC(08609bad) SHA1(e5daee3c3fea6620e3c2b91becd93bc4d3cdf011) )  // sprite lookup table on BK-2 PCB
 
 	ROM_REGION( 0x0100, "user1", 0 )
-	ROM_LOAD( "tc2a_4e.bin",  0x0000, 0x0100, CRC(2c43991f) SHA1(312112832bee511b0545524295aa9bc2e756db0f) )    /* sprite palette bank */
+	ROM_LOAD( "5.4e",  0x0000, 0x0100, CRC(2c43991f) SHA1(312112832bee511b0545524295aa9bc2e756db0f) )  // sprite palette bank on TC-2A PCB
+
+	ROM_REGION( 0x030c, "plds", 0 )
+	ROM_LOAD( "cp1408.11e", 0x000, 0x104, NO_DUMP ) // PAL16L8 on TC-1A PCB
+	ROM_LOAD( "tc1411.12a", 0x104, 0x104, NO_DUMP ) // PAL16R4 on TC-1A PCB
+	ROM_LOAD( "tc1412.12f", 0x208, 0x104, NO_DUMP ) // PAL16R4 on TC-2A PCB
 ROM_END
 
-ROM_START( terracren ) /* 'n' for OPN(YM2203), older than YM3526 sets */
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* 68000 code (main CPU) */
-	ROM_LOAD16_BYTE( "1a_4b.rom",    0x00001, 0x4000, CRC(76f17479) SHA1(e6be7f78fe7dc9d66feb3ada6ad08d461c66640d) )
-	ROM_LOAD16_BYTE( "1a_4d.rom",    0x00000, 0x4000, CRC(8119f06e) SHA1(314e2d8e75f66862cf6567ac05f417a3a66f1254) )
-	ROM_LOAD16_BYTE( "1a_6b.rom",    0x08001, 0x4000, CRC(ba4b5822) SHA1(0de3ce04e14aa5757936babdec9cd1341d4a06d6) )
-	ROM_LOAD16_BYTE( "1a_6d.rom",    0x08000, 0x4000, CRC(ca4852f6) SHA1(12e968efb890ff4f982c2e04e090ac4339a97fc0) )
-	ROM_LOAD16_BYTE( "1a_7b.rom",    0x10001, 0x4000, CRC(d0771bba) SHA1(ebbc24562d677488a536cb515d761f07cd50425c) )
-	ROM_LOAD16_BYTE( "1a_7d.rom",    0x10000, 0x4000, CRC(029d59d9) SHA1(51053cafd5e7a4a5ba7008c6c6b28c612d935f40) )
-	ROM_LOAD16_BYTE( "1a_9b.rom",    0x18001, 0x4000, CRC(69227b56) SHA1(58c8aa4baa1f5ddfc151f5ed6284a06e87866dd7) )
-	ROM_LOAD16_BYTE( "1a_9d.rom",    0x18000, 0x4000, CRC(5a672942) SHA1(3890f87edb9047f3e4c6f4d4b47b7f9873962148) )
+ROM_START( terracren ) // 'n' for OPN(YM2203), newer than YM3526 sets because it uses a daughterboard to convert the existing YM3526 socket to a YM2203
+	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code (main CPU) on TC-1A PCB
+	ROM_LOAD16_BYTE( "1.4b",    0x00001, 0x4000, CRC(76f17479) SHA1(e6be7f78fe7dc9d66feb3ada6ad08d461c66640d) )
+	ROM_LOAD16_BYTE( "5.4d",    0x00000, 0x4000, CRC(8119f06e) SHA1(314e2d8e75f66862cf6567ac05f417a3a66f1254) )
+	ROM_LOAD16_BYTE( "2.6b",    0x08001, 0x4000, CRC(ba4b5822) SHA1(0de3ce04e14aa5757936babdec9cd1341d4a06d6) )
+	ROM_LOAD16_BYTE( "6.6d",    0x08000, 0x4000, CRC(ca4852f6) SHA1(12e968efb890ff4f982c2e04e090ac4339a97fc0) )
+	ROM_LOAD16_BYTE( "3.7b",    0x10001, 0x4000, CRC(d0771bba) SHA1(ebbc24562d677488a536cb515d761f07cd50425c) )
+	ROM_LOAD16_BYTE( "7.7d",    0x10000, 0x4000, CRC(029d59d9) SHA1(51053cafd5e7a4a5ba7008c6c6b28c612d935f40) )
+	ROM_LOAD16_BYTE( "4.9b",    0x18001, 0x4000, CRC(69227b56) SHA1(58c8aa4baa1f5ddfc151f5ed6284a06e87866dd7) )
+	ROM_LOAD16_BYTE( "8.9d",    0x18000, 0x4000, CRC(5a672942) SHA1(3890f87edb9047f3e4c6f4d4b47b7f9873962148) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )/* Z80 code (sound) */
-	ROM_LOAD( "tc2a_15b.bin", 0x0000, 0x4000, CRC(790ddfa9) SHA1(90aa25fbfc9b5f52145ab3cf126610cf21024c20) )
-	ROM_LOAD( "tc2a_17b.bin", 0x4000, 0x4000, CRC(d4531113) SHA1(efc37c33a0791cae4d4ab50bc884cd6c8a6f95f5) )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code (sound)
+	ROM_LOAD( "11.15b", 0x0000, 0x4000, CRC(790ddfa9) SHA1(90aa25fbfc9b5f52145ab3cf126610cf21024c20) )
+	ROM_LOAD( "12.17b", 0x4000, 0x4000, CRC(d4531113) SHA1(efc37c33a0791cae4d4ab50bc884cd6c8a6f95f5) )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )    /* tiles */
-	ROM_LOAD( "2a_16b.rom",   0x00000, 0x2000, CRC(591a3804) SHA1(e1b46f5652e7f9677d75f01c6132975ace4facdd) )
+	ROM_REGION( 0x02000, "gfx1", 0 )    // tiles on TC-2A PCB
+	ROM_LOAD( "18.16g",   0x00000, 0x2000, CRC(591a3804) SHA1(e1b46f5652e7f9677d75f01c6132975ace4facdd) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )    /* background */
-	ROM_LOAD( "1a_15f.rom",   0x00000, 0x8000, CRC(984a597f) SHA1(1f33892f160691c44872b37f0f6cb1493c9f7fb1) )
-	ROM_LOAD( "1a_17f.rom",   0x08000, 0x8000, CRC(30e297ff) SHA1(9843826ae63039d6693c8a0b30af721d70f40056) )
+	ROM_REGION( 0x10000, "gfx2", 0 )    // background on TC-1A PCB
+	ROM_LOAD( "9.15f",    0x00000, 0x8000, CRC(984a597f) SHA1(1f33892f160691c44872b37f0f6cb1493c9f7fb1) )
+	ROM_LOAD( "10.17f",   0x08000, 0x8000, CRC(30e297ff) SHA1(9843826ae63039d6693c8a0b30af721d70f40056) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 )    /* sprites */
-	ROM_LOAD( "2a_6e.rom",    0x00000, 0x4000, CRC(bcf7740b) SHA1(8701862c35eb8fb1ec239253136a3858ebea4d0c) )
-	ROM_LOAD( "2a_7e.rom",    0x04000, 0x4000, CRC(a70b565c) SHA1(153e5f5a9927c294660dd0d636a9f651d4984d6d) )
-	ROM_LOAD( "2a_6g.rom",    0x08000, 0x4000, CRC(4a9ec3e6) SHA1(0a35b82fb49ecf7edafd02744a48490e744c0a00) )
-	ROM_LOAD( "2a_7g.rom",    0x0c000, 0x4000, CRC(450749fc) SHA1(376ab98ab8db56ed45f7d97a221dfd52e389cb5a) )
+	ROM_REGION( 0x10000, "gfx3", 0 )    // sprites on TC-2A PCB
+	ROM_LOAD( "14.6e",    0x00000, 0x4000, CRC(bcf7740b) SHA1(8701862c35eb8fb1ec239253136a3858ebea4d0c) )
+	ROM_LOAD( "15.7e",    0x04000, 0x4000, CRC(a70b565c) SHA1(153e5f5a9927c294660dd0d636a9f651d4984d6d) )
+	ROM_LOAD( "16.6g",    0x08000, 0x4000, CRC(4a9ec3e6) SHA1(0a35b82fb49ecf7edafd02744a48490e744c0a00) )
+	ROM_LOAD( "17.7g",    0x0c000, 0x4000, CRC(450749fc) SHA1(376ab98ab8db56ed45f7d97a221dfd52e389cb5a) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "tc1a_10f.bin", 0x0000, 0x0100, CRC(ce07c544) SHA1(c3691cb420c88f1887a55e3035b5d017decbc17a) )    /* red component */
-	ROM_LOAD( "tc1a_11f.bin", 0x0100, 0x0100, CRC(566d323a) SHA1(fe83585a0d9c7f942a5e54620b627a5a17a0fcf4) )    /* green component */
-	ROM_LOAD( "tc1a_12f.bin", 0x0200, 0x0100, CRC(7ea63946) SHA1(d7b89694a80736c7605b5c83d25d8b706f4504ab) )    /* blue component */
-	ROM_LOAD( "tc2a_2g.bin",  0x0300, 0x0100, CRC(08609bad) SHA1(e5daee3c3fea6620e3c2b91becd93bc4d3cdf011) )    /* sprite lookup table */
+	ROM_REGION( 0x0400, "proms", 0 ) // all type 82S129
+	ROM_LOAD( "3.10f", 0x0000, 0x0100, CRC(ce07c544) SHA1(c3691cb420c88f1887a55e3035b5d017decbc17a) )  // red component on BK-1 PCB
+	ROM_LOAD( "2.11f", 0x0100, 0x0100, CRC(566d323a) SHA1(fe83585a0d9c7f942a5e54620b627a5a17a0fcf4) )  // green component on BK-1 PCB
+	ROM_LOAD( "1.12f", 0x0200, 0x0100, CRC(7ea63946) SHA1(d7b89694a80736c7605b5c83d25d8b706f4504ab) )  // blue component on BK-1 PCB
+	ROM_LOAD( "4.2g",  0x0300, 0x0100, CRC(08609bad) SHA1(e5daee3c3fea6620e3c2b91becd93bc4d3cdf011) )  // sprite lookup table on BK-2 PCB
 
 	ROM_REGION( 0x0100, "user1", 0 )
-	ROM_LOAD( "tc2a_4e.bin",  0x0000, 0x0100, CRC(2c43991f) SHA1(312112832bee511b0545524295aa9bc2e756db0f) )    /* sprite palette bank */
+	ROM_LOAD( "5.4e",  0x0000, 0x0100, CRC(2c43991f) SHA1(312112832bee511b0545524295aa9bc2e756db0f) )  // sprite palette bank on TC-2A PCB
+
+	ROM_REGION( 0x030c, "plds", 0 )
+	ROM_LOAD( "cp1408.11e", 0x000, 0x104, NO_DUMP ) // PAL16L8 on TC-1A PCB
+	ROM_LOAD( "tc1411.12a", 0x104, 0x104, NO_DUMP ) // PAL16R4 on TC-1A PCB
+	ROM_LOAD( "tc1412.12f", 0x208, 0x104, NO_DUMP ) // PAL16R4 on TC-2A PCB
 ROM_END
 
 ROM_START( amazon )

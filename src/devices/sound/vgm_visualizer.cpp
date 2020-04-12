@@ -78,6 +78,7 @@ void vgmviz_device::device_start()
 {
 	WDL_fft_init();
 	fill_window();
+	m_bitmap.resize(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 
@@ -166,8 +167,8 @@ void vgmviz_device::apply_waterfall()
 			continue;
 		}
 		int permuted = WDL_fft_permute(FFT_LENGTH / 2, bar);
-		float val = bins[0][permuted].re + bins[1][permuted].re;
-		int level = int(logf(val * 32768.0f) * 31.0f);
+		float val = std::max<float>(bins[0][permuted].re, bins[1][permuted].re);
+		int level = int(log10f(val * 32768.0f) * 95.0f);
 		m_waterfall_buf[m_waterfall_length % SCREEN_WIDTH][total_bars - bar] = (level < 0) ? 0 : (level > 255 ? 255 : level);
 	}
 	m_waterfall_length++;
@@ -253,6 +254,8 @@ void vgmviz_device::device_reset()
 	}
 
 	m_viz_mode = VIZ_WAVEFORM;
+	m_clear_pending = true;
+	m_bitmap.fill(0);
 
 	m_history_length = 0;
 }
@@ -270,6 +273,8 @@ void vgmviz_device::cycle_viz_mode()
 	{
 		m_viz_mode = VIZ_WAVEFORM;
 	}
+	m_bitmap.fill(0);
+	m_clear_pending = true;
 }
 
 
@@ -309,10 +314,17 @@ void vgmviz_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			update_waveform(outputs);
 			break;
 		case VIZ_WATERFALL:
-		case VIZ_RAWSPEC:
-		case VIZ_BARSPEC4:
-		case VIZ_BARSPEC8:
-		case VIZ_BARSPEC16:
+		case VIZ_RAW_SPEC:
+		case VIZ_BAR_SPEC4:
+		case VIZ_BAR_SPEC8:
+		case VIZ_BAR_SPEC16:
+		case VIZ_PILLAR_SPEC4:
+		case VIZ_PILLAR_SPEC8:
+		case VIZ_PILLAR_SPEC16:
+		case VIZ_TOP_SPEC:
+		case VIZ_TOP_SPEC4:
+		case VIZ_TOP_SPEC8:
+		case VIZ_TOP_SPEC16:
 			update_fft(outputs);
 			break;
 		}
@@ -483,98 +495,204 @@ void vgmviz_device::device_add_mconfig(machine_config &config)
 //  screen_update - update vu meters
 //-------------------------------------------------
 
+template void vgmviz_device::draw_spectrogram<1, vgmviz_device::SPEC_VIZ_BAR>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<4, vgmviz_device::SPEC_VIZ_BAR>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<8, vgmviz_device::SPEC_VIZ_BAR>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<16, vgmviz_device::SPEC_VIZ_BAR>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<4, vgmviz_device::SPEC_VIZ_TOP>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<8, vgmviz_device::SPEC_VIZ_TOP>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<16, vgmviz_device::SPEC_VIZ_TOP>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<3, vgmviz_device::SPEC_VIZ_PILLAR>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<6, vgmviz_device::SPEC_VIZ_PILLAR>(bitmap_rgb32 &bitmap);
+template void vgmviz_device::draw_spectrogram<12, vgmviz_device::SPEC_VIZ_PILLAR>(bitmap_rgb32 &bitmap);
+
 uint32_t vgmviz_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0, cliprect);
-
 	switch (m_viz_mode)
 	{
 	default:
+		bitmap.fill(0, cliprect);
 		draw_waveform(bitmap);
 		break;
 	case VIZ_WATERFALL:
+		bitmap.fill(0, cliprect);
 		draw_waterfall(bitmap);
 		break;
-	case VIZ_RAWSPEC:
-	case VIZ_BARSPEC4:
-	case VIZ_BARSPEC8:
-	case VIZ_BARSPEC16:
-		draw_spectrogram(bitmap);
+	case VIZ_RAW_SPEC:
+		draw_spectrogram<1, SPEC_VIZ_BAR>(bitmap);
+		break;
+	case VIZ_TOP_SPEC:
+		draw_spectrogram<1, SPEC_VIZ_TOP>(bitmap);
+		break;
+	case VIZ_BAR_SPEC4:
+		draw_spectrogram<4, SPEC_VIZ_BAR>(bitmap);
+		break;
+	case VIZ_PILLAR_SPEC4:
+		draw_spectrogram<3, SPEC_VIZ_PILLAR>(bitmap);
+		break;
+	case VIZ_TOP_SPEC4:
+		draw_spectrogram<4, SPEC_VIZ_TOP>(bitmap);
+		break;
+	case VIZ_BAR_SPEC8:
+		draw_spectrogram<8, SPEC_VIZ_BAR>(bitmap);
+		break;
+	case VIZ_PILLAR_SPEC8:
+		draw_spectrogram<6, SPEC_VIZ_PILLAR>(bitmap);
+		break;
+	case VIZ_TOP_SPEC8:
+		draw_spectrogram<8, SPEC_VIZ_TOP>(bitmap);
+		break;
+	case VIZ_BAR_SPEC16:
+		draw_spectrogram<16, SPEC_VIZ_BAR>(bitmap);
+		break;
+	case VIZ_PILLAR_SPEC16:
+		draw_spectrogram<12, SPEC_VIZ_PILLAR>(bitmap);
+		break;
+	case VIZ_TOP_SPEC16:
+		draw_spectrogram<16, SPEC_VIZ_TOP>(bitmap);
 		break;
 	}
 	return 0;
 }
 
-void vgmviz_device::draw_spectrogram(bitmap_rgb32 &bitmap)
+template <int BarSize, int SpecMode> void vgmviz_device::draw_spectrogram(bitmap_rgb32 &bitmap)
 {
-	const pen_t *pal = m_palette->pens();
-	const int black_idx = (512 + FFT_LENGTH / 2);
+	const int black_index = 512 + FFT_LENGTH / 2;
 
-	/*
-	find_levels();
-
-	int chan_x = 0;
-	for (int chan = 0; chan < 2; chan++)
+	if (m_clear_pending || SpecMode == SPEC_VIZ_BAR)
 	{
-		int level = int(m_curr_levels[chan] * 255.0f);
-		int peak = int(m_curr_peaks[chan] * 255.0f);
-		for (int y = 0; y < 512; y++)
+		bitmap.fill(0);
+		m_clear_pending = false;
+	}
+
+	const pen_t *pal = m_palette->pens();
+
+	int width = SCREEN_WIDTH;
+	switch (SpecMode)
+	{
+	case SPEC_VIZ_PILLAR:
+		for (int y = 2; y < SCREEN_HEIGHT; y++)
 		{
-			int bar_y = 255 - (y >> 1);
-			for (int x = 0; x < 7; x++)
+			uint32_t *src = &m_bitmap.pix32(y);
+			uint32_t *dst = &bitmap.pix32(y - 2);
+			for (int x = SCREEN_WIDTH - 1; x >= 1; x--)
 			{
-				uint32_t *line = &bitmap.pix32(y + 256);
-				bool lit = bar_y <= level || bar_y == peak;
-				line[chan_x + x] = pal[lit ? bar_y : black_idx];
+				dst[x] = src[x - 1];
 			}
 		}
-		chan_x += 8;
-		m_curr_peaks[chan] *= 0.99f;
-	}
-	*/
-
-	int bar_size = 1;
-	switch (m_viz_mode)
-	{
+		width = (int)(SCREEN_WIDTH * 0.75f);
+		break;
+	case SPEC_VIZ_TOP:
+		for (int y = 1; y < SCREEN_HEIGHT; y++)
+		{
+			uint32_t *src = &m_bitmap.pix32(y);
+			uint32_t *dst = &bitmap.pix32(y - 1);
+			for (int x = 0; x < SCREEN_WIDTH; x++)
+			{
+				dst[x] = src[x];
+			}
+		}
+		break;
 	default:
-		bar_size = 1;
-		break;
-	case VIZ_BARSPEC4:
-		bar_size = 4;
-		break;
-	case VIZ_BARSPEC8:
-		bar_size = 8;
-		break;
-	case VIZ_BARSPEC16:
-		bar_size = 16;
 		break;
 	}
 
 	int total_bars = FFT_LENGTH / 2;
 	WDL_FFT_COMPLEX *bins[2] = { (WDL_FFT_COMPLEX *)m_fft_buf[0], (WDL_FFT_COMPLEX *)m_fft_buf[1] };
-	for (int bar = 0; bar < total_bars && bar < SCREEN_WIDTH; bar += bar_size)
+
+	for (int bar = 2; bar < total_bars && bar < width; bar += BarSize)
 	{
-		if (bar < 2)
-		{
-			continue;
-		}
 		float max_val = 0.0f;
-		for (int sub_bar = 0; sub_bar < bar_size && (bar + sub_bar) < total_bars; sub_bar++)
+		for (int sub_bar = 0; sub_bar < BarSize && (bar + sub_bar) < total_bars; sub_bar++)
 		{
 			int permuted = WDL_fft_permute(FFT_LENGTH/2, bar + sub_bar);
-			max_val = std::max<float>((bins[0][permuted].re + bins[1][permuted].re) * 0.5f, max_val);
+			const float max_channel = std::max<float>(bins[0][permuted].re, bins[1][permuted].re);
+			max_val = std::max<float>(max_channel, max_val);
 		}
-		int level = int(logf(max_val * 32768.0f) * 96.0f);
-		for (int y = 0; y < SCREEN_HEIGHT; y++)
+
+		float raw_level = logf(max_val * 32768.0f);
+
+		int level = 0;
+		int pal_index = 0;
+		switch (SpecMode)
 		{
-			int bar_y = SCREEN_HEIGHT - y;
-			uint32_t *line = &bitmap.pix32(y);
-			bool lit = bar_y <= level;
-			const int x_limit = bar_size == 1 ? 1 : bar_size - 1;
-			for (int x = 0; x < x_limit; x++)
+		case SPEC_VIZ_BAR:
+			level = int(raw_level * 95.0f);
+			if (level <= 767)
 			{
-				line[(bar - 2) + x] = pal[lit ? (256 + bar) : black_idx];
+				pal_index = 255 - level / 3;
 			}
+			for (int y = 0; y < SCREEN_HEIGHT; y++)
+			{
+				int bar_y = SCREEN_HEIGHT - y;
+				uint32_t *line = &bitmap.pix32(y);
+				for (int x = 0; x < BarSize; x++)
+				{
+					line[(bar - 2) + x] = bar_y <= level ? pal[256 + pal_index] : pal[black_index];
+				}
+			}
+			break;
+		case SPEC_VIZ_PILLAR:
+			level = int(raw_level * 59.0f);
+			if (level < 383)
+			{
+				pal_index = 255 - (int)(level * 0.75f);
+			}
+
+			for (int y = 0; y < SCREEN_HEIGHT; y++)
+			{
+				int bar_y = SCREEN_HEIGHT - y;
+				uint32_t *line = &bitmap.pix32(y);
+				line[0] = 0;
+				if (bar_y > level)
+				{
+					continue;
+				}
+				const uint32_t entry = pal[256 + pal_index];
+				for (int x = (bar_y < level) ? 0 : 1; x < (BarSize - 1); x++)
+				{
+					if (bar_y < (level - 1))
+					{
+						const uint8_t r = (uint8_t)(((entry >> 16) & 0xff) * 0.75f);
+						const uint8_t g = (uint8_t)(((entry >>  8) & 0xff) * 0.75f);
+						const uint8_t b = (uint8_t)(((entry >>  0) & 0xff) * 0.75f);
+						line[(bar - 2) + x] = 0xff000000 | (r << 16) | (g << 8) | b;
+					}
+					else
+					{
+						line[(bar - 2) + x] = pal[256 + pal_index];
+					}
+				}
+				const uint8_t r = (uint8_t)(((entry >> 16) & 0xff) * 0.5f);
+				const uint8_t g = (uint8_t)(((entry >>  8) & 0xff) * 0.5f);
+				const uint8_t b = (uint8_t)(((entry >>  0) & 0xff) * 0.5f);
+				line[(bar - 2) + (BarSize - 1)] = 0xff000000 | (r << 16) | (g << 8) | b;
+				if (bar_y < level)
+				{
+					line[(bar - 2) + (BarSize - 2)] = 0xff000000 | (r << 16) | (g << 8) | b;
+				}
+			}
+			for (int x = 0; x < SCREEN_WIDTH; x++)
+			{
+				bitmap.pix32(SCREEN_HEIGHT - 1, x) = 0;
+				bitmap.pix32(SCREEN_HEIGHT - 2, x) = 0;
+			}
+			memcpy(&m_bitmap.pix32(0), &bitmap.pix32(0), sizeof(uint32_t) * SCREEN_WIDTH * SCREEN_HEIGHT);
+			break;
+		case SPEC_VIZ_TOP:
+			level = int(raw_level * 63.0f);
+			if (level < 255)
+			{
+				pal_index = 255 - level;
+			}
+
+			for (int x = 0; x < BarSize; x++)
+			{
+				bitmap.pix32(SCREEN_HEIGHT - 1, (bar - 2) + x) = level > 0 ? pal[256 + pal_index] : pal[black_index];
+			}
+
+			memcpy(&m_bitmap.pix32(0), &bitmap.pix32(0), sizeof(uint32_t) * SCREEN_WIDTH * SCREEN_HEIGHT);
+			break;
 		}
 	}
 }

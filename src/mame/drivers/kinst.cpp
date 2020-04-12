@@ -455,7 +455,7 @@ WRITE32_MEMBER(kinst_state::control_w)
 			break;
 
 		case 1:     /* $88 - sound reset */
-			m_dcs->reset_w(~data & 0x01);
+			m_dcs->reset_w(data & 0x01);
 			break;
 
 		case 2:     /* $90 - sound control */

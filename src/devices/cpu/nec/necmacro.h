@@ -53,6 +53,22 @@
 	SetSZPF_Word(tmp1);                     \
 	Wreg(Reg)=tmp1
 
+#define IncByteReg(Reg)                     \
+	unsigned tmp = (unsigned)Breg(Reg); \
+	unsigned tmp1 = tmp+1;                  \
+	m_OverVal = (tmp == 0x7f);           \
+	SetAF(tmp1,tmp,1);                      \
+	SetSZPF_Byte(tmp1);                     \
+	Breg(Reg)=tmp1
+
+#define DecByteReg(Reg)                     \
+	unsigned tmp = (unsigned)Breg(Reg); \
+	unsigned tmp1 = tmp-1;                  \
+	m_OverVal = (tmp == 0x80);           \
+	SetAF(tmp1,tmp,1);                      \
+	SetSZPF_Byte(tmp1);                     \
+	Breg(Reg)=tmp1
+
 #define JMP(flag)                           \
 	int tmp;                                \
 	EMPTY_PREfetch();                       \

@@ -345,6 +345,7 @@ VIDEOS["HD61603"] = true
 VIDEOS["HD61830"] = true
 --VIDEOS["HD63484"] = true
 VIDEOS["HD66421"] = true
+VIDEOS["HLCD0488"] = true
 VIDEOS["HLCD0515"] = true
 VIDEOS["HLCD0538"] = true
 VIDEOS["HP1LL3"] = true
@@ -371,6 +372,7 @@ VIDEOS["MSM6255"] = true
 VIDEOS["MOS6566"] = true
 VIDEOS["PC_VGA"] = true
 VIDEOS["PCD8544"] = true
+VIDEOS["PCF2100"] = true
 --VIDEOS["POLY"] = true
 VIDEOS["PSX"] = true
 VIDEOS["RAMDAC"] = true
@@ -536,6 +538,7 @@ MACHINES["LH5810"] = true
 MACHINES["LINFLASH"] = true
 MACHINES["LPCI"] = true
 MACHINES["LSI53C810"] = true
+MACHINES["M3002"] = true
 MACHINES["M68307"] = true
 MACHINES["M68340"] = true
 MACHINES["M6M80011AP"] = true
@@ -669,6 +672,7 @@ MACHINES["TTL74175"] = true
 MACHINES["TTL74181"] = true
 MACHINES["TTL74259"] = true
 MACHINES["TTL74381"] = true
+MACHINES["TTL74543"] = true
 MACHINES["TTL7474"] = true
 MACHINES["TUBE"] = true
 MACHINES["UPD1990A"] = true
@@ -2433,6 +2437,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mephisto_modena.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_modular.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_modular_tm.cpp",
+	MAME_DIR .. "src/mame/drivers/mephisto_mondial.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_mondial68k.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_montec.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_polgar.cpp",
@@ -3281,6 +3286,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/roland_jv80.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_jx3p.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_jx8p.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_mc50.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_mt32.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_r8.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_ra30.cpp",

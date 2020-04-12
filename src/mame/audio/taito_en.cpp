@@ -65,10 +65,6 @@ void taito_en_device::device_reset()
 
 	uint16_t *ROM = (uint16_t *)m_osrom->base();
 	std::copy(&ROM[0x80000], &ROM[0x80004], &m_osram[0]); /* Stack and Reset vectors */
-
-	/* reset CPU to catch any banking of startup vectors */
-	m_audiocpu->reset();
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

@@ -60,7 +60,7 @@ public:
 		m_buffer_overflows(0)
 	{
 	}
-	virtual ~sound_direct_sound() = default;
+	virtual ~sound_direct_sound() { }
 
 	virtual int init(osd_options const &options) override;
 	virtual void exit() override;

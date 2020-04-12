@@ -1198,73 +1198,38 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )   /* DIP#1 & DIP#2 */
-
+	// most common dip config
+	PORT_DIPNAME( 0x01000000, 0x00000000, "Sound Output" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Stereo ))
+	PORT_DIPSETTING(          0x01000000, DEF_STR( Mono ))
+	PORT_DIPNAME( 0x02000000, 0x02000000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(          0x02000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04000000, 0x04000000, "SW1:3")
+	PORT_DIPUNUSED_DIPLOC( 0x08000000, 0x08000000, "SW1:4")
+	PORT_DIPUNUSED_DIPLOC( 0x10000000, 0x10000000, "SW1:5")
+	PORT_DIPUNUSED_DIPLOC( 0x20000000, 0x20000000, "SW1:6")
+	PORT_DIPUNUSED_DIPLOC( 0x40000000, 0x40000000, "SW1:7")
+	PORT_DIPUNUSED_DIPLOC( 0x80000000, 0x80000000, "SW1:8")
+	// these doesn't seem to be used by anything so far
+	PORT_DIPUNUSED_DIPLOC( 0x00010000, 0x00010000, "SW2:1")
+	PORT_DIPUNUSED_DIPLOC( 0x00020000, 0x00020000, "SW2:2")
+	PORT_DIPUNUSED_DIPLOC( 0x00040000, 0x00040000, "SW2:3")
+	PORT_DIPUNUSED_DIPLOC( 0x00080000, 0x00080000, "SW2:4")
+	PORT_DIPUNUSED_DIPLOC( 0x00100000, 0x00100000, "SW2:5")
+	PORT_DIPUNUSED_DIPLOC( 0x00200000, 0x00200000, "SW2:6")
+	PORT_DIPUNUSED_DIPLOC( 0x00400000, 0x00400000, "SW2:7")
+	PORT_DIPUNUSED_DIPLOC( 0x00800000, 0x00800000, "SW2:8")
+	
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
 INPUT_PORTS_END
 
-
-static INPUT_PORTS_START( konamigx )
-	PORT_INCLUDE( common )
-
-	PORT_MODIFY("SYSTEM_DSW")
-	PORT_DIPNAME( 0x00010000, 0x00010000, "Foo")
-	PORT_DIPSETTING(          0x00000000, "Foo")
-	PORT_DIPSETTING(          0x00010000, "Bar")
-	PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(          0x00020000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00040000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00080000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00200000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00400000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x00800000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01000000, 0x00000000, DEF_STR( Stereo ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( Stereo ))
-	PORT_DIPSETTING(          0x01000000, DEF_STR( Mono ))
-	PORT_DIPNAME( 0x02000000, 0x02000000, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(          0x02000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04000000, 0x04000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x04000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08000000, 0x08000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x08000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10000000, 0x10000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x10000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40000000, 0x40000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x40000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80000000, 0x80000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-INPUT_PORTS_END
-
-
 static INPUT_PORTS_START( racinfrc )
 	/* racin force needs Player 2 Button 1 ("IN3" & 0x10) set to get past the calibration screen */
-	PORT_INCLUDE( konamigx )
+	PORT_INCLUDE( common )
 
 	PORT_START("ADC-WRPORT")
 	PORT_BIT( 0x1000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0834", adc083x_device, clk_write)
@@ -1279,6 +1244,108 @@ static INPUT_PORTS_START( racinfrc )
 
 	PORT_START("AN1")
 	PORT_BIT( 0xff, 0xf0, IPT_PEDAL ) PORT_MINMAX(0x90,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_CODE_INC(KEYCODE_LCONTROL) PORT_REVERSE
+	
+	PORT_MODIFY("SYSTEM_DSW")
+	PORT_DIPUNUSED_DIPLOC( 0x01000000, 0x01000000, "SW1:1")
+	PORT_DIPUNUSED_DIPLOC( 0x02000000, 0x02000000, "SW1:2")
+	PORT_DIPNAME( 0x04000000, 0x04000000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    	  0x04000000, DEF_STR( No ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x18000000, 0x00000000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPSETTING(    	  0x18000000, "2in1" )
+	PORT_DIPSETTING(    	  0x10000000, "Upright (Mono)" )
+	PORT_DIPSETTING(          0x08000000, DEF_STR( Unused ) ) // ???
+	PORT_DIPSETTING(    	  0x00000000, "Upright (Stereo)" )
+	PORT_DIPNAME( 0xe0000000, 0xe0000000, "Car Number & Color" ) PORT_DIPLOCATION("SW1:6,7,8")
+	PORT_DIPSETTING(          0xe0000000, "No. 1 (Red)" )
+	PORT_DIPSETTING(          0xc0000000, "No. 2 (Blue)" )
+	PORT_DIPSETTING(          0xa0000000, "No. 3 (Yellow)" )
+	PORT_DIPSETTING(          0x80000000, "No. 4 (Green)" )
+	PORT_DIPSETTING(          0x60000000, "No. 5 (Red)" )
+	PORT_DIPSETTING(          0x40000000, "No. 6 (Blue)" )
+	PORT_DIPSETTING(          0x20000000, "No. 7 (Yellow)" )
+	PORT_DIPSETTING(          0x00000000, "No. 8 (Green)" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( opengolf )
+	PORT_INCLUDE( racinfrc )
+	
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 Shoot")
+	PORT_BIT( 0x00000060, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Shoot")
+	PORT_BIT( 0x00006000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Shoot")
+	PORT_BIT( 0x00600000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shoot")
+	PORT_BIT( 0x60000000, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	PORT_MODIFY("AN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )	
+	
+	PORT_MODIFY("SYSTEM_DSW")
+	// TODO: these coin mechs are available only when coin slots is in independent mode
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SERVICE4 )
+	PORT_DIPNAME( 0x01000000, 0x00000000, "Sound Output" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Stereo ))
+	PORT_DIPSETTING(          0x01000000, DEF_STR( Mono ))
+	PORT_DIPNAME( 0x02000000, 0x02000000, "Coin Slots" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(          0x02000000, "Common" )
+	PORT_DIPSETTING(          0x00000000, "Independent" )
+	PORT_DIPNAME( 0x04000000, 0x00000000, "Number of Players" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(          0x04000000, "2P" )
+	PORT_DIPSETTING(          0x00000000, "4P" )
+	PORT_DIPUNUSED_DIPLOC( 0x08000000, 0x08000000, "SW1:4")
+	PORT_DIPUNUSED_DIPLOC( 0x10000000, 0x10000000, "SW1:5")
+	PORT_DIPUNUSED_DIPLOC( 0x20000000, 0x20000000, "SW1:6")
+	PORT_DIPUNUSED_DIPLOC( 0x40000000, 0x40000000, "SW1:7")
+	PORT_DIPUNUSED_DIPLOC( 0x80000000, 0x80000000, "SW1:8")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ggreats2 )
+	PORT_INCLUDE( opengolf )
+	
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED ) // P3/P4 connector
+	// Advice is on top of the ball device
+	// According to the attract mode all buttons are actually two "half" buttons for each couple
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Direction/Left")
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Direction/Right")
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Club/Left")
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Club/Right")
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Stance/Left")
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("P2 Stance/Right")
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Advice")
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Direction/Left")
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Direction/Right")
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Club/Left")
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Club/Right")
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Stance/Left")
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Stance/Right")
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Advice")
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_START1 )
+	
+	PORT_MODIFY("SYSTEM_DSW")
+	PORT_BIT( 0x00000c00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0000c000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPUNUSED_DIPLOC( 0x04000000, 0x04000000, "SW1:3")
+	// TODO: if on 3P/4P mode inputs are re-routed (ignore it for now)
+	PORT_DIPNAME( 0x08000000, 0x00000000, "Select Connector" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(          0x08000000, "3P 4P" )
+	PORT_DIPSETTING(          0x00000000, "1P 2P" )
+
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_MODIFY("AN1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_REVERSE PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( le2 )
@@ -1289,7 +1356,6 @@ static INPUT_PORTS_START( le2 )
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )          /* Unmapped P1 B1 for gun games */
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)   /* for gun games */
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)   /* for gun games */
@@ -1298,34 +1364,28 @@ static INPUT_PORTS_START( le2 )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)   /* for gun games */
 
 	PORT_MODIFY("SYSTEM_DSW")
 	PORT_BIT( 0x00ff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Stereo ))
+	PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Stereo )) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(          0x01000000, DEF_STR( Stereo ))
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Mono ))
-	PORT_DIPNAME( 0x02000000, 0x02000000, "Coin Mechanism")
-	PORT_DIPSETTING(          0x02000000, "Common")
-	PORT_DIPSETTING(          0x00000000, "Independent")
-	//  TODO: inverted for le2j
-	PORT_DIPNAME( 0x04000000, 0x04000000, "Stage Select" )
-	PORT_DIPSETTING(          0x04000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08000000, 0x00000000, "Mirror" )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x08000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10000000, 0x10000000, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x02000000, 0x02000000, "Coin Mechanism" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(          0x02000000, "Common" )
+	PORT_DIPSETTING(          0x00000000, "Independent" )
+	PORT_DIPNAME( 0x04000000, 0x04000000, "Stage Select" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(          0x04000000, DEF_STR( No ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08000000, 0x00000000, "Mirror" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(          0x00000000, DEF_STR( No ) )
+	PORT_DIPSETTING(          0x08000000, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10000000, 0x10000000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(          0x10000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40000000, 0x40000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x40000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80000000, 0x80000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x20000000, 0x20000000, "SW1:6")
+	PORT_DIPUNUSED_DIPLOC( 0x40000000, 0x40000000, "SW1:7")
+	PORT_DIPUNUSED_DIPLOC( 0x80000000, 0x80000000, "SW1:8")
 
 	PORT_START("LIGHT0_X")  /* mask default type                     sens delta min max */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(1)
@@ -1351,35 +1411,36 @@ static INPUT_PORTS_START( le2_flip )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_REVERSE
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( le2u )
+	PORT_INCLUDE( le2_flip )
+
+	PORT_MODIFY("SYSTEM_DSW")
+	// cannot set mirror and flip on US rev
+	PORT_DIPUNUSED_DIPLOC( 0x08000000, 0x08000000, "SW1:4")
+	PORT_DIPUNUSED_DIPLOC( 0x10000000, 0x10000000, "SW1:5")
+	PORT_DIPUNUSED_DIPLOC( 0x20000000, 0x20000000, "SW1:6")
+	PORT_DIPUNUSED_DIPLOC( 0x40000000, 0x40000000, "SW1:7")
+	PORT_DIPUNUSED_DIPLOC( 0x80000000, 0x80000000, "SW1:8")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( le2j )
+	PORT_INCLUDE( le2_flip )
+
+	PORT_MODIFY("SYSTEM_DSW")
+	// inverted defaults
+	PORT_DIPNAME( 0x04000000, 0x04000000, "Stage Select" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(          0x04000000, DEF_STR( Yes ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( No ) )
+	PORT_DIPNAME( 0x08000000, 0x00000000, "Mirror" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(          0x08000000, DEF_STR( No ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( gokuparo )
 	PORT_INCLUDE( common )
 
 	PORT_MODIFY("SYSTEM_DSW")
 	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x01000000, 0x00000000, DEF_STR( Stereo ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( Stereo ))
-	PORT_DIPSETTING(          0x01000000, DEF_STR( Mono ))
-	PORT_DIPNAME( 0x02000000, 0x02000000, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(          0x02000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04000000, 0x04000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x04000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08000000, 0x08000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x08000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10000000, 0x10000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x10000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40000000, 0x40000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x40000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80000000, 0x80000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( puzldama )
@@ -1387,31 +1448,20 @@ static INPUT_PORTS_START( puzldama )
 
 	PORT_MODIFY("SYSTEM_DSW")
 	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x01000000, 0x00000000, DEF_STR( Stereo ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( Stereo ))
-	PORT_DIPSETTING(          0x01000000, DEF_STR( Mono ))
-	PORT_DIPNAME( 0x02000000, 0x02000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x02000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04000000, 0x04000000, DEF_STR( Flip_Screen ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02000000, 0x02000000, "SW1:2")
+	PORT_DIPNAME( 0x04000000, 0x04000000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(          0x04000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08000000, 0x08000000, DEF_STR( Cabinet ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tokkae )
+	PORT_INCLUDE( puzldama )
+
+	PORT_MODIFY("SYSTEM_DSW")
+	PORT_DIPNAME( 0x08000000, 0x08000000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(          0x08000000, DEF_STR( Upright ) )
-	PORT_DIPSETTING(          0x00000000, "Vs. cabinet" )
-	PORT_DIPNAME( 0x10000000, 0x10000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x10000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40000000, 0x40000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x40000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80000000, 0x80000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPSETTING(          0x02000000, DEF_STR( High ) )
+	// unemulated, supposedly same as Type 3/4 games?
+	PORT_DIPSETTING(          0x00000000, "Vs. Cabinet" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dragoonj )
@@ -1437,31 +1487,6 @@ static INPUT_PORTS_START( dragoonj )
 
 	PORT_MODIFY("SYSTEM_DSW")
 	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x01000000, 0x00000000, DEF_STR( Stereo ))
-	PORT_DIPSETTING(          0x00000000, DEF_STR( Stereo ))
-	PORT_DIPSETTING(          0x01000000, DEF_STR( Mono ))
-	PORT_DIPNAME( 0x02000000, 0x02000000, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(          0x02000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04000000, 0x04000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x04000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08000000, 0x08000000, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(          0x08000000, DEF_STR( Upright ) )
-	PORT_DIPSETTING(          0x00000000, "Vs. cabinet" )
-	PORT_DIPNAME( 0x10000000, 0x10000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x10000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40000000, 0x40000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x40000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80000000, 0x80000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPSETTING(          0x02000000, DEF_STR( High ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( type3 )
@@ -1472,31 +1497,19 @@ static INPUT_PORTS_START( type3 )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_SERVICE3 )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SERVICE4 )
-	PORT_DIPNAME( 0x01000000, 0x00000000, DEF_STR( Stereo ))
+	// TODO: this fallbacks to mono if number of screens is 2
+	PORT_DIPNAME( 0x01000000, 0x00000000, "Sound output" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Stereo ))
 	PORT_DIPSETTING(          0x01000000, DEF_STR( Mono ))
-	PORT_DIPNAME( 0x02000000, 0x02000000, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x02000000, 0x02000000, "Left Monitor Flip Screen" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(          0x02000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04000000, 0x04000000, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x04000000, 0x04000000, "Right Monitor Flip Screen" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(          0x04000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08000000, 0x08000000, "Screens" )
+	PORT_DIPNAME( 0x08000000, 0x08000000, "Number of Screens" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(          0x08000000, "1" )
 	PORT_DIPSETTING(          0x00000000, "2" )
-	PORT_DIPNAME( 0x10000000, 0x10000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x10000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40000000, 0x40000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x40000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80000000, 0x80000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPSETTING(          0x02000000, DEF_STR( High ) )
 INPUT_PORTS_END
 
 
@@ -3924,7 +3937,7 @@ void konamigx_state::init_posthack()
 /*     year  ROM       parent    machine   inp       init */
 
 /* dummy parent for the BIOS */
-GAME( 1994, konamigx,  0,        konamigx_bios, konamigx, konamigx_state, init_konamigx, ROT0, "Konami", "System GX", MACHINE_IS_BIOS_ROOT )
+GAME( 1994, konamigx,  0,        konamigx_bios, common, konamigx_state, init_konamigx, ROT0, "Konami", "System GX", MACHINE_IS_BIOS_ROOT )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 1: standard with an add-on 53936 on the ROM board, analog inputs, */
@@ -3935,29 +3948,29 @@ GAME( 1994, konamigx,  0,        konamigx_bios, konamigx, konamigx_state, init_k
 GAME( 1994, racinfrc,  konamigx, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 GAME( 1994, racinfrcu, racinfrc, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 
-GAME( 1994, opengolf,  konamigx, opengolf,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAE)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
-GAME( 1994, opengolf2, opengolf, opengolf,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
-GAME( 1994, ggreats2,  opengolf, opengolf,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Golfing Greats 2 (ver JAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1994, opengolf,  konamigx, opengolf,      opengolf, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAE)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
+GAME( 1994, opengolf2, opengolf, opengolf,      opengolf, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
+GAME( 1994, ggreats2,  opengolf, opengolf,      ggreats2, konamigx_state, init_posthack, ROT0, "Konami", "Golfing Greats 2 (ver JAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 2: totally stock, sometimes with funny protection chips on the ROM board */
 /* these games work and are playable with minor graphics glitches */
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1994, le2,       konamigx, le2,           le2,      konamigx_state, init_konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, le2u,      le2,      le2,           le2_flip, konamigx_state, init_konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: Gun Fighters (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, le2j,      le2,      le2,           le2_flip, konamigx_state, init_konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: The Western (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, le2,       konamigx, le2,          le2,  konamigx_state, init_konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, le2u,      le2,      le2,          le2u, konamigx_state, init_konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: Gun Fighters (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, le2j,      le2,      le2,          le2j, konamigx_state, init_konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: The Western (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, fantjour,  konamigx, gokuparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Fantastic Journey (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, fantjoura, fantjour, gokuparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Fantastic Journey (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, gokuparo,  fantjour, gokuparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Gokujyou Parodius (ver JAD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, fantjour,  konamigx, gokuparo,     gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Fantastic Journey (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, fantjoura, fantjour, gokuparo,     gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Fantastic Journey (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, gokuparo,  fantjour, gokuparo,     gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Gokujyou Parodius (ver JAD)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, crzcross,  konamigx, gokuparo,      puzldama, konamigx_state, init_posthack, ROT0, "Konami", "Crazy Cross (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, puzldama,  crzcross, gokuparo,      puzldama, konamigx_state, init_posthack, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, crzcross,  konamigx, gokuparo,     puzldama, konamigx_state, init_posthack, ROT0, "Konami", "Crazy Cross (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, puzldama,  crzcross, gokuparo,     puzldama, konamigx_state, init_posthack, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1995, tbyahhoo,  konamigx, tbyahhoo,      gokuparo, konamigx_state, init_posthack, ROT0, "Konami", "Twin Bee Yahhoo! (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, tbyahhoo,  konamigx, tbyahhoo,     gokuparo, konamigx_state, init_posthack, ROT0, "Konami", "Twin Bee Yahhoo! (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1995, tkmmpzdm,  konamigx, konamigx_6bpp, puzldama, konamigx_state, init_konamigx, ROT0, "Konami", "Tokimeki Memorial Taisen Puzzle-dama (ver JAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, tkmmpzdm,  konamigx, konamigx_6bpp, tokkae,   konamigx_state, init_konamigx, ROT0, "Konami", "Tokimeki Memorial Taisen Puzzle-dama (ver JAB)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1995, dragoona,  konamigx, dragoonj,      dragoonj, konamigx_state, init_posthack, ROT0, "Konami", "Dragoon Might (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, dragoonj,  dragoona, dragoonj,      dragoonj, konamigx_state, init_posthack, ROT0, "Konami", "Dragoon Might (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
@@ -3967,15 +3980,15 @@ GAME( 1996, sexyparoa, sexyparo, sexyparo,      gokuparo, konamigx_state, init_k
 
 GAME( 1996, daiskiss,  konamigx, konamigx,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Daisu-Kiss (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1996, tokkae,    konamigx, konamigx_6bpp, puzldama, konamigx_state, init_konamigx, ROT0, "Konami", "Taisen Tokkae-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, tokkae,    konamigx, konamigx_6bpp, tokkae,   konamigx_state, init_konamigx, ROT0, "Konami", "Taisen Tokkae-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* protection controls player ship direction in attract mode - doesn't impact playability */
 GAME( 1996, salmndr2,  konamigx, salmndr2,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Salamander 2 (ver JAA)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1996, salmndr2a, salmndr2, salmndr2,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Salamander 2 (ver AAB)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
 
 /* bad sprite colours, part of tilemap gets blanked out when a game starts (might be more protection) */
-GAME( 1997, winspike,  konamigx, winspike,      konamigx, konamigx_state, init_konamigx, ROT0, "Konami", "Winning Spike (ver EAA)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, winspikej, winspike, winspike,      konamigx, konamigx_state, init_konamigx, ROT0, "Konami", "Winning Spike (ver JAA)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, winspike,  konamigx, winspike,      common, konamigx_state, init_konamigx, ROT0, "Konami", "Winning Spike (ver EAA)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, winspikej, winspike, winspike,      common, konamigx_state, init_konamigx, ROT0, "Konami", "Winning Spike (ver JAA)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 3: dual monitor output and 53936 on the ROM board, external palette RAM */

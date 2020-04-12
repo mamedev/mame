@@ -30,16 +30,20 @@ By default, the "visitor" side is at the bottom. This is how most of the games
 are played, Space Invader 2 is an exception.
 
 TODO:
-- add softwarelist? impractical with different MCUs, and no CPU inside console
 - add the rest of the games
 
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/tms1000/tms1400.h"
 #include "video/pwm.h"
 #include "sound/spkrdev.h"
+
+#include "softlist.h"
 #include "speaker.h"
 
 #include "sag.lh"
@@ -47,75 +51,122 @@ TODO:
 
 namespace {
 
-class base_state : public driver_device
+class sag_state : public driver_device
 {
 public:
-	base_state(const machine_config &mconfig, device_type type, const char *tag) :
+	sag_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_hmcs40_cpu(*this, "hmcs40_cpu"),
+		m_tms1k_cpu(*this, "tms1k_cpu"),
 		m_display(*this, "display"),
 		m_speaker(*this, "speaker"),
+		m_cart(*this, "cartslot"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	void shared(machine_config &config);
+	void sag(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 
+private:
+	optional_device<hmcs40_cpu_device> m_hmcs40_cpu;
+	optional_device<tms1k_base_device> m_tms1k_cpu;
+	required_device<pwm_display_device> m_display;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<generic_slot_device> m_cart;
+	required_ioport_array<6> m_inputs;
+
 	void update_display();
 	u8 input_r();
 	void speaker_w(int state);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	u16 m_grid = 0;
 	u16 m_plate = 0;
 
-private:
-	required_device<pwm_display_device> m_display;
-	required_device<speaker_sound_device> m_speaker;
-	required_ioport_array<6> m_inputs;
+	DECLARE_WRITE8_MEMBER(hmcs40_write_r);
+	DECLARE_WRITE16_MEMBER(hmcs40_write_d);
+	DECLARE_READ16_MEMBER(hmcs40_read_d);
+
+	DECLARE_WRITE16_MEMBER(tms1k_write_r);
+	DECLARE_WRITE16_MEMBER(tms1k_write_o);
+	DECLARE_READ8_MEMBER(tms1k_read_k);
 };
 
-void base_state::machine_start()
+void sag_state::machine_start()
 {
 	save_item(NAME(m_grid));
 	save_item(NAME(m_plate));
 }
 
-class hmcs40_state : public base_state
+
+
+/******************************************************************************
+    Cartridge Init
+******************************************************************************/
+
+DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 {
-public:
-	hmcs40_state(const machine_config &mconfig, device_type type, const char *tag) :
-		base_state(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
-	{ }
+	u32 size = m_cart->common_get_size("rom");
 
-	void sag(machine_config &config);
+	if (size != 0x1000 && size != 0x1100 && size != 0x2000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM file size");
+		return image_init_result::FAIL;
+	}
 
-private:
-	required_device<hmcs40_cpu_device> m_maincpu;
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	DECLARE_WRITE8_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_d);
-	DECLARE_READ16_MEMBER(read_d);
-};
+	// detect MCU on file size
+	if (size == 0x1000)
+	{
+		// TMS1670 MCU
+		if (!image.loaded_through_softlist())
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Can only load TMS1670 type through softwarelist");
+			return image_init_result::FAIL;
+		}
 
-class tms1k_state : public base_state
-{
-public:
-	tms1k_state(const machine_config &mconfig, device_type type, const char *tag) :
-		base_state(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
-	{ }
+		memcpy(memregion("tms1k_cpu")->base(), m_cart->get_rom_base(), size);
+		m_tms1k_cpu->set_clock(375000); // approximation - RC osc. R=47K, C=47pF
 
-	void sag(machine_config &config);
+		// init PLAs
+		size = image.get_software_region_length("rom:mpla");
+		if (size != 867)
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid MPLA file size");
+			return image_init_result::FAIL;
+		}
+		memcpy(memregion("tms1k_cpu:mpla")->base(), image.get_software_region("rom:mpla"), size);
 
-private:
-	required_device<tms1k_base_device> m_maincpu;
+		size = image.get_software_region_length("rom:opla");
+		if (size != 557)
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid OPLA file size");
+			return image_init_result::FAIL;
+		}
+		memcpy(memregion("tms1k_cpu:opla")->base(), image.get_software_region("rom:opla"), size);
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
-};
+		subdevice<pla_device>("tms1k_cpu:mpla")->reinit();
+		subdevice<pla_device>("tms1k_cpu:opla")->reinit();
+	}
+	else
+	{
+		// HD38800 MCU
+		u8 *dest = memregion("hmcs40_cpu")->base();
+		memcpy(dest, m_cart->get_rom_base(), size);
+
+		// copy patterns
+		if (size == 0x1100)
+			memmove(dest + 0x1e80, dest + 0x1000, 0x100);
+
+		m_hmcs40_cpu->set_clock(450000); // from main PCB
+	}
+
+	return image_init_result::PASS;
+}
 
 
 
@@ -125,7 +176,7 @@ private:
 
 // main unit
 
-void base_state::update_display()
+void sag_state::update_display()
 {
 	// grid 0-7 are the 'pixels'
 	m_display->matrix_partial(0, 8, m_grid, m_plate, false);
@@ -135,7 +186,7 @@ void base_state::update_display()
 	m_display->matrix_partial(8, 6, m_grid >> 8, seg);
 }
 
-u8 base_state::input_r()
+u8 sag_state::input_r()
 {
 	u8 data = 0;
 
@@ -147,7 +198,7 @@ u8 base_state::input_r()
 	return data;
 }
 
-void base_state::speaker_w(int state)
+void sag_state::speaker_w(int state)
 {
 	m_speaker->level_w(state);
 }
@@ -155,7 +206,7 @@ void base_state::speaker_w(int state)
 
 // cartridge type 1: HD38800
 
-WRITE8_MEMBER(hmcs40_state::write_r)
+WRITE8_MEMBER(sag_state::hmcs40_write_r)
 {
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
@@ -163,7 +214,7 @@ WRITE8_MEMBER(hmcs40_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(hmcs40_state::write_d)
+WRITE16_MEMBER(sag_state::hmcs40_write_d)
 {
 	// D0: speaker out
 	speaker_w(data & 1);
@@ -173,7 +224,7 @@ WRITE16_MEMBER(hmcs40_state::write_d)
 	update_display();
 }
 
-READ16_MEMBER(hmcs40_state::read_d)
+READ16_MEMBER(sag_state::hmcs40_read_d)
 {
 	// D13-D15: multiplexed inputs
 	return input_r() << 13;
@@ -182,7 +233,7 @@ READ16_MEMBER(hmcs40_state::read_d)
 
 // cartridge type 2: TMS1670
 
-WRITE16_MEMBER(tms1k_state::write_r)
+WRITE16_MEMBER(sag_state::tms1k_write_r)
 {
 	// R0: speaker out
 	speaker_w(data & 1);
@@ -194,14 +245,14 @@ WRITE16_MEMBER(tms1k_state::write_r)
 	update_display();
 }
 
-WRITE16_MEMBER(tms1k_state::write_o)
+WRITE16_MEMBER(sag_state::tms1k_write_o)
 {
 	// O0-O7: vfd plate 4-11
 	m_plate = (m_plate & 0xf) | data << 4;
 	update_display();
 }
 
-READ8_MEMBER(tms1k_state::read_k)
+READ8_MEMBER(sag_state::tms1k_read_k)
 {
 	// K1-K4: multiplexed inputs
 	return input_r();
@@ -261,8 +312,22 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void base_state::shared(machine_config &config)
+void sag_state::sag(machine_config &config)
 {
+	/* basic machine hardware */
+	HD38800(config, m_hmcs40_cpu, 0);
+	m_hmcs40_cpu->write_r<0>().set(FUNC(sag_state::hmcs40_write_r));
+	m_hmcs40_cpu->write_r<1>().set(FUNC(sag_state::hmcs40_write_r));
+	m_hmcs40_cpu->write_r<2>().set(FUNC(sag_state::hmcs40_write_r));
+	m_hmcs40_cpu->write_r<3>().set(FUNC(sag_state::hmcs40_write_r));
+	m_hmcs40_cpu->write_d().set(FUNC(sag_state::hmcs40_write_d));
+	m_hmcs40_cpu->read_d().set(FUNC(sag_state::hmcs40_read_d));
+
+	TMS1670(config, m_tms1k_cpu, 0);
+	m_tms1k_cpu->k().set(FUNC(sag_state::tms1k_read_k));
+	m_tms1k_cpu->r().set(FUNC(sag_state::tms1k_write_r));
+	m_tms1k_cpu->o().set(FUNC(sag_state::tms1k_write_o));
+
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8+6, 14);
 	m_display->set_segmask(0x3f00, 0x7f);
@@ -271,31 +336,13 @@ void base_state::shared(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
 
-void hmcs40_state::sag(machine_config &config)
-{
-	/* basic machine hardware */
-	HD38800(config, m_maincpu, 450000); // approximation
-	m_maincpu->write_r<0>().set(FUNC(hmcs40_state::write_r));
-	m_maincpu->write_r<1>().set(FUNC(hmcs40_state::write_r));
-	m_maincpu->write_r<2>().set(FUNC(hmcs40_state::write_r));
-	m_maincpu->write_r<3>().set(FUNC(hmcs40_state::write_r));
-	m_maincpu->write_d().set(FUNC(hmcs40_state::write_d));
-	m_maincpu->read_d().set(FUNC(hmcs40_state::read_d));
+	/* cartridge */
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "sag_cart");
+	m_cart->set_must_be_loaded(true);
+	m_cart->set_device_load(FUNC(sag_state::cart_load));
 
-	shared(config);
-}
-
-void tms1k_state::sag(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1670(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(tms1k_state::read_k));
-	m_maincpu->r().set(FUNC(tms1k_state::write_r));
-	m_maincpu->o().set(FUNC(tms1k_state::write_o));
-
-	shared(config);
+	SOFTWARE_LIST(config, "cart_list").set_original("entex_sag");
 }
 
 
@@ -304,32 +351,12 @@ void tms1k_state::sag(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( sag_sinv2 )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "inv2_hd38800a31", 0x0000, 0x1000, BAD_DUMP CRC(29c8c100) SHA1(41cd413065659c6d7d5b2408de2ca6d51c49629a) )
-	ROM_CONTINUE( 0x1e80, 0x0100 )
-ROM_END
-
-ROM_START( sag_baseb4 )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "b-b5_hd38800a37", 0x0000, 0x1000, CRC(64852bd5) SHA1(fb1c24ca43934ceb6fc35ac7c35b71e6e843dbc5) )
-	ROM_CONTINUE( 0x1e80, 0x0100 )
-ROM_END
-
-ROM_START( sag_pinb )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "pinb_hd38800a38", 0x0000, 0x1000, CRC(6e53a56b) SHA1(13f057eab2e4cfbb3ef1247a041abff15ae727c9) )
-	ROM_CONTINUE( 0x1e80, 0x0100 )
-ROM_END
-
-ROM_START( sag_footb4 )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "ftba_mp7573", 0x0000, 0x1000, CRC(b17dd9e3) SHA1(9c9e7a56643233ef2adff7b68a6df19e6ca176c2) ) // die label TMS1400, MP7573
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
-	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_sag_fb4_output.pla", 0, 557, CRC(f15dc6a1) SHA1(ee11a64037895ac566e902b6b590ff62a7f703b0) )
+ROM_START( sag )
+	// nothing here yet, ROM is on the cartridge
+	ROM_REGION( 0x2000, "hmcs40_cpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x1000, "tms1k_cpu", ROMREGION_ERASE00 )
+	ROM_REGION( 867, "tms1k_cpu:mpla", ROMREGION_ERASE00 )
+	ROM_REGION( 557, "tms1k_cpu:opla", ROMREGION_ERASE00 )
 ROM_END
 
 } // anonymous namespace
@@ -340,9 +367,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME        PARENT CMP MACHINE INPUT  CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, sag_sinv2,  0,      0, sag,    sag,   hmcs40_state, empty_init, "Entex", "Select-A-Game Machine: Space Invader 2", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING ) // suspect bad dump
-CONS( 1981, sag_baseb4, 0,      0, sag,    sag,   hmcs40_state, empty_init, "Entex", "Select-A-Game Machine: Baseball 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, sag_pinb,   0,      0, sag,    sag,   hmcs40_state, empty_init, "Entex", "Select-A-Game Machine: Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-
-CONS( 1981, sag_footb4, 0,      0, sag,    sag,   tms1k_state,  empty_init, "Entex", "Select-A-Game Machine: Football 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+//    YEAR  NAME  PARENT CMP MACHINE INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1981, sag,  0,      0, sag,    sag,   sag_state, empty_init, "Entex", "Select-A-Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
