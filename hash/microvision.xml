@@ -252,6 +252,23 @@ The "overlay" feature indicates screen/keypad overlay
 	</software>
 
 
+<!-- Homebrew (real hardware) -->
+
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>2019</year>
+		<publisher>Ayza</publisher>
+		<part name="cart" interface="microvision_cart">
+			<feature name="clock" value="500000" />
+			<feature name="pla" value="1" />
+			<feature name="paddle" value="0" />
+			<dataarea name="rom" size="0x800"> <!-- TMS1098 MCU + MBM2716 EPROM -->
+				<rom name="tetris.bin" size="0x800" crc="f08ebfe3" sha1="a1318228235189c9dcdc567a4b71bc82301ee5b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- Homebrew (emulator or Arduino version, untested on real console) -->
 
 	<software name="bomber">
