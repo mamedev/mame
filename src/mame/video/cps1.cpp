@@ -707,6 +707,9 @@ static const struct gfx_range mapper_TK24B1_table[] =
 };
 
 
+// WL22B and WL24B are equivalent, but since we have dumps of both PALs we will
+// document both.
+
 #define mapper_WL24B    { 0x8000, 0x8000, 0, 0 }, mapper_WL24B_table
 static const struct gfx_range mapper_WL24B_table[] =
 {
@@ -721,6 +724,26 @@ static const struct gfx_range mapper_WL24B_table[] =
 	{ GFXTYPE_SCROLL1, 0x7000, 0x7fff, 0 },
 
 	{ GFXTYPE_SCROLL2, 0x0000, 0x3fff, 1 },
+	{ 0 }
+};
+
+#define mapper_WL22B    { 0x4000, 0x4000, 0x4000, 0 }, mapper_WL22B_table
+static const struct gfx_range mapper_WL22B_table[] =
+{
+	// verified from PAL dump
+	// bank 0 = pin 19 (ROMs 1,5, 9,13,17,24,32,38)
+	// bank 1 = pin 16 (ROMs 2,6,10,14,18,25,33,39)
+	// bank 2 = pin 14 (ROMs 3,7,11,15,19,21,26,28)
+	// pin 12 is never enabled
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x3fff, 0 },
+
+	{ GFXTYPE_SPRITES, 0x4000, 0x4fff, 1 },
+	{ GFXTYPE_SCROLL3, 0x5000, 0x6fff, 1 },
+	{ GFXTYPE_SCROLL1, 0x7000, 0x7fff, 1 },
+
+	{ GFXTYPE_SCROLL2, 0x0000, 0x3fff, 2 },
 	{ 0 }
 };
 
@@ -1702,7 +1725,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"willow",      CPS_B_03,     mapper_WL24B },
 	{"willowu",     CPS_B_03,     mapper_WL24B },
 	{"willowuo",    CPS_B_03,     mapper_WL24B },
-	{"willowj",     CPS_B_03,     mapper_WL24B },   // wrong, this set uses WL22B, still not dumped
+	{"willowj",     CPS_B_03,     mapper_WL22B },
 	{"ffight",      CPS_B_04,     mapper_S224B },
 	{"ffighta",     CPS_B_04,     mapper_S224B },
 	{"ffightu",     CPS_B_04,     mapper_S224B },
