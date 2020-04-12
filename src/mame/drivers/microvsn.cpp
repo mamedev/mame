@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, hap
-// thanks-to:Kevin Horton, Sean Riddle
+// thanks-to:Dan Boris, Kevin Horton, Sean Riddle
 /***************************************************************************
 
 Milton Bradley MicroVision, handheld game console
@@ -19,7 +19,8 @@ The Connect Four I8021 game is clocked at around 2MHz. The TMS1100 versions
 of the games were clocked at around 500KHz, 550KHz, or 350KHz.
 
 Each game had a screen- and keypad overlay attached to it, MAME external
-artwork is recommended.
+artwork is recommended. It's also advised to disable screen filtering,
+eg. with -prescale, or on Windows simply -video gdi.
 
 TODO:
 - Finish support for i8021 based cartridges
@@ -34,6 +35,7 @@ TODO:
 #include "cpu/tms1000/tms1100.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/hlcd0488.h"
 
 #include "emupal.h"
 #include "softlist.h"
@@ -54,6 +56,7 @@ public:
 		m_dac( *this, "dac" ),
 		m_i8021( *this, "i8021_cpu" ),
 		m_tms1100( *this, "tms1100_cpu" ),
+		m_lcd(*this, "lcd"),
 		m_cart(*this, "cartslot"),
 		m_inputs(*this, "COL%u", 0),
 		m_paddle(*this, "PADDLE"),
@@ -96,6 +99,7 @@ private:
 	required_device<dac_byte_interface> m_dac;
 	optional_device<i8021_device> m_i8021;
 	optional_device<tms1100_cpu_device> m_tms1100;
+	required_device<hlcd0488_device> m_lcd;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<3> m_inputs;
 	required_ioport m_paddle;
@@ -116,7 +120,7 @@ private:
 
 	// generic variables
 	void    update_lcd();
-	void    lcd_write(uint8_t control, uint8_t data);
+	DECLARE_WRITE16_MEMBER(lcd_output_w);
 
 	void apply_settings(void);
 
@@ -126,11 +130,9 @@ private:
 	bool m_paddle_auto;
 	bool m_paddle_on;
 
-	uint8_t   m_lcd_latch[8];
-	uint8_t   m_lcd_holding_latch[8];
-	uint8_t   m_lcd_latch_index;
-	uint8_t   m_lcd[16][16];
-	uint8_t   m_lcd_control_old;
+	uint8_t   m_lcd_data[16][16];
+	u16 m_lcd_row;
+	u16 m_lcd_col;
 };
 
 
@@ -165,20 +167,14 @@ void microvision_state::machine_start()
 	save_item(NAME(m_t1));
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
-	save_item(NAME(m_lcd_latch));
-	save_item(NAME(m_lcd_latch_index));
-	save_item(NAME(m_lcd));
-	save_item(NAME(m_lcd_control_old));
-	save_item(NAME(m_lcd_holding_latch));
 }
 
 
 void microvision_state::machine_reset()
 {
 	apply_settings();
-	std::fill(std::begin(m_lcd_latch), std::end(m_lcd_latch), 0);
 
-	for (auto &elem : m_lcd)
+	for (auto &elem : m_lcd_data)
 		std::fill(std::begin(elem), std::end(elem), 0);
 
 	m_o = 0;
@@ -193,15 +189,15 @@ void microvision_state::machine_reset()
 
 void microvision_state::update_lcd()
 {
-	uint16_t row = ( m_lcd_holding_latch[0] << 12 ) | ( m_lcd_holding_latch[1] << 8 ) | ( m_lcd_holding_latch[2] << 4 ) | m_lcd_holding_latch[3];
-	uint16_t col = ( m_lcd_holding_latch[4] << 12 ) | ( m_lcd_holding_latch[5] << 8 ) | ( m_lcd_holding_latch[6] << 4 ) | m_lcd_holding_latch[7];
+	uint16_t row = m_lcd_row;
+	uint16_t col = m_lcd_col;
 
 	LOG( "row = %04x, col = %04x\n", row, col );
 	for ( int i = 0; i < 16; i++ )
 	{
 		uint16_t temp = row;
 
-		for (auto & elem : m_lcd)
+		for (auto & elem : m_lcd_data)
 		{
 			if ( ( temp & col ) & 0x8000 )
 			{
@@ -220,7 +216,7 @@ uint32_t microvision_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	{
 		for ( uint8_t j = 0; j < 16; j++ )
 		{
-			bitmap.pix16(i,j) = m_lcd [i] [j];
+			bitmap.pix16(i,j) = m_lcd_data [i] [j];
 		}
 	}
 
@@ -232,7 +228,7 @@ WRITE_LINE_MEMBER(microvision_state::screen_vblank)
 {
 	if ( state )
 	{
-		for (auto & elem : m_lcd)
+		for (auto & elem : m_lcd_data)
 		{
 			for ( int j= 0; j < 16; j++ )
 			{
@@ -246,47 +242,11 @@ WRITE_LINE_MEMBER(microvision_state::screen_vblank)
 	}
 }
 
-
-/*
-control is signals LCD5 LCD4
-  LCD5 = -Data Clk on 0488
-  LCD4 = Latch pulse on 0488
-  LCD3 = Data 0
-  LCD2 = Data 1
-  LCD1 = Data 2
-  LCD0 = Data 3
-data is signals LCD3 LCD2 LCD1 LCD0
-*/
-void microvision_state::lcd_write(uint8_t control, uint8_t data)
+WRITE16_MEMBER( microvision_state::lcd_output_w )
 {
-	// Latch pulse, when high, resets the %8 latch address counter
-	if ( control & 0x01 ) {
-		m_lcd_latch_index = 0;
-	}
-
-	// The addressed latches load when -Data Clk is low
-	if ( ! ( control & 0x02 ) ) {
-		m_lcd_latch[ m_lcd_latch_index & 0x07 ] = data & 0x0f;
-	}
-
-	// The latch address counter is incremented on rising edges of -Data Clk
-	if ( ( ! ( m_lcd_control_old & 0x02 ) ) && ( control & 0x02 ) ) {
-		// Check if Latch pule is low
-		if ( ! ( control & 0x01 ) ) {
-			m_lcd_latch_index++;
-		}
-	}
-
-	// A parallel transfer of data from the addressed latches to the holding latches occurs
-	// whenever Latch Pulse is high and -Data Clk is high
-	if ( control == 3 ) {
-		for ( int i = 0; i < 8; i++ ) {
-			m_lcd_holding_latch[i] = m_lcd_latch[i];
-		}
-		update_lcd();
-	}
-
-	m_lcd_control_old = control;
+	m_lcd_row = offset;
+	m_lcd_col = data;
+	update_lcd();
 }
 
 
@@ -331,7 +291,9 @@ WRITE8_MEMBER( microvision_state::i8021_p1_write )
 {
 	LOG( "p1_write: %02x\n", data );
 
-	lcd_write( data & 0x03, data >> 4 );
+	m_lcd->data_w(data >> 4 & 0xf);
+	m_lcd->latch_pulse_w(BIT(data, 0));
+	m_lcd->data_clk_w(BIT(data, 1));
 }
 
 
@@ -433,9 +395,7 @@ WRITE16_MEMBER( microvision_state::tms1100_write_o )
 	LOG("write_o: %04x\n", data);
 
 	// O0-O3: LCD data
-	m_o = data;
-
-	lcd_write( ( m_r >> 6 ) & 0x03, m_o & 0x0f );
+	m_lcd->data_w(data & 0xf);
 }
 
 
@@ -449,8 +409,8 @@ WRITE16_MEMBER( microvision_state::tms1100_write_r )
 	{
 		// range is ~360us to ~2663us (measured on 4952-79 REV B PCB)
 		// note that the games don't use the whole range, so there's a deadzone around the edges
-		float step = (2663 - 360) / 255.0;
-		m_paddle_timer->adjust(attotime::from_usec(360 + m_paddle->read() * step));
+		float step = (2000 - 500) / 255.0; // approximate it
+		m_paddle_timer->adjust(attotime::from_usec(500 + m_paddle->read() * step));
 	}
 
 	// R0: speaker lead 2
@@ -459,7 +419,8 @@ WRITE16_MEMBER( microvision_state::tms1100_write_r )
 
 	// R6: LCD latch pulse
 	// R7: LCD data clock
-	lcd_write((data >> 6) & 0x03, m_o & 0x0f);
+	m_lcd->latch_pulse_w(BIT(data, 6));
+	m_lcd->data_clk_w(BIT(data, 7));
 
 	// R8-R10: input mux
 	m_r = data;
@@ -640,13 +601,16 @@ void microvision_state::microvision(machine_config &config)
 	m_tms1100->r().set(FUNC(microvision_state::tms1100_write_r));
 
 	/* video hardware */
+	HLCD0488(config, m_lcd);
+	m_lcd->write_cols().set(FUNC(microvision_state::lcd_output_w));
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(0);
 	screen.set_screen_update(FUNC(microvision_state::screen_update));
 	screen.screen_vblank().set(FUNC(microvision_state::screen_vblank));
 	screen.set_size(16, 16);
-	screen.set_visarea(0, 15, 0, 15);
+	screen.set_visarea_full();
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(microvision_state::microvision_palette), 16);
