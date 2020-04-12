@@ -3055,6 +3055,7 @@ files {
 	MAME_DIR .. "src/mame/machine/m24_kbd.h",
 	MAME_DIR .. "src/mame/machine/m24_z8000.cpp",
 	MAME_DIR .. "src/mame/machine/m24_z8000.h",
+	MAME_DIR .. "src/mame/drivers/olivpc1.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "olympia")
