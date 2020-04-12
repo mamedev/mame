@@ -517,6 +517,7 @@ mephisto_mm2.cpp
 mephisto_modena.cpp
 mephisto_modular.cpp
 mephisto_modular_tm.cpp
+mephisto_mondial.cpp
 mephisto_mondial68k.cpp
 mephisto_montec.cpp
 mephisto_polgar.cpp

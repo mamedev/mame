@@ -22123,17 +22123,19 @@ berl32t8p
 lond32t
 lond32t8
 
+@source:mephisto_mondial.cpp
+mondial                         // 1985 Mephisto Mondial
+mondial2                        // 1987 Mephisto Mondial II
+
 @source:mephisto_mondial68k.cpp
 mondl68k                        // 1988 Mephisto Mondial 68000XL
 
 @source:mephisto_montec.cpp
-mondial                         // 1985 Mephisto Mondial
 smondial                        // 1986 Mephisto Super Mondial (Ver A)
 smondialab                      // 1986 Mephisto Super Mondial (Ver AB)
 smondialb                       // 1986 Mephisto Super Mondial (Ver B)
 montec                          // 1987 Mephisto Monte Carlo
 monteca                         // 1987 Mephisto Monte Carlo
-mondial2                        // 1987 Mephisto Mondial II
 smondial2                       // 1989 Mephisto Super Mondial II
 megaiv                          // 1989 Mephisto Mega IV
 megaiva                         // 1989 Mephisto Mega IV

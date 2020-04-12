@@ -6,7 +6,6 @@
     Mephisto Monte Carlo
     Mephisto Mega IV
     Mephisto Monte Carlo IV LE
-    Mephisto Mondial II
     Mephisto Super Mondial
     Mephisto Super Mondial II
 
@@ -29,8 +28,6 @@
 #include "cpu/m6502/m65c02.h"
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
-#include "machine/timer.h"
-#include "sound/beep.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/pcf2100.h"
@@ -41,7 +38,6 @@
 
 #include "mephisto_montec.lh"
 #include "mephisto_megaiv.lh"
-#include "mephisto_mondial2.lh"
 #include "mephisto_smondial2.lh"
 
 
@@ -54,48 +50,38 @@ public:
 		, m_board(*this, "board")
 		, m_lcd(*this, "lcd%u", 0)
 		, m_dac(*this, "dac")
-		, m_beeper(*this, "beeper")
 		, m_keys(*this, "KEY.%u", 0)
 		, m_digits(*this, "digit%u", 0U)
 		, m_low_leds(*this, "led%u", 0U)
 		, m_high_leds(*this, "led%u", 100U)
 	{ }
 
-	void mondial(machine_config &config);
 	void smondial(machine_config &config);
-	void mondial2(machine_config &config);
 	void smondial2(machine_config &config);
 	void montec(machine_config &config);
 	void monteciv(machine_config &config);
 	void megaiv(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(montec_input_r);
-	DECLARE_READ8_MEMBER(montec_nmi_ack_r);
-	DECLARE_WRITE8_MEMBER(montec_nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(montec_mux_w);
-	DECLARE_WRITE8_MEMBER(montec_led_w);
-	DECLARE_WRITE8_MEMBER(montec_beeper_w);
-	DECLARE_WRITE8_MEMBER(montec_lcd_data_w);
-	DECLARE_WRITE8_MEMBER(montec_ldc_cs0_w);
-	DECLARE_WRITE8_MEMBER(montec_ldc_cs1_w);
-	DECLARE_WRITE8_MEMBER(montec_lcd_clk_w);
-	template<int N> DECLARE_WRITE32_MEMBER(montec_lcd_s_w);
+	uint8_t montec_input_r();
+	uint8_t montec_nmi_ack_r();
+	void montec_nmi_ack_w(uint8_t data);
+	void montec_mux_w(offs_t offset, uint8_t data);
+	void montec_led_w(uint8_t data);
+	void montec_beeper_w(uint8_t data);
+	void montec_lcd_data_w(uint8_t data);
+	void montec_ldc_cs0_w(uint8_t data);
+	void montec_ldc_cs1_w(uint8_t data);
+	void montec_lcd_clk_w(uint8_t data);
+	template<int N> void montec_lcd_s_w(uint32_t data);
 
-	DECLARE_READ8_MEMBER(megaiv_input_r);
-	DECLARE_WRITE8_MEMBER(megaiv_led_w);
+	uint8_t megaiv_input_r(offs_t offset);
+	void megaiv_led_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(smondial_board_mux_w);
-	DECLARE_WRITE8_MEMBER(smondial_led_data_w);
-
-	DECLARE_WRITE8_MEMBER(mondial_input_mux_w);
-	DECLARE_READ8_MEMBER(mondial_input_r);
-	DECLARE_WRITE8_MEMBER(mondial2_input_mux_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(refresh_leds);
+	void smondial_board_mux_w(offs_t offset, uint8_t data);
+	void smondial_led_data_w(offs_t offset, uint8_t data);
 
 	void megaiv_mem(address_map &map);
-	void mondial_mem(address_map &map);
-	void mondial2_mem(address_map &map);
 	void montec_mem(address_map &map);
 	void smondial2_mem(address_map &map);
 	void smondial_mem(address_map &map);
@@ -105,10 +91,9 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
-	optional_device_array<pcf2112_device, 2> m_lcd;
-	optional_device<dac_bit_interface> m_dac;
-	optional_device<beep_device> m_beeper;
-	optional_ioport_array<2> m_keys;
+	required_device_array<pcf2112_device, 2> m_lcd;
+	required_device<dac_bit_interface> m_dac;
+	required_ioport_array<2> m_keys;
 	output_finder<8> m_digits;
 	output_finder<16> m_low_leds, m_high_leds;
 
@@ -136,7 +121,7 @@ void mephisto_montec_state::machine_reset()
 	m_smondial_board_mux = 0xff;
 }
 
-WRITE8_MEMBER(mephisto_montec_state::montec_led_w)
+void mephisto_montec_state::montec_led_w(uint8_t data)
 {
 	for(int i=0; i<4; i++)
 		for(int j=0; j<4; j++)
@@ -145,36 +130,36 @@ WRITE8_MEMBER(mephisto_montec_state::montec_led_w)
 }
 
 template<int N>
-WRITE32_MEMBER(mephisto_montec_state::montec_lcd_s_w)
+void mephisto_montec_state::montec_lcd_s_w(uint32_t data)
 {
 	for (int i=0; i<4; i++)
 		m_digits[i + N*4] = bitswap<8>(data >> (8 * i), 7,4,5,0,1,2,3,6);
 }
 
-WRITE8_MEMBER(mephisto_montec_state::montec_lcd_data_w)
+void mephisto_montec_state::montec_lcd_data_w(uint8_t data)
 {
 	m_lcd[0]->data_w(BIT(data, 7));
 	m_lcd[1]->data_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER(mephisto_montec_state::montec_ldc_cs0_w)
+void mephisto_montec_state::montec_ldc_cs0_w(uint8_t data)
 {
 	m_lcd[0]->dlen_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER(mephisto_montec_state::montec_ldc_cs1_w)
+void mephisto_montec_state::montec_ldc_cs1_w(uint8_t data)
 {
 	m_lcd[1]->dlen_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER(mephisto_montec_state::montec_lcd_clk_w)
+void mephisto_montec_state::montec_lcd_clk_w(uint8_t data)
 {
 	m_lcd[0]->clb_w(BIT(data, 7));
 	m_lcd[1]->clb_w(BIT(data, 7));
 }
 
 
-WRITE8_MEMBER(mephisto_montec_state::montec_mux_w)
+void mephisto_montec_state::montec_mux_w(offs_t offset, uint8_t data)
 {
 	if (data)
 		m_input_mux &= ~(1 << offset);
@@ -182,7 +167,7 @@ WRITE8_MEMBER(mephisto_montec_state::montec_mux_w)
 		m_input_mux |= (1 << offset);
 }
 
-READ8_MEMBER(mephisto_montec_state::montec_input_r)
+uint8_t mephisto_montec_state::montec_input_r()
 {
 	if      (m_input_mux & 0x01)    return m_keys[1]->read();
 	else if (m_input_mux & 0x02)    return m_keys[0]->read();
@@ -190,23 +175,24 @@ READ8_MEMBER(mephisto_montec_state::montec_input_r)
 	return m_board->input_r() ^ 0xff;
 }
 
-READ8_MEMBER(mephisto_montec_state::montec_nmi_ack_r)
+uint8_t mephisto_montec_state::montec_nmi_ack_r()
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return 0;
 }
 
-WRITE8_MEMBER(mephisto_montec_state::montec_nmi_ack_w)
+void mephisto_montec_state::montec_nmi_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mephisto_montec_state::montec_beeper_w)
+void mephisto_montec_state::montec_beeper_w(uint8_t data)
 {
 	m_dac->write(BIT(data, 7));
 }
 
-WRITE8_MEMBER(mephisto_montec_state::megaiv_led_w)
+void mephisto_montec_state::megaiv_led_w(uint8_t data)
 {
 	if (m_leds_mux != m_board->mux_r())
 	{
@@ -225,7 +211,7 @@ WRITE8_MEMBER(mephisto_montec_state::megaiv_led_w)
 	m_dac->write(BIT(data, 7));
 }
 
-READ8_MEMBER(mephisto_montec_state::megaiv_input_r)
+uint8_t mephisto_montec_state::megaiv_input_r(offs_t offset)
 {
 	if      (m_input_mux & 0x01)    return BIT(m_keys[1]->read(), 0 + offset) << 7;
 	else if (m_input_mux & 0x02)    return BIT(m_keys[1]->read(), 4 + offset) << 7;
@@ -275,7 +261,7 @@ void mephisto_montec_state::smondial2_mem(address_map &map)
 }
 
 
-WRITE8_MEMBER(mephisto_montec_state::smondial_board_mux_w)
+void mephisto_montec_state::smondial_board_mux_w(offs_t offset, uint8_t data)
 {
 	if (data)
 		m_smondial_board_mux &= ~(1 << offset);
@@ -292,7 +278,7 @@ WRITE8_MEMBER(mephisto_montec_state::smondial_board_mux_w)
 	}
 }
 
-WRITE8_MEMBER(mephisto_montec_state::smondial_led_data_w)
+void mephisto_montec_state::smondial_led_data_w(offs_t offset, uint8_t data)
 {
 	if (data & 0x80)
 		m_leds_mux &= ~(1 << offset);
@@ -314,85 +300,6 @@ void mephisto_montec_state::smondial_mem(address_map &map)
 	map(0x6c06, 0x6c06).w(FUNC(mephisto_montec_state::montec_lcd_clk_w));
 	map(0x6c07, 0x6c07).w(FUNC(mephisto_montec_state::montec_ldc_cs0_w));
 	map(0x8000, 0xffff).rom();
-}
-
-WRITE8_MEMBER(mephisto_montec_state::mondial2_input_mux_w)
-{
-	uint8_t leds_data = m_board->mux_r();
-	for (int i=0; i<8; i++)
-	{
-		if (!BIT(leds_data, i))
-		{
-			if (data & 0x10) m_high_leds[i] = 1;
-			if (data & 0x20) m_low_leds[8 + i] = 1;
-			if (data & 0x40) m_low_leds[0 + i] = 1;
-		}
-	}
-
-	m_input_mux = data ^ 0xff;
-	m_dac->write(BIT(data, 7));
-	m_maincpu->set_input_line(M65C02_NMI_LINE, CLEAR_LINE);
-}
-
-
-void mephisto_montec_state::mondial2_mem(address_map &map)
-{
-	map(0x0000, 0x07ff).ram().share("nvram");
-	map(0x2000, 0x2000).w(FUNC(mephisto_montec_state::mondial2_input_mux_w));
-	map(0x2800, 0x2800).w(m_board, FUNC(mephisto_board_device::mux_w));
-	map(0x3000, 0x3007).r(FUNC(mephisto_montec_state::megaiv_input_r));
-	map(0x8000, 0xffff).rom();
-}
-
-READ8_MEMBER(mephisto_montec_state::mondial_input_r)
-{
-	uint8_t data;
-	if (m_input_mux & 0x08)
-		data = m_keys[BIT(~m_input_mux, 0)]->read();
-	else
-		data = m_board->input_r();
-
-	return BIT(data, offset) << 7;
-}
-
-WRITE8_MEMBER(mephisto_montec_state::mondial_input_mux_w)
-{
-	uint8_t leds_data = ~(1 << (data & 0x07));
-	m_board->mux_w(leds_data);
-
-	for (int i=0; i<8; i++)
-	{
-		if (!BIT(leds_data, i))
-		{
-			if (!(data & 0x10)) m_high_leds[i] = 1;
-			if (!(data & 0x20)) m_low_leds[8 + i] = 1;
-			if (!(data & 0x40)) m_low_leds[0 + i] = 1;
-		}
-	}
-
-	m_input_mux = data;
-	m_beeper->set_state(BIT(data, 7));
-	m_maincpu->set_input_line(M65C02_IRQ_LINE, CLEAR_LINE);
-}
-
-
-void mephisto_montec_state::mondial_mem(address_map &map)
-{
-	map(0x0000, 0x07ff).ram().share("nvram");
-	map(0x1000, 0x1000).w(FUNC(mephisto_montec_state::mondial_input_mux_w));
-	map(0x2000, 0x2000).r(m_board, FUNC(mephisto_board_device::input_r));
-	map(0x1800, 0x1807).r(FUNC(mephisto_montec_state::mondial_input_r));
-	map(0xc000, 0xffff).rom();
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(mephisto_montec_state::refresh_leds)
-{
-	for (int i=0; i<8; i++)
-	{
-		m_low_leds[0 + i] = 0;
-		m_low_leds[8 + i] = 0;
-		m_high_leds[i] = 0;
-	}
 }
 
 static INPUT_PORTS_START( montec )
@@ -437,28 +344,6 @@ static INPUT_PORTS_START( megaiv )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("6 King")   PORT_CODE(KEYCODE_6)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("0 Pos")    PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_O)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Level")    PORT_CODE(KEYCODE_L)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( mondial2 )
-	PORT_START("KEY.0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Play")     PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Pos")      PORT_CODE(KEYCODE_O)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Mem")      PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Info")     PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Clear")    PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Level")    PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Enter")    PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("Reset")    PORT_CODE(KEYCODE_DEL)
-
-	PORT_START("KEY.1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("1 Pawn")   PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("2 Knight") PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("3 Bishop") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("4 Rook")   PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("5 Queen")  PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("6 King")   PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("7 Black")  PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)        PORT_NAME("8 White")  PORT_CODE(KEYCODE_8)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( smondial2 )
@@ -526,28 +411,6 @@ void mephisto_montec_state::megaiv(machine_config &config)
 	config.set_default_layout(layout_mephisto_megaiv);
 }
 
-void mephisto_montec_state::mondial2(machine_config &config)
-{
-	megaiv(config);
-	m_maincpu->set_clock(XTAL(2'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::mondial2_mem);
-	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_assert), attotime::from_hz(XTAL(2'000'000) / (1 << 12)));
-
-	TIMER(config, "refresh_leds").configure_periodic(FUNC(mephisto_montec_state::refresh_leds), attotime::from_hz(2));
-	config.set_default_layout(layout_mephisto_mondial2);
-}
-
-void mephisto_montec_state::mondial(machine_config &config)
-{
-	mondial2(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::mondial_mem);
-	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::irq0_line_assert), attotime::from_hz(XTAL(2'000'000) / (1 << 12)));
-
-	config.device_remove("dac");
-	config.device_remove("vref");
-	BEEP(config, m_beeper, 2048).add_route(ALL_OUTPUTS, "speaker", 0.25); // measured C7(2093Hz)
-}
-
 void mephisto_montec_state::smondial(machine_config &config)
 {
 	megaiv(config);
@@ -613,21 +476,8 @@ ROM_START( smondial2 )
 	ROM_LOAD("supermondial_ii.bin", 0x8000, 0x8000, CRC(cd73df4a) SHA1(bad786074be613d7f48bf98b6fdf8178a4a85f5b) )
 ROM_END
 
-ROM_START( mondial )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("mondial_1.bin", 0xc000, 0x4000, CRC(5cde2e26) SHA1(337be35d5120ca12143ca17f8aa0642b313b3851) )
-ROM_END
-
-ROM_START( mondial2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("mondial_ii_01.08.87", 0x8000, 0x8000, CRC(e5945ce6) SHA1(e75bbf9d54087271d9d46fb1de7634eb957f8db0) )
-ROM_END
-
 
 /*    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      CLASS                  INIT        COMPANY             FULLNAME                     FLAGS */
-CONS( 1985, mondial,    0,        0,      mondial,   mondial2,  mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mondial",          MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mondial2,   0,        0,      mondial2,  mondial2,  mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mondial II",       MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-
 CONS( 1988, megaiv,     0,        0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 1)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1988, megaiva,    megaiv,   0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 2)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
