@@ -92,30 +92,35 @@ void grid2102_device::ieee488_eoi(int state) {
 }
 
 void grid2102_device::accept_transfer() {
-    if(m_floppy_loop_state == GRID2102_STATE_IDLE) {
-        if(m_data_buffer.size() >= 0xA) {
+    if (m_floppy_loop_state == GRID2102_STATE_IDLE) {
+        if (m_data_buffer.size() >= 0xA) {
             uint8_t command = m_data_buffer[0];
             uint32_t sector_number = GRID2102_FETCH32(m_data_buffer, 3);
             uint16_t data_size = GRID2102_FETCH16(m_data_buffer, 7);
-            logerror("grid2102_device command %d, data size %d\n", command, data_size);
+            // logerror("grid2102_device command %d, data size %d\n", command, data_size);
             (void)(sector_number);
             if (command == 0x1) { // ddGetStatus
                 for (int i = 0; i < sizeof(grid2102_identify_response) && i < data_size; i++) {
                     m_output_data_buffer.push(grid2102_identify_response[i]);
                 }
             } else if (command == 0x4) { // ddRead
-                /*// we should send a service request
-                serial_poll_byte = 0x0F;
-                has_srq = true;*/
                 floppy_sector_number = sector_number;
                 m_floppy_loop_state = GRID2102_STATE_READING_DATA;
                 m_delay_timer->adjust(attotime::from_msec(5));
             } else if (command == 0x5) {
-                // needs read
+                floppy_sector_number = sector_number;
                 m_floppy_loop_state = GRID2102_STATE_WRITING_DATA;
             }
         } // else something is wrong, ignore
-    } else if(m_floppy_loop_state == GRID2102_STATE_WRITING_DATA) {
+    } else if (m_floppy_loop_state == GRID2102_STATE_WRITING_DATA) {
+        // write
+        if (floppy_sector_number != 0xFFFFFFFF) {
+            fseek(floppy_sector_number * 512, SEEK_SET);
+            fwrite(m_data_buffer.data(), 512);
+        } else {
+            // TODO: set status
+        }
+        // logerror("grid2102_device write sector %d\n", floppy_sector_number);
         // wait
         m_floppy_loop_state = GRID2102_STATE_WRITING_DATA_WAIT;
         m_delay_timer->adjust(attotime::from_msec(5));
@@ -147,21 +152,21 @@ void grid2102_device::ieee488_dav(int state) {
                 if ((m_last_recv_byte & 0x1F) == GRID2102_DEV_ADDR) {
                     // dev-id = 5
                     listening = true;
-                    logerror("grid2102_device now listening\n");
+                    //logerror("grid2102_device now listening\n");
                 } else if((m_last_recv_byte & 0x1F) == 0x1F) {
                     // reset listen
                     listening = false;
-                    logerror("grid2102_device now not listening\n");
+                    //logerror("grid2102_device now not listening\n");
                 }
             } else if ((m_last_recv_byte & 0xE0) == 0x40) {
                 if ((m_last_recv_byte & 0x1F) == GRID2102_DEV_ADDR) {
                     // dev-id = 5
                     talking = true;
-                    logerror("grid2102_device now talking\n");
+                    //logerror("grid2102_device now talking\n");
                 } else {
                     // reset talk
                     talking = false;
-                    logerror("grid2102_device now not talking\n");
+                    //logerror("grid2102_device now not talking\n");
                 }
             } else if (m_last_recv_byte == 0x18) {
                 // serial poll enable
@@ -241,7 +246,7 @@ void grid2102_device::ieee488_ifc(int state) {
 }
 
 void grid2102_device::ieee488_srq(int state) {
-    logerror("grid2102_device srq state set to %d\n", state);
+    // logerror("grid2102_device srq state set to %d\n", state);
 }
 
 void grid2102_device::ieee488_atn(int state) {
