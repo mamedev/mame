@@ -25,10 +25,13 @@ Status of each game:
 dinopic:           No sound.
 dinopic2:          No sound, one bad graphics ROM. Copying 8.bin from dinopic fixes it.
 dinopic3:          No sound. Some minor gfx priority issues, confirmed present on real board.
+jurassic99:        No sound.
 punipic, punipic2: No sound. Problems in Central Park. Patches used.
 punipic3:          Same as punipic, and doors are missing.
 slampic:           No sound. Some minor gfx issues (sprites on character select screen).
 slampic2:          No sound. All gfx issues confirmed present on real board.
+
+all dinopic sets have some priority issues with sprites overlapping foreground objects on certain levels
 
 */
 
@@ -1077,8 +1080,8 @@ ROM_START( dinopic3 )
 ROM_END
 
 /*
-    Jurassic 99 (Cadillacs and Dinosaurs bootleg)
-    pcb marking: H11F6
+	Jurassic 99 (Cadillacs and Dinosaurs bootleg)
+	pcb marking: H11F6
 	uses a pin compatible EMC EM78P447AP instead of usual PIC 16c57, secured unfortunately so no dump
 	
 	Confirmed clocks (measured):
@@ -1104,7 +1107,7 @@ ROM_END
 	  |_________________________________________|
 	
 	V = volume pot
-    # = player 3 connector	
+	# = player 3 connector	
 	T = test mode button
 	U6295 = oki M6295 clone
 	68K = MC68HC000FN16 PLCC68
@@ -1522,8 +1525,8 @@ GAME( 1993,  jurassic99, dino,      dinopic,   dino,      dinopic_state,     ini
 GAME( 1993,  punipic,    punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,    ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
 GAME( 1993,  punipic2,   punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,    ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
 GAME( 1993,  punipic3,   punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic3,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
-                                                                                               
+
 GAME( 1993,  slampic,    slammast,  slampic,   slampic,   cps1bl_pic_state,  init_dinopic,    ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
 GAME( 1993,  slampic2,   slammast,  slampic2,  slampic2,  slampic2_state,    init_slampic2,   ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16C57, set 2)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
-                                                                                               
+
 GAME( 1992,  wofpic,     wof,       dinopic,   wof,       dinopic_state,     init_wofpic,     ROT0,  "bootleg",  "Warriors of Fate (bootleg with PIC16C57)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 021002 ETC, needs correct layers enable, etc. Currently only sprites show.
