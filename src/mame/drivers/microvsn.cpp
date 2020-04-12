@@ -36,13 +36,12 @@ TODO:
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/hlcd0488.h"
+#include "video/pwm.h"
 
 #include "emupal.h"
 #include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
-
-#include <algorithm>
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -57,6 +56,7 @@ public:
 		m_i8021( *this, "i8021_cpu" ),
 		m_tms1100( *this, "tms1100_cpu" ),
 		m_lcd(*this, "lcd"),
+		m_lcd_pwm(*this, "lcd_pwm"),
 		m_cart(*this, "cartslot"),
 		m_inputs(*this, "COL%u", 0),
 		m_paddle(*this, "PADDLE"),
@@ -76,11 +76,8 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void microvision_palette(palette_device &palette) const;
-
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	// i8021 interface
@@ -100,6 +97,7 @@ private:
 	optional_device<i8021_device> m_i8021;
 	optional_device<tms1100_cpu_device> m_tms1100;
 	required_device<hlcd0488_device> m_lcd;
+	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<3> m_inputs;
 	required_ioport m_paddle;
@@ -119,7 +117,6 @@ private:
 	uint16_t  m_o;
 
 	// generic variables
-	void    update_lcd();
 	DECLARE_WRITE16_MEMBER(lcd_output_w);
 
 	void apply_settings(void);
@@ -129,32 +126,7 @@ private:
 	u16 m_button_mask;
 	bool m_paddle_auto;
 	bool m_paddle_on;
-
-	uint8_t   m_lcd_data[16][16];
-	u16 m_lcd_row;
-	u16 m_lcd_col;
 };
-
-
-void microvision_state::microvision_palette(palette_device &palette) const
-{
-	palette.set_pen_color( 15, 0x00, 0x00, 0x00 );
-	palette.set_pen_color( 14, 0x11, 0x11, 0x11 );
-	palette.set_pen_color( 13, 0x22, 0x22, 0x22 );
-	palette.set_pen_color( 12, 0x33, 0x33, 0x33 );
-	palette.set_pen_color( 11, 0x44, 0x44, 0x44 );
-	palette.set_pen_color( 10, 0x55, 0x55, 0x55 );
-	palette.set_pen_color(  9, 0x66, 0x66, 0x66 );
-	palette.set_pen_color(  8, 0x77, 0x77, 0x77 );
-	palette.set_pen_color(  7, 0x88, 0x88, 0x88 );
-	palette.set_pen_color(  6, 0x99, 0x99, 0x99 );
-	palette.set_pen_color(  5, 0xaa, 0xaa, 0xaa );
-	palette.set_pen_color(  4, 0xbb, 0xbb, 0xbb );
-	palette.set_pen_color(  3, 0xcc, 0xcc, 0xcc );
-	palette.set_pen_color(  2, 0xdd, 0xdd, 0xdd );
-	palette.set_pen_color(  1, 0xee, 0xee, 0xee );
-	palette.set_pen_color(  0, 0xff, 0xff, 0xff );
-}
 
 
 void microvision_state::machine_start()
@@ -174,9 +146,6 @@ void microvision_state::machine_reset()
 {
 	apply_settings();
 
-	for (auto &elem : m_lcd_data)
-		std::fill(std::begin(elem), std::end(elem), 0);
-
 	m_o = 0;
 	m_r = 0;
 	m_p0 = 0;
@@ -187,36 +156,18 @@ void microvision_state::machine_reset()
 }
 
 
-void microvision_state::update_lcd()
+
+uint32_t microvision_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t row = m_lcd_row;
-	uint16_t col = m_lcd_col;
-
-	LOG( "row = %04x, col = %04x\n", row, col );
-	for ( int i = 0; i < 16; i++ )
+	for (int y = 0; y < 16; y++)
 	{
-		uint16_t temp = row;
-
-		for (auto & elem : m_lcd_data)
+		for (int x = 0; x < 16; x++)
 		{
-			if ( ( temp & col ) & 0x8000 )
-			{
-				elem[i] = 15;
-			}
-			temp <<= 1;
-		}
-		col <<= 1;
-	}
-}
+			// simulate LCD persistence
+			int p = m_lcd_pwm->read_element_bri(y ^ 15, x ^ 15) * 25000;
+			p = (p > 255) ? 0 : p ^ 255;
 
-
-uint32_t microvision_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	for ( uint8_t i = 0; i < 16; i++ )
-	{
-		for ( uint8_t j = 0; j < 16; j++ )
-		{
-			bitmap.pix16(i,j) = m_lcd_data [i] [j];
+			bitmap.pix32(y, x) = p << 16 | p << 8 | p;
 		}
 	}
 
@@ -224,29 +175,10 @@ uint32_t microvision_state::screen_update(screen_device &screen, bitmap_ind16 &b
 }
 
 
-WRITE_LINE_MEMBER(microvision_state::screen_vblank)
-{
-	if ( state )
-	{
-		for (auto & elem : m_lcd_data)
-		{
-			for ( int j= 0; j < 16; j++ )
-			{
-				if ( elem[j] )
-				{
-					elem[j]--;
-				}
-			}
-		}
-		update_lcd();
-	}
-}
 
 WRITE16_MEMBER( microvision_state::lcd_output_w )
 {
-	m_lcd_row = offset;
-	m_lcd_col = data;
-	update_lcd();
+	m_lcd_pwm->matrix(offset, data);
 }
 
 
@@ -604,16 +536,14 @@ void microvision_state::microvision(machine_config &config)
 	HLCD0488(config, m_lcd);
 	m_lcd->write_cols().set(FUNC(microvision_state::lcd_output_w));
 
+	PWM_DISPLAY(config, m_lcd_pwm).set_size(16, 16);
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(0);
 	screen.set_screen_update(FUNC(microvision_state::screen_update));
-	screen.screen_vblank().set(FUNC(microvision_state::screen_vblank));
 	screen.set_size(16, 16);
 	screen.set_visarea_full();
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette", FUNC(microvision_state::microvision_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
