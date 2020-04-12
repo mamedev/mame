@@ -98,7 +98,7 @@ Nemo (World 901130)                                                89624B-3   NM
 Nemo (Japan 901120)                                                89625B-1   NM22B            ?     ?            CPS-B-15  DL-0411-10010
 
 Street Fighter II: The World Warrior (World 910129)          1991  90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
-Street Fighter II: The World Warrior (World 910204)                89625B-1   STF29?           IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
+Street Fighter II: The World Warrior (World 910204)#               90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (World 910214)                90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (World 910228)                90629B-3   STF29            IOB2  90632C-1     CPS-B-18  DL-0411-10013  C632B
 Street Fighter II: The World Warrior (World 910318)                90629B-3   STF29            IOB1  90632C-1     CPS-B-05  DL-0411-10006  C632
@@ -215,6 +215,7 @@ Ganbare! Marine Kun (Japan 2K0411)                           2000  91634B-2   GB
 @the original number (CPS-B-01) was scratched out and "04" stamped over it.
 *denotes Suicide Battery
 ^c632b chips seen, but all variants of the game read the same c board io ports so the fusemap must be the same, perhaps incorrectly marked?
+#sf2 world 910204: sf2ea is official set on 90629B-2 b-board, sf2en on 89625B-1 b-board most likely an unofficial conversion (see notes in drivers\cps1.cpp)
 
 The C628/C632 PALs on some C-boards handle the io for games with more than 3 buttons or more than 2 players.
 
