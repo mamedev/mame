@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Kevin Horton, Sean Riddle
-/***************************************************************************
+/******************************************************************************
 
 Entex Select-A-Game Machine, handheld game console.
 Technically, the main unit is the peripheral(buttons, display, speaker, power),
@@ -32,7 +32,7 @@ are played, Space Invader 2 is an exception.
 TODO:
 - add the rest of the games
 
-***************************************************************************/
+******************************************************************************/
 
 #include "emu.h"
 

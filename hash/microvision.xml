@@ -106,7 +106,7 @@ The "overlay" feature indicates screen/keypad overlay
 		<info name="pcb" value="4952-79 REV-B" /> <!-- correct? -->
 		<info name="serial" value="4971" />
 		<part name="cart" interface="microvision_cart">
-			<feature name="clock" value="500000" /> <!-- correct? -->
+			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K? (matches video recording) -->
 			<feature name="pla" value="1" />
 			<feature name="paddle" value="1" />
 			<feature name="overlay" value="2" />
@@ -123,10 +123,10 @@ The "overlay" feature indicates screen/keypad overlay
 		<info name="pcb" value="4971-REV-C" />
 		<info name="serial" value="4971" />
 		<part name="cart" interface="microvision_cart">
-			<feature name="clock" value="2000000" /> <!-- LC circuit -->
+			<feature name="clock" value="3500000" /> <!-- LC circuit, correct? (matches video recording) -->
 			<feature name="paddle" value="1" />
 			<feature name="overlay" value="2" />
-			<dataarea name="rom" size="0x400"> <!-- I8021 MCU -->
+			<dataarea name="rom" size="0x400"> <!-- Intel 8021 MCU -->
 				<rom name="4971" size="0x400" crc="bdd8660b" sha1="971f9117dc809f7b9796134208b47ea34990ae71"/>
 			</dataarea>
 		</part>
