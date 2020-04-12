@@ -13,14 +13,18 @@ Notes:
 - Golfing Greats has a peculiar way to know where the ball is laying: the
   hardware latches the color of roz pixel at the center (more or less) of the
   screen, and uses that to determine if it's water, fairway etc.
-
-TODO:
-
-- glfgretj uses a special controller.
+- glfgreatj uses a special controller.
   1 "shot controller (with stance selection button on the top of it)" and 3
   buttons for shot direction (right/left) and club selection.
   Twist the "shot controller" to adjust shot power, then release it.
   The controller returns to its default position by internal spring.
+  
+TODO:
+
+- glfgreat: imperfect protection emulation:
+  1. putting to MAX power on green causes the game to return an incorrect 
+     value a.k.a. it detects a bunker/rough/water hazard;
+  2. top/back spins doesn't seem to have any effect in-game;
 - prmrsocr: when the field rotates before the penalty kicks, parts of the
   053936 tilemap that shouldn't be seen are visible. Maybe the tilemap ROM is
   banked, or there are controls to clip the visible region (registers 0x06 and
@@ -1618,18 +1622,19 @@ static INPUT_PORTS_START( glfgreat )
 	PORT_START("P3/P4")
 	KONAMI16_LSB( 3, IPT_BUTTON3, IPT_UNUSED ) PORT_PLAYER(3)
 	KONAMI16_MSB( 4, IPT_BUTTON3, IPT_UNUSED ) PORT_PLAYER(4)
-
+	
+	// actually unused by World/US sets but still tested in service mode
 	PORT_START("CONTROLA")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_PLAYER(1)
 
 	PORT_START("CONTROLB")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_PLAYER(2)
 
 	PORT_START("CONTROLC")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_PLAYER(3)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_PLAYER(3)
 
 	PORT_START("CONTROLD")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_PLAYER(4)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_PLAYER(4)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( glfgreatu )
@@ -1653,37 +1658,40 @@ static INPUT_PORTS_START( glfgreatj )
 	PORT_DIPSETTING(      0x0100, "4/2" ) // Cocktail (P1&P3 <-> P2&P4)
 	PORT_DIPSETTING(      0x0000, "4/4" ) // Cocktail (P1&P2 <-> P3&P4)
 
+	// I/O test in service mode actually returns same mapping as World/US revs
+	// for accuracy we actually map these like the Jp flyer claims
+	// (where stance button is on top of the ball shaped controller)
 	PORT_MODIFY("P1/P2")
-	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1) PORT_NAME("Spare (P1 Left)")
-	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Spare (P1 Right)")
-	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1) PORT_NAME("P1 Stance Select")
-	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1) PORT_NAME("Spare (P1 Down)")
-	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(1) PORT_NAME("P1 Right Direction")
-	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(1) PORT_NAME("P1 Left Direction")
-	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(1) PORT_NAME("P1 Club Select")
-	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) PORT_NAME("Spare (P2 Left)")
-	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_NAME("Spare (P2 Right)")
-	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2) PORT_NAME("P2 Stance Select")
-	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2) PORT_NAME("Spare (P2 Down)")
-	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(2) PORT_NAME("P2 Right Direction")
-	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2) PORT_NAME("P2 Left Direction")
-	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(2) PORT_NAME("P2 Club Select")
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Stance Select Button")
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Left Direction Button")
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Right Direction Button")
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Club Select Button")
+	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Stance Select Button")
+	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Left Direction Button")
+	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Right Direction Button")
+	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Club Select Button")
 
 	PORT_MODIFY("P3/P4")
-	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(3) PORT_NAME("Spare (P3 Left)")
-	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3) PORT_NAME("Spare (P3 Right)")
-	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(3) PORT_NAME("P3 Stance Select")
-	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(3) PORT_NAME("Spare (P3 Down)")
-	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(3) PORT_NAME("P3 Right Direction")
-	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(3) PORT_NAME("P3 Left Direction")
-	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(3) PORT_NAME("P3 Club Select")
-	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(4) PORT_NAME("Spare (P4 Left)")
-	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4) PORT_NAME("Spare (P4 Right)")
-	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(4) PORT_NAME("P4 Stance Select")
-	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(4) PORT_NAME("Spare (P4 Down)")
-	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(4) PORT_NAME("P4 Right Direction")
-	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(4) PORT_NAME("P4 Left Direction")
-	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(4) PORT_NAME("P4 Club Select")
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Stance Select Button")
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_UNUSED  )
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 Left Direction Button")
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Right Direction Button")
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3) PORT_NAME("P3 Club Select Button")
+	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 Stance Select Button")
+	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("P4 Left Direction Button")
+	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("P4 Right Direction Button")
+	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4) PORT_NAME("P4 Club Select Button")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ssriders )
@@ -4338,9 +4346,9 @@ GAME( 1991, blswhstl,    0,        blswhstl, blswhstl,  tmnt_state, empty_init, 
 GAME( 1991, blswhstla,   blswhstl, blswhstl, blswhstl,  tmnt_state, empty_init,  ROT90,  "Konami",  "Bells & Whistles (Asia, version M)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1991, detatwin,    blswhstl, blswhstl, blswhstl,  tmnt_state, empty_init,  ROT90,  "Konami",  "Detana!! Twin Bee (Japan, version J)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (World, version L)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, glfgreatu,   glfgreat, glfgreat, glfgreatu, glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (US, version K)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (Japan, version J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (World, version L)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1991, glfgreatu,   glfgreat, glfgreat, glfgreatu, glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (US, version K)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, glfgreat_state, empty_init, ROT0, "Konami", "Golfing Greats (Japan, version J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
 GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
