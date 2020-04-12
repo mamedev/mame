@@ -45,7 +45,7 @@ constexpr uint32_t sha1_rol(uint32_t x, unsigned n)
 	return (x << n) | (x >> (32 - n));
 }
 
-uint32_t sha1_b(uint32_t *data, unsigned i)
+inline uint32_t sha1_b(uint32_t *data, unsigned i)
 {
 	uint32_t r = data[(i + 13) & 15U];
 	r ^= data[(i + 8) & 15U];
