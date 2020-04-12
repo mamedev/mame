@@ -143,28 +143,25 @@ gsword notes:
 
 There are two 8041 MCUs and one 8741 MCU:
 * One connected to the main CPU for communicating with the sub CPU and
-  reading DIP switch C.
+  reading DIP switch C (D8741A-8 AA-013 at 9.5A).
 * One connected to the sub CPU for communicating with the main CPU and
-  reading DIP switches A and B.
+  reading DIP switches A and B (8041AH AA-016 at 9C).
 * One connected to the sub CPU for reading player, start and coin
-  inputs, and driving the coin counter outputs.
-* TODO: confirm which MCU is connected to which CPU.
+  inputs, and driving the coin counter outputs (8041AH AA-017 at 9G).
 
-So far, the AA-016 and AA-017 MCUs have been dumped successfully.  It's
-not clear which of the MCUs (AA-013 at 5A and AA-016 at 9C) is connected
-to the main CPU and which is connected to the sub CPU.
+So far, the AA-016 and AA-017 MCUs have been dumped successfully.
 
 At least two Great Swordsman boards have been seen with a UVEPROM-based
-D8741A-8 MCU for AA-013 at 5A.  This suggests the developers made some
-last-minute change to the code that only either the main or sub CPU.
+D8741A-8 MCU for AA-013 at 9.5A.  This suggests the developers made some
+last-minute change to the code that only the main CPU.
 
 It appears that during development, the developers worked with three
 copies of what became the AA-016 MCU.  Protection code was added to the
 I/O MCU program, and this became AA-017.  At this point they intended to
 use two copies of AA-016 for communications, and one AA-017 for I/O.  It
-turned out that some last-minute change was required for either the
-master or slave CPU, but it was too late to order new mask ROM MUCs.
-This resulted in the use of UVEPROM parts being used for AA-013.
+turned out that some last-minute change was required for the master CPU,
+but it was too late to order new mask ROM MUCs.  This resulted in the
+use of UVEPROM parts for AA-013.
 
 There are problems with sound.  Many effects aren't playing or are cut
 off almost immediately.  It's not clear why - possibly due to some of
@@ -172,30 +169,30 @@ the I/O that isn't understood.
 
 The audio CPU seems to have some unmapped peripheral(s) around $FEB0.
 
-+-----+----------------+----------------+----------------+
-| Pin | MCU 1          | MCU 2          | MCU 3          |
-+-----+----------------+----------------+----------------+
-| P10 | to MCU 2 P10   | to MCU 1 P10   | P1 right       |
-| P11 | to MCU 2 T1    | to MCU 1 T1    | P1 left        |
-| P12 | unknown        | DSW A 3        | unknown        |
-| P13 | unknown        | DSW A 4        | P1 lower       |
-| P14 | unknown        | DSW A 5        | P1 raise       |
-| P15 | unknown        | unknown        | P1 middle      |
-| P16 | unknown        | unknown        | 1P start       |
-| P17 | unknown        | unknown        | 2P start       |
-+-----+----------------+----------------+----------------+
-| P20 | DSW C 1?       | DSW B 1?       | P2 right       |
-| P21 | DSW C 2?       | DSW B 2?       | P2 left        |
-| P22 | DSW C 3        | DSW B 3        | unknown        |
-| P23 | DSW C 4        | DSW B 4        | P2 lower       |
-| P24 | DSW C 5        | DSW B 5        | P2 raise       |
-| P25 | DSW C 6        | DSW B 6        | P2 middle      |
-| P26 | DSW C 7        | DSW B 7        | coin counter 1 |
-| P27 | DSW C 8?       | DSW B 8        | coin counter 2 |
-+-----+----------------+----------------+----------------+
-| T0  | serial clock   | serial clock   | coin chute 1   |
-| T1  | from MCU 2 P11 | from MCU 1 P11 | coin chute 2   |
-+-----+----------------+----------------+----------------+
++-----+-----------------+-----------------+----------------+
+| Pin | AA-013          | AA-016          | AA-017         |
++-----+-----------------+-----------------+----------------+
+| P10 | to AA-016 P10   | to AA-013 P10   | P1 right       |
+| P11 | to AA-016 T1    | to AA-013 T1    | P1 left        |
+| P12 | unknown         | DSW A 3         | unknown        |
+| P13 | unknown         | DSW A 4         | P1 lower       |
+| P14 | unknown         | DSW A 5         | P1 raise       |
+| P15 | unknown         | unknown         | P1 middle      |
+| P16 | unknown         | unknown         | 1P start       |
+| P17 | unknown         | unknown         | 2P start       |
++-----+-----------------+-----------------+----------------+
+| P20 | DSW C 1?        | DSW B 1?        | P2 right       |
+| P21 | DSW C 2?        | DSW B 2?        | P2 left        |
+| P22 | DSW C 3         | DSW B 3         | unknown        |
+| P23 | DSW C 4         | DSW B 4         | P2 lower       |
+| P24 | DSW C 5         | DSW B 5         | P2 raise       |
+| P25 | DSW C 6         | DSW B 6         | P2 middle      |
+| P26 | DSW C 7         | DSW B 7         | coin counter 1 |
+| P27 | DSW C 8?        | DSW B 8         | coin counter 2 |
++-----+-----------------+-----------------+----------------+
+| T0  | serial clock    | serial clock    | coin chute 1   |
+| T1  | from AA-016 P11 | from AA-013 P11 | coin chute 2   |
++-----+-----------------+-----------------+----------------+
 
 
 **************
@@ -241,12 +238,12 @@ an odd parity bit.  Useful addresses for debugging communication:
 * $194: Premature end-of-data
 * $199: Excess data
 
-MCU 2 P15, P16 and P17 seem to have some effect, although it's not clear
-what they're supposed to do.  Tying them low during startup prevents the
-sub CPU from correctly programming the I/O MCU.  It's not clear whether
-pins corresponding to unused DIP switches have some other purpose. Fake
-DIP switches have been included to make it easier to mess with some of
-the unknown I/O.
+AA-016 P15, P16 and P17 seem to have some effect, although it's not
+clear what they're supposed to do.  Tying them low during startup
+prevents the sub CPU from correctly programming the I/O MCU.  It's not
+clear whether pins corresponding to unused DIP switches have some other
+purpose. Fake DIP switches have been included to make it easier to mess
+with some of the unknown I/O.
 
 
 **************
@@ -1114,7 +1111,7 @@ ROM_START( gsword )
 	ROM_LOAD( "ac10-17.4d",   0x6000, 0x2000, CRC(87817985) SHA1(370399a4622958829ca6d1545e614b121f09c2c0) )
 
 	ROM_REGION( 0x0400, "mcu1", 0 )    // D8741A-8
-	ROM_LOAD( "aa-013.5a",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) BAD_DUMP )
+	ROM_LOAD( "aa-013.9.5a",  0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) BAD_DUMP )
 
 	ROM_REGION( 0x0400, "mcu2", 0 )    // 8041AH
 	ROM_LOAD( "aa-016.9c",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) )
@@ -1161,7 +1158,7 @@ ROM_START( gsword2 )
 	// 6000-7fff empty
 
 	ROM_REGION( 0x0400, "mcu1", 0 )    // D8741A-8
-	ROM_LOAD( "aa-013.5a",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) BAD_DUMP )
+	ROM_LOAD( "aa-013.9.5a",  0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) BAD_DUMP )
 
 	ROM_REGION( 0x0400, "mcu2", 0 )    // 8041AH
 	ROM_LOAD( "aa-016.9c",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) )
