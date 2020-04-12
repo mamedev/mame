@@ -1292,14 +1292,30 @@ static const struct gfx_range mapper_VA24B_table[] =
 };
 
 
-/* unverified, no dump */
-#define mapper_Q522B    { 0x8000, 0, 0, 0 }, mapper_Q522B_table
+// /* unverified, no dump */
+// #define mapper_Q522B    { 0x8000, 0, 0, 0 }, mapper_Q522B_table
+// static const struct gfx_range mapper_Q522B_table[] =
+// {
+	// /* type                              start   end     bank */
+	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x0000, 0x6fff, 0 },
+	// { GFXTYPE_SCROLL3,                   0x7000, 0x77ff, 0 },
+	// { GFXTYPE_SCROLL1,                   0x7800, 0x7fff, 0 },
+	// { 0 }
+// };
+#define mapper_Q522B    { 0x4000, 0x4000, 0, 0 }, mapper_Q522B_table
 static const struct gfx_range mapper_Q522B_table[] =
 {
-	/* type                              start   end     bank */
-	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x0000, 0x6fff, 0 },
-	{ GFXTYPE_SCROLL3,                   0x7000, 0x77ff, 0 },
-	{ GFXTYPE_SCROLL1,                   0x7800, 0x7fff, 0 },
+	// verified from PAL dump:
+	// bank 0 = pin 19 (ROMs 1,5, 9,13,17,24,32,38)
+	// bank 1 = pin 16 (ROMs 2,6,10,14,18,25,33,39)
+	// pin 12 and pin 14 are never enabled
+
+	/* type                              start    end      bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x00000, 0x03fff, 0 },
+	
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x04000, 0x06fff, 1 },
+	{ GFXTYPE_SCROLL3,                   0x07000, 0x077ff, 1 },
+	{ GFXTYPE_SCROLL1,                   0x07800, 0x07fff, 1 },
 	{ 0 }
 };
 
@@ -1849,7 +1865,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"varthu",      CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthj",      CPS_B_21_BT5, mapper_VA22B },   /* CPSB test has been patched out (72=0001) register is also written to, possibly leftover from development */
 	{"varthjr",     CPS_B_21_BT5, mapper_VA63B },   /* CPSB test has been patched out (72=0001) register is also written to, possibly leftover from development */
-	{"cworld2j",    CPS_B_21_BT6, mapper_Q522B,  0x36, 0, 0x34 },  // Q522B unverified, no dump                       ports 36, 34 probably leftover input code from another game
+	{"cworld2j",    CPS_B_21_BT6, mapper_Q522B,  0x36, 0, 0x34 },  // ports 36, 34 probably leftover input code from another game
 	{"cworld2ja",   CPS_B_21_DEF, mapper_Q522B },                  // wrong, this set uses Q529B, still not dumped     patched set, no battery, could be desuicided
 	{"cworld2jb",   CPS_B_21_BT6, mapper_Q522B,  0x36, 0, 0x34 },  // wrong, this set uses Q563B, still not dumped
 	{"wof",         CPS_B_21_QS1, mapper_TK263B },
