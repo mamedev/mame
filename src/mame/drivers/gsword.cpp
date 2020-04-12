@@ -299,8 +299,9 @@ and a value in the low five bits.  Instructions recognised are:
 * 0x60: Set coin 2 coins per credit ($3D, default 1)
 * 0x80: Set coin 1 credits per coin ($33, default 1)
 * 0xa0: Set coin 2 credits per coin ($3B, default 1)
-* 0xc0: Set value at $2A (default $08)
-* 0xe0: Swap nybbles and set value at $29 (default $80)
+* 0xc0: Set protection delay ($2A, default $08)
+* 0xe0: Swap nybbles and set protection time ($29, default $80)
+The protection delay is not used by Great Swordsman.
 
 The setup phase is terminated by writing a command to the I/O MCU's data
 port.  The MCU return a data byte depending on the low three bits of the
@@ -322,9 +323,18 @@ byte of program memory from page 2 using the received byte as the
 offset, twos-complement it, return it, and then immediately re-execute
 the previous command received on the data port.
 
+The protection routine sends a sequence of incrementing values to the
+host.  The value is incremented by 1 or 2 if its most significant bit is
+clear or set, respectively.  Every 256 iterations, the value will be
+replaced with a byte read from an incrementing offset in program page 3.
+The iteration count, protection value and offset all start at zero and
+persist between invocations of the protection subroutine.  The
+protection subroutine runs for a configurable amount of time after each
+command is received.
+
 The I/O MCU indicates status via the user-defined status flags.  It sets
-them to 0000 while waiting for a command, or 1111 while processing a
-command.
+them to 0000 while waiting for a command, or 1111 while running the
+protection subroutine and processing the command.
 
 ******************************************/
 
