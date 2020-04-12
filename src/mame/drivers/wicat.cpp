@@ -28,8 +28,8 @@ Wicat - various systems.
 #include "machine/am9517a.h"
 #include "machine/im6402.h"
 #include "machine/input_merger.h"
-#include "machine/mc2661.h"
 #include "machine/mm58274c.h"
+#include "machine/scn_pci.h"
 #include "machine/wd_fdc.h"
 #include "machine/x2212.h"
 #include "video/i8275.h"
@@ -106,14 +106,14 @@ private:
 	required_device<m68000_device> m_maincpu;
 	required_device<mm58274c_device> m_rtc;
 	required_device<via6522_device> m_via;
-	required_device_array<mc2661_device, 7> m_uart;
+	required_device_array<scn2661c_device, 7> m_uart;
 	required_device<cpu_device> m_videocpu;
 	required_device<ls259_device> m_videoctrl;
 	required_device<input_merger_device> m_videoirq;
 	required_device<i8275_device> m_crtc;
 	required_device<am9517a_device> m_videodma;
-	required_device<mc2661_device> m_videouart0;
-	required_device<mc2661_device> m_videouart1;
+	required_device<scn2651_device> m_videouart0;
+	required_device<scn2651_device> m_videouart1;
 	required_device<im6402_device> m_videouart;
 	required_device<x2210_device> m_videosram;
 	required_device<palette_device> m_palette;
@@ -160,13 +160,14 @@ void wicat_state::main_mem(address_map &map)
 	map(0x300000, 0xdfffff).rw(FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
 	map(0xeff800, 0xeffbff).ram();  // memory mapping SRAM, used during boot sequence for storing various data (TODO)
 	map(0xeffc00, 0xeffc01).rw(FUNC(wicat_state::memmap_r), FUNC(wicat_state::memmap_w));
-	map(0xf00000, 0xf00007).rw(m_uart[0], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);  // UARTs
-	map(0xf00008, 0xf0000f).rw(m_uart[1], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00010, 0xf00017).rw(m_uart[2], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00018, 0xf0001f).rw(m_uart[3], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00020, 0xf00027).rw(m_uart[4], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00028, 0xf0002f).rw(m_uart[5], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00030, 0xf00037).rw(m_uart[6], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00000, 0xf00007).rw(m_uart[0], FUNC(scn2661c_device::read), FUNC(scn2661c_device::write)).umask16(0xff00);  // UARTs
+	map(0xf00008, 0xf0000f).rw(m_uart[1], FUNC(scn2661c_device::read), FUNC(scn2661c_device::write)).umask16(0xff00);
+	map(0xf00010, 0xf00017).rw(m_uart[2], FUNC(scn2661c_device::read), FUNC(scn2661c_device::write)).umask16(0xff00);
+	map(0xf00018, 0xf0001f).rw(m_uart[3], FUNC(scn2661c_device::read), FUNC(scn2661c_device::write)).umask16(0xff00);
+	map(0xf00020, 0xf00027).rw(m_uart[4], FUNC(scn2661c_device::read), FUNC(scn2661c_device::write)).umask16(0xff00);
+	map(0xf00028, 0xf0002f).rw(m_uart[5], FUNC(scn2661c_device::read), FUNC(scn2661c_device::write)).umask16(0xff00);
+	map(0xf00030, 0xf00037).rw(m_uart[6], FUNC(scn2661c_device::read), FUNC(scn2661c_device::write)).umask16(0xff00);
+	map(0xf0003a, 0xf0003b).nopr();
 	map(0xf00040, 0xf0005f).rw(FUNC(wicat_state::via_r), FUNC(wicat_state::via_w));
 	map(0xf00060, 0xf0007f).rw(m_rtc, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0xff00);
 	map(0xf000d0, 0xf000d0).w("ledlatch", FUNC(ls259_device::write_nibble_d3));
@@ -736,37 +737,37 @@ void wicat_state::wicat(machine_config &config)
 	m_rtc->set_day1(1);   // monday
 
 	// internal terminal
-	MC2661(config, m_uart[0], 5.0688_MHz_XTAL);  // connected to terminal board
-	m_uart[0]->txd_handler().set(m_videouart0, FUNC(mc2661_device::rx_w));
+	SCN2661C(config, m_uart[0], 5.0688_MHz_XTAL);  // connected to terminal board
+	m_uart[0]->txd_handler().set(m_videouart0, FUNC(scn2651_device::rxd_w));
 	m_uart[0]->rxrdy_handler().set_inputline(m_maincpu, M68K_IRQ_2);
-	m_uart[0]->rts_handler().set(m_videouart0, FUNC(mc2661_device::cts_w));
-	m_uart[0]->dtr_handler().set(m_videouart0, FUNC(mc2661_device::dsr_w));
+	m_uart[0]->rts_handler().set(m_videouart0, FUNC(scn2651_device::cts_w));
+	m_uart[0]->dtr_handler().set(m_videouart0, FUNC(scn2651_device::dsr_w));
 
 	// RS232C ports (x5)
 	const char *serial_names[5] = { "serial1", "serial2", "serial3", "serial4", "serial5" };
 	for (int i = 1; i <= 5; i++)
 	{
-		MC2661(config, m_uart[i], 5.0688_MHz_XTAL);
+		SCN2661C(config, m_uart[i], 5.0688_MHz_XTAL);
 		m_uart[i]->txd_handler().set(serial_names[i - 1], FUNC(rs232_port_device::write_txd));
 		m_uart[i]->rts_handler().set(serial_names[i - 1], FUNC(rs232_port_device::write_rts));
 		m_uart[i]->dtr_handler().set(serial_names[i - 1], FUNC(rs232_port_device::write_dtr));
-		m_uart[i]->rxrdy_handler().set_inputline(m_maincpu, M68K_IRQ_2);
-		m_uart[i]->txemt_dschg_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+		//m_uart[i]->rxrdy_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+		//m_uart[i]->txemt_dschg_handler().set_inputline(m_maincpu, M68K_IRQ_2);
 	}
 
 	// modem
-	MC2661(config, m_uart[6], 5.0688_MHz_XTAL);  // connected to modem port
-	m_uart[6]->rxrdy_handler().set_inputline(m_maincpu, M68K_IRQ_2);
-	m_uart[6]->txemt_dschg_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+	SCN2661C(config, m_uart[6], 5.0688_MHz_XTAL);  // connected to modem port
+	//m_uart[6]->rxrdy_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+	//m_uart[6]->txemt_dschg_handler().set_inputline(m_maincpu, M68K_IRQ_2);
 
 	const char *uart_names[5] = { "uart1", "uart2", "uart3", "uart4", "uart5" };
 	for (int i = 1; i <= 5; i++)
 	{
 		rs232_port_device &port(RS232_PORT(config, serial_names[i - 1], default_rs232_devices, nullptr));
-		port.rxd_handler().set(uart_names[i - 1], FUNC(mc2661_device::rx_w));
-		port.dcd_handler().set(uart_names[i - 1], FUNC(mc2661_device::dcd_w));
-		port.dsr_handler().set(uart_names[i - 1], FUNC(mc2661_device::dsr_w));
-		port.cts_handler().set(uart_names[i - 1], FUNC(mc2661_device::cts_w));
+		port.rxd_handler().set(uart_names[i - 1], FUNC(scn2661c_device::rxd_w));
+		port.dcd_handler().set(uart_names[i - 1], FUNC(scn2661c_device::dcd_w));
+		port.dsr_handler().set(uart_names[i - 1], FUNC(scn2661c_device::dsr_w));
+		port.cts_handler().set(uart_names[i - 1], FUNC(scn2661c_device::cts_w));
 	}
 
 	ls259_device &ledlatch(LS259(config, "ledlatch")); // U19 on I/O board
@@ -810,15 +811,15 @@ void wicat_state::wicat(machine_config &config)
 	INPUT_MERGER_ALL_HIGH(config, "tbreirq").output_handler().set(m_videoirq, FUNC(input_merger_device::in_w<3>));
 
 	// terminal (2x INS2651, 1x IM6042 - one of these is for the keyboard, another communicates with the main board, the third is unknown)
-	MC2661(config, m_videouart0, 5.0688_MHz_XTAL);  // the INS2651 looks similar enough to the MC2661...
-	m_videouart0->txd_handler().set(m_uart[0], FUNC(mc2661_device::rx_w));
+	SCN2651(config, m_videouart0, 5.0688_MHz_XTAL);
+	m_videouart0->txd_handler().set(m_uart[0], FUNC(scn2651_device::rxd_w));
 	m_videouart0->rxrdy_handler().set(m_videoirq, FUNC(input_merger_device::in_w<0>));
-	m_videouart0->rts_handler().set(m_uart[0], FUNC(mc2661_device::cts_w));
-	m_videouart0->dtr_handler().set(m_uart[0], FUNC(mc2661_device::dsr_w));
+	m_videouart0->rts_handler().set(m_uart[0], FUNC(scn2651_device::cts_w));
+	m_videouart0->dtr_handler().set(m_uart[0], FUNC(scn2651_device::dsr_w));
 
-	MC2661(config, m_videouart1, 5.0688_MHz_XTAL);
-	m_videouart1->set_rxc(19200);
-	m_videouart1->set_txc(19200);
+	SCN2651(config, m_videouart1, 5.0688_MHz_XTAL);
+	//m_videouart1->set_rxc(19200);
+	//m_videouart1->set_txc(19200);
 	m_videouart1->rxrdy_handler().set(m_videoirq, FUNC(input_merger_device::in_w<4>));
 
 	X2210(config, "vsram");  // XD2210

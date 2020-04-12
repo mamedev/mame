@@ -80,12 +80,10 @@ void msm5232_device::device_start()
 
 void msm5232_device::device_reset()
 {
-	int i;
-
-	for (i=0; i<8; i++)
+	for (int i=0; i<8; i++)
 	{
-		write(machine().dummy_space(), i, 0x80);
-		write(machine().dummy_space(), i, 0x00);
+		write(i, 0x80);
+		write(i, 0x00);
 	}
 	m_noise_cnt     = 0;
 	m_noise_rng     = 1;
@@ -341,7 +339,7 @@ void msm5232_device::init(int clock, int rate)
 }
 
 
-WRITE8_MEMBER( msm5232_device::write )
+void msm5232_device::write(offs_t offset, uint8_t data)
 {
 	if (offset > 0x0d)
 		return;

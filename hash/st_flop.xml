@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="st_flop" description="Atari ST disk images">
 
 	<software name="10frame" supported="no">
@@ -12,6 +15,18 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="468252">
 				<rom name="10th frame (europe).ipf" size="468252" crc="d866745b" sha1="011c930e119495a760beabf9edba16b3291a201e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1943" supported="no">
+		<description>1943 (Euro)</description>
+		<year>1987</year>
+		<publisher>Kixx</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3133369">
+				<rom name="1943.mfm" size="3133369" crc="ff64e5f9" sha1="65a442c6812245e3842fdad5e60c9ccb17b0f80d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1671,6 +1686,18 @@
 		</part>
 	</software>
 
+	<software name="fwdizzy" supported="no">
+		<description>Fantasy World Dizzy (Euro)</description>
+		<year>1991</year>
+		<publisher>Codemasters</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="2111192">
+				<rom name="fantasy world dizzy.mfm" size="2111192" crc="0e3bc56e" sha1="dd941a52b47a3c078b02c2c9ee8b566a94622a1f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ferrari" supported="no">
 		<description>Ferrari Formula One (Euro)</description>
 		<year>1989</year>
@@ -1678,14 +1705,14 @@
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
-			<dataarea name="flop" size="425552">
-				<rom name="e02431xl(1).stx" size="425552" crc="55d733c5" sha1="9c5581f80bc3c89c3bc97b907c80db99919eb4d4"/>
+			<dataarea name="flop" size="2377383">
+				<rom name="e02431xl(1).mfm" size="2377383" crc="97032905" sha1="e7448484dd03f68ccb01e8188e29404953ab28cb"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Data Disk" />
-			<dataarea name="flop" size="425040">
-				<rom name="e02431xl(2).stx" size="425040" crc="a0c353e9" sha1="f976beb1167ed203293969d8c1b3db35a4dd005d"/>
+			<dataarea name="flop" size="2377453">
+				<rom name="e02431xl(2).mfm" size="2377453" crc="1eeea420" sha1="7234349114f2bb077d4d2ba8da5e6368c6caa475"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2701,6 +2728,18 @@
 		</part>
 	</software>
 
+	<software name="leviathan" supported="no">
+		<description>Leviathan (Euro)</description>
+		<year>1987</year>
+		<publisher>English Software</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3133311">
+				<rom name="leviathan.mfm" size="3133311" crc="8ba6fcfb" sha1="340b866b34bdb99a96d4fe3784d32672c65d1165" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lightcor" supported="no">
 		<!-- SPS (CAPS) release 3297 -->
 		<description>The Light Corridor (Euro)</description>
@@ -2984,6 +3023,18 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="527932">
 				<rom name="metro-cross (europe).ipf" size="527932" crc="cd252332" sha1="7a296cb6301a0e087da4c1ee8b01e3976606dac9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midwintr" supported="no">
+		<description>Midwinter (Euro)</description>
+		<year>1992</year>
+		<publisher>Kixx XL</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="2150273">
+				<rom name="midwinter.mfm" size="2150273" crc="8486d6b0" sha1="c6500e99a3b2af9dae1cc7681ffc0c1c7f3b8061" />
 			</dataarea>
 		</part>
 	</software>
@@ -4054,6 +4105,18 @@
 		</part>
 	</software>
 
+	<software name="spidertr1" cloneof="spidertr" supported="no">
+		<description>Spidertronic (Euro, Smash 16)</description>
+		<year>1990</year>
+		<publisher>Smash 16</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3133401">
+				<rom name="spidertronic.mfm" size="3133401" crc="57607130" sha1="4dc1ee4efacd52e5ba9a5c74c3b82618783b35aa" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spitfr40" supported="no">
 		<!-- SPS (CAPS) release 3101 -->
 		<description>Spitfire 40 (Euro)</description>
@@ -4255,6 +4318,18 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="517627">
 				<rom name="strike (europe).ipf" size="517627" crc="43013dcd" sha1="98836048190c82466f39dbad065d38b0682759ce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="striker" supported="no">
+		<description>Striker (Euro)</description>
+		<year>1993</year>
+		<publisher>Gremlin Graphics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="2150288">
+				<rom name="striker.mfm" size="2150288" crc="f4145309" sha1="af26fd1b75bedd50f2a58fbb0eb4acf1f37f3d19" />
 			</dataarea>
 		</part>
 	</software>
@@ -4575,6 +4650,18 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="520242">
 				<rom name="tower of babel (europe).ipf" size="520242" crc="dc83d3fb" sha1="47e73c3522e53194cfd6ff538e2d0813682e41d5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="traksuit" supported="no">
+		<description>Track Suit Manager (Euro)</description>
+		<year>1989</year>
+		<publisher>Again Again</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="2993999">
+				<rom name="track suit manager.mfm" size="2993999" crc="4ed508ad" sha1="4e2d765b06efa87a80362439566da96f367993e0" />
 			</dataarea>
 		</part>
 	</software>

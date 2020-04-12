@@ -186,7 +186,7 @@ void tms9927_device::device_post_load()
 }
 
 
-void tms9927_device::generic_access(address_space &space, offs_t offset)
+void tms9927_device::generic_access(offs_t offset)
 {
 	switch (offset)
 	{
@@ -195,9 +195,9 @@ void tms9927_device::generic_access(address_space &space, offs_t offset)
 			if (m_selfload.found())
 			{
 				for (int cur = 0; cur < 7; cur++)
-					write(space, cur, m_selfload[cur]);
+					write(cur, m_selfload[cur]);
 				for (int cur = 0; cur < 1; cur++)
-					write(space, cur + 0xc, m_selfload[cur + 7]);
+					write(cur + 0xc, m_selfload[cur + 7]);
 			}
 			else
 				popmessage("tms9927: self-load initiated with no PROM!");
@@ -231,7 +231,7 @@ void tms9927_device::generic_access(address_space &space, offs_t offset)
 	}
 }
 
-WRITE8_MEMBER( tms9927_device::write )
+void tms9927_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -263,13 +263,13 @@ WRITE8_MEMBER( tms9927_device::write )
 			break;
 
 		default:
-			generic_access(space, offset);
+			generic_access(offset);
 			break;
 	}
 }
 
 
-READ8_MEMBER( tms9927_device::read )
+uint8_t tms9927_device::read(offs_t offset)
 {
 	switch (offset)
 	{
@@ -279,14 +279,14 @@ READ8_MEMBER( tms9927_device::read )
 
 		default:
 			if (!machine().side_effects_disabled())
-				generic_access(space, offset);
+				generic_access(offset);
 			break;
 	}
 	return 0xff;
 }
 
 
-READ_LINE_MEMBER(tms9927_device::bl_r)
+int tms9927_device::bl_r()
 {
 	return (m_reset || screen().vblank() || screen().hblank()) ? 1 : 0;
 }

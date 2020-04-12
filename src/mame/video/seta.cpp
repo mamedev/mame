@@ -306,7 +306,7 @@ TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info)
 	const u16 attr = vram[tile_index + 0x800];
 	if ((code & 0x3e00) == 0x3e00)
 		code = (code & 0xc07f) | ((m_twineagl_tilebank[(code & 0x0180) >> 7] >> 1) << 7);
-	SET_TILE_INFO_MEMBER(1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14));
+	tileinfo.set(1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14));
 }
 
 template<int Layer>
@@ -327,7 +327,7 @@ TILE_GET_INFO_MEMBER(seta_state::get_tile_info)
 		popmessage("Missing Color Mode = 1 for Layer = %d. Contact MAMETesters.", Layer);
 	}
 
-	SET_TILE_INFO_MEMBER(gfx, m_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14));
+	tileinfo.set(gfx, m_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14));
 }
 
 

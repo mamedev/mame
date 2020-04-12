@@ -227,7 +227,7 @@ TILE_GET_INFO_MEMBER(ssv_state::get_tile_info_0)
 {
 	uint16_t tile = m_gdfs_tmapram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1, tile, 0, TILE_FLIPXY( tile >> 14 ));
+	tileinfo.set(1, tile, 0, TILE_FLIPXY( tile >> 14 ));
 }
 
 WRITE16_MEMBER(ssv_state::gdfs_tmapram_w)

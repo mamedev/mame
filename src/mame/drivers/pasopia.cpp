@@ -35,7 +35,7 @@
 #include "speaker.h"
 #include "emupal.h"
 #include "screen.h"
-
+#include "softlist.h"
 
 class pasopia_state : public driver_device
 {
@@ -377,6 +377,8 @@ void pasopia_state::pasopia(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	SOFTWARE_LIST(config, "cass_list").set_original("pasopia_cass");
 }
 
 /* ROM definition */

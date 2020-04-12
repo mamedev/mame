@@ -155,7 +155,7 @@ TIMER_CALLBACK_MEMBER( sp0250_device::timer_tick )
 	m_stream->update();
 }
 
-WRITE8_MEMBER( sp0250_device::write )
+void sp0250_device::write(uint8_t data)
 {
 	m_stream->update();
 	if (m_fifo_pos != 15)

@@ -39,6 +39,8 @@ ROM_START(ieee488)
 	ROMX_LOAD("ieeefs-0.5.rom", 0x0000, 0x2000, CRC(4c2e80ee) SHA1(0bf33f0378657cf35a49f4f74be40c26ebcb9de5), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "ieee02", "IEEEFS 0.02")
 	ROMX_LOAD("ieeefs-0.2.rom", 0x0000, 0x2000, CRC(73a7960c) SHA1(86828db58e6d1d0a9aade9e73fb1fafd5b6aedff), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "ieee01", "IEEEFS 0.01")
+	ROMX_LOAD("ieeefs-0.1.rom", 0x0000, 0x2000, CRC(69dfc98d) SHA1(0d3fcb79e70cfa42eff8cc78bf29c2493898d6eb), ROM_BIOS(2))
 ROM_END
 
 //ROM_START(procyon)

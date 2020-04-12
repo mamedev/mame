@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="tg16" description="NEC Turbografx 16 cartridges">
 	<software name="aeroblst">
 		<description>Aero Blasters</description>

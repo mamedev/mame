@@ -124,14 +124,14 @@ TILE_GET_INFO_MEMBER(exedexes_state::get_bg_tile_info)
 	const u8 color = m_tilerom[tile_index + (8 * 8)];
 	const int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(exedexes_state::get_fg_tile_info)
 {
 	const u8 code = m_tilerom[tile_index];
 
-	SET_TILE_INFO_MEMBER(2, code, 0, 0);
+	tileinfo.set(2, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(exedexes_state::get_tx_tile_info)
@@ -141,7 +141,7 @@ TILE_GET_INFO_MEMBER(exedexes_state::get_tx_tile_info)
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(exedexes_state::bg_tilemap_scan)

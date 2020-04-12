@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="pi_storyreader_v2_cart" description="Publications International Ltd Story Reader 2.0 cartridges">
 
 	<software name="ts2" supported="no">

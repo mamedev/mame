@@ -109,7 +109,7 @@ protected:
 		bool flipx, flipy;
 		int x, y;
 		int zoomx, zoomy;
-		u32 primask;
+		u64 primask;
 	};
 	/* memory pointers */
 	optional_shared_ptr<u16> m_sprite_extension;
@@ -243,13 +243,13 @@ protected:
 	INTERRUPT_GEN_MEMBER(megab_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 	void core_vh_start(int sprite_type, int hide, int flip_hide);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u32 *primasks, int uses_tc360_mixer);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u64 *primasks, int uses_tc360_mixer);
 	void update_spritebanks();
 	void handle_sprite_buffering();
 	void update_sprites_active_area();
 	void draw_roz_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 priority, u8 priority_mask = 0xff);
 	void taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-	u32 code, u32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley);
+	u32 code, u32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, u64 primask = 0, bool use_mixer = false);
 
 	void cameltry_map(address_map &map);
 	void cameltrya_map(address_map &map);

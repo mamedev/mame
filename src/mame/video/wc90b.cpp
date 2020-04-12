@@ -14,7 +14,7 @@ TILE_GET_INFO_MEMBER(wc90b_state::get_bg_tile_info)
 {
 	int attr = m_bgvideoram[tile_index];
 	int tile = m_bgvideoram[tile_index + 0x800];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			 ((((attr & 3) + ((attr >> 1) & 4)))<<8) | tile | 0x800,
 			(attr >> 4) | 0x10,
 			0);
@@ -24,7 +24,7 @@ TILE_GET_INFO_MEMBER(wc90b_state::get_fg_tile_info)
 {
 	int attr = m_fgvideoram[tile_index];
 	int tile = m_fgvideoram[tile_index + 0x800];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			((((attr & 3) + ((attr >> 1) & 4)))<<8) | tile,
 			attr >> 4,
 			0);
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(wc90b_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(wc90b_state::get_tx_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_txvideoram[tile_index + 0x800] + ((m_txvideoram[tile_index] & 0x07) << 8),
 			m_txvideoram[tile_index] >> 4,
 			0);

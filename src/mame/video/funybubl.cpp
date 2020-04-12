@@ -24,7 +24,7 @@ WRITE8_MEMBER(funybubl_state::tilemap_w)
 TILE_GET_INFO_MEMBER(funybubl_state::get_tile_info)
 {
 	uint16_t const code = m_tilemapram[tile_index << 1] | (m_tilemapram[(tile_index << 1) | 1] << 8);
-	SET_TILE_INFO_MEMBER(0, code & 0x7fff, BIT(code, 15), 0);
+	tileinfo.set(0, code & 0x7fff, BIT(code, 15), 0);
 }
 
 void funybubl_state::video_start()

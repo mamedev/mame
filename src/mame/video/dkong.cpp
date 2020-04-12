@@ -435,7 +435,7 @@ TILE_GET_INFO_MEMBER(dkong_state::dkong_bg_tile_info)
 	int code = m_video_ram[tile_index] + 256 * m_gfx_bank;
 	int color = (m_color_codes[tile_index % 32 + 32 * (tile_index / 32 / 4)] & 0x0f) + 0x10 * m_palette_bank;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(dkong_state::radarscp1_bg_tile_info)
@@ -444,7 +444,7 @@ TILE_GET_INFO_MEMBER(dkong_state::radarscp1_bg_tile_info)
 	int color = (m_color_codes[tile_index % 32] & 0x0f);
 	color = color | (m_palette_bank<<4);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 /***************************************************************************

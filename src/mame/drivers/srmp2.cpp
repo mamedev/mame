@@ -240,12 +240,12 @@ WRITE_LINE_MEMBER(srmp2_state::adpcm_int)
 			}
 			else
 			{
-				m_msm->write_data(((m_adpcm_data >> 4) & 0x0f));
+				m_msm->data_w((m_adpcm_data >> 4) & 0x0f);
 			}
 		}
 		else
 		{
-			m_msm->write_data(((m_adpcm_data >> 0) & 0x0f));
+			m_msm->data_w((m_adpcm_data >> 0) & 0x0f);
 			m_adpcm_sptr++;
 			m_adpcm_data = -1;
 		}

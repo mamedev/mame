@@ -183,7 +183,7 @@ WRITE8_MEMBER( eti660_state::dma_w )
 	else
 		m_color = m_p_videoram[offset] ? 7 : 0;
 
-	m_cti->dma_w(space, offset, data);
+	m_cti->dma_w(data);
 }
 
 /* PIA6821 Interface */

@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
-<!-- Pinball Machine, Bally ~ Template -17 MPU board -->
+<!--
+license:CC0
+copyright-holders:Robbbert, Quench
 
-<!-- 2014-07-26: Initial version.  [Robbbert] -->
-<!-- 2015-August: Added Lamp states, Solenoid states, Switch Matrix and a kit of playfield objects.  [Quench] -->
+Pinball Machine, Bally ~ Template -17 MPU board
 
-
-<!-- Any state="9" items are not displayed and are only used for object alignment -->
+Any state="9" items are not displayed and are only used for object alignment
+-->
 
 <mamelayout version="2">
 

@@ -154,7 +154,7 @@ TILE_GET_INFO_MEMBER(m92_state::get_pf_tile_info)
 	attrib = m_vram_data[tile_index + 1];
 	tile = m_vram_data[tile_index] + ((attrib & 0x8000) << 1);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			attrib & 0x7f,
 			TILE_FLIPYX(attrib >> 9));

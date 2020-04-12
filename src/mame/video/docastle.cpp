@@ -99,7 +99,7 @@ TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
 	int code = m_videoram[tile_index] + 8 * (m_colorram[tile_index] & 0x20);
 	int color = m_colorram[tile_index] & 0x1f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void docastle_state::video_start_common( uint32_t tile_transmask )

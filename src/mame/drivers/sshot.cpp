@@ -207,7 +207,7 @@ private:
 TILE_GET_INFO_MEMBER(supershot_state::get_supershot_text_tile_info)
 {
 	uint8_t code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 void supershot_state::video_start()

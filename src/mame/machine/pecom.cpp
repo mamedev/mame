@@ -46,22 +46,22 @@ void pecom_state::machine_reset()
 
 READ8_MEMBER(pecom_state::pecom_cdp1869_charram_r)
 {
-	return m_cdp1869->char_ram_r(space, offset);
+	return m_cdp1869->char_ram_r(offset);
 }
 
 WRITE8_MEMBER(pecom_state::pecom_cdp1869_charram_w)
 {
-	return m_cdp1869->char_ram_w(space, offset, data);
+	return m_cdp1869->char_ram_w(offset, data);
 }
 
 READ8_MEMBER(pecom_state::pecom_cdp1869_pageram_r)
 {
-	return m_cdp1869->page_ram_r(space, offset);
+	return m_cdp1869->page_ram_r(offset);
 }
 
 WRITE8_MEMBER(pecom_state::pecom_cdp1869_pageram_w)
 {
-	return m_cdp1869->page_ram_w(space, offset, data);
+	return m_cdp1869->page_ram_w(offset, data);
 }
 
 WRITE8_MEMBER(pecom_state::pecom_bank_w)

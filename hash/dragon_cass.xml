@@ -1,17 +1,19 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Dragon 32/64 cassettes -->
+Dragon 32/64 cassettes
 
-<!-- Loading Instructions:
+    Loading Instructions:
 
       Most software can be loaded with either:
         CLOAD then RUN or CLOADM then EXEC
 
       Additional loading instructions to be added for each title at a later date.
--->
 
-<!-- This list was compiled from the archive at http://archive.worldofdragon.org/archive/index.php?dir=Tapes/Dragon/cas/ as of 26/03/2017. -->
+This list was compiled from the archive at http://archive.worldofdragon.org/archive/index.php?dir=Tapes/Dragon/cas/ as of 26/03/2017.
+-->
 
 <softwarelist name="dragon_cass" description="Dragon 32/64 cassettes">
 

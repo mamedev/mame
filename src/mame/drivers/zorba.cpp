@@ -89,7 +89,7 @@ void zorba_state::zorba_io(address_map &map)
 	map(0x22, 0x23).rw(m_uart1, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x24, 0x25).rw(m_uart2, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x26, 0x26).w(FUNC(zorba_state::intmask_w));
-	map(0x30, 0x30).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x30, 0x30).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x40, 0x43).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	map(0x50, 0x53).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x60, 0x63).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -188,7 +188,7 @@ void zorba_state::zorba(machine_config &config)
 	// port B - parallel interface
 	PIA6821(config, m_pia0, 0);
 	m_pia0->writepa_handler().set(FUNC(zorba_state::pia0_porta_w));
-	m_pia0->writepb_handler().set("parprndata", FUNC(output_latch_device::bus_w));
+	m_pia0->writepb_handler().set("parprndata", FUNC(output_latch_device::write));
 	m_pia0->cb2_handler().set("parprn", FUNC(centronics_device::write_strobe));
 
 	// IEEE488 interface

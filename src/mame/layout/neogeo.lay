@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 	<element name="white">
 		<rect><color red="1" green="1" blue="1" /></rect>

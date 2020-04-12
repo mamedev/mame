@@ -114,7 +114,7 @@ TILE_GET_INFO_MEMBER(ladybug_video_device::get_bg_tile_info)
 	int const code = m_bg_ram[tile_index] + (BIT(m_bg_ram[0x0400 | tile_index], 3) << 8);
 	int const color = m_bg_ram[0x0400 | tile_index] & 0x07;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -393,13 +393,13 @@ TILE_GET_INFO_MEMBER(sraider_state::get_grid_tile_info)
 {
 	if (tile_index < 512)
 	{
-		SET_TILE_INFO_MEMBER(3, tile_index, 0, 0);
+		tileinfo.set(3, tile_index, 0, 0);
 	}
 	else
 	{
 		int temp = tile_index / 32;
 		tile_index = (31 - temp) * 32 + (tile_index % 32);
-		SET_TILE_INFO_MEMBER(4, tile_index, 0, 0);
+		tileinfo.set(4, tile_index, 0, 0);
 	}
 }
 

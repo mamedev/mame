@@ -21,10 +21,12 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
-		m_ppi8255_0(*this, "ppi8255_0"),
-		m_ppi8255_1(*this, "ppi8255_1"),
+		m_ppi8255(*this, "ppi8255%d", 0),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram")
+		m_colorram(*this, "colorram"),
+		m_mux(*this, "MUX%u", 0),
+		m_proms(*this, "proms"),
+		m_gfxroms(*this, "gfx")
 	{ }
 
 	void dribling(machine_config &config);
@@ -34,16 +36,18 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	/* devices */
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
-	optional_device<i8255_device>  m_ppi8255_0;
-	optional_device<i8255_device>  m_ppi8255_1;
-	/* memory pointers */
+	required_device_array<i8255_device, 2>  m_ppi8255;
+	// memory pointers
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
+	required_ioport_array<3> m_mux;
+	required_region_ptr<uint8_t> m_proms;
+	required_region_ptr<uint8_t> m_gfxroms;
 
-	/* misc */
+	// misc
 	uint8_t    m_abca;
 	uint8_t    m_dr;
 	uint8_t    m_ds;
@@ -51,19 +55,19 @@ private:
 	uint8_t    m_input_mux;
 	uint8_t    m_di;
 
-	DECLARE_READ8_MEMBER(ioread);
-	DECLARE_WRITE8_MEMBER(iowrite);
-	DECLARE_WRITE8_MEMBER(dribling_colorram_w);
-	DECLARE_READ8_MEMBER(dsr_r);
-	DECLARE_READ8_MEMBER(input_mux0_r);
-	DECLARE_WRITE8_MEMBER(misc_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(pb_w);
-	DECLARE_WRITE8_MEMBER(shr_w);
-	void dribling_palette(palette_device &palette) const;
-	uint32_t screen_update_dribling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(dribling_irq_gen);
-	void dribling_map(address_map &map);
+	uint8_t ioread(offs_t offset);
+	void iowrite(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	uint8_t dsr_r();
+	uint8_t input_mux0_r();
+	void misc_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void pb_w(uint8_t data);
+	void shr_w(uint8_t data);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(irq_gen);
+	void prg_map(address_map &map);
 	void io_map(address_map &map);
 };
 

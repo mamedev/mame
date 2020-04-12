@@ -16,11 +16,11 @@ namespace netlist
 	NETLIB_OBJECT(82S115)
 	{
 		NETLIB_CONSTRUCTOR(82S115)
-		, m_A(*this, {{"A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"}})
+		, m_A(*this, {"A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"})
 		, m_CE1Q(*this, "CE1Q")
 		, m_CE2(*this, "CE2")
 		, m_STROBE(*this, "STROBE")
-		, m_O(*this, {{"O1", "O2", "O3", "O4", "O5", "O6", "O7", "O8"}})
+		, m_O(*this, {"O1", "O2", "O3", "O4", "O5", "O6", "O7", "O8"})
 		, m_last_O(*this, "m_last_O", 0)
 		, m_ROM(*this, "ROM")
 		, m_power_pins(*this)

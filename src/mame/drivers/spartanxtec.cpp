@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(spartanxtec_state::get_kungfum_bg_tile_info)
 	{
 		flags |= TILE_FLIPX;
 	}
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0)<< 2), color & 0x1f, flags);
+	tileinfo.set(0, code | ((color & 0xc0)<< 2), color & 0x1f, flags);
 
 	/* is the following right? */
 	if ((tile_index / 64) < 6 || ((color & 0x1f) >> 1) > 0x0c)

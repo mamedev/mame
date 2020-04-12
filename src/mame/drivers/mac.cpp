@@ -73,6 +73,7 @@
 #include "bus/nubus/nubus_m2video.h"
 #include "bus/nubus/bootbug.h"
 #include "bus/nubus/quadralink.h"
+#include "bus/nubus/laserview.h"
 #include "bus/nubus/pds30_cb264.h"
 #include "bus/nubus/pds30_procolor816.h"
 #include "bus/nubus/pds30_sigmalview.h"
@@ -881,6 +882,7 @@ static void mac_nubus_cards(device_slot_interface &device)
 	device.option_add("enetnb", NUBUS_APPLEENET);   /* Apple NuBus Ethernet */
 	device.option_add("bootbug", NUBUS_BOOTBUG);    /* Brigent BootBug debugger card */
 	device.option_add("quadralink", NUBUS_QUADRALINK);  /* AE Quadralink serial card */
+	device.option_add("laserview", NUBUS_LASERVIEW);  /* Sigma Designs LaserView monochrome video card */
 }
 
 static void mac_pds030_cards(device_slot_interface &device)

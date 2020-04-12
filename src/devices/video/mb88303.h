@@ -45,12 +45,12 @@ public:
 	auto vobn_callback() { return m_write_vobn.bind(); }
 	auto do_callback() { return m_write_do.bind(); }
 
-	DECLARE_WRITE8_MEMBER(da_w);
-	DECLARE_WRITE_LINE_MEMBER(adm_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_n_w);
-	DECLARE_WRITE_LINE_MEMBER(ldi_w);
-	DECLARE_WRITE_LINE_MEMBER(hsync_n_w);
-	DECLARE_WRITE_LINE_MEMBER(vsync_n_w);
+	void da_w(uint8_t data);
+	void adm_w(int state);
+	void reset_n_w(int state);
+	void ldi_w(int state);
+	void hsync_n_w(int state);
+	void vsync_n_w(int state);
 
 	void update_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

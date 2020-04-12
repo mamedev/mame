@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(mcr68_state::get_bg_tile_info)
 	int data = LOW_BYTE(videoram[tile_index * 2]) | (LOW_BYTE(videoram[tile_index * 2 + 1]) << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0xc00);
 	int color = (~data >> 12) & 3;
-	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX(data >> 10));
+	tileinfo.set(0, code, color, TILE_FLIPYX(data >> 10));
 	if (m_gfxdecode->gfx(0)->elements() < 0x1000)
 		tileinfo.category = (data >> 15) & 1;
 }

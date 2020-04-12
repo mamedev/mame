@@ -883,7 +883,10 @@ void pc_state::ncrpc4i(machine_config & config)
 
 ROM_START( ncrpc4i )
 	ROM_REGION(0x10000,"bios", 0)
-	ROM_LOAD("ncr_pc4i_biosrom_1985.bin",0xc000, 0x4000, CRC(b9732648) SHA1(0d5d96fbc36089ca4d893b0db84faffa8043a5e4))
+	ROM_SYSTEM_BIOS(0, "v22", "V2.2") // this machine came with a "Intersil Display Adapter Color III", probably aftermarket, there's no card BIOS, just a chargen ROM
+	ROMX_LOAD("ncr_pc4i_43928.bin",0xc000, 0x4000, CRC(e66a46b9) SHA1(f74f8f9226325d2a8b927de3847449db4c907b1d), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v23", "2.3") // this machine came with a NCR graphics card with a card BIOS and a chargen ROM
+	ROMX_LOAD("ncr_pc4i_biosrom_1985.bin",0xc000, 0x4000, CRC(b9732648) SHA1(0d5d96fbc36089ca4d893b0db84faffa8043a5e4), ROM_BIOS(1))
 ROM_END
 
 

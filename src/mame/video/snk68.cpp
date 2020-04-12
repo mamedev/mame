@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(snk68_state::get_tile_info)
 	int tile = m_fg_tile_offset + (m_fg_videoram[2*tile_index] & 0xff);
 	int color = m_fg_videoram[2*tile_index+1] & 0x07;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(searchar_state::get_tile_info)
@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(searchar_state::get_tile_info)
 	// used in the ikari3 intro
 	int flags = (data & 0x8000) ? TILE_FORCE_LAYER0 : 0;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, flags);
+	tileinfo.set(0, tile, color, flags);
 }
 
 /***************************************************************************

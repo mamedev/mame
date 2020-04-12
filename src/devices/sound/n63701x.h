@@ -18,7 +18,7 @@ class namco_63701x_device : public device_t,
 public:
 	namco_63701x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(namco_63701x_w);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

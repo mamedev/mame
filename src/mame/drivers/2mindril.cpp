@@ -76,7 +76,7 @@ private:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	//INTERRUPT_GEN_MEMBER(drill_device_irq);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void irqhandler(int state);
 
 	void drill_map(address_map &map);
 
@@ -330,7 +330,7 @@ INTERRUPT_GEN_MEMBER(_2mindril_state::drill_device_irq)
 #endif
 
 /* WRONG,it does something with 60000c & 700002,likely to be called when the player throws the ball.*/
-WRITE_LINE_MEMBER(_2mindril_state::irqhandler)
+void _2mindril_state::irqhandler(int state)
 {
 //  m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
 }

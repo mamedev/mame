@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 
-<!-- define elements -->
+	<!-- define elements -->
 
 	<element name="digit" defstate="0">
 		<led7seg><color red="1.0" green="0.3" blue="0.2" /></led7seg>
@@ -29,7 +32,7 @@
 	</element>
 
 
-<!-- build screen -->
+	<!-- build screen -->
 
 	<view name="Internal Layout">
 		<bounds left="0" right="93.5" top="0" bottom="15" />
@@ -46,7 +49,7 @@
 		<bezel name="digit6" element="digit"><bounds x="60" y="0" width="10" height="15" /></bezel>
 		<bezel name="digit7" element="digit"><bounds x="70" y="0" width="10" height="15" /></bezel>
 
-<!-- math symbols custom digit -->
+		<!-- math symbols custom digit -->
 
 		<bezel name="2.4" element="seg_rect"><bounds x="21.5" y="7.25" width="7" height="0.5" /></bezel>
 

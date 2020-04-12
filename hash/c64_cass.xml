@@ -1,9 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- The majority of this list was sourced from The Ultimate Tape Archive V1.0 released 11th December 2018. -->
-<!-- Some others are based on c64tapes.org dumps -->
-<!-- Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/index.htm -->
+The majority of this list was sourced from The Ultimate Tape Archive V1.0 released 11th December 2018.
+Some others are based on c64tapes.org dumps
+Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/index.htm
+-->
 
 <softwarelist name="c64_cass" description="Commodore 64 cassettes">
 

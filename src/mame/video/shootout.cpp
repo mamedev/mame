@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(shootout_state::get_bg_tile_info)
 	int tile_number = m_videoram[tile_index] + 256*(attributes&7);
 	int color = attributes>>4;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile_number,
 			color,
 			0);
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(shootout_state::get_fg_tile_info)
 	int tile_number = m_textram[tile_index] + 256*(attributes&0x3);
 	int color = attributes>>4;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			color,
 			0);

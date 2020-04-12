@@ -24,7 +24,7 @@ namespace netlist
 	NETLIB_OBJECT(7497)
 	{
 		NETLIB_CONSTRUCTOR(7497)
-		, m_B(*this, {{"B5", "B4", "B3", "B2", "B1", "B0"}})
+		, m_B(*this, {"B5", "B4", "B3", "B2", "B1", "B0"})
 		, m_CLK(*this, "CLK", NETLIB_DELEGATE(7497, clk_strb))
 		, m_STRBQ(*this, "STRBQ", NETLIB_DELEGATE(7497, clk_strb))
 		, m_ENQ(*this, "ENQ")

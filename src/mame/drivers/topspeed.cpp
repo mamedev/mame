@@ -275,7 +275,7 @@ void topspeed_state::msm5205_update(int chip)
 
 	const u8 data = m_msm_rom[chip][m_msm_pos[chip]];
 
-	m_msm[chip]->write_data((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
+	m_msm[chip]->data_w((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
 
 	if (m_msm_nibble[chip])
 		++m_msm_pos[chip];

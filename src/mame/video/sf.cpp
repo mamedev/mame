@@ -15,7 +15,7 @@ TILE_GET_INFO_MEMBER(sf_state::get_bg_tile_info)
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000 + 1] << 8) | base[1];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			color,
 			TILE_FLIPYX(attr & 3));
@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(sf_state::get_fg_tile_info)
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000 + 1] << 8) | base[1];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			color,
 			TILE_FLIPYX(attr & 3));
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(sf_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(sf_state::get_tx_tile_info)
 {
 	int code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			code & 0x3ff,
 			code>>12,
 			TILE_FLIPYX((code & 0xc00)>>10));

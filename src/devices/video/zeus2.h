@@ -107,8 +107,8 @@ public:
 	zeus2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ32_MEMBER( zeus2_r );
-	DECLARE_WRITE32_MEMBER( zeus2_w );
+	uint32_t zeus2_r(offs_t offset);
+	void zeus2_w(offs_t offset, uint32_t data);
 	TIMER_CALLBACK_MEMBER(display_irq_off);
 	TIMER_CALLBACK_MEMBER(display_irq);
 

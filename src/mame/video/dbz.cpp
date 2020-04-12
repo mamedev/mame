@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg2_tile_info)
 	colour = (m_bg2_videoram[tile_index * 2] & 0x000f);
 	flag = (m_bg2_videoram[tile_index * 2] & 0x0080) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour + (m_layer_colorbase[5] << 1), flag);
+	tileinfo.set(0, tileno, colour + (m_layer_colorbase[5] << 1), flag);
 }
 
 WRITE16_MEMBER(dbz_state::dbz_bg1_videoram_w)
@@ -68,7 +68,7 @@ TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg1_tile_info)
 	colour = (m_bg1_videoram[tile_index * 2] & 0x000f);
 	flag = (m_bg1_videoram[tile_index * 2] & 0x0080) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, tileno, colour + (m_layer_colorbase[4] << 1), flag);
+	tileinfo.set(1, tileno, colour + (m_layer_colorbase[4] << 1), flag);
 }
 
 void dbz_state::video_start()

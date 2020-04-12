@@ -264,7 +264,7 @@ TILE_GET_INFO_MEMBER(mappy_state::superpac_get_tile_info)
 
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[tile_index],
 			attr & 0x3f,
 			0);
@@ -276,7 +276,7 @@ TILE_GET_INFO_MEMBER(mappy_state::phozon_get_tile_info)
 
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[tile_index] + ((attr & 0x80) << 1),
 			attr & 0x3f,
 			0);
@@ -288,7 +288,7 @@ TILE_GET_INFO_MEMBER(mappy_state::mappy_get_tile_info)
 
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[tile_index],
 			attr & 0x3f,
 			0);

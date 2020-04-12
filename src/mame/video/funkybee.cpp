@@ -74,7 +74,7 @@ TILE_GET_INFO_MEMBER(funkybee_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x80) << 1);
 	int color = m_colorram[tile_index] & 0x03;
 
-	SET_TILE_INFO_MEMBER(m_gfx_bank, code, color, 0);
+	tileinfo.set(m_gfx_bank, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(funkybee_state::funkybee_tilemap_scan)

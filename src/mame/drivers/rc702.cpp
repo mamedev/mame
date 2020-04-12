@@ -32,8 +32,8 @@ Issues:
 #include "machine/keyboard.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
 #include "machine/z80pio.h"
+#include "machine/z80sio.h"
 #include "sound/beep.h"
 #include "video/i8275.h"
 

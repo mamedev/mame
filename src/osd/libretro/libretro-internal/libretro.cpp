@@ -68,7 +68,7 @@ retro_log_printf_t log_cb;
 
 static bool draw_this_frame;
 
-//FIXME: re-add way to handle 16/32 bit 
+//FIXME: re-add way to handle 16/32 bit
 #ifdef M16B
 uint16_t videoBuffer[4096*3072];
 #define LOG_PIXEL_BYTES 1
@@ -316,7 +316,7 @@ video_changed=true;
          alternate_renderer = true;
 	video_changed=true;
 	NEWGAME_FROM_OSD=1;
-		
+
    }
 
    var.key   = option_osd;
@@ -414,7 +414,7 @@ video_changed=true;
       if (!strcmp(var.value, "enabled"))
          write_config_enable = true;
    }
-   
+
    var.key   = option_mame_paths;
    var.value = NULL;
 
@@ -565,7 +565,7 @@ void retro_init (void)
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY, &save_dir) && save_dir)
    {
-      /* If save directory is defined use it, 
+      /* If save directory is defined use it,
        * otherwise use system directory. */
       retro_save_directory = *save_dir ? save_dir : retro_system_directory;
 
@@ -573,7 +573,7 @@ void retro_init (void)
    else
    {
       /* make retro_save_directory the same,
-       * in case RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY 
+       * in case RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY
        * is not implemented by the frontend. */
       retro_save_directory=retro_system_directory;
    }
@@ -707,22 +707,22 @@ void retro_unload_game(void)
 size_t retro_serialize_size(void)
 {
 	if ( mame_machine_manager::instance() != NULL && mame_machine_manager::instance()->machine() != NULL &&
-			mame_machine_manager::instance()->machine()->save().state_size() > 0)
-		return mame_machine_manager::instance()->machine()->save().state_size();
+			ram_state::get_size(mame_machine_manager::instance()->machine()->save()) > 0)
+		return ram_state::get_size(mame_machine_manager::instance()->machine()->save());
 	return 0;
 }
 bool retro_serialize(void *data, size_t size)
 {
 	if ( mame_machine_manager::instance() != NULL && mame_machine_manager::instance()->machine() != NULL &&
-			mame_machine_manager::instance()->machine()->save().state_size() > 0)
-		return (mame_machine_manager::instance()->machine()->save().write_data(data, size) == STATERR_NONE);
+			ram_state::get_size(mame_machine_manager::instance()->machine()->save()) > 0)
+		return (mame_machine_manager::instance()->machine()->save().write_buffer((u8*)data, size) == STATERR_NONE);
 	return false;
 }
-bool retro_unserialize(const void * data, size_t size)
+bool retro_unserialize(const void *data, size_t size)
 {
 	if ( mame_machine_manager::instance() != NULL && mame_machine_manager::instance()->machine() != NULL &&
-			mame_machine_manager::instance()->machine()->save().state_size() > 0)
-		return (mame_machine_manager::instance()->machine()->save().read_data((void*)data, size) == STATERR_NONE);
+			ram_state::get_size(mame_machine_manager::instance()->machine()->save()) > 0)
+		return (mame_machine_manager::instance()->machine()->save().read_buffer((u8*)data, size) == STATERR_NONE);
 	return false;
 }
 

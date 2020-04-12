@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(twincobr_state::get_bg_tile_info)
 	const u16 code = m_bgvideoram16[tile_index+m_bg_ram_bank];
 	const u32 tile_number = code & 0x0fff;
 	const u32 color = (code & 0xf000) >> 12;
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile_number,
 			color,
 			0);
@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(twincobr_state::get_fg_tile_info)
 	const u16 code = m_fgvideoram16[tile_index];
 	const u32 tile_number = (code & 0x0fff) | m_fg_rom_bank;
 	const u32 color = (code & 0xf000) >> 12;
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile_number,
 			color,
 			0);
@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(twincobr_state::get_tx_tile_info)
 	const u16 code = m_txvideoram16[tile_index];
 	const u32 tile_number = code & 0x07ff;
 	const u32 color = (code & 0xf800) >> 11;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			color,
 			0);

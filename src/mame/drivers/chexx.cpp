@@ -143,7 +143,7 @@ READ8_MEMBER(chexx_state::via_b_in)
 WRITE8_MEMBER(chexx_state::via_a_out)
 {
 	m_port_a = data;    // multiplexer
-	m_digitalker->digitalker_data_w(space, 0, data, 0);
+	m_digitalker->digitalker_data_w(data);
 //  logerror("%s: VIA write A = %02X\n", machine().describe_context(), data);
 }
 

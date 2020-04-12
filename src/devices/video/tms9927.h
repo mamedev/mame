@@ -28,10 +28,10 @@ public:
 	}
 	void set_visarea(s16 minx, s16 maxx, s16 miny, s16 maxy) { m_custom_visarea.set(minx, maxx, miny, maxy); }
 
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(read);
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
 
-	DECLARE_READ_LINE_MEMBER(bl_r);
+	int bl_r();
 
 	bool screen_reset() const { return m_reset; }
 	int upscroll_offset() const { return m_start_datarow; }
@@ -56,7 +56,7 @@ private:
 	};
 
 	void recompute_parameters(bool postload);
-	void generic_access(address_space &space, offs_t offset);
+	void generic_access(offs_t offset);
 
 	devcb_write_line m_write_vsyn;
 	devcb_write_line m_write_hsyn;

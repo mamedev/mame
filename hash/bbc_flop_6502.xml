@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Acorn BBC Micro - 6502 2nd Processor Discs -->
+Acorn BBC Micro - 6502 2nd Processor Discs
 
-<!-- Loading Instructions:
+    Loading Instructions:
 
       Hold down the SHIFT key and press and release the BREAK key.
 -->

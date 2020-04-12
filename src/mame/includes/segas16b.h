@@ -67,6 +67,8 @@ public:
 		, m_hwc_monitor(*this, "MONITOR")
 		, m_hwc_left(*this, "LEFT")
 		, m_hwc_right(*this, "RIGHT")
+		, m_hwc_left_limit(*this, "LEFT_LIMIT")
+		, m_hwc_right_limit(*this, "RIGHT_LIMIT")
 		, m_mj_input_num(0)
 		, m_mj_last_val(0)
 		, m_mj_inputs(*this, "MJ%u", 0U)
@@ -271,6 +273,8 @@ protected:
 	optional_ioport     m_hwc_monitor;
 	optional_ioport     m_hwc_left;
 	optional_ioport     m_hwc_right;
+	optional_ioport     m_hwc_left_limit;
+	optional_ioport     m_hwc_right_limit;
 	uint8_t               m_mj_input_num;
 	uint8_t               m_mj_last_val;
 	optional_ioport_array<6> m_mj_inputs;

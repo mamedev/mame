@@ -69,24 +69,25 @@ public:
 
 	void a7150(machine_config &config);
 
-private:
+protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
+private:
 	DECLARE_READ8_MEMBER(a7150_kgs_r);
 	DECLARE_WRITE8_MEMBER(a7150_kgs_w);
 
-	DECLARE_WRITE_LINE_MEMBER(a7150_tmr2_w);
-	DECLARE_WRITE8_MEMBER(ppi_c_w);
+	void a7150_tmr2_w(int state);
+	void ppi_c_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(ifss_write_txd);
-	DECLARE_WRITE_LINE_MEMBER(ifss_write_dtr);
+	void ifss_write_txd(int state);
+	void ifss_write_dtr(int state);
 
-	DECLARE_READ8_MEMBER(kgs_host_r);
-	DECLARE_WRITE8_MEMBER(kgs_host_w);
-	DECLARE_WRITE_LINE_MEMBER(kgs_iml_w);
-	DECLARE_WRITE_LINE_MEMBER(ifss_loopback_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t kgs_host_r(offs_t offset);
+	void kgs_host_w(offs_t offset, uint8_t data);
+	void kgs_iml_w(int state);
+	void ifss_loopback_w(int state);
+	void kbd_put(uint8_t data);
 	void kgs_memory_remap();
 
 	bool m_kgs_msel, m_kgs_iml;
@@ -137,24 +138,24 @@ uint32_t a7150_state::screen_update_k7072(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-WRITE_LINE_MEMBER(a7150_state::kgs_iml_w)
+void a7150_state::kgs_iml_w(int state)
 {
 	m_kgs_iml = !state;
 	kgs_memory_remap();
 }
 
-WRITE_LINE_MEMBER(a7150_state::a7150_tmr2_w)
+void a7150_state::a7150_tmr2_w(int state)
 {
 	m_uart8251->write_rxc(state);
 	m_uart8251->write_txc(state);
 }
 
-WRITE_LINE_MEMBER(a7150_state::ifss_loopback_w)
+void a7150_state::ifss_loopback_w(int state)
 {
 	m_ifss_loopback = !state;
 }
 
-WRITE_LINE_MEMBER(a7150_state::ifss_write_txd)
+void a7150_state::ifss_write_txd(int state)
 {
 	if (m_ifss_loopback)
 		m_uart8251->write_rxd(state);
@@ -162,7 +163,7 @@ WRITE_LINE_MEMBER(a7150_state::ifss_write_txd)
 		m_rs232->write_txd(state);
 }
 
-WRITE_LINE_MEMBER(a7150_state::ifss_write_dtr)
+void a7150_state::ifss_write_dtr(int state)
 {
 	if (m_ifss_loopback)
 		m_uart8251->write_dsr(state);
@@ -170,7 +171,7 @@ WRITE_LINE_MEMBER(a7150_state::ifss_write_dtr)
 		m_rs232->write_dtr(state);
 }
 
-WRITE8_MEMBER(a7150_state::ppi_c_w)
+void a7150_state::ppi_c_w(uint8_t data)
 {
 	// b0 -- INTR(B)
 	// b1 -- /OBF(B)
@@ -183,7 +184,7 @@ WRITE8_MEMBER(a7150_state::ppi_c_w)
 #define KGS_ST_INT  0x04
 #define KGS_ST_ERR  0x80
 
-READ8_MEMBER(a7150_state::kgs_host_r)
+uint8_t a7150_state::kgs_host_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -218,7 +219,7 @@ READ8_MEMBER(a7150_state::kgs_host_r)
 	return data;
 }
 
-WRITE8_MEMBER(a7150_state::kgs_host_w)
+void a7150_state::kgs_host_w(offs_t offset, uint8_t data)
 {
 	if (0) logerror("%s: kgs %d <- %02x '%c', ctrl %02x\n", machine().describe_context(), offset, data,
 			 (data > 0x1f && data < 0x7f) ? data : 0x20, m_kgs_ctrl);
@@ -254,7 +255,7 @@ WRITE8_MEMBER(a7150_state::kgs_host_w)
 	}
 }
 
-WRITE8_MEMBER(a7150_state::kbd_put)
+void a7150_state::kbd_put(uint8_t data)
 {
 	m_kgs_datai = data;
 	m_kgs_ctrl |= KGS_ST_OBF | KGS_ST_INT;
@@ -484,8 +485,8 @@ void a7150_state::a7150(machine_config &config)
 
 	// IFSP port on processor card
 	i8255_device &ppi(I8255(config, "ppi8255"));
-//  ppi.in_pa_callback().set("cent_status_in", FUNC(input_buffer_device::bus_r));
-//  ppi.out_pb_callback().set("cent_data_out", output_latch_device::bus_w));
+//  ppi.in_pa_callback().set("cent_status_in", FUNC(input_buffer_device::read));
+//  ppi.out_pb_callback().set("cent_data_out", output_latch_device::write));
 	ppi.out_pc_callback().set(FUNC(a7150_state::ppi_c_w));
 
 	PIT8253(config, m_pit8253, 0);

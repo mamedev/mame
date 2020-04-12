@@ -13,19 +13,18 @@ class tlcs90_device : public cpu_device
 	static constexpr int MAX_PORTS = 9;
 	//static constexpr int MAX_ANALOG_INPUTS = 16;
 
-public:
-	DECLARE_READ8_MEMBER( t90_internal_registers_r );
-	DECLARE_WRITE8_MEMBER( t90_internal_registers_w );
-
+protected:
 	TIMER_CALLBACK_MEMBER( t90_timer_callback );
 	TIMER_CALLBACK_MEMBER( t90_timer4_callback );
 
+	void tmp90840_regs(address_map &map);
 	void tmp90840_mem(address_map &map);
 	void tmp90841_mem(address_map &map);
+	void tmp90844_regs(address_map &map);
 	void tmp90ph44_mem(address_map &map);
 	void tmp91640_mem(address_map &map);
 	void tmp91641_mem(address_map &map);
-protected:
+
 	enum _e_op {    UNKNOWN,    NOP,    EX,     EXX,    LD,     LDW,    LDA,    LDI,    LDIR,   LDD,    LDDR,   CPI,    CPIR,   CPD,    CPDR,   PUSH,   POP,    JP,     JR,     CALL,   CALLR,      RET,    RETI,   HALT,   DI,     EI,     SWI,    DAA,    CPL,    NEG,    LDAR,   RCF,    SCF,    CCF,    TSET,   BIT,    SET,    RES,    INC,    DEC,    INCX,   DECX,   INCW,   DECW,   ADD,    ADC,    SUB,    SBC,    AND,    XOR,    OR,     CP,     RLC,    RRC,    RL,     RR,     SLA,    SRA,    SLL,    SRL,    RLD,    RRD,    DJNZ,   MUL,    DIV     };
 
 
@@ -56,6 +55,47 @@ protected:
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+	// internal registers
+	uint8_t p3_r();
+	void p3_w(uint8_t data);
+	uint8_t p4_r();
+	void p4_w(uint8_t data);
+	void p4cr_w(uint8_t data);
+	uint8_t p5_r();
+	uint8_t p6_r();
+	void p6_w(uint8_t data);
+	uint8_t p7_r();
+	void p7_w(uint8_t data);
+	void p67cr_w(uint8_t data);
+	uint8_t p8_r();
+	void p8_w(uint8_t data);
+	void p8cr_w(uint8_t data);
+	uint8_t smmod_r();
+	void smmod_w(uint8_t data);
+	uint8_t tmod_r();
+	void tmod_w(uint8_t data);
+	uint8_t tclk_r();
+	void tclk_w(uint8_t data);
+	uint8_t t01mod_r();
+	void t01mod_w(uint8_t data);
+	uint8_t t23mod_r();
+	void t23mod_w(uint8_t data);
+	void treg_8bit_w(offs_t offset, uint8_t data);
+	uint8_t t4mod_r();
+	void t4mod_w(uint8_t data);
+	void treg_16bit_w(offs_t offset, uint8_t data);
+	uint8_t trun_r();
+	void trun_w(uint8_t data);
+	void intel_w(uint8_t data);
+	void inteh_w(uint8_t data);
+	void irf_clear_w(uint8_t data);
+	uint8_t bx_r();
+	void bx_w(uint8_t data);
+	uint8_t by_r();
+	void by_w(uint8_t data);
+	uint8_t reserved_r(offs_t offset);
+	void reserved_w(offs_t offset, uint8_t data);
 
 private:
 	enum class e_mode : u8 {

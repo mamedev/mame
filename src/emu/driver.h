@@ -87,7 +87,7 @@ public:
 	virtual ~driver_device();
 
 	// getters
-	const game_driver &system() const { assert(m_system != nullptr); return *m_system; }
+	const game_driver &system() const { return m_system; }
 
 	// indexes into our generic callbacks
 	enum callback_type
@@ -100,7 +100,6 @@ public:
 	};
 
 	// inline configuration helpers
-	void set_game_driver(const game_driver &game);
 	static void static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback);
 
 	// dummy driver_init callback
@@ -139,6 +138,8 @@ public:
 	void irq7_line_hold(device_t &device);
 	void irq7_line_assert(device_t &device);
 
+	virtual std::vector<std::string> searchpath() const override;
+
 	virtual void driver_init();
 
 protected:
@@ -174,7 +175,8 @@ private:
 	void updateflip();
 
 	// internal state
-	const game_driver        *m_system;               // pointer to the game driver
+	const game_driver        &m_system;               // reference to the system description
+	std::vector<std::string>  m_searchpath;           // media search path following parent/clone links
 	driver_callback_delegate  m_callbacks[CB_COUNT];  // start/reset callbacks
 
 	// generic video

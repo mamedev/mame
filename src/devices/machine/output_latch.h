@@ -14,7 +14,6 @@ public:
 	template <unsigned Bit> auto bit_handler() { return m_bit_handlers[Bit].bind(); }
 
 	void write(uint8_t data);
-	DECLARE_WRITE8_MEMBER(bus_w) { write(data); }
 
 protected:
 	virtual void device_resolve_objects() override;

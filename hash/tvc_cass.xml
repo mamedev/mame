@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
     If you want to use these cassettes, you must remove the hbf floppy interface from the slot devices.
     After doing so, mount the cassette and load with the "LOAD" command. In most cases the program will
     auto-start.

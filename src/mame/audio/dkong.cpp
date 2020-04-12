@@ -1199,7 +1199,7 @@ Addresses found at @0x510, cpu2
 
 WRITE8_MEMBER(dkong_state::m58817_command_w)
 {
-	m_m58817->ctl_w(space, 0, data & 0x0f);
+	m_m58817->ctl_w(data & 0x0f);
 	m_m58817->pdc_w((data>>4) & 0x01);
 	/* FIXME 0x20 is CS */
 }

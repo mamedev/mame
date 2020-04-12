@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- General purpose software list for Amiga software with a MINIMUM requirement of the AGA chipset (A1200 / A4000)
+    General purpose software list for Amiga software with a MINIMUM requirement of the AGA chipset (A1200 / A4000)
     some AGA software exists instead in other lists if it is backwards compatible with older hardware.
 
     The software listed here is not designed for use on systems without the AGA chipset and

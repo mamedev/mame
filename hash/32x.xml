@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
+
     Notes on GameId:
     - first Id is the Japanese one, second Id is the USA one. European Ids are the same as USA with
       a -5x appended to the end, depending on the country/language (generic English titles have a -50)

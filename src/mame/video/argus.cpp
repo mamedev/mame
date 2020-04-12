@@ -131,7 +131,7 @@ TILE_GET_INFO_MEMBER(argus_common_state::get_tx_tile_info)
 	u8 lo = m_txram[tile_index];
 	u8 hi = m_txram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(Gfx,
+	tileinfo.set(Gfx,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(argus_state::get_bg0_tile_info)
 	u8 lo = m_vrom[1][tile_index];
 	u8 hi = m_vrom[1][tile_index | 1];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
@@ -161,7 +161,7 @@ TILE_GET_INFO_MEMBER(argus_state::get_bg1_tile_info)
 	u8 lo = m_bg1ram[tile_index];
 	u8 hi = m_bg1ram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
@@ -174,7 +174,7 @@ TILE_GET_INFO_MEMBER(valtric_state::get_bg_tile_info)
 	u8 lo = m_bg1ram[tile_index];
 	u8 hi = m_bg1ram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			((hi & 0xc0) << 2) | ((hi & 0x20) << 5) | lo,
 			hi & 0x0f,
 			0);
@@ -187,7 +187,7 @@ TILE_GET_INFO_MEMBER(butasan_state::get_tx_tile_info)
 	u8 lo = m_butasan_txram[tile_index];
 	u8 hi = m_butasan_txram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
@@ -200,7 +200,7 @@ TILE_GET_INFO_MEMBER(butasan_state::get_bg0_tile_info)
 	u8 lo = m_butasan_bg0ram[tile_index];
 	u8 hi = m_butasan_bg0ram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
@@ -210,7 +210,7 @@ TILE_GET_INFO_MEMBER(butasan_state::get_bg1_tile_info)
 {
 	int const tile = m_butasan_bg1ram[tile_index] | ((m_butasan_bg1_status & 2) << 7);
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			(tile & 0x80) >> 7,
 			0);

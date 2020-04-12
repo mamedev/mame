@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(divebomb_state::get_fg_tile_info)
 
 	code |= (attr & 0x3) << 8;
 
-	SET_TILE_INFO_MEMBER(0, code, colour, 0);
+	tileinfo.set(0, code, colour, 0);
 }
 
 

@@ -86,7 +86,7 @@ WRITE16_MEMBER(tatsumi_state::text_w)
 TILE_GET_INFO_MEMBER(tatsumi_state::get_text_tile_info)
 {
 	int tile = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile & 0xfff,
 			tile >> 12,
 			0);
@@ -1109,7 +1109,7 @@ TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_bigfight)
 	// bit 14: ignore transparency on this tile
 	int opaque = ((tile >> 14) & 1) == 1;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 						 tileno,
 						 color,
 						opaque ? TILE_FORCE_LAYER0 : 0);
@@ -1132,7 +1132,7 @@ TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_cyclwarr_road)
 	color |= 4;
 	int opaque = ((tile >> 14) & 1) == 1;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 						 tileno,
 						 color | m_road_color_bank,
 						 opaque ? TILE_FORCE_LAYER0 : 0);

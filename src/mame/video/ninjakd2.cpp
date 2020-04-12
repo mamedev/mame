@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::get_fg_tile_info)
 	int const flipyx = (hi & 0x30) >> 4;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			TILE_FLIPYX(flipyx));
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::ninjakd2_get_bg_tile_info)
 	int const flipyx = (hi & 0x30) >> 4;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			color,
 			TILE_FLIPYX(flipyx));
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(mnight_state::mnight_get_bg_tile_info)
 	int const flipy = (hi & 0x20) >> 5;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			color,
 			flipy ? TILE_FLIPY : 0);
@@ -79,7 +79,7 @@ TILE_GET_INFO_MEMBER(robokid_state::robokid_get_bg_tile_info)
 	int const tile = ((hi & 0x10) << 7) | ((hi & 0x20) << 5) | ((hi & 0xc0) << 2) | lo;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(Layer + 2,
+	tileinfo.set(Layer + 2,
 			tile,
 			color,
 			0);

@@ -44,7 +44,7 @@ I/O ports: These ranges are what is guessed
 #include "machine/upd765.h"
 #include "machine/z80daisy.h"
 #include "machine/z80pio.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80ctc.h"
 #include "machine/terminal.h"
 

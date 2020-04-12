@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="leapfrog_ltleappad_cart" description="LeapFrog Little Touch LeapPad cartridges">
 
 	<software name="babyfwords" supported="no">

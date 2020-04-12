@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
-<!-- There are a few images which are in a different TAP format (look for filesize%60000!=4)... -->
 <!--
+license:CC0
+
+There are a few images which are in a different TAP format (look for filesize%60000!=4)...
 
 Titles, publishers and release dates taken from:
   - X1 Soft Database ( http://www2s.biglobe.ne.jp/~ITTO/x1/softdb.html )

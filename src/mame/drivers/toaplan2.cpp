@@ -373,6 +373,8 @@ To Do / Unknowns:
     - Need to sort out the video status register.
     - Find out how exactly how sound CPU communication really works in bgaregga/batrider/bbakraid
         current emulation seems to work (plays all sounds), but there are still some unknown reads/writes
+    - Music timing is bit different on bbakraid.
+        reference : https://www.youtube.com/watch?v=zjrWs0iHQ5A
 
 Notes on Power Kick coin inputs:
 - The 10 yen input is "Key In" according to the bookkeeping screen, but is
@@ -3782,7 +3784,7 @@ void toaplan2_state::pwrkick(machine_config &config)
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pwrkick_68k_mem);
 
-	UPD4992(config, m_rtc);
+	UPD4992(config, m_rtc, 32'768);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -3817,7 +3819,7 @@ void toaplan2_state::othldrby(machine_config &config)
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::othldrby_68k_mem);
 
-	UPD4992(config, m_rtc);
+	UPD4992(config, m_rtc, 32'768);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

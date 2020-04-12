@@ -25,7 +25,7 @@ namespace netlist
 		, m_CLK(*this, "CLK")
 		, m_cnt(*this, "m_cnt", 0)
 		, m_last_CLK(*this, "m_last_CLK", 0)
-		, m_Q(*this, {{"QA", "QB", "QC", "QD", "QE", "QF", "QG", "QH"}})
+		, m_Q(*this, {"QA", "QB", "QC", "QD", "QE", "QF", "QG", "QH"})
 		, m_power_pins(*this)
 		{
 		}

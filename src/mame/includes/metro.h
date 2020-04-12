@@ -110,7 +110,8 @@ private:
 	void irq_cause_w(offs_t offset, u8 data);
 	uint8_t irq_vector_r(offs_t offset);
 	DECLARE_WRITE16_MEMBER(mouja_irq_timer_ctrl_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
+	DECLARE_WRITE8_MEMBER(sound_data_w);
+	TIMER_CALLBACK_MEMBER(sound_data_sync);
 	DECLARE_READ8_MEMBER(soundstatus_r);
 	DECLARE_WRITE8_MEMBER(soundstatus_w);
 	template<int Mask> DECLARE_WRITE8_MEMBER(upd7810_rombank_w);
@@ -227,6 +228,7 @@ private:
 	emu_timer   *m_karatour_irq_timer;
 
 	/* sound related */
+	uint8_t     m_sound_data;
 	uint16_t      m_soundstatus;
 	int         m_porta;
 	int         m_portb;

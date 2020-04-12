@@ -181,7 +181,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_tx0_tile_info)
 	tileno = m_ms32_tx0_ram[tile_index *2+0] & 0x0000ffff;
 	colour = m_ms32_tx0_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO_MEMBER(2,tileno,colour,0);
+	tileinfo.set(2,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_tx1_tile_info)
@@ -191,7 +191,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_tx1_tile_info)
 	tileno = m_ms32_tx1_ram[tile_index *2+0] & 0x0000ffff;
 	colour = m_ms32_tx1_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO_MEMBER(5,tileno,colour,0);
+	tileinfo.set(5,tileno,colour,0);
 }
 
 WRITE16_MEMBER(bnstars_state::ms32_tx0_ram_w)
@@ -215,7 +215,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_bg0_tile_info)
 	tileno = m_ms32_bg0_ram[tile_index *2+0] & 0x0000ffff;
 	colour = m_ms32_bg0_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
+	tileinfo.set(1,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_bg1_tile_info)
@@ -225,7 +225,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_bg1_tile_info)
 	tileno = m_ms32_bg1_ram[tile_index *2+0] & 0x0000ffff;
 	colour = m_ms32_bg1_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO_MEMBER(4,tileno,colour,0);
+	tileinfo.set(4,tileno,colour,0);
 }
 
 WRITE16_MEMBER(bnstars_state::ms32_bg0_ram_w)
@@ -334,7 +334,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_roz0_tile_info)
 	tileno = m_ms32_roz0_ram[tile_index *2+0] & 0x0000ffff;
 	colour = m_ms32_roz0_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
+	tileinfo.set(0,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_roz1_tile_info)
@@ -344,7 +344,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_roz1_tile_info)
 	tileno = m_ms32_roz1_ram[tile_index *2+0] & 0x0000ffff;
 	colour = m_ms32_roz1_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO_MEMBER(3,tileno,colour,0);
+	tileinfo.set(3,tileno,colour,0);
 }
 
 WRITE16_MEMBER(bnstars_state::ms32_roz0_ram_w)

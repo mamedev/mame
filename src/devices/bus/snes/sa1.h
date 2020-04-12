@@ -36,14 +36,15 @@ protected:
 	virtual void chip_write(offs_t offset, uint8_t data) override;
 
 private:
-	uint8_t var_length_read(uint32_t offset);
+	template<bool SA1Read> uint8_t var_length_read(uint32_t offset);
 	void dma_transfer();
 	void dma_cctype1_transfer();
 	void dma_cctype2_transfer();
 
-	uint8_t read_regs(uint32_t offset);
+	template<bool SA1Read> uint8_t read_regs(uint32_t offset);
 	uint8_t read_iram(uint32_t offset);
-	uint8_t read_bwram(uint32_t offset);
+	template<bool SA1Read> uint8_t read_bwram(uint32_t offset);
+	uint8_t read_cconv1_dma(uint32_t offset);
 	void write_regs(uint32_t offset, uint8_t data);
 	void write_iram(uint32_t offset, uint8_t data);
 	void write_bwram(uint32_t offset, uint8_t data);
@@ -84,6 +85,9 @@ private:
 	uint8_t m_iram_write_snes, m_iram_write_sa1;
 	// $2230-$2231
 	uint8_t m_dma_ctrl, m_dma_ccparam;
+	bool m_dma_cconv_end;
+	uint8_t m_dma_cconv_size;
+	uint8_t m_dma_cconv_bits;
 	// $2232-$2237
 	uint32_t m_src_addr, m_dst_addr;
 	// $2238-$2239
@@ -103,12 +107,17 @@ private:
 	// $2302-$2305
 	uint16_t m_hcr, m_vcr;
 
+	bool m_cconv1_dma_active;
+	uint32_t m_cconv_bits;
+
 	uint8_t sa1_lo_r(offs_t offset);
 	uint8_t sa1_hi_r(offs_t offset);
 	void sa1_lo_w(offs_t offset, uint8_t data);
 	void sa1_hi_w(offs_t offset, uint8_t data);
 
 	void sa1_map(address_map &map);
+
+	uint8_t dma_cctype1_read(offs_t offset);
 };
 
 

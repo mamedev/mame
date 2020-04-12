@@ -40,11 +40,11 @@ public:
 	// construction/destruction
 	tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_READ8_MEMBER( vram_r );
-	DECLARE_WRITE8_MEMBER( vram_w );
-	DECLARE_READ8_MEMBER( reg_r );
-	DECLARE_WRITE8_MEMBER( reg_w );
-	DECLARE_READ8_MEMBER( initptr_r );
+	uint8_t vram_r();
+	void vram_w(uint8_t data);
+	uint8_t reg_r(offs_t offset);
+	void reg_w(offs_t offset, uint8_t data);
+	uint8_t initptr_r();
 
 	void interrupt();
 

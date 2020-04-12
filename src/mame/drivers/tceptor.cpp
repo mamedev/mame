@@ -178,7 +178,7 @@ void tceptor_state::m68k_map(address_map &map)
 
 void tceptor_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw("mcu", FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m("mcu", FUNC(hd63701v0_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram();
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));
 	map(0x1400, 0x154d).ram();
@@ -328,7 +328,7 @@ void tceptor_state::tceptor(machine_config &config)
 	M68000(config, m_subcpu, XTAL(49'152'000)/4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &tceptor_state::m68k_map);
 
-	HD63701(config, m_mcu, XTAL(49'152'000)/8); // or compatible 6808 with extra instructions
+	HD63701V0(config, m_mcu, XTAL(49'152'000)/8); // or compatible 6808 with extra instructions
 	m_mcu->set_addrmap(AS_PROGRAM, &tceptor_state::mcu_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));

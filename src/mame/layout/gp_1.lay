@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<!-- Game Plan 1 copied from s6.lay -->
-
-<!-- 2014-07-22: Initial version.  [Robbbert] -->
-
+<!--
+license:CC0
+copyright-holders:Robbbert
+-->
 <mamelayout version="2">
 
 	<element name="digit" defstate="0">

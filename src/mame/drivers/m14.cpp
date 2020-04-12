@@ -146,7 +146,7 @@ TILE_GET_INFO_MEMBER(m14_state::m14_get_tile_info)
 
 	/* colorram & 0xf0 used but unknown purpose*/
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			color,
 			0);

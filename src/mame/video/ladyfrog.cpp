@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(ladyfrog_state::get_tile_info)
 {
 	int pal = m_videoram[tile_index * 2 + 1] & 0x0f;
 	int tile = m_videoram[tile_index * 2] + ((m_videoram[tile_index * 2 + 1] & 0xc0) << 2)+ ((m_videoram[tile_index * 2 + 1] & 0x30) << 6);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile + 0x1000 * m_tilebank,
 			pal,TILE_FLIPY
 			);

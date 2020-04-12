@@ -24,11 +24,11 @@ genie - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 
 glm - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
-libflac - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
+libflac - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause) (codecs), [The GNU General Public License, version 2](https://opensource.org/licenses/GPL-2.0)
 
 libjpeg - [Custom BSD-like](https://github.com/numenta/nupic/blob/master/external/licenses/LICENSE.libjpeg-6b.txt)
 
-linenoise-ng - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
+linenoise - [The BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)
 
 lsqlite3 - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
@@ -40,7 +40,7 @@ lua-zlib - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 luafilesystem - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
-lzma - [The GNU Lesser General Public License](http://opensource.org/licenses/LGPL-2.1)
+lzma - Custom public domain license
 
 minimp3 - [Creative Commons Zero v1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)
 
@@ -52,7 +52,7 @@ portmidi - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 pugixml - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
-rapidjson - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
+rapidjson - [The MIT License (MIT)](http://opensource.org/licenses/MIT), [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause) (msinttypes), JSON license (JSON_checker)
 
 sdl2 - [zlib license](http://opensource.org/licenses/Zlib)
 
@@ -62,12 +62,12 @@ softfloat3 - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Cla
 
 sol2 - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
-sqlite3 - Public Domain
+sqlite3 - Custom public domain license
 
 tap-windows6.h - Dual-licensed [The GNU General Public License, version 2](https://opensource.org/licenses/GPL-2.0) and [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 utf8proc - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
-winpcap - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
+wdlfft - [zlib license](http://opensource.org/licenses/Zlib)
 
 zlib - [zlib license](http://opensource.org/licenses/Zlib)

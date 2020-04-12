@@ -59,7 +59,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -70,6 +69,7 @@ protected:
 	int address_mask();
 	int select_device();
 	int data_offset();
+	bool skip_addresshigh() const { return m_data_size <= 0x800; }
 
 	optional_memory_region m_region;
 
@@ -89,11 +89,11 @@ protected:
 	int m_bits;
 	int m_shift;
 	int m_devsel;
+	int m_addresshigh;
 	int m_byteaddr;
 	std::vector<uint8_t> m_page;
 	int m_page_offset;
 	int m_page_written_size;
-	bool m_in_write;
 };
 
 #define DECLARE_I2C_DEVICE(name) \

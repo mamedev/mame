@@ -27,10 +27,10 @@ public:
 	auto reset_handler() { return m_reset_handler.bind(); }
 	auto msm_write_handler() { return m_msm_write_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(msm_w);
-	DECLARE_WRITE_LINE_MEMBER(msm_int);
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
+	void msm_w(offs_t offset, uint8_t data);
+	void msm_int(int state);
 
 	void play();
 

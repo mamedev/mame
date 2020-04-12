@@ -349,7 +349,7 @@ WRITE8_MEMBER(mgavegas_state::csoki_w)
 	if (LOG_MSM5205)
 		logerror("MSM5205 write to %04X data = %02X \n",offset+0xc800,data);
 	m_msm->reset_w(data&0x10>>4);
-	m_msm->write_data(data&0x0f);
+	m_msm->data_w(data&0x0f);
 }
 
 

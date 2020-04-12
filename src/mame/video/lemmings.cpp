@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(lemmings_state::get_tile_info)
 {
 	uint16_t tile = m_vram_data[tile_index];
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile&0x7ff,
 			(tile>>12)&0xf,
 			0);

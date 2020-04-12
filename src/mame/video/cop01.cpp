@@ -77,14 +77,14 @@ TILE_GET_INFO_MEMBER(cop01_state::get_bg_tile_info)
 	if (attr & 0x10)
 		pri = 0;
 
-	SET_TILE_INFO_MEMBER(1, tile + ((attr & 0x03) << 8), (attr & 0x1c) >> 2, 0);
+	tileinfo.set(1, tile + ((attr & 0x03) << 8), (attr & 0x1c) >> 2, 0);
 	tileinfo.group = pri;
 }
 
 TILE_GET_INFO_MEMBER(cop01_state::get_fg_tile_info)
 {
 	int tile = m_fgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, tile, 0, 0);
+	tileinfo.set(0, tile, 0, 0);
 }
 
 

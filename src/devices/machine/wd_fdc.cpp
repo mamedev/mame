@@ -87,7 +87,8 @@ wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_typ
 	enp_cb(*this),
 	sso_cb(*this),
 	ready_cb(*this), // actually output by the drive, not by the FDC
-	enmf_cb(*this)
+	enmf_cb(*this),
+	mon_cb(*this)
 {
 	force_ready = false;
 	disable_motor_control = false;
@@ -113,6 +114,7 @@ void wd_fdc_device_base::device_start()
 	sso_cb.resolve();
 	ready_cb.resolve();
 	enmf_cb.resolve();
+	mon_cb.resolve_safe();
 
 	if (!has_enmf && !enmf_cb.isnull())
 		logerror("Warning, this chip doesn't have an ENMF line.\n");
@@ -190,6 +192,9 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
 			drq_cb(drq);
 		}
 		hld = false;
+
+		mon_cb(1); // Clear the MON* line
+
 		intrq_cond = 0;
 		live_abort();
 	} else if(state && !mr) {
@@ -216,6 +221,9 @@ void wd_fdc_device_base::set_floppy(floppy_image_device *_floppy)
 	floppy = _floppy;
 
 	int next_ready = floppy ? floppy->ready_r() : 1;
+
+	if (motor_control)
+		mon_cb(status & S_MON ? 0 : 1);
 
 	if(floppy) {
 		if(motor_control && !disable_motor_control)
@@ -1296,6 +1304,8 @@ void wd_fdc_device_base::spinup()
 	}
 
 	status |= S_MON|S_SPIN;
+
+	mon_cb(0);
 	if(floppy && !disable_motor_control)
 		floppy->mon_w(0);
 }
@@ -1333,8 +1343,10 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 	case IDLE:
 		if(motor_control || head_control) {
 			motor_timeout ++;
-			if(motor_control && motor_timeout >= 5) {
+			// Spindown delay is 9 revs according to spec
+			if(motor_control && motor_timeout >= 8) {
 				status &= ~S_MON;
+				mon_cb(1);
 				if(floppy && !disable_motor_control)
 					floppy->mon_w(1);
 			}

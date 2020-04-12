@@ -282,7 +282,7 @@ TILE_GET_INFO_MEMBER(skns_state::get_tilemap_A_tile_info)
 	if(m_tilemapA_ram[tile_index] & 0x80000000) flags |= TILE_FLIPX;
 	if(m_tilemapA_ram[tile_index] & 0x40000000) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(0+depth,
+	tileinfo.set(0+depth,
 			code,
 			0x40+colr,
 			flags);
@@ -308,7 +308,7 @@ TILE_GET_INFO_MEMBER(skns_state::get_tilemap_B_tile_info)
 	if(m_tilemapB_ram[tile_index] & 0x80000000) flags |= TILE_FLIPX;
 	if(m_tilemapB_ram[tile_index] & 0x40000000) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(1+depth,
+	tileinfo.set(1+depth,
 			code,
 			0x40+colr,
 			flags);

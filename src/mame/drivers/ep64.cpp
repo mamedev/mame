@@ -416,7 +416,7 @@ void ep64_state::dave_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x80, 0x8f).m(m_nick, FUNC(nick_device::vio_map));
 	map(0xb5, 0xb5).rw(FUNC(ep64_state::rd0_r), FUNC(ep64_state::wr0_w));
-	map(0xb6, 0xb6).r(FUNC(ep64_state::rd1_r)).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0xb6, 0xb6).r(FUNC(ep64_state::rd1_r)).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0xb7, 0xb7).w(FUNC(ep64_state::wr2_w));
 }
 

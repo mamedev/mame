@@ -24,7 +24,7 @@ TILE_GET_INFO_MEMBER(polygonet_state::ttl_get_tile_info)
 
 	attr = m_ttl_vram[tile_index]>>12;  /* palette in all 4 bits? */
 
-	SET_TILE_INFO_MEMBER(m_ttl_gfx_index, code, attr, 0);
+	tileinfo.set(m_ttl_gfx_index, code, attr, 0);
 }
 
 TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
 	attr = (m_roz_vram[tile_index] >> 12) + 16; /* roz base palette is palette 16 */
 	code = m_roz_vram[tile_index] & 0x3ff;
 
-	SET_TILE_INFO_MEMBER(0, code, attr, 0);
+	tileinfo.set(0, code, attr, 0);
 }
 
 READ32_MEMBER(polygonet_state::polygonet_ttl_ram_r)

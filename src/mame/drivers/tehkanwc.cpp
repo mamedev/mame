@@ -217,10 +217,10 @@ WRITE_LINE_MEMBER(tehkanwc_state::adpcm_int)
 	int msm_data = SAMPLES[m_msm_data_offs & 0x7fff];
 
 	if (m_toggle == 0)
-		m_msm->write_data((msm_data >> 4) & 0x0f);
+		m_msm->data_w((msm_data >> 4) & 0x0f);
 	else
 	{
-		m_msm->write_data(msm_data & 0x0f);
+		m_msm->data_w(msm_data & 0x0f);
 		m_msm_data_offs++;
 	}
 

@@ -386,7 +386,7 @@ WRITE8_MEMBER( olyboss_state::fdcdma_w )
 WRITE8_MEMBER( olyboss_state::crtcdma_w )
 {
 	m_channel = 2;
-	m_crtc->dack_w(space, offset, data, mem_mask);
+	m_crtc->dack_w(data);
 }
 
 READ8_MEMBER( olyboss_state::fdcctrl_r )

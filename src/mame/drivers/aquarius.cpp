@@ -19,6 +19,16 @@
     - "old" version of BASIC ROM
     - Aquarius II
 
+Dick Smith catalog numbers, taken from advertisements:
+
+X-6000 : Aquarius Computer (2K RAM)
+X-6005 : Mini Expander
+X-6010 : Data Recorder
+X-6015 : 16K RAM cart
+X-6020 : 32K RAM cart
+X-6025 : Thermal Printer
+X-6026 : Roll of paper for the printer
+
 ***************************************************************************/
 
 #include "emu.h"

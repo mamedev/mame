@@ -1,9 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
-<softwarelist name="ti95_cart" description="TI-95 cartridges">
-
 <!--
+license:CC0
 
     Library functions can be reached from [RUN], [F3]
 
@@ -15,6 +13,7 @@
 
 -->
 
+<softwarelist name="ti95_cart" description="TI-95 cartridges">
 
 	<software name="maths">
 		<description>Mathematics Library</description>

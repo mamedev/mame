@@ -381,7 +381,7 @@ WRITE8_MEMBER( portfolio_state::dtmf_w )
 
 	m_dtmf->mode_w(!BIT(data, 7));
 	m_dtmf->a0_w(!BIT(data, 7));
-	m_dtmf->write(space, 0, data & 0x3f);
+	m_dtmf->write(data & 0x3f);
 	m_dtmf->strobe_w(BIT(data, 6));
 }
 
@@ -674,11 +674,11 @@ READ8_MEMBER( portfolio_state::io_r )
 		case 1:
 			if (offset & 0x01)
 			{
-				data = m_lcdc->status_r(space, 0);
+				data = m_lcdc->status_r();
 			}
 			else
 			{
-				data = m_lcdc->data_r(space, 0);
+				data = m_lcdc->data_r();
 			}
 			break;
 
@@ -726,11 +726,11 @@ WRITE8_MEMBER( portfolio_state::io_w )
 		case 1:
 			if (offset & 0x01)
 			{
-				m_lcdc->control_w(space, 0, data);
+				m_lcdc->control_w(data);
 			}
 			else
 			{
-				m_lcdc->data_w(space, 0, data);
+				m_lcdc->data_w(data);
 			}
 			break;
 

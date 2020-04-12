@@ -43,7 +43,7 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_A)
 		bank = 0;   /*  this allows the game to print text
 		            in all banks selected by the k007121 */
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code + 256*bank,
 			(attr & 0x0f) + 16,
 			(attr & 0x20) ? TILE_FLIPY : 0);
@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_B)
 	int attr = m_vram[tile_index + 0x800];
 	int code = m_vram[tile_index + 0xc00];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			(attr & 0x0f) + 16,
 			0);

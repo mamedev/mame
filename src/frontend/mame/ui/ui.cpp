@@ -2128,7 +2128,7 @@ void mame_ui_manager::save_main_option()
 	// attempt to open the main ini file
 	{
 		emu_file file(machine().options().ini_path(), OPEN_FLAG_READ);
-		if (file.open(emulator_info::get_configname(), ".ini") == osd_file::error::NONE)
+		if (file.open(std::string(emulator_info::get_configname()) + ".ini") == osd_file::error::NONE)
 		{
 			try
 			{
@@ -2158,7 +2158,7 @@ void mame_ui_manager::save_main_option()
 	// attempt to open the output file
 	{
 		emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(emulator_info::get_configname(), ".ini") == osd_file::error::NONE)
+		if (file.open(std::string(emulator_info::get_configname()) + ".ini") == osd_file::error::NONE)
 		{
 			// generate the updated INI
 			std::string initext = options.output_ini();

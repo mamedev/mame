@@ -74,6 +74,7 @@ links {
 }
 end
 
+
 --------------------------------------------------
 -- zlib library objects
 --------------------------------------------------
@@ -139,6 +140,7 @@ links {
 }
 end
 
+
 --------------------------------------------------
 -- SoftFloat library objects
 --------------------------------------------------
@@ -178,6 +180,7 @@ end
 		MAME_DIR .. "3rdparty/softfloat/fsincos.c",
 		MAME_DIR .. "3rdparty/softfloat/fyl2x.c",
 	}
+
 
 --------------------------------------------------
 -- SoftFloat 3 library objects
@@ -523,6 +526,7 @@ files {
 	MAME_DIR .. "3rdparty/softfloat3/source/f128M_lt_quiet.c",
 }
 
+
 -------------------------------------------------
 -- libJPEG library objects
 --------------------------------------------------
@@ -604,6 +608,7 @@ links {
 	ext_lib("jpeg"),
 }
 end
+
 
 --------------------------------------------------
 -- libflac library objects
@@ -698,6 +703,7 @@ links {
 }
 end
 
+
 --------------------------------------------------
 -- lib7z library objects
 --------------------------------------------------
@@ -783,6 +789,7 @@ end
 			-- MAME_DIR .. "3rdparty/lzma/C/XzEnc.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/XzIn.c",
 		}
+
 
 --------------------------------------------------
 -- LUA library objects
@@ -888,6 +895,7 @@ links {
 	ext_lib("lua"),
 }
 end
+
 
 --------------------------------------------------
 -- small lua library objects
@@ -995,9 +1003,12 @@ links {
 end
 
 end
+
+
 --------------------------------------------------
 -- portmidi library objects
 --------------------------------------------------
+
 if _OPTIONS["NO_USE_MIDI"]~="1" then
 if not _OPTIONS["with-system-portmidi"] then
 project "portmidi"
@@ -1079,6 +1090,7 @@ links {
 end
 end
 
+
 --------------------------------------------------
 -- BX library objects
 --------------------------------------------------
@@ -1157,6 +1169,7 @@ project "bx"
 		MAME_DIR .. "3rdparty/bx/src/url.cpp",
 	}
 
+
 --------------------------------------------------
 -- BIMG library objects
 --------------------------------------------------
@@ -1231,6 +1244,7 @@ project "bimg"
 		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/quantization.cc",
 		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/weight_infill.cc",
 	}
+
 
 --------------------------------------------------
 -- BGFX library objects
@@ -1420,9 +1434,11 @@ end
 		}
 	end
 
+
 --------------------------------------------------
 -- PortAudio library objects
 --------------------------------------------------
+
 if _OPTIONS["NO_USE_PORTAUDIO"]~="1" then
 if not _OPTIONS["with-system-portaudio"] then
 project "portaudio"
@@ -1590,6 +1606,7 @@ links {
 }
 end
 end
+
 
 --------------------------------------------------
 -- SDL2 library
@@ -2101,9 +2118,11 @@ end
 
 end
 
+
 --------------------------------------------------
 -- linenoise library
 --------------------------------------------------
+
 if (_OPTIONS["osd"] ~= "uwp") then
 project "linenoise"
 	uuid "7320ffc8-2748-4add-8864-ae29b72a8511"
@@ -2138,9 +2157,9 @@ project "utf8proc"
 	uuid "1f881f09-0395-4483-ac37-2935fb092187"
 	kind "StaticLib"
 
-  defines {
-	"UTF8PROC_DLLEXPORT="
-  }
+	defines {
+		"UTF8PROC_DLLEXPORT="
+	}
 
 	configuration "Debug"
 		defines {
@@ -2166,3 +2185,23 @@ links {
 }
 end
 
+
+--------------------------------------------------
+-- wdlfft library objects (from Cockos WDL)
+--------------------------------------------------
+
+project "wdlfft"
+	uuid "74ca017e-fa0d-48b8-81d6-8081a37be14c"
+	kind "StaticLib"
+
+	configuration { "gmake or ninja" }
+		buildoptions_c {
+			"-Wno-strict-prototypes",
+		}
+
+	configuration { }
+
+	files {
+		MAME_DIR .. "3rdparty/wdlfft/fft.c",
+		MAME_DIR .. "3rdparty/wdlfft/fft.h"
+	}

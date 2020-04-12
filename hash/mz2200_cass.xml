@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="mz2200_cass" description="Sharp MZ-2200 cassettes">
+
+	<software name="cnonball">
+		<description>Cannon Ball</description>
+		<year>1983</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="WB-1001"/>
+		<info name="alt_title" value="キャノンボール"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1386284">
+				<rom name="wb-1001.wav" size="1386284" crc="461ce2f5" sha1="8d859095b18ac5aab348a205f3734340e6b5290b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vegecrsh">
+		<description>Vegetable Crash</description>
+		<year>1983</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="WB-1002"/>
+		<info name="alt_title" value="ベジタブルクラッシュ"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1233964">
+				<rom name="wb-1002.wav" size="1233964" crc="953f5d0e" sha1="527f9bfef1fd0a923ce982ef971602c86820c26b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombrman">
+		<description>Bomber Man</description>
+		<year>1983</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="WB-1003"/>
+		<info name="alt_title" value="爆弾男"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3944464">
+				<rom name="wb-1003.wav" size="3944464" crc="da852425" sha1="03c5b8694b7482c6af696fef5338d05c3d86c70e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="powrfail">
+		<description>Power Fail</description>
+		<year>1983</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="WB-1004"/>
+		<info name="alt_title" value="パワーフェイル"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2145580">
+				<rom name="wb-1004.wav" size="2145580" crc="eecf0e2a" sha1="8263a0ba92c6e9f3d94fed0d7005591841d4d826" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hiyokof">
+		<description>Hiyoko Fighter</description>
+		<year>1983</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="WB-1005"/>
+		<info name="alt_title" value="ヒヨコファイター"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1566764">
+				<rom name="wb-1005.wav" size="1566764" crc="08c2d4a3" sha1="1325773c7f640c1f86186c1d5608cdff7995d007" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thespidr">
+		<description>The Spider</description>
+		<year>1983</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="WB-1006"/>
+		<info name="alt_title" value="ザ・スパイダー"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3149100">
+				<rom name="wb-1006.wav" size="3149100" crc="eec8674f" sha1="231d55c6cbb48fe88676fec31f014c6002788b5f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hitsujai">
+		<description>Hitsuja~i!</description>
+		<year>1983</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="WB-1007"/>
+		<info name="alt_title" value="ひつじゃ～い!"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1887532">
+				<rom name="wb-1007.wav" size="1887532" crc="6fc27604" sha1="d3031ad40cb5c4bfc4a7afd8ddd7a16bbf345e70" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mj05">
+		<description>MJ-05</description>
+		<year>1983</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="WB-1008"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="6366398">
+				<rom name="wb-1008.wav" size="6366398" crc="d7335aad" sha1="a26dd12e064b02d18ba673bb4633762aa38cca09" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="help">
+		<description>Help!</description>
+		<year>1983</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="WB-1009"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1489708">
+				<rom name="wb-1009.wav" size="1489708" crc="523985e0" sha1="f4a0f20d698caf5dd597ea17b59e5a351f49f1f2" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER(appoooh_state::adpcm_int)
 			uint8_t *RAM = memregion("adpcm")->base();
 
 			m_adpcm_data = RAM[m_adpcm_address++];
-			m_msm->write_data(m_adpcm_data >> 4);
+			m_msm->data_w(m_adpcm_data >> 4);
 
 			if (m_adpcm_data == 0x70)
 			{
@@ -192,7 +192,7 @@ WRITE_LINE_MEMBER(appoooh_state::adpcm_int)
 		}
 		else
 		{
-			m_msm->write_data(m_adpcm_data & 0x0f);
+			m_msm->data_w(m_adpcm_data & 0x0f);
 			m_adpcm_data = -1;
 		}
 	}

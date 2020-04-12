@@ -525,7 +525,7 @@ void to7_io_line_device::device_add_mconfig(machine_config &config)
 	PIA6821(config, m_pia_io, 0);
 	m_pia_io->readpa_handler().set(FUNC(to7_io_line_device::porta_in));
 	m_pia_io->writepa_handler().set(FUNC(to7_io_line_device::porta_out));
-	m_pia_io->writepb_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pia_io->writepb_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pia_io->cb2_handler().set("centronics", FUNC(centronics_device::write_strobe));
 	m_pia_io->irqa_handler().set("^mainfirq", FUNC(input_merger_device::in_w<1>));
 	m_pia_io->irqb_handler().set("^mainfirq", FUNC(input_merger_device::in_w<1>));
@@ -675,7 +675,7 @@ READ8_MEMBER( thomson_state::to7_modem_mea8000_r )
 
 	if ( m_io_mconfig->read() & 1 )
 	{
-		return m_mea8000->read(space, offset);
+		return m_mea8000->read(offset);
 	}
 	else
 	{
@@ -697,7 +697,7 @@ WRITE8_MEMBER( thomson_state::to7_modem_mea8000_w )
 {
 	if ( m_io_mconfig->read() & 1 )
 	{
-		m_mea8000->write(space, offset, data);
+		m_mea8000->write(offset, data);
 	}
 	else
 	{

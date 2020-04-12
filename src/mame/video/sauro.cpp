@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_bg)
 	int color = ((m_colorram[tile_index] >> 4) & 0x0f) | m_palette_bank;
 	int flags = m_colorram[tile_index] & 0x08 ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_fg)
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_fg)
 	int color = ((m_colorram2[tile_index] >> 4) & 0x0f) | m_palette_bank;
 	int flags = m_colorram2[tile_index] & 0x08 ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 /* Sauro */

@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(dcon_state::get_back_tile_info)
 
 	tile&=0xfff;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile,
 			color,
 			0);
@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(dcon_state::get_fore_tile_info)
 
 	tile&=0xfff;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			color,
 			0);
@@ -78,7 +78,7 @@ TILE_GET_INFO_MEMBER(dcon_state::get_mid_tile_info)
 
 	tile&=0xfff;
 
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			tile|m_gfx_bank_select,
 			color,
 			0);
@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(dcon_state::get_text_tile_info)
 
 	tile&=0xfff;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);

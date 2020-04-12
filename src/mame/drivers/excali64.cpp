@@ -145,7 +145,7 @@ void excali64_state::io_map(address_map &map)
 	map(0x50, 0x5f).r(FUNC(excali64_state::port50_r));
 	map(0x60, 0x63).mirror(0x0c).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x70, 0x7f).w(FUNC(excali64_state::port70_w));
-	map(0xe0, 0xe3).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0xe0, 0xe3).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0xe4, 0xe7).w(FUNC(excali64_state::porte4_w));
 	map(0xe8, 0xeb).r(FUNC(excali64_state::porte8_r));
 	map(0xec, 0xef).w(FUNC(excali64_state::portec_w));
@@ -572,7 +572,7 @@ void excali64_state::excali64(machine_config &config)
 	//pit.set_clk<2>(16_MHz_XTAL / 16); /* Timer 2: not used */
 
 	i8255_device &ppi(I8255A(config, "ppi"));
-	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w)); // parallel port
+	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write)); // parallel port
 	ppi.out_pb_callback().set(FUNC(excali64_state::ppib_w));
 	ppi.in_pc_callback().set(FUNC(excali64_state::ppic_r));
 	ppi.out_pc_callback().set(FUNC(excali64_state::ppic_w));

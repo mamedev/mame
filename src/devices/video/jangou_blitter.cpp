@@ -206,52 +206,52 @@ void jangou_blitter_device::trigger_write(void)
 	m_bltflip = false;
 }
 
-WRITE8_MEMBER( jangou_blitter_device::vregs_w )
+void jangou_blitter_device::vregs_w(offs_t offset, uint8_t data)
 {
 	// bit 5 set by Jangou, left-over?
 	m_pen_data[offset] = data & 0x0f;
 }
 
-WRITE8_MEMBER( jangou_blitter_device::bltflip_w )
+void jangou_blitter_device::bltflip_w(uint8_t data)
 {
 	// TODO: unsure about how this works, Charles says it swaps the nibble but afaik it's used for CPU tiles in Night Gal Summer/Sexy Gal and they seems fine?
 	//       Maybe flipx is actually bltflip for later HW?
 	m_bltflip = true;
 }
 
-READ_LINE_MEMBER( jangou_blitter_device::status_r )
+int jangou_blitter_device::status_r()
 {
 	return false;
 }
 
 // data accessors
 
-WRITE8_MEMBER( jangou_blitter_device::x_w ) { m_x = data; }
-WRITE8_MEMBER( jangou_blitter_device::y_w ) { m_y = data; }
-WRITE8_MEMBER( jangou_blitter_device::src_lo_address_w )
+void jangou_blitter_device::x_w(uint8_t data) { m_x = data; }
+void jangou_blitter_device::y_w(uint8_t data) { m_y = data; }
+void jangou_blitter_device::src_lo_address_w(uint8_t data)
 {
 	m_src_addr &= ~0xff;
 	m_src_addr |= data & 0xff;
 }
 
-WRITE8_MEMBER( jangou_blitter_device::src_md_address_w )
+void jangou_blitter_device::src_md_address_w(uint8_t data)
 {
 	m_src_addr &= ~0xff00;
 	m_src_addr |= data << 8;
 }
 
-WRITE8_MEMBER( jangou_blitter_device::src_hi_address_w )
+void jangou_blitter_device::src_hi_address_w(uint8_t data)
 {
 	m_src_addr &= ~0xff0000;
 	m_src_addr |= data << 16;
 }
 
-WRITE8_MEMBER( jangou_blitter_device::width_w )
+void jangou_blitter_device::width_w(uint8_t data)
 {
 	m_width = data;
 }
 
-WRITE8_MEMBER( jangou_blitter_device::height_and_trigger_w )
+void jangou_blitter_device::height_and_trigger_w(uint8_t data)
 {
 	m_height = data;
 	trigger_write();

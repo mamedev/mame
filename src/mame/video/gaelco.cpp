@@ -43,7 +43,7 @@ TILE_GET_INFO_MEMBER(gaelco_state::get_tile_info)
 
 	tileinfo.category = (data2 >> 6) & 0x03;
 
-	SET_TILE_INFO_MEMBER(1, 0x4000 + code, data2 & 0x3f, TILE_FLIPYX(data & 0x03));
+	tileinfo.set(1, 0x4000 + code, data2 & 0x3f, TILE_FLIPYX(data & 0x03));
 }
 
 /***************************************************************************

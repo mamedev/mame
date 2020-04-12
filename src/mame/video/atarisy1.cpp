@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(atarisy1_state::get_alpha_tile_info)
 	int code = data & 0x3ff;
 	int color = (data >> 10) & 0x07;
 	int opaque = data & 0x2000;
-	SET_TILE_INFO_MEMBER(0, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
+	tileinfo.set(0, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(atarisy1_state::get_playfield_tile_info)
 	int gfxindex = (lookup >> 8) & 15;
 	int code = ((lookup & 0xff) << 8) | (data & 0xff);
 	int color = 0x20 + (((lookup >> 12) & 15) << m_bank_color_shift[gfxindex]);
-	SET_TILE_INFO_MEMBER(gfxindex, code, color, (data >> 15) & 1);
+	tileinfo.set(gfxindex, code, color, (data >> 15) & 1);
 }
 
 

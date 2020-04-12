@@ -154,7 +154,7 @@ TILE_GET_INFO_MEMBER(spool99_state::get_tile_info)
 	int code = ((m_vram[tile_index*2+1]<<8) | (m_vram[tile_index*2+0]));
 	int color = m_cram[tile_index*2+0];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code & 0x3fff,
 			color & 0x1f,
 			0);

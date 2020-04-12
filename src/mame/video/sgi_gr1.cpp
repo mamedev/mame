@@ -324,9 +324,6 @@ void sgi_gr1_device::fifo_w(offs_t offset, u32 data, u32 mem_mask)
 		m_dr3 &= ~DR3_FIFOFULL;
 		m_int_fifo_cb(ASSERT_LINE);
 	}
-
-	if (m_ge->suspended())
-		m_ge->resume(SUSPEND_REASON_TRIGGER);
 }
 
 void sgi_gr1_device::reset_w(int state)

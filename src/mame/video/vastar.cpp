@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(vastar_state::get_fg_tile_info)
 	int code = m_fgvideoram[tile_index + 0x800] | (m_fgvideoram[tile_index + 0x400] << 8);
 	int color = m_fgvideoram[tile_index];
 	int fxy = (code & 0xc00) >> 10; // maybe, based on the other layers
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			color & 0x3f,
 			TILE_FLIPXY(fxy));
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(vastar_state::get_bg1_tile_info)
 	int code = m_bg1videoram[tile_index + 0x800] | (m_bg1videoram[tile_index] << 8);
 	int color = m_bg1videoram[tile_index + 0xc00];
 	int fxy = (code & 0xc00) >> 10;
-	SET_TILE_INFO_MEMBER(4,
+	tileinfo.set(4,
 			code,
 			color & 0x3f,
 			TILE_FLIPXY(fxy));
@@ -45,7 +45,7 @@ TILE_GET_INFO_MEMBER(vastar_state::get_bg2_tile_info)
 	int code = m_bg2videoram[tile_index + 0x800] | (m_bg2videoram[tile_index] << 8);
 	int color = m_bg2videoram[tile_index + 0xc00];
 	int fxy = (code & 0xc00) >> 10;
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			code,
 			color & 0x3f,
 			TILE_FLIPXY(fxy));

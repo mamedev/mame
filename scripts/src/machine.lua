@@ -705,6 +705,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/am79c30.h,MACHINES["AM79C30"] = true
+---------------------------------------------------
+
+if (MACHINES["AM79C30"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/am79c30.cpp",
+		MAME_DIR .. "src/devices/machine/am79c30.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/am79c90.h,MACHINES["AM79C90"] = true
 ---------------------------------------------------
 
@@ -1873,18 +1885,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/mc2661.h,MACHINES["MC2661"] = true
----------------------------------------------------
-
-if (MACHINES["MC2661"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/mc2661.cpp",
-		MAME_DIR .. "src/devices/machine/mc2661.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/mc6843.h,MACHINES["MC6843"] = true
 ---------------------------------------------------
 
@@ -2709,6 +2709,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/scnxx562.h,MACHINES["SCN_PCI"] = true
+---------------------------------------------------
+
+if (MACHINES["SCN_PCI"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/scn_pci.cpp",
+		MAME_DIR .. "src/devices/machine/scn_pci.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/scnxx562.h,MACHINES["DUSCC"] = true
 ---------------------------------------------------
 
@@ -3320,18 +3332,6 @@ if (MACHINES["Z80CTC"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/z80ctc.cpp",
 		MAME_DIR .. "src/devices/machine/z80ctc.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/z80dart.h,MACHINES["Z80DART"] = true
----------------------------------------------------
-
-if (MACHINES["Z80DART"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/z80dart.cpp",
-		MAME_DIR .. "src/devices/machine/z80dart.h",
 	}
 end
 

@@ -196,7 +196,7 @@ WRITE_LINE_MEMBER(crgolf_state::vck_callback)
 		uint8_t data = memregion("adpcm")->base()[m_sample_offset >> 1];
 
 		/* write the next nibble and advance */
-		m_msm->write_data((data >> (4 * (~m_sample_offset & 1))) & 0x0f);
+		m_msm->data_w((data >> (4 * (~m_sample_offset & 1))) & 0x0f);
 		m_sample_offset++;
 
 		/* every 256 clocks, we decrement the length */

@@ -546,7 +546,7 @@ WRITE8_MEMBER(pacman_state::alibaba_sound_w)
 	/* since the sound region in Ali Baba is not contiguous, translate the
 	   offset into the 0-0x1f range */
 	offset = (offset >> 1 & 0x10) | (offset & 0x0f);
-	m_namco_sound->pacman_sound_w(space, offset, data);
+	m_namco_sound->pacman_sound_w(offset, data);
 }
 
 READ8_MEMBER(pacman_state::alibaba_mystery_1_r)

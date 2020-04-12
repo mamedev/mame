@@ -635,7 +635,7 @@ void sf7000_state::sf7000(machine_config &config)
 	/* devices */
 	i8255_device &ppi(I8255(config, UPD9255_1_TAG));
 	ppi.in_pa_callback().set(FUNC(sf7000_state::ppi_pa_r));
-	ppi.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ppi.out_pc_callback().set(FUNC(sf7000_state::ppi_pc_w));
 
 	i8251_device &upd8251(I8251(config, UPD8251_TAG, 0));

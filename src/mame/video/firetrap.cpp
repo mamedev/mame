@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(firetrap_state::get_fg_tile_info)
 {
 	int code = m_fgvideoram[tile_index];
 	int color = m_fgvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | ((color & 0x01) << 8),
 			color >> 4,
 			0);
@@ -97,7 +97,7 @@ inline void firetrap_state::get_bg_tile_info(tile_data &tileinfo, int tile_index
 {
 	int code = bgvideoram[tile_index];
 	int color = bgvideoram[tile_index + 0x100];
-	SET_TILE_INFO_MEMBER(gfx_region,
+	tileinfo.set(gfx_region,
 			code + ((color & 0x03) << 8),
 			(color & 0x30) >> 4,
 			TILE_FLIPXY((color & 0x0c) >> 2));

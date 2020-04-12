@@ -18,7 +18,7 @@
 #include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 
 
 //**************************************************************************

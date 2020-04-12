@@ -72,22 +72,22 @@ WRITE8_MEMBER(grchamp_state::right_w)
 
 TILE_GET_INFO_MEMBER(grchamp_state::get_text_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
+	tileinfo.set(0, m_videoram[tile_index], 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(grchamp_state::get_left_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1, m_leftram[tile_index], 0, 0);
+	tileinfo.set(1, m_leftram[tile_index], 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(grchamp_state::get_right_tile_info)
 {
-	SET_TILE_INFO_MEMBER(2, m_rightram[tile_index], 0, 0);
+	tileinfo.set(2, m_rightram[tile_index], 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(grchamp_state::get_center_tile_info)
 {
-	SET_TILE_INFO_MEMBER(3, m_centerram[tile_index], 0, 0);
+	tileinfo.set(3, m_centerram[tile_index], 0, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(grchamp_state::get_memory_offset)

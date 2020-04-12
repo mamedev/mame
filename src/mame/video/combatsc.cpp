@@ -115,7 +115,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0)
 
 	number = m_page[0][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			number,
 			color,
 			0);
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1)
 
 	number = m_page[1][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			number,
 			color,
 			0);
@@ -161,7 +161,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info)
 	int number = m_page[0][tile_index + 0xc00];
 	int color = 16 + (attributes & 0x0f);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			number,
 			color,
 			0);
@@ -193,7 +193,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0_bootleg)
 	color = pal*16;// + (attributes & 0x0f);
 	number = m_page[0][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			number,
 			color,
 			0);
@@ -224,7 +224,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1_bootleg)
 	color = pal * 16;// + (attributes & 0x0f);
 	number = m_page[1][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			number,
 			color,
 			0);
@@ -236,7 +236,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info_bootleg)
 	int number = m_page[0][tile_index + 0xc00];
 	int color = 16;// + (attributes & 0x0f);
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			number,
 			color,
 			0);

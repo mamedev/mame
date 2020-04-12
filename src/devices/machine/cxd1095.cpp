@@ -70,7 +70,7 @@ void cxd1095_device::device_reset()
 //  read - read from an input port
 //-------------------------------------------------
 
-READ8_MEMBER(cxd1095_device::read)
+u8 cxd1095_device::read(offs_t offset)
 {
 	if (offset < 5)
 	{
@@ -98,7 +98,7 @@ READ8_MEMBER(cxd1095_device::read)
 //  control registers
 //-------------------------------------------------
 
-WRITE8_MEMBER(cxd1095_device::write)
+void cxd1095_device::write(offs_t offset, u8 data)
 {
 	if (offset < 5)
 	{

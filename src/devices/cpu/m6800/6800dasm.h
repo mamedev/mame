@@ -64,7 +64,7 @@ private:
 		_std,   sei,    sts,    stx,    suba,   subb,   subd,   swi,
 		wai,    tab,    tap,    tba,    tim,    tpa,    tst,    tsta,
 		tstb,   tsx,    txs,    asx1,   asx2,   xgdx,   addx,   adcx,
-		bitx
+		bitx,   slp
 	};
 
 	static const char *const op_name_str[];

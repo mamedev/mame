@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(markham_state::get_bg_tile_info)
 	int code = m_videoram[(tile_index * 2) + 1] + ((attr & 0x60) << 3);
 	int color = (attr & 0x1f) | ((attr & 0x80) >> 2);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void markham_state::video_start()

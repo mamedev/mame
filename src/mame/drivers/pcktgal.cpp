@@ -50,7 +50,7 @@ WRITE8_MEMBER(pcktgal_state::sound_w)
 
 WRITE_LINE_MEMBER(pcktgal_state::adpcm_int)
 {
-	m_msm->write_data(m_msm5205next >> 4);
+	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_toggle = 1 - m_toggle;

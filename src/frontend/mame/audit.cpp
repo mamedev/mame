@@ -29,7 +29,7 @@
 media_auditor::media_auditor(const driver_enumerator &enumerator)
 	: m_enumerator(enumerator)
 	, m_validation(AUDIT_VALIDATE_FULL)
-	, m_searchpath(nullptr)
+	, m_searchpath()
 {
 }
 
@@ -47,10 +47,6 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 	// store validation for later
 	m_validation = validation;
 
-// temporary hack until romload is update: get the driver path and support it for
-// all searches
-const char *driverpath = m_enumerator.config()->root_device().searchpath();
-
 	std::size_t found = 0;
 	std::size_t required = 0;
 	std::size_t shared_found = 0;
@@ -60,17 +56,17 @@ const char *driverpath = m_enumerator.config()->root_device().searchpath();
 	for (device_t &device : device_iterator(m_enumerator.config()->root_device()))
 	{
 		// determine the search path for this source and iterate through the regions
-		m_searchpath = device.searchpath();
+		m_searchpath.clear();
+		for (const std::string &path : device.searchpath())
+		{
+			if (!m_searchpath.empty())
+				m_searchpath += ';';
+			m_searchpath += path;
+		}
 
 		// now iterate over regions and ROMs within
 		for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
 		{
-// temporary hack: add the driver path & region name
-std::string combinedpath = util::string_format("%s;%s", device.searchpath(), driverpath);
-if (device.shortname())
-	combinedpath.append(";").append(device.shortname());
-m_searchpath = combinedpath.c_str();
-
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 			{
 				char const *const name(ROM_GETNAME(rom));
@@ -166,7 +162,7 @@ media_auditor::summary media_auditor::audit_software(const std::string &list_nam
 		locationtag.append(swinfo->parentname());
 		combinedpath.append(util::string_format(";%s;%s%s%s", swinfo->parentname(), list_name, PATH_SEPARATOR, swinfo->parentname()));
 	}
-	m_searchpath = combinedpath.c_str();
+	m_searchpath = combinedpath;
 
 	std::size_t found = 0;
 	std::size_t required = 0;
@@ -225,9 +221,9 @@ media_auditor::summary media_auditor::audit_samples()
 			while (path.next(curpath, samplename))
 			{
 				// attempt to access the file (.flac) or (.wav)
-				osd_file::error filerr = file.open(curpath, ".flac");
+				osd_file::error filerr = file.open(curpath + ".flac");
 				if (filerr != osd_file::error::NONE)
-					filerr = file.open(curpath, ".wav");
+					filerr = file.open(curpath + ".wav");
 
 				if (filerr == osd_file::error::NONE)
 				{
@@ -392,6 +388,7 @@ media_auditor::audit_record &media_auditor::audit_one_rom(const rom_entry *rom)
 	file.set_restrict_to_mediapath(true);
 	path_iterator path(m_searchpath);
 	std::string curpath;
+	// FIXME: needs to be adjusted to match ROM loading behaviour
 	while (path.next(curpath, record.name()))
 	{
 		// open the file if we can

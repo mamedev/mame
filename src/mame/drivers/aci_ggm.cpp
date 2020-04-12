@@ -106,14 +106,14 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(ca1_off) { m_via->write_ca1(0); }
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
-	DECLARE_READ8_MEMBER(cartridge_r);
+	u8 cartridge_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(select_w);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void select_w(u8 data);
+	void control_w(u8 data);
+	u8 input_r();
 
-	DECLARE_WRITE_LINE_MEMBER(shift_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(shift_data_w);
+	void shift_clock_w(int state);
+	void shift_data_w(int state);
 
 	u8 m_inp_mux;
 	u16 m_digit_data;
@@ -189,7 +189,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ggm_state::cartridge)
 	return image_init_result::PASS;
 }
 
-READ8_MEMBER(ggm_state::cartridge_r)
+u8 ggm_state::cartridge_r(offs_t offset)
 {
 	return m_cart->read_rom(offset & m_cart_mask);
 }
@@ -203,7 +203,7 @@ void ggm_state::update_display()
 	m_display->matrix(m_inp_mux, data);
 }
 
-WRITE_LINE_MEMBER(ggm_state::shift_clock_w)
+void ggm_state::shift_clock_w(int state)
 {
 	// shift display segment data on rising edge
 	if (state && !m_shift_clock)
@@ -215,19 +215,19 @@ WRITE_LINE_MEMBER(ggm_state::shift_clock_w)
 	m_shift_clock = state;
 }
 
-WRITE_LINE_MEMBER(ggm_state::shift_data_w)
+void ggm_state::shift_data_w(int state)
 {
 	m_shift_data = state;
 }
 
-WRITE8_MEMBER(ggm_state::select_w)
+void ggm_state::select_w(u8 data)
 {
 	// PA0-PA7: input mux, digit select
 	m_inp_mux = data;
 	update_display();
 }
 
-WRITE8_MEMBER(ggm_state::control_w)
+void ggm_state::control_w(u8 data)
 {
 	// PB0: ?
 
@@ -235,7 +235,7 @@ WRITE8_MEMBER(ggm_state::control_w)
 	m_dac->write(BIT(data, 7));
 }
 
-READ8_MEMBER(ggm_state::input_r)
+u8 ggm_state::input_r()
 {
 	u8 data = 0;
 

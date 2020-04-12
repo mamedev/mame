@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(unico_state::get_tile_info)
 	uint16_t *vram = (uint16_t *)tilemap.user_data();
 	uint16_t code = vram[2 * tile_index + 0 ];
 	uint16_t attr = vram[2 * tile_index + 1 ];
-	SET_TILE_INFO_MEMBER(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
+	tileinfo.set(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
 }
 
 READ16_MEMBER(unico_state::vram_r) { return m_vram[offset]; }

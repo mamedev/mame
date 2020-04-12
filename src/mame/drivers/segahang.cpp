@@ -52,6 +52,7 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 	//
 	//  D7 : FLIPC (1= flip screen, 0= normal orientation)
 	//  D6 : SHADE0 (1= highlight, 0= shadow)
+	//  D5 : Z80 /RESET
 	//  D4 : /KILL (1= screen on, 0= screen off)
 	//  D3 : LAMP2
 	//  D2 : LAMP1
@@ -65,6 +66,9 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 
 	// bit 6: shadow/highlight control
 	m_shadow = ~data & 0x40;
+
+	// bit 5: Z80 RESET line
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	// bit 4: enable display
 	m_segaic16vid->set_display_enable(data & 0x10);
@@ -314,8 +318,8 @@ void segahang_state::sharrier_i8751_sim()
 	// signal a VBLANK to the main CPU
 	m_maincpu->set_input_line(4, HOLD_LINE);
 
-	// clear add lifes protection flag
-	m_workram[0x0f0/2] = 0;
+	// disable timer-based protection
+	m_workram[0x090/2] = 1;
 
 	// read I/O ports
 	m_workram[0x492/2] = (m_adc_ports[0]->read() << 8) | m_adc_ports[1]->read();
@@ -399,7 +403,7 @@ void segahang_state::sound_map_2203(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc7ff).mirror(0x0800).ram();
 	map(0xd000, 0xd001).mirror(0x0ffe).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xe000, 0xe0ff).mirror(0x0f00).rw("pcm", FUNC(segapcm_device::sega_pcm_r), FUNC(segapcm_device::sega_pcm_w));
+	map(0xe000, 0xe0ff).mirror(0x0f00).rw("pcm", FUNC(segapcm_device::read), FUNC(segapcm_device::write));
 }
 
 void segahang_state::sound_portmap_2203(address_map &map)
@@ -413,7 +417,7 @@ void segahang_state::sound_map_2151(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
-	map(0xf000, 0xf0ff).mirror(0x700).rw("pcm", FUNC(segapcm_device::sega_pcm_r), FUNC(segapcm_device::sega_pcm_w));
+	map(0xf000, 0xf0ff).mirror(0x700).rw("pcm", FUNC(segapcm_device::read), FUNC(segapcm_device::write));
 	map(0xf800, 0xffff).ram();
 }
 

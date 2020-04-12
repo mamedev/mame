@@ -292,9 +292,6 @@ class newport_base_device : public device_t
 public:
 	newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device_gio_slot_interface overrides
-	virtual void install_device() override;
-
 	DECLARE_READ64_MEMBER(rex3_r);
 	DECLARE_WRITE64_MEMBER(rex3_w);
 

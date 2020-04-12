@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="nes" description="Nintendo Entertainment System cartridges">
 
 <!-- Confirmed dumps (thanks to Bootgod for his efforts on documenting the real content of NES and Famicom carts!) -->

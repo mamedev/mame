@@ -15,7 +15,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_highest)
 {
 	int code = m_tileram[0][tile_index];
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code & 0xfff,
 			((code >> 12) & 0x0f),
 			0);
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_midlow)
 	int code = m_tileram[1][tile_index * 2];
 	int attr = m_tileram[1][tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(4,
+	tileinfo.set(4,
 			(code & 0x7fff),
 			((attr >> 8) & 0x1f) + 0x40,
 			0);
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_high)
 {
 	int code = m_tileram[2][tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code & 0xfff,
 			((code >> 12) & 0x0f) + 0x10,
 			0);
@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_low)
 {
 	int code = m_tileram[3][tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code & 0xfff,
 			((code >> 12) & 0x0f) + 0x60,
 			0);
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_midhigh)
 	int code = m_tileram[4][tile_index * 2];
 	int attr = m_tileram[4][tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(4,
+	tileinfo.set(4,
 			(code & 0x7fff),
 			((attr >> 8) & 0x1f) + 0x20,
 			0);
@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_lowest)
 	int code = m_tileram[5 + buffer][tile_index * 2];
 	int attr = m_tileram[5 + buffer][tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			(code & 0x1fff),
 			((attr >> 8) & 0x1f) + 0x70,
 			0);

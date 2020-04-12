@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
 There appear to exist some undumped N64 protos
 
   - Air Boardin' USA
@@ -17,9 +18,8 @@ Canceled games (possibly never got to the proto stage)
   - Freak Boy
   - Ikazuchi No Go Toku
   - X-Men Mutant Academy
--->
 
-<!--
+
     Undumped
 
     007: Goldeneye (demo)                      DIS-NUS-NGEE-USA
@@ -46,9 +46,6 @@ Canceled games (possibly never got to the proto stage)
     Super Mario 64 (demo)                      DIS-NUS-NSME-USA
     Turok 2: Seeds of Evil (demo)              NUS-NTYE-USA
 
--->
-
-<!--
 
 Info on N64 chip labels (from The Cart Scan Repository)
 

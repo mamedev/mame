@@ -20,7 +20,7 @@ inline void gotcha_state::get_tile_info( tile_data &tileinfo, int tile_index ,ui
 	uint16_t data = vram[tile_index];
 	int code = (data & 0x3ff) | (m_gfxbank[(data & 0x0c00) >> 10] << 10);
 
-	SET_TILE_INFO_MEMBER(0, code, (data >> 12) + color_offs, 0);
+	tileinfo.set(0, code, (data >> 12) + color_offs, 0);
 }
 
 TILE_GET_INFO_MEMBER(gotcha_state::fg_get_tile_info)

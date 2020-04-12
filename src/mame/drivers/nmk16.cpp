@@ -96,6 +96,7 @@ tharrier test mode:
 1)  Press player 2 buttons 1+2 during reset.  "Are you ready?" will appear
 2)  Press player 1 buttons in this sequence:
     2,1,2,2,1,1,↓,↓
+Note: this doesn't currently work, the message never appears (most likely an error in the protection simulation).
 
 tdragon and hachamf test mode:
 
@@ -106,6 +107,8 @@ mustang and blkheart test mode:
 
 1)  Press player 2 buttons 1+2 during reset.  "Ready?" will appear
 2)  Press player 1 button 1 14 (!) times
+Note: blkheart has a buggy service mode, apparently they shifted the ASCII gfx bank at $3xx but
+      forgot to update the routines so it treats the VRAM as if ASCII bank is at $0xx (cfr. the move.w imm,Ax).
 
 gunnail test mode:
 
@@ -118,9 +121,8 @@ bjtwin test mode:
 2)  Press player 1 buttons in this sequence:
     2,2,2, 1,1,1, 2,2,2, 1,1,1
     The release date of this program will appear.
-
-Some code has to be patched out for this to work (see below). The program
-remaps button 2 and 3 to button 1, so you can't enter the above sequence.
+Note: Some code has to be patched out for this to work (cfr. init_bjtwin fn).
+The program remaps button 2 and 3 to button 1, so you can't enter the above sequence.
 
 ---
 

@@ -204,7 +204,7 @@ bool debugger_cpu::comment_save()
 		if (found_comments)
 		{
 			emu_file file(m_machine.options().comment_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr = file.open(m_machine.basename(), ".cmt");
+			osd_file::error filerr = file.open(m_machine.basename() + ".cmt");
 			if (filerr == osd_file::error::NONE)
 			{
 				root->write(file);
@@ -230,7 +230,7 @@ bool debugger_cpu::comment_load(bool is_inline)
 {
 	// open the file
 	emu_file file(m_machine.options().comment_directory(), OPEN_FLAG_READ);
-	osd_file::error filerr = file.open(m_machine.basename(), ".cmt");
+	osd_file::error filerr = file.open(m_machine.basename() + ".cmt");
 
 	// if an error, just return false
 	if (filerr != osd_file::error::NONE)

@@ -187,7 +187,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_bg0_tile_info)
 	int base = m_tilemap_base[0];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
-	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
+	tileinfo.set(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_bg1_tile_info)
@@ -195,7 +195,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_bg1_tile_info)
 	int base = m_tilemap_base[1];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
-	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
+	tileinfo.set(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_bg2_tile_info)
@@ -203,7 +203,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_bg2_tile_info)
 	int base = m_tilemap_base[2];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
-	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
+	tileinfo.set(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_bg3_tile_info)
@@ -211,7 +211,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_bg3_tile_info)
 	int base = m_tilemap_base[3];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
-	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
+	tileinfo.set(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 

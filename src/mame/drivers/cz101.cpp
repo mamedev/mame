@@ -7,8 +7,6 @@
     Digital Synthesizer
 
     TODO:
-    - To get the display to show something, our uPD7810 core needs to
-      output the full port value even if the port is set as input (port a).
     - Currently seems to hang while processing the serial ports (midi). Our
       uPD7810 core is lacking the externally clocked serial mode.
 
@@ -59,8 +57,6 @@ private:
 
 	void maincpu_map(address_map &map);
 
-	DECLARE_READ8_MEMBER(port_a_r);
-	DECLARE_WRITE8_MEMBER(port_a_w);
 	DECLARE_WRITE8_MEMBER(port_b_w);
 	DECLARE_READ8_MEMBER(port_c_r);
 	DECLARE_WRITE8_MEMBER(port_c_w);
@@ -320,22 +316,6 @@ READ8_MEMBER( cz101_state::keys_r )
 	return m_keys[m_port_b & 0x0f]->read();
 }
 
-// 76543210  lcd data bus
-
-READ8_MEMBER( cz101_state::port_a_r )
-{
-	if ((BIT(m_port_c, 7) == 1) && (BIT(m_port_c, 6) == 1))
-		return m_hd44780->read(BIT(m_port_c, 5));
-
-	return 0xff;
-}
-
-WRITE8_MEMBER( cz101_state::port_a_w )
-{
-	if ((BIT(m_port_c, 7) == 1) && (BIT(m_port_c, 6) == 0))
-		m_hd44780->write(BIT(m_port_c, 5), data);
-}
-
 // 7-------  nmi output
 // -6------  music lsi write enable
 // --5-----  music lsi chip select
@@ -363,6 +343,9 @@ WRITE8_MEMBER( cz101_state::port_c_w )
 	LOG("port_c_w: %02x\n", data);
 
 	m_port_c = data;
+	m_hd44780->e_w(!BIT(data, 7));
+	m_hd44780->rw_w(BIT(data, 6));
+	m_hd44780->rs_w(BIT(data, 5));
 }
 
 void cz101_state::machine_start()
@@ -385,10 +368,11 @@ void cz101_state::cz101(machine_config &config)
 {
 	UPD7810(config, m_maincpu, 10_MHz_XTAL); // actually 7811, but internal ROM disabled
 	m_maincpu->set_addrmap(AS_PROGRAM, &cz101_state::maincpu_map);
-	m_maincpu->pa_in_cb().set(FUNC(cz101_state::port_a_r));
-	m_maincpu->pa_out_cb().set(FUNC(cz101_state::port_a_w));
+	m_maincpu->pa_in_cb().set(m_hd44780, FUNC(hd44780_device::db_r));
+	m_maincpu->pa_out_cb().set(m_hd44780, FUNC(hd44780_device::db_w));
 	m_maincpu->pb_out_cb().set(FUNC(cz101_state::port_b_w));
 	m_maincpu->pc_out_cb().set(FUNC(cz101_state::port_c_w));
+	m_maincpu->set_pc_pullups(0x03);
 
 	CLOCK(config, "midi_clock", 2_MHz_XTAL)/*.signal_handler().set(m_maincpu, FUNC(upd7810_device::sck_w))*/; // not supported yet
 

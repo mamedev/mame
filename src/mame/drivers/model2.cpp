@@ -3481,6 +3481,51 @@ ROM_START( vf2o ) /* Virtua Fighter 2, Model 2A */
 	MODEL2A_VID_BOARD
 ROM_END
 
+ROM_START( airwlkrs )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_LOAD32_WORD( "j_2-14_ic12_fe7e.12",    0x000000, 0x080000, CRC(8851a8d7) SHA1(fe4b1fab4c641718c026ea54c2b2777f3f206f2c) )
+	ROM_LOAD32_WORD( "j_2-14_ic13_d539.13",    0x000002, 0x080000, CRC(72287ee0) SHA1(634d5dcd815883cd03ec633f08e1920adc15c53c) )
+
+	ROM_REGION32_LE( 0x2400000, "main_data", 0 ) // Data
+	ROM_LOAD32_WORD( "mpr-19236.10",     0x000000, 0x200000, CRC(d1bfbebe) SHA1(67ea1d2423682e83126dbf31f9b526e213cd25fd) )
+	ROM_LOAD32_WORD( "mpr-19237.11",     0x000002, 0x200000, CRC(fbcb7b52) SHA1(4428008f9cc62aaf9479009363116c3dafe0626d) )
+	ROM_LOAD32_WORD( "11-7_ic8_d400.8",  0x400000, 0x080000, CRC(37f300bd) SHA1(eb43583917cbf4501e9d21ea721577b36764cc6f) )
+	ROM_LOAD32_WORD( "11-7_ic9_6e4a.9",  0x400002, 0x080000, CRC(454e4a09) SHA1(177715de3dffbaed0eaff2d5e859460a650bea42) )
+	ROM_COPY( "main_data", 0x400000, 0x500000, 0x100000 )
+	ROM_COPY( "main_data", 0x400000, 0x600000, 0x100000 )
+	ROM_COPY( "main_data", 0x400000, 0x700000, 0x100000 )
+	ROM_COPY( "main_data", 0x400000, 0x800000, 0x100000 )
+	ROM_COPY( "main_data", 0x400000, 0x900000, 0x100000 )
+	ROM_COPY( "main_data", 0x400000, 0xa00000, 0x100000 )
+	ROM_COPY( "main_data", 0x400000, 0xb00000, 0x100000 )
+	ROM_COPY( "main_data", 0x400000, 0xc00000, 0x100000 )
+	ROM_COPY( "main_data", 0x400000, 0xd00000, 0x100000 )
+	ROM_COPY( "main_data", 0x400000, 0xe00000, 0x100000 )
+	ROM_COPY( "main_data", 0x400000, 0xf00000, 0x100000 )
+
+	ROM_REGION32_LE( 0x800000, "copro_data", ROMREGION_ERASE00 ) // Copro extra data (collision/height map/etc)
+
+	ROM_REGION( 0x2000000, "polygons", 0 ) // Models
+	ROM_LOAD32_WORD( "mpr-19235.16", 0x000000, 0x200000, CRC(eaad8f92) SHA1(a44094c8d4b91b84e20fad1cf1df77f0bb79837d) )
+	ROM_LOAD32_WORD( "mpr-19232.20", 0x000002, 0x200000, CRC(fd153001) SHA1(f36dea1013106c9bfc6c4b2c0e7155de80445197) )
+
+	ROM_REGION( 0x1000000, "textures", ROMREGION_ERASEFF ) // Textures
+	ROM_LOAD32_WORD( "mpr-19234.25", 0x000000, 0x200000, CRC(d7d69493) SHA1(9502d5f7e1ba6c372b7797c1fadd5d9bffd6a553) )
+	ROM_LOAD32_WORD( "mpr-19233.24", 0x000002, 0x200000, CRC(7a2e51f1) SHA1(be9c9c9bf9c7c7e3262f6eaf4a7c2eeb62cf0962) )
+
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP( "10-18_ic30_30f2.30", 0x000000, 0x080000, CRC(de335a79) SHA1(136b13a317d001e58c9b83e63a3372453a1ad27e) )
+
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP( "mpr-19243.31", 0x000000, 0x200000, CRC(10f530c0) SHA1(c33c513f921c59323bc91ab1bde83bbd8aafc092) )
+	ROM_LOAD16_WORD_SWAP( "mpr-19242.32", 0x200000, 0x200000, CRC(c0772a28) SHA1(85982cb03566067428be96947dc3cf96c4b29c2c) )
+	ROM_LOAD16_WORD_SWAP( "mpr-19241.36", 0x400000, 0x200000, CRC(226fa430) SHA1(766e81bed7a224f32eb1d03660da77fd2b2cda8f) )
+	ROM_LOAD16_WORD_SWAP( "mpr-19240.37", 0x600000, 0x200000, CRC(fb6edae7) SHA1(28ffaa314f9389acf76be9047f9b95eee1615b73) )
+
+	MODEL2_CPU_BOARD
+	MODEL2A_VID_BOARD
+ROM_END
+
 /* Sega Rally Championship Revision C, Model 2A, Sega game ID# 833-11649 RALLY TWIN, Sega ROM board ID# 834-11618 RALLY TWIN */
 ROM_START( srallyc )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
@@ -7041,6 +7086,7 @@ GAME( 1997, zeroguna,  zerogun,  zeroguna,     zerogun,  model2a_state, init_zer
 GAME( 1997, zerogunaj, zerogun,  zeroguna,     zerogun,  model2a_state, init_zerogun, ROT0, "Psikyo", "Zero Gunner (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, motoraid,  0,        manxtt,       motoraid, model2a_state, empty_init,   ROT0, "Sega",   "Motor Raid - Twin", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, motoraiddx,motoraid, manxtt,       motoraid, model2a_state, empty_init,   ROT0, "Sega",   "Motor Raid - Twin/DX", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, airwlkrs,  0,        model2a,      vf2,      model2a_state, empty_init,   ROT0, "Data East", "Air Walkers", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // missing 3D
 GAME( 1998, dynamcop,  0,        model2a_5881, dynamcop, model2a_state, empty_init,   ROT0, "Sega",   "Dynamite Cop (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, dyndeka2,  dynamcop, model2a_5881, dynamcop, model2a_state, empty_init,   ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, pltkidsa,  pltkids,  model2a_5881, pltkids,  model2a_state, init_pltkids, ROT0, "Psikyo", "Pilot Kids (Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

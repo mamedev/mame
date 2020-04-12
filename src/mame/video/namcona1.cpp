@@ -34,11 +34,11 @@ void namcona1_state::tilemap_get_info(
 
 	if (data & 0x8000)
 	{
-		SET_TILE_INFO_MEMBER(gfx, tile, color, TILE_FORCE_LAYER0);
+		tileinfo.set(gfx, tile, color, TILE_FORCE_LAYER0);
 	}
 	else
 	{
-		SET_TILE_INFO_MEMBER(gfx, tile, color, 0);
+		tileinfo.set(gfx, tile, color, 0);
 		tileinfo.mask_data = &m_shaperam[tile << 3];
 	}
 } /* tilemap_get_info */
@@ -76,11 +76,11 @@ TILE_GET_INFO_MEMBER(namcona1_state::roz_get_info)
 
 	if (data & 0x8000)
 	{
-		SET_TILE_INFO_MEMBER(gfx, tile, color, TILE_FORCE_LAYER0);
+		tileinfo.set(gfx, tile, color, TILE_FORCE_LAYER0);
 	}
 	else
 	{
-		SET_TILE_INFO_MEMBER(gfx, tile, color, 0);
+		tileinfo.set(gfx, tile, color, 0);
 		tileinfo.mask_data = &m_shaperam[tile << 3];
 	}
 } /* roz_get_info */

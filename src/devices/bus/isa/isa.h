@@ -155,6 +155,7 @@ public:
 	void unmap_device(offs_t start, offs_t end) const { m_iospace->unmap_readwrite(start, end); }
 	void unmap_bank(offs_t start, offs_t end);
 	void unmap_rom(offs_t start, offs_t end);
+	void unmap_readwrite(offs_t start, offs_t end);
 	bool is_option_rom_space_available(offs_t start, int size);
 
 	// FIXME: shouldn't need to expose this

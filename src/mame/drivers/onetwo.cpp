@@ -116,7 +116,7 @@ TILE_GET_INFO_MEMBER(onetwo_state::get_fg_tile_info)
 
 	code &= 0x7fff;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void onetwo_state::video_start()

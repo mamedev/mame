@@ -315,7 +315,7 @@ void dynax_state::nanajign_palette_update(offs_t offset)
 
 WRITE_LINE_MEMBER(dynax_state::adpcm_int)
 {
-	m_msm->write_data(m_msm5205next >> 4);
+	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_toggle = 1 - m_toggle;
@@ -329,7 +329,7 @@ WRITE_LINE_MEMBER(dynax_state::adpcm_int)
 
 WRITE_LINE_MEMBER(dynax_state::adpcm_int_cpu1)
 {
-	m_msm->write_data(m_msm5205next >> 4);
+	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_toggle_cpu1 = 1 - m_toggle_cpu1;

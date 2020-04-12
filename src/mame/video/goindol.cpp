@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(goindol_state::get_fg_tile_info)
 {
 	int code = m_fg_videoram[2 * tile_index + 1];
 	int attr = m_fg_videoram[2 * tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | ((attr & 0x7) << 8) | (m_char_bank << 11),
 			(attr & 0xf8) >> 3,
 			0);
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(goindol_state::get_bg_tile_info)
 {
 	int code = m_bg_videoram[2 * tile_index + 1];
 	int attr = m_bg_videoram[2 * tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code | ((attr & 0x7) << 8) | (m_char_bank << 11),
 			(attr & 0xf8) >> 3,
 			0);

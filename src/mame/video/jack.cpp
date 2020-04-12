@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(jack_state::get_bg_tile_info)
 
 	// striv: m_colorram[tile_index] & 0x80 ???
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(jack_state::tilemap_scan_cols_flipy)
@@ -170,7 +170,7 @@ TILE_GET_INFO_MEMBER(jack_state::joinem_get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x03) << 8);
 	int color = (m_colorram[tile_index] & 0x38) >> 3 | m_joinem_palette_bank;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 VIDEO_START_MEMBER(jack_state,joinem)

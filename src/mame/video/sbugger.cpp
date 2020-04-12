@@ -12,7 +12,7 @@ TILE_GET_INFO_MEMBER(sbugger_state::get_tile_info)
 	tileno = m_videoram[tile_index];
 	color = m_videoram_attr[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,tileno,color,0);
+	tileinfo.set(0,tileno,color,0);
 }
 
 WRITE8_MEMBER(sbugger_state::videoram_w)

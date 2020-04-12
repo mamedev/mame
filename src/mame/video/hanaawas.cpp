@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(hanaawas_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((attr & 0x20) << 3);
 	int color = m_colorram[tile_index] & 0x1f;
 
-	SET_TILE_INFO_MEMBER(gfxbank, code, color, 0);
+	tileinfo.set(gfxbank, code, color, 0);
 }
 
 void hanaawas_state::video_start()
