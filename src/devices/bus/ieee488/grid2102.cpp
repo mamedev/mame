@@ -77,6 +77,9 @@ void grid2102_device::device_timer(emu_timer &timer, device_timer_id id, int par
         m_floppy_loop_state = GRID2102_STATE_IDLE;
     } else if (m_floppy_loop_state == GRID2102_STATE_WRITING_DATA_WAIT) {
         // send an srq as success flag
+        for (int i = 0; i < 7; i++) { // FIXME:
+            m_output_data_buffer.push(0);
+        }
         serial_poll_byte = 0x0F;
         has_srq = true;
         m_bus->srq_w(this, 0);
@@ -126,7 +129,7 @@ void grid2102_device::ieee488_dav(int state) {
         m_bus->nrfd_w(this, 0);
         uint8_t data = m_bus->read_dio() ^ 0xFF;
         int eoi = m_bus->eoi_r() ^ 1;
-        logerror("grid2102_device byte recv %02x atn %d eoi %d\n", data, atn, eoi);
+        // logerror("grid2102_device byte recv %02x atn %d eoi %d\n", data, atn, eoi);
         m_last_recv_byte = data;
         m_last_recv_atn = atn;
         m_last_recv_eoi = eoi;
@@ -204,7 +207,7 @@ void grid2102_device::ieee488_nrfd(int state) {
         m_bus->dav_w(this, 0);
         m_bus->ndac_w(this, 1);
         m_gpib_loop_state = GRID2102_GPIB_STATE_WAIT_NDAC_FALSE;
-        logerror("grid2102_device byte send %02x eoi %d\n", m_byte_to_send, m_send_eoi);
+        // logerror("grid2102_device byte send %02x eoi %d\n", m_byte_to_send, m_send_eoi);
         ieee488_ndac(m_bus->ndac_r());
     }
     // logerror("grid2102_device nrfd state set to %d\n", state);
