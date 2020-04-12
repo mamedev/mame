@@ -1384,26 +1384,52 @@ static const struct gfx_range mapper_QD22B_table[] =
 };
 
 
-#define mapper_QAD63B   { 0x8000, 0, 0, 0 }, mapper_QAD63B_table
+// #define mapper_QAD63B   { 0x8000, 0, 0, 0 }, mapper_QAD63B_table
+// static const struct gfx_range mapper_QAD63B_table[] =
+// {
+	// /* type                              start   end     bank */
+	// { GFXTYPE_SCROLL1,                   0x0000, 0x07ff, 0 },
+	// { GFXTYPE_SCROLL3,                   0x0800, 0x1fff, 0 },
+	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x2000, 0x7fff, 0 },
+	// { 0 }
+// };
+#define mapper_QAD63B    { 0x8000, 0, 0, 0 }, mapper_QAD63B_table
 static const struct gfx_range mapper_QAD63B_table[] =
 {
-	/* type                              start   end     bank */
-	{ GFXTYPE_SCROLL1,                   0x0000, 0x07ff, 0 },
-	{ GFXTYPE_SCROLL3,                   0x0800, 0x1fff, 0 },
-	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x2000, 0x7fff, 0 },
+	// verified from PAL dump:
+	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
+	// pins 12,13,14,15,16,17 are always enabled
+
+	/* type                                                                  start    end      bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x07fff, 0 },
 	{ 0 }
 };
 
 
-#define mapper_TN2292   { 0x8000, 0x8000, 0, 0 }, mapper_TN2292_table
+// #define mapper_TN2292   { 0x8000, 0x8000, 0, 0 }, mapper_TN2292_table
+// static const struct gfx_range mapper_TN2292_table[] =
+// {
+	// /* type                              start   end     bank */
+	// { GFXTYPE_SCROLL1,                   0x0000, 0x0fff, 0 },
+	// { GFXTYPE_SCROLL3,                   0x1000, 0x3fff, 0 },
+	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x4000, 0x7fff, 0 },
+
+	// { GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0xffff, 1 },
+	// { 0 }
+// };
+#define mapper_TN2292    { 0x8000, 0x8000, 0x8000, 0 }, mapper_TN2292_table
 static const struct gfx_range mapper_TN2292_table[] =
 {
-	/* type                              start   end     bank */
-	{ GFXTYPE_SCROLL1,                   0x0000, 0x0fff, 0 },
-	{ GFXTYPE_SCROLL3,                   0x1000, 0x3fff, 0 },
-	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x4000, 0x7fff, 0 },
+	// verified from PAL dump:
+	// bank 0 = pin 19 (ROMs 5,6,7,8)
+	// bank 1 = pin 14 (ROMs 14,15,16,17)
+	// bank 2 = pin 12 (ROMS 24,25,26,27)  these sockets are empty
+	// doesn't use a22-a20 to determine gfx type
 
-	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0xffff, 1 },
+	/* type                                                                                  start    end      bank */
+	{ GFXTYPE_STARS | GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x07fff, 0 },
+	{ GFXTYPE_STARS | GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x08000, 0x0ffff, 1 },
+	{ GFXTYPE_STARS | GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x10000, 0x17fff, 2 },
 	{ 0 }
 };
 
