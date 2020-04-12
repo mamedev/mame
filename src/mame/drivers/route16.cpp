@@ -98,7 +98,7 @@ SUN ELECTRONICS CORPORATION
 |                                    |         X |
 |                                    | MB8841  X | <--- Sub board on top containing 4 logic
 |                                    |         X |      chips and an MB8841 microcontroller
-| 10MHz                              |         X |
+| 10MHz                              |         X |      PCB Number: TVX-S1
 |                                    |         X |
 |  ^SN76477      MB7052.61           |---------X-|
 |#VRS  AY-3-8910                               X |
@@ -162,7 +162,6 @@ PL2 Button | 7A | 7B | PL1 Button
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -182,7 +181,7 @@ MACHINE_START_MEMBER(route16_state, jongpute)
 	save_item(NAME(m_jongpute_port_select));
 }
 
-void route16_state::init_route16()
+void route16_state::init_route16a()
 {
 	// hack out the protection
 	u8 *rom = memregion("cpu1")->base();
@@ -196,7 +195,7 @@ void route16_state::init_route16()
 	init_route16c();
 }
 
-void route16_state::init_route16a()
+void route16_state::init_route16()
 {
 	save_item(NAME(m_protection_data));
 	// hack out the protection
@@ -283,7 +282,7 @@ void route16_state::init_vscompmj() // only opcodes encrypted
  *
  *************************************/
 
-template<bool cpu1> WRITE8_MEMBER(route16_state::route16_sharedram_w)
+template<bool cpu1> void route16_state::route16_sharedram_w(offs_t offset, uint8_t data)
 {
 	m_sharedram[offset] = data;
 
@@ -303,7 +302,7 @@ template<bool cpu1> WRITE8_MEMBER(route16_state::route16_sharedram_w)
  *
  *************************************/
 
-READ8_MEMBER(route16_state::routex_prot_read)
+uint8_t route16_state::routex_prot_read()
 {
 	if (m_cpu1->pc() == 0x2f) return 0xfb;
 
@@ -312,7 +311,7 @@ READ8_MEMBER(route16_state::routex_prot_read)
 }
 
 // never called, see notes.
-READ8_MEMBER(route16_state::route16_prot_read)
+uint8_t route16_state::route16_prot_read()
 {
 	m_protection_data++;
 	return (1 << ((m_protection_data >> 1) & 7));
@@ -326,7 +325,7 @@ READ8_MEMBER(route16_state::route16_prot_read)
  *
  *************************************/
 
-WRITE8_MEMBER(route16_state::stratvox_sn76477_w)
+void route16_state::stratvox_sn76477_w(uint8_t data)
 {
 	/***************************************************************
 	 * AY8910 output bits are connected to...
@@ -356,38 +355,38 @@ WRITE8_MEMBER(route16_state::stratvox_sn76477_w)
  *
  ***************************************************/
 
-WRITE8_MEMBER(route16_state::jongpute_input_port_matrix_w)
+void route16_state::jongpute_input_port_matrix_w(uint8_t data)
 {
 	m_jongpute_port_select = data;
 }
 
 
-READ8_MEMBER(route16_state::jongpute_p1_matrix_r)
+uint8_t route16_state::jongpute_p1_matrix_r()
 {
 	uint8_t ret = 0;
 
 	switch (m_jongpute_port_select)
 	{
-	case 1:  ret = ioport("KEY0")->read(); break;
-	case 2:  ret = ioport("KEY1")->read(); break;
-	case 4:  ret = ioport("KEY2")->read(); break;
-	case 8:  ret = ioport("KEY3")->read(); break;
+	case 1:  ret = m_key[0]->read(); break;
+	case 2:  ret = m_key[1]->read(); break;
+	case 4:  ret = m_key[2]->read(); break;
+	case 8:  ret = m_key[3]->read(); break;
 	default: break;
 	}
 
 	return ret;
 }
 
-READ8_MEMBER(route16_state::jongpute_p2_matrix_r)
+uint8_t route16_state::jongpute_p2_matrix_r()
 {
 	uint8_t ret = 0;
 
 	switch (m_jongpute_port_select)
 	{
-	case 1:  ret = ioport("KEY4")->read(); break;
-	case 2:  ret = ioport("KEY5")->read(); break;
-	case 4:  ret = ioport("KEY6")->read(); break;
-	case 8:  ret = ioport("KEY7")->read(); break;
+	case 1:  ret = m_key[4]->read(); break;
+	case 2:  ret = m_key[5]->read(); break;
+	case 4:  ret = m_key[6]->read(); break;
+	case 8:  ret = m_key[7]->read(); break;
 	default: break;
 	}
 
@@ -404,7 +403,7 @@ READ8_MEMBER(route16_state::jongpute_p2_matrix_r)
   this would then be checking that the sounds are mixed correctly.
 ***************************************************************************/
 
-READ8_MEMBER(route16_state::speakres_in3_r)
+uint8_t route16_state::speakres_in3_r()
 {
 	int bit2=4, bit1=2, bit0=1;
 
@@ -419,7 +418,7 @@ READ8_MEMBER(route16_state::speakres_in3_r)
 	return 0xf8|bit2|bit1|bit0;
 }
 
-WRITE8_MEMBER(route16_state::speakres_out2_w)
+void route16_state::speakres_out2_w(uint8_t data)
 {
 	m_speakres_vrx=0;
 }
@@ -545,10 +544,10 @@ static INPUT_PORTS_START( route16 )
 	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_HIGH, "DSW:!2" )  // Manual says unused
 	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_HIGH, "DSW:!3" )  // Manual says unused
 	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )         PORT_DIPLOCATION("DSW:!4,!5")
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )  // same as 0x00
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )  // same as 0x10
+	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )  // Same as 0x08
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )         PORT_DIPLOCATION("DSW:!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -586,10 +585,10 @@ static INPUT_PORTS_START( route16a )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )         PORT_DIPLOCATION("DSW:!4,!5")
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )  // same as 0x00
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )  // Same as 0x08
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )  // same as 0x10
 INPUT_PORTS_END
 
 
@@ -965,6 +964,30 @@ void route16_state::vscompmj(machine_config &config)
 
 ROM_START( route16 )
 	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "stvg54.a0",       0x0000, 0x0800, CRC(b8471cdc) SHA1(2a890782e15fa74a6c706b06f91216f427435700) )
+	ROM_LOAD( "stvg55.a1",       0x0800, 0x0800, CRC(3ec52fe5) SHA1(451969b5caedd665231ef78cf262679d6d4c8507) )
+	ROM_LOAD( "stvg56.a2",       0x1000, 0x0800, CRC(a8e92871) SHA1(68a709c14309d2b617997b76ae9d7b80fd326f39) )
+	ROM_LOAD( "stvg57.a3",       0x1800, 0x0800, CRC(a0fc9fc5) SHA1(7013750c1b3d403b12eac10282a930538ed9c73e) )
+	ROM_LOAD( "stvg58.a4",       0x2000, 0x0800, CRC(cc95c02c) SHA1(c0b85070883463a98098d72282c52e14822c204e) )
+	ROM_LOAD( "stvg59.a5",       0x2800, 0x0800, CRC(a39ef648) SHA1(866095d9880b60b01f7ca66b332f5f6c4b41a5ac) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "stvg60.b0",       0x0000, 0x0800, CRC(fef605f3) SHA1(bfbffa0ded3e285c034f0ad832864021ef3f2256) )
+	ROM_LOAD( "stvg61.b1",       0x0800, 0x0800, CRC(d0d6c189) SHA1(75cec891e20cf05aae354c8950857aea83c6dadc) )
+	ROM_LOAD( "stvg62.b2",       0x1000, 0x0800, CRC(defc5797) SHA1(aec8179e647de70016e0e63b720f932752adacc1) )
+	ROM_LOAD( "stvg63.b3",       0x1800, 0x0800, CRC(88d94a66) SHA1(163e952ada7c05110d1f1c681bd57d3b9ea8866e) )
+
+	ROM_REGION( 0x800, "mcu", 0 ) // on a small daughterboard inserted at a6
+	ROM_LOAD( "mb8841",       0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* Intersil IM5623CPE proms compatible with 82s129 */
+	/* The upper 128 bytes are 0's, used by the hardware to blank the display */
+	ROM_LOAD( "im5623.f10",   0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* top bitmap */
+	ROM_LOAD( "im5623.f12",   0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
+ROM_END
+
+ROM_START( route16a )
+	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "tvg54.a0",     0x0000, 0x0800, CRC(aef9ffc1) SHA1(178d23e4963336ded93c13cb17940a4ae98270c5) )
 	ROM_LOAD( "tvg55.a1",     0x0800, 0x0800, CRC(389bc077) SHA1(b0606f6e647e81ceae7148bda96bd4673a51e823) )
 	ROM_LOAD( "tvg56.a2",     0x1000, 0x0800, CRC(1065a468) SHA1(4a707a42fb5a718043c173cb98ff3523eb274ccc) )
@@ -1005,7 +1028,7 @@ ROM_START( route16c )
 	ROM_LOAD( "im5623.f12",   0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
 ROM_END
 
-ROM_START( route16a )
+ROM_START( route16b )
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "vg-54",        0x0000, 0x0800, CRC(0c966319) SHA1(2f57e9a30dab864bbee2ccb0107c1b4212c5abaf) )
 	ROM_LOAD( "vg-55",        0x0800, 0x0800, CRC(a6a8c212) SHA1(a4a695d401b1e495c863c6938296a99592df0e7d) )
@@ -1046,8 +1069,6 @@ ROM_START( route16bl )
 	ROM_LOAD( "im5623.f10",   0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* top bitmap */
 	ROM_LOAD( "im5623.f12",   0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
 ROM_END
-
-
 
 ROM_START( routex )
 	ROM_REGION( 0x10000, "cpu1", 0 )
@@ -1329,11 +1350,12 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, route16,  0,        route16,  route16,  route16_state, init_route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16a, route16,  route16,  route16a, route16_state, init_route16a, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16c, route16,  route16,  route16a, route16_state, init_route16c, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
-GAME( 1981, route16bl,route16,  route16,  route16a, route16_state, empty_init,    ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, routex,   route16,  routex,   route16a, route16_state, empty_init,    ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16,  0,        route16,  route16,  route16_state, init_route16,  ROT270, "Sun Electronics",                            "Route 16 (Sun Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16a, 0,        route16,  route16a, route16_state, init_route16a, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (Centuri license, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16b, route16,  route16,  route16,  route16_state, init_route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (Centuri license, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16c, route16,  route16,  route16,  route16_state, init_route16c, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (Centuri license, set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
+GAME( 1981, route16bl,route16,  route16,  route16,  route16_state, empty_init,    ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, routex,   route16,  routex,   route16,  route16_state, empty_init,    ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1980, speakres, 0,        speakres, speakres, route16_state, empty_init,    ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, speakresb,speakres, speakres, speakres, route16_state, empty_init,    ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
