@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /*********************************************************************
 
