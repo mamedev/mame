@@ -4401,22 +4401,19 @@ ROM_START( strideruc )
 	ROM_LOAD( "18.11c",  0x00000, 0x20000, CRC(4386bc80) SHA1(fb2b261995aeacfa13e7ee40b1a973dfb178f015) )
 	ROM_LOAD( "19.12c",  0x20000, 0x20000, CRC(444536d7) SHA1(a14f5de2f6b5b29ae5161dca1f8c08c566301a91) )
 
-	// which of these should we be using?
-	/*
-	ROM_REGION( 0x0200, "aboardplds", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0200, "aboardplds", 0 )
 	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
 	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
 	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
 	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
-	ROM_REGION( 0x0200, "bboardplds", ROMREGION_ERASE00 )
-	ROM_LOAD( "stf29.1a",     0x0000, 0x0117, CRC(043309c5) SHA1(f6b9610c9f896c495041ba56a654776a521c356b) )
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "unknown.1a",   0x0000, 0x0117, NO_DUMP ) // unknown custom pal or gal
 	ROM_LOAD( "iob1.11d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 
-	ROM_REGION( 0x0200, "cboardplds", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0200, "cboardplds", 0 )
 	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
-	*/
 ROM_END
 
 /* B-Board 88622B-3 */
@@ -4930,7 +4927,7 @@ ROM_START( willowj )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "wl22b.1a",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "wl22b.1a",     0x0000, 0x0117, CRC(950cfa39) SHA1(c30eadfccf4129f2eece16f9df25cff50bdcfd53) )
 	ROM_LOAD( "lwio.12c",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )
 ROM_END
 
@@ -6912,7 +6909,7 @@ ROM_START( sf2en )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "stf29.1a",     0x0000, 0x0117, CRC(043309c5) SHA1(f6b9610c9f896c495041ba56a654776a521c356b) ) // not labeled
+	ROM_LOAD( "unknown.1a",   0x0000, 0x0117, NO_DUMP ) // unknown custom gal
 	ROM_LOAD( "iob1.11d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
@@ -8819,7 +8816,7 @@ ROM_START( kodja )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "kd22b.1a",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "kd22b.1a",     0x0000, 0x0117, CRC(bd1a6035) SHA1(16f36373eee5823733b0bbf01aafc4a07e3d1667) )
 	ROM_LOAD( "iob1.12e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
@@ -9285,7 +9282,7 @@ ROM_START( knightsja )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "kr22b.1a",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "kr22b.1a",     0x0000, 0x0117, CRC(f15b2c0f) SHA1(07113a14a60b5ba232451bc73e36f7e6a7fee572) )
 	ROM_LOAD( "lwio.12e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
@@ -11178,7 +11175,7 @@ ROM_START( cworld2j )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "q522b.1a",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "q522b.1a",     0x0000, 0x0117, CRC(0a1527ab) SHA1(116bab946ebe87fa0e913c210604910f9af0389f) )
 	ROM_LOAD( "lwio.12e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )    /* seen the same pcb with IOB1.12E */
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
