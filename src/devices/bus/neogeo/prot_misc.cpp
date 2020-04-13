@@ -304,6 +304,34 @@ uint32_t neoboot_prot_device::mslug5p_bank_base(uint16_t sel)
 }
 
 
+/* Metal Slug 5 (bootleg) */
+
+void neoboot_prot_device::mslug5b_vx_decrypt(uint8_t* ymsndrom, uint32_t ymsndrom_size)
+{
+	// only odd bytes are scrambled
+	int ym_size = ymsndrom_size;
+	uint8_t *rom = ymsndrom;
+	for (int i = 1; i < ym_size; i += 2)
+		rom[i] = bitswap<8>(rom[i], 3, 2, 4, 1, 5, 0, 6, 7);
+}
+
+void neoboot_prot_device::mslug5b_cx_decrypt(uint8_t* sprrom, uint32_t sprrom_size)
+{
+	// rom a18/a19 lines are swapped
+	int cx_size = sprrom_size;
+	uint8_t *rom = sprrom;
+	std::vector<uint8_t> buf(cx_size);
+
+	memcpy(&buf[0], rom, cx_size);
+
+	for (int i = 1; i < 128; i += 4)
+	{
+		memcpy(&rom[i * 0x80000], &buf[(i + 1) * 0x80000], 0x80000);
+		memcpy(&rom[(i + 1) * 0x80000], &buf[i * 0x80000], 0x80000);
+	}
+}
+
+
 /* The King of Gladiator (The King of Fighters '97 bootleg) */
 
 // The protection patching here may be incomplete - Thanks to Razoola for the info

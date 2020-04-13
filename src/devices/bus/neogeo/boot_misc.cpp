@@ -257,7 +257,9 @@ neogeo_mslug5b_cart_device::neogeo_mslug5b_cart_device(const machine_config &mco
 
 void neogeo_mslug5b_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
+	m_prot->mslug5b_vx_decrypt(ym_region, ym_region_size);
 	m_prot->sx_decrypt(fix_region, fix_region_size, 2);
+	m_prot->mslug5b_cx_decrypt(spr_region, spr_region_size);
 }
 
 
