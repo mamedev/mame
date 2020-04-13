@@ -81,12 +81,12 @@ private:
 	u64 cheat_byte_swap(const cheat_system *cheatsys, u64 value);
 	u64 cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address);
 
-	u64 execute_min(symbol_table &table, int params, const u64 *param);
-	u64 execute_max(symbol_table &table, int params, const u64 *param);
-	u64 execute_if(symbol_table &table, int params, const u64 *param);
+	u64 execute_min(int params, const u64 *param);
+	u64 execute_max(int params, const u64 *param);
+	u64 execute_if(int params, const u64 *param);
 
-	u64 global_get(symbol_table &table, global_entry *global);
-	void global_set(symbol_table &table, global_entry *global, u64 value);
+	u64 global_get(global_entry *global);
+	void global_set(global_entry *global, u64 value);
 
 	int mini_printf(char *buffer, const char *format, int params, u64 *param);
 

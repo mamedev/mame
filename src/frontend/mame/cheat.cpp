@@ -401,8 +401,8 @@ cheat_script::script_entry::script_entry(
 		std::string const &filename,
 		util::xml::data_node const &entrynode,
 		bool isaction)
-	: m_condition(&symbols)
-	, m_expression(&symbols)
+	: m_condition(symbols)
+	, m_expression(symbols)
 {
 	char const *expression(nullptr);
 	try
@@ -610,7 +610,7 @@ cheat_script::script_entry::output_argument::output_argument(
 		symbol_table &symbols,
 		std::string const &filename,
 		util::xml::data_node const &argnode)
-	: m_expression(&symbols)
+	: m_expression(symbols)
 	, m_count(0)
 {
 	// first extract attributes
@@ -679,7 +679,7 @@ void cheat_script::script_entry::output_argument::save(emu_file &cheatfile) cons
 
 cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, std::string const &filename, util::xml::data_node const &cheatnode)
 	: m_manager(manager)
-	, m_symbols(&manager.machine(), &globaltable)
+	, m_symbols(&globaltable)
 	, m_state(SCRIPT_STATE_OFF)
 	, m_numtemp(DEFAULT_TEMP_VARIABLES)
 	, m_argindex(0)
@@ -1058,7 +1058,7 @@ constexpr int cheat_manager::CHEAT_VERSION;
 cheat_manager::cheat_manager(running_machine &machine)
 	: m_machine(machine)
 	, m_disabled(true)
-	, m_symtable(&machine)
+	, m_symtable()
 {
 	// if the cheat engine is disabled, we're done
 	if (!machine.options().cheat())
@@ -1329,7 +1329,7 @@ std::string cheat_manager::quote_expression(const parsed_expression &expression)
 //  execute_frombcd - convert a value from BCD
 //-------------------------------------------------
 
-uint64_t cheat_manager::execute_frombcd(symbol_table &table, int params, const uint64_t *param)
+uint64_t cheat_manager::execute_frombcd(int params, const uint64_t *param)
 {
 	uint64_t value(param[0]);
 	uint64_t multiplier(1);
@@ -1349,7 +1349,7 @@ uint64_t cheat_manager::execute_frombcd(symbol_table &table, int params, const u
 //  execute_tobcd - convert a value to BCD
 //-------------------------------------------------
 
-uint64_t cheat_manager::execute_tobcd(symbol_table &table, int params, const uint64_t *param)
+uint64_t cheat_manager::execute_tobcd(int params, const uint64_t *param)
 {
 	uint64_t value(param[0]);
 	uint64_t result(0);

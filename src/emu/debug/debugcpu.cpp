@@ -53,7 +53,7 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	m_tempvar = make_unique_clear<u64[]>(NUM_TEMP_VARIABLES);
 
 	/* create a global symbol table */
-	m_symtable = std::make_unique<symbol_table>(&m_machine);
+	m_symtable = std::make_unique<symbol_table>();
 
 	// configure our base memory accessors
 	configure_memory(*m_symtable);
@@ -62,8 +62,7 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	m_symtable->add("wpaddr", symbol_table::READ_ONLY, &m_wpaddr);
 	m_symtable->add("wpdata", symbol_table::READ_ONLY, &m_wpdata);
 
-	using namespace std::placeholders;
-	m_symtable->add("cpunum", std::bind(&debugger_cpu::get_cpunum, this, _1));
+	m_symtable->add("cpunum", std::bind(&debugger_cpu::get_cpunum, this));
 
 	screen_device_iterator screen_iterator = screen_device_iterator(m_machine.root_device());
 	screen_device_iterator::auto_iterator iter = screen_iterator.begin();
@@ -71,18 +70,20 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 
 	if (count == 1)
 	{
-		m_symtable->add("beamx", std::bind(&debugger_cpu::get_beamx, this, _1, iter.current()));
-		m_symtable->add("beamy", std::bind(&debugger_cpu::get_beamy, this, _1, iter.current()));
-		m_symtable->add("frame", std::bind(&debugger_cpu::get_frame, this, _1, iter.current()));
+		screen_device &screen = *iter.current();
+		m_symtable->add("beamx", [&screen]() { return screen.hpos(); });
+		m_symtable->add("beamy", [&screen]() { return screen.vpos(); });
+		m_symtable->add("frame", [&screen]() { return screen.frame_number(); });
 		iter.current()->register_vblank_callback(vblank_state_delegate(&debugger_cpu::on_vblank, this));
 	}
 	else if (count > 1)
 	{
 		for (uint32_t i = 0; i < count; i++, iter++)
 		{
-			m_symtable->add(string_format("beamx%d", i).c_str(), std::bind(&debugger_cpu::get_beamx, this, _1, iter.current()));
-			m_symtable->add(string_format("beamy%d", i).c_str(), std::bind(&debugger_cpu::get_beamy, this, _1, iter.current()));
-			m_symtable->add(string_format("frame%d", i).c_str(), std::bind(&debugger_cpu::get_frame, this, _1, iter.current()));
+			screen_device &screen = *iter.current();
+			m_symtable->add(string_format("beamx%d", i).c_str(), [&screen]() { return screen.hpos(); });
+			m_symtable->add(string_format("beamy%d", i).c_str(), [&screen]() { return screen.vpos(); });
+			m_symtable->add(string_format("frame%d", i).c_str(), [&screen]() { return screen.frame_number(); });
 			iter.current()->register_vblank_callback(vblank_state_delegate(&debugger_cpu::on_vblank, this));
 		}
 	}
@@ -111,10 +112,9 @@ void debugger_cpu::configure_memory(symbol_table &table)
 {
 	using namespace std::placeholders;
 	table.configure_memory(
-		&m_machine,
-		std::bind(&debugger_cpu::expression_validate, this, _1, _2, _3),
-		std::bind(&debugger_cpu::expression_read_memory, this, _1, _2, _3, _4, _5, _6),
-		std::bind(&debugger_cpu::expression_write_memory, this, _1, _2, _3, _4, _5, _6, _7));
+		std::bind(&debugger_cpu::expression_validate, this, _1, _2),
+		std::bind(&debugger_cpu::expression_read_memory, this, _1, _2, _3, _4, _5),
+		std::bind(&debugger_cpu::expression_write_memory, this, _1, _2, _3, _4, _5, _6));
 }
 
 /*-------------------------------------------------
@@ -134,18 +134,18 @@ void debugger_cpu::flush_traces()
 
 
 
-/***************************************************************************
-    SYMBOL TABLE INTERFACES
-***************************************************************************/
+//**************************************************************************
+//  SYMBOL TABLE INTERFACES
+//**************************************************************************
 
-/*-------------------------------------------------
-    get_visible_symtable - return the
-    locally-visible symbol table
--------------------------------------------------*/
+//-------------------------------------------------
+//  visible_symtable - return the locally-visible
+//  symbol table
+//-------------------------------------------------
 
-symbol_table* debugger_cpu::get_visible_symtable()
+symbol_table &debugger_cpu::visible_symtable()
 {
-	return &m_visiblecpu->debug()->symtable();
+	return m_visiblecpu->debug()->symtable();
 }
 
 
@@ -630,7 +630,7 @@ device_t* debugger_cpu::expression_get_device(const char *tag)
     space
 -------------------------------------------------*/
 
-u64 debugger_cpu::expression_read_memory(void *param, const char *name, expression_space spacenum, u32 address, int size, bool disable_se)
+u64 debugger_cpu::expression_read_memory(const char *name, expression_space spacenum, u32 address, int size, bool disable_se)
 {
 	switch (spacenum)
 	{
@@ -836,7 +836,7 @@ u64 debugger_cpu::expression_read_memory_region(const char *rgntag, offs_t addre
     space
 -------------------------------------------------*/
 
-void debugger_cpu::expression_write_memory(void *param, const char *name, expression_space spacenum, u32 address, int size, u64 data, bool disable_se)
+void debugger_cpu::expression_write_memory(const char *name, expression_space spacenum, u32 address, int size, u64 data, bool disable_se)
 {
 	device_t *device = nullptr;
 	device_memory_interface *memory;
@@ -1040,7 +1040,7 @@ void debugger_cpu::expression_write_memory_region(const char *rgntag, offs_t add
     appropriate name
 -------------------------------------------------*/
 
-expression_error::error_code debugger_cpu::expression_validate(void *param, const char *name, expression_space space)
+expression_error::error_code debugger_cpu::expression_validate(const char *name, expression_space space)
 {
 	device_t *device = nullptr;
 	device_memory_interface *memory;
@@ -1120,51 +1120,25 @@ expression_error::error_code debugger_cpu::expression_validate(void *param, cons
 
 
 
-/***************************************************************************
-    VARIABLE GETTERS/SETTERS
-***************************************************************************/
+//**************************************************************************
+//  VARIABLE GETTERS/SETTERS
+//**************************************************************************
 
-/*-------------------------------------------------
-    get_beamx - get beam horizontal position
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_cpunum - getter callback for the
+//  'cpunum' symbol
+//-------------------------------------------------
 
-u64 debugger_cpu::get_beamx(symbol_table &table, screen_device *screen)
-{
-	return (screen != nullptr) ? screen->hpos() : 0;
-}
-
-
-/*-------------------------------------------------
-    get_beamy - get beam vertical position
--------------------------------------------------*/
-
-u64 debugger_cpu::get_beamy(symbol_table &table, screen_device *screen)
-{
-	return (screen != nullptr) ? screen->vpos() : 0;
-}
-
-
-/*-------------------------------------------------
-    get_frame - get current frame number
--------------------------------------------------*/
-
-u64 debugger_cpu::get_frame(symbol_table &table, screen_device *screen)
-{
-	return (screen != nullptr) ? screen->frame_number() : 0;
-}
-
-
-/*-------------------------------------------------
-    get_cpunum - getter callback for the
-    'cpunum' symbol
--------------------------------------------------*/
-
-u64 debugger_cpu::get_cpunum(symbol_table &table)
+u64 debugger_cpu::get_cpunum()
 {
 	execute_interface_iterator iter(m_machine.root_device());
 	return iter.indexof(m_visiblecpu->execute());
 }
 
+
+//**************************************************************************
+//  EXECUTION HOOKS
+//**************************************************************************
 
 void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 {
@@ -1285,7 +1259,7 @@ device_debug::device_debug(device_t &device)
 	, m_state(nullptr)
 	, m_disasm(nullptr)
 	, m_flags(0)
-	, m_symtable(&device, device.machine().debugger().cpu().get_global_symtable())
+	, m_symtable(&device.machine().debugger().cpu().global_symtable())
 	, m_instrhook(nullptr)
 	, m_stepaddr(0)
 	, m_stepsleft(0)
@@ -1338,9 +1312,9 @@ device_debug::device_debug(device_t &device)
 		// add global symbol for cycles and totalcycles
 		if (m_exec != nullptr)
 		{
-			m_symtable.add("cycles", get_cycles);
-			m_symtable.add("totalcycles", get_totalcycles);
-			m_symtable.add("lastinstructioncycles", get_lastinstructioncycles);
+			m_symtable.add("cycles", [this]() { return m_exec->cycles_remaining(); });
+			m_symtable.add("totalcycles", symbol_table::READ_ONLY, &m_total_cycles);
+			m_symtable.add("lastinstructioncycles", [this]() { return m_total_cycles - m_last_total_cycles; });
 		}
 
 		// add entries to enable/disable unmap reporting for each space
@@ -1349,23 +1323,23 @@ device_debug::device_debug(device_t &device)
 			if (m_memory->has_space(AS_PROGRAM))
 				m_symtable.add(
 						"logunmap",
-						[&space = m_memory->space(AS_PROGRAM)] (symbol_table &table) { return space.log_unmap(); },
-						[&space = m_memory->space(AS_PROGRAM)] (symbol_table &table, u64 value) { return space.set_log_unmap(bool(value)); });
+						[&space = m_memory->space(AS_PROGRAM)] () { return space.log_unmap(); },
+						[&space = m_memory->space(AS_PROGRAM)] (u64 value) { return space.set_log_unmap(bool(value)); });
 			if (m_memory->has_space(AS_DATA))
 				m_symtable.add(
 						"logunmap",
-						[&space = m_memory->space(AS_DATA)] (symbol_table &table) { return space.log_unmap(); },
-						[&space = m_memory->space(AS_DATA)] (symbol_table &table, u64 value) { return space.set_log_unmap(bool(value)); });
+						[&space = m_memory->space(AS_DATA)] () { return space.log_unmap(); },
+						[&space = m_memory->space(AS_DATA)] (u64 value) { return space.set_log_unmap(bool(value)); });
 			if (m_memory->has_space(AS_IO))
 				m_symtable.add(
 						"logunmap",
-						[&space = m_memory->space(AS_IO)] (symbol_table &table) { return space.log_unmap(); },
-						[&space = m_memory->space(AS_IO)] (symbol_table &table, u64 value) { return space.set_log_unmap(bool(value)); });
+						[&space = m_memory->space(AS_IO)] () { return space.log_unmap(); },
+						[&space = m_memory->space(AS_IO)] (u64 value) { return space.set_log_unmap(bool(value)); });
 			if (m_memory->has_space(AS_OPCODES))
 				m_symtable.add(
 						"logunmap",
-						[&space = m_memory->space(AS_OPCODES)] (symbol_table &table) { return space.log_unmap(); },
-						[&space = m_memory->space(AS_OPCODES)] (symbol_table &table, u64 value) { return space.set_log_unmap(bool(value)); });
+						[&space = m_memory->space(AS_OPCODES)] () { return space.log_unmap(); },
+						[&space = m_memory->space(AS_OPCODES)] (u64 value) { return space.set_log_unmap(bool(value)); });
 		}
 
 		// add all registers into it
@@ -1379,8 +1353,8 @@ device_debug::device_debug(device_t &device)
 				strmakelower(tempstr.assign(entry->symbol()));
 				m_symtable.add(
 						tempstr.c_str(),
-						std::bind(&device_debug::get_state, _1, entry->index()),
-						entry->writeable() ? std::bind(&device_debug::set_state, _1, entry->index(), _2) : symbol_table::setter_func(nullptr),
+						std::bind(&device_state_interface::state_int, m_state, entry->index()),
+						entry->writeable() ? std::bind(&device_state_interface::set_state_int, m_state, entry->index(), _1) : symbol_table::setter_func(nullptr),
 						entry->format_string());
 			}
 		}
@@ -1393,7 +1367,7 @@ device_debug::device_debug(device_t &device)
 
 		// if no curpc, add one
 		if (m_state && !m_symtable.find("curpc"))
-			m_symtable.add("curpc", get_current_pc);
+			m_symtable.add("curpc", std::bind(&device_state_interface::pcbase, m_state));
 	}
 
 	// set up trace
@@ -1902,7 +1876,7 @@ void device_debug::go_privilege(const char *condition)
 {
 	assert(m_exec != nullptr);
 	m_device.machine().rewind_invalidate();
-	m_privilege_condition = std::make_unique<parsed_expression>(&m_symtable, condition);
+	m_privilege_condition = std::make_unique<parsed_expression>(m_symtable, condition);
 	m_flags |= DEBUG_FLAG_STOP_PRIVILEGE;
 	m_device.machine().debugger().cpu().set_execution_running();
 }
@@ -2636,79 +2610,6 @@ void device_debug::hotspot_check(address_space &space, offs_t address)
 	}
 }
 
-//-------------------------------------------------
-//  get_current_pc - getter callback for a device's
-//  current instruction pointer
-//-------------------------------------------------
-
-u64 device_debug::get_current_pc(symbol_table &table)
-{
-	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->state().pcbase();
-}
-
-
-//-------------------------------------------------
-//  get_cycles - getter callback for the
-//  'cycles' symbol
-//-------------------------------------------------
-
-u64 device_debug::get_cycles(symbol_table &table)
-{
-	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->debug()->m_exec->cycles_remaining();
-}
-
-
-//-------------------------------------------------
-//  get_totalcycles - getter callback for the
-//  'totalcycles' symbol
-//-------------------------------------------------
-
-u64 device_debug::get_totalcycles(symbol_table &table)
-{
-	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->debug()->m_total_cycles;
-}
-
-
-//-------------------------------------------------
-//  get_lastinstructioncycles - getter callback for the
-//  'lastinstructioncycles' symbol
-//-------------------------------------------------
-
-u64 device_debug::get_lastinstructioncycles(symbol_table &table)
-{
-	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	device_debug *debug = device->debug();
-	return debug->m_total_cycles - debug->m_last_total_cycles;
-}
-
-
-//-------------------------------------------------
-//  get_state - getter callback for a device's
-//  state symbols
-//-------------------------------------------------
-
-u64 device_debug::get_state(symbol_table &table, int index)
-{
-	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->debug()->m_state->state_int(index);
-}
-
-
-//-------------------------------------------------
-//  set_state - setter callback for a device's
-//  state symbols
-//-------------------------------------------------
-
-void device_debug::set_state(symbol_table &table, int index, u64 value)
-{
-	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	device->debug()->m_state->set_state_int(index, value);
-}
-
-
 
 //**************************************************************************
 //  DEBUG BREAKPOINT
@@ -2728,7 +2629,7 @@ device_debug::breakpoint::breakpoint(device_debug* debugInterface,
 		m_index(index),
 		m_enabled(true),
 		m_address(address),
-		m_condition(&symbols, (condition != nullptr) ? condition : "1"),
+		m_condition(symbols, (condition != nullptr) ? condition : "1"),
 		m_action((action != nullptr) ? action : "")
 {
 }
@@ -2792,7 +2693,7 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	  m_type(type),
 	  m_address(address & space.addrmask()),
 	  m_length(length),
-	  m_condition(&symbols, (condition != nullptr) ? condition : "1"),
+	  m_condition(symbols, (condition != nullptr) ? condition : "1"),
 	  m_action((action != nullptr) ? action : ""),
 	  m_installing(false)
 {
@@ -3094,7 +2995,7 @@ void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64
 device_debug::registerpoint::registerpoint(symbol_table &symbols, int index, const char *condition, const char *action)
 	: m_index(index),
 		m_enabled(true),
-		m_condition(&symbols, (condition != nullptr) ? condition : "1"),
+		m_condition(symbols, (condition != nullptr) ? condition : "1"),
 		m_action((action != nullptr) ? action : "")
 {
 }

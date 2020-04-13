@@ -449,7 +449,7 @@ debug_view_expression::debug_view_expression(running_machine &machine)
 	: m_machine(machine)
 	, m_dirty(true)
 	, m_result(0)
-	, m_parsed(machine.debugger().cpu().get_global_symtable())
+	, m_parsed(machine.debugger().cpu().global_symtable())
 	, m_string("0")
 {
 }
@@ -471,7 +471,10 @@ debug_view_expression::~debug_view_expression()
 
 void debug_view_expression::set_context(symbol_table *context)
 {
-	m_parsed.set_symbols((context != nullptr) ? context : m_machine.debugger().cpu().get_global_symtable());
+	if (context != nullptr)
+		m_parsed.set_symbols(*context);
+	else
+		m_parsed.set_symbols(m_machine.debugger().cpu().global_symtable());
 	m_dirty = true;
 }
 

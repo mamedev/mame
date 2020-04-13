@@ -103,13 +103,13 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 {
 	m_global_array = std::make_unique<global_entry []>(MAX_GLOBALS);
 
-	symbol_table *symtable = m_cpu.get_global_symtable();
+	symbol_table &symtable = m_cpu.global_symtable();
 
 	/* add a few simple global functions */
 	using namespace std::placeholders;
-	symtable->add("min", 2, 2, std::bind(&debugger_commands::execute_min, this, _1, _2, _3));
-	symtable->add("max", 2, 2, std::bind(&debugger_commands::execute_max, this, _1, _2, _3));
-	symtable->add("if", 3, 3, std::bind(&debugger_commands::execute_if, this, _1, _2, _3));
+	symtable.add("min", 2, 2, std::bind(&debugger_commands::execute_min, this, _1, _2));
+	symtable.add("max", 2, 2, std::bind(&debugger_commands::execute_max, this, _1, _2));
+	symtable.add("if", 3, 3, std::bind(&debugger_commands::execute_if, this, _1, _2));
 
 	/* add all single-entry save state globals */
 	for (int itemnum = 0; itemnum < MAX_GLOBALS; itemnum++)
@@ -129,10 +129,10 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 			sprintf(symname, ".%s", strrchr(name, '/') + 1);
 			m_global_array[itemnum].base = base;
 			m_global_array[itemnum].size = valsize;
-			symtable->add(
+			symtable.add(
 					symname,
-					std::bind(&debugger_commands::global_get, this, _1, &m_global_array[itemnum]),
-					std::bind(&debugger_commands::global_set, this, _1, &m_global_array[itemnum], _2));
+					std::bind(&debugger_commands::global_get, this, &m_global_array[itemnum]),
+					std::bind(&debugger_commands::global_set, this, &m_global_array[itemnum], _1));
 		}
 	}
 
@@ -306,7 +306,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
     execute_min - return the minimum of two values
 -------------------------------------------------*/
 
-u64 debugger_commands::execute_min(symbol_table &table, int params, const u64 *param)
+u64 debugger_commands::execute_min(int params, const u64 *param)
 {
 	return (param[0] < param[1]) ? param[0] : param[1];
 }
@@ -316,7 +316,7 @@ u64 debugger_commands::execute_min(symbol_table &table, int params, const u64 *p
     execute_max - return the maximum of two values
 -------------------------------------------------*/
 
-u64 debugger_commands::execute_max(symbol_table &table, int params, const u64 *param)
+u64 debugger_commands::execute_max(int params, const u64 *param)
 {
 	return (param[0] > param[1]) ? param[0] : param[1];
 }
@@ -326,7 +326,7 @@ u64 debugger_commands::execute_max(symbol_table &table, int params, const u64 *p
     execute_if - if (a) return b; else return c;
 -------------------------------------------------*/
 
-u64 debugger_commands::execute_if(symbol_table &table, int params, const u64 *param)
+u64 debugger_commands::execute_if(int params, const u64 *param)
 {
 	return param[0] ? param[1] : param[2];
 }
@@ -341,7 +341,7 @@ u64 debugger_commands::execute_if(symbol_table &table, int params, const u64 *pa
     global_get - symbol table getter for globals
 -------------------------------------------------*/
 
-u64 debugger_commands::global_get(symbol_table &table, global_entry *global)
+u64 debugger_commands::global_get(global_entry *global)
 {
 	switch (global->size)
 	{
@@ -358,7 +358,7 @@ u64 debugger_commands::global_get(symbol_table &table, global_entry *global)
     global_set - symbol table setter for globals
 -------------------------------------------------*/
 
-void debugger_commands::global_set(symbol_table &table, global_entry *global, u64 value)
+void debugger_commands::global_set(global_entry *global, u64 value)
 {
 	switch (global->size)
 	{
@@ -385,7 +385,7 @@ bool debugger_commands::validate_number_parameter(const std::string &param, u64 
 	/* evaluate the expression; success if no error */
 	try
 	{
-		parsed_expression expression(m_cpu.get_visible_symtable(), param.c_str(), &result);
+		result = parsed_expression(m_cpu.visible_symtable(), param.c_str()).execute();
 		return true;
 	}
 	catch (expression_error &error)
@@ -454,7 +454,7 @@ bool debugger_commands::validate_cpu_parameter(const char *param, device_t *&res
 	u64 cpunum;
 	try
 	{
-		parsed_expression expression(m_cpu.get_visible_symtable(), param, &cpunum);
+		cpunum = parsed_expression(m_cpu.visible_symtable(), param).execute();
 	}
 	catch (expression_error &)
 	{
@@ -759,7 +759,7 @@ void debugger_commands::execute_tracesym(int ref, const std::vector<std::string>
 	for (int i = 0; i < params.size(); i++)
 	{
 		// find this symbol
-		symbol_entry *sym = m_cpu.get_visible_symtable()->find(params[i].c_str());
+		symbol_entry *sym = m_cpu.visible_symtable().find(params[i].c_str());
 		if (!sym)
 		{
 			m_console.printf("Unknown symbol: %s\n", params[i].c_str());
@@ -925,7 +925,7 @@ void debugger_commands::execute_go_time(int ref, const std::vector<std::string> 
 -------------------------------------------------*/
 void debugger_commands::execute_go_privilege(int ref, const std::vector<std::string> &params)
 {
-	parsed_expression condition(&m_cpu.get_visible_cpu()->debug()->symtable());
+	parsed_expression condition(m_cpu.get_visible_cpu()->debug()->symtable());
 	if (params.size() > 0 && !debug_command_parameter_expression(params[0], condition))
 		return;
 
@@ -1319,7 +1319,7 @@ void debugger_commands::execute_bpset(int ref, const std::vector<std::string> &p
 		return;
 
 	/* param 2 is the condition */
-	parsed_expression condition(&cpu->debug()->symtable());
+	parsed_expression condition(cpu->debug()->symtable());
 	if (params.size() > 1 && !debug_command_parameter_expression(params[1], condition))
 		return;
 
@@ -1477,7 +1477,7 @@ void debugger_commands::execute_wpset(int ref, const std::vector<std::string> &p
 	}
 
 	/* param 4 is the condition */
-	parsed_expression condition(&space->device().debug()->symtable());
+	parsed_expression condition(space->device().debug()->symtable());
 	if (params.size() > 3 && !debug_command_parameter_expression(params[3], condition))
 		return;
 
@@ -1619,7 +1619,7 @@ void debugger_commands::execute_rpset(int ref, const std::vector<std::string> &p
 		return;
 
 	/* param 1 is the condition */
-	parsed_expression condition(&cpu->debug()->symtable());
+	parsed_expression condition(cpu->debug()->symtable());
 	if (params.size() > 0 && !debug_command_parameter_expression(params[0], condition))
 		return;
 
@@ -2708,7 +2708,7 @@ void debugger_commands::execute_find(int ref, const std::vector<std::string> &pa
 	for (u64 i = offset; i <= endoffset; i += data_size[0])
 	{
 		int suboffset = 0;
-		int match = 1;
+		bool match = true;
 
 		/* find the entire string */
 		for (j = 0; j < data_count && match; j++)
@@ -3257,7 +3257,7 @@ void debugger_commands::execute_symlist(int ref, const std::vector<std::string> 
 	}
 	else
 	{
-		symtable = m_cpu.get_global_symtable();
+		symtable = &m_cpu.global_symtable();
 		m_console.printf("Global symbols:\n");
 	}
 
