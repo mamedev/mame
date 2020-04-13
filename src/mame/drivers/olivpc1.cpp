@@ -2,6 +2,27 @@
 // copyright-holders:Carl, rfka01
 
 /*************************************************** Olivetti Prodest PC 1 ***
+
+The PC 1 could be considered the Italian equivalent to the German Schneider Euro PC.
+Form factor: home computer (keyboard, main unit and floppy drive in one case)
+CPU: NEC V40 4.77/8MHz, software switchable, RAM: 256K/512K, expandable to 640K over the bus, ROM: 16K
+Chipset: Video V6355D, M5L8255AP-5, Floppy: WD37C65B-PL, Keyboard: MBL8042H
+OSC: 21.477270,  16.000
+Keyboard: 83 keys, 10 function keys
+Mass storage: 1 or 2 3.5" DS/DD floppy disk drive(s) 720K, external 5.25" DS/DD drive (D:) instead of the internal drive B: possible
+There's a switch that activates the external drive chain. Drives are assigned their parameters via the DOS mechanism (DRIVPARM/DRIVER.SYS)
+Video: CGA, with two monitor connectors (RGB/CGA and Ext. Video/SCART)
+Mouse: Cursor emulation, on board: parallel, serial, speaker, audio connector("HIFI-Sound"), IBM compatible expansion bus, external 360K floppy drive
+Options (from the manual): "BOX with a single slot of medium-small dimensions" which could house RAM, LAN, Modem, EGA, 3.5" harddisk,
+Music Box, TV/teletext adapter
+
+Olivetti Prodest PC 1 HD:  Different motherboard
+http://www.ti99iuc.it/web/_upload/image/PC1-OnePage/Docs/GuidaCFModPC1HD/pc1CF-IDE-Guide.pdf
+- on board XTA (8-bit IDE) port that was able to connect to either a Conner CP4024XT oder CP4044XT harddisk.
+- 768K RAM of which 640K are accessible
+Chipset: Video: V6355D, Floppy: WD37C65JM, VLSI ???43559, WD8250NJM, AMD N8255A-5, Keyboard: MBL8042H
+OSC: 16.000, 21.477270, 1.8432
+
 *****************************************************************************/
 
 #include "emu.h"
@@ -123,6 +144,7 @@ void olivpc1_state::nmi()
 static void pc1_floppies(device_slot_interface &device)
 {
 	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("525dd", FLOPPY_525_DD);
 }
 
 void olivpc1_state::olivpc1(machine_config &config)
@@ -149,6 +171,7 @@ void olivpc1_state::olivpc1(machine_config &config)
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v40_device::dreq_w<1>));
 	FLOPPY_CONNECTOR(config, "fdc:0", pc1_floppies, "35dd", isa8_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc1_floppies, nullptr, isa8_fdc_device::floppy_formats).enable_sound(true);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.5);
@@ -176,7 +199,12 @@ void olivpc1_state::olivpc1(machine_config &config)
 
 ROM_START( olivpc1 )
 	ROM_REGION(0x4000, "bios", 0)
-	ROM_LOAD("pc1_bios_1_21.bin", 0x0000, 0x4000, CRC(3c44cdbf) SHA1(46e6c8531ad1fe81cf4457f1edb7554a0eaed7e8))
+	ROM_SYSTEM_BIOS(0, "rev121", "Rev. 1.21")
+	ROMX_LOAD("pc1_bios_1_21.bin", 0x0000, 0x4000, CRC(3c44cdbf) SHA1(46e6c8531ad1fe81cf4457f1edb7554a0eaed7e8), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "rev106", "Rev. 1.06 20/08/87")
+	ROMX_LOAD("pc1_bios_1_06.bin", 0x0000, 0x4000, CRC(679d2235) SHA1(621d0abafcc1ee7edc090c01ca496f056c184410), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "rev107", "Rev. 1.07 12/10/88")
+	ROMX_LOAD("pc1_bios_1_07.bin", 0x0000, 0x4000, CRC(3b84757c) SHA1(a2288ecc7616767d3ea5dd3262bfad98cf1b39d3), ROM_BIOS(2))
 
 	ROM_REGION(0x2000, "gfx1", 0)
 	ROM_LOAD("xu4600_pc1_prodest_font101.bin", 0x0000, 0x2000, CRC(5c21981e) SHA1(d0db791079ece9c9e50bb7f38b5b11024ba7ec99))
