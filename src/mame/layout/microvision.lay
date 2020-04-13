@@ -8,7 +8,7 @@ license:CC0
 
 	<element name="lcdb"><rect><color red="1" green="1" blue="1" /></rect></element>
 	<element name="lcdm"><rect><color red="0.75" green="0.78" blue="0.78" /></rect></element>
-	<element name="lcda"><rect><color red="0.22" green="0.2" blue="0.36" /></rect></element> <!-- blue tint -->
+	<element name="lcda"><rect><color red="0.22" green="0.2" blue="0.33" /></rect></element> <!-- blue tint -->
 
 
 <!-- build screen -->

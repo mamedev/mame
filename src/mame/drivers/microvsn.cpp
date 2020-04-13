@@ -284,12 +284,9 @@ READ8_MEMBER(microvision_state::tms1100_k_r)
 
 	// K8: paddle capacitor
 	if (m_paddle_on)
-	{
-		u8 paddle = m_paddle_timer->enabled() ? 0 : BIT(m_r, 2);
-		return paddle << 3 | data;
-	}
-	else
-		return data;
+		data |= (m_paddle_timer->enabled() ? 0 : BIT(m_r, 2)) << 3;
+
+	return data;
 }
 
 WRITE16_MEMBER(microvision_state::tms1100_o_w)
@@ -505,5 +502,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE     INPUT         CLASS              INIT        COMPANY, FULLNAME, FLAGS
+//    YEAR  NAME      PARENT CMP MACHINE      INPUT        CLASS              INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1979, microvsn, 0,      0, microvision, microvision, microvision_state, empty_init, "Milton Bradley", "Microvision", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

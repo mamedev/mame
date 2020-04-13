@@ -282,17 +282,6 @@ The "butmask" feature indicates cartridge button restrict mask (active-low)
 		</part>
 	</software>
 
-	<software name="demo">
-		<description>Demo</description>
-		<year>2013</year>
-		<publisher>Paul Robson</publisher>
-		<part name="cart" interface="microvision_cart">
-			<dataarea name="rom" size="0x800">
-				<rom name="demo.bin" size="0x800" crc="54f1b288" sha1="9fcd930dff5f09979d3ed1278a928330b7000068"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="invaders">
 		<description>Invaders</description>
 		<year>2014</year>
