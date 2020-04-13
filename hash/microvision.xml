@@ -7,11 +7,11 @@ license:CC0
 <!--
 
 All known games are dumped, see below for list in chronological order.
-But, 1st revisions of Block Buster and Bowling (I8021 MCU) are not yet dumped.
+But, 1st revisions of Block Buster and Bowling (8021 MCU) are not yet dumped.
 One more game "Barrage" was announced but not released.
 
 4952 - Block Buster
-4971 - Connect Four (TMS1100 and I8021 versions)
+4971 - Connect Four (TMS1100 and 8021 versions)
 4972 - Bowling
 4973 - Star Trek: Phaser Strike (aka Shooting Star in Europe)
 4974 - Pinball
@@ -123,7 +123,7 @@ The "butmask" feature indicates cartridge button restrict mask (active-low)
 		<info name="pcb" value="4971-REV-C" />
 		<info name="serial" value="4971" />
 		<part name="cart" interface="microvision_cart">
-			<feature name="clock" value="3500000" /> <!-- LC circuit, correct? (matches video recording) -->
+			<feature name="clock" value="3000000" /> <!-- LC circuit, correct? (matches video recording) -->
 			<feature name="paddle" value="1" />
 			<feature name="butmask" value="0xaaa" />
 			<dataarea name="rom" size="0x400"> <!-- Intel 8021 MCU -->
@@ -255,7 +255,7 @@ The "butmask" feature indicates cartridge button restrict mask (active-low)
 <!-- Homebrew (real hardware) -->
 
 	<software name="tetris">
-		<description>Tetris</description>
+		<description>Tetris (TMS1100 version)</description>
 		<year>2019</year>
 		<publisher>Ayza</publisher>
 		<part name="cart" interface="microvision_cart">
@@ -264,6 +264,32 @@ The "butmask" feature indicates cartridge button restrict mask (active-low)
 			<feature name="paddle" value="0" />
 			<dataarea name="rom" size="0x800"> <!-- TMS1098 MCU + MBM2716 EPROM -->
 				<rom name="tetris.bin" size="0x800" crc="f08ebfe3" sha1="a1318228235189c9dcdc567a4b71bc82301ee5b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetriso" cloneof="tetris">
+		<description>Tetris (8021 version)</description>
+		<year>2018</year>
+		<publisher>Ayza</publisher>
+		<part name="cart" interface="microvision_cart">
+			<feature name="clock" value="3000000" />
+			<feature name="paddle" value="0" />
+			<dataarea name="rom" size="0x400"> <!-- Intel 8748 MCU, reassembled to 8021 here -->
+				<rom name="tetriso.bin" size="0x400" crc="1170e3e7" sha1="0ce4fd165e12585ca70b86333262576ec2edc880"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microbrd">
+		<description>MicroBird</description>
+		<year>2018</year>
+		<publisher>Ayza</publisher>
+		<part name="cart" interface="microvision_cart">
+			<feature name="clock" value="3000000" />
+			<feature name="paddle" value="0" />
+			<dataarea name="rom" size="0x400"> <!-- Intel 8748 MCU, reassembled to 8021 here -->
+				<rom name="microbrd.bin" size="0x400" crc="475a093d" sha1="6e3d2f47c836c43e8a3e74fffe30a64964e8df8c"/>
 			</dataarea>
 		</part>
 	</software>

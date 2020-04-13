@@ -196,7 +196,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	// set default settings
-	u32 clock = (size == 0x400) ? 3500000 : 500000;
+	u32 clock = (size == 0x400) ? 3000000 : 500000;
 	m_pla_auto = 0;
 	m_butmask_auto = 0xfff;
 	m_paddle_auto = false;
@@ -215,7 +215,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 	// detect MCU on file size
 	if (size == 0x400)
 	{
-		// I8021 MCU
+		// 8021 MCU
 		memcpy(memregion("i8021_cpu")->base(), m_cart->get_rom_base(), size);
 		m_i8021->set_clock(clock);
 	}
