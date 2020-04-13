@@ -869,6 +869,8 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 	}
 	else
 	{
+		if ((data & 0xff00) == 0)
+			m_last_prot_param = data & 0xffff;
 		data >>= 16;
 
 		clk = data & 0x200;
@@ -908,11 +910,23 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 				}
 				else if(m_last_prot_op == 0xd97)  // rushhero
 				{
-					int src = 0xc09ff0;
-					int dst = 0xd20000;
-					int spr;
-
-					for (spr = 0; spr < 256; spr++)
+					u32 src = 0xc09ff0;
+					u32 dst = 0xd20000;
+					//u32 input_src = 0xc01cc0;
+					//u32 input_dst = 0xc00507;
+					
+					// screen 1
+					// if (m_last_prot_param == 0x004a)
+					// screen 2
+					if (m_last_prot_param == 0x0062)
+					{
+						src = 0xc19ff0;
+						dst = 0xd21000;
+						//input_src += 0x10000;
+						//input_dst += 0x40;
+					}
+					
+					for (int spr = 0; spr < 256; spr++)
 					{
 						for (i = 0; i <= 0x10; i += 4)
 						{
@@ -924,10 +938,15 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 					}
 
 					/* Input buffer copiers, only this command is executed so it's safe to assume that's polled here */
-					space.write_byte(0xc01cc0, ~space.read_byte(0xc00507));
-					space.write_byte(0xc01cc1, ~space.read_byte(0xc00527));
-					space.write_byte(0xc01cc4, ~space.read_byte(0xc00547));
-					space.write_byte(0xc01cc5, ~space.read_byte(0xc00567));
+					space.write_byte(0xc01cc0 + 0, ~space.read_byte(0xc00507 + 0x00));
+					space.write_byte(0xc01cc0 + 1, ~space.read_byte(0xc00507 + 0x20));
+					space.write_byte(0xc01cc0 + 4, ~space.read_byte(0xc00507 + 0x40));
+					space.write_byte(0xc01cc0 + 5, ~space.read_byte(0xc00507 + 0x60));
+					space.write_byte(0xc11cc0 + 0, ~space.read_byte(0xc00507 + 0x00));
+					space.write_byte(0xc11cc0 + 1, ~space.read_byte(0xc00507 + 0x20));
+					space.write_byte(0xc11cc0 + 4, ~space.read_byte(0xc00507 + 0x40));
+					space.write_byte(0xc11cc0 + 5, ~space.read_byte(0xc00507 + 0x60));
+
 				}
 				else if(m_last_prot_op == 0xb16) // slamdnk2
 				{
@@ -943,6 +962,20 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 					}
 
 					//maybe here there's a [$d8001f] <- 0x31 write too?
+				}
+				// TODO: it actually calls 0x1b54-335e-125c-3a56-1b55-3357-1255-3a4f on odd frames
+				// should first move a block to a work RAM buffer then send it to the actual sprite entries
+				else if (m_last_prot_op == 0x3a4f) // slamdnk2 right screen
+				{
+					u32 src = 0xc18400;
+					u32 dst = 0xd21000;
+					
+					for (int spr = 0; spr < 0x400; spr++)
+					{
+						space.write_word(dst, space.read_word(src));
+						src += 4;
+						dst += 2;
+					}
 				}
 				else if(m_last_prot_op == 0x515) // vsnetscr screen 1
 				{
@@ -1046,11 +1079,12 @@ void konamigx_state::gx_type2_map(address_map &map)
 void konamigx_state::gx_type3_map(address_map &map)
 {
 	gx_base_memmap(map);
+	map(0xd20000, 0xd21fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0xd90000, 0xd97fff).ram();
 	//map(0xcc0000, 0xcc0007).w(FUNC(konamigx_state::type4_prot_w));
 	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
 	//map(0xe20000, 0xe20003).nopw();
-	map(0xe40000, 0xe40003).w(FUNC(konamigx_state::konamigx_type3_psac2_bank_w)).share("psac2_bank");
+	map(0xe40000, 0xe40003).w(FUNC(konamigx_state::type3_bank_w)).umask32(0xffffffff);
 	map(0xe60000, 0xe60fff).ram().share("k053936_0_line");
 	map(0xe80000, 0xe83fff).ram().share("paletteram");  // main monitor palette
 	map(0xea0000, 0xea3fff).ram().share("subpaletteram");
@@ -1062,10 +1096,11 @@ void konamigx_state::gx_type4_map(address_map &map)
 {
 	gx_base_memmap(map);
 	map(0xcc0000, 0xcc0007).w(FUNC(konamigx_state::type4_prot_w));
+	map(0xd20000, 0xd21fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0xd90000, 0xd97fff).ram();
 	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
 	map(0xe20000, 0xe20003).nopw();
-	map(0xe40000, 0xe40003).nopw();
+	map(0xe40000, 0xe40003).w(FUNC(konamigx_state::type3_bank_w)).umask32(0xffffffff);
 	map(0xe60000, 0xe60fff).ram().share("k053936_0_line");  // 29C & 29G (PSAC2 line control)
 	map(0xe80000, 0xe87fff).ram().share("paletteram"); // 11G/13G/15G (main screen palette RAM)
 	map(0xea0000, 0xea7fff).ram().share("subpaletteram"); // 5G/7G/9G (sub screen palette RAM)
@@ -1507,7 +1542,7 @@ static INPUT_PORTS_START( type3 )
 	PORT_DIPNAME( 0x04000000, 0x04000000, "Right Monitor Flip Screen" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(          0x04000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08000000, 0x08000000, "Number of Screens" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08000000, 0x00000000, "Number of Screens" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(          0x08000000, "1" )
 	PORT_DIPSETTING(          0x00000000, "2" )
 INPUT_PORTS_END
