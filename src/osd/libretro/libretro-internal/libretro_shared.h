@@ -78,6 +78,8 @@ extern bool auto_save_enable;
 extern bool game_specific_saves_enable;
 extern bool buttons_profiles;
 extern bool mame_paths_enable;
+extern bool mame_4way_enable;
+extern char mame_4way_map[256];
 
 extern bool res_43;
 extern bool video_changed;
@@ -125,7 +127,7 @@ void *retro_get_fb_ptr(void);
 #ifdef __cplusplus
 extern "C" {
 #endif
-   
+
 int mmain2(int argc, const char *argv);
 int mmain(int argc, char *argv[]);
 

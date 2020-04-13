@@ -61,7 +61,8 @@ bool throttle_enable = false;
 bool game_specific_saves_enable = false;
 bool buttons_profiles = true;
 bool mame_paths_enable = false;
-
+bool mame_4way_enable = false;
+char mame_4way_map[256];
 
 bool res_43 = false;
 bool video_changed = false;
@@ -139,7 +140,7 @@ static int parsePath(char* path, char* gamePath, char* gameName)
         gameName[dotIndex] = 0;
         return 1;
    }
-    
+
    if (slashIndex < 0 || dotIndex < 0)
       return 0;
 
@@ -367,6 +368,12 @@ static void Set_Default_Option(void)
       Add_Option("-statename");
       sprintf(option,"%%g/%s",MgameName);
       Add_Option(option);
+   }
+
+   if(mame_4way_enable)
+   {
+      Add_Option("-joystick_map");
+      Add_Option(mame_4way_map);
    }
 }
 
@@ -735,18 +742,18 @@ static char CMDFILE[512];
 int loadcmdfile(char *argv)
 {
   std::ifstream cmdfile(argv);
-  std::string cmdstr; 
-  
+  std::string cmdstr;
+
   if(cmdfile.is_open()){
-  
+
     std::getline(cmdfile, cmdstr);
     cmdfile.close();
-    
+
     sprintf(CMDFILE, "%s", cmdstr.c_str());
 
     return 1;
   }
-  
+
   return 0;
 }
 
@@ -765,19 +772,19 @@ int mmain2(int argc, const char *argv)
 
    strcpy(gameName,argv);
 
-   // handle cmd file 
+   // handle cmd file
    if (strlen(gameName) >= strlen("cmd")){
            if(!core_stricmp(&gameName[strlen(gameName)-strlen("cmd")], "cmd"))
-                       i=loadcmdfile(gameName);                        
+                       i=loadcmdfile(gameName);
    }
-   
+
    if(i==1)
    {
       parse_cmdline(CMDFILE);
       if (log_cb)
          log_cb(RETRO_LOG_INFO, "Starting game from command line:%s\n",CMDFILE);
 
-      result = execute_game_cmd(ARGUV[ARGUC-1]);      
+      result = execute_game_cmd(ARGUV[ARGUC-1]);
 
    }
    else
@@ -814,6 +821,6 @@ int mmain2(int argc, const char *argv)
    result=mmain(PARAMCOUNT, ( char **)xargv_cmd);
 
    xargv_cmd[PARAMCOUNT - 2] = NULL;
-   
+
    return result/*==0?0:1*/;
 }
