@@ -438,7 +438,7 @@ video_changed=true;
       log_cb(RETRO_LOG_INFO, "Joystick map: %s\n", var.value);
       mame_4way_enable = true;
       if (!strcmp(var.value, "disabled"))
-         mame_paths_enable = false;
+         mame_4way_enable = false;
       if (!strcmp(var.value, "4way"))
          sprintf(mame_4way_map, "%s", "s8.4s8.44s8.4445");
       if (!strcmp(var.value, "strict"))
