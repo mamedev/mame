@@ -12,7 +12,6 @@
 
 #include <zlib.h>
 
-#include <algorithm>
 #include <iomanip>
 #include <sstream>
 
