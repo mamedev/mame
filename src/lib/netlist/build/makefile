@@ -73,6 +73,7 @@ OBJDIRS = $(OBJ) \
 			$(OBJ)/macro \
 			$(OBJ)/tools \
 			$(OBJ)/prg \
+			$(OBJ)/generated \
 
 
 OBJS = $(POBJS) $(NLOBJS)
@@ -163,6 +164,7 @@ NLOBJS := \
 	$(NLOBJ)/solver/nld_solver.o \
 	$(NLOBJ)/solver/nld_matrix_solver.o \
 	$(NLOBJ)/tools/nl_convert.o \
+	$(NLOBJ)/generated/static_solvers.o \
 	
 VSBUILDS = \
 	$(VSBUILD/netlistlib.vcxproj) \

@@ -2,13 +2,13 @@
 // Documentation settings
 //
 
-///
-/// \mainpage Netlist
-///
+/*!
+ *
+ * \mainpage Netlist
 
-##Netlist
+## Netlist
 
-###A mixed signal circuit simulation.
+### A mixed signal circuit simulation.
 
 - D: Device
 - O: Rail output (output)
