@@ -15,7 +15,7 @@ games had an Intel 8021 MCU at first, but Milton Bradley switched to TMS1100.
 
 Each game had a screen- and keypad overlay attached to it, MAME external
 artwork is recommended. It's also advised to disable screen filtering,
-eg. with -prescale, or on Windows simply -video gdi.
+eg. with -prescale or -nofilter.
 
 TODO:
 - dump/add remaining 8021 cartridges
@@ -39,6 +39,8 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include "microvision.lh"
+
 
 namespace {
 
@@ -56,8 +58,7 @@ public:
 		m_paddle_timer(*this, "paddle_timer"),
 		m_inputs(*this, "COL%u", 0),
 		m_paddle(*this, "PADDLE"),
-		m_conf(*this, "CONF"),
-		m_overlay_out(*this, "overlay")
+		m_conf(*this, "CONF")
 	{ }
 
 	void microvision(machine_config &config);
@@ -80,14 +81,13 @@ private:
 	required_ioport_array<3> m_inputs;
 	required_ioport m_paddle;
 	required_ioport m_conf;
-	output_finder<> m_overlay_out;
 
 	u32 tms1100_decode_micro(offs_t offset);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	void apply_settings(void);
 
 	u8 m_pla_auto;
-	u8 m_overlay_auto;
+	u16 m_butmask_auto;
 	u16 m_button_mask;
 	bool m_paddle_auto;
 	bool m_paddle_on;
@@ -115,14 +115,12 @@ private:
 
 void microvision_state::machine_start()
 {
-	m_overlay_out.resolve();
-
 	// register for savestates
 	save_item(NAME(m_r));
 	save_item(NAME(m_p0));
 	save_item(NAME(m_p2));
 
-	// don't save: m_pla_auto, m_overlay_auto, m_paddle_auto,
+	// don't save: m_pla_auto, m_butmask_auto, m_paddle_auto,
 	// m_button_mask, m_paddle_on
 }
 
@@ -204,7 +202,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 	// set default settings
 	u32 clock = (size == 0x400) ? 3500000 : 500000;
 	m_pla_auto = 0;
-	m_overlay_auto = 0;
+	m_butmask_auto = 0xfff;
 	m_paddle_auto = false;
 
 	if (image.loaded_through_softlist())
@@ -213,7 +211,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 		if (sclock != 0)
 			clock = sclock;
 
-		m_overlay_auto = strtoul(image.get_feature("overlay"), nullptr, 0);
+		m_butmask_auto = ~strtoul(image.get_feature("butmask"), nullptr, 0) & 0xfff;
 		m_pla_auto = strtoul(image.get_feature("pla"), nullptr, 0) ? 1 : 0;
 		m_paddle_auto = bool(strtoul(image.get_feature("paddle"), nullptr, 0) ? 1 : 0);
 	}
@@ -239,38 +237,8 @@ void microvision_state::apply_settings()
 {
 	u8 conf = m_conf->read();
 
-	u8 overlay = (conf & 1) ? m_overlay_auto : 0;
-	m_overlay_out = overlay;
-
-	// overlay physically restricts button panel
-	switch (overlay)
-	{
-		case 1: case 5:
-			m_button_mask = 0x454;
-			break;
-		case 2: case 8: case 10:
-			m_button_mask = 0x555;
-			break;
-		case 3:
-			m_button_mask = 0x858;
-			break;
-		case 4:
-			m_button_mask = 0xaea;
-			break;
-		case 6:
-			m_button_mask = 0xaaa;
-			break;
-		case 11:
-			m_button_mask = 0xafa;
-			break;
-		case 12:
-			m_button_mask = 0x404;
-			break;
-
-		default:
-			m_button_mask = 0xfff;
-			break;
-	}
+	// cartridge physically restricts button panel (some glitches otherwise)
+	m_button_mask = (conf & 1) ? m_butmask_auto : 0xfff;
 
 	u8 pla = ((conf & 0x18) == 0x10) ? m_pla_auto : (conf >> 3 & 1);
 	m_tms1100->set_output_pla(microvision_output_pla[pla]);
@@ -494,6 +462,7 @@ void microvision_state::microvision(machine_config &config)
 	m_lcd->write_cols().set(FUNC(microvision_state::lcd_output_w));
 
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(16, 16);
+	config.set_default_layout(layout_microvision);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);

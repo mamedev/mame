@@ -6,6 +6,10 @@
     Mephisto Mondial
     Mephisto Mondial II
 
+    TODO:
+    - split driver into 2? they're not on the same hardware
+    - add mondial MM 1000 module
+
 **************************************************************************************************/
 
 #include "emu.h"

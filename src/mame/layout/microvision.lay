@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="lcdb"><rect><color red="1" green="1" blue="1" /></rect></element>
+	<element name="lcdm"><rect><color red="0.75" green="0.78" blue="0.77" /></rect></element>
+	<element name="lcda"><rect><color red="0.3" green="0.3" blue="0.3" /></rect></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="18" top="0" bottom="18" />
+
+		<element ref="lcdb"><bounds x="0" y="0" width="18" height="18" /></element>
+		<screen index="0"><bounds x="1" y="1" width="16" height="16" /></screen>
+
+		<repeat count="17">
+			<param name="i" start="0.95" increment="1" />
+			<element ref="lcdb"><bounds x="~i~" y="0.5" width="0.1" height="17" /></element>
+			<element ref="lcdb"><bounds x="0.5" y="~i~" width="17" height="0.1" /></element>
+		</repeat>
+
+		<element ref="lcda" blend="add"><bounds x="0" y="0" width="18" height="18" /></element>
+		<element ref="lcdm" blend="multiply"><bounds x="0" y="0" width="18" height="18" /></element>
+	</view>
+
+</mamelayout>

@@ -51,14 +51,13 @@ protected:
 	void mondial68k_mem(address_map &map);
 
 	DECLARE_WRITE32_MEMBER(lcd_s_w);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_WRITE8_MEMBER(input_mux_w);
 	DECLARE_WRITE8_MEMBER(board_mux_w);
 	DECLARE_READ8_MEMBER(inputs_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(refresh_leds);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_device<sensorboard_device> m_board;
 	required_device<pcf2112_device> m_lcd;
 	required_ioport_array<4> m_inputs;
@@ -102,11 +101,6 @@ WRITE32_MEMBER(mondial68k_state::lcd_s_w)
 	// output LCD digits (note: last digit DP segment is unused)
 	for (int i=0; i<4; i++)
 		m_digits[i] = bitswap<8>((data & 0x7fffffff) >> (8 * i), 7,4,5,0,1,2,3,6);
-}
-
-WRITE_LINE_MEMBER(mondial68k_state::speaker_w)
-{
-	m_dac->write(state);
 }
 
 WRITE8_MEMBER(mondial68k_state::board_mux_w)
@@ -208,7 +202,7 @@ void mondial68k_state::mondial68k(machine_config &config)
 	outlatch.q_out_cb<1>().set(m_lcd, FUNC(pcf2112_device::data_w));
 	outlatch.q_out_cb<2>().set(m_lcd, FUNC(pcf2112_device::dlen_w));
 	outlatch.q_out_cb<6>().set_nop(); // another DAC input?
-	outlatch.q_out_cb<7>().set(FUNC(mondial68k_state::speaker_w));
+	outlatch.q_out_cb<7>().set(m_dac, FUNC(dac_1bit_device::write));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
