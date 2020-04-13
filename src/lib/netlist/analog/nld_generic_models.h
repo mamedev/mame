@@ -124,6 +124,29 @@ namespace analog
 		nl_fptype m_gmin;
 	};
 
+	// Constant model for constant capacitor model
+	// "Circuit simulation", page 274
+	struct generic_capacitor_const
+	{
+	public:
+		generic_capacitor_const(device_t &dev, const pstring &name)
+		: m_gmin(nlconst::zero())
+		{
+		}
+
+		// Returns { G, Ieq }
+		std::pair<nl_fptype, nl_fptype> timestep(nl_fptype cap, nl_fptype v, nl_fptype step) const noexcept
+		{
+			const nl_fptype h(plib::reciprocal(step));
+			const nl_fptype G(cap * h + m_gmin);
+			return { G, - G * v };
+		}
+		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
+	private:
+		nl_fptype m_gmin;
+	};
+
+
 	// -----------------------------------------------------------------------------
 	// A generic diode model to be used in other devices (Diode, BJT ...)
 	// -----------------------------------------------------------------------------
@@ -155,9 +178,9 @@ namespace analog
 			  , nlconst::magic(1)
 			  , nlconst::magic(1e-15)
 			  , nlconst::magic(300.0));
-			m_name = name;
+			//m_name = name;
 		}
-		pstring m_name;
+		//pstring m_name;
 		// Basic math
 		//
 		// I(V) = f(V)

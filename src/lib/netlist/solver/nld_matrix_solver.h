@@ -182,8 +182,8 @@ namespace solver
 		netlist_time solve(netlist_time_ext now);
 		void update_inputs();
 
-		bool has_dynamic_devices() const noexcept { return !m_dynamic_devices.empty(); }
-		bool has_timestep_devices() const noexcept { return !m_step_devices.empty(); }
+		std::size_t dynamic_device_count() const noexcept { return m_dynamic_funcs.size(); }
+		std::size_t timestep_device_count() const noexcept { return m_step_funcs.size(); }
 
 		void update_forced();
 		void update_after(netlist_time after) noexcept
@@ -238,8 +238,8 @@ namespace solver
 		state_var<std::size_t> m_stat_vsolver_calls;
 
 		state_var<netlist_time_ext> m_last_step;
-		std::vector<core_device_t *> m_step_devices;
-		std::vector<core_device_t *> m_dynamic_devices;
+		std::vector<nldelegate_ts> m_step_funcs;
+		std::vector<nldelegate_dyn> m_dynamic_funcs;
 
 		logic_input_t m_fb_sync;
 		logic_output_t m_Q_sync;
@@ -251,8 +251,8 @@ namespace solver
 
 		void sort_terms(matrix_sort_type_e sort);
 
-		void update_dynamic();
-		void step(const netlist_time &delta);
+		void update_dynamic() noexcept;
+		void step(netlist_time delta) noexcept;
 
 		int get_net_idx(const analog_net_t *net) const noexcept;
 		std::pair<int, int> get_left_right_of_diag(std::size_t irow, std::size_t idiag);
@@ -311,7 +311,7 @@ namespace solver
 		plib::parray<FT, SIZE> m_RHS;
 
 		PALIGNAS_VECTOROPT()
-		plib::parray2D<float_type *, SIZE, 0> m_mat_ptr;
+		plib::pmatrix2d<float_type *> m_mat_ptr;
 
 		// FIXME: below should be private
 		// state - variable time_stepping

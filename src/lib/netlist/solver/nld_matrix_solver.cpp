@@ -66,6 +66,8 @@ namespace solver
 	void matrix_solver_t::setup_base(const analog_net_t::list_t &nets)
 	{
 		log().debug("New solver setup\n");
+		std::vector<core_device_t *> step_devices;
+		std::vector<core_device_t *> dynamic_devices;
 
 		m_terms.clear();
 
@@ -90,11 +92,11 @@ namespace solver
 				{
 					case detail::terminal_type::TERMINAL:
 						if (p->device().is_timestep())
-							if (!plib::container::contains(m_step_devices, &p->device()))
-								m_step_devices.push_back(&p->device());
+							if (!plib::container::contains(step_devices, &p->device()))
+								step_devices.push_back(&p->device());
 						if (p->device().is_dynamic())
-							if (!plib::container::contains(m_dynamic_devices, &p->device()))
-								m_dynamic_devices.push_back(&p->device());
+							if (!plib::container::contains(dynamic_devices, &p->device()))
+								dynamic_devices.push_back(&p->device());
 						{
 							auto *pterm = dynamic_cast<terminal_t *>(p);
 							add_term(k, pterm);
@@ -131,6 +133,10 @@ namespace solver
 				}
 			}
 		}
+		for (auto &d : step_devices)
+			m_step_funcs.push_back(nldelegate_ts(&core_device_t::timestep, d));
+		for (auto &d : dynamic_devices)
+			m_dynamic_funcs.push_back(nldelegate_dyn(&core_device_t::update_terminals, d));
 	}
 
 	void matrix_solver_t::sort_terms(matrix_sort_type_e sort)
@@ -383,11 +389,11 @@ namespace solver
 			inp->push(inp->proxied_net()->Q_Analog());
 	}
 
-	void matrix_solver_t::update_dynamic()
+	void matrix_solver_t::update_dynamic() noexcept
 	{
 		// update all non-linear devices
-		for (auto &dyn : m_dynamic_devices)
-			dyn->update_terminals();
+		for (auto &dyn : m_dynamic_funcs)
+			dyn();
 	}
 
 	void matrix_solver_t::reset()
@@ -400,7 +406,7 @@ namespace solver
 		const netlist_time new_timestep = solve(exec().time());
 		update_inputs();
 
-		if (m_params.m_dynamic_ts && has_timestep_devices() && new_timestep > netlist_time::zero())
+		if (m_params.m_dynamic_ts && (timestep_device_count() != 0) && new_timestep > netlist_time::zero())
 		{
 			m_Q_sync.net().toggle_and_push_to_queue(new_timestep);
 		}
@@ -418,17 +424,17 @@ namespace solver
 
 		update_inputs();
 
-		if (m_params.m_dynamic_ts && has_timestep_devices())
+		if (m_params.m_dynamic_ts && (timestep_device_count() != 0))
 		{
 			m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_min_timestep));
 		}
 	}
 
-	void matrix_solver_t::step(const netlist_time &delta)
+	void matrix_solver_t::step(netlist_time delta) noexcept
 	{
 		const auto dd(delta.as_fp<nl_fptype>());
-		for (auto &d : m_step_devices)
-			d->timestep(dd);
+		for (auto &d : m_step_funcs)
+			d(dd);
 	}
 
 	netlist_time matrix_solver_t::solve(netlist_time_ext now)
@@ -445,7 +451,7 @@ namespace solver
 		step(static_cast<netlist_time>(delta));
 
 		++m_stat_vsolver_calls;
-		if (has_dynamic_devices())
+		if (dynamic_device_count() != 0)
 		{
 			std::size_t this_resched(0);
 			std::size_t newton_loops = 0;
@@ -574,8 +580,8 @@ namespace solver
 			log().verbose("==============================================");
 			log().verbose("Solver {1}", this->name());
 			log().verbose("       ==> {1} nets", this->m_terms.size()); //, (*(*groups[i].first())->m_core_terms.first())->name());
-			log().verbose("       has {1} elements", this->has_dynamic_devices() ? "dynamic" : "no dynamic");
-			log().verbose("       has {1} elements", this->has_timestep_devices() ? "timestep" : "no timestep");
+			log().verbose("       has {1} dynamic elements", this->dynamic_device_count());
+			log().verbose("       has {1} timestep elements", this->timestep_device_count());
 			log().verbose("       {1:6.3} average newton raphson loops",
 						static_cast<nl_fptype>(this->m_stat_newton_raphson) / static_cast<nl_fptype>(this->m_stat_vsolver_calls));
 			log().verbose("       {1:10} invocations ({2:6.0} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",

@@ -245,7 +245,44 @@ namespace analog
 	// -----------------------------------------------------------------------------
 	// nld_C
 	// -----------------------------------------------------------------------------
+#if 1
+	NETLIB_OBJECT_DERIVED(C, twoterm)
+	{
+	public:
+		NETLIB_CONSTRUCTOR_DERIVED(C, twoterm)
+		, m_C(*this, "C", nlconst::magic(1e-6))
+		, m_cap(*this, "m_cap")
+		{
+		}
 
+		NETLIB_IS_TIMESTEP(true)
+		NETLIB_TIMESTEPI()
+		{
+			// G, Ieq
+			const auto res(m_cap.timestep(m_C(), deltaV(), step));
+			const nl_fptype G = res.first;
+			const nl_fptype I = res.second;
+			set_mat( G, -G, -I,
+					-G,  G,  I);
+		}
+
+		NETLIB_RESETI()
+		{
+			m_cap.setparams(exec().gmin());
+		}
+
+		param_fp_t m_C;
+	protected:
+		//NETLIB_UPDATEI();
+		//FIXME: should be able to change
+		NETLIB_UPDATE_PARAMI() { }
+
+	private:
+		generic_capacitor_const m_cap;
+	};
+
+#else
+	// Code preserved as a basis for a current/voltage controlled capacitor
 	NETLIB_OBJECT_DERIVED(C, twoterm)
 	{
 	public:
@@ -292,7 +329,7 @@ namespace analog
 		//generic_capacitor<capacitor_e::VARIABLE_CAPACITY> m_cap;
 		generic_capacitor<capacitor_e::CONSTANT_CAPACITY> m_cap;
 	};
-
+#endif
 	// -----------------------------------------------------------------------------
 	// nld_L
 	// -----------------------------------------------------------------------------

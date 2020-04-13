@@ -20,6 +20,7 @@
 #include "plib/pstring.h"
 #include "plib/ptime.h"
 #include "plib/putil.h"
+#include "plib/pdynlib.h"
 
 #include <unordered_map>
 
@@ -57,6 +58,9 @@ namespace netlist
 		///
 		virtual void vlog(const plib::plog_level &l, const pstring &ls) const noexcept = 0;
 
+		/// \brief provide library with static solver implementations.
+		///
+		virtual plib::unique_ptr<plib::dynlib_base> static_solver_lib() const;
 	};
 
 	using log_type =  plib::plog_base<callbacks_t, NL_DEBUG>;

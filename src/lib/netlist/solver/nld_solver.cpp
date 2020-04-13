@@ -391,8 +391,8 @@ namespace devices
 
 			log().verbose("Solver {1}", ms->name());
 			log().verbose("       ==> {1} nets", grp.size());
-			log().verbose("       has {1} elements", ms->has_dynamic_devices() ? "dynamic" : "no dynamic");
-			log().verbose("       has {1} elements", ms->has_timestep_devices() ? "timestep" : "no timestep");
+			log().verbose("       has {1} dynamic elements", ms->dynamic_device_count());
+			log().verbose("       has {1} timestep elements", ms->timestep_device_count());
 			for (auto &n : grp)
 			{
 				log().verbose("Net {1}", n->name());
@@ -403,7 +403,7 @@ namespace devices
 			}
 
 			m_mat_solvers_all.push_back(ms.get());
-			if (ms->has_timestep_devices())
+			if (ms->timestep_device_count() != 0)
 				m_mat_solvers_timestepping.push_back(ms.get());
 
 			m_mat_solvers.emplace_back(std::move(ms));

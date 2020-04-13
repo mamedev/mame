@@ -187,6 +187,8 @@ namespace netlist
 	/// \brief Delegate type for device notification.
 	///
 	using nldelegate = plib::pmfp<void>;
+	using nldelegate_ts = plib::pmfp<void, nl_fptype>;
+	using nldelegate_dyn = plib::pmfp<void>;
 
 	// -----------------------------------------------------------------------------
 	// forward definitions
@@ -825,11 +827,11 @@ namespace netlist
 		void set_go_gt_I(nl_fptype GO, nl_fptype GT, nl_fptype I) const noexcept
 		{
 			// Check for rail nets ...
-			if (m_go1 != nullptr)
+			if (m_go != nullptr)
 			{
-				*m_Idr1 = I;
-				*m_go1 = GO;
-				*m_gt1 = GT;
+				*m_Idr = I;
+				*m_go = GO;
+				*m_gt = GT;
 			}
 		}
 
@@ -837,11 +839,11 @@ namespace netlist
 		void schedule_solve_after(netlist_time after) noexcept;
 
 		void set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false);
-	private:
 
-		nl_fptype *m_Idr1; // drive current
-		nl_fptype *m_go1;  // conductance for Voltage from other term
-		nl_fptype *m_gt1;  // conductance for total conductance
+	private:
+		nl_fptype *m_Idr; // drive current
+		nl_fptype *m_go;  // conductance for Voltage from other term
+		nl_fptype *m_gt;  // conductance for total conductance
 
 	};
 
@@ -1430,7 +1432,7 @@ namespace netlist
 		log_type & log() noexcept { return m_log; }
 		const log_type &log() const noexcept { return m_log; }
 
-		plib::dynlib &lib() const noexcept { return *m_lib; }
+		plib::dynlib_base &lib() const noexcept { return *m_lib; }
 
 		netlist_t &exec() noexcept { return *m_netlist; }
 		const netlist_t &exec() const noexcept { return *m_netlist; }
@@ -1576,7 +1578,7 @@ namespace netlist
 
 		pstring                             m_name;
 		unique_pool_ptr<netlist_t>          m_netlist;
-		plib::unique_ptr<plib::dynlib>      m_lib; // external lib needs to be loaded as long as netlist exists
+		plib::unique_ptr<plib::dynlib_base> m_lib; // external lib needs to be loaded as long as netlist exists
 		plib::state_manager_t               m_state;
 		plib::unique_ptr<callbacks_t>       m_callbacks;
 		log_type                            m_log;
@@ -1951,9 +1953,9 @@ namespace netlist
 			throw nl_exception("Inconsistent nullptrs for terminal {}", name());
 		}
 
-		m_gt1 = gt;
-		m_go1 = go;
-		m_Idr1 = Idr;
+		m_gt = gt;
+		m_go = go;
+		m_Idr = Idr;
 	}
 
 	inline logic_net_t & logic_t::net() noexcept

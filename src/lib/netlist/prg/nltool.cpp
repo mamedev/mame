@@ -23,6 +23,11 @@
 #include <ios>
 #include <iostream> // scanf
 
+#ifndef NL_DISABLE_DYNAMIC_LOAD
+#define NL_DISABLE_DYNAMIC_LOAD 0
+#endif
+
+
 class tool_app_t : public plib::app
 {
 public:
@@ -47,7 +52,8 @@ public:
 		opt_dir(*this,      "d", "dir",        "",          "output directory for the generated files"),
 
 		opt_grp4(*this,     "Options for run command",      "These options are only used by the run command."),
-		opt_ttr (*this,     "t", "time_to_run", 1,          "time to run the emulation (seconds)\n\n  abc def\n\n xyz"),
+		opt_ttr (*this,     "t", "time_to_run", 1,          "time to run the emulation (seconds)"),
+		opt_boostlib(*this,  "",  "boost_lib", "builtin",   "generic: will use generic solvers.\nbuiltin: Use optimized solvers compiled in.\nsomelib.so: Use library with precompiled solvers."),
 		opt_stats(*this,    "s", "statistics",              "gather runtime statistics"),
 		opt_logs(*this,     "l", "log" ,                    "define terminal to log. This option may be specified repeatedly."),
 		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
@@ -94,6 +100,7 @@ public:
 	plib::option_str    opt_dir;
 	plib::option_group  opt_grp4;
 	plib::option_num<nl_fptype> opt_ttr;
+	plib::option_str    opt_boostlib;
 	plib::option_bool   opt_stats;
 	plib::option_vec    opt_logs;
 	plib::option_str    opt_inp;
@@ -190,6 +197,23 @@ public:
 	{ }
 
 	void vlog(const plib::plog_level &l, const pstring &ls) const noexcept override;
+
+	plib::unique_ptr<plib::dynlib_base> static_solver_lib() const override
+	{
+		if (m_app.opt_boostlib() == "builtin")
+			return netlist::callbacks_t::static_solver_lib();
+		else if (m_app.opt_boostlib() == "generic")
+			return plib::make_unique<plib::dynlib_static>(nullptr);
+		if (NL_DISABLE_DYNAMIC_LOAD)
+		{
+			throw netlist::nl_exception("Dynamic library loading not supported due to project security concerns.");
+		}
+		else
+		{
+			//pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
+			return plib::make_unique<plib::dynlib>(m_app.opt_boostlib());
+		}
+	}
 
 private:
 	tool_app_t &m_app;

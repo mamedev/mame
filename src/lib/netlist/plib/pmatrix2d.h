@@ -67,6 +67,20 @@ namespace plib
 			return (*this)[r][c];
 		}
 
+		T * data() noexcept
+		{
+			return m_v.data();
+		}
+
+		const T * data() const noexcept
+		{
+			return m_v.data();
+		}
+
+		size_type didx(size_type r, size_type c) const noexcept
+		{
+			return m_stride * r + c;
+		}
 	private:
 
 		size_type m_N;

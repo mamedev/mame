@@ -164,8 +164,8 @@ namespace analog
 	NETLIB_UPDATE_TERMINALS(D)
 	{
 		m_D.update_diode(deltaV());
-		const nl_fptype G = m_D.G();
-		const nl_fptype I = m_D.Ieq();
+		const nl_fptype G(m_D.G());
+		const nl_fptype I(m_D.Ieq());
 		set_mat( G, -G, -I,
 				-G,  G,  I);
 		//set(m_D.G(), 0.0, m_D.Ieq());
