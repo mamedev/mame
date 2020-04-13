@@ -31468,6 +31468,7 @@ dnce2000
 
 @source:nes_sh6578.cpp
 bandgpad
+bandggcn
 cpatrolm
 ts_handy11
 ablwikid
@@ -31520,6 +31521,7 @@ gprnrs1
 gprnrs16
 ddrdismx                        // (c) 2006 Majesco / Konami [(c) 2001 Disney on title screen]
 ddrstraw                        // (c) 2006 Majesco / Konami
+dbdancem
 megapad
 timetp36
 majkon
@@ -37296,6 +37298,7 @@ ablkickb
 guitarfv
 guitarss
 jjstrip
+vtechtvs
 tmntmutm
 pballpup
 swclone
@@ -38009,6 +38012,9 @@ wrlshunt                        // Wireless: Hunting Video Game System
 tkmag220                        //
 jak_car2
 jak_gtg
+jak_sspop
+jak_hmhsm
+jak_umfit
 jak_duck
 jak_swc
 jak_wdzh

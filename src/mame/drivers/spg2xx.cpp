@@ -1527,6 +1527,11 @@ ROM_START( swclone )
 ROM_END
 
 
+ROM_START( vtechtvs )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "vtechtvstation.bin", 0x000000, 0x800000, CRC(4a2e91eb) SHA1(1ff9cc0360b670cc0ad7efa9de0edd2c68d4d8e3) )
+ROM_END
+
 void spg2xx_game_state::init_crc()
 {
 	// several games have a byte sum checksum listed at the start of ROM, this little helper function logs what it should match.
@@ -1603,6 +1608,8 @@ CONS( 2007, guitarfv,    0,     0,        guitarfv,       guitarfv,    spg2xx_ga
 
 // Another version of this has a red "Gibson Flying V" style controller.  The difference is reflected on the title screen, songs are the same.
 CONS( 200?, guitarss,    0,     0,        abltenni,       guitarss,    spg2xx_game_state, empty_init, "Senario", "Guitar Super Star (Fender Stratocaster style)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 200?, vtechtvs,    0,     0,        abltenni,       fordrace,    spg2xx_game_state, empty_init, "VTech", "TV Station (VTech, Spain)", MACHINE_NOT_WORKING )
 
 CONS( 200?, jjstrip,    0,     0,        tvsprt10,       jjstrip,    spg2xx_game_state, empty_init, "Shiggles Inc.", "Club Jenna Presents: Jenna Jameson's Strip Poker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
