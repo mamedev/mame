@@ -55,6 +55,12 @@
         paccon:  Pac-Man - Bottom set of Power Pills are squashed.
                  Galaga - Incorrect sprite used for left shot in 'Double Ship' mode
 
+
+	JAKKS Pacific Test modes:
+
+	jak_hmhsm : uses the standard JAKKS code (on first screen - Hold Up, Hold A, Release Up, Down)
+	            the High School Musical part has its own test mode which tests a different part of the ROM, use the same code but after selecting the game from menu
+
 */
 
 #include "emu.h"
@@ -1678,6 +1684,35 @@ ROM_START( jak_car2 )
 	ROM_LOAD( "cars2.bin", 0x0000, 0x4200000, CRC(4d610e09) SHA1(bc59f5f7f676a8f2a78dfda7fb62c804bbf850b6) )
 ROM_END
 
+
+/*  The following pinout was used when dumping jak_sspop, jak_hmhsm, jak_umfit
+    For the 256Mbyte parts the parameters of the programmer had to be overridden to dump the full capacity as there were no equivalent parts.
+
+	   Sandisk TSOP32 NAND Flash
+
+       +----------------------------------------------+
+    NC-|01                                          32|-NC
+   VSS-|02                                          31|-NC
+   R/B-|03                  SanDisk                 30|-I/O7
+    NC-|04                   NAND                   29|-I/O6
+    RE-|05                                          28|-I/O5
+    CE-|06                   32PIN                  27|-I/O4
+    NC-|07                                          26|-VCC
+   VCC-|08                                          25|-VSS
+   VSS-|09                                          24|-NC
+    NC-|10                                          23|-I/O3
+    NC-|11                                          22|-I/O2
+   CLE-|12                                          21|-I/O1
+   ALE-|13                                          20|-I/O0
+    WE-|14                                          19|-NC
+    WP-|15                                          18|-NC
+    NC-|16                                          17|-NC
+       +----------------------------------------------+
+
+One of the games has pin 2 grounded, and the other 2 have it N/C.  I'm not sure what it would be, since all the signals are accounted for.
+
+*/
+
 ROM_START( jak_sspop )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
@@ -1712,18 +1747,12 @@ ROM_START( jak_hmhsm )
 	xx20
 	01xxxx_HSM
 
-	if jak_sspop is a 128MByte part the label here suggests this is 256MByte and therefore a bad dump.
-	the internal ROM test does 'pass' testing only what we have here, but if you attempt to load the High School Musical part
-	then it tries to load from outside of this data.  Theory is that High School Musical has it's own test mode and the
-	test mode present in the first loader is only testing the first program (Menu and Hannah Montana game)
-
-	note _HSM on the label is part of the actual label printed onto the chip surface suggesting these have been produced to
-	order specifically for JAKKS
+	256Mbyte part, 2nd half is just 0xff filled tho so a 128Mbyte part would have been fine
 
 	*/
 
-	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
-	ROM_LOAD( "hmhsm_as_hy27us08121a_45da.bin", 0x0000, 0x4200000, BAD_DUMP CRC(fc09d9eb) SHA1(9b84e57f247ccddc8b98e5d15bff79af36d372db) )
+	ROM_REGION( 0x10800000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "hmhsm.bin", 0x0000, 0x10800000, CRC(e63ad24c) SHA1(a7844b14af701914150aa7c06743a410f478ff7b) )
 ROM_END
 
 
@@ -2027,7 +2056,7 @@ CONS(200?, vbaby,    0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac
 
 
 CONS(2009, jak_sspop,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc",                   "Sing Scene Pop (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(2008, jak_hmhsm,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc",                   "Hannah Montana G2 Deluxe / High School Musical G2 Deluxe 2-in-1 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // bad dump
+CONS(2008, jak_hmhsm,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc",                   "Hannah Montana G2 Deluxe / High School Musical G2 Deluxe 2-in-1 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(2008, jak_umfit,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc",                   "Ultimotion Fitness (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // bad dump
 // Ultimotion Swing Zone is SPG29xx instead
 
