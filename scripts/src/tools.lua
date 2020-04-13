@@ -113,7 +113,7 @@ if _OPTIONS["SEPARATE_BIN"]~="1" then
 	targetdir(MAME_DIR)
 end
 
-if string.find(_ACTION, "vs+") then
+if string.find(_ACTION, "vs+") or string.find(_ACTION, "osx-clang+") then
 	includedirs {
 		MAME_DIR .. "3rdparty/portcurses",
 	}
