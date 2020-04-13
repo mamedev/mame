@@ -3,7 +3,7 @@
 // thanks-to:Dan Boris, Kevin Horton, Sean Riddle
 /******************************************************************************
 
-Milton Bradley MicroVision, handheld game console
+Milton Bradley Microvision, handheld game console
 
 Hardware notes:
 - SCUS0488(Hughes HLCD0488) LCD, 16*16 screen
@@ -12,6 +12,7 @@ Hardware notes:
 
 12 games were released, all of them have a TMS1100 MCU. The first couple of
 games had an Intel 8021 MCU at first, but Milton Bradley switched to TMS1100.
+See the softwarelist XML for details.
 
 Each game had a screen- and keypad overlay attached to it, MAME external
 artwork is recommended. It's also advised to disable screen filtering,
@@ -67,7 +68,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override { apply_settings(); }
 	virtual void device_post_load() override { apply_settings(); }
 
 private:
@@ -122,11 +123,6 @@ void microvision_state::machine_start()
 
 	// don't save: m_pla_auto, m_butmask_auto, m_paddle_auto,
 	// m_button_mask, m_paddle_on
-}
-
-void microvision_state::machine_reset()
-{
-	apply_settings();
 }
 
 
@@ -259,7 +255,7 @@ uint32_t microvision_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 		for (int x = 0; x < 16; x++)
 		{
 			// simulate LCD persistence
-			int p = m_lcd_pwm->read_element_bri(y ^ 15, x ^ 15) * 25000;
+			int p = m_lcd_pwm->read_element_bri(y ^ 15, x ^ 15) * 10000;
 			p = (p > 255) ? 0 : p ^ 255;
 
 			bitmap.pix32(y, x) = p << 16 | p << 8 | p;
@@ -462,6 +458,7 @@ void microvision_state::microvision(machine_config &config)
 	m_lcd->write_cols().set(FUNC(microvision_state::lcd_output_w));
 
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(16, 16);
+	m_lcd_pwm->set_interpolation(0.2);
 	config.set_default_layout(layout_microvision);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -509,4 +506,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE     INPUT         CLASS              INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, microvsn, 0,      0, microvision, microvision, microvision_state, empty_init, "Milton Bradley", "MicroVision", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1979, microvsn, 0,      0, microvision, microvision, microvision_state, empty_init, "Milton Bradley", "Microvision", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

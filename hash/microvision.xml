@@ -29,7 +29,7 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 The "butmask" feature indicates cartridge button restrict mask (active-low)
 -->
 
-<softwarelist name="microvision" description="Milton Bradley MicroVision cartridges">
+<softwarelist name="microvision" description="Milton Bradley Microvision cartridges">
 
 	<software name="alienrdr">
 		<description>Alien Raiders</description>
@@ -70,7 +70,7 @@ The "butmask" feature indicates cartridge button restrict mask (active-low)
 		<year>1979</year>
 		<publisher>Milton Bradley</publisher>
 		<info name="pcb" value="4952 REV-A" />
-		<info name="serial" value="4952" /> <!-- pack-in game, serial of MicroVision console -->
+		<info name="serial" value="4952" /> <!-- pack-in game, serial of Microvision console -->
 		<part name="cart" interface="microvision_cart">
 			<feature name="clock" value="500000" /> <!-- RC = 100pf/23.2K -->
 			<feature name="pla" value="0" />
