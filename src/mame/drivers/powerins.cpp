@@ -72,7 +72,7 @@ void powerins_state::powerins_map(address_map &map)
 	map(0x100019, 0x100019).w(FUNC(powerins_state::tilebank_w));
 	map(0x10001f, 0x10001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x120000, 0x120fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x130000, 0x130007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x130000, 0x130007).ram().w(FUNC(powerins_state::scroll_w<0>)).umask16(0x00ff);
 	map(0x140000, 0x143fff).ram().w(FUNC(powerins_state::bgvideoram_w<0>)).share("bgvideoram0");
 	map(0x170000, 0x170fff).mirror(0x1000).ram().w(FUNC(powerins_state::txvideoram_w)).share("txvideoram");
 	map(0x180000, 0x18ffff).ram().share("mainram");
