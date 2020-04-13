@@ -104,9 +104,10 @@
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "imageutl.h"
 #include "jvc_dsk.h"
+
+#include "emucore.h" // emu_fatalerror
+
 
 jvc_format::jvc_format()
 {

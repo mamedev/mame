@@ -8,9 +8,12 @@
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "imageutl.h"
 #include "apridisk.h"
+
+#include "imageutl.h"
+
+#include "emucore.h" // emu_fatalerror
+
 
 apridisk_format::apridisk_format()
 {
@@ -97,7 +100,7 @@ bool apridisk_format::load(io_generic *io, uint32_t form_factor, floppy_image *i
 					uint16_t length = pick_integer_le(comp, 0, 2);
 
 					if (length != SECTOR_SIZE)
-						fatalerror("apridisk_format: Invalid compression length %04x\n", length);
+						throw emu_fatalerror("apridisk_format: Invalid compression length %04x\n", length);
 
 					memset(data_ptr, comp[2], SECTOR_SIZE);
 				}
@@ -108,7 +111,7 @@ bool apridisk_format::load(io_generic *io, uint32_t form_factor, floppy_image *i
 				break;
 
 			default:
-				fatalerror("apridisk_format: Invalid compression %04x\n", compression);
+				throw emu_fatalerror("apridisk_format: Invalid compression %04x\n", compression);
 			}
 
 			sectors[track][head][sector - 1].data = data_ptr;
