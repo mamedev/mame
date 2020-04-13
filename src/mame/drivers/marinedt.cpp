@@ -182,7 +182,7 @@ TILE_GET_INFO_MEMBER(marinedt_state::get_tile_info)
 {
 	int code = m_vram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 // initialize sea bitmap gradient

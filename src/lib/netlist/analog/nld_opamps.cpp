@@ -7,6 +7,13 @@
 #include "nlid_fourterm.h"
 #include "nlid_twoterm.h"
 
+//
+// Set to 1 to model output impedance as a series resistor.
+// The default is that the VCVS already has an internal impedance.
+// This needs more investigation.
+//
+#define TEST_ALT_OUTPUT (0)
+
 namespace netlist
 {
 	namespace analog
@@ -130,7 +137,9 @@ namespace netlist
 			{
 				create_and_register_subdevice("CP1", m_CP);
 				create_and_register_subdevice("EBUF", m_EBUF);
-
+#if TEST_ALT_OUTPUT
+				create_and_register_subdevice("RO", m_RO);
+#endif
 				register_subalias("PLUS", "G1.IP");
 				register_subalias("MINUS", "G1.IN");
 
@@ -147,7 +156,12 @@ namespace netlist
 			}
 			if (m_type == 2)
 			{
+#if TEST_ALT_OUTPUT
+				connect("EBUF.OP", "RO.1");
+				register_subalias("OUT", "RO.2");
+#else
 				register_subalias("OUT", "EBUF.OP");
+#endif
 			}
 			if (m_type == 3)
 			{
@@ -159,8 +173,12 @@ namespace netlist
 				connect("VL", "DN.A");
 				connect("DP.A", "DN.K");
 				connect("DN.K", "RP1.1");
-
+#if TEST_ALT_OUTPUT
+				connect("EBUF.OP", "RO.1");
+				register_subalias("OUT", "RO.2");
+#else
 				register_subalias("OUT", "EBUF.OP");
+#endif
 			}
 
 		}
@@ -176,6 +194,9 @@ namespace netlist
 		analog::NETLIB_SUB(R_base) m_RP;
 		analog::NETLIB_SUB(VCCS) m_G1;
 		NETLIB_SUB_UPTR(analog, C) m_CP;
+#if TEST_ALT_OUTPUT
+		NETLIB_SUB_UPTR(analog, R_base) m_RO;
+#endif
 		NETLIB_SUB_UPTR(analog, VCVS) m_EBUF;
 		NETLIB_SUB_UPTR(analog, D) m_DP;
 		NETLIB_SUB_UPTR(analog, D) m_DN;
@@ -232,12 +253,22 @@ namespace netlist
 		if (m_type == 2)
 		{
 			m_EBUF->m_G.setTo(nlconst::one());
+#if TEST_ALT_OUTPUT
+			m_EBUF->m_RO.setTo(0.001);
+			m_RO->set_R(m_model.m_RO);
+#else
 			m_EBUF->m_RO.setTo(m_model.m_RO);
+#endif
 		}
 		if (m_type == 3)
 		{
 			m_EBUF->m_G.setTo(nlconst::one());
+#if TEST_ALT_OUTPUT
+			m_EBUF->m_RO.setTo(0.001);
+			m_RO->set_R(m_model.m_RO);
+#else
 			m_EBUF->m_RO.setTo(m_model.m_RO);
+#endif
 		}
 	}
 

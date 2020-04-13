@@ -29,7 +29,7 @@ void pcd_keyboard_device::pcd_keyboard_map(address_map &map)
 
 void pcd_keyboard_device::device_add_mconfig(machine_config &config)
 {
-	i8035_device &mcu(I8035(config, "mcu", 5760000*2)); // FIXME: the mc2661 baud rate calculation
+	i8035_device &mcu(I8035(config, "mcu", 5760000));
 	mcu.set_addrmap(AS_PROGRAM, &pcd_keyboard_device::pcd_keyboard_map);
 	mcu.bus_in_cb().set(FUNC(pcd_keyboard_device::bus_r));
 	mcu.p1_in_cb().set(FUNC(pcd_keyboard_device::p1_r));

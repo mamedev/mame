@@ -49,6 +49,7 @@ namespace devices
 		LIB_ENTRY(MOSFET)
 		LIB_ENTRY(logic_input_ttl)
 		LIB_ENTRY(logic_input)
+		LIB_ENTRY(logic_input8)
 		LIB_ENTRY(analog_input)
 		LIB_ENTRY(log)
 		LIB_ENTRY(logD)

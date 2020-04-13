@@ -551,9 +551,9 @@ void msx_state::msx_io_map(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::bus_r));
-	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
-	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::write));
+	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x98, 0x99).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
@@ -568,9 +568,9 @@ void msx2_state::msx2_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x40, 0x4f).rw(FUNC(msx2_state::msx_switched_r), FUNC(msx2_state::msx_switched_w));
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::bus_r));
-	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
-	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::write));
+	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
@@ -587,9 +587,9 @@ void msx2_state::msx2p_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x40, 0x4f).rw(FUNC(msx2_state::msx_switched_r), FUNC(msx2_state::msx_switched_w));
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::bus_r));
-	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
-	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::write));
+	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x98, 0x9b).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));

@@ -293,8 +293,6 @@ Filter Board
 
 #define ENABLE_LOGGING      0
 
-#define NAMCOS21_NUM_COLORS 0x8000
-
 class namcos21_state : public driver_device
 {
 public:
@@ -888,7 +886,7 @@ void namcos21_state::winrun(machine_config &config)
 	m_screen->set_screen_update(FUNC(namcos21_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, NAMCOS21_NUM_COLORS);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, 0x10000/2);
 
 	NAMCOS21_3D(config, m_namcos21_3d, 0);
 	m_namcos21_3d->set_fixed_palbase(0x4000);

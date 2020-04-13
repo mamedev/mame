@@ -587,11 +587,11 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
 
 	if( col >= m_page_x )
 	{
-		SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else if( row >= m_page_y )
 	{
-		SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else
 	{
@@ -669,7 +669,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
 			j += m_namcond1_gfxbank * 0x8000;
 		}
 
-		SET_TILE_INFO_MEMBER(set, j, attr & 0x0F, f );
+		tileinfo.set(set, j, attr & 0x0F, f );
 	}
 }
 
@@ -688,15 +688,15 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
 
 	if (m_md & MD_1PLANE )
 	{
-		SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else if (col >= m_page_x)
 	{
-		SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else if (row >= m_page_y)
 	{
-		SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else
 	{
@@ -774,7 +774,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
 			j += m_namcond1_gfxbank * 0x8000;
 		}
 
-		SET_TILE_INFO_MEMBER(set, j, attr, f );
+		tileinfo.set(set, j, attr, f );
 	}
 }
 
@@ -792,87 +792,87 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_16 )
 	int             base = row >> m_base_y_shift;
 
 	if( col >= m_page_x ) {
-	SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else if( row >= m_page_y ) {
-	SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else {
-	int sx, sy, page;
-	int j;
-	int i = ( ( ( row << m_pny_shift ) + col ) << m_bits16 );
-	int f = 0;
-	i += pattern_name_base;
+		int sx, sy, page;
+		int j;
+		int i = ( ( ( row << m_pny_shift ) + col ) << m_bits16 );
+		int f = 0;
+		i += pattern_name_base;
 
-	j = m_pattern_name_table[i];
-	if( m_bits16 ) {
-		j += ((int)(m_pattern_name_table[i+1] & m_na8_mask )) << 8;
-		// attribute only valid in 16 color mode
-		if( set == GFX_16X16_4BIT )
-			attr = m_pattern_name_table[i+1] >> 4;
+		j = m_pattern_name_table[i];
+		if( m_bits16 ) {
+			j += ((int)(m_pattern_name_table[i+1] & m_na8_mask )) << 8;
+			// attribute only valid in 16 color mode
+			if( set == GFX_16X16_4BIT )
+				attr = m_pattern_name_table[i+1] >> 4;
 
-		if (m_flip == true)
-		{
-		if (m_pattern_name_table[i+1] & (1<<3)) f |= TILE_FLIPX;
-		if (m_pattern_name_table[i+1] & (1<<2)) f |= TILE_FLIPY;
+			if (m_flip == true)
+			{
+			if (m_pattern_name_table[i+1] & (1<<3)) f |= TILE_FLIPX;
+			if (m_pattern_name_table[i+1] & (1<<2)) f |= TILE_FLIPY;
+			}
 		}
-	}
 
-	/* calculate page according to scroll data */
-	/* - assuming full-screen scroll only for now... */
-	if (m_v_div_size) {
-		page = 0;
-	}
-	else {
-		sy = (int)m_scroll_data_table[0][translated_column] +
-		   (((int)m_scroll_data_table[0][translated_column+1] & 0x0f ) << 8);
-		sx = (int)m_scroll_data_table[0][0x80] +
-		   (((int)m_scroll_data_table[0][0x81] & 0x0f ) << 8);
-
-		if (m_md == MD_2PLANE_16BIT) {
-			page = ( ( sx + col * 16 ) % 2048 ) / 512;
-			page += ( ( sy + row * 16 ) / 512 ) * 4;
-		}
-		else if (m_page_size) {
-			page = ( sx + col * 16 ) / 512;
-			page += ( ( sy + row * 16 ) / 1024 ) * 8;
+		/* calculate page according to scroll data */
+		/* - assuming full-screen scroll only for now... */
+		if (m_v_div_size) {
+			page = 0;
 		}
 		else {
-			page = ( sx + col * 16 ) / 1024;
-			page += ( ( sy + row * 16 ) / 512 ) * 4;
+			sy = (int)m_scroll_data_table[0][translated_column] +
+			   (((int)m_scroll_data_table[0][translated_column+1] & 0x0f ) << 8);
+			sx = (int)m_scroll_data_table[0][0x80] +
+			   (((int)m_scroll_data_table[0][0x81] & 0x0f ) << 8);
+
+			if (m_md == MD_2PLANE_16BIT) {
+				page = ( ( sx + col * 16 ) % 2048 ) / 512;
+				page += ( ( sy + row * 16 ) / 512 ) * 4;
+			}
+			else if (m_page_size) {
+				page = ( sx + col * 16 ) / 512;
+				page += ( ( sy + row * 16 ) / 1024 ) * 8;
+			}
+			else {
+				page = ( sx + col * 16 ) / 1024;
+				page += ( ( sy + row * 16 ) / 512 ) * 4;
+			}
 		}
-	}
 
-	page &= 0x1f;
+		page &= 0x1f;
 
-	/* add page, base address to pattern name */
-	j += ( (int)m_scroll_data_table[0][0xc0+page] << 8 );
-	j += ( m_base_addr[0][base] << 8 );
+		/* add page, base address to pattern name */
+		j += ( (int)m_scroll_data_table[0][0xc0+page] << 8 );
+		j += ( m_base_addr[0][base] << 8 );
 
-	if( j >= layout_total(set) ) {
-	logerror( "A_16X16: tilemap=%d\n", j );
-		j = 0;
-	}
+		if( j >= layout_total(set) ) {
+		logerror( "A_16X16: tilemap=%d\n", j );
+			j = 0;
+		}
 
-	if (m_planeA_color_fetch != 0)
-	{
-		// attribute only valid in 16 color mode
-		if( set == GFX_16X16_4BIT )
-			attr = ( j >> ( m_planeA_color_fetch * 2 ) ) & 0x0f;
-	}
+		if (m_planeA_color_fetch != 0)
+		{
+			// attribute only valid in 16 color mode
+			if( set == GFX_16X16_4BIT )
+				attr = ( j >> ( m_planeA_color_fetch * 2 ) ) & 0x0f;
+		}
 
-	// banking
-	if (set == GFX_16X16_4BIT)
-	{
-		j += m_namcond1_gfxbank * 0x4000;
-	}
-	else // 8x8x8
-	{
-		j += m_namcond1_gfxbank * 0x2000;
-	}
+		// banking
+		if (set == GFX_16X16_4BIT)
+		{
+			j += m_namcond1_gfxbank * 0x4000;
+		}
+		else // 8x8x8
+		{
+			j += m_namcond1_gfxbank * 0x2000;
+		}
 
 
-	SET_TILE_INFO_MEMBER(set, j, attr, f );
+		tileinfo.set(set, j, attr, f );
 	}
 }
 
@@ -890,88 +890,88 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_16 )
 	int             base = row >> m_base_y_shift;
 
 	if(m_md & MD_1PLANE ) {
-	SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	if( col >= m_page_x ) {
-	SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else if( row >= m_page_y ) {
-	SET_TILE_INFO_MEMBER(set, 0, 0, 0 );
+		tileinfo.set(set, 0, 0, 0 );
 	}
 	else {
-	int sx, sy, page;
-	int j;
-	int i = ( ( ( row << m_pny_shift ) + col ) << m_bits16 );
-	int f = 0;
-	i += pattern_name_base;
+		int sx, sy, page;
+		int j;
+		int i = ( ( ( row << m_pny_shift ) + col ) << m_bits16 );
+		int f = 0;
+		i += pattern_name_base;
 
-	j = m_pattern_name_table[i];
-	if( m_bits16 ) {
-		j += ((int)(m_pattern_name_table[i+1] & m_na8_mask )) << 8;
-		attr = m_pattern_name_table[i+1] >> 4; /*& 0x00; 0xf0;*/
+		j = m_pattern_name_table[i];
+		if( m_bits16 ) {
+			j += ((int)(m_pattern_name_table[i+1] & m_na8_mask )) << 8;
+			attr = m_pattern_name_table[i+1] >> 4; /*& 0x00; 0xf0;*/
 
-		if (m_flip == true)
-		{
-			if (m_pattern_name_table[i+1] & (1<<3)) f |= TILE_FLIPX;
-			if (m_pattern_name_table[i+1] & (1<<2)) f |= TILE_FLIPY;
+			if (m_flip == true)
+			{
+				if (m_pattern_name_table[i+1] & (1<<3)) f |= TILE_FLIPX;
+				if (m_pattern_name_table[i+1] & (1<<2)) f |= TILE_FLIPY;
+			}
 		}
-	}
 
-	/* calculate page according to scroll data */
-	/* - assuming full-screen scroll only for now... */
-	if (m_v_div_size) {
-		page = 0;
-	}
-	else {
-		sy = (int)m_scroll_data_table[1][translated_column] +
-		   (((int)m_scroll_data_table[1][translated_column+1] & 0x0f ) << 8);
-		sx = (int)m_scroll_data_table[1][0x80] +
-		   (((int)m_scroll_data_table[1][0x81] & 0x0f ) << 8);
-
-		if (m_md == MD_2PLANE_16BIT) {
-			page = ( ( sx + col * 16 ) % 2048 ) / 512;
-			page += ( ( sy + row * 16 ) / 512 ) * 4;
-		}
-		else if (m_page_size) {
-			page = ( sx + col * 16 ) / 512;
-			page += ( ( sy + row * 16 ) / 1024 ) * 8;
+		/* calculate page according to scroll data */
+		/* - assuming full-screen scroll only for now... */
+		if (m_v_div_size) {
+			page = 0;
 		}
 		else {
-			page = ( sx + col * 16 ) / 1024;
-			page += ( ( sy + row * 16 ) / 512 ) * 4;
+			sy = (int)m_scroll_data_table[1][translated_column] +
+			   (((int)m_scroll_data_table[1][translated_column+1] & 0x0f ) << 8);
+			sx = (int)m_scroll_data_table[1][0x80] +
+			   (((int)m_scroll_data_table[1][0x81] & 0x0f ) << 8);
+
+			if (m_md == MD_2PLANE_16BIT) {
+				page = ( ( sx + col * 16 ) % 2048 ) / 512;
+				page += ( ( sy + row * 16 ) / 512 ) * 4;
+			}
+			else if (m_page_size) {
+				page = ( sx + col * 16 ) / 512;
+				page += ( ( sy + row * 16 ) / 1024 ) * 8;
+			}
+			else {
+				page = ( sx + col * 16 ) / 1024;
+				page += ( ( sy + row * 16 ) / 512 ) * 4;
+			}
 		}
-	}
 
-	page &= 0x1f;
+		page &= 0x1f;
 
-	/* add page, base address to pattern name */
-	j += ( (int)m_scroll_data_table[1][0xc0+page] << 8 );
-	j += ( m_base_addr[1][base] << 8 );
+		/* add page, base address to pattern name */
+		j += ( (int)m_scroll_data_table[1][0xc0+page] << 8 );
+		j += ( m_base_addr[1][base] << 8 );
 
-	if( j >= layout_total(set) ) {
-	logerror( "B_16X16: tilemap=%d\n", j );
-		j = 0;
-	}
+		if( j >= layout_total(set) ) {
+			logerror( "B_16X16: tilemap=%d\n", j );
+			j = 0;
+		}
 
-	if (m_planeB_color_fetch != 0)
-	{
-		uint8_t color = (m_planeB_color_fetch);
+		if (m_planeB_color_fetch != 0)
+		{
+			uint8_t color = (m_planeB_color_fetch);
 
-		/* assume 16 colour mode for now... */
-		attr = ( j >> (color * 2)) & 0x0f;
-	}
+			/* assume 16 colour mode for now... */
+			attr = ( j >> (color * 2)) & 0x0f;
+		}
 
-	// banking
-	if (set == GFX_16X16_4BIT)
-	{
-		j += m_namcond1_gfxbank * 0x4000;
-	}
-	else // 8x8x8
-	{
-		j += m_namcond1_gfxbank * 0x2000;
-	}
+		// banking
+		if (set == GFX_16X16_4BIT)
+		{
+			j += m_namcond1_gfxbank * 0x4000;
+		}
+		else // 8x8x8
+		{
+			j += m_namcond1_gfxbank * 0x2000;
+		}
 
-	SET_TILE_INFO_MEMBER(set, j, attr, f );
+		tileinfo.set(set, j, attr, f );
 	}
 }
 

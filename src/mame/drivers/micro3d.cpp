@@ -361,7 +361,7 @@ void micro3d_state::micro3d(machine_config &config)
 	screen.set_screen_update("vgb", FUNC(tms34010_device::tms340x0_ind16));
 	screen.set_palette(m_palette);
 
-	MC2661(config, m_vgb_uart, 40_MHz_XTAL / 8); // actually SCN2651
+	SCN2651(config, m_vgb_uart, 40_MHz_XTAL / 8);
 	m_vgb_uart->txd_handler().set("monitor_vgb", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &monitor_host(RS232_PORT(config, "monitor_host", default_rs232_devices, nullptr)); // J2 (4-pin molex)
@@ -372,8 +372,8 @@ void micro3d_state::micro3d(machine_config &config)
 	monitor_drmath.dcd_handler().set("scc", FUNC(z80scc_device::dcdb_w));
 
 	rs232_port_device &monitor_vgb(RS232_PORT(config, "monitor_vgb", default_rs232_devices, nullptr)); // J3 (4-pin molex)
-	monitor_vgb.rxd_handler().set(m_vgb_uart, FUNC(mc2661_device::rx_w));
-	monitor_vgb.dsr_handler().set(m_vgb_uart, FUNC(mc2661_device::dsr_w));
+	monitor_vgb.rxd_handler().set(m_vgb_uart, FUNC(scn2651_device::rxd_w));
+	monitor_vgb.dsr_handler().set(m_vgb_uart, FUNC(scn2651_device::dsr_w));
 
 	ADC0844(config, m_adc);
 	m_adc->intr_callback().set("mfp", FUNC(mc68901_device::i3_w));

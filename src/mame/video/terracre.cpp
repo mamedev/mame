@@ -19,13 +19,13 @@ TILE_GET_INFO_MEMBER(terracre_state::get_bg_tile_info)
 	 * ----.--xx.xxxx.xxxx */
 	unsigned data = m_bg_videoram[tile_index];
 	unsigned color = data>>11;
-	SET_TILE_INFO_MEMBER(1,data&0x3ff,color,0 );
+	tileinfo.set(1,data&0x3ff,color,0 );
 }
 
 TILE_GET_INFO_MEMBER(terracre_state::get_fg_tile_info)
 {
 	unsigned data = m_fg_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,data&0xff,0,0 );
+	tileinfo.set(0,data&0xff,0,0 );
 }
 
 void terracre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )

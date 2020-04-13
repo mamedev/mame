@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(BBC_MICROWARE, bbc_microware_device, "bbc_microware", "Microw
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( microware )
+//  FLOPPY_FORMATS( microware )
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER( bbc_microware_device::floppy_formats )
@@ -38,6 +38,11 @@ static void bbc_floppies_525(device_slot_interface &device)
 	device.option_add("525dd",   FLOPPY_525_DD);
 	device.option_add("525qd",   FLOPPY_525_QD);
 }
+
+
+//-------------------------------------------------
+//  ROM( microware )
+//-------------------------------------------------
 
 ROM_START( microware )
 	ROM_REGION(0x4000, "dfs_rom", 0)

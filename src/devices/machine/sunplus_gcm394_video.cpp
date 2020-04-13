@@ -4,6 +4,8 @@
 
     SunPlus GCM394-series SoC peripheral emulation (Video)
 
+    This is very similar to spg2xx but with additional features, layers and modes
+
 **********************************************************************/
 
 #include "emu.h"
@@ -35,7 +37,6 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	m_space_read_cb(*this),
 	m_rowscroll(*this, "^rowscroll"),
 	m_rowzoom(*this, "^rowzoom"),
-	m_global_y_mask(0x1ff),
 	m_pal_displaybank_high(0),
 	m_alt_tile_addressing(0)
 {
@@ -219,6 +220,9 @@ void gcm394_base_video_device::device_start()
 
 	m_space_read_cb.resolve_safe(0);
 
+	m_screenpos_timer = timer_alloc(TIMER_SCREENPOS);
+	m_screenpos_timer->adjust(attotime::never);
+
 
 	save_item(NAME(m_screenbuf));
 	save_item(NAME(m_rgb5_to_rgb8));
@@ -241,10 +245,12 @@ void gcm394_base_video_device::device_start()
 	save_item(NAME(m_tmap3_scroll));
 	save_item(NAME(m_707f));
 	save_item(NAME(m_703a_palettebank));
-	save_item(NAME(m_7062));
-	save_item(NAME(m_7063));
+	save_item(NAME(m_video_irq_enable));
+	save_item(NAME(m_video_irq_status));
 	save_item(NAME(m_702a));
 	save_item(NAME(m_7030_brightness));
+	save_item(NAME(m_xirqpos));
+	save_item(NAME(m_yirqpos));
 	save_item(NAME(m_703c_tvcontrol1));
 	save_item(NAME(m_7042_sprite));
 	save_item(NAME(m_7080));
@@ -262,12 +268,10 @@ void gcm394_base_video_device::device_start()
 	save_item(NAME(m_page2_addr_msb));
 	save_item(NAME(m_page3_addr_lsb));
 	save_item(NAME(m_page3_addr_msb));
-	save_item(NAME(m_video_irq_status));
 	save_item(NAME(m_spriteram));
 	save_item(NAME(m_spriteextra));
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_maxgfxelement));
-	save_item(NAME(m_global_y_mask));
 	save_item(NAME(m_pal_displaybank_high));
 	save_item(NAME(m_alt_tile_addressing));
 }
@@ -302,11 +306,13 @@ void gcm394_base_video_device::device_reset()
 
 	m_707f = 0x0000;
 	m_703a_palettebank = 0x0000;
-	m_7062 = 0x0000;
-	m_7063 = 0x0000;
+	m_video_irq_enable = 0x0000;
+	m_video_irq_status = 0x0000;
 
 	m_702a = 0x0000;
 	m_7030_brightness = 0x0000;
+	m_xirqpos = 0x0000;
+	m_yirqpos = 0x0000;
 	m_703c_tvcontrol1 = 0x0000;
 
 	m_7042_sprite = 0x0000;
@@ -325,8 +331,6 @@ void gcm394_base_video_device::device_reset()
 	m_videodma_size = 0x0000;
 	m_videodma_dest = 0x0000;
 	m_videodma_source = 0x0000;
-
-	m_video_irq_status = 0x0000;
 
 	m_sprite_7022_gfxbase_lsb = 0;
 	m_sprite_702d_gfxbase_msb = 0;
@@ -361,6 +365,17 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 	{
 		words_per_tile = 8; // seems to be correct for sprites regardless of size / bpp on smartfp
 	}
+
+	int x_max;
+	if (m_707f & 0x0010)
+	{
+		x_max = 0x400;
+	}
+	else
+	{
+		x_max = 0x200;
+	}
+
 
 	uint32_t m = (bitmap_addr) + (words_per_tile * tile + bits_per_row * (line ^ yflipmask));
 
@@ -424,9 +439,9 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 		if (RowScroll)
 			xx -= 0;// (int16_t)m_scrollram[yy & 0x1ff];
 
-		//xx &= 0x01ff;
-		//if (xx >= 0x01c0)
-		//  xx -= 0x0200;
+		xx &= (x_max-1);
+		if (xx >= (x_max-0x40))
+			xx -= x_max;
 
 		if (xx >= 0 && xx <= cliprect.max_x)
 		{
@@ -550,35 +565,35 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 
 		int total_width;
 		int use_alt_drawmode = m_alt_tile_addressing;
+		int y_mask = 0;
 
 		// just a guess based on this being set on the higher resolution tilemaps we've seen, could be 100% incorrect register
 		if ((attr_reg >> 14) & 0x2)
 		{
 			total_width = 1024;
+			y_mask = 0x1ff;
 		//  use_alt_drawmode = 1; // probably doesn't control this
 		}
 		else
 		{
 			total_width = 512;
+			y_mask = 0xff;
 		//  use_alt_drawmode = 0; // probably doesn't control this
 		}
 
 		uint32_t tile_count_x = total_width / tile_w;
 
-		uint32_t bitmap_y = (scanline + yscroll);// &0xff;
+		uint32_t bitmap_y = (scanline + yscroll) & y_mask;
 		uint32_t y0 = bitmap_y / tile_h;
 		uint32_t tile_scanline = bitmap_y % tile_h;
 		uint32_t tile_address = tile_count_x * y0;
 
 		for (uint32_t x0 = 0; x0 < tile_count_x; x0++, tile_address++)
 		{
-			uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & m_global_y_mask) - 0x10;
-			uint32_t xx = (tile_w * x0 - xscroll);// &0x1ff;
+			uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & y_mask) - 0x10;
+			uint32_t xx = (tile_w * x0 - xscroll) & (total_width-1);
 			uint32_t tile = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
 
-			uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
-			if (x0 & 1)
-				palette >>= 8;
 
 
 			if (!tile)
@@ -588,19 +603,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 			uint32_t tileattr = attr_reg;
 			uint32_t tilectrl = ctrl_reg;
 
-#if 0
-			if ((ctrl_reg & 2) == 0)
-			{   // -(1) bld(1) flip(2) pal(4)
-				tileattr &= ~0x000c;
-				tileattr |= (palette >> 2) & 0x000c;    // flip
 
-				tileattr &= ~0x0f00;
-				tileattr |= (palette << 8) & 0x0f00;    // palette
-
-				tilectrl &= ~0x0100;
-				tilectrl |= (palette << 2) & 0x0100;    // blend
-			}
-#endif
 			bool blend;
 			bool row_scroll;
 			bool flip_x;
@@ -611,18 +614,41 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 			row_scroll = (tilectrl & 0x0010);
 
 
-			if ((ctrl_reg & 2) == 0)
+			if ((ctrl_reg & 2) == 0) // RegSet:0
 			{
-				flip_x = 0;
-				yflipmask = 0;
+				uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
+				if (x0 & 1)
+					palette >>= 8;
+
+				flip_x = palette & 0x0010;
+				yflipmask = (palette & 0x0020) ? tile_h - 1 : 0;
 				palette_offset = (palette & 0x0f) << 4;
+
+				//tilectrl &= ~0x0100;
+				//tilectrl |= (palette << 2) & 0x0100;    // blend
 			}
-			else // jak_car2 uses this mode for sky ingame
+			else // RegSet:1
 			{
-				flip_x = (tileattr & TILE_X_FLIP);
-				yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
-				palette_offset = (tileattr & 0x0f00) >> 4;
-				tile |= (palette & 0x0007) << 16;
+				if (m_alt_tile_addressing == 0)
+				{
+					// smartfp needs the attribute table to contain extra tile bits even if regset is 1
+					uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
+					if (x0 & 1)
+						palette >>= 8;
+
+					tile |= (palette & 0x0007) << 16;
+
+					flip_x = (tileattr & TILE_X_FLIP);
+					yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
+					palette_offset = (tileattr & 0x0f00) >> 4;
+
+				}
+				else
+				{
+					flip_x = (tileattr & TILE_X_FLIP);
+					yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
+					palette_offset = (tileattr & 0x0f00) >> 4;
+				}
 			}
 
 
@@ -671,7 +697,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 }
 
 
-void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr)
+void gcm394_base_video_device::draw_sprite(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t base_addr)
 {
 	uint32_t bitmap_addr = (m_sprite_702d_gfxbase_msb << 16) | m_sprite_7022_gfxbase_lsb;
 	uint32_t tile = m_spriteram[base_addr + 0];
@@ -687,14 +713,29 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 
 	int addressing_mode = 0;
 
-	// m_7042_sprite is f7 on smartfp
-	//                  01 on wrlshunt
-	// this is not enough to conclude anything
+	int screenwidth, screenheight, x_max;
+	if (m_707f & 0x0010)
+	{
+		screenwidth = 640;
+		screenheight = 480;
+		x_max = 0x400;
+	}
+	else
+	{
+		screenwidth = 320;
+		screenheight = 240;
+		x_max = 0x200;
+	}
 
-	if (m_7042_sprite == 0x01)
+
+	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
+	if ((m_7042_sprite & 0x0010) == 0x10)
+		addressing_mode = 0; // smartfp, paccon
+	else
 		addressing_mode = 1;
 
-	tile |= m_spriteextra[base_addr / 4] << 16;
+	if (addressing_mode == 0) // smartfp, paccon
+		tile |= m_spriteextra[base_addr / 4] << 16;
 
 	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
 	{
@@ -704,15 +745,16 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 	const uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
 	const uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
-	/*
-	if (!(m_video_regs[0x42] & SPRITE_COORD_TL_MASK))
-	{
-	    x = (160 + x) - w / 2;
-	    y = (120 - y) - (h / 2) + 8;
-	}
-	*/
 
-	x &= 0x01ff;
+
+	if (!(m_7042_sprite & SPRITE_COORD_TL_MASK))
+	{
+		x = ((screenwidth / 2) + x) - w / 2;
+		y = ((screenheight / 2) - y) - (h / 2) + 8;
+	}
+
+
+	x &= (x_max - 1);
 	y &= 0x01ff;
 
 	uint32_t tile_line = ((scanline - y) + 0x200) % h;
@@ -727,17 +769,26 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 
 	bool blend = (attr & 0x4000);
 
-	bool flip_x = false;
+	bool flip_x;
+	uint8_t bpp;
+	uint32_t yflipmask;
+	uint32_t palette_offset;
 
 	// different attribute use?
-	if (addressing_mode == 0)
+	if (addressing_mode == 0) // smartfp, paccon
 	{
 		flip_x = (attr & TILE_X_FLIP);
+		bpp = attr & 0x0003;
+		yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
+		palette_offset = (attr & 0x0f00) >> 4;
 	}
-
-	const uint8_t bpp = attr & 0x0003;
-	const uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
-	uint32_t palette_offset = (attr & 0x0f00) >> 4;
+	else
+	{
+		flip_x = 0;// (attr & TILE_X_FLIP); // wrlshunt, jak_totm, jak_s550 do not want this to be flip bit, gormiti does.  also configurable, or error in spriteram content?
+		bpp = attr & 0x0003;
+		yflipmask = 0;// attr& TILE_Y_FLIP ? h - 1 : 0; // see flipx comment
+		palette_offset = (attr & 0x0f00) >> 4;
+	}
 
 	//palette_offset |= 0x0d00;
 	palette_offset |= 0x0500;
@@ -760,7 +811,12 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 
 void gcm394_base_video_device::draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority)
 {
-	for (uint32_t n = 0; n < 0x100; n++)
+	// paccon suggests this, does older hardware have similar?
+	int numsprites = (m_7042_sprite & 0xff00) >> 8;
+	if (numsprites == 0)
+		numsprites = 0x100;
+
+	for (uint32_t n = 0; n < numsprites; n++)
 	{
 		draw_sprite(cliprect, scanline, priority, 4 * n);
 	}
@@ -800,15 +856,17 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 		for (int i = 0; i < 4; i++)
 		{
+			const int draw_all = 1;
+
 			if (1)
 			{
-				draw_page(cliprect, scanline, i, (m_page0_addr_lsb | (m_page0_addr_msb<<16)), m_tmap0_regs, m_tmap0_scroll);
-				draw_page(cliprect, scanline, i, (m_page1_addr_lsb | (m_page1_addr_msb<<16)), m_tmap1_regs, m_tmap1_scroll);
-				draw_page(cliprect, scanline, i, (m_page2_addr_lsb | (m_page2_addr_msb<<16)), m_tmap2_regs, m_tmap2_scroll);
-				draw_page(cliprect, scanline, i, (m_page3_addr_lsb | (m_page3_addr_msb<<16)), m_tmap3_regs, m_tmap3_scroll);
+				if ((!(machine().input().code_pressed(KEYCODE_Q))) || draw_all) draw_page(cliprect, scanline, i, (m_page0_addr_lsb | (m_page0_addr_msb<<16)), m_tmap0_regs, m_tmap0_scroll);
+				if ((!(machine().input().code_pressed(KEYCODE_W))) || draw_all) draw_page(cliprect, scanline, i, (m_page1_addr_lsb | (m_page1_addr_msb<<16)), m_tmap1_regs, m_tmap1_scroll);
+				if ((!(machine().input().code_pressed(KEYCODE_E))) || draw_all) draw_page(cliprect, scanline, i, (m_page2_addr_lsb | (m_page2_addr_msb<<16)), m_tmap2_regs, m_tmap2_scroll);
+				if ((!(machine().input().code_pressed(KEYCODE_R))) || draw_all) draw_page(cliprect, scanline, i, (m_page3_addr_lsb | (m_page3_addr_msb<<16)), m_tmap3_regs, m_tmap3_scroll);
 
 			}
-			draw_sprites(cliprect, scanline, i);
+			if ((!(machine().input().code_pressed(KEYCODE_T))) || draw_all) draw_sprites(cliprect, scanline, i);
 		}
 	}
 
@@ -1145,6 +1203,7 @@ WRITE16_MEMBER(gcm394_base_video_device::sprite_7042_extra_w)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::sprite_7042_extra_w %04x\n", machine().describe_context(), data);
 	m_7042_sprite = data;
+	//popmessage("extra modes %04x\n", data);
 }
 
 
@@ -1182,6 +1241,15 @@ WRITE16_MEMBER(gcm394_base_video_device::video_dma_size_trigger_w)
 	}
 
 	m_videodma_size = 0x0000;
+
+	if (m_video_irq_enable & 4)
+	{
+		const uint16_t old = m_video_irq_status;
+		m_video_irq_status |= 4;
+		const uint16_t changed = old ^ (m_video_irq_enable & m_video_irq_status);
+		if (changed)
+			check_video_irq();
+	}
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::video_dma_unk_w)
@@ -1255,6 +1323,8 @@ WRITE16_MEMBER(gcm394_base_video_device::video_707f_w)
 	}
 
 	m_707f = data;
+
+	//popmessage("707f is %04x\n", data);
 }
 
 READ16_MEMBER(gcm394_base_video_device::video_703a_palettebank_r)
@@ -1272,33 +1342,34 @@ WRITE16_MEMBER(gcm394_base_video_device::video_703a_palettebank_w)
 READ16_MEMBER(gcm394_base_video_device::videoirq_source_enable_r)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::videoirq_source_enable_r\n", machine().describe_context());
-	return m_7062;
+	return m_video_irq_enable;
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::videoirq_source_enable_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::videoirq_source_enable_w %04x\n", machine().describe_context(), data);
-	m_7062 = data;
+	LOGMASKED(LOG_GCM394_VIDEO, "videoirq_source_enable_w: Video IRQ Enable = %04x (DMA:%d, Timing:%d, Blanking:%d)\n", data, BIT(data, 2), BIT(data, 1), BIT(data, 0));
+	const uint16_t old = m_video_irq_enable & m_video_irq_status;
+	m_video_irq_enable = data & 0x0007;
+	const uint16_t changed = old ^ (m_video_irq_enable & m_video_irq_status);
+	if (changed)
+		check_video_irq();
 }
 
 READ16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_r)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7063_videoirq_source_r\n", machine().describe_context());
-	return machine().rand();
+	return m_video_irq_status;
 }
 
 
 WRITE16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_ack_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7063_videoirq_source_ack_w %04x\n", machine().describe_context(), data);
-	m_7063 = data;
-
-	// ack or enable? happens near start of the IRQ
-	if (data & 0x01)
-	{
-		m_video_irq_status &= ~1;
+	LOGMASKED(LOG_GCM394_VIDEO, "video_7063_videoirq_source_ack_w: Video IRQ Acknowledge = %04x\n", data);
+	const uint16_t old = m_video_irq_enable & m_video_irq_status;
+	m_video_irq_status &= ~data;
+	const uint16_t changed = old ^ (m_video_irq_enable & m_video_irq_status);
+	if (changed)
 		check_video_irq();
-	}
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::video_702a_w)
@@ -1331,6 +1402,35 @@ WRITE16_MEMBER(gcm394_base_video_device::video_7030_brightness_w)
 	m_7030_brightness = data;
 }
 
+void gcm394_base_video_device::update_raster_split_position()
+{
+	// this might need updating to handle higher res modes
+	LOGMASKED(LOG_GCM394_VIDEO, "update_raster_split_position: %04x,%04x\n", m_yirqpos, m_xirqpos);
+	if (m_xirqpos < 300 && m_yirqpos < 240)
+	{
+		m_screenpos_timer->adjust(m_screen->time_until_pos(m_yirqpos, m_xirqpos));
+		//printf("setting irq timer for y:%d x:%d", m_yirqpos, m_xirqpos);
+	}
+	else
+		m_screenpos_timer->adjust(attotime::never);
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::split_irq_ypos_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:split_irq_ypos_w %04x\n", machine().describe_context(), data);
+
+	m_yirqpos = data & 0x1ff;
+	update_raster_split_position();
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::split_irq_xpos_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:split_irq_xpos_w %04x\n", machine().describe_context(), data);
+
+	m_xirqpos = data & 0x1ff;
+	update_raster_split_position();
+}
+
 READ16_MEMBER(gcm394_base_video_device::video_703c_tvcontrol1_r)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703c_tvcontrol1_r\n", machine().describe_context());
@@ -1350,6 +1450,14 @@ READ16_MEMBER(gcm394_base_video_device::video_7051_r)
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7051_r (returning %04x)\n", machine().describe_context(), retdat);
 	return retdat;
 }
+
+READ16_MEMBER(gcm394_base_video_device::video_70e0_r)
+{
+	uint16_t retdat = machine().rand();
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_70e0_r (returning %04x)\n", machine().describe_context(), retdat);
+	return retdat;
+}
+
 
 // this block get set once, in a single function, could be important
 WRITE16_MEMBER(gcm394_base_video_device::video_7080_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7080_w %04x\n", machine().describe_context(), data); m_7080 = data; }
@@ -1441,32 +1549,67 @@ READ16_MEMBER(gcm394_base_video_device::palette_r)
 
 WRITE16_MEMBER(gcm394_base_video_device::video_701c_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_701c_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_701c_w (unknown video reg?) %04x\n", machine().describe_context(), data);
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::video_701d_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_701d_w (unknown video reg?) %04x\n", machine().describe_context(), data);
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::video_701e_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_701e_w (unknown video reg?) %04x\n", machine().describe_context(), data);
 }
 
 
 void gcm394_base_video_device::check_video_irq()
 {
-	m_video_irq_cb((m_video_irq_status & 1) ? ASSERT_LINE : CLEAR_LINE);
+	LOGMASKED(LOG_GCM394_VIDEO, "%ssserting Video IRQ (%04x, %04x)\n", (m_video_irq_status & m_video_irq_enable) ? "A" : "Dea", m_video_irq_status, m_video_irq_enable);
+	m_video_irq_cb((m_video_irq_status & m_video_irq_enable) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(gcm394_base_video_device::vblank)
 {
-	int i = 0x0001;
-
 	if (!state)
 	{
-		m_video_irq_status &= ~i;
+		m_video_irq_status &= ~1;
+		LOGMASKED(LOG_GCM394_VIDEO, "Setting video IRQ status to %04x\n", m_video_irq_status);
 		check_video_irq();
 		return;
 	}
 
-	//if (m_video_irq_enable & 1)
+	if (m_video_irq_enable & 1)
 	{
-		m_video_irq_status |= i;
+		m_video_irq_status |= 1;
+		LOGMASKED(LOG_GCM394_VIDEO, "Setting video IRQ status to %04x\n", m_video_irq_status);
 		check_video_irq();
 	}
 }
+
+void gcm394_base_video_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case TIMER_SCREENPOS:
+		{
+			if (m_video_irq_enable & 2)
+			{
+				m_video_irq_status |= 2;
+				check_video_irq();
+			}
+
+			//printf("firing irq timer\n");
+
+			m_screen->update_partial(m_screen->vpos());
+
+			// fire again, jak_dbz pinball needs this
+			m_screenpos_timer->adjust(m_screen->time_until_pos(m_yirqpos, m_xirqpos));
+			break;
+		}
+	}
+}
+
 
 static GFXDECODE_START( gfx )
 GFXDECODE_END

@@ -1351,7 +1351,7 @@ READ8_MEMBER(royalmah_state::mjvegasa_rom_io_r)
 
 	if((offset & 0xfff0) == 0x8000)
 	{
-		return m_rtc->read(space, offset & 0xf);
+		return m_rtc->read(offset & 0xf);
 	}
 
 	logerror("%04X: unmapped IO read at %04X\n", m_maincpu->pc(), offset);
@@ -1370,7 +1370,7 @@ WRITE8_MEMBER(royalmah_state::mjvegasa_rom_io_w)
 
 	if((offset & 0xfff0) == 0x8000)
 	{
-		m_rtc->write(space, offset & 0xf,data);
+		m_rtc->write(offset & 0xf, data);
 		return;
 	}
 

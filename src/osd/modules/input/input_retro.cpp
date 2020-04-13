@@ -181,10 +181,10 @@ void Input_Binding(running_machine &machine)
    log_cb(RETRO_LOG_INFO, "YEAR: %s\n", machine.system().year);
    log_cb(RETRO_LOG_INFO, "MANUFACTURER: %s\n", machine.system().manufacturer);
 
-   Buttons_mapping[0]=RETROPAD_A;
-   Buttons_mapping[1]=RETROPAD_B;
-   Buttons_mapping[2]=RETROPAD_X;
-   Buttons_mapping[3]=RETROPAD_Y;
+   Buttons_mapping[1]=RETROPAD_A;
+   Buttons_mapping[0]=RETROPAD_B;
+   Buttons_mapping[3]=RETROPAD_X;
+   Buttons_mapping[2]=RETROPAD_Y;
    Buttons_mapping[4]=RETROPAD_L;
    Buttons_mapping[5]=RETROPAD_R;
 

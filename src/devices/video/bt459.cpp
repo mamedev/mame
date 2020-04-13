@@ -147,7 +147,7 @@ void bt459_device::set_component(rgb_t *const arr, const int index, const u8 dat
 	}
 }
 
-READ8_MEMBER(bt459_device::address_lo_r)
+u8 bt459_device::address_lo_r()
 {
 	// reset component pointer and return address register lsb
 	if (!machine().side_effects_disabled())
@@ -155,14 +155,14 @@ READ8_MEMBER(bt459_device::address_lo_r)
 	return m_address & ADDRESS_LSB;
 }
 
-WRITE8_MEMBER(bt459_device::address_lo_w)
+void bt459_device::address_lo_w(u8 data)
 {
 	// reset component pointer and set address register lsb
 	m_address_rgb = 0;
 	m_address = (m_address & ADDRESS_MSB) | data;
 }
 
-READ8_MEMBER(bt459_device::address_hi_r)
+u8 bt459_device::address_hi_r()
 {
 	// reset component pointer and return address register msb
 	if (!machine().side_effects_disabled())
@@ -170,14 +170,14 @@ READ8_MEMBER(bt459_device::address_hi_r)
 	return (m_address & ADDRESS_MSB) >> 8;
 }
 
-WRITE8_MEMBER(bt459_device::address_hi_w)
+void bt459_device::address_hi_w(u8 data)
 {
 	// reset component pointer and set address register msb
 	m_address_rgb = 0;
 	m_address = ((data << 8) | (m_address & ADDRESS_LSB)) & ADDRESS_MASK;
 }
 
-READ8_MEMBER(bt459_device::register_r)
+u8 bt459_device::register_r()
 {
 	u8 result = 0;
 
@@ -263,7 +263,7 @@ READ8_MEMBER(bt459_device::register_r)
 	return result;
 }
 
-WRITE8_MEMBER(bt459_device::register_w)
+void bt459_device::register_w(u8 data)
 {
 	switch (m_address)
 	{
@@ -477,13 +477,13 @@ WRITE8_MEMBER(bt459_device::register_w)
 	m_address = (m_address + 1) & ADDRESS_MASK;
 }
 
-READ8_MEMBER(bt459_device::palette_r)
+u8 bt459_device::palette_r()
 {
 	// return component from palette ram
 	return get_component(m_palette_ram, m_address & 0xff);
 }
 
-WRITE8_MEMBER(bt459_device::palette_w)
+void bt459_device::palette_w(u8 data)
 {
 	// set component in color palette ram
 	const int index = m_address & 0xff;

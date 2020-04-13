@@ -131,7 +131,7 @@ TILE_GET_INFO_MEMBER(bankp_state::get_bg_tile_info)
 	int color = m_colorram2[tile_index] >> 4;
 	int flags = (m_colorram2[tile_index] & 0x08) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 	tileinfo.group = color;
 }
 
@@ -141,7 +141,7 @@ TILE_GET_INFO_MEMBER(bankp_state::get_fg_tile_info)
 	int color = m_colorram[tile_index] >> 3;
 	int flags = (m_colorram[tile_index] & 0x04) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 	tileinfo.group = color;
 }
 

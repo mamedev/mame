@@ -26,7 +26,7 @@ namespace netlist
 		, m_cnt(*this, "m_cnt", 0)
 		, m_last_CU(*this, "m_last_CU", 0)
 		, m_last_CD(*this, "m_last_CD", 0)
-		, m_Q(*this, {{"QA", "QB", "QC", "QD"}})
+		, m_Q(*this, {"QA", "QB", "QC", "QD"})
 		, m_BORROWQ(*this, "BORROWQ")
 		, m_CARRYQ(*this, "CARRYQ")
 		, m_A(*this, "A", NETLIB_DELEGATE(74192, sub))

@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(sanremo_state::get_tile_info)
 	int code = m_videoram[tile_index];
 	int bank = m_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code + bank * 256, 0, 0);
+	tileinfo.set(0, code + bank * 256, 0, 0);
 }
 
 void sanremo_state::video_start()

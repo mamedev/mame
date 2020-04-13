@@ -1236,7 +1236,7 @@ void video_manager::recompute_speed(const attotime &emutime)
 	{
 		// create a final screenshot
 		emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		osd_file::error filerr = file.open(machine().basename(), PATH_SEPARATOR "final.png");
+		osd_file::error filerr = file.open(machine().basename() + PATH_SEPARATOR "final.png");
 		if (filerr == osd_file::error::NONE)
 			save_snapshot(nullptr, file);
 

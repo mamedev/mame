@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(mainsnk_state::get_tx_tile_info)
 {
 	int code = m_fgram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			0,
 			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
@@ -60,7 +60,7 @@ TILE_GET_INFO_MEMBER(mainsnk_state::get_bg_tile_info)
 {
 	int code = (m_bgram[tile_index]);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_bg_tile_offset + code,
 			0,
 			0);

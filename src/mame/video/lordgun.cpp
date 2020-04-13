@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info)
 	uint16_t attr = m_vram[Layer][tile_index * 2 + 0 ];
 	uint16_t code = m_vram[Layer][ tile_index * 2 + 1 ];
 	uint16_t pri  = (attr & 0x0e00) >> 9;
-	SET_TILE_INFO_MEMBER(Layer, code, ((attr & 0x0030) >> 4) + 0x10 + 0x4 * ((Layer + 1) & 3) + pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
+	tileinfo.set(Layer, code, ((attr & 0x0030) >> 4) + 0x10 + 0x4 * ((Layer + 1) & 3) + pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
 /***************************************************************************

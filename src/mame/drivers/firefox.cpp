@@ -235,7 +235,7 @@ WRITE8_MEMBER(firefox_state::firefox_disc_data_w)
 
 TILE_GET_INFO_MEMBER(firefox_state::bgtile_get_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index], 0, 0);
+	tileinfo.set(0, m_tileram[tile_index], 0, 0);
 }
 
 

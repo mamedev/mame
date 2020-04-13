@@ -46,12 +46,12 @@ TILE_GET_INFO_MEMBER(tryout_state::get_fg_tile_info)
 	code |= ((attr & 0x03) << 8);
 	int color = ((attr & 0x4) >> 2) + 6;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(tryout_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(2, m_vram[tile_index] & 0x7f, 2, 0);
+	tileinfo.set(2, m_vram[tile_index] & 0x7f, 2, 0);
 }
 
 READ8_MEMBER(tryout_state::vram_r)

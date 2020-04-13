@@ -34,8 +34,6 @@ protected:
 private:
 	DECLARE_WRITE_LINE_MEMBER(midi_rx_w);
 
-	DECLARE_READ8_MEMBER(regs_mode2_r);
-	DECLARE_WRITE8_MEMBER(regs_mode2_w);
 	DECLARE_READ8_MEMBER(asic_r);
 	DECLARE_WRITE8_MEMBER(asic_w);
 	DECLARE_READ8_MEMBER(port1_r);

@@ -187,7 +187,7 @@ TILE_GET_INFO_MEMBER(kingdrby_state::get_sc0_tile_info)
 
 	tile&=0x1ff;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile,
 			color|0x40,
 			0);
@@ -203,7 +203,7 @@ TILE_GET_INFO_MEMBER(kingdrby_state::get_sc1_tile_info)
 	//0x13
 	//
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile,
 			color|0x40,
 			0);

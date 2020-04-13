@@ -1,66 +1,155 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Undumped:
+
+Ekologi-akvariet (nät/skollicens) [24-34203, 1987-07-27]
+Systemskiva för hårdskiveenhet [version 7242]
+-->
 <softwarelist name="compis" description="Telenova Compis disk images">
 
 	<software name="abcenkat">
-		<description>ABC enkät etikett klockan (Swe)</description>
+		<description>ABC/Enkät/Etikett/Klockan</description>
 		<year>1989</year>
-		<publisher>Gävle DPC</publisher>
-
+		<publisher>Gävle Datapedagogiska Centrum</publisher>
+		<info name="release" value="19890109" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1: Matsnill, rita, schema, stava"/>
+			<feature name="part_id" value="Disk 1: Matsnill/Rita/Schema/Stava"/>
 			<dataarea name="flop" size="309963">
-				<rom name="compis-program.td0" size="309963" crc="bc2e30cb" sha1="02b12b205104547869773f5bc7a0100a7a70c997"/>
+				<rom name="compis-program.td0" size="309963" crc="bc2e30cb" sha1="02b12b205104547869773f5bc7a0100a7a70c997" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="demospel">
-		<description>Demospel (Swe)</description>
+		<description>Demospel</description>
 		<year>19??</year>
 		<publisher>DataNova</publisher>
-
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="331170">
-				<rom name="demospel.td0" size="331170" crc="974cd06e" sha1="656baa0c46ad443e8d2507d783a2a1371cdd2d1e"/>
+				<rom name="demospel.td0" size="331170" crc="974cd06e" sha1="656baa0c46ad443e8d2507d783a2a1371cdd2d1e" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="harmonie">
-		<description>PI HarmoniEtt (Delta)</description>
+		<description>PI HarmoniEtt (Delta, enanvändare)</description>
 		<year>1987</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
+		<publisher>Telenova</publisher>
+		<info name="serial" value="24-33664" />
+		<info name="release" value="19871021" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="246025">
-				<rom name="harmoniett.td0" size="246025" crc="85334c70" sha1="d8d49ee3c246a44bb0c714f465af2853534c92ee"/>
+				<rom name="harmoniett.td0" size="246025" crc="85334c70" sha1="d8d49ee3c246a44bb0c714f465af2853534c92ee" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ma2">
+		<description>MA2 info (skollicens)</description>
+		<year>19??</year>
+		<publisher>Hjärsta Mediakonsult Handelsbolag</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="113003">
+				<rom name="ma2.td0" size="113003" crc="5bede5b3" sha1="b6753ede4cc24ef8c0d4ba503302aebc27cc1e10" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skriv">
+		<description>Skriv lätt, skriv rätt (version 7532)</description>
+		<year>19??</year>
+		<publisher>Telenova</publisher>
+		<info name="serial" value="24-33825-7" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="140545">
+				<rom name="skriv1.td0" size="140545" crc="69c68426" sha1="5bc886ec8cae72a70e1d31a8fca3ebe963117be2" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="msdos32">
-		<description>MS-DOS v3.2</description>
-		<year>1986</year>
+		<description>MS-DOS v3.2 (version 7331)</description>
+		<year>1987</year>
 		<publisher>Telenova</publisher>
-
+		<info name="release" value="19870609" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="557550">
-				<rom name="compismsdos.imd" size="557550" crc="5919305f" sha1="5cacb6344c96eba5c99a134e573cb4571751b892"/>
+			<dataarea name="flop" size="737280">
+				<rom name="compismsdos.img" size="737280" crc="4abfe76c" sha1="ecac054d4044675d53454a7878f9b9438d29d818"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="system2">
-		<description>Systemskiva II (Swe)</description>
+		<description>Systemskiva II (Svensk, version 6385)</description>
 		<year>1986</year>
 		<publisher>Telenova</publisher>
-
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="671503">
-				<rom name="compissys2.imd" size="671503" crc="13ca7af8" sha1="c6c1e747d5e5899a31ceb2fc7f83b0ac6593bf08"/>
+			<dataarea name="flop" size="737280">
+				<rom name="compissys2.img" size="737280" crc="2eb61d13" sha1="d96a3aeb2dde991e840b3f4938b904feca72abef"/>
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="distrib">
+		<description>Distributionskunskap (version 8014)</description>
+		<year>19??</year>
+		<publisher>Telenova</publisher>
+		<info name="serial" value="24-33362" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209534">
+				<rom name="distributionskunskap.mfm" size="2209534" crc="145c545d" sha1="8bfdd67985af6b4626b9ec56c36e4ef5aea17909"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adblon">
+		<description>ADB-lön (version 7482)</description>
+		<year>19??</year>
+		<publisher>Telenova</publisher>
+		<info name="serial" value="24-33810-9" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209445">
+				<rom name="adb-lon.mfm" size="2209445" crc="3dfce719" sha1="e09ae56402f10d0209c2049a13f2141be43490fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lkmdlrkn">
+		<description>Läkemedelsräkning (version 7234)</description>
+		<year>19??</year>
+		<publisher>Telenova</publisher>
+		<info name="serial" value="24-34327-7" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209417">
+				<rom name="lakemedelsrakning.mfm" size="2209417" crc="39df5967" sha1="190713daa7dc50ec428ea5259972f2865de91ec9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="procent">
+		<description>Procenträkning (version 7334)</description>
+		<year>19??</year>
+		<publisher>Telenova</publisher>
+		<info name="serial" value="24-34736-1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209414">
+				<rom name="procentrakning.mfm" size="2209414" crc="888188a0" sha1="88f45b4fd560ff847b27eb4f754d4a1a7c9bd5a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raknratt">
+		<description>Räkna lätt, räkna rätt (version 6175)</description>
+		<year>19??</year>
+		<publisher>Telenova</publisher>
+		<info name="serial" value="24-34408-7" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2209544">
+				<rom name="rakna latt, rakna ratt.mfm" size="2209544" crc="1268cd5d" sha1="56c31ccadf4515e5926eadd2e3cd7639611e8cb4"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

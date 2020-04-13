@@ -119,7 +119,7 @@ void amu880_state::amu880_io(address_map &map)
 	map(0x0c, 0x0f).rw(Z80PIO2_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x10, 0x13).rw(Z80PIO1_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x14, 0x17).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x18, 0x1b).rw(m_sio, FUNC(z80sio0_device::ba_cd_r), FUNC(z80sio0_device::ba_cd_w));
+	map(0x18, 0x1b).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 }
 
 /* Input Ports */
@@ -369,7 +369,7 @@ void amu880_state::amu880(machine_config &config)
 	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, XTAL(10'000'000)/4));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	ctc.zc_callback<0>().set(FUNC(amu880_state::ctc_z0_w));
-	ctc.zc_callback<1>().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
+	ctc.zc_callback<1>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 	ctc.zc_callback<2>().set(FUNC(amu880_state::ctc_z2_w));
 
 	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, XTAL(10'000'000)/4));
@@ -378,7 +378,7 @@ void amu880_state::amu880(machine_config &config)
 	z80pio_device& pio2(Z80PIO(config, Z80PIO2_TAG, XTAL(10'000'000)/4));
 	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80SIO0(config, m_sio, XTAL(10'000'000)/4); // U856
+	Z80SIO(config, m_sio, XTAL(10'000'000)/4); // U856
 	m_sio->out_txda_callback().set(FUNC(amu880_state::cassette_w));
 	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 

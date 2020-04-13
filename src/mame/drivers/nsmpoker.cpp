@@ -136,7 +136,7 @@ TILE_GET_INFO_MEMBER(nsmpoker_state::get_bg_tile_info)
 //  int bank = (attr & 0x08) >> 3;
 //  int color = (attr & 0x03);
 
-	SET_TILE_INFO_MEMBER(0 /* bank */, code, 0 /* color */, 0);
+	tileinfo.set(0 /* bank */, code, 0 /* color */, 0);
 }
 
 

@@ -424,13 +424,10 @@ void tool_app_t::run()
 
 	netlist::netlist_time_ext nlstart = nt.exec().time();
 	{
-		auto t_guard(t.guard());
-
 		pout("runnning ...\n");
-
 		unsigned pos = 0;
-
 		netlist::netlist_time_ext nlt = nlstart;
+		auto t_guard(t.guard());
 
 		while (pos < inps.size()
 				&& inps[pos].m_time < ttr
@@ -450,7 +447,6 @@ void tool_app_t::run()
 					ttr.as_double(), nlt.as_double());
 			ttr = nlt;
 		}
-
 	}
 
 	if (opt_savestate.was_specified())

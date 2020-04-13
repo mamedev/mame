@@ -602,7 +602,7 @@ TILE_GET_INFO_MEMBER(galaxold_state::drivfrcg_get_tile_info)
 	code |= (bank << 4);
 	color |= ((m_attributesram[(x << 1) | 1] & 0x40) >> 3);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 VIDEO_START_MEMBER(galaxold_state,drivfrcg)
@@ -652,7 +652,7 @@ TILE_GET_INFO_MEMBER(galaxold_state::racknrol_get_tile_info)
 
 	code |= (bank << 8);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 VIDEO_START_MEMBER(galaxold_state,racknrol)
@@ -678,7 +678,7 @@ TILE_GET_INFO_MEMBER(galaxold_state::harem_get_tile_info)
 
 	code  |= bank * 0x200;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void galaxold_state::harem_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs)
@@ -732,7 +732,7 @@ TILE_GET_INFO_MEMBER(galaxold_state::dambustr_get_tile_info2)
 		(this->*m_modify_color)(&color);
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 VIDEO_START_MEMBER(galaxold_state,dambustr)
@@ -1578,13 +1578,13 @@ TILE_GET_INFO_MEMBER(galaxold_state::get_tile_info)
 		(this->*m_modify_color)(&color);
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxold_state::rockclim_get_tile_info)
 {
 	uint16_t code = m_rockclim_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(2, code, 0, 0);
+	tileinfo.set(2, code, 0, 0);
 }
 
 void galaxold_state::draw_bullets_common(bitmap_ind16 &bitmap, const rectangle &cliprect)

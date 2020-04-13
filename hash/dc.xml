@@ -1,7 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
 TODO:
 
 Sort list by name
@@ -11,16 +12,12 @@ Create easy-to-browse missing dumps list
 Check romanization of Japanese titles
 Required hardware
 Make revisions have parent-style names
--->
 
-<!--
 This is a software list of the disc-based media released for the Sega Dreamcast.
 
 Much of the information in this softlist has been gathered from Sega Retro:
 http://segaretro.org/
--->
 
-<!--
 Dreamcast serial labels
 
     WORLD

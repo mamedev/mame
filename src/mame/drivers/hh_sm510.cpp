@@ -101,7 +101,7 @@ DR-106    nws  SM511   Climber
 BF-107    nws  SM511   Balloon Fight
 MB-108    nws  SM511   Mario The Juggler
 BU-201    sc   SM510   Spitball Sparky
-UD-202*   sc   SM510?  Crab Grab
+UD-202    sc   SM510   Crab Grab
 BX-301    mvs  SM511   Boxing (aka Punch Out)
 AK-302*   mvs  SM511?  Donkey Kong 3
 HK-303*   mvs  SM511?  Donkey Kong Hockey
@@ -3866,6 +3866,73 @@ ROM_START( gnw_ssparky )
 
 	ROM_REGION( 136929, "screen", 0)
 	ROM_LOAD( "gnw_ssparky.svg", 0, 136929, CRC(66e5d586) SHA1(b666f675abb8edef65ff402e8bc9a5213b630851) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Crab Grab (model UD-202)
+  * PCB label UD-202
+  * Sharp SM510 label UD-202 542B (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_cgrab_state : public hh_sm510_state
+{
+public:
+	gnw_cgrab_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_cgrab(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_cgrab )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Do not release crabs (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_cgrab_state::gnw_cgrab(machine_config &config)
+{
+	sm510_common(config, 609, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_cgrab )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ud-202", 0x0000, 0x1000, CRC(65e97963) SHA1(f6d589fac337e2c4acdaa8f1281912feabc54198) )
+
+	ROM_REGION( 354770, "screen", 0)
+	ROM_LOAD( "gnw_cgrab.svg", 0, 354770, CRC(d61478aa) SHA1(8dd44cfb3720740150defdfbebe0bd52a3b3a377) )
 ROM_END
 
 
@@ -8991,6 +9058,7 @@ CONS( 1984, gnw_dkcirc,  gnw_mmousep,0, gnw_dkcirc,  gnw_mmousep, gnw_mmousep_st
 
 // Nintendo G&W: Super Color
 CONS( 1984, gnw_ssparky, 0,          0, gnw_ssparky, gnw_ssparky, gnw_ssparky_state, empty_init, "Nintendo", "Game & Watch: Spitball Sparky", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, gnw_cgrab,   0,          0, gnw_cgrab,   gnw_cgrab,   gnw_cgrab_state,   empty_init, "Nintendo", "Game & Watch: Crab Grab", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: Micro Vs. System (actually, no official Game & Watch logo anywhere)
 CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  empty_init, "Nintendo", "Micro Vs. System: Boxing", MACHINE_SUPPORTS_SAVE )

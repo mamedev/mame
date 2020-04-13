@@ -45,7 +45,7 @@ TILE_GET_INFO_MEMBER(wrally_state::get_tile_info)
 
 	tileinfo.category = (data2 >> 5) & 0x01;
 
-	SET_TILE_INFO_MEMBER(0, code, data2 & 0x1f, TILE_FLIPYX((data2 >> 6) & 0x03));
+	tileinfo.set(0, code, data2 & 0x1f, TILE_FLIPYX((data2 >> 6) & 0x03));
 }
 
 /***************************************************************************

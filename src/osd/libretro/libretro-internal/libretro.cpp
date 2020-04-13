@@ -728,22 +728,22 @@ void retro_unload_game(void)
 size_t retro_serialize_size(void)
 {
 	if ( mame_machine_manager::instance() != NULL && mame_machine_manager::instance()->machine() != NULL &&
-			mame_machine_manager::instance()->machine()->save().state_size() > 0)
-		return mame_machine_manager::instance()->machine()->save().state_size();
+			ram_state::get_size(mame_machine_manager::instance()->machine()->save()) > 0)
+		return ram_state::get_size(mame_machine_manager::instance()->machine()->save());
 	return 0;
 }
 bool retro_serialize(void *data, size_t size)
 {
 	if ( mame_machine_manager::instance() != NULL && mame_machine_manager::instance()->machine() != NULL &&
-			mame_machine_manager::instance()->machine()->save().state_size() > 0)
-		return (mame_machine_manager::instance()->machine()->save().write_data(data, size) == STATERR_NONE);
+			ram_state::get_size(mame_machine_manager::instance()->machine()->save()) > 0)
+		return (mame_machine_manager::instance()->machine()->save().write_buffer((u8*)data, size) == STATERR_NONE);
 	return false;
 }
-bool retro_unserialize(const void * data, size_t size)
+bool retro_unserialize(const void *data, size_t size)
 {
 	if ( mame_machine_manager::instance() != NULL && mame_machine_manager::instance()->machine() != NULL &&
-			mame_machine_manager::instance()->machine()->save().state_size() > 0)
-		return (mame_machine_manager::instance()->machine()->save().read_data((void*)data, size) == STATERR_NONE);
+			ram_state::get_size(mame_machine_manager::instance()->machine()->save()) > 0)
+		return (mame_machine_manager::instance()->machine()->save().read_buffer((u8*)data, size) == STATERR_NONE);
 	return false;
 }
 

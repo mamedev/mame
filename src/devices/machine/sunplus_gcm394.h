@@ -231,6 +231,7 @@ private:
 	DECLARE_READ16_MEMBER(ioarea_7860_porta_r);
 	DECLARE_WRITE16_MEMBER(ioarea_7860_porta_w);
 	DECLARE_READ16_MEMBER(ioarea_7861_porta_buffer_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7861_porta_buffer_w);
 	DECLARE_READ16_MEMBER(ioarea_7862_porta_direction_r);
 	DECLARE_WRITE16_MEMBER(ioarea_7862_porta_direction_w);
 	DECLARE_READ16_MEMBER(ioarea_7863_porta_attribute_r);
@@ -240,6 +241,7 @@ private:
 	DECLARE_READ16_MEMBER(ioarea_7868_portb_r);
 	DECLARE_WRITE16_MEMBER(ioarea_7868_portb_w);
 	DECLARE_READ16_MEMBER(ioarea_7869_portb_buffer_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7869_portb_buffer_w);
 	DECLARE_READ16_MEMBER(ioarea_786a_portb_direction_r);
 	DECLARE_WRITE16_MEMBER(ioarea_786a_portb_direction_w);
 	DECLARE_READ16_MEMBER(ioarea_786b_portb_attribute_r);
@@ -285,6 +287,7 @@ private:
 	DECLARE_WRITE16_MEMBER(unkarea_78b8_w);
 
 	DECLARE_READ16_MEMBER(unkarea_78d0_r);
+	DECLARE_READ16_MEMBER(unkarea_78d8_r);
 
 	DECLARE_WRITE16_MEMBER(unkarea_78f0_w);
 
@@ -299,6 +302,7 @@ private:
 
 	DECLARE_READ16_MEMBER(spi_7944_rxdata_r);
 	DECLARE_READ16_MEMBER(spi_7945_misc_control_reg_r);
+	DECLARE_WRITE16_MEMBER(spi_7942_txdata_w);
 
 	DECLARE_WRITE16_MEMBER(unkarea_7960_w);
 	DECLARE_READ16_MEMBER(unkarea_7961_r);

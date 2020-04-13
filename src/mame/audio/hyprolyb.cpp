@@ -54,7 +54,7 @@ READ8_MEMBER( hyprolyb_adpcm_device::busy_r )
 
 WRITE8_MEMBER( hyprolyb_adpcm_device::msm_data_w )
 {
-	m_msm->write_data(data);
+	m_msm->data_w(data);
 	m_adpcm_busy = ~data & 0x80;
 }
 

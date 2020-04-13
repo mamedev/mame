@@ -52,7 +52,7 @@ void namcos2_roz_device::device_start()
 TILE_GET_INFO_MEMBER(namcos2_roz_device::roz_tile_info)
 {
 	int tile = m_rozram[tile_index];
-	SET_TILE_INFO_MEMBER(0, tile, 0/*color*/, 0);
+	tileinfo.set(0, tile, 0/*color*/, 0);
 }
 
 struct roz_param

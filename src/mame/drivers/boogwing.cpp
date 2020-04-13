@@ -60,7 +60,6 @@
           (Addendum - all known issues seem to be correct - see Sprite Priority Notes below).
         * There may be some kind of fullscreen palette effect (controlled by bit 3 in priority
           word - used at end of each level, and on final boss).
-        * A shadow effect (used in level 1) is not implemented.
         * ACE Chip aren't fully emulated.
 
     Sprite Priority Notes:
@@ -117,7 +116,6 @@ WRITE16_MEMBER( boogwing_state::boogwing_protection_region_0_104_w )
 WRITE16_MEMBER( boogwing_state::priority_w )
 {
 	COMBINE_DATA(&m_priority);
-	m_deco_ace->set_palette_effect_max((m_priority & 0x8) ? 0x4ff : 0xfff);
 }
 
 
@@ -289,7 +287,7 @@ static const gfx_layout tile_16x16_layout =
 
 
 static GFXDECODE_START( gfx_boogwing )
-	GFXDECODE_ENTRY( "tiles1",   0, tile_8x8_layout,            0, 16 ) /* Tiles (8x8) */
+	GFXDECODE_ENTRY( "tiles1",   0, tile_8x8_layout,        0x800, 16 ) /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "tiles2",   0, tile_16x16_layout_5bpp, 0x100, 16 ) /* Tiles (16x16) */
 	GFXDECODE_ENTRY( "tiles3",   0, tile_16x16_layout,      0x300, 32 ) /* Tiles (16x16) */
 	GFXDECODE_ENTRY( "sprites1", 0, tile_16x16_layout,      0x500, 32 ) /* Sprites (16x16) */

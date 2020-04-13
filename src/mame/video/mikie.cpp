@@ -120,7 +120,7 @@ TILE_GET_INFO_MEMBER(mikie_state::get_bg_tile_info)
 	else
 		tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 
 
 }

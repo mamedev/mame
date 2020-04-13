@@ -13,7 +13,8 @@
  * TODO:
  * - finish slave DSP emulation
  * - emulate System22 I/O board C74 instead of HLE (inputs, outputs, volume control - HLE only handles the inputs)
- * - alpinesa doesn't work, protection related?
+ * - alpinesa doesn't work, protection related? - depending on value written, it looks like it changes the addressing
+ *   of some of the gfx chips on the fly
  * - C139 for linked cabinets, as well as in RR fullscale
  * - confirm DSP and MCU clocks and their IRQ timing
  * - EEPROM write timing should be around 5ms, it doesn't do any data/rdy polling

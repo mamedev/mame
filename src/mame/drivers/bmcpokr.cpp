@@ -121,7 +121,7 @@ template<unsigned N>
 TILE_GET_INFO_MEMBER(bmcpokr_state::get_tile_info)
 {
 	uint16_t data = m_videoram[N][tile_index];
-	SET_TILE_INFO_MEMBER(0, data, 0, (data & 0x8000) ? TILE_FLIPX : 0);
+	tileinfo.set(0, data, 0, (data & 0x8000) ? TILE_FLIPX : 0);
 }
 
 void bmcpokr_state::video_start()

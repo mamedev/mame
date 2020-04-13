@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
-<!-- terminal display for the Apollo DSP3x00 -->
+<!--
+license:CC0
+
+terminal display for the Apollo DSP3x00
+-->
 
 <mamelayout version="2">
 

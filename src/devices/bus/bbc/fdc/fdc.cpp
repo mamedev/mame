@@ -45,7 +45,8 @@ bbc_fdc_slot_device::bbc_fdc_slot_device(const machine_config &mconfig, const ch
 	device_single_card_slot_interface<device_bbc_fdc_interface>(mconfig, *this),
 	m_card(nullptr),
 	m_intrq_cb(*this),
-	m_drq_cb(*this)
+	m_drq_cb(*this),
+	m_insert_rom(true)
 {
 }
 

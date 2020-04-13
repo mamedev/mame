@@ -157,7 +157,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::horizontal_tile_info)
 	int code = m_videoram[0x400 + tile_index];
 	int attr = m_videoram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, code, attr, 0);
+	tileinfo.set(0, code, attr, 0);
 }
 
 TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
@@ -165,7 +165,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
 	int code = m_videoram[0x400 + tile_index];
 	int attr = m_videoram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), attr, 0);
+	tileinfo.set(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), attr, 0);
 }
 
 

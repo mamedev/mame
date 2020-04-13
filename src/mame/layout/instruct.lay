@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<!-- instruct.lay -->
-
-<!-- 2012-05-20: Initial version.  [Robbbert] -->
-<!-- 2013-09-28: Added round LEDs. [Robbbert] -->
+<!--
+license:CC0
+copyright-holders:Robbbert
+-->
 
 <mamelayout version="2">
 

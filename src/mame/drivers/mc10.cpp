@@ -286,8 +286,8 @@ void mc10_state::driver_start()
 	save_item(NAME(m_pr_counter));
 
 	//for alice32 force port4 DDR to 0xff at startup
-	if (!strcmp(machine().system().name, "alice32") || !strcmp(machine().system().name, "alice90"))
-		m_maincpu->m6801_io_w(prg, 0x05, 0xff);
+	//if (!strcmp(machine().system().name, "alice32") || !strcmp(machine().system().name, "alice90"))
+		//m_maincpu->m6801_io_w(prg, 0x05, 0xff);
 }
 
 

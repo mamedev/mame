@@ -1363,6 +1363,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/ibmxdf_dsk.h,FORMATS["IBMXDF_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["IBMXDF_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/ibmxdf_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/ibmxdf_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/p6001_cas.h,FORMATS["P6001_CAS"] = true
 --------------------------------------------------
 

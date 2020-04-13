@@ -46,16 +46,16 @@ class msm6242_device : public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
-	msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	auto out_int_handler() { return m_out_int_handler.bind(); }
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(offs_t offset, u8 data);
+	u8 read(offs_t offset);
 
 protected:
-	msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -70,32 +70,32 @@ protected:
 private:
 	static constexpr int RTC_TICKS = ~0;
 
-	static constexpr uint8_t IRQ_64THSECOND = 0;
-	static constexpr uint8_t IRQ_SECOND = 1;
-	static constexpr uint8_t IRQ_MINUTE = 2;
-	static constexpr uint8_t IRQ_HOUR = 3;
+	static constexpr u8 IRQ_64THSECOND = 0;
+	static constexpr u8 IRQ_SECOND = 1;
+	static constexpr u8 IRQ_MINUTE = 2;
+	static constexpr u8 IRQ_HOUR = 3;
 
 	// state
-	uint8_t                       m_reg[3];
-	uint8_t                       m_irq_flag;
-	uint8_t                       m_irq_type;
-	uint16_t                      m_tick;
+	u8                          m_reg[3];
+	u8                          m_irq_flag;
+	u8                          m_irq_type;
+	u16                         m_tick;
 
 	// incidentals
 	devcb_write_line m_out_int_handler;
 	emu_timer *                 m_timer;
-	uint64_t                      m_last_update_time; // last update time, in clock cycles
+	u64                         m_last_update_time; // last update time, in clock cycles
 
 	// methods
 	void rtc_timer_callback();
-	uint64_t current_time();
+	u64 current_time();
 	void set_irq(bool active);
-	void irq(uint8_t irq_type);
-	uint64_t bump(int rtc_register, uint64_t delta, uint64_t register_min, uint64_t register_range);
+	void irq(u8 irq_type);
+	u64 bump(int rtc_register, u64 delta, u64 register_min, u64 register_range);
 	void update_rtc_registers();
 	void update_timer();
-	uint8_t get_clock_nibble(int rtc_register, bool high);
-	static const char *irq_type_string(uint8_t irq_type);
+	u8 get_clock_nibble(int rtc_register, bool high);
+	static const char *irq_type_string(u8 irq_type);
 };
 
 // ======================> rtc62421_device
@@ -104,7 +104,7 @@ class rtc62421_device : public msm6242_device
 {
 public:
 	// construction/destruction
-	rtc62421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rtc62421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 // ======================> rtc62423_device
@@ -113,7 +113,7 @@ class rtc62423_device : public msm6242_device
 {
 public:
 	// construction/destruction
-	rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 // ======================> rtc72421_device
@@ -122,7 +122,7 @@ class rtc72421_device : public msm6242_device
 {
 public:
 	// construction/destruction
-	rtc72421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rtc72421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 // ======================> rtc72423_device
@@ -131,7 +131,7 @@ class rtc72423_device : public msm6242_device
 {
 public:
 	// construction/destruction
-	rtc72423_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rtc72423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 

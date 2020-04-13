@@ -38,6 +38,7 @@
 #include "formats/cqm_dsk.h"
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
+#include "formats/ibmxdf_dsk.h"
 
 #include "formats/ap_dsk35.h"
 #include "formats/ap2_dsk.h"
@@ -82,6 +83,7 @@ static floppy_format_type floppy_formats[] = {
 	FLOPPY_CQM_FORMAT,
 	FLOPPY_PC_FORMAT,
 	FLOPPY_NASLITE_FORMAT,
+	FLOPPY_IBMXDF_FORMAT,
 
 	FLOPPY_DC42_FORMAT,
 	FLOPPY_A216S_FORMAT,

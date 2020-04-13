@@ -123,7 +123,7 @@ TILE_GET_INFO_MEMBER(caswin_state::get_sc0_tile_info)
 	int tile = (m_sc0_vram[tile_index] | ((m_sc0_attr[tile_index] & 0x70)<<4)) & 0x7ff;
 	int colour = m_sc0_attr[tile_index] & 0xf;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			colour,
 			0);

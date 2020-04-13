@@ -79,7 +79,7 @@ TILE_GET_INFO_MEMBER(skykid_state::tx_get_tile_info)
 	   screen is flipped, character flip is done by selecting the 2nd character set.
 	   We reproduce this here, but since the tilemap system automatically flips
 	   characters when screen is flipped, we have to flip them back. */
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code | (flip_screen() ? 0x100 : 0),
 			attr & 0x3f,
 			flip_screen() ? (TILE_FLIPY | TILE_FLIPX) : 0);
@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(skykid_state::bg_get_tile_info)
 	int code = m_videoram[tile_index];
 	int attr = m_videoram[tile_index+0x800];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code + ((attr & 0x01) << 8),
 			((attr & 0x7e) >> 1) | ((attr & 0x01) << 6),
 			0);

@@ -33,6 +33,7 @@
 #include "bus/coco/coco_multi.h"
 #include "bus/coco/coco_orch90.h"
 #include "bus/coco/coco_pak.h"
+#include "bus/coco/coco_psg.h"
 #include "bus/coco/coco_rs232.h"
 #include "bus/coco/coco_ssc.h"
 #include "bus/coco/coco_t4426.h"
@@ -366,6 +367,7 @@ void coco_cart(device_slot_interface &device)
 	device.option_add("banked_16k", COCO_PAK_BANKED);
 	device.option_add("pak", COCO_PAK);
 	device.option_add("multi", COCO_MULTIPAK);
+	device.option_add("ccpsg", COCO_PSG);
 }
 
 //-------------------------------------------------

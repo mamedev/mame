@@ -95,7 +95,7 @@ uint16_t hp80_io_slot_device::get_base_addr() const
 	const device_hp80_io_interface *card = get_card_device();
 
 	if (card != nullptr) {
-		uint16_t addr = ((uint16_t)(card->get_sc() - HP80_IO_FIRST_SC) << 1) | 0xff50;
+		uint16_t addr = ((uint16_t)(card->get_sc()) << 1) | 0xff40;
 		return addr;
 	} else {
 		return 0;
@@ -107,7 +107,7 @@ uint16_t hp80_io_slot_device::get_base_addr() const
 // +------------------------+
 uint8_t device_hp80_io_interface::get_sc() const
 {
-	return m_select_code_port->read() + HP80_IO_FIRST_SC;
+	return m_select_code_port->read();
 }
 
 void device_hp80_io_interface::inten()
@@ -142,9 +142,13 @@ WRITE_LINE_MEMBER(device_hp80_io_interface::halt_w)
 	slot->halt_w(state);
 }
 
+#include "82900.h"
 #include "82937.h"
+#include "82939.h"
 
 void hp80_io_slot_devices(device_slot_interface &device)
 {
+	device.option_add("82900_cpm" , HP82900_IO_CARD);
 	device.option_add("82937_hpib" , HP82937_IO_CARD);
+	device.option_add("82939_serial" , HP82939_IO_CARD);
 }

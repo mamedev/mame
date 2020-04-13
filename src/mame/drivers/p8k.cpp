@@ -161,7 +161,7 @@ void p8k_state::p8k_iomap(address_map &map)
 	map(0x24, 0x27).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x28, 0x2b).rw("sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x2c, 0x2f).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x3c, 0x3c).rw("dma", FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x3c, 0x3c).rw("dma", FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 }
 
 

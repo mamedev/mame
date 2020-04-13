@@ -13,9 +13,9 @@
 #pragma once
 
 #include "z80.h"
-#include "machine/z80dart.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
+#include "machine/z80sio.h"
 
 
 /***************************************************************************
@@ -66,8 +66,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ctsb_w ) { m_sio->ctsb_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( dcda_w ) { m_sio->dcda_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( dcdb_w ) { m_sio->dcdb_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ria_w ) { m_sio->ria_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rib_w ) { m_sio->rib_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( rxca_w ) { m_sio->rxca_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( rxcb_w ) { m_sio->rxcb_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( txca_w ) { m_sio->txca_w(state); }
@@ -127,7 +125,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<z80ctc_device> m_ctc;
-	required_device<z80dart_device> m_sio;
+	required_device<z80sio_device> m_sio;
 	required_device<z80pio_device> m_pio;
 
 	// internal state

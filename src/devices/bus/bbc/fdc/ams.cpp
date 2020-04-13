@@ -19,12 +19,17 @@ DEFINE_DEVICE_TYPE(BBC_AMS3, bbc_ams3_device, "bbc_ams3", "AMS 3\" Microdrive Di
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( ams3 )
+//  FLOPPY_FORMATS( ams3 )
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER( bbc_ams3_device::floppy_formats )
 	FLOPPY_ACORN_SSD_FORMAT
 FLOPPY_FORMATS_END
+
+
+//-------------------------------------------------
+//  ROM( ams3 )
+//-------------------------------------------------
 
 ROM_START( ams3 )
 	ROM_REGION(0x8000, "dfs_rom", 0)

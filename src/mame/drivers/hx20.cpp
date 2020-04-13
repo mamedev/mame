@@ -527,7 +527,7 @@ WRITE8_MEMBER( hx20_state::slave_p4_w )
 
 void hx20_state::hx20_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw(m_maincpu, FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6301v1_cpu_device::m6801_io));
 	map(0x0020, 0x0020).w(FUNC(hx20_state::ksc_w));
 	map(0x0022, 0x0022).r(FUNC(hx20_state::krtn07_r));
 	map(0x0026, 0x0026).w(FUNC(hx20_state::lcd_cs_w));
@@ -549,7 +549,7 @@ void hx20_state::hx20_mem(address_map &map)
 
 void hx20_state::hx20_sub_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw(m_subcpu, FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m(m_subcpu, FUNC(hd6301v1_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram();
 	map(0xf000, 0xffff).rom().region(HD6301V1_SLAVE_TAG, 0);
 }
@@ -886,7 +886,7 @@ void hx20_state::machine_start()
 void hx20_state::hx20(machine_config &config)
 {
 	// basic machine hardware
-	HD63701(config, m_maincpu, 2.4576_MHz_XTAL);
+	HD6301V1(config, m_maincpu, 2.4576_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::hx20_mem);
 	m_maincpu->in_p1_cb().set(FUNC(hx20_state::main_p1_r));
 	m_maincpu->out_p1_cb().set(FUNC(hx20_state::main_p1_w));
@@ -895,7 +895,7 @@ void hx20_state::hx20(machine_config &config)
 	// Port 3 = A0-A7, D0-D7
 	// Port 4 = A8-A15
 
-	HD63701(config, m_subcpu, 2.4576_MHz_XTAL);
+	HD6301V1(config, m_subcpu, 2.4576_MHz_XTAL);
 	m_subcpu->set_addrmap(AS_PROGRAM, &hx20_state::hx20_sub_mem);
 	m_subcpu->in_p1_cb().set(FUNC(hx20_state::slave_p1_r));
 	m_subcpu->out_p1_cb().set(FUNC(hx20_state::slave_p1_w));

@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 	<view name="Main Screen Standard (4:3)">
 		<screen index="0">

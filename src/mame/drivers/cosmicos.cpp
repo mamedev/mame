@@ -98,7 +98,7 @@ READ8_MEMBER( cosmicos_state::video_off_r )
 
 	if (!m_q)
 	{
-		data = m_cti->dispoff_r(space, 0);
+		data = m_cti->dispoff_r();
 	}
 
 	return data;
@@ -110,7 +110,7 @@ READ8_MEMBER( cosmicos_state::video_on_r )
 
 	if (!m_q)
 	{
-		data = m_cti->dispon_r(space, 0);
+		data = m_cti->dispon_r();
 	}
 
 	return data;
@@ -120,7 +120,7 @@ WRITE8_MEMBER( cosmicos_state::audio_latch_w )
 {
 	if (m_q)
 	{
-		m_cti->tone_latch_w(space, 0, data);
+		m_cti->tone_latch_w(data);
 	}
 }
 

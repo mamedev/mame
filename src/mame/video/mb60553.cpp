@@ -116,7 +116,7 @@ TILE_GET_INFO_MEMBER(mb60553_zooming_tilemap_device::get_tile_info)
 	pal = (data >> 12) & 0xF;
 	bankno = (data >> 9) & 0x7;
 
-	SET_TILE_INFO_MEMBER(m_gfx_region, tileno + m_bank[bankno] * 0x200, pal + m_pal_base, 0);
+	tileinfo.set(m_gfx_region, tileno + m_bank[bankno] * 0x200, pal + m_pal_base, 0);
 }
 
 void mb60553_zooming_tilemap_device::reg_written( int num_reg)

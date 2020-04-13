@@ -24,6 +24,8 @@ public:
 
 	void ___empty(machine_config &config);
 
+	virtual std::vector<std::string> searchpath() const override { return std::vector<std::string>(); }
+
 protected:
 	virtual void machine_start() override
 	{

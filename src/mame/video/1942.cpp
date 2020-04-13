@@ -105,7 +105,7 @@ TILE_GET_INFO_MEMBER(_1942_state::get_fg_tile_info)
 {
 	int code = m_fg_videoram[tile_index];
 	int color = m_fg_videoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code + ((color & 0x80) << 1),
 			color & 0x3f,
 			0);
@@ -117,7 +117,7 @@ TILE_GET_INFO_MEMBER(_1942_state::get_bg_tile_info)
 
 	int code = m_bg_videoram[tile_index];
 	int color = m_bg_videoram[tile_index + 0x10];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code + ((color & 0x80) << 1),
 			(color & 0x1f) + (0x20 * m_palette_bank),
 			TILE_FLIPYX((color & 0x60) >> 5));

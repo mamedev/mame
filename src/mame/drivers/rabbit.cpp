@@ -227,7 +227,7 @@ void rabbit_state::get_tilemap_info(tile_data &tileinfo, int tile_index, int whi
 		colour &= 0x0f;
 		colour += 0x20;
 		tileinfo.group = 1;
-		SET_TILE_INFO_MEMBER(6+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
+		tileinfo.set(6+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
 	}
 	else
 	{
@@ -235,7 +235,7 @@ void rabbit_state::get_tilemap_info(tile_data &tileinfo, int tile_index, int whi
 		if (cmask) colour&=0x3f; // see health bars
 		colour += 0x200;
 		tileinfo.group = 0;
-		SET_TILE_INFO_MEMBER(4+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
+		tileinfo.set(4+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
 	}
 }
 

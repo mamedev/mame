@@ -105,7 +105,7 @@ TILE_GET_INFO_MEMBER(sbowling_state::get_tile_info)
 	uint8_t *rom = memregion("user1")->base();
 	int tileno = rom[tile_index + m_bgmap * 1024];
 
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	tileinfo.set(0, tileno, 0, 0);
 }
 
 static void plot_pixel_sbw(bitmap_ind16 *tmpbitmap, int x, int y, int col, int flip)

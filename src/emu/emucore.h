@@ -72,6 +72,7 @@ using osd::s64;
 // useful utility functions
 using util::underlying_value;
 using util::enum_value;
+using util::make_bitmask;
 using util::BIT;
 using util::bitswap;
 using util::iabs;

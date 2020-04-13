@@ -60,22 +60,22 @@ WRITE8_MEMBER(fastlane_state::fastlane_bankswitch_w)
 
 READ8_MEMBER(fastlane_state::fastlane_k1_k007232_r)
 {
-	return m_k007232_1->read(space, offset ^ 1);
+	return m_k007232_1->read(offset ^ 1);
 }
 
 WRITE8_MEMBER(fastlane_state::fastlane_k1_k007232_w)
 {
-	m_k007232_1->write(space, offset ^ 1, data);
+	m_k007232_1->write(offset ^ 1, data);
 }
 
 READ8_MEMBER(fastlane_state::fastlane_k2_k007232_r)
 {
-	return m_k007232_2->read(space, offset ^ 1);
+	return m_k007232_2->read(offset ^ 1);
 }
 
 WRITE8_MEMBER(fastlane_state::fastlane_k2_k007232_w)
 {
-	m_k007232_2->write(space, offset ^ 1, data);
+	m_k007232_2->write(offset ^ 1, data);
 }
 void fastlane_state::fastlane_map(address_map &map)
 {

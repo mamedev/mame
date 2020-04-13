@@ -282,7 +282,7 @@ void software_list_device::parse()
 	m_errors.clear();
 
 	// attempt to open the file
-	osd_file::error filerr = m_file.open(m_list_name, ".xml");
+	const osd_file::error filerr = m_file.open(m_list_name + ".xml");
 	if (filerr == osd_file::error::NONE)
 	{
 		// parse if no error

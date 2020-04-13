@@ -318,7 +318,7 @@ void cclimber_state::swimmer_set_background_pen()
 
 
 
-WRITE8_MEMBER(cclimber_state::cclimber_colorram_w)
+void cclimber_state::cclimber_colorram_w(offs_t offset, uint8_t data)
 {
 	/* A5 is not connected, there is only 0x200 bytes of RAM */
 	m_colorram[offset & ~0x20] = data;
@@ -326,25 +326,25 @@ WRITE8_MEMBER(cclimber_state::cclimber_colorram_w)
 }
 
 
-WRITE_LINE_MEMBER(cclimber_state::flip_screen_x_w)
+void cclimber_state::flip_screen_x_w(int state)
 {
 	m_flip_x = state;
 }
 
 
-WRITE_LINE_MEMBER(cclimber_state::flip_screen_y_w)
+void cclimber_state::flip_screen_y_w(int state)
 {
 	m_flip_y = state;
 }
 
 
-WRITE_LINE_MEMBER(cclimber_state::sidebg_enable_w)
+void cclimber_state::sidebg_enable_w(int state)
 {
 	m_swimmer_side_background_enabled = state;
 }
 
 
-WRITE_LINE_MEMBER(cclimber_state::palette_bank_w)
+void cclimber_state::palette_bank_w(int state)
 {
 	m_swimmer_palettebank = state;
 }
@@ -366,7 +366,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_pf_tile_info)
 
 	color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 
@@ -383,7 +383,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::swimmer_get_pf_tile_info)
 	code = ((m_colorram[tile_index] & 0x10) << 4) | m_videoram[tile_index];
 	color = (m_swimmer_palettebank << 4) | (m_colorram[tile_index] & 0x0f);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 
@@ -395,7 +395,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::toprollr_get_pf_tile_info)
 	code = ((attr & 0x30) << 4) | m_videoram[tile_index];
 	color = attr & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -412,7 +412,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_bs_tile_info)
 	code = ((m_bigsprite_control[1] & 0x08) << 5) | m_bigsprite_videoram[tile_index];
 	color = m_bigsprite_control[1] & 0x07;
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	tileinfo.set(2, code, color, 0);
 }
 
 
@@ -429,7 +429,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::toprollr_get_bs_tile_info)
 	code = ((m_bigsprite_control[1] & 0x18) << 5) | m_bigsprite_videoram[tile_index];
 	color = m_bigsprite_control[1] & 0x07;
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	tileinfo.set(2, code, color, 0);
 }
 
 
@@ -438,7 +438,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::toproller_get_bg_tile_info)
 	int code = ((m_toprollr_bg_coloram[tile_index] & 0x40) << 2) | m_toprollr_bg_videoram[tile_index];
 	int color = m_toprollr_bg_coloram[tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(3, code, color, TILE_FLIPX);
+	tileinfo.set(3, code, color, TILE_FLIPX);
 }
 
 

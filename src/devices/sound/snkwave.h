@@ -19,7 +19,7 @@ class snkwave_device : public device_t,
 public:
 	snkwave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( snkwave_w );
+	void snkwave_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

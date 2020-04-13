@@ -1,5 +1,10 @@
 <?xml version="1.0"?>
-<!-- Electronics Australia Car Computer [Robbbert] -->
+<!--
+license:CC0
+copyright-holders:Robbbert
+
+Electronics Australia Car Computer
+-->
 
 <mamelayout version="2">
 	<element name="digit" defstate="0">

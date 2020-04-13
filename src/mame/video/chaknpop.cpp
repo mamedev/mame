@@ -137,7 +137,7 @@ TILE_GET_INFO_MEMBER(chaknpop_state::get_tx_tile_info)
 
 	tile |= tile_h_bank;
 
-	SET_TILE_INFO_MEMBER(1, tile, color, 0);
+	tileinfo.set(1, tile, color, 0);
 }
 
 

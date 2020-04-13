@@ -1842,7 +1842,7 @@ void chihiro_state::machine_start()
 	}
 	m_hack_index = -1;
 	for (int a = 1; a < HACK_ITEMS; a++)
-		if (strcmp(machine().basename(), hacks[a].game_name) == 0) {
+		if (machine().basename() == hacks[a].game_name) {
 			m_hack_index = a;
 			break;
 		}

@@ -433,7 +433,7 @@ void namcos1_state::sound_map(address_map &map)
 
 void namcos1_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw(m_mcu, FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m(m_mcu, FUNC(hd63701v0_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram(); /* built in RAM */
 	map(0x1000, 0x1003).r(FUNC(namcos1_state::dsw_r));
 	map(0x1400, 0x1400).portr("CONTROL0");
@@ -1015,7 +1015,7 @@ void namcos1_state::ns1(machine_config &config)
 	MC6809E(config, m_audiocpu, XTAL(49'152'000)/32);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos1_state::sound_map);
 
-	HD63701(config, m_mcu, XTAL(49'152'000)/8);
+	HD63701V0(config, m_mcu, XTAL(49'152'000)/8);
 	m_mcu->set_addrmap(AS_PROGRAM, &namcos1_state::mcu_map);
 	m_mcu->in_p1_cb().set_ioport("COIN");
 	m_mcu->out_p1_cb().set(FUNC(namcos1_state::coin_w));

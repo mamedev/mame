@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 
-<!-- define periscope lamps -->
+	<!-- define periscope lamps -->
 
 	<element name="lamp_1" defstate="0">
 		<disk state="1">
@@ -124,7 +127,7 @@
 	</element>
 
 
-<!-- NOTE: does not include explosion lamps yet -->
+	<!-- NOTE: does not include explosion lamps yet -->
 
 	<view name="Periscope Lamps">
 		<bounds left="0" top="0" right="400" bottom="390" />
@@ -132,7 +135,7 @@
 			<bounds left="0" top="0" right="400" bottom="300" />
 		</screen>
 
-<!-- player 1 is right -->
+		<!-- player 1 is right -->
 
 		<bezel name="lamp3" element="lamp_1">
 			<bounds x="225" y="310" width="30" height="30" />
@@ -154,7 +157,7 @@
 			<bounds x="315" y="350" width="75" height="30" />
 		</bezel>
 
-<!-- player 2 is left -->
+		<!-- player 2 is left -->
 
 		<bezel name="lamp10" element="lamp_1">
 			<bounds x="10" y="310" width="30" height="30" />

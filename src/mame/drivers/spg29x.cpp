@@ -77,11 +77,13 @@ public:
 
 	void hyperscan(machine_config &config);
 
-private:
+protected:
+	virtual void machine_reset() override;
+
 	required_device<score7_cpu_device> m_maincpu;
+private:
 
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	uint32_t spg290_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -175,10 +177,15 @@ public:
 	{ }
 
 	void nand_init(int blocksize, int blocksize_stripped);
-	void nand_init210();
+	void nand_jak_bbh();
+	void nand_jak_bbsf();
+
+protected:
+	void machine_reset() override;
 
 private:
 	std::vector<uint8_t> m_strippedrom;
+	int m_firstvector;
 };
 
 
@@ -642,6 +649,31 @@ void spg29x_game_state::machine_reset()
 	m_maincpu->set_state_int(SCORE_CR + 29, 0x20000000);
 }
 
+void spg29x_nand_game_state::machine_reset()
+{
+	spg29x_game_state::machine_reset();
+
+	uint32_t bootstrap_ram_start = (m_strippedrom[m_firstvector+0] << 0) | (m_strippedrom[m_firstvector+1] << 8) | (m_strippedrom[m_firstvector+2] << 16) | (m_strippedrom[m_firstvector+3] << 24);
+	uint32_t bootstrap_ram_end   = (m_strippedrom[m_firstvector+4] << 0) | (m_strippedrom[m_firstvector+5] << 8) | (m_strippedrom[m_firstvector+6] << 16) | (m_strippedrom[m_firstvector+7] << 24);
+	uint32_t bootstrap_ram_boot  = (m_strippedrom[m_firstvector+8] << 0) | (m_strippedrom[m_firstvector+9] << 8) | (m_strippedrom[m_firstvector+10] << 16) | (m_strippedrom[m_firstvector+11] << 24);
+
+	// there is a 0x01 at 0x26, possibly related to source location / block in NAND to copy from?
+
+	logerror("NAND Bootstrap RAM start: %08x RAM end: %08x RAM boot: %08x", bootstrap_ram_start, bootstrap_ram_end, bootstrap_ram_boot);
+
+	uint32_t sourceaddr = 0x10000;
+	for (uint32_t addr = bootstrap_ram_start; addr <= bootstrap_ram_end; addr++)
+	{
+		address_space& mem = m_maincpu->space(AS_PROGRAM);
+		uint8_t byte = m_strippedrom[sourceaddr];
+		mem.write_byte(addr, byte);
+		sourceaddr++;
+	}
+
+	// probably jumped to from internal ROM?
+	m_maincpu->set_state_int(SCORE_PC, bootstrap_ram_boot);
+}
+
 
 void spg29x_game_state::hyperscan(machine_config &config)
 {
@@ -698,10 +730,18 @@ void spg29x_nand_game_state::nand_init(int blocksize, int blocksize_stripped)
 	}
 }
 
-void spg29x_nand_game_state::nand_init210()
+void spg29x_nand_game_state::nand_jak_bbh()
 {
 	nand_init(0x210, 0x200);
+	m_firstvector = 0xc;
 }
+
+void spg29x_nand_game_state::nand_jak_bbsf()
+{
+	nand_init(0x210, 0x200);
+	m_firstvector = 0x8;
+}
+
 
 
 /* ROM definition */
@@ -712,6 +752,18 @@ ROM_START( hyprscan )
 	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
 	ROM_LOAD32_DWORD("spg290.bin", 0x000000, 0x008000, NO_DUMP)     // 256Kbit SPG290 internal ROM
 ROM_END
+
+
+ROM_START( jak_bbh )
+	ROM_REGION( 0x100000, "bios", ROMREGION_32BIT | ROMREGION_LE | ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x4200000, "nand", 0 ) // ID returned C25A, read as what appears to be a compatible type.
+	ROM_LOAD("bigbuckhunterpro_as_hy27us0812a_c25a.bin", 0x000000, 0x4200000, CRC(e2627540) SHA1(c8c6e5fbc4084fa695390bbb4e1e52e671f050da) )
+
+	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
+	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
+ROM_END
+
 
 ROM_START( jak_bbsf )
 	ROM_REGION( 0x100000, "bios", ROMREGION_32BIT | ROMREGION_LE | ROMREGION_ERASE00 )
@@ -729,7 +781,9 @@ ROM_END
 //    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY   FULLNAME     FLAGS
 COMP( 2006, hyprscan,   0,      0,      hyperscan, hyperscan, spg29x_game_state, empty_init, "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-// Big Buck Hunter has ISSI 404A (24C04)
-COMP( 2009, jak_bbsf,   0,      0,      hyperscan, hyperscan, spg29x_nand_game_state, nand_init210, "JAKKS Pacific Inc", "Big Buck Hunter Safari (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Big Buck Safari has ISSI 416A (24C16)
+// There were 1 player and 2 player versions for these JAKKS guns.  The 2nd gun appears to be simply a controller (no AV connectors) but as they were separate products with the 2 player verisons being released up to a year after the original, the code could differ.
+// If they differ, it is currently uncertain which versions these ROMs are from
+COMP( 2009, jak_bbh,    0,      0,      hyperscan, hyperscan, spg29x_nand_game_state, nand_jak_bbh, "JAKKS Pacific Inc", "Big Buck Hunter Pro (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) //has ISSI 404A (24C04)
+COMP( 2011, jak_bbsf,   0,      0,      hyperscan, hyperscan, spg29x_nand_game_state, nand_jak_bbsf,"JAKKS Pacific Inc", "Big Buck Safari (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // has ISSI 416A (24C16)
 
 

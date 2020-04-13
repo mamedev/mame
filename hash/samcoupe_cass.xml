@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- load software with LOAD ""
+    load software with LOAD ""
 
     Tape must be started manually from the MESS menu
     " is mapped to ] by default on a UK keyboard layout

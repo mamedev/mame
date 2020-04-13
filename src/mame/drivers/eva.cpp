@@ -122,7 +122,7 @@ READ8_MEMBER(eva24_state::read_g)
 WRITE8_MEMBER(eva24_state::write_d)
 {
 	// D3210: TMS5100 CTL8421
-	m_tms5100->ctl_w(space, 0, data & 0xf);
+	m_tms5100->ctl_w(data & 0xf);
 }
 
 
@@ -137,13 +137,13 @@ WRITE16_MEMBER(eva11_state::write_r)
 WRITE16_MEMBER(eva11_state::write_o)
 {
 	// O3210: TMS5100 CTL8421
-	m_tms5100->ctl_w(space, 0, data & 0xf);
+	m_tms5100->ctl_w(data & 0xf);
 }
 
 READ8_MEMBER(eva11_state::read_k)
 {
 	// K84: TMS5100 CTL81(O30)
-	u8 ctl = m_tms5100->ctl_r(space, 0);
+	u8 ctl = m_tms5100->ctl_r();
 	ctl = bitswap<2>(ctl, 3,0) << 2;
 
 	// TODO: sensors

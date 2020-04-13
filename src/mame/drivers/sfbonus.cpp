@@ -804,7 +804,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_tile_info)
 	int flipx = (m_tilemap_ram[(tile_index*2)+1] & 0x80)>>7;
 	int flipy = (m_tilemap_ram[(tile_index*2)+1] & 0x40)>>5;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			0,
 			TILE_FLIPYX(flipx | flipy));
@@ -819,7 +819,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_reel_tile_info)
 
 	int priority = (m_reel_ram[Reel][(tile_index*2)+1] & 0x40)>>6;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			priority,  // colour abused as priority
 			TILE_FLIPYX(flipx | flipy));

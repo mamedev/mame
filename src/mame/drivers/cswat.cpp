@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(cswat_state::get_tile_info)
 	int code = m_videoram[tile_index] | (attr << 8 & 0x300);
 	int flags = TILE_FLIPYX(attr >> 2);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 void cswat_state::video_start()

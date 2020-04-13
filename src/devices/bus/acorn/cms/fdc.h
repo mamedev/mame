@@ -41,8 +41,6 @@ protected:
 private:
 	DECLARE_READ8_MEMBER(wd1770_state_r);
 	DECLARE_WRITE8_MEMBER(wd1770_control_w);
-	DECLARE_WRITE_LINE_MEMBER(bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(bus_nmi_w);
 
 	required_device<wd_fdc_device_base> m_fdc;
 	required_device_array<floppy_connector, 3> m_floppy;

@@ -77,7 +77,7 @@ TILE_GET_INFO_MEMBER(snk_state::marvins_get_tx_tile_info)
 	int code = m_tx_videoram[tile_index];
 	int color = code >> 5;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_tx_tile_offset + code,
 			color,
 			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(snk_state::ikari_get_tx_tile_info)
 {
 	int code = m_tx_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_tx_tile_offset + code,
 			0,
 			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(snk_state::gwar_get_tx_tile_info)
 {
 	int code = m_tx_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_tx_tile_offset + code,
 			0,
 			0);
@@ -108,7 +108,7 @@ TILE_GET_INFO_MEMBER(snk_state::marvins_get_fg_tile_info)
 {
 	int code = m_fg_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			0,
 			0);
@@ -118,7 +118,7 @@ TILE_GET_INFO_MEMBER(snk_state::marvins_get_bg_tile_info)
 {
 	int code = m_bg_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code,
 			0,
 			0);
@@ -129,7 +129,7 @@ TILE_GET_INFO_MEMBER(snk_state::aso_get_bg_tile_info)
 {
 	int code = m_bg_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_bg_tile_offset + code,
 			0,
 			0);
@@ -141,7 +141,7 @@ TILE_GET_INFO_MEMBER(snk_state::tnk3_get_bg_tile_info)
 	int code = m_bg_videoram[2*tile_index] | ((attr & 0x30) << 4);
 	int color = (attr & 0xf) ^ 8;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			color,
 			0);
@@ -153,7 +153,7 @@ TILE_GET_INFO_MEMBER(snk_state::ikari_get_bg_tile_info)
 	int code = m_bg_videoram[2*tile_index] | ((attr & 0x03) << 8);
 	int color = (attr & 0x70) >> 4;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			color,
 			0);
@@ -168,13 +168,13 @@ TILE_GET_INFO_MEMBER(snk_state::gwar_get_bg_tile_info)
 	if (m_is_psychos)   // psychos has a separate palette bank bit
 		color &= 7;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			color,
 			0);
 
 	// bermudat, tdfever use FFFF to blank the background.
-	// (still call SET_TILE_INFO_MEMBER, otherwise problems might occur on boot when
+	// (still call tileinfo.set, otherwise problems might occur on boot when
 	// the tile data hasn't been initialised)
 	if (code >= m_gfxdecode->gfx(1)->elements())
 		tileinfo.pen_data = m_empty_tile;

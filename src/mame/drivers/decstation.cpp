@@ -27,7 +27,7 @@
             Serial: DEC "DZ" quad-UART for keyboard/mouse, SCC8530 for modem/printer
             SCSI: NCR53C94
             Ethernet: AMD7990 "LANCE" controller
-            Audio: AMD AM79C30
+            Audio/ISDN: AMD AM79C30
             Color 1024x768 8bpp video on-board
             2 TURBOchannel slots
 

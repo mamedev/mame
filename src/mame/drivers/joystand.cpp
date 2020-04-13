@@ -222,13 +222,13 @@ const rgb_t joystand_state::BG15_TRANSPARENT = 0x99999999;
 TILE_GET_INFO_MEMBER(joystand_state::get_bg1_tile_info)
 {
 	uint32_t code = (m_bg1_ram[tile_index * 2 + 0] << 16) | m_bg1_ram[tile_index * 2 + 1];
-	SET_TILE_INFO_MEMBER(0, code & 0x00ffffff, code >> 24, 0);
+	tileinfo.set(0, code & 0x00ffffff, code >> 24, 0);
 }
 
 TILE_GET_INFO_MEMBER(joystand_state::get_bg2_tile_info)
 {
 	uint32_t code = (m_bg2_ram[tile_index * 2 + 0] << 16) | m_bg2_ram[tile_index * 2 + 1];
-	SET_TILE_INFO_MEMBER(0, code & 0x00ffffff, code >> 24, 0);
+	tileinfo.set(0, code & 0x00ffffff, code >> 24, 0);
 }
 
 WRITE16_MEMBER(joystand_state::bg1_w)

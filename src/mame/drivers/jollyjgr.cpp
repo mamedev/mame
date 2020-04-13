@@ -486,7 +486,7 @@ TILE_GET_INFO_MEMBER(jollyjgr_state::get_bg_tile_info)
 {
 	int color = m_colorram[((tile_index & 0x1f) << 1) | 1] & 7;
 	int region = (m_tilemap_bank & 0x20) ? 2 : 0;
-	SET_TILE_INFO_MEMBER(region, m_videoram[tile_index], color, 0);
+	tileinfo.set(region, m_videoram[tile_index], color, 0);
 }
 
 void jollyjgr_state::video_start()

@@ -119,6 +119,8 @@ void gigatron_cpu_device::init()
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_inReg));
 	save_item(NAME(m_pc));
+
+	m_outx_cb.resolve_safe();
 }
 
 void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
@@ -314,6 +316,7 @@ gigatron_cpu_device::gigatron_cpu_device(const machine_config &mconfig, const ch
 	, m_ramMask(0x7fff)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 14, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 8, 15, 0)
+	, m_outx_cb(*this)
 {
 }
 

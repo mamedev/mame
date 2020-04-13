@@ -26,7 +26,7 @@ In debug build press 'w' for spotlight and 'e' for lightning
 TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info1)
 {
 	int code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		code,
 		0,
 		0);
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info1)
 TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info2)
 {
 	int code = m_videoram2[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 		code + (m_char_bank<<8),
 		m_color_select&1,
 		0);

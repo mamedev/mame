@@ -992,6 +992,26 @@ static INPUT_PORTS_START( abl4play )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( shtscore )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Select")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Kick")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
 static const gfx_layout tiles8x8x8_layout =
 {
@@ -1440,8 +1460,12 @@ ROM_START( abl4play )
 	ROM_LOAD( "abl4play.bin", 0x000000, 0x800000, CRC(5d57fb70) SHA1(34cdf80dc8cb08e5cd98c724268e4c5f483780d7) )
 ROM_END
 
+ROM_START( shtscore )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "shootnscore.bin", 0x000000, 0x400000, CRC(37aa16bd) SHA1(609d0191301480c51ec1188c67101a4e88a5170f) )
+ROM_END
 
 CONS( 2007, trkfldch,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",             "Track & Field Challenge", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 CONS( 2006, my1stddr,  0,          0,  trkfldch, my1stddr,trkfldch_state,      empty_init,    "Konami",             "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
 CONS( 200?, abl4play,  0,          0,  trkfldch, abl4play,trkfldch_state,      empty_init,    "Advance Bright Ltd", "4 Player System - 10 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-
+CONS( 200?, shtscore,  0,          0,  trkfldch, shtscore,trkfldch_state,      empty_init,    "Halsall / time4toys.com / Electronic Games", "Shoot n' Score", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

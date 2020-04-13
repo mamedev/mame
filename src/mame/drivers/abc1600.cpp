@@ -512,9 +512,9 @@ void abc1600_state::mac_mem(address_map &map)
 	map(0x1ff006, 0x1ff006).mirror(0xf9).rw(m_fdc, FUNC(fd1797_device::data_r), FUNC(fd1797_device::data_w));
 	map(0x1ff100, 0x1ff101).mirror(0xfe).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::crtc_map));
 	map(0x1ff200, 0x1ff207).mirror(0xf8).rw(FUNC(abc1600_state::dart_r), FUNC(abc1600_state::dart_w));
-	map(0x1ff300, 0x1ff300).mirror(0xff).rw(m_dma0, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
-	map(0x1ff400, 0x1ff400).mirror(0xff).rw(m_dma1, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
-	map(0x1ff500, 0x1ff500).mirror(0xff).rw(m_dma2, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x1ff300, 0x1ff300).mirror(0xff).rw(m_dma0, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x1ff400, 0x1ff400).mirror(0xff).rw(m_dma1, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x1ff500, 0x1ff500).mirror(0xff).rw(m_dma2, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x1ff600, 0x1ff607).mirror(0xf8).rw(FUNC(abc1600_state::scc_r), FUNC(abc1600_state::scc_w));
 	map(0x1ff700, 0x1ff707).mirror(0xf8).rw(FUNC(abc1600_state::cio_r), FUNC(abc1600_state::cio_w));
 	map(0x1ff800, 0x1ff8ff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr0_map));
@@ -634,12 +634,12 @@ WRITE8_MEMBER( abc1600_state::scc_w )
 
 READ8_MEMBER( abc1600_state::cio_r )
 {
-	return m_cio->read(space, A2_A1);
+	return m_cio->read(A2_A1);
 }
 
 WRITE8_MEMBER( abc1600_state::cio_w )
 {
-	m_cio->write(space, A2_A1, data);
+	m_cio->write(A2_A1, data);
 }
 
 READ8_MEMBER( abc1600_state::cio_pa_r )

@@ -39,10 +39,10 @@ public:
 
 private:
 	/* video-related */
-	DECLARE_WRITE8_MEMBER(hanaroku_out_0_w);
-	DECLARE_WRITE8_MEMBER(hanaroku_out_1_w);
-	DECLARE_WRITE8_MEMBER(hanaroku_out_2_w);
-	DECLARE_WRITE8_MEMBER(albazc_vregs_w);
+	void hanaroku_out_0_w(uint8_t data);
+	void hanaroku_out_1_w(uint8_t data);
+	void hanaroku_out_2_w(uint8_t data);
+	void albazc_vregs_w(offs_t offset, uint8_t data);
 	virtual void video_start() override;
 	void albazc_palette(palette_device &palette) const;
 	uint32_t screen_update_hanaroku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -113,7 +113,7 @@ uint32_t albazc_state::screen_update_hanaroku(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-WRITE8_MEMBER(albazc_state::hanaroku_out_0_w)
+void albazc_state::hanaroku_out_0_w(uint8_t data)
 {
 	/*
 	    bit     description
@@ -135,7 +135,7 @@ WRITE8_MEMBER(albazc_state::hanaroku_out_0_w)
 	machine().bookkeeping().coin_counter_w(4, data & 0x80);
 }
 
-WRITE8_MEMBER(albazc_state::hanaroku_out_1_w)
+void albazc_state::hanaroku_out_1_w(uint8_t data)
 {
 	/*
 	    bit     description
@@ -153,12 +153,12 @@ WRITE8_MEMBER(albazc_state::hanaroku_out_1_w)
 	m_hopper->motor_w(BIT(data, 0));
 }
 
-WRITE8_MEMBER(albazc_state::hanaroku_out_2_w)
+void albazc_state::hanaroku_out_2_w(uint8_t data)
 {
 	// unused
 }
 
-WRITE8_MEMBER(albazc_state::albazc_vregs_w)
+void albazc_state::albazc_vregs_w(offs_t offset, uint8_t data)
 {
 	#ifdef UNUSED_FUNCTION
 	{

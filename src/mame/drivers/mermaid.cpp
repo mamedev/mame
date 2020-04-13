@@ -400,7 +400,7 @@ void mermaid_state::machine_reset()
 WRITE8_MEMBER(mermaid_state::adpcm_data_w)
 {
 	m_adpcm_data = data;
-	m_adpcm->write_data(m_adpcm_trigger ? (data & 0x0f) : (data & 0xf0) >> 4);
+	m_adpcm->data_w(m_adpcm_trigger ? (data & 0x0f) : (data & 0xf0) >> 4);
 }
 
 WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
@@ -409,7 +409,7 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 		return;
 
 	m_adpcm_trigger ^= 1;
-	m_adpcm->write_data(m_adpcm_trigger ? (m_adpcm_data & 0x0f) : (m_adpcm_data & 0xf0) >> 4);
+	m_adpcm->data_w(m_adpcm_trigger ? (m_adpcm_data & 0x0f) : (m_adpcm_data & 0xf0) >> 4);
 	m_adpcm_counter->clock_w(m_adpcm_trigger);
 	if (m_adpcm_trigger == 0 && m_adpcm_counter->count() == 0)
 	{

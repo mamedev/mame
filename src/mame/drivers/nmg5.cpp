@@ -857,7 +857,7 @@ static INPUT_PORTS_START( wondstck )
 INPUT_PORTS_END
 
 template<int Layer>
-TILE_GET_INFO_MEMBER(nmg5_state::get_tile_info){ SET_TILE_INFO_MEMBER(0, m_vram[Layer][tile_index] | (m_gfx_bank << 16), Layer ^ 1, 0);}
+TILE_GET_INFO_MEMBER(nmg5_state::get_tile_info){ tileinfo.set(0, m_vram[Layer][tile_index] | (m_gfx_bank << 16), Layer ^ 1, 0);}
 
 void nmg5_state::video_start()
 {

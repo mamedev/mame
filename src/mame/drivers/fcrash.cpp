@@ -121,7 +121,7 @@ WRITE8_MEMBER( fcrash_state::fcrash_snd_bankswitch_w )
 
 WRITE_LINE_MEMBER(fcrash_state::m5205_int1)
 {
-	m_msm_1->write_data(m_sample_buffer1 & 0x0f);
+	m_msm_1->data_w(m_sample_buffer1 & 0x0f);
 	m_sample_buffer1 >>= 4;
 	m_sample_select1 ^= 1;
 	if (m_sample_select1 == 0)
@@ -130,7 +130,7 @@ WRITE_LINE_MEMBER(fcrash_state::m5205_int1)
 
 WRITE_LINE_MEMBER(fcrash_state::m5205_int2)
 {
-	m_msm_2->write_data(m_sample_buffer2 & 0x0f);
+	m_msm_2->data_w(m_sample_buffer2 & 0x0f);
 	m_sample_buffer2 >>= 4;
 	m_sample_select2 ^= 1;
 }

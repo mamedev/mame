@@ -64,9 +64,6 @@ save_manager::save_manager(running_machine &machine)
 	: m_machine(machine)
 	, m_reg_allowed(true)
 	, m_illegal_regs(0)
-#if defined(__LIBRETRO__)
-	, m_state_size(-1)
-#endif
 {
 	m_rewind = std::make_unique<rewinder>(*this);
 }
@@ -342,21 +339,21 @@ save_error save_manager::write_file(emu_file &file)
 	return STATERR_NONE;
 }
 
-#if defined(__LIBRETRO__)
+
 //-------------------------------------------------
-//  write_data - writes the data to buffer
+//  save - write the current machine state to the
+//  allocated stream
 //-------------------------------------------------
 
-save_error save_manager::write_data(void *data, size_t size)
+save_error save_manager::write_buffer(u8 *data, size_t size)
 {
-	unsigned char *pos = (unsigned char*)data ;
-
 	// if we have illegal registrations, return an error
 	if (m_illegal_regs > 0)
 		return STATERR_ILLEGAL_REGISTRATIONS;
 
-	if ( data == NULL )
-		return STATERR_WRITE_ERROR ;
+	// verify the buffer length
+	if (size != ram_state::get_size(*this))
+		return STATERR_WRITE_ERROR;
 
 	// generate the header
 	u8 header[HEADER_SIZE];
@@ -367,8 +364,11 @@ save_error save_manager::write_data(void *data, size_t size)
 	u32 sig = signature();
 	*(u32 *)&header[0x1c] = little_endianize_int32(sig);
 
-	memcpy(pos, header, sizeof(header)) ;
-	pos += sizeof(header) ;
+	// write the header
+	memcpy(data, header, sizeof(header));
+
+	// advance the pointer
+	u8 *byte_ptr = data + sizeof(header);
 
 	// call the pre-save functions
 	dispatch_presave();
@@ -377,30 +377,39 @@ save_error save_manager::write_data(void *data, size_t size)
 	for (auto &entry : m_entry_list)
 	{
 		u32 totalsize = entry->m_typesize * entry->m_typecount;
-		memcpy(pos, entry->m_data, totalsize) ;
-		pos += totalsize ;
+
+		// check bounds before writing
+		if (byte_ptr + totalsize > data + size)
+			return STATERR_WRITE_ERROR;
+
+		memcpy(byte_ptr, entry->m_data, totalsize);
+		byte_ptr += totalsize;
 	}
 	return STATERR_NONE;
 }
 
+
 //-------------------------------------------------
-//  read_data - read the data from a buffer
+//  load - restore the machine state from the
+//  stream
 //-------------------------------------------------
 
-save_error save_manager::read_data(void *data, size_t size)
+save_error save_manager::read_buffer(u8 *data, size_t size)
 {
-	unsigned char *pos = (unsigned char*)data ;
-
 	// if we have illegal registrations, return an error
 	if (m_illegal_regs > 0)
 		return STATERR_ILLEGAL_REGISTRATIONS;
 
-	if ( data == NULL )
-		return STATERR_READ_ERROR ;
+	// verify the buffer length
+	if (size != ram_state::get_size(*this))
+		return STATERR_WRITE_ERROR;
 
+	// read the header
 	u8 header[HEADER_SIZE];
-	memcpy(header, pos, sizeof(header)) ;
-	pos += sizeof(header) ;
+	memcpy(header, data, sizeof(header));
+
+	// advance the pointer
+	u8 *byte_ptr = data + sizeof(header);
 
 	// verify the header and report an error if it doesn't match
 	u32 sig = signature();
@@ -414,8 +423,13 @@ save_error save_manager::read_data(void *data, size_t size)
 	for (auto &entry : m_entry_list)
 	{
 		u32 totalsize = entry->m_typesize * entry->m_typecount;
-		memcpy(entry->m_data, pos, totalsize) ;
-		pos += totalsize ;
+
+		// check bounds before reading
+		if (byte_ptr + totalsize > data + size)
+			return STATERR_READ_ERROR;
+
+		memcpy(entry->m_data, byte_ptr, totalsize);
+		byte_ptr += totalsize;
 
 		// handle flipping
 		if (flip)
@@ -428,33 +442,6 @@ save_error save_manager::read_data(void *data, size_t size)
 	return STATERR_NONE;
 }
 
-//-------------------------------------------------------------------
-//  state_size - calculate the buffer size needed to store state data
-//-------------------------------------------------------------------
-
-s32 save_manager::state_size()
-{
-	u8 header[HEADER_SIZE];
-
-	// if we have illegal registrations, return an error
-	if (m_illegal_regs > 0)
-		return -1 ;
-
-	if ( m_state_size != -1 )
-		return m_state_size ;
-
-	m_state_size = sizeof(header) ;
-
-	// call the pre-save functions
-	dispatch_presave();
-
-	// then calculate size
-	for (auto &entry : m_entry_list)
-		m_state_size += ( entry->m_typesize * entry->m_typecount );
-
-	return m_state_size ;
-}
-#endif
 
 //-------------------------------------------------
 //  signature - compute the signature, which

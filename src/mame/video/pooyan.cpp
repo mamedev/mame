@@ -100,7 +100,7 @@ TILE_GET_INFO_MEMBER(pooyan_state::get_bg_tile_info)
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX(attr >> 6);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 

@@ -92,7 +92,7 @@ TILE_GET_INFO_MEMBER(pzletime_state::get_mid_tile_info)
 	int tileno = m_mid_videoram[tile_index] & 0x0fff;
 	int colour = m_mid_videoram[tile_index] & 0xf000;
 	colour = colour >> 12;
-	SET_TILE_INFO_MEMBER(2, tileno, colour, 0);
+	tileinfo.set(2, tileno, colour, 0);
 }
 
 TILE_GET_INFO_MEMBER(pzletime_state::get_txt_tile_info)
@@ -101,7 +101,7 @@ TILE_GET_INFO_MEMBER(pzletime_state::get_txt_tile_info)
 	int colour = m_txt_videoram[tile_index] & 0xf000;
 	colour = colour >> 12;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
+	tileinfo.set(0, tileno, colour, 0);
 
 	tileinfo.category = BIT(colour, 3);
 }

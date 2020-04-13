@@ -24,7 +24,7 @@ TILE_GET_INFO_MEMBER(suprslam_state::get_suprslam_tile_info)
 	tileno += m_screen_bank;
 	colour = colour >> 12;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
+	tileinfo.set(0, tileno, colour, 0);
 }
 
 
@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(suprslam_state::get_suprslam_bg_tile_info)
 	tileno += m_bg_bank;
 	colour = colour >> 12;
 
-	SET_TILE_INFO_MEMBER(2, tileno, colour, 0);
+	tileinfo.set(2, tileno, colour, 0);
 }
 
 

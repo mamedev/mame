@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
-
 	<view name="Square (1:1)">
 		<screen index="0">
 			<bounds left="0" top="0" right="1" bottom="1" />

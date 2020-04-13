@@ -54,7 +54,7 @@ INPUT_PORTS_END
 void a2bus_agat7_ports_device::device_add_mconfig(machine_config &config)
 {
 	I8255(config, m_d9);
-	m_d9->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_d9->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_d9->out_pb_callback().set(FUNC(a2bus_agat7_ports_device::write_portb));
 	m_d9->in_pc_callback().set(FUNC(a2bus_agat7_ports_device::read_portc));
 

@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(mrjong_state::get_bg_tile_info)
 	int color = m_colorram[tile_index] & 0x1f;
 	int flags = ((m_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((m_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 void mrjong_state::video_start()

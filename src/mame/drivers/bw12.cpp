@@ -73,54 +73,8 @@ void bw12_state::bankswitch()
 	membank("bank1")->set_entry(m_bank);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(bw12_state::floppy_motor_off_tick)
+void bw12_state::floppy_motor_on_off()
 {
-	if (m_motor0 || m_motor1)
-		return;
-	m_floppy0->mon_w(1);
-	m_floppy1->mon_w(1);
-
-	m_motor_on = 0;
-}
-
-void bw12_state::write_ls259(int address, int data)
-{
-	switch (address)
-	{
-	case 0: /* LS138 A0 */
-		m_bank = (m_bank & 0x02) | data;
-		bankswitch();
-		break;
-
-	case 1: /* LS138 A1 */
-		m_bank = (data << 1) | (m_bank & 0x01);
-		bankswitch();
-		break;
-
-	case 2: /* not connected */
-		break;
-
-	case 3: /* _INIT */
-		break;
-
-	case 4: /* CAP LOCK */
-		m_led = data ? 1 : 0;
-		break;
-
-	case 5: /* MOTOR 0 */
-		m_motor0 = data;
-		break;
-
-	case 6: /* MOTOR 1 */
-		m_motor1 = data;
-		break;
-
-	case 7: /* FDC TC */
-		m_fdc->tc_w(data);
-		break;
-	}
-
-
 	if (m_motor0 || m_motor1)
 	{
 		m_motor_on = 1;
@@ -132,17 +86,48 @@ void bw12_state::write_ls259(int address, int data)
 		m_floppy_timer->adjust(attotime::from_msec(170));
 }
 
-WRITE8_MEMBER( bw12_state::ls259_w )
+TIMER_DEVICE_CALLBACK_MEMBER(bw12_state::floppy_motor_off_tick)
 {
-	int d = BIT(offset, 0);
-	int a = (offset >> 1) & 0x07;
+	if (m_motor0 || m_motor1)
+		return;
+	m_floppy0->mon_w(1);
+	m_floppy1->mon_w(1);
 
-	write_ls259(a, d);
+	m_motor_on = 0;
+}
+
+WRITE_LINE_MEMBER(bw12_state::ls138_a0_w)
+{
+	m_bank = (m_bank & 0x02) | state;
+	bankswitch();
+}
+
+WRITE_LINE_MEMBER(bw12_state::ls138_a1_w)
+{
+	m_bank = (state << 1) | (m_bank & 0x01);
+	bankswitch();
+}
+
+WRITE_LINE_MEMBER(bw12_state::init_w)
+{
+}
+
+WRITE_LINE_MEMBER(bw12_state::motor0_w)
+{
+	m_motor0 = state;
+	floppy_motor_on_off();
+}
+
+WRITE_LINE_MEMBER(bw12_state::motor1_w)
+{
+	m_motor1 = state;
+	floppy_motor_on_off();
 }
 
 READ8_MEMBER( bw12_state::ls259_r )
 {
-	ls259_w(space, offset, 0);
+	if (!machine().side_effects_disabled())
+		m_latch->write_bit(offset >> 1, BIT(offset, 0));
 
 	return 0;
 }
@@ -159,12 +144,12 @@ void bw12_state::bw12_mem(address_map &map)
 void bw12_state::bw12_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).rw(FUNC(bw12_state::ls259_r), FUNC(bw12_state::ls259_w));
+	map(0x00, 0x0f).r(FUNC(bw12_state::ls259_r)).w(m_latch, FUNC(ls259_device::write_a0));
 	map(0x10, 0x10).mirror(0x0e).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x11, 0x11).mirror(0x0e).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x20, 0x21).mirror(0x0e).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x30, 0x33).mirror(0x0c).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x40, 0x43).mirror(0x0c).rw(m_sio, FUNC(z80sio0_device::ba_cd_r), FUNC(z80sio0_device::ba_cd_w));
+	map(0x40, 0x43).mirror(0x0c).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x50, 0x50).mirror(0x0f).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x60, 0x63).mirror(0x0c).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 }
@@ -408,12 +393,6 @@ WRITE_LINE_MEMBER( bw12_state::pia_cb2_w )
 
 /* PIT8253 Interface */
 
-WRITE_LINE_MEMBER( bw12_state::pit_out0_w )
-{
-	m_sio->txca_w(state);
-	m_sio->rxca_w(state);
-}
-
 WRITE_LINE_MEMBER( bw12_state::pit_out2_w )
 {
 	m_pit_out2 = state;
@@ -460,8 +439,6 @@ WRITE_LINE_MEMBER( bw12_state::ay3600_data_ready_w )
 
 void bw12_state::machine_start()
 {
-	m_led.resolve();
-
 	/* setup memory banking */
 	membank("bank1")->configure_entry(0, m_rom->base());
 	membank("bank1")->configure_entry(1, m_ram->pointer());
@@ -485,10 +462,6 @@ void bw12_state::machine_start()
 
 void bw12_state::machine_reset()
 {
-	for (int i = 0; i < 8; i++)
-	{
-		write_ls259(i, 0);
-	}
 }
 
 static void bw12_floppies(device_slot_interface &device)
@@ -533,9 +506,19 @@ GFXDECODE_END
 void bw12_state::common(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(16'000'000)/4);
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bw12_state::bw12_mem);
 	m_maincpu->set_addrmap(AS_IO, &bw12_state::bw12_io);
+
+	LS259(config, m_latch); // IC18
+	m_latch->q_out_cb<0>().set(FUNC(bw12_state::ls138_a0_w)); // LS138 A0
+	m_latch->q_out_cb<1>().set(FUNC(bw12_state::ls138_a1_w)); // LS138 A1
+	// Q2 not connected
+	m_latch->q_out_cb<3>().set(FUNC(bw12_state::init_w)); // _INIT
+	m_latch->q_out_cb<4>().set_output("led0"); // CAP LOCK
+	m_latch->q_out_cb<5>().set(FUNC(bw12_state::motor0_w)); // MOTOR 0
+	m_latch->q_out_cb<6>().set(FUNC(bw12_state::motor1_w)); // MOTOR 1
+	m_latch->q_out_cb<7>().set(m_fdc, FUNC(upd765a_device::tc_line_w)); // FDC TC
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::amber()));
@@ -548,7 +531,7 @@ void bw12_state::common(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_bw12);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MC6845(config, m_crtc, XTAL(16'000'000)/8);
+	MC6845(config, m_crtc, 16_MHz_XTAL / 8);
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
@@ -563,17 +546,17 @@ void bw12_state::common(machine_config &config)
 
 	/* devices */
 	TIMER(config, FLOPPY_TIMER_TAG).configure_generic(FUNC(bw12_state::floppy_motor_off_tick));
-	UPD765A(config, m_fdc, 8'000'000, false, true);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, false, true);
 
 	PIA6821(config, m_pia, 0);
 	m_pia->readpa_handler().set(FUNC(bw12_state::pia_pa_r));
-	m_pia->writepb_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pia->writepb_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pia->ca2_handler().set(CENTRONICS_TAG, FUNC(centronics_device::write_strobe));
 	m_pia->cb2_handler().set(FUNC(bw12_state::pia_cb2_w));
 	m_pia->irqa_handler().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
 	m_pia->irqb_handler().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
 
-	Z80SIO0(config, m_sio, XTAL(16'000'000)/4);
+	Z80SIO(config, m_sio, 16_MHz_XTAL / 4); // SIO/0
 	m_sio->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 	m_sio->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
 	m_sio->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
@@ -582,12 +565,15 @@ void bw12_state::common(machine_config &config)
 	m_sio->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
 	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	PIT8253(config, m_pit, 0);
-	m_pit->set_clk<0>(XTAL(1'843'200));
-	m_pit->out_handler<0>().set(FUNC(bw12_state::pit_out0_w));
-	m_pit->set_clk<1>(XTAL(1'843'200));
-	m_pit->out_handler<1>().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
-	m_pit->set_clk<2>(XTAL(1'843'200));
+	PIT8253(config, m_pit);
+	m_pit->set_clk<0>(1.8432_MHz_XTAL);
+	m_pit->out_handler<0>().set(m_sio, FUNC(z80sio_device::rxca_w));
+	m_pit->out_handler<0>().append(m_sio, FUNC(z80sio_device::txca_w));
+	m_pit->out_handler<0>().append(RS232_A_TAG, FUNC(rs232_port_device::write_etc));
+	m_pit->set_clk<1>(1.8432_MHz_XTAL);
+	m_pit->out_handler<1>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
+	m_pit->out_handler<1>().append(RS232_B_TAG, FUNC(rs232_port_device::write_etc));
+	m_pit->set_clk<2>(1.8432_MHz_XTAL);
 	m_pit->out_handler<2>().set(FUNC(bw12_state::pit_out2_w));
 
 	AY3600(config, m_kbc, 0);
@@ -605,14 +591,14 @@ void bw12_state::common(machine_config &config)
 	m_kbc->data_ready().set(FUNC(bw12_state::ay3600_data_ready_w));
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
-	rs232a.rxd_handler().set(m_sio, FUNC(z80dart_device::rxa_w));
-	rs232a.dcd_handler().set(m_sio, FUNC(z80dart_device::dcda_w));
-	rs232a.cts_handler().set(m_sio, FUNC(z80dart_device::ctsa_w));
+	rs232a.rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w));
+	rs232a.dcd_handler().set(m_sio, FUNC(z80sio_device::dcda_w));
+	rs232a.cts_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
-	rs232b.rxd_handler().set(m_sio, FUNC(z80dart_device::rxb_w));
-	rs232b.dcd_handler().set(m_sio, FUNC(z80dart_device::dcdb_w));
-	rs232b.cts_handler().set(m_sio, FUNC(z80dart_device::ctsb_w));
+	rs232b.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
+	rs232b.dcd_handler().set(m_sio, FUNC(z80sio_device::dcdb_w));
+	rs232b.cts_handler().set(m_sio, FUNC(z80sio_device::ctsb_w));
 
 	/* printer */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");

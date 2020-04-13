@@ -138,7 +138,7 @@ WRITE8_MEMBER(warpspeed_state::hardware_w)
 TILE_GET_INFO_MEMBER(warpspeed_state::get_text_tile_info)
 {
 	uint8_t code = m_videoram[tile_index] & 0x3f;
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(warpspeed_state::get_starfield_tile_info)
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(warpspeed_state::get_starfield_tile_info)
 	{
 		code = memregion("starfield")->base()[tile_index >> 1] & 0x3f;
 	}
-	SET_TILE_INFO_MEMBER(1, code, 0, 0);
+	tileinfo.set(1, code, 0, 0);
 }
 
 WRITE8_MEMBER(warpspeed_state::vidram_w)

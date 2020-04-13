@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(silkroad_state::get_tile_info)
 
 	code += 0x18000;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			color,
 			TILE_FLIPYX(flipx));

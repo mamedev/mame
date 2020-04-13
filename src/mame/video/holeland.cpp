@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(holeland_state::holeland_get_tile_info)
 	int attr = m_colorram[tile_index];
 	int tile_number = m_videoram[tile_index] | ((attr & 0x03) << 8);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			m_palette_offset + ((attr >> 4) & 0x0f),
 			TILE_FLIPYX((attr >> 2) & 0x03));
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(holeland_state::crzrally_get_tile_info)
 	int attr = m_colorram[tile_index];
 	int tile_number = m_videoram[tile_index] | ((attr & 0x03) << 8);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			m_palette_offset + ((attr >> 4) & 0x0f),
 			TILE_FLIPYX((attr >> 2) & 0x03));

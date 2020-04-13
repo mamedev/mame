@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Sinclair ZX Spectrum Beta Disc / TR-DOS disk images
+    Sinclair ZX Spectrum Beta Disc / TR-DOS disk images
     (currently only hooked up to Pentagon machine, but interfaces available for older systems too)
 
     some original release TR-DOS images seem to be in SCL format, which does not appear to properly

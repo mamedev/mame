@@ -237,7 +237,7 @@ void istrebiteli_state::motogonki_palette(palette_device &palette) const
 
 TILE_GET_INFO_MEMBER(istrebiteli_state::get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index] & 0x1f, 0, 0);
+	tileinfo.set(0, m_tileram[tile_index] & 0x1f, 0, 0);
 }
 
 void istrebiteli_state::init_istreb()

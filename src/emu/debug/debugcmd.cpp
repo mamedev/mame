@@ -2535,6 +2535,12 @@ void debugger_commands::execute_cheatlist(int ref, const std::vector<std::string
 	u64 sizemask;
 	FILE *f = nullptr;
 
+	if (m_cheat.cpu[0] == 0)
+	{
+		m_console.printf("Use cheatinit before cheatlist\n");
+		return;
+	}
+
 	if (!validate_cpu_space_parameter(m_cheat.cpu, AS_PROGRAM, space))
 		return;
 

@@ -62,7 +62,7 @@ TILE_GET_INFO_MEMBER(ddragon_state::get_bg_tile_info)
 {
 	tile_index <<= 1;
 	uint8_t attr = m_bgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			m_bgvideoram[tile_index | 1] | ((attr & 0x07) << 8),
 			(attr >> 3) & 0x07,
 			TILE_FLIPYX((attr & 0xc0) >> 6));
@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(ddragon_state::get_fg_tile_info)
 {
 	tile_index <<= 1;
 	uint8_t attr = m_fgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_fgvideoram[tile_index | 1] | ((attr & 0x07) << 8),
 			attr >> 5,
 			0);
@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(ddragon_state::get_fg_16color_tile_info)
 {
 	tile_index <<= 1;
 	uint8_t attr = m_fgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_fgvideoram[tile_index | 1] | ((attr & 0x0f) << 8),
 			attr >> 4,
 			0);

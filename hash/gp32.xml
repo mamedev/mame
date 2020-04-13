@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
+
 Undumped games (from http://ko.wikipedia.org/wiki/GP32 )
 
 * 달려라 하니 시리즈 ~ Ride Do Series
@@ -15,10 +17,10 @@ Questionable?
 
 It is recommended to use the firmware 1.6.6 as default BIOS
 
--->
 
-<!-- All games have a cap of partial support because not extensively tested given the very demanding host CPU usage -->
-<!-- plus reload after save needs to be counterchecked for all games unless explicitly stated. -->
+All games have a cap of partial support because not extensively tested given the very demanding host CPU usage
+plus reload after save needs to be counterchecked for all games unless explicitly stated.
+-->
 <softwarelist name="gp32" description="GamePark GP32 SmartMedia cards">
 
 	<!-- boot OK -->

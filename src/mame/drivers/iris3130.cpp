@@ -49,7 +49,7 @@
 #define LOG_INVALID_SEGMENT (1 << 1)
 #define LOG_OTHER           (1 << 2)
 
-#define VERBOSE     (LOG_OTHER)
+#define VERBOSE     (0)
 
 #include "logmacro.h"
 
@@ -59,6 +59,7 @@ public:
 	iris3000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_storagercpu(*this, "storager"),
 		m_mainram(*this, "mainram"),
 		m_duarta(*this, "duart68681a"),
 		m_duartb(*this, "duart68681b"),
@@ -129,8 +130,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
 
 	void mem_map(address_map &map);
+	void storager_map(address_map& map);
 
 	required_device<m68020_device> m_maincpu;
+	required_device<m68000_device> m_storagercpu;
 	required_shared_ptr<uint32_t> m_mainram;
 	required_device<mc68681_device> m_duarta;
 	required_device<mc68681_device> m_duartb;
@@ -581,6 +584,11 @@ void iris3000_state::mem_map(address_map &map)
 	map(0x00000000, 0xffffffff).rw(FUNC(iris3000_state::mmu_r), FUNC(iris3000_state::mmu_w));
 }
 
+void iris3000_state::storager_map(address_map& map)
+{
+	map(0x00000000, 0x0000ffff).rom().region("storagercpu", 0);
+}
+
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
@@ -609,6 +617,9 @@ void iris3000_state::iris3130(machine_config &config)
 	/* basic machine hardware */
 	M68020(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &iris3000_state::mem_map);
+
+	M68000(config, m_storagercpu, 10000000);
+	m_storagercpu->set_addrmap(AS_PROGRAM, &iris3000_state::storager_map);
 
 	ADDRESS_MAP_BANK(config, "text_data").set_map(&iris3000_state::text_data_map).set_options(ENDIANNESS_BIG, 32, 32);
 	ADDRESS_MAP_BANK(config, "stack").set_map(&iris3000_state::stack_map).set_options(ENDIANNESS_BIG, 32, 32);
@@ -694,6 +705,10 @@ ROM_START( iris3130 )
 	ROM_LOAD( "sgi-ip2-u91.nolabel.od",    0x00000, 0x8000, CRC(32e1f6b5) SHA1(2bd928c3fe2e364b9a38189158e9bad0e5271a59) )
 	ROM_LOAD( "sgi-ip2-u92.nolabel.od",    0x08000, 0x8000, CRC(13dbfdb3) SHA1(3361fb62f7a8c429653700bccfc3e937f7508182) )
 	ROM_LOAD( "sgi-ip2-u93.ip2.2-008.od",  0x10000, 0x8000, CRC(bf967590) SHA1(1aac48e4f5531a25c5482f64de5cd3c7a9931f11) )
+
+	ROM_REGION16_BE(0x10000, "storagercpu", 0)
+	ROM_LOAD16_BYTE( "5808423a.bin", 0x0000, 0x8000, CRC(161e6a90) SHA1(d4dcbf630a83e4c5994d8331ac85d81130400e33) )
+	ROM_LOAD16_BYTE( "5808523a.bin", 0x0001, 0x8000, CRC(4c99e4b8) SHA1(899855e54c4520816ad43eb19b972b45783ccb6b) )
 ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME           FLAGS

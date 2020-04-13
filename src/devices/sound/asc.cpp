@@ -266,7 +266,7 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 //  read - read from the chip's registers and internal RAM
 //-------------------------------------------------
 
-READ8_MEMBER( asc_device::read )
+uint8_t asc_device::read(offs_t offset)
 {
 	uint8_t rv;
 
@@ -412,7 +412,7 @@ READ8_MEMBER( asc_device::read )
 //  write - write to the chip's registers and internal RAM
 //-------------------------------------------------
 
-WRITE8_MEMBER( asc_device::write )
+void asc_device::write(offs_t offset, uint8_t data)
 {
   //printf("ASC: write %02x to %x\n", data, offset);
 

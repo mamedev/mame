@@ -1,16 +1,19 @@
 <?xml version="1.0"?>
+<!--
+license:CC0
+-->
 <mamelayout version="2">
 
 	<element name="overlay">
 
-<!-- backdrop -->
+		<!-- backdrop -->
 
 		<rect>
 			<color red="1.0" green="0.15" blue="0.15" />
 			<bounds x="0" y="0" width="500" height="300" />
 		</rect>
 
-<!-- gradient -->
+		<!-- gradient -->
 
 		<disk>
 			<color red="1.0" green="0.29" blue="0.15" />
@@ -37,10 +40,10 @@
 			<bounds x="0" y="76" width="500" height="170" />
 		</disk>
 
-<!-- ground -->
+		<!-- ground -->
 
-<!-- note: obviously missing the destroyed city skyline here, -->
-<!-- you'd need external artwork for that -->
+		<!-- note: obviously missing the destroyed city skyline here, -->
+		<!-- you'd need external artwork for that -->
 
 		<rect>
 			<color red="1.0" green="1.0" blue="0.15" />

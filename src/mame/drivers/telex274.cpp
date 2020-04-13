@@ -127,7 +127,7 @@ void telex274_state::main_mem(address_map &map)
 	map(0x008000, 0x01ffff).ram();
 	map(0x080000, 0x09ffff).ram();
 	map(0xff811e, 0xff811f).nopr();
-	map(0xff8810, 0xff8817).rw("mpsc", FUNC(i8274_new_device::cd_ba_r), FUNC(i8274_new_device::cd_ba_w)).umask16(0x00ff);
+	map(0xff8810, 0xff8817).rw("mpsc", FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
 	map(0xff8818, 0xff881b).rw("maintimer", FUNC(am9513a_device::read8), FUNC(am9513a_device::write8)).umask16(0x00ff);
 }
 
@@ -150,11 +150,11 @@ void telex274_state::telex274(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &telex274_state::main_mem);
 
 	am9513a_device &maintimer(AM9513A(config, "maintimer", 4_MHz_XTAL));
-	maintimer.out4_cb().set("mpsc", FUNC(i8274_new_device::rxca_w)); // ?
-	maintimer.out4_cb().append("mpsc", FUNC(i8274_new_device::txca_w)); // ?
-	maintimer.out5_cb().set("mpsc", FUNC(i8274_new_device::rxtxcb_w)); // ?
+	maintimer.out4_cb().set("mpsc", FUNC(i8274_device::rxca_w)); // ?
+	maintimer.out4_cb().append("mpsc", FUNC(i8274_device::txca_w)); // ?
+	maintimer.out5_cb().set("mpsc", FUNC(i8274_device::rxtxcb_w)); // ?
 
-	I8274_NEW(config, "mpsc", 4'000'000);
+	I8274(config, "mpsc", 4'000'000);
 
 	M68000(config, m_coaxcpu, 10'000'000);
 	m_coaxcpu->set_addrmap(AS_PROGRAM, &telex274_state::coax_mem);

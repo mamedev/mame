@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="pcecd" description="NEC PC-Engine / Turbografx 16 CD-ROMs">
 
 <!-- The JPN CHDs have all been converted from the 'PD PC-Engine V2' collection, dated 2007

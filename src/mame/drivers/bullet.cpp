@@ -625,7 +625,7 @@ void bullet_state::bullet_io(address_map &map)
 	map(0x08, 0x0b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0c).mirror(0x03).rw(FUNC(bullet_state::win_r), FUNC(bullet_state::wstrobe_w));
 	map(0x10, 0x13).rw(m_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write));
-	map(0x14, 0x14).rw(m_dmac, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x14, 0x14).rw(m_dmac, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x15, 0x15).rw(FUNC(bullet_state::brom_r), FUNC(bullet_state::brom_w));
 	map(0x16, 0x16).w(FUNC(bullet_state::exdsk_w));
 	map(0x17, 0x17).w(FUNC(bullet_state::exdma_w));
@@ -660,7 +660,7 @@ void bulletf_state::bulletf_io(address_map &map)
 	map(0x16, 0x16).w(FUNC(bulletf_state::xfdc_w));
 	map(0x17, 0x17).w(FUNC(bulletf_state::mbank_w));
 	map(0x19, 0x19).rw(FUNC(bulletf_state::scsi_r), FUNC(bulletf_state::scsi_w));
-	map(0x1a, 0x1a).rw(m_dmac, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x1a, 0x1a).rw(m_dmac, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x1b, 0x1b).r(FUNC(bulletf_state::hwsts_r));
 }
 
@@ -1144,7 +1144,7 @@ void bullet_state::bullet(machine_config &config)
 
 	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, 16_MHz_XTAL / 4));
 	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	pio.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	pio.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	pio.in_pb_callback().set(FUNC(bullet_state::pio_pb_r));
 
 	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
@@ -1225,9 +1225,9 @@ void bulletf_state::bulletf(machine_config &config)
 
 	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, 16_MHz_XTAL / 4));
 	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	pio.in_pa_callback().set("scsi_ctrl_in", FUNC(input_buffer_device::bus_r));
+	pio.in_pa_callback().set("scsi_ctrl_in", FUNC(input_buffer_device::read));
 	pio.out_pa_callback().set(FUNC(bulletf_state::pio_pa_w));
-	pio.out_ardy_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	pio.out_ardy_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	pio.out_brdy_callback().set(FUNC(bulletf_state::cstrb_w));
 
 	MB8877(config, m_fdc, 16_MHz_XTAL / 16);

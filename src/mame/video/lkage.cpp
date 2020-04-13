@@ -70,19 +70,19 @@ WRITE8_MEMBER(lkage_state::lkage_videoram_w)
 TILE_GET_INFO_MEMBER(lkage_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index + 0x800] + 256 * (m_bg_tile_bank ? 5 : 1);
-	SET_TILE_INFO_MEMBER(0/*gfx*/, code, 0/*color*/, 0/*flags*/ );
+	tileinfo.set(0/*gfx*/, code, 0/*color*/, 0/*flags*/ );
 }
 
 TILE_GET_INFO_MEMBER(lkage_state::get_fg_tile_info)
 {
 	int code = m_videoram[tile_index + 0x400] + 256 * (m_fg_tile_bank ? 1 : 0);
-	SET_TILE_INFO_MEMBER(0/*gfx*/, code, 0/*color*/, 0/*flags*/);
+	tileinfo.set(0/*gfx*/, code, 0/*color*/, 0/*flags*/);
 }
 
 TILE_GET_INFO_MEMBER(lkage_state::get_tx_tile_info)
 {
 	int code = m_videoram[tile_index] + 256 * (m_tx_tile_bank ? 4 : 0);
-	SET_TILE_INFO_MEMBER(0/*gfx*/, code, 0/*color*/, 0/*flags*/);
+	tileinfo.set(0/*gfx*/, code, 0/*color*/, 0/*flags*/);
 }
 
 void lkage_state::video_start()

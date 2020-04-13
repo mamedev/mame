@@ -233,7 +233,7 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( upd3301_device::read )
+uint8_t upd3301_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -256,7 +256,7 @@ READ8_MEMBER( upd3301_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( upd3301_device::write )
+void upd3301_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x01)
 	{
@@ -397,7 +397,7 @@ WRITE8_MEMBER( upd3301_device::write )
 //  dack_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( upd3301_device::dack_w )
+void upd3301_device::dack_w(uint8_t data)
 {
 	if (m_y >= (m_l * m_r))
 	{
@@ -437,7 +437,7 @@ WRITE8_MEMBER( upd3301_device::dack_w )
 //  lpen_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd3301_device::lpen_w )
+void upd3301_device::lpen_w(int state)
 {
 }
 
@@ -446,7 +446,7 @@ WRITE_LINE_MEMBER( upd3301_device::lpen_w )
 //  hrtc_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( upd3301_device::hrtc_r )
+int upd3301_device::hrtc_r()
 {
 	return m_hrtc;
 }
@@ -456,7 +456,7 @@ READ_LINE_MEMBER( upd3301_device::hrtc_r )
 //  vrtc_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( upd3301_device::vrtc_r )
+int upd3301_device::vrtc_r()
 {
 	return m_vrtc;
 }

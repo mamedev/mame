@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(EPSON_PF10, epson_pf10_device, "epson_pf10", "EPSON PF-10 Por
 
 void epson_pf10_device::cpu_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw("maincpu", FUNC(hd6303y_cpu_device::m6801_io_r), FUNC(hd6303y_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m("maincpu", FUNC(hd6303y_cpu_device::m6801_io));
 	map(0x0040, 0x00ff).ram(); /* 192 bytes internal ram */
 	map(0x0800, 0x0fff).ram(); /* external 2k ram */
 	map(0x1000, 0x17ff).rw(FUNC(epson_pf10_device::fdc_r), FUNC(epson_pf10_device::fdc_w));

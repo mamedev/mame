@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
-<softwarelist name="sorcerer_cass" description="Exidy Sorcerer cassettes">
-
 <!--
+license:CC0
+
 Compiled by Robbbert
 -->
+
+<softwarelist name="sorcerer_cass" description="Exidy Sorcerer cassettes">
 
 <!--
      These come from tapes.

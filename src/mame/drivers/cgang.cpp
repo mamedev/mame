@@ -848,10 +848,10 @@ ROM_START( cgang )
 	ROM_LOAD("cg1_sp0b.4b", 0x8000, 0x8000, CRC(62974140) SHA1(5eee3f6345521e3fb76acb3acaa5c9df75db91db) )
 
 	ROM_REGION( 0x20000, "adpcm0", 0 )
-	ROM_LOAD("cg2_9c_e02a", 0x00000, 0x20000, CRC(f9a3f8a0) SHA1(5ad8b408d36397227019afd15c3516f85488c6df) ) // handwritten label seen on one PCB
+	ROM_LOAD("cg2_9c_e02a.9c", 0x00000, 0x20000, CRC(f9a3f8a0) SHA1(5ad8b408d36397227019afd15c3516f85488c6df) ) // handwritten label seen on one PCB
 
 	ROM_REGION( 0x20000, "adpcm1", 0 )
-	ROM_LOAD("cg2_9e_586e", 0x00000, 0x20000, CRC(40e7f60b) SHA1(af641b0562db1ae033cee67df583d178fd8c93f3) ) // handwritten label seen on one PCB
+	ROM_LOAD("cg2_9e_586e.9e", 0x00000, 0x20000, CRC(40e7f60b) SHA1(af641b0562db1ae033cee67df583d178fd8c93f3) ) // handwritten label seen on one PCB
 ROM_END
 
 } // anonymous namespace

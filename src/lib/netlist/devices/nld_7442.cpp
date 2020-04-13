@@ -24,7 +24,7 @@ namespace devices
 		, m_D(*this, "D")
 		, m_val(*this, "m_val", 0)
 		, m_last_val(*this, "m_last_val", 0)
-		, m_Q(*this, {{"Q0", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9"}})
+		, m_Q(*this, {"Q0", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9"})
 		, m_power_pins(*this)
 		{
 		}

@@ -2604,7 +2604,7 @@ READ8_MEMBER( h6280_device::io_buffer_r )
 WRITE8_MEMBER( h6280_device::psg_w )
 {
 	m_io_buffer = data;
-	m_psg->c6280_w(space,offset,data,mem_mask);
+	m_psg->c6280_w(offset, data);
 }
 
 bool h6280_device::memory_translate(int spacenum, int intention, offs_t &address)

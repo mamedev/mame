@@ -328,7 +328,7 @@ void mos6560_device::drawlines( int first, int last )
  mos6560_port_w - write to regs
 -------------------------------------------------*/
 
-WRITE8_MEMBER( mos6560_device::write )
+void mos6560_device::write(offs_t offset, uint8_t data)
 {
 	DBG_LOG(1, "mos6560_port_w", ("%.4x:%.2x\n", offset, data));
 
@@ -406,7 +406,7 @@ WRITE8_MEMBER( mos6560_device::write )
  mos6560_port_r - read from regs
 -------------------------------------------------*/
 
-READ8_MEMBER( mos6560_device::read )
+uint8_t mos6560_device::read(offs_t offset)
 {
 	int val;
 
@@ -450,7 +450,7 @@ READ8_MEMBER( mos6560_device::read )
 	return val;
 }
 
-WRITE_LINE_MEMBER( mos6560_device::lp_w )
+void mos6560_device::lp_w(int state)
 {
 	// TODO
 }

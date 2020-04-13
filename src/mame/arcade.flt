@@ -1069,6 +1069,7 @@ sderby.cpp
 sderby2.cpp
 seabattl.cpp
 sealy.cpp
+sealy_fr.cpp
 seattle.cpp
 segaatom.cpp
 segac2.cpp
@@ -1315,6 +1316,7 @@ trackfld.cpp
 travrusa.cpp
 triforce.cpp
 triplhnt.cpp
+triviaquiz.cpp
 trivrus.cpp
 truco.cpp
 trucocl.cpp

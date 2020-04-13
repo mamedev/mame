@@ -126,26 +126,26 @@ DEFINE_DEVICE_TYPE(VME_MZR8300, vme_mzr8300_card_device, "mzr8300", "Mizar 8300 
 
 void vme_mzr8300_card_device::device_add_mconfig(machine_config &config)
 {
-	upd7201_new_device& sio0(UPD7201_NEW(config, "sio0", XTAL(4'000'000)));
+	upd7201_device& sio0(UPD7201(config, "sio0", XTAL(4'000'000)));
 	sio0.out_txdb_callback().set("rs232p1", FUNC(rs232_port_device::write_txd));
 	sio0.out_dtrb_callback().set("rs232p1", FUNC(rs232_port_device::write_dtr));
 	sio0.out_rtsb_callback().set("rs232p1", FUNC(rs232_port_device::write_rts));
 
-	UPD7201_NEW(config, "sio1", XTAL(4'000'000));
+	UPD7201(config, "sio1", XTAL(4'000'000));
 
 	rs232_port_device &rs232p1(RS232_PORT(config, "rs232p1", default_rs232_devices, "terminal"));
-	rs232p1.rxd_handler().set("sio0", FUNC(upd7201_new_device::rxb_w));
-	rs232p1.cts_handler().set("sio0", FUNC(upd7201_new_device::ctsb_w));
+	rs232p1.rxd_handler().set("sio0", FUNC(upd7201_device::rxb_w));
+	rs232p1.cts_handler().set("sio0", FUNC(upd7201_device::ctsb_w));
 
 	am9513_device &stc(AM9513(config, "stc", 4_MHz_XTAL));
-	stc.out1_cb().set("sio0", FUNC(upd7201_new_device::rxca_w));
-	stc.out1_cb().append("sio0", FUNC(upd7201_new_device::txca_w));
-	stc.out2_cb().set("sio0", FUNC(upd7201_new_device::rxcb_w));
-	stc.out2_cb().append("sio0", FUNC(upd7201_new_device::txcb_w));
-	stc.out3_cb().set("sio1", FUNC(upd7201_new_device::rxca_w));
-	stc.out3_cb().append("sio1", FUNC(upd7201_new_device::txca_w));
-	stc.out4_cb().set("sio1", FUNC(upd7201_new_device::rxcb_w));
-	stc.out4_cb().append("sio1", FUNC(upd7201_new_device::txcb_w));
+	stc.out1_cb().set("sio0", FUNC(upd7201_device::rxca_w));
+	stc.out1_cb().append("sio0", FUNC(upd7201_device::txca_w));
+	stc.out2_cb().set("sio0", FUNC(upd7201_device::rxcb_w));
+	stc.out2_cb().append("sio0", FUNC(upd7201_device::txcb_w));
+	stc.out3_cb().set("sio1", FUNC(upd7201_device::rxca_w));
+	stc.out3_cb().append("sio1", FUNC(upd7201_device::txca_w));
+	stc.out4_cb().set("sio1", FUNC(upd7201_device::rxcb_w));
+	stc.out4_cb().append("sio1", FUNC(upd7201_device::txcb_w));
 }
 
 

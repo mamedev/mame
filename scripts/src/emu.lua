@@ -288,12 +288,12 @@ custombuildtask {
 }
 else
 custombuildtask {
-	{ MAME_DIR .. "scripts/font/NotoSans-Bold.bdc", GEN_DIR .. "emu/uismall.fh",     {  MAME_DIR .. "scripts/build/file2str.py" }, {"@echo Converting NotoSans-Bold.bdc...", PYTHON .. " $(1) $(<) $(@) font_uismall uint8_t" }},
+	{ MAME_DIR .. "scripts/font/NotoSans-Bold.bdc", GEN_DIR .. "emu/uismall.fh", { MAME_DIR .. "scripts/build/file2str.py" }, { "@echo Converting NotoSans-Bold.bdc...", PYTHON .. " $(1) $(<) $(@) font_uismall uint8_t" } },
 }
 end
 -- RETRO HACK
 custombuildtask {
-	{ MAME_DIR .. "src/frontend/mame/ui/uicmd14.png"        , GEN_DIR .. "emu/ui/uicmd14.fh",  {  MAME_DIR.. "scripts/build/png2bdc.py",  MAME_DIR .. "scripts/build/file2str.py" }, {"@echo Converting uicmd14.png...", PYTHON .. " $(1) $(<) temp_cmd.bdc", PYTHON .. " $(2) temp_cmd.bdc $(@) font_uicmd14 uint8_t" }},
+	{ MAME_DIR .. "src/frontend/mame/ui/uicmd14.png", GEN_DIR .. "emu/ui/uicmd14.fh", { MAME_DIR.. "scripts/build/png2bdc.py",  MAME_DIR .. "scripts/build/file2str.py" }, { "@echo Converting uicmd14.png...", PYTHON .. " $(1) $(<) temp_cmd.bdc", PYTHON .. " $(2) temp_cmd.bdc $(@) font_uicmd14 uint8_t" } },
 
 	layoutbuildtask("emu/layout", "dualhovu"),
 	layoutbuildtask("emu/layout", "dualhsxs"),

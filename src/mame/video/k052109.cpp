@@ -709,7 +709,7 @@ void k052109_device::get_tile_info( tile_data &tileinfo, int tile_index, int lay
 	if (flipy && (m_tileflip_enable & 2))
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			color,
 			flags);

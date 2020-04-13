@@ -15,7 +15,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/am9517a.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 
 
 
@@ -51,7 +51,7 @@ private:
 	required_device<am9517a_device> m_dmac;
 	required_device<z80ctc_device> m_ctc0;
 	required_device<z80ctc_device> m_ctc1;
-	required_device<z80dart_device> m_sio;
+	required_device<z80sio_device> m_sio;
 	optional_shared_ptr<uint8_t> m_char_ram;
 
 	void wangpc_rtc_io(address_map &map);

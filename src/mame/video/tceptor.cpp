@@ -111,7 +111,7 @@ TILE_GET_INFO_MEMBER(tceptor_state::get_tx_tile_info)
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void tceptor_state::tile_mark_dirty(int offset)
@@ -168,7 +168,7 @@ TILE_GET_INFO_MEMBER(tceptor_state::get_bg1_tile_info)
 	int code = (data & 0x3ff) | 0x000;
 	int color = (data & 0xfc00) >> 10;
 
-	SET_TILE_INFO_MEMBER(m_bg, code, color, 0);
+	tileinfo.set(m_bg, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(tceptor_state::get_bg2_tile_info)
@@ -177,7 +177,7 @@ TILE_GET_INFO_MEMBER(tceptor_state::get_bg2_tile_info)
 	int code = (data & 0x3ff) | 0x400;
 	int color = (data & 0xfc00) >> 10;
 
-	SET_TILE_INFO_MEMBER(m_bg, code, color, 0);
+	tileinfo.set(m_bg, code, color, 0);
 }
 
 WRITE8_MEMBER(tceptor_state::tceptor_bg_ram_w)

@@ -484,7 +484,7 @@ void spc1000_state::spc1000(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(4'000'000) / 1));
 	ay8910.port_a_read_callback().set(FUNC(spc1000_state::porta_r));
-	ay8910.port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ay8910.port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	SPC1000_EXP_SLOT(config, "ext1", spc1000_exp);

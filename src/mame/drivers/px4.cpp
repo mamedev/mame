@@ -1294,7 +1294,7 @@ void px4_state::px4_io(address_map &map)
 	map(0x14, 0x14).rw(FUNC(px4_state::artdir_r), FUNC(px4_state::artdor_w));
 	map(0x15, 0x15).rw(FUNC(px4_state::artsr_r), FUNC(px4_state::artmr_w));
 	map(0x16, 0x16).rw(FUNC(px4_state::iostr_r), FUNC(px4_state::artcr_w));
-	map(0x17, 0x17).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x17, 0x17).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x18, 0x18).w(FUNC(px4_state::swr_w));
 	map(0x19, 0x19).w(FUNC(px4_state::ioctlr_w));
 	map(0x1a, 0x1f).noprw();

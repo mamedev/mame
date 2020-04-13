@@ -68,7 +68,7 @@ TILE_GET_INFO_MEMBER(commando_state::get_bg_tile_info)
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(commando_state::get_fg_tile_info)
@@ -78,7 +78,7 @@ TILE_GET_INFO_MEMBER(commando_state::get_fg_tile_info)
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 void commando_state::video_start()

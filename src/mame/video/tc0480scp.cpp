@@ -350,7 +350,7 @@ TILE_GET_INFO_MEMBER(tc0480scp_device::get_bg_tile_info)
 {
 	const u32 code = m_ram[(2 * tile_index) + 1 + Offset] & 0x7fff;
 	const u16 attr = m_ram[(2 * tile_index) + Offset];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			(attr & 0xff),
 			TILE_FLIPYX((attr & 0xc000) >> 14));
@@ -359,7 +359,7 @@ TILE_GET_INFO_MEMBER(tc0480scp_device::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(tc0480scp_device::get_tx_tile_info)
 {
 	const u16 attr = m_ram[0x6000 + tile_index]; //c000
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			attr & 0xff,
 			((attr & 0x3f00) >> 8),
 			TILE_FLIPYX((attr & 0xc000) >> 14));

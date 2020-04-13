@@ -37,6 +37,7 @@ public:
 		, m_sys_register(*this, "sys_register")
 		, m_stby_pwr(1)
 		, m_ram(*this, "ram")
+		, m_kb_lines(*this, "K%u", 1U)
 	{ }
 
 	void psion_2lines(machine_config &config);
@@ -50,7 +51,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(psion_on);
 
 protected:
-	required_device<hd63701_cpu_device> m_maincpu;
+	required_device<hd6301x_cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 	required_device<beep_device> m_beep;
 	required_device<datapack_device> m_pack1;
@@ -66,11 +67,6 @@ protected:
 	uint8_t m_stby_pwr;
 	uint8_t m_pulse;
 
-	uint8_t m_port2_ddr;  // datapack i/o ddr
-	uint8_t m_port2;      // datapack i/o data bus
-	uint8_t m_port6_ddr;  // datapack control lines ddr
-	uint8_t m_port6;      // datapack control lines
-
 	// RAM/ROM banks
 	required_shared_ptr<uint8_t> m_ram;
 	std::unique_ptr<uint8_t[]> m_paged_ram;
@@ -79,21 +75,30 @@ protected:
 	uint8_t m_ram_bank_count;
 	uint8_t m_rom_bank_count;
 
+	required_ioport_array<7> m_kb_lines;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	uint8_t kb_read();
 	void update_banks();
-	DECLARE_WRITE8_MEMBER( hd63701_int_reg_w );
-	DECLARE_READ8_MEMBER( hd63701_int_reg_r );
-	void io_rw(address_space &space, uint16_t offset);
+	void port2_w(offs_t offset, uint8_t data, uint8_t ddr);
+	uint8_t port2_r();
+	void tcsr_w(uint8_t data);
+	uint8_t tcsr_r();
+	uint8_t rcp5c_r();
+	uint8_t port5_r();
+	void port6_w(uint8_t data);
+	uint8_t port6_r();
+	void io_rw(uint16_t offset);
 	DECLARE_WRITE8_MEMBER( io_w );
 	DECLARE_READ8_MEMBER( io_r );
 	void psion_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 
 	HD44780_PIXEL_UPDATE(lz_pixel_update);
+	void psion_int_reg(address_map &map);
 	void psioncm_mem(address_map &map);
 	void psionla_mem(address_map &map);
 	void psionlam_mem(address_map &map);

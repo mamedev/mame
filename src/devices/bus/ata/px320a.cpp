@@ -75,7 +75,7 @@ void px320a_device::frcpu_map(address_map &map)
 
 void px320a_device::device_add_mconfig(machine_config &config)
 {
-	MB91101A(config, m_frcpu, 8000000); // FR type guessed; clock unknown
+	MB91F155A(config, m_frcpu, 16'000'000); // FR type guessed; clock unknown
 	m_frcpu->set_addrmap(AS_PROGRAM, &px320a_device::frcpu_map);
 }
 

@@ -12,11 +12,13 @@
 #include "machine/pc_fdc.h"
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
+#include "formats/ibmxdf_dsk.h"
 
 
 FLOPPY_FORMATS_MEMBER( isa8_fdc_device::floppy_formats )
 	FLOPPY_PC_FORMAT,
-	FLOPPY_NASLITE_FORMAT
+	FLOPPY_NASLITE_FORMAT,
+	FLOPPY_IBMXDF_FORMAT
 FLOPPY_FORMATS_END
 
 static void pc_dd_floppies(device_slot_interface &device)

@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(mastboyo_state::get_fg_tile_info)
 {
 	int code = m_fgram[tile_index];
 	int attr = m_fgram2[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			attr & 0x0f,
 			0);

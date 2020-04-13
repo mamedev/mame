@@ -379,7 +379,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_kungfum_bg_tile_info)
 	{
 		flags |= TILE_FLIPX;
 	}
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0)<< 2), color & 0x1f, flags);
+	tileinfo.set(0, code | ((color & 0xc0)<< 2), color & 0x1f, flags);
 
 	/* is the following right? */
 	if ((tile_index / 64) < 6 || ((color & 0x1f) >> 1) > 0x0c)
@@ -423,7 +423,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_ldrun_bg_tile_info)
 	{
 		flags |= TILE_FLIPX;
 	}
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0) << 2), color & 0x1f, flags);
+	tileinfo.set(0, code | ((color & 0xc0) << 2), color & 0x1f, flags);
 	if (((color & 0x1f) >> 1) >= 0x0c)
 		tileinfo.group = 1;
 	else
@@ -461,7 +461,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_ldrun2_bg_tile_info)
 	{
 		flags |= TILE_FLIPX;
 	}
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0) << 2), color & 0x1f, flags);
+	tileinfo.set(0, code | ((color & 0xc0) << 2), color & 0x1f, flags);
 	if (((color & 0x1f) >> 1) >= 0x04)
 		tileinfo.group = 1;
 	else
@@ -514,7 +514,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_battroad_bg_tile_info)
 	{
 		flags |= TILE_FLIPX;
 	}
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0x40) << 3) | ((color & 0x10) << 4), color & 0x0f, flags);
+	tileinfo.set(0, code | ((color & 0x40) << 3) | ((color & 0x10) << 4), color & 0x0f, flags);
 	if (((color & 0x1f) >> 1) >= 0x04)
 		tileinfo.group = 1;
 	else
@@ -527,7 +527,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_battroad_fg_tile_info)
 	int color;
 	code = m_m62_textram[tile_index << 1];
 	color = m_m62_textram[(tile_index << 1) | 1];
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0x40) << 3) | ((color & 0x10) << 4), color & 0x0f, 0);
+	tileinfo.set(0, code | ((color & 0x40) << 3) | ((color & 0x10) << 4), color & 0x0f, 0);
 }
 
 VIDEO_START_MEMBER(m62_state,battroad)
@@ -563,7 +563,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_ldrun4_bg_tile_info)
 	int color;
 	code = m_m62_tileram[tile_index << 1];
 	color = m_m62_tileram[(tile_index << 1) | 1];
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0) << 2) | ((color & 0x20) << 5), color & 0x1f, 0);
+	tileinfo.set(0, code | ((color & 0xc0) << 2) | ((color & 0x20) << 5), color & 0x1f, 0);
 }
 
 VIDEO_START_MEMBER(m62_state,ldrun4)
@@ -593,7 +593,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_lotlot_bg_tile_info)
 	{
 		flags |= TILE_FLIPX;
 	}
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0) << 2), color & 0x1f, flags);
+	tileinfo.set(0, code | ((color & 0xc0) << 2), color & 0x1f, flags);
 }
 
 TILE_GET_INFO_MEMBER(m62_state::get_lotlot_fg_tile_info)
@@ -602,7 +602,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_lotlot_fg_tile_info)
 	int color;
 	code = m_m62_textram[tile_index << 1];
 	color = m_m62_textram[(tile_index << 1) | 1];
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0) << 2), color & 0x1f, 0);
+	tileinfo.set(0, code | ((color & 0xc0) << 2), color & 0x1f, 0);
 }
 
 VIDEO_START_MEMBER(m62_state,lotlot)
@@ -651,7 +651,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_kidniki_bg_tile_info)
 	int color;
 	code = m_m62_tileram[tile_index << 1];
 	color = m_m62_tileram[(tile_index << 1) | 1];
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0xe0) << 3) | (m_kidniki_background_bank << 11), color & 0x1f, 0);
+	tileinfo.set(0, code | ((color & 0xe0) << 3) | (m_kidniki_background_bank << 11), color & 0x1f, 0);
 	tileinfo.group = ((color & 0xe0) == 0xe0) ? 1 : 0;
 }
 
@@ -661,7 +661,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_kidniki_fg_tile_info)
 	int color;
 	code = m_m62_textram[tile_index << 1];
 	color = m_m62_textram[(tile_index << 1) | 1];
-	SET_TILE_INFO_MEMBER(0, code | ( ( color & 0xc0 ) << 2 ), color & 0x1f, 0);
+	tileinfo.set(0, code | ( ( color & 0xc0 ) << 2 ), color & 0x1f, 0);
 }
 
 VIDEO_START_MEMBER(m62_state,kidniki)
@@ -706,7 +706,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_spelunkr_bg_tile_info)
 	int color;
 	code = m_m62_tileram[tile_index << 1];
 	color = m_m62_tileram[(tile_index << 1) | 1];
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0x10) << 4) | ((color & 0x20) << 6) | ((color & 0xc0) << 3), (color & 0x0f) | (m_spelunkr_palbank << 4), 0);
+	tileinfo.set(0, code | ((color & 0x10) << 4) | ((color & 0x20) << 6) | ((color & 0xc0) << 3), (color & 0x0f) | (m_spelunkr_palbank << 4), 0);
 }
 
 TILE_GET_INFO_MEMBER(m62_state::get_spelunkr_fg_tile_info)
@@ -716,7 +716,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_spelunkr_fg_tile_info)
 	code = m_m62_textram[tile_index << 1];
 	color = m_m62_textram[(tile_index << 1) | 1];
 	if (color & 0xe0) popmessage("fg tilemap %x %x", tile_index, color & 0xe0);
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0x10) << 4), (color & 0x0f) | (m_spelunkr_palbank << 4), 0);
+	tileinfo.set(0, code | ((color & 0x10) << 4), (color & 0x0f) | (m_spelunkr_palbank << 4), 0);
 }
 
 VIDEO_START_MEMBER(m62_state,spelunkr)
@@ -758,7 +758,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_spelunk2_bg_tile_info)
 	int color;
 	code = m_m62_tileram[tile_index << 1];
 	color = m_m62_tileram[(tile_index << 1) | 1];
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0xf0) << 4), (color & 0x0f) | (m_spelunkr_palbank << 4), 0 );
+	tileinfo.set(0, code | ((color & 0xf0) << 4), (color & 0x0f) | (m_spelunkr_palbank << 4), 0 );
 }
 
 VIDEO_START_MEMBER(m62_state,spelunk2)
@@ -788,7 +788,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_youjyudn_bg_tile_info)
 	int color;
 	code = m_m62_tileram[tile_index << 1];
 	color = m_m62_tileram[(tile_index << 1) | 1];
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0x60) << 3), color & 0x1f, 0);
+	tileinfo.set(0, code | ((color & 0x60) << 3), color & 0x1f, 0);
 	if (((color & 0x1f) >> 1) >= 0x08)
 		tileinfo.group = 1;
 	else
@@ -801,7 +801,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_youjyudn_fg_tile_info)
 	int color;
 	code = m_m62_textram[tile_index << 1];
 	color = m_m62_textram[(tile_index << 1) | 1];
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0) << 2), (color & 0x0f), 0);
+	tileinfo.set(0, code | ((color & 0xc0) << 2), (color & 0x0f), 0);
 }
 
 VIDEO_START_MEMBER(m62_state,youjyudn)
@@ -836,7 +836,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_horizon_bg_tile_info)
 {
 	int const code = m_m62_tileram[tile_index << 1];
 	int const color = m_m62_tileram[(tile_index << 1) | 1];
-	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0) << 2) | ((color & 0x20) << 5), color & 0x1f, 0);
+	tileinfo.set(0, code | ((color & 0xc0) << 2) | ((color & 0x20) << 5), color & 0x1f, 0);
 
 	if (((color & 0x1f) >> 1) >= 0x08)
 		tileinfo.group = 1;

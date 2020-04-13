@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- based on vic20tapes.org dumps -->
+<!--
+license:CC0
+
+based on vic20tapes.org dumps
+-->
 <softwarelist name="vic1001_cass" description="Commodore VIC-1001 / VIC-20 cassettes">
 
 	<software name="3dmaze">

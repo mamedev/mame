@@ -638,7 +638,7 @@ TILE_GET_INFO_MEMBER( ambush_state::ambush_char_tile_info )
 	int color = (m_color_bank << 4) | (attr & 0x0f);
 	tileinfo.category = BIT(attr, 4);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( ambush_state::mariobl_char_tile_info )
@@ -650,7 +650,7 @@ TILE_GET_INFO_MEMBER( ambush_state::mariobl_char_tile_info )
 	int code = ((attr & 0x40) << 2) | m_video_ram[tile_index];
 	int color = ((attr & 0x40) >> 2) | 8 | (m_video_ram[tile_index] >> 5);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( ambush_state::dkong3abl_char_tile_info )
@@ -663,7 +663,7 @@ TILE_GET_INFO_MEMBER( ambush_state::dkong3abl_char_tile_info )
 	int code = ((attr & 0x40) << 2) | m_video_ram[tile_index];
 	int color = (BIT(attr, 6) << 5) | (BIT(attr, 6) << 4) | (attr & 0x07);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 

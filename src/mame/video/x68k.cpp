@@ -567,7 +567,7 @@ TILE_GET_INFO_MEMBER(x68k_state::get_bg0_tile)
 	int code = m_spriteram[0x3000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
 	int flags = (m_spriteram[0x3000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(0,code,colour,flags);
+	tileinfo.set(0,code,colour,flags);
 }
 
 TILE_GET_INFO_MEMBER(x68k_state::get_bg1_tile)
@@ -575,7 +575,7 @@ TILE_GET_INFO_MEMBER(x68k_state::get_bg1_tile)
 	int code = m_spriteram[0x2000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
 	int flags = (m_spriteram[0x2000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(0,code,colour,flags);
+	tileinfo.set(0,code,colour,flags);
 }
 
 TILE_GET_INFO_MEMBER(x68k_state::get_bg0_tile_16)
@@ -583,7 +583,7 @@ TILE_GET_INFO_MEMBER(x68k_state::get_bg0_tile_16)
 	int code = m_spriteram[0x3000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
 	int flags = (m_spriteram[0x3000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(1,code,colour,flags);
+	tileinfo.set(1,code,colour,flags);
 }
 
 TILE_GET_INFO_MEMBER(x68k_state::get_bg1_tile_16)
@@ -591,7 +591,7 @@ TILE_GET_INFO_MEMBER(x68k_state::get_bg1_tile_16)
 	int code = m_spriteram[0x2000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
 	int flags = (m_spriteram[0x2000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(1,code,colour,flags);
+	tileinfo.set(1,code,colour,flags);
 }
 
 void x68k_state::video_start()
