@@ -77,8 +77,8 @@ public:
 	auto hblank_wr_callback() { return m_write_hblank.bind(); }
 	auto db_rd_callback() { return m_read_db.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
 	DECLARE_READ_LINE_MEMBER( kbd_r );
