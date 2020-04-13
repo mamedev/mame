@@ -560,6 +560,15 @@ void abc800_state::abc800m_io(address_map &map)
 	map(0x39, 0x39).mirror(0xff06).w(MC6845_TAG, FUNC(mc6845_device::register_w));
 }
 
+//-------------------------------------------------
+//  ADDRESS_MAP( abc802_m1 )
+//-------------------------------------------------
+
+void abc802_state::abc802_m1(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(abc802_state::m1_r));
+}
+
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc802_mem )
@@ -1184,6 +1193,7 @@ void abc802_state::abc802(machine_config &config)
 	common(config);
 
 	// basic machine hardware
+	m_maincpu->set_addrmap(AS_OPCODES, &abc802_state::abc802_m1);
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc802_state::abc802_mem);
 	m_maincpu->set_addrmap(AS_IO, &abc802_state::abc802_io);
 

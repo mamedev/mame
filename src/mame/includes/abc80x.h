@@ -254,8 +254,9 @@ public:
 
 	void abc802(machine_config &config);
 	void abc802_video(machine_config &config);
-	void abc802_io(address_map &map);
+	void abc802_m1(address_map &map);
 	void abc802_mem(address_map &map);
+	void abc802_io(address_map &map);
 };
 
 
