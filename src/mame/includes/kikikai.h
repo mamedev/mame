@@ -2,6 +2,7 @@
 // copyright-holders:Ernesto Corvi
 
 #include "cpu/m6805/m68705.h"
+#include "cpu/m6800/m6801.h"
 
 #include "sound/2203intf.h"
 #include "emupal.h"
@@ -12,12 +13,13 @@ class mexico86_state : public driver_device
 public:
 	mexico86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_protection_ram(*this, "protection_ram"),
+		m_mcu_sharedram(*this, "mcu_sharedram"),
 		m_mainram(*this, "mainram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
-		m_68705mcu(*this, "mcu"),
+		m_mcu(*this, "mcu"),
+		m_68705mcu(*this, "68705mcu"),
 		m_ymsnd(*this, "ymsnd"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -29,10 +31,11 @@ public:
 	void mexico86(machine_config &config);
 	void mexico86_68705(machine_config &config);
 	void kikikai(machine_config &config);
+	void kicknrun(machine_config &config);
 
 private:
 	/* memory pointers */
-	required_shared_ptr<u8> m_protection_ram;
+	required_shared_ptr<u8> m_mcu_sharedram;
 	required_shared_ptr<u8> m_mainram;
 
 	/* video-related */
@@ -45,8 +48,8 @@ private:
 	int      m_address;
 	u8       m_latch;
 	/* kikikai mcu simulation */
-	int      m_68705mcu_running;
-	int      m_68705mcu_initialised;
+	int      m_kikikai_simulated_mcu_running;
+	int      m_kikikai_simulated_mcu_initialised;
 	bool     m_coin_last[2];
 	u8       m_coin_fract;
 
@@ -54,6 +57,7 @@ private:
 	required_device<cpu_device>         m_maincpu;
 	required_device<cpu_device>         m_audiocpu;
 	optional_device<cpu_device>         m_subcpu;
+	optional_device<cpu_device>			m_mcu;
 	optional_device<m68705p_device>     m_68705mcu;
 	required_device<ym2203_device>      m_ymsnd;
 	required_device<gfxdecode_device>   m_gfxdecode;
@@ -81,4 +85,5 @@ private:
 	void mexico86_map(address_map &map);
 	void mexico86_sound_map(address_map &map);
 	void mexico86_sub_cpu_map(address_map &map);
+	void mcu_map(address_map& map);
 };
